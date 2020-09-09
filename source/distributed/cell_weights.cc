@@ -84,9 +84,8 @@ namespace parallel
         std::trunc(coefficients.first *
                    std::pow(future_fe.n_dofs_per_cell(), coefficients.second));
 
-      Assert(result >= 0. &&
-               result <=
-                 static_cast<float>(std::numeric_limits<unsigned int>::max()),
+      Assert(result >= 0. DEAL_II_AND result <=
+               static_cast<float>(std::numeric_limits<unsigned int>::max()),
              ExcMessage(
                "Cannot cast determined weight for this cell to unsigned int!"));
 
@@ -110,9 +109,8 @@ namespace parallel
           pair.first * std::pow(future_fe.n_dofs_per_cell(), pair.second);
       result = std::trunc(result);
 
-      Assert(result >= 0. &&
-               result <=
-                 static_cast<float>(std::numeric_limits<unsigned int>::max()),
+      Assert(result >= 0. DEAL_II_AND result <=
+               static_cast<float>(std::numeric_limits<unsigned int>::max()),
              ExcMessage(
                "Cannot cast determined weight for this cell to unsigned int!"));
 
@@ -169,9 +167,9 @@ namespace parallel
   {
     // Check if we are still working with the correct combination of
     // Triangulation and DoFHandler.
-    AssertThrow(&triangulation == &(dof_handler.get_triangulation()),
-                ExcMessage(
-                  "Triangulation associated with the DoFHandler has changed!"));
+    AssertThrow(
+      &triangulation DEAL_II_EQUALS & (dof_handler.get_triangulation()),
+      ExcMessage("Triangulation associated with the DoFHandler has changed!"));
 
     // Convert cell type from Triangulation to DoFHandler to be able
     // to access the information about the degrees of freedom.
@@ -196,7 +194,7 @@ namespace parallel
                  ++child_index)
               {
                 const auto &child = cell->child(child_index);
-                Assert(child->is_active() && child->coarsen_flag_set(),
+                Assert(child->is_active() DEAL_II_AND child->coarsen_flag_set(),
                        typename dealii::Triangulation<
                          dim>::ExcInconsistentCoarseningFlags());
 

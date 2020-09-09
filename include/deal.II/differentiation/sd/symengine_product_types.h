@@ -75,8 +75,8 @@ namespace internal
       T,
       Differentiation::SD::Expression,
       typename std::enable_if<
-        boost::is_complex<T>::value &&
-        std::is_arithmetic<typename T::value_type>::value>::type>
+        boost::is_complex<T>::value DEAL_II_AND
+                                    std::is_arithmetic<typename T::value_type>::value>::type>
     {
       using type = Differentiation::SD::Expression;
     };

@@ -92,7 +92,7 @@ namespace internal
       n_dimensions                 = dim;
       n_components                 = fe_in.n_components();
 
-      Assert(fe->n_components() == 1,
+      Assert(fe->n_components() DEAL_II_EQUALS 1,
              ExcMessage("FEEvaluation only works for scalar finite elements."));
 
       // assuming isotropy of dimensions and components
@@ -136,7 +136,7 @@ namespace internal
       Point<dim>                unit_point;
       {
         // find numbering to lexicographic
-        Assert(fe->n_components() == 1,
+        Assert(fe->n_components() DEAL_II_EQUALS 1,
                ExcMessage("Expected a scalar element"));
 
         const FE_Poly<dim, dim> *fe_poly =
@@ -147,13 +147,14 @@ namespace internal
         const FE_Q_DG0<dim> *fe_q_dg0 = dynamic_cast<const FE_Q_DG0<dim> *>(fe);
 
         element_type = tensor_general;
-        if (fe_poly != nullptr &&
-            (dynamic_cast<const TensorProductPolynomials<dim> *>(
-               &fe_poly->get_poly_space()) != nullptr ||
-             dynamic_cast<const TensorProductPolynomials<
-                 dim,
-                 Polynomials::PiecewisePolynomial<double>> *>(
-               &fe_poly->get_poly_space()) != nullptr))
+        if (fe_poly !=
+            nullptr DEAL_II_AND(
+              dynamic_cast<const TensorProductPolynomials<dim> *>(
+                &fe_poly->get_poly_space()) !=
+              nullptr DEAL_II_OR dynamic_cast<const TensorProductPolynomials<
+                dim,
+                Polynomials::PiecewisePolynomial<double>> *>(
+                &fe_poly->get_poly_space()) != nullptr))
           scalar_lexicographic = fe_poly->get_poly_space_numbering_inverse();
         else if (fe_dgp != nullptr)
           {
@@ -167,7 +168,7 @@ namespace internal
             scalar_lexicographic = fe_q_dg0->get_poly_space_numbering_inverse();
             element_type         = tensor_symmetric_plus_dg0;
           }
-        else if (fe->n_dofs_per_cell() == 0)
+        else if (fe->n_dofs_per_cell() DEAL_II_EQUALS 0)
           {
             // FE_Nothing case -> nothing to do here
           }
@@ -176,7 +177,7 @@ namespace internal
 
         // Finally store the renumbering into the member variable of this
         // class
-        if (fe_in.n_components() == 1)
+        if (fe_in.n_components() DEAL_II_EQUALS 1)
           lexicographic_numbering = scalar_lexicographic;
         else
           {
@@ -214,14 +215,15 @@ namespace internal
           }
 
         // to evaluate 1D polynomials, evaluate along the line with the first
-        // unit support point, assuming that fe.shape_value(0,unit_point) ==
+        // unit support point, assuming that fe.shape_value(0,unit_point)
+        // DEAL_II_EQUALS
         // 1. otherwise, need other entry point (e.g. generating a 1D element
         // by reading the name, as done before r29356)
         if (fe->has_support_points())
           unit_point = fe->get_unit_support_points()[scalar_lexicographic[0]];
-        Assert(fe->n_dofs_per_cell() == 0 ||
-                 std::abs(fe->shape_value(scalar_lexicographic[0], unit_point) -
-                          1) < 1e-13,
+        Assert(fe->n_dofs_per_cell() DEAL_II_EQUALS 0 DEAL_II_OR std::abs(
+                 fe->shape_value(scalar_lexicographic[0], unit_point) - 1) <
+                 1e-13,
                ExcInternalError("Could not decode 1D shape functions for the "
                                 "element " +
                                 fe->get_name()));
@@ -437,14 +439,15 @@ namespace internal
             }
         }
 
-      if (element_type == tensor_general &&
-          check_1d_shapes_symmetric(univariate_shape_data))
+      if (element_type DEAL_II_EQUALS tensor_general DEAL_II_AND
+                                                     check_1d_shapes_symmetric(univariate_shape_data))
         {
           if (check_1d_shapes_collocation(univariate_shape_data))
             element_type = tensor_symmetric_collocation;
           else
             element_type = tensor_symmetric;
-          if (n_dofs_1d > 2 && element_type == tensor_symmetric)
+          if (n_dofs_1d >
+              2 DEAL_II_AND element_type DEAL_II_EQUALS tensor_symmetric)
             {
               // check if we are a Hermite type
               element_type = tensor_symmetric_hermite;
@@ -458,18 +461,17 @@ namespace internal
                   element_type = tensor_symmetric;
             }
         }
-      else if (element_type == tensor_symmetric_plus_dg0)
+      else if (element_type DEAL_II_EQUALS tensor_symmetric_plus_dg0)
         check_1d_shapes_symmetric(univariate_shape_data);
 
       nodal_at_cell_boundaries = true;
       for (unsigned int i = 1; i < n_dofs_1d; ++i)
         if (std::abs(get_first_array_element(shape_data_on_face[0][i])) >
-              1e-13 ||
-            std::abs(get_first_array_element(shape_data_on_face[1][i - 1])) >
-              1e-13)
+            1e-13 DEAL_II_OR std::abs(
+              get_first_array_element(shape_data_on_face[1][i - 1])) > 1e-13)
           nodal_at_cell_boundaries = false;
 
-      if (nodal_at_cell_boundaries == true)
+      if (nodal_at_cell_boundaries DEAL_II_EQUALS true)
         {
           face_to_cell_index_nodal.reinit(GeometryInfo<dim>::faces_per_cell,
                                           dofs_per_component_on_face);
@@ -483,7 +485,9 @@ namespace internal
                 shift *= fe_degree + 1;
               const unsigned int offset = (f % 2) * fe_degree * shift;
 
-              if (direction == 0 || direction == dim - 1)
+              if (direction DEAL_II_EQUALS 0 DEAL_II_OR direction DEAL_II_EQUALS
+                                                                  dim -
+                  1)
                 for (unsigned int i = 0; i < dofs_per_component_on_face; ++i)
                   face_to_cell_index_nodal(f, i) = offset + i * stride;
               else
@@ -503,7 +507,7 @@ namespace internal
 
           // face orientation for faces in 3D
           // (similar to MappingInfoStorage::QuadratureDescriptor::initialize)
-          if (dim == 3)
+          if (dim DEAL_II_EQUALS 3)
             {
               const unsigned int n = fe_degree + 1;
               face_orientations.reinit(8, n * n);
@@ -542,7 +546,7 @@ namespace internal
             }
         }
 
-      if (element_type == tensor_symmetric_hermite)
+      if (element_type DEAL_II_EQUALS tensor_symmetric_hermite)
         {
           face_to_cell_index_hermite.reinit(GeometryInfo<dim>::faces_per_cell,
                                             2 * dofs_per_component_on_face);
@@ -555,10 +559,12 @@ namespace internal
               for (unsigned int d = 0; d < direction; ++d)
                 shift *= fe_degree + 1;
               const unsigned int offset = (f % 2) * fe_degree * shift;
-              if (f % 2 == 1)
+              if (f % 2 DEAL_II_EQUALS 1)
                 shift = -shift;
 
-              if (direction == 0 || direction == dim - 1)
+              if (direction DEAL_II_EQUALS 0 DEAL_II_OR direction DEAL_II_EQUALS
+                                                                  dim -
+                  1)
                 for (unsigned int i = 0; i < dofs_per_component_on_face; ++i)
                   {
                     face_to_cell_index_hermite(f, 2 * i) = offset + i * stride;
@@ -592,7 +598,7 @@ namespace internal
     ShapeInfo<Number>::check_1d_shapes_symmetric(
       UnivariateShapeData<Number> &univariate_shape_data)
     {
-      if (dofs_per_component_on_cell == 0)
+      if (dofs_per_component_on_cell DEAL_II_EQUALS 0)
         return false;
 
       const auto n_q_points_1d   = univariate_shape_data.n_q_points_1d;
@@ -615,8 +621,8 @@ namespace internal
       auto &inverse_shape_values_eo =
         univariate_shape_data.inverse_shape_values_eo;
 
-      const double zero_tol =
-        std::is_same<Number, double>::value == true ? 1e-12 : 1e-7;
+      const double                          zero_tol =
+        std::is_same<Number, double>::value DEAL_II_EQUALS true ? 1e-12 : 1e-7;
       // symmetry for values
       const unsigned int n_dofs_1d = fe_degree + 1;
       for (unsigned int i = 0; i < (n_dofs_1d + 1) / 2; ++i)
@@ -631,7 +637,9 @@ namespace internal
 
       // shape values should be zero at x=0.5 for all basis functions except
       // for the middle one for degrees of 4 and higher
-      if (n_dofs_1d > 3 && n_q_points_1d % 2 == 1 && n_dofs_1d % 2 == 1)
+      if (n_dofs_1d > 3 DEAL_II_AND                    n_q_points_1d %
+                        2 DEAL_II_EQUALS 1 DEAL_II_AND n_dofs_1d %
+                        2 DEAL_II_EQUALS 1)
         {
           for (unsigned int i = 0; i < n_dofs_1d / 2; ++i)
             if (std::abs(get_first_array_element(
@@ -652,7 +660,8 @@ namespace internal
                 shape_gradients[(n_dofs_1d - i) * n_q_points_1d - j - 1])) >
               zero_tol_gradient)
             return false;
-      if (n_dofs_1d % 2 == 1 && n_q_points_1d % 2 == 1)
+      if (n_dofs_1d % 2 DEAL_II_EQUALS 1 DEAL_II_AND n_q_points_1d %
+          2 DEAL_II_EQUALS 1)
         if (std::abs(get_first_array_element(
               shape_gradients[(n_dofs_1d / 2) * n_q_points_1d +
                               (n_q_points_1d / 2)])) > zero_tol_gradient)
@@ -685,7 +694,7 @@ namespace internal
                 0.5 *
                 (array[i * n_cols + q] - array[i * n_cols + n_cols - 1 - q]);
             }
-        if ((n_rows - 1) % 2 == 0)
+        if ((n_rows - 1) % 2 DEAL_II_EQUALS 0)
           for (unsigned int q = 0; q < stride; ++q)
             {
               array_eo[(n_rows - 1) / 2 * stride + q] =
@@ -734,8 +743,8 @@ namespace internal
       const auto fe_degree    = univariate_shape_data.fe_degree;
       auto &     shape_values = univariate_shape_data.shape_values;
 
-      const double zero_tol =
-        std::is_same<Number, double>::value == true ? 1e-12 : 1e-7;
+      const double                          zero_tol =
+        std::is_same<Number, double>::value DEAL_II_EQUALS true ? 1e-12 : 1e-7;
       // check: identity operation for shape values
       const unsigned int n_points_1d = fe_degree + 1;
       for (unsigned int i = 0; i < n_points_1d; ++i)

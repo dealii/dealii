@@ -448,7 +448,7 @@ public:
   FESystem(const std::vector<const FiniteElement<dim, spacedim> *> &fes,
            const std::vector<unsigned int> &multiplicities);
 
-#  if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
+#  if !defined(__INTEL_COMPILER) DEAL_II_OR __INTEL_COMPILER >= 1900
   /**
    * Constructor taking an arbitrary number of parameters of type
    * <code>std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned
@@ -496,9 +496,9 @@ public:
     typename = typename enable_if_all<
       (std::is_same<typename std::decay<FEPairs>::type,
                     std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
-                              unsigned int>>::value ||
-       std::is_base_of<FiniteElement<dim, spacedim>,
-                       typename std::decay<FEPairs>::type>::value)...>::type>
+                              unsigned int>>::value DEAL_II_OR
+                                                    std::is_base_of<FiniteElement<dim, spacedim>,
+                         typename std::decay<FEPairs>::type>::value)...>::type>
   FESystem(FEPairs &&... fe_pairs);
 
   /**
@@ -528,7 +528,7 @@ public:
   /**
    * Move constructor.
    */
-  FESystem(FESystem<dim, spacedim> &&other_fe_system) noexcept
+  FESystem(FESystem<dim, spacedim> DEAL_II_AND other_fe_system) noexcept
     : FiniteElement<dim, spacedim>(std::move(other_fe_system))
   {
     base_elements = std::move(other_fe_system.base_elements);
@@ -1088,8 +1088,9 @@ protected:
    *
    * Calls (among other things) <tt>fill_fe_([sub]face)_values</tt> of the
    * base elements. Calls @p fill_fe_values if
-   * <tt>face_no==invalid_face_no</tt> and <tt>sub_no==invalid_face_no</tt>;
-   * calls @p fill_fe_face_values if <tt>face_no==invalid_face_no</tt> and
+   * <tt>face_noDEAL_II_EQUALS invalid_face_no</tt> and <tt>sub_noDEAL_II_EQUALS
+   * invalid_face_no</tt>;
+   * calls @p fill_fe_face_values if <tt>face_noDEAL_II_EQUALS invalid_face_no</tt> and
    * <tt>sub_no!=invalid_face_no</tt>; and calls @p fill_fe_subface_values if
    * <tt>face_no!=invalid_face_no</tt> and <tt>sub_no!=invalid_face_no</tt>.
    */
@@ -1132,7 +1133,7 @@ private:
    * It holds true that
    * @code
    *   auto n = generalized_support_points_index_table[i][j];
-   *   generalized_support_points[n] ==
+   *   generalized_support_points[n] DEAL_II_EQUALS
    *           base_elements[i].generalized_support_points[j];
    * @endcode
    * for each base element (indexed by i) and each g. s. point of the base
@@ -1283,7 +1284,7 @@ namespace internal
     template <int dim, int spacedim>
     auto
     promote_to_fe_pair(std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
-                                 unsigned int> &&p)
+                                 unsigned int> DEAL_II_AND p)
       -> decltype(
         std::forward<std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
                                unsigned int>>(p))
@@ -1297,7 +1298,7 @@ namespace internal
 
 
 
-#    if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
+#    if !defined(__INTEL_COMPILER) DEAL_II_OR __INTEL_COMPILER >= 1900
 // We are just forwarding/delegating to the constructor taking a
 // std::initializer_list. If we decide to remove the deprecated constructors, we
 // might just use the variadic constructor with a suitable static_assert instead

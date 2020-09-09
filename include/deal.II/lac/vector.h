@@ -163,7 +163,7 @@ public:
    * Move constructor. Creates a new vector by stealing the internal data of
    * the vector @p v.
    */
-  Vector(Vector<Number> &&v) noexcept = default;
+  Vector(Vector<Number> DEAL_II_AND v) noexcept = default;
 
   /**
    * Copy constructor taking a vector of another data type.
@@ -271,11 +271,11 @@ public:
   /**
    * Change the dimension of the vector to @p N. The reserved memory for this
    * vector remains unchanged if possible, to make things faster; this may
-   * waste some memory, so keep this in mind.  However, if <tt>N==0</tt> all
-   * memory is freed, i.e. if you want to resize the vector and release the
-   * memory not needed, you have to first call <tt>reinit(0)</tt> and then
-   * <tt>reinit(N)</tt>. This cited behaviour is analogous to that of the
-   * standard library containers.
+   * waste some memory, so keep this in mind.  However, if <tt>NDEAL_II_EQUALS
+   * 0</tt> all memory is freed, i.e. if you want to resize the vector and
+   * release the memory not needed, you have to first call <tt>reinit(0)</tt>
+   * and then <tt>reinit(N)</tt>. This cited behaviour is analogous to that of
+   * the standard library containers.
    *
    * If @p omit_zeroing_entries is false, the vector is filled by zeros.
    * Otherwise, the elements are left an unspecified state.
@@ -380,7 +380,7 @@ public:
    * have after being newly default-constructed.
    */
   Vector<Number> &
-  operator=(Vector<Number> &&v) noexcept = default;
+  operator=(Vector<Number> DEAL_II_AND v) noexcept = default;
 
   /**
    * Copy the given vector. Resize the present vector if necessary.
@@ -440,8 +440,7 @@ public:
    * of different sizes makes not much sense anyway.
    */
   template <typename Number2>
-  bool
-  operator==(const Vector<Number2> &v) const;
+  bool operator DEAL_II_EQUALS(const Vector<Number2> &v) const;
 
   /**
    * Test for inequality. This function assumes that the present vector and
@@ -935,7 +934,8 @@ public:
    * form disjoint sets that add up to the complete index set. Obviously, if a
    * vector is created on only one processor, then the result would satisfy
    * @code
-   *   vec.locally_owned_elements() == complete_index_set (vec.size())
+   *   vec.locally_owned_elements() DEAL_II_EQUALS  complete_index_set
+   * (vec.size())
    * @endcode
    *
    * Since the current data type does not support parallel data storage across
@@ -1232,7 +1232,7 @@ inline void
 Vector<Number>::add(const std::vector<size_type> &  indices,
                     const std::vector<OtherNumber> &values)
 {
-  Assert(indices.size() == values.size(),
+  Assert(indices.size() DEAL_II_EQUALS values.size(),
          ExcDimensionMismatch(indices.size(), values.size()));
   add(indices.size(), indices.data(), values.data());
 }
@@ -1245,7 +1245,7 @@ inline void
 Vector<Number>::add(const std::vector<size_type> &indices,
                     const Vector<OtherNumber> &   values)
 {
-  Assert(indices.size() == values.size(),
+  Assert(indices.size() DEAL_II_EQUALS values.size(),
          ExcDimensionMismatch(indices.size(), values.size()));
   add(indices.size(), indices.data(), values.values.begin());
 }
@@ -1278,7 +1278,7 @@ template <typename Number2>
 inline bool
 Vector<Number>::operator!=(const Vector<Number2> &v) const
 {
-  return !(*this == v);
+  return !(*this DEAL_II_EQUALS v);
 }
 
 

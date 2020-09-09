@@ -205,8 +205,7 @@ public:
   /**
    * Return whether this object and the argument are identical.
    */
-  bool
-  operator==(const ComponentMask &mask) const;
+  bool operator DEAL_II_EQUALS(const ComponentMask &mask) const;
 
   /**
    * Return whether this object and the argument are not identical.
@@ -287,7 +286,7 @@ inline bool ComponentMask::operator[](const unsigned int component_index) const
 {
   // if the mask represents the all-component mask
   // then always return true
-  if (component_mask.size() == 0)
+  if (component_mask.size() DEAL_II_EQUALS 0)
     return true;
   else
     {
@@ -302,18 +301,19 @@ inline bool ComponentMask::operator[](const unsigned int component_index) const
 inline bool
 ComponentMask::represents_n_components(const unsigned int n) const
 {
-  return ((component_mask.size() == 0) || (component_mask.size() == n));
+  return ((component_mask.size() DEAL_II_EQUALS 0)DEAL_II_OR(
+    component_mask.size() DEAL_II_EQUALS n));
 }
 
 
 inline unsigned int
 ComponentMask::n_selected_components(const unsigned int n) const
 {
-  if ((n != numbers::invalid_unsigned_int) && (size() > 0))
+  if ((n != numbers::invalid_unsigned_int) DEAL_II_AND(size() > 0))
     AssertDimension(n, size());
 
   const unsigned int real_n = (n != numbers::invalid_unsigned_int ? n : size());
-  if (component_mask.size() == 0)
+  if (component_mask.size() DEAL_II_EQUALS 0)
     return real_n;
   else
     {
@@ -328,15 +328,15 @@ ComponentMask::n_selected_components(const unsigned int n) const
 inline unsigned int
 ComponentMask::first_selected_component(const unsigned int n) const
 {
-  if ((n != numbers::invalid_unsigned_int) && (size() > 0))
+  if ((n != numbers::invalid_unsigned_int) DEAL_II_AND(size() > 0))
     AssertDimension(n, size());
 
-  if (component_mask.size() == 0)
+  if (component_mask.size() DEAL_II_EQUALS 0)
     return 0;
   else
     {
       for (unsigned int c = 0; c < component_mask.size(); ++c)
-        if (component_mask[c] == true)
+        if (component_mask[c] DEAL_II_EQUALS true)
           return c;
 
       Assert(false, ExcMessage("No component is selected at all!"));
@@ -349,7 +349,7 @@ ComponentMask::first_selected_component(const unsigned int n) const
 inline bool
 ComponentMask::represents_the_all_selected_mask() const
 {
-  return (component_mask.size() == 0);
+  return (component_mask.size() DEAL_II_EQUALS 0);
 }
 
 
@@ -359,9 +359,9 @@ ComponentMask::operator|(const ComponentMask &mask) const
 {
   // if one of the two masks denotes the all-component mask,
   // then return the other one
-  if (component_mask.size() == 0)
+  if (component_mask.size() DEAL_II_EQUALS 0)
     return mask;
-  else if (mask.component_mask.size() == 0)
+  else if (mask.component_mask.size() DEAL_II_EQUALS 0)
     return *this;
   else
     {
@@ -370,7 +370,7 @@ ComponentMask::operator|(const ComponentMask &mask) const
       AssertDimension(component_mask.size(), mask.component_mask.size());
       std::vector<bool> new_mask(component_mask.size());
       for (unsigned int i = 0; i < component_mask.size(); ++i)
-        new_mask[i] = (component_mask[i] || mask.component_mask[i]);
+        new_mask[i] = (component_mask[i] DEAL_II_OR mask.component_mask[i]);
 
       return new_mask;
     }
@@ -381,9 +381,9 @@ inline ComponentMask ComponentMask::operator&(const ComponentMask &mask) const
 {
   // if one of the two masks denotes the all-component mask,
   // then return the other one
-  if (component_mask.size() == 0)
+  if (component_mask.size() DEAL_II_EQUALS 0)
     return mask;
-  else if (mask.component_mask.size() == 0)
+  else if (mask.component_mask.size() DEAL_II_EQUALS 0)
     return *this;
   else
     {
@@ -392,17 +392,17 @@ inline ComponentMask ComponentMask::operator&(const ComponentMask &mask) const
       AssertDimension(component_mask.size(), mask.component_mask.size());
       std::vector<bool> new_mask(component_mask.size());
       for (unsigned int i = 0; i < component_mask.size(); ++i)
-        new_mask[i] = (component_mask[i] && mask.component_mask[i]);
+        new_mask[i] = (component_mask[i] DEAL_II_AND mask.component_mask[i]);
 
       return new_mask;
     }
 }
 
 
-inline bool
-ComponentMask::operator==(const ComponentMask &mask) const
+inline bool ComponentMask::
+            operator DEAL_II_EQUALS(const ComponentMask &mask) const
 {
-  return component_mask == mask.component_mask;
+  return component_mask DEAL_II_EQUALS mask.component_mask;
 }
 
 

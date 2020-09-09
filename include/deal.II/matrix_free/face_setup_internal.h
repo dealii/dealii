@@ -167,7 +167,7 @@ namespace internal
       const bool                        hold_all_faces_to_owned_cells,
       std::vector<std::pair<unsigned int, unsigned int>> &cell_levels)
     {
-      use_active_cells = mg_level == numbers::invalid_unsigned_int;
+      use_active_cells = mg_level DEAL_II_EQUALS numbers::invalid_unsigned_int;
 
 #  ifdef DEBUG
       // safety check
@@ -199,13 +199,15 @@ namespace internal
             triangulation.locally_owned_subdomain();
           for (unsigned int i = 0; i < cell_levels.size(); ++i)
             {
-              if (i > 0 && cell_levels[i] == cell_levels[i - 1])
+              if (i > 0 DEAL_II_AND cell_levels[i] DEAL_II_EQUALS
+                                    cell_levels[i - 1])
                 continue;
               typename dealii::Triangulation<dim>::cell_iterator dcell(
                 &triangulation, cell_levels[i].first, cell_levels[i].second);
               for (const unsigned int f : dcell->face_indices())
                 {
-                  if (dcell->at_boundary(f) && !dcell->has_periodic_neighbor(f))
+                  if (dcell->at_boundary(f)
+                        DEAL_II_AND !dcell->has_periodic_neighbor(f))
                     continue;
                   typename dealii::Triangulation<dim>::cell_iterator neighbor =
                     dcell->neighbor_or_periodic_neighbor(f);
@@ -215,7 +217,7 @@ namespace internal
                   // the number of inner faces in order to balance the remaining
                   // faces properly
                   const CellId id_mine = dcell->id();
-                  if (use_active_cells && neighbor->has_children())
+                  if (use_active_cells DEAL_II_AND neighbor->has_children())
                     for (unsigned int c = 0;
                          c < (dcell->has_periodic_neighbor(f) ?
                                 dcell->periodic_neighbor(f)
@@ -243,8 +245,8 @@ namespace internal
                       const types::subdomain_id neigh_domain =
                         use_active_cells ? neighbor->subdomain_id() :
                                            neighbor->level_subdomain_id();
-                      if (neighbor->level() < dcell->level() &&
-                          use_active_cells)
+                      if (neighbor->level() < dcell->level()
+                                                DEAL_II_AND use_active_cells)
                         {
                           if (my_domain < neigh_domain)
                             inner_faces_at_proc_boundary[neigh_domain]
@@ -253,8 +255,8 @@ namespace internal
                             inner_faces_at_proc_boundary[neigh_domain]
                               .n_hanging_faces_larger_subdomain++;
                         }
-                      else if (neighbor->level() == dcell->level() &&
-                               my_domain != neigh_domain)
+                      else if (neighbor->level() DEAL_II_EQUALS dcell->level()
+                                 DEAL_II_AND my_domain != neigh_domain)
                         {
                           // always list the cell whose owner has the lower
                           // subdomain id first. this applies to both processors
@@ -289,7 +291,7 @@ namespace internal
               // safety check: both involved processors should see the same list
               // because the pattern of ghosting is symmetric. We test this by
               // looking at the length of the lists of faces
-#  if defined(DEAL_II_WITH_MPI) && defined(DEBUG)
+#  if defined(DEAL_II_WITH_MPI) DEAL_II_AND defined(DEBUG)
               MPI_Comm comm = MPI_COMM_SELF;
               if (const dealii::parallel::TriangulationBase<dim> *ptria =
                     dynamic_cast<const dealii::parallel::TriangulationBase<dim>
@@ -382,8 +384,10 @@ namespace internal
                   for (unsigned int i = 1;
                        i < inner_face.second.shared_faces.size();
                        ++i)
-                    if (inner_face.second.shared_faces[i].first ==
-                        inner_face.second.shared_faces[i - 1 - count].first)
+                    if (inner_face.second.shared_faces[i]
+                          .first DEAL_II_EQUALS inner_face.second
+                          .shared_faces[i - 1 - count]
+                          .first)
                       ++count;
                     else
                       {
@@ -403,8 +407,8 @@ namespace internal
                   // other_range rather than `shared_faces`.
                   count = 0;
                   for (unsigned int i = 1; i < other_range.size(); ++i)
-                    if (std::get<0>(other_range[i]) ==
-                        std::get<0>(other_range[i - 1 - count]))
+                    if (std::get<0>(other_range[i]) DEAL_II_EQUALS std::get<0>(
+                          other_range[i - 1 - count]))
                       ++count;
                     else
                       {
@@ -413,19 +417,19 @@ namespace internal
                           {
                             for (unsigned int k = 0; k <= count; ++k)
                               {
-                                Assert(inner_face.second
-                                           .shared_faces[std::get<2>(
-                                             other_range[i - 1])]
-                                           .second ==
-                                         inner_face.second
-                                           .shared_faces[std::get<2>(
-                                             other_range[i - 1 - k])]
-                                           .second,
-                                       ExcInternalError());
+                                Assert(
+                                  inner_face.second
+                                    .shared_faces[std::get<2>(
+                                      other_range[i - 1])]
+                                    .second DEAL_II_EQUALS inner_face.second
+                                    .shared_faces[std::get<2>(
+                                      other_range[i - 1 - k])]
+                                    .second,
+                                  ExcInternalError());
                                 // only assign to -1 if higher rank was not
                                 // yet set
                                 if (assignment[std::get<2>(
-                                      other_range[i - 1 - k])] == 0)
+                                      other_range[i - 1 - k])] DEAL_II_EQUALS 0)
                                   {
                                     assignment[std::get<2>(
                                       other_range[i - 1 - k])] = -1;
@@ -462,7 +466,7 @@ namespace internal
                               n_faces_higher_proc - n_faces_lower_proc;
 
                 // make sure the splitting is consistent between both sides
-#  if defined(DEAL_II_WITH_MPI) && defined(DEBUG)
+#  if defined(DEAL_II_WITH_MPI) DEAL_II_AND defined(DEBUG)
               MPI_Sendrecv(&split_index,
                            1,
                            MPI_UNSIGNED,
@@ -520,15 +524,15 @@ namespace internal
                                  owned_faces_higher.size());
 
               unsigned int i = 0, c = 0;
-              for (; i < assignment.size() && c < split_index; ++i)
-                if (assignment[i] == 0)
+              for (; i < assignment.size() DEAL_II_AND c < split_index; ++i)
+                if (assignment[i] DEAL_II_EQUALS 0)
                   {
                     owned_faces_lower.push_back(
                       inner_face.second.shared_faces[i]);
                     ++c;
                   }
               for (; i < assignment.size(); ++i)
-                if (assignment[i] == 0)
+                if (assignment[i] DEAL_II_EQUALS 0)
                   {
                     owned_faces_higher.push_back(
                       inner_face.second.shared_faces[i]);
@@ -547,7 +551,8 @@ namespace internal
               AssertDimension(check_faces.size(),
                               inner_face.second.shared_faces.size());
               for (unsigned int i = 0; i < check_faces.size(); ++i)
-                Assert(check_faces[i] == inner_face.second.shared_faces[i],
+                Assert(check_faces[i] DEAL_II_EQUALS inner_face.second
+                         .shared_faces[i],
                        ExcInternalError());
 #  endif
 
@@ -573,17 +578,19 @@ namespace internal
             Assert(dcell->is_active(), ExcNotImplemented());
           for (const auto f : dcell->face_indices())
             {
-              if (dcell->at_boundary(f) && !dcell->has_periodic_neighbor(f))
+              if (dcell->at_boundary(f)
+                    DEAL_II_AND !dcell->has_periodic_neighbor(f))
                 face_is_owned[dcell->face(f)->index()] =
                   FaceCategory::locally_active_at_boundary;
 
               // treat boundaries of cells of different refinement level
               // inside the domain in case of multigrid separately
-              else if ((dcell->at_boundary(f) == false ||
-                        dcell->has_periodic_neighbor(f)) &&
-                       mg_level != numbers::invalid_unsigned_int &&
-                       dcell->neighbor_or_periodic_neighbor(f)->level() <
-                         dcell->level())
+              else if ((dcell
+                          ->at_boundary(f) DEAL_II_EQUALS false DEAL_II_OR dcell
+                          ->has_periodic_neighbor(f))DEAL_II_AND mg_level !=
+                       numbers::invalid_unsigned_int DEAL_II_AND dcell
+                           ->neighbor_or_periodic_neighbor(f)
+                           ->level() < dcell->level())
                 {
                   face_is_owned[dcell->face(f)->index()] =
                     FaceCategory::multigrid_refinement_edge;
@@ -594,8 +601,9 @@ namespace internal
                     dcell->neighbor_or_periodic_neighbor(f);
 
                   // neighbor is refined -> face will be treated by neighbor
-                  if (use_active_cells && neighbor->has_children() &&
-                      hold_all_faces_to_owned_cells == false)
+                  if (use_active_cells DEAL_II_AND neighbor->has_children()
+                        DEAL_II_AND                hold_all_faces_to_owned_cells
+                                                   DEAL_II_EQUALS false)
                     continue;
 
                   bool add_to_ghost = false;
@@ -614,10 +622,10 @@ namespace internal
                   // side). We process a face locally when we are more refined
                   // (in the active cell case) or when the face is listed in
                   // the `shared_faces` data structure that we built above.
-                  if ((id1 == id2 &&
-                       (use_active_cells == false || neighbor->is_active())) ||
-                      dcell->level() > neighbor->level() ||
-                      std::binary_search(
+                  if ((id1 DEAL_II_EQUALS id2 DEAL_II_AND(
+                        use_active_cells DEAL_II_EQUALS false DEAL_II_OR
+                                         neighbor->is_active()))DEAL_II_OR dcell->level() >
+                      neighbor->level() DEAL_II_OR          std::binary_search(
                         inner_faces_at_proc_boundary[id2].shared_faces.begin(),
                         inner_faces_at_proc_boundary[id2].shared_faces.end(),
                         std::make_pair(id1 < id2 ? dcell->id() : neighbor->id(),
@@ -626,7 +634,7 @@ namespace internal
                     {
                       face_is_owned[dcell->face(f)->index()] =
                         FaceCategory::locally_active_done_here;
-                      if (dcell->level() == neighbor->level())
+                      if (dcell->level() DEAL_II_EQUALS neighbor->level())
                         face_is_owned
                           [neighbor
                              ->face(dcell->has_periodic_neighbor(f) ?
@@ -646,7 +654,7 @@ namespace internal
                         add_to_ghost = (dcell->level_subdomain_id() !=
                                         neighbor->level_subdomain_id());
                     }
-                  else if (hold_all_faces_to_owned_cells == true)
+                  else if (hold_all_faces_to_owned_cells DEAL_II_EQUALS true)
                     {
                       // add all cells to ghost layer...
                       face_is_owned[dcell->face(f)->index()] =
@@ -684,7 +692,7 @@ namespace internal
 
                   if (add_to_ghost)
                     {
-                      if (use_active_cells && neighbor->has_children())
+                      if (use_active_cells DEAL_II_AND neighbor->has_children())
                         for (unsigned int s = 0;
                              s < dcell->face(f)->n_children();
                              ++s)
@@ -732,7 +740,8 @@ namespace internal
       std::map<std::pair<unsigned int, unsigned int>, unsigned int>
         map_to_vectorized;
       for (unsigned int cell = 0; cell < cell_levels.size(); ++cell)
-        if (cell == 0 || cell_levels[cell] != cell_levels[cell - 1])
+        if (cell DEAL_II_EQUALS 0 DEAL_II_OR cell_levels[cell] !=
+            cell_levels[cell - 1])
           {
             typename dealii::Triangulation<dim>::cell_iterator dcell(
               &triangulation,
@@ -761,7 +770,8 @@ namespace internal
                cell < task_info.cell_partition_data[partition + 1] *
                         vectorization_length;
                ++cell)
-            if (cell == 0 || cell_levels[cell] != cell_levels[cell - 1])
+            if (cell DEAL_II_EQUALS 0 DEAL_II_OR cell_levels[cell] !=
+                cell_levels[cell - 1])
               {
                 typename dealii::Triangulation<dim>::cell_iterator dcell(
                   &triangulation,
@@ -770,8 +780,8 @@ namespace internal
                 for (const auto f : dcell->face_indices())
                   {
                     // boundary face
-                    if (face_is_owned[dcell->face(f)->index()] ==
-                        FaceCategory::locally_active_at_boundary)
+                    if (face_is_owned[dcell->face(f)->index()] DEAL_II_EQUALS
+                          FaceCategory::locally_active_at_boundary)
                       {
                         Assert(dcell->at_boundary(f), ExcInternalError());
                         ++boundary_counter;
@@ -792,7 +802,8 @@ namespace internal
                       {
                         typename dealii::Triangulation<dim>::cell_iterator
                           neighbor = dcell->neighbor_or_periodic_neighbor(f);
-                        if (use_active_cells && neighbor->has_children())
+                        if (use_active_cells DEAL_II_AND
+                                             neighbor->has_children())
                           {
                             for (unsigned int c = 0;
                                  c < dcell->face(f)->n_children();
@@ -810,16 +821,20 @@ namespace internal
                                   dcell->has_periodic_neighbor(f) ?
                                     dcell->periodic_neighbor_face_no(f) :
                                     dcell->neighbor_face_no(f);
-                                if (neigh_domain != dcell->subdomain_id() ||
-                                    face_visited
-                                        [dcell->face(f)->child(c)->index()] ==
-                                      1)
+                                if (neigh_domain !=
+                                    dcell->subdomain_id()
+                                      DEAL_II_OR face_visited
+                                        [dcell->face(f)
+                                           ->child(c)
+                                           ->index()] DEAL_II_EQUALS 1)
                                   {
                                     std::pair<unsigned int, unsigned int>
                                       level_index(neighbor_c->level(),
                                                   neighbor_c->index());
-                                    if (face_is_owned
-                                          [dcell->face(f)->child(c)->index()] ==
+                                    if (
+                                      face_is_owned[dcell->face(f)
+                                                      ->child(c)
+                                                      ->index()] DEAL_II_EQUALS
                                         FaceCategory::locally_active_done_here)
                                       {
                                         ++inner_counter;
@@ -830,10 +845,11 @@ namespace internal
                                           dcell,
                                           cell));
                                       }
-                                    else if (face_is_owned[dcell->face(f)
-                                                             ->child(c)
-                                                             ->index()] ==
-                                             FaceCategory::ghosted)
+                                    else if (face_is_owned
+                                               [dcell->face(f)
+                                                  ->child(c)
+                                                  ->index()] DEAL_II_EQUALS
+                                                 FaceCategory::ghosted)
                                       {
                                         inner_ghost_faces.push_back(create_face(
                                           neighbor_face_no,
@@ -844,13 +860,15 @@ namespace internal
                                       }
                                     else
                                       Assert(
-                                        face_is_owned[dcell->face(f)
-                                                        ->index()] ==
+                                        face_is_owned
+                                          [dcell->face(f)
+                                             ->index()] DEAL_II_EQUALS
                                             FaceCategory::
-                                              locally_active_done_elsewhere ||
-                                          face_is_owned[dcell->face(f)
-                                                          ->index()] ==
-                                            FaceCategory::ghosted,
+                                              locally_active_done_elsewhere
+                                                DEAL_II_OR face_is_owned
+                                                  [dcell->face(f)
+                                                     ->index()] DEAL_II_EQUALS
+                                                    FaceCategory::ghosted,
                                         ExcInternalError());
                                   }
                                 else
@@ -868,18 +886,20 @@ namespace internal
                             const types::subdomain_id neigh_domain =
                               use_active_cells ? neighbor->subdomain_id() :
                                                  neighbor->level_subdomain_id();
-                            if (neigh_domain != my_domain ||
-                                face_visited[dcell->face(f)->index()] == 1)
+                            if (neigh_domain !=
+                                my_domain DEAL_II_OR face_visited
+                                  [dcell->face(f)->index()] DEAL_II_EQUALS 1)
                               {
                                 std::pair<unsigned int, unsigned int>
                                   level_index(neighbor->level(),
                                               neighbor->index());
-                                if (face_is_owned[dcell->face(f)->index()] ==
-                                    FaceCategory::locally_active_done_here)
+                                if (face_is_owned[dcell->face(f)
+                                                    ->index()] DEAL_II_EQUALS
+                                      FaceCategory::locally_active_done_here)
                                   {
-                                    Assert(use_active_cells ||
-                                             dcell->level() ==
-                                               neighbor->level(),
+                                    Assert(use_active_cells DEAL_II_OR dcell
+                                             ->level()
+                                               DEAL_II_EQUALS neighbor->level(),
                                            ExcInternalError());
                                     ++inner_counter;
                                     inner_faces.push_back(create_face(
@@ -889,9 +909,10 @@ namespace internal
                                       neighbor,
                                       map_to_vectorized[level_index]));
                                   }
-                                else if (face_is_owned[dcell->face(f)
-                                                         ->index()] ==
-                                         FaceCategory::ghosted)
+                                else if (face_is_owned
+                                           [dcell->face(f)
+                                              ->index()] DEAL_II_EQUALS
+                                             FaceCategory::ghosted)
                                   {
                                     inner_ghost_faces.push_back(create_face(
                                       f,
@@ -911,8 +932,9 @@ namespace internal
                                          dcell->periodic_neighbor_face_no(f))
                                        ->index()] = 1;
                               }
-                            if (face_is_owned[dcell->face(f)->index()] ==
-                                FaceCategory::multigrid_refinement_edge)
+                            if (face_is_owned[dcell->face(f)
+                                                ->index()] DEAL_II_EQUALS
+                                  FaceCategory::multigrid_refinement_edge)
                               {
                                 refinement_edge_faces.push_back(
                                   create_face(f,
@@ -973,7 +995,7 @@ namespace internal
         }
 
       // special treatment of periodic boundaries
-      if (dim == 3 && cell->has_periodic_neighbor(face_no))
+      if (dim DEAL_II_EQUALS 3 DEAL_II_AND cell->has_periodic_neighbor(face_no))
         {
           const unsigned int exterior_face_orientation =
             !cell->get_triangulation()
@@ -1005,7 +1027,7 @@ namespace internal
       if (interior_face_orientation != 0)
         {
           info.face_orientation = 8 + interior_face_orientation;
-          Assert(exterior_face_orientation == 0,
+          Assert(exterior_face_orientation DEAL_II_EQUALS 0,
                  ExcMessage(
                    "Face seems to be wrongly oriented from both sides"));
         }
@@ -1153,8 +1175,7 @@ namespace internal
               unsigned int n_vectorized = 0;
               for (unsigned int f = 0; f < no_faces; ++f)
                 if (faces_in[face_type[f]].cells_interior[0] %
-                      vectorization_width ==
-                    0)
+                    vectorization_width DEAL_II_EQUALS 0)
                   {
                     bool is_contiguous = true;
                     if (f + vectorization_width > no_faces)
@@ -1186,7 +1207,7 @@ namespace internal
               std::vector<unsigned int> untouched;
               untouched.reserve(no_faces - n_vectorized);
               for (unsigned int f = 0; f < no_faces; ++f)
-                if (touched[f] == 0)
+                if (touched[f] DEAL_II_EQUALS 0)
                   untouched.push_back(f);
               unsigned int v = 0;
               for (const auto f : untouched)
@@ -1196,17 +1217,18 @@ namespace internal
                   macro_face.cells_exterior[v] =
                     faces_in[face_type[f]].cells_exterior[0];
                   ++v;
-                  if (v == vectorization_width)
+                  if (v DEAL_II_EQUALS vectorization_width)
                     {
                       new_faces.insert(macro_face);
                       v = 0;
                     }
                 }
-              if (v > 0 && v < vectorization_width)
+              if (v > 0 DEAL_II_AND v < vectorization_width)
                 {
                   // must add non-filled face
-                  if (hard_vectorization_boundary[partition + 1] ||
-                      partition == face_partition_data.size() - 2)
+                  if (hard_vectorization_boundary[partition + 1] DEAL_II_OR
+                        partition DEAL_II_EQUALS face_partition_data.size() -
+                      2)
                     {
                       for (; v < vectorization_width; ++v)
                         {
@@ -1261,8 +1283,9 @@ namespace internal
            i < face_partition_data.back();
            ++i)
         for (unsigned int v = 0;
-             v < vectorization_width &&
-             faces_out[i].cells_interior[v] != numbers::invalid_unsigned_int;
+             v <
+               vectorization_width DEAL_II_AND faces_out[i].cells_interior[v] !=
+             numbers::invalid_unsigned_int;
              ++v)
           out_faces.emplace_back(faces_out[i].cells_interior[v],
                                  faces_out[i].cells_exterior[v]);

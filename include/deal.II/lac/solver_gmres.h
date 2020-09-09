@@ -554,7 +554,7 @@ namespace internal
                                        const VectorType & temp)
     {
       AssertIndexRange(i, data.size());
-      if (data[i] == nullptr)
+      if (data[i] DEAL_II_EQUALS nullptr)
         {
           data[i] = std::move(typename VectorMemory<VectorType>::Pointer(mem));
           data[i]->reinit(temp);
@@ -578,8 +578,9 @@ namespace internal
     complex_less_pred(const std::complex<double> &x,
                       const std::complex<double> &y)
     {
-      return x.real() < y.real() ||
-             (x.real() == y.real() && x.imag() < y.imag());
+      return x.real() <
+             y.real() DEAL_II_OR(x.real() DEAL_II_EQUALS y.real()
+                                   DEAL_II_AND           x.imag() < y.imag());
     }
   } // namespace SolverGMRESImplementation
 } // namespace internal
@@ -668,7 +669,8 @@ SolverGMRES<VectorType>::modified_gram_schmidt(
   // need initial norm for detection of re-orthogonalization, see below
   double     norm_vv_start = 0;
   const bool consider_reorthogonalize =
-    (reorthogonalize == false) && (inner_iteration % 5 == 4);
+    (reorthogonalize DEAL_II_EQUALS false)DEAL_II_AND(inner_iteration %
+                                                      5 DEAL_II_EQUALS 4);
   if (consider_reorthogonalize)
     norm_vv_start = vv.l2_norm();
 
@@ -704,7 +706,7 @@ SolverGMRES<VectorType>::modified_gram_schmidt(
         }
     }
 
-  if (reorthogonalize == true)
+  if (reorthogonalize DEAL_II_EQUALS true)
     {
       double htmp = vv * orthogonal_vectors[0];
       h(0) += htmp;
@@ -736,9 +738,9 @@ SolverGMRES<VectorType>::compute_eigs_and_cond(
   const boost::signals2::signal<void(double)> &cond_signal)
 {
   // Avoid copying the Hessenberg matrix if it isn't needed.
-  if ((!eigenvalues_signal.empty() || !hessenberg_signal.empty() ||
-       !cond_signal.empty()) &&
-      dim > 0)
+  if ((!eigenvalues_signal.empty()
+          DEAL_II_OR !hessenberg_signal.empty()
+            DEAL_II_OR !cond_signal.empty())DEAL_II_AND dim > 0)
     {
       LAPACKFullMatrix<double> mat(dim, dim);
       for (unsigned int i = 0; i < dim; ++i)
@@ -764,7 +766,7 @@ SolverGMRES<VectorType>::compute_eigs_and_cond(
         }
       // Calculate condition number, avoid calculating the svd if a slot
       // isn't connected. Need at least a 2-by-2 matrix to do the estimate.
-      if (!cond_signal.empty() && (mat.n() > 1))
+      if (!cond_signal.empty() DEAL_II_AND(mat.n() > 1))
         {
           mat.compute_svd();
           double condition_number =
@@ -805,9 +807,12 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
   unsigned int accumulated_iterations = 0;
 
   const bool do_eigenvalues =
-    !condition_number_signal.empty() || !all_condition_numbers_signal.empty() ||
-    !eigenvalues_signal.empty() || !all_eigenvalues_signal.empty() ||
-    !hessenberg_signal.empty() || !all_hessenberg_signal.empty();
+    !condition_number_signal.empty() DEAL_II_OR !all_condition_numbers_signal
+       .empty() DEAL_II_OR !eigenvalues_signal
+       .empty() DEAL_II_OR !all_eigenvalues_signal
+       .empty()
+         DEAL_II_OR !hessenberg_signal.empty()
+           DEAL_II_OR !all_hessenberg_signal.empty();
   // for eigenvalue computation, need to collect the Hessenberg matrix (before
   // applying Givens rotations)
   FullMatrix<double> H_orig;
@@ -921,8 +926,8 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
       // vectors. the number of steps actually been done is propagated outside
       // through the @p dim variable
       for (unsigned int inner_iteration = 0;
-           ((inner_iteration < n_tmp_vectors - 2) &&
-            (iteration_state == SolverControl::iterate));
+           ((inner_iteration < n_tmp_vectors - 2) DEAL_II_AND(
+             iteration_state DEAL_II_EQUALS SolverControl::iterate));
            ++inner_iteration)
         {
           ++accumulated_iterations;
@@ -1059,7 +1064,7 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
       // end of outer iteration. restart if no convergence and the number of
       // iterations is not exceeded
     }
-  while (iteration_state == SolverControl::iterate);
+  while (iteration_state DEAL_II_EQUALS SolverControl::iterate);
 
   compute_eigs_and_cond(H_orig,
                         dim,
@@ -1071,7 +1076,7 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
     krylov_space_signal(tmp_vectors);
 
   // in case of failure: throw exception
-  AssertThrow(iteration_state == SolverControl::success,
+  AssertThrow(iteration_state DEAL_II_EQUALS SolverControl::success,
               SolverControl::NoConvergence(accumulated_iterations, last_res));
 }
 
@@ -1228,7 +1233,7 @@ SolverFGMRES<VectorType>::solve(const MatrixType &        A,
       double beta     = aux->l2_norm();
       res             = beta;
       iteration_state = this->iteration_status(accumulated_iterations, res, x);
-      if (iteration_state == SolverControl::success)
+      if (iteration_state DEAL_II_EQUALS SolverControl::success)
         break;
 
       H.reinit(basis_size + 1, basis_size);
@@ -1278,7 +1283,7 @@ SolverFGMRES<VectorType>::solve(const MatrixType &        A,
       for (unsigned int j = 0; j < y.size(); ++j)
         x.add(y(j), z[j]);
     }
-  while (iteration_state == SolverControl::iterate);
+  while (iteration_state DEAL_II_EQUALS SolverControl::iterate);
 
   // in case of failure: throw exception
   if (iteration_state != SolverControl::success)

@@ -191,7 +191,7 @@ namespace Particles
       OutputVectorType &                               interpolated_field,
       const ComponentMask &field_comps = ComponentMask())
     {
-      if (particle_handler.n_locally_owned_particles() == 0)
+      if (particle_handler.n_locally_owned_particles() DEAL_II_EQUALS 0)
         {
           interpolated_field.compress(VectorOperation::add);
           return; // nothing else to do here
@@ -202,9 +202,9 @@ namespace Particles
       auto        particle = particle_handler.begin();
 
       // Take care of components
-      const ComponentMask comps =
-        (field_comps.size() == 0 ? ComponentMask(fe.n_components(), true) :
-                                   field_comps);
+      const ComponentMask comps = (field_comps.size() DEAL_II_EQUALS 0 ?
+                                     ComponentMask(fe.n_components(), true) :
+                                     field_comps);
       AssertDimension(comps.size(), fe.n_components());
       const auto n_comps = comps.n_selected_components();
 
@@ -230,7 +230,7 @@ namespace Particles
           dh_cell->get_dof_indices(dof_indices);
           const auto pic = particle_handler.particles_in_cell(cell);
 
-          Assert(pic.begin() == particle, ExcInternalError());
+          Assert(pic.begin() DEAL_II_EQUALS particle, ExcInternalError());
           for (unsigned int i = 0; particle != pic.end(); ++particle, ++i)
             {
               const auto &reference_location =

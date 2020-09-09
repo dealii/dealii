@@ -64,7 +64,7 @@ for (deal_II_dimension : DIMENSIONS)
     \}
 #endif
 
-#if deal_II_dimension == 3
+#if deal_II_dimension DEAL_II_EQUALS 3
 
     namespace hp
     \{

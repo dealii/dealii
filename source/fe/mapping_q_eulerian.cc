@@ -188,7 +188,8 @@ MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
   typename DoFHandler<dim, spacedim>::cell_iterator dof_cell(
     *cell, mapping_q_eulerian.euler_dof_handler);
 
-  Assert(mg_vector || dof_cell->is_active() == true, ExcInactiveCell());
+  Assert(mg_vector DEAL_II_OR dof_cell->is_active() DEAL_II_EQUALS true,
+         ExcInactiveCell());
 
   // our quadrature rule is chosen so that each quadrature point corresponds
   // to a support point in the undeformed configuration. We can then query

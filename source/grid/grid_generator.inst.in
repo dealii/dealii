@@ -254,8 +254,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
   {
     namespace GridGenerator
     \{
-#if (deal_II_dimension <= deal_II_space_dimension) && \
-  (deal_II_dimension <= deal_II_space_dimension_2)
+#if (deal_II_dimension <= deal_II_space_dimension) \
+  DEAL_II_AND(deal_II_dimension <= deal_II_space_dimension_2)
       template void
       flatten_triangulation<>(
         const Triangulation<deal_II_dimension, deal_II_space_dimension> &,

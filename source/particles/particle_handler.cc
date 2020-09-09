@@ -33,7 +33,7 @@ namespace Particles
     {
       std::vector<char> buffer;
 
-      if (particles.size() == 0)
+      if (particles.size() DEAL_II_EQUALS 0)
         return buffer;
 
       buffer.resize(particles.size() *
@@ -74,7 +74,7 @@ namespace Particles
         }
 
       Assert(
-        data == &(*data_range.end()),
+        data DEAL_II_EQUALS & (*data_range.end()),
         ExcMessage(
           "The particle data could not be deserialized successfully. "
           "Check that when deserializing the particles you expect the same "
@@ -201,7 +201,7 @@ namespace Particles
         global_number_of_particles = dealii::Utilities::MPI::sum(
           particles.size(), parallel_triangulation->get_communicator());
         next_free_particle_index =
-          global_number_of_particles == 0 ?
+          global_number_of_particles DEAL_II_EQUALS 0 ?
             0 :
             dealii::Utilities::MPI::max(
               locally_highest_index,
@@ -214,8 +214,9 @@ namespace Particles
     else
       {
         global_number_of_particles = particles.size();
-        next_free_particle_index =
-          global_number_of_particles == 0 ? 0 : locally_highest_index + 1;
+        next_free_particle_index = global_number_of_particles DEAL_II_EQUALS 0 ?
+                                     0 :
+                                     locally_highest_index + 1;
         global_max_particles_per_cell = local_max_particles_per_cell;
       }
   }
@@ -463,7 +464,7 @@ namespace Particles
     auto &local_positions = std::get<1>(point_locations);
     auto &index_map       = std::get<2>(point_locations);
 
-    if (cells.size() == 0)
+    if (cells.size() DEAL_II_EQUALS 0)
       return;
 
     auto hint =
@@ -580,9 +581,10 @@ namespace Particles
             const unsigned int calling_process =
               calling_process_indices[i_cell][i_particle];
 
-            if (original_process_to_local_particle_indices.find(
-                  calling_process) ==
-                original_process_to_local_particle_indices.end())
+            if (original_process_to_local_particle_indices
+                  .find(calling_process)
+                    DEAL_II_EQUALS original_process_to_local_particle_indices
+                  .end())
               original_process_to_local_particle_indices.insert(
                 {calling_process,
                  IndexSet(n_particles_per_proc[calling_process])});
@@ -612,7 +614,7 @@ namespace Particles
     std::map<unsigned int, std::vector<types::particle_index>>
       locally_owned_ids_from_other_processes;
 
-    if (n_global_properties > 0 || !ids.empty())
+    if (n_global_properties > 0 DEAL_II_OR !ids.empty())
       {
         // Gather whom I sent my own particles to, to decide whom to send
         // the particle properties or the ids
@@ -1188,7 +1190,7 @@ namespace Particles
     if (parallel_triangulation != nullptr)
       {
         if (dealii::Utilities::MPI::n_mpi_processes(
-              parallel_triangulation->get_communicator()) == 1)
+              parallel_triangulation->get_communicator()) DEAL_II_EQUALS 1)
           return;
       }
     else
@@ -1283,12 +1285,14 @@ namespace Particles
     const unsigned int                     n_neighbors = neighbors.size();
 
     if (send_cells.size() != 0)
-      Assert(particles_to_send.size() == send_cells.size(), ExcInternalError());
+      Assert(particles_to_send.size() DEAL_II_EQUALS send_cells.size(),
+             ExcInternalError());
 
     // If we do not know the subdomain this particle needs to be send to,
     // throw an error
-    Assert(particles_to_send.find(numbers::artificial_subdomain_id) ==
-             particles_to_send.end(),
+    Assert(particles_to_send
+             .find(numbers::artificial_subdomain_id)
+               DEAL_II_EQUALS particles_to_send.end(),
            ExcInternalError());
 
     // TODO: Implement the shipping of particles to processes that are not
@@ -1338,7 +1342,7 @@ namespace Particles
                 // If no target cells are given, use the iterator information
                 typename Triangulation<dim, spacedim>::active_cell_iterator
                   cell;
-                if (send_cells.size() == 0)
+                if (send_cells.size() DEAL_II_EQUALS 0)
                   cell =
                     particles_to_send.at(neighbors[i])[j]->get_surrounding_cell(
                       *triangulation);
@@ -1480,7 +1484,7 @@ namespace Particles
                           recv_data_it);
       }
 
-    AssertThrow(recv_data_it == recv_data.data() + recv_data.size(),
+    AssertThrow(recv_data_it DEAL_II_EQUALS recv_data.data() + recv_data.size(),
                 ExcMessage(
                   "The amount of data that was read into new particles "
                   "does not match the amount of data sent around."));
@@ -1564,7 +1568,7 @@ namespace Particles
     // store function again, to set the triangulation in the same state as
     // before the serialization. Only by this it knows how to deserialize the
     // data correctly. Only do this if something was actually stored.
-    if (serialization && (global_max_particles_per_cell > 0))
+    if (serialization DEAL_II_AND(global_max_particles_per_cell > 0))
       {
         const auto callback_function =
           [this](const typename Triangulation<dim, spacedim>::cell_iterator

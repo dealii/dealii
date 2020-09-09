@@ -72,7 +72,7 @@ public:
   /**
    * Remove an element with index @p index,
    * counting from the last added element.
-   * `index==0` therefore corresponds to removing
+   * `indexDEAL_II_EQUALS 0` therefore corresponds to removing
    * the newset element.
    */
   void
@@ -81,14 +81,14 @@ public:
   /**
    * Read/write access to an element with index @p index,
    * counting from the last added element.
-   * `index==0` therefore corresponds to the newset element.
+   * `indexDEAL_II_EQUALS 0` therefore corresponds to the newset element.
    */
   T &operator[](const std::size_t index);
 
   /**
    * Read access to an element with index @p index,
    * counting from the last added element.
-   * `index==0` therefore corresponds to the newset element.
+   * `indexDEAL_II_EQUALS 0` therefore corresponds to the newset element.
    */
   const T &operator[](const std::size_t index) const;
 
@@ -167,7 +167,7 @@ FiniteSizeHistory<T>::add(const T &element)
   if (data.size() < max_n_elements)
     // have not reached the maximum number of elements yet
     {
-      if (cache.size() == 0)
+      if (cache.size() DEAL_II_EQUALS 0)
         // nothing is cached, just copy a given element
         {
           new_el = std::make_unique<T>(element);

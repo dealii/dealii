@@ -230,10 +230,12 @@ namespace MeshWorker
     inline void
     CellsAndFaces<number>::initialize(AnyData &r, bool sep)
     {
-      Assert(r.name(0) == "cells", AnyData::ExcNameMismatch(0, "cells"));
+      Assert(r.name(0) DEAL_II_EQUALS "cells",
+             AnyData::ExcNameMismatch(0, "cells"));
       if (sep)
         {
-          Assert(r.name(1) == "faces", AnyData::ExcNameMismatch(1, "faces"));
+          Assert(r.name(1) DEAL_II_EQUALS "faces",
+                 AnyData::ExcNameMismatch(1, "faces"));
           AssertDimension(r.entry<BlockVector<double> *>(0)->n_blocks(),
                           r.entry<BlockVector<double> *>(1)->n_blocks());
         }
@@ -258,7 +260,8 @@ namespace MeshWorker
     CellsAndFaces<number>::assemble(const DOFINFO &info)
     {
       BlockVector<double> *v;
-      if (separate_faces && info.face_number != numbers::invalid_unsigned_int)
+      if (separate_faces DEAL_II_AND info.face_number !=
+          numbers::invalid_unsigned_int)
         v = results.entry<BlockVector<double> *>(1);
       else
         v = results.entry<BlockVector<double> *>(0);

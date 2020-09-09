@@ -756,7 +756,7 @@ namespace ReferenceCell
           const unsigned int  face,
           const unsigned char face_orientation) const override
         {
-          if (face == 0) // Quad
+          if (face DEAL_II_EQUALS 0) // Quad
             {
               return GeometryInfo<3>::standard_to_real_face_vertex(
                 vertex,
@@ -783,7 +783,7 @@ namespace ReferenceCell
         {
           AssertIndexRange(face_no, n_faces());
 
-          if (face_no == 1)
+          if (face_no DEAL_II_EQUALS 1)
             return ReferenceCell::Type::Quad;
           else
             return ReferenceCell::Type::Tri;
@@ -963,9 +963,9 @@ namespace ReferenceCell
           const bool face_flip        = get_bit(face_orientation_raw, 2);
           const bool face_rotation    = get_bit(face_orientation_raw, 1);
 
-          return (
-            static_cast<bool>(line_orientation) ==
-            bool_table[line / 2][face_orientation][face_flip][face_rotation]);
+          return (static_cast<bool>(line_orientation)
+                    DEAL_II_EQUALS bool_table[line / 2][face_orientation]
+                                             [face_flip][face_rotation]);
         }
 
         std::array<unsigned int, 2>

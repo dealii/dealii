@@ -398,7 +398,9 @@ namespace DoFRenumbering
                const std::pair<Point<dim>, types::global_dof_index> &c2) const
     {
       const Tensor<1, dim> diff = c2.first - c1.first;
-      return (diff * dir > 0 || (diff * dir == 0 && c1.second < c2.second));
+      return (diff * dir >
+              0 DEAL_II_OR(diff * dir DEAL_II_EQUALS 0 DEAL_II_AND c1.second <
+                           c2.second));
     }
 
   private:
@@ -889,7 +891,7 @@ namespace DoFRenumbering
    * cell iterator of that triangulation needs to be present in @p
    * cell_order exactly once. @post For each @p i between zero and
    * <code>dof_handler.n_locally_owned_dofs()</code>, the condition
-   * <code>renumbering[inverse_renumbering[i]] ==
+   * <code>renumbering[inverse_renumbering[i]] DEAL_II_EQUALS
    * dof_handler.locally_owned_dofs().nth_index_in_set(i)</code> will hold.
    */
   template <int dim, int spacedim>

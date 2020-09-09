@@ -419,8 +419,8 @@ private:
   /**
    * Initialize fp and vars on the current thread. This function may only be
    * called once per thread. A thread can test whether the function has
-   * already been called by testing whether 'fp.get().size()==0' (not
-   * initialized) or >0 (already initialized).
+   * already been called by testing whether 'fp.get().size()DEAL_II_EQUALS 0'
+   * (not initialized) or >0 (already initialized).
    */
   void
   init_muparser() const;

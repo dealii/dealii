@@ -30,7 +30,7 @@ ConvergenceTable::evaluate_convergence_rates(
   Assert(columns.count(reference_column_key),
          ExcColumnNotExistent(reference_column_key));
 
-  if (rate_mode == none)
+  if (rate_mode DEAL_II_EQUALS none)
     return;
 
   // reset the auto fill mode flag since we are going to fill columns from
@@ -44,7 +44,7 @@ ConvergenceTable::evaluate_convergence_rates(
 
   const unsigned int n     = entries.size();
   const unsigned int n_ref = ref_entries.size();
-  Assert(n == n_ref, ExcDimensionMismatch(n, n_ref));
+  Assert(n DEAL_II_EQUALS n_ref, ExcDimensionMismatch(n, n_ref));
 
   std::vector<double> values(n);
   std::vector<double> ref_values(n_ref);
@@ -66,7 +66,7 @@ ConvergenceTable::evaluate_convergence_rates(
         // Calculate all missing rate values:
         for (unsigned int i = no_rate_entries; i < n; ++i)
           {
-            if (i == 0)
+            if (i DEAL_II_EQUALS 0)
               {
                 // no value available for the first row
                 add_value(rate_key, std::string("-"));
@@ -85,7 +85,7 @@ ConvergenceTable::evaluate_convergence_rates(
         // Calculate all missing rate values:
         for (unsigned int i = no_rate_entries; i < n; ++i)
           {
-            if (i == 0)
+            if (i DEAL_II_EQUALS 0)
               {
                 // no value available for the first row
                 add_value(rate_key, std::string("-"));
@@ -115,7 +115,7 @@ ConvergenceTable::evaluate_convergence_rates(
     }
 
   // only add rate_key to the supercolumn once
-  if (no_rate_entries == 0)
+  if (no_rate_entries DEAL_II_EQUALS 0)
     {
       add_column_to_supercolumn(rate_key, superkey);
     }
@@ -155,7 +155,7 @@ ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
         // Calculate all missing rate values:
         for (unsigned int i = no_rate_entries; i < n; ++i)
           {
-            if (i == 0)
+            if (i DEAL_II_EQUALS 0)
               {
                 // no value available for the first row
                 add_value(rate_key, std::string("-"));
@@ -173,7 +173,7 @@ ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
         // Calculate all missing rate values:
         for (unsigned int i = no_rate_entries; i < n; ++i)
           {
-            if (i == 0)
+            if (i DEAL_II_EQUALS 0)
               {
                 // no value available for the first row
                 add_value(rate_key, std::string("-"));
@@ -206,7 +206,7 @@ ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
     }
 
   // only add rate_key to the supercolumn once
-  if (no_rate_entries == 0)
+  if (no_rate_entries DEAL_II_EQUALS 0)
     {
       add_column_to_supercolumn(rate_key, superkey);
     }

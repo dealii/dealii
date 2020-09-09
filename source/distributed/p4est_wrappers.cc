@@ -259,7 +259,7 @@ namespace internal
         dealii::types::subdomain_id *subdomain_ids;
         std::map<unsigned int, std::set<dealii::types::subdomain_id>>
           * vertices_with_ghost_neighbors = fg->vertices_with_ghost_neighbors;
-        int limit                         = (dim == 2) ? 2 : 4;
+        int limit                         = (dim DEAL_II_EQUALS 2) ? 2 : 4;
 
         subids->elem_count = 0;
         for (i = 0; i < nsides; i++)
@@ -309,7 +309,7 @@ namespace internal
 
                         for (k = 0; k < nsubs; k++)
                           {
-                            if (dim == 2)
+                            if (dim DEAL_II_EQUALS 2)
                               {
                                 (*vertices_with_ghost_neighbors)
                                   [cell->vertex_index(
@@ -779,8 +779,9 @@ namespace internal
     {
       Assert(coarse_grid_cell < parallel_forest->connectivity->num_trees,
              ExcInternalError());
-      return ((coarse_grid_cell >= parallel_forest->first_local_tree) &&
-              (coarse_grid_cell <= parallel_forest->last_local_tree));
+      return (
+        (coarse_grid_cell >= parallel_forest->first_local_tree)
+          DEAL_II_AND(coarse_grid_cell <= parallel_forest->last_local_tree));
     }
 
 
@@ -790,7 +791,7 @@ namespace internal
     quadrant_is_equal<1>(const typename types<1>::quadrant &q1,
                          const typename types<1>::quadrant &q2)
     {
-      return q1 == q2;
+      return q1 DEAL_II_EQUALS q2;
     }
 
 
@@ -816,7 +817,7 @@ namespace internal
                                  << (types<1>::n_bits - 1 - level_1);
 
       // compare paths
-      return truncated_id_1 == truncated_id_2;
+      return truncated_id_1 DEAL_II_EQUALS truncated_id_2;
     }
 
 

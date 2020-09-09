@@ -62,7 +62,7 @@ namespace
     const unsigned int n_selected =
       std::accumulate(selected.begin(), selected.end(), 0u);
 
-    if (ndofs.size() == 0)
+    if (ndofs.size() DEAL_II_EQUALS 0)
       {
         std::vector<std::vector<types::global_dof_index>> new_dofs(
           dof_handler.get_triangulation().n_levels(),
@@ -76,7 +76,7 @@ namespace
         v[level].reinit(n_selected, 0);
         unsigned int k = 0;
         for (unsigned int i = 0;
-             i < selected.size() && (k < v[level].n_blocks());
+             i < selected.size() DEAL_II_AND(k < v[level].n_blocks());
              ++i)
           {
             if (selected[i])
@@ -109,7 +109,7 @@ namespace
     std::vector<bool> selected(n_blocks, false);
     selected[selected_block] = true;
 
-    if (ndofs.size() == 0)
+    if (ndofs.size() DEAL_II_EQUALS 0)
       {
         std::vector<std::vector<types::global_dof_index>> new_dofs(
           dof_handler.get_triangulation().n_levels(),
@@ -222,7 +222,7 @@ MGTransferBlockBase::build(const DoFHandler<dim, spacedim> &dof_handler)
   const unsigned int        dofs_per_cell = fe.n_dofs_per_cell();
   const unsigned int n_levels = dof_handler.get_triangulation().n_levels();
 
-  Assert(selected.size() == n_blocks,
+  Assert(selected.size() DEAL_II_EQUALS n_blocks,
          ExcDimensionMismatch(selected.size(), n_blocks));
 
   // Compute the mapping between real
@@ -327,7 +327,7 @@ MGTransferBlockBase::build(const DoFHandler<dim, spacedim> &dof_handler)
       prolongation_sparsities[level]->reinit(n_blocks, n_blocks);
       for (unsigned int i = 0; i < n_blocks; ++i)
         for (unsigned int j = 0; j < n_blocks; ++j)
-          if (i == j)
+          if (i DEAL_II_EQUALS j)
             prolongation_sparsities[level]->block(i, j).reinit(
               sizes[level + 1][i], sizes[level][j], dofs_per_cell + 1);
           else
@@ -344,8 +344,8 @@ MGTransferBlockBase::build(const DoFHandler<dim, spacedim> &dof_handler)
           {
             cell->get_mg_dof_indices(dof_indices_parent);
 
-            Assert(cell->n_children() ==
-                     GeometryInfo<dim>::max_children_per_cell,
+            Assert(cell->n_children()
+                     DEAL_II_EQUALS GeometryInfo<dim>::max_children_per_cell,
                    ExcNotImplemented());
             for (unsigned int child = 0; child < cell->n_children(); ++child)
               {
@@ -369,7 +369,8 @@ MGTransferBlockBase::build(const DoFHandler<dim, spacedim> &dof_handler)
                           fe.system_to_block_index(i).first;
                         const unsigned int jcomp =
                           fe.system_to_block_index(j).first;
-                        if ((icomp == jcomp) && selected[icomp])
+                        if ((icomp DEAL_II_EQUALS jcomp)
+                              DEAL_II_AND selected[icomp])
                           prolongation_sparsities[level]->add(
                             dof_indices_child[i], dof_indices_parent[j]);
                       }
@@ -387,8 +388,8 @@ MGTransferBlockBase::build(const DoFHandler<dim, spacedim> &dof_handler)
           {
             cell->get_mg_dof_indices(dof_indices_parent);
 
-            Assert(cell->n_children() ==
-                     GeometryInfo<dim>::max_children_per_cell,
+            Assert(cell->n_children()
+                     DEAL_II_EQUALS GeometryInfo<dim>::max_children_per_cell,
                    ExcNotImplemented());
             for (unsigned int child = 0; child < cell->n_children(); ++child)
               {
@@ -411,7 +412,8 @@ MGTransferBlockBase::build(const DoFHandler<dim, spacedim> &dof_handler)
                           fe.system_to_block_index(i).first;
                         const unsigned int jcomp =
                           fe.system_to_block_index(j).first;
-                        if ((icomp == jcomp) && selected[icomp])
+                        if ((icomp DEAL_II_EQUALS jcomp)
+                              DEAL_II_AND selected[icomp])
                           prolongation_matrices[level]->set(
                             dof_indices_child[i],
                             dof_indices_parent[j],
@@ -423,15 +425,15 @@ MGTransferBlockBase::build(const DoFHandler<dim, spacedim> &dof_handler)
   // impose boundary conditions
   // but only in the column of
   // the prolongation matrix
-  if (mg_constrained_dofs != nullptr &&
-      mg_constrained_dofs->have_boundary_indices())
+  if (mg_constrained_dofs !=
+      nullptr DEAL_II_AND mg_constrained_dofs->have_boundary_indices())
     {
       std::vector<types::global_dof_index> constrain_indices;
       std::vector<std::vector<bool>>       constraints_per_block(n_blocks);
       for (int level = n_levels - 2; level >= 0; --level)
         {
-          if (mg_constrained_dofs->get_boundary_indices(level).n_elements() ==
-              0)
+          if (mg_constrained_dofs->get_boundary_indices(level).n_elements()
+                DEAL_II_EQUALS 0)
             continue;
 
           // need to delete all the columns in the
@@ -456,7 +458,7 @@ MGTransferBlockBase::build(const DoFHandler<dim, spacedim> &dof_handler)
               constraints_per_block[block].resize(n_dofs, false);
               for (types::global_dof_index i = 0; i < n_dofs; ++i, ++index)
                 constraints_per_block[block][i] =
-                  (constrain_indices[index] == 1);
+                  (constrain_indices[index] DEAL_II_EQUALS 1);
 
               for (types::global_dof_index i = 0; i < n_dofs; ++i)
                 {
@@ -571,7 +573,7 @@ MGTransferBlockSelect<number>::build(
           copy_indices[selected_block][level][counter++] =
             std::pair<types::global_dof_index, unsigned int>(
               temp_copy_indices[i], i);
-      Assert(counter == n_active_dofs, ExcInternalError());
+      Assert(counter DEAL_II_EQUALS n_active_dofs, ExcInternalError());
     }
 }
 
@@ -598,11 +600,11 @@ MGTransferBlock<number>::build(const DoFHandler<dim, spacedim> &dof_handler,
 
   if (sel.size() != 0)
     {
-      Assert(sel.size() == n_blocks,
+      Assert(sel.size() DEAL_II_EQUALS n_blocks,
              ExcDimensionMismatch(sel.size(), n_blocks));
       selected = sel;
     }
-  if (selected.size() == 0)
+  if (selected.size() DEAL_II_EQUALS 0)
     selected = std::vector<bool>(n_blocks, true);
 
   MGTransferBlockBase::build(dof_handler);
@@ -665,7 +667,7 @@ MGTransferBlock<number>::build(const DoFHandler<dim, spacedim> &dof_handler,
                 copy_indices[block][level][counter++] =
                   std::pair<types::global_dof_index, unsigned int>(
                     temp_copy_indices[block][i], i);
-            Assert(counter == n_active_dofs, ExcInternalError());
+            Assert(counter DEAL_II_EQUALS n_active_dofs, ExcInternalError());
           }
     }
 }

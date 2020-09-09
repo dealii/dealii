@@ -251,7 +251,7 @@ public:
    */
   template <typename OtherNumber>
   DEAL_II_CONSTEXPR bool
-  operator==(const Tensor<0, dim, OtherNumber> &rhs) const;
+  operator DEAL_II_EQUALS(const Tensor<0, dim, OtherNumber> &rhs) const;
 
   /**
    * Test for inequality of two tensors.
@@ -483,7 +483,8 @@ public:
 
   /**
    * Declare an array type which can be used to initialize an object of this
-   * type statically. For `dim == 0`, its size is 1. Otherwise, it is `dim`.
+   * type statically. For `dim DEAL_II_EQUALS  0`, its size is 1. Otherwise, it
+   * is `dim`.
    */
   using array_type =
     typename Tensor<rank_ - 1, dim, Number>::array_type[(dim != 0) ? dim : 1];
@@ -628,7 +629,7 @@ public:
    */
   template <typename OtherNumber>
   DEAL_II_CONSTEXPR bool
-  operator==(const Tensor<rank_, dim, OtherNumber> &) const;
+  operator DEAL_II_EQUALS(const Tensor<rank_, dim, OtherNumber> &) const;
 
   /**
    * Test for inequality of two tensors.
@@ -770,8 +771,8 @@ private:
    * Array of tensors holding the subelements.
    */
   Tensor<rank_ - 1, dim, Number> values[(dim != 0) ? dim : 1];
-  // ... avoid a compiler warning in case of dim == 0 and ensure that the
-  // array always has positive size.
+  // ... avoid a compiler warning in case of dim DEAL_II_EQUALS  0 and ensure
+  // that the array always has positive size.
 
   /**
    * Internal helper function for unroll.
@@ -990,12 +991,12 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
 
 template <int dim, typename Number>
 template <typename OtherNumber>
-DEAL_II_CONSTEXPR inline bool
-Tensor<0, dim, Number>::operator==(const Tensor<0, dim, OtherNumber> &p) const
+DEAL_II_CONSTEXPR inline bool Tensor<0, dim, Number>::
+                              operator DEAL_II_EQUALS(const Tensor<0, dim, OtherNumber> &p) const
 {
 #  if defined(DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING)
-  Assert(!(std::is_same<Number, adouble>::value ||
-           std::is_same<OtherNumber, adouble>::value),
+  Assert(!(std::is_same<Number, adouble>::value DEAL_II_OR
+                                                std::is_same<OtherNumber, adouble>::value),
          ExcMessage(
            "The Tensor equality operator for ADOL-C taped numbers has not yet "
            "been extended to support advanced branching."));
@@ -1010,7 +1011,7 @@ template <typename OtherNumber>
 constexpr bool
 Tensor<0, dim, Number>::operator!=(const Tensor<0, dim, OtherNumber> &p) const
 {
-  return !((*this) == p);
+  return !((*this)DEAL_II_EQUALS p);
 }
 
 
@@ -1160,7 +1161,7 @@ constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
                                    std::index_sequence<indices...>)
   : values{Tensor<rank_ - 1, dim, Number>(initializer[indices])...}
 {
-  static_assert(sizeof...(indices) == dim,
+  static_assert(sizeof...(indices) DEAL_II_EQUALS dim,
                 "dim should match the number of indices");
 }
 
@@ -1386,9 +1387,8 @@ Tensor<rank_, dim, Number>::operator=(const Number &d)
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-DEAL_II_CONSTEXPR inline bool
-Tensor<rank_, dim, Number>::
-operator==(const Tensor<rank_, dim, OtherNumber> &p) const
+DEAL_II_CONSTEXPR inline bool Tensor<rank_, dim, Number>::
+                              operator DEAL_II_EQUALS(const Tensor<rank_, dim, OtherNumber> &p) const
 {
   for (unsigned int i = 0; i < dim; ++i)
     if (values[i] != p.values[i])
@@ -1404,8 +1404,8 @@ operator==(const Tensor<rank_, dim, OtherNumber> &p) const
 // implement this function here
 template <>
 template <>
-DEAL_II_CONSTEXPR inline bool
-Tensor<1, 0, double>::operator==(const Tensor<1, 0, double> &) const
+DEAL_II_CONSTEXPR inline bool Tensor<1, 0, double>::
+                              operator DEAL_II_EQUALS(const Tensor<1, 0, double> &) const
 {
   return true;
 }
@@ -1417,7 +1417,7 @@ constexpr bool
 Tensor<rank_, dim, Number>::
 operator!=(const Tensor<rank_, dim, OtherNumber> &p) const
 {
-  return !((*this) == p);
+  return !((*this)DEAL_II_EQUALS p);
 }
 
 
@@ -1468,9 +1468,9 @@ namespace internal
               typename Number,
               typename OtherNumber,
               typename std::enable_if<
-                !std::is_integral<
-                  typename ProductType<Number, OtherNumber>::type>::value &&
-                  !std::is_same<Number, Differentiation::SD::Expression>::value,
+                !std::is_integral<typename ProductType<Number, OtherNumber>::
+                                    type>::value DEAL_II_AND !std::
+                  is_same<Number, Differentiation::SD::Expression>::value,
                 int>::type = 0>
     DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE void
                       division_operator(Tensor<rank, dim, Number> (&t)[dim],
@@ -1483,15 +1483,16 @@ namespace internal
     }
 
 
-    template <int rank,
-              int dim,
-              typename Number,
-              typename OtherNumber,
-              typename std::enable_if<
-                std::is_integral<
-                  typename ProductType<Number, OtherNumber>::type>::value ||
-                  std::is_same<Number, Differentiation::SD::Expression>::value,
-                int>::type = 0>
+    template <
+      int rank,
+      int dim,
+      typename Number,
+      typename OtherNumber,
+      typename std::enable_if<
+        std::is_integral<typename ProductType<Number, OtherNumber>::type>::value
+            DEAL_II_OR
+            std::is_same<Number, Differentiation::SD::Expression>::value,
+        int>::type = 0>
     DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE void
                       division_operator(Tensor<rank, dim, Number> (&t)[dim],
                                         const OtherNumber &factor)
@@ -1591,8 +1592,8 @@ Tensor<rank_, dim, Number>::component_to_unrolled_index(
 
 namespace internal
 {
-  // unrolled_to_component_indices is instantiated from DataOut for dim==0
-  // and rank=2. Make sure we don't have compiler warnings.
+  // unrolled_to_component_indices is instantiated from DataOut for
+  // dimDEAL_II_EQUALS 0 and rank=2. Make sure we don't have compiler warnings.
 
   template <int dim>
   inline DEAL_II_CONSTEXPR unsigned int
@@ -1642,7 +1643,7 @@ Tensor<rank_, dim, Number>::unrolled_to_component_indices(const unsigned int i)
       indices[r] = internal::mod<dim>(remainder);
       remainder  = internal::div<dim>(remainder);
     }
-  Assert(remainder == 0, ExcInternalError());
+  Assert(remainder DEAL_II_EQUALS 0, ExcInternalError());
 
   return indices;
 }
@@ -2093,12 +2094,13 @@ inline DEAL_II_CONSTEXPR DEAL_II_ALWAYS_INLINE
  *
  * @relatesalso Tensor
  */
-template <int rank_1,
-          int rank_2,
-          int dim,
-          typename Number,
-          typename OtherNumber,
-          typename = typename std::enable_if<rank_1 >= 1 && rank_2 >= 1>::type>
+template <
+  int rank_1,
+  int rank_2,
+  int dim,
+  typename Number,
+  typename OtherNumber,
+  typename = typename std::enable_if<rank_1 >= 1 DEAL_II_AND rank_2 >= 1>::type>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
   typename Tensor<rank_1 + rank_2 - 2,
                   dim,
@@ -2132,10 +2134,10 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
  *     \text{right}_{j_1,\ldots,k,\ldots,j_{r2}}
  * @f]
  *
- * If for example the first index (<code>index_1==0</code>) of a tensor
- * <code>t1</code> shall be contracted with the third index
- * (<code>index_2==2</code>) of a tensor <code>t2</code>, this function should
- * be invoked as
+ * If for example the first index (<code>index_1DEAL_II_EQUALS 0</code>) of a
+ * tensor <code>t1</code> shall be contracted with the third index
+ * (<code>index_2DEAL_II_EQUALS 2</code>) of a tensor <code>t2</code>, this
+ * function should be invoked as
  * @code
  *   contract<0, 2>(t1, t2);
  * @endcode
@@ -2162,10 +2164,10 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
   contract(const Tensor<rank_1, dim, Number> &     src1,
            const Tensor<rank_2, dim, OtherNumber> &src2)
 {
-  Assert(0 <= index_1 && index_1 < rank_1,
+  Assert(0 <= index_1 DEAL_II_AND index_1 < rank_1,
          ExcMessage(
            "The specified index_1 must lie within the range [0,rank_1)"));
-  Assert(0 <= index_2 && index_2 < rank_2,
+  Assert(0 <= index_2 DEAL_II_AND index_2 < rank_2,
          ExcMessage(
            "The specified index_2 must lie within the range [0,rank_2)"));
 
@@ -2202,11 +2204,12 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
  *     \text{right}_{j_1,\ldots,k,\ldots,l\ldots,j_{r2}}
  * @f]
  *
- * If for example the first index (<code>index_1==0</code>) shall be
- * contracted with the third index (<code>index_2==2</code>), and the second
- * index (<code>index_3==1</code>) with the first index
- * (<code>index_4==0</code>) of a tensor <code>t2</code>, this function should
- * be invoked as
+ * If for example the first index (<code>index_1DEAL_II_EQUALS 0</code>) shall
+ * be contracted with the third index (<code>index_2DEAL_II_EQUALS 2</code>),
+ * and the second index (<code>index_3DEAL_II_EQUALS 1</code>) with the first
+ * index
+ * (<code>index_4DEAL_II_EQUALS 0</code>) of a tensor <code>t2</code>, this
+ * function should be invoked as
  * @code
  *   double_contract<0, 2, 1, 0>(t1, t2);
  * @endcode
@@ -2235,18 +2238,18 @@ DEAL_II_CONSTEXPR inline
   double_contract(const Tensor<rank_1, dim, Number> &     src1,
                   const Tensor<rank_2, dim, OtherNumber> &src2)
 {
-  Assert(0 <= index_1 && index_1 < rank_1,
+  Assert(0 <= index_1 DEAL_II_AND index_1 < rank_1,
          ExcMessage(
            "The specified index_1 must lie within the range [0,rank_1)"));
-  Assert(0 <= index_3 && index_3 < rank_1,
+  Assert(0 <= index_3 DEAL_II_AND index_3 < rank_1,
          ExcMessage(
            "The specified index_3 must lie within the range [0,rank_1)"));
   Assert(index_1 != index_3,
          ExcMessage("index_1 and index_3 must not be the same"));
-  Assert(0 <= index_2 && index_2 < rank_2,
+  Assert(0 <= index_2 DEAL_II_AND index_2 < rank_2,
          ExcMessage(
            "The specified index_2 must lie within the range [0,rank_2)"));
-  Assert(0 <= index_4 && index_4 < rank_2,
+  Assert(0 <= index_4 DEAL_II_AND index_4 < rank_2,
          ExcMessage(
            "The specified index_4 must lie within the range [0,rank_2)"));
   Assert(index_2 != index_4,
@@ -2402,7 +2405,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
  * function is defined for all space dimensions to allow for dimension
  * independent programming (e.g. within switches over the space dimension),
  * but may only be called if the actual dimension of the arguments is two
- * (e.g. from the <tt>dim==2</tt> case in the switch).
+ * (e.g. from the <tt>dimDEAL_II_EQUALS 2</tt> case in the switch).
  *
  * @relatesalso Tensor
  */
@@ -2410,7 +2413,7 @@ template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, Number>
                                                cross_product_2d(const Tensor<1, dim, Number> &src)
 {
-  Assert(dim == 2, ExcInternalError());
+  Assert(dim DEAL_II_EQUALS 2, ExcInternalError());
 
   Tensor<1, dim, Number> result;
 
@@ -2425,8 +2428,8 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, Number>
  * Return the cross product of 2 vectors in 3d. This function is defined for
  * all space dimensions to allow for dimension independent programming (e.g.
  * within switches over the space dimension), but may only be called if the
- * actual dimension of the arguments is three (e.g. from the <tt>dim==3</tt>
- * case in the switch).
+ * actual dimension of the arguments is three (e.g. from the
+ * <tt>dimDEAL_II_EQUALS 3</tt> case in the switch).
  *
  * @relatesalso Tensor
  */
@@ -2436,7 +2439,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
   cross_product_3d(const Tensor<1, dim, Number1> &src1,
                    const Tensor<1, dim, Number2> &src2)
 {
-  Assert(dim == 3, ExcInternalError());
+  Assert(dim DEAL_II_EQUALS 3, ExcInternalError());
 
   Tensor<1, dim, typename ProductType<Number1, Number2>::type> result;
 
@@ -2480,16 +2483,17 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number
         for (unsigned int j = 0; j < dim - 1; ++j)
           minor[i][j] = t[i][j < k ? j : j + 1];
 
-      const Number cofactor = ((k % 2 == 0) ? -1. : 1.) * determinant(minor);
+      const Number cofactor =
+        ((k % 2 DEAL_II_EQUALS 0) ? -1. : 1.) * determinant(minor);
 
       det += t[dim - 1][k] * cofactor;
     }
 
-  return ((dim % 2 == 0) ? 1. : -1.) * det;
+  return ((dim % 2 DEAL_II_EQUALS 0) ? 1. : -1.) * det;
 }
 
 /**
- * Specialization for dim==1.
+ * Specialization for dimDEAL_II_EQUALS 1.
  *
  * @relatesalso Tensor
  */
@@ -2501,7 +2505,7 @@ constexpr DEAL_II_ALWAYS_INLINE Number
 }
 
 /**
- * Specialization for dim==2.
+ * Specialization for dimDEAL_II_EQUALS 2.
  *
  * @relatesalso Tensor
  */
@@ -2514,7 +2518,7 @@ constexpr DEAL_II_ALWAYS_INLINE Number
 }
 
 /**
- * Specialization for dim==3.
+ * Specialization for dimDEAL_II_EQUALS 3.
  *
  * @relatesalso Tensor
  */

@@ -284,7 +284,7 @@ for (deal_II_dimension : DIMENSIONS)
 
 #endif
 
-#if deal_II_dimension == 3
+#if deal_II_dimension DEAL_II_EQUALS 3
     template void DoFTools::extract_boundary_dofs<1, 3>(
       const DoFHandler<1, 3> &,
       const ComponentMask &,
@@ -353,7 +353,7 @@ for (deal_II_dimension : DIMENSIONS)
 
 #endif
 
-#if deal_II_dimension == 3
+#if deal_II_dimension DEAL_II_EQUALS 3
 
     template void DoFTools::map_dof_to_boundary_indices<1, 3>(
       const DoFHandler<1, 3> &,

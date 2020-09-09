@@ -48,9 +48,9 @@ namespace CUDAWrappers
     __device__ inline unsigned int
     compute_index()
     {
-      return (dim == 1 ?
+      return (dim DEAL_II_EQUALS 1 ?
                 threadIdx.x % n_points_1d :
-                dim == 2 ?
+                dim DEAL_II_EQUALS 2 ?
                 threadIdx.x % n_points_1d + n_points_1d * threadIdx.y :
                 threadIdx.x % n_points_1d +
                     n_points_1d * (threadIdx.y + n_points_1d * threadIdx.z));
@@ -366,7 +366,8 @@ namespace CUDAWrappers
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     read_dof_values(const Number *src)
   {
-    static_assert(n_components_ == 1, "This function only supports FE with one \
+    static_assert(n_components_ DEAL_II_EQUALS 1,
+                  "This function only supports FE with one \
                   components");
     const unsigned int idx = internal::compute_index<dim, n_q_points_1d>();
 
@@ -391,7 +392,8 @@ namespace CUDAWrappers
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     distribute_local_to_global(Number *dst) const
   {
-    static_assert(n_components_ == 1, "This function only supports FE with one \
+    static_assert(n_components_ DEAL_II_EQUALS 1,
+                  "This function only supports FE with one \
                   components");
     internal::resolve_hanging_nodes<dim, fe_degree, true>(constraint_mask,
                                                           values);
@@ -427,18 +429,19 @@ namespace CUDAWrappers
       n_q_points_1d,
       Number>
       evaluator_tensor_product(mf_object_id);
-    if (evaluate_val == true && evaluate_grad == true)
+    if (evaluate_val DEAL_II_EQUALS true DEAL_II_AND evaluate_grad
+                                                     DEAL_II_EQUALS true)
       {
         evaluator_tensor_product.value_and_gradient_at_quad_pts(values,
                                                                 gradients);
         __syncthreads();
       }
-    else if (evaluate_grad == true)
+    else if (evaluate_grad DEAL_II_EQUALS true)
       {
         evaluator_tensor_product.gradient_at_quad_pts(values, gradients);
         __syncthreads();
       }
-    else if (evaluate_val == true)
+    else if (evaluate_val DEAL_II_EQUALS true)
       {
         evaluator_tensor_product.value_at_quad_pts(values);
         __syncthreads();
@@ -464,17 +467,18 @@ namespace CUDAWrappers
       n_q_points_1d,
       Number>
       evaluator_tensor_product(mf_object_id);
-    if (integrate_val == true && integrate_grad == true)
+    if (integrate_val DEAL_II_EQUALS true DEAL_II_AND integrate_grad
+                                                      DEAL_II_EQUALS true)
       {
         evaluator_tensor_product.integrate_value_and_gradient(values,
                                                               gradients);
       }
-    else if (integrate_val == true)
+    else if (integrate_val DEAL_II_EQUALS true)
       {
         evaluator_tensor_product.integrate_value(values);
         __syncthreads();
       }
-    else if (integrate_grad == true)
+    else if (integrate_grad DEAL_II_EQUALS true)
       {
         evaluator_tensor_product.integrate_gradient<false>(values, gradients);
         __syncthreads();
@@ -628,7 +632,8 @@ namespace CUDAWrappers
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     get_gradient(const unsigned int q_point) const
   {
-    static_assert(n_components_ == 1, "This function only supports FE with one \
+    static_assert(n_components_ DEAL_II_EQUALS 1,
+                  "This function only supports FE with one \
                   components");
     // TODO optimize if the mesh is uniform
     const Number *inv_jacobian = &inv_jac[q_point];
@@ -660,7 +665,8 @@ namespace CUDAWrappers
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     get_gradient() const
   {
-    static_assert(n_components_ == 1, "This function only supports FE with one \
+    static_assert(n_components_ DEAL_II_EQUALS 1,
+                  "This function only supports FE with one \
                   components");
 
     // TODO optimize if the mesh is uniform

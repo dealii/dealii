@@ -73,8 +73,9 @@ template <int dim, int spacedim = dim>
 class FE_NedelecSZ : public FiniteElement<dim, dim>
 {
 public:
-  static_assert(dim == spacedim,
-                "FE_NedelecSZ is only implemented for dim==spacedim!");
+  static_assert(
+    dim DEAL_II_EQUALS spacedim,
+    "FE_NedelecSZ is only implemented for dimDEAL_II_EQUALS spacedim!");
 
   /**
    * Constructor for the NedelecSZ element of given @p order. The maximal

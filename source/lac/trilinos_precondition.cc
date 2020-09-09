@@ -137,13 +137,13 @@ namespace TrilinosWrappers
                        additional_data.min_diagonal);
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
   }
 
 
@@ -190,13 +190,13 @@ namespace TrilinosWrappers
     parameter_list.set("schwarz: combine mode", "Add");
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
   }
 
 
@@ -243,13 +243,13 @@ namespace TrilinosWrappers
     parameter_list.set("schwarz: combine mode", "Add");
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
   }
 
 
@@ -281,7 +281,7 @@ namespace TrilinosWrappers
     // Block relaxation setup fails if we have no locally owned rows. As a
     // work-around we just pretend to use point relaxation on those processors:
     preconditioner.reset(
-      Ifpack().Create((matrix.trilinos_matrix().NumMyRows() == 0) ?
+      Ifpack().Create((matrix.trilinos_matrix().NumMyRows() DEAL_II_EQUALS 0) ?
                         "point relaxation" :
                         "block relaxation",
                       const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
@@ -310,13 +310,13 @@ namespace TrilinosWrappers
     parameter_list.set("partitioner: local parts", n_local_parts);
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
   }
 
 
@@ -349,7 +349,7 @@ namespace TrilinosWrappers
     // Block relaxation setup fails if we have no locally owned rows. As a
     // work-around we just pretend to use point relaxation on those processors:
     preconditioner.reset(
-      Ifpack().Create((matrix.trilinos_matrix().NumMyRows() == 0) ?
+      Ifpack().Create((matrix.trilinos_matrix().NumMyRows() DEAL_II_EQUALS 0) ?
                         "point relaxation" :
                         "block relaxation",
                       const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
@@ -379,13 +379,13 @@ namespace TrilinosWrappers
     parameter_list.set("partitioner: local parts", n_local_parts);
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
   }
 
 
@@ -418,7 +418,7 @@ namespace TrilinosWrappers
     // Block relaxation setup fails if we have no locally owned rows. As a
     // work-around we just pretend to use point relaxation on those processors:
     preconditioner.reset(
-      Ifpack().Create((matrix.trilinos_matrix().NumMyRows() == 0) ?
+      Ifpack().Create((matrix.trilinos_matrix().NumMyRows() DEAL_II_EQUALS 0) ?
                         "point relaxation" :
                         "block relaxation",
                       const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
@@ -448,13 +448,13 @@ namespace TrilinosWrappers
     parameter_list.set("partitioner: local parts", n_local_parts);
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
   }
 
 
@@ -498,13 +498,13 @@ namespace TrilinosWrappers
     parameter_list.set("schwarz: combine mode", "Add");
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
   }
 
 
@@ -549,13 +549,13 @@ namespace TrilinosWrappers
     parameter_list.set("schwarz: combine mode", "Add");
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
   }
 
 
@@ -603,13 +603,13 @@ namespace TrilinosWrappers
     parameter_list.set("schwarz: combine mode", "Add");
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
   }
 
 
@@ -645,13 +645,13 @@ namespace TrilinosWrappers
     parameter_list.set("schwarz: combine mode", "Add");
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
   }
 
 
@@ -705,13 +705,13 @@ namespace TrilinosWrappers
                        !additional_data.nonzero_starting);
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
   }
 
 
@@ -753,13 +753,13 @@ namespace TrilinosWrappers
     parameter_list.set("relaxation: min diagonal value", 0.0);
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
   }
 
   void

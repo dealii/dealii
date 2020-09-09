@@ -2687,9 +2687,9 @@ namespace DoFTools
   inline Coupling
   operator|=(Coupling &c1, const Coupling c2)
   {
-    if (c2 == always)
+    if (c2 DEAL_II_EQUALS always)
       c1 = always;
-    else if (c1 != always && c2 == nonzero)
+    else if (c1 != always DEAL_II_AND c2 DEAL_II_EQUALS nonzero)
       return c1 = nonzero;
     return c1;
   }
@@ -2703,9 +2703,9 @@ namespace DoFTools
   inline Coupling
   operator|(const Coupling c1, const Coupling c2)
   {
-    if (c1 == always || c2 == always)
+    if (c1 DEAL_II_EQUALS always DEAL_II_OR c2 DEAL_II_EQUALS always)
       return always;
-    if (c1 == nonzero || c2 == nonzero)
+    if (c1 DEAL_II_EQUALS nonzero DEAL_II_OR c2 DEAL_II_EQUALS nonzero)
       return nonzero;
     return none;
   }

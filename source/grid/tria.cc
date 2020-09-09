@@ -126,15 +126,15 @@ namespace
   cell_is_patch_level_1(
     const TriaIterator<dealii::CellAccessor<dim, spacedim>> &cell)
   {
-    Assert(cell->is_active() == false, ExcInternalError());
+    Assert(cell->is_active() DEAL_II_EQUALS false, ExcInternalError());
 
     unsigned int n_active_children = 0;
     for (unsigned int i = 0; i < cell->n_children(); ++i)
       if (cell->child(i)->is_active())
         ++n_active_children;
 
-    return (n_active_children == 0) ||
-           (n_active_children == cell->n_children());
+    return (n_active_children DEAL_II_EQUALS 0)DEAL_II_OR(
+      n_active_children DEAL_II_EQUALS cell->n_children());
   }
 
 
@@ -158,9 +158,11 @@ namespace
         const unsigned int n_children          = cell->n_children();
 
         for (unsigned int c = 0; c < n_children; ++c)
-          if (cell->child(c)->is_active() && cell->child(c)->coarsen_flag_set())
+          if (cell->child(c)
+                ->is_active() DEAL_II_AND cell->child(c)
+                ->coarsen_flag_set())
             ++children_to_coarsen;
-        if (children_to_coarsen == n_children)
+        if (children_to_coarsen DEAL_II_EQUALS n_children)
           return true;
         else
           for (unsigned int c = 0; c < n_children; ++c)
@@ -268,7 +270,7 @@ namespace
             // possibilities here: the neighbor
             // might be coarser or as coarse
             // as we are
-            if (neighbor_face->index() == this_face_index)
+            if (neighbor_face->index() DEAL_II_EQUALS this_face_index)
               // the neighbor is as coarse as
               // we are and will be refined at
               // the face of consideration, so
@@ -293,7 +295,8 @@ namespace
                 // (it could also be a
                 // grand_child)
                 for (unsigned int c = 0; c < neighbor_face->n_children(); ++c)
-                  if (neighbor_face->child_index(c) == this_face_index)
+                  if (neighbor_face->child_index(c)
+                        DEAL_II_EQUALS this_face_index)
                     {
                       // if the flagged refine
                       // case of the face is a
@@ -302,8 +305,8 @@ namespace
                       // then the face, as seen
                       // from our cell, won't be
                       // refined by the neighbor
-                      if ((neighbor_face->refinement_case() | face_ref_case) ==
-                          neighbor_face->refinement_case())
+                      if ((neighbor_face->refinement_case() | face_ref_case)
+                            DEAL_II_EQUALS neighbor_face->refinement_case())
                         return false;
                       else
                         {
@@ -319,8 +322,8 @@ namespace
                           // that the face has
                           // now...
                           Assert(
-                            face_ref_case ==
-                              RefinementCase<dim - 1>::isotropic_refinement,
+                            face_ref_case DEAL_II_EQUALS
+                                          RefinementCase<dim - 1>::isotropic_refinement,
                             ExcInternalError());
                           expected_face_ref_case =
                             ~neighbor_face->refinement_case();
@@ -332,7 +335,7 @@ namespace
                 // one of the children, but a
                 // grandchild. This is only
                 // possible in 3d.
-                Assert(dim == 3, ExcInternalError());
+                Assert(dim DEAL_II_EQUALS 3, ExcInternalError());
                 // In that case, however, no
                 // matter what the neighbor
                 // does, it won't be finer
@@ -622,7 +625,7 @@ namespace
    * which the determinant of the
    * Jacobian is zero or
    * negative. This is the function
-   * for the case dim==spacedim.
+   * for the case dimDEAL_II_EQUALS spacedim.
    */
   template <int dim>
   inline typename Triangulation<dim, dim>::DistortedCellList
@@ -654,7 +657,7 @@ namespace
    * Return whether any of the
    * children of the given cell is
    * distorted or not. This is the
-   * function for dim==spacedim.
+   * function for dimDEAL_II_EQUALS spacedim.
    */
   template <int dim>
   bool
@@ -809,15 +812,15 @@ namespace
           // as well. Fortunately the normal
           // orientation of children will be just
           // the same.
-          if (dim == 2)
+          if (dim DEAL_II_EQUALS 2)
             {
-              if (cell->is_active() && face->has_children())
+              if (cell->is_active() DEAL_II_AND face->has_children())
                 {
                   adjacent_cells[2 * face->child(0)->index() + offset] = cell;
                   adjacent_cells[2 * face->child(1)->index() + offset] = cell;
                 }
             }
-          else // -> dim == 3
+          else // -> dim DEAL_II_EQUALS  3
             {
               // We need the same as in 2d
               // here. Furthermore, if the face is
@@ -839,11 +842,11 @@ namespace
               // will be overwritten later on when we
               // visit cells on finer levels, so no
               // harm will be done.
-              if (face->has_children() &&
-                  (cell->is_active() ||
-                   GeometryInfo<dim>::face_refinement_case(
-                     cell->refinement_case(), f) ==
-                     RefinementCase<dim - 1>::isotropic_refinement))
+              if (face->has_children() DEAL_II_AND(
+                    cell->is_active()
+                      DEAL_II_OR GeometryInfo<dim>::face_refinement_case(
+                        cell->refinement_case(), f) DEAL_II_EQUALS
+                        RefinementCase<dim - 1>::isotropic_refinement))
                 {
                   for (unsigned int c = 0; c < face->n_children(); ++c)
                     adjacent_cells[2 * face->child(c)->index() + offset] = cell;
@@ -862,7 +865,7 @@ namespace
                                      offset] = cell;
                     }
                 } // if cell active and face refined
-            }     // else -> dim==3
+            }     // else -> dimDEAL_II_EQUALS 3
         }         // for all faces of all cells
 
     // now loop again over all cells and set the
@@ -906,27 +909,32 @@ namespace
     const bool face_flip        = orientation[1];
     const bool face_rotation    = orientation[2];
 
-    Assert((dim != 1) || (face_orientation == true && face_flip == false &&
-                          face_rotation == false),
-           ExcMessage("The supplied orientation "
-                      "(face_orientation, face_flip, face_rotation) "
-                      "is invalid for 1D"));
+    Assert(
+      (dim != 1) DEAL_II_OR(
+        face_orientation DEAL_II_EQUALS true DEAL_II_AND face_flip
+          DEAL_II_EQUALS false DEAL_II_AND face_rotation DEAL_II_EQUALS false),
+      ExcMessage("The supplied orientation "
+                 "(face_orientation, face_flip, face_rotation) "
+                 "is invalid for 1D"));
 
-    Assert((dim != 2) || (face_orientation == true && face_rotation == false),
+    Assert((dim != 2) DEAL_II_OR(
+             face_orientation DEAL_II_EQUALS true DEAL_II_AND face_rotation
+                                                              DEAL_II_EQUALS false),
            ExcMessage("The supplied orientation "
                       "(face_orientation, face_flip, face_rotation) "
                       "is invalid for 2D"));
 
     Assert(face_1 != face_2, ExcMessage("face_1 and face_2 are equal!"));
 
-    Assert(face_1->at_boundary() && face_2->at_boundary(),
+    Assert(face_1->at_boundary() DEAL_II_AND face_2->at_boundary(),
            ExcMessage("Periodic faces must be on the boundary"));
 
     // Check if the requirement that each edge can only have at most one hanging
     // node, and as a consequence neighboring cells can differ by at most
     // one refinement level is enforced. In 1d, there are no hanging nodes and
     // so neighboring cells can differ by more than one refinement level.
-    Assert(dim == 1 || std::abs(cell_1->level() - cell_2->level()) < 2,
+    Assert(dim DEAL_II_EQUALS 1 DEAL_II_OR std::abs(cell_1->level() -
+                                                    cell_2->level()) < 2,
            ExcInternalError());
 
     // insert periodic face pair for both cells
@@ -942,10 +950,11 @@ namespace
       periodic_faces(cell_face_1, cell_face_orientation_2);
 
     // Only one periodic neighbor is allowed
-    Assert(periodic_face_map.count(cell_face_1) == 0, ExcInternalError());
+    Assert(periodic_face_map.count(cell_face_1) DEAL_II_EQUALS 0,
+           ExcInternalError());
     periodic_face_map.insert(periodic_faces);
 
-    if (dim == 1)
+    if (dim DEAL_II_EQUALS 1)
       {
         if (cell_1->has_children())
           {
@@ -971,7 +980,7 @@ namespace
               }
           }
       }
-    else // dim == 2 || dim == 3
+    else // dim DEAL_II_EQUALS  2 DEAL_II_OR  dim DEAL_II_EQUALS  3
       {
         // A lookup table on how to go through the child cells depending on the
         // orientation:
@@ -1011,10 +1020,11 @@ namespace
                 // children and apply update_periodic_face_map_recursively
                 // recursively:
 
-                Assert(face_1->n_children() ==
-                           GeometryInfo<dim>::max_children_per_face &&
-                         face_2->n_children() ==
-                           GeometryInfo<dim>::max_children_per_face,
+                Assert(face_1
+                         ->n_children() DEAL_II_EQUALS
+                           GeometryInfo<dim>::max_children_per_face DEAL_II_AND
+                                                                    face_2->n_children() DEAL_II_EQUALS
+                                                                    GeometryInfo<dim>::max_children_per_face,
                        ExcNotImplemented());
 
                 for (unsigned int i = 0;
@@ -1056,11 +1066,11 @@ namespace
                         cell_2->face_rotation(n_face_2),
                         face_2->refinement_case());
 
-                    Assert(cell_1->child(child_cell_1)->face(n_face_1) ==
-                             face_1->child(i),
+                    Assert(cell_1->child(child_cell_1)
+                             ->face(n_face_1) DEAL_II_EQUALS face_1->child(i),
                            ExcInternalError());
-                    Assert(cell_2->child(child_cell_2)->face(n_face_2) ==
-                             face_2->child(j),
+                    Assert(cell_2->child(child_cell_2)
+                             ->face(n_face_2) DEAL_II_EQUALS face_2->child(j),
                            ExcInternalError());
 
                     // precondition: subcell has the same orientation as cell
@@ -1308,7 +1318,7 @@ namespace internal
     {
       AssertDimension(tria_faces.dim, 3);
 
-      Assert(new_quads_in_pairs % 2 == 0, ExcInternalError());
+      Assert(new_quads_in_pairs % 2 DEAL_II_EQUALS 0, ExcInternalError());
 
       unsigned int next_free_single = 0;
       unsigned int next_free_pair   = 0;
@@ -1327,13 +1337,13 @@ namespace internal
               if (tria_faces.quads.used[i + 1])
                 {
                   ++n_unused_singles;
-                  if (next_free_single == 0)
+                  if (next_free_single DEAL_II_EQUALS 0)
                     next_free_single = i;
                 }
               else
                 {
                   ++n_unused_pairs;
-                  if (next_free_pair == 0)
+                  if (next_free_pair DEAL_II_EQUALS 0)
                     next_free_pair = i;
                   ++i;
                 }
@@ -1341,8 +1351,8 @@ namespace internal
           else
             ++n_unused_singles;
         }
-      Assert(n_quads + 2 * n_unused_pairs + n_unused_singles ==
-               tria_faces.quads.used.size(),
+      Assert(n_quads + 2 * n_unused_pairs +
+               n_unused_singles DEAL_II_EQUALS tria_faces.quads.used.size(),
              ExcInternalError());
 
       // how many single quads are needed in addition to n_unused_quads?
@@ -1456,7 +1466,7 @@ namespace internal
                                       std::make_pair(-1, -1));
 
 
-          if (tria_level.dim == 3)
+          if (tria_level.dim DEAL_II_EQUALS 3)
             {
               tria_level.face_orientations.reserve(
                 total_cells * GeometryInfo<3>::faces_per_cell);
@@ -1467,14 +1477,15 @@ namespace internal
                 true);
             }
 
-          if (tria_level.dim == 2 || tria_level.dim == 3)
+          if (tria_level.dim DEAL_II_EQUALS 2 DEAL_II_OR tria_level
+                .dim                                     DEAL_II_EQUALS 3)
             {
               tria_level.reference_cell_type.reserve(total_cells);
               tria_level.reference_cell_type.insert(
                 tria_level.reference_cell_type.end(),
                 total_cells - tria_level.reference_cell_type.size(),
-                tria_level.dim == 2 ? ReferenceCell::Type::Quad :
-                                      ReferenceCell::Type::Hex);
+                tria_level.dim DEAL_II_EQUALS 2 ? ReferenceCell::Type::Quad :
+                                                  ReferenceCell::Type::Hex);
             }
         }
     }
@@ -1501,12 +1512,14 @@ namespace internal
     {
       (void)tria_level;
       (void)true_dimension;
-      Assert(2 * true_dimension * tria_level.refine_flags.size() ==
-               tria_level.neighbors.size(),
+      Assert(2 * true_dimension *
+               tria_level.refine_flags.size()
+                 DEAL_II_EQUALS tria_level.neighbors.size(),
              ExcMemoryInexact(tria_level.refine_flags.size(),
                               tria_level.neighbors.size()));
-      Assert(2 * true_dimension * tria_level.coarsen_flags.size() ==
-               tria_level.neighbors.size(),
+      Assert(2 * true_dimension *
+               tria_level.coarsen_flags.size()
+                 DEAL_II_EQUALS tria_level.neighbors.size(),
              ExcMemoryInexact(tria_level.coarsen_flags.size(),
                               tria_level.neighbors.size()));
     }
@@ -1532,7 +1545,7 @@ namespace internal
     {
       if (tria_objects.structdim <= 2)
         {
-          Assert(new_objects_in_pairs % 2 == 0, ExcInternalError());
+          Assert(new_objects_in_pairs % 2 DEAL_II_EQUALS 0, ExcInternalError());
 
           tria_objects.next_free_single               = 0;
           tria_objects.next_free_pair                 = 0;
@@ -1552,13 +1565,13 @@ namespace internal
                   if (tria_objects.used[i + 1])
                     {
                       ++n_unused_singles;
-                      if (tria_objects.next_free_single == 0)
+                      if (tria_objects.next_free_single DEAL_II_EQUALS 0)
                         tria_objects.next_free_single = i;
                     }
                   else
                     {
                       ++n_unused_pairs;
-                      if (tria_objects.next_free_pair == 0)
+                      if (tria_objects.next_free_pair DEAL_II_EQUALS 0)
                         tria_objects.next_free_pair = i;
                       ++i;
                     }
@@ -1566,8 +1579,8 @@ namespace internal
               else
                 ++n_unused_singles;
             }
-          Assert(n_objects + 2 * n_unused_pairs + n_unused_singles ==
-                   tria_objects.used.size(),
+          Assert(n_objects + 2 * n_unused_pairs +
+                   n_unused_singles DEAL_II_EQUALS tria_objects.used.size(),
                  ExcInternalError());
 
           // how many single objects are needed in addition to
@@ -1586,20 +1599,20 @@ namespace internal
               unsigned int faces_per_cell        = 1;
               unsigned int max_children_per_cell = 1;
 
-              if (tria_objects.structdim == 1)
+              if (tria_objects.structdim DEAL_II_EQUALS 1)
                 faces_per_cell = GeometryInfo<1>::faces_per_cell;
-              else if (tria_objects.structdim == 2)
+              else if (tria_objects.structdim DEAL_II_EQUALS 2)
                 faces_per_cell = GeometryInfo<2>::faces_per_cell;
-              else if (tria_objects.structdim == 3)
+              else if (tria_objects.structdim DEAL_II_EQUALS 3)
                 faces_per_cell = GeometryInfo<3>::faces_per_cell;
               else
                 AssertThrow(false, ExcNotImplemented());
 
-              if (tria_objects.structdim == 1)
+              if (tria_objects.structdim DEAL_II_EQUALS 1)
                 max_children_per_cell = GeometryInfo<1>::max_children_per_cell;
-              else if (tria_objects.structdim == 2)
+              else if (tria_objects.structdim DEAL_II_EQUALS 2)
                 max_children_per_cell = GeometryInfo<2>::max_children_per_cell;
-              else if (tria_objects.structdim == 3)
+              else if (tria_objects.structdim DEAL_II_EQUALS 3)
                 max_children_per_cell = GeometryInfo<3>::max_children_per_cell;
               else
                 AssertThrow(false, ExcNotImplemented());
@@ -1652,7 +1665,7 @@ namespace internal
                                               numbers::flat_manifold_id);
             }
 
-          if (n_unused_singles == 0)
+          if (n_unused_singles DEAL_II_EQUALS 0)
             {
               tria_objects.next_free_single               = new_size - 1;
               tria_objects.reverse_order_next_free_single = true;
@@ -1672,11 +1685,11 @@ namespace internal
             {
               unsigned int faces_per_cell = 1;
 
-              if (tria_objects.structdim == 1)
+              if (tria_objects.structdim DEAL_II_EQUALS 1)
                 faces_per_cell = GeometryInfo<1>::faces_per_cell;
-              else if (tria_objects.structdim == 2)
+              else if (tria_objects.structdim DEAL_II_EQUALS 2)
                 faces_per_cell = GeometryInfo<2>::faces_per_cell;
-              else if (tria_objects.structdim == 3)
+              else if (tria_objects.structdim DEAL_II_EQUALS 3)
                 faces_per_cell = GeometryInfo<3>::faces_per_cell;
               else
                 AssertThrow(false, ExcNotImplemented());
@@ -1740,38 +1753,44 @@ namespace internal
     void
     monitor_memory(const TriaObjects &tria_object, const unsigned int)
     {
-      Assert(tria_object.n_objects() == tria_object.used.size(),
+      Assert(tria_object.n_objects() DEAL_II_EQUALS tria_object.used.size(),
              ExcMemoryInexact(tria_object.n_objects(),
                               tria_object.used.size()));
-      Assert(tria_object.n_objects() == tria_object.user_flags.size(),
+      Assert(tria_object.n_objects()
+               DEAL_II_EQUALS tria_object.user_flags.size(),
              ExcMemoryInexact(tria_object.n_objects(),
                               tria_object.user_flags.size()));
-      Assert(tria_object.n_objects() ==
-               tria_object.boundary_or_material_id.size(),
+      Assert(tria_object.n_objects()
+               DEAL_II_EQUALS tria_object.boundary_or_material_id.size(),
              ExcMemoryInexact(tria_object.n_objects(),
                               tria_object.boundary_or_material_id.size()));
-      Assert(tria_object.n_objects() == tria_object.manifold_id.size(),
+      Assert(tria_object.n_objects()
+               DEAL_II_EQUALS tria_object.manifold_id.size(),
              ExcMemoryInexact(tria_object.n_objects(),
                               tria_object.manifold_id.size()));
-      Assert(tria_object.n_objects() == tria_object.user_data.size(),
+      Assert(tria_object.n_objects()
+               DEAL_II_EQUALS tria_object.user_data.size(),
              ExcMemoryInexact(tria_object.n_objects(),
                               tria_object.user_data.size()));
 
-      if (tria_object.structdim == 1)
+      if (tria_object.structdim DEAL_II_EQUALS 1)
         {
-          Assert(1 * tria_object.n_objects() == tria_object.children.size(),
+          Assert(1 * tria_object.n_objects()
+                       DEAL_II_EQUALS tria_object.children.size(),
                  ExcMemoryInexact(tria_object.n_objects(),
                                   tria_object.children.size()));
         }
-      else if (tria_object.structdim == 2)
+      else if (tria_object.structdim DEAL_II_EQUALS 2)
         {
-          Assert(2 * tria_object.n_objects() == tria_object.children.size(),
+          Assert(2 * tria_object.n_objects()
+                       DEAL_II_EQUALS tria_object.children.size(),
                  ExcMemoryInexact(tria_object.n_objects(),
                                   tria_object.children.size()));
         }
-      else if (tria_object.structdim == 3)
+      else if (tria_object.structdim DEAL_II_EQUALS 3)
         {
-          Assert(4 * tria_object.n_objects() == tria_object.children.size(),
+          Assert(4 * tria_object.n_objects()
+                       DEAL_II_EQUALS tria_object.children.size(),
                  ExcMemoryInexact(tria_object.n_objects(),
                                   tria_object.children.size()));
         }
@@ -1781,9 +1800,10 @@ namespace internal
      * A class into which we put many of the functions that implement
      * functionality of the Triangulation class. The main reason for this
      * class is as follows: the majority of the functions in Triangulation
-     * need to be implemented differently for dim==1, dim==2, and
-     * dim==3. However, their implementation is largly independent of the
-     * spacedim template parameter. So we would like to write things like
+     * need to be implemented differently for dimDEAL_II_EQUALS 1,
+     * dimDEAL_II_EQUALS 2, and dimDEAL_II_EQUALS 3. However, their
+     * implementation is largly independent of the spacedim template parameter.
+     * So we would like to write things like
      *
      * @code
      * template <int spacedim>
@@ -1913,7 +1933,7 @@ namespace internal
 
         // for 1d, lines have levels so take count the objects per
         // level and globally
-        if (dim == 1)
+        if (dim DEAL_II_EQUALS 1)
           {
             number_cache.n_lines_level.resize(number_cache.n_levels);
             number_cache.n_active_lines_level.resize(number_cache.n_levels);
@@ -1926,13 +1946,14 @@ namespace internal
 
                 line_iterator line = triangulation.begin_line(level),
                               endc =
-                                (level == number_cache.n_levels - 1 ?
+                                (level DEAL_II_EQUALS number_cache.n_levels -
+                                     1 ?
                                    line_iterator(triangulation.end_line()) :
                                    triangulation.begin_line(level + 1));
                 for (; line != endc; ++line)
                   {
                     ++number_cache.n_lines_level[level];
-                    if (line->has_children() == false)
+                    if (line->has_children() DEAL_II_EQUALS false)
                       ++number_cache.n_active_lines_level[level];
                   }
 
@@ -1953,7 +1974,7 @@ namespace internal
             for (; line != endc; ++line)
               {
                 ++number_cache.n_lines;
-                if (line->has_children() == false)
+                if (line->has_children() DEAL_II_EQUALS false)
                   ++number_cache.n_active_lines;
               }
           }
@@ -2005,7 +2026,7 @@ namespace internal
 
         // for 2d, quads have levels so take count the objects per
         // level and globally
-        if (dim == 2)
+        if (dim DEAL_II_EQUALS 2)
           {
             // count the number of levels; the function we called above
             // on a separate Task for lines also does this and puts it into
@@ -2029,13 +2050,13 @@ namespace internal
 
                 quad_iterator quad = triangulation.begin_quad(level),
                               endc =
-                                (level == n_levels - 1 ?
+                                (level DEAL_II_EQUALS n_levels - 1 ?
                                    quad_iterator(triangulation.end_quad()) :
                                    triangulation.begin_quad(level + 1));
                 for (; quad != endc; ++quad)
                   {
                     ++number_cache.n_quads_level[level];
-                    if (quad->has_children() == false)
+                    if (quad->has_children() DEAL_II_EQUALS false)
                       ++number_cache.n_active_quads_level[level];
                   }
 
@@ -2056,7 +2077,7 @@ namespace internal
             for (; quad != endc; ++quad)
               {
                 ++number_cache.n_quads;
-                if (quad->has_children() == false)
+                if (quad->has_children() DEAL_II_EQUALS false)
                   ++number_cache.n_active_quads;
               }
           }
@@ -2112,7 +2133,7 @@ namespace internal
 
         // for 3d, hexes have levels so take count the objects per
         // level and globally
-        if (dim == 3)
+        if (dim DEAL_II_EQUALS 3)
           {
             // count the number of levels; the function we called
             // above on a separate Task for quads (recursively, via
@@ -2136,13 +2157,13 @@ namespace internal
                 number_cache.n_active_hexes_level[level] = 0;
 
                 hex_iterator hex  = triangulation.begin_hex(level),
-                             endc = (level == n_levels - 1 ?
+                             endc = (level DEAL_II_EQUALS n_levels - 1 ?
                                        hex_iterator(triangulation.end_hex()) :
                                        triangulation.begin_hex(level + 1));
                 for (; hex != endc; ++hex)
                   {
                     ++number_cache.n_hexes_level[level];
-                    if (hex->has_children() == false)
+                    if (hex->has_children() DEAL_II_EQUALS false)
                       ++number_cache.n_active_hexes_level[level];
                   }
 
@@ -2163,7 +2184,7 @@ namespace internal
             for (; hex != endc; ++hex)
               {
                 ++number_cache.n_hexes;
-                if (hex->has_children() == false)
+                if (hex->has_children() DEAL_II_EQUALS false)
                   ++number_cache.n_active_hexes;
               }
           }
@@ -2190,7 +2211,7 @@ namespace internal
 #ifndef _MSC_VER
         // TODO: The following code does not compile with MSVC. Find a way
         // around it
-        if (dim == spacedim)
+        if (dim DEAL_II_EQUALS spacedim)
           for (unsigned int cell_no = 0; cell_no < cells.size(); ++cell_no)
             {
               // If we should check for distorted cells, then we permit them
@@ -2247,7 +2268,7 @@ namespace internal
           }
 
         // TriaObjects: quads
-        if (dim == 3)
+        if (dim DEAL_II_EQUALS 3)
           {
             auto &quads_0 = tria.faces->quads; // data structures to be filled
             auto &faces   = *tria.faces;
@@ -2294,12 +2315,11 @@ namespace internal
 
           // in 2D optional: since in in pure QUAD meshes same line
           // orientations can be guaranteed
-          const bool orientation_needed =
-            dim == 3 ||
-            (dim == 2 &&
-             std::any_of(connectivity.entity_orientations(1).begin(),
-                         connectivity.entity_orientations(1).end(),
-                         [](const auto &i) { return i == 0; }));
+          const bool orientation_needed = dim DEAL_II_EQUALS 3 DEAL_II_OR(
+            dim DEAL_II_EQUALS 2 DEAL_II_AND std::any_of(
+              connectivity.entity_orientations(1).begin(),
+              connectivity.entity_orientations(1).end(),
+              [](const auto &i) { return i DEAL_II_EQUALS 0; }));
 
           // allocate memory
           reserve_space_(cells_0, n_cell);
@@ -2344,7 +2364,7 @@ namespace internal
         // TriaFaces: boundary id of boundary faces
         if (dim > 1)
           {
-            auto &bids_face = dim == 3 ?
+            auto &bids_face = dim DEAL_II_EQUALS 3 ?
                                 tria.faces->quads.boundary_or_material_id :
                                 tria.faces->lines.boundary_or_material_id;
 
@@ -2391,14 +2411,15 @@ namespace internal
               for (unsigned int i = crs.ptr[cell], j = 0; i < crs.ptr[cell + 1];
                    ++i, ++j)
                 if (type[crs.col[i]] != t_inner)
-                  type[crs.col[i]] = type[crs.col[i]] == t_tba ? j : t_inner;
+                  type[crs.col[i]] =
+                    type[crs.col[i]] DEAL_II_EQUALS t_tba ? j : t_inner;
 
             for (unsigned int face = 0; face < type.size(); ++face)
               {
                 // note: we also treat manifolds here!?
                 (*tria.vertex_to_manifold_id_map_1d)[face] =
                   numbers::flat_manifold_id;
-                if (type[face] != t_inner && type[face] != t_tba)
+                if (type[face] != t_inner DEAL_II_AND type[face] != t_tba)
                   (*tria.vertex_to_boundary_id_map_1d)[face] = type[face];
               }
           }
@@ -2410,7 +2431,7 @@ namespace internal
                               subcelldata.boundary_lines);
 
         // SubCellData: quad
-        if (dim == 3)
+        if (dim DEAL_II_EQUALS 3)
           process_subcelldata(connectivity.entity_to_entities(2, 0),
                               tria.faces->quads,
                               subcelldata.boundary_quads);
@@ -2426,7 +2447,7 @@ namespace internal
       {
         AssertDimension(obj.structdim, structdim);
 
-        if (boundary_objects_in.size() == 0)
+        if (boundary_objects_in.size() DEAL_II_EQUALS 0)
           return; // empty subcelldata -> nothing to do
 
         // pre-sort subcelldata
@@ -2456,10 +2477,10 @@ namespace internal
 
             // assert that object has not been visited yet and its value
             // has not been modified yet
-            AssertThrow(boundary_id == 0 ||
-                          boundary_id == numbers::internal_face_boundary_id,
+            AssertThrow(boundary_id DEAL_II_EQUALS 0 DEAL_II_OR boundary_id
+                          DEAL_II_EQUALS numbers::internal_face_boundary_id,
                         ExcNotImplemented());
-            AssertThrow(manifold_id == numbers::flat_manifold_id,
+            AssertThrow(manifold_id DEAL_II_EQUALS numbers::flat_manifold_id,
                         ExcNotImplemented());
 
             // create key
@@ -2477,8 +2498,8 @@ namespace internal
                                });
 
             // no subcelldata provided for this object
-            if (subcell_object == boundary_objects.end() ||
-                subcell_object->vertices != key)
+            if (subcell_object DEAL_II_EQUALS boundary_objects
+                  .end() DEAL_II_OR           subcell_object->vertices != key)
               continue;
 
             counter++;
@@ -2511,11 +2532,12 @@ namespace internal
         const unsigned int dim = faces.dim;
 
         const unsigned int faces_per_cell =
-          structdim == 1 ? GeometryInfo<1>::faces_per_cell :
-                           (structdim == 2 ? GeometryInfo<2>::faces_per_cell :
-                                             GeometryInfo<3>::faces_per_cell);
+          structdim        DEAL_II_EQUALS 1 ?
+            GeometryInfo<1>::faces_per_cell :
+            (structdim DEAL_II_EQUALS 2 ? GeometryInfo<2>::faces_per_cell :
+                                          GeometryInfo<3>::faces_per_cell);
 
-        if (dim == 3 && structdim == 2)
+        if (dim DEAL_II_EQUALS 3 DEAL_II_AND structdim DEAL_II_EQUALS 2)
           {
             // quad entity types
             faces.quad_reference_cell_type.assign(size,
@@ -2537,9 +2559,10 @@ namespace internal
         const unsigned int dim = level.dim;
 
         const unsigned int faces_per_cell =
-          dim == 1 ? GeometryInfo<1>::faces_per_cell :
-                     (dim == 2 ? GeometryInfo<2>::faces_per_cell :
-                                 GeometryInfo<3>::faces_per_cell);
+          dim              DEAL_II_EQUALS 1 ?
+            GeometryInfo<1>::faces_per_cell :
+            (dim DEAL_II_EQUALS 2 ? GeometryInfo<2>::faces_per_cell :
+                                    GeometryInfo<3>::faces_per_cell);
 
         level.active_cell_indices.assign(size, -1);
         level.subdomain_ids.assign(size, 0);
@@ -2569,14 +2592,16 @@ namespace internal
         const unsigned int structdim = obj.structdim;
 
         const unsigned int max_children_per_cell =
-          structdim == 1 ?
+          structdim        DEAL_II_EQUALS 1 ?
             GeometryInfo<1>::max_children_per_cell :
-            (structdim == 2 ? GeometryInfo<2>::max_children_per_cell :
-                              GeometryInfo<3>::max_children_per_cell);
+            (structdim DEAL_II_EQUALS 2 ?
+               GeometryInfo<2>::max_children_per_cell :
+               GeometryInfo<3>::max_children_per_cell);
         const unsigned int faces_per_cell =
-          structdim == 1 ? GeometryInfo<1>::faces_per_cell :
-                           (structdim == 2 ? GeometryInfo<2>::faces_per_cell :
-                                             GeometryInfo<3>::faces_per_cell);
+          structdim        DEAL_II_EQUALS 1 ?
+            GeometryInfo<1>::faces_per_cell :
+            (structdim DEAL_II_EQUALS 2 ? GeometryInfo<2>::faces_per_cell :
+                                          GeometryInfo<3>::faces_per_cell);
 
         obj.used.assign(size, true);
         obj.boundary_or_material_id.assign(
@@ -2641,24 +2666,26 @@ namespace internal
         // that of this cell's children by
         // more than one level.
 
-        Assert(!cell->child(0)->has_children() &&
-                 !cell->child(1)->has_children(),
+        Assert(!cell->child(0)
+                  ->has_children() DEAL_II_AND !cell->child(1)
+                  ->has_children(),
                ExcInternalError());
 
         // first do it for the cells to the
         // left
-        if (cell->neighbor(0).state() == IteratorState::valid)
+        if (cell->neighbor(0).state() DEAL_II_EQUALS IteratorState::valid)
           if (cell->neighbor(0)->has_children())
             {
               typename Triangulation<dim, spacedim>::cell_iterator neighbor =
                 cell->neighbor(0);
-              Assert(neighbor->level() == cell->level(), ExcInternalError());
+              Assert(neighbor->level() DEAL_II_EQUALS cell->level(),
+                     ExcInternalError());
 
               // right child
               neighbor = neighbor->child(1);
               while (true)
                 {
-                  Assert(neighbor->neighbor(1) == cell->child(0),
+                  Assert(neighbor->neighbor(1) DEAL_II_EQUALS cell->child(0),
                          ExcInternalError());
                   neighbor->set_neighbor(1, cell);
 
@@ -2675,18 +2702,19 @@ namespace internal
 
         // now do it for the cells to the
         // left
-        if (cell->neighbor(1).state() == IteratorState::valid)
+        if (cell->neighbor(1).state() DEAL_II_EQUALS IteratorState::valid)
           if (cell->neighbor(1)->has_children())
             {
               typename Triangulation<dim, spacedim>::cell_iterator neighbor =
                 cell->neighbor(1);
-              Assert(neighbor->level() == cell->level(), ExcInternalError());
+              Assert(neighbor->level() DEAL_II_EQUALS cell->level(),
+                     ExcInternalError());
 
               // left child
               neighbor = neighbor->child(0);
               while (true)
                 {
-                  Assert(neighbor->neighbor(0) == cell->child(1),
+                  Assert(neighbor->neighbor(0) DEAL_II_EQUALS cell->child(1),
                          ExcInternalError());
                   neighbor->set_neighbor(0, cell);
 
@@ -2736,7 +2764,8 @@ namespace internal
         const unsigned int        dim      = 2;
         const RefinementCase<dim> ref_case = cell->refinement_case();
 
-        Assert(line_cell_count.size() == triangulation.n_raw_lines(),
+        Assert(line_cell_count.size()
+                 DEAL_II_EQUALS triangulation.n_raw_lines(),
                ExcInternalError());
 
         // vectors to hold all lines which
@@ -2766,7 +2795,7 @@ namespace internal
         // is no inner vertex.
         // additionally delete unneeded inner
         // lines
-        if (ref_case == RefinementCase<dim>::cut_xy)
+        if (ref_case DEAL_II_EQUALS RefinementCase<dim>::cut_xy)
           {
             triangulation
               .vertices_used[cell->child(0)->line(1)->vertex_index(1)] = false;
@@ -2779,7 +2808,7 @@ namespace internal
         else
           {
             unsigned int inner_face_no =
-              ref_case == RefinementCase<dim>::cut_x ? 1 : 3;
+              ref_case DEAL_II_EQUALS RefinementCase<dim>::cut_x ? 1 : 3;
 
             // the inner line will not be
             // used any more
@@ -2816,13 +2845,16 @@ namespace internal
                 // if one of the cell counters is
                 // zero, the other has to be as well
 
-                Assert((line_cell_count[line->child_index(0)] == 0 &&
-                        line_cell_count[line->child_index(1)] == 0) ||
-                         (line_cell_count[line->child_index(0)] > 0 &&
-                          line_cell_count[line->child_index(1)] > 0),
-                       ExcInternalError());
+                Assert(
+                  (line_cell_count[line->child_index(
+                    0)] DEAL_II_EQUALS 0 DEAL_II_AND
+                     line_cell_count[line->child_index(1)] DEAL_II_EQUALS 0)
+                    DEAL_II_OR(
+                      line_cell_count[line->child_index(0)] >
+                      0 DEAL_II_AND line_cell_count[line->child_index(1)] > 0),
+                  ExcInternalError());
 
-                if (line_cell_count[line->child_index(0)] == 0)
+                if (line_cell_count[line->child_index(0)] DEAL_II_EQUALS 0)
                   {
                     for (unsigned int c = 0; c < 2; ++c)
                       Assert(!line->child(c)->has_children(),
@@ -2873,9 +2905,11 @@ namespace internal
       {
         const unsigned int dim = 3;
 
-        Assert(line_cell_count.size() == triangulation.n_raw_lines(),
+        Assert(line_cell_count.size()
+                 DEAL_II_EQUALS triangulation.n_raw_lines(),
                ExcInternalError());
-        Assert(quad_cell_count.size() == triangulation.n_raw_quads(),
+        Assert(quad_cell_count.size()
+                 DEAL_II_EQUALS triangulation.n_raw_quads(),
                ExcInternalError());
 
         // first of all, we store the RefineCase of
@@ -3022,12 +3056,11 @@ namespace internal
             typename Triangulation<dim, spacedim>::quad_iterator quad =
               cell->face(quad_no);
 
-            Assert(
-              (GeometryInfo<dim>::face_refinement_case(ref_case, quad_no) &&
-               quad->has_children()) ||
-                GeometryInfo<dim>::face_refinement_case(ref_case, quad_no) ==
-                  RefinementCase<dim - 1>::no_refinement,
-              ExcInternalError());
+            Assert((GeometryInfo<dim>::face_refinement_case(ref_case, quad_no)
+                      DEAL_II_AND quad->has_children())DEAL_II_OR
+                                      GeometryInfo<dim>::face_refinement_case(ref_case, quad_no)
+                       DEAL_II_EQUALS RefinementCase<dim - 1>::no_refinement,
+                   ExcInternalError());
 
             switch (quad->refinement_case())
               {
@@ -3041,11 +3074,15 @@ namespace internal
                     // if one of the cell counters is
                     // zero, the other has to be as
                     // well
-                    Assert((quad_cell_count[quad->child_index(0)] == 0 &&
-                            quad_cell_count[quad->child_index(1)] == 0) ||
-                             (quad_cell_count[quad->child_index(0)] > 0 &&
-                              quad_cell_count[quad->child_index(1)] > 0),
-                           ExcInternalError());
+                    Assert(
+                      (quad_cell_count[quad->child_index(
+                        0)] DEAL_II_EQUALS 0 DEAL_II_AND
+                         quad_cell_count[quad->child_index(1)] DEAL_II_EQUALS 0)
+                        DEAL_II_OR(
+                          quad_cell_count[quad->child_index(0)] >
+                          0 DEAL_II_AND quad_cell_count[quad->child_index(1)] >
+                          0),
+                      ExcInternalError());
                     // it might be, that the quad is
                     // refined twice anisotropically,
                     // first check, whether we may
@@ -3061,26 +3098,27 @@ namespace internal
                           // zero, the other has to be as
                           // well
                           Assert(
-                            (quad_cell_count[quad->child(c)->child_index(0)] ==
-                               0 &&
-                             quad_cell_count[quad->child(c)->child_index(1)] ==
-                               0) ||
-                              (quad_cell_count[quad->child(c)->child_index(0)] >
-                                 0 &&
-                               quad_cell_count[quad->child(c)->child_index(1)] >
-                                 0),
+                            (quad_cell_count[quad->child(c)->child_index(
+                              0)] DEAL_II_EQUALS 0 DEAL_II_AND
+                               quad_cell_count[quad->child(c)->child_index(
+                                 1)] DEAL_II_EQUALS 0)
+                              DEAL_II_OR(
+                                quad_cell_count[quad->child(c)->child_index(
+                                  0)] > 0 DEAL_II_AND quad_cell_count
+                                          [quad->child(c)->child_index(1)] > 0),
                             ExcInternalError());
-                          if (quad_cell_count[quad->child(c)->child_index(0)] ==
-                              0)
+                          if (quad_cell_count[quad->child(c)->child_index(
+                                0)] DEAL_II_EQUALS 0)
                             {
                               // Assert, that the two
                               // anisotropic
                               // refinements add up to
                               // isotropic refinement
-                              Assert(quad->refinement_case() +
-                                         quad->child(c)->refinement_case() ==
-                                       RefinementCase<dim>::cut_xy,
-                                     ExcInternalError());
+                              Assert(
+                                quad->refinement_case() +
+                                  quad->child(c)->refinement_case()
+                                    DEAL_II_EQUALS RefinementCase<dim>::cut_xy,
+                                ExcInternalError());
                               // we may delete the
                               // quad's children and
                               // the inner line as no
@@ -3090,8 +3128,8 @@ namespace internal
                                 quad->child(c)->child(0));
                               quads_to_delete.push_back(
                                 quad->child(c)->child(1));
-                              if (quad->child(c)->refinement_case() ==
-                                  RefinementCase<2>::cut_x)
+                              if (quad->child(c)->refinement_case()
+                                    DEAL_II_EQUALS RefinementCase<2>::cut_x)
                                 lines_to_delete.push_back(
                                   quad->child(c)->child(0)->line(1));
                               else
@@ -3107,12 +3145,14 @@ namespace internal
                     // refinement of the inner line
                     // between our children and the
                     // corresponding vertex
-                    if (number_of_child_refinements > 0 &&
-                        deleted_grandchildren == number_of_child_refinements)
+                    if (number_of_child_refinements >
+                        0 DEAL_II_AND deleted_grandchildren DEAL_II_EQUALS
+                                                            number_of_child_refinements)
                       {
                         typename Triangulation<dim, spacedim>::line_iterator
                           middle_line;
-                        if (quad->refinement_case() == RefinementCase<2>::cut_x)
+                        if (quad->refinement_case()
+                              DEAL_II_EQUALS RefinementCase<2>::cut_x)
                           middle_line = quad->child(0)->line(1);
                         else
                           middle_line = quad->child(0)->line(3);
@@ -3127,7 +3167,7 @@ namespace internal
 
                     // now consider the direct children
                     // of the given quad
-                    if (quad_cell_count[quad->child_index(0)] == 0)
+                    if (quad_cell_count[quad->child_index(0)] DEAL_II_EQUALS 0)
                       {
                         // we may delete the quad's
                         // children and the inner line
@@ -3135,7 +3175,8 @@ namespace internal
                         // anymore
                         quads_to_delete.push_back(quad->child(0));
                         quads_to_delete.push_back(quad->child(1));
-                        if (quad->refinement_case() == RefinementCase<2>::cut_x)
+                        if (quad->refinement_case()
+                              DEAL_II_EQUALS RefinementCase<2>::cut_x)
                           lines_to_delete.push_back(quad->child(0)->line(1));
                         else
                           lines_to_delete.push_back(quad->child(0)->line(3));
@@ -3159,8 +3200,8 @@ namespace internal
                         // set the children
                         // accordingly.
                         if (quad->child(0)->has_children())
-                          if (quad->refinement_case() ==
-                              RefinementCase<2>::cut_x)
+                          if (quad->refinement_case()
+                                DEAL_II_EQUALS RefinementCase<2>::cut_x)
                             {
                               // now evereything is
                               // quite complicated. we
@@ -3219,11 +3260,12 @@ namespace internal
                                         triangulation.levels[l]
                                           ->cells.get_bounding_object_indices(
                                             h)[q];
-                                      if (index == switch_1_index)
+                                      if (index DEAL_II_EQUALS switch_1_index)
                                         triangulation.levels[l]
                                           ->cells.get_bounding_object_indices(
                                             h)[q] = switch_2_index;
-                                      else if (index == switch_2_index)
+                                      else if (index DEAL_II_EQUALS
+                                                     switch_2_index)
                                         triangulation.levels[l]
                                           ->cells.get_bounding_object_indices(
                                             h)[q] = switch_1_index;
@@ -3349,17 +3391,22 @@ namespace internal
                     // zero, the others have to be as
                     // well
 
-                    Assert((quad_cell_count[quad->child_index(0)] == 0 &&
-                            quad_cell_count[quad->child_index(1)] == 0 &&
-                            quad_cell_count[quad->child_index(2)] == 0 &&
-                            quad_cell_count[quad->child_index(3)] == 0) ||
-                             (quad_cell_count[quad->child_index(0)] > 0 &&
-                              quad_cell_count[quad->child_index(1)] > 0 &&
-                              quad_cell_count[quad->child_index(2)] > 0 &&
-                              quad_cell_count[quad->child_index(3)] > 0),
-                           ExcInternalError());
+                    Assert(
+                      (quad_cell_count[quad->child_index(
+                        0)] DEAL_II_EQUALS 0 DEAL_II_AND quad_cell_count
+                         [quad->child_index(1)] DEAL_II_EQUALS 0 DEAL_II_AND
+                           quad_cell_count[quad->child_index(
+                             2)] DEAL_II_EQUALS 0 DEAL_II_AND quad_cell_count
+                             [quad->child_index(3)] DEAL_II_EQUALS 0)
+                        DEAL_II_OR(
+                          quad_cell_count[quad->child_index(0)] >
+                          0 DEAL_II_AND quad_cell_count[quad->child_index(1)] >
+                          0 DEAL_II_AND quad_cell_count[quad->child_index(2)] >
+                          0 DEAL_II_AND quad_cell_count[quad->child_index(3)] >
+                          0),
+                      ExcInternalError());
 
-                    if (quad_cell_count[quad->child_index(0)] == 0)
+                    if (quad_cell_count[quad->child_index(0)] DEAL_II_EQUALS 0)
                       {
                         // we may delete the quad's
                         // children, the inner lines
@@ -3405,25 +3452,27 @@ namespace internal
             typename Triangulation<dim, spacedim>::line_iterator line =
               cell->line(line_no);
 
-            Assert(
-              (GeometryInfo<dim>::line_refinement_case(ref_case, line_no) &&
-               line->has_children()) ||
-                GeometryInfo<dim>::line_refinement_case(ref_case, line_no) ==
-                  RefinementCase<1>::no_refinement,
-              ExcInternalError());
+            Assert((GeometryInfo<dim>::line_refinement_case(ref_case, line_no)
+                      DEAL_II_AND line->has_children())DEAL_II_OR
+                                      GeometryInfo<dim>::line_refinement_case(ref_case, line_no)
+                       DEAL_II_EQUALS RefinementCase<1>::no_refinement,
+                   ExcInternalError());
 
             if (line->has_children())
               {
                 // if one of the cell counters is
                 // zero, the other has to be as well
 
-                Assert((line_cell_count[line->child_index(0)] == 0 &&
-                        line_cell_count[line->child_index(1)] == 0) ||
-                         (line_cell_count[line->child_index(0)] > 0 &&
-                          line_cell_count[line->child_index(1)] > 0),
-                       ExcInternalError());
+                Assert(
+                  (line_cell_count[line->child_index(
+                    0)] DEAL_II_EQUALS 0 DEAL_II_AND
+                     line_cell_count[line->child_index(1)] DEAL_II_EQUALS 0)
+                    DEAL_II_OR(
+                      line_cell_count[line->child_index(0)] >
+                      0 DEAL_II_AND line_cell_count[line->child_index(1)] > 0),
+                  ExcInternalError());
 
-                if (line_cell_count[line->child_index(0)] == 0)
+                if (line_cell_count[line->child_index(0)] DEAL_II_EQUALS 0)
                   {
                     for (unsigned int c = 0; c < 2; ++c)
                       Assert(!line->child(c)->has_children(),
@@ -3612,14 +3661,15 @@ namespace internal
             new_vertices[4 + line_no] =
               cell->line(line_no)->child(0)->vertex_index(1);
 
-        if (ref_case == RefinementCase<dim>::cut_xy)
+        if (ref_case DEAL_II_EQUALS RefinementCase<dim>::cut_xy)
           {
             // find the next
             // unused vertex and
             // allocate it for
             // the new vertex we
             // need here
-            while (triangulation.vertices_used[next_unused_vertex] == true)
+            while (triangulation
+                     .vertices_used[next_unused_vertex] DEAL_II_EQUALS true)
               ++next_unused_vertex;
             Assert(
               next_unused_vertex < triangulation.vertices.size(),
@@ -3639,7 +3689,7 @@ namespace internal
             // not the case, then
             // we need to ask a
             // boundary object
-            if (dim == spacedim)
+            if (dim DEAL_II_EQUALS spacedim)
               {
                 // triangulation.vertices[next_unused_vertex] = new_point;
                 triangulation.vertices[next_unused_vertex] = cell->center(true);
@@ -3687,18 +3737,18 @@ namespace internal
 
         for (unsigned int l = lmin; l < lmax; ++l)
           {
-            while (next_unused_line->used() == true)
+            while (next_unused_line->used() DEAL_II_EQUALS true)
               ++next_unused_line;
             new_lines[l] = next_unused_line;
             ++next_unused_line;
 
             Assert(
-              new_lines[l]->used() == false,
+              new_lines[l]->used() DEAL_II_EQUALS false,
               ExcMessage(
                 "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
           }
 
-        if (ref_case == RefinementCase<dim>::cut_xy)
+        if (ref_case DEAL_II_EQUALS RefinementCase<dim>::cut_xy)
           {
             //   .-6-.-7-.
             //   1   9   3
@@ -3712,7 +3762,7 @@ namespace internal
             for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
               for (unsigned int c = 0; c < 2; ++c, ++l)
                 new_lines[l] = cell->line(face_no)->child(c);
-            Assert(l == 8, ExcInternalError());
+            Assert(l DEAL_II_EQUALS 8, ExcInternalError());
 
             new_lines[8]->set_bounding_object_indices(
               {new_vertices[6], new_vertices[8]});
@@ -3723,7 +3773,7 @@ namespace internal
             new_lines[11]->set_bounding_object_indices(
               {new_vertices[8], new_vertices[5]});
           }
-        else if (ref_case == RefinementCase<dim>::cut_x)
+        else if (ref_case DEAL_II_EQUALS RefinementCase<dim>::cut_x)
           {
             //   .-4-.-5-.
             //   |   |   |
@@ -3741,7 +3791,8 @@ namespace internal
           }
         else
           {
-            Assert(ref_case == RefinementCase<dim>::cut_y, ExcInternalError());
+            Assert(ref_case DEAL_II_EQUALS RefinementCase<dim>::cut_y,
+                   ExcInternalError());
             //   .---5---.
             //   1       3
             //   .---6---.
@@ -3773,24 +3824,24 @@ namespace internal
         // new cells!
         typename Triangulation<dim, spacedim>::raw_cell_iterator
           subcells[GeometryInfo<dim>::max_children_per_cell];
-        while (next_unused_cell->used() == true)
+        while (next_unused_cell->used() DEAL_II_EQUALS true)
           ++next_unused_cell;
 
         const unsigned int n_children = GeometryInfo<dim>::n_children(ref_case);
         for (unsigned int i = 0; i < n_children; ++i)
           {
             Assert(
-              next_unused_cell->used() == false,
+              next_unused_cell->used() DEAL_II_EQUALS false,
               ExcMessage(
                 "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
             subcells[i] = next_unused_cell;
             ++next_unused_cell;
-            if (i % 2 == 1 && i < n_children - 1)
-              while (next_unused_cell->used() == true)
+            if (i % 2 DEAL_II_EQUALS 1 DEAL_II_AND i < n_children - 1)
+              while (next_unused_cell->used() DEAL_II_EQUALS true)
                 ++next_unused_cell;
           }
 
-        if (ref_case == RefinementCase<dim>::cut_xy)
+        if (ref_case DEAL_II_EQUALS RefinementCase<dim>::cut_xy)
           {
             // children:
             //   .--.--.
@@ -3821,7 +3872,7 @@ namespace internal
                                                       new_lines[11]->index(),
                                                       new_lines[7]->index()});
           }
-        else if (ref_case == RefinementCase<dim>::cut_x)
+        else if (ref_case DEAL_II_EQUALS RefinementCase<dim>::cut_x)
           {
             // children:
             //   .--.--.
@@ -3846,7 +3897,8 @@ namespace internal
           }
         else
           {
-            Assert(ref_case == RefinementCase<dim>::cut_y, ExcInternalError());
+            Assert(ref_case DEAL_II_EQUALS RefinementCase<dim>::cut_y,
+                   ExcInternalError());
             // children:
             //   .-----.
             //   |  1  |
@@ -3884,7 +3936,7 @@ namespace internal
             subcells[i]->set_manifold_id(cell->manifold_id());
             subcells[i]->set_subdomain_id(subdomainid);
 
-            if (i % 2 == 0)
+            if (i % 2 DEAL_II_EQUALS 0)
               subcells[i]->set_parent(cell->index());
           }
 
@@ -4016,8 +4068,9 @@ namespace internal
 
                   // search for next unused
                   // vertex
-                  while (triangulation.vertices_used[next_unused_vertex] ==
-                         true)
+                  while (
+                    triangulation
+                      .vertices_used[next_unused_vertex] DEAL_II_EQUALS true)
                     ++next_unused_vertex;
                   Assert(
                     next_unused_vertex < triangulation.vertices.size(),
@@ -4037,14 +4090,14 @@ namespace internal
                   typename Triangulation<dim, spacedim>::raw_cell_iterator
                     first_child,
                     second_child;
-                  while (next_unused_cell->used() == true)
+                  while (next_unused_cell->used() DEAL_II_EQUALS true)
                     ++next_unused_cell;
                   first_child = next_unused_cell;
                   first_child->set_used_flag();
                   first_child->clear_user_data();
                   ++next_unused_cell;
                   Assert(
-                    next_unused_cell->used() == false,
+                    next_unused_cell->used() DEAL_II_EQUALS false,
                     ExcMessage(
                       "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
                   second_child = next_unused_cell;
@@ -4213,7 +4266,8 @@ namespace internal
                  triangulation.active_cell_iterators_on_level(level))
               if (cell->refine_flag_set())
                 {
-                  if (cell->refine_flag_set() == RefinementCase<dim>::cut_xy)
+                  if (cell->refine_flag_set()
+                        DEAL_II_EQUALS RefinementCase<dim>::cut_xy)
                     {
                       needed_cells += 4;
 
@@ -4224,7 +4278,7 @@ namespace internal
                       // the four inner lines can be stored as singles
                       n_single_lines += 4;
                     }
-                  else // cut_x || cut_y
+                  else // cut_x DEAL_II_OR  cut_y
                     {
                       // set the flag showing that anisotropic
                       // refinement is used for at least one cell
@@ -4246,12 +4300,12 @@ namespace internal
                        GeometryInfo<dim>::face_indices())
                     {
                       if (GeometryInfo<dim>::face_refinement_case(
-                            cell->refine_flag_set(), line_no) ==
-                          RefinementCase<1>::cut_x)
+                            cell->refine_flag_set(), line_no)
+                            DEAL_II_EQUALS RefinementCase<1>::cut_x)
                         {
                           typename Triangulation<dim, spacedim>::line_iterator
                             line = cell->line(line_no);
-                          if (line->has_children() == false)
+                          if (line->has_children() DEAL_II_EQUALS false)
                             line->set_user_flag();
                         }
                     }
@@ -4287,7 +4341,8 @@ namespace internal
              ++line)
           if (line->user_flag_set())
             {
-              Assert(line->has_children() == false, ExcInternalError());
+              Assert(line->has_children() DEAL_II_EQUALS false,
+                     ExcInternalError());
               n_lines_in_pairs += 2;
               needed_vertices += 1;
             }
@@ -4337,7 +4392,8 @@ namespace internal
 
                 // find the next unused vertex and set it
                 // appropriately
-                while (triangulation.vertices_used[next_unused_vertex] == true)
+                while (triangulation
+                         .vertices_used[next_unused_vertex] DEAL_II_EQUALS true)
                   ++next_unused_vertex;
                 Assert(
                   next_unused_vertex < triangulation.vertices.size(),
@@ -4353,8 +4409,9 @@ namespace internal
                 bool pair_found = false;
                 (void)pair_found;
                 for (; next_unused_line != endl; ++next_unused_line)
-                  if (!next_unused_line->used() &&
-                      !(++next_unused_line)->used())
+                  if (!next_unused_line
+                         ->used() DEAL_II_AND !(++next_unused_line)
+                         ->used())
                     {
                       // go back to the first of the two unused
                       // lines
@@ -4375,11 +4432,11 @@ namespace internal
                 // some tests; if any of the iterators should be
                 // invalid, then already dereferencing will fail
                 Assert(
-                  children[0]->used() == false,
+                  children[0]->used() DEAL_II_EQUALS false,
                   ExcMessage(
                     "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
                 Assert(
-                  children[1]->used() == false,
+                  children[1]->used() DEAL_II_EQUALS false,
                   ExcMessage(
                     "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
@@ -4453,11 +4510,11 @@ namespace internal
                                   next_unused_cell,
                                   cell);
 
-                  if (check_for_distorted_cells &&
-                      has_distorted_children(
-                        cell,
-                        std::integral_constant<int, dim>(),
-                        std::integral_constant<int, spacedim>()))
+                  if (check_for_distorted_cells DEAL_II_AND
+                                                has_distorted_children(
+                          cell,
+                          std::integral_constant<int, dim>(),
+                          std::integral_constant<int, spacedim>()))
                     cells_with_distorted_children.distorted_cells.push_back(
                       cell);
                   // inform all listeners that cell refinement is done
@@ -4484,7 +4541,7 @@ namespace internal
         // isn't tested. it will probably be necessary to pull new
         // vertices onto the manifold just as we do for the other
         // functions above.
-        Assert(spacedim == 3, ExcNotImplemented());
+        Assert(spacedim DEAL_II_EQUALS 3, ExcNotImplemented());
 
         // check whether a new level is needed we have to check for
         // this on the highest level only (on this, all used cells are
@@ -4560,24 +4617,26 @@ namespace internal
 
                   // now for interior vertices, lines and quads, which
                   // are needed in any case
-                  if (ref_case == RefinementCase<dim>::cut_x ||
-                      ref_case == RefinementCase<dim>::cut_y ||
-                      ref_case == RefinementCase<dim>::cut_z)
+                  if (ref_case DEAL_II_EQUALS
+                        RefinementCase<dim>::cut_x DEAL_II_OR ref_case
+                          DEAL_II_EQUALS RefinementCase<dim>::cut_y DEAL_II_OR
+                            ref_case DEAL_II_EQUALS RefinementCase<dim>::cut_z)
                     {
                       ++needed_quads_single;
                       new_cells += 2;
                       triangulation.anisotropic_refinement = true;
                     }
-                  else if (ref_case == RefinementCase<dim>::cut_xy ||
-                           ref_case == RefinementCase<dim>::cut_xz ||
-                           ref_case == RefinementCase<dim>::cut_yz)
+                  else if (ref_case DEAL_II_EQUALS RefinementCase<dim>::cut_xy
+                             DEAL_II_OR ref_case DEAL_II_EQUALS
+                               RefinementCase<dim>::cut_xz DEAL_II_OR ref_case
+                                 DEAL_II_EQUALS RefinementCase<dim>::cut_yz)
                     {
                       ++needed_lines_single;
                       needed_quads_single += 4;
                       new_cells += 4;
                       triangulation.anisotropic_refinement = true;
                     }
-                  else if (ref_case == RefinementCase<dim>::cut_xyz)
+                  else if (ref_case DEAL_II_EQUALS RefinementCase<dim>::cut_xyz)
                     {
                       ++needed_vertices;
                       needed_lines_single += 6;
@@ -4613,8 +4672,8 @@ namespace internal
                       // refined
                       if (face_ref_case)
                         {
-                          if (face_ref_case ==
-                              RefinementCase<dim - 1>::isotropic_refinement)
+                          if (face_ref_case DEAL_II_EQUALS
+                                            RefinementCase<dim - 1>::isotropic_refinement)
                             {
                               if (aface->number_of_children() < 4)
                                 // we use user_flags to denote needed
@@ -4632,12 +4691,14 @@ namespace internal
                             // face. therefore we set the user_index
                             // uniquely
                             {
-                              Assert(aface->refinement_case() ==
-                                         RefinementCase<
-                                           dim - 1>::isotropic_refinement ||
-                                       aface->refinement_case() ==
-                                         RefinementCase<dim - 1>::no_refinement,
-                                     ExcInternalError());
+                              Assert(
+                                aface
+                                  ->refinement_case()
+                                    DEAL_II_EQUALS RefinementCase<
+                                      dim - 1>::isotropic_refinement DEAL_II_OR
+                                                                     aface->refinement_case() DEAL_II_EQUALS
+                                                                     RefinementCase<dim - 1>::no_refinement,
+                                ExcInternalError());
                               aface->set_user_index(face_ref_case);
                             }
                         }
@@ -4647,9 +4708,9 @@ namespace internal
                   for (unsigned int line = 0;
                        line < GeometryInfo<dim>::lines_per_cell;
                        ++line)
-                    if (GeometryInfo<dim>::line_refinement_case(ref_case,
-                                                                line) &&
-                        !acell->line(line)->has_children())
+                    if (GeometryInfo<dim>::line_refinement_case(ref_case, line)
+                          DEAL_II_AND !acell->line(line)
+                            ->has_children())
                       acell->line(line)->set_user_flag();
 
                 } // if refine_flag set and for all cells on this level
@@ -4710,17 +4771,20 @@ namespace internal
                 // in case we need them...
                 if (quad->has_children())
                   {
-                    Assert(quad->refinement_case() ==
+                    Assert(quad->refinement_case() DEAL_II_EQUALS
                              RefinementCase<dim - 1>::isotropic_refinement,
                            ExcInternalError());
-                    if ((face_refinement_cases[quad->user_index()] ==
-                           RefinementCase<dim - 1>::cut_x &&
-                         (quad->child(0)->line_index(1) + 1 !=
-                          quad->child(2)->line_index(1))) ||
-                        (face_refinement_cases[quad->user_index()] ==
-                           RefinementCase<dim - 1>::cut_y &&
-                         (quad->child(0)->line_index(3) + 1 !=
-                          quad->child(1)->line_index(3))))
+                    if ((face_refinement_cases[quad
+                                                 ->user_index()] DEAL_II_EQUALS
+                           RefinementCase<dim - 1>::cut_x DEAL_II_AND(
+                             quad->child(0)->line_index(1) + 1 !=
+                             quad->child(2)->line_index(1)))
+                          DEAL_II_OR(
+                            face_refinement_cases
+                              [quad->user_index()] DEAL_II_EQUALS
+                                RefinementCase<dim - 1>::cut_y DEAL_II_AND(
+                                  quad->child(0)->line_index(3) + 1 !=
+                                  quad->child(1)->line_index(3))))
                       needed_lines_pair += 2;
                   }
               }
@@ -4781,7 +4845,8 @@ namespace internal
                  ++line)
               if (cell->line(line)->has_children())
                 for (unsigned int c = 0; c < 2; ++c)
-                  Assert(cell->line(line)->child(c)->user_flag_set() == false,
+                  Assert(cell->line(line)->child(c)->user_flag_set()
+                           DEAL_II_EQUALS false,
                          ExcInternalError());
 #endif
 
@@ -4811,7 +4876,8 @@ namespace internal
 
                 // find the next unused vertex and set it
                 // appropriately
-                while (triangulation.vertices_used[next_unused_vertex] == true)
+                while (triangulation
+                         .vertices_used[next_unused_vertex] DEAL_II_EQUALS true)
                   ++next_unused_vertex;
                 Assert(
                   next_unused_vertex < triangulation.vertices.size(),
@@ -4827,7 +4893,8 @@ namespace internal
                 next_unused_line =
                   triangulation.faces->lines.template next_free_pair_object<1>(
                     triangulation);
-                Assert(next_unused_line.state() == IteratorState::valid,
+                Assert(next_unused_line.state()
+                         DEAL_II_EQUALS IteratorState::valid,
                        ExcInternalError());
 
                 // now we found two consecutive unused lines, such
@@ -4842,11 +4909,11 @@ namespace internal
                 // some tests; if any of the iterators should be
                 // invalid, then already dereferencing will fail
                 Assert(
-                  children[0]->used() == false,
+                  children[0]->used() DEAL_II_EQUALS false,
                   ExcMessage(
                     "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
                 Assert(
-                  children[1]->used() == false,
+                  children[1]->used() DEAL_II_EQUALS false,
                   ExcMessage(
                     "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
@@ -4930,20 +4997,23 @@ namespace internal
                     // children were already flagged for anisotropic
                     // refinement, they might already be processed and
                     // refined.
-                    if (aniso_quad_ref_case == quad->refinement_case())
+                    if (aniso_quad_ref_case DEAL_II_EQUALS
+                                            quad->refinement_case())
                       continue;
 
-                    Assert(quad->refinement_case() ==
-                               RefinementCase<dim - 1>::cut_xy ||
-                             quad->refinement_case() ==
-                               RefinementCase<dim - 1>::no_refinement,
+                    Assert(quad
+                             ->refinement_case()
+                               DEAL_II_EQUALS RefinementCase<dim - 1>::cut_xy
+                                 DEAL_II_OR quad->refinement_case()
+                                   DEAL_II_EQUALS
+                                     RefinementCase<dim - 1>::no_refinement,
                            ExcInternalError());
 
                     // this quad needs to be refined anisotropically
-                    Assert(quad->user_index() ==
-                               RefinementCase<dim - 1>::cut_x ||
-                             quad->user_index() ==
-                               RefinementCase<dim - 1>::cut_y,
+                    Assert(quad
+                             ->user_index() DEAL_II_EQUALS RefinementCase<
+                               dim - 1>::cut_x DEAL_II_OR quad->user_index()
+                               DEAL_II_EQUALS RefinementCase<dim - 1>::cut_y,
                            ExcInternalError());
 
                     // make the new line interior to the quad
@@ -4954,7 +5024,7 @@ namespace internal
                       triangulation.faces->lines
                         .template next_free_single_object<1>(triangulation);
                     Assert(
-                      new_line->used() == false,
+                      new_line->used() DEAL_II_EQUALS false,
                       ExcMessage(
                         "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
@@ -4972,7 +5042,8 @@ namespace internal
                     // |     |
                     // *-----*
                     unsigned int vertex_indices[2];
-                    if (aniso_quad_ref_case == RefinementCase<dim - 1>::cut_x)
+                    if (aniso_quad_ref_case DEAL_II_EQUALS
+                                            RefinementCase<dim - 1>::cut_x)
                       {
                         vertex_indices[0] =
                           quad->line(2)->child(0)->vertex_index(1);
@@ -5016,19 +5087,20 @@ namespace internal
                         .template next_free_pair_object<2>(triangulation);
                     new_quads[0] = next_unused_quad;
                     Assert(
-                      new_quads[0]->used() == false,
+                      new_quads[0]->used() DEAL_II_EQUALS false,
                       ExcMessage(
                         "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
                     ++next_unused_quad;
                     new_quads[1] = next_unused_quad;
                     Assert(
-                      new_quads[1]->used() == false,
+                      new_quads[1]->used() DEAL_II_EQUALS false,
                       ExcMessage(
                         "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
 
-                    if (aniso_quad_ref_case == RefinementCase<dim - 1>::cut_x)
+                    if (aniso_quad_ref_case DEAL_II_EQUALS
+                                            RefinementCase<dim - 1>::cut_x)
                       {
                         new_quads[0]->set_bounding_object_indices(
                           {static_cast<int>(quad->line_index(0)),
@@ -5099,7 +5171,8 @@ namespace internal
                       1, quad->line_orientation(1));
                     new_quads[1]->set_line_orientation(
                       3, quad->line_orientation(3));
-                    if (aniso_quad_ref_case == RefinementCase<dim - 1>::cut_x)
+                    if (aniso_quad_ref_case DEAL_II_EQUALS
+                                            RefinementCase<dim - 1>::cut_x)
                       {
                         new_quads[0]->set_line_orientation(
                           3, quad->line_orientation(3));
@@ -5117,8 +5190,8 @@ namespace internal
                     // test, whether this face is refined
                     // isotropically already. if so, set the correct
                     // children pointers.
-                    if (quad->refinement_case() ==
-                        RefinementCase<dim - 1>::cut_xy)
+                    if (quad->refinement_case()
+                          DEAL_II_EQUALS RefinementCase<dim - 1>::cut_xy)
                       {
                         // we will put a new refinemnt level of
                         // anisotropic refinement between the
@@ -5140,16 +5213,16 @@ namespace internal
                         // it often...
                         typename Triangulation<dim, spacedim>::line_iterator
                           old_child[2];
-                        if (aniso_quad_ref_case ==
-                            RefinementCase<dim - 1>::cut_x)
+                        if (aniso_quad_ref_case DEAL_II_EQUALS
+                                                RefinementCase<dim - 1>::cut_x)
                           {
                             old_child[0] = quad->child(0)->line(1);
                             old_child[1] = quad->child(2)->line(1);
                           }
                         else
                           {
-                            Assert(aniso_quad_ref_case ==
-                                     RefinementCase<dim - 1>::cut_y,
+                            Assert(aniso_quad_ref_case DEAL_II_EQUALS
+                                                       RefinementCase<dim - 1>::cut_y,
                                    ExcInternalError());
 
                             old_child[0] = quad->child(0)->line(3);
@@ -5191,11 +5264,12 @@ namespace internal
                                   const int this_index =
                                     triangulation.faces->quads
                                       .get_bounding_object_indices(q)[l];
-                                  if (this_index == old_index_0)
+                                  if (this_index DEAL_II_EQUALS old_index_0)
                                     triangulation.faces->quads
                                       .get_bounding_object_indices(q)[l] =
                                       new_index_0;
-                                  else if (this_index == old_index_1)
+                                  else if (this_index DEAL_II_EQUALS
+                                                      old_index_1)
                                     triangulation.faces->quads
                                       .get_bounding_object_indices(q)[l] =
                                       new_index_1;
@@ -5231,13 +5305,14 @@ namespace internal
                         // now that we cared about the lines, go on
                         // with the quads themselves, where we might
                         // encounter similar situations...
-                        if (aniso_quad_ref_case ==
-                            RefinementCase<dim - 1>::cut_x)
+                        if (aniso_quad_ref_case DEAL_II_EQUALS
+                                                RefinementCase<dim - 1>::cut_x)
                           {
                             new_line->set_children(
                               0, quad->child(0)->line_index(1));
-                            Assert(new_line->child(1) ==
-                                     quad->child(2)->line(1),
+                            Assert(new_line->child(1)
+                                     DEAL_II_EQUALS quad->child(2)
+                                       ->line(1),
                                    ExcInternalError());
                             // now evereything is quite
                             // complicated. we have the children
@@ -5292,11 +5367,13 @@ namespace internal
                                       triangulation.levels[l]
                                         ->cells.get_bounding_object_indices(
                                           h)[q];
-                                    if (face_index == switch_1_index)
+                                    if (face_index DEAL_II_EQUALS
+                                                   switch_1_index)
                                       triangulation.levels[l]
                                         ->cells.get_bounding_object_indices(
                                           h)[q] = switch_2_index;
-                                    else if (face_index == switch_2_index)
+                                    else if (face_index DEAL_II_EQUALS
+                                                        switch_2_index)
                                       triangulation.levels[l]
                                         ->cells.get_bounding_object_indices(
                                           h)[q] = switch_1_index;
@@ -5327,8 +5404,8 @@ namespace internal
                                  switch_1->child_index(0) :
                                  -1);
                             const int switch_1_second_child_pair =
-                              (switch_1_refinement_case ==
-                                   RefinementCase<dim - 1>::cut_xy ?
+                              (switch_1_refinement_case DEAL_II_EQUALS
+                                                        RefinementCase<dim - 1>::cut_xy ?
                                  switch_1->child_index(2) :
                                  -1);
 
@@ -5360,8 +5437,8 @@ namespace internal
                             if (switch_2->refinement_case())
                               switch_1->set_children(0,
                                                      switch_2->child_index(0));
-                            if (switch_2->refinement_case() ==
-                                RefinementCase<dim - 1>::cut_xy)
+                            if (switch_2->refinement_case() DEAL_II_EQUALS
+                                  RefinementCase<dim - 1>::cut_xy)
                               switch_1->set_children(2,
                                                      switch_2->child_index(2));
 
@@ -5412,8 +5489,9 @@ namespace internal
                             new_quads[1]->set_children(0, quad->child_index(2));
                             new_line->set_children(
                               0, quad->child(0)->line_index(3));
-                            Assert(new_line->child(1) ==
-                                     quad->child(1)->line(3),
+                            Assert(new_line->child(1)
+                                     DEAL_II_EQUALS quad->child(1)
+                                       ->line(3),
                                    ExcInternalError());
                           }
                         quad->clear_children();
@@ -5435,12 +5513,13 @@ namespace internal
 
                     // first of all: we only get here in the first run
                     // of the loop
-                    Assert(loop == 0, ExcInternalError());
+                    Assert(loop DEAL_II_EQUALS 0, ExcInternalError());
 
                     // find the next unused vertex. we'll need this in
                     // any case
-                    while (triangulation.vertices_used[next_unused_vertex] ==
-                           true)
+                    while (
+                      triangulation
+                        .vertices_used[next_unused_vertex] DEAL_II_EQUALS true)
                       ++next_unused_vertex;
                     Assert(
                       next_unused_vertex < triangulation.vertices.size(),
@@ -5455,8 +5534,10 @@ namespace internal
                     const RefinementCase<dim - 1> quad_ref_case =
                       quad->refinement_case();
 
-                    if (quad_ref_case == RefinementCase<dim - 1>::cut_x ||
-                        quad_ref_case == RefinementCase<dim - 1>::cut_y)
+                    if (quad_ref_case DEAL_II_EQUALS
+                          RefinementCase<dim - 1>::cut_x DEAL_II_OR
+                            quad_ref_case DEAL_II_EQUALS
+                                          RefinementCase<dim - 1>::cut_y)
                       {
                         // set the 'opposite' refine case for children
                         quad->child(0)->set_user_index(
@@ -5466,7 +5547,8 @@ namespace internal
                         // refine the inner line
                         typename Triangulation<dim, spacedim>::line_iterator
                           middle_line;
-                        if (quad_ref_case == RefinementCase<dim - 1>::cut_x)
+                        if (quad_ref_case DEAL_II_EQUALS
+                                          RefinementCase<dim - 1>::cut_x)
                           middle_line = quad->child(0)->line(1);
                         else
                           middle_line = quad->child(0)->line(3);
@@ -5509,11 +5591,11 @@ namespace internal
                             // should be invalid, then already
                             // dereferencing will fail
                             Assert(
-                              children[0]->used() == false,
+                              children[0]->used() DEAL_II_EQUALS false,
                               ExcMessage(
                                 "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
                             Assert(
-                              children[1]->used() == false,
+                              children[1]->used() DEAL_II_EQUALS false,
                               ExcMessage(
                                 "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
@@ -5554,8 +5636,8 @@ namespace internal
                     // if we got here, we have an unrefined quad and
                     // have to do the usual work like in an purely
                     // isotropic refinement
-                    Assert(quad_ref_case ==
-                             RefinementCase<dim - 1>::no_refinement,
+                    Assert(quad_ref_case DEAL_II_EQUALS
+                                         RefinementCase<dim - 1>::no_refinement,
                            ExcInternalError());
 
                     // set the middle vertex appropriately: it might be that
@@ -5588,7 +5670,7 @@ namespace internal
 
                     for (unsigned int i = 0; i < 4; ++i)
                       {
-                        if (i % 2 == 0)
+                        if (i % 2 DEAL_II_EQUALS 0)
                           // search a free pair of lines for 0. and
                           // 2. line, so that two of them end up
                           // together, which is necessary if later on
@@ -5603,7 +5685,7 @@ namespace internal
                         ++next_unused_line;
 
                         Assert(
-                          new_lines[i]->used() == false,
+                          new_lines[i]->used() DEAL_II_EQUALS false,
                           ExcMessage(
                             "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
                       }
@@ -5713,14 +5795,14 @@ namespace internal
 
                     new_quads[0] = next_unused_quad;
                     Assert(
-                      new_quads[0]->used() == false,
+                      new_quads[0]->used() DEAL_II_EQUALS false,
                       ExcMessage(
                         "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
                     ++next_unused_quad;
                     new_quads[1] = next_unused_quad;
                     Assert(
-                      new_quads[1]->used() == false,
+                      new_quads[1]->used() DEAL_II_EQUALS false,
                       ExcMessage(
                         "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
@@ -5729,14 +5811,14 @@ namespace internal
                         .template next_free_pair_object<2>(triangulation);
                     new_quads[2] = next_unused_quad;
                     Assert(
-                      new_quads[2]->used() == false,
+                      new_quads[2]->used() DEAL_II_EQUALS false,
                       ExcMessage(
                         "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
                     ++next_unused_quad;
                     new_quads[3] = next_unused_quad;
                     Assert(
-                      new_quads[3]->used() == false,
+                      new_quads[3]->used() DEAL_II_EQUALS false,
                       ExcMessage(
                         "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
@@ -5891,7 +5973,7 @@ namespace internal
                           .template next_free_single_object<1>(triangulation);
 
                       Assert(
-                        new_lines[i]->used() == false,
+                        new_lines[i]->used() DEAL_II_EQUALS false,
                         ExcMessage(
                           "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
                       new_lines[i]->set_used_flag();
@@ -5918,7 +6000,7 @@ namespace internal
                           .template next_free_single_object<2>(triangulation);
 
                       Assert(
-                        new_quads[i]->used() == false,
+                        new_quads[i]->used() DEAL_II_EQUALS false,
                         ExcMessage(
                           "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
                       new_quads[i]->set_used_flag();
@@ -5948,7 +6030,7 @@ namespace internal
                     new_hexes(n_new_hexes);
                   for (unsigned int i = 0; i < n_new_hexes; ++i)
                     {
-                      if (i % 2 == 0)
+                      if (i % 2 DEAL_II_EQUALS 0)
                         next_unused_hex =
                           triangulation.levels[level + 1]->cells.next_free_hex(
                             triangulation, level + 1);
@@ -5958,7 +6040,7 @@ namespace internal
                       new_hexes[i] = next_unused_hex;
 
                       Assert(
-                        new_hexes[i]->used() == false,
+                        new_hexes[i]->used() DEAL_II_EQUALS false,
                         ExcMessage(
                           "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
                       new_hexes[i]->set_used_flag();
@@ -6121,23 +6203,23 @@ namespace internal
                           const typename Triangulation<dim, spacedim>::
                             raw_line_iterator lines[4] = {
                               hex->face(2)->child(0)->line(
-                                (hex->face(2)->refinement_case() ==
-                                 RefinementCase<2>::cut_x) ?
+                                (hex->face(2)->refinement_case()
+                                   DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                   1 :
                                   3), // 0
                               hex->face(3)->child(0)->line(
-                                (hex->face(3)->refinement_case() ==
-                                 RefinementCase<2>::cut_x) ?
+                                (hex->face(3)->refinement_case()
+                                   DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                   1 :
                                   3), // 1
                               hex->face(4)->child(0)->line(
-                                (hex->face(4)->refinement_case() ==
-                                 RefinementCase<2>::cut_x) ?
+                                (hex->face(4)->refinement_case()
+                                   DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                   1 :
                                   3), // 2
                               hex->face(5)->child(0)->line(
-                                (hex->face(5)->refinement_case() ==
-                                 RefinementCase<2>::cut_x) ?
+                                (hex->face(5)->refinement_case()
+                                   DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                   1 :
                                   3) // 3
                             };
@@ -6162,15 +6244,15 @@ namespace internal
                             hex->line(7)->child(0)->vertex_index(1)};
 
                           for (unsigned int i = 0; i < 4; ++i)
-                            if (lines[i]->vertex_index(i % 2) ==
-                                middle_vertices[i % 2])
+                            if (lines[i]->vertex_index(i % 2)
+                                  DEAL_II_EQUALS middle_vertices[i % 2])
                               line_orientation[i] = true;
                             else
                               {
                                 // it must be the other
                                 // way round then
-                                Assert(lines[i]->vertex_index((i + 1) % 2) ==
-                                         middle_vertices[i % 2],
+                                Assert(lines[i]->vertex_index((i + 1) % 2)
+                                         DEAL_II_EQUALS middle_vertices[i % 2],
                                        ExcInternalError());
                                 line_orientation[i] = false;
                               }
@@ -6348,23 +6430,23 @@ namespace internal
                           const typename Triangulation<dim, spacedim>::
                             raw_line_iterator lines[4] = {
                               hex->face(0)->child(0)->line(
-                                (hex->face(0)->refinement_case() ==
-                                 RefinementCase<2>::cut_x) ?
+                                (hex->face(0)->refinement_case()
+                                   DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                   1 :
                                   3), // 0
                               hex->face(1)->child(0)->line(
-                                (hex->face(1)->refinement_case() ==
-                                 RefinementCase<2>::cut_x) ?
+                                (hex->face(1)->refinement_case()
+                                   DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                   1 :
                                   3), // 1
                               hex->face(4)->child(0)->line(
-                                (hex->face(4)->refinement_case() ==
-                                 RefinementCase<2>::cut_x) ?
+                                (hex->face(4)->refinement_case()
+                                   DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                   1 :
                                   3), // 2
                               hex->face(5)->child(0)->line(
-                                (hex->face(5)->refinement_case() ==
-                                 RefinementCase<2>::cut_x) ?
+                                (hex->face(5)->refinement_case()
+                                   DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                   1 :
                                   3) // 3
                             };
@@ -6389,14 +6471,14 @@ namespace internal
                             hex->line(5)->child(0)->vertex_index(1)};
 
                           for (unsigned int i = 0; i < 4; ++i)
-                            if (lines[i]->vertex_index(i % 2) ==
-                                middle_vertices[i % 2])
+                            if (lines[i]->vertex_index(i % 2)
+                                  DEAL_II_EQUALS middle_vertices[i % 2])
                               line_orientation[i] = true;
                             else
                               {
                                 // it must be the other way round then
-                                Assert(lines[i]->vertex_index((i + 1) % 2) ==
-                                         middle_vertices[i % 2],
+                                Assert(lines[i]->vertex_index((i + 1) % 2)
+                                         DEAL_II_EQUALS middle_vertices[i % 2],
                                        ExcInternalError());
                                 line_orientation[i] = false;
                               }
@@ -6576,23 +6658,23 @@ namespace internal
                           const typename Triangulation<dim, spacedim>::
                             raw_line_iterator lines[4] = {
                               hex->face(0)->child(0)->line(
-                                (hex->face(0)->refinement_case() ==
-                                 RefinementCase<2>::cut_x) ?
+                                (hex->face(0)->refinement_case()
+                                   DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                   1 :
                                   3), // 0
                               hex->face(1)->child(0)->line(
-                                (hex->face(1)->refinement_case() ==
-                                 RefinementCase<2>::cut_x) ?
+                                (hex->face(1)->refinement_case()
+                                   DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                   1 :
                                   3), // 1
                               hex->face(2)->child(0)->line(
-                                (hex->face(2)->refinement_case() ==
-                                 RefinementCase<2>::cut_x) ?
+                                (hex->face(2)->refinement_case()
+                                   DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                   1 :
                                   3), // 2
                               hex->face(3)->child(0)->line(
-                                (hex->face(3)->refinement_case() ==
-                                 RefinementCase<2>::cut_x) ?
+                                (hex->face(3)->refinement_case()
+                                   DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                   1 :
                                   3) // 3
                             };
@@ -6617,14 +6699,14 @@ namespace internal
                             middle_vertex_index<dim, spacedim>(hex->line(11))};
 
                           for (unsigned int i = 0; i < 4; ++i)
-                            if (lines[i]->vertex_index(i % 2) ==
-                                middle_vertices[i % 2])
+                            if (lines[i]->vertex_index(i % 2)
+                                  DEAL_II_EQUALS middle_vertices[i % 2])
                               line_orientation[i] = true;
                             else
                               {
                                 // it must be the other way round then
-                                Assert(lines[i]->vertex_index((i + 1) % 2) ==
-                                         middle_vertices[i % 2],
+                                Assert(lines[i]->vertex_index((i + 1) % 2)
+                                         DEAL_II_EQUALS middle_vertices[i % 2],
                                        ExcInternalError());
                                 line_orientation[i] = false;
                               }
@@ -6829,23 +6911,23 @@ namespace internal
                             dim,
                             spacedim>::raw_line_iterator lines[13] = {
                             hex->face(0)->child(0)->line(
-                              (hex->face(0)->refinement_case() ==
-                               RefinementCase<2>::cut_x) ?
+                              (hex->face(0)->refinement_case()
+                                 DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                 1 :
                                 3), // 0
                             hex->face(1)->child(0)->line(
-                              (hex->face(1)->refinement_case() ==
-                               RefinementCase<2>::cut_x) ?
+                              (hex->face(1)->refinement_case()
+                                 DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                 1 :
                                 3), // 1
                             hex->face(2)->child(0)->line(
-                              (hex->face(2)->refinement_case() ==
-                               RefinementCase<2>::cut_x) ?
+                              (hex->face(2)->refinement_case()
+                                 DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                 1 :
                                 3), // 2
                             hex->face(3)->child(0)->line(
-                              (hex->face(3)->refinement_case() ==
-                               RefinementCase<2>::cut_x) ?
+                              (hex->face(3)->refinement_case()
+                                 DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                 1 :
                                 3), // 3
 
@@ -6934,13 +7016,14 @@ namespace internal
                           // line is 'true', if vertex 0 is on the bottom
                           // face
                           for (unsigned int i = 0; i < 4; ++i)
-                            if (lines[i]->vertex_index(0) == middle_vertices[i])
+                            if (lines[i]->vertex_index(0)
+                                  DEAL_II_EQUALS middle_vertices[i])
                               line_orientation[i] = true;
                             else
                               {
                                 // it must be the other way round then
-                                Assert(lines[i]->vertex_index(1) ==
-                                         middle_vertices[i],
+                                Assert(lines[i]->vertex_index(1)
+                                         DEAL_II_EQUALS middle_vertices[i],
                                        ExcInternalError());
                                 line_orientation[i] = false;
                               }
@@ -6952,17 +7035,19 @@ namespace internal
                           // the quad, whereas for odd lines the first
                           // vertex is the same middle vertex.
                           for (unsigned int i = 4; i < 12; ++i)
-                            if (lines[i]->vertex_index((i + 1) % 2) ==
-                                middle_vertex_index<dim, spacedim>(
-                                  hex->face(3 + i / 4)))
+                            if (lines[i]->vertex_index((i + 1) % 2)
+                                  DEAL_II_EQUALS
+                                    middle_vertex_index<dim, spacedim>(
+                                      hex->face(3 + i / 4)))
                               line_orientation[i] = true;
                             else
                               {
                                 // it must be the other way
                                 // round then
-                                Assert(lines[i]->vertex_index(i % 2) ==
-                                         (middle_vertex_index<dim, spacedim>(
-                                           hex->face(3 + i / 4))),
+                                Assert(lines[i]->vertex_index(i % 2)
+                                         DEAL_II_EQUALS(
+                                           middle_vertex_index<dim, spacedim>(
+                                             hex->face(3 + i / 4))),
                                        ExcInternalError());
                                 line_orientation[i] = false;
                               }
@@ -7263,23 +7348,23 @@ namespace internal
                             dim,
                             spacedim>::raw_line_iterator lines[13] = {
                             hex->face(0)->child(0)->line(
-                              (hex->face(0)->refinement_case() ==
-                               RefinementCase<2>::cut_x) ?
+                              (hex->face(0)->refinement_case()
+                                 DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                 1 :
                                 3), // 0
                             hex->face(1)->child(0)->line(
-                              (hex->face(1)->refinement_case() ==
-                               RefinementCase<2>::cut_x) ?
+                              (hex->face(1)->refinement_case()
+                                 DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                 1 :
                                 3), // 1
                             hex->face(4)->child(0)->line(
-                              (hex->face(4)->refinement_case() ==
-                               RefinementCase<2>::cut_x) ?
+                              (hex->face(4)->refinement_case()
+                                 DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                 1 :
                                 3), // 2
                             hex->face(5)->child(0)->line(
-                              (hex->face(5)->refinement_case() ==
-                               RefinementCase<2>::cut_x) ?
+                              (hex->face(5)->refinement_case()
+                                 DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                 1 :
                                 3), // 3
 
@@ -7367,13 +7452,14 @@ namespace internal
                           // note: for lines 0 to 3 the orientation of the
                           // line is 'true', if vertex 0 is on the front
                           for (unsigned int i = 0; i < 4; ++i)
-                            if (lines[i]->vertex_index(0) == middle_vertices[i])
+                            if (lines[i]->vertex_index(0)
+                                  DEAL_II_EQUALS middle_vertices[i])
                               line_orientation[i] = true;
                             else
                               {
                                 // it must be the other way round then
-                                Assert(lines[i]->vertex_index(1) ==
-                                         middle_vertices[i],
+                                Assert(lines[i]->vertex_index(1)
+                                         DEAL_II_EQUALS middle_vertices[i],
                                        ExcInternalError());
                                 line_orientation[i] = false;
                               }
@@ -7385,17 +7471,19 @@ namespace internal
                           // the quad, whereas for odd lines the first
                           // vertex is the same middle vertex.
                           for (unsigned int i = 4; i < 12; ++i)
-                            if (lines[i]->vertex_index((i + 1) % 2) ==
-                                middle_vertex_index<dim, spacedim>(
-                                  hex->face(1 + i / 4)))
+                            if (lines[i]->vertex_index((i + 1) % 2)
+                                  DEAL_II_EQUALS
+                                    middle_vertex_index<dim, spacedim>(
+                                      hex->face(1 + i / 4)))
                               line_orientation[i] = true;
                             else
                               {
                                 // it must be the other way
                                 // round then
-                                Assert(lines[i]->vertex_index(i % 2) ==
-                                         (middle_vertex_index<dim, spacedim>(
-                                           hex->face(1 + i / 4))),
+                                Assert(lines[i]->vertex_index(i % 2)
+                                         DEAL_II_EQUALS(
+                                           middle_vertex_index<dim, spacedim>(
+                                             hex->face(1 + i / 4))),
                                        ExcInternalError());
                                 line_orientation[i] = false;
                               }
@@ -7710,23 +7798,23 @@ namespace internal
                             dim,
                             spacedim>::raw_line_iterator lines[13] = {
                             hex->face(2)->child(0)->line(
-                              (hex->face(2)->refinement_case() ==
-                               RefinementCase<2>::cut_x) ?
+                              (hex->face(2)->refinement_case()
+                                 DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                 1 :
                                 3), // 0
                             hex->face(3)->child(0)->line(
-                              (hex->face(3)->refinement_case() ==
-                               RefinementCase<2>::cut_x) ?
+                              (hex->face(3)->refinement_case()
+                                 DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                 1 :
                                 3), // 1
                             hex->face(4)->child(0)->line(
-                              (hex->face(4)->refinement_case() ==
-                               RefinementCase<2>::cut_x) ?
+                              (hex->face(4)->refinement_case()
+                                 DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                 1 :
                                 3), // 2
                             hex->face(5)->child(0)->line(
-                              (hex->face(5)->refinement_case() ==
-                               RefinementCase<2>::cut_x) ?
+                              (hex->face(5)->refinement_case()
+                                 DEAL_II_EQUALS RefinementCase<2>::cut_x) ?
                                 1 :
                                 3), // 3
 
@@ -7815,13 +7903,14 @@ namespace internal
                           // note: for lines 0 to 3 the orientation of the
                           // line is 'true', if vertex 0 is on the front
                           for (unsigned int i = 0; i < 4; ++i)
-                            if (lines[i]->vertex_index(0) == middle_vertices[i])
+                            if (lines[i]->vertex_index(0)
+                                  DEAL_II_EQUALS middle_vertices[i])
                               line_orientation[i] = true;
                             else
                               {
                                 // it must be the other way round then
-                                Assert(lines[i]->vertex_index(1) ==
-                                         middle_vertices[i],
+                                Assert(lines[i]->vertex_index(1)
+                                         DEAL_II_EQUALS middle_vertices[i],
                                        ExcInternalError());
                                 line_orientation[i] = false;
                               }
@@ -7833,17 +7922,19 @@ namespace internal
                           // the quad, whereas for odd lines the first
                           // vertex is the same middle vertex.
                           for (unsigned int i = 4; i < 12; ++i)
-                            if (lines[i]->vertex_index((i + 1) % 2) ==
-                                middle_vertex_index<dim, spacedim>(
-                                  hex->face(i / 4 - 1)))
+                            if (lines[i]->vertex_index((i + 1) % 2)
+                                  DEAL_II_EQUALS
+                                    middle_vertex_index<dim, spacedim>(
+                                      hex->face(i / 4 - 1)))
                               line_orientation[i] = true;
                             else
                               {
                                 // it must be the other way
                                 // round then
-                                Assert(lines[i]->vertex_index(i % 2) ==
-                                         (middle_vertex_index<dim, spacedim>(
-                                           hex->face(i / 4 - 1))),
+                                Assert(lines[i]->vertex_index(i % 2)
+                                         DEAL_II_EQUALS(
+                                           middle_vertex_index<dim, spacedim>(
+                                             hex->face(i / 4 - 1))),
                                        ExcInternalError());
                                 line_orientation[i] = false;
                               }
@@ -8071,9 +8162,8 @@ namespace internal
 
                           // find the next unused vertex and set it
                           // appropriately
-                          while (
-                            triangulation.vertices_used[next_unused_vertex] ==
-                            true)
+                          while (triangulation.vertices_used
+                                   [next_unused_vertex] DEAL_II_EQUALS true)
                             ++next_unused_vertex;
                           Assert(
                             next_unused_vertex < triangulation.vertices.size(),
@@ -8400,15 +8490,15 @@ namespace internal
                           // the quad, whereas for odd lines the first
                           // vertex is the same middle vertex.
                           for (unsigned int i = 0; i < 24; ++i)
-                            if (lines[i]->vertex_index((i + 1) % 2) ==
-                                vertex_indices[i / 4])
+                            if (lines[i]->vertex_index((i + 1) % 2)
+                                  DEAL_II_EQUALS vertex_indices[i / 4])
                               line_orientation[i] = true;
                             else
                               {
                                 // it must be the other way
                                 // round then
-                                Assert(lines[i]->vertex_index(i % 2) ==
-                                         vertex_indices[i / 4],
+                                Assert(lines[i]->vertex_index(i % 2)
+                                         DEAL_II_EQUALS vertex_indices[i / 4],
                                        ExcInternalError());
                                 line_orientation[i] = false;
                               }
@@ -8820,11 +8910,11 @@ namespace internal
 
                   // now see if we have created cells that are
                   // distorted and if so add them to our list
-                  if (check_for_distorted_cells &&
-                      has_distorted_children(
-                        hex,
-                        std::integral_constant<int, dim>(),
-                        std::integral_constant<int, spacedim>()))
+                  if (check_for_distorted_cells DEAL_II_AND
+                                                has_distorted_children(
+                          hex,
+                          std::integral_constant<int, dim>(),
+                          std::integral_constant<int, spacedim>()))
                     cells_with_distorted_children.distorted_cells.push_back(
                       hex);
 
@@ -8876,9 +8966,10 @@ namespace internal
           return;
 
         for (const auto &cell : triangulation.cell_iterators())
-          if (cell->at_boundary() && cell->refine_flag_set() &&
-              cell->refine_flag_set() !=
-                RefinementCase<dim>::isotropic_refinement)
+          if (cell->at_boundary()
+                DEAL_II_AND   cell->refine_flag_set()
+                  DEAL_II_AND cell->refine_flag_set() !=
+              RefinementCase<dim>::isotropic_refinement)
             {
               // The cell is at the boundary and it is flagged for
               // anisotropic refinement. Therefore, we have a closer
@@ -8991,27 +9082,27 @@ namespace internal
                        line < GeometryInfo<dim>::lines_per_cell;
                        ++line)
                     if (GeometryInfo<dim>::line_refinement_case(
-                          cell->refine_flag_set(), line) ==
-                        RefinementCase<1>::cut_x)
+                          cell->refine_flag_set(), line)
+                          DEAL_II_EQUALS RefinementCase<1>::cut_x)
                       // flag a line, that will be
                       // refined
                       cell->line(line)->set_user_flag();
                 }
-              else if (cell->has_children() &&
-                       !cell->child(0)->coarsen_flag_set())
+              else if (cell->has_children() DEAL_II_AND !cell->child(0)
+                         ->coarsen_flag_set())
                 {
                   for (unsigned int line = 0;
                        line < GeometryInfo<dim>::lines_per_cell;
                        ++line)
                     if (GeometryInfo<dim>::line_refinement_case(
-                          cell->refinement_case(), line) ==
-                        RefinementCase<1>::cut_x)
+                          cell->refinement_case(), line)
+                          DEAL_II_EQUALS RefinementCase<1>::cut_x)
                       // flag a line, that is refined
                       // and will stay so
                       cell->line(line)->set_user_flag();
                 }
-              else if (cell->has_children() &&
-                       cell->child(0)->coarsen_flag_set())
+              else if (cell->has_children() DEAL_II_AND cell->child(0)
+                         ->coarsen_flag_set())
                 cell->set_user_flag();
 
 
@@ -9040,14 +9131,16 @@ namespace internal
 
                       for (unsigned int c = 0; c < 2; ++c)
                         {
-                          Assert(cell->line(line)->child(c)->has_children() ==
-                                   false,
+                          Assert(cell->line(line)->child(c)->has_children()
+                                   DEAL_II_EQUALS false,
                                  ExcInternalError());
 
-                          if (cell->line(line)->child(c)->user_flag_set() &&
-                              (GeometryInfo<dim>::line_refinement_case(
-                                 cell->refine_flag_set(), line) ==
-                               RefinementCase<1>::no_refinement))
+                          if (cell->line(line)->child(c)->user_flag_set()
+                                DEAL_II_AND(
+                                  GeometryInfo<dim>::line_refinement_case(
+                                    cell->refine_flag_set(), line)
+                                    DEAL_II_EQUALS
+                                      RefinementCase<1>::no_refinement))
                             {
                               // tag this cell for refinement
                               cell->clear_coarsen_flag();
@@ -9066,8 +9159,8 @@ namespace internal
                                    l < GeometryInfo<dim>::lines_per_cell;
                                    ++l)
                                 if (GeometryInfo<dim>::line_refinement_case(
-                                      cell->refine_flag_set(), line) ==
-                                    RefinementCase<1>::cut_x)
+                                      cell->refine_flag_set(), line)
+                                      DEAL_II_EQUALS RefinementCase<1>::cut_x)
                                   // flag a line, that will be refined
                                   cell->line(l)->set_user_flag();
 
@@ -9081,10 +9174,10 @@ namespace internal
                               for (unsigned int l = 0;
                                    l < GeometryInfo<dim>::lines_per_cell;
                                    ++l)
-                                if (!cell->line(l)->has_children() &&
-                                    (GeometryInfo<dim>::line_refinement_case(
-                                       cell->refine_flag_set(), l) !=
-                                     RefinementCase<1>::no_refinement))
+                                if (!cell->line(l)->has_children() DEAL_II_AND(
+                                      GeometryInfo<dim>::line_refinement_case(
+                                        cell->refine_flag_set(), l) !=
+                                      RefinementCase<1>::no_refinement))
                                   cell->line(l)->set_user_flag();
 
                               break;
@@ -9119,9 +9212,12 @@ namespace internal
                   for (unsigned int line = 0;
                        line < GeometryInfo<dim>::lines_per_cell;
                        ++line)
-                    if (cell->line(line)->has_children() &&
-                        (cell->line(line)->child(0)->user_flag_set() ||
-                         cell->line(line)->child(1)->user_flag_set()))
+                    if (cell->line(line)->has_children() DEAL_II_AND(
+                          cell->line(line)
+                            ->child(0)
+                            ->user_flag_set() DEAL_II_OR cell->line(line)
+                            ->child(1)
+                            ->user_flag_set()))
                       {
                         for (unsigned int c = 0; c < cell->n_children(); ++c)
                           cell->child(c)->clear_coarsen_flag();
@@ -9130,8 +9226,8 @@ namespace internal
                              l < GeometryInfo<dim>::lines_per_cell;
                              ++l)
                           if (GeometryInfo<dim>::line_refinement_case(
-                                cell->refinement_case(), l) ==
-                              RefinementCase<1>::cut_x)
+                                cell->refinement_case(), l)
+                                DEAL_II_EQUALS RefinementCase<1>::cut_x)
                             // flag a line, that is refined
                             // and will stay so
                             cell->line(l)->set_user_flag();
@@ -9140,7 +9236,7 @@ namespace internal
                       }
               }
           }
-        while (mesh_changed == true);
+        while (mesh_changed DEAL_II_EQUALS true);
       }
 
 
@@ -9158,7 +9254,7 @@ namespace internal
       {
         // in 1d, coarsening is always allowed since we don't enforce
         // the 2:1 constraint there
-        if (dim == 1)
+        if (dim DEAL_II_EQUALS 1)
           return true;
 
         const RefinementCase<dim> ref_case = cell->refinement_case();
@@ -9174,7 +9270,7 @@ namespace internal
             const unsigned int n_subfaces =
               GeometryInfo<dim - 1>::n_children(face_ref_case);
 
-            if (n_subfaces == 0 || cell->at_boundary(n))
+            if (n_subfaces DEAL_II_EQUALS 0 DEAL_II_OR cell->at_boundary(n))
               continue;
             for (unsigned int c = 0; c < n_subfaces; ++c)
               {
@@ -9197,17 +9293,19 @@ namespace internal
                   // refined twice with reference to our cell.  that
                   // only has to be asked, if the child's neighbor is
                   // not a coarser one.
-                  if ((child_neighbor->has_children() &&
-                       !child_neighbor->user_flag_set()) ||
-                      // neighbor has children, which are further
-                      // refined along the face, otherwise something
-                      // went wrong in the construction of neighbor
-                      // pointers.  then only allow coarsening if this
-                      // neighbor will be coarsened as well
-                      // (user_pointer is set).  the same applies, if
-                      // the neighbors children are not refined but
-                      // will be after refinement
-                      child_neighbor->refine_flag_set())
+                  if ((child_neighbor
+                         ->has_children()
+                           DEAL_II_AND !child_neighbor->user_flag_set())
+                        DEAL_II_OR
+                          // neighbor has children, which are further
+                          // refined along the face, otherwise something
+                          // went wrong in the construction of neighbor
+                          // pointers.  then only allow coarsening if this
+                          // neighbor will be coarsened as well
+                          // (user_pointer is set).  the same applies, if
+                          // the neighbors children are not refined but
+                          // will be after refinement
+                          child_neighbor->refine_flag_set())
                     return false;
               }
           }
@@ -9242,7 +9340,7 @@ Triangulation<dim, spacedim>::Triangulation(
   , anisotropic_refinement(false)
   , check_for_distorted_cells(check_for_distorted_cells)
 {
-  if (dim == 1)
+  if (dim DEAL_II_EQUALS 1)
     {
       vertex_to_boundary_id_map_1d =
         std::make_unique<std::map<unsigned int, types::boundary_id>>();
@@ -9261,7 +9359,7 @@ Triangulation<dim, spacedim>::Triangulation(
 
 template <int dim, int spacedim>
 Triangulation<dim, spacedim>::Triangulation(
-  Triangulation<dim, spacedim> &&tria) noexcept
+  Triangulation<dim, spacedim> DEAL_II_AND tria) noexcept
   : Subscriptor(std::move(tria))
   , smooth_grid(tria.smooth_grid)
   , periodic_face_pairs_level_0(std::move(tria.periodic_face_pairs_level_0))
@@ -9284,7 +9382,7 @@ Triangulation<dim, spacedim>::Triangulation(
 template <int dim, int spacedim>
 Triangulation<dim, spacedim> &
 Triangulation<dim, spacedim>::
-operator=(Triangulation<dim, spacedim> &&tria) noexcept
+operator=(Triangulation<dim, spacedim> DEAL_II_AND tria) noexcept
 {
   Subscriptor::operator=(std::move(tria));
 
@@ -9325,12 +9423,14 @@ Triangulation<dim, spacedim>::~Triangulation()
   // 1d. double check this here, as destruction is a good place to
   // ensure that what we've done over the course of the lifetime of
   // this object makes sense
-  AssertNothrow((dim == 1) || (vertex_to_boundary_id_map_1d == nullptr),
+  AssertNothrow((dim DEAL_II_EQUALS 1)DEAL_II_OR(
+                  vertex_to_boundary_id_map_1d DEAL_II_EQUALS nullptr),
                 ExcInternalError());
 
   // the vertex_to_manifold_id_map_1d field should be also unused
   // except in 1d. check this as well
-  AssertNothrow((dim == 1) || (vertex_to_manifold_id_map_1d == nullptr),
+  AssertNothrow((dim DEAL_II_EQUALS 1)DEAL_II_OR(
+                  vertex_to_manifold_id_map_1d DEAL_II_EQUALS nullptr),
                 ExcInternalError());
 }
 
@@ -9356,7 +9456,7 @@ void
 Triangulation<dim, spacedim>::set_mesh_smoothing(
   const MeshSmoothing mesh_smoothing)
 {
-  Assert(n_levels() == 0,
+  Assert(n_levels() DEAL_II_EQUALS 0,
          ExcTriangulationNotEmpty(vertices.size(), levels.size()));
   smooth_grid = mesh_smoothing;
 }
@@ -9453,8 +9553,9 @@ Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary(
     {
       // loop on faces
       for (auto f : GeometryInfo<dim>::face_indices())
-        if (cell->face(f)->at_boundary() &&
-            cell->face(f)->boundary_id() == b_id)
+        if (cell->face(f)
+              ->at_boundary() DEAL_II_AND    cell->face(f)
+              ->boundary_id() DEAL_II_EQUALS b_id)
           {
             boundary_found = true;
             cell->face(f)->set_manifold_id(m_number);
@@ -9463,8 +9564,9 @@ Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary(
       // loop on edges if dim >= 3
       if (dim >= 3)
         for (unsigned int e = 0; e < GeometryInfo<dim>::lines_per_cell; ++e)
-          if (cell->line(e)->at_boundary() &&
-              cell->line(e)->boundary_id() == b_id)
+          if (cell->line(e)
+                ->at_boundary() DEAL_II_AND    cell->line(e)
+                ->boundary_id() DEAL_II_EQUALS b_id)
             {
               boundary_found = true;
               cell->line(e)->set_manifold_id(m_number);
@@ -9506,7 +9608,7 @@ Triangulation<dim, spacedim>::get_boundary_ids() const
 {
   // in 1d, we store a map of all used boundary indicators. use it for
   // our purposes
-  if (dim == 1)
+  if (dim DEAL_II_EQUALS 1)
     {
       std::vector<types::boundary_id> boundary_ids;
       for (std::map<unsigned int, types::boundary_id>::const_iterator p =
@@ -9559,16 +9661,18 @@ void
 Triangulation<dim, spacedim>::copy_triangulation(
   const Triangulation<dim, spacedim> &other_tria)
 {
-  Assert((vertices.size() == 0) && (levels.size() == 0) && (faces == nullptr),
+  Assert((vertices.size() DEAL_II_EQUALS 0)DEAL_II_AND(levels.size()
+                                                         DEAL_II_EQUALS 0)
+           DEAL_II_AND(faces DEAL_II_EQUALS nullptr),
          ExcTriangulationNotEmpty(vertices.size(), levels.size()));
-  Assert((other_tria.levels.size() != 0) && (other_tria.vertices.size() != 0) &&
-           (dim == 1 || other_tria.faces != nullptr),
-         ExcMessage(
-           "When calling Triangulation::copy_triangulation(), "
-           "the target triangulation must be empty but the source "
-           "triangulation (the argument to this function) must contain "
-           "something. Here, it seems like the source does not "
-           "contain anything at all."));
+  Assert(
+    (other_tria.levels.size() != 0) DEAL_II_AND(other_tria.vertices.size() != 0)
+      DEAL_II_AND(dim DEAL_II_EQUALS 1 DEAL_II_OR other_tria.faces != nullptr),
+    ExcMessage("When calling Triangulation::copy_triangulation(), "
+               "the target triangulation must be empty but the source "
+               "triangulation (the argument to this function) must contain "
+               "something. Here, it seems like the source does not "
+               "contain anything at all."));
 
 
   // copy normal elements
@@ -9594,7 +9698,7 @@ Triangulation<dim, spacedim>::copy_triangulation(
 
   number_cache = other_tria.number_cache;
 
-  if (dim == 1)
+  if (dim DEAL_II_EQUALS 1)
     {
       vertex_to_boundary_id_map_1d =
         std::make_unique<std::map<unsigned int, types::boundary_id>>(
@@ -9644,7 +9748,9 @@ Triangulation<dim, spacedim>::create_triangulation(
   const std::vector<CellData<dim>> &  cells,
   const SubCellData &                 subcelldata)
 {
-  Assert((vertices.size() == 0) && (levels.size() == 0) && (faces == nullptr),
+  Assert((vertices.size() DEAL_II_EQUALS 0)DEAL_II_AND(levels.size()
+                                                         DEAL_II_EQUALS 0)
+           DEAL_II_AND(faces DEAL_II_EQUALS nullptr),
          ExcTriangulationNotEmpty(vertices.size(), levels.size()));
   // check that no forbidden arrays
   // are used
@@ -9662,7 +9768,7 @@ Triangulation<dim, spacedim>::create_triangulation(
                     [](const auto &cell) {
                       return cell.vertices.size() !=
                              GeometryInfo<dim>::vertices_per_cell;
-                    }) == false,
+                    }) DEAL_II_EQUALS false,
         ExcMessage(
           "A cell with invalid number of vertices has been provided."));
 #endif
@@ -9691,7 +9797,8 @@ Triangulation<dim, spacedim>::create_triangulation(
       // throw the array (and fill the various location fields) if
       // there are distorted cells. otherwise, just fall off the end
       // of the function
-      AssertThrow(distorted_cells.distorted_cells.size() == 0, distorted_cells);
+      AssertThrow(distorted_cells.distorted_cells.size() DEAL_II_EQUALS 0,
+                  distorted_cells);
     }
 
 
@@ -9789,16 +9896,18 @@ Triangulation<dim, spacedim>::create_triangulation(
                           // If we have visited this guy, then the ordering and
                           // the orientation should agree
                           Assert(!(correct(i, j) ^
-                                   (neighbor->direction_flag() ==
-                                    (*cell)->direction_flag())),
+                                   (neighbor
+                                      ->direction_flag() DEAL_II_EQUALS(*cell)
+                                      ->direction_flag())),
                                  ExcNonOrientableTriangulation());
                         }
                       else
                         {
                           next_round.push_back(neighbor);
                           neighbor->set_user_flag();
-                          if ((correct(i, j) ^ (neighbor->direction_flag() ==
-                                                (*cell)->direction_flag())))
+                          if ((correct(i, j) ^
+                               (neighbor->direction_flag() DEAL_II_EQUALS(*cell)
+                                  ->direction_flag())))
                             neighbor->set_direction_flag(
                               !neighbor->direction_flag());
                         }
@@ -9810,9 +9919,9 @@ Triangulation<dim, spacedim>::create_triangulation(
           // that if the triangulation
           // is disconnected that we
           // still get all cells
-          if (next_round.size() == 0)
+          if (next_round.size() DEAL_II_EQUALS 0)
             for (const auto &cell : this->active_cell_iterators())
-              if (cell->user_flag_set() == false)
+              if (cell->user_flag_set() DEAL_II_EQUALS false)
                 {
                   next_round.push_back(cell);
                   cell->set_direction_flag(true);
@@ -9882,7 +9991,7 @@ Triangulation<dim, spacedim>::create_triangulation(
           {
             while (cell_info->id != cell->id().template to_binary<dim>())
               ++cell;
-            if (dim == 3)
+            if (dim DEAL_II_EQUALS 3)
               for (const auto quad : cell->face_indices())
                 cell->quad(quad)->set_manifold_id(
                   cell_info->manifold_quad_ids[quad]);
@@ -9950,8 +10059,8 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::flip_all_direction_flags()
 {
-  AssertThrow(dim + 1 == spacedim,
-              ExcMessage("Only works for dim == spacedim-1"));
+  AssertThrow(dim + 1 DEAL_II_EQUALS spacedim,
+              ExcMessage("Only works for dim DEAL_II_EQUALS  spacedim-1"));
   for (const auto &cell : this->active_cell_iterators())
     cell->set_direction_flag(!cell->direction_flag());
 }
@@ -10003,7 +10112,7 @@ Triangulation<dim, spacedim>::save_refine_flags(std::vector<bool> &v) const
       if (cell->refine_flag_set() & (1 << j))
         *i = true;
 
-  Assert(i == v.end(), ExcInternalError());
+  Assert(i DEAL_II_EQUALS v.end(), ExcInternalError());
 }
 
 
@@ -10037,7 +10146,8 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::load_refine_flags(const std::vector<bool> &v)
 {
-  AssertThrow(v.size() == dim * n_active_cells(), ExcGridReadError());
+  AssertThrow(v.size() DEAL_II_EQUALS dim * n_active_cells(),
+              ExcGridReadError());
 
   std::vector<bool>::const_iterator i = v.begin();
   for (const auto &cell : this->active_cell_iterators())
@@ -10045,7 +10155,7 @@ Triangulation<dim, spacedim>::load_refine_flags(const std::vector<bool> &v)
       unsigned int ref_case = 0;
 
       for (unsigned int j = 0; j < dim; ++j, ++i)
-        if (*i == true)
+        if (*i DEAL_II_EQUALS true)
           ref_case += 1 << j;
       Assert(ref_case < RefinementCase<dim>::isotropic_refinement + 1,
              ExcGridReadError());
@@ -10055,7 +10165,7 @@ Triangulation<dim, spacedim>::load_refine_flags(const std::vector<bool> &v)
         cell->clear_refine_flag();
     }
 
-  Assert(i == v.end(), ExcInternalError());
+  Assert(i DEAL_II_EQUALS v.end(), ExcInternalError());
 }
 
 
@@ -10072,7 +10182,7 @@ Triangulation<dim, spacedim>::save_coarsen_flags(std::vector<bool> &v) const
       ++i;
     }
 
-  Assert(i == v.end(), ExcInternalError());
+  Assert(i DEAL_II_EQUALS v.end(), ExcInternalError());
 }
 
 
@@ -10109,19 +10219,19 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::load_coarsen_flags(const std::vector<bool> &v)
 {
-  Assert(v.size() == n_active_cells(), ExcGridReadError());
+  Assert(v.size() DEAL_II_EQUALS n_active_cells(), ExcGridReadError());
 
   std::vector<bool>::const_iterator i = v.begin();
   for (const auto &cell : this->active_cell_iterators())
     {
-      if (*i == true)
+      if (*i DEAL_II_EQUALS true)
         cell->set_coarsen_flag();
       else
         cell->clear_coarsen_flag();
       ++i;
     }
 
-  Assert(i == v.end(), ExcInternalError());
+  Assert(i DEAL_II_EQUALS v.end(), ExcInternalError());
 }
 
 
@@ -10153,13 +10263,13 @@ namespace
   void
   clear_user_data(internal::TriangulationImplementation::TriaFaces *faces)
   {
-    if (faces->dim == 2)
+    if (faces->dim DEAL_II_EQUALS 2)
       {
         faces->lines.clear_user_data();
       }
 
 
-    if (faces->dim == 3)
+    if (faces->dim DEAL_II_EQUALS 3)
       {
         faces->lines.clear_user_data();
         faces->quads.clear_user_data();
@@ -10189,12 +10299,12 @@ namespace
       &                                               levels,
     internal::TriangulationImplementation::TriaFaces *faces)
   {
-    if (dim == 1)
+    if (dim DEAL_II_EQUALS 1)
       {
         for (const auto &level : levels)
           level->cells.clear_user_flags();
       }
-    else if (dim == 2 || dim == 3)
+    else if (dim DEAL_II_EQUALS 2 DEAL_II_OR dim DEAL_II_EQUALS 3)
       {
         faces->lines.clear_user_flags();
       }
@@ -10225,16 +10335,16 @@ namespace
       &                                               levels,
     internal::TriangulationImplementation::TriaFaces *faces)
   {
-    if (dim == 1)
+    if (dim DEAL_II_EQUALS 1)
       {
         // nothing to do in 1d
       }
-    else if (dim == 2)
+    else if (dim DEAL_II_EQUALS 2)
       {
         for (const auto &level : levels)
           level->cells.clear_user_flags();
       }
-    else if (dim == 3)
+    else if (dim DEAL_II_EQUALS 3)
       {
         faces->quads.clear_user_flags();
       }
@@ -10265,15 +10375,15 @@ namespace
       &levels,
     internal::TriangulationImplementation::TriaFaces *)
   {
-    if (dim == 1)
+    if (dim DEAL_II_EQUALS 1)
       {
         // nothing to do in 1d
       }
-    else if (dim == 2)
+    else if (dim DEAL_II_EQUALS 2)
       {
         // nothing to do in 2d
       }
-    else if (dim == 3)
+    else if (dim DEAL_II_EQUALS 3)
       {
         for (const auto &level : levels)
           level->cells.clear_user_flags();
@@ -10377,7 +10487,8 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::load_user_flags(const std::vector<bool> &v)
 {
-  Assert(v.size() == n_lines() + n_quads() + n_hexs(), ExcInternalError());
+  Assert(v.size() DEAL_II_EQUALS n_lines() + n_quads() + n_hexs(),
+         ExcInternalError());
   std::vector<bool> tmp;
 
   // first extract the flags
@@ -10420,7 +10531,7 @@ Triangulation<dim, spacedim>::save_user_flags_line(std::vector<bool> &v) const
   for (; line != endl; ++line, ++i)
     *i = line->user_flag_set();
 
-  Assert(i == v.end(), ExcInternalError());
+  Assert(i DEAL_II_EQUALS v.end(), ExcInternalError());
 }
 
 
@@ -10457,17 +10568,17 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::load_user_flags_line(const std::vector<bool> &v)
 {
-  Assert(v.size() == n_lines(), ExcGridReadError());
+  Assert(v.size() DEAL_II_EQUALS n_lines(), ExcGridReadError());
 
   line_iterator                     line = begin_line(), endl = end_line();
   std::vector<bool>::const_iterator i = v.begin();
   for (; line != endl; ++line, ++i)
-    if (*i == true)
+    if (*i DEAL_II_EQUALS true)
       line->set_user_flag();
     else
       line->clear_user_flag();
 
-  Assert(i == v.end(), ExcInternalError());
+  Assert(i DEAL_II_EQUALS v.end(), ExcInternalError());
 }
 
 
@@ -10542,7 +10653,7 @@ Triangulation<dim, spacedim>::save_user_flags_quad(std::vector<bool> &v) const
       for (; quad != endq; ++quad, ++i)
         *i = get_user_flag(quad);
 
-      Assert(i == v.end(), ExcInternalError());
+      Assert(i DEAL_II_EQUALS v.end(), ExcInternalError());
     }
 }
 
@@ -10580,19 +10691,19 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::load_user_flags_quad(const std::vector<bool> &v)
 {
-  Assert(v.size() == n_quads(), ExcGridReadError());
+  Assert(v.size() DEAL_II_EQUALS n_quads(), ExcGridReadError());
 
   if (dim >= 2)
     {
       quad_iterator                     quad = begin_quad(), endq = end_quad();
       std::vector<bool>::const_iterator i = v.begin();
       for (; quad != endq; ++quad, ++i)
-        if (*i == true)
+        if (*i DEAL_II_EQUALS true)
           set_user_flag(quad);
         else
           clear_user_flag(quad);
 
-      Assert(i == v.end(), ExcInternalError());
+      Assert(i DEAL_II_EQUALS v.end(), ExcInternalError());
     }
 }
 
@@ -10611,7 +10722,7 @@ Triangulation<dim, spacedim>::save_user_flags_hex(std::vector<bool> &v) const
       for (; hex != endh; ++hex, ++i)
         *i = get_user_flag(hex);
 
-      Assert(i == v.end(), ExcInternalError());
+      Assert(i DEAL_II_EQUALS v.end(), ExcInternalError());
     }
 }
 
@@ -10649,19 +10760,19 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::load_user_flags_hex(const std::vector<bool> &v)
 {
-  Assert(v.size() == n_hexs(), ExcGridReadError());
+  Assert(v.size() DEAL_II_EQUALS n_hexs(), ExcGridReadError());
 
   if (dim >= 3)
     {
       hex_iterator                      hex = begin_hex(), endh = end_hex();
       std::vector<bool>::const_iterator i = v.begin();
       for (; hex != endh; ++hex, ++i)
-        if (*i == true)
+        if (*i DEAL_II_EQUALS true)
           set_user_flag(hex);
         else
           clear_user_flag(hex);
 
-      Assert(i == v.end(), ExcInternalError());
+      Assert(i DEAL_II_EQUALS v.end(), ExcInternalError());
     }
 }
 
@@ -10704,7 +10815,8 @@ void
 Triangulation<dim, spacedim>::load_user_indices(
   const std::vector<unsigned int> &v)
 {
-  Assert(v.size() == n_lines() + n_quads() + n_hexs(), ExcInternalError());
+  Assert(v.size() DEAL_II_EQUALS n_lines() + n_quads() + n_hexs(),
+         ExcInternalError());
   std::vector<unsigned int> tmp;
 
   // first extract the indices
@@ -10798,7 +10910,7 @@ void
 Triangulation<dim, spacedim>::load_user_indices_line(
   const std::vector<unsigned int> &v)
 {
-  Assert(v.size() == n_lines(), ExcGridReadError());
+  Assert(v.size() DEAL_II_EQUALS n_lines(), ExcGridReadError());
 
   line_iterator line = begin_line(), endl = end_line();
   std::vector<unsigned int>::const_iterator i = v.begin();
@@ -10830,7 +10942,7 @@ void
 Triangulation<dim, spacedim>::load_user_indices_quad(
   const std::vector<unsigned int> &v)
 {
-  Assert(v.size() == n_quads(), ExcGridReadError());
+  Assert(v.size() DEAL_II_EQUALS n_quads(), ExcGridReadError());
 
   if (dim >= 2)
     {
@@ -10865,7 +10977,7 @@ void
 Triangulation<dim, spacedim>::load_user_indices_hex(
   const std::vector<unsigned int> &v)
 {
-  Assert(v.size() == n_hexs(), ExcGridReadError());
+  Assert(v.size() DEAL_II_EQUALS n_hexs(), ExcGridReadError());
 
   if (dim >= 3)
     {
@@ -10958,7 +11070,8 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::load_user_pointers(const std::vector<void *> &v)
 {
-  Assert(v.size() == n_lines() + n_quads() + n_hexs(), ExcInternalError());
+  Assert(v.size() DEAL_II_EQUALS n_lines() + n_quads() + n_hexs(),
+         ExcInternalError());
   std::vector<void *> tmp;
 
   // first extract the pointers
@@ -11010,7 +11123,7 @@ void
 Triangulation<dim, spacedim>::load_user_pointers_line(
   const std::vector<void *> &v)
 {
-  Assert(v.size() == n_lines(), ExcGridReadError());
+  Assert(v.size() DEAL_II_EQUALS n_lines(), ExcGridReadError());
 
   line_iterator                       line = begin_line(), endl = end_line();
   std::vector<void *>::const_iterator i = v.begin();
@@ -11043,7 +11156,7 @@ void
 Triangulation<dim, spacedim>::load_user_pointers_quad(
   const std::vector<void *> &v)
 {
-  Assert(v.size() == n_quads(), ExcGridReadError());
+  Assert(v.size() DEAL_II_EQUALS n_quads(), ExcGridReadError());
 
   if (dim >= 2)
     {
@@ -11078,7 +11191,7 @@ void
 Triangulation<dim, spacedim>::load_user_pointers_hex(
   const std::vector<void *> &v)
 {
-  Assert(v.size() == n_hexs(), ExcGridReadError());
+  Assert(v.size() DEAL_II_EQUALS n_hexs(), ExcGridReadError());
 
   if (dim >= 3)
     {
@@ -11159,7 +11272,7 @@ typename Triangulation<dim, spacedim>::cell_iterator
 Triangulation<dim, spacedim>::last() const
 {
   const unsigned int level = levels.size() - 1;
-  if (levels[level]->cells.n_objects() == 0)
+  if (levels[level]->cells.n_objects() DEAL_II_EQUALS 0)
     return end(level);
 
   // find the last raw iterator on
@@ -11169,10 +11282,10 @@ Triangulation<dim, spacedim>::last() const
                        levels[level]->cells.n_objects() - 1);
 
   // then move to the last used one
-  if (ri->used() == true)
+  if (ri->used() DEAL_II_EQUALS true)
     return ri;
-  while ((--ri).state() == IteratorState::valid)
-    if (ri->used() == true)
+  while ((--ri).state() DEAL_II_EQUALS IteratorState::valid)
+    if (ri->used() DEAL_II_EQUALS true)
       return ri;
   return ri;
 }
@@ -11189,10 +11302,10 @@ Triangulation<dim, spacedim>::last_active() const
   if (cell != end())
     {
       // then move to the last active one
-      if (cell->is_active() == true)
+      if (cell->is_active() DEAL_II_EQUALS true)
         return cell;
-      while ((--cell).state() == IteratorState::valid)
-        if (cell->is_active() == true)
+      while ((--cell).state() DEAL_II_EQUALS IteratorState::valid)
+        if (cell->is_active() DEAL_II_EQUALS true)
           return cell;
     }
   return cell;
@@ -11426,7 +11539,7 @@ Triangulation<dim, spacedim>::begin_vertex() const
   if (i.state() != IteratorState::valid)
     return i;
   // This loop will end because every triangulation has used vertices.
-  while (i->used() == false)
+  while (i->used() DEAL_II_EQUALS false)
     if ((++i).state() != IteratorState::valid)
       return i;
   return i;
@@ -11485,14 +11598,15 @@ Triangulation<dim, spacedim>::begin_raw_line(const unsigned int level) const
         // triangulation.
         Assert(level < levels.size(), ExcInvalidLevel(level, levels.size()));
 
-        if (level >= levels.size() || levels[level]->cells.n_objects() == 0)
+        if (level >= levels.size() DEAL_II_OR levels[level]->cells.n_objects()
+                       DEAL_II_EQUALS 0)
           return end_line();
 
         return raw_line_iterator(
           const_cast<Triangulation<dim, spacedim> *>(this), level, 0);
 
       default:
-        Assert(level == 0, ExcFacesHaveNoLevel());
+        Assert(level DEAL_II_EQUALS 0, ExcFacesHaveNoLevel());
         return raw_line_iterator(
           const_cast<Triangulation<dim, spacedim> *>(this), 0, 0);
     }
@@ -11507,7 +11621,7 @@ Triangulation<dim, spacedim>::begin_line(const unsigned int level) const
   raw_line_iterator ri = begin_raw_line(level);
   if (ri.state() != IteratorState::valid)
     return ri;
-  while (ri->used() == false)
+  while (ri->used() DEAL_II_EQUALS false)
     if ((++ri).state() != IteratorState::valid)
       return ri;
   return ri;
@@ -11575,7 +11689,8 @@ Triangulation<dim, spacedim>::begin_raw_quad(const unsigned int level) const
           // triangulation.
           Assert(level < levels.size(), ExcInvalidLevel(level, levels.size()));
 
-          if (level >= levels.size() || levels[level]->cells.n_objects() == 0)
+          if (level >= levels.size() DEAL_II_OR levels[level]->cells.n_objects()
+                         DEAL_II_EQUALS 0)
             return end_quad();
 
           return raw_quad_iterator(
@@ -11584,7 +11699,7 @@ Triangulation<dim, spacedim>::begin_raw_quad(const unsigned int level) const
 
       case 3:
         {
-          Assert(level == 0, ExcFacesHaveNoLevel());
+          Assert(level DEAL_II_EQUALS 0, ExcFacesHaveNoLevel());
 
           return raw_quad_iterator(
             const_cast<Triangulation<dim, spacedim> *>(this), 0, 0);
@@ -11607,7 +11722,7 @@ Triangulation<dim, spacedim>::begin_quad(const unsigned int level) const
   raw_quad_iterator ri = begin_raw_quad(level);
   if (ri.state() != IteratorState::valid)
     return ri;
-  while (ri->used() == false)
+  while (ri->used() DEAL_II_EQUALS false)
     if ((++ri).state() != IteratorState::valid)
       return ri;
   return ri;
@@ -11675,7 +11790,8 @@ Triangulation<dim, spacedim>::begin_raw_hex(const unsigned int level) const
           // triangulation.
           Assert(level < levels.size(), ExcInvalidLevel(level, levels.size()));
 
-          if (level >= levels.size() || levels[level]->cells.n_objects() == 0)
+          if (level >= levels.size() DEAL_II_OR levels[level]->cells.n_objects()
+                         DEAL_II_EQUALS 0)
             return end_hex();
 
           return raw_hex_iterator(
@@ -11698,7 +11814,7 @@ Triangulation<dim, spacedim>::begin_hex(const unsigned int level) const
   raw_hex_iterator ri = begin_raw_hex(level);
   if (ri.state() != IteratorState::valid)
     return ri;
-  while (ri->used() == false)
+  while (ri->used() DEAL_II_EQUALS false)
     if ((++ri).state() != IteratorState::valid)
       return ri;
   return ri;
@@ -11953,7 +12069,7 @@ template <int dim, int spacedim>
 unsigned int
 Triangulation<dim, spacedim>::n_raw_lines(const unsigned int level) const
 {
-  if (dim == 1)
+  if (dim DEAL_II_EQUALS 1)
     {
       AssertIndexRange(level, n_levels());
       return levels[level]->cells.n_objects();
@@ -11968,7 +12084,7 @@ template <int dim, int spacedim>
 unsigned int
 Triangulation<dim, spacedim>::n_raw_lines() const
 {
-  if (dim == 1)
+  if (dim DEAL_II_EQUALS 1)
     {
       Assert(false, ExcNotImplemented());
       return 0;
@@ -11983,7 +12099,7 @@ unsigned int
 Triangulation<dim, spacedim>::n_lines(const unsigned int level) const
 {
   AssertIndexRange(level, number_cache.n_lines_level.size());
-  Assert(dim == 1, ExcFacesHaveNoLevel());
+  Assert(dim DEAL_II_EQUALS 1, ExcFacesHaveNoLevel());
   return number_cache.n_lines_level[level];
 }
 
@@ -12001,7 +12117,7 @@ unsigned int
 Triangulation<dim, spacedim>::n_active_lines(const unsigned int level) const
 {
   AssertIndexRange(level, number_cache.n_lines_level.size());
-  Assert(dim == 1, ExcFacesHaveNoLevel());
+  Assert(dim DEAL_II_EQUALS 1, ExcFacesHaveNoLevel());
 
   return number_cache.n_active_lines_level[level];
 }
@@ -12165,7 +12281,7 @@ template <int dim, int spacedim>
 unsigned int
 Triangulation<dim, spacedim>::n_quads(const unsigned int level) const
 {
-  Assert(dim == 2, ExcFacesHaveNoLevel());
+  Assert(dim DEAL_II_EQUALS 2, ExcFacesHaveNoLevel());
   AssertIndexRange(level, number_cache.n_quads_level.size());
   return number_cache.n_quads_level[level];
 }
@@ -12233,7 +12349,7 @@ unsigned int
 Triangulation<dim, spacedim>::n_active_quads(const unsigned int level) const
 {
   AssertIndexRange(level, number_cache.n_quads_level.size());
-  Assert(dim == 2, ExcFacesHaveNoLevel());
+  Assert(dim DEAL_II_EQUALS 2, ExcFacesHaveNoLevel());
 
   return number_cache.n_active_quads_level[level];
 }
@@ -12473,7 +12589,8 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
   // some difficulty in the past (see the
   // deal.II/coarsening_* tests)
   if (smooth_grid & limit_level_difference_at_vertices)
-    Assert(satisfies_level1_at_vertex_rule(*this) == true, ExcInternalError());
+    Assert(satisfies_level1_at_vertex_rule(*this) DEAL_II_EQUALS true,
+           ExcInternalError());
 
   // Inform all listeners about beginning of refinement.
   signals.pre_refinement();
@@ -12486,7 +12603,8 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
   // some difficulty in the past (see the
   // deal.II/coarsening_* tests)
   if (smooth_grid & limit_level_difference_at_vertices)
-    Assert(satisfies_level1_at_vertex_rule(*this) == true, ExcInternalError());
+    Assert(satisfies_level1_at_vertex_rule(*this) DEAL_II_EQUALS true,
+           ExcInternalError());
 
   // finally build up neighbor connectivity information, and set
   // active cell indices
@@ -12496,7 +12614,8 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
   // Inform all listeners about end of refinement.
   signals.post_refinement();
 
-  AssertThrow(cells_with_distorted_children.distorted_cells.size() == 0,
+  AssertThrow(cells_with_distorted_children.distorted_cells.size()
+                DEAL_II_EQUALS 0,
               cells_with_distorted_children);
 
   update_periodic_face_map();
@@ -12510,7 +12629,7 @@ Triangulation<dim, spacedim>::reset_active_cell_indices()
 {
   unsigned int active_cell_index = 0;
   for (raw_cell_iterator cell = begin_raw(); cell != end(); ++cell)
-    if ((cell->used() == false) || cell->has_children())
+    if ((cell->used() DEAL_II_EQUALS false)DEAL_II_OR cell->has_children())
       cell->set_active_cell_index(numbers::invalid_unsigned_int);
     else
       {
@@ -12518,7 +12637,7 @@ Triangulation<dim, spacedim>::reset_active_cell_indices()
         ++active_cell_index;
       }
 
-  Assert(active_cell_index == n_active_cells(), ExcInternalError());
+  Assert(active_cell_index DEAL_II_EQUALS n_active_cells(), ExcInternalError());
 }
 
 
@@ -12572,12 +12691,12 @@ Triangulation<dim, spacedim>::update_periodic_face_map()
         it_test->first.first;
       const Triangulation<dim, spacedim>::cell_iterator cell_2 =
         it_test->second.first.first;
-      if (cell_1->level() == cell_2->level())
+      if (cell_1->level() DEAL_II_EQUALS cell_2->level())
         {
           // if both cells have the same neighbor, then the same pair
           // order swapped has to be in the map
-          Assert(periodic_face_map[it_test->second.first].first ==
-                   it_test->first,
+          Assert(periodic_face_map[it_test->second.first]
+                   .first DEAL_II_EQUALS it_test->first,
                  ExcInternalError());
         }
     }
@@ -12684,8 +12803,8 @@ Triangulation<dim, spacedim>::execute_coarsening()
   cell_iterator cell = begin(), endc = end();
   if (levels.size() >= 2)
     for (cell = last(); cell != endc; --cell)
-      if (cell->level() <= static_cast<int>(levels.size() - 2) &&
-          cell->user_flag_set())
+      if (cell->level() <= static_cast<int>(levels.size() - 2)
+                             DEAL_II_AND cell->user_flag_set())
         {
           // inform all listeners that cell coarsening is going to happen
           signals.pre_coarsening_on_cell(cell);
@@ -12701,7 +12820,7 @@ Triangulation<dim, spacedim>::execute_coarsening()
   // in principle no user flags should be set any more at this point
 #if DEBUG
   for (cell = begin(); cell != endc; ++cell)
-    Assert(cell->user_flag_set() == false, ExcInternalError());
+    Assert(cell->user_flag_set() DEAL_II_EQUALS false, ExcInternalError());
 #endif
 }
 
@@ -12786,7 +12905,7 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
           // see refinement
           active_cell_iterator cell = begin_active(), endc = end();
           for (cell = last_active(); cell != endc; --cell)
-            if (cell->refine_flag_set() == false)
+            if (cell->refine_flag_set() DEAL_II_EQUALS false)
               {
                 for (const unsigned int vertex :
                      GeometryInfo<dim>::vertex_indices())
@@ -12845,8 +12964,9 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
           const unsigned int n_children       = cell->n_children();
           unsigned int       flagged_children = 0;
           for (unsigned int child = 0; child < n_children; ++child)
-            if (cell->child(child)->is_active() &&
-                cell->child(child)->coarsen_flag_set())
+            if (cell->child(child)
+                  ->is_active() DEAL_II_AND cell->child(child)
+                  ->coarsen_flag_set())
               {
                 ++flagged_children;
                 // clear flag since we don't need it anymore
@@ -12855,7 +12975,7 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
 
           // flag this cell for coarsening if all children were
           // flagged
-          if (flagged_children == n_children)
+          if (flagged_children DEAL_II_EQUALS n_children)
             cell->set_user_flag();
         }
 
@@ -12863,7 +12983,8 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
         // point
 #if DEBUG
       for (auto &cell : this->cell_iterators())
-        Assert(cell->coarsen_flag_set() == false, ExcInternalError());
+        Assert(cell->coarsen_flag_set() DEAL_II_EQUALS false,
+               ExcInternalError());
 #endif
 
       // now loop over all cells which have the user flag set. their
@@ -12892,7 +13013,7 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
                 template coarsening_allowed<dim, spacedim>(cell))
             for (unsigned int c = 0; c < cell->n_children(); ++c)
               {
-                Assert(cell->child(c)->refine_flag_set() == false,
+                Assert(cell->child(c)->refine_flag_set() DEAL_II_EQUALS false,
                        ExcInternalError());
 
                 cell->child(c)->set_coarsen_flag();
@@ -12911,7 +13032,7 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
       continue_iterating = (current_coarsen_flags != previous_coarsen_flags);
       previous_coarsen_flags = current_coarsen_flags;
     }
-  while (continue_iterating == true);
+  while (continue_iterating DEAL_II_EQUALS true);
 }
 
 
@@ -12995,7 +13116,7 @@ namespace
       {
         const typename Triangulation<dim, spacedim>::cell_iterator neighbor =
           cell->neighbor(n);
-        if (neighbor.state() == IteratorState::valid)
+        if (neighbor.state() DEAL_II_EQUALS IteratorState::valid)
           {
             ++n_neighbors;
             if (face_will_be_refined_by_neighbor(cell, n))
@@ -13005,17 +13126,17 @@ namespace
     // clear coarsen flags if either all existing neighbors will be
     // refined or all but one will be and the cell is in the interior
     // of the domain
-    if (count == n_neighbors ||
-        (count >= n_neighbors - 1 &&
-         n_neighbors == GeometryInfo<dim>::faces_per_cell))
+    if (count DEAL_II_EQUALS n_neighbors DEAL_II_OR(
+          count >= n_neighbors - 1 DEAL_II_AND n_neighbors DEAL_II_EQUALS
+                                                           GeometryInfo<dim>::faces_per_cell))
       {
         for (unsigned int c = 0; c < cell->n_children(); ++c)
           cell->child(c)->clear_coarsen_flag();
 
         for (const unsigned int face : GeometryInfo<dim>::face_indices())
-          if (!cell->at_boundary(face) &&
-              (!cell->neighbor(face)->is_active()) &&
-              (cell_will_be_coarsened(cell->neighbor(face))))
+          if (!cell->at_boundary(face)
+                 DEAL_II_AND(!cell->neighbor(face)->is_active())
+                   DEAL_II_AND(cell_will_be_coarsened(cell->neighbor(face))))
             possibly_do_not_produce_unrefined_islands<dim, spacedim>(
               cell->neighbor(face));
       }
@@ -13039,7 +13160,7 @@ namespace
     const bool allow_anisotropic_smoothing)
   {
     Assert(cell->is_active(), ExcInternalError());
-    Assert(cell->refine_flag_set() == false, ExcInternalError());
+    Assert(cell->refine_flag_set() DEAL_II_EQUALS false, ExcInternalError());
 
 
     // now we provide two algorithms. the first one is the standard
@@ -13051,7 +13172,7 @@ namespace
     // one) are refined, the current cell is flagged to be refined in
     // an according direction.
 
-    if (allow_anisotropic_smoothing == false)
+    if (allow_anisotropic_smoothing DEAL_II_EQUALS false)
       {
         // use first algorithm
         unsigned int refined_neighbors = 0, unrefined_neighbors = 0;
@@ -13074,10 +13195,13 @@ namespace
             // of those will have to be refined as well
             if (unrefined_neighbors > 0)
               for (const unsigned int face : GeometryInfo<dim>::face_indices())
-                if (!cell->at_boundary(face) &&
-                    (face_will_be_refined_by_neighbor(cell, face) == false) &&
-                    (cell->neighbor(face)->has_children() == false) &&
-                    (cell->neighbor(face)->refine_flag_set() == false))
+                if (!cell->at_boundary(face)
+                       DEAL_II_AND(face_will_be_refined_by_neighbor(cell, face)
+                                     DEAL_II_EQUALS false)
+                         DEAL_II_AND(cell->neighbor(face)->has_children()
+                                       DEAL_II_EQUALS false)
+                           DEAL_II_AND(cell->neighbor(face)->refine_flag_set()
+                                         DEAL_II_EQUALS false))
                   possibly_refine_unrefined_island<dim, spacedim>(
                     cell->neighbor(face), allow_anisotropic_smoothing);
           }
@@ -13109,7 +13233,8 @@ namespace
                 RefinementCase<dim - 1> expected_face_ref_case =
                   RefinementCase<dim - 1>::no_refinement;
 
-                if (cell->neighbor(face).state() == IteratorState::valid)
+                if (cell->neighbor(face).state()
+                      DEAL_II_EQUALS IteratorState::valid)
                   face_will_be_refined_by_neighbor<dim, spacedim>(
                     cell, face, expected_face_ref_case);
                 // now extract which refine case would be necessary to
@@ -13262,8 +13387,8 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
   //    Only if coarsest_level_1 or patch_level_1 is set: clear all
   //    coarsen flags on level 1 to avoid level 0 cells being created
   //    by coarsening.
-  if (((smooth_grid & coarsest_level_1) || (smooth_grid & patch_level_1)) &&
-      n_levels() >= 2)
+  if (((smooth_grid & coarsest_level_1) DEAL_II_OR(smooth_grid & patch_level_1))
+        DEAL_II_AND n_levels() >= 2)
     {
       for (const auto &cell : active_cell_iterators_on_level(1))
         cell->clear_coarsen_flag();
@@ -13278,14 +13403,14 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
       //    refined after the step. This is to prevent the occurrence
       //    of unrefined islands.  If patch_level_1 is set, this will
       //    be automatically fulfilled.
-      if (smooth_grid & do_not_produce_unrefined_islands &&
-          !(smooth_grid & patch_level_1))
+      if (smooth_grid & do_not_produce_unrefined_islands DEAL_II_AND !(
+                          smooth_grid & patch_level_1))
         {
           for (const auto &cell : cell_iterators())
             {
               // only do something if this
               // cell will be coarsened
-              if (!cell->is_active() && cell_will_be_coarsened(cell))
+              if (!cell->is_active() DEAL_II_AND cell_will_be_coarsened(cell))
                 possibly_do_not_produce_unrefined_islands<dim, spacedim>(cell);
             }
         }
@@ -13310,14 +13435,15 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
       //    the following: only set coarsen flags to remove this
       //    refined island if all cells we want to set flags on are
       //    locally owned
-      if (smooth_grid & (eliminate_refined_inner_islands |
-                         eliminate_refined_boundary_islands) &&
-          !(smooth_grid & patch_level_1))
+      if (smooth_grid &
+          (eliminate_refined_inner_islands | eliminate_refined_boundary_islands)
+            DEAL_II_AND !(smooth_grid & patch_level_1))
         {
           for (const auto &cell : cell_iterators())
-            if (!cell->is_active() ||
-                (cell->is_active() && cell->refine_flag_set() &&
-                 cell->is_locally_owned()))
+            if (!cell->is_active() DEAL_II_OR(
+                  cell->is_active()
+                    DEAL_II_AND   cell->refine_flag_set()
+                      DEAL_II_AND cell->is_locally_owned()))
               {
                 // check whether all children are active, i.e. not
                 // refined themselves. This is a precondition that the
@@ -13327,9 +13453,10 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                 bool all_children_active = true;
                 if (!cell->is_active())
                   for (unsigned int c = 0; c < cell->n_children(); ++c)
-                    if (!cell->child(c)->is_active() ||
-                        cell->child(c)->is_ghost() ||
-                        cell->child(c)->is_artificial())
+                    if (!cell->child(c)
+                           ->is_active() DEAL_II_OR cell->child(c)
+                           ->is_ghost() DEAL_II_OR  cell->child(c)
+                           ->is_artificial())
                       {
                         all_children_active = false;
                         break;
@@ -13359,7 +13486,8 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                          GeometryInfo<dim>::face_indices())
                       {
                         const cell_iterator neighbor = cell->neighbor(n);
-                        if (neighbor.state() == IteratorState::valid)
+                        if (neighbor.state()
+                              DEAL_II_EQUALS IteratorState::valid)
                           {
                             ++total_neighbors;
 
@@ -13384,13 +13512,16 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                     // neighbors at all. if not so, then we are (e.g.)
                     // on the coarsest grid with one cell, for which,
                     // of course, we do not remove the refine flag.
-                    if ((unrefined_neighbors == total_neighbors) &&
-                        ((!cell->at_boundary() &&
-                          (smooth_grid & eliminate_refined_inner_islands)) ||
-                         (cell->at_boundary() && !at_periodic_boundary &&
-                          (smooth_grid &
-                           eliminate_refined_boundary_islands))) &&
-                        (total_neighbors != 0))
+                    if ((unrefined_neighbors DEAL_II_EQUALS total_neighbors)
+                          DEAL_II_AND(
+                            (!cell->at_boundary() DEAL_II_AND(
+                              smooth_grid & eliminate_refined_inner_islands))
+                              DEAL_II_OR(
+                                cell->at_boundary()
+                                  DEAL_II_AND !at_periodic_boundary DEAL_II_AND(
+                                    smooth_grid &
+                                    eliminate_refined_boundary_islands)))
+                            DEAL_II_AND(total_neighbors != 0))
                       {
                         if (!cell->is_active())
                           for (unsigned int c = 0; c < cell->n_children(); ++c)
@@ -13464,7 +13595,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
           // coarsening flags on cells adjacent to vertices that will
           // see refinement
           for (active_cell_iterator cell = last_active(); cell != end(); --cell)
-            if (cell->refine_flag_set() == false)
+            if (cell->refine_flag_set() DEAL_II_EQUALS false)
               {
                 for (const unsigned int vertex :
                      GeometryInfo<dim>::vertex_indices())
@@ -13560,7 +13691,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                 // of its children are further refined or not by
                 // simply looking at the first child
                 Assert(cell_is_patch_level_1(cell), ExcInternalError());
-                if (cell->child(0)->has_children() == true)
+                if (cell->child(0)->has_children() DEAL_II_EQUALS true)
                   continue;
 
                 // cell is found to be a patch.  combine the refine
@@ -13595,7 +13726,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
               // that we know that it is patch_level_1, i.e. if one of
               // its children is active then so are all, and it isn't
               // going to have any grandchildren at all:
-              if (cell->is_active() || cell->child(0)->is_active())
+              if (cell->is_active() DEAL_II_OR cell->child(0)->is_active())
                 continue;
 
               // cell is not active, and so are none of its
@@ -13612,7 +13743,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                     break;
                   }
 
-              if (has_active_grandchildren == false)
+              if (has_active_grandchildren DEAL_II_EQUALS false)
                 continue;
 
 
@@ -13656,7 +13787,8 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
               //
               // there is nothing we have to do if no coarsen flags
               // have been set at all
-              if ((n_coarsen_flags != n_grandchildren) && (n_coarsen_flags > 0))
+              if ((n_coarsen_flags != n_grandchildren)
+                    DEAL_II_AND(n_coarsen_flags > 0))
                 for (unsigned int c = 0; c < n_children; ++c)
                   {
                     const cell_iterator child = cell->child(c);
@@ -13708,11 +13840,11 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                     const bool has_periodic_neighbor =
                       cell->has_periodic_neighbor(i);
                     const bool has_neighbor_or_periodic_neighbor =
-                      !cell->at_boundary(i) || has_periodic_neighbor;
-                    if (has_neighbor_or_periodic_neighbor &&
-                        GeometryInfo<dim>::face_refinement_case(
-                          cell->refine_flag_set(), i) !=
-                          RefinementCase<dim - 1>::no_refinement)
+                      !cell->at_boundary(i) DEAL_II_OR has_periodic_neighbor;
+                    if (has_neighbor_or_periodic_neighbor DEAL_II_AND
+                                                          GeometryInfo<dim>::face_refinement_case(
+                            cell->refine_flag_set(), i) !=
+                        RefinementCase<dim - 1>::no_refinement)
                       {
                         // 1) if the neighbor has children: nothing to
                         // worry about.  2) if the neighbor is active
@@ -13726,10 +13858,11 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                         // mother cell will not be coarsened
                         if (cell->neighbor_or_periodic_neighbor(i)->is_active())
                           {
-                            if ((!has_periodic_neighbor &&
-                                 cell->neighbor_is_coarser(i)) ||
-                                (has_periodic_neighbor &&
-                                 cell->periodic_neighbor_is_coarser(i)))
+                            if ((!has_periodic_neighbor DEAL_II_AND
+                                                        cell->neighbor_is_coarser(i))
+                                  DEAL_II_OR(
+                                    has_periodic_neighbor DEAL_II_AND
+                                                          cell->periodic_neighbor_is_coarser(i)))
                               {
                                 if (cell->neighbor_or_periodic_neighbor(i)
                                       ->coarsen_flag_set())
@@ -13748,7 +13881,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                 // worry about if we remove coarsen
                                 // flags
 
-                                if (dim == 2)
+                                if (dim DEAL_II_EQUALS 2)
                                   {
                                     if (smooth_grid &
                                         allow_anisotropic_smoothing)
@@ -13779,7 +13912,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                           ->set_refine_flag();
                                       }
                                   }
-                                else // i.e. if (dim==3)
+                                else // i.e. if (dimDEAL_II_EQUALS 3)
                                   {
                                     // ugly situations might arise here,
                                     // consider the following situation, which
@@ -13949,10 +14082,11 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                           nb_indices.first);
                                     }();
 
-                                    if ((this_face_index ==
-                                         parent_face->child_index(0)) ||
-                                        (this_face_index ==
-                                         parent_face->child_index(1)))
+                                    if ((this_face_index DEAL_II_EQUALS
+                                                         parent_face->child_index(0))
+                                          DEAL_II_OR(
+                                            this_face_index DEAL_II_EQUALS
+                                                            parent_face->child_index(1)))
                                       {
                                         // this might be an
                                         // anisotropic child. get the
@@ -13994,9 +14128,10 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                     // step 3: set the refine flag of the
                                     // (coarser and active) neighbor.
                                     if ((smooth_grid &
-                                         allow_anisotropic_smoothing) ||
-                                        cell->neighbor_or_periodic_neighbor(i)
-                                          ->refine_flag_set())
+                                         allow_anisotropic_smoothing)
+                                          DEAL_II_OR cell
+                                            ->neighbor_or_periodic_neighbor(i)
+                                            ->refine_flag_set())
                                       {
                                         if (refined_along_x +
                                               to_be_refined_along_x >
@@ -14042,15 +14177,17 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                         nb->face_orientation(nb_indices.first),
                                         nb->face_flip(nb_indices.first),
                                         nb->face_rotation(nb_indices.first));
-                                    if ((nb_frc & RefinementCase<dim>::cut_x) &&
-                                        !(refined_along_x ||
-                                          to_be_refined_along_x))
+                                    if ((nb_frc & RefinementCase<dim>::cut_x)
+                                          DEAL_II_AND !(
+                                            refined_along_x DEAL_II_OR
+                                                            to_be_refined_along_x))
                                       changed |= cell->flag_for_face_refinement(
                                         i,
                                         RefinementCase<dim - 1>::cut_axis(0));
-                                    if ((nb_frc & RefinementCase<dim>::cut_y) &&
-                                        !(refined_along_y ||
-                                          to_be_refined_along_y))
+                                    if ((nb_frc & RefinementCase<dim>::cut_y)
+                                          DEAL_II_AND !(
+                                            refined_along_y DEAL_II_OR
+                                                            to_be_refined_along_y))
                                       changed |= cell->flag_for_face_refinement(
                                         i,
                                         RefinementCase<dim - 1>::cut_axis(1));
@@ -14086,14 +14223,15 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                 // face with cut_x and we want cut_y
                                 // or vice versa, we have to refine
                                 // isotropically at the given face
-                                if ((face_ref_case ==
-                                       RefinementCase<dim>::cut_x &&
-                                     needed_face_ref_case ==
-                                       RefinementCase<dim>::cut_y) ||
-                                    (face_ref_case ==
-                                       RefinementCase<dim>::cut_y &&
-                                     needed_face_ref_case ==
-                                       RefinementCase<dim>::cut_x))
+                                if ((face_ref_case DEAL_II_EQUALS
+                                       RefinementCase<dim>::cut_x DEAL_II_AND
+                                         needed_face_ref_case DEAL_II_EQUALS
+                                                              RefinementCase<dim>::cut_y)
+                                      DEAL_II_OR(
+                                        face_ref_case DEAL_II_EQUALS
+                                          RefinementCase<dim>::cut_y DEAL_II_AND
+                                            needed_face_ref_case DEAL_II_EQUALS
+                                                                 RefinementCase<dim>::cut_x))
                                   {
                                     changed = cell->flag_for_face_refinement(
                                       i, face_ref_case);
@@ -14116,12 +14254,15 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                             // if the face is refined with cut_x and
                             // we want cut_y or vice versa, we have to
                             // refine isotropically at the given face
-                            if ((face_ref_case == RefinementCase<dim>::cut_x &&
-                                 needed_face_ref_case ==
-                                   RefinementCase<dim>::cut_y) ||
-                                (face_ref_case == RefinementCase<dim>::cut_y &&
-                                 needed_face_ref_case ==
-                                   RefinementCase<dim>::cut_x))
+                            if ((face_ref_case DEAL_II_EQUALS
+                                   RefinementCase<dim>::cut_x DEAL_II_AND
+                                     needed_face_ref_case DEAL_II_EQUALS
+                                                          RefinementCase<dim>::cut_y)
+                                  DEAL_II_OR(
+                                    face_ref_case DEAL_II_EQUALS
+                                      RefinementCase<dim>::cut_y DEAL_II_AND
+                                        needed_face_ref_case DEAL_II_EQUALS
+                                                             RefinementCase<dim>::cut_x))
                               changed =
                                 cell->flag_for_face_refinement(i,
                                                                face_ref_case);
@@ -14154,8 +14295,8 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
       // find out whether something was
       // changed in this loop
       mesh_changed_in_this_loop =
-        ((flags_before_loop[0] != flags_after_loop[0]) ||
-         (flags_before_loop[1] != flags_after_loop[1]));
+        ((flags_before_loop[0] != flags_after_loop[0])
+           DEAL_II_OR(flags_before_loop[1] != flags_after_loop[1]));
 
       // set the flags for the next loop
       // already
@@ -14168,8 +14309,8 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
   // find out whether something was really changed in this
   // function. Note that @p{flags_before_loop} represents the state
   // after the last loop, i.e.  the present state
-  return ((flags_before[0] != flags_before_loop[0]) ||
-          (flags_before[1] != flags_before_loop[1]));
+  return ((flags_before[0] != flags_before_loop[0])
+            DEAL_II_OR(flags_before[1] != flags_before_loop[1]));
 }
 
 
@@ -14220,7 +14361,7 @@ Triangulation<dim, spacedim>::read_bool_vector(const unsigned int magic_number1,
 
   unsigned int magic_number;
   in >> magic_number;
-  AssertThrow(magic_number == magic_number1, ExcGridReadError());
+  AssertThrow(magic_number DEAL_II_EQUALS magic_number1, ExcGridReadError());
 
   unsigned int N;
   in >> N;
@@ -14238,7 +14379,7 @@ Triangulation<dim, spacedim>::read_bool_vector(const unsigned int magic_number1,
     v[position] = (flags[position / 8] & (1 << (position % 8)));
 
   in >> magic_number;
-  AssertThrow(magic_number == magic_number2, ExcGridReadError());
+  AssertThrow(magic_number DEAL_II_EQUALS magic_number2, ExcGridReadError());
 
   delete[] flags;
 

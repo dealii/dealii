@@ -37,7 +37,7 @@ namespace TrilinosWrappers
     {
       // if we are asked to visit the past-the-end line, then simply
       // release all our caches and go on with life
-      if (this->a_row == sparsity_pattern->n_rows())
+      if (this->a_row DEAL_II_EQUALS sparsity_pattern->n_rows())
         {
           colnum_cache.reset();
           return;
@@ -60,9 +60,9 @@ namespace TrilinosWrappers
             ncols,
             reinterpret_cast<TrilinosWrappers::types::int_type *>(
               const_cast<size_type *>(colnum_cache->data())));
-          AssertThrow(ierr == 0, ExcTrilinosError(ierr));
-          AssertThrow(static_cast<std::vector<size_type>::size_type>(ncols) ==
-                        colnum_cache->size(),
+          AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
+          AssertThrow(static_cast<std::vector<size_type>::size_type>(ncols)
+                        DEAL_II_EQUALS colnum_cache->size(),
                       ExcInternalError());
         }
     }
@@ -114,7 +114,7 @@ namespace TrilinosWrappers
 
 
 
-  SparsityPattern::SparsityPattern(SparsityPattern &&other) noexcept
+  SparsityPattern::SparsityPattern(SparsityPattern DEAL_II_AND other) noexcept
     : Subscriptor(std::move(other))
     , column_space_map(std::move(other.column_space_map))
     , graph(std::move(other.graph))
@@ -134,7 +134,7 @@ namespace TrilinosWrappers
         new Epetra_FECrsGraph(View, *column_space_map, *column_space_map, 0))
   {
     (void)input_sparsity;
-    Assert(input_sparsity.n_rows() == 0,
+    Assert(input_sparsity.n_rows() DEAL_II_EQUALS 0,
            ExcMessage(
              "Copy constructor only works for empty sparsity patterns."));
   }
@@ -346,7 +346,7 @@ namespace TrilinosWrappers
 
       column_space_map = std::make_unique<Epetra_Map>(col_map);
 
-      Assert(row_map.LinearMap() == true,
+      Assert(row_map.LinearMap() DEAL_II_EQUALS true,
              ExcMessage(
                "This function only works if the row map is contiguous."));
 
@@ -375,12 +375,12 @@ namespace TrilinosWrappers
 
       // Include possibility to exchange data since DynamicSparsityPattern is
       // able to do so
-      if (exchange_data == false)
+      if (exchange_data DEAL_II_EQUALS false)
         for (size_type row = first_row; row < last_row; ++row)
           {
             const TrilinosWrappers::types::int_type row_length =
               sp.row_length(row);
-            if (row_length == 0)
+            if (row_length DEAL_II_EQUALS 0)
               continue;
 
             row_indices.resize(row_length, -1);
@@ -404,7 +404,7 @@ namespace TrilinosWrappers
           {
             const TrilinosWrappers::types::int_type row_length =
               sp.row_length(row);
-            if (row_length == 0)
+            if (row_length DEAL_II_EQUALS 0)
               continue;
 
             row_indices.resize(row_length, -1);
@@ -430,10 +430,10 @@ namespace TrilinosWrappers
       const auto &range_map =
         static_cast<const Epetra_Map &>(graph->RangeMap()); // NOLINT
       int ierr = graph->GlobalAssemble(*column_space_map, range_map, true);
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
       ierr = graph->OptimizeStorage();
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
     }
   } // namespace
 
@@ -529,7 +529,7 @@ namespace TrilinosWrappers
 #  ifdef DEBUG
     {
       IndexSet tmp = writable_rows & row_parallel_partitioning;
-      Assert(tmp == row_parallel_partitioning,
+      Assert(tmp DEAL_II_EQUALS row_parallel_partitioning,
              ExcMessage(
                "The set of writable rows passed to this method does not "
                "contain the locally owned rows, which is not allowed."));
@@ -544,7 +544,8 @@ namespace TrilinosWrappers
           std::make_unique<Epetra_CrsGraph>(Copy, nonlocal_map, 0);
       }
     else
-      Assert(nonlocal_partitioner.n_elements() == 0, ExcInternalError());
+      Assert(nonlocal_partitioner.n_elements() DEAL_II_EQUALS 0,
+             ExcInternalError());
   }
 
 
@@ -662,9 +663,11 @@ namespace TrilinosWrappers
     Assert(column_space_map.get(), ExcInternalError());
     if (nonlocal_graph.get() != nullptr)
       {
-        if (nonlocal_graph->IndicesAreGlobal() == false &&
-            nonlocal_graph->RowMap().NumMyElements() > 0 &&
-            n_global_elements(*column_space_map) > 0)
+        if (nonlocal_graph
+              ->IndicesAreGlobal()
+                DEAL_II_EQUALS false DEAL_II_AND nonlocal_graph->RowMap()
+              .NumMyElements() >
+            0 DEAL_II_AND n_global_elements(*column_space_map) > 0)
           {
             // Insert dummy element at (row, column) that corresponds to row 0
             // in local index counting.
@@ -674,8 +677,9 @@ namespace TrilinosWrappers
 
             // in case we have a square sparsity pattern, add the entry on the
             // diagonal
-            if (TrilinosWrappers::n_global_elements(*column_space_map) ==
-                TrilinosWrappers::n_global_elements(graph->RangeMap()))
+            if (TrilinosWrappers::n_global_elements(*column_space_map)
+                  DEAL_II_EQUALS TrilinosWrappers::n_global_elements(
+                    graph->RangeMap()))
               column = row;
             // if not, take a column index that we have ourselves since we
             // know for sure it is there (and it will not create spurious
@@ -683,12 +687,15 @@ namespace TrilinosWrappers
             else if (column_space_map->NumMyElements() > 0)
               column = TrilinosWrappers::global_index(*column_space_map, 0);
             ierr = nonlocal_graph->InsertGlobalIndices(row, 1, &column);
-            AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+            AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
           }
-        Assert(nonlocal_graph->RowMap().NumMyElements() == 0 ||
-                 n_global_elements(*column_space_map) == 0 ||
-                 nonlocal_graph->IndicesAreGlobal() == true,
-               ExcInternalError());
+        Assert(
+          nonlocal_graph->RowMap()
+            .NumMyElements()
+              DEAL_II_EQUALS 0 DEAL_II_OR   n_global_elements(*column_space_map)
+                DEAL_II_EQUALS 0 DEAL_II_OR nonlocal_graph->IndicesAreGlobal()
+                  DEAL_II_EQUALS true,
+          ExcInternalError());
 
         ierr =
           nonlocal_graph->FillComplete(*column_space_map, graph->RangeMap());
@@ -697,9 +704,9 @@ namespace TrilinosWrappers
         AssertThrow(ierr >= 0, ExcTrilinosError(ierr));
         Epetra_Export exporter(nonlocal_graph->RowMap(), graph->RowMap());
         ierr = graph->Export(*nonlocal_graph, exporter, Add);
-        AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+        AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
         ierr = graph->FillComplete(*column_space_map, graph->RangeMap());
-        AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+        AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
       }
     else
       {
@@ -707,11 +714,11 @@ namespace TrilinosWrappers
         const auto &range_map =
           static_cast<const Epetra_Map &>(graph->RangeMap()); // NOLINT
         ierr = graph->GlobalAssemble(*column_space_map, range_map, true);
-        AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+        AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
       }
 
     ierr = graph->OptimizeStorage();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
   }
 
 
@@ -744,7 +751,7 @@ namespace TrilinosWrappers
         // Check whether the matrix
         // already is transformed to
         // local indices.
-        if (graph->Filled() == false)
+        if (graph->Filled() DEAL_II_EQUALS false)
           {
             int nnz_present = graph->NumGlobalIndices(i);
             int nnz_extracted;
@@ -760,8 +767,8 @@ namespace TrilinosWrappers
                                                    nnz_extracted,
                                                    col_indices);
             (void)ierr;
-            Assert(ierr == 0, ExcTrilinosError(ierr));
-            Assert(nnz_present == nnz_extracted,
+            Assert(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
+            Assert(nnz_present DEAL_II_EQUALS nnz_extracted,
                    ExcDimensionMismatch(nnz_present, nnz_extracted));
 
             // Search the index
@@ -769,7 +776,7 @@ namespace TrilinosWrappers
               std::find(col_indices, col_indices + nnz_present, trilinos_j) -
               col_indices;
 
-            if (local_col_index == nnz_present)
+            if (local_col_index DEAL_II_EQUALS nnz_present)
               return false;
           }
         else
@@ -786,9 +793,9 @@ namespace TrilinosWrappers
             int ierr =
               graph->ExtractMyRowView(trilinos_i, nnz_extracted, col_indices);
             (void)ierr;
-            Assert(ierr == 0, ExcTrilinosError(ierr));
+            Assert(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
-            Assert(nnz_present == nnz_extracted,
+            Assert(nnz_present DEAL_II_EQUALS nnz_extracted,
                    ExcDimensionMismatch(nnz_present, nnz_extracted));
 
             // Search the index
@@ -796,7 +803,7 @@ namespace TrilinosWrappers
               std::find(col_indices, col_indices + nnz_present, trilinos_j) -
               col_indices;
 
-            if (local_col_index == nnz_present)
+            if (local_col_index DEAL_II_EQUALS nnz_present)
               return false;
           }
       }
@@ -845,7 +852,7 @@ namespace TrilinosWrappers
   SparsityPattern::n_cols() const
   {
     TrilinosWrappers::types::int_type n_cols;
-    if (graph->Filled() == true)
+    if (graph->Filled() DEAL_II_EQUALS true)
       n_cols = n_global_cols(*graph);
     else
       n_cols = TrilinosWrappers::n_global_elements(*column_space_map);
@@ -998,7 +1005,7 @@ namespace TrilinosWrappers
   void
   SparsityPattern::print_gnuplot(std::ostream &out) const
   {
-    Assert(graph->Filled() == true, ExcInternalError());
+    Assert(graph->Filled() DEAL_II_EQUALS true, ExcInternalError());
     for (dealii::types::global_dof_index row = 0; row < local_size(); ++row)
       {
         int *indices;

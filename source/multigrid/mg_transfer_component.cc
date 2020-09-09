@@ -98,7 +98,7 @@ namespace
     // directly after this function was
     // called, we use the arguments
     // directly.
-    if (target_component.size() == 0)
+    if (target_component.size() DEAL_II_EQUALS 0)
       {
         target_component.resize(ncomp);
         for (unsigned int i = 0; i < ncomp; ++i)
@@ -107,7 +107,7 @@ namespace
 
     // If selected is an empty vector,
     // all components are selected.
-    if (selected.size() == 0)
+    if (selected.size() DEAL_II_EQUALS 0)
       {
         selected.resize(target_component.size());
         std::fill_n(selected.begin(), ncomp, false);
@@ -115,14 +115,14 @@ namespace
           selected[component] = true;
       }
 
-    Assert(selected.size() == target_component.size(),
+    Assert(selected.size() DEAL_II_EQUALS target_component.size(),
            ExcDimensionMismatch(selected.size(), target_component.size()));
 
     // Compute the number of blocks needed
     const unsigned int n_selected =
       std::accumulate(selected.begin(), selected.end(), 0u);
 
-    if (ndofs.size() == 0)
+    if (ndofs.size() DEAL_II_EQUALS 0)
       {
         std::vector<std::vector<types::global_dof_index>> new_dofs(
           mg_dof.get_triangulation().n_levels(),
@@ -136,7 +136,7 @@ namespace
         v[level].reinit(n_selected, 0);
         unsigned int k = 0;
         for (unsigned int i = 0;
-             i < selected.size() && (k < v[level].n_blocks());
+             i < selected.size() DEAL_II_AND(k < v[level].n_blocks());
              ++i)
           {
             if (selected[i])
@@ -192,7 +192,7 @@ namespace
       if (component_mask[i])
         selected_block = target_component[i];
 
-    if (ndofs.size() == 0)
+    if (ndofs.size() DEAL_II_EQUALS 0)
       {
         std::vector<std::vector<types::global_dof_index>> new_dofs(
           mg_dof.get_triangulation().n_levels(),
@@ -219,8 +219,9 @@ MGTransferSelect<number>::do_copy_to_mg(
 {
   dst = 0;
 
-  Assert(sizes.size() == mg_dof_handler.get_triangulation().n_levels(),
-         ExcMatricesNotBuilt());
+  Assert(
+    sizes.size() DEAL_II_EQUALS mg_dof_handler.get_triangulation().n_levels(),
+    ExcMatricesNotBuilt());
 
   reinit_vector_by_components(
     mg_dof_handler, dst, mg_component_mask, mg_target_component, sizes);
@@ -269,7 +270,7 @@ MGTransferComponentBase::build(const DoFHandler<dim, spacedim> &mg_dof)
   // Fill target component with
   // standard values (identity) if it
   // is empty
-  if (target_component.size() == 0)
+  if (target_component.size() DEAL_II_EQUALS 0)
     {
       target_component.resize(mg_dof.get_fe(0).n_components());
       for (unsigned int i = 0; i < target_component.size(); ++i)
@@ -278,9 +279,10 @@ MGTransferComponentBase::build(const DoFHandler<dim, spacedim> &mg_dof)
   else
     {
       // otherwise, check it for consistency
-      Assert(target_component.size() == mg_dof.get_fe(0).n_components(),
-             ExcDimensionMismatch(target_component.size(),
-                                  mg_dof.get_fe(0).n_components()));
+      Assert(
+        target_component.size() DEAL_II_EQUALS mg_dof.get_fe(0).n_components(),
+        ExcDimensionMismatch(target_component.size(),
+                             mg_dof.get_fe(0).n_components()));
 
       for (unsigned int i = 0; i < target_component.size(); ++i)
         {
@@ -290,7 +292,7 @@ MGTransferComponentBase::build(const DoFHandler<dim, spacedim> &mg_dof)
   // Do the same for the multilevel
   // components. These may be
   // different.
-  if (mg_target_component.size() == 0)
+  if (mg_target_component.size() DEAL_II_EQUALS 0)
     {
       mg_target_component.resize(mg_dof.get_fe(0).n_components());
       for (unsigned int i = 0; i < mg_target_component.size(); ++i)
@@ -298,7 +300,8 @@ MGTransferComponentBase::build(const DoFHandler<dim, spacedim> &mg_dof)
     }
   else
     {
-      Assert(mg_target_component.size() == mg_dof.get_fe(0).n_components(),
+      Assert(mg_target_component.size() DEAL_II_EQUALS mg_dof.get_fe(0)
+               .n_components(),
              ExcDimensionMismatch(mg_target_component.size(),
                                   mg_dof.get_fe(0).n_components()));
 
@@ -414,7 +417,7 @@ MGTransferComponentBase::build(const DoFHandler<dim, spacedim> &mg_dof)
       prolongation_sparsities[level]->reinit(n_components, n_components);
       for (unsigned int i = 0; i < n_components; ++i)
         for (unsigned int j = 0; j < n_components; ++j)
-          if (i == j)
+          if (i DEAL_II_EQUALS j)
             prolongation_sparsities[level]->block(i, j).reinit(
               sizes[level + 1][i], sizes[level][j], dofs_per_cell + 1);
           else
@@ -453,7 +456,8 @@ MGTransferComponentBase::build(const DoFHandler<dim, spacedim> &mg_dof)
                           fe.system_to_component_index(i).first;
                         const unsigned int jcomp =
                           fe.system_to_component_index(j).first;
-                        if ((icomp == jcomp) && mg_component_mask[icomp])
+                        if ((icomp DEAL_II_EQUALS jcomp)
+                              DEAL_II_AND mg_component_mask[icomp])
                           prolongation_sparsities[level]->add(
                             dof_indices_child[i], dof_indices_parent[j]);
                       }
@@ -492,7 +496,8 @@ MGTransferComponentBase::build(const DoFHandler<dim, spacedim> &mg_dof)
                           fe.system_to_component_index(i).first;
                         const unsigned int jcomp =
                           fe.system_to_component_index(j).first;
-                        if ((icomp == jcomp) && mg_component_mask[icomp])
+                        if ((icomp DEAL_II_EQUALS jcomp)
+                              DEAL_II_AND mg_component_mask[icomp])
                           prolongation_matrices[level]->set(
                             dof_indices_child[i],
                             dof_indices_parent[j],
@@ -517,12 +522,12 @@ MGTransferComponentBase::build(const DoFHandler<dim, spacedim> &mg_dof)
                                     mg_target_component);
       for (unsigned int level = 0; level < n_levels - 1; ++level)
         {
-          if (boundary_indices[level].size() == 0)
+          if (boundary_indices[level].size() DEAL_II_EQUALS 0)
             continue;
 
           for (unsigned int iblock = 0; iblock < n_components; ++iblock)
             for (unsigned int jblock = 0; jblock < n_components; ++jblock)
-              if (iblock == jblock)
+              if (iblock DEAL_II_EQUALS jblock)
                 {
                   const types::global_dof_index n_dofs =
                     prolongation_matrices[level]->block(iblock, jblock).m();
@@ -609,7 +614,7 @@ MGTransferSelect<number>::build(
   {
     std::vector<bool> tmp(ncomp, false);
     for (unsigned int c = 0; c < ncomp; ++c)
-      if (t_component[c] == selected_component)
+      if (t_component[c] DEAL_II_EQUALS selected_component)
         tmp[c] = true;
     component_mask = ComponentMask(tmp);
   }
@@ -617,7 +622,7 @@ MGTransferSelect<number>::build(
   {
     std::vector<bool> tmp(ncomp, false);
     for (unsigned int c = 0; c < ncomp; ++c)
-      if (mg_t_component[c] == mg_selected_component)
+      if (mg_t_component[c] DEAL_II_EQUALS mg_selected_component)
         tmp[c] = true;
     mg_component_mask = ComponentMask(tmp);
   }
@@ -628,7 +633,7 @@ MGTransferSelect<number>::build(
   // target component.
   for (unsigned int i = 0; i < target_component.size(); ++i)
     {
-      if (target_component[i] == select)
+      if (target_component[i] DEAL_II_EQUALS select)
         {
           selected_component = i;
           break;
@@ -637,7 +642,7 @@ MGTransferSelect<number>::build(
 
   for (unsigned int i = 0; i < mg_target_component.size(); ++i)
     {
-      if (mg_target_component[i] == mg_select)
+      if (mg_target_component[i] DEAL_II_EQUALS mg_select)
         {
           mg_selected_component = i;
           break;
@@ -687,8 +692,8 @@ MGTransferSelect<number>::build(
             {
               const unsigned int component =
                 fe.system_to_component_index(i).first;
-              if (component_mask[component] &&
-                  !interface_dofs[level].is_element(level_dof_indices[i]))
+              if (component_mask[component] DEAL_II_AND !interface_dofs[level]
+                    .is_element(level_dof_indices[i]))
                 {
                   const types::global_dof_index level_start =
                     mg_component_start[level][mg_target_component[component]];
@@ -715,7 +720,7 @@ MGTransferSelect<number>::build(
           copy_to_and_from_indices[level][counter++] =
             std::pair<types::global_dof_index, unsigned int>(
               temp_copy_indices[i], i);
-      Assert(counter == n_active_dofs, ExcInternalError());
+      Assert(counter DEAL_II_EQUALS n_active_dofs, ExcInternalError());
     }
 }
 

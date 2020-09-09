@@ -1815,12 +1815,12 @@ namespace internal
                    VectorType &              temp_vector2,
                    VectorType &              solution)
     {
-      if (iteration_index == 0)
+      if (iteration_index DEAL_II_EQUALS 0)
         {
           solution.equ(factor2, rhs);
           preconditioner.vmult(solution_old, solution);
         }
-      else if (iteration_index == 1)
+      else if (iteration_index DEAL_II_EQUALS 1)
         {
           // compute t = P^{-1} * (b-A*x^{n})
           temp_vector1.sadd(-1.0, 1.0, rhs);
@@ -1877,13 +1877,13 @@ namespace internal
         const Number factor1        = this->factor1;
         const Number factor1_plus_1 = 1. + this->factor1;
         const Number factor2        = this->factor2;
-        if (iteration_index == 0)
+        if (iteration_index DEAL_II_EQUALS 0)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (std::size_t i = begin; i < end; ++i)
               solution[i] = factor2 * matrix_diagonal_inverse[i] * rhs[i];
           }
-        else if (iteration_index == 1)
+        else if (iteration_index DEAL_II_EQUALS 1)
           {
             // x^{n+1} = x^{n} + f_1 * x^{n} + f_2 * P^{-1} * (b-A*x^{n})
             DEAL_II_OPENMP_SIMD_PRAGMA
@@ -1968,12 +1968,12 @@ namespace internal
       VectorUpdatesRange<Number>(upd, rhs.size());
 
       // swap vectors x^{n+1}->x^{n}, given the updates in the function above
-      if (iteration_index == 0)
+      if (iteration_index DEAL_II_EQUALS 0)
         {
           // nothing to do here because we can immediately write into the
           // solution vector without remembering any of the other vectors
         }
-      else if (iteration_index == 1)
+      else if (iteration_index DEAL_II_EQUALS 1)
         {
           solution.swap(temp_vector1);
           solution_old.swap(temp_vector1);
@@ -2010,12 +2010,12 @@ namespace internal
       VectorUpdatesRange<Number>(upd, rhs.local_size());
 
       // swap vectors x^{n+1}->x^{n}, given the updates in the function above
-      if (iteration_index == 0)
+      if (iteration_index DEAL_II_EQUALS 0)
         {
           // nothing to do here because we can immediately write into the
           // solution vector without remembering any of the other vectors
         }
-      else if (iteration_index == 1)
+      else if (iteration_index DEAL_II_EQUALS 1)
         {
           solution.swap(temp_vector1);
           solution_old.swap(temp_vector1);
@@ -2041,13 +2041,14 @@ namespace internal
       const MatrixType &                           matrix,
       std::shared_ptr<DiagonalMatrix<VectorType>> &preconditioner)
     {
-      if (preconditioner.get() == nullptr || preconditioner->m() != matrix.m())
+      if (preconditioner.get()
+            DEAL_II_EQUALS nullptr DEAL_II_OR preconditioner->m() != matrix.m())
         {
-          if (preconditioner.get() == nullptr)
+          if (preconditioner.get() DEAL_II_EQUALS nullptr)
             preconditioner = std::make_shared<DiagonalMatrix<VectorType>>();
 
           Assert(
-            preconditioner->m() == 0,
+            preconditioner->m() DEAL_II_EQUALS 0,
             ExcMessage(
               "Preconditioner appears to be initialized but not sized correctly"));
 
@@ -2257,7 +2258,7 @@ inline typename PreconditionChebyshev<MatrixType,
 PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   estimate_eigenvalues(const VectorType &src) const
 {
-  Assert(eigenvalues_are_initialized == false, ExcInternalError());
+  Assert(eigenvalues_are_initialized DEAL_II_EQUALS false, ExcInternalError());
   Assert(data.preconditioner.get() != nullptr, ExcNotInitialized());
 
   PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
@@ -2338,7 +2339,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   // estimate, given the target tolerance specified by smoothing_range. This
   // estimate is based on the error formula given in section 5.1 of
   // R. S. Varga, Matrix iterative analysis, 2nd ed., Springer, 2009
-  if (data.degree == numbers::invalid_unsigned_int)
+  if (data.degree DEAL_II_EQUALS numbers::invalid_unsigned_int)
     {
       const double actual_range = info.max_eigenvalue_estimate / alpha;
       const double sigma        = (1. - std::sqrt(1. / actual_range)) /
@@ -2365,17 +2366,19 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   // We do not need the second temporary vector in case we have a
   // DiagonalMatrix as preconditioner and use deal.II's own vectors
   using NumberType = typename VectorType::value_type;
-  if (std::is_same<PreconditionerType, DiagonalMatrix<VectorType>>::value ==
-        false ||
-      (std::is_same<VectorType, dealii::Vector<NumberType>>::value == false &&
-       ((std::is_same<VectorType,
-                      LinearAlgebra::distributed::
-                        Vector<NumberType, MemorySpace::Host>>::value ==
-         false) ||
-        (std::is_same<VectorType,
-                      LinearAlgebra::distributed::
-                        Vector<NumberType, MemorySpace::CUDA>>::value ==
-         false))))
+  if (std::is_same<PreconditionerType, DiagonalMatrix<VectorType>>::value
+        DEAL_II_EQUALS false DEAL_II_OR(
+          std::is_same<VectorType, dealii::Vector<NumberType>>::value
+            DEAL_II_EQUALS false DEAL_II_AND(
+              (std::is_same<VectorType,
+                            LinearAlgebra::distributed::
+                              Vector<NumberType, MemorySpace::Host>>::value
+                 DEAL_II_EQUALS false)
+                DEAL_II_OR(
+                  std::is_same<VectorType,
+                               LinearAlgebra::distributed::
+                                 Vector<NumberType, MemorySpace::CUDA>>::value
+                    DEAL_II_EQUALS false))))
     temp_vector2.reinit(src, true);
   else
     {
@@ -2399,7 +2402,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::vmult(
   const VectorType &rhs) const
 {
   std::lock_guard<std::mutex> lock(mutex);
-  if (eigenvalues_are_initialized == false)
+  if (eigenvalues_are_initialized DEAL_II_EQUALS false)
     estimate_eigenvalues(rhs);
 
   internal::PreconditionChebyshevImplementation::vector_updates(
@@ -2415,7 +2418,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::vmult(
 
   // if delta is zero, we do not need to iterate because the updates will be
   // zero
-  if (data.degree < 2 || std::abs(delta) < 1e-40)
+  if (data.degree < 2 DEAL_II_OR std::abs(delta) < 1e-40)
     return;
 
   double rhok = delta / theta, sigma = theta / delta;
@@ -2447,7 +2450,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::Tvmult(
   const VectorType &rhs) const
 {
   std::lock_guard<std::mutex> lock(mutex);
-  if (eigenvalues_are_initialized == false)
+  if (eigenvalues_are_initialized DEAL_II_EQUALS false)
     estimate_eigenvalues(rhs);
 
   internal::PreconditionChebyshevImplementation::vector_updates(
@@ -2461,7 +2464,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::Tvmult(
     temp_vector2,
     solution);
 
-  if (data.degree < 2 || std::abs(delta) < 1e-40)
+  if (data.degree < 2 DEAL_II_OR std::abs(delta) < 1e-40)
     return;
 
   double rhok = delta / theta, sigma = theta / delta;
@@ -2493,7 +2496,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::step(
   const VectorType &rhs) const
 {
   std::lock_guard<std::mutex> lock(mutex);
-  if (eigenvalues_are_initialized == false)
+  if (eigenvalues_are_initialized DEAL_II_EQUALS false)
     estimate_eigenvalues(rhs);
 
   matrix_ptr->vmult(temp_vector1, solution);
@@ -2508,7 +2511,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::step(
     temp_vector2,
     solution);
 
-  if (data.degree < 2 || std::abs(delta) < 1e-40)
+  if (data.degree < 2 DEAL_II_OR std::abs(delta) < 1e-40)
     return;
 
   double rhok = delta / theta, sigma = theta / delta;
@@ -2540,7 +2543,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::Tstep(
   const VectorType &rhs) const
 {
   std::lock_guard<std::mutex> lock(mutex);
-  if (eigenvalues_are_initialized == false)
+  if (eigenvalues_are_initialized DEAL_II_EQUALS false)
     estimate_eigenvalues(rhs);
 
   matrix_ptr->Tvmult(temp_vector1, solution);
@@ -2555,7 +2558,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::Tstep(
     temp_vector2,
     solution);
 
-  if (data.degree < 2 || std::abs(delta) < 1e-40)
+  if (data.degree < 2 DEAL_II_OR std::abs(delta) < 1e-40)
     return;
 
   double rhok = delta / theta, sigma = theta / delta;

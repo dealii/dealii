@@ -69,7 +69,7 @@ namespace TrilinosWrappers
     std::unique_ptr<Epetra_MultiVector> &distributed_constant_modes,
     const Epetra_RowMatrix &             matrix) const
   {
-    if (elliptic == true)
+    if (elliptic DEAL_II_EQUALS true)
       {
         ML_Epetra::SetDefaults("SA", parameter_list);
 
@@ -102,7 +102,7 @@ namespace TrilinosWrappers
 
     parameter_list.set("smoother: sweeps", static_cast<int>(smoother_sweeps));
     parameter_list.set("cycle applications", static_cast<int>(n_cycles));
-    if (w_cycle == true)
+    if (w_cycle DEAL_II_EQUALS true)
       parameter_list.set("prec type", "MGW");
     else
       parameter_list.set("prec type", "MGV");
@@ -143,14 +143,13 @@ namespace TrilinosWrappers
         const size_type global_size = TrilinosWrappers::n_global_rows(matrix);
         (void)global_length; // work around compiler warning about unused
                              // function in release mode
-        Assert(global_size ==
-                 static_cast<size_type>(
-                   TrilinosWrappers::global_length(distributed_constant_modes)),
+        Assert(global_size DEAL_II_EQUALS static_cast<size_type>(
+                 TrilinosWrappers::global_length(distributed_constant_modes)),
                ExcDimensionMismatch(global_size,
                                     TrilinosWrappers::global_length(
                                       distributed_constant_modes)));
-        const bool constant_modes_are_global =
-          constant_modes[0].size() == global_size;
+        const bool                                constant_modes_are_global =
+          constant_modes[0].size() DEAL_II_EQUALS global_size;
         const size_type my_size = domain_map.NumMyElements();
 
         // Reshape null space as a contiguous vector of doubles so that
@@ -159,7 +158,7 @@ namespace TrilinosWrappers
           constant_modes_are_global ? global_size : my_size;
         for (size_type d = 0; d < constant_modes_dimension; ++d)
           {
-            Assert(constant_modes[d].size() == expected_mode_size,
+            Assert(constant_modes[d].size() DEAL_II_EQUALS expected_mode_size,
                    ExcDimensionMismatch(constant_modes[d].size(),
                                         expected_mode_size));
             for (size_type row = 0; row < my_size; ++row)
@@ -291,7 +290,7 @@ namespace TrilinosWrappers
     distributor.add_range(my_id * n_rows / n_mpi_processes,
                           (my_id + 1) * n_rows / n_mpi_processes);
 
-    if (trilinos_matrix.get() == nullptr)
+    if (trilinos_matrix.get() DEAL_II_EQUALS nullptr)
       trilinos_matrix = std::make_shared<SparseMatrix>();
 
     trilinos_matrix->reinit(distributor,

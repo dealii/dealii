@@ -863,10 +863,11 @@ namespace Differentiation
     struct is_sacado_dfad_number<
       NumberType,
       typename std::enable_if<
-        ADNumberTraits<typename std::decay<NumberType>::type>::type_code ==
-          NumberTypes::sacado_dfad ||
-        ADNumberTraits<typename std::decay<NumberType>::type>::type_code ==
-          NumberTypes::sacado_dfad_dfad>::type> : std::true_type
+        ADNumberTraits<typename std::decay<NumberType>::type>::type_code
+          DEAL_II_EQUALS NumberTypes::sacado_dfad DEAL_II_OR
+                                                  ADNumberTraits<typename std::decay<NumberType>::type>::type_code
+              DEAL_II_EQUALS NumberTypes::sacado_dfad_dfad>::type>
+      : std::true_type
     {};
 
 
@@ -884,10 +885,11 @@ namespace Differentiation
     struct is_sacado_rad_number<
       NumberType,
       typename std::enable_if<
-        ADNumberTraits<typename std::decay<NumberType>::type>::type_code ==
-          NumberTypes::sacado_rad ||
-        ADNumberTraits<typename std::decay<NumberType>::type>::type_code ==
-          NumberTypes::sacado_rad_dfad>::type> : std::true_type
+        ADNumberTraits<typename std::decay<NumberType>::type>::type_code
+          DEAL_II_EQUALS NumberTypes::sacado_rad DEAL_II_OR
+                                                 ADNumberTraits<typename std::decay<NumberType>::type>::type_code
+              DEAL_II_EQUALS NumberTypes::sacado_rad_dfad>::type>
+      : std::true_type
     {};
 
 
@@ -905,9 +907,9 @@ namespace Differentiation
     template <typename NumberType>
     struct is_sacado_number<
       NumberType,
-      typename std::enable_if<is_sacado_dfad_number<NumberType>::value ||
-                              is_sacado_rad_number<NumberType>::value>::type>
-      : std::true_type
+      typename std::enable_if<
+        is_sacado_dfad_number<NumberType>::value DEAL_II_OR
+                                                 is_sacado_rad_number<NumberType>::value>::type> : std::true_type
     {};
 
   } // namespace AD

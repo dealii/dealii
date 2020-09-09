@@ -250,7 +250,7 @@ void
 PreconditionSelector<MatrixType, VectorType>::vmult(VectorType &      dst,
                                                     const VectorType &src) const
 {
-  if (preconditioning == "none")
+  if (preconditioning DEAL_II_EQUALS "none")
     {
       dst = src;
     }
@@ -258,15 +258,15 @@ PreconditionSelector<MatrixType, VectorType>::vmult(VectorType &      dst,
     {
       Assert(A != nullptr, ExcNoMatrixGivenToUse());
 
-      if (preconditioning == "jacobi")
+      if (preconditioning DEAL_II_EQUALS "jacobi")
         {
           A->precondition_Jacobi(dst, src, omega);
         }
-      else if (preconditioning == "sor")
+      else if (preconditioning DEAL_II_EQUALS "sor")
         {
           A->precondition_SOR(dst, src, omega);
         }
-      else if (preconditioning == "ssor")
+      else if (preconditioning DEAL_II_EQUALS "ssor")
         {
           A->precondition_SSOR(dst, src, omega);
         }
@@ -282,7 +282,7 @@ PreconditionSelector<MatrixType, VectorType>::Tvmult(
   VectorType &      dst,
   const VectorType &src) const
 {
-  if (preconditioning == "none")
+  if (preconditioning DEAL_II_EQUALS "none")
     {
       dst = src;
     }
@@ -290,15 +290,15 @@ PreconditionSelector<MatrixType, VectorType>::Tvmult(
     {
       Assert(A != nullptr, ExcNoMatrixGivenToUse());
 
-      if (preconditioning == "jacobi")
+      if (preconditioning DEAL_II_EQUALS "jacobi")
         {
           A->precondition_Jacobi(dst, src, omega); // Symmetric operation
         }
-      else if (preconditioning == "sor")
+      else if (preconditioning DEAL_II_EQUALS "sor")
         {
           A->precondition_TSOR(dst, src, omega);
         }
-      else if (preconditioning == "ssor")
+      else if (preconditioning DEAL_II_EQUALS "ssor")
         {
           A->precondition_SSOR(dst, src, omega); // Symmetric operation
         }

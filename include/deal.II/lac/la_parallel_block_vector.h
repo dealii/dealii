@@ -254,8 +254,8 @@ namespace LinearAlgebra
        * and call collect_sizes() to update the block system's knowledge of
        * its individual block's sizes.
        *
-       * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with
-       * zeros.
+       * If <tt>omit_zeroing_entriesDEAL_II_EQUALS false</tt>, the vector is
+       * filled with zeros.
        */
       void
       reinit(const size_type num_blocks,
@@ -271,8 +271,8 @@ namespace LinearAlgebra
        * called, all vectors remain the same and reinit() is called for each
        * vector.
        *
-       * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with
-       * zeros.
+       * If <tt>omit_zeroing_entriesDEAL_II_EQUALS false</tt>, the vector is
+       * filled with zeros.
        *
        * Note that you must call this (or the other reinit() functions)
        * function, rather than calling the reinit() functions of an individual
@@ -653,7 +653,8 @@ namespace LinearAlgebra
        * a vector is created on only one processor, then the result would
        * satisfy
        * @code
-       *  vec.locally_owned_elements() == complete_index_set(vec.size())
+       *  vec.locally_owned_elements() DEAL_II_EQUALS
+       * complete_index_set(vec.size())
        * @endcode
        */
       virtual dealii::IndexSet

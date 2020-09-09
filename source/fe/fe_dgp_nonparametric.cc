@@ -56,7 +56,8 @@ FE_DGPNonparametric<dim, spacedim>::FE_DGPNonparametric(
        ref_case < RefinementCase<dim>::isotropic_refinement + 1;
        ++ref_case)
     {
-      if (dim != 2 && ref_case != RefinementCase<dim>::isotropic_refinement)
+      if (dim != 2 DEAL_II_AND ref_case !=
+          RefinementCase<dim>::isotropic_refinement)
         // do nothing, as anisotropic
         // refinement is not
         // implemented so far
@@ -82,7 +83,7 @@ FE_DGPNonparametric<dim, spacedim>::FE_DGPNonparametric(
   //
   // if it were, then the following
   // snippet would be the right code
-  //    if ((degree < Matrices::n_projection_matrices) &&
+  //    if ((degree < Matrices::n_projection_matrices) DEAL_II_AND
   //        (Matrices::projection_matrices[degree] != 0))
   //      {
   //        restriction[0].fill (Matrices::projection_matrices[degree]);
@@ -485,14 +486,14 @@ FE_DGPNonparametric<dim, spacedim>::get_face_interpolation_matrix(
   // much we need to do here.
   (void)interpolation_matrix;
   AssertThrow(
-    (x_source_fe.get_name().find("FE_DGPNonparametric<") == 0) ||
-      (dynamic_cast<const FE_DGPNonparametric<dim, spacedim> *>(&x_source_fe) !=
-       nullptr),
+    (x_source_fe.get_name().find("FE_DGPNonparametric<") DEAL_II_EQUALS 0)
+      DEAL_II_OR(dynamic_cast<const FE_DGPNonparametric<dim, spacedim> *>(
+                   &x_source_fe) != nullptr),
     (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
 
-  Assert(interpolation_matrix.m() == 0,
+  Assert(interpolation_matrix.m() DEAL_II_EQUALS 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS 0,
          ExcDimensionMismatch(interpolation_matrix.n(), 0));
 }
 
@@ -514,14 +515,14 @@ FE_DGPNonparametric<dim, spacedim>::get_subface_interpolation_matrix(
   // much we need to do here.
   (void)interpolation_matrix;
   AssertThrow(
-    (x_source_fe.get_name().find("FE_DGPNonparametric<") == 0) ||
-      (dynamic_cast<const FE_DGPNonparametric<dim, spacedim> *>(&x_source_fe) !=
-       nullptr),
+    (x_source_fe.get_name().find("FE_DGPNonparametric<") DEAL_II_EQUALS 0)
+      DEAL_II_OR(dynamic_cast<const FE_DGPNonparametric<dim, spacedim> *>(
+                   &x_source_fe) != nullptr),
     (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
 
-  Assert(interpolation_matrix.m() == 0,
+  Assert(interpolation_matrix.m() DEAL_II_EQUALS 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS 0,
          ExcDimensionMismatch(interpolation_matrix.n(), 0));
 }
 
@@ -617,7 +618,7 @@ FE_DGPNonparametric<dim, spacedim>::compare_for_domination(
     {
       if (this->degree < fe_nonparametric_other->degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_nonparametric_other->degree)
+      else if (this->degree DEAL_II_EQUALS fe_nonparametric_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;

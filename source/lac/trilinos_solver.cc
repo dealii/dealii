@@ -182,9 +182,11 @@ namespace TrilinosWrappers
   {
     // In case we call the solver with deal.II vectors, we create views of the
     // vectors in Epetra format.
-    Assert(x.size() == A.n(), ExcDimensionMismatch(x.size(), A.n()));
-    Assert(b.size() == A.m(), ExcDimensionMismatch(b.size(), A.m()));
-    Assert(A.local_range().second == A.m(),
+    Assert(x.size() DEAL_II_EQUALS A.n(),
+           ExcDimensionMismatch(x.size(), A.n()));
+    Assert(b.size() DEAL_II_EQUALS A.m(),
+           ExcDimensionMismatch(b.size(), A.m()));
+    Assert(A.local_range().second DEAL_II_EQUALS A.m(),
            ExcMessage("Can only work in serial when using deal.II vectors."));
     Assert(A.trilinos_matrix().Filled(),
            ExcMessage("Matrix is not compressed. Call compress() method."));
@@ -281,11 +283,11 @@ namespace TrilinosWrappers
       double
       compute_residual(const Epetra_MultiVector *const residual_vector)
       {
-        Assert(residual_vector->NumVectors() == 1,
+        Assert(residual_vector->NumVectors() DEAL_II_EQUALS 1,
                ExcMessage("Residual multivector holds more than one vector"));
         TrilinosScalar res_l2_norm = 0.0;
         const int      ierr        = residual_vector->Norm2(&res_l2_norm);
-        AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+        AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
         return res_l2_norm;
       }
 
@@ -316,7 +318,7 @@ namespace TrilinosWrappers
           current_residual =
             (CurrentResNormEst < 0.0 ? compute_residual(CurrentResVector) :
                                        CurrentResNormEst);
-          if (CurrentIter == 0)
+          if (CurrentIter DEAL_II_EQUALS 0)
             initial_residual = current_residual;
 
           return status_test_collection->CheckStatus(CurrentIter,
@@ -377,7 +379,7 @@ namespace TrilinosWrappers
           std::make_unique<AztecOO_StatusTestMaxIters>(max_steps);
         status_test_collection->AddStatusTest(*status_test_max_steps);
 
-        Assert(linear_problem.GetRHS()->NumVectors() == 1,
+        Assert(linear_problem.GetRHS()->NumVectors() DEAL_II_EQUALS 1,
                ExcMessage("RHS multivector holds more than one vector"));
 
         // Residual norm is below some absolute value
@@ -571,7 +573,7 @@ namespace TrilinosWrappers
       {
         const int ierr = solver.SetPrecOperator(
           const_cast<Epetra_Operator *>(preconditioner.preconditioner.get()));
-        AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+        AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
       }
     else
       solver.SetAztecOption(AZ_precond, AZ_none);
@@ -585,7 +587,7 @@ namespace TrilinosWrappers
   {
     const int ierr =
       solver.SetPrecOperator(const_cast<Epetra_Operator *>(&preconditioner));
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
   }
 
 
@@ -735,11 +737,11 @@ namespace TrilinosWrappers
 
     verbose_cout << "Starting symbolic factorization" << std::endl;
     ierr = solver->SymbolicFactorization();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     verbose_cout << "Starting numeric factorization" << std::endl;
     ierr = solver->NumericFactorization();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
   }
 
 
@@ -763,7 +765,7 @@ namespace TrilinosWrappers
 
     // Fetch return value of Amesos Solver functions
     int ierr = solver->Solve();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     // Finally, force the SolverControl object to report convergence
     solver_control.check(0, 0);
@@ -798,7 +800,7 @@ namespace TrilinosWrappers
 
     // Fetch return value of Amesos Solver functions
     int ierr = solver->Solve();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     // Finally, force the SolverControl object to report convergence
     solver_control.check(0, 0);
@@ -835,15 +837,15 @@ namespace TrilinosWrappers
 
     verbose_cout << "Starting symbolic factorization" << std::endl;
     ierr = solver->SymbolicFactorization();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     verbose_cout << "Starting numeric factorization" << std::endl;
     ierr = solver->NumericFactorization();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     verbose_cout << "Starting solve" << std::endl;
     ierr = solver->Solve();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     // Finally, let the deal.II SolverControl object know what has
     // happened. If the solve succeeded, the status of the solver control will
@@ -881,9 +883,11 @@ namespace TrilinosWrappers
   {
     // In case we call the solver with deal.II vectors, we create views of the
     // vectors in Epetra format.
-    Assert(x.size() == A.n(), ExcDimensionMismatch(x.size(), A.n()));
-    Assert(b.size() == A.m(), ExcDimensionMismatch(b.size(), A.m()));
-    Assert(A.local_range().second == A.m(),
+    Assert(x.size() DEAL_II_EQUALS A.n(),
+           ExcDimensionMismatch(x.size(), A.n()));
+    Assert(b.size() DEAL_II_EQUALS A.m(),
+           ExcDimensionMismatch(b.size(), A.m()));
+    Assert(A.local_range().second DEAL_II_EQUALS A.m(),
            ExcMessage("Can only work in serial when using deal.II vectors."));
     Epetra_Vector ep_x(View, A.trilinos_matrix().DomainMap(), x.begin());
     Epetra_Vector ep_b(View,

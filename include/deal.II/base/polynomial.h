@@ -206,8 +206,7 @@ namespace Polynomials
     /**
      * Test for equality of two polynomials.
      */
-    bool
-    operator==(const Polynomial<number> &p) const;
+    bool operator DEAL_II_EQUALS(const Polynomial<number> &p) const;
 
     /**
      * Print coefficients.
@@ -423,8 +422,8 @@ namespace Polynomials
    *
    * Calling the constructor with a given index <tt>k</tt> will generate the
    * polynomial with index <tt>k</tt>. But only for $k\geq 1$ the index equals
-   * the degree of the polynomial. For <tt>k==0</tt> also a polynomial of
-   * degree 1 is generated.
+   * the degree of the polynomial. For <tt>kDEAL_II_EQUALS 0</tt> also a
+   * polynomial of degree 1 is generated.
    *
    * These polynomials are used for the construction of the shape functions of
    * N&eacute;d&eacute;lec elements of arbitrary order.
@@ -434,13 +433,14 @@ namespace Polynomials
   public:
     /**
      * Constructor for polynomial of degree <tt>p</tt>. There is an exception
-     * for <tt>p==0</tt>, see the general documentation.
+     * for <tt>pDEAL_II_EQUALS 0</tt>, see the general documentation.
      */
     Lobatto(const unsigned int p = 0);
 
     /**
      * Return the polynomials with index <tt>0</tt> up to <tt>degree</tt>.
-     * There is an exception for <tt>p==0</tt>, see the general documentation.
+     * There is an exception for <tt>pDEAL_II_EQUALS 0</tt>, see the general
+     * documentation.
      */
     static std::vector<Polynomial<double>>
     generate_complete_basis(const unsigned int p);
@@ -477,14 +477,14 @@ namespace Polynomials
    * possibly be achieved with scaling.
    *
    * Calling the constructor with a given index <tt>p</tt> will generate the
-   * following: if <tt>p==0</tt>, then the resulting polynomial is the linear
-   * function associated with the left vertex, if <tt>p==1</tt> the one
-   * associated with the right vertex. For higher values of <tt>p</tt>, you
-   * get the polynomial of degree <tt>p</tt> that is orthogonal to all
-   * previous ones. Note that for <tt>p==0</tt> you therefore do <b>not</b>
-   * get a polynomial of degree zero, but one of degree one. This is to allow
-   * generating a complete basis for polynomial spaces, by just iterating over
-   * the indices given to the constructor.
+   * following: if <tt>pDEAL_II_EQUALS 0</tt>, then the resulting polynomial is
+   * the linear function associated with the left vertex, if <tt>pDEAL_II_EQUALS
+   * 1</tt> the one associated with the right vertex. For higher values of
+   * <tt>p</tt>, you get the polynomial of degree <tt>p</tt> that is orthogonal
+   * to all previous ones. Note that for <tt>pDEAL_II_EQUALS 0</tt> you
+   * therefore do <b>not</b> get a polynomial of degree zero, but one of degree
+   * one. This is to allow generating a complete basis for polynomial spaces, by
+   * just iterating over the indices given to the constructor.
    *
    * On the other hand, the function generate_complete_basis() creates a
    * complete basis of given degree. In order to be consistent with the
@@ -497,7 +497,7 @@ namespace Polynomials
   public:
     /**
      * Constructor for polynomial of degree <tt>p</tt>. There is an exception
-     * for <tt>p==0</tt>, see the general documentation.
+     * for <tt>pDEAL_II_EQUALS 0</tt>, see the general documentation.
      */
     Hierarchical(const unsigned int p);
 
@@ -765,7 +765,7 @@ namespace Polynomials
   inline unsigned int
   Polynomial<number>::degree() const
   {
-    if (in_lagrange_product_form == true)
+    if (in_lagrange_product_form DEAL_II_EQUALS true)
       {
         return lagrange_support_points.size();
       }
@@ -782,7 +782,7 @@ namespace Polynomials
   inline number
   Polynomial<number>::value(const number x) const
   {
-    if (in_lagrange_product_form == false)
+    if (in_lagrange_product_form DEAL_II_EQUALS false)
       {
         Assert(coefficients.size() > 0, ExcEmptyObject());
 
@@ -829,7 +829,7 @@ namespace Polynomials
                           const int          beta,
                           const Number       x)
   {
-    Assert(alpha >= 0 && beta >= 0,
+    Assert(alpha >= 0 DEAL_II_AND beta >= 0,
            ExcNotImplemented("Negative alpha/beta coefficients not supported"));
     // the Jacobi polynomial is evaluated using a recursion formula.
     Number p0, p1;
@@ -840,10 +840,10 @@ namespace Polynomials
 
     // initial values P_0(x), P_1(x):
     p0 = 1.0;
-    if (degree == 0)
+    if (degree DEAL_II_EQUALS 0)
       return p0;
     p1 = ((alpha + beta + 2) * xeval + (alpha - beta)) / 2;
-    if (degree == 1)
+    if (degree DEAL_II_EQUALS 1)
       return p1;
 
     for (unsigned int i = 1; i < degree; ++i)
@@ -890,7 +890,8 @@ namespace Polynomials
     // 2005)
 
     // If symmetric, we only need to compute the half of points
-    const unsigned int n_points = (alpha == beta ? degree / 2 : degree);
+    const unsigned int n_points =
+      (alpha DEAL_II_EQUALS beta ? degree / 2 : degree);
     for (unsigned int k = 0; k < n_points; ++k)
       {
         // we take the zeros of the Chebyshev polynomial (alpha=beta=-0.5) as
@@ -916,13 +917,14 @@ namespace Polynomials
             const Number f = jacobi_polynomial_value(degree, alpha, beta, r);
             const Number delta = f / (f * s - J_x);
             r += delta;
-            if (converged == numbers::invalid_unsigned_int &&
-                std::abs(delta) < tolerance)
+            if (converged DEAL_II_EQUALS
+                  numbers::invalid_unsigned_int DEAL_II_AND std::abs(delta) <
+                tolerance)
               converged = it;
 
             // do one more iteration to ensure accuracy also for tighter
             // types than double (e.g. long double)
-            if (it == converged + 1)
+            if (it DEAL_II_EQUALS converged + 1)
               break;
           }
 

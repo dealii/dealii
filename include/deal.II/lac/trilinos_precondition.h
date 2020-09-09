@@ -1507,10 +1507,10 @@ namespace TrilinosWrappers
        * <tt>n_component</tt>, the provided @p constant_modes should fulfill
        * the following requirements:
        * <ul>
-       * <li>  n_component.size() == <tt>n_component</tt> </li>
-       * <li>  n_component[*].size() == n_dof_local or n_component[*].size()
-       * == n_dof_global </li>
-       * <li>  n_component[<tt>ic</tt>][<tt>id</tt>] ==
+       * <li>  n_component.size() DEAL_II_EQUALS  <tt>n_component</tt> </li>
+       * <li>  n_component[*].size() DEAL_II_EQUALS  n_dof_local or n_component[*].size()
+       * DEAL_II_EQUALS  n_dof_global </li>
+       * <li>  n_component[<tt>ic</tt>][<tt>id</tt>] DEAL_II_EQUALS
        * "<tt>id</tt><em>th</em> DoF is corresponding to component <tt>ic</tt>
        * </li>
        * </ul>
@@ -1701,7 +1701,7 @@ namespace TrilinosWrappers
 
 
 
-#    if defined(DOXYGEN) || defined(DEAL_II_TRILINOS_WITH_MUELU)
+#    if defined(DOXYGEN) DEAL_II_OR defined(DEAL_II_TRILINOS_WITH_MUELU)
   /**
    * This class implements an algebraic multigrid (AMG) preconditioner based
    * on the Trilinos MueLu implementation, which is a black-box preconditioner
@@ -2041,12 +2041,12 @@ namespace TrilinosWrappers
     if (!preconditioner->UseTranspose())
       {
         ierr = preconditioner->SetUseTranspose(true);
-        AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+        AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
       }
     else
       {
         ierr = preconditioner->SetUseTranspose(false);
-        AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+        AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
       }
   }
 
@@ -2063,7 +2063,7 @@ namespace TrilinosWrappers
 
     const int ierr = preconditioner->ApplyInverse(src.trilinos_vector(),
                                                   dst.trilinos_vector());
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
   }
 
   inline void
@@ -2079,7 +2079,7 @@ namespace TrilinosWrappers
     preconditioner->SetUseTranspose(true);
     const int ierr = preconditioner->ApplyInverse(src.trilinos_vector(),
                                                   dst.trilinos_vector());
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
     preconditioner->SetUseTranspose(false);
   }
 
@@ -2109,7 +2109,7 @@ namespace TrilinosWrappers
                            const_cast<double *>(src.begin()));
 
     const int ierr = preconditioner->ApplyInverse(tril_src, tril_dst);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
   }
 
 
@@ -2130,7 +2130,7 @@ namespace TrilinosWrappers
 
     preconditioner->SetUseTranspose(true);
     const int ierr = preconditioner->ApplyInverse(tril_src, tril_dst);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
     preconditioner->SetUseTranspose(false);
   }
 
@@ -2153,7 +2153,7 @@ namespace TrilinosWrappers
                            const_cast<double *>(src.begin()));
 
     const int ierr = preconditioner->ApplyInverse(tril_src, tril_dst);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
   }
 
   inline void
@@ -2174,7 +2174,7 @@ namespace TrilinosWrappers
 
     preconditioner->SetUseTranspose(true);
     const int ierr = preconditioner->ApplyInverse(tril_src, tril_dst);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
     preconditioner->SetUseTranspose(false);
   }
 

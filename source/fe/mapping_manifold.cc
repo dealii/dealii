@@ -405,7 +405,7 @@ namespace internal
                   {
                     const Point<dim> ei = Point<dim>::unit_vector(i);
                     const double     pi = p[i];
-                    Assert(pi >= 0 && pi <= 1.0,
+                    Assert(pi >= 0 DEAL_II_AND pi <= 1.0,
                            ExcInternalError(
                              "Was expecting a quadrature point "
                              "inside the unit reference element."));
@@ -499,15 +499,15 @@ MappingManifold<dim, spacedim>::fill_fe_values(
     {
       AssertDimension(output_data.JxW_values.size(), n_q_points);
 
-      Assert(!(update_flags & update_normal_vectors) ||
-               (output_data.normal_vectors.size() == n_q_points),
+      Assert(!(update_flags & update_normal_vectors) DEAL_II_OR(
+               output_data.normal_vectors.size() DEAL_II_EQUALS n_q_points),
              ExcDimensionMismatch(output_data.normal_vectors.size(),
                                   n_q_points));
 
 
       for (unsigned int point = 0; point < n_q_points; ++point)
         {
-          if (dim == spacedim)
+          if (dim DEAL_II_EQUALS spacedim)
             {
               const double det = data.contravariant[point].determinant();
 
@@ -523,7 +523,7 @@ MappingManifold<dim, spacedim>::fill_fe_values(
 
               output_data.JxW_values[point] = weights[point] * det;
             }
-          // if dim==spacedim, then there is no cell normal to
+          // if dimDEAL_II_EQUALS spacedim, then there is no cell normal to
           // compute. since this is for FEValues (and not FEFaceValues),
           // there are also no face normals to compute
           else // codim>0 case
@@ -543,7 +543,7 @@ MappingManifold<dim, spacedim>::fill_fe_values(
 
               if (update_flags & update_normal_vectors)
                 {
-                  Assert(spacedim == dim + 1,
+                  Assert(spacedim DEAL_II_EQUALS dim + 1,
                          ExcMessage(
                            "There is no (unique) cell normal for " +
                            Utilities::int_to_string(dim) +
@@ -553,17 +553,17 @@ MappingManifold<dim, spacedim>::fill_fe_values(
                            "space dimension is one greater than the "
                            "dimensionality of the mesh cells."));
 
-                  if (dim == 1)
+                  if (dim DEAL_II_EQUALS 1)
                     output_data.normal_vectors[point] =
                       cross_product_2d(-DX_t[0]);
-                  else // dim == 2
+                  else // dim DEAL_II_EQUALS  2
                     output_data.normal_vectors[point] =
                       cross_product_3d(DX_t[0], DX_t[1]);
 
                   output_data.normal_vectors[point] /=
                     output_data.normal_vectors[point].norm();
 
-                  if (cell->direction_flag() == false)
+                  if (cell->direction_flag() DEAL_II_EQUALS false)
                     output_data.normal_vectors[point] *= -1.;
                 }
             } // codim>0 case
@@ -660,9 +660,9 @@ namespace internal
                   make_array_view(data.aux[d]));
               }
 
-            // if dim==spacedim, we can use the unit tangentials to compute the
-            // boundary form by simply taking the cross product
-            if (dim == spacedim)
+            // if dimDEAL_II_EQUALS spacedim, we can use the unit tangentials to
+            // compute the boundary form by simply taking the cross product
+            if (dim DEAL_II_EQUALS spacedim)
               {
                 for (unsigned int i = 0; i < n_q_points; ++i)
                   switch (dim)
@@ -673,7 +673,7 @@ namespace internal
                         // can still compute the boundary form by simply
                         // looking at the number of the face
                         output_data.boundary_forms[i][0] =
-                          (face_no == 0 ? -1 : +1);
+                          (face_no DEAL_II_EQUALS 0 ? -1 : +1);
                         break;
                       case 2:
                         output_data.boundary_forms[i] =
@@ -707,7 +707,7 @@ namespace internal
                             output_data.boundary_forms[point] =
                               data.contravariant[point].transpose()[0];
                             output_data.boundary_forms[point] /=
-                              (face_no == 0 ? -1. : +1.) *
+                              (face_no DEAL_II_EQUALS 0 ? -1. : +1.) *
                               output_data.boundary_forms[point].norm();
 
                             break;
@@ -856,7 +856,7 @@ namespace internal
                   data.update_each & update_volume_elements,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_volume_elements"));
-                Assert(rank == 1, ExcMessage("Only for rank 1"));
+                Assert(rank DEAL_II_EQUALS 1, ExcMessage("Only for rank 1"));
                 if (rank != 1)
                   return;
 
@@ -920,7 +920,7 @@ namespace internal
                   data.update_each & update_contravariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_contravariant_transformation"));
-                Assert(rank == 2, ExcMessage("Only for rank 2"));
+                Assert(rank DEAL_II_EQUALS 2, ExcMessage("Only for rank 2"));
 
                 for (unsigned int i = 0; i < output.size(); ++i)
                   {
@@ -940,7 +940,7 @@ namespace internal
                   data.update_each & update_covariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_covariant_transformation"));
-                Assert(rank == 2, ExcMessage("Only for rank 2"));
+                Assert(rank DEAL_II_EQUALS 2, ExcMessage("Only for rank 2"));
 
                 for (unsigned int i = 0; i < output.size(); ++i)
                   {
@@ -968,7 +968,7 @@ namespace internal
                   data.update_each & update_volume_elements,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_volume_elements"));
-                Assert(rank == 2, ExcMessage("Only for rank 2"));
+                Assert(rank DEAL_II_EQUALS 2, ExcMessage("Only for rank 2"));
 
                 for (unsigned int i = 0; i < output.size(); ++i)
                   {

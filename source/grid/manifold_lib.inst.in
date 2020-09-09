@@ -26,7 +26,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
     template class EllipticalManifold<deal_II_dimension,
                                       deal_II_space_dimension>;
 #endif
-#if deal_II_dimension == deal_II_space_dimension
+#if deal_II_dimension DEAL_II_EQUALS deal_II_space_dimension
     template class TorusManifold<deal_II_dimension>;
 #endif
   }

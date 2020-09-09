@@ -105,7 +105,7 @@ namespace internal
           const DoFHandler<dim, spacedim> &dof_handler)
         {
           const auto worker = [](const auto &cell, void *, void *) {
-            if (cell->has_children() || !cell->is_artificial())
+            if (cell->has_children() DEAL_II_OR !cell->is_artificial())
               cell->update_cell_dof_indices_cache();
           };
 
@@ -149,7 +149,7 @@ namespace internal
         {
           // see if we need to fill this entry, or whether it already
           // exists
-          if (identities.get() == nullptr)
+          if (identities.get() DEAL_II_EQUALS nullptr)
             {
               switch (structdim)
                 {
@@ -211,7 +211,7 @@ namespace internal
           const DoFHandler<dim, spacedim> &dof_handler)
         {
           Assert(
-            dof_handler.hp_capability_enabled == true,
+            dof_handler.hp_capability_enabled DEAL_II_EQUALS true,
             (typename DoFHandler<dim, spacedim>::ExcNotAvailableWithoutHP()));
 
           std::map<types::global_dof_index, types::global_dof_index>
@@ -232,7 +232,7 @@ namespace internal
                vertex_index < dof_handler.get_triangulation().n_vertices();
                ++vertex_index)
             if (dof_handler.get_triangulation()
-                  .get_used_vertices()[vertex_index] == true)
+                  .get_used_vertices()[vertex_index] DEAL_II_EQUALS true)
               {
                 const unsigned int n_active_fe_indices =
                   dealii::internal::DoFAccessorImplementation::Implementation::
@@ -260,8 +260,8 @@ namespace internal
 
                     // if we haven't found a dominating finite element,
                     // choose the very first one to be dominant
-                    if (most_dominating_fe_index ==
-                        numbers::invalid_unsigned_int)
+                    if (most_dominating_fe_index DEAL_II_EQUALS
+                                                 numbers::invalid_unsigned_int)
                       most_dominating_fe_index =
                         dealii::internal::DoFAccessorImplementation::
                           Implementation::nth_active_fe_index(
@@ -343,10 +343,13 @@ namespace internal
                                   if (primary_dof_index !=
                                       numbers::invalid_dof_index)
                                     Assert(
-                                      (dof_identities.find(primary_dof_index) ==
-                                       dof_identities.end()) ||
-                                        (dof_identities[dependent_dof_index] ==
-                                         primary_dof_index),
+                                      (dof_identities
+                                         .find(primary_dof_index)
+                                           DEAL_II_EQUALS dof_identities.end())
+                                        DEAL_II_OR(
+                                          dof_identities
+                                            [dependent_dof_index] DEAL_II_EQUALS
+                                              primary_dof_index),
                                       ExcInternalError());
 
                                   dof_identities[dependent_dof_index] =
@@ -371,7 +374,7 @@ namespace internal
         {
           (void)dof_handler;
           Assert(
-            dof_handler.hp_capability_enabled == true,
+            dof_handler.hp_capability_enabled DEAL_II_EQUALS true,
             (typename DoFHandler<1, spacedim>::ExcNotAvailableWithoutHP()));
 
           return std::map<types::global_dof_index, types::global_dof_index>();
@@ -384,7 +387,7 @@ namespace internal
           const DoFHandler<dim, spacedim> &dof_handler)
         {
           Assert(
-            dof_handler.hp_capability_enabled == true,
+            dof_handler.hp_capability_enabled DEAL_II_EQUALS true,
             (typename DoFHandler<dim, spacedim>::ExcNotAvailableWithoutHP()));
 
           std::map<types::global_dof_index, types::global_dof_index>
@@ -422,7 +425,7 @@ namespace internal
 
           for (const auto &cell : dof_handler.active_cell_iterators())
             for (const auto l : cell->line_indices())
-              if (cell->line(l)->user_flag_set() == false)
+              if (cell->line(l)->user_flag_set() DEAL_II_EQUALS false)
                 {
                   const auto line = cell->line(l);
                   line->set_user_flag();
@@ -458,11 +461,12 @@ namespace internal
                         // FE_Q objects of the same order, from which one is
                         // enhanced by a bubble function that is zero on the
                         // boundary.
-                        if ((dof_handler.get_fe(fe_index_1).n_dofs_per_line() ==
-                             dof_handler.get_fe(fe_index_2)
-                               .n_dofs_per_line()) &&
-                            (dof_handler.get_fe(fe_index_1).n_dofs_per_line() >
-                             0))
+                        if ((dof_handler.get_fe(fe_index_1)
+                               .n_dofs_per_line()
+                                 DEAL_II_EQUALS dof_handler.get_fe(fe_index_2)
+                               .n_dofs_per_line())
+                              DEAL_II_AND(dof_handler.get_fe(fe_index_1)
+                                            .n_dofs_per_line() > 0))
                           {
                             // the number of dofs per line is identical
                             const unsigned int dofs_per_line =
@@ -476,16 +480,16 @@ namespace internal
                             // see if these sets of dofs are identical. the
                             // first condition for this is that indeed there are
                             // n identities
-                            if (identities.size() == dofs_per_line)
+                            if (identities.size() DEAL_II_EQUALS dofs_per_line)
                               {
                                 unsigned int i = 0;
                                 for (; i < dofs_per_line; ++i)
-                                  if ((identities[i].first != i) &&
-                                      (identities[i].second != i))
+                                  if ((identities[i].first != i)
+                                        DEAL_II_AND(identities[i].second != i))
                                     // not an identity
                                     break;
 
-                                if (i == dofs_per_line)
+                                if (i DEAL_II_EQUALS dofs_per_line)
                                   {
                                     // The line dofs (i.e., the ones interior to
                                     // a line) of these two finite elements are
@@ -511,7 +515,8 @@ namespace internal
                                     if (dominating_fe_index !=
                                         numbers::invalid_unsigned_int)
                                       other_fe_index =
-                                        (dominating_fe_index == fe_index_1) ?
+                                        (dominating_fe_index DEAL_II_EQUALS
+                                                             fe_index_1) ?
                                           fe_index_2 :
                                           fe_index_1;
                                     else
@@ -573,10 +578,13 @@ namespace internal
                                                     // exactly as we had
                                                     // computed before
                                                     Assert(
-                                                      dof_identities.find(
-                                                        dof_identities
-                                                          [primary_dof_index]) ==
-                                                        dof_identities.end(),
+                                                      dof_identities
+                                                        .find(
+                                                          dof_identities
+                                                            [primary_dof_index])
+                                                          DEAL_II_EQUALS
+                                                            dof_identities
+                                                        .end(),
                                                       ExcInternalError());
 
                                                     dof_identities
@@ -590,12 +598,16 @@ namespace internal
                                                     // explanation of this
                                                     // assertion
                                                     Assert(
-                                                      (dof_identities.find(
-                                                         primary_dof_index) ==
-                                                       dof_identities.end()) ||
-                                                        (dof_identities
-                                                           [dependent_dof_index] ==
-                                                         primary_dof_index),
+                                                      (dof_identities
+                                                         .find(
+                                                           primary_dof_index)
+                                                           DEAL_II_EQUALS
+                                                             dof_identities
+                                                         .end())
+                                                        DEAL_II_OR(
+                                                          dof_identities
+                                                            [dependent_dof_index] DEAL_II_EQUALS
+                                                              primary_dof_index),
                                                       ExcInternalError());
 
                                                     dof_identities
@@ -624,12 +636,12 @@ namespace internal
                   // are two, then we need to deal with them here. if there are
                   // more, then we punt, as described in the paper (and
                   // mentioned above)
-                  // TODO: The check for 'dim==2' was inserted by intuition. It
-                  // fixes
-                  // the previous problems with step-27 in 3D. But an
-                  // explanation for this is still required, and what we do here
-                  // is not what we describe in the paper!.
-                  if ((unique_sets_of_dofs == 2) && (dim == 2))
+                  // TODO: The check for 'dimDEAL_II_EQUALS 2' was inserted by
+                  // intuition. It fixes the previous problems with step-27 in
+                  // 3D. But an explanation for this is still required, and what
+                  // we do here is not what we describe in the paper!.
+                  if ((unique_sets_of_dofs DEAL_II_EQUALS 2)DEAL_II_AND(
+                        dim DEAL_II_EQUALS 2))
                     {
                       const std::set<unsigned int> fe_indices =
                         line->get_active_fe_indices();
@@ -700,13 +712,16 @@ namespace internal
                                         // exactly as we had computed before
                                         if (primary_dof_index !=
                                             numbers::invalid_dof_index)
-                                          Assert((dof_identities.find(
-                                                    primary_dof_index) ==
-                                                  dof_identities.end()) ||
-                                                   (dof_identities
-                                                      [dependent_dof_index] ==
+                                          Assert(
+                                            (dof_identities
+                                               .find(primary_dof_index)
+                                                 DEAL_II_EQUALS dof_identities
+                                               .end())
+                                              DEAL_II_OR(
+                                                dof_identities
+                                                  [dependent_dof_index] DEAL_II_EQUALS
                                                     primary_dof_index),
-                                                 ExcInternalError());
+                                            ExcInternalError());
 
                                         dof_identities[dependent_dof_index] =
                                           primary_dof_index;
@@ -738,12 +753,12 @@ namespace internal
         {
           (void)dof_handler;
           Assert(
-            dof_handler.hp_capability_enabled == true,
+            dof_handler.hp_capability_enabled DEAL_II_EQUALS true,
             (typename DoFHandler<dim, spacedim>::ExcNotAvailableWithoutHP()));
 
           // this function should only be called for dim<3 where there are
-          // no quad dof identies. for dim==3, the specialization below should
-          // take care of it
+          // no quad dof identies. for dimDEAL_II_EQUALS 3, the specialization
+          // below should take care of it
           Assert(dim < 3, ExcInternalError());
 
           return std::map<types::global_dof_index, types::global_dof_index>();
@@ -755,7 +770,7 @@ namespace internal
         compute_quad_dof_identities(const DoFHandler<3, spacedim> &dof_handler)
         {
           Assert(
-            dof_handler.hp_capability_enabled == true,
+            dof_handler.hp_capability_enabled DEAL_II_EQUALS true,
             (typename DoFHandler<3, spacedim>::ExcNotAvailableWithoutHP()));
 
           const int dim = 3;
@@ -791,8 +806,9 @@ namespace internal
 
           for (const auto &cell : dof_handler.active_cell_iterators())
             for (const auto q : cell->face_indices())
-              if ((cell->quad(q)->user_flag_set() == false) &&
-                  (cell->quad(q)->n_active_fe_indices() == 2))
+              if ((cell->quad(q)->user_flag_set() DEAL_II_EQUALS false)
+                    DEAL_II_AND(cell->quad(q)->n_active_fe_indices()
+                                  DEAL_II_EQUALS 2))
                 {
                   const auto quad = cell->quad(q);
                   quad->set_user_flag();
@@ -828,8 +844,8 @@ namespace internal
                                 dof_handler.get_fe(other_fe_index),
                                 quad_dof_identities
                                   [most_dominating_fe_index][other_fe_index]
-                                  [cell->quad(q)->reference_cell_type() ==
-                                   ReferenceCell::Type::Quad]);
+                                  [cell->quad(q)->reference_cell_type()
+                                     DEAL_II_EQUALS ReferenceCell::Type::Quad]);
 
                             for (const auto &identity : identities)
                               {
@@ -859,13 +875,16 @@ namespace internal
                                     // computed before
                                     if (primary_dof_index !=
                                         numbers::invalid_dof_index)
-                                      Assert((dof_identities.find(
-                                                primary_dof_index) ==
-                                              dof_identities.end()) ||
-                                               (dof_identities
-                                                  [dependent_dof_index] ==
+                                      Assert(
+                                        (dof_identities
+                                           .find(primary_dof_index)
+                                             DEAL_II_EQUALS dof_identities
+                                           .end())
+                                          DEAL_II_OR(
+                                            dof_identities
+                                              [dependent_dof_index] DEAL_II_EQUALS
                                                 primary_dof_index),
-                                             ExcInternalError());
+                                        ExcInternalError());
 
                                     dof_identities[dependent_dof_index] =
                                       primary_dof_index;
@@ -896,10 +915,11 @@ namespace internal
                                  &all_constrained_indices,
                                const DoFHandler<dim, spacedim> &dof_handler)
         {
-          if (dof_handler.hp_capability_enabled == false)
+          if (dof_handler.hp_capability_enabled DEAL_II_EQUALS false)
             return;
 
-          Assert(all_constrained_indices.size() == dim, ExcInternalError());
+          Assert(all_constrained_indices.size() DEAL_II_EQUALS dim,
+                 ExcInternalError());
 
           Threads::TaskGroup<> tasks;
 
@@ -960,14 +980,16 @@ namespace internal
             &all_constrained_indices,
           const DoFHandler<dim, spacedim> &)
         {
-          Assert(all_constrained_indices.size() == dim, ExcInternalError());
+          Assert(all_constrained_indices.size() DEAL_II_EQUALS dim,
+                 ExcInternalError());
 
           // first preset the new DoF indices that are identities
           for (const auto &constrained_dof_indices : all_constrained_indices)
             for (const auto &p : constrained_dof_indices)
               if (new_dof_indices[p.first] != numbers::invalid_dof_index)
                 {
-                  Assert(new_dof_indices[p.first] == enumeration_dof_index,
+                  Assert(new_dof_indices[p.first] DEAL_II_EQUALS
+                           enumeration_dof_index,
                          ExcInternalError());
 
                   new_dof_indices[p.first] = p.second;
@@ -976,7 +998,7 @@ namespace internal
           // then enumerate the rest
           types::global_dof_index next_free_dof = 0;
           for (auto &new_dof_index : new_dof_indices)
-            if (new_dof_index == enumeration_dof_index)
+            if (new_dof_index DEAL_II_EQUALS enumeration_dof_index)
               new_dof_index = next_free_dof++;
 
           // then loop over all those that are constrained and record the
@@ -997,8 +1019,9 @@ namespace internal
               (void)new_dof_index;
               Assert(new_dof_index != enumeration_dof_index,
                      ExcInternalError());
-              Assert(new_dof_index < next_free_dof ||
-                       new_dof_index == numbers::invalid_dof_index,
+              Assert(new_dof_index <
+                       next_free_dof DEAL_II_OR new_dof_index DEAL_II_EQUALS
+                                                              numbers::invalid_dof_index,
                      ExcInternalError());
             }
 
@@ -1021,7 +1044,7 @@ namespace internal
                           const unsigned int n_dofs_before_identification,
                           const bool         check_validity)
         {
-          if (dof_handler.hp_capability_enabled == false)
+          if (dof_handler.hp_capability_enabled DEAL_II_EQUALS false)
             return n_dofs_before_identification;
 
           std::vector<
@@ -1055,7 +1078,7 @@ namespace internal
           DoFHandler<dim, spacedim> &dof_handler)
         {
           Assert(
-            dof_handler.hp_capability_enabled == true,
+            dof_handler.hp_capability_enabled DEAL_II_EQUALS true,
             (typename DoFHandler<dim, spacedim>::ExcNotAvailableWithoutHP()));
 
           // Note: we may wish to have something here similar to what
@@ -1084,8 +1107,8 @@ namespace internal
                vertex_index < dof_handler.get_triangulation().n_vertices();
                ++vertex_index)
             if ((dof_handler.get_triangulation()
-                   .get_used_vertices()[vertex_index] == true) &&
-                (include_vertex[vertex_index] == true))
+                   .get_used_vertices()[vertex_index] DEAL_II_EQUALS true)
+                  DEAL_II_AND(include_vertex[vertex_index] DEAL_II_EQUALS true))
               {
                 const unsigned int n_active_fe_indices =
                   dealii::internal::DoFAccessorImplementation::Implementation::
@@ -1114,8 +1137,8 @@ namespace internal
                     // if we haven't found a dominating finite element,
                     // choose the very first one to be dominant similar
                     // to compute_vertex_dof_identities()
-                    if (most_dominating_fe_index ==
-                        numbers::invalid_unsigned_int)
+                    if (most_dominating_fe_index DEAL_II_EQUALS
+                                                 numbers::invalid_unsigned_int)
                       most_dominating_fe_index =
                         dealii::internal::DoFAccessorImplementation::
                           Implementation::nth_active_fe_index(
@@ -1183,10 +1206,10 @@ namespace internal
                               // we only have to set the indices of
                               // degrees of freedom that have been
                               // previously flagged invalid.
-                              if ((dependent_dof_index ==
-                                   numbers::invalid_dof_index) &&
-                                  (primary_dof_index !=
-                                   numbers::invalid_dof_index))
+                              if ((dependent_dof_index DEAL_II_EQUALS
+                                                       numbers::invalid_dof_index)
+                                    DEAL_II_AND(primary_dof_index !=
+                                                numbers::invalid_dof_index))
                                 dealii::internal::DoFAccessorImplementation::
                                   Implementation::set_dof_index(
                                     dof_handler,
@@ -1214,7 +1237,7 @@ namespace internal
         {
           (void)dof_handler;
           Assert(
-            dof_handler.hp_capability_enabled == true,
+            dof_handler.hp_capability_enabled DEAL_II_EQUALS true,
             (typename DoFHandler<1, spacedim>::ExcNotAvailableWithoutHP()));
         }
 
@@ -1225,7 +1248,7 @@ namespace internal
           DoFHandler<dim, spacedim> &dof_handler)
         {
           Assert(
-            dof_handler.hp_capability_enabled == true,
+            dof_handler.hp_capability_enabled DEAL_II_EQUALS true,
             (typename DoFHandler<dim, spacedim>::ExcNotAvailableWithoutHP()));
 
           // we will mark lines that we have already treated, so first save and
@@ -1266,8 +1289,8 @@ namespace internal
 
           for (const auto &cell : dof_handler.active_cell_iterators())
             for (const auto l : cell->line_indices())
-              if ((cell->is_locally_owned()) &&
-                  (cell->line(l)->user_flag_set() == true))
+              if ((cell->is_locally_owned())DEAL_II_AND(
+                    cell->line(l)->user_flag_set() DEAL_II_EQUALS true))
                 {
                   const auto line = cell->line(l);
                   line->clear_user_flag();
@@ -1287,11 +1310,12 @@ namespace internal
                                            fe_index_2 =
                                              line->nth_active_fe_index(g);
 
-                        if ((dof_handler.get_fe(fe_index_1).n_dofs_per_line() ==
-                             dof_handler.get_fe(fe_index_2)
-                               .n_dofs_per_line()) &&
-                            (dof_handler.get_fe(fe_index_1).n_dofs_per_line() >
-                             0))
+                        if ((dof_handler.get_fe(fe_index_1)
+                               .n_dofs_per_line()
+                                 DEAL_II_EQUALS dof_handler.get_fe(fe_index_2)
+                               .n_dofs_per_line())
+                              DEAL_II_AND(dof_handler.get_fe(fe_index_1)
+                                            .n_dofs_per_line() > 0))
                           {
                             // the number of dofs per line is identical
                             const unsigned int dofs_per_line =
@@ -1305,16 +1329,16 @@ namespace internal
                             // see if these sets of dofs are identical. the
                             // first condition for this is that indeed there are
                             // n identities
-                            if (identities.size() == dofs_per_line)
+                            if (identities.size() DEAL_II_EQUALS dofs_per_line)
                               {
                                 unsigned int i = 0;
                                 for (; i < dofs_per_line; ++i)
-                                  if ((identities[i].first != i) &&
-                                      (identities[i].second != i))
+                                  if ((identities[i].first != i)
+                                        DEAL_II_AND(identities[i].second != i))
                                     // not an identity
                                     break;
 
-                                if (i == dofs_per_line)
+                                if (i DEAL_II_EQUALS dofs_per_line)
                                   {
                                     // The line dofs (i.e., the ones interior to
                                     // a line) of these two finite elements are
@@ -1340,7 +1364,8 @@ namespace internal
                                     if (dominating_fe_index !=
                                         numbers::invalid_unsigned_int)
                                       other_fe_index =
-                                        (dominating_fe_index == fe_index_1) ?
+                                        (dominating_fe_index DEAL_II_EQUALS
+                                                             fe_index_1) ?
                                           fe_index_2 :
                                           fe_index_1;
                                     else
@@ -1375,10 +1400,11 @@ namespace internal
                                         // have to set the indices of degrees
                                         // of freedom that have been previously
                                         // flagged invalid.
-                                        if ((dependent_dof_index ==
-                                             numbers::invalid_dof_index) &&
-                                            (primary_dof_index !=
-                                             numbers::invalid_dof_index))
+                                        if ((dependent_dof_index DEAL_II_EQUALS
+                                                                 numbers::invalid_dof_index)
+                                              DEAL_II_AND(
+                                                primary_dof_index !=
+                                                numbers::invalid_dof_index))
                                           line->set_dof_index(j,
                                                               primary_dof_index,
                                                               fe_index_2);
@@ -1393,12 +1419,12 @@ namespace internal
                   // are two, then we need to deal with them here. if there are
                   // more, then we punt, as described in the paper (and
                   // mentioned above)
-                  // TODO: The check for 'dim==2' was inserted by intuition. It
-                  // fixes
-                  // the previous problems with step-27 in 3D. But an
-                  // explanation for this is still required, and what we do here
-                  // is not what we describe in the paper!.
-                  if ((unique_sets_of_dofs == 2) && (dim == 2))
+                  // TODO: The check for 'dimDEAL_II_EQUALS 2' was inserted by
+                  // intuition. It fixes the previous problems with step-27 in
+                  // 3D. But an explanation for this is still required, and what
+                  // we do here is not what we describe in the paper!.
+                  if ((unique_sets_of_dofs DEAL_II_EQUALS 2)DEAL_II_AND(
+                        dim DEAL_II_EQUALS 2))
                     {
                       const std::set<unsigned int> fe_indices =
                         line->get_active_fe_indices();
@@ -1456,10 +1482,11 @@ namespace internal
                                     // we only have to set the indices of
                                     // degrees of freedom that have been
                                     // previously flagged invalid.
-                                    if ((dependent_dof_index ==
-                                         numbers::invalid_dof_index) &&
-                                        (primary_dof_index !=
-                                         numbers::invalid_dof_index))
+                                    if ((dependent_dof_index DEAL_II_EQUALS
+                                                             numbers::invalid_dof_index)
+                                          DEAL_II_AND(
+                                            primary_dof_index !=
+                                            numbers::invalid_dof_index))
                                       line->set_dof_index(identity.second,
                                                           primary_dof_index,
                                                           other_fe_index);
@@ -1488,7 +1515,7 @@ namespace internal
         {
           (void)dof_handler;
           Assert(
-            dof_handler.hp_capability_enabled == true,
+            dof_handler.hp_capability_enabled DEAL_II_EQUALS true,
             (typename DoFHandler<dim, spacedim>::ExcNotAvailableWithoutHP()));
 
           // this function should only be called for dim<3 where there are
@@ -1503,7 +1530,7 @@ namespace internal
           DoFHandler<3, spacedim> &dof_handler)
         {
           Assert(
-            dof_handler.hp_capability_enabled == true,
+            dof_handler.hp_capability_enabled DEAL_II_EQUALS true,
             (typename DoFHandler<3, spacedim>::ExcNotAvailableWithoutHP()));
 
           const int dim = 3;
@@ -1541,9 +1568,10 @@ namespace internal
 
           for (const auto &cell : dof_handler.active_cell_iterators())
             for (const auto q : cell->face_indices())
-              if ((cell->is_locally_owned()) &&
-                  (cell->quad(q)->user_flag_set() == true) &&
-                  (cell->quad(q)->n_active_fe_indices() == 2))
+              if ((cell->is_locally_owned())DEAL_II_AND(
+                    cell->quad(q)->user_flag_set() DEAL_II_EQUALS true)
+                    DEAL_II_AND(cell->quad(q)->n_active_fe_indices()
+                                  DEAL_II_EQUALS 2))
                 {
                   const auto quad = cell->quad(q);
                   quad->clear_user_flag();
@@ -1579,8 +1607,8 @@ namespace internal
                                 dof_handler.get_fe(other_fe_index),
                                 quad_dof_identities
                                   [most_dominating_fe_index][other_fe_index]
-                                  [cell->quad(q)->reference_cell_type() ==
-                                   ReferenceCell::Type::Quad]);
+                                  [cell->quad(q)->reference_cell_type()
+                                     DEAL_II_EQUALS ReferenceCell::Type::Quad]);
 
                             for (const auto &identity : identities)
                               {
@@ -1604,10 +1632,10 @@ namespace internal
                                 // exchange in Phase 5). thus, we only have to
                                 // set the indices of degrees of freedom that
                                 // have been previously flagged invalid.
-                                if ((dependent_dof_index ==
-                                     numbers::invalid_dof_index) &&
-                                    (primary_dof_index !=
-                                     numbers::invalid_dof_index))
+                                if ((dependent_dof_index DEAL_II_EQUALS
+                                                         numbers::invalid_dof_index)
+                                      DEAL_II_AND(primary_dof_index !=
+                                                  numbers::invalid_dof_index))
                                   quad->set_dof_index(identity.second,
                                                       primary_dof_index,
                                                       other_fe_index);
@@ -1641,7 +1669,7 @@ namespace internal
         merge_invalid_dof_indices_on_ghost_interfaces(
           DoFHandler<dim, spacedim> &dof_handler)
         {
-          if (dof_handler.hp_capability_enabled == false)
+          if (dof_handler.hp_capability_enabled DEAL_II_EQUALS false)
             return;
 
           {
@@ -1695,8 +1723,9 @@ namespace internal
 
           for (auto cell : dof_handler.active_cell_iterators())
             if (!cell->is_artificial())
-              if ((subdomain_id == numbers::invalid_subdomain_id) ||
-                  (cell->subdomain_id() == subdomain_id))
+              if ((subdomain_id DEAL_II_EQUALS numbers::invalid_subdomain_id)
+                    DEAL_II_OR(cell->subdomain_id()
+                                 DEAL_II_EQUALS subdomain_id))
                 {
                   dof_indices.resize(cell->get_fe().n_dofs_per_cell());
 
@@ -1707,7 +1736,7 @@ namespace internal
                                     cell->active_fe_index());
 
                   for (auto &dof_index : dof_indices)
-                    if (dof_index == numbers::invalid_dof_index)
+                    if (dof_index DEAL_II_EQUALS numbers::invalid_dof_index)
                       dof_index = next_free_dof++;
 
                   cell->set_dof_indices(dof_indices);
@@ -1743,7 +1772,8 @@ namespace internal
           std::vector<types::global_dof_index> local_dof_indices;
 
           for (const auto &cell : dof_handler.active_cell_iterators())
-            if (cell->is_ghost() && (cell->subdomain_id() < subdomain_id))
+            if (cell->is_ghost()
+                  DEAL_II_AND(cell->subdomain_id() < subdomain_id))
               {
                 // we found a neighboring ghost cell whose subdomain
                 // is "stronger" than our own subdomain
@@ -1771,7 +1801,7 @@ namespace internal
                                  DoFHandler<dim, spacedim> &dof_handler,
                                  const unsigned int         level)
         {
-          Assert(dof_handler.hp_capability_enabled == false,
+          Assert(dof_handler.hp_capability_enabled DEAL_II_EQUALS false,
                  ExcInternalError());
 
           const dealii::Triangulation<dim, spacedim> &tria =
@@ -1785,15 +1815,17 @@ namespace internal
           std::vector<types::global_dof_index> dof_indices;
 
           for (auto cell : dof_handler.cell_iterators_on_level(level))
-            if ((level_subdomain_id == numbers::invalid_subdomain_id) ||
-                (cell->level_subdomain_id() == level_subdomain_id))
+            if ((level_subdomain_id DEAL_II_EQUALS
+                                    numbers::invalid_subdomain_id)
+                  DEAL_II_OR(cell->level_subdomain_id()
+                               DEAL_II_EQUALS level_subdomain_id))
               {
                 dof_indices.resize(cell->get_fe().n_dofs_per_cell());
 
                 cell->get_mg_dof_indices(dof_indices);
 
                 for (auto &dof_index : dof_indices)
-                  if (dof_index == numbers::invalid_dof_index)
+                  if (dof_index DEAL_II_EQUALS numbers::invalid_dof_index)
                     dof_index = next_free_dof++;
 
                 cell->set_mg_dof_indices(dof_indices);
@@ -1824,7 +1856,7 @@ namespace internal
           for (unsigned int d = 1; d < dim; d++)
             for (auto &i : dof_handler.object_dof_indices[0][d])
               if (i != numbers::invalid_dof_index)
-                i = ((indices_we_care_about.size() == 0) ?
+                i = ((indices_we_care_about.size() DEAL_II_EQUALS 0) ?
                        new_numbers[i] :
                        new_numbers[indices_we_care_about.index_within_set(i)]);
         }
@@ -1839,7 +1871,7 @@ namespace internal
           DoFHandler<dim, spacedim> &                 dof_handler,
           const bool                                  check_validity)
         {
-          if (dof_handler.hp_capability_enabled == false)
+          if (dof_handler.hp_capability_enabled DEAL_II_EQUALS false)
             {
               // we can not use cell iterators in this function since then
               // we would renumber the dofs on the interface of two cells
@@ -1853,7 +1885,7 @@ namespace internal
                    ++i)
                 if (*i != numbers::invalid_dof_index)
                   *i =
-                    (indices_we_care_about.size() == 0) ?
+                    (indices_we_care_about.size() DEAL_II_EQUALS 0) ?
                       (new_numbers[*i]) :
                       (new_numbers[indices_we_care_about.index_within_set(*i)]);
                 else if (check_validity)
@@ -1861,7 +1893,8 @@ namespace internal
                   // really is unused
                   Assert(dof_handler.get_triangulation().vertex_used(
                            (i - dof_handler.object_dof_indices[0][0].begin()) /
-                           dof_handler.get_fe().n_dofs_per_vertex()) == false,
+                           dof_handler.get_fe().n_dofs_per_vertex())
+                           DEAL_II_EQUALS false,
                          ExcInternalError());
               return;
             }
@@ -1882,9 +1915,10 @@ namespace internal
               // allocated any space for it, i.e., n_active_fe_indices should be
               // zero, and there is no space to actually store dof indices for
               // this vertex
-              if (dof_handler.get_triangulation().vertex_used(vertex_index) ==
-                  false)
-                Assert(n_active_fe_indices == 0, ExcInternalError());
+              if (dof_handler.get_triangulation().vertex_used(vertex_index)
+                    DEAL_II_EQUALS false)
+                Assert(n_active_fe_indices DEAL_II_EQUALS 0,
+                       ExcInternalError());
 
               // otherwise the vertex is used; it may still not hold any dof
               // indices if it is located on an artificial cell and not adjacent
@@ -1944,7 +1978,7 @@ namespace internal
                           // This will later be fixed up after the first ghost
                           // exchange phase when we unify hp DoFs on neighboring
                           // cells.
-                          if (indices_we_care_about.size() == 0)
+                          if (indices_we_care_about.size() DEAL_II_EQUALS 0)
                             dealii::internal::DoFAccessorImplementation::
                               Implementation::set_dof_index(
                                 dof_handler,
@@ -1995,14 +2029,14 @@ namespace internal
           const IndexSet &                            indices_we_care_about,
           DoFHandler<dim, spacedim> &                 dof_handler)
         {
-          if (dof_handler.hp_capability_enabled == false)
+          if (dof_handler.hp_capability_enabled DEAL_II_EQUALS false)
             {
               for (unsigned int level = 0;
                    level < dof_handler.object_dof_indices.size();
                    ++level)
                 for (auto &i : dof_handler.object_dof_indices[level][dim])
                   if (i != numbers::invalid_dof_index)
-                    i = ((indices_we_care_about.size() == 0) ?
+                    i = ((indices_we_care_about.size() DEAL_II_EQUALS 0) ?
                            new_numbers[i] :
                            new_numbers[indices_we_care_about.index_within_set(
                              i)]);
@@ -2037,7 +2071,7 @@ namespace internal
                         // set it to an invalid index. This will later be fixed
                         // up after the first ghost exchange phase when we unify
                         // hp DoFs on neighboring cells.
-                        if (indices_we_care_about.size() == 0)
+                        if (indices_we_care_about.size() DEAL_II_EQUALS 0)
                           cell->set_dof_index(d,
                                               new_numbers[old_dof_index],
                                               fe_index);
@@ -2083,12 +2117,12 @@ namespace internal
         {
           const unsigned int dim = 2;
 
-          if (dof_handler.hp_capability_enabled == false)
+          if (dof_handler.hp_capability_enabled DEAL_II_EQUALS false)
             {
               for (unsigned int d = 1; d < dim; d++)
                 for (auto &i : dof_handler.object_dof_indices[0][d])
                   if (i != numbers::invalid_dof_index)
-                    i = ((indices_we_care_about.size() == 0) ?
+                    i = ((indices_we_care_about.size() DEAL_II_EQUALS 0) ?
                            new_numbers[i] :
                            new_numbers[indices_we_care_about.index_within_set(
                              i)]);
@@ -2110,7 +2144,7 @@ namespace internal
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
                 for (const auto l : cell->line_indices())
-                  if (cell->line(l)->user_flag_set() == false)
+                  if (cell->line(l)->user_flag_set() DEAL_II_EQUALS false)
                     {
                       const auto line = cell->line(l);
                       line->set_user_flag();
@@ -2149,7 +2183,8 @@ namespace internal
                                   // will later be fixed up after the first
                                   // ghost exchange phase when we unify hp DoFs
                                   // on neighboring cells.
-                                  if (indices_we_care_about.size() == 0)
+                                  if (indices_we_care_about.size()
+                                        DEAL_II_EQUALS 0)
                                     line->set_dof_index(
                                       d, new_numbers[old_dof_index], fe_index);
                                   else
@@ -2192,12 +2227,12 @@ namespace internal
         {
           const unsigned int dim = 3;
 
-          if (dof_handler.hp_capability_enabled == false)
+          if (dof_handler.hp_capability_enabled DEAL_II_EQUALS false)
             {
               for (unsigned int d = 1; d < dim; d++)
                 for (auto &i : dof_handler.object_dof_indices[0][d])
                   if (i != numbers::invalid_dof_index)
-                    i = ((indices_we_care_about.size() == 0) ?
+                    i = ((indices_we_care_about.size() DEAL_II_EQUALS 0) ?
                            new_numbers[i] :
                            new_numbers[indices_we_care_about.index_within_set(
                              i)]);
@@ -2219,7 +2254,7 @@ namespace internal
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
                 for (const auto l : cell->line_indices())
-                  if (cell->line(l)->user_flag_set() == false)
+                  if (cell->line(l)->user_flag_set() DEAL_II_EQUALS false)
                     {
                       const auto line = cell->line(l);
                       line->set_user_flag();
@@ -2258,7 +2293,8 @@ namespace internal
                                   // will later be fixed up after the first
                                   // ghost exchange phase when we unify hp DoFs
                                   // on neighboring cells.
-                                  if (indices_we_care_about.size() == 0)
+                                  if (indices_we_care_about.size()
+                                        DEAL_II_EQUALS 0)
                                     line->set_dof_index(
                                       d, new_numbers[old_dof_index], fe_index);
                                   else if (indices_we_care_about.is_element(
@@ -2297,7 +2333,7 @@ namespace internal
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
                 for (const auto q : cell->face_indices())
-                  if (cell->quad(q)->user_flag_set() == false)
+                  if (cell->quad(q)->user_flag_set() DEAL_II_EQUALS false)
                     {
                       const auto quad = cell->quad(q);
                       quad->set_user_flag();
@@ -2336,7 +2372,8 @@ namespace internal
                                   // will later be fixed up after the first
                                   // ghost exchange phase when we unify hp DoFs
                                   // on neighboring cells.
-                                  if (indices_we_care_about.size() == 0)
+                                  if (indices_we_care_about.size()
+                                        DEAL_II_EQUALS 0)
                                     quad->set_dof_index(
                                       d, new_numbers[old_dof_index], fe_index);
                                   else
@@ -2387,8 +2424,9 @@ namespace internal
                       const DoFHandler<dim, space_dim> &dof_handler,
                       const bool                        check_validity)
         {
-          if (dim == 1)
-            Assert(indices_we_care_about == IndexSet(0), ExcNotImplemented());
+          if (dim DEAL_II_EQUALS 1)
+            Assert(indices_we_care_about DEAL_II_EQUALS IndexSet(0),
+                   ExcNotImplemented());
 
           // renumber DoF indices on vertices, cells, and faces. this
           // can be done in parallel because the respective functions
@@ -2451,8 +2489,8 @@ namespace internal
                i != dof_handler.mg_vertex_dofs.end();
                ++i)
             // if the present vertex lives on the current level
-            if ((i->get_coarsest_level() <= level) &&
-                (i->get_finest_level() >= level))
+            if ((i->get_coarsest_level() <= level)
+                  DEAL_II_AND(i->get_finest_level() >= level))
               for (unsigned int d = 0;
                    d < dof_handler.get_fe().n_dofs_per_vertex();
                    ++d)
@@ -2464,18 +2502,19 @@ namespace internal
 
                   if (idx != numbers::invalid_dof_index)
                     {
-                      Assert(check_validity == false ||
-                               (indices_we_care_about.size() > 0 ?
-                                  indices_we_care_about.is_element(idx) :
-                                  (idx < new_numbers.size())),
+                      Assert(check_validity DEAL_II_EQUALS false DEAL_II_OR(
+                               indices_we_care_about.size() > 0 ?
+                                 indices_we_care_about.is_element(idx) :
+                                 (idx < new_numbers.size())),
                              ExcInternalError());
-                      i->set_index(level,
-                                   d,
-                                   dof_handler.get_fe().n_dofs_per_vertex(),
-                                   (indices_we_care_about.size() == 0) ?
-                                     (new_numbers[idx]) :
-                                     (new_numbers[indices_we_care_about
-                                                    .index_within_set(idx)]));
+                      i->set_index(
+                        level,
+                        d,
+                        dof_handler.get_fe().n_dofs_per_vertex(),
+                        (indices_we_care_about.size() DEAL_II_EQUALS 0) ?
+                          (new_numbers[idx]) :
+                          (new_numbers[indices_we_care_about.index_within_set(
+                            idx)]));
                     }
                 }
         }
@@ -2509,7 +2548,7 @@ namespace internal
                             (*i < new_numbers.size())),
                          ExcInternalError());
                   *i =
-                    (indices_we_care_about.size() == 0) ?
+                    (indices_we_care_about.size() DEAL_II_EQUALS 0) ?
                       (new_numbers[*i]) :
                       (new_numbers[indices_we_care_about.index_within_set(*i)]);
                 }
@@ -2587,7 +2626,7 @@ namespace internal
                             cell->line(l)->set_mg_dof_index(
                               level,
                               d,
-                              ((indices_we_care_about.size() == 0) ?
+                              ((indices_we_care_about.size() DEAL_II_EQUALS 0) ?
                                  new_numbers[idx] :
                                  new_numbers[indices_we_care_about
                                                .index_within_set(idx)]));
@@ -2612,8 +2651,8 @@ namespace internal
           const unsigned int       level,
           const bool               check_validity)
         {
-          if (dof_handler.get_fe().n_dofs_per_line() > 0 ||
-              dof_handler.get_fe().max_dofs_per_quad() > 0)
+          if (dof_handler.get_fe().n_dofs_per_line() >
+              0 DEAL_II_OR dof_handler.get_fe().max_dofs_per_quad() > 0)
             {
               // save user flags as they will be modified
               std::vector<bool> user_flags;
@@ -2651,7 +2690,7 @@ namespace internal
                             cell->line(l)->set_mg_dof_index(
                               level,
                               d,
-                              ((indices_we_care_about.size() == 0) ?
+                              ((indices_we_care_about.size() DEAL_II_EQUALS 0) ?
                                  new_numbers[idx] :
                                  new_numbers[indices_we_care_about
                                                .index_within_set(idx)]));
@@ -2687,7 +2726,7 @@ namespace internal
                             cell->quad(l)->set_mg_dof_index(
                               level,
                               d,
-                              ((indices_we_care_about.size() == 0) ?
+                              ((indices_we_care_about.size() DEAL_II_EQUALS 0) ?
                                  new_numbers[idx] :
                                  new_numbers[indices_we_care_about
                                                .index_within_set(idx)]));
@@ -2714,7 +2753,7 @@ namespace internal
           const bool                 check_validity)
         {
           Assert(
-            dof_handler.hp_capability_enabled == false,
+            dof_handler.hp_capability_enabled DEAL_II_EQUALS false,
             (typename DoFHandler<dim, spacedim>::ExcNotImplementedWithHP()));
 
           Assert(level < dof_handler.get_triangulation().n_global_levels(),
@@ -2906,8 +2945,8 @@ namespace internal
               // they must be on partition interfaces. In that case assign them
               // to the processor with the smaller subdomain id.
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                if (subdomain_association[local_dof_indices[i]] ==
-                    numbers::invalid_subdomain_id)
+                if (subdomain_association[local_dof_indices[i]] DEAL_II_EQUALS
+                      numbers::invalid_subdomain_id)
                   subdomain_association[local_dof_indices[i]] = subdomain_id;
                 else if (subdomain_association[local_dof_indices[i]] >
                          subdomain_id)
@@ -2918,8 +2957,8 @@ namespace internal
 
           Assert(std::find(subdomain_association.begin(),
                            subdomain_association.end(),
-                           numbers::invalid_subdomain_id) ==
-                   subdomain_association.end(),
+                           numbers::invalid_subdomain_id)
+                   DEAL_II_EQUALS subdomain_association.end(),
                  ExcInternalError());
 
           Assert(*std::max_element(subdomain_association.begin(),
@@ -2969,8 +3008,9 @@ namespace internal
               // then they must be on partition interfaces. In that case assign
               // them to the processor with the smaller subdomain id.
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                if (level_subdomain_association[local_dof_indices[i]] ==
-                    numbers::invalid_subdomain_id)
+                if (level_subdomain_association
+                      [local_dof_indices[i]] DEAL_II_EQUALS
+                        numbers::invalid_subdomain_id)
                   level_subdomain_association[local_dof_indices[i]] =
                     level_subdomain_id;
                 else if (level_subdomain_association[local_dof_indices[i]] >
@@ -2983,8 +3023,8 @@ namespace internal
 
           Assert(std::find(level_subdomain_association.begin(),
                            level_subdomain_association.end(),
-                           numbers::invalid_subdomain_id) ==
-                   level_subdomain_association.end(),
+                           numbers::invalid_subdomain_id)
+                   DEAL_II_EQUALS level_subdomain_association.end(),
                  ExcInternalError());
 
           Assert(*std::max_element(level_subdomain_association.begin(),
@@ -3067,19 +3107,21 @@ namespace internal
           for (types::subdomain_id subdomain = 0; subdomain < n_procs;
                ++subdomain)
             for (types::global_dof_index i = 0; i < n_dofs; ++i)
-              if (subdomain_association[i] == subdomain)
+              if (subdomain_association[i] DEAL_II_EQUALS subdomain)
                 {
-                  Assert(new_dof_indices[i] == enumeration_dof_index,
-                         ExcInternalError());
+                  Assert(
+                    new_dof_indices[i] DEAL_II_EQUALS enumeration_dof_index,
+                    ExcInternalError());
                   new_dof_indices[i] = next_free_index;
                   ++next_free_index;
                 }
 
           // we should have numbered all dofs
-          Assert(next_free_index == n_dofs, ExcInternalError());
+          Assert(next_free_index DEAL_II_EQUALS n_dofs, ExcInternalError());
           Assert(std::find(new_dof_indices.begin(),
                            new_dof_indices.end(),
-                           enumeration_dof_index) == new_dof_indices.end(),
+                           enumeration_dof_index)
+                   DEAL_II_EQUALS new_dof_indices.end(),
                  ExcInternalError());
         }
         // finally do the renumbering. we can use the sequential
@@ -3122,9 +3164,10 @@ namespace internal
           unsigned int end_index   = 0;
           while (start_index < n_dofs)
             {
-              while ((end_index) < n_dofs &&
-                     (subdomain_association[end_index] ==
-                      subdomain_association[start_index]))
+              while ((end_index) <
+                     n_dofs DEAL_II_AND(
+                       subdomain_association[end_index] DEAL_II_EQUALS
+                         subdomain_association[start_index]))
                 ++end_index;
 
               // we've now identified a range of same indices. set that
@@ -3240,20 +3283,23 @@ namespace internal
                    level_subdomain < n_procs;
                    ++level_subdomain)
                 for (types::global_dof_index i = 0; i < n_dofs_on_level; ++i)
-                  if (level_subdomain_association[i] == level_subdomain)
+                  if (level_subdomain_association[i] DEAL_II_EQUALS
+                        level_subdomain)
                     {
-                      Assert(new_dof_indices[i] == numbers::invalid_dof_index,
+                      Assert(new_dof_indices[i] DEAL_II_EQUALS
+                               numbers::invalid_dof_index,
                              ExcInternalError());
                       new_dof_indices[i] = next_free_index;
                       ++next_free_index;
                     }
 
               // we should have numbered all dofs
-              Assert(next_free_index == n_dofs_on_level, ExcInternalError());
+              Assert(next_free_index DEAL_II_EQUALS n_dofs_on_level,
+                     ExcInternalError());
               Assert(std::find(new_dof_indices.begin(),
                                new_dof_indices.end(),
-                               numbers::invalid_dof_index) ==
-                       new_dof_indices.end(),
+                               numbers::invalid_dof_index)
+                       DEAL_II_EQUALS new_dof_indices.end(),
                      ExcInternalError());
             }
 
@@ -3300,9 +3346,10 @@ namespace internal
               unsigned int end_index   = 0;
               while (start_index < n_dofs_on_level)
                 {
-                  while ((end_index) < n_dofs_on_level &&
-                         (level_subdomain_association[end_index] ==
-                          level_subdomain_association[start_index]))
+                  while ((end_index) <
+                         n_dofs_on_level DEAL_II_AND(
+                           level_subdomain_association[end_index] DEAL_II_EQUALS
+                             level_subdomain_association[start_index]))
                     ++end_index;
 
                   // we've now identified a range of same indices. set that
@@ -3384,21 +3431,22 @@ namespace internal
         // distribute_dofs(), we need to support sequential-like input.
         // Distributed-like input from, for example, component_wise renumbering
         // is also supported.
-        if (new_numbers.size() == this->dof_handler->n_dofs())
+        if (new_numbers.size() DEAL_II_EQUALS this->dof_handler->n_dofs())
           {
             global_gathered_numbers = new_numbers;
           }
         else
           {
-            Assert(new_numbers.size() ==
-                     this->dof_handler->locally_owned_dofs().n_elements(),
+            Assert(new_numbers.size()
+                     DEAL_II_EQUALS this->dof_handler->locally_owned_dofs()
+                       .n_elements(),
                    ExcInternalError());
             const unsigned int n_cpu =
               Utilities::MPI::n_mpi_processes(tr->get_communicator());
             std::vector<types::global_dof_index> gathered_new_numbers(
               this->dof_handler->n_dofs(), 0);
-            Assert(Utilities::MPI::this_mpi_process(tr->get_communicator()) ==
-                     this->dof_handler->get_triangulation()
+            Assert(Utilities::MPI::this_mpi_process(tr->get_communicator())
+                     DEAL_II_EQUALS this->dof_handler->get_triangulation()
                        .locally_owned_subdomain(),
                    ExcInternalError())
 
@@ -3431,8 +3479,8 @@ namespace internal
                   displacements[i] = shift;
                   shift += rcounts[i];
                 }
-              Assert(new_numbers_copy.size() ==
-                       static_cast<unsigned int>(
+              Assert(new_numbers_copy.size()
+                       DEAL_II_EQUALS static_cast<unsigned int>(
                          rcounts[Utilities::MPI::this_mpi_process(
                            tr->get_communicator())]),
                      ExcInternalError());
@@ -3477,13 +3525,17 @@ namespace internal
                 shift += iset.n_elements();
               }
 
-            Assert(*std::max_element(flag_1.begin(), flag_1.end()) == 1,
+            Assert(*std::max_element(flag_1.begin(), flag_1.end())
+                     DEAL_II_EQUALS 1,
                    ExcInternalError());
-            Assert(*std::min_element(flag_1.begin(), flag_1.end()) == 1,
+            Assert(*std::min_element(flag_1.begin(), flag_1.end())
+                     DEAL_II_EQUALS 1,
                    ExcInternalError());
-            Assert((*std::max_element(flag_2.begin(), flag_2.end())) == 1,
+            Assert((*std::max_element(flag_2.begin(),
+                                      flag_2.end()))DEAL_II_EQUALS 1,
                    ExcInternalError());
-            Assert((*std::min_element(flag_2.begin(), flag_2.end())) == 1,
+            Assert((*std::min_element(flag_2.begin(),
+                                      flag_2.end()))DEAL_II_EQUALS 1,
                    ExcInternalError());
           }
 
@@ -3541,7 +3593,8 @@ namespace internal
           (void)tria;
           const auto pack = [&](const auto &cell) {
             // why would somebody request a cell that is not ours?
-            Assert(cell->level_subdomain_id() == tria.locally_owned_subdomain(),
+            Assert(cell->level_subdomain_id()
+                     DEAL_II_EQUALS tria.locally_owned_subdomain(),
                    ExcInternalError());
 
             std::vector<dealii::types::global_dof_index> data(
@@ -3552,7 +3605,7 @@ namespace internal
           };
 
           const auto unpack = [](const auto &cell, const auto &dofs) {
-            Assert(cell->get_fe().n_dofs_per_cell() == dofs.size(),
+            Assert(cell->get_fe().n_dofs_per_cell() DEAL_II_EQUALS dofs.size(),
                    ExcInternalError());
 
             Assert(cell->level_subdomain_id() !=
@@ -3567,8 +3620,9 @@ namespace internal
             for (unsigned int i = 0; i < dof_indices.size(); ++i)
               if (dofs[i] != numbers::invalid_dof_index)
                 {
-                  Assert((dof_indices[i] == (numbers::invalid_dof_index)) ||
-                           (dof_indices[i] == dofs[i]),
+                  Assert((dof_indices[i] DEAL_II_EQUALS(
+                           numbers::invalid_dof_index))
+                           DEAL_II_OR(dof_indices[i] DEAL_II_EQUALS dofs[i]),
                          ExcInternalError());
                   dof_indices[i] = dofs[i];
                 }
@@ -3653,7 +3707,7 @@ namespace internal
           };
 
           const auto unpack = [](const auto &cell, const auto &dofs) {
-            Assert(cell->get_fe().n_dofs_per_cell() == dofs.size(),
+            Assert(cell->get_fe().n_dofs_per_cell() DEAL_II_EQUALS dofs.size(),
                    ExcInternalError());
 
             Assert(cell->is_ghost(), ExcInternalError());
@@ -3667,8 +3721,9 @@ namespace internal
             for (unsigned int i = 0; i < dof_indices.size(); ++i)
               if (dofs[i] != numbers::invalid_dof_index)
                 {
-                  Assert((dof_indices[i] == (numbers::invalid_dof_index)) ||
-                           (dof_indices[i] == dofs[i]),
+                  Assert((dof_indices[i] DEAL_II_EQUALS(
+                           numbers::invalid_dof_index))
+                           DEAL_II_OR(dof_indices[i] DEAL_II_EQUALS dofs[i]),
                          ExcInternalError());
                   dof_indices[i] = dofs[i];
                 }
@@ -3918,7 +3973,8 @@ namespace internal
           // on all cells we had previously marked. verify this
 #  ifdef DEBUG
           for (const auto &cell : dof_handler->active_cell_iterators())
-            Assert(cell->user_flag_set() == false, ExcInternalError());
+            Assert(cell->user_flag_set() DEAL_II_EQUALS false,
+                   ExcInternalError());
 #  endif
 
           triangulation->load_user_flags(user_flags);
@@ -4021,9 +4077,9 @@ namespace internal
                 for (const auto &cell :
                      dof_handler->cell_iterators_on_level(level))
                   if (cell->level_subdomain_id() !=
-                        numbers::artificial_subdomain_id &&
-                      (cell->level_subdomain_id() <
-                       triangulation->locally_owned_subdomain()))
+                      numbers::artificial_subdomain_id DEAL_II_AND(
+                        cell->level_subdomain_id() <
+                        triangulation->locally_owned_subdomain()))
                     {
                       // we found a neighboring ghost cell whose
                       // subdomain is "stronger" than our own
@@ -4115,8 +4171,8 @@ namespace internal
           {
             for (const auto &cell : dof_handler->cell_iterators())
               if (cell->level_subdomain_id() !=
-                    dealii::numbers::artificial_subdomain_id &&
-                  !cell->is_locally_owned_on_level())
+                  dealii::numbers::artificial_subdomain_id DEAL_II_AND !cell
+                    ->is_locally_owned_on_level())
                 cell->set_user_flag();
           }
 
@@ -4150,9 +4206,10 @@ namespace internal
           {
             for (const auto &cell : dof_handler->cell_iterators())
               if (cell->level_subdomain_id() !=
-                    dealii::numbers::artificial_subdomain_id &&
-                  !cell->is_locally_owned_on_level())
-                Assert(cell->user_flag_set() == false, ExcInternalError());
+                  dealii::numbers::artificial_subdomain_id DEAL_II_AND !cell
+                    ->is_locally_owned_on_level())
+                Assert(cell->user_flag_set() DEAL_II_EQUALS false,
+                       ExcInternalError());
           }
 #  endif
 
@@ -4195,7 +4252,8 @@ namespace internal
       {
         (void)new_numbers;
 
-        Assert(new_numbers.size() == dof_handler->n_locally_owned_dofs(),
+        Assert(new_numbers.size()
+                 DEAL_II_EQUALS dof_handler->n_locally_owned_dofs(),
                ExcInternalError());
 
 #ifndef DEAL_II_WITH_MPI
@@ -4220,13 +4278,13 @@ namespace internal
           std::any_of(new_numbers.cbegin(),
                       new_numbers.cend(),
                       [this](const types::global_dof_index i) {
-                        return dof_handler->locally_owned_dofs().is_element(
-                                 i) == false;
+                        return dof_handler->locally_owned_dofs().is_element(i)
+                          DEAL_II_EQUALS false;
                       });
 
-        if (Utilities::MPI::sum(static_cast<unsigned int>(
-                                  locally_owned_set_changes),
-                                triangulation->get_communicator()) == 0)
+        if (Utilities::MPI::sum(
+              static_cast<unsigned int>(locally_owned_set_changes),
+              triangulation->get_communicator()) DEAL_II_EQUALS 0)
           {
             // Since only the order within the local subdomains has changed,
             // all we need to do is to propagate the knowledge about the
@@ -4340,8 +4398,8 @@ namespace internal
                   new_numbers_sorted.begin(), new_numbers_sorted.end());
                 my_locally_owned_new_dof_indices.compress();
 
-                Assert(my_locally_owned_new_dof_indices.n_elements() ==
-                         new_numbers.size(),
+                Assert(my_locally_owned_new_dof_indices
+                         .n_elements() DEAL_II_EQUALS new_numbers.size(),
                        ExcInternalError());
               }
 
@@ -4371,10 +4429,10 @@ namespace internal
                       // delete a DoF index if it has not already been deleted
                       // (e.g., by visiting a neighboring cell, if it is on the
                       // boundary), and if we don't own it
-                      if ((local_dof_indices[i] !=
-                           numbers::invalid_dof_index) &&
-                          (!dof_handler->locally_owned_dofs().is_element(
-                            local_dof_indices[i])))
+                      if ((local_dof_indices[i] != numbers::invalid_dof_index)
+                            DEAL_II_AND(
+                              !dof_handler->locally_owned_dofs().is_element(
+                                local_dof_indices[i])))
                         local_dof_indices[i] = numbers::invalid_dof_index;
 
                     cell->set_dof_indices(local_dof_indices);
@@ -4534,8 +4592,8 @@ namespace internal
 
         // in case we do not own any of the given level (but only some remote
         // processor), we do not need to call the renumbering
-        if (level < this->dof_handler->get_triangulation().n_levels() &&
-            relevant_dofs.n_elements() > 0)
+        if (level<this->dof_handler->get_triangulation()
+                    .n_levels() DEAL_II_AND relevant_dofs.n_elements()> 0)
           Implementation::renumber_mg_dofs(
             ghosted_new_numbers, relevant_dofs, *dof_handler, level, true);
 #else

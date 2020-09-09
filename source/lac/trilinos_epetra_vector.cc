@@ -69,12 +69,12 @@ namespace LinearAlgebra
     {
       Epetra_Map input_map =
         parallel_partitioner.make_trilinos_map(communicator, false);
-      if (vector->Map().SameAs(input_map) == false)
+      if (vector->Map().SameAs(input_map) DEAL_II_EQUALS false)
         vector = std::make_unique<Epetra_FEVector>(input_map);
-      else if (omit_zeroing_entries == false)
+      else if (omit_zeroing_entries DEAL_II_EQUALS false)
         {
           const int ierr = vector->PutScalar(0.);
-          Assert(ierr == 0, ExcTrilinosError(ierr));
+          Assert(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
           (void)ierr;
         }
     }
@@ -110,14 +110,14 @@ namespace LinearAlgebra
         *vector = V.trilinos_vector();
       else
         {
-          if (size() == V.size())
+          if (size() DEAL_II_EQUALS V.size())
             {
               Epetra_Import data_exchange(vector->Map(),
                                           V.trilinos_vector().Map());
 
               const int ierr =
                 vector->Import(V.trilinos_vector(), data_exchange, Insert);
-              Assert(ierr == 0, ExcTrilinosError(ierr));
+              Assert(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
               (void)ierr;
             }
           else
@@ -132,10 +132,11 @@ namespace LinearAlgebra
     Vector &
     Vector::operator=(const double s)
     {
-      Assert(s == 0., ExcMessage("Only 0 can be assigned to a vector."));
+      Assert(s DEAL_II_EQUALS 0.,
+             ExcMessage("Only 0 can be assigned to a vector."));
 
       const int ierr = vector->PutScalar(s);
-      Assert(ierr == 0, ExcTrilinosError(ierr));
+      Assert(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
       (void)ierr;
 
       return *this;
@@ -151,14 +152,13 @@ namespace LinearAlgebra
     {
       // If no communication pattern is given, create one. Otherwise, use the
       // one given.
-      if (communication_pattern == nullptr)
+      if (communication_pattern DEAL_II_EQUALS nullptr)
         {
           // The first time import is called, a communication pattern is
           // created. Check if the communication pattern already exists and if
           // it can be reused.
-          if ((source_stored_elements.size() !=
-               V.get_stored_elements().size()) ||
-              (source_stored_elements != V.get_stored_elements()))
+          if ((source_stored_elements.size() != V.get_stored_elements().size())
+                DEAL_II_OR(source_stored_elements != V.get_stored_elements()))
             {
               create_epetra_comm_pattern(
                 V.get_stored_elements(),
@@ -184,13 +184,13 @@ namespace LinearAlgebra
       double *        values = source_vector.Values();
       std::copy(V.begin(), V.end(), values);
 
-      if (operation == VectorOperation::insert)
+      if (operation DEAL_II_EQUALS VectorOperation::insert)
         vector->Export(source_vector, import, Insert);
-      else if (operation == VectorOperation::add)
+      else if (operation DEAL_II_EQUALS VectorOperation::add)
         vector->Export(source_vector, import, Add);
-      else if (operation == VectorOperation::max)
+      else if (operation DEAL_II_EQUALS VectorOperation::max)
         vector->Export(source_vector, import, Epetra_Max);
-      else if (operation == VectorOperation::min)
+      else if (operation DEAL_II_EQUALS VectorOperation::min)
         vector->Export(source_vector, import, Epetra_Min);
       else
         AssertThrow(false, ExcNotImplemented());
@@ -234,12 +234,12 @@ namespace LinearAlgebra
       if (vector->Map().SameAs(down_V.trilinos_vector().Map()))
         {
           const int ierr = vector->Update(1., down_V.trilinos_vector(), 1.);
-          Assert(ierr == 0, ExcTrilinosError(ierr));
+          Assert(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
           (void)ierr;
         }
       else
         {
-          Assert(this->size() == down_V.size(),
+          Assert(this->size() DEAL_II_EQUALS down_V.size(),
                  ExcDimensionMismatch(this->size(), down_V.size()));
 
 #    if DEAL_II_TRILINOS_VERSION_GTE(11, 11, 0)
@@ -248,7 +248,7 @@ namespace LinearAlgebra
           const int     ierr = vector->Import(down_V.trilinos_vector(),
                                           data_exchange,
                                           Epetra_AddLocalAlso);
-          Assert(ierr == 0, ExcTrilinosError(ierr));
+          Assert(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
           (void)ierr;
 #    else
           // In versions older than 11.11 the Import function is broken for
@@ -260,10 +260,10 @@ namespace LinearAlgebra
 
           int ierr =
             dummy.Import(down_V.trilinos_vector(), data_exchange, Insert);
-          Assert(ierr == 0, ExcTrilinosError(ierr));
+          Assert(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
           ierr = vector->Update(1.0, dummy, 1.0);
-          Assert(ierr == 0, ExcTrilinosError(ierr));
+          Assert(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
           (void)ierr;
 #    endif
         }
@@ -291,14 +291,14 @@ namespace LinearAlgebra
 
       // Downcast V. If fails, throws an exception.
       const Vector &down_V = dynamic_cast<const Vector &>(V);
-      Assert(this->size() == down_V.size(),
+      Assert(this->size() DEAL_II_EQUALS down_V.size(),
              ExcDimensionMismatch(this->size(), down_V.size()));
       Assert(vector->Map().SameAs(down_V.trilinos_vector().Map()),
              ExcDifferentParallelPartitioning());
 
       double    result(0.);
       const int ierr = vector->Dot(down_V.trilinos_vector(), &result);
-      Assert(ierr == 0, ExcTrilinosError(ierr));
+      Assert(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
       (void)ierr;
 
       return result;
@@ -331,7 +331,7 @@ namespace LinearAlgebra
              ExcDifferentParallelPartitioning());
 
       const int ierr = vector->Update(a, down_V.trilinos_vector(), 1.);
-      Assert(ierr == 0, ExcTrilinosError(ierr));
+      Assert(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
       (void)ierr;
     }
 
@@ -363,7 +363,7 @@ namespace LinearAlgebra
 
       const int ierr = vector->Update(
         a, down_V.trilinos_vector(), b, down_W.trilinos_vector(), 1.);
-      Assert(ierr == 0, ExcTrilinosError(ierr));
+      Assert(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
       (void)ierr;
     }
 
@@ -405,7 +405,7 @@ namespace LinearAlgebra
                                         down_scaling_factors.trilinos_vector(),
                                         *vector,
                                         0.0);
-      Assert(ierr == 0, ExcTrilinosError(ierr));
+      Assert(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
       (void)ierr;
     }
 
@@ -421,13 +421,14 @@ namespace LinearAlgebra
       // Downcast V. If fails, throws an exception.
       const Vector &down_V = dynamic_cast<const Vector &>(V);
       // If we don't have the same map, copy.
-      if (vector->Map().SameAs(down_V.trilinos_vector().Map()) == false)
+      if (vector->Map().SameAs(down_V.trilinos_vector().Map())
+            DEAL_II_EQUALS false)
         this->sadd(0., a, V);
       else
         {
           // Otherwise, just update
           int ierr = vector->Update(a, down_V.trilinos_vector(), 0.);
-          Assert(ierr == 0, ExcTrilinosError(ierr));
+          Assert(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
           (void)ierr;
         }
     }
@@ -458,7 +459,7 @@ namespace LinearAlgebra
       Assert(mpi_comm != nullptr, ExcInternalError());
       unsigned int num_nonzero = Utilities::MPI::sum(flag, mpi_comm->Comm());
 
-      return num_nonzero == 0;
+      return num_nonzero DEAL_II_EQUALS 0;
     }
 
 
@@ -469,7 +470,7 @@ namespace LinearAlgebra
       double mean_value(0.);
 
       int ierr = vector->MeanValue(&mean_value);
-      Assert(ierr == 0, ExcTrilinosError(ierr));
+      Assert(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
       (void)ierr;
 
       return mean_value;
@@ -482,7 +483,7 @@ namespace LinearAlgebra
     {
       double norm(0.);
       int    ierr = vector->Norm1(&norm);
-      Assert(ierr == 0, ExcTrilinosError(ierr));
+      Assert(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
       (void)ierr;
 
       return norm;
@@ -495,7 +496,7 @@ namespace LinearAlgebra
     {
       double norm(0.);
       int    ierr = vector->Norm2(&norm);
-      Assert(ierr == 0, ExcTrilinosError(ierr));
+      Assert(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
       (void)ierr;
 
       return norm;
@@ -508,7 +509,7 @@ namespace LinearAlgebra
     {
       double norm(0.);
       int    ierr = vector->NormInf(&norm);
-      Assert(ierr == 0, ExcTrilinosError(ierr));
+      Assert(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
       (void)ierr;
 
       return norm;
@@ -616,7 +617,7 @@ namespace LinearAlgebra
       int     leading_dimension;
       int     ierr = vector->ExtractView(&val, &leading_dimension);
 
-      Assert(ierr == 0, ExcTrilinosError(ierr));
+      Assert(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
       (void)ierr;
       out.precision(precision);
       if (scientific)

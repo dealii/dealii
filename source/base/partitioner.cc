@@ -110,7 +110,7 @@ namespace Utilities
     void
     Partitioner::set_owned_indices(const IndexSet &locally_owned_indices)
     {
-      if (Utilities::MPI::job_supports_mpi() == true)
+      if (Utilities::MPI::job_supports_mpi() DEAL_II_EQUALS true)
         {
           my_pid  = Utilities::MPI::this_mpi_process(communicator);
           n_procs = Utilities::MPI::n_mpi_processes(communicator);
@@ -122,7 +122,7 @@ namespace Utilities
         }
 
       // set the local range
-      Assert(locally_owned_indices.is_contiguous() == true,
+      Assert(locally_owned_indices.is_contiguous() DEAL_II_EQUALS true,
              ExcMessage("The index set specified in locally_owned_indices "
                         "is not contiguous."));
       locally_owned_indices.compress();
@@ -155,8 +155,9 @@ namespace Utilities
       // Set ghost indices from input. To be sure that no entries from the
       // locally owned range are present, subtract the locally owned indices
       // in any case.
-      Assert(ghost_indices_in.n_elements() == 0 ||
-               ghost_indices_in.size() == locally_owned_range_data.size(),
+      Assert(ghost_indices_in
+               .n_elements() DEAL_II_EQUALS 0 DEAL_II_OR ghost_indices_in
+               .size() DEAL_II_EQUALS locally_owned_range_data.size(),
              ExcDimensionMismatch(ghost_indices_in.size(),
                                   locally_owned_range_data.size()));
 
@@ -187,9 +188,10 @@ namespace Utilities
 #ifdef DEAL_II_WITH_MPI
       if (n_procs < 2)
         {
-          Assert(ghost_indices_data.n_elements() == 0, ExcInternalError());
-          Assert(n_import_indices_data == 0, ExcInternalError());
-          Assert(n_ghost_indices_data == 0, ExcInternalError());
+          Assert(ghost_indices_data.n_elements() DEAL_II_EQUALS 0,
+                 ExcInternalError());
+          Assert(n_import_indices_data DEAL_II_EQUALS 0, ExcInternalError());
+          Assert(n_ghost_indices_data DEAL_II_EQUALS 0, ExcInternalError());
           return;
         }
 
@@ -198,7 +200,7 @@ namespace Utilities
       // Allow non-zero start index for the vector. Part 1:
       // Assume for now that the index set of rank 0 starts with 0
       // and therefore has an increased size.
-      if (my_pid == 0)
+      if (my_pid DEAL_II_EQUALS 0)
         my_size += local_range_data.first;
 
       types::global_dof_index my_shift = 0;
@@ -217,12 +219,12 @@ namespace Utilities
       // index set of rank 0 actually start from the
       // correct value, i.e. we correct the shift to
       // its start.
-      if (my_pid == 0)
+      if (my_pid DEAL_II_EQUALS 0)
         my_shift = local_range_data.first;
 
       // Fix the index start in case the index set could not give us that
       // information.
-      if (local_range_data.first == 0 && my_shift != 0)
+      if (local_range_data.first DEAL_II_EQUALS 0 DEAL_II_AND my_shift != 0)
         {
           const types::global_dof_index old_local_size = local_size();
           local_range_data.first                       = my_shift;
@@ -261,7 +263,7 @@ namespace Utilities
                        ExcInternalError(
                          "Expect result of ConsensusAlgorithmsProcess to be "
                          "sorted"));
-                if (i == ghost_targets_data.back().first)
+                if (i DEAL_II_EQUALS ghost_targets_data.back().first)
                   ghost_targets_data.back().second++;
                 else
                   ghost_targets_data.emplace_back(i, 1);
@@ -294,7 +296,7 @@ namespace Utilities
       import_indices_data.reserve(import_indices_chunks_by_rank_data.back());
       for (const auto &i : import_data)
         {
-          Assert((i.second & locally_owned_range_data) == i.second,
+          Assert((i.second & locally_owned_range_data) DEAL_II_EQUALS i.second,
                  ExcInternalError("Requested indices must be in local range"));
           for (auto interval = i.second.begin_intervals();
                interval != i.second.end_intervals();
@@ -345,7 +347,7 @@ namespace Utilities
                                    &flag,
                                    MPI_STATUSES_IGNORE);
       AssertThrowMPI(ierr);
-      Assert(flag == 1,
+      Assert(flag DEAL_II_EQUALS 1,
              ExcMessage(
                "MPI found unfinished requests. Check communication setup"));
 
@@ -356,7 +358,7 @@ namespace Utilities
 
 #endif // #ifdef DEAL_II_WITH_MPI
 
-      if (larger_ghost_index_set.size() == 0)
+      if (larger_ghost_index_set.size() DEAL_II_EQUALS 0)
         {
           ghost_indices_subset_chunks_by_rank_data.clear();
           ghost_indices_subset_data.emplace_back(local_size(),
@@ -368,12 +370,12 @@ namespace Utilities
         {
           AssertDimension(larger_ghost_index_set.size(),
                           ghost_indices_data.size());
-          Assert(
-            (larger_ghost_index_set & locally_owned_range_data).n_elements() ==
-              0,
-            ExcMessage("Ghost index set should not overlap with owned set."));
-          Assert((larger_ghost_index_set & ghost_indices_data) ==
-                   ghost_indices_data,
+          Assert((larger_ghost_index_set & locally_owned_range_data)
+                   .n_elements() DEAL_II_EQUALS 0,
+                 ExcMessage(
+                   "Ghost index set should not overlap with owned set."));
+          Assert((larger_ghost_index_set & ghost_indices_data)
+                   DEAL_II_EQUALS ghost_indices_data,
                  ExcMessage("Larger ghost index set must contain the tight "
                             "ghost index set."));
 
@@ -411,7 +413,7 @@ namespace Utilities
               for (unsigned int ii = 0; ii < ghost_targets_data[p].second; ii++)
                 {
                   const unsigned int i = shift + ii;
-                  if (expanded_numbering[i] == last_index + 1)
+                  if (expanded_numbering[i] DEAL_II_EQUALS last_index + 1)
                     // if contiguous, increment the end of last range:
                     ghost_indices_subset.back().second++;
                   else
@@ -436,7 +438,7 @@ namespace Utilities
     {
       // if the partitioner points to the same memory location as the calling
       // processor
-      if (&part == this)
+      if (&part DEAL_II_EQUALS this)
         return true;
 #ifdef DEAL_II_WITH_MPI
       if (Utilities::MPI::job_supports_mpi())
@@ -446,14 +448,15 @@ namespace Utilities
                                             communicator,
                                             &communicators_same);
           AssertThrowMPI(ierr);
-          if (!(communicators_same == MPI_IDENT ||
-                communicators_same == MPI_CONGRUENT))
+          if (!(communicators_same DEAL_II_EQUALS MPI_IDENT DEAL_II_OR
+                  communicators_same DEAL_II_EQUALS MPI_CONGRUENT))
             return false;
         }
 #endif
-      return (global_size == part.global_size &&
-              local_range_data == part.local_range_data &&
-              ghost_indices_data == part.ghost_indices_data);
+      return (global_size DEAL_II_EQUALS part
+                .global_size DEAL_II_AND local_range_data DEAL_II_EQUALS part
+                .local_range_data DEAL_II_AND ghost_indices_data DEAL_II_EQUALS
+                                                                 part.ghost_indices_data);
     }
 
 
@@ -462,7 +465,7 @@ namespace Utilities
     Partitioner::is_globally_compatible(const Partitioner &part) const
     {
       return Utilities::MPI::min(static_cast<int>(is_compatible(part)),
-                                 communicator) == 1;
+                                 communicator) DEAL_II_EQUALS 1;
     }
 
 

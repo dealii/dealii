@@ -217,10 +217,10 @@ ExceptionBase::print_info(std::ostream &out) const
 void
 ExceptionBase::print_stack_trace(std::ostream &out) const
 {
-  if (n_stacktrace_frames == 0)
+  if (n_stacktrace_frames DEAL_II_EQUALS 0)
     return;
 
-  if (deal_II_exceptions::internals::show_stacktrace == false)
+  if (deal_II_exceptions::internals::show_stacktrace DEAL_II_EQUALS false)
     return;
 
   // if there is a stackframe stored, print it
@@ -232,11 +232,10 @@ ExceptionBase::print_stack_trace(std::ostream &out) const
   // correspond to the exception raising mechanism themselves, rather than
   // the place where the exception was triggered
   int frame = 0;
-  while ((frame < n_stacktrace_frames) &&
-         ((std::string(stacktrace[frame]).find("ExceptionBase") !=
-           std::string::npos) ||
-          (std::string(stacktrace[frame]).find("deal_II_exceptions") !=
-           std::string::npos)))
+  while ((frame < n_stacktrace_frames) DEAL_II_AND(
+    (std::string(stacktrace[frame]).find("ExceptionBase") != std::string::npos)
+      DEAL_II_OR(std::string(stacktrace[frame]).find("deal_II_exceptions") !=
+                 std::string::npos)))
     ++frame;
 
   // output the rest
@@ -266,7 +265,7 @@ ExceptionBase::print_stack_trace(std::ostream &out) const
       char *p =
         abi::__cxa_demangle(functionname.c_str(), nullptr, nullptr, &status);
 
-      if ((status == 0) && (functionname != "main"))
+      if ((status DEAL_II_EQUALS 0)DEAL_II_AND(functionname != "main"))
         {
           std::string realname(p);
           // in MT mode, one often gets backtraces spanning several lines
@@ -296,7 +295,7 @@ ExceptionBase::print_stack_trace(std::ostream &out) const
       out << stacktrace_entry << std::endl;
 
       // stop if we're in main()
-      if (functionname == "main")
+      if (functionname DEAL_II_EQUALS "main")
         break;
     }
 }
@@ -370,14 +369,15 @@ namespace StandardExceptions
         // error class.
         int error_class  = 0;
         int ierr         = MPI_Error_class(error_code, &error_class);
-        error_name_known = (ierr == MPI_SUCCESS);
+        error_name_known = (ierr DEAL_II_EQUALS MPI_SUCCESS);
 
         // Check the output of the error printing functions. If either MPI
         // function fails we should just print a less descriptive message.
         if (error_name_known)
           {
             ierr = MPI_Error_string(error_class, error_name, &resulting_length);
-            error_name_known = error_name_known && (ierr == MPI_SUCCESS);
+            error_name_known =
+              error_name_known DEAL_II_AND(ierr DEAL_II_EQUALS MPI_SUCCESS);
           }
       }
 

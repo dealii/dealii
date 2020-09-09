@@ -178,7 +178,7 @@ MGLevelObject<Object>::MGLevelObject(const unsigned int min,
 template <class Object>
 Object &MGLevelObject<Object>::operator[](const unsigned int i)
 {
-  Assert((i >= minlevel) && (i < minlevel + objects.size()),
+  Assert((i >= minlevel) DEAL_II_AND(i < minlevel + objects.size()),
          ExcIndexRange(i, minlevel, minlevel + objects.size()));
   return *objects[i - minlevel];
 }
@@ -187,7 +187,7 @@ Object &MGLevelObject<Object>::operator[](const unsigned int i)
 template <class Object>
 const Object &MGLevelObject<Object>::operator[](const unsigned int i) const
 {
-  Assert((i >= minlevel) && (i < minlevel + objects.size()),
+  Assert((i >= minlevel) DEAL_II_AND(i < minlevel + objects.size()),
          ExcIndexRange(i, minlevel, minlevel + objects.size()));
   return *objects[i - minlevel];
 }

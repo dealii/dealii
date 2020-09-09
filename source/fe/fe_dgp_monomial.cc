@@ -88,7 +88,8 @@ namespace internal
       void
       generate_unit_points(const unsigned int k, std::vector<Point<1>> &p)
       {
-        Assert(p.size() == k + 1, ExcDimensionMismatch(p.size(), k + 1));
+        Assert(p.size() DEAL_II_EQUALS k + 1,
+               ExcDimensionMismatch(p.size(), k + 1));
         const double h = 1. / k;
         for (unsigned int i = 0; i < p.size(); ++i)
           p[i](0) = i * h;
@@ -99,7 +100,7 @@ namespace internal
       generate_unit_points(const unsigned int k, std::vector<Point<2>> &p)
       {
         Assert(k <= 4, ExcNotImplemented());
-        Assert(p.size() == start_index2d[k + 1] - start_index2d[k],
+        Assert(p.size() DEAL_II_EQUALS start_index2d[k + 1] - start_index2d[k],
                ExcInternalError());
         for (unsigned int i = 0; i < p.size(); ++i)
           {
@@ -113,7 +114,7 @@ namespace internal
       generate_unit_points(const unsigned int k, std::vector<Point<3>> &p)
       {
         Assert(k <= 2, ExcNotImplemented());
-        Assert(p.size() == start_index3d[k + 1] - start_index3d[k],
+        Assert(p.size() DEAL_II_EQUALS start_index3d[k + 1] - start_index3d[k],
                ExcInternalError());
         for (unsigned int i = 0; i < p.size(); ++i)
           {
@@ -144,8 +145,10 @@ FE_DGPMonomial<dim>::FE_DGPMonomial(const unsigned int degree)
                      .n_dofs_per_cell(),
                    std::vector<bool>(1, true)))
 {
-  Assert(this->poly_space->n() == this->n_dofs_per_cell(), ExcInternalError());
-  Assert(this->poly_space->degree() == this->degree, ExcInternalError());
+  Assert(this->poly_space->n() DEAL_II_EQUALS this->n_dofs_per_cell(),
+         ExcInternalError());
+  Assert(this->poly_space->degree() DEAL_II_EQUALS this->degree,
+         ExcInternalError());
 
   // DG doesn't have constraints, so
   // leave them empty
@@ -209,9 +212,9 @@ FE_DGPMonomial<dim>::get_interpolation_matrix(
       const unsigned int n = interpolation_matrix.n();
       (void)m;
       (void)n;
-      Assert(m == this->n_dofs_per_cell(),
+      Assert(m DEAL_II_EQUALS this->n_dofs_per_cell(),
              ExcDimensionMismatch(m, this->n_dofs_per_cell()));
-      Assert(n == source_dgp_monomial->n_dofs_per_cell(),
+      Assert(n DEAL_II_EQUALS source_dgp_monomial->n_dofs_per_cell(),
              ExcDimensionMismatch(n, source_dgp_monomial->n_dofs_per_cell()));
 
       const unsigned int min_mn =
@@ -290,14 +293,14 @@ FE_DGPMonomial<dim>::get_face_interpolation_matrix(
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
   (void)interpolation_matrix;
-  AssertThrow((x_source_fe.get_name().find("FE_DGPMonomial<") == 0) ||
-                (dynamic_cast<const FE_DGPMonomial<dim> *>(&x_source_fe) !=
-                 nullptr),
-              typename FiniteElement<dim>::ExcInterpolationNotImplemented());
+  AssertThrow(
+    (x_source_fe.get_name().find("FE_DGPMonomial<") DEAL_II_EQUALS 0)DEAL_II_OR(
+      dynamic_cast<const FE_DGPMonomial<dim> *>(&x_source_fe) != nullptr),
+    typename FiniteElement<dim>::ExcInterpolationNotImplemented());
 
-  Assert(interpolation_matrix.m() == 0,
+  Assert(interpolation_matrix.m() DEAL_II_EQUALS 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS 0,
          ExcDimensionMismatch(interpolation_matrix.n(), 0));
 }
 
@@ -318,14 +321,14 @@ FE_DGPMonomial<dim>::get_subface_interpolation_matrix(
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
   (void)interpolation_matrix;
-  AssertThrow((x_source_fe.get_name().find("FE_DGPMonomial<") == 0) ||
-                (dynamic_cast<const FE_DGPMonomial<dim> *>(&x_source_fe) !=
-                 nullptr),
-              typename FiniteElement<dim>::ExcInterpolationNotImplemented());
+  AssertThrow(
+    (x_source_fe.get_name().find("FE_DGPMonomial<") DEAL_II_EQUALS 0)DEAL_II_OR(
+      dynamic_cast<const FE_DGPMonomial<dim> *>(&x_source_fe) != nullptr),
+    typename FiniteElement<dim>::ExcInterpolationNotImplemented());
 
-  Assert(interpolation_matrix.m() == 0,
+  Assert(interpolation_matrix.m() DEAL_II_EQUALS 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS 0,
          ExcDimensionMismatch(interpolation_matrix.n(), 0));
 }
 
@@ -416,7 +419,7 @@ FE_DGPMonomial<dim>::compare_for_domination(const FiniteElement<dim> &fe_other,
     {
       if (this->degree < fe_monomial_other->degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_monomial_other->degree)
+      else if (this->degree DEAL_II_EQUALS fe_monomial_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;
@@ -444,7 +447,8 @@ bool
 FE_DGPMonomial<1>::has_support_on_face(const unsigned int,
                                        const unsigned int face_index) const
 {
-  return face_index == 1 || (face_index == 0 && this->degree == 0);
+  return face_index DEAL_II_EQUALS 1 DEAL_II_OR(
+    face_index DEAL_II_EQUALS 0 DEAL_II_AND this->degree DEAL_II_EQUALS 0);
 }
 
 
@@ -455,7 +459,7 @@ FE_DGPMonomial<2>::has_support_on_face(const unsigned int shape_index,
                                        const unsigned int face_index) const
 {
   bool support_on_face = false;
-  if (face_index == 1 || face_index == 2)
+  if (face_index DEAL_II_EQUALS 1 DEAL_II_OR face_index DEAL_II_EQUALS 2)
     support_on_face = true;
   else
     {
@@ -465,8 +469,9 @@ FE_DGPMonomial<2>::has_support_on_face(const unsigned int shape_index,
       const std::array<unsigned int, 2> degrees =
         polynomial_space_p->directional_degrees(shape_index);
 
-      if ((face_index == 0 && degrees[1] == 0) ||
-          (face_index == 3 && degrees[0] == 0))
+      if ((face_index DEAL_II_EQUALS 0 DEAL_II_AND degrees[1] DEAL_II_EQUALS 0)
+            DEAL_II_OR(face_index DEAL_II_EQUALS 3 DEAL_II_AND
+                                  degrees[0] DEAL_II_EQUALS 0))
         support_on_face = true;
     }
   return support_on_face;
@@ -480,7 +485,8 @@ FE_DGPMonomial<3>::has_support_on_face(const unsigned int shape_index,
                                        const unsigned int face_index) const
 {
   bool support_on_face = false;
-  if (face_index == 1 || face_index == 3 || face_index == 4)
+  if (face_index DEAL_II_EQUALS 1 DEAL_II_OR face_index
+        DEAL_II_EQUALS 3 DEAL_II_OR face_index DEAL_II_EQUALS 4)
     support_on_face = true;
   else
     {
@@ -490,9 +496,11 @@ FE_DGPMonomial<3>::has_support_on_face(const unsigned int shape_index,
       const std::array<unsigned int, 3> degrees =
         polynomial_space_p->directional_degrees(shape_index);
 
-      if ((face_index == 0 && degrees[1] == 0) ||
-          (face_index == 2 && degrees[2] == 0) ||
-          (face_index == 5 && degrees[0] == 0))
+      if ((face_index DEAL_II_EQUALS 0 DEAL_II_AND degrees[1] DEAL_II_EQUALS 0)
+            DEAL_II_OR(face_index DEAL_II_EQUALS 2 DEAL_II_AND
+                                  degrees[2] DEAL_II_EQUALS 0)
+              DEAL_II_OR(face_index DEAL_II_EQUALS 5 DEAL_II_AND
+                                    degrees[0] DEAL_II_EQUALS 0))
         support_on_face = true;
     }
   return support_on_face;

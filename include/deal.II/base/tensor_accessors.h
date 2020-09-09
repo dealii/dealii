@@ -159,7 +159,7 @@ namespace TensorAccessors
    * via
    * @code
    *   auto tensor_view = reordered_index_view<1, 5>(tensor);
-   *   tensor_view[0][2][3][4][1] == 42.; // is true
+   *   tensor_view[0][2][3][4][1] DEAL_II_EQUALS  42.; // is true
    * @endcode
    * The usage of the dealii::Tensor type was solely for the sake of an
    * example. The mechanism implemented by this function is available for
@@ -187,7 +187,7 @@ namespace TensorAccessors
   constexpr DEAL_II_ALWAYS_INLINE internal::ReorderedIndexView<index, rank, T>
                                   reordered_index_view(T &t)
   {
-    static_assert(0 <= index && index < rank,
+    static_assert(0 <= index DEAL_II_AND index < rank,
                   "The specified index must lie within the range [0,rank)");
 
     return internal::ReorderedIndexView<index, rank, T>(t);
@@ -421,8 +421,8 @@ namespace TensorAccessors
       typename ReferenceType<T>::type t_;
     };
 
-    // At some point we hit the condition index == 0 and rank > 1, i.e.,
-    // the first index should be reordered to the end.
+    // At some point we hit the condition index DEAL_II_EQUALS  0 and rank > 1,
+    // i.e., the first index should be reordered to the end.
     //
     // At this point we cannot be lazy any more and have to start storing
     // indices because we get them in the wrong order. The user supplies
@@ -540,8 +540,8 @@ namespace TensorAccessors
       const int i_;
     };
 
-    // We have to store indices until we hit rank == 1. Then, upon the next
-    // invocation of operator[](unsigned int j) we have all necessary
+    // We have to store indices until we hit rank DEAL_II_EQUALS  1. Then, upon
+    // the next invocation of operator[](unsigned int j) we have all necessary
     // information available to return the actual object.
 
     template <typename S>
@@ -574,8 +574,8 @@ namespace TensorAccessors
     // -------------------------------------------------------------------------
 
     // Straightforward recursion implemented by specializing ExtractHelper
-    // for position == rank. We use the type trait ReturnType<rank, T> to
-    // have an idea what the final type will be.
+    // for position DEAL_II_EQUALS  rank. We use the type trait ReturnType<rank,
+    // T> to have an idea what the final type will be.
     template <int position, int rank>
     struct ExtractHelper
     {
@@ -589,8 +589,8 @@ namespace TensorAccessors
       }
     };
 
-    // For position == rank there is nothing to extract, just return the
-    // object.
+    // For position DEAL_II_EQUALS  rank there is nothing to extract, just
+    // return the object.
     template <int rank>
     struct ExtractHelper<rank, rank>
     {
@@ -633,9 +633,9 @@ namespace TensorAccessors
       }
     };
 
-    // If rank_1 == no_contr leave out the remaining no_contr indices for
-    // the contraction and assign indices from the right tensor to the
-    // result. This builds up the second part of the nested loops:
+    // If rank_1 DEAL_II_EQUALS  no_contr leave out the remaining no_contr
+    // indices for the contraction and assign indices from the right tensor to
+    // the result. This builds up the second part of the nested loops:
     //
     //  for(unsigned int i_0 = 0; i_0 < dim; ++i_0)
     //    ...
@@ -663,8 +663,8 @@ namespace TensorAccessors
       }
     };
 
-    // If rank_1 == rank_2 == no_contr we have built up all of the outer
-    // loop. Now, it is time to do the actual contraction:
+    // If rank_1 DEAL_II_EQUALS  rank_2 DEAL_II_EQUALS  no_contr we have built
+    // up all of the outer loop. Now, it is time to do the actual contraction:
     //
     // [...]
     //   {
@@ -704,7 +704,7 @@ namespace TensorAccessors
       {
         // Some auto-differentiable numbers need explicit
         // zero initialization.
-        if (dim == 0)
+        if (dim DEAL_II_EQUALS 0)
           {
             T1 result = dealii::internal::NumberType<T1>::value(0.0);
             return result;
@@ -771,7 +771,7 @@ namespace TensorAccessors
       }
     };
 
-    // If rank_1 ==0, continue to recurse over middle and right:
+    // If rank_1 DEAL_II_EQUALS 0, continue to recurse over middle and right:
     //
     // for(unsigned int i_0; i_0 < dim; ++i_0)
     //   ...

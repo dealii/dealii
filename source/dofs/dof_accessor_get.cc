@@ -51,8 +51,8 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
   const unsigned int fe_index_) const
 {
   const unsigned int fe_index =
-    (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
+    (this->dof_handler->hp_capability_enabled DEAL_II_EQUALS false DEAL_II_AND
+       fe_index_ DEAL_II_EQUALS DoFHandler<dim, spacedim>::invalid_fe_index) ?
       DoFHandler<dim, spacedim>::default_fe_index :
       fe_index_;
 
@@ -61,12 +61,14 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
     // cell unless the finite element we need to interpolate to is different
     // than the one we have on the current cell
     {
-      if ((this->dof_handler->hp_capability_enabled == false) ||
+      if ((this->dof_handler->hp_capability_enabled DEAL_II_EQUALS false)
+            DEAL_II_OR
           // for hp-DoFHandlers, we need to require that on
           // active cells, you either don't specify an fe_index,
           // or that you specify the correct one
-          (fe_index == this->active_fe_index()) ||
-          (fe_index == DoFHandler<dim, spacedim>::invalid_fe_index))
+          (fe_index DEAL_II_EQUALS this->active_fe_index())
+            DEAL_II_OR(fe_index DEAL_II_EQUALS
+                                DoFHandler<dim, spacedim>::invalid_fe_index))
         this->get_dof_values(values, interpolated_values);
       else
         {
@@ -74,7 +76,7 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
           // cell and then interpolate it to the element requested. this
           // can clearly only happen for hp::DoFHandler objects
           const unsigned int dofs_per_cell = this->get_fe().n_dofs_per_cell();
-          if (dofs_per_cell == 0)
+          if (dofs_per_cell DEAL_II_EQUALS 0)
             {
               interpolated_values = 0;
             }
@@ -103,15 +105,15 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
       // mesh). consequently, we cannot interpolate from children's FE
       // space to this cell's (unknown) FE space unless an explicit
       // fe_index is given
-      Assert((this->dof_handler->hp_capability_enabled == false) ||
-               (fe_index != DoFHandler<dim, spacedim>::invalid_fe_index),
-             ExcMessage(
-               "You cannot call this function on non-active cells "
-               "of hp::DoFHandler objects unless you provide an explicit "
-               "finite element index because they do not have naturally "
-               "associated finite element spaces associated: degrees "
-               "of freedom are only distributed on active cells for which "
-               "the active_fe_index has been set."));
+      Assert(
+        (this->dof_handler->hp_capability_enabled DEAL_II_EQUALS false)
+          DEAL_II_OR(fe_index != DoFHandler<dim, spacedim>::invalid_fe_index),
+        ExcMessage("You cannot call this function on non-active cells "
+                   "of hp::DoFHandler objects unless you provide an explicit "
+                   "finite element index because they do not have naturally "
+                   "associated finite element spaces associated: degrees "
+                   "of freedom are only distributed on active cells for which "
+                   "the active_fe_index has been set."));
 
       const FiniteElement<dim, spacedim> &fe =
         this->get_dof_handler().get_fe(fe_index);
@@ -119,9 +121,9 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
 
       Assert(this->dof_handler != nullptr,
              typename BaseClass::ExcInvalidObject());
-      Assert(interpolated_values.size() == dofs_per_cell,
+      Assert(interpolated_values.size() DEAL_II_EQUALS dofs_per_cell,
              typename BaseClass::ExcVectorDoesNotMatch());
-      Assert(values.size() == this->dof_handler->n_dofs(),
+      Assert(values.size() DEAL_II_EQUALS this->dof_handler->n_dofs(),
              typename BaseClass::ExcVectorDoesNotMatch());
 
 

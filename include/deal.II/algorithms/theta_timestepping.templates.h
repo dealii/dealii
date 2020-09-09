@@ -140,7 +140,7 @@ namespace Algorithms
         (*op_explicit)(out1, src1);
         (*op_implicit)(out, src2);
 
-        if (output != nullptr && control.print())
+        if (output != nullptr DEAL_II_AND control.print())
           (*output) << count << out;
 
         d_explicit.time = control.now();

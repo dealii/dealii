@@ -624,8 +624,8 @@ protected:
  * @endcode
  * into an object of type Function@<dim@>. Since the argument returns a
  * scalar, the result is clearly a Function object for which
- * <code>function.n_components == 1</code>. The class works by storing a pointer
- * to the given function and every time
+ * <code>function.n_components DEAL_II_EQUALS  1</code>. The class works by
+ * storing a pointer to the given function and every time
  * <code>function.value(p,component)</code> is called, calls
  * <code>foo(p)</code> and returns the corresponding value. It also makes sure
  * that <code>component</code> is in fact zero, as needs be for scalar
@@ -654,8 +654,8 @@ protected:
  *   value(const Point<dim> & p,
  *         const unsigned int component) const
  *   {
- *     Assert (component == 0, ExcMessage ("This object is scalar!"));
- *     return p.norm();
+ *     Assert (component DEAL_II_EQUALS  0, ExcMessage ("This object is
+ * scalar!")); return p.norm();
  *   }
  * };
  *
@@ -681,8 +681,8 @@ protected:
  *   value (const Point<dim> & p,
  *          const unsigned int component) const
  *   {
- *     Assert(component == 0, ExcMessage("This object is scalar!"));
- *     return q.distance(p);
+ *     Assert(component DEAL_II_EQUALS  0, ExcMessage("This object is
+ * scalar!")); return q.distance(p);
  *   }
  * private:
  *   const Point<dim> q;

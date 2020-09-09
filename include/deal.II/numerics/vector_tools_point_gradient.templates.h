@@ -48,7 +48,7 @@ namespace VectorTools
     std::vector<Tensor<1, spacedim, typename VectorType::value_type>>
       &gradients)
   {
-    if (dof.hp_capability_enabled == false)
+    if (dof.hp_capability_enabled DEAL_II_EQUALS false)
       point_gradient(StaticMappingQ1<dim, spacedim>::mapping,
                      dof,
                      fe_function,
@@ -69,7 +69,7 @@ namespace VectorTools
                  const VectorType &               fe_function,
                  const Point<spacedim> &          point)
   {
-    if (dof.hp_capability_enabled == false)
+    if (dof.hp_capability_enabled DEAL_II_EQUALS false)
       return point_gradient(StaticMappingQ1<dim, spacedim>::mapping,
                             dof,
                             fe_function,
@@ -94,7 +94,7 @@ namespace VectorTools
   {
     const FiniteElement<dim> &fe = dof.get_fe();
 
-    Assert(gradient.size() == fe.n_components(),
+    Assert(gradient.size() DEAL_II_EQUALS fe.n_components(),
            ExcDimensionMismatch(gradient.size(), fe.n_components()));
 
     // first find the cell in which this point
@@ -139,7 +139,7 @@ namespace VectorTools
     using Number                              = typename VectorType::value_type;
     const hp::FECollection<dim, spacedim> &fe = dof.get_fe_collection();
 
-    Assert(gradient.size() == fe.n_components(),
+    Assert(gradient.size() DEAL_II_EQUALS fe.n_components(),
            ExcDimensionMismatch(gradient.size(), fe.n_components()));
 
     // first find the cell in which this point
@@ -180,7 +180,7 @@ namespace VectorTools
                  const VectorType &               fe_function,
                  const Point<spacedim> &          point)
   {
-    Assert(dof.get_fe(0).n_components() == 1,
+    Assert(dof.get_fe(0).n_components() DEAL_II_EQUALS 1,
            ExcMessage(
              "Finite element is not scalar as is necessary for this function"));
 
@@ -199,7 +199,7 @@ namespace VectorTools
                  const VectorType &                          fe_function,
                  const Point<spacedim> &                     point)
   {
-    Assert(dof.get_fe(0).n_components() == 1,
+    Assert(dof.get_fe(0).n_components() DEAL_II_EQUALS 1,
            ExcMessage(
              "Finite element is not scalar as is necessary for this function"));
 

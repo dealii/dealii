@@ -615,7 +615,7 @@ Multigrid<VectorType>::Multigrid(const MGMatrixBase<VectorType> &    matrix,
   , edge_down(nullptr, typeid(*this).name())
   , edge_up(nullptr, typeid(*this).name())
 {
-  if (max_level == numbers::invalid_unsigned_int)
+  if (max_level DEAL_II_EQUALS numbers::invalid_unsigned_int)
     maxlevel = matrix.get_maxlevel();
   else
     maxlevel = max_level;

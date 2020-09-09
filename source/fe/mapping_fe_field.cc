@@ -197,7 +197,7 @@ namespace
   get_vertex_quadrature()
   {
     static Quadrature<dim> quad;
-    if (quad.size() == 0)
+    if (quad.size() DEAL_II_EQUALS 0)
       {
         std::vector<Point<dim>> points(GeometryInfo<dim>::vertices_per_cell);
         for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
@@ -366,7 +366,8 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::get_vertices(
   const typename DoFHandler<dim, spacedim>::cell_iterator dof_cell(
     *cell, euler_dof_handler);
 
-  Assert(uses_level_dofs || dof_cell->is_active() == true, ExcInactiveCell());
+  Assert(uses_level_dofs DEAL_II_OR dof_cell->is_active() DEAL_II_EQUALS true,
+         ExcInactiveCell());
   AssertDimension(GeometryInfo<dim>::vertices_per_cell,
                   fe_values.n_quadrature_points);
   AssertDimension(fe_to_real.size(),
@@ -1322,9 +1323,9 @@ namespace internal
                   make_array_view(data.aux[d]));
               }
 
-            // if dim==spacedim, we can use the unit tangentials to compute the
-            // boundary form by simply taking the cross product
-            if (dim == spacedim)
+            // if dimDEAL_II_EQUALS spacedim, we can use the unit tangentials to
+            // compute the boundary form by simply taking the cross product
+            if (dim DEAL_II_EQUALS spacedim)
               {
                 for (unsigned int i = 0; i < n_q_points; ++i)
                   switch (dim)
@@ -1335,7 +1336,7 @@ namespace internal
                         // can still compute the boundary form by simply looking
                         // at the number of the face
                         output_data.boundary_forms[i][0] =
-                          (face_no == 0 ? -1 : +1);
+                          (face_no DEAL_II_EQUALS 0 ? -1 : +1);
                         break;
                       case 2:
                         output_data.boundary_forms[i] =
@@ -1361,17 +1362,17 @@ namespace internal
 
                 for (unsigned int point = 0; point < n_q_points; ++point)
                   {
-                    if (dim == 1)
+                    if (dim DEAL_II_EQUALS 1)
                       {
                         // J is a tangent vector
                         output_data.boundary_forms[point] =
                           data.contravariant[point].transpose()[0];
                         output_data.boundary_forms[point] /=
-                          (face_no == 0 ? -1. : +1.) *
+                          (face_no DEAL_II_EQUALS 0 ? -1. : +1.) *
                           output_data.boundary_forms[point].norm();
                       }
 
-                    if (dim == 2)
+                    if (dim DEAL_II_EQUALS 2)
                       {
                         const DerivativeForm<1, spacedim, dim> DX_t =
                           data.contravariant[point].transpose();
@@ -1583,15 +1584,15 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::fill_fe_values(
     {
       AssertDimension(output_data.JxW_values.size(), n_q_points);
 
-      Assert(!(update_flags & update_normal_vectors) ||
-               (output_data.normal_vectors.size() == n_q_points),
+      Assert(!(update_flags & update_normal_vectors) DEAL_II_OR(
+               output_data.normal_vectors.size() DEAL_II_EQUALS n_q_points),
              ExcDimensionMismatch(output_data.normal_vectors.size(),
                                   n_q_points));
 
 
       for (unsigned int point = 0; point < n_q_points; ++point)
         {
-          if (dim == spacedim)
+          if (dim DEAL_II_EQUALS spacedim)
             {
               const double det = data.contravariant[point].determinant();
 
@@ -1606,7 +1607,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::fill_fe_values(
                        cell->center(), det, point)));
               output_data.JxW_values[point] = weights[point] * det;
             }
-          // if dim==spacedim, then there is no cell normal to
+          // if dimDEAL_II_EQUALS spacedim, then there is no cell normal to
           // compute. since this is for FEValues (and not FEFaceValues),
           // there are also no face normals to compute
           else // codim>0 case
@@ -1626,20 +1627,20 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::fill_fe_values(
 
               if (update_flags & update_normal_vectors)
                 {
-                  Assert(spacedim - dim == 1,
+                  Assert(spacedim - dim DEAL_II_EQUALS 1,
                          ExcMessage("There is no cell normal in codim 2."));
 
-                  if (dim == 1)
+                  if (dim DEAL_II_EQUALS 1)
                     output_data.normal_vectors[point] =
                       cross_product_2d(-DX_t[0]);
-                  else // dim == 2
+                  else // dim DEAL_II_EQUALS  2
                     output_data.normal_vectors[point] =
                       cross_product_3d(DX_t[0], DX_t[1]);
 
                   output_data.normal_vectors[point] /=
                     output_data.normal_vectors[point].norm();
 
-                  if (cell->direction_flag() == false)
+                  if (cell->direction_flag() DEAL_II_EQUALS false)
                     output_data.normal_vectors[point] *= -1.;
                 }
             } // codim>0 case
@@ -1886,7 +1887,7 @@ namespace internal
                   data.update_each & update_volume_elements,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_volume_elements"));
-                Assert(rank == 1, ExcMessage("Only for rank 1"));
+                Assert(rank DEAL_II_EQUALS 1, ExcMessage("Only for rank 1"));
                 for (unsigned int i = 0; i < output.size(); ++i)
                   {
                     output[i] =
@@ -2055,7 +2056,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::transform(
                                          input[q][i][0][0];
                     for (unsigned int J = 0; J < dim; ++J)
                       {
-                        const unsigned int K0 = (0 == J) ? 1 : 0;
+                        const unsigned int K0 = (0 DEAL_II_EQUALS J) ? 1 : 0;
                         for (unsigned int K = K0; K < dim; ++K)
                           output[q][i][j][k] += data.covariant[q][j][J] *
                                                 data.covariant[q][k][K] *
@@ -2331,7 +2332,8 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::update_internal_dofs(
          ExcMessage("euler_dof_handler is empty"));
 
   typename DoFHandlerType::cell_iterator dof_cell(*cell, euler_dof_handler);
-  Assert(uses_level_dofs || dof_cell->is_active() == true, ExcInactiveCell());
+  Assert(uses_level_dofs DEAL_II_OR dof_cell->is_active() DEAL_II_EQUALS true,
+         ExcInactiveCell());
   if (uses_level_dofs)
     {
       AssertIndexRange(cell->level(), euler_vector.size());

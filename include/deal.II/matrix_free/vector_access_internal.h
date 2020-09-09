@@ -166,7 +166,7 @@ namespace internal
 
   // this is to make sure that the parallel partitioning in VectorType
   // is really the same as stored in MatrixFree.
-  // version below is when has_partitioners_are_compatible == false
+  // version below is when has_partitioners_are_compatible DEAL_II_EQUALS  false
   // FIXME: this is incorrect for PETSc/Trilinos MPI vectors
   template <
     typename VectorType,
@@ -185,7 +185,7 @@ namespace internal
 
 
 
-  // same as above for has_partitioners_are_compatible == true
+  // same as above for has_partitioners_are_compatible DEAL_II_EQUALS  true
   template <
     typename VectorType,
     typename std::enable_if<has_partitioners_are_compatible<VectorType>::value,

@@ -125,7 +125,8 @@ namespace Functions
       {
         std::vector<std::string> this_c =
           Utilities::split_string_list(constant, '=');
-        AssertThrow(this_c.size() == 2, ExcMessage("Invalid format"));
+        AssertThrow(this_c.size() DEAL_II_EQUALS 2,
+                    ExcMessage("Invalid format"));
         double tmp;
         AssertThrow(std::sscanf(this_c[1].c_str(), "%lf", &tmp),
                     ExcMessage("Double number?"));

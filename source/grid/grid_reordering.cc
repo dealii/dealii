@@ -53,7 +53,8 @@ namespace
     bool
     operator<(const CheapEdge &e) const
     {
-      return ((v0 < e.v0) || ((v0 == e.v0) && (v1 < e.v1)));
+      return ((v0 < e.v0)
+                DEAL_II_OR((v0 DEAL_II_EQUALS e.v0)DEAL_II_AND(v1 < e.v1)));
     }
 
   private:
@@ -222,11 +223,13 @@ namespace
     void
     push_back(const AdjacentCell &adjacent_cell)
     {
-      if (adjacent_cells[0].cell_index == numbers::invalid_unsigned_int)
+      if (adjacent_cells[0].cell_index DEAL_II_EQUALS
+                                       numbers::invalid_unsigned_int)
         adjacent_cells[0] = adjacent_cell;
       else
         {
-          Assert(adjacent_cells[1].cell_index == numbers::invalid_unsigned_int,
+          Assert(adjacent_cells[1].cell_index DEAL_II_EQUALS
+                                              numbers::invalid_unsigned_int,
                  ExcInternalError());
           adjacent_cells[1] = adjacent_cell;
         }
@@ -255,9 +258,11 @@ namespace
       // check whether the current object stores zero, one, or two
       // adjacent cells, and use this to point to the element past the
       // last valid one
-      if (adjacent_cells[0].cell_index == numbers::invalid_unsigned_int)
+      if (adjacent_cells[0].cell_index DEAL_II_EQUALS
+                                       numbers::invalid_unsigned_int)
         return adjacent_cells;
-      else if (adjacent_cells[1].cell_index == numbers::invalid_unsigned_int)
+      else if (adjacent_cells[1].cell_index DEAL_II_EQUALS
+                                            numbers::invalid_unsigned_int)
         return adjacent_cells + 1;
       else
         return adjacent_cells + 2;
@@ -329,19 +334,18 @@ namespace
     bool
     operator<(const Edge<dim> &e) const
     {
-      return ((vertex_indices[0] < e.vertex_indices[0]) ||
-              ((vertex_indices[0] == e.vertex_indices[0]) &&
-               (vertex_indices[1] < e.vertex_indices[1])));
+      return ((vertex_indices[0] < e.vertex_indices[0]) DEAL_II_OR(
+        (vertex_indices[0] DEAL_II_EQUALS e.vertex_indices[0])DEAL_II_AND(
+          vertex_indices[1] < e.vertex_indices[1])));
     }
 
     /**
      * Compare two edges for equality based on their vertex indices.
      */
-    bool
-    operator==(const Edge<dim> &e) const
+    bool operator DEAL_II_EQUALS(const Edge<dim> &e) const
     {
-      return ((vertex_indices[0] == e.vertex_indices[0]) &&
-              (vertex_indices[1] == e.vertex_indices[1]));
+      return ((vertex_indices[0] DEAL_II_EQUALS e.vertex_indices[0])DEAL_II_AND(
+        vertex_indices[1] DEAL_II_EQUALS e.vertex_indices[1]));
     }
 
     /**
@@ -398,7 +402,8 @@ namespace
             (std::lower_bound(edge_list.begin(), edge_list.end(), e) -
              edge_list.begin());
           Assert(edge_indices[l] < edge_list.size(), ExcInternalError());
-          Assert(edge_list[edge_indices[l]] == e, ExcInternalError())
+          Assert(edge_list[edge_indices[l]] DEAL_II_EQUALS e,
+                 ExcInternalError())
         }
     }
 
@@ -463,11 +468,11 @@ namespace
     void
     insert(const unsigned int edge_index)
     {
-      if (edge_indices[0] == numbers::invalid_unsigned_int)
+      if (edge_indices[0] DEAL_II_EQUALS numbers::invalid_unsigned_int)
         edge_indices[0] = edge_index;
       else
         {
-          Assert(edge_indices[1] == numbers::invalid_unsigned_int,
+          Assert(edge_indices[1] DEAL_II_EQUALS numbers::invalid_unsigned_int,
                  ExcInternalError());
           edge_indices[1] = edge_index;
         }
@@ -493,9 +498,9 @@ namespace
       // check whether the current object stores zero, one, or two
       // indices, and use this to point to the element past the
       // last valid one
-      if (edge_indices[0] == numbers::invalid_unsigned_int)
+      if (edge_indices[0] DEAL_II_EQUALS numbers::invalid_unsigned_int)
         return edge_indices;
-      else if (edge_indices[1] == numbers::invalid_unsigned_int)
+      else if (edge_indices[1] DEAL_II_EQUALS numbers::invalid_unsigned_int)
         return edge_indices + 1;
       else
         return edge_indices + 2;
@@ -578,7 +583,7 @@ namespace
           edges[cell_list.back().edge_indices[l]].adjacent_cells.push_back(
             AdjacentCell(i, l));
       }
-    Assert(cell_list.size() == cells.size(), ExcInternalError());
+    Assert(cell_list.size() DEAL_II_EQUALS cells.size(), ExcInternalError());
 
     return cell_list;
   }
@@ -597,8 +602,8 @@ namespace
   {
     for (unsigned int c = current_cell; c < cells.size(); ++c)
       for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
-        if (edges[cells[c].edge_indices[l]].orientation_status ==
-            Edge<dim>::not_oriented)
+        if (edges[cells[c].edge_indices[l]].orientation_status DEAL_II_EQUALS
+                                                               Edge<dim>::not_oriented)
           return c;
 
     return numbers::invalid_unsigned_int;
@@ -638,30 +643,31 @@ namespace
     // this bug only existed in the 2d implementation since there
     // were different implementations for 2d and 3d. consequently,
     // only replicate it for the 2d case and be "intuitive" in 3d.
-    if (edges[cells[cell].edge_indices[local_edge]].vertex_indices[0] ==
-        cells[cell].vertex_indices[GeometryInfo<dim>::line_to_cell_vertices(
-          local_edge, 0)])
+    if (edges[cells[cell].edge_indices[local_edge]]
+          .vertex_indices[0] DEAL_II_EQUALS cells[cell]
+          .vertex_indices[GeometryInfo<dim>::line_to_cell_vertices(local_edge,
+                                                                   0)])
       // orient initial edge *opposite* to the way it is in the cell
       // (see above for the reason)
       edges[cells[cell].edge_indices[local_edge]].orientation_status =
-        (dim == 2 ? Edge<dim>::backward : Edge<dim>::forward);
+        (dim DEAL_II_EQUALS 2 ? Edge<dim>::backward : Edge<dim>::forward);
     else
       {
-        Assert(
-          edges[cells[cell].edge_indices[local_edge]].vertex_indices[0] ==
-            cells[cell].vertex_indices[GeometryInfo<dim>::line_to_cell_vertices(
-              local_edge, 1)],
-          ExcInternalError());
-        Assert(
-          edges[cells[cell].edge_indices[local_edge]].vertex_indices[1] ==
-            cells[cell].vertex_indices[GeometryInfo<dim>::line_to_cell_vertices(
-              local_edge, 0)],
-          ExcInternalError());
+        Assert(edges[cells[cell].edge_indices[local_edge]]
+                 .vertex_indices[0] DEAL_II_EQUALS cells[cell]
+                 .vertex_indices[GeometryInfo<dim>::line_to_cell_vertices(
+                   local_edge, 1)],
+               ExcInternalError());
+        Assert(edges[cells[cell].edge_indices[local_edge]]
+                 .vertex_indices[1] DEAL_II_EQUALS cells[cell]
+                 .vertex_indices[GeometryInfo<dim>::line_to_cell_vertices(
+                   local_edge, 0)],
+               ExcInternalError());
 
         // orient initial edge *opposite* to the way it is in the cell
         // (see above for the reason)
         edges[cells[cell].edge_indices[local_edge]].orientation_status =
-          (dim == 2 ? Edge<dim>::forward : Edge<dim>::backward);
+          (dim DEAL_II_EQUALS 2 ? Edge<dim>::forward : Edge<dim>::backward);
       }
 
     // walk outward from the given edge as described in
@@ -700,7 +706,8 @@ namespace
                 // figure out the direction of delta with respect to the cell K
                 // (in the orientation in which the user has given it to us)
                 const unsigned int first_edge_vertex =
-                  (edges[*delta].orientation_status == Edge<dim>::forward ?
+                  (edges[*delta].orientation_status DEAL_II_EQUALS
+                                                    Edge<dim>::forward ?
                      edges[*delta].vertex_indices[0] :
                      edges[*delta].vertex_indices[1]);
                 const unsigned int first_edge_vertex_in_K =
@@ -708,10 +715,10 @@ namespace
                     .vertex_indices[GeometryInfo<dim>::line_to_cell_vertices(
                       delta_is_edge_in_K, 0)];
                 Assert(
-                  first_edge_vertex == first_edge_vertex_in_K ||
-                    first_edge_vertex ==
-                      cells[K].vertex_indices[GeometryInfo<
-                        dim>::line_to_cell_vertices(delta_is_edge_in_K, 1)],
+                  first_edge_vertex DEAL_II_EQUALS first_edge_vertex_in_K
+                    DEAL_II_OR first_edge_vertex DEAL_II_EQUALS cells[K]
+                      .vertex_indices[GeometryInfo<dim>::line_to_cell_vertices(
+                        delta_is_edge_in_K, 1)],
                   ExcInternalError());
 
                 // now figure out which direction the each of the "opposite"
@@ -731,8 +738,10 @@ namespace
                         [GeometryInfo<dim>::line_to_cell_vertices(
                           ParallelEdges<dim>::parallel_edges[delta_is_edge_in_K]
                                                             [o_e],
-                          (first_edge_vertex == first_edge_vertex_in_K ? 0 :
-                                                                         1))];
+                          (first_edge_vertex DEAL_II_EQUALS
+                                             first_edge_vertex_in_K ?
+                             0 :
+                             1))];
 
                     // then determine the orientation of the edge based on
                     // whether the vertex we want to be the edge's first
@@ -740,15 +749,15 @@ namespace
                     // whether it points in the opposite direction
                     const typename Edge<dim>::OrientationStatus
                       opposite_edge_orientation =
-                        (edges[opposite_edge].vertex_indices[0] ==
+                        (edges[opposite_edge].vertex_indices[0] DEAL_II_EQUALS
                              first_opposite_edge_vertex ?
                            Edge<dim>::forward :
                            Edge<dim>::backward);
 
                     // see if the opposite edge (there is only one in 2d) has
                     // already been oriented.
-                    if (edges[opposite_edge].orientation_status ==
-                        Edge<dim>::not_oriented)
+                    if (edges[opposite_edge].orientation_status DEAL_II_EQUALS
+                                                                Edge<dim>::not_oriented)
                       {
                         // the opposite edge is not yet oriented. do orient it
                         // and add it to Delta_k
@@ -767,13 +776,13 @@ namespace
                         // propagate through a couple of functions without
                         // having to do error checking and without modifying the
                         // 'cells' array that the user gave us
-                        if (dim == 2)
+                        if (dim DEAL_II_EQUALS 2)
                           {
-                            Assert(edges[opposite_edge].orientation_status ==
-                                     opposite_edge_orientation,
+                            Assert(edges[opposite_edge].orientation_status
+                                     DEAL_II_EQUALS opposite_edge_orientation,
                                    ExcMeshNotOrientable());
                           }
-                        else if (dim == 3)
+                        else if (dim DEAL_II_EQUALS 3)
                           {
                             if (edges[opposite_edge].orientation_status !=
                                 opposite_edge_orientation)
@@ -817,7 +826,7 @@ namespace
                    .orientation_status != Edge<dim>::not_oriented,
                ExcInternalError());
         if (edge_list[cell_list[cell_index].edge_indices[e]]
-              .orientation_status == Edge<dim>::forward)
+              .orientation_status DEAL_II_EQUALS Edge<dim>::forward)
           starting_vertex_of_edge[e] =
             edge_list[cell_list[cell_index].edge_indices[e]].vertex_indices[0];
         else
@@ -836,12 +845,15 @@ namespace
             // in 2d, we can simply enumerate the possibilities where the
             // origin may be located because edges zero and one don't share
             // any vertices, and the same for edges two and three
-            if ((starting_vertex_of_edge[0] == starting_vertex_of_edge[2]) ||
-                (starting_vertex_of_edge[0] == starting_vertex_of_edge[3]))
+            if ((starting_vertex_of_edge[0] DEAL_II_EQUALS
+                   starting_vertex_of_edge[2])
+                  DEAL_II_OR(starting_vertex_of_edge[0] DEAL_II_EQUALS
+                               starting_vertex_of_edge[3]))
               origin_vertex_of_cell = starting_vertex_of_edge[0];
-            else if ((starting_vertex_of_edge[1] ==
-                      starting_vertex_of_edge[2]) ||
-                     (starting_vertex_of_edge[1] == starting_vertex_of_edge[3]))
+            else if ((starting_vertex_of_edge[1] DEAL_II_EQUALS
+                        starting_vertex_of_edge[2])
+                       DEAL_II_OR(starting_vertex_of_edge[1] DEAL_II_EQUALS
+                                    starting_vertex_of_edge[3]))
               origin_vertex_of_cell = starting_vertex_of_edge[1];
             else
               Assert(false, ExcInternalError());
@@ -857,11 +869,11 @@ namespace
             for (origin_vertex_of_cell = 0;
                  origin_vertex_of_cell < GeometryInfo<dim>::vertices_per_cell;
                  ++origin_vertex_of_cell)
-              if (std::count(starting_vertex_of_edge,
-                             starting_vertex_of_edge +
-                               GeometryInfo<dim>::lines_per_cell,
-                             cell_list[cell_index]
-                               .vertex_indices[origin_vertex_of_cell]) == dim)
+              if (std::count(
+                    starting_vertex_of_edge,
+                    starting_vertex_of_edge + GeometryInfo<dim>::lines_per_cell,
+                    cell_list[cell_index].vertex_indices[origin_vertex_of_cell])
+                    DEAL_II_EQUALS dim)
                 break;
             Assert(origin_vertex_of_cell < GeometryInfo<dim>::vertices_per_cell,
                    ExcInternalError());
@@ -976,7 +988,7 @@ namespace
         for (unsigned int l = 0; l < dim; ++l)
           if (edge_list[cell_list[next_cell_with_unoriented_edge]
                           .edge_indices[ParallelEdges<dim>::starter_edges[l]]]
-                .orientation_status == Edge<dim>::not_oriented)
+                .orientation_status DEAL_II_EQUALS Edge<dim>::not_oriented)
             orient_one_set_of_parallel_edges(
               cell_list,
               edge_list,
@@ -1082,11 +1094,11 @@ GridReordering<dim, spacedim>::reorder_cells(std::vector<CellData<dim>> &cells,
          ExcMessage("List of elements to orient must have at least one cell"));
 
   // there is nothing for us to do in 1d
-  if (dim == 1)
+  if (dim DEAL_II_EQUALS 1)
     return;
 
   // if necessary, convert to new-style format
-  if (use_new_style_ordering == false)
+  if (use_new_style_ordering DEAL_II_EQUALS false)
     reorder_old_to_new_style(cells);
 
   // check if grids are already consistent. if so, do
@@ -1106,7 +1118,7 @@ GridReordering<dim, spacedim>::reorder_cells(std::vector<CellData<dim>> &cells,
       }
 
   // and convert back if necessary
-  if (use_new_style_ordering == false)
+  if (use_new_style_ordering DEAL_II_EQUALS false)
     reorder_new_to_old_style(cells);
 }
 
@@ -1182,7 +1194,8 @@ GridReordering<2>::invert_all_cells_of_negative_grid(
   // with both kind of cells are very likely to
   // be broken. Check for this here.
   AssertThrow(
-    n_negative_cells == 0 || n_negative_cells == cells.size(),
+    n_negative_cells DEAL_II_EQUALS 0 DEAL_II_OR n_negative_cells DEAL_II_EQUALS
+                                                                  cells.size(),
     ExcMessage(
       std::string("This class assumes that either all cells have positive "
                   "volume, or that all cells have been specified in an "
@@ -1251,7 +1264,8 @@ GridReordering<3>::invert_all_cells_of_negative_grid(
   // grids with both kind of cells
   // are very likely to be
   // broken. Check for this here.
-  AssertThrow(n_negative_cells == 0 || n_negative_cells == cells.size(),
+  AssertThrow(n_negative_cells DEAL_II_EQUALS 0 DEAL_II_OR n_negative_cells
+                DEAL_II_EQUALS cells.size(),
               ExcMessage("While sorting the cells that will be passed for "
                          "creating a Triangulation object, deal.II found that "
                          "some but not all cells have a negative volume. (If "

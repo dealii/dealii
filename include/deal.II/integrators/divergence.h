@@ -98,7 +98,7 @@ namespace LocalIntegrators
       AssertDimension(fetest.get_fe().n_components(), 1);
       AssertVectorVectorDimension(input, dim, fetest.n_quadrature_points);
       const unsigned int t_dofs = fetest.dofs_per_cell;
-      Assert(result.size() == t_dofs,
+      Assert(result.size() DEAL_II_EQUALS t_dofs,
              ExcDimensionMismatch(result.size(), t_dofs));
 
       for (unsigned int k = 0; k < fetest.n_quadrature_points; ++k)
@@ -131,7 +131,7 @@ namespace LocalIntegrators
       AssertDimension(fetest.get_fe().n_components(), 1);
       AssertVectorVectorDimension(input, dim, fetest.n_quadrature_points);
       const unsigned int t_dofs = fetest.dofs_per_cell;
-      Assert(result.size() == t_dofs,
+      Assert(result.size() DEAL_II_EQUALS t_dofs,
              ExcDimensionMismatch(result.size(), t_dofs));
 
       for (unsigned int k = 0; k < fetest.n_quadrature_points; ++k)
@@ -202,7 +202,7 @@ namespace LocalIntegrators
       AssertDimension(fetest.get_fe().n_components(), dim);
       AssertDimension(input.size(), fetest.n_quadrature_points);
       const unsigned int t_dofs = fetest.dofs_per_cell;
-      Assert(result.size() == t_dofs,
+      Assert(result.size() DEAL_II_EQUALS t_dofs,
              ExcDimensionMismatch(result.size(), t_dofs));
 
       for (unsigned int k = 0; k < fetest.n_quadrature_points; ++k)
@@ -235,7 +235,7 @@ namespace LocalIntegrators
       AssertDimension(fetest.get_fe().n_components(), dim);
       AssertDimension(input.size(), fetest.n_quadrature_points);
       const unsigned int t_dofs = fetest.dofs_per_cell;
-      Assert(result.size() == t_dofs,
+      Assert(result.size() DEAL_II_EQUALS t_dofs,
              ExcDimensionMismatch(result.size(), t_dofs));
 
       for (unsigned int k = 0; k < fetest.n_quadrature_points; ++k)

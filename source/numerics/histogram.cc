@@ -29,8 +29,9 @@ template <typename number>
 bool
 Histogram::logarithmic_less(const number n1, const number n2)
 {
-  return (((n1 < n2) && (n1 > 0)) || ((n1 < n2) && (n2 <= 0)) ||
-          ((n2 < n1) && (n1 > 0) && (n2 <= 0)));
+  return (((n1 < n2) DEAL_II_AND(n1 > 0))
+            DEAL_II_OR((n1 < n2) DEAL_II_AND(n2 <= 0))
+              DEAL_II_OR((n2 < n1) DEAL_II_AND(n1 > 0) DEAL_II_AND(n2 <= 0)));
 }
 
 
@@ -65,7 +66,7 @@ Histogram::evaluate(const std::vector<Vector<number>> &values,
          ExcMessage("The number of intervals needs to be at least one."));
   for (unsigned int i = 0; i < values.size(); ++i)
     Assert(values[i].size() > 0, ExcEmptyData());
-  Assert(values.size() == y_values_.size(),
+  Assert(values.size() DEAL_II_EQUALS y_values_.size(),
          ExcIncompatibleArraySize(values.size(), y_values_.size()));
 
   // store y_values
@@ -231,7 +232,7 @@ Histogram::write_gnuplot(std::ostream &out) const
 
   // do a simple 2d plot, if only
   // one data set is available
-  if (intervals.size() == 1)
+  if (intervals.size() DEAL_II_EQUALS 1)
     {
       for (const auto &interval : intervals[0])
         out << interval.left_point << ' ' << interval.content << std::endl
@@ -286,9 +287,9 @@ Histogram::get_interval_spacing_names()
 Histogram::IntervalSpacing
 Histogram::parse_interval_spacing(const std::string &name)
 {
-  if (name == "linear")
+  if (name DEAL_II_EQUALS "linear")
     return linear;
-  else if (name == "logarithmic")
+  else if (name DEAL_II_EQUALS "logarithmic")
     return logarithmic;
   else
     {

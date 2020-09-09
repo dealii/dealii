@@ -47,7 +47,7 @@ namespace VectorTools
               const Point<spacedim> &                  point,
               Vector<typename VectorType::value_type> &value)
   {
-    if (dof.hp_capability_enabled == false)
+    if (dof.hp_capability_enabled DEAL_II_EQUALS false)
       point_value(StaticMappingQ1<dim, spacedim>::mapping,
                   dof,
                   fe_function,
@@ -68,7 +68,7 @@ namespace VectorTools
               const VectorType &               fe_function,
               const Point<spacedim> &          point)
   {
-    if (dof.hp_capability_enabled == false)
+    if (dof.hp_capability_enabled DEAL_II_EQUALS false)
       return point_value(StaticMappingQ1<dim, spacedim>::mapping,
                          dof,
                          fe_function,
@@ -92,7 +92,7 @@ namespace VectorTools
     using Number                 = typename VectorType::value_type;
     const FiniteElement<dim> &fe = dof.get_fe();
 
-    Assert(value.size() == fe.n_components(),
+    Assert(value.size() DEAL_II_EQUALS fe.n_components(),
            ExcDimensionMismatch(value.size(), fe.n_components()));
 
     // first find the cell in which this point
@@ -134,7 +134,7 @@ namespace VectorTools
     using Number                              = typename VectorType::value_type;
     const hp::FECollection<dim, spacedim> &fe = dof.get_fe_collection();
 
-    Assert(value.size() == fe.n_components(),
+    Assert(value.size() DEAL_II_EQUALS fe.n_components(),
            ExcDimensionMismatch(value.size(), fe.n_components()));
 
     // first find the cell in which this point
@@ -176,7 +176,7 @@ namespace VectorTools
               const VectorType &               fe_function,
               const Point<spacedim> &          point)
   {
-    Assert(dof.get_fe(0).n_components() == 1,
+    Assert(dof.get_fe(0).n_components() DEAL_II_EQUALS 1,
            ExcMessage(
              "Finite element is not scalar as is necessary for this function"));
 
@@ -194,7 +194,7 @@ namespace VectorTools
               const VectorType &                          fe_function,
               const Point<spacedim> &                     point)
   {
-    Assert(dof.get_fe(0).n_components() == 1,
+    Assert(dof.get_fe(0).n_components() DEAL_II_EQUALS 1,
            ExcMessage(
              "Finite element is not scalar as is necessary for this function"));
 
@@ -236,7 +236,7 @@ namespace VectorTools
     using Number                 = typename VectorType::value_type;
     const FiniteElement<dim> &fe = dof.get_fe();
 
-    Assert(difference.size() == fe.n_components(),
+    Assert(difference.size() DEAL_II_EQUALS fe.n_components(),
            ExcDimensionMismatch(difference.size(), fe.n_components()));
 
     // first find the cell in which this point
@@ -262,7 +262,7 @@ namespace VectorTools
     std::vector<Vector<Number>> u_value(1, Vector<Number>(fe.n_components()));
     fe_values.get_function_values(fe_function, u_value);
 
-    if (fe.n_components() == 1)
+    if (fe.n_components() DEAL_II_EQUALS 1)
       difference(0) = exact_function.value(point);
     else
       exact_function.vector_value(point, difference);
@@ -278,9 +278,9 @@ namespace VectorTools
                              const Point<spacedim> &          p,
                              Vector<double> &                 rhs_vector)
   {
-    Assert(rhs_vector.size() == dof_handler.n_dofs(),
+    Assert(rhs_vector.size() DEAL_II_EQUALS dof_handler.n_dofs(),
            ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
-    Assert(dof_handler.get_fe(0).n_components() == 1,
+    Assert(dof_handler.get_fe(0).n_components() DEAL_II_EQUALS 1,
            ExcMessage("This function only works for scalar finite elements"));
 
     rhs_vector = 0;
@@ -337,9 +337,9 @@ namespace VectorTools
     const Point<spacedim> &                     p,
     Vector<double> &                            rhs_vector)
   {
-    Assert(rhs_vector.size() == dof_handler.n_dofs(),
+    Assert(rhs_vector.size() DEAL_II_EQUALS dof_handler.n_dofs(),
            ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
-    Assert(dof_handler.get_fe(0).n_components() == 1,
+    Assert(dof_handler.get_fe(0).n_components() DEAL_II_EQUALS 1,
            ExcMessage("This function only works for scalar finite elements"));
 
     rhs_vector = 0;
@@ -378,9 +378,9 @@ namespace VectorTools
                              const Point<dim> &               orientation,
                              Vector<double> &                 rhs_vector)
   {
-    Assert(rhs_vector.size() == dof_handler.n_dofs(),
+    Assert(rhs_vector.size() DEAL_II_EQUALS dof_handler.n_dofs(),
            ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
-    Assert(dof_handler.get_fe(0).n_components() == dim,
+    Assert(dof_handler.get_fe(0).n_components() DEAL_II_EQUALS dim,
            ExcMessage(
              "This function only works for vector-valued finite elements."));
 
@@ -444,9 +444,9 @@ namespace VectorTools
     const Point<dim> &                          orientation,
     Vector<double> &                            rhs_vector)
   {
-    Assert(rhs_vector.size() == dof_handler.n_dofs(),
+    Assert(rhs_vector.size() DEAL_II_EQUALS dof_handler.n_dofs(),
            ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
-    Assert(dof_handler.get_fe(0).n_components() == dim,
+    Assert(dof_handler.get_fe(0).n_components() DEAL_II_EQUALS dim,
            ExcMessage(
              "This function only works for vector-valued finite elements."));
 

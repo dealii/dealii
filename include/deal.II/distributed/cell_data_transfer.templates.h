@@ -113,19 +113,19 @@ namespace parallel
                            Triangulation<dim, spacedim>::cell_iterator &,
                          const VectorType &)>();
 
-      if (*old_strategy == CoarseningStrategies::check_equality)
+      if (*old_strategy DEAL_II_EQUALS CoarseningStrategies::check_equality)
         const_cast<std::function<value_type(
           const typename dealii::Triangulation<dim, spacedim>::cell_iterator &,
           const std::vector<value_type> &)> &>(this->coarsening_strategy) =
           &dealii::AdaptationStrategies::Coarsening::
             check_equality<dim, spacedim, value_type>;
-      else if (*old_strategy == CoarseningStrategies::sum)
+      else if (*old_strategy DEAL_II_EQUALS CoarseningStrategies::sum)
         const_cast<std::function<value_type(
           const typename dealii::Triangulation<dim, spacedim>::cell_iterator &,
           const std::vector<value_type> &)> &>(this->coarsening_strategy) =
           &dealii::AdaptationStrategies::Coarsening::
             sum<dim, spacedim, value_type>;
-      else if (*old_strategy == CoarseningStrategies::mean)
+      else if (*old_strategy DEAL_II_EQUALS CoarseningStrategies::mean)
         const_cast<std::function<value_type(
           const typename dealii::Triangulation<dim, spacedim>::cell_iterator &,
           const std::vector<value_type> &)> &>(this->coarsening_strategy) =
@@ -218,7 +218,7 @@ namespace parallel
     CellDataTransfer<dim, spacedim, VectorType>::unpack(
       std::vector<VectorType *> &all_out)
     {
-      Assert(input_vectors.size() == all_out.size(),
+      Assert(input_vectors.size() DEAL_II_EQUALS all_out.size(),
              ExcDimensionMismatch(input_vectors.size(), all_out.size()));
 
       // TODO: casting away constness is bad
@@ -326,7 +326,8 @@ namespace parallel
                        ++child_index)
                     {
                       const auto &child = cell->child(child_index);
-                      Assert(child->is_active() && child->coarsen_flag_set(),
+                      Assert(child->is_active()
+                               DEAL_II_AND child->coarsen_flag_set(),
                              typename dealii::Triangulation<
                                dim>::ExcInconsistentCoarseningFlags());
 
@@ -345,7 +346,7 @@ namespace parallel
         }
 
       // We don't have to pack the whole container if there is just one entry.
-      if (input_vectors.size() == 1)
+      if (input_vectors.size() DEAL_II_EQUALS 1)
         return Utilities::pack(
           cell_data[0], /*allow_compression=*/transfer_variable_size_data);
       else
@@ -371,7 +372,7 @@ namespace parallel
 
       // We have to unpack the corresponding datatype that has been packed
       // beforehand.
-      if (all_out.size() == 1)
+      if (all_out.size() DEAL_II_EQUALS 1)
         cell_data.push_back(Utilities::unpack<value_type>(
           data_range.begin(),
           data_range.end(),
@@ -383,7 +384,8 @@ namespace parallel
           /*allow_compression=*/transfer_variable_size_data);
 
       // Check if sizes match.
-      Assert(cell_data.size() == all_out.size(), ExcInternalError());
+      Assert(cell_data.size() DEAL_II_EQUALS all_out.size(),
+             ExcInternalError());
 
       auto it_input  = cell_data.cbegin();
       auto it_output = all_out.begin();

@@ -548,8 +548,9 @@ namespace MeshWorker
           for (unsigned int i = 0; i != info.vector(k).n_blocks(); ++i)
             {
               const std::vector<types::global_dof_index> &ldi =
-                info.vector(k).n_blocks() == 1 ? info.indices :
-                                                 info.indices_by_block[i];
+                info.vector(k).n_blocks() DEAL_II_EQUALS 1 ?
+                  info.indices :
+                  info.indices_by_block[i];
 
               if (constraints != nullptr)
                 constraints->distribute_local_to_global(info.vector(k).block(i),
@@ -617,7 +618,7 @@ namespace MeshWorker
 
       const unsigned int n = info.indices_by_block.size();
 
-      if (n == 0)
+      if (n DEAL_II_EQUALS 0)
         info.initialize_matrices(matrix.size(), face);
       else
         {
@@ -651,7 +652,7 @@ namespace MeshWorker
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
 
-      if (constraints == nullptr)
+      if (constraints DEAL_II_EQUALS nullptr)
         {
           for (unsigned int j = 0; j < i1.size(); ++j)
             for (unsigned int k = 0; k < i2.size(); ++k)
@@ -671,7 +672,7 @@ namespace MeshWorker
       Assert(!info.level_cell, ExcMessage("Cell may not access level dofs"));
       const unsigned int n = info.indices_by_block.size();
 
-      if (n == 0)
+      if (n DEAL_II_EQUALS 0)
         for (unsigned int m = 0; m < matrix.size(); ++m)
           assemble(info.matrix(m, false).matrix, m, info.indices, info.indices);
       else
@@ -703,7 +704,7 @@ namespace MeshWorker
 
       const unsigned int n = info1.indices_by_block.size();
 
-      if (n == 0)
+      if (n DEAL_II_EQUALS 0)
         {
           for (unsigned int m = 0; m < matrix.size(); ++m)
             {
@@ -807,7 +808,7 @@ namespace MeshWorker
     {
       const unsigned int n = info.indices_by_block.size();
 
-      if (n == 0)
+      if (n DEAL_II_EQUALS 0)
         info.initialize_matrices(1, face);
       else
         {
@@ -838,7 +839,7 @@ namespace MeshWorker
     {
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
-      Assert(mg_constrained_dofs == 0, ExcInternalError());
+      Assert(mg_constrained_dofs DEAL_II_EQUALS 0, ExcInternalError());
       // TODO: Possibly remove this function all together
 
       for (unsigned int j = 0; j < i1.size(); ++j)
@@ -860,7 +861,7 @@ namespace MeshWorker
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
 
-      if (mg_constrained_dofs == nullptr)
+      if (mg_constrained_dofs DEAL_II_EQUALS nullptr)
         {
           for (unsigned int j = 0; j < i1.size(); ++j)
             for (unsigned int k = 0; k < i2.size(); ++k)
@@ -884,15 +885,18 @@ namespace MeshWorker
                 // eliminate these rows and columns. The corresponding
                 // matrix entries are entered by assemble_in() and
                 // assemble_out().
-                if (mg_constrained_dofs->at_refinement_edge(level, i1[j]) ||
-                    mg_constrained_dofs->at_refinement_edge(level, i2[k]))
+                if (mg_constrained_dofs
+                      ->at_refinement_edge(level, i1[j])
+                        DEAL_II_OR mg_constrained_dofs->at_refinement_edge(
+                          level, i2[k]))
                   continue;
 
                 // At the boundary, only enter the term on the
                 // diagonal, but not the coupling terms
-                if ((mg_constrained_dofs->is_boundary_index(level, i1[j]) ||
-                     mg_constrained_dofs->is_boundary_index(level, i2[k])) &&
-                    (i1[j] != i2[k]))
+                if ((mg_constrained_dofs
+                       ->is_boundary_index(level, i1[j])
+                         DEAL_II_OR mg_constrained_dofs->is_boundary_index(
+                           level, i2[k]))DEAL_II_AND(i1[j] != i2[k]))
                   continue;
 
                 G.add(i1[j], i2[k], M(j, k));
@@ -913,7 +917,7 @@ namespace MeshWorker
       AssertDimension(M.n(), i1.size());
       AssertDimension(M.m(), i2.size());
 
-      if (mg_constrained_dofs == nullptr)
+      if (mg_constrained_dofs DEAL_II_EQUALS nullptr)
         {
           for (unsigned int j = 0; j < i1.size(); ++j)
             for (unsigned int k = 0; k < i2.size(); ++k)
@@ -942,7 +946,7 @@ namespace MeshWorker
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
 
-      if (mg_constrained_dofs == nullptr)
+      if (mg_constrained_dofs DEAL_II_EQUALS nullptr)
         {
           for (unsigned int j = 0; j < i1.size(); ++j)
             for (unsigned int k = 0; k < i2.size(); ++k)
@@ -986,14 +990,20 @@ namespace MeshWorker
             // constrained by hanging node constraints (actually,
             // the whole refinement edge), but not if it is
             // constrained by a boundary constraint.
-            if (mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
-                !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
+            if (mg_constrained_dofs
+                  ->at_refinement_edge(level, i1[j])
+                    DEAL_II_AND !mg_constrained_dofs->at_refinement_edge(level,
+                                                                         i2[k]))
               {
-                if ((!mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
-                     !mg_constrained_dofs->is_boundary_index(level, i2[k])) ||
-                    (mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
-                     mg_constrained_dofs->is_boundary_index(level, i2[k]) &&
-                     i1[j] == i2[k]))
+                if ((!mg_constrained_dofs
+                        ->is_boundary_index(level, i1[j])
+                          DEAL_II_AND !mg_constrained_dofs->is_boundary_index(
+                            level, i2[k]))
+                      DEAL_II_OR(mg_constrained_dofs
+                                   ->is_boundary_index(level, i1[j])
+                                     DEAL_II_AND mg_constrained_dofs
+                                   ->is_boundary_index(level, i2[k])
+                                     DEAL_II_AND i1[j] DEAL_II_EQUALS i2[k]))
                   G.add(i1[j], i2[k], M(j, k));
               }
     }
@@ -1015,14 +1025,20 @@ namespace MeshWorker
       for (unsigned int j = 0; j < i1.size(); ++j)
         for (unsigned int k = 0; k < i2.size(); ++k)
           if (std::fabs(M(k, j)) >= threshold)
-            if (mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
-                !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
+            if (mg_constrained_dofs
+                  ->at_refinement_edge(level, i1[j])
+                    DEAL_II_AND !mg_constrained_dofs->at_refinement_edge(level,
+                                                                         i2[k]))
               {
-                if ((!mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
-                     !mg_constrained_dofs->is_boundary_index(level, i2[k])) ||
-                    (mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
-                     mg_constrained_dofs->is_boundary_index(level, i2[k]) &&
-                     i1[j] == i2[k]))
+                if ((!mg_constrained_dofs
+                        ->is_boundary_index(level, i1[j])
+                          DEAL_II_AND !mg_constrained_dofs->is_boundary_index(
+                            level, i2[k]))
+                      DEAL_II_OR(mg_constrained_dofs
+                                   ->is_boundary_index(level, i1[j])
+                                     DEAL_II_AND mg_constrained_dofs
+                                   ->is_boundary_index(level, i2[k])
+                                     DEAL_II_AND i1[j] DEAL_II_EQUALS i2[k]))
                   G.add(i1[j], i2[k], M(k, j));
               }
     }
@@ -1036,7 +1052,7 @@ namespace MeshWorker
       Assert(info.level_cell, ExcMessage("Cell must access level dofs"));
       const unsigned int level = info.cell->level();
 
-      if (info.indices_by_block.size() == 0)
+      if (info.indices_by_block.size() DEAL_II_EQUALS 0)
         {
           assemble((*matrix)[level],
                    info.matrix(0, false).matrix,
@@ -1097,9 +1113,9 @@ namespace MeshWorker
       const unsigned int level1 = info1.cell->level();
       const unsigned int level2 = info2.cell->level();
 
-      if (info1.indices_by_block.size() == 0)
+      if (info1.indices_by_block.size() DEAL_II_EQUALS 0)
         {
-          if (level1 == level2)
+          if (level1 DEAL_II_EQUALS level2)
             {
               assemble((*matrix)[level1],
                        info1.matrix(0, false).matrix,
@@ -1154,7 +1170,7 @@ namespace MeshWorker
             const unsigned int row    = info1.matrix(k, false).row;
             const unsigned int column = info1.matrix(k, false).column;
 
-            if (level1 == level2)
+            if (level1 DEAL_II_EQUALS level2)
               {
                 assemble((*matrix)[level1],
                          info1.matrix(k, false).matrix,
@@ -1259,7 +1275,7 @@ namespace MeshWorker
       AnyData     residuals = ResidualSimple<VectorType>::residuals;
       VectorType *v         = residuals.entry<VectorType *>(index);
 
-      if (ResidualSimple<VectorType>::constraints == nullptr)
+      if (ResidualSimple<VectorType>::constraints DEAL_II_EQUALS nullptr)
         {
           for (unsigned int i = 0; i < indices.size(); ++i)
             (*v)(indices[i]) += vector(i);
@@ -1298,7 +1314,7 @@ namespace MeshWorker
       AnyData     residuals = ResidualSimple<VectorType>::residuals;
       VectorType *v         = residuals.entry<VectorType *>(index);
 
-      if (ResidualSimple<VectorType>::constraints == nullptr)
+      if (ResidualSimple<VectorType>::constraints DEAL_II_EQUALS nullptr)
         {
           for (unsigned int j = 0; j < i1.size(); ++j)
             for (unsigned int k = 0; k < i2.size(); ++k)
@@ -1327,7 +1343,7 @@ namespace MeshWorker
       Assert(!info.level_cell, ExcMessage("Cell may not access level dofs"));
       const unsigned int n = info.indices_by_block.size();
 
-      if (n == 0)
+      if (n DEAL_II_EQUALS 0)
         {
           for (unsigned int m = 0; m < MatrixSimple<MatrixType>::matrix.size();
                ++m)
@@ -1346,7 +1362,7 @@ namespace MeshWorker
                 const unsigned int column =
                   info.matrix(k + m * n * n, false).column;
 
-                if (row == column)
+                if (row DEAL_II_EQUALS column)
                   assemble(info.matrix(k + m * n * n, false).matrix,
                            info.vector(m).block(row),
                            m,
@@ -1375,7 +1391,7 @@ namespace MeshWorker
 
       const unsigned int n = info1.indices_by_block.size();
 
-      if (n == 0)
+      if (n DEAL_II_EQUALS 0)
         {
           for (unsigned int m = 0; m < MatrixSimple<MatrixType>::matrix.size();
                ++m)
@@ -1410,7 +1426,7 @@ namespace MeshWorker
                 const unsigned int column =
                   info1.matrix(k + m * n * n, false).column;
 
-                if (row == column)
+                if (row DEAL_II_EQUALS column)
                   {
                     assemble(info1.matrix(k + m * n * n, false).matrix,
                              info1.vector(m).block(row),

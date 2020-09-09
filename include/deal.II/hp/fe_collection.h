@@ -143,7 +143,7 @@ namespace hp
     FECollection(FECollection<dim, spacedim> &&) noexcept(
       std::is_nothrow_move_constructible<
         std::vector<std::shared_ptr<const FiniteElement<dim, spacedim>>>>::value
-        &&std::is_nothrow_move_constructible<std::function<
+        DEAL_II_AND std::is_nothrow_move_constructible<std::function<
           unsigned int(const typename hp::FECollection<dim, spacedim> &,
                        const unsigned int)>>::value) = default;
 
@@ -157,8 +157,8 @@ namespace hp
      * Equality comparison operator. All stored FiniteElement objects are
      * compared in order.
      */
-    bool
-    operator==(const FECollection<dim, spacedim> &fe_collection) const;
+    bool operator DEAL_II_EQUALS(
+      const FECollection<dim, spacedim> &fe_collection) const;
 
     /**
      * Non-equality comparison operator. All stored FiniteElement objects are
@@ -824,16 +824,15 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  inline bool
-  FECollection<dim, spacedim>::
-  operator==(const FECollection<dim, spacedim> &fe_collection) const
+  inline bool FECollection<dim, spacedim>::operator DEAL_II_EQUALS(
+    const FECollection<dim, spacedim> &fe_collection) const
   {
     const unsigned int n_elements = size();
     if (n_elements != fe_collection.size())
       return false;
 
     for (unsigned int i = 0; i < n_elements; ++i)
-      if (!(*finite_elements[i] == fe_collection[i]))
+      if (!(*finite_elements[i] DEAL_II_EQUALS fe_collection[i]))
         return false;
 
     return true;
@@ -846,7 +845,7 @@ namespace hp
   FECollection<dim, spacedim>::
   operator!=(const FECollection<dim, spacedim> &fe_collection) const
   {
-    return !(*this == fe_collection);
+    return !(*this DEAL_II_EQUALS fe_collection);
   }
 
 

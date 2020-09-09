@@ -65,7 +65,7 @@ CellDataTransfer<dim, spacedim, VectorType>::CellDataTransfer(
 {
   Assert(
     (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
-       &triangulation) == nullptr),
+      &triangulation) DEAL_II_EQUALS nullptr),
     ExcMessage("You are calling the CellDataTransfer class "
                "with a parallel::distributed::Triangulation. "
                "You probably want to use the "
@@ -101,8 +101,8 @@ CellDataTransfer<dim, spacedim, VectorType>::
 
           // Check if the active_cell_indices for the current cell have
           // been determined already.
-          if (coarsened_cells_active_index.find(parent) ==
-              coarsened_cells_active_index.end())
+          if (coarsened_cells_active_index
+                .find(parent) DEAL_II_EQUALS coarsened_cells_active_index.end())
             {
               std::set<unsigned int> indices_children;
               for (unsigned int child_index = 0;
@@ -110,7 +110,8 @@ CellDataTransfer<dim, spacedim, VectorType>::
                    ++child_index)
                 {
                   const auto &sibling = parent->child(child_index);
-                  Assert(sibling->is_active() && sibling->coarsen_flag_set(),
+                  Assert(sibling->is_active()
+                           DEAL_II_AND sibling->coarsen_flag_set(),
                          typename dealii::Triangulation<
                            dim>::ExcInconsistentCoarseningFlags());
 
@@ -144,9 +145,9 @@ CellDataTransfer<dim, spacedim, VectorType>::unpack(const VectorType &in,
                                                     VectorType &      out)
 {
 #ifdef DEBUG
-  Assert(in.size() == n_active_cells_pre,
+  Assert(in.size() DEAL_II_EQUALS n_active_cells_pre,
          ExcDimensionMismatch(in.size(), n_active_cells_pre));
-  Assert(out.size() == triangulation->n_active_cells(),
+  Assert(out.size() DEAL_II_EQUALS triangulation->n_active_cells(),
          ExcDimensionMismatch(out.size(), triangulation->n_active_cells()));
 #else
   (void)n_active_cells_pre;
@@ -166,7 +167,7 @@ CellDataTransfer<dim, spacedim, VectorType>::unpack(const VectorType &in,
     {
       // Decide how to handle the previous data.
       children_values = refinement_strategy(refined.first, in[refined.second]);
-      Assert(refined.first->n_children() == children_values.size(),
+      Assert(refined.first->n_children() DEAL_II_EQUALS children_values.size(),
              ExcInternalError());
 
       // Set values for all children cells.
@@ -191,7 +192,8 @@ CellDataTransfer<dim, spacedim, VectorType>::unpack(const VectorType &in,
       auto values_it  = children_values.begin();
       for (; indices_it != coarsened.second.cend(); ++indices_it, ++values_it)
         *values_it = in[*indices_it];
-      Assert(values_it == children_values.end(), ExcInternalError());
+      Assert(values_it DEAL_II_EQUALS children_values.end(),
+             ExcInternalError());
 
       // Decide how to handle the previous data.
       const value_type parent_value =

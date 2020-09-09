@@ -225,17 +225,17 @@ namespace Particles
   ParticleAccessor<dim, spacedim>::
   operator!=(const ParticleAccessor<dim, spacedim> &other) const
   {
-    return (map != other.map) || (particle != other.particle);
+    return (map != other.map) DEAL_II_OR(particle != other.particle);
   }
 
 
 
   template <int dim, int spacedim>
-  bool
-  ParticleAccessor<dim, spacedim>::
-  operator==(const ParticleAccessor<dim, spacedim> &other) const
+  bool ParticleAccessor<dim, spacedim>::
+       operator DEAL_II_EQUALS(const ParticleAccessor<dim, spacedim> &other) const
   {
-    return (map == other.map) && (particle == other.particle);
+    return (map DEAL_II_EQUALS other.map)DEAL_II_AND(
+      particle DEAL_II_EQUALS other.particle);
   }
 } // namespace Particles
 

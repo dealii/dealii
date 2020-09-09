@@ -868,7 +868,7 @@ BlockSparsityPatternBase<SparsityPatternType>::add_entries(
   size_type length = 0;
   for (size_type i = 0; i < this->n_block_cols(); ++i)
     length += counter_within_block[i];
-  Assert(length == n_cols, ExcInternalError());
+  Assert(length DEAL_II_EQUALS n_cols, ExcInternalError());
 #endif
 
   // Now we found out about where the
@@ -880,7 +880,7 @@ BlockSparsityPatternBase<SparsityPatternType>::add_entries(
     this->row_indices.global_to_local(row);
   for (size_type block_col = 0; block_col < n_block_cols(); ++block_col)
     {
-      if (counter_within_block[block_col] == 0)
+      if (counter_within_block[block_col] DEAL_II_EQUALS 0)
         continue;
       sub_objects[row_index.first][block_col]->add_entries(
         row_index.second,

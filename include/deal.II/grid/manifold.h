@@ -556,7 +556,7 @@ public:
    * mapped surface, however, will not usually coincide with the
    * actual surface.)
    *
-   * This function only makes sense if dim==spacedim because
+   * This function only makes sense if dimDEAL_II_EQUALS spacedim because
    * otherwise there is no unique normal vector but in fact a
    * (spacedim-dim+1)-dimensional tangent space of vectors that
    * are all both normal to the face and normal to the dim-dimensional
@@ -1157,16 +1157,20 @@ namespace Manifolds
     switch (dim)
       {
         case 1:
-          Assert(points_weights.first.size() == 2, ExcInternalError());
-          Assert(points_weights.second.size() == 2, ExcInternalError());
+          Assert(points_weights.first.size() DEAL_II_EQUALS 2,
+                 ExcInternalError());
+          Assert(points_weights.second.size() DEAL_II_EQUALS 2,
+                 ExcInternalError());
           points_weights.first[0]  = iterator->vertex(0);
           points_weights.second[0] = .5;
           points_weights.first[1]  = iterator->vertex(1);
           points_weights.second[1] = .5;
           break;
         case 2:
-          Assert(points_weights.first.size() == 8, ExcInternalError());
-          Assert(points_weights.second.size() == 8, ExcInternalError());
+          Assert(points_weights.first.size() DEAL_II_EQUALS 8,
+                 ExcInternalError());
+          Assert(points_weights.second.size() DEAL_II_EQUALS 8,
+                 ExcInternalError());
 
           for (unsigned int i = 0; i < 4; ++i)
             {
@@ -1199,8 +1203,10 @@ namespace Manifolds
             const unsigned int np = GeometryInfo<dim>::vertices_per_cell +
                                     GeometryInfo<dim>::lines_per_cell +
                                     GeometryInfo<dim>::faces_per_cell;
-            Assert(points_weights.first.size() == np, ExcInternalError());
-            Assert(points_weights.second.size() == np, ExcInternalError());
+            Assert(points_weights.first.size() DEAL_II_EQUALS np,
+                   ExcInternalError());
+            Assert(points_weights.second.size() DEAL_II_EQUALS np,
+                   ExcInternalError());
             auto *sp3 = reinterpret_cast<
               std::array<Point<3>, n_default_points_per_cell<decltype(hex)>()>
                 *>(&points_weights.first);

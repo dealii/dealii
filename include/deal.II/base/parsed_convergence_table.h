@@ -475,9 +475,19 @@ private:
 
 
 #ifndef DOXYGEN
-// ============================================================
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
 // Template functions
-// ============================================================
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
 template <int dim, int spacedim, typename VectorType>
 void
 ParsedConvergenceTable::difference(const DoFHandler<dim, spacedim> &dh,
@@ -485,7 +495,7 @@ ParsedConvergenceTable::difference(const DoFHandler<dim, spacedim> &dh,
                                    const VectorType &               solution2,
                                    const Function<spacedim> *       weight)
 {
-  AssertThrow(solution1.size() == solution2.size(),
+  AssertThrow(solution1.size() DEAL_II_EQUALS solution2.size(),
               ExcDimensionMismatch(solution1.size(), solution2.size()));
   VectorType solution(solution1);
   solution -= solution2;
@@ -506,7 +516,7 @@ ParsedConvergenceTable::difference(const Mapping<dim, spacedim> &   mapping,
                                    const VectorType &               solution2,
                                    const Function<spacedim> *       weight)
 {
-  AssertThrow(solution1.size() == solution2.size(),
+  AssertThrow(solution1.size() DEAL_II_EQUALS solution2.size(),
               ExcDimensionMismatch(solution1.size(), solution2.size()));
   VectorType solution(solution1);
   solution -= solution2;
@@ -553,13 +563,13 @@ ParsedConvergenceTable::error_from_exact(const Mapping<dim, spacedim> &mapping,
       const unsigned int n_dofs = dh.n_dofs();
 
       for (const auto &col : extra_columns)
-        if (col == "cells")
+        if (col DEAL_II_EQUALS "cells")
           {
             table.add_value("cells", n_active_cells);
             table.set_tex_caption("cells", "\\# cells");
             table.set_tex_format("cells", "r");
           }
-        else if (col == "dofs")
+        else if (col DEAL_II_EQUALS "dofs")
           {
             table.add_value("dofs", n_dofs);
             table.set_tex_caption("dofs", "\\# dofs");
@@ -578,7 +588,7 @@ ParsedConvergenceTable::error_from_exact(const Mapping<dim, spacedim> &mapping,
 
       if (weight != nullptr)
         {
-          if (weight->n_components == 1)
+          if (weight->n_components DEAL_II_EQUALS 1)
             {
               for (auto &f : weight_components)
                 f = [&](const Point<spacedim> &p) { return weight->value(p); };
@@ -606,7 +616,7 @@ ParsedConvergenceTable::error_from_exact(const Mapping<dim, spacedim> &mapping,
 
           auto components_expr = zero_components;
           for (unsigned int i = 0; i < n_components; ++i)
-            if (mask[i] == true)
+            if (mask[i] DEAL_II_EQUALS true)
               components_expr[i] = weight_components[i];
 
           FunctionFromFunctionObjects<spacedim> select_component(

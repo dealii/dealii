@@ -222,7 +222,8 @@ namespace WorkStream
               : currently_in_use(false)
             {}
 
-            ScratchDataObject(ScratchDataObject &&o) noexcept = default;
+            ScratchDataObject(ScratchDataObject DEAL_II_AND o) noexcept =
+              default;
           };
 
 
@@ -332,7 +333,8 @@ namespace WorkStream
           for (unsigned int element = 0; element < item_buffer.size();
                ++element)
             {
-              Assert(item_buffer[element].n_items == 0, ExcInternalError());
+              Assert(item_buffer[element].n_items DEAL_II_EQUALS 0,
+                     ExcInternalError());
 
               item_buffer[element].work_items.resize(
                 chunk_size, remaining_iterator_range.second);
@@ -367,7 +369,7 @@ namespace WorkStream
           // problems)
           ItemType *current_item = nullptr;
           for (unsigned int i = 0; i < item_buffer.size(); ++i)
-            if (item_buffer[i].currently_in_use == false)
+            if (item_buffer[i].currently_in_use DEAL_II_EQUALS false)
               {
                 item_buffer[i].currently_in_use = true;
                 current_item                    = &item_buffer[i];
@@ -380,9 +382,9 @@ namespace WorkStream
           // consist of at most chunk_size
           // elements
           current_item->n_items = 0;
-          while ((remaining_iterator_range.first !=
-                  remaining_iterator_range.second) &&
-                 (current_item->n_items < chunk_size))
+          while (
+            (remaining_iterator_range.first != remaining_iterator_range.second)
+              DEAL_II_AND(current_item->n_items < chunk_size))
             {
               current_item->work_items[current_item->n_items] =
                 remaining_iterator_range.first;
@@ -391,7 +393,7 @@ namespace WorkStream
               ++current_item->n_items;
             }
 
-          if (current_item->n_items == 0)
+          if (current_item->n_items DEAL_II_EQUALS 0)
             // there were no items
             // left. terminate the pipeline
             return nullptr;
@@ -522,7 +524,7 @@ namespace WorkStream
                    scratch_data_list.begin();
                  p != scratch_data_list.end();
                  ++p)
-              if (p->currently_in_use == false)
+              if (p->currently_in_use DEAL_II_EQUALS false)
                 {
                   scratch_data        = p->scratch_data.get();
                   p->currently_in_use = true;
@@ -530,7 +532,7 @@ namespace WorkStream
                 }
 
             // if no object was found, create one and mark it as used
-            if (scratch_data == nullptr)
+            if (scratch_data DEAL_II_EQUALS nullptr)
               {
                 scratch_data =
                   new ScratchData(*current_item->sample_scratch_data);
@@ -575,15 +577,16 @@ namespace WorkStream
                    scratch_data_list.begin();
                  p != scratch_data_list.end();
                  ++p)
-              if (p->scratch_data.get() == scratch_data)
+              if (p->scratch_data.get() DEAL_II_EQUALS scratch_data)
                 {
-                  Assert(p->currently_in_use == true, ExcInternalError());
+                  Assert(p->currently_in_use DEAL_II_EQUALS true,
+                         ExcInternalError());
                   p->currently_in_use = false;
                 }
           }
 
           // if there is no copier, mark current item as usable again
-          if (copier_exist == false)
+          if (copier_exist DEAL_II_EQUALS false)
             current_item->currently_in_use = false;
 
 
@@ -849,9 +852,9 @@ namespace WorkStream
           : currently_in_use(false)
         {}
 
-        ScratchAndCopyDataObjects(std::unique_ptr<ScratchData> &&p,
-                                  std::unique_ptr<CopyData> &&   q,
-                                  const bool                     in_use)
+        ScratchAndCopyDataObjects(std::unique_ptr<ScratchData> DEAL_II_AND p,
+                                  std::unique_ptr<CopyData> DEAL_II_AND q,
+                                  const bool                            in_use)
           : scratch_data(std::move(p))
           , copy_data(std::move(q))
           , currently_in_use(in_use)
@@ -921,7 +924,7 @@ namespace WorkStream
                    scratch_and_copy_data_list.begin();
                  p != scratch_and_copy_data_list.end();
                  ++p)
-              if (p->currently_in_use == false)
+              if (p->currently_in_use DEAL_II_EQUALS false)
                 {
                   scratch_data        = p->scratch_data.get();
                   copy_data           = p->copy_data.get();
@@ -931,9 +934,9 @@ namespace WorkStream
 
             // if no element in the list was found, create one and mark it as
             // used
-            if (scratch_data == nullptr)
+            if (scratch_data DEAL_II_EQUALS nullptr)
               {
-                Assert(copy_data == nullptr, ExcInternalError());
+                Assert(copy_data DEAL_II_EQUALS nullptr, ExcInternalError());
 
                 scratch_and_copy_data_list.emplace_back(
                   std::make_unique<ScratchData>(sample_scratch_data),
@@ -978,9 +981,10 @@ namespace WorkStream
                    scratch_and_copy_data_list.begin();
                  p != scratch_and_copy_data_list.end();
                  ++p)
-              if (p->scratch_data.get() == scratch_data)
+              if (p->scratch_data.get() DEAL_II_EQUALS scratch_data)
                 {
-                  Assert(p->currently_in_use == true, ExcInternalError());
+                  Assert(p->currently_in_use DEAL_II_EQUALS true,
+                         ExcInternalError());
                   p->currently_in_use = false;
                 }
           }

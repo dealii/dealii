@@ -52,7 +52,7 @@ template <typename number>
 bool
 TridiagonalMatrix<number>::all_zero() const
 {
-  Assert(state == matrix, ExcState(state));
+  Assert(state DEAL_II_EQUALS matrix, ExcState(state));
 
   typename std::vector<number>::const_iterator i;
   typename std::vector<number>::const_iterator e;
@@ -82,12 +82,12 @@ TridiagonalMatrix<number>::vmult(Vector<number> &      w,
                                  const Vector<number> &v,
                                  const bool            adding) const
 {
-  Assert(state == matrix, ExcState(state));
+  Assert(state DEAL_II_EQUALS matrix, ExcState(state));
 
-  Assert(w.size() == n(), ExcDimensionMismatch(w.size(), n()));
-  Assert(v.size() == n(), ExcDimensionMismatch(v.size(), n()));
+  Assert(w.size() DEAL_II_EQUALS n(), ExcDimensionMismatch(w.size(), n()));
+  Assert(v.size() DEAL_II_EQUALS n(), ExcDimensionMismatch(v.size(), n()));
 
-  if (n() == 0)
+  if (n() DEAL_II_EQUALS 0)
     return;
 
   // The actual loop skips the first
@@ -146,12 +146,12 @@ TridiagonalMatrix<number>::Tvmult(Vector<number> &      w,
                                   const Vector<number> &v,
                                   const bool            adding) const
 {
-  Assert(state == matrix, ExcState(state));
+  Assert(state DEAL_II_EQUALS matrix, ExcState(state));
 
-  Assert(w.size() == n(), ExcDimensionMismatch(w.size(), n()));
-  Assert(v.size() == n(), ExcDimensionMismatch(v.size(), n()));
+  Assert(w.size() DEAL_II_EQUALS n(), ExcDimensionMismatch(w.size(), n()));
+  Assert(v.size() DEAL_II_EQUALS n(), ExcDimensionMismatch(v.size(), n()));
 
-  if (n() == 0)
+  if (n() DEAL_II_EQUALS 0)
     return;
 
   const size_type                              e = n() - 1;
@@ -200,7 +200,7 @@ number
 TridiagonalMatrix<number>::matrix_scalar_product(const Vector<number> &w,
                                                  const Vector<number> &v) const
 {
-  Assert(state == matrix, ExcState(state));
+  Assert(state DEAL_II_EQUALS matrix, ExcState(state));
 
   const size_type                              e = n() - 1;
   typename std::vector<number>::const_iterator d = diagonal.begin();
@@ -236,7 +236,7 @@ void
 TridiagonalMatrix<number>::compute_eigenvalues()
 {
 #ifdef DEAL_II_WITH_LAPACK
-  Assert(state == matrix, ExcState(state));
+  Assert(state DEAL_II_EQUALS matrix, ExcState(state));
   Assert(is_symmetric, ExcNotImplemented());
 
   const types::blas_int nn = n();
@@ -249,7 +249,7 @@ TridiagonalMatrix<number>::compute_eigenvalues()
        &one,
        static_cast<number *>(nullptr),
        &info);
-  Assert(info == 0, ExcInternalError());
+  Assert(info DEAL_II_EQUALS 0, ExcInternalError());
 
   state = LAPACKSupport::eigenvalues;
 #else
@@ -263,7 +263,7 @@ template <typename number>
 number
 TridiagonalMatrix<number>::eigenvalue(const size_type i) const
 {
-  Assert(state == LAPACKSupport::eigenvalues, ExcState(state));
+  Assert(state DEAL_II_EQUALS LAPACKSupport::eigenvalues, ExcState(state));
   AssertIndexRange(i, n());
   return diagonal[i];
 }

@@ -193,8 +193,9 @@ template <typename OutVectorType, typename InVectorType>
 inline void
 IdentityMatrix::vmult(OutVectorType &out, const InVectorType &in) const
 {
-  Assert(out.size() == size, ExcDimensionMismatch(out.size(), size));
-  Assert(in.size() == size, ExcDimensionMismatch(in.size(), size));
+  Assert(out.size() DEAL_II_EQUALS size,
+         ExcDimensionMismatch(out.size(), size));
+  Assert(in.size() DEAL_II_EQUALS size, ExcDimensionMismatch(in.size(), size));
 
   out = in;
 }
@@ -205,8 +206,9 @@ template <typename OutVectorType, typename InVectorType>
 inline void
 IdentityMatrix::vmult_add(OutVectorType &out, const InVectorType &in) const
 {
-  Assert(out.size() == size, ExcDimensionMismatch(out.size(), size));
-  Assert(in.size() == size, ExcDimensionMismatch(in.size(), size));
+  Assert(out.size() DEAL_II_EQUALS size,
+         ExcDimensionMismatch(out.size(), size));
+  Assert(in.size() DEAL_II_EQUALS size, ExcDimensionMismatch(in.size(), size));
 
   out += in;
 }
@@ -217,8 +219,9 @@ template <typename OutVectorType, typename InVectorType>
 inline void
 IdentityMatrix::Tvmult(OutVectorType &out, const InVectorType &in) const
 {
-  Assert(out.size() == size, ExcDimensionMismatch(out.size(), size));
-  Assert(in.size() == size, ExcDimensionMismatch(in.size(), size));
+  Assert(out.size() DEAL_II_EQUALS size,
+         ExcDimensionMismatch(out.size(), size));
+  Assert(in.size() DEAL_II_EQUALS size, ExcDimensionMismatch(in.size(), size));
 
   out = in;
 }
@@ -229,8 +232,9 @@ template <typename OutVectorType, typename InVectorType>
 inline void
 IdentityMatrix::Tvmult_add(OutVectorType &out, const InVectorType &in) const
 {
-  Assert(out.size() == size, ExcDimensionMismatch(out.size(), size));
-  Assert(in.size() == size, ExcDimensionMismatch(in.size(), size));
+  Assert(out.size() DEAL_II_EQUALS size,
+         ExcDimensionMismatch(out.size(), size));
+  Assert(in.size() DEAL_II_EQUALS size, ExcDimensionMismatch(in.size(), size));
 
   out += in;
 }

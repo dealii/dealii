@@ -174,7 +174,8 @@ namespace FETools
             sizeof(typename dealii::internal::p4est::types<dim>::quadrant));
           ptr += sizeof(typename dealii::internal::p4est::types<dim>::quadrant);
 
-          Assert(ptr == buffer.data() + buffer.size(), ExcInternalError());
+          Assert(ptr DEAL_II_EQUALS buffer.data() + buffer.size(),
+                 ExcInternalError());
         }
 
         void
@@ -198,7 +199,8 @@ namespace FETools
             sizeof(typename dealii::internal::p4est::types<dim>::quadrant));
           ptr += sizeof(typename dealii::internal::p4est::types<dim>::quadrant);
 
-          Assert(ptr == buffer.data() + buffer.size(), ExcInternalError());
+          Assert(ptr DEAL_II_EQUALS buffer.data() + buffer.size(),
+                 ExcInternalError());
         }
       };
 
@@ -517,14 +519,15 @@ namespace FETools
 
       // if neither this cell nor one of it's children belongs to us, don't do
       // anything
-      if (idx == -1 &&
-          (dealii::internal::p4est::functions<dim>::quadrant_overlaps_tree(
-             const_cast<typename dealii::internal::p4est::types<dim>::tree *>(
-               &tree),
-             &p4est_cell) == false))
+      if (idx DEAL_II_EQUALS -
+          1 DEAL_II_AND(
+            dealii::internal::p4est::functions<dim>::quadrant_overlaps_tree(
+              const_cast<typename dealii::internal::p4est::types<dim>::tree *>(
+                &tree),
+              &p4est_cell) DEAL_II_EQUALS false))
         return;
 
-      bool p4est_has_children = (idx == -1);
+      bool p4est_has_children = (idx DEAL_II_EQUALS - 1);
 
       bool locally_owned_children = false;
       if (p4est_has_children)
@@ -564,7 +567,7 @@ namespace FETools
           // at this point of
           // the procedure no new
           // needs should come up
-          Assert(new_needs.size() == 0, ExcInternalError());
+          Assert(new_needs.size() DEAL_II_EQUALS 0, ExcInternalError());
 
           set_dof_values_by_interpolation(dealii_cell,
                                           p4est_cell,
@@ -610,12 +613,13 @@ namespace FETools
             dealii_cell->get_dof_handler().get_fe();
           const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
-          Assert(interpolated_values.size() == dofs_per_cell,
+          Assert(interpolated_values.size() DEAL_II_EQUALS dofs_per_cell,
                  ExcDimensionMismatch(interpolated_values.size(),
                                       dofs_per_cell));
-          Assert(u.size() == dealii_cell->get_dof_handler().n_dofs(),
-                 ExcDimensionMismatch(u.size(),
-                                      dealii_cell->get_dof_handler().n_dofs()));
+          Assert(
+            u.size() DEAL_II_EQUALS dealii_cell->get_dof_handler().n_dofs(),
+            ExcDimensionMismatch(u.size(),
+                                 dealii_cell->get_dof_handler().n_dofs()));
 
           Vector<value_type> tmp1(dofs_per_cell);
           Vector<value_type> tmp2(dofs_per_cell);
@@ -640,7 +644,7 @@ namespace FETools
                       const_cast<
                         typename dealii::internal::p4est::types<dim>::tree *>(
                         &tree),
-                      &p4est_child[c]) == false)
+                      &p4est_child[c]) DEAL_II_EQUALS false)
                 {
                   // this is a cell this process needs
                   // data from another process
@@ -652,7 +656,7 @@ namespace FETools
                   cell_data.quadrant = p4est_child[c];
                   int pos = cell_data_search(cell_data, available_cells);
 
-                  if (pos == -1)
+                  if (pos DEAL_II_EQUALS - 1)
                     {
                       // data is not available
                       // create a new need
@@ -666,8 +670,8 @@ namespace FETools
                     }
                   else
                     {
-                      Assert(available_cells[pos].dof_values.size() ==
-                               dofs_per_cell,
+                      Assert(available_cells[pos].dof_values.size()
+                               DEAL_II_EQUALS dofs_per_cell,
                              ExcDimensionMismatch(
                                available_cells[pos].dof_values.size(),
                                dofs_per_cell));
@@ -709,7 +713,7 @@ namespace FETools
                 }
             }
 
-          if (found_child == false)
+          if (found_child DEAL_II_EQUALS false)
             interpolated_values = 0;
         }
     }
@@ -743,9 +747,9 @@ namespace FETools
                   const bool on_refined_neighbor =
                     (dofs_on_refined_neighbors.find(indices[j]) !=
                      dofs_on_refined_neighbors.end());
-                  if (!(on_refined_neighbor &&
-                        dofs_on_refined_neighbors[indices[j]] >
-                          dealii_cell->level()))
+                  if (!(on_refined_neighbor DEAL_II_AND
+                                            dofs_on_refined_neighbors[indices[j]] >
+                        dealii_cell->level()))
                     ::dealii::internal::ElementAccess<OutVector>::set(
                       local_values(j), indices[j], u);
                 }
@@ -753,11 +757,12 @@ namespace FETools
         }
       else
         {
-          Assert(local_values.size() == dofs_per_cell,
+          Assert(local_values.size() DEAL_II_EQUALS dofs_per_cell,
                  ExcDimensionMismatch(local_values.size(), dofs_per_cell));
-          Assert(u.size() == dealii_cell->get_dof_handler().n_dofs(),
-                 ExcDimensionMismatch(u.size(),
-                                      dealii_cell->get_dof_handler().n_dofs()));
+          Assert(
+            u.size() DEAL_II_EQUALS dealii_cell->get_dof_handler().n_dofs(),
+            ExcDimensionMismatch(u.size(),
+                                 dealii_cell->get_dof_handler().n_dofs()));
 
           Vector<value_type> tmp(dofs_per_cell);
 
@@ -802,8 +807,8 @@ namespace FETools
         {
           if (dealii::internal::p4est::tree_exists_locally<dim>(
                 tr->parallel_forest,
-                tr->coarse_cell_to_p4est_tree_permutation[cell->index()]) ==
-              false)
+                tr->coarse_cell_to_p4est_tree_permutation[cell->index()])
+                DEAL_II_EQUALS false)
             continue;
 
           typename dealii::internal::p4est::types<dim>::quadrant
@@ -826,7 +831,7 @@ namespace FETools
               &p4est_coarse_cell,
               dealii::internal::p4est::functions<dim>::quadrant_compare);
 
-            AssertThrow(idx == -1, ExcGridNotRefinedAtLeastOnce());
+            AssertThrow(idx DEAL_II_EQUALS - 1, ExcGridNotRefinedAtLeastOnce());
           }
 
           traverse_tree_recursively(*tr->parallel_forest,
@@ -860,14 +865,15 @@ namespace FETools
 
       // if neither this cell nor one of it's children belongs to us, don't do
       // anything
-      if (idx == -1 &&
-          (dealii::internal::p4est::functions<dim>::quadrant_overlaps_tree(
-             const_cast<typename dealii::internal::p4est::types<dim>::tree *>(
-               &tree),
-             &p4est_cell) == false))
+      if (idx DEAL_II_EQUALS -
+          1 DEAL_II_AND(
+            dealii::internal::p4est::functions<dim>::quadrant_overlaps_tree(
+              const_cast<typename dealii::internal::p4est::types<dim>::tree *>(
+                &tree),
+              &p4est_cell) DEAL_II_EQUALS false))
         return;
 
-      bool p4est_has_children = (idx == -1);
+      bool p4est_has_children = (idx DEAL_II_EQUALS - 1);
 
       // this cell is part of a patch
       // this process has to interpolate on
@@ -954,7 +960,7 @@ namespace FETools
                       const_cast<
                         typename dealii::internal::p4est::types<dim>::tree *>(
                         &tree),
-                      &p4est_child[c]) == false)
+                      &p4est_child[c]) DEAL_II_EQUALS false)
                 {
                   // this is a cell for which this process
                   // needs data from another process
@@ -1017,9 +1023,9 @@ namespace FETools
           const unsigned int tree_index =
             tr->coarse_cell_to_p4est_tree_permutation[cell->index()];
 
-          if ((trees.find(tree_index) == trees.end()) ||
-              (dealii::internal::p4est::tree_exists_locally<dim>(
-                 tr->parallel_forest, tree_index) == false))
+          if ((trees.find(tree_index) DEAL_II_EQUALS trees.end())DEAL_II_OR(
+                dealii::internal::p4est::tree_exists_locally<dim>(
+                  tr->parallel_forest, tree_index) DEAL_II_EQUALS false))
             continue;
 
           typename dealii::internal::p4est::types<dim>::quadrant
@@ -1059,7 +1065,7 @@ namespace FETools
         std::vector<CellData> &computed_cells,
         std::vector<CellData> &new_needs)
     {
-      if (cells_to_compute.size() == 0)
+      if (cells_to_compute.size() DEAL_II_EQUALS 0)
         return;
 
       // check if this cell exists in the local p4est
@@ -1070,14 +1076,15 @@ namespace FETools
 
       // if neither this cell nor one of it's children belongs to us, don't do
       // anything
-      if (idx == -1 &&
-          (dealii::internal::p4est::functions<dim>::quadrant_overlaps_tree(
-             const_cast<typename dealii::internal::p4est::types<dim>::tree *>(
-               &tree),
-             &p4est_cell) == false))
+      if (idx DEAL_II_EQUALS -
+          1 DEAL_II_AND(
+            dealii::internal::p4est::functions<dim>::quadrant_overlaps_tree(
+              const_cast<typename dealii::internal::p4est::types<dim>::tree *>(
+                &tree),
+              &p4est_cell) DEAL_II_EQUALS false))
         return;
 
-      bool p4est_has_children = (idx == -1);
+      bool p4est_has_children = (idx DEAL_II_EQUALS - 1);
 
       // check if this quadrant is in the list
       CellData cell_data;
@@ -1100,7 +1107,7 @@ namespace FETools
           // store cell_data in the list of
           // computed cells and erase this cell
           // from the list of cells to compute
-          if (tmp.size() == 0)
+          if (tmp.size() DEAL_II_EQUALS 0)
             {
               cell_data_insert(cells_to_compute[pos], computed_cells);
               cells_to_compute.erase(cells_to_compute.begin() + pos);
@@ -1178,7 +1185,8 @@ namespace FETools
           AssertThrowMPI(ierr);
         }
 
-      Assert(destinations.size() == cells_to_send.size(), ExcInternalError());
+      Assert(destinations.size() DEAL_II_EQUALS cells_to_send.size(),
+             ExcInternalError());
 
       const unsigned int n_senders =
         Utilities::MPI::compute_n_point_to_point_communications(communicator,
@@ -1269,7 +1277,7 @@ namespace FETools
       typename std::vector<CellData>::const_iterator bound =
         std::lower_bound(cells_list.begin(), cells_list.end(), cell_data);
 
-      if ((bound != cells_list.end()) && !(cell_data < *bound))
+      if ((bound != cells_list.end()) DEAL_II_AND !(cell_data < *bound))
         return static_cast<int>(bound - cells_list.begin());
 
       return -1;
@@ -1286,7 +1294,7 @@ namespace FETools
       typename std::vector<CellData>::iterator bound =
         std::lower_bound(cells_list.begin(), cells_list.end(), cell_data);
 
-      if ((bound == cells_list.end()) || (cell_data < *bound))
+      if ((bound DEAL_II_EQUALS cells_list.end())DEAL_II_OR(cell_data < *bound))
         cells_list.insert(bound, 1, cell_data);
     }
 
@@ -1465,8 +1473,8 @@ namespace FETools
           {
             if (dealii::internal::p4est::tree_exists_locally<dim>(
                   tr->parallel_forest,
-                  tr->coarse_cell_to_p4est_tree_permutation[cell->index()]) ==
-                false)
+                  tr->coarse_cell_to_p4est_tree_permutation[cell->index()])
+                  DEAL_II_EQUALS false)
               continue;
 
             typename dealii::internal::p4est::types<dim>::quadrant
@@ -1783,14 +1791,16 @@ namespace FETools
     const AffineConstraints<typename OutVector::value_type> &constraints,
     OutVector &                                              u2)
   {
-    Assert(dof1.get_fe(0).n_components() == dof2.get_fe(0).n_components(),
+    Assert(dof1.get_fe(0)
+             .n_components() DEAL_II_EQUALS dof2.get_fe(0)
+             .n_components(),
            ExcDimensionMismatch(dof1.get_fe(0).n_components(),
                                 dof2.get_fe(0).n_components()));
-    Assert(&dof1.get_triangulation() == &dof2.get_triangulation(),
+    Assert(&dof1.get_triangulation() DEAL_II_EQUALS & dof2.get_triangulation(),
            ExcTriangulationMismatch());
-    Assert(u1.size() == dof1.n_dofs(),
+    Assert(u1.size() DEAL_II_EQUALS dof1.n_dofs(),
            ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
-    Assert(u2.size() == dof2.n_dofs(),
+    Assert(u2.size() DEAL_II_EQUALS dof2.n_dofs(),
            ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
     // make sure that each cell on the coarsest level is at least once refined,
@@ -1799,7 +1809,7 @@ namespace FETools
       typename DoFHandler<dim, spacedim>::cell_iterator cell = dof2.begin(0),
                                                         endc = dof2.end(0);
       for (; cell != endc; ++cell)
-        Assert(cell->has_children() || cell->is_artificial(),
+        Assert(cell->has_children() DEAL_II_OR cell->is_artificial(),
                ExcGridNotRefinedAtLeastOnce());
     }
 

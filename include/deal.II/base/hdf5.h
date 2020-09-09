@@ -107,7 +107,7 @@ DEAL_II_NAMESPACE_OPEN
  * @code
  * std::vector<hsize_t> dataset_dimensions = {50, 30};
  * auto dataset = group.create_dataset<double>("name", dataset_dimensions);
- * if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+ * if (Utilities::MPI::this_mpi_process(mpi_communicator) DEAL_II_EQUALS  0)
  *   {
  *     // hyperslab_data can be std::vector, FullMatrix or Vector
  *     FullMatrix<double> hyperslab_data = {...};
@@ -140,7 +140,7 @@ DEAL_II_NAMESPACE_OPEN
  * std::vector<hsize_t> dataset_dimensions = {50, 30};
  * auto dataset = group.create_dataset<double>("name", dataset_dimensions);
  *
- * if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+ * if (Utilities::MPI::this_mpi_process(mpi_communicator) DEAL_II_EQUALS  0)
  *   {
  *     std::vector<hsize_t> coordinates = {0,
  *                                         0, // first point
@@ -153,7 +153,7 @@ DEAL_II_NAMESPACE_OPEN
  *     std::vector<double>  data        = {2, 3, 5, 6};
  *     dataset.write_selection(data, coordinates);
  *   }
- * else if (Utilities::MPI::this_mpi_process(mpi_communicator) == 1)
+ * else if (Utilities::MPI::this_mpi_process(mpi_communicator) DEAL_II_EQUALS  1)
  *   {
  *     std::vector<hsize_t> coordinates = {5,
  *                                         0, // first point
@@ -198,7 +198,7 @@ DEAL_II_NAMESPACE_OPEN
  * dataset.set_query_io_mode(true);
  * #endif
  *
- * if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+ * if (Utilities::MPI::this_mpi_process(mpi_communicator) DEAL_II_EQUALS  0)
  *   {
  *     dataset.write(data);
  *   }
@@ -240,7 +240,7 @@ DEAL_II_NAMESPACE_OPEN
  * // Dataset of rank 2. dim_0 = 50, dim_1 = 30
  * std::vector<hsize_t> dataset_dimensions = {50, 30};
  * auto dataset = group.create_dataset<double>("name", dataset_dimensions);
- * if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+ * if (Utilities::MPI::this_mpi_process(mpi_communicator) DEAL_II_EQUALS  0)
  *   {
  *     // hyperslab_data can be std::vector, FullMatrix or Vector
  *     std::vector<double> hyperslab_data = {0,1,2,3,4,5};
@@ -1514,37 +1514,37 @@ namespace HDF5
       // MPI/IO driver.
 
       // H5D_MPIO_COLLECTIVE
-      if (no_collective_cause == 0x00)
+      if (no_collective_cause DEAL_II_EQUALS 0x00)
         {
           append_to_message("H5D_MPIO_COLLECTIVE");
         }
       // H5D_MPIO_SET_INDEPENDENT
-      if ((no_collective_cause & 0x01) == 0x01)
+      if ((no_collective_cause & 0x01) DEAL_II_EQUALS 0x01)
         {
           append_to_message("H5D_MPIO_SET_INDEPENDENT");
         }
       // H5D_MPIO_DATATYPE_CONVERSION
-      if ((no_collective_cause & 0x02) == 0x02)
+      if ((no_collective_cause & 0x02) DEAL_II_EQUALS 0x02)
         {
           append_to_message("H5D_MPIO_DATATYPE_CONVERSION");
         }
       // H5D_MPIO_DATA_TRANSFORMS
-      if ((no_collective_cause & 0x04) == 0x04)
+      if ((no_collective_cause & 0x04) DEAL_II_EQUALS 0x04)
         {
           append_to_message("H5D_MPIO_DATA_TRANSFORMS");
         }
       // H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES
-      if ((no_collective_cause & 0x10) == 0x10)
+      if ((no_collective_cause & 0x10) DEAL_II_EQUALS 0x10)
         {
           append_to_message("H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES");
         }
       // H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET
-      if ((no_collective_cause & 0x20) == 0x20)
+      if ((no_collective_cause & 0x20) DEAL_II_EQUALS 0x20)
         {
           append_to_message("H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET");
         }
       // H5D_MPIO_FILTERS
-      if ((no_collective_cause & 0x40) == 0x40)
+      if ((no_collective_cause & 0x40) DEAL_II_EQUALS 0x40)
         {
           append_to_message("H5D_MPIO_FILTERS");
         }
@@ -1787,7 +1787,7 @@ namespace HDF5
   Container
   DataSet::read_selection(const std::vector<hsize_t> &coordinates)
   {
-    Assert(coordinates.size() % rank == 0,
+    Assert(coordinates.size() % rank DEAL_II_EQUALS 0,
            ExcMessage(
              "The dimension of coordinates has to be divisible by the rank"));
     const std::shared_ptr<hid_t> t_type =

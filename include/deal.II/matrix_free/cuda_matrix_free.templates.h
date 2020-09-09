@@ -325,12 +325,12 @@ namespace CUDAWrappers
       // TODO this should be a templated parameter.
       const unsigned int n_dofs_1d = fe_degree + 1;
 
-      if (data->parallelization_scheme ==
-          MatrixFree<dim, Number>::parallel_in_elem)
+      if (data->parallelization_scheme DEAL_II_EQUALS
+                                       MatrixFree<dim, Number>::parallel_in_elem)
         {
-          if (dim == 1)
+          if (dim DEAL_II_EQUALS 1)
             data->block_dim[color] = dim3(n_dofs_1d * cells_per_block);
-          else if (dim == 2)
+          else if (dim DEAL_II_EQUALS 2)
             data->block_dim[color] =
               dim3(n_dofs_1d * cells_per_block, n_dofs_1d);
           else
@@ -425,8 +425,8 @@ namespace CUDAWrappers
       const unsigned int n_cells = data->n_cells[color];
 
       // Local-to-global mapping
-      if (data->parallelization_scheme ==
-          MatrixFree<dim, Number>::parallel_over_elem)
+      if (data->parallelization_scheme DEAL_II_EQUALS
+                                       MatrixFree<dim, Number>::parallel_over_elem)
         transpose_in_place(local_to_global_host, n_cells, padding_length);
 
       alloc_and_copy(
@@ -438,8 +438,8 @@ namespace CUDAWrappers
       // Quadrature points
       if (update_flags & update_quadrature_points)
         {
-          if (data->parallelization_scheme ==
-              MatrixFree<dim, Number>::parallel_over_elem)
+          if (data->parallelization_scheme DEAL_II_EQUALS
+                                           MatrixFree<dim, Number>::parallel_over_elem)
             transpose_in_place(q_points_host, n_cells, padding_length);
 
           alloc_and_copy(&data->q_points[color],
@@ -451,8 +451,8 @@ namespace CUDAWrappers
       // Jacobian determinants/quadrature weights
       if (update_flags & update_JxW_values)
         {
-          if (data->parallelization_scheme ==
-              MatrixFree<dim, Number>::parallel_over_elem)
+          if (data->parallelization_scheme DEAL_II_EQUALS
+                                           MatrixFree<dim, Number>::parallel_over_elem)
             transpose_in_place(JxW_host, n_cells, padding_length);
 
           alloc_and_copy(&data->JxW[color],
@@ -475,8 +475,8 @@ namespace CUDAWrappers
           // Transpose second time means we get the following index order:
           // q*n_cells*dim*dim + i*n_cells + cell_id which is good for an
           // element-level parallelization
-          if (data->parallelization_scheme ==
-              MatrixFree<dim, Number>::parallel_over_elem)
+          if (data->parallelization_scheme DEAL_II_EQUALS
+                                           MatrixFree<dim, Number>::parallel_over_elem)
             transpose_in_place(inv_jacobian_host,
                                n_cells * dim * dim,
                                padding_length);
@@ -526,7 +526,7 @@ namespace CUDAWrappers
       // When working with distributed vectors, the constrained dofs are
       // computed for ghosted vectors but we want to copy the values of the
       // constrained dofs of non-ghosted vectors.
-      if ((dof < n_constrained_dofs) && (constrained_dofs[dof] < size))
+      if ((dof < n_constrained_dofs) DEAL_II_AND(constrained_dofs[dof] < size))
         dst[constrained_dofs[dof]] = src[constrained_dofs[dof]];
     }
 
@@ -546,7 +546,7 @@ namespace CUDAWrappers
       // When working with distributed vectors, the constrained dofs are
       // computed for ghosted vectors but we want to set the values of the
       // constrained dofs of non-ghosted vectors.
-      if ((dof < n_constrained_dofs) && (constrained_dofs[dof] < size))
+      if ((dof < n_constrained_dofs) DEAL_II_AND(constrained_dofs[dof] < size))
         dst[constrained_dofs[dof]] = val;
     }
 
@@ -854,13 +854,14 @@ namespace CUDAWrappers
   {
     dof_handler = &dof_handler_;
 
-    if (typeid(Number) == typeid(double))
+    if (typeid(Number) DEAL_II_EQUALS typeid(double))
       cudaDeviceSetSharedMemConfig(cudaSharedMemBankSizeEightByte);
 
     const UpdateFlags &update_flags = additional_data.mapping_update_flags;
 
-    if (additional_data.parallelization_scheme != parallel_over_elem &&
-        additional_data.parallelization_scheme != parallel_in_elem)
+    if (additional_data.parallelization_scheme !=
+        parallel_over_elem DEAL_II_AND additional_data.parallelization_scheme !=
+        parallel_in_elem)
       AssertThrow(false, ExcMessage("Invalid parallelization scheme."));
 
     this->parallelization_scheme = additional_data.parallelization_scheme;
@@ -880,7 +881,7 @@ namespace CUDAWrappers
     const unsigned int n_dofs_1d     = fe_degree + 1;
     const unsigned int n_q_points_1d = quad.size();
 
-    Assert(n_dofs_1d == n_q_points_1d,
+    Assert(n_dofs_1d DEAL_II_EQUALS n_q_points_1d,
            ExcMessage("n_q_points_1d must be equal to fe_degree+1."));
 
     // Set padding length to the closest power of two larger than or equal to
@@ -1156,8 +1157,10 @@ namespace CUDAWrappers
   {
     // in case we have compatible partitioners, we can simply use the provided
     // vectors
-    if (src.get_partitioner().get() == partitioner.get() &&
-        dst.get_partitioner().get() == partitioner.get())
+    if (src.get_partitioner()
+          .get() DEAL_II_EQUALS partitioner.get()
+            DEAL_II_AND         dst.get_partitioner()
+          .get() DEAL_II_EQUALS partitioner.get())
       {
         // This code is inspired to the code in TaskInfo::loop.
         if (overlap_communication_computation)
@@ -1273,7 +1276,7 @@ namespace CUDAWrappers
   MatrixFree<dim, Number>::serial_copy_constrained_values(const VectorType &src,
                                                           VectorType &dst) const
   {
-    Assert(src.size() == dst.size(),
+    Assert(src.size() DEAL_II_EQUALS dst.size(),
            ExcMessage("src and dst vectors have different size."));
     internal::copy_constrained_dofs<Number>
       <<<constraint_grid_dim, constraint_block_dim>>>(constrained_dofs,
@@ -1292,7 +1295,7 @@ namespace CUDAWrappers
     const LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &src,
     LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &dst) const
   {
-    Assert(src.size() == dst.size(),
+    Assert(src.size() DEAL_II_EQUALS dst.size(),
            ExcMessage("src and dst vectors have different local size."));
     internal::copy_constrained_dofs<Number>
       <<<constraint_grid_dim, constraint_block_dim>>>(constrained_dofs,

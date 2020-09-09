@@ -171,13 +171,13 @@ namespace MatrixCreator
       const FiniteElement<dim, spacedim> &fe = fe_values.get_fe();
       const unsigned int                  n_components = fe.n_components();
 
-      Assert(data.rhs_function == nullptr ||
-               data.rhs_function->n_components == 1 ||
-               data.rhs_function->n_components == n_components,
+      Assert(data.rhs_function DEAL_II_EQUALS nullptr DEAL_II_OR data
+               .rhs_function->n_components DEAL_II_EQUALS 1 DEAL_II_OR data
+               .rhs_function->n_components DEAL_II_EQUALS n_components,
              ::dealii::MatrixCreator::ExcComponentMismatch());
-      Assert(data.coefficient == nullptr ||
-               data.coefficient->n_components == 1 ||
-               data.coefficient->n_components == n_components,
+      Assert(data.coefficient DEAL_II_EQUALS nullptr DEAL_II_OR data
+               .coefficient->n_components DEAL_II_EQUALS 1 DEAL_II_OR data
+               .coefficient->n_components DEAL_II_EQUALS n_components,
              ::dealii::MatrixCreator::ExcComponentMismatch());
 
       copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
@@ -189,7 +189,7 @@ namespace MatrixCreator
       const bool use_rhs_function = data.rhs_function != nullptr;
       if (use_rhs_function)
         {
-          if (data.rhs_function->n_components == 1)
+          if (data.rhs_function->n_components DEAL_II_EQUALS 1)
             {
               data.rhs_values.resize(n_q_points);
               data.rhs_function->value_list(fe_values.get_quadrature_points(),
@@ -207,7 +207,7 @@ namespace MatrixCreator
       const bool use_coefficient = data.coefficient != nullptr;
       if (use_coefficient)
         {
-          if (data.coefficient->n_components == 1)
+          if (data.coefficient->n_components DEAL_II_EQUALS 1)
             {
               data.coefficient_values.resize(n_q_points);
               data.coefficient->value_list(fe_values.get_quadrature_points(),
@@ -237,14 +237,15 @@ namespace MatrixCreator
             // and half of the elements above the
             // diagonal
             for (unsigned int j = i; j < dofs_per_cell; ++j)
-              if ((n_components == 1) ||
-                  (fe.system_to_component_index(j).first == component_i))
+              if ((n_components DEAL_II_EQUALS 1)DEAL_II_OR(
+                    fe.system_to_component_index(j).first DEAL_II_EQUALS
+                                                          component_i))
                 {
                   const double *phi_j    = &fe_values.shape_value(j, 0);
                   number        add_data = 0;
                   if (use_coefficient)
                     {
-                      if (data.coefficient->n_components == 1)
+                      if (data.coefficient->n_components DEAL_II_EQUALS 1)
                         for (unsigned int point = 0; point < n_q_points;
                              ++point)
                           add_data +=
@@ -262,7 +263,7 @@ namespace MatrixCreator
                     for (unsigned int point = 0; point < n_q_points; ++point)
                       add_data += phi_i[point] * phi_j[point] * JxW[point];
 
-                  // this is even ok for i==j, since then
+                  // this is even ok for iDEAL_II_EQUALS j, since then
                   // we just write the same value twice.
                   copy_data.cell_matrix(i, j) = add_data;
                   copy_data.cell_matrix(j, i) = add_data;
@@ -271,7 +272,7 @@ namespace MatrixCreator
             if (use_rhs_function)
               {
                 number add_data = 0;
-                if (data.rhs_function->n_components == 1)
+                if (data.rhs_function->n_components DEAL_II_EQUALS 1)
                   for (unsigned int point = 0; point < n_q_points; ++point)
                     add_data +=
                       data.rhs_values[point] * phi_i[point] * JxW[point];
@@ -290,12 +291,12 @@ namespace MatrixCreator
               {
                 number add_data = 0;
                 for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
-                  if (fe.get_nonzero_components(i)[comp_i] &&
-                      fe.get_nonzero_components(j)[comp_i])
+                  if (fe.get_nonzero_components(i)[comp_i] DEAL_II_AND fe
+                        .get_nonzero_components(j)[comp_i])
                     {
                       if (use_coefficient)
                         {
-                          if (data.coefficient->n_components == 1)
+                          if (data.coefficient->n_components DEAL_II_EQUALS 1)
                             for (unsigned int point = 0; point < n_q_points;
                                  ++point)
                               add_data +=
@@ -339,7 +340,7 @@ namespace MatrixCreator
                 for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
                   if (fe.get_nonzero_components(i)[comp_i])
                     {
-                      if (data.rhs_function->n_components == 1)
+                      if (data.rhs_function->n_components DEAL_II_EQUALS 1)
                         for (unsigned int point = 0; point < n_q_points;
                              ++point)
                           add_data +=
@@ -378,13 +379,13 @@ namespace MatrixCreator
       const FiniteElement<dim, spacedim> &fe = fe_values.get_fe();
       const unsigned int                  n_components = fe.n_components();
 
-      Assert(data.rhs_function == nullptr ||
-               data.rhs_function->n_components == 1 ||
-               data.rhs_function->n_components == n_components,
+      Assert(data.rhs_function DEAL_II_EQUALS nullptr DEAL_II_OR data
+               .rhs_function->n_components DEAL_II_EQUALS 1 DEAL_II_OR data
+               .rhs_function->n_components DEAL_II_EQUALS n_components,
              ::dealii::MatrixCreator::ExcComponentMismatch());
-      Assert(data.coefficient == nullptr ||
-               data.coefficient->n_components == 1 ||
-               data.coefficient->n_components == n_components,
+      Assert(data.coefficient DEAL_II_EQUALS nullptr DEAL_II_OR data
+               .coefficient->n_components DEAL_II_EQUALS 1 DEAL_II_OR data
+               .coefficient->n_components DEAL_II_EQUALS n_components,
              ::dealii::MatrixCreator::ExcComponentMismatch());
 
       copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
@@ -396,7 +397,7 @@ namespace MatrixCreator
       const bool use_rhs_function = data.rhs_function != nullptr;
       if (use_rhs_function)
         {
-          if (data.rhs_function->n_components == 1)
+          if (data.rhs_function->n_components DEAL_II_EQUALS 1)
             {
               data.rhs_values.resize(n_q_points);
               data.rhs_function->value_list(fe_values.get_quadrature_points(),
@@ -414,7 +415,7 @@ namespace MatrixCreator
       const bool use_coefficient = data.coefficient != nullptr;
       if (use_coefficient)
         {
-          if (data.coefficient->n_components == 1)
+          if (data.coefficient->n_components DEAL_II_EQUALS 1)
             {
               data.coefficient_values.resize(n_q_points);
               data.coefficient->value_list(fe_values.get_quadrature_points(),
@@ -442,15 +443,16 @@ namespace MatrixCreator
 
             // can use symmetry
             for (unsigned int j = i; j < dofs_per_cell; ++j)
-              if ((n_components == 1) ||
-                  (fe.system_to_component_index(j).first == component_i))
+              if ((n_components DEAL_II_EQUALS 1)DEAL_II_OR(
+                    fe.system_to_component_index(j).first DEAL_II_EQUALS
+                                                          component_i))
                 {
                   const Tensor<1, spacedim> *grad_phi_j =
                     &fe_values.shape_grad(j, 0);
                   add_data = 0;
                   if (use_coefficient)
                     {
-                      if (data.coefficient->n_components == 1)
+                      if (data.coefficient->n_components DEAL_II_EQUALS 1)
                         for (unsigned int point = 0; point < n_q_points;
                              ++point)
                           add_data +=
@@ -477,7 +479,7 @@ namespace MatrixCreator
               {
                 const double *phi_i = &fe_values.shape_value(i, 0);
                 add_data            = 0;
-                if (data.rhs_function->n_components == 1)
+                if (data.rhs_function->n_components DEAL_II_EQUALS 1)
                   for (unsigned int point = 0; point < n_q_points; ++point)
                     add_data +=
                       phi_i[point] * JxW[point] * data.rhs_values[point];
@@ -495,12 +497,12 @@ namespace MatrixCreator
               {
                 add_data = 0;
                 for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
-                  if (fe.get_nonzero_components(i)[comp_i] &&
-                      fe.get_nonzero_components(j)[comp_i])
+                  if (fe.get_nonzero_components(i)[comp_i] DEAL_II_AND fe
+                        .get_nonzero_components(j)[comp_i])
                     {
                       if (use_coefficient)
                         {
-                          if (data.coefficient->n_components == 1)
+                          if (data.coefficient->n_components DEAL_II_EQUALS 1)
                             for (unsigned int point = 0; point < n_q_points;
                                  ++point)
                               add_data +=
@@ -543,7 +545,7 @@ namespace MatrixCreator
                 for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
                   if (fe.get_nonzero_components(i)[comp_i])
                     {
-                      if (data.rhs_function->n_components == 1)
+                      if (data.rhs_function->n_components DEAL_II_EQUALS 1)
                         for (unsigned int point = 0; point < n_q_points;
                              ++point)
                           add_data +=
@@ -572,10 +574,12 @@ namespace MatrixCreator
       const unsigned int dofs_per_cell = data.dof_indices.size();
       (void)dofs_per_cell;
 
-      Assert(data.cell_matrix.m() == dofs_per_cell, ExcInternalError());
-      Assert(data.cell_matrix.n() == dofs_per_cell, ExcInternalError());
-      Assert((right_hand_side == nullptr) ||
-               (data.cell_rhs.size() == dofs_per_cell),
+      Assert(data.cell_matrix.m() DEAL_II_EQUALS dofs_per_cell,
+             ExcInternalError());
+      Assert(data.cell_matrix.n() DEAL_II_EQUALS dofs_per_cell,
+             ExcInternalError());
+      Assert((right_hand_side DEAL_II_EQUALS nullptr)DEAL_II_OR(
+               data.cell_rhs.size() DEAL_II_EQUALS dofs_per_cell),
              ExcInternalError());
 
       if (right_hand_side != nullptr)
@@ -635,9 +639,9 @@ namespace MatrixCreator
                      const Function<spacedim, number> *const coefficient,
                      const AffineConstraints<number> &       constraints)
   {
-    Assert(matrix.m() == dof.n_dofs(),
+    Assert(matrix.m() DEAL_II_EQUALS dof.n_dofs(),
            ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
-    Assert(matrix.n() == dof.n_dofs(),
+    Assert(matrix.n() DEAL_II_EQUALS dof.n_dofs(),
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     hp::FECollection<dim, spacedim>      fe_collection(dof.get_fe());
@@ -710,9 +714,9 @@ namespace MatrixCreator
                      const Function<spacedim, number> *const coefficient,
                      const AffineConstraints<number> &       constraints)
   {
-    Assert(matrix.m() == dof.n_dofs(),
+    Assert(matrix.m() DEAL_II_EQUALS dof.n_dofs(),
            ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
-    Assert(matrix.n() == dof.n_dofs(),
+    Assert(matrix.n() DEAL_II_EQUALS dof.n_dofs(),
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     hp::FECollection<dim, spacedim>      fe_collection(dof.get_fe());
@@ -787,9 +791,9 @@ namespace MatrixCreator
                      const Function<spacedim, number> *const     coefficient,
                      const AffineConstraints<number> &           constraints)
   {
-    Assert(matrix.m() == dof.n_dofs(),
+    Assert(matrix.m() DEAL_II_EQUALS dof.n_dofs(),
            ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
-    Assert(matrix.n() == dof.n_dofs(),
+    Assert(matrix.n() DEAL_II_EQUALS dof.n_dofs(),
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, number>
@@ -858,9 +862,9 @@ namespace MatrixCreator
                      const Function<spacedim, number> *const     coefficient,
                      const AffineConstraints<number> &           constraints)
   {
-    Assert(matrix.m() == dof.n_dofs(),
+    Assert(matrix.m() DEAL_II_EQUALS dof.n_dofs(),
            ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
-    Assert(matrix.n() == dof.n_dofs(),
+    Assert(matrix.n() DEAL_II_EQUALS dof.n_dofs(),
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, number>
@@ -964,7 +968,7 @@ namespace MatrixCreator
       std::vector<Vector<number>> coefficient_vector_values(
         fe_values.n_quadrature_points, Vector<number>(n_components));
       const bool coefficient_is_vector =
-        (coefficient != nullptr && coefficient->n_components != 1);
+        (coefficient != nullptr DEAL_II_AND coefficient->n_components != 1);
 
       std::vector<number> rhs_values_scalar(fe_values.n_quadrature_points);
       std::vector<Vector<number>> rhs_values_system(
@@ -1041,17 +1045,23 @@ namespace MatrixCreator
                     const unsigned int bcomp =
                       fe.component_to_base_index(comp).second;
 
-                    if (!base.conforms(FiniteElementData<dim>::H1) &&
-                        base.conforms(FiniteElementData<dim>::Hdiv) &&
-                        fe_is_primitive)
+                    if (!base
+                           .conforms(FiniteElementData<dim>::H1)
+                             DEAL_II_AND base.conforms(
+                               FiniteElementData<dim>::Hdiv)
+                               DEAL_II_AND fe_is_primitive)
                       Assert(false, ExcNotImplemented());
 
-                    if (!base.conforms(FiniteElementData<dim>::H1) &&
-                        base.conforms(FiniteElementData<dim>::Hcurl))
+                    if (!base
+                           .conforms(FiniteElementData<dim>::H1)
+                             DEAL_II_AND base.conforms(
+                               FiniteElementData<dim>::Hcurl))
                       Assert(false, ExcNotImplemented());
 
-                    if (!base.conforms(FiniteElementData<dim>::H1) &&
-                        base.conforms(FiniteElementData<dim>::Hdiv))
+                    if (!base
+                           .conforms(FiniteElementData<dim>::H1)
+                             DEAL_II_AND base.conforms(
+                               FiniteElementData<dim>::Hdiv))
                       for (unsigned int point = 0;
                            point < fe_values.n_quadrature_points;
                            ++point)
@@ -1071,8 +1081,10 @@ namespace MatrixCreator
                           for (unsigned int j = 0; j < fe_values.dofs_per_cell;
                                ++j)
                             {
-                              if (fe.system_to_component_index(j).first ==
-                                  fe.system_to_component_index(i).first)
+                              if (fe.system_to_component_index(j)
+                                    .first DEAL_II_EQUALS fe
+                                    .system_to_component_index(i)
+                                    .first)
                                 {
                                   copy_data.cell_matrix.back()(i, j) +=
                                     coefficient_vector_values[point](
@@ -1209,14 +1221,14 @@ namespace MatrixCreator
             {
               for (unsigned int i = 0; i < copy_data.dofs_per_cell; ++i)
                 {
-                  if (copy_data.dof_is_on_face[pos][i] &&
-                      dof_to_boundary_mapping[copy_data.dofs[i]] !=
-                        numbers::invalid_dof_index)
+                  if (copy_data.dof_is_on_face[pos][i] DEAL_II_AND
+                        dof_to_boundary_mapping[copy_data.dofs[i]] !=
+                      numbers::invalid_dof_index)
                     {
                       for (unsigned int j = 0; j < copy_data.dofs_per_cell; ++j)
-                        if (copy_data.dof_is_on_face[pos][j] &&
-                            dof_to_boundary_mapping[copy_data.dofs[j]] !=
-                              numbers::invalid_dof_index)
+                        if (copy_data.dof_is_on_face[pos][j] DEAL_II_AND
+                              dof_to_boundary_mapping[copy_data.dofs[j]] !=
+                            numbers::invalid_dof_index)
                           {
                             AssertIsFinite(copy_data.cell_matrix[pos](i, j));
                             matrix.add(
@@ -1290,7 +1302,7 @@ namespace MatrixCreator
     // what would that be in 1d? the
     // identity matrix on the boundary
     // dofs?
-    if (dim == 1)
+    if (dim DEAL_II_EQUALS 1)
       {
         Assert(false, ExcNotImplemented());
         return;
@@ -1299,17 +1311,19 @@ namespace MatrixCreator
     const FiniteElement<dim, spacedim> &fe           = dof.get_fe();
     const unsigned int                  n_components = fe.n_components();
 
-    Assert(matrix.n() == dof.n_boundary_dofs(boundary_functions),
+    Assert(matrix.n() DEAL_II_EQUALS dof.n_boundary_dofs(boundary_functions),
            ExcInternalError());
-    Assert(matrix.n() == matrix.m(), ExcInternalError());
-    Assert(matrix.n() == rhs_vector.size(), ExcInternalError());
+    Assert(matrix.n() DEAL_II_EQUALS matrix.m(), ExcInternalError());
+    Assert(matrix.n() DEAL_II_EQUALS rhs_vector.size(), ExcInternalError());
     Assert(boundary_functions.size() != 0, ExcInternalError());
-    Assert(dof_to_boundary_mapping.size() == dof.n_dofs(), ExcInternalError());
-    Assert(coefficient == nullptr || coefficient->n_components == 1 ||
-             coefficient->n_components == n_components,
+    Assert(dof_to_boundary_mapping.size() DEAL_II_EQUALS dof.n_dofs(),
+           ExcInternalError());
+    Assert(coefficient DEAL_II_EQUALS nullptr DEAL_II_OR coefficient
+             ->n_components DEAL_II_EQUALS 1 DEAL_II_OR coefficient
+             ->n_components DEAL_II_EQUALS n_components,
            ExcComponentMismatch());
 
-    if (component_mapping.size() == 0)
+    if (component_mapping.size() DEAL_II_EQUALS 0)
       {
         AssertDimension(n_components,
                         boundary_functions.begin()->second->n_components);
@@ -1402,7 +1416,7 @@ namespace MatrixCreator
       std::vector<Vector<number>> coefficient_vector_values;
 
       const bool coefficient_is_vector =
-        (coefficient != nullptr && coefficient->n_components != 1);
+        (coefficient != nullptr DEAL_II_AND coefficient->n_components != 1);
 
       std::vector<number>         rhs_values_scalar;
       std::vector<Vector<number>> rhs_values_system;
@@ -1487,17 +1501,23 @@ namespace MatrixCreator
                     const unsigned int bcomp =
                       fe.component_to_base_index(comp).second;
 
-                    if (!base.conforms(FiniteElementData<dim>::H1) &&
-                        base.conforms(FiniteElementData<dim>::Hdiv) &&
-                        fe_is_primitive)
+                    if (!base
+                           .conforms(FiniteElementData<dim>::H1)
+                             DEAL_II_AND base.conforms(
+                               FiniteElementData<dim>::Hdiv)
+                               DEAL_II_AND fe_is_primitive)
                       Assert(false, ExcNotImplemented());
 
-                    if (!base.conforms(FiniteElementData<dim>::H1) &&
-                        base.conforms(FiniteElementData<dim>::Hcurl))
+                    if (!base
+                           .conforms(FiniteElementData<dim>::H1)
+                             DEAL_II_AND base.conforms(
+                               FiniteElementData<dim>::Hcurl))
                       Assert(false, ExcNotImplemented());
 
-                    if (!base.conforms(FiniteElementData<dim>::H1) &&
-                        base.conforms(FiniteElementData<dim>::Hdiv))
+                    if (!base
+                           .conforms(FiniteElementData<dim>::H1)
+                             DEAL_II_AND base.conforms(
+                               FiniteElementData<dim>::Hdiv))
                       for (unsigned int point = 0;
                            point < fe_values.n_quadrature_points;
                            ++point)
@@ -1517,8 +1537,10 @@ namespace MatrixCreator
                           for (unsigned int j = 0; j < fe_values.dofs_per_cell;
                                ++j)
                             {
-                              if (fe.system_to_component_index(i).first ==
-                                  fe.system_to_component_index(j).first)
+                              if (fe.system_to_component_index(i)
+                                    .first DEAL_II_EQUALS fe
+                                    .system_to_component_index(j)
+                                    .first)
                                 {
                                   copy_data.cell_matrix.back()(i, j) +=
                                     coefficient_vector_values[point](
@@ -1676,10 +1698,11 @@ namespace MatrixCreator
               // maximum diagonal entry.
               types::global_dof_index max_element = 0;
               for (const auto index : dof_to_boundary_mapping)
-                if ((index != numbers::invalid_dof_index) &&
-                    (index > max_element))
+                if ((index != numbers::invalid_dof_index)
+                      DEAL_II_AND(index > max_element))
                   max_element = index;
-              Assert(max_element == matrix.n() - 1, ExcInternalError());
+              Assert(max_element DEAL_II_EQUALS matrix.n() - 1,
+                     ExcInternalError());
 
               double max_diag_entry = 0;
               for (unsigned int i = 0; i < copy_data.dofs_per_cell; ++i)
@@ -1689,14 +1712,14 @@ namespace MatrixCreator
 
               for (unsigned int i = 0; i < copy_data.dofs_per_cell; ++i)
                 {
-                  if (copy_data.dof_is_on_face[pos][i] &&
-                      dof_to_boundary_mapping[copy_data.dofs[i]] !=
-                        numbers::invalid_dof_index)
+                  if (copy_data.dof_is_on_face[pos][i] DEAL_II_AND
+                        dof_to_boundary_mapping[copy_data.dofs[i]] !=
+                      numbers::invalid_dof_index)
                     {
                       for (unsigned int j = 0; j < copy_data.dofs_per_cell; ++j)
-                        if (copy_data.dof_is_on_face[pos][j] &&
-                            dof_to_boundary_mapping[copy_data.dofs[j]] !=
-                              numbers::invalid_dof_index)
+                        if (copy_data.dof_is_on_face[pos][j] DEAL_II_AND
+                              dof_to_boundary_mapping[copy_data.dofs[j]] !=
+                            numbers::invalid_dof_index)
                           {
                             AssertIsFinite(copy_data.cell_matrix[pos](i, j));
                             matrix.add(
@@ -1759,7 +1782,7 @@ namespace MatrixCreator
     // what would that be in 1d? the
     // identity matrix on the boundary
     // dofs?
-    if (dim == 1)
+    if (dim DEAL_II_EQUALS 1)
       {
         Assert(false, ExcNotImplemented());
         return;
@@ -1769,17 +1792,19 @@ namespace MatrixCreator
       dof.get_fe_collection();
     const unsigned int n_components = fe_collection.n_components();
 
-    Assert(matrix.n() == dof.n_boundary_dofs(boundary_functions),
+    Assert(matrix.n() DEAL_II_EQUALS dof.n_boundary_dofs(boundary_functions),
            ExcInternalError());
-    Assert(matrix.n() == matrix.m(), ExcInternalError());
-    Assert(matrix.n() == rhs_vector.size(), ExcInternalError());
+    Assert(matrix.n() DEAL_II_EQUALS matrix.m(), ExcInternalError());
+    Assert(matrix.n() DEAL_II_EQUALS rhs_vector.size(), ExcInternalError());
     Assert(boundary_functions.size() != 0, ExcInternalError());
-    Assert(dof_to_boundary_mapping.size() == dof.n_dofs(), ExcInternalError());
-    Assert(coefficient == nullptr || coefficient->n_components == 1 ||
-             coefficient->n_components == n_components,
+    Assert(dof_to_boundary_mapping.size() DEAL_II_EQUALS dof.n_dofs(),
+           ExcInternalError());
+    Assert(coefficient DEAL_II_EQUALS nullptr DEAL_II_OR coefficient
+             ->n_components DEAL_II_EQUALS 1 DEAL_II_OR coefficient
+             ->n_components DEAL_II_EQUALS n_components,
            ExcComponentMismatch());
 
-    if (component_mapping.size() == 0)
+    if (component_mapping.size() DEAL_II_EQUALS 0)
       {
         AssertDimension(n_components,
                         boundary_functions.begin()->second->n_components);
@@ -1866,9 +1891,9 @@ namespace MatrixCreator
                         const Function<spacedim> *const  coefficient,
                         const AffineConstraints<double> &constraints)
   {
-    Assert(matrix.m() == dof.n_dofs(),
+    Assert(matrix.m() DEAL_II_EQUALS dof.n_dofs(),
            ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
-    Assert(matrix.n() == dof.n_dofs(),
+    Assert(matrix.n() DEAL_II_EQUALS dof.n_dofs(),
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     hp::FECollection<dim, spacedim>      fe_collection(dof.get_fe());
@@ -1939,9 +1964,9 @@ namespace MatrixCreator
                         const Function<spacedim> *const  coefficient,
                         const AffineConstraints<double> &constraints)
   {
-    Assert(matrix.m() == dof.n_dofs(),
+    Assert(matrix.m() DEAL_II_EQUALS dof.n_dofs(),
            ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
-    Assert(matrix.n() == dof.n_dofs(),
+    Assert(matrix.n() DEAL_II_EQUALS dof.n_dofs(),
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     hp::FECollection<dim, spacedim>      fe_collection(dof.get_fe());
@@ -2015,9 +2040,9 @@ namespace MatrixCreator
                         const Function<spacedim> *const             coefficient,
                         const AffineConstraints<double> &           constraints)
   {
-    Assert(matrix.m() == dof.n_dofs(),
+    Assert(matrix.m() DEAL_II_EQUALS dof.n_dofs(),
            ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
-    Assert(matrix.n() == dof.n_dofs(),
+    Assert(matrix.n() DEAL_II_EQUALS dof.n_dofs(),
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, double>
@@ -2086,9 +2111,9 @@ namespace MatrixCreator
                         const Function<spacedim> *const             coefficient,
                         const AffineConstraints<double> &           constraints)
   {
-    Assert(matrix.m() == dof.n_dofs(),
+    Assert(matrix.m() DEAL_II_EQUALS dof.n_dofs(),
            ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
-    Assert(matrix.n() == dof.n_dofs(),
+    Assert(matrix.n() DEAL_II_EQUALS dof.n_dofs(),
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, double>

@@ -528,7 +528,7 @@ FEInterfaceValues<dim, spacedim>::reinit(
   const unsigned int                               face_no_neighbor,
   const unsigned int                               sub_face_no_neighbor)
 {
-  if (sub_face_no == numbers::invalid_unsigned_int)
+  if (sub_face_no DEAL_II_EQUALS numbers::invalid_unsigned_int)
     {
       internal_fe_face_values.reinit(cell, face_no);
       fe_face_values = &internal_fe_face_values;
@@ -538,7 +538,7 @@ FEInterfaceValues<dim, spacedim>::reinit(
       internal_fe_subface_values.reinit(cell, face_no, sub_face_no);
       fe_face_values = &internal_fe_subface_values;
     }
-  if (sub_face_no_neighbor == numbers::invalid_unsigned_int)
+  if (sub_face_no_neighbor DEAL_II_EQUALS numbers::invalid_unsigned_int)
     {
       internal_fe_face_values_neighbor.reinit(cell_neighbor, face_no_neighbor);
       fe_face_values_neighbor = &internal_fe_face_values_neighbor;
@@ -720,7 +720,7 @@ template <int dim, int spacedim>
 bool
 FEInterfaceValues<dim, spacedim>::at_boundary() const
 {
-  return fe_face_values_neighbor == nullptr;
+  return fe_face_values_neighbor DEAL_II_EQUALS nullptr;
 }
 
 
@@ -752,11 +752,12 @@ FEInterfaceValues<dim, spacedim>::get_fe_face_values(
 {
   AssertIndexRange(cell_index, 2);
   Assert(
-    cell_index == 0 || !at_boundary(),
+    cell_index DEAL_II_EQUALS 0 DEAL_II_OR !at_boundary(),
     ExcMessage(
       "You are on a boundary, so you can only ask for the first FEFaceValues object."));
 
-  return (cell_index == 0) ? *fe_face_values : *fe_face_values_neighbor;
+  return (cell_index DEAL_II_EQUALS 0) ? *fe_face_values :
+                                         *fe_face_values_neighbor;
 }
 
 
@@ -780,11 +781,11 @@ FEInterfaceValues<dim, spacedim>::shape_value(
 {
   const auto dof_pair = dofmap[interface_dof_index];
 
-  if (here_or_there && dof_pair[0] != numbers::invalid_unsigned_int)
+  if (here_or_there DEAL_II_AND dof_pair[0] != numbers::invalid_unsigned_int)
     return get_fe_face_values(0).shape_value_component(dof_pair[0],
                                                        q_point,
                                                        component);
-  if (!here_or_there && dof_pair[1] != numbers::invalid_unsigned_int)
+  if (!here_or_there DEAL_II_AND dof_pair[1] != numbers::invalid_unsigned_int)
     return get_fe_face_values(1).shape_value_component(dof_pair[1],
                                                        q_point,
                                                        component);

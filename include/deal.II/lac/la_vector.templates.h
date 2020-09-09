@@ -73,7 +73,7 @@ namespace LinearAlgebra
 
     // Downcast V. If fails, throws an exception.
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-    Assert(down_V.size() == this->size(),
+    Assert(down_V.size() DEAL_II_EQUALS this->size(),
            ExcMessage(
              "Cannot add two vectors with different numbers of elements"));
 
@@ -132,7 +132,7 @@ namespace LinearAlgebra
   Vector<Number> &
   Vector<Number>::operator=(const Number s)
   {
-    Assert(s == static_cast<Number>(0),
+    Assert(s DEAL_II_EQUALS static_cast<Number>(0),
            ExcMessage("Only 0 can be assigned to a vector."));
     (void)s;
 
@@ -188,7 +188,7 @@ namespace LinearAlgebra
 
     // Downcast V. If fails, throws an exception.
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-    Assert(down_V.size() == this->size(),
+    Assert(down_V.size() DEAL_II_EQUALS this->size(),
            ExcMessage(
              "Cannot add two vectors with different numbers of elements"));
 
@@ -212,7 +212,7 @@ namespace LinearAlgebra
 
     // Downcast V. If fails, throws an exception.
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-    Assert(down_V.size() == this->size(),
+    Assert(down_V.size() DEAL_II_EQUALS this->size(),
            ExcMessage(
              "Cannot subtract two vectors with different numbers of elements"));
     dealii::internal::VectorOperations::Vectorization_subtract_v<Number>
@@ -234,7 +234,7 @@ namespace LinearAlgebra
 
     // Downcast V. If fails, throws an exception.
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-    Assert(down_V.size() == this->size(),
+    Assert(down_V.size() DEAL_II_EQUALS this->size(),
            ExcMessage("Cannot compute the scalar product "
                       "of two vectors with different numbers of elements"));
     Number                                                  sum;
@@ -284,7 +284,7 @@ namespace LinearAlgebra
     // Downcast V. If fails, throws an exception.
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
     AssertIsFinite(a);
-    Assert(down_V.size() == this->size(),
+    Assert(down_V.size() DEAL_II_EQUALS this->size(),
            ExcMessage(
              "Cannot add two vectors with different numbers of elements"));
 
@@ -315,11 +315,11 @@ namespace LinearAlgebra
     // Downcast W. If fails, throws an exception.
     const Vector<Number> &down_W = dynamic_cast<const Vector<Number> &>(W);
     AssertIsFinite(a);
-    Assert(down_V.size() == this->size(),
+    Assert(down_V.size() DEAL_II_EQUALS this->size(),
            ExcMessage(
              "Cannot add two vectors with different numbers of elements"));
     AssertIsFinite(b);
-    Assert(down_W.size() == this->size(),
+    Assert(down_W.size() DEAL_II_EQUALS this->size(),
            ExcMessage(
              "Cannot add two vectors with different numbers of elements"));
 
@@ -366,7 +366,7 @@ namespace LinearAlgebra
     // Downcast scaling_factors. If fails, throws an exception.
     const Vector<Number> &down_scaling_factors =
       dynamic_cast<const Vector<Number> &>(scaling_factors);
-    Assert(down_scaling_factors.size() == this->size(),
+    Assert(down_scaling_factors.size() DEAL_II_EQUALS this->size(),
            ExcMessage(
              "Cannot add two vectors with different numbers of elements"));
 
@@ -467,8 +467,8 @@ namespace LinearAlgebra
       this->values.get());
     dealii::internal::VectorOperations::parallel_reduce(
       norm2, 0, this->size(), norm_square, this->thread_loop_partitioner);
-    if (numbers::is_finite(norm_square) &&
-        norm_square >= std::numeric_limits<real_type>::min())
+    if (numbers::is_finite(norm_square)
+          DEAL_II_AND norm_square >= std::numeric_limits<real_type>::min())
       return std::sqrt(norm_square);
     else
       {
@@ -529,10 +529,10 @@ namespace LinearAlgebra
     // Downcast W. If fails, throws an exception.
     const Vector<Number> &down_W = dynamic_cast<const Vector<Number> &>(W);
     AssertIsFinite(a);
-    Assert(down_V.size() == this->size(),
+    Assert(down_V.size() DEAL_II_EQUALS this->size(),
            ExcMessage(
              "Cannot add two vectors with different numbers of elements"));
-    Assert(down_W.size() == this->size(),
+    Assert(down_W.size() DEAL_II_EQUALS this->size(),
            ExcMessage(
              "Cannot add two vectors with different numbers of elements"));
 
@@ -617,7 +617,7 @@ namespace LinearAlgebra
     char c;
     // in >> c;
     in.read(&c, 1);
-    AssertThrow(c == '[', ExcIO());
+    AssertThrow(c DEAL_II_EQUALS '[', ExcIO());
 
     in.read(reinterpret_cast<char *>(this->begin()),
             reinterpret_cast<const char *>(this->end()) -
@@ -625,7 +625,7 @@ namespace LinearAlgebra
 
     // in >> c;
     in.read(&c, 1);
-    AssertThrow(c == ']', ExcIO());
+    AssertThrow(c DEAL_II_EQUALS ']', ExcIO());
   }
 } // namespace LinearAlgebra
 

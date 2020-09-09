@@ -216,7 +216,7 @@ namespace internal
                                        const VectorType & temp)
     {
       AssertIndexRange(i, data.size());
-      if (data[i] == nullptr)
+      if (data[i] DEAL_II_EQUALS nullptr)
         {
           data[i] = std::move(typename VectorMemory<VectorType>::Pointer(mem));
           data[i]->reinit(temp);
@@ -297,7 +297,7 @@ SolverIDR<VectorType>::solve(const MatrixType &        A,
   // Check for convergent initial guess
   double res      = r.l2_norm();
   iteration_state = this->iteration_status(step, res, x);
-  if (iteration_state == SolverControl::success)
+  if (iteration_state DEAL_II_EQUALS SolverControl::success)
     return;
 
   // Initialize sets of vectors/matrices whose size dependent on s
@@ -350,7 +350,7 @@ SolverIDR<VectorType>::solve(const MatrixType &        A,
   bool early_exit = false;
 
   // Outer iteration
-  while (iteration_state == SolverControl::iterate)
+  while (iteration_state DEAL_II_EQUALS SolverControl::iterate)
     {
       ++step;
 
@@ -443,7 +443,7 @@ SolverIDR<VectorType>::solve(const MatrixType &        A,
               }
           }
         }
-      if (early_exit == true)
+      if (early_exit DEAL_II_EQUALS true)
         break;
 
       // Update r and x

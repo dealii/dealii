@@ -72,7 +72,7 @@ inline void
 SparseMIC<number>::initialize(const SparseMatrix<somenumber> &matrix,
                               const AdditionalData &          data)
 {
-  Assert(matrix.m() == matrix.n(), ExcNotQuadratic());
+  Assert(matrix.m() DEAL_II_EQUALS matrix.n(), ExcNotQuadratic());
   Assert(data.strengthen_diagonal >= 0,
          ExcInvalidStrengthening(data.strengthen_diagonal));
 
@@ -81,8 +81,9 @@ SparseMIC<number>::initialize(const SparseMatrix<somenumber> &matrix,
   this->prebuild_lower_bound();
   this->copy_from(matrix);
 
-  Assert(this->m() == this->n(), ExcNotQuadratic());
-  Assert(matrix.m() == this->m(), ExcDimensionMismatch(matrix.m(), this->m()));
+  Assert(this->m() DEAL_II_EQUALS this->n(), ExcNotQuadratic());
+  Assert(matrix.m() DEAL_II_EQUALS this->m(),
+         ExcDimensionMismatch(matrix.m(), this->m()));
 
   if (data.strengthen_diagonal > 0)
     this->strengthen_diagonal_impl();
@@ -113,7 +114,7 @@ SparseMIC<number>::initialize(const SparseMatrix<somenumber> &matrix,
       // it's symmetric, so we can work with this alone
       for (typename SparseMatrix<somenumber>::const_iterator p =
              matrix.begin(row) + 1;
-           (p != matrix.end(row)) && (p->column() < row);
+           (p != matrix.end(row)) DEAL_II_AND(p->column() < row);
            ++p)
         temp1 += p->value() / diag[p->column()] * inner_sums[p->column()];
 
@@ -130,7 +131,7 @@ template <typename number>
 inline number
 SparseMIC<number>::get_rowsum(const size_type row) const
 {
-  Assert(this->m() == this->n(), ExcNotQuadratic());
+  Assert(this->m() DEAL_II_EQUALS this->n(), ExcNotQuadratic());
 
   number rowsum = 0;
   for (typename SparseMatrix<number>::const_iterator p = this->begin(row) + 1;
@@ -150,9 +151,10 @@ void
 SparseMIC<number>::vmult(Vector<somenumber> &      dst,
                          const Vector<somenumber> &src) const
 {
-  Assert(dst.size() == src.size(),
+  Assert(dst.size() DEAL_II_EQUALS src.size(),
          ExcDimensionMismatch(dst.size(), src.size()));
-  Assert(dst.size() == this->m(), ExcDimensionMismatch(dst.size(), this->m()));
+  Assert(dst.size() DEAL_II_EQUALS this->m(),
+         ExcDimensionMismatch(dst.size(), this->m()));
 
   const size_type N = dst.size();
   // We assume the underlying matrix A is: A = X - L - U, where -L and -U are
@@ -168,7 +170,7 @@ SparseMIC<number>::vmult(Vector<somenumber> &      dst,
       // the diagonal element
       for (typename SparseMatrix<number>::const_iterator p =
              this->begin(row) + 1;
-           (p != this->end(row)) && (p->column() < row);
+           (p != this->end(row)) DEAL_II_AND(p->column() < row);
            ++p)
         dst(row) -= p->value() * dst(p->column());
 

@@ -64,7 +64,7 @@ namespace internal
       {
         ++indices[0];
         for (int d = 0; d < dim - 1; ++d)
-          if (indices[d] == dofs1d)
+          if (indices[d] DEAL_II_EQUALS dofs1d)
             {
               indices[d] = 0;
               indices[d + 1]++;
@@ -116,7 +116,7 @@ struct FE_Q_Base<PolynomialType, xdim, xspacedim>::Implementation
     // that finite element solutions from both sides coincide. i.e. if a and b
     // are expansion coefficients for the shape functions from both sides, we
     // seek a relation between a and b such that
-    //   sum_j a_j phi^c_j(x) == sum_j b_j phi_j(x)
+    //   sum_j a_j phi^c_j(x) DEAL_II_EQUALS  sum_j b_j phi_j(x)
     // for all points x on the interface. here, phi^c_j are the shape
     // functions on the small cell on one side of the face, and phi_j those on
     // the big cell on the other side. To get this relation, it suffices to
@@ -125,7 +125,7 @@ struct FE_Q_Base<PolynomialType, xdim, xspacedim>::Implementation
     // them equidistantly.
     //
     // we obtain the matrix system
-    //    A a  ==  B b
+    //    A a  DEAL_II_EQUALS   B b
     // where
     //    A_ij = phi^c_j(x_i)
     //    B_ij = phi_j(x_i)
@@ -431,9 +431,9 @@ void
 FE_Q_Base<PolynomialType, dim, spacedim>::initialize(
   const std::vector<Point<1>> &points)
 {
-  Assert(points[0][0] == 0,
+  Assert(points[0][0] DEAL_II_EQUALS 0,
          ExcMessage("The first support point has to be zero."));
-  Assert(points.back()[0] == 1,
+  Assert(points.back()[0] DEAL_II_EQUALS 1,
          ExcMessage("The last support point has to be one."));
 
   // distinguish q/q_dg0 case: need to be flexible enough to allow more
@@ -441,9 +441,10 @@ FE_Q_Base<PolynomialType, dim, spacedim>::initialize(
   // class FE_Q_DG0 that otherwise shares 95% of the code.
   const unsigned int q_dofs_per_cell =
     Utilities::fixed_power<dim>(q_degree + 1);
-  Assert(q_dofs_per_cell == this->n_dofs_per_cell() ||
-           q_dofs_per_cell + 1 == this->n_dofs_per_cell() ||
-           q_dofs_per_cell + dim == this->n_dofs_per_cell(),
+  Assert(q_dofs_per_cell DEAL_II_EQUALS this->n_dofs_per_cell()
+             DEAL_II_OR  q_dofs_per_cell +
+           1 DEAL_II_EQUALS this->n_dofs_per_cell() DEAL_II_OR q_dofs_per_cell +
+           dim DEAL_II_EQUALS this->n_dofs_per_cell(),
          ExcInternalError());
 
   [this, q_dofs_per_cell]() {
@@ -515,10 +516,11 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_interpolation_matrix(
           &x_source_fe))
     {
       // ok, source is a Q element, so we will be able to do the work
-      Assert(interpolation_matrix.m() == this->n_dofs_per_cell(),
+      Assert(interpolation_matrix.m() DEAL_II_EQUALS this->n_dofs_per_cell(),
              ExcDimensionMismatch(interpolation_matrix.m(),
                                   this->n_dofs_per_cell()));
-      Assert(interpolation_matrix.n() == x_source_fe.n_dofs_per_cell(),
+      Assert(interpolation_matrix.n()
+               DEAL_II_EQUALS x_source_fe.n_dofs_per_cell(),
              ExcDimensionMismatch(interpolation_matrix.m(),
                                   x_source_fe.n_dofs_per_cell()));
 
@@ -589,7 +591,8 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_interpolation_matrix(
       // whenever we do FullMatrix::reinit(m,0), it sets both rows and
       // columns to zero, instead of m and zero. thus, only test the
       // number of columns
-      Assert(interpolation_matrix.n() == x_source_fe.n_dofs_per_cell(),
+      Assert(interpolation_matrix.n()
+               DEAL_II_EQUALS x_source_fe.n_dofs_per_cell(),
              ExcDimensionMismatch(interpolation_matrix.m(),
                                   x_source_fe.n_dofs_per_cell()));
     }
@@ -626,7 +629,8 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_subface_interpolation_matrix(
   FullMatrix<double> &                interpolation_matrix,
   const unsigned int                  face_no) const
 {
-  Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.m()
+           DEAL_II_EQUALS x_source_fe.n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.m(),
                               x_source_fe.n_dofs_per_face(face_no)));
 
@@ -637,7 +641,8 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_subface_interpolation_matrix(
     {
       // have this test in here since a table of size 2x0 reports its size as
       // 0x0
-      Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
+      Assert(interpolation_matrix.n()
+               DEAL_II_EQUALS this->n_dofs_per_face(face_no),
              ExcDimensionMismatch(interpolation_matrix.n(),
                                   this->n_dofs_per_face(face_no)));
 
@@ -666,7 +671,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_subface_interpolation_matrix(
       // these support points. Furthermore, check if something has to
       // be done for the face orientation flag in 3D.
       const Quadrature<dim> subface_quadrature =
-        subface == numbers::invalid_unsigned_int ?
+        subface DEAL_II_EQUALS numbers::invalid_unsigned_int ?
           QProjector<dim>::project_to_face(this->reference_cell_type(),
                                            quad_face_support,
                                            0) :
@@ -750,7 +755,9 @@ FE_Q_Base<PolynomialType, dim, spacedim>::hp_vertex_dof_identities(
       // equivalencies to be recorded
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
-  else if (fe_other.n_unique_faces() == 1 && fe_other.n_dofs_per_face(0) == 0)
+  else if (fe_other.n_unique_faces()
+             DEAL_II_EQUALS 1 DEAL_II_AND fe_other.n_dofs_per_face(0)
+               DEAL_II_EQUALS 0)
     {
       // if the other element has no elements on faces at all,
       // then it would be impossible to enforce any kind of
@@ -783,12 +790,12 @@ FE_Q_Base<PolynomialType, dim, spacedim>::hp_line_dof_identities(
     {
       // dofs are located along lines, so two dofs are identical if they are
       // located at identical positions. if we had only equidistant points, we
-      // could simply check for similarity like (i+1)*q == (j+1)*p, but we
-      // might have other support points (e.g. Gauss-Lobatto
-      // points). Therefore, read the points in unit_support_points for the
-      // first coordinate direction. We take the lexicographic ordering of the
-      // points in the first direction (i.e., x-direction), which we access
-      // between index 1 and p-1 (index 0 and p are vertex dofs).
+      // could simply check for similarity like (i+1)*q DEAL_II_EQUALS  (j+1)*p,
+      // but we might have other support points (e.g. Gauss-Lobatto points).
+      // Therefore, read the points in unit_support_points for the first
+      // coordinate direction. We take the lexicographic ordering of the points
+      // in the first direction (i.e., x-direction), which we access between
+      // index 1 and p-1 (index 0 and p are vertex dofs).
       const unsigned int p = this->degree;
       const unsigned int q = fe_q_other->degree;
 
@@ -815,7 +822,9 @@ FE_Q_Base<PolynomialType, dim, spacedim>::hp_line_dof_identities(
       // equivalencies to be recorded
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
-  else if (fe_other.n_unique_faces() == 1 && fe_other.n_dofs_per_face(0) == 0)
+  else if (fe_other.n_unique_faces()
+             DEAL_II_EQUALS 1 DEAL_II_AND fe_other.n_dofs_per_face(0)
+               DEAL_II_EQUALS 0)
     {
       // if the other element has no elements on faces at all,
       // then it would be impossible to enforce any kind of
@@ -870,12 +879,14 @@ FE_Q_Base<PolynomialType, dim, spacedim>::hp_quad_dof_identities(
                      this->unit_support_points[index_map_inverse[i1 + 1]][0] -
                      fe_q_other
                        ->unit_support_points[index_map_inverse_other[j1 + 1]]
-                                            [0]) < 1e-14) &&
-                  (std::fabs(
-                     this->unit_support_points[index_map_inverse[i2 + 1]][0] -
-                     fe_q_other
-                       ->unit_support_points[index_map_inverse_other[j2 + 1]]
-                                            [0]) < 1e-14))
+                                            [0]) < 1e-14)
+                    DEAL_II_AND(
+                      std::fabs(
+                        this
+                          ->unit_support_points[index_map_inverse[i2 + 1]][0] -
+                        fe_q_other
+                          ->unit_support_points[index_map_inverse_other[j2 + 1]]
+                                               [0]) < 1e-14))
                 identities.emplace_back(i1 * (p - 1) + i2, j1 * (q - 1) + j2);
 
       return identities;
@@ -886,7 +897,9 @@ FE_Q_Base<PolynomialType, dim, spacedim>::hp_quad_dof_identities(
       // equivalencies to be recorded
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
-  else if (fe_other.n_unique_faces() == 1 && fe_other.n_dofs_per_face(0) == 0)
+  else if (fe_other.n_unique_faces()
+             DEAL_II_EQUALS 1 DEAL_II_AND fe_other.n_dofs_per_face(0)
+               DEAL_II_EQUALS 0)
     {
       // if the other element has no elements on faces at all,
       // then it would be impossible to enforce any kind of
@@ -943,7 +956,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::initialize_unit_face_support_points(
   const std::vector<Point<1>> &points)
 {
   // no faces in 1d, so nothing to do
-  if (dim == 1)
+  if (dim DEAL_II_EQUALS 1)
     return;
 
   // TODO: the implementation makes the assumption that all faces have the
@@ -989,15 +1002,17 @@ FE_Q_Base<PolynomialType, dim, spacedim>::
   AssertDimension(this->n_unique_faces(), 1);
   const unsigned int face_no = 0;
 
-  Assert(this->adjust_quad_dof_index_for_face_orientation_table[0]
-             .n_elements() == 8 * this->n_dofs_per_quad(face_no),
+  Assert(this->adjust_quad_dof_index_for_face_orientation_table[0].n_elements()
+             DEAL_II_EQUALS 8 *
+           this->n_dofs_per_quad(face_no),
          ExcInternalError());
 
   const unsigned int n = q_degree - 1;
-  Assert(n * n == this->n_dofs_per_quad(face_no), ExcInternalError());
+  Assert(n * n DEAL_II_EQUALS this->n_dofs_per_quad(face_no),
+         ExcInternalError());
 
   // the dofs on a face are connected to a n x n matrix. for example, for
-  // degree==4 we have the following dofs on a quad
+  // degreeDEAL_II_EQUALS 4 we have the following dofs on a quad
 
   //  ___________
   // |           |
@@ -1123,7 +1138,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::face_to_cell_index(
           case 2:
             // in 2d, only face_flip has a meaning. if it is set, consider
             // dofs in reverse order
-            if (face_flip == false)
+            if (face_flip DEAL_II_EQUALS false)
               adjusted_dof_index_on_line = dof_index_on_line;
             else
               adjusted_dof_index_on_line =
@@ -1138,9 +1153,10 @@ FE_Q_Base<PolynomialType, dim, spacedim>::face_to_cell_index(
             //
             // that said, the Q2 case is easy enough to implement, as is the
             // case where everything is in standard orientation
-            Assert((this->n_dofs_per_line() <= 1) ||
-                     ((face_orientation == true) && (face_flip == false) &&
-                      (face_rotation == false)),
+            Assert((this->n_dofs_per_line() <= 1) DEAL_II_OR(
+                     (face_orientation DEAL_II_EQUALS true)DEAL_II_AND(
+                       face_flip DEAL_II_EQUALS false)
+                       DEAL_II_AND(face_rotation DEAL_II_EQUALS false)),
                    ExcNotImplemented());
             adjusted_dof_index_on_line = dof_index_on_line;
             break;
@@ -1167,9 +1183,10 @@ FE_Q_Base<PolynomialType, dim, spacedim>::face_to_cell_index(
       // the same is true here as above for the 3d case -- someone will
       // just have to draw a bunch of pictures. in the meantime,
       // we can implement the Q2 case in which it is simple
-      Assert((this->n_dofs_per_quad(face) <= 1) ||
-               ((face_orientation == true) && (face_flip == false) &&
-                (face_rotation == false)),
+      Assert((this->n_dofs_per_quad(face) <= 1)
+               DEAL_II_OR((face_orientation DEAL_II_EQUALS true)DEAL_II_AND(
+                 face_flip DEAL_II_EQUALS false)
+                            DEAL_II_AND(face_rotation DEAL_II_EQUALS false)),
              ExcNotImplemented());
       return (this->get_first_quad_index(face) + index);
     }
@@ -1216,13 +1233,13 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_prolongation_matrix(
   AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
 
   // initialization upon first request
-  if (this->prolongation[refinement_case - 1][child].n() == 0)
+  if (this->prolongation[refinement_case - 1][child].n() DEAL_II_EQUALS 0)
     {
       std::lock_guard<std::mutex> lock(this->mutex);
 
       // if matrix got updated while waiting for the lock
-      if (this->prolongation[refinement_case - 1][child].n() ==
-          this->n_dofs_per_cell())
+      if (this->prolongation[refinement_case - 1][child]
+            .n() DEAL_II_EQUALS this->n_dofs_per_cell())
         return this->prolongation[refinement_case - 1][child];
 
       // distinguish q/q_dg0 case: only treat Q dofs first
@@ -1362,7 +1379,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_prolongation_matrix(
               // fuzzy and therefore not done for innermost x_0 direction
               internal::FE_Q_Base::increment_indices<dim>(i_indices, dofs1d);
             }
-          Assert(i_indices[dim - 1] == 1, ExcInternalError());
+          Assert(i_indices[dim - 1] DEAL_II_EQUALS 1, ExcInternalError());
           internal::FE_Q_Base::increment_indices<dim>(j_indices, dofs1d);
         }
 
@@ -1415,13 +1432,13 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_restriction_matrix(
   AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
 
   // initialization upon first request
-  if (this->restriction[refinement_case - 1][child].n() == 0)
+  if (this->restriction[refinement_case - 1][child].n() DEAL_II_EQUALS 0)
     {
       std::lock_guard<std::mutex> lock(this->mutex);
 
       // if matrix got updated while waiting for the lock...
-      if (this->restriction[refinement_case - 1][child].n() ==
-          this->n_dofs_per_cell())
+      if (this->restriction[refinement_case - 1][child].n()
+            DEAL_II_EQUALS this->n_dofs_per_cell())
         return this->restriction[refinement_case - 1][child];
 
       FullMatrix<double> my_restriction(this->n_dofs_per_cell(),
@@ -1555,32 +1572,35 @@ FE_Q_Base<PolynomialType, dim, spacedim>::has_support_on_face(
   AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
 
   // in 1d, things are simple. since there is only one degree of freedom per
-  // vertex in this class, the first is on vertex 0 (==face 0 in some sense),
-  // the second on face 1:
-  if (dim == 1)
-    return (((shape_index == 0) && (face_index == 0)) ||
-            ((shape_index == 1) && (face_index == 1)));
+  // vertex in this class, the first is on vertex 0 (DEAL_II_EQUALS face 0 in
+  // some sense), the second on face 1:
+  if (dim DEAL_II_EQUALS 1)
+    return (
+      ((shape_index DEAL_II_EQUALS 0)DEAL_II_AND(face_index DEAL_II_EQUALS 0))
+        DEAL_II_OR((shape_index DEAL_II_EQUALS 1)DEAL_II_AND(
+          face_index DEAL_II_EQUALS 1)));
 
   // first, special-case interior shape functions, since they have no support
   // no-where on the boundary
-  if (((dim == 2) &&
-       (shape_index >= this->get_first_quad_index(0 /*first quad*/))) ||
-      ((dim == 3) && (shape_index >= this->get_first_hex_index())))
+  if (((dim DEAL_II_EQUALS 2)DEAL_II_AND(
+        shape_index >= this->get_first_quad_index(0 /*first quad*/)))
+        DEAL_II_OR((dim DEAL_II_EQUALS 3)DEAL_II_AND(
+          shape_index >= this->get_first_hex_index())))
     return false;
 
   // let's see whether this is a vertex
   if (shape_index < this->get_first_line_index())
     {
       // for Q elements, there is one dof per vertex, so
-      // shape_index==vertex_number. check whether this vertex is on the given
-      // face. thus, for each face, give a list of vertices
+      // shape_indexDEAL_II_EQUALS vertex_number. check whether this vertex is
+      // on the given face. thus, for each face, give a list of vertices
       const unsigned int vertex_no = shape_index;
       Assert(vertex_no < GeometryInfo<dim>::vertices_per_cell,
              ExcInternalError());
 
       for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)
-        if (GeometryInfo<dim>::face_to_cell_vertices(face_index, v) ==
-            vertex_no)
+        if (GeometryInfo<dim>::face_to_cell_vertices(face_index, v)
+              DEAL_II_EQUALS vertex_no)
           return true;
 
       return false;
@@ -1594,17 +1614,17 @@ FE_Q_Base<PolynomialType, dim, spacedim>::has_support_on_face(
              ExcInternalError());
 
       // in 2d, the line is the face, so get the line index
-      if (dim == 2)
-        return (line_index == face_index);
-      else if (dim == 3)
+      if (dim DEAL_II_EQUALS 2)
+        return (line_index DEAL_II_EQUALS face_index);
+      else if (dim DEAL_II_EQUALS 3)
         {
           // silence compiler warning
           const unsigned int lines_per_face =
-            dim == 3 ? GeometryInfo<dim>::lines_per_face : 1;
+            dim DEAL_II_EQUALS 3 ? GeometryInfo<dim>::lines_per_face : 1;
           // see whether the given line is on the given face.
           for (unsigned int l = 0; l < lines_per_face; ++l)
-            if (GeometryInfo<3>::face_to_cell_lines(face_index, l) ==
-                line_index)
+            if (GeometryInfo<3>::face_to_cell_lines(face_index, l)
+                  DEAL_II_EQUALS line_index)
               return true;
 
           return false;
@@ -1627,8 +1647,8 @@ FE_Q_Base<PolynomialType, dim, spacedim>::has_support_on_face(
       Assert(dim != 2, ExcInternalError());
 
       // in 3d, quad_index=face_index
-      if (dim == 3)
-        return (quad_index == face_index);
+      if (dim DEAL_II_EQUALS 3)
+        return (quad_index DEAL_II_EQUALS face_index);
       else
         Assert(false, ExcNotImplemented());
     }

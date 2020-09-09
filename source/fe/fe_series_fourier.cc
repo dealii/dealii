@@ -95,7 +95,7 @@ namespace
   {
     AssertIndexRange(fe, fe_collection.size());
 
-    if (fourier_transform_matrices[fe].m() == 0)
+    if (fourier_transform_matrices[fe].m() DEAL_II_EQUALS 0)
       {
         fourier_transform_matrices[fe].reinit(
           n_coefficients_per_direction[fe],
@@ -120,7 +120,7 @@ namespace
   {
     AssertIndexRange(fe, fe_collection.size());
 
-    if (fourier_transform_matrices[fe].m() == 0)
+    if (fourier_transform_matrices[fe].m() DEAL_II_EQUALS 0)
       {
         fourier_transform_matrices[fe].reinit(
           Utilities::fixed_power<2>(n_coefficients_per_direction[fe]),
@@ -149,7 +149,7 @@ namespace
   {
     AssertIndexRange(fe, fe_collection.size());
 
-    if (fourier_transform_matrices[fe].m() == 0)
+    if (fourier_transform_matrices[fe].m() DEAL_II_EQUALS 0)
       {
         fourier_transform_matrices[fe].reinit(
           Utilities::fixed_power<3>(n_coefficients_per_direction[fe]),
@@ -185,8 +185,9 @@ namespace FESeries
     , q_collection(q_collection)
     , fourier_transform_matrices(fe_collection.size())
   {
-    Assert(n_coefficients_per_direction.size() == fe_collection.size() &&
-             n_coefficients_per_direction.size() == q_collection.size(),
+    Assert(n_coefficients_per_direction.size() DEAL_II_EQUALS fe_collection
+             .size() DEAL_II_AND    n_coefficients_per_direction
+             .size() DEAL_II_EQUALS q_collection.size(),
            ExcMessage("All parameters are supposed to have the same size."));
 
     const unsigned int max_n_coefficients_per_direction =
@@ -215,16 +216,17 @@ namespace FESeries
 
 
   template <int dim, int spacedim>
-  inline bool
-  Fourier<dim, spacedim>::
-  operator==(const Fourier<dim, spacedim> &fourier) const
+  inline bool Fourier<dim, spacedim>::
+              operator DEAL_II_EQUALS(const Fourier<dim, spacedim> &fourier) const
   {
     return (
-      (n_coefficients_per_direction == fourier.n_coefficients_per_direction) &&
-      (*fe_collection == *(fourier.fe_collection)) &&
-      (q_collection == fourier.q_collection) &&
-      (k_vectors == fourier.k_vectors) &&
-      (fourier_transform_matrices == fourier.fourier_transform_matrices));
+      (n_coefficients_per_direction DEAL_II_EQUALS
+                                    fourier.n_coefficients_per_direction)
+        DEAL_II_AND(*fe_collection DEAL_II_EQUALS * (fourier.fe_collection))
+          DEAL_II_AND(q_collection DEAL_II_EQUALS fourier.q_collection)
+            DEAL_II_AND(k_vectors DEAL_II_EQUALS fourier.k_vectors)
+              DEAL_II_AND(fourier_transform_matrices DEAL_II_EQUALS
+                                                     fourier.fourier_transform_matrices));
   }
 
 
@@ -287,9 +289,10 @@ namespace FESeries
               unrolled_coefficients.end(),
               CoefficientType(0.));
 
-    Assert(unrolled_coefficients.size() == matrix.m(), ExcInternalError());
+    Assert(unrolled_coefficients.size() DEAL_II_EQUALS matrix.m(),
+           ExcInternalError());
 
-    Assert(local_dof_values.size() == matrix.n(),
+    Assert(local_dof_values.size() DEAL_II_EQUALS matrix.n(),
            ExcDimensionMismatch(local_dof_values.size(), matrix.n()));
 
     for (unsigned int i = 0; i < unrolled_coefficients.size(); i++)

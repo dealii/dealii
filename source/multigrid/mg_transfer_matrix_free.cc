@@ -131,8 +131,11 @@ MGTransferMatrixFree<dim, Number>::build(
   this->ghosted_level_vector.resize(0, vector_partitioners.max_level());
   for (unsigned int level = 0; level <= vector_partitioners.max_level();
        ++level)
-    if (external_partitioners.size() == vector_partitioners.max_level() + 1 &&
-        external_partitioners[level].get() == vector_partitioners[level].get())
+    if (external_partitioners.size()
+          DEAL_II_EQUALS        vector_partitioners.max_level() +
+        1 DEAL_II_AND           external_partitioners[level]
+          .get() DEAL_II_EQUALS vector_partitioners[level]
+          .get())
       this->ghosted_level_vector[level].reinit(0);
     else
       this->ghosted_level_vector[level].reinit(vector_partitioners[level]);
@@ -185,12 +188,14 @@ MGTransferMatrixFree<dim, Number>::prolongate(
   LinearAlgebra::distributed::Vector<Number> &      dst,
   const LinearAlgebra::distributed::Vector<Number> &src) const
 {
-  Assert((to_level >= 1) && (to_level <= level_dof_indices.size()),
+  Assert((to_level >= 1) DEAL_II_AND(to_level <= level_dof_indices.size()),
          ExcIndexRange(to_level, 1, level_dof_indices.size() + 1));
 
-  const bool src_inplace = src.get_partitioner().get() ==
-                           this->vector_partitioners[to_level - 1].get();
-  if (src_inplace == false)
+  const bool src_inplace =
+    src.get_partitioner()
+      .get() DEAL_II_EQUALS this->vector_partitioners[to_level - 1]
+      .get();
+  if (src_inplace DEAL_II_EQUALS false)
     {
       if (this->ghosted_level_vector[to_level - 1].get_partitioner().get() !=
           this->vector_partitioners[to_level - 1].get())
@@ -201,8 +206,10 @@ MGTransferMatrixFree<dim, Number>::prolongate(
     }
 
   const bool dst_inplace =
-    dst.get_partitioner().get() == this->vector_partitioners[to_level].get();
-  if (dst_inplace == false)
+    dst.get_partitioner()
+      .get() DEAL_II_EQUALS this->vector_partitioners[to_level]
+      .get();
+  if (dst_inplace DEAL_II_EQUALS false)
     {
       if (this->ghosted_level_vector[to_level].get_partitioner().get() !=
           this->vector_partitioners[to_level].get())
@@ -223,36 +230,36 @@ MGTransferMatrixFree<dim, Number>::prolongate(
   // the implementation in do_prolongate_add is templated in the degree of the
   // element (for efficiency reasons), so we need to find the appropriate
   // kernel here...
-  if (fe_degree == 0)
+  if (fe_degree DEAL_II_EQUALS 0)
     do_prolongate_add<0>(to_level, dst_vec, src_vec);
-  else if (fe_degree == 1)
+  else if (fe_degree DEAL_II_EQUALS 1)
     do_prolongate_add<1>(to_level, dst_vec, src_vec);
-  else if (fe_degree == 2)
+  else if (fe_degree DEAL_II_EQUALS 2)
     do_prolongate_add<2>(to_level, dst_vec, src_vec);
-  else if (fe_degree == 3)
+  else if (fe_degree DEAL_II_EQUALS 3)
     do_prolongate_add<3>(to_level, dst_vec, src_vec);
-  else if (fe_degree == 4)
+  else if (fe_degree DEAL_II_EQUALS 4)
     do_prolongate_add<4>(to_level, dst_vec, src_vec);
-  else if (fe_degree == 5)
+  else if (fe_degree DEAL_II_EQUALS 5)
     do_prolongate_add<5>(to_level, dst_vec, src_vec);
-  else if (fe_degree == 6)
+  else if (fe_degree DEAL_II_EQUALS 6)
     do_prolongate_add<6>(to_level, dst_vec, src_vec);
-  else if (fe_degree == 7)
+  else if (fe_degree DEAL_II_EQUALS 7)
     do_prolongate_add<7>(to_level, dst_vec, src_vec);
-  else if (fe_degree == 8)
+  else if (fe_degree DEAL_II_EQUALS 8)
     do_prolongate_add<8>(to_level, dst_vec, src_vec);
-  else if (fe_degree == 9)
+  else if (fe_degree DEAL_II_EQUALS 9)
     do_prolongate_add<9>(to_level, dst_vec, src_vec);
-  else if (fe_degree == 10)
+  else if (fe_degree DEAL_II_EQUALS 10)
     do_prolongate_add<10>(to_level, dst_vec, src_vec);
   else
     do_prolongate_add<-1>(to_level, dst_vec, src_vec);
 
   dst_vec.compress(VectorOperation::add);
-  if (dst_inplace == false)
+  if (dst_inplace DEAL_II_EQUALS false)
     dst.copy_locally_owned_data_from(this->ghosted_level_vector[to_level]);
 
-  if (src_inplace == true)
+  if (src_inplace DEAL_II_EQUALS true)
     src.zero_out_ghosts();
 }
 
@@ -265,12 +272,14 @@ MGTransferMatrixFree<dim, Number>::restrict_and_add(
   LinearAlgebra::distributed::Vector<Number> &      dst,
   const LinearAlgebra::distributed::Vector<Number> &src) const
 {
-  Assert((from_level >= 1) && (from_level <= level_dof_indices.size()),
+  Assert((from_level >= 1) DEAL_II_AND(from_level <= level_dof_indices.size()),
          ExcIndexRange(from_level, 1, level_dof_indices.size() + 1));
 
   const bool src_inplace =
-    src.get_partitioner().get() == this->vector_partitioners[from_level].get();
-  if (src_inplace == false)
+    src.get_partitioner()
+      .get() DEAL_II_EQUALS this->vector_partitioners[from_level]
+      .get();
+  if (src_inplace DEAL_II_EQUALS false)
     {
       if (this->ghosted_level_vector[from_level].get_partitioner().get() !=
           this->vector_partitioners[from_level].get())
@@ -279,9 +288,11 @@ MGTransferMatrixFree<dim, Number>::restrict_and_add(
       this->ghosted_level_vector[from_level].copy_locally_owned_data_from(src);
     }
 
-  const bool dst_inplace = dst.get_partitioner().get() ==
-                           this->vector_partitioners[from_level - 1].get();
-  if (dst_inplace == false)
+  const bool dst_inplace =
+    dst.get_partitioner()
+      .get() DEAL_II_EQUALS this->vector_partitioners[from_level - 1]
+      .get();
+  if (dst_inplace DEAL_II_EQUALS false)
     {
       if (this->ghosted_level_vector[from_level - 1].get_partitioner().get() !=
           this->vector_partitioners[from_level - 1].get())
@@ -299,37 +310,37 @@ MGTransferMatrixFree<dim, Number>::restrict_and_add(
 
   src_vec.update_ghost_values();
 
-  if (fe_degree == 0)
+  if (fe_degree DEAL_II_EQUALS 0)
     do_restrict_add<0>(from_level, dst_vec, src_vec);
-  else if (fe_degree == 1)
+  else if (fe_degree DEAL_II_EQUALS 1)
     do_restrict_add<1>(from_level, dst_vec, src_vec);
-  else if (fe_degree == 2)
+  else if (fe_degree DEAL_II_EQUALS 2)
     do_restrict_add<2>(from_level, dst_vec, src_vec);
-  else if (fe_degree == 3)
+  else if (fe_degree DEAL_II_EQUALS 3)
     do_restrict_add<3>(from_level, dst_vec, src_vec);
-  else if (fe_degree == 4)
+  else if (fe_degree DEAL_II_EQUALS 4)
     do_restrict_add<4>(from_level, dst_vec, src_vec);
-  else if (fe_degree == 5)
+  else if (fe_degree DEAL_II_EQUALS 5)
     do_restrict_add<5>(from_level, dst_vec, src_vec);
-  else if (fe_degree == 6)
+  else if (fe_degree DEAL_II_EQUALS 6)
     do_restrict_add<6>(from_level, dst_vec, src_vec);
-  else if (fe_degree == 7)
+  else if (fe_degree DEAL_II_EQUALS 7)
     do_restrict_add<7>(from_level, dst_vec, src_vec);
-  else if (fe_degree == 8)
+  else if (fe_degree DEAL_II_EQUALS 8)
     do_restrict_add<8>(from_level, dst_vec, src_vec);
-  else if (fe_degree == 9)
+  else if (fe_degree DEAL_II_EQUALS 9)
     do_restrict_add<9>(from_level, dst_vec, src_vec);
-  else if (fe_degree == 10)
+  else if (fe_degree DEAL_II_EQUALS 10)
     do_restrict_add<10>(from_level, dst_vec, src_vec);
   else
     // go to the non-templated version of the evaluator
     do_restrict_add<-1>(from_level, dst_vec, src_vec);
 
   dst_vec.compress(VectorOperation::add);
-  if (dst_inplace == false)
+  if (dst_inplace DEAL_II_EQUALS false)
     dst += dst_vec;
 
-  if (src_inplace == true)
+  if (src_inplace DEAL_II_EQUALS true)
     src.zero_out_ghosts();
 }
 
@@ -359,7 +370,7 @@ namespace
             const unsigned int shift = 9 * degree_to_3[k] + 3 * degree_to_3[j];
             data[0] *= weights[shift];
             // loop bound as int avoids compiler warnings in case loop_length
-            // == 1 (polynomial degree 0)
+            // DEAL_II_EQUALS  1 (polynomial degree 0)
             for (int i = 1; i < loop_length - 1; ++i)
               data[i] *= weights[shift + 1];
             data[loop_length - 1] *= weights[shift + 2];
@@ -390,8 +401,9 @@ MGTransferMatrixFree<dim, Number>::do_prolongate_add(
   // constraints.
   const LinearAlgebra::distributed::Vector<Number> *to_use = &src;
   LinearAlgebra::distributed::Vector<Number>        new_src;
-  if (this->mg_constrained_dofs != nullptr &&
-      this->mg_constrained_dofs->get_user_constraint_matrix(to_level - 1)
+  if (this->mg_constrained_dofs !=
+      nullptr DEAL_II_AND this->mg_constrained_dofs
+          ->get_user_constraint_matrix(to_level - 1)
           .get_local_lines()
           .size() > 0)
     {

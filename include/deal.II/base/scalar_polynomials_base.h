@@ -257,22 +257,22 @@ inline Tensor<order, dim>
 ScalarPolynomialsBase<dim>::compute_derivative(const unsigned int i,
                                                const Point<dim> & p) const
 {
-  if (order == 1)
+  if (order DEAL_II_EQUALS 1)
     {
       auto derivative = compute_1st_derivative(i, p);
       return *reinterpret_cast<Tensor<order, dim> *>(&derivative);
     }
-  if (order == 2)
+  if (order DEAL_II_EQUALS 2)
     {
       auto derivative = compute_2nd_derivative(i, p);
       return *reinterpret_cast<Tensor<order, dim> *>(&derivative);
     }
-  if (order == 3)
+  if (order DEAL_II_EQUALS 3)
     {
       auto derivative = compute_3rd_derivative(i, p);
       return *reinterpret_cast<Tensor<order, dim> *>(&derivative);
     }
-  if (order == 4)
+  if (order DEAL_II_EQUALS 4)
     {
       auto derivative = compute_4th_derivative(i, p);
       return *reinterpret_cast<Tensor<order, dim> *>(&derivative);

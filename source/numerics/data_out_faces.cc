@@ -84,7 +84,7 @@ template <int dim, typename DoFHandlerType>
 DataOutFaces<dim, DoFHandlerType>::DataOutFaces(const bool so)
   : surface_only(so)
 {
-  Assert(dim == DoFHandlerType::dimension, ExcNotImplemented());
+  Assert(dim DEAL_II_EQUALS DoFHandlerType::dimension, ExcNotImplemented());
 }
 
 
@@ -128,7 +128,7 @@ DataOutFaces<dim, DoFHandlerType>::build_one_patch(
       const unsigned int n_q_points = fe_patch_values.n_quadrature_points;
 
       // store the intermediate points
-      Assert(patch.space_dim == dimension, ExcInternalError());
+      Assert(patch.space_dim DEAL_II_EQUALS dimension, ExcInternalError());
       const std::vector<Point<dimension>> &q_points =
         fe_patch_values.get_quadrature_points();
       // resize the patch.data member in order to have enough memory for the
@@ -161,7 +161,7 @@ DataOutFaces<dim, DoFHandlerType>::build_one_patch(
               const UpdateFlags update_flags =
                 postprocessor->get_needed_update_flags();
 
-              if (n_components == 1)
+              if (n_components DEAL_II_EQUALS 1)
                 {
                   // at each point there is only one component of value,
                   // gradient etc.
@@ -260,7 +260,7 @@ DataOutFaces<dim, DoFHandlerType>::build_one_patch(
             // now we use the given data vector without modifications. again,
             // we treat single component functions separately for efficiency
             // reasons.
-            if (n_components == 1)
+            if (n_components DEAL_II_EQUALS 1)
             {
               this->dof_data[dataset]->get_function_values(
                 this_fe_patch_values,
@@ -333,7 +333,7 @@ DataOutFaces<dim, DoFHandlerType>::build_patches(
   const unsigned int        n_subdivisions_)
 {
   // Check consistency of redundant template parameter
-  Assert(dim == dimension, ExcDimensionMismatch(dim, dimension));
+  Assert(dim DEAL_II_EQUALS dimension, ExcDimensionMismatch(dim, dimension));
 
   const unsigned int n_subdivisions =
     (n_subdivisions_ != 0) ? n_subdivisions_ : this->default_subdivisions;
@@ -357,15 +357,15 @@ DataOutFaces<dim, DoFHandlerType>::build_patches(
   // case that first_face() returns an invalid FaceDescriptor object
   std::vector<FaceDescriptor> all_faces;
   for (FaceDescriptor face = first_face();
-       ((face.first != this->triangulation->end()) &&
-        (face != FaceDescriptor()));
+       ((face.first != this->triangulation->end())
+          DEAL_II_AND(face != FaceDescriptor()));
        face = next_face(face))
     all_faces.push_back(face);
 
   // clear the patches array and allocate the right number of elements
   this->patches.clear();
   this->patches.reserve(all_faces.size());
-  Assert(this->patches.size() == 0, ExcInternalError());
+  Assert(this->patches.size() DEAL_II_EQUALS 0, ExcInternalError());
 
 
   std::vector<unsigned int> n_postprocessor_outputs(this->dof_data.size());
@@ -425,7 +425,7 @@ DataOutFaces<dim, DoFHandlerType>::first_face()
   for (; cell != this->triangulation->end(); ++cell)
     if (cell->is_locally_owned())
       for (const unsigned int f : GeometryInfo<dimension>::face_indices())
-        if (!surface_only || cell->face(f)->at_boundary())
+        if (!surface_only DEAL_II_OR cell->face(f)->at_boundary())
           return FaceDescriptor(cell, f);
 
   // just return an invalid descriptor if we haven't found a locally
@@ -448,7 +448,7 @@ DataOutFaces<dim, DoFHandlerType>::next_face(const FaceDescriptor &old_face)
   for (unsigned int f = face.second + 1;
        f < GeometryInfo<dimension>::faces_per_cell;
        ++f)
-    if (!surface_only || face.first->face(f)->at_boundary())
+    if (!surface_only DEAL_II_OR face.first->face(f)->at_boundary())
       // yup, that is so, so return it
       {
         face.second = f;
@@ -472,7 +472,7 @@ DataOutFaces<dim, DoFHandlerType>::next_face(const FaceDescriptor &old_face)
       // if it isn't locally owned
       if (active_cell->is_locally_owned())
         for (const unsigned int f : GeometryInfo<dimension>::face_indices())
-          if (!surface_only || active_cell->face(f)->at_boundary())
+          if (!surface_only DEAL_II_OR active_cell->face(f)->at_boundary())
             {
               face.first  = active_cell;
               face.second = f;

@@ -507,7 +507,7 @@ operator()(const ExtractLevelVisitor::InternalNode &node)
 
   const auto &elements = boost::geometry::index::detail::rtree::elements(node);
 
-  if (level == target_level)
+  if (level DEAL_II_EQUALS target_level)
     {
       const auto offset = boxes.size();
       boxes.resize(offset + elements.size());
@@ -562,11 +562,11 @@ extract_rtree_level(const Rtree &tree, const unsigned int level)
 
   std::vector<BoundingBox<dim>> boxes;
 
-  if (rtv.depth() == 0)
+  if (rtv.depth() DEAL_II_EQUALS 0)
     {
-      // The below algorithm does not work for `rtv.depth()==0`, which might
-      // happen if the number entries in the tree is too small.
-      // In this case, simply return a single bounding box.
+      // The below algorithm does not work for `rtv.depth()DEAL_II_EQUALS 0`,
+      // which might happen if the number entries in the tree is too small. In
+      // this case, simply return a single bounding box.
       boxes.resize(1);
       boost::geometry::convert(tree.bounds(), boxes[0]);
     }

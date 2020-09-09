@@ -122,7 +122,7 @@ namespace PETScWrappers
      *
      *   // do some additions to vector elements, but only for some elements
      *   for (unsigned int i=0; i<vector.size(); ++i)
-     *     if (some_condition(i) == true)
+     *     if (some_condition(i) DEAL_II_EQUALS  true)
      *       vector(i) += 1;
      *
      *   // do another collective operation
@@ -467,7 +467,8 @@ namespace PETScWrappers
     inline Vector &
     Vector::operator=(const dealii::Vector<number> &v)
     {
-      Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
+      Assert(size() DEAL_II_EQUALS v.size(),
+             ExcDimensionMismatch(size(), v.size()));
 
       // FIXME: the following isn't necessarily fast, but this is due to
       // the fact that PETSc doesn't offer an inlined access operator.
@@ -485,10 +486,10 @@ namespace PETScWrappers
       // efficient.
       //
       // a second way to make things faster is for the special case that
-      // number==PetscScalar. we could then declare a specialization of
-      // this template, and omit the conversion. the problem with this is
-      // that the best we can do is to use VecSetValues, but this isn't
-      // very efficient either: it wants to see an array of indices, which
+      // numberDEAL_II_EQUALS PetscScalar. we could then declare a
+      // specialization of this template, and omit the conversion. the problem
+      // with this is that the best we can do is to use VecSetValues, but this
+      // isn't very efficient either: it wants to see an array of indices, which
       // in this case a) again takes up a whole lot of memory on the heap,
       // and b) is totally dumb since its content would simply be the
       // sequence 0,1,2,3,...,n. the best of all worlds would probably be a

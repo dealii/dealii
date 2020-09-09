@@ -67,7 +67,7 @@ public:
 
   /**
    * Set the ordering of the polynomials. Requires
-   * <tt>renumber.size()==tensor_polys.n()</tt>.  Stores a copy of
+   * <tt>renumber.size()DEAL_II_EQUALS tensor_polys.n()</tt>.  Stores a copy of
    * <tt>renumber</tt>.
    */
   void
@@ -114,8 +114,8 @@ public:
    * polynomials is not efficient, because then each point value of the
    * underlying (one-dimensional) polynomials is (unnecessarily) computed
    * several times.  Instead use the evaluate() function with
-   * <tt>values.size()==</tt>n() to get the point values of all tensor
-   * polynomials all at once and in a much more efficient way.
+   * <tt>values.size()DEAL_II_EQUALS </tt>n() to get the point values of all
+   * tensor polynomials all at once and in a much more efficient way.
    */
   double
   compute_value(const unsigned int i, const Point<dim> &p) const override;
@@ -173,8 +173,8 @@ public:
    * polynomials is not efficient, because then each derivative value of the
    * underlying (one-dimensional) polynomials is (unnecessarily) computed
    * several times.  Instead use the evaluate() function, see above, with
-   * <tt>grads.size()==</tt>n() to get the point value of all tensor
-   * polynomials all at once and in a much more efficient way.
+   * <tt>grads.size()DEAL_II_EQUALS </tt>n() to get the point value of all
+   * tensor polynomials all at once and in a much more efficient way.
    */
   Tensor<1, dim>
   compute_grad(const unsigned int i, const Point<dim> &p) const override;
@@ -188,8 +188,8 @@ public:
    * polynomials is not efficient, because then each derivative value of the
    * underlying (one-dimensional) polynomials is (unnecessarily) computed
    * several times.  Instead use the evaluate() function, see above, with
-   * <tt>grad_grads.size()==</tt>n() to get the point value of all tensor
-   * polynomials all at once and in a much more efficient way.
+   * <tt>grad_grads.size()DEAL_II_EQUALS </tt>n() to get the point value of all
+   * tensor polynomials all at once and in a much more efficient way.
    */
   Tensor<2, dim>
   compute_grad_grad(const unsigned int i, const Point<dim> &p) const override;
@@ -334,8 +334,8 @@ TensorProductPolynomialsBubbles<dim>::compute_derivative(
               derivative_1[d] = 1.;
               // compute grad(4*\prod_{i=1}^d (x_i(1-x_i)))(p)
               for (unsigned j = 0; j < dim; ++j)
-                derivative_1[d] *=
-                  (d == j ? 4 * (1 - 2 * p(j)) : 4 * p(j) * (1 - p(j)));
+                derivative_1[d] *= (d DEAL_II_EQUALS j ? 4 * (1 - 2 * p(j)) :
+                                                         4 * p(j) * (1 - p(j)));
               // and multiply with (2*x_i-1)^{r-1}
               for (unsigned int i = 0; i < q_degree - 1; ++i)
                 derivative_1[d] *= 2 * p(comp) - 1;
@@ -405,9 +405,9 @@ TensorProductPolynomialsBubbles<dim>::compute_derivative(
                 for (unsigned int x = 0; x < dim; ++x)
                   {
                     unsigned int derivative = 0;
-                    if (d1 == x || d2 == x)
+                    if (d1 DEAL_II_EQUALS x DEAL_II_OR d2 DEAL_II_EQUALS x)
                       {
-                        if (d1 == d2)
+                        if (d1 DEAL_II_EQUALS d2)
                           derivative = 2;
                         else
                           derivative = 1;
@@ -426,8 +426,8 @@ TensorProductPolynomialsBubbles<dim>::compute_derivative(
               grad_grad_3[comp][d] = v[dim][1];
               for (unsigned int x = 0; x < dim; ++x)
                 {
-                  grad_grad_2[d][comp] *= v[x][d == x];
-                  grad_grad_3[comp][d] *= v[x][d == x];
+                  grad_grad_2[d][comp] *= v[x][d DEAL_II_EQUALS x];
+                  grad_grad_3[comp][d] *= v[x][d DEAL_II_EQUALS x];
                 }
             }
 

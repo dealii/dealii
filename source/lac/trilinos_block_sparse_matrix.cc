@@ -60,7 +60,8 @@ namespace TrilinosWrappers
         {
           BlockType *p = new BlockType();
 
-          Assert(this->sub_objects[r][c] == nullptr, ExcInternalError());
+          Assert(this->sub_objects[r][c] DEAL_II_EQUALS nullptr,
+                 ExcInternalError());
           this->sub_objects[r][c] = p;
         }
   }
@@ -81,20 +82,22 @@ namespace TrilinosWrappers
       epetra_maps.push_back(
         parallel_partitioning[i].make_trilinos_map(communicator, false));
 
-    Assert(epetra_maps.size() == block_sparsity_pattern.n_block_rows(),
+    Assert(epetra_maps.size()
+             DEAL_II_EQUALS block_sparsity_pattern.n_block_rows(),
            ExcDimensionMismatch(epetra_maps.size(),
                                 block_sparsity_pattern.n_block_rows()));
-    Assert(epetra_maps.size() == block_sparsity_pattern.n_block_cols(),
+    Assert(epetra_maps.size()
+             DEAL_II_EQUALS block_sparsity_pattern.n_block_cols(),
            ExcDimensionMismatch(epetra_maps.size(),
                                 block_sparsity_pattern.n_block_cols()));
 
     const size_type n_block_rows = epetra_maps.size();
     (void)n_block_rows;
 
-    Assert(n_block_rows == block_sparsity_pattern.n_block_rows(),
+    Assert(n_block_rows DEAL_II_EQUALS block_sparsity_pattern.n_block_rows(),
            ExcDimensionMismatch(n_block_rows,
                                 block_sparsity_pattern.n_block_rows()));
-    Assert(n_block_rows == block_sparsity_pattern.n_block_cols(),
+    Assert(n_block_rows DEAL_II_EQUALS block_sparsity_pattern.n_block_cols(),
            ExcDimensionMismatch(n_block_rows,
                                 block_sparsity_pattern.n_block_cols()));
 
@@ -169,12 +172,14 @@ namespace TrilinosWrappers
   {
     const size_type n_block_rows = parallel_partitioning.size();
 
-    Assert(n_block_rows == dealii_block_sparse_matrix.n_block_rows(),
-           ExcDimensionMismatch(n_block_rows,
-                                dealii_block_sparse_matrix.n_block_rows()));
-    Assert(n_block_rows == dealii_block_sparse_matrix.n_block_cols(),
-           ExcDimensionMismatch(n_block_rows,
-                                dealii_block_sparse_matrix.n_block_cols()));
+    Assert(
+      n_block_rows DEAL_II_EQUALS dealii_block_sparse_matrix.n_block_rows(),
+      ExcDimensionMismatch(n_block_rows,
+                           dealii_block_sparse_matrix.n_block_rows()));
+    Assert(
+      n_block_rows DEAL_II_EQUALS dealii_block_sparse_matrix.n_block_cols(),
+      ExcDimensionMismatch(n_block_rows,
+                           dealii_block_sparse_matrix.n_block_cols()));
 
     // Call the other basic reinit function ...
     reinit(n_block_rows, n_block_rows);
@@ -202,13 +207,16 @@ namespace TrilinosWrappers
     const ::dealii::BlockSparseMatrix<double> &dealii_block_sparse_matrix,
     const double                               drop_tolerance)
   {
-    Assert(dealii_block_sparse_matrix.n_block_rows() ==
-             dealii_block_sparse_matrix.n_block_cols(),
+    Assert(dealii_block_sparse_matrix
+             .n_block_rows()
+               DEAL_II_EQUALS dealii_block_sparse_matrix.n_block_cols(),
            ExcDimensionMismatch(dealii_block_sparse_matrix.n_block_rows(),
                                 dealii_block_sparse_matrix.n_block_cols()));
-    Assert(dealii_block_sparse_matrix.m() == dealii_block_sparse_matrix.n(),
-           ExcDimensionMismatch(dealii_block_sparse_matrix.m(),
-                                dealii_block_sparse_matrix.n()));
+    Assert(
+      dealii_block_sparse_matrix.m()
+        DEAL_II_EQUALS dealii_block_sparse_matrix.n(),
+      ExcDimensionMismatch(dealii_block_sparse_matrix.m(),
+                           dealii_block_sparse_matrix.n()));
 
     std::vector<IndexSet> parallel_partitioning;
     for (size_type i = 0; i < dealii_block_sparse_matrix.n_block_rows(); ++i)

@@ -236,8 +236,8 @@ namespace LinearAlgebra
       using real_type       = typename numbers::NumberTraits<Number>::real_type;
 
       static_assert(
-        std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value ||
-          std::is_same<MemorySpace, ::dealii::MemorySpace::CUDA>::value,
+        std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value DEAL_II_OR
+                                                                      std::is_same<MemorySpace, ::dealii::MemorySpace::CUDA>::value,
         "MemorySpace should be Host or CUDA");
 
       /**
@@ -788,7 +788,8 @@ namespace LinearAlgebra
        * a vector is created on only one processor, then the result would
        * satisfy
        * @code
-       *  vec.locally_owned_elements() == complete_index_set(vec.size())
+       *  vec.locally_owned_elements() DEAL_II_EQUALS
+       * complete_index_set(vec.size())
        * @endcode
        */
       virtual dealii::IndexSet
@@ -876,7 +877,7 @@ namespace LinearAlgebra
        * the C++ standard library by returning iterators to the start and end
        * of the <i>locally owned</i> elements of this vector.
        *
-       * It holds that end() - begin() == local_size().
+       * It holds that end() - begin() DEAL_II_EQUALS  local_size().
        *
        * @note For the CUDA memory space, the iterator points to memory on the
        * device.
@@ -1504,15 +1505,16 @@ namespace LinearAlgebra
              ExcMessage(
                "This function is only implemented for the Host memory space"));
       Assert(
-        partitioner->in_local_range(global_index) ||
-          partitioner->ghost_indices().is_element(global_index),
+        partitioner->in_local_range(global_index)
+          DEAL_II_OR partitioner->ghost_indices()
+            .is_element(global_index),
         ExcAccessToNonLocalElement(global_index,
                                    partitioner->local_range().first,
                                    partitioner->local_range().second,
                                    partitioner->ghost_indices().n_elements()));
       // do not allow reading a vector which is not in ghost mode
-      Assert(partitioner->in_local_range(global_index) ||
-               vector_is_ghosted == true,
+      Assert(partitioner->in_local_range(global_index)
+               DEAL_II_OR vector_is_ghosted DEAL_II_EQUALS true,
              ExcMessage("You tried to read a ghost element of this vector, "
                         "but it has not imported its ghost values."));
       return data.values[partitioner->global_to_local(global_index)];
@@ -1528,8 +1530,9 @@ namespace LinearAlgebra
              ExcMessage(
                "This function is only implemented for the Host memory space"));
       Assert(
-        partitioner->in_local_range(global_index) ||
-          partitioner->ghost_indices().is_element(global_index),
+        partitioner->in_local_range(global_index)
+          DEAL_II_OR partitioner->ghost_indices()
+            .is_element(global_index),
         ExcAccessToNonLocalElement(global_index,
                                    partitioner->local_range().first,
                                    partitioner->local_range().second,
@@ -1575,7 +1578,8 @@ namespace LinearAlgebra
                        partitioner->local_size() +
                          partitioner->n_ghost_indices());
       // do not allow reading a vector which is not in ghost mode
-      Assert(local_index < local_size() || vector_is_ghosted == true,
+      Assert(local_index < local_size()
+                             DEAL_II_OR vector_is_ghosted DEAL_II_EQUALS true,
              ExcMessage("You tried to read a ghost element of this vector, "
                         "but it has not imported its ghost values."));
 
@@ -1828,8 +1832,8 @@ namespace internal
       // Used for (Trilinos/PETSc)Wrappers::SparseMatrix
       template <typename MatrixType,
                 typename std::enable_if<
-                  has_get_mpi_communicator<MatrixType>::value &&
-                    has_locally_owned_domain_indices<MatrixType>::value,
+                  has_get_mpi_communicator<MatrixType>::value DEAL_II_AND
+                                                              has_locally_owned_domain_indices<MatrixType>::value,
                   MatrixType>::type * = nullptr>
       static void
       reinit_domain_vector(MatrixType &                                mat,
@@ -1858,8 +1862,8 @@ namespace internal
       // Used for (Trilinos/PETSc)Wrappers::SparseMatrix
       template <typename MatrixType,
                 typename std::enable_if<
-                  has_get_mpi_communicator<MatrixType>::value &&
-                    has_locally_owned_range_indices<MatrixType>::value,
+                  has_get_mpi_communicator<MatrixType>::value DEAL_II_AND
+                                                              has_locally_owned_range_indices<MatrixType>::value,
                   MatrixType>::type * = nullptr>
       static void
       reinit_range_vector(MatrixType &                                mat,

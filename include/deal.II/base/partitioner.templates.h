@@ -48,8 +48,10 @@ namespace Utilities
     {
       AssertDimension(temporary_storage.size(), n_import_indices());
       AssertIndexRange(communication_channel, 200);
-      Assert(ghost_array.size() == n_ghost_indices() ||
-               ghost_array.size() == n_ghost_indices_in_larger_set,
+      Assert(ghost_array
+               .size() DEAL_II_EQUALS n_ghost_indices()
+                 DEAL_II_OR           ghost_array.size()
+                   DEAL_II_EQUALS     n_ghost_indices_in_larger_set,
              ExcGhostIndexArrayHasWrongSize(ghost_array.size(),
                                             n_ghost_indices(),
                                             n_ghost_indices_in_larger_set));
@@ -60,7 +62,7 @@ namespace Utilities
       if (n_import_targets > 0)
         AssertDimension(locally_owned_array.size(), local_size());
 
-      Assert(requests.size() == 0,
+      Assert(requests.size() DEAL_II_EQUALS 0,
              ExcMessage("Another operation seems to still be running. "
                         "Call update_ghost_values_finish() first."));
 
@@ -81,8 +83,9 @@ namespace Utilities
       // function.
       AssertIndexRange(n_ghost_indices(), n_ghost_indices_in_larger_set + 1);
       const bool use_larger_set =
-        (n_ghost_indices_in_larger_set > n_ghost_indices() &&
-         ghost_array.size() == n_ghost_indices_in_larger_set);
+        (n_ghost_indices_in_larger_set >
+         n_ghost_indices() DEAL_II_AND ghost_array.size()
+           DEAL_II_EQUALS              n_ghost_indices_in_larger_set);
       Number *ghost_array_ptr =
         use_larger_set ? ghost_array.data() + n_ghost_indices_in_larger_set -
                            n_ghost_indices() :
@@ -105,22 +108,22 @@ namespace Utilities
         }
 
       Number *temp_array_ptr = temporary_storage.data();
-#    if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-      defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+#    if defined(DEAL_II_COMPILER_CUDA_AWARE) \
+      DEAL_II_AND defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
       // When using CUDAs-aware MPI, the set of local indices that are ghosts
       // indices on other processors is expanded in arrays. This is for
       // performance reasons as this can significantly decrease the number of
       // kernel launched. The indices are expanded the first time the function
       // is called.
-      if ((std::is_same<MemorySpaceType, MemorySpace::CUDA>::value) &&
-          (import_indices_plain_dev.size() == 0))
+      if ((std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)DEAL_II_AND(
+            import_indices_plain_dev.size() DEAL_II_EQUALS 0))
         initialize_import_indices_plain_dev();
 #    endif
 
       for (unsigned int i = 0; i < n_import_targets; i++)
         {
-#    if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-      defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+#    if defined(DEAL_II_COMPILER_CUDA_AWARE) \
+      DEAL_II_AND defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
           if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
             {
               const auto chunk_size = import_indices_plain_dev[i].second;
@@ -182,8 +185,10 @@ namespace Utilities
       const ArrayView<Number, MemorySpaceType> &ghost_array,
       std::vector<MPI_Request> &                requests) const
     {
-      Assert(ghost_array.size() == n_ghost_indices() ||
-               ghost_array.size() == n_ghost_indices_in_larger_set,
+      Assert(ghost_array
+               .size() DEAL_II_EQUALS n_ghost_indices()
+                 DEAL_II_OR           ghost_array.size()
+                   DEAL_II_EQUALS     n_ghost_indices_in_larger_set,
              ExcGhostIndexArrayHasWrongSize(ghost_array.size(),
                                             n_ghost_indices(),
                                             n_ghost_indices_in_larger_set));
@@ -202,8 +207,9 @@ namespace Utilities
 
       // in case we only sent a subset of indices, we now need to move the data
       // to the correct positions and delete the old content
-      if (n_ghost_indices_in_larger_set > n_ghost_indices() &&
-          ghost_array.size() == n_ghost_indices_in_larger_set)
+      if (n_ghost_indices_in_larger_set >
+          n_ghost_indices() DEAL_II_AND ghost_array.size()
+            DEAL_II_EQUALS              n_ghost_indices_in_larger_set)
         {
           unsigned int offset =
             n_ghost_indices_in_larger_set - n_ghost_indices();
@@ -272,8 +278,10 @@ namespace Utilities
     {
       AssertDimension(temporary_storage.size(), n_import_indices());
       AssertIndexRange(communication_channel, 200);
-      Assert(ghost_array.size() == n_ghost_indices() ||
-               ghost_array.size() == n_ghost_indices_in_larger_set,
+      Assert(ghost_array
+               .size() DEAL_II_EQUALS n_ghost_indices()
+                 DEAL_II_OR           ghost_array.size()
+                   DEAL_II_EQUALS     n_ghost_indices_in_larger_set,
              ExcGhostIndexArrayHasWrongSize(ghost_array.size(),
                                             n_ghost_indices(),
                                             n_ghost_indices_in_larger_set));
@@ -286,19 +294,20 @@ namespace Utilities
       // Having different code in debug and optimized mode is somewhat
       // dangerous, but it really saves communication so do it anyway
 #    ifndef DEBUG
-      if (vector_operation == VectorOperation::insert)
+      if (vector_operation DEAL_II_EQUALS VectorOperation::insert)
         return;
 #    endif
 
       // nothing to do when we neither have import
       // nor ghost indices.
-      if (n_ghost_indices() == 0 && n_import_indices() == 0)
+      if (n_ghost_indices() DEAL_II_EQUALS 0 DEAL_II_AND n_import_indices()
+            DEAL_II_EQUALS 0)
         return;
 
       const unsigned int n_import_targets = import_targets_data.size();
       const unsigned int n_ghost_targets  = ghost_targets_data.size();
 
-      Assert(requests.size() == 0,
+      Assert(requests.size() DEAL_II_EQUALS 0,
              ExcMessage("Another compress operation seems to still be running. "
                         "Call compress_finish() first."));
 
@@ -346,8 +355,9 @@ namespace Utilities
         {
           // in case we only sent a subset of indices, we now need to move the
           // data to the correct positions and delete the old content
-          if (n_ghost_indices_in_larger_set > n_ghost_indices() &&
-              ghost_array.size() == n_ghost_indices_in_larger_set)
+          if (n_ghost_indices_in_larger_set >
+              n_ghost_indices() DEAL_II_AND ghost_array.size()
+                DEAL_II_EQUALS              n_ghost_indices_in_larger_set)
             {
               std::vector<std::pair<unsigned int, unsigned int>>::const_iterator
                 my_ghosts = ghost_indices_subset_data.begin() +
@@ -412,8 +422,8 @@ namespace Utilities
             ExcMessage("Index overflow: Maximum message size in MPI is 2GB. "
                        "The number of ghost entries times the size of 'Number' "
                        "exceeds this value. This is not supported."));
-#    if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-      defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+#    if defined(DEAL_II_COMPILER_CUDA_AWARE) \
+      DEAL_II_AND defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
           if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
             cudaDeviceSynchronize();
 #    endif
@@ -506,8 +516,10 @@ namespace Utilities
       std::vector<MPI_Request> &                      requests) const
     {
       AssertDimension(temporary_storage.size(), n_import_indices());
-      Assert(ghost_array.size() == n_ghost_indices() ||
-               ghost_array.size() == n_ghost_indices_in_larger_set,
+      Assert(ghost_array
+               .size() DEAL_II_EQUALS n_ghost_indices()
+                 DEAL_II_OR           ghost_array.size()
+                   DEAL_II_EQUALS     n_ghost_indices_in_larger_set,
              ExcGhostIndexArrayHasWrongSize(ghost_array.size(),
                                             n_ghost_indices(),
                                             n_ghost_indices_in_larger_set));
@@ -515,7 +527,7 @@ namespace Utilities
       // in optimized mode, no communication was started, so leave the
       // function directly (and only clear ghosts)
 #    ifndef DEBUG
-      if (vector_operation == VectorOperation::insert)
+      if (vector_operation DEAL_II_EQUALS VectorOperation::insert)
         {
           Assert(requests.empty(),
                  ExcInternalError(
@@ -553,28 +565,29 @@ namespace Utilities
 #    endif
 
       // nothing to do when we neither have import nor ghost indices.
-      if (n_ghost_indices() == 0 && n_import_indices() == 0)
+      if (n_ghost_indices() DEAL_II_EQUALS 0 DEAL_II_AND n_import_indices()
+            DEAL_II_EQUALS 0)
         return;
 
       const unsigned int n_import_targets = import_targets_data.size();
       const unsigned int n_ghost_targets  = ghost_targets_data.size();
 
-#    if (defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-         defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
+#    if (defined(DEAL_II_COMPILER_CUDA_AWARE) \
+           DEAL_II_AND defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
       // When using CUDAs-aware MPI, the set of local indices that are ghosts
       // indices on other processors is expanded in arrays. This is for
       // performance reasons as this can significantly decrease the number of
       // kernel launched. The indices are expanded the first time the function
       // is called.
-      if ((std::is_same<MemorySpaceType, MemorySpace::CUDA>::value) &&
-          (import_indices_plain_dev.size() == 0))
+      if ((std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)DEAL_II_AND(
+            import_indices_plain_dev.size() DEAL_II_EQUALS 0))
         initialize_import_indices_plain_dev();
 #    endif
 
       if (vector_operation != dealii::VectorOperation::insert)
         AssertDimension(n_ghost_targets + n_import_targets, requests.size());
       // first wait for the receive to complete
-      if (requests.size() > 0 && n_import_targets > 0)
+      if (requests.size() > 0 DEAL_II_AND n_import_targets > 0)
         {
           AssertDimension(locally_owned_array.size(), local_size());
           const int ierr =
@@ -582,18 +595,18 @@ namespace Utilities
           AssertThrowMPI(ierr);
 
           const Number *read_position = temporary_storage.data();
-#    if !(defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-          defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
+#    if !(defined(DEAL_II_COMPILER_CUDA_AWARE) \
+            DEAL_II_AND defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
           // If the operation is no insertion, add the imported data to the
           // local values. For insert, nothing is done here (but in debug mode
           // we assert that the specified value is either zero or matches with
           // the ones already present
-          if (vector_operation == dealii::VectorOperation::add)
+          if (vector_operation DEAL_II_EQUALS dealii::VectorOperation::add)
             for (const auto &import_range : import_indices_data)
               for (unsigned int j = import_range.first; j < import_range.second;
                    j++)
                 locally_owned_array[j] += *read_position++;
-          else if (vector_operation == dealii::VectorOperation::min)
+          else if (vector_operation DEAL_II_EQUALS dealii::VectorOperation::min)
             for (const auto &import_range : import_indices_data)
               for (unsigned int j = import_range.first; j < import_range.second;
                    j++)
@@ -602,7 +615,7 @@ namespace Utilities
                     internal::get_min(*read_position, locally_owned_array[j]);
                   read_position++;
                 }
-          else if (vector_operation == dealii::VectorOperation::max)
+          else if (vector_operation DEAL_II_EQUALS dealii::VectorOperation::max)
             for (const auto &import_range : import_indices_data)
               for (unsigned int j = import_range.first; j < import_range.second;
                    j++)
@@ -621,20 +634,20 @@ namespace Utilities
                 // interpolation on two elements sharing the face, values on
                 // this face obtained from each side might be different due to
                 // additions being done in different order.
-                Assert(*read_position == Number() ||
-                         internal::get_abs(locally_owned_array[j] -
-                                           *read_position) <=
-                           internal::get_abs(locally_owned_array[j] +
-                                             *read_position) *
-                             100000. *
-                             std::numeric_limits<typename numbers::NumberTraits<
-                               Number>::real_type>::epsilon(),
+                Assert(*read_position DEAL_II_EQUALS Number()
+                           DEAL_II_OR internal::get_abs(locally_owned_array[j] -
+                                                        *read_position) <=
+                         internal::get_abs(locally_owned_array[j] +
+                                           *read_position) *
+                           100000. *
+                           std::numeric_limits<typename numbers::NumberTraits<
+                             Number>::real_type>::epsilon(),
                        typename dealii::LinearAlgebra::distributed::Vector<
                          Number>::ExcNonMatchingElements(*read_position,
                                                          locally_owned_array[j],
                                                          my_pid));
 #    else
-          if (vector_operation == dealii::VectorOperation::add)
+          if (vector_operation DEAL_II_EQUALS dealii::VectorOperation::add)
             {
               for (auto const &import_indices_plain : import_indices_plain_dev)
                 {
@@ -654,7 +667,7 @@ namespace Utilities
                   read_position += chunk_size;
                 }
             }
-          else if (vector_operation == dealii::VectorOperation::min)
+          else if (vector_operation DEAL_II_EQUALS dealii::VectorOperation::min)
             {
               for (auto const &import_indices_plain : import_indices_plain_dev)
                 {
@@ -674,7 +687,7 @@ namespace Utilities
                   read_position += chunk_size;
                 }
             }
-          else if (vector_operation == dealii::VectorOperation::max)
+          else if (vector_operation DEAL_II_EQUALS dealii::VectorOperation::max)
             {
               for (auto const &import_indices_plain : import_indices_plain_dev)
                 {
@@ -710,7 +723,7 @@ namespace Utilities
         }
 
       // wait for the send operations to complete
-      if (requests.size() > 0 && n_ghost_targets > 0)
+      if (requests.size() > 0 DEAL_II_AND n_ghost_targets > 0)
         {
           const int ierr = MPI_Waitall(n_ghost_targets,
                                        &requests[n_import_targets],
@@ -726,8 +739,8 @@ namespace Utilities
         {
           Assert(ghost_array.begin() != nullptr, ExcInternalError());
 
-#    if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-      defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+#    if defined(DEAL_II_COMPILER_CUDA_AWARE) \
+      DEAL_II_AND defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
           if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
             {
               Assert(std::is_trivial<Number>::value, ExcNotImplemented());

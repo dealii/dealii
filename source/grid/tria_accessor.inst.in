@@ -18,8 +18,8 @@
 for (deal_II_struct_dimension : DIMENSIONS; deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : DIMENSIONS)
   {
-#if deal_II_struct_dimension <= deal_II_dimension && \
-  deal_II_dimension <= deal_II_space_dimension
+#if deal_II_struct_dimension <= \
+  deal_II_dimension DEAL_II_AND deal_II_dimension <= deal_II_space_dimension
     template class TriaAccessorBase<deal_II_struct_dimension,
                                     deal_II_dimension,
                                     deal_II_space_dimension>;

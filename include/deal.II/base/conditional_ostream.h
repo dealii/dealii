@@ -40,14 +40,14 @@ DEAL_II_NAMESPACE_OPEN
  * condition. This becomes cumbersome and clutters up the code. Rather than
  * doing so, the present class can be used: objects of its type act just like
  * a standard output stream, but they only print something based on a
- * condition that can be set to, for example, <tt>mpi_process==0</tt>, so that
- * only one process has a true condition and in all other processes writes to
- * this object just disappear in nirvana.
+ * condition that can be set to, for example, <tt>mpi_processDEAL_II_EQUALS
+ * 0</tt>, so that only one process has a true condition and in all other
+ * processes writes to this object just disappear in nirvana.
  *
  * The usual usage of this class is as follows:
  *
  * @code
- * ConditionalOStream pout(std::cout, this_mpi_process==0);
+ * ConditionalOStream pout(std::cout, this_mpi_processDEAL_II_EQUALS 0);
  *
  * // all processes print the following information to standard output
  * std::cout << "Reading parameter file on process "
@@ -147,7 +147,7 @@ template <class T>
 inline const ConditionalOStream &
 ConditionalOStream::operator<<(const T &t) const
 {
-  if (active_flag == true)
+  if (active_flag DEAL_II_EQUALS true)
     output_stream << t;
 
   return *this;
@@ -157,7 +157,7 @@ ConditionalOStream::operator<<(const T &t) const
 inline const ConditionalOStream &
 ConditionalOStream::operator<<(std::ostream &(*p)(std::ostream &)) const
 {
-  if (active_flag == true)
+  if (active_flag DEAL_II_EQUALS true)
     output_stream << p;
 
   return *this;

@@ -76,10 +76,10 @@ PreconditionBlock<MatrixType, inverse_type>::initialize(
   const size_type bsize = parameters.block_size;
 
   clear();
-  Assert(M.m() == M.n(), ExcNotQuadratic());
+  Assert(M.m() DEAL_II_EQUALS M.n(), ExcNotQuadratic());
   A = &M;
   Assert(bsize > 0, ExcIndexRange(bsize, 1, M.m()));
-  Assert(A->m() % bsize == 0, ExcWrongBlockSize(bsize, A->m()));
+  Assert(A->m() % bsize DEAL_II_EQUALS 0, ExcWrongBlockSize(bsize, A->m()));
   blocksize                  = bsize;
   relaxation                 = parameters.relaxation;
   const unsigned int nblocks = A->m() / bsize;
@@ -90,7 +90,7 @@ PreconditionBlock<MatrixType, inverse_type>::initialize(
 
   if (parameters.invert_diagonal)
     {
-      if (permutation.size() == M.m())
+      if (permutation.size() DEAL_II_EQUALS M.m())
         invert_permuted_diagblocks();
       else
         invert_diagblocks();
@@ -118,7 +118,8 @@ PreconditionBlock<MatrixType, inverse_type>::invert_permuted_diagblocks()
   Assert(blocksize != 0, ExcNotInitialized());
 
   const MatrixType &M = *A;
-  Assert(this->inverses_ready() == 0, ExcInverseMatricesAlreadyExist());
+  Assert(this->inverses_ready() DEAL_II_EQUALS 0,
+         ExcInverseMatricesAlreadyExist());
   AssertDimension(permutation.size(), M.m());
   AssertDimension(inverse_permutation.size(), M.m());
 
@@ -231,12 +232,13 @@ PreconditionBlock<MatrixType, inverse_type>::forward_step(
 
   if (permutation.size() != 0)
     Assert(
-      permutation.size() == M.m() || permutation.size() == this->size(),
+      permutation.size() DEAL_II_EQUALS M.m()
+        DEAL_II_OR permutation.size() DEAL_II_EQUALS this->size(),
       ExcMessage(
         "Permutation vector size must be equal to either the number of blocks or the dimension of the system"));
 
-  const bool permuted      = (permutation.size() == M.m());
-  const bool cell_permuted = (permutation.size() == this->size());
+  const bool permuted      = (permutation.size() DEAL_II_EQUALS M.m());
+  const bool cell_permuted = (permutation.size() DEAL_II_EQUALS this->size());
 
   Vector<number2> b_cell(this->blocksize), x_cell(this->blocksize);
 
@@ -281,9 +283,9 @@ PreconditionBlock<MatrixType, inverse_type>::forward_step(
               b_cell_row -= entry->value() * prev(column);
               // TODO:[GK] Find out if this is really once column and once
               // permuted
-              if (!this->inverses_ready() &&
-                  inverse_permuted_column >= block_start &&
-                  inverse_permuted_column < block_start + this->blocksize)
+              if (!this->inverses_ready() DEAL_II_AND inverse_permuted_column >=
+                  block_start DEAL_II_AND inverse_permuted_column <
+                  block_start + this->blocksize)
                 {
                   const size_type column_cell = column - block_start;
                   if (transpose_diagonal)
@@ -330,12 +332,13 @@ PreconditionBlock<MatrixType, inverse_type>::backward_step(
 
   if (permutation.size() != 0)
     Assert(
-      permutation.size() == M.m() || permutation.size() == this->size(),
+      permutation.size() DEAL_II_EQUALS M.m()
+        DEAL_II_OR permutation.size() DEAL_II_EQUALS this->size(),
       ExcMessage(
         "Permutation vector size must be equal to either the number of blocks or the dimension of the system"));
 
-  const bool permuted      = (permutation.size() == M.m());
-  const bool cell_permuted = (permutation.size() == this->size());
+  const bool permuted      = (permutation.size() DEAL_II_EQUALS M.m());
+  const bool cell_permuted = (permutation.size() DEAL_II_EQUALS this->size());
 
   Vector<number2> b_cell(this->blocksize), x_cell(this->blocksize);
 
@@ -371,8 +374,8 @@ PreconditionBlock<MatrixType, inverse_type>::backward_step(
               const size_type inverse_permuted_column =
                 permuted ? inverse_permutation[column] : column;
               b_cell_row -= entry->value() * prev(column);
-              if (!this->inverses_ready() &&
-                  inverse_permuted_column < block_end && column >= block_start)
+              if (!this->inverses_ready() DEAL_II_AND inverse_permuted_column <
+                  block_end DEAL_II_AND column >= block_start)
                 {
                   const size_type column_cell = column - block_start;
                   // We need the
@@ -427,7 +430,8 @@ PreconditionBlock<MatrixType, inverse_type>::invert_diagblocks()
   Assert(blocksize != 0, ExcNotInitialized());
 
   const MatrixType &M = *A;
-  Assert(this->inverses_ready() == 0, ExcInverseMatricesAlreadyExist());
+  Assert(this->inverses_ready() DEAL_II_EQUALS 0,
+         ExcInverseMatricesAlreadyExist());
 
   FullMatrix<inverse_type> M_cell(blocksize);
 
@@ -726,7 +730,7 @@ PreconditionBlockSOR<MatrixType, inverse_type>::forward(
   const bool        permuted = (this->permutation.size() != 0);
   if (permuted)
     {
-      Assert(this->permutation.size() == M.m(),
+      Assert(this->permutation.size() DEAL_II_EQUALS M.m(),
              ExcDimensionMismatch(this->permutation.size(), M.m()));
     }
 
@@ -765,8 +769,8 @@ PreconditionBlockSOR<MatrixType, inverse_type>::forward(
 
               if (inverse_permuted_column < block_start)
                 b_cell_row -= entry->value() * dst(column);
-              else if (!this->inverses_ready() &&
-                       column < block_start + this->blocksize)
+              else if (!this->inverses_ready()
+                          DEAL_II_AND column < block_start + this->blocksize)
                 {
                   const size_type column_cell = column - block_start;
                   if (transpose_diagonal)
@@ -815,7 +819,7 @@ PreconditionBlockSOR<MatrixType, inverse_type>::backward(
   const bool        permuted = (this->permutation.size() != 0);
   if (permuted)
     {
-      Assert(this->permutation.size() == M.m(),
+      Assert(this->permutation.size() DEAL_II_EQUALS M.m(),
              ExcDimensionMismatch(this->permutation.size(), M.m()));
     }
 
@@ -855,7 +859,8 @@ PreconditionBlockSOR<MatrixType, inverse_type>::backward(
                 permuted ? this->inverse_permutation[column] : column;
               if (inverse_permuted_column >= block_end)
                 b_cell_row -= entry->value() * dst(column);
-              else if (!this->inverses_ready() && column >= block_start)
+              else if (!this->inverses_ready()
+                          DEAL_II_AND column >= block_start)
                 {
                   const size_type column_cell = column - block_start;
                   // We need the

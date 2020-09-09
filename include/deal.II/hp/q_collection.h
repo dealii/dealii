@@ -108,8 +108,7 @@ namespace hp
      * Equality comparison operator. All stored Quadrature objects are compared
      * in order.
      */
-    bool
-    operator==(const QCollection<dim> &q_collection) const;
+    bool operator DEAL_II_EQUALS(const QCollection<dim> &q_collection) const;
 
     /**
      * Return the number of quadrature pointers stored in this object.
@@ -206,15 +205,15 @@ namespace hp
 
 
   template <int dim>
-  inline bool
-  QCollection<dim>::operator==(const QCollection<dim> &q_collection) const
+  inline bool QCollection<dim>::
+              operator DEAL_II_EQUALS(const QCollection<dim> &q_collection) const
   {
     const unsigned int n_quadratures = size();
     if (n_quadratures != q_collection.size())
       return false;
 
     for (unsigned int i = 0; i < n_quadratures; ++i)
-      if (!(*quadratures[i] == q_collection[i]))
+      if (!(*quadratures[i] DEAL_II_EQUALS q_collection[i]))
         return false;
 
     return true;

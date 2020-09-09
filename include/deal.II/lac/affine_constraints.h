@@ -565,7 +565,8 @@ public:
   /**
    * Move constructor
    */
-  AffineConstraints(AffineConstraints &&affine_constraints) = default; // NOLINT
+  AffineConstraints(AffineConstraints DEAL_II_AND affine_constraints) =
+    default; // NOLINT
 
   /**
    * Copy operator. Like for many other large objects, this operator
@@ -583,7 +584,8 @@ public:
    * Move assignment operator
    */
   AffineConstraints &
-  operator=(AffineConstraints &&affine_constraints) = default; // NOLINT
+  operator=(AffineConstraints DEAL_II_AND affine_constraints) =
+    default; // NOLINT
 
   /**
    * Copy the given object to the current one.
@@ -1576,8 +1578,7 @@ public:
      * the two operands are equal, irrespective of the fact that the contents
      * of the line may be different.
      */
-    bool
-    operator==(const ConstraintLine &) const;
+    bool operator DEAL_II_EQUALS(const ConstraintLine &) const;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
@@ -1946,7 +1947,7 @@ template <typename number>
 inline void
 AffineConstraints<number>::add_line(const size_type line_n)
 {
-  Assert(sorted == false, ExcMatrixIsClosed());
+  Assert(sorted DEAL_II_EQUALS false, ExcMatrixIsClosed());
 
   // the following can happen when we compute with distributed meshes and dof
   // handlers and we constrain a degree of freedom whose number we don't have
@@ -1978,7 +1979,7 @@ AffineConstraints<number>::add_entry(const size_type line_n,
                                      const size_type column,
                                      const number    value)
 {
-  Assert(sorted == false, ExcMatrixIsClosed());
+  Assert(sorted DEAL_II_EQUALS false, ExcMatrixIsClosed());
   Assert(line_n != column,
          ExcMessage("Can't constrain a degree of freedom to itself"));
 
@@ -1996,12 +1997,12 @@ AffineConstraints<number>::add_entry(const size_type line_n,
   // exists, since we don't want to enter it twice
   Assert(lines_cache[line_index] != numbers::invalid_size_type,
          ExcInternalError());
-  Assert(!local_lines.size() || local_lines.is_element(column),
+  Assert(!local_lines.size() DEAL_II_OR local_lines.is_element(column),
          ExcColumnNotStoredHere(line_n, column));
   ConstraintLine *line_ptr = &lines[lines_cache[line_index]];
-  Assert(line_ptr->index == line_n, ExcInternalError());
+  Assert(line_ptr->index DEAL_II_EQUALS line_n, ExcInternalError());
   for (const auto &p : line_ptr->entries)
-    if (p.first == column)
+    if (p.first DEAL_II_EQUALS column)
       {
         Assert(std::abs(p.second - value) < 1.e-14,
                ExcEntryAlreadyExists(line_n, column, p.second, value));
@@ -2017,8 +2018,8 @@ AffineConstraints<number>::set_inhomogeneity(const size_type line_n,
                                              const number    value)
 {
   const size_type line_index = calculate_line_index(line_n);
-  Assert(line_index < lines_cache.size() &&
-           lines_cache[line_index] != numbers::invalid_size_type,
+  Assert(line_index < lines_cache.size() DEAL_II_AND lines_cache[line_index] !=
+           numbers::invalid_size_type,
          ExcMessage("call add_line() before calling set_inhomogeneity()"));
   Assert(lines_cache[line_index] < lines.size(), ExcInternalError());
   ConstraintLine *line_ptr = &lines[lines_cache[line_index]];
@@ -2051,8 +2052,8 @@ inline bool
 AffineConstraints<number>::is_constrained(const size_type index) const
 {
   const size_type line_index = calculate_line_index(index);
-  return ((line_index < lines_cache.size()) &&
-          (lines_cache[line_index] != numbers::invalid_size_type));
+  return ((line_index < lines_cache.size())
+            DEAL_II_AND(lines_cache[line_index] != numbers::invalid_size_type));
 }
 
 template <typename number>
@@ -2063,13 +2064,15 @@ AffineConstraints<number>::is_inhomogeneously_constrained(
   // check whether the entry is constrained. could use is_constrained, but
   // that means computing the line index twice
   const size_type line_index = calculate_line_index(line_n);
-  if (line_index >= lines_cache.size() ||
-      lines_cache[line_index] == numbers::invalid_size_type)
+  if (line_index >= lines_cache.size()
+                      DEAL_II_OR lines_cache[line_index] DEAL_II_EQUALS
+                                 numbers::invalid_size_type)
     return false;
   else
     {
       Assert(lines_cache[line_index] < lines.size(), ExcInternalError());
-      return !(lines[lines_cache[line_index]].inhomogeneity == number(0.));
+      return !(
+        lines[lines_cache[line_index]].inhomogeneity DEAL_II_EQUALS number(0.));
     }
 }
 
@@ -2080,8 +2083,9 @@ AffineConstraints<number>::get_constraint_entries(const size_type line_n) const
   // check whether the entry is constrained. could use is_constrained, but
   // that means computing the line index twice
   const size_type line_index = calculate_line_index(line_n);
-  if (line_index >= lines_cache.size() ||
-      lines_cache[line_index] == numbers::invalid_size_type)
+  if (line_index >= lines_cache.size()
+                      DEAL_II_OR lines_cache[line_index] DEAL_II_EQUALS
+                                 numbers::invalid_size_type)
     return nullptr;
   else
     return &lines[lines_cache[line_index]].entries;
@@ -2094,8 +2098,9 @@ AffineConstraints<number>::get_inhomogeneity(const size_type line_n) const
   // check whether the entry is constrained. could use is_constrained, but
   // that means computing the line index twice
   const size_type line_index = calculate_line_index(line_n);
-  if (line_index >= lines_cache.size() ||
-      lines_cache[line_index] == numbers::invalid_size_type)
+  if (line_index >= lines_cache.size()
+                      DEAL_II_OR lines_cache[line_index] DEAL_II_EQUALS
+                                 numbers::invalid_size_type)
     return 0;
   else
     return lines[lines_cache[line_index]].inhomogeneity;
@@ -2118,7 +2123,7 @@ template <typename number>
 inline bool
 AffineConstraints<number>::can_store_line(size_type line_n) const
 {
-  return !local_lines.size() || local_lines.is_element(line_n);
+  return !local_lines.size() DEAL_II_OR local_lines.is_element(line_n);
 }
 
 template <typename number>
@@ -2136,9 +2141,10 @@ AffineConstraints<number>::distribute_local_to_global(
   const number    value,
   VectorType &    global_vector) const
 {
-  Assert(lines.empty() || sorted == true, ExcMatrixNotClosed());
+  Assert(lines.empty() DEAL_II_OR sorted DEAL_II_EQUALS true,
+         ExcMatrixNotClosed());
 
-  if (is_constrained(index) == false)
+  if (is_constrained(index) DEAL_II_EQUALS false)
     global_vector(index) += value;
   else
     {
@@ -2161,11 +2167,12 @@ AffineConstraints<number>::distribute_local_to_global(
   ForwardIteratorInd local_indices_begin,
   VectorType &       global_vector) const
 {
-  Assert(lines.empty() || sorted == true, ExcMatrixNotClosed());
+  Assert(lines.empty() DEAL_II_OR sorted DEAL_II_EQUALS true,
+         ExcMatrixNotClosed());
   for (; local_vector_begin != local_vector_end;
        ++local_vector_begin, ++local_indices_begin)
     {
-      if (is_constrained(*local_indices_begin) == false)
+      if (is_constrained(*local_indices_begin) DEAL_II_EQUALS false)
         internal::ElementAccess<VectorType>::add(*local_vector_begin,
                                                  *local_indices_begin,
                                                  global_vector);
@@ -2190,7 +2197,7 @@ AffineConstraints<number>::distribute_local_to_global(
   const std::vector<size_type> &local_dof_indices,
   OutVector &                   global_vector) const
 {
-  Assert(local_vector.size() == local_dof_indices.size(),
+  Assert(local_vector.size() DEAL_II_EQUALS local_dof_indices.size(),
          ExcDimensionMismatch(local_vector.size(), local_dof_indices.size()));
   distribute_local_to_global(local_vector.begin(),
                              local_vector.end(),
@@ -2209,11 +2216,12 @@ AffineConstraints<number>::get_dof_values(
   ForwardIteratorVec local_vector_begin,
   ForwardIteratorVec local_vector_end) const
 {
-  Assert(lines.empty() || sorted == true, ExcMatrixNotClosed());
+  Assert(lines.empty() DEAL_II_OR sorted DEAL_II_EQUALS true,
+         ExcMatrixNotClosed());
   for (; local_vector_begin != local_vector_end;
        ++local_vector_begin, ++local_indices_begin)
     {
-      if (is_constrained(*local_indices_begin) == false)
+      if (is_constrained(*local_indices_begin) DEAL_II_EQUALS false)
         *local_vector_begin = global_vector(*local_indices_begin);
       else
         {
@@ -2304,8 +2312,8 @@ public:
    * derived from BlockMatrixBase<T>).
    */
   static const bool value =
-    (sizeof(check_for_block_matrix(static_cast<MatrixType *>(nullptr))) ==
-     sizeof(yes_type));
+    (sizeof(check_for_block_matrix(static_cast<MatrixType *>(nullptr)))
+       DEAL_II_EQUALS sizeof(yes_type));
 };
 
 // instantiation of the static member

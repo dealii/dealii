@@ -251,8 +251,9 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
         if (cell->level_subdomain_id() != numbers::artificial_subdomain_id)
           {
             for (auto f : cell->face_indices())
-              if (cell->has_periodic_neighbor(f) &&
-                  cell->periodic_neighbor(f)->level() == cell->level())
+              if (cell->has_periodic_neighbor(f)
+                    DEAL_II_AND                cell->periodic_neighbor(f)
+                      ->level() DEAL_II_EQUALS cell->level())
                 {
                   if (cell->is_locally_owned_on_level())
                     {
@@ -264,10 +265,11 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
                     }
                   // Cell is a level-ghost and its neighbor is a
                   // level-artificial cell nothing to do here
-                  else if (cell->periodic_neighbor(f)->level_subdomain_id() ==
-                           numbers::artificial_subdomain_id)
+                  else if (cell->periodic_neighbor(f)->level_subdomain_id()
+                             DEAL_II_EQUALS numbers::artificial_subdomain_id)
                     {
-                      Assert(cell->is_locally_owned_on_level() == false,
+                      Assert(cell->is_locally_owned_on_level()
+                               DEAL_II_EQUALS false,
                              ExcInternalError());
                       continue;
                     }
@@ -287,10 +289,14 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
                   // can happen, for example, for a vertex dof at a periodic
                   // boundary that we visit from more than one cell
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
-                    if (level_constraints[l].can_store_line(dofs_2[i]) &&
-                        level_constraints[l].can_store_line(dofs_1[i]) &&
-                        !level_constraints[l].is_constrained(dofs_2[i]) &&
-                        !level_constraints[l].is_constrained(dofs_1[i]))
+                    if (level_constraints[l]
+                          .can_store_line(dofs_2[i])
+                            DEAL_II_AND level_constraints[l]
+                          .can_store_line(dofs_1[i])
+                            DEAL_II_AND !level_constraints[l]
+                          .is_constrained(dofs_2[i])
+                            DEAL_II_AND !level_constraints[l]
+                          .is_constrained(dofs_1[i]))
                       {
                         level_constraints[l].add_line(dofs_2[i]);
                         level_constraints[l].add_entry(dofs_2[i],
@@ -320,7 +326,9 @@ MGConstrainedDoFs::make_zero_boundary_constraints(
   // allocate an IndexSet for each global level. Contents will be
   // overwritten inside make_boundary_list.
   const unsigned int n_levels = dof.get_triangulation().n_global_levels();
-  Assert(boundary_indices.size() == 0 || boundary_indices.size() == n_levels,
+  Assert(boundary_indices.size()
+           DEAL_II_EQUALS 0 DEAL_II_OR boundary_indices.size()
+             DEAL_II_EQUALS            n_levels,
          ExcInternalError());
   boundary_indices.resize(n_levels);
 
@@ -350,7 +358,7 @@ MGConstrainedDoFs::make_no_normal_flux_constraints(
     face = dof.get_triangulation().begin_face(),
     endf = dof.get_triangulation().end_face();
   for (; face != endf; ++face)
-    if (face->at_boundary() && face->boundary_id() == bid)
+    if (face->at_boundary() DEAL_II_AND face->boundary_id() DEAL_II_EQUALS bid)
       for (unsigned int d = 0; d < dim; ++d)
         {
           Tensor<1, dim, double> unit_vec;
@@ -370,7 +378,7 @@ MGConstrainedDoFs::make_no_normal_flux_constraints(
                 "x, y, or z axis."));
         }
 
-  Assert(comp_mask.n_selected_components() == 1,
+  Assert(comp_mask.n_selected_components() DEAL_II_EQUALS 1,
          ExcMessage(
            "We can currently only support no normal flux conditions "
            "for a specific boundary id if all faces are facing in the "
@@ -394,7 +402,7 @@ MGConstrainedDoFs::add_user_constraints(
 
   // Get the relevant DoFs from level_constraints if
   // the user constraint matrix has not been initialized
-  if (user_constraints[level].get_local_lines().size() == 0)
+  if (user_constraints[level].get_local_lines().size() DEAL_II_EQUALS 0)
     user_constraints[level].reinit(level_constraints[level].get_local_lines());
 
   user_constraints[level].merge(
@@ -417,7 +425,7 @@ inline bool
 MGConstrainedDoFs::is_boundary_index(const unsigned int            level,
                                      const types::global_dof_index index) const
 {
-  if (boundary_indices.size() == 0)
+  if (boundary_indices.size() DEAL_II_EQUALS 0)
     return false;
 
   AssertIndexRange(level, boundary_indices.size());
@@ -442,10 +450,13 @@ MGConstrainedDoFs::is_interface_matrix_entry(
   const IndexSet &interface_dofs_on_level =
     this->get_refinement_edge_indices(level);
 
-  return interface_dofs_on_level.is_element(i)     // at_refinement_edge(i)
-         && !interface_dofs_on_level.is_element(j) // !at_refinement_edge(j)
-         && !this->is_boundary_index(level, i)     // !on_boundary(i)
-         && !this->is_boundary_index(level, j);    // !on_boundary(j)
+  return interface_dofs_on_level
+    .is_element(i) // at_refinement_edge(i)
+    DEAL_II_AND !interface_dofs_on_level
+    .is_element(j) // !at_refinement_edge(j)
+    DEAL_II_AND !this
+    ->is_boundary_index(level, i)                   // !on_boundary(i)
+    DEAL_II_AND !this->is_boundary_index(level, j); // !on_boundary(j)
 }
 
 

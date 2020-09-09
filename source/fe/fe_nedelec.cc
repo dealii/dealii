@@ -2058,7 +2058,7 @@ FE_Nedelec<dim>::get_dpo_vector(const unsigned int degree, bool dg)
       dpo[1] = degree + 1;
       dpo[2] = 2 * degree * (degree + 1);
 
-      if (dim == 3)
+      if (dim DEAL_II_EQUALS 3)
         dpo[3] = 3 * degree * degree * (degree + 1);
     }
 
@@ -2093,16 +2093,17 @@ FE_Nedelec<dim>::has_support_on_face(const unsigned int shape_index,
         switch (face_index)
           {
             case 0:
-              if (!((shape_index > deg) && (shape_index < 2 * this->degree)))
+              if (!((shape_index > deg)
+                      DEAL_II_AND(shape_index < 2 * this->degree)))
                 return true;
 
               else
                 return false;
 
             case 1:
-              if ((shape_index > deg) &&
-                  (shape_index <
-                   GeometryInfo<2>::lines_per_cell * this->degree))
+              if ((shape_index > deg)
+                    DEAL_II_AND(shape_index <
+                                GeometryInfo<2>::lines_per_cell * this->degree))
                 return true;
 
               else
@@ -2116,8 +2117,8 @@ FE_Nedelec<dim>::has_support_on_face(const unsigned int shape_index,
                 return false;
 
             case 3:
-              if (!((shape_index >= 2 * this->degree) &&
-                    (shape_index < 3 * this->degree)))
+              if (!((shape_index >= 2 * this->degree)
+                      DEAL_II_AND(shape_index < 3 * this->degree)))
                 return true;
 
               else
@@ -2134,89 +2135,141 @@ FE_Nedelec<dim>::has_support_on_face(const unsigned int shape_index,
         switch (face_index)
           {
             case 0:
-              if (((shape_index > deg) && (shape_index < 2 * this->degree)) ||
-                  ((shape_index >= 5 * this->degree) &&
-                   (shape_index < 6 * this->degree)) ||
-                  ((shape_index >= 9 * this->degree) &&
-                   (shape_index < 10 * this->degree)) ||
-                  ((shape_index >= 11 * this->degree) &&
-                   (shape_index <
-                    GeometryInfo<3>::lines_per_cell * this->degree)) ||
-                  ((shape_index >= (GeometryInfo<3>::lines_per_cell + 2 * deg) *
-                                     this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 4 * deg) *
-                                    this->degree)) ||
-                  ((shape_index >= (GeometryInfo<3>::lines_per_cell + 5 * deg) *
-                                     this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 6 * deg) *
-                                    this->degree)) ||
-                  ((shape_index >= (GeometryInfo<3>::lines_per_cell + 7 * deg) *
-                                     this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 9 * deg) *
-                                    this->degree)) ||
-                  ((shape_index >=
-                    (GeometryInfo<3>::lines_per_cell + 10 * deg) *
-                      this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 11 * deg) *
-                                    this->degree)))
+              if (((shape_index > deg)
+                     DEAL_II_AND(shape_index < 2 * this->degree))
+                    DEAL_II_OR((shape_index >= 5 * this->degree)
+                                 DEAL_II_AND(shape_index < 6 * this->degree))
+                      DEAL_II_OR((shape_index >= 9 * this->degree)
+                                   DEAL_II_AND(shape_index < 10 * this->degree))
+                        DEAL_II_OR(
+                          (shape_index >= 11 * this->degree) DEAL_II_AND(
+                            shape_index <
+                            GeometryInfo<3>::lines_per_cell * this->degree))
+                          DEAL_II_OR(
+                            (shape_index >=
+                             (GeometryInfo<3>::lines_per_cell + 2 * deg) *
+                               this->degree)
+                              DEAL_II_AND(
+                                shape_index <
+                                (GeometryInfo<3>::lines_per_cell + 4 * deg) *
+                                  this->degree))
+                            DEAL_II_OR(
+                              (shape_index >=
+                               (GeometryInfo<3>::lines_per_cell + 5 * deg) *
+                                 this->degree)
+                                DEAL_II_AND(
+                                  shape_index <
+                                  (GeometryInfo<3>::lines_per_cell + 6 * deg) *
+                                    this->degree))
+                              DEAL_II_OR(
+                                (shape_index >=
+                                 (GeometryInfo<3>::lines_per_cell + 7 * deg) *
+                                   this->degree)
+                                  DEAL_II_AND(shape_index <
+                                              (GeometryInfo<3>::lines_per_cell +
+                                               9 * deg) *
+                                                this->degree))
+                                DEAL_II_OR(
+                                  (shape_index >=
+                                   (GeometryInfo<3>::lines_per_cell +
+                                    10 * deg) *
+                                     this->degree)
+                                    DEAL_II_AND(
+                                      shape_index <
+                                      (GeometryInfo<3>::lines_per_cell +
+                                       11 * deg) *
+                                        this->degree)))
                 return false;
 
               else
                 return true;
 
             case 1:
-              if (((shape_index > deg) && (shape_index < 4 * this->degree)) ||
-                  ((shape_index >= 5 * this->degree) &&
-                   (shape_index < 8 * this->degree)) ||
-                  ((shape_index >= 9 * this->degree) &&
-                   (shape_index < 10 * this->degree)) ||
-                  ((shape_index >= 11 * this->degree) &&
-                   (shape_index <
-                    GeometryInfo<3>::lines_per_cell * this->degree)) ||
-                  ((shape_index >= (GeometryInfo<3>::lines_per_cell + 2 * deg) *
-                                     this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 5 * deg) *
-                                    this->degree)) ||
-                  ((shape_index >= (GeometryInfo<3>::lines_per_cell + 6 * deg) *
-                                     this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 7 * deg) *
-                                    this->degree)) ||
-                  ((shape_index >= (GeometryInfo<3>::lines_per_cell + 9 * deg) *
-                                     this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 10 * deg) *
-                                    this->degree)) ||
-                  ((shape_index >=
-                    (GeometryInfo<3>::lines_per_cell + 11 * deg) *
-                      this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 12 * deg) *
-                                    this->degree)))
+              if (((shape_index > deg)
+                     DEAL_II_AND(shape_index < 4 * this->degree))
+                    DEAL_II_OR((shape_index >= 5 * this->degree)
+                                 DEAL_II_AND(shape_index < 8 * this->degree))
+                      DEAL_II_OR((shape_index >= 9 * this->degree)
+                                   DEAL_II_AND(shape_index < 10 * this->degree))
+                        DEAL_II_OR(
+                          (shape_index >= 11 * this->degree) DEAL_II_AND(
+                            shape_index <
+                            GeometryInfo<3>::lines_per_cell * this->degree))
+                          DEAL_II_OR(
+                            (shape_index >=
+                             (GeometryInfo<3>::lines_per_cell + 2 * deg) *
+                               this->degree)
+                              DEAL_II_AND(
+                                shape_index <
+                                (GeometryInfo<3>::lines_per_cell + 5 * deg) *
+                                  this->degree))
+                            DEAL_II_OR(
+                              (shape_index >=
+                               (GeometryInfo<3>::lines_per_cell + 6 * deg) *
+                                 this->degree)
+                                DEAL_II_AND(
+                                  shape_index <
+                                  (GeometryInfo<3>::lines_per_cell + 7 * deg) *
+                                    this->degree))
+                              DEAL_II_OR(
+                                (shape_index >=
+                                 (GeometryInfo<3>::lines_per_cell + 9 * deg) *
+                                   this->degree)
+                                  DEAL_II_AND(shape_index <
+                                              (GeometryInfo<3>::lines_per_cell +
+                                               10 * deg) *
+                                                this->degree))
+                                DEAL_II_OR(
+                                  (shape_index >=
+                                   (GeometryInfo<3>::lines_per_cell +
+                                    11 * deg) *
+                                     this->degree)
+                                    DEAL_II_AND(
+                                      shape_index <
+                                      (GeometryInfo<3>::lines_per_cell +
+                                       12 * deg) *
+                                        this->degree)))
                 return true;
 
               else
                 return false;
 
             case 2:
-              if ((shape_index < 3 * this->degree) ||
-                  ((shape_index >= 4 * this->degree) &&
-                   (shape_index < 7 * this->degree)) ||
-                  ((shape_index >= 8 * this->degree) &&
-                   (shape_index < 10 * this->degree)) ||
-                  ((shape_index >=
-                    (GeometryInfo<3>::lines_per_cell + deg) * this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 2 * deg) *
-                                    this->degree)) ||
-                  ((shape_index >= (GeometryInfo<3>::lines_per_cell + 3 * deg) *
-                                     this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 6 * deg) *
-                                    this->degree)) ||
-                  ((shape_index >= (GeometryInfo<3>::lines_per_cell + 8 * deg) *
-                                     this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 9 * deg) *
-                                    this->degree)) ||
-                  ((shape_index >=
-                    (GeometryInfo<3>::lines_per_cell + 10 * deg) *
-                      this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 11 * deg) *
+              if ((shape_index < 3 * this->degree) DEAL_II_OR(
+                    (shape_index >= 4 * this->degree)
+                      DEAL_II_AND(shape_index < 7 * this->degree))
+                    DEAL_II_OR((shape_index >= 8 * this->degree)
+                                 DEAL_II_AND(shape_index < 10 * this->degree))
+                      DEAL_II_OR(
+                        (shape_index >=
+                         (GeometryInfo<3>::lines_per_cell + deg) * this->degree)
+                          DEAL_II_AND(
+                            shape_index <
+                            (GeometryInfo<3>::lines_per_cell + 2 * deg) *
+                              this->degree))
+                        DEAL_II_OR(
+                          (shape_index >=
+                           (GeometryInfo<3>::lines_per_cell + 3 * deg) *
+                             this->degree)
+                            DEAL_II_AND(
+                              shape_index <
+                              (GeometryInfo<3>::lines_per_cell + 6 * deg) *
+                                this->degree))
+                          DEAL_II_OR(
+                            (shape_index >=
+                             (GeometryInfo<3>::lines_per_cell + 8 * deg) *
+                               this->degree)
+                              DEAL_II_AND(
+                                shape_index <
+                                (GeometryInfo<3>::lines_per_cell + 9 * deg) *
+                                  this->degree))
+                            DEAL_II_OR(
+                              (shape_index >=
+                               (GeometryInfo<3>::lines_per_cell + 10 * deg) *
+                                 this->degree)
+                                DEAL_II_AND(
+                                  shape_index <
+                                  (GeometryInfo<3>::lines_per_cell + 11 * deg) *
                                     this->degree)))
                 return true;
 
@@ -2224,79 +2277,119 @@ FE_Nedelec<dim>::has_support_on_face(const unsigned int shape_index,
                 return false;
 
             case 3:
-              if ((shape_index < 2 * this->degree) ||
-                  ((shape_index >= 3 * this->degree) &&
-                   (shape_index < 6 * this->degree)) ||
-                  ((shape_index >= 7 * this->degree) &&
-                   (shape_index < 8 * this->degree)) ||
-                  ((shape_index >= 10 * this->degree) &&
-                   (shape_index <
-                    GeometryInfo<3>::lines_per_cell * this->degree)) ||
-                  ((shape_index >=
-                    (GeometryInfo<3>::lines_per_cell + deg) * this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 2 * deg) *
-                                    this->degree)) ||
-                  ((shape_index >= (GeometryInfo<3>::lines_per_cell + 3 * deg) *
-                                     this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 4 * deg) *
-                                    this->degree)) ||
-                  ((shape_index >= (GeometryInfo<3>::lines_per_cell + 6 * deg) *
-                                     this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 9 * deg) *
-                                    this->degree)) ||
-                  ((shape_index >=
-                    (GeometryInfo<3>::lines_per_cell + 10 * deg) *
-                      this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 11 * deg) *
-                                    this->degree)))
+              if ((shape_index < 2 * this->degree) DEAL_II_OR(
+                    (shape_index >= 3 * this->degree)
+                      DEAL_II_AND(shape_index < 6 * this->degree))
+                    DEAL_II_OR((shape_index >= 7 * this->degree)
+                                 DEAL_II_AND(shape_index < 8 * this->degree))
+                      DEAL_II_OR((shape_index >= 10 * this->degree) DEAL_II_AND(
+                        shape_index <
+                        GeometryInfo<3>::lines_per_cell * this->degree))
+                        DEAL_II_OR(
+                          (shape_index >=
+                           (GeometryInfo<3>::lines_per_cell + deg) *
+                             this->degree)
+                            DEAL_II_AND(
+                              shape_index <
+                              (GeometryInfo<3>::lines_per_cell + 2 * deg) *
+                                this->degree))
+                          DEAL_II_OR(
+                            (shape_index >=
+                             (GeometryInfo<3>::lines_per_cell + 3 * deg) *
+                               this->degree)
+                              DEAL_II_AND(
+                                shape_index <
+                                (GeometryInfo<3>::lines_per_cell + 4 * deg) *
+                                  this->degree))
+                            DEAL_II_OR(
+                              (shape_index >=
+                               (GeometryInfo<3>::lines_per_cell + 6 * deg) *
+                                 this->degree)
+                                DEAL_II_AND(
+                                  shape_index <
+                                  (GeometryInfo<3>::lines_per_cell + 9 * deg) *
+                                    this->degree))
+                              DEAL_II_OR(
+                                (shape_index >=
+                                 (GeometryInfo<3>::lines_per_cell + 10 * deg) *
+                                   this->degree)
+                                  DEAL_II_AND(shape_index <
+                                              (GeometryInfo<3>::lines_per_cell +
+                                               11 * deg) *
+                                                this->degree)))
                 return true;
 
               else
                 return false;
 
             case 4:
-              if ((shape_index < 4 * this->degree) ||
-                  ((shape_index >= 8 * this->degree) &&
-                   (shape_index <
-                    (GeometryInfo<3>::lines_per_cell + deg) * this->degree)) ||
-                  ((shape_index >= (GeometryInfo<3>::lines_per_cell + 2 * deg) *
-                                     this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 3 * deg) *
-                                    this->degree)) ||
-                  ((shape_index >= (GeometryInfo<3>::lines_per_cell + 5 * deg) *
-                                     this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 6 * deg) *
-                                    this->degree)) ||
-                  ((shape_index >= (GeometryInfo<3>::lines_per_cell + 7 * deg) *
-                                     this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 10 * deg) *
-                                    this->degree)))
+              if ((shape_index < 4 * this->degree) DEAL_II_OR(
+                    (shape_index >= 8 * this->degree) DEAL_II_AND(
+                      shape_index <
+                      (GeometryInfo<3>::lines_per_cell + deg) * this->degree))
+                    DEAL_II_OR((shape_index >=
+                                (GeometryInfo<3>::lines_per_cell + 2 * deg) *
+                                  this->degree)
+                                 DEAL_II_AND(
+                                   shape_index <
+                                   (GeometryInfo<3>::lines_per_cell + 3 * deg) *
+                                     this->degree))
+                      DEAL_II_OR(
+                        (shape_index >=
+                         (GeometryInfo<3>::lines_per_cell + 5 * deg) *
+                           this->degree)
+                          DEAL_II_AND(
+                            shape_index <
+                            (GeometryInfo<3>::lines_per_cell + 6 * deg) *
+                              this->degree))
+                        DEAL_II_OR(
+                          (shape_index >=
+                           (GeometryInfo<3>::lines_per_cell + 7 * deg) *
+                             this->degree)
+                            DEAL_II_AND(
+                              shape_index <
+                              (GeometryInfo<3>::lines_per_cell + 10 * deg) *
+                                this->degree)))
                 return true;
 
               else
                 return false;
 
             case 5:
-              if (((shape_index >= 4 * this->degree) &&
-                   (shape_index <
-                    (GeometryInfo<3>::lines_per_cell + deg) * this->degree)) ||
-                  ((shape_index >= (GeometryInfo<3>::lines_per_cell + 2 * deg) *
-                                     this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 3 * deg) *
-                                    this->degree)) ||
-                  ((shape_index >= (GeometryInfo<3>::lines_per_cell + 5 * deg) *
-                                     this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 6 * deg) *
-                                    this->degree)) ||
-                  ((shape_index >= (GeometryInfo<3>::lines_per_cell + 7 * deg) *
-                                     this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 8 * deg) *
-                                    this->degree)) ||
-                  ((shape_index >=
-                    (GeometryInfo<3>::lines_per_cell + 10 * deg) *
-                      this->degree) &&
-                   (shape_index < (GeometryInfo<3>::lines_per_cell + 12 * deg) *
-                                    this->degree)))
+              if (((shape_index >= 4 * this->degree) DEAL_II_AND(
+                    shape_index <
+                    (GeometryInfo<3>::lines_per_cell + deg) * this->degree))
+                    DEAL_II_OR((shape_index >=
+                                (GeometryInfo<3>::lines_per_cell + 2 * deg) *
+                                  this->degree)
+                                 DEAL_II_AND(
+                                   shape_index <
+                                   (GeometryInfo<3>::lines_per_cell + 3 * deg) *
+                                     this->degree))
+                      DEAL_II_OR(
+                        (shape_index >=
+                         (GeometryInfo<3>::lines_per_cell + 5 * deg) *
+                           this->degree)
+                          DEAL_II_AND(
+                            shape_index <
+                            (GeometryInfo<3>::lines_per_cell + 6 * deg) *
+                              this->degree))
+                        DEAL_II_OR(
+                          (shape_index >=
+                           (GeometryInfo<3>::lines_per_cell + 7 * deg) *
+                             this->degree)
+                            DEAL_II_AND(
+                              shape_index <
+                              (GeometryInfo<3>::lines_per_cell + 8 * deg) *
+                                this->degree))
+                          DEAL_II_OR(
+                            (shape_index >=
+                             (GeometryInfo<3>::lines_per_cell + 10 * deg) *
+                               this->degree)
+                              DEAL_II_AND(
+                                shape_index <
+                                (GeometryInfo<3>::lines_per_cell + 12 * deg) *
+                                  this->degree)))
                 return true;
 
               else
@@ -2332,7 +2425,7 @@ FE_Nedelec<dim>::compare_for_domination(const FiniteElement<dim> &fe_other,
     {
       if (this->degree < fe_nedelec_other->degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_nedelec_other->degree)
+      else if (this->degree DEAL_II_EQUALS fe_nedelec_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;
@@ -2476,13 +2569,15 @@ FE_Nedelec<dim>::get_face_interpolation_matrix(
   // this is only implemented, if the
   // source FE is also a
   // Nedelec element
-  AssertThrow((source.get_name().find("FE_Nedelec<") == 0) ||
-                (dynamic_cast<const FE_Nedelec<dim> *>(&source) != nullptr),
+  AssertThrow((source.get_name().find("FE_Nedelec<") DEAL_II_EQUALS 0)
+                DEAL_II_OR(dynamic_cast<const FE_Nedelec<dim> *>(&source) !=
+                           nullptr),
               (typename FiniteElement<dim>::ExcInterpolationNotImplemented()));
-  Assert(interpolation_matrix.m() == source.n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.m()
+           DEAL_II_EQUALS source.n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.m(),
                               source.n_dofs_per_face(face_no)));
-  Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS this->n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.n(),
                               this->n_dofs_per_face(face_no)));
 
@@ -2517,7 +2612,7 @@ FE_Nedelec<dim>::get_face_interpolation_matrix(
   // to take a bit more care of the
   // indices of the degrees of
   // freedom.
-  if (dim == 3)
+  if (dim DEAL_II_EQUALS 3)
     {
       const unsigned int p = source_fe.degree;
       const unsigned int q = this->degree;
@@ -2583,13 +2678,15 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
   // this is only implemented, if the
   // source FE is also a
   // Nedelec element
-  AssertThrow((source.get_name().find("FE_Nedelec<") == 0) ||
-                (dynamic_cast<const FE_Nedelec<dim> *>(&source) != nullptr),
+  AssertThrow((source.get_name().find("FE_Nedelec<") DEAL_II_EQUALS 0)
+                DEAL_II_OR(dynamic_cast<const FE_Nedelec<dim> *>(&source) !=
+                           nullptr),
               typename FiniteElement<dim>::ExcInterpolationNotImplemented());
-  Assert(interpolation_matrix.m() == source.n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.m()
+           DEAL_II_EQUALS source.n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.m(),
                               source.n_dofs_per_face(face_no)));
-  Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS this->n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.n(),
                               this->n_dofs_per_face(face_no)));
 
@@ -3025,13 +3122,13 @@ FE_Nedelec<dim>::get_prolongation_matrix(
   AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
 
   // initialization upon first request
-  if (this->prolongation[refinement_case - 1][child].n() == 0)
+  if (this->prolongation[refinement_case - 1][child].n() DEAL_II_EQUALS 0)
     {
       std::lock_guard<std::mutex> lock(this->mutex);
 
       // if matrix got updated while waiting for the lock
-      if (this->prolongation[refinement_case - 1][child].n() ==
-          this->n_dofs_per_cell())
+      if (this->prolongation[refinement_case - 1][child]
+            .n() DEAL_II_EQUALS this->n_dofs_per_cell())
         return this->prolongation[refinement_case - 1][child];
 
       // now do the work. need to get a non-const version of data in order to
@@ -3081,13 +3178,13 @@ FE_Nedelec<dim>::get_restriction_matrix(
     child, GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)));
 
   // initialization upon first request
-  if (this->restriction[refinement_case - 1][child].n() == 0)
+  if (this->restriction[refinement_case - 1][child].n() DEAL_II_EQUALS 0)
     {
       std::lock_guard<std::mutex> lock(this->mutex);
 
       // if matrix got updated while waiting for the lock...
-      if (this->restriction[refinement_case - 1][child].n() ==
-          this->n_dofs_per_cell())
+      if (this->restriction[refinement_case - 1][child].n()
+            DEAL_II_EQUALS this->n_dofs_per_cell())
         return this->restriction[refinement_case - 1][child];
 
       // now do the work. need to get a non-const version of data in order to
@@ -3141,13 +3238,14 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
   const unsigned int face_no = 0;
 
   const unsigned int deg = this->degree - 1;
-  Assert(support_point_values.size() == this->generalized_support_points.size(),
+  Assert(support_point_values.size()
+           DEAL_II_EQUALS this->generalized_support_points.size(),
          ExcDimensionMismatch(support_point_values.size(),
                               this->generalized_support_points.size()));
-  Assert(support_point_values[0].size() == this->n_components(),
+  Assert(support_point_values[0].size() DEAL_II_EQUALS this->n_components(),
          ExcDimensionMismatch(support_point_values[0].size(),
                               this->n_components()));
-  Assert(nodal_values.size() == this->n_dofs_per_cell(),
+  Assert(nodal_values.size() DEAL_II_EQUALS this->n_dofs_per_cell(),
          ExcDimensionMismatch(nodal_values.size(), this->n_dofs_per_cell()));
   std::fill(nodal_values.begin(), nodal_values.end(), 0.0);
 

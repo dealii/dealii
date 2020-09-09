@@ -64,7 +64,7 @@ namespace GridGenerator
         ExcMessage(
           "Mesh is to small to enclose airfoil! Choose larger field or smaller"
           " chord length!"));
-      Assert(incline_factor < 1.0 && incline_factor >= 0.0,
+      Assert(incline_factor < 1.0 DEAL_II_AND incline_factor >= 0.0,
              ExcMessage("incline_factor has to be in [0,1)!"));
     }
 
@@ -184,11 +184,11 @@ namespace GridGenerator
           // create points on the airfoil
           , airfoil_1D(set_airfoil_length(
               // call either the 'joukowski' or 'naca' static member function
-              data.airfoil_type == "Joukowski" ?
+              data.airfoil_type DEAL_II_EQUALS "Joukowski" ?
                 joukowski(data.joukowski_center,
                           n_points_on_each_side,
                           data.airfoil_sampling_factor) :
-                (data.airfoil_type == "NACA" ?
+                (data.airfoil_type DEAL_II_EQUALS "NACA" ?
                    naca(data.naca_id,
                         n_points_on_each_side,
                         data.airfoil_sampling_factor) :
@@ -224,8 +224,8 @@ namespace GridGenerator
           , K(J(0), G(1))
           , L(J(0), I(1))
         {
-          Assert(data.airfoil_type == "Joukowski" ||
-                   data.airfoil_type == "NACA",
+          Assert(data.airfoil_type      DEAL_II_EQUALS
+                 "Joukowski" DEAL_II_OR data.airfoil_type DEAL_II_EQUALS "NACA",
                  ExcMessage("Unknown airfoil type."));
         }
 
@@ -611,7 +611,7 @@ namespace GridGenerator
                            const unsigned int number_points,
                            const bool         is_upper)
         {
-          Assert(serialnumber.length() == 4,
+          Assert(serialnumber.length() DEAL_II_EQUALS 4,
                  ExcMessage("This NACA-serial number is not implemented!"));
 
           return naca_create_points_4_digits(serialnumber,
@@ -651,7 +651,8 @@ namespace GridGenerator
 
           std::vector<Point<2>> naca_points;
 
-          if (digit_0 == 0 && digit_1 == 0) // is symmetric
+          if (digit_0 DEAL_II_EQUALS 0 DEAL_II_AND digit_1
+                                                   DEAL_II_EQUALS 0) // is symmetric
             for (unsigned int i = 0; i < number_points; i++)
               {
                 const double x = i * 1 / (1.0 * number_points - 1);
@@ -791,8 +792,8 @@ namespace GridGenerator
               const auto Lj  = arclength_L[j];
               const auto Ljp = arclength_L[j + 1];
 
-              while (Lj <= i * deltaX && i * deltaX <= Ljp &&
-                     i < number_points - 1)
+              while (Lj <= i * deltaX DEAL_II_AND i * deltaX <=
+                     Ljp DEAL_II_AND i < number_points - 1)
                 {
                   equidist[i] = Point<2>((i * deltaX - Lj) / (Ljp - Lj) *
                                            (non_equidistant_points[j + 1] -
@@ -902,28 +903,40 @@ namespace GridGenerator
           for (auto cell : tria.active_cell_iterators())
             for (unsigned int f : GeometryInfo<2>::face_indices())
               {
-                if (cell->face(f)->at_boundary() == false)
+                if (cell->face(f)->at_boundary() DEAL_II_EQUALS false)
                   continue;
 
                 const auto mid = cell->material_id();
 
-                if ((mid == id_block_1 && f == 0) ||
-                    (mid == id_block_4 && f == 0))
+                if ((mid DEAL_II_EQUALS id_block_1 DEAL_II_AND f
+                                                               DEAL_II_EQUALS 0)
+                      DEAL_II_OR(mid DEAL_II_EQUALS id_block_4 DEAL_II_AND f
+                                                                           DEAL_II_EQUALS 0))
                   cell->face(f)->set_boundary_id(0); // inlet
-                else if ((mid == id_block_3 && f == 0) ||
-                         (mid == id_block_6 && f == 2))
+                else if ((mid DEAL_II_EQUALS id_block_3 DEAL_II_AND f
+                                                                    DEAL_II_EQUALS 0)
+                           DEAL_II_OR(mid DEAL_II_EQUALS id_block_6 DEAL_II_AND
+                                        f DEAL_II_EQUALS 2))
                   cell->face(f)->set_boundary_id(1); // outlet
-                else if ((mid == id_block_1 && f == 1) ||
-                         (mid == id_block_2 && f == 1))
+                else if ((mid DEAL_II_EQUALS id_block_1 DEAL_II_AND f
+                                                                    DEAL_II_EQUALS 1)
+                           DEAL_II_OR(mid DEAL_II_EQUALS id_block_2 DEAL_II_AND
+                                        f DEAL_II_EQUALS 1))
                   cell->face(f)->set_boundary_id(2); // upper airfoil side
-                else if ((mid == id_block_4 && f == 1) ||
-                         (mid == id_block_5 && f == 3))
+                else if ((mid DEAL_II_EQUALS id_block_4 DEAL_II_AND f
+                                                                    DEAL_II_EQUALS 1)
+                           DEAL_II_OR(mid DEAL_II_EQUALS id_block_5 DEAL_II_AND
+                                        f DEAL_II_EQUALS 3))
                   cell->face(f)->set_boundary_id(3); // lower airfoil side
-                else if ((mid == id_block_2 && f == 0) ||
-                         (mid == id_block_3 && f == 2))
+                else if ((mid DEAL_II_EQUALS id_block_2 DEAL_II_AND f
+                                                                    DEAL_II_EQUALS 0)
+                           DEAL_II_OR(mid DEAL_II_EQUALS id_block_3 DEAL_II_AND
+                                        f DEAL_II_EQUALS 2))
                   cell->face(f)->set_boundary_id(4); // upper far-field side
-                else if ((mid == id_block_5 && f == 2) ||
-                         (mid == id_block_6 && f == 0))
+                else if ((mid DEAL_II_EQUALS id_block_5 DEAL_II_AND f
+                                                                    DEAL_II_EQUALS 2)
+                           DEAL_II_OR(mid DEAL_II_EQUALS id_block_6 DEAL_II_AND
+                                        f DEAL_II_EQUALS 0))
                   cell->face(f)->set_boundary_id(5); // lower far-field side
                 else
                   Assert(false, ExcIndexRange(mid, id_block_1, id_block_6));
@@ -977,8 +990,9 @@ namespace GridGenerator
                 auto &node = cell.vertex(v);
 
                 // distinguish blocks
-                if (cell.material_id() == id_block_1 ||
-                    cell.material_id() == id_block_4) // block 1 and 4
+                if (cell.material_id()
+                      DEAL_II_EQUALS id_block_1 DEAL_II_OR cell.material_id()
+                        DEAL_II_EQUALS id_block_4) // block 1 and 4
                   {
                     // step 1: rotate block 1 clockwise by gamma and move block
                     // 1 so that A(0) is on y-axis so that faces AD and BC are
@@ -987,7 +1001,7 @@ namespace GridGenerator
                     // positive) Move trapeze to be in first quadrant by adding
                     // trapeze_offset
                     Point<2, double> node_;
-                    if (cell.material_id() == id_block_1)
+                    if (cell.material_id() DEAL_II_EQUALS id_block_1)
                       {
                         node_ = Point<2, double>(rotation_matrix_1 *
                                                    (node - horizontal_offset) +
@@ -996,7 +1010,7 @@ namespace GridGenerator
                     // step 1: rotate block 4 counterclockwise and move down so
                     // that trapeze is located in fourth quadrant (subtracting
                     // trapeze_offset)
-                    else if (cell.material_id() == id_block_4)
+                    else if (cell.material_id() DEAL_II_EQUALS id_block_4)
                       {
                         node_ = Point<2, double>(rotation_matrix_2 *
                                                    (node - horizontal_offset) -
@@ -1040,25 +1054,31 @@ namespace GridGenerator
                         bias_alpha(1 - (1.0 * iy) / n_cells_y);
                       const double   theta = node_(0);
                       const Point<2> p(-height * std::cos(theta) + center_mesh,
-                                       ((cell.material_id() == id_block_1) ?
+                                       ((cell.material_id()
+                                           DEAL_II_EQUALS id_block_1) ?
                                           (height) :
                                           (-height)) *
                                          std::sin(theta));
-                      node =
-                        airfoil_1D[(
-                          (cell.material_id() == id_block_1) ? (0) : (1))][ix] *
-                          alpha +
-                        p * (1 - alpha);
+                      node = airfoil_1D[(
+                               (cell.material_id() DEAL_II_EQUALS id_block_1) ?
+                                 (0) :
+                                 (1))][ix] *
+                               alpha +
+                             p * (1 - alpha);
                     }
                   }
-                else if (cell.material_id() == id_block_2 ||
-                         cell.material_id() == id_block_5) // block 2 and 5
+                else if (cell
+                           .material_id() DEAL_II_EQUALS id_block_2 DEAL_II_OR
+                                                                    cell.material_id()
+                               DEAL_II_EQUALS id_block_5) // block 2 and 5
                   {
                     // geometric parameters and indices for interpolation
                     Assert(
-                      (std::abs(D(1) - C(1)) == std::abs(F(1) - E(1))) &&
-                        (std::abs(C(1)) == std::abs(E(1))) &&
-                        (std::abs(G(1)) == std::abs(I(1))),
+                      (std::abs(D(1) - C(1))
+                         DEAL_II_EQUALS std::abs(F(1) - E(1)))
+                        DEAL_II_AND(std::abs(C(1)) DEAL_II_EQUALS std::abs(
+                          E(1))) DEAL_II_AND(std::abs(G(1))
+                                               DEAL_II_EQUALS std::abs(I(1))),
                       ExcMessage(
                         "Points D,C,G and E,F,I are not defined symmetric to "
                         "x-axis, which is required to interpolate block 2"
@@ -1077,22 +1097,25 @@ namespace GridGenerator
                     // define points on upper/lower horizontal far field side,
                     // i.e. face DG or FI. Incline factor to move points G and I
                     // to the right by distance incline_facor*lenght_b2
-                    const Point<2> p(ix * dx + center_mesh +
-                                       incline_factor * length_b2 * ix /
-                                         n_cells_x_1,
-                                     ((cell.material_id() == id_block_2) ?
-                                        (height) :
-                                        (-height)));
+                    const Point<2> p(
+                      ix * dx + center_mesh +
+                        incline_factor * length_b2 * ix / n_cells_x_1,
+                      ((cell.material_id() DEAL_II_EQUALS id_block_2) ?
+                         (height) :
+                         (-height)));
                     // interpolate between y = height and upper airfoil points
                     // (block2) or y = -height and lower airfoil points (block5)
                     node = airfoil_1D[(
-                             (cell.material_id() == id_block_2) ? (0) : (1))]
-                                     [n_cells_x_0 + ix] *
+                             (cell.material_id() DEAL_II_EQUALS id_block_2) ?
+                               (0) :
+                               (1))][n_cells_x_0 + ix] *
                              alpha +
                            p * (1 - alpha);
                   }
-                else if (cell.material_id() == id_block_3 ||
-                         cell.material_id() == id_block_6) // block 3 and 6
+                else if (cell
+                           .material_id() DEAL_II_EQUALS id_block_3 DEAL_II_OR
+                                                                    cell.material_id()
+                               DEAL_II_EQUALS id_block_6) // block 3 and 6
                   {
                     // compute indices ix and iy
                     const double dx = length_b2 / n_cells_x_2;
@@ -1108,11 +1131,11 @@ namespace GridGenerator
                     // define on upper/lower horizontal far field side at y =
                     // +/- height, i.e. face GK or IL incline factor to move
                     // points G and H to the right
-                    const Point<2> p1(J(0) - (1 - incline_factor) * length_b2 *
-                                               (alpha_x),
-                                      ((cell.material_id() == id_block_3) ?
-                                         (height) :
-                                         (-height)));
+                    const Point<2> p1(
+                      J(0) - (1 - incline_factor) * length_b2 * (alpha_x),
+                      ((cell.material_id() DEAL_II_EQUALS id_block_3) ?
+                         (height) :
+                         (-height)));
                     // define points on HJ but use tail_y as y-coordinate, in
                     // case last airfoil point has y =/= 0
                     const Point<2> p2(J(0) - alpha_x * length_b2, tail_y);
@@ -1283,7 +1306,7 @@ namespace GridGenerator
                                                              tria.end_face();
       for (; face != endface; ++face)
         if (face->at_boundary())
-          if (face->boundary_id() == 0)
+          if (face->boundary_id() DEAL_II_EQUALS 0)
             {
               const Point<spacedim> center(face->center());
 
@@ -1291,13 +1314,17 @@ namespace GridGenerator
                 face->set_boundary_id(0);
               else if (std::abs(center(0) - p2[0]) < epsilon)
                 face->set_boundary_id(1);
-              else if (dim > 1 && std::abs(center(1) - p1[1]) < epsilon)
+              else if (dim > 1 DEAL_II_AND std::abs(center(1) - p1[1]) <
+                       epsilon)
                 face->set_boundary_id(2);
-              else if (dim > 1 && std::abs(center(1) - p2[1]) < epsilon)
+              else if (dim > 1 DEAL_II_AND std::abs(center(1) - p2[1]) <
+                       epsilon)
                 face->set_boundary_id(3);
-              else if (dim > 2 && std::abs(center(2) - p1[2]) < epsilon)
+              else if (dim > 2 DEAL_II_AND std::abs(center(2) - p1[2]) <
+                       epsilon)
                 face->set_boundary_id(4);
-              else if (dim > 2 && std::abs(center(2) - p2[2]) < epsilon)
+              else if (dim > 2 DEAL_II_AND std::abs(center(2) - p2[2]) <
+                       epsilon)
                 face->set_boundary_id(5);
               else
                 // triangulation says it
@@ -1359,7 +1386,7 @@ namespace GridGenerator
       // of knowledge about the
       // orientation of cells. this is
       // probably not good style...
-      if (tria.n_cells() == 6)
+      if (tria.n_cells() DEAL_II_EQUALS 6)
         {
           Triangulation<3>::cell_iterator cell = tria.begin();
 
@@ -1386,7 +1413,7 @@ namespace GridGenerator
           Assert(cell->face(0)->at_boundary(), ExcInternalError());
           cell->face(0)->set_all_boundary_ids(1);
         }
-      else if (tria.n_cells() == 12)
+      else if (tria.n_cells() DEAL_II_EQUALS 12)
         {
           // again use some internal
           // knowledge
@@ -1398,13 +1425,13 @@ namespace GridGenerator
               cell->face(5)->set_all_boundary_ids(1);
             }
         }
-      else if (tria.n_cells() == 96)
+      else if (tria.n_cells() DEAL_II_EQUALS 96)
         {
           // the 96-cell hypershell is
           // based on a once refined
           // 12-cell mesh. consequently,
           // since the outer faces all
-          // are face_no==5 above, so
+          // are face_noDEAL_II_EQUALS 5 above, so
           // they are here (unless they
           // are in the interior). Use
           // this to assign boundary
@@ -1420,7 +1447,7 @@ namespace GridGenerator
                 cell->face(5)->set_all_boundary_ids(1);
                 ++count;
               }
-          Assert(count == 48, ExcInternalError());
+          Assert(count DEAL_II_EQUALS 48, ExcInternalError());
         }
       else
         Assert(false, ExcNotImplemented());
@@ -1723,7 +1750,7 @@ namespace GridGenerator
     Assert(n_cells > 4,
            ExcMessage(
              "More than 4 cells are needed to create a moebius grid."));
-    Assert(r > 0 && R > 0,
+    Assert(r > 0 DEAL_II_AND R > 0,
            ExcMessage("Outer and inner radius must be positive."));
     Assert(R > r,
            ExcMessage("Outer radius must be greater than inner radius."));
@@ -1933,7 +1960,7 @@ namespace GridGenerator
     Assert(n_cells_toroidal > 2,
            ExcMessage("Number of cells in toroidal direction has "
                       "to be at least 3."));
-    AssertThrow(phi > 0.0 && phi < 2.0 * numbers::PI + 1.0e-15,
+    AssertThrow(phi > 0.0 DEAL_II_AND phi < 2.0 * numbers::PI + 1.0e-15,
                 ExcMessage("Invalid angle phi specified."));
 
     // the first 8 vertices are in the x-y-plane
@@ -2027,14 +2054,15 @@ namespace GridGenerator
           {
             // faces 4 and 5 are those with normal vector aligned with torus
             // centerline
-            if (cell->face(f)->at_boundary() && f != 4 && f != 5)
+            if (cell->face(f)->at_boundary()
+                  DEAL_II_AND f != 4 DEAL_II_AND f != 5)
               {
                 cell->face(f)->set_all_manifold_ids(1);
               }
           }
 
         // set manifold id to 2 for those cells that are on the torus centerline
-        if (cell->material_id() == 1)
+        if (cell->material_id() DEAL_II_EQUALS 1)
           {
             cell->set_all_manifold_ids(2);
             // reset to 0
@@ -2059,7 +2087,8 @@ namespace GridGenerator
                const std::vector<Point<spacedim>> &vertices,
                const bool                          colorize)
   {
-    Assert(vertices.size() == dealii::GeometryInfo<dim>::vertices_per_cell,
+    Assert(vertices.size()
+             DEAL_II_EQUALS dealii::GeometryInfo<dim>::vertices_per_cell,
            ExcMessage("Wrong number of vertices."));
 
     // First create a hyper_rectangle and then deform it.
@@ -2185,12 +2214,12 @@ namespace GridGenerator
                             const bool                       colorize)
   {
     std::vector<unsigned int> compute_subdivisions = subdivisions;
-    if (compute_subdivisions.size() == 0)
+    if (compute_subdivisions.size() DEAL_II_EQUALS 0)
       {
         compute_subdivisions.resize(dim, 1);
       }
 
-    Assert(compute_subdivisions.size() == dim,
+    Assert(compute_subdivisions.size() DEAL_II_EQUALS dim,
            ExcMessage("One subdivision must be provided for each dimension."));
     // check subdivisions
     for (unsigned int i = 0; i < dim; ++i)
@@ -2218,7 +2247,8 @@ namespace GridGenerator
           }
         case 2:
           {
-            if (spacedim == 2) // this check does not make sense otherwise
+            if (spacedim
+                  DEAL_II_EQUALS 2) // this check does not make sense otherwise
               {
                 const double plane_normal =
                   edges[0][0] * edges[1][1] - edges[0][1] * edges[1][0];
@@ -2448,7 +2478,8 @@ namespace GridGenerator
                              const Point<dim> &               p_2,
                              const bool                       colorize)
   {
-    Assert(repetitions.size() == dim, ExcInvalidRepetitionsDimension(dim));
+    Assert(repetitions.size() DEAL_II_EQUALS dim,
+           ExcInvalidRepetitionsDimension(dim));
 
     // First, extend dimensions from dim to spacedim and
     // normalize such that p1 is lower in all coordinate
@@ -2598,7 +2629,8 @@ namespace GridGenerator
                              const Point<dim> &                      p_2,
                              const bool                              colorize)
   {
-    Assert(step_sz.size() == dim, ExcInvalidRepetitionsDimension(dim));
+    Assert(step_sz.size() DEAL_II_EQUALS dim,
+           ExcInvalidRepetitionsDimension(dim));
 
     // First, normalize input such that
     // p1 is lower in all coordinate
@@ -2647,7 +2679,7 @@ namespace GridGenerator
                 // avoid accessing
                 // non-existent values
                 // and exit early instead
-                if (i == step_sizes[0].size())
+                if (i DEAL_II_EQUALS step_sizes[0].size())
                   break;
 
                 x += step_sizes[0][i];
@@ -2664,13 +2696,13 @@ namespace GridGenerator
                 for (unsigned int i = 0;; ++i)
                   {
                     points.push_back(Point<dim>(p1[0] + x, p1[1] + y));
-                    if (i == step_sizes[0].size())
+                    if (i DEAL_II_EQUALS step_sizes[0].size())
                       break;
 
                     x += step_sizes[0][i];
                   }
 
-                if (j == step_sizes[1].size())
+                if (j DEAL_II_EQUALS step_sizes[1].size())
                   break;
 
                 y += step_sizes[1][j];
@@ -2690,19 +2722,19 @@ namespace GridGenerator
                       {
                         points.push_back(
                           Point<dim>(p1[0] + x, p1[1] + y, p1[2] + z));
-                        if (i == step_sizes[0].size())
+                        if (i DEAL_II_EQUALS step_sizes[0].size())
                           break;
 
                         x += step_sizes[0][i];
                       }
 
-                    if (j == step_sizes[1].size())
+                    if (j DEAL_II_EQUALS step_sizes[1].size())
                       break;
 
                     y += step_sizes[1][j];
                   }
 
-                if (k == step_sizes[2].size())
+                if (k DEAL_II_EQUALS step_sizes[2].size())
                   break;
 
                 z += step_sizes[2][k];
@@ -2818,11 +2850,12 @@ namespace GridGenerator
                                const Table<1, types::material_id> &material_id,
                                const bool                          colorize)
   {
-    Assert(spacing.size() == 1, ExcInvalidRepetitionsDimension(1));
+    Assert(spacing.size() DEAL_II_EQUALS 1, ExcInvalidRepetitionsDimension(1));
 
     const unsigned int n_cells = material_id.size(0);
 
-    Assert(spacing[0].size() == n_cells, ExcInvalidRepetitionsDimension(1));
+    Assert(spacing[0].size() DEAL_II_EQUALS n_cells,
+           ExcInvalidRepetitionsDimension(1));
 
     double delta = std::numeric_limits<double>::max();
     for (unsigned int i = 0; i < n_cells; i++)
@@ -2876,7 +2909,7 @@ namespace GridGenerator
                                const Table<2, types::material_id> &material_id,
                                const bool                          colorize)
   {
-    Assert(spacing.size() == 2, ExcInvalidRepetitionsDimension(2));
+    Assert(spacing.size() DEAL_II_EQUALS 2, ExcInvalidRepetitionsDimension(2));
 
     std::vector<unsigned int> repetitions(2);
     unsigned int              n_cells = 1;
@@ -2890,7 +2923,7 @@ namespace GridGenerator
             Assert(spacing[i][j] >= 0, ExcInvalidRepetitions(-1));
             delta = std::min(delta, spacing[i][j]);
           }
-        Assert(material_id.size(i) == repetitions[i],
+        Assert(material_id.size(i) DEAL_II_EQUALS repetitions[i],
                ExcInvalidRepetitionsDimension(i));
       }
 
@@ -2946,7 +2979,7 @@ namespace GridGenerator
           {
             Point<2> cell_center = cell->center();
             for (unsigned int f : GeometryInfo<2>::face_indices())
-              if (cell->face(f)->boundary_id() == 0)
+              if (cell->face(f)->boundary_id() DEAL_II_EQUALS 0)
                 {
                   Point<2> face_center = cell->face(f)->center();
                   for (unsigned int i = 0; i < 2; ++i)
@@ -2972,7 +3005,8 @@ namespace GridGenerator
   {
     const unsigned int dim = 3;
 
-    Assert(spacing.size() == dim, ExcInvalidRepetitionsDimension(dim));
+    Assert(spacing.size() DEAL_II_EQUALS dim,
+           ExcInvalidRepetitionsDimension(dim));
 
     std::vector<unsigned int> repetitions(dim);
     unsigned int              n_cells = 1;
@@ -2986,7 +3020,7 @@ namespace GridGenerator
             Assert(spacing[i][j] >= 0, ExcInvalidRepetitions(-1));
             delta = std::min(delta, spacing[i][j]);
           }
-        Assert(material_id.size(i) == repetitions[i],
+        Assert(material_id.size(i) DEAL_II_EQUALS repetitions[i],
                ExcInvalidRepetitionsDimension(i));
       }
 
@@ -3057,7 +3091,7 @@ namespace GridGenerator
           {
             Point<dim> cell_center = cell->center();
             for (auto f : GeometryInfo<dim>::face_indices())
-              if (cell->face(f)->boundary_id() == 0)
+              if (cell->face(f)->boundary_id() DEAL_II_EQUALS 0)
                 {
                   Point<dim> face_center = cell->face(f)->center();
                   for (unsigned int i = 0; i < dim; ++i)
@@ -3141,7 +3175,8 @@ namespace GridGenerator
             for (unsigned int y = 0; y < repetitions[1]; ++y)
               for (unsigned int x = 0; x < repetitions[0]; ++x)
                 {
-                  if ((x % 2 == 1) && (y % 2 == 1))
+                  if ((x % 2 DEAL_II_EQUALS 1)
+                        DEAL_II_AND(y % 2 DEAL_II_EQUALS 1))
                     continue;
                   Assert(c < cells.size(), ExcInternalError());
                   cells[c].vertices[0] = y * (repetitions[0] + 1) + x;
@@ -3231,8 +3266,8 @@ namespace GridGenerator
                                 const Point<2> &c,
                                 const double    radius)
     {
-      return (std::abs(p[0] - c[0]) < radius) &&
-             (std::abs(p[1] - c[1]) < radius);
+      return (std::abs(p[0] - c[0]) < radius)
+        DEAL_II_AND(std::abs(p[1] - c[1]) < radius);
     }
 
 
@@ -3269,8 +3304,9 @@ namespace GridGenerator
                          const unsigned int /*n_slices*/,
                          const bool colorize)
   {
-    const bool with_padding =
-      pad_bottom > 0 || pad_top > 0 || pad_left > 0 || pad_right > 0;
+    const bool with_padding = pad_bottom > 0 DEAL_II_OR pad_top >
+                              0 DEAL_II_OR pad_left > 0 DEAL_II_OR pad_right >
+                              0;
 
     Assert(pad_bottom >= 0., ExcMessage("Negative bottom padding."));
     Assert(pad_top >= 0., ExcMessage("Negative top padding."));
@@ -3317,7 +3353,8 @@ namespace GridGenerator
             static_cast<unsigned int>(std::round(padding / h));
           // in case padding is much smaller than h, make sure we
           // have at least 1 element
-          const unsigned int num = (padding > 0. && rounded == 0) ? 1 : rounded;
+          const unsigned int num =
+            (padding > 0. DEAL_II_AND rounded DEAL_II_EQUALS 0) ? 1 : rounded;
           for (unsigned int i = 0; i < num; ++i)
             step_sizes.push_back(padding / num);
         };
@@ -3371,15 +3408,13 @@ namespace GridGenerator
       {
         // set all non-boundary manifold ids on the cells that came from the
         // grid around the cylinder to the new TFI manifold id.
-        if (cell->manifold_id() == tfi_manifold_id)
+        if (cell->manifold_id() DEAL_II_EQUALS tfi_manifold_id)
           {
             for (const unsigned int face_n : GeometryInfo<2>::face_indices())
               {
                 const auto &face = cell->face(face_n);
-                if (face->at_boundary() &&
-                    internal::point_in_2d_box(face->center(),
-                                              center,
-                                              outer_radius))
+                if (face->at_boundary() DEAL_II_AND internal::point_in_2d_box(
+                      face->center(), center, outer_radius))
                   face->set_manifold_id(polar_manifold_id);
                 else
                   face->set_manifold_id(tfi_manifold_id);
@@ -3418,7 +3453,7 @@ namespace GridGenerator
                 // cylinder boundary
                 else
                   {
-                    Assert(cell->manifold_id() == tfi_manifold_id,
+                    Assert(cell->manifold_id() DEAL_II_EQUALS tfi_manifold_id,
                            ExcInternalError());
                     face->set_boundary_id(4);
                   }
@@ -3493,7 +3528,7 @@ namespace GridGenerator
                              const double       skewness,
                              const bool         colorize)
   {
-    Assert(0.0 <= shell_region_width && shell_region_width < 0.05,
+    Assert(0.0 <= shell_region_width DEAL_II_AND shell_region_width < 0.05,
            ExcMessage("The width of the shell region must be less than 0.05 "
                       "(and preferably close to 0.03)"));
     const types::manifold_id polar_manifold_id = 0;
@@ -3536,11 +3571,11 @@ namespace GridGenerator
         if ((cell->center() - Point<2>(0.2, 0.2)).norm() < 0.15)
           cells_to_remove.insert(cell);
 
-        if (cylinder_triangulation_offset == Tensor<1, 2>())
+        if (cylinder_triangulation_offset DEAL_II_EQUALS Tensor<1, 2>())
           {
             for (const unsigned int vertex_n :
                  GeometryInfo<2>::vertex_indices())
-              if (cell->vertex(vertex_n) == Point<2>())
+              if (cell->vertex(vertex_n) DEAL_II_EQUALS Point<2>())
                 {
                   // cylinder_tria is centered at zero, so we need to
                   // shift it up and to the right by two cells:
@@ -3647,21 +3682,21 @@ namespace GridGenerator
     // Ensure that all manifold ids on a polar cell really are set to the
     // polar manifold id:
     for (const auto &cell : tria.active_cell_iterators())
-      if (cell->manifold_id() == polar_manifold_id)
+      if (cell->manifold_id() DEAL_II_EQUALS polar_manifold_id)
         cell->set_all_manifold_ids(polar_manifold_id);
 
     // Ensure that all other manifold ids (including the interior faces
     // opposite the cylinder) are set to the flat manifold id:
     for (const auto &cell : tria.active_cell_iterators())
-      if (cell->manifold_id() != polar_manifold_id &&
-          cell->manifold_id() != tfi_manifold_id)
+      if (cell->manifold_id() !=
+          polar_manifold_id DEAL_II_AND cell->manifold_id() != tfi_manifold_id)
         cell->set_all_manifold_ids(numbers::flat_manifold_id);
 
     // We need to calculate the current center so that we can move it later:
     // to start get a unique list of (points to) vertices on the cylinder
     std::vector<Point<2> *> cylinder_pointers;
     for (const auto &face : tria.active_face_iterators())
-      if (face->manifold_id() == polar_manifold_id)
+      if (face->manifold_id() DEAL_II_EQUALS polar_manifold_id)
         {
           cylinder_pointers.push_back(&face->vertex(0));
           cylinder_pointers.push_back(&face->vertex(1));
@@ -3700,13 +3735,14 @@ namespace GridGenerator
             else if (std::abs(center[0] - 2.2) < 1e-10)
               face->set_boundary_id(1);
             // cylinder boundary
-            else if (face->manifold_id() == polar_manifold_id)
+            else if (face->manifold_id() DEAL_II_EQUALS polar_manifold_id)
               face->set_boundary_id(2);
             // sides of channel
             else
               {
-                Assert(std::abs(center[1] - 0.00) < 1.0e-10 ||
-                         std::abs(center[1] - 0.41) < 1.0e-10,
+                Assert(std::abs(center[1] - 0.00) <
+                         1.0e-10 DEAL_II_OR std::abs(center[1] - 0.41) <
+                         1.0e-10,
                        ExcInternalError());
                 face->set_boundary_id(3);
               }
@@ -3748,7 +3784,8 @@ namespace GridGenerator
     // them to 3
     if (colorize)
       for (const auto &face : tria.active_face_iterators())
-        if (face->boundary_id() == 4 || face->boundary_id() == 5)
+        if (face->boundary_id() DEAL_II_EQUALS 4 DEAL_II_OR face->boundary_id()
+              DEAL_II_EQUALS 5)
           face->set_boundary_id(3);
   }
 
@@ -3800,7 +3837,8 @@ namespace GridGenerator
         // We are moving in the direction of face
         for (unsigned int j = 0; j < sizes[face]; ++j, ++cell_index)
           {
-            const unsigned int last_cell = (j == 0) ? 0U : (cell_index - 1);
+            const unsigned int last_cell =
+              (j DEAL_II_EQUALS 0) ? 0U : (cell_index - 1);
 
             for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face;
                  ++v)
@@ -4179,8 +4217,10 @@ namespace GridGenerator
         const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
         -> bool {
         for (unsigned int d = 0; d < dim; ++d)
-          if ((n_cells_to_remove[d] > 0 && cell->center()[d] >= cut_step[d]) ||
-              (n_cells_to_remove[d] < 0 && cell->center()[d] <= cut_step[d]))
+          if ((n_cells_to_remove[d] > 0 DEAL_II_AND cell->center()[d] >=
+               cut_step[d])
+                DEAL_II_OR(n_cells_to_remove[d] <
+                           0 DEAL_II_AND cell->center()[d] <= cut_step[d]))
             return false;
 
         return true;
@@ -4224,7 +4264,8 @@ namespace GridGenerator
         for (unsigned int j = 0; j < 4; ++j)
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
-        cells[i].manifold_id = i == 2 ? numbers::flat_manifold_id : 1;
+        cells[i].manifold_id =
+          i DEAL_II_EQUALS 2 ? numbers::flat_manifold_id : 1;
       }
 
     tria.create_triangulation(std::vector<Point<2>>(std::begin(vertices),
@@ -4247,7 +4288,7 @@ namespace GridGenerator
                    const unsigned int n_cells,
                    const bool         colorize)
   {
-    Assert((inner_radius > 0) && (inner_radius < outer_radius),
+    Assert((inner_radius > 0) DEAL_II_AND(inner_radius < outer_radius),
            ExcInvalidRadii());
 
     const double pi = numbers::PI;
@@ -4261,11 +4302,11 @@ namespace GridGenerator
     // radial extent (which is the
     // difference between the two
     // radii)
-    const unsigned int N =
-      (n_cells == 0 ? static_cast<unsigned int>(
-                        std::ceil((2 * pi * (outer_radius + inner_radius) / 2) /
-                                  (outer_radius - inner_radius))) :
-                      n_cells);
+    const unsigned int N = (n_cells DEAL_II_EQUALS 0 ?
+                              static_cast<unsigned int>(std::ceil(
+                                (2 * pi * (outer_radius + inner_radius) / 2) /
+                                (outer_radius - inner_radius))) :
+                              n_cells);
 
     // set up N vertices on the
     // outer and N vertices on
@@ -4331,7 +4372,7 @@ namespace GridGenerator
     std::set<Point<dim> *> vertices_to_move;
 
     for (const auto &face : tria.active_face_iterators())
-      if (face->boundary_id() == 0)
+      if (face->boundary_id() DEAL_II_EQUALS 0)
         for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)
           vertices_to_move.insert(&face->vertex(v));
 
@@ -4450,14 +4491,15 @@ namespace GridGenerator
       {
         for (unsigned int i : GeometryInfo<dim>::face_indices())
           {
-            if (cell->face(i)->boundary_id() ==
-                numbers::internal_face_boundary_id)
+            if (cell->face(i)->boundary_id()
+                  DEAL_II_EQUALS numbers::internal_face_boundary_id)
               continue;
 
             // If one the components is the same as the respective
             // component of the center, then this is part of the plane
-            if (cell->face(i)->center()(0) < p(0) + 1.e-5 * radius ||
-                cell->face(i)->center()(1) < p(1) + 1.e-5 * radius)
+            if (cell->face(i)->center()(0) <
+                p(0) + 1.e-5 * radius DEAL_II_OR cell->face(i)->center()(1) <
+                p(1) + 1.e-5 * radius)
               {
                 cell->face(i)->set_boundary_id(1);
                 cell->face(i)->set_manifold_id(numbers::flat_manifold_id);
@@ -4516,8 +4558,8 @@ namespace GridGenerator
       {
         for (unsigned int i : GeometryInfo<2>::face_indices())
           {
-            if (cell->face(i)->boundary_id() ==
-                numbers::internal_face_boundary_id)
+            if (cell->face(i)->boundary_id()
+                  DEAL_II_EQUALS numbers::internal_face_boundary_id)
               continue;
 
             // If x is zero, then this is part of the plane
@@ -4543,7 +4585,7 @@ namespace GridGenerator
                         const unsigned int n_cells,
                         const bool         colorize)
   {
-    Assert((inner_radius > 0) && (inner_radius < outer_radius),
+    Assert((inner_radius > 0) DEAL_II_AND(inner_radius < outer_radius),
            ExcInvalidRadii());
 
     const double pi = numbers::PI;
@@ -4557,10 +4599,10 @@ namespace GridGenerator
     // difference between the two
     // radii)
     const unsigned int N =
-      (n_cells == 0 ? static_cast<unsigned int>(
-                        std::ceil((pi * (outer_radius + inner_radius) / 2) /
-                                  (outer_radius - inner_radius))) :
-                      n_cells);
+      (n_cells DEAL_II_EQUALS 0 ? static_cast<unsigned int>(std::ceil(
+                                    (pi * (outer_radius + inner_radius) / 2) /
+                                    (outer_radius - inner_radius))) :
+                                  n_cells);
 
     // set up N+1 vertices on the
     // outer and N+1 vertices on
@@ -4578,7 +4620,9 @@ namespace GridGenerator
         // compute using the imprecise
         // value of pi)
         vertices[i] =
-          Point<2>(((i == 0) || (i == N) ? 0 : std::cos(pi * i / N - pi / 2)),
+          Point<2>(((i DEAL_II_EQUALS 0)DEAL_II_OR(i DEAL_II_EQUALS N) ?
+                      0 :
+                      std::cos(pi * i / N - pi / 2)),
                    std::sin(pi * i / N - pi / 2)) *
           outer_radius;
         vertices[i + N + 1] = vertices[i] * (inner_radius / outer_radius);
@@ -4626,7 +4670,7 @@ namespace GridGenerator
                            const unsigned int n_cells,
                            const bool         colorize)
   {
-    Assert((inner_radius > 0) && (inner_radius < outer_radius),
+    Assert((inner_radius > 0) DEAL_II_AND(inner_radius < outer_radius),
            ExcInvalidRadii());
 
     const double pi = numbers::PI;
@@ -4640,10 +4684,10 @@ namespace GridGenerator
     // difference between the two
     // radii)
     const unsigned int N =
-      (n_cells == 0 ? static_cast<unsigned int>(
-                        std::ceil((pi * (outer_radius + inner_radius) / 4) /
-                                  (outer_radius - inner_radius))) :
-                      n_cells);
+      (n_cells DEAL_II_EQUALS 0 ? static_cast<unsigned int>(std::ceil(
+                                    (pi * (outer_radius + inner_radius) / 4) /
+                                    (outer_radius - inner_radius))) :
+                                  n_cells);
 
     // set up N+1 vertices on the
     // outer and N+1 vertices on
@@ -4659,9 +4703,10 @@ namespace GridGenerator
         // zero (contrary to what we may
         // compute using the imprecise
         // value of pi)
-        vertices[i] = Point<2>(((i == N) ? 0 : std::cos(pi * i / N / 2)),
-                               std::sin(pi * i / N / 2)) *
-                      outer_radius;
+        vertices[i] =
+          Point<2>(((i DEAL_II_EQUALS N) ? 0 : std::cos(pi * i / N / 2)),
+                   std::sin(pi * i / N / 2)) *
+          outer_radius;
         vertices[i + N + 1] = vertices[i] * (inner_radius / outer_radius);
 
         vertices[i] += center;
@@ -4809,7 +4854,7 @@ namespace GridGenerator
                       const double      radius_1,
                       const double      half_length)
   {
-    Assert(triangulation.n_cells() == 0,
+    Assert(triangulation.n_cells() DEAL_II_EQUALS 0,
            ExcMessage("The output triangulation object needs to be empty."));
     Assert(0 < radius_0, ExcMessage("The radii must be positive."));
     Assert(0 < radius_1, ExcMessage("The radii must be positive."));
@@ -4978,7 +5023,8 @@ namespace GridGenerator
         for (const unsigned int j : GeometryInfo<3>::vertex_indices())
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
-        cells[i].manifold_id = i == 0 ? numbers::flat_manifold_id : 1;
+        cells[i].manifold_id =
+          i DEAL_II_EQUALS 0 ? numbers::flat_manifold_id : 1;
       }
 
     tria.create_triangulation(std::vector<Point<3>>(std::begin(vertices),
@@ -5102,10 +5148,14 @@ namespace GridGenerator
 
                 for (unsigned int e = 0; e < GeometryInfo<3>::lines_per_face;
                      ++e)
-                  if ((std::fabs(cell->face(i)->line(e)->vertex(0)[1]) == a) ||
-                      (std::fabs(cell->face(i)->line(e)->vertex(0)[2]) == a) ||
-                      (std::fabs(cell->face(i)->line(e)->vertex(1)[1]) == a) ||
-                      (std::fabs(cell->face(i)->line(e)->vertex(1)[2]) == a))
+                  if ((std::fabs(cell->face(i)->line(e)->vertex(0)[1])
+                         DEAL_II_EQUALS a)
+                        DEAL_II_OR(std::fabs(cell->face(i)->line(e)->vertex(
+                          0)[2]) DEAL_II_EQUALS a)
+                          DEAL_II_OR(std::fabs(cell->face(i)->line(e)->vertex(
+                            1)[1]) DEAL_II_EQUALS a)
+                            DEAL_II_OR(std::fabs(cell->face(i)->line(e)->vertex(
+                              1)[2]) DEAL_II_EQUALS a))
                     {
                       cell->face(i)->line(e)->set_boundary_id(2);
                       cell->face(i)->line(e)->set_manifold_id(
@@ -5119,10 +5169,14 @@ namespace GridGenerator
 
                 for (unsigned int e = 0; e < GeometryInfo<3>::lines_per_face;
                      ++e)
-                  if ((std::fabs(cell->face(i)->line(e)->vertex(0)[1]) == a) ||
-                      (std::fabs(cell->face(i)->line(e)->vertex(0)[2]) == a) ||
-                      (std::fabs(cell->face(i)->line(e)->vertex(1)[1]) == a) ||
-                      (std::fabs(cell->face(i)->line(e)->vertex(1)[2]) == a))
+                  if ((std::fabs(cell->face(i)->line(e)->vertex(0)[1])
+                         DEAL_II_EQUALS a)
+                        DEAL_II_OR(std::fabs(cell->face(i)->line(e)->vertex(
+                          0)[2]) DEAL_II_EQUALS a)
+                          DEAL_II_OR(std::fabs(cell->face(i)->line(e)->vertex(
+                            1)[1]) DEAL_II_EQUALS a)
+                            DEAL_II_OR(std::fabs(cell->face(i)->line(e)->vertex(
+                              1)[2]) DEAL_II_EQUALS a))
                     {
                       cell->face(i)->line(e)->set_boundary_id(1);
                       cell->face(i)->line(e)->set_manifold_id(
@@ -5193,14 +5247,17 @@ namespace GridGenerator
       {
         for (unsigned int i : GeometryInfo<dim>::face_indices())
           {
-            if (cell->face(i)->boundary_id() ==
-                numbers::internal_face_boundary_id)
+            if (cell->face(i)->boundary_id()
+                  DEAL_II_EQUALS numbers::internal_face_boundary_id)
               continue;
 
             // If x,y or z is zero, then this is part of the plane
-            if (cell->face(i)->center()(0) < center(0) + 1.e-5 * radius ||
-                cell->face(i)->center()(1) < center(1) + 1.e-5 * radius ||
-                cell->face(i)->center()(2) < center(2) + 1.e-5 * radius)
+            if (cell->face(i)->center()(0) <
+                center(0) +
+                  1.e-5 * radius DEAL_II_OR cell->face(i)->center()(1) <
+                center(1) +
+                  1.e-5 * radius DEAL_II_OR cell->face(i)->center()(2) <
+                center(2) + 1.e-5 * radius)
               {
                 cell->face(i)->set_boundary_id(1);
                 cell->face(i)->set_manifold_id(numbers::flat_manifold_id);
@@ -5213,9 +5270,10 @@ namespace GridGenerator
                       cell->face(i)->line(j)->vertex(0),
                       cell->face(i)->line(j)->vertex(1)};
                     if ((std::fabs(line_vertices[0].distance(center) - radius) >
-                         1e-5 * radius) ||
-                        (std::fabs(line_vertices[1].distance(center) - radius) >
-                         1e-5 * radius))
+                         1e-5 * radius)
+                          DEAL_II_OR(
+                            std::fabs(line_vertices[1].distance(center) -
+                                      radius) > 1e-5 * radius))
                       {
                         cell->face(i)->line(j)->set_boundary_id(1);
                         cell->face(i)->line(j)->set_manifold_id(
@@ -5319,9 +5377,10 @@ namespace GridGenerator
                       cell->face(i)->line(j)->vertex(0),
                       cell->face(i)->line(j)->vertex(1)};
                     if ((std::fabs(line_vertices[0].distance(center) - radius) >
-                         1e-5 * radius) ||
-                        (std::fabs(line_vertices[1].distance(center) - radius) >
-                         1e-5 * radius))
+                         1e-5 * radius)
+                          DEAL_II_OR(
+                            std::fabs(line_vertices[1].distance(center) -
+                                      radius) > 1e-5 * radius))
                       {
                         cell->face(i)->line(j)->set_boundary_id(1);
                         cell->face(i)->line(j)->set_manifold_id(
@@ -5357,31 +5416,31 @@ namespace GridGenerator
         tria_copy.copy_triangulation(tria_piece);
         tria_piece.clear();
         std::vector<Point<dim>> new_points(tria_copy.n_vertices());
-        if (round == 0)
+        if (round DEAL_II_EQUALS 0)
           for (unsigned int v = 0; v < tria_copy.n_vertices(); ++v)
             {
               // rotate by 90 degrees counterclockwise
               new_points[v][0] = -tria_copy.get_vertices()[v][1];
               new_points[v][1] = tria_copy.get_vertices()[v][0];
-              if (dim == 3)
+              if (dim DEAL_II_EQUALS 3)
                 new_points[v][2] = tria_copy.get_vertices()[v][2];
             }
-        else if (round == 1)
+        else if (round DEAL_II_EQUALS 1)
           {
             for (unsigned int v = 0; v < tria_copy.n_vertices(); ++v)
               {
                 // rotate by 180 degrees along the xy plane
                 new_points[v][0] = -tria_copy.get_vertices()[v][0];
                 new_points[v][1] = -tria_copy.get_vertices()[v][1];
-                if (dim == 3)
+                if (dim DEAL_II_EQUALS 3)
                   new_points[v][2] = tria_copy.get_vertices()[v][2];
               }
           }
-        else if (round == 2)
+        else if (round DEAL_II_EQUALS 2)
           for (unsigned int v = 0; v < tria_copy.n_vertices(); ++v)
             {
               // rotate by 180 degrees along the xz plane
-              Assert(dim == 3, ExcInternalError());
+              Assert(dim DEAL_II_EQUALS 3, ExcInternalError());
               new_points[v][0] = -tria_copy.get_vertices()[v][0];
               new_points[v][1] = tria_copy.get_vertices()[v][1];
               new_points[v][2] = -tria_copy.get_vertices()[v][2];
@@ -5408,7 +5467,7 @@ namespace GridGenerator
 
         // merge the triangulations - this will make sure that the duplicate
         // vertices in the interior are absorbed
-        if (round == dim - 1)
+        if (round DEAL_II_EQUALS dim - 1)
           merge_triangulations(tria_copy, rotated_tria, tria, 1e-12 * radius);
         else
           merge_triangulations(tria_copy,
@@ -5437,25 +5496,29 @@ namespace GridGenerator
                    const unsigned int n_cells,
                    const bool         colorize)
   {
-    Assert((inner_radius > 0) && (inner_radius < outer_radius),
+    Assert((inner_radius > 0) DEAL_II_AND(inner_radius < outer_radius),
            ExcInvalidRadii());
 
     unsigned int n_refinement_steps = 0;
     unsigned int n_cells_coarsened  = n_cells;
-    if (n_cells != 96 && n_cells > 12)
-      while (n_cells_coarsened > 12 && n_cells_coarsened % 4 == 0)
+    if (n_cells != 96 DEAL_II_AND n_cells > 12)
+      while (n_cells_coarsened >
+             12 DEAL_II_AND n_cells_coarsened % 4 DEAL_II_EQUALS 0)
         {
           ++n_refinement_steps;
           n_cells_coarsened /= 4;
         }
-    Assert(n_cells == 0 || n_cells == 6 || n_cells == 12 || n_cells == 96 ||
-             (n_refinement_steps > 0 &&
-              (n_cells_coarsened == 6 || n_cells_coarsened == 12)),
+    Assert(n_cells DEAL_II_EQUALS 0 DEAL_II_OR n_cells
+             DEAL_II_EQUALS 6 DEAL_II_OR n_cells DEAL_II_EQUALS 12 DEAL_II_OR
+               n_cells DEAL_II_EQUALS 96 DEAL_II_OR(
+                 n_refinement_steps >
+                 0 DEAL_II_AND(n_cells_coarsened DEAL_II_EQUALS 6 DEAL_II_OR
+                                 n_cells_coarsened DEAL_II_EQUALS 12)),
            ExcMessage("Invalid number of coarse mesh cells"));
 
     const unsigned int n = n_refinement_steps > 0 ?
                              4 * n_cells_coarsened :
-                             ((n_cells == 0) ? 6 : n_cells);
+                             ((n_cells DEAL_II_EQUALS 0) ? 6 : n_cells);
 
     const double             irad = inner_radius / std::sqrt(3.0);
     const double             orad = outer_radius / std::sqrt(3.0);
@@ -5597,7 +5660,7 @@ namespace GridGenerator
 
                 AssertDimension(cells_to_remove.size(),
                                 tmp.n_active_cells() / 2);
-                if (r == n_refinement_steps - 1)
+                if (r DEAL_II_EQUALS n_refinement_steps - 1)
                   create_triangulation_with_removed_cells(tmp,
                                                           cells_to_remove,
                                                           tria);
@@ -5652,7 +5715,7 @@ namespace GridGenerator
                         const unsigned int /*n_cells*/,
                         const bool colorize)
   {
-    Assert((inner_radius > 0) && (inner_radius < outer_radius),
+    Assert((inner_radius > 0) DEAL_II_AND(inner_radius < outer_radius),
            ExcInvalidRadii());
 
     // These are for the two lower squares
@@ -5752,9 +5815,9 @@ namespace GridGenerator
                            const unsigned int n,
                            const bool         colorize)
   {
-    Assert((inner_radius > 0) && (inner_radius < outer_radius),
+    Assert((inner_radius > 0) DEAL_II_AND(inner_radius < outer_radius),
            ExcInvalidRadii());
-    if (n == 0 || n == 3)
+    if (n DEAL_II_EQUALS 0 DEAL_II_OR n DEAL_II_EQUALS 3)
       {
         const double a = inner_radius * std::sqrt(2.0) / 2e0;
         const double b = outer_radius * std::sqrt(2.0) / 2e0;
@@ -5820,7 +5883,7 @@ namespace GridGenerator
                       const unsigned int n_radial_cells,
                       const unsigned int n_axial_cells)
   {
-    Assert((inner_radius > 0) && (inner_radius < outer_radius),
+    Assert((inner_radius > 0) DEAL_II_AND(inner_radius < outer_radius),
            ExcInvalidRadii());
 
     const double pi = numbers::PI;
@@ -5834,13 +5897,13 @@ namespace GridGenerator
     // radial extent (which is the
     // difference between the two
     // radii)
-    const unsigned int N_r =
-      (n_radial_cells == 0 ? static_cast<unsigned int>(std::ceil(
-                               (2 * pi * (outer_radius + inner_radius) / 2) /
-                               (outer_radius - inner_radius))) :
-                             n_radial_cells);
+    const unsigned int N_r = (n_radial_cells DEAL_II_EQUALS 0 ?
+                                static_cast<unsigned int>(std::ceil(
+                                  (2 * pi * (outer_radius + inner_radius) / 2) /
+                                  (outer_radius - inner_radius))) :
+                                n_radial_cells);
     const unsigned int N_z =
-      (n_axial_cells == 0 ?
+      (n_axial_cells DEAL_II_EQUALS 0 ?
          static_cast<unsigned int>(std::ceil(
            length / (2 * pi * (outer_radius + inner_radius) / 2 / N_r))) :
          n_axial_cells);
@@ -5912,7 +5975,7 @@ namespace GridGenerator
     unsigned int n_accumulated_vertices = 0;
     for (const auto triangulation : triangulations)
       {
-        Assert(triangulation->n_levels() == 1,
+        Assert(triangulation->n_levels() DEAL_II_EQUALS 1,
                ExcMessage("The input triangulations must be non-empty "
                           "and must not be refined."));
 
@@ -5937,7 +6000,8 @@ namespace GridGenerator
           {
             for (CellData<1> &line_data : tria_subcell_data.boundary_lines)
               {
-                if (line_data.manifold_id == numbers::flat_manifold_id)
+                if (line_data.manifold_id DEAL_II_EQUALS
+                                          numbers::flat_manifold_id)
                   continue;
                 for (unsigned int &vertex_n : line_data.vertices)
                   vertex_n += n_accumulated_vertices;
@@ -5948,7 +6012,8 @@ namespace GridGenerator
 
             for (CellData<2> &quad_data : tria_subcell_data.boundary_quads)
               {
-                if (quad_data.manifold_id == numbers::flat_manifold_id)
+                if (quad_data.manifold_id DEAL_II_EQUALS
+                                          numbers::flat_manifold_id)
                   continue;
                 for (unsigned int &vertex_n : quad_data.vertices)
                   vertex_n += n_accumulated_vertices;
@@ -5987,12 +6052,12 @@ namespace GridGenerator
                        const bool   copy_manifold_ids)
   {
     // if either Triangulation is empty then merging is just a copy.
-    if (triangulation_1.n_cells() == 0)
+    if (triangulation_1.n_cells() DEAL_II_EQUALS 0)
       {
         result.copy_triangulation(triangulation_2);
         return;
       }
-    if (triangulation_2.n_cells() == 0)
+    if (triangulation_2.n_cells() DEAL_II_EQUALS 0)
       {
         result.copy_triangulation(triangulation_1);
         return;
@@ -6032,18 +6097,19 @@ namespace GridGenerator
     void
     delete_duplicated_objects(std::vector<CellData<structdim>> &subcell_data)
     {
-      static_assert(structdim == 1 || structdim == 2,
-                    "This function is only implemented for lines and "
-                    "quadrilaterals.");
+      static_assert(
+        structdim DEAL_II_EQUALS 1 DEAL_II_OR structdim DEAL_II_EQUALS 2,
+        "This function is only implemented for lines and "
+        "quadrilaterals.");
       // start by making sure that all objects representing the same vertices
       // are numbered in the same way by canonicalizing the numberings. This
       // makes it possible to detect duplicates.
       for (CellData<structdim> &cell_data : subcell_data)
         {
-          if (structdim == 1)
+          if (structdim DEAL_II_EQUALS 1)
             std::sort(std::begin(cell_data.vertices),
                       std::end(cell_data.vertices));
-          else if (structdim == 2)
+          else if (structdim DEAL_II_EQUALS 2)
             {
               // rotate the vertex numbers so that the lowest one is first
               std::array<unsigned int, 4> renumbering;
@@ -6106,7 +6172,7 @@ namespace GridGenerator
             for (auto it = left; it != right; ++it)
               {
                 it->boundary_id = numbers::internal_face_boundary_id;
-                Assert(it->manifold_id == left->manifold_id,
+                Assert(it->manifold_id DEAL_II_EQUALS left->manifold_id,
                        ExcMessage(
                          "In the process of grid generation a single "
                          "line or quadrilateral has been assigned two "
@@ -6208,9 +6274,9 @@ namespace GridGenerator
         // clean up the boundary ids of the boundary objects: note that we
         // have to do this after delete_duplicated_vertices so that boundary
         // objects are actually duplicated at this point
-        if (dim == 2)
+        if (dim DEAL_II_EQUALS 2)
           delete_duplicated_objects(output_subcell_data.boundary_lines);
-        else if (dim == 3)
+        else if (dim DEAL_II_EQUALS 3)
           {
             delete_duplicated_objects(output_subcell_data.boundary_quads);
             for (CellData<1> &boundary_line :
@@ -6242,11 +6308,12 @@ namespace GridGenerator
            ExcMessage("The two input triangulations are not derived from "
                       "the same coarse mesh as required."));
     Assert((dynamic_cast<
-              const parallel::distributed::Triangulation<dim, spacedim> *>(
-              &triangulation_1) == nullptr) &&
-             (dynamic_cast<
-                const parallel::distributed::Triangulation<dim, spacedim> *>(
-                &triangulation_2) == nullptr),
+             const parallel::distributed::Triangulation<dim, spacedim> *>(
+             &triangulation_1) DEAL_II_EQUALS nullptr)
+             DEAL_II_AND(
+               dynamic_cast<
+                 const parallel::distributed::Triangulation<dim, spacedim> *>(
+                 &triangulation_2) DEAL_II_EQUALS nullptr),
            ExcMessage("The source triangulations for this function must both "
                       "be available entirely locally, and not be distributed "
                       "triangulations."));
@@ -6280,7 +6347,7 @@ namespace GridGenerator
               result_cell->set_refine_flag();
             }
 
-        if (any_cell_flagged == false)
+        if (any_cell_flagged DEAL_II_EQUALS false)
           break;
         else
           result.execute_coarsening_and_refinement();
@@ -6305,10 +6372,11 @@ namespace GridGenerator
     // the ones we are to remove
     std::vector<CellData<dim>> cells;
     for (const auto &cell : input_triangulation.active_cell_iterators())
-      if (cells_to_remove.find(cell) == cells_to_remove.end())
+      if (cells_to_remove.find(cell) DEAL_II_EQUALS cells_to_remove.end())
         {
-          Assert(static_cast<unsigned int>(cell->level()) ==
-                   input_triangulation.n_levels() - 1,
+          Assert(static_cast<unsigned int>(cell->level())
+                     DEAL_II_EQUALS input_triangulation.n_levels() -
+                   1,
                  ExcMessage(
                    "Your input triangulation appears to have "
                    "adaptively refined cells. This is not allowed. You can "
@@ -6347,11 +6415,11 @@ namespace GridGenerator
     const bool                             copy_manifold_ids,
     const std::vector<types::manifold_id> &manifold_priorities)
   {
-    Assert(input.n_levels() == 1,
+    Assert(input.n_levels() DEAL_II_EQUALS 1,
            ExcMessage(
              "The input triangulation must be a coarse mesh, i.e., it must "
              "not have been refined."));
-    Assert(result.n_cells() == 0,
+    Assert(result.n_cells() DEAL_II_EQUALS 0,
            ExcMessage("The output triangulation object needs to be empty."));
     Assert(height > 0,
            ExcMessage("The given height for extrusion must be positive."));
@@ -6401,11 +6469,11 @@ namespace GridGenerator
     const bool                             copy_manifold_ids,
     const std::vector<types::manifold_id> &manifold_priorities)
   {
-    Assert(input.n_levels() == 1,
+    Assert(input.n_levels() DEAL_II_EQUALS 1,
            ExcMessage(
              "The input triangulation must be a coarse mesh, i.e., it must "
              "not have been refined."));
-    Assert(result.n_cells() == 0,
+    Assert(result.n_cells() DEAL_II_EQUALS 0,
            ExcMessage("The output triangulation object needs to be empty."));
     Assert(slice_coordinates.size() >= 2,
            ExcMessage(
@@ -6426,8 +6494,8 @@ namespace GridGenerator
           std::sort(sorted_manifold_priorities.begin(),
                     sorted_manifold_priorities.end());
           Assert(std::unique(sorted_manifold_priorities.begin(),
-                             sorted_manifold_priorities.end()) ==
-                   sorted_manifold_priorities.end(),
+                             sorted_manifold_priorities.end())
+                   DEAL_II_EQUALS sorted_manifold_priorities.end(),
                  ExcMessage(
                    "The given vector of manifold ids may not contain any "
                    "duplicated entries."));
@@ -6464,7 +6532,7 @@ namespace GridGenerator
         default_priorities.end(),
         [&input](const types::manifold_id &id) {
           return dynamic_cast<const TransfiniteInterpolationManifold<2, 2> *>(
-                   &input.get_manifold(id)) == nullptr;
+            &input.get_manifold(id)) DEAL_II_EQUALS nullptr;
         });
       std::sort(default_priorities.begin(), first_tfi_it);
       std::sort(first_tfi_it, default_priorities.end());
@@ -6569,9 +6637,9 @@ namespace GridGenerator
     // then mark the bottom and top boundaries of the extruded mesh
     // with max_boundary_id+1 and max_boundary_id+2. check that this
     // remains valid
-    Assert((max_boundary_id != numbers::invalid_boundary_id) &&
-             (max_boundary_id + 1 != numbers::invalid_boundary_id) &&
-             (max_boundary_id + 2 != numbers::invalid_boundary_id),
+    Assert((max_boundary_id != numbers::invalid_boundary_id)
+             DEAL_II_AND(max_boundary_id + 1 != numbers::invalid_boundary_id)
+               DEAL_II_AND(max_boundary_id + 2 != numbers::invalid_boundary_id),
            ExcMessage(
              "The input triangulation to this function is using boundary "
              "indicators in a range that do not allow using "
@@ -6614,7 +6682,7 @@ namespace GridGenerator
          manifold_id_it != priorities.rend();
          ++manifold_id_it)
       for (const auto &face : result.active_face_iterators())
-        if (face->manifold_id() == *manifold_id_it)
+        if (face->manifold_id() DEAL_II_EQUALS * manifold_id_it)
           for (unsigned int line_n = 0;
                line_n < GeometryInfo<3>::lines_per_face;
                ++line_n)
@@ -6688,7 +6756,7 @@ namespace GridGenerator
                    ++v)
                 {
                   unsigned int vv = cell->face(f)->vertex_index(v);
-                  if (treated_vertices[vv] == false)
+                  if (treated_vertices[vv] DEAL_II_EQUALS false)
                     {
                       treated_vertices[vv] = true;
                       switch (vv)
@@ -6770,18 +6838,19 @@ namespace GridGenerator
                           const unsigned int  n_cells,
                           const bool          colorize)
   {
-    Assert(dim == 2 || dim == 3, ExcNotImplemented());
+    Assert(dim DEAL_II_EQUALS 2 DEAL_II_OR dim DEAL_II_EQUALS 3,
+           ExcNotImplemented());
     (void)colorize;
     (void)n_cells;
     Assert(inner_radius < outer_radius,
            ExcMessage("outer_radius has to be bigger than inner_radius."));
-    if (n_shells == 0)
+    if (n_shells DEAL_II_EQUALS 0)
       return; // empty Triangulation
 
     std::vector<double> radii;
     radii.push_back(inner_radius);
     for (unsigned int shell_n = 1; shell_n < n_shells; ++shell_n)
-      if (skewness == 0.0)
+      if (skewness DEAL_II_EQUALS 0.0)
         // same as below, but works in the limiting case of zero skewness
         radii.push_back(inner_radius +
                         (outer_radius - inner_radius) *
@@ -6802,12 +6871,13 @@ namespace GridGenerator
                                    center,
                                    radii[shell_n],
                                    radii[shell_n + 1],
-                                   n_cells == 0 ? (dim == 2 ? 8 : 12) :
-                                                  n_cells);
+                                   n_cells DEAL_II_EQUALS 0 ?
+                                     (dim DEAL_II_EQUALS 2 ? 8 : 12) :
+                                     n_cells);
 
         // The innermost shell has the smallest cells: use that to set the
         // vertex merging tolerance
-        if (grid_vertex_tolerance == 0.0)
+        if (grid_vertex_tolerance DEAL_II_EQUALS 0.0)
           grid_vertex_tolerance =
             0.5 * internal::minimal_vertex_distance(current_shell);
 
@@ -6821,9 +6891,9 @@ namespace GridGenerator
 
     const types::manifold_id manifold_id = 0;
     triangulation.set_all_manifold_ids(manifold_id);
-    if (dim == 2)
+    if (dim DEAL_II_EQUALS 2)
       triangulation.set_manifold(manifold_id, PolarManifold<dim>(center));
-    else if (dim == 3)
+    else if (dim DEAL_II_EQUALS 3)
       triangulation.set_manifold(manifold_id, SphericalManifold<dim>(center));
 
     // We use boundary vertex positions to see if things are on the inner or
@@ -6904,7 +6974,7 @@ namespace GridGenerator
                    ++v)
                 {
                   unsigned int vv = cell->face(f)->vertex_index(v);
-                  if (treated_vertices[vv] == false)
+                  if (treated_vertices[vv] DEAL_II_EQUALS false)
                     {
                       treated_vertices[vv] = true;
                       for (unsigned int i = 0; i <= Nz; ++i)
@@ -7002,7 +7072,7 @@ namespace GridGenerator
 
     (void)pt;
     Assert(
-      pt == nullptr,
+      pt DEAL_II_EQUALS nullptr,
       ExcMessage(
         "Cannot use this function on parallel::distributed::Triangulation."));
 
@@ -7037,7 +7107,7 @@ namespace GridGenerator
           face = in_tria.begin_active_face(),
           endf = in_tria.end_face();
 
-        // Face counter for both dim == 2 and dim == 3
+        // Face counter for both dim DEAL_II_EQUALS  2 and dim DEAL_II_EQUALS  3
         unsigned int f = 0;
         switch (dim)
           {
@@ -7102,8 +7172,8 @@ namespace GridGenerator
                         const std::set<types::boundary_id> &boundary_ids)
   {
     Assert((dynamic_cast<
-              const parallel::distributed::Triangulation<dim, spacedim> *>(
-              &volume_mesh.get_triangulation()) == nullptr),
+             const parallel::distributed::Triangulation<dim, spacedim> *>(
+             &volume_mesh.get_triangulation()) DEAL_II_EQUALS nullptr),
            ExcNotImplemented());
 
     // This function works using the following assumption:
@@ -7114,7 +7184,7 @@ namespace GridGenerator
     // dimension of the boundary mesh
     const unsigned int boundary_dim = dim - 1;
 
-    // temporary map for level==0
+    // temporary map for levelDEAL_II_EQUALS 0
     // iterator to face is stored along with face number
     // (this is required by the algorithm to adjust the normals of the
     // cells of the boundary mesh)
@@ -7155,13 +7225,13 @@ namespace GridGenerator
       }
     // vertex swapping such that normals on the surface mesh point out of the
     // underlying volume
-    if (dim == 3)
+    if (dim DEAL_II_EQUALS 3)
       {
         std::swap(swap_matrix[0][1], swap_matrix[0][2]);
         std::swap(swap_matrix[2][1], swap_matrix[2][2]);
         std::swap(swap_matrix[4][1], swap_matrix[4][2]);
       }
-    else if (dim == 2)
+    else if (dim DEAL_II_EQUALS 2)
       {
         std::swap(swap_matrix[1][0], swap_matrix[1][1]);
         std::swap(swap_matrix[2][0], swap_matrix[2][1]);
@@ -7178,9 +7248,8 @@ namespace GridGenerator
           const typename MeshType<dim, spacedim>::face_iterator face =
             cell->face(i);
 
-          if (face->at_boundary() &&
-              (boundary_ids.empty() ||
-               (boundary_ids.find(face->boundary_id()) != boundary_ids.end())))
+          if (face->at_boundary() DEAL_II_AND(boundary_ids.empty() DEAL_II_OR(
+                boundary_ids.find(face->boundary_id()) != boundary_ids.end())))
             {
               CellData<boundary_dim> c_data;
 
@@ -7209,7 +7278,7 @@ namespace GridGenerator
               //
               // we set default boundary ids for boundary lines
               // and numbers::internal_face_boundary_id for internal lines
-              if (dim == 3)
+              if (dim DEAL_II_EQUALS 3)
                 for (unsigned int e = 0; e < 4; ++e)
                   {
                     // see if we already saw this edge from a
@@ -7218,22 +7287,27 @@ namespace GridGenerator
                     {
                       bool edge_found = false;
                       for (auto &boundary_line : subcell_data.boundary_lines)
-                        if (((boundary_line.vertices[0] ==
-                              map_vert_index[face->line(e)->vertex_index(0)]) &&
-                             (boundary_line.vertices[1] ==
-                              map_vert_index[face->line(e)->vertex_index(
-                                1)])) ||
-                            ((boundary_line.vertices[0] ==
-                              map_vert_index[face->line(e)->vertex_index(1)]) &&
-                             (boundary_line.vertices[1] ==
-                              map_vert_index[face->line(e)->vertex_index(0)])))
+                        if (((boundary_line.vertices[0] DEAL_II_EQUALS
+                                map_vert_index[face->line(e)->vertex_index(0)])
+                               DEAL_II_AND(
+                                 boundary_line.vertices[1] DEAL_II_EQUALS
+                                   map_vert_index[face->line(e)->vertex_index(
+                                     1)]))
+                              DEAL_II_OR(
+                                (boundary_line.vertices[0] DEAL_II_EQUALS
+                                   map_vert_index[face->line(e)->vertex_index(
+                                     1)])
+                                  DEAL_II_AND(
+                                    boundary_line.vertices[1] DEAL_II_EQUALS
+                                      map_vert_index[face->line(e)
+                                                       ->vertex_index(0)])))
                           {
                             boundary_line.boundary_id =
                               numbers::internal_face_boundary_id;
                             edge_found = true;
                             break;
                           }
-                      if (edge_found == true)
+                      if (edge_found DEAL_II_EQUALS true)
                         // try next edge of current face
                         continue;
                     }
@@ -7261,7 +7335,7 @@ namespace GridGenerator
       .create_triangulation(vertices, cells, subcell_data);
 
     // in 2d: set default boundary ids for "boundary vertices"
-    if (dim == 2)
+    if (dim DEAL_II_EQUALS 2)
       {
         for (const auto &cell : surface_mesh.active_cell_iterators())
           for (unsigned int vertex = 0; vertex < 2; vertex++)
@@ -7314,8 +7388,8 @@ namespace GridGenerator
                 // algorithm only works for
                 // isotropic refinement!
                 Assert(temporary_map_boundary_cell_face[cell_n]
-                           .second.first->refinement_case() ==
-                         RefinementCase<dim - 1>::isotropic_refinement,
+                         .second.first->refinement_case() DEAL_II_EQUALS
+                           RefinementCase<dim - 1>::isotropic_refinement,
                        ExcNotImplemented());
                 temporary_map_boundary_cell_face[cell_n]
                   .first->set_refine_flag();

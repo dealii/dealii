@@ -36,12 +36,11 @@ namespace std
   /**
    * Implementation of the error function for real-valued Sacado numbers.
    */
-  template <
-    typename ADNumberType,
-    typename = typename std::enable_if<
-      dealii::Differentiation::AD::is_sacado_number<ADNumberType>::value &&
-      dealii::Differentiation::AD::is_real_valued_ad_number<
-        ADNumberType>::value>::type>
+  template <typename ADNumberType,
+            typename = typename std::enable_if<
+              dealii::Differentiation::AD::is_sacado_number<ADNumberType>::value
+                DEAL_II_AND dealii::Differentiation::AD::
+                  is_real_valued_ad_number<ADNumberType>::value>::type>
   inline ADNumberType
   erf(ADNumberType x)
   {

@@ -189,8 +189,7 @@ namespace BlockMatrixIterators
     /**
      * Compare this accessor with another one for equality.
      */
-    bool
-    operator==(const Accessor &a) const;
+    bool operator DEAL_II_EQUALS(const Accessor &a) const;
 
     template <typename>
     friend class MatrixIterator;
@@ -275,8 +274,7 @@ namespace BlockMatrixIterators
     /**
      * Compare this accessor with another one for equality.
      */
-    bool
-    operator==(const Accessor &a) const;
+    bool operator DEAL_II_EQUALS(const Accessor &a) const;
 
     // Let the iterator class be a friend.
     template <typename>
@@ -1117,7 +1115,7 @@ namespace BlockMatrixIterators
     , base_iterator(matrix->block(0, 0).begin())
   {
     (void)col;
-    Assert(col == 0, ExcNotImplemented());
+    Assert(col DEAL_II_EQUALS 0, ExcNotImplemented());
 
     // check if this is a regular row or
     // the end of the matrix
@@ -1242,8 +1240,9 @@ namespace BlockMatrixIterators
     // times if rows inside a block are
     // empty), we have to jump to the next
     // block and take the
-    while (base_iterator ==
-           matrix->block(this->row_block, this->col_block).end(local_row))
+    while (base_iterator DEAL_II_EQUALS matrix
+             ->block(this->row_block, this->col_block)
+             .end(local_row))
       {
         // jump to next block in this block
         // row, if possible, otherwise go
@@ -1267,12 +1266,13 @@ namespace BlockMatrixIterators
             // whether we've just fallen
             // off the end of the whole
             // matrix
-            if (local_row ==
-                matrix->block(this->row_block, this->col_block).m())
+            if (local_row DEAL_II_EQUALS matrix
+                  ->block(this->row_block, this->col_block)
+                  .m())
               {
                 local_row = 0;
                 ++this->row_block;
-                if (this->row_block == matrix->n_block_rows())
+                if (this->row_block DEAL_II_EQUALS matrix->n_block_rows())
                   {
                     this->row_block = numbers::invalid_unsigned_int;
                     this->col_block = numbers::invalid_unsigned_int;
@@ -1288,20 +1288,23 @@ namespace BlockMatrixIterators
 
 
   template <class BlockMatrixType>
-  inline bool
-  Accessor<BlockMatrixType, true>::operator==(const Accessor &a) const
+  inline bool Accessor<BlockMatrixType, true>::
+              operator DEAL_II_EQUALS(const Accessor &a) const
   {
     if (matrix != a.matrix)
       return false;
 
-    if (this->row_block == a.row_block && this->col_block == a.col_block)
+    if (this->row_block DEAL_II_EQUALS
+          a.row_block DEAL_II_AND this->col_block DEAL_II_EQUALS a.col_block)
       // end iterators do not necessarily
       // have to have the same
       // base_iterator representation, but
       // valid iterators have to
-      return (((this->row_block == numbers::invalid_unsigned_int) &&
-               (this->col_block == numbers::invalid_unsigned_int)) ||
-              (base_iterator == a.base_iterator));
+      return (
+        ((this->row_block DEAL_II_EQUALS numbers::invalid_unsigned_int)
+           DEAL_II_AND(
+             this->col_block DEAL_II_EQUALS numbers::invalid_unsigned_int))
+          DEAL_II_OR(base_iterator DEAL_II_EQUALS a.base_iterator));
 
     return false;
   }
@@ -1317,7 +1320,7 @@ namespace BlockMatrixIterators
     , base_iterator(matrix->block(0, 0).begin())
   {
     (void)col;
-    Assert(col == 0, ExcNotImplemented());
+    Assert(col DEAL_II_EQUALS 0, ExcNotImplemented());
     // check if this is a regular row or
     // the end of the matrix
     if (row < matrix->m())
@@ -1424,8 +1427,9 @@ namespace BlockMatrixIterators
     // times if rows inside a block are
     // empty), we have to jump to the next
     // block and take the
-    while (base_iterator ==
-           matrix->block(this->row_block, this->col_block).end(local_row))
+    while (base_iterator DEAL_II_EQUALS matrix
+             ->block(this->row_block, this->col_block)
+             .end(local_row))
       {
         // jump to next block in this block
         // row, if possible, otherwise go
@@ -1449,12 +1453,13 @@ namespace BlockMatrixIterators
             // whether we've just fallen
             // off the end of the whole
             // matrix
-            if (local_row ==
-                matrix->block(this->row_block, this->col_block).m())
+            if (local_row DEAL_II_EQUALS matrix
+                  ->block(this->row_block, this->col_block)
+                  .m())
               {
                 local_row = 0;
                 ++this->row_block;
-                if (this->row_block == matrix->n_block_rows())
+                if (this->row_block DEAL_II_EQUALS matrix->n_block_rows())
                   {
                     this->row_block = numbers::invalid_size_type;
                     this->col_block = numbers::invalid_size_type;
@@ -1471,20 +1476,22 @@ namespace BlockMatrixIterators
 
 
   template <class BlockMatrixType>
-  inline bool
-  Accessor<BlockMatrixType, false>::operator==(const Accessor &a) const
+  inline bool Accessor<BlockMatrixType, false>::
+              operator DEAL_II_EQUALS(const Accessor &a) const
   {
     if (matrix != a.matrix)
       return false;
 
-    if (this->row_block == a.row_block && this->col_block == a.col_block)
+    if (this->row_block DEAL_II_EQUALS
+          a.row_block DEAL_II_AND this->col_block DEAL_II_EQUALS a.col_block)
       // end iterators do not necessarily
       // have to have the same
       // base_iterator representation, but
       // valid iterators have to
-      return (((this->row_block == numbers::invalid_size_type) &&
-               (this->col_block == numbers::invalid_size_type)) ||
-              (base_iterator == a.base_iterator));
+      return (
+        ((this->row_block DEAL_II_EQUALS numbers::invalid_size_type)DEAL_II_AND(
+          this->col_block DEAL_II_EQUALS numbers::invalid_size_type))
+          DEAL_II_OR(base_iterator DEAL_II_EQUALS a.base_iterator));
 
     return false;
   }
@@ -1653,9 +1660,9 @@ BlockMatrixBase<MatrixType>::set(const std::vector<size_type> &row_indices,
                                  const FullMatrix<number> &    values,
                                  const bool elide_zero_values)
 {
-  Assert(row_indices.size() == values.m(),
+  Assert(row_indices.size() DEAL_II_EQUALS values.m(),
          ExcDimensionMismatch(row_indices.size(), values.m()));
-  Assert(col_indices.size() == values.n(),
+  Assert(col_indices.size() DEAL_II_EQUALS values.n(),
          ExcDimensionMismatch(col_indices.size(), values.n()));
 
   for (size_type i = 0; i < row_indices.size(); ++i)
@@ -1675,9 +1682,9 @@ BlockMatrixBase<MatrixType>::set(const std::vector<size_type> &indices,
                                  const FullMatrix<number> &    values,
                                  const bool elide_zero_values)
 {
-  Assert(indices.size() == values.m(),
+  Assert(indices.size() DEAL_II_EQUALS values.m(),
          ExcDimensionMismatch(indices.size(), values.m()));
-  Assert(values.n() == values.m(), ExcNotQuadratic());
+  Assert(values.n() DEAL_II_EQUALS values.m(), ExcNotQuadratic());
 
   for (size_type i = 0; i < indices.size(); ++i)
     set(indices[i],
@@ -1697,7 +1704,7 @@ BlockMatrixBase<MatrixType>::set(const size_type               row,
                                  const std::vector<number> &   values,
                                  const bool elide_zero_values)
 {
-  Assert(col_indices.size() == values.size(),
+  Assert(col_indices.size() DEAL_II_EQUALS values.size(),
          ExcDimensionMismatch(col_indices.size(), values.size()));
 
   set(row,
@@ -1772,7 +1779,8 @@ BlockMatrixBase<MatrixType>::set(const size_type  row,
     {
       number value = values[j];
 
-      if (value == number() && elide_zero_values == true)
+      if (value DEAL_II_EQUALS number()
+            DEAL_II_AND elide_zero_values DEAL_II_EQUALS true)
         continue;
 
       const std::pair<unsigned int, size_type> col_index =
@@ -1804,7 +1812,7 @@ BlockMatrixBase<MatrixType>::set(const size_type  row,
     this->row_block_indices.global_to_local(row);
   for (unsigned int block_col = 0; block_col < n_block_cols(); ++block_col)
     {
-      if (temporary_data.counter_within_block[block_col] == 0)
+      if (temporary_data.counter_within_block[block_col] DEAL_II_EQUALS 0)
         continue;
 
       block(row_index.first, block_col)
@@ -1832,8 +1840,8 @@ BlockMatrixBase<MatrixType>::add(const size_type  i,
   // only if it is safe for the matrix we are
   // working with
   using MatrixTraits = typename MatrixType::Traits;
-  if ((MatrixTraits::zero_addition_can_be_elided == true) &&
-      (value == value_type()))
+  if ((MatrixTraits::zero_addition_can_be_elided DEAL_II_EQUALS true)
+        DEAL_II_AND(value DEAL_II_EQUALS value_type()))
     return;
 
   const std::pair<unsigned int, size_type>
@@ -1853,9 +1861,9 @@ BlockMatrixBase<MatrixType>::add(const std::vector<size_type> &row_indices,
                                  const FullMatrix<number> &    values,
                                  const bool elide_zero_values)
 {
-  Assert(row_indices.size() == values.m(),
+  Assert(row_indices.size() DEAL_II_EQUALS values.m(),
          ExcDimensionMismatch(row_indices.size(), values.m()));
-  Assert(col_indices.size() == values.n(),
+  Assert(col_indices.size() DEAL_II_EQUALS values.n(),
          ExcDimensionMismatch(col_indices.size(), values.n()));
 
   for (size_type i = 0; i < row_indices.size(); ++i)
@@ -1875,9 +1883,9 @@ BlockMatrixBase<MatrixType>::add(const std::vector<size_type> &indices,
                                  const FullMatrix<number> &    values,
                                  const bool elide_zero_values)
 {
-  Assert(indices.size() == values.m(),
+  Assert(indices.size() DEAL_II_EQUALS values.m(),
          ExcDimensionMismatch(indices.size(), values.m()));
-  Assert(values.n() == values.m(), ExcNotQuadratic());
+  Assert(values.n() DEAL_II_EQUALS values.m(), ExcNotQuadratic());
 
   for (size_type i = 0; i < indices.size(); ++i)
     add(indices[i],
@@ -1897,7 +1905,7 @@ BlockMatrixBase<MatrixType>::add(const size_type               row,
                                  const std::vector<number> &   values,
                                  const bool elide_zero_values)
 {
-  Assert(col_indices.size() == values.size(),
+  Assert(col_indices.size() DEAL_II_EQUALS values.size(),
          ExcDimensionMismatch(col_indices.size(), values.size()));
 
   add(row,
@@ -1927,7 +1935,7 @@ BlockMatrixBase<MatrixType>::add(const size_type  row,
   // TODO: Look over this to find out
   // whether we can do that more
   // efficiently.
-  if (col_indices_are_sorted == true)
+  if (col_indices_are_sorted DEAL_II_EQUALS true)
     {
 #  ifdef DEBUG
       // check whether indices really are
@@ -2028,7 +2036,8 @@ BlockMatrixBase<MatrixType>::add(const size_type  row,
     {
       number value = values[j];
 
-      if (value == number() && elide_zero_values == true)
+      if (value DEAL_II_EQUALS number()
+            DEAL_II_AND elide_zero_values DEAL_II_EQUALS true)
         continue;
 
       const std::pair<unsigned int, size_type> col_index =
@@ -2060,7 +2069,7 @@ BlockMatrixBase<MatrixType>::add(const size_type  row,
     this->row_block_indices.global_to_local(row);
   for (unsigned int block_col = 0; block_col < n_block_cols(); ++block_col)
     {
-      if (temporary_data.counter_within_block[block_col] == 0)
+      if (temporary_data.counter_within_block[block_col] DEAL_II_EQUALS 0)
         continue;
 
       block(row_index.first, block_col)
@@ -2088,7 +2097,8 @@ BlockMatrixBase<MatrixType>::add(const value_type                   factor,
   // only if it is safe for the matrix we are
   // working with
   using MatrixTraits = typename MatrixType::Traits;
-  if ((MatrixTraits::zero_addition_can_be_elided == true) && (factor == 0))
+  if ((MatrixTraits::zero_addition_can_be_elided DEAL_II_EQUALS true)
+        DEAL_II_AND(factor DEAL_II_EQUALS 0))
     return;
 
   for (unsigned int row = 0; row < n_block_rows(); ++row)
@@ -2131,7 +2141,7 @@ template <class MatrixType>
 inline typename BlockMatrixBase<MatrixType>::value_type
 BlockMatrixBase<MatrixType>::diag_element(const size_type i) const
 {
-  Assert(n_block_rows() == n_block_cols(), ExcNotQuadratic());
+  Assert(n_block_rows() DEAL_II_EQUALS n_block_cols(), ExcNotQuadratic());
 
   const std::pair<unsigned int, size_type> index =
     row_block_indices.global_to_local(i);
@@ -2211,9 +2221,9 @@ void
 BlockMatrixBase<MatrixType>::vmult_block_block(BlockVectorType &      dst,
                                                const BlockVectorType &src) const
 {
-  Assert(dst.n_blocks() == n_block_rows(),
+  Assert(dst.n_blocks() DEAL_II_EQUALS n_block_rows(),
          ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
-  Assert(src.n_blocks() == n_block_cols(),
+  Assert(src.n_blocks() DEAL_II_EQUALS n_block_cols(),
          ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
 
   for (size_type row = 0; row < n_block_rows(); ++row)
@@ -2233,8 +2243,9 @@ BlockMatrixBase<MatrixType>::vmult_nonblock_block(
   VectorType &           dst,
   const BlockVectorType &src) const
 {
-  Assert(n_block_rows() == 1, ExcDimensionMismatch(1, n_block_rows()));
-  Assert(src.n_blocks() == n_block_cols(),
+  Assert(n_block_rows() DEAL_II_EQUALS 1,
+         ExcDimensionMismatch(1, n_block_rows()));
+  Assert(src.n_blocks() DEAL_II_EQUALS n_block_cols(),
          ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
 
   block(0, 0).vmult(dst, src.block(0));
@@ -2250,9 +2261,10 @@ void
 BlockMatrixBase<MatrixType>::vmult_block_nonblock(BlockVectorType & dst,
                                                   const VectorType &src) const
 {
-  Assert(dst.n_blocks() == n_block_rows(),
+  Assert(dst.n_blocks() DEAL_II_EQUALS n_block_rows(),
          ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
-  Assert(1 == n_block_cols(), ExcDimensionMismatch(1, n_block_cols()));
+  Assert(1 DEAL_II_EQUALS n_block_cols(),
+         ExcDimensionMismatch(1, n_block_cols()));
 
   for (size_type row = 0; row < n_block_rows(); ++row)
     block(row, 0).vmult(dst.block(row), src);
@@ -2267,8 +2279,10 @@ BlockMatrixBase<MatrixType>::vmult_nonblock_nonblock(
   VectorType &      dst,
   const VectorType &src) const
 {
-  Assert(1 == n_block_rows(), ExcDimensionMismatch(1, n_block_rows()));
-  Assert(1 == n_block_cols(), ExcDimensionMismatch(1, n_block_cols()));
+  Assert(1 DEAL_II_EQUALS n_block_rows(),
+         ExcDimensionMismatch(1, n_block_rows()));
+  Assert(1 DEAL_II_EQUALS n_block_cols(),
+         ExcDimensionMismatch(1, n_block_cols()));
 
   block(0, 0).vmult(dst, src);
 }
@@ -2281,9 +2295,9 @@ void
 BlockMatrixBase<MatrixType>::vmult_add(BlockVectorType &      dst,
                                        const BlockVectorType &src) const
 {
-  Assert(dst.n_blocks() == n_block_rows(),
+  Assert(dst.n_blocks() DEAL_II_EQUALS n_block_rows(),
          ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
-  Assert(src.n_blocks() == n_block_cols(),
+  Assert(src.n_blocks() DEAL_II_EQUALS n_block_cols(),
          ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
 
   for (unsigned int row = 0; row < n_block_rows(); ++row)
@@ -2300,9 +2314,9 @@ BlockMatrixBase<MatrixType>::Tvmult_block_block(
   BlockVectorType &      dst,
   const BlockVectorType &src) const
 {
-  Assert(dst.n_blocks() == n_block_cols(),
+  Assert(dst.n_blocks() DEAL_II_EQUALS n_block_cols(),
          ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
-  Assert(src.n_blocks() == n_block_rows(),
+  Assert(src.n_blocks() DEAL_II_EQUALS n_block_rows(),
          ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
 
   dst = 0.;
@@ -2322,9 +2336,10 @@ void
 BlockMatrixBase<MatrixType>::Tvmult_block_nonblock(BlockVectorType & dst,
                                                    const VectorType &src) const
 {
-  Assert(dst.n_blocks() == n_block_cols(),
+  Assert(dst.n_blocks() DEAL_II_EQUALS n_block_cols(),
          ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
-  Assert(1 == n_block_rows(), ExcDimensionMismatch(1, n_block_rows()));
+  Assert(1 DEAL_II_EQUALS n_block_rows(),
+         ExcDimensionMismatch(1, n_block_rows()));
 
   dst = 0.;
 
@@ -2341,8 +2356,9 @@ BlockMatrixBase<MatrixType>::Tvmult_nonblock_block(
   VectorType &           dst,
   const BlockVectorType &src) const
 {
-  Assert(1 == n_block_cols(), ExcDimensionMismatch(1, n_block_cols()));
-  Assert(src.n_blocks() == n_block_rows(),
+  Assert(1 DEAL_II_EQUALS n_block_cols(),
+         ExcDimensionMismatch(1, n_block_cols()));
+  Assert(src.n_blocks() DEAL_II_EQUALS n_block_rows(),
          ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
 
   block(0, 0).Tvmult(dst, src.block(0));
@@ -2360,8 +2376,10 @@ BlockMatrixBase<MatrixType>::Tvmult_nonblock_nonblock(
   VectorType &      dst,
   const VectorType &src) const
 {
-  Assert(1 == n_block_cols(), ExcDimensionMismatch(1, n_block_cols()));
-  Assert(1 == n_block_rows(), ExcDimensionMismatch(1, n_block_rows()));
+  Assert(1 DEAL_II_EQUALS n_block_cols(),
+         ExcDimensionMismatch(1, n_block_cols()));
+  Assert(1 DEAL_II_EQUALS n_block_rows(),
+         ExcDimensionMismatch(1, n_block_rows()));
 
   block(0, 0).Tvmult(dst, src);
 }
@@ -2374,9 +2392,9 @@ void
 BlockMatrixBase<MatrixType>::Tvmult_add(BlockVectorType &      dst,
                                         const BlockVectorType &src) const
 {
-  Assert(dst.n_blocks() == n_block_cols(),
+  Assert(dst.n_blocks() DEAL_II_EQUALS n_block_cols(),
          ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
-  Assert(src.n_blocks() == n_block_rows(),
+  Assert(src.n_blocks() DEAL_II_EQUALS n_block_rows(),
          ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
 
   for (unsigned int row = 0; row < n_block_rows(); ++row)
@@ -2391,14 +2409,14 @@ template <class BlockVectorType>
 typename BlockMatrixBase<MatrixType>::value_type
 BlockMatrixBase<MatrixType>::matrix_norm_square(const BlockVectorType &v) const
 {
-  Assert(n_block_rows() == n_block_cols(), ExcNotQuadratic());
-  Assert(v.n_blocks() == n_block_rows(),
+  Assert(n_block_rows() DEAL_II_EQUALS n_block_cols(), ExcNotQuadratic());
+  Assert(v.n_blocks() DEAL_II_EQUALS n_block_rows(),
          ExcDimensionMismatch(v.n_blocks(), n_block_rows()));
 
   value_type norm_sqr = 0;
   for (unsigned int row = 0; row < n_block_rows(); ++row)
     for (unsigned int col = 0; col < n_block_cols(); ++col)
-      if (row == col)
+      if (row DEAL_II_EQUALS col)
         norm_sqr += block(row, col).matrix_norm_square(v.block(row));
       else
         norm_sqr +=
@@ -2437,9 +2455,9 @@ BlockMatrixBase<MatrixType>::matrix_scalar_product(
   const BlockVectorType &u,
   const BlockVectorType &v) const
 {
-  Assert(u.n_blocks() == n_block_rows(),
+  Assert(u.n_blocks() DEAL_II_EQUALS n_block_rows(),
          ExcDimensionMismatch(u.n_blocks(), n_block_rows()));
-  Assert(v.n_blocks() == n_block_cols(),
+  Assert(v.n_blocks() DEAL_II_EQUALS n_block_cols(),
          ExcDimensionMismatch(v.n_blocks(), n_block_cols()));
 
   value_type result = 0;
@@ -2459,11 +2477,11 @@ BlockMatrixBase<MatrixType>::residual(BlockVectorType &      dst,
                                       const BlockVectorType &x,
                                       const BlockVectorType &b) const
 {
-  Assert(dst.n_blocks() == n_block_rows(),
+  Assert(dst.n_blocks() DEAL_II_EQUALS n_block_rows(),
          ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
-  Assert(b.n_blocks() == n_block_rows(),
+  Assert(b.n_blocks() DEAL_II_EQUALS n_block_rows(),
          ExcDimensionMismatch(b.n_blocks(), n_block_rows()));
-  Assert(x.n_blocks() == n_block_cols(),
+  Assert(x.n_blocks() DEAL_II_EQUALS n_block_cols(),
          ExcDimensionMismatch(x.n_blocks(), n_block_cols()));
   // in block notation, the residual is
   // r_i = b_i - \sum_j A_ij x_j.
@@ -2610,7 +2628,7 @@ BlockMatrixBase<MatrixType>::collect_sizes()
   // sizes
   for (unsigned int c = 1; c < this->n_block_cols(); ++c)
     for (unsigned int r = 0; r < this->n_block_rows(); ++r)
-      Assert(row_sizes[r] == sub_objects[r][c]->m(),
+      Assert(row_sizes[r] DEAL_II_EQUALS sub_objects[r][c]->m(),
              ExcIncompatibleRowNumbers(r, 0, r, c));
 
   // finally initialize the row
@@ -2623,7 +2641,7 @@ BlockMatrixBase<MatrixType>::collect_sizes()
     col_sizes[c] = sub_objects[0][c]->n();
   for (unsigned int r = 1; r < this->n_block_rows(); ++r)
     for (unsigned int c = 0; c < this->n_block_cols(); ++c)
-      Assert(col_sizes[c] == sub_objects[r][c]->n(),
+      Assert(col_sizes[c] DEAL_II_EQUALS sub_objects[r][c]->n(),
              ExcIncompatibleRowNumbers(0, c, r, c));
 
   // finally initialize the row

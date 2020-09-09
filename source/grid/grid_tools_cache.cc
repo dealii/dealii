@@ -174,8 +174,8 @@ namespace GridTools
   const RTree<std::pair<BoundingBox<spacedim>, unsigned int>> &
   Cache<dim, spacedim>::get_covering_rtree(const unsigned int level) const
   {
-    if (update_flags & update_covering_rtree ||
-        covering_rtree.find(level) == covering_rtree.end())
+    if (update_flags & update_covering_rtree DEAL_II_OR covering_rtree
+                         .find(level) DEAL_II_EQUALS    covering_rtree.end())
       {
         const auto boxes =
           extract_rtree_level(get_locally_owned_cell_bounding_boxes_rtree(),

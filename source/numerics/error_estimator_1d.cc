@@ -310,21 +310,21 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const types::material_id  material_id,
   const Strategy            strategy)
 {
-  AssertThrow(strategy == cell_diameter_over_24, ExcNotImplemented());
+  AssertThrow(strategy DEAL_II_EQUALS cell_diameter_over_24,
+              ExcNotImplemented());
   using number = typename InputVector::value_type;
 #ifdef DEAL_II_WITH_P4EST
   if (dynamic_cast<const parallel::distributed::Triangulation<1, spacedim> *>(
         &dof_handler.get_triangulation()) != nullptr)
-    Assert((subdomain_id_ == numbers::invalid_subdomain_id) ||
-             (subdomain_id_ ==
-              dynamic_cast<
-                const parallel::distributed::Triangulation<1, spacedim> &>(
-                dof_handler.get_triangulation())
-                .locally_owned_subdomain()),
-           ExcMessage(
-             "For parallel distributed triangulations, the only "
-             "valid subdomain_id that can be passed here is the "
-             "one that corresponds to the locally owned subdomain id."));
+    Assert(
+      (subdomain_id_ DEAL_II_EQUALS numbers::invalid_subdomain_id)DEAL_II_OR(
+        subdomain_id_ DEAL_II_EQUALS dynamic_cast<
+          const parallel::distributed::Triangulation<1, spacedim> &>(
+          dof_handler.get_triangulation())
+          .locally_owned_subdomain()),
+      ExcMessage("For parallel distributed triangulations, the only "
+                 "valid subdomain_id that can be passed here is the "
+                 "one that corresponds to the locally owned subdomain id."));
 
   const types::subdomain_id subdomain_id =
     ((dynamic_cast<const parallel::distributed::Triangulation<1, spacedim> *>(
@@ -341,8 +341,9 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const unsigned int n_solution_vectors = solutions.size();
 
   // sanity checks
-  Assert(neumann_bc.find(numbers::internal_face_boundary_id) ==
-           neumann_bc.end(),
+  Assert(neumann_bc
+           .find(numbers::internal_face_boundary_id)
+             DEAL_II_EQUALS neumann_bc.end(),
          ExcMessage("You are not allowed to list the special boundary "
                     "indicator for internal boundaries in your boundary "
                     "value map."));
@@ -350,7 +351,7 @@ KellyErrorEstimator<1, spacedim>::estimate(
   for (const auto &boundary_function : neumann_bc)
     {
       (void)boundary_function;
-      Assert(boundary_function.second->n_components == n_components,
+      Assert(boundary_function.second->n_components DEAL_II_EQUALS n_components,
              ExcInvalidBoundaryFunction(boundary_function.first,
                                         boundary_function.second->n_components,
                                         n_components));
@@ -361,27 +362,27 @@ KellyErrorEstimator<1, spacedim>::estimate(
   Assert(component_mask.n_selected_components(n_components) > 0,
          ExcInvalidComponentMask());
 
-  Assert((coefficient == nullptr) ||
-           (coefficient->n_components == n_components) ||
-           (coefficient->n_components == 1),
+  Assert((coefficient DEAL_II_EQUALS nullptr)DEAL_II_OR(
+           coefficient->n_components DEAL_II_EQUALS n_components)
+           DEAL_II_OR(coefficient->n_components DEAL_II_EQUALS 1),
          ExcInvalidCoefficient());
 
   Assert(solutions.size() > 0, ExcNoSolutions());
-  Assert(solutions.size() == errors.size(),
+  Assert(solutions.size() DEAL_II_EQUALS errors.size(),
          ExcIncompatibleNumberOfElements(solutions.size(), errors.size()));
   for (unsigned int n = 0; n < solutions.size(); ++n)
-    Assert(solutions[n]->size() == dof_handler.n_dofs(),
+    Assert(solutions[n]->size() DEAL_II_EQUALS dof_handler.n_dofs(),
            ExcDimensionMismatch(solutions[n]->size(), dof_handler.n_dofs()));
 
-  Assert((coefficient == nullptr) ||
-           (coefficient->n_components == n_components) ||
-           (coefficient->n_components == 1),
+  Assert((coefficient DEAL_II_EQUALS nullptr)DEAL_II_OR(
+           coefficient->n_components DEAL_II_EQUALS n_components)
+           DEAL_II_OR(coefficient->n_components DEAL_II_EQUALS 1),
          ExcInvalidCoefficient());
 
   for (const auto &boundary_function : neumann_bc)
     {
       (void)boundary_function;
-      Assert(boundary_function.second->n_components == n_components,
+      Assert(boundary_function.second->n_components DEAL_II_EQUALS n_components,
              ExcInvalidBoundaryFunction(boundary_function.first,
                                         boundary_function.second->n_components,
                                         n_components));
@@ -411,7 +412,7 @@ KellyErrorEstimator<1, spacedim>::estimate(
   // coefficient, then we fill it by unity once and for all and don't set it
   // any more
   Vector<double> coefficient_values(n_components);
-  if (coefficient == nullptr)
+  if (coefficient DEAL_II_EQUALS nullptr)
     for (unsigned int c = 0; c < n_components; ++c)
       coefficient_values(c) = 1;
 
@@ -436,10 +437,11 @@ KellyErrorEstimator<1, spacedim>::estimate(
   // work on. note that the error indicator is only a sum over the two
   // contributions from the two vertices of each cell.
   for (const auto &cell : dof_handler.active_cell_iterators())
-    if (((subdomain_id == numbers::invalid_subdomain_id) ||
-         (cell->subdomain_id() == subdomain_id)) &&
-        ((material_id == numbers::invalid_material_id) ||
-         (cell->material_id() == material_id)))
+    if (((subdomain_id DEAL_II_EQUALS numbers::invalid_subdomain_id)DEAL_II_OR(
+          cell->subdomain_id() DEAL_II_EQUALS subdomain_id))
+          DEAL_II_AND(
+            (material_id DEAL_II_EQUALS numbers::invalid_material_id)DEAL_II_OR(
+              cell->material_id() DEAL_II_EQUALS material_id)))
       {
         for (unsigned int n = 0; n < n_solution_vectors; ++n)
           (*errors[n])(cell->active_cell_index()) = 0;
@@ -449,21 +451,21 @@ KellyErrorEstimator<1, spacedim>::estimate(
           fe_values.get_present_fe_values().get_function_gradients(
             *solutions[s], gradients_here[s]);
 
-        // loop over the two points bounding this line. n==0 is left point,
-        // n==1 is right point
+        // loop over the two points bounding this line. nDEAL_II_EQUALS 0 is
+        // left point, nDEAL_II_EQUALS 1 is right point
         for (unsigned int n = 0; n < 2; ++n)
           {
             // find left or right active neighbor
             auto neighbor = cell->neighbor(n);
-            if (neighbor.state() == IteratorState::valid)
+            if (neighbor.state() DEAL_II_EQUALS IteratorState::valid)
               while (neighbor->has_children())
-                neighbor = neighbor->child(n == 0 ? 1 : 0);
+                neighbor = neighbor->child(n DEAL_II_EQUALS 0 ? 1 : 0);
 
             fe_face_values.reinit(cell, n);
             Tensor<1, spacedim> normal =
               fe_face_values.get_present_fe_values().get_normal_vectors()[0];
 
-            if (neighbor.state() == IteratorState::valid)
+            if (neighbor.state() DEAL_II_EQUALS IteratorState::valid)
               {
                 fe_values.reinit(neighbor);
 
@@ -471,7 +473,7 @@ KellyErrorEstimator<1, spacedim>::estimate(
                   fe_values.get_present_fe_values().get_function_gradients(
                     *solutions[s], gradients_neighbor[s]);
 
-                fe_face_values.reinit(neighbor, n == 0 ? 1 : 0);
+                fe_face_values.reinit(neighbor, n DEAL_II_EQUALS 0 ? 1 : 0);
                 Tensor<1, spacedim> neighbor_normal =
                   fe_face_values.get_present_fe_values()
                     .get_normal_vectors()[0];
@@ -481,14 +483,14 @@ KellyErrorEstimator<1, spacedim>::estimate(
                 for (unsigned int s = 0; s < n_solution_vectors; ++s)
                   for (unsigned int c = 0; c < n_components; ++c)
                     grad_dot_n_neighbor[s](c) =
-                      -(gradients_neighbor[s][n == 0 ? 1 : 0][c] *
+                      -(gradients_neighbor[s][n DEAL_II_EQUALS 0 ? 1 : 0][c] *
                         neighbor_normal);
               }
             else if (neumann_bc.find(n) != neumann_bc.end())
               // if Neumann b.c., then fill the gradients field which will be
               // used later on.
               {
-                if (n_components == 1)
+                if (n_components DEAL_II_EQUALS 1)
                   {
                     const typename InputVector::value_type v =
                       neumann_bc.find(n)->second->value(cell->vertex(n));
@@ -515,7 +517,7 @@ KellyErrorEstimator<1, spacedim>::estimate(
             // position. if there is none, reuse the preset values.
             if (coefficient != nullptr)
               {
-                if (coefficient->n_components == 1)
+                if (coefficient->n_components DEAL_II_EQUALS 1)
                   {
                     const double c_value = coefficient->value(cell->vertex(n));
                     for (unsigned int c = 0; c < n_components; ++c)
@@ -530,7 +532,7 @@ KellyErrorEstimator<1, spacedim>::estimate(
             for (unsigned int s = 0; s < n_solution_vectors; ++s)
               for (unsigned int component = 0; component < n_components;
                    ++component)
-                if (component_mask[component] == true)
+                if (component_mask[component] DEAL_II_EQUALS true)
                   {
                     // get gradient here
                     const typename ProductType<number, double>::type

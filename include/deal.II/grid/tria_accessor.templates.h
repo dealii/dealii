@@ -46,7 +46,7 @@ inline TriaAccessorBase<structdim, dim, spacedim>::TriaAccessorBase(
   const int                           level,
   const int                           index,
   const AccessorData *)
-  : present_level((structdim == dim) ? level : 0)
+  : present_level((structdim DEAL_II_EQUALS dim) ? level : 0)
   , present_index(index)
   , tria(tria)
 {
@@ -57,7 +57,8 @@ inline TriaAccessorBase<structdim, dim, spacedim>::TriaAccessorBase(
   // iterator
   if (structdim != dim)
     {
-      Assert((level == 0) || (level == -1) || (level == -2),
+      Assert((level DEAL_II_EQUALS 0)DEAL_II_OR(level DEAL_II_EQUALS - 1)
+               DEAL_II_OR(level DEAL_II_EQUALS - 2),
              ExcInternalError());
     }
 }
@@ -83,8 +84,9 @@ TriaAccessorBase<structdim, dim, spacedim>::copy_from(
 
   if (structdim != dim)
     {
-      Assert((present_level == 0) || (present_level == -1) ||
-               (present_level == -2),
+      Assert((present_level DEAL_II_EQUALS 0)DEAL_II_OR(
+               present_level DEAL_II_EQUALS - 1)
+               DEAL_II_OR(present_level DEAL_II_EQUALS - 2),
              ExcInternalError());
     }
 }
@@ -102,8 +104,9 @@ operator=(const TriaAccessorBase<structdim, dim, spacedim> &a)
 
   if (structdim != dim)
     {
-      Assert((present_level == 0) || (present_level == -1) ||
-               (present_level == -2),
+      Assert((present_level DEAL_II_EQUALS 0)DEAL_II_OR(
+               present_level DEAL_II_EQUALS - 1)
+               DEAL_II_OR(present_level DEAL_II_EQUALS - 2),
              ExcInternalError());
     }
   return *this;
@@ -112,14 +115,16 @@ operator=(const TriaAccessorBase<structdim, dim, spacedim> &a)
 
 
 template <int structdim, int dim, int spacedim>
-inline bool
-TriaAccessorBase<structdim, dim, spacedim>::
-operator==(const TriaAccessorBase<structdim, dim, spacedim> &a) const
+inline bool TriaAccessorBase<structdim, dim, spacedim>::operator DEAL_II_EQUALS(
+  const TriaAccessorBase<structdim, dim, spacedim> &a) const
 {
-  Assert(tria == a.tria || tria == nullptr || a.tria == nullptr,
+  Assert(tria DEAL_II_EQUALS
+           a.tria DEAL_II_OR tria
+             DEAL_II_EQUALS nullptr DEAL_II_OR a.tria DEAL_II_EQUALS nullptr,
          TriaAccessorExceptions::ExcCantCompareIterators());
-  return ((tria == a.tria) && (present_level == a.present_level) &&
-          (present_index == a.present_index));
+  return ((tria DEAL_II_EQUALS a.tria)DEAL_II_AND(
+    present_level DEAL_II_EQUALS a.present_level)
+            DEAL_II_AND(present_index DEAL_II_EQUALS a.present_index));
 }
 
 
@@ -129,10 +134,12 @@ inline bool
 TriaAccessorBase<structdim, dim, spacedim>::
 operator!=(const TriaAccessorBase<structdim, dim, spacedim> &a) const
 {
-  Assert(tria == a.tria || tria == nullptr || a.tria == nullptr,
+  Assert(tria DEAL_II_EQUALS
+           a.tria DEAL_II_OR tria
+             DEAL_II_EQUALS nullptr DEAL_II_OR a.tria DEAL_II_EQUALS nullptr,
          TriaAccessorExceptions::ExcCantCompareIterators());
-  return ((tria != a.tria) || (present_level != a.present_level) ||
-          (present_index != a.present_index));
+  return ((tria != a.tria) DEAL_II_OR(present_level != a.present_level)
+            DEAL_II_OR(present_index != a.present_index));
 }
 
 
@@ -142,7 +149,8 @@ inline bool
 TriaAccessorBase<structdim, dim, spacedim>::
 operator<(const TriaAccessorBase<structdim, dim, spacedim> &other) const
 {
-  Assert(tria == other.tria, TriaAccessorExceptions::ExcCantCompareIterators());
+  Assert(tria DEAL_II_EQUALS other.tria,
+         TriaAccessorExceptions::ExcCantCompareIterators());
 
   if (present_level != other.present_level)
     return (present_level < other.present_level);
@@ -176,9 +184,9 @@ template <int structdim, int dim, int spacedim>
 inline IteratorState::IteratorStates
 TriaAccessorBase<structdim, dim, spacedim>::state() const
 {
-  if ((present_level >= 0) && (present_index >= 0))
+  if ((present_level >= 0) DEAL_II_AND(present_index >= 0))
     return IteratorState::valid;
-  else if (present_index == -1)
+  else if (present_index DEAL_II_EQUALS - 1)
     return IteratorState::past_the_end;
   else
     return IteratorState::invalid;
@@ -255,7 +263,7 @@ TriaAccessorBase<structdim, dim, spacedim>::operator--()
           // no -> go one level down
           --this->present_level;
           // lowest level reached?
-          if (this->present_level == -1)
+          if (this->present_level DEAL_II_EQUALS - 1)
             {
               // return with past the end pointer
               this->present_level = this->present_index = -1;
@@ -274,13 +282,13 @@ template <int structdim, int dim, int spacedim>
 inline dealii::internal::TriangulationImplementation::TriaObjects &
 TriaAccessorBase<structdim, dim, spacedim>::objects() const
 {
-  if (structdim == dim)
+  if (structdim DEAL_II_EQUALS dim)
     return this->tria->levels[this->present_level]->cells;
 
-  if (structdim == 1 && dim > 1)
+  if (structdim DEAL_II_EQUALS 1 DEAL_II_AND dim > 1)
     return this->tria->faces->lines;
 
-  if (structdim == 2 && dim > 2)
+  if (structdim DEAL_II_EQUALS 2 DEAL_II_AND dim > 2)
     return this->tria->faces->quads;
 
   Assert(false, ExcInternalError());
@@ -339,9 +347,8 @@ InvalidAccessor<structdim, dim, spacedim>::copy_from(const InvalidAccessor &)
 
 
 template <int structdim, int dim, int spacedim>
-bool
-InvalidAccessor<structdim, dim, spacedim>::
-operator==(const InvalidAccessor &) const
+bool InvalidAccessor<structdim, dim, spacedim>::
+     operator DEAL_II_EQUALS(const InvalidAccessor &) const
 {
   // nothing to do here. we could
   // throw an exception but we can't
@@ -716,7 +723,7 @@ namespace internal
                        const unsigned int                  line)
       {
         if (accessor.tria->levels[accessor.present_level]
-              ->face_orientations.size() == 0)
+              ->face_orientations.size() DEAL_II_EQUALS 0)
           return true; // quads in 2d have no non-standard orientation and
                        // the array TriaLevel::face_orientations is left empty
         else
@@ -982,7 +989,7 @@ template <int structdim, int dim, int spacedim>
 inline bool
 TriaAccessor<structdim, dim, spacedim>::used() const
 {
-  Assert(this->state() == IteratorState::valid,
+  Assert(this->state() DEAL_II_EQUALS IteratorState::valid,
          TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(
            *this));
   return this->objects().used[this->present_index];
@@ -1006,11 +1013,11 @@ template <int structdim, int dim, int spacedim>
 inline ReferenceCell::Type
 TriaAccessor<structdim, dim, spacedim>::reference_cell_type() const
 {
-  if (structdim == 0)
+  if (structdim DEAL_II_EQUALS 0)
     return ReferenceCell::Type::Vertex;
-  else if (structdim == 1)
+  else if (structdim DEAL_II_EQUALS 1)
     return ReferenceCell::Type::Line;
-  else if (structdim == dim)
+  else if (structdim DEAL_II_EQUALS dim)
     return this->tria->levels[this->present_level]
       ->reference_cell_type[this->present_index];
   else
@@ -1197,7 +1204,7 @@ template <int structdim, int dim, int spacedim>
 void
 TriaAccessor<structdim, dim, spacedim>::set_used_flag() const
 {
-  Assert(this->state() == IteratorState::valid,
+  Assert(this->state() DEAL_II_EQUALS IteratorState::valid,
          TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(
            *this));
   this->objects().used[this->present_index] = true;
@@ -1209,7 +1216,7 @@ template <int structdim, int dim, int spacedim>
 void
 TriaAccessor<structdim, dim, spacedim>::clear_used_flag() const
 {
-  Assert(this->state() == IteratorState::valid,
+  Assert(this->state() DEAL_II_EQUALS IteratorState::valid,
          TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(
            *this));
   this->objects().used[this->present_index] = false;
@@ -1253,15 +1260,17 @@ TriaAccessor<structdim, dim, spacedim>::isotropic_child_index(
           Assert(this_refinement_case != RefinementCase<2>::no_refinement,
                  TriaAccessorExceptions::ExcCellHasNoChildren());
 
-          if (this_refinement_case == RefinementCase<2>::cut_xy)
+          if (this_refinement_case DEAL_II_EQUALS RefinementCase<2>::cut_xy)
             return child_index(i);
-          else if ((this_refinement_case == RefinementCase<2>::cut_x) &&
-                   (child(i % 2)->refinement_case() ==
-                    RefinementCase<2>::cut_y))
+          else if ((this_refinement_case DEAL_II_EQUALS
+                                         RefinementCase<2>::cut_x)
+                     DEAL_II_AND(child(i % 2)->refinement_case()
+                                   DEAL_II_EQUALS RefinementCase<2>::cut_y))
             return child(i % 2)->child_index(i / 2);
-          else if ((this_refinement_case == RefinementCase<2>::cut_y) &&
-                   (child(i / 2)->refinement_case() ==
-                    RefinementCase<2>::cut_x))
+          else if ((this_refinement_case DEAL_II_EQUALS
+                                         RefinementCase<2>::cut_y)
+                     DEAL_II_AND(child(i / 2)->refinement_case()
+                                   DEAL_II_EQUALS RefinementCase<2>::cut_x))
             return child(i / 2)->child_index(i % 2);
           else
             Assert(
@@ -1283,7 +1292,7 @@ template <int structdim, int dim, int spacedim>
 RefinementCase<structdim>
 TriaAccessor<structdim, dim, spacedim>::refinement_case() const
 {
-  Assert(this->state() == IteratorState::valid,
+  Assert(this->state() DEAL_II_EQUALS IteratorState::valid,
          TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(
            *this));
 
@@ -1327,9 +1336,12 @@ TriaAccessor<structdim, dim, spacedim>::child(const unsigned int i) const
 {
   // checking of 'i' happens in child_index
   const TriaIterator<TriaAccessor<structdim, dim, spacedim>> q(
-    this->tria, (dim == structdim ? this->level() + 1 : 0), child_index(i));
+    this->tria,
+    (dim DEAL_II_EQUALS structdim ? this->level() + 1 : 0),
+    child_index(i));
 
-  Assert((q.state() == IteratorState::past_the_end) || q->used(),
+  Assert((q.state()
+            DEAL_II_EQUALS IteratorState::past_the_end)DEAL_II_OR q->used(),
          ExcInternalError());
 
   return q;
@@ -1344,7 +1356,7 @@ TriaAccessor<structdim, dim, spacedim>::child_iterator_to_index(
 {
   const auto n_children = this->n_children();
   for (unsigned int child_n = 0; child_n < n_children; ++child_n)
-    if (this->child(child_n) == child)
+    if (this->child(child_n) DEAL_II_EQUALS child)
       return child_n;
 
   Assert(false,
@@ -1375,15 +1387,17 @@ TriaAccessor<structdim, dim, spacedim>::isotropic_child(
           Assert(this_refinement_case != RefinementCase<2>::no_refinement,
                  TriaAccessorExceptions::ExcCellHasNoChildren());
 
-          if (this_refinement_case == RefinementCase<2>::cut_xy)
+          if (this_refinement_case DEAL_II_EQUALS RefinementCase<2>::cut_xy)
             return child(i);
-          else if ((this_refinement_case == RefinementCase<2>::cut_x) &&
-                   (child(i % 2)->refinement_case() ==
-                    RefinementCase<2>::cut_y))
+          else if ((this_refinement_case DEAL_II_EQUALS
+                                         RefinementCase<2>::cut_x)
+                     DEAL_II_AND(child(i % 2)->refinement_case()
+                                   DEAL_II_EQUALS RefinementCase<2>::cut_y))
             return child(i % 2)->child(i / 2);
-          else if ((this_refinement_case == RefinementCase<2>::cut_y) &&
-                   (child(i / 2)->refinement_case() ==
-                    RefinementCase<2>::cut_x))
+          else if ((this_refinement_case DEAL_II_EQUALS
+                                         RefinementCase<2>::cut_y)
+                     DEAL_II_AND(child(i / 2)->refinement_case()
+                                   DEAL_II_EQUALS RefinementCase<2>::cut_x))
             return child(i / 2)->child(i % 2);
           else
             Assert(
@@ -1407,7 +1421,7 @@ template <int structdim, int dim, int spacedim>
 inline bool
 TriaAccessor<structdim, dim, spacedim>::has_children() const
 {
-  Assert(this->state() == IteratorState::valid,
+  Assert(this->state() DEAL_II_EQUALS IteratorState::valid,
          TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(
            *this));
 
@@ -1435,7 +1449,7 @@ inline void
 TriaAccessor<structdim, dim, spacedim>::set_refinement_case(
   const RefinementCase<structdim> &refinement_case) const
 {
-  Assert(this->state() == IteratorState::valid,
+  Assert(this->state() DEAL_II_EQUALS IteratorState::valid,
          TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(
            *this));
   Assert(static_cast<unsigned int>(this->present_index) <
@@ -1452,7 +1466,7 @@ template <int structdim, int dim, int spacedim>
 inline void
 TriaAccessor<structdim, dim, spacedim>::clear_refinement_case() const
 {
-  Assert(this->state() == IteratorState::valid,
+  Assert(this->state() DEAL_II_EQUALS IteratorState::valid,
          TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(
            *this));
   Assert(static_cast<unsigned int>(this->present_index) <
@@ -1473,7 +1487,8 @@ TriaAccessor<structdim, dim, spacedim>::set_children(const unsigned int i,
                                                      const int index) const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(i % 2 == 0, TriaAccessorExceptions::ExcSetOnlyEvenChildren(i));
+  Assert(i % 2 DEAL_II_EQUALS 0,
+         TriaAccessorExceptions::ExcSetOnlyEvenChildren(i));
 
   // each set of two children are stored
   // consecutively, so we only have to find
@@ -1483,16 +1498,19 @@ TriaAccessor<structdim, dim, spacedim>::set_children(const unsigned int i,
 
   Assert(
     // clearing the child index for a cell
-    (index == -1) ||
-      // if setting the child index for the i'th child (with i==0),
-      // then the index must be a non-negative number
-      (i == 0 && !this->has_children() && (index >= 0)) ||
-      // if setting the child index for the i'th child (with i>0),
-      // then the previously stored index must be the invalid
-      // index
-      (i > 0 && this->has_children() && (index >= 0) &&
-       this->objects().children[n_sets_of_two * this->present_index + i / 2] ==
-         -1),
+    (index DEAL_II_EQUALS - 1) DEAL_II_OR
+    // if setting the child index for the i'th child (with iDEAL_II_EQUALS 0),
+    // then the index must be a non-negative number
+    (i DEAL_II_EQUALS 0 DEAL_II_AND !this->has_children()
+       DEAL_II_AND(index >= 0)) DEAL_II_OR
+    // if setting the child index for the i'th child (with i>0),
+    // then the previously stored index must be the invalid
+    // index
+    (i >
+     0 DEAL_II_AND this->has_children() DEAL_II_AND(index >= 0) DEAL_II_AND this
+         ->objects()
+         .children[n_sets_of_two * this->present_index + i / 2] DEAL_II_EQUALS -
+       1),
     TriaAccessorExceptions::ExcCantSetChildren(index));
 
   this->objects().children[n_sets_of_two * this->present_index + i / 2] = index;
@@ -1862,7 +1880,7 @@ TriaAccessor<structdim, dim, spacedim>::set_all_manifold_ids(
   switch (structdim)
     {
       case 1:
-        if (dim == 1)
+        if (dim DEAL_II_EQUALS 1)
           {
             (*this->tria->vertex_to_manifold_id_map_1d)[vertex_index(0)] =
               manifold_ind;
@@ -1927,7 +1945,7 @@ TriaAccessor<structdim, dim, spacedim>::enclosing_ball() const
   // the enclosing ball is the initial iterate
   // i.e., the ball's center and diameter are
   // the center and the diameter of the object.
-  if (structdim == 1)
+  if (structdim DEAL_II_EQUALS 1)
     return std::make_pair((this->vertex(1) + this->vertex(0)) * 0.5,
                           (this->vertex(1) - this->vertex(0)).norm() * 0.5);
 
@@ -1982,19 +2000,19 @@ TriaAccessor<structdim, dim, spacedim>::enclosing_ball() const
                                                  p34.norm()};
           const std::vector<double>::const_iterator it =
             std::max_element(diagonals.begin(), diagonals.end());
-          if (it == diagonals.begin())
+          if (it DEAL_II_EQUALS diagonals.begin())
             {
               center                     = this->vertex(0) + 0.5 * p70;
               is_initial_guess_vertex[7] = true;
               is_initial_guess_vertex[0] = true;
             }
-          else if (it == diagonals.begin() + 1)
+          else if (it DEAL_II_EQUALS diagonals.begin() + 1)
             {
               center                     = this->vertex(1) + 0.5 * p61;
               is_initial_guess_vertex[6] = true;
               is_initial_guess_vertex[1] = true;
             }
-          else if (it == diagonals.begin() + 2)
+          else if (it DEAL_II_EQUALS diagonals.begin() + 2)
             {
               center                     = this->vertex(5) + 0.5 * p25;
               is_initial_guess_vertex[2] = true;
@@ -2177,9 +2195,9 @@ template <int structdim, int dim, int spacedim>
 inline const ReferenceCell::internal::Info::Base &
 TriaAccessor<structdim, dim, spacedim>::reference_cell_info() const
 {
-  if (structdim == 0)
+  if (structdim DEAL_II_EQUALS 0)
     return ReferenceCell::internal::Info::get_cell(ReferenceCell::Type::Vertex);
-  else if (structdim == 1)
+  else if (structdim DEAL_II_EQUALS 1)
     return ReferenceCell::internal::Info::get_cell(ReferenceCell::Type::Line);
   else
     return ReferenceCell::internal::Info::get_cell(this->reference_cell_type());
@@ -2249,7 +2267,8 @@ inline bool
 TriaAccessor<0, dim, spacedim>::
 operator<(const TriaAccessor<0, dim, spacedim> &other) const
 {
-  Assert(tria == other.tria, TriaAccessorExceptions::ExcCantCompareIterators());
+  Assert(tria DEAL_II_EQUALS other.tria,
+         TriaAccessorExceptions::ExcCantCompareIterators());
 
   return (global_vertex_index < other.global_vertex_index);
 }
@@ -2322,11 +2341,11 @@ TriaAccessor<0, dim, spacedim>::operator--()
 
 
 template <int dim, int spacedim>
-inline bool
-TriaAccessor<0, dim, spacedim>::operator==(const TriaAccessor &t) const
+inline bool TriaAccessor<0, dim, spacedim>::
+            operator DEAL_II_EQUALS(const TriaAccessor &t) const
 {
-  const bool result =
-    ((tria == t.tria) && (global_vertex_index == t.global_vertex_index));
+  const bool result = ((tria DEAL_II_EQUALS t.tria)DEAL_II_AND(
+    global_vertex_index DEAL_II_EQUALS t.global_vertex_index));
 
   return result;
 }
@@ -2337,7 +2356,7 @@ template <int dim, int spacedim>
 inline bool
 TriaAccessor<0, dim, spacedim>::operator!=(const TriaAccessor &t) const
 {
-  return !(*this == t);
+  return !(*this DEAL_II_EQUALS t);
 }
 
 
@@ -2608,7 +2627,8 @@ inline TriaAccessor<0, 1, spacedim>::TriaAccessor(
   // accessor
   (void)level;
   (void)index;
-  Assert((level == -2) && (index == -2), ExcInternalError());
+  Assert((level DEAL_II_EQUALS - 2) DEAL_II_AND(index DEAL_II_EQUALS - 2),
+         ExcInternalError());
 }
 
 
@@ -2655,7 +2675,8 @@ inline bool
 TriaAccessor<0, 1, spacedim>::
 operator<(const TriaAccessor<0, 1, spacedim> &other) const
 {
-  Assert(tria == other.tria, TriaAccessorExceptions::ExcCantCompareIterators());
+  Assert(tria DEAL_II_EQUALS other.tria,
+         TriaAccessorExceptions::ExcCantCompareIterators());
 
   return (global_vertex_index < other.global_vertex_index);
 }
@@ -2715,16 +2736,16 @@ TriaAccessor<0, 1, spacedim>::operator--() const
 
 
 template <int spacedim>
-inline bool
-TriaAccessor<0, 1, spacedim>::operator==(const TriaAccessor &t) const
+inline bool TriaAccessor<0, 1, spacedim>::
+            operator DEAL_II_EQUALS(const TriaAccessor &t) const
 {
-  const bool result =
-    ((tria == t.tria) && (global_vertex_index == t.global_vertex_index));
+  const bool result = ((tria DEAL_II_EQUALS t.tria)DEAL_II_AND(
+    global_vertex_index DEAL_II_EQUALS t.global_vertex_index));
   // if we point to the same vertex,
   // make sure we know the same about
   // it
-  if (result == true)
-    Assert(vertex_kind == t.vertex_kind, ExcInternalError());
+  if (result DEAL_II_EQUALS true)
+    Assert(vertex_kind DEAL_II_EQUALS t.vertex_kind, ExcInternalError());
 
   return result;
 }
@@ -2735,7 +2756,7 @@ template <int spacedim>
 inline bool
 TriaAccessor<0, 1, spacedim>::operator!=(const TriaAccessor &t) const
 {
-  return !(*this == t);
+  return !(*this DEAL_II_EQUALS t);
 }
 
 
@@ -3112,9 +3133,9 @@ namespace internal
     {
       dealii::TriaAccessor<0, 1, spacedim> a(
         &cell.get_triangulation(),
-        ((i == 0) && cell.at_boundary(0) ?
+        ((i DEAL_II_EQUALS 0)DEAL_II_AND cell.at_boundary(0) ?
            dealii::TriaAccessor<0, 1, spacedim>::left_vertex :
-           ((i == 1) && cell.at_boundary(1) ?
+           ((i DEAL_II_EQUALS 1)DEAL_II_AND cell.at_boundary(1) ?
               dealii::TriaAccessor<0, 1, spacedim>::right_vertex :
               dealii::TriaAccessor<0, 1, spacedim>::interior_vertex)),
         cell.vertex_index(i));
@@ -3151,7 +3172,8 @@ CellAccessor<dim, spacedim>::child(const unsigned int i) const
                                               this->present_level + 1,
                                               this->child_index(i));
 
-  Assert((q.state() == IteratorState::past_the_end) || q->used(),
+  Assert((q.state()
+            DEAL_II_EQUALS IteratorState::past_the_end)DEAL_II_OR q->used(),
          ExcInternalError());
 
   return q;
@@ -3174,7 +3196,7 @@ CellAccessor<dim, spacedim>::face_iterator_to_index(
   const TriaIterator<TriaAccessor<dim - 1, dim, spacedim>> &face) const
 {
   for (const unsigned int face_n : this->face_indices())
-    if (this->face(face_n) == face)
+    if (this->face(face_n) DEAL_II_EQUALS face)
       return face_n;
 
   Assert(false,
@@ -3262,8 +3284,8 @@ CellAccessor<dim, spacedim>::refine_flag_set() const
   // but activity may change when refinement is
   // executed and for some reason the refine
   // flag is not cleared).
-  Assert(this->is_active() || !this->tria->levels[this->present_level]
-                                 ->refine_flags[this->present_index],
+  Assert(this->is_active() DEAL_II_OR !this->tria->levels[this->present_level]
+           ->refine_flags[this->present_index],
          ExcRefineCellNotActive());
   return RefinementCase<dim>(
     this->tria->levels[this->present_level]->refine_flags[this->present_index]);
@@ -3276,7 +3298,7 @@ inline void
 CellAccessor<dim, spacedim>::set_refine_flag(
   const RefinementCase<dim> refinement_case) const
 {
-  Assert(this->used() && this->is_active(), ExcRefineCellNotActive());
+  Assert(this->used() DEAL_II_AND this->is_active(), ExcRefineCellNotActive());
   Assert(!coarsen_flag_set(), ExcCellFlaggedForCoarsening());
 
   this->tria->levels[this->present_level]->refine_flags[this->present_index] =
@@ -3289,7 +3311,7 @@ template <int dim, int spacedim>
 inline void
 CellAccessor<dim, spacedim>::clear_refine_flag() const
 {
-  Assert(this->used() && this->is_active(), ExcRefineCellNotActive());
+  Assert(this->used() DEAL_II_AND this->is_active(), ExcRefineCellNotActive());
   this->tria->levels[this->present_level]->refine_flags[this->present_index] =
     RefinementCase<dim>::no_refinement;
 }
@@ -3412,13 +3434,13 @@ CellAccessor<3>::subface_case(const unsigned int face_no) const
       case RefinementCase<3>::cut_x:
         if (face(face_no)->child(0)->has_children())
           {
-            Assert(face(face_no)->child(0)->refinement_case() ==
-                     RefinementCase<2>::cut_y,
+            Assert(face(face_no)->child(0)->refinement_case()
+                     DEAL_II_EQUALS RefinementCase<2>::cut_y,
                    ExcInternalError());
             if (face(face_no)->child(1)->has_children())
               {
-                Assert(face(face_no)->child(1)->refinement_case() ==
-                         RefinementCase<2>::cut_y,
+                Assert(face(face_no)->child(1)->refinement_case()
+                         DEAL_II_EQUALS RefinementCase<2>::cut_y,
                        ExcInternalError());
                 return dealii::internal::SubfaceCase<3>::case_x1y2y;
               }
@@ -3429,8 +3451,8 @@ CellAccessor<3>::subface_case(const unsigned int face_no) const
           {
             if (face(face_no)->child(1)->has_children())
               {
-                Assert(face(face_no)->child(1)->refinement_case() ==
-                         RefinementCase<2>::cut_y,
+                Assert(face(face_no)->child(1)->refinement_case()
+                         DEAL_II_EQUALS RefinementCase<2>::cut_y,
                        ExcInternalError());
                 return dealii::internal::SubfaceCase<3>::case_x2y;
               }
@@ -3440,13 +3462,13 @@ CellAccessor<3>::subface_case(const unsigned int face_no) const
       case RefinementCase<3>::cut_y:
         if (face(face_no)->child(0)->has_children())
           {
-            Assert(face(face_no)->child(0)->refinement_case() ==
-                     RefinementCase<2>::cut_x,
+            Assert(face(face_no)->child(0)->refinement_case()
+                     DEAL_II_EQUALS RefinementCase<2>::cut_x,
                    ExcInternalError());
             if (face(face_no)->child(1)->has_children())
               {
-                Assert(face(face_no)->child(1)->refinement_case() ==
-                         RefinementCase<2>::cut_x,
+                Assert(face(face_no)->child(1)->refinement_case()
+                         DEAL_II_EQUALS RefinementCase<2>::cut_x,
                        ExcInternalError());
                 return dealii::internal::SubfaceCase<3>::case_y1x2x;
               }
@@ -3457,8 +3479,8 @@ CellAccessor<3>::subface_case(const unsigned int face_no) const
           {
             if (face(face_no)->child(1)->has_children())
               {
-                Assert(face(face_no)->child(1)->refinement_case() ==
-                         RefinementCase<2>::cut_x,
+                Assert(face(face_no)->child(1)->refinement_case()
+                         DEAL_II_EQUALS RefinementCase<2>::cut_x,
                        ExcInternalError());
                 return dealii::internal::SubfaceCase<3>::case_y2x;
               }
@@ -3486,8 +3508,8 @@ CellAccessor<dim, spacedim>::coarsen_flag_set() const
   // but activity may change when refinement is
   // executed and for some reason the refine
   // flag is not cleared).
-  Assert(this->is_active() || !this->tria->levels[this->present_level]
-                                 ->coarsen_flags[this->present_index],
+  Assert(this->is_active() DEAL_II_OR !this->tria->levels[this->present_level]
+           ->coarsen_flags[this->present_index],
          ExcRefineCellNotActive());
   return this->tria->levels[this->present_level]
     ->coarsen_flags[this->present_index];
@@ -3499,7 +3521,7 @@ template <int dim, int spacedim>
 inline void
 CellAccessor<dim, spacedim>::set_coarsen_flag() const
 {
-  Assert(this->used() && this->is_active(), ExcRefineCellNotActive());
+  Assert(this->used() DEAL_II_AND this->is_active(), ExcRefineCellNotActive());
   Assert(!refine_flag_set(), ExcCellFlaggedForRefinement());
 
   this->tria->levels[this->present_level]->coarsen_flags[this->present_index] =
@@ -3512,7 +3534,7 @@ template <int dim, int spacedim>
 inline void
 CellAccessor<dim, spacedim>::clear_coarsen_flag() const
 {
-  Assert(this->used() && this->is_active(), ExcRefineCellNotActive());
+  Assert(this->used() DEAL_II_AND this->is_active(), ExcRefineCellNotActive());
   this->tria->levels[this->present_level]->coarsen_flags[this->present_index] =
     false;
 }
@@ -3527,7 +3549,8 @@ CellAccessor<dim, spacedim>::neighbor(const unsigned int i) const
                                               neighbor_level(i),
                                               neighbor_index(i));
 
-  Assert((q.state() == IteratorState::past_the_end) || q->used(),
+  Assert((q.state()
+            DEAL_II_EQUALS IteratorState::past_the_end)DEAL_II_OR q->used(),
          ExcInternalError());
 
   return q;
@@ -3567,9 +3590,11 @@ CellAccessor<dim, spacedim>::is_locally_owned() const
   // subdomain, so the first condition checks whether we have a serial
   // triangulation, in which case all cells are locally owned. The second
   // condition compares the subdomain id in the parallel case.
-  return (this->tria->locally_owned_subdomain() ==
-            numbers::invalid_subdomain_id ||
-          this->subdomain_id() == this->tria->locally_owned_subdomain());
+  return (this->tria
+            ->locally_owned_subdomain()
+              DEAL_II_EQUALS numbers::invalid_subdomain_id DEAL_II_OR this
+            ->subdomain_id()
+              DEAL_II_EQUALS this->tria->locally_owned_subdomain());
 
 #endif
 }
@@ -3587,9 +3612,11 @@ CellAccessor<dim, spacedim>::is_locally_owned_on_level() const
   // subdomain, so the first condition checks whether we have a serial
   // triangulation, in which case all cells are locally owned. The second
   // condition compares the subdomain id in the parallel case.
-  return (this->tria->locally_owned_subdomain() ==
-            numbers::invalid_subdomain_id ||
-          this->level_subdomain_id() == this->tria->locally_owned_subdomain());
+  return (this->tria
+            ->locally_owned_subdomain()
+              DEAL_II_EQUALS numbers::invalid_subdomain_id DEAL_II_OR this
+            ->level_subdomain_id()
+              DEAL_II_EQUALS this->tria->locally_owned_subdomain());
 
 #endif
 }
@@ -3614,9 +3641,10 @@ CellAccessor<dim, spacedim>::is_ghost() const
   // and third conditions check whether the cell's subdomain is not the
   // locally owned one and not artificial.
   return (this->tria->locally_owned_subdomain() !=
-            numbers::invalid_subdomain_id &&
-          this->subdomain_id() != this->tria->locally_owned_subdomain() &&
-          this->subdomain_id() != numbers::artificial_subdomain_id);
+          numbers::invalid_subdomain_id DEAL_II_AND this->subdomain_id() !=
+          this->tria->locally_owned_subdomain()
+            DEAL_II_AND this->subdomain_id() !=
+          numbers::artificial_subdomain_id);
 
 #endif
 }
@@ -3637,8 +3665,8 @@ CellAccessor<dim, spacedim>::is_artificial() const
   // subdomain, so the first condition rules out that case as all cells to a
   // serial triangulation are locally owned and none is artificial.
   return (this->tria->locally_owned_subdomain() !=
-            numbers::invalid_subdomain_id &&
-          this->subdomain_id() == numbers::artificial_subdomain_id);
+          numbers::invalid_subdomain_id DEAL_II_AND this->subdomain_id()
+            DEAL_II_EQUALS              numbers::artificial_subdomain_id);
 
 #endif
 }

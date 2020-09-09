@@ -49,7 +49,7 @@ void
 TensorProductPolynomialsConst<dim>::set_numbering(
   const std::vector<unsigned int> &renumber)
 {
-  Assert(renumber.size() == index_map.size(),
+  Assert(renumber.size() DEAL_II_EQUALS index_map.size(),
          ExcDimensionMismatch(renumber.size(), index_map.size()));
 
   index_map = renumber;
@@ -134,19 +134,22 @@ TensorProductPolynomialsConst<dim>::evaluate(
   std::vector<Tensor<3, dim>> &third_derivatives,
   std::vector<Tensor<4, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == tensor_polys.n() + 1 || values.size() == 0,
+  Assert(values.size() DEAL_II_EQUALS tensor_polys.n() +
+           1 DEAL_II_OR               values.size() DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(values.size(), tensor_polys.n() + 1, 0));
-  Assert(grads.size() == tensor_polys.n() + 1 || grads.size() == 0,
+  Assert(grads.size() DEAL_II_EQUALS tensor_polys.n() +
+           1 DEAL_II_OR              grads.size() DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(grads.size(), tensor_polys.n() + 1, 0));
-  Assert(grad_grads.size() == tensor_polys.n() + 1 || grad_grads.size() == 0,
+  Assert(grad_grads.size() DEAL_II_EQUALS tensor_polys.n() +
+           1 DEAL_II_OR                   grad_grads.size() DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(grad_grads.size(), tensor_polys.n() + 1, 0));
-  Assert(third_derivatives.size() == tensor_polys.n() + 1 ||
-           third_derivatives.size() == 0,
+  Assert(third_derivatives.size() DEAL_II_EQUALS tensor_polys.n() +
+           1 DEAL_II_OR third_derivatives.size() DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(third_derivatives.size(),
                                tensor_polys.n() + 1,
                                0));
-  Assert(fourth_derivatives.size() == tensor_polys.n() + 1 ||
-           fourth_derivatives.size() == 0,
+  Assert(fourth_derivatives.size() DEAL_II_EQUALS tensor_polys.n() +
+           1 DEAL_II_OR fourth_derivatives.size() DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(fourth_derivatives.size(),
                                tensor_polys.n() + 1,
                                0));
@@ -155,27 +158,27 @@ TensorProductPolynomialsConst<dim>::evaluate(
   // finally append the const value again
   bool do_values = false, do_grads = false, do_grad_grads = false;
   bool do_3rd_derivatives = false, do_4th_derivatives = false;
-  if (values.empty() == false)
+  if (values.empty() DEAL_II_EQUALS false)
     {
       values.pop_back();
       do_values = true;
     }
-  if (grads.empty() == false)
+  if (grads.empty() DEAL_II_EQUALS false)
     {
       grads.pop_back();
       do_grads = true;
     }
-  if (grad_grads.empty() == false)
+  if (grad_grads.empty() DEAL_II_EQUALS false)
     {
       grad_grads.pop_back();
       do_grad_grads = true;
     }
-  if (third_derivatives.empty() == false)
+  if (third_derivatives.empty() DEAL_II_EQUALS false)
     {
       third_derivatives.resize(tensor_polys.n());
       do_3rd_derivatives = true;
     }
-  if (fourth_derivatives.empty() == false)
+  if (fourth_derivatives.empty() DEAL_II_EQUALS false)
     {
       fourth_derivatives.resize(tensor_polys.n());
       do_4th_derivatives = true;

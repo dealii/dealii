@@ -93,20 +93,20 @@ Mapping<dim, spacedim>::project_real_point_to_unit_point_on_face(
   const unsigned int unit_normal_direction =
     GeometryInfo<dim>::unit_normal_direction[face_no];
 
-  if (dim == 2)
+  if (dim DEAL_II_EQUALS 2)
     {
-      if (unit_normal_direction == 0)
+      if (unit_normal_direction DEAL_II_EQUALS 0)
         return Point<dim - 1>{unit_cell_pt(1)};
-      else if (unit_normal_direction == 1)
+      else if (unit_normal_direction DEAL_II_EQUALS 1)
         return Point<dim - 1>{unit_cell_pt(0)};
     }
-  else if (dim == 3)
+  else if (dim DEAL_II_EQUALS 3)
     {
-      if (unit_normal_direction == 0)
+      if (unit_normal_direction DEAL_II_EQUALS 0)
         return Point<dim - 1>{unit_cell_pt(1), unit_cell_pt(2)};
-      else if (unit_normal_direction == 1)
+      else if (unit_normal_direction DEAL_II_EQUALS 1)
         return Point<dim - 1>{unit_cell_pt(0), unit_cell_pt(2)};
-      else if (unit_normal_direction == 2)
+      else if (unit_normal_direction DEAL_II_EQUALS 2)
         return Point<dim - 1>{unit_cell_pt(0), unit_cell_pt(1)};
     }
 

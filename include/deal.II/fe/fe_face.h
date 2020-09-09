@@ -142,7 +142,7 @@ public:
    * pair denotes one of the vertex dofs of the present element, whereas the
    * second is the corresponding index of the other finite element.
    *
-   * The set of such constraints is non-empty only for dim==1.
+   * The set of such constraints is non-empty only for dimDEAL_II_EQUALS 1.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
   hp_vertex_dof_identities(
@@ -152,7 +152,7 @@ public:
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
    * of freedom on lines.
    *
-   * The set of such constraints is non-empty only for dim==2.
+   * The set of such constraints is non-empty only for dimDEAL_II_EQUALS 2.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
   hp_line_dof_identities(
@@ -162,7 +162,7 @@ public:
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
    * of freedom on quads.
    *
-   * The set of such constraints is non-empty only for dim==3.
+   * The set of such constraints is non-empty only for dimDEAL_II_EQUALS 3.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
   hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other,
@@ -295,7 +295,7 @@ public:
    * pair denotes one of the vertex dofs of the present element, whereas the
    * second is the corresponding index of the other finite element.
    *
-   * The set of such constraints is non-empty only for dim==1.
+   * The set of such constraints is non-empty only for dimDEAL_II_EQUALS 1.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
   hp_vertex_dof_identities(
@@ -305,7 +305,7 @@ public:
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
    * of freedom on lines.
    *
-   * The set of such constraints is non-empty only for dim==2.
+   * The set of such constraints is non-empty only for dimDEAL_II_EQUALS 2.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
   hp_line_dof_identities(
@@ -315,7 +315,7 @@ public:
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
    * of freedom on quads.
    *
-   * The set of such constraints is non-empty only for dim==3.
+   * The set of such constraints is non-empty only for dimDEAL_II_EQUALS 3.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
   hp_quad_dof_identities(const FiniteElement<1, spacedim> &fe_other,
@@ -368,8 +368,8 @@ protected:
     (void)n_q_points;
 
     // No derivatives of this element are implemented.
-    if (data_ptr->update_each & update_gradients ||
-        data_ptr->update_each & update_hessians)
+    if (data_ptr->update_each &
+        update_gradients DEAL_II_OR data_ptr->update_each & update_hessians)
       {
         Assert(false, ExcNotImplemented());
       }

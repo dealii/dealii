@@ -75,10 +75,10 @@ namespace Functions
     const Point<dim> &                       p,
     Vector<typename VectorType::value_type> &values) const
   {
-    Assert(values.size() == this->n_components,
+    Assert(values.size() DEAL_II_EQUALS this->n_components,
            ExcDimensionMismatch(values.size(), this->n_components));
     typename DoFHandlerType::active_cell_iterator cell = cell_hint.get();
-    if (cell == dh->end())
+    if (cell DEAL_II_EQUALS dh->end())
       cell = dh->begin_active();
 
     std_cxx17::optional<Point<dim>> qp = get_reference_coordinates(cell, p);
@@ -134,10 +134,10 @@ namespace Functions
     const
   {
     using number = typename VectorType::value_type;
-    Assert(gradients.size() == this->n_components,
+    Assert(gradients.size() DEAL_II_EQUALS this->n_components,
            ExcDimensionMismatch(gradients.size(), this->n_components));
     typename DoFHandlerType::active_cell_iterator cell = cell_hint.get();
-    if (cell == dh->end())
+    if (cell DEAL_II_EQUALS dh->end())
       cell = dh->begin_active();
 
     std_cxx17::optional<Point<dim>> qp = get_reference_coordinates(cell, p);
@@ -165,7 +165,7 @@ namespace Functions
     FEValues<dim>   fe_v(mapping, cell->get_fe(), quad, update_gradients);
     fe_v.reinit(cell);
 
-    if (this->n_components == 1)
+    if (this->n_components DEAL_II_EQUALS 1)
       {
         // the size of the @p gradients coincidentally coincides
         // with the number of quadrature points we evaluate the function at.
@@ -207,10 +207,10 @@ namespace Functions
     const Point<dim> &                       p,
     Vector<typename VectorType::value_type> &values) const
   {
-    Assert(values.size() == this->n_components,
+    Assert(values.size() DEAL_II_EQUALS this->n_components,
            ExcDimensionMismatch(values.size(), this->n_components));
     typename DoFHandlerType::active_cell_iterator cell = cell_hint.get();
-    if (cell == dh->end())
+    if (cell DEAL_II_EQUALS dh->end())
       cell = dh->begin_active();
 
     std_cxx17::optional<Point<dim>> qp = get_reference_coordinates(cell, p);
@@ -258,7 +258,9 @@ namespace Functions
 
 
   // Now the list versions
-  // ==============================
+  // DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+  // DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+  // DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
 
   template <int dim, typename DoFHandlerType, typename VectorType>
   void
@@ -266,7 +268,7 @@ namespace Functions
     const std::vector<Point<dim>> &                       points,
     std::vector<Vector<typename VectorType::value_type>> &values) const
   {
-    Assert(points.size() == values.size(),
+    Assert(points.size() DEAL_II_EQUALS values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
 
     std::vector<typename DoFHandlerType::active_cell_iterator> cells;
@@ -320,7 +322,7 @@ namespace Functions
     std::vector<typename VectorType::value_type> &values,
     const unsigned int                            component) const
   {
-    Assert(points.size() == values.size(),
+    Assert(points.size() DEAL_II_EQUALS values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
 
     // Simply forward everything to the vector_value_list()
@@ -346,7 +348,7 @@ namespace Functions
     std::vector<std::vector<Tensor<1, dim, typename VectorType::value_type>>>
       &values) const
   {
-    Assert(points.size() == values.size(),
+    Assert(points.size() DEAL_II_EQUALS values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
 
     std::vector<typename DoFHandlerType::active_cell_iterator> cells;
@@ -409,7 +411,7 @@ namespace Functions
     std::vector<Tensor<1, dim, typename VectorType::value_type>> &values,
     const unsigned int component) const
   {
-    Assert(points.size() == values.size(),
+    Assert(points.size() DEAL_II_EQUALS values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
 
     // Simply forward everything to the vector_gradient_list()
@@ -435,7 +437,7 @@ namespace Functions
     const std::vector<Point<dim>> &                       points,
     std::vector<Vector<typename VectorType::value_type>> &values) const
   {
-    Assert(points.size() == values.size(),
+    Assert(points.size() DEAL_II_EQUALS values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
 
     std::vector<typename DoFHandlerType::active_cell_iterator> cells;
@@ -491,7 +493,7 @@ namespace Functions
     std::vector<typename VectorType::value_type> &values,
     const unsigned int                            component) const
   {
-    Assert(points.size() == values.size(),
+    Assert(points.size() DEAL_II_EQUALS values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
 
     // Simply forward everything to the vector_gradient_list()

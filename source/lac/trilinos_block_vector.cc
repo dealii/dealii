@@ -41,7 +41,8 @@ namespace TrilinosWrappers
     {
       // we only allow assignment to vectors with the same number of blocks
       // or to an empty BlockVector
-      Assert(n_blocks() == 0 || n_blocks() == v.n_blocks(),
+      Assert(n_blocks() DEAL_II_EQUALS 0 DEAL_II_OR n_blocks()
+               DEAL_II_EQUALS                       v.n_blocks(),
              ExcDimensionMismatch(n_blocks(), v.n_blocks()));
 
       if (this->n_blocks() != v.n_blocks())
@@ -58,7 +59,7 @@ namespace TrilinosWrappers
 
 
     BlockVector &
-    BlockVector::operator=(BlockVector &&v) noexcept
+    BlockVector::operator=(BlockVector DEAL_II_AND v) noexcept
     {
       swap(v);
       return *this;
@@ -155,9 +156,9 @@ namespace TrilinosWrappers
       const TrilinosWrappers::BlockSparseMatrix &m,
       const BlockVector &                        v)
     {
-      Assert(m.n_block_rows() == v.n_blocks(),
+      Assert(m.n_block_rows() DEAL_II_EQUALS v.n_blocks(),
              ExcDimensionMismatch(m.n_block_rows(), v.n_blocks()));
-      Assert(m.n_block_cols() == v.n_blocks(),
+      Assert(m.n_block_cols() DEAL_II_EQUALS v.n_blocks(),
              ExcDimensionMismatch(m.n_block_cols(), v.n_blocks()));
 
       if (v.n_blocks() != n_blocks())

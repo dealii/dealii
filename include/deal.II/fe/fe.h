@@ -292,14 +292,14 @@ class FESystem;
  *
  * <h4>Interpolation matrices in one dimension</h4>
  *
- * In one space dimension (i.e., for <code>dim==1</code> and any value of
- * <code>spacedim</code>), finite element classes implementing the interface
- * of the current base class need only set the #restriction and #prolongation
- * matrices that describe the interpolation of the finite element space on one
- * cell to that of its parent cell, and to that on its children, respectively.
- * The constructor of the current class in one dimension presets the
- * #interface_constraints matrix (used to describe hanging node constraints at
- * the interface between cells of different refinement levels) to have size
+ * In one space dimension (i.e., for <code>dimDEAL_II_EQUALS 1</code> and any
+ * value of <code>spacedim</code>), finite element classes implementing the
+ * interface of the current base class need only set the #restriction and
+ * #prolongation matrices that describe the interpolation of the finite element
+ * space on one cell to that of its parent cell, and to that on its children,
+ * respectively. The constructor of the current class in one dimension presets
+ * the #interface_constraints matrix (used to describe hanging node constraints
+ * at the interface between cells of different refinement levels) to have size
  * zero because there are no hanging nodes in 1d.
  *
  * <h4>Interpolation matrices in two dimensions</h4>
@@ -621,7 +621,7 @@ class FESystem;
  * @code
  * for (unsigned int child=0; child<cell->n_children(); ++child)
  *   for (unsigned int i=0; i<dofs_per_cell; ++i)
- *     if (fe.restriction_is_additive(i) == true)
+ *     if (fe.restriction_is_additive(i) DEAL_II_EQUALS  true)
  *       U_coarse_on_parent[i] += U_tilde_coarse[child][i];
  *     else
  *       if (U_tilde_coarse[child][i] != 0)
@@ -747,17 +747,17 @@ public:
    * be the case if you couple a FE_RaviartThomas and a FE_Nedelec together
    * into a FESystem.)
    *
-   * @pre <code>restriction_is_additive_flags.size() == dofs_per_cell</code>,
-   * or <code>restriction_is_additive_flags.size() == 1</code>. In the latter
-   * case, the array is simply interpreted as having size
-   * <code>dofs_per_cell</code> where each element has the same value as the
-   * single element given.
+   * @pre <code>restriction_is_additive_flags.size() DEAL_II_EQUALS
+   * dofs_per_cell</code>, or <code>restriction_is_additive_flags.size()
+   * DEAL_II_EQUALS  1</code>. In the latter case, the array is simply
+   * interpreted as having size <code>dofs_per_cell</code> where each element
+   * has the same value as the single element given.
    *
-   * @pre <code>nonzero_components.size() == dofs_per_cell</code>, or
-   * <code>nonzero_components.size() == 1</code>. In the latter case, the
-   * array is simply interpreted as having size <code>dofs_per_cell</code>
-   * where each element equals the component mask provided in the single
-   * element given.
+   * @pre <code>nonzero_components.size() DEAL_II_EQUALS  dofs_per_cell</code>,
+   * or <code>nonzero_components.size() DEAL_II_EQUALS  1</code>. In the latter
+   * case, the array is simply interpreted as having size
+   * <code>dofs_per_cell</code> where each element equals the component mask
+   * provided in the single element given.
    */
   FiniteElement(const FiniteElementData<dim> &    fe_data,
                 const std::vector<bool> &         restriction_is_additive_flags,
@@ -1351,11 +1351,11 @@ public:
    * @p fe_other, whether it is the other way around, whether neither dominates,
    * or if either could dominate. The @p codim parameter describes the codimension
    * of the investigated subspace and specifies that it is subject to this
-   * comparison. For example, if `codim==0` then this function compares which
-   * element dominates at the cell level. If `codim==1`, then the elements are
-   * compared at faces, i.e., the comparison happens between the function spaces
-   * of the two finite elements as restricted to a face. Larger values of
-   * `codim` work correspondingly.
+   * comparison. For example, if `codimDEAL_II_EQUALS 0` then this function
+   * compares which element dominates at the cell level. If `codimDEAL_II_EQUALS
+   * 1`, then the elements are compared at faces, i.e., the comparison happens
+   * between the function spaces of the two finite elements as restricted to a
+   * face. Larger values of `codim` work correspondingly.
    *
    * For a definition of domination, see FiniteElementDomination::Domination
    * and in particular the
@@ -1394,11 +1394,12 @@ public:
    *  these are generally big arrays, but also because their computation may
    *  be expensive. On the other hand, derived classes for which these
    *  arrays may differ for two objects even though the above list compares
-   *  as equal, will probably want to implement their own operator==()
-   *  anyway.
+   *  as equal, will probably want to implement their own operator
+   * DEAL_II_EQUALS
+   * () anyway.
    */
   virtual bool
-  operator==(const FiniteElement<dim, spacedim> &fe) const;
+  operator DEAL_II_EQUALS(const FiniteElement<dim, spacedim> &fe) const;
 
   /**
    * Non-equality comparison operator. Defined in terms of the equality
@@ -3058,7 +3059,7 @@ inline const FiniteElement<dim, spacedim> &FiniteElement<dim, spacedim>::
                                            operator[](const unsigned int fe_index) const
 {
   (void)fe_index;
-  Assert(fe_index == 0,
+  Assert(fe_index DEAL_II_EQUALS 0,
          ExcMessage("A fe_index of zero is the only index allowed here"));
   return *this;
 }
@@ -3131,10 +3132,10 @@ FiniteElement<dim, spacedim>::face_system_to_component_index(
   const unsigned int index,
   const unsigned int face_no) const
 {
-  AssertIndexRange(
-    index,
-    face_system_to_component_table[this->n_unique_faces() == 1 ? 0 : face_no]
-      .size());
+  AssertIndexRange(index,
+                   face_system_to_component_table
+                     [this->n_unique_faces() DEAL_II_EQUALS 1 ? 0 : face_no]
+                       .size());
 
   // in debug mode, check whether the
   // function is primitive, since
@@ -3153,9 +3154,8 @@ FiniteElement<dim, spacedim>::face_system_to_component_index(
          (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
            index)));
 
-  return face_system_to_component_table[this->n_unique_faces() == 1 ?
-                                          0 :
-                                          face_no][index];
+  return face_system_to_component_table
+    [this->n_unique_faces() DEAL_II_EQUALS 1 ? 0 : face_no][index];
 }
 
 
@@ -3179,10 +3179,12 @@ FiniteElement<dim, spacedim>::face_system_to_base_index(
 {
   AssertIndexRange(
     index,
-    face_system_to_base_table[this->n_unique_faces() == 1 ? 0 : face_no]
+    face_system_to_base_table[this->n_unique_faces() DEAL_II_EQUALS 1 ? 0 :
+                                                                        face_no]
       .size());
-  return face_system_to_base_table[this->n_unique_faces() == 1 ? 0 : face_no]
-                                  [index];
+  return face_system_to_base_table[this->n_unique_faces() DEAL_II_EQUALS 1 ?
+                                     0 :
+                                     face_no][index];
 }
 
 
@@ -3294,7 +3296,8 @@ FiniteElement<dim, spacedim>::is_primitive(const unsigned int i) const
   //
   // for good measure, short circuit the test
   // if the entire FE is primitive
-  return (is_primitive() || (n_nonzero_components_table[i] == 1));
+  return (is_primitive()
+            DEAL_II_OR(n_nonzero_components_table[i] DEAL_II_EQUALS 1));
 }
 
 

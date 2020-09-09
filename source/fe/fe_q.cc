@@ -114,7 +114,7 @@ FE_Q<dim, spacedim>::get_name() const
         break;
       }
 
-  if (equidistant == true)
+  if (equidistant DEAL_II_EQUALS true)
     {
       if (this->degree > 2)
         namebuf << "FE_Q<" << Utilities::dim_string(dim, spacedim)
@@ -134,7 +134,7 @@ FE_Q<dim, spacedim>::get_name() const
             gauss_lobatto = false;
             break;
           }
-      if (gauss_lobatto == true)
+      if (gauss_lobatto DEAL_II_EQUALS true)
         namebuf << "FE_Q<" << Utilities::dim_string(dim, spacedim) << ">("
                 << this->degree << ")";
       else
@@ -201,7 +201,7 @@ FE_Q<dim, spacedim>::compare_for_domination(
     {
       if (this->degree < fe_q_other->degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_q_other->degree)
+      else if (this->degree DEAL_II_EQUALS fe_q_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;

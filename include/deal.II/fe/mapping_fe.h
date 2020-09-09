@@ -49,8 +49,8 @@ DEAL_II_NAMESPACE_OPEN
  * equivalent to MappingQGeneric(degree). Please note that no optimizations
  * exploiting tensor-product structures of finite elements have been added here.
  *
- * @node Currently, only implemented for elements with tensor_degree==1 and
- *   n_components==1.
+ * @node Currently, only implemented for elements with
+ * tensor_degreeDEAL_II_EQUALS 1 and n_componentsDEAL_II_EQUALS 1.
  *
  * @ingroup simplex
  */

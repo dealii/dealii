@@ -30,7 +30,7 @@ static const char *unknown_subscriber = "unknown subscriber";
 std::mutex Subscriptor::mutex;
 
 
-Subscriptor::Subscriptor(Subscriptor &&subscriptor) noexcept
+Subscriptor::Subscriptor(Subscriptor DEAL_II_AND subscriptor) noexcept
   : counter(0)
   , object_info(subscriptor.object_info)
 {
@@ -76,9 +76,9 @@ Subscriptor::check_no_subscribers() const noexcept
     {
 #  if __cpp_lib_uncaught_exceptions >= 201411
       // std::uncaught_exception() is deprecated in c++17
-      if (std::uncaught_exceptions() == 0)
+      if (std::uncaught_exceptions() DEAL_II_EQUALS 0)
 #  else
-      if (std::uncaught_exception() == false)
+      if (std::uncaught_exception() DEAL_II_EQUALS false)
 #  endif
         {
           std::string infostring;
@@ -92,7 +92,7 @@ Subscriptor::check_no_subscribers() const noexcept
           if (infostring.empty())
             infostring = "<none>";
 
-          AssertNothrow(counter == 0,
+          AssertNothrow(counter DEAL_II_EQUALS 0,
                         ExcInUse(counter.load(),
                                  object_info->name(),
                                  infostring));
@@ -121,7 +121,7 @@ Subscriptor::check_no_subscribers() const noexcept
 
 
 Subscriptor &
-Subscriptor::operator=(Subscriptor &&s) noexcept
+Subscriptor::operator=(Subscriptor DEAL_II_AND s) noexcept
 {
   for (const auto validity_ptr : s.validity_pointers)
     *validity_ptr = false;
@@ -138,7 +138,7 @@ Subscriptor::subscribe(std::atomic<bool> *const validity,
 {
   std::lock_guard<std::mutex> lock(mutex);
 
-  if (object_info == nullptr)
+  if (object_info DEAL_II_EQUALS nullptr)
     object_info = &typeid(*this);
   ++counter;
 
@@ -158,7 +158,7 @@ Subscriptor::unsubscribe(std::atomic<bool> *const validity,
 {
   const std::string &name = id.empty() ? unknown_subscriber : id;
 
-  if (counter == 0)
+  if (counter DEAL_II_EQUALS 0)
     {
       AssertNothrow(counter > 0, ExcNoSubscriber(object_info->name(), name));
       // This is for the case that we do not abort after the exception
@@ -168,14 +168,14 @@ Subscriptor::unsubscribe(std::atomic<bool> *const validity,
   std::lock_guard<std::mutex> lock(mutex);
 
   map_iterator it = counter_map.find(name);
-  if (it == counter_map.end())
+  if (it DEAL_II_EQUALS counter_map.end())
     {
       AssertNothrow(it != counter_map.end(),
                     ExcNoSubscriber(object_info->name(), name));
       // This is for the case that we do not abort after the exception
       return;
     }
-  if (it->second == 0)
+  if (it->second DEAL_II_EQUALS 0)
     {
       AssertNothrow(it->second > 0, ExcNoSubscriber(object_info->name(), name));
       // This is for the case that we do not abort after the exception
@@ -184,7 +184,7 @@ Subscriptor::unsubscribe(std::atomic<bool> *const validity,
 
   auto validity_ptr_it =
     std::find(validity_pointers.begin(), validity_pointers.end(), validity);
-  if (validity_ptr_it == validity_pointers.end())
+  if (validity_ptr_it DEAL_II_EQUALS validity_pointers.end())
     {
       AssertNothrow(
         validity_ptr_it != validity_pointers.end(),

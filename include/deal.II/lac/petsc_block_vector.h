@@ -155,8 +155,8 @@ namespace PETScWrappers
        * @p communicator argument denotes which MPI channel each of these
        * blocks shall communicate.
        *
-       * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with
-       * zeros.
+       * If <tt>omit_zeroing_entriesDEAL_II_EQUALS false</tt>, the vector is
+       * filled with zeros.
        */
       void
       reinit(const unsigned int n_blocks,
@@ -175,8 +175,8 @@ namespace PETScWrappers
        * called, all vectors remain the same and reinit() is called for each
        * vector.
        *
-       * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with
-       * zeros.
+       * If <tt>omit_zeroing_entriesDEAL_II_EQUALS false</tt>, the vector is
+       * filled with zeros.
        *
        * Note that you must call this (or the other reinit() functions)
        * function, rather than calling the reinit() functions of an individual
@@ -345,7 +345,8 @@ namespace PETScWrappers
     {
       // we only allow assignment to vectors with the same number of blocks
       // or to an empty BlockVector
-      Assert(n_blocks() == 0 || n_blocks() == v.n_blocks(),
+      Assert(n_blocks() DEAL_II_EQUALS 0 DEAL_II_OR n_blocks()
+               DEAL_II_EQUALS                       v.n_blocks(),
              ExcDimensionMismatch(n_blocks(), v.n_blocks()));
 
       if (this->n_blocks() != v.n_blocks())
@@ -454,7 +455,8 @@ namespace PETScWrappers
       bool ghosted = block(0).has_ghost_elements();
 #  ifdef DEBUG
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
-        Assert(block(i).has_ghost_elements() == ghosted, ExcInternalError());
+        Assert(block(i).has_ghost_elements() DEAL_II_EQUALS ghosted,
+               ExcInternalError());
 #  endif
       return ghosted;
     }

@@ -373,7 +373,7 @@ FESystem<dim, spacedim>::get_sub_fe(
     return this->base_element(base_index)
       .get_sub_fe(component_in_base, n_selected_components);
 
-  Assert(n_selected_components == this->n_components(),
+  Assert(n_selected_components DEAL_II_EQUALS this->n_components(),
          ExcMessage("You can not select a part of a FiniteElement."));
   return *this;
 }
@@ -408,7 +408,7 @@ FESystem<dim, spacedim>::shape_value_component(
 
   // if this value is supposed to be
   // zero, then return right away...
-  if (this->nonzero_components[i][component] == false)
+  if (this->nonzero_components[i][component] DEAL_II_EQUALS false)
     return 0;
 
   // ...otherwise: first find out to
@@ -459,7 +459,7 @@ FESystem<dim, spacedim>::shape_grad_component(
   AssertIndexRange(component, this->n_components());
 
   // if this value is supposed to be zero, then return right away...
-  if (this->nonzero_components[i][component] == false)
+  if (this->nonzero_components[i][component] DEAL_II_EQUALS false)
     return Tensor<1, dim>();
 
   // ...otherwise: first find out to which of the base elements this desired
@@ -504,7 +504,7 @@ FESystem<dim, spacedim>::shape_grad_grad_component(
   AssertIndexRange(component, this->n_components());
 
   // if this value is supposed to be zero, then return right away...
-  if (this->nonzero_components[i][component] == false)
+  if (this->nonzero_components[i][component] DEAL_II_EQUALS false)
     return Tensor<2, dim>();
 
   // ...otherwise: first find out to which of the base elements this desired
@@ -549,7 +549,7 @@ FESystem<dim, spacedim>::shape_3rd_derivative_component(
   AssertIndexRange(component, this->n_components());
 
   // if this value is supposed to be zero, then return right away...
-  if (this->nonzero_components[i][component] == false)
+  if (this->nonzero_components[i][component] DEAL_II_EQUALS false)
     return Tensor<3, dim>();
 
   // ...otherwise: first find out to which of the base elements this desired
@@ -594,7 +594,7 @@ FESystem<dim, spacedim>::shape_4th_derivative_component(
   AssertIndexRange(component, this->n_components());
 
   // if this value is supposed to be zero, then return right away...
-  if (this->nonzero_components[i][component] == false)
+  if (this->nonzero_components[i][component] DEAL_II_EQUALS false)
     return Tensor<4, dim>();
 
   // ...otherwise: first find out to which of the base elements this desired
@@ -620,14 +620,14 @@ FESystem<dim, spacedim>::get_interpolation_matrix(
 {
   // check that the size of the matrices is correct. for historical
   // reasons, if you call matrix.reinit(8,0), it sets the sizes
-  // to m==n==0 internally. this may happen when we use a FE_Nothing,
-  // so write the test in a more lenient way
-  Assert((interpolation_matrix.m() == this->n_dofs_per_cell()) ||
-           (x_source_fe.n_dofs_per_cell() == 0),
+  // to mDEAL_II_EQUALS nDEAL_II_EQUALS 0 internally. this may happen when we
+  // use a FE_Nothing, so write the test in a more lenient way
+  Assert((interpolation_matrix.m() DEAL_II_EQUALS this->n_dofs_per_cell())
+           DEAL_II_OR(x_source_fe.n_dofs_per_cell() DEAL_II_EQUALS 0),
          ExcDimensionMismatch(interpolation_matrix.m(),
                               this->n_dofs_per_cell()));
-  Assert((interpolation_matrix.n() == x_source_fe.n_dofs_per_cell()) ||
-           (this->n_dofs_per_cell() == 0),
+  Assert((interpolation_matrix.n() DEAL_II_EQUALS x_source_fe.n_dofs_per_cell())
+           DEAL_II_OR(this->n_dofs_per_cell() DEAL_II_EQUALS 0),
          ExcDimensionMismatch(interpolation_matrix.m(),
                               x_source_fe.n_dofs_per_cell()));
 
@@ -637,8 +637,8 @@ FESystem<dim, spacedim>::get_interpolation_matrix(
   // condition 1: the other element must also be a system element
 
   AssertThrow(
-    (x_source_fe.get_name().find("FESystem<") == 0) ||
-      (dynamic_cast<const FESystem<dim, spacedim> *>(&x_source_fe) != nullptr),
+    (x_source_fe.get_name().find("FESystem<") DEAL_II_EQUALS 0)DEAL_II_OR(
+      dynamic_cast<const FESystem<dim, spacedim> *>(&x_source_fe) != nullptr),
     (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
 
   // ok, source is a system element, so we may be able to do the work
@@ -647,13 +647,14 @@ FESystem<dim, spacedim>::get_interpolation_matrix(
 
   // condition 2: same number of basis elements
   AssertThrow(
-    this->n_base_elements() == source_fe.n_base_elements(),
+    this->n_base_elements() DEAL_II_EQUALS source_fe.n_base_elements(),
     (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
 
   // condition 3: same number of basis elements
   for (unsigned int i = 0; i < this->n_base_elements(); ++i)
     AssertThrow(
-      this->element_multiplicity(i) == source_fe.element_multiplicity(i),
+      this->element_multiplicity(i)
+        DEAL_II_EQUALS source_fe.element_multiplicity(i),
       (typename FiniteElement<dim,
                               spacedim>::ExcInterpolationNotImplemented()));
 
@@ -679,8 +680,9 @@ FESystem<dim, spacedim>::get_interpolation_matrix(
   interpolation_matrix = 0;
   for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
     for (unsigned int j = 0; j < source_fe.n_dofs_per_cell(); ++j)
-      if (this->system_to_base_table[i].first ==
-          source_fe.system_to_base_table[j].first)
+      if (this->system_to_base_table[i]
+            .first DEAL_II_EQUALS source_fe.system_to_base_table[j]
+            .first)
         interpolation_matrix(i, j) =
           (base_matrices[this->system_to_base_table[i].first.first](
             this->system_to_base_table[i].second,
@@ -703,13 +705,13 @@ FESystem<dim, spacedim>::get_restriction_matrix(
   AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
 
   // initialization upon first request
-  if (this->restriction[refinement_case - 1][child].n() == 0)
+  if (this->restriction[refinement_case - 1][child].n() DEAL_II_EQUALS 0)
     {
       std::lock_guard<std::mutex> lock(this->mutex);
 
       // check if updated while waiting for lock
-      if (this->restriction[refinement_case - 1][child].n() ==
-          this->n_dofs_per_cell())
+      if (this->restriction[refinement_case - 1][child].n()
+            DEAL_II_EQUALS this->n_dofs_per_cell())
         return this->restriction[refinement_case - 1][child];
 
       // Check if some of the matrices of the base elements are void.
@@ -795,12 +797,12 @@ FESystem<dim, spacedim>::get_prolongation_matrix(
 
   // initialization upon first request, construction completely analogous to
   // restriction matrix
-  if (this->prolongation[refinement_case - 1][child].n() == 0)
+  if (this->prolongation[refinement_case - 1][child].n() DEAL_II_EQUALS 0)
     {
       std::lock_guard<std::mutex> lock(this->mutex);
 
-      if (this->prolongation[refinement_case - 1][child].n() ==
-          this->n_dofs_per_cell())
+      if (this->prolongation[refinement_case - 1][child]
+            .n() DEAL_II_EQUALS this->n_dofs_per_cell())
         return this->prolongation[refinement_case - 1][child];
 
       bool                                    do_prolongation = true;
@@ -876,7 +878,7 @@ FESystem<dim, spacedim>::face_to_cell_index(const unsigned int face_dof_index,
   const std::pair<std::pair<unsigned int, unsigned int>, unsigned int> target =
     std::make_pair(face_base_index.first, base_face_to_cell_index);
   for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
-    if (this->system_to_base_index(i) == target)
+    if (this->system_to_base_index(i) DEAL_II_EQUALS target)
       return i;
 
   Assert(false, ExcInternalError());
@@ -1208,10 +1210,11 @@ FESystem<dim, spacedim>::compute_fill(
          ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &>(fe_internal);
 
-  // Either dim_1==dim
-  // (fill_fe_values) or dim_1==dim-1
+  // Either dim_1DEAL_II_EQUALS dim
+  // (fill_fe_values) or dim_1DEAL_II_EQUALS dim-1
   // (fill_fe_(sub)face_values)
-  Assert(dim_1 == dim || dim_1 == dim - 1, ExcInternalError());
+  Assert(dim_1 DEAL_II_EQUALS dim DEAL_II_OR dim_1 DEAL_II_EQUALS dim - 1,
+         ExcInternalError());
   const UpdateFlags flags = fe_data.update_each;
 
 
@@ -1237,7 +1240,8 @@ FESystem<dim, spacedim>::compute_fill(
           &base_data = fe_data.get_fe_output_object(base_no);
 
         // fill_fe_face_values needs argument Quadrature<dim-1> for both cases
-        // dim_1==dim-1 and dim_1=dim. Hence the following workaround
+        // dim_1DEAL_II_EQUALS dim-1 and dim_1=dim. Hence the following
+        // workaround
         const Quadrature<dim> *    cell_quadrature = nullptr;
         const Quadrature<dim - 1> *face_quadrature = nullptr;
         const unsigned int         n_q_points      = quadrature.size();
@@ -1246,9 +1250,9 @@ FESystem<dim, spacedim>::compute_fill(
         // Quadrature<dim> or Quadrature<dim-1>:
         const Subscriptor *quadrature_base_pointer = &quadrature;
 
-        if (face_no == invalid_face_number)
+        if (face_no DEAL_II_EQUALS invalid_face_number)
           {
-            Assert(dim_1 == dim, ExcDimensionMismatch(dim_1, dim));
+            Assert(dim_1 DEAL_II_EQUALS dim, ExcDimensionMismatch(dim_1, dim));
             Assert(dynamic_cast<const Quadrature<dim> *>(
                      quadrature_base_pointer) != nullptr,
                    ExcInternalError());
@@ -1258,7 +1262,8 @@ FESystem<dim, spacedim>::compute_fill(
           }
         else
           {
-            Assert(dim_1 == dim - 1, ExcDimensionMismatch(dim_1, dim - 1));
+            Assert(dim_1 DEAL_II_EQUALS dim - 1,
+                   ExcDimensionMismatch(dim_1, dim - 1));
             Assert(dynamic_cast<const Quadrature<dim - 1> *>(
                      quadrature_base_pointer) != nullptr,
                    ExcInternalError());
@@ -1275,7 +1280,7 @@ FESystem<dim, spacedim>::compute_fill(
         // for the case of fill_fe_(sub)face_values the data needs to be
         // copied from base_data to data on each face, therefore use
         // base_fe_data.update_flags.
-        if (face_no == invalid_face_number)
+        if (face_no DEAL_II_EQUALS invalid_face_number)
           base_fe.fill_fe_values(cell,
                                  cell_similarity,
                                  *cell_quadrature,
@@ -1284,7 +1289,7 @@ FESystem<dim, spacedim>::compute_fill(
                                  mapping_data,
                                  base_fe_data,
                                  base_data);
-        else if (sub_no == invalid_face_number)
+        else if (sub_no DEAL_II_EQUALS invalid_face_number)
           base_fe.fill_fe_face_values(cell,
                                       face_no,
                                       *face_quadrature,
@@ -1327,7 +1332,8 @@ FESystem<dim, spacedim>::compute_fill(
         for (unsigned int system_index = 0;
              system_index < this->n_dofs_per_cell();
              ++system_index)
-          if (this->system_to_base_table[system_index].first.first == base_no)
+          if (this->system_to_base_table[system_index]
+                .first.first DEAL_II_EQUALS base_no)
             {
               const unsigned int base_index =
                 this->system_to_base_table[system_index].second;
@@ -1348,9 +1354,10 @@ FESystem<dim, spacedim>::compute_fill(
                 in_index += base_fe.n_nonzero_components(i);
 
               // then loop over the number of components to be copied
-              Assert(this->n_nonzero_components(system_index) ==
-                       base_fe.n_nonzero_components(base_index),
-                     ExcInternalError());
+              Assert(
+                this->n_nonzero_components(system_index)
+                  DEAL_II_EQUALS base_fe.n_nonzero_components(base_index),
+                ExcInternalError());
 
               if (base_flags & update_values)
                 for (unsigned int s = 0;
@@ -1402,7 +1409,7 @@ FESystem<dim, spacedim>::build_interface_constraints()
   // this composed element empty as well; however, the rest of the element is
   // usable
   for (unsigned int base = 0; base < this->n_base_elements(); ++base)
-    if (base_element(base).constraints_are_implemented() == false)
+    if (base_element(base).constraints_are_implemented() DEAL_II_EQUALS false)
       return;
 
   this->interface_constraints.TableBase<2, double>::reinit(
@@ -1603,7 +1610,7 @@ FESystem<dim, spacedim>::build_interface_constraints()
         // now that we gathered all information: use it to build the
         // matrix. note that if n and m belong to different base elements or
         // instances, then there definitely will be no coupling
-        if (n_index.first == m_index.first)
+        if (n_index.first DEAL_II_EQUALS m_index.first)
           this->interface_constraints(m, n) =
             (base_element(n_index.first.first)
                .constraints()(m_index.second, n_index.second));
@@ -1618,7 +1625,7 @@ FESystem<dim, spacedim>::initialize(
   const std::vector<const FiniteElement<dim, spacedim> *> &fes,
   const std::vector<unsigned int> &                        multiplicities)
 {
-  Assert(fes.size() == multiplicities.size(),
+  Assert(fes.size() DEAL_II_EQUALS multiplicities.size(),
          ExcDimensionMismatch(fes.size(), multiplicities.size()));
   Assert(fes.size() > 0,
          ExcMessage("Need to pass at least one finite element."));
@@ -1694,8 +1701,9 @@ FESystem<dim, spacedim>::initialize(
     // array to demonstrate that fact. Note that we ignore FE_Nothing in this
     // logic.
     for (unsigned int base_el = 0; base_el < this->n_base_elements(); ++base_el)
-      if (!base_element(base_el).has_support_points() &&
-          base_element(base_el).n_dofs_per_cell() != 0)
+      if (!base_element(base_el)
+             .has_support_points() DEAL_II_AND base_element(base_el)
+             .n_dofs_per_cell() != 0)
         {
           this->unit_support_points.resize(0);
           return;
@@ -1716,7 +1724,8 @@ FESystem<dim, spacedim>::initialize(
       }
   });
 
-  // initialize face support points (for dim==2,3). same procedure as above
+  // initialize face support points (for dimDEAL_II_EQUALS 2,3). same procedure
+  // as above
   if (dim > 1)
     init_tasks += Threads::new_task([&]() {
       for (unsigned int face_no = 0; face_no < this->n_unique_faces();
@@ -1736,8 +1745,8 @@ FESystem<dim, spacedim>::initialize(
 
           for (unsigned int base_el = 0; base_el < this->n_base_elements();
                ++base_el)
-            if (!base_element(base_el).has_support_points() &&
-                (base_element(base_el).n_dofs_per_face(face_no) > 0))
+            if (!base_element(base_el).has_support_points() DEAL_II_AND(
+                  base_element(base_el).n_dofs_per_face(face_no) > 0))
               {
                 this->unit_face_support_points[face_no].resize(0);
                 flag_has_no_support_points = true;
@@ -1805,7 +1814,7 @@ FESystem<dim, spacedim>::initialize(
                         std::end(this->generalized_support_points),
                         point);
 
-            if (p == std::end(this->generalized_support_points))
+            if (p DEAL_II_EQUALS std::end(this->generalized_support_points))
               {
                 // If no, update the table and add the point to the vector
                 const auto n = this->generalized_support_points.size();
@@ -1833,7 +1842,7 @@ FESystem<dim, spacedim>::initialize(
         for (unsigned int j = 0; j < points.size(); ++j)
           {
             const auto n = generalized_support_points_index_table[i][j];
-            Assert(this->generalized_support_points[n] == points[j],
+            Assert(this->generalized_support_points[n] DEAL_II_EQUALS points[j],
                    ExcInternalError());
           }
       }
@@ -1849,7 +1858,8 @@ FESystem<dim, spacedim>::initialize(
           // the array into which we want to write should have the correct size
           // already.
           Assert(this->adjust_quad_dof_index_for_face_orientation_table[face_no]
-                     .n_elements() == 8 * this->n_dofs_per_quad(face_no),
+                     .n_elements() DEAL_II_EQUALS 8 *
+                   this->n_dofs_per_quad(face_no),
                  ExcInternalError());
 
           // to obtain the shifts for this composed element, copy the shift
@@ -1869,12 +1879,13 @@ FESystem<dim, spacedim>::initialize(
                   index += temp.size(0);
                 }
             }
-          Assert(index == this->n_dofs_per_quad(face_no), ExcInternalError());
+          Assert(index DEAL_II_EQUALS this->n_dofs_per_quad(face_no),
+                 ExcInternalError());
         }
 
       // additionally compose the permutation information for lines
-      Assert(this->adjust_line_dof_index_for_line_orientation_table.size() ==
-               this->n_dofs_per_line(),
+      Assert(this->adjust_line_dof_index_for_line_orientation_table
+               .size() DEAL_II_EQUALS this->n_dofs_per_line(),
              ExcInternalError());
       unsigned int index = 0;
       for (unsigned int b = 0; b < this->n_base_elements(); ++b)
@@ -1892,7 +1903,7 @@ FESystem<dim, spacedim>::initialize(
               index += temp2.size();
             }
         }
-      Assert(index == this->n_dofs_per_line(), ExcInternalError());
+      Assert(index DEAL_II_EQUALS this->n_dofs_per_line(), ExcInternalError());
     });
 
   // wait for all of this to finish
@@ -1906,7 +1917,7 @@ bool
 FESystem<dim, spacedim>::hp_constraints_are_implemented() const
 {
   for (unsigned int b = 0; b < this->n_base_elements(); ++b)
-    if (base_element(b).hp_constraints_are_implemented() == false)
+    if (base_element(b).hp_constraints_are_implemented() DEAL_II_EQUALS false)
       return false;
 
   return true;
@@ -1921,10 +1932,11 @@ FESystem<dim, spacedim>::get_face_interpolation_matrix(
   FullMatrix<double> &                interpolation_matrix,
   const unsigned int                  face_no) const
 {
-  Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS this->n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.n(),
                               this->n_dofs_per_face(face_no)));
-  Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.m()
+           DEAL_II_EQUALS x_source_fe.n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.m(),
                               x_source_fe.n_dofs_per_face(face_no)));
 
@@ -1958,7 +1970,7 @@ FESystem<dim, spacedim>::get_face_interpolation_matrix(
                                                fe_other_system->base_element(
                                                  base_index_other);
 
-          Assert(base.n_components() == base_other.n_components(),
+          Assert(base.n_components() DEAL_II_EQUALS base_other.n_components(),
                  ExcNotImplemented());
 
           // get the interpolation from the bases
@@ -1972,14 +1984,15 @@ FESystem<dim, spacedim>::get_face_interpolation_matrix(
           // face_base_to_system_index, but that doesn't exist. rather, all we
           // have is the reverse. well, use that then
           for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
-            if (this->face_system_to_base_index(i, face_no).first ==
-                std::make_pair(base_index, multiplicity))
+            if (this->face_system_to_base_index(i, face_no)
+                  .first DEAL_II_EQUALS std::make_pair(base_index,
+                                                       multiplicity))
               for (unsigned int j = 0;
                    j < fe_other_system->n_dofs_per_face(face_no);
                    ++j)
                 if (fe_other_system->face_system_to_base_index(j, face_no)
-                      .first ==
-                    std::make_pair(base_index_other, multiplicity_other))
+                      .first DEAL_II_EQUALS std::make_pair(base_index_other,
+                                                           multiplicity_other))
                   interpolation_matrix(j, i) = base_to_base_interpolation(
                     fe_other_system->face_system_to_base_index(j, face_no)
                       .second,
@@ -1989,14 +2002,15 @@ FESystem<dim, spacedim>::get_face_interpolation_matrix(
           // see if we can simply advance the multiplicity by one, or if have to
           // move on to the next base element
           ++multiplicity;
-          if (multiplicity == this->element_multiplicity(base_index))
+          if (multiplicity DEAL_II_EQUALS this->element_multiplicity(
+                base_index))
             {
               multiplicity = 0;
               ++base_index;
             }
           ++multiplicity_other;
-          if (multiplicity_other ==
-              fe_other_system->element_multiplicity(base_index_other))
+          if (multiplicity_other DEAL_II_EQUALS
+                                 fe_other_system->element_multiplicity(base_index_other))
             {
               multiplicity_other = 0;
               ++base_index_other;
@@ -2004,9 +2018,10 @@ FESystem<dim, spacedim>::get_face_interpolation_matrix(
 
           // see if we have reached the end of the present element. if so, we
           // should have reached the end of the other one as well
-          if (base_index == this->n_base_elements())
+          if (base_index DEAL_II_EQUALS this->n_base_elements())
             {
-              Assert(base_index_other == fe_other_system->n_base_elements(),
+              Assert(base_index_other DEAL_II_EQUALS
+                                      fe_other_system->n_base_elements(),
                      ExcInternalError());
               break;
             }
@@ -2039,14 +2054,15 @@ FESystem<dim, spacedim>::get_subface_interpolation_matrix(
   const unsigned int                  face_no) const
 {
   AssertThrow(
-    (x_source_fe.get_name().find("FESystem<") == 0) ||
-      (dynamic_cast<const FESystem<dim, spacedim> *>(&x_source_fe) != nullptr),
+    (x_source_fe.get_name().find("FESystem<") DEAL_II_EQUALS 0)DEAL_II_OR(
+      dynamic_cast<const FESystem<dim, spacedim> *>(&x_source_fe) != nullptr),
     (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
 
-  Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS this->n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.n(),
                               this->n_dofs_per_face(face_no)));
-  Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.m()
+           DEAL_II_EQUALS x_source_fe.n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.m(),
                               x_source_fe.n_dofs_per_face(face_no)));
 
@@ -2081,7 +2097,7 @@ FESystem<dim, spacedim>::get_subface_interpolation_matrix(
                                                fe_other_system->base_element(
                                                  base_index_other);
 
-          Assert(base.n_components() == base_other.n_components(),
+          Assert(base.n_components() DEAL_II_EQUALS base_other.n_components(),
                  ExcNotImplemented());
 
           // get the interpolation from the bases
@@ -2096,14 +2112,15 @@ FESystem<dim, spacedim>::get_subface_interpolation_matrix(
           // face_base_to_system_index, but that doesn't exist. rather, all we
           // have is the reverse. well, use that then
           for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
-            if (this->face_system_to_base_index(i, face_no).first ==
-                std::make_pair(base_index, multiplicity))
+            if (this->face_system_to_base_index(i, face_no)
+                  .first DEAL_II_EQUALS std::make_pair(base_index,
+                                                       multiplicity))
               for (unsigned int j = 0;
                    j < fe_other_system->n_dofs_per_face(face_no);
                    ++j)
                 if (fe_other_system->face_system_to_base_index(j, face_no)
-                      .first ==
-                    std::make_pair(base_index_other, multiplicity_other))
+                      .first DEAL_II_EQUALS std::make_pair(base_index_other,
+                                                           multiplicity_other))
                   interpolation_matrix(j, i) = base_to_base_interpolation(
                     fe_other_system->face_system_to_base_index(j, face_no)
                       .second,
@@ -2113,14 +2130,15 @@ FESystem<dim, spacedim>::get_subface_interpolation_matrix(
           // see if we can simply advance the multiplicity by one, or if have to
           // move on to the next base element
           ++multiplicity;
-          if (multiplicity == this->element_multiplicity(base_index))
+          if (multiplicity DEAL_II_EQUALS this->element_multiplicity(
+                base_index))
             {
               multiplicity = 0;
               ++base_index;
             }
           ++multiplicity_other;
-          if (multiplicity_other ==
-              fe_other_system->element_multiplicity(base_index_other))
+          if (multiplicity_other DEAL_II_EQUALS
+                                 fe_other_system->element_multiplicity(base_index_other))
             {
               multiplicity_other = 0;
               ++base_index_other;
@@ -2128,9 +2146,10 @@ FESystem<dim, spacedim>::get_subface_interpolation_matrix(
 
           // see if we have reached the end of the present element. if so, we
           // should have reached the end of the other one as well
-          if (base_index == this->n_base_elements())
+          if (base_index DEAL_II_EQUALS this->n_base_elements())
             {
-              Assert(base_index_other == fe_other_system->n_base_elements(),
+              Assert(base_index_other DEAL_II_EQUALS
+                                      fe_other_system->n_base_elements(),
                      ExcInternalError());
               break;
             }
@@ -2193,7 +2212,7 @@ FESystem<dim, spacedim>::hp_object_dof_identities(
                                                fe_other_system->base_element(
                                                  base_index_other);
 
-          Assert(base.n_components() == base_other.n_components(),
+          Assert(base.n_components() DEAL_II_EQUALS base_other.n_components(),
                  ExcNotImplemented());
 
           // now translate the identities returned by the base elements to the
@@ -2228,14 +2247,15 @@ FESystem<dim, spacedim>::hp_object_dof_identities(
           // fe_system; see if we can simply advance the multiplicity by one,
           // or if have to move on to the next base element
           ++multiplicity;
-          if (multiplicity == this->element_multiplicity(base_index))
+          if (multiplicity DEAL_II_EQUALS this->element_multiplicity(
+                base_index))
             {
               multiplicity = 0;
               ++base_index;
             }
           ++multiplicity_other;
-          if (multiplicity_other ==
-              fe_other_system->element_multiplicity(base_index_other))
+          if (multiplicity_other DEAL_II_EQUALS
+                                 fe_other_system->element_multiplicity(base_index_other))
             {
               multiplicity_other = 0;
               ++base_index_other;
@@ -2243,9 +2263,10 @@ FESystem<dim, spacedim>::hp_object_dof_identities(
 
           // see if we have reached the end of the present element. if so, we
           // should have reached the end of the other one as well
-          if (base_index == this->n_base_elements())
+          if (base_index DEAL_II_EQUALS this->n_base_elements())
             {
-              Assert(base_index_other == fe_other_system->n_base_elements(),
+              Assert(base_index_other DEAL_II_EQUALS
+                                      fe_other_system->n_base_elements(),
                      ExcInternalError());
               break;
             }
@@ -2311,9 +2332,10 @@ FESystem<dim, spacedim>::compare_for_domination(
   if (const FESystem<dim, spacedim> *fe_sys_other =
         dynamic_cast<const FESystem<dim, spacedim> *>(&fe_other))
     {
-      Assert(this->n_components() == fe_sys_other->n_components(),
+      Assert(this->n_components() DEAL_II_EQUALS fe_sys_other->n_components(),
              ExcNotImplemented());
-      Assert(this->n_base_elements() == fe_sys_other->n_base_elements(),
+      Assert(this->n_base_elements()
+               DEAL_II_EQUALS fe_sys_other->n_base_elements(),
              ExcNotImplemented());
 
       FiniteElementDomination::Domination domination =
@@ -2322,11 +2344,12 @@ FESystem<dim, spacedim>::compare_for_domination(
       // loop over all base elements and do some sanity checks
       for (unsigned int b = 0; b < this->n_base_elements(); ++b)
         {
-          Assert(this->base_element(b).n_components() ==
-                   fe_sys_other->base_element(b).n_components(),
+          Assert(this->base_element(b)
+                   .n_components() DEAL_II_EQUALS fe_sys_other->base_element(b)
+                   .n_components(),
                  ExcNotImplemented());
-          Assert(this->element_multiplicity(b) ==
-                   fe_sys_other->element_multiplicity(b),
+          Assert(this->element_multiplicity(b)
+                   DEAL_II_EQUALS fe_sys_other->element_multiplicity(b),
                  ExcNotImplemented());
 
           // for this pair of base elements, check who dominates and combine
@@ -2374,8 +2397,9 @@ Point<dim>
 FESystem<dim, spacedim>::unit_support_point(const unsigned int index) const
 {
   AssertIndexRange(index, this->n_dofs_per_cell());
-  Assert((this->unit_support_points.size() == this->n_dofs_per_cell()) ||
-           (this->unit_support_points.size() == 0),
+  Assert((this->unit_support_points.size()
+            DEAL_II_EQUALS this->n_dofs_per_cell())
+           DEAL_II_OR(this->unit_support_points.size() DEAL_II_EQUALS 0),
          (typename FiniteElement<dim, spacedim>::ExcFEHasNoSupportPoints()));
 
   // let's see whether we have the information pre-computed
@@ -2397,19 +2421,26 @@ FESystem<dim, spacedim>::unit_face_support_point(
   const unsigned int face_no) const
 {
   AssertIndexRange(index, this->n_dofs_per_face(face_no));
-  Assert(
-    (this->unit_face_support_points[this->n_unique_faces() == 1 ? 0 : face_no]
-       .size() == this->n_dofs_per_face(face_no)) ||
-      (this->unit_face_support_points[this->n_unique_faces() == 1 ? 0 : face_no]
-         .size() == 0),
-    (typename FiniteElement<dim, spacedim>::ExcFEHasNoSupportPoints()));
+  Assert((this
+            ->unit_face_support_points[this->n_unique_faces() DEAL_II_EQUALS 1 ?
+                                         0 :
+                                         face_no]
+            .size() DEAL_II_EQUALS this->n_dofs_per_face(face_no))
+           DEAL_II_OR(
+             this
+               ->unit_face_support_points
+                 [this->n_unique_faces() DEAL_II_EQUALS 1 ? 0 : face_no]
+               .size() DEAL_II_EQUALS 0),
+         (typename FiniteElement<dim, spacedim>::ExcFEHasNoSupportPoints()));
 
   // let's see whether we have the information pre-computed
-  if (this->unit_face_support_points[this->n_unique_faces() == 1 ? 0 : face_no]
+  if (this
+        ->unit_face_support_points[this->n_unique_faces() DEAL_II_EQUALS 1 ?
+                                     0 :
+                                     face_no]
         .size() != 0)
-    return this
-      ->unit_face_support_points[this->n_unique_faces() == 1 ? 0 : face_no]
-                                [index];
+    return this->unit_face_support_points
+      [this->n_unique_faces() DEAL_II_EQUALS 1 ? 0 : face_no][index];
   else
     // no. ask the base element whether it would like to provide this
     // information
@@ -2459,7 +2490,7 @@ FESystem<dim, spacedim>::get_constant_modes() const
         {
           std::pair<std::pair<unsigned int, unsigned int>, unsigned int> ind =
             this->system_to_base_index(k);
-          if (ind.first.first == i)
+          if (ind.first.first DEAL_II_EQUALS i)
             for (unsigned int c = 0; c < base_table.first.n_rows(); ++c)
               constant_modes(comp +
                                ind.first.second * base_table.first.n_rows() + c,
@@ -2510,7 +2541,7 @@ FESystem<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
       // If the number of base degrees of freedom is zero, there is nothing
       // to do, skip the rest of the body in this case and continue with
       // the next element
-      if (n_base_dofs == 0)
+      if (n_base_dofs DEAL_II_EQUALS 0)
         {
           current_vector_component += multiplicity * n_base_components;
           continue;
@@ -2556,8 +2587,8 @@ FESystem<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
               // reverse table -- the amount of work done here is not worth
               // trying to optimizing this.
               for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
-                if (this->system_to_base_index(i).first ==
-                    std::make_pair(base, m))
+                if (this->system_to_base_index(i).first DEAL_II_EQUALS
+                                                        std::make_pair(base, m))
                   dof_values[i] =
                     base_dof_values[this->system_to_base_index(i).second];
             } /*for*/
@@ -2573,8 +2604,8 @@ FESystem<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
           // trying to optimizing this.
           for (unsigned int m = 0; m < multiplicity; ++m)
             for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
-              if (this->system_to_base_index(i).first ==
-                  std::make_pair(base, m))
+              if (this->system_to_base_index(i).first DEAL_II_EQUALS
+                                                      std::make_pair(base, m))
                 dof_values[i] = std::numeric_limits<double>::signaling_NaN();
 
           current_vector_component += multiplicity * n_base_components;

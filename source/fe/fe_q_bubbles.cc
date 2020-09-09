@@ -61,9 +61,9 @@ namespace internal
         switch (dim)
           {
             case 1:
-              if (spacedim == 1)
+              if (spacedim DEAL_II_EQUALS 1)
                 q_fine = std::make_unique<QGauss<dim>>(degree + 1);
-              else if (spacedim == 2)
+              else if (spacedim DEAL_II_EQUALS 2)
                 q_fine =
                   std::make_unique<QAnisotropic<dim>>(QGauss<1>(degree + 1),
                                                       q_dummy);
@@ -74,7 +74,7 @@ namespace internal
                                                       q_dummy);
               break;
             case 2:
-              if (spacedim == 2)
+              if (spacedim DEAL_II_EQUALS 2)
                 q_fine = std::make_unique<QGauss<dim>>(degree + 1);
               else
                 q_fine =
@@ -104,10 +104,10 @@ namespace internal
 
             for (unsigned int i = 0; i < nc; ++i)
               {
-                Assert(matrices[ref_case - 1][i].n() == dpc,
+                Assert(matrices[ref_case - 1][i].n() DEAL_II_EQUALS dpc,
                        ExcDimensionMismatch(matrices[ref_case - 1][i].n(),
                                             dpc));
-                Assert(matrices[ref_case - 1][i].m() == dpc,
+                Assert(matrices[ref_case - 1][i].m() DEAL_II_EQUALS dpc,
                        ExcDimensionMismatch(matrices[ref_case - 1][i].m(),
                                             dpc));
               }
@@ -212,7 +212,7 @@ FE_Q_Bubbles<dim, spacedim>::FE_Q_Bubbles(const unsigned int q_degree)
   AssertDimension(this->n_dofs_per_cell(), this->unit_support_points.size());
 
   this->reinit_restriction_and_prolongation_matrices();
-  if (dim == spacedim)
+  if (dim DEAL_II_EQUALS spacedim)
     {
       internal::FE_Q_Bubbles::compute_embedding_matrices(*this,
                                                          this->prolongation,
@@ -251,7 +251,7 @@ FE_Q_Bubbles<dim, spacedim>::FE_Q_Bubbles(const Quadrature<1> &points)
   AssertDimension(this->n_dofs_per_cell(), this->unit_support_points.size());
 
   this->reinit_restriction_and_prolongation_matrices();
-  if (dim == spacedim)
+  if (dim DEAL_II_EQUALS spacedim)
     {
       internal::FE_Q_Bubbles::compute_embedding_matrices(*this,
                                                          this->prolongation,
@@ -283,13 +283,14 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
   // Decode the support points in one coordinate direction.
   for (unsigned int j = 0; j < dofs_per_cell; j++)
     {
-      if ((dim > 1) ? (unit_support_points[j](1) == 0 &&
-                       ((dim > 2) ? unit_support_points[j](2) == 0 : true)) :
-                      true)
+      if ((dim > 1) ?
+            (unit_support_points[j](1) DEAL_II_EQUALS 0 DEAL_II_AND(
+              (dim > 2) ? unit_support_points[j](2) DEAL_II_EQUALS 0 : true)) :
+            true)
         {
-          if (index == 0)
+          if (index DEAL_II_EQUALS 0)
             points[index] = unit_support_points[j](0);
-          else if (index == 1)
+          else if (index DEAL_II_EQUALS 1)
             points[n_points - 1] = unit_support_points[j](0);
           else
             points[index - 1] = unit_support_points[j](0);
@@ -298,7 +299,9 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
         }
     }
   // Do not consider the discontinuous node for dimension 1
-  Assert(index == n_points || (dim == 1 && index == n_points + n_bubbles),
+  Assert(index DEAL_II_EQUALS n_points DEAL_II_OR(
+           dim DEAL_II_EQUALS 1 DEAL_II_AND index DEAL_II_EQUALS n_points +
+           n_bubbles),
          ExcMessage(
            "Could not decode support points in one coordinate direction."));
 
@@ -311,7 +314,7 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
         break;
       }
 
-  if (type == true)
+  if (type DEAL_II_EQUALS true)
     {
       if (this->degree > 3)
         namebuf << "FE_Q_Bubbles<" << Utilities::dim_string(dim, spacedim)
@@ -331,7 +334,7 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
             type = false;
             break;
           }
-      if (type == true)
+      if (type DEAL_II_EQUALS true)
         namebuf << "FE_Q_Bubbles<" << dim << ">(" << this->degree - 1 << ")";
       else
         namebuf << "FE_Q_Bubbles<" << dim << ">(QUnknownNodes(" << this->degree
@@ -358,12 +361,13 @@ FE_Q_Bubbles<dim, spacedim>::
     const std::vector<Vector<double>> &support_point_values,
     std::vector<double> &              nodal_values) const
 {
-  Assert(support_point_values.size() == this->unit_support_points.size(),
+  Assert(support_point_values.size()
+           DEAL_II_EQUALS this->unit_support_points.size(),
          ExcDimensionMismatch(support_point_values.size(),
                               this->unit_support_points.size()));
-  Assert(nodal_values.size() == this->n_dofs_per_cell(),
+  Assert(nodal_values.size() DEAL_II_EQUALS this->n_dofs_per_cell(),
          ExcDimensionMismatch(nodal_values.size(), this->n_dofs_per_cell()));
-  Assert(support_point_values[0].size() == this->n_components(),
+  Assert(support_point_values[0].size() DEAL_II_EQUALS this->n_components(),
          ExcDimensionMismatch(support_point_values[0].size(),
                               this->n_components()));
 
@@ -393,19 +397,20 @@ FE_Q_Bubbles<dim, spacedim>::get_interpolation_matrix(
   using FEQBUBBLES = FE_Q_Bubbles<dim, spacedim>;
 
   AssertThrow(
-    (x_source_fe.get_name().find("FE_Q_Bubbles<") == 0) ||
-      (dynamic_cast<const FEQBUBBLES *>(&x_source_fe) != nullptr),
+    (x_source_fe.get_name().find("FE_Q_Bubbles<") DEAL_II_EQUALS 0)DEAL_II_OR(
+      dynamic_cast<const FEQBUBBLES *>(&x_source_fe) != nullptr),
     (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
-  Assert(interpolation_matrix.m() == this->n_dofs_per_cell(),
+  Assert(interpolation_matrix.m() DEAL_II_EQUALS this->n_dofs_per_cell(),
          ExcDimensionMismatch(interpolation_matrix.m(),
                               this->n_dofs_per_cell()));
-  Assert(interpolation_matrix.n() == x_source_fe.n_dofs_per_cell(),
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS x_source_fe.n_dofs_per_cell(),
          ExcDimensionMismatch(interpolation_matrix.m(),
                               x_source_fe.n_dofs_per_cell()));
 
   // Provide a short cut in case we are just inquiring the identity
   auto casted_fe = dynamic_cast<const FEQBUBBLES *>(&x_source_fe);
-  if (casted_fe != nullptr && casted_fe->degree == this->degree)
+  if (casted_fe !=
+      nullptr DEAL_II_AND casted_fe->degree DEAL_II_EQUALS this->degree)
     for (unsigned int i = 0; i < interpolation_matrix.m(); ++i)
       interpolation_matrix.set(i, i, 1.);
   // else we need to do more...
@@ -528,7 +533,7 @@ FE_Q_Bubbles<dim, spacedim>::compare_for_domination(
     {
       if (this->degree < fe_bubbles_other->degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_bubbles_other->degree)
+      else if (this->degree DEAL_II_EQUALS fe_bubbles_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;

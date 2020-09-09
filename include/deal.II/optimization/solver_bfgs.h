@@ -140,7 +140,7 @@ public:
    *        const unsigned int i  = s.size() - 1;
    *        const auto         yy = y[i] * y[i];
    *        const auto         sy = s[i] * y[i];
-   *        Assert(yy > 0 && sy > 0, ExcInternalError());
+   *        Assert(yy > 0 DEAL_II_AND  sy > 0, ExcInternalError());
    *        g *= sy / yy;
    *      }
    *  };
@@ -265,7 +265,7 @@ SolverBFGS<VectorType>::solve(
           // https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.line_search.html#scipy.optimize.line_search
           // and Eq. 2.6.8 in Fletcher 2013, Practical methods of optimization
           Number df = f_prev - f;
-          Assert(first_step || df >= 0.,
+          Assert(first_step DEAL_II_OR df >= 0.,
                  ExcMessage("Function value is not decreasing"));
           df = std::max(df, 100. * std::numeric_limits<Number>::epsilon());
           // guess a reasonable first step:
@@ -330,7 +330,7 @@ SolverBFGS<VectorType>::solve(
   if (conv != SolverControl::iterate)
     return;
 
-  while (conv == SolverControl::iterate)
+  while (conv DEAL_II_EQUALS SolverControl::iterate)
     {
       if (additional_data.debug_output)
         deallog << "Iteration " << k << " history " << m << std::endl
@@ -381,22 +381,22 @@ SolverBFGS<VectorType>::solve(
       if (additional_data.debug_output)
         deallog << "Curvature " << curvature << std::endl;
 
-      if (curvature > 0. && additional_data.max_history_size > 0)
+      if (curvature > 0. DEAL_II_AND additional_data.max_history_size > 0)
         {
           s.add(s_k);
           y.add(y_k);
           rho.add(1. / curvature);
           m = s.size();
 
-          Assert(y.size() == m, ExcInternalError());
-          Assert(rho.size() == m, ExcInternalError());
+          Assert(y.size() DEAL_II_EQUALS m, ExcInternalError());
+          Assert(rho.size() DEAL_II_EQUALS m, ExcInternalError());
         }
 
       Assert(m <= additional_data.max_history_size, ExcInternalError());
     }
 
   // In the case of failure: throw exception.
-  AssertThrow(conv == SolverControl::success,
+  AssertThrow(conv DEAL_II_EQUALS SolverControl::success,
               SolverControl::NoConvergence(k, g.l2_norm()));
 }
 

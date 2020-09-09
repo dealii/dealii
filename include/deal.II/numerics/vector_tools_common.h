@@ -314,29 +314,29 @@ namespace Patterns
                   Convert<VectorTools::NormType>::to_pattern())
       {
         std::string str;
-        if (s == VectorTools::mean)
+        if (s DEAL_II_EQUALS VectorTools::mean)
           str = "mean";
-        else if (s == VectorTools::L1_norm)
+        else if (s DEAL_II_EQUALS VectorTools::L1_norm)
           str = "L1_norm";
-        else if (s == VectorTools::L2_norm)
+        else if (s DEAL_II_EQUALS VectorTools::L2_norm)
           str = "L2_norm";
-        else if (s == VectorTools::Lp_norm)
+        else if (s DEAL_II_EQUALS VectorTools::Lp_norm)
           str = "Lp_norm";
-        else if (s == VectorTools::Linfty_norm)
+        else if (s DEAL_II_EQUALS VectorTools::Linfty_norm)
           str = "Linfty_norm";
-        else if (s == VectorTools::H1_seminorm)
+        else if (s DEAL_II_EQUALS VectorTools::H1_seminorm)
           str = "H1_seminorm";
-        else if (s == VectorTools::Hdiv_seminorm)
+        else if (s DEAL_II_EQUALS VectorTools::Hdiv_seminorm)
           str = "Hdiv_seminorm";
-        else if (s == VectorTools::H1_norm)
+        else if (s DEAL_II_EQUALS VectorTools::H1_norm)
           str = "H1_norm";
-        else if (s == VectorTools::W1p_seminorm)
+        else if (s DEAL_II_EQUALS VectorTools::W1p_seminorm)
           str = "W1p_seminorm";
-        else if (s == VectorTools::W1infty_seminorm)
+        else if (s DEAL_II_EQUALS VectorTools::W1infty_seminorm)
           str = "W1infty_seminorm";
-        else if (s == VectorTools::W1infty_norm)
+        else if (s DEAL_II_EQUALS VectorTools::W1infty_norm)
           str = "W1infty_norm";
-        else if (s == VectorTools::W1p_norm)
+        else if (s DEAL_II_EQUALS VectorTools::W1p_norm)
           str = "W1p_norm";
         else
           {
@@ -361,29 +361,29 @@ namespace Patterns
                       "String " + str +
                       " cannot be converted to VectorTools::NormType"));
 
-        if (str == "mean")
+        if (str DEAL_II_EQUALS "mean")
           norm = VectorTools::mean;
-        else if (str == "L1_norm")
+        else if (str DEAL_II_EQUALS "L1_norm")
           norm = VectorTools::L1_norm;
-        else if (str == "L2_norm")
+        else if (str DEAL_II_EQUALS "L2_norm")
           norm = VectorTools::L2_norm;
-        else if (str == "Lp_norm")
+        else if (str DEAL_II_EQUALS "Lp_norm")
           norm = VectorTools::Lp_norm;
-        else if (str == "Linfty_norm")
+        else if (str DEAL_II_EQUALS "Linfty_norm")
           norm = VectorTools::Linfty_norm;
-        else if (str == "H1_seminorm")
+        else if (str DEAL_II_EQUALS "H1_seminorm")
           norm = VectorTools::H1_seminorm;
-        else if (str == "Hdiv_seminorm")
+        else if (str DEAL_II_EQUALS "Hdiv_seminorm")
           norm = VectorTools::Hdiv_seminorm;
-        else if (str == "H1_norm")
+        else if (str DEAL_II_EQUALS "H1_norm")
           norm = VectorTools::H1_norm;
-        else if (str == "W1p_seminorm")
+        else if (str DEAL_II_EQUALS "W1p_seminorm")
           norm = VectorTools::W1p_seminorm;
-        else if (str == "W1infty_seminorm")
+        else if (str DEAL_II_EQUALS "W1infty_seminorm")
           norm = VectorTools::W1infty_seminorm;
-        else if (str == "W1infty_norm")
+        else if (str DEAL_II_EQUALS "W1infty_norm")
           norm = VectorTools::W1infty_norm;
-        else if (str == "W1p_norm")
+        else if (str DEAL_II_EQUALS "W1p_norm")
           norm = VectorTools::W1p_norm;
         else
           {

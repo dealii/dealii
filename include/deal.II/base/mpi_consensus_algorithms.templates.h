@@ -213,8 +213,9 @@ namespace Utilities
             const auto other_rank = status.MPI_SOURCE;
 
 #  ifdef DEBUG
-            Assert(requesting_processes.find(other_rank) ==
-                     requesting_processes.end(),
+            Assert(requesting_processes
+                     .find(other_rank)
+                       DEAL_II_EQUALS requesting_processes.end(),
                    ExcMessage("Process is requesting a second time!"));
             requesting_processes.insert(other_rank);
 #  endif
@@ -226,7 +227,8 @@ namespace Utilities
             AssertThrowMPI(ierr);
 
             // allocate memory for incoming message
-            Assert(number_amount % sizeof(T1) == 0, ExcInternalError());
+            Assert(number_amount % sizeof(T1) DEAL_II_EQUALS 0,
+                   ExcInternalError());
             buffer_recv.resize(number_amount / sizeof(T1));
             ierr = MPI_Recv(buffer_recv.data(),
                             number_amount,
@@ -424,7 +426,7 @@ namespace Utilities
         AssertThrowMPI(ierr);
 
         // allocate memory for incoming message
-        Assert(number_amount % sizeof(T1) == 0, ExcInternalError());
+        Assert(number_amount % sizeof(T1) DEAL_II_EQUALS 0, ExcInternalError());
         buffer_recv.resize(number_amount / sizeof(T1));
         ierr = MPI_Recv(buffer_recv.data(),
                         number_amount,

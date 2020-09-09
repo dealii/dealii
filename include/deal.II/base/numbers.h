@@ -102,13 +102,14 @@ namespace internal
      * Maximal vector length of VectorizedArray for float.
      */
     constexpr static unsigned int max_width =
-#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__ALTIVEC__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 DEAL_II_AND defined(__ALTIVEC__)
       4;
-#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512 && defined(__AVX512F__)
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= \
+  512 DEAL_II_AND defined(__AVX512F__)
       16;
-#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && defined(__AVX__)
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 DEAL_II_AND defined(__AVX__)
       8;
-#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__SSE2__)
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 DEAL_II_AND defined(__SSE2__)
       4;
 #else
       1;
@@ -448,15 +449,15 @@ namespace numbers
      */
     template <typename Dummy = number>
     static constexpr DEAL_II_CUDA_HOST_DEV
-      typename std::enable_if<std::is_same<Dummy, number>::value &&
-                                is_cuda_compatible<Dummy>::value,
+      typename std::enable_if<std::is_same<Dummy, number>::value DEAL_II_AND
+                                                                 is_cuda_compatible<Dummy>::value,
                               real_type>::type
       abs_square(const number &x);
 
     template <typename Dummy = number>
     static constexpr
-      typename std::enable_if<std::is_same<Dummy, number>::value &&
-                                !is_cuda_compatible<Dummy>::value,
+      typename std::enable_if<std::is_same<Dummy, number>::value
+                                DEAL_II_AND !is_cuda_compatible<Dummy>::value,
                               real_type>::type
       abs_square(const number &x);
 
@@ -536,7 +537,7 @@ namespace numbers
   {
     // Check complex numbers for infinity
     // by testing real and imaginary part
-    return (is_finite(x.real()) && is_finite(x.imag()));
+    return (is_finite(x.real()) DEAL_II_AND is_finite(x.imag()));
   }
 
 
@@ -546,7 +547,7 @@ namespace numbers
   {
     // Check complex numbers for infinity
     // by testing real and imaginary part
-    return (is_finite(x.real()) && is_finite(x.imag()));
+    return (is_finite(x.real()) DEAL_II_AND is_finite(x.imag()));
   }
 
 
@@ -555,7 +556,7 @@ namespace numbers
   is_finite(const std::complex<long double> &x)
   {
     // Same for std::complex<long double>
-    return (is_finite(x.real()) && is_finite(x.imag()));
+    return (is_finite(x.real()) DEAL_II_AND is_finite(x.imag()));
   }
 
 
@@ -571,8 +572,8 @@ namespace numbers
   template <typename number>
   template <typename Dummy>
   constexpr DEAL_II_CUDA_HOST_DEV
-    typename std::enable_if<std::is_same<Dummy, number>::value &&
-                              is_cuda_compatible<Dummy>::value,
+    typename std::enable_if<std::is_same<Dummy, number>::value DEAL_II_AND
+                                                               is_cuda_compatible<Dummy>::value,
                             typename NumberTraits<number>::real_type>::type
     NumberTraits<number>::abs_square(const number &x)
   {
@@ -584,8 +585,8 @@ namespace numbers
   template <typename number>
   template <typename Dummy>
   constexpr
-    typename std::enable_if<std::is_same<Dummy, number>::value &&
-                              !is_cuda_compatible<Dummy>::value,
+    typename std::enable_if<std::is_same<Dummy, number>::value
+                              DEAL_II_AND !is_cuda_compatible<Dummy>::value,
                             typename NumberTraits<number>::real_type>::type
     NumberTraits<number>::abs_square(const number &x)
   {
@@ -708,8 +709,8 @@ namespace internal
                                                                  value(const F &f,
                                                                        typename std::enable_if<
             !std::is_same<typename std::decay<T>::type,
-                          typename std::decay<F>::type>::value &&
-            std::is_constructible<T, F>::value>::type * = nullptr)
+                          typename std::decay<F>::type>::value DEAL_II_AND
+                                                               std::is_constructible<T, F>::value>::type * = nullptr)
     {
       return T(f);
     }
@@ -720,9 +721,9 @@ namespace internal
                                            value(const F &f,
                                                  typename std::enable_if<
             !std::is_same<typename std::decay<T>::type,
-                          typename std::decay<F>::type>::value &&
-            !std::is_constructible<T, F>::value &&
-            is_explicitly_convertible<const F, T>::value>::type * = nullptr)
+                          typename std::decay<F>::type>::value
+              DEAL_II_AND !std::is_constructible<T, F>::value DEAL_II_AND
+                                                              is_explicitly_convertible<const F, T>::value>::type * = nullptr)
     {
       return static_cast<T>(f);
     }
@@ -736,10 +737,11 @@ namespace internal
     value(const F &f,
           typename std::enable_if<
             !std::is_same<typename std::decay<T>::type,
-                          typename std::decay<F>::type>::value &&
-            !std::is_constructible<T, F>::value &&
-            !is_explicitly_convertible<const F, T>::value &&
-            Differentiation::AD::is_ad_number<F>::value>::type * = nullptr)
+                          typename std::decay<F>::type>::value
+                  DEAL_II_AND !std::is_constructible<T, F>::value
+                  DEAL_II_AND !is_explicitly_convertible<const F, T>::value
+                  DEAL_II_AND Differentiation::AD::is_ad_number<F>::value>::type
+            * = nullptr)
     {
       return Differentiation::AD::internal::NumberType<T>::value(f);
     }
@@ -914,7 +916,8 @@ namespace numbers
   constexpr bool
   values_are_equal(const Number1 &value_1, const Number2 &value_2)
   {
-    return (value_1 == internal::NumberType<Number1>::value(value_2));
+    return (
+      value_1 DEAL_II_EQUALS internal::NumberType<Number1>::value(value_2));
   }
 
 
@@ -946,8 +949,8 @@ namespace numbers
   inline bool
   value_is_less_than_or_equal_to(const Number1 &value_1, const Number2 &value_2)
   {
-    return (value_is_less_than(value_1, value_2) ||
-            values_are_equal(value_1, value_2));
+    return (value_is_less_than(value_1, value_2)
+              DEAL_II_OR values_are_equal(value_1, value_2));
   }
 
 

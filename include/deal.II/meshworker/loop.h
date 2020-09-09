@@ -203,20 +203,20 @@ namespace MeshWorker
     const LoopControl &                                      loop_control)
   {
     const bool ignore_subdomain =
-      (cell->get_triangulation().locally_owned_subdomain() ==
-       numbers::invalid_subdomain_id);
+      (cell->get_triangulation().locally_owned_subdomain()
+         DEAL_II_EQUALS numbers::invalid_subdomain_id);
 
     types::subdomain_id csid = (cell->is_level_cell()) ?
                                  cell->level_subdomain_id() :
                                  cell->subdomain_id();
 
-    const bool own_cell =
-      ignore_subdomain ||
-      (csid == cell->get_triangulation().locally_owned_subdomain());
+    const bool own_cell = ignore_subdomain DEAL_II_OR(
+      csid DEAL_II_EQUALS cell->get_triangulation().locally_owned_subdomain());
 
     dof_info.reset();
 
-    if ((!ignore_subdomain) && (csid == numbers::artificial_subdomain_id))
+    if ((!ignore_subdomain)DEAL_II_AND(
+          csid DEAL_II_EQUALS numbers::artificial_subdomain_id))
       return;
 
     dof_info.cell.reinit(cell);
@@ -231,9 +231,9 @@ namespace MeshWorker
     // Execute this, if cells
     // have to be dealt with
     // before faces
-    if (integrate_cell && loop_control.cells_first &&
-        ((loop_control.own_cells && own_cell) ||
-         (loop_control.ghost_cells && !own_cell)))
+    if (integrate_cell DEAL_II_AND loop_control.cells_first DEAL_II_AND(
+          (loop_control.own_cells DEAL_II_AND own_cell)DEAL_II_OR(
+            loop_control.ghost_cells DEAL_II_AND !own_cell)))
       cell_worker(dof_info.cell, info.cell);
 
     // Call the callback function in
@@ -242,16 +242,16 @@ namespace MeshWorker
     // face action.
     info.post_cell(dof_info);
 
-    if (integrate_interior_face || integrate_boundary)
+    if (integrate_interior_face DEAL_II_OR integrate_boundary)
       for (const unsigned int face_no : cell->face_indices())
         {
           typename ITERATOR::AccessorType::Container::face_iterator face =
             cell->face(face_no);
-          if (cell->at_boundary(face_no) &&
-              !cell->has_periodic_neighbor(face_no))
+          if (cell->at_boundary(face_no)
+                DEAL_II_AND !cell->has_periodic_neighbor(face_no))
             {
               // only integrate boundary faces of own cells
-              if (integrate_boundary && own_cell)
+              if (integrate_boundary DEAL_II_AND own_cell)
                 {
                   dof_info.interior_face_available[face_no] = true;
                   dof_info.interior[face_no].reinit(cell, face, face_no);
@@ -272,23 +272,23 @@ namespace MeshWorker
               else if (neighbor->is_active())
                 neighbid = neighbor->subdomain_id();
 
-              const bool own_neighbor =
-                ignore_subdomain ||
-                (neighbid ==
-                 cell->get_triangulation().locally_owned_subdomain());
+              const bool own_neighbor = ignore_subdomain DEAL_II_OR(
+                neighbid DEAL_II_EQUALS cell->get_triangulation()
+                  .locally_owned_subdomain());
 
               // skip all faces between two ghost cells
-              if (!own_cell && !own_neighbor)
+              if (!own_cell DEAL_II_AND !own_neighbor)
                 continue;
 
               // skip if the user doesn't want faces between own cells
-              if (own_cell && own_neighbor &&
-                  loop_control.own_faces == LoopControl::never)
+              if (own_cell DEAL_II_AND own_neighbor DEAL_II_AND
+                    loop_control.own_faces DEAL_II_EQUALS LoopControl::never)
                 continue;
 
               // skip face to ghost
-              if (own_cell != own_neighbor &&
-                  loop_control.faces_to_ghost == LoopControl::never)
+              if (own_cell !=
+                  own_neighbor DEAL_II_AND loop_control
+                    .faces_to_ghost DEAL_II_EQUALS LoopControl::never)
                 continue;
 
               // Deal with refinement edges from the refined side. Assuming
@@ -297,17 +297,18 @@ namespace MeshWorker
               const bool periodic_neighbor =
                 cell->has_periodic_neighbor(face_no);
 
-              if ((!periodic_neighbor && cell->neighbor_is_coarser(face_no)) ||
-                  (periodic_neighbor &&
-                   cell->periodic_neighbor_is_coarser(face_no)))
+              if ((!periodic_neighbor DEAL_II_AND cell->neighbor_is_coarser(
+                    face_no))DEAL_II_OR(periodic_neighbor DEAL_II_AND
+                                                          cell->periodic_neighbor_is_coarser(
+                                            face_no)))
                 {
                   Assert(cell->is_active(), ExcInternalError());
                   Assert(neighbor->is_active(), ExcInternalError());
 
                   // skip if only one processor needs to assemble the face
                   // to a ghost cell and the fine cell is not ours.
-                  if (!own_cell &&
-                      loop_control.faces_to_ghost == LoopControl::one)
+                  if (!own_cell DEAL_II_AND loop_control
+                         .faces_to_ghost DEAL_II_EQUALS LoopControl::one)
                     continue;
 
                   const std::pair<unsigned int, unsigned int> neighbor_face_no =
@@ -338,8 +339,8 @@ namespace MeshWorker
                 {
                   // If iterator is active and neighbor is refined, skip
                   // internal face.
-                  if (dealii::internal::is_active_iterator(cell) &&
-                      neighbor->has_children())
+                  if (dealii::internal::is_active_iterator(cell)
+                        DEAL_II_AND neighbor->has_children())
                     {
                       Assert(
                         loop_control.own_faces != LoopControl::both,
@@ -350,15 +351,15 @@ namespace MeshWorker
                     }
 
                   // Now neighbor is on same level, double-check this:
-                  Assert(cell->level() == neighbor->level(),
+                  Assert(cell->level() DEAL_II_EQUALS neighbor->level(),
                          ExcInternalError());
 
                   // If we own both cells only do faces from one side (unless
                   // LoopControl says otherwise). Here, we rely on cell
                   // comparison that will look at cell->index().
-                  if (own_cell && own_neighbor &&
-                      loop_control.own_faces == LoopControl::one &&
-                      (neighbor < cell))
+                  if (own_cell DEAL_II_AND own_neighbor DEAL_II_AND loop_control
+                        .own_faces DEAL_II_EQUALS LoopControl::one DEAL_II_AND(
+                          neighbor < cell))
                     continue;
 
                   // independent of loop_control.faces_to_ghost,
@@ -370,17 +371,17 @@ namespace MeshWorker
                   // now only one processor assembles faces_to_ghost. We let the
                   // processor with the smaller (level-)subdomain id assemble
                   // the face.
-                  if (own_cell && !own_neighbor &&
-                      loop_control.faces_to_ghost == LoopControl::one &&
-                      (neighbid < csid))
+                  if (own_cell DEAL_II_AND !own_neighbor DEAL_II_AND
+                        loop_control.faces_to_ghost DEAL_II_EQUALS
+                          LoopControl::one DEAL_II_AND(neighbid < csid))
                     continue;
 
                   const unsigned int neighbor_face_no =
                     periodic_neighbor ?
                       cell->periodic_neighbor_face_no(face_no) :
                       cell->neighbor_face_no(face_no);
-                  Assert(periodic_neighbor ||
-                           neighbor->face(neighbor_face_no) == face,
+                  Assert(periodic_neighbor DEAL_II_OR       neighbor->face(
+                           neighbor_face_no) DEAL_II_EQUALS face,
                          ExcInternalError());
                   // Regular interior face
                   dof_info.interior_face_available[face_no] = true;
@@ -408,9 +409,9 @@ namespace MeshWorker
 
     // Execute this, if faces
     // have to be handled first
-    if (integrate_cell && !loop_control.cells_first &&
-        ((loop_control.own_cells && own_cell) ||
-         (loop_control.ghost_cells && !own_cell)))
+    if (integrate_cell DEAL_II_AND !loop_control.cells_first DEAL_II_AND(
+          (loop_control.own_cells DEAL_II_AND own_cell)DEAL_II_OR(
+            loop_control.ghost_cells DEAL_II_AND !own_cell)))
       cell_worker(dof_info.cell, info.cell);
   }
 

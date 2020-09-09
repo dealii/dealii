@@ -219,8 +219,9 @@ namespace Functions
   CutOffFunctionLinfty<dim>::value(const Point<dim> & p,
                                    const unsigned int component) const
   {
-    if (this->selected == CutOffFunctionBase<dim>::no_component ||
-        component == this->selected)
+    if (this
+          ->selected DEAL_II_EQUALS CutOffFunctionBase<dim>::no_component
+            DEAL_II_OR component DEAL_II_EQUALS this->selected)
       return ((this->center.distance(p) < this->radius) ? this->rescaling : 0.);
     return 0.;
   }
@@ -232,13 +233,14 @@ namespace Functions
                                         std::vector<double> &          values,
                                         const unsigned int component) const
   {
-    Assert(values.size() == points.size(),
+    Assert(values.size() DEAL_II_EQUALS points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
     AssertIndexRange(component, this->n_components);
 
 
-    if (this->selected == CutOffFunctionBase<dim>::no_component ||
-        component == this->selected)
+    if (this
+          ->selected DEAL_II_EQUALS CutOffFunctionBase<dim>::no_component
+            DEAL_II_OR component DEAL_II_EQUALS this->selected)
       for (unsigned int k = 0; k < values.size(); ++k)
         values[k] = (this->center.distance(points[k]) < this->radius) ?
                       this->rescaling :
@@ -254,7 +256,7 @@ namespace Functions
     const std::vector<Point<dim>> &points,
     std::vector<Vector<double>> &  values) const
   {
-    Assert(values.size() == points.size(),
+    Assert(values.size() DEAL_II_EQUALS points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int k = 0; k < values.size(); ++k)
@@ -262,7 +264,7 @@ namespace Functions
         const double val = (this->center.distance(points[k]) < this->radius) ?
                              this->rescaling :
                              0.;
-        if (this->selected == CutOffFunctionBase<dim>::no_component)
+        if (this->selected DEAL_II_EQUALS CutOffFunctionBase<dim>::no_component)
           values[k] = val;
         else
           {
@@ -292,8 +294,9 @@ namespace Functions
   CutOffFunctionW1<dim>::value(const Point<dim> & p,
                                const unsigned int component) const
   {
-    if (this->selected == CutOffFunctionBase<dim>::no_component ||
-        component == this->selected)
+    if (this
+          ->selected DEAL_II_EQUALS CutOffFunctionBase<dim>::no_component
+            DEAL_II_OR component DEAL_II_EQUALS this->selected)
       {
         const double d = this->center.distance(p);
         return ((d < this->radius) ?
@@ -310,11 +313,12 @@ namespace Functions
                                     std::vector<double> &          values,
                                     const unsigned int component) const
   {
-    Assert(values.size() == points.size(),
+    Assert(values.size() DEAL_II_EQUALS points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
 
-    if (this->selected == CutOffFunctionBase<dim>::no_component ||
-        component == this->selected)
+    if (this
+          ->selected DEAL_II_EQUALS CutOffFunctionBase<dim>::no_component
+            DEAL_II_OR component DEAL_II_EQUALS this->selected)
       for (unsigned int i = 0; i < values.size(); ++i)
         {
           const double d = this->center.distance(points[i]);
@@ -334,7 +338,7 @@ namespace Functions
     const std::vector<Point<dim>> &points,
     std::vector<Vector<double>> &  values) const
   {
-    Assert(values.size() == points.size(),
+    Assert(values.size() DEAL_II_EQUALS points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int k = 0; k < values.size(); ++k)
@@ -344,7 +348,7 @@ namespace Functions
           (d < this->radius) ?
             (this->radius - d) / this->radius * this->rescaling :
             0.;
-        if (this->selected == CutOffFunctionBase<dim>::no_component)
+        if (this->selected DEAL_II_EQUALS CutOffFunctionBase<dim>::no_component)
           values[k] = val;
         else
           {
@@ -376,8 +380,9 @@ namespace Functions
   CutOffFunctionCinfty<dim>::value(const Point<dim> & p,
                                    const unsigned int component) const
   {
-    if (this->selected == CutOffFunctionBase<dim>::no_component ||
-        component == this->selected)
+    if (this
+          ->selected DEAL_II_EQUALS CutOffFunctionBase<dim>::no_component
+            DEAL_II_OR component DEAL_II_EQUALS this->selected)
       {
         const double d = this->center.distance(p);
         const double r = this->radius;
@@ -396,13 +401,14 @@ namespace Functions
                                         std::vector<double> &          values,
                                         const unsigned int component) const
   {
-    Assert(values.size() == points.size(),
+    Assert(values.size() DEAL_II_EQUALS points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
 
     const double r = this->radius;
 
-    if (this->selected == CutOffFunctionBase<dim>::no_component ||
-        component == this->selected)
+    if (this
+          ->selected DEAL_II_EQUALS CutOffFunctionBase<dim>::no_component
+            DEAL_II_OR component DEAL_II_EQUALS this->selected)
       for (unsigned int i = 0; i < values.size(); ++i)
         {
           const double d = this->center.distance(points[i]);
@@ -428,7 +434,7 @@ namespace Functions
     const std::vector<Point<dim>> &points,
     std::vector<Vector<double>> &  values) const
   {
-    Assert(values.size() == points.size(),
+    Assert(values.size() DEAL_II_EQUALS points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int k = 0; k < values.size(); ++k)
@@ -443,7 +449,7 @@ namespace Functions
               val = numbers::E * std::exp(e) * this->rescaling;
           }
 
-        if (this->selected == CutOffFunctionBase<dim>::no_component)
+        if (this->selected DEAL_II_EQUALS CutOffFunctionBase<dim>::no_component)
           values[k] = val;
         else
           {
@@ -494,8 +500,9 @@ namespace Functions
   CutOffFunctionC1<dim>::value(const Point<dim> & p,
                                const unsigned int component) const
   {
-    if (this->selected == CutOffFunctionBase<dim>::no_component ||
-        component == this->selected)
+    if (this
+          ->selected DEAL_II_EQUALS CutOffFunctionBase<dim>::no_component
+            DEAL_II_OR component DEAL_II_EQUALS this->selected)
       {
         const double d = this->center.distance(p);
         const double r = this->radius;
@@ -513,13 +520,14 @@ namespace Functions
                                     std::vector<double> &          values,
                                     const unsigned int component) const
   {
-    Assert(values.size() == points.size(),
+    Assert(values.size() DEAL_II_EQUALS points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
 
     const double r = this->radius;
 
-    if (this->selected == CutOffFunctionBase<dim>::no_component ||
-        component == this->selected)
+    if (this
+          ->selected DEAL_II_EQUALS CutOffFunctionBase<dim>::no_component
+            DEAL_II_OR component DEAL_II_EQUALS this->selected)
       for (unsigned int i = 0; i < values.size(); ++i)
         {
           const double d = this->center.distance(points[i]);
@@ -544,7 +552,7 @@ namespace Functions
     const std::vector<Point<dim>> &points,
     std::vector<Vector<double>> &  values) const
   {
-    Assert(values.size() == points.size(),
+    Assert(values.size() DEAL_II_EQUALS points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int k = 0; k < values.size(); ++k)
@@ -557,7 +565,7 @@ namespace Functions
             val = .5 * (std::cos(numbers::PI * d / r) + 1) * this->rescaling;
           }
 
-        if (this->selected == CutOffFunctionBase<dim>::no_component)
+        if (this->selected DEAL_II_EQUALS CutOffFunctionBase<dim>::no_component)
           values[k] = val;
         else
           {

@@ -2269,7 +2269,7 @@ template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
 MatrixFree<dim, Number, VectorizedArrayType>::n_inner_face_batches() const
 {
-  if (task_info.face_partition_data.size() == 0)
+  if (task_info.face_partition_data.size() DEAL_II_EQUALS 0)
     return 0;
   return task_info.face_partition_data.back();
 }
@@ -2280,7 +2280,7 @@ template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
 MatrixFree<dim, Number, VectorizedArrayType>::n_boundary_face_batches() const
 {
-  if (task_info.face_partition_data.size() == 0)
+  if (task_info.face_partition_data.size() DEAL_II_EQUALS 0)
     return 0;
   return task_info.boundary_partition_data.back() -
          task_info.face_partition_data.back();
@@ -2292,7 +2292,7 @@ template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
 MatrixFree<dim, Number, VectorizedArrayType>::n_ghost_inner_face_batches() const
 {
-  if (task_info.face_partition_data.size() == 0)
+  if (task_info.face_partition_data.size() DEAL_II_EQUALS 0)
     return 0;
   return face_info.faces.size() - task_info.boundary_partition_data.back();
 }
@@ -2304,8 +2304,9 @@ inline types::boundary_id
 MatrixFree<dim, Number, VectorizedArrayType>::get_boundary_id(
   const unsigned int macro_face) const
 {
-  Assert(macro_face >= task_info.boundary_partition_data[0] &&
-           macro_face < task_info.boundary_partition_data.back(),
+  Assert(macro_face >=
+           task_info.boundary_partition_data[0] DEAL_II_AND macro_face <
+           task_info.boundary_partition_data.back(),
          ExcIndexRange(macro_face,
                        task_info.boundary_partition_data[0],
                        task_info.boundary_partition_data.back()));
@@ -2402,7 +2403,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::create_cell_subrange_hp(
         dof_info[dof_handler_component].fe_index_conversion.size(), 1);
       AssertDimension(
         dof_info[dof_handler_component].fe_index_conversion[0].size(), 1);
-      if (dof_info[dof_handler_component].fe_index_conversion[0][0] == degree)
+      if (dof_info[dof_handler_component]
+            .fe_index_conversion[0][0] DEAL_II_EQUALS degree)
         return range;
       else
         return {range.second, range.second};
@@ -2426,9 +2428,11 @@ MatrixFree<dim, Number, VectorizedArrayType>::at_irregular_cell(
   const unsigned int macro_cell) const
 {
   AssertIndexRange(macro_cell, task_info.cell_partition_data.back());
-  return VectorizedArrayType::size() > 1 &&
-         cell_level_index[(macro_cell + 1) * VectorizedArrayType::size() - 1] ==
-           cell_level_index[(macro_cell + 1) * VectorizedArrayType::size() - 2];
+  return VectorizedArrayType::size() >
+         1 DEAL_II_AND cell_level_index[(macro_cell + 1) *
+                                          VectorizedArrayType::size() -
+                                        1] DEAL_II_EQUALS
+                       cell_level_index[(macro_cell + 1) * VectorizedArrayType::size() - 2];
 }
 
 
@@ -2450,11 +2454,12 @@ MatrixFree<dim, Number, VectorizedArrayType>::n_active_entries_per_cell_batch(
 {
   AssertIndexRange(cell_batch_number, task_info.cell_partition_data.back());
   unsigned int n_lanes = VectorizedArrayType::size();
-  while (n_lanes > 1 &&
-         cell_level_index[cell_batch_number * VectorizedArrayType::size() +
-                          n_lanes - 1] ==
-           cell_level_index[cell_batch_number * VectorizedArrayType::size() +
-                            n_lanes - 2])
+  while (n_lanes >
+         1 DEAL_II_AND
+             cell_level_index[cell_batch_number * VectorizedArrayType::size() +
+                            n_lanes - 1] DEAL_II_EQUALS
+             cell_level_index[cell_batch_number * VectorizedArrayType::size() +
+                              n_lanes - 2])
     --n_lanes;
   AssertIndexRange(n_lanes - 1, VectorizedArrayType::size());
   return n_lanes;
@@ -2469,9 +2474,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::n_active_entries_per_face_batch(
 {
   AssertIndexRange(face_batch_number, face_info.faces.size());
   unsigned int n_lanes = VectorizedArrayType::size();
-  while (n_lanes > 1 &&
-         face_info.faces[face_batch_number].cells_interior[n_lanes - 1] ==
-           numbers::invalid_unsigned_int)
+  while (
+    n_lanes >
+    1 DEAL_II_AND face_info.faces[face_batch_number]
+      .cells_interior[n_lanes - 1] DEAL_II_EQUALS numbers::invalid_unsigned_int)
     --n_lanes;
   AssertIndexRange(n_lanes - 1, VectorizedArrayType::size());
   return n_lanes;
@@ -2645,9 +2651,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_category(
     return std::make_pair(0U, 0U);
 
   std::pair<unsigned int, unsigned int> result;
-  for (unsigned int v = 0; v < VectorizedArrayType::size() &&
-                           face_info.faces[macro_face].cells_interior[v] !=
-                             numbers::invalid_unsigned_int;
+  for (unsigned int                                v = 0;
+       v < VectorizedArrayType::size() DEAL_II_AND face_info.faces[macro_face]
+             .cells_interior[v] !=
+       numbers::invalid_unsigned_int;
        ++v)
     result.first = std::max(
       result.first,
@@ -2655,9 +2662,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_category(
         .cell_active_fe_index[face_info.faces[macro_face].cells_interior[v]]);
   if (face_info.faces[macro_face].cells_exterior[0] !=
       numbers::invalid_unsigned_int)
-    for (unsigned int v = 0; v < VectorizedArrayType::size() &&
-                             face_info.faces[macro_face].cells_exterior[v] !=
-                               numbers::invalid_unsigned_int;
+    for (unsigned int                                v = 0;
+         v < VectorizedArrayType::size() DEAL_II_AND face_info.faces[macro_face]
+               .cells_exterior[v] !=
+         numbers::invalid_unsigned_int;
          ++v)
       result.second = std::max(
         result.first,
@@ -2704,7 +2712,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::acquire_scratch_data() const
     std::list<std::pair<bool, AlignedVector<VectorizedArrayType>>>;
   list_type &data = scratch_pad.get();
   for (typename list_type::iterator it = data.begin(); it != data.end(); ++it)
-    if (it->first == false)
+    if (it->first DEAL_II_EQUALS false)
       {
         it->first = true;
         return &it->second;
@@ -2724,9 +2732,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::release_scratch_data(
     std::list<std::pair<bool, AlignedVector<VectorizedArrayType>>>;
   list_type &data = scratch_pad.get();
   for (typename list_type::iterator it = data.begin(); it != data.end(); ++it)
-    if (&it->second == scratch)
+    if (&it->second DEAL_II_EQUALS scratch)
       {
-        Assert(it->first == true, ExcInternalError());
+        Assert(it->first DEAL_II_EQUALS true, ExcInternalError());
         it->first = false;
         return;
       }
@@ -2744,7 +2752,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::
          scratch_pad_non_threadsafe.begin();
        it != scratch_pad_non_threadsafe.end();
        ++it)
-    if (it->first == false)
+    if (it->first DEAL_II_EQUALS false)
       {
         it->first = true;
         return &it->second;
@@ -2766,9 +2774,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::
          scratch_pad_non_threadsafe.begin();
        it != scratch_pad_non_threadsafe.end();
        ++it)
-    if (&it->second == scratch)
+    if (&it->second DEAL_II_EQUALS scratch)
       {
-        Assert(it->first == true, ExcInternalError());
+        Assert(it->first DEAL_II_EQUALS true, ExcInternalError());
         it->first = false;
         return;
       }
@@ -2792,7 +2800,7 @@ namespace internal
       std::vector<IndexSet> locally_owned_set;
       locally_owned_set.reserve(dofh.size());
       for (unsigned int j = 0; j < dofh.size(); j++)
-        if (level == numbers::invalid_unsigned_int)
+        if (level DEAL_II_EQUALS numbers::invalid_unsigned_int)
           locally_owned_set.push_back(dofh[j]->locally_owned_dofs());
         else
           locally_owned_set.push_back(dofh[j]->locally_owned_mg_dofs(level));
@@ -3167,27 +3175,27 @@ namespace internal
       AssertDimension(matrix_free.get_dof_info(mf_component)
                         .vector_partitioner_face_variants.size(),
                       5);
-      if (vector_face_access ==
-          dealii::MatrixFree<dim, Number, VectorizedArrayType>::
-            DataAccessOnFaces::none)
+      if (vector_face_access DEAL_II_EQUALS
+                             dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+              DataAccessOnFaces::none)
         return *matrix_free.get_dof_info(mf_component)
                   .vector_partitioner_face_variants[0];
-      else if (vector_face_access ==
-               dealii::MatrixFree<dim, Number, VectorizedArrayType>::
-                 DataAccessOnFaces::values)
+      else if (vector_face_access DEAL_II_EQUALS
+                                  dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+                   DataAccessOnFaces::values)
         return *matrix_free.get_dof_info(mf_component)
                   .vector_partitioner_face_variants[1];
-      else if (vector_face_access ==
-               dealii::MatrixFree<dim, Number, VectorizedArrayType>::
-                 DataAccessOnFaces::gradients)
+      else if (vector_face_access DEAL_II_EQUALS
+                                  dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+                   DataAccessOnFaces::gradients)
         return *matrix_free.get_dof_info(mf_component)
                   .vector_partitioner_face_variants[2];
-      else if (vector_face_access ==
-               dealii::MatrixFree<dim, Number, VectorizedArrayType>::
-                 DataAccessOnFaces::values_all_faces)
+      else if (vector_face_access DEAL_II_EQUALS
+                                  dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+                   DataAccessOnFaces::values_all_faces)
         return *matrix_free.get_dof_info(mf_component)
                   .vector_partitioner_face_variants[3];
-      else /*if (vector_face_access ==
+      else /*if (vector_face_access DEAL_II_EQUALS
                dealii::MatrixFree<dim,
               Number>::DataAccessOnFaces::gradients_all_faces)*/
         return *matrix_free.get_dof_info(mf_component)
@@ -3214,8 +3222,8 @@ namespace internal
      */
     template <typename VectorType,
               typename std::enable_if<
-                !has_update_ghost_values_start<VectorType>::value &&
-                  !is_serial_or_dummy<VectorType>::value,
+                !has_update_ghost_values_start<VectorType>::value
+                  DEAL_II_AND !is_serial_or_dummy<VectorType>::value,
                 VectorType>::type * = nullptr>
     void
     update_ghost_values_start(const unsigned int component_in_block_vector,
@@ -3238,8 +3246,8 @@ namespace internal
      */
     template <typename VectorType,
               typename std::enable_if<
-                has_update_ghost_values_start<VectorType>::value &&
-                  !has_exchange_on_subset<VectorType>::value,
+                has_update_ghost_values_start<VectorType>::value
+                  DEAL_II_AND !has_exchange_on_subset<VectorType>::value,
                 VectorType>::type * = nullptr>
     void
     update_ghost_values_start(const unsigned int component_in_block_vector,
@@ -3263,8 +3271,8 @@ namespace internal
      */
     template <typename VectorType,
               typename std::enable_if<
-                has_update_ghost_values_start<VectorType>::value &&
-                  has_exchange_on_subset<VectorType>::value,
+                has_update_ghost_values_start<VectorType>::value DEAL_II_AND
+                                                                 has_exchange_on_subset<VectorType>::value,
                 VectorType>::type * = nullptr>
     void
     update_ghost_values_start(const unsigned int component_in_block_vector,
@@ -3277,18 +3285,19 @@ namespace internal
       bool ghosts_set = vec.has_ghost_elements();
       if (ghosts_set)
         ghosts_were_set = true;
-      if (vector_face_access ==
-            dealii::MatrixFree<dim, Number, VectorizedArrayType>::
-              DataAccessOnFaces::unspecified ||
-          vec.size() == 0)
+      if (vector_face_access                 DEAL_II_EQUALS
+                                             dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+              DataAccessOnFaces::unspecified DEAL_II_OR vec.size()
+                DEAL_II_EQUALS 0)
         vec.update_ghost_values_start(component_in_block_vector +
                                       channel_shift);
       else
         {
 #  ifdef DEAL_II_WITH_MPI
           const unsigned int mf_component = find_vector_in_mf(vec);
-          if (&get_partitioner(mf_component) ==
-              matrix_free.get_dof_info(mf_component).vector_partitioner.get())
+          if (&get_partitioner(mf_component)
+                 DEAL_II_EQUALS matrix_free.get_dof_info(mf_component)
+                   .vector_partitioner.get())
             {
               vec.update_ghost_values_start(component_in_block_vector +
                                             channel_shift);
@@ -3297,7 +3306,9 @@ namespace internal
 
           const Utilities::MPI::Partitioner &part =
             get_partitioner(mf_component);
-          if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0)
+          if (part.n_ghost_indices()
+                DEAL_II_EQUALS 0 DEAL_II_AND part.n_import_indices()
+                  DEAL_II_EQUALS 0)
             return;
 
           tmp_data[component_in_block_vector] =
@@ -3343,8 +3354,8 @@ namespace internal
      */
     template <typename VectorType,
               typename std::enable_if<
-                has_update_ghost_values_start<VectorType>::value &&
-                  !has_exchange_on_subset<VectorType>::value,
+                has_update_ghost_values_start<VectorType>::value
+                  DEAL_II_AND !has_exchange_on_subset<VectorType>::value,
                 VectorType>::type * = nullptr>
     void
     update_ghost_values_finish(const unsigned int component_in_block_vector,
@@ -3364,8 +3375,8 @@ namespace internal
      */
     template <typename VectorType,
               typename std::enable_if<
-                has_update_ghost_values_start<VectorType>::value &&
-                  has_exchange_on_subset<VectorType>::value,
+                has_update_ghost_values_start<VectorType>::value DEAL_II_AND
+                                                                 has_exchange_on_subset<VectorType>::value,
                 VectorType>::type * = nullptr>
     void
     update_ghost_values_finish(const unsigned int component_in_block_vector,
@@ -3375,10 +3386,10 @@ namespace internal
         std::is_same<Number, typename VectorType::value_type>::value,
         "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
-      if (vector_face_access ==
-            dealii::MatrixFree<dim, Number, VectorizedArrayType>::
-              DataAccessOnFaces::unspecified ||
-          vec.size() == 0)
+      if (vector_face_access                 DEAL_II_EQUALS
+                                             dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+              DataAccessOnFaces::unspecified DEAL_II_OR vec.size()
+                DEAL_II_EQUALS 0)
         vec.update_ghost_values_finish();
       else
         {
@@ -3390,14 +3401,16 @@ namespace internal
           const unsigned int mf_component = find_vector_in_mf(vec);
           const Utilities::MPI::Partitioner &part =
             get_partitioner(mf_component);
-          if (&part ==
-              matrix_free.get_dof_info(mf_component).vector_partitioner.get())
+          if (&part DEAL_II_EQUALS matrix_free.get_dof_info(mf_component)
+                 .vector_partitioner.get())
             {
               vec.update_ghost_values_finish();
               return;
             }
 
-          if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0)
+          if (part.n_ghost_indices()
+                DEAL_II_EQUALS 0 DEAL_II_AND part.n_import_indices()
+                  DEAL_II_EQUALS 0)
             return;
 
           part.export_to_ghosted_array_finish(
@@ -3437,15 +3450,17 @@ namespace internal
      * the split into _start() and finish() stages
      */
     template <typename VectorType,
-              typename std::enable_if<!has_compress_start<VectorType>::value &&
-                                        !is_serial_or_dummy<VectorType>::value,
-                                      VectorType>::type * = nullptr>
+              typename std::enable_if<
+                !has_compress_start<VectorType>::value
+                  DEAL_II_AND !is_serial_or_dummy<VectorType>::value,
+                VectorType>::type * = nullptr>
     void
     compress_start(const unsigned int component_in_block_vector,
                    VectorType &       vec)
     {
       (void)component_in_block_vector;
-      Assert(vec.has_ghost_elements() == false, ExcNotImplemented());
+      Assert(vec.has_ghost_elements() DEAL_II_EQUALS false,
+             ExcNotImplemented());
       vec.compress(dealii::VectorOperation::add);
     }
 
@@ -3456,17 +3471,18 @@ namespace internal
      * the split into _start() and finish() stages, but don't support
      * exchange on a subset of DoFs
      */
-    template <
-      typename VectorType,
-      typename std::enable_if<has_compress_start<VectorType>::value &&
-                                !has_exchange_on_subset<VectorType>::value,
-                              VectorType>::type * = nullptr>
+    template <typename VectorType,
+              typename std::enable_if<
+                has_compress_start<VectorType>::value
+                  DEAL_II_AND !has_exchange_on_subset<VectorType>::value,
+                VectorType>::type * = nullptr>
     void
     compress_start(const unsigned int component_in_block_vector,
                    VectorType &       vec)
     {
       (void)component_in_block_vector;
-      Assert(vec.has_ghost_elements() == false, ExcNotImplemented());
+      Assert(vec.has_ghost_elements() DEAL_II_EQUALS false,
+             ExcNotImplemented());
       vec.compress_start(component_in_block_vector + channel_shift);
     }
 
@@ -3480,8 +3496,8 @@ namespace internal
      */
     template <
       typename VectorType,
-      typename std::enable_if<has_compress_start<VectorType>::value &&
-                                has_exchange_on_subset<VectorType>::value,
+      typename std::enable_if<has_compress_start<VectorType>::value DEAL_II_AND
+                                                                    has_exchange_on_subset<VectorType>::value,
                               VectorType>::type * = nullptr>
     void
     compress_start(const unsigned int component_in_block_vector,
@@ -3491,11 +3507,12 @@ namespace internal
         std::is_same<Number, typename VectorType::value_type>::value,
         "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
-      Assert(vec.has_ghost_elements() == false, ExcNotImplemented());
-      if (vector_face_access ==
-            dealii::MatrixFree<dim, Number, VectorizedArrayType>::
-              DataAccessOnFaces::unspecified ||
-          vec.size() == 0)
+      Assert(vec.has_ghost_elements() DEAL_II_EQUALS false,
+             ExcNotImplemented());
+      if (vector_face_access                 DEAL_II_EQUALS
+                                             dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+              DataAccessOnFaces::unspecified DEAL_II_OR vec.size()
+                DEAL_II_EQUALS 0)
         vec.compress_start(component_in_block_vector + channel_shift);
       else
         {
@@ -3504,14 +3521,16 @@ namespace internal
           const unsigned int mf_component = find_vector_in_mf(vec);
           const Utilities::MPI::Partitioner &part =
             get_partitioner(mf_component);
-          if (&part ==
-              matrix_free.get_dof_info(mf_component).vector_partitioner.get())
+          if (&part DEAL_II_EQUALS matrix_free.get_dof_info(mf_component)
+                 .vector_partitioner.get())
             {
               vec.compress_start(component_in_block_vector + channel_shift);
               return;
             }
 
-          if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0)
+          if (part.n_ghost_indices()
+                DEAL_II_EQUALS 0 DEAL_II_AND part.n_import_indices()
+                  DEAL_II_EQUALS 0)
             return;
 
           tmp_data[component_in_block_vector] =
@@ -3553,11 +3572,11 @@ namespace internal
      * the split into _start() and finish() stages, but don't support
      * exchange on a subset of DoFs
      */
-    template <
-      typename VectorType,
-      typename std::enable_if<has_compress_start<VectorType>::value &&
-                                !has_exchange_on_subset<VectorType>::value,
-                              VectorType>::type * = nullptr>
+    template <typename VectorType,
+              typename std::enable_if<
+                has_compress_start<VectorType>::value
+                  DEAL_II_AND !has_exchange_on_subset<VectorType>::value,
+                VectorType>::type * = nullptr>
     void
     compress_finish(const unsigned int component_in_block_vector,
                     VectorType &       vec)
@@ -3576,8 +3595,8 @@ namespace internal
      */
     template <
       typename VectorType,
-      typename std::enable_if<has_compress_start<VectorType>::value &&
-                                has_exchange_on_subset<VectorType>::value,
+      typename std::enable_if<has_compress_start<VectorType>::value DEAL_II_AND
+                                                                    has_exchange_on_subset<VectorType>::value,
                               VectorType>::type * = nullptr>
     void
     compress_finish(const unsigned int component_in_block_vector,
@@ -3587,10 +3606,10 @@ namespace internal
         std::is_same<Number, typename VectorType::value_type>::value,
         "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
-      if (vector_face_access ==
-            dealii::MatrixFree<dim, Number, VectorizedArrayType>::
-              DataAccessOnFaces::unspecified ||
-          vec.size() == 0)
+      if (vector_face_access                 DEAL_II_EQUALS
+                                             dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+              DataAccessOnFaces::unspecified DEAL_II_OR vec.size()
+                DEAL_II_EQUALS 0)
         vec.compress_finish(dealii::VectorOperation::add);
       else
         {
@@ -3602,14 +3621,16 @@ namespace internal
 
           const Utilities::MPI::Partitioner &part =
             get_partitioner(mf_component);
-          if (&part ==
-              matrix_free.get_dof_info(mf_component).vector_partitioner.get())
+          if (&part DEAL_II_EQUALS matrix_free.get_dof_info(mf_component)
+                 .vector_partitioner.get())
             {
               vec.compress_finish(dealii::VectorOperation::add);
               return;
             }
 
-          if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0)
+          if (part.n_ghost_indices()
+                DEAL_II_EQUALS 0 DEAL_II_AND part.n_import_indices()
+                  DEAL_II_EQUALS 0)
             return;
 
           part.import_from_ghosted_array_finish(
@@ -3647,15 +3668,15 @@ namespace internal
      * Reset all ghost values for vector that don't support
      * exchange on a subset of DoFs
      */
-    template <
-      typename VectorType,
-      typename std::enable_if<!has_exchange_on_subset<VectorType>::value &&
-                                !is_serial_or_dummy<VectorType>::value,
-                              VectorType>::type * = nullptr>
+    template <typename VectorType,
+              typename std::enable_if<
+                !has_exchange_on_subset<VectorType>::value
+                  DEAL_II_AND !is_serial_or_dummy<VectorType>::value,
+                VectorType>::type * = nullptr>
     void
     reset_ghost_values(const VectorType &vec) const
     {
-      if (ghosts_were_set == true)
+      if (ghosts_were_set DEAL_II_EQUALS true)
         return;
 
       vec.zero_out_ghosts();
@@ -3677,13 +3698,13 @@ namespace internal
       static_assert(
         std::is_same<Number, typename VectorType::value_type>::value,
         "Type mismatch between VectorType and VectorDataExchange");
-      if (ghosts_were_set == true)
+      if (ghosts_were_set DEAL_II_EQUALS true)
         return;
 
-      if (vector_face_access ==
-            dealii::MatrixFree<dim, Number, VectorizedArrayType>::
-              DataAccessOnFaces::unspecified ||
-          vec.size() == 0)
+      if (vector_face_access                 DEAL_II_EQUALS
+                                             dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+              DataAccessOnFaces::unspecified DEAL_II_OR vec.size()
+                DEAL_II_EQUALS 0)
         vec.zero_out_ghosts();
       else
         {
@@ -3693,8 +3714,8 @@ namespace internal
           const unsigned int mf_component = find_vector_in_mf(vec);
           const Utilities::MPI::Partitioner &part =
             get_partitioner(mf_component);
-          if (&part ==
-              matrix_free.get_dof_info(mf_component).vector_partitioner.get())
+          if (&part DEAL_II_EQUALS matrix_free.get_dof_info(mf_component)
+                 .vector_partitioner.get())
             vec.zero_out_ghosts();
           else if (part.n_ghost_indices() > 0)
             {
@@ -3723,8 +3744,9 @@ namespace internal
 
     /**
      * Zero out vector region for vector that _do_ support
-     * exchange on a subset of DoFs <==> begin() + ind == local_element(ind),
-     * i.e. LinearAlgebra::distributed::Vector
+     * exchange on a subset of DoFs <DEAL_II_EQUALS > begin() + ind
+     * DEAL_II_EQUALS  local_element(ind), i.e.
+     * LinearAlgebra::distributed::Vector
      */
     template <typename VectorType,
               typename std::enable_if<has_exchange_on_subset<VectorType>::value,
@@ -3735,14 +3757,15 @@ namespace internal
       static_assert(
         std::is_same<Number, typename VectorType::value_type>::value,
         "Type mismatch between VectorType and VectorDataExchange");
-      if (range_index == numbers::invalid_unsigned_int)
+      if (range_index DEAL_II_EQUALS numbers::invalid_unsigned_int)
         vec = Number();
       else
         {
           const unsigned int mf_component = find_vector_in_mf(vec, false);
           const internal::MatrixFreeFunctions::DoFInfo &dof_info =
             matrix_free.get_dof_info(mf_component);
-          Assert(dof_info.vector_zero_range_list_index.empty() == false,
+          Assert(dof_info.vector_zero_range_list_index.empty()
+                   DEAL_II_EQUALS false,
                  ExcNotInitialized());
 
           Assert(vec.partitioners_are_compatible(*dof_info.vector_partitioner),
@@ -3765,8 +3788,8 @@ namespace internal
 
     /**
      * Zero out vector region for vector that do _not_ support exchange on a
-     * subset of DoFs <==> begin() + ind == local_element(ind) but are still a
-     * vector type
+     * subset of DoFs <DEAL_II_EQUALS > begin() + ind DEAL_II_EQUALS
+     * local_element(ind) but are still a vector type
      */
     template <
       typename VectorType,
@@ -3776,7 +3799,7 @@ namespace internal
     void
     zero_vector_region(const unsigned int range_index, VectorType &vec) const
     {
-      if (range_index == numbers::invalid_unsigned_int)
+      if (range_index DEAL_II_EQUALS numbers::invalid_unsigned_int)
         vec = typename VectorType::value_type();
       else
         {
@@ -4269,7 +4292,7 @@ namespace internal
     VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     // return immediately if there is nothing to do.
-    if (exchanger.ghosts_were_set == true)
+    if (exchanger.ghosts_were_set DEAL_II_EQUALS true)
       return;
 
     for (unsigned int i = 0; i < vec.n_blocks(); ++i)
@@ -4306,7 +4329,7 @@ namespace internal
     VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     // return immediately if there is nothing to do.
-    if (exchanger.ghosts_were_set == true)
+    if (exchanger.ghosts_were_set DEAL_II_EQUALS true)
       return;
 
     for (unsigned int comp = 0; comp < vec.size(); comp++)
@@ -4326,7 +4349,7 @@ namespace internal
     VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     // return immediately if there is nothing to do.
-    if (exchanger.ghosts_were_set == true)
+    if (exchanger.ghosts_were_set DEAL_II_EQUALS true)
       return;
 
     for (unsigned int comp = 0; comp < vec.size(); comp++)
@@ -4496,8 +4519,8 @@ namespace internal
                            dst_vector_face_access,
                            n_components(dst))
       , src_and_dst_are_same(PointerComparison::equal(&src, &dst))
-      , zero_dst_vector_setting(zero_dst_vector_setting &&
-                                !src_and_dst_are_same)
+      , zero_dst_vector_setting(
+          zero_dst_vector_setting DEAL_II_AND !src_and_dst_are_same)
       , operation_before_loop(operation_before_loop)
       , operation_after_loop(operation_after_loop)
       , dof_handler_index_pre_post(dof_handler_index_pre_post)
@@ -4507,7 +4530,8 @@ namespace internal
     virtual void
     cell(const std::pair<unsigned int, unsigned int> &cell_range) override
     {
-      if (cell_function != nullptr && cell_range.second > cell_range.first)
+      if (cell_function !=
+          nullptr DEAL_II_AND cell_range.second > cell_range.first)
         (container.*
          cell_function)(matrix_free, this->dst, this->src, cell_range);
     }
@@ -4517,7 +4541,8 @@ namespace internal
     virtual void
     face(const std::pair<unsigned int, unsigned int> &face_range) override
     {
-      if (face_function != nullptr && face_range.second > face_range.first)
+      if (face_function !=
+          nullptr DEAL_II_AND face_range.second > face_range.first)
         (container.*
          face_function)(matrix_free, this->dst, this->src, face_range);
     }
@@ -4527,7 +4552,8 @@ namespace internal
     virtual void
     boundary(const std::pair<unsigned int, unsigned int> &face_range) override
     {
-      if (boundary_function != nullptr && face_range.second > face_range.first)
+      if (boundary_function !=
+          nullptr DEAL_II_AND face_range.second > face_range.first)
         (container.*
          boundary_function)(matrix_free, this->dst, this->src, face_range);
     }
@@ -4584,7 +4610,7 @@ namespace internal
         {
           const internal::MatrixFreeFunctions::DoFInfo &dof_info =
             matrix_free.get_dof_info(dof_handler_index_pre_post);
-          if (range_index == numbers::invalid_unsigned_int)
+          if (range_index DEAL_II_EQUALS numbers::invalid_unsigned_int)
             {
               // Case with threaded loop -> currently no overlap implemented
               dealii::parallel::apply_to_subranges(
@@ -4614,7 +4640,7 @@ namespace internal
         {
           const internal::MatrixFreeFunctions::DoFInfo &dof_info =
             matrix_free.get_dof_info(dof_handler_index_pre_post);
-          if (range_index == numbers::invalid_unsigned_int)
+          if (range_index DEAL_II_EQUALS numbers::invalid_unsigned_int)
             {
               // Case with threaded loop -> currently no overlap implemented
               dealii::parallel::apply_to_subranges(
@@ -5114,9 +5140,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::loop_cell_centric(
   const DataAccessOnFaces src_vector_face_access) const
 {
   auto src_vector_face_access_temp = src_vector_face_access;
-  if (DataAccessOnFaces::gradients == src_vector_face_access_temp)
+  if (DataAccessOnFaces::gradients DEAL_II_EQUALS src_vector_face_access_temp)
     src_vector_face_access_temp = DataAccessOnFaces::gradients_all_faces;
-  else if (DataAccessOnFaces::values == src_vector_face_access_temp)
+  else if (DataAccessOnFaces::values DEAL_II_EQUALS src_vector_face_access_temp)
     src_vector_face_access_temp = DataAccessOnFaces::values_all_faces;
 
   internal::MFWorker<MatrixFree<dim, Number, VectorizedArrayType>,
@@ -5155,9 +5181,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::loop_cell_centric(
   const DataAccessOnFaces src_vector_face_access) const
 {
   auto src_vector_face_access_temp = src_vector_face_access;
-  if (DataAccessOnFaces::gradients == src_vector_face_access_temp)
+  if (DataAccessOnFaces::gradients DEAL_II_EQUALS src_vector_face_access_temp)
     src_vector_face_access_temp = DataAccessOnFaces::gradients_all_faces;
-  else if (DataAccessOnFaces::values == src_vector_face_access_temp)
+  else if (DataAccessOnFaces::values DEAL_II_EQUALS src_vector_face_access_temp)
     src_vector_face_access_temp = DataAccessOnFaces::values_all_faces;
 
   internal::MFWorker<MatrixFree<dim, Number, VectorizedArrayType>,
@@ -5195,9 +5221,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::loop_cell_centric(
   const DataAccessOnFaces src_vector_face_access) const
 {
   auto src_vector_face_access_temp = src_vector_face_access;
-  if (DataAccessOnFaces::gradients == src_vector_face_access_temp)
+  if (DataAccessOnFaces::gradients DEAL_II_EQUALS src_vector_face_access_temp)
     src_vector_face_access_temp = DataAccessOnFaces::gradients_all_faces;
-  else if (DataAccessOnFaces::values == src_vector_face_access_temp)
+  else if (DataAccessOnFaces::values DEAL_II_EQUALS src_vector_face_access_temp)
     src_vector_face_access_temp = DataAccessOnFaces::values_all_faces;
 
   using Wrapper =

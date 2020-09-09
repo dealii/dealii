@@ -122,7 +122,8 @@ public:
 
   /**
    * Set the ordering of the polynomials. Requires
-   * <tt>renumber.size()==n()</tt>. Stores a copy of <tt>renumber</tt>.
+   * <tt>renumber.size()DEAL_II_EQUALS n()</tt>. Stores a copy of
+   * <tt>renumber</tt>.
    */
   void
   set_numbering(const std::vector<unsigned int> &renumber);
@@ -358,7 +359,7 @@ PolynomialSpace<dim>::compute_derivative(const unsigned int i,
               for (unsigned int x = 0; x < dim; ++x)
                 {
                   unsigned int x_order = 0;
-                  if (d == x)
+                  if (d DEAL_II_EQUALS x)
                     ++x_order;
 
                   derivative_1[d] *= v[x][x_order];
@@ -378,9 +379,9 @@ PolynomialSpace<dim>::compute_derivative(const unsigned int i,
                 for (unsigned int x = 0; x < dim; ++x)
                   {
                     unsigned int x_order = 0;
-                    if (d1 == x)
+                    if (d1 DEAL_II_EQUALS x)
                       ++x_order;
-                    if (d2 == x)
+                    if (d2 DEAL_II_EQUALS x)
                       ++x_order;
 
                     derivative_2[d1][d2] *= v[x][x_order];
@@ -401,11 +402,11 @@ PolynomialSpace<dim>::compute_derivative(const unsigned int i,
                   for (unsigned int x = 0; x < dim; ++x)
                     {
                       unsigned int x_order = 0;
-                      if (d1 == x)
+                      if (d1 DEAL_II_EQUALS x)
                         ++x_order;
-                      if (d2 == x)
+                      if (d2 DEAL_II_EQUALS x)
                         ++x_order;
-                      if (d3 == x)
+                      if (d3 DEAL_II_EQUALS x)
                         ++x_order;
 
                       derivative_3[d1][d2][d3] *= v[x][x_order];
@@ -427,13 +428,13 @@ PolynomialSpace<dim>::compute_derivative(const unsigned int i,
                     for (unsigned int x = 0; x < dim; ++x)
                       {
                         unsigned int x_order = 0;
-                        if (d1 == x)
+                        if (d1 DEAL_II_EQUALS x)
                           ++x_order;
-                        if (d2 == x)
+                        if (d2 DEAL_II_EQUALS x)
                           ++x_order;
-                        if (d3 == x)
+                        if (d3 DEAL_II_EQUALS x)
                           ++x_order;
-                        if (d4 == x)
+                        if (d4 DEAL_II_EQUALS x)
                           ++x_order;
 
                         derivative_4[d1][d2][d3][d4] *= v[x][x_order];

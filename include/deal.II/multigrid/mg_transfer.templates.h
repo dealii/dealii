@@ -80,13 +80,13 @@ namespace internal
                   MGLevelObject<BlockVector<number>> &     v)
     {
       const unsigned int n_blocks = dof_handler.get_fe().n_blocks();
-      if (target_component.size() == 0)
+      if (target_component.size() DEAL_II_EQUALS 0)
         {
           target_component.resize(n_blocks);
           for (unsigned int i = 0; i < n_blocks; ++i)
             target_component[i] = i;
         }
-      Assert(target_component.size() == n_blocks,
+      Assert(target_component.size() DEAL_II_EQUALS n_blocks,
              ExcDimensionMismatch(target_component.size(), n_blocks));
       const unsigned int max_block =
         *std::max_element(target_component.begin(), target_component.end());
@@ -182,8 +182,9 @@ namespace internal
               const T &src,
               V &      dst)
   {
-    // we should have copy_index.second == copy_index.first, therefore we can
-    // use the same function for both copying to mg as well as copying from mg
+    // we should have copy_index.second DEAL_II_EQUALS  copy_index.first,
+    // therefore we can use the same function for both copying to mg as well as
+    // copying from mg
     for (const auto &copy_index : copy_indices)
       dst(copy_index.first) = src(copy_index.first);
     dst.compress(VectorOperation::insert);
@@ -386,8 +387,8 @@ MGLevelGlobalTransfer<VectorType>::assert_built(
   const DoFHandler<dim, spacedim> &dof_handler) const
 {
   (void)dof_handler;
-  Assert(copy_indices.size() ==
-           dof_handler.get_triangulation().n_global_levels(),
+  Assert(copy_indices.size() DEAL_II_EQUALS dof_handler.get_triangulation()
+           .n_global_levels(),
          ExcMessage("MGTransfer::build() has not been called!"));
 }
 
@@ -431,15 +432,16 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
   AssertIndexRange(dst.min_level(), dst.max_level() + 1);
 
   for (unsigned int level = dst.min_level(); level <= dst.max_level(); ++level)
-    if (dst[level].size() != dof_handler.n_dofs(level) ||
-        dst[level].local_size() !=
-          dof_handler.locally_owned_mg_dofs(level).n_elements())
+    if (dst[level].size() !=
+        dof_handler.n_dofs(level) DEAL_II_OR dst[level].local_size() !=
+        dof_handler.locally_owned_mg_dofs(level).n_elements())
       {
         // In case a ghosted level vector has been initialized, we can simply
         // use that as a template for the vector partitioning. If not, we
         // resort to the locally owned range of the dof handler.
-        if (level <= ghosted_level_vector.max_level() &&
-            ghosted_level_vector[level].size() == dof_handler.n_dofs(level))
+        if (level <= ghosted_level_vector
+                       .max_level() DEAL_II_AND ghosted_level_vector[level]
+                       .size() DEAL_II_EQUALS   dof_handler.n_dofs(level))
           dst[level].reinit(ghosted_level_vector[level], false);
         else
           {
@@ -452,9 +454,9 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
                                                 MPI_COMM_SELF);
           }
       }
-    else if ((perform_plain_copy == false &&
-              perform_renumbered_plain_copy == false) ||
-             level != dst.max_level())
+    else if ((perform_plain_copy DEAL_II_EQUALS false DEAL_II_AND
+                perform_renumbered_plain_copy DEAL_II_EQUALS false)
+               DEAL_II_OR level != dst.max_level())
       dst[level] = 0;
 
   if (perform_plain_copy)
@@ -468,7 +470,8 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
     {
       AssertDimension(dst[dst.max_level()].local_size(), src.local_size());
       AssertDimension(this_copy_indices.back().n_cols(), src.local_size());
-      Assert(copy_indices_level_mine.back().n_rows() == 0, ExcInternalError());
+      Assert(copy_indices_level_mine.back().n_rows() DEAL_II_EQUALS 0,
+             ExcInternalError());
       LinearAlgebra::distributed::Vector<Number> &dst_level =
         dst[dst.max_level()];
       // as opposed to the copy_unknowns lambda below, we here know that all
@@ -540,7 +543,8 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_from_mg(
     {
       AssertDimension(src[src.max_level()].local_size(), dst.local_size());
       AssertDimension(copy_indices.back().n_cols(), dst.local_size());
-      Assert(copy_indices_global_mine.back().n_rows() == 0, ExcInternalError());
+      Assert(copy_indices_global_mine.back().n_rows() DEAL_II_EQUALS 0,
+             ExcInternalError());
       Assert(copy_indices_global_mine.back().empty(), ExcInternalError());
       const LinearAlgebra::distributed::Vector<Number> &src_level =
         src[src.max_level()];
@@ -650,8 +654,8 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::assert_built(
   const DoFHandler<dim, spacedim> &dof_handler) const
 {
   (void)dof_handler;
-  Assert(copy_indices.size() ==
-           dof_handler.get_triangulation().n_global_levels(),
+  Assert(copy_indices.size() DEAL_II_EQUALS dof_handler.get_triangulation()
+           .n_global_levels(),
          ExcMessage("MGTransfer::build() has not been called!"));
 }
 

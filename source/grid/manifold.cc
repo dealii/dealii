@@ -69,7 +69,7 @@ Manifold<dim, spacedim>::get_new_point(
 
   Assert(n_points > 0, ExcMessage("There should be at least one point."));
 
-  Assert(n_points == weights.size(),
+  Assert(n_points DEAL_II_EQUALS weights.size(),
          ExcMessage(
            "There should be as many surrounding points as weights given."));
 
@@ -545,7 +545,7 @@ FlatManifold<dim, spacedim>::get_new_point(
   Point<spacedim> p;
 
   // if there is no periodicity, use a shortcut
-  if (periodicity == Tensor<1, spacedim>())
+  if (periodicity DEAL_II_EQUALS Tensor<1, spacedim>())
     {
       for (unsigned int i = 0; i < surrounding_points.size(); ++i)
         p += surrounding_points[i] * weights[i];
@@ -560,9 +560,9 @@ FlatManifold<dim, spacedim>::get_new_point(
             {
               minP[d] = std::min(minP[d], surrounding_points[i][d]);
               Assert((surrounding_points[i][d] <
-                      periodicity[d] + tolerance * periodicity[d]) ||
-                       (surrounding_points[i][d] >=
-                        -tolerance * periodicity[d]),
+                      periodicity[d] + tolerance * periodicity[d])
+                       DEAL_II_OR(surrounding_points[i][d] >=
+                                  -tolerance * periodicity[d]),
                      ExcPeriodicBox(d, surrounding_points[i], periodicity[d]));
             }
 
@@ -601,7 +601,7 @@ FlatManifold<dim, spacedim>::get_new_points(
   ArrayView<Point<spacedim>>              new_points) const
 {
   AssertDimension(surrounding_points.size(), weights.size(1));
-  if (weights.size(0) == 0)
+  if (weights.size(0) DEAL_II_EQUALS 0)
     return;
 
   const std::size_t n_points = surrounding_points.size();
@@ -613,8 +613,9 @@ FlatManifold<dim, spacedim>::get_new_points(
         {
           minP[d] = std::min(minP[d], surrounding_points[i][d]);
           Assert((surrounding_points[i][d] <
-                  periodicity[d] + tolerance * periodicity[d]) ||
-                   (surrounding_points[i][d] >= -tolerance * periodicity[d]),
+                  periodicity[d] + tolerance * periodicity[d])
+                   DEAL_II_OR(surrounding_points[i][d] >=
+                              -tolerance * periodicity[d]),
                  ExcPeriodicBox(d, surrounding_points[i], periodicity[i]));
         }
 
@@ -632,7 +633,7 @@ FlatManifold<dim, spacedim>::get_new_points(
             adjust_periodicity = true;
             break;
           }
-  if (adjust_periodicity == true)
+  if (adjust_periodicity DEAL_II_EQUALS true)
     {
       modified_points.resize(surrounding_points.size());
       std::copy(surrounding_points.begin(),
@@ -864,18 +865,18 @@ FlatManifold<dim, spacedim>::normal_vector(
   // because we would need to know not only about the tangent vectors
   // of the face, but also of the cell, to compute the normal vector.
   // Someone will have to think about this some more.
-  Assert(dim == spacedim, ExcNotImplemented());
+  Assert(dim DEAL_II_EQUALS spacedim, ExcNotImplemented());
 
   // in order to find out what the normal vector is, we first need to
   // find the reference coordinates of the point p on the given face,
   // or at least the reference coordinates of the closest point on the
   // face
   //
-  // in other words, we need to find a point xi so that f(xi)=||F(xi)-p||^2->min
-  // where F(xi) is the mapping. this algorithm is implemented in
-  // MappingQ1<dim,spacedim>::transform_real_to_unit_cell but only for cells,
-  // while we need it for faces here. it's also implemented in somewhat
-  // more generality there using the machinery of the MappingQ1 class
+  // in other words, we need to find a point xi so that f(xi)=DEAL_II_OR
+  // F(xi)-pDEAL_II_OR ^2->min where F(xi) is the mapping. this algorithm is
+  // implemented in MappingQ1<dim,spacedim>::transform_real_to_unit_cell but
+  // only for cells, while we need it for faces here. it's also implemented in
+  // somewhat more generality there using the machinery of the MappingQ1 class
   // while we really only need it for a specific case here
   //
   // in any case, the iteration we use here is a Gauss-Newton's iteration with
@@ -945,7 +946,7 @@ FlatManifold<dim, spacedim>::normal_vector(
       // compute:
       const double normalized_delta_world = (F - p).norm() / face->diameter();
 
-      if (delta_xi.norm() < eps || normalized_delta_world < eps)
+      if (delta_xi.norm() < eps DEAL_II_OR normalized_delta_world < eps)
         break;
     }
 

@@ -140,11 +140,12 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &support_point_values,
   std::vector<double> &              nodal_values) const
 {
-  Assert(support_point_values.size() == this->generalized_support_points.size(),
+  Assert(support_point_values.size()
+           DEAL_II_EQUALS this->generalized_support_points.size(),
          ExcDimensionMismatch(support_point_values.size(),
                               this->generalized_support_points.size()));
   AssertDimension(support_point_values[0].size(), dim);
-  Assert(nodal_values.size() == this->n_dofs_per_cell(),
+  Assert(nodal_values.size() DEAL_II_EQUALS this->n_dofs_per_cell(),
          ExcDimensionMismatch(nodal_values.size(), this->n_dofs_per_cell()));
 
   // First do interpolation on faces. There, the component evaluated
@@ -158,7 +159,7 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
     {
       // Old version with no moments in 2D. See comment below in
       // initialize_support_points()
-      if (test_values_face.size() == 0)
+      if (test_values_face.size() DEAL_II_EQUALS 0)
         {
           for (unsigned int i = 0; i < this->n_dofs_per_face(f); ++i)
             nodal_values[dbase + i] =
@@ -195,14 +196,15 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
                     test_values_cell.size());
 
   // Done for BDM1
-  if (dbase == this->n_dofs_per_cell())
+  if (dbase DEAL_II_EQUALS this->n_dofs_per_cell())
     return;
 
   // What's missing are the interior
   // degrees of freedom. In each
   // point, we take all components of
   // the solution.
-  Assert((this->n_dofs_per_cell() - dbase) % dim == 0, ExcInternalError());
+  Assert((this->n_dofs_per_cell() - dbase) % dim DEAL_II_EQUALS 0,
+         ExcInternalError());
 
   for (unsigned int d = 0; d < dim; ++d, dbase += test_values_cell[0].size())
     {
@@ -215,7 +217,7 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
         }
     }
 
-  Assert(dbase == this->n_dofs_per_cell(), ExcInternalError());
+  Assert(dbase DEAL_II_EQUALS this->n_dofs_per_cell(), ExcInternalError());
 }
 
 
@@ -248,7 +250,7 @@ template <int dim>
 std::vector<bool>
 FE_BDM<dim>::get_ria_vector(const unsigned int deg)
 {
-  if (dim == 1)
+  if (dim DEAL_II_EQUALS 1)
     {
       Assert(false, ExcImpossibleInDim(1));
       return std::vector<bool>();
@@ -356,7 +358,7 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
   // deg-2, thus we use deg points. Note that deg>=1 and the lowest
   // order element has no points in the cell, such that we have to
   // distinguish this case.
-  QGauss<dim> cell_points(deg == 1 ? 0 : deg);
+  QGauss<dim> cell_points(deg DEAL_II_EQUALS 1 ? 0 : deg);
 
   // Compute the size of the whole support point set
   const unsigned int npoints =

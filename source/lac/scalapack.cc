@@ -147,7 +147,7 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(
   // Before reading the content from disk the root process determines the
   // dimensions of the matrix. Subsequently, memory is allocated by a call to
   // reinit() and the matrix is loaded by a call to load().
-  if (this_mpi_process == 0)
+  if (this_mpi_process DEAL_II_EQUALS 0)
     {
       herr_t status = 0;
 
@@ -164,7 +164,7 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(
 
       // get number of dimensions in data set
       int rank = H5Sget_simple_extent_ndims(filespace);
-      AssertThrow(rank == 2, ExcIO());
+      AssertThrow(rank DEAL_II_EQUALS 2, ExcIO());
       hsize_t dims[2];
       status = H5Sget_simple_extent_dims(filespace, dims, nullptr);
       AssertThrow(status >= 0, ExcIO());
@@ -270,7 +270,8 @@ ScaLAPACKMatrix<NumberType>::reinit(
                 &(grid->blacs_context),
                 &lda,
                 &info);
-      AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("descinit_", info));
+      AssertThrow(info DEAL_II_EQUALS 0,
+                  LAPACKSupport::ExcErrorCode("descinit_", info));
 
       this->TransposeTable<NumberType>::reinit(n_local_rows, n_local_columns);
     }
@@ -335,8 +336,9 @@ ScaLAPACKMatrix<NumberType>::operator=(const FullMatrix<NumberType> &matrix)
   // Matrices can have different distribution,in particular matrix A can
   // be owned by only one process, so we can set a=1 and b=0 to copy
   // non-distributed matrix A into distributed matrix B.
-  Assert(n_rows == int(matrix.m()), ExcDimensionMismatch(n_rows, matrix.m()));
-  Assert(n_columns == int(matrix.n()),
+  Assert(n_rows DEAL_II_EQUALS int(matrix.m()),
+         ExcDimensionMismatch(n_rows, matrix.m()));
+  Assert(n_columns DEAL_II_EQUALS int(matrix.n()),
          ExcDimensionMismatch(n_columns, matrix.n()));
 
   if (grid->mpi_process_is_active)
@@ -362,25 +364,29 @@ void
 ScaLAPACKMatrix<NumberType>::copy_from(const LAPACKFullMatrix<NumberType> &B,
                                        const unsigned int                  rank)
 {
-  if (n_rows * n_columns == 0)
+  if (n_rows * n_columns DEAL_II_EQUALS 0)
     return;
 
   const unsigned int this_mpi_process(
     Utilities::MPI::this_mpi_process(this->grid->mpi_communicator));
 
 #  ifdef DEBUG
-  Assert(Utilities::MPI::max(rank, this->grid->mpi_communicator) == rank,
+  Assert(Utilities::MPI::max(rank, this->grid->mpi_communicator)
+           DEAL_II_EQUALS rank,
          ExcMessage("All processes have to call routine with identical rank"));
-  Assert(Utilities::MPI::min(rank, this->grid->mpi_communicator) == rank,
+  Assert(Utilities::MPI::min(rank, this->grid->mpi_communicator)
+           DEAL_II_EQUALS rank,
          ExcMessage("All processes have to call routine with identical rank"));
 #  endif
 
   // root process has to be active in the grid of A
-  if (this_mpi_process == rank)
+  if (this_mpi_process DEAL_II_EQUALS rank)
     {
       Assert(grid->mpi_process_is_active, ExcInternalError());
-      Assert(n_rows == int(B.m()), ExcDimensionMismatch(n_rows, B.m()));
-      Assert(n_columns == int(B.n()), ExcDimensionMismatch(n_columns, B.n()));
+      Assert(n_rows DEAL_II_EQUALS int(B.m()),
+             ExcDimensionMismatch(n_rows, B.m()));
+      Assert(n_columns DEAL_II_EQUALS int(B.n()),
+             ExcDimensionMismatch(n_columns, B.n()));
     }
   // Create 1x1 grid for matrix B.
   // The underlying grid for matrix B only contains the process #rank.
@@ -413,13 +419,14 @@ ScaLAPACKMatrix<NumberType>::copy_from(const LAPACKFullMatrix<NumberType> &B,
                       &n_proc_cols_B,
                       &this_process_row_B,
                       &this_process_column_B);
-      Assert(n_proc_rows_B * n_proc_cols_B == 1, ExcInternalError());
+      Assert(n_proc_rows_B * n_proc_cols_B DEAL_II_EQUALS 1,
+             ExcInternalError());
       // the active process of grid B has to be process #rank of the
       // communicator attached to A
-      Assert(this_mpi_process == rank, ExcInternalError());
+      Assert(this_mpi_process DEAL_II_EQUALS rank, ExcInternalError());
     }
   const bool mpi_process_is_active_B =
-    (this_process_row_B >= 0 && this_process_column_B >= 0);
+    (this_process_row_B >= 0 DEAL_II_AND this_process_column_B >= 0);
 
   // create descriptor for matrix B
   std::vector<int> descriptor_B(9, -1);
@@ -438,8 +445,8 @@ ScaLAPACKMatrix<NumberType>::copy_from(const LAPACKFullMatrix<NumberType> &B,
                                    &this_process_column_B,
                                    &first_process_col_B,
                                    &n_proc_cols_B);
-      Assert(n_local_rows_B == n_rows, ExcInternalError());
-      Assert(n_local_cols_B == n_columns, ExcInternalError());
+      Assert(n_local_rows_B DEAL_II_EQUALS n_rows, ExcInternalError());
+      Assert(n_local_cols_B DEAL_II_EQUALS n_columns, ExcInternalError());
       (void)n_local_cols_B;
 
       int lda  = std::max(1, n_local_rows_B);
@@ -454,7 +461,8 @@ ScaLAPACKMatrix<NumberType>::copy_from(const LAPACKFullMatrix<NumberType> &B,
                 &blacs_context_B,
                 &lda,
                 &info);
-      AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("descinit_", info));
+      AssertThrow(info DEAL_II_EQUALS 0,
+                  LAPACKSupport::ExcErrorCode("descinit_", info));
     }
   if (this->grid->mpi_process_is_active)
     {
@@ -495,7 +503,8 @@ template <typename NumberType>
 unsigned int
 ScaLAPACKMatrix<NumberType>::global_row(const unsigned int loc_row) const
 {
-  Assert(n_local_rows >= 0 && loc_row < static_cast<unsigned int>(n_local_rows),
+  Assert(n_local_rows >= 0 DEAL_II_AND loc_row <
+           static_cast<unsigned int>(n_local_rows),
          ExcIndexRange(loc_row, 0, n_local_rows));
   const int i = loc_row + 1;
   return indxl2g_(&i,
@@ -512,8 +521,8 @@ template <typename NumberType>
 unsigned int
 ScaLAPACKMatrix<NumberType>::global_column(const unsigned int loc_column) const
 {
-  Assert(n_local_columns >= 0 &&
-           loc_column < static_cast<unsigned int>(n_local_columns),
+  Assert(n_local_columns >= 0 DEAL_II_AND loc_column <
+           static_cast<unsigned int>(n_local_columns),
          ExcIndexRange(loc_column, 0, n_local_columns));
   const int j = loc_column + 1;
   return indxl2g_(&j,
@@ -531,25 +540,29 @@ void
 ScaLAPACKMatrix<NumberType>::copy_to(LAPACKFullMatrix<NumberType> &B,
                                      const unsigned int            rank) const
 {
-  if (n_rows * n_columns == 0)
+  if (n_rows * n_columns DEAL_II_EQUALS 0)
     return;
 
   const unsigned int this_mpi_process(
     Utilities::MPI::this_mpi_process(this->grid->mpi_communicator));
 
 #  ifdef DEBUG
-  Assert(Utilities::MPI::max(rank, this->grid->mpi_communicator) == rank,
+  Assert(Utilities::MPI::max(rank, this->grid->mpi_communicator)
+           DEAL_II_EQUALS rank,
          ExcMessage("All processes have to call routine with identical rank"));
-  Assert(Utilities::MPI::min(rank, this->grid->mpi_communicator) == rank,
+  Assert(Utilities::MPI::min(rank, this->grid->mpi_communicator)
+           DEAL_II_EQUALS rank,
          ExcMessage("All processes have to call routine with identical rank"));
 #  endif
 
-  if (this_mpi_process == rank)
+  if (this_mpi_process DEAL_II_EQUALS rank)
     {
       // the process which gets the serial copy has to be in the process grid
       Assert(this->grid->is_process_active(), ExcInternalError());
-      Assert(n_rows == int(B.m()), ExcDimensionMismatch(n_rows, B.m()));
-      Assert(n_columns == int(B.n()), ExcDimensionMismatch(n_columns, B.n()));
+      Assert(n_rows DEAL_II_EQUALS int(B.m()),
+             ExcDimensionMismatch(n_rows, B.m()));
+      Assert(n_columns DEAL_II_EQUALS int(B.n()),
+             ExcDimensionMismatch(n_columns, B.n()));
     }
 
   // Create 1x1 grid for matrix B.
@@ -583,13 +596,14 @@ ScaLAPACKMatrix<NumberType>::copy_to(LAPACKFullMatrix<NumberType> &B,
                       &n_proc_cols_B,
                       &this_process_row_B,
                       &this_process_column_B);
-      Assert(n_proc_rows_B * n_proc_cols_B == 1, ExcInternalError());
+      Assert(n_proc_rows_B * n_proc_cols_B DEAL_II_EQUALS 1,
+             ExcInternalError());
       // the active process of grid B has to be process #rank of the
       // communicator attached to A
-      Assert(this_mpi_process == rank, ExcInternalError());
+      Assert(this_mpi_process DEAL_II_EQUALS rank, ExcInternalError());
     }
   const bool mpi_process_is_active_B =
-    (this_process_row_B >= 0 && this_process_column_B >= 0);
+    (this_process_row_B >= 0 DEAL_II_AND this_process_column_B >= 0);
 
   // create descriptor for matrix B
   std::vector<int> descriptor_B(9, -1);
@@ -608,8 +622,8 @@ ScaLAPACKMatrix<NumberType>::copy_to(LAPACKFullMatrix<NumberType> &B,
                                    &this_process_column_B,
                                    &first_process_col_B,
                                    &n_proc_cols_B);
-      Assert(n_local_rows_B == n_rows, ExcInternalError());
-      Assert(n_local_cols_B == n_columns, ExcInternalError());
+      Assert(n_local_rows_B DEAL_II_EQUALS n_rows, ExcInternalError());
+      Assert(n_local_cols_B DEAL_II_EQUALS n_columns, ExcInternalError());
       (void)n_local_cols_B;
 
       int lda  = std::max(1, n_local_rows_B);
@@ -625,7 +639,8 @@ ScaLAPACKMatrix<NumberType>::copy_to(LAPACKFullMatrix<NumberType> &B,
                 &blacs_context_B,
                 &lda,
                 &info);
-      AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("descinit_", info));
+      AssertThrow(info DEAL_II_EQUALS 0,
+                  LAPACKSupport::ExcErrorCode("descinit_", info));
     }
   // pgemr2d has to be called only for processes active on grid attached to
   // matrix A
@@ -667,8 +682,9 @@ ScaLAPACKMatrix<NumberType>::copy_to(FullMatrix<NumberType> &matrix) const
   // PDGEMR2D copies a submatrix of A on a submatrix of B.
   // A and B can have different distributions
   // see http://icl.cs.utk.edu/lapack-forum/viewtopic.php?t=50
-  Assert(n_rows == int(matrix.m()), ExcDimensionMismatch(n_rows, matrix.m()));
-  Assert(n_columns == int(matrix.n()),
+  Assert(n_rows DEAL_II_EQUALS int(matrix.m()),
+         ExcDimensionMismatch(n_rows, matrix.m()));
+  Assert(n_columns DEAL_II_EQUALS int(matrix.n()),
          ExcDimensionMismatch(n_columns, matrix.n()));
 
   matrix = 0.;
@@ -689,25 +705,25 @@ ScaLAPACKMatrix<NumberType>::copy_to(FullMatrix<NumberType> &matrix) const
   // we could move the following lines under the main loop above,
   // but they would be dependent on glob_i and glob_j, which
   // won't make it much prettier
-  if (state == LAPACKSupport::cholesky)
+  if (state DEAL_II_EQUALS LAPACKSupport::cholesky)
     {
-      if (property == LAPACKSupport::lower_triangular)
+      if (property DEAL_II_EQUALS LAPACKSupport::lower_triangular)
         for (unsigned int i = 0; i < matrix.n(); ++i)
           for (unsigned int j = i + 1; j < matrix.m(); ++j)
             matrix(i, j) = 0.;
-      else if (property == LAPACKSupport::upper_triangular)
+      else if (property DEAL_II_EQUALS LAPACKSupport::upper_triangular)
         for (unsigned int i = 0; i < matrix.n(); ++i)
           for (unsigned int j = 0; j < i; ++j)
             matrix(i, j) = 0.;
     }
-  else if (property == LAPACKSupport::symmetric &&
-           state == LAPACKSupport::inverse_matrix)
+  else if (property DEAL_II_EQUALS LAPACKSupport::symmetric DEAL_II_AND state
+             DEAL_II_EQUALS LAPACKSupport::inverse_matrix)
     {
-      if (uplo == 'L')
+      if (uplo DEAL_II_EQUALS 'L')
         for (unsigned int i = 0; i < matrix.n(); ++i)
           for (unsigned int j = i + 1; j < matrix.m(); ++j)
             matrix(i, j) = matrix(j, i);
-      else if (uplo == 'U')
+      else if (uplo DEAL_II_EQUALS 'U')
         for (unsigned int i = 0; i < matrix.n(); ++i)
           for (unsigned int j = 0; j < i; ++j)
             matrix(i, j) = matrix(j, i);
@@ -725,7 +741,8 @@ ScaLAPACKMatrix<NumberType>::copy_to(
   const std::pair<unsigned int, unsigned int> &submatrix_size) const
 {
   // submatrix is empty
-  if (submatrix_size.first == 0 || submatrix_size.second == 0)
+  if (submatrix_size.first DEAL_II_EQUALS 0 DEAL_II_OR submatrix_size
+        .second                                        DEAL_II_EQUALS 0)
     return;
 
   // range checking for matrix A
@@ -743,7 +760,7 @@ ScaLAPACKMatrix<NumberType>::copy_to(
                           B.grid->mpi_communicator,
                           &comparison);
   AssertThrowMPI(ierr);
-  Assert(comparison == MPI_IDENT,
+  Assert(comparison DEAL_II_EQUALS MPI_IDENT,
          ExcMessage("Matrix A and B must have a common MPI Communicator"));
 
   /*
@@ -770,9 +787,8 @@ ScaLAPACKMatrix<NumberType>::copy_to(
                   &my_column_A);
 
   // check whether process is in the BLACS context of matrix A
-  const bool in_context_A =
-    (my_row_A >= 0 && my_row_A < n_grid_rows_A) &&
-    (my_column_A >= 0 && my_column_A < n_grid_columns_A);
+  const bool in_context_A = (my_row_A >= 0 DEAL_II_AND my_row_A < n_grid_rows_A)
+    DEAL_II_AND(my_column_A >= 0 DEAL_II_AND my_column_A < n_grid_columns_A);
 
   int n_grid_rows_B, n_grid_columns_B, my_row_B, my_column_B;
   Cblacs_gridinfo(B.grid->blacs_context,
@@ -782,9 +798,8 @@ ScaLAPACKMatrix<NumberType>::copy_to(
                   &my_column_B);
 
   // check whether process is in the BLACS context of matrix B
-  const bool in_context_B =
-    (my_row_B >= 0 && my_row_B < n_grid_rows_B) &&
-    (my_column_B >= 0 && my_column_B < n_grid_columns_B);
+  const bool in_context_B = (my_row_B >= 0 DEAL_II_AND my_row_B < n_grid_rows_B)
+    DEAL_II_AND(my_column_B >= 0 DEAL_II_AND my_column_B < n_grid_columns_B);
 
   const int n_rows_submatrix    = submatrix_size.first;
   const int n_columns_submatrix = submatrix_size.second;
@@ -849,18 +864,19 @@ template <typename NumberType>
 void
 ScaLAPACKMatrix<NumberType>::copy_to(ScaLAPACKMatrix<NumberType> &dest) const
 {
-  Assert(n_rows == dest.n_rows, ExcDimensionMismatch(n_rows, dest.n_rows));
-  Assert(n_columns == dest.n_columns,
+  Assert(n_rows DEAL_II_EQUALS dest.n_rows,
+         ExcDimensionMismatch(n_rows, dest.n_rows));
+  Assert(n_columns DEAL_II_EQUALS dest.n_columns,
          ExcDimensionMismatch(n_columns, dest.n_columns));
 
   if (this->grid->mpi_process_is_active)
     AssertThrow(
-      this->descriptor[0] == 1,
+      this->descriptor[0] DEAL_II_EQUALS 1,
       ExcMessage(
         "Copying of ScaLAPACK matrices only implemented for dense matrices"));
   if (dest.grid->mpi_process_is_active)
     AssertThrow(
-      dest.descriptor[0] == 1,
+      dest.descriptor[0] DEAL_II_EQUALS 1,
       ExcMessage(
         "Copying of ScaLAPACK matrices only implemented for dense matrices"));
 
@@ -870,8 +886,9 @@ ScaLAPACKMatrix<NumberType>::copy_to(ScaLAPACKMatrix<NumberType> &dest) const
    * if distributed matrices have the same process grid and block sizes, local
    * copying is enough
    */
-  if ((this->grid != dest.grid) || (row_block_size != dest.row_block_size) ||
-      (column_block_size != dest.column_block_size))
+  if ((this->grid != dest.grid)
+        DEAL_II_OR(row_block_size != dest.row_block_size)
+          DEAL_II_OR(column_block_size != dest.column_block_size))
     {
       /*
        * get the MPI communicator, which is the union of the source and
@@ -924,14 +941,15 @@ ScaLAPACKMatrix<NumberType>::copy_to(ScaLAPACKMatrix<NumberType> &dest) const
       const NumberType *loc_vals_source = nullptr;
       NumberType *      loc_vals_dest   = nullptr;
 
-      if (this->grid->mpi_process_is_active && (this->values.size() > 0))
+      if (this->grid->mpi_process_is_active DEAL_II_AND(this->values.size() >
+                                                        0))
         {
           AssertThrow(this->values.size() > 0,
                       dealii::ExcMessage(
                         "source: process is active but local matrix empty"));
           loc_vals_source = this->values.data();
         }
-      if (dest.grid->mpi_process_is_active && (dest.values.size() > 0))
+      if (dest.grid->mpi_process_is_active DEAL_II_AND(dest.values.size() > 0))
         {
           AssertThrow(
             dest.values.size() > 0,
@@ -995,24 +1013,27 @@ ScaLAPACKMatrix<NumberType>::add(const ScaLAPACKMatrix<NumberType> &B,
 {
   if (transpose_B)
     {
-      Assert(n_rows == B.n_columns, ExcDimensionMismatch(n_rows, B.n_columns));
-      Assert(n_columns == B.n_rows, ExcDimensionMismatch(n_columns, B.n_rows));
-      Assert(column_block_size == B.row_block_size,
+      Assert(n_rows DEAL_II_EQUALS B.n_columns,
+             ExcDimensionMismatch(n_rows, B.n_columns));
+      Assert(n_columns DEAL_II_EQUALS B.n_rows,
+             ExcDimensionMismatch(n_columns, B.n_rows));
+      Assert(column_block_size DEAL_II_EQUALS B.row_block_size,
              ExcDimensionMismatch(column_block_size, B.row_block_size));
-      Assert(row_block_size == B.column_block_size,
+      Assert(row_block_size DEAL_II_EQUALS B.column_block_size,
              ExcDimensionMismatch(row_block_size, B.column_block_size));
     }
   else
     {
-      Assert(n_rows == B.n_rows, ExcDimensionMismatch(n_rows, B.n_rows));
-      Assert(n_columns == B.n_columns,
+      Assert(n_rows DEAL_II_EQUALS B.n_rows,
+             ExcDimensionMismatch(n_rows, B.n_rows));
+      Assert(n_columns DEAL_II_EQUALS B.n_columns,
              ExcDimensionMismatch(n_columns, B.n_columns));
-      Assert(column_block_size == B.column_block_size,
+      Assert(column_block_size DEAL_II_EQUALS B.column_block_size,
              ExcDimensionMismatch(column_block_size, B.column_block_size));
-      Assert(row_block_size == B.row_block_size,
+      Assert(row_block_size DEAL_II_EQUALS B.row_block_size,
              ExcDimensionMismatch(row_block_size, B.row_block_size));
     }
-  Assert(this->grid == B.grid,
+  Assert(this->grid DEAL_II_EQUALS B.grid,
          ExcMessage("The matrices A and B need to have the same process grid"));
 
   if (this->grid->mpi_process_is_active)
@@ -1071,72 +1092,72 @@ ScaLAPACKMatrix<NumberType>::mult(const NumberType                   b,
                                   const bool transpose_A,
                                   const bool transpose_B) const
 {
-  Assert(this->grid == B.grid,
+  Assert(this->grid DEAL_II_EQUALS B.grid,
          ExcMessage("The matrices A and B need to have the same process grid"));
-  Assert(C.grid == B.grid,
+  Assert(C.grid DEAL_II_EQUALS B.grid,
          ExcMessage("The matrices B and C need to have the same process grid"));
 
   // see for further info:
   // https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lgemm.htm
-  if (!transpose_A && !transpose_B)
+  if (!transpose_A DEAL_II_AND !transpose_B)
     {
-      Assert(this->n_columns == B.n_rows,
+      Assert(this->n_columns DEAL_II_EQUALS B.n_rows,
              ExcDimensionMismatch(this->n_columns, B.n_rows));
-      Assert(this->n_rows == C.n_rows,
+      Assert(this->n_rows DEAL_II_EQUALS C.n_rows,
              ExcDimensionMismatch(this->n_rows, C.n_rows));
-      Assert(B.n_columns == C.n_columns,
+      Assert(B.n_columns DEAL_II_EQUALS C.n_columns,
              ExcDimensionMismatch(B.n_columns, C.n_columns));
-      Assert(this->row_block_size == C.row_block_size,
+      Assert(this->row_block_size DEAL_II_EQUALS C.row_block_size,
              ExcDimensionMismatch(this->row_block_size, C.row_block_size));
-      Assert(this->column_block_size == B.row_block_size,
+      Assert(this->column_block_size DEAL_II_EQUALS B.row_block_size,
              ExcDimensionMismatch(this->column_block_size, B.row_block_size));
-      Assert(B.column_block_size == C.column_block_size,
+      Assert(B.column_block_size DEAL_II_EQUALS C.column_block_size,
              ExcDimensionMismatch(B.column_block_size, C.column_block_size));
     }
-  else if (transpose_A && !transpose_B)
+  else if (transpose_A DEAL_II_AND !transpose_B)
     {
-      Assert(this->n_rows == B.n_rows,
+      Assert(this->n_rows DEAL_II_EQUALS B.n_rows,
              ExcDimensionMismatch(this->n_rows, B.n_rows));
-      Assert(this->n_columns == C.n_rows,
+      Assert(this->n_columns DEAL_II_EQUALS C.n_rows,
              ExcDimensionMismatch(this->n_columns, C.n_rows));
-      Assert(B.n_columns == C.n_columns,
+      Assert(B.n_columns DEAL_II_EQUALS C.n_columns,
              ExcDimensionMismatch(B.n_columns, C.n_columns));
-      Assert(this->column_block_size == C.row_block_size,
+      Assert(this->column_block_size DEAL_II_EQUALS C.row_block_size,
              ExcDimensionMismatch(this->column_block_size, C.row_block_size));
-      Assert(this->row_block_size == B.row_block_size,
+      Assert(this->row_block_size DEAL_II_EQUALS B.row_block_size,
              ExcDimensionMismatch(this->row_block_size, B.row_block_size));
-      Assert(B.column_block_size == C.column_block_size,
+      Assert(B.column_block_size DEAL_II_EQUALS C.column_block_size,
              ExcDimensionMismatch(B.column_block_size, C.column_block_size));
     }
-  else if (!transpose_A && transpose_B)
+  else if (!transpose_A DEAL_II_AND transpose_B)
     {
-      Assert(this->n_columns == B.n_columns,
+      Assert(this->n_columns DEAL_II_EQUALS B.n_columns,
              ExcDimensionMismatch(this->n_columns, B.n_columns));
-      Assert(this->n_rows == C.n_rows,
+      Assert(this->n_rows DEAL_II_EQUALS C.n_rows,
              ExcDimensionMismatch(this->n_rows, C.n_rows));
-      Assert(B.n_rows == C.n_columns,
+      Assert(B.n_rows DEAL_II_EQUALS C.n_columns,
              ExcDimensionMismatch(B.n_rows, C.n_columns));
-      Assert(this->row_block_size == C.row_block_size,
+      Assert(this->row_block_size DEAL_II_EQUALS C.row_block_size,
              ExcDimensionMismatch(this->row_block_size, C.row_block_size));
-      Assert(this->column_block_size == B.column_block_size,
+      Assert(this->column_block_size DEAL_II_EQUALS B.column_block_size,
              ExcDimensionMismatch(this->column_block_size,
                                   B.column_block_size));
-      Assert(B.row_block_size == C.column_block_size,
+      Assert(B.row_block_size DEAL_II_EQUALS C.column_block_size,
              ExcDimensionMismatch(B.row_block_size, C.column_block_size));
     }
-  else // if (transpose_A && transpose_B)
+  else // if (transpose_A DEAL_II_AND  transpose_B)
     {
-      Assert(this->n_rows == B.n_columns,
+      Assert(this->n_rows DEAL_II_EQUALS B.n_columns,
              ExcDimensionMismatch(this->n_rows, B.n_columns));
-      Assert(this->n_columns == C.n_rows,
+      Assert(this->n_columns DEAL_II_EQUALS C.n_rows,
              ExcDimensionMismatch(this->n_columns, C.n_rows));
-      Assert(B.n_rows == C.n_columns,
+      Assert(B.n_rows DEAL_II_EQUALS C.n_columns,
              ExcDimensionMismatch(B.n_rows, C.n_columns));
-      Assert(this->column_block_size == C.row_block_size,
+      Assert(this->column_block_size DEAL_II_EQUALS C.row_block_size,
              ExcDimensionMismatch(this->row_block_size, C.row_block_size));
-      Assert(this->row_block_size == B.column_block_size,
+      Assert(this->row_block_size DEAL_II_EQUALS B.column_block_size,
              ExcDimensionMismatch(this->column_block_size, B.row_block_size));
-      Assert(B.row_block_size == C.column_block_size,
+      Assert(B.row_block_size DEAL_II_EQUALS C.column_block_size,
              ExcDimensionMismatch(B.column_block_size, C.column_block_size));
     }
 
@@ -1240,10 +1261,11 @@ void
 ScaLAPACKMatrix<NumberType>::compute_cholesky_factorization()
 {
   Assert(
-    n_columns == n_rows && property == LAPACKSupport::Property::symmetric,
+    n_columns DEAL_II_EQUALS n_rows DEAL_II_AND property DEAL_II_EQUALS
+                                                         LAPACKSupport::Property::symmetric,
     ExcMessage(
       "Cholesky factorization can be applied to symmetric matrices only."));
-  Assert(state == LAPACKSupport::matrix,
+  Assert(state DEAL_II_EQUALS LAPACKSupport::matrix,
          ExcMessage(
            "Matrix has to be in Matrix state before calling this function."));
 
@@ -1259,11 +1281,12 @@ ScaLAPACKMatrix<NumberType>::compute_cholesky_factorization()
              &submatrix_column,
              descriptor,
              &info);
-      AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("ppotrf", info));
+      AssertThrow(info DEAL_II_EQUALS 0,
+                  LAPACKSupport::ExcErrorCode("ppotrf", info));
     }
   state    = LAPACKSupport::cholesky;
-  property = (uplo == 'L' ? LAPACKSupport::lower_triangular :
-                            LAPACKSupport::upper_triangular);
+  property = (uplo DEAL_II_EQUALS 'L' ? LAPACKSupport::lower_triangular :
+                                        LAPACKSupport::upper_triangular);
 }
 
 
@@ -1272,7 +1295,7 @@ template <typename NumberType>
 void
 ScaLAPACKMatrix<NumberType>::compute_lu_factorization()
 {
-  Assert(state == LAPACKSupport::matrix,
+  Assert(state DEAL_II_EQUALS LAPACKSupport::matrix,
          ExcMessage(
            "Matrix has to be in Matrix state before calling this function."));
 
@@ -1301,7 +1324,8 @@ ScaLAPACKMatrix<NumberType>::compute_lu_factorization()
              descriptor,
              ipiv.data(),
              &info);
-      AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("pgetrf", info));
+      AssertThrow(info DEAL_II_EQUALS 0,
+                  LAPACKSupport::ExcErrorCode("pgetrf", info));
     }
   state    = LAPACKSupport::State::lu;
   property = LAPACKSupport::Property::general;
@@ -1316,24 +1340,26 @@ ScaLAPACKMatrix<NumberType>::invert()
   // Check whether matrix is symmetric and save flag.
   // If a Cholesky factorization has been applied previously,
   // the original matrix was symmetric.
-  const bool is_symmetric = (property == LAPACKSupport::symmetric ||
-                             state == LAPACKSupport::State::cholesky);
+  const bool is_symmetric =
+    (property DEAL_II_EQUALS LAPACKSupport::symmetric DEAL_II_OR state
+       DEAL_II_EQUALS LAPACKSupport::State::cholesky);
 
   // Check whether matrix is triangular and is in an unfactorized state.
-  const bool is_triangular = (property == LAPACKSupport::upper_triangular ||
-                              property == LAPACKSupport::lower_triangular) &&
-                             (state == LAPACKSupport::State::matrix ||
-                              state == LAPACKSupport::State::inverse_matrix);
+  const bool is_triangular =
+    (property DEAL_II_EQUALS LAPACKSupport::upper_triangular DEAL_II_OR property
+       DEAL_II_EQUALS LAPACKSupport::lower_triangular)
+      DEAL_II_AND(state DEAL_II_EQUALS LAPACKSupport::State::matrix DEAL_II_OR
+                    state DEAL_II_EQUALS LAPACKSupport::State::inverse_matrix);
 
   if (is_triangular)
     {
       if (grid->mpi_process_is_active)
         {
           const char uploTriangular =
-            property == LAPACKSupport::upper_triangular ? 'U' : 'L';
-          const char  diag  = 'N';
-          int         info  = 0;
-          NumberType *A_loc = this->values.data();
+            property DEAL_II_EQUALS LAPACKSupport::upper_triangular ? 'U' : 'L';
+          const char                diag  = 'N';
+          int                       info  = 0;
+          NumberType *              A_loc = this->values.data();
           ptrtri(&uploTriangular,
                  &diag,
                  &n_columns,
@@ -1342,7 +1368,8 @@ ScaLAPACKMatrix<NumberType>::invert()
                  &submatrix_column,
                  descriptor,
                  &info);
-          AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("ptrtri", info));
+          AssertThrow(info DEAL_II_EQUALS 0,
+                      LAPACKSupport::ExcErrorCode("ptrtri", info));
           // The inversion is stored in the same part as the triangular matrix,
           // so we don't need to re-set the property here.
         }
@@ -1352,8 +1379,8 @@ ScaLAPACKMatrix<NumberType>::invert()
       // Matrix is neither in Cholesky nor LU state.
       // Compute the required factorizations based on the property of the
       // matrix.
-      if (!(state == LAPACKSupport::State::lu ||
-            state == LAPACKSupport::State::cholesky))
+      if (!(state DEAL_II_EQUALS LAPACKSupport::State::lu DEAL_II_OR state
+              DEAL_II_EQUALS LAPACKSupport::State::cholesky))
         {
           if (is_symmetric)
             compute_cholesky_factorization();
@@ -1374,7 +1401,7 @@ ScaLAPACKMatrix<NumberType>::invert()
                      &submatrix_column,
                      descriptor,
                      &info);
-              AssertThrow(info == 0,
+              AssertThrow(info DEAL_II_EQUALS 0,
                           LAPACKSupport::ExcErrorCode("ppotri", info));
               property = LAPACKSupport::Property::symmetric;
             }
@@ -1396,7 +1423,7 @@ ScaLAPACKMatrix<NumberType>::invert()
                      &liwork,
                      &info);
 
-              AssertThrow(info == 0,
+              AssertThrow(info DEAL_II_EQUALS 0,
                           LAPACKSupport::ExcErrorCode("pgetri", info));
               lwork  = static_cast<int>(work[0]);
               liwork = iwork[0];
@@ -1415,7 +1442,7 @@ ScaLAPACKMatrix<NumberType>::invert()
                      &liwork,
                      &info);
 
-              AssertThrow(info == 0,
+              AssertThrow(info DEAL_II_EQUALS 0,
                           LAPACKSupport::ExcErrorCode("pgetri", info));
             }
         }
@@ -1440,7 +1467,8 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_by_index(
                    std::max(index_limits.first, index_limits.second));
 
   // compute all eigenvalues/eigenvectors
-  if (idx.first == 0 && idx.second == static_cast<unsigned int>(n_rows - 1))
+  if (idx.first DEAL_II_EQUALS 0 DEAL_II_AND idx
+        .second DEAL_II_EQUALS static_cast<unsigned int>(n_rows - 1))
     return eigenpairs_symmetric(compute_eigenvectors);
   else
     return eigenpairs_symmetric(compute_eigenvectors, idx);
@@ -1475,26 +1503,27 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
   const std::pair<unsigned int, unsigned int> &eigenvalue_idx,
   const std::pair<NumberType, NumberType> &    eigenvalue_limits)
 {
-  Assert(state == LAPACKSupport::matrix,
+  Assert(state DEAL_II_EQUALS LAPACKSupport::matrix,
          ExcMessage(
            "Matrix has to be in Matrix state before calling this function."));
-  Assert(property == LAPACKSupport::symmetric,
+  Assert(property DEAL_II_EQUALS LAPACKSupport::symmetric,
          ExcMessage("Matrix has to be symmetric for this operation."));
 
   std::lock_guard<std::mutex> lock(mutex);
 
-  const bool use_values = (std::isnan(eigenvalue_limits.first) ||
-                           std::isnan(eigenvalue_limits.second)) ?
+  const bool use_values = (std::isnan(eigenvalue_limits.first)
+                             DEAL_II_OR std::isnan(eigenvalue_limits.second)) ?
                             false :
                             true;
   const bool use_indices =
-    ((eigenvalue_idx.first == numbers::invalid_unsigned_int) ||
-     (eigenvalue_idx.second == numbers::invalid_unsigned_int)) ?
+    ((eigenvalue_idx.first DEAL_II_EQUALS numbers::invalid_unsigned_int)
+       DEAL_II_OR(
+         eigenvalue_idx.second DEAL_II_EQUALS numbers::invalid_unsigned_int)) ?
       false :
       true;
 
   Assert(
-    !(use_values && use_indices),
+    !(use_values DEAL_II_AND use_indices),
     ExcMessage(
       "Prescribing both the index and value range for the eigenvalues is ambiguous"));
 
@@ -1519,8 +1548,8 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
     {
       int info = 0;
       /*
-       * for jobz==N only eigenvalues are computed, for jobz='V' also the
-       * eigenvectors of the matrix are computed
+       * for jobzDEAL_II_EQUALS N only eigenvalues are computed, for jobz='V'
+       * also the eigenvectors of the matrix are computed
        */
       char jobz  = compute_eigenvectors ? 'V' : 'N';
       char range = 'A';
@@ -1530,7 +1559,7 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
       int        il = 1, iu = 1;
       // number of eigenvectors to be returned;
       // upon successful exit the first m=nz columns contain the selected
-      // eigenvectors (only if jobz=='V')
+      // eigenvectors (only if jobzDEAL_II_EQUALS 'V')
       int        nz     = 0;
       NumberType abstol = NumberType();
 
@@ -1612,7 +1641,8 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
                 work.data(),
                 &lwork,
                 &info);
-          AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("psyev", info));
+          AssertThrow(info DEAL_II_EQUALS 0,
+                      LAPACKSupport::ExcErrorCode("psyev", info));
         }
       else
         {
@@ -1652,7 +1682,8 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
                  iclustr.data(),
                  gap.data(),
                  &info);
-          AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("psyevx", info));
+          AssertThrow(info DEAL_II_EQUALS 0,
+                      LAPACKSupport::ExcErrorCode("psyevx", info));
         }
       lwork = static_cast<int>(work[0]);
       work.resize(lwork);
@@ -1675,7 +1706,8 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
                 &lwork,
                 &info);
 
-          AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("psyev", info));
+          AssertThrow(info DEAL_II_EQUALS 0,
+                      LAPACKSupport::ExcErrorCode("psyev", info));
         }
       else
         {
@@ -1713,7 +1745,8 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
                  gap.data(),
                  &info);
 
-          AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("psyevx", info));
+          AssertThrow(info DEAL_II_EQUALS 0,
+                      LAPACKSupport::ExcErrorCode("psyevx", info));
         }
       // if eigenvectors are queried copy eigenvectors to original matrix
       // as the temporary matrix eigenvectors has identical dimensions and
@@ -1773,7 +1806,8 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_by_index_MRRR(
                    std::max(index_limits.first, index_limits.second));
 
   // Compute all eigenvalues/eigenvectors.
-  if (idx.first == 0 && idx.second == static_cast<unsigned int>(n_rows - 1))
+  if (idx.first DEAL_II_EQUALS 0 DEAL_II_AND idx
+        .second DEAL_II_EQUALS static_cast<unsigned int>(n_rows - 1))
     return eigenpairs_symmetric_MRRR(compute_eigenvectors);
   else
     return eigenpairs_symmetric_MRRR(compute_eigenvectors, idx);
@@ -1806,26 +1840,27 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_MRRR(
   const std::pair<unsigned int, unsigned int> &eigenvalue_idx,
   const std::pair<NumberType, NumberType> &    eigenvalue_limits)
 {
-  Assert(state == LAPACKSupport::matrix,
+  Assert(state DEAL_II_EQUALS LAPACKSupport::matrix,
          ExcMessage(
            "Matrix has to be in Matrix state before calling this function."));
-  Assert(property == LAPACKSupport::symmetric,
+  Assert(property DEAL_II_EQUALS LAPACKSupport::symmetric,
          ExcMessage("Matrix has to be symmetric for this operation."));
 
   std::lock_guard<std::mutex> lock(mutex);
 
-  const bool use_values = (std::isnan(eigenvalue_limits.first) ||
-                           std::isnan(eigenvalue_limits.second)) ?
+  const bool use_values = (std::isnan(eigenvalue_limits.first)
+                             DEAL_II_OR std::isnan(eigenvalue_limits.second)) ?
                             false :
                             true;
   const bool use_indices =
-    ((eigenvalue_idx.first == numbers::invalid_unsigned_int) ||
-     (eigenvalue_idx.second == numbers::invalid_unsigned_int)) ?
+    ((eigenvalue_idx.first DEAL_II_EQUALS numbers::invalid_unsigned_int)
+       DEAL_II_OR(
+         eigenvalue_idx.second DEAL_II_EQUALS numbers::invalid_unsigned_int)) ?
       false :
       true;
 
   Assert(
-    !(use_values && use_indices),
+    !(use_values DEAL_II_AND use_indices),
     ExcMessage(
       "Prescribing both the index and value range for the eigenvalues is ambiguous"));
 
@@ -1847,15 +1882,15 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_MRRR(
 
   // Number of eigenvectors to be returned;
   // Upon successful exit the first m=nz columns contain the selected
-  // eigenvectors (only if jobz=='V').
+  // eigenvectors (only if jobzDEAL_II_EQUALS 'V').
   int nz = 0;
 
   if (grid->mpi_process_is_active)
     {
       int info = 0;
       /*
-       * For jobz==N only eigenvalues are computed, for jobz='V' also the
-       * eigenvectors of the matrix are computed.
+       * For jobzDEAL_II_EQUALS N only eigenvalues are computed, for jobz='V'
+       * also the eigenvectors of the matrix are computed.
        */
       char jobz = compute_eigenvectors ? 'V' : 'N';
       // Default value is to compute all eigenvalues and optionally
@@ -1926,7 +1961,8 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_MRRR(
              &liwork,
              &info);
 
-      AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("psyevr", info));
+      AssertThrow(info DEAL_II_EQUALS 0,
+                  LAPACKSupport::ExcErrorCode("psyevr", info));
 
       lwork = static_cast<int>(work[0]);
       work.resize(lwork);
@@ -1958,11 +1994,12 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_MRRR(
              &liwork,
              &info);
 
-      AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("psyevr", info));
+      AssertThrow(info DEAL_II_EQUALS 0,
+                  LAPACKSupport::ExcErrorCode("psyevr", info));
 
       if (compute_eigenvectors)
         AssertThrow(
-          m == nz,
+          m DEAL_II_EQUALS nz,
           ExcMessage(
             "psyevr failed to compute all eigenvectors for the selected eigenvalues"));
 
@@ -2014,10 +2051,10 @@ std::vector<NumberType>
 ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix<NumberType> *U,
                                          ScaLAPACKMatrix<NumberType> *VT)
 {
-  Assert(state == LAPACKSupport::matrix,
+  Assert(state DEAL_II_EQUALS LAPACKSupport::matrix,
          ExcMessage(
            "Matrix has to be in Matrix state before calling this function."));
-  Assert(row_block_size == column_block_size,
+  Assert(row_block_size DEAL_II_EQUALS column_block_size,
          ExcDimensionMismatch(row_block_size, column_block_size));
 
   const bool left_singluar_vectors  = (U != nullptr) ? true : false;
@@ -2025,27 +2062,28 @@ ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix<NumberType> *U,
 
   if (left_singluar_vectors)
     {
-      Assert(n_rows == U->n_rows, ExcDimensionMismatch(n_rows, U->n_rows));
-      Assert(U->n_rows == U->n_columns,
+      Assert(n_rows DEAL_II_EQUALS U->n_rows,
+             ExcDimensionMismatch(n_rows, U->n_rows));
+      Assert(U->n_rows DEAL_II_EQUALS U->n_columns,
              ExcDimensionMismatch(U->n_rows, U->n_columns));
-      Assert(row_block_size == U->row_block_size,
+      Assert(row_block_size DEAL_II_EQUALS U->row_block_size,
              ExcDimensionMismatch(row_block_size, U->row_block_size));
-      Assert(column_block_size == U->column_block_size,
+      Assert(column_block_size DEAL_II_EQUALS U->column_block_size,
              ExcDimensionMismatch(column_block_size, U->column_block_size));
-      Assert(grid->blacs_context == U->grid->blacs_context,
+      Assert(grid->blacs_context DEAL_II_EQUALS U->grid->blacs_context,
              ExcDimensionMismatch(grid->blacs_context, U->grid->blacs_context));
     }
   if (right_singluar_vectors)
     {
-      Assert(n_columns == VT->n_rows,
+      Assert(n_columns DEAL_II_EQUALS VT->n_rows,
              ExcDimensionMismatch(n_columns, VT->n_rows));
-      Assert(VT->n_rows == VT->n_columns,
+      Assert(VT->n_rows DEAL_II_EQUALS VT->n_columns,
              ExcDimensionMismatch(VT->n_rows, VT->n_columns));
-      Assert(row_block_size == VT->row_block_size,
+      Assert(row_block_size DEAL_II_EQUALS VT->row_block_size,
              ExcDimensionMismatch(row_block_size, VT->row_block_size));
-      Assert(column_block_size == VT->column_block_size,
+      Assert(column_block_size DEAL_II_EQUALS VT->column_block_size,
              ExcDimensionMismatch(column_block_size, VT->column_block_size));
-      Assert(grid->blacs_context == VT->grid->blacs_context,
+      Assert(grid->blacs_context DEAL_II_EQUALS VT->grid->blacs_context,
              ExcDimensionMismatch(grid->blacs_context,
                                   VT->grid->blacs_context));
     }
@@ -2088,7 +2126,8 @@ ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix<NumberType> *U,
              work.data(),
              &lwork,
              &info);
-      AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("pgesvd", info));
+      AssertThrow(info DEAL_II_EQUALS 0,
+                  LAPACKSupport::ExcErrorCode("pgesvd", info));
 
       lwork = static_cast<int>(work[0]);
       work.resize(lwork);
@@ -2113,7 +2152,8 @@ ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix<NumberType> *U,
              work.data(),
              &lwork,
              &info);
-      AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("pgesvd", info));
+      AssertThrow(info DEAL_II_EQUALS 0,
+                  LAPACKSupport::ExcErrorCode("pgesvd", info));
     }
 
   /*
@@ -2134,33 +2174,35 @@ void
 ScaLAPACKMatrix<NumberType>::least_squares(ScaLAPACKMatrix<NumberType> &B,
                                            const bool transpose)
 {
-  Assert(grid == B.grid,
+  Assert(grid DEAL_II_EQUALS B.grid,
          ExcMessage("The matrices A and B need to have the same process grid"));
-  Assert(state == LAPACKSupport::matrix,
+  Assert(state DEAL_II_EQUALS LAPACKSupport::matrix,
          ExcMessage(
            "Matrix has to be in Matrix state before calling this function."));
-  Assert(B.state == LAPACKSupport::matrix,
+  Assert(B.state DEAL_II_EQUALS LAPACKSupport::matrix,
          ExcMessage(
            "Matrix B has to be in Matrix state before calling this function."));
 
   if (transpose)
     {
-      Assert(n_columns == B.n_rows, ExcDimensionMismatch(n_columns, B.n_rows));
+      Assert(n_columns DEAL_II_EQUALS B.n_rows,
+             ExcDimensionMismatch(n_columns, B.n_rows));
     }
   else
     {
-      Assert(n_rows == B.n_rows, ExcDimensionMismatch(n_rows, B.n_rows));
+      Assert(n_rows DEAL_II_EQUALS B.n_rows,
+             ExcDimensionMismatch(n_rows, B.n_rows));
     }
 
   // see
   // https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lgels.htm
-  Assert(row_block_size == column_block_size,
+  Assert(row_block_size DEAL_II_EQUALS column_block_size,
          ExcMessage(
            "Use identical block sizes for rows and columns of matrix A"));
-  Assert(B.row_block_size == B.column_block_size,
+  Assert(B.row_block_size DEAL_II_EQUALS B.column_block_size,
          ExcMessage(
            "Use identical block sizes for rows and columns of matrix B"));
-  Assert(row_block_size == B.row_block_size,
+  Assert(row_block_size DEAL_II_EQUALS B.row_block_size,
          ExcMessage(
            "Use identical block-cyclic distribution for matrices A and B"));
 
@@ -2194,7 +2236,8 @@ ScaLAPACKMatrix<NumberType>::least_squares(ScaLAPACKMatrix<NumberType> &B,
             work.data(),
             &lwork,
             &info);
-      AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("pgels", info));
+      AssertThrow(info DEAL_II_EQUALS 0,
+                  LAPACKSupport::ExcErrorCode("pgels", info));
 
       lwork = static_cast<int>(work[0]);
       work.resize(lwork);
@@ -2214,7 +2257,8 @@ ScaLAPACKMatrix<NumberType>::least_squares(ScaLAPACKMatrix<NumberType> &B,
             work.data(),
             &lwork,
             &info);
-      AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("pgels", info));
+      AssertThrow(info DEAL_II_EQUALS 0,
+                  LAPACKSupport::ExcErrorCode("pgels", info));
     }
   state = LAPACKSupport::State::unusable;
 }
@@ -2225,14 +2269,14 @@ template <typename NumberType>
 unsigned int
 ScaLAPACKMatrix<NumberType>::pseudoinverse(const NumberType ratio)
 {
-  Assert(state == LAPACKSupport::matrix,
+  Assert(state DEAL_II_EQUALS LAPACKSupport::matrix,
          ExcMessage(
            "Matrix has to be in Matrix state before calling this function."));
-  Assert(row_block_size == column_block_size,
+  Assert(row_block_size DEAL_II_EQUALS column_block_size,
          ExcMessage(
            "Use identical block sizes for rows and columns of matrix A"));
   Assert(
-    ratio > 0. && ratio < 1.,
+    ratio > 0. DEAL_II_AND ratio < 1.,
     ExcMessage(
       "input parameter ratio has to be larger than zero and smaller than 1"));
 
@@ -2313,7 +2357,7 @@ NumberType
 ScaLAPACKMatrix<NumberType>::reciprocal_condition_number(
   const NumberType a_norm) const
 {
-  Assert(state == LAPACKSupport::cholesky,
+  Assert(state DEAL_II_EQUALS LAPACKSupport::cholesky,
          ExcMessage(
            "Matrix has to be in Cholesky state before calling this function."));
   std::lock_guard<std::mutex> lock(mutex);
@@ -2344,7 +2388,8 @@ ScaLAPACKMatrix<NumberType>::reciprocal_condition_number(
              iwork.data(),
              &liwork,
              &info);
-      AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("pdpocon", info));
+      AssertThrow(info DEAL_II_EQUALS 0,
+                  LAPACKSupport::ExcErrorCode("pdpocon", info));
       lwork = static_cast<int>(std::ceil(work[0]));
       work.resize(lwork);
 
@@ -2362,7 +2407,8 @@ ScaLAPACKMatrix<NumberType>::reciprocal_condition_number(
              iwork.data(),
              &liwork,
              &info);
-      AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("pdpocon", info));
+      AssertThrow(info DEAL_II_EQUALS 0,
+                  LAPACKSupport::ExcErrorCode("pdpocon", info));
     }
   grid->send_to_inactive(&rcond);
   return rcond;
@@ -2376,7 +2422,7 @@ ScaLAPACKMatrix<NumberType>::l1_norm() const
 {
   const char type('O');
 
-  if (property == LAPACKSupport::symmetric)
+  if (property DEAL_II_EQUALS LAPACKSupport::symmetric)
     return norm_symmetric(type);
   else
     return norm_general(type);
@@ -2390,7 +2436,7 @@ ScaLAPACKMatrix<NumberType>::linfty_norm() const
 {
   const char type('I');
 
-  if (property == LAPACKSupport::symmetric)
+  if (property DEAL_II_EQUALS LAPACKSupport::symmetric)
     return norm_symmetric(type);
   else
     return norm_general(type);
@@ -2404,7 +2450,7 @@ ScaLAPACKMatrix<NumberType>::frobenius_norm() const
 {
   const char type('F');
 
-  if (property == LAPACKSupport::symmetric)
+  if (property DEAL_II_EQUALS LAPACKSupport::symmetric)
     return norm_symmetric(type);
   else
     return norm_general(type);
@@ -2416,8 +2462,8 @@ template <typename NumberType>
 NumberType
 ScaLAPACKMatrix<NumberType>::norm_general(const char type) const
 {
-  Assert(state == LAPACKSupport::matrix ||
-           state == LAPACKSupport::inverse_matrix,
+  Assert(state DEAL_II_EQUALS LAPACKSupport::matrix DEAL_II_OR state
+           DEAL_II_EQUALS LAPACKSupport::inverse_matrix,
          ExcMessage("norms can be called in matrix state only."));
   std::lock_guard<std::mutex> lock(mutex);
   NumberType                  res = 0.;
@@ -2446,12 +2492,13 @@ ScaLAPACKMatrix<NumberType>::norm_general(const char type) const
                               &(grid->n_process_columns));
 
       // type='M': compute largest absolute value
-      // type='F' || type='E': compute Frobenius norm
-      // type='0' || type='1': compute infinity norm
-      int lwork = 0; // for type == 'M' || type == 'F' || type == 'E'
-      if (type == 'O' || type == '1')
+      // type='F' DEAL_II_OR  type='E': compute Frobenius norm
+      // type='0' DEAL_II_OR  type='1': compute infinity norm
+      int lwork = 0; // for type DEAL_II_EQUALS  'M' DEAL_II_OR  type
+                     // DEAL_II_EQUALS  'F' DEAL_II_OR  type DEAL_II_EQUALS  'E'
+      if (type DEAL_II_EQUALS 'O' DEAL_II_OR type DEAL_II_EQUALS '1')
         lwork = nq0;
-      else if (type == 'I')
+      else if (type DEAL_II_EQUALS 'I')
         lwork = mp0;
 
       work.resize(lwork);
@@ -2475,10 +2522,10 @@ template <typename NumberType>
 NumberType
 ScaLAPACKMatrix<NumberType>::norm_symmetric(const char type) const
 {
-  Assert(state == LAPACKSupport::matrix ||
-           state == LAPACKSupport::inverse_matrix,
+  Assert(state DEAL_II_EQUALS LAPACKSupport::matrix DEAL_II_OR state
+           DEAL_II_EQUALS LAPACKSupport::inverse_matrix,
          ExcMessage("norms can be called in matrix state only."));
-  Assert(property == LAPACKSupport::symmetric,
+  Assert(property DEAL_II_EQUALS LAPACKSupport::symmetric,
          ExcMessage("Matrix has to be symmetric for this operation."));
   std::lock_guard<std::mutex> lock(mutex);
   NumberType                  res = 0.;
@@ -2513,12 +2560,15 @@ ScaLAPACKMatrix<NumberType>::norm_symmetric(const char type) const
                               &(grid->n_process_columns));
 
       const int v1  = iceil_(&Np0, &row_block_size);
-      const int ldw = (n_local_rows == n_local_columns) ?
+      const int ldw = (n_local_rows DEAL_II_EQUALS n_local_columns) ?
                         0 :
                         row_block_size * iceil_(&v1, &v2);
 
       const int lwork =
-        (type == 'M' || type == 'F' || type == 'E') ? 0 : 2 * Nq0 + Np0 + ldw;
+        (type DEAL_II_EQUALS 'M' DEAL_II_OR type
+           DEAL_II_EQUALS 'F' DEAL_II_OR type DEAL_II_EQUALS 'E') ?
+          0 :
+          2 * Nq0 + Np0 + ldw;
       work.resize(lwork);
       const NumberType *A_loc = this->values.begin();
       res                     = plansy(&type,
@@ -2617,8 +2667,9 @@ ScaLAPACKMatrix<NumberType>::save(
 
   std::pair<unsigned int, unsigned int> chunks_size_ = chunk_size;
 
-  if (chunks_size_.first == numbers::invalid_unsigned_int ||
-      chunks_size_.second == numbers::invalid_unsigned_int)
+  if (chunks_size_
+        .first DEAL_II_EQUALS numbers::invalid_unsigned_int DEAL_II_OR
+          chunks_size_.second DEAL_II_EQUALS numbers::invalid_unsigned_int)
     {
       // default: store the matrix in chunks of columns
       chunks_size_.first  = n_rows;
@@ -2962,7 +3013,7 @@ ScaLAPACKMatrix<NumberType>::save_parallel(
   AssertThrowMPI(ierr);
 
   // only root process will write state and property to the file
-  if (tmp.grid->this_mpi_process == 0)
+  if (tmp.grid->this_mpi_process DEAL_II_EQUALS 0)
     {
       // open file using default properties
       hid_t file_id_reopen =
@@ -3105,7 +3156,7 @@ ScaLAPACKMatrix<NumberType>::load_serial(const std::string &filename)
       H5T_class_t t_class_in = H5Tget_class(datatype);
       H5T_class_t t_class    = H5Tget_class(hdf5_type_id(tmp.values.data()));
       AssertThrow(
-        t_class_in == t_class,
+        t_class_in DEAL_II_EQUALS t_class,
         ExcMessage(
           "The data type of the matrix to be read does not match the archive"));
 
@@ -3113,16 +3164,16 @@ ScaLAPACKMatrix<NumberType>::load_serial(const std::string &filename)
       hid_t dataspace_id = H5Dget_space(dataset_id);
       // get number of dimensions
       const int ndims = H5Sget_simple_extent_ndims(dataspace_id);
-      AssertThrow(ndims == 2, ExcIO());
+      AssertThrow(ndims DEAL_II_EQUALS 2, ExcIO());
       // get every dimension
       hsize_t dims[2];
       H5Sget_simple_extent_dims(dataspace_id, dims, nullptr);
       AssertThrow(
-        static_cast<int>(dims[0]) == n_columns,
+        static_cast<int>(dims[0]) DEAL_II_EQUALS n_columns,
         ExcMessage(
           "The number of columns of the matrix does not match the content of the archive"));
       AssertThrow(
-        static_cast<int>(dims[1]) == n_rows,
+        static_cast<int>(dims[1]) DEAL_II_EQUALS n_rows,
         ExcMessage(
           "The number of rows of the matrix does not match the content of the archive"));
 
@@ -3145,28 +3196,28 @@ ScaLAPACKMatrix<NumberType>::load_serial(const std::string &filename)
       hid_t       dataset_state_id = H5Dopen2(file_id, "/state", H5P_DEFAULT);
       hid_t       datatype_state   = H5Dget_type(dataset_state_id);
       H5T_class_t t_class_state    = H5Tget_class(datatype_state);
-      AssertThrow(t_class_state == H5T_ENUM, ExcIO());
+      AssertThrow(t_class_state DEAL_II_EQUALS H5T_ENUM, ExcIO());
 
       hid_t dataset_property_id = H5Dopen2(file_id, "/property", H5P_DEFAULT);
       hid_t datatype_property   = H5Dget_type(dataset_property_id);
       H5T_class_t t_class_property = H5Tget_class(datatype_property);
-      AssertThrow(t_class_property == H5T_ENUM, ExcIO());
+      AssertThrow(t_class_property DEAL_II_EQUALS H5T_ENUM, ExcIO());
 
       // get dataspace handles
       hid_t dataspace_state    = H5Dget_space(dataset_state_id);
       hid_t dataspace_property = H5Dget_space(dataset_property_id);
       // get number of dimensions
       const int ndims_state = H5Sget_simple_extent_ndims(dataspace_state);
-      AssertThrow(ndims_state == 1, ExcIO());
+      AssertThrow(ndims_state DEAL_II_EQUALS 1, ExcIO());
       const int ndims_property = H5Sget_simple_extent_ndims(dataspace_property);
-      AssertThrow(ndims_property == 1, ExcIO());
+      AssertThrow(ndims_property DEAL_II_EQUALS 1, ExcIO());
       // get every dimension
       hsize_t dims_state[1];
       H5Sget_simple_extent_dims(dataspace_state, dims_state, nullptr);
-      AssertThrow(static_cast<int>(dims_state[0]) == 1, ExcIO());
+      AssertThrow(static_cast<int>(dims_state[0]) DEAL_II_EQUALS 1, ExcIO());
       hsize_t dims_property[1];
       H5Sget_simple_extent_dims(dataspace_property, dims_property, nullptr);
-      AssertThrow(static_cast<int>(dims_property[0]) == 1, ExcIO());
+      AssertThrow(static_cast<int>(dims_property[0]) DEAL_II_EQUALS 1, ExcIO());
 
       // read data
       status = H5Dread(dataset_state_id,
@@ -3299,7 +3350,7 @@ ScaLAPACKMatrix<NumberType>::load_parallel(const std::string &filename)
   H5T_class_t t_class_inp  = H5Tget_class(datatype_inp);
   H5T_class_t t_class      = H5Tget_class(datatype);
   AssertThrow(
-    t_class_inp == t_class,
+    t_class_inp DEAL_II_EQUALS t_class,
     ExcMessage(
       "The data type of the matrix to be read does not match the archive"));
 
@@ -3308,17 +3359,17 @@ ScaLAPACKMatrix<NumberType>::load_parallel(const std::string &filename)
   hid_t dataspace_id = H5Dget_space(dataset_id);
   // get number of dimensions
   const int ndims = H5Sget_simple_extent_ndims(dataspace_id);
-  AssertThrow(ndims == 2, ExcIO());
+  AssertThrow(ndims DEAL_II_EQUALS 2, ExcIO());
   // get every dimension
   hsize_t dims[2];
   status = H5Sget_simple_extent_dims(dataspace_id, dims, nullptr);
   AssertThrow(status >= 0, ExcIO());
   AssertThrow(
-    static_cast<int>(dims[0]) == n_columns,
+    static_cast<int>(dims[0]) DEAL_II_EQUALS n_columns,
     ExcMessage(
       "The number of columns of the matrix does not match the content of the archive"));
   AssertThrow(
-    static_cast<int>(dims[1]) == n_rows,
+    static_cast<int>(dims[1]) DEAL_II_EQUALS n_rows,
     ExcMessage(
       "The number of rows of the matrix does not match the content of the archive"));
 
@@ -3378,28 +3429,28 @@ ScaLAPACKMatrix<NumberType>::load_parallel(const std::string &filename)
   hid_t       dataset_state_id = H5Dopen2(file_id, "/state", H5P_DEFAULT);
   hid_t       datatype_state   = H5Dget_type(dataset_state_id);
   H5T_class_t t_class_state    = H5Tget_class(datatype_state);
-  AssertThrow(t_class_state == H5T_ENUM, ExcIO());
+  AssertThrow(t_class_state DEAL_II_EQUALS H5T_ENUM, ExcIO());
 
   hid_t       dataset_property_id = H5Dopen2(file_id, "/property", H5P_DEFAULT);
   hid_t       datatype_property   = H5Dget_type(dataset_property_id);
   H5T_class_t t_class_property    = H5Tget_class(datatype_property);
-  AssertThrow(t_class_property == H5T_ENUM, ExcIO());
+  AssertThrow(t_class_property DEAL_II_EQUALS H5T_ENUM, ExcIO());
 
   // get dataspace handles
   hid_t dataspace_state    = H5Dget_space(dataset_state_id);
   hid_t dataspace_property = H5Dget_space(dataset_property_id);
   // get number of dimensions
   const int ndims_state = H5Sget_simple_extent_ndims(dataspace_state);
-  AssertThrow(ndims_state == 1, ExcIO());
+  AssertThrow(ndims_state DEAL_II_EQUALS 1, ExcIO());
   const int ndims_property = H5Sget_simple_extent_ndims(dataspace_property);
-  AssertThrow(ndims_property == 1, ExcIO());
+  AssertThrow(ndims_property DEAL_II_EQUALS 1, ExcIO());
   // get every dimension
   hsize_t dims_state[1];
   H5Sget_simple_extent_dims(dataspace_state, dims_state, nullptr);
-  AssertThrow(static_cast<int>(dims_state[0]) == 1, ExcIO());
+  AssertThrow(static_cast<int>(dims_state[0]) DEAL_II_EQUALS 1, ExcIO());
   hsize_t dims_property[1];
   H5Sget_simple_extent_dims(dataspace_property, dims_property, nullptr);
-  AssertThrow(static_cast<int>(dims_property[0]) == 1, ExcIO());
+  AssertThrow(static_cast<int>(dims_property[0]) DEAL_II_EQUALS 1, ExcIO());
 
   // read data
   status = H5Dread(
@@ -3456,7 +3507,7 @@ namespace internal
     scale_columns(ScaLAPACKMatrix<NumberType> &      matrix,
                   const ArrayView<const NumberType> &factors)
     {
-      Assert(matrix.n() == factors.size(),
+      Assert(matrix.n() DEAL_II_EQUALS factors.size(),
              ExcDimensionMismatch(matrix.n(), factors.size()));
 
       for (unsigned int i = 0; i < matrix.local_n(); ++i)
@@ -3473,7 +3524,7 @@ namespace internal
     scale_rows(ScaLAPACKMatrix<NumberType> &      matrix,
                const ArrayView<const NumberType> &factors)
     {
-      Assert(matrix.m() == factors.size(),
+      Assert(matrix.m() DEAL_II_EQUALS factors.size(),
              ExcDimensionMismatch(matrix.m(), factors.size()));
 
       for (unsigned int i = 0; i < matrix.local_m(); ++i)

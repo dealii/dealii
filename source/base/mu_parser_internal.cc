@@ -52,13 +52,13 @@ namespace internal
     double
     mu_or(double left, double right)
     {
-      return (mu_round(left)) || (mu_round(right));
+      return (mu_round(left))DEAL_II_OR(mu_round(right));
     }
 
     double
     mu_and(double left, double right)
     {
-      return (mu_round(left)) && (mu_round(right));
+      return (mu_round(left))DEAL_II_AND(mu_round(right));
     }
 
     double
@@ -129,7 +129,7 @@ namespace internal
       // which is initialized with the seed itself
       static std::map<double, std::mt19937> rng_map;
 
-      if (rng_map.find(seed) == rng_map.end())
+      if (rng_map.find(seed) DEAL_II_EQUALS rng_map.end())
         rng_map[seed] = std::mt19937(static_cast<unsigned int>(seed));
 
       return uniform_distribution(rng_map[seed]);

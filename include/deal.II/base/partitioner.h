@@ -806,8 +806,8 @@ namespace Utilities
     Partitioner::in_local_range(
       const types::global_dof_index global_index) const
     {
-      return (local_range_data.first <= global_index &&
-              global_index < local_range_data.second);
+      return (local_range_data.first <= global_index DEAL_II_AND global_index <
+              local_range_data.second);
     }
 
 
@@ -817,7 +817,7 @@ namespace Utilities
       const types::global_dof_index global_index) const
     {
       // if the index is in the global range, it is trivially not a ghost
-      if (in_local_range(global_index) == true)
+      if (in_local_range(global_index) DEAL_II_EQUALS true)
         return false;
       else
         return ghost_indices().is_element(global_index);
@@ -829,7 +829,8 @@ namespace Utilities
     Partitioner::global_to_local(
       const types::global_dof_index global_index) const
     {
-      Assert(in_local_range(global_index) || is_ghost_entry(global_index),
+      Assert(in_local_range(global_index)
+               DEAL_II_OR is_ghost_entry(global_index),
              ExcIndexNotPresent(global_index, my_pid));
       if (in_local_range(global_index))
         return static_cast<unsigned int>(global_index - local_range_data.first);

@@ -61,7 +61,7 @@ namespace
     u.reserve(s.size());
 
     // see if the name is special and if so mangle the whole thing
-    const bool mangle_whole_string = (s == "value");
+    const bool mangle_whole_string = (s DEAL_II_EQUALS "value");
 
     // for all parts of the string, see if it is an allowed character or not
     for (const char c : s)
@@ -69,8 +69,8 @@ namespace
         static const std::string allowed_characters(
           "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
 
-        if ((!mangle_whole_string) &&
-            (allowed_characters.find(c) != std::string::npos))
+        if ((!mangle_whole_string)DEAL_II_AND(allowed_characters.find(c) !=
+                                              std::string::npos))
           u.push_back(c);
         else
           {
@@ -298,17 +298,17 @@ namespace
       [](const std::pair<std::string, boost::property_tree::ptree> &a,
          const std::pair<std::string, boost::property_tree::ptree> &b) {
         bool a_is_param =
-          (is_parameter_node(a.second) || is_alias_node(a.second));
+          (is_parameter_node(a.second) DEAL_II_OR is_alias_node(a.second));
 
         bool b_is_param =
-          (is_parameter_node(b.second) || is_alias_node(b.second));
+          (is_parameter_node(b.second) DEAL_II_OR is_alias_node(b.second));
 
         // If a is a parameter/alias and b is a subsection,
         // a should go first, and viceversa.
-        if (a_is_param && !b_is_param)
+        if (a_is_param DEAL_II_AND !b_is_param)
           return true;
 
-        if (!a_is_param && b_is_param)
+        if (!a_is_param DEAL_II_AND b_is_param)
           return false;
 
         // Otherwise, compare a and b.
@@ -320,8 +320,8 @@ namespace
     // Now transverse subsections tree recursively.
     for (auto &p : current_section)
       {
-        if ((is_parameter_node(p.second) == false) &&
-            (is_alias_node(p.second) == false))
+        if ((is_parameter_node(p.second) DEAL_II_EQUALS false)DEAL_II_AND(
+              is_alias_node(p.second) DEAL_II_EQUALS false))
           {
             const std::string subsection = demangle(p.first);
 
@@ -344,7 +344,7 @@ namespace
        ((style & ParameterHandler::JSON) != 0) +
        ((style & ParameterHandler::PRM) != 0) +
        ((style & ParameterHandler::Description) != 0) +
-       ((style & ParameterHandler::LaTeX) != 0)) == 1,
+       ((style & ParameterHandler::LaTeX) != 0)) DEAL_II_EQUALS 1,
       ExcMessage(
         "You have chosen either no or multiple style formats. You can choose "
         "between: PRM, Description, LaTeX, XML, JSON."));
@@ -366,7 +366,7 @@ std::string
 ParameterHandler::get_current_full_path(const std::string &name) const
 {
   std::string path = get_current_path();
-  if (path.empty() == false)
+  if (path.empty() DEAL_II_EQUALS false)
     path += path_separator;
 
   path += mangle(name);
@@ -382,10 +382,10 @@ ParameterHandler::get_current_full_path(
   const std::string &             name) const
 {
   std::string path = get_current_path();
-  if (path.empty() == false)
+  if (path.empty() DEAL_II_EQUALS false)
     path += path_separator;
 
-  if (sub_path.empty() == false)
+  if (sub_path.empty() DEAL_II_EQUALS false)
     path += collate_path_string(path_separator, sub_path) + path_separator;
 
   path += mangle(name);
@@ -427,23 +427,23 @@ ParameterHandler::parse_input(std::istream &     input,
   // unknown state.
   //
   // after unwinding the subsection stack, just re-throw the exception
-  auto scan_line_or_cleanup = [this,
-                               &skip_undefined,
-                               &saved_path](const std::string &line,
-                                            const std::string &filename,
-                                            const unsigned int line_number) {
-    try
-      {
-        scan_line(line, filename, line_number, skip_undefined);
-      }
-    catch (...)
-      {
-        while ((saved_path != subsection_path) && (subsection_path.size() > 0))
-          leave_subsection();
+  auto scan_line_or_cleanup =
+    [this, &skip_undefined, &saved_path](const std::string &line,
+                                         const std::string &filename,
+                                         const unsigned int line_number) {
+      try
+        {
+          scan_line(line, filename, line_number, skip_undefined);
+        }
+      catch (...)
+        {
+          while ((saved_path != subsection_path)
+                   DEAL_II_AND(subsection_path.size() > 0))
+            leave_subsection();
 
-        throw;
-      }
-  };
+          throw;
+        }
+    };
 
 
   while (std::getline(input, input_line))
@@ -457,13 +457,16 @@ ParameterHandler::parse_input(std::istream &     input,
 
       // If we see the line which is the same as @p last_line ,
       // terminate the parsing.
-      if (last_line.length() != 0 && input_line == last_line)
+      if (last_line.length() !=
+          0 DEAL_II_AND input_line DEAL_II_EQUALS last_line)
         break;
 
       // Check whether or not the current line should be joined with the next
       // line before calling scan_line.
-      if (input_line.length() != 0 &&
-          input_line.find_last_of('\\') == input_line.length() - 1)
+      if (input_line.length() !=
+          0 DEAL_II_AND      input_line.find_last_of('\\')
+              DEAL_II_EQUALS input_line.length() -
+            1)
         {
           input_line.erase(input_line.length() - 1); // remove the last '\'
           is_concatenated = true;
@@ -514,9 +517,10 @@ ParameterHandler::parse_input(std::istream &     input,
           paths_message << "Current path:\n";
           for (unsigned int i = 0; i < subsection_path.size(); ++i)
             {
-              paths_message << std::setw(i * 2 + 4) << " "
-                            << "subsection " << subsection_path[i]
-                            << (i == subsection_path.size() - 1 ? "" : "\n");
+              paths_message
+                << std::setw(i * 2 + 4) << " "
+                << "subsection " << subsection_path[i]
+                << (i DEAL_II_EQUALS subsection_path.size() - 1 ? "" : "\n");
             }
         }
       // restore subsection we started with before throwing the exception:
@@ -539,11 +543,11 @@ ParameterHandler::parse_input(const std::string &filename,
 
   std::string file_ending = filename.substr(filename.find_last_of('.') + 1);
   boost::algorithm::to_lower(file_ending);
-  if (file_ending == "prm")
+  if (file_ending DEAL_II_EQUALS "prm")
     parse_input(is, filename, last_line, skip_undefined);
-  else if (file_ending == "xml")
+  else if (file_ending DEAL_II_EQUALS "xml")
     parse_input_from_xml(is, skip_undefined);
-  else if (file_ending == "json")
+  else if (file_ending DEAL_II_EQUALS "json")
     parse_input_from_json(is, skip_undefined);
   else
     AssertThrow(false,
@@ -739,7 +743,7 @@ ParameterHandler::parse_input_from_xml(std::istream &in,
         }
 
       // repeat assertion condition to make the printed version easier to read
-      AssertThrow(n_top_level_elements == 1,
+      AssertThrow(n_top_level_elements DEAL_II_EQUALS 1,
                   ExcInvalidXMLParameterFile(top_level_message.str()));
     }
 
@@ -898,8 +902,8 @@ ParameterHandler::declare_alias(const std::string &existing_entry_name,
                         "further subsection, or a parameter entry, with "
                         "the same name as the alias)."));
       Assert(entries->get<std::string>(get_current_full_path(alias_name) +
-                                       path_separator + "alias") ==
-               existing_entry_name,
+                                       path_separator + "alias")
+               DEAL_II_EQUALS existing_entry_name,
              ExcMessage(
                "You are trying to declare an alias entry <" + alias_name +
                "> but an alias entry already exists in this "
@@ -965,8 +969,8 @@ ParameterHandler::subsection_path_exists(
   // If subsection is boost::null (i.e. it does not exist)
   // or it exists as a parameter/alias node, return false.
   // Otherwise (i.e. it exists as a subsection node), return true.
-  return !(!subsection || is_parameter_node(subsection.get()) ||
-           is_alias_node(subsection.get()));
+  return !(!subsection DEAL_II_OR is_parameter_node(subsection.get())
+             DEAL_II_OR           is_alias_node(subsection.get()));
 }
 
 
@@ -1102,11 +1106,13 @@ ParameterHandler::get_bool(const std::string &entry_string) const
 {
   const std::string s = get(entry_string);
 
-  AssertThrow((s == "true") || (s == "false") || (s == "yes") || (s == "no"),
+  AssertThrow((s DEAL_II_EQUALS "true")DEAL_II_OR(s DEAL_II_EQUALS "false")
+                DEAL_II_OR(s DEAL_II_EQUALS "yes")
+                  DEAL_II_OR(s DEAL_II_EQUALS "no"),
               ExcMessage("Can't convert the parameter value <" +
                          get(entry_string) + "> for entry <" + entry_string +
                          "> to a boolean."));
-  if (s == "true" || s == "yes")
+  if (s DEAL_II_EQUALS "true" DEAL_II_OR s DEAL_II_EQUALS "yes")
     return true;
   else
     return false;
@@ -1121,14 +1127,16 @@ ParameterHandler::get_bool(
 {
   const std::string s = get(entry_subsection_path, entry_string);
 
-  AssertThrow((s == "true") || (s == "false") || (s == "yes") || (s == "no"),
+  AssertThrow((s DEAL_II_EQUALS "true")DEAL_II_OR(s DEAL_II_EQUALS "false")
+                DEAL_II_OR(s DEAL_II_EQUALS "yes")
+                  DEAL_II_OR(s DEAL_II_EQUALS "no"),
               ExcMessage("Can't convert the parameter value <" +
                          get(entry_subsection_path, entry_string) +
                          "> for entry <" +
                          demangle(get_current_full_path(entry_subsection_path,
                                                         entry_string)) +
                          "> to a boolean."));
-  if (s == "true" || s == "yes")
+  if (s DEAL_II_EQUALS "true" DEAL_II_OR s DEAL_II_EQUALS "yes")
     return true;
   else
     return false;
@@ -1270,7 +1278,7 @@ ParameterHandler::print_parameters(std::ostream &    out,
   // first
 
   // explicitly compress the tree if requested
-  if ((style & Short) && (style & (XML | JSON)))
+  if ((style & Short) DEAL_II_AND(style & (XML | JSON)))
     {
       // modify the copy of the tree
       recursively_compress_tree(current_entries);
@@ -1301,7 +1309,7 @@ ParameterHandler::print_parameters(std::ostream &    out,
     }
 
   // for all of the other formats, print a preamble:
-  if ((style & Short) && (style & Text))
+  if ((style & Short) DEAL_II_AND(style & Text))
     {
       // nothing to do
     }
@@ -1347,13 +1355,13 @@ ParameterHandler::print_parameters(
   boost::algorithm::to_lower(extension);
 
   ParameterHandler::OutputStyle output_style = style;
-  if (extension == "prm")
+  if (extension DEAL_II_EQUALS "prm")
     output_style = style | PRM;
-  else if (extension == "xml")
+  else if (extension DEAL_II_EQUALS "xml")
     output_style = style | XML;
-  else if (extension == "json")
+  else if (extension DEAL_II_EQUALS "json")
     output_style = style | JSON;
-  else if (extension == "tex")
+  else if (extension DEAL_II_EQUALS "tex")
     output_style = style | LaTeX;
 
   std::ofstream out(filename);
@@ -1395,7 +1403,7 @@ ParameterHandler::recursively_print_parameters(
       std::size_t longest_name  = 0;
       std::size_t longest_value = 0;
       for (const auto &p : current_section)
-        if (is_parameter_node(p.second) == true)
+        if (is_parameter_node(p.second) DEAL_II_EQUALS true)
           {
             longest_name = std::max(longest_name, demangle(p.first).length());
             longest_value =
@@ -1406,7 +1414,7 @@ ParameterHandler::recursively_print_parameters(
       // print entries one by one
       bool first_entry = true;
       for (const auto &p : current_section)
-        if (is_parameter_node(p.second) == true)
+        if (is_parameter_node(p.second) DEAL_II_EQUALS true)
           {
             const std::string value = p.second.get<std::string>("value");
 
@@ -1415,10 +1423,11 @@ ParameterHandler::recursively_print_parameters(
             // the documentation, and then the actual entry; break the
             // documentation into readable chunks such that the whole
             // thing is at most 78 characters wide
-            if (!is_short &&
-                !p.second.get<std::string>("documentation").empty())
+            if (!is_short DEAL_II_AND !p.second
+                   .get<std::string>("documentation")
+                   .empty())
               {
-                if (first_entry == false)
+                if (first_entry DEAL_II_EQUALS false)
                   out << '\n';
                 else
                   first_entry = false;
@@ -1442,8 +1451,8 @@ ParameterHandler::recursively_print_parameters(
 
             // finally print the default value, but only if it differs
             // from the actual value
-            if (!is_short &&
-                value != p.second.get<std::string>("default_value"))
+            if (!is_short DEAL_II_AND value !=
+                p.second.get<std::string>("default_value"))
               {
                 out << std::setw(longest_value - value.length() + 1) << ' '
                     << "# ";
@@ -1466,8 +1475,8 @@ ParameterHandler::recursively_print_parameters(
         std::any_of(current_section.begin(),
                     current_section.end(),
                     [](const boost::property_tree::ptree::value_type &p) {
-                      return is_parameter_node(p.second) ||
-                             is_alias_node(p.second);
+                      return is_parameter_node(p.second)
+                        DEAL_II_OR is_alias_node(p.second);
                     });
       if (parameters_exist_here)
         {
@@ -1475,7 +1484,7 @@ ParameterHandler::recursively_print_parameters(
 
           // print entries one by one
           for (const auto &p : current_section)
-            if (is_parameter_node(p.second) == true)
+            if (is_parameter_node(p.second) DEAL_II_EQUALS true)
               {
                 const std::string value = p.second.get<std::string>("value");
 
@@ -1520,8 +1529,9 @@ ParameterHandler::recursively_print_parameters(
 
                 // if there is a documenting string, print it as well but
                 // don't escape to allow formatting/formulas
-                if (!is_short &&
-                    !p.second.get<std::string>("documentation").empty())
+                if (!is_short DEAL_II_AND !p.second
+                       .get<std::string>("documentation")
+                       .empty())
                   out << "{\\it Description:} "
                       << p.second.get<std::string>("documentation") << "\n\n"
                       << '\n';
@@ -1537,7 +1547,7 @@ ParameterHandler::recursively_print_parameters(
                     out << "{\\it Possible values:} " << desc_str << '\n';
                   }
               }
-            else if (is_alias_node(p.second) == true)
+            else if (is_alias_node(p.second) DEAL_II_EQUALS true)
               {
                 const std::string alias = p.second.get<std::string>("alias");
 
@@ -1576,8 +1586,8 @@ ParameterHandler::recursively_print_parameters(
                 out
                   << "This parameter is an alias for the parameter ``\\texttt{"
                   << escape(alias) << "}''."
-                  << (p.second.get<std::string>("deprecation_status") ==
-                          "true" ?
+                  << (p.second.get<std::string>("deprecation_status")
+                          DEAL_II_EQUALS "true" ?
                         " Its use is deprecated." :
                         "")
                   << "\n\n"
@@ -1592,12 +1602,12 @@ ParameterHandler::recursively_print_parameters(
       // equal signs
       std::size_t longest_name = 0;
       for (const auto &p : current_section)
-        if (is_parameter_node(p.second) == true)
+        if (is_parameter_node(p.second) DEAL_II_EQUALS true)
           longest_name = std::max(longest_name, demangle(p.first).length());
 
       // print entries one by one
       for (const auto &p : current_section)
-        if (is_parameter_node(p.second) == true)
+        if (is_parameter_node(p.second) DEAL_II_EQUALS true)
           {
             // print name and value
             out << std::setw(overall_indent_level * 2) << ""
@@ -1621,14 +1631,14 @@ ParameterHandler::recursively_print_parameters(
                   out << std::setw(overall_indent_level * 2 + 6) << ""
                       << description << '\n';
               }
-            else if (description_str.empty() == false)
+            else if (description_str.empty() DEAL_II_EQUALS false)
               out << "  " << description_str[0] << '\n';
             else
               out << '\n';
 
             // if there is a documenting string, print it as well
-            if (!is_short &&
-                p.second.get<std::string>("documentation").length() != 0)
+            if (!is_short DEAL_II_AND p.second.get<std::string>("documentation")
+                   .length() != 0)
               out << std::setw(overall_indent_level * 2 + longest_name + 10)
                   << ""
                   << "(" << p.second.get<std::string>("documentation") << ")"
@@ -1647,23 +1657,24 @@ ParameterHandler::recursively_print_parameters(
     unsigned int n_parameters = 0;
     unsigned int n_sections   = 0;
     for (const auto &p : current_section)
-      if (is_parameter_node(p.second) == true)
+      if (is_parameter_node(p.second) DEAL_II_EQUALS true)
         ++n_parameters;
-      else if (is_alias_node(p.second) == false)
+      else if (is_alias_node(p.second) DEAL_II_EQUALS false)
         ++n_sections;
 
-    if (!(style & Description) && (!((style & Text) && is_short)) &&
-        (n_parameters != 0) && (n_sections != 0))
+    if (!(style & Description)
+          DEAL_II_AND(!((style & Text) DEAL_II_AND is_short))
+            DEAL_II_AND(n_parameters != 0) DEAL_II_AND(n_sections != 0))
       out << "\n\n";
   }
 
   // now transverse subsections tree
   for (const auto &p : current_section)
-    if ((is_parameter_node(p.second) == false) &&
-        (is_alias_node(p.second) == false))
+    if ((is_parameter_node(p.second) DEAL_II_EQUALS false)DEAL_II_AND(
+          is_alias_node(p.second) DEAL_II_EQUALS false))
       {
         // first print the subsection header
-        if ((style & Text) || (style & Description))
+        if ((style & Text) DEAL_II_OR(style & Description))
           {
             out << std::setw(overall_indent_level * 2) << ""
                 << "subsection " << demangle(p.first) << '\n';
@@ -1705,7 +1716,7 @@ ParameterHandler::recursively_print_parameters(
         recursively_print_parameters(
           tree, directory_path, style, overall_indent_level + 1, out);
 
-        if (is_short && (style & Text))
+        if (is_short DEAL_II_AND(style & Text))
           {
             // write end of subsection.
             out << std::setw(overall_indent_level * 2) << ""
@@ -1721,7 +1732,7 @@ ParameterHandler::recursively_print_parameters(
 
             // if this is a toplevel subsection, then have two
             // newlines
-            if (overall_indent_level == 0)
+            if (overall_indent_level DEAL_II_EQUALS 0)
               out << '\n';
           }
         else if (style & Description)
@@ -1780,13 +1791,13 @@ ParameterHandler::log_parameters_section(LogStream &       out,
 
   // print entries one by one
   for (const auto &p : current_section)
-    if (is_parameter_node(p.second) == true)
+    if (is_parameter_node(p.second) DEAL_II_EQUALS true)
       out << demangle(p.first) << ": " << p.second.get<std::string>("value")
           << std::endl;
 
   // now transverse subsections tree
   for (const auto &p : current_section)
-    if (is_parameter_node(p.second) == false)
+    if (is_parameter_node(p.second) DEAL_II_EQUALS false)
       {
         out.push(demangle(p.first));
         enter_subsection(demangle(p.first));
@@ -1819,13 +1830,13 @@ ParameterHandler::scan_line(std::string        line,
   line = Utilities::trim(line);
 
   // if line is now empty: leave
-  if (line.length() == 0)
+  if (line.length() DEAL_II_EQUALS 0)
     {
       return;
     }
   // enter subsection
-  else if (Utilities::match_at_string_start(line, "SUBSECTION ") ||
-           Utilities::match_at_string_start(line, "subsection "))
+  else if (Utilities::match_at_string_start(line, "SUBSECTION ")
+             DEAL_II_OR Utilities::match_at_string_start(line, "subsection "))
     {
       // delete this prefix
       line.erase(0, std::string("subsection").length() + 1);
@@ -1833,8 +1844,8 @@ ParameterHandler::scan_line(std::string        line,
       const std::string subsection = Utilities::trim(line);
 
       // check whether subsection exists
-      AssertThrow(skip_undefined || entries->get_child_optional(
-                                      get_current_full_path(subsection)),
+      AssertThrow(skip_undefined DEAL_II_OR entries->get_child_optional(
+                    get_current_full_path(subsection)),
                   ExcNoSubsection(current_line_n,
                                   input_filename,
                                   demangle(get_current_full_path(subsection))));
@@ -1843,15 +1854,15 @@ ParameterHandler::scan_line(std::string        line,
       subsection_path.push_back(subsection);
     }
   // exit subsection
-  else if (Utilities::match_at_string_start(line, "END") ||
-           Utilities::match_at_string_start(line, "end"))
+  else if (Utilities::match_at_string_start(line, "END")
+             DEAL_II_OR Utilities::match_at_string_start(line, "end"))
     {
       line.erase(0, 3);
-      while ((line.size() > 0) && (std::isspace(line[0])))
+      while ((line.size() > 0) DEAL_II_AND(std::isspace(line[0])))
         line.erase(0, 1);
 
       AssertThrow(
-        line.size() == 0,
+        line.size() DEAL_II_EQUALS 0,
         ExcCannotParseLine(current_line_n,
                            input_filename,
                            "Invalid content after 'end' or 'END' statement."));
@@ -1862,8 +1873,8 @@ ParameterHandler::scan_line(std::string        line,
       leave_subsection();
     }
   // regular entry
-  else if (Utilities::match_at_string_start(line, "SET ") ||
-           Utilities::match_at_string_start(line, "set "))
+  else if (Utilities::match_at_string_start(line, "SET ")
+             DEAL_II_OR Utilities::match_at_string_start(line, "set "))
     {
       // erase "set" statement
       line.erase(0, 4);
@@ -1886,7 +1897,8 @@ ParameterHandler::scan_line(std::string        line,
       if (entries->get_optional<std::string>(path + path_separator + "alias"))
         {
           if (entries->get<std::string>(path + path_separator +
-                                        "deprecation_status") == "true")
+                                        "deprecation_status") DEAL_II_EQUALS
+              "true")
             {
               std::cerr << "Warning in line <" << current_line_n
                         << "> of file <" << input_filename
@@ -1908,7 +1920,7 @@ ParameterHandler::scan_line(std::string        line,
           // if entry was declared: does it match the regex? if not, don't enter
           // it into the database exception: if it contains characters which
           // specify it as a multiple loop entry, then ignore content
-          if (entry_value.find('{') == std::string::npos)
+          if (entry_value.find('{') DEAL_II_EQUALS std::string::npos)
             {
               // verify that the new value satisfies the provided pattern
               const unsigned int pattern_index =
@@ -1951,12 +1963,12 @@ ParameterHandler::scan_line(std::string        line,
         }
     }
   // an include statement?
-  else if (Utilities::match_at_string_start(line, "include ") ||
-           Utilities::match_at_string_start(line, "INCLUDE "))
+  else if (Utilities::match_at_string_start(line, "include ")
+             DEAL_II_OR Utilities::match_at_string_start(line, "INCLUDE "))
     {
       // erase "include " statement and eliminate spaces
       line.erase(0, 7);
-      while ((line.size() > 0) && (line[0] == ' '))
+      while ((line.size() > 0) DEAL_II_AND(line[0] DEAL_II_EQUALS ' '))
         line.erase(0, 1);
 
       // the remainder must then be a filename
@@ -2002,8 +2014,8 @@ ParameterHandler::memory_consumption() const
 
 
 
-bool
-ParameterHandler::operator==(const ParameterHandler &prm2) const
+bool ParameterHandler::
+     operator DEAL_II_EQUALS(const ParameterHandler &prm2) const
 {
   if (patterns.size() != prm2.patterns.size())
     return false;
@@ -2022,7 +2034,7 @@ ParameterHandler::operator==(const ParameterHandler &prm2) const
   std::ostringstream o1, o2;
   write_json(o1, *entries);
   write_json(o2, *prm2.entries);
-  return (o1.str() == o2.str());
+  return (o1.str() DEAL_II_EQUALS o2.str());
 }
 
 
@@ -2033,7 +2045,8 @@ ParameterHandler::get_entries_wrongly_not_set() const
   std::set<std::string> entries_wrongly_not_set;
 
   for (const auto &it : entries_set_status)
-    if (it.second.first == true && it.second.second == false)
+    if (it.second.first DEAL_II_EQUALS true DEAL_II_AND it.second
+          .second                                       DEAL_II_EQUALS false)
       entries_wrongly_not_set.insert(it.first);
 
   return entries_wrongly_not_set;
@@ -2055,7 +2068,7 @@ ParameterHandler::assert_that_entries_have_been_set() const
       list_of_missing_parameters += "\n";
 
       AssertThrow(
-        entries_wrongly_not_set.size() == 0,
+        entries_wrongly_not_set.size() DEAL_II_EQUALS 0,
         ExcMessage(
           "Not all entries of the parameter handler that were declared with "
           "`has_to_be_set = true` have been set. The following parameters " +
@@ -2118,13 +2131,13 @@ MultipleParameterLoop::init_branches()
   // finally calculate number of branches
   n_branches = 1;
   for (const auto &multiple_choice : multiple_choices)
-    if (multiple_choice.type == Entry::variant)
+    if (multiple_choice.type DEAL_II_EQUALS Entry::variant)
       n_branches *= multiple_choice.different_values.size();
 
   // check whether array entries have the correct
   // number of entries
   for (const auto &multiple_choice : multiple_choices)
-    if (multiple_choice.type == Entry::array)
+    if (multiple_choice.type DEAL_II_EQUALS Entry::array)
       if (multiple_choice.different_values.size() != n_branches)
         std::cerr << "    The entry value" << std::endl
                   << "        " << multiple_choice.entry_value << std::endl
@@ -2156,7 +2169,7 @@ MultipleParameterLoop::init_branches_current_section()
   // subsection whether they are
   // multiple entries
   for (const auto &p : current_section)
-    if (is_parameter_node(p.second) == true)
+    if (is_parameter_node(p.second) DEAL_II_EQUALS true)
       {
         const std::string value = p.second.get<std::string>("value");
         if (value.find('{') != std::string::npos)
@@ -2167,7 +2180,7 @@ MultipleParameterLoop::init_branches_current_section()
 
   // then loop over all subsections
   for (const auto &p : current_section)
-    if (is_parameter_node(p.second) == false)
+    if (is_parameter_node(p.second) DEAL_II_EQUALS false)
       {
         enter_subsection(demangle(p.first));
         init_branches_current_section();
@@ -2189,7 +2202,7 @@ MultipleParameterLoop::fill_entry_values(const unsigned int run_no)
       const unsigned int selection =
         (run_no / possibilities) % choice->different_values.size();
       std::string entry_value;
-      if (choice->type == Entry::variant)
+      if (choice->type DEAL_II_EQUALS Entry::variant)
         entry_value = choice->different_values[selection];
       else
         {
@@ -2218,7 +2231,7 @@ MultipleParameterLoop::fill_entry_values(const unsigned int run_no)
       subsection_path.swap(choice->subsection_path);
 
       // move ahead if it was a variant entry
-      if (choice->type == Entry::variant)
+      if (choice->type DEAL_II_EQUALS Entry::variant)
         possibilities *= choice->different_values.size();
     }
 }
@@ -2264,9 +2277,9 @@ MultipleParameterLoop::Entry::split_different_values()
                       std::string::npos);
   // if array entry {{..}}: delete inner
   // pair of braces
-  if (multiple[0] == '{')
+  if (multiple[0] DEAL_II_EQUALS '{')
     multiple.erase(0, 1);
-  if (multiple[multiple.size() - 1] == '}')
+  if (multiple[multiple.size() - 1] DEAL_II_EQUALS '}')
     multiple.erase(multiple.size() - 1, 1);
   // erase leading and trailing spaces
   // in multiple
@@ -2292,8 +2305,8 @@ MultipleParameterLoop::Entry::split_different_values()
   different_values.push_back(prefix + multiple + postfix);
   // finally check whether this was a variant
   // entry ({...}) or an array ({{...}})
-  if ((entry_value.find("{{") != std::string::npos) &&
-      (entry_value.find("}}") != std::string::npos))
+  if ((entry_value.find("{{") != std::string::npos)
+        DEAL_II_AND(entry_value.find("}}") != std::string::npos))
     type = Entry::array;
   else
     type = Entry::variant;

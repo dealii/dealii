@@ -60,11 +60,14 @@ MGLevelGlobalTransfer<VectorType>::fill_and_communicate_copy_indices(
   // check if we can run a plain copy operation between the global DoFs and
   // the finest level.
   bool my_perform_plain_copy =
-    (copy_indices.back().size() == mg_dof.locally_owned_dofs().n_elements()) &&
-    (mg_dof.locally_owned_dofs().n_elements() ==
-     mg_dof
-       .locally_owned_mg_dofs(mg_dof.get_triangulation().n_global_levels() - 1)
-       .n_elements());
+    (copy_indices.back()
+       .size() DEAL_II_EQUALS mg_dof.locally_owned_dofs()
+       .n_elements())
+      DEAL_II_AND(mg_dof.locally_owned_dofs()
+                    .n_elements() DEAL_II_EQUALS mg_dof
+                    .locally_owned_mg_dofs(
+                      mg_dof.get_triangulation().n_global_levels() - 1)
+                    .n_elements());
   if (my_perform_plain_copy)
     {
       AssertDimension(copy_indices_global_mine.back().size(), 0);
@@ -86,8 +89,9 @@ MGLevelGlobalTransfer<VectorType>::fill_and_communicate_copy_indices(
   if (const parallel::TriangulationBase<dim, spacedim> *ptria =
         dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
           &mg_dof.get_triangulation()))
-    perform_plain_copy = (Utilities::MPI::min(my_perform_plain_copy ? 1 : 0,
-                                              ptria->get_communicator()) == 1);
+    perform_plain_copy =
+      (Utilities::MPI::min(my_perform_plain_copy ? 1 : 0,
+                           ptria->get_communicator()) DEAL_II_EQUALS 1);
   else
     perform_plain_copy = my_perform_plain_copy;
 }
@@ -315,7 +319,8 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
           have_refinement_edge_dofs = 1;
           break;
         }
-  if (Utilities::MPI::max(have_refinement_edge_dofs, mpi_communicator) == 1)
+  if (Utilities::MPI::max(have_refinement_edge_dofs, mpi_communicator)
+        DEAL_II_EQUALS 1)
     fill_internal(mg_dof,
                   mg_constrained_dofs,
                   mpi_communicator,
@@ -335,8 +340,9 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
     }
 
   bool my_perform_renumbered_plain_copy =
-    (this->copy_indices.back().n_cols() ==
-     mg_dof.locally_owned_dofs().n_elements());
+    (this->copy_indices.back()
+       .n_cols() DEAL_II_EQUALS mg_dof.locally_owned_dofs()
+       .n_elements());
   bool my_perform_plain_copy = false;
   if (my_perform_renumbered_plain_copy)
     {

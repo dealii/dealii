@@ -240,7 +240,8 @@ namespace OpenCASCADE
     IGESControl_Reader    reader;
     IFSelect_ReturnStatus stat;
     stat = reader.ReadFile(filename.c_str());
-    AssertThrow(stat == IFSelect_RetDone, ExcMessage("Error in reading file!"));
+    AssertThrow(stat DEAL_II_EQUALS IFSelect_RetDone,
+                ExcMessage("Error in reading file!"));
 
     Standard_Boolean    failsonly = Standard_False;
     IFSelect_PrintCount mode      = IFSelect_ItemsByEntity;
@@ -337,11 +338,12 @@ namespace OpenCASCADE
 
     // which is a custom type between 6.9.0 and 7.1.0
 #    if ((OCC_VERSION_MAJOR * 100 + OCC_VERSION_MINOR * 10) < 720)
-    AssertThrow(error == StlAPI_StatusOK,
+    AssertThrow(error DEAL_II_EQUALS StlAPI_StatusOK,
                 ExcMessage("Error writing STL from shape."));
 #    else
     // and a boolean from version 7.2.0 onwards
-    AssertThrow(error == true, ExcMessage("Error writing STL from shape."));
+    AssertThrow(error DEAL_II_EQUALS true,
+                ExcMessage("Error writing STL from shape."));
 #    endif
 
 #  else
@@ -357,7 +359,8 @@ namespace OpenCASCADE
     STEPControl_Reader    reader;
     IFSelect_ReturnStatus stat;
     stat = reader.ReadFile(filename.c_str());
-    AssertThrow(stat == IFSelect_RetDone, ExcMessage("Error in reading file!"));
+    AssertThrow(stat DEAL_II_EQUALS IFSelect_RetDone,
+                ExcMessage("Error in reading file!"));
 
     Standard_Boolean    failsonly = Standard_False;
     IFSelect_PrintCount mode      = IFSelect_ItemsByEntity;
@@ -387,12 +390,12 @@ namespace OpenCASCADE
     STEPControl_Writer    SCW;
     IFSelect_ReturnStatus status;
     status = SCW.Transfer(shape, STEPControl_AsIs);
-    AssertThrow(status == IFSelect_RetDone,
+    AssertThrow(status DEAL_II_EQUALS IFSelect_RetDone,
                 ExcMessage("Failed to add shape to STEP controller."));
 
     status = SCW.Write(filename.c_str());
 
-    AssertThrow(status == IFSelect_RetDone,
+    AssertThrow(status DEAL_II_EQUALS IFSelect_RetDone,
                 ExcMessage("Failed to write translated shape to STEP file."));
   }
 
@@ -466,19 +469,19 @@ namespace OpenCASCADE
     bool              check = false, one_added = true, one_failed = true;
     std::vector<bool> added(numIntersEdges, false);
     added[0] = true;
-    while (one_added == true)
+    while (one_added DEAL_II_EQUALS true)
       {
         one_added  = false;
         one_failed = false;
         for (unsigned int i = 1; i < numIntersEdges; ++i)
-          if (added[i] == false)
+          if (added[i] DEAL_II_EQUALS false)
             {
               Handle(Geom_Curve) curve = intersections[i];
               Handle(Geom_BoundedCurve) bcurve =
                 Handle(Geom_BoundedCurve)::DownCast(curve);
               check = convert_bspline.Add(bcurve, tolerance, false, true, 0);
-              if (check ==
-                  false) // If we failed, try again with the reversed curve
+              if (check DEAL_II_EQUALS false) // If we failed, try again with
+                                              // the reversed curve
                 {
                   curve->Reverse();
                   Handle(Geom_BoundedCurve) bcurve =
@@ -486,13 +489,13 @@ namespace OpenCASCADE
                   check =
                     convert_bspline.Add(bcurve, tolerance, false, true, 0);
                 }
-              one_failed = one_failed || (check == false);
-              one_added  = one_added || (check == true);
+              one_failed = one_failed DEAL_II_OR(check DEAL_II_EQUALS false);
+              one_added  = one_added   DEAL_II_OR(check DEAL_II_EQUALS true);
               added[i]   = check;
             }
       }
 
-    Assert(one_failed == false,
+    Assert(one_failed DEAL_II_EQUALS false,
            ExcMessage("Joining some of the Edges failed."));
 
     Handle(Geom_Curve) bspline = convert_bspline.BSplineCurve();
@@ -627,7 +630,7 @@ namespace OpenCASCADE
               f, 1, true, false, false)];
 
             // distribute indices into maps
-            if (vert_to_faces.find(v0) == vert_to_faces.end())
+            if (vert_to_faces.find(v0) DEAL_II_EQUALS vert_to_faces.end())
               {
                 vert_to_faces[v0].first = face_index;
               }
@@ -635,7 +638,7 @@ namespace OpenCASCADE
               {
                 vert_to_faces[v0].second = face_index;
               }
-            if (vert_to_faces.find(v1) == vert_to_faces.end())
+            if (vert_to_faces.find(v1) DEAL_II_EQUALS vert_to_faces.end())
               {
                 vert_to_faces[v1].first = face_index;
               }
@@ -648,10 +651,10 @@ namespace OpenCASCADE
     // run through maps in an orderly fashion, i.e., through the
     // boundary in one cycle and add points to pointlist.
     std::vector<TopoDS_Edge> interpolation_curves;
-    bool                     finished = (face_to_verts.size() == 0);
+    bool                     finished = (face_to_verts.size() DEAL_II_EQUALS 0);
     face_index = finished ? 0 : face_to_verts.begin()->first;
 
-    while (finished == false)
+    while (finished DEAL_II_EQUALS false)
       {
         const unsigned int start_point_index = face_to_verts[face_index].first;
         unsigned int       point_index       = start_point_index;
@@ -683,7 +686,7 @@ namespace OpenCASCADE
 
         finished = true;
         for (const auto &f : visited_faces)
-          if (f.second == false)
+          if (f.second DEAL_II_EQUALS false)
             {
               face_index = f.first;
               finished   = false;
@@ -743,7 +746,7 @@ namespace OpenCASCADE
     // no need to loop on edges. Even if the closest point lies on the boundary
     // of a parametric surface, we need in fact to retain the face and both u
     // and v, if we want to use this method to retrieve the surface normal
-    if (face_counter == 0)
+    if (face_counter DEAL_II_EQUALS 0)
       for (exp.Init(in_shape, TopAbs_EDGE); exp.More(); exp.Next())
         {
           TopoDS_Edge edge = TopoDS::Edge(exp.Current());
@@ -760,7 +763,8 @@ namespace OpenCASCADE
 
               GeomAPI_ProjectPointOnCurve Proj(point(origin), CurveToProj);
               unsigned int                num_proj_points = Proj.NbPoints();
-              if ((num_proj_points > 0) && (Proj.LowerDistance() < minDistance))
+              if ((num_proj_points > 0)
+                    DEAL_II_AND(Proj.LowerDistance() < minDistance))
                 {
                   minDistance = Proj.LowerDistance();
                   Pproj       = Proj.NearestPoint();
@@ -866,7 +870,7 @@ namespace OpenCASCADE
     // the normal could jump from "inner" to "outer" normal.
     // However, you should be able to change the normal sense preserving
     // the manifold orientation:
-    if (face.Orientation() == TopAbs_REVERSED)
+    if (face.Orientation() DEAL_II_EQUALS TopAbs_REVERSED)
       {
         normal *= -1;
         Min_Curvature *= -1;

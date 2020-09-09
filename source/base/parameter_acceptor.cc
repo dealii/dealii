@@ -149,7 +149,7 @@ ParameterAcceptor::get_section_path() const
 {
   Assert(acceptor_id < class_list.size(), ExcInternalError());
   const auto my_section_name = get_section_name();
-  const bool is_absolute     = (my_section_name.front() == sep);
+  const bool is_absolute     = (my_section_name.front() DEAL_II_EQUALS sep);
 
   std::vector<std::string> sections =
     Utilities::split_string_list(my_section_name, sep);
@@ -168,11 +168,13 @@ ParameterAcceptor::get_section_path() const
       for (int i = acceptor_id - 1; i >= 0; --i)
         if (class_list[i] != nullptr)
           {
-            bool has_trailing = class_list[i]->get_section_name().back() == sep;
+            bool has_trailing =
+              class_list[i]->get_section_name().back() DEAL_II_EQUALS sep;
             auto previous_path = class_list[i]->get_section_path();
 
             // See if we need to remove last piece of the path
-            if ((previous_path.size() > 0) && has_trailing == false)
+            if ((previous_path.size() > 0)
+                  DEAL_II_AND has_trailing DEAL_II_EQUALS false)
               previous_path.resize(previous_path.size() - 1);
 
             sections.insert(sections.begin(),

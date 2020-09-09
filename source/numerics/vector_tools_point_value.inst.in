@@ -20,7 +20,7 @@
 for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : SPACE_DIMENSIONS)
   {
-#if deal_II_dimension == deal_II_space_dimension
+#if deal_II_dimension DEAL_II_EQUALS deal_II_space_dimension
 
     namespace VectorTools
     \{
@@ -95,7 +95,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
     namespace VectorTools
     \{
 
-#if deal_II_dimension == deal_II_space_dimension
+#if deal_II_dimension DEAL_II_EQUALS deal_II_space_dimension
 
       template void
       create_point_source_vector<deal_II_dimension>(

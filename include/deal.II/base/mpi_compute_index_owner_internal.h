@@ -114,14 +114,17 @@ namespace Utilities
                 for (types::global_dof_index i = interval.first;
                      i < interval.second;
                      i++)
-                  Assert(actually_owning_ranks[i - local_range.first] ==
-                           numbers::invalid_unsigned_int,
-                         ExcInternalError());
-                Assert(interval.first >= local_range.first &&
-                         interval.first < local_range.second,
+                  Assert(
+                    actually_owning_ranks[i - local_range.first] DEAL_II_EQUALS
+                      numbers::invalid_unsigned_int,
+                    ExcInternalError());
+                Assert(interval.first >=
+                         local_range.first DEAL_II_AND interval.first <
+                         local_range.second,
                        ExcInternalError());
-                Assert(interval.second > local_range.first &&
-                         interval.second <= local_range.second,
+                Assert(interval.second >
+                         local_range.first DEAL_II_AND interval.second <=
+                         local_range.second,
                        ExcInternalError());
 #endif
                 std::fill(actually_owning_ranks.data() + interval.first -
@@ -280,7 +283,7 @@ namespace Utilities
 
                     // add the interval, either to the local range or into a
                     // buffer to be sent to another processor
-                    if (owner_first == my_rank)
+                    if (owner_first DEAL_II_EQUALS my_rank)
                       {
                         std::fill(actually_owning_ranks.data() +
                                     index_range.first - local_range.first,
@@ -303,8 +306,8 @@ namespace Utilities
             std::vector<MPI_Request> request;
 
             // Check if index set space is partitioned globally without gaps.
-            if (Utilities::MPI::sum(owned_indices.n_elements(), comm) ==
-                owned_indices.size())
+            if (Utilities::MPI::sum(owned_indices.n_elements(), comm)
+                  DEAL_II_EQUALS owned_indices.size())
               {
                 // no gaps: setup is simple! Processes send their locally owned
                 // indices to the dictionary. The dictionary stores the sending
@@ -356,7 +359,8 @@ namespace Utilities
                     actually_owning_rank_list.push_back(other_rank);
 
                     // receive message
-                    Assert(number_amount % 2 == 0, ExcInternalError());
+                    Assert(number_amount % 2 DEAL_II_EQUALS 0,
+                           ExcInternalError());
                     std::vector<std::pair<types::global_dof_index,
                                           types::global_dof_index>>
                       buffer(number_amount / 2);
@@ -375,14 +379,17 @@ namespace Utilities
                         for (types::global_dof_index i = interval.first;
                              i < interval.second;
                              i++)
-                          Assert(actually_owning_ranks[i - local_range.first] ==
-                                   numbers::invalid_unsigned_int,
+                          Assert(actually_owning_ranks
+                                   [i - local_range.first] DEAL_II_EQUALS
+                                     numbers::invalid_unsigned_int,
                                  ExcInternalError());
-                        Assert(interval.first >= local_range.first &&
-                                 interval.first < local_range.second,
+                        Assert(interval.first >=
+                                 local_range.first DEAL_II_AND interval.first <
+                                 local_range.second,
                                ExcInternalError());
-                        Assert(interval.second > local_range.first &&
-                                 interval.second <= local_range.second,
+                        Assert(interval.second >
+                                 local_range.first DEAL_II_AND
+                                                   interval.second <= local_range.second,
                                ExcInternalError());
 #  endif
 
@@ -474,7 +481,8 @@ namespace Utilities
                                 const unsigned int guess = 0)
           {
             AssertIndexRange(guess, actually_owning_rank_list.size());
-            if (actually_owning_rank_list[guess] == rank_in_owned_indices)
+            if (actually_owning_rank_list[guess] DEAL_II_EQUALS
+                  rank_in_owned_indices)
               return guess;
             else
               {
@@ -483,7 +491,8 @@ namespace Utilities
                                            rank_in_owned_indices);
                 Assert(it != actually_owning_rank_list.end(),
                        ExcInternalError());
-                Assert(*it == rank_in_owned_indices, ExcInternalError());
+                Assert(*it DEAL_II_EQUALS rank_in_owned_indices,
+                       ExcInternalError());
                 return it - actually_owning_rank_list.begin();
               }
           }
@@ -677,14 +686,15 @@ namespace Utilities
               for (auto i : indices_to_look_up)
                 {
                   unsigned int other_rank = dict.dof_to_dict_rank(i);
-                  if (other_rank == my_rank)
+                  if (other_rank DEAL_II_EQUALS my_rank)
                     {
                       owning_ranks[index] =
                         dict.actually_owning_ranks[i - dict.local_range.first];
                       if (track_index_requests)
                         append_index_origin(i, owner_index, my_rank);
                     }
-                  else if (targets.empty() || targets.back() != other_rank)
+                  else if (targets.empty()
+                             DEAL_II_OR targets.back() != other_rank)
                     targets.push_back(other_rank);
                   index++;
                 }
@@ -712,8 +722,10 @@ namespace Utilities
                 }
             }
 
-            Assert(targets.size() == recv_indices.size() &&
-                     targets.size() == indices_to_look_up_by_dict_rank.size(),
+            Assert(targets.size()
+                     DEAL_II_EQUALS recv_indices.size() DEAL_II_AND targets
+                       .size()
+                         DEAL_II_EQUALS indices_to_look_up_by_dict_rank.size(),
                    ExcMessage("Size does not match!"));
 
             return targets;
@@ -762,7 +774,8 @@ namespace Utilities
           read_answer(const unsigned int               other_rank,
                       const std::vector<unsigned int> &recv_buffer) override
           {
-            Assert(recv_indices[other_rank].size() == recv_buffer.size(),
+            Assert(recv_indices[other_rank].size()
+                     DEAL_II_EQUALS recv_buffer.size(),
                    ExcMessage("Sizes do not match!"));
 
             for (unsigned int j = 0; j < recv_indices[other_rank].size(); j++)
@@ -814,7 +827,7 @@ namespace Utilities
             for (unsigned int i = 0; i < requesters.size(); ++i)
               {
                 // special code for our own indices
-                if (dict.actually_owning_rank_list[i] == my_rank)
+                if (dict.actually_owning_rank_list[i] DEAL_II_EQUALS my_rank)
                   {
                     for (const auto &j : requesters[i])
                       {
@@ -869,7 +882,7 @@ namespace Utilities
                 AssertThrowMPI(ierr);
 
                 // receive message
-                Assert(number_amount % 2 == 0, ExcInternalError());
+                Assert(number_amount % 2 DEAL_II_EQUALS 0, ExcInternalError());
                 std::vector<std::pair<unsigned int, unsigned int>> buffer(
                   number_amount / 2);
                 ierr = MPI_Recv(buffer.data(),
@@ -903,7 +916,7 @@ namespace Utilities
                     // dictionary
                     IndexSet &index_set =
                       requested_indices[buffer[offset].first];
-                    if (index_set.size() == 0)
+                    if (index_set.size() DEAL_II_EQUALS 0)
                       index_set.set_size(owned_indices.size());
                     index_set.add_indices(my_index_set);
 
@@ -926,7 +939,7 @@ namespace Utilities
               {
                 IndexSet copy_set = it.second;
                 copy_set.subtract_set(owned_indices);
-                Assert(copy_set.n_elements() == 0,
+                Assert(copy_set.n_elements() DEAL_II_EQUALS 0,
                        ExcInternalError(
                          "The indices requested from the current "
                          "MPI rank should be locally owned here!"));
@@ -965,14 +978,19 @@ namespace Utilities
               dict.actually_owning_ranks[index - dict.local_range.first];
             owner_index =
               dict.get_owning_rank_index(rank_of_owner, owner_index);
-            if (requesters[owner_index].empty() ||
-                requesters[owner_index].back().first != rank_of_request)
+            if (requesters[owner_index]
+                  .empty() DEAL_II_OR requesters[owner_index]
+                  .back()
+                  .first != rank_of_request)
               requesters[owner_index].emplace_back(
                 rank_of_request,
                 std::vector<std::pair<unsigned int, unsigned int>>());
-            if (requesters[owner_index].back().second.empty() ||
-                requesters[owner_index].back().second.back().second !=
-                  index - dict.local_range.first)
+            if (requesters[owner_index]
+                  .back()
+                  .second.empty() DEAL_II_OR requesters[owner_index]
+                  .back()
+                  .second.back()
+                  .second != index - dict.local_range.first)
               requesters[owner_index].back().second.emplace_back(
                 index - dict.local_range.first,
                 index - dict.local_range.first + 1);

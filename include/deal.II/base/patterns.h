@@ -1486,34 +1486,31 @@ namespace Patterns
                    typename std::enable_if<std::is_arithmetic<T>::value>::type>
     {
       template <typename Dummy = T>
-      static
-        typename std::enable_if<std::is_same<Dummy, T>::value &&
-                                  std::is_same<T, bool>::value,
-                                std::unique_ptr<Patterns::PatternBase>>::type
-        to_pattern()
+      static typename std::enable_if<
+        std::is_same<Dummy, T>::value DEAL_II_AND std::is_same<T, bool>::value,
+        std::unique_ptr<Patterns::PatternBase>>::type
+      to_pattern()
       {
         return std::make_unique<Patterns::Bool>();
       }
 
       template <typename Dummy = T>
-      static
-        typename std::enable_if<std::is_same<Dummy, T>::value &&
-                                  !std::is_same<T, bool>::value &&
-                                  std::is_integral<T>::value,
-                                std::unique_ptr<Patterns::PatternBase>>::type
-        to_pattern()
+      static typename std::enable_if<
+        std::is_same<Dummy, T>::value DEAL_II_AND !std::is_same<T, bool>::value
+          DEAL_II_AND std::is_integral<T>::value,
+        std::unique_ptr<Patterns::PatternBase>>::type
+      to_pattern()
       {
         return std::make_unique<Patterns::Integer>(
           std::numeric_limits<T>::lowest(), std::numeric_limits<T>::max());
       }
 
       template <typename Dummy = T>
-      static
-        typename std::enable_if<std::is_same<Dummy, T>::value &&
-                                  !std::is_same<T, bool>::value &&
-                                  std::is_floating_point<T>::value,
-                                std::unique_ptr<Patterns::PatternBase>>::type
-        to_pattern()
+      static typename std::enable_if<
+        std::is_same<Dummy, T>::value DEAL_II_AND !std::is_same<T, bool>::value
+          DEAL_II_AND std::is_floating_point<T>::value,
+        std::unique_ptr<Patterns::PatternBase>>::type
+      to_pattern()
       {
         return std::make_unique<Patterns::Double>(
           std::numeric_limits<T>::lowest(), std::numeric_limits<T>::max());
@@ -1525,8 +1522,9 @@ namespace Patterns
                   Convert<T>::to_pattern())
       {
         std::stringstream str;
-        if (std::is_same<T, unsigned char>::value ||
-            std::is_same<T, signed char>::value || std::is_same<T, char>::value)
+        if (std::is_same<T, unsigned char>::value DEAL_II_OR
+              std::is_same<T, signed char>::value DEAL_II_OR
+                                                  std::is_same<T, char>::value)
           str << static_cast<int>(value);
         else if (std::is_same<T, bool>::value)
           str << (static_cast<bool>(value) ? "true" : "false");
@@ -1545,13 +1543,13 @@ namespace Patterns
         AssertThrow(p->match(s), ExcNoMatch(s, p->description()));
         T value;
         if (std::is_same<T, bool>::value)
-          value = (s == "true");
+          value = (s DEAL_II_EQUALS "true");
         else
           {
             std::istringstream is(s);
-            if (std::is_same<T, unsigned char>::value ||
-                std::is_same<T, signed char>::value ||
-                std::is_same<T, char>::value)
+            if (std::is_same<T, unsigned char>::value DEAL_II_OR
+                  std::is_same<T, signed char>::value DEAL_II_OR
+                                                      std::is_same<T, char>::value)
               {
                 int i;
                 is >> i;
@@ -2041,7 +2039,7 @@ namespace Patterns
                                "to a List compatible type."));
 
         const auto &expressions = t->get_expressions();
-        if (expressions.size() == 0)
+        if (expressions.size() DEAL_II_EQUALS 0)
           return std::string();
 
         std::string s = expressions[0];

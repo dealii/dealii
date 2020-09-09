@@ -264,7 +264,7 @@ SolverMinRes<VectorType>::solve(const MatrixType &        A,
   m[2]->reinit(b);
 
   SolverControl::State conv = this->iteration_status(0, r_l2, x);
-  while (conv == SolverControl::iterate)
+  while (conv DEAL_II_EQUALS SolverControl::iterate)
     {
       if (delta[1] != 0)
         v *= 1. / std::sqrt(delta[1]);
@@ -287,7 +287,7 @@ SolverMinRes<VectorType>::solve(const MatrixType &        A,
 
       Assert(delta[2] >= 0, ExcPreconditionerNotDefinite());
 
-      if (j == 1)
+      if (j DEAL_II_EQUALS 1)
         {
           d_   = gamma;
           e[1] = std::sqrt(delta[2]);
@@ -309,7 +309,7 @@ SolverMinRes<VectorType>::solve(const MatrixType &        A,
 
       s = std::sqrt(delta[2]) / d;
 
-      if (j == 1)
+      if (j DEAL_II_EQUALS 1)
         tau = r0 * c;
 
       m[0]->add(-e[0], *m[1]);
@@ -344,7 +344,7 @@ SolverMinRes<VectorType>::solve(const MatrixType &        A,
     }
 
   // in case of failure: throw exception
-  AssertThrow(conv == SolverControl::success,
+  AssertThrow(conv DEAL_II_EQUALS SolverControl::success,
               SolverControl::NoConvergence(j, r_l2));
 
   // otherwise exit as normal

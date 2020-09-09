@@ -68,9 +68,9 @@ namespace
     // first_hex_index
     result.object_index[3][0] =
       (first_quad_index +
-       (dim == 2 ?
+       (dim DEAL_II_EQUALS 2 ?
           1 :
-          (dim == 3 ?
+          (dim DEAL_II_EQUALS 3 ?
              ReferenceCell::internal::Info::get_cell(cell_type).n_faces() :
              0)) *
          dofs_per_quad);
@@ -83,7 +83,7 @@ namespace
 
     // first_face_quad_index
     result.first_object_index_on_face[2][0] =
-      ((dim == 3 ?
+      ((dim DEAL_II_EQUALS 3 ?
           ReferenceCell::internal::Info::get_face(cell_type, face_no)
               .n_vertices() *
             dofs_per_vertex :
@@ -99,7 +99,7 @@ namespace
          dofs_per_vertex +
        ReferenceCell::internal::Info::get_face(cell_type, face_no).n_lines() *
          dofs_per_line +
-       (dim == 3 ? 1 : 0) * dofs_per_quad);
+       (dim DEAL_II_EQUALS 3 ? 1 : 0) * dofs_per_quad);
 
 
     // dofs_per_cell
@@ -108,13 +108,13 @@ namespace
          dofs_per_vertex +
        ReferenceCell::internal::Info::get_cell(cell_type).n_lines() *
          dofs_per_line +
-       (dim == 2 ?
+       (dim DEAL_II_EQUALS 2 ?
           1 :
-          (dim == 3 ?
+          (dim DEAL_II_EQUALS 3 ?
              ReferenceCell::internal::Info::get_cell(cell_type).n_faces() :
              0)) *
          dofs_per_quad +
-       (dim == 3 ? 1 : 0) * dofs_per_hex);
+       (dim DEAL_II_EQUALS 3 ? 1 : 0) * dofs_per_hex);
 
     return result;
   }
@@ -128,11 +128,12 @@ FiniteElementData<dim>::FiniteElementData(
   const Conformity                 conformity,
   const BlockIndices &             block_indices)
   : FiniteElementData(dofs_per_object,
-                      dim == 0 ?
+                      dim DEAL_II_EQUALS 0 ?
                         ReferenceCell::Type::Vertex :
-                        (dim == 1 ? ReferenceCell::Type::Line :
-                                    (dim == 2 ? ReferenceCell::Type::Quad :
-                                                ReferenceCell::Type::Hex)),
+                        (dim DEAL_II_EQUALS 1 ?
+                           ReferenceCell::Type::Line :
+                           (dim DEAL_II_EQUALS 2 ? ReferenceCell::Type::Quad :
+                                                   ReferenceCell::Type::Hex)),
                       n_components,
                       degree,
                       conformity,
@@ -190,7 +191,7 @@ FiniteElementData<dim>::FiniteElementData(
   , components(n_components)
   , degree(degree)
   , conforming_space(conformity)
-  , block_indices_data(block_indices.size() == 0 ?
+  , block_indices_data(block_indices.size() DEAL_II_EQUALS 0 ?
                          BlockIndices(1, dofs_per_cell) :
                          block_indices)
 {}
@@ -198,14 +199,16 @@ FiniteElementData<dim>::FiniteElementData(
 
 
 template <int dim>
-bool
-FiniteElementData<dim>::operator==(const FiniteElementData<dim> &f) const
+bool FiniteElementData<dim>::
+     operator DEAL_II_EQUALS(const FiniteElementData<dim> &f) const
 {
-  return ((dofs_per_vertex == f.dofs_per_vertex) &&
-          (dofs_per_line == f.dofs_per_line) &&
-          (dofs_per_quad == f.dofs_per_quad) &&
-          (dofs_per_hex == f.dofs_per_hex) && (components == f.components) &&
-          (degree == f.degree) && (conforming_space == f.conforming_space));
+  return ((dofs_per_vertex DEAL_II_EQUALS f.dofs_per_vertex)DEAL_II_AND(
+    dofs_per_line DEAL_II_EQUALS f.dofs_per_line)
+            DEAL_II_AND(dofs_per_quad DEAL_II_EQUALS f.dofs_per_quad)
+              DEAL_II_AND(dofs_per_hex DEAL_II_EQUALS f.dofs_per_hex)
+                DEAL_II_AND(components DEAL_II_EQUALS f.components)
+                  DEAL_II_AND(degree DEAL_II_EQUALS f.degree) DEAL_II_AND(
+                    conforming_space DEAL_II_EQUALS f.conforming_space));
 }
 
 

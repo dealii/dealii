@@ -123,7 +123,7 @@ namespace parallel
     void
     ErrorPredictor<dim, spacedim>::unpack(std::vector<Vector<float> *> &all_out)
     {
-      Assert(error_indicators.size() == all_out.size(),
+      Assert(error_indicators.size() DEAL_II_EQUALS all_out.size(),
              ExcDimensionMismatch(error_indicators.size(), all_out.size()));
 
       // TODO: casting away constness is bad
@@ -239,7 +239,8 @@ namespace parallel
                      ++child_index)
                   {
                     const auto child = cell->child(child_index);
-                    Assert(child->is_active() && child->coarsen_flag_set(),
+                    Assert(child->is_active()
+                             DEAL_II_AND child->coarsen_flag_set(),
                            typename dealii::Triangulation<
                              dim>::ExcInconsistentCoarseningFlags());
 
@@ -288,7 +289,7 @@ namespace parallel
           }
 
       // We don't have to pack the whole container if there is just one entry.
-      if (error_indicators.size() == 1)
+      if (error_indicators.size() DEAL_II_EQUALS 1)
         return Utilities::pack(predicted_errors[0],
                                /*allow_compression=*/false);
       else
@@ -308,7 +309,7 @@ namespace parallel
     {
       std::vector<float> predicted_errors;
 
-      if (all_out.size() == 1)
+      if (all_out.size() DEAL_II_EQUALS 1)
         predicted_errors.push_back(
           Utilities::unpack<float>(data_range.begin(),
                                    data_range.end(),
@@ -319,7 +320,8 @@ namespace parallel
                                                 data_range.end(),
                                                 /*allow_compression=*/false);
 
-      Assert(predicted_errors.size() == all_out.size(), ExcInternalError());
+      Assert(predicted_errors.size() DEAL_II_EQUALS all_out.size(),
+             ExcInternalError());
 
       auto it_input  = predicted_errors.cbegin();
       auto it_output = all_out.begin();

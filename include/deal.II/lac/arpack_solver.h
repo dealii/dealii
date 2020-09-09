@@ -547,7 +547,7 @@ ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
 
   // Number of eigenvalues
   const unsigned int nev_const =
-    (n_eigenvalues == 0) ? eigenvalues.size() : n_eigenvalues;
+    (n_eigenvalues DEAL_II_EQUALS 0) ? eigenvalues.size() : n_eigenvalues;
   // nev for arpack, which might change by plus one during dneupd
   unsigned int nev = nev_const;
 
@@ -627,7 +627,7 @@ ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
   double tol = control().tolerance();
 
   // if the starting vector is used it has to be in resid
-  if (!initial_vector_provided || resid.size() != n)
+  if (!initial_vector_provided DEAL_II_OR resid.size() != n)
     resid.resize(n, 1.);
 
   // number of Arnoldi basis vectors specified
@@ -698,7 +698,7 @@ ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
                 &lworkl,
                 &info);
 
-      if (ido == 99)
+      if (ido DEAL_II_EQUALS 99)
         break;
 
       switch (mode)
@@ -862,11 +862,11 @@ ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
                   &info);
         }
 
-      if (info == 1)
+      if (info DEAL_II_EQUALS 1)
         {
           Assert(false, ArpackExcArpackInfoMaxIt(control().max_steps()));
         }
-      else if (info == 3)
+      else if (info DEAL_II_EQUALS 3)
         {
           Assert(false, ArpackExcArpackNoShifts());
         }

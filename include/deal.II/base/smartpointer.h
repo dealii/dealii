@@ -252,7 +252,7 @@ inline SmartPointer<T, P>::SmartPointer(const SmartPointer<T, Q> &tt)
   , id(tt.id)
   , pointed_to_object_is_alive(false)
 {
-  if (tt.pointed_to_object_is_alive && t != nullptr)
+  if (tt.pointed_to_object_is_alive DEAL_II_AND t != nullptr)
     t->subscribe(&pointed_to_object_is_alive, id);
 }
 
@@ -264,7 +264,7 @@ inline SmartPointer<T, P>::SmartPointer(const SmartPointer<T, P> &tt)
   , id(tt.id)
   , pointed_to_object_is_alive(false)
 {
-  if (tt.pointed_to_object_is_alive && t != nullptr)
+  if (tt.pointed_to_object_is_alive DEAL_II_AND t != nullptr)
     t->subscribe(&pointed_to_object_is_alive, id);
 }
 
@@ -273,7 +273,7 @@ inline SmartPointer<T, P>::SmartPointer(const SmartPointer<T, P> &tt)
 template <typename T, typename P>
 inline SmartPointer<T, P>::~SmartPointer()
 {
-  if (pointed_to_object_is_alive && t != nullptr)
+  if (pointed_to_object_is_alive DEAL_II_AND t != nullptr)
     t->unsubscribe(&pointed_to_object_is_alive, id);
 }
 
@@ -283,11 +283,12 @@ template <typename T, typename P>
 inline void
 SmartPointer<T, P>::clear()
 {
-  if (pointed_to_object_is_alive && t != nullptr)
+  if (pointed_to_object_is_alive DEAL_II_AND t != nullptr)
     {
       t->unsubscribe(&pointed_to_object_is_alive, id);
       delete t;
-      Assert(pointed_to_object_is_alive == false, ExcInternalError());
+      Assert(pointed_to_object_is_alive DEAL_II_EQUALS false,
+             ExcInternalError());
     }
   t = nullptr;
 }
@@ -300,10 +301,10 @@ SmartPointer<T, P>::operator=(T *tt)
 {
   // optimize if no real action is
   // requested
-  if (t == tt)
+  if (t DEAL_II_EQUALS tt)
     return *this;
 
-  if (pointed_to_object_is_alive && t != nullptr)
+  if (pointed_to_object_is_alive DEAL_II_AND t != nullptr)
     t->unsubscribe(&pointed_to_object_is_alive, id);
   t = tt;
   if (tt != nullptr)
@@ -321,13 +322,13 @@ SmartPointer<T, P>::operator=(const SmartPointer<T, Q> &tt)
   // if objects on the left and right
   // hand side of the operator= are
   // the same, then this is a no-op
-  if (&tt == this)
+  if (&tt DEAL_II_EQUALS this)
     return *this;
 
-  if (pointed_to_object_is_alive && t != nullptr)
+  if (pointed_to_object_is_alive DEAL_II_AND t != nullptr)
     t->unsubscribe(&pointed_to_object_is_alive, id);
   t = static_cast<T *>(tt);
-  if (tt.pointed_to_object_is_alive && tt != nullptr)
+  if (tt.pointed_to_object_is_alive DEAL_II_AND tt != nullptr)
     tt->subscribe(&pointed_to_object_is_alive, id);
   return *this;
 }
@@ -341,13 +342,13 @@ SmartPointer<T, P>::operator=(const SmartPointer<T, P> &tt)
   // if objects on the left and right
   // hand side of the operator= are
   // the same, then this is a no-op
-  if (&tt == this)
+  if (&tt DEAL_II_EQUALS this)
     return *this;
 
-  if (pointed_to_object_is_alive && t != nullptr)
+  if (pointed_to_object_is_alive DEAL_II_AND t != nullptr)
     t->unsubscribe(&pointed_to_object_is_alive, id);
   t = static_cast<T *>(tt);
-  if (tt.pointed_to_object_is_alive && tt != nullptr)
+  if (tt.pointed_to_object_is_alive DEAL_II_AND tt != nullptr)
     tt->subscribe(&pointed_to_object_is_alive, id);
   return *this;
 }
@@ -404,7 +405,7 @@ template <typename T, typename P>
 inline void
 SmartPointer<T, P>::swap(T *&tt)
 {
-  if (pointed_to_object_is_alive && t != nullptr)
+  if (pointed_to_object_is_alive DEAL_II_AND t != nullptr)
     t->unsubscribe(pointed_to_object_is_alive, id);
 
   std::swap(t, tt);

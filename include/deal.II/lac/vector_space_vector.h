@@ -241,7 +241,8 @@ namespace LinearAlgebra
      * a vector is created on only one processor, then the result would
      * satisfy
      * @code
-     *  vec.locally_owned_elements() == complete_index_set(vec.size())
+     *  vec.locally_owned_elements() DEAL_II_EQUALS
+     * complete_index_set(vec.size())
      * @endcode
      */
     virtual dealii::IndexSet

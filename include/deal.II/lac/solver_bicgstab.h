@@ -401,7 +401,7 @@ SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
       rhobar = r * rbar;
       beta   = rhobar * alpha / (rho * omega);
       rho    = rhobar;
-      if (startup == true)
+      if (startup DEAL_II_EQUALS true)
         {
           p       = r;
           startup = false;
@@ -431,7 +431,8 @@ SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
       // note: the vector *Vx we pass to the iteration_status signal here is
       // only the current approximation, not the one we will return with, which
       // will be x=*Vx + alpha*y
-      if (this->iteration_status(step, res, *Vx) == SolverControl::success)
+      if (this->iteration_status(step, res, *Vx)
+            DEAL_II_EQUALS SolverControl::success)
         {
           Vx->add(alpha, y);
           print_vectors(step, *Vx, r, y);
@@ -455,7 +456,7 @@ SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
       state = this->iteration_status(step, res, *Vx);
       print_vectors(step, *Vx, r, y);
     }
-  while (state == SolverControl::iterate);
+  while (state DEAL_II_EQUALS SolverControl::iterate);
 
   return IterationResult(false, state, step, res);
 }
@@ -502,7 +503,7 @@ SolverBicgstab<VectorType>::solve(const MatrixType &        A,
     {
       if (step != 0)
         deallog << "Restart step " << step << std::endl;
-      if (start(A) == SolverControl::success)
+      if (start(A) DEAL_II_EQUALS SolverControl::success)
         {
           state.state = SolverControl::success;
           break;
@@ -510,7 +511,7 @@ SolverBicgstab<VectorType>::solve(const MatrixType &        A,
       state = iterate(A, preconditioner);
       ++step;
     }
-  while (state.breakdown == true);
+  while (state.breakdown DEAL_II_EQUALS true);
 
   // Release the temporary memory again.
   Vr.reset();
@@ -522,7 +523,7 @@ SolverBicgstab<VectorType>::solve(const MatrixType &        A,
   Vv.reset();
 
   // In case of failure: throw exception
-  AssertThrow(state.state == SolverControl::success,
+  AssertThrow(state.state DEAL_II_EQUALS SolverControl::success,
               SolverControl::NoConvergence(state.last_step,
                                            state.last_residual));
   // Otherwise exit as normal

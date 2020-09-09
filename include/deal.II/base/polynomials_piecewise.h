@@ -204,7 +204,7 @@ namespace Polynomials
         const number step = 1. / n_intervals;
 
         // polynomial spans over two intervals
-        if (spans_two_intervals == true)
+        if (spans_two_intervals DEAL_II_EQUALS true)
           {
             const number offset = step * interval;
             if (x < offset)
@@ -219,7 +219,7 @@ namespace Polynomials
         else
           {
             const number offset = step * interval;
-            if (x < offset || x > offset + step)
+            if (x<offset DEAL_II_OR x> offset + step)
               return 0;
             else
               y = x - offset;

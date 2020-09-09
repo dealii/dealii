@@ -85,9 +85,10 @@ namespace LinearAlgebra
       template <typename Number, typename MemorySpaceType>
       struct la_parallel_vector_templates_functions
       {
-        static_assert(std::is_same<MemorySpaceType, MemorySpace::Host>::value ||
-                        std::is_same<MemorySpaceType, MemorySpace::CUDA>::value,
-                      "MemorySpace should be Host or CUDA");
+        static_assert(
+          std::is_same<MemorySpaceType, MemorySpace::Host>::value DEAL_II_OR
+                                                                  std::is_same<MemorySpaceType, MemorySpace::CUDA>::value,
+          "MemorySpace should be Host or CUDA");
 
         static void
         resize_val(
@@ -132,8 +133,8 @@ namespace LinearAlgebra
         {
           if (new_alloc_size > allocated_size)
             {
-              Assert(((allocated_size > 0 && data.values != nullptr) ||
-                      data.values == nullptr),
+              Assert(((allocated_size > 0 DEAL_II_AND data.values != nullptr)
+                        DEAL_II_OR data.values DEAL_II_EQUALS nullptr),
                      ExcInternalError());
 
               Number *new_val;
@@ -145,7 +146,7 @@ namespace LinearAlgebra
 
               allocated_size = new_alloc_size;
             }
-          else if (new_alloc_size == 0)
+          else if (new_alloc_size DEAL_II_EQUALS 0)
             {
               data.values.reset();
               allocated_size = 0;
@@ -164,8 +165,8 @@ namespace LinearAlgebra
             &data)
         {
           Assert(
-            (operation == ::dealii::VectorOperation::add) ||
-              (operation == ::dealii::VectorOperation::insert),
+            (operation DEAL_II_EQUALS ::dealii::VectorOperation::add)DEAL_II_OR(
+              operation DEAL_II_EQUALS ::dealii::VectorOperation::insert),
             ExcMessage(
               "Only VectorOperation::add and VectorOperation::insert are allowed"));
 
@@ -185,7 +186,7 @@ namespace LinearAlgebra
 
           // Copy the local elements of tmp_vector to the right place in val
           IndexSet tmp_index_set = tmp_vector.locally_owned_elements();
-          if (operation == VectorOperation::add)
+          if (operation DEAL_II_EQUALS VectorOperation::add)
             {
               for (size_type i = 0; i < tmp_index_set.n_elements(); ++i)
                 {
@@ -233,14 +234,15 @@ namespace LinearAlgebra
                      MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
         {
           static_assert(
-            std::is_same<Number, float>::value ||
-              std::is_same<Number, double>::value,
+            std::is_same<Number, float>::value DEAL_II_OR
+                                               std::is_same<Number, double>::value,
             "Number should be float or double for CUDA memory space");
 
           if (new_alloc_size > allocated_size)
             {
-              Assert(((allocated_size > 0 && data.values_dev != nullptr) ||
-                      data.values_dev == nullptr),
+              Assert(((allocated_size > 0 DEAL_II_AND data.values_dev !=
+                       nullptr)
+                        DEAL_II_OR data.values_dev DEAL_II_EQUALS nullptr),
                      ExcInternalError());
 
               Number *new_val_dev;
@@ -249,7 +251,7 @@ namespace LinearAlgebra
 
               allocated_size = new_alloc_size;
             }
-          else if (new_alloc_size == 0)
+          else if (new_alloc_size DEAL_II_EQUALS 0)
             {
               data.values_dev.reset();
               allocated_size = 0;
@@ -266,8 +268,8 @@ namespace LinearAlgebra
                  MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
         {
           Assert(
-            (operation == ::dealii::VectorOperation::add) ||
-              (operation == ::dealii::VectorOperation::insert),
+            (operation DEAL_II_EQUALS ::dealii::VectorOperation::add)DEAL_II_OR(
+              operation DEAL_II_EQUALS ::dealii::VectorOperation::insert),
             ExcMessage(
               "Only VectorOperation::add and VectorOperation::insert are allowed"));
 
@@ -319,7 +321,7 @@ namespace LinearAlgebra
           ::dealii::Utilities::CUDA::malloc(indices_dev, tmp_n_elements);
           ::dealii::Utilities::CUDA::copy_to_dev(indices, indices_dev);
 
-          if (operation == VectorOperation::add)
+          if (operation DEAL_II_EQUALS VectorOperation::add)
             ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_permutated<
               Number><<<n_blocks, ::dealii::CUDAWrappers::block_size>>>(
               indices_dev,
@@ -431,7 +433,7 @@ namespace LinearAlgebra
       partitioner = std::make_shared<Utilities::MPI::Partitioner>(size);
 
       // set entries to zero if so requested
-      if (omit_zeroing_entries == false)
+      if (omit_zeroing_entries DEAL_II_EQUALS false)
         this->operator=(Number());
       else
         zero_out_ghosts();
@@ -461,7 +463,7 @@ namespace LinearAlgebra
           resize_val(new_allocated_size);
         }
 
-      if (omit_zeroing_entries == false)
+      if (omit_zeroing_entries DEAL_II_EQUALS false)
         this->operator=(Number());
       else
         zero_out_ghosts();
@@ -659,7 +661,7 @@ namespace LinearAlgebra
       // c does not have any ghosts (constructed without ghost elements given)
       // but the current vector does: In that case, we need to exchange data
       // also when none of the two vector had updated its ghost values before.
-      if (partitioner.get() == nullptr)
+      if (partitioner.get() DEAL_II_EQUALS nullptr)
         reinit(c, true);
       else if (partitioner.get() != c.partitioner.get())
         {
@@ -667,23 +669,27 @@ namespace LinearAlgebra
           // (even if they happen to define the empty range as [0,0) or [c,c)
           // for some c!=0 in a different way).
           int local_ranges_are_identical =
-            (partitioner->local_range() == c.partitioner->local_range() ||
-             (partitioner->local_range().second ==
-                partitioner->local_range().first &&
-              c.partitioner->local_range().second ==
-                c.partitioner->local_range().first));
-          if ((c.partitioner->n_mpi_processes() > 1 &&
-               Utilities::MPI::min(local_ranges_are_identical,
-                                   c.partitioner->get_mpi_communicator()) ==
-                 0) ||
-              !local_ranges_are_identical)
+            (partitioner->local_range()
+               DEAL_II_EQUALS c.partitioner->local_range() DEAL_II_OR(
+                 partitioner->local_range()
+                   .second DEAL_II_EQUALS partitioner->local_range()
+                   .first DEAL_II_AND c.partitioner->local_range()
+                   .second DEAL_II_EQUALS c.partitioner->local_range()
+                   .first));
+          if ((c.partitioner->n_mpi_processes() >
+               1 DEAL_II_AND Utilities::MPI::min(
+                 local_ranges_are_identical,
+                 c.partitioner->get_mpi_communicator()) DEAL_II_EQUALS 0)
+                DEAL_II_OR !local_ranges_are_identical)
             reinit(c, true);
           else
             must_update_ghost_values |= vector_is_ghosted;
 
           must_update_ghost_values |=
-            (c.partitioner->ghost_indices_initialized() == false &&
-             partitioner->ghost_indices_initialized() == true);
+            (c.partitioner
+               ->ghost_indices_initialized()
+                 DEAL_II_EQUALS false DEAL_II_AND partitioner
+               ->ghost_indices_initialized() DEAL_II_EQUALS true);
         }
       else
         must_update_ghost_values |= vector_is_ghosted;
@@ -735,10 +741,11 @@ namespace LinearAlgebra
       VectorOperation::values                 operation)
     {
       Assert(src.partitioner.get() != nullptr, ExcNotInitialized());
-      Assert(partitioner->locally_owned_range() ==
-               src.partitioner->locally_owned_range(),
+      Assert(partitioner->locally_owned_range()
+               DEAL_II_EQUALS src.partitioner->locally_owned_range(),
              ExcMessage("Locally owned indices should be identical."));
-      Assert(partitioner->ghost_indices() == src.partitioner->ghost_indices(),
+      Assert(partitioner->ghost_indices()
+               DEAL_II_EQUALS src.partitioner->ghost_indices(),
              ExcMessage("Ghost indices should be identical."));
       ::dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::import(
@@ -799,7 +806,7 @@ namespace LinearAlgebra
       ::dealii::VectorOperation::values operation)
     {
       AssertIndexRange(communication_channel, 200);
-      Assert(vector_is_ghosted == false,
+      Assert(vector_is_ghosted DEAL_II_EQUALS false,
              ExcMessage("Cannot call compress() on a ghosted vector"));
 
 #ifdef DEAL_II_WITH_MPI
@@ -809,11 +816,11 @@ namespace LinearAlgebra
       // allocate import_data in case it is not set up yet
       if (partitioner->n_import_indices() > 0)
         {
-#  if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-    defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+#  if defined(DEAL_II_COMPILER_CUDA_AWARE) \
+    DEAL_II_AND defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
           if (std::is_same<MemorySpaceType, dealii::MemorySpace::CUDA>::value)
             {
-              if (import_data.values_dev == nullptr)
+              if (import_data.values_dev DEAL_II_EQUALS nullptr)
                 import_data.values_dev.reset(
                   Utilities::CUDA::allocate_device_data<Number>(
                     partitioner->n_import_indices()));
@@ -821,13 +828,13 @@ namespace LinearAlgebra
           else
 #  endif
             {
-#  if !defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-    defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+#  if !defined(DEAL_II_COMPILER_CUDA_AWARE) \
+    DEAL_II_AND defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
               static_assert(
                 std::is_same<MemorySpaceType, dealii::MemorySpace::Host>::value,
                 "This code path should only be compiled for CUDA-aware-MPI for MemorySpace::Host!");
 #  endif
-              if (import_data.values == nullptr)
+              if (import_data.values DEAL_II_EQUALS nullptr)
                 {
                   Number *new_val;
                   Utilities::System::posix_memalign(
@@ -839,8 +846,8 @@ namespace LinearAlgebra
             }
         }
 
-#  if defined DEAL_II_COMPILER_CUDA_AWARE && \
-    !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+#  if defined DEAL_II_COMPILER_CUDA_AWARE DEAL_II_AND !defined( \
+    DEAL_II_MPI_WITH_CUDA_SUPPORT)
       if (std::is_same<MemorySpaceType, dealii::MemorySpace::CUDA>::value)
         {
           // Move the data to the host and then move it back to the
@@ -863,8 +870,8 @@ namespace LinearAlgebra
         }
 #  endif
 
-#  if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-    defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+#  if defined(DEAL_II_COMPILER_CUDA_AWARE) \
+    DEAL_II_AND defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
       if (std::is_same<MemorySpaceType, dealii::MemorySpace::CUDA>::value)
         {
           partitioner->import_from_ghosted_array_start(
@@ -908,16 +915,18 @@ namespace LinearAlgebra
 
       // in order to zero ghost part of the vector, we need to call
       // import_from_ghosted_array_finish() regardless of
-      // compress_requests.size() == 0
+      // compress_requests.size() DEAL_II_EQUALS  0
 
       // make this function thread safe
       std::lock_guard<std::mutex> lock(mutex);
-#  if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-    defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+#  if defined(DEAL_II_COMPILER_CUDA_AWARE) \
+    DEAL_II_AND defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
       if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
         {
-          Assert(partitioner->n_import_indices() == 0 ||
-                   import_data.values_dev != nullptr,
+          Assert(partitioner
+                     ->n_import_indices()
+                       DEAL_II_EQUALS 0 DEAL_II_OR import_data.values_dev !=
+                   nullptr,
                  ExcNotInitialized());
           partitioner
             ->import_from_ghosted_array_finish<Number, MemorySpace::CUDA>(
@@ -934,8 +943,10 @@ namespace LinearAlgebra
       else
 #  endif
         {
-          Assert(partitioner->n_import_indices() == 0 ||
-                   import_data.values != nullptr,
+          Assert(partitioner
+                     ->n_import_indices()
+                       DEAL_II_EQUALS 0 DEAL_II_OR import_data.values !=
+                   nullptr,
                  ExcNotInitialized());
           partitioner
             ->import_from_ghosted_array_finish<Number, MemorySpace::Host>(
@@ -950,8 +961,8 @@ namespace LinearAlgebra
               compress_requests);
         }
 
-#  if defined DEAL_II_COMPILER_CUDA_AWARE && \
-    !defined  DEAL_II_MPI_WITH_CUDA_SUPPORT
+#  if defined DEAL_II_COMPILER_CUDA_AWARE \
+    DEAL_II_AND !defined DEAL_II_MPI_WITH_CUDA_SUPPORT
       // The communication is done on the host, so we need to
       // move the data back to the device.
       if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
@@ -981,8 +992,10 @@ namespace LinearAlgebra
       AssertIndexRange(communication_channel, 200);
 #ifdef DEAL_II_WITH_MPI
       // nothing to do when we neither have import nor ghost indices.
-      if (partitioner->n_ghost_indices() == 0 &&
-          partitioner->n_import_indices() == 0)
+      if (partitioner
+            ->n_ghost_indices()
+              DEAL_II_EQUALS 0 DEAL_II_AND partitioner->n_import_indices()
+                DEAL_II_EQUALS 0)
         return;
 
       // make this function thread safe
@@ -991,13 +1004,13 @@ namespace LinearAlgebra
       // allocate import_data in case it is not set up yet
       if (partitioner->n_import_indices() > 0)
         {
-#  if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-    defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+#  if defined(DEAL_II_COMPILER_CUDA_AWARE) \
+    DEAL_II_AND defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
           Assert(
             (std::is_same<MemorySpaceType, dealii::MemorySpace::CUDA>::value),
             ExcMessage(
               "Using MemorySpace::CUDA only allowed if the code is compiled with a CUDA compiler!"));
-          if (import_data.values_dev == nullptr)
+          if (import_data.values_dev DEAL_II_EQUALS nullptr)
             import_data.values_dev.reset(
               Utilities::CUDA::allocate_device_data<Number>(
                 partitioner->n_import_indices()));
@@ -1007,7 +1020,7 @@ namespace LinearAlgebra
             std::is_same<MemorySpaceType, dealii::MemorySpace::Host>::value,
             "This code path should only be compiled for CUDA-aware-MPI for MemorySpace::Host!");
 #    endif
-          if (import_data.values == nullptr)
+          if (import_data.values DEAL_II_EQUALS nullptr)
             {
               Number *new_val;
               Utilities::System::posix_memalign(
@@ -1019,8 +1032,8 @@ namespace LinearAlgebra
 #  endif
         }
 
-#  if defined DEAL_II_COMPILER_CUDA_AWARE && \
-    !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+#  if defined DEAL_II_COMPILER_CUDA_AWARE DEAL_II_AND !defined( \
+    DEAL_II_MPI_WITH_CUDA_SUPPORT)
       // Move the data to the host and then move it back to the
       // device. We use values to store the elements because the function
       // uses a view of the array and thus we need the data on the host to
@@ -1039,8 +1052,8 @@ namespace LinearAlgebra
       AssertCuda(cuda_error_code);
 #  endif
 
-#  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-        defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
+#  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) \
+          DEAL_II_AND defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
       partitioner->export_to_ghosted_array_start<Number, MemorySpace::Host>(
         communication_channel,
         ArrayView<const Number, MemorySpace::Host>(data.values.get(),
@@ -1086,8 +1099,8 @@ namespace LinearAlgebra
           // make this function thread safe
           std::lock_guard<std::mutex> lock(mutex);
 
-#  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-        defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
+#  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) \
+          DEAL_II_AND defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
           partitioner->export_to_ghosted_array_finish(
             ArrayView<Number, MemorySpace::Host>(
               data.values.get() + partitioner->local_size(),
@@ -1102,8 +1115,8 @@ namespace LinearAlgebra
 #  endif
         }
 
-#  if defined DEAL_II_COMPILER_CUDA_AWARE && \
-    !defined  DEAL_II_MPI_WITH_CUDA_SUPPORT
+#  if defined DEAL_II_COMPILER_CUDA_AWARE \
+    DEAL_II_AND !defined DEAL_II_MPI_WITH_CUDA_SUPPORT
       // The communication is done on the host, so we need to
       // move the data back to the device.
       if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
@@ -1135,7 +1148,7 @@ namespace LinearAlgebra
       // If no communication pattern is given, create one. Otherwise, use the
       // given one.
       std::shared_ptr<const Utilities::MPI::Partitioner> comm_pattern;
-      if (communication_pattern.get() == nullptr)
+      if (communication_pattern.get() DEAL_II_EQUALS nullptr)
         {
           // Split the IndexSet of V in locally owned elements and ghost indices
           // then create the communication pattern
@@ -1227,7 +1240,7 @@ namespace LinearAlgebra
                                            &flag,
                                            MPI_STATUSES_IGNORE);
               AssertThrowMPI(ierr);
-              Assert(flag == 1,
+              Assert(flag DEAL_II_EQUALS 1,
                      ExcMessage(
                        "MPI found unfinished update_ghost_values() requests "
                        "when calling swap, which is not allowed."));
@@ -1239,7 +1252,7 @@ namespace LinearAlgebra
                                            &flag,
                                            MPI_STATUSES_IGNORE);
               AssertThrowMPI(ierr);
-              Assert(flag == 1,
+              Assert(flag DEAL_II_EQUALS 1,
                      ExcMessage("MPI found unfinished compress() requests "
                                 "when calling swap, which is not allowed."));
             }
@@ -1274,7 +1287,7 @@ namespace LinearAlgebra
 
       // if we call Vector::operator=0, we want to zero out all the entries
       // plus ghosts.
-      if (s == Number())
+      if (s DEAL_II_EQUALS Number())
         zero_out_ghosts();
 
       return *this;
@@ -1380,7 +1393,7 @@ namespace LinearAlgebra
       AssertDimension(local_size(), v.local_size());
 
       // nothing to do if a is zero
-      if (a == Number(0.))
+      if (a DEAL_II_EQUALS Number(0.))
         return;
 
       dealii::internal::VectorOperations::
@@ -1595,7 +1608,7 @@ namespace LinearAlgebra
     bool
     Vector<Number, MemorySpaceType>::all_zero() const
     {
-      return (linfty_norm() == 0) ? true : false;
+      return (linfty_norm() DEAL_II_EQUALS 0) ? true : false;
     }
 
 
@@ -1662,7 +1675,7 @@ namespace LinearAlgebra
     {
       Assert(size() != 0, ExcEmptyObject());
 
-      if (partitioner->local_size() == 0)
+      if (partitioner->local_size() DEAL_II_EQUALS 0)
         return Number();
 
       Number sum = ::dealii::internal::VectorOperations::
@@ -1884,7 +1897,8 @@ namespace LinearAlgebra
       if (partitioner.use_count() > 0)
         memory +=
           partitioner->memory_consumption() / partitioner.use_count() + 1;
-      if (import_data.values != nullptr || import_data.values_dev != nullptr)
+      if (import_data.values != nullptr DEAL_II_OR import_data.values_dev !=
+          nullptr)
         memory += (static_cast<std::size_t>(partitioner->n_import_indices()) *
                    sizeof(Number));
       return memory;

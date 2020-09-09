@@ -256,11 +256,11 @@ namespace SUNDIALS
     if (arkode_mem)
       ARKodeFree(&arkode_mem);
 #  ifdef DEAL_II_WITH_MPI
-    if (is_serial_vector<VectorType>::value == false)
+    if (is_serial_vector<VectorType>::value DEAL_II_EQUALS false)
       {
         const int ierr = MPI_Comm_free(&communicator);
         (void)ierr;
-        AssertNothrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
+        AssertNothrow(ierr DEAL_II_EQUALS MPI_SUCCESS, ExcMPI(ierr));
       }
 #  endif
   }
@@ -275,7 +275,7 @@ namespace SUNDIALS
 
     // The solution is stored in solution. Here we take only a view of it.
 #  ifdef DEAL_II_WITH_MPI
-    if (is_serial_vector<VectorType>::value == false)
+    if (is_serial_vector<VectorType>::value DEAL_II_EQUALS false)
       {
         const IndexSet    is                = solution.locally_owned_elements();
         const std::size_t local_system_size = is.n_elements();
@@ -303,7 +303,7 @@ namespace SUNDIALS
     if (output_step)
       output_step(time.get_current_time(), solution, time.get_step_number());
 
-    while (time.is_at_end() == false)
+    while (time.is_at_end() DEAL_II_EQUALS false)
       {
         time.set_desired_next_step_size(data.output_period);
         double     actual_next_time;
@@ -330,7 +330,7 @@ namespace SUNDIALS
 
       // Free the vectors which are no longer used.
 #  ifdef DEAL_II_WITH_MPI
-    if (is_serial_vector<VectorType>::value == false)
+    if (is_serial_vector<VectorType>::value DEAL_II_EQUALS false)
       {
         N_VDestroy_Parallel(yy);
         N_VDestroy_Parallel(abs_tolls);
@@ -362,7 +362,7 @@ namespace SUNDIALS
     if (yy)
       {
 #  ifdef DEAL_II_WITH_MPI
-        if (is_serial_vector<VectorType>::value == false)
+        if (is_serial_vector<VectorType>::value DEAL_II_EQUALS false)
           {
             N_VDestroy_Parallel(yy);
             N_VDestroy_Parallel(abs_tolls);
@@ -379,7 +379,7 @@ namespace SUNDIALS
     (void)status;
     system_size = solution.size();
 #  ifdef DEAL_II_WITH_MPI
-    if (is_serial_vector<VectorType>::value == false)
+    if (is_serial_vector<VectorType>::value DEAL_II_EQUALS false)
       {
         const IndexSet    is                = solution.locally_owned_elements();
         const std::size_t local_system_size = is.n_elements();
@@ -398,8 +398,9 @@ namespace SUNDIALS
 
     copy(yy, solution);
 
-    Assert(explicit_function || implicit_function,
-           ExcFunctionNotProvided("explicit_function || implicit_function"));
+    Assert(explicit_function DEAL_II_OR implicit_function,
+           ExcFunctionNotProvided(
+             "explicit_function DEAL_II_OR  implicit_function"));
 
     status = ARKodeInit(
       arkode_mem,

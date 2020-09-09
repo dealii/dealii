@@ -73,8 +73,9 @@ FunctionParser<dim>::FunctionParser(const std::string &expression,
   initialize(variable_names,
              expression,
              constants_map,
-             Utilities::split_string_list(variable_names, ",").size() ==
-               dim + 1);
+             Utilities::split_string_list(variable_names, ",")
+                 .size() DEAL_II_EQUALS dim +
+               1);
 }
 
 
@@ -101,12 +102,13 @@ FunctionParser<dim>::initialize(const std::string &             variables,
   this->constants   = constants;
   this->var_names   = Utilities::split_string_list(variables, ',');
   this->expressions = expressions;
-  AssertThrow(((time_dependent) ? dim + 1 : dim) == var_names.size(),
+  AssertThrow(((time_dependent) ? dim + 1 : dim)
+                DEAL_II_EQUALS var_names.size(),
               ExcMessage("Wrong number of variables"));
 
   // We check that the number of components of this function matches the
   // number of components passed in as a vector of strings.
-  AssertThrow(this->n_components == expressions.size(),
+  AssertThrow(this->n_components DEAL_II_EQUALS expressions.size(),
               ExcInvalidExpressionSize(this->n_components, expressions.size()));
 
   // Now we define how many variables we expect to read in.  We distinguish
@@ -139,7 +141,7 @@ FunctionParser<dim>::init_muparser() const
   // check that we have not already initialized the parser on the
   // current thread, i.e., that the current function is only called
   // once per thread
-  Assert(fp.get().size() == 0, ExcInternalError());
+  Assert(fp.get().size() DEAL_II_EQUALS 0, ExcInternalError());
 
   // initialize the objects for the current thread (fp.get() and
   // vars.get())
@@ -219,16 +221,19 @@ FunctionParser<dim>::init_muparser() const
                 {
                   // try to find any occurrences of the function name
                   pos = transformed_expression.find(current_function_name, pos);
-                  if (pos == std::string::npos)
+                  if (pos DEAL_II_EQUALS std::string::npos)
                     break;
 
                   // replace whitespace until there no longer is any
-                  while ((pos + function_name_length <
-                          transformed_expression.size()) &&
-                         ((transformed_expression[pos + function_name_length] ==
-                           ' ') ||
-                          (transformed_expression[pos + function_name_length] ==
-                           '\t')))
+                  while (
+                    (pos + function_name_length < transformed_expression.size())
+                      DEAL_II_AND(
+                        (transformed_expression
+                           [pos + function_name_length] DEAL_II_EQUALS ' ')
+                          DEAL_II_OR(
+                            transformed_expression
+                              [pos +
+                               function_name_length] DEAL_II_EQUALS '\t')))
                     transformed_expression.erase(
                       transformed_expression.begin() + pos +
                       function_name_length);
@@ -276,11 +281,11 @@ double
 FunctionParser<dim>::value(const Point<dim> & p,
                            const unsigned int component) const
 {
-  Assert(initialized == true, ExcNotInitialized());
+  Assert(initialized DEAL_II_EQUALS true, ExcNotInitialized());
   AssertIndexRange(component, this->n_components);
 
   // initialize the parser if that hasn't happened yet on the current thread
-  if (fp.get().size() == 0)
+  if (fp.get().size() DEAL_II_EQUALS 0)
     init_muparser();
 
   for (unsigned int i = 0; i < dim; ++i)
@@ -311,13 +316,13 @@ void
 FunctionParser<dim>::vector_value(const Point<dim> &p,
                                   Vector<double> &  values) const
 {
-  Assert(initialized == true, ExcNotInitialized());
-  Assert(values.size() == this->n_components,
+  Assert(initialized DEAL_II_EQUALS true, ExcNotInitialized());
+  Assert(values.size() DEAL_II_EQUALS this->n_components,
          ExcDimensionMismatch(values.size(), this->n_components));
 
 
   // initialize the parser if that hasn't happened yet on the current thread
-  if (fp.get().size() == 0)
+  if (fp.get().size() DEAL_II_EQUALS 0)
     init_muparser();
 
   for (unsigned int i = 0; i < dim; ++i)

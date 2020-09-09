@@ -229,8 +229,8 @@ namespace AdaptationStrategies
             &              parent,
           const value_type parent_value)
     {
-      static_assert(std::is_arithmetic<value_type>::value &&
-                      !std::is_same<value_type, bool>::value,
+      static_assert(std::is_arithmetic<value_type>::value
+                      DEAL_II_AND !std::is_same<value_type, bool>::value,
                     "The provided value_type may not meet the requirements "
                     "of this function.");
 
@@ -247,8 +247,8 @@ namespace AdaptationStrategies
               &              parent,
             const value_type parent_value)
     {
-      static_assert(std::is_arithmetic<value_type>::value &&
-                      !std::is_same<value_type, bool>::value,
+      static_assert(std::is_arithmetic<value_type>::value
+                      DEAL_II_AND !std::is_same<value_type, bool>::value,
                     "The provided value_type may not meet the requirements "
                     "of this function.");
 
@@ -275,7 +275,7 @@ namespace AdaptationStrategies
       for (auto other_child = first_child + 1;
            other_child != children_values.cend();
            ++other_child)
-        Assert(*first_child == *other_child,
+        Assert(*first_child DEAL_II_EQUALS * other_child,
                ExcMessage(
                  "Values on cells that will be coarsened are not equal!"));
 
@@ -289,8 +289,8 @@ namespace AdaptationStrategies
     sum(const typename dealii::Triangulation<dim, spacedim>::cell_iterator &,
         const std::vector<value_type> &children_values)
     {
-      static_assert(std::is_arithmetic<value_type>::value &&
-                      !std::is_same<value_type, bool>::value,
+      static_assert(std::is_arithmetic<value_type>::value
+                      DEAL_II_AND !std::is_same<value_type, bool>::value,
                     "The provided value_type may not meet the requirements "
                     "of this function.");
 
@@ -308,8 +308,8 @@ namespace AdaptationStrategies
       const typename dealii::Triangulation<dim, spacedim>::cell_iterator &,
       const std::vector<value_type> &children_values)
     {
-      static_assert(std::is_arithmetic<value_type>::value &&
-                      !std::is_same<value_type, bool>::value,
+      static_assert(std::is_arithmetic<value_type>::value
+                      DEAL_II_AND !std::is_same<value_type, bool>::value,
                     "The provided value_type may not meet the requirements "
                     "of this function.");
 

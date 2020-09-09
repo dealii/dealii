@@ -278,7 +278,7 @@ namespace MeshWorker
     const unsigned int chunk_size   = 8)
   {
     Assert(
-      (!cell_worker) == !(flags & work_on_cells),
+      (!cell_worker)DEAL_II_EQUALS !(flags & work_on_cells),
       ExcMessage(
         "If you specify a cell_worker, you need to set assemble_own_cells or assemble_ghost_cells."));
 
@@ -296,17 +296,17 @@ namespace MeshWorker
         "You can only specify assemble_ghost_faces_once OR assemble_ghost_faces_both."));
 
     Assert(
-      !(flags & cells_after_faces) ||
-        (flags & (assemble_own_cells | assemble_ghost_cells)),
+      !(flags & cells_after_faces)
+        DEAL_II_OR(flags & (assemble_own_cells | assemble_ghost_cells)),
       ExcMessage(
         "The option cells_after_faces only makes sense if you assemble on cells."));
 
-    Assert((!face_worker) == !(flags & work_on_faces),
+    Assert((!face_worker)DEAL_II_EQUALS !(flags & work_on_faces),
            ExcMessage(
              "If you specify a face_worker, assemble_face_* needs to be set."));
 
     Assert(
-      (!boundary_worker) == !(flags & assemble_boundary_faces),
+      (!boundary_worker)DEAL_II_EQUALS !(flags & assemble_boundary_faces),
       ExcMessage(
         "If you specify a boundary_worker, assemble_boundary_faces needs to be set."));
 
@@ -321,35 +321,34 @@ namespace MeshWorker
       const auto dim = cell->get_triangulation().dimension;
 
       const bool ignore_subdomain =
-        (cell->get_triangulation().locally_owned_subdomain() ==
-         numbers::invalid_subdomain_id);
+        (cell->get_triangulation().locally_owned_subdomain()
+           DEAL_II_EQUALS numbers::invalid_subdomain_id);
 
       types::subdomain_id current_subdomain_id =
         (cell->is_level_cell() ? cell->level_subdomain_id() :
                                  cell->subdomain_id());
 
-      const bool own_cell =
-        ignore_subdomain ||
-        (current_subdomain_id ==
-         cell->get_triangulation().locally_owned_subdomain());
+      const bool own_cell = ignore_subdomain DEAL_II_OR(
+        current_subdomain_id DEAL_II_EQUALS cell->get_triangulation()
+          .locally_owned_subdomain());
 
-      if ((!ignore_subdomain) &&
-          (current_subdomain_id == numbers::artificial_subdomain_id))
+      if ((!ignore_subdomain)DEAL_II_AND(current_subdomain_id DEAL_II_EQUALS
+                                                              numbers::artificial_subdomain_id))
         return;
 
-      if (!(flags & (cells_after_faces)) &&
-          (((flags & (assemble_own_cells)) && own_cell) ||
-           ((flags & assemble_ghost_cells) && !own_cell)))
+      if (!(flags & (cells_after_faces)) DEAL_II_AND(
+            ((flags & (assemble_own_cells)) DEAL_II_AND own_cell)
+              DEAL_II_OR((flags & assemble_ghost_cells) DEAL_II_AND !own_cell)))
         cell_worker(cell, scratch, copy);
 
       if (flags & (work_on_faces | work_on_boundary))
         for (const unsigned int face_no : cell->face_indices())
           {
-            if (cell->at_boundary(face_no) &&
-                !cell->has_periodic_neighbor(face_no))
+            if (cell->at_boundary(face_no)
+                  DEAL_II_AND !cell->has_periodic_neighbor(face_no))
               {
                 // only integrate boundary faces of own cells
-                if ((flags & assemble_boundary_faces) && own_cell)
+                if ((flags & assemble_boundary_faces) DEAL_II_AND own_cell)
                   boundary_worker(cell, face_no, scratch, copy);
               }
             else
@@ -366,25 +365,24 @@ namespace MeshWorker
                 else if (neighbor->is_active())
                   neighbor_subdomain_id = neighbor->subdomain_id();
 
-                const bool own_neighbor =
-                  ignore_subdomain ||
-                  (neighbor_subdomain_id ==
-                   cell->get_triangulation().locally_owned_subdomain());
+                const bool own_neighbor = ignore_subdomain DEAL_II_OR(
+                  neighbor_subdomain_id DEAL_II_EQUALS cell->get_triangulation()
+                    .locally_owned_subdomain());
 
                 // skip all faces between two ghost cells
-                if (!own_cell && !own_neighbor)
+                if (!own_cell DEAL_II_AND !own_neighbor)
                   continue;
 
                 // skip if the user doesn't want faces between own cells
-                if (own_cell && own_neighbor &&
-                    !(flags & (assemble_own_interior_faces_both |
+                if (own_cell DEAL_II_AND own_neighbor DEAL_II_AND !(
+                      flags & (assemble_own_interior_faces_both |
                                assemble_own_interior_faces_once)))
                   continue;
 
                 // skip face to ghost
-                if (own_cell != own_neighbor &&
-                    !(flags &
-                      (assemble_ghost_faces_both | assemble_ghost_faces_once)))
+                if (own_cell != own_neighbor DEAL_II_AND !(
+                                  flags & (assemble_ghost_faces_both |
+                                           assemble_ghost_faces_once)))
                   continue;
 
                 // Deal with refinement edges from the refined side. Assuming
@@ -393,17 +391,20 @@ namespace MeshWorker
                 const bool periodic_neighbor =
                   cell->has_periodic_neighbor(face_no);
 
-                if (dim > 1 && ((!periodic_neighbor &&
-                                 cell->neighbor_is_coarser(face_no)) ||
-                                (periodic_neighbor &&
-                                 cell->periodic_neighbor_is_coarser(face_no))))
+                if (dim >
+                    1 DEAL_II_AND(
+                      (!periodic_neighbor DEAL_II_AND cell->neighbor_is_coarser(
+                        face_no))DEAL_II_OR(periodic_neighbor DEAL_II_AND cell
+                                              ->periodic_neighbor_is_coarser(
+                                                face_no))))
                   {
                     Assert(cell->is_active(), ExcInternalError());
                     Assert(neighbor->is_active(), ExcInternalError());
 
                     // skip if only one processor needs to assemble the face
                     // to a ghost cell and the fine cell is not ours.
-                    if (!own_cell && (flags & assemble_ghost_faces_once))
+                    if (!own_cell DEAL_II_AND(flags &
+                                              assemble_ghost_faces_once))
                       continue;
 
                     const std::pair<unsigned int, unsigned int>
@@ -438,16 +439,17 @@ namespace MeshWorker
                                     copy);
                       }
                   }
-                else if (dim == 1 && cell->level() > neighbor->level())
+                else if (dim DEAL_II_EQUALS 1 DEAL_II_AND cell->level() >
+                         neighbor->level())
                   {
                     // In one dimension, there is no other check to do
                     const unsigned int neighbor_face_no =
                       periodic_neighbor ?
                         cell->periodic_neighbor_face_no(face_no) :
                         cell->neighbor_face_no(face_no);
-                    Assert(periodic_neighbor ||
-                             neighbor->face(neighbor_face_no) ==
-                               cell->face(face_no),
+                    Assert(periodic_neighbor DEAL_II_OR neighbor
+                             ->face(neighbor_face_no)
+                               DEAL_II_EQUALS cell->face(face_no),
                            ExcInternalError());
 
                     face_worker(cell,
@@ -477,20 +479,20 @@ namespace MeshWorker
                   {
                     // If iterator is active and neighbor is refined, skip
                     // internal face.
-                    if (dealii::internal::is_active_iterator(cell) &&
-                        neighbor->has_children())
+                    if (dealii::internal::is_active_iterator(cell)
+                          DEAL_II_AND neighbor->has_children())
                       continue;
 
                     // Now neighbor is on same level, double-check this:
-                    Assert(cell->level() == neighbor->level(),
+                    Assert(cell->level() DEAL_II_EQUALS neighbor->level(),
                            ExcInternalError());
 
                     // If we own both cells only do faces from one side (unless
                     // AssembleFlags says otherwise). Here, we rely on cell
                     // comparison that will look at cell->index().
-                    if (own_cell && own_neighbor &&
-                        (flags & assemble_own_interior_faces_once) &&
-                        (neighbor < cell))
+                    if (own_cell DEAL_II_AND own_neighbor DEAL_II_AND(
+                          flags & assemble_own_interior_faces_once)
+                          DEAL_II_AND(neighbor < cell))
                       continue;
 
                     // We only look at faces to ghost on the same level once
@@ -501,18 +503,19 @@ namespace MeshWorker
                     // now only one processor assembles faces_to_ghost. We let
                     // the processor with the smaller (level-)subdomain id
                     // assemble the face.
-                    if (own_cell && !own_neighbor &&
-                        (flags & assemble_ghost_faces_once) &&
-                        (neighbor_subdomain_id < current_subdomain_id))
+                    if (own_cell DEAL_II_AND !own_neighbor DEAL_II_AND(
+                          flags & assemble_ghost_faces_once)
+                          DEAL_II_AND(neighbor_subdomain_id <
+                                      current_subdomain_id))
                       continue;
 
                     const unsigned int neighbor_face_no =
                       periodic_neighbor ?
                         cell->periodic_neighbor_face_no(face_no) :
                         cell->neighbor_face_no(face_no);
-                    Assert(periodic_neighbor ||
-                             neighbor->face(neighbor_face_no) ==
-                               cell->face(face_no),
+                    Assert(periodic_neighbor DEAL_II_OR neighbor
+                             ->face(neighbor_face_no)
+                               DEAL_II_EQUALS cell->face(face_no),
                            ExcInternalError());
 
                     face_worker(cell,
@@ -528,9 +531,9 @@ namespace MeshWorker
           } // faces
 
       // Execute the cell_worker if faces are handled before cells
-      if ((flags & cells_after_faces) &&
-          (((flags & assemble_own_cells) && own_cell) ||
-           ((flags & assemble_ghost_cells) && !own_cell)))
+      if ((flags & cells_after_faces) DEAL_II_AND(
+            ((flags & assemble_own_cells) DEAL_II_AND own_cell)
+              DEAL_II_OR((flags & assemble_ghost_cells) DEAL_II_AND !own_cell)))
         cell_worker(cell, scratch, copy);
     };
 

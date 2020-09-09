@@ -74,11 +74,10 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  bool
-  ParticleIterator<dim, spacedim>::
-  operator==(const ParticleIterator<dim, spacedim> &other) const
+  bool ParticleIterator<dim, spacedim>::
+       operator DEAL_II_EQUALS(const ParticleIterator<dim, spacedim> &other) const
   {
-    return accessor == other.accessor;
+    return accessor DEAL_II_EQUALS other.accessor;
   }
 
 

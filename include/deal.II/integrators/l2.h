@@ -248,7 +248,7 @@ namespace LocalIntegrators
       const unsigned int n2_dofs      = fe2.n_dofs_per_cell();
       const unsigned int n_components = fe1.get_fe().n_components();
 
-      Assert(n1_dofs == n2_dofs, ExcNotImplemented());
+      Assert(n1_dofs DEAL_II_EQUALS n2_dofs, ExcNotImplemented());
       (void)n2_dofs;
       AssertDimension(n_components, fe2.get_fe().n_components());
       AssertDimension(M11.m(), n1_dofs);

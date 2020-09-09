@@ -158,8 +158,9 @@ namespace internal
       // only go to the parallel function in case there are at least 4 parallel
       // items, otherwise the overhead is too large
       if (vec_size >=
-            4 * internal::VectorImplementation::minimum_parallel_grain_size &&
-          MultithreadInfo::n_threads() > 1)
+          4 * internal::VectorImplementation::minimum_parallel_grain_size
+                DEAL_II_AND MultithreadInfo::n_threads() >
+          1)
         {
           Assert(partitioner.get() != nullptr,
                  ExcInternalError(
@@ -211,7 +212,7 @@ namespace internal
       {
         Assert(end >= begin, ExcInternalError());
 
-        if (value == Number())
+        if (value DEAL_II_EQUALS Number())
           {
 #ifdef DEAL_II_HAVE_CXX17
             if constexpr (std::is_trivial<Number>::value)
@@ -246,16 +247,16 @@ namespace internal
       {
         Assert(end >= begin, ExcInternalError());
 
-#if __GNUG__ && __GNUC__ < 5
-        if (__has_trivial_copy(Number) &&
-            std::is_same<Number, OtherNumber>::value)
+#if __GNUG__ DEAL_II_AND __GNUC__ < 5
+        if (__has_trivial_copy(Number)
+              DEAL_II_AND std::is_same<Number, OtherNumber>::value)
 #else
 #  ifdef DEAL_II_HAVE_CXX17
-        if constexpr (std::is_trivially_copyable<Number>() &&
-                      std::is_same<Number, OtherNumber>::value)
+        if constexpr (std::is_trivially_copyable<Number>()
+                        DEAL_II_AND std::is_same<Number, OtherNumber>::value)
 #  else
-        if (std::is_trivially_copyable<Number>() &&
-            std::is_same<Number, OtherNumber>::value)
+        if (std::is_trivially_copyable<Number>()
+              DEAL_II_AND std::is_same<Number, OtherNumber>::value)
 #  endif
 #endif
           std::memcpy(dst + begin, src + begin, (end - begin) * sizeof(Number));
@@ -743,8 +744,9 @@ namespace internal
     template <typename Number, typename Number2>
     struct Dot
     {
-      static constexpr bool vectorizes = std::is_same<Number, Number2>::value &&
-                                         (VectorizedArray<Number>::size() > 1);
+      static constexpr bool                  vectorizes =
+        std::is_same<Number, Number2>::value DEAL_II_AND(
+          VectorizedArray<Number>::size() > 1);
 
       Dot(const Number *const X, const Number2 *const Y)
         : X(X)
@@ -771,9 +773,10 @@ namespace internal
         // work on real scalars, it doesn't really matter very much.
         // in any case, assert that we really don't get here for
         // complex-valued objects
-        static_assert(numbers::NumberTraits<Number>::is_complex == false,
-                      "This operation is not correctly implemented for "
-                      "complex-valued objects.");
+        static_assert(
+          numbers::NumberTraits<Number>::is_complex DEAL_II_EQUALS false,
+          "This operation is not correctly implemented for "
+          "complex-valued objects.");
         return x * y;
       }
 
@@ -928,9 +931,10 @@ namespace internal
         // work on real scalars, it doesn't really matter very much.
         // in any case, assert that we really don't get here for
         // complex-valued objects
-        static_assert(numbers::NumberTraits<Number>::is_complex == false,
-                      "This operation is not correctly implemented for "
-                      "complex-valued objects.");
+        static_assert(
+          numbers::NumberTraits<Number>::is_complex DEAL_II_EQUALS false,
+          "This operation is not correctly implemented for "
+          "complex-valued objects.");
         return x * w;
       }
 
@@ -1001,7 +1005,7 @@ namespace internal
           ResultType outer_results[vector_accumulation_recursion_threshold];
 
           // set the zeroth element to zero to correctly handle the case where
-          // vec_size == 0
+          // vec_size DEAL_II_EQUALS  0
           outer_results[0] = ResultType();
 
           // the variable serves two purposes: (i)  number of chunks (each 32
@@ -1011,8 +1015,8 @@ namespace internal
           // accumulate_regular() is executed.
           size_type       n_chunks  = vec_size / 32;
           const size_type remainder = vec_size % 32;
-          Assert(remainder == 0 ||
-                   n_chunks < vector_accumulation_recursion_threshold,
+          Assert(remainder DEAL_II_EQUALS 0 DEAL_II_OR n_chunks <
+                   vector_accumulation_recursion_threshold,
                  ExcInternalError());
 
           // Select between the regular version and vectorized version based
@@ -1068,7 +1072,8 @@ namespace internal
                       r0 += op(index++);
                     r0 += r2;
                     r0 += r1;
-                    if (n_chunks == vector_accumulation_recursion_threshold)
+                    if (n_chunks DEAL_II_EQUALS
+                                 vector_accumulation_recursion_threshold)
                       outer_results[vector_accumulation_recursion_threshold -
                                     1] += r0;
                     else
@@ -1086,7 +1091,7 @@ namespace internal
           // outer_results[0,n_chunks) recursively
           while (n_chunks > 1)
             {
-              if (n_chunks % 2 == 1)
+              if (n_chunks % 2 DEAL_II_EQUALS 1)
                 outer_results[n_chunks++] = ResultType();
               for (size_type i = 0; i < n_chunks; i += 2)
                 outer_results[i / 2] = outer_results[i] + outer_results[i + 1];
@@ -1202,12 +1207,12 @@ namespace internal
       // The remaining chunks are processed one by one starting from
       // regular_chunks * nvecs; We do as much as possible with 2 SIMD
       // operations within each chunk. Here we assume that nvecs < 32/2 = 16 as
-      // well as 16%nvecs==0.
+      // well as 16%nvecsDEAL_II_EQUALS 0.
       static_assert(
-        VectorizedArray<Number>::size() <= 16 &&
-          16 % VectorizedArray<Number>::size() == 0,
+        VectorizedArray<Number>::size() <=
+          16 DEAL_II_AND 16 % VectorizedArray<Number>::size() DEAL_II_EQUALS 0,
         "VectorizedArray::size() must be a power of 2 and not more than 16");
-      Assert(16 % nvecs == 0, ExcInternalError());
+      Assert(16 % nvecs DEAL_II_EQUALS 0, ExcInternalError());
       if (n_chunks % nvecs != 0)
         {
           VectorizedArray<Number> r0  = VectorizedArray<Number>(),
@@ -1319,7 +1324,7 @@ namespace internal
       {
         while (n_chunks > 1)
           {
-            if (n_chunks % 2 == 1)
+            if (n_chunks % 2 DEAL_II_EQUALS 1)
               array_ptr[n_chunks++] = ResultType();
             for (size_type i = 0; i < n_chunks; i += 2)
               array_ptr[i / 2] = array_ptr[i] + array_ptr[i + 1];
@@ -1363,8 +1368,9 @@ namespace internal
       // only go to the parallel function in case there are at least 4 parallel
       // items, otherwise the overhead is too large
       if (vec_size >=
-            4 * internal::VectorImplementation::minimum_parallel_grain_size &&
-          MultithreadInfo::n_threads() > 1)
+          4 * internal::VectorImplementation::minimum_parallel_grain_size
+                DEAL_II_AND MultithreadInfo::n_threads() >
+          1)
         {
           Assert(partitioner.get() != nullptr,
                  ExcInternalError(
@@ -1414,8 +1420,8 @@ namespace internal
         ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
       {
         static_assert(
-          std::is_same<MemorySpace, ::dealii::MemorySpace::CUDA>::value &&
-            std::is_same<Number, Number2>::value,
+          std::is_same<MemorySpace, ::dealii::MemorySpace::CUDA>::value
+            DEAL_II_AND std::is_same<Number, Number2>::value,
           "For the CUDA MemorySpace Number and Number2 should be the same type");
       }
 
@@ -2008,11 +2014,11 @@ namespace internal
                std::is_same<MemorySpace2, dealii::MemorySpace::Host>::value,
                int>::type = 0)
       {
-        if (operation == VectorOperation::insert)
+        if (operation DEAL_II_EQUALS VectorOperation::insert)
           {
             copy(thread_loop_partitioner, size, v_data, data);
           }
-        else if (operation == VectorOperation::add)
+        else if (operation DEAL_II_EQUALS VectorOperation::add)
           {
             add_vector(thread_loop_partitioner, size, v_data, data);
           }
@@ -2038,7 +2044,7 @@ namespace internal
                std::is_same<MemorySpace2, ::dealii::MemorySpace::CUDA>::value,
                int>::type = 0)
       {
-        if (operation == VectorOperation::insert)
+        if (operation DEAL_II_EQUALS VectorOperation::insert)
           {
             cudaError_t cuda_error_code = cudaMemcpy(data.values.get(),
                                                      v_data.values_dev.get(),
@@ -2524,11 +2530,11 @@ namespace internal
                std::is_same<MemorySpace2, ::dealii::MemorySpace::CUDA>::value,
                int>::type = 0)
       {
-        if (operation == VectorOperation::insert)
+        if (operation DEAL_II_EQUALS VectorOperation::insert)
           {
             copy(thread_loop_partitioner, size, v_data, data);
           }
-        else if (operation == VectorOperation::add)
+        else if (operation DEAL_II_EQUALS VectorOperation::add)
           {
             add_vector(thread_loop_partitioner, size, v_data, data);
           }
@@ -2553,7 +2559,7 @@ namespace internal
                std::is_same<MemorySpace2, ::dealii::MemorySpace::Host>::value,
                int>::type = 0)
       {
-        if (operation == VectorOperation::insert)
+        if (operation DEAL_II_EQUALS VectorOperation::insert)
           {
             cudaError_t cuda_error_code = cudaMemcpy(data.values_dev.get(),
                                                      v_data.values.get(),

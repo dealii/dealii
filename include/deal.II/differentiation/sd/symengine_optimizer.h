@@ -122,11 +122,11 @@ namespace Differentiation
     inline StreamType &
     operator<<(StreamType &s, OptimizerType o)
     {
-      if (o == OptimizerType::dictionary)
+      if (o DEAL_II_EQUALS OptimizerType::dictionary)
         s << "dictionary";
-      else if (o == OptimizerType::lambda)
+      else if (o DEAL_II_EQUALS OptimizerType::lambda)
         s << "lambda";
-      else if (o == OptimizerType::llvm)
+      else if (o DEAL_II_EQUALS OptimizerType::llvm)
         s << "llvm";
       else
         {
@@ -389,8 +389,8 @@ namespace Differentiation
       struct SupportedOptimizerTypeTraits<
         ReturnType_,
         typename std::enable_if<
-          boost::is_complex<ReturnType_>::value &&
-          std::is_arithmetic<typename ReturnType_::value_type>::value>::type>
+          boost::is_complex<ReturnType_>::value DEAL_II_AND
+                                                std::is_arithmetic<typename ReturnType_::value_type>::value>::type>
       {
         static const bool is_supported = true;
 
@@ -720,8 +720,8 @@ namespace Differentiation
       struct LLVMOptimizer<
         ReturnType_,
         typename std::enable_if<
-          boost::is_complex<ReturnType_>::value &&
-          std::is_arithmetic<typename ReturnType_::value_type>::value>::type>
+          boost::is_complex<ReturnType_>::value DEAL_II_AND
+                                                std::is_arithmetic<typename ReturnType_::value_type>::value>::type>
       {
         // Since there is no working implementation, these are dummy types
         // that help with templating in the calling function.
@@ -2113,14 +2113,15 @@ namespace Differentiation
       stream << "\n" << std::flush;
 
       // Common subexpression
-      if (optimized() == true && use_symbolic_CSE() == true)
+      if (optimized() DEAL_II_EQUALS true DEAL_II_AND use_symbolic_CSE()
+            DEAL_II_EQUALS true)
         {
           Assert(optimizer, ExcNotInitialized());
           const bool print_cse_reductions      = true;
           const bool print_independent_symbols = false;
           const bool print_dependent_functions = false;
 
-          if (optimization_method() == OptimizerType::dictionary)
+          if (optimization_method() DEAL_II_EQUALS OptimizerType::dictionary)
             {
               Assert(dynamic_cast<typename internal::DictionaryOptimizer<
                        ReturnType>::OptimizerType *>(optimizer.get()),
@@ -2138,7 +2139,7 @@ namespace Differentiation
 
               stream << "\n" << std::flush;
             }
-          else if (optimization_method() == OptimizerType::lambda)
+          else if (optimization_method() DEAL_II_EQUALS OptimizerType::lambda)
             {
               Assert(dynamic_cast<typename internal::LambdaOptimizer<
                        ReturnType>::OptimizerType *>(optimizer.get()),
@@ -2154,7 +2155,7 @@ namespace Differentiation
                       print_cse_reductions);
             }
 #    ifdef HAVE_SYMENGINE_LLVM
-          else if (optimization_method() == OptimizerType::llvm)
+          else if (optimization_method() DEAL_II_EQUALS OptimizerType::llvm)
             {
               Assert(dynamic_cast<typename internal::LLVMOptimizer<
                        ReturnType>::OptimizerType *>(optimizer.get()),
@@ -2238,7 +2239,7 @@ namespace Differentiation
             *opt = dynamic_cast<typename internal::DictionaryOptimizer<
               ReturnType>::OptimizerType *>(optimizer.get()))
         {
-          Assert(optimization_method() == OptimizerType::dictionary,
+          Assert(optimization_method() DEAL_II_EQUALS OptimizerType::dictionary,
                  ExcInternalError());
           internal::OptimizerHelper<
             ReturnType,
@@ -2248,7 +2249,7 @@ namespace Differentiation
                  *opt = dynamic_cast<typename internal::LambdaOptimizer<
                    ReturnType>::OptimizerType *>(optimizer.get()))
         {
-          Assert(optimization_method() == OptimizerType::lambda,
+          Assert(optimization_method() DEAL_II_EQUALS OptimizerType::lambda,
                  ExcInternalError());
           internal::OptimizerHelper<
             ReturnType,
@@ -2259,7 +2260,7 @@ namespace Differentiation
                  *opt = dynamic_cast<typename internal::LLVMOptimizer<
                    ReturnType>::OptimizerType *>(optimizer.get()))
         {
-          Assert(optimization_method() == OptimizerType::llvm,
+          Assert(optimization_method() DEAL_II_EQUALS OptimizerType::llvm,
                  ExcInternalError());
           internal::OptimizerHelper<
             ReturnType,
@@ -2283,7 +2284,8 @@ namespace Differentiation
       Assert(dependent_variables_functions.empty(), ExcInternalError());
       Assert(dependent_variables_output.empty(), ExcInternalError());
       Assert(map_dep_expr_vec_entry.empty(), ExcInternalError());
-      Assert(ready_for_value_extraction == false, ExcInternalError());
+      Assert(ready_for_value_extraction DEAL_II_EQUALS false,
+             ExcInternalError());
 
       // Deserialize enum classes...
       {
@@ -2326,7 +2328,7 @@ namespace Differentiation
             *opt = dynamic_cast<typename internal::DictionaryOptimizer<
               ReturnType>::OptimizerType *>(optimizer.get()))
         {
-          Assert(optimization_method() == OptimizerType::dictionary,
+          Assert(optimization_method() DEAL_II_EQUALS OptimizerType::dictionary,
                  ExcInternalError());
           internal::OptimizerHelper<ReturnType,
                                     internal::DictionaryOptimizer<ReturnType>>::
@@ -2343,7 +2345,7 @@ namespace Differentiation
                  *opt = dynamic_cast<typename internal::LambdaOptimizer<
                    ReturnType>::OptimizerType *>(optimizer.get()))
         {
-          Assert(optimization_method() == OptimizerType::lambda,
+          Assert(optimization_method() DEAL_II_EQUALS OptimizerType::lambda,
                  ExcInternalError());
           internal::OptimizerHelper<ReturnType,
                                     internal::LambdaOptimizer<ReturnType>>::
@@ -2361,7 +2363,7 @@ namespace Differentiation
                  *opt = dynamic_cast<typename internal::LLVMOptimizer<
                    ReturnType>::OptimizerType *>(optimizer.get()))
         {
-          Assert(optimization_method() == OptimizerType::llvm,
+          Assert(optimization_method() DEAL_II_EQUALS OptimizerType::llvm,
                  ExcInternalError());
           internal::OptimizerHelper<ReturnType,
                                     internal::LLVMOptimizer<ReturnType>>::
@@ -2389,7 +2391,7 @@ namespace Differentiation
     BatchOptimizer<ReturnType>::register_function(
       const Tensor<rank, dim, Expression> &function_tensor)
     {
-      Assert(optimized() == false,
+      Assert(optimized() DEAL_II_EQUALS false,
              ExcMessage(
                "Cannot register functions once the optimizer is finalised."));
 
@@ -2405,7 +2407,7 @@ namespace Differentiation
     BatchOptimizer<ReturnType>::register_function(
       const SymmetricTensor<rank, dim, Expression> &function_tensor)
     {
-      Assert(optimized() == false,
+      Assert(optimized() DEAL_II_EQUALS false,
              ExcMessage(
                "Cannot register functions once the optimizer is finalised."));
 
@@ -2446,7 +2448,7 @@ namespace Differentiation
       const Tensor<rank, dim, Expression> &funcs) const
     {
       Assert(
-        values_substituted() == true,
+        values_substituted() DEAL_II_EQUALS true,
         ExcMessage(
           "The optimizer is not configured to perform evaluation. "
           "This action can only performed after substitute() has been called."));
@@ -2463,7 +2465,7 @@ namespace Differentiation
       const SymmetricTensor<rank, dim, Expression> &funcs) const
     {
       Assert(
-        values_substituted() == true,
+        values_substituted() DEAL_II_EQUALS true,
         ExcMessage(
           "The optimizer is not configured to perform evaluation. "
           "This action can only performed after substitute() has been called."));

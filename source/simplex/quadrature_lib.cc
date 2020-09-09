@@ -33,22 +33,22 @@ namespace Simplex
     : QSimplex<dim>(Quadrature<dim>())
   {
     // fill quadrature points and quadrature weights
-    if (dim == 1)
+    if (dim DEAL_II_EQUALS 1)
       {
         const dealii::QGauss<dim> quad(n_points);
 
         this->quadrature_points = quad.get_points();
         this->weights           = quad.get_weights();
       }
-    else if (dim == 2)
+    else if (dim DEAL_II_EQUALS 2)
       {
-        if (n_points == 1)
+        if (n_points DEAL_II_EQUALS 1)
           {
             const double p = 1.0 / 3.0;
             this->quadrature_points.emplace_back(p, p);
             this->weights.emplace_back(1.0);
           }
-        else if (n_points == 3)
+        else if (n_points DEAL_II_EQUALS 3)
           {
             const double Q23 = 2.0 / 3.0;
             const double Q16 = 1.0 / 6.0;
@@ -60,7 +60,7 @@ namespace Simplex
             this->weights.emplace_back(Q16);
             this->weights.emplace_back(Q16);
           }
-        else if (n_points == 7)
+        else if (n_points DEAL_II_EQUALS 7)
           {
             const double q12 = 0.5;
 
@@ -83,9 +83,9 @@ namespace Simplex
             this->weights.emplace_back(q12 * 0.132394152789);
           }
       }
-    else if (dim == 3)
+    else if (dim DEAL_II_EQUALS 3)
       {
-        if (n_points == 1)
+        if (n_points DEAL_II_EQUALS 1)
           {
             const double Q14 = 1.0 / 4.0;
             const double Q16 = 1.0 / 6.0;
@@ -93,7 +93,7 @@ namespace Simplex
             this->quadrature_points.emplace_back(Q14, Q14, Q14);
             this->weights.emplace_back(Q16);
           }
-        else if (n_points == 4)
+        else if (n_points DEAL_II_EQUALS 4)
           {
             const double Q124 = 1.0 / 6.0 / 4.0;
 
@@ -108,7 +108,7 @@ namespace Simplex
             this->weights.emplace_back(Q124);
             this->weights.emplace_back(Q124);
           }
-        else if (n_points == 10)
+        else if (n_points DEAL_II_EQUALS 10)
           {
             const double Q16 = 1.0 / 6.0;
 

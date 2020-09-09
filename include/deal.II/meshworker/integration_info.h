@@ -645,7 +645,8 @@ namespace MeshWorker
     const BlockInfo *                               block_info)
   {
     fe_pointer = &el;
-    if (block_info == nullptr || block_info->local().size() == 0)
+    if (block_info DEAL_II_EQUALS nullptr DEAL_II_OR block_info->local().size()
+          DEAL_II_EQUALS 0)
       {
         fevalv.resize(1);
         fevalv[0] = std::make_shared<FEVALUES>(mapping, el, quadrature, flags);
@@ -737,11 +738,11 @@ namespace MeshWorker
                                                              unsigned int fp,
                                                              bool         force)
   {
-    if (force || cell_quadrature.size() == 0)
+    if (force DEAL_II_OR cell_quadrature.size() DEAL_II_EQUALS 0)
       cell_quadrature = QGauss<dim>(cp);
-    if (force || boundary_quadrature.size() == 0)
+    if (force DEAL_II_OR boundary_quadrature.size() DEAL_II_EQUALS 0)
       boundary_quadrature = QGauss<dim - 1>(bp);
-    if (force || face_quadrature.size() == 0)
+    if (force DEAL_II_OR face_quadrature.size() DEAL_II_EQUALS 0)
       face_quadrature = QGauss<dim - 1>(fp);
   }
 

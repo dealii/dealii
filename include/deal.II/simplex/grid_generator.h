@@ -40,7 +40,7 @@ namespace GridGenerator
    *   quadrilateral/hexahedral cells and subdivides these into 2/5
    * triangular/tetrahedral cells.
    *
-   * @note Currently, this function only works for `dim==spacedim`.
+   * @note Currently, this function only works for `dimDEAL_II_EQUALS spacedim`.
    *
    * @ingroup simplex
    */

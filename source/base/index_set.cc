@@ -43,7 +43,7 @@ IndexSet::IndexSet(const Epetra_BlockMap &map)
   , index_space_size(1 + map.MaxAllGID64())
   , largest_range(numbers::invalid_unsigned_int)
 {
-  Assert(map.MinAllGID64() == 0,
+  Assert(map.MinAllGID64() DEAL_II_EQUALS 0,
          ExcMessage(
            "The Epetra_BlockMap does not contain the global index 0, "
            "which means some entries are not present on any processor."));
@@ -70,7 +70,7 @@ IndexSet::IndexSet(const Epetra_BlockMap &map)
   , index_space_size(1 + map.MaxAllGID())
   , largest_range(numbers::invalid_unsigned_int)
 {
-  Assert(map.MinAllGID() == 0,
+  Assert(map.MinAllGID() DEAL_II_EQUALS 0,
          ExcMessage(
            "The Epetra_BlockMap does not contain the global index 0, "
            "which means some entries are not present on any processor."));
@@ -118,7 +118,7 @@ IndexSet::do_compress() const
       size_type last_index  = i->end;
 
       // see if we can merge any of the following ranges
-      while (next != ranges.end() && (next->begin <= last_index))
+      while (next != ranges.end() DEAL_II_AND(next->begin <= last_index))
         {
           last_index = std::max(last_index, next->end);
           ++next;
@@ -154,7 +154,7 @@ IndexSet::do_compress() const
 
   // check that next_index is correct. needs to be after the previous
   // statement because we otherwise will get into an endless loop
-  Assert(next_index == n_elements(), ExcInternalError());
+  Assert(next_index DEAL_II_EQUALS n_elements(), ExcInternalError());
 }
 
 
@@ -162,7 +162,8 @@ IndexSet::do_compress() const
 #ifndef DOXYGEN
 IndexSet IndexSet::operator&(const IndexSet &is) const
 {
-  Assert(size() == is.size(), ExcDimensionMismatch(size(), is.size()));
+  Assert(size() DEAL_II_EQUALS is.size(),
+         ExcDimensionMismatch(size(), is.size()));
 
   compress();
   is.compress();
@@ -171,7 +172,7 @@ IndexSet IndexSet::operator&(const IndexSet &is) const
                                      r2 = is.ranges.begin();
   IndexSet result(size());
 
-  while ((r1 != ranges.end()) && (r2 != is.ranges.end()))
+  while ((r1 != ranges.end()) DEAL_II_AND(r2 != is.ranges.end()))
     {
       // if r1 and r2 do not overlap at all, then move the pointer that sits
       // to the left of the other up by one
@@ -182,8 +183,9 @@ IndexSet IndexSet::operator&(const IndexSet &is) const
       else
         {
           // the ranges must overlap somehow
-          Assert(((r1->begin <= r2->begin) && (r1->end > r2->begin)) ||
-                   ((r2->begin <= r1->begin) && (r2->end > r1->begin)),
+          Assert(((r1->begin <= r2->begin) DEAL_II_AND(r1->end > r2->begin))
+                   DEAL_II_OR((r2->begin <= r1->begin)
+                                DEAL_II_AND(r2->end > r1->begin)),
                  ExcInternalError());
 
           // add the overlapping range to the result
@@ -219,7 +221,7 @@ IndexSet::get_view(const size_type begin, const size_type end) const
 
   while (r1 != ranges.end())
     {
-      if ((r1->end > begin) && (r1->begin < end))
+      if ((r1->end > begin) DEAL_II_AND(r1->begin < end))
         {
           result.add_range(std::max(r1->begin, begin) - begin,
                            std::min(r1->end, end) - begin);
@@ -269,7 +271,7 @@ IndexSet::subtract_set(const IndexSet &other)
   std::vector<Range>::iterator own_it   = ranges.begin();
   std::vector<Range>::iterator other_it = other.ranges.begin();
 
-  while (own_it != ranges.end() && other_it != other.ranges.end())
+  while (own_it != ranges.end() DEAL_II_AND other_it != other.ranges.end())
     {
       // advance own iterator until we get an overlap
       if (own_it->end <= other_it->begin)
@@ -341,14 +343,14 @@ IndexSet::tensor_product(const IndexSet &other) const
 IndexSet::size_type
 IndexSet::pop_back()
 {
-  Assert(is_empty() == false,
+  Assert(is_empty() DEAL_II_EQUALS false,
          ExcMessage(
            "pop_back() failed, because this IndexSet contains no entries."));
 
   const size_type index = ranges.back().end - 1;
   --ranges.back().end;
 
-  if (ranges.back().begin == ranges.back().end)
+  if (ranges.back().begin DEAL_II_EQUALS ranges.back().end)
     ranges.pop_back();
 
   return index;
@@ -359,14 +361,14 @@ IndexSet::pop_back()
 IndexSet::size_type
 IndexSet::pop_front()
 {
-  Assert(is_empty() == false,
+  Assert(is_empty() DEAL_II_EQUALS false,
          ExcMessage(
            "pop_front() failed, because this IndexSet contains no entries."));
 
   const size_type index = ranges.front().begin;
   ++ranges.front().begin;
 
-  if (ranges.front().begin == ranges.front().end)
+  if (ranges.front().begin DEAL_II_EQUALS ranges.front().end)
     ranges.erase(ranges.begin());
 
   // We have to set this in any case, because nth_index_in_set is no longer
@@ -381,7 +383,7 @@ IndexSet::pop_front()
 void
 IndexSet::add_indices(const IndexSet &other, const size_type offset)
 {
-  if ((this == &other) && (offset == 0))
+  if ((this DEAL_II_EQUALS & other) DEAL_II_AND(offset DEAL_II_EQUALS 0))
     return;
 
   if (other.ranges.size() != 0)
@@ -398,17 +400,18 @@ IndexSet::add_indices(const IndexSet &other, const size_type offset)
   std::vector<Range> new_ranges;
   // just get the start and end of the ranges right in this method, everything
   // else will be done in compress()
-  while (r1 != ranges.end() || r2 != other.ranges.end())
+  while (r1 != ranges.end() DEAL_II_OR r2 != other.ranges.end())
     {
       // the two ranges do not overlap or we are at the end of one of the
       // ranges
-      if (r2 == other.ranges.end() ||
-          (r1 != ranges.end() && r1->end < (r2->begin + offset)))
+      if (r2 DEAL_II_EQUALS other.ranges.end() DEAL_II_OR(
+            r1 != ranges.end() DEAL_II_AND r1->end < (r2->begin + offset)))
         {
           new_ranges.push_back(*r1);
           ++r1;
         }
-      else if (r1 == ranges.end() || (r2->end + offset) < r1->begin)
+      else if (r1 DEAL_II_EQUALS ranges.end()
+                 DEAL_II_OR(r2->end + offset) < r1->begin)
         {
           new_ranges.emplace_back(r2->begin + offset, r2->end + offset);
           ++r2;
@@ -477,7 +480,7 @@ IndexSet::block_write(std::ostream &out) const
             sizeof(index_space_size));
   std::size_t n_ranges = ranges.size();
   out.write(reinterpret_cast<const char *>(&n_ranges), sizeof(n_ranges));
-  if (ranges.empty() == false)
+  if (ranges.empty() DEAL_II_EQUALS false)
     out.write(reinterpret_cast<const char *>(&*ranges.begin()),
               ranges.size() * sizeof(Range));
   AssertThrow(out, ExcIO());
@@ -515,7 +518,7 @@ IndexSet::fill_index_vector(std::vector<size_type> &indices) const
     for (size_type entry = range.begin; entry < range.end; ++entry)
       indices.push_back(entry);
 
-  Assert(indices.size() == n_elements(), ExcInternalError());
+  Assert(indices.size() DEAL_II_EQUALS n_elements(), ExcInternalError());
 }
 
 
@@ -535,7 +538,7 @@ IndexSet::make_tpetra_map(const MPI_Comm &communicator,
     {
       const size_type n_global_elements =
         Utilities::MPI::sum(n_elements(), communicator);
-      Assert(n_global_elements == size(),
+      Assert(n_global_elements DEAL_II_EQUALS size(),
              ExcMessage("You are trying to create an Tpetra::Map object "
                         "that partitions elements of an index set "
                         "between processors. However, the union of the "
@@ -604,7 +607,7 @@ IndexSet::make_trilinos_map(const MPI_Comm &communicator,
     {
       const size_type n_global_elements =
         Utilities::MPI::sum(n_elements(), communicator);
-      Assert(n_global_elements == size(),
+      Assert(n_global_elements DEAL_II_EQUALS size(),
              ExcMessage("You are trying to create an Epetra_Map object "
                         "that partitions elements of an index set "
                         "between processors. However, the union of the "
@@ -672,13 +675,14 @@ IndexSet::is_ascending_and_one_to_one(const MPI_Comm &communicator) const
   if (n_global_elements != size())
     return false;
 
-  if (n_global_elements == 0)
+  if (n_global_elements DEAL_II_EQUALS 0)
     return true;
 
 #ifdef DEAL_II_WITH_MPI
   // Non-contiguous IndexSets can't be linear.
   const bool all_contiguous =
-    (Utilities::MPI::min(is_contiguous() ? 1 : 0, communicator) == 1);
+    (Utilities::MPI::min(is_contiguous() ? 1 : 0, communicator)
+       DEAL_II_EQUALS 1);
   if (!all_contiguous)
     return false;
 
@@ -692,11 +696,11 @@ IndexSet::is_ascending_and_one_to_one(const MPI_Comm &communicator) const
   const std::vector<types::global_dof_index> global_dofs =
     Utilities::MPI::gather(communicator, first_local_dof, 0);
 
-  if (my_rank == 0)
+  if (my_rank DEAL_II_EQUALS 0)
     {
       // find out if the received std::vector is ascending
       types::global_dof_index index = 0;
-      while (global_dofs[index] == numbers::invalid_dof_index)
+      while (global_dofs[index] DEAL_II_EQUALS numbers::invalid_dof_index)
         ++index;
       types::global_dof_index old_dof = global_dofs[index++];
       for (; index < global_dofs.size(); ++index)
@@ -720,7 +724,7 @@ IndexSet::is_ascending_and_one_to_one(const MPI_Comm &communicator) const
   int ierr         = MPI_Bcast(&is_ascending, 1, MPI_INT, 0, communicator);
   AssertThrowMPI(ierr);
 
-  return (is_ascending == 1);
+  return (is_ascending DEAL_II_EQUALS 1);
 #else
   return true;
 #endif // DEAL_II_WITH_MPI

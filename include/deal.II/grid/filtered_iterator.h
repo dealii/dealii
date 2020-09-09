@@ -363,7 +363,7 @@ namespace IteratorFilters
  *   template <typename BIterator>
  *   bool level_equal_to_3 (const BIterator& c)
  *   {
- *     return (static_cast<unsigned int>(c->level()) == 3);
+ *     return (static_cast<unsigned int>(c->level()) DEAL_II_EQUALS  3);
  *   };
  * @endcode
  * then
@@ -378,7 +378,7 @@ namespace IteratorFilters
  *   bool level_equal_to (const BIterator&     c,
  *                        const unsigned int level)
  *   {
- *     return (static_cast<unsigned int>(c->level()) == level);
+ *     return (static_cast<unsigned int>(c->level()) DEAL_II_EQUALS  level);
  *   };
  * @endcode
  * then
@@ -415,7 +415,7 @@ namespace IteratorFilters
  *     template <class Iterator>
  *     bool operator () (const Iterator &i) const
  *     {
- *       return (i->subdomain_id() == subdomain_id);
+ *       return (i->subdomain_id() DEAL_II_EQUALS  subdomain_id);
  *     }
  *
  *   private:
@@ -607,8 +607,7 @@ public:
    *
    * We do not compare for equality of the predicates.
    */
-  bool
-  operator==(const FilteredIterator &fi) const;
+  bool operator DEAL_II_EQUALS(const FilteredIterator &fi) const;
 
   /**
    * Compare for equality of the underlying iterator value of this object with
@@ -616,8 +615,7 @@ public:
    *
    * The predicate of this object is irrelevant for this operation.
    */
-  bool
-  operator==(const BaseIterator &fi) const;
+  bool operator DEAL_II_EQUALS(const BaseIterator &fi) const;
 
   /**
    * Compare for inequality of the underlying iterator values of this and the
@@ -935,7 +933,8 @@ inline FilteredIterator<BaseIterator>::FilteredIterator(Predicate           p,
   : BaseIterator(bi)
   , predicate(new PredicateTemplate<Predicate>(p))
 {
-  if ((this->state() == IteratorState::valid) && !(*predicate)(*this))
+  if ((this->state()
+         DEAL_II_EQUALS IteratorState::valid)DEAL_II_AND !(*predicate)(*this))
     set_to_next_positive(bi);
 }
 
@@ -973,7 +972,7 @@ template <typename BaseIterator>
 inline FilteredIterator<BaseIterator> &
 FilteredIterator<BaseIterator>::operator=(const BaseIterator &bi)
 {
-  Assert((bi.state() != IteratorState::valid) || (*predicate)(bi),
+  Assert((bi.state() != IteratorState::valid) DEAL_II_OR(*predicate)(bi),
          ExcInvalidElement(bi));
   BaseIterator::operator=(bi);
   return *this;
@@ -986,7 +985,8 @@ inline FilteredIterator<BaseIterator> &
 FilteredIterator<BaseIterator>::set_to_next_positive(const BaseIterator &bi)
 {
   BaseIterator::operator=(bi);
-  while ((this->state() == IteratorState::valid) && (!(*predicate)(*this)))
+  while ((this->state() DEAL_II_EQUALS IteratorState::valid)DEAL_II_AND(
+    !(*predicate)(*this)))
     BaseIterator::operator++();
 
   return *this;
@@ -999,7 +999,8 @@ inline FilteredIterator<BaseIterator> &
 FilteredIterator<BaseIterator>::set_to_previous_positive(const BaseIterator &bi)
 {
   BaseIterator::operator=(bi);
-  while ((this->state() == IteratorState::valid) && (!(*predicate)(*this)))
+  while ((this->state() DEAL_II_EQUALS IteratorState::valid)DEAL_II_AND(
+    !(*predicate)(*this)))
     BaseIterator::operator--();
 
   return *this;
@@ -1008,11 +1009,11 @@ FilteredIterator<BaseIterator>::set_to_previous_positive(const BaseIterator &bi)
 
 
 template <typename BaseIterator>
-inline bool
-FilteredIterator<BaseIterator>::operator==(const FilteredIterator &fi) const
+inline bool FilteredIterator<BaseIterator>::
+            operator DEAL_II_EQUALS(const FilteredIterator &fi) const
 {
-  return (static_cast<const BaseIterator &>(*this) ==
-          static_cast<const BaseIterator &>(fi));
+  return (static_cast<const BaseIterator &>(*this)
+            DEAL_II_EQUALS static_cast<const BaseIterator &>(fi));
 }
 
 
@@ -1038,10 +1039,10 @@ FilteredIterator<BaseIterator>::operator<(const FilteredIterator &fi) const
 
 
 template <typename BaseIterator>
-inline bool
-FilteredIterator<BaseIterator>::operator==(const BaseIterator &bi) const
+inline bool FilteredIterator<BaseIterator>::
+            operator DEAL_II_EQUALS(const BaseIterator &bi) const
 {
-  return (static_cast<const BaseIterator &>(*this) == bi);
+  return (static_cast<const BaseIterator &>(*this) DEAL_II_EQUALS bi);
 }
 
 
@@ -1067,10 +1068,11 @@ template <typename BaseIterator>
 inline FilteredIterator<BaseIterator> &
 FilteredIterator<BaseIterator>::operator++()
 {
-  if (this->state() == IteratorState::valid)
+  if (this->state() DEAL_II_EQUALS IteratorState::valid)
     do
       BaseIterator::operator++();
-    while ((this->state() == IteratorState::valid) && !(*predicate)(*this));
+    while ((this->state() DEAL_II_EQUALS IteratorState::valid)DEAL_II_AND !(
+      *predicate)(*this));
   return *this;
 }
 
@@ -1082,10 +1084,11 @@ FilteredIterator<BaseIterator>::operator++(int)
 {
   const FilteredIterator old_state = *this;
 
-  if (this->state() == IteratorState::valid)
+  if (this->state() DEAL_II_EQUALS IteratorState::valid)
     do
       BaseIterator::operator++();
-    while ((this->state() == IteratorState::valid) && !(*predicate)(*this));
+    while ((this->state() DEAL_II_EQUALS IteratorState::valid)DEAL_II_AND !(
+      *predicate)(*this));
   return old_state;
 }
 
@@ -1095,10 +1098,11 @@ template <typename BaseIterator>
 inline FilteredIterator<BaseIterator> &
 FilteredIterator<BaseIterator>::operator--()
 {
-  if (this->state() == IteratorState::valid)
+  if (this->state() DEAL_II_EQUALS IteratorState::valid)
     do
       BaseIterator::operator--();
-    while ((this->state() == IteratorState::valid) && !(*predicate)(*this));
+    while ((this->state() DEAL_II_EQUALS IteratorState::valid)DEAL_II_AND !(
+      *predicate)(*this));
   return *this;
 }
 
@@ -1110,10 +1114,11 @@ FilteredIterator<BaseIterator>::operator--(int)
 {
   const FilteredIterator old_state = *this;
 
-  if (this->state() == IteratorState::valid)
+  if (this->state() DEAL_II_EQUALS IteratorState::valid)
     do
       BaseIterator::operator--();
-    while ((this->state() == IteratorState::valid) && !(*predicate)(*this));
+    while ((this->state() DEAL_II_EQUALS IteratorState::valid)DEAL_II_AND !(
+      *predicate)(*this));
   return old_state;
 }
 
@@ -1192,7 +1197,7 @@ namespace IteratorFilters
   inline bool
   LevelEqualTo::operator()(const Iterator &i) const
   {
-    return (static_cast<unsigned int>(i->level()) == level);
+    return (static_cast<unsigned int>(i->level()) DEAL_II_EQUALS level);
   }
 
 
@@ -1209,7 +1214,7 @@ namespace IteratorFilters
   inline bool
   SubdomainEqualTo::operator()(const Iterator &i) const
   {
-    return (i->subdomain_id() == subdomain_id);
+    return (i->subdomain_id() DEAL_II_EQUALS subdomain_id);
   }
 
 
@@ -1258,9 +1263,9 @@ namespace IteratorFilters
   inline bool
   MaterialIdEqualTo::operator()(const Iterator &i) const
   {
-    return only_locally_owned == true ?
-             (material_ids.find(i->material_id()) != material_ids.end() &&
-              i->is_locally_owned()) :
+    return only_locally_owned DEAL_II_EQUALS true ?
+             (material_ids.find(i->material_id()) !=
+              material_ids.end() DEAL_II_AND i->is_locally_owned()) :
              material_ids.find(i->material_id()) != material_ids.end();
   }
 
@@ -1289,10 +1294,9 @@ namespace IteratorFilters
   inline bool
   ActiveFEIndexEqualTo::operator()(const Iterator &i) const
   {
-    return only_locally_owned == true ?
+    return only_locally_owned DEAL_II_EQUALS true ?
              (active_fe_indices.find(i->active_fe_index()) !=
-                active_fe_indices.end() &&
-              i->is_locally_owned()) :
+              active_fe_indices.end() DEAL_II_AND i->is_locally_owned()) :
              active_fe_indices.find(i->active_fe_index()) !=
                active_fe_indices.end();
   }

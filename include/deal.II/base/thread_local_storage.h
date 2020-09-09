@@ -100,9 +100,8 @@ namespace Threads
   class ThreadLocalStorage
   {
     static_assert(
-      std::is_copy_constructible<
-        typename internal::unpack_container<T>::type>::value ||
-        std::is_default_constructible<T>::value,
+      std::is_copy_constructible<typename internal::unpack_container<T>::type>::
+        value DEAL_II_OR std::is_default_constructible<T>::value,
       "The stored type must be either copyable, or default constructible");
 
   public:
@@ -121,7 +120,7 @@ namespace Threads
      * Move constructor. The constructor moves all internal data structures
      * from the argument.
      */
-    ThreadLocalStorage(ThreadLocalStorage &&t) noexcept;
+    ThreadLocalStorage(ThreadLocalStorage DEAL_II_AND t) noexcept;
 
     /**
      * A kind of copy constructor. Initializes an internal exemplar by the
@@ -135,7 +134,7 @@ namespace Threads
      * exemplar. The exemplar is in turn used to initialize each thread
      * local object instead of invoking the default constructor.
      */
-    explicit ThreadLocalStorage(T &&t);
+    explicit ThreadLocalStorage(T DEAL_II_AND t);
 
     /**
      * Copy assignment operator.
@@ -147,7 +146,7 @@ namespace Threads
      * Move assignment operator.
      */
     ThreadLocalStorage &
-    operator=(ThreadLocalStorage &&t) noexcept;
+    operator=(ThreadLocalStorage DEAL_II_AND t) noexcept;
 
     /**
      * Return a reference to the data stored by this object for the current
@@ -209,7 +208,7 @@ namespace Threads
      * @return The current object, after the changes have been made
      */
     ThreadLocalStorage<T> &
-    operator=(T &&t);
+    operator=(T DEAL_II_AND t);
 
     /**
      * Remove the thread-local objects stored for all threads that have
@@ -284,7 +283,8 @@ namespace Threads
 
 
   template <typename T>
-  ThreadLocalStorage<T>::ThreadLocalStorage(ThreadLocalStorage<T> &&t) noexcept
+  ThreadLocalStorage<T>::ThreadLocalStorage(
+    ThreadLocalStorage<T> DEAL_II_AND t) noexcept
     : exemplar(std::move(t.exemplar))
   {
     // We are nice and raise the writer lock before copying over internal
@@ -319,7 +319,7 @@ namespace Threads
 
 
   template <typename T>
-  inline ThreadLocalStorage<T>::ThreadLocalStorage(T &&t)
+  inline ThreadLocalStorage<T>::ThreadLocalStorage(T DEAL_II_AND t)
     : exemplar(std::make_shared<T>(std::forward<T>(t)))
   {}
 
@@ -341,7 +341,7 @@ namespace Threads
 
   template <typename T>
   inline ThreadLocalStorage<T> &
-  ThreadLocalStorage<T>::operator=(ThreadLocalStorage<T> &&t) noexcept
+  ThreadLocalStorage<T>::operator=(ThreadLocalStorage<T> DEAL_II_AND t) noexcept
   {
     // We need to raise the writer lock of the argument (because we're
     // moving information *away* from that object) and the writer lock
@@ -464,7 +464,7 @@ namespace Threads
 
   template <typename T>
   inline ThreadLocalStorage<T> &
-  ThreadLocalStorage<T>::operator=(T &&t)
+  ThreadLocalStorage<T>::operator=(T DEAL_II_AND t)
   {
     get() = std::forward<T>(t);
     return *this;

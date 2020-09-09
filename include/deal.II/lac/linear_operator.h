@@ -485,7 +485,7 @@ operator*(typename Range::value_type                    number,
     {
       return op;
     }
-  else if (number == 0.)
+  else if (number DEAL_II_EQUALS 0.)
     {
       return null_operator(op);
     }
@@ -576,7 +576,7 @@ LinearOperator<Range, Domain, Payload>
 operator*(const LinearOperator<Range, Intermediate, Payload> & first_op,
           const LinearOperator<Intermediate, Domain, Payload> &second_op)
 {
-  if (first_op.is_null_operator || second_op.is_null_operator)
+  if (first_op.is_null_operator DEAL_II_OR second_op.is_null_operator)
     {
       LinearOperator<Range, Domain, Payload> return_op;
       return_op.reinit_domain_vector = second_op.reinit_domain_vector;
@@ -1497,7 +1497,7 @@ template <
     !std::is_same<OperatorExemplar,
                   LinearOperator<Range, Domain, Payload>>::value>::type>
 LinearOperator<Range, Domain, Payload>
-linear_operator(OperatorExemplar &&, const Matrix &) = delete;
+linear_operator(OperatorExemplar DEAL_II_AND, const Matrix &) = delete;
 
 template <
   typename Range   = Vector<double>,
@@ -1513,7 +1513,7 @@ template <
     !std::is_same<OperatorExemplar,
                   LinearOperator<Range, Domain, Payload>>::value>::type>
 LinearOperator<Range, Domain, Payload>
-linear_operator(OperatorExemplar &&, Matrix &&) = delete;
+linear_operator(OperatorExemplar DEAL_II_AND, Matrix &&) = delete;
 
 template <
   typename Range   = Vector<double>,

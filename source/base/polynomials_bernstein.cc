@@ -33,7 +33,7 @@ namespace
     std::vector<number> coeff(n + 1, number(0.0));
     for (unsigned int i = k; i < n + 1; ++i)
       {
-        coeff[i] = ((i - k) % 2 == 0 ? 1 : -1) *
+        coeff[i] = ((i - k) % 2 DEAL_II_EQUALS 0 ? 1 : -1) *
                    boost::math::binomial_coefficient<number>(n, i) *
                    boost::math::binomial_coefficient<number>(i, k);
       }

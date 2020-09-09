@@ -38,11 +38,11 @@ namespace VectorTools
   namespace internal
   {
     template <typename VectorType>
-    typename std::enable_if<dealii::is_serial_vector<VectorType>::value ==
-                            true>::type
+    typename std::enable_if<
+      dealii::is_serial_vector<VectorType>::value DEAL_II_EQUALS true>::type
     subtract_mean_value(VectorType &v, const std::vector<bool> &p_select)
     {
-      if (p_select.size() == 0)
+      if (p_select.size() DEAL_II_EQUALS 0)
         {
           // In case of an empty boolean mask operate on the whole vector:
           v.add(-v.mean_value());
@@ -51,7 +51,7 @@ namespace VectorTools
         {
           const unsigned int n = v.size();
 
-          Assert(p_select.size() == n,
+          Assert(p_select.size() DEAL_II_EQUALS n,
                  ExcDimensionMismatch(p_select.size(), n));
 
           typename VectorType::value_type s       = 0.;
@@ -65,7 +65,7 @@ namespace VectorTools
               }
           // Error out if we have not constrained anything. Note that in this
           // case the vector v is always nonempty.
-          Assert(n == 0 || counter > 0,
+          Assert(n DEAL_II_EQUALS 0 DEAL_II_OR counter > 0,
                  ComponentMask::ExcNoComponentSelected());
 
           s /= counter;
@@ -79,12 +79,12 @@ namespace VectorTools
 
 
     template <typename VectorType>
-    typename std::enable_if<dealii::is_serial_vector<VectorType>::value ==
-                            false>::type
+    typename std::enable_if<
+      dealii::is_serial_vector<VectorType>::value DEAL_II_EQUALS false>::type
     subtract_mean_value(VectorType &v, const std::vector<bool> &p_select)
     {
       (void)p_select;
-      Assert(p_select.size() == 0, ExcNotImplemented());
+      Assert(p_select.size() DEAL_II_EQUALS 0, ExcNotImplemented());
       // In case of an empty boolean mask operate on the whole vector:
       v.add(-v.mean_value());
     }
@@ -128,7 +128,7 @@ namespace VectorTools
                      const unsigned int               component)
   {
     using Number = typename VectorType::value_type;
-    Assert(v.size() == dof.n_dofs(),
+    Assert(v.size() DEAL_II_EQUALS dof.n_dofs(),
            ExcDimensionMismatch(v.size(), dof.n_dofs()));
     AssertIndexRange(component, dof.get_fe(0).n_components());
 

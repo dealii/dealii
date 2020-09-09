@@ -60,7 +60,7 @@ namespace GraphColoring
       // we know that there is no intersection
       std::vector<types::global_dof_index>::const_iterator p = indices1.begin(),
                                                            q = indices2.begin();
-      while ((p != indices1.end()) && (q != indices2.end()))
+      while ((p != indices1.end()) DEAL_II_AND(q != indices2.end()))
         {
           if (*p < *q)
             ++p;
@@ -163,8 +163,9 @@ namespace GraphColoring
                       //
                       // we can shortcut this test if the conflicting iterator
                       // is the current iterator
-                      if ((conflicting_elements[j] != *previous_zone_it) &&
-                          (used_it.count(conflicting_elements[j]) == 0))
+                      if ((conflicting_elements[j] != *previous_zone_it)
+                            DEAL_II_AND(used_it.count(conflicting_elements[j])
+                                          DEAL_II_EQUALS 0))
                         {
                           new_zone.push_back(conflicting_elements[j]);
                           used_it.insert(conflicting_elements[j]);
@@ -182,7 +183,7 @@ namespace GraphColoring
             zones.push_back(new_zone);
           else
             for (Iterator it = begin; it != end; ++it)
-              if (used_it.count(it) == 0)
+              if (used_it.count(it) DEAL_II_EQUALS 0)
                 {
                   zones.push_back(std::vector<Iterator>(1, it));
                   used_it.insert(it);
@@ -286,7 +287,7 @@ namespace GraphColoring
               // color cannot be used anymore.
               bool unused_color(true);
               for (const auto adjacent_vertex : graph[current_vertex])
-                if (colors_used[j].count(adjacent_vertex) == 1)
+                if (colors_used[j].count(adjacent_vertex) DEAL_II_EQUALS 1)
                   {
                     unused_color = false;
                     break;
@@ -374,7 +375,7 @@ namespace GraphColoring
                   // Find the color of coloring with the least number of colors
                   // among the colors that have not been used yet.
                   for (unsigned int k = 0; k < max_even_n_colors; ++k)
-                    if (used_k.count(k) == 0)
+                    if (used_k.count(k) DEAL_II_EQUALS 0)
                       if (colors_counter[i_color][k] < min_iterators)
                         {
                           min_iterators = colors_counter[i_color][k];
@@ -429,7 +430,7 @@ namespace GraphColoring
                       // Find the color of coloring with the least number of
                       // colors among the colors that have not been used yet.
                       for (unsigned int k = 0; k < max_odd_n_colors; ++k)
-                        if (used_k.count(k) == 0)
+                        if (used_k.count(k) DEAL_II_EQUALS 0)
                           if (colors_counter[i_color][k] < min_iterators)
                             {
                               min_iterators = colors_counter[i_color][k];

@@ -287,9 +287,9 @@ namespace Differentiation
        * The generated expression may be interpreted as the result of the
        * set of nested if-elseif-else statements, i.e. (in pseudo-code)
        * @code
-       *   if (condition_expression[0].first == true)
+       *   if (condition_expression[0].first DEAL_II_EQUALS  true)
        *     return condition_expression[0].second;
-       *   else if (condition_expression[1].first == true)
+       *   else if (condition_expression[1].first DEAL_II_EQUALS  true)
        *     return condition_expression[1].second;
        *   else if (...)
        *     return ...;
@@ -312,9 +312,9 @@ namespace Differentiation
        * The generated expression may be interpreted as the result of the
        * set of nested if-elseif statements, i.e. (in pseudo-code)
        * @code
-       *   if (condition_expression[0].first == true)
+       *   if (condition_expression[0].first DEAL_II_EQUALS  true)
        *     return condition_expression[0].second;
-       *   else if (condition_expression[1].first == true)
+       *   else if (condition_expression[1].first DEAL_II_EQUALS  true)
        *     return condition_expression[1].second;
        *   else if (...)
        *     return ...;
@@ -388,7 +388,7 @@ namespace Differentiation
       /**
        * Move constructor.
        */
-      Expression(Expression &&rhs) = default;
+      Expression(Expression DEAL_II_AND rhs) = default;
 
       /**
        * Move constructor.
@@ -398,7 +398,7 @@ namespace Differentiation
        * "diff", because the returned result is not primitive, but rather a set
        * of compound operations.
        */
-      Expression(SymEngine::RCP<const SymEngine::Basic> &&rhs);
+      Expression(SymEngine::RCP<const SymEngine::Basic> DEAL_II_AND rhs);
 
       /**
        * Destructor.
@@ -550,7 +550,7 @@ namespace Differentiation
        * to that of the @p rhs object.
        */
       Expression &
-      operator=(Expression &&rhs) noexcept;
+      operator=(Expression DEAL_II_AND rhs) noexcept;
 
       /**
        * Addition assignment.
@@ -822,7 +822,7 @@ namespace Differentiation
        *     template <typename ResultType>
        *     explicit operator ResultType() const
        *     {
-       *       if (this->get_value()->get_type_code() ==
+       *       if (this->get_value()->get_type_code() DEAL_II_EQUALS
        * SymEngine::NUMBER_WRAPPER)
        *       {
        *         // Implement custom evaluation function
@@ -927,8 +927,8 @@ namespace Differentiation
      *
      * Return whether the @p lhs is equal to the @p rhs.
      */
-    Expression
-    operator==(const Expression &lhs, const Expression &rhs);
+    Expression operator DEAL_II_EQUALS(const Expression &lhs,
+                                       const Expression &rhs);
 
     /**
      * Non-equality operator.
@@ -1018,8 +1018,8 @@ namespace Differentiation
      * expressions.
      * This operator is a convenience wrapper for the logical and operator.
      */
-    Expression
-    operator&&(const Expression &lhs, const Expression &rhs);
+    Expression operator DEAL_II_AND(const Expression &lhs,
+                                    const Expression &rhs);
 
     /**
      * Inclusive or operator.
@@ -1028,8 +1028,8 @@ namespace Differentiation
      * expressions.
      * This operator is a convenience wrapper for the logical or operator.
      */
-    Expression
-    operator||(const Expression &lhs, const Expression &rhs);
+    Expression operator DEAL_II_OR(const Expression &lhs,
+                                   const Expression &rhs);
 
     //@}
 
@@ -1381,7 +1381,7 @@ namespace internal
       typename T,
       typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
     static Differentiation::SD::Expression
-    value(T &&t)
+    value(T DEAL_II_AND t)
     {
       return Differentiation::SD::Expression(t);
     }
@@ -1433,7 +1433,7 @@ namespace numbers
   values_are_equal(const Differentiation::SD::Expression &value_1,
                    const Differentiation::SD::Expression &value_2)
   {
-    return (value_1.get_value().__cmp__(value_2.get_value()) == 0);
+    return (value_1.get_value().__cmp__(value_2.get_value()) DEAL_II_EQUALS 0);
   }
 
   template <>
@@ -1441,7 +1441,8 @@ namespace numbers
   value_is_less_than(const Differentiation::SD::Expression &value_1,
                      const Differentiation::SD::Expression &value_2)
   {
-    return (value_1.get_value().__cmp__(value_2.get_value()) == -1);
+    return (value_1.get_value().__cmp__(value_2.get_value()) DEAL_II_EQUALS -
+            1);
   }
 } // namespace numbers
 

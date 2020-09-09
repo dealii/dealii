@@ -242,7 +242,8 @@ FE_NedelecSZ<dim, spacedim>::get_data(
                   // positive direction are from smaller to higher local vertex
                   // numbering.
                   sigma_imj_sign[i][j] = (i < j) ? -1 : 1;
-                  sigma_imj_sign[i][j] = (i == j) ? 0 : sigma_imj_sign[i][j];
+                  sigma_imj_sign[i][j] =
+                    (i DEAL_II_EQUALS j) ? 0 : sigma_imj_sign[i][j];
 
                   // Now store the component which the sigma_i - sigma_j
                   // corresponds to:
@@ -628,7 +629,8 @@ FE_NedelecSZ<dim, spacedim>::get_data(
                   // the positive direction go from smaller to higher local
                   // vertex numbering.
                   sigma_imj_sign[i][j] = (i < j) ? -1 : 1;
-                  sigma_imj_sign[i][j] = (i == j) ? 0 : sigma_imj_sign[i][j];
+                  sigma_imj_sign[i][j] =
+                    (i DEAL_II_EQUALS j) ? 0 : sigma_imj_sign[i][j];
 
                   // Now store the component which the sigma_i - sigma_j
                   // corresponds to:
@@ -1129,12 +1131,13 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
   const UpdateFlags  flags(fe_data.update_each);
   const unsigned int n_q_points = quadrature.size();
 
-  Assert(!(flags & update_values) ||
-           fe_data.shape_values.size() == this->n_dofs_per_cell(),
+  Assert(!(flags & update_values)
+            DEAL_II_OR fe_data.shape_values.size()
+              DEAL_II_EQUALS this->n_dofs_per_cell(),
          ExcDimensionMismatch(fe_data.shape_values.size(),
                               this->n_dofs_per_cell()));
-  Assert(!(flags & update_values) ||
-           fe_data.shape_values[0].size() == n_q_points,
+  Assert(!(flags & update_values) DEAL_II_OR fe_data.shape_values[0].size()
+            DEAL_II_EQUALS                   n_q_points,
          ExcDimensionMismatch(fe_data.shape_values[0].size(), n_q_points));
 
   // Useful constants:
@@ -1544,7 +1547,7 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
   // shape functions.
   //
   // Note that it should only be called in 3D.
-  Assert(dim == 3, ExcDimensionMismatch(dim, 3));
+  Assert(dim DEAL_II_EQUALS 3, ExcDimensionMismatch(dim, 3));
   //
   // It will fill in the missing parts of fe_data which were not possible to
   // fill in the get_data routine, with respect to face-based shape functions.
@@ -1566,14 +1569,15 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
         {
           const unsigned int n_q_points = quadrature.size();
 
-          Assert(!(flags & update_values) ||
-                   fe_data.shape_values.size() == this->n_dofs_per_cell(),
+          Assert(!(flags & update_values)
+                    DEAL_II_OR fe_data.shape_values.size()
+                      DEAL_II_EQUALS this->n_dofs_per_cell(),
                  ExcDimensionMismatch(fe_data.shape_values.size(),
                                       this->n_dofs_per_cell()));
-          Assert(!(flags & update_values) ||
-                   fe_data.shape_values[0].size() == n_q_points,
-                 ExcDimensionMismatch(fe_data.shape_values[0].size(),
-                                      n_q_points));
+          Assert(
+            !(flags & update_values) DEAL_II_OR fe_data.shape_values[0].size()
+               DEAL_II_EQUALS                   n_q_points,
+            ExcDimensionMismatch(fe_data.shape_values[0].size(), n_q_points));
 
           // Useful geometry info:
           const unsigned int vertices_per_face(
@@ -1933,7 +1937,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_values(
   // This will fill in the missing items in the InternalData
   // (fe_internal/fe_data) which was not filled in by get_data.
   fill_edge_values(cell, quadrature, fe_data);
-  if (dim == 3 && this->degree > 1)
+  if (dim DEAL_II_EQUALS 3 DEAL_II_AND this->degree > 1)
     {
       fill_face_values(cell, quadrature, fe_data);
     }
@@ -1941,12 +1945,13 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_values(
   const UpdateFlags  flags(fe_data.update_each);
   const unsigned int n_q_points = quadrature.size();
 
-  Assert(!(flags & update_values) ||
-           fe_data.shape_values.size() == this->n_dofs_per_cell(),
+  Assert(!(flags & update_values)
+            DEAL_II_OR fe_data.shape_values.size()
+              DEAL_II_EQUALS this->n_dofs_per_cell(),
          ExcDimensionMismatch(fe_data.shape_values.size(),
                               this->n_dofs_per_cell()));
-  Assert(!(flags & update_values) ||
-           fe_data.shape_values[0].size() == n_q_points,
+  Assert(!(flags & update_values) DEAL_II_OR fe_data.shape_values[0].size()
+            DEAL_II_EQUALS                   n_q_points,
          ExcDimensionMismatch(fe_data.shape_values[0].size(), n_q_points));
 
   if (flags & update_values)
@@ -2062,7 +2067,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
                    QProjector<dim>::project_to_all_faces(
                      this->reference_cell_type(), quadrature),
                    fe_data);
-  if (dim == 3 && this->degree > 1)
+  if (dim DEAL_II_EQUALS 3 DEAL_II_AND this->degree > 1)
     {
       fill_face_values(cell,
                        QProjector<dim>::project_to_all_faces(
@@ -2242,7 +2247,7 @@ FE_NedelecSZ<dim, spacedim>::get_dpo_vector(const unsigned int degree)
   dpo[0] = 0;
   dpo[1] = degree + 1;
   dpo[2] = 2 * degree * (degree + 1);
-  if (dim == 3)
+  if (dim DEAL_II_EQUALS 3)
     {
       dpo[3] = 3 * degree * degree * (degree + 1);
     }

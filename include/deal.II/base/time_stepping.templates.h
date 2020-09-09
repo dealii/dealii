@@ -44,11 +44,11 @@ namespace TimeStepping
     VectorType &y)
   {
     AssertThrow(
-      F.size() == 0,
+      F.size() DEAL_II_EQUALS 0,
       ExcMessage(
         "RungeKutta methods cannot handle more that one function to integate."));
     AssertThrow(
-      J_inverse.size() == 0,
+      J_inverse.size() DEAL_II_EQUALS 0,
       ExcMessage(
         "RungeKutta methods cannot handle more that one function to integate."));
 
@@ -322,7 +322,7 @@ namespace TimeStepping
     compute_stages(f, id_minus_tau_J_inverse, t, delta_t, y, f_stages);
 
     // If necessary, compute the linear combinations of the stages.
-    if (skip_linear_combi == false)
+    if (skip_linear_combi DEAL_II_EQUALS false)
       {
         y = old_y;
         for (unsigned int i = 0; i < this->n_stages; ++i)
@@ -800,7 +800,7 @@ namespace TimeStepping
         else
           {
             // If the time step is already the smallest acceptable, exit.
-            if (delta_t == min_delta_t)
+            if (delta_t DEAL_II_EQUALS min_delta_t)
               {
                 done                 = true;
                 status.exit_delta_t  = MIN_DELTA_T;
@@ -819,9 +819,9 @@ namespace TimeStepping
       }
 
     // Save the last stage if necessary
-    if (last_same_as_first == true)
+    if (last_same_as_first DEAL_II_EQUALS true)
       {
-        if (last_stage == nullptr)
+        if (last_stage DEAL_II_EQUALS nullptr)
           last_stage = new VectorType(f_stages.back());
         else
           *last_stage = f_stages.back();
@@ -877,7 +877,7 @@ namespace TimeStepping
 
     // If the last stage is the same as the first, we can skip the evaluation
     // of the first stage.
-    if (last_same_as_first == true)
+    if (last_same_as_first DEAL_II_EQUALS true)
       {
         if (last_stage != nullptr)
           {

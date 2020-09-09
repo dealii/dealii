@@ -66,7 +66,7 @@ namespace Functions
    * first and second derivatives at the supplied data-points. The second
    * derivative is chosen to be zero at the first point and last point.
    *
-   * @note This function is only implemented for dim==1 .
+   * @note This function is only implemented for dimDEAL_II_EQUALS 1 .
    *
    * @ingroup functions
    */

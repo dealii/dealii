@@ -113,8 +113,7 @@ namespace ChunkSparsityPatternIterators
     /**
      * Comparison. True, if both iterators point to the same matrix position.
      */
-    bool
-    operator==(const Accessor &) const;
+    bool operator DEAL_II_EQUALS(const Accessor &) const;
 
 
     /**
@@ -202,11 +201,10 @@ namespace ChunkSparsityPatternIterators
     /**
      * Comparison. True, if both iterators point to the same matrix position.
      */
-    bool
-    operator==(const Iterator &) const;
+    bool operator DEAL_II_EQUALS(const Iterator &) const;
 
     /**
-     * Inverse of <tt>==</tt>.
+     * Inverse of <tt>DEAL_II_EQUALS </tt>.
      */
     bool
     operator!=(const Iterator &) const;
@@ -379,7 +377,7 @@ public:
    * entries for each row is taken from the array <tt>row_lengths</tt> which
    * has to give this number of each row <tt>i=1...m</tt>.
    *
-   * If <tt>m*n==0</tt> all memory is freed, resulting in a total
+   * If <tt>m*nDEAL_II_EQUALS 0</tt> all memory is freed, resulting in a total
    * reinitialization of the object. If it is nonzero, new memory is only
    * allocated if the new size extends the old one. This is done to save time
    * and to avoid fragmentation of the heap.
@@ -866,11 +864,11 @@ namespace ChunkSparsityPatternIterators
   inline Accessor::Accessor(const ChunkSparsityPattern *sparsity_pattern,
                             const size_type             row)
     : sparsity_pattern(sparsity_pattern)
-    , reduced_accessor(row == sparsity_pattern->n_rows() ?
+    , reduced_accessor(row DEAL_II_EQUALS sparsity_pattern->n_rows() ?
                          *sparsity_pattern->sparsity_pattern.end() :
                          *sparsity_pattern->sparsity_pattern.begin(
                            row / sparsity_pattern->get_chunk_size()))
-    , chunk_row(row == sparsity_pattern->n_rows() ?
+    , chunk_row(row DEAL_II_EQUALS sparsity_pattern->n_rows() ?
                   0 :
                   row % sparsity_pattern->get_chunk_size())
     , chunk_col(0)
@@ -890,13 +888,15 @@ namespace ChunkSparsityPatternIterators
   inline bool
   Accessor::is_valid_entry() const
   {
-    return reduced_accessor.is_valid_entry() &&
-           sparsity_pattern->get_chunk_size() * reduced_accessor.row() +
-               chunk_row <
-             sparsity_pattern->n_rows() &&
-           sparsity_pattern->get_chunk_size() * reduced_accessor.column() +
-               chunk_col <
-             sparsity_pattern->n_cols();
+    return reduced_accessor.is_valid_entry()
+                 DEAL_II_AND sparsity_pattern->get_chunk_size() *
+               reduced_accessor.row() +
+             chunk_row <
+           sparsity_pattern->n_rows()
+                 DEAL_II_AND sparsity_pattern->get_chunk_size() *
+               reduced_accessor.column() +
+             chunk_col <
+           sparsity_pattern->n_cols();
   }
 
 
@@ -904,7 +904,7 @@ namespace ChunkSparsityPatternIterators
   inline Accessor::size_type
   Accessor::row() const
   {
-    Assert(is_valid_entry() == true, ExcInvalidIterator());
+    Assert(is_valid_entry() DEAL_II_EQUALS true, ExcInvalidIterator());
 
     return sparsity_pattern->get_chunk_size() * reduced_accessor.row() +
            chunk_row;
@@ -915,7 +915,7 @@ namespace ChunkSparsityPatternIterators
   inline Accessor::size_type
   Accessor::column() const
   {
-    Assert(is_valid_entry() == true, ExcInvalidIterator());
+    Assert(is_valid_entry() DEAL_II_EQUALS true, ExcInvalidIterator());
 
     return sparsity_pattern->get_chunk_size() * reduced_accessor.column() +
            chunk_col;
@@ -926,21 +926,22 @@ namespace ChunkSparsityPatternIterators
   inline std::size_t
   Accessor::reduced_index() const
   {
-    Assert(is_valid_entry() == true, ExcInvalidIterator());
+    Assert(is_valid_entry() DEAL_II_EQUALS true, ExcInvalidIterator());
 
     return reduced_accessor.linear_index;
   }
 
 
 
-  inline bool
-  Accessor::operator==(const Accessor &other) const
+  inline bool Accessor::operator DEAL_II_EQUALS(const Accessor &other) const
   {
     // no need to check for equality of sparsity patterns as this is done in
     // the reduced case already and every ChunkSparsityPattern has its own
     // reduced sparsity pattern
-    return (reduced_accessor == other.reduced_accessor &&
-            chunk_row == other.chunk_row && chunk_col == other.chunk_col);
+    return (
+      reduced_accessor DEAL_II_EQUALS
+        other.reduced_accessor DEAL_II_AND chunk_row DEAL_II_EQUALS
+          other.chunk_row DEAL_II_AND chunk_col DEAL_II_EQUALS other.chunk_col);
   }
 
 
@@ -948,15 +949,16 @@ namespace ChunkSparsityPatternIterators
   inline bool
   Accessor::operator<(const Accessor &other) const
   {
-    Assert(sparsity_pattern == other.sparsity_pattern, ExcInternalError());
+    Assert(sparsity_pattern DEAL_II_EQUALS other.sparsity_pattern,
+           ExcInternalError());
 
     if (chunk_row != other.chunk_row)
       {
-        if (reduced_accessor.linear_index ==
-            reduced_accessor.container->n_nonzero_elements())
+        if (reduced_accessor.linear_index DEAL_II_EQUALS
+                                          reduced_accessor.container->n_nonzero_elements())
           return false;
-        if (other.reduced_accessor.linear_index ==
-            reduced_accessor.container->n_nonzero_elements())
+        if (other.reduced_accessor.linear_index DEAL_II_EQUALS
+                                                reduced_accessor.container->n_nonzero_elements())
           return true;
 
         const auto global_row = sparsity_pattern->get_chunk_size() *
@@ -971,10 +973,11 @@ namespace ChunkSparsityPatternIterators
           return false;
       }
 
-    return (
-      reduced_accessor.linear_index < other.reduced_accessor.linear_index ||
-      (reduced_accessor.linear_index == other.reduced_accessor.linear_index &&
-       chunk_col < other.chunk_col));
+    return (reduced_accessor.linear_index <
+            other.reduced_accessor.linear_index DEAL_II_OR(
+              reduced_accessor.linear_index DEAL_II_EQUALS
+                other.reduced_accessor.linear_index DEAL_II_AND chunk_col <
+              other.chunk_col));
   }
 
 
@@ -982,14 +985,15 @@ namespace ChunkSparsityPatternIterators
   Accessor::advance()
   {
     const auto chunk_size = sparsity_pattern->get_chunk_size();
-    Assert(chunk_row < chunk_size && chunk_col < chunk_size,
+    Assert(chunk_row < chunk_size DEAL_II_AND chunk_col < chunk_size,
            ExcIteratorPastEnd());
     Assert(reduced_accessor.row() * chunk_size + chunk_row <
-               sparsity_pattern->n_rows() &&
-             reduced_accessor.column() * chunk_size + chunk_col <
-               sparsity_pattern->n_cols(),
+             sparsity_pattern->n_rows() DEAL_II_AND reduced_accessor.column() *
+                 chunk_size +
+               chunk_col <
+             sparsity_pattern->n_cols(),
            ExcIteratorPastEnd());
-    if (chunk_size == 1)
+    if (chunk_size DEAL_II_EQUALS 1)
       {
         reduced_accessor.advance();
         return;
@@ -998,23 +1002,25 @@ namespace ChunkSparsityPatternIterators
     ++chunk_col;
 
     // end of chunk
-    if (chunk_col == chunk_size ||
-        reduced_accessor.column() * chunk_size + chunk_col ==
-          sparsity_pattern->n_cols())
+    if (chunk_col DEAL_II_EQUALS chunk_size DEAL_II_OR
+                                            reduced_accessor.column() *
+          chunk_size +
+        chunk_col DEAL_II_EQUALS sparsity_pattern->n_cols())
       {
         const auto reduced_row = reduced_accessor.row();
         // end of row
-        if (reduced_accessor.linear_index + 1 ==
-            reduced_accessor.container->rowstart[reduced_row + 1])
+        if (reduced_accessor.linear_index +
+            1 DEAL_II_EQUALS reduced_accessor.container
+              ->rowstart[reduced_row + 1])
           {
             ++chunk_row;
 
             chunk_col = 0;
 
             // end of chunk rows or end of matrix
-            if (chunk_row == chunk_size ||
-                (reduced_row * chunk_size + chunk_row ==
-                 sparsity_pattern->n_rows()))
+            if (chunk_row DEAL_II_EQUALS chunk_size DEAL_II_OR(
+                  reduced_row * chunk_size +
+                  chunk_row DEAL_II_EQUALS sparsity_pattern->n_rows()))
               {
                 chunk_row = 0;
                 reduced_accessor.advance();
@@ -1075,10 +1081,9 @@ namespace ChunkSparsityPatternIterators
   }
 
 
-  inline bool
-  Iterator::operator==(const Iterator &other) const
+  inline bool Iterator::operator DEAL_II_EQUALS(const Iterator &other) const
   {
-    return (accessor == other.accessor);
+    return (accessor DEAL_II_EQUALS other.accessor);
   }
 
 
@@ -1086,7 +1091,7 @@ namespace ChunkSparsityPatternIterators
   inline bool
   Iterator::operator!=(const Iterator &other) const
   {
-    return !(accessor == other.accessor);
+    return !(accessor DEAL_II_EQUALS other.accessor);
   }
 
 
@@ -1172,14 +1177,15 @@ ChunkSparsityPattern::copy_from(const size_type       n_rows,
                                 const ForwardIterator end,
                                 const size_type       chunk_size)
 {
-  Assert(static_cast<size_type>(std::distance(begin, end)) == n_rows,
+  Assert(static_cast<size_type>(std::distance(begin, end))
+           DEAL_II_EQUALS n_rows,
          ExcIteratorRange(std::distance(begin, end), n_rows));
 
   // first determine row lengths for each row. if the matrix is quadratic,
   // then we might have to add an additional entry for the diagonal, if that
   // is not yet present. as we have to call compress anyway later on, don't
   // bother to check whether that diagonal entry is in a certain row or not
-  const bool             is_square = (n_rows == n_cols);
+  const bool             is_square = (n_rows DEAL_II_EQUALS n_cols);
   std::vector<size_type> row_lengths;
   row_lengths.reserve(n_rows);
   for (ForwardIterator i = begin; i != end; ++i)

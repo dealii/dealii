@@ -103,7 +103,7 @@ public:
    * Move constructor. Create a new aligned vector by stealing the contents of
    * @p vec.
    */
-  AlignedVector(AlignedVector<T> &&vec) noexcept;
+  AlignedVector(AlignedVector<T> DEAL_II_AND vec) noexcept;
 
   /**
    * Assignment to the input vector @p vec.
@@ -117,7 +117,7 @@ public:
    * Move assignment operator.
    */
   AlignedVector &
-  operator=(AlignedVector<T> &&vec) noexcept;
+  operator=(AlignedVector<T> DEAL_II_AND vec) noexcept;
 
   /**
    * Change the size of the vector. It keeps old elements previously available
@@ -406,7 +406,8 @@ namespace internal
       , destination_(destination)
     {
       Assert(source_end >= source_begin, ExcInternalError());
-      Assert(source_end == source_begin || destination != nullptr,
+      Assert(source_end DEAL_II_EQUALS source_begin DEAL_II_OR destination !=
+               nullptr,
              ExcInternalError());
       const std::size_t size = source_end - source_begin;
       if (size < minimum_parallel_grain_size)
@@ -423,14 +424,14 @@ namespace internal
     apply_to_subrange(const std::size_t begin,
                       const std::size_t end) const override
     {
-      if (end == begin)
+      if (end DEAL_II_EQUALS begin)
         return;
 
       // for classes trivial assignment can use memcpy. cast element to
       // (void*) to silence compiler warning for virtual classes (they will
       // never arrive here because they are non-trivial).
 
-      if (std::is_trivial<T>::value == true)
+      if (std::is_trivial<T>::value DEAL_II_EQUALS true)
         std::memcpy(static_cast<void *>(destination_ + begin),
                     static_cast<const void *>(source_ + begin),
                     (end - begin) * sizeof(T));
@@ -473,7 +474,8 @@ namespace internal
       , destination_(destination)
     {
       Assert(source_end >= source_begin, ExcInternalError());
-      Assert(source_end == source_begin || destination != nullptr,
+      Assert(source_end DEAL_II_EQUALS source_begin DEAL_II_OR destination !=
+               nullptr,
              ExcInternalError());
       const std::size_t size = source_end - source_begin;
       if (size < minimum_parallel_grain_size)
@@ -490,14 +492,14 @@ namespace internal
     apply_to_subrange(const std::size_t begin,
                       const std::size_t end) const override
     {
-      if (end == begin)
+      if (end DEAL_II_EQUALS begin)
         return;
 
       // for classes trivial assignment can use memcpy. cast element to
       // (void*) to silence compiler warning for virtual classes (they will
       // never arrive here because they are non-trivial).
 
-      if (std::is_trivial<T>::value == true)
+      if (std::is_trivial<T>::value DEAL_II_EQUALS true)
         std::memcpy(static_cast<void *>(destination_ + begin),
                     static_cast<void *>(source_ + begin),
                     (end - begin) * sizeof(T));
@@ -546,23 +548,22 @@ namespace internal
       , destination_(destination)
       , trivial_element(false)
     {
-      if (size == 0)
+      if (size DEAL_II_EQUALS 0)
         return;
       Assert(destination != nullptr, ExcInternalError());
 
       // do not use memcmp for long double because on some systems it does not
       // completely fill its memory and may lead to false positives in
       // e.g. valgrind
-      if (std::is_trivial<T>::value == true &&
-          std::is_same<T, long double>::value == false)
+      if (std::is_trivial<T>::value DEAL_II_EQUALS true DEAL_II_AND
+            std::is_same<T, long double>::value DEAL_II_EQUALS false)
         {
           const unsigned char zero[sizeof(T)] = {};
           // cast element to (void*) to silence compiler warning for virtual
           // classes (they will never arrive here because they are
           // non-trivial).
-          if (std::memcmp(zero,
-                          static_cast<const void *>(&element),
-                          sizeof(T)) == 0)
+          if (std::memcmp(zero, static_cast<const void *>(&element), sizeof(T))
+                DEAL_II_EQUALS 0)
             trivial_element = true;
         }
       if (size < minimum_parallel_grain_size)
@@ -582,7 +583,8 @@ namespace internal
       // element to (void*) to silence compiler warning for virtual
       // classes (they will never arrive here because they are
       // non-trivial).
-      if (std::is_trivial<T>::value == true && trivial_element)
+      if (std::is_trivial<T>::value DEAL_II_EQUALS true DEAL_II_AND
+                                    trivial_element)
         std::memset(static_cast<void *>(destination_ + begin),
                     0,
                     (end - begin) * sizeof(T));
@@ -644,7 +646,7 @@ namespace internal
     AlignedVectorDefaultInitialize(const std::size_t size, T *const destination)
       : destination_(destination)
     {
-      if (size == 0)
+      if (size DEAL_II_EQUALS 0)
         return;
       Assert(destination != nullptr, ExcInternalError());
 
@@ -665,7 +667,7 @@ namespace internal
       // element to (void*) to silence compiler warning for virtual
       // classes (they will never arrive here because they are
       // non-trivial).
-      if (std::is_trivial<T>::value == true)
+      if (std::is_trivial<T>::value DEAL_II_EQUALS true)
         std::memset(static_cast<void *>(destination_ + begin),
                     0,
                     (end - begin) * sizeof(T));
@@ -748,7 +750,8 @@ inline AlignedVector<T>::AlignedVector(const AlignedVector<T> &vec)
 
 
 template <class T>
-inline AlignedVector<T>::AlignedVector(AlignedVector<T> &&vec) noexcept
+inline AlignedVector<T>::AlignedVector(
+  AlignedVector<T> DEAL_II_AND vec) noexcept
   : data_begin(vec.data_begin)
   , data_end(vec.data_end)
   , allocated_end(vec.allocated_end)
@@ -774,7 +777,7 @@ AlignedVector<T>::operator=(const AlignedVector<T> &vec)
 
 template <class T>
 inline AlignedVector<T> &
-AlignedVector<T>::operator=(AlignedVector<T> &&vec) noexcept
+AlignedVector<T>::operator=(AlignedVector<T> DEAL_II_AND vec) noexcept
 {
   clear();
 
@@ -796,7 +799,8 @@ inline void
 AlignedVector<T>::resize_fast(const size_type size_in)
 {
   const size_type old_size = size();
-  if (std::is_trivial<T>::value == false && size_in < old_size)
+  if (std::is_trivial<T>::value DEAL_II_EQUALS false DEAL_II_AND size_in <
+      old_size)
     {
       // call destructor on fields that are released. doing it backward
       // releases the elements in reverse order as compared to how they were
@@ -809,7 +813,8 @@ AlignedVector<T>::resize_fast(const size_type size_in)
 
   // need to still set the values in case the class is non-trivial because
   // virtual classes etc. need to run their (default) constructor
-  if (std::is_trivial<T>::value == false && size_in > old_size)
+  if (std::is_trivial<T>::value DEAL_II_EQUALS false DEAL_II_AND size_in >
+      old_size)
     dealii::internal::AlignedVectorDefaultInitialize<T, true>(
       size_in - old_size, data_begin + old_size);
 }
@@ -821,7 +826,8 @@ inline void
 AlignedVector<T>::resize(const size_type size_in)
 {
   const size_type old_size = size();
-  if (std::is_trivial<T>::value == false && size_in < old_size)
+  if (std::is_trivial<T>::value DEAL_II_EQUALS false DEAL_II_AND size_in <
+      old_size)
     {
       // call destructor on fields that are released. doing it backward
       // releases the elements in reverse order as compared to how they were
@@ -845,7 +851,8 @@ inline void
 AlignedVector<T>::resize(const size_type size_in, const T &init)
 {
   const size_type old_size = size();
-  if (std::is_trivial<T>::value == false && size_in < old_size)
+  if (std::is_trivial<T>::value DEAL_II_EQUALS false DEAL_II_AND size_in <
+      old_size)
     {
       // call destructor on fields that are released. doing it backward
       // releases the elements in reverse order as compared to how they were
@@ -902,9 +909,9 @@ AlignedVector<T>::reserve(const size_type size_alloc)
           free(new_data);
         }
       else
-        Assert(new_data == nullptr, ExcInternalError());
+        Assert(new_data DEAL_II_EQUALS nullptr, ExcInternalError());
     }
-  else if (size_alloc == 0)
+  else if (size_alloc DEAL_II_EQUALS 0)
     clear();
 }
 
@@ -916,7 +923,7 @@ AlignedVector<T>::clear()
 {
   if (data_begin != nullptr)
     {
-      if (std::is_trivial<T>::value == false)
+      if (std::is_trivial<T>::value DEAL_II_EQUALS false)
         while (data_end != data_begin)
           (--data_end)->~T();
 
@@ -934,9 +941,9 @@ inline void
 AlignedVector<T>::push_back(const T in_data)
 {
   Assert(data_end <= allocated_end, ExcInternalError());
-  if (data_end == allocated_end)
+  if (data_end DEAL_II_EQUALS allocated_end)
     reserve(std::max(2 * capacity(), static_cast<size_type>(16)));
-  if (std::is_trivial<T>::value == false)
+  if (std::is_trivial<T>::value DEAL_II_EQUALS false)
     new (data_end++) T(in_data);
   else
     *data_end++ = in_data;
@@ -975,7 +982,7 @@ AlignedVector<T>::insert_back(ForwardIterator begin, ForwardIterator end)
   reserve(old_size + (end - begin));
   for (; begin != end; ++begin, ++data_end)
     {
-      if (std::is_trivial<T>::value == false)
+      if (std::is_trivial<T>::value DEAL_II_EQUALS false)
         new (data_end) T;
       *data_end = *begin;
     }
@@ -1017,7 +1024,7 @@ template <class T>
 inline bool
 AlignedVector<T>::empty() const
 {
-  return data_end == data_begin;
+  return data_end DEAL_II_EQUALS data_begin;
 }
 
 
@@ -1161,13 +1168,13 @@ AlignedVector<T>::memory_consumption() const
 
 
 /**
- * Relational operator == for AlignedVector
+ * Relational operator DEAL_II_EQUALS  for AlignedVector
  *
  * @relatesalso AlignedVector
  */
 template <class T>
-bool
-operator==(const AlignedVector<T> &lhs, const AlignedVector<T> &rhs)
+bool operator DEAL_II_EQUALS(const AlignedVector<T> &lhs,
+                             const AlignedVector<T> &rhs)
 {
   if (lhs.size() != rhs.size())
     return false;
@@ -1191,7 +1198,7 @@ template <class T>
 bool
 operator!=(const AlignedVector<T> &lhs, const AlignedVector<T> &rhs)
 {
-  return !(operator==(lhs, rhs));
+  return !(operator DEAL_II_EQUALS(lhs, rhs));
 }
 
 

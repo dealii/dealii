@@ -686,8 +686,8 @@ public:
    * Cholesky factorization (see l1_norm()).
    *
    * @note An alternative is to compute the inverse of the matrix
-   * explicitly and manually construct $k_1 = ||\mathbf{A}||_1 \,
-   * ||\mathbf{A}^{-1}||_1$.
+   * explicitly and manually construct $k_1 = DEAL_II_OR \mathbf{A}DEAL_II_OR _1
+   * \, DEAL_II_OR \mathbf{A}^{-1}DEAL_II_OR _1$.
    */
   NumberType
   reciprocal_condition_number(const NumberType a_norm) const;

@@ -2159,9 +2159,9 @@ namespace GridGenerator
    * freedom on this newly created surface mesh.
    *
    * @tparam dim The dimension of the cells of the volume mesh. For example,
-   * if dim==2, then the cells are quadrilaterals that either live in the
-   * plane, or form a surface in a higher-dimensional space. The dimension of
-   * the cells of the surface mesh is consequently dim-1.
+   * if dimDEAL_II_EQUALS 2, then the cells are quadrilaterals that either live
+   * in the plane, or form a surface in a higher-dimensional space. The
+   * dimension of the cells of the surface mesh is consequently dim-1.
    * @tparam spacedim The dimension of the space in which both the volume and
    * the surface mesh live.
    *

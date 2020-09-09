@@ -116,13 +116,14 @@ namespace CUDAWrappers
       {
 #  ifndef DEAL_II_MPI_WITH_CUDA_SUPPORT
         AssertThrow(
-          overlap_communication_computation == false,
+          overlap_communication_computation DEAL_II_EQUALS false,
           ExcMessage(
             "Overlapping communication and computation requires CUDA-aware MPI."));
 #  endif
-        if (overlap_communication_computation == true)
+        if (overlap_communication_computation DEAL_II_EQUALS true)
           AssertThrow(
-            use_coloring == false || overlap_communication_computation == false,
+            use_coloring DEAL_II_EQUALS false DEAL_II_OR
+              overlap_communication_computation DEAL_II_EQUALS false,
             ExcMessage(
               "Overlapping communication and coloring are incompatible options. Only one of them can be enabled."));
       }
@@ -666,13 +667,13 @@ namespace CUDAWrappers
     // following formulas:
     //  - in 2D: `threads = cells * (k+1)^d <= 4*CUDAWrappers::warp_size`
     //  - in 3D: `threads = cells * (k+1)^d <= 2*CUDAWrappers::warp_size`
-    return dim==2 ? (fe_degree==1 ? CUDAWrappers::warp_size :    // 128
-                     fe_degree==2 ? CUDAWrappers::warp_size/4 :  //  72
-                     fe_degree==3 ? CUDAWrappers::warp_size/8 :  //  64
-                     fe_degree==4 ? CUDAWrappers::warp_size/8 :  // 100
+    return dimDEAL_II_EQUALS 2 ? (fe_degreeDEAL_II_EQUALS 1 ? CUDAWrappers::warp_size :    // 128
+                     fe_degreeDEAL_II_EQUALS 2 ? CUDAWrappers::warp_size/4 :  //  72
+                     fe_degreeDEAL_II_EQUALS 3 ? CUDAWrappers::warp_size/8 :  //  64
+                     fe_degreeDEAL_II_EQUALS 4 ? CUDAWrappers::warp_size/8 :  // 100
                      1) :
-           dim==3 ? (fe_degree==1 ? CUDAWrappers::warp_size/4 :  //  64
-                     fe_degree==2 ? CUDAWrappers::warp_size/16 : //  54
+           dimDEAL_II_EQUALS 3 ? (fe_degreeDEAL_II_EQUALS 1 ? CUDAWrappers::warp_size/4 :  //  64
+                     fe_degreeDEAL_II_EQUALS 2 ? CUDAWrappers::warp_size/16 : //  54
                      1) : 1;
     /* clang-format on */
   }
@@ -688,9 +689,9 @@ namespace CUDAWrappers
   __device__ inline unsigned int
   q_point_id_in_cell(const unsigned int n_q_points_1d)
   {
-    return (dim == 1 ?
+    return (dim DEAL_II_EQUALS 1 ?
               threadIdx.x % n_q_points_1d :
-              dim == 2 ?
+              dim DEAL_II_EQUALS 2 ?
               threadIdx.x % n_q_points_1d + n_q_points_1d * threadIdx.y :
               threadIdx.x % n_q_points_1d +
                   n_q_points_1d * (threadIdx.y + n_q_points_1d * threadIdx.z));

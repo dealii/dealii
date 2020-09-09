@@ -146,7 +146,7 @@ CompositionManifold<dim, spacedim, chartdim, intermediate_dim, dim1, dim2>::
 {
   // We don't know what to do with a periodicity in the second manifold, so
   // throw an assertion if the second manifold is periodic
-  Assert(G.get_periodicity().norm() == 0.0,
+  Assert(G.get_periodicity().norm() DEAL_II_EQUALS 0.0,
          ExcMessage("The second manifold cannot be periodic."));
 }
 

@@ -473,7 +473,8 @@ namespace Physics
        * SymmetricTensor<2,dim>::n_independent_components), as it is assumed
        * that the entries corresponding to the alternation of the second and
        * third indices are equal. That is to say that
-       * <code>r3_symm_tnsr[i][j][k] == r3_symm_tnsr[i][k][j]</code>.
+       * <code>r3_symm_tnsr[i][j][k] DEAL_II_EQUALS
+       * r3_symm_tnsr[i][k][j]</code>.
        */
       template <int dim,
                 typename SubTensor1 = Tensor<2, dim>,
@@ -699,7 +700,7 @@ namespace Physics
         indices_from_component<2>(const unsigned int component_n,
                                   const bool         symmetric)
         {
-          if (symmetric == true)
+          if (symmetric DEAL_II_EQUALS true)
             {
               Assert(
                 (component_n < SymmetricTensor<2, 2>::n_independent_components),
@@ -729,7 +730,7 @@ namespace Physics
         indices_from_component<3>(const unsigned int component_n,
                                   const bool         symmetric)
         {
-          if (symmetric == true)
+          if (symmetric DEAL_II_EQUALS true)
             {
               Assert(
                 (component_n < SymmetricTensor<2, 3>::n_independent_components),
@@ -768,7 +769,7 @@ namespace Physics
         vector_component_factor(const unsigned int component_i,
                                 const bool         symmetric)
         {
-          if (symmetric == false)
+          if (symmetric DEAL_II_EQUALS false)
             return 1.0;
 
           if (component_i < dim)
@@ -788,17 +789,18 @@ namespace Physics
                                 const unsigned int component_j,
                                 const bool         symmetric)
         {
-          if (symmetric == false)
+          if (symmetric DEAL_II_EQUALS false)
             return 1.0;
 
           // This case check returns equivalent of this result:
           // internal::vector_component_factor<dim>(component_i,symmetric)*internal::vector_component_factor<dim>(component_j,symmetric);
-          if (component_i < dim && component_j < dim)
+          if (component_i < dim DEAL_II_AND component_j < dim)
             return 1.0;
-          else if (component_i >= dim && component_j >= dim)
+          else if (component_i >= dim DEAL_II_AND component_j >= dim)
             return 2.0;
-          else // ((component_i >= dim && component_j < dim) || (component_i <
-               // dim && component_j >= dim))
+          else // ((component_i >= dim DEAL_II_AND  component_j < dim)
+               // DEAL_II_OR  (component_i < dim DEAL_II_AND  component_j >=
+               // dim))
             return numbers::SQRT2;
         }
 
@@ -989,12 +991,15 @@ namespace Physics
       to_matrix(const Tensor<3, dim, Number> &t)
       {
         static_assert(
-          (SubTensor1::dimension == dim && SubTensor2::dimension == dim),
+          (SubTensor1::dimension DEAL_II_EQUALS dim DEAL_II_AND
+             SubTensor2::dimension DEAL_II_EQUALS dim),
           "Sub-tensor spatial dimension is different from those of the input tensor.");
 
         static_assert(
-          (SubTensor1::rank == 2 && SubTensor2::rank == 1) ||
-            (SubTensor1::rank == 1 && SubTensor2::rank == 2),
+          (SubTensor1::rank DEAL_II_EQUALS 2 DEAL_II_AND SubTensor2::rank
+                                                         DEAL_II_EQUALS 1)
+            DEAL_II_OR(SubTensor1::rank DEAL_II_EQUALS 1 DEAL_II_AND
+                         SubTensor2::rank DEAL_II_EQUALS 2),
           "Cannot build a rank 3 tensor from the given combination of sub-tensors.");
 
         FullMatrix<Number> out(SubTensor1::n_independent_components,
@@ -1002,7 +1007,8 @@ namespace Physics
         const unsigned int n_rows = out.m();
         const unsigned int n_cols = out.n();
 
-        if (SubTensor1::rank == 2 && SubTensor2::rank == 1)
+        if (SubTensor1::rank DEAL_II_EQUALS 2 DEAL_II_AND SubTensor2::rank
+                                                          DEAL_II_EQUALS 1)
           {
             const bool subtensor_is_rank_2_symmetric_tensor =
               internal::is_rank_2_symmetric_tensor<SubTensor1>::value;
@@ -1039,7 +1045,8 @@ namespace Physics
                   }
               }
           }
-        else if (SubTensor1::rank == 1 && SubTensor2::rank == 2)
+        else if (SubTensor1::rank DEAL_II_EQUALS 1 DEAL_II_AND SubTensor2::rank
+                                                               DEAL_II_EQUALS 2)
           {
             const bool subtensor_is_rank_2_symmetric_tensor =
               internal::is_rank_2_symmetric_tensor<SubTensor2>::value;
@@ -1165,7 +1172,8 @@ namespace Physics
       void
       to_tensor(const Vector<Number> &vec, Number &s)
       {
-        Assert(vec.size() == 1, ExcDimensionMismatch(vec.size(), 1));
+        Assert(vec.size() DEAL_II_EQUALS 1,
+               ExcDimensionMismatch(vec.size(), 1));
         s = vec(0);
       }
 
@@ -1182,7 +1190,7 @@ namespace Physics
       void
       to_tensor(const Vector<Number> &vec, Tensor<1, dim, Number> &v)
       {
-        Assert(vec.size() == v.n_independent_components,
+        Assert(vec.size() DEAL_II_EQUALS v.n_independent_components,
                ExcDimensionMismatch(vec.size(), v.n_independent_components));
         const unsigned int n_rows = vec.size();
         for (unsigned int r = 0; r < n_rows; ++r)
@@ -1200,7 +1208,7 @@ namespace Physics
       void
       to_tensor(const Vector<Number> &vec, Tensor<2, dim, Number> &t)
       {
-        Assert(vec.size() == t.n_independent_components,
+        Assert(vec.size() DEAL_II_EQUALS t.n_independent_components,
                ExcDimensionMismatch(vec.size(), t.n_independent_components));
         const unsigned int n_rows = vec.size();
         for (unsigned int r = 0; r < n_rows; ++r)
@@ -1220,7 +1228,7 @@ namespace Physics
       void
       to_tensor(const Vector<Number> &vec, SymmetricTensor<2, dim, Number> &st)
       {
-        Assert(vec.size() == st.n_independent_components,
+        Assert(vec.size() DEAL_II_EQUALS st.n_independent_components,
                ExcDimensionMismatch(vec.size(), st.n_independent_components));
         const unsigned int n_rows = vec.size();
         for (unsigned int r = 0; r < n_rows; ++r)
@@ -1245,9 +1253,9 @@ namespace Physics
       void
       to_tensor(const FullMatrix<Number> &mtrx, Number &s)
       {
-        Assert(mtrx.m() == 1, ExcDimensionMismatch(mtrx.m(), 1));
-        Assert(mtrx.n() == 1, ExcDimensionMismatch(mtrx.n(), 1));
-        Assert(mtrx.n_elements() == 1,
+        Assert(mtrx.m() DEAL_II_EQUALS 1, ExcDimensionMismatch(mtrx.m(), 1));
+        Assert(mtrx.n() DEAL_II_EQUALS 1, ExcDimensionMismatch(mtrx.n(), 1));
+        Assert(mtrx.n_elements() DEAL_II_EQUALS 1,
                ExcDimensionMismatch(mtrx.n_elements(), 1));
         s = mtrx(0, 0);
       }
@@ -1265,9 +1273,10 @@ namespace Physics
       void
       to_tensor(const FullMatrix<Number> &mtrx, Tensor<1, dim, Number> &v)
       {
-        Assert(mtrx.m() == dim, ExcDimensionMismatch(mtrx.m(), dim));
-        Assert(mtrx.n() == 1, ExcDimensionMismatch(mtrx.n(), 1));
-        Assert(mtrx.n_elements() == v.n_independent_components,
+        Assert(mtrx.m() DEAL_II_EQUALS dim,
+               ExcDimensionMismatch(mtrx.m(), dim));
+        Assert(mtrx.n() DEAL_II_EQUALS 1, ExcDimensionMismatch(mtrx.n(), 1));
+        Assert(mtrx.n_elements() DEAL_II_EQUALS v.n_independent_components,
                ExcDimensionMismatch(mtrx.n_elements(),
                                     v.n_independent_components));
 
@@ -1278,7 +1287,7 @@ namespace Physics
             const std::pair<unsigned int, unsigned int> indices =
               internal::indices_from_component<dim>(r, false);
             Assert(indices.first < dim, ExcInternalError());
-            Assert(indices.second == 0, ExcInternalError());
+            Assert(indices.second DEAL_II_EQUALS 0, ExcInternalError());
             const unsigned int i = indices.first;
 
             for (unsigned int c = 0; c < n_cols; ++c)
@@ -1294,9 +1303,11 @@ namespace Physics
       void
       to_tensor(const FullMatrix<Number> &mtrx, Tensor<2, dim, Number> &t)
       {
-        Assert(mtrx.m() == dim, ExcDimensionMismatch(mtrx.m(), dim));
-        Assert(mtrx.n() == dim, ExcDimensionMismatch(mtrx.n(), dim));
-        Assert(mtrx.n_elements() == t.n_independent_components,
+        Assert(mtrx.m() DEAL_II_EQUALS dim,
+               ExcDimensionMismatch(mtrx.m(), dim));
+        Assert(mtrx.n() DEAL_II_EQUALS dim,
+               ExcDimensionMismatch(mtrx.n(), dim));
+        Assert(mtrx.n_elements() DEAL_II_EQUALS t.n_independent_components,
                ExcDimensionMismatch(mtrx.n_elements(),
                                     t.n_independent_components));
 
@@ -1333,13 +1344,16 @@ namespace Physics
         // matrix We therefore assume that its been converted to a standard
         // tensor format using to_matrix (SymmetricTensor<2,dim,Number>) at some
         // point...
-        Assert(mtrx.m() == dim, ExcDimensionMismatch(mtrx.m(), dim));
-        Assert(mtrx.n() == dim, ExcDimensionMismatch(mtrx.n(), dim));
-        Assert((mtrx.n_elements() ==
-                Tensor<2, dim, Number>::n_independent_components),
-               ExcDimensionMismatch(
-                 mtrx.n_elements(),
-                 Tensor<2, dim, Number>::n_independent_components));
+        Assert(mtrx.m() DEAL_II_EQUALS dim,
+               ExcDimensionMismatch(mtrx.m(), dim));
+        Assert(mtrx.n() DEAL_II_EQUALS dim,
+               ExcDimensionMismatch(mtrx.n(), dim));
+        Assert(
+          (mtrx.n_elements()
+             DEAL_II_EQUALS Tensor<2, dim, Number>::n_independent_components),
+          ExcDimensionMismatch(
+            mtrx.n_elements(),
+            Tensor<2, dim, Number>::n_independent_components));
 
         Tensor<2, dim, Number> tmp;
         to_tensor(mtrx, tmp);
@@ -1354,43 +1368,54 @@ namespace Physics
       void
       to_tensor(const FullMatrix<Number> &mtrx, Tensor<3, dim, Number> &t)
       {
-        Assert((mtrx.m() == Tensor<1, dim, Number>::n_independent_components) ||
-                 (mtrx.m() ==
-                  Tensor<2, dim, Number>::n_independent_components) ||
-                 (mtrx.m() ==
+        Assert(
+          (mtrx.m()
+             DEAL_II_EQUALS Tensor<1, dim, Number>::n_independent_components)
+            DEAL_II_OR(
+              mtrx.m()
+                DEAL_II_EQUALS Tensor<2, dim, Number>::n_independent_components)
+              DEAL_II_OR(
+                mtrx.m() DEAL_II_EQUALS
                   SymmetricTensor<2, dim, Number>::n_independent_components),
-               ExcNotationExcFullMatrixToTensorColSize3(
-                 mtrx.m(),
-                 Tensor<1, dim, Number>::n_independent_components,
-                 Tensor<2, dim, Number>::n_independent_components,
-                 SymmetricTensor<2, dim, Number>::n_independent_components));
-        Assert((mtrx.n() == Tensor<1, dim, Number>::n_independent_components) ||
-                 (mtrx.n() ==
-                  Tensor<2, dim, Number>::n_independent_components) ||
-                 (mtrx.n() ==
+          ExcNotationExcFullMatrixToTensorColSize3(
+            mtrx.m(),
+            Tensor<1, dim, Number>::n_independent_components,
+            Tensor<2, dim, Number>::n_independent_components,
+            SymmetricTensor<2, dim, Number>::n_independent_components));
+        Assert(
+          (mtrx.n()
+             DEAL_II_EQUALS Tensor<1, dim, Number>::n_independent_components)
+            DEAL_II_OR(
+              mtrx.n()
+                DEAL_II_EQUALS Tensor<2, dim, Number>::n_independent_components)
+              DEAL_II_OR(
+                mtrx.n() DEAL_II_EQUALS
                   SymmetricTensor<2, dim, Number>::n_independent_components),
-               ExcNotationExcFullMatrixToTensorColSize3(
-                 mtrx.n(),
-                 Tensor<1, dim, Number>::n_independent_components,
-                 Tensor<2, dim, Number>::n_independent_components,
-                 SymmetricTensor<2, dim, Number>::n_independent_components));
+          ExcNotationExcFullMatrixToTensorColSize3(
+            mtrx.n(),
+            Tensor<1, dim, Number>::n_independent_components,
+            Tensor<2, dim, Number>::n_independent_components,
+            SymmetricTensor<2, dim, Number>::n_independent_components));
 
         const unsigned int n_rows = mtrx.m();
         const unsigned int n_cols = mtrx.n();
-        if (mtrx.n() == Tensor<1, dim, Number>::n_independent_components)
+        if (mtrx.n()
+              DEAL_II_EQUALS Tensor<1, dim, Number>::n_independent_components)
           {
             Assert(
-              (mtrx.m() == Tensor<2, dim, Number>::n_independent_components) ||
-                (mtrx.m() ==
-                 SymmetricTensor<2, dim, Number>::n_independent_components),
+              (mtrx.m() DEAL_II_EQUALS
+                 Tensor<2, dim, Number>::n_independent_components)
+                DEAL_II_OR(
+                  mtrx.m() DEAL_II_EQUALS
+                    SymmetricTensor<2, dim, Number>::n_independent_components),
               ExcNotationExcFullMatrixToTensorRowSize2(
                 mtrx.m(),
                 Tensor<2, dim, Number>::n_independent_components,
                 SymmetricTensor<2, dim, Number>::n_independent_components));
 
             const bool subtensor_is_rank_2_symmetric_tensor =
-              (mtrx.m() ==
-               SymmetricTensor<2, dim, Number>::n_independent_components);
+              (mtrx.m() DEAL_II_EQUALS
+                 SymmetricTensor<2, dim, Number>::n_independent_components);
 
             for (unsigned int r = 0; r < n_rows; ++r)
               {
@@ -1430,22 +1455,25 @@ namespace Physics
           }
         else
           {
+            Assert((mtrx.m() DEAL_II_EQUALS
+                      Tensor<1, dim, Number>::n_independent_components),
+                   ExcDimensionMismatch(
+                     mtrx.m(),
+                     Tensor<1, dim, Number>::n_independent_components));
             Assert(
-              (mtrx.m() == Tensor<1, dim, Number>::n_independent_components),
-              ExcDimensionMismatch(
-                mtrx.m(), Tensor<1, dim, Number>::n_independent_components));
-            Assert(
-              (mtrx.n() == Tensor<2, dim, Number>::n_independent_components) ||
-                (mtrx.n() ==
-                 SymmetricTensor<2, dim, Number>::n_independent_components),
+              (mtrx.n() DEAL_II_EQUALS
+                 Tensor<2, dim, Number>::n_independent_components)
+                DEAL_II_OR(
+                  mtrx.n() DEAL_II_EQUALS
+                    SymmetricTensor<2, dim, Number>::n_independent_components),
               ExcNotationExcFullMatrixToTensorColSize2(
                 mtrx.n(),
                 Tensor<2, dim, Number>::n_independent_components,
                 SymmetricTensor<2, dim, Number>::n_independent_components));
 
             const bool subtensor_is_rank_2_symmetric_tensor =
-              (mtrx.n() ==
-               SymmetricTensor<2, dim, Number>::n_independent_components);
+              (mtrx.n() DEAL_II_EQUALS
+                 SymmetricTensor<2, dim, Number>::n_independent_components);
 
             for (unsigned int r = 0; r < n_rows; ++r)
               {
@@ -1489,13 +1517,17 @@ namespace Physics
       void
       to_tensor(const FullMatrix<Number> &mtrx, Tensor<4, dim, Number> &t)
       {
-        Assert((mtrx.m() == Tensor<2, dim, Number>::n_independent_components),
-               ExcDimensionMismatch(
-                 mtrx.m(), Tensor<2, dim, Number>::n_independent_components));
-        Assert((mtrx.n() == Tensor<2, dim, Number>::n_independent_components),
-               ExcDimensionMismatch(
-                 mtrx.n(), Tensor<2, dim, Number>::n_independent_components));
-        Assert(mtrx.n_elements() == t.n_independent_components,
+        Assert(
+          (mtrx.m()
+             DEAL_II_EQUALS Tensor<2, dim, Number>::n_independent_components),
+          ExcDimensionMismatch(
+            mtrx.m(), Tensor<2, dim, Number>::n_independent_components));
+        Assert(
+          (mtrx.n()
+             DEAL_II_EQUALS Tensor<2, dim, Number>::n_independent_components),
+          ExcDimensionMismatch(
+            mtrx.n(), Tensor<2, dim, Number>::n_independent_components));
+        Assert(mtrx.n_elements() DEAL_II_EQUALS t.n_independent_components,
                ExcDimensionMismatch(mtrx.n_elements(),
                                     t.n_independent_components));
 
@@ -1530,17 +1562,17 @@ namespace Physics
       to_tensor(const FullMatrix<Number> &       mtrx,
                 SymmetricTensor<4, dim, Number> &st)
       {
-        Assert((mtrx.m() ==
-                SymmetricTensor<2, dim, Number>::n_independent_components),
+        Assert((mtrx.m() DEAL_II_EQUALS
+                  SymmetricTensor<2, dim, Number>::n_independent_components),
                ExcDimensionMismatch(
                  mtrx.m(),
                  SymmetricTensor<2, dim, Number>::n_independent_components));
-        Assert((mtrx.n() ==
-                SymmetricTensor<2, dim, Number>::n_independent_components),
+        Assert((mtrx.n() DEAL_II_EQUALS
+                  SymmetricTensor<2, dim, Number>::n_independent_components),
                ExcDimensionMismatch(
                  mtrx.n(),
                  SymmetricTensor<2, dim, Number>::n_independent_components));
-        Assert(mtrx.n_elements() == st.n_independent_components,
+        Assert(mtrx.n_elements() DEAL_II_EQUALS st.n_independent_components,
                ExcDimensionMismatch(mtrx.n_elements(),
                                     st.n_independent_components));
 

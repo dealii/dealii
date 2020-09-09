@@ -429,9 +429,11 @@ namespace CUDAWrappers
         if (diagonal_first)
           {
             // find the diagonal and print if it exists
-            for (size_type j = rows[i]; j < rows[i + 1] && cols[j] <= i; ++j)
+            for (size_type                   j = rows[i];
+                 j < rows[i + 1] DEAL_II_AND cols[j] <= i;
+                 ++j)
               {
-                if (i == cols[j])
+                if (i DEAL_II_EQUALS cols[j])
                   {
                     diagonal     = val[j];
                     has_diagonal = true;
@@ -446,7 +448,7 @@ namespace CUDAWrappers
           }
         for (size_type j = rows[i]; j < rows[i + 1]; ++j)
           {
-            if (has_diagonal && i == cols[j])
+            if (has_diagonal DEAL_II_AND i DEAL_II_EQUALS cols[j])
               continue;
             if (across)
               out << ' ' << i << ',' << cols[j] << ':' << val[j];
@@ -503,7 +505,7 @@ namespace CUDAWrappers
         size_type j = rows[i];
         for (size_type k = 0; k < n_cols; ++k)
           {
-            if (k == cols[j])
+            if (k DEAL_II_EQUALS cols[j])
               {
                 out << std::setw(width) << val[j] * Number(denominator) << ' ';
                 ++j;

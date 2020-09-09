@@ -85,11 +85,10 @@ template <typename Accessor>
 template <typename OtherAccessor>
 inline
   typename std::enable_if<std::is_convertible<OtherAccessor, Accessor>::value,
-                          bool>::type
-  TriaRawIterator<Accessor>::
-  operator==(const TriaRawIterator<OtherAccessor> &other) const
+                          bool>::type TriaRawIterator<Accessor>::
+                                      operator DEAL_II_EQUALS(const TriaRawIterator<OtherAccessor> &other) const
 {
-  return accessor == other.accessor;
+  return accessor DEAL_II_EQUALS other.accessor;
 }
 
 
@@ -98,7 +97,7 @@ inline bool
 TriaRawIterator<Accessor>::
 operator!=(const TriaRawIterator<Accessor> &other) const
 {
-  return !(*this == other);
+  return !(*this DEAL_II_EQUALS other);
 }
 
 
@@ -146,9 +145,9 @@ inline TriaIterator<Accessor>::TriaIterator(const TriaRawIterator<Accessor> &i)
 #ifdef DEBUG
   // do this like this, because:
   // if we write
-  // "Assert (IteratorState::past_the_end || used)"
+  // "Assert (IteratorState::past_the_end DEAL_II_OR  used)"
   // used() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
+  // stateDEAL_II_EQUALS IteratorState::past_the_end, and will then
   // throw the exception!
   if (this->state() != IteratorState::past_the_end)
     Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
@@ -167,9 +166,9 @@ inline TriaIterator<Accessor>::TriaIterator(
 #ifdef DEBUG
   // do this like this, because:
   // if we write
-  // "Assert (IteratorState::past_the_end || used)"
+  // "Assert (IteratorState::past_the_end DEAL_II_OR  used)"
   // used() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
+  // stateDEAL_II_EQUALS IteratorState::past_the_end, and will then
   // throw the exception!
   if (this->state() != IteratorState::past_the_end)
     Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
@@ -188,9 +187,9 @@ inline TriaIterator<Accessor>::TriaIterator(
 #ifdef DEBUG
   // do this like this, because:
   // if we write
-  // "Assert (IteratorState::past_the_end || used)"
+  // "Assert (IteratorState::past_the_end DEAL_II_OR  used)"
   // used() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
+  // stateDEAL_II_EQUALS IteratorState::past_the_end, and will then
   // throw the exception!
   if (this->state() != IteratorState::past_the_end)
     Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
@@ -225,9 +224,9 @@ TriaIterator<Accessor>::operator=(const TriaRawIterator<Accessor> &i)
 #ifdef DEBUG
   // do this like this, because:
   // if we write
-  // "Assert (IteratorState::past_the_end || used)"
+  // "Assert (IteratorState::past_the_end DEAL_II_OR  used)"
   // used() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
+  // stateDEAL_II_EQUALS IteratorState::past_the_end, and will then
   // throw the exception!
   if (this->state() != IteratorState::past_the_end)
     Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
@@ -245,9 +244,9 @@ TriaIterator<Accessor>::operator=(const TriaRawIterator<OtherAccessor> &i)
 #ifdef DEBUG
   // do this like this, because:
   // if we write
-  // "Assert (IteratorState::past_the_end || used)"
+  // "Assert (IteratorState::past_the_end DEAL_II_OR  used)"
   // used() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
+  // stateDEAL_II_EQUALS IteratorState::past_the_end, and will then
   // throw the exception!
   if (this->state() != IteratorState::past_the_end)
     Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
@@ -261,8 +260,8 @@ inline TriaIterator<Accessor> &
 TriaIterator<Accessor>::operator++()
 {
   while (TriaRawIterator<Accessor>::operator++(),
-         (this->state() == IteratorState::valid))
-    if (this->accessor.used() == true)
+         (this->state() DEAL_II_EQUALS IteratorState::valid))
+    if (this->accessor.used() DEAL_II_EQUALS true)
       return *this;
   return *this;
 }
@@ -284,8 +283,8 @@ inline TriaIterator<Accessor> &
 TriaIterator<Accessor>::operator--()
 {
   while (TriaRawIterator<Accessor>::operator--(),
-         (this->state() == IteratorState::valid))
-    if (this->accessor.used() == true)
+         (this->state() DEAL_II_EQUALS IteratorState::valid))
+    if (this->accessor.used() DEAL_II_EQUALS true)
       return *this;
   return *this;
 }
@@ -326,12 +325,12 @@ inline TriaActiveIterator<Accessor>::TriaActiveIterator(
 #ifdef DEBUG
   // do this like this, because:
   // if we write
-  // "Assert (IteratorState::past_the_end || !has_children())"
+  // "Assert (IteratorState::past_the_end DEAL_II_OR  !has_children())"
   // has_children() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
+  // stateDEAL_II_EQUALS IteratorState::past_the_end, and will then
   // throw the exception!
   if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.has_children() == false,
+    Assert(this->accessor.has_children() DEAL_II_EQUALS false,
            ExcAssignmentOfInactiveObject());
 #endif
 }
@@ -345,12 +344,12 @@ inline TriaActiveIterator<Accessor>::TriaActiveIterator(
 #ifdef DEBUG
   // do this like this, because:
   // if we write
-  // "Assert (IteratorState::past_the_end || !has_children())"
+  // "Assert (IteratorState::past_the_end DEAL_II_OR  !has_children())"
   // has_children() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
+  // stateDEAL_II_EQUALS IteratorState::past_the_end, and will then
   // throw the exception!
   if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.has_children() == false,
+    Assert(this->accessor.has_children() DEAL_II_EQUALS false,
            ExcAssignmentOfInactiveObject());
 #endif
 }
@@ -367,12 +366,12 @@ inline TriaActiveIterator<Accessor>::TriaActiveIterator(
 #ifdef DEBUG
   // do this like this, because:
   // if we write
-  // "Assert (IteratorState::past_the_end || !has_children())"
+  // "Assert (IteratorState::past_the_end DEAL_II_OR  !has_children())"
   // has_children() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
+  // stateDEAL_II_EQUALS IteratorState::past_the_end, and will then
   // throw the exception!
   if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.has_children() == false,
+    Assert(this->accessor.has_children() DEAL_II_EQUALS false,
            ExcAssignmentOfInactiveObject());
 #endif
 }
@@ -389,12 +388,12 @@ inline TriaActiveIterator<Accessor>::TriaActiveIterator(
 #ifdef DEBUG
   // do this like this, because:
   // if we write
-  // "Assert (IteratorState::past_the_end || !has_children())"
+  // "Assert (IteratorState::past_the_end DEAL_II_OR  !has_children())"
   // has_children() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
+  // stateDEAL_II_EQUALS IteratorState::past_the_end, and will then
   // throw the exception!
   if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.has_children() == false,
+    Assert(this->accessor.has_children() DEAL_II_EQUALS false,
            ExcAssignmentOfInactiveObject());
 #endif
 }
@@ -428,12 +427,13 @@ TriaActiveIterator<Accessor>::operator=(const TriaRawIterator<Accessor> &i)
 #ifdef DEBUG
   // do this like this, because:
   // if we write
-  // "Assert (IteratorState::past_the_end || !has_children())"
+  // "Assert (IteratorState::past_the_end DEAL_II_OR  !has_children())"
   // has_children() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
+  // stateDEAL_II_EQUALS IteratorState::past_the_end, and will then
   // throw the exception!
   if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.used() && this->accessor.has_children() == false,
+    Assert(this->accessor.used() DEAL_II_AND this->accessor.has_children()
+             DEAL_II_EQUALS false,
            ExcAssignmentOfInactiveObject());
 #endif
   return *this;
@@ -449,12 +449,13 @@ TriaActiveIterator<Accessor>::operator=(const TriaRawIterator<OtherAccessor> &i)
 #ifdef DEBUG
   // do this like this, because:
   // if we write
-  // "Assert (IteratorState::past_the_end || !has_children())"
+  // "Assert (IteratorState::past_the_end DEAL_II_OR  !has_children())"
   // has_children() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
+  // stateDEAL_II_EQUALS IteratorState::past_the_end, and will then
   // throw the exception!
   if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.used() && this->accessor.has_children() == false,
+    Assert(this->accessor.used() DEAL_II_AND this->accessor.has_children()
+             DEAL_II_EQUALS false,
            ExcAssignmentOfInactiveObject());
 #endif
   return *this;
@@ -470,12 +471,12 @@ TriaActiveIterator<Accessor>::operator=(const TriaIterator<OtherAccessor> &i)
 #ifdef DEBUG
   // do this like this, because:
   // if we write
-  // "Assert (IteratorState::past_the_end || !has_children())"
+  // "Assert (IteratorState::past_the_end DEAL_II_OR  !has_children())"
   // has_children() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
+  // stateDEAL_II_EQUALS IteratorState::past_the_end, and will then
   // throw the exception!
   if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.has_children() == false,
+    Assert(this->accessor.has_children() DEAL_II_EQUALS false,
            ExcAssignmentOfInactiveObject());
 #endif
   return *this;
@@ -490,12 +491,12 @@ TriaActiveIterator<Accessor>::operator=(const TriaIterator<Accessor> &i)
 #ifdef DEBUG
   // do this like this, because:
   // if we write
-  // "Assert (IteratorState::past_the_end || !has_children())"
+  // "Assert (IteratorState::past_the_end DEAL_II_OR  !has_children())"
   // has_children() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
+  // stateDEAL_II_EQUALS IteratorState::past_the_end, and will then
   // throw the exception!
   if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.has_children() == false,
+    Assert(this->accessor.has_children() DEAL_II_EQUALS false,
            ExcAssignmentOfInactiveObject());
 #endif
   return *this;
@@ -507,8 +508,8 @@ inline TriaActiveIterator<Accessor> &
 TriaActiveIterator<Accessor>::operator++()
 {
   while (TriaIterator<Accessor>::operator++(),
-         (this->state() == IteratorState::valid))
-    if (this->accessor.has_children() == false)
+         (this->state() DEAL_II_EQUALS IteratorState::valid))
+    if (this->accessor.has_children() DEAL_II_EQUALS false)
       return *this;
   return *this;
 }
@@ -530,8 +531,8 @@ inline TriaActiveIterator<Accessor> &
 TriaActiveIterator<Accessor>::operator--()
 {
   while (TriaIterator<Accessor>::operator--(),
-         (this->state() == IteratorState::valid))
-    if (this->accessor.has_children() == false)
+         (this->state() DEAL_II_EQUALS IteratorState::valid))
+    if (this->accessor.has_children() DEAL_II_EQUALS false)
       return *this;
   return *this;
 }

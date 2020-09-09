@@ -32,15 +32,16 @@ namespace Particles
       &data_component_interpretations_)
   {
     Assert(
-      data_component_names.size() == data_component_interpretations_.size(),
+      data_component_names.size()
+        DEAL_II_EQUALS data_component_interpretations_.size(),
       ExcMessage(
         "When calling Particles::DataOut::build_patches with data component "
         "names and interpretations you need to provide as many data component "
         "names as interpretations. Provide the same name for components that "
         "belong to a single vector or tensor."));
 
-    if ((data_component_names.size() > 0) &&
-        (particles.n_locally_owned_particles() > 0))
+    if ((data_component_names.size() > 0)
+          DEAL_II_AND(particles.n_locally_owned_particles() > 0))
       {
         Assert(
           particles.begin()->has_properties(),
@@ -50,8 +51,9 @@ namespace Particles
             "any properties."));
 
         Assert(
-          data_component_names.size() ==
-            particles.begin()->get_properties().size(),
+          data_component_names.size() DEAL_II_EQUALS particles.begin()
+            ->get_properties()
+            .size(),
           ExcMessage(
             "When calling Particles::DataOut::build_patches with data component "
             "names and interpretations you need to provide as many data component "
@@ -139,7 +141,8 @@ namespace Particles
     // Make sure the data structures were set up correctly. Since they
     // can only be filled by build_patches() above, they should have
     // been checked already.
-    Assert(dataset_names.size() == data_component_interpretations.size(),
+    Assert(dataset_names.size()
+             DEAL_II_EQUALS data_component_interpretations.size(),
            ExcInternalError());
 
     // collect the ranges of particle data
@@ -169,7 +172,7 @@ namespace Particles
                   i, dataset_names[i]));
               for (unsigned int dd = 1; dd < spacedim; ++dd)
                 Assert(
-                  data_component_interpretations[i + dd] ==
+                  data_component_interpretations[i + dd] DEAL_II_EQUALS
                     DataComponentInterpretation::component_is_part_of_vector,
                   Exceptions::DataOutImplementation::
                     ExcInvalidVectorDeclaration(i, dataset_names[i]));
@@ -215,7 +218,7 @@ namespace Particles
                   i, dataset_names[i]));
               for (unsigned int dd = 1; dd < size; ++dd)
                 Assert(
-                  data_component_interpretations[i + dd] ==
+                  data_component_interpretations[i + dd] DEAL_II_EQUALS
                     DataComponentInterpretation::component_is_part_of_tensor,
                   Exceptions::DataOutImplementation::
                     ExcInvalidTensorDeclaration(i, dataset_names[i]));

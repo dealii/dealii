@@ -41,7 +41,7 @@ namespace PETScWrappers
     // get rid of old matrix and generate a
     // new one
     const PetscErrorCode ierr = destroy_matrix(matrix);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     do_reinit(m, n);
   }
@@ -53,7 +53,7 @@ namespace PETScWrappers
     // elements per row for all rows globally
     const PetscErrorCode ierr =
       MatCreateSeqDense(PETSC_COMM_SELF, m, n, nullptr, &matrix);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
   }
 
 

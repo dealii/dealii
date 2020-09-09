@@ -19,7 +19,7 @@
 
 #include <deal.II/base/config.h>
 
-#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
+#if defined(DEAL_II_WITH_TRILINOS) DEAL_II_AND defined(DEAL_II_WITH_MPI)
 
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/subscriptor.h>
@@ -298,7 +298,8 @@ namespace LinearAlgebra
        * a vector is created on only one processor, then the result would
        * satisfy
        * @code
-       *  vec.locally_owned_elements() == complete_index_set(vec.size())
+       *  vec.locally_owned_elements() DEAL_II_EQUALS
+       * complete_index_set(vec.size())
        * @endcode
        */
       virtual ::dealii::IndexSet

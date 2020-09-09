@@ -56,8 +56,7 @@ namespace VectorTools
         return false;
       }
 
-      bool
-      operator==(const VectorDoFTuple<dim> &other) const
+      bool operator DEAL_II_EQUALS(const VectorDoFTuple<dim> &other) const
       {
         for (unsigned int i = 0; i < dim; ++i)
           if (dof_indices[i] != other.dof_indices[i])
@@ -69,7 +68,7 @@ namespace VectorTools
       bool
       operator!=(const VectorDoFTuple<dim> &other) const
       {
-        return !(*this == other);
+        return !(*this DEAL_II_EQUALS other);
       }
     };
 
@@ -143,8 +142,10 @@ namespace VectorTools
               if (std::fabs(constraining_vector[0]) >
                   std::fabs(constraining_vector[1]) + 1e-10)
                 {
-                  if (!constraints.is_constrained(dof_indices.dof_indices[0]) &&
-                      constraints.can_store_line(dof_indices.dof_indices[0]))
+                  if (!constraints
+                         .is_constrained(dof_indices.dof_indices[0])
+                           DEAL_II_AND constraints.can_store_line(
+                             dof_indices.dof_indices[0]))
                     {
                       constraints.add_line(dof_indices.dof_indices[0]);
 
@@ -165,8 +166,10 @@ namespace VectorTools
                 }
               else
                 {
-                  if (!constraints.is_constrained(dof_indices.dof_indices[1]) &&
-                      constraints.can_store_line(dof_indices.dof_indices[1]))
+                  if (!constraints
+                         .is_constrained(dof_indices.dof_indices[1])
+                           DEAL_II_AND constraints.can_store_line(
+                             dof_indices.dof_indices[1]))
                     {
                       constraints.add_line(dof_indices.dof_indices[1]);
 
@@ -191,12 +194,14 @@ namespace VectorTools
           case 3:
             {
               if ((std::fabs(constraining_vector[0]) >=
-                   std::fabs(constraining_vector[1]) + 1e-10) &&
-                  (std::fabs(constraining_vector[0]) >=
-                   std::fabs(constraining_vector[2]) + 2e-10))
+                   std::fabs(constraining_vector[1]) + 1e-10)
+                    DEAL_II_AND(std::fabs(constraining_vector[0]) >=
+                                std::fabs(constraining_vector[2]) + 2e-10))
                 {
-                  if (!constraints.is_constrained(dof_indices.dof_indices[0]) &&
-                      constraints.can_store_line(dof_indices.dof_indices[0]))
+                  if (!constraints
+                         .is_constrained(dof_indices.dof_indices[0])
+                           DEAL_II_AND constraints.can_store_line(
+                             dof_indices.dof_indices[0]))
                     {
                       constraints.add_line(dof_indices.dof_indices[0]);
 
@@ -224,12 +229,14 @@ namespace VectorTools
                     }
                 }
               else if ((std::fabs(constraining_vector[1]) + 1e-10 >=
-                        std::fabs(constraining_vector[0])) &&
-                       (std::fabs(constraining_vector[1]) >=
-                        std::fabs(constraining_vector[2]) + 1e-10))
+                        std::fabs(constraining_vector[0]))
+                         DEAL_II_AND(std::fabs(constraining_vector[1]) >=
+                                     std::fabs(constraining_vector[2]) + 1e-10))
                 {
-                  if (!constraints.is_constrained(dof_indices.dof_indices[1]) &&
-                      constraints.can_store_line(dof_indices.dof_indices[1]))
+                  if (!constraints
+                         .is_constrained(dof_indices.dof_indices[1])
+                           DEAL_II_AND constraints.can_store_line(
+                             dof_indices.dof_indices[1]))
                     {
                       constraints.add_line(dof_indices.dof_indices[1]);
 
@@ -258,8 +265,10 @@ namespace VectorTools
                 }
               else
                 {
-                  if (!constraints.is_constrained(dof_indices.dof_indices[2]) &&
-                      constraints.can_store_line(dof_indices.dof_indices[2]))
+                  if (!constraints
+                         .is_constrained(dof_indices.dof_indices[2])
+                           DEAL_II_AND constraints.can_store_line(
+                             dof_indices.dof_indices[2]))
                     {
                       constraints.add_line(dof_indices.dof_indices[2]);
 
@@ -336,8 +345,10 @@ namespace VectorTools
       // terms of the one just found
       for (unsigned int d = 0; d < dim; ++d)
         if (d != largest_component)
-          if (!constraints.is_constrained(dof_indices.dof_indices[d]) &&
-              constraints.can_store_line(dof_indices.dof_indices[d]))
+          if (!constraints
+                 .is_constrained(dof_indices.dof_indices[d])
+                   DEAL_II_AND constraints.can_store_line(
+                     dof_indices.dof_indices[d]))
             {
               constraints.add_line(dof_indices.dof_indices[d]);
 
@@ -404,8 +415,8 @@ namespace VectorTools
               // with the average
               // tangent
               Tensor<1, dim> tmp = vector;
-              if ((std::fabs(tmp[0]) > std::fabs(tmp[1])) &&
-                  (std::fabs(tmp[0]) > std::fabs(tmp[2])))
+              if ((std::fabs(tmp[0]) > std::fabs(tmp[1]))
+                    DEAL_II_AND(std::fabs(tmp[0]) > std::fabs(tmp[2])))
                 {
                   // entry zero
                   // is the
@@ -417,8 +428,8 @@ namespace VectorTools
 
                   tmp[0] *= -1;
                 }
-              else if ((std::fabs(tmp[1]) > std::fabs(tmp[0])) &&
-                       (std::fabs(tmp[1]) > std::fabs(tmp[2])))
+              else if ((std::fabs(tmp[1]) > std::fabs(tmp[0]))
+                         DEAL_II_AND(std::fabs(tmp[1]) > std::fabs(tmp[2])))
                 {
                   // entry one
                   // is the
@@ -499,7 +510,8 @@ namespace VectorTools
         const std::vector<Point<dim - 1>> &unit_support_points =
           fe_collection[i].get_unit_face_support_points();
 
-        Assert(unit_support_points.size() == fe_collection[i].n_dofs_per_face(),
+        Assert(unit_support_points.size() DEAL_II_EQUALS fe_collection[i]
+                 .n_dofs_per_face(),
                ExcInternalError());
 
         face_quadrature_collection.push_back(
@@ -559,8 +571,8 @@ namespace VectorTools
               // then identify which of them correspond to the selected set of
               // vector components
               for (unsigned int i = 0; i < face_dofs.size(); ++i)
-                if (fe.face_system_to_component_index(i).first ==
-                    first_vector_component)
+                if (fe.face_system_to_component_index(i).first DEAL_II_EQUALS
+                                                               first_vector_component)
                   {
                     // find corresponding other components of vector
                     internal::VectorDoFTuple<dim> vector_dofs;
@@ -573,15 +585,18 @@ namespace VectorTools
                         "to define a normal direction."));
 
                     for (unsigned int k = 0; k < fe.n_dofs_per_face(); ++k)
-                      if ((k != i) &&
-                          (face_quadrature_collection[cell->active_fe_index()]
-                             .point(k) ==
-                           face_quadrature_collection[cell->active_fe_index()]
-                             .point(i)) &&
-                          (fe.face_system_to_component_index(k).first >=
-                           first_vector_component) &&
-                          (fe.face_system_to_component_index(k).first <
-                           first_vector_component + dim))
+                      if ((k != i) DEAL_II_AND(
+                            face_quadrature_collection[cell->active_fe_index()]
+                              .point(k)
+                                DEAL_II_EQUALS face_quadrature_collection
+                                  [cell->active_fe_index()]
+                              .point(i))
+                            DEAL_II_AND(
+                              fe.face_system_to_component_index(k).first >=
+                              first_vector_component)
+                              DEAL_II_AND(
+                                fe.face_system_to_component_index(k).first <
+                                first_vector_component + dim))
                         vector_dofs.dof_indices
                           [fe.face_system_to_component_index(k).first -
                            first_vector_component] = face_dofs[k];
@@ -690,7 +705,7 @@ namespace VectorTools
               same_dof_range[1] = p;
               break;
             }
-        if (p == dof_to_normals_map.end())
+        if (p DEAL_II_EQUALS dof_to_normals_map.end())
           same_dof_range[1] = dof_to_normals_map.end();
 
 #ifdef DEBUG_NO_NORMAL_FLUX
@@ -716,8 +731,9 @@ namespace VectorTools
         for (typename DoFToNormalsMap::const_iterator q = same_dof_range[0];
              q != same_dof_range[1];
              ++q)
-          if (cell_to_normals_map.find(q->second.second) ==
-              cell_to_normals_map.end())
+          if (cell_to_normals_map
+                .find(q->second.second)
+                  DEAL_II_EQUALS cell_to_normals_map.end())
             cell_to_normals_map[q->second.second] =
               std::make_pair(q->second.first, 1U);
           else
@@ -823,7 +839,8 @@ namespace VectorTools
             case dim:
               {
                 // assert that indeed only a single cell has contributed
-                Assert(cell_to_normals_map.size() == 1, ExcInternalError());
+                Assert(cell_to_normals_map.size() DEAL_II_EQUALS 1,
+                       ExcInternalError());
 
                 // check linear independence by computing the determinant of
                 // the matrix created from all the normal vectors. if they are
@@ -856,10 +873,11 @@ namespace VectorTools
                 const Vector<double> b_values =
                   dof_vector_to_b_values[dof_indices];
                 for (unsigned int i = 0; i < dim; ++i)
-                  if (!constraints.is_constrained(
-                        same_dof_range[0]->first.dof_indices[i]) &&
-                      constraints.can_store_line(
-                        same_dof_range[0]->first.dof_indices[i]))
+                  if (!constraints
+                         .is_constrained(
+                           same_dof_range[0]->first.dof_indices[i])
+                           DEAL_II_AND constraints.can_store_line(
+                             same_dof_range[0]->first.dof_indices[i]))
                     {
                       const types::global_dof_index line =
                         dof_indices.dof_indices[i];
@@ -878,7 +896,8 @@ namespace VectorTools
             default:
               {
                 Assert(dim >= 3, ExcNotImplemented());
-                Assert(max_n_contributions_per_cell == 2, ExcInternalError());
+                Assert(max_n_contributions_per_cell DEAL_II_EQUALS 2,
+                       ExcInternalError());
 
                 // as described in the documentation, let us first collect
                 // what each of the cells contributed at the current point. we
@@ -955,7 +974,7 @@ namespace VectorTools
                            t != contribution->second.end();
                            ++t, ++index)
                         normals[index] = *t;
-                      Assert(index == dim - 1, ExcInternalError());
+                      Assert(index DEAL_II_EQUALS dim - 1, ExcInternalError());
                     }
 
                     // calculate the tangent as the outer product of the
@@ -974,9 +993,10 @@ namespace VectorTools
                           // normals[1]. write it in the current form (with
                           // [dim-2]) to make sure that compilers don't warn
                           // about out-of-bounds accesses -- the warnings are
-                          // bogus since we get here only for dim==3, but at
-                          // least one isn't quite smart enough to notice this
-                          // and warns when compiling the function in 2d
+                          // bogus since we get here only for dimDEAL_II_EQUALS
+                          // 3, but at least one isn't quite smart enough to
+                          // notice this and warns when compiling the function
+                          // in 2d
                           tangent =
                             cross_product_3d(normals[0], normals[dim - 2]);
                           break;
@@ -1085,7 +1105,8 @@ namespace VectorTools
         const std::vector<Point<dim - 1>> &unit_support_points =
           fe_collection[i].get_unit_face_support_points();
 
-        Assert(unit_support_points.size() == fe_collection[i].n_dofs_per_face(),
+        Assert(unit_support_points.size() DEAL_II_EQUALS fe_collection[i]
+                 .n_dofs_per_face(),
                ExcInternalError());
 
         face_quadrature_collection.push_back(
@@ -1137,9 +1158,9 @@ namespace VectorTools
               for (unsigned int i = 0; i < fe.n_dofs_per_face(); ++i)
                 {
                   if (fe.face_system_to_component_index(i).first >=
-                        first_vector_component &&
-                      fe.face_system_to_component_index(i).first <
-                        first_vector_component + dim)
+                      first_vector_component DEAL_II_AND fe
+                        .face_system_to_component_index(i)
+                        .first < first_vector_component + dim)
                     {
                       const unsigned int component =
                         fe.face_system_to_component_index(i).first -
@@ -1230,7 +1251,7 @@ namespace VectorTools
               {
                 int index = -1;
                 for (unsigned int d = 0; d < dim; ++d)
-                  if (entry.first == dofs[d])
+                  if (entry.first DEAL_II_EQUALS dofs[d])
                     index = d;
                 Assert(index != -1, ExcInternalError());
                 normal[index] = entry.second;

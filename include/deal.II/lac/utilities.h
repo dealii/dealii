@@ -101,7 +101,8 @@ namespace Utilities
      * decomposition $H V_k=V_k T_k+f_k e_k^T$ where $V_k$ contains k Lanczos
      * basis, $V_k^TV_k=I_k$, $T_k$ is the tridiagonal Lanczos matrix, $f_k$ is
      * a residual vector $f_k^TV_k=0$, and $e_k$ is the k-th canonical basis of
-     * $R^k$. The returned value is $ ||T_k||_2 + ||f_k||_2$.
+     * $R^k$. The returned value is $ DEAL_II_OR T_kDEAL_II_OR _2 + DEAL_II_OR
+     * f_kDEAL_II_OR _2$.
      * If @p eigenvalues is not <code>nullptr</code>, the eigenvalues of $T_k$ will be written there.
      *
      * @p vector_memory is used to allocate memory for temporary vectors.
@@ -292,13 +293,13 @@ namespace Utilities
       // December 4, 2000.
       // Algorithm 4
       // We implement the latter below:
-      if (g == NumberType())
+      if (g DEAL_II_EQUALS NumberType())
         {
           res[0] = std::copysign(1., f);
           res[1] = NumberType();
           res[2] = std::abs(f);
         }
-      else if (f == NumberType())
+      else if (f DEAL_II_EQUALS NumberType())
         {
           res[0] = NumberType();
           res[1] = std::copysign(1., g);
@@ -382,11 +383,11 @@ namespace Utilities
           subdiagonal.push_back(b);
         }
 
-      Assert(diagonal.size() == k, ExcInternalError());
-      Assert(subdiagonal.size() == k - 1, ExcInternalError());
+      Assert(diagonal.size() DEAL_II_EQUALS k, ExcInternalError());
+      Assert(subdiagonal.size() DEAL_II_EQUALS k - 1, ExcInternalError());
 
-      // Use Lapack dstev to get ||T||_2 norm, i.e. the largest eigenvalue
-      // of T
+      // Use Lapack dstev to get DEAL_II_OR TDEAL_II_OR _2 norm, i.e. the
+      // largest eigenvalue of T
       const types::blas_int n = k;
       std::vector<double>   Z;       // unused for eigenvalues-only ("N") job
       const types::blas_int ldz = 1; // ^^   (>=1)
@@ -402,7 +403,7 @@ namespace Utilities
                                                    work.data(),
                                                    &info);
 
-      Assert(info == 0, LAPACKSupport::ExcErrorCode("dstev", info));
+      Assert(info DEAL_II_EQUALS 0, LAPACKSupport::ExcErrorCode("dstev", info));
 
       if (eigenvalues != nullptr)
         {
@@ -412,8 +413,8 @@ namespace Utilities
 
       // note that the largest eigenvalue of T is below the largest
       // eigenvalue of the operator.
-      // return ||T||_2 + ||f||_2, although it is not guaranteed to be an upper
-      // bound.
+      // return DEAL_II_OR TDEAL_II_OR _2 + DEAL_II_OR fDEAL_II_OR _2, although
+      // it is not guaranteed to be an upper bound.
       return diagonal[k - 1] + f->l2_norm();
     }
 
@@ -437,7 +438,7 @@ namespace Utilities
         ExcMessage(
           "Lower bound of the unwanted spectrum should be smaller than the upper bound."));
 
-      Assert(a_L <= a || a_L >= b || !scale,
+      Assert(a_L <= a DEAL_II_OR a_L >= b DEAL_II_OR !scale,
              ExcMessage(
                "Scaling point should be outside of the unwanted spectrum."));
 

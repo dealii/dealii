@@ -80,7 +80,7 @@ public:
    * Move constructor. Initialize a new object by stealing the internal data of
    * another BlockIndices object.
    */
-  BlockIndices(BlockIndices &&b) noexcept;
+  BlockIndices(BlockIndices DEAL_II_AND b) noexcept;
 
   /**
    * Copy constructor.
@@ -197,8 +197,7 @@ public:
    * Compare whether two objects are the same, i.e. whether the number of
    * blocks and the sizes of all blocks are equal.
    */
-  bool
-  operator==(const BlockIndices &b) const;
+  bool operator DEAL_II_EQUALS(const BlockIndices &b) const;
 
   /**
    * Swap the contents of these two objects.
@@ -305,7 +304,7 @@ inline BlockIndices::BlockIndices(const std::vector<size_type> &block_sizes)
 
 
 
-inline BlockIndices::BlockIndices(BlockIndices &&b) noexcept
+inline BlockIndices::BlockIndices(BlockIndices DEAL_II_AND b) noexcept
   : n_blocks(b.n_blocks)
   , start_indices(std::move(b.start_indices))
 {
@@ -330,7 +329,8 @@ BlockIndices::global_to_local(const size_type i) const
   AssertIndexRange(i, total_size());
   Assert(n_blocks > 0, ExcLowerRangeType<size_type>(i, size_type(1)));
 
-  // start_indices[0] == 0 so we might as well start from the next one
+  // start_indices[0] DEAL_II_EQUALS  0 so we might as well start from the next
+  // one
   const auto it =
     --std::upper_bound(++start_indices.begin(), start_indices.end(), i);
 
@@ -360,7 +360,7 @@ BlockIndices::size() const
 inline BlockIndices::size_type
 BlockIndices::total_size() const
 {
-  if (n_blocks == 0)
+  if (n_blocks DEAL_II_EQUALS 0)
     return 0;
   return start_indices[n_blocks];
 }
@@ -412,7 +412,7 @@ BlockIndices::operator=(const BlockIndices &b)
 
 
 inline BlockIndices &
-BlockIndices::operator=(BlockIndices &&b) noexcept
+BlockIndices::operator=(BlockIndices DEAL_II_AND b) noexcept
 {
   start_indices = std::move(b.start_indices);
   n_blocks      = b.n_blocks;
@@ -425,8 +425,7 @@ BlockIndices::operator=(BlockIndices &&b) noexcept
 
 
 
-inline bool
-BlockIndices::operator==(const BlockIndices &b) const
+inline bool BlockIndices::operator DEAL_II_EQUALS(const BlockIndices &b) const
 {
   if (n_blocks != b.n_blocks)
     return false;

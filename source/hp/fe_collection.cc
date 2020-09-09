@@ -52,9 +52,11 @@ namespace hp
                            *finite_elements[other_fe], codim);
 
         // If current_fe dominates, add it to the set.
-        if ((domination == FiniteElementDomination::this_element_dominates) ||
-            (domination == FiniteElementDomination::either_element_can_dominate
-             /*covers cases like {Q2,Q3,Q1,Q1} with fes={2,3}*/))
+        if ((domination DEAL_II_EQUALS
+                        FiniteElementDomination::this_element_dominates)
+              DEAL_II_OR(domination DEAL_II_EQUALS
+                                    FiniteElementDomination::either_element_can_dominate
+                         /*covers cases like {Q2,Q3,Q1,Q1} with fes={2,3}*/))
           dominating_fes.insert(current_fe);
       }
     return dominating_fes;
@@ -92,9 +94,11 @@ namespace hp
                            *finite_elements[other_fe], codim);
 
         // If current_fe is dominated, add it to the set.
-        if ((domination == FiniteElementDomination::other_element_dominates) ||
-            (domination == FiniteElementDomination::either_element_can_dominate
-             /*covers cases like {Q2,Q3,Q1,Q1} with fes={2,3}*/))
+        if ((domination DEAL_II_EQUALS
+                        FiniteElementDomination::other_element_dominates)
+              DEAL_II_OR(domination DEAL_II_EQUALS
+                                    FiniteElementDomination::either_element_can_dominate
+                         /*covers cases like {Q2,Q3,Q1,Q1} with fes={2,3}*/))
           dominated_fes.insert(current_fe);
       }
     return dominated_fes;
@@ -118,7 +122,7 @@ namespace hp
 
     // If the set of elements contains only a single element,
     // then this very element is considered to be the dominating one.
-    if (fes.size() == 1)
+    if (fes.size() DEAL_II_EQUALS 1)
       return *fes.begin();
 
     // There may also be others, in which case we'll check if any of these
@@ -136,9 +140,11 @@ namespace hp
                              *finite_elements[other_fe], codim);
 
         // If current_fe dominates, return its index.
-        if ((domination == FiniteElementDomination::this_element_dominates) ||
-            (domination == FiniteElementDomination::either_element_can_dominate
-             /*covers cases like {Q2,Q3,Q1,Q1} with fes={2,3}*/))
+        if ((domination DEAL_II_EQUALS
+                        FiniteElementDomination::this_element_dominates)
+              DEAL_II_OR(domination DEAL_II_EQUALS
+                                    FiniteElementDomination::either_element_can_dominate
+                         /*covers cases like {Q2,Q3,Q1,Q1} with fes={2,3}*/))
           return current_fe;
       }
 
@@ -164,7 +170,7 @@ namespace hp
 
     // If the set of elements contains only a single element,
     // then this very element is considered to be the dominated one.
-    if (fes.size() == 1)
+    if (fes.size() DEAL_II_EQUALS 1)
       return *fes.begin();
 
     // There may also be others, in which case we'll check if any of these
@@ -182,9 +188,11 @@ namespace hp
                              *finite_elements[other_fe], codim);
 
         // If current_fe is dominated, return its index.
-        if ((domination == FiniteElementDomination::other_element_dominates) ||
-            (domination == FiniteElementDomination::either_element_can_dominate
-             /*covers cases like {Q2,Q3,Q1,Q1} with fes={2,3}*/))
+        if ((domination DEAL_II_EQUALS
+                        FiniteElementDomination::other_element_dominates)
+              DEAL_II_OR(domination DEAL_II_EQUALS
+                                    FiniteElementDomination::either_element_can_dominate
+                         /*covers cases like {Q2,Q3,Q1,Q1} with fes={2,3}*/))
           return current_fe;
       }
 
@@ -202,7 +210,7 @@ namespace hp
   {
     unsigned int fe_index = find_dominating_fe(fes, codim);
 
-    if (fe_index == numbers::invalid_unsigned_int)
+    if (fe_index DEAL_II_EQUALS numbers::invalid_unsigned_int)
       {
         const std::set<unsigned int> dominating_fes =
           find_common_fes(fes, codim);
@@ -222,7 +230,7 @@ namespace hp
   {
     unsigned int fe_index = find_dominated_fe(fes, codim);
 
-    if (fe_index == numbers::invalid_unsigned_int)
+    if (fe_index DEAL_II_EQUALS numbers::invalid_unsigned_int)
       {
         const std::set<unsigned int> dominated_fes =
           find_enclosing_fes(fes, codim);
@@ -277,9 +285,10 @@ namespace hp
     // elements have already passed the test
     // against the first element
     if (finite_elements.size() != 0)
-      Assert(new_fe.n_components() == finite_elements[0]->n_components(),
-             ExcMessage("All elements inside a collection need to have the "
-                        "same number of vector components!"));
+      Assert(
+        new_fe.n_components() DEAL_II_EQUALS finite_elements[0]->n_components(),
+        ExcMessage("All elements inside a collection need to have the "
+                   "same number of vector components!"));
 
     finite_elements.push_back(new_fe.clone());
   }
@@ -358,7 +367,8 @@ namespace hp
     // but then also verify that the other elements of the collection
     // would return the same mask
     for (unsigned int c = 1; c < size(); ++c)
-      Assert(mask == (*this)[c].component_mask(scalar), ExcInternalError());
+      Assert(mask DEAL_II_EQUALS(*this)[c].component_mask(scalar),
+             ExcInternalError());
 
     return mask;
   }
@@ -378,7 +388,8 @@ namespace hp
     // but then also verify that the other elements of the collection
     // would return the same mask
     for (unsigned int c = 1; c < size(); ++c)
-      Assert(mask == (*this)[c].component_mask(vector), ExcInternalError());
+      Assert(mask DEAL_II_EQUALS(*this)[c].component_mask(vector),
+             ExcInternalError());
 
     return mask;
   }
@@ -398,7 +409,8 @@ namespace hp
     // but then also verify that the other elements of the collection
     // would return the same mask
     for (unsigned int c = 1; c < size(); ++c)
-      Assert(mask == (*this)[c].component_mask(sym_tensor), ExcInternalError());
+      Assert(mask DEAL_II_EQUALS(*this)[c].component_mask(sym_tensor),
+             ExcInternalError());
 
     return mask;
   }
@@ -417,7 +429,7 @@ namespace hp
     // but then also verify that the other elements of the collection
     // would return the same mask
     for (unsigned int c = 1; c < size(); ++c)
-      Assert(mask == (*this)[c].component_mask(block_mask),
+      Assert(mask DEAL_II_EQUALS(*this)[c].component_mask(block_mask),
              ExcMessage("Not all elements of this collection agree on what "
                         "the appropriate mask should be."));
 
@@ -439,7 +451,7 @@ namespace hp
     // but then also verify that the other elements of the collection
     // would return the same mask
     for (unsigned int c = 1; c < size(); ++c)
-      Assert(mask == (*this)[c].block_mask(scalar),
+      Assert(mask DEAL_II_EQUALS(*this)[c].block_mask(scalar),
              ExcMessage("Not all elements of this collection agree on what "
                         "the appropriate mask should be."));
 
@@ -461,7 +473,7 @@ namespace hp
     // but then also verify that the other elements of the collection
     // would return the same mask
     for (unsigned int c = 1; c < size(); ++c)
-      Assert(mask == (*this)[c].block_mask(vector),
+      Assert(mask DEAL_II_EQUALS(*this)[c].block_mask(vector),
              ExcMessage("Not all elements of this collection agree on what "
                         "the appropriate mask should be."));
 
@@ -483,7 +495,7 @@ namespace hp
     // but then also verify that the other elements of the collection
     // would return the same mask
     for (unsigned int c = 1; c < size(); ++c)
-      Assert(mask == (*this)[c].block_mask(sym_tensor),
+      Assert(mask DEAL_II_EQUALS(*this)[c].block_mask(sym_tensor),
              ExcMessage("Not all elements of this collection agree on what "
                         "the appropriate mask should be."));
 
@@ -506,7 +518,7 @@ namespace hp
     // but then also verify that the other elements of the collection
     // would return the same mask
     for (unsigned int c = 1; c < size(); ++c)
-      Assert(mask == (*this)[c].block_mask(component_mask),
+      Assert(mask DEAL_II_EQUALS(*this)[c].block_mask(component_mask),
              ExcMessage("Not all elements of this collection agree on what "
                         "the appropriate mask should be."));
 
@@ -523,7 +535,7 @@ namespace hp
 
     const unsigned int nb = finite_elements[0]->n_blocks();
     for (unsigned int i = 1; i < finite_elements.size(); ++i)
-      Assert(finite_elements[i]->n_blocks() == nb,
+      Assert(finite_elements[i]->n_blocks() DEAL_II_EQUALS nb,
              ExcMessage("Not all finite elements in this collection have "
                         "the same number of components."));
 

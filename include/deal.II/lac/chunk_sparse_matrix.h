@@ -349,11 +349,10 @@ namespace ChunkSparseMatrixIterators
     /**
      * Comparison. True, if both iterators point to the same matrix position.
      */
-    bool
-    operator==(const Iterator &) const;
+    bool operator DEAL_II_EQUALS(const Iterator &) const;
 
     /**
-     * Inverse of <tt>==</tt>.
+     * Inverse of <tt>DEAL_II_EQUALS </tt>.
      */
     bool
     operator!=(const Iterator &) const;
@@ -1458,7 +1457,7 @@ ChunkSparseMatrix<number>::compute_location(const size_type i,
   const size_type chunk_index =
     cols->sparsity_pattern(i / chunk_size, j / chunk_size);
 
-  if (chunk_index == ChunkSparsityPattern::invalid_entry)
+  if (chunk_index DEAL_II_EQUALS ChunkSparsityPattern::invalid_entry)
     return ChunkSparsityPattern::invalid_entry;
   else
     {
@@ -1480,7 +1479,8 @@ ChunkSparseMatrix<number>::set(const size_type i,
   // it is allowed to set elements of the matrix that are not part of the
   // sparsity pattern, if the value to which we set it is zero
   const size_type index = compute_location(i, j);
-  Assert((index != SparsityPattern::invalid_entry) || (value == 0.),
+  Assert((index != SparsityPattern::invalid_entry)
+           DEAL_II_OR(value DEAL_II_EQUALS 0.),
          ExcInvalidIndex(i, j));
 
   if (index != SparsityPattern::invalid_entry)
@@ -1615,7 +1615,7 @@ inline number
 ChunkSparseMatrix<number>::diag_element(const size_type i) const
 {
   Assert(cols != nullptr, ExcNotInitialized());
-  Assert(m() == n(), ExcNotQuadratic());
+  Assert(m() DEAL_II_EQUALS n(), ExcNotQuadratic());
   AssertIndexRange(i, m());
 
   // Use that the first element in each row of a quadratic matrix is the main
@@ -1634,7 +1634,7 @@ inline void
 ChunkSparseMatrix<number>::copy_from(const ForwardIterator begin,
                                      const ForwardIterator end)
 {
-  Assert(static_cast<size_type>(std::distance(begin, end)) == m(),
+  Assert(static_cast<size_type>(std::distance(begin, end)) DEAL_II_EQUALS m(),
          ExcIteratorRange(std::distance(begin, end), m()));
 
   // for use in the inner loop, we define an alias to the type of the inner
@@ -1890,10 +1890,10 @@ namespace ChunkSparseMatrixIterators
 
 
   template <typename number, bool Constness>
-  inline bool
-  Iterator<number, Constness>::operator==(const Iterator &other) const
+  inline bool Iterator<number, Constness>::
+              operator DEAL_II_EQUALS(const Iterator &other) const
   {
-    return (accessor == other.accessor);
+    return (accessor DEAL_II_EQUALS other.accessor);
   }
 
 
@@ -1901,7 +1901,7 @@ namespace ChunkSparseMatrixIterators
   inline bool
   Iterator<number, Constness>::operator!=(const Iterator &other) const
   {
-    return !(*this == other);
+    return !(*this DEAL_II_EQUALS other);
   }
 
 
@@ -1909,7 +1909,7 @@ namespace ChunkSparseMatrixIterators
   inline bool
   Iterator<number, Constness>::operator<(const Iterator &other) const
   {
-    Assert(&accessor.get_matrix() == &other.accessor.get_matrix(),
+    Assert(&accessor.get_matrix() DEAL_II_EQUALS & other.accessor.get_matrix(),
            ExcInternalError());
 
     return (accessor < other.accessor);
@@ -1928,7 +1928,7 @@ namespace ChunkSparseMatrixIterators
   inline int
   Iterator<number, Constness>::operator-(const Iterator &other) const
   {
-    Assert(&accessor.get_matrix() == &other.accessor.get_matrix(),
+    Assert(&accessor.get_matrix() DEAL_II_EQUALS & other.accessor.get_matrix(),
            ExcInternalError());
 
     // TODO: can be optimized

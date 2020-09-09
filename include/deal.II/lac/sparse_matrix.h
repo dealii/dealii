@@ -408,11 +408,10 @@ namespace SparseMatrixIterators
     /**
      * Comparison. True, if both iterators point to the same matrix position.
      */
-    bool
-    operator==(const Iterator &) const;
+    bool operator DEAL_II_EQUALS(const Iterator &) const;
 
     /**
-     * Inverse of <tt>==</tt>.
+     * Inverse of <tt>DEAL_II_EQUALS </tt>.
      */
     bool
     operator!=(const Iterator &) const;
@@ -475,9 +474,9 @@ namespace SparseMatrixIterators
  * The elements of a SparseMatrix are stored in the same order in which the
  * SparsityPattern class stores its entries. Within each row, elements are
  * generally stored left-to-right in increasing column index order; the
- * exception to this rule is that if the matrix is square (m() == n()), then
- * the diagonal entry is stored as the first element in each row to make
- * operations like applying a Jacobi or SSOR preconditioner faster. As a
+ * exception to this rule is that if the matrix is square (m() DEAL_II_EQUALS
+ * n()), then the diagonal entry is stored as the first element in each row to
+ * make operations like applying a Jacobi or SSOR preconditioner faster. As a
  * consequence, if you traverse the elements of a row of a SparseMatrix with
  * the help of iterators into this object (using SparseMatrix::begin and
  * SparseMatrix::end) you will find that the elements are not sorted by column
@@ -579,7 +578,7 @@ public:
    * Move construction allows an object to be returned from a function or
    * packed into a tuple even when the class cannot be copy-constructed.
    */
-  SparseMatrix(SparseMatrix<number> &&m) noexcept;
+  SparseMatrix(SparseMatrix<number> DEAL_II_AND m) noexcept;
 
   /**
    * Constructor. Takes the given matrix sparsity structure to represent the
@@ -627,7 +626,7 @@ public:
    * @p m by transferring the internal data of @p m.
    */
   SparseMatrix<number> &
-  operator=(SparseMatrix<number> &&m) noexcept;
+  operator=(SparseMatrix<number> DEAL_II_AND m) noexcept;
 
   /**
    * Copy operator: initialize the matrix with the identity matrix. This
@@ -1786,9 +1785,10 @@ SparseMatrix<number>::set(const size_type i,
 
   // it is allowed to set elements of the matrix that are not part of the
   // sparsity pattern, if the value to which we set it is zero
-  if (index == SparsityPattern::invalid_entry)
+  if (index DEAL_II_EQUALS SparsityPattern::invalid_entry)
     {
-      Assert((index != SparsityPattern::invalid_entry) || (value == number()),
+      Assert((index != SparsityPattern::invalid_entry)
+               DEAL_II_OR(value DEAL_II_EQUALS number()),
              ExcInvalidIndex(i, j));
       return;
     }
@@ -1805,9 +1805,9 @@ SparseMatrix<number>::set(const std::vector<size_type> &indices,
                           const FullMatrix<number2> &   values,
                           const bool                    elide_zero_values)
 {
-  Assert(indices.size() == values.m(),
+  Assert(indices.size() DEAL_II_EQUALS values.m(),
          ExcDimensionMismatch(indices.size(), values.m()));
-  Assert(values.m() == values.n(), ExcNotQuadratic());
+  Assert(values.m() DEAL_II_EQUALS values.n(), ExcNotQuadratic());
 
   for (size_type i = 0; i < indices.size(); ++i)
     set(indices[i],
@@ -1827,9 +1827,9 @@ SparseMatrix<number>::set(const std::vector<size_type> &row_indices,
                           const FullMatrix<number2> &   values,
                           const bool                    elide_zero_values)
 {
-  Assert(row_indices.size() == values.m(),
+  Assert(row_indices.size() DEAL_II_EQUALS values.m(),
          ExcDimensionMismatch(row_indices.size(), values.m()));
-  Assert(col_indices.size() == values.n(),
+  Assert(col_indices.size() DEAL_II_EQUALS values.n(),
          ExcDimensionMismatch(col_indices.size(), values.n()));
 
   for (size_type i = 0; i < row_indices.size(); ++i)
@@ -1850,7 +1850,7 @@ SparseMatrix<number>::set(const size_type               row,
                           const std::vector<number2> &  values,
                           const bool                    elide_zero_values)
 {
-  Assert(col_indices.size() == values.size(),
+  Assert(col_indices.size() DEAL_II_EQUALS values.size(),
          ExcDimensionMismatch(col_indices.size(), values.size()));
 
   set(row,
@@ -1870,16 +1870,17 @@ SparseMatrix<number>::add(const size_type i,
 {
   AssertIsFinite(value);
 
-  if (value == number())
+  if (value DEAL_II_EQUALS number())
     return;
 
   const size_type index = cols->operator()(i, j);
 
   // it is allowed to add elements to the matrix that are not part of the
   // sparsity pattern, if the value to which we set it is zero
-  if (index == SparsityPattern::invalid_entry)
+  if (index DEAL_II_EQUALS SparsityPattern::invalid_entry)
     {
-      Assert((index != SparsityPattern::invalid_entry) || (value == number()),
+      Assert((index != SparsityPattern::invalid_entry)
+               DEAL_II_OR(value DEAL_II_EQUALS number()),
              ExcInvalidIndex(i, j));
       return;
     }
@@ -1896,9 +1897,9 @@ SparseMatrix<number>::add(const std::vector<size_type> &indices,
                           const FullMatrix<number2> &   values,
                           const bool                    elide_zero_values)
 {
-  Assert(indices.size() == values.m(),
+  Assert(indices.size() DEAL_II_EQUALS values.m(),
          ExcDimensionMismatch(indices.size(), values.m()));
-  Assert(values.m() == values.n(), ExcNotQuadratic());
+  Assert(values.m() DEAL_II_EQUALS values.n(), ExcNotQuadratic());
 
   for (size_type i = 0; i < indices.size(); ++i)
     add(indices[i],
@@ -1918,9 +1919,9 @@ SparseMatrix<number>::add(const std::vector<size_type> &row_indices,
                           const FullMatrix<number2> &   values,
                           const bool                    elide_zero_values)
 {
-  Assert(row_indices.size() == values.m(),
+  Assert(row_indices.size() DEAL_II_EQUALS values.m(),
          ExcDimensionMismatch(row_indices.size(), values.m()));
-  Assert(col_indices.size() == values.n(),
+  Assert(col_indices.size() DEAL_II_EQUALS values.n(),
          ExcDimensionMismatch(col_indices.size(), values.n()));
 
   for (size_type i = 0; i < row_indices.size(); ++i)
@@ -1941,7 +1942,7 @@ SparseMatrix<number>::add(const size_type               row,
                           const std::vector<number2> &  values,
                           const bool                    elide_zero_values)
 {
-  Assert(col_indices.size() == values.size(),
+  Assert(col_indices.size() DEAL_II_EQUALS values.size(),
          ExcDimensionMismatch(col_indices.size(), values.size()));
 
   add(row,
@@ -2036,7 +2037,7 @@ inline number
 SparseMatrix<number>::diag_element(const size_type i) const
 {
   Assert(cols != nullptr, ExcNotInitialized());
-  Assert(m() == n(), ExcNotQuadratic());
+  Assert(m() DEAL_II_EQUALS n(), ExcNotQuadratic());
   AssertIndexRange(i, m());
 
   // Use that the first element in each row of a quadratic matrix is the main
@@ -2051,7 +2052,7 @@ inline number &
 SparseMatrix<number>::diag_element(const size_type i)
 {
   Assert(cols != nullptr, ExcNotInitialized());
-  Assert(m() == n(), ExcNotQuadratic());
+  Assert(m() DEAL_II_EQUALS n(), ExcNotQuadratic());
   AssertIndexRange(i, m());
 
   // Use that the first element in each row of a quadratic matrix is the main
@@ -2067,7 +2068,7 @@ void
 SparseMatrix<number>::copy_from(const ForwardIterator begin,
                                 const ForwardIterator end)
 {
-  Assert(static_cast<size_type>(std::distance(begin, end)) == m(),
+  Assert(static_cast<size_type>(std::distance(begin, end)) DEAL_II_EQUALS m(),
          ExcIteratorRange(std::distance(begin, end), m()));
 
   // for use in the inner loop, we define an alias to the type of the inner
@@ -2318,10 +2319,10 @@ namespace SparseMatrixIterators
 
 
   template <typename number, bool Constness>
-  inline bool
-  Iterator<number, Constness>::operator==(const Iterator &other) const
+  inline bool Iterator<number, Constness>::
+              operator DEAL_II_EQUALS(const Iterator &other) const
   {
-    return (accessor == other.accessor);
+    return (accessor DEAL_II_EQUALS other.accessor);
   }
 
 
@@ -2329,7 +2330,7 @@ namespace SparseMatrixIterators
   inline bool
   Iterator<number, Constness>::operator!=(const Iterator &other) const
   {
-    return !(*this == other);
+    return !(*this DEAL_II_EQUALS other);
   }
 
 
@@ -2337,7 +2338,7 @@ namespace SparseMatrixIterators
   inline bool
   Iterator<number, Constness>::operator<(const Iterator &other) const
   {
-    Assert(&accessor.get_matrix() == &other.accessor.get_matrix(),
+    Assert(&accessor.get_matrix() DEAL_II_EQUALS & other.accessor.get_matrix(),
            ExcInternalError());
 
     return (accessor < other.accessor);
@@ -2356,7 +2357,7 @@ namespace SparseMatrixIterators
   inline int
   Iterator<number, Constness>::operator-(const Iterator &other) const
   {
-    Assert(&accessor.get_matrix() == &other.accessor.get_matrix(),
+    Assert(&accessor.get_matrix() DEAL_II_EQUALS & other.accessor.get_matrix(),
            ExcInternalError());
 
     return (*this)->linear_index - other->linear_index;
@@ -2472,14 +2473,14 @@ SparseMatrix<number>::print(StreamType &out,
     {
       for (size_type j = cols->rowstart[i]; j < cols->rowstart[i + 1]; ++j)
         {
-          if (!diagonal_first && i == cols->colnums[j])
+          if (!diagonal_first DEAL_II_AND i DEAL_II_EQUALS cols->colnums[j])
             {
               diagonal         = val[j];
               hanging_diagonal = true;
             }
           else
             {
-              if (hanging_diagonal && cols->colnums[j] > i)
+              if (hanging_diagonal DEAL_II_AND cols->colnums[j] > i)
                 {
                   if (across)
                     out << ' ' << i << ',' << i << ':' << diagonal;

@@ -194,8 +194,8 @@ SolverFIRE<VectorType>::AdditionalData::AdditionalData(
   , maximum_timestep(maximum_timestep)
   , maximum_linfty_norm(maximum_linfty_norm)
 {
-  AssertThrow(initial_timestep > 0. && maximum_timestep > 0. &&
-                maximum_linfty_norm > 0.,
+  AssertThrow(initial_timestep > 0. DEAL_II_AND maximum_timestep >
+                0. DEAL_II_AND                  maximum_linfty_norm > 0.,
               ExcMessage("Expected positive values for initial_timestep, "
                          "maximum_timestep and maximum_linfty_norm but one "
                          "or more of the these values are not positive."));
@@ -272,7 +272,7 @@ SolverFIRE<VectorType>::solve(
 
   unsigned int previous_iter_with_positive_v_dot_g = 0;
 
-  while (conv == SolverControl::iterate)
+  while (conv DEAL_II_EQUALS SolverControl::iterate)
     {
       ++iter;
       // Euler integration step.

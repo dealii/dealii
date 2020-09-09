@@ -143,7 +143,7 @@ namespace internal
     inline Tensor<order, dim>
     compute_derivative(const unsigned int, const Point<dim> &)
     {
-      Assert(dim == 2, ExcNotImplemented());
+      Assert(dim DEAL_II_EQUALS 2, ExcNotImplemented());
       return Tensor<order, dim>();
     }
 
@@ -161,22 +161,22 @@ namespace internal
             {
               Tensor<1, dim> &grad =
                 *reinterpret_cast<Tensor<1, dim> *>(&derivative);
-              if (i == 0)
+              if (i DEAL_II_EQUALS 0)
                 {
                   grad[0] = -2.5 + 3 * p(0);
                   grad[1] = 1.5 - 3 * p(1);
                 }
-              else if (i == 1)
+              else if (i DEAL_II_EQUALS 1)
                 {
                   grad[0] = -0.5 + 3.0 * p(0);
                   grad[1] = 1.5 - 3.0 * p(1);
                 }
-              else if (i == 2)
+              else if (i DEAL_II_EQUALS 2)
                 {
                   grad[0] = 1.5 - 3.0 * p(0);
                   grad[1] = -2.5 + 3.0 * p(1);
                 }
-              else if (i == 3)
+              else if (i DEAL_II_EQUALS 3)
                 {
                   grad[0] = 1.5 - 3.0 * p(0);
                   grad[1] = -0.5 + 3.0 * p(1);
@@ -191,28 +191,28 @@ namespace internal
             {
               Tensor<2, dim> &grad_grad =
                 *reinterpret_cast<Tensor<2, dim> *>(&derivative);
-              if (i == 0)
+              if (i DEAL_II_EQUALS 0)
                 {
                   grad_grad[0][0] = 3;
                   grad_grad[0][1] = 0;
                   grad_grad[1][0] = 0;
                   grad_grad[1][1] = -3;
                 }
-              else if (i == 1)
+              else if (i DEAL_II_EQUALS 1)
                 {
                   grad_grad[0][0] = 3;
                   grad_grad[0][1] = 0;
                   grad_grad[1][0] = 0;
                   grad_grad[1][1] = -3;
                 }
-              else if (i == 2)
+              else if (i DEAL_II_EQUALS 2)
                 {
                   grad_grad[0][0] = -3;
                   grad_grad[0][1] = 0;
                   grad_grad[1][0] = 0;
                   grad_grad[1][1] = 3;
                 }
-              else if (i == 3)
+              else if (i DEAL_II_EQUALS 3)
                 {
                   grad_grad[0][0] = -3;
                   grad_grad[0][1] = 0;

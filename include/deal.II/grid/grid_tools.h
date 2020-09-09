@@ -622,10 +622,10 @@ namespace GridTools
    * Consider the following grid:
    * @image html remove_hanging_nodes-hanging.png
    *
-   * @p isotropic == @p false would return:
+   * @p isotropic DEAL_II_EQUALS  @p false would return:
    * @image html remove_hanging_nodes-aniso.png
    *
-   * @p isotropic == @p true would return:
+   * @p isotropic DEAL_II_EQUALS  @p true would return:
    * @image html remove_hanging_nodes-isotro.png
    *
    * @param[in,out] tria Triangulation to refine.
@@ -636,7 +636,7 @@ namespace GridTools
    * @param[in] max_iterations At each step only closest cells to hanging nodes
    * are refined. The code may require a lot of iterations to remove all
    * hanging nodes. @p max_iterations is the maximum number of iteration
-   * allowed. If @p max_iterations == numbers::invalid_unsigned_int this
+   * allowed. If @p max_iterations DEAL_II_EQUALS  numbers::invalid_unsigned_int this
    * function continues refining until there are no hanging nodes.
    *
    * @note In the case of parallel codes, this function should be combined
@@ -991,7 +991,7 @@ namespace GridTools
    * auto all_vertices = tria.get_vertices();
    *
    * for(const auto &id_and_v : used_vertices)
-   *   all_vertices[id_and_v.first] == id_and_v.second; // true
+   *   all_vertices[id_and_v.first] DEAL_II_EQUALS  id_and_v.second; // true
    * @endcode
    *
    * Notice that the above is not satisfied for mappings that change the
@@ -1456,7 +1456,7 @@ namespace GridTools
    * bool
    * pred_mat_id(const typename Triangulation<dim>::active_cell_iterator & cell)
    * {
-   *   return cell->material_id() ==  1;
+   *   return cell->material_id() DEAL_II_EQUALS   1;
    * }
    * @endcode
    * and we can then extract the layer of cells around this material with the
@@ -2800,7 +2800,7 @@ namespace GridTools
     const std::function<types::manifold_id(
       const std::set<types::manifold_id> &)> &disambiguation_function =
       [](const std::set<types::manifold_id> &manifold_ids) {
-        if (manifold_ids.size() == 1)
+        if (manifold_ids.size() DEAL_II_EQUALS 1)
           return *manifold_ids.begin();
         else
           return numbers::flat_manifold_id;
@@ -3199,7 +3199,7 @@ namespace GridTools
       endc = triangulation.end();
     for (; cell != endc; ++cell)
       for (const unsigned int v : cell->vertex_indices())
-        if (treated_vertices[cell->vertex_index(v)] == false)
+        if (treated_vertices[cell->vertex_index(v)] DEAL_II_EQUALS false)
           {
             // transform this vertex
             cell->vertex(v) = predicate(cell->vertex(v));
@@ -3209,18 +3209,19 @@ namespace GridTools
 
 
     // now fix any vertices on hanging nodes so that we don't create any holes
-    if (dim == 2)
+    if (dim DEAL_II_EQUALS 2)
       {
         typename Triangulation<dim, spacedim>::active_cell_iterator
           cell = triangulation.begin_active(),
           endc = triangulation.end();
         for (; cell != endc; ++cell)
           for (const unsigned int face : cell->face_indices())
-            if (cell->face(face)->has_children() &&
-                !cell->face(face)->at_boundary())
+            if (cell->face(face)
+                  ->has_children() DEAL_II_AND !cell->face(face)
+                  ->at_boundary())
               {
-                Assert(cell->reference_cell_type() ==
-                         ReferenceCell::get_hypercube(dim),
+                Assert(cell->reference_cell_type()
+                         DEAL_II_EQUALS ReferenceCell::get_hypercube(dim),
                        ExcNotImplemented());
 
                 // this line has children
@@ -3229,18 +3230,19 @@ namespace GridTools
                   2;
               }
       }
-    else if (dim == 3)
+    else if (dim DEAL_II_EQUALS 3)
       {
         typename Triangulation<dim, spacedim>::active_cell_iterator
           cell = triangulation.begin_active(),
           endc = triangulation.end();
         for (; cell != endc; ++cell)
           for (const unsigned int face : cell->face_indices())
-            if (cell->face(face)->has_children() &&
-                !cell->face(face)->at_boundary())
+            if (cell->face(face)
+                  ->has_children() DEAL_II_AND !cell->face(face)
+                  ->at_boundary())
               {
-                Assert(cell->reference_cell_type() ==
-                         ReferenceCell::get_hypercube(dim),
+                Assert(cell->reference_cell_type()
+                         DEAL_II_EQUALS ReferenceCell::get_hypercube(dim),
                        ExcNotImplemented());
 
                 // this face has hanging nodes
@@ -3307,7 +3309,7 @@ namespace GridTools
     for (const unsigned int n : cell->face_indices())
       if (!cell->at_boundary(n))
         {
-          if (MeshType::dimension == 1)
+          if (MeshType::dimension DEAL_II_EQUALS 1)
             {
               // check children of neighbor. note
               // that in 1d children of the neighbor
@@ -3319,9 +3321,11 @@ namespace GridTools
               if (!neighbor_child->is_active())
                 {
                   while (neighbor_child->has_children())
-                    neighbor_child = neighbor_child->child(n == 0 ? 1 : 0);
+                    neighbor_child =
+                      neighbor_child->child(n DEAL_II_EQUALS 0 ? 1 : 0);
 
-                  Assert(neighbor_child->neighbor(n == 0 ? 1 : 0) == cell,
+                  Assert(neighbor_child->neighbor(n DEAL_II_EQUALS 0 ? 1 : 0)
+                           DEAL_II_EQUALS cell,
                          ExcInternalError());
                 }
               active_neighbors.push_back(neighbor_child);
@@ -3457,9 +3461,9 @@ namespace GridTools
         const double                                                 step,
         const F &                                                    f)
       {
-        Assert(row_n < GeometryInfo<structdim>::vertices_per_cell &&
-                 dependent_direction <
-                   GeometryInfo<structdim>::vertices_per_cell,
+        Assert(row_n < GeometryInfo<structdim>::vertices_per_cell DEAL_II_AND
+                                                                  dependent_direction <
+                 GeometryInfo<structdim>::vertices_per_cell,
                ExcMessage("This function assumes that the last weight is a "
                           "dependent variable (and hence we cannot take its "
                           "derivative directly)."));
@@ -3488,27 +3492,28 @@ namespace GridTools
       project_to_d_linear_object(const Iterator &       object,
                                  const Point<spacedim> &trial_point)
       {
-        // let's look at this for simplicity for a quad (structdim==2) in a
-        // space with spacedim>2 (notate trial_point by y): all points on the
-        // surface are given by
+        // let's look at this for simplicity for a quad (structdimDEAL_II_EQUALS
+        // 2) in a space with spacedim>2 (notate trial_point by y): all points
+        // on the surface are given by
         //   x(\xi) = sum_i v_i phi_x(\xi)
         // where v_i are the vertices of the quad, and \xi=(\xi_1,\xi_2) are the
         // reference coordinates of the quad. so what we are trying to do is
         // find a point x on the surface that is closest to the point y. there
         // are different ways to solve this problem, but in the end it's a
         // nonlinear problem and we have to find reference coordinates \xi so
-        // that J(\xi) = 1/2 || x(\xi)-y ||^2 is minimal. x(\xi) is a function
-        // that is structdim-linear in \xi, so J(\xi) is a polynomial of degree
-        // 2*structdim that we'd like to minimize. unless structdim==1, we'll
-        // have to use a Newton method to find the answer. This leads to the
-        // following formulation of Newton steps:
+        // that J(\xi) = 1/2 DEAL_II_OR  x(\xi)-y DEAL_II_OR ^2 is minimal.
+        // x(\xi) is a function that is structdim-linear in \xi, so J(\xi) is a
+        // polynomial of degree 2*structdim that we'd like to minimize. unless
+        // structdimDEAL_II_EQUALS 1, we'll have to use a Newton method to find
+        // the answer. This leads to the following formulation of Newton steps:
         //
         // Given \xi_k, find \delta\xi_k so that
         //   H_k \delta\xi_k = - F_k
         // where H_k is an approximation to the second derivatives of J at
         // \xi_k, and F_k is the first derivative of J.  We'll iterate this a
         // number of times until the right hand side is small enough. As a
-        // stopping criterion, we terminate if ||\delta\xi||<eps.
+        // stopping criterion, we terminate if DEAL_II_OR \delta\xiDEAL_II_OR
+        // <eps.
         //
         // As for the Hessian, the best choice would be
         //   H_k = J''(\xi_k)
@@ -3591,7 +3596,7 @@ namespace GridTools
       for (unsigned int i = 0; i < n_vertices_per_cell; ++i)
         {
           copied_weights[i] = v[i];
-          if (v[i] < 0.0 || v[i] > 1.0)
+          if (v[i]<0.0 DEAL_II_OR v[i]> 1.0)
             return false;
         }
 
@@ -3616,7 +3621,7 @@ namespace GridTools
 
     if (structdim >= spacedim)
       return projected_point;
-    else if (structdim == 1 || structdim == 2)
+    else if (structdim DEAL_II_EQUALS 1 DEAL_II_OR structdim DEAL_II_EQUALS 2)
       {
         using namespace internal::ProjectToObject;
         // Try to use the special flat algorithm for quads (this is better
@@ -3625,8 +3630,8 @@ namespace GridTools
         // lines below anyway:
         const int                      dim = Iterator::AccessorType::dimension;
         const Manifold<dim, spacedim> &manifold = object->get_manifold();
-        if (structdim == 2 && dynamic_cast<const FlatManifold<dim, spacedim> *>(
-                                &manifold) != nullptr)
+        if (structdim DEAL_II_EQUALS 2 DEAL_II_AND dynamic_cast<
+              const FlatManifold<dim, spacedim> *>(&manifold) != nullptr)
           {
             projected_point =
               project_to_d_linear_object<Iterator, spacedim, structdim>(
@@ -3702,7 +3707,7 @@ namespace GridTools
               {
                 const double distance =
                   vertices[vertex_n].distance(trial_point);
-                if (distance == 0.0)
+                if (distance DEAL_II_EQUALS 0.0)
                   {
                     guess_weights           = 0.0;
                     guess_weights[vertex_n] = 1.0;
@@ -3787,7 +3792,7 @@ namespace GridTools
 
                     // avoid division by zero. Note that we limit the gradient
                     // weight below
-                    if (std::abs(update_denominator) == 0.0)
+                    if (std::abs(update_denominator) DEAL_II_EQUALS 0.0)
                       break;
                     gradient_weight =
                       gradient_weight - update_numerator / update_denominator;
@@ -3824,8 +3829,8 @@ namespace GridTools
                               (tentative_weights[i] / current_gradient[i]) *
                               current_gradient;
                           }
-                        if (tentative_weights[i] < 0.0 ||
-                            1.0 < tentative_weights[i])
+                        if (tentative_weights[i] < 0.0 DEAL_II_OR 1.0 <
+                            tentative_weights[i])
                           {
                             new_gradient_weight /= 2.0;
                             tentative_weights =
@@ -3856,10 +3861,10 @@ namespace GridTools
             projected_point = get_point_from_weights(guess_weights);
           }
 
-        // if structdim == 2 and the optimal point is not on the interior then
-        // we may be able to get a more accurate result by projecting onto the
-        // lines.
-        if (structdim == 2)
+        // if structdim DEAL_II_EQUALS  2 and the optimal point is not on the
+        // interior then we may be able to get a more accurate result by
+        // projecting onto the lines.
+        if (structdim DEAL_II_EQUALS 2)
           {
             std::array<Point<spacedim>, GeometryInfo<structdim>::lines_per_cell>
               line_projections;
@@ -3898,7 +3903,7 @@ namespace GridTools
   CellDataTransferBuffer<dim, T>::save(Archive &ar,
                                        const unsigned int /*version*/) const
   {
-    Assert(cell_ids.size() == data.size(),
+    Assert(cell_ids.size() DEAL_II_EQUALS data.size(),
            ExcDimensionMismatch(cell_ids.size(), data.size()));
     // archive the cellids in an efficient binary format
     const std::size_t n_cells = cell_ids.size();
@@ -3991,7 +3996,7 @@ namespace GridTools
             cell->id().template to_binary<spacedim>());
       });
 
-      Assert(ghost_owners.size() == neighbor_cell_list.size(),
+      Assert(ghost_owners.size() DEAL_II_EQUALS neighbor_cell_list.size(),
              ExcInternalError());
 
 
@@ -4050,7 +4055,7 @@ namespace GridTools
           int len;
           ierr = MPI_Get_count(&status, MPI_BYTE, &len);
           AssertThrowMPI(ierr);
-          Assert(len % sizeof(cell_data_to_send[idx][0]) == 0,
+          Assert(len % sizeof(cell_data_to_send[idx][0]) DEAL_II_EQUALS 0,
                  ExcInternalError());
 
           const unsigned int n_cells =
@@ -4244,8 +4249,8 @@ namespace GridTools
       [&](const auto &process) {
         for (const auto &cell : mesh.cell_iterators())
           if (cell->level_subdomain_id() !=
-                dealii::numbers::artificial_subdomain_id &&
-              !cell->is_locally_owned_on_level())
+              dealii::numbers::artificial_subdomain_id DEAL_II_AND !cell
+                ->is_locally_owned_on_level())
             process(cell, cell->level_subdomain_id());
       },
       [](const auto &tria) { return tria.level_ghost_owners(); });

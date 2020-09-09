@@ -89,15 +89,16 @@ namespace internal
 
                       Assert(f * fe.n_dofs_per_face(f) + j < face_sign.size(),
                              ExcInternalError());
-                      Assert(mapping_kind.size() == 1 ||
-                               cell_j < mapping_kind.size(),
+                      Assert(mapping_kind.size()
+                                 DEAL_II_EQUALS 1 DEAL_II_OR cell_j <
+                               mapping_kind.size(),
                              ExcInternalError());
 
                       // TODO: This is probably only going to work for those
                       // elements for which all dofs are face dofs
-                      if ((mapping_kind.size() > 1 ?
-                             mapping_kind[cell_j] :
-                             mapping_kind[0]) == mapping_raviart_thomas)
+                      if ((mapping_kind.size() > 1 ? mapping_kind[cell_j] :
+                                                     mapping_kind[0])
+                            DEAL_II_EQUALS mapping_raviart_thomas)
                         face_sign[f * fe.n_dofs_per_face(f) + j] = -1.0;
                     }
               }
@@ -156,8 +157,8 @@ namespace internal
         // TODO: This is probably only going to work for those elements for
         // which all dofs are face dofs
         for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
-          if (!(cell->line_orientation(l)) &&
-              mapping_kind[0] == mapping_nedelec)
+          if (!(cell->line_orientation(
+                l))DEAL_II_AND mapping_kind[0] DEAL_II_EQUALS mapping_nedelec)
             face_sign[l] = -1.0;
       }
     } // namespace
@@ -206,7 +207,7 @@ template <int dim, int spacedim>
 bool
 FE_PolyTensor<dim, spacedim>::single_mapping_kind() const
 {
-  return mapping_kind.size() == 1;
+  return mapping_kind.size() DEAL_II_EQUALS 1;
 }
 
 
@@ -248,7 +249,7 @@ FE_PolyTensor<dim, spacedim>::shape_value_component(
 
   std::lock_guard<std::mutex> lock(cache_mutex);
 
-  if (cached_point != p || cached_values.size() == 0)
+  if (cached_point != p DEAL_II_OR cached_values.size() DEAL_II_EQUALS 0)
     {
       cached_point = p;
       cached_values.resize(poly_space->n());
@@ -260,7 +261,7 @@ FE_PolyTensor<dim, spacedim>::shape_value_component(
     }
 
   double s = 0;
-  if (inverse_node_matrix.n_cols() == 0)
+  if (inverse_node_matrix.n_cols() DEAL_II_EQUALS 0)
     return cached_values[i][component];
   else
     for (unsigned int j = 0; j < inverse_node_matrix.n_cols(); ++j)
@@ -293,7 +294,7 @@ FE_PolyTensor<dim, spacedim>::shape_grad_component(
 
   std::lock_guard<std::mutex> lock(cache_mutex);
 
-  if (cached_point != p || cached_grads.size() == 0)
+  if (cached_point != p DEAL_II_OR cached_grads.size() DEAL_II_EQUALS 0)
     {
       cached_point = p;
       cached_grads.resize(poly_space->n());
@@ -305,7 +306,7 @@ FE_PolyTensor<dim, spacedim>::shape_grad_component(
     }
 
   Tensor<1, dim> s;
-  if (inverse_node_matrix.n_cols() == 0)
+  if (inverse_node_matrix.n_cols() DEAL_II_EQUALS 0)
     return cached_grads[i][component];
   else
     for (unsigned int j = 0; j < inverse_node_matrix.n_cols(); ++j)
@@ -339,7 +340,7 @@ FE_PolyTensor<dim, spacedim>::shape_grad_grad_component(
 
   std::lock_guard<std::mutex> lock(cache_mutex);
 
-  if (cached_point != p || cached_grad_grads.size() == 0)
+  if (cached_point != p DEAL_II_OR cached_grad_grads.size() DEAL_II_EQUALS 0)
     {
       cached_point = p;
       cached_grad_grads.resize(poly_space->n());
@@ -351,7 +352,7 @@ FE_PolyTensor<dim, spacedim>::shape_grad_grad_component(
     }
 
   Tensor<2, dim> s;
-  if (inverse_node_matrix.n_cols() == 0)
+  if (inverse_node_matrix.n_cols() DEAL_II_EQUALS 0)
     return cached_grad_grads[i][component];
   else
     for (unsigned int j = 0; j < inverse_node_matrix.n_cols(); ++j)
@@ -391,12 +392,12 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
 
   const unsigned int n_q_points = quadrature.size();
 
-  Assert(!(fe_data.update_each & update_values) ||
-           fe_data.shape_values.size()[0] == this->n_dofs_per_cell(),
+  Assert(!(fe_data.update_each & update_values) DEAL_II_OR fe_data.shape_values
+            .size()[0] DEAL_II_EQUALS this->n_dofs_per_cell(),
          ExcDimensionMismatch(fe_data.shape_values.size()[0],
                               this->n_dofs_per_cell()));
-  Assert(!(fe_data.update_each & update_values) ||
-           fe_data.shape_values.size()[1] == n_q_points,
+  Assert(!(fe_data.update_each & update_values)
+            DEAL_II_OR fe_data.shape_values.size()[1] DEAL_II_EQUALS n_q_points,
          ExcDimensionMismatch(fe_data.shape_values.size()[1], n_q_points));
 
   // Create table with sign changes, due to the special structure of the RT
@@ -433,11 +434,12 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
       // the previous one; or, even if it is a translation, if we use mappings
       // other than the standard mappings that require us to recompute values
       // and derivatives because of possible sign changes
-      if (fe_data.update_each & update_values &&
-          ((cell_similarity != CellSimilarity::translation) ||
-           ((mapping_kind == mapping_piola) ||
-            (mapping_kind == mapping_raviart_thomas) ||
-            (mapping_kind == mapping_nedelec))))
+      if (fe_data.update_each &
+          update_values DEAL_II_AND(
+            (cell_similarity != CellSimilarity::translation) DEAL_II_OR(
+              (mapping_kind DEAL_II_EQUALS mapping_piola)DEAL_II_OR(
+                mapping_kind DEAL_II_EQUALS mapping_raviart_thomas)
+                DEAL_II_OR(mapping_kind DEAL_II_EQUALS mapping_nedelec))))
         {
           switch (mapping_kind)
             {
@@ -506,11 +508,12 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
         }
 
       // update gradients. apply the same logic as above
-      if (fe_data.update_each & update_gradients &&
-          ((cell_similarity != CellSimilarity::translation) ||
-           ((mapping_kind == mapping_piola) ||
-            (mapping_kind == mapping_raviart_thomas) ||
-            (mapping_kind == mapping_nedelec))))
+      if (fe_data.update_each &
+          update_gradients DEAL_II_AND(
+            (cell_similarity != CellSimilarity::translation) DEAL_II_OR(
+              (mapping_kind DEAL_II_EQUALS mapping_piola)DEAL_II_OR(
+                mapping_kind DEAL_II_EQUALS mapping_raviart_thomas)
+                DEAL_II_OR(mapping_kind DEAL_II_EQUALS mapping_nedelec))))
 
         {
           switch (mapping_kind)
@@ -651,11 +654,12 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
         }
 
       // update hessians. apply the same logic as above
-      if (fe_data.update_each & update_hessians &&
-          ((cell_similarity != CellSimilarity::translation) ||
-           ((mapping_kind == mapping_piola) ||
-            (mapping_kind == mapping_raviart_thomas) ||
-            (mapping_kind == mapping_nedelec))))
+      if (fe_data.update_each &
+          update_hessians DEAL_II_AND(
+            (cell_similarity != CellSimilarity::translation) DEAL_II_OR(
+              (mapping_kind DEAL_II_EQUALS mapping_piola)DEAL_II_OR(
+                mapping_kind DEAL_II_EQUALS mapping_raviart_thomas)
+                DEAL_II_OR(mapping_kind DEAL_II_EQUALS mapping_nedelec))))
 
         {
           switch (mapping_kind)
@@ -927,11 +931,12 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
         }
 
       // third derivatives are not implemented
-      if (fe_data.update_each & update_3rd_derivatives &&
-          ((cell_similarity != CellSimilarity::translation) ||
-           ((mapping_kind == mapping_piola) ||
-            (mapping_kind == mapping_raviart_thomas) ||
-            (mapping_kind == mapping_nedelec))))
+      if (fe_data.update_each &
+          update_3rd_derivatives DEAL_II_AND(
+            (cell_similarity != CellSimilarity::translation) DEAL_II_OR(
+              (mapping_kind DEAL_II_EQUALS mapping_piola)DEAL_II_OR(
+                mapping_kind DEAL_II_EQUALS mapping_raviart_thomas)
+                DEAL_II_OR(mapping_kind DEAL_II_EQUALS mapping_nedelec))))
         {
           Assert(false, ExcNotImplemented())
         }
@@ -1606,9 +1611,10 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                                                 n_q_points,
                                                 cell->subface_case(face_no));
 
-  //   Assert(mapping_kind == independent
-  //       || ( mapping_kind == independent_on_cartesian
-  //            && dynamic_cast<const MappingCartesian<dim>*>(&mapping) != 0),
+  //   Assert(mapping_kind DEAL_II_EQUALS  independent
+  //       DEAL_II_OR  ( mapping_kind DEAL_II_EQUALS  independent_on_cartesian
+  //            DEAL_II_AND  dynamic_cast<const
+  //            MappingCartesian<dim>*>(&mapping) != 0),
   //       ExcNotImplemented());
   // TODO: Size assertions
 

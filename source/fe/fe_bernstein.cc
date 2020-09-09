@@ -114,7 +114,8 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
   FullMatrix<double> &                interpolation_matrix,
   const unsigned int                  face_no) const
 {
-  Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.m()
+           DEAL_II_EQUALS x_source_fe.n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.m(),
                               x_source_fe.n_dofs_per_face(face_no)));
 
@@ -124,7 +125,8 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
     {
       // have this test in here since a table of size 2x0 reports its size as
       // 0x0
-      Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
+      Assert(interpolation_matrix.n()
+               DEAL_II_EQUALS this->n_dofs_per_face(face_no),
              ExcDimensionMismatch(interpolation_matrix.n(),
                                   this->n_dofs_per_face(face_no)));
 
@@ -154,7 +156,7 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
       // these support points. Furthermore, check if something has to
       // be done for the face orientation flag in 3D.
       const Quadrature<dim> subface_quadrature =
-        subface == numbers::invalid_unsigned_int ?
+        subface DEAL_II_EQUALS numbers::invalid_unsigned_int ?
           QProjector<dim>::project_to_face(this->reference_cell_type(),
                                            quad_face_support,
                                            0) :
@@ -236,7 +238,9 @@ FE_Bernstein<dim, spacedim>::hp_vertex_dof_identities(
       // equivalencies to be recorded
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
-  else if (fe_other.n_unique_faces() == 1 && fe_other.n_dofs_per_face(0) == 0)
+  else if (fe_other.n_unique_faces()
+             DEAL_II_EQUALS 1 DEAL_II_AND fe_other.n_dofs_per_face(0)
+               DEAL_II_EQUALS 0)
     {
       // if the other element has no elements on faces at all,
       // then it would be impossible to enforce any kind of
@@ -311,7 +315,7 @@ FE_Bernstein<dim, spacedim>::compare_for_domination(
     {
       if (this->degree < fe_b_other->degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_b_other->degree)
+      else if (this->degree DEAL_II_EQUALS fe_b_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;

@@ -127,8 +127,7 @@ struct CellData
   /**
    * Comparison operator.
    */
-  bool
-  operator==(const CellData<structdim> &other) const;
+  bool operator DEAL_II_EQUALS(const CellData<structdim> &other) const;
 
   /**
    * Boost serialization function
@@ -288,8 +287,7 @@ namespace TriangulationDescription
     /**
      * Comparison operator.
      */
-    bool
-    operator==(const CellData<dim> &other) const;
+    bool operator DEAL_II_EQUALS(const CellData<dim> &other) const;
 
     /**
      * Unique CellID of the cell.
@@ -325,7 +323,7 @@ namespace TriangulationDescription
      * @note Only used for 3D.
      */
     std::array<types::manifold_id,
-               dim == 1 ? 1 : GeometryInfo<3>::quads_per_cell>
+               dim DEAL_II_EQUALS 1 ? 1 : GeometryInfo<3>::quads_per_cell>
       manifold_quad_ids;
 
     /**
@@ -351,8 +349,7 @@ namespace TriangulationDescription
     /**
      * Comparison operator.
      */
-    bool
-    operator==(const Description<dim, spacedim> &other) const;
+    bool operator DEAL_II_EQUALS(const Description<dim, spacedim> &other) const;
 
     /**
      * Cells of the locally-relevant coarse-grid triangulation.
@@ -522,8 +519,7 @@ namespace TriangulationDescription
 
 
   template <int dim>
-  bool
-  CellData<dim>::operator==(const CellData<dim> &other) const
+  bool CellData<dim>::operator DEAL_II_EQUALS(const CellData<dim> &other) const
   {
     if (this->id != other.id)
       return false;
@@ -533,9 +529,9 @@ namespace TriangulationDescription
       return false;
     if (this->manifold_id != other.manifold_id)
       return false;
-    if (dim >= 2 && this->manifold_line_ids != other.manifold_line_ids)
+    if (dim >= 2 DEAL_II_AND this->manifold_line_ids != other.manifold_line_ids)
       return false;
-    if (dim >= 3 && this->manifold_quad_ids != other.manifold_quad_ids)
+    if (dim >= 3 DEAL_II_AND this->manifold_quad_ids != other.manifold_quad_ids)
       return false;
     if (this->boundary_ids != other.boundary_ids)
       return false;
@@ -546,9 +542,8 @@ namespace TriangulationDescription
 
 
   template <int dim, int spacedim>
-  bool
-  Description<dim, spacedim>::
-  operator==(const Description<dim, spacedim> &other) const
+  bool Description<dim, spacedim>::
+       operator DEAL_II_EQUALS(const Description<dim, spacedim> &other) const
   {
     if (this->coarse_cells != other.coarse_cells)
       return false;

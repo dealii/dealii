@@ -275,7 +275,7 @@ SolverCG<VectorType>::compute_eigs_and_cond(
   const boost::signals2::signal<void(double)> &cond_signal)
 {
   // Avoid computing eigenvalues unless they are needed.
-  if (!cond_signal.empty() || !eigenvalues_signal.empty())
+  if (!cond_signal.empty() DEAL_II_OR !eigenvalues_signal.empty())
     {
       TridiagonalMatrix<typename VectorType::value_type> T(diagonal.size(),
                                                            true);
@@ -338,8 +338,9 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
 
   // Should we build the matrix for eigenvalue computations?
   const bool do_eigenvalues =
-    !condition_number_signal.empty() || !all_condition_numbers_signal.empty() ||
-    !eigenvalues_signal.empty() || !all_eigenvalues_signal.empty();
+    !condition_number_signal.empty() DEAL_II_OR !all_condition_numbers_signal
+       .empty() DEAL_II_OR !eigenvalues_signal
+       .empty() DEAL_II_OR !all_eigenvalues_signal.empty();
 
   // vectors used for eigenvalue
   // computations
@@ -376,7 +377,8 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
   if (conv != SolverControl::iterate)
     return;
 
-  if (std::is_same<PreconditionerType, PreconditionIdentity>::value == false)
+  if (std::is_same<PreconditionerType, PreconditionIdentity>::value
+        DEAL_II_EQUALS false)
     {
       preconditioner.vmult(h, g);
 
@@ -390,7 +392,7 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
       gh = res * res;
     }
 
-  while (conv == SolverControl::iterate)
+  while (conv DEAL_II_EQUALS SolverControl::iterate)
     {
       it++;
       A.vmult(h, d);
@@ -408,8 +410,8 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
       if (conv != SolverControl::iterate)
         break;
 
-      if (std::is_same<PreconditionerType, PreconditionIdentity>::value ==
-          false)
+      if (std::is_same<PreconditionerType, PreconditionIdentity>::value
+            DEAL_II_EQUALS false)
         {
           preconditioner.vmult(h, g);
 

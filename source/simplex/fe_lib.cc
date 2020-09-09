@@ -32,12 +32,12 @@ namespace Simplex
     {
       std::vector<unsigned int> dpo(dim + 1, 0U);
 
-      if (degree == 1)
+      if (degree DEAL_II_EQUALS 1)
         {
           // one dof at each vertex
           dpo[0] = 1;
         }
-      else if (degree == 2)
+      else if (degree DEAL_II_EQUALS 2)
         {
           // one dof at each vertex and in the middle of each line
           dpo[0] = 1;
@@ -62,13 +62,13 @@ namespace Simplex
       std::vector<unsigned int> dpo(dim + 1, 0U);
 
       // all dofs are internal
-      if (dim == 2 && degree == 1)
+      if (dim DEAL_II_EQUALS 2 DEAL_II_AND degree DEAL_II_EQUALS 1)
         dpo[dim] = 3;
-      else if (dim == 2 && degree == 2)
+      else if (dim DEAL_II_EQUALS 2 DEAL_II_AND degree DEAL_II_EQUALS 2)
         dpo[dim] = 6;
-      else if (dim == 3 && degree == 1)
+      else if (dim DEAL_II_EQUALS 3 DEAL_II_AND degree DEAL_II_EQUALS 1)
         dpo[dim] = 4;
-      else if (dim == 3 && degree == 2)
+      else if (dim DEAL_II_EQUALS 3 DEAL_II_AND degree DEAL_II_EQUALS 2)
         dpo[dim] = 10;
       else
         {
@@ -87,13 +87,13 @@ namespace Simplex
     : dealii::FE_Poly<dim, spacedim>(
         Simplex::ScalarPolynomial<dim>(degree),
         FiniteElementData<dim>(dpo_vector,
-                               dim == 2 ? ReferenceCell::Type::Tri :
-                                          ReferenceCell::Type::Tet,
+                               dim DEAL_II_EQUALS 2 ? ReferenceCell::Type::Tri :
+                                                      ReferenceCell::Type::Tet,
                                1,
                                degree,
                                FiniteElementData<dim>::L2),
         std::vector<bool>(FiniteElementData<dim>(dpo_vector,
-                                                 dim == 2 ?
+                                                 dim DEAL_II_EQUALS 2 ?
                                                    ReferenceCell::Type::Tri :
                                                    ReferenceCell::Type::Tet,
                                                  1,
@@ -102,8 +102,9 @@ namespace Simplex
                           true),
         std::vector<ComponentMask>(
           FiniteElementData<dim>(dpo_vector,
-                                 dim == 2 ? ReferenceCell::Type::Tri :
-                                            ReferenceCell::Type::Tet,
+                                 dim DEAL_II_EQUALS 2 ?
+                                   ReferenceCell::Type::Tri :
+                                   ReferenceCell::Type::Tet,
                                  1,
                                  degree)
             .dofs_per_cell,
@@ -111,9 +112,9 @@ namespace Simplex
   {
     this->unit_support_points.clear();
 
-    if (dim == 2)
+    if (dim DEAL_II_EQUALS 2)
       {
-        if (degree == 1)
+        if (degree DEAL_II_EQUALS 1)
           {
             this->unit_support_points.emplace_back(0.0, 0.0);
             this->unit_support_points.emplace_back(1.0, 0.0);
@@ -123,7 +124,7 @@ namespace Simplex
             this->unit_face_support_points[0].emplace_back(0.0);
             this->unit_face_support_points[0].emplace_back(1.0);
           }
-        else if (degree == 2)
+        else if (degree DEAL_II_EQUALS 2)
           {
             this->unit_support_points.emplace_back(0.0, 0.0);
             this->unit_support_points.emplace_back(1.0, 0.0);
@@ -142,9 +143,9 @@ namespace Simplex
             Assert(false, ExcNotImplemented());
           }
       }
-    else if (dim == 3)
+    else if (dim DEAL_II_EQUALS 3)
       {
-        if (degree == 1)
+        if (degree DEAL_II_EQUALS 1)
           {
             this->unit_support_points.emplace_back(0.0, 0.0, 0.0);
             this->unit_support_points.emplace_back(1.0, 0.0, 0.0);
@@ -156,7 +157,7 @@ namespace Simplex
             this->unit_face_support_points[0].emplace_back(0.0, 1.0);
             this->unit_face_support_points[0].emplace_back(0.0, 0.0);
           }
-        else if (degree == 2)
+        else if (degree DEAL_II_EQUALS 2)
           {
             this->unit_support_points.emplace_back(0.0, 0.0, 0.0);
             this->unit_support_points.emplace_back(1.0, 0.0, 0.0);

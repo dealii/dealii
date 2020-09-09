@@ -42,8 +42,8 @@ FE_RannacherTurek<dim>::FE_RannacherTurek(
   , order(order)
   , n_face_support_points(n_face_support_points)
 {
-  Assert(dim == 2, ExcNotImplemented());
-  Assert(order == 0, ExcNotImplemented());
+  Assert(dim DEAL_II_EQUALS 2, ExcNotImplemented());
+  Assert(order DEAL_II_EQUALS 0, ExcNotImplemented());
   this->initialize_support_points();
 }
 
@@ -88,7 +88,7 @@ template <int dim>
 void
 FE_RannacherTurek<dim>::initialize_support_points()
 {
-  Assert(dim == 2, ExcNotImplemented());
+  Assert(dim DEAL_II_EQUALS 2, ExcNotImplemented());
   dealii::QGauss<dim - 1> face_quadrature(this->n_face_support_points);
   this->weights = face_quadrature.get_weights();
   this->generalized_support_points.resize(4 * face_quadrature.size());

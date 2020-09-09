@@ -121,8 +121,8 @@ namespace SmoothnessEstimator
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (cell->is_locally_owned())
           {
-            if (!only_flagged_cells || cell->refine_flag_set() ||
-                cell->coarsen_flag_set())
+            if (!only_flagged_cells DEAL_II_OR
+                   cell->refine_flag_set() DEAL_II_OR cell->coarsen_flag_set())
               {
                 n_modes = fe_legendre.get_n_coefficients_per_direction(
                   cell->active_fe_index());
@@ -147,7 +147,7 @@ namespace SmoothnessEstimator
                   regression_strategy,
                   smallest_abs_coefficient);
 
-                Assert(res.first.size() == res.second.size(),
+                Assert(res.first.size() DEAL_II_EQUALS res.second.size(),
                        ExcInternalError());
 
                 // Last, do the linear regression.
@@ -214,8 +214,8 @@ namespace SmoothnessEstimator
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (cell->is_locally_owned())
           {
-            if (!only_flagged_cells || cell->refine_flag_set() ||
-                cell->coarsen_flag_set())
+            if (!only_flagged_cells DEAL_II_OR
+                   cell->refine_flag_set() DEAL_II_OR cell->coarsen_flag_set())
               {
                 n_modes = fe_legendre.get_n_coefficients_per_direction(
                   cell->active_fe_index());
@@ -353,7 +353,7 @@ namespace SmoothnessEstimator
         for (unsigned int i = 0; i < dim; ++i)
           v += ind[i] * ind[i];
 
-        return std::make_pair((v > 0 && v < N * N), v);
+        return std::make_pair((v > 0 DEAL_II_AND v < N * N), v);
       }
     } // namespace
 
@@ -385,8 +385,8 @@ namespace SmoothnessEstimator
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (cell->is_locally_owned())
           {
-            if (!only_flagged_cells || cell->refine_flag_set() ||
-                cell->coarsen_flag_set())
+            if (!only_flagged_cells DEAL_II_OR
+                   cell->refine_flag_set() DEAL_II_OR cell->coarsen_flag_set())
               {
                 n_modes = fe_fourier.get_n_coefficients_per_direction(
                   cell->active_fe_index());
@@ -416,7 +416,7 @@ namespace SmoothnessEstimator
                   regression_strategy,
                   smallest_abs_coefficient);
 
-                Assert(res.first.size() == res.second.size(),
+                Assert(res.first.size() DEAL_II_EQUALS res.second.size(),
                        ExcInternalError());
 
                 // Last, do the linear regression.
@@ -495,8 +495,8 @@ namespace SmoothnessEstimator
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (cell->is_locally_owned())
           {
-            if (!only_flagged_cells || cell->refine_flag_set() ||
-                cell->coarsen_flag_set())
+            if (!only_flagged_cells DEAL_II_OR
+                   cell->refine_flag_set() DEAL_II_OR cell->coarsen_flag_set())
               {
                 n_modes = fe_fourier.get_n_coefficients_per_direction(
                   cell->active_fe_index());

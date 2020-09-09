@@ -102,8 +102,8 @@ public:
    * data set a value in the y direction, which is the depth coordinate in the
    * resulting plot. For 2d plots, the @p y_values are ignored.
    *
-   * If you give only one data set, i.e. <tt>values.size()==1</tt>, then the
-   * resulting histogram will be a 2d one.
+   * If you give only one data set, i.e. <tt>values.size()DEAL_II_EQUALS 1</tt>,
+   * then the resulting histogram will be a 2d one.
    *
    * @p n_intervals denotes the number of intervals into which the data will
    * be sorted; @p interval_spacing denotes the way the bounds of the

@@ -272,7 +272,7 @@ public:
   template <typename Type, typename Arg, typename... Args>
   Type &
   get_or_add_object_with_name(const std::string &name,
-                              Arg &&             argument,
+                              Arg DEAL_II_AND argument,
                               Args &&... arguments);
 
   /**
@@ -284,7 +284,8 @@ public:
    */
   template <typename Type, typename Arg>
   Type &
-  get_or_add_object_with_name(const std::string &name, Arg &&argument);
+  get_or_add_object_with_name(const std::string &name,
+                              Arg DEAL_II_AND argument);
 
   /**
    * Same as above for default constructors.
@@ -424,11 +425,11 @@ GeneralDataStorage::get_object_with_name(const std::string &name)
 
   Type *p = nullptr;
 
-  if (any_data[name].type() == typeid(Type *))
+  if (any_data[name].type() DEAL_II_EQUALS typeid(Type *))
     {
       p = boost::any_cast<Type *>(any_data[name]);
     }
-  else if (any_data[name].type() == typeid(Type))
+  else if (any_data[name].type() DEAL_II_EQUALS typeid(Type))
     {
       p = boost::any_cast<Type>(&any_data[name]);
     }
@@ -452,12 +453,12 @@ GeneralDataStorage::get_object_with_name(const std::string &name) const
 
   const auto it = any_data.find(name);
 
-  if (it->second.type() == typeid(Type *))
+  if (it->second.type() DEAL_II_EQUALS typeid(Type *))
     {
       const Type *p = boost::any_cast<Type *>(it->second);
       return *p;
     }
-  else if (it->second.type() == typeid(Type))
+  else if (it->second.type() DEAL_II_EQUALS typeid(Type))
     {
       const Type *p = boost::any_cast<Type>(&it->second);
       return *p;
@@ -505,7 +506,7 @@ GeneralDataStorage::get_or_add_object_with_name(const std::string &name,
 template <typename Type, typename Arg>
 Type &
 GeneralDataStorage::get_or_add_object_with_name(const std::string &name,
-                                                Arg &&             argument)
+                                                Arg DEAL_II_AND argument)
 {
   if (!stores_object_with_name(name))
     add_unique_copy(name, Type(std::forward<Arg>(argument)));
@@ -518,7 +519,7 @@ GeneralDataStorage::get_or_add_object_with_name(const std::string &name,
 template <typename Type, typename Arg, typename... Args>
 Type &
 GeneralDataStorage::get_or_add_object_with_name(const std::string &name,
-                                                Arg &&             argument,
+                                                Arg DEAL_II_AND argument,
                                                 Args &&... arguments)
 {
   if (!stores_object_with_name(name))

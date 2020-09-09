@@ -90,7 +90,7 @@ namespace internal
      * the alias in the general
      * <tt>Inheritance@<structdim,dim,spacedim@></tt> class, which is
      * <tt>TriaAccessor@<structdim,dim,spacedim@></tt>, but if
-     * <tt>structdim==dim</tt>, then the specialization
+     * <tt>structdimDEAL_II_EQUALS dim</tt>, then the specialization
      * <tt>Inheritance@<dim,dim,spacedim@></tt> is used which declares its
      * local type to be <tt>CellAccessor@<dim,spacedim@></tt>. Therefore, the
      * inheritance is automatically chosen to be from CellAccessor if the
@@ -643,12 +643,11 @@ public:
    * active degrees of freedom.
    */
   template <int structdim2, int dim2, int spacedim2, bool level_dof_access2>
-  bool
-  operator==(
+  bool operator DEAL_II_EQUALS(
     const DoFAccessor<structdim2, dim2, spacedim2, level_dof_access2> &) const;
 
   /**
-   * Compare for inequality. The boolean not of operator==().
+   * Compare for inequality. The boolean not of operator DEAL_II_EQUALS ().
    */
   template <int structdim2, int dim2, int spacedim2, bool level_dof_access2>
   bool
@@ -725,7 +724,7 @@ protected:
                             DoFHandler<dim, spacedim>::invalid_fe_index) const;
 
   // Iterator classes need to be friends because they need to access
-  // operator== and operator!=.
+  // operator DEAL_II_EQUALS  and operator!=.
   template <typename>
   friend class TriaRawIterator;
   template <int, int, int, bool>
@@ -1132,8 +1131,7 @@ protected:
    * Compare for equality.
    */
   template <int structdim2, int dim2, int spacedim2, bool level_dof_access2>
-  bool
-  operator==(
+  bool operator DEAL_II_EQUALS(
     const DoFAccessor<structdim2, dim2, spacedim2, level_dof_access2> &) const;
 
   /**
@@ -1199,7 +1197,7 @@ protected:
     const unsigned int fe_index = AccessorData::invalid_fe_index) const;
 
   // Iterator classes need to be friends because they need to access
-  // operator== and operator!=.
+  // operator DEAL_II_EQUALS  and operator!=.
   template <typename>
   friend class TriaRawIterator;
 
@@ -1473,8 +1471,8 @@ public:
   /**
    * Return an iterator to the @p ith face of this cell.
    *
-   * This function returns a DoFAccessor with <code>structdim == 0</code> in
-   * 1D, a DoFAccessor::line in 2D, and a DoFAccessor::quad in 3d.
+   * This function returns a DoFAccessor with <code>structdim DEAL_II_EQUALS
+   * 0</code> in 1D, a DoFAccessor::line in 2D, and a DoFAccessor::quad in 3d.
    */
   face_iterator
   face(const unsigned int i) const;

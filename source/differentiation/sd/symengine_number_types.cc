@@ -160,7 +160,8 @@ namespace Differentiation
     {}
 
 
-    Expression::Expression(SymEngine::RCP<const SymEngine::Basic> &&rhs)
+    Expression::Expression(
+      SymEngine::RCP<const SymEngine::Basic> DEAL_II_AND rhs)
       : expression(rhs)
     {}
 
@@ -327,7 +328,7 @@ namespace Differentiation
 
 
     Expression &
-    Expression::operator=(Expression &&rhs) noexcept
+    Expression::operator=(Expression DEAL_II_AND rhs) noexcept
     {
       if (this != &rhs)
         this->expression = std::move(rhs.expression);
@@ -393,8 +394,8 @@ namespace Differentiation
     }
 
 
-    Expression
-    operator==(const Expression &lhs, const Expression &rhs)
+    Expression operator DEAL_II_EQUALS(const Expression &lhs,
+                                       const Expression &rhs)
     {
       return Expression(SE::Eq(lhs.get_RCP(), rhs.get_RCP()));
     }
@@ -497,15 +498,14 @@ namespace Differentiation
     }
 
 
-    Expression
-    operator&&(const Expression &lhs, const Expression &rhs)
+    Expression operator DEAL_II_AND(const Expression &lhs,
+                                    const Expression &rhs)
     {
       return lhs & rhs;
     }
 
 
-    Expression
-    operator||(const Expression &lhs, const Expression &rhs)
+    Expression operator DEAL_II_OR(const Expression &lhs, const Expression &rhs)
     {
       return lhs | rhs;
     }

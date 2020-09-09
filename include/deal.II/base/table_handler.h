@@ -936,10 +936,10 @@ void
 TableHandler::add_value(const std::string &key, const T value)
 {
   // see if the column already exists
-  if (columns.find(key) == columns.end())
+  if (columns.find(key) DEAL_II_EQUALS columns.end())
     declare_column(key);
 
-  if (auto_fill_mode == true)
+  if (auto_fill_mode DEAL_II_EQUALS true)
     {
       // follow the algorithm given in the introduction to this class
       // of padding columns as necessary

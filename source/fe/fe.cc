@@ -60,7 +60,7 @@ FiniteElement<dim, spacedim>::FiniteElement(
   const std::vector<ComponentMask> &nonzero_c)
   : FiniteElementData<dim>(fe_data)
   , adjust_line_dof_index_for_line_orientation_table(
-      dim == 3 ? this->n_dofs_per_line() : 0)
+      dim DEAL_II_EQUALS 3 ? this->n_dofs_per_line() : 0)
   , system_to_base_table(this->n_dofs_per_cell())
   , component_to_base_table(this->components,
                             std::make_pair(std::make_pair(0U, 0U), 0U))
@@ -69,11 +69,11 @@ FiniteElement<dim, spacedim>::FiniteElement(
   // Special handling of vectors of length one: in this case, we
   // assume that all entries were supposed to be equal
   restriction_is_additive_flags(
-    r_i_a_f.size() == 1 ?
+    r_i_a_f.size() DEAL_II_EQUALS 1 ?
       std::vector<bool>(fe_data.n_dofs_per_cell(), r_i_a_f[0]) :
       r_i_a_f)
   , nonzero_components(
-      nonzero_c.size() == 1 ?
+      nonzero_c.size() DEAL_II_EQUALS 1 ?
         std::vector<ComponentMask>(fe_data.n_dofs_per_cell(), nonzero_c[0]) :
         nonzero_c)
   , n_nonzero_components_table(compute_n_nonzero_components(nonzero_components))
@@ -81,15 +81,17 @@ FiniteElement<dim, spacedim>::FiniteElement(
                                     n_nonzero_components_table.end(),
                                     [](const unsigned int n_components) {
                                       return n_components != 1U;
-                                    }) == n_nonzero_components_table.end())
+                                    })
+                         DEAL_II_EQUALS n_nonzero_components_table.end())
 {
-  Assert(restriction_is_additive_flags.size() == this->n_dofs_per_cell(),
+  Assert(restriction_is_additive_flags.size()
+           DEAL_II_EQUALS this->n_dofs_per_cell(),
          ExcDimensionMismatch(restriction_is_additive_flags.size(),
                               this->n_dofs_per_cell()));
   AssertDimension(nonzero_components.size(), this->n_dofs_per_cell());
   for (unsigned int i = 0; i < nonzero_components.size(); ++i)
     {
-      Assert(nonzero_components[i].size() == this->n_components(),
+      Assert(nonzero_components[i].size() DEAL_II_EQUALS this->n_components(),
              ExcInternalError());
       Assert(nonzero_components[i].n_selected_components() >= 1,
              ExcInternalError());
@@ -149,19 +151,21 @@ FiniteElement<dim, spacedim>::FiniteElement(
     }
 
 
-  if (dim == 3)
+  if (dim DEAL_II_EQUALS 3)
     {
       adjust_quad_dof_index_for_face_orientation_table.resize(
         this->n_unique_quads());
 
       for (unsigned int f = 0; f < this->n_unique_quads(); ++f)
         {
-          adjust_quad_dof_index_for_face_orientation_table[f] = Table<2, int>(
-            this->n_dofs_per_quad(f),
-            ReferenceCell::internal::Info::get_cell(this->reference_cell_type())
-                  .face_reference_cell_type(f) == ReferenceCell::Type::Quad ?
-              8 :
-              6);
+          adjust_quad_dof_index_for_face_orientation_table[f] =
+            Table<2, int>(this->n_dofs_per_quad(f),
+                          ReferenceCell::internal::Info::get_cell(
+                            this->reference_cell_type())
+                              .face_reference_cell_type(f)
+                                DEAL_II_EQUALS ReferenceCell::Type::Quad ?
+                            8 :
+                            6);
           adjust_quad_dof_index_for_face_orientation_table[f].fill(0);
         }
     }
@@ -314,15 +318,15 @@ FiniteElement<dim, spacedim>::reinit_restriction_and_prolongation_matrices(
       for (unsigned int i = 0; i < nc; ++i)
         {
           if (this->restriction[ref_case - 1][i].m() !=
-                this->n_dofs_per_cell() &&
-              (!isotropic_restriction_only ||
-               ref_case == RefinementCase<dim>::isotropic_refinement))
+              this->n_dofs_per_cell() DEAL_II_AND(
+                !isotropic_restriction_only DEAL_II_OR ref_case DEAL_II_EQUALS
+                                                                RefinementCase<dim>::isotropic_refinement))
             this->restriction[ref_case - 1][i].reinit(this->n_dofs_per_cell(),
                                                       this->n_dofs_per_cell());
           if (this->prolongation[ref_case - 1][i].m() !=
-                this->n_dofs_per_cell() &&
-              (!isotropic_prolongation_only ||
-               ref_case == RefinementCase<dim>::isotropic_refinement))
+              this->n_dofs_per_cell() DEAL_II_AND(
+                !isotropic_prolongation_only DEAL_II_OR ref_case DEAL_II_EQUALS
+                                                                 RefinementCase<dim>::isotropic_refinement))
             this->prolongation[ref_case - 1][i].reinit(this->n_dofs_per_cell(),
                                                        this->n_dofs_per_cell());
         }
@@ -346,7 +350,8 @@ FiniteElement<dim, spacedim>::get_restriction_matrix(
   // we use refinement_case-1 here. the -1 takes care of the origin of the
   // vector, as for RefinementCase<dim>::no_refinement (=0) there is no data
   // available and so the vector indices are shifted
-  Assert(restriction[refinement_case - 1][child].n() == this->n_dofs_per_cell(),
+  Assert(restriction[refinement_case - 1][child].n()
+           DEAL_II_EQUALS this->n_dofs_per_cell(),
          ExcProjectionVoid());
   return restriction[refinement_case - 1][child];
 }
@@ -371,8 +376,8 @@ FiniteElement<dim, spacedim>::get_prolongation_matrix(
   // RefinementCase::no_refinement (=0) there is no
   // data available and so the vector indices
   // are shifted
-  Assert(prolongation[refinement_case - 1][child].n() ==
-           this->n_dofs_per_cell(),
+  Assert(prolongation[refinement_case - 1][child].n()
+           DEAL_II_EQUALS this->n_dofs_per_cell(),
          ExcEmbeddingVoid());
   return prolongation[refinement_case - 1][child];
 }
@@ -469,7 +474,7 @@ FiniteElement<dim, spacedim>::component_mask(const BlockMask &block_mask) const
 
   std::vector<bool> component_mask(this->n_components(), false);
   for (unsigned int c = 0; c < this->n_components(); ++c)
-    if (block_mask[component_to_block_index(c)] == true)
+    if (block_mask[component_to_block_index(c)] DEAL_II_EQUALS true)
       component_mask[c] = true;
 
   return component_mask;
@@ -536,17 +541,17 @@ FiniteElement<dim, spacedim>::block_mask(
   for (unsigned int c = 0; c < this->n_components();)
     {
       const unsigned int block = component_to_block_index(c);
-      if (component_mask[c] == true)
+      if (component_mask[c] DEAL_II_EQUALS true)
         block_mask[block] = true;
 
       // now check all of the other
       // components that correspond
       // to this block
       ++c;
-      while ((c < this->n_components()) &&
-             (component_to_block_index(c) == block))
+      while ((c < this->n_components())
+               DEAL_II_AND(component_to_block_index(c) DEAL_II_EQUALS block))
         {
-          Assert(component_mask[c] == block_mask[block],
+          Assert(component_mask[c] DEAL_II_EQUALS block_mask[block],
                  ExcMessage(
                    "The component mask argument given to this function "
                    "is not a mask where the individual components belonging "
@@ -590,9 +595,10 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
   // assertion -- in essence, derived classes have to implement
   // an overloaded version of this function if we are to use any
   // other than standard orientation
-  if ((face_orientation != true) || (face_flip != false) ||
-      (face_rotation != false))
-    Assert((this->n_dofs_per_line() <= 1) && (this->n_dofs_per_quad(face) <= 1),
+  if ((face_orientation != true) DEAL_II_OR(face_flip != false)
+        DEAL_II_OR(face_rotation != false))
+    Assert((this->n_dofs_per_line() <= 1)
+             DEAL_II_AND(this->n_dofs_per_quad(face) <= 1),
            ExcMessage(
              "The function in this base class can not handle this case. "
              "Rather, the derived class you are using must provide "
@@ -668,7 +674,7 @@ FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
   // implemented. in fact, the function
   // shouldn't even be called unless we are
   // in 3d, so throw an internal error
-  Assert(dim == 3, ExcInternalError());
+  Assert(dim DEAL_II_EQUALS 3, ExcInternalError());
   if (dim < 3)
     return index;
 
@@ -677,23 +683,25 @@ FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
   // derived elements need to have set up
   // front. the exception are discontinuous
   // elements for which there should be no
-  // face dofs anyway (i.e. dofs_per_quad==0
+  // face dofs anyway (i.e. dofs_per_quadDEAL_II_EQUALS 0
   // in 3d), so we don't need the table, but
   // the function should also not have been
   // called
   AssertIndexRange(index, this->n_dofs_per_quad(face));
   Assert(adjust_quad_dof_index_for_face_orientation_table
-             [this->n_unique_quads() == 1 ? 0 : face]
-               .n_elements() ==
-           (ReferenceCell::internal::Info::get_cell(this->reference_cell_type())
-                  .face_reference_cell_type(face) == ReferenceCell::Type::Quad ?
-              8 :
-              6) *
-             this->n_dofs_per_quad(face),
+             [this->n_unique_quads() DEAL_II_EQUALS 1 ? 0 : face]
+               .n_elements()
+                 DEAL_II_EQUALS(ReferenceCell::internal::Info::get_cell(
+                                  this->reference_cell_type())
+                                    .face_reference_cell_type(face)
+                                      DEAL_II_EQUALS ReferenceCell::Type::Quad ?
+                                  8 :
+                                  6) *
+           this->n_dofs_per_quad(face),
          ExcInternalError());
   return index +
          adjust_quad_dof_index_for_face_orientation_table
-           [this->n_unique_quads() == 1 ? 0 : face](
+           [this->n_unique_quads() DEAL_II_EQUALS 1 ? 0 : face](
              index, 4 * face_orientation + 2 * face_flip + face_rotation);
 }
 
@@ -713,9 +721,10 @@ FiniteElement<dim, spacedim>::adjust_line_dof_index_for_line_orientation(
     return index;
 
   AssertIndexRange(index, this->n_dofs_per_line());
-  Assert(adjust_line_dof_index_for_line_orientation_table.size() ==
-           this->n_dofs_per_line(),
-         ExcInternalError());
+  Assert(
+    adjust_line_dof_index_for_line_orientation_table.size()
+      DEAL_II_EQUALS this->n_dofs_per_line(),
+    ExcInternalError());
   if (line_orientation)
     return index;
   else
@@ -737,14 +746,16 @@ FiniteElement<dim, spacedim>::prolongation_is_implemented() const
       {
         // make sure also the lazily initialized matrices are created
         get_prolongation_matrix(c, RefinementCase<dim>(ref_case));
-        Assert((prolongation[ref_case - 1][c].m() == this->n_dofs_per_cell()) ||
-                 (prolongation[ref_case - 1][c].m() == 0),
+        Assert((prolongation[ref_case - 1][c].m()
+                  DEAL_II_EQUALS this->n_dofs_per_cell())
+                 DEAL_II_OR(prolongation[ref_case - 1][c].m() DEAL_II_EQUALS 0),
                ExcInternalError());
-        Assert((prolongation[ref_case - 1][c].n() == this->n_dofs_per_cell()) ||
-                 (prolongation[ref_case - 1][c].n() == 0),
+        Assert((prolongation[ref_case - 1][c].n()
+                  DEAL_II_EQUALS this->n_dofs_per_cell())
+                 DEAL_II_OR(prolongation[ref_case - 1][c].n() DEAL_II_EQUALS 0),
                ExcInternalError());
-        if ((prolongation[ref_case - 1][c].m() == 0) ||
-            (prolongation[ref_case - 1][c].n() == 0))
+        if ((prolongation[ref_case - 1][c].m() DEAL_II_EQUALS 0)
+              DEAL_II_OR(prolongation[ref_case - 1][c].n() DEAL_II_EQUALS 0))
           return false;
       }
   return true;
@@ -765,14 +776,16 @@ FiniteElement<dim, spacedim>::restriction_is_implemented() const
       {
         // make sure also the lazily initialized matrices are created
         get_restriction_matrix(c, RefinementCase<dim>(ref_case));
-        Assert((restriction[ref_case - 1][c].m() == this->n_dofs_per_cell()) ||
-                 (restriction[ref_case - 1][c].m() == 0),
+        Assert((restriction[ref_case - 1][c].m()
+                  DEAL_II_EQUALS this->n_dofs_per_cell())
+                 DEAL_II_OR(restriction[ref_case - 1][c].m() DEAL_II_EQUALS 0),
                ExcInternalError());
-        Assert((restriction[ref_case - 1][c].n() == this->n_dofs_per_cell()) ||
-                 (restriction[ref_case - 1][c].n() == 0),
+        Assert((restriction[ref_case - 1][c].n()
+                  DEAL_II_EQUALS this->n_dofs_per_cell())
+                 DEAL_II_OR(restriction[ref_case - 1][c].n() DEAL_II_EQUALS 0),
                ExcInternalError());
-        if ((restriction[ref_case - 1][c].m() == 0) ||
-            (restriction[ref_case - 1][c].n() == 0))
+        if ((restriction[ref_case - 1][c].m() DEAL_II_EQUALS 0)
+              DEAL_II_OR(restriction[ref_case - 1][c].n() DEAL_II_EQUALS 0))
           return false;
       }
   return true;
@@ -793,14 +806,16 @@ FiniteElement<dim, spacedim>::isotropic_prolongation_is_implemented() const
     {
       // make sure also the lazily initialized matrices are created
       get_prolongation_matrix(c, RefinementCase<dim>(ref_case));
-      Assert((prolongation[ref_case - 1][c].m() == this->n_dofs_per_cell()) ||
-               (prolongation[ref_case - 1][c].m() == 0),
+      Assert((prolongation[ref_case - 1][c].m()
+                DEAL_II_EQUALS this->n_dofs_per_cell())
+               DEAL_II_OR(prolongation[ref_case - 1][c].m() DEAL_II_EQUALS 0),
              ExcInternalError());
-      Assert((prolongation[ref_case - 1][c].n() == this->n_dofs_per_cell()) ||
-               (prolongation[ref_case - 1][c].n() == 0),
+      Assert((prolongation[ref_case - 1][c].n()
+                DEAL_II_EQUALS this->n_dofs_per_cell())
+               DEAL_II_OR(prolongation[ref_case - 1][c].n() DEAL_II_EQUALS 0),
              ExcInternalError());
-      if ((prolongation[ref_case - 1][c].m() == 0) ||
-          (prolongation[ref_case - 1][c].n() == 0))
+      if ((prolongation[ref_case - 1][c].m() DEAL_II_EQUALS 0)
+            DEAL_II_OR(prolongation[ref_case - 1][c].n() DEAL_II_EQUALS 0))
         return false;
     }
   return true;
@@ -821,14 +836,16 @@ FiniteElement<dim, spacedim>::isotropic_restriction_is_implemented() const
     {
       // make sure also the lazily initialized matrices are created
       get_restriction_matrix(c, RefinementCase<dim>(ref_case));
-      Assert((restriction[ref_case - 1][c].m() == this->n_dofs_per_cell()) ||
-               (restriction[ref_case - 1][c].m() == 0),
+      Assert((restriction[ref_case - 1][c].m()
+                DEAL_II_EQUALS this->n_dofs_per_cell())
+               DEAL_II_OR(restriction[ref_case - 1][c].m() DEAL_II_EQUALS 0),
              ExcInternalError());
-      Assert((restriction[ref_case - 1][c].n() == this->n_dofs_per_cell()) ||
-               (restriction[ref_case - 1][c].n() == 0),
+      Assert((restriction[ref_case - 1][c].n()
+                DEAL_II_EQUALS this->n_dofs_per_cell())
+               DEAL_II_OR(restriction[ref_case - 1][c].n() DEAL_II_EQUALS 0),
              ExcInternalError());
-      if ((restriction[ref_case - 1][c].m() == 0) ||
-          (restriction[ref_case - 1][c].n() == 0))
+      if ((restriction[ref_case - 1][c].m() DEAL_II_EQUALS 0)
+            DEAL_II_OR(restriction[ref_case - 1][c].n() DEAL_II_EQUALS 0))
         return false;
     }
   return true;
@@ -846,9 +863,9 @@ FiniteElement<dim, spacedim>::constraints_are_implemented(
   AssertDimension(this->n_unique_faces(), 1);
   const unsigned int face_no = 0;
 
-  if (subface_case == internal::SubfaceCase<dim>::case_isotropic)
-    return (this->n_dofs_per_face(face_no) == 0) ||
-           (interface_constraints.m() != 0);
+  if (subface_case DEAL_II_EQUALS internal::SubfaceCase<dim>::case_isotropic)
+    return (this->n_dofs_per_face(face_no)
+              DEAL_II_EQUALS 0)DEAL_II_OR(interface_constraints.m() != 0);
   else
     return false;
 }
@@ -876,20 +893,21 @@ FiniteElement<dim, spacedim>::constraints(
   (void)face_no;
 
   (void)subface_case;
-  Assert(subface_case == internal::SubfaceCase<dim>::case_isotropic,
+  Assert(subface_case DEAL_II_EQUALS internal::SubfaceCase<dim>::case_isotropic,
          ExcMessage("Constraints for this element are only implemented "
                     "for the case that faces are refined isotropically "
                     "(which is always the case in 2d, and in 3d requires "
                     "that the neighboring cell of a coarse cell presents "
                     "exactly four children on the common face)."));
-  Assert((this->n_dofs_per_face(face_no) == 0) ||
-           (interface_constraints.m() != 0),
+  Assert((this->n_dofs_per_face(face_no)
+            DEAL_II_EQUALS 0)DEAL_II_OR(interface_constraints.m() != 0),
          ExcMessage("The finite element for which you try to obtain "
                     "hanging node constraints does not appear to "
                     "implement them."));
 
-  if (dim == 1)
-    Assert((interface_constraints.m() == 0) && (interface_constraints.n() == 0),
+  if (dim DEAL_II_EQUALS 1)
+    Assert((interface_constraints.m() DEAL_II_EQUALS 0)DEAL_II_AND(
+             interface_constraints.n() DEAL_II_EQUALS 0),
            ExcWrongInterfaceMatrixSize(interface_constraints.m(),
                                        interface_constraints.n()));
 
@@ -1024,16 +1042,18 @@ FiniteElement<dim, spacedim>::compare_for_domination(
 
 
 template <int dim, int spacedim>
-bool
-FiniteElement<dim, spacedim>::
-operator==(const FiniteElement<dim, spacedim> &f) const
+bool FiniteElement<dim, spacedim>::
+     operator DEAL_II_EQUALS(const FiniteElement<dim, spacedim> &f) const
 {
   // Compare fields in roughly increasing order of how expensive the
   // comparison is
-  return ((typeid(*this) == typeid(f)) && (this->get_name() == f.get_name()) &&
-          (static_cast<const FiniteElementData<dim> &>(*this) ==
-           static_cast<const FiniteElementData<dim> &>(f)) &&
-          (interface_constraints == f.interface_constraints));
+  return ((typeid(*this) DEAL_II_EQUALS typeid(f))DEAL_II_AND(
+    this->get_name() DEAL_II_EQUALS f.get_name())
+            DEAL_II_AND(
+              static_cast<const FiniteElementData<dim> &>(*this)
+                DEAL_II_EQUALS static_cast<const FiniteElementData<dim> &>(f))
+              DEAL_II_AND(
+                interface_constraints DEAL_II_EQUALS f.interface_constraints));
 }
 
 
@@ -1043,7 +1063,7 @@ bool
 FiniteElement<dim, spacedim>::
 operator!=(const FiniteElement<dim, spacedim> &f) const
 {
-  return !(*this == f);
+  return !(*this DEAL_II_EQUALS f);
 }
 
 
@@ -1056,8 +1076,8 @@ FiniteElement<dim, spacedim>::get_unit_support_points() const
   // support points, but only if
   // there are as many as there are
   // degrees of freedom
-  Assert((unit_support_points.size() == 0) ||
-           (unit_support_points.size() == this->n_dofs_per_cell()),
+  Assert((unit_support_points.size() DEAL_II_EQUALS 0)DEAL_II_OR(
+           unit_support_points.size() DEAL_II_EQUALS this->n_dofs_per_cell()),
          ExcInternalError());
   return unit_support_points;
 }
@@ -1079,7 +1099,7 @@ FiniteElement<dim, spacedim>::get_generalized_support_points() const
 {
   // If the finite element implements generalized support points, return
   // those. Otherwise fall back to unit support points.
-  return ((generalized_support_points.size() == 0) ?
+  return ((generalized_support_points.size() DEAL_II_EQUALS 0) ?
             unit_support_points :
             generalized_support_points);
 }
@@ -1100,7 +1120,7 @@ Point<dim>
 FiniteElement<dim, spacedim>::unit_support_point(const unsigned int index) const
 {
   AssertIndexRange(index, this->n_dofs_per_cell());
-  Assert(unit_support_points.size() == this->n_dofs_per_cell(),
+  Assert(unit_support_points.size() DEAL_II_EQUALS this->n_dofs_per_cell(),
          ExcFEHasNoSupportPoints());
   return unit_support_points[index];
 }
@@ -1116,12 +1136,17 @@ FiniteElement<dim, spacedim>::get_unit_face_support_points(
   // support points, but only if
   // there are as many as there are
   // degrees of freedom on a face
-  Assert((unit_face_support_points[this->n_unique_faces() == 1 ? 0 : face_no]
-            .size() == 0) ||
-           (unit_face_support_points[this->n_unique_faces() == 1 ? 0 : face_no]
-              .size() == this->n_dofs_per_face(face_no)),
-         ExcInternalError());
-  return unit_face_support_points[this->n_unique_faces() == 1 ? 0 : face_no];
+  Assert(
+    (unit_face_support_points[this->n_unique_faces() DEAL_II_EQUALS 1 ? 0 :
+                                                                        face_no]
+       .size() DEAL_II_EQUALS 0)
+      DEAL_II_OR(unit_face_support_points
+                   [this->n_unique_faces() DEAL_II_EQUALS 1 ? 0 : face_no]
+                     .size() DEAL_II_EQUALS this->n_dofs_per_face(face_no)),
+    ExcInternalError());
+  return unit_face_support_points[this->n_unique_faces() DEAL_II_EQUALS 1 ?
+                                    0 :
+                                    face_no];
 }
 
 
@@ -1131,8 +1156,10 @@ bool
 FiniteElement<dim, spacedim>::has_face_support_points(
   const unsigned int face_no) const
 {
-  return (unit_face_support_points[this->n_unique_faces() == 1 ? 0 : face_no]
-            .size() != 0);
+  return (
+    unit_face_support_points[this->n_unique_faces() DEAL_II_EQUALS 1 ? 0 :
+                                                                       face_no]
+      .size() != 0);
 }
 
 
@@ -1144,11 +1171,14 @@ FiniteElement<dim, spacedim>::unit_face_support_point(
   const unsigned int face_no) const
 {
   AssertIndexRange(index, this->n_dofs_per_face(face_no));
-  Assert(unit_face_support_points[this->n_unique_faces() == 1 ? 0 : face_no]
-             .size() == this->n_dofs_per_face(face_no),
-         ExcFEHasNoSupportPoints());
-  return unit_face_support_points[this->n_unique_faces() == 1 ? 0 : face_no]
-                                 [index];
+  Assert(
+    unit_face_support_points[this->n_unique_faces() DEAL_II_EQUALS 1 ? 0 :
+                                                                       face_no]
+      .size() DEAL_II_EQUALS this->n_dofs_per_face(face_no),
+    ExcFEHasNoSupportPoints());
+  return unit_face_support_points[this->n_unique_faces() DEAL_II_EQUALS 1 ?
+                                    0 :
+                                    face_no][index];
 }
 
 
@@ -1170,7 +1200,8 @@ FiniteElement<dim, spacedim>::get_sub_fe(const ComponentMask &mask) const
   // Translate the ComponentMask into first_selected and n_components after
   // some error checking:
   const unsigned int n_total_components = this->n_components();
-  Assert((n_total_components == mask.size()) || (mask.size() == 0),
+  Assert((n_total_components DEAL_II_EQUALS mask.size())DEAL_II_OR(
+           mask.size() DEAL_II_EQUALS 0),
          ExcMessage("The given ComponentMask has the wrong size."));
 
   const unsigned int n_selected =
@@ -1184,10 +1215,10 @@ FiniteElement<dim, spacedim>::get_sub_fe(const ComponentMask &mask) const
 #ifdef DEBUG
   // check that it is contiguous:
   for (unsigned int c = 0; c < n_total_components; ++c)
-    Assert((c < first_selected && (!mask[c])) ||
-             (c >= first_selected && c < first_selected + n_selected &&
-              mask[c]) ||
-             (c >= first_selected + n_selected && !mask[c]),
+    Assert((c < first_selected DEAL_II_AND(!mask[c])) DEAL_II_OR(
+             c >= first_selected DEAL_II_AND c <
+             first_selected + n_selected DEAL_II_AND mask[c])
+             DEAL_II_OR(c >= first_selected + n_selected DEAL_II_AND !mask[c]),
            ExcMessage("Error: the given ComponentMask is not contiguous!"));
 #endif
 
@@ -1204,7 +1235,8 @@ FiniteElement<dim, spacedim>::get_sub_fe(
 {
   // No complicated logic is needed here, because it is overridden in
   // FESystem<dim,spacedim>. Just make sure that what the user chose is valid:
-  Assert(first_component == 0 && n_selected_components == this->n_components(),
+  Assert(first_component DEAL_II_EQUALS 0 DEAL_II_AND n_selected_components
+                                                      DEAL_II_EQUALS this->n_components(),
          ExcMessage(
            "You can only select a whole FiniteElement, not a part of one."));
 
@@ -1327,7 +1359,7 @@ FiniteElement<dim, spacedim>::base_element(const unsigned int index) const
   AssertIndexRange(index, 1);
   // This function should not be
   // called for a system element
-  Assert(base_to_block_indices.size() == 1, ExcInternalError());
+  Assert(base_to_block_indices.size() DEAL_II_EQUALS 1, ExcInternalError());
   return *this;
 }
 

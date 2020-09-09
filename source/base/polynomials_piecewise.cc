@@ -68,7 +68,7 @@ namespace Polynomials
         if (spans_two_intervals)
           {
             const double offset = step * interval;
-            if (x < offset || x > offset + step + step)
+            if (x<offset DEAL_II_OR x> offset + step + step)
               {
                 for (unsigned int k = 0; k <= n_derivatives; ++k)
                   values[k] = 0;
@@ -85,7 +85,7 @@ namespace Polynomials
         else
           {
             const double offset = step * interval;
-            if (x < offset || x > offset + step)
+            if (x<offset DEAL_II_OR x> offset + step)
               {
                 for (unsigned int k = 0; k <= n_derivatives; ++k)
                   values[k] = 0;
@@ -97,10 +97,16 @@ namespace Polynomials
 
         // on subinterval boundaries, cannot evaluate derivatives properly, so
         // set them to zero
-        if ((std::abs(y) < 1e-14 &&
-             (interval > 0 || derivative_change_sign == -1.)) ||
-            (std::abs(y - step) < 1e-14 &&
-             (interval < n_intervals - 1 || derivative_change_sign == -1.)))
+        if ((std::abs(y) <
+             1e-14 DEAL_II_AND(
+               interval >
+               0 DEAL_II_OR derivative_change_sign DEAL_II_EQUALS - 1.))
+              DEAL_II_OR(
+                std::abs(y - step) <
+                1e-14 DEAL_II_AND(
+                  interval <
+                  n_intervals -
+                    1 DEAL_II_OR derivative_change_sign DEAL_II_EQUALS - 1.)))
           {
             values[0] = value(x);
             for (unsigned int d = 1; d <= n_derivatives; ++d)
@@ -149,7 +155,8 @@ namespace Polynomials
         p.emplace_back(p_base[i + 1],
                        n_subdivisions,
                        s,
-                       i == (base_degree - 1) && s < n_subdivisions - 1);
+                       i               DEAL_II_EQUALS(base_degree - 1)
+                           DEAL_II_AND s < n_subdivisions - 1);
     return p;
   }
 

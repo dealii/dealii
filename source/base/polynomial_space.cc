@@ -113,7 +113,7 @@ template <int dim>
 void
 PolynomialSpace<dim>::set_numbering(const std::vector<unsigned int> &renumber)
 {
-  Assert(renumber.size() == index_map.size(),
+  Assert(renumber.size() DEAL_II_EQUALS index_map.size(),
          ExcDimensionMismatch(renumber.size(), index_map.size()));
 
   index_map = renumber;
@@ -212,42 +212,48 @@ PolynomialSpace<dim>::evaluate(
 {
   const unsigned int n_1d = polynomials.size();
 
-  Assert(values.size() == this->n() || values.size() == 0,
+  Assert(values.size() DEAL_II_EQUALS this->n() DEAL_II_OR values.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(values.size(), this->n(), 0));
-  Assert(grads.size() == this->n() || grads.size() == 0,
+  Assert(grads.size() DEAL_II_EQUALS this->n() DEAL_II_OR grads.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(grads.size(), this->n(), 0));
-  Assert(grad_grads.size() == this->n() || grad_grads.size() == 0,
+  Assert(grad_grads.size() DEAL_II_EQUALS this->n() DEAL_II_OR grad_grads.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(grad_grads.size(), this->n(), 0));
-  Assert(third_derivatives.size() == this->n() || third_derivatives.size() == 0,
+  Assert(third_derivatives.size()
+           DEAL_II_EQUALS this->n() DEAL_II_OR third_derivatives.size()
+             DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(third_derivatives.size(), this->n(), 0));
-  Assert(fourth_derivatives.size() == this->n() ||
-           fourth_derivatives.size() == 0,
+  Assert(fourth_derivatives.size()
+           DEAL_II_EQUALS this->n() DEAL_II_OR fourth_derivatives.size()
+             DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(fourth_derivatives.size(), this->n(), 0));
 
   unsigned int v_size = 0;
   bool update_values = false, update_grads = false, update_grad_grads = false;
   bool update_3rd_derivatives = false, update_4th_derivatives = false;
-  if (values.size() == this->n())
+  if (values.size() DEAL_II_EQUALS this->n())
     {
       update_values = true;
       v_size        = 1;
     }
-  if (grads.size() == this->n())
+  if (grads.size() DEAL_II_EQUALS this->n())
     {
       update_grads = true;
       v_size       = 2;
     }
-  if (grad_grads.size() == this->n())
+  if (grad_grads.size() DEAL_II_EQUALS this->n())
     {
       update_grad_grads = true;
       v_size            = 3;
     }
-  if (third_derivatives.size() == this->n())
+  if (third_derivatives.size() DEAL_II_EQUALS this->n())
     {
       update_3rd_derivatives = true;
       v_size                 = 4;
     }
-  if (fourth_derivatives.size() == this->n())
+  if (fourth_derivatives.size() DEAL_II_EQUALS this->n())
     {
       update_4th_derivatives = true;
       v_size                 = 5;
@@ -289,9 +295,10 @@ PolynomialSpace<dim>::evaluate(
             {
               const unsigned int k2 = index_map_inverse[k++];
               for (unsigned int d = 0; d < dim; ++d)
-                grads[k2][d] = v[0][ix][(d == 0) ? 1 : 0] *
-                               ((dim > 1) ? v[1][iy][(d == 1) ? 1 : 0] : 1.) *
-                               ((dim > 2) ? v[2][iz][(d == 2) ? 1 : 0] : 1.);
+                grads[k2][d] =
+                  v[0][ix][(d DEAL_II_EQUALS 0) ? 1 : 0] *
+                  ((dim > 1) ? v[1][iy][(d DEAL_II_EQUALS 1) ? 1 : 0] : 1.) *
+                  ((dim > 2) ? v[2][iz][(d DEAL_II_EQUALS 2) ? 1 : 0] : 1.);
             }
     }
 
@@ -310,12 +317,12 @@ PolynomialSpace<dim>::evaluate(
                     // Derivative
                     // order for each
                     // direction
-                    const unsigned int j0 =
-                      ((d1 == 0) ? 1 : 0) + ((d2 == 0) ? 1 : 0);
-                    const unsigned int j1 =
-                      ((d1 == 1) ? 1 : 0) + ((d2 == 1) ? 1 : 0);
-                    const unsigned int j2 =
-                      ((d1 == 2) ? 1 : 0) + ((d2 == 2) ? 1 : 0);
+                    const unsigned int j0 = ((d1 DEAL_II_EQUALS 0) ? 1 : 0) +
+                                            ((d2 DEAL_II_EQUALS 0) ? 1 : 0);
+                    const unsigned int j1 = ((d1 DEAL_II_EQUALS 1) ? 1 : 0) +
+                                            ((d2 DEAL_II_EQUALS 1) ? 1 : 0);
+                    const unsigned int j2 = ((d1 DEAL_II_EQUALS 2) ? 1 : 0) +
+                                            ((d2 DEAL_II_EQUALS 2) ? 1 : 0);
 
                     grad_grads[k2][d1][d2] = v[0][ix][j0] *
                                              ((dim > 1) ? v[1][iy][j1] : 1.) *
@@ -343,11 +350,11 @@ PolynomialSpace<dim>::evaluate(
                       std::vector<unsigned int> deriv_order(dim, 0);
                       for (unsigned int x = 0; x < dim; ++x)
                         {
-                          if (d1 == x)
+                          if (d1 DEAL_II_EQUALS x)
                             ++deriv_order[x];
-                          if (d2 == x)
+                          if (d2 DEAL_II_EQUALS x)
                             ++deriv_order[x];
-                          if (d3 == x)
+                          if (d3 DEAL_II_EQUALS x)
                             ++deriv_order[x];
                         }
 
@@ -379,13 +386,13 @@ PolynomialSpace<dim>::evaluate(
                         std::vector<unsigned int> deriv_order(dim, 0);
                         for (unsigned int x = 0; x < dim; ++x)
                           {
-                            if (d1 == x)
+                            if (d1 DEAL_II_EQUALS x)
                               ++deriv_order[x];
-                            if (d2 == x)
+                            if (d2 DEAL_II_EQUALS x)
                               ++deriv_order[x];
-                            if (d3 == x)
+                            if (d3 DEAL_II_EQUALS x)
                               ++deriv_order[x];
-                            if (d4 == x)
+                            if (d4 DEAL_II_EQUALS x)
                               ++deriv_order[x];
                           }
 

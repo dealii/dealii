@@ -410,7 +410,7 @@ namespace TrilinosWrappers
   inline BlockSparseMatrix &
   BlockSparseMatrix::operator=(const double d)
   {
-    Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
+    Assert(d DEAL_II_EQUALS 0, ExcScalarAssignmentOnlyForZeroValue());
 
     for (size_type r = 0; r < this->n_block_rows(); ++r)
       for (size_type c = 0; c < this->n_block_cols(); ++c)
@@ -427,7 +427,7 @@ namespace TrilinosWrappers
     bool compressed = true;
     for (size_type row = 0; row < n_block_rows(); ++row)
       for (size_type col = 0; col < n_block_cols(); ++col)
-        if (block(row, col).is_compressed() == false)
+        if (block(row, col).is_compressed() DEAL_II_EQUALS false)
           {
             compressed = false;
             break;
@@ -472,7 +472,7 @@ namespace TrilinosWrappers
                            std::integral_constant<bool, true>,
                            std::integral_constant<bool, true>) const
   {
-    if (transpose == true)
+    if (transpose DEAL_II_EQUALS true)
       BaseClass::Tvmult_block_block(dst, src);
     else
       BaseClass::vmult_block_block(dst, src);
@@ -488,7 +488,7 @@ namespace TrilinosWrappers
                            std::integral_constant<bool, false>,
                            std::integral_constant<bool, true>) const
   {
-    if (transpose == true)
+    if (transpose DEAL_II_EQUALS true)
       BaseClass::Tvmult_nonblock_block(dst, src);
     else
       BaseClass::vmult_nonblock_block(dst, src);
@@ -504,7 +504,7 @@ namespace TrilinosWrappers
                            std::integral_constant<bool, true>,
                            std::integral_constant<bool, false>) const
   {
-    if (transpose == true)
+    if (transpose DEAL_II_EQUALS true)
       BaseClass::Tvmult_block_nonblock(dst, src);
     else
       BaseClass::vmult_block_nonblock(dst, src);
@@ -520,7 +520,7 @@ namespace TrilinosWrappers
                            std::integral_constant<bool, false>,
                            std::integral_constant<bool, false>) const
   {
-    if (transpose == true)
+    if (transpose DEAL_II_EQUALS true)
       BaseClass::Tvmult_nonblock_nonblock(dst, src);
     else
       BaseClass::vmult_nonblock_nonblock(dst, src);

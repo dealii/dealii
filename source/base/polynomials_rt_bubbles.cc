@@ -50,23 +50,29 @@ PolynomialsRT_Bubbles<dim>::evaluate(
   std::vector<Tensor<4, dim>> &third_derivatives,
   std::vector<Tensor<5, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == this->n() || values.size() == 0,
+  Assert(values.size() DEAL_II_EQUALS this->n() DEAL_II_OR values.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch(values.size(), this->n()));
-  Assert(grads.size() == this->n() || grads.size() == 0,
+  Assert(grads.size() DEAL_II_EQUALS this->n() DEAL_II_OR grads.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch(grads.size(), this->n()));
-  Assert(grad_grads.size() == this->n() || grad_grads.size() == 0,
+  Assert(grad_grads.size() DEAL_II_EQUALS this->n() DEAL_II_OR grad_grads.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch(grad_grads.size(), this->n()));
-  Assert(third_derivatives.size() == this->n() || third_derivatives.size() == 0,
+  Assert(third_derivatives.size()
+           DEAL_II_EQUALS this->n() DEAL_II_OR third_derivatives.size()
+             DEAL_II_EQUALS 0,
          ExcDimensionMismatch(third_derivatives.size(), this->n()));
-  Assert(fourth_derivatives.size() == this->n() ||
-           fourth_derivatives.size() == 0,
+  Assert(fourth_derivatives.size()
+           DEAL_II_EQUALS this->n() DEAL_II_OR fourth_derivatives.size()
+             DEAL_II_EQUALS 0,
          ExcDimensionMismatch(fourth_derivatives.size(), this->n()));
 
   // Third and fourth derivatives are not implemented
   (void)third_derivatives;
-  Assert(third_derivatives.size() == 0, ExcNotImplemented());
+  Assert(third_derivatives.size() DEAL_II_EQUALS 0, ExcNotImplemented());
   (void)fourth_derivatives;
-  Assert(fourth_derivatives.size() == 0, ExcNotImplemented());
+  Assert(fourth_derivatives.size() DEAL_II_EQUALS 0, ExcNotImplemented());
 
   const unsigned int n_sub     = raviart_thomas_space.n();
   const unsigned int my_degree = this->degree();
@@ -84,9 +90,9 @@ PolynomialsRT_Bubbles<dim>::evaluate(
     static std::vector<Tensor<4, dim>> p_third_derivatives;
     static std::vector<Tensor<5, dim>> p_fourth_derivatives;
 
-    p_values.resize((values.size() == 0) ? 0 : n_sub);
-    p_grads.resize((grads.size() == 0) ? 0 : n_sub);
-    p_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_sub);
+    p_values.resize((values.size() DEAL_II_EQUALS 0) ? 0 : n_sub);
+    p_grads.resize((grads.size() DEAL_II_EQUALS 0) ? 0 : n_sub);
+    p_grad_grads.resize((grad_grads.size() DEAL_II_EQUALS 0) ? 0 : n_sub);
 
     // This is the Raviart-Thomas part of the space
     raviart_thomas_space.evaluate(unit_point,
@@ -115,7 +121,7 @@ PolynomialsRT_Bubbles<dim>::evaluate(
 
   unsigned int start = n_sub;
 
-  if (dim == 2)
+  if (dim DEAL_II_EQUALS 2)
     {
       // In 2d the curl part of the space is spanned by the vectors
       // of two types. The first one is
@@ -196,9 +202,10 @@ PolynomialsRT_Bubbles<dim>::evaluate(
                 monoval_plus[0][1] * monoval_i[1][2];
             }
         }
-      Assert(start == this->n() - my_degree - 1, ExcInternalError());
+      Assert(start DEAL_II_EQUALS this->n() - my_degree - 1,
+             ExcInternalError());
     }
-  else if (dim == 3)
+  else if (dim DEAL_II_EQUALS 3)
     {
       // In 3d the first type of basis vector is
       //  [ x^i * y^j * z^k * (j+k+2) ]
@@ -821,13 +828,13 @@ PolynomialsRT_Bubbles<dim>::evaluate(
                     }
                 }
 
-              if (j == my_degree)
+              if (j DEAL_II_EQUALS my_degree)
                 start += 1;
               else
                 start += 2;
             }
         }
-      Assert(start == this->n() - 2 * n_curls, ExcInternalError());
+      Assert(start DEAL_II_EQUALS this->n() - 2 * n_curls, ExcInternalError());
     }
 }
 
@@ -837,7 +844,8 @@ template <int dim>
 unsigned int
 PolynomialsRT_Bubbles<dim>::n_polynomials(const unsigned int k)
 {
-  if (dim == 1 || dim == 2 || dim == 3)
+  if (dim DEAL_II_EQUALS 1 DEAL_II_OR dim DEAL_II_EQUALS 2 DEAL_II_OR dim
+                                                                      DEAL_II_EQUALS 3)
     return dim * Utilities::fixed_power<dim>(k + 1);
 
   Assert(false, ExcNotImplemented());

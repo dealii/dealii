@@ -122,7 +122,7 @@ MappingCartesian<dim, spacedim>::get_face_data(
 
   // verify that we have computed the transitive hull of the required
   // flags and that FEValues has faithfully passed them on to us
-  Assert(update_flags == requires_update_flags(update_flags),
+  Assert(update_flags DEAL_II_EQUALS requires_update_flags(update_flags),
          ExcInternalError());
 
   // store the flags in the internal data object so we can access them
@@ -147,7 +147,7 @@ MappingCartesian<dim, spacedim>::get_subface_data(
 
   // verify that we have computed the transitive hull of the required
   // flags and that FEValues has faithfully passed them on to us
-  Assert(update_flags == requires_update_flags(update_flags),
+  Assert(update_flags DEAL_II_EQUALS requires_update_flags(update_flags),
          ExcInternalError());
 
   // store the flags in the internal data object so we can access them

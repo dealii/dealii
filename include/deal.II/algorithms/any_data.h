@@ -245,7 +245,7 @@ AnyData::entry(const unsigned int i) const
 {
   AssertIndexRange(i, size());
   const type *p = boost::any_cast<type>(&data[i]);
-  if (p == nullptr)
+  if (p DEAL_II_EQUALS nullptr)
     p = boost::any_cast<const type>(&data[i]);
   Assert(p != nullptr,
          ExcTypeMismatch(typeid(type).name(), data[i].type().name()));
@@ -259,7 +259,7 @@ AnyData::read(const unsigned int i) const
 {
   AssertIndexRange(i, size());
   const type *p = boost::any_cast<type>(&data[i]);
-  if (p == nullptr)
+  if (p DEAL_II_EQUALS nullptr)
     p = boost::any_cast<const type>(&data[i]);
   Assert(p != nullptr,
          ExcTypeMismatch(typeid(type).name(), data[i].type().name()));
@@ -273,7 +273,7 @@ AnyData::read_ptr(const unsigned int i) const
 {
   AssertIndexRange(i, size());
   const type *const *p = boost::any_cast<type *>(&data[i]);
-  if (p == nullptr)
+  if (p DEAL_II_EQUALS nullptr)
     p = boost::any_cast<const type *>(&data[i]);
   Assert(p != nullptr,
          ExcTypeMismatch(typeid(type *).name(), data[i].type().name()));
@@ -287,9 +287,9 @@ AnyData::try_read_ptr(const unsigned int i) const
 {
   AssertIndexRange(i, size());
   const type *const *p = boost::any_cast<type *>(&data[i]);
-  if (p == nullptr)
+  if (p DEAL_II_EQUALS nullptr)
     p = boost::any_cast<const type *>(&data[i]);
-  if (p == nullptr)
+  if (p DEAL_II_EQUALS nullptr)
     return nullptr;
   return *p;
 }
@@ -301,7 +301,7 @@ AnyData::try_read(const unsigned int i) const
 {
   AssertIndexRange(i, size());
   const type *p = boost::any_cast<type>(&data[i]);
-  if (p == 0)
+  if (p DEAL_II_EQUALS 0)
     p = boost::any_cast<const type>(&data[i]);
   return p;
 }
@@ -321,7 +321,7 @@ AnyData::try_find(const std::string &n) const
   std::vector<std::string>::const_iterator it =
     std::find(names.begin(), names.end(), n);
 
-  if (it == names.end())
+  if (it DEAL_II_EQUALS names.end())
     return numbers::invalid_unsigned_int;
 
   return it - names.begin();
@@ -342,7 +342,7 @@ template <typename type>
 inline bool
 AnyData::is_type(const unsigned int i) const
 {
-  return data[i].type() == typeid(type);
+  return data[i].type() DEAL_II_EQUALS typeid(type);
 }
 
 
@@ -386,7 +386,7 @@ AnyData::read_ptr(const std::string &n) const
 {
   const unsigned int i = find(n);
   const type *const *p = boost::any_cast<type *>(&data[i]);
-  if (p == nullptr)
+  if (p DEAL_II_EQUALS nullptr)
     p = boost::any_cast<const type *>(&data[i]);
   Assert(p != nullptr,
          ExcTypeMismatch(typeid(type).name(), data[i].type().name()));
@@ -399,11 +399,11 @@ inline const type *
 AnyData::try_read_ptr(const std::string &n) const
 {
   const unsigned int i = try_find(n);
-  if (i == numbers::invalid_unsigned_int)
+  if (i DEAL_II_EQUALS numbers::invalid_unsigned_int)
     return 0;
 
   const type *const *p = boost::any_cast<type *>(&data[i]);
-  if (p == 0)
+  if (p DEAL_II_EQUALS 0)
     p = boost::any_cast<const type *>(&data[i]);
   return *p;
 }
@@ -417,7 +417,7 @@ AnyData::try_read(const std::string &n) const
   std::vector<std::string>::const_iterator it =
     std::find(names.begin(), names.end(), n);
   // Return null pointer if not found
-  if (it == names.end())
+  if (it DEAL_II_EQUALS names.end())
     return nullptr;
 
   // Compute index and return casted pointer

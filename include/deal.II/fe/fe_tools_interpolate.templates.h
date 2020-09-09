@@ -82,12 +82,12 @@ namespace FETools
     const AffineConstraints<typename OutVector::value_type> &constraints,
     OutVector &                                              u2)
   {
-    Assert(&dof1.get_triangulation() == &dof2.get_triangulation(),
+    Assert(&dof1.get_triangulation() DEAL_II_EQUALS & dof2.get_triangulation(),
            ExcTriangulationMismatch());
 
-    Assert(u1.size() == dof1.n_dofs(),
+    Assert(u1.size() DEAL_II_EQUALS dof1.n_dofs(),
            ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
-    Assert(u2.size() == dof2.n_dofs(),
+    Assert(u2.size() DEAL_II_EQUALS dof2.n_dofs(),
            ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
 
@@ -96,10 +96,10 @@ namespace FETools
     const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
     const IndexSet &dof2_local_dofs = dof2.locally_owned_dofs();
     const IndexSet  u1_elements     = u1.locally_owned_elements();
-    Assert(u1_elements == dof1_local_dofs,
+    Assert(u1_elements DEAL_II_EQUALS dof1_local_dofs,
            ExcMessage("The provided vector and DoF handler should have the same"
                       " index sets."));
-    Assert(u2_elements == dof2_local_dofs,
+    Assert(u2_elements DEAL_II_EQUALS dof2_local_dofs,
            ExcMessage("The provided vector and DoF handler should have the same"
                       " index sets."));
 #endif
@@ -145,11 +145,12 @@ namespace FETools
       dof1.get_triangulation().locally_owned_subdomain();
 
     for (; cell1 != endc1; ++cell1, ++cell2)
-      if ((cell1->subdomain_id() == subdomain_id) ||
-          (subdomain_id == numbers::invalid_subdomain_id))
+      if ((cell1->subdomain_id() DEAL_II_EQUALS subdomain_id)DEAL_II_OR(
+            subdomain_id DEAL_II_EQUALS numbers::invalid_subdomain_id))
         {
-          Assert(cell1->get_fe().n_components() ==
-                   cell2->get_fe().n_components(),
+          Assert(cell1->get_fe()
+                   .n_components() DEAL_II_EQUALS cell2->get_fe()
+                   .n_components(),
                  ExcDimensionMismatch(cell1->get_fe().n_components(),
                                       cell2->get_fe().n_components()));
 
@@ -158,13 +159,13 @@ namespace FETools
           // hanging node constraints. Consequently, when the elements are
           // continuous no hanging node constraints are allowed.
           const bool hanging_nodes_not_allowed =
-            ((cell2->get_fe().n_dofs_per_vertex() != 0) &&
-             (constraints.n_constraints() == 0));
+            ((cell2->get_fe().n_dofs_per_vertex() != 0)
+               DEAL_II_AND(constraints.n_constraints() DEAL_II_EQUALS 0));
 
           if (hanging_nodes_not_allowed)
             for (const unsigned int face : cell1->face_indices())
-              Assert(cell1->at_boundary(face) ||
-                       cell1->neighbor(face)->level() == cell1->level(),
+              Assert(cell1->at_boundary(face) DEAL_II_OR cell1->neighbor(face)
+                       ->level() DEAL_II_EQUALS          cell1->level(),
                      ExcHangingNodesNotAllowed());
 #endif
 
@@ -177,8 +178,8 @@ namespace FETools
           // matrix for this particular
           // pair of elements is already
           // there
-          if (interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()]
-                .get() == nullptr)
+          if (interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()].get()
+                DEAL_II_EQUALS nullptr)
             {
               auto interpolation_matrix =
                 std::make_unique<FullMatrix<double>>(dofs_per_cell2,
@@ -215,7 +216,7 @@ namespace FETools
         }
     // cell1 is at the end, so should
     // be cell2
-    Assert(cell2 == endc2, ExcInternalError());
+    Assert(cell2 DEAL_II_EQUALS endc2, ExcInternalError());
 
     u2.compress(VectorOperation::add);
     touch_count.compress(VectorOperation::add);
@@ -264,12 +265,12 @@ namespace FETools
                    const FiniteElement<dim, spacedim> &fe2,
                    OutVector &                         u1_interpolated)
   {
-    Assert(dof1.get_fe(0).n_components() == fe2.n_components(),
+    Assert(dof1.get_fe(0).n_components() DEAL_II_EQUALS fe2.n_components(),
            ExcDimensionMismatch(dof1.get_fe(0).n_components(),
                                 fe2.n_components()));
-    Assert(u1.size() == dof1.n_dofs(),
+    Assert(u1.size() DEAL_II_EQUALS dof1.n_dofs(),
            ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
-    Assert(u1_interpolated.size() == dof1.n_dofs(),
+    Assert(u1_interpolated.size() DEAL_II_EQUALS dof1.n_dofs(),
            ExcDimensionMismatch(u1_interpolated.size(), dof1.n_dofs()));
 
 #ifdef DEBUG
@@ -277,10 +278,10 @@ namespace FETools
     const IndexSet  u1_elements     = u1.locally_owned_elements();
     const IndexSet  u1_interpolated_elements =
       u1_interpolated.locally_owned_elements();
-    Assert(u1_elements == dof1_local_dofs,
+    Assert(u1_elements DEAL_II_EQUALS dof1_local_dofs,
            ExcMessage("The provided vector and DoF handler should have the same"
                       " index sets."));
-    Assert(u1_interpolated_elements == dof1_local_dofs,
+    Assert(u1_interpolated_elements DEAL_II_EQUALS dof1_local_dofs,
            ExcMessage("The provided vector and DoF handler should have the same"
                       " index sets."));
 #endif
@@ -304,28 +305,28 @@ namespace FETools
       interpolation_matrices;
 
     for (; cell != endc; ++cell)
-      if ((cell->subdomain_id() == subdomain_id) ||
-          (subdomain_id == numbers::invalid_subdomain_id))
+      if ((cell->subdomain_id() DEAL_II_EQUALS subdomain_id)DEAL_II_OR(
+            subdomain_id DEAL_II_EQUALS numbers::invalid_subdomain_id))
         {
 #ifdef DEBUG
           // For continuous elements on grids with hanging nodes we need
           // hanging node constraints. Consequently, when the elements are
           // continuous no hanging node constraints are allowed.
           const bool hanging_nodes_not_allowed =
-            (cell->get_fe().n_dofs_per_vertex() != 0) ||
-            (fe2.n_dofs_per_vertex() != 0);
+            (cell->get_fe().n_dofs_per_vertex() != 0)
+              DEAL_II_OR(fe2.n_dofs_per_vertex() != 0);
 
           if (hanging_nodes_not_allowed)
             for (const unsigned int face : cell->face_indices())
-              Assert(cell->at_boundary(face) ||
-                       cell->neighbor(face)->level() == cell->level(),
+              Assert(cell->at_boundary(face) DEAL_II_OR cell->neighbor(face)
+                       ->level() DEAL_II_EQUALS         cell->level(),
                      ExcHangingNodesNotAllowed());
 #endif
 
           const unsigned int dofs_per_cell1 = cell->get_fe().n_dofs_per_cell();
 
           // make sure back_interpolation matrix is available
-          if (interpolation_matrices[&cell->get_fe()] == nullptr)
+          if (interpolation_matrices[&cell->get_fe()] DEAL_II_EQUALS nullptr)
             {
               interpolation_matrices[&cell->get_fe()] =
                 std::make_unique<FullMatrix<double>>(dofs_per_cell1,
@@ -462,7 +463,7 @@ namespace FETools
         typename TrilinosWrappers::MPI::BlockVector::value_type> &constraints2,
       TrilinosWrappers::MPI::BlockVector &u1_interpolated)
     {
-      if (u1.n_blocks() == 0)
+      if (u1.n_blocks() DEAL_II_EQUALS 0)
         return;
       const MPI_Comm &mpi_communicator = u1.block(0).get_mpi_communicator();
       const IndexSet &dof2_locally_owned_dofs = dof2.locally_owned_dofs();
@@ -570,18 +571,23 @@ namespace FETools
   {
     // For discontinuous elements without constraints take the simpler version
     // of the back_interpolate function.
-    if (dof1.get_fe().n_dofs_per_vertex() == 0 &&
-        dof2.get_fe().n_dofs_per_vertex() == 0 &&
-        constraints1.n_constraints() == 0 && constraints2.n_constraints() == 0)
+    if (dof1.get_fe()
+          .n_dofs_per_vertex() DEAL_II_EQUALS 0 DEAL_II_AND dof2.get_fe()
+          .n_dofs_per_vertex() DEAL_II_EQUALS 0 DEAL_II_AND constraints1
+          .n_constraints()
+            DEAL_II_EQUALS 0 DEAL_II_AND constraints2.n_constraints()
+              DEAL_II_EQUALS 0)
       back_interpolate(dof1, u1, dof2.get_fe(), u1_interpolated);
     else
       {
-        Assert(dof1.get_fe(0).n_components() == dof2.get_fe(0).n_components(),
+        Assert(dof1.get_fe(0)
+                 .n_components() DEAL_II_EQUALS dof2.get_fe(0)
+                 .n_components(),
                ExcDimensionMismatch(dof1.get_fe(0).n_components(),
                                     dof2.get_fe(0).n_components()));
-        Assert(u1.size() == dof1.n_dofs(),
+        Assert(u1.size() DEAL_II_EQUALS dof1.n_dofs(),
                ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
-        Assert(u1_interpolated.size() == dof1.n_dofs(),
+        Assert(u1_interpolated.size() DEAL_II_EQUALS dof1.n_dofs(),
                ExcDimensionMismatch(u1_interpolated.size(), dof1.n_dofs()));
 
         // For continuous elements first interpolate to dof2, taking into
@@ -601,12 +607,12 @@ namespace FETools
                            const FiniteElement<dim, spacedim> &fe2,
                            OutVector &                         u1_difference)
   {
-    Assert(dof1.get_fe(0).n_components() == fe2.n_components(),
+    Assert(dof1.get_fe(0).n_components() DEAL_II_EQUALS fe2.n_components(),
            ExcDimensionMismatch(dof1.get_fe(0).n_components(),
                                 fe2.n_components()));
-    Assert(u1.size() == dof1.n_dofs(),
+    Assert(u1.size() DEAL_II_EQUALS dof1.n_dofs(),
            ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
-    Assert(u1_difference.size() == dof1.n_dofs(),
+    Assert(u1_difference.size() DEAL_II_EQUALS dof1.n_dofs(),
            ExcDimensionMismatch(u1_difference.size(), dof1.n_dofs()));
 
 #ifdef DEBUG
@@ -614,10 +620,10 @@ namespace FETools
     const IndexSet  u1_elements     = u1.locally_owned_elements();
     const IndexSet  u1_difference_elements =
       u1_difference.locally_owned_elements();
-    Assert(u1_elements == dof1_local_dofs,
+    Assert(u1_elements DEAL_II_EQUALS dof1_local_dofs,
            ExcMessage("The provided vector and DoF handler should have the same"
                       " index sets."));
-    Assert(u1_difference_elements == dof1_local_dofs,
+    Assert(u1_difference_elements DEAL_II_EQUALS dof1_local_dofs,
            ExcMessage("The provided vector and DoF handler should have the same"
                       " index sets."));
 #endif
@@ -638,21 +644,21 @@ namespace FETools
       endc = dof1.end();
 
     for (; cell != endc; ++cell)
-      if ((cell->subdomain_id() == subdomain_id) ||
-          (subdomain_id == numbers::invalid_subdomain_id))
+      if ((cell->subdomain_id() DEAL_II_EQUALS subdomain_id)DEAL_II_OR(
+            subdomain_id DEAL_II_EQUALS numbers::invalid_subdomain_id))
         {
 #ifdef DEBUG
           // For continuous elements on grids with hanging nodes we need
           // hanging node constraints. Consequently, when the elements are
           // continuous no hanging node constraints are allowed.
           const bool hanging_nodes_not_allowed =
-            (dof1.get_fe().n_dofs_per_vertex() != 0) ||
-            (fe2.n_dofs_per_vertex() != 0);
+            (dof1.get_fe().n_dofs_per_vertex() != 0)
+              DEAL_II_OR(fe2.n_dofs_per_vertex() != 0);
 
           if (hanging_nodes_not_allowed)
             for (const unsigned int face : cell->face_indices())
-              Assert(cell->at_boundary(face) ||
-                       cell->neighbor(face)->level() == cell->level(),
+              Assert(cell->at_boundary(face) DEAL_II_OR cell->neighbor(face)
+                       ->level() DEAL_II_EQUALS         cell->level(),
                      ExcHangingNodesNotAllowed());
 #endif
 
@@ -732,9 +738,12 @@ namespace FETools
     // without constraints take the
     // cheaper version of the
     // interpolation_difference function.
-    if (dof1.get_fe().n_dofs_per_vertex() == 0 &&
-        dof2.get_fe().n_dofs_per_vertex() == 0 &&
-        constraints1.n_constraints() == 0 && constraints2.n_constraints() == 0)
+    if (dof1.get_fe()
+          .n_dofs_per_vertex() DEAL_II_EQUALS 0 DEAL_II_AND dof2.get_fe()
+          .n_dofs_per_vertex() DEAL_II_EQUALS 0 DEAL_II_AND constraints1
+          .n_constraints()
+            DEAL_II_EQUALS 0 DEAL_II_AND constraints2.n_constraints()
+              DEAL_II_EQUALS 0)
       interpolation_difference(dof1, u1, dof2.get_fe(), u1_difference);
     else
       {
@@ -752,14 +761,16 @@ namespace FETools
              const DoFHandler<dim, spacedim> &dof2,
              OutVector &                      u2)
   {
-    Assert(&dof1.get_triangulation() == &dof2.get_triangulation(),
+    Assert(&dof1.get_triangulation() DEAL_II_EQUALS & dof2.get_triangulation(),
            ExcTriangulationMismatch());
-    Assert(dof1.get_fe(0).n_components() == dof2.get_fe(0).n_components(),
+    Assert(dof1.get_fe(0)
+             .n_components() DEAL_II_EQUALS dof2.get_fe(0)
+             .n_components(),
            ExcDimensionMismatch(dof1.get_fe(0).n_components(),
                                 dof2.get_fe(0).n_components()));
-    Assert(u1.size() == dof1.n_dofs(),
+    Assert(u1.size() DEAL_II_EQUALS dof1.n_dofs(),
            ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
-    Assert(u2.size() == dof2.n_dofs(),
+    Assert(u2.size() DEAL_II_EQUALS dof2.n_dofs(),
            ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
     typename DoFHandler<dim, spacedim>::active_cell_iterator cell1 =

@@ -87,9 +87,9 @@ namespace internal
     NumberCache::get_n_locally_owned_dofs_per_processor(
       const MPI_Comm mpi_communicator) const
     {
-      if (n_global_dofs == 0)
+      if (n_global_dofs DEAL_II_EQUALS 0)
         return std::vector<types::global_dof_index>();
-      else if (n_locally_owned_dofs_per_processor.empty() == false)
+      else if (n_locally_owned_dofs_per_processor.empty() DEAL_II_EQUALS false)
         {
           AssertDimension(n_locally_owned_dofs_per_processor.size(),
                           (Utilities::MPI::job_supports_mpi() ?
@@ -111,9 +111,9 @@ namespace internal
       const MPI_Comm mpi_communicator) const
     {
       AssertDimension(locally_owned_dofs.size(), n_global_dofs);
-      if (n_global_dofs == 0)
+      if (n_global_dofs DEAL_II_EQUALS 0)
         return std::vector<IndexSet>();
-      else if (locally_owned_dofs_per_processor.empty() == false)
+      else if (locally_owned_dofs_per_processor.empty() DEAL_II_EQUALS false)
         {
           AssertDimension(locally_owned_dofs_per_processor.size(),
                           (Utilities::MPI::job_supports_mpi() ?

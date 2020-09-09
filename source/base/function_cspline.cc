@@ -32,7 +32,8 @@ namespace Functions
     Assert(interpolation_points.size() > 0,
            ExcCSplineEmpty(interpolation_points.size()));
 
-    Assert(interpolation_points.size() == interpolation_values.size(),
+    Assert(interpolation_points.size()
+             DEAL_II_EQUALS interpolation_values.size(),
            ExcCSplineSizeMismatch(interpolation_points.size(),
                                   interpolation_values.size()));
 
@@ -76,8 +77,8 @@ namespace Functions
     std::lock_guard<std::mutex> lock(acc_mutex);
 
     const double x = p[0];
-    Assert(x >= interpolation_points.front() &&
-             x <= interpolation_points.back(),
+    Assert(x >= interpolation_points.front()
+                  DEAL_II_AND x <= interpolation_points.back(),
            ExcCSplineRange(x,
                            interpolation_points.front(),
                            interpolation_points.back()));
@@ -97,8 +98,8 @@ namespace Functions
     std::lock_guard<std::mutex> lock(acc_mutex);
 
     const double x = p[0];
-    Assert(x >= interpolation_points.front() &&
-             x <= interpolation_points.back(),
+    Assert(x >= interpolation_points.front()
+                  DEAL_II_AND x <= interpolation_points.back(),
            ExcCSplineRange(x,
                            interpolation_points.front(),
                            interpolation_points.back()));
@@ -121,8 +122,8 @@ namespace Functions
     std::lock_guard<std::mutex> lock(acc_mutex);
 
     const double x = p[0];
-    Assert(x >= interpolation_points.front() &&
-             x <= interpolation_points.back(),
+    Assert(x >= interpolation_points.front()
+                  DEAL_II_AND x <= interpolation_points.back(),
            ExcCSplineRange(x,
                            interpolation_points.front(),
                            interpolation_points.back()));

@@ -34,9 +34,9 @@ namespace internal
     std::size_t
     TriaFaces::memory_consumption() const
     {
-      if (dim == 2)
+      if (dim DEAL_II_EQUALS 2)
         return MemoryConsumption::memory_consumption(lines);
-      if (dim == 3)
+      if (dim DEAL_II_EQUALS 3)
         return (MemoryConsumption::memory_consumption(quads) +
                 MemoryConsumption::memory_consumption(lines));
 

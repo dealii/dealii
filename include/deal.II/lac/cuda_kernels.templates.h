@@ -218,7 +218,7 @@ namespace LinearAlgebra
               }
           }
 
-        if (local_idx == 0)
+        if (local_idx DEAL_II_EQUALS 0)
           Operation::atomic_op(result, result_buffer[0]);
       }
 

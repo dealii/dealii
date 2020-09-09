@@ -48,24 +48,24 @@ namespace PETScWrappers
           PetscInt       begin, end;
           PetscErrorCode ierr =
             VecGetOwnershipRange(vector.vector, &begin, &end);
-          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
           Vec locally_stored_elements = PETSC_NULL;
           ierr = VecGhostGetLocalForm(vector.vector, &locally_stored_elements);
-          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
           PetscInt lsize;
           ierr = VecGetSize(locally_stored_elements, &lsize);
-          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
           PetscScalar *ptr;
           ierr = VecGetArray(locally_stored_elements, &ptr);
-          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
           PetscScalar value;
 
-          if (index >= static_cast<size_type>(begin) &&
-              index < static_cast<size_type>(end))
+          if (index >= static_cast<size_type>(begin)
+                         DEAL_II_AND index < static_cast<size_type>(end))
             {
               // local entry
               value = *(ptr + index - begin);
@@ -81,11 +81,11 @@ namespace PETScWrappers
             }
 
           ierr = VecRestoreArray(locally_stored_elements, &ptr);
-          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
           ierr =
             VecGhostRestoreLocalForm(vector.vector, &locally_stored_elements);
-          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
           return value;
         }
@@ -97,16 +97,16 @@ namespace PETScWrappers
       PetscInt begin, end;
 
       PetscErrorCode ierr = VecGetOwnershipRange(vector.vector, &begin, &end);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
-      AssertThrow((index >= static_cast<size_type>(begin)) &&
-                    (index < static_cast<size_type>(end)),
+      AssertThrow((index >= static_cast<size_type>(begin))
+                    DEAL_II_AND(index < static_cast<size_type>(end)),
                   ExcAccessToNonlocalElement(index, begin, end - 1));
 
       PetscInt    idx = index;
       PetscScalar value;
       ierr = VecGetValues(vector.vector, 1, &idx, &value);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       return value;
     }
@@ -138,10 +138,10 @@ namespace PETScWrappers
                       "the thread limit to 1 in MPI_InitFinalize()."));
 
     PetscErrorCode ierr = VecDuplicate(v.vector, &vector);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     ierr = VecCopy(v.vector, vector);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
   }
 
 
@@ -165,7 +165,7 @@ namespace PETScWrappers
     if (obtained_ownership)
       {
         const PetscErrorCode ierr = VecDestroy(&vector);
-        AssertNothrow(ierr == 0, ExcPETScError(ierr));
+        AssertNothrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
         (void)ierr;
       }
   }
@@ -178,7 +178,7 @@ namespace PETScWrappers
     if (obtained_ownership)
       {
         const PetscErrorCode ierr = VecDestroy(&vector);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
       }
 
     ghosted = false;
@@ -197,19 +197,19 @@ namespace PETScWrappers
     // TODO[TH]: assert(is_compressed())
 
     PetscErrorCode ierr = VecSet(vector, s);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     if (has_ghost_elements())
       {
         Vec ghost = PETSC_NULL;
         ierr      = VecGhostGetLocalForm(vector, &ghost);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
         ierr = VecSet(ghost, s);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
         ierr = VecGhostRestoreLocalForm(vector, &ghost);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
       }
 
     return *this;
@@ -217,16 +217,16 @@ namespace PETScWrappers
 
 
 
-  bool
-  VectorBase::operator==(const VectorBase &v) const
+  bool VectorBase::operator DEAL_II_EQUALS(const VectorBase &v) const
   {
-    Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
+    Assert(size() DEAL_II_EQUALS v.size(),
+           ExcDimensionMismatch(size(), v.size()));
 
     PetscBool            flag;
     const PetscErrorCode ierr = VecEqual(vector, v.vector, &flag);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
-    return (flag == PETSC_TRUE);
+    return (flag DEAL_II_EQUALS PETSC_TRUE);
   }
 
 
@@ -234,13 +234,14 @@ namespace PETScWrappers
   bool
   VectorBase::operator!=(const VectorBase &v) const
   {
-    Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
+    Assert(size() DEAL_II_EQUALS v.size(),
+           ExcDimensionMismatch(size(), v.size()));
 
     PetscBool            flag;
     const PetscErrorCode ierr = VecEqual(vector, v.vector, &flag);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
-    return (flag == PETSC_FALSE);
+    return (flag DEAL_II_EQUALS PETSC_FALSE);
   }
 
 
@@ -250,7 +251,7 @@ namespace PETScWrappers
   {
     PetscInt             sz;
     const PetscErrorCode ierr = VecGetSize(vector, &sz);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     return sz;
   }
@@ -262,7 +263,7 @@ namespace PETScWrappers
   {
     PetscInt             sz;
     const PetscErrorCode ierr = VecGetLocalSize(vector, &sz);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     return sz;
   }
@@ -275,7 +276,7 @@ namespace PETScWrappers
     PetscInt             begin, end;
     const PetscErrorCode ierr =
       VecGetOwnershipRange(static_cast<const Vec &>(vector), &begin, &end);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     return std::make_pair(begin, end);
   }
@@ -286,7 +287,7 @@ namespace PETScWrappers
   VectorBase::set(const std::vector<size_type> &  indices,
                   const std::vector<PetscScalar> &values)
   {
-    Assert(indices.size() == values.size(),
+    Assert(indices.size() DEAL_II_EQUALS values.size(),
            ExcMessage("Function called with arguments of different sizes"));
     do_set_add_operation(indices.size(), indices.data(), values.data(), false);
   }
@@ -297,7 +298,7 @@ namespace PETScWrappers
   VectorBase::add(const std::vector<size_type> &  indices,
                   const std::vector<PetscScalar> &values)
   {
-    Assert(indices.size() == values.size(),
+    Assert(indices.size() DEAL_II_EQUALS values.size(),
            ExcMessage("Function called with arguments of different sizes"));
     do_set_add_operation(indices.size(), indices.data(), values.data(), true);
   }
@@ -308,7 +309,7 @@ namespace PETScWrappers
   VectorBase::add(const std::vector<size_type> &       indices,
                   const ::dealii::Vector<PetscScalar> &values)
   {
-    Assert(indices.size() == values.size(),
+    Assert(indices.size() DEAL_II_EQUALS values.size(),
            ExcMessage("Function called with arguments of different sizes"));
     do_set_add_operation(indices.size(), indices.data(), values.begin(), true);
   }
@@ -327,7 +328,8 @@ namespace PETScWrappers
 
   PetscScalar VectorBase::operator*(const VectorBase &vec) const
   {
-    Assert(size() == vec.size(), ExcDimensionMismatch(size(), vec.size()));
+    Assert(size() DEAL_II_EQUALS vec.size(),
+           ExcDimensionMismatch(size(), vec.size()));
 
     PetscScalar result;
 
@@ -339,7 +341,7 @@ namespace PETScWrappers
     // complex conjugate, which is also how we document this
     // operation.
     const PetscErrorCode ierr = VecDot(vec.vector, vector, &result);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     return result;
   }
@@ -385,8 +387,8 @@ namespace PETScWrappers
     }
 
     AssertThrow(
-      last_action == ::dealii::VectorOperation::unknown ||
-        last_action == operation,
+      last_action DEAL_II_EQUALS ::dealii::VectorOperation::unknown DEAL_II_OR
+        last_action DEAL_II_EQUALS operation,
       ExcMessage(
         "Missing compress() or calling with wrong VectorOperation argument."));
 
@@ -405,9 +407,9 @@ namespace PETScWrappers
     // VecAssemblyBegin/End on all
     // processors.
     PetscErrorCode ierr = VecAssemblyBegin(vector);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
     ierr = VecAssemblyEnd(vector);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     // reset the last action field to
     // indicate that we're back to a
@@ -435,7 +437,7 @@ namespace PETScWrappers
       {
         PetscScalar          sum;
         const PetscErrorCode ierr = VecSum(vector, &sum);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
         return sum / static_cast<PetscReal>(size());
       }
 
@@ -443,7 +445,7 @@ namespace PETScWrappers
     // loop over all the elements
     PetscScalar *  start_ptr;
     PetscErrorCode ierr = VecGetArray(vector, &start_ptr);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     PetscScalar mean = 0;
     {
@@ -471,7 +473,7 @@ namespace PETScWrappers
     // restore the representation of the
     // vector
     ierr = VecRestoreArray(vector, &start_ptr);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     return mean;
   }
@@ -483,7 +485,7 @@ namespace PETScWrappers
     real_type d;
 
     const PetscErrorCode ierr = VecNorm(vector, NORM_1, &d);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     return d;
   }
@@ -496,7 +498,7 @@ namespace PETScWrappers
     real_type d;
 
     const PetscErrorCode ierr = VecNorm(vector, NORM_2, &d);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     return d;
   }
@@ -510,7 +512,7 @@ namespace PETScWrappers
     // loop over all the elements
     PetscScalar *  start_ptr;
     PetscErrorCode ierr = VecGetArray(vector, &start_ptr);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     real_type norm = 0;
     {
@@ -538,7 +540,7 @@ namespace PETScWrappers
     // restore the representation of the
     // vector
     ierr = VecRestoreArray(vector, &start_ptr);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     return norm;
   }
@@ -551,7 +553,7 @@ namespace PETScWrappers
     real_type d;
 
     const PetscErrorCode ierr = VecNorm(vector, NORM_INFINITY, &d);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     return d;
   }
@@ -565,7 +567,7 @@ namespace PETScWrappers
     real_type d;
 
     const PetscErrorCode ierr = VecMin(vector, &p, &d);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     return d;
   }
@@ -578,7 +580,7 @@ namespace PETScWrappers
     real_type d;
 
     const PetscErrorCode ierr = VecMax(vector, &p, &d);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     return d;
   }
@@ -592,7 +594,7 @@ namespace PETScWrappers
     // loop over all the elements
     PetscScalar *  start_ptr;
     PetscErrorCode ierr = VecGetArray(vector, &start_ptr);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     const PetscScalar *ptr = start_ptr, *eptr = start_ptr + local_size();
     bool               flag = true;
@@ -609,7 +611,7 @@ namespace PETScWrappers
     // restore the representation of the
     // vector
     ierr = VecRestoreArray(vector, &start_ptr);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     return flag;
   }
@@ -645,7 +647,7 @@ namespace PETScWrappers
     // loop over all the elements
     PetscScalar *  start_ptr;
     PetscErrorCode ierr = VecGetArray(vector, &start_ptr);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     const PetscScalar *ptr = start_ptr, *eptr = start_ptr + local_size();
     bool               flag = true;
@@ -662,7 +664,7 @@ namespace PETScWrappers
     // restore the representation of the
     // vector
     ierr = VecRestoreArray(vector, &start_ptr);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     return flag;
   }
@@ -676,7 +678,7 @@ namespace PETScWrappers
     AssertIsFinite(a);
 
     const PetscErrorCode ierr = VecScale(vector, a);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     return *this;
   }
@@ -693,7 +695,7 @@ namespace PETScWrappers
     AssertIsFinite(factor);
 
     const PetscErrorCode ierr = VecScale(vector, factor);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     return *this;
   }
@@ -705,7 +707,7 @@ namespace PETScWrappers
   {
     Assert(!has_ghost_elements(), ExcGhostsPresent());
     const PetscErrorCode ierr = VecAXPY(vector, 1, v);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     return *this;
   }
@@ -717,7 +719,7 @@ namespace PETScWrappers
   {
     Assert(!has_ghost_elements(), ExcGhostsPresent());
     const PetscErrorCode ierr = VecAXPY(vector, -1, v);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     return *this;
   }
@@ -731,7 +733,7 @@ namespace PETScWrappers
     AssertIsFinite(s);
 
     const PetscErrorCode ierr = VecShift(vector, s);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
   }
 
 
@@ -743,7 +745,7 @@ namespace PETScWrappers
     AssertIsFinite(a);
 
     const PetscErrorCode ierr = VecAXPY(vector, a, v);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
   }
 
 
@@ -762,7 +764,7 @@ namespace PETScWrappers
     Vec               addends[2] = {v.vector, w.vector};
 
     const PetscErrorCode ierr = VecMAXPY(vector, 2, weights, addends);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
   }
 
 
@@ -774,7 +776,7 @@ namespace PETScWrappers
     AssertIsFinite(s);
 
     const PetscErrorCode ierr = VecAYPX(vector, s, v);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
   }
 
 
@@ -802,7 +804,7 @@ namespace PETScWrappers
   {
     Assert(!has_ghost_elements(), ExcGhostsPresent());
     const PetscErrorCode ierr = VecPointwiseMult(vector, factors, vector);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
   }
 
 
@@ -813,13 +815,14 @@ namespace PETScWrappers
     Assert(!has_ghost_elements(), ExcGhostsPresent());
     AssertIsFinite(a);
 
-    Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
+    Assert(size() DEAL_II_EQUALS v.size(),
+           ExcDimensionMismatch(size(), v.size()));
 
     // there is no simple operation for this
     // in PETSc. there are multiple ways to
     // emulate it, we choose this one:
     const PetscErrorCode ierr = VecCopy(v.vector, vector);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     *this *= a;
   }
@@ -834,11 +837,11 @@ namespace PETScWrappers
     // Set options
     PetscErrorCode ierr =
       PetscViewerSetFormat(PETSC_VIEWER_STDOUT_WORLD, format);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     // Write to screen
     ierr = VecView(vector, PETSC_VIEWER_STDOUT_WORLD);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
   }
 
 
@@ -856,7 +859,7 @@ namespace PETScWrappers
     PetscScalar *  val;
     PetscErrorCode ierr = VecGetArray(vector, &val);
 
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     // save the state of out stream
     const std::ios::fmtflags old_flags     = out.flags();
@@ -883,7 +886,7 @@ namespace PETScWrappers
     // restore the representation of the
     // vector
     ierr = VecRestoreArray(vector, &val);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     AssertThrow(out, ExcIO());
   }
@@ -894,7 +897,7 @@ namespace PETScWrappers
   VectorBase::swap(VectorBase &v)
   {
     const PetscErrorCode ierr = VecSwap(vector, v.vector);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
   }
 
 
@@ -936,8 +939,8 @@ namespace PETScWrappers
     ::dealii::VectorOperation::values action =
       (add_values ? ::dealii::VectorOperation::add :
                     ::dealii::VectorOperation::insert);
-    Assert((last_action == action) ||
-             (last_action == ::dealii::VectorOperation::unknown),
+    Assert((last_action DEAL_II_EQUALS action)DEAL_II_OR(
+             last_action DEAL_II_EQUALS ::dealii::VectorOperation::unknown),
            internal::VectorReference::ExcWrongMode(action, last_action));
     Assert(!has_ghost_elements(), ExcGhostsPresent());
     // VecSetValues complains if we
@@ -954,7 +957,7 @@ namespace PETScWrappers
         const InsertMode     mode = (add_values ? ADD_VALUES : INSERT_VALUES);
         const PetscErrorCode ierr =
           VecSetValues(vector, n_elements, petsc_indices, values, mode);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
       }
 
     // set the mode here, independent of whether we have actually

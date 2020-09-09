@@ -415,9 +415,9 @@ namespace Particles
       const auto &fe = dof_handler.get_fe();
 
       // Take care of components
-      const ComponentMask mask =
-        (components.size() == 0 ? ComponentMask(fe.n_components(), true) :
-                                  components);
+      const ComponentMask mask = (components.size() DEAL_II_EQUALS 0 ?
+                                    ComponentMask(fe.n_components(), true) :
+                                    components);
 
       std::map<types::global_dof_index, Point<spacedim>> support_points_map;
 

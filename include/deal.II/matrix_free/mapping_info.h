@@ -628,7 +628,7 @@ namespace internal
       quad_index_from_n_q_points(const unsigned int n_q_points) const
     {
       for (unsigned int i = 0; i < descriptor.size(); ++i)
-        if (n_q_points == descriptor[i].n_q_points)
+        if (n_q_points DEAL_II_EQUALS descriptor[i].n_q_points)
           return i;
       return 0;
     }

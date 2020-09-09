@@ -29,29 +29,32 @@ DEAL_II_NAMESPACE_OPEN
 #endif
 #include "mapping_info.inst"
 
-#if SPLIT_INSTANTIATIONS_INDEX == 0
+#if SPLIT_INSTANTIATIONS_INDEX DEAL_II_EQUALS 0
 
 template struct internal::MatrixFreeFunctions::
   FPArrayComparator<double, VectorizedArray<double, 1>>;
 template struct internal::MatrixFreeFunctions::
   FPArrayComparator<float, VectorizedArray<float, 1>>;
 
-#  if (DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__SSE2__)) || \
-    (DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__ALTIVEC__))
+#  if (DEAL_II_VECTORIZATION_WIDTH_IN_BITS >=         \
+       128 DEAL_II_AND defined(__SSE2__))             \
+    DEAL_II_OR(DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= \
+               128 DEAL_II_AND defined(__ALTIVEC__))
 template struct internal::MatrixFreeFunctions::
   FPArrayComparator<double, VectorizedArray<double, 2>>;
 template struct internal::MatrixFreeFunctions::
   FPArrayComparator<float, VectorizedArray<float, 4>>;
 #  endif
 
-#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && defined(__AVX__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 DEAL_II_AND defined(__AVX__)
 template struct internal::MatrixFreeFunctions::
   FPArrayComparator<double, VectorizedArray<double, 4>>;
 template struct internal::MatrixFreeFunctions::
   FPArrayComparator<float, VectorizedArray<float, 8>>;
 #  endif
 
-#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512 && defined(__AVX512F__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= \
+    512 DEAL_II_AND defined(__AVX512F__)
 template struct internal::MatrixFreeFunctions::
   FPArrayComparator<double, VectorizedArray<double, 8>>;
 template struct internal::MatrixFreeFunctions::

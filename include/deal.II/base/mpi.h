@@ -27,7 +27,7 @@
 #include <set>
 #include <vector>
 
-#if !defined(DEAL_II_WITH_MPI) && !defined(DEAL_II_WITH_PETSC)
+#if !defined(DEAL_II_WITH_MPI) DEAL_II_AND !defined(DEAL_II_WITH_PETSC)
 // without MPI, we would still like to use
 // some constructs with MPI data
 // types. Therefore, create some dummies
@@ -1117,8 +1117,9 @@ namespace Utilities
       (void)comm;
       Assert(objects_to_send.size() < 2,
              ExcMessage("Cannot send to more than one processor."));
-      Assert(objects_to_send.find(0) != objects_to_send.end() ||
-               objects_to_send.size() == 0,
+      Assert(objects_to_send.find(0) !=
+               objects_to_send.end() DEAL_II_OR objects_to_send.size()
+                 DEAL_II_EQUALS 0,
              ExcMessage("Can only send to myself or to nobody."));
       return objects_to_send;
 #  else
@@ -1129,7 +1130,7 @@ namespace Utilities
       std::vector<unsigned int> send_to;
       send_to.reserve(objects_to_send.size());
       for (const auto &m : objects_to_send)
-        if (m.first == my_proc)
+        if (m.first DEAL_II_EQUALS my_proc)
           received_objects[my_proc] = m.second;
         else
           send_to.emplace_back(m.first);
@@ -1145,7 +1146,9 @@ namespace Utilities
       // processors, we need to visit one of the two scopes below. Otherwise,
       // no other action is required by this mpi process, and we can safely
       // return.
-      if (send_to.size() == 0 && n_point_point_communications == 0)
+      if (send_to.size()
+            DEAL_II_EQUALS 0 DEAL_II_AND n_point_point_communications
+                                         DEAL_II_EQUALS 0)
         return received_objects;
 
       const int mpi_tag =
@@ -1202,9 +1205,9 @@ namespace Utilities
                             comm,
                             MPI_STATUS_IGNORE);
             AssertThrowMPI(ierr);
-            Assert(received_objects.find(rank) == received_objects.end(),
-                   ExcInternalError(
-                     "I should not receive again from this rank"));
+            Assert(
+              received_objects.find(rank) DEAL_II_EQUALS received_objects.end(),
+              ExcInternalError("I should not receive again from this rank"));
             received_objects[rank] = Utilities::unpack<T>(buffer);
           }
       }
@@ -1223,7 +1226,7 @@ namespace Utilities
     std::vector<T>
     all_gather(const MPI_Comm &comm, const T &object)
     {
-      if (job_supports_mpi() == false)
+      if (job_supports_mpi() DEAL_II_EQUALS false)
         return {object};
 
 #  ifndef DEAL_II_WITH_MPI
@@ -1301,7 +1304,7 @@ namespace Utilities
       // Vector to store the size of loc_data_array for every process
       // only the root process needs to allocate memory for that purpose
       std::vector<int> size_all_data;
-      if (my_rank == root_process)
+      if (my_rank DEAL_II_EQUALS root_process)
         size_all_data.resize(n_procs, 0);
 
       // Exchanging the size of each buffer
@@ -1318,7 +1321,7 @@ namespace Utilities
       // Now computing the displacement, relative to recvbuf,
       // at which to store the incoming buffer; only for root
       std::vector<int> rdispls;
-      if (my_rank == root_process)
+      if (my_rank DEAL_II_EQUALS root_process)
         {
           rdispls.resize(n_procs, 0);
           for (unsigned int i = 1; i < n_procs; ++i)
@@ -1326,7 +1329,7 @@ namespace Utilities
         }
       // exchange the buffer:
       std::vector<char> received_unrolled_buffer;
-      if (my_rank == root_process)
+      if (my_rank DEAL_II_EQUALS root_process)
         received_unrolled_buffer.resize(rdispls.back() + size_all_data.back());
 
       ierr = MPI_Gatherv(buffer.data(),
@@ -1342,7 +1345,7 @@ namespace Utilities
 
       std::vector<T> received_objects;
 
-      if (my_rank == root_process)
+      if (my_rank DEAL_II_EQUALS root_process)
         {
           received_objects.resize(n_procs);
 

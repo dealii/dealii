@@ -63,7 +63,7 @@ namespace parallel
 
     TBBPartitioner::~TBBPartitioner()
     {
-      AssertNothrow(in_use == false,
+      AssertNothrow(in_use DEAL_II_EQUALS false,
                     ExcInternalError(
                       "A vector partitioner goes out of scope, but "
                       "it appears to be still in use."));
@@ -88,7 +88,7 @@ namespace parallel
     TBBPartitioner::release_one_partitioner(
       std::shared_ptr<tbb::affinity_partitioner> &p)
     {
-      if (p.get() == my_partitioner.get())
+      if (p.get() DEAL_II_EQUALS my_partitioner.get())
         {
           std::lock_guard<std::mutex> lock(mutex);
           in_use = false;

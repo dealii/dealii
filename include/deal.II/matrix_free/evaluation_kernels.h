@@ -148,7 +148,7 @@ namespace internal
     Number *                                      hessians_quad,
     Number *                                      scratch_data)
   {
-    if (evaluation_flag == EvaluationFlags::nothing)
+    if (evaluation_flag DEAL_II_EQUALS EvaluationFlags::nothing)
       return;
 
     const EvaluatorVariant variant =
@@ -158,27 +158,27 @@ namespace internal
                                         fe_degree + 1,
                                         n_q_points_1d,
                                         Number>;
-    Eval eval(variant == evaluate_evenodd ?
+    Eval eval(variant DEAL_II_EQUALS evaluate_evenodd ?
                 shape_info.data.front().shape_values_eo :
                 shape_info.data.front().shape_values,
-              variant == evaluate_evenodd ?
+              variant DEAL_II_EQUALS evaluate_evenodd ?
                 shape_info.data.front().shape_gradients_eo :
                 shape_info.data.front().shape_gradients,
-              variant == evaluate_evenodd ?
+              variant DEAL_II_EQUALS evaluate_evenodd ?
                 shape_info.data.front().shape_hessians_eo :
                 shape_info.data.front().shape_hessians,
               shape_info.data.front().fe_degree + 1,
               shape_info.data.front().n_q_points_1d);
 
-    const unsigned int temp_size =
-      Eval::n_rows_of_product == numbers::invalid_unsigned_int ?
+    const unsigned int        temp_size =
+      Eval::n_rows_of_product DEAL_II_EQUALS numbers::invalid_unsigned_int ?
         0 :
         (Eval::n_rows_of_product > Eval::n_columns_of_product ?
            Eval::n_rows_of_product :
            Eval::n_columns_of_product);
     Number *temp1;
     Number *temp2;
-    if (temp_size == 0)
+    if (temp_size DEAL_II_EQUALS 0)
       {
         temp1 = scratch_data;
         temp2 = temp1 + std::max(Utilities::fixed_power<dim>(
@@ -192,14 +192,15 @@ namespace internal
         temp2 = temp1 + temp_size;
       }
 
-    const unsigned int n_q_points =
-      temp_size == 0 ? shape_info.n_q_points : Eval::n_columns_of_product;
+    const unsigned int n_q_points = temp_size DEAL_II_EQUALS 0 ?
+                                      shape_info.n_q_points :
+                                      Eval::n_columns_of_product;
     const unsigned int dofs_per_comp =
-      (type == MatrixFreeFunctions::truncated_tensor) ?
+      (type DEAL_II_EQUALS MatrixFreeFunctions::truncated_tensor) ?
         Utilities::fixed_power<dim>(shape_info.data.front().fe_degree + 1) :
         shape_info.dofs_per_component_on_cell;
     const Number *values_dofs = values_dofs_actual;
-    if (type == MatrixFreeFunctions::truncated_tensor)
+    if (type DEAL_II_EQUALS MatrixFreeFunctions::truncated_tensor)
       {
         Number *values_dofs_tmp =
           scratch_data + 2 * (std::max(shape_info.dofs_per_component_on_cell,
@@ -395,8 +396,8 @@ namespace internal
 
     // case additional dof for FE_Q_DG0: add values; gradients and second
     // derivatives evaluate to zero
-    if (type == MatrixFreeFunctions::tensor_symmetric_plus_dg0 &&
-        (evaluation_flag & EvaluationFlags::values))
+    if (type DEAL_II_EQUALS MatrixFreeFunctions::tensor_symmetric_plus_dg0
+                            DEAL_II_AND(evaluation_flag & EvaluationFlags::values))
       {
         values_quad -= n_components * n_q_points;
         values_dofs -= n_components * dofs_per_comp;
@@ -432,27 +433,27 @@ namespace internal
                                         fe_degree + 1,
                                         n_q_points_1d,
                                         Number>;
-    Eval eval(variant == evaluate_evenodd ?
+    Eval eval(variant DEAL_II_EQUALS evaluate_evenodd ?
                 shape_info.data.front().shape_values_eo :
                 shape_info.data.front().shape_values,
-              variant == evaluate_evenodd ?
+              variant DEAL_II_EQUALS evaluate_evenodd ?
                 shape_info.data.front().shape_gradients_eo :
                 shape_info.data.front().shape_gradients,
-              variant == evaluate_evenodd ?
+              variant DEAL_II_EQUALS evaluate_evenodd ?
                 shape_info.data.front().shape_hessians_eo :
                 shape_info.data.front().shape_hessians,
               shape_info.data.front().fe_degree + 1,
               shape_info.data.front().n_q_points_1d);
 
-    const unsigned int temp_size =
-      Eval::n_rows_of_product == numbers::invalid_unsigned_int ?
+    const unsigned int        temp_size =
+      Eval::n_rows_of_product DEAL_II_EQUALS numbers::invalid_unsigned_int ?
         0 :
         (Eval::n_rows_of_product > Eval::n_columns_of_product ?
            Eval::n_rows_of_product :
            Eval::n_columns_of_product);
     Number *temp1;
     Number *temp2;
-    if (temp_size == 0)
+    if (temp_size DEAL_II_EQUALS 0)
       {
         temp1 = scratch_data;
         temp2 = temp1 + std::max(Utilities::fixed_power<dim>(
@@ -466,15 +467,16 @@ namespace internal
         temp2 = temp1 + temp_size;
       }
 
-    const unsigned int n_q_points =
-      temp_size == 0 ? shape_info.n_q_points : Eval::n_columns_of_product;
+    const unsigned int n_q_points = temp_size DEAL_II_EQUALS 0 ?
+                                      shape_info.n_q_points :
+                                      Eval::n_columns_of_product;
     const unsigned int dofs_per_comp =
-      (type == MatrixFreeFunctions::truncated_tensor) ?
+      (type DEAL_II_EQUALS MatrixFreeFunctions::truncated_tensor) ?
         Utilities::fixed_power<dim>(shape_info.data.front().fe_degree + 1) :
         shape_info.dofs_per_component_on_cell;
     // expand dof_values to tensor product for truncated tensor products
     Number *values_dofs =
-      (type == MatrixFreeFunctions::truncated_tensor) ?
+      (type DEAL_II_EQUALS MatrixFreeFunctions::truncated_tensor) ?
         scratch_data + 2 * (std::max(shape_info.dofs_per_component_on_cell,
                                      shape_info.n_q_points)) :
         values_dofs_actual;
@@ -486,7 +488,7 @@ namespace internal
             {
               if (integration_flag & EvaluationFlags::values)
                 {
-                  if (add_into_values_array == false)
+                  if (add_into_values_array DEAL_II_EQUALS false)
                     eval.template values<0, false, false>(values_quad,
                                                           values_dofs);
                   else
@@ -495,8 +497,9 @@ namespace internal
                 }
               if (integration_flag & EvaluationFlags::gradients)
                 {
-                  if (integration_flag & EvaluationFlags::values ||
-                      add_into_values_array == true)
+                  if (integration_flag &
+                      EvaluationFlags::values DEAL_II_OR add_into_values_array
+                                                         DEAL_II_EQUALS true)
                     eval.template gradients<0, false, true>(gradients_quad,
                                                             values_dofs);
                   else
@@ -514,11 +517,11 @@ namespace internal
         case 2:
           for (unsigned int c = 0; c < n_components; c++)
             {
-              if ((integration_flag & EvaluationFlags::values) &&
-                  !(integration_flag & EvaluationFlags::gradients))
+              if ((integration_flag & EvaluationFlags::values) DEAL_II_AND !(
+                    integration_flag & EvaluationFlags::gradients))
                 {
                   eval.template values<1, false, false>(values_quad, temp1);
-                  if (add_into_values_array == false)
+                  if (add_into_values_array DEAL_II_EQUALS false)
                     eval.template values<0, false, false>(temp1, values_dofs);
                   else
                     eval.template values<0, false, true>(temp1, values_dofs);
@@ -530,7 +533,7 @@ namespace internal
                                                            temp1);
                   if (integration_flag & EvaluationFlags::values)
                     eval.template values<1, false, true>(values_quad, temp1);
-                  if (add_into_values_array == false)
+                  if (add_into_values_array DEAL_II_EQUALS false)
                     eval.template values<0, false, false>(temp1, values_dofs);
                   else
                     eval.template values<0, false, true>(temp1, values_dofs);
@@ -548,12 +551,12 @@ namespace internal
         case 3:
           for (unsigned int c = 0; c < n_components; c++)
             {
-              if ((integration_flag & EvaluationFlags::values) &&
-                  !(integration_flag & EvaluationFlags::gradients))
+              if ((integration_flag & EvaluationFlags::values) DEAL_II_AND !(
+                    integration_flag & EvaluationFlags::gradients))
                 {
                   eval.template values<2, false, false>(values_quad, temp1);
                   eval.template values<1, false, false>(temp1, temp2);
-                  if (add_into_values_array == false)
+                  if (add_into_values_array DEAL_II_EQUALS false)
                     eval.template values<0, false, false>(temp2, values_dofs);
                   else
                     eval.template values<0, false, true>(temp2, values_dofs);
@@ -570,7 +573,7 @@ namespace internal
                                                           n_q_points,
                                                         temp1);
                   eval.template gradients<1, false, true>(temp1, temp2);
-                  if (add_into_values_array == false)
+                  if (add_into_values_array DEAL_II_EQUALS false)
                     eval.template values<0, false, false>(temp2, values_dofs);
                   else
                     eval.template values<0, false, true>(temp2, values_dofs);
@@ -591,7 +594,7 @@ namespace internal
       }
 
     // case FE_Q_DG0: add values, gradients and second derivatives are zero
-    if (type == MatrixFreeFunctions::tensor_symmetric_plus_dg0)
+    if (type DEAL_II_EQUALS MatrixFreeFunctions::tensor_symmetric_plus_dg0)
       {
         values_dofs -= n_components * dofs_per_comp -
                        shape_info.dofs_per_component_on_cell + 1;
@@ -613,7 +616,7 @@ namespace internal
           }
       }
 
-    if (type == MatrixFreeFunctions::truncated_tensor)
+    if (type DEAL_II_EQUALS MatrixFreeFunctions::truncated_tensor)
       {
         values_dofs -= dofs_per_comp * n_components;
         const int degree =
@@ -658,7 +661,8 @@ namespace internal
             typename Number2>
   struct FEEvaluationImplBasisChange
   {
-    static_assert(basis_size_1 == 0 || basis_size_1 <= basis_size_2,
+    static_assert(basis_size_1 DEAL_II_EQUALS 0 DEAL_II_OR basis_size_1 <=
+                    basis_size_2,
                   "The second dimension must not be smaller than the first");
 
     /**
@@ -694,26 +698,29 @@ namespace internal
       const unsigned int basis_size_1_variable = numbers::invalid_unsigned_int,
       const unsigned int basis_size_2_variable = numbers::invalid_unsigned_int)
     {
-      Assert(
-        basis_size_1 != 0 || basis_size_1_variable <= basis_size_2_variable,
-        ExcMessage("The second dimension must not be smaller than the first"));
+      Assert(basis_size_1 !=
+               0 DEAL_II_OR basis_size_1_variable <= basis_size_2_variable,
+             ExcMessage(
+               "The second dimension must not be smaller than the first"));
 
-      Assert(quantity == EvaluatorQuantity::value, ExcInternalError());
+      Assert(quantity DEAL_II_EQUALS EvaluatorQuantity::value,
+             ExcInternalError());
 
-      // we do recursion until dim==1 or dim==2 and we have
-      // basis_size_1==basis_size_2. The latter optimization increases
-      // optimization possibilities for the compiler but does only work for
-      // aliased pointers if the sizes are equal.
+      // we do recursion until dimDEAL_II_EQUALS 1 or dimDEAL_II_EQUALS 2 and we
+      // have basis_size_1DEAL_II_EQUALS basis_size_2. The latter optimization
+      // increases optimization possibilities for the compiler but does only
+      // work for aliased pointers if the sizes are equal.
       constexpr int next_dim =
-        (dim > 2 ||
-         ((basis_size_1 == 0 || basis_size_2 > basis_size_1) && dim > 1)) ?
+        (dim >
+         2 DEAL_II_OR((basis_size_1 DEAL_II_EQUALS 0 DEAL_II_OR basis_size_2 >
+                       basis_size_1) DEAL_II_AND dim > 1)) ?
           dim - 1 :
           dim;
 
       EvaluatorTensorProduct<variant,
                              dim,
                              basis_size_1,
-                             (basis_size_1 == 0 ? 0 : basis_size_2),
+                             (basis_size_1 DEAL_II_EQUALS 0 ? 0 : basis_size_2),
                              Number,
                              Number2>
                          eval_val(transformation_matrix,
@@ -725,9 +732,9 @@ namespace internal
         basis_size_1 > 0 ? basis_size_1 : basis_size_1_variable;
       const unsigned int np_2 =
         basis_size_1 > 0 ? basis_size_2 : basis_size_2_variable;
-      Assert(np_1 > 0 && np_1 != numbers::invalid_unsigned_int,
+      Assert(np_1 > 0 DEAL_II_AND np_1 != numbers::invalid_unsigned_int,
              ExcMessage("Cannot transform with 0-point basis"));
-      Assert(np_2 > 0 && np_2 != numbers::invalid_unsigned_int,
+      Assert(np_2 > 0 DEAL_II_AND np_2 != numbers::invalid_unsigned_int,
              ExcMessage("Cannot transform with 0-point basis"));
 
       // run loop backwards to ensure correctness if values_in aliases with
@@ -759,15 +766,16 @@ namespace internal
                                      basis_size_1_variable,
                                      basis_size_2_variable);
 
-          // the recursion stops if dim==1 or if dim==2 and
-          // basis_size_1==basis_size_2 (the latter is used because the
-          // compiler generates nicer code)
-          if (basis_size_1 > 0 && basis_size_2 == basis_size_1 && dim == 2)
+          // the recursion stops if dimDEAL_II_EQUALS 1 or if dimDEAL_II_EQUALS
+          // 2 and basis_size_1DEAL_II_EQUALS basis_size_2 (the latter is used
+          // because the compiler generates nicer code)
+          if (basis_size_1 > 0 DEAL_II_AND basis_size_2 DEAL_II_EQUALS
+                               basis_size_1 DEAL_II_AND dim DEAL_II_EQUALS 2)
             {
               eval_val.template values<0, true, false>(values_in, values_out);
               eval_val.template values<1, true, false>(values_out, values_out);
             }
-          else if (dim == 1)
+          else if (dim DEAL_II_EQUALS 1)
             eval_val.template values<dim - 1, true, false>(values_in,
                                                            values_out);
           else
@@ -818,27 +826,30 @@ namespace internal
       const unsigned int basis_size_1_variable = numbers::invalid_unsigned_int,
       const unsigned int basis_size_2_variable = numbers::invalid_unsigned_int)
     {
-      Assert(
-        basis_size_1 != 0 || basis_size_1_variable <= basis_size_2_variable,
-        ExcMessage("The second dimension must not be smaller than the first"));
-      Assert(add_into_result == false || values_in != values_out,
+      Assert(basis_size_1 !=
+               0 DEAL_II_OR basis_size_1_variable <= basis_size_2_variable,
+             ExcMessage(
+               "The second dimension must not be smaller than the first"));
+      Assert(add_into_result DEAL_II_EQUALS false DEAL_II_OR values_in !=
+               values_out,
              ExcMessage(
                "Input and output cannot alias with each other when "
                "adding the result of the basis change to existing data"));
 
-      Assert(quantity == EvaluatorQuantity::value ||
-               quantity == EvaluatorQuantity::hessian,
+      Assert(quantity DEAL_II_EQUALS EvaluatorQuantity::value DEAL_II_OR
+               quantity DEAL_II_EQUALS EvaluatorQuantity::hessian,
              ExcInternalError());
 
       constexpr int next_dim =
-        (dim > 2 ||
-         ((basis_size_1 == 0 || basis_size_2 > basis_size_1) && dim > 1)) ?
+        (dim >
+         2 DEAL_II_OR((basis_size_1 DEAL_II_EQUALS 0 DEAL_II_OR basis_size_2 >
+                       basis_size_1) DEAL_II_AND dim > 1)) ?
           dim - 1 :
           dim;
       EvaluatorTensorProduct<variant,
                              dim,
                              basis_size_1,
-                             (basis_size_1 == 0 ? 0 : basis_size_2),
+                             (basis_size_1 DEAL_II_EQUALS 0 ? 0 : basis_size_2),
                              Number,
                              Number2>
                          eval_val(transformation_matrix,
@@ -850,16 +861,17 @@ namespace internal
         basis_size_1 > 0 ? basis_size_1 : basis_size_1_variable;
       const unsigned int np_2 =
         basis_size_1 > 0 ? basis_size_2 : basis_size_2_variable;
-      Assert(np_1 > 0 && np_1 != numbers::invalid_unsigned_int,
+      Assert(np_1 > 0 DEAL_II_AND np_1 != numbers::invalid_unsigned_int,
              ExcMessage("Cannot transform with 0-point basis"));
-      Assert(np_2 > 0 && np_2 != numbers::invalid_unsigned_int,
+      Assert(np_2 > 0 DEAL_II_AND np_2 != numbers::invalid_unsigned_int,
              ExcMessage("Cannot transform with 0-point basis"));
 
       for (unsigned int c = 0; c < n_components; ++c)
         {
-          if (basis_size_1 > 0 && basis_size_2 == basis_size_1 && dim == 2)
+          if (basis_size_1 > 0 DEAL_II_AND basis_size_2 DEAL_II_EQUALS
+                               basis_size_1 DEAL_II_AND dim DEAL_II_EQUALS 2)
             {
-              if (quantity == EvaluatorQuantity::value)
+              if (quantity DEAL_II_EQUALS EvaluatorQuantity::value)
                 eval_val.template values<1, false, false>(values_in, values_in);
               else
                 eval_val.template hessians<1, false, false>(values_in,
@@ -867,7 +879,7 @@ namespace internal
 
               if (add_into_result)
                 {
-                  if (quantity == EvaluatorQuantity::value)
+                  if (quantity DEAL_II_EQUALS EvaluatorQuantity::value)
                     eval_val.template values<0, false, true>(values_in,
                                                              values_out);
                   else
@@ -876,7 +888,7 @@ namespace internal
                 }
               else
                 {
-                  if (quantity == EvaluatorQuantity::value)
+                  if (quantity DEAL_II_EQUALS EvaluatorQuantity::value)
                     eval_val.template values<0, false, false>(values_in,
                                                               values_out);
                   else
@@ -886,18 +898,18 @@ namespace internal
             }
           else
             {
-              if (dim == 1 && add_into_result)
+              if (dim DEAL_II_EQUALS 1 DEAL_II_AND add_into_result)
                 {
-                  if (quantity == EvaluatorQuantity::value)
+                  if (quantity DEAL_II_EQUALS EvaluatorQuantity::value)
                     eval_val.template values<0, false, true>(values_in,
                                                              values_out);
                   else
                     eval_val.template hessians<0, false, true>(values_in,
                                                                values_out);
                 }
-              else if (dim == 1)
+              else if (dim DEAL_II_EQUALS 1)
                 {
-                  if (quantity == EvaluatorQuantity::value)
+                  if (quantity DEAL_II_EQUALS EvaluatorQuantity::value)
                     eval_val.template values<0, false, false>(values_in,
                                                               values_out);
                   else
@@ -906,7 +918,7 @@ namespace internal
                 }
               else
                 {
-                  if (quantity == EvaluatorQuantity::value)
+                  if (quantity DEAL_II_EQUALS EvaluatorQuantity::value)
                     eval_val.template values<dim - 1, false, false>(values_in,
                                                                     values_in);
                   else
@@ -970,11 +982,13 @@ namespace internal
         basis_size_1 != basis_size_2 ? scratch_data : values_out;
 
       const unsigned int size_per_component = Utilities::pow(basis_size_2, dim);
-      Assert(coefficients.size() == size_per_component ||
-               coefficients.size() == n_components * size_per_component,
+      Assert(coefficients
+                 .size() DEAL_II_EQUALS size_per_component DEAL_II_OR
+                   coefficients.size() DEAL_II_EQUALS n_components *
+               size_per_component,
              ExcDimensionMismatch(coefficients.size(), size_per_component));
-      const unsigned int stride =
-        coefficients.size() == size_per_component ? 0 : 1;
+      const unsigned int                   stride =
+        coefficients.size() DEAL_II_EQUALS size_per_component ? 0 : 1;
 
       for (unsigned int q = basis_size_1; q != 0; --q)
         FEEvaluationImplBasisChange<
@@ -1000,7 +1014,7 @@ namespace internal
                              Number2>
                          eval_val(transformation_matrix);
       const unsigned int n_inner_blocks =
-        (dim > 1 && basis_size_2 < 10) ? basis_size_2 : 1;
+        (dim > 1 DEAL_II_AND basis_size_2 < 10) ? basis_size_2 : 1;
       const unsigned int n_blocks = Utilities::pow(basis_size_2, dim - 1);
       for (unsigned int ii = 0; ii < n_blocks; ii += n_inner_blocks)
         for (unsigned int c = 0; c < n_components; ++c)
@@ -1183,7 +1197,7 @@ namespace internal
       {
         if (integration_flag & EvaluationFlags::values)
           {
-            if (add_into_values_array == false)
+            if (add_into_values_array DEAL_II_EQUALS false)
               for (unsigned int i = 0; i < n_q_points; ++i)
                 values_dofs[i] = values_quad[i];
             else
@@ -1192,8 +1206,8 @@ namespace internal
           }
         if (integration_flag & EvaluationFlags::gradients)
           {
-            if (integration_flag & EvaluationFlags::values ||
-                add_into_values_array == true)
+            if (integration_flag & EvaluationFlags::values DEAL_II_OR
+                                     add_into_values_array DEAL_II_EQUALS true)
               eval.template gradients<0, false, true>(gradients_quad,
                                                       values_dofs);
             else
@@ -1386,9 +1400,9 @@ namespace internal
     // able to initialize the fields in shape_info.templates.h from the
     // polynomials (fourth condition).
     static constexpr bool use_collocation =
-      symmetric_evaluate &&
-      n_q_points_1d > fe_degree &&n_q_points_1d <= 3 * fe_degree / 2 + 1 &&
-      n_q_points_1d < 200;
+      symmetric_evaluate DEAL_II_AND n_q_points_1d >
+      fe_degree DEAL_II_AND             n_q_points_1d <=
+      3 * fe_degree / 2 + 1 DEAL_II_AND n_q_points_1d < 200;
 
     static void
     evaluate_in_face(const MatrixFreeFunctions::ShapeInfo<Number> &data,
@@ -1456,7 +1470,7 @@ namespace internal
                                         Utilities::pow(n_q_points_1d, dim - 1) :
                                         data.n_q_points_face;
 
-      if (evaluate_grad == false)
+      if (evaluate_grad DEAL_II_EQUALS false)
         for (unsigned int c = 0; c < n_components; ++c)
           {
             switch (dim)
@@ -1520,7 +1534,7 @@ namespace internal
                                                                gradients_quad +
                                                                  n_q_points);
 
-                      if (evaluate_val == true)
+                      if (evaluate_val DEAL_II_EQUALS true)
                         eval2.template values<1, true, false>(scratch_data,
                                                               values_quad);
                     }
@@ -1537,7 +1551,7 @@ namespace internal
                                                             n_q_points);
                   eval1.template gradients<0, true, false>(values_dofs,
                                                            gradients_quad);
-                  if (evaluate_val == true)
+                  if (evaluate_val DEAL_II_EQUALS true)
                     eval1.template values<0, true, false>(values_dofs,
                                                           values_quad);
                   break;
@@ -1620,7 +1634,7 @@ namespace internal
                                         Utilities::pow(n_q_points_1d, dim - 1) :
                                         data.n_q_points_face;
 
-      if (integrate_grad == false)
+      if (integrate_grad DEAL_II_EQUALS false)
         for (unsigned int c = 0; c < n_components; ++c)
           {
             switch (dim)
@@ -1707,7 +1721,7 @@ namespace internal
                     gradients_quad + n_q_points, values_dofs + size_deg);
                   eval1.template gradients<0, false, false>(gradients_quad,
                                                             values_dofs);
-                  if (integrate_val == true)
+                  if (integrate_val DEAL_II_EQUALS true)
                     eval1.template values<0, false, true>(values_quad,
                                                           values_dofs);
                   break;
@@ -1742,9 +1756,10 @@ namespace internal
                 const bool                                    do_gradients,
                 const unsigned int                            face_no)
     {
-      Assert(static_cast<unsigned int>(fe_degree) ==
-                 data.data.front().fe_degree ||
-               fe_degree == -1,
+      Assert(static_cast<unsigned int>(fe_degree)
+                 DEAL_II_EQUALS data.data.front()
+                   .fe_degree DEAL_II_OR fe_degree DEAL_II_EQUALS -
+               1,
              ExcInternalError());
 
       interpolate_generic<do_evaluate, add_into_output>(
@@ -1769,9 +1784,10 @@ namespace internal
                            const bool         do_gradients,
                            const unsigned int face_no)
     {
-      Assert(static_cast<unsigned int>(fe_degree + 1) ==
-                 data.data.front().quadrature.size() ||
-               fe_degree == -1,
+      Assert(static_cast<unsigned int>(fe_degree + 1)
+                 DEAL_II_EQUALS                  data.data.front()
+                   .quadrature.size() DEAL_II_OR fe_degree DEAL_II_EQUALS -
+               1,
              ExcInternalError());
 
       interpolate_generic<do_evaluate, add_into_output>(
@@ -1797,7 +1813,7 @@ namespace internal
                         const unsigned int dofs_per_component_on_cell,
                         const unsigned int dofs_per_component_on_face)
     {
-      if (face_direction == face_no / 2)
+      if (face_direction DEAL_II_EQUALS face_no / 2)
         {
           internal::EvaluatorTensorProduct<internal::evaluate_general,
                                            dim,
@@ -2016,9 +2032,9 @@ namespace internal
 
       const unsigned int n_q_points_1d_actual =
         fe_degree > -1 ? n_q_points_1d : 0;
-      if (fe_degree > -1 &&
-          subface_index >= GeometryInfo<dim>::max_children_per_cell &&
-          data.element_type <= MatrixFreeFunctions::tensor_symmetric)
+      if (fe_degree > -1 DEAL_II_AND               subface_index >=
+          GeometryInfo<dim>::max_children_per_cell DEAL_II_AND
+                                                   data.element_type <= MatrixFreeFunctions::tensor_symmetric)
         FEFaceEvaluationImpl<
           true,
           dim,
@@ -2111,9 +2127,9 @@ namespace internal
 
       const unsigned int n_q_points_1d_actual =
         fe_degree > -1 ? n_q_points_1d : 0;
-      if (fe_degree > -1 &&
-          subface_index >= GeometryInfo<dim - 1>::max_children_per_cell &&
-          data.element_type <= MatrixFreeFunctions::tensor_symmetric)
+      if (fe_degree > -1 DEAL_II_AND                   subface_index >=
+          GeometryInfo<dim - 1>::max_children_per_cell DEAL_II_AND
+                                                       data.element_type <= MatrixFreeFunctions::tensor_symmetric)
         FEFaceEvaluationImpl<
           true,
           dim,
@@ -2176,7 +2192,7 @@ namespace internal
       const std::array<unsigned int, n_face_orientations> face_orientations,
       const Table<2, unsigned int> &                      orientation_map)
     {
-      if (src_ptr == nullptr)
+      if (src_ptr DEAL_II_EQUALS nullptr)
         {
           return false;
         }
@@ -2246,9 +2262,9 @@ namespace internal
           // case 5)
         },
         [&](auto &temp1, const auto &dofs_per_face) {
-          if (fe_degree > -1 &&
-              subface_index >= GeometryInfo<dim>::max_children_per_cell &&
-              data.element_type <= MatrixFreeFunctions::tensor_symmetric)
+          if (fe_degree > -1 DEAL_II_AND               subface_index >=
+              GeometryInfo<dim>::max_children_per_cell DEAL_II_AND
+                                                       data.element_type <= MatrixFreeFunctions::tensor_symmetric)
             FEFaceEvaluationImpl<
               true,
               dim,
@@ -2306,7 +2322,7 @@ namespace internal
       const std::array<unsigned int, n_face_orientations> face_orientations,
       const Table<2, unsigned int> &                      orientation_map)
     {
-      if (dst_ptr == nullptr)
+      if (dst_ptr DEAL_II_EQUALS nullptr)
         {
           AssertDimension(face_nos.size(), 1);
           AssertDimension(face_orientations.size(), 1);
@@ -2407,10 +2423,10 @@ namespace internal
               data, temp1, values_array, integrate_gradients, face_nos[0]);
         },
         [&](auto &temp1, const auto &dofs_per_face) {
-          if (fe_degree > -1 &&
-              subface_index >= GeometryInfo<dim>::max_children_per_cell &&
-              data.element_type <=
-                internal::MatrixFreeFunctions::tensor_symmetric)
+          if (fe_degree > -1 DEAL_II_AND               subface_index >=
+              GeometryInfo<dim>::max_children_per_cell DEAL_II_AND
+                                                       data.element_type <=
+              internal::MatrixFreeFunctions::tensor_symmetric)
             internal::FEFaceEvaluationImpl<
               true,
               dim,
@@ -2496,26 +2512,35 @@ namespace internal
       // values) or Hermite shape functions are used. These cases are
       // handled later when the values are written back into the
       // glrobal vector.
-      if (integrate &&
-          (face_orientations[0] > 0 &&
-           (subface_index < GeometryInfo<dim>::max_children_per_cell ||
-            !(((do_gradients == false &&
-                data.data.front().nodal_at_cell_boundaries == true) ||
-               (data.element_type ==
-                  MatrixFreeFunctions::tensor_symmetric_hermite &&
-                fe_degree > 1)) &&
-              (dof_info.index_storage_variants[dof_access_index][cell] ==
-                 MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
-                   interleaved_contiguous ||
-               dof_info.index_storage_variants[dof_access_index][cell] ==
-                 MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
-                   interleaved_contiguous_strided ||
-               dof_info.index_storage_variants[dof_access_index][cell] ==
-                 MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
-                   interleaved_contiguous_mixed_strides ||
-               dof_info.index_storage_variants[dof_access_index][cell] ==
-                 MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
-                   contiguous)))))
+      if (integrate DEAL_II_AND(
+            face_orientations[0] >
+            0 DEAL_II_AND(
+              subface_index <
+              GeometryInfo<dim>::max_children_per_cell DEAL_II_OR !(
+                ((do_gradients DEAL_II_EQUALS false DEAL_II_AND data.data
+                    .front()
+                    .nodal_at_cell_boundaries DEAL_II_EQUALS true)
+                   DEAL_II_OR(data.element_type DEAL_II_EQUALS
+                                                MatrixFreeFunctions::tensor_symmetric_hermite
+                                  DEAL_II_AND fe_degree > 1))
+                  DEAL_II_AND(
+                    dof_info
+                      .index_storage_variants
+                        [dof_access_index][cell] DEAL_II_EQUALS
+                                                   MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+                            interleaved_contiguous DEAL_II_OR dof_info
+                      .index_storage_variants
+                        [dof_access_index][cell] DEAL_II_EQUALS
+                                                           MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+                            interleaved_contiguous_strided DEAL_II_OR dof_info
+                      .index_storage_variants
+                        [dof_access_index][cell] DEAL_II_EQUALS
+                                                                 MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+                            interleaved_contiguous_mixed_strides DEAL_II_OR
+                                                                 dof_info.index_storage_variants
+                                [dof_access_index][cell] DEAL_II_EQUALS
+                                  MatrixFreeFunctions::DoFInfo::
+                                    IndexStorageVariants::contiguous)))))
         {
           AssertDimension(face_orientations.size(), 1);
           adjust_for_face_orientation(face_orientations[0],
@@ -2530,11 +2555,13 @@ namespace internal
         }
 
       // we know that the gradient weights for the Hermite case on the
-      // right (side==1) are the negative from the value at the left
-      // (side==0), so we only read out one of them.
+      // right (sideDEAL_II_EQUALS 1) are the negative from the value at the
+      // left (sideDEAL_II_EQUALS 0), so we only read out one of them.
       VectorizedArrayType grad_weight =
-        (data.data.front().nodal_at_cell_boundaries == true && fe_degree > 1 &&
-         data.element_type == MatrixFreeFunctions::tensor_symmetric_hermite) ?
+        (data.data.front()
+           .nodal_at_cell_boundaries DEAL_II_EQUALS true DEAL_II_AND fe_degree >
+         1 DEAL_II_AND data.element_type DEAL_II_EQUALS
+                                         MatrixFreeFunctions::tensor_symmetric_hermite) ?
           data.data.front()
             .shape_data_on_face[0][fe_degree + (integrate ?
                                                   (2 - (face_nos[0] % 2)) :
@@ -2571,10 +2598,11 @@ namespace internal
 
       // re-orientation
       std::array<const unsigned int *, n_face_orientations> orientation;
-      if (n_face_orientations == 1)
-        orientation[0] = (data.data.front().nodal_at_cell_boundaries == true) ?
-                           &data.face_orientations[face_orientations[0]][0] :
-                           &dummy;
+      if (n_face_orientations DEAL_II_EQUALS 1)
+        orientation[0] =
+          (data.data.front().nodal_at_cell_boundaries DEAL_II_EQUALS true) ?
+            &data.face_orientations[face_orientations[0]][0] :
+            &dummy;
       else
         {
           for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
@@ -2582,11 +2610,12 @@ namespace internal
               // the loop breaks once an invalid_unsigned_int is hit for
               // all cases except the exterior faces in the ECL loop (where
               // some faces might be at the boundaries but others not)
-              if (cells[v] == numbers::invalid_unsigned_int)
+              if (cells[v] DEAL_II_EQUALS numbers::invalid_unsigned_int)
                 continue;
 
               orientation[v] =
-                (data.data.front().nodal_at_cell_boundaries == true) ?
+                (data.data.front()
+                   .nodal_at_cell_boundaries DEAL_II_EQUALS true) ?
                   &data.face_orientations[face_orientations[v]][0] :
                   &dummy;
             }
@@ -2595,21 +2624,24 @@ namespace internal
       // face_to_cell_index_hermite
       std::array<const unsigned int *, n_face_orientations> index_array_hermite;
 
-      if (n_face_orientations == 1)
+      if (n_face_orientations DEAL_II_EQUALS 1)
         index_array_hermite[0] =
-          (data.data.front().nodal_at_cell_boundaries == true &&
-           fe_degree > 1 &&
-           data.element_type == MatrixFreeFunctions::tensor_symmetric_hermite) ?
+          (data.data.front().nodal_at_cell_boundaries
+             DEAL_II_EQUALS true DEAL_II_AND fe_degree >
+           1 DEAL_II_AND data.element_type DEAL_II_EQUALS
+                                           MatrixFreeFunctions::tensor_symmetric_hermite) ?
             &data.face_to_cell_index_hermite(face_nos[0], 0) :
             &dummy;
 
-      if (n_face_orientations > 1 &&
-          data.data.front().nodal_at_cell_boundaries == true && fe_degree > 1 &&
-          data.element_type == MatrixFreeFunctions::tensor_symmetric_hermite)
+      if (n_face_orientations >
+          1 DEAL_II_AND data.data.front().nodal_at_cell_boundaries
+            DEAL_II_EQUALS true DEAL_II_AND fe_degree >
+          1 DEAL_II_AND data.element_type DEAL_II_EQUALS
+                                          MatrixFreeFunctions::tensor_symmetric_hermite)
         {
           for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
             {
-              if (cells[v] == numbers::invalid_unsigned_int)
+              if (cells[v] DEAL_II_EQUALS numbers::invalid_unsigned_int)
                 continue;
 
               grad_weight[v] =
@@ -2625,18 +2657,19 @@ namespace internal
       // face_to_cell_index_nodal
       std::array<const unsigned int *, n_face_orientations> index_array_nodal;
 
-      if (n_face_orientations == 1)
+      if (n_face_orientations DEAL_II_EQUALS 1)
         index_array_nodal[0] =
-          (data.data.front().nodal_at_cell_boundaries == true) ?
+          (data.data.front().nodal_at_cell_boundaries DEAL_II_EQUALS true) ?
             &data.face_to_cell_index_nodal(face_nos[0], 0) :
             &dummy;
 
-      if (n_face_orientations > 1 &&
-          (data.data.front().nodal_at_cell_boundaries == true))
+      if (n_face_orientations >
+          1 DEAL_II_AND(
+            data.data.front().nodal_at_cell_boundaries DEAL_II_EQUALS true))
         {
           for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
             {
-              if (cells[v] == numbers::invalid_unsigned_int)
+              if (cells[v] DEAL_II_EQUALS numbers::invalid_unsigned_int)
                 continue;
 
               index_array_nodal[v] =
@@ -2645,23 +2678,27 @@ namespace internal
         }
 
       const auto reorientate = [&](const unsigned int v, const unsigned int i) {
-        return (dim < 3 ||
-                face_orientations[n_face_orientations == 1 ? 0 : v] == 0 ||
-                subface_index < GeometryInfo<dim>::max_children_per_cell) ?
+        return (dim < 3 DEAL_II_OR
+                          face_orientations[n_face_orientations DEAL_II_EQUALS 1 ?
+                                            0 :
+                                            v] DEAL_II_EQUALS 0 DEAL_II_OR
+                          subface_index <
+                GeometryInfo<dim>::max_children_per_cell) ?
                  i :
                  orientation[v][i];
       };
 
-      if ((do_gradients == false &&
-           data.data.front().nodal_at_cell_boundaries == true) ||
-          (data.element_type == MatrixFreeFunctions::tensor_symmetric_hermite &&
-           fe_degree > 1))
+      if ((do_gradients DEAL_II_EQUALS false DEAL_II_AND data.data.front()
+             .nodal_at_cell_boundaries                   DEAL_II_EQUALS true)
+            DEAL_II_OR(data.element_type DEAL_II_EQUALS
+                                         MatrixFreeFunctions::tensor_symmetric_hermite
+                           DEAL_II_AND fe_degree > 1))
         {
           // case 1: contiguous and interleaved indices
-          if (n_face_orientations == 1 &&
-              dof_info.index_storage_variants[dof_access_index][cell] ==
-                MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
-                  interleaved_contiguous)
+          if (n_face_orientations DEAL_II_EQUALS 1 DEAL_II_AND dof_info
+                .index_storage_variants[dof_access_index][cell] DEAL_II_EQUALS
+                  MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+                    interleaved_contiguous)
             {
               AssertDimension(n_face_orientations, 1);
 
@@ -2677,11 +2714,11 @@ namespace internal
                                                  [first_selected_component] *
                   VectorizedArrayType::size();
 
-              if (fe_degree > 1 && do_gradients == true)
+              if (fe_degree > 1 DEAL_II_AND do_gradients DEAL_II_EQUALS true)
                 {
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
                     {
-                      if (n_face_orientations == 1)
+                      if (n_face_orientations DEAL_II_EQUALS 1)
                         {
                           const unsigned int ind1 =
                             index_array_hermite[0][2 * i];
@@ -2716,7 +2753,7 @@ namespace internal
                 {
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
                     {
-                      if (n_face_orientations == 1)
+                      if (n_face_orientations DEAL_II_EQUALS 1)
                         {
                           const unsigned int i_  = reorientate(0, i);
                           const unsigned int ind = index_array_nodal[0][i];
@@ -2737,10 +2774,11 @@ namespace internal
             }
 
           // case 2: contiguous and interleaved indices with fixed stride
-          else if (n_face_orientations == 1 &&
-                   dof_info.index_storage_variants[dof_access_index][cell] ==
-                     MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
-                       interleaved_contiguous_strided)
+          else if (n_face_orientations DEAL_II_EQUALS 1 DEAL_II_AND dof_info
+                     .index_storage_variants
+                       [dof_access_index][cell] DEAL_II_EQUALS
+                         MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+                           interleaved_contiguous_strided)
             {
               AssertDimension(n_face_orientations, 1);
 
@@ -2751,11 +2789,11 @@ namespace internal
                 &dof_info
                    .dof_indices_contiguous[dof_access_index]
                                           [cell * VectorizedArrayType::size()];
-              if (fe_degree > 1 && do_gradients == true)
+              if (fe_degree > 1 DEAL_II_AND do_gradients DEAL_II_EQUALS true)
                 {
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
                     {
-                      if (n_face_orientations == 1)
+                      if (n_face_orientations DEAL_II_EQUALS 1)
                         {
                           const unsigned int i_ = reorientate(0, i);
 
@@ -2798,7 +2836,7 @@ namespace internal
                 {
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
                     {
-                      if (n_face_orientations == 1)
+                      if (n_face_orientations DEAL_II_EQUALS 1)
                         {
                           const unsigned int i_ = reorientate(0, i);
 
@@ -2825,10 +2863,11 @@ namespace internal
             }
 
           // case 3: contiguous and interleaved indices with mixed stride
-          else if (n_face_orientations == 1 &&
-                   dof_info.index_storage_variants[dof_access_index][cell] ==
-                     MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
-                       interleaved_contiguous_mixed_strides)
+          else if (n_face_orientations DEAL_II_EQUALS 1 DEAL_II_AND dof_info
+                     .index_storage_variants
+                       [dof_access_index][cell] DEAL_II_EQUALS
+                         MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+                           interleaved_contiguous_mixed_strides)
             {
               AssertDimension(n_face_orientations, 1);
 
@@ -2847,13 +2886,13 @@ namespace internal
               const unsigned int n_filled_lanes =
                 dof_info.n_vectorization_lanes_filled[dof_access_index][cell];
 
-              if (fe_degree > 1 && do_gradients == true)
+              if (fe_degree > 1 DEAL_II_AND do_gradients DEAL_II_EQUALS true)
                 {
-                  if (n_filled_lanes == VectorizedArrayType::size())
+                  if (n_filled_lanes DEAL_II_EQUALS VectorizedArrayType::size())
                     for (unsigned int comp = 0; comp < n_components; ++comp)
                       for (unsigned int i = 0; i < dofs_per_face; ++i)
                         {
-                          if (n_face_orientations == 1)
+                          if (n_face_orientations DEAL_II_EQUALS 1)
                             {
                               const unsigned int i_ = reorientate(0, i);
                               unsigned int ind1[VectorizedArrayType::size()];
@@ -2892,7 +2931,7 @@ namespace internal
                         }
                   else
                     {
-                      if (integrate == false)
+                      if (integrate DEAL_II_EQUALS false)
                         for (unsigned int i = 0;
                              i < n_components * 2 * dofs_per_face;
                              ++i)
@@ -2902,9 +2941,9 @@ namespace internal
                         for (unsigned int comp = 0; comp < n_components; ++comp)
                           for (unsigned int i = 0; i < dofs_per_face; ++i)
                             {
-                              const unsigned int i_ =
-                                reorientate(n_face_orientations == 1 ? 0 : v,
-                                            i);
+                              const unsigned int i_ = reorientate(
+                                n_face_orientations DEAL_II_EQUALS 1 ? 0 : v,
+                                i);
                               function_3a(
                                 temp1[i_ + 2 * comp * dofs_per_face][v],
                                 temp1[i_ + dofs_per_face +
@@ -2912,28 +2951,32 @@ namespace internal
                                 global_vector_ptr
                                   [indices[v] +
                                    (comp * static_dofs_per_component +
-                                    index_array_hermite
-                                      [n_face_orientations == 1 ? 0 : v]
-                                      [2 * i]) *
+                                    index_array_hermite[n_face_orientations
+                                                            DEAL_II_EQUALS 1 ?
+                                                          0 :
+                                                          v][2 * i]) *
                                      strides[v]],
                                 global_vector_ptr
                                   [indices[v] +
                                    (comp * static_dofs_per_component +
-                                    index_array_hermite
-                                      [n_face_orientations == 1 ? 0 : v]
-                                      [2 * i + 1]) *
+                                    index_array_hermite[n_face_orientations
+                                                            DEAL_II_EQUALS 1 ?
+                                                          0 :
+                                                          v][2 * i + 1]) *
                                      strides[v]],
-                                grad_weight[n_face_orientations == 1 ? 0 : v]);
+                                grad_weight
+                                  [n_face_orientations DEAL_II_EQUALS 1 ? 0 :
+                                                                          v]);
                             }
                     }
                 }
               else
                 {
-                  if (n_filled_lanes == VectorizedArrayType::size())
+                  if (n_filled_lanes DEAL_II_EQUALS VectorizedArrayType::size())
                     for (unsigned int comp = 0; comp < n_components; ++comp)
                       for (unsigned int i = 0; i < dofs_per_face; ++i)
                         {
-                          if (n_face_orientations == 1)
+                          if (n_face_orientations DEAL_II_EQUALS 1)
                             {
                               unsigned int ind[VectorizedArrayType::size()];
                               DEAL_II_OPENMP_SIMD_PRAGMA
@@ -2956,7 +2999,7 @@ namespace internal
                         }
                   else
                     {
-                      if (integrate == false)
+                      if (integrate DEAL_II_EQUALS false)
                         for (unsigned int i = 0;
                              i < n_components * dofs_per_face;
                              ++i)
@@ -2967,40 +3010,44 @@ namespace internal
                           for (unsigned int i = 0; i < dofs_per_face; ++i)
                             function_3b(
                               temp1[reorientate(
-                                      n_face_orientations == 1 ? 0 : v, i) +
+                                      n_face_orientations DEAL_II_EQUALS 1 ? 0 :
+                                                                             v,
+                                      i) +
                                     2 * comp * dofs_per_face][v],
                               global_vector_ptr
                                 [indices[v] +
                                  (comp * static_dofs_per_component +
-                                  index_array_nodal
-                                    [n_face_orientations == 1 ? 0 : v][i]) *
+                                  index_array_nodal[n_face_orientations
+                                                        DEAL_II_EQUALS 1 ?
+                                                      0 :
+                                                      v][i]) *
                                    strides[v]]);
                     }
                 }
             }
 
           // case 4: contiguous indices without interleaving
-          else if (n_face_orientations > 1 ||
-                   dof_info.index_storage_variants[dof_access_index][cell] ==
-                     MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
-                       contiguous)
+          else if (n_face_orientations >
+                   1 DEAL_II_OR dof_info.index_storage_variants
+                     [dof_access_index][cell] DEAL_II_EQUALS
+                       MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+                         contiguous)
             {
               const unsigned int *indices =
                 &dof_info
                    .dof_indices_contiguous[dof_access_index]
                                           [cell * VectorizedArrayType::size()];
 
-              if (do_gradients == true &&
-                  data.element_type ==
-                    MatrixFreeFunctions::tensor_symmetric_hermite)
+              if (do_gradients DEAL_II_EQUALS true DEAL_II_AND data
+                    .element_type                              DEAL_II_EQUALS
+                                                               MatrixFreeFunctions::tensor_symmetric_hermite)
                 {
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
                     {
-                      if (n_face_orientations == 1 &&
-                          dof_info
-                              .n_vectorization_lanes_filled[dof_access_index]
-                                                           [cell] ==
-                            VectorizedArrayType::size())
+                      if (n_face_orientations DEAL_II_EQUALS 1 DEAL_II_AND
+                                              dof_info.n_vectorization_lanes_filled
+                              [dof_access_index][cell] DEAL_II_EQUALS
+                                VectorizedArrayType::size())
                         {
                           const unsigned int ind1 =
                             index_array_hermite[0][2 * i];
@@ -3026,7 +3073,7 @@ namespace internal
                               indices,
                               indices);
                         }
-                      else if (n_face_orientations == 1)
+                      else if (n_face_orientations DEAL_II_EQUALS 1)
                         {
                           const unsigned int ind1 =
                             index_array_hermite[0][2 * i];
@@ -3060,7 +3107,7 @@ namespace internal
                                    indices[v]],
                                 grad_weight[v]);
 
-                          if (integrate == false)
+                          if (integrate DEAL_II_EQUALS false)
                             for (unsigned int v = n_filled_lanes;
                                  v < VectorizedArrayType::size();
                                  ++v)
@@ -3069,7 +3116,7 @@ namespace internal
                                 {
                                   temp1[i_ + 2 * comp * dofs_per_face][v] = 0.0;
                                   temp1[i_ + dofs_per_face +
-                                        2 * comp * dofs_per_face][v]      = 0.0;
+                                        2 * comp * dofs_per_face][v] = 0.0;
                                 }
                         }
                       else
@@ -3112,11 +3159,10 @@ namespace internal
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
                     for (unsigned int comp = 0; comp < n_components; ++comp)
                       {
-                        if (n_face_orientations == 1 &&
-                            dof_info
-                                .n_vectorization_lanes_filled[dof_access_index]
-                                                             [cell] ==
-                              VectorizedArrayType::size())
+                        if (n_face_orientations DEAL_II_EQUALS 1 DEAL_II_AND
+                                                dof_info.n_vectorization_lanes_filled
+                                [dof_access_index][cell] DEAL_II_EQUALS
+                                  VectorizedArrayType::size())
                           {
                             const unsigned int ind = index_array_nodal[0][i];
                             const unsigned int i_  = reorientate(0, i);
@@ -3129,7 +3175,7 @@ namespace internal
                                   [active_fe_index][first_selected_component],
                               indices);
                           }
-                        else if (n_face_orientations == 1)
+                        else if (n_face_orientations DEAL_II_EQUALS 1)
                           {
                             const unsigned int ind = index_array_nodal[0][i];
                             const unsigned int i_  = reorientate(0, i);
@@ -3149,7 +3195,7 @@ namespace internal
                                      [first_selected_component] +
                                    indices[v]]);
 
-                            if (integrate == false)
+                            if (integrate DEAL_II_EQUALS false)
                               for (unsigned int v = n_filled_lanes;
                                    v < VectorizedArrayType::size();
                                    ++v)
@@ -3193,9 +3239,9 @@ namespace internal
       if (!integrate)
         function_0(temp1, dofs_per_face);
 
-      if (!integrate &&
-          (face_orientations[0] > 0 &&
-           subface_index < GeometryInfo<dim>::max_children_per_cell))
+      if (!integrate DEAL_II_AND(face_orientations[0] >
+                                 0 DEAL_II_AND subface_index <
+                                 GeometryInfo<dim>::max_children_per_cell))
         {
           AssertDimension(face_orientations.size(), 1);
           adjust_for_face_orientation(face_orientations[0],
@@ -3227,7 +3273,7 @@ namespace internal
       const unsigned int *orientation = &orientation_map[face_orientation][0];
       for (unsigned int c = 0; c < n_components; ++c)
         {
-          if (values == true)
+          if (values DEAL_II_EQUALS true)
             {
               if (integrate)
                 for (unsigned int q = 0; q < n_q_points; ++q)
@@ -3238,7 +3284,7 @@ namespace internal
               for (unsigned int q = 0; q < n_q_points; ++q)
                 values_quad[c * n_q_points + q] = tmp_values[q];
             }
-          if (gradients == true)
+          if (gradients DEAL_II_EQUALS true)
             for (unsigned int d = 0; d < dim; ++d)
               {
                 if (integrate)
@@ -3275,7 +3321,7 @@ namespace internal
       constexpr unsigned int dofs_per_component =
         Utilities::pow(fe_degree + 1, dim);
 
-      Assert(dim >= 1 || dim <= 3, ExcNotImplemented());
+      Assert(dim >= 1 DEAL_II_OR dim <= 3, ExcNotImplemented());
       Assert(fe_eval.get_shape_info().element_type <=
                MatrixFreeFunctions::tensor_symmetric,
              ExcNotImplemented());
@@ -3328,15 +3374,16 @@ namespace internal
     {
       constexpr unsigned int dofs_per_component =
         Utilities::pow(fe_degree + 1, dim);
-      Assert(inverse_coefficients.size() > 0 &&
-               inverse_coefficients.size() % dofs_per_component == 0,
+      Assert(inverse_coefficients.size() >
+               0 DEAL_II_AND        inverse_coefficients.size() %
+                 dofs_per_component DEAL_II_EQUALS 0,
              ExcMessage(
                "Expected diagonal to be a multiple of scalar dof per cells"));
       if (inverse_coefficients.size() != dofs_per_component)
         AssertDimension(n_desired_components * dofs_per_component,
                         inverse_coefficients.size());
 
-      Assert(dim >= 1 || dim <= 3, ExcNotImplemented());
+      Assert(dim >= 1 DEAL_II_OR dim <= 3, ExcNotImplemented());
 
       internal::EvaluatorTensorProduct<internal::evaluate_evenodd,
                                        dim,
@@ -3397,18 +3444,18 @@ namespace internal
           const Number *in  = in_array + d * dofs_per_cell;
           Number *      out = out_array + d * dofs_per_cell;
 
-          if (dim == 3)
+          if (dim DEAL_II_EQUALS 3)
             {
               evaluator.template hessians<2, false, false>(in, out);
               evaluator.template hessians<1, false, false>(out, out);
               evaluator.template hessians<0, false, false>(out, out);
             }
-          if (dim == 2)
+          if (dim DEAL_II_EQUALS 2)
             {
               evaluator.template hessians<1, false, false>(in, out);
               evaluator.template hessians<0, false, false>(out, out);
             }
-          if (dim == 1)
+          if (dim DEAL_II_EQUALS 1)
             evaluator.template hessians<0, false, false>(in, out);
         }
     }

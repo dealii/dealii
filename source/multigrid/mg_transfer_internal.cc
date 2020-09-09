@@ -112,11 +112,12 @@ namespace internal
                dof_handler.active_cell_iterators_on_level(level))
             {
               if (dof_handler.get_triangulation().locally_owned_subdomain() !=
-                    numbers::invalid_subdomain_id &&
-                  (level_cell->level_subdomain_id() ==
-                     numbers::artificial_subdomain_id ||
-                   level_cell->subdomain_id() ==
-                     numbers::artificial_subdomain_id))
+                  numbers::invalid_subdomain_id DEAL_II_AND(
+                    level_cell
+                      ->level_subdomain_id()
+                        DEAL_II_EQUALS numbers::artificial_subdomain_id
+                          DEAL_II_OR       level_cell->subdomain_id()
+                            DEAL_II_EQUALS numbers::artificial_subdomain_id))
                 continue;
 
               unrolled_copy_indices.resize(
@@ -132,9 +133,9 @@ namespace internal
                 {
                   // we need to ignore if the DoF is on a refinement edge
                   // (hanging node)
-                  if (skip_interface_dofs && mg_constrained_dofs != nullptr &&
-                      mg_constrained_dofs->at_refinement_edge(
-                        level, level_dof_indices[i]))
+                  if (skip_interface_dofs DEAL_II_AND mg_constrained_dofs !=
+                      nullptr DEAL_II_AND             mg_constrained_dofs
+                        ->at_refinement_edge(level, level_dof_indices[i]))
                     continue;
 
                   // First check whether we own any of the active dof index
@@ -148,7 +149,7 @@ namespace internal
                     dof_handler.locally_owned_mg_dofs(level).is_element(
                       level_dof_indices[i]);
 
-                  if (global_mine && level_mine)
+                  if (global_mine DEAL_II_AND level_mine)
                     {
                       // we own both the active dof index and the level one ->
                       // set them into the vector, indexed by the local index
@@ -169,7 +170,7 @@ namespace internal
 
                       // Work on this dof if we haven't already (on this or a
                       // coarser level)
-                      if (dof_touched[relevant_idx] == false)
+                      if (dof_touched[relevant_idx] DEAL_II_EQUALS false)
                         {
                           if (global_mine)
                             {
@@ -218,13 +219,13 @@ namespace internal
         (dynamic_cast<const dealii::parallel::TriangulationBase<dim, spacedim>
                         *>(&dof_handler.get_triangulation()));
       AssertThrow(
-        send_data_temp.size() == 0 || tria != nullptr,
+        send_data_temp.size() DEAL_II_EQUALS 0 DEAL_II_OR tria != nullptr,
         ExcMessage(
           "We should only be sending information with a parallel Triangulation!"));
 
 #ifdef DEAL_II_WITH_MPI
-      if (tria && Utilities::MPI::sum(send_data_temp.size(),
-                                      tria->get_communicator()) > 0)
+      if (tria DEAL_II_AND Utilities::MPI::sum(send_data_temp.size(),
+                                               tria->get_communicator()) > 0)
         {
           const std::set<types::subdomain_id> &neighbors =
             tria->level_ghost_owners();
@@ -249,13 +250,15 @@ namespace internal
                         return false;
                     });
           send_data_temp.erase(
-            std::unique(send_data_temp.begin(),
-                        send_data_temp.end(),
-                        [](const DoFPair &lhs, const DoFPair &rhs) {
-                          return (lhs.level == rhs.level) &&
-                                 (lhs.level_dof_index == rhs.level_dof_index) &&
-                                 (lhs.global_dof_index == rhs.global_dof_index);
-                        }),
+            std::unique(
+              send_data_temp.begin(),
+              send_data_temp.end(),
+              [](const DoFPair &lhs, const DoFPair &rhs) {
+                return (lhs.level DEAL_II_EQUALS rhs.level)DEAL_II_AND(
+                  lhs.level_dof_index DEAL_II_EQUALS rhs.level_dof_index)
+                  DEAL_II_AND(
+                    lhs.global_dof_index DEAL_II_EQUALS rhs.global_dof_index);
+              }),
             send_data_temp.end());
 
           for (unsigned int level = 0; level < n_levels; ++level)
@@ -266,7 +269,7 @@ namespace internal
               std::vector<types::global_dof_index> level_dof_indices;
               std::vector<types::global_dof_index> global_dof_indices;
               for (const auto &dofpair : send_data_temp)
-                if (dofpair.level == level)
+                if (dofpair.level DEAL_II_EQUALS level)
                   {
                     level_dof_indices.push_back(dofpair.level_dof_index);
                     global_dof_indices.push_back(dofpair.global_dof_index);
@@ -276,7 +279,8 @@ namespace internal
               is_ghost.add_indices(level_dof_indices.begin(),
                                    level_dof_indices.end());
 
-              AssertThrow(level_dof_indices.size() == is_ghost.n_elements(),
+              AssertThrow(level_dof_indices.size()
+                            DEAL_II_EQUALS is_ghost.n_elements(),
                           ExcMessage("Size does not match!"));
 
               const auto index_owner =
@@ -284,7 +288,8 @@ namespace internal
                                                     is_ghost,
                                                     tria->get_communicator());
 
-              AssertThrow(level_dof_indices.size() == index_owner.size(),
+              AssertThrow(level_dof_indices.size()
+                            DEAL_II_EQUALS index_owner.size(),
                           ExcMessage("Size does not match!"));
 
               for (unsigned int i = 0; i < index_owner.size(); i++)
@@ -354,7 +359,7 @@ namespace internal
                 ierr = MPI_Get_count(&status, MPI_BYTE, &len);
                 AssertThrowMPI(ierr);
 
-                if (len == 0)
+                if (len DEAL_II_EQUALS 0)
                   {
                     ierr = MPI_Recv(nullptr,
                                     0,
@@ -368,7 +373,8 @@ namespace internal
                   }
 
                 int count = len / sizeof(DoFPair);
-                Assert(static_cast<int>(count * sizeof(DoFPair)) == len,
+                Assert(static_cast<int>(count * sizeof(DoFPair))
+                         DEAL_II_EQUALS len,
                        ExcInternalError());
                 receive_buffer.resize(count);
 
@@ -443,8 +449,9 @@ namespace internal
       ghosted_dofs.compress();
 
       // Add possible ghosts from the previous content in the vector
-      if (target_partitioner.get() != nullptr &&
-          target_partitioner->size() == locally_owned.size())
+      if (target_partitioner.get() != nullptr DEAL_II_AND target_partitioner
+                                        ->size()
+                                          DEAL_II_EQUALS locally_owned.size())
         {
           ghosted_dofs.add_indices(target_partitioner->ghost_indices());
         }
@@ -452,19 +459,22 @@ namespace internal
       // check if the given partitioner's ghosts represent a superset of the
       // ghosts we require in this function
       const int ghosts_locally_contained =
-        (external_partitioner.get() != nullptr &&
-         (external_partitioner->ghost_indices() & ghosted_dofs) ==
-           ghosted_dofs) ?
+        (external_partitioner.get() !=
+         nullptr DEAL_II_AND(external_partitioner->ghost_indices() &
+                             ghosted_dofs) DEAL_II_EQUALS ghosted_dofs) ?
           1 :
           0;
-      if (external_partitioner.get() != nullptr &&
-          Utilities::MPI::min(ghosts_locally_contained, communicator) == 1)
+      if (external_partitioner.get() !=
+          nullptr DEAL_II_AND Utilities::MPI::min(ghosts_locally_contained,
+                                                  communicator)
+            DEAL_II_EQUALS 1)
         {
           // shift the local number of the copy indices according to the new
           // partitioner that we are going to use during the access to the
           // entries
-          if (target_partitioner.get() != nullptr &&
-              target_partitioner->size() == locally_owned.size())
+          if (target_partitioner.get() !=
+              nullptr DEAL_II_AND       target_partitioner
+                ->size() DEAL_II_EQUALS locally_owned.size())
             for (unsigned int i = 0; i < copy_indices_global_mine.n_cols(); ++i)
               copy_indices_global_mine(1, i) =
                 external_partitioner->global_to_local(
@@ -474,8 +484,9 @@ namespace internal
         }
       else
         {
-          if (target_partitioner.get() != nullptr &&
-              target_partitioner->size() == locally_owned.size())
+          if (target_partitioner.get() !=
+              nullptr DEAL_II_AND       target_partitioner
+                ->size() DEAL_II_EQUALS locally_owned.size())
             for (unsigned int i = 0; i < copy_indices_global_mine.n_cols(); ++i)
               copy_indices_global_mine(1, i) =
                 locally_owned.n_elements() +
@@ -569,9 +580,9 @@ namespace internal
                   c * n_scalar_cell_dofs +
                   k * n_child_dofs_1d * n_child_dofs_1d + j * n_child_dofs_1d +
                   i;
-                Assert(indices[index] == numbers::invalid_dof_index ||
-                         indices[index] ==
-                           local_dof_indices[lexicographic_numbering[m]],
+                Assert(indices[index] DEAL_II_EQUALS numbers::invalid_dof_index
+                         DEAL_II_OR indices[index] DEAL_II_EQUALS
+                                    local_dof_indices[lexicographic_numbering[m]],
                        ExcInternalError());
                 indices[index] = local_dof_indices[lexicographic_numbering[m]];
               }
@@ -612,7 +623,9 @@ namespace internal
 
       // step 1.3: create a dummy 1D quadrature formula to extract the
       // lexicographic numbering for the elements
-      Assert(fe.n_dofs_per_vertex() == 0 || fe.n_dofs_per_vertex() == 1,
+      Assert(fe.n_dofs_per_vertex()
+               DEAL_II_EQUALS 0 DEAL_II_OR fe.n_dofs_per_vertex()
+                 DEAL_II_EQUALS 1,
              ExcNotImplemented());
       const unsigned int shift = fe.n_dofs_per_cell() - fe.n_dofs_per_vertex();
       const unsigned int n_child_dofs_1d =
@@ -653,16 +666,16 @@ namespace internal
               const unsigned int                    level,
               std::vector<types::global_dof_index> &dof_indices)
       {
-        if (mg_constrained_dofs != nullptr &&
-            mg_constrained_dofs->get_level_constraints(level).n_constraints() >
-              0)
+        if (mg_constrained_dofs != nullptr DEAL_II_AND mg_constrained_dofs
+                                       ->get_level_constraints(level)
+                                       .n_constraints() > 0)
           for (auto &ind : dof_indices)
             if (mg_constrained_dofs->get_level_constraints(level)
                   .is_identity_constrained(ind))
               {
                 Assert(mg_constrained_dofs->get_level_constraints(level)
-                           .get_constraint_entries(ind)
-                           ->size() == 1,
+                         .get_constraint_entries(ind)
+                         ->size() DEAL_II_EQUALS 1,
                        ExcInternalError());
                 ind = mg_constrained_dofs->get_level_constraints(level)
                         .get_constraint_entries(ind)
@@ -713,8 +726,9 @@ namespace internal
       std::string fe_name = dof_handler.get_fe().base_element(0).get_name();
       {
         const std::size_t template_starts = fe_name.find_first_of('<');
-        Assert(fe_name[template_starts + 1] ==
-                 (dim == 1 ? '1' : (dim == 2 ? '2' : '3')),
+        Assert(fe_name[template_starts + 1] DEAL_II_EQUALS(
+                 dim DEAL_II_EQUALS 1 ? '1' :
+                                        (dim DEAL_II_EQUALS 2 ? '2' : '3')),
                ExcInternalError());
         fe_name[template_starts + 1] = '1';
       }
@@ -741,8 +755,8 @@ namespace internal
       dirichlet_indices.resize(n_levels - 1);
 
       AssertDimension(target_partitioners.max_level(), n_levels - 1);
-      Assert(external_partitioners.empty() ||
-               external_partitioners.size() == n_levels,
+      Assert(external_partitioners.empty()
+               DEAL_II_OR external_partitioners.size() DEAL_II_EQUALS n_levels,
              ExcDimensionMismatch(external_partitioners.size(), n_levels));
 
       for (unsigned int level = n_levels - 1; level > 0; --level)
@@ -765,9 +779,11 @@ namespace internal
                 continue;
 
               bool consider_cell =
-                (tria.locally_owned_subdomain() ==
-                   numbers::invalid_subdomain_id ||
-                 cell->level_subdomain_id() == tria.locally_owned_subdomain());
+                (tria
+                   .locally_owned_subdomain()
+                     DEAL_II_EQUALS numbers::invalid_subdomain_id DEAL_II_OR
+                                                                  cell->level_subdomain_id()
+                         DEAL_II_EQUALS tria.locally_owned_subdomain());
 
               // due to the particular way we store DoF indices (via children),
               // we also need to add the DoF indices for coarse cells where we
@@ -776,8 +792,8 @@ namespace internal
               for (unsigned int c = 0;
                    c < GeometryInfo<dim>::max_children_per_cell;
                    ++c)
-                if (cell->child(c)->level_subdomain_id() ==
-                    tria.locally_owned_subdomain())
+                if (cell->child(c)->level_subdomain_id()
+                      DEAL_II_EQUALS tria.locally_owned_subdomain())
                   {
                     consider_cell = true;
                     break;
@@ -804,8 +820,9 @@ namespace internal
                    c < GeometryInfo<dim>::max_children_per_cell;
                    ++c)
                 {
-                  if (cell_is_remote && cell->child(c)->level_subdomain_id() !=
-                                          tria.locally_owned_subdomain())
+                  if (cell_is_remote DEAL_II_AND cell->child(c)
+                        ->level_subdomain_id() !=
+                      tria.locally_owned_subdomain())
                     continue;
                   cell->child(c)->get_mg_dof_indices(local_dof_indices);
 
@@ -826,11 +843,13 @@ namespace internal
                                          &next_indices[start_index]);
 
                   // step 2.3 store the connectivity to the parent
-                  if (cell->child(c)->has_children() &&
-                      (tria.locally_owned_subdomain() ==
-                         numbers::invalid_subdomain_id ||
-                       cell->child(c)->level_subdomain_id() ==
-                         tria.locally_owned_subdomain()))
+                  if (cell->child(c)->has_children() DEAL_II_AND(
+                        tria
+                          .locally_owned_subdomain()
+                            DEAL_II_EQUALS numbers::invalid_subdomain_id
+                              DEAL_II_OR cell->child(c)
+                          ->level_subdomain_id()
+                            DEAL_II_EQUALS tria.locally_owned_subdomain()))
                     {
                       const unsigned int child_index =
                         coarse_level_indices[level][cell->child(c)->index()];
@@ -876,7 +895,7 @@ namespace internal
               // insert the indices as if they were from a child in order to use
               // the same code (the coarsest level does not matter much in terms
               // of memory, so we gain in code simplicity)
-              if (level == 1 && !cell_is_remote)
+              if (level DEAL_II_EQUALS 1 DEAL_II_AND !cell_is_remote)
                 {
                   cell->get_mg_dof_indices(local_dof_indices);
 
@@ -966,7 +985,7 @@ namespace internal
                                             global_level_dof_indices_remote,
                                             level_dof_indices[level]);
           // step 2.8: Initialize the ghosted vector for level 0
-          if (level == 1)
+          if (level DEAL_II_EQUALS 1)
             {
               for (unsigned int i = 0; i < parent_child_connect[0].size(); ++i)
                 parent_child_connect[0][i] = std::make_pair(i, 0U);

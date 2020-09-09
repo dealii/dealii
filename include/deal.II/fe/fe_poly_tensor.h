@@ -275,8 +275,10 @@ protected:
       std::any_of(this->mapping_kind.begin(),
                   this->mapping_kind.end(),
                   [](const MappingKind t) {
-                    return (t == mapping_raviart_thomas || t == mapping_piola ||
-                            t == mapping_nedelec || t == mapping_contravariant);
+                    return (t DEAL_II_EQUALS mapping_raviart_thomas DEAL_II_OR t
+                              DEAL_II_EQUALS mapping_piola DEAL_II_OR t
+                                DEAL_II_EQUALS mapping_nedelec DEAL_II_OR t
+                                  DEAL_II_EQUALS mapping_contravariant);
                   });
 
     const bool update_transformed_shape_hessian_tensors =
@@ -328,7 +330,7 @@ protected:
 
           if (update_flags & update_values)
             {
-              if (inverse_node_matrix.n_cols() == 0)
+              if (inverse_node_matrix.n_cols() DEAL_II_EQUALS 0)
                 for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
                   data.shape_values[i][k] = values[i];
               else
@@ -343,7 +345,7 @@ protected:
 
           if (update_flags & update_gradients)
             {
-              if (inverse_node_matrix.n_cols() == 0)
+              if (inverse_node_matrix.n_cols() DEAL_II_EQUALS 0)
                 for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
                   data.shape_grads[i][k] = grads[i];
               else
@@ -358,7 +360,7 @@ protected:
 
           if (update_flags & update_hessians)
             {
-              if (inverse_node_matrix.n_cols() == 0)
+              if (inverse_node_matrix.n_cols() DEAL_II_EQUALS 0)
                 for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
                   data.shape_grad_grads[i][k] = grad_grads[i];
               else

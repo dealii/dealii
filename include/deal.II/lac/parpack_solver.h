@@ -630,7 +630,7 @@ PArpackSolver<VectorType>::AdditionalData::AdditionalData(
         ExcMessage(
           "'smallest imaginary part' can only be used for non-symmetric problems!"));
     }
-  Assert(mode >= 1 && mode <= 3,
+  Assert(mode >= 1 DEAL_II_AND mode <= 3,
          ExcMessage("Currently, only modes 1, 2 and 3 are supported."));
 }
 
@@ -672,7 +672,7 @@ void
 PArpackSolver<VectorType>::set_initial_vector(const VectorType &vec)
 {
   initial_vector_provided = true;
-  Assert(resid.size() == local_indices.size(),
+  Assert(resid.size() DEAL_II_EQUALS local_indices.size(),
          ExcDimensionMismatch(resid.size(), local_indices.size()));
   vec.extract_subvector_to(local_indices.begin(),
                            local_indices.end(),
@@ -830,7 +830,7 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
   // 'G' generalized eigenvalue problem
   // 'I' standard eigenvalue problem
   char bmat[2];
-  bmat[0] = (mode == 1) ? 'I' : 'G';
+  bmat[0] = (mode DEAL_II_EQUALS 1) ? 'I' : 'G';
   bmat[1] = '\0';
 
   // Specify the eigenvalues of interest, possible parameters:
@@ -954,10 +954,10 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
                  &lworkl,
                  &info);
 
-      AssertThrow(info == 0, PArpackExcInfoPdnaupd(info));
+      AssertThrow(info DEAL_II_EQUALS 0, PArpackExcInfoPdnaupd(info));
 
       // if we converge, we shall not modify anything in work arrays!
-      if (ido == 99)
+      if (ido DEAL_II_EQUALS 99)
         break;
 
       // IPNTR(1) is the pointer into WORKD for X,
@@ -974,19 +974,20 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
       src = 0.;
 
       // switch based on both ido and mode
-      if ((ido == -1) || (ido == 1 && mode < 3))
+      if ((ido DEAL_II_EQUALS - 1)
+            DEAL_II_OR(ido DEAL_II_EQUALS 1 DEAL_II_AND mode < 3))
         // compute  Y = OP * X
         {
           src.add(nloc, local_indices.data(), workd.data() + shift_x);
           src.compress(VectorOperation::add);
 
-          if (mode == 3)
+          if (mode DEAL_II_EQUALS 3)
             // OP = inv[K - sigma*M]*M
             {
               mass_matrix.vmult(tmp, src);
               inverse.vmult(dst, tmp);
             }
-          else if (mode == 2)
+          else if (mode DEAL_II_EQUALS 2)
             // OP = inv[M]*K
             {
               system_matrix.vmult(tmp, src);
@@ -996,14 +997,14 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
                                        workd.data() + shift_x);
               inverse.vmult(dst, tmp);
             }
-          else if (mode == 1)
+          else if (mode DEAL_II_EQUALS 1)
             {
               system_matrix.vmult(dst, src);
             }
           else
             AssertThrow(false, PArpackExcMode(mode));
         }
-      else if (ido == 1 && mode >= 3)
+      else if (ido DEAL_II_EQUALS 1 DEAL_II_AND mode >= 3)
         // compute  Y = OP * X for mode 3, 4 and 5, where
         // the vector B * X is already available in WORKD(ipntr(3)).
         {
@@ -1017,17 +1018,17 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
           src.compress(VectorOperation::add);
 
           // solving linear system
-          Assert(mode == 3, ExcNotImplemented());
+          Assert(mode DEAL_II_EQUALS 3, ExcNotImplemented());
           inverse.vmult(dst, src);
         }
-      else if (ido == 2)
+      else if (ido DEAL_II_EQUALS 2)
         // compute  Y = B * X
         {
           src.add(nloc, local_indices.data(), workd.data() + shift_x);
           src.compress(VectorOperation::add);
 
           // Multiplication with mass matrix M
-          if (mode == 1)
+          if (mode DEAL_II_EQUALS 1)
             {
               dst = src;
             }
@@ -1111,11 +1112,11 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
              &lworkl,
              &info);
 
-  if (info == 1)
+  if (info DEAL_II_EQUALS 1)
     {
       AssertThrow(false, PArpackExcInfoMaxIt(control().max_steps()));
     }
-  else if (info == 3)
+  else if (info DEAL_II_EQUALS 3)
     {
       AssertThrow(false, PArpackExcNoShifts(1));
     }

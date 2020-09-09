@@ -71,11 +71,12 @@ namespace VectorTools
 
       // if for whatever reason we were passed an empty map, return
       // immediately
-      if (function_map.size() == 0)
+      if (function_map.size() DEAL_II_EQUALS 0)
         return;
 
-      Assert(function_map.find(numbers::internal_face_boundary_id) ==
-               function_map.end(),
+      Assert(function_map
+               .find(numbers::internal_face_boundary_id)
+                 DEAL_II_EQUALS function_map.end(),
              ExcMessage("You cannot specify the special boundary indicator "
                         "for interior faces in your function map."));
 
@@ -85,7 +86,7 @@ namespace VectorTools
              i = function_map.begin();
            i != function_map.end();
            ++i)
-        Assert(n_components == i->second->n_components,
+        Assert(n_components DEAL_II_EQUALS i->second->n_components,
                ExcDimensionMismatch(n_components, i->second->n_components));
 
 
@@ -93,13 +94,13 @@ namespace VectorTools
       // use FEValues to figure out what to do on faces, but in 1d
       // faces are points and it is far easier to simply work on
       // individual vertices
-      if (dim == 1)
+      if (dim DEAL_II_EQUALS 1)
         {
           for (const auto &cell : dof.active_cell_iterators())
             for (const unsigned int direction : cell->face_indices())
-              if (cell->at_boundary(direction) &&
-                  (function_map.find(cell->face(direction)->boundary_id()) !=
-                   function_map.end()))
+              if (cell->at_boundary(direction) DEAL_II_AND(
+                    function_map.find(cell->face(direction)->boundary_id()) !=
+                    function_map.end()))
                 {
                   const Function<spacedim, number> &boundary_function =
                     *function_map.find(cell->face(direction)->boundary_id())
@@ -107,7 +108,8 @@ namespace VectorTools
 
                   // get the FE corresponding to this cell
                   const FiniteElement<dim, spacedim> &fe = cell->get_fe();
-                  Assert(fe.n_components() == boundary_function.n_components,
+                  Assert(fe.n_components()
+                           DEAL_II_EQUALS boundary_function.n_components,
                          ExcDimensionMismatch(fe.n_components(),
                                               boundary_function.n_components));
 
@@ -123,7 +125,7 @@ namespace VectorTools
                   // each point, irrespective of the number of
                   // components of the function
                   Vector<number> function_values(fe.n_components());
-                  if (fe.n_components() == 1)
+                  if (fe.n_components() DEAL_II_EQUALS 1)
                     function_values(0) =
                       boundary_function.value(cell->vertex(direction));
                   else
@@ -199,7 +201,7 @@ namespace VectorTools
                   for (unsigned int i = 0; i < fe.n_dofs_per_face(); ++i)
                     if (fe.is_primitive(fe.face_to_cell_index(i, 0)))
                       if (component_mask[fe.face_system_to_component_index(i)
-                                           .first] == true)
+                                           .first] DEAL_II_EQUALS true)
                         unit_support_points[i] = fe.unit_face_support_point(i);
 
                   q_collection.push_back(
@@ -235,8 +237,9 @@ namespace VectorTools
                       const ComponentMask &nonzero_component_array =
                         cell->get_fe().get_nonzero_components(i);
                       for (unsigned int c = 0; c < n_components; ++c)
-                        if ((nonzero_component_array[c] == true) &&
-                            (component_mask[c] == true))
+                        if ((nonzero_component_array[c] DEAL_II_EQUALS true)
+                              DEAL_II_AND(
+                                component_mask[c] DEAL_II_EQUALS true))
                           Assert(
                             cell->get_fe().is_primitive(i),
                             ExcMessage(
@@ -259,8 +262,8 @@ namespace VectorTools
                   // supposed to do something, and also see if the finite
                   // element in use here has DoFs on the face at all
                   if ((function_map.find(boundary_component) !=
-                       function_map.end()) &&
-                      (cell->get_fe().n_dofs_per_face() > 0))
+                       function_map.end())
+                        DEAL_II_AND(cell->get_fe().n_dofs_per_face() > 0))
                     {
                       // face is of the right component
                       x_fe_values.reinit(cell, face_no);
@@ -307,13 +310,13 @@ namespace VectorTools
                                   // to transfer face dof index to cell dof
                                   // index
                                   const unsigned int cell_i =
-                                    (dim == 1 ?
+                                    (dim DEAL_II_EQUALS 1 ?
                                        i :
-                                       (dim == 2 ?
+                                       (dim DEAL_II_EQUALS 2 ?
                                           (i < 2 * fe.n_dofs_per_vertex() ?
                                              i :
                                              i + 2 * fe.n_dofs_per_vertex()) :
-                                          (dim == 3 ?
+                                          (dim DEAL_II_EQUALS 3 ?
                                              (i < 4 * fe.n_dofs_per_vertex() ?
                                                 i :
                                                 (i < 4 * fe.n_dofs_per_vertex() +
@@ -338,7 +341,8 @@ namespace VectorTools
                                     for (unsigned int c = 0; c < n_components;
                                          ++c)
                                       if (fe.get_nonzero_components(cell_i)[c])
-                                        Assert(component_mask[c] == false,
+                                        Assert(component_mask
+                                                 [c] DEAL_II_EQUALS false,
                                                FETools::ExcFENotPrimitive());
 
                                   // let's pick the first of possibly more than
@@ -351,7 +355,7 @@ namespace VectorTools
                                                 .first_selected_component();
                                 }
 
-                              if (component_mask[component] == true)
+                              if (component_mask[component] DEAL_II_EQUALS true)
                                 boundary_values[face_dofs[i]] =
                                   dof_values_system[i](component);
                             }
@@ -489,8 +493,9 @@ namespace VectorTools
       boundary_value = boundary_values.begin();
     for (; boundary_value != boundary_values.end(); ++boundary_value)
       {
-        if (constraints.can_store_line(boundary_value->first) &&
-            !constraints.is_constrained(boundary_value->first))
+        if (constraints
+              .can_store_line(boundary_value->first)
+                DEAL_II_AND !constraints.is_constrained(boundary_value->first))
           {
             constraints.add_line(boundary_value->first);
             constraints.set_inhomogeneity(boundary_value->first,
@@ -630,10 +635,11 @@ namespace VectorTools
       std::map<types::global_dof_index, number> &boundary_values,
       std::vector<unsigned int>                  component_mapping)
     {
-      // in 1d, projection onto the 0d end points == interpolation
-      if (dim == 1)
+      // in 1d, projection onto the 0d end points DEAL_II_EQUALS  interpolation
+      if (dim DEAL_II_EQUALS 1)
         {
-          Assert(component_mapping.size() == 0, ExcNotImplemented());
+          Assert(component_mapping.size() DEAL_II_EQUALS 0,
+                 ExcNotImplemented());
           interpolate_boundary_values(
             mapping, dof, boundary_functions, boundary_values, ComponentMask());
           return;
@@ -645,7 +651,7 @@ namespace VectorTools
       //    there are no constrained nodes on the boundary, but is not
       //    acceptable for higher dimensions. Fix this.
 
-      if (component_mapping.size() == 0)
+      if (component_mapping.size() DEAL_II_EQUALS 0)
         {
           AssertDimension(dof.get_fe(0).n_components(),
                           boundary_functions.begin()->second->n_components);
@@ -673,7 +679,7 @@ namespace VectorTools
                                             dof_to_boundary_mapping);
 
       // Done if no degrees of freedom on the boundary
-      if (dof.n_boundary_dofs(boundary_functions) == 0)
+      if (dof.n_boundary_dofs(boundary_functions) DEAL_II_EQUALS 0)
         return;
 
       // set up sparsity structure
@@ -712,12 +718,12 @@ namespace VectorTools
               {
                 if (cell->at_boundary(f))
                   {
-                    if (level == -1)
+                    if (level DEAL_II_EQUALS - 1)
                       level = cell->level();
                     else
                       {
                         Assert(
-                          level == cell->level(),
+                          level DEAL_II_EQUALS cell->level(),
                           ExcMessage(
                             "The mesh you use in projecting boundary values "
                             "has hanging nodes at the boundary. This would require "
@@ -1027,19 +1033,23 @@ namespace VectorTools
           // Compute the degrees of
           // freedom.
           for (unsigned int i = 0; i < fe.n_dofs_per_face(); ++i)
-            if (((dynamic_cast<const FESystem<dim> *>(&fe) != nullptr) &&
-                 (fe.system_to_base_index(fe.face_to_cell_index(i, face))
-                    .first == base_indices) &&
-                 (fe.base_element(base_indices.first)
-                    .face_to_cell_index(line * fe.degree, face) <=
-                  fe.system_to_base_index(fe.face_to_cell_index(i, face))
-                    .second) &&
-                 (fe.system_to_base_index(fe.face_to_cell_index(i, face))
-                    .second <=
-                  fe.base_element(base_indices.first)
-                    .face_to_cell_index((line + 1) * fe.degree - 1, face))) ||
-                ((dynamic_cast<const FE_Nedelec<dim> *>(&fe) != nullptr) &&
-                 (line * fe.degree <= i) && (i < (line + 1) * fe.degree)))
+            if (((dynamic_cast<const FESystem<dim> *>(&fe) != nullptr)
+                   DEAL_II_AND(
+                     fe.system_to_base_index(fe.face_to_cell_index(i, face))
+                       .first DEAL_II_EQUALS base_indices)
+                     DEAL_II_AND(
+                       fe.base_element(base_indices.first)
+                         .face_to_cell_index(line * fe.degree, face) <=
+                       fe.system_to_base_index(fe.face_to_cell_index(i, face))
+                         .second)
+                       DEAL_II_AND(
+                         fe.system_to_base_index(fe.face_to_cell_index(i, face))
+                           .second <= fe.base_element(base_indices.first)
+                                        .face_to_cell_index(
+                                          (line + 1) * fe.degree - 1, face)))
+                  DEAL_II_OR((dynamic_cast<const FE_Nedelec<dim> *>(&fe) !=
+                              nullptr) DEAL_II_AND(line * fe.degree <= i)
+                               DEAL_II_AND(i < (line + 1) * fe.degree)))
               {
                 const double tangential_solution_component =
                   (values[q_point](first_vector_component) *
@@ -1067,7 +1077,7 @@ namespace VectorTools
                        jacobians[q_point][2]
                                 [edge_coordinate_direction[face][line]]));
 
-                if (q_point == 0)
+                if (q_point DEAL_II_EQUALS 0)
                   dofs_processed[i] = true;
               }
         }
@@ -1202,12 +1212,12 @@ namespace VectorTools
                   // Compute the degrees
                   // of freedom.
                   for (unsigned int i = 0; i < fe.n_dofs_per_face(); ++i)
-                    if (((dynamic_cast<const FESystem<dim> *>(&fe) !=
-                          nullptr) &&
-                         (fe.system_to_base_index(
-                              fe.face_to_cell_index(i, face))
-                            .first == base_indices)) ||
-                        (dynamic_cast<const FE_Nedelec<dim> *>(&fe) != nullptr))
+                    if (((dynamic_cast<const FESystem<dim> *>(&fe) != nullptr)
+                           DEAL_II_AND(fe.system_to_base_index(
+                                           fe.face_to_cell_index(i, face))
+                                         .first DEAL_II_EQUALS base_indices))
+                          DEAL_II_OR(dynamic_cast<const FE_Nedelec<dim> *>(
+                                       &fe) != nullptr))
                       {
                         dof_values[i] +=
                           fe_values.JxW(q_point) *
@@ -1219,7 +1229,7 @@ namespace VectorTools
                                                 q_point) *
                            tangentials[q_point]);
 
-                        if (q_point == 0)
+                        if (q_point DEAL_II_EQUALS 0)
                           dofs_processed[i] = true;
                       }
                 }
@@ -1272,24 +1282,26 @@ namespace VectorTools
                     tmp[d] = values[q_point](first_vector_component + d);
 
                   for (unsigned int i = 0; i < fe.n_dofs_per_face(); ++i)
-                    if (((dynamic_cast<const FESystem<dim> *>(&fe) !=
-                          nullptr) &&
-                         (fe.system_to_base_index(
-                              fe.face_to_cell_index(i, face))
-                            .first == base_indices) &&
-                         (fe.base_element(base_indices.first)
-                            .face_to_cell_index(2 * fe.degree, face) <=
-                          fe.system_to_base_index(
-                              fe.face_to_cell_index(i, face))
-                            .second) &&
-                         (fe.system_to_base_index(
-                              fe.face_to_cell_index(i, face))
-                            .second <=
-                          fe.base_element(base_indices.first)
-                            .face_to_cell_index(4 * fe.degree - 1, face))) ||
-                        ((dynamic_cast<const FE_Nedelec<dim> *>(&fe) !=
-                          nullptr) &&
-                         (2 * fe.degree <= i) && (i < 4 * fe.degree)))
+                    if (((dynamic_cast<const FESystem<dim> *>(&fe) != nullptr)
+                           DEAL_II_AND(fe.system_to_base_index(
+                                           fe.face_to_cell_index(i, face))
+                                         .first DEAL_II_EQUALS base_indices)
+                             DEAL_II_AND(
+                               fe.base_element(base_indices.first)
+                                 .face_to_cell_index(2 * fe.degree, face) <=
+                               fe.system_to_base_index(
+                                   fe.face_to_cell_index(i, face))
+                                 .second)
+                               DEAL_II_AND(fe.system_to_base_index(
+                                               fe.face_to_cell_index(i, face))
+                                             .second <=
+                                           fe.base_element(base_indices.first)
+                                             .face_to_cell_index(
+                                               4 * fe.degree - 1, face)))
+                          DEAL_II_OR(
+                            (dynamic_cast<const FE_Nedelec<dim> *>(&fe) !=
+                             nullptr) DEAL_II_AND(2 * fe.degree <= i)
+                              DEAL_II_AND(i < 4 * fe.degree)))
                       tmp -=
                         dof_values[i] *
                         fe_values[vec].value(fe.face_to_cell_index(i, face),
@@ -1338,31 +1350,38 @@ namespace VectorTools
                   unsigned int index = 0;
 
                   for (unsigned int i = 0; i < fe.n_dofs_per_face(); ++i)
-                    if (((dynamic_cast<const FESystem<dim> *>(&fe) !=
-                          nullptr) &&
-                         (fe.system_to_base_index(
-                              fe.face_to_cell_index(i, face))
-                            .first == base_indices) &&
-                         (fe.base_element(base_indices.first)
-                            .face_to_cell_index(
-                              GeometryInfo<dim>::lines_per_face * fe.degree,
-                              face) <=
-                          fe.system_to_base_index(
-                              fe.face_to_cell_index(i, face))
-                            .second) &&
-                         (fe.system_to_base_index(
-                              fe.face_to_cell_index(i, face))
-                            .second <
-                          fe.base_element(base_indices.first)
-                            .face_to_cell_index(
-                              (degree + GeometryInfo<dim>::lines_per_face) *
-                                fe.degree,
-                              face))) ||
-                        ((dynamic_cast<const FE_Nedelec<dim> *>(&fe) !=
-                          nullptr) &&
-                         (GeometryInfo<dim>::lines_per_face * fe.degree <= i) &&
-                         (i < (degree + GeometryInfo<dim>::lines_per_face) *
-                                fe.degree)))
+                    if (((dynamic_cast<const FESystem<dim> *>(&fe) != nullptr)
+                           DEAL_II_AND(fe.system_to_base_index(
+                                           fe.face_to_cell_index(i, face))
+                                         .first DEAL_II_EQUALS base_indices)
+                             DEAL_II_AND(fe.base_element(base_indices.first)
+                                           .face_to_cell_index(
+                                             GeometryInfo<dim>::lines_per_face *
+                                               fe.degree,
+                                             face) <=
+                                         fe.system_to_base_index(
+                                             fe.face_to_cell_index(i, face))
+                                           .second)
+                               DEAL_II_AND(
+                                 fe.system_to_base_index(
+                                     fe.face_to_cell_index(i, face))
+                                   .second <
+                                 fe.base_element(base_indices.first)
+                                   .face_to_cell_index(
+                                     (degree +
+                                      GeometryInfo<dim>::lines_per_face) *
+                                       fe.degree,
+                                     face)))
+                          DEAL_II_OR(
+                            (dynamic_cast<const FE_Nedelec<dim> *>(&fe) !=
+                             nullptr)
+                              DEAL_II_AND(GeometryInfo<dim>::lines_per_face *
+                                            fe.degree <=
+                                          i)
+                                DEAL_II_AND(
+                                  i <
+                                  (degree + GeometryInfo<dim>::lines_per_face) *
+                                    fe.degree)))
                       {
                         const Tensor<1, dim> shape_value =
                           (JxW *
@@ -1392,27 +1411,38 @@ namespace VectorTools
                 unsigned int index = 0;
 
                 for (unsigned int i = 0; i < fe.n_dofs_per_face(); ++i)
-                  if (((dynamic_cast<const FESystem<dim> *>(&fe) != nullptr) &&
-                       (fe.system_to_base_index(fe.face_to_cell_index(i, face))
-                          .first == base_indices) &&
-                       (fe.base_element(base_indices.first)
-                          .face_to_cell_index(
-                            GeometryInfo<dim>::lines_per_face * fe.degree,
-                            face) <=
-                        fe.system_to_base_index(fe.face_to_cell_index(i, face))
-                          .second) &&
-                       (fe.system_to_base_index(fe.face_to_cell_index(i, face))
-                          .second <
-                        fe.base_element(base_indices.first)
-                          .face_to_cell_index(
-                            (degree + GeometryInfo<dim>::lines_per_face) *
-                              fe.degree,
-                            face))) ||
-                      ((dynamic_cast<const FE_Nedelec<dim> *>(&fe) !=
-                        nullptr) &&
-                       (GeometryInfo<dim>::lines_per_face * fe.degree <= i) &&
-                       (i < (degree + GeometryInfo<dim>::lines_per_face) *
-                              fe.degree)))
+                  if (((dynamic_cast<const FESystem<dim> *>(&fe) != nullptr)
+                         DEAL_II_AND(fe.system_to_base_index(
+                                         fe.face_to_cell_index(i, face))
+                                       .first DEAL_II_EQUALS base_indices)
+                           DEAL_II_AND(
+                             fe.base_element(base_indices.first)
+                               .face_to_cell_index(
+                                 GeometryInfo<dim>::lines_per_face * fe.degree,
+                                 face) <=
+                             fe.system_to_base_index(
+                                 fe.face_to_cell_index(i, face))
+                               .second)
+                             DEAL_II_AND(
+                               fe.system_to_base_index(
+                                   fe.face_to_cell_index(i, face))
+                                 .second <
+                               fe.base_element(base_indices.first)
+                                 .face_to_cell_index(
+                                   (degree +
+                                    GeometryInfo<dim>::lines_per_face) *
+                                     fe.degree,
+                                   face)))
+                        DEAL_II_OR(
+                          (dynamic_cast<const FE_Nedelec<dim> *>(&fe) !=
+                           nullptr)
+                            DEAL_II_AND(GeometryInfo<dim>::lines_per_face *
+                                          fe.degree <=
+                                        i)
+                              DEAL_II_AND(
+                                i <
+                                (degree + GeometryInfo<dim>::lines_per_face) *
+                                  fe.degree)))
                     {
                       dof_values[i]     = solution(index);
                       dofs_processed[i] = true;
@@ -1432,23 +1462,24 @@ namespace VectorTools
                     tmp[d] = values[q_point](first_vector_component + d);
 
                   for (unsigned int i = 0; i < fe.n_dofs_per_face(); ++i)
-                    if (((dynamic_cast<const FESystem<dim> *>(&fe) !=
-                          nullptr) &&
-                         (fe.system_to_base_index(
-                              fe.face_to_cell_index(i, face))
-                            .first == base_indices) &&
-                         (fe.system_to_base_index(
-                              fe.face_to_cell_index(i, face))
-                            .second <=
-                          fe.base_element(base_indices.first)
-                            .face_to_cell_index(2 * fe.degree - 1, face)) &&
-                         (fe.system_to_base_index(
-                              fe.face_to_cell_index(i, face))
-                            .second >= fe.base_element(base_indices.first)
-                                         .face_to_cell_index(0, face))) ||
-                        ((dynamic_cast<const FE_Nedelec<dim> *>(&fe) !=
-                          nullptr) &&
-                         (i < 2 * fe.degree)))
+                    if (((dynamic_cast<const FESystem<dim> *>(&fe) != nullptr)
+                           DEAL_II_AND(fe.system_to_base_index(
+                                           fe.face_to_cell_index(i, face))
+                                         .first DEAL_II_EQUALS base_indices)
+                             DEAL_II_AND(
+                               fe.system_to_base_index(
+                                   fe.face_to_cell_index(i, face))
+                                 .second <=
+                               fe.base_element(base_indices.first)
+                                 .face_to_cell_index(2 * fe.degree - 1, face))
+                               DEAL_II_AND(fe.system_to_base_index(
+                                               fe.face_to_cell_index(i, face))
+                                             .second >=
+                                           fe.base_element(base_indices.first)
+                                             .face_to_cell_index(0, face)))
+                          DEAL_II_OR(
+                            (dynamic_cast<const FE_Nedelec<dim> *>(&fe) !=
+                             nullptr) DEAL_II_AND(i < 2 * fe.degree)))
                       tmp -=
                         dof_values[i] *
                         fe_values[vec].value(fe.face_to_cell_index(i, face),
@@ -1488,24 +1519,27 @@ namespace VectorTools
                   unsigned int index = 0;
 
                   for (unsigned int i = 0; i < fe.n_dofs_per_face(); ++i)
-                    if (((dynamic_cast<const FESystem<dim> *>(&fe) !=
-                          nullptr) &&
-                         (fe.system_to_base_index(
-                              fe.face_to_cell_index(i, face))
-                            .first == base_indices) &&
-                         (fe.base_element(base_indices.first)
-                            .face_to_cell_index(
-                              (degree + GeometryInfo<dim>::lines_per_face) *
-                                fe.degree,
-                              face) <=
-                          fe.system_to_base_index(
-                              fe.face_to_cell_index(i, face))
-                            .second)) ||
-                        ((dynamic_cast<const FE_Nedelec<dim> *>(&fe) !=
-                          nullptr) &&
-                         ((degree + GeometryInfo<dim>::lines_per_face) *
-                            fe.degree <=
-                          i)))
+                    if (((dynamic_cast<const FESystem<dim> *>(&fe) != nullptr)
+                           DEAL_II_AND(fe.system_to_base_index(
+                                           fe.face_to_cell_index(i, face))
+                                         .first DEAL_II_EQUALS base_indices)
+                             DEAL_II_AND(
+                               fe.base_element(base_indices.first)
+                                 .face_to_cell_index(
+                                   (degree +
+                                    GeometryInfo<dim>::lines_per_face) *
+                                     fe.degree,
+                                   face) <=
+                               fe.system_to_base_index(
+                                   fe.face_to_cell_index(i, face))
+                                 .second))
+                          DEAL_II_OR(
+                            (dynamic_cast<const FE_Nedelec<dim> *>(&fe) !=
+                             nullptr)
+                              DEAL_II_AND(
+                                (degree + GeometryInfo<dim>::lines_per_face) *
+                                  fe.degree <=
+                                i)))
                       {
                         const Tensor<1, dim> shape_value =
                           JxW *
@@ -1528,20 +1562,25 @@ namespace VectorTools
               unsigned int index = 0;
 
               for (unsigned int i = 0; i < fe.n_dofs_per_face(); ++i)
-                if (((dynamic_cast<const FESystem<dim> *>(&fe) != nullptr) &&
-                     (fe.system_to_base_index(fe.face_to_cell_index(i, face))
-                        .first == base_indices) &&
-                     (fe.base_element(base_indices.first)
-                        .face_to_cell_index(
-                          (degree + GeometryInfo<dim>::lines_per_face) *
-                            fe.degree,
-                          face) <=
-                      fe.system_to_base_index(fe.face_to_cell_index(i, face))
-                        .second)) ||
-                    ((dynamic_cast<const FE_Nedelec<dim> *>(&fe) != nullptr) &&
-                     ((degree + GeometryInfo<dim>::lines_per_face) *
-                        fe.degree <=
-                      i)))
+                if (((dynamic_cast<const FESystem<dim> *>(&fe) != nullptr)
+                       DEAL_II_AND(
+                         fe.system_to_base_index(fe.face_to_cell_index(i, face))
+                           .first DEAL_II_EQUALS base_indices)
+                         DEAL_II_AND(
+                           fe.base_element(base_indices.first)
+                             .face_to_cell_index(
+                               (degree + GeometryInfo<dim>::lines_per_face) *
+                                 fe.degree,
+                               face) <=
+                           fe.system_to_base_index(
+                               fe.face_to_cell_index(i, face))
+                             .second))
+                      DEAL_II_OR(
+                        (dynamic_cast<const FE_Nedelec<dim> *>(&fe) != nullptr)
+                          DEAL_II_AND(
+                            (degree + GeometryInfo<dim>::lines_per_face) *
+                              fe.degree <=
+                            i)))
                   {
                     dof_values[i]     = solution(index);
                     dofs_processed[i] = true;
@@ -1610,9 +1649,10 @@ namespace VectorTools
         case 2:
           {
             for (; cell != dof_handler.end(); ++cell)
-              if (cell->at_boundary() && cell->is_locally_owned())
+              if (cell->at_boundary() DEAL_II_AND cell->is_locally_owned())
                 for (const unsigned int face : cell->face_indices())
-                  if (cell->face(face)->boundary_id() == boundary_component)
+                  if (cell->face(face)->boundary_id()
+                        DEAL_II_EQUALS boundary_component)
                     {
                       // if the FE is a
                       // FE_Nothing object
@@ -1628,8 +1668,8 @@ namespace VectorTools
                       // element. If the FE
                       // is a FESystem, we
                       // cannot check this.
-                      if (dynamic_cast<const FESystem<dim> *>(
-                            &cell->get_fe()) == nullptr)
+                      if (dynamic_cast<const FESystem<dim> *>(&cell->get_fe())
+                            DEAL_II_EQUALS nullptr)
                         {
                           AssertThrow(
                             dynamic_cast<const FE_Nedelec<dim> *>(
@@ -1663,10 +1703,10 @@ namespace VectorTools
                       // object, if the degree of freedom is not already
                       // constrained.
                       for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
-                        if (dofs_processed[dof] &&
-                            constraints.can_store_line(face_dof_indices[dof]) &&
-                            !(constraints.is_constrained(
-                              face_dof_indices[dof])))
+                        if (dofs_processed[dof] DEAL_II_AND constraints
+                              .can_store_line(face_dof_indices[dof])
+                                DEAL_II_AND !(constraints.is_constrained(
+                                  face_dof_indices[dof])))
                           {
                             constraints.add_line(face_dof_indices[dof]);
 
@@ -1704,9 +1744,10 @@ namespace VectorTools
                                                update_values);
 
             for (; cell != dof_handler.end(); ++cell)
-              if (cell->at_boundary() && cell->is_locally_owned())
+              if (cell->at_boundary() DEAL_II_AND cell->is_locally_owned())
                 for (const unsigned int face : cell->face_indices())
-                  if (cell->face(face)->boundary_id() == boundary_component)
+                  if (cell->face(face)->boundary_id()
+                        DEAL_II_EQUALS boundary_component)
                     {
                       // if the FE is a
                       // FE_Nothing object
@@ -1722,8 +1763,8 @@ namespace VectorTools
                       // element. If the FE is
                       // a FESystem we cannot
                       // check this.
-                      if (dynamic_cast<const FESystem<dim> *>(
-                            &cell->get_fe()) == nullptr)
+                      if (dynamic_cast<const FESystem<dim> *>(&cell->get_fe())
+                            DEAL_II_EQUALS nullptr)
                         {
                           AssertThrow(dynamic_cast<const FE_Nedelec<dim> *>(
                                         &cell->get_fe()) != nullptr,
@@ -1775,10 +1816,10 @@ namespace VectorTools
                         face_dof_indices, cell->active_fe_index());
 
                       for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
-                        if (dofs_processed[dof] &&
-                            constraints.can_store_line(face_dof_indices[dof]) &&
-                            !(constraints.is_constrained(
-                              face_dof_indices[dof])))
+                        if (dofs_processed[dof] DEAL_II_AND constraints
+                              .can_store_line(face_dof_indices[dof])
+                                DEAL_II_AND !(constraints.is_constrained(
+                                  face_dof_indices[dof])))
                           {
                             constraints.add_line(face_dof_indices[dof]);
 
@@ -1839,9 +1880,10 @@ namespace VectorTools
         case 2:
           {
             for (; cell != dof_handler.end(); ++cell)
-              if (cell->at_boundary() && cell->is_locally_owned())
+              if (cell->at_boundary() DEAL_II_AND cell->is_locally_owned())
                 for (const unsigned int face : cell->face_indices())
-                  if (cell->face(face)->boundary_id() == boundary_component)
+                  if (cell->face(face)->boundary_id()
+                        DEAL_II_EQUALS boundary_component)
                     {
                       // if the FE is a FE_Nothing object there is no work to do
                       if (dynamic_cast<const FE_Nothing<dim> *>(
@@ -1850,8 +1892,8 @@ namespace VectorTools
 
                       // This is only implemented, if the FE is a Nedelec
                       // element. If the FE is a FESystem we cannot check this.
-                      if (dynamic_cast<const FESystem<dim> *>(
-                            &cell->get_fe()) == nullptr)
+                      if (dynamic_cast<const FESystem<dim> *>(&cell->get_fe())
+                            DEAL_II_EQUALS nullptr)
                         {
                           AssertThrow(dynamic_cast<const FE_Nedelec<dim> *>(
                                         &cell->get_fe()) != nullptr,
@@ -1884,10 +1926,10 @@ namespace VectorTools
                         face_dof_indices, cell->active_fe_index());
 
                       for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
-                        if (dofs_processed[dof] &&
-                            constraints.can_store_line(face_dof_indices[dof]) &&
-                            !(constraints.is_constrained(
-                              face_dof_indices[dof])))
+                        if (dofs_processed[dof] DEAL_II_AND constraints
+                              .can_store_line(face_dof_indices[dof])
+                                DEAL_II_AND !(constraints.is_constrained(
+                                  face_dof_indices[dof])))
                           {
                             constraints.add_line(face_dof_indices[dof]);
 
@@ -1930,9 +1972,10 @@ namespace VectorTools
                                                update_values);
 
             for (; cell != dof_handler.end(); ++cell)
-              if (cell->at_boundary() && cell->is_locally_owned())
+              if (cell->at_boundary() DEAL_II_AND cell->is_locally_owned())
                 for (const unsigned int face : cell->face_indices())
-                  if (cell->face(face)->boundary_id() == boundary_component)
+                  if (cell->face(face)->boundary_id()
+                        DEAL_II_EQUALS boundary_component)
                     {
                       // if the FE is a FE_Nothing object there is no work to do
                       if (dynamic_cast<const FE_Nothing<dim> *>(
@@ -1941,8 +1984,8 @@ namespace VectorTools
 
                       // This is only implemented, if the FE is a Nedelec
                       // element. If the FE is a FESystem we cannot check this.
-                      if (dynamic_cast<const FESystem<dim> *>(
-                            &cell->get_fe()) == nullptr)
+                      if (dynamic_cast<const FESystem<dim> *>(&cell->get_fe())
+                            DEAL_II_EQUALS nullptr)
                         {
                           AssertThrow(dynamic_cast<const FE_Nedelec<dim> *>(
                                         &cell->get_fe()) != nullptr,
@@ -1995,10 +2038,10 @@ namespace VectorTools
                         face_dof_indices, cell->active_fe_index());
 
                       for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
-                        if (dofs_processed[dof] &&
-                            constraints.can_store_line(face_dof_indices[dof]) &&
-                            !(constraints.is_constrained(
-                              face_dof_indices[dof])))
+                        if (dofs_processed[dof] DEAL_II_AND constraints
+                              .can_store_line(face_dof_indices[dof])
+                                DEAL_II_AND !(constraints.is_constrained(
+                                  face_dof_indices[dof])))
                           {
                             constraints.add_line(face_dof_indices[dof]);
 
@@ -2020,7 +2063,7 @@ namespace VectorTools
   namespace internals
   {
     template <int dim, typename cell_iterator, typename number>
-    typename std::enable_if<dim == 3>::type
+    typename std::enable_if<dim DEAL_II_EQUALS 3>::type
     compute_edge_projection_l2(const cell_iterator &        cell,
                                const unsigned int           face,
                                const unsigned int           line,
@@ -2094,9 +2137,9 @@ namespace VectorTools
         // (with 3 components). In that case, the values of
         // 'base_indices' as initialized above are correct.
         Assert((dynamic_cast<const FE_Nedelec<dim> *>(&cell->get_fe()) !=
-                nullptr) ||
-                 (dynamic_cast<const FE_NedelecSZ<dim> *>(&cell->get_fe()) !=
-                  nullptr),
+                nullptr)
+                 DEAL_II_OR(dynamic_cast<const FE_NedelecSZ<dim> *>(
+                              &cell->get_fe()) != nullptr),
                ExcNotImplemented());
 
 
@@ -2176,16 +2219,19 @@ namespace VectorTools
           bool dof_is_of_interest = false;
           if (dynamic_cast<const FESystem<dim> *>(&fe) != nullptr)
             {
-              dof_is_of_interest =
-                (fe.system_to_base_index(cell_dof_idx).first == base_indices) &&
-                (lower_bound <= fe.system_to_base_index(cell_dof_idx).second) &&
-                (fe.system_to_base_index(cell_dof_idx).second <= upper_bound);
+              dof_is_of_interest = (fe.system_to_base_index(cell_dof_idx)
+                                      .first DEAL_II_EQUALS base_indices)
+                DEAL_II_AND(lower_bound <=
+                            fe.system_to_base_index(cell_dof_idx).second)
+                  DEAL_II_AND(fe.system_to_base_index(cell_dof_idx).second <=
+                              upper_bound);
             }
-          else if ((dynamic_cast<const FE_Nedelec<dim> *>(&fe) != nullptr) ||
-                   (dynamic_cast<const FE_NedelecSZ<dim> *>(&fe) != nullptr))
+          else if ((dynamic_cast<const FE_Nedelec<dim> *>(&fe) != nullptr)
+                     DEAL_II_OR(dynamic_cast<const FE_NedelecSZ<dim> *>(&fe) !=
+                                nullptr))
             {
-              Assert((line * (degree + 1) <= face_dof_idx) &&
-                       (face_dof_idx < (line + 1) * (degree + 1)),
+              Assert((line * (degree + 1) <= face_dof_idx)
+                       DEAL_II_AND(face_dof_idx < (line + 1) * (degree + 1)),
                      ExcInternalError());
               dof_is_of_interest = true;
             }
@@ -2201,7 +2247,7 @@ namespace VectorTools
         }
       // Sanity check:
       const unsigned int n_associated_edge_dofs = associated_edge_dof_index;
-      Assert(n_associated_edge_dofs == degree + 1,
+      Assert(n_associated_edge_dofs DEAL_II_EQUALS degree + 1,
              ExcMessage("Error: Unexpected number of 3D edge DoFs"));
 
       // Matrix and RHS vectors to store linear system:
@@ -2399,11 +2445,11 @@ namespace VectorTools
       else
         {
           // Assert that the FE is in fact an FE_Nedelec, so that the default
-          // base_indices == (0,0) is correct.
+          // base_indices DEAL_II_EQUALS  (0,0) is correct.
           Assert((dynamic_cast<const FE_Nedelec<dim> *>(&cell->get_fe()) !=
-                  nullptr) ||
-                   (dynamic_cast<const FE_NedelecSZ<dim> *>(&cell->get_fe()) !=
-                    nullptr),
+                  nullptr)
+                   DEAL_II_OR(dynamic_cast<const FE_NedelecSZ<dim> *>(
+                                &cell->get_fe()) != nullptr),
                  ExcNotImplemented());
         }
       const unsigned int degree =
@@ -2433,11 +2479,13 @@ namespace VectorTools
                 {
                   const unsigned int cell_idx =
                     fe.face_to_cell_index(face_idx, face);
-                  if (((dynamic_cast<const FESystem<dim> *>(&fe) != nullptr) &&
-                       (fe.system_to_base_index(cell_idx).first ==
-                        base_indices)) ||
-                      (dynamic_cast<const FE_Nedelec<dim> *>(&fe) != nullptr) ||
-                      (dynamic_cast<const FE_NedelecSZ<dim> *>(&fe) != nullptr))
+                  if (((dynamic_cast<const FESystem<dim> *>(&fe) != nullptr)
+                         DEAL_II_AND(fe.system_to_base_index(cell_idx)
+                                       .first DEAL_II_EQUALS base_indices))
+                        DEAL_II_OR(dynamic_cast<const FE_Nedelec<dim> *>(&fe) !=
+                                   nullptr)
+                          DEAL_II_OR(dynamic_cast<const FE_NedelecSZ<dim> *>(
+                                       &fe) != nullptr))
                     {
                       associated_edge_dof_to_face_dof
                         [associated_edge_dof_index] = face_idx;
@@ -2447,7 +2495,7 @@ namespace VectorTools
               // Sanity check:
               const unsigned int associated_edge_dofs =
                 associated_edge_dof_index;
-              Assert(associated_edge_dofs == degree + 1,
+              Assert(associated_edge_dofs DEAL_II_EQUALS degree + 1,
                      ExcMessage("Error: Unexpected number of 2D edge DoFs"));
 
               // Matrix and RHS vectors to store:
@@ -2609,20 +2657,24 @@ namespace VectorTools
                       if (dynamic_cast<const FESystem<dim> *>(&fe) != nullptr)
                         {
                           dof_is_of_interest =
-                            (fe.system_to_base_index(cell_dof_idx).first ==
-                             base_indices) &&
-                            (lower_bound <=
-                             fe.system_to_base_index(cell_dof_idx).second) &&
-                            (fe.system_to_base_index(cell_dof_idx).second <=
-                             upper_bound);
+                            (fe.system_to_base_index(cell_dof_idx)
+                               .first DEAL_II_EQUALS base_indices)
+                              DEAL_II_AND(
+                                lower_bound <=
+                                fe.system_to_base_index(cell_dof_idx).second)
+                                DEAL_II_AND(
+                                  fe.system_to_base_index(cell_dof_idx)
+                                    .second <= upper_bound);
                         }
                       else if ((dynamic_cast<const FE_Nedelec<dim> *>(&fe) !=
-                                nullptr) ||
-                               (dynamic_cast<const FE_NedelecSZ<dim> *>(&fe) !=
-                                nullptr))
+                                nullptr)
+                                 DEAL_II_OR(
+                                   dynamic_cast<const FE_NedelecSZ<dim> *>(
+                                     &fe) != nullptr))
                         {
-                          Assert((line * (degree + 1) <= face_dof_idx) &&
-                                   (face_dof_idx < (line + 1) * (degree + 1)),
+                          Assert((line * (degree + 1) <= face_dof_idx)
+                                   DEAL_II_AND(face_dof_idx <
+                                               (line + 1) * (degree + 1)),
                                  ExcInternalError());
                           dof_is_of_interest = true;
                         }
@@ -2638,7 +2690,7 @@ namespace VectorTools
                     }
                   // Sanity check:
                   associated_edge_dofs[line] = associated_edge_dof_index;
-                  Assert(associated_edge_dofs[line] == degree + 1,
+                  Assert(associated_edge_dofs[line] DEAL_II_EQUALS degree + 1,
                          ExcInternalError());
                 }
 
@@ -2672,11 +2724,13 @@ namespace VectorTools
                     lines_per_face * fe.n_dofs_per_line() + quad_dof_idx;
                   const unsigned int cell_idx =
                     fe.face_to_cell_index(face_idx, face);
-                  if (((dynamic_cast<const FESystem<dim> *>(&fe) != nullptr) &&
-                       (fe.system_to_base_index(cell_idx).first ==
-                        base_indices)) ||
-                      (dynamic_cast<const FE_Nedelec<dim> *>(&fe) != nullptr) ||
-                      (dynamic_cast<const FE_NedelecSZ<dim> *>(&fe) != nullptr))
+                  if (((dynamic_cast<const FESystem<dim> *>(&fe) != nullptr)
+                         DEAL_II_AND(fe.system_to_base_index(cell_idx)
+                                       .first DEAL_II_EQUALS base_indices))
+                        DEAL_II_OR(dynamic_cast<const FE_Nedelec<dim> *>(&fe) !=
+                                   nullptr)
+                          DEAL_II_OR(dynamic_cast<const FE_NedelecSZ<dim> *>(
+                                       &fe) != nullptr))
                     {
                       AssertIndexRange(associated_face_dof_index,
                                        associated_face_dof_to_face_dof.size());
@@ -2688,7 +2742,8 @@ namespace VectorTools
               // Sanity check:
               const unsigned int associated_face_dofs =
                 associated_face_dof_index;
-              Assert(associated_face_dofs == 2 * degree * (degree + 1),
+              Assert(associated_face_dofs DEAL_II_EQUALS 2 * degree *
+                       (degree + 1),
                      ExcMessage("Error: Unexpected number of 3D face DoFs"));
 
               // Storage for the linear system.
@@ -2894,12 +2949,12 @@ namespace VectorTools
             {
               for (; cell != dof_handler.end(); ++cell)
                 {
-                  if (cell->at_boundary() && cell->is_locally_owned())
+                  if (cell->at_boundary() DEAL_II_AND cell->is_locally_owned())
                     {
                       for (const unsigned int face : cell->face_indices())
                         {
-                          if (cell->face(face)->boundary_id() ==
-                              boundary_component)
+                          if (cell->face(face)->boundary_id()
+                                DEAL_II_EQUALS boundary_component)
                             {
                               // If the FE is an FE_Nothing object there is no
                               // work to do
@@ -2913,13 +2968,14 @@ namespace VectorTools
                               // elements. If the FE is a FESystem we cannot
                               // check this.
                               if (dynamic_cast<const FESystem<dim> *>(
-                                    &cell->get_fe()) == nullptr)
+                                    &cell->get_fe()) DEAL_II_EQUALS nullptr)
                                 {
                                   AssertThrow(
                                     (dynamic_cast<const FE_Nedelec<dim> *>(
-                                       &cell->get_fe()) != nullptr) ||
-                                      (dynamic_cast<const FE_NedelecSZ<dim> *>(
-                                         &cell->get_fe()) != nullptr),
+                                       &cell->get_fe()) != nullptr)
+                                      DEAL_II_OR(
+                                        dynamic_cast<const FE_NedelecSZ<dim> *>(
+                                          &cell->get_fe()) != nullptr),
                                     typename FiniteElement<
                                       dim>::ExcInterpolationNotImplemented());
                                 }
@@ -2959,11 +3015,12 @@ namespace VectorTools
                               for (unsigned int dof = 0; dof < dofs_per_face;
                                    ++dof)
                                 {
-                                  if (dofs_processed[dof] &&
-                                      constraints.can_store_line(
-                                        face_dof_indices[dof]) &&
-                                      !(constraints.is_constrained(
-                                        face_dof_indices[dof])))
+                                  if (dofs_processed[dof] DEAL_II_AND
+                                        constraints.can_store_line(
+                                          face_dof_indices[dof])
+                                          DEAL_II_AND !(
+                                            constraints.is_constrained(
+                                              face_dof_indices[dof])))
                                     {
                                       constraints.add_line(
                                         face_dof_indices[dof]);
@@ -3017,12 +3074,12 @@ namespace VectorTools
 
               for (; cell != dof_handler.end(); ++cell)
                 {
-                  if (cell->at_boundary() && cell->is_locally_owned())
+                  if (cell->at_boundary() DEAL_II_AND cell->is_locally_owned())
                     {
                       for (const unsigned int face : cell->face_indices())
                         {
-                          if (cell->face(face)->boundary_id() ==
-                              boundary_component)
+                          if (cell->face(face)->boundary_id()
+                                DEAL_II_EQUALS boundary_component)
                             {
                               // If the FE is an FE_Nothing object there is no
                               // work to do
@@ -3036,13 +3093,14 @@ namespace VectorTools
                               // elements. If the FE is a FESystem we cannot
                               // check this.
                               if (dynamic_cast<const FESystem<dim> *>(
-                                    &cell->get_fe()) == nullptr)
+                                    &cell->get_fe()) DEAL_II_EQUALS nullptr)
                                 {
                                   AssertThrow(
                                     (dynamic_cast<const FE_Nedelec<dim> *>(
-                                       &cell->get_fe()) != nullptr) ||
-                                      (dynamic_cast<const FE_NedelecSZ<dim> *>(
-                                         &cell->get_fe()) != nullptr),
+                                       &cell->get_fe()) != nullptr)
+                                      DEAL_II_OR(
+                                        dynamic_cast<const FE_NedelecSZ<dim> *>(
+                                          &cell->get_fe()) != nullptr),
                                     typename FiniteElement<
                                       dim>::ExcInterpolationNotImplemented());
                                 }
@@ -3100,11 +3158,12 @@ namespace VectorTools
                               for (unsigned int dof = 0; dof < dofs_per_face;
                                    ++dof)
                                 {
-                                  if (dofs_processed[dof] &&
-                                      constraints.can_store_line(
-                                        face_dof_indices[dof]) &&
-                                      !(constraints.is_constrained(
-                                        face_dof_indices[dof])))
+                                  if (dofs_processed[dof] DEAL_II_AND
+                                        constraints.can_store_line(
+                                          face_dof_indices[dof])
+                                          DEAL_II_AND !(
+                                            constraints.is_constrained(
+                                              face_dof_indices[dof])))
                                     {
                                       constraints.add_line(
                                         face_dof_indices[dof]);
@@ -3252,13 +3311,13 @@ namespace VectorTools
       // Copy the computed values in the AffineConstraints only, if the degree
       // of freedom is not already constrained.
       for (unsigned int i = 0; i < fe.n_dofs_per_face(); ++i)
-        if (!(constraints.is_constrained(face_dof_indices[i])) &&
-            fe.get_nonzero_components(fe.face_to_cell_index(
-              i,
-              face,
-              cell->face_orientation(face),
-              cell->face_flip(face),
-              cell->face_rotation(face)))[first_vector_component])
+        if (!(constraints.is_constrained(face_dof_indices[i]))
+               DEAL_II_AND fe.get_nonzero_components(fe.face_to_cell_index(
+                 i,
+                 face,
+                 cell->face_orientation(face),
+                 cell->face_flip(face),
+                 cell->face_rotation(face)))[first_vector_component])
           {
             constraints.add_line(face_dof_indices[i]);
 
@@ -3359,13 +3418,14 @@ namespace VectorTools
                                         cell->active_fe_index());
 
       for (unsigned int i = 0; i < fe.n_dofs_per_face(); ++i)
-        if (projected_dofs[face_dof_indices[i]] < fe.degree &&
-            fe.get_nonzero_components(fe.face_to_cell_index(
-              i,
-              face,
-              cell->face_orientation(face),
-              cell->face_flip(face),
-              cell->face_rotation(face)))[first_vector_component])
+        if (projected_dofs[face_dof_indices[i]] <
+            fe.degree DEAL_II_AND fe.get_nonzero_components(
+              fe.face_to_cell_index(i,
+                                    face,
+                                    cell->face_orientation(face),
+                                    cell->face_flip(face),
+                                    cell->face_rotation(
+                                      face)))[first_vector_component])
           {
             dof_values[face_dof_indices[i]]     = dof_values_local(i);
             projected_dofs[face_dof_indices[i]] = fe.degree;
@@ -3440,9 +3500,10 @@ namespace VectorTools
         case 2:
           {
             for (const auto &cell : dof_handler.active_cell_iterators())
-              if (cell->at_boundary() && cell->is_locally_owned())
+              if (cell->at_boundary() DEAL_II_AND cell->is_locally_owned())
                 for (const unsigned int face : cell->face_indices())
-                  if (cell->face(face)->boundary_id() == boundary_component)
+                  if (cell->face(face)->boundary_id()
+                        DEAL_II_EQUALS boundary_component)
                     {
                       // if the FE is a
                       // FE_Nothing object
@@ -3458,8 +3519,8 @@ namespace VectorTools
                       // element. If the FE is
                       // a FESystem we cannot
                       // check this.
-                      if (dynamic_cast<const FESystem<dim> *>(
-                            &cell->get_fe()) == nullptr)
+                      if (dynamic_cast<const FESystem<dim> *>(&cell->get_fe())
+                            DEAL_II_EQUALS nullptr)
                         {
                           AssertThrow(
                             dynamic_cast<const FE_RaviartThomas<dim> *>(
@@ -3507,15 +3568,16 @@ namespace VectorTools
               projected_dofs[dof] = 0;
 
             for (const auto &cell : dof_handler.active_cell_iterators())
-              if (cell->at_boundary() && cell->is_locally_owned())
+              if (cell->at_boundary() DEAL_II_AND cell->is_locally_owned())
                 for (const unsigned int face : cell->face_indices())
-                  if (cell->face(face)->boundary_id() == boundary_component)
+                  if (cell->face(face)->boundary_id()
+                        DEAL_II_EQUALS boundary_component)
                     {
                       // This is only implemented, if the FE is a
                       // Raviart-Thomas element. If the FE is a FESystem we
                       // cannot check this.
-                      if (dynamic_cast<const FESystem<dim> *>(
-                            &cell->get_fe()) == nullptr)
+                      if (dynamic_cast<const FESystem<dim> *>(&cell->get_fe())
+                            DEAL_II_EQUALS nullptr)
                         {
                           AssertThrow(
                             dynamic_cast<const FE_RaviartThomas<dim> *>(
@@ -3545,8 +3607,8 @@ namespace VectorTools
                     }
 
             for (unsigned int dof = 0; dof < n_dofs; ++dof)
-              if ((projected_dofs[dof] != 0) &&
-                  !(constraints.is_constrained(dof)))
+              if ((projected_dofs[dof] != 0)
+                    DEAL_II_AND !(constraints.is_constrained(dof)))
                 {
                   constraints.add_line(dof);
 
@@ -3607,9 +3669,10 @@ namespace VectorTools
         case 2:
           {
             for (const auto &cell : dof_handler.active_cell_iterators())
-              if (cell->at_boundary() && cell->is_locally_owned())
+              if (cell->at_boundary() DEAL_II_AND cell->is_locally_owned())
                 for (const unsigned int face : cell->face_indices())
-                  if (cell->face(face)->boundary_id() == boundary_component)
+                  if (cell->face(face)->boundary_id()
+                        DEAL_II_EQUALS boundary_component)
                     {
                       // This is only
                       // implemented, if the
@@ -3617,8 +3680,8 @@ namespace VectorTools
                       // element. If the FE is
                       // a FESystem we cannot
                       // check this.
-                      if (dynamic_cast<const FESystem<dim> *>(
-                            &cell->get_fe()) == nullptr)
+                      if (dynamic_cast<const FESystem<dim> *>(&cell->get_fe())
+                            DEAL_II_EQUALS nullptr)
                         {
                           AssertThrow(
                             dynamic_cast<const FE_RaviartThomas<dim> *>(
@@ -3659,9 +3722,10 @@ namespace VectorTools
               projected_dofs[dof] = 0;
 
             for (const auto &cell : dof_handler.active_cell_iterators())
-              if (cell->at_boundary() && cell->is_locally_owned())
+              if (cell->at_boundary() DEAL_II_AND cell->is_locally_owned())
                 for (const unsigned int face : cell->face_indices())
-                  if (cell->face(face)->boundary_id() == boundary_component)
+                  if (cell->face(face)->boundary_id()
+                        DEAL_II_EQUALS boundary_component)
                     {
                       // This is only
                       // implemented, if the
@@ -3669,8 +3733,8 @@ namespace VectorTools
                       // element. If the FE is
                       // a FESystem we cannot
                       // check this.
-                      if (dynamic_cast<const FESystem<dim> *>(
-                            &cell->get_fe()) == nullptr)
+                      if (dynamic_cast<const FESystem<dim> *>(&cell->get_fe())
+                            DEAL_II_EQUALS nullptr)
                         {
                           AssertThrow(
                             dynamic_cast<const FE_RaviartThomas<dim> *>(
@@ -3700,8 +3764,8 @@ namespace VectorTools
                     }
 
             for (unsigned int dof = 0; dof < n_dofs; ++dof)
-              if ((projected_dofs[dof] != 0) &&
-                  !(constraints.is_constrained(dof)))
+              if ((projected_dofs[dof] != 0)
+                    DEAL_II_AND !(constraints.is_constrained(dof)))
                 {
                   constraints.add_line(dof);
 

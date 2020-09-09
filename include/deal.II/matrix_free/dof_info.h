@@ -695,7 +695,8 @@ namespace internal
       if (n_indices <= 1)
         return 0;
       for (unsigned int i = 0; i < n_indices; ++i)
-        if (fe_index_conversion[i][first_selected_component] == fe_degree)
+        if (fe_index_conversion[i][first_selected_component] DEAL_II_EQUALS
+              fe_degree)
           return i;
       return numbers::invalid_unsigned_int;
     }

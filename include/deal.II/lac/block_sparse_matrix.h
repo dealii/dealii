@@ -378,7 +378,7 @@ template <typename number>
 inline BlockSparseMatrix<number> &
 BlockSparseMatrix<number>::operator=(const double d)
 {
-  Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
+  Assert(d DEAL_II_EQUALS 0, ExcScalarAssignmentOnlyForZeroValue());
 
   for (size_type r = 0; r < this->n_block_rows(); ++r)
     for (size_type c = 0; c < this->n_block_cols(); ++c)
@@ -484,10 +484,11 @@ BlockSparseMatrix<number>::precondition_Jacobi(BlockVectorType &      dst,
                                                const BlockVectorType &src,
                                                const number omega) const
 {
-  Assert(this->n_block_rows() == this->n_block_cols(), ExcNotQuadratic());
-  Assert(dst.n_blocks() == this->n_block_rows(),
+  Assert(this->n_block_rows() DEAL_II_EQUALS this->n_block_cols(),
+         ExcNotQuadratic());
+  Assert(dst.n_blocks() DEAL_II_EQUALS this->n_block_rows(),
          ExcDimensionMismatch(dst.n_blocks(), this->n_block_rows()));
-  Assert(src.n_blocks() == this->n_block_cols(),
+  Assert(src.n_blocks() DEAL_II_EQUALS this->n_block_cols(),
          ExcDimensionMismatch(src.n_blocks(), this->n_block_cols()));
 
   // do a diagonal preconditioning. uses only
@@ -508,10 +509,10 @@ BlockSparseMatrix<number>::precondition_Jacobi(Vector<number2> &      dst,
   // check number of blocks. the sizes of the
   // single block is checked in the function
   // we call
-  Assert(this->n_block_cols() == 1,
+  Assert(this->n_block_cols() DEAL_II_EQUALS 1,
          ExcMessage("This function only works if the matrix has "
                     "a single block"));
-  Assert(this->n_block_rows() == 1,
+  Assert(this->n_block_rows() DEAL_II_EQUALS 1,
          ExcMessage("This function only works if the matrix has "
                     "a single block"));
 

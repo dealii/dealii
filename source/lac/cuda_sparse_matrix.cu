@@ -312,7 +312,8 @@ namespace CUDAWrappers
 
 
   template <typename Number>
-  SparseMatrix<Number>::SparseMatrix(CUDAWrappers::SparseMatrix<Number> &&other)
+  SparseMatrix<Number>::SparseMatrix(
+    CUDAWrappers::SparseMatrix<Number> DEAL_II_AND other)
     : cusparse_handle(other.cusparse_handle)
     , nnz(other.nnz)
     , n_rows(other.n_rows)
@@ -359,7 +360,7 @@ namespace CUDAWrappers
 
   template <typename Number>
   SparseMatrix<Number> &
-  SparseMatrix<Number>::operator=(SparseMatrix<Number> &&other)
+  SparseMatrix<Number>::operator=(SparseMatrix<Number> DEAL_II_AND other)
   {
     cusparse_handle  = other.cusparse_handle;
     nnz              = other.nnz;
@@ -418,7 +419,7 @@ namespace CUDAWrappers
         int const          diag_index = column_index[offset];
         Number             diag_elem  = sparse_matrix_host.diag_element(row);
         unsigned int       pos        = 1;
-        while ((column_index[offset + pos] < row) && (pos < counter))
+        while ((column_index[offset + pos] < row) DEAL_II_AND(pos < counter))
           {
             val[offset + pos - 1]          = val[offset + pos];
             column_index[offset + pos - 1] = column_index[offset + pos];

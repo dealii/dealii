@@ -55,8 +55,8 @@ namespace MemorySpace
   {
     MemorySpaceData()
     {
-      static_assert(std::is_same<MemorySpace, Host>::value ||
-                      std::is_same<MemorySpace, CUDA>::value,
+      static_assert(std::is_same<MemorySpace, Host>::value DEAL_II_OR
+                                                           std::is_same<MemorySpace, CUDA>::value,
                     "MemorySpace should be Host or CUDA");
     }
 
@@ -103,8 +103,8 @@ namespace MemorySpace
   swap(MemorySpaceData<Number, MemorySpace> &,
        MemorySpaceData<Number, MemorySpace> &)
   {
-    static_assert(std::is_same<MemorySpace, Host>::value ||
-                    std::is_same<MemorySpace, CUDA>::value,
+    static_assert(std::is_same<MemorySpace, Host>::value DEAL_II_OR
+                                                         std::is_same<MemorySpace, CUDA>::value,
                   "MemorySpace should be Host or CUDA");
   }
 

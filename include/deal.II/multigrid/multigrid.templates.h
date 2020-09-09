@@ -101,7 +101,7 @@ template <typename VectorType>
 void
 Multigrid<VectorType>::level_v_step(const unsigned int level)
 {
-  if (level == minlevel)
+  if (level DEAL_II_EQUALS minlevel)
     {
       this->signals.coarse_solve(true, level);
       (*coarse)(level, solution[level], defect[level]);
@@ -173,7 +173,7 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
   defect2[level] += defect[level];
   defect[level] = typename VectorType::value_type(0.);
 
-  if (level == minlevel)
+  if (level DEAL_II_EQUALS minlevel)
     {
       this->signals.coarse_solve(true, level);
       (*coarse)(level, solution[level], defect2[level]);
@@ -211,10 +211,10 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
   if (level > minlevel + 1)
     {
       // while the W-cycle repeats itself, ...
-      if (cycle == w_cycle)
+      if (cycle DEAL_II_EQUALS w_cycle)
         level_step(level - 1, cycle);
       // ... the F-cycle does a V-cycle after an F-cycle, ...
-      else if (cycle == f_cycle)
+      else if (cycle DEAL_II_EQUALS f_cycle)
         level_step(level - 1, v_cycle);
       // ... and the V-cycle does nothing.
     }
@@ -267,7 +267,7 @@ Multigrid<VectorType>::cycle()
         defect2[level].reinit(defect[level]);
     }
 
-  if (cycle_type == v_cycle)
+  if (cycle_type DEAL_II_EQUALS v_cycle)
     level_v_step(maxlevel);
   else
     level_step(maxlevel, cycle_type);

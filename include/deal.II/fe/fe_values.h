@@ -2454,12 +2454,12 @@ public:
    *
    * Depending on the value of the last argument, the outer vector of
    * <tt>values</tt> has either the length of the quadrature rule
-   * (<tt>quadrature_points_fastest == false</tt>) or the length of components
-   * to be filled <tt>quadrature_points_fastest == true</tt>. If <tt>p</tt> is
-   * the current quadrature point number and <tt>i</tt> is the vector
-   * component of the solution desired, the access to <tt>values</tt> is
-   * <tt>values[p][i]</tt> if <tt>quadrature_points_fastest == false</tt>, and
-   * <tt>values[i][p]</tt> otherwise.
+   * (<tt>quadrature_points_fastest DEAL_II_EQUALS  false</tt>) or the length of
+   * components to be filled <tt>quadrature_points_fastest DEAL_II_EQUALS
+   * true</tt>. If <tt>p</tt> is the current quadrature point number and
+   * <tt>i</tt> is the vector component of the solution desired, the access to
+   * <tt>values</tt> is <tt>values[p][i]</tt> if <tt>quadrature_points_fastest
+   * DEAL_II_EQUALS  false</tt>, and <tt>values[i][p]</tt> otherwise.
    *
    * You may want to use this function, if you want to access just a single
    * block from a BlockVector, if you have a multi-level vector or if you
@@ -4221,7 +4221,7 @@ namespace FEValuesViews
     // same as for the scalar case except that we have one more index
     const int snc =
       shape_function_data[shape_function].single_nonzero_component;
-    if (snc == -2)
+    if (snc DEAL_II_EQUALS - 2)
       return value_type();
     else if (snc != -1)
       {
@@ -4259,7 +4259,7 @@ namespace FEValuesViews
     // same as for the scalar case except that we have one more index
     const int snc =
       shape_function_data[shape_function].single_nonzero_component;
-    if (snc == -2)
+    if (snc DEAL_II_EQUALS - 2)
       return gradient_type();
     else if (snc != -1)
       {
@@ -4299,7 +4299,7 @@ namespace FEValuesViews
     // same as for the scalar case except that we have one more index
     const int snc =
       shape_function_data[shape_function].single_nonzero_component;
-    if (snc == -2)
+    if (snc DEAL_II_EQUALS - 2)
       return divergence_type();
     else if (snc != -1)
       return fe_values->finite_element_output
@@ -4336,7 +4336,7 @@ namespace FEValuesViews
     const int snc =
       shape_function_data[shape_function].single_nonzero_component;
 
-    if (snc == -2)
+    if (snc DEAL_II_EQUALS - 2)
       return curl_type();
 
     else
@@ -4358,7 +4358,7 @@ namespace FEValuesViews
 
                   // the single nonzero component can only be zero or one in 2d
                   if (shape_function_data[shape_function]
-                        .single_nonzero_component_index == 0)
+                        .single_nonzero_component_index DEAL_II_EQUALS 0)
                     return_value[0] =
                       -1.0 * fe_values->finite_element_output
                                .shape_gradients[snc][q_point][1];
@@ -4508,7 +4508,7 @@ namespace FEValuesViews
     // same as for the scalar case except that we have one more index
     const int snc =
       shape_function_data[shape_function].single_nonzero_component;
-    if (snc == -2)
+    if (snc DEAL_II_EQUALS - 2)
       return hessian_type();
     else if (snc != -1)
       {
@@ -4548,7 +4548,7 @@ namespace FEValuesViews
     // same as for the scalar case except that we have one more index
     const int snc =
       shape_function_data[shape_function].single_nonzero_component;
-    if (snc == -2)
+    if (snc DEAL_II_EQUALS - 2)
       return third_derivative_type();
     else if (snc != -1)
       {
@@ -4655,7 +4655,7 @@ namespace FEValuesViews
     // same as for the scalar case except that we have one more index
     const int snc =
       shape_function_data[shape_function].single_nonzero_component;
-    if (snc == -2)
+    if (snc DEAL_II_EQUALS - 2)
       return symmetric_gradient_type();
     else if (snc != -1)
       return internal::symmetrize_single_row(
@@ -4692,7 +4692,7 @@ namespace FEValuesViews
     const int snc =
       shape_function_data[shape_function].single_nonzero_component;
 
-    if (snc == -2)
+    if (snc DEAL_II_EQUALS - 2)
       {
         // shape function is zero for the selected components
         return value_type();
@@ -4735,7 +4735,7 @@ namespace FEValuesViews
     const int snc =
       shape_function_data[shape_function].single_nonzero_component;
 
-    if (snc == -2)
+    if (snc DEAL_II_EQUALS - 2)
       {
         // shape function is zero for the selected components
         return divergence_type();
@@ -4815,7 +4815,7 @@ namespace FEValuesViews
     const int snc =
       shape_function_data[shape_function].single_nonzero_component;
 
-    if (snc == -2)
+    if (snc DEAL_II_EQUALS - 2)
       {
         // shape function is zero for the selected components
         return value_type();
@@ -4863,7 +4863,7 @@ namespace FEValuesViews
     const int snc =
       shape_function_data[shape_function].single_nonzero_component;
 
-    if (snc == -2)
+    if (snc DEAL_II_EQUALS - 2)
       {
         // shape function is zero for the selected components
         return divergence_type();
@@ -4919,7 +4919,7 @@ namespace FEValuesViews
     const int snc =
       shape_function_data[shape_function].single_nonzero_component;
 
-    if (snc == -2)
+    if (snc DEAL_II_EQUALS - 2)
       {
         // shape function is zero for the selected components
         return gradient_type();
@@ -5074,7 +5074,7 @@ FEValuesBase<dim, spacedim>::shape_value_component(
   // check whether the shape function
   // is non-zero at all within
   // this component:
-  if (fe->get_nonzero_components(i)[component] == false)
+  if (fe->get_nonzero_components(i)[component] DEAL_II_EQUALS false)
     return 0;
 
   // look up the right row in the
@@ -5139,7 +5139,7 @@ FEValuesBase<dim, spacedim>::shape_grad_component(
   // check whether the shape function
   // is non-zero at all within
   // this component:
-  if (fe->get_nonzero_components(i)[component] == false)
+  if (fe->get_nonzero_components(i)[component] DEAL_II_EQUALS false)
     return Tensor<1, spacedim>();
 
   // look up the right row in the
@@ -5204,7 +5204,7 @@ FEValuesBase<dim, spacedim>::shape_hessian_component(
   // check whether the shape function
   // is non-zero at all within
   // this component:
-  if (fe->get_nonzero_components(i)[component] == false)
+  if (fe->get_nonzero_components(i)[component] DEAL_II_EQUALS false)
     return Tensor<2, spacedim>();
 
   // look up the right row in the
@@ -5269,7 +5269,7 @@ FEValuesBase<dim, spacedim>::shape_3rd_derivative_component(
   // check whether the shape function
   // is non-zero at all within
   // this component:
-  if (fe->get_nonzero_components(i)[component] == false)
+  if (fe->get_nonzero_components(i)[component] DEAL_II_EQUALS false)
     return Tensor<3, spacedim>();
 
   // look up the right row in the

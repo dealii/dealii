@@ -38,8 +38,8 @@ CellData<structdim>::CellData(const unsigned int n_vertices)
 
 
 template <int structdim>
-bool
-CellData<structdim>::operator==(const CellData<structdim> &other) const
+bool CellData<structdim>::
+     operator DEAL_II_EQUALS(const CellData<structdim> &other) const
 {
   if (vertices.size() != other.vertices.size())
     return false;
@@ -68,9 +68,10 @@ SubCellData::check_consistency(const unsigned int dim) const
   switch (dim)
     {
       case 1:
-        return ((boundary_lines.size() == 0) && (boundary_quads.size() == 0));
+        return ((boundary_lines.size() DEAL_II_EQUALS 0)DEAL_II_AND(
+          boundary_quads.size() DEAL_II_EQUALS 0));
       case 2:
-        return (boundary_quads.size() == 0);
+        return (boundary_quads.size() DEAL_II_EQUALS 0);
     }
   return true;
 }
@@ -106,22 +107,23 @@ namespace TriangulationDescription
     {
       if (auto tria_pdt = dynamic_cast<
             const parallel::distributed::Triangulation<dim, spacedim> *>(&tria))
-        Assert(comm == tria_pdt->get_communicator(),
+        Assert(comm DEAL_II_EQUALS tria_pdt->get_communicator(),
                ExcMessage("MPI communicators do not match."));
 
       // First, figure out for what rank we are supposed to build the
       // TriangulationDescription::Description object
       unsigned int my_rank = my_rank_in;
-      Assert(my_rank == numbers::invalid_unsigned_int ||
-               my_rank < dealii::Utilities::MPI::n_mpi_processes(comm),
+      Assert(my_rank DEAL_II_EQUALS numbers::invalid_unsigned_int DEAL_II_OR
+                                                                  my_rank < dealii::Utilities::MPI::n_mpi_processes(comm),
              ExcMessage("Rank has to be smaller than available processes."));
 
       if (auto tria_pdt = dynamic_cast<
             const parallel::distributed::Triangulation<dim, spacedim> *>(&tria))
         {
           Assert(
-            my_rank == numbers::invalid_unsigned_int ||
-              my_rank == dealii::Utilities::MPI::this_mpi_process(comm),
+            my_rank DEAL_II_EQUALS numbers::invalid_unsigned_int DEAL_II_OR
+              my_rank DEAL_II_EQUALS dealii::Utilities::MPI::this_mpi_process(
+                comm),
             ExcMessage(
               "If parallel::distributed::Triangulation as source triangulation, my_rank has to equal global rank."));
 
@@ -131,7 +133,7 @@ namespace TriangulationDescription
                  dynamic_cast<const dealii::Triangulation<dim, spacedim> *>(
                    &tria))
         {
-          if (my_rank == numbers::invalid_unsigned_int)
+          if (my_rank DEAL_II_EQUALS numbers::invalid_unsigned_int)
             my_rank = dealii::Utilities::MPI::this_mpi_process(comm);
         }
       else
@@ -184,9 +186,10 @@ namespace TriangulationDescription
 
       Assert(
         !(settings &
-          TriangulationDescription::Settings::construct_multigrid_hierarchy) ||
-          (tria.get_mesh_smoothing() &
-           Triangulation<dim, spacedim>::limit_level_difference_at_vertices),
+          TriangulationDescription::Settings::construct_multigrid_hierarchy)
+          DEAL_II_OR(
+            tria.get_mesh_smoothing() &
+            Triangulation<dim, spacedim>::limit_level_difference_at_vertices),
         ExcMessage(
           "Source triangulation has to be setup with limit_level_difference_at_vertices if the construction of the multigrid hierarchy is requested!"));
 
@@ -209,14 +212,15 @@ namespace TriangulationDescription
           std::vector<bool> vertices_owned_by_locally_owned_cells_on_level(
             tria.n_vertices());
           for (auto cell : tria.cell_iterators_on_level(level))
-            if ((construct_multigrid &&
-                 (cell->level_subdomain_id() == my_rank)) ||
-                (cell->active() && cell->subdomain_id() == my_rank))
+            if ((construct_multigrid DEAL_II_AND(cell->level_subdomain_id()
+                                                   DEAL_II_EQUALS my_rank))
+                  DEAL_II_OR(cell->active() DEAL_II_AND cell->subdomain_id()
+                               DEAL_II_EQUALS           my_rank))
               add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
                 cell, vertices_owned_by_locally_owned_cells_on_level);
 
           for (auto cell : tria.active_cell_iterators())
-            if (cell->subdomain_id() == my_rank)
+            if (cell->subdomain_id() DEAL_II_EQUALS my_rank)
               add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
                 cell, vertices_owned_by_locally_owned_cells_on_level);
 
@@ -290,7 +294,7 @@ namespace TriangulationDescription
       std::vector<bool> vertices_owned_by_locally_owned_active_cells(
         tria.n_vertices());
       for (auto cell : tria.active_cell_iterators())
-        if (cell->subdomain_id() == my_rank)
+        if (cell->subdomain_id() DEAL_II_EQUALS my_rank)
           add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
             cell, vertices_owned_by_locally_owned_active_cells);
 
@@ -314,9 +318,10 @@ namespace TriangulationDescription
           std::vector<bool> vertices_owned_by_locally_owned_cells_on_level(
             tria.n_vertices());
           for (auto cell : tria.cell_iterators_on_level(level))
-            if ((construct_multigrid &&
-                 (cell->level_subdomain_id() == my_rank)) ||
-                (cell->active() && cell->subdomain_id() == my_rank))
+            if ((construct_multigrid DEAL_II_AND(cell->level_subdomain_id()
+                                                   DEAL_II_EQUALS my_rank))
+                  DEAL_II_OR(cell->active() DEAL_II_AND cell->subdomain_id()
+                               DEAL_II_EQUALS           my_rank))
               add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
                 cell, vertices_owned_by_locally_owned_cells_on_level);
 
@@ -364,7 +369,7 @@ namespace TriangulationDescription
                       cell->line(line)->manifold_id();
 
                 // ... of quads
-                if (dim == 3)
+                if (dim DEAL_II_EQUALS 3)
                   for (const auto f : cell->face_indices())
                     cell_info.manifold_quad_ids[f] =
                       cell->quad(f)->manifold_id();
@@ -428,7 +433,7 @@ namespace TriangulationDescription
         dealii::Utilities::MPI::internal::Tags::fully_distributed_create;
 
       // check if process is root of the group
-      if (my_rank == group_root)
+      if (my_rank DEAL_II_EQUALS group_root)
         {
           // Step 1: create serial triangulation
           dealii::Triangulation<dim, spacedim> tria(

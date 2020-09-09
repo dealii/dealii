@@ -358,7 +358,7 @@ namespace LineMinimization
   {
     Assert(x1 != x2, ExcMessage("Point are the same"));
     const NumberType denom = (2. * g1 * x2 - 2. * g1 * x1 - 2. * f2 + 2. * f1);
-    if (denom == 0)
+    if (denom DEAL_II_EQUALS 0)
       return {};
     else
       return (g1 * (x2 * x2 - x1 * x1) + 2. * (f1 - f2) * x1) / denom;
@@ -384,7 +384,7 @@ namespace LineMinimization
     const NumberType beta2 = std::sqrt(s);
     const NumberType denom =
       x1 < x2 ? g2 - g1 + 2. * beta2 : g1 - g2 + 2. * beta2;
-    if (denom == 0.)
+    if (denom DEAL_II_EQUALS 0.)
       return {};
 
     return x1 < x2 ? x2 - (x2 - x1) * (g2 + beta2 - beta1) / denom :
@@ -418,7 +418,7 @@ namespace LineMinimization
     const NumberType r2       = f3 - f1 - g1 * x3_shift;
     const NumberType denom =
       std::pow(x2_shift * x3_shift, 2) * (x2_shift - x3_shift);
-    if (denom == 0.)
+    if (denom DEAL_II_EQUALS 0.)
       return {};
 
     const NumberType A =
@@ -458,12 +458,14 @@ namespace LineMinimization
 
     // First try cubic interpolation
     std_cxx17::optional<NumberType> res = cubic_fit(x1, f1, g1, x2, f2, g2);
-    if (res && *res >= bounds.first && *res <= bounds.second)
+    if (res DEAL_II_AND * res >= bounds.first DEAL_II_AND * res <=
+        bounds.second)
       return *res;
 
     // cubic either fails or outside of safe region, do quadratic:
     res = quadratic_fit(x1, f1, g1, x2, f2);
-    if (res && *res >= bounds.first && *res <= bounds.second)
+    if (res DEAL_II_AND * res >= bounds.first DEAL_II_AND * res <=
+        bounds.second)
       return *res;
 
     // quadratic either failed or outside of safe region. Do bisection
@@ -497,12 +499,14 @@ namespace LineMinimization
       x_rec.size() > 0 ?
         cubic_fit_three_points(x1, f1, g1, x2, f2, x_rec[0], f_rec[0]) :
         std_cxx17::optional<NumberType>{};
-    if (res && *res >= bounds.first && *res <= bounds.second)
+    if (res DEAL_II_AND * res >= bounds.first DEAL_II_AND * res <=
+        bounds.second)
       return *res;
 
     // cubic either fails or outside of safe region, do quadratic:
     res = quadratic_fit(x1, f1, g1, x2, f2);
-    if (res && *res >= bounds.first && *res <= bounds.second)
+    if (res DEAL_II_AND * res >= bounds.first DEAL_II_AND * res <=
+        bounds.second)
       return *res;
 
     // quadratic either failed or outside of safe region. Do bisection
@@ -538,10 +542,10 @@ namespace LineMinimization
     const bool         debug_output)
   {
     // Note that scipy use dcsrch() from Minpack2 Fortran lib for line search
-    Assert(mu < 0.5 && mu > 0, ExcMessage("mu is not in (0,1/2)."));
-    Assert(eta < 1. && eta > mu, ExcMessage("eta is not in (mu,1)."));
+    Assert(mu<0.5 DEAL_II_AND mu> 0, ExcMessage("mu is not in (0,1/2)."));
+    Assert(eta<1. DEAL_II_AND eta> mu, ExcMessage("eta is not in (mu,1)."));
     Assert(a_max > 0, ExcMessage("max is not positive."));
-    Assert(a1 > 0 && a1 <= a_max, ExcMessage("a1 is not in (0,max]."));
+    Assert(a1 > 0 DEAL_II_AND a1 <= a_max, ExcMessage("a1 is not in (0,max]."));
     Assert(g0 < 0, ExcMessage("Initial slope is not negative"));
 
     // Growth parameter for bracketing phase:
@@ -599,15 +603,16 @@ namespace LineMinimization
                     << w2(gi) << " " << f_min << std::endl;
 
           // first check if we can stop bracketing or the whole line search:
-          if (fi <= f_min || ai == a_max)
+          if (fi <= f_min DEAL_II_OR ai DEAL_II_EQUALS a_max)
             {
               if (debug_output)
                 deallog << "Reached the maximum step size." << std::endl;
               return std::make_pair(ai, i);
             }
 
-          if (!w1(ai, fi) ||
-              (fi >= f_prev && i > 1)) // violate first Wolfe or not descending
+          if (!w1(ai, fi)
+                DEAL_II_OR(fi >= f_prev DEAL_II_AND i >
+                           1)) // violate first Wolfe or not descending
             {
               a_lo = a_prev;
               f_lo = f_prev;
@@ -670,16 +675,18 @@ namespace LineMinimization
     // More and Thorenton, 94.
 
     /*
-    Assert((f_lo < f_hi) && w1(a_lo, f_lo), ExcInternalError());
-    Assert(((a_hi - a_lo) * g_lo < 0) && !w2(g_lo), ExcInternalError());
-    Assert((w1(a_hi, f_hi) || f_hi >= f_lo), ExcInternalError());
+    Assert((f_lo < f_hi) DEAL_II_AND  w1(a_lo, f_lo), ExcInternalError());
+    Assert(((a_hi - a_lo) * g_lo < 0) DEAL_II_AND  !w2(g_lo),
+    ExcInternalError()); Assert((w1(a_hi, f_hi) DEAL_II_OR  f_hi >= f_lo),
+    ExcInternalError());
     */
 
     // keep short history of last points to improve interpolation
     FiniteSizeHistory<NumberType> a_rec(5), f_rec(5), g_rec(5);
     // if neither a_lo nor a_hi are zero:
-    if (std::abs(a_lo) > std::numeric_limits<NumberType>::epsilon() &&
-        std::abs(a_hi) > std::numeric_limits<NumberType>::epsilon())
+    if (std::abs(a_lo) > std::numeric_limits<NumberType>::epsilon()
+                           DEAL_II_AND std::abs(a_hi) >
+        std::numeric_limits<NumberType>::epsilon())
       {
         a_rec.add(0);
         f_rec.add(f0);
@@ -710,7 +717,7 @@ namespace LineMinimization
                   << ai << " " << fi << " " << gi << " " << w1(ai, fi) << " "
                   << w2(gi) << std::endl;
 
-        if (!w1(ai, fi) || fi >= f_lo)
+        if (!w1(ai, fi) DEAL_II_OR fi >= f_lo)
           // take [a_lo, ai]
           {
             a_rec.add(a_hi);

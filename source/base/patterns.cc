@@ -127,7 +127,7 @@ namespace Patterns
           if (!(in >> c))
             break;
 
-          if ((c != ' ') && (c != '\t'))
+          if ((c != ' ') DEAL_II_AND(c != '\t'))
             return false;
         }
       return true;
@@ -232,7 +232,7 @@ namespace Patterns
     // were specified, and if so
     // enforce their values
     if (lower_bound <= upper_bound)
-      return ((lower_bound <= i) && (upper_bound >= i));
+      return ((lower_bound <= i) DEAL_II_AND(upper_bound >= i));
     else
       return true;
   }
@@ -311,9 +311,8 @@ namespace Patterns
   std::unique_ptr<Integer>
   Integer::create(const std::string &description)
   {
-    if (description.compare(0,
-                            std::strlen(description_init),
-                            description_init) == 0)
+    if (description.compare(0, std::strlen(description_init), description_init)
+          DEAL_II_EQUALS 0)
       {
         std::istringstream is(description);
 
@@ -372,7 +371,7 @@ namespace Patterns
     // were specified, and if so
     // enforce their values
     if (lower_bound <= upper_bound)
-      return ((lower_bound <= d) && (upper_bound >= d));
+      return ((lower_bound <= d) DEAL_II_AND(upper_bound >= d));
     else
       return true;
   }
@@ -392,18 +391,18 @@ namespace Patterns
               {
                 // bounds are valid
                 description << description_init << " ";
-                // We really want to compare with ==, but -Wfloat-equal would
-                // create a warning here, so work around it.
-                if (0 == std::memcmp(&lower_bound,
-                                     &min_double_value,
-                                     sizeof(lower_bound)))
+                // We really want to compare with DEAL_II_EQUALS , but
+                // -Wfloat-equal would create a warning here, so work around it.
+                if (0 DEAL_II_EQUALS std::memcmp(&lower_bound,
+                                                 &min_double_value,
+                                                 sizeof(lower_bound)))
                   description << "-MAX_DOUBLE";
                 else
                   description << lower_bound;
                 description << "...";
-                if (0 == std::memcmp(&upper_bound,
-                                     &max_double_value,
-                                     sizeof(upper_bound)))
+                if (0 DEAL_II_EQUALS std::memcmp(&upper_bound,
+                                                 &max_double_value,
+                                                 sizeof(upper_bound)))
                   description << "MAX_DOUBLE";
                 else
                   description << upper_bound;
@@ -424,16 +423,16 @@ namespace Patterns
                 std::ostringstream description;
 
                 description << "A floating point number v such that ";
-                if (0 == std::memcmp(&lower_bound,
-                                     &min_double_value,
-                                     sizeof(lower_bound)))
+                if (0 DEAL_II_EQUALS std::memcmp(&lower_bound,
+                                                 &min_double_value,
+                                                 sizeof(lower_bound)))
                   description << "-MAX_DOUBLE";
                 else
                   description << lower_bound;
                 description << " <= v <= ";
-                if (0 == std::memcmp(&upper_bound,
-                                     &max_double_value,
-                                     sizeof(upper_bound)))
+                if (0 DEAL_II_EQUALS std::memcmp(&upper_bound,
+                                                 &max_double_value,
+                                                 sizeof(upper_bound)))
                   description << "MAX_DOUBLE";
                 else
                   description << upper_bound;
@@ -450,16 +449,16 @@ namespace Patterns
                 std::ostringstream description;
 
                 description << "A floating point number $v$ such that $";
-                if (0 == std::memcmp(&lower_bound,
-                                     &min_double_value,
-                                     sizeof(lower_bound)))
+                if (0 DEAL_II_EQUALS std::memcmp(&lower_bound,
+                                                 &min_double_value,
+                                                 sizeof(lower_bound)))
                   description << "-\\text{MAX\\_DOUBLE}";
                 else
                   description << lower_bound;
                 description << " \\leq v \\leq ";
-                if (0 == std::memcmp(&upper_bound,
-                                     &max_double_value,
-                                     sizeof(upper_bound)))
+                if (0 DEAL_II_EQUALS std::memcmp(&upper_bound,
+                                                 &max_double_value,
+                                                 sizeof(upper_bound)))
                   description << "\\text{MAX\\_DOUBLE}";
                 else
                   description << upper_bound;
@@ -499,7 +498,7 @@ namespace Patterns
       return std::unique_ptr<Double>();
 
     std::string temp = description.substr(description_init_str.size());
-    if (temp == "]")
+    if (temp DEAL_II_EQUALS "]")
       return std::make_unique<Double>(1.0,
                                       -1.0); // return an invalid range
 
@@ -509,7 +508,9 @@ namespace Patterns
     double lower_bound = min_double_value, upper_bound = max_double_value;
 
     std::istringstream is(temp);
-    if (0 == temp.compare(0, std::strlen(" -MAX_DOUBLE"), " -MAX_DOUBLE"))
+    if (0 DEAL_II_EQUALS temp.compare(0,
+                                      std::strlen(" -MAX_DOUBLE"),
+                                      " -MAX_DOUBLE"))
       is.ignore(std::strlen(" -MAX_DOUBLE"));
     else
       {
@@ -548,24 +549,24 @@ namespace Patterns
     std::string tmp(sequence);
 
     // remove whitespace at beginning
-    while ((tmp.length() != 0) && (std::isspace(tmp[0])))
+    while ((tmp.length() != 0) DEAL_II_AND(std::isspace(tmp[0])))
       tmp.erase(0, 1);
 
     // check the different possibilities
     while (tmp.find('|') != std::string::npos)
       {
-        if (test_string == std::string(tmp, 0, tmp.find('|')))
+        if (test_string DEAL_II_EQUALS std::string(tmp, 0, tmp.find('|')))
           return true;
 
         tmp.erase(0, tmp.find('|') + 1);
       }
 
     // remove whitespace at the end
-    while ((tmp.length() != 0) && (std::isspace(*(tmp.end() - 1))))
+    while ((tmp.length() != 0) DEAL_II_AND(std::isspace(*(tmp.end() - 1))))
       tmp.erase(tmp.end() - 1);
 
     // check last choice, not finished by |
-    if (test_string == tmp)
+    if (test_string DEAL_II_EQUALS tmp)
       return true;
 
     // not found
@@ -628,9 +629,8 @@ namespace Patterns
   std::unique_ptr<Selection>
   Selection::create(const std::string &description)
   {
-    if (description.compare(0,
-                            std::strlen(description_init),
-                            description_init) == 0)
+    if (description.compare(0, std::strlen(description_init), description_init)
+          DEAL_II_EQUALS 0)
       {
         std::string sequence(description);
 
@@ -698,13 +698,13 @@ namespace Patterns
     const std::vector<std::string> split_list =
       Utilities::split_string_list(test_string_list, separator);
 
-    if ((split_list.size() < min_elements) ||
-        (split_list.size() > max_elements))
+    if ((split_list.size() < min_elements)
+          DEAL_II_OR(split_list.size() > max_elements))
       return false;
 
     // check the different possibilities
     for (const std::string &string : split_list)
-      if (pattern->match(string) == false)
+      if (pattern->match(string) DEAL_II_EQUALS false)
         return false;
 
     return true;
@@ -776,9 +776,8 @@ namespace Patterns
   std::unique_ptr<List>
   List::create(const std::string &description)
   {
-    if (description.compare(0,
-                            std::strlen(description_init),
-                            description_init) == 0)
+    if (description.compare(0, std::strlen(description_init), description_init)
+          DEAL_II_EQUALS 0)
       {
         unsigned int min_elements = 0, max_elements = 0;
 
@@ -866,8 +865,8 @@ namespace Patterns
   {
     std::vector<std::string> split_list =
       Utilities::split_string_list(test_string_list, separator);
-    if ((split_list.size() < min_elements) ||
-        (split_list.size() > max_elements))
+    if ((split_list.size() < min_elements)
+          DEAL_II_OR(split_list.size() > max_elements))
       return false;
 
     for (const auto &key_value_pair : split_list)
@@ -880,9 +879,9 @@ namespace Patterns
           return false;
 
         // then verify that the patterns are satisfied
-        if (key_pattern->match(pair[0]) == false)
+        if (key_pattern->match(pair[0]) DEAL_II_EQUALS false)
           return false;
-        if (value_pattern->match(pair[1]) == false)
+        if (value_pattern->match(pair[1]) DEAL_II_EQUALS false)
           return false;
       }
 
@@ -968,9 +967,8 @@ namespace Patterns
   std::unique_ptr<Map>
   Map::create(const std::string &description)
   {
-    if (description.compare(0,
-                            std::strlen(description_init),
-                            description_init) == 0)
+    if (description.compare(0, std::strlen(description_init), description_init)
+          DEAL_II_EQUALS 0)
       {
         unsigned int min_elements = 0, max_elements = 0;
 
@@ -1096,7 +1094,7 @@ namespace Patterns
 
     for (unsigned int i = 0; i < patterns.size(); ++i)
       {
-        if (patterns[i]->match(split_list[i]) == false)
+        if (patterns[i]->match(split_list[i]) DEAL_II_EQUALS false)
           return false;
       }
 
@@ -1174,9 +1172,8 @@ namespace Patterns
   std::unique_ptr<Tuple>
   Tuple::create(const std::string &description)
   {
-    if (description.compare(0,
-                            std::strlen(description_init),
-                            description_init) == 0)
+    if (description.compare(0, std::strlen(description_init), description_init)
+          DEAL_II_EQUALS 0)
       {
         std::vector<std::unique_ptr<PatternBase>> patterns;
 
@@ -1240,7 +1237,7 @@ namespace Patterns
 
   MultipleSelection::MultipleSelection(const std::string &seq)
   {
-    Assert(seq.find(',') == std::string::npos,
+    Assert(seq.find(',') DEAL_II_EQUALS std::string::npos,
            ExcCommasNotAllowed(seq.find(',')));
 
     sequence = seq;
@@ -1272,7 +1269,7 @@ namespace Patterns
         else
           tmp = "";
 
-        while ((name.length() != 0) && (std::isspace(name[0])))
+        while ((name.length() != 0) DEAL_II_AND(std::isspace(name[0])))
           name.erase(0, 1);
         while (std::isspace(name[name.length() - 1]))
           name.erase(name.length() - 1, 1);
@@ -1289,7 +1286,7 @@ namespace Patterns
         tmp = sequence;
         while (tmp.find('|') != std::string::npos)
           {
-            if (test_string == std::string(tmp, 0, tmp.find('|')))
+            if (test_string DEAL_II_EQUALS std::string(tmp, 0, tmp.find('|')))
               {
                 // string found, quit
                 // loop. don't change
@@ -1303,7 +1300,7 @@ namespace Patterns
           }
         // check last choice, not finished by |
         if (!string_found)
-          if (test_string == tmp)
+          if (test_string DEAL_II_EQUALS tmp)
             string_found = true;
 
         if (!string_found)
@@ -1369,9 +1366,8 @@ namespace Patterns
   std::unique_ptr<MultipleSelection>
   MultipleSelection::create(const std::string &description)
   {
-    if (description.compare(0,
-                            std::strlen(description_init),
-                            description_init) == 0)
+    if (description.compare(0, std::strlen(description_init), description_init)
+          DEAL_II_EQUALS 0)
       {
         std::string sequence(description);
 
@@ -1434,9 +1430,8 @@ namespace Patterns
   std::unique_ptr<Bool>
   Bool::create(const std::string &description)
   {
-    if (description.compare(0,
-                            std::strlen(description_init),
-                            description_init) == 0)
+    if (description.compare(0, std::strlen(description_init), description_init)
+          DEAL_II_EQUALS 0)
       return std::make_unique<Bool>();
     else
       return std::unique_ptr<Bool>();
@@ -1495,9 +1490,8 @@ namespace Patterns
   std::unique_ptr<Anything>
   Anything::create(const std::string &description)
   {
-    if (description.compare(0,
-                            std::strlen(description_init),
-                            description_init) == 0)
+    if (description.compare(0, std::strlen(description_init), description_init)
+          DEAL_II_EQUALS 0)
       return std::make_unique<Anything>();
     else
       return std::unique_ptr<Anything>();
@@ -1533,7 +1527,7 @@ namespace Patterns
 
             description << description_init;
 
-            if (file_type == input)
+            if (file_type DEAL_II_EQUALS input)
               description << " (Type: input)]";
             else
               description << " (Type: output)]";
@@ -1543,7 +1537,7 @@ namespace Patterns
         case Text:
         case LaTeX:
           {
-            if (file_type == input)
+            if (file_type DEAL_II_EQUALS input)
               return "an input filename";
             else
               return "an output filename";
@@ -1569,9 +1563,8 @@ namespace Patterns
   std::unique_ptr<FileName>
   FileName::create(const std::string &description)
   {
-    if (description.compare(0,
-                            std::strlen(description_init),
-                            description_init) == 0)
+    if (description.compare(0, std::strlen(description_init), description_init)
+          DEAL_II_EQUALS 0)
       {
         std::istringstream is(description);
         std::string        file_type;
@@ -1581,7 +1574,7 @@ namespace Patterns
 
         is >> file_type;
 
-        if (file_type == "input)]")
+        if (file_type DEAL_II_EQUALS "input)]")
           type = input;
         else
           type = output;
@@ -1645,9 +1638,8 @@ namespace Patterns
   std::unique_ptr<DirectoryName>
   DirectoryName::create(const std::string &description)
   {
-    if (description.compare(0,
-                            std::strlen(description_init),
-                            description_init) == 0)
+    if (description.compare(0, std::strlen(description_init), description_init)
+          DEAL_II_EQUALS 0)
       return std::make_unique<DirectoryName>();
     else
       return std::unique_ptr<DirectoryName>();

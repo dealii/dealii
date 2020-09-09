@@ -102,7 +102,7 @@ namespace Algorithms
   void
   Newton<VectorType>::operator()(AnyData &out, const AnyData &in)
   {
-    Assert(out.size() == 1, ExcNotImplemented());
+    Assert(out.size() DEAL_II_EQUALS 1, ExcNotImplemented());
     LogStream::Prefix prefix("Newton");
 
     VectorType &u = *out.entry<VectorType *>(0);
@@ -146,10 +146,11 @@ namespace Algorithms
         *data_out << tmp;
       }
 
-    while (control.check(step++, resnorm) == SolverControl::iterate)
+    while (control.check(step++, resnorm) DEAL_II_EQUALS SolverControl::iterate)
       {
         // assemble (Df(u), v)
-        if ((step > 1) && (resnorm / old_residual >= assemble_threshold))
+        if ((step > 1)
+              DEAL_II_AND(resnorm / old_residual >= assemble_threshold))
           inverse_derivative->notify(Events::bad_derivative);
 
         Du->reinit(u);

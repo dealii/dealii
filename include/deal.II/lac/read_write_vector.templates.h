@@ -106,8 +106,9 @@ namespace LinearAlgebra
         (void)rw_vector;
 
         static_assert(
-          std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value ||
-            std::is_same<MemorySpace, ::dealii::MemorySpace::CUDA>::value,
+          std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value
+              DEAL_II_OR
+              std::is_same<MemorySpace, ::dealii::MemorySpace::CUDA>::value,
           "MemorySpace should be Host or CUDA");
       }
     };
@@ -135,16 +136,16 @@ namespace LinearAlgebra
         tmp_vector.update_ghost_values();
 
         const IndexSet &stored = rw_vector.get_stored_elements();
-        if (operation == VectorOperation::add)
+        if (operation DEAL_II_EQUALS VectorOperation::add)
           for (size_type i = 0; i < stored.n_elements(); ++i)
             rw_vector.local_element(i) +=
               tmp_vector(stored.nth_index_in_set(i));
-        else if (operation == VectorOperation::min)
+        else if (operation DEAL_II_EQUALS VectorOperation::min)
           for (size_type i = 0; i < stored.n_elements(); ++i)
             rw_vector.local_element(i) =
               get_min(tmp_vector(stored.nth_index_in_set(i)),
                       rw_vector.local_element(i));
-        else if (operation == VectorOperation::max)
+        else if (operation DEAL_II_EQUALS VectorOperation::max)
           for (size_type i = 0; i < stored.n_elements(); ++i)
             rw_vector.local_element(i) =
               get_max(tmp_vector(stored.nth_index_in_set(i)),
@@ -182,16 +183,16 @@ namespace LinearAlgebra
         tmp_vector.update_ghost_values();
 
         const IndexSet &stored = rw_vector.get_stored_elements();
-        if (operation == VectorOperation::add)
+        if (operation DEAL_II_EQUALS VectorOperation::add)
           for (size_type i = 0; i < stored.n_elements(); ++i)
             rw_vector.local_element(i) +=
               tmp_vector(stored.nth_index_in_set(i));
-        else if (operation == VectorOperation::min)
+        else if (operation DEAL_II_EQUALS VectorOperation::min)
           for (size_type i = 0; i < stored.n_elements(); ++i)
             rw_vector.local_element(i) =
               get_min(tmp_vector(stored.nth_index_in_set(i)),
                       rw_vector.local_element(i));
-        else if (operation == VectorOperation::max)
+        else if (operation DEAL_II_EQUALS VectorOperation::max)
           for (size_type i = 0; i < stored.n_elements(); ++i)
             rw_vector.local_element(i) =
               get_max(tmp_vector(stored.nth_index_in_set(i)),
@@ -209,7 +210,7 @@ namespace LinearAlgebra
   void
   ReadWriteVector<Number>::resize_val(const size_type new_alloc_size)
   {
-    if (new_alloc_size == 0)
+    if (new_alloc_size DEAL_II_EQUALS 0)
       {
         values.reset();
         thread_loop_partitioner =
@@ -245,7 +246,7 @@ namespace LinearAlgebra
     stored_elements.compress();
 
     // set entries to zero if so requested
-    if (omit_zeroing_entries == false)
+    if (omit_zeroing_entries DEAL_II_EQUALS false)
       this->operator=(Number());
 
     // reset the communication patter
@@ -265,7 +266,7 @@ namespace LinearAlgebra
 
     stored_elements = v.get_stored_elements();
 
-    if (omit_zeroing_entries == false)
+    if (omit_zeroing_entries DEAL_II_EQUALS false)
       this->operator=(Number());
 
     // reset the communication patter
@@ -286,7 +287,7 @@ namespace LinearAlgebra
     resize_val(stored_elements.n_elements());
 
     // initialize to zero
-    if (omit_zeroing_entries == false)
+    if (omit_zeroing_entries DEAL_II_EQUALS false)
       this->operator=(Number());
 
     // reset the communication pattern
@@ -296,7 +297,7 @@ namespace LinearAlgebra
 
 
 
-#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
+#if defined(DEAL_II_WITH_TRILINOS) DEAL_II_AND defined(DEAL_II_WITH_MPI)
   template <typename Number>
   void
   ReadWriteVector<Number>::reinit(
@@ -315,7 +316,7 @@ namespace LinearAlgebra
     int             leading_dimension;
     int ierr = trilinos_vec.trilinos_vector().ExtractView(&start_ptr,
                                                           &leading_dimension);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
     std::copy(start_ptr, start_ptr + leading_dimension, values.get());
 
@@ -389,7 +390,7 @@ namespace LinearAlgebra
   ReadWriteVector<Number> &
   ReadWriteVector<Number>::operator=(const Number s)
   {
-    Assert(s == static_cast<Number>(0),
+    Assert(s DEAL_II_EQUALS static_cast<Number>(0),
            ExcMessage("Only 0 can be assigned to a vector."));
     (void)s;
 
@@ -419,7 +420,7 @@ namespace LinearAlgebra
     // If no communication pattern is given, create one. Otherwise, use the
     // given one.
     std::shared_ptr<const Utilities::MPI::Partitioner> comm_pattern;
-    if (communication_pattern.get() == nullptr)
+    if (communication_pattern.get() DEAL_II_EQUALS nullptr)
       {
         comm_pattern = std::make_shared<Utilities::MPI::Partitioner>(
           vec.locally_owned_elements(),
@@ -485,27 +486,27 @@ namespace LinearAlgebra
       & /*communication_pattern*/)
   {
     // TODO: this works only if no communication is needed.
-    Assert(petsc_vec.locally_owned_elements() == stored_elements,
+    Assert(petsc_vec.locally_owned_elements() DEAL_II_EQUALS stored_elements,
            StandardExceptions::ExcInvalidState());
 
     // get a representation of the vector and copy it
     PetscScalar *  start_ptr;
     PetscErrorCode ierr =
       VecGetArray(static_cast<const Vec &>(petsc_vec), &start_ptr);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     const size_type vec_size = petsc_vec.local_size();
     internal::copy_petsc_vector(start_ptr, start_ptr + vec_size, begin());
 
     // restore the representation of the vector
     ierr = VecRestoreArray(static_cast<const Vec &>(petsc_vec), &start_ptr);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
   }
 #endif
 
 
 
-#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
+#if defined(DEAL_II_WITH_TRILINOS) DEAL_II_AND defined(DEAL_II_WITH_MPI)
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
   template <typename Number>
   void
@@ -522,17 +523,19 @@ namespace LinearAlgebra
 
     // If no communication pattern is given, create one. Otherwise, use the one
     // given.
-    if (communication_pattern == nullptr)
+    if (communication_pattern DEAL_II_EQUALS nullptr)
       {
         // The first time import is called, we create a communication pattern.
         // Check if the communication pattern already exists and if it can be
         // reused.
-        if ((source_elements.size() == source_stored_elements.size()) &&
-            (source_elements == source_stored_elements))
+        if ((source_elements.size()
+               DEAL_II_EQUALS source_stored_elements.size())
+              DEAL_II_AND(
+                source_elements DEAL_II_EQUALS source_stored_elements))
           {
             tpetra_comm_pattern = std::dynamic_pointer_cast<
               const TpetraWrappers::CommunicationPattern>(comm_pattern);
-            if (tpetra_comm_pattern == nullptr)
+            if (tpetra_comm_pattern DEAL_II_EQUALS nullptr)
               tpetra_comm_pattern =
                 std::make_shared<const TpetraWrappers::CommunicationPattern>(
                   create_tpetra_comm_pattern(source_elements, mpi_comm));
@@ -565,7 +568,8 @@ namespace LinearAlgebra
 
     using size_type = typename std::decay<decltype(size)>::type;
 
-    Assert(size == 0 || values != nullptr, ExcInternalError("Export failed."));
+    Assert(size DEAL_II_EQUALS 0 DEAL_II_OR values != nullptr,
+           ExcInternalError("Export failed."));
     AssertDimension(size, stored_elements.n_elements());
 
     switch (operation)
@@ -588,11 +592,11 @@ namespace LinearAlgebra
           for (size_type i = 0; i < size; ++i)
             {
               Assert(
-                std::imag(new_values[i]) == 0.,
+                std::imag(new_values[i]) DEAL_II_EQUALS 0.,
                 ExcMessage(
                   "VectorOperation::min is not defined if there is an imaginary part!)"));
               Assert(
-                std::imag(values[i]) == 0.,
+                std::imag(values[i]) DEAL_II_EQUALS 0.,
                 ExcMessage(
                   "VectorOperation::min is not defined if there is an imaginary part!)"));
               if (std::real(new_values[i]) - std::real(values[i]) < 0.0)
@@ -604,11 +608,11 @@ namespace LinearAlgebra
           for (size_type i = 0; i < size; ++i)
             {
               Assert(
-                std::imag(new_values[i]) == 0.,
+                std::imag(new_values[i]) DEAL_II_EQUALS 0.,
                 ExcMessage(
                   "VectorOperation::max is not defined if there is an imaginary part!)"));
               Assert(
-                std::imag(values[i]) == 0.,
+                std::imag(values[i]) DEAL_II_EQUALS 0.,
                 ExcMessage(
                   "VectorOperation::max is not defined if there is an imaginary part!)"));
               if (std::real(new_values[i]) - std::real(values[i]) > 0.0)
@@ -639,17 +643,19 @@ namespace LinearAlgebra
 
     // If no communication pattern is given, create one. Otherwise, use the one
     // given.
-    if (communication_pattern == nullptr)
+    if (communication_pattern DEAL_II_EQUALS nullptr)
       {
         // The first time import is called, we create a communication pattern.
         // Check if the communication pattern already exists and if it can be
         // reused.
-        if ((source_elements.size() == source_stored_elements.size()) &&
-            (source_elements == source_stored_elements))
+        if ((source_elements.size()
+               DEAL_II_EQUALS source_stored_elements.size())
+              DEAL_II_AND(
+                source_elements DEAL_II_EQUALS source_stored_elements))
           {
             epetra_comm_pattern = std::dynamic_pointer_cast<
               const EpetraWrappers::CommunicationPattern>(comm_pattern);
-            if (epetra_comm_pattern == nullptr)
+            if (epetra_comm_pattern DEAL_II_EQUALS nullptr)
               epetra_comm_pattern =
                 std::make_shared<const EpetraWrappers::CommunicationPattern>(
                   create_epetra_comm_pattern(source_elements, mpi_comm));
@@ -674,46 +680,46 @@ namespace LinearAlgebra
 
     Epetra_FEVector target_vector(import.TargetMap());
 
-    if (operation == VectorOperation::insert)
+    if (operation DEAL_II_EQUALS VectorOperation::insert)
       {
         const int err = target_vector.Import(multivector, import, Insert);
-        AssertThrow(err == 0,
+        AssertThrow(err DEAL_II_EQUALS 0,
                     ExcMessage("Epetra Import() failed with error code: " +
                                std::to_string(err)));
 
         const double *new_values = target_vector.Values();
         const int     size       = target_vector.MyLength();
-        Assert(size == 0 || values != nullptr,
+        Assert(size DEAL_II_EQUALS 0 DEAL_II_OR values != nullptr,
                ExcInternalError("Import failed."));
 
         for (int i = 0; i < size; ++i)
           values[i] = new_values[i];
       }
-    else if (operation == VectorOperation::add)
+    else if (operation DEAL_II_EQUALS VectorOperation::add)
       {
         const int err = target_vector.Import(multivector, import, Add);
-        AssertThrow(err == 0,
+        AssertThrow(err DEAL_II_EQUALS 0,
                     ExcMessage("Epetra Import() failed with error code: " +
                                std::to_string(err)));
 
         const double *new_values = target_vector.Values();
         const int     size       = target_vector.MyLength();
-        Assert(size == 0 || values != nullptr,
+        Assert(size DEAL_II_EQUALS 0 DEAL_II_OR values != nullptr,
                ExcInternalError("Import failed."));
 
         for (int i = 0; i < size; ++i)
           values[i] += new_values[i];
       }
-    else if (operation == VectorOperation::min)
+    else if (operation DEAL_II_EQUALS VectorOperation::min)
       {
         const int err = target_vector.Import(multivector, import, Add);
-        AssertThrow(err == 0,
+        AssertThrow(err DEAL_II_EQUALS 0,
                     ExcMessage("Epetra Import() failed with error code: " +
                                std::to_string(err)));
 
         const double *new_values = target_vector.Values();
         const int     size       = target_vector.MyLength();
-        Assert(size == 0 || values != nullptr,
+        Assert(size DEAL_II_EQUALS 0 DEAL_II_OR values != nullptr,
                ExcInternalError("Import failed."));
 
         // To ensure that this code also compiles with complex
@@ -723,37 +729,37 @@ namespace LinearAlgebra
         for (int i = 0; i < size; ++i)
           {
             Assert(
-              std::imag(new_values[i]) == 0.,
+              std::imag(new_values[i]) DEAL_II_EQUALS 0.,
               ExcMessage(
                 "VectorOperation::min is not defined if there is an imaginary part!)"));
             Assert(
-              std::imag(values[i]) == 0.,
+              std::imag(values[i]) DEAL_II_EQUALS 0.,
               ExcMessage(
                 "VectorOperation::min is not defined if there is an imaginary part!)"));
             if (std::real(new_values[i]) - std::real(values[i]) < 0.0)
               values[i] = new_values[i];
           }
       }
-    else if (operation == VectorOperation::max)
+    else if (operation DEAL_II_EQUALS VectorOperation::max)
       {
         const int err = target_vector.Import(multivector, import, Add);
-        AssertThrow(err == 0,
+        AssertThrow(err DEAL_II_EQUALS 0,
                     ExcMessage("Epetra Import() failed with error code: " +
                                std::to_string(err)));
 
         const double *new_values = target_vector.Values();
         const int     size       = target_vector.MyLength();
-        Assert(size == 0 || values != nullptr,
+        Assert(size DEAL_II_EQUALS 0 DEAL_II_OR values != nullptr,
                ExcInternalError("Import failed."));
 
         for (int i = 0; i < size; ++i)
           {
             Assert(
-              std::imag(new_values[i]) == 0.,
+              std::imag(new_values[i]) DEAL_II_EQUALS 0.,
               ExcMessage(
                 "VectorOperation::max is not defined if there is an imaginary part!)"));
             Assert(
-              std::imag(values[i]) == 0.,
+              std::imag(values[i]) DEAL_II_EQUALS 0.,
               ExcMessage(
                 "VectorOperation::max is not defined if there is an imaginary part!)"));
             if (std::real(new_values[i]) - std::real(values[i]) > 0.0)
@@ -835,7 +841,7 @@ namespace LinearAlgebra
     const std::shared_ptr<const CommunicationPatternBase> &)
   {
     const unsigned int n_elements = stored_elements.n_elements();
-    if (operation == VectorOperation::insert)
+    if (operation DEAL_II_EQUALS VectorOperation::insert)
       {
         cudaError_t error_code = cudaMemcpy(values.get(),
                                             cuda_vec.get_values(),
@@ -843,7 +849,7 @@ namespace LinearAlgebra
                                             cudaMemcpyDeviceToHost);
         AssertCuda(error_code);
       }
-    else if (operation == VectorOperation::add)
+    else if (operation DEAL_II_EQUALS VectorOperation::add)
       {
         // Copy the vector from the device to a temporary vector on the host
         std::vector<Number> tmp(n_elements);
@@ -857,7 +863,7 @@ namespace LinearAlgebra
         for (unsigned int i = 0; i < n_elements; ++i)
           values[i] += tmp[i];
       }
-    else if (operation == VectorOperation::min)
+    else if (operation DEAL_II_EQUALS VectorOperation::min)
       {
         // Copy the vector from the device to a temporary vector on the host
         std::vector<Number> tmp(n_elements);
@@ -874,18 +880,18 @@ namespace LinearAlgebra
         for (unsigned int i = 0; i < n_elements; ++i)
           {
             Assert(
-              std::imag(tmp[i]) == 0.,
+              std::imag(tmp[i]) DEAL_II_EQUALS 0.,
               ExcMessage(
                 "VectorOperation::min is not defined if there is an imaginary part!)"));
             Assert(
-              std::imag(values[i]) == 0.,
+              std::imag(values[i]) DEAL_II_EQUALS 0.,
               ExcMessage(
                 "VectorOperation::min is not defined if there is an imaginary part!)"));
             if (std::real(tmp[i]) - std::real(values[i]) < 0.0)
               values[i] = tmp[i];
           }
       }
-    else if (operation == VectorOperation::max)
+    else if (operation DEAL_II_EQUALS VectorOperation::max)
       {
         // Copy the vector from the device to a temporary vector on the host
         std::vector<Number> tmp(n_elements);
@@ -898,11 +904,11 @@ namespace LinearAlgebra
         for (unsigned int i = 0; i < n_elements; ++i)
           {
             Assert(
-              std::imag(tmp[i]) == 0.,
+              std::imag(tmp[i]) DEAL_II_EQUALS 0.,
               ExcMessage(
                 "VectorOperation::max is not defined if there is an imaginary part!)"));
             Assert(
-              std::imag(values[i]) == 0.,
+              std::imag(values[i]) DEAL_II_EQUALS 0.,
               ExcMessage(
                 "VectorOperation::max is not defined if there is an imaginary part!)"));
             if (std::real(tmp[i]) - std::real(values[i]) > 0.0)
@@ -968,7 +974,7 @@ namespace LinearAlgebra
 
 
 
-#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
+#if defined(DEAL_II_WITH_TRILINOS) DEAL_II_AND defined(DEAL_II_WITH_MPI)
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
   template <typename Number>
   TpetraWrappers::CommunicationPattern

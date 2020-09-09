@@ -125,8 +125,8 @@ DEAL_II_NAMESPACE_OPEN
  *   not need to be an integer: it could be a class type (convertible to the
  *   correct index type of the container) that implements
  *   <code>operator+=</code>, <code>operator&lt;</code>, and
- *   <code>operator==</code>. For example, one could implement a strided
- *   iterator by implementing <code>operator+=</code> and
+ *   <code>operator DEAL_II_EQUALS </code>. For example, one could implement a
+ * strided iterator by implementing <code>operator+=</code> and
  *   <code>operator-</code> with multiplicative factors.</li>
  * </ol>
  * In addition, <code>AccessorType</code> should declare the relevant
@@ -251,14 +251,15 @@ public:
   friend typename std::enable_if<
     std::is_convertible<OtherIterator, DerivedIterator>::value,
     bool>::type
-  operator==(const LinearIndexIterator &left, const OtherIterator &right)
+  operator DEAL_II_EQUALS(const LinearIndexIterator &left,
+                          const OtherIterator &      right)
   {
-    const auto &right_2 = static_cast<const DerivedIterator &>(right);
-    return left.accessor == right_2.accessor;
+    const auto &         right_2 = static_cast<const DerivedIterator &>(right);
+    return left.accessor DEAL_II_EQUALS right_2.accessor;
   }
 
   /**
-   * Opposite of operator==().
+   * Opposite of operator DEAL_II_EQUALS ().
    */
   template <typename OtherIterator>
   friend typename std::enable_if<
@@ -266,7 +267,7 @@ public:
     bool>::type
   operator!=(const LinearIndexIterator &left, const OtherIterator &right)
   {
-    return !(left == right);
+    return !(left DEAL_II_EQUALS right);
   }
 
   /**
@@ -429,7 +430,7 @@ inline
   LinearIndexIterator<DerivedIterator, AccessorType>::
   operator-(const DerivedIterator &other) const
 {
-  Assert(this->accessor.container == other.accessor.container,
+  Assert(this->accessor.container DEAL_II_EQUALS other.accessor.container,
          ExcMessage(
            "Only iterators pointing to the same container can be compared."));
   return this->accessor.linear_index - other.accessor.linear_index;
@@ -460,7 +461,7 @@ inline bool
 LinearIndexIterator<DerivedIterator, AccessorType>::
 operator<=(const DerivedIterator &other) const
 {
-  return (*this == other) || (*this < other);
+  return (*this DEAL_II_EQUALS other)DEAL_II_OR(*this < other);
 }
 
 
@@ -480,7 +481,7 @@ inline bool
 LinearIndexIterator<DerivedIterator, AccessorType>::
 operator<(const DerivedIterator &other) const
 {
-  Assert(this->accessor.container == other.accessor.container,
+  Assert(this->accessor.container DEAL_II_EQUALS other.accessor.container,
          ExcMessage(
            "Only iterators pointing to the same container can be compared."));
   return this->accessor.linear_index < other.accessor.linear_index;

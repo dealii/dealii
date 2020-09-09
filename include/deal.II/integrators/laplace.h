@@ -96,8 +96,9 @@ namespace LocalIntegrators
     {
       const unsigned int nq     = fe.n_quadrature_points;
       const unsigned int n_dofs = fe.dofs_per_cell;
-      Assert(input.size() == nq, ExcDimensionMismatch(input.size(), nq));
-      Assert(result.size() == n_dofs,
+      Assert(input.size() DEAL_II_EQUALS nq,
+             ExcDimensionMismatch(input.size(), nq));
+      Assert(result.size() DEAL_II_EQUALS n_dofs,
              ExcDimensionMismatch(result.size(), n_dofs));
 
       for (unsigned int k = 0; k < nq; ++k)
@@ -126,7 +127,7 @@ namespace LocalIntegrators
       const unsigned int n_comp = fe.get_fe().n_components();
 
       AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
-      Assert(result.size() == n_dofs,
+      Assert(result.size() DEAL_II_EQUALS n_dofs,
              ExcDimensionMismatch(result.size(), n_dofs));
 
       for (unsigned int k = 0; k < nq; ++k)
@@ -162,8 +163,8 @@ namespace LocalIntegrators
       const unsigned int n_dofs = fe.dofs_per_cell;
       const unsigned int n_comp = fe.get_fe().n_components();
 
-      Assert(M.m() == n_dofs, ExcDimensionMismatch(M.m(), n_dofs));
-      Assert(M.n() == n_dofs, ExcDimensionMismatch(M.n(), n_dofs));
+      Assert(M.m() DEAL_II_EQUALS n_dofs, ExcDimensionMismatch(M.m(), n_dofs));
+      Assert(M.n() DEAL_II_EQUALS n_dofs, ExcDimensionMismatch(M.n(), n_dofs));
 
       for (unsigned int k = 0; k < fe.n_quadrature_points; ++k)
         {
@@ -202,8 +203,8 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
       AssertDimension(fe.get_fe().n_components(), dim);
-      Assert(M.m() == n_dofs, ExcDimensionMismatch(M.m(), n_dofs));
-      Assert(M.n() == n_dofs, ExcDimensionMismatch(M.n(), n_dofs));
+      Assert(M.m() DEAL_II_EQUALS n_dofs, ExcDimensionMismatch(M.m(), n_dofs));
+      Assert(M.n() DEAL_II_EQUALS n_dofs, ExcDimensionMismatch(M.n(), n_dofs));
 
       for (unsigned int k = 0; k < fe.n_quadrature_points; ++k)
         {
@@ -553,9 +554,9 @@ namespace LocalIntegrators
                 double                             int_factor = 1.,
                 double                             ext_factor = -1.)
     {
-      Assert(fe1.get_fe().n_components() == 1,
+      Assert(fe1.get_fe().n_components() DEAL_II_EQUALS 1,
              ExcDimensionMismatch(fe1.get_fe().n_components(), 1));
-      Assert(fe2.get_fe().n_components() == 1,
+      Assert(fe2.get_fe().n_components() DEAL_II_EQUALS 1,
              ExcDimensionMismatch(fe2.get_fe().n_components(), 1));
 
       const double nui     = int_factor;
@@ -691,14 +692,16 @@ namespace LocalIntegrators
         GeometryInfo<dim>::unit_normal_direction[dinfo1.face_number];
       const unsigned int normal2 =
         GeometryInfo<dim>::unit_normal_direction[dinfo2.face_number];
-      const unsigned int deg1sq = (deg1 == 0) ? 1 : deg1 * (deg1 + 1);
-      const unsigned int deg2sq = (deg2 == 0) ? 1 : deg2 * (deg2 + 1);
+      const unsigned int deg1sq =
+        (deg1 DEAL_II_EQUALS 0) ? 1 : deg1 * (deg1 + 1);
+      const unsigned int deg2sq =
+        (deg2 DEAL_II_EQUALS 0) ? 1 : deg2 * (deg2 + 1);
 
       double penalty1 = deg1sq / dinfo1.cell->extent_in_direction(normal1);
       double penalty2 = deg2sq / dinfo2.cell->extent_in_direction(normal2);
       if (dinfo1.cell->has_children() ^ dinfo2.cell->has_children())
         {
-          Assert(dinfo1.face == dinfo2.face, ExcInternalError());
+          Assert(dinfo1.face DEAL_II_EQUALS dinfo2.face, ExcInternalError());
           Assert(dinfo1.face->has_children(), ExcInternalError());
           penalty1 *= 2;
         }

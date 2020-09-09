@@ -190,7 +190,7 @@ FE_TraceQ<dim, spacedim>::compare_for_domination(
     {
       if (this->degree < fe_traceq_other->degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_traceq_other->degree)
+      else if (this->degree DEAL_II_EQUALS fe_traceq_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;
@@ -237,10 +237,11 @@ FE_TraceQ<dim, spacedim>::get_subface_interpolation_matrix(
   const unsigned int                  face_no) const
 {
   // this is the code from FE_FaceQ
-  Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS this->n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.n(),
                               this->n_dofs_per_face(face_no)));
-  Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.m()
+           DEAL_II_EQUALS x_source_fe.n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.m(),
                               x_source_fe.n_dofs_per_face(face_no)));
 

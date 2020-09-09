@@ -100,9 +100,9 @@ namespace MemoryConsumption
    * <tt>t.memory_consumption()</tt>'s value.
    */
   template <typename T>
-  inline typename std::enable_if<!(std::is_fundamental<T>::value ||
-                                   std::is_pointer<T>::value),
-                                 std::size_t>::type
+  inline typename std::enable_if<
+    !(std::is_fundamental<T>::value DEAL_II_OR std::is_pointer<T>::value),
+    std::size_t>::type
   memory_consumption(const T &t);
 
   /**
@@ -273,7 +273,7 @@ namespace MemoryConsumption
   inline std::size_t
   memory_consumption(const char *string)
   {
-    if (string == nullptr)
+    if (string DEAL_II_EQUALS nullptr)
       {
         return 0;
       }
@@ -316,7 +316,7 @@ namespace MemoryConsumption
   memory_consumption(const std::vector<T> &v)
   {
     // shortcut for types that do not allocate memory themselves
-    if (std::is_fundamental<T>::value || std::is_pointer<T>::value)
+    if (std::is_fundamental<T>::value DEAL_II_OR std::is_pointer<T>::value)
       {
         return v.capacity() * sizeof(T) + sizeof(v);
       }
@@ -339,7 +339,7 @@ namespace MemoryConsumption
   memory_consumption(const std::array<T, N> &v)
   {
     // shortcut for types that do not allocate memory themselves
-    if (std::is_fundamental<T>::value || std::is_pointer<T>::value)
+    if (std::is_fundamental<T>::value DEAL_II_OR std::is_pointer<T>::value)
       {
         return sizeof(v);
       }
@@ -411,9 +411,9 @@ namespace MemoryConsumption
 
 
   template <typename T>
-  inline typename std::enable_if<!(std::is_fundamental<T>::value ||
-                                   std::is_pointer<T>::value),
-                                 std::size_t>::type
+  inline typename std::enable_if<
+    !(std::is_fundamental<T>::value DEAL_II_OR std::is_pointer<T>::value),
+    std::size_t>::type
   memory_consumption(const T &t)
   {
     return t.memory_consumption();

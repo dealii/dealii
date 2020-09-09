@@ -415,11 +415,11 @@ namespace SUNDIALS
           Patterns::Selection("none|use_y_diff|use_y_dot"));
         prm.add_action("Correction type at initial time",
                        [&](const std::string &value) {
-                         if (value == "use_y_diff")
+                         if (value DEAL_II_EQUALS "use_y_diff")
                            ic_type = use_y_diff;
-                         else if (value == "use_y_dot")
+                         else if (value DEAL_II_EQUALS "use_y_dot")
                            ic_type = use_y_dot;
-                         else if (value == "none")
+                         else if (value DEAL_II_EQUALS "none")
                            ic_type = none;
                          else
                            AssertThrow(false, ExcInternalError());
@@ -440,11 +440,11 @@ namespace SUNDIALS
           Patterns::Selection("none|use_y_diff|use_y_dot"));
         prm.add_action("Correction type after restart",
                        [&](const std::string &value) {
-                         if (value == "use_y_diff")
+                         if (value DEAL_II_EQUALS "use_y_diff")
                            reset_type = use_y_diff;
-                         else if (value == "use_y_dot")
+                         else if (value DEAL_II_EQUALS "use_y_dot")
                            reset_type = use_y_dot;
-                         else if (value == "none")
+                         else if (value DEAL_II_EQUALS "none")
                            reset_type = none;
                          else
                            AssertThrow(false, ExcInternalError());
@@ -606,9 +606,9 @@ namespace SUNDIALS
      * and returns true.
      *
      * During reset(), both y and yp are checked for consistency, and according
-     * to what was specified as ic_type (if t==initial_time) or reset_type (if
-     * t>initial_time), yp, y, or both are modified to obtain a consistent set
-     * of initial data.
+     * to what was specified as ic_type (if tDEAL_II_EQUALS initial_time) or
+     * reset_type (if t>initial_time), yp, y, or both are modified to obtain a
+     * consistent set of initial data.
      *
      * @param[in] t  The new starting time
      * @param[in] h  The new (tentative) starting time step

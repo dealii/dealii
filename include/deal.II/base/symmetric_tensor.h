@@ -148,7 +148,7 @@ namespace internal
     {
       AssertIndexRange(position, 2);
 
-      if (position == 0)
+      if (position DEAL_II_EQUALS 0)
         return {new_index, numbers::invalid_unsigned_int};
       else
         return {previous_indices[0], new_index};
@@ -470,8 +470,8 @@ namespace internal
        * elements of this array, but passes it on to the next level with P-1
        * which fills the next entry, and so on.
        *
-       * For this particular specialization, i.e. for P==1, all but the last
-       * index are already filled.
+       * For this particular specialization, i.e. for PDEAL_II_EQUALS 1, all but
+       * the last index are already filled.
        *
        * The constructor is made private in order to prevent you having such
        * objects around. The only way to create such objects is via the
@@ -597,7 +597,8 @@ template <int rank_, int dim, typename Number>
 class SymmetricTensor
 {
 public:
-  static_assert(rank_ % 2 == 0, "A SymmetricTensor must have even rank!");
+  static_assert(rank_ % 2 DEAL_II_EQUALS 0,
+                "A SymmetricTensor must have even rank!");
 
   /**
    * Provide a way to get the dimension of an object without explicit
@@ -725,8 +726,7 @@ public:
   /**
    * Test for equality of two tensors.
    */
-  constexpr bool
-  operator==(const SymmetricTensor &) const;
+  constexpr bool operator DEAL_II_EQUALS(const SymmetricTensor &) const;
 
   /**
    * Test for inequality of two tensors.
@@ -1077,10 +1077,11 @@ inline DEAL_II_ALWAYS_INLINE
 SymmetricTensor<rank_, dim, Number>::SymmetricTensor(
   const Tensor<2, dim, OtherNumber> &t)
 {
-  static_assert(rank == 2, "This function is only implemented for rank==2");
+  static_assert(rank DEAL_II_EQUALS 2,
+                "This function is only implemented for rankDEAL_II_EQUALS 2");
   for (unsigned int d = 0; d < dim; ++d)
     for (unsigned int e = 0; e < d; ++e)
-      Assert(t[d][e] == t[e][d],
+      Assert(t[d][e] DEAL_II_EQUALS t[e][d],
              ExcMessage("The incoming Tensor must be exactly symmetric."));
 
   for (unsigned int d = 0; d < dim; ++d)
@@ -1111,7 +1112,8 @@ SymmetricTensor<rank_, dim, Number>::SymmetricTensor(
       *reinterpret_cast<const typename base_tensor_type::array_type *>(array))
 {
   // ensure that the reinterpret_cast above actually works
-  Assert(sizeof(typename base_tensor_type::array_type) == sizeof(array),
+  Assert(sizeof(typename base_tensor_type::array_type)
+           DEAL_II_EQUALS sizeof(array),
          ExcInternalError());
 }
 
@@ -1444,11 +1446,11 @@ namespace internal
             tmp.data[j][j]  = hr;
             for (unsigned int k = 0; k < N; ++k)
               {
-                if (k == j)
+                if (k DEAL_II_EQUALS j)
                   continue;
                 for (unsigned int i = 0; i < N; ++i)
                   {
-                    if (i == j)
+                    if (i DEAL_II_EQUALS j)
                       continue;
                     tmp.data[i][k] -= tmp.data[i][j] * tmp.data[j][k] * hr;
                   }
@@ -1504,11 +1506,10 @@ constexpr DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim, Number>::
 
 
 template <int rank_, int dim, typename Number>
-constexpr bool
-SymmetricTensor<rank_, dim, Number>::
-operator==(const SymmetricTensor<rank_, dim, Number> &t) const
+constexpr bool SymmetricTensor<rank_, dim, Number>::
+               operator DEAL_II_EQUALS(const SymmetricTensor<rank_, dim, Number> &t) const
 {
-  return data == t.data;
+  return data DEAL_II_EQUALS t.data;
 }
 
 
@@ -1814,12 +1815,12 @@ namespace internal
                                                                            StorageType<2, dim, Number>::base_tensor_type &data)
   {
     // 1d is very simple and done first
-    if (dim == 1)
+    if (dim DEAL_II_EQUALS 1)
       return data[0];
 
     // first treat the main diagonal elements, which are stored consecutively
     // at the beginning
-    if (indices[0] == indices[1])
+    if (indices[0] DEAL_II_EQUALS indices[1])
       return data[indices[0]];
 
     // the rest is messier and requires a few switches.
@@ -1827,8 +1828,10 @@ namespace internal
       {
         case 2:
           // at least for the 2x2 case it is reasonably simple
-          Assert(((indices[0] == 1) && (indices[1] == 0)) ||
-                   ((indices[0] == 0) && (indices[1] == 1)),
+          Assert(((indices[0] DEAL_II_EQUALS 1)DEAL_II_AND(
+                   indices[1] DEAL_II_EQUALS 0))
+                   DEAL_II_OR((indices[0] DEAL_II_EQUALS 0)DEAL_II_AND(
+                     indices[1] DEAL_II_EQUALS 1)),
                  ExcInternalError());
           return data[2];
 
@@ -1839,7 +1842,8 @@ namespace internal
                                            std::max(indices[0], indices[1]));
             for (unsigned int d = 0, c = 0; d < dim; ++d)
               for (unsigned int e = d + 1; e < dim; ++e, ++c)
-                if ((sorted_indices[0] == d) && (sorted_indices[1] == e))
+                if ((sorted_indices[0] DEAL_II_EQUALS d)DEAL_II_AND(
+                      sorted_indices[1] DEAL_II_EQUALS e))
                   return data[dim + c];
             Assert(false, ExcInternalError());
           }
@@ -1860,12 +1864,12 @@ namespace internal
                                                                                  StorageType<2, dim, Number>::base_tensor_type &data)
   {
     // 1d is very simple and done first
-    if (dim == 1)
+    if (dim DEAL_II_EQUALS 1)
       return data[0];
 
     // first treat the main diagonal elements, which are stored consecutively
     // at the beginning
-    if (indices[0] == indices[1])
+    if (indices[0] DEAL_II_EQUALS indices[1])
       return data[indices[0]];
 
     // the rest is messier and requires a few switches.
@@ -1873,8 +1877,10 @@ namespace internal
       {
         case 2:
           // at least for the 2x2 case it is reasonably simple
-          Assert(((indices[0] == 1) && (indices[1] == 0)) ||
-                   ((indices[0] == 0) && (indices[1] == 1)),
+          Assert(((indices[0] DEAL_II_EQUALS 1)DEAL_II_AND(
+                   indices[1] DEAL_II_EQUALS 0))
+                   DEAL_II_OR((indices[0] DEAL_II_EQUALS 0)DEAL_II_AND(
+                     indices[1] DEAL_II_EQUALS 1)),
                  ExcInternalError());
           return data[2];
 
@@ -1885,7 +1891,8 @@ namespace internal
                                            std::max(indices[0], indices[1]));
             for (unsigned int d = 0, c = 0; d < dim; ++d)
               for (unsigned int e = d + 1; e < dim; ++e, ++c)
-                if ((sorted_indices[0] == d) && (sorted_indices[1] == e))
+                if ((sorted_indices[0] DEAL_II_EQUALS d)DEAL_II_AND(
+                      sorted_indices[1] DEAL_II_EQUALS e))
                   return data[dim + c];
             Assert(false, ExcInternalError());
           }
@@ -2329,7 +2336,7 @@ namespace internal
           default:
             // for the remainder, manually figure out the numbering
             {
-              if (indices[0] == indices[1])
+              if (indices[0] DEAL_II_EQUALS indices[1])
                 return indices[0];
 
               TableIndices<2> sorted_indices(indices);
@@ -2337,7 +2344,8 @@ namespace internal
 
               for (unsigned int d = 0, c = 0; d < dim; ++d)
                 for (unsigned int e = d + 1; e < dim; ++e, ++c)
-                  if ((sorted_indices[0] == d) && (sorted_indices[1] == e))
+                  if ((sorted_indices[0] DEAL_II_EQUALS d)DEAL_II_AND(
+                        sorted_indices[1] DEAL_II_EQUALS e))
                     return dim + c;
 
               // should never get here:
@@ -2430,7 +2438,7 @@ namespace internal
 
             for (unsigned int d = 0, c = dim; d < dim; ++d)
               for (unsigned int e = d + 1; e < dim; ++e, ++c)
-                if (c == i)
+                if (c DEAL_II_EQUALS i)
                   return {d, e};
 
             // should never get here:
@@ -3272,11 +3280,9 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim>
  * \f}
  *
  * For every tensor <tt>T</tt>, there holds the identity
- * <tt>deviator<dim,Number>(T) == deviator_tensor<dim,Number>() * T</tt>,
- * up to numerical round-off.
- * \f[
- *   \text{dev}\mathbf T = \mathbb P : \mathbf T
- * \f]
+ * <tt>deviator<dim,Number>(T) DEAL_II_EQUALS  deviator_tensor<dim,Number>() *
+ * T</tt>, up to numerical round-off. \f[ \text{dev}\mathbf T = \mathbb P :
+ * \mathbf T \f]
  *
  * @note The reason this operator representation is provided is to simplify
  * taking derivatives of the deviatoric part of tensors:
@@ -3295,8 +3301,8 @@ deviator_tensor()
   // fill the elements treating the diagonal
   for (unsigned int i = 0; i < dim; ++i)
     for (unsigned int j = 0; j < dim; ++j)
-      tmp.data[i][j] =
-        internal::NumberType<Number>::value((i == j ? 1. : 0.) - 1. / dim);
+      tmp.data[i][j] = internal::NumberType<Number>::value(
+        (i DEAL_II_EQUALS j ? 1. : 0.) - 1. / dim);
 
   // then fill the ones that copy over the
   // non-diagonal elements. note that during

@@ -170,14 +170,13 @@ namespace internal
   // we can do vectorized load/save.
   // for VectorReader and VectorDistributorLocalToGlobal we assume that
   // if both begin() and local_element()
-  // exist, then begin() + offset == local_element(offset)
+  // exist, then begin() + offset DEAL_II_EQUALS  local_element(offset)
   template <typename T, typename Number>
   struct is_vectorizable
   {
-    static const bool value =
-      has_begin<T>::value &&
-      (has_local_element<T>::value || is_serial_vector<T>::value) &&
-      std::is_same<typename T::value_type, Number>::value;
+    static const bool value = has_begin<T>::value DEAL_II_AND(
+      has_local_element<T>::value DEAL_II_OR is_serial_vector<T>::value)
+      DEAL_II_AND std::is_same<typename T::value_type, Number>::value;
   };
 
   // We need to have a separate declaration for static const members
@@ -245,12 +244,12 @@ namespace internal
   // type trait for vector T to see if
   // we do a custom data exchange route.
   // We assume that if both begin() and local_element()
-  // exist, then begin() + offset == local_element(offset)
+  // exist, then begin() + offset DEAL_II_EQUALS  local_element(offset)
   template <typename T>
   struct has_exchange_on_subset
   {
-    static const bool value =
-      has_begin<T>::value && has_local_element<T>::value;
+    static const bool     value =
+      has_begin<T>::value DEAL_II_AND has_local_element<T>::value;
   };
 
   // We need to have a separate declaration for static const members
@@ -287,7 +286,7 @@ namespace internal
   // we need to do any data exchange for this vector type at all.
   // is_serial_vector<> would have been enough, but in some circumstances
   // (like calculation of diagonals for matrix-free operators)
-  // a dummy InVector == unsigned int is provided.
+  // a dummy InVector DEAL_II_EQUALS  unsigned int is provided.
   // Thus we have to treat this case as well.
   template <typename T>
   struct is_serial_or_dummy

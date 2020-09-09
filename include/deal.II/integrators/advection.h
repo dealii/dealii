@@ -87,9 +87,10 @@ namespace LocalIntegrators
       // velocity vectors is one,
       // then do not increment
       // between quadrature points.
-      const unsigned int v_increment = (velocity[0].size() == 1) ? 0 : 1;
+      const unsigned int v_increment =
+        (velocity[0].size() DEAL_II_EQUALS 1) ? 0 : 1;
 
-      if (v_increment == 1)
+      if (v_increment DEAL_II_EQUALS 1)
         {
           AssertVectorVectorDimension(velocity, dim, fe.n_quadrature_points);
         }
@@ -136,13 +137,15 @@ namespace LocalIntegrators
     {
       const unsigned int nq     = fe.n_quadrature_points;
       const unsigned int n_dofs = fe.dofs_per_cell;
-      Assert(input.size() == nq, ExcDimensionMismatch(input.size(), nq));
-      Assert(result.size() == n_dofs,
+      Assert(input.size() DEAL_II_EQUALS nq,
+             ExcDimensionMismatch(input.size(), nq));
+      Assert(result.size() DEAL_II_EQUALS n_dofs,
              ExcDimensionMismatch(result.size(), n_dofs));
 
       AssertDimension(velocity.size(), dim);
-      const unsigned int v_increment = (velocity[0].size() == 1) ? 0 : 1;
-      if (v_increment == 1)
+      const unsigned int v_increment =
+        (velocity[0].size() DEAL_II_EQUALS 1) ? 0 : 1;
+      if (v_increment DEAL_II_EQUALS 1)
         {
           AssertVectorVectorDimension(velocity, dim, fe.n_quadrature_points);
         }
@@ -182,12 +185,13 @@ namespace LocalIntegrators
       const unsigned int n_comp = fe.get_fe().n_components();
 
       AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
-      Assert(result.size() == n_dofs,
+      Assert(result.size() DEAL_II_EQUALS n_dofs,
              ExcDimensionMismatch(result.size(), n_dofs));
 
       AssertDimension(velocity.size(), dim);
-      const unsigned int v_increment = (velocity[0].size() == 1) ? 0 : 1;
-      if (v_increment == 1)
+      const unsigned int v_increment =
+        (velocity[0].size() DEAL_II_EQUALS 1) ? 0 : 1;
+      if (v_increment DEAL_II_EQUALS 1)
         {
           AssertVectorVectorDimension(velocity, dim, fe.n_quadrature_points);
         }
@@ -221,13 +225,15 @@ namespace LocalIntegrators
     {
       const unsigned int nq     = fe.n_quadrature_points;
       const unsigned int n_dofs = fe.dofs_per_cell;
-      Assert(input.size() == nq, ExcDimensionMismatch(input.size(), nq));
-      Assert(result.size() == n_dofs,
+      Assert(input.size() DEAL_II_EQUALS nq,
+             ExcDimensionMismatch(input.size(), nq));
+      Assert(result.size() DEAL_II_EQUALS n_dofs,
              ExcDimensionMismatch(result.size(), n_dofs));
 
       AssertDimension(velocity.size(), dim);
-      const unsigned int v_increment = (velocity[0].size() == 1) ? 0 : 1;
-      if (v_increment == 1)
+      const unsigned int v_increment =
+        (velocity[0].size() DEAL_II_EQUALS 1) ? 0 : 1;
+      if (v_increment DEAL_II_EQUALS 1)
         {
           AssertVectorVectorDimension(velocity, dim, fe.n_quadrature_points);
         }
@@ -264,12 +270,13 @@ namespace LocalIntegrators
       const unsigned int n_comp = fe.get_fe().n_components();
 
       AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
-      Assert(result.size() == n_dofs,
+      Assert(result.size() DEAL_II_EQUALS n_dofs,
              ExcDimensionMismatch(result.size(), n_dofs));
 
       AssertDimension(velocity.size(), dim);
-      const unsigned int v_increment = (velocity[0].size() == 1) ? 0 : 1;
-      if (v_increment == 1)
+      const unsigned int v_increment =
+        (velocity[0].size() DEAL_II_EQUALS 1) ? 0 : 1;
+      if (v_increment DEAL_II_EQUALS 1)
         {
           AssertVectorVectorDimension(velocity, dim, fe.n_quadrature_points);
         }
@@ -320,8 +327,9 @@ namespace LocalIntegrators
       AssertDimension(M.n(), n_dofs);
 
       AssertDimension(velocity.size(), dim);
-      const unsigned int v_increment = (velocity[0].size() == 1) ? 0 : 1;
-      if (v_increment == 1)
+      const unsigned int v_increment =
+        (velocity[0].size() DEAL_II_EQUALS 1) ? 0 : 1;
+      if (v_increment DEAL_II_EQUALS 1)
         {
           AssertVectorVectorDimension(velocity, dim, fe.n_quadrature_points);
         }
@@ -393,8 +401,9 @@ namespace LocalIntegrators
       AssertDimension(data.size(), fe.n_quadrature_points);
 
       AssertDimension(velocity.size(), dim);
-      const unsigned int v_increment = (velocity[0].size() == 1) ? 0 : 1;
-      if (v_increment == 1)
+      const unsigned int v_increment =
+        (velocity[0].size() DEAL_II_EQUALS 1) ? 0 : 1;
+      if (v_increment DEAL_II_EQUALS 1)
         {
           AssertVectorVectorDimension(velocity, dim, fe.n_quadrature_points);
         }
@@ -461,8 +470,9 @@ namespace LocalIntegrators
       AssertVectorVectorDimension(data, n_comp, fe.n_quadrature_points);
 
       AssertDimension(velocity.size(), dim);
-      const unsigned int v_increment = (velocity[0].size() == 1) ? 0 : 1;
-      if (v_increment == 1)
+      const unsigned int v_increment =
+        (velocity[0].size() DEAL_II_EQUALS 1) ? 0 : 1;
+      if (v_increment DEAL_II_EQUALS 1)
         {
           AssertVectorVectorDimension(velocity, dim, fe.n_quadrature_points);
         }
@@ -531,8 +541,9 @@ namespace LocalIntegrators
       // have simpler data for constant
       // velocities.
       AssertDimension(velocity.size(), dim);
-      const unsigned int v_increment = (velocity[0].size() == 1) ? 0 : 1;
-      if (v_increment == 1)
+      const unsigned int v_increment =
+        (velocity[0].size() DEAL_II_EQUALS 1) ? 0 : 1;
+      if (v_increment DEAL_II_EQUALS 1)
         {
           AssertVectorVectorDimension(velocity, dim, fe1.n_quadrature_points);
         }
@@ -608,9 +619,9 @@ namespace LocalIntegrators
                          const ArrayView<const std::vector<double>> &velocity,
                          const double factor = 1.)
     {
-      Assert(fe1.get_fe().n_components() == 1,
+      Assert(fe1.get_fe().n_components() DEAL_II_EQUALS 1,
              ExcDimensionMismatch(fe1.get_fe().n_components(), 1));
-      Assert(fe2.get_fe().n_components() == 1,
+      Assert(fe2.get_fe().n_components() DEAL_II_EQUALS 1,
              ExcDimensionMismatch(fe2.get_fe().n_components(), 1));
 
       const unsigned int n1 = fe1.dofs_per_cell;
@@ -619,8 +630,9 @@ namespace LocalIntegrators
       // have simpler data for constant
       // velocities.
       AssertDimension(velocity.size(), dim);
-      const unsigned int v_increment = (velocity[0].size() == 1) ? 0 : 1;
-      if (v_increment == 1)
+      const unsigned int v_increment =
+        (velocity[0].size() DEAL_II_EQUALS 1) ? 0 : 1;
+      if (v_increment DEAL_II_EQUALS 1)
         {
           AssertVectorVectorDimension(velocity, dim, fe1.n_quadrature_points);
         }
@@ -695,8 +707,9 @@ namespace LocalIntegrators
       // have simpler data for constant
       // velocities.
       AssertDimension(velocity.size(), dim);
-      const unsigned int v_increment = (velocity[0].size() == 1) ? 0 : 1;
-      if (v_increment == 1)
+      const unsigned int v_increment =
+        (velocity[0].size() DEAL_II_EQUALS 1) ? 0 : 1;
+      if (v_increment DEAL_II_EQUALS 1)
         {
           AssertVectorVectorDimension(velocity, dim, fe1.n_quadrature_points);
         }

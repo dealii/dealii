@@ -503,9 +503,9 @@ BaseQR<VectorType>::solve(Vector<Number> &      x,
                           const Vector<Number> &y,
                           const bool            transpose) const
 {
-  Assert(x.size() == this->current_size,
+  Assert(x.size() DEAL_II_EQUALS this->current_size,
          ExcDimensionMismatch(x.size(), this->current_size));
-  Assert(y.size() == this->current_size,
+  Assert(y.size() DEAL_II_EQUALS this->current_size,
          ExcDimensionMismatch(y.size(), this->current_size));
 
   // copy if the two vectors are not the same
@@ -536,7 +536,7 @@ void
 BaseQR<VectorType>::multiply_with_cols(VectorType &          y,
                                        const Vector<Number> &x) const
 {
-  Assert(x.size() == this->current_size,
+  Assert(x.size() DEAL_II_EQUALS this->current_size,
          ExcDimensionMismatch(x.size(), this->current_size));
 
   y = 0.;
@@ -551,7 +551,7 @@ void
 BaseQR<VectorType>::multiply_with_colsT(Vector<Number> &  y,
                                         const VectorType &x) const
 {
-  Assert(y.size() == this->current_size,
+  Assert(y.size() DEAL_II_EQUALS this->current_size,
          ExcDimensionMismatch(y.size(), this->current_size));
 
   for (unsigned int j = 0; j < this->current_size; ++j)
@@ -595,7 +595,7 @@ template <typename VectorType>
 bool
 ImplicitQR<VectorType>::append_column(const VectorType &column)
 {
-  if (this->current_size == 0)
+  if (this->current_size DEAL_II_EQUALS 0)
     {
       this->R.grow_or_shrink(this->current_size + 1);
       this->columns.push_back(std::make_unique<VectorType>(column));

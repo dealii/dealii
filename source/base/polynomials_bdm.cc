@@ -30,7 +30,7 @@ template <int dim>
 PolynomialsBDM<dim>::PolynomialsBDM(const unsigned int k)
   : TensorPolynomialsBase<dim>(k + 1, n_polynomials(k))
   , polynomial_space(Polynomials::Legendre::generate_complete_basis(k))
-  , monomials((dim == 2) ? (1) : (k + 2))
+  , monomials((dim DEAL_II_EQUALS 2) ? (1) : (k + 2))
   , p_values(polynomial_space.n())
   , p_grads(polynomial_space.n())
   , p_grad_grads(polynomial_space.n())
@@ -61,23 +61,29 @@ PolynomialsBDM<dim>::evaluate(
   std::vector<Tensor<4, dim>> &third_derivatives,
   std::vector<Tensor<5, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == this->n() || values.size() == 0,
+  Assert(values.size() DEAL_II_EQUALS this->n() DEAL_II_OR values.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch(values.size(), this->n()));
-  Assert(grads.size() == this->n() || grads.size() == 0,
+  Assert(grads.size() DEAL_II_EQUALS this->n() DEAL_II_OR grads.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch(grads.size(), this->n()));
-  Assert(grad_grads.size() == this->n() || grad_grads.size() == 0,
+  Assert(grad_grads.size() DEAL_II_EQUALS this->n() DEAL_II_OR grad_grads.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch(grad_grads.size(), this->n()));
-  Assert(third_derivatives.size() == this->n() || third_derivatives.size() == 0,
+  Assert(third_derivatives.size()
+           DEAL_II_EQUALS this->n() DEAL_II_OR third_derivatives.size()
+             DEAL_II_EQUALS 0,
          ExcDimensionMismatch(third_derivatives.size(), this->n()));
-  Assert(fourth_derivatives.size() == this->n() ||
-           fourth_derivatives.size() == 0,
+  Assert(fourth_derivatives.size()
+           DEAL_II_EQUALS this->n() DEAL_II_OR fourth_derivatives.size()
+             DEAL_II_EQUALS 0,
          ExcDimensionMismatch(fourth_derivatives.size(), this->n()));
 
   // third and fourth derivatives not implemented
   (void)third_derivatives;
-  Assert(third_derivatives.size() == 0, ExcNotImplemented());
+  Assert(third_derivatives.size() DEAL_II_EQUALS 0, ExcNotImplemented());
   (void)fourth_derivatives;
-  Assert(fourth_derivatives.size() == 0, ExcNotImplemented());
+  Assert(fourth_derivatives.size() DEAL_II_EQUALS 0, ExcNotImplemented());
 
   const unsigned int n_sub = polynomial_space.n();
 
@@ -89,9 +95,9 @@ PolynomialsBDM<dim>::evaluate(
   {
     std::lock_guard<std::mutex> lock(mutex);
 
-    p_values.resize((values.size() == 0) ? 0 : n_sub);
-    p_grads.resize((grads.size() == 0) ? 0 : n_sub);
-    p_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_sub);
+    p_values.resize((values.size() DEAL_II_EQUALS 0) ? 0 : n_sub);
+    p_grads.resize((grads.size() DEAL_II_EQUALS 0) ? 0 : n_sub);
+    p_grad_grads.resize((grad_grads.size() DEAL_II_EQUALS 0) ? 0 : n_sub);
 
     // Compute values of complete space
     // and insert into tensors.  Result
@@ -131,7 +137,7 @@ PolynomialsBDM<dim>::evaluate(
   std::vector<std::vector<double>> monovali(dim, std::vector<double>(4));
   std::vector<std::vector<double>> monovalk(dim, std::vector<double>(4));
 
-  if (dim == 2)
+  if (dim DEAL_II_EQUALS 2)
     {
       for (unsigned int d = 0; d < dim; ++d)
         monomials[0].value(unit_point(d), monovali[d]);
@@ -173,7 +179,7 @@ PolynomialsBDM<dim>::evaluate(
           grad_grads[start + 1][1][1][1] = -monovali[1][2];
         }
     }
-  else // dim == 3
+  else // dim DEAL_II_EQUALS  3
     {
       // The number of curls in each
       // component. Note that the
@@ -356,7 +362,7 @@ PolynomialsBDM<dim>::evaluate(
               grad_grads[start + 2][2][2][2] = 0.;
             }
         }
-      Assert(start == this->n(), ExcInternalError());
+      Assert(start DEAL_II_EQUALS this->n(), ExcInternalError());
     }
 }
 
@@ -380,7 +386,7 @@ PolynomialsBDM<dim>::compute_node_matrix (Table<2,double>& A) const
   for (unsigned int face=0;face<2*dim;++face)
     {
       double orientation = 1.;
-      if ((face==0) || (face==3))
+      if ((faceDEAL_II_EQUALS 0) DEAL_II_OR  (faceDEAL_II_EQUALS 3))
         orientation = -1.;
 
       for (unsigned int k=0;k<qface.size();++k)
@@ -432,11 +438,11 @@ template <int dim>
 unsigned int
 PolynomialsBDM<dim>::n_polynomials(const unsigned int k)
 {
-  if (dim == 1)
+  if (dim DEAL_II_EQUALS 1)
     return k + 1;
-  if (dim == 2)
+  if (dim DEAL_II_EQUALS 2)
     return (k + 1) * (k + 2) + 2;
-  if (dim == 3)
+  if (dim DEAL_II_EQUALS 3)
     return ((k + 1) * (k + 2) * (k + 3)) / 2 + 3 * (k + 1);
   Assert(false, ExcNotImplemented());
   return 0;

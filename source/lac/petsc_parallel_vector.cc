@@ -114,10 +114,10 @@ namespace PETScWrappers
     {
       // make sure left- and right-hand side of the assignment are
       // compress()'ed:
-      Assert(v.last_action == VectorOperation::unknown,
+      Assert(v.last_action DEAL_II_EQUALS VectorOperation::unknown,
              internal::VectorReference::ExcWrongMode(VectorOperation::unknown,
                                                      v.last_action));
-      Assert(last_action == VectorOperation::unknown,
+      Assert(last_action DEAL_II_EQUALS VectorOperation::unknown,
              internal::VectorReference::ExcWrongMode(VectorOperation::unknown,
                                                      last_action));
 
@@ -132,14 +132,14 @@ namespace PETScWrappers
         }
 
       PetscErrorCode ierr = VecCopy(v.vector, vector);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       if (has_ghost_elements())
         {
           ierr = VecGhostUpdateBegin(vector, INSERT_VALUES, SCATTER_FORWARD);
-          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
           ierr = VecGhostUpdateEnd(vector, INSERT_VALUES, SCATTER_FORWARD);
-          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
         }
       return *this;
     }
@@ -168,33 +168,33 @@ namespace PETScWrappers
       // only do something if the sizes
       // mismatch (may not be true for every proc)
 
-      int k_global, k = ((size() != n) || (local_size() != local_sz));
+      int k_global, k = ((size() != n) DEAL_II_OR(local_size() != local_sz));
       {
         const int ierr =
           MPI_Allreduce(&k, &k_global, 1, MPI_INT, MPI_LOR, communicator);
         AssertThrowMPI(ierr);
       }
 
-      if (k_global || has_ghost_elements())
+      if (k_global DEAL_II_OR has_ghost_elements())
         {
           // FIXME: I'd like to use this here,
           // but somehow it leads to odd errors
           // somewhere down the line in some of
           // the tests:
           //         const PetscErrorCode ierr = VecSetSizes (vector, n, n);
-          //         AssertThrow (ierr == 0, ExcPETScError(ierr));
+          //         AssertThrow (ierr DEAL_II_EQUALS  0, ExcPETScError(ierr));
 
           // so let's go the slow way:
 
           const PetscErrorCode ierr = VecDestroy(&vector);
-          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
           create_vector(n, local_sz);
         }
 
       // finally clear the new vector if so
       // desired
-      if (omit_zeroing_entries == false)
+      if (omit_zeroing_entries DEAL_II_EQUALS false)
         *this = 0;
     }
 
@@ -209,7 +209,7 @@ namespace PETScWrappers
           if (!omit_zeroing_entries)
             {
               const PetscErrorCode ierr = VecSet(vector, 0.0);
-              AssertThrow(ierr == 0, ExcPETScError(ierr));
+              AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
             }
         }
       else
@@ -224,7 +224,7 @@ namespace PETScWrappers
                    const MPI_Comm &comm)
     {
       const PetscErrorCode ierr = VecDestroy(&vector);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       communicator = comm;
 
@@ -240,7 +240,7 @@ namespace PETScWrappers
     Vector::reinit(const IndexSet &local, const MPI_Comm &comm)
     {
       const PetscErrorCode ierr = VecDestroy(&vector);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       communicator = comm;
 
@@ -259,9 +259,9 @@ namespace PETScWrappers
 
       const PetscErrorCode ierr =
         VecCreateMPI(communicator, local_size, PETSC_DETERMINE, &vector);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
-      Assert(size() == n, ExcDimensionMismatch(size(), n));
+      Assert(size() DEAL_II_EQUALS n, ExcDimensionMismatch(size(), n));
     }
 
 
@@ -290,9 +290,9 @@ namespace PETScWrappers
                                            ghostindices.size(),
                                            ptr,
                                            &vector);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
-      Assert(size() == n, ExcDimensionMismatch(size(), n));
+      Assert(size() DEAL_II_EQUALS n, ExcDimensionMismatch(size(), n));
 
 #  if DEBUG
       {
@@ -300,20 +300,20 @@ namespace PETScWrappers
         PetscInt begin, end;
 
         ierr = VecGetOwnershipRange(vector, &begin, &end);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
         AssertDimension(local_size, static_cast<size_type>(end - begin));
 
         Vec l;
         ierr = VecGhostGetLocalForm(vector, &l);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
         PetscInt lsize;
         ierr = VecGetSize(l, &lsize);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
         ierr = VecGhostRestoreLocalForm(vector, &l);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
         AssertDimension(lsize,
                         end - begin +
@@ -344,9 +344,9 @@ namespace PETScWrappers
       // in parallel, check that the vector
       // is zero on _all_ processors.
       unsigned int num_nonzero = Utilities::MPI::sum(has_nonzero, communicator);
-      return num_nonzero == 0;
+      return num_nonzero DEAL_II_EQUALS 0;
 #  else
-      return has_nonzero == 0;
+      return has_nonzero DEAL_II_EQUALS 0;
 #  endif
     }
 
@@ -365,13 +365,13 @@ namespace PETScWrappers
       PetscInt     nlocal, istart, iend;
 
       PetscErrorCode ierr = VecGetArray(vector, &val);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       ierr = VecGetLocalSize(vector, &nlocal);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       ierr = VecGetOwnershipRange(vector, &istart, &iend);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       // save the state of out stream
       std::ios::fmtflags old_flags     = out.flags();
@@ -395,7 +395,7 @@ namespace PETScWrappers
           const int mpi_ierr = MPI_Barrier(communicator);
           AssertThrowMPI(mpi_ierr);
 
-          if (i == Utilities::MPI::this_mpi_process(communicator))
+          if (i DEAL_II_EQUALS Utilities::MPI::this_mpi_process(communicator))
             {
               if (across)
                 {
@@ -421,7 +421,7 @@ namespace PETScWrappers
       // restore the representation of the
       // vector
       ierr = VecRestoreArray(vector, &val);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       AssertThrow(out, ExcIO());
     }

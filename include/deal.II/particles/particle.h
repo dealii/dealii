@@ -197,7 +197,7 @@ namespace Particles
      * Move constructor for Particle, creates a particle from an existing
      * one by stealing its state.
      */
-    Particle(Particle<dim, spacedim> &&particle) noexcept;
+    Particle(Particle<dim, spacedim> DEAL_II_AND particle) noexcept;
 
     /**
      * Copy assignment operator.
@@ -209,7 +209,7 @@ namespace Particles
      * Move assignment operator.
      */
     Particle<dim, spacedim> &
-    operator=(Particle<dim, spacedim> &&particle) noexcept;
+    operator=(Particle<dim, spacedim> DEAL_II_AND particle) noexcept;
 
     /**
      * Destructor. Releases the property handle if it is valid, and
@@ -477,8 +477,8 @@ namespace Particles
   Particle<dim, spacedim>::save(Archive &ar, const unsigned int) const
   {
     unsigned int n_properties = 0;
-    if ((property_pool != nullptr) &&
-        (properties != PropertyPool::invalid_handle))
+    if ((property_pool != nullptr)
+          DEAL_II_AND(properties != PropertyPool::invalid_handle))
       n_properties = get_properties().size();
 
     ar &location &reference_location &id &n_properties;

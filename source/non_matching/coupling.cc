@@ -140,11 +140,13 @@ namespace NonMatching
                                 const FiniteElement<dim1, spacedim> &fe1)
     {
       // Take care of components
-      const ComponentMask mask0 =
-        (comps0.size() == 0 ? ComponentMask(fe0.n_components(), true) : comps0);
+      const ComponentMask mask0 = (comps0.size() DEAL_II_EQUALS 0 ?
+                                     ComponentMask(fe0.n_components(), true) :
+                                     comps0);
 
-      const ComponentMask mask1 =
-        (comps1.size() == 0 ? ComponentMask(fe1.n_components(), true) : comps1);
+      const ComponentMask mask1 = (comps1.size() DEAL_II_EQUALS 0 ?
+                                     ComponentMask(fe1.n_components(), true) :
+                                     comps1);
 
       AssertDimension(mask0.size(), fe0.n_components());
       AssertDimension(mask1.size(), fe1.n_components());
@@ -220,8 +222,8 @@ namespace NonMatching
     Assert(dim1 <= dim0,
            ExcMessage("This function can only work if dim1 <= dim0"));
     Assert((dynamic_cast<
-              const parallel::distributed::Triangulation<dim1, spacedim> *>(
-              &immersed_dh.get_triangulation()) == nullptr),
+             const parallel::distributed::Triangulation<dim1, spacedim> *>(
+             &immersed_dh.get_triangulation()) DEAL_II_EQUALS nullptr),
            ExcNotImplemented());
 
     const bool tria_is_parallel =
@@ -236,11 +238,12 @@ namespace NonMatching
 
     // Take care of components
     const ComponentMask space_c =
-      (space_comps.size() == 0 ? ComponentMask(space_fe.n_components(), true) :
-                                 space_comps);
+      (space_comps.size() DEAL_II_EQUALS 0 ?
+         ComponentMask(space_fe.n_components(), true) :
+         space_comps);
 
     const ComponentMask immersed_c =
-      (immersed_comps.size() == 0 ?
+      (immersed_comps.size() DEAL_II_EQUALS 0 ?
          ComponentMask(immersed_fe.n_components(), true) :
          immersed_comps);
 
@@ -286,7 +289,7 @@ namespace NonMatching
     //        {
     //          const auto comp_j =
     //          immersed_fe.system_to_component_index(j).first; if
-    //          (immersed_gtl[comp_j] == space_gtl[comp_i])
+    //          (immersed_gtl[comp_j] DEAL_II_EQUALS  space_gtl[comp_i])
     //            dof_mask(i,j) = true;
     //        }
     //  }
@@ -404,8 +407,8 @@ namespace NonMatching
     Assert(dim1 <= dim0,
            ExcMessage("This function can only work if dim1 <= dim0"));
     Assert((dynamic_cast<
-              const parallel::distributed::Triangulation<dim1, spacedim> *>(
-              &immersed_dh.get_triangulation()) == nullptr),
+             const parallel::distributed::Triangulation<dim1, spacedim> *>(
+             &immersed_dh.get_triangulation()) DEAL_II_EQUALS nullptr),
            ExcNotImplemented());
 
     const bool tria_is_parallel =
@@ -421,11 +424,12 @@ namespace NonMatching
 
     // Take care of components
     const ComponentMask space_c =
-      (space_comps.size() == 0 ? ComponentMask(space_fe.n_components(), true) :
-                                 space_comps);
+      (space_comps.size() DEAL_II_EQUALS 0 ?
+         ComponentMask(space_fe.n_components(), true) :
+         space_comps);
 
     const ComponentMask immersed_c =
-      (immersed_comps.size() == 0 ?
+      (immersed_comps.size() DEAL_II_EQUALS 0 ?
          ComponentMask(immersed_fe.n_components(), true) :
          immersed_comps);
 
@@ -508,7 +512,7 @@ namespace NonMatching
               }
             // If there are already cells, we begin by looking
             // at the last inserted cell, which is more likely:
-            else if (cell_container[cell_id].back() == all_cells[o])
+            else if (cell_container[cell_id].back() DEAL_II_EQUALS all_cells[o])
               {
                 qpoints_container[cell_id].back().emplace_back(
                   all_qpoints[o][j]);
@@ -521,7 +525,7 @@ namespace NonMatching
                                               cell_container[cell_id].end() - 1,
                                               all_cells[o]);
 
-                if (cell_p == cell_container[cell_id].end() - 1)
+                if (cell_p DEAL_II_EQUALS cell_container[cell_id].end() - 1)
                   {
                     cell_container[cell_id].emplace_back(all_cells[o]);
                     qpoints_container[cell_id].emplace_back(
@@ -591,7 +595,8 @@ namespace NonMatching
                           const auto comp_j = immersed_dh.get_fe()
                                                 .system_to_component_index(j)
                                                 .first;
-                          if (space_gtl[comp_i] == immersed_gtl[comp_j])
+                          if (space_gtl[comp_i] DEAL_II_EQUALS
+                                immersed_gtl[comp_j])
                             for (unsigned int oq = 0;
                                  oq < o_fe_v.n_quadrature_points;
                                  ++oq)
@@ -634,7 +639,7 @@ namespace NonMatching
     const ComponentMask &                   comps0,
     const ComponentMask &                   comps1)
   {
-    if (epsilon == 0.0)
+    if (epsilon DEAL_II_EQUALS 0.0)
       {
         Assert(dim1 <= dim0,
                ExcMessage("When epsilon is zero, you can only "
@@ -661,7 +666,8 @@ namespace NonMatching
                       *>(&dh1.get_triangulation()) != nullptr);
 
     // We bail out if both are distributed triangulations
-    Assert(!zero_is_distributed || !one_is_distributed, ExcNotImplemented());
+    Assert(!zero_is_distributed DEAL_II_OR !one_is_distributed,
+           ExcNotImplemented());
 
     // If we can loop on both, we decide where to make the outer loop according
     // to the size of the triangulation. The reasoning is the following:
@@ -670,9 +676,9 @@ namespace NonMatching
     // Total cost (besides the setup) is: M log(N)
     // If we can, make sure M is the smaller number of the two.
     const bool outer_loop_on_zero =
-      (zero_is_distributed && !one_is_distributed) ||
-      (dh1.get_triangulation().n_active_cells() >
-       dh0.get_triangulation().n_active_cells());
+      (zero_is_distributed DEAL_II_AND !one_is_distributed)DEAL_II_OR(
+        dh1.get_triangulation().n_active_cells() >
+        dh0.get_triangulation().n_active_cells());
 
     const auto &fe0 = dh0.get_fe();
     const auto &fe1 = dh1.get_fe();
@@ -683,7 +689,7 @@ namespace NonMatching
 
     if (outer_loop_on_zero)
       {
-        Assert(one_is_distributed == false, ExcInternalError());
+        Assert(one_is_distributed DEAL_II_EQUALS false, ExcInternalError());
 
         const auto &tree1 = cache1.get_cell_bounding_boxes_rtree();
 
@@ -720,7 +726,7 @@ namespace NonMatching
       }
     else
       {
-        Assert(zero_is_distributed == false, ExcInternalError());
+        Assert(zero_is_distributed DEAL_II_EQUALS false, ExcInternalError());
         const auto &tree0 = cache0.get_cell_bounding_boxes_rtree();
 
         std::vector<std::pair<
@@ -774,7 +780,7 @@ namespace NonMatching
     const ComponentMask &                                 comps0,
     const ComponentMask &                                 comps1)
   {
-    if (epsilon == 0)
+    if (epsilon DEAL_II_EQUALS 0)
       {
         Assert(dim1 <= dim0,
                ExcMessage("When epsilon is zero, you can only "
@@ -802,7 +808,8 @@ namespace NonMatching
                       *>(&dh1.get_triangulation()) != nullptr);
 
     // We bail out if both are distributed triangulations
-    Assert(!zero_is_distributed || !one_is_distributed, ExcNotImplemented());
+    Assert(!zero_is_distributed DEAL_II_OR !one_is_distributed,
+           ExcNotImplemented());
 
     // If we can loop on both, we decide where to make the outer loop according
     // to the size of the triangulation. The reasoning is the following:
@@ -811,9 +818,9 @@ namespace NonMatching
     // Total cost (besides the setup) is: M log(N)
     // If we can, make sure M is the smaller number of the two.
     const bool outer_loop_on_zero =
-      (zero_is_distributed && !one_is_distributed) ||
-      (dh1.get_triangulation().n_active_cells() >
-       dh0.get_triangulation().n_active_cells());
+      (zero_is_distributed DEAL_II_AND !one_is_distributed)DEAL_II_OR(
+        dh1.get_triangulation().n_active_cells() >
+        dh0.get_triangulation().n_active_cells());
 
     const auto &fe0 = dh0.get_fe();
     const auto &fe1 = dh1.get_fe();
@@ -871,8 +878,9 @@ namespace NonMatching
               for (unsigned int i = 0; i < fe0.n_dofs_per_cell(); ++i)
                 {
                   const auto comp_i = fe0.system_to_component_index(i).first;
-                  if (gtl0[comp_i] != numbers::invalid_unsigned_int &&
-                      gtl1[comp_j] == gtl0[comp_i])
+                  if (gtl0[comp_i] !=
+                      numbers::invalid_unsigned_int DEAL_II_AND
+                        gtl1[comp_j] DEAL_II_EQUALS gtl0[comp_i])
                     cell_matrix(i, j) += fev0.shape_value(i, q0) * sum_q1;
                 }
             }
@@ -886,7 +894,7 @@ namespace NonMatching
 
     if (outer_loop_on_zero)
       {
-        Assert(one_is_distributed == false, ExcInternalError());
+        Assert(one_is_distributed DEAL_II_EQUALS false, ExcInternalError());
 
         const auto &tree1 = cache1.get_cell_bounding_boxes_rtree();
 
@@ -923,7 +931,7 @@ namespace NonMatching
       }
     else
       {
-        Assert(zero_is_distributed == false, ExcInternalError());
+        Assert(zero_is_distributed DEAL_II_EQUALS false, ExcInternalError());
         const auto &tree0 = cache0.get_cell_bounding_boxes_rtree();
 
         std::vector<std::pair<

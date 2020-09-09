@@ -91,7 +91,7 @@ namespace LocalIntegrators
       AssertDimension(fe.get_fe().n_components(), dim);
 
       AssertVectorVectorDimension(input, dim, fe.n_quadrature_points);
-      Assert(result.size() == n_dofs,
+      Assert(result.size() DEAL_II_EQUALS n_dofs,
              ExcDimensionMismatch(result.size(), n_dofs));
 
       for (unsigned int k = 0; k < nq; ++k)

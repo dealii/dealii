@@ -78,8 +78,8 @@ namespace
     // finally, get the rows:
     int n_process_rows = Np / n_process_columns;
 
-    Assert(n_process_columns >= 1 && n_process_rows >= 1 &&
-             n_processes >= n_process_rows * n_process_columns,
+    Assert(n_process_columns >= 1 DEAL_II_AND n_process_rows >=
+             1 DEAL_II_AND n_processes >= n_process_rows * n_process_columns,
            ExcMessage(
              "error in process grid: " + std::to_string(n_process_rows) + "x" +
              std::to_string(n_process_columns) + "=" +
@@ -143,7 +143,7 @@ namespace Utilities
       // skip all jobs
       // Note that a different condition is used in FORTRAN code here
       // https://stackoverflow.com/questions/18516915/calling-blacs-with-more-processes-than-used
-      if (this_process_row < 0 || this_process_column < 0)
+      if (this_process_row < 0 DEAL_II_OR this_process_column < 0)
         mpi_process_is_active = false;
       else
         mpi_process_is_active = true;
@@ -153,8 +153,8 @@ namespace Utilities
       // id=n_process_rows*n_process_columns
       const unsigned int n_active_mpi_processes =
         n_process_rows * n_process_columns;
-      Assert(mpi_process_is_active ||
-               this_mpi_process >= n_active_mpi_processes,
+      Assert(mpi_process_is_active DEAL_II_OR this_mpi_process >=
+               n_active_mpi_processes,
              ExcInternalError());
 
       std::vector<int> inactive_with_root_ranks;
@@ -197,9 +197,9 @@ namespace Utilities
 
       // Double check that the process with rank 0 in subgroup is active:
 #  ifdef DEBUG
-      if (mpi_communicator_inactive_with_root != MPI_COMM_NULL &&
-          Utilities::MPI::this_mpi_process(
-            mpi_communicator_inactive_with_root) == 0)
+      if (mpi_communicator_inactive_with_root !=
+          MPI_COMM_NULL DEAL_II_AND Utilities::MPI::this_mpi_process(
+            mpi_communicator_inactive_with_root) DEAL_II_EQUALS 0)
         Assert(mpi_process_is_active, ExcInternalError());
 #  endif
     }

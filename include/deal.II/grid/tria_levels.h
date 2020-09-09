@@ -172,7 +172,7 @@ namespace internal
        * orientation from vertex false: revert the orientation. See
        * @ref GlossDirectionFlag.
        *
-       * This is only used for codim==1 meshes.
+       * This is only used for codimDEAL_II_EQUALS 1 meshes.
        */
       std::vector<bool> direction_flags;
 
@@ -250,10 +250,10 @@ namespace internal
       ar &direction_flags;
       ar &cells;
 
-      if (dim == 3)
+      if (dim DEAL_II_EQUALS 3)
         ar &face_orientations;
 
-      if (dim == 2 || dim == 3)
+      if (dim DEAL_II_EQUALS 2 DEAL_II_OR dim DEAL_II_EQUALS 3)
         ar &reference_cell_type;
     }
 

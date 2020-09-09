@@ -32,7 +32,7 @@ namespace PETScWrappers
     const int            m = 0, n = 0, n_nonzero_per_row = 0;
     const PetscErrorCode ierr = MatCreateSeqAIJ(
       PETSC_COMM_SELF, m, n, n_nonzero_per_row, nullptr, &matrix);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
   }
 
 
@@ -84,7 +84,7 @@ namespace PETScWrappers
     // get rid of old matrix and generate a
     // new one
     const PetscErrorCode ierr = destroy_matrix(matrix);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     do_reinit(m, n, n_nonzero_per_row, is_symmetric);
   }
@@ -100,7 +100,7 @@ namespace PETScWrappers
     // get rid of old matrix and generate a
     // new one
     const PetscErrorCode ierr = destroy_matrix(matrix);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     do_reinit(m, n, row_lengths, is_symmetric);
   }
@@ -115,7 +115,7 @@ namespace PETScWrappers
     // get rid of old matrix and generate a
     // new one
     const PetscErrorCode ierr = destroy_matrix(matrix);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     do_reinit(sparsity_pattern, preset_nonzero_locations);
   }
@@ -128,7 +128,7 @@ namespace PETScWrappers
     static MPI_Comm      comm;
     const PetscErrorCode ierr =
       PetscObjectGetComm(reinterpret_cast<PetscObject>(matrix), &comm);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
     return comm;
   }
 
@@ -145,10 +145,10 @@ namespace PETScWrappers
     // for all rows globally
     const PetscErrorCode ierr = MatCreateSeqAIJ(
       PETSC_COMM_SELF, m, n, n_nonzero_per_row, nullptr, &matrix);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     // set symmetric flag, if so requested
-    if (is_symmetric == true)
+    if (is_symmetric DEAL_II_EQUALS true)
       {
         set_matrix_option(matrix, MAT_SYMMETRIC, PETSC_TRUE);
       }
@@ -162,7 +162,7 @@ namespace PETScWrappers
                           const std::vector<size_type> &row_lengths,
                           const bool                    is_symmetric)
   {
-    Assert(row_lengths.size() == m,
+    Assert(row_lengths.size() DEAL_II_EQUALS m,
            ExcDimensionMismatch(row_lengths.size(), m));
 
     // use the call sequence indicating a
@@ -178,10 +178,10 @@ namespace PETScWrappers
 
     const PetscErrorCode ierr = MatCreateSeqAIJ(
       PETSC_COMM_SELF, m, n, 0, int_row_lengths.data(), &matrix);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     // set symmetric flag, if so requested
-    if (is_symmetric == true)
+    if (is_symmetric DEAL_II_EQUALS true)
       {
         set_matrix_option(matrix, MAT_SYMMETRIC, PETSC_TRUE);
       }
@@ -216,7 +216,7 @@ namespace PETScWrappers
     // for the usefulness of this option
     // read the documentation of this
     // class.
-    if (preset_nonzero_locations == true)
+    if (preset_nonzero_locations DEAL_II_EQUALS true)
       {
         std::vector<PetscInt>    row_entries;
         std::vector<PetscScalar> row_values;
@@ -235,7 +235,7 @@ namespace PETScWrappers
                                                      row_entries.data(),
                                                      row_values.data(),
                                                      INSERT_VALUES);
-            AssertThrow(ierr == 0, ExcPETScError(ierr));
+            AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
           }
         compress(VectorOperation::insert);
 
@@ -249,7 +249,7 @@ namespace PETScWrappers
   {
     PetscInt             m, n;
     const PetscErrorCode ierr = MatGetSize(matrix, &m, &n);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     return m;
   }
@@ -259,7 +259,7 @@ namespace PETScWrappers
   {
     PetscInt             m, n;
     const PetscErrorCode ierr = MatGetSize(matrix, &m, &n);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
     return n;
   }

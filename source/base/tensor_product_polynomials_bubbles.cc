@@ -49,7 +49,7 @@ void
 TensorProductPolynomialsBubbles<dim>::set_numbering(
   const std::vector<unsigned int> &renumber)
 {
-  Assert(renumber.size() == index_map.size(),
+  Assert(renumber.size() DEAL_II_EQUALS index_map.size(),
          ExcDimensionMismatch(renumber.size(), index_map.size()));
 
   index_map = renumber;
@@ -125,7 +125,8 @@ TensorProductPolynomialsBubbles<dim>::compute_grad(const unsigned int i,
       grad[d] = 1.;
       // compute grad(4*\prod_{i=1}^d (x_i(1-x_i)))(p)
       for (unsigned j = 0; j < dim; ++j)
-        grad[d] *= (d == j ? 4 * (1 - 2 * p(j)) : 4 * p(j) * (1 - p(j)));
+        grad[d] *=
+          (d DEAL_II_EQUALS j ? 4 * (1 - 2 * p(j)) : 4 * p(j) * (1 - p(j)));
       // and multiply with (2*x_i-1)^{r-1}
       for (unsigned int i = 0; i < q_degree - 1; ++i)
         grad[d] *= 2 * p(comp) - 1;
@@ -210,9 +211,9 @@ TensorProductPolynomialsBubbles<dim>::compute_grad_grad(
         for (unsigned int x = 0; x < dim; ++x)
           {
             unsigned int derivative = 0;
-            if (d1 == x || d2 == x)
+            if (d1 DEAL_II_EQUALS x DEAL_II_OR d2 DEAL_II_EQUALS x)
               {
-                if (d1 == d2)
+                if (d1 DEAL_II_EQUALS d2)
                   derivative = 2;
                 else
                   derivative = 1;
@@ -231,8 +232,8 @@ TensorProductPolynomialsBubbles<dim>::compute_grad_grad(
       grad_grad_3[comp][d] = v[dim][1];
       for (unsigned int x = 0; x < dim; ++x)
         {
-          grad_grad_2[d][comp] *= v[x][d == x];
-          grad_grad_3[comp][d] *= v[x][d == x];
+          grad_grad_2[d][comp] *= v[x][d DEAL_II_EQUALS x];
+          grad_grad_3[comp][d] *= v[x][d DEAL_II_EQUALS x];
         }
     }
 
@@ -267,47 +268,51 @@ TensorProductPolynomialsBubbles<dim>::evaluate(
   const unsigned int max_q_indices = tensor_polys.n();
   (void)max_q_indices;
   const unsigned int n_bubbles = ((q_degree <= 1) ? 1 : dim);
-  Assert(values.size() == max_q_indices + n_bubbles || values.size() == 0,
+  Assert(values.size() DEAL_II_EQUALS max_q_indices +
+           n_bubbles DEAL_II_OR values.size() DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(values.size(), max_q_indices + n_bubbles, 0));
-  Assert(grads.size() == max_q_indices + n_bubbles || grads.size() == 0,
+  Assert(grads.size() DEAL_II_EQUALS max_q_indices +
+           n_bubbles DEAL_II_OR grads.size() DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(grads.size(), max_q_indices + n_bubbles, 0));
-  Assert(
-    grad_grads.size() == max_q_indices + n_bubbles || grad_grads.size() == 0,
-    ExcDimensionMismatch2(grad_grads.size(), max_q_indices + n_bubbles, 0));
-  Assert(third_derivatives.size() == max_q_indices + n_bubbles ||
-           third_derivatives.size() == 0,
+  Assert(grad_grads.size() DEAL_II_EQUALS max_q_indices +
+           n_bubbles DEAL_II_OR grad_grads.size() DEAL_II_EQUALS 0,
+         ExcDimensionMismatch2(grad_grads.size(),
+                               max_q_indices + n_bubbles,
+                               0));
+  Assert(third_derivatives.size() DEAL_II_EQUALS max_q_indices +
+           n_bubbles DEAL_II_OR third_derivatives.size() DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(third_derivatives.size(),
                                max_q_indices + n_bubbles,
                                0));
-  Assert(fourth_derivatives.size() == max_q_indices + n_bubbles ||
-           fourth_derivatives.size() == 0,
+  Assert(fourth_derivatives.size() DEAL_II_EQUALS max_q_indices +
+           n_bubbles DEAL_II_OR fourth_derivatives.size() DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(fourth_derivatives.size(),
                                max_q_indices + n_bubbles,
                                0));
 
   bool do_values = false, do_grads = false, do_grad_grads = false;
   bool do_3rd_derivatives = false, do_4th_derivatives = false;
-  if (values.empty() == false)
+  if (values.empty() DEAL_II_EQUALS false)
     {
       values.resize(tensor_polys.n());
       do_values = true;
     }
-  if (grads.empty() == false)
+  if (grads.empty() DEAL_II_EQUALS false)
     {
       grads.resize(tensor_polys.n());
       do_grads = true;
     }
-  if (grad_grads.empty() == false)
+  if (grad_grads.empty() DEAL_II_EQUALS false)
     {
       grad_grads.resize(tensor_polys.n());
       do_grad_grads = true;
     }
-  if (third_derivatives.empty() == false)
+  if (third_derivatives.empty() DEAL_II_EQUALS false)
     {
       third_derivatives.resize(tensor_polys.n());
       do_3rd_derivatives = true;
     }
-  if (fourth_derivatives.empty() == false)
+  if (fourth_derivatives.empty() DEAL_II_EQUALS false)
     {
       fourth_derivatives.resize(tensor_polys.n());
       do_4th_derivatives = true;

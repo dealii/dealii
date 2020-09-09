@@ -836,7 +836,7 @@ namespace Differentiation
                              const SymmetricTensor<rank, dim, ValueType> &)
       {
         static_assert(
-          rank == 0 || rank == 2,
+          rank DEAL_II_EQUALS 0 DEAL_II_OR rank DEAL_II_EQUALS 2,
           "Querying symmetric component for non rank-2 symmetric tensor index is not allowed.");
         return false;
       }

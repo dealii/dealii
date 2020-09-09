@@ -499,9 +499,12 @@ MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
   const unsigned int min_level = dst.min_level();
   const unsigned int max_level = dst.max_level();
 
-  Assert(max_level == dof_handler.get_triangulation().n_global_levels() - 1,
-         ExcDimensionMismatch(
-           max_level, dof_handler.get_triangulation().n_global_levels() - 1));
+  Assert(
+    max_level DEAL_II_EQUALS dof_handler.get_triangulation().n_global_levels() -
+      1,
+    ExcDimensionMismatch(max_level,
+                         dof_handler.get_triangulation().n_global_levels() -
+                           1));
 
   const parallel::TriangulationBase<dim, spacedim> *p_tria =
     (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
@@ -517,9 +520,10 @@ MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
                                                     level,
                                                     relevant_dofs[level]);
       if (dst[level].size() !=
-            dof_handler.locally_owned_mg_dofs(level).size() ||
-          dst[level].local_size() !=
-            dof_handler.locally_owned_mg_dofs(level).n_elements())
+          dof_handler.locally_owned_mg_dofs(level)
+            .size() DEAL_II_OR dst[level]
+            .local_size() !=
+          dof_handler.locally_owned_mg_dofs(level).n_elements())
         dst[level].reinit(dof_handler.locally_owned_mg_dofs(level),
                           relevant_dofs[level],
                           mpi_communicator);
@@ -555,8 +559,8 @@ MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
       for (; cell != endc; ++cell)
         if (cell->is_locally_owned_on_level())
           {
-            // if we get to a cell without children (== active), we can
-            // skip it as there values should be already set by the
+            // if we get to a cell without children (DEAL_II_EQUALS  active), we
+            // can skip it as there values should be already set by the
             // equivalent of copy_to_mg()
             if (cell->is_active())
               continue;
@@ -618,15 +622,15 @@ MGTransferBlockMatrixFree<dim, Number>::copy_to_mg(
   const unsigned int n_blocks = src.n_blocks();
   AssertDimension(dof_handler.size(), n_blocks);
 
-  if (n_blocks == 0)
+  if (n_blocks DEAL_II_EQUALS 0)
     return;
 
   const unsigned int min_level = dst.min_level();
   const unsigned int max_level = dst.max_level();
 
   // this function is normally called within the Multigrid class with
-  // dst == defect level block vector. At first run this vector is not
-  // initialized. Do this below:
+  // dst DEAL_II_EQUALS  defect level block vector. At first run this vector is
+  // not initialized. Do this below:
   {
     const parallel::TriangulationBase<dim, spacedim> *tria =
       (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
@@ -634,7 +638,7 @@ MGTransferBlockMatrixFree<dim, Number>::copy_to_mg(
     for (unsigned int i = 1; i < n_blocks; ++i)
       AssertThrow(
         (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-           &(dof_handler[0]->get_triangulation())) == tria),
+          &(dof_handler[0]->get_triangulation())) DEAL_II_EQUALS tria),
         ExcMessage("The DoFHandler use different Triangulations!"));
 
     MGLevelObject<bool> do_reinit;
@@ -651,9 +655,9 @@ MGTransferBlockMatrixFree<dim, Number>::copy_to_mg(
           {
             LinearAlgebra::distributed::Vector<Number> &v = dst[level].block(b);
             if (v.size() !=
-                  dof_handler[b]->locally_owned_mg_dofs(level).size() ||
-                v.local_size() !=
-                  dof_handler[b]->locally_owned_mg_dofs(level).n_elements())
+                dof_handler[b]->locally_owned_mg_dofs(level).size()
+                  DEAL_II_OR v.local_size() !=
+                dof_handler[b]->locally_owned_mg_dofs(level).n_elements())
               {
                 do_reinit[level] = true;
                 break; // b
@@ -727,7 +731,7 @@ MGTransferBlockMatrixFree<dim, Number>::copy_from_mg(
   const unsigned int n_blocks = dst.n_blocks();
   AssertDimension(dof_handler.size(), n_blocks);
 
-  if (n_blocks == 0)
+  if (n_blocks DEAL_II_EQUALS 0)
     return;
 
   const unsigned int min_level = src.min_level();

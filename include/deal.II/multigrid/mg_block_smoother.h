@@ -224,7 +224,7 @@ MGSmootherBlock<MatrixType, RelaxationType, number>::smooth(
   d->reinit(u);
 
   bool T = this->transpose;
-  if (this->symmetric && (steps2 % 2 == 0))
+  if (this->symmetric DEAL_II_AND(steps2 % 2 DEAL_II_EQUALS 0))
     T = false;
 
   for (unsigned int i = 0; i < steps2; ++i)

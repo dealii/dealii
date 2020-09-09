@@ -128,7 +128,7 @@ AutoDerivativeFunction<dim>::vector_gradient(
   const Point<dim> &           p,
   std::vector<Tensor<1, dim>> &gradients) const
 {
-  Assert(gradients.size() == this->n_components,
+  Assert(gradients.size() DEAL_II_EQUALS this->n_components,
          ExcDimensionMismatch(gradients.size(), this->n_components));
 
   switch (formula)
@@ -206,7 +206,7 @@ AutoDerivativeFunction<dim>::gradient_list(
   std::vector<Tensor<1, dim>> &  gradients,
   const unsigned int             comp) const
 {
-  Assert(gradients.size() == points.size(),
+  Assert(gradients.size() DEAL_II_EQUALS points.size(),
          ExcDimensionMismatch(gradients.size(), points.size()));
 
   switch (formula)
@@ -269,10 +269,10 @@ AutoDerivativeFunction<dim>::vector_gradient_list(
   const std::vector<Point<dim>> &           points,
   std::vector<std::vector<Tensor<1, dim>>> &gradients) const
 {
-  Assert(gradients.size() == points.size(),
+  Assert(gradients.size() DEAL_II_EQUALS points.size(),
          ExcDimensionMismatch(gradients.size(), points.size()));
   for (unsigned int p = 0; p < points.size(); ++p)
-    Assert(gradients[p].size() == this->n_components,
+    Assert(gradients[p].size() DEAL_II_EQUALS this->n_components,
            ExcDimensionMismatch(gradients.size(), this->n_components));
 
   switch (formula)

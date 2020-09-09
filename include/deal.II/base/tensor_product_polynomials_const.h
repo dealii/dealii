@@ -68,7 +68,7 @@ public:
 
   /**
    * Set the ordering of the polynomials. Requires
-   * <tt>renumber.size()==tensor_polys.n()</tt>.  Stores a copy of
+   * <tt>renumber.size()DEAL_II_EQUALS tensor_polys.n()</tt>.  Stores a copy of
    * <tt>renumber</tt>.
    */
   void
@@ -115,8 +115,8 @@ public:
    * polynomials is not efficient, because then each point value of the
    * underlying (one-dimensional) polynomials is (unnecessarily) computed
    * several times.  Instead use the evaluate() function with
-   * <tt>values.size()==</tt>n() to get the point values of all tensor
-   * polynomials all at once and in a much more efficient way.
+   * <tt>values.size()DEAL_II_EQUALS </tt>n() to get the point values of all
+   * tensor polynomials all at once and in a much more efficient way.
    */
   double
   compute_value(const unsigned int i, const Point<dim> &p) const override;
@@ -176,8 +176,8 @@ public:
    * polynomials is not efficient, because then each derivative value of the
    * underlying (one-dimensional) polynomials is (unnecessarily) computed
    * several times.  Instead use the evaluate() function, see above, with
-   * <tt>grads.size()==</tt>n() to get the point value of all tensor
-   * polynomials all at once and in a much more efficient way.
+   * <tt>grads.size()DEAL_II_EQUALS </tt>n() to get the point value of all
+   * tensor polynomials all at once and in a much more efficient way.
    */
   Tensor<1, dim>
   compute_grad(const unsigned int i, const Point<dim> &p) const override;
@@ -191,8 +191,8 @@ public:
    * polynomials is not efficient, because then each derivative value of the
    * underlying (one-dimensional) polynomials is (unnecessarily) computed
    * several times.  Instead use the evaluate() function, see above, with
-   * <tt>grad_grads.size()==</tt>n() to get the point value of all tensor
-   * polynomials all at once and in a much more efficient way.
+   * <tt>grad_grads.size()DEAL_II_EQUALS </tt>n() to get the point value of all
+   * tensor polynomials all at once and in a much more efficient way.
    */
   Tensor<2, dim>
   compute_grad_grad(const unsigned int i, const Point<dim> &p) const override;

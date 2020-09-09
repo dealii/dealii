@@ -179,15 +179,20 @@ namespace internal
       // n_rows * n_columns entries or for the apply_face() path that only has
       // n_rows * 3 entries in the array. Since we cannot decide about the use
       // we must allow for both here.
-      Assert(shape_values.size() == 0 ||
-               shape_values.size() == n_rows * n_columns ||
-               shape_values.size() == 3 * n_rows,
+      Assert(shape_values.size() DEAL_II_EQUALS 0 DEAL_II_OR shape_values.size()
+                 DEAL_II_EQUALS                              n_rows *
+               n_columns DEAL_II_OR shape_values.size() DEAL_II_EQUALS 3 *
+               n_rows,
              ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-      Assert(shape_gradients.size() == 0 ||
-               shape_gradients.size() == n_rows * n_columns,
+      Assert(shape_gradients.size()
+                 DEAL_II_EQUALS 0 DEAL_II_OR shape_gradients.size()
+                   DEAL_II_EQUALS            n_rows *
+               n_columns,
              ExcDimensionMismatch(shape_gradients.size(), n_rows * n_columns));
-      Assert(shape_hessians.size() == 0 ||
-               shape_hessians.size() == n_rows * n_columns,
+      Assert(shape_hessians.size()
+                 DEAL_II_EQUALS 0 DEAL_II_OR shape_hessians.size()
+                   DEAL_II_EQUALS            n_rows *
+               n_columns,
              ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
       (void)dummy1;
       (void)dummy2;
@@ -242,7 +247,8 @@ namespace internal
      * This function applies the tensor product kernel, corresponding to a
      * multiplication of 1D stripes, along the given @p direction of the tensor
      * data in the input array. This function allows the @p in and @p out
-     * arrays to alias for the case n_rows == n_columns, i.e., it is safe to
+     * arrays to alias for the case n_rows DEAL_II_EQUALS  n_columns, i.e., it
+     * is safe to
      * perform the contraction in place where @p in and @p out point to the
      * same address. For the case n_rows != n_columns, the output is in general
      * not correct.
@@ -287,8 +293,8 @@ namespace internal
      *                            data from n_rows^(dim-1) points is expanded
      *                            into the n_rows^dim points of the higher-
      *                            dimensional data array. Derivatives in the
-     *                            case contract_onto_face==false are summed
-     *                            together
+     *                            case contract_onto_faceDEAL_II_EQUALS false
+     * are summed together
      * @tparam add If true, the result is added to the output vector, else
      *             the computed values overwrite the content in the output
      * @tparam max_derivative Sets the number of derivatives that should be
@@ -338,15 +344,19 @@ namespace internal
                                          const Number * in,
                                          Number *       out)
   {
-    static_assert(one_line == false || direction == dim - 1,
-                  "Single-line evaluation only works for direction=dim-1.");
+    static_assert(
+      one_line DEAL_II_EQUALS false DEAL_II_OR direction DEAL_II_EQUALS dim - 1,
+      "Single-line evaluation only works for direction=dim-1.");
     Assert(shape_data != nullptr,
            ExcMessage(
              "The given array shape_data must not be the null pointer!"));
-    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns ||
-             in != out,
-           ExcMessage("In-place operation only supported for "
-                      "n_rows==n_columns or single-line interpolation"));
+    Assert(dim DEAL_II_EQUALS direction +
+               1 DEAL_II_OR one_line DEAL_II_EQUALS true DEAL_II_OR n_rows
+                 DEAL_II_EQUALS n_columns DEAL_II_OR in !=
+             out,
+           ExcMessage(
+             "In-place operation only supported for "
+             "n_rowsDEAL_II_EQUALS n_columns or single-line interpolation"));
     AssertIndexRange(direction, dim);
     constexpr int mm = contract_over_rows ? n_rows : n_columns,
                   nn = contract_over_rows ? n_columns : n_rows;
@@ -366,32 +376,32 @@ namespace internal
             for (int col = 0; col < nn; ++col)
               {
                 Number2 val0;
-                if (contract_over_rows == true)
+                if (contract_over_rows DEAL_II_EQUALS true)
                   val0 = shape_data[col];
                 else
                   val0 = shape_data[col * n_columns];
                 Number res0 = val0 * x[0];
                 for (int i = 1; i < mm; ++i)
                   {
-                    if (contract_over_rows == true)
+                    if (contract_over_rows DEAL_II_EQUALS true)
                       val0 = shape_data[i * n_columns + col];
                     else
                       val0 = shape_data[col * n_columns + i];
                     res0 += val0 * x[i];
                   }
-                if (add == false)
+                if (add DEAL_II_EQUALS false)
                   out[stride * col] = res0;
                 else
                   out[stride * col] += res0;
               }
 
-            if (one_line == false)
+            if (one_line DEAL_II_EQUALS false)
               {
                 ++in;
                 ++out;
               }
           }
-        if (one_line == false)
+        if (one_line DEAL_II_EQUALS false)
           {
             in += stride * (mm - 1);
             out += stride * (nn - 1);
@@ -421,9 +431,9 @@ namespace internal
                                               Number *DEAL_II_RESTRICT
                                                       out) const
   {
-    Assert(dim > 0 && (lex_faces || dim < 4),
+    Assert(dim > 0 DEAL_II_AND(lex_faces DEAL_II_OR dim < 4),
            ExcMessage("Only dim=1,2,3 supported"));
-    static_assert(max_derivative >= 0 && max_derivative < 3,
+    static_assert(max_derivative >= 0 DEAL_II_AND max_derivative < 3,
                   "Only derivative orders 0-2 implemented");
     Assert(shape_values != nullptr,
            ExcMessage(
@@ -446,7 +456,7 @@ namespace internal
       {
         for (int i1 = 0; i1 < n_blocks1; ++i1)
           {
-            if (contract_onto_face == true)
+            if (contract_onto_face DEAL_II_EQUALS true)
               {
                 Number res0 = shape_values[0] * in[0];
                 Number res1, res2;
@@ -462,7 +472,7 @@ namespace internal
                     if (max_derivative > 1)
                       res2 += shape_values[ind + 2 * n_rows] * in[stride * ind];
                   }
-                if (add == false)
+                if (add DEAL_II_EQUALS false)
                   {
                     out[0] = res0;
                     if (max_derivative > 0)
@@ -483,7 +493,7 @@ namespace internal
               {
                 for (int col = 0; col < n_rows; ++col)
                   {
-                    if (add == false)
+                    if (add DEAL_II_EQUALS false)
                       out[col * stride] = shape_values[col] * in[0];
                     else
                       out[col * stride] += shape_values[col] * in[0];
@@ -517,7 +527,7 @@ namespace internal
                     // faces 2 and 3 in 3D use local coordinate system zx, which
                     // is the other way around compared to the tensor
                     // product. Need to take that into account.
-                    if (dim == 3)
+                    if (dim DEAL_II_EQUALS 3)
                       {
                         if (contract_onto_face)
                           out += n_rows - 1;
@@ -542,7 +552,8 @@ namespace internal
               out += (dealii::Utilities::pow(n_rows, face_direction + 1) -
                       n_blocks1);
           }
-        else if (face_direction == 1 && dim == 3)
+        else if (face_direction DEAL_II_EQUALS 1 DEAL_II_AND dim
+                                                             DEAL_II_EQUALS 3)
           {
             // adjust for local coordinate system zx
             if (contract_onto_face)
@@ -612,15 +623,20 @@ namespace internal
       // n_rows * n_columns entries or for the apply_face() path that only has
       // n_rows * 3 entries in the array. Since we cannot decide about the use
       // we must allow for both here.
-      Assert(shape_values.size() == 0 ||
-               shape_values.size() == n_rows * n_columns ||
-               shape_values.size() == n_rows * 3,
+      Assert(shape_values.size() DEAL_II_EQUALS 0 DEAL_II_OR shape_values.size()
+                 DEAL_II_EQUALS                              n_rows *
+               n_columns DEAL_II_OR shape_values.size() DEAL_II_EQUALS n_rows *
+               3,
              ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-      Assert(shape_gradients.size() == 0 ||
-               shape_gradients.size() == n_rows * n_columns,
+      Assert(shape_gradients.size()
+                 DEAL_II_EQUALS 0 DEAL_II_OR shape_gradients.size()
+                   DEAL_II_EQUALS            n_rows *
+               n_columns,
              ExcDimensionMismatch(shape_gradients.size(), n_rows * n_columns));
-      Assert(shape_hessians.size() == 0 ||
-               shape_hessians.size() == n_rows * n_columns,
+      Assert(shape_hessians.size()
+                 DEAL_II_EQUALS 0 DEAL_II_OR shape_hessians.size()
+                   DEAL_II_EQUALS            n_rows *
+               n_columns,
              ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
     }
 
@@ -704,21 +720,26 @@ namespace internal
     const Number *                  in,
     Number *                        out) const
   {
-    static_assert(one_line == false || direction == dim - 1,
-                  "Single-line evaluation only works for direction=dim-1.");
+    static_assert(
+      one_line DEAL_II_EQUALS false DEAL_II_OR direction DEAL_II_EQUALS dim - 1,
+      "Single-line evaluation only works for direction=dim-1.");
     Assert(shape_data != nullptr,
            ExcMessage(
              "The given array shape_data must not be the null pointer!"));
-    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns ||
-             in != out,
-           ExcMessage("In-place operation only supported for "
-                      "n_rows==n_columns or single-line interpolation"));
+    Assert(dim DEAL_II_EQUALS direction +
+               1 DEAL_II_OR one_line DEAL_II_EQUALS true DEAL_II_OR n_rows
+                 DEAL_II_EQUALS n_columns DEAL_II_OR in !=
+             out,
+           ExcMessage(
+             "In-place operation only supported for "
+             "n_rowsDEAL_II_EQUALS n_columns or single-line interpolation"));
     AssertIndexRange(direction, dim);
     const int mm = contract_over_rows ? n_rows : n_columns,
               nn = contract_over_rows ? n_columns : n_rows;
 
-    const int stride =
-      direction == 0 ? 1 : Utilities::fixed_power<direction>(n_columns);
+    const int stride = direction DEAL_II_EQUALS 0 ?
+                         1 :
+                         Utilities::fixed_power<direction>(n_columns);
     const int n_blocks1 = one_line ? 1 : stride;
     const int n_blocks2 = direction >= dim - 1 ?
                             1 :
@@ -730,7 +751,7 @@ namespace internal
     // templated one, but much better than the generic version down below,
     // because the loop over col can be more effectively unrolled by the
     // compiler)
-    if (contract_over_rows && n_rows == 2)
+    if (contract_over_rows DEAL_II_AND n_rows DEAL_II_EQUALS 2)
       {
         const Number2 *shape_data_1 = shape_data + n_columns;
         for (int i2 = 0; i2 < n_blocks2; ++i2)
@@ -742,19 +763,19 @@ namespace internal
                   {
                     const Number result =
                       shape_data[col] * x0 + shape_data_1[col] * x1;
-                    if (add == false)
+                    if (add DEAL_II_EQUALS false)
                       out[stride * col] = result;
                     else
                       out[stride * col] += result;
                   }
 
-                if (one_line == false)
+                if (one_line DEAL_II_EQUALS false)
                   {
                     ++in;
                     ++out;
                   }
               }
-            if (one_line == false)
+            if (one_line DEAL_II_EQUALS false)
               {
                 in += stride * (mm - 1);
                 out += stride * (nn - 1);
@@ -762,7 +783,7 @@ namespace internal
           }
       }
     // specialization for n = 3
-    else if (contract_over_rows && n_rows == 3)
+    else if (contract_over_rows DEAL_II_AND n_rows DEAL_II_EQUALS 3)
       {
         const Number2 *shape_data_1 = shape_data + n_columns;
         const Number2 *shape_data_2 = shape_data + 2 * n_columns;
@@ -776,19 +797,19 @@ namespace internal
                     const Number result = shape_data[col] * x0 +
                                           shape_data_1[col] * x1 +
                                           shape_data_2[col] * x2;
-                    if (add == false)
+                    if (add DEAL_II_EQUALS false)
                       out[stride * col] = result;
                     else
                       out[stride * col] += result;
                   }
 
-                if (one_line == false)
+                if (one_line DEAL_II_EQUALS false)
                   {
                     ++in;
                     ++out;
                   }
               }
-            if (one_line == false)
+            if (one_line DEAL_II_EQUALS false)
               {
                 in += stride * (mm - 1);
                 out += stride * (nn - 1);
@@ -807,32 +828,32 @@ namespace internal
               for (int col = 0; col < nn; ++col)
                 {
                   Number2 val0;
-                  if (contract_over_rows == true)
+                  if (contract_over_rows DEAL_II_EQUALS true)
                     val0 = shape_data[col];
                   else
                     val0 = shape_data[col * n_columns];
                   Number res0 = val0 * x[0];
                   for (int i = 1; i < mm; ++i)
                     {
-                      if (contract_over_rows == true)
+                      if (contract_over_rows DEAL_II_EQUALS true)
                         val0 = shape_data[i * n_columns + col];
                       else
                         val0 = shape_data[col * n_columns + i];
                       res0 += val0 * x[i];
                     }
-                  if (add == false)
+                  if (add DEAL_II_EQUALS false)
                     out[stride * col] = res0;
                   else
                     out[stride * col] += res0;
                 }
 
-              if (one_line == false)
+              if (one_line DEAL_II_EQUALS false)
                 {
                   ++in;
                   ++out;
                 }
             }
-          if (one_line == false)
+          if (one_line DEAL_II_EQUALS false)
             {
               in += stride * (mm - 1);
               out += stride * (nn - 1);
@@ -853,12 +874,12 @@ namespace internal
     apply_face(const Number *DEAL_II_RESTRICT in,
                Number *DEAL_II_RESTRICT out) const
   {
-    static_assert(lex_faces == false, "Not implemented yet.");
+    static_assert(lex_faces DEAL_II_EQUALS false, "Not implemented yet.");
 
     Assert(shape_values != nullptr,
            ExcMessage(
              "The given array shape_data must not be the null pointer!"));
-    static_assert(dim > 0 && dim < 4, "Only dim=1,2,3 supported");
+    static_assert(dim > 0 DEAL_II_AND dim < 4, "Only dim=1,2,3 supported");
     const int n_blocks1 = dim > 1 ? n_rows : 1;
     const int n_blocks2 = dim > 2 ? n_rows : 1;
 
@@ -872,7 +893,7 @@ namespace internal
       {
         for (int i1 = 0; i1 < n_blocks1; ++i1)
           {
-            if (contract_onto_face == true)
+            if (contract_onto_face DEAL_II_EQUALS true)
               {
                 Number res0 = shape_values[0] * in[0];
                 Number res1, res2;
@@ -888,7 +909,7 @@ namespace internal
                     if (max_derivative > 1)
                       res2 += shape_values[ind + 2 * n_rows] * in[stride * ind];
                   }
-                if (add == false)
+                if (add DEAL_II_EQUALS false)
                   {
                     out[0] = res0;
                     if (max_derivative > 0)
@@ -909,7 +930,7 @@ namespace internal
               {
                 for (unsigned int col = 0; col < n_rows; ++col)
                   {
-                    if (add == false)
+                    if (add DEAL_II_EQUALS false)
                       out[col * stride] = shape_values[col] * in[0];
                     else
                       out[col * stride] += shape_values[col] * in[0];
@@ -937,7 +958,7 @@ namespace internal
                   // faces 2 and 3 in 3D use local coordinate system zx, which
                   // is the other way around compared to the tensor
                   // product. Need to take that into account.
-                  if (dim == 3)
+                  if (dim DEAL_II_EQUALS 3)
                     {
                       if (contract_onto_face)
                         out += n_rows - 1;
@@ -953,7 +974,7 @@ namespace internal
                   Assert(false, ExcNotImplemented());
               }
           }
-        if (face_direction == 1 && dim == 3)
+        if (face_direction DEAL_II_EQUALS 1 DEAL_II_AND dim DEAL_II_EQUALS 3)
           {
             // adjust for local coordinate system zx
             if (contract_onto_face)
@@ -1021,14 +1042,19 @@ namespace internal
       , shape_gradients(shape_gradients.begin())
       , shape_hessians(shape_hessians.begin())
     {
-      Assert(shape_values.size() == 0 ||
-               shape_values.size() == n_rows * n_columns,
+      Assert(shape_values.size() DEAL_II_EQUALS 0 DEAL_II_OR shape_values.size()
+                 DEAL_II_EQUALS                              n_rows *
+               n_columns,
              ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-      Assert(shape_gradients.size() == 0 ||
-               shape_gradients.size() == n_rows * n_columns,
+      Assert(shape_gradients.size()
+                 DEAL_II_EQUALS 0 DEAL_II_OR shape_gradients.size()
+                   DEAL_II_EQUALS            n_rows *
+               n_columns,
              ExcDimensionMismatch(shape_gradients.size(), n_rows * n_columns));
-      Assert(shape_hessians.size() == 0 ||
-               shape_hessians.size() == n_rows * n_columns,
+      Assert(shape_hessians.size()
+                 DEAL_II_EQUALS 0 DEAL_II_OR shape_hessians.size()
+                   DEAL_II_EQUALS            n_rows *
+               n_columns,
              ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
       (void)dummy1;
       (void)dummy2;
@@ -1105,7 +1131,7 @@ namespace internal
               {
                 Number2 val0, val1;
                 Number  in0, in1, res0, res1;
-                if (contract_over_rows == true)
+                if (contract_over_rows DEAL_II_EQUALS true)
                   {
                     val0 = shape_values[col];
                     val1 = shape_values[nn - 1 - col];
@@ -1125,7 +1151,7 @@ namespace internal
                     res1 += val0 * in1;
                     for (int ind = 1; ind < mid; ++ind)
                       {
-                        if (contract_over_rows == true)
+                        if (contract_over_rows DEAL_II_EQUALS true)
                           {
                             val0 = shape_values[ind * n_columns + col];
                             val1 = shape_values[ind * n_columns + nn - 1 - col];
@@ -1146,9 +1172,9 @@ namespace internal
                   }
                 else
                   res0 = res1 = Number();
-                if (contract_over_rows == true)
+                if (contract_over_rows DEAL_II_EQUALS true)
                   {
-                    if (mm % 2 == 1)
+                    if (mm % 2 DEAL_II_EQUALS 1)
                       {
                         val0 = shape_values[mid * n_columns + col];
                         in1  = val0 * in[stride * mid];
@@ -1158,7 +1184,8 @@ namespace internal
                   }
                 else
                   {
-                    if (mm % 2 == 1 && nn % 2 == 0)
+                    if (mm % 2 DEAL_II_EQUALS 1 DEAL_II_AND nn %
+                        2 DEAL_II_EQUALS 0)
                       {
                         val0 = shape_values[col * n_columns + mid];
                         in1  = val0 * in[stride * mid];
@@ -1166,7 +1193,7 @@ namespace internal
                         res1 += in1;
                       }
                   }
-                if (add == false)
+                if (add DEAL_II_EQUALS false)
                   {
                     out[stride * col]            = res0;
                     out[stride * (nn - 1 - col)] = res1;
@@ -1177,14 +1204,16 @@ namespace internal
                     out[stride * (nn - 1 - col)] += res1;
                   }
               }
-            if (contract_over_rows == true && nn % 2 == 1 && mm % 2 == 1)
+            if (contract_over_rows DEAL_II_EQUALS true DEAL_II_AND nn %
+                2 DEAL_II_EQUALS 1 DEAL_II_AND mm % 2 DEAL_II_EQUALS 1)
               {
-                if (add == false)
+                if (add DEAL_II_EQUALS false)
                   out[stride * n_cols] = in[stride * mid];
                 else
                   out[stride * n_cols] += in[stride * mid];
               }
-            else if (contract_over_rows == true && nn % 2 == 1)
+            else if (contract_over_rows DEAL_II_EQUALS true DEAL_II_AND nn %
+                     2 DEAL_II_EQUALS 1)
               {
                 Number  res0;
                 Number2 val0 = shape_values[n_cols];
@@ -1200,12 +1229,13 @@ namespace internal
                   }
                 else
                   res0 = Number();
-                if (add == false)
+                if (add DEAL_II_EQUALS false)
                   out[stride * n_cols] = res0;
                 else
                   out[stride * n_cols] += res0;
               }
-            else if (contract_over_rows == false && nn % 2 == 1)
+            else if (contract_over_rows DEAL_II_EQUALS false DEAL_II_AND nn %
+                     2 DEAL_II_EQUALS 1)
               {
                 Number res0;
                 if (mid > 0)
@@ -1224,7 +1254,7 @@ namespace internal
                   }
                 else
                   res0 = in[0];
-                if (add == false)
+                if (add DEAL_II_EQUALS false)
                   out[stride * n_cols] = res0;
                 else
                   out[stride * n_cols] += res0;
@@ -1294,7 +1324,7 @@ namespace internal
               {
                 Number2 val0, val1;
                 Number  in0, in1, res0, res1;
-                if (contract_over_rows == true)
+                if (contract_over_rows DEAL_II_EQUALS true)
                   {
                     val0 = shape_gradients[col];
                     val1 = shape_gradients[nn - 1 - col];
@@ -1314,7 +1344,7 @@ namespace internal
                     res1 -= val0 * in1;
                     for (int ind = 1; ind < mid; ++ind)
                       {
-                        if (contract_over_rows == true)
+                        if (contract_over_rows DEAL_II_EQUALS true)
                           {
                             val0 = shape_gradients[ind * n_columns + col];
                             val1 =
@@ -1336,9 +1366,9 @@ namespace internal
                   }
                 else
                   res0 = res1 = Number();
-                if (mm % 2 == 1)
+                if (mm % 2 DEAL_II_EQUALS 1)
                   {
-                    if (contract_over_rows == true)
+                    if (contract_over_rows DEAL_II_EQUALS true)
                       val0 = shape_gradients[mid * n_columns + col];
                     else
                       val0 = shape_gradients[col * n_columns + mid];
@@ -1346,7 +1376,7 @@ namespace internal
                     res0 += in1;
                     res1 -= in1;
                   }
-                if (add == false)
+                if (add DEAL_II_EQUALS false)
                   {
                     out[stride * col]            = res0;
                     out[stride * (nn - 1 - col)] = res1;
@@ -1357,18 +1387,18 @@ namespace internal
                     out[stride * (nn - 1 - col)] += res1;
                   }
               }
-            if (nn % 2 == 1)
+            if (nn % 2 DEAL_II_EQUALS 1)
               {
                 Number2 val0;
                 Number  res0;
-                if (contract_over_rows == true)
+                if (contract_over_rows DEAL_II_EQUALS true)
                   val0 = shape_gradients[n_cols];
                 else
                   val0 = shape_gradients[n_cols * n_columns];
                 res0 = val0 * (in[0] - in[stride * (mm - 1)]);
                 for (int ind = 1; ind < mid; ++ind)
                   {
-                    if (contract_over_rows == true)
+                    if (contract_over_rows DEAL_II_EQUALS true)
                       val0 = shape_gradients[ind * n_columns + n_cols];
                     else
                       val0 = shape_gradients[n_cols * n_columns + ind];
@@ -1376,7 +1406,7 @@ namespace internal
                       val0 * (in[stride * ind] - in[stride * (mm - 1 - ind)]);
                     res0 += in1;
                   }
-                if (add == false)
+                if (add DEAL_II_EQUALS false)
                   out[stride * n_cols] = res0;
                 else
                   out[stride * n_cols] += res0;
@@ -1430,7 +1460,7 @@ namespace internal
               {
                 Number2 val0, val1;
                 Number  in0, in1, res0, res1;
-                if (contract_over_rows == true)
+                if (contract_over_rows DEAL_II_EQUALS true)
                   {
                     val0 = shape_hessians[col];
                     val1 = shape_hessians[nn - 1 - col];
@@ -1450,7 +1480,7 @@ namespace internal
                     res1 += val0 * in1;
                     for (int ind = 1; ind < mid; ++ind)
                       {
-                        if (contract_over_rows == true)
+                        if (contract_over_rows DEAL_II_EQUALS true)
                           {
                             val0 = shape_hessians[ind * n_columns + col];
                             val1 =
@@ -1472,9 +1502,9 @@ namespace internal
                   }
                 else
                   res0 = res1 = Number();
-                if (mm % 2 == 1)
+                if (mm % 2 DEAL_II_EQUALS 1)
                   {
-                    if (contract_over_rows == true)
+                    if (contract_over_rows DEAL_II_EQUALS true)
                       val0 = shape_hessians[mid * n_columns + col];
                     else
                       val0 = shape_hessians[col * n_columns + mid];
@@ -1482,7 +1512,7 @@ namespace internal
                     res0 += in1;
                     res1 += in1;
                   }
-                if (add == false)
+                if (add DEAL_II_EQUALS false)
                   {
                     out[stride * col]            = res0;
                     out[stride * (nn - 1 - col)] = res1;
@@ -1493,11 +1523,11 @@ namespace internal
                     out[stride * (nn - 1 - col)] += res1;
                   }
               }
-            if (nn % 2 == 1)
+            if (nn % 2 DEAL_II_EQUALS 1)
               {
                 Number2 val0;
                 Number  res0;
-                if (contract_over_rows == true)
+                if (contract_over_rows DEAL_II_EQUALS true)
                   val0 = shape_hessians[n_cols];
                 else
                   val0 = shape_hessians[n_cols * n_columns];
@@ -1506,7 +1536,7 @@ namespace internal
                     res0 = val0 * (in[0] + in[stride * (mm - 1)]);
                     for (int ind = 1; ind < mid; ++ind)
                       {
-                        if (contract_over_rows == true)
+                        if (contract_over_rows DEAL_II_EQUALS true)
                           val0 = shape_hessians[ind * n_columns + n_cols];
                         else
                           val0 = shape_hessians[n_cols * n_columns + ind];
@@ -1517,15 +1547,15 @@ namespace internal
                   }
                 else
                   res0 = Number();
-                if (mm % 2 == 1)
+                if (mm % 2 DEAL_II_EQUALS 1)
                   {
-                    if (contract_over_rows == true)
+                    if (contract_over_rows DEAL_II_EQUALS true)
                       val0 = shape_hessians[mid * n_columns + n_cols];
                     else
                       val0 = shape_hessians[n_cols * n_columns + mid];
                     res0 += val0 * in[stride * mid];
                   }
-                if (add == false)
+                if (add DEAL_II_EQUALS false)
                   out[stride * n_cols] = res0;
                 else
                   out[stride * n_cols] += res0;
@@ -1693,7 +1723,8 @@ namespace internal
      * This function applies the tensor product kernel, corresponding to a
      * multiplication of 1D stripes, along the given @p direction of the tensor
      * data in the input array. This function allows the @p in and @p out
-     * arrays to alias for the case n_rows == n_columns, i.e., it is safe to
+     * arrays to alias for the case n_rows DEAL_II_EQUALS  n_columns, i.e., it
+     * is safe to
      * perform the contraction in place where @p in and @p out point to the
      * same address. For the case n_rows != n_columns, the output is only
      * correct if @p one_line is set to true.
@@ -1755,12 +1786,16 @@ namespace internal
                                          Number *                        out)
   {
     static_assert(type < 3, "Only three variants type=0,1,2 implemented");
-    static_assert(one_line == false || direction == dim - 1,
-                  "Single-line evaluation only works for direction=dim-1.");
-    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns ||
-             in != out,
-           ExcMessage("In-place operation only supported for "
-                      "n_rows==n_columns or single-line interpolation"));
+    static_assert(
+      one_line DEAL_II_EQUALS false DEAL_II_OR direction DEAL_II_EQUALS dim - 1,
+      "Single-line evaluation only works for direction=dim-1.");
+    Assert(dim DEAL_II_EQUALS direction +
+               1 DEAL_II_OR one_line DEAL_II_EQUALS true DEAL_II_OR n_rows
+                 DEAL_II_EQUALS n_columns DEAL_II_OR in !=
+             out,
+           ExcMessage(
+             "In-place operation only supported for "
+             "n_rowsDEAL_II_EQUALS n_columns or single-line interpolation"));
 
     // We cannot statically assert that direction is less than dim, so must do
     // an additional dynamic check
@@ -1789,7 +1824,8 @@ namespace internal
             Number xp[mid > 0 ? mid : 1], xm[mid > 0 ? mid : 1];
             for (int i = 0; i < mid; ++i)
               {
-                if (contract_over_rows == true && type == 1)
+                if (contract_over_rows DEAL_II_EQUALS true DEAL_II_AND type
+                                                                       DEAL_II_EQUALS 1)
                   {
                     xp[i] = in[stride * i] - in[stride * (mm - 1 - i)];
                     xm[i] = in[stride * i] + in[stride * (mm - 1 - i)];
@@ -1806,7 +1842,7 @@ namespace internal
                 Number r0, r1;
                 if (mid > 0)
                   {
-                    if (contract_over_rows == true)
+                    if (contract_over_rows DEAL_II_EQUALS true)
                       {
                         r0 = shapes[col] * xp[0];
                         r1 = shapes[(n_rows - 1) * offset + col] * xm[0];
@@ -1818,7 +1854,7 @@ namespace internal
                       }
                     for (int ind = 1; ind < mid; ++ind)
                       {
-                        if (contract_over_rows == true)
+                        if (contract_over_rows DEAL_II_EQUALS true)
                           {
                             r0 += shapes[ind * offset + col] * xp[ind];
                             r1 += shapes[(n_rows - 1 - ind) * offset + col] *
@@ -1834,20 +1870,24 @@ namespace internal
                   }
                 else
                   r0 = r1 = Number();
-                if (mm % 2 == 1 && contract_over_rows == true)
+                if (mm % 2 DEAL_II_EQUALS 1 DEAL_II_AND contract_over_rows
+                                                        DEAL_II_EQUALS true)
                   {
-                    if (type == 1)
+                    if (type DEAL_II_EQUALS 1)
                       r1 += shapes[mid * offset + col] * xmid;
                     else
                       r0 += shapes[mid * offset + col] * xmid;
                   }
-                else if (mm % 2 == 1 && (nn % 2 == 0 || type > 0 || mm == 3))
+                else if (mm % 2 DEAL_II_EQUALS 1 DEAL_II_AND(
+                                nn % 2 DEAL_II_EQUALS 0 DEAL_II_OR type >
+                                0 DEAL_II_OR mm DEAL_II_EQUALS 3))
                   r0 += shapes[col * offset + mid] * xmid;
 
-                if (add == false)
+                if (add DEAL_II_EQUALS false)
                   {
                     out[stride * col] = r0 + r1;
-                    if (type == 1 && contract_over_rows == false)
+                    if (type DEAL_II_EQUALS 1 DEAL_II_AND contract_over_rows
+                                                          DEAL_II_EQUALS false)
                       out[stride * (nn - 1 - col)] = r1 - r0;
                     else
                       out[stride * (nn - 1 - col)] = r0 - r1;
@@ -1855,21 +1895,26 @@ namespace internal
                 else
                   {
                     out[stride * col] += r0 + r1;
-                    if (type == 1 && contract_over_rows == false)
+                    if (type DEAL_II_EQUALS 1 DEAL_II_AND contract_over_rows
+                                                          DEAL_II_EQUALS false)
                       out[stride * (nn - 1 - col)] += r1 - r0;
                     else
                       out[stride * (nn - 1 - col)] += r0 - r1;
                   }
               }
-            if (type == 0 && contract_over_rows == true && nn % 2 == 1 &&
-                mm % 2 == 1 && mm > 3)
+            if (type DEAL_II_EQUALS 0 DEAL_II_AND contract_over_rows
+                    DEAL_II_EQUALS true DEAL_II_AND nn %
+                  2 DEAL_II_EQUALS 1 DEAL_II_AND    mm %
+                  2 DEAL_II_EQUALS 1 DEAL_II_AND    mm >
+                3)
               {
-                if (add == false)
+                if (add DEAL_II_EQUALS false)
                   out[stride * n_cols] = shapes[mid * offset + n_cols] * xmid;
                 else
                   out[stride * n_cols] += shapes[mid * offset + n_cols] * xmid;
               }
-            else if (contract_over_rows == true && nn % 2 == 1)
+            else if (contract_over_rows DEAL_II_EQUALS true DEAL_II_AND nn %
+                     2 DEAL_II_EQUALS 1)
               {
                 Number r0;
                 if (mid > 0)
@@ -1880,20 +1925,21 @@ namespace internal
                   }
                 else
                   r0 = Number();
-                if (type != 1 && mm % 2 == 1)
+                if (type != 1 DEAL_II_AND mm % 2 DEAL_II_EQUALS 1)
                   r0 += shapes[mid * offset + n_cols] * xmid;
 
-                if (add == false)
+                if (add DEAL_II_EQUALS false)
                   out[stride * n_cols] = r0;
                 else
                   out[stride * n_cols] += r0;
               }
-            else if (contract_over_rows == false && nn % 2 == 1)
+            else if (contract_over_rows DEAL_II_EQUALS false DEAL_II_AND nn %
+                     2 DEAL_II_EQUALS 1)
               {
                 Number r0;
                 if (mid > 0)
                   {
-                    if (type == 1)
+                    if (type DEAL_II_EQUALS 1)
                       {
                         r0 = shapes[n_cols * offset] * xm[0];
                         for (int ind = 1; ind < mid; ++ind)
@@ -1909,21 +1955,23 @@ namespace internal
                 else
                   r0 = Number();
 
-                if ((type == 0 || type == 2) && mm % 2 == 1)
+                if ((type DEAL_II_EQUALS 0 DEAL_II_OR type DEAL_II_EQUALS 2)
+                      DEAL_II_AND mm %
+                    2 DEAL_II_EQUALS 1)
                   r0 += shapes[n_cols * offset + mid] * xmid;
 
-                if (add == false)
+                if (add DEAL_II_EQUALS false)
                   out[stride * n_cols] = r0;
                 else
                   out[stride * n_cols] += r0;
               }
-            if (one_line == false)
+            if (one_line DEAL_II_EQUALS false)
               {
                 in += 1;
                 out += 1;
               }
           }
-        if (one_line == false)
+        if (one_line DEAL_II_EQUALS false)
           {
             in += stride * (mm - 1);
             out += stride * (nn - 1);
@@ -2072,7 +2120,8 @@ namespace internal
      * This function applies the tensor product kernel, corresponding to a
      * multiplication of 1D stripes, along the given @p direction of the tensor
      * data in the input array. This function allows the @p in and @p out
-     * arrays to alias for the case n_rows == n_columns, i.e., it is safe to
+     * arrays to alias for the case n_rows DEAL_II_EQUALS  n_columns, i.e., it
+     * is safe to
      * perform the contraction in place where @p in and @p out point to the
      * same address. For the case n_rows != n_columns, the output is only
      * correct if @p one_line is set to true.
@@ -2132,15 +2181,19 @@ namespace internal
                                          const Number *                  in,
                                          Number *                        out)
   {
-    static_assert(one_line == false || direction == dim - 1,
-                  "Single-line evaluation only works for direction=dim-1.");
     static_assert(
-      type == 0 || type == 1,
+      one_line DEAL_II_EQUALS false DEAL_II_OR direction DEAL_II_EQUALS dim - 1,
+      "Single-line evaluation only works for direction=dim-1.");
+    static_assert(
+      type DEAL_II_EQUALS 0 DEAL_II_OR type DEAL_II_EQUALS 1,
       "Only types 0 and 1 implemented for evaluate_symmetric_hierarchical.");
-    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns ||
-             in != out,
-           ExcMessage("In-place operation only supported for "
-                      "n_rows==n_columns or single-line interpolation"));
+    Assert(dim DEAL_II_EQUALS direction +
+               1 DEAL_II_OR one_line DEAL_II_EQUALS true DEAL_II_OR n_rows
+                 DEAL_II_EQUALS n_columns DEAL_II_OR in !=
+             out,
+           ExcMessage(
+             "In-place operation only supported for "
+             "n_rowsDEAL_II_EQUALS n_columns or single-line interpolation"));
 
     // We cannot statically assert that direction is less than dim, so must do
     // an additional dynamic check
@@ -2186,12 +2239,12 @@ namespace internal
                       }
                     else
                       r0 = r1 = Number();
-                    if (mm % 2 == 1)
+                    if (mm % 2 DEAL_II_EQUALS 1)
                       r0 += shapes[col + (mm - 1) * n_columns] * x[mm - 1];
-                    if (add == false)
+                    if (add DEAL_II_EQUALS false)
                       {
                         out[stride * col] = r0 + r1;
-                        if (type == 1)
+                        if (type DEAL_II_EQUALS 1)
                           out[stride * (nn - 1 - col)] = r1 - r0;
                         else
                           out[stride * (nn - 1 - col)] = r0 - r1;
@@ -2199,16 +2252,16 @@ namespace internal
                     else
                       {
                         out[stride * col] += r0 + r1;
-                        if (type == 1)
+                        if (type DEAL_II_EQUALS 1)
                           out[stride * (nn - 1 - col)] += r1 - r0;
                         else
                           out[stride * (nn - 1 - col)] += r0 - r1;
                       }
                   }
-                if (nn % 2 == 1)
+                if (nn % 2 DEAL_II_EQUALS 1)
                   {
                     Number             r0;
-                    const unsigned int shift = type == 1 ? 1 : 0;
+                    const unsigned int shift = type DEAL_II_EQUALS 1 ? 1 : 0;
                     if (mid > 0)
                       {
                         r0 = shapes[n_cols + shift * n_columns] * x[shift];
@@ -2218,9 +2271,9 @@ namespace internal
                       }
                     else
                       r0 = 0;
-                    if (type != 1 && mm % 2 == 1)
+                    if (type != 1 DEAL_II_AND mm % 2 DEAL_II_EQUALS 1)
                       r0 += shapes[n_cols + (mm - 1) * n_columns] * x[mm - 1];
-                    if (add == false)
+                    if (add DEAL_II_EQUALS false)
                       out[stride * n_cols] = r0;
                     else
                       out[stride * n_cols] += r0;
@@ -2230,7 +2283,7 @@ namespace internal
               {
                 Number xp[mid + 1], xm[mid > 0 ? mid : 1];
                 for (int i = 0; i < mid; ++i)
-                  if (type == 0)
+                  if (type DEAL_II_EQUALS 0)
                     {
                       xp[i] = in[stride * i] + in[stride * (mm - 1 - i)];
                       xm[i] = in[stride * i] - in[stride * (mm - 1 - i)];
@@ -2240,7 +2293,7 @@ namespace internal
                       xp[i] = in[stride * i] - in[stride * (mm - 1 - i)];
                       xm[i] = in[stride * i] + in[stride * (mm - 1 - i)];
                     }
-                if (mm % 2 == 1)
+                if (mm % 2 DEAL_II_EQUALS 1)
                   xp[mid] = in[stride * mid];
                 for (unsigned int col = 0; col < n_cols; ++col)
                   {
@@ -2258,15 +2311,15 @@ namespace internal
                       }
                     else
                       r0 = r1 = Number();
-                    if (mm % 2 == 1)
+                    if (mm % 2 DEAL_II_EQUALS 1)
                       {
-                        if (type == 1)
+                        if (type DEAL_II_EQUALS 1)
                           r1 +=
                             shapes[(2 * col + 1) * n_columns + mid] * xp[mid];
                         else
                           r0 += shapes[2 * col * n_columns + mid] * xp[mid];
                       }
-                    if (add == false)
+                    if (add DEAL_II_EQUALS false)
                       {
                         out[stride * (2 * col)]     = r0;
                         out[stride * (2 * col + 1)] = r1;
@@ -2277,7 +2330,7 @@ namespace internal
                         out[stride * (2 * col + 1)] += r1;
                       }
                   }
-                if (nn % 2 == 1)
+                if (nn % 2 DEAL_II_EQUALS 1)
                   {
                     Number r0;
                     if (mid > 0)
@@ -2288,21 +2341,22 @@ namespace internal
                       }
                     else
                       r0 = Number();
-                    if (mm % 2 == 1 && type == 0)
+                    if (mm %
+                        2 DEAL_II_EQUALS 1 DEAL_II_AND type DEAL_II_EQUALS 0)
                       r0 += shapes[(nn - 1) * n_columns + mid] * xp[mid];
-                    if (add == false)
+                    if (add DEAL_II_EQUALS false)
                       out[stride * (nn - 1)] = r0;
                     else
                       out[stride * (nn - 1)] += r0;
                   }
               }
-            if (one_line == false)
+            if (one_line DEAL_II_EQUALS false)
               {
                 in += 1;
                 out += 1;
               }
           }
-        if (one_line == false)
+        if (one_line DEAL_II_EQUALS false)
           {
             in += stride * (mm - 1);
             out += stride * (nn - 1);

@@ -116,7 +116,7 @@ SolverRelaxation<VectorType>::solve(const MatrixType &    A,
 
   int iter = 0;
   // Main loop
-  for (; conv == SolverControl::iterate; iter++)
+  for (; conv DEAL_II_EQUALS SolverControl::iterate; iter++)
     {
       // Compute residual
       A.vmult(r, x);
@@ -134,7 +134,7 @@ SolverRelaxation<VectorType>::solve(const MatrixType &    A,
     }
 
   // in case of failure: throw exception
-  AssertThrow(conv == SolverControl::success,
+  AssertThrow(conv DEAL_II_EQUALS SolverControl::success,
               SolverControl::NoConvergence(iter, r.l2_norm()));
   // otherwise exit as normal
 }

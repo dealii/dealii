@@ -28,13 +28,13 @@ DEAL_II_NAMESPACE_OPEN
 
 // please note: for a given dimension, we need the quadrature formulae
 // for all lower dimensions as well. That is why in this file the check
-// is for deal_II_dimension >= any_number and not for ==
+// is for deal_II_dimension >= any_number and not for DEAL_II_EQUALS
 
 
 
 template <>
 QGauss<0>::QGauss(const unsigned int)
-  : // there are n_q^dim == 1
+  : // there are n_q^dim DEAL_II_EQUALS  1
     // points
   Quadrature<0>(1)
 {
@@ -47,7 +47,7 @@ QGauss<0>::QGauss(const unsigned int)
 
 template <>
 QGaussLobatto<0>::QGaussLobatto(const unsigned int)
-  : // there are n_q^dim == 1
+  : // there are n_q^dim DEAL_II_EQUALS  1
     // points
   Quadrature<0>(1)
 {
@@ -62,7 +62,7 @@ template <>
 QGauss<1>::QGauss(const unsigned int n)
   : Quadrature<1>(n)
 {
-  if (n == 0)
+  if (n DEAL_II_EQUALS 0)
     return;
 
   std::vector<long double> points =
@@ -530,8 +530,13 @@ QGaussLogR<1>::QGaussLogR(const unsigned int n,
                           const double       alpha,
                           const bool         factor_out_singularity)
   : Quadrature<1>(
-      ((origin[0] == 0) || (origin[0] == 1)) ? (alpha == 1 ? n : 2 * n) : 4 * n)
-  , fraction(((origin[0] == 0) || (origin[0] == 1.)) ? 1. : origin[0])
+      ((origin[0] DEAL_II_EQUALS 0)DEAL_II_OR(origin[0] DEAL_II_EQUALS 1)) ?
+        (alpha DEAL_II_EQUALS 1 ? n : 2 * n) :
+        4 * n)
+  , fraction(
+      ((origin[0] DEAL_II_EQUALS 0)DEAL_II_OR(origin[0] DEAL_II_EQUALS 1.)) ?
+        1. :
+        origin[0])
 {
   // The three quadrature formulas that make this one up. There are
   // at most two when the origin is one of the extremes, and there is
@@ -551,12 +556,12 @@ QGaussLogR<1>::QGaussLogR(const unsigned int n,
   QGauss<1>    quad(n);
 
   // Check that the origin is inside 0,1
-  Assert((fraction >= 0) && (fraction <= 1),
+  Assert((fraction >= 0) DEAL_II_AND(fraction <= 1),
          ExcMessage("Origin is outside [0,1]."));
 
   // Non singular offset. This is the start of non singular quad
   // points.
-  unsigned int ns_offset = (fraction == 1) ? n : 2 * n;
+  unsigned int ns_offset = (fraction DEAL_II_EQUALS 1) ? n : 2 * n;
 
   for (unsigned int i = 0, j = ns_offset; i < n; ++i, ++j)
     {
@@ -566,7 +571,7 @@ QGaussLogR<1>::QGaussLogR(const unsigned int n,
       this->weights[i]           = quad1.weight(i) * fraction;
 
       // We need to scale with -log|fraction*alpha|
-      if ((alpha != 1) || (fraction != 1))
+      if ((alpha != 1) DEAL_II_OR(fraction != 1))
         {
           this->quadrature_points[j] = quad.point(i) * fraction;
           this->weights[j] =
@@ -586,7 +591,7 @@ QGaussLogR<1>::QGaussLogR(const unsigned int n,
             -std::log(alpha / (1 - fraction)) * quad.weight(i) * (1 - fraction);
         }
     }
-  if (factor_out_singularity == true)
+  if (factor_out_singularity DEAL_II_EQUALS true)
     for (unsigned int i = 0; i < size(); ++i)
       {
         Assert(
@@ -608,16 +613,14 @@ template <>
 unsigned int
 QGaussOneOverR<2>::quad_size(const Point<2> singularity, const unsigned int n)
 {
-  const double eps = 1e-8;
-  const bool   on_edge =
-    std::any_of(singularity.begin_raw(),
-                singularity.end_raw(),
-                [eps](double coord) {
-                  return std::abs(coord) < eps || std::abs(coord - 1.) < eps;
-                });
+  const double eps     = 1e-8;
+  const bool   on_edge = std::any_of(
+    singularity.begin_raw(), singularity.end_raw(), [eps](double coord) {
+      return std::abs(coord) < eps DEAL_II_OR std::abs(coord - 1.) < eps;
+    });
   const bool on_vertex =
-    on_edge &&
-    std::abs((singularity - Point<2>(.5, .5)).norm_square() - .5) < eps;
+    on_edge DEAL_II_AND std::abs(
+      (singularity - Point<2>(.5, .5)).norm_square() - .5) < eps;
   if (on_vertex)
     return 2 * n * n;
   else if (on_edge)
@@ -693,7 +696,7 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
   // element.
   QGauss<2> gauss(n);
 
-  Assert(gauss.size() == n * n, ExcInternalError());
+  Assert(gauss.size() DEAL_II_EQUALS n * n, ExcInternalError());
 
   // For the moment we only implemented this for the vertices of a
   // quadrilateral. We are planning to do this also for the support
@@ -856,14 +859,14 @@ QWeddle<dim>::QWeddle()
 template <int dim>
 QTelles<dim>::QTelles(const Quadrature<1> &base_quad,
                       const Point<dim> &   singularity)
-  : // We need the explicit implementation if dim == 1. If dim > 1 we use the
-    // former implementation and apply a tensorial product to obtain the higher
-    // dimensions.
+  : // We need the explicit implementation if dim DEAL_II_EQUALS  1. If dim > 1
+    // we use the former implementation and apply a tensorial product to obtain
+    // the higher dimensions.
   Quadrature<dim>(
-    dim == 2 ?
+    dim DEAL_II_EQUALS 2 ?
       QAnisotropic<dim>(QTelles<1>(base_quad, Point<1>(singularity[0])),
                         QTelles<1>(base_quad, Point<1>(singularity[1]))) :
-      dim == 3 ?
+      dim DEAL_II_EQUALS 3 ?
       QAnisotropic<dim>(QTelles<1>(base_quad, Point<1>(singularity[0])),
                         QTelles<1>(base_quad, Point<1>(singularity[1])),
                         QTelles<1>(base_quad, Point<1>(singularity[2]))) :
@@ -881,7 +884,8 @@ QTelles<dim>::QTelles(const unsigned int n, const Point<dim> &singularity)
 
 template <>
 QTelles<1>::QTelles(const Quadrature<1> &base_quad, const Point<1> &singularity)
-  : // We explicitly implement the Telles' variable change if dim == 1.
+  : // We explicitly implement the Telles' variable change if dim DEAL_II_EQUALS
+    // 1.
   Quadrature<1>(base_quad)
 {
   // We define all the constants to be used in the implementation of
@@ -908,7 +912,7 @@ QTelles<1>::QTelles(const Quadrature<1> &base_quad, const Point<1> &singularity)
           cont = 1;
         }
     }
-  if (cont == 1)
+  if (cont DEAL_II_EQUALS 1)
     {
       quadrature_points.resize(quadrature_points_dummy.size() - 1);
       weights.resize(weights_dummy.size() - 1);
@@ -1082,10 +1086,11 @@ namespace internal
         {
           // same weights as on [-1,1]
           weights[i] = 2. * numbers::PI / double(2 * (n - 1) + 1.);
-          if (ep == ::dealii::QGaussRadauChebyshev<1>::left && i == 0)
+          if (ep DEAL_II_EQUALS ::dealii::QGaussRadauChebyshev<1>::left
+                DEAL_II_AND i DEAL_II_EQUALS 0)
             weights[i] /= 2.;
-          else if (ep == ::dealii::QGaussRadauChebyshev<1>::right &&
-                   i == (n - 1))
+          else if (ep DEAL_II_EQUALS ::dealii::QGaussRadauChebyshev<1>::right
+                     DEAL_II_AND i DEAL_II_EQUALS(n - 1))
             weights[i] /= 2.;
         }
 
@@ -1156,7 +1161,7 @@ namespace internal
         {
           // same weights as on [-1,1]
           weights[i] = numbers::PI / double((n - 1));
-          if (i == 0 || i == (n - 1))
+          if (i DEAL_II_EQUALS 0 DEAL_II_OR i DEAL_II_EQUALS(n - 1))
             weights[i] /= 2.;
         }
 

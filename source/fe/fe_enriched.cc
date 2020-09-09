@@ -78,14 +78,14 @@ namespace internal
             &)>>> &                                              functions)
       {
         AssertThrow(fes.size() > 0, ExcMessage("FEs size should be >=1"));
-        AssertThrow(fes.size() == multiplicities.size(),
+        AssertThrow(fes.size() DEAL_II_EQUALS multiplicities.size(),
                     ExcMessage(
                       "FEs and multiplicities should have the same size"));
 
-        AssertThrow(functions.size() == fes.size() - 1,
+        AssertThrow(functions.size() DEAL_II_EQUALS fes.size() - 1,
                     ExcDimensionMismatch(functions.size(), fes.size() - 1));
 
-        AssertThrow(multiplicities[0] == 1,
+        AssertThrow(multiplicities[0] DEAL_II_EQUALS 1,
                     ExcMessage("First multiplicity should be 1"));
 
         const unsigned int n_comp_base = fes[0]->n_components();
@@ -102,7 +102,7 @@ namespace internal
                   "Only dominating FE_Nothing can be used in FE_Enriched"));
 
             AssertThrow(
-              fes[fe]->n_components() == n_comp_base,
+              fes[fe]->n_components() DEAL_II_EQUALS n_comp_base,
               ExcMessage(
                 "All elements must have the same number of components"));
           }
@@ -121,7 +121,8 @@ namespace internal
       {
         // start from fe=1 as 0th is always non-enriched FE.
         for (unsigned int fe = 1; fe < fes.size(); fe++)
-          if (dynamic_cast<const FE_Nothing<dim> *>(fes[fe]) == nullptr)
+          if (dynamic_cast<const FE_Nothing<dim> *>(fes[fe])
+                DEAL_II_EQUALS nullptr)
             // this is not FE_Nothing => there will be enrichment
             return true;
 
@@ -206,7 +207,8 @@ FE_Enriched<dim, spacedim>::FE_Enriched(
   for (unsigned int fe = 1; fe < fes.size(); fe++)
     base_no_mult_local_enriched_dofs[fe].resize(multiplicities[fe]);
 
-  Assert(base_no_mult_local_enriched_dofs.size() == this->n_base_elements(),
+  Assert(base_no_mult_local_enriched_dofs.size()
+           DEAL_II_EQUALS this->n_base_elements(),
          ExcDimensionMismatch(base_no_mult_local_enriched_dofs.size(),
                               this->n_base_elements()));
 
@@ -216,7 +218,7 @@ FE_Enriched<dim, spacedim>::FE_Enriched(
     {
       const unsigned int base_no =
         this->system_to_base_table[system_index].first.first;
-      if (base_no == 0) // 0th is always non-enriched FE
+      if (base_no DEAL_II_EQUALS 0) // 0th is always non-enriched FE
         continue;
 
       const unsigned int base_m =
@@ -247,8 +249,9 @@ FE_Enriched<dim, spacedim>::FE_Enriched(
       for (unsigned int m = 0;
            m < base_no_mult_local_enriched_dofs[base_no].size();
            m++)
-        Assert(base_no_mult_local_enriched_dofs[base_no][m].size() ==
-                 fes[base_no]->n_dofs_per_cell(),
+        Assert(base_no_mult_local_enriched_dofs[base_no][m]
+                 .size() DEAL_II_EQUALS fes[base_no]
+                 ->n_dofs_per_cell(),
                ExcDimensionMismatch(
                  base_no_mult_local_enriched_dofs[base_no][m].size(),
                  fes[base_no]->n_dofs_per_cell()));
@@ -425,7 +428,7 @@ FE_Enriched<dim, spacedim>::initialize(
   const std::vector<const FiniteElement<dim, spacedim> *> &fes,
   const std::vector<unsigned int> &                        multiplicities)
 {
-  Assert(fes.size() == multiplicities.size(),
+  Assert(fes.size() DEAL_II_EQUALS multiplicities.size(),
          ExcDimensionMismatch(fes.size(), multiplicities.size()));
 
   // Note that we need to skip every fe with multiplicity 0 in the following
@@ -641,10 +644,11 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
   // fe_internal is needed to get update flags
   // finally, output_data should store all the results we need.
 
-  // Either dim_1==dim
-  // (fill_fe_values) or dim_1==dim-1
+  // Either dim_1DEAL_II_EQUALS dim
+  // (fill_fe_values) or dim_1DEAL_II_EQUALS dim-1
   // (fill_fe_(sub)face_values)
-  Assert(dim_1 == dim || dim_1 == dim - 1, ExcInternalError());
+  Assert(dim_1 DEAL_II_EQUALS dim DEAL_II_OR dim_1 DEAL_II_EQUALS dim - 1,
+         ExcInternalError());
   const UpdateFlags flags = fe_data.update_each;
 
   const unsigned int n_q_points = quadrature.size();
@@ -655,8 +659,9 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
   // being that we do it irrespectively of cell_similarity and use
   // base_fe_data.update_flags
 
-  // TODO: do we need it only for dim_1 == dim (i.e. fill_fe_values)?
-  if (dim_1 == dim)
+  // TODO: do we need it only for dim_1 DEAL_II_EQUALS  dim (i.e.
+  // fill_fe_values)?
+  if (dim_1 DEAL_II_EQUALS dim)
     for (unsigned int base_no = 1; base_no < this->n_base_elements(); base_no++)
       {
         const FiniteElement<dim, spacedim> &base_fe = base_element(base_no);
@@ -671,7 +676,8 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
         for (unsigned int system_index = 0;
              system_index < this->n_dofs_per_cell();
              ++system_index)
-          if (this->system_to_base_table[system_index].first.first == base_no)
+          if (this->system_to_base_table[system_index]
+                .first.first DEAL_II_EQUALS base_no)
             {
               const unsigned int base_index =
                 this->system_to_base_table[system_index].second;
@@ -692,9 +698,10 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
                 in_index += base_fe.n_nonzero_components(i);
 
               // then loop over the number of components to be copied
-              Assert(this->n_nonzero_components(system_index) ==
-                       base_fe.n_nonzero_components(base_index),
-                     ExcInternalError());
+              Assert(
+                this->n_nonzero_components(system_index)
+                  DEAL_II_EQUALS base_fe.n_nonzero_components(base_index),
+                ExcInternalError());
               for (unsigned int s = 0;
                    s < this->n_nonzero_components(system_index);
                    ++s)
@@ -717,15 +724,17 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
             }
       }
 
-  Assert(base_no_mult_local_enriched_dofs.size() == fe_data.enrichment.size(),
+  Assert(base_no_mult_local_enriched_dofs.size()
+           DEAL_II_EQUALS fe_data.enrichment.size(),
          ExcDimensionMismatch(base_no_mult_local_enriched_dofs.size(),
                               fe_data.enrichment.size()));
   // calculate hessians, gradients and values for each function
   for (unsigned int base_no = 1; base_no < this->n_base_elements(); base_no++)
     {
       Assert(
-        base_no_mult_local_enriched_dofs[base_no].size() ==
-          fe_data.enrichment[base_no].size(),
+        base_no_mult_local_enriched_dofs[base_no]
+          .size() DEAL_II_EQUALS fe_data.enrichment[base_no]
+          .size(),
         ExcDimensionMismatch(base_no_mult_local_enriched_dofs[base_no].size(),
                              fe_data.enrichment[base_no].size()));
       for (unsigned int m = 0;
@@ -735,21 +744,22 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
           // Avoid evaluating quadrature points if no dofs are assigned. This
           // happens when FE_Nothing is used together with other FE (i.e. FE_Q)
           // as enrichments.
-          if (base_no_mult_local_enriched_dofs[base_no][m].size() == 0)
+          if (base_no_mult_local_enriched_dofs[base_no][m].size()
+                DEAL_II_EQUALS 0)
             continue;
 
           Assert(enrichments[base_no - 1][m](cell) != nullptr,
                  ExcMessage(
                    "The pointer to the enrichment function is not set"));
 
-          Assert(enrichments[base_no - 1][m](cell)->n_components == 1,
-                 ExcMessage(
-                   "Only scalar-valued enrichment functions are allowed"));
+          Assert(
+            enrichments[base_no - 1][m](cell)->n_components DEAL_II_EQUALS 1,
+            ExcMessage("Only scalar-valued enrichment functions are allowed"));
 
           if (flags & update_hessians)
             {
-              Assert(fe_data.enrichment[base_no][m].hessians.size() ==
-                       n_q_points,
+              Assert(fe_data.enrichment[base_no][m].hessians.size()
+                       DEAL_II_EQUALS n_q_points,
                      ExcDimensionMismatch(
                        fe_data.enrichment[base_no][m].hessians.size(),
                        n_q_points));
@@ -761,8 +771,8 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
 
           if (flags & update_gradients)
             {
-              Assert(fe_data.enrichment[base_no][m].gradients.size() ==
-                       n_q_points,
+              Assert(fe_data.enrichment[base_no][m].gradients.size()
+                       DEAL_II_EQUALS n_q_points,
                      ExcDimensionMismatch(
                        fe_data.enrichment[base_no][m].gradients.size(),
                        n_q_points));
@@ -774,7 +784,8 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
 
           if (flags & update_values)
             {
-              Assert(fe_data.enrichment[base_no][m].values.size() == n_q_points,
+              Assert(fe_data.enrichment[base_no][m].values.size()
+                       DEAL_II_EQUALS n_q_points,
                      ExcDimensionMismatch(
                        fe_data.enrichment[base_no][m].values.size(),
                        n_q_points));
@@ -1091,15 +1102,15 @@ namespace ColorEnriched
 
       // Mark vertices that belong to cells in subdomain 1
       for (const auto &cell : dof_handler.active_cell_iterators())
-        if (predicate_1(cell)) // True ==> part of subdomain 1
+        if (predicate_1(cell)) // True DEAL_II_EQUALS > part of subdomain 1
           for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
             vertices_subdomain_1[cell->vertex_index(v)] = true;
 
       // Find if cells in subdomain 2 and subdomain 1 share vertices.
       for (const auto &cell : dof_handler.active_cell_iterators())
-        if (predicate_2(cell)) // True ==> part of subdomain 2
+        if (predicate_2(cell)) // True DEAL_II_EQUALS > part of subdomain 2
           for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
-            if (vertices_subdomain_1[cell->vertex_index(v)] == true)
+            if (vertices_subdomain_1[cell->vertex_index(v)] DEAL_II_EQUALS true)
               {
                 return true;
               }
@@ -1191,7 +1202,8 @@ namespace ColorEnriched
       unsigned int map_index = 0;
       for (const auto &cell : dof_handler.active_cell_iterators())
         {
-          // set default FE index ==> no enrichment and no active predicates
+          // set default FE index DEAL_II_EQUALS > no enrichment and no active
+          // predicates
           cell->set_active_fe_index(0);
 
           // Give each cell a unique id, which the cellwise_color_predicate_map
@@ -1224,7 +1236,7 @@ namespace ColorEnriched
                     std::pair<unsigned int, unsigned int>(predicate_colors[i],
                                                           i));
 
-                  AssertThrow(ret.second == 1,
+                  AssertThrow(ret.second DEAL_II_EQUALS 1,
                               ExcMessage(
                                 "Only one enrichment function per color"));
 
@@ -1250,7 +1262,7 @@ namespace ColorEnriched
               const auto it =
                 std::find(fe_sets.begin(), fe_sets.end(), color_list);
               // when entry is not found
-              if (it == fe_sets.end())
+              if (it DEAL_II_EQUALS fe_sets.end())
                 {
                   fe_sets.push_back(color_list);
                   cell->set_active_fe_index(fe_sets.size() - 1);
@@ -1313,8 +1325,8 @@ namespace ColorEnriched
               // neighboring cell is not already visited (to avoid visiting
               // same face twice). Note that the cells' material ids are
               // labeled according to their order in dof_handler previously.
-              if (!cell->at_boundary(face) &&
-                  cell->material_id() < cell->neighbor(face)->material_id())
+              if (!cell->at_boundary(face) DEAL_II_AND cell->material_id() <
+                  cell->neighbor(face)->material_id())
                 {
                   const auto nbr_fe_index =
                     cell->neighbor(face)->active_fe_index();
@@ -1338,7 +1350,7 @@ namespace ColorEnriched
                                                 fe_sets.end(),
                                                 intersection_set);
                       // add the set if it is not found
-                      if (it == fe_sets.end())
+                      if (it DEAL_II_EQUALS fe_sets.end())
                         {
                           fe_sets.push_back(intersection_set);
                         }

@@ -212,7 +212,7 @@ namespace VectorTools
     // function such that function(cell) is of type
     // Function<spacedim, typename VectorType::value_type>*
     //
-    // A given cell is skipped if function(cell) == nullptr
+    // A given cell is skipped if function(cell) DEAL_II_EQUALS  nullptr
     template <int dim, int spacedim, typename VectorType, typename T>
     void
     interpolate(const hp::MappingCollection<dim, spacedim> &mapping_collection,
@@ -228,7 +228,7 @@ namespace VectorTools
                "zero or equal to the number of components in the finite "
                "element."));
 
-      Assert(vec.size() == dof_handler.n_dofs(),
+      Assert(vec.size() DEAL_II_EQUALS dof_handler.n_dofs(),
              ExcDimensionMismatch(vec.size(), dof_handler.n_dofs()));
 
       Assert(component_mask.n_selected_components(
@@ -332,7 +332,7 @@ namespace VectorTools
           const unsigned int fe_index = cell->active_fe_index();
 
           // Do nothing if there are no local degrees of freedom.
-          if (fe[fe_index].n_dofs_per_cell() == 0)
+          if (fe[fe_index].n_dofs_per_cell() DEAL_II_EQUALS 0)
             continue;
 
           // Skip processing of the current cell if the function object is
@@ -362,7 +362,7 @@ namespace VectorTools
 
           // Get all function values:
           Assert(
-            n_components == function(cell)->n_components,
+            n_components DEAL_II_EQUALS function(cell)->n_components,
             ExcDimensionMismatch(dof_handler.get_fe_collection().n_components(),
                                  function(cell)->n_components));
           function(cell)->vector_value_list(generalized_support_points,
@@ -381,7 +381,7 @@ namespace VectorTools
                               fe_values,
                               function_values);
             (void)offset;
-            Assert(offset == n_components, ExcInternalError());
+            Assert(offset DEAL_II_EQUALS n_components, ExcInternalError());
           }
 
           FETools::convert_generalized_support_point_values_to_dof_values(
@@ -397,8 +397,8 @@ namespace VectorTools
               // one of the components (of the dof) is selected.
               bool selected = false;
               for (unsigned int c = 0; c < nonzero_components.size(); ++c)
-                selected =
-                  selected || (nonzero_components[c] && component_mask[c]);
+                selected = selected DEAL_II_OR(
+                  nonzero_components[c] DEAL_II_AND component_mask[c]);
 
               if (selected)
                 {
@@ -485,10 +485,11 @@ namespace VectorTools
     VectorType &                                               vec,
     const ComponentMask &                                      component_mask)
   {
-    Assert(dof_handler.get_fe_collection().n_components() ==
-             function.n_components,
-           ExcDimensionMismatch(dof_handler.get_fe_collection().n_components(),
-                                function.n_components));
+    Assert(
+      dof_handler.get_fe_collection().n_components()
+        DEAL_II_EQUALS function.n_components,
+      ExcDimensionMismatch(dof_handler.get_fe_collection().n_components(),
+                           function.n_components));
 
     // Create a small lambda capture wrapping function and call the
     // internal implementation
@@ -643,7 +644,7 @@ namespace VectorTools
           fe_to_real[i] = size++;
       }
     Assert(
-      size == spacedim,
+      size DEAL_II_EQUALS spacedim,
       ExcMessage(
         "The Component Mask you provided is invalid. It has to select exactly spacedim entries."));
 
@@ -697,9 +698,11 @@ namespace VectorTools
             {
               const unsigned int base_i =
                 fe_system->component_to_base_index(i).first;
-              Assert(degree == numbers::invalid_unsigned_int ||
-                       degree == fe_system->base_element(base_i).degree,
-                     ExcNotImplemented());
+              Assert(
+                degree DEAL_II_EQUALS numbers::invalid_unsigned_int DEAL_II_OR
+                  degree DEAL_II_EQUALS fe_system->base_element(base_i)
+                    .degree,
+                ExcNotImplemented());
               Assert(fe_system->base_element(base_i).is_primitive(),
                      ExcNotImplemented());
               degree = fe_system->base_element(base_i).degree;
@@ -762,7 +765,7 @@ namespace VectorTools
 
         // If index is not the same as feq.n_dofs_per_cell(), we won't
         // know how to invert the resulting matrix. Bail out.
-        Assert(index == feq.n_dofs_per_cell(), ExcNotImplemented());
+        Assert(index DEAL_II_EQUALS feq.n_dofs_per_cell(), ExcNotImplemented());
 
         for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
           {
@@ -770,8 +773,9 @@ namespace VectorTools
             if (fe_mask[comp_j])
               for (unsigned int i = 0; i < points.size(); ++i)
                 {
-                  if (fe_to_real[comp_j] ==
-                      feq.system_to_component_index(i).first)
+                  if (fe_to_real[comp_j] DEAL_II_EQUALS feq
+                        .system_to_component_index(i)
+                        .first)
                     local_transfer(i, fe_to_feq[j]) =
                       fe.shape_value(j, points[i]);
                 }
@@ -897,12 +901,12 @@ namespace VectorTools
     const DoFHandler<dim, spacedim> &dof2 = intergridmap.get_destination_grid();
     (void)dof2;
 
-    Assert(dof1.get_fe_collection() == dof2.get_fe_collection(),
+    Assert(dof1.get_fe_collection() DEAL_II_EQUALS dof2.get_fe_collection(),
            ExcMessage(
              "The FECollections of both DoFHandler objects must match"));
-    Assert(u1.size() == dof1.n_dofs(),
+    Assert(u1.size() DEAL_II_EQUALS dof1.n_dofs(),
            ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
-    Assert(u2.size() == dof2.n_dofs(),
+    Assert(u2.size() DEAL_II_EQUALS dof2.n_dofs(),
            ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
     Vector<typename VectorType::value_type> cache;
@@ -929,19 +933,19 @@ namespace VectorTools
         if (cell1->level() != cell2->level())
           continue;
         // .. or none of them is active.
-        if (!cell1->is_active() && !cell2->is_active())
+        if (!cell1->is_active() DEAL_II_AND !cell2->is_active())
           continue;
 
         Assert(
-          internal::is_locally_owned(cell1) ==
-            internal::is_locally_owned(cell2),
+          internal::is_locally_owned(cell1)
+            DEAL_II_EQUALS internal::is_locally_owned(cell2),
           ExcMessage(
             "The two Triangulations are required to have the same parallel partitioning."));
 
         // Skip foreign cells.
-        if (cell1->is_active() && !cell1->is_locally_owned())
+        if (cell1->is_active() DEAL_II_AND !cell1->is_locally_owned())
           continue;
-        if (cell2->is_active() && !cell2->is_locally_owned())
+        if (cell2->is_active() DEAL_II_AND !cell2->is_locally_owned())
           continue;
 
         // Get and set the corresponding

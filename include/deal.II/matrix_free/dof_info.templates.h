@@ -85,7 +85,7 @@ namespace internal
       const auto it = constraints.insert(next_constraint);
 
       types::global_dof_index insert_position = numbers::invalid_dof_index;
-      if (it.second == false)
+      if (it.second DEAL_II_EQUALS false)
         insert_position = it.first->second;
       else
         insert_position = next_constraint.second;
@@ -149,7 +149,7 @@ namespace internal
     {
       const unsigned int n_fe_components = start_components.back();
       const unsigned int fe_index =
-        dofs_per_cell.size() == 1 ? 0 : cell_active_fe_index[cell];
+        dofs_per_cell.size() DEAL_II_EQUALS 1 ? 0 : cell_active_fe_index[cell];
       const unsigned int dofs_this_cell = dofs_per_cell[fe_index];
 
       const unsigned int n_vectorization  = vectorization_length;
@@ -186,7 +186,7 @@ namespace internal
             std::copy(begin, end, my_rows.begin() + shift);
           };
 
-          if (!has_constraints || apply_constraints)
+          if (!has_constraints DEAL_II_OR apply_constraints)
             {
               const unsigned int *begin =
                 dof_indices.data() + row_starts[ib].first;
@@ -231,11 +231,12 @@ namespace internal
                         "exceed the size of unsigned int"));
       const unsigned int n_owned = last_owned - first_owned;
 
-      Assert(dofs_per_cell.size() == 1 ||
-               cell_number < cell_active_fe_index.size(),
+      Assert(dofs_per_cell.size() DEAL_II_EQUALS 1 DEAL_II_OR cell_number <
+               cell_active_fe_index.size(),
              ExcInternalError());
-      const unsigned int fe_index =
-        dofs_per_cell.size() == 1 ? 0 : cell_active_fe_index[cell_number];
+      const unsigned int fe_index = dofs_per_cell.size() DEAL_II_EQUALS 1 ?
+                                      0 :
+                                      cell_active_fe_index[cell_number];
       const unsigned int dofs_this_cell = dofs_per_cell[fe_index];
       const unsigned int n_components   = start_components.back();
       for (unsigned int comp = 0; comp < n_components; ++comp)
@@ -256,7 +257,8 @@ namespace internal
                   // in case we want to access plain indices, we need to know
                   // about the location of constrained indices as well (all the
                   // other indices are collected by the cases below)
-                  if (current_dof < first_owned || current_dof >= last_owned)
+                  if (current_dof < first_owned DEAL_II_OR current_dof >=
+                      last_owned)
                     {
                       ghost_dofs.push_back(current_dof);
                       cell_at_subdomain_boundary = true;
@@ -267,9 +269,9 @@ namespace internal
                   // need to actually resolve the constraint entries
                   const auto &                  entries   = *entries_ptr;
                   const types::global_dof_index n_entries = entries.size();
-                  if (n_entries == 1 &&
-                      std::abs(entries[0].second - 1.) <
-                        100 * std::numeric_limits<double>::epsilon())
+                  if (n_entries DEAL_II_EQUALS 1 DEAL_II_AND std::abs(
+                        entries[0].second - 1.) <
+                      100 * std::numeric_limits<double>::epsilon())
                     {
                       current_dof = entries[0].first;
                       goto no_constraint;
@@ -293,9 +295,11 @@ namespace internal
                           constraint_values.constraint_indices;
                       for (unsigned int j = 0; j < n_entries; ++j)
                         {
-                          if (n_mpi_procs > 1 &&
-                              (constraint_indices[j] < first_owned ||
-                               constraint_indices[j] >= last_owned))
+                          if (n_mpi_procs >
+                              1 DEAL_II_AND(
+                                constraint_indices[j] <
+                                first_owned DEAL_II_OR constraint_indices[j] >=
+                                last_owned))
                             {
                               dof_indices.push_back(n_owned +
                                                     ghost_dofs.size());
@@ -320,8 +324,10 @@ namespace internal
                   // Not constrained, we simply have to add the local index to
                   // the indices_local_to_global list and increment constraint
                   // iterator. transform to local index space/mark as ghost
-                  if (n_mpi_procs > 1 &&
-                      (current_dof < first_owned || current_dof >= last_owned))
+                  if (n_mpi_procs >
+                      1 DEAL_II_AND(current_dof <
+                                    first_owned DEAL_II_OR current_dof >=
+                                    last_owned))
                     {
                       ghost_dofs.push_back(current_dof);
                       current_dof = n_owned + ghost_dofs.size() - 1;
@@ -348,23 +354,25 @@ namespace internal
 
       // now to the plain indices: in case we have constraints on this cell,
       // store the indices without the constraints resolve once again
-      if (store_plain_indices == true)
+      if (store_plain_indices DEAL_II_EQUALS true)
         {
-          if (cell_number == 0)
+          if (cell_number DEAL_II_EQUALS 0)
             row_starts_plain_indices.resize(
               (row_starts.size() - 1) / n_components + 1);
           row_starts_plain_indices[cell_number] = plain_dof_indices.size();
           const bool cell_has_constraints =
             (row_starts[(cell_number + 1) * n_components].second >
              row_starts[cell_number * n_components].second);
-          if (cell_has_constraints == true)
+          if (cell_has_constraints DEAL_II_EQUALS true)
             {
               for (unsigned int i = 0; i < dofs_this_cell; ++i)
                 {
                   types::global_dof_index current_dof =
                     local_indices[lexicographic_inv[i]];
-                  if (n_mpi_procs > 1 &&
-                      (current_dof < first_owned || current_dof >= last_owned))
+                  if (n_mpi_procs >
+                      1 DEAL_II_AND(current_dof <
+                                    first_owned DEAL_II_OR current_dof >=
+                                    last_owned))
                     {
                       ghost_dofs.push_back(current_dof);
                       current_dof = n_owned + ghost_dofs.size() - 1;
@@ -437,8 +445,8 @@ namespace internal
           {
             AssertDimension(n_unique_ghosts, ghost_indices.n_elements());
             for (std::size_t i = 0; i < n_ghosts; ++i)
-              Assert(ghost_numbering[i] ==
-                       ghost_indices.index_within_set(ghost_dofs[i]),
+              Assert(ghost_numbering[i] DEAL_II_EQUALS ghost_indices
+                       .index_within_set(ghost_dofs[i]),
                      ExcInternalError());
           }
 
@@ -461,7 +469,7 @@ namespace internal
                                n_owned + ghost_numbering[*data_ptr - n_owned]);
 
               // now the same procedure for plain indices
-              if (store_plain_indices == true)
+              if (store_plain_indices DEAL_II_EQUALS true)
                 {
                   if (row_starts[boundary_cells[i] * n_components].second !=
                       row_starts[(boundary_cells[i] + 1) * n_components].second)
@@ -470,8 +478,10 @@ namespace internal
                         plain_dof_indices.data() +
                         row_starts_plain_indices[boundary_cells[i]];
                       const unsigned int fe_index =
-                        (cell_active_fe_index.size() == 0 ||
-                         dofs_per_cell.size() == 1) ?
+                        (cell_active_fe_index
+                           .size()
+                             DEAL_II_EQUALS 0 DEAL_II_OR dofs_per_cell.size()
+                               DEAL_II_EQUALS 1) ?
                           0 :
                           cell_active_fe_index[i];
                       AssertIndexRange(fe_index, dofs_per_cell.size());
@@ -555,7 +565,7 @@ namespace internal
       unsigned int              position_cell = 0;
       new_dof_indices.reserve(dof_indices.size());
       new_constraint_indicator.reserve(constraint_indicator.size());
-      if (store_plain_indices == true)
+      if (store_plain_indices DEAL_II_EQUALS true)
         {
           new_rowstart_plain.resize(vectorization_length *
                                         task_info.cell_partition_data.back() +
@@ -602,9 +612,8 @@ namespace internal
                     new_constraint_indicator.push_back(
                       constraint_indicator[index]);
                 }
-              if (store_plain_indices &&
-                  row_starts[cell_no].second !=
-                    row_starts[cell_no + n_components].second)
+              if (store_plain_indices DEAL_II_AND row_starts[cell_no].second !=
+                  row_starts[cell_no + n_components].second)
                 {
                   new_rowstart_plain[i * vectorization_length + j] =
                     new_plain_indices.size();
@@ -709,9 +718,10 @@ namespace internal
       const bool         have_hp      = dofs_per_cell.size() > 1;
       const unsigned int n_components = start_components.back();
 
-      Assert(vectorization_length == 1 ||
-               row_starts.size() % vectorization_length == 1,
-             ExcInternalError());
+      Assert(
+        vectorization_length DEAL_II_EQUALS 1 DEAL_II_OR row_starts.size() %
+          vectorization_length                           DEAL_II_EQUALS 1,
+        ExcInternalError());
       if (vectorization_length > 1)
         AssertDimension(row_starts.size() / vectorization_length / n_components,
                         irregular_cells.size());
@@ -784,7 +794,8 @@ namespace internal
                 }
 
               bool indices_are_interleaved_and_contiguous =
-                (ndofs > 1 && n_comp == vectorization_length);
+                (ndofs >
+                 1 DEAL_II_AND n_comp DEAL_II_EQUALS vectorization_length);
 
               {
                 const unsigned int *dof_indices =
@@ -800,8 +811,8 @@ namespace internal
                       }
               }
 
-              if (indices_are_contiguous ||
-                  indices_are_interleaved_and_contiguous)
+              if (indices_are_contiguous DEAL_II_OR
+                                         indices_are_interleaved_and_contiguous)
                 {
                   for (unsigned int j = 0; j < n_comp; ++j)
                     dof_indices_contiguous
@@ -814,7 +825,8 @@ namespace internal
 
               if (indices_are_interleaved_and_contiguous)
                 {
-                  Assert(n_comp == vectorization_length, ExcInternalError());
+                  Assert(n_comp DEAL_II_EQUALS vectorization_length,
+                         ExcInternalError());
                   index_storage_variants[dof_access_cell][i] =
                     IndexStorageVariants::interleaved_contiguous;
                   for (unsigned int j = 0; j < n_comp; ++j)
@@ -843,14 +855,15 @@ namespace internal
                     for (unsigned int j = 0; j < n_comp; ++j)
                       // the first if case is to avoid negative offsets
                       // (invalid)
-                      if (dof_indices[j * ndofs + 1] < dof_indices[j * ndofs] ||
-                          dof_indices[j * ndofs + k] !=
-                            dof_indices[j * ndofs] + k * offsets[j])
+                      if (dof_indices[j * ndofs + 1] <
+                            dof_indices[j * ndofs] DEAL_II_OR
+                              dof_indices[j * ndofs + k] !=
+                          dof_indices[j * ndofs] + k * offsets[j])
                         {
                           indices_are_interleaved_and_mixed = 0;
                           break;
                         }
-                  if (indices_are_interleaved_and_mixed == 2)
+                  if (indices_are_interleaved_and_mixed DEAL_II_EQUALS 2)
                     {
                       for (unsigned int j = 0; j < n_comp; ++j)
                         dof_indices_interleave_strides
@@ -866,8 +879,9 @@ namespace internal
                             indices_are_interleaved_and_mixed = 1;
                             break;
                           }
-                      if (indices_are_interleaved_and_mixed == 1 ||
-                          n_comp != vectorization_length)
+                      if (indices_are_interleaved_and_mixed
+                            DEAL_II_EQUALS 1 DEAL_II_OR n_comp !=
+                          vectorization_length)
                         index_storage_variants[dof_access_cell][i] =
                           IndexStorageVariants::
                             interleaved_contiguous_mixed_strides;
@@ -881,7 +895,7 @@ namespace internal
                         this->dof_indices.data() +
                         row_starts[i * vectorization_length * n_components]
                           .first;
-                      if (n_comp == vectorization_length)
+                      if (n_comp DEAL_II_EQUALS vectorization_length)
                         index_storage_variants[dof_access_cell][i] =
                           IndexStorageVariants::interleaved;
                       else
@@ -894,8 +908,8 @@ namespace internal
                       for (unsigned int k = 0; k < ndofs; ++k)
                         for (unsigned int l = 0; l < n_comp; ++l)
                           for (unsigned int j = l + 1; j < n_comp; ++j)
-                            if (dof_indices[j * ndofs + k] ==
-                                dof_indices[l * ndofs + k])
+                            if (dof_indices[j * ndofs + k] DEAL_II_EQUALS
+                                  dof_indices[l * ndofs + k])
                               {
                                 index_storage_variants[dof_access_cell][i] =
                                   IndexStorageVariants::full;
@@ -918,18 +932,18 @@ namespace internal
         [&](const IndexStorageVariants variant) {
           if (index_kinds[static_cast<unsigned int>(
                 IndexStorageVariants::interleaved_contiguous_mixed_strides)] >
-                0 &&
-              index_kinds[static_cast<unsigned int>(variant)] > 0)
+              0 DEAL_II_AND index_kinds[static_cast<unsigned int>(variant)] > 0)
             for (unsigned int i = 0; i < irregular_cells.size(); ++i)
               {
-                if (index_storage_variants[dof_access_cell][i] ==
-                      IndexStorageVariants::
-                        interleaved_contiguous_mixed_strides &&
-                    n_vectorization_lanes_filled[dof_access_cell][i] == 1 &&
-                    (variant != IndexStorageVariants::contiguous ||
-                     dof_indices_interleave_strides[dof_access_cell]
-                                                   [i * vectorization_length] ==
-                       1))
+                if (index_storage_variants[dof_access_cell][i] DEAL_II_EQUALS
+                        IndexStorageVariants::interleaved_contiguous_mixed_strides
+                        DEAL_II_AND n_vectorization_lanes_filled
+                          [dof_access_cell][i] DEAL_II_EQUALS 1 DEAL_II_AND(
+                            variant !=
+                            IndexStorageVariants::contiguous DEAL_II_OR
+                                                             dof_indices_interleave_strides
+                                [dof_access_cell]
+                                [i * vectorization_length] DEAL_II_EQUALS 1))
                   {
                     index_storage_variants[dof_access_cell][i] = variant;
                     index_kinds[static_cast<unsigned int>(
@@ -954,11 +968,11 @@ namespace internal
 
       // Step 2: fix single contiguous cell among others with interleaved
       // storage
-      if (n_interleaved > 0 && index_kinds[static_cast<unsigned int>(
-                                 IndexStorageVariants::contiguous)] > 0)
+      if (n_interleaved > 0 DEAL_II_AND index_kinds[static_cast<unsigned int>(
+                            IndexStorageVariants::contiguous)] > 0)
         for (unsigned int i = 0; i < irregular_cells.size(); ++i)
-          if (index_storage_variants[dof_access_cell][i] ==
-              IndexStorageVariants::contiguous)
+          if (index_storage_variants[dof_access_cell][i] DEAL_II_EQUALS
+                IndexStorageVariants::contiguous)
             {
               index_storage_variants[dof_access_cell][i] =
                 IndexStorageVariants::interleaved_contiguous_mixed_strides;
@@ -970,19 +984,20 @@ namespace internal
 
       // Step 3: Interleaved cells are left but also some non-contiguous ones
       // -> revert all to full storage
-      if (n_interleaved > 0 &&
-          index_kinds[static_cast<unsigned int>(IndexStorageVariants::full)] +
-              index_kinds[static_cast<unsigned int>(
-                IndexStorageVariants::interleaved)] >
-            0)
+      if (n_interleaved > 0 DEAL_II_AND index_kinds[static_cast<unsigned int>(
+                            IndexStorageVariants::full)] +
+                            index_kinds[static_cast<unsigned int>(
+                              IndexStorageVariants::interleaved)] >
+          0)
         for (unsigned int i = 0; i < irregular_cells.size(); ++i)
           if (index_storage_variants[dof_access_cell][i] >
               IndexStorageVariants::contiguous)
             {
               index_kinds[static_cast<unsigned int>(
                 index_storage_variants[2][i])]--;
-              if (n_vectorization_lanes_filled[dof_access_cell][i] ==
-                  vectorization_length)
+              if (n_vectorization_lanes_filled[dof_access_cell]
+                                              [i] DEAL_II_EQUALS
+                                                vectorization_length)
                 index_storage_variants[dof_access_cell][i] =
                   IndexStorageVariants::interleaved;
               else
@@ -994,8 +1009,8 @@ namespace internal
 
       // Step 4: Copy the interleaved indices into their own data structure
       for (unsigned int i = 0; i < irregular_cells.size(); ++i)
-        if (index_storage_variants[dof_access_cell][i] ==
-            IndexStorageVariants::interleaved)
+        if (index_storage_variants[dof_access_cell][i] DEAL_II_EQUALS
+              IndexStorageVariants::interleaved)
           {
             if (n_vectorization_lanes_filled[dof_access_cell][i] <
                 vectorization_length)
@@ -1051,8 +1066,8 @@ namespace internal
       // all interior faces come before the boundary faces
       unsigned int n_exterior_faces = 0;
       for (; n_exterior_faces < faces.size(); ++n_exterior_faces)
-        if (faces[n_exterior_faces].cells_exterior[0] ==
-            numbers::invalid_unsigned_int)
+        if (faces[n_exterior_faces]
+              .cells_exterior[0] DEAL_II_EQUALS numbers::invalid_unsigned_int)
           break;
       index_storage_variants[dof_access_face_exterior].resize(
         n_exterior_faces, IndexStorageVariants::full);
@@ -1072,8 +1087,8 @@ namespace internal
             bool is_interleaved     = false;
             bool needs_full_storage = false;
             for (unsigned int v = 0;
-                 v < length &&
-                 cell_indices_face[v] != numbers::invalid_unsigned_int;
+                 v < length DEAL_II_AND cell_indices_face[v] !=
+                 numbers::invalid_unsigned_int;
                  ++v)
               {
                 n_vectorization_lanes_filled[face_index][face]++;
@@ -1082,8 +1097,9 @@ namespace internal
                     IndexStorageVariants::interleaved_contiguous)
                   is_interleaved = true;
                 if (index_storage_variants[dof_access_cell]
-                                          [cell_indices_face[v] / length] ==
-                    IndexStorageVariants::contiguous)
+                                          [cell_indices_face[v] /
+                                           length] DEAL_II_EQUALS
+                                            IndexStorageVariants::contiguous)
                   is_contiguous = true;
                 if (index_storage_variants[dof_access_cell]
                                           [cell_indices_face[v] / length] >=
@@ -1097,10 +1113,10 @@ namespace internal
                     IndexStorageVariants::contiguous)
                   needs_full_storage = true;
               }
-            Assert(!(is_interleaved && is_contiguous),
+            Assert(!(is_interleaved DEAL_II_AND is_contiguous),
                    ExcMessage("Unsupported index compression found"));
 
-            if (is_interleaved || is_contiguous)
+            if (is_interleaved DEAL_II_OR is_contiguous)
               for (unsigned int v = 0;
                    v < n_vectorization_lanes_filled[face_index][face];
                    ++v)
@@ -1109,15 +1125,16 @@ namespace internal
             if (is_interleaved)
               {
                 bool is_also_contiguous =
-                  n_vectorization_lanes_filled[face_index][face] == length;
+                  n_vectorization_lanes_filled[face_index][face] DEAL_II_EQUALS
+                    length;
                 for (unsigned int v = 0;
                      v < n_vectorization_lanes_filled[face_index][face];
                      ++v)
                   if (dof_indices_contiguous[face_index][face * length + v] !=
-                        dof_indices_contiguous[face_index][face * length] + v ||
-                      dof_indices_interleave_strides[dof_access_cell]
-                                                    [cell_indices_face[v]] !=
-                        length)
+                      dof_indices_contiguous[face_index][face * length] +
+                        v DEAL_II_OR dof_indices_interleave_strides
+                          [dof_access_cell][cell_indices_face[v]] !=
+                      length)
                     is_also_contiguous = false;
 
                 if (is_also_contiguous)
@@ -1128,7 +1145,8 @@ namespace internal
                 else
                   {
                     bool all_indices_same_offset =
-                      n_vectorization_lanes_filled[face_index][face] == length;
+                      n_vectorization_lanes_filled[face_index]
+                                                  [face] DEAL_II_EQUALS length;
                     for (unsigned int v = 0;
                          v < n_vectorization_lanes_filled[face_index][face];
                          ++v)
@@ -1144,7 +1162,7 @@ namespace internal
                           interleaved_contiguous_mixed_strides;
                   }
               }
-            else if (is_contiguous && !needs_full_storage)
+            else if (is_contiguous DEAL_II_AND !needs_full_storage)
               index_storage_variants[face_index][face] =
                 IndexStorageVariants::contiguous;
             else
@@ -1187,8 +1205,9 @@ namespace internal
                 ghost_indices.push_back(part.local_to_global(dof_indices[i]));
 
             const unsigned int fe_index =
-              dofs_per_cell.size() == 1 ? 0 :
-                                          cell_active_fe_index[cell / n_lanes];
+              dofs_per_cell.size() DEAL_II_EQUALS 1 ?
+                0 :
+                cell_active_fe_index[cell / n_lanes];
             const unsigned int dofs_this_cell = dofs_per_cell[fe_index];
 
             for (unsigned int i = row_starts_plain_indices[cell];
@@ -1206,9 +1225,10 @@ namespace internal
         compressed_set.add_indices(ghost_indices.begin(), ghost_indices.end());
         compressed_set.subtract_set(part.locally_owned_range());
         const bool all_ghosts_equal =
-          Utilities::MPI::min<int>(compressed_set.n_elements() ==
-                                     part.ghost_indices().n_elements(),
-                                   part.get_mpi_communicator()) != 0;
+          Utilities::MPI::min<int>(
+            compressed_set.n_elements() DEAL_II_EQUALS part.ghost_indices()
+              .n_elements(),
+            part.get_mpi_communicator()) != 0;
         if (all_ghosts_equal)
           vector_partitioner_face_variants[0] = vector_partitioner;
         else
@@ -1260,15 +1280,16 @@ namespace internal
             for (unsigned int d = 0; d < cell_and_face_to_faces.size(1); ++d)
               {
                 const unsigned int f = cell_and_face_to_faces(c, d);
-                if (f == numbers::invalid_unsigned_int)
+                if (f DEAL_II_EQUALS numbers::invalid_unsigned_int)
                   continue;
 
                 const unsigned int cell_m = all_faces[f].cells_interior[0];
                 const unsigned int cell_p = all_faces[f].cells_exterior[0];
 
-                const bool ext = c == cell_m;
+                const bool ext = c DEAL_II_EQUALS cell_m;
 
-                if (ext && cell_p == numbers::invalid_unsigned_int)
+                if (ext DEAL_II_AND cell_p DEAL_II_EQUALS
+                                           numbers::invalid_unsigned_int)
                   continue;
 
                 const unsigned int p       = ext ? cell_p : cell_m;
@@ -1293,7 +1314,7 @@ namespace internal
                    .data.front()
                    .nodal_at_cell_boundaries)
               all_nodal = false;
-          if (all_nodal == false)
+          if (all_nodal DEAL_II_EQUALS false)
             vector_partitioner_values = vector_partitioner;
           else
             {
@@ -1304,8 +1325,10 @@ namespace internal
                        const bool         flag) {
                 const unsigned int index =
                   dof_indices_contiguous[dof_access_cell][cell_no];
-                if (flag || (index != numbers::invalid_unsigned_int &&
-                             index >= part.local_size()))
+                if (flag DEAL_II_OR(
+                      index !=
+                      numbers::invalid_unsigned_int DEAL_II_AND index >=
+                        part.local_size()))
                   {
                     const unsigned int stride =
                       dof_indices_interleave_strides[dof_access_cell][cell_no];
@@ -1326,7 +1349,7 @@ namespace internal
                         }
                     AssertDimension(i, dofs_per_cell[0] * stride);
                   }
-                else if (index == numbers::invalid_unsigned_int)
+                else if (index DEAL_II_EQUALS numbers::invalid_unsigned_int)
                   has_noncontiguous_cell = true;
               });
               has_noncontiguous_cell =
@@ -1342,10 +1365,12 @@ namespace internal
                                          ghost_indices.end());
               compressed_set.subtract_set(part.locally_owned_range());
               const bool all_ghosts_equal =
-                Utilities::MPI::min<int>(compressed_set.n_elements() ==
-                                           part.ghost_indices().n_elements(),
-                                         part.get_mpi_communicator()) != 0;
-              if (all_ghosts_equal || has_noncontiguous_cell)
+                Utilities::MPI::min<int>(
+                  compressed_set.n_elements()
+                    DEAL_II_EQUALS part.ghost_indices()
+                      .n_elements(),
+                  part.get_mpi_communicator()) != 0;
+              if (all_ghosts_equal DEAL_II_OR has_noncontiguous_cell)
                 vector_partitioner_values = vector_partitioner;
               else
                 {
@@ -1374,8 +1399,9 @@ namespace internal
             if (shape_info(global_base_element_offset + c, 0).element_type !=
                 internal::MatrixFreeFunctions::tensor_symmetric_hermite)
               all_hermite = false;
-          if (all_hermite == false ||
-              vector_partitoner_values.get() == vector_partitioner.get())
+          if (all_hermite        DEAL_II_EQUALS false DEAL_II_OR
+                                 vector_partitoner_values.get()
+                  DEAL_II_EQUALS vector_partitioner.get())
             vector_partitioner_gradients = vector_partitioner;
           else
             {
@@ -1384,8 +1410,10 @@ namespace internal
                        const bool         flag) {
                 const unsigned int index =
                   dof_indices_contiguous[dof_access_cell][cell_no];
-                if (flag || (index != numbers::invalid_unsigned_int &&
-                             index >= part.local_size()))
+                if (flag DEAL_II_OR(
+                      index !=
+                      numbers::invalid_unsigned_int DEAL_II_AND index >=
+                        part.local_size()))
                   {
                     const unsigned int stride =
                       dof_indices_interleave_strides[dof_access_cell][cell_no];
@@ -1416,9 +1444,11 @@ namespace internal
                                          ghost_indices.end());
               compressed_set.subtract_set(part.locally_owned_range());
               const bool all_ghosts_equal =
-                Utilities::MPI::min<int>(compressed_set.n_elements() ==
-                                           part.ghost_indices().n_elements(),
-                                         part.get_mpi_communicator()) != 0;
+                Utilities::MPI::min<int>(
+                  compressed_set.n_elements()
+                    DEAL_II_EQUALS part.ghost_indices()
+                      .n_elements(),
+                  part.get_mpi_communicator()) != 0;
               if (all_ghosts_equal)
                 vector_partitioner_gradients = vector_partitioner;
               else
@@ -1504,8 +1534,8 @@ namespace internal
                   {
                     const unsigned int myindex =
                       dof_indices[it] / chunk_size_zero_vector;
-                    if (touched_first_by[myindex] ==
-                        numbers::invalid_unsigned_int)
+                    if (touched_first_by[myindex] DEAL_II_EQUALS
+                          numbers::invalid_unsigned_int)
                       touched_first_by[myindex] = chunk;
                     touched_last_by[myindex] = chunk;
                   }
@@ -1515,8 +1545,8 @@ namespace internal
                    face < task_info.face_partition_data[chunk + 1];
                    ++face)
                 for (unsigned int v = 0;
-                     v < length && faces[face].cells_exterior[v] !=
-                                     numbers::invalid_unsigned_int;
+                     v < length DEAL_II_AND faces[face].cells_exterior[v] !=
+                     numbers::invalid_unsigned_int;
                      ++v)
                   {
                     const unsigned int cell = faces[face].cells_exterior[v];
@@ -1527,8 +1557,8 @@ namespace internal
                       {
                         const unsigned int myindex =
                           dof_indices[it] / chunk_size_zero_vector;
-                        if (touched_first_by[myindex] ==
-                            numbers::invalid_unsigned_int)
+                        if (touched_first_by[myindex] DEAL_II_EQUALS
+                              numbers::invalid_unsigned_int)
                           touched_first_by[myindex] = chunk;
                         touched_last_by[myindex] = chunk;
                       }
@@ -1537,7 +1567,7 @@ namespace internal
 
       // ensure that all indices are touched at least during the last round
       for (auto &index : touched_first_by)
-        if (index == numbers::invalid_unsigned_int)
+        if (index DEAL_II_EQUALS numbers::invalid_unsigned_int)
           index =
             task_info
               .partition_row_index[task_info.partition_row_index.size() - 2] -
@@ -1568,8 +1598,10 @@ namespace internal
                   for (unsigned int i = 0; i < it->second.size(); ++i)
                     {
                       const unsigned int first_i = i;
-                      while (i + 1 < it->second.size() &&
-                             it->second[i + 1] == it->second[i] + 1)
+                      while (i + 1 <
+                             it->second.size() DEAL_II_AND      it
+                                 ->second[i + 1] DEAL_II_EQUALS it->second[i] +
+                               1)
                         ++i;
                       range_list.emplace_back(
                         std::min(it->second[first_i] * chunk_size_zero_vector,
@@ -1628,7 +1660,7 @@ namespace internal
       // are not part of the cell/face loops), we use the second to last entry
       // in the partition list.
       for (auto &index : touched_last_by)
-        if (index == numbers::invalid_unsigned_int)
+        if (index DEAL_II_EQUALS numbers::invalid_unsigned_int)
           index =
             task_info
               .partition_row_index[task_info.partition_row_index.size() - 2] -
@@ -1676,10 +1708,10 @@ namespace internal
           AssertIndexRange(static_cast<std::size_t>(dat - begin()), size() + 1);
           AssertIndexRange(static_cast<std::size_t>(end() - dat), size() + 1);
           AssertIndexRange(size(), capacity());
-          while (dat != end() && *dat < entry)
+          while (dat != end() DEAL_II_AND * dat < entry)
             ++dat;
 
-          if (dat == end())
+          if (dat DEAL_II_EQUALS end())
             {
               push_back(entry);
               dat = end();
@@ -1732,7 +1764,7 @@ namespace internal
                   (*it / bucket_size_threading + 1) * bucket_size_threading;
                 std::lock_guard<std::mutex> lock(
                   mutexes[*it / bucket_size_threading]);
-                for (; it != end_unique && *it < next_bucket; ++it)
+                for (; it != end_unique DEAL_II_AND * it < next_bucket; ++it)
                   {
                     AssertIndexRange(*it, row_lengths.size());
                     row_lengths[*it]++;
@@ -1770,7 +1802,7 @@ namespace internal
                   (*it / bucket_size_threading + 1) * bucket_size_threading;
                 std::lock_guard<std::mutex> lock(
                   mutexes[*it / bucket_size_threading]);
-                for (; it != end_unique && *it < next_bucket; ++it)
+                for (; it != end_unique DEAL_II_AND * it < next_bucket; ++it)
                   if (row_lengths[*it] > 0)
                     connectivity_dof.add(*it, block);
               }
@@ -1825,7 +1857,7 @@ namespace internal
                             vector_partitioner->ghost_indices().n_elements();
 
       // Avoid square sparsity patterns that allocate the diagonal entry
-      if (n_rows == task_info.n_active_cells)
+      if (n_rows DEAL_II_EQUALS task_info.n_active_cells)
         ++n_rows;
 
       // first determine row lengths
@@ -1910,12 +1942,12 @@ namespace internal
         {
           // do not renumber in case we have constraints
           if (row_starts[cell_no * n_components * vectorization_length]
-                .second ==
-              row_starts[(cell_no + 1) * n_components * vectorization_length]
+                .second DEAL_II_EQUALS row_starts[(cell_no + 1) * n_components *
+                                                  vectorization_length]
                 .second)
             {
               const unsigned int ndofs =
-                dofs_per_cell.size() == 1 ?
+                dofs_per_cell.size() DEAL_II_EQUALS 1 ?
                   dofs_per_cell[0] :
                   (dofs_per_cell[cell_active_fe_index.size() > 0 ?
                                    cell_active_fe_index[cell_no] :
@@ -1928,15 +1960,15 @@ namespace internal
                      j < n_vectorization_lanes_filled[dof_access_cell][cell_no];
                      ++j)
                   if (dof_ind[j * ndofs + i] < local_size)
-                    if (renumbering[dof_ind[j * ndofs + i]] ==
-                        numbers::invalid_dof_index)
+                    if (renumbering[dof_ind[j * ndofs + i]] DEAL_II_EQUALS
+                          numbers::invalid_dof_index)
                       renumbering[dof_ind[j * ndofs + i]] = counter++;
             }
         }
 
       AssertIndexRange(counter, local_size + 1);
       for (types::global_dof_index &dof_index : renumbering)
-        if (dof_index == numbers::invalid_dof_index)
+        if (dof_index DEAL_II_EQUALS numbers::invalid_dof_index)
           dof_index = counter++;
 
       // transform indices to global index space
@@ -2000,7 +2032,7 @@ namespace internal
       const unsigned int n_rows = row_starts.size() - 1;
       for (unsigned int row = 0; row < n_rows; ++row)
         {
-          if (row_starts[row].first == row_starts[row + 1].first)
+          if (row_starts[row].first DEAL_II_EQUALS row_starts[row + 1].first)
             continue;
           out << "Entries row " << row << ": ";
           const unsigned int *glob_indices =

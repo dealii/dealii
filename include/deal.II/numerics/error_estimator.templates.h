@@ -318,7 +318,8 @@ namespace internal
       {
         // double check that the element does not already exists in the
         // global map
-        Assert(face_integrals.find(p->first) == face_integrals.end(),
+        Assert(face_integrals.find(p->first)
+                 DEAL_II_EQUALS face_integrals.end(),
                ExcInternalError());
 
         for (unsigned int i = 0; i < p->second.size(); ++i)
@@ -369,7 +370,7 @@ namespace internal
             (parallel_data.psi[n][point][component] *
              parallel_data.normal_vectors[point]);
 
-    if (face->at_boundary() == false)
+    if (face->at_boundary() DEAL_II_EQUALS false)
       {
         // compute the jump in the gradients
 
@@ -387,7 +388,7 @@ namespace internal
     if (parallel_data.coefficients != nullptr)
       {
         // scalar coefficient
-        if (parallel_data.coefficients->n_components == 1)
+        if (parallel_data.coefficients->n_components DEAL_II_EQUALS 1)
           {
             parallel_data.coefficients->value_list(
               fe_face_values_cell.get_present_fe_values()
@@ -417,7 +418,7 @@ namespace internal
       }
 
 
-    if (face->at_boundary() == true)
+    if (face->at_boundary() DEAL_II_EQUALS true)
       // neumann boundary face. compute difference between normal derivative
       // and boundary function
       {
@@ -427,7 +428,7 @@ namespace internal
                  parallel_data.neumann_bc->end(),
                ExcInternalError());
         // get the values of the boundary function at the quadrature points
-        if (n_components == 1)
+        if (n_components DEAL_II_EQUALS 1)
           {
             std::vector<number> g(n_q_points);
             parallel_data.neumann_bc->find(boundary_id)
@@ -472,7 +473,7 @@ namespace internal
     std::vector<double> face_integral(n_solution_vectors, 0);
     for (unsigned int n = 0; n < n_solution_vectors; ++n)
       for (unsigned int component = 0; component < n_components; ++component)
-        if (parallel_data.component_mask[component] == true)
+        if (parallel_data.component_mask[component] DEAL_II_EQUALS true)
           for (unsigned int p = 0; p < n_q_points; ++p)
             face_integral[n] += numbers::NumberTraits<number>::abs_square(
                                   parallel_data.phi[n][p][component]) *
@@ -683,10 +684,11 @@ namespace internal
 
     double factor;
     // now compute over the other side of the face
-    if (face->at_boundary() == false)
+    if (face->at_boundary() DEAL_II_EQUALS false)
       // internal face; integrate jump of gradient across this face
       {
-        Assert(cell->neighbor(face_no).state() == IteratorState::valid,
+        Assert(cell->neighbor(face_no).state()
+                 DEAL_II_EQUALS IteratorState::valid,
                ExcInternalError());
 
         const typename DoFHandler<dim, spacedim>::active_cell_iterator
@@ -765,7 +767,8 @@ namespace internal
     const unsigned int n_solution_vectors = solutions.size();
     const auto         face               = cell->face(face_no);
 
-    Assert(neighbor.state() == IteratorState::valid, ExcInternalError());
+    Assert(neighbor.state() DEAL_II_EQUALS IteratorState::valid,
+           ExcInternalError());
     Assert(face->has_children(), ExcInternalError());
 
     // set up a vector of the gradients of the finite element function on
@@ -891,17 +894,21 @@ namespace internal
         // the face twice, once from every side. let the one with the lower
         // index do the work. if it is at the boundary, or if the face is
         // irregular, then do the work below
-        if ((face->has_children() == false) && !cell->at_boundary(face_no) &&
-            (!cell->neighbor_is_coarser(face_no) &&
-             (cell->neighbor(face_no)->index() < cell->index() ||
-              (cell->neighbor(face_no)->index() == cell->index() &&
-               cell->neighbor(face_no)->level() < cell->level()))))
+        if ((face->has_children()
+               DEAL_II_EQUALS false)DEAL_II_AND !cell->at_boundary(face_no)
+              DEAL_II_AND(!cell->neighbor_is_coarser(face_no) DEAL_II_AND(
+                cell->neighbor(face_no)->index() <
+                cell->index() DEAL_II_OR(
+                  cell->neighbor(face_no)
+                    ->index() DEAL_II_EQUALS cell->index()
+                      DEAL_II_AND            cell->neighbor(face_no)
+                    ->level() < cell->level()))))
           continue;
 
         // if the neighboring cell is less refined than the present one,
         // then do nothing since we integrate over the subfaces when we
         // visit the coarse cells.
-        if (face->at_boundary() == false)
+        if (face->at_boundary() DEAL_II_EQUALS false)
           if (cell->neighbor_is_coarser(face_no))
             continue;
 
@@ -909,9 +916,10 @@ namespace internal
         // boundary -> nothing to do. However, to make things easier when
         // summing up the contributions of the faces of cells, we enter this
         // face into the list of faces with contribution zero.
-        if (face->at_boundary() &&
-            (parallel_data.neumann_bc->find(face->boundary_id()) ==
-             parallel_data.neumann_bc->end()))
+        if (face->at_boundary()
+              DEAL_II_AND(parallel_data.neumann_bc
+                            ->find(face->boundary_id())
+                              DEAL_II_EQUALS parallel_data.neumann_bc->end()))
           {
             local_face_integrals[face] =
               std::vector<double>(n_solution_vectors, 0.);
@@ -922,10 +930,12 @@ namespace internal
         // present cell is on the subdomain we care for (and the same for
         // material_id), or if one of the neighbors behind the face is on
         // the subdomain we care for
-        if (!(((subdomain_id == numbers::invalid_subdomain_id) ||
-               (cell->subdomain_id() == subdomain_id)) &&
-              ((material_id == numbers::invalid_material_id) ||
-               (cell->material_id() == material_id))))
+        if (!(((subdomain_id DEAL_II_EQUALS numbers::invalid_subdomain_id)
+                 DEAL_II_OR(cell->subdomain_id() DEAL_II_EQUALS subdomain_id))
+                DEAL_II_AND(
+                  (material_id DEAL_II_EQUALS numbers::invalid_material_id)
+                    DEAL_II_OR(cell->material_id()
+                                 DEAL_II_EQUALS material_id))))
           {
             // ok, cell is unwanted, but maybe its neighbor behind the face
             // we presently work on? oh is there a face at all?
@@ -933,21 +943,28 @@ namespace internal
               continue;
 
             bool care_for_cell = false;
-            if (face->has_children() == false)
+            if (face->has_children() DEAL_II_EQUALS false)
               care_for_cell |=
-                ((cell->neighbor(face_no)->subdomain_id() == subdomain_id) ||
-                 (subdomain_id == numbers::invalid_subdomain_id)) &&
-                ((cell->neighbor(face_no)->material_id() == material_id) ||
-                 (material_id == numbers::invalid_material_id));
+                ((cell->neighbor(face_no)->subdomain_id()
+                    DEAL_II_EQUALS subdomain_id)
+                   DEAL_II_OR(
+                     subdomain_id DEAL_II_EQUALS numbers::invalid_subdomain_id))
+                  DEAL_II_AND((cell->neighbor(face_no)->material_id()
+                                 DEAL_II_EQUALS material_id)
+                                DEAL_II_OR(material_id DEAL_II_EQUALS
+                                                       numbers::invalid_material_id));
             else
               {
                 for (unsigned int sf = 0; sf < face->n_children(); ++sf)
                   if (((cell->neighbor_child_on_subface(face_no, sf)
-                          ->subdomain_id() == subdomain_id) &&
-                       (material_id == numbers::invalid_material_id)) ||
-                      ((cell->neighbor_child_on_subface(face_no, sf)
-                          ->material_id() == material_id) &&
-                       (subdomain_id == numbers::invalid_subdomain_id)))
+                          ->subdomain_id() DEAL_II_EQUALS subdomain_id)
+                         DEAL_II_AND(material_id DEAL_II_EQUALS
+                                                 numbers::invalid_material_id))
+                        DEAL_II_OR(
+                          (cell->neighbor_child_on_subface(face_no, sf)
+                             ->material_id() DEAL_II_EQUALS material_id)
+                            DEAL_II_AND(subdomain_id DEAL_II_EQUALS
+                                                     numbers::invalid_subdomain_id)))
                     {
                       care_for_cell = true;
                       break;
@@ -956,7 +973,7 @@ namespace internal
 
             // so if none of the neighbors cares for this subdomain or
             // material either, then try next face
-            if (care_for_cell == false)
+            if (care_for_cell DEAL_II_EQUALS false)
               continue;
           }
 
@@ -967,7 +984,7 @@ namespace internal
 
 
         // then do the actual integration
-        if (face->has_children() == false)
+        if (face->has_children() DEAL_II_EQUALS false)
           // if the face is a regular one, i.e.  either on the other side
           // there is nirvana (face is at boundary), or the other side's
           // refinement level is the same as that of this side, then handle
@@ -1163,16 +1180,15 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 #ifdef DEAL_II_WITH_P4EST
   if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
         &dof_handler.get_triangulation()) != nullptr)
-    Assert((subdomain_id_ == numbers::invalid_subdomain_id) ||
-             (subdomain_id_ ==
-              dynamic_cast<
-                const parallel::distributed::Triangulation<dim, spacedim> &>(
-                dof_handler.get_triangulation())
-                .locally_owned_subdomain()),
-           ExcMessage(
-             "For parallel distributed triangulations, the only "
-             "valid subdomain_id that can be passed here is the "
-             "one that corresponds to the locally owned subdomain id."));
+    Assert(
+      (subdomain_id_ DEAL_II_EQUALS numbers::invalid_subdomain_id)DEAL_II_OR(
+        subdomain_id_ DEAL_II_EQUALS dynamic_cast<
+          const parallel::distributed::Triangulation<dim, spacedim> &>(
+          dof_handler.get_triangulation())
+          .locally_owned_subdomain()),
+      ExcMessage("For parallel distributed triangulations, the only "
+                 "valid subdomain_id that can be passed here is the "
+                 "one that corresponds to the locally owned subdomain id."));
 
   const types::subdomain_id subdomain_id =
     ((dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
@@ -1190,13 +1206,13 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 
   // sanity checks
   Assert(solutions.size() > 0, ExcNoSolutions());
-  Assert(solutions.size() == errors.size(),
+  Assert(solutions.size() DEAL_II_EQUALS errors.size(),
          ExcIncompatibleNumberOfElements(solutions.size(), errors.size()));
 
   for (const auto &boundary_function : neumann_bc)
     {
       (void)boundary_function;
-      Assert(boundary_function.second->n_components == n_components,
+      Assert(boundary_function.second->n_components DEAL_II_EQUALS n_components,
              ExcInvalidBoundaryFunction(boundary_function.first,
                                         boundary_function.second->n_components,
                                         n_components));
@@ -1207,13 +1223,13 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   Assert(component_mask.n_selected_components(n_components) > 0,
          ExcInvalidComponentMask());
 
-  Assert((coefficients == nullptr) ||
-           (coefficients->n_components == n_components) ||
-           (coefficients->n_components == 1),
+  Assert((coefficients DEAL_II_EQUALS nullptr)DEAL_II_OR(
+           coefficients->n_components DEAL_II_EQUALS n_components)
+           DEAL_II_OR(coefficients->n_components DEAL_II_EQUALS 1),
          ExcInvalidCoefficient());
 
   for (unsigned int n = 0; n < solutions.size(); ++n)
-    Assert(solutions[n]->size() == dof_handler.n_dofs(),
+    Assert(solutions[n]->size() DEAL_II_EQUALS dof_handler.n_dofs(),
            ExcDimensionMismatch(solutions[n]->size(), dof_handler.n_dofs()));
 
   const unsigned int n_solution_vectors = solutions.size();
@@ -1233,7 +1249,7 @@ KellyErrorEstimator<dim, spacedim>::estimate(
     parallel_data(dof_handler.get_fe_collection(),
                   face_quadratures,
                   mapping_collection,
-                  (!neumann_bc.empty() || (coefficients != nullptr)),
+                  (!neumann_bc.empty() DEAL_II_OR(coefficients != nullptr)),
                   solutions.size(),
                   subdomain_id,
                   material_id,
@@ -1282,10 +1298,11 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   // now walk over all cells and collect information from the faces. only do
   // something if this is a cell we care for based on the subdomain id
   for (const auto &cell : dof_handler.active_cell_iterators())
-    if (((subdomain_id == numbers::invalid_subdomain_id) ||
-         (cell->subdomain_id() == subdomain_id)) &&
-        ((material_id == numbers::invalid_material_id) ||
-         (cell->material_id() == material_id)))
+    if (((subdomain_id DEAL_II_EQUALS numbers::invalid_subdomain_id)DEAL_II_OR(
+          cell->subdomain_id() DEAL_II_EQUALS subdomain_id))
+          DEAL_II_AND(
+            (material_id DEAL_II_EQUALS numbers::invalid_material_id)DEAL_II_OR(
+              cell->material_id() DEAL_II_EQUALS material_id)))
       {
         const unsigned int present_cell = cell->active_cell_index();
 

@@ -206,13 +206,14 @@ namespace Algorithms
         // Test all flags separately
         // and return false if one is
         // not set
-        return std::find(flags.begin(), flags.end(), false) == flags.end();
+        return std::find(flags.begin(), flags.end(), false)
+          DEAL_II_EQUALS flags.end();
       }
 
     // Finally, compare each flag
     // separately
     for (unsigned int i = 0; i < n_min; ++i)
-      if (event.flags[i] && !flags[i])
+      if (event.flags[i] DEAL_II_AND !flags[i])
         return false;
     for (unsigned int i = n_min; i < m; ++i)
       if (event.flags[i])
@@ -232,7 +233,7 @@ namespace Algorithms
     if (flags.size() < event.flags.size())
       flags.resize(event.flags.size());
     for (unsigned int i = 0; i < event.flags.size(); ++i)
-      flags[i] = flags[i] || event.flags[i];
+      flags[i] = flags[i] DEAL_II_OR event.flags[i];
 
     return *this;
   }

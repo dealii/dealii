@@ -69,11 +69,11 @@ namespace GridGenerator
                                    const std::string & arguments,
                                    Triangulation<dim> &tria)
     {
-      if (name == "simplex")
+      if (name DEAL_II_EQUALS "simplex")
         parse_and_create<dim, dim, const std::vector<Point<dim>> &>(simplex,
                                                                     arguments,
                                                                     tria);
-      else if (name == "subdivided_hyper_rectangle")
+      else if (name DEAL_II_EQUALS "subdivided_hyper_rectangle")
         {
           // subdivided_hyper_rectangle is polymorphic, and can be called with
           // different sets of arguments. We support two of these function
@@ -102,7 +102,7 @@ namespace GridGenerator
                                      tria);
             }
         }
-      else if (name == "plate_with_a_hole")
+      else if (name DEAL_II_EQUALS "plate_with_a_hole")
         parse_and_create<dim,
                          dim,
                          double,
@@ -117,47 +117,47 @@ namespace GridGenerator
                          double,
                          unsigned int,
                          bool>(plate_with_a_hole, arguments, tria);
-      else if (name == "channel_with_cylinder")
+      else if (name DEAL_II_EQUALS "channel_with_cylinder")
         parse_and_create<dim, dim, double, unsigned int, double, bool>(
           channel_with_cylinder, arguments, tria);
 
-      else if (name == "enclosed_hyper_cube")
+      else if (name DEAL_II_EQUALS "enclosed_hyper_cube")
         parse_and_create<dim, dim, double, double, double, bool>(
           enclosed_hyper_cube, arguments, tria);
 
-      else if (name == "hyper_ball")
+      else if (name DEAL_II_EQUALS "hyper_ball")
         parse_and_create<dim, dim, const Point<dim> &, double, bool>(hyper_ball,
                                                                      arguments,
                                                                      tria);
 
-      else if (name == "quarter_hyper_ball")
+      else if (name DEAL_II_EQUALS "quarter_hyper_ball")
         parse_and_create<dim, dim, const Point<dim> &, double>(
           quarter_hyper_ball, arguments, tria);
 
-      else if (name == "half_hyper_ball")
+      else if (name DEAL_II_EQUALS "half_hyper_ball")
         parse_and_create<dim, dim, const Point<dim> &, double>(half_hyper_ball,
                                                                arguments,
                                                                tria);
 
-      else if (name == "cylinder")
+      else if (name DEAL_II_EQUALS "cylinder")
         parse_and_create<dim, dim, double, double>(cylinder, arguments, tria);
 
-      else if (name == "truncated_cone")
+      else if (name DEAL_II_EQUALS "truncated_cone")
         parse_and_create<dim, dim, double, double, double>(truncated_cone,
                                                            arguments,
                                                            tria);
 
-      else if (name == "hyper_L")
+      else if (name DEAL_II_EQUALS "hyper_L")
         parse_and_create<dim, dim, double, double, bool>(hyper_L,
                                                          arguments,
                                                          tria);
 
-      else if (name == "hyper_cube_slit")
+      else if (name DEAL_II_EQUALS "hyper_cube_slit")
         parse_and_create<dim, dim, double, double, bool>(hyper_cube_slit,
                                                          arguments,
                                                          tria);
 
-      else if (name == "hyper_shell")
+      else if (name DEAL_II_EQUALS "hyper_shell")
         parse_and_create<dim,
                          dim,
                          const Point<dim> &,
@@ -166,7 +166,7 @@ namespace GridGenerator
                          unsigned int,
                          bool>(hyper_shell, arguments, tria);
 
-      else if (name == "half_hyper_shell")
+      else if (name DEAL_II_EQUALS "half_hyper_shell")
         parse_and_create<dim,
                          dim,
                          const Point<dim> &,
@@ -175,7 +175,7 @@ namespace GridGenerator
                          unsigned int,
                          bool>(half_hyper_shell, arguments, tria);
 
-      else if (name == "quarter_hyper_shell")
+      else if (name DEAL_II_EQUALS "quarter_hyper_shell")
         parse_and_create<dim,
                          dim,
                          const Point<dim> &,
@@ -184,7 +184,7 @@ namespace GridGenerator
                          unsigned int,
                          bool>(quarter_hyper_shell, arguments, tria);
 
-      else if (name == "cylinder_shell")
+      else if (name DEAL_II_EQUALS "cylinder_shell")
         parse_and_create<dim,
                          dim,
                          double,
@@ -193,11 +193,11 @@ namespace GridGenerator
                          unsigned int,
                          unsigned int>(cylinder_shell, arguments, tria);
 
-      else if (name == "hyper_cube_with_cylindrical_hole")
+      else if (name DEAL_II_EQUALS "hyper_cube_with_cylindrical_hole")
         parse_and_create<dim, dim, double, double, double, unsigned int, bool>(
           hyper_cube_with_cylindrical_hole, arguments, tria);
 
-      else if (name == "concentric_hyper_shells")
+      else if (name DEAL_II_EQUALS "concentric_hyper_shells")
         parse_and_create<dim,
                          dim,
                          const Point<dim> &,
@@ -239,7 +239,7 @@ namespace GridGenerator
                                   const std::string &          arguments,
                                   Triangulation<dim, dim + 1> &tria)
     {
-      if (name == "hyper_sphere")
+      if (name DEAL_II_EQUALS "hyper_sphere")
         parse_and_create<dim, dim + 1, const Point<dim + 1> &, double>(
           hyper_sphere, arguments, tria);
       else
@@ -271,10 +271,10 @@ namespace GridGenerator
                      const std::string &  arguments,
                      Triangulation<3, 3> &tria)
     {
-      if (name == "moebius")
+      if (name DEAL_II_EQUALS "moebius")
         parse_and_create<3, 3, unsigned int, unsigned int, double, double>(
           moebius, arguments, tria);
-      else if (name == "torus")
+      else if (name DEAL_II_EQUALS "torus")
         parse_and_create<3, 3, double, double, unsigned int, double>(torus,
                                                                      arguments,
                                                                      tria);
@@ -295,7 +295,7 @@ namespace GridGenerator
                      const std::string &  arguments,
                      Triangulation<2, 3> &tria)
     {
-      if (name == "torus")
+      if (name DEAL_II_EQUALS "torus")
         parse_and_create<2, 3, double, double, unsigned int, double>(torus,
                                                                      arguments,
                                                                      tria);
@@ -317,35 +317,35 @@ namespace GridGenerator
   {
     // We begin with all function calls that are implemented for all
     // combinations of dim and spacedim.
-    if (name == "hyper_cube")
+    if (name DEAL_II_EQUALS "hyper_cube")
       parse_and_create<dim, spacedim, double, double, bool>(hyper_cube,
                                                             arguments,
                                                             tria);
-    else if (name == "subdivided_hyper_cube")
+    else if (name DEAL_II_EQUALS "subdivided_hyper_cube")
       parse_and_create<dim, spacedim, unsigned int, double, double, bool>(
         subdivided_hyper_cube, arguments, tria);
-    else if (name == "hyper_rectangle")
+    else if (name DEAL_II_EQUALS "hyper_rectangle")
       parse_and_create<dim,
                        spacedim,
                        const Point<dim> &,
                        const Point<dim> &,
                        bool>(hyper_rectangle, arguments, tria);
-    else if (name == "cheese")
+    else if (name DEAL_II_EQUALS "cheese")
       parse_and_create<dim, spacedim, const std::vector<unsigned int> &>(
         cheese, arguments, tria);
-    else if (name == "general_cell")
+    else if (name DEAL_II_EQUALS "general_cell")
       parse_and_create<dim,
                        spacedim,
                        const std::vector<Point<spacedim>> &,
                        bool>(general_cell, arguments, tria);
-    else if (name == "hyper_cross")
+    else if (name DEAL_II_EQUALS "hyper_cross")
       parse_and_create<dim, spacedim, const std::vector<unsigned int> &, bool>(
         hyper_cross, arguments, tria);
     // If none of the above worked, than we try with more specific function
     // calls. First we try to call functions that are only implemented when
-    // dim == spacedim, then when dim == spacedim-1, and lastly, we try to see
-    // if the name, dim, and spacedim match some of the very special grid
-    // generator functions, like torus, moebius, etc.
+    // dim DEAL_II_EQUALS  spacedim, then when dim DEAL_II_EQUALS  spacedim-1,
+    // and lastly, we try to see if the name, dim, and spacedim match some of
+    // the very special grid generator functions, like torus, moebius, etc.
     //
     // If one of the function call succeeds, we skip the rest and return.
     else if (generate_codimension_zero_grid(name, arguments, tria))

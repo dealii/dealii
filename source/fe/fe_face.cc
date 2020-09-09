@@ -64,7 +64,7 @@ FE_FaceQ<dim, spacedim>::FE_FaceQ(const unsigned int degree)
   this->unit_face_support_points[0].resize(
     Utilities::fixed_power<codim>(this->degree + 1));
 
-  if (this->degree == 0)
+  if (this->degree DEAL_II_EQUALS 0)
     for (unsigned int d = 0; d < codim; ++d)
       this->unit_face_support_points[0][0][d] = 0.5;
   else
@@ -103,7 +103,7 @@ FE_FaceQ<dim, spacedim>::FE_FaceQ(const unsigned int degree)
             {
               // faces in y-direction are oriented differently
               unsigned int renumber = i;
-              if (dim == 3 && d == 1)
+              if (dim DEAL_II_EQUALS 3 DEAL_II_AND d DEAL_II_EQUALS 1)
                 renumber = i / (degree + 1) + (degree + 1) * (i % (degree + 1));
               this->unit_support_points[n_face_dofs * 2 * d + i][e] =
                 this->unit_face_support_points[0][renumber][c];
@@ -167,10 +167,11 @@ FE_FaceQ<dim, spacedim>::get_subface_interpolation_matrix(
 {
   // this function is similar to the respective method in FE_Q
 
-  Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS this->n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.n(),
                               this->n_dofs_per_face(face_no)));
-  Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.m()
+           DEAL_II_EQUALS x_source_fe.n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.m(),
                               x_source_fe.n_dofs_per_face(face_no)));
 
@@ -202,7 +203,7 @@ FE_FaceQ<dim, spacedim>::get_subface_interpolation_matrix(
       for (unsigned int i = 0; i < source_fe->n_dofs_per_face(face_no); ++i)
         {
           const Point<dim - 1> p =
-            subface == numbers::invalid_unsigned_int ?
+            subface DEAL_II_EQUALS numbers::invalid_unsigned_int ?
               face_quadrature.point(i) :
               GeometryInfo<dim - 1>::child_to_cell_coordinates(
                 face_quadrature.point(i), subface);
@@ -254,7 +255,8 @@ FE_FaceQ<dim, spacedim>::has_support_on_face(
   const unsigned int shape_index,
   const unsigned int face_index) const
 {
-  return (face_index == (shape_index / this->n_dofs_per_face(face_index)));
+  return (
+    face_index DEAL_II_EQUALS(shape_index / this->n_dofs_per_face(face_index)));
 }
 
 
@@ -340,8 +342,9 @@ FE_FaceQ<dim, spacedim>::hp_line_dof_identities(
           // equivalencies to be recorded
           return std::vector<std::pair<unsigned int, unsigned int>>();
         }
-      else if (fe_other.n_unique_faces() == 1 &&
-               fe_other.n_dofs_per_face(0) == 0)
+      else if (fe_other.n_unique_faces()
+                 DEAL_II_EQUALS 1 DEAL_II_AND fe_other.n_dofs_per_face(0)
+                   DEAL_II_EQUALS 0)
         {
           // if the other element has no elements on faces at all,
           // then it would be impossible to enforce any kind of
@@ -419,8 +422,9 @@ FE_FaceQ<dim, spacedim>::hp_quad_dof_identities(
           // equivalencies to be recorded
           return std::vector<std::pair<unsigned int, unsigned int>>();
         }
-      else if (fe_other.n_unique_faces() == 1 &&
-               fe_other.n_dofs_per_face(0) == 0)
+      else if (fe_other.n_unique_faces()
+                 DEAL_II_EQUALS 1 DEAL_II_AND fe_other.n_dofs_per_face(0)
+                   DEAL_II_EQUALS 0)
         {
           // if the other element has no elements on faces at all,
           // then it would be impossible to enforce any kind of
@@ -457,7 +461,7 @@ FE_FaceQ<dim, spacedim>::compare_for_domination(
     {
       if (this->degree < fe_faceq_other->degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_faceq_other->degree)
+      else if (this->degree DEAL_II_EQUALS fe_faceq_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;
@@ -581,10 +585,11 @@ FE_FaceQ<1, spacedim>::get_subface_interpolation_matrix(
   (void)x_source_fe;
   (void)face_no;
 
-  Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS this->n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.n(),
                               this->n_dofs_per_face(face_no)));
-  Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.m()
+           DEAL_II_EQUALS x_source_fe.n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.m(),
                               x_source_fe.n_dofs_per_face(face_no)));
   interpolation_matrix(0, 0) = 1.;
@@ -598,7 +603,7 @@ FE_FaceQ<1, spacedim>::has_support_on_face(const unsigned int shape_index,
                                            const unsigned int face_index) const
 {
   AssertIndexRange(shape_index, 2);
-  return (face_index == shape_index);
+  return (face_index DEAL_II_EQUALS shape_index);
 }
 
 
@@ -802,7 +807,8 @@ FE_FaceP<dim, spacedim>::has_support_on_face(
   const unsigned int shape_index,
   const unsigned int face_index) const
 {
-  return (face_index == (shape_index / this->n_dofs_per_face(face_index)));
+  return (
+    face_index DEAL_II_EQUALS(shape_index / this->n_dofs_per_face(face_index)));
 }
 
 
@@ -848,7 +854,7 @@ FE_FaceP<dim, spacedim>::compare_for_domination(
     {
       if (this->degree < fe_facep_other->degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_facep_other->degree)
+      else if (this->degree DEAL_II_EQUALS fe_facep_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;
@@ -896,10 +902,11 @@ FE_FaceP<dim, spacedim>::get_subface_interpolation_matrix(
 {
   // this function is similar to the respective method in FE_Q
 
-  Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS this->n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.n(),
                               this->n_dofs_per_face(face_no)));
-  Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.m()
+           DEAL_II_EQUALS x_source_fe.n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.m(),
                               x_source_fe.n_dofs_per_face(face_no)));
 
@@ -933,7 +940,7 @@ FE_FaceP<dim, spacedim>::get_subface_interpolation_matrix(
       for (unsigned int k = 0; k < face_quadrature.size(); ++k)
         {
           const Point<dim - 1> p =
-            subface == numbers::invalid_unsigned_int ?
+            subface DEAL_II_EQUALS numbers::invalid_unsigned_int ?
               face_quadrature.point(k) :
               GeometryInfo<dim - 1>::child_to_cell_coordinates(
                 face_quadrature.point(k), subface);

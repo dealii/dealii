@@ -219,7 +219,7 @@ FE_RaviartThomas<dim>::initialize_support_points(const unsigned int deg)
         }
     }
 
-  if (deg == 0)
+  if (deg DEAL_II_EQUALS 0)
     return;
 
   // Create Legendre basis for the space D_xi Q_k
@@ -247,7 +247,7 @@ FE_RaviartThomas<dim>::initialize_support_points(const unsigned int deg)
             polynomials[d]->compute_value(i, cell_quadrature.point(k));
     }
 
-  Assert(current == this->generalized_support_points.size(),
+  Assert(current DEAL_II_EQUALS this->generalized_support_points.size(),
          ExcInternalError());
 }
 
@@ -354,7 +354,7 @@ FE_RaviartThomas<dim>::initialize_restriction()
         }
     }
 
-  if (this->degree == 1)
+  if (this->degree DEAL_II_EQUALS 1)
     return;
 
   // Create Legendre basis for the space D_xi Q_k. Here, we cannot
@@ -511,12 +511,13 @@ FE_RaviartThomas<dim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &support_point_values,
   std::vector<double> &              nodal_values) const
 {
-  Assert(support_point_values.size() == this->generalized_support_points.size(),
+  Assert(support_point_values.size()
+           DEAL_II_EQUALS this->generalized_support_points.size(),
          ExcDimensionMismatch(support_point_values.size(),
                               this->generalized_support_points.size()));
-  Assert(nodal_values.size() == this->n_dofs_per_cell(),
+  Assert(nodal_values.size() DEAL_II_EQUALS this->n_dofs_per_cell(),
          ExcDimensionMismatch(nodal_values.size(), this->n_dofs_per_cell()));
-  Assert(support_point_values[0].size() == this->n_components(),
+  Assert(support_point_values[0].size() DEAL_II_EQUALS this->n_components(),
          ExcDimensionMismatch(support_point_values[0].size(),
                               this->n_components()));
 

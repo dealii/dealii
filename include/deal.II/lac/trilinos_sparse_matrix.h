@@ -402,11 +402,10 @@ namespace TrilinosWrappers
        * Comparison. True, if both iterators point to the same matrix
        * position.
        */
-      bool
-      operator==(const Iterator<Constness> &) const;
+      bool operator DEAL_II_EQUALS(const Iterator<Constness> &) const;
 
       /**
-       * Inverse of <tt>==</tt>.
+       * Inverse of <tt>DEAL_II_EQUALS </tt>.
        */
       bool
       operator!=(const Iterator<Constness> &) const;
@@ -596,7 +595,7 @@ namespace TrilinosWrappers
      * Move constructor. Create a new sparse matrix by stealing the internal
      * data.
      */
-    SparseMatrix(SparseMatrix &&other) noexcept;
+    SparseMatrix(SparseMatrix DEAL_II_AND other) noexcept;
 
     /**
      * Copy constructor is deleted.
@@ -1935,20 +1934,20 @@ namespace TrilinosWrappers
                               const Epetra_MultiVector &dst,
                               const bool                transpose)
     {
-      if (transpose == false)
+      if (transpose DEAL_II_EQUALS false)
         {
-          Assert(src.Map().SameAs(mtrx.DomainMap()) == true,
+          Assert(src.Map().SameAs(mtrx.DomainMap()) DEAL_II_EQUALS true,
                  ExcMessage(
                    "Column map of matrix does not fit with vector map!"));
-          Assert(dst.Map().SameAs(mtrx.RangeMap()) == true,
+          Assert(dst.Map().SameAs(mtrx.RangeMap()) DEAL_II_EQUALS true,
                  ExcMessage("Row map of matrix does not fit with vector map!"));
         }
       else
         {
-          Assert(src.Map().SameAs(mtrx.RangeMap()) == true,
+          Assert(src.Map().SameAs(mtrx.RangeMap()) DEAL_II_EQUALS true,
                  ExcMessage(
                    "Column map of matrix does not fit with vector map!"));
-          Assert(dst.Map().SameAs(mtrx.DomainMap()) == true,
+          Assert(dst.Map().SameAs(mtrx.DomainMap()) DEAL_II_EQUALS true,
                  ExcMessage("Row map of matrix does not fit with vector map!"));
         }
       (void)mtrx; // removes -Wunused-variable in optimized mode
@@ -1962,21 +1961,21 @@ namespace TrilinosWrappers
                               const Epetra_MultiVector &dst,
                               const bool                transpose)
     {
-      if (transpose == false)
+      if (transpose DEAL_II_EQUALS false)
         {
-          Assert(src.Map().SameAs(op.OperatorDomainMap()) == true,
+          Assert(src.Map().SameAs(op.OperatorDomainMap()) DEAL_II_EQUALS true,
                  ExcMessage(
                    "Column map of operator does not fit with vector map!"));
-          Assert(dst.Map().SameAs(op.OperatorRangeMap()) == true,
+          Assert(dst.Map().SameAs(op.OperatorRangeMap()) DEAL_II_EQUALS true,
                  ExcMessage(
                    "Row map of operator does not fit with vector map!"));
         }
       else
         {
-          Assert(src.Map().SameAs(op.OperatorRangeMap()) == true,
+          Assert(src.Map().SameAs(op.OperatorRangeMap()) DEAL_II_EQUALS true,
                  ExcMessage(
                    "Column map of operator does not fit with vector map!"));
-          Assert(dst.Map().SameAs(op.OperatorDomainMap()) == true,
+          Assert(dst.Map().SameAs(op.OperatorDomainMap()) DEAL_II_EQUALS true,
                  ExcMessage(
                    "Row map of operator does not fit with vector map!"));
         }
@@ -2114,9 +2113,9 @@ namespace TrilinosWrappers
          */
         template <typename Solver, typename Preconditioner>
         typename std::enable_if<
-          std::is_base_of<TrilinosWrappers::SolverBase, Solver>::value &&
-            std::is_base_of<TrilinosWrappers::PreconditionBase,
-                            Preconditioner>::value,
+          std::is_base_of<TrilinosWrappers::SolverBase, Solver>::value
+            DEAL_II_AND std::is_base_of<TrilinosWrappers::PreconditionBase,
+                                        Preconditioner>::value,
           TrilinosPayload>::type
         inverse_payload(Solver &, const Preconditioner &) const;
 
@@ -2139,9 +2138,9 @@ namespace TrilinosWrappers
          */
         template <typename Solver, typename Preconditioner>
         typename std::enable_if<
-          !(std::is_base_of<TrilinosWrappers::SolverBase, Solver>::value &&
-            std::is_base_of<TrilinosWrappers::PreconditionBase,
-                            Preconditioner>::value),
+          !(std::is_base_of<TrilinosWrappers::SolverBase, Solver>::value
+              DEAL_II_AND std::is_base_of<TrilinosWrappers::PreconditionBase,
+                                          Preconditioner>::value),
           TrilinosPayload>::type
         inverse_payload(Solver &, const Preconditioner &) const;
 
@@ -2583,9 +2582,11 @@ namespace TrilinosWrappers
           accessor.a_index = 0;
           ++accessor.a_row;
 
-          while ((accessor.a_row < accessor.matrix->m()) &&
-                 ((accessor.matrix->in_local_range(accessor.a_row) == false) ||
-                  (accessor.matrix->row_length(accessor.a_row) == 0)))
+          while ((accessor.a_row < accessor.matrix->m()) DEAL_II_AND(
+            (accessor.matrix->in_local_range(accessor.a_row)
+               DEAL_II_EQUALS false)
+              DEAL_II_OR(accessor.matrix->row_length(accessor.a_row)
+                           DEAL_II_EQUALS 0)))
             ++accessor.a_row;
 
           accessor.visit_present_row();
@@ -2622,11 +2623,12 @@ namespace TrilinosWrappers
 
 
     template <bool Constness>
-    inline bool
-    Iterator<Constness>::operator==(const Iterator<Constness> &other) const
+    inline bool Iterator<Constness>::
+                operator DEAL_II_EQUALS(const Iterator<Constness> &other) const
     {
-      return (accessor.a_row == other.accessor.a_row &&
-              accessor.a_index == other.accessor.a_index);
+      return (
+        accessor.a_row DEAL_II_EQUALS other.accessor.a_row DEAL_II_AND
+          accessor.a_index DEAL_II_EQUALS other.accessor.a_index);
     }
 
 
@@ -2635,7 +2637,7 @@ namespace TrilinosWrappers
     inline bool
     Iterator<Constness>::operator!=(const Iterator<Constness> &other) const
     {
-      return !(*this == other);
+      return !(*this DEAL_II_EQUALS other);
     }
 
 
@@ -2644,9 +2646,11 @@ namespace TrilinosWrappers
     inline bool
     Iterator<Constness>::operator<(const Iterator<Constness> &other) const
     {
-      return (accessor.row() < other.accessor.row() ||
-              (accessor.row() == other.accessor.row() &&
-               accessor.index() < other.accessor.index()));
+      return (accessor.row() <
+              other.accessor.row() DEAL_II_OR(
+                accessor.row()
+                  DEAL_II_EQUALS other.accessor.row()
+                    DEAL_II_AND  accessor.index() < other.accessor.index()));
     }
 
 
@@ -2681,7 +2685,7 @@ namespace TrilinosWrappers
   SparseMatrix::begin(const size_type r) const
   {
     AssertIndexRange(r, m());
-    if (in_local_range(r) && (row_length(r) > 0))
+    if (in_local_range(r) DEAL_II_AND(row_length(r) > 0))
       return const_iterator(this, r, 0);
     else
       return end(r);
@@ -2698,7 +2702,7 @@ namespace TrilinosWrappers
     // past this line, or at the end of the
     // matrix
     for (size_type i = r + 1; i < m(); ++i)
-      if (in_local_range(i) && (row_length(i) > 0))
+      if (in_local_range(i) DEAL_II_AND(row_length(i) > 0))
         return const_iterator(this, i, 0);
 
     // if there is no such line, then take the
@@ -2728,7 +2732,7 @@ namespace TrilinosWrappers
   SparseMatrix::begin(const size_type r)
   {
     AssertIndexRange(r, m());
-    if (in_local_range(r) && (row_length(r) > 0))
+    if (in_local_range(r) DEAL_II_AND(row_length(r) > 0))
       return iterator(this, r, 0);
     else
       return end(r);
@@ -2745,7 +2749,7 @@ namespace TrilinosWrappers
     // past this line, or at the end of the
     // matrix
     for (size_type i = r + 1; i < m(); ++i)
-      if (in_local_range(i) && (row_length(i) > 0))
+      if (in_local_range(i) DEAL_II_AND(row_length(i) > 0))
         return iterator(this, i, 0);
 
     // if there is no such line, then take the
@@ -2767,8 +2771,8 @@ namespace TrilinosWrappers
     end   = matrix->RowMap().MaxMyGID64() + 1;
 #      endif
 
-    return ((index >= static_cast<size_type>(begin)) &&
-            (index < static_cast<size_type>(end)));
+    return ((index >= static_cast<size_type>(begin))
+              DEAL_II_AND(index < static_cast<size_type>(end)));
   }
 
 
@@ -2827,9 +2831,9 @@ namespace TrilinosWrappers
                     const FullMatrix<TrilinosScalar> &values,
                     const bool                        elide_zero_values)
   {
-    Assert(indices.size() == values.m(),
+    Assert(indices.size() DEAL_II_EQUALS values.m(),
            ExcDimensionMismatch(indices.size(), values.m()));
-    Assert(values.m() == values.n(), ExcNotQuadratic());
+    Assert(values.m() DEAL_II_EQUALS values.n(), ExcNotQuadratic());
 
     for (size_type i = 0; i < indices.size(); ++i)
       set(indices[i],
@@ -2848,7 +2852,7 @@ namespace TrilinosWrappers
   {
     AssertIsFinite(value);
 
-    if (value == 0)
+    if (value DEAL_II_EQUALS 0)
       {
         // we have to check after Insert/Add in any case to be consistent
         // with the MPI communication model, but we can save some
@@ -2856,14 +2860,14 @@ namespace TrilinosWrappers
         // we pass on to the other function.
 
         // TODO: fix this (do not run compress here, but fail)
-        if (last_action == Insert)
+        if (last_action DEAL_II_EQUALS Insert)
           {
             int ierr;
             ierr = matrix->GlobalAssemble(*column_space_map,
                                           matrix->RowMap(),
                                           false);
 
-            Assert(ierr == 0, ExcTrilinosError(ierr));
+            Assert(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
             (void)ierr; // removes -Wunused-but-set-variable in optimized mode
           }
 
@@ -3030,8 +3034,8 @@ namespace TrilinosWrappers
     {
       template <typename Solver, typename Preconditioner>
       typename std::enable_if<
-        std::is_base_of<TrilinosWrappers::SolverBase, Solver>::value &&
-          std::is_base_of<TrilinosWrappers::PreconditionBase,
+        std::is_base_of<TrilinosWrappers::SolverBase, Solver>::value DEAL_II_AND
+                                                                     std::is_base_of<TrilinosWrappers::PreconditionBase,
                           Preconditioner>::value,
         TrilinosPayload>::type
       TrilinosPayload::inverse_payload(
@@ -3077,7 +3081,7 @@ namespace TrilinosWrappers
 
         // If the input operator is already setup for transpose operations, then
         // we must do similar with its inverse.
-        if (return_op.UseTranspose() == true)
+        if (return_op.UseTranspose() DEAL_II_EQUALS true)
           std::swap(return_op.inv_vmult, return_op.inv_Tvmult);
 
         return return_op;
@@ -3085,9 +3089,9 @@ namespace TrilinosWrappers
 
       template <typename Solver, typename Preconditioner>
       typename std::enable_if<
-        !(std::is_base_of<TrilinosWrappers::SolverBase, Solver>::value &&
-          std::is_base_of<TrilinosWrappers::PreconditionBase,
-                          Preconditioner>::value),
+        !(std::is_base_of<TrilinosWrappers::SolverBase, Solver>::value
+            DEAL_II_AND std::is_base_of<TrilinosWrappers::PreconditionBase,
+                                        Preconditioner>::value),
         TrilinosPayload>::type
       TrilinosPayload::inverse_payload(Solver &, const Preconditioner &) const
       {

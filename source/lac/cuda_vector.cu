@@ -97,13 +97,13 @@ namespace LinearAlgebra
     Vector<Number>::reinit(const size_type n, const bool omit_zeroing_entries)
     {
       // Resize the underlying array if necessary
-      if (n == 0)
+      if (n DEAL_II_EQUALS 0)
         val.reset();
       else if (n != n_elements)
         val.reset(Utilities::CUDA::allocate_device_data<Number>(n));
 
       // If necessary set the elements to zero
-      if (omit_zeroing_entries == false)
+      if (omit_zeroing_entries DEAL_II_EQUALS false)
         {
           const cudaError_t error_code =
             cudaMemset(val.get(), 0, n * sizeof(Number));
@@ -130,7 +130,7 @@ namespace LinearAlgebra
                            VectorOperation::values        operation,
                            std::shared_ptr<const CommunicationPatternBase>)
     {
-      if (operation == VectorOperation::insert)
+      if (operation DEAL_II_EQUALS VectorOperation::insert)
         {
           const cudaError_t error_code = cudaMemcpy(val.get(),
                                                     V.begin(),
@@ -138,7 +138,7 @@ namespace LinearAlgebra
                                                     cudaMemcpyHostToDevice);
           AssertCuda(error_code);
         }
-      else if (operation == VectorOperation::add)
+      else if (operation DEAL_II_EQUALS VectorOperation::add)
         {
           // Create a temporary vector on the device
           Number *    tmp;
@@ -173,7 +173,8 @@ namespace LinearAlgebra
     Vector<Number> &
     Vector<Number>::operator=(const Number s)
     {
-      Assert(s == Number(), ExcMessage("Only 0 can be assigned to a vector."));
+      Assert(s DEAL_II_EQUALS Number(),
+             ExcMessage("Only 0 can be assigned to a vector."));
       (void)s;
 
       const cudaError_t error_code =
@@ -226,7 +227,7 @@ namespace LinearAlgebra
 
       // Downcast V. If it fails, it throw an exception.
       const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-      Assert(down_V.size() == this->size(),
+      Assert(down_V.size() DEAL_II_EQUALS this->size(),
              ExcMessage(
                "Cannot add two vectors with different numbers of elements"));
 
@@ -251,7 +252,7 @@ namespace LinearAlgebra
 
       // Downcast V. If fails, throws an exception.
       const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-      Assert(down_V.size() == this->size(),
+      Assert(down_V.size() DEAL_II_EQUALS this->size(),
              ExcMessage(
                "Cannot add two vectors with different numbers of elements."));
 
@@ -275,7 +276,7 @@ namespace LinearAlgebra
 
       // Downcast V. If fails, throws an exception.
       const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-      Assert(down_V.size() == this->size(),
+      Assert(down_V.size() DEAL_II_EQUALS this->size(),
              ExcMessage(
                "Cannot add two vectors with different numbers of elements"));
 
@@ -333,7 +334,7 @@ namespace LinearAlgebra
 
       // Downcast V. If fails, throw an exception.
       const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-      Assert(down_V.size() == this->size(),
+      Assert(down_V.size() DEAL_II_EQUALS this->size(),
              ExcMessage(
                "Cannot add two vectors with different numbers of elements."));
 
@@ -361,7 +362,7 @@ namespace LinearAlgebra
 
       // Downcast V. If fails, throw an exception.
       const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-      Assert(down_V.size() == this->size(),
+      Assert(down_V.size() DEAL_II_EQUALS this->size(),
              ExcMessage(
                "Cannot add two vectors with different numbers of elements."));
 
@@ -371,7 +372,7 @@ namespace LinearAlgebra
 
       // Downcast V. If fails, throw an exception.
       const Vector<Number> &down_W = dynamic_cast<const Vector<Number> &>(W);
-      Assert(down_W.size() == this->size(),
+      Assert(down_W.size() DEAL_II_EQUALS this->size(),
              ExcMessage(
                "Cannot add two vectors with different numbers of elements."));
 
@@ -398,7 +399,7 @@ namespace LinearAlgebra
 
       // Downcast V. If fails, throw an exception.
       const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-      Assert(down_V.size() == this->size(),
+      Assert(down_V.size() DEAL_II_EQUALS this->size(),
              ExcMessage(
                "Cannot add two vectors with different numbers of elements."));
 
@@ -421,7 +422,7 @@ namespace LinearAlgebra
       // Downcast V. If fails, throw an exception.
       const Vector<Number> &down_scaling_factors =
         dynamic_cast<const Vector<Number> &>(scaling_factors);
-      Assert(down_scaling_factors.size() == this->size(),
+      Assert(down_scaling_factors.size() DEAL_II_EQUALS this->size(),
              ExcMessage(
                "Cannot scale two vectors with different numbers of elements."));
 
@@ -446,7 +447,7 @@ namespace LinearAlgebra
       // Downcast V. If fails, throw an exception.
       const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
       Assert(
-        down_V.size() == this->size(),
+        down_V.size() DEAL_II_EQUALS this->size(),
         ExcMessage(
           "Cannot assign two vectors with different numbers of elements."));
 
@@ -462,7 +463,7 @@ namespace LinearAlgebra
     bool
     Vector<Number>::all_zero() const
     {
-      return (linfty_norm() == 0) ? true : false;
+      return (linfty_norm() DEAL_II_EQUALS 0) ? true : false;
     }
 
 
@@ -592,10 +593,10 @@ namespace LinearAlgebra
 
       // Downcast V and W. If it fails, throw an exceptiion.
       const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-      Assert(down_V.size() == this->size(),
+      Assert(down_V.size() DEAL_II_EQUALS this->size(),
              ExcMessage("Vector V has the wrong size."));
       const Vector<Number> &down_W = dynamic_cast<const Vector<Number> &>(W);
-      Assert(down_W.size() == this->size(),
+      Assert(down_W.size() DEAL_II_EQUALS this->size(),
              ExcMessage("Vector W has the wrong size."));
 
       Number *    result_device;

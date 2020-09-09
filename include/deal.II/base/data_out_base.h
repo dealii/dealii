@@ -106,21 +106,22 @@ class XDMFEntry;
  * the data on the vertices only, but the data is organizes as a tensor
  * product grid on each cell. The parameter <tt>n_subdivisions</tt>, which is
  * given for each patch separately, denotes how often the cell is to be
- * divided for output; for example, <tt>n_subdivisions==1</tt> yields no
- * subdivision of the cell, <tt>n_subdivisions==2</tt> will produce a grid of
- * 3 times 3 points in two spatial dimensions and 3 times 3 times 3 points in
- * three dimensions, <tt>n_subdivisions==3</tt> will yield 4 times 4 (times 4)
- * points, etc. The actual location of these points on the patch will be
- * computed by a multilinear transformation from the vertices given for this
- * patch.  For cells at the boundary, a mapping might be used to calculate the
- * position of the inner points. In that case the coordinates are stored
- * inside the Patch, as they cannot be easily recovered otherwise.
+ * divided for output; for example, <tt>n_subdivisionsDEAL_II_EQUALS 1</tt>
+ * yields no subdivision of the cell, <tt>n_subdivisionsDEAL_II_EQUALS 2</tt>
+ * will produce a grid of 3 times 3 points in two spatial dimensions and 3 times
+ * 3 times 3 points in three dimensions, <tt>n_subdivisionsDEAL_II_EQUALS 3</tt>
+ * will yield 4 times 4 (times 4) points, etc. The actual location of these
+ * points on the patch will be computed by a multilinear transformation from the
+ * vertices given for this patch.  For cells at the boundary, a mapping might be
+ * used to calculate the position of the inner points. In that case the
+ * coordinates are stored inside the Patch, as they cannot be easily recovered
+ * otherwise.
  *
  * Given these comments, the actual data to be printed on this patch of points
  * consists of several data sets each of which has a value at each of the
- * patch points. For example with <tt>n_subdivisions==2</tt> in two space
- * dimensions, each data set has to provide nine values, and since the patch
- * is to be printed as a tensor product (or its transformation to the real
+ * patch points. For example with <tt>n_subdivisionsDEAL_II_EQUALS 2</tt> in two
+ * space dimensions, each data set has to provide nine values, and since the
+ * patch is to be printed as a tensor product (or its transformation to the real
  * space cell), its values are to be ordered like <i>(x0,y0) (x0,y1) (x0,y2)
  * (x1,y0) (x1,y1) (x1,y2) (x2,y0) (x2,y1) (x2,y2)</i>, i.e. the z-coordinate
  * runs fastest, then the y-coordinate, then x (if there are that many space
@@ -253,11 +254,11 @@ namespace DataOutBase
     /**
      * Corner points of a patch.  Interior points are computed by a multilinear
      * transformation of the unit cell to the cell specified by these corner
-     * points, if <code>points_are_available==false</code>.
+     * points, if <code>points_are_availableDEAL_II_EQUALS false</code>.
      *
-     * On the other hand, if <code>points_are_available==true</code>, then
-     * the coordinates of the points at which output is to be generated
-     * is attached in additional rows to the <code>data</code> table.
+     * On the other hand, if <code>points_are_availableDEAL_II_EQUALS
+     * true</code>, then the coordinates of the points at which output is to be
+     * generated is attached in additional rows to the <code>data</code> table.
      *
      * The order of points is the same as for cells in the
      * triangulation.
@@ -336,8 +337,7 @@ namespace DataOutBase
      * Compare the present patch for equality with another one. This is used
      * in a few of the automated tests in our testsuite.
      */
-    bool
-    operator==(const Patch &patch) const;
+    bool operator DEAL_II_EQUALS(const Patch &patch) const;
 
     /**
      * Return an estimate for the memory consumption, in bytes, of this
@@ -406,7 +406,7 @@ namespace DataOutBase
      * Corner points of a patch.  For the current class of zero-dimensional
      * patches, there is of course only a single vertex.
      *
-     * If <code>points_are_available==true</code>, then
+     * If <code>points_are_availableDEAL_II_EQUALS true</code>, then
      * the coordinates of the point at which output is to be generated
      * is attached as an additional row to the <code>data</code> table.
      */
@@ -486,8 +486,7 @@ namespace DataOutBase
      * Compare the present patch for equality with another one. This is used
      * in a few of the automated tests in our testsuite.
      */
-    bool
-    operator==(const Patch &patch) const;
+    bool operator DEAL_II_EQUALS(const Patch &patch) const;
 
     /**
      * Return an estimate for the memory consumption, in bytes, of this
@@ -807,8 +806,8 @@ namespace DataOutBase
     /**
      * This denotes the number of the data vector which shall be used for
      * generating the height information. By default, the first data vector is
-     * taken, i.e. <tt>height_vector==0</tt>, if there is any data vector. If
-     * there is no data vector, no height information is generated.
+     * taken, i.e. <tt>height_vectorDEAL_II_EQUALS 0</tt>, if there is any data
+     * vector. If there is no data vector, no height information is generated.
      */
     unsigned int height_vector;
 
@@ -923,8 +922,8 @@ namespace DataOutBase
     /**
      * Flag to determine whether the cells shall be colorized by the data set
      * denoted by #color_vector, or simply be painted in white. This flag only
-     * makes sense if <tt>#draw_cells==true</tt>. Colorization is done through
-     * #color_function.
+     * makes sense if <tt>#draw_cellsDEAL_II_EQUALS true</tt>. Colorization is
+     * done through #color_function.
      *
      * Default is <tt>true</tt>.
      */
@@ -1202,8 +1201,8 @@ namespace DataOutBase
     /**
      * This denotes the number of the data vector which shall be used for
      * generating the height information. By default, the first data vector is
-     * taken, i.e. <tt>#height_vector==0</tt>, if there is any data vector. If
-     * there is no data vector, no height information is generated.
+     * taken, i.e. <tt>#height_vectorDEAL_II_EQUALS 0</tt>, if there is any data
+     * vector. If there is no data vector, no height information is generated.
      */
     unsigned int height_vector;
 
@@ -1474,9 +1473,10 @@ namespace DataOutBase
          * return false;
          */
 
-        return (one(0) < two(0) ||
-                (!(two(0) < one(0)) &&
-                 (one(1) < two(1) || (!(two(1) < one(1)) && one(2) < two(2)))));
+        return (one(0) <
+                two(0) DEAL_II_OR(!(two(0) < one(0)) DEAL_II_AND(
+                  one(1) < two(1) DEAL_II_OR(!(two(1) < one(1))
+                                               DEAL_II_AND one(2) < two(2)))));
       }
     };
 
@@ -1653,8 +1653,8 @@ namespace DataOutBase
    * may want to change.)
    *
    * This function only supports output for two-dimensional domains (i.e.,
-   * with dim==2), with values in the vertical direction taken from a data
-   * vector.
+   * with dimDEAL_II_EQUALS 2), with values in the vertical direction taken from
+   * a data vector.
    *
    * Basically, output consists of the mesh and the cells in between them. You
    * can draw either of these, or both, or none if you are really interested
@@ -1781,7 +1781,7 @@ namespace DataOutBase
    * following):
    * @verbatim
    *   set data style lines
-   *   splot [:][:][0:] "T" using 1:2:(&3==.5 ? &4 : -1)
+   *   splot [:][:][0:] "T" using 1:2:(&3DEAL_II_EQUALS .5 ? &4 : -1)
    * @endverbatim
    *
    * This command plots data in x- and y-direction unbounded, but in
@@ -3277,8 +3277,8 @@ public:
 
   /**
    * Simplified constructor that calls the complete constructor for
-   * cases where <code>solution_filename == mesh_filename</code>, and
-   * <code>dim==spacedim</code>.
+   * cases where <code>solution_filename DEAL_II_EQUALS  mesh_filename</code>,
+   * and <code>dimDEAL_II_EQUALS spacedim</code>.
    */
   XDMFEntry(const std::string &filename,
             const double       time,
@@ -3288,7 +3288,7 @@ public:
 
   /**
    * Simplified constructor that calls the complete constructor for
-   * cases where <code>dim==spacedim</code>.
+   * cases where <code>dimDEAL_II_EQUALS spacedim</code>.
    */
   XDMFEntry(const std::string &mesh_filename,
             const std::string &solution_filename,
@@ -3400,7 +3400,7 @@ namespace DataOutBase
   inline bool
   EpsFlags::RgbValues::is_grey() const
   {
-    return (red == green) && (red == blue);
+    return (red DEAL_II_EQUALS green)DEAL_II_AND(red DEAL_II_EQUALS blue);
   }
 
 

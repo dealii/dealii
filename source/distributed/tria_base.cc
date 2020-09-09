@@ -149,7 +149,7 @@ namespace parallel
     number_cache.level_ghost_owners.clear();
     number_cache.n_locally_owned_active_cells = 0;
 
-    if (this->n_levels() == 0)
+    if (this->n_levels() DEAL_II_EQUALS 0)
       {
         // Skip communication done below if we do not have any cells
         // (meaning the Triangulation is empty on all processors). This will
@@ -175,7 +175,7 @@ namespace parallel
 
     if (this->n_levels() > 0)
       for (const auto &cell : this->active_cell_iterators())
-        if (cell->subdomain_id() == my_subdomain)
+        if (cell->subdomain_id() DEAL_II_EQUALS my_subdomain)
           ++number_cache.n_locally_owned_active_cells;
 
     // Potentially cast to a 64 bit type before accumulating to avoid overflow:
@@ -188,12 +188,12 @@ namespace parallel
       Utilities::MPI::max(this->n_levels(), this->mpi_communicator);
 
     // Store MPI ranks of level ghost owners of this processor on all levels.
-    if (this->is_multilevel_hierarchy_constructed() == true)
+    if (this->is_multilevel_hierarchy_constructed() DEAL_II_EQUALS true)
       {
         number_cache.level_ghost_owners.clear();
 
         // if there is nothing to do, then do nothing
-        if (this->n_levels() == 0)
+        if (this->n_levels() DEAL_II_EQUALS 0)
           return;
 
         // find level ghost owners
@@ -201,8 +201,9 @@ namespace parallel
                this->begin();
              cell != this->end();
              ++cell)
-          if (cell->level_subdomain_id() != numbers::artificial_subdomain_id &&
-              cell->level_subdomain_id() != this->locally_owned_subdomain())
+          if (cell->level_subdomain_id() !=
+              numbers::artificial_subdomain_id DEAL_II_AND
+                                               cell->level_subdomain_id() != this->locally_owned_subdomain())
             this->number_cache.level_ghost_owners.insert(
               cell->level_subdomain_id());
 

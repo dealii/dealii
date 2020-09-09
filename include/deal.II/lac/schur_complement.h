@@ -255,7 +255,7 @@ schur_complement(const LinearOperator<Domain_1, Range_1, Payload> &A_inv,
   // definition aligns with the operations expressed here.
   // All of the memory allocations etc. are taken care of
   // internally.
-  if (D.is_null_operator == false)
+  if (D.is_null_operator DEAL_II_EQUALS false)
     return D - C * A_inv * B;
   else
     return -1.0 * C * A_inv * B;

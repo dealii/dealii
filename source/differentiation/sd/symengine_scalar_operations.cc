@@ -113,8 +113,9 @@ namespace Differentiation
                 // Derivative type
                 const SE::map_basic_basic &entry_mul_dict =
                   entry_mul.get_dict();
-                if (entry_mul_dict.size() == 1 &&
-                    SE::is_a<SE::Derivative>(*(entry_mul_dict.begin()->first)))
+                if (entry_mul_dict.size()
+                      DEAL_II_EQUALS 1 DEAL_II_AND SE::is_a<SE::Derivative>(
+                        *(entry_mul_dict.begin()->first)))
                   return true;
               }
           }
@@ -190,7 +191,7 @@ namespace Differentiation
         {
           const typename types::substitution_map::const_iterator it_other =
             symb_map_out.find(entry.first);
-          if (it_other == symb_map_out.end())
+          if (it_other DEAL_II_EQUALS symb_map_out.end())
             symb_map_out.insert(std::make_pair(entry.first, entry.second));
           else
             {

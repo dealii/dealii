@@ -236,7 +236,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const double,
         Triangulation<deal_II_dimension, deal_II_space_dimension> &);
 
-#  if deal_II_space_dimension == 3
+#  if deal_II_space_dimension DEAL_II_EQUALS 3
       template void
       rotate<deal_II_dimension>(
         const double,
@@ -351,7 +351,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           deal_II_dimension,
           deal_II_space_dimension>::active_cell_iterator>> &vertex_to_cells);
 
-#  if deal_II_dimension == deal_II_space_dimension
+#  if deal_II_dimension DEAL_II_EQUALS deal_II_space_dimension
 #    if deal_II_dimension > 1
       template void
       laplace_transform(

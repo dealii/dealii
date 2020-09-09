@@ -91,7 +91,8 @@ namespace
     const std::size_t  bytes_per_entry = sizeof(value_type) * dofs_per_cell;
     const unsigned int n_elements      = data_range.size() / bytes_per_entry;
 
-    Assert((data_range.size() % bytes_per_entry == 0), ExcInternalError());
+    Assert((data_range.size() % bytes_per_entry DEAL_II_EQUALS 0),
+           ExcInternalError());
 
     std::vector<Vector<value_type>> unpacked_data;
     unpacked_data.reserve(n_elements);
@@ -228,7 +229,7 @@ namespace parallel
     SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
       std::vector<VectorType *> &all_out)
     {
-      Assert(input_vectors.size() == all_out.size(),
+      Assert(input_vectors.size() DEAL_II_EQUALS all_out.size(),
              ExcDimensionMismatch(input_vectors.size(), all_out.size()));
 
       // TODO: casting away constness is bad
@@ -317,7 +318,8 @@ namespace parallel
                        ++child_index)
                     {
                       const auto &child = cell->child(child_index);
-                      Assert(child->is_active() && child->coarsen_flag_set(),
+                      Assert(child->is_active()
+                               DEAL_II_AND child->coarsen_flag_set(),
                              typename dealii::Triangulation<
                                dim>::ExcInconsistentCoarseningFlags());
 
@@ -345,7 +347,7 @@ namespace parallel
       const unsigned int dofs_per_cell =
         dof_handler->get_fe(fe_index).n_dofs_per_cell();
 
-      if (dofs_per_cell == 0)
+      if (dofs_per_cell DEAL_II_EQUALS 0)
         return std::vector<char>(); // nothing to do for FE_Nothing
 
       auto it_input  = input_vectors.cbegin();
@@ -405,8 +407,8 @@ namespace parallel
                   for (unsigned int child_index = 1;
                        child_index < cell->n_children();
                        ++child_index)
-                    Assert(cell->child(child_index)->active_fe_index() ==
-                             fe_index,
+                    Assert(cell->child(child_index)
+                             ->active_fe_index() DEAL_II_EQUALS fe_index,
                            ExcInternalError());
                   break;
                 }
@@ -420,7 +422,7 @@ namespace parallel
       const unsigned int dofs_per_cell =
         dof_handler->get_fe(fe_index).n_dofs_per_cell();
 
-      if (dofs_per_cell == 0)
+      if (dofs_per_cell DEAL_II_EQUALS 0)
         return; // nothing to do for FE_Nothing
 
       const std::vector<::dealii::Vector<typename VectorType::value_type>>
@@ -429,7 +431,8 @@ namespace parallel
                                                              dofs_per_cell);
 
       // check if sizes match
-      Assert(dof_values.size() == all_out.size(), ExcInternalError());
+      Assert(dof_values.size() DEAL_II_EQUALS all_out.size(),
+             ExcInternalError());
 
       // check if we have enough dofs provided by the FE object
       // to interpolate the transferred data correctly
@@ -437,7 +440,7 @@ namespace parallel
            it_dof_values != dof_values.end();
            ++it_dof_values)
         Assert(
-          dofs_per_cell == it_dof_values->size(),
+          dofs_per_cell DEAL_II_EQUALS it_dof_values->size(),
           ExcMessage(
             "The transferred data was packed with a different number of dofs than the "
             "currently registered FE object assigned to the DoFHandler has."));

@@ -224,7 +224,7 @@ EigenPower<VectorType>::solve(double &value, const MatrixType &A, VectorType &x)
 
   // Main loop
   int iter = 0;
-  for (; conv == SolverControl::iterate; iter++)
+  for (; conv DEAL_II_EQUALS SolverControl::iterate; iter++)
     {
       y.add(additional_data.shift, x);
 
@@ -264,7 +264,7 @@ EigenPower<VectorType>::solve(double &value, const MatrixType &A, VectorType &x)
     }
 
   // in case of failure: throw exception
-  AssertThrow(conv == SolverControl::success,
+  AssertThrow(conv DEAL_II_EQUALS SolverControl::success,
               SolverControl::NoConvergence(
                 iter, std::fabs(1. / length - 1. / old_length)));
 
@@ -323,7 +323,7 @@ EigenInverse<VectorType>::solve(double &          value,
   // Main loop
   double    res  = -std::numeric_limits<double>::max();
   size_type iter = 0;
-  for (; conv == SolverControl::iterate; iter++)
+  for (; conv DEAL_II_EQUALS SolverControl::iterate; iter++)
     {
       solver.solve(A_s, y, x, prec);
 
@@ -347,7 +347,7 @@ EigenInverse<VectorType>::solve(double &          value,
       // Compute unshifted eigenvalue
       value = (entry * x(i) < 0. ? -1. : 1.) / length - current_shift;
 
-      if (iter == goal)
+      if (iter DEAL_II_EQUALS goal)
         {
           const auto & relaxation = additional_data.relaxation;
           const double new_shift =
@@ -381,7 +381,7 @@ EigenInverse<VectorType>::solve(double &          value,
 
   // in case of failure: throw
   // exception
-  AssertThrow(conv == SolverControl::success,
+  AssertThrow(conv DEAL_II_EQUALS SolverControl::success,
               SolverControl::NoConvergence(iter, res));
   // otherwise exit as normal
 }

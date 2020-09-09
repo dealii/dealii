@@ -370,9 +370,9 @@ void
 BlockSparseMatrixEZ<Number>::vmult(BlockVector<somenumber> &      dst,
                                    const BlockVector<somenumber> &src) const
 {
-  Assert(dst.n_blocks() == n_block_rows(),
+  Assert(dst.n_blocks() DEAL_II_EQUALS n_block_rows(),
          ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
-  Assert(src.n_blocks() == n_block_cols(),
+  Assert(src.n_blocks() DEAL_II_EQUALS n_block_cols(),
          ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
 
   dst = 0.;
@@ -390,9 +390,9 @@ void
 BlockSparseMatrixEZ<Number>::vmult_add(BlockVector<somenumber> &      dst,
                                        const BlockVector<somenumber> &src) const
 {
-  Assert(dst.n_blocks() == n_block_rows(),
+  Assert(dst.n_blocks() DEAL_II_EQUALS n_block_rows(),
          ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
-  Assert(src.n_blocks() == n_block_cols(),
+  Assert(src.n_blocks() DEAL_II_EQUALS n_block_cols(),
          ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
 
   for (unsigned int row = 0; row < n_block_rows(); ++row)
@@ -408,9 +408,9 @@ void
 BlockSparseMatrixEZ<Number>::Tvmult(BlockVector<somenumber> &      dst,
                                     const BlockVector<somenumber> &src) const
 {
-  Assert(dst.n_blocks() == n_block_cols(),
+  Assert(dst.n_blocks() DEAL_II_EQUALS n_block_cols(),
          ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
-  Assert(src.n_blocks() == n_block_rows(),
+  Assert(src.n_blocks() DEAL_II_EQUALS n_block_rows(),
          ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
 
   dst = 0.;
@@ -429,9 +429,9 @@ BlockSparseMatrixEZ<Number>::Tvmult_add(
   BlockVector<somenumber> &      dst,
   const BlockVector<somenumber> &src) const
 {
-  Assert(dst.n_blocks() == n_block_cols(),
+  Assert(dst.n_blocks() DEAL_II_EQUALS n_block_cols(),
          ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
-  Assert(src.n_blocks() == n_block_rows(),
+  Assert(src.n_blocks() DEAL_II_EQUALS n_block_rows(),
          ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
 
   for (unsigned int row = 0; row < n_block_rows(); ++row)

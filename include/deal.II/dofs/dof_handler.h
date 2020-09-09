@@ -1764,7 +1764,8 @@ DoFHandler<dim, spacedim>::locally_owned_mg_dofs(const unsigned int level) const
          ExcMessage("The given level index exceeds the number of levels "
                     "present in the triangulation"));
   Assert(
-    mg_number_cache.size() == this->get_triangulation().n_global_levels(),
+    mg_number_cache.size() DEAL_II_EQUALS this->get_triangulation()
+      .n_global_levels(),
     ExcMessage(
       "The level dofs are not set up properly! Did you call distribute_mg_dofs()?"));
   return mg_number_cache[level].locally_owned_dofs;
@@ -1776,8 +1777,8 @@ template <int dim, int spacedim>
 const std::vector<types::global_dof_index> &
 DoFHandler<dim, spacedim>::n_locally_owned_dofs_per_processor() const
 {
-  if (number_cache.n_locally_owned_dofs_per_processor.empty() &&
-      number_cache.n_global_dofs > 0)
+  if (number_cache.n_locally_owned_dofs_per_processor
+        .empty() DEAL_II_AND number_cache.n_global_dofs > 0)
     {
       MPI_Comm comm;
 
@@ -1803,8 +1804,8 @@ template <int dim, int spacedim>
 const std::vector<IndexSet> &
 DoFHandler<dim, spacedim>::locally_owned_dofs_per_processor() const
 {
-  if (number_cache.locally_owned_dofs_per_processor.empty() &&
-      number_cache.n_global_dofs > 0)
+  if (number_cache.locally_owned_dofs_per_processor
+        .empty() DEAL_II_AND number_cache.n_global_dofs > 0)
     {
       MPI_Comm comm;
 
@@ -1835,11 +1836,14 @@ DoFHandler<dim, spacedim>::locally_owned_mg_dofs_per_processor(
          ExcMessage("The given level index exceeds the number of levels "
                     "present in the triangulation"));
   Assert(
-    mg_number_cache.size() == this->get_triangulation().n_global_levels(),
+    mg_number_cache.size() DEAL_II_EQUALS this->get_triangulation()
+      .n_global_levels(),
     ExcMessage(
       "The level dofs are not set up properly! Did you call distribute_mg_dofs()?"));
-  if (mg_number_cache[level].locally_owned_dofs_per_processor.empty() &&
-      mg_number_cache[level].n_global_dofs > 0)
+  if (mg_number_cache[level]
+        .locally_owned_dofs_per_processor
+        .empty() DEAL_II_AND mg_number_cache[level]
+        .n_global_dofs > 0)
     {
       MPI_Comm comm;
 
@@ -1901,7 +1905,8 @@ template <int dim, int spacedim>
 inline const BlockInfo &
 DoFHandler<dim, spacedim>::block_info() const
 {
-  Assert(this->hp_capability_enabled == false, ExcNotImplementedWithHP());
+  Assert(this->hp_capability_enabled DEAL_II_EQUALS false,
+         ExcNotImplementedWithHP());
 
   return block_info_object;
 }
@@ -1915,7 +1920,8 @@ DoFHandler<dim, spacedim>::n_boundary_dofs(
   const std::map<types::boundary_id, const Function<spacedim, number> *>
     &boundary_ids) const
 {
-  Assert(!(dim == 2 && spacedim == 3) || this->hp_capability_enabled == false,
+  Assert(!(dim DEAL_II_EQUALS 2 DEAL_II_AND spacedim DEAL_II_EQUALS 3)
+            DEAL_II_OR this->hp_capability_enabled DEAL_II_EQUALS false,
          ExcNotImplementedWithHP());
 
   // extract the set of boundary ids and forget about the function object
@@ -2038,17 +2044,18 @@ DoFHandler<dim, spacedim>::load(Archive &ar, const unsigned int)
       ar &n_cells &policy_name;
 
       AssertThrow(
-        n_cells == this->tria->n_cells(),
+        n_cells DEAL_II_EQUALS this->tria->n_cells(),
         ExcMessage(
           "The object being loaded into does not match the triangulation "
           "that has been stored previously."));
-      AssertThrow(
-        policy_name == dealii::internal::policy_to_string(*this->policy),
-        ExcMessage("The policy currently associated with this DoFHandler (" +
-                   dealii::internal::policy_to_string(*this->policy) +
-                   ") does not match the one that was associated with the "
-                   "DoFHandler previously stored (" +
-                   policy_name + ")."));
+      AssertThrow(policy_name DEAL_II_EQUALS dealii::internal::policy_to_string(
+                    *this->policy),
+                  ExcMessage(
+                    "The policy currently associated with this DoFHandler (" +
+                    dealii::internal::policy_to_string(*this->policy) +
+                    ") does not match the one that was associated with the "
+                    "DoFHandler previously stored (" +
+                    policy_name + ")."));
     }
   else
     {
@@ -2074,22 +2081,22 @@ DoFHandler<dim, spacedim>::load(Archive &ar, const unsigned int)
       ar &n_cells &fe_name &policy_name;
 
       AssertThrow(
-        n_cells == this->tria->n_cells(),
+        n_cells DEAL_II_EQUALS this->tria->n_cells(),
         ExcMessage(
           "The object being loaded into does not match the triangulation "
           "that has been stored previously."));
       AssertThrow(
-        fe_name == this->get_fe(0).get_name(),
+        fe_name DEAL_II_EQUALS this->get_fe(0).get_name(),
         ExcMessage(
           "The finite element associated with this DoFHandler does not match "
           "the one that was associated with the DoFHandler previously stored."));
-      AssertThrow(policy_name == internal::policy_to_string(*this->policy),
-                  ExcMessage(
-                    "The policy currently associated with this DoFHandler (" +
-                    internal::policy_to_string(*this->policy) +
-                    ") does not match the one that was associated with the "
-                    "DoFHandler previously stored (" +
-                    policy_name + ")."));
+      AssertThrow(
+        policy_name DEAL_II_EQUALS internal::policy_to_string(*this->policy),
+        ExcMessage("The policy currently associated with this DoFHandler (" +
+                   internal::policy_to_string(*this->policy) +
+                   ") does not match the one that was associated with the "
+                   "DoFHandler previously stored (" +
+                   policy_name + ")."));
     }
 }
 
@@ -2102,7 +2109,7 @@ DoFHandler<dim, spacedim>::MGVertexDoFs::get_index(
   const unsigned int dof_number,
   const unsigned int dofs_per_vertex) const
 {
-  Assert((level >= coarsest_level) && (level <= finest_level),
+  Assert((level >= coarsest_level) DEAL_II_AND(level <= finest_level),
          ExcInvalidLevel(level));
   return indices[dofs_per_vertex * (level - coarsest_level) + dof_number];
 }
@@ -2117,7 +2124,7 @@ DoFHandler<dim, spacedim>::MGVertexDoFs::set_index(
   const unsigned int            dofs_per_vertex,
   const types::global_dof_index index)
 {
-  Assert((level >= coarsest_level) && (level <= finest_level),
+  Assert((level >= coarsest_level) DEAL_II_AND(level <= finest_level),
          ExcInvalidLevel(level));
   indices[dofs_per_vertex * (level - coarsest_level) + dof_number] = index;
 }

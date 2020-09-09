@@ -50,13 +50,13 @@ namespace OpenCASCADE
     Handle_Adaptor3d_HCurve
     curve_adaptor(const TopoDS_Shape &shape)
     {
-      Assert((shape.ShapeType() == TopAbs_WIRE) ||
-               (shape.ShapeType() == TopAbs_EDGE),
+      Assert((shape.ShapeType() DEAL_II_EQUALS TopAbs_WIRE)DEAL_II_OR(
+               shape.ShapeType() DEAL_II_EQUALS TopAbs_EDGE),
              ExcUnsupportedShape());
-      if (shape.ShapeType() == TopAbs_WIRE)
+      if (shape.ShapeType() DEAL_II_EQUALS TopAbs_WIRE)
         return Handle(BRepAdaptor_HCompCurve)(
           new BRepAdaptor_HCompCurve(TopoDS::Wire(shape)));
-      else if (shape.ShapeType() == TopAbs_EDGE)
+      else if (shape.ShapeType() DEAL_II_EQUALS TopAbs_EDGE)
         return Handle(BRepAdaptor_HCurve)(
           new BRepAdaptor_HCurve(TopoDS::Edge(shape)));
 
@@ -75,7 +75,12 @@ namespace OpenCASCADE
     }
   } // namespace
 
-  /*======================= NormalProjectionManifold =========================*/
+  /*DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+   * DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+   * DEAL_II_EQUALS = NormalProjectionManifold DEAL_II_EQUALS DEAL_II_EQUALS
+   * DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+   * DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+   * =*/
   template <int dim, int spacedim>
   NormalProjectionManifold<dim, spacedim>::NormalProjectionManifold(
     const TopoDS_Shape &sh,
@@ -83,7 +88,7 @@ namespace OpenCASCADE
     : sh(sh)
     , tolerance(tolerance)
   {
-    Assert(spacedim == 3, ExcNotImplemented());
+    Assert(spacedim DEAL_II_EQUALS 3, ExcNotImplemented());
   }
 
 
@@ -116,7 +121,11 @@ namespace OpenCASCADE
   }
 
 
-  /*===================== DirectionalProjectionManifold ======================*/
+  /*DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+   * DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+   * = DirectionalProjectionManifold DEAL_II_EQUALS DEAL_II_EQUALS
+   * DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+   * DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS */
   template <int dim, int spacedim>
   DirectionalProjectionManifold<dim, spacedim>::DirectionalProjectionManifold(
     const TopoDS_Shape &       sh,
@@ -126,7 +135,7 @@ namespace OpenCASCADE
     , direction(direction)
     , tolerance(tolerance)
   {
-    Assert(spacedim == 3, ExcNotImplemented());
+    Assert(spacedim DEAL_II_EQUALS 3, ExcNotImplemented());
   }
 
 
@@ -160,7 +169,11 @@ namespace OpenCASCADE
 
 
 
-  /*===================== NormalToMeshProjectionManifold =====================*/
+  /*DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+   * DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+   * = NormalToMeshProjectionManifold DEAL_II_EQUALS DEAL_II_EQUALS
+   * DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+   * DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS =*/
   template <int dim, int spacedim>
   NormalToMeshProjectionManifold<dim, spacedim>::NormalToMeshProjectionManifold(
     const TopoDS_Shape &sh,
@@ -168,7 +181,7 @@ namespace OpenCASCADE
     : sh(sh)
     , tolerance(tolerance)
   {
-    Assert(spacedim == 3, ExcNotImplemented());
+    Assert(spacedim DEAL_II_EQUALS 3, ExcNotImplemented());
     Assert(
       std::get<0>(count_elements(sh)) > 0,
       ExcMessage(
@@ -320,7 +333,7 @@ namespace OpenCASCADE
                 for (unsigned int j = 0; j < surrounding_points.size(); ++j)
                   if (j != i)
                     for (unsigned int k = 0; k < surrounding_points.size(); ++k)
-                      if (k != j && k != i)
+                      if (k != j DEAL_II_AND k != i)
                         {
                           Tensor<1, 3> u =
                             surrounding_points[i] - surrounding_points[j];
@@ -376,7 +389,11 @@ namespace OpenCASCADE
   }
 
 
-  /*==================== ArclengthProjectionLineManifold =====================*/
+  /*DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+   * DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+   * ArclengthProjectionLineManifold DEAL_II_EQUALS DEAL_II_EQUALS
+   * DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+   * DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS =*/
   template <int dim, int spacedim>
   ArclengthProjectionLineManifold<dim, spacedim>::
     ArclengthProjectionLineManifold(const TopoDS_Shape &sh,

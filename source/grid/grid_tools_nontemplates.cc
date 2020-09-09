@@ -45,7 +45,7 @@ namespace GridTools
   cell_measure<2>(const std::vector<Point<2>> &        all_vertices,
                   const ArrayView<const unsigned int> &vertex_indices)
   {
-    if (vertex_indices.size() == 3) // triangle
+    if (vertex_indices.size() DEAL_II_EQUALS 3) // triangle
       {
         const double x[3] = {all_vertices[vertex_indices[0]](0),
                              all_vertices[vertex_indices[1]](0),
@@ -119,7 +119,7 @@ namespace GridTools
   cell_measure<3>(const std::vector<Point<3>> &        all_vertices,
                   const ArrayView<const unsigned int> &vertex_indices)
   {
-    if (vertex_indices.size() == 4) // tetrahedron
+    if (vertex_indices.size() DEAL_II_EQUALS 4) // tetrahedron
       {
         const auto &a = all_vertices[vertex_indices[0]];
         const auto &b = all_vertices[vertex_indices[1]];

@@ -218,8 +218,7 @@ public:
    * equal if they have the same size and the same starting pointer.
    * This version always compares with the const value_type.
    */
-  bool
-  operator==(
+  bool operator DEAL_II_EQUALS(
     const ArrayView<const value_type, MemorySpaceType> &other_view) const;
 
   /**
@@ -227,9 +226,9 @@ public:
    * equal if they have the same size and the same starting pointer.
    * This version always compares with the non-const value_type.
    */
-  bool
-  operator==(const ArrayView<typename std::remove_cv<value_type>::type,
-                             MemorySpaceType> &other_view) const;
+  bool operator DEAL_II_EQUALS(
+    const ArrayView<typename std::remove_cv<value_type>::type, MemorySpaceType>
+      &other_view) const;
 
   /**
    * Compare two ArrayView objects of the same type. Two objects are considered
@@ -342,10 +341,11 @@ namespace internal
         {
           AssertCuda(cuda_error);
           if (std::is_same<MemorySpaceType, MemorySpace::Host>::value)
-            return (attributes.type == cudaMemoryTypeHost) ||
-                   (attributes.type == cudaMemoryTypeUnregistered);
+            return (attributes.type DEAL_II_EQUALS cudaMemoryTypeHost)
+              DEAL_II_OR(
+                attributes.type DEAL_II_EQUALS cudaMemoryTypeUnregistered);
           else
-            return attributes.type == cudaMemoryTypeDevice;
+            return attributes.type DEAL_II_EQUALS cudaMemoryTypeDevice;
         }
       else
         {
@@ -376,8 +376,8 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   , n_elements(n_elements)
 {
   Assert(
-    n_elements == 0 ||
-      internal::ArrayViewHelper::is_in_correct_memory_space<MemorySpaceType>(
+    n_elements DEAL_II_EQUALS 0 DEAL_II_OR
+               internal::ArrayViewHelper::is_in_correct_memory_space<MemorySpaceType>(
         starting_element),
     ExcMessage("The memory space indicated by the template parameter "
                "and the one derived from the pointer value do not match!"));
@@ -428,7 +428,7 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   // nevertheless, leave the static_assert in since it provides a
   // more descriptive error message that will simply come after the first
   // error produced above
-  static_assert(std::is_const<value_type>::value == true,
+  static_assert(std::is_const<value_type>::value DEAL_II_EQUALS true,
                 "This constructor may only be called if the ArrayView "
                 "object has a const value_type. In other words, you can "
                 "only create an ArrayView to const values from a const "
@@ -462,7 +462,7 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   // nevertheless, leave the static_assert in since it provides a
   // more descriptive error message that will simply come after the first
   // error produced above
-  static_assert(std::is_const<value_type>::value == true,
+  static_assert(std::is_const<value_type>::value DEAL_II_EQUALS true,
                 "This constructor may only be called if the ArrayView "
                 "object has a const value_type. In other words, you can "
                 "only create an ArrayView to const values from a const "
@@ -482,24 +482,22 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
 
 
 template <typename ElementType, typename MemorySpaceType>
-inline bool
-ArrayView<ElementType, MemorySpaceType>::
-operator==(const ArrayView<const value_type, MemorySpaceType> &other_view) const
+inline bool ArrayView<ElementType, MemorySpaceType>::operator DEAL_II_EQUALS(
+  const ArrayView<const value_type, MemorySpaceType> &other_view) const
 {
-  return (other_view.data() == starting_element) &&
-         (other_view.size() == n_elements);
+  return (other_view.data() DEAL_II_EQUALS starting_element)DEAL_II_AND(
+    other_view.size() DEAL_II_EQUALS n_elements);
 }
 
 
 
 template <typename ElementType, typename MemorySpaceType>
-inline bool
-ArrayView<ElementType, MemorySpaceType>::
-operator==(const ArrayView<typename std::remove_cv<value_type>::type,
-                           MemorySpaceType> &other_view) const
+inline bool ArrayView<ElementType, MemorySpaceType>::operator DEAL_II_EQUALS(
+  const ArrayView<typename std::remove_cv<value_type>::type, MemorySpaceType>
+    &other_view) const
 {
-  return (other_view.data() == starting_element) &&
-         (other_view.size() == n_elements);
+  return (other_view.data() DEAL_II_EQUALS starting_element)DEAL_II_AND(
+    other_view.size() DEAL_II_EQUALS n_elements);
 }
 
 
@@ -509,7 +507,7 @@ inline bool
 ArrayView<ElementType, MemorySpaceType>::
 operator!=(const ArrayView<const value_type, MemorySpaceType> &other_view) const
 {
-  return !(*this == other_view);
+  return !(*this DEAL_II_EQUALS other_view);
 }
 
 
@@ -518,7 +516,7 @@ template <typename ElementType, typename MemorySpaceType>
 inline typename ArrayView<ElementType, MemorySpaceType>::value_type *
 ArrayView<ElementType, MemorySpaceType>::data() const noexcept
 {
-  if (n_elements == 0)
+  if (n_elements DEAL_II_EQUALS 0)
     return nullptr;
   else
     return starting_element;
@@ -532,7 +530,7 @@ ArrayView<ElementType, MemorySpaceType>::
 operator!=(const ArrayView<typename std::remove_cv<value_type>::type,
                            MemorySpaceType> &other_view) const
 {
-  return !(*this == other_view);
+  return !(*this DEAL_II_EQUALS other_view);
 }
 
 

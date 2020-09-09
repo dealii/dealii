@@ -584,11 +584,11 @@ public:
 
   /**
    * Return the number of degrees per structdim-dimensional object. For
-   * structdim==0, the function therefore returns dofs_per_vertex, for
-   * structdim==1 dofs_per_line, etc. This function is mostly used to allow
-   * some template trickery for functions that should work on all sorts of
-   * objects without wanting to use the different names (vertex, line, ...)
-   * associated with these objects.
+   * structdimDEAL_II_EQUALS 0, the function therefore returns dofs_per_vertex,
+   * for structdimDEAL_II_EQUALS 1 dofs_per_line, etc. This function is mostly
+   * used to allow some template trickery for functions that should work on all
+   * sorts of objects without wanting to use the different names (vertex, line,
+   * ...) associated with these objects.
    */
   template <int structdim>
   unsigned int
@@ -637,8 +637,7 @@ public:
   /**
    * Comparison operator.
    */
-  bool
-  operator==(const FiniteElementData &) const;
+  bool operator DEAL_II_EQUALS(const FiniteElementData &) const;
 
   /**
    * Return first index of dof on a line.
@@ -691,15 +690,17 @@ namespace FiniteElementDomination
     switch (d1)
       {
         case this_element_dominates:
-          if ((d2 == this_element_dominates) ||
-              (d2 == either_element_can_dominate) || (d2 == no_requirements))
+          if ((d2 DEAL_II_EQUALS this_element_dominates)DEAL_II_OR(
+                d2 DEAL_II_EQUALS either_element_can_dominate)
+                DEAL_II_OR(d2 DEAL_II_EQUALS no_requirements))
             return this_element_dominates;
           else
             return neither_element_dominates;
 
         case other_element_dominates:
-          if ((d2 == other_element_dominates) ||
-              (d2 == either_element_can_dominate) || (d2 == no_requirements))
+          if ((d2 DEAL_II_EQUALS other_element_dominates)DEAL_II_OR(
+                d2 DEAL_II_EQUALS either_element_can_dominate)
+                DEAL_II_OR(d2 DEAL_II_EQUALS no_requirements))
             return other_element_dominates;
           else
             return neither_element_dominates;
@@ -708,7 +709,7 @@ namespace FiniteElementDomination
           return neither_element_dominates;
 
         case either_element_can_dominate:
-          if (d2 == no_requirements)
+          if (d2 DEAL_II_EQUALS no_requirements)
             return either_element_can_dominate;
           else
             return d2;
@@ -775,7 +776,7 @@ template <int dim>
 inline unsigned int
 FiniteElementData<dim>::n_dofs_per_quad(unsigned int face_no) const
 {
-  return n_dofs_on_quad[n_dofs_on_quad.size() == 1 ? 0 : face_no];
+  return n_dofs_on_quad[n_dofs_on_quad.size() DEAL_II_EQUALS 1 ? 0 : face_no];
 }
 
 
@@ -805,7 +806,7 @@ FiniteElementData<dim>::n_dofs_per_face(unsigned int face_no,
 {
   (void)child_no;
 
-  return n_dofs_on_face[n_dofs_on_face.size() == 1 ? 0 : face_no];
+  return n_dofs_on_face[n_dofs_on_face.size() DEAL_II_EQUALS 1 ? 0 : face_no];
 }
 
 
@@ -840,7 +841,9 @@ FiniteElementData<dim>::n_dofs_per_object(const unsigned int i) const
       case 1:
         return n_dofs_per_line();
       case 2:
-        return n_dofs_per_quad((structdim == 2 && dim == 3) ? i : 0);
+        return n_dofs_per_quad(
+          (structdim DEAL_II_EQUALS 2 DEAL_II_AND dim DEAL_II_EQUALS 3) ? i :
+                                                                          0);
       case 3:
         return n_dofs_per_hex();
       default:
@@ -890,7 +893,7 @@ template <int dim>
 inline bool
 FiniteElementData<dim>::conforms(const Conformity space) const
 {
-  return ((space & conforming_space) == space);
+  return ((space & conforming_space) DEAL_II_EQUALS space);
 }
 
 
@@ -906,7 +909,7 @@ template <int dim>
 unsigned int
 FiniteElementData<dim>::get_first_quad_index(const unsigned int quad_no) const
 {
-  if (first_index_of_quads.size() == 1)
+  if (first_index_of_quads.size() DEAL_II_EQUALS 1)
     return first_index_of_quads[0] + quad_no * n_dofs_per_quad(0);
   else
     return first_index_of_quads[quad_no];
@@ -924,9 +927,8 @@ unsigned int
 FiniteElementData<dim>::get_first_face_line_index(
   const unsigned int face_no) const
 {
-  return first_line_index_of_faces[first_line_index_of_faces.size() == 1 ?
-                                     0 :
-                                     face_no];
+  return first_line_index_of_faces
+    [first_line_index_of_faces.size() DEAL_II_EQUALS 1 ? 0 : face_no];
 }
 
 template <int dim>
@@ -934,9 +936,8 @@ unsigned int
 FiniteElementData<dim>::get_first_face_quad_index(
   const unsigned int face_no) const
 {
-  return first_quad_index_of_faces[first_quad_index_of_faces.size() == 1 ?
-                                     0 :
-                                     face_no];
+  return first_quad_index_of_faces
+    [first_quad_index_of_faces.size() DEAL_II_EQUALS 1 ? 0 : face_no];
 }
 
 

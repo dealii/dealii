@@ -35,7 +35,7 @@ namespace
     std::vector<std::vector<Polynomials::Polynomial<double>>> pols(dim);
     pols[0] = Polynomials::LagrangeEquidistant::generate_complete_basis(k + 2);
 
-    if (k == 0)
+    if (k DEAL_II_EQUALS 0)
       for (unsigned int d = 1; d < dim; ++d)
         pols[d] = Polynomials::Legendre::generate_complete_basis(0);
     else
@@ -54,7 +54,8 @@ PolynomialsABF<dim>::PolynomialsABF(const unsigned int k)
   // check that the dimensions match. we only store one of the 'dim'
   // anisotropic polynomials that make up the vector-valued space, so
   // multiply by 'dim'
-  Assert(dim * polynomial_space.n() == n_polynomials(k), ExcInternalError());
+  Assert(dim * polynomial_space.n() DEAL_II_EQUALS n_polynomials(k),
+         ExcInternalError());
 }
 
 
@@ -69,16 +70,22 @@ PolynomialsABF<dim>::evaluate(
   std::vector<Tensor<4, dim>> &third_derivatives,
   std::vector<Tensor<5, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == this->n() || values.size() == 0,
+  Assert(values.size() DEAL_II_EQUALS this->n() DEAL_II_OR values.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch(values.size(), this->n()));
-  Assert(grads.size() == this->n() || grads.size() == 0,
+  Assert(grads.size() DEAL_II_EQUALS this->n() DEAL_II_OR grads.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch(grads.size(), this->n()));
-  Assert(grad_grads.size() == this->n() || grad_grads.size() == 0,
+  Assert(grad_grads.size() DEAL_II_EQUALS this->n() DEAL_II_OR grad_grads.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch(grad_grads.size(), this->n()));
-  Assert(third_derivatives.size() == this->n() || third_derivatives.size() == 0,
+  Assert(third_derivatives.size()
+           DEAL_II_EQUALS this->n() DEAL_II_OR third_derivatives.size()
+             DEAL_II_EQUALS 0,
          ExcDimensionMismatch(third_derivatives.size(), this->n()));
-  Assert(fourth_derivatives.size() == this->n() ||
-           fourth_derivatives.size() == 0,
+  Assert(fourth_derivatives.size()
+           DEAL_II_EQUALS this->n() DEAL_II_OR fourth_derivatives.size()
+             DEAL_II_EQUALS 0,
          ExcDimensionMismatch(fourth_derivatives.size(), this->n()));
 
   const unsigned int n_sub = polynomial_space.n();
@@ -89,11 +96,13 @@ PolynomialsABF<dim>::evaluate(
   // at once
   std::lock_guard<std::mutex> lock(mutex);
 
-  p_values.resize((values.size() == 0) ? 0 : n_sub);
-  p_grads.resize((grads.size() == 0) ? 0 : n_sub);
-  p_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_sub);
-  p_third_derivatives.resize((third_derivatives.size() == 0) ? 0 : n_sub);
-  p_fourth_derivatives.resize((fourth_derivatives.size() == 0) ? 0 : n_sub);
+  p_values.resize((values.size() DEAL_II_EQUALS 0) ? 0 : n_sub);
+  p_grads.resize((grads.size() DEAL_II_EQUALS 0) ? 0 : n_sub);
+  p_grad_grads.resize((grad_grads.size() DEAL_II_EQUALS 0) ? 0 : n_sub);
+  p_third_derivatives.resize(
+    (third_derivatives.size() DEAL_II_EQUALS 0) ? 0 : n_sub);
+  p_fourth_derivatives.resize(
+    (fourth_derivatives.size() DEAL_II_EQUALS 0) ? 0 : n_sub);
 
   for (unsigned int d = 0; d < dim; ++d)
     {

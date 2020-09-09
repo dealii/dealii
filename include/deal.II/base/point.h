@@ -127,8 +127,8 @@ public:
 
   /**
    * Constructor for one dimensional points. This function is only implemented
-   * for <tt>dim==1</tt> since the usage is considered unsafe for points with
-   * <tt>dim!=1</tt> as it would leave some components of the point
+   * for <tt>dimDEAL_II_EQUALS 1</tt> since the usage is considered unsafe for
+   * points with <tt>dim!=1</tt> as it would leave some components of the point
    * coordinates uninitialized.
    *
    * @note This function can also be used in CUDA device code.
@@ -138,8 +138,8 @@ public:
 
   /**
    * Constructor for two dimensional points. This function is only implemented
-   * for <tt>dim==2</tt> since the usage is considered unsafe for points with
-   * <tt>dim!=2</tt> as it would leave some components of the point
+   * for <tt>dimDEAL_II_EQUALS 2</tt> since the usage is considered unsafe for
+   * points with <tt>dim!=2</tt> as it would leave some components of the point
    * coordinates uninitialized (if dim>2) or would not use some arguments (if
    * dim<2).
    *
@@ -150,9 +150,9 @@ public:
 
   /**
    * Constructor for three dimensional points. This function is only
-   * implemented for <tt>dim==3</tt> since the usage is considered unsafe for
-   * points with <tt>dim!=3</tt> as it would leave some components of the
-   * point coordinates uninitialized (if dim>3) or would not use some
+   * implemented for <tt>dimDEAL_II_EQUALS 3</tt> since the usage is considered
+   * unsafe for points with <tt>dim!=3</tt> as it would leave some components of
+   * the point coordinates uninitialized (if dim>3) or would not use some
    * arguments (if dim<3).
    *
    * @note This function can also be used in CUDA device code.
@@ -164,7 +164,8 @@ public:
    * Convert a boost::geometry::point to a dealii::Point.
    */
   template <std::size_t dummy_dim,
-            typename std::enable_if<(dim == dummy_dim) && (dummy_dim != 0),
+            typename std::enable_if<(dim DEAL_II_EQUALS dummy_dim)
+                                      DEAL_II_AND(dummy_dim != 0),
                                     int>::type = 0>
   Point(const boost::geometry::model::
           point<Number, dummy_dim, boost::geometry::cs::cartesian> &boost_pt);
@@ -363,7 +364,7 @@ inline DEAL_II_CUDA_HOST_DEV
 Point<dim, Number>::Point(const Number x)
 {
 #  ifndef __CUDA_ARCH__
-  Assert(dim == 1,
+  Assert(dim DEAL_II_EQUALS 1,
          ExcMessage(
            "You can only initialize Point<1> objects using the constructor "
            "that takes only one argument. Point<dim> objects with dim!=1 "
@@ -391,7 +392,7 @@ inline DEAL_II_CUDA_HOST_DEV
 Point<dim, Number>::Point(const Number x, const Number y)
 {
 #  ifndef __CUDA_ARCH__
-  Assert(dim == 2,
+  Assert(dim DEAL_II_EQUALS 2,
          ExcMessage(
            "You can only initialize Point<2> objects using the constructor "
            "that takes two arguments. Point<dim> objects with dim!=2 "
@@ -414,7 +415,7 @@ inline DEAL_II_CUDA_HOST_DEV
 Point<dim, Number>::Point(const Number x, const Number y, const Number z)
 {
 #  ifndef __CUDA_ARCH__
-  Assert(dim == 3,
+  Assert(dim DEAL_II_EQUALS 3,
          ExcMessage(
            "You can only initialize Point<3> objects using the constructor "
            "that takes three arguments. Point<dim> objects with dim!=3 "
@@ -435,9 +436,10 @@ Point<dim, Number>::Point(const Number x, const Number y, const Number z)
 
 
 template <int dim, typename Number>
-template <
-  std::size_t dummy_dim,
-  typename std::enable_if<(dim == dummy_dim) && (dummy_dim != 0), int>::type>
+template <std::size_t dummy_dim,
+          typename std::enable_if<(dim DEAL_II_EQUALS dummy_dim)
+                                    DEAL_II_AND(dummy_dim != 0),
+                                  int>::type>
 inline Point<dim, Number>::Point(
   const boost::geometry::model::
     point<Number, dummy_dim, boost::geometry::cs::cartesian> &boost_pt)

@@ -15,7 +15,7 @@
 
 #include <deal.II/base/config.h>
 
-#if defined(DEAL_II_WITH_ADOLC) || defined(DEAL_II_TRILINOS_WITH_SACADO)
+#if defined(DEAL_II_WITH_ADOLC) DEAL_II_OR defined(DEAL_II_TRILINOS_WITH_SACADO)
 
 #  include <deal.II/differentiation/ad/ad_drivers.h>
 #  include <deal.II/differentiation/ad/ad_helpers.h>
@@ -46,7 +46,7 @@ namespace Differentiation
       , registered_marked_dependent_variables(n_dependent_variables, false)
     {
       // We have enabled the compilation of this class for arithmetic
-      // types (i.e. ADNumberTypeCode == NumberTypes::none), but we
+      // types (i.e. ADNumberTypeCode DEAL_II_EQUALS  NumberTypes::none), but we
       // can't actually do anything with them. Lets not advance any further
       // and seemingly allow any operations that will not give any
       // sensible results.
@@ -106,21 +106,21 @@ namespace Differentiation
       const unsigned int index,
       const scalar_type &value)
     {
-      if (ADNumberTraits<ad_type>::is_tapeless == true)
+      if (ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true)
         {
           // A dummy call in case the user does not encapsulate a set of
           // calls to tapeless ADHelpers with the initial and final calls to
           // [start,stop]_recording_operations.
-          if (this->is_recording() == false)
+          if (this->is_recording() DEAL_II_EQUALS false)
             start_recording_operations(1 /*tape index*/);
 
-          Assert(this->is_recording() == true,
+          Assert(this->is_recording() DEAL_II_EQUALS true,
                  ExcMessage(
                    "Cannot change the value of an independent variable "
                    "of the tapeless variety while this class is not set "
                    "in recording operations."));
         }
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           Assert(this->active_tape_index() !=
                    Numbers<ad_type>::invalid_tape_index,
@@ -144,22 +144,23 @@ namespace Differentiation
       ad_type &          out) const
     {
       Assert(index < n_independent_variables(), ExcInternalError());
-      Assert(registered_independent_variable_values[index] == true,
+      Assert(registered_independent_variable_values[index] DEAL_II_EQUALS true,
              ExcInternalError());
 
       if (index > 0)
         {
           Assert(
-            registered_marked_independent_variables[index - 1] == true,
+            registered_marked_independent_variables[index -
+                                                    1] DEAL_II_EQUALS true,
             ExcMessage(
               "Need to extract sensitivities in the order they're created."));
         }
 
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           Assert(active_tape_index() != Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
-          Assert(is_recording() == true,
+          Assert(is_recording() DEAL_II_EQUALS true,
                  ExcMessage(
                    "The marking of independent variables is only valid "
                    "during recording."));
@@ -181,11 +182,12 @@ namespace Differentiation
                ScalarType>::finalize_sensitive_independent_variables() const
     {
       // Double check that we've actually registered all DoFs
-      Assert(n_registered_independent_variables() == n_independent_variables(),
+      Assert(n_registered_independent_variables()
+               DEAL_II_EQUALS n_independent_variables(),
              ExcMessage("Not all values of sensitivities have been recorded!"));
 
       // This should happen only once
-      if (this->independent_variables.size() == 0)
+      if (this->independent_variables.size() DEAL_II_EQUALS 0)
         {
           this->independent_variables.resize(
             this->n_independent_variables(),
@@ -205,18 +207,18 @@ namespace Differentiation
       initialize_non_sensitive_independent_variable(const unsigned int index,
                                                     ad_type &out) const
     {
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           Assert(active_tape_index() != Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
         }
-      Assert(is_recording() == false,
+      Assert(is_recording() DEAL_II_EQUALS false,
              ExcMessage(
                "The initialization of non-sensitive independent variables is "
                "only valid outside of recording operations."));
 
       Assert(index < n_independent_variables(), ExcInternalError());
-      Assert(registered_independent_variable_values[index] == true,
+      Assert(registered_independent_variable_values[index] DEAL_II_EQUALS true,
              ExcInternalError());
 
       out = independent_variable_values[index];
@@ -379,7 +381,7 @@ namespace Differentiation
       const typename Types<ad_type>::tape_index tape_index,
       std::ostream &                            stream) const
     {
-      if (ADNumberTraits<ad_type>::is_tapeless == true)
+      if (ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true)
         return;
 
       Assert(is_registered_tape(tape_index),
@@ -454,14 +456,14 @@ namespace Differentiation
       const unsigned int n_independent_variables,
       const bool         ensure_persistent_setting)
     {
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         return;
 
       // Try to safely initialize the global environment
       TapelessDrivers<ad_type, scalar_type>::initialize_global_environment(
         n_independent_variables);
 
-      if (ensure_persistent_setting == true)
+      if (ensure_persistent_setting DEAL_II_EQUALS true)
         if (is_adolc_tapeless_number<ad_type>::value)
           {
             // In order to ensure that the settings remain for the entire
@@ -489,7 +491,7 @@ namespace Differentiation
     HelperBase<ADNumberTypeCode, ScalarType>::recorded_tape_requires_retaping(
       const typename Types<ad_type>::tape_index tape_index) const
     {
-      if (ADNumberTraits<ad_type>::is_tapeless == true)
+      if (ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true)
         return false;
 
       return taped_driver.requires_retaping(tape_index);
@@ -502,7 +504,7 @@ namespace Differentiation
     HelperBase<ADNumberTypeCode, ScalarType>::active_tape_requires_retaping()
       const
     {
-      if (ADNumberTraits<ad_type>::is_tapeless == true)
+      if (ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true)
         return false;
 
       return taped_driver.last_action_requires_retaping();
@@ -514,7 +516,7 @@ namespace Differentiation
     void
     HelperBase<ADNumberTypeCode, ScalarType>::clear_active_tape()
     {
-      if (ADNumberTraits<ad_type>::is_tapeless == true)
+      if (ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true)
         return;
 
       taped_driver.remove_tape(taped_driver.active_tape_index());
@@ -528,7 +530,7 @@ namespace Differentiation
       const typename Types<ad_type>::tape_index tape_index,
       const bool                                read_mode)
     {
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           Assert(tape_index != Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
@@ -540,19 +542,19 @@ namespace Differentiation
           // A tape may have been defined by a different ADHelper, so in this
           // case we ignore the fact that any dependent variables within the
           // current data structure have not been marked as dependents
-          if (read_mode == true)
+          if (read_mode DEAL_II_EQUALS true)
             {
               Assert(is_registered_tape(tape_index),
                      ExcMessage("Tape number not registered"));
               reset_registered_dependent_variables(true);
-              Assert(n_registered_dependent_variables() ==
-                       n_dependent_variables(),
+              Assert(n_registered_dependent_variables()
+                       DEAL_II_EQUALS n_dependent_variables(),
                      ExcMessage("Not all dependent variables have been set!"));
             }
         }
       else
         {
-          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+          Assert(ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true,
                  ExcInternalError());
         }
     }
@@ -569,7 +571,7 @@ namespace Differentiation
     {
       // When valid for the chosen AD number type, these values will be used the
       // next time start_recording_operations() is called.
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         taped_driver.set_tape_buffer_sizes(obufsize,
                                            lbufsize,
                                            vbufsize,
@@ -588,16 +590,18 @@ namespace Differentiation
       // Define this here for clarity when this flag is used later.
       const bool read_mode = false;
 
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           if (overwrite_tape != true)
             {
-              Assert(is_recording() == false,
+              Assert(is_recording() DEAL_II_EQUALS false,
                      ExcMessage("Already recording..."));
             }
 
           // Check conditions to enable tracing
-          if (is_registered_tape(tape_index) == false || overwrite_tape == true)
+          if (is_registered_tape(tape_index)
+                DEAL_II_EQUALS false DEAL_II_OR overwrite_tape
+                                                DEAL_II_EQUALS true)
             {
               // Setup the data structures for this class in the
               // appropriate manner
@@ -614,7 +618,7 @@ namespace Differentiation
             }
           else
             {
-              Assert(is_recording() == false,
+              Assert(is_recording() DEAL_II_EQUALS false,
                      ExcMessage(
                        "Tape recording is unexpectedly still enabled."));
 
@@ -625,7 +629,7 @@ namespace Differentiation
         }
       else
         {
-          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+          Assert(ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true,
                  ExcInternalError());
 
           // Set the flag that states that we can safely mark dependent
@@ -648,23 +652,26 @@ namespace Differentiation
     HelperBase<ADNumberTypeCode, ScalarType>::stop_recording_operations(
       const bool write_tapes_to_file)
     {
-      Assert(is_recording() == true, ExcMessage("Not currently recording..."));
+      Assert(is_recording() DEAL_II_EQUALS true,
+             ExcMessage("Not currently recording..."));
 
       // Double check that we've actually registered all DoFs
-      Assert(n_registered_independent_variables() == n_independent_variables(),
+      Assert(n_registered_independent_variables()
+               DEAL_II_EQUALS n_independent_variables(),
              ExcMessage("Not all values of sensitivities have been recorded!"));
 
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           // Stop tracing
           taped_driver.stop_taping(active_tape_index(), write_tapes_to_file);
         }
       else
         {
-          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+          Assert(ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true,
                  ExcInternalError());
           // Double check that we've actually registered dependent variables
-          Assert(n_registered_dependent_variables() == n_dependent_variables(),
+          Assert(n_registered_dependent_variables()
+                   DEAL_II_EQUALS n_dependent_variables(),
                  ExcMessage("Not all dependent variables have been set!"));
 
           // By changing this flag, we ensure that the we can no longer
@@ -686,15 +693,15 @@ namespace Differentiation
       const ad_type &    func)
     {
       Assert(index < n_dependent_variables(), ExcMessage("Index out of range"));
-      Assert(registered_marked_dependent_variables[index] == false,
+      Assert(registered_marked_dependent_variables[index] DEAL_II_EQUALS false,
              ExcMessage(
                "This dependent variable has already been registered."));
 
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           Assert(active_tape_index() != Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
-          Assert(is_recording() == true,
+          Assert(is_recording() DEAL_II_EQUALS true,
                  ExcMessage(
                    "Must be recording when registering dependent variables."));
         }
@@ -730,13 +737,15 @@ namespace Differentiation
       // in the sense that we simply populate our array of independent values
       // with a meaningful number. However, in this case we need to double check
       // that we're not registering these variables twice
-      Assert(dof_values.size() == this->n_independent_variables(),
+      Assert(dof_values.size() DEAL_II_EQUALS this->n_independent_variables(),
              ExcMessage(
                "Vector size does not match number of independent variables"));
       for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
         {
-          Assert(this->registered_independent_variable_values[i] == false,
-                 ExcMessage("Independent variable value already registered."));
+          Assert(
+            this
+              ->registered_independent_variable_values[i] DEAL_II_EQUALS false,
+            ExcMessage("Independent variable value already registered."));
         }
       set_dof_values(dof_values);
     }
@@ -749,7 +758,7 @@ namespace Differentiation
     CellLevelBase<ADNumberTypeCode, ScalarType>::get_sensitive_dof_values()
       const
     {
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           Assert(this->active_tape_index() !=
                    Numbers<ad_type>::invalid_tape_index,
@@ -759,8 +768,8 @@ namespace Differentiation
       // If necessary, initialize the internally stored vector of
       // AD numbers that represents the independent variables
       this->finalize_sensitive_independent_variables();
-      Assert(this->independent_variables.size() ==
-               this->n_independent_variables(),
+      Assert(this->independent_variables.size()
+               DEAL_II_EQUALS this->n_independent_variables(),
              ExcDimensionMismatch(this->independent_variables.size(),
                                   this->n_independent_variables()));
 
@@ -774,13 +783,13 @@ namespace Differentiation
     CellLevelBase<ADNumberTypeCode, ScalarType>::set_dof_values(
       const std::vector<scalar_type> &values)
     {
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           Assert(this->active_tape_index() !=
                    Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
         }
-      Assert(values.size() == this->n_independent_variables(),
+      Assert(values.size() DEAL_II_EQUALS this->n_independent_variables(),
              ExcMessage(
                "Vector size does not match number of independent variables"));
       for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
@@ -807,7 +816,8 @@ namespace Differentiation
     EnergyFunctional<ADNumberTypeCode, ScalarType>::register_energy_functional(
       const ad_type &energy)
     {
-      Assert(this->n_dependent_variables() == 1, ExcInternalError());
+      Assert(this->n_dependent_variables() DEAL_II_EQUALS 1,
+             ExcInternalError());
       HelperBase<ADNumberTypeCode, ScalarType>::register_dependent_variable(
         0, energy);
     }
@@ -818,35 +828,36 @@ namespace Differentiation
     typename EnergyFunctional<ADNumberTypeCode, ScalarType>::scalar_type
     EnergyFunctional<ADNumberTypeCode, ScalarType>::compute_energy() const
     {
-      if ((ADNumberTraits<ad_type>::is_taped == true &&
-           this->taped_driver.keep_independent_values() == false) ||
-          ADNumberTraits<ad_type>::is_tapeless == true)
+      if ((ADNumberTraits<ad_type>::is_taped
+             DEAL_II_EQUALS true DEAL_II_AND this->taped_driver
+               .keep_independent_values() DEAL_II_EQUALS false)
+            DEAL_II_OR ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true)
         {
           Assert(
-            this->n_registered_independent_variables() ==
-              this->n_independent_variables(),
+            this->n_registered_independent_variables()
+              DEAL_II_EQUALS this->n_independent_variables(),
             ExcMessage(
               "Not all values of sensitivities have been registered or subsequently set!"));
         }
-      Assert(this->n_registered_dependent_variables() ==
-               this->n_dependent_variables(),
+      Assert(this->n_registered_dependent_variables()
+               DEAL_II_EQUALS this->n_dependent_variables(),
              ExcMessage("Not all dependent variables have been registered."));
 
       Assert(
-        this->n_dependent_variables() == 1,
+        this->n_dependent_variables() DEAL_II_EQUALS 1,
         ExcMessage(
           "The EnergyFunctional class expects there to be only one dependent variable."));
 
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           Assert(this->active_tape_index() !=
                    Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
-          Assert(this->is_recording() == false,
+          Assert(this->is_recording() DEAL_II_EQUALS false,
                  ExcMessage(
                    "Cannot compute value while tape is being recorded."));
-          Assert(this->independent_variable_values.size() ==
-                   this->n_independent_variables(),
+          Assert(this->independent_variable_values.size()
+                   DEAL_II_EQUALS this->n_independent_variables(),
                  ExcDimensionMismatch(this->independent_variable_values.size(),
                                       this->n_independent_variables()));
 
@@ -855,10 +866,10 @@ namespace Differentiation
         }
       else
         {
-          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+          Assert(ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true,
                  ExcInternalError());
-          Assert(this->independent_variables.size() ==
-                   this->n_independent_variables(),
+          Assert(this->independent_variables.size()
+                   DEAL_II_EQUALS this->n_independent_variables(),
                  ExcDimensionMismatch(this->independent_variables.size(),
                                       this->n_independent_variables()));
 
@@ -873,22 +884,23 @@ namespace Differentiation
     EnergyFunctional<ADNumberTypeCode, ScalarType>::compute_residual(
       Vector<scalar_type> &gradient) const
     {
-      if ((ADNumberTraits<ad_type>::is_taped == true &&
-           this->taped_driver.keep_independent_values() == false) ||
-          ADNumberTraits<ad_type>::is_tapeless == true)
+      if ((ADNumberTraits<ad_type>::is_taped
+             DEAL_II_EQUALS true DEAL_II_AND this->taped_driver
+               .keep_independent_values() DEAL_II_EQUALS false)
+            DEAL_II_OR ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true)
         {
           Assert(
-            this->n_registered_independent_variables() ==
-              this->n_independent_variables(),
+            this->n_registered_independent_variables()
+              DEAL_II_EQUALS this->n_independent_variables(),
             ExcMessage(
               "Not all values of sensitivities have been registered or subsequently set!"));
         }
-      Assert(this->n_registered_dependent_variables() ==
-               this->n_dependent_variables(),
+      Assert(this->n_registered_dependent_variables()
+               DEAL_II_EQUALS this->n_dependent_variables(),
              ExcMessage("Not all dependent variables have been registered."));
 
       Assert(
-        this->n_dependent_variables() == 1,
+        this->n_dependent_variables() DEAL_II_EQUALS 1,
         ExcMessage(
           "The EnergyFunctional class expects there to be only one dependent variable."));
 
@@ -899,16 +911,16 @@ namespace Differentiation
         gradient.reinit(this->n_independent_variables(),
                         true /*omit_zeroing_entries*/);
 
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           Assert(this->active_tape_index() !=
                    Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
-          Assert(this->is_recording() == false,
+          Assert(this->is_recording() DEAL_II_EQUALS false,
                  ExcMessage(
                    "Cannot compute gradient while tape is being recorded."));
-          Assert(this->independent_variable_values.size() ==
-                   this->n_independent_variables(),
+          Assert(this->independent_variable_values.size()
+                   DEAL_II_EQUALS this->n_independent_variables(),
                  ExcDimensionMismatch(this->independent_variable_values.size(),
                                       this->n_independent_variables()));
 
@@ -918,10 +930,10 @@ namespace Differentiation
         }
       else
         {
-          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+          Assert(ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true,
                  ExcInternalError());
-          Assert(this->independent_variables.size() ==
-                   this->n_independent_variables(),
+          Assert(this->independent_variables.size()
+                   DEAL_II_EQUALS this->n_independent_variables(),
                  ExcDimensionMismatch(this->independent_variables.size(),
                                       this->n_independent_variables()));
 
@@ -943,43 +955,45 @@ namespace Differentiation
                "Cannot computed function Hessian: AD number type does "
                "not support the calculation of second order derivatives."));
 
-      if ((ADNumberTraits<ad_type>::is_taped == true &&
-           this->taped_driver.keep_independent_values() == false))
+      if ((ADNumberTraits<ad_type>::is_taped
+             DEAL_II_EQUALS true DEAL_II_AND this->taped_driver
+               .keep_independent_values() DEAL_II_EQUALS false))
         {
           Assert(
-            this->n_registered_independent_variables() ==
-              this->n_independent_variables(),
+            this->n_registered_independent_variables()
+              DEAL_II_EQUALS this->n_independent_variables(),
             ExcMessage(
               "Not all values of sensitivities have been registered or subsequently set!"));
         }
-      Assert(this->n_registered_dependent_variables() ==
-               this->n_dependent_variables(),
+      Assert(this->n_registered_dependent_variables()
+               DEAL_II_EQUALS this->n_dependent_variables(),
              ExcMessage("Not all dependent variables have been registered."));
 
       Assert(
-        this->n_dependent_variables() == 1,
+        this->n_dependent_variables() DEAL_II_EQUALS 1,
         ExcMessage(
           "The EnergyFunctional class expects there to be only one dependent variable."));
 
       // We can neglect correctly initializing the entries as
       // we'll be overwriting them immediately in the succeeding call to
       // Drivers::hessian().
-      if (hessian.m() != this->n_independent_variables() ||
-          hessian.n() != this->n_independent_variables())
+      if (hessian.m() !=
+          this->n_independent_variables() DEAL_II_OR hessian.n() !=
+          this->n_independent_variables())
         hessian.reinit({this->n_independent_variables(),
                         this->n_independent_variables()},
                        true /*omit_default_initialization*/);
 
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           Assert(this->active_tape_index() !=
                    Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
-          Assert(this->is_recording() == false,
+          Assert(this->is_recording() DEAL_II_EQUALS false,
                  ExcMessage(
                    "Cannot compute hessian while tape is being recorded."));
-          Assert(this->independent_variable_values.size() ==
-                   this->n_independent_variables(),
+          Assert(this->independent_variable_values.size()
+                   DEAL_II_EQUALS this->n_independent_variables(),
                  ExcDimensionMismatch(this->independent_variable_values.size(),
                                       this->n_independent_variables()));
 
@@ -989,10 +1003,10 @@ namespace Differentiation
         }
       else
         {
-          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+          Assert(ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true,
                  ExcInternalError());
-          Assert(this->independent_variables.size() ==
-                   this->n_independent_variables(),
+          Assert(this->independent_variables.size()
+                   DEAL_II_EQUALS this->n_independent_variables(),
                  ExcDimensionMismatch(this->independent_variables.size(),
                                       this->n_independent_variables()));
 
@@ -1022,7 +1036,7 @@ namespace Differentiation
     ResidualLinearization<ADNumberTypeCode, ScalarType>::
       register_residual_vector(const std::vector<ad_type> &residual)
     {
-      Assert(residual.size() == this->n_dependent_variables(),
+      Assert(residual.size() DEAL_II_EQUALS this->n_dependent_variables(),
              ExcMessage(
                "Vector size does not match number of dependent variables"));
       for (unsigned int i = 0; i < this->n_dependent_variables(); ++i)
@@ -1037,18 +1051,19 @@ namespace Differentiation
     ResidualLinearization<ADNumberTypeCode, ScalarType>::compute_residual(
       Vector<scalar_type> &values) const
     {
-      if ((ADNumberTraits<ad_type>::is_taped == true &&
-           this->taped_driver.keep_independent_values() == false) ||
-          ADNumberTraits<ad_type>::is_tapeless == true)
+      if ((ADNumberTraits<ad_type>::is_taped
+             DEAL_II_EQUALS true DEAL_II_AND this->taped_driver
+               .keep_independent_values() DEAL_II_EQUALS false)
+            DEAL_II_OR ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true)
         {
           Assert(
-            this->n_registered_independent_variables() ==
-              this->n_independent_variables(),
+            this->n_registered_independent_variables()
+              DEAL_II_EQUALS this->n_independent_variables(),
             ExcMessage(
               "Not all values of sensitivities have been registered or subsequently set!"));
         }
-      Assert(this->n_registered_dependent_variables() ==
-               this->n_dependent_variables(),
+      Assert(this->n_registered_dependent_variables()
+               DEAL_II_EQUALS this->n_dependent_variables(),
              ExcMessage("Not all dependent variables have been registered."));
 
       // We can neglect correctly initializing the entries as
@@ -1058,16 +1073,16 @@ namespace Differentiation
         values.reinit(this->n_dependent_variables(),
                       true /*omit_zeroing_entries*/);
 
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           Assert(this->active_tape_index() !=
                    Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
-          Assert(this->is_recording() == false,
+          Assert(this->is_recording() DEAL_II_EQUALS false,
                  ExcMessage(
                    "Cannot compute values while tape is being recorded."));
-          Assert(this->independent_variable_values.size() ==
-                   this->n_independent_variables(),
+          Assert(this->independent_variable_values.size()
+                   DEAL_II_EQUALS this->n_independent_variables(),
                  ExcDimensionMismatch(this->independent_variable_values.size(),
                                       this->n_independent_variables()));
 
@@ -1078,7 +1093,7 @@ namespace Differentiation
         }
       else
         {
-          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+          Assert(ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true,
                  ExcInternalError());
           this->tapeless_driver.values(this->dependent_variables, values);
         }
@@ -1091,39 +1106,41 @@ namespace Differentiation
     ResidualLinearization<ADNumberTypeCode, ScalarType>::compute_linearization(
       FullMatrix<scalar_type> &jacobian) const
     {
-      if ((ADNumberTraits<ad_type>::is_taped == true &&
-           this->taped_driver.keep_independent_values() == false) ||
-          ADNumberTraits<ad_type>::is_tapeless == true)
+      if ((ADNumberTraits<ad_type>::is_taped
+             DEAL_II_EQUALS true DEAL_II_AND this->taped_driver
+               .keep_independent_values() DEAL_II_EQUALS false)
+            DEAL_II_OR ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true)
         {
           Assert(
-            this->n_registered_independent_variables() ==
-              this->n_independent_variables(),
+            this->n_registered_independent_variables()
+              DEAL_II_EQUALS this->n_independent_variables(),
             ExcMessage(
               "Not all values of sensitivities have been registered or subsequently set!"));
         }
-      Assert(this->n_registered_dependent_variables() ==
-               this->n_dependent_variables(),
+      Assert(this->n_registered_dependent_variables()
+               DEAL_II_EQUALS this->n_dependent_variables(),
              ExcMessage("Not all dependent variables have been registered."));
 
       // We can neglect correctly initializing the entries as
       // we'll be overwriting them immediately in the succeeding call to
       // Drivers::jacobian().
-      if (jacobian.m() != this->n_dependent_variables() ||
-          jacobian.n() != this->n_independent_variables())
+      if (jacobian.m() !=
+          this->n_dependent_variables() DEAL_II_OR jacobian.n() !=
+          this->n_independent_variables())
         jacobian.reinit({this->n_dependent_variables(),
                          this->n_independent_variables()},
                         true /*omit_default_initialization*/);
 
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           Assert(this->active_tape_index() !=
                    Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
-          Assert(this->is_recording() == false,
+          Assert(this->is_recording() DEAL_II_EQUALS false,
                  ExcMessage(
                    "Cannot compute hessian while tape is being recorded."));
-          Assert(this->independent_variable_values.size() ==
-                   this->n_independent_variables(),
+          Assert(this->independent_variable_values.size()
+                   DEAL_II_EQUALS this->n_independent_variables(),
                  ExcDimensionMismatch(this->independent_variable_values.size(),
                                       this->n_independent_variables()));
 
@@ -1134,10 +1151,10 @@ namespace Differentiation
         }
       else
         {
-          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+          Assert(ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true,
                  ExcInternalError());
-          Assert(this->independent_variables.size() ==
-                   this->n_independent_variables(),
+          Assert(this->independent_variables.size()
+                   DEAL_II_EQUALS this->n_independent_variables(),
                  ExcDimensionMismatch(this->independent_variables.size(),
                                       this->n_independent_variables()));
 
@@ -1228,13 +1245,15 @@ namespace Differentiation
       // in the sense that we simply populate our array of independent values
       // with a meaningful number. However, in this case we need to double check
       // that we're not registering these variables twice
-      Assert(values.size() == this->n_independent_variables(),
+      Assert(values.size() DEAL_II_EQUALS this->n_independent_variables(),
              ExcMessage(
                "Vector size does not match number of independent variables"));
       for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
         {
-          Assert(this->registered_independent_variable_values[i] == false,
-                 ExcMessage("Independent variable value already registered."));
+          Assert(
+            this
+              ->registered_independent_variable_values[i] DEAL_II_EQUALS false,
+            ExcMessage("Independent variable value already registered."));
         }
       set_independent_variables(values);
     }
@@ -1250,7 +1269,7 @@ namespace Differentiation
     PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
       get_sensitive_variables() const
     {
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           Assert(this->active_tape_index() !=
                    Numbers<ad_type>::invalid_tape_index,
@@ -1261,8 +1280,8 @@ namespace Differentiation
       // initialize the internally stored vector of AD numbers that
       // represents the independent variables.
       this->finalize_sensitive_independent_variables();
-      Assert(this->independent_variables.size() ==
-               this->n_independent_variables(),
+      Assert(this->independent_variables.size()
+               DEAL_II_EQUALS this->n_independent_variables(),
              ExcDimensionMismatch(this->independent_variables.size(),
                                   this->n_independent_variables()));
 
@@ -1300,13 +1319,13 @@ namespace Differentiation
     PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
       set_independent_variables(const std::vector<scalar_type> &values)
     {
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           Assert(this->active_tape_index() !=
                    Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
         }
-      Assert(values.size() == this->n_independent_variables(),
+      Assert(values.size() DEAL_II_EQUALS this->n_independent_variables(),
              ExcMessage(
                "Vector size does not match number of independent variables"));
       for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
@@ -1339,7 +1358,8 @@ namespace Differentiation
     ScalarFunction<dim, ADNumberTypeCode, ScalarType>::
       register_dependent_variable(const ad_type &func)
     {
-      Assert(this->n_dependent_variables() == 1, ExcInternalError());
+      Assert(this->n_dependent_variables() DEAL_II_EQUALS 1,
+             ExcInternalError());
       HelperBase<ADNumberTypeCode, ScalarType>::register_dependent_variable(
         0, func);
     }
@@ -1352,35 +1372,36 @@ namespace Differentiation
     typename ScalarFunction<dim, ADNumberTypeCode, ScalarType>::scalar_type
     ScalarFunction<dim, ADNumberTypeCode, ScalarType>::compute_value() const
     {
-      if ((ADNumberTraits<ad_type>::is_taped == true &&
-           this->taped_driver.keep_independent_values() == false) ||
-          ADNumberTraits<ad_type>::is_tapeless == true)
+      if ((ADNumberTraits<ad_type>::is_taped
+             DEAL_II_EQUALS true DEAL_II_AND this->taped_driver
+               .keep_independent_values() DEAL_II_EQUALS false)
+            DEAL_II_OR ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true)
         {
           Assert(
-            this->n_registered_independent_variables() ==
-              this->n_independent_variables(),
+            this->n_registered_independent_variables()
+              DEAL_II_EQUALS this->n_independent_variables(),
             ExcMessage(
               "Not all values of sensitivities have been registered or subsequently set!"));
         }
-      Assert(this->n_registered_dependent_variables() ==
-               this->n_dependent_variables(),
+      Assert(this->n_registered_dependent_variables()
+               DEAL_II_EQUALS this->n_dependent_variables(),
              ExcMessage("Not all dependent variables have been registered."));
 
       Assert(
-        this->n_dependent_variables() == 1,
+        this->n_dependent_variables() DEAL_II_EQUALS 1,
         ExcMessage(
           "The ScalarFunction class expects there to be only one dependent variable."));
 
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           Assert(this->active_tape_index() !=
                    Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
-          Assert(this->is_recording() == false,
+          Assert(this->is_recording() DEAL_II_EQUALS false,
                  ExcMessage(
                    "Cannot compute values while tape is being recorded."));
-          Assert(this->independent_variable_values.size() ==
-                   this->n_independent_variables(),
+          Assert(this->independent_variable_values.size()
+                   DEAL_II_EQUALS this->n_independent_variables(),
                  ExcDimensionMismatch(this->independent_variable_values.size(),
                                       this->n_independent_variables()));
 
@@ -1389,7 +1410,7 @@ namespace Differentiation
         }
       else
         {
-          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+          Assert(ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true,
                  ExcInternalError());
           return this->tapeless_driver.value(this->dependent_variables);
         }
@@ -1403,22 +1424,23 @@ namespace Differentiation
     ScalarFunction<dim, ADNumberTypeCode, ScalarType>::compute_gradient(
       Vector<scalar_type> &gradient) const
     {
-      if ((ADNumberTraits<ad_type>::is_taped == true &&
-           this->taped_driver.keep_independent_values() == false) ||
-          ADNumberTraits<ad_type>::is_tapeless == true)
+      if ((ADNumberTraits<ad_type>::is_taped
+             DEAL_II_EQUALS true DEAL_II_AND this->taped_driver
+               .keep_independent_values() DEAL_II_EQUALS false)
+            DEAL_II_OR ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true)
         {
           Assert(
-            this->n_registered_independent_variables() ==
-              this->n_independent_variables(),
+            this->n_registered_independent_variables()
+              DEAL_II_EQUALS this->n_independent_variables(),
             ExcMessage(
               "Not all values of sensitivities have been registered or subsequently set!"));
         }
-      Assert(this->n_registered_dependent_variables() ==
-               this->n_dependent_variables(),
+      Assert(this->n_registered_dependent_variables()
+               DEAL_II_EQUALS this->n_dependent_variables(),
              ExcMessage("Not all dependent variables have been registered."));
 
       Assert(
-        this->n_dependent_variables() == 1,
+        this->n_dependent_variables() DEAL_II_EQUALS 1,
         ExcMessage(
           "The ScalarFunction class expects there to be only one dependent variable."));
 
@@ -1429,16 +1451,16 @@ namespace Differentiation
         gradient.reinit(this->n_independent_variables(),
                         true /*omit_zeroing_entries*/);
 
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           Assert(this->active_tape_index() !=
                    Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
-          Assert(this->is_recording() == false,
+          Assert(this->is_recording() DEAL_II_EQUALS false,
                  ExcMessage(
                    "Cannot compute gradient while tape is being recorded."));
-          Assert(this->independent_variable_values.size() ==
-                   this->n_independent_variables(),
+          Assert(this->independent_variable_values.size()
+                   DEAL_II_EQUALS this->n_independent_variables(),
                  ExcDimensionMismatch(this->independent_variable_values.size(),
                                       this->n_independent_variables()));
 
@@ -1448,10 +1470,10 @@ namespace Differentiation
         }
       else
         {
-          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+          Assert(ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true,
                  ExcInternalError());
-          Assert(this->independent_variables.size() ==
-                   this->n_independent_variables(),
+          Assert(this->independent_variables.size()
+                   DEAL_II_EQUALS this->n_independent_variables(),
                  ExcDimensionMismatch(this->independent_variables.size(),
                                       this->n_independent_variables()));
 
@@ -1463,7 +1485,7 @@ namespace Differentiation
       // Account for symmetries of tensor components
       for (unsigned int i = 0; i < this->n_independent_variables(); i++)
         {
-          if (this->is_symmetric_independent_variable(i) == true)
+          if (this->is_symmetric_independent_variable(i) DEAL_II_EQUALS true)
             gradient[i] *= 0.5;
         }
     }
@@ -1482,43 +1504,45 @@ namespace Differentiation
                "Cannot computed function Hessian: AD number type does "
                "not support the calculation of second order derivatives."));
 
-      if ((ADNumberTraits<ad_type>::is_taped == true &&
-           this->taped_driver.keep_independent_values() == false))
+      if ((ADNumberTraits<ad_type>::is_taped
+             DEAL_II_EQUALS true DEAL_II_AND this->taped_driver
+               .keep_independent_values() DEAL_II_EQUALS false))
         {
           Assert(
-            this->n_registered_independent_variables() ==
-              this->n_independent_variables(),
+            this->n_registered_independent_variables()
+              DEAL_II_EQUALS this->n_independent_variables(),
             ExcMessage(
               "Not all values of sensitivities have been registered or subsequently set!"));
         }
-      Assert(this->n_registered_dependent_variables() ==
-               this->n_dependent_variables(),
+      Assert(this->n_registered_dependent_variables()
+               DEAL_II_EQUALS this->n_dependent_variables(),
              ExcMessage("Not all dependent variables have been registered."));
 
       Assert(
-        this->n_dependent_variables() == 1,
+        this->n_dependent_variables() DEAL_II_EQUALS 1,
         ExcMessage(
           "The ScalarFunction class expects there to be only one dependent variable."));
 
       // We can neglect correctly initializing the entries as
       // we'll be overwriting them immediately in the succeeding call to
       // Drivers::hessian().
-      if (hessian.m() != this->n_independent_variables() ||
-          hessian.n() != this->n_independent_variables())
+      if (hessian.m() !=
+          this->n_independent_variables() DEAL_II_OR hessian.n() !=
+          this->n_independent_variables())
         hessian.reinit({this->n_independent_variables(),
                         this->n_independent_variables()},
                        true /*omit_default_initialization*/);
 
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           Assert(this->active_tape_index() !=
                    Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
-          Assert(this->is_recording() == false,
+          Assert(this->is_recording() DEAL_II_EQUALS false,
                  ExcMessage(
                    "Cannot compute Hessian while tape is being recorded."));
-          Assert(this->independent_variable_values.size() ==
-                   this->n_independent_variables(),
+          Assert(this->independent_variable_values.size()
+                   DEAL_II_EQUALS this->n_independent_variables(),
                  ExcDimensionMismatch(this->independent_variable_values.size(),
                                       this->n_independent_variables()));
 
@@ -1528,10 +1552,10 @@ namespace Differentiation
         }
       else
         {
-          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+          Assert(ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true,
                  ExcInternalError());
-          Assert(this->independent_variables.size() ==
-                   this->n_independent_variables(),
+          Assert(this->independent_variables.size()
+                   DEAL_II_EQUALS this->n_independent_variables(),
                  ExcDimensionMismatch(this->independent_variables.size(),
                                       this->n_independent_variables()));
 
@@ -1544,17 +1568,25 @@ namespace Differentiation
       for (unsigned int i = 0; i < this->n_independent_variables(); i++)
         for (unsigned int j = 0; j < i + 1; j++)
           {
-            if (this->is_symmetric_independent_variable(i) == true &&
-                this->is_symmetric_independent_variable(j) == true)
+            if (this
+                  ->is_symmetric_independent_variable(i)
+                    DEAL_II_EQUALS true DEAL_II_AND this
+                  ->is_symmetric_independent_variable(j) DEAL_II_EQUALS true)
               {
                 hessian[i][j] *= 0.25;
                 if (i != j)
                   hessian[j][i] *= 0.25;
               }
-            else if ((this->is_symmetric_independent_variable(i) == true &&
-                      this->is_symmetric_independent_variable(j) == false) ||
-                     (this->is_symmetric_independent_variable(j) == true &&
-                      this->is_symmetric_independent_variable(i) == false))
+            else if ((this
+                        ->is_symmetric_independent_variable(i)
+                          DEAL_II_EQUALS true DEAL_II_AND this
+                        ->is_symmetric_independent_variable(j)
+                          DEAL_II_EQUALS false)
+                       DEAL_II_OR(this
+                                    ->is_symmetric_independent_variable(j)
+                                      DEAL_II_EQUALS true DEAL_II_AND this
+                                    ->is_symmetric_independent_variable(i)
+                                      DEAL_II_EQUALS false))
               {
                 hessian[i][j] *= 0.5;
                 if (i != j)
@@ -1590,8 +1622,8 @@ namespace Differentiation
         internal::extract_field_component_indices<dim>(extractor_row));
       const std::vector<unsigned int> col_index_set(
         internal::extract_field_component_indices<dim>(extractor_col));
-      Assert(row_index_set.size() == 1, ExcInternalError());
-      Assert(col_index_set.size() == 1, ExcInternalError());
+      Assert(row_index_set.size() DEAL_II_EQUALS 1, ExcInternalError());
+      Assert(col_index_set.size() DEAL_II_EQUALS 1, ExcInternalError());
 
       internal::set_tensor_entry(out,
                                  0,
@@ -1665,7 +1697,7 @@ namespace Differentiation
     VectorFunction<dim, ADNumberTypeCode, ScalarType>::
       register_dependent_variables(const std::vector<ad_type> &funcs)
     {
-      Assert(funcs.size() == this->n_dependent_variables(),
+      Assert(funcs.size() DEAL_II_EQUALS this->n_dependent_variables(),
              ExcMessage(
                "Vector size does not match number of dependent variables"));
       for (unsigned int i = 0; i < this->n_dependent_variables(); ++i)
@@ -1682,18 +1714,19 @@ namespace Differentiation
     VectorFunction<dim, ADNumberTypeCode, ScalarType>::compute_values(
       Vector<scalar_type> &values) const
     {
-      if ((ADNumberTraits<ad_type>::is_taped == true &&
-           this->taped_driver.keep_independent_values() == false) ||
-          ADNumberTraits<ad_type>::is_tapeless == true)
+      if ((ADNumberTraits<ad_type>::is_taped
+             DEAL_II_EQUALS true DEAL_II_AND this->taped_driver
+               .keep_independent_values() DEAL_II_EQUALS false)
+            DEAL_II_OR ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true)
         {
           Assert(
-            this->n_registered_independent_variables() ==
-              this->n_independent_variables(),
+            this->n_registered_independent_variables()
+              DEAL_II_EQUALS this->n_independent_variables(),
             ExcMessage(
               "Not all values of sensitivities have been registered or subsequently set!"));
         }
-      Assert(this->n_registered_dependent_variables() ==
-               this->n_dependent_variables(),
+      Assert(this->n_registered_dependent_variables()
+               DEAL_II_EQUALS this->n_dependent_variables(),
              ExcMessage("Not all dependent variables have been registered."));
 
       // We can neglect correctly initializing the entries as
@@ -1703,16 +1736,16 @@ namespace Differentiation
         values.reinit(this->n_dependent_variables(),
                       true /*omit_zeroing_entries*/);
 
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           Assert(this->active_tape_index() !=
                    Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
-          Assert(this->is_recording() == false,
+          Assert(this->is_recording() DEAL_II_EQUALS false,
                  ExcMessage(
                    "Cannot compute values while tape is being recorded."));
-          Assert(this->independent_variable_values.size() ==
-                   this->n_independent_variables(),
+          Assert(this->independent_variable_values.size()
+                   DEAL_II_EQUALS this->n_independent_variables(),
                  ExcDimensionMismatch(this->independent_variable_values.size(),
                                       this->n_independent_variables()));
 
@@ -1723,7 +1756,7 @@ namespace Differentiation
         }
       else
         {
-          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+          Assert(ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true,
                  ExcInternalError());
           this->tapeless_driver.values(this->dependent_variables, values);
         }
@@ -1738,39 +1771,41 @@ namespace Differentiation
     VectorFunction<dim, ADNumberTypeCode, ScalarType>::compute_jacobian(
       FullMatrix<scalar_type> &jacobian) const
     {
-      if ((ADNumberTraits<ad_type>::is_taped == true &&
-           this->taped_driver.keep_independent_values() == false) ||
-          ADNumberTraits<ad_type>::is_tapeless == true)
+      if ((ADNumberTraits<ad_type>::is_taped
+             DEAL_II_EQUALS true DEAL_II_AND this->taped_driver
+               .keep_independent_values() DEAL_II_EQUALS false)
+            DEAL_II_OR ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true)
         {
           Assert(
-            this->n_registered_independent_variables() ==
-              this->n_independent_variables(),
+            this->n_registered_independent_variables()
+              DEAL_II_EQUALS this->n_independent_variables(),
             ExcMessage(
               "Not all values of sensitivities have been registered or subsequently set!"));
         }
-      Assert(this->n_registered_dependent_variables() ==
-               this->n_dependent_variables(),
+      Assert(this->n_registered_dependent_variables()
+               DEAL_II_EQUALS this->n_dependent_variables(),
              ExcMessage("Not all dependent variables have been registered."));
 
       // We can neglect correctly initializing the entries as
       // we'll be overwriting them immediately in the succeeding call to
       // Drivers::jacobian().
-      if (jacobian.m() != this->n_dependent_variables() ||
-          jacobian.n() != this->n_independent_variables())
+      if (jacobian.m() !=
+          this->n_dependent_variables() DEAL_II_OR jacobian.n() !=
+          this->n_independent_variables())
         jacobian.reinit({this->n_dependent_variables(),
                          this->n_independent_variables()},
                         true /*omit_default_initialization*/);
 
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           Assert(this->active_tape_index() !=
                    Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
-          Assert(this->is_recording() == false,
+          Assert(this->is_recording() DEAL_II_EQUALS false,
                  ExcMessage(
                    "Cannot compute Jacobian while tape is being recorded."));
-          Assert(this->independent_variable_values.size() ==
-                   this->n_independent_variables(),
+          Assert(this->independent_variable_values.size()
+                   DEAL_II_EQUALS this->n_independent_variables(),
                  ExcDimensionMismatch(this->independent_variable_values.size(),
                                       this->n_independent_variables()));
 
@@ -1781,10 +1816,10 @@ namespace Differentiation
         }
       else
         {
-          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+          Assert(ADNumberTraits<ad_type>::is_tapeless DEAL_II_EQUALS true,
                  ExcInternalError());
-          Assert(this->independent_variables.size() ==
-                   this->n_independent_variables(),
+          Assert(this->independent_variables.size()
+                   DEAL_II_EQUALS this->n_independent_variables(),
                  ExcDimensionMismatch(this->independent_variables.size(),
                                       this->n_independent_variables()));
 
@@ -1798,7 +1833,7 @@ namespace Differentiation
           // Because we perform just a single differentiation
           // operation with respect to the "column" variables,
           // we only need to consider them for symmetry conditions.
-          if (this->is_symmetric_independent_variable(j) == true)
+          if (this->is_symmetric_independent_variable(j) DEAL_II_EQUALS true)
             for (unsigned int i = 0; i < this->n_dependent_variables(); i++)
               jacobian[i][j] *= 0.5;
         }
@@ -1832,8 +1867,8 @@ namespace Differentiation
         internal::extract_field_component_indices<dim>(extractor_row));
       const std::vector<unsigned int> col_index_set(
         internal::extract_field_component_indices<dim>(extractor_col));
-      Assert(row_index_set.size() == 1, ExcInternalError());
-      Assert(col_index_set.size() == 1, ExcInternalError());
+      Assert(row_index_set.size() DEAL_II_EQUALS 1, ExcInternalError());
+      Assert(col_index_set.size() DEAL_II_EQUALS 1, ExcInternalError());
 
       internal::set_tensor_entry(out,
                                  0,
@@ -1899,4 +1934,5 @@ namespace Differentiation
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // defined(DEAL_II_WITH_ADOLC) || defined(DEAL_II_TRILINOS_WITH_SACADO)
+#endif // defined(DEAL_II_WITH_ADOLC) DEAL_II_OR
+       // defined(DEAL_II_TRILINOS_WITH_SACADO)

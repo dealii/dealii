@@ -82,11 +82,12 @@ MGTransferPrebuilt<VectorType>::prolongate(const unsigned int to_level,
                                            VectorType &       dst,
                                            const VectorType & src) const
 {
-  Assert((to_level >= 1) && (to_level <= prolongation_matrices.size()),
+  Assert((to_level >= 1) DEAL_II_AND(to_level <= prolongation_matrices.size()),
          ExcIndexRange(to_level, 1, prolongation_matrices.size() + 1));
 
-  if (this->mg_constrained_dofs != nullptr &&
-      this->mg_constrained_dofs->get_user_constraint_matrix(to_level - 1)
+  if (this->mg_constrained_dofs !=
+      nullptr DEAL_II_AND this->mg_constrained_dofs
+          ->get_user_constraint_matrix(to_level - 1)
           .get_local_lines()
           .size() > 0)
     {
@@ -109,7 +110,8 @@ MGTransferPrebuilt<VectorType>::restrict_and_add(const unsigned int from_level,
                                                  VectorType &       dst,
                                                  const VectorType & src) const
 {
-  Assert((from_level >= 1) && (from_level <= prolongation_matrices.size()),
+  Assert((from_level >= 1)
+           DEAL_II_AND(from_level <= prolongation_matrices.size()),
          ExcIndexRange(from_level, 1, prolongation_matrices.size() + 1));
   (void)from_level;
 
@@ -128,15 +130,16 @@ namespace
           const unsigned int                    level,
           std::vector<types::global_dof_index> &dof_indices)
   {
-    if (mg_constrained_dofs != nullptr &&
-        mg_constrained_dofs->get_level_constraints(level).n_constraints() > 0)
+    if (mg_constrained_dofs !=
+        nullptr DEAL_II_AND mg_constrained_dofs->get_level_constraints(level)
+            .n_constraints() > 0)
       for (auto &ind : dof_indices)
         if (mg_constrained_dofs->get_level_constraints(level)
               .is_identity_constrained(ind))
           {
             Assert(mg_constrained_dofs->get_level_constraints(level)
-                       .get_constraint_entries(ind)
-                       ->size() == 1,
+                     .get_constraint_entries(ind)
+                     ->size() DEAL_II_EQUALS 1,
                    ExcInternalError());
             ind = mg_constrained_dofs->get_level_constraints(level)
                     .get_constraint_entries(ind)
@@ -214,18 +217,20 @@ MGTransferPrebuilt<VectorType>::build(
       typename DoFHandler<dim>::cell_iterator cell,
         endc = dof_handler.end(level);
       for (cell = dof_handler.begin(level); cell != endc; ++cell)
-        if (cell->has_children() &&
-            (dof_handler.get_triangulation().locally_owned_subdomain() ==
-               numbers::invalid_subdomain_id ||
-             cell->level_subdomain_id() ==
-               dof_handler.get_triangulation().locally_owned_subdomain()))
+        if (cell->has_children() DEAL_II_AND(
+              dof_handler.get_triangulation()
+                .locally_owned_subdomain()
+                  DEAL_II_EQUALS numbers::invalid_subdomain_id DEAL_II_OR
+                                                               cell->level_subdomain_id()
+                      DEAL_II_EQUALS dof_handler.get_triangulation()
+                .locally_owned_subdomain()))
           {
             cell->get_mg_dof_indices(dof_indices_parent);
 
             replace(this->mg_constrained_dofs, level, dof_indices_parent);
 
-            Assert(cell->n_children() ==
-                     GeometryInfo<dim>::max_children_per_cell,
+            Assert(cell->n_children()
+                     DEAL_II_EQUALS GeometryInfo<dim>::max_children_per_cell,
                    ExcNotImplemented());
             for (unsigned int child = 0; child < cell->n_children(); ++child)
               {
@@ -304,18 +309,20 @@ MGTransferPrebuilt<VectorType>::build(
 
       // now actually build the matrices
       for (cell = dof_handler.begin(level); cell != endc; ++cell)
-        if (cell->has_children() &&
-            (dof_handler.get_triangulation().locally_owned_subdomain() ==
-               numbers::invalid_subdomain_id ||
-             cell->level_subdomain_id() ==
-               dof_handler.get_triangulation().locally_owned_subdomain()))
+        if (cell->has_children() DEAL_II_AND(
+              dof_handler.get_triangulation()
+                .locally_owned_subdomain()
+                  DEAL_II_EQUALS numbers::invalid_subdomain_id DEAL_II_OR
+                                                               cell->level_subdomain_id()
+                      DEAL_II_EQUALS dof_handler.get_triangulation()
+                .locally_owned_subdomain()))
           {
             cell->get_mg_dof_indices(dof_indices_parent);
 
             replace(this->mg_constrained_dofs, level, dof_indices_parent);
 
-            Assert(cell->n_children() ==
-                     GeometryInfo<dim>::max_children_per_cell,
+            Assert(cell->n_children()
+                     DEAL_II_EQUALS GeometryInfo<dim>::max_children_per_cell,
                    ExcNotImplemented());
             for (unsigned int child = 0; child < cell->n_children(); ++child)
               {
@@ -323,8 +330,9 @@ MGTransferPrebuilt<VectorType>::build(
                 prolongation = dof_handler.get_fe().get_prolongation_matrix(
                   child, cell->refinement_case());
 
-                if (this->mg_constrained_dofs != nullptr &&
-                    this->mg_constrained_dofs->have_boundary_indices())
+                if (this->mg_constrained_dofs !=
+                    nullptr DEAL_II_AND this->mg_constrained_dofs
+                      ->have_boundary_indices())
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     if (this->mg_constrained_dofs->is_boundary_index(
                           level, dof_indices_parent[j]))

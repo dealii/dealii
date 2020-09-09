@@ -158,7 +158,7 @@ namespace Functions
     : Function<dim>(n_components)
     , coordinate_system_offset(p)
   {
-    AssertThrow(dim == 3, ExcNotImplemented());
+    AssertThrow(dim DEAL_II_EQUALS 3, ExcNotImplemented());
   }
 
 

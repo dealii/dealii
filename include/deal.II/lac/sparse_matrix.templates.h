@@ -61,7 +61,8 @@ SparseMatrix<number>::SparseMatrix(const SparseMatrix &m)
   , val(nullptr)
   , max_len(0)
 {
-  Assert(m.cols == nullptr && m.val == nullptr && m.max_len == 0,
+  Assert(m.cols DEAL_II_EQUALS nullptr DEAL_II_AND m
+           .val DEAL_II_EQUALS nullptr DEAL_II_AND m.max_len DEAL_II_EQUALS 0,
          ExcMessage(
            "This constructor can only be called if the provided argument "
            "is an empty matrix. This constructor can not be used to "
@@ -72,7 +73,7 @@ SparseMatrix<number>::SparseMatrix(const SparseMatrix &m)
 
 
 template <typename number>
-SparseMatrix<number>::SparseMatrix(SparseMatrix<number> &&m) noexcept
+SparseMatrix<number>::SparseMatrix(SparseMatrix<number> DEAL_II_AND m) noexcept
   : Subscriptor(std::move(m))
   , cols(m.cols)
   , val(std::move(m.val))
@@ -90,7 +91,8 @@ SparseMatrix<number> &
 SparseMatrix<number>::operator=(const SparseMatrix<number> &m)
 {
   (void)m;
-  Assert(m.cols == nullptr && m.val == nullptr && m.max_len == 0,
+  Assert(m.cols DEAL_II_EQUALS nullptr DEAL_II_AND m
+           .val DEAL_II_EQUALS nullptr DEAL_II_AND m.max_len DEAL_II_EQUALS 0,
          ExcMessage("This operator can only be called if the provided right "
                     "hand side is an empty matrix. This operator can not be "
                     "used to copy a non-empty matrix. Use the "
@@ -103,7 +105,7 @@ SparseMatrix<number>::operator=(const SparseMatrix<number> &m)
 
 template <typename number>
 SparseMatrix<number> &
-SparseMatrix<number>::operator=(SparseMatrix<number> &&m) noexcept
+SparseMatrix<number>::operator=(SparseMatrix<number> DEAL_II_AND m) noexcept
 {
   cols    = m.cols;
   val     = std::move(m.val);
@@ -140,8 +142,10 @@ SparseMatrix<number>::SparseMatrix(const SparsityPattern &c,
   , max_len(0)
 {
   (void)id;
-  Assert(c.n_rows() == id.m(), ExcDimensionMismatch(c.n_rows(), id.m()));
-  Assert(c.n_cols() == id.n(), ExcDimensionMismatch(c.n_cols(), id.n()));
+  Assert(c.n_rows() DEAL_II_EQUALS id.m(),
+         ExcDimensionMismatch(c.n_rows(), id.m()));
+  Assert(c.n_cols() DEAL_II_EQUALS id.n(),
+         ExcDimensionMismatch(c.n_cols(), id.n()));
 
   // virtual functions called in constructors and destructors never use the
   // override in a derived class
@@ -190,10 +194,10 @@ SparseMatrix<number> &
 SparseMatrix<number>::operator=(const double d)
 {
   (void)d;
-  Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
+  Assert(d DEAL_II_EQUALS 0, ExcScalarAssignmentOnlyForZeroValue());
 
   Assert(cols != nullptr, ExcNotInitialized());
-  Assert(cols->compressed || cols->empty(),
+  Assert(cols->compressed DEAL_II_OR cols->empty(),
          SparsityPattern::ExcNotCompressed());
 
   // do initial zeroing of elements in parallel. Try to achieve a similar
@@ -239,9 +243,9 @@ SparseMatrix<number> &
 SparseMatrix<number>::operator=(const IdentityMatrix &id)
 {
   (void)id;
-  Assert(cols->n_rows() == id.m(),
+  Assert(cols->n_rows() DEAL_II_EQUALS id.m(),
          ExcDimensionMismatch(cols->n_rows(), id.m()));
-  Assert(cols->n_cols() == id.n(),
+  Assert(cols->n_cols() DEAL_II_EQUALS id.n(),
          ExcDimensionMismatch(cols->n_cols(), id.n()));
 
   *this = 0;
@@ -267,7 +271,7 @@ SparseMatrix<number>::reinit(const SparsityPattern &sparsity)
     }
 
   const std::size_t N = cols->n_nonzero_elements();
-  if (N > max_len || max_len == 0)
+  if (N > max_len DEAL_II_OR max_len DEAL_II_EQUALS 0)
     {
       val     = std::make_unique<number[]>(N);
       max_len = N;
@@ -293,7 +297,7 @@ template <typename number>
 bool
 SparseMatrix<number>::empty() const
 {
-  if (cols == nullptr)
+  if (cols DEAL_II_EQUALS nullptr)
     return true;
   else
     return cols->empty();
@@ -342,20 +346,20 @@ void
 SparseMatrix<number>::symmetrize()
 {
   Assert(cols != nullptr, ExcNotInitialized());
-  Assert(cols->rows == cols->cols, ExcNotQuadratic());
+  Assert(cols->rows DEAL_II_EQUALS cols->cols, ExcNotQuadratic());
 
   const size_type n_rows = m();
   for (size_type row = 0; row < n_rows; ++row)
     {
       // first skip diagonal entry
       number *val_ptr = &val[cols->rowstart[row]];
-      if (m() == n())
+      if (m() DEAL_II_EQUALS n())
         ++val_ptr;
       const size_type *   colnum_ptr = &cols->colnums[cols->rowstart[row] + 1];
       const number *const val_end_of_row = &val[cols->rowstart[row + 1]];
 
       // treat lower left triangle
-      while ((val_ptr != val_end_of_row) && (*colnum_ptr < row))
+      while ((val_ptr != val_end_of_row) DEAL_II_AND(*colnum_ptr < row))
         {
           // compute the mean of this
           // and the transpose value
@@ -383,7 +387,7 @@ SparseMatrix<number>::copy_from(const SparseMatrix<somenumber> &matrix)
 {
   Assert(cols != nullptr, ExcNotInitialized());
   Assert(val != nullptr, ExcNotInitialized());
-  Assert(cols == matrix.cols, ExcDifferentSparsityPatterns());
+  Assert(cols DEAL_II_EQUALS matrix.cols, ExcDifferentSparsityPatterns());
 
   std::copy(matrix.val.get(),
             matrix.val.get() + cols->n_nonzero_elements(),
@@ -417,8 +421,8 @@ template <typename number>
 SparseMatrix<number> &
 SparseMatrix<number>::copy_from(const TrilinosWrappers::SparseMatrix &matrix)
 {
-  Assert(m() == matrix.m(), ExcDimensionMismatch(m(), matrix.m()));
-  Assert(n() == matrix.n(), ExcDimensionMismatch(n(), matrix.n()));
+  Assert(m() DEAL_II_EQUALS matrix.m(), ExcDimensionMismatch(m(), matrix.m()));
+  Assert(n() DEAL_II_EQUALS matrix.n(), ExcDimensionMismatch(n(), matrix.n()));
 
   // first delete previous content
   *this = 0;
@@ -442,7 +446,7 @@ SparseMatrix<number>::copy_from(const TrilinosWrappers::SparseMatrix &matrix)
         reinterpret_cast<TrilinosWrappers::types::int_type *>(
           colnum_cache.data()));
       (void)ierr;
-      Assert(ierr == 0, ExcTrilinosError(ierr));
+      Assert(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
       // resize arrays to the size actually used
       value_cache.resize(ncols);
@@ -466,7 +470,7 @@ SparseMatrix<number>::add(const number                    factor,
 {
   Assert(cols != nullptr, ExcNotInitialized());
   Assert(val != nullptr, ExcNotInitialized());
-  Assert(cols == matrix.cols, ExcDifferentSparsityPatterns());
+  Assert(cols DEAL_II_EQUALS matrix.cols, ExcDifferentSparsityPatterns());
 
   number *            val_ptr    = val.get();
   const somenumber *  matrix_ptr = matrix.val.get();
@@ -505,7 +509,7 @@ namespace internal
       const size_type *            colnum_ptr = &colnums[rowstart[begin_row]];
       typename OutVector::iterator dst_ptr    = dst.begin() + begin_row;
 
-      if (add == false)
+      if (add DEAL_II_EQUALS false)
         for (size_type row = begin_row; row < end_row; ++row)
           {
             typename OutVector::value_type s   = 0.;
@@ -548,8 +552,8 @@ SparseMatrix<number>::add(const size_type  row,
   // just go through the column indices and
   // look whether we found one, rather than
   // doing many binary searches
-  if (elide_zero_values == false && col_indices_are_sorted == true &&
-      n_cols > 3)
+  if (elide_zero_values DEAL_II_EQUALS false DEAL_II_AND col_indices_are_sorted
+        DEAL_II_EQUALS true DEAL_II_AND n_cols > 3)
     {
       // check whether the given indices are
       // really sorted
@@ -564,15 +568,15 @@ SparseMatrix<number>::add(const size_type  row,
       const size_type  row_length_1 = cols->row_length(row) - 1;
       number *         val_ptr      = &val[cols->rowstart[row]];
 
-      if (m() == n())
+      if (m() DEAL_II_EQUALS n())
         {
           // find diagonal and add it if found
-          Assert(this_cols[0] == row, ExcInternalError());
+          Assert(this_cols[0] DEAL_II_EQUALS row, ExcInternalError());
           const size_type *diag_pos =
             Utilities::lower_bound(col_indices, col_indices + n_cols, row);
           const size_type diag      = diag_pos - col_indices;
           size_type       post_diag = diag;
-          if (diag != n_cols && *diag_pos == row)
+          if (diag != n_cols DEAL_II_AND * diag_pos DEAL_II_EQUALS row)
             {
               val_ptr[0] += *(values + (diag_pos - col_indices));
               ++post_diag;
@@ -582,12 +586,12 @@ SparseMatrix<number>::add(const size_type  row,
           size_type counter = 1;
           for (size_type i = 0; i < diag; ++i)
             {
-              while (this_cols[counter] < col_indices[i] &&
-                     counter < row_length_1)
+              while (this_cols[counter] < col_indices[i] DEAL_II_AND counter <
+                     row_length_1)
                 ++counter;
 
-              Assert((this_cols[counter] == col_indices[i]) ||
-                       (values[i] == number2()),
+              Assert((this_cols[counter] DEAL_II_EQUALS col_indices[i])
+                       DEAL_II_OR(values[i] DEAL_II_EQUALS number2()),
                      ExcInvalidIndex(row, col_indices[i]));
 
               val_ptr[counter] += values[i];
@@ -596,12 +600,12 @@ SparseMatrix<number>::add(const size_type  row,
           // add indices after diagonal
           for (size_type i = post_diag; i < n_cols; ++i)
             {
-              while (this_cols[counter] < col_indices[i] &&
-                     counter < row_length_1)
+              while (this_cols[counter] < col_indices[i] DEAL_II_AND counter <
+                     row_length_1)
                 ++counter;
 
-              Assert((this_cols[counter] == col_indices[i]) ||
-                       (values[i] == number2()),
+              Assert((this_cols[counter] DEAL_II_EQUALS col_indices[i])
+                       DEAL_II_OR(values[i] DEAL_II_EQUALS number2()),
                      ExcInvalidIndex(row, col_indices[i]));
 
               val_ptr[counter] += values[i];
@@ -616,12 +620,12 @@ SparseMatrix<number>::add(const size_type  row,
           size_type counter = 0;
           for (size_type i = 0; i < n_cols; ++i)
             {
-              while (this_cols[counter] < col_indices[i] &&
-                     counter < row_length_1)
+              while (this_cols[counter] < col_indices[i] DEAL_II_AND counter <
+                     row_length_1)
                 ++counter;
 
-              Assert((this_cols[counter] == col_indices[i]) ||
-                       (values[i] == number2()),
+              Assert((this_cols[counter] DEAL_II_EQUALS col_indices[i])
+                       DEAL_II_OR(values[i] DEAL_II_EQUALS number2()),
                      ExcInvalidIndex(row, col_indices[i]));
 
               val_ptr[counter] += values[i];
@@ -646,10 +650,11 @@ SparseMatrix<number>::add(const size_type  row,
       AssertIsFinite(value);
 
 #ifdef DEBUG
-      if (elide_zero_values == true && value == number())
+      if (elide_zero_values DEAL_II_EQUALS true DEAL_II_AND value DEAL_II_EQUALS
+                                                                  number())
         continue;
 #else
-      if (value == number())
+      if (value DEAL_II_EQUALS number())
         continue;
 #endif
 
@@ -657,7 +662,8 @@ SparseMatrix<number>::add(const size_type  row,
       // the next present index in the sparsity
       // pattern (otherwise, do a binary
       // search)
-      if (index < next_row_index && my_cols[index] == col_indices[j])
+      if (index < next_row_index DEAL_II_AND
+                    my_cols[index] DEAL_II_EQUALS col_indices[j])
         goto add_value;
 
       index = cols->operator()(row, col_indices[j]);
@@ -666,9 +672,10 @@ SparseMatrix<number>::add(const size_type  row,
       // the matrix that are not part of
       // the sparsity pattern, if the
       // value we add is zero
-      if (index == SparsityPattern::invalid_entry)
+      if (index DEAL_II_EQUALS SparsityPattern::invalid_entry)
         {
-          Assert(value == number(), ExcInvalidIndex(row, col_indices[j]));
+          Assert(value DEAL_II_EQUALS number(),
+                 ExcInvalidIndex(row, col_indices[j]));
           continue;
         }
 
@@ -699,21 +706,22 @@ SparseMatrix<number>::set(const size_type  row,
   std::size_t       index = cols->rowstart[row], next_index = index;
   const std::size_t next_row_index = cols->rowstart[row + 1];
 
-  if (elide_zero_values == true)
+  if (elide_zero_values DEAL_II_EQUALS true)
     {
       for (size_type j = 0; j < n_cols; ++j)
         {
           const number value = number(values[j]);
           AssertIsFinite(value);
 
-          if (value == number())
+          if (value DEAL_II_EQUALS number())
             continue;
 
           // check whether the next index to set is
           // the next present index in the sparsity
           // pattern (otherwise, do a binary
           // search)
-          if (index != next_row_index && my_cols[index] == col_indices[j])
+          if (index != next_row_index DEAL_II_AND
+                         my_cols[index] DEAL_II_EQUALS col_indices[j])
             goto set_value;
 
           next_index = cols->operator()(row, col_indices[j]);
@@ -722,7 +730,7 @@ SparseMatrix<number>::set(const size_type  row,
           // the matrix that are not part of
           // the sparsity pattern, if the
           // value to which we set it is zero
-          if (next_index == SparsityPattern::invalid_entry)
+          if (next_index DEAL_II_EQUALS SparsityPattern::invalid_entry)
             {
               Assert(false, ExcInvalidIndex(row, col_indices[j]));
               continue;
@@ -742,14 +750,16 @@ SparseMatrix<number>::set(const size_type  row,
           const number value = number(values[j]);
           AssertIsFinite(value);
 
-          if (index != next_row_index && my_cols[index] == col_indices[j])
+          if (index != next_row_index DEAL_II_AND
+                         my_cols[index] DEAL_II_EQUALS col_indices[j])
             goto set_value_checked;
 
           next_index = cols->operator()(row, col_indices[j]);
 
-          if (next_index == SparsityPattern::invalid_entry)
+          if (next_index DEAL_II_EQUALS SparsityPattern::invalid_entry)
             {
-              Assert(value == number(), ExcInvalidIndex(row, col_indices[j]));
+              Assert(value DEAL_II_EQUALS number(),
+                     ExcInvalidIndex(row, col_indices[j]));
               continue;
             }
           index = next_index;
@@ -770,8 +780,8 @@ SparseMatrix<number>::vmult(OutVector &dst, const InVector &src) const
 {
   Assert(cols != nullptr, ExcNotInitialized());
   Assert(val != nullptr, ExcNotInitialized());
-  Assert(m() == dst.size(), ExcDimensionMismatch(m(), dst.size()));
-  Assert(n() == src.size(), ExcDimensionMismatch(n(), src.size()));
+  Assert(m() DEAL_II_EQUALS dst.size(), ExcDimensionMismatch(m(), dst.size()));
+  Assert(n() DEAL_II_EQUALS src.size(), ExcDimensionMismatch(n(), src.size()));
 
   Assert(!PointerComparison::equal(&src, &dst), ExcSourceEqualsDestination());
 
@@ -801,8 +811,8 @@ SparseMatrix<number>::Tvmult(OutVector &dst, const InVector &src) const
 {
   Assert(val != nullptr, ExcNotInitialized());
   Assert(cols != nullptr, ExcNotInitialized());
-  Assert(n() == dst.size(), ExcDimensionMismatch(n(), dst.size()));
-  Assert(m() == src.size(), ExcDimensionMismatch(m(), src.size()));
+  Assert(n() DEAL_II_EQUALS dst.size(), ExcDimensionMismatch(n(), dst.size()));
+  Assert(m() DEAL_II_EQUALS src.size(), ExcDimensionMismatch(m(), src.size()));
 
   Assert(!PointerComparison::equal(&src, &dst), ExcSourceEqualsDestination());
 
@@ -828,8 +838,8 @@ SparseMatrix<number>::vmult_add(OutVector &dst, const InVector &src) const
 {
   Assert(cols != nullptr, ExcNotInitialized());
   Assert(val != nullptr, ExcNotInitialized());
-  Assert(m() == dst.size(), ExcDimensionMismatch(m(), dst.size()));
-  Assert(n() == src.size(), ExcDimensionMismatch(n(), src.size()));
+  Assert(m() DEAL_II_EQUALS dst.size(), ExcDimensionMismatch(m(), dst.size()));
+  Assert(n() DEAL_II_EQUALS src.size(), ExcDimensionMismatch(n(), src.size()));
 
   Assert(!PointerComparison::equal(&src, &dst), ExcSourceEqualsDestination());
 
@@ -859,8 +869,8 @@ SparseMatrix<number>::Tvmult_add(OutVector &dst, const InVector &src) const
 {
   Assert(val != nullptr, ExcNotInitialized());
   Assert(cols != nullptr, ExcNotInitialized());
-  Assert(n() == dst.size(), ExcDimensionMismatch(n(), dst.size()));
-  Assert(m() == src.size(), ExcDimensionMismatch(m(), src.size()));
+  Assert(n() DEAL_II_EQUALS dst.size(), ExcDimensionMismatch(n(), dst.size()));
+  Assert(m() DEAL_II_EQUALS src.size(), ExcDimensionMismatch(m(), src.size()));
 
   Assert(!PointerComparison::equal(&src, &dst), ExcSourceEqualsDestination());
 
@@ -920,8 +930,8 @@ SparseMatrix<number>::matrix_norm_square(const Vector<somenumber> &v) const
 {
   Assert(cols != nullptr, ExcNotInitialized());
   Assert(val != nullptr, ExcNotInitialized());
-  Assert(m() == v.size(), ExcDimensionMismatch(m(), v.size()));
-  Assert(n() == v.size(), ExcDimensionMismatch(n(), v.size()));
+  Assert(m() DEAL_II_EQUALS v.size(), ExcDimensionMismatch(m(), v.size()));
+  Assert(n() DEAL_II_EQUALS v.size(), ExcDimensionMismatch(n(), v.size()));
 
   return parallel::accumulate_from_subranges<somenumber>(
     [this, &v](const size_type begin_row, const size_type end_row) {
@@ -988,8 +998,8 @@ SparseMatrix<number>::matrix_scalar_product(const Vector<somenumber> &u,
 {
   Assert(cols != nullptr, ExcNotInitialized());
   Assert(val != nullptr, ExcNotInitialized());
-  Assert(m() == u.size(), ExcDimensionMismatch(m(), u.size()));
-  Assert(n() == v.size(), ExcDimensionMismatch(n(), v.size()));
+  Assert(m() DEAL_II_EQUALS u.size(), ExcDimensionMismatch(m(), u.size()));
+  Assert(n() DEAL_II_EQUALS v.size(), ExcDimensionMismatch(n(), v.size()));
 
   return parallel::accumulate_from_subranges<somenumber>(
     [this, &u, &v](const size_type begin_row, const size_type end_row) {
@@ -1017,8 +1027,8 @@ SparseMatrix<number>::mmult(SparseMatrix<numberC> &      C,
                             const Vector<number> &       V,
                             const bool rebuild_sparsity_C) const
 {
-  const bool use_vector = V.size() == n() ? true : false;
-  Assert(n() == B.m(), ExcDimensionMismatch(n(), B.m()));
+  const bool use_vector = V.size() DEAL_II_EQUALS n() ? true : false;
+  Assert(n() DEAL_II_EQUALS B.m(), ExcDimensionMismatch(n(), B.m()));
   Assert(cols != nullptr, ExcNotInitialized());
   Assert(B.cols != nullptr, ExcNotInitialized());
   Assert(C.cols != nullptr, ExcNotInitialized());
@@ -1027,7 +1037,7 @@ SparseMatrix<number>::mmult(SparseMatrix<numberC> &      C,
   const SparsityPattern &sp_B = *B.cols;
 
   // clear previous content of C
-  if (rebuild_sparsity_C == true)
+  if (rebuild_sparsity_C DEAL_II_EQUALS true)
     {
       // we are about to change the sparsity pattern of C. this can not work
       // if either A or B use the same sparsity pattern
@@ -1055,8 +1065,8 @@ SparseMatrix<number>::mmult(SparseMatrix<numberC> &      C,
       C.reinit(sp_C);
     }
 
-  Assert(C.m() == m(), ExcDimensionMismatch(C.m(), m()));
-  Assert(C.n() == B.n(), ExcDimensionMismatch(C.n(), B.n()));
+  Assert(C.m() DEAL_II_EQUALS m(), ExcDimensionMismatch(C.m(), m()));
+  Assert(C.n() DEAL_II_EQUALS B.n(), ExcDimensionMismatch(C.n(), B.n()));
 
   // create an array that caches some
   // elements that are going to be written
@@ -1081,7 +1091,7 @@ SparseMatrix<number>::mmult(SparseMatrix<numberC> &      C,
           const size_type *new_cols = (&sp_B.colnums[sp_B.rowstart[col]]);
 
           // special treatment for diagonal
-          if (sp_B.n_rows() == sp_B.n_cols())
+          if (sp_B.n_rows() DEAL_II_EQUALS sp_B.n_cols())
             {
               C.add(i,
                     *new_cols,
@@ -1123,8 +1133,8 @@ SparseMatrix<number>::Tmmult(SparseMatrix<numberC> &      C,
                              const Vector<number> &       V,
                              const bool rebuild_sparsity_C) const
 {
-  const bool use_vector = V.size() == m() ? true : false;
-  Assert(m() == B.m(), ExcDimensionMismatch(m(), B.m()));
+  const bool use_vector = V.size() DEAL_II_EQUALS m() ? true : false;
+  Assert(m() DEAL_II_EQUALS B.m(), ExcDimensionMismatch(m(), B.m()));
   Assert(cols != nullptr, ExcNotInitialized());
   Assert(B.cols != nullptr, ExcNotInitialized());
   Assert(C.cols != nullptr, ExcNotInitialized());
@@ -1133,7 +1143,7 @@ SparseMatrix<number>::Tmmult(SparseMatrix<numberC> &      C,
   const SparsityPattern &sp_B = *B.cols;
 
   // clear previous content of C
-  if (rebuild_sparsity_C == true)
+  if (rebuild_sparsity_C DEAL_II_EQUALS true)
     {
       // we are about to change the sparsity pattern of C. this can not work
       // if either A or B use the same sparsity pattern
@@ -1161,8 +1171,8 @@ SparseMatrix<number>::Tmmult(SparseMatrix<numberC> &      C,
       C.reinit(sp_C);
     }
 
-  Assert(C.m() == n(), ExcDimensionMismatch(C.m(), n()));
-  Assert(C.n() == B.n(), ExcDimensionMismatch(C.n(), B.n()));
+  Assert(C.m() DEAL_II_EQUALS n(), ExcDimensionMismatch(C.m(), n()));
+  Assert(C.n() DEAL_II_EQUALS B.n(), ExcDimensionMismatch(C.n(), B.n()));
 
   // create an array that caches some
   // elements that are going to be written
@@ -1181,7 +1191,7 @@ SparseMatrix<number>::Tmmult(SparseMatrix<numberC> &      C,
       const size_type *      rows     = &sp_A.colnums[sp_A.rowstart[i]];
       const size_type *const end_rows = &sp_A.colnums[sp_A.rowstart[i + 1]];
       const size_type *      new_cols = &sp_B.colnums[sp_B.rowstart[i]];
-      if (sp_B.n_rows() == sp_B.n_cols())
+      if (sp_B.n_rows() DEAL_II_EQUALS sp_B.n_cols())
         ++new_cols;
 
       const numberB *const end_cols = &B.val[sp_B.rowstart[i + 1]];
@@ -1192,7 +1202,7 @@ SparseMatrix<number>::Tmmult(SparseMatrix<numberC> &      C,
           const number    A_val = val[rows - &sp_A.colnums[sp_A.rowstart[0]]];
 
           // special treatment for diagonal
-          if (sp_B.n_rows() == sp_B.n_cols())
+          if (sp_B.n_rows() DEAL_II_EQUALS sp_B.n_cols())
             C.add(row,
                   i,
                   numberC(A_val) *
@@ -1334,9 +1344,9 @@ SparseMatrix<number>::residual(Vector<somenumber> &      dst,
 {
   Assert(cols != nullptr, ExcNotInitialized());
   Assert(val != nullptr, ExcNotInitialized());
-  Assert(m() == dst.size(), ExcDimensionMismatch(m(), dst.size()));
-  Assert(m() == b.size(), ExcDimensionMismatch(m(), b.size()));
-  Assert(n() == u.size(), ExcDimensionMismatch(n(), u.size()));
+  Assert(m() DEAL_II_EQUALS dst.size(), ExcDimensionMismatch(m(), dst.size()));
+  Assert(m() DEAL_II_EQUALS b.size(), ExcDimensionMismatch(m(), b.size()));
+  Assert(n() DEAL_II_EQUALS u.size(), ExcDimensionMismatch(n(), u.size()));
 
   Assert(&u != &dst, ExcSourceEqualsDestination());
 
@@ -1464,7 +1474,7 @@ SparseMatrix<number>::precondition_SSOR(
   // don't have to search for it).
   if (pos_right_of_diagonal.size() != 0)
     {
-      Assert(pos_right_of_diagonal.size() == dst.size(),
+      Assert(pos_right_of_diagonal.size() DEAL_II_EQUALS dst.size(),
              ExcDimensionMismatch(pos_right_of_diagonal.size(), dst.size()));
 
       // forward sweep
@@ -1646,7 +1656,7 @@ SparseMatrix<number>::TSOR(Vector<somenumber> &dst, const number om) const
 
       dst(row) = s * somenumber(om) / somenumber(val[cols->rowstart[row]]);
 
-      if (row == 0)
+      if (row DEAL_II_EQUALS 0)
         break;
 
       --row;
@@ -1666,10 +1676,10 @@ SparseMatrix<number>::PSOR(Vector<somenumber> &          dst,
   Assert(val != nullptr, ExcNotInitialized());
   AssertDimension(m(), n());
 
-  Assert(m() == dst.size(), ExcDimensionMismatch(m(), dst.size()));
-  Assert(m() == permutation.size(),
+  Assert(m() DEAL_II_EQUALS dst.size(), ExcDimensionMismatch(m(), dst.size()));
+  Assert(m() DEAL_II_EQUALS permutation.size(),
          ExcDimensionMismatch(m(), permutation.size()));
-  Assert(m() == inverse_permutation.size(),
+  Assert(m() DEAL_II_EQUALS inverse_permutation.size(),
          ExcDimensionMismatch(m(), inverse_permutation.size()));
 
   internal::SparseMatrixImplementation::AssertNoZerosOnDiagonal(*this);
@@ -1705,10 +1715,10 @@ SparseMatrix<number>::TPSOR(Vector<somenumber> &          dst,
   Assert(val != nullptr, ExcNotInitialized());
   AssertDimension(m(), n());
 
-  Assert(m() == dst.size(), ExcDimensionMismatch(m(), dst.size()));
-  Assert(m() == permutation.size(),
+  Assert(m() DEAL_II_EQUALS dst.size(), ExcDimensionMismatch(m(), dst.size()));
+  Assert(m() DEAL_II_EQUALS permutation.size(),
          ExcDimensionMismatch(m(), permutation.size()));
-  Assert(m() == inverse_permutation.size(),
+  Assert(m() DEAL_II_EQUALS inverse_permutation.size(),
          ExcDimensionMismatch(m(), inverse_permutation.size()));
 
   internal::SparseMatrixImplementation::AssertNoZerosOnDiagonal(*this);
@@ -1742,8 +1752,8 @@ SparseMatrix<number>::Jacobi_step(Vector<somenumber> &      v,
   Assert(val != nullptr, ExcNotInitialized());
   AssertDimension(m(), n());
 
-  Assert(m() == v.size(), ExcDimensionMismatch(m(), v.size()));
-  Assert(m() == b.size(), ExcDimensionMismatch(m(), b.size()));
+  Assert(m() DEAL_II_EQUALS v.size(), ExcDimensionMismatch(m(), v.size()));
+  Assert(m() DEAL_II_EQUALS b.size(), ExcDimensionMismatch(m(), b.size()));
 
   GrowingVectorMemory<Vector<somenumber>>            mem;
   typename VectorMemory<Vector<somenumber>>::Pointer w(mem);
@@ -1772,8 +1782,8 @@ SparseMatrix<number>::SOR_step(Vector<somenumber> &      v,
   Assert(cols != nullptr, ExcNotInitialized());
   Assert(val != nullptr, ExcNotInitialized());
   AssertDimension(m(), n());
-  Assert(m() == v.size(), ExcDimensionMismatch(m(), v.size()));
-  Assert(m() == b.size(), ExcDimensionMismatch(m(), b.size()));
+  Assert(m() DEAL_II_EQUALS v.size(), ExcDimensionMismatch(m(), v.size()));
+  Assert(m() DEAL_II_EQUALS b.size(), ExcDimensionMismatch(m(), b.size()));
 
   internal::SparseMatrixImplementation::AssertNoZerosOnDiagonal(*this);
 
@@ -1800,8 +1810,8 @@ SparseMatrix<number>::TSOR_step(Vector<somenumber> &      v,
   Assert(cols != nullptr, ExcNotInitialized());
   Assert(val != nullptr, ExcNotInitialized());
   AssertDimension(m(), n());
-  Assert(m() == v.size(), ExcDimensionMismatch(m(), v.size()));
-  Assert(m() == b.size(), ExcDimensionMismatch(m(), b.size()));
+  Assert(m() DEAL_II_EQUALS v.size(), ExcDimensionMismatch(m(), v.size()));
+  Assert(m() DEAL_II_EQUALS b.size(), ExcDimensionMismatch(m(), b.size()));
 
   internal::SparseMatrixImplementation::AssertNoZerosOnDiagonal(*this);
 
@@ -1843,7 +1853,7 @@ SparseMatrix<number>::SSOR(Vector<somenumber> &dst, const number om) const
   Assert(cols != nullptr, ExcNotInitialized());
   Assert(val != nullptr, ExcNotInitialized());
   AssertDimension(m(), n());
-  Assert(m() == dst.size(), ExcDimensionMismatch(m(), dst.size()));
+  Assert(m() DEAL_II_EQUALS dst.size(), ExcDimensionMismatch(m(), dst.size()));
 
   internal::SparseMatrixImplementation::AssertNoZerosOnDiagonal(*this);
 
@@ -1956,7 +1966,7 @@ SparseMatrix<number>::print_pattern(std::ostream &out,
   for (size_type i = 0; i < m(); ++i)
     {
       for (size_type j = 0; j < n(); ++j)
-        if ((*cols)(i, j) == SparsityPattern::invalid_entry)
+        if ((*cols)(i, j)DEAL_II_EQUALS SparsityPattern::invalid_entry)
           out << '.';
         else if (std::abs(val[cols->operator()(i, j)]) > threshold)
           out << '*';
@@ -2047,13 +2057,13 @@ SparseMatrix<number>::block_read(std::istream &in)
 
   // first read in simple data
   in >> c;
-  AssertThrow(c == '[', ExcIO());
+  AssertThrow(c DEAL_II_EQUALS '[', ExcIO());
   in >> max_len;
 
   in >> c;
-  AssertThrow(c == ']', ExcIO());
+  AssertThrow(c DEAL_II_EQUALS ']', ExcIO());
   in >> c;
-  AssertThrow(c == '[', ExcIO());
+  AssertThrow(c DEAL_II_EQUALS '[', ExcIO());
 
   // reallocate space
   val = std::make_unique<number[]>(max_len);
@@ -2063,7 +2073,7 @@ SparseMatrix<number>::block_read(std::istream &in)
           reinterpret_cast<char *>(val.get() + max_len) -
             reinterpret_cast<char *>(val.get()));
   in >> c;
-  AssertThrow(c == ']', ExcIO());
+  AssertThrow(c DEAL_II_EQUALS ']', ExcIO());
 }
 
 

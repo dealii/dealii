@@ -46,7 +46,7 @@ std::array<Number, 2>
 eigenvalues(const SymmetricTensor<2, 2, Number> &T)
 {
   const Number upp_tri_sq = T[0][1] * T[0][1];
-  if (upp_tri_sq == internal::NumberType<Number>::value(0.0))
+  if (upp_tri_sq DEAL_II_EQUALS internal::NumberType<Number>::value(0.0))
     {
       // The tensor is diagonal
       std::array<Number, 2> eig_vals = {{T[0][0], T[1][1]}};
@@ -83,7 +83,7 @@ eigenvalues(const SymmetricTensor<2, 3, Number> &T)
 {
   const Number upp_tri_sq =
     T[0][1] * T[0][1] + T[0][2] * T[0][2] + T[1][2] * T[1][2];
-  if (upp_tri_sq == internal::NumberType<Number>::value(0.0))
+  if (upp_tri_sq DEAL_II_EQUALS internal::NumberType<Number>::value(0.0))
     {
       // The tensor is diagonal
       std::array<Number, 3> eig_vals = {{T[0][0], T[1][1], T[2][2]}};
@@ -182,7 +182,7 @@ namespace internal
       for (int i = 1; i < dim; i++)
         {
           u[i] = A[0][i];
-          if (i == 1)
+          if (i DEAL_II_EQUALS 1)
             u[i] -= g;
         }
 
@@ -241,7 +241,7 @@ namespace internal
     ql_implicit_shifts(const dealii::SymmetricTensor<2, dim, Number> &A)
     {
       static_assert(
-        numbers::NumberTraits<Number>::is_complex == false,
+        numbers::NumberTraits<Number>::is_complex DEAL_II_EQUALS false,
         "This implementation of the QL implicit shift algorithm does "
         "not support complex numbers");
 
@@ -279,15 +279,15 @@ namespace internal
               for (; m <= dim - 2; m++)
                 {
                   g = std::abs(w[m]) + std::abs(w[m + 1]);
-                  if (std::abs(e[m]) + g == g)
+                  if (std::abs(e[m]) + g DEAL_II_EQUALS g)
                     break;
                 }
-              if (m == l)
+              if (m DEAL_II_EQUALS l)
                 break;
 
               // Throw if no convergence is achieved within a
               // stipulated number of iterations
-              if (it == max_n_it)
+              if (it DEAL_II_EQUALS max_n_it)
                 {
                   AssertThrow(
                     false,
@@ -378,9 +378,10 @@ namespace internal
     std::array<std::pair<Number, Tensor<1, dim, Number>>, dim>
       jacobi(dealii::SymmetricTensor<2, dim, Number> A)
     {
-      static_assert(numbers::NumberTraits<Number>::is_complex == false,
-                    "This implementation of the Jacobi algorithm does "
-                    "not support complex numbers");
+      static_assert(
+        numbers::NumberTraits<Number>::is_complex DEAL_II_EQUALS false,
+        "This implementation of the Jacobi algorithm does "
+        "not support complex numbers");
 
       // Sums of diagonal resp. off-diagonal elements
       Number sd, so;
@@ -415,12 +416,12 @@ namespace internal
           for (int p = 0; p < dim; p++)
             for (int q = p + 1; q < dim; q++)
               so += std::abs(A[p][q]);
-          if (so == 0.0)
+          if (so DEAL_II_EQUALS 0.0)
             break;
 
           // Throw if no convergence is achieved within a
           // stipulated number of iterations
-          if (it == max_n_it)
+          if (it DEAL_II_EQUALS max_n_it)
             {
               AssertThrow(
                 false,
@@ -446,8 +447,10 @@ namespace internal
                 // After a given number of iterations the
                 // rotation is skipped if the off-diagonal
                 // element is small
-                if (it > n_it_skip && std::abs(w[p]) + g == std::abs(w[p]) &&
-                    std::abs(w[q]) + g == std::abs(w[q]))
+                if (it > n_it_skip DEAL_II_AND std::abs(w[p]) +
+                           g DEAL_II_EQUALS std::abs(w[p])
+                             DEAL_II_AND    std::abs(w[q]) +
+                           g DEAL_II_EQUALS std::abs(w[q]))
                   {
                     A[p][q] = 0.0;
                   }
@@ -459,7 +462,7 @@ namespace internal
                     // Compute surrogate for angle theta resulting from
                     // angle transformation and subsequent smallest solution
                     // of quadratic equation
-                    if (std::abs(h) + g == std::abs(h))
+                    if (std::abs(h) + g DEAL_II_EQUALS std::abs(h))
                       {
                         // Prevent overflow for large theta^2. This computation
                         // is the algebraic equivalent of t = 1/(2*theta).
@@ -542,9 +545,10 @@ namespace internal
     std::array<std::pair<Number, Tensor<1, 2, Number>>, 2>
     hybrid(const dealii::SymmetricTensor<2, 2, Number> &A)
     {
-      static_assert(numbers::NumberTraits<Number>::is_complex == false,
-                    "This implementation of the 2d Hybrid algorithm does "
-                    "not support complex numbers");
+      static_assert(
+        numbers::NumberTraits<Number>::is_complex DEAL_II_EQUALS false,
+        "This implementation of the 2d Hybrid algorithm does "
+        "not support complex numbers");
 
       const unsigned int dim = 2;
 
@@ -619,9 +623,10 @@ namespace internal
     std::array<std::pair<Number, Tensor<1, 3, Number>>, 3>
     hybrid(const dealii::SymmetricTensor<2, 3, Number> &A)
     {
-      static_assert(numbers::NumberTraits<Number>::is_complex == false,
-                    "This implementation of the 3d Hybrid algorithm does "
-                    "not support complex numbers");
+      static_assert(
+        numbers::NumberTraits<Number>::is_complex DEAL_II_EQUALS false,
+        "This implementation of the 3d Hybrid algorithm does "
+        "not support complex numbers");
 
       const unsigned int dim = 3;
       Number norm; // Squared norm or inverse norm of current eigenvector
@@ -826,13 +831,13 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
              const SymmetricTensorEigenvectorMethod method)
 {
   // Not much to do when there's only a single entry
-  if (dim == 1)
+  if (dim DEAL_II_EQUALS 1)
     return internal::SymmetricTensorImplementation::
       perform_eigenvector_decomposition(T, method);
 
   std::array<std::pair<Number, Tensor<1, dim, Number>>, dim> eig_vals_vecs;
 
-  if (Differentiation::AD::is_ad_number<Number>::value && dim > 1)
+  if (Differentiation::AD::is_ad_number<Number>::value DEAL_II_AND dim > 1)
     {
       // If the tensor is diagonal, then we have a bit on an issue when using
       // auto-differentiable numbers. The reason for this is that all of the
@@ -883,22 +888,24 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
           if (Differentiation::AD::is_taped_ad_number<Number>::value)
             {
               // ADOL-C taped
-              if (method ==
-                  SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
+              if (method DEAL_II_EQUALS
+                         SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
                 sf = 2e11;
-              else if (method == SymmetricTensorEigenvectorMethod::jacobi)
-                sf = (dim == 2 ? 1e6 : 1e9);
+              else if (method DEAL_II_EQUALS
+                              SymmetricTensorEigenvectorMethod::jacobi)
+                sf = (dim DEAL_II_EQUALS 2 ? 1e6 : 1e9);
               else
                 AssertThrow(false, ExcNotImplemented());
             }
           else if (Differentiation::AD::is_sacado_rad_number<Number>::value)
             {
               // Sacado::Rad
-              if (method ==
-                  SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
-                sf = (dim == 2 ? 1e8 : 1e9);
-              else if (method == SymmetricTensorEigenvectorMethod::jacobi)
-                sf = (dim == 2 ? 1e8 : 1e9);
+              if (method DEAL_II_EQUALS
+                         SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
+                sf = (dim DEAL_II_EQUALS 2 ? 1e8 : 1e9);
+              else if (method DEAL_II_EQUALS
+                              SymmetricTensorEigenvectorMethod::jacobi)
+                sf = (dim DEAL_II_EQUALS 2 ? 1e8 : 1e9);
               else
                 AssertThrow(false, ExcNotImplemented());
             }
@@ -907,16 +914,17 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
               // Everything else
               Assert(Differentiation::AD::is_tapeless_ad_number<Number>::value,
                      ExcInternalError());
-              Assert(
-                Differentiation::AD::is_sacado_dfad_number<Number>::value ||
-                  Differentiation::AD::is_adolc_tapeless_number<Number>::value,
-                ExcInternalError());
+              Assert(Differentiation::AD::is_sacado_dfad_number<Number>::value
+                       DEAL_II_OR Differentiation::AD::is_adolc_tapeless_number<
+                         Number>::value,
+                     ExcInternalError());
 
-              if (method ==
-                  SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
-                sf = (dim == 2 ? 1e7 : 2.5e7);
-              else if (method == SymmetricTensorEigenvectorMethod::jacobi)
-                sf = (dim == 2 ? 1e2 : 1e7);
+              if (method DEAL_II_EQUALS
+                         SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
+                sf = (dim DEAL_II_EQUALS 2 ? 1e7 : 2.5e7);
+              else if (method DEAL_II_EQUALS
+                              SymmetricTensorEigenvectorMethod::jacobi)
+                sf = (dim DEAL_II_EQUALS 2 ? 1e2 : 1e7);
               else
                 AssertThrow(false, ExcNotImplemented());
             }
@@ -926,7 +934,7 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
           const double delta = sf * std::numeric_limits<scalar_type>::epsilon();
           const double rotation_angle = delta * numbers::PI / 180.0;
 
-          if (dim == 2)
+          if (dim DEAL_II_EQUALS 2)
             {
               const Tensor<2, dim, Number> T_prime_ns =
                 internal::SymmetricTensorImplementation::dediagonalize_tensor(
@@ -950,7 +958,7 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
             }
           else
             {
-              Assert(dim == 3, ExcDimensionMismatch(dim, 3));
+              Assert(dim DEAL_II_EQUALS 3, ExcDimensionMismatch(dim, 3));
 
               SymmetricTensor<2, dim, Number> T_prime;
               Tensor<2, dim, Number>          T_prime_ns;

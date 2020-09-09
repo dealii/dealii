@@ -163,7 +163,7 @@ namespace DoFRenumbering
 
       std::vector<boosttypes::Vertex> inv_perm(num_vertices(graph));
 
-      if (reversed_numbering == false)
+      if (reversed_numbering DEAL_II_EQUALS false)
         ::boost::cuthill_mckee_ordering(graph,
                                         inv_perm.rbegin(),
                                         get(::boost::vertex_color, graph),
@@ -179,7 +179,8 @@ namespace DoFRenumbering
 
       Assert(std::find(new_dof_indices.begin(),
                        new_dof_indices.end(),
-                       numbers::invalid_dof_index) == new_dof_indices.end(),
+                       numbers::invalid_dof_index)
+               DEAL_II_EQUALS new_dof_indices.end(),
              ExcInternalError());
     }
 
@@ -225,7 +226,7 @@ namespace DoFRenumbering
 
       std::vector<boosttypes::Vertex> inv_perm(num_vertices(graph));
 
-      if (reversed_numbering == false)
+      if (reversed_numbering DEAL_II_EQUALS false)
         ::boost::king_ordering(graph, inv_perm.rbegin());
       else
         ::boost::king_ordering(graph, inv_perm.begin());
@@ -235,7 +236,8 @@ namespace DoFRenumbering
 
       Assert(std::find(new_dof_indices.begin(),
                        new_dof_indices.end(),
-                       numbers::invalid_dof_index) == new_dof_indices.end(),
+                       numbers::invalid_dof_index)
+               DEAL_II_EQUALS new_dof_indices.end(),
              ExcInternalError());
     }
 
@@ -270,7 +272,7 @@ namespace DoFRenumbering
       const bool                            use_constraints)
     {
       (void)use_constraints;
-      Assert(use_constraints == false, ExcNotImplemented());
+      Assert(use_constraints DEAL_II_EQUALS false, ExcNotImplemented());
 
       // the following code is pretty
       // much a verbatim copy of the
@@ -345,10 +347,10 @@ namespace DoFRenumbering
           Assert(std::find(inverse_perm.begin(), inverse_perm.end(), i) !=
                    inverse_perm.end(),
                  ExcInternalError());
-          Assert(inverse_perm[perm[i]] == i, ExcInternalError());
+          Assert(inverse_perm[perm[i]] DEAL_II_EQUALS i, ExcInternalError());
         }
 
-      if (reversed_numbering == true)
+      if (reversed_numbering DEAL_II_EQUALS true)
         std::copy(perm.begin(), perm.end(), new_dof_indices.begin());
       else
         std::copy(inverse_perm.begin(),
@@ -395,9 +397,9 @@ namespace DoFRenumbering
   {
     // see if there is anything to do at all or whether we can skip the work on
     // this processor
-    if (dof_handler.locally_owned_dofs().n_elements() == 0)
+    if (dof_handler.locally_owned_dofs().n_elements() DEAL_II_EQUALS 0)
       {
-        Assert(new_indices.size() == 0, ExcInternalError());
+        Assert(new_indices.size() DEAL_II_EQUALS 0, ExcInternalError());
         return;
       }
 
@@ -419,7 +421,8 @@ namespace DoFRenumbering
     const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
 
     // see if we can get away with the sequential algorithm
-    if (locally_owned_dofs.n_elements() == locally_owned_dofs.size())
+    if (locally_owned_dofs.n_elements()
+          DEAL_II_EQUALS locally_owned_dofs.size())
       {
         AssertDimension(new_indices.size(), dof_handler.n_dofs());
 
@@ -448,9 +451,10 @@ namespace DoFRenumbering
         bool needs_locally_active = false;
         for (const auto starting_index : starting_indices)
           {
-            if ((needs_locally_active ==
-                 /* previously already set to */ true) ||
-                (locally_owned_dofs.is_element(starting_index) == false))
+            if ((needs_locally_active DEAL_II_EQUALS
+                 /* previously already set to */ true)
+                  DEAL_II_OR(locally_owned_dofs.is_element(starting_index)
+                               DEAL_II_EQUALS false))
               {
                 Assert(
                   locally_active_dofs.is_element(starting_index),
@@ -487,7 +491,7 @@ namespace DoFRenumbering
             for (unsigned int j = 0; j < row_length; ++j)
               {
                 const unsigned int col = dsp.column_number(row, j);
-                if (col != row && index_set_to_use.is_element(col))
+                if (col != row DEAL_II_AND index_set_to_use.is_element(col))
                   row_entries.push_back(index_set_to_use.index_within_set(col));
               }
             local_sparsity.add_entries(i,
@@ -519,7 +523,7 @@ namespace DoFRenumbering
         // functions only want new indices for the locally owned DoFs (other
         // processors are responsible for renumbering the ones that are
         // on cell interfaces)
-        if (needs_locally_active == true)
+        if (needs_locally_active DEAL_II_EQUALS true)
           {
             // first step: figure out which DoF indices to eliminate
             IndexSet active_but_not_owned_dofs = locally_active_dofs;
@@ -534,14 +538,15 @@ namespace DoFRenumbering
                 erase_these_indices.insert(my_new_indices[index]);
                 my_new_indices[index] = numbers::invalid_dof_index;
               }
-            Assert(erase_these_indices.size() ==
-                     active_but_not_owned_dofs.n_elements(),
+            Assert(erase_these_indices
+                     .size()
+                       DEAL_II_EQUALS active_but_not_owned_dofs.n_elements(),
                    ExcInternalError());
             Assert(static_cast<unsigned int>(
                      std::count(my_new_indices.begin(),
                                 my_new_indices.end(),
-                                numbers::invalid_dof_index)) ==
-                     active_but_not_owned_dofs.n_elements(),
+                                numbers::invalid_dof_index))
+                     DEAL_II_EQUALS active_but_not_owned_dofs.n_elements(),
                    ExcInternalError());
 
             // then compute a renumbering of the remaining ones
@@ -552,8 +557,8 @@ namespace DoFRenumbering
                                       next_erased_index = erase_these_indices.begin();
               types::global_dof_index next_new_index = 0;
               for (unsigned int i = 0; i < translate_indices.size(); ++i)
-                if ((next_erased_index != erase_these_indices.end()) &&
-                    (*next_erased_index == i))
+                if ((next_erased_index != erase_these_indices.end())
+                      DEAL_II_AND(*next_erased_index DEAL_II_EQUALS i))
                   {
                     translate_indices[i] = numbers::invalid_dof_index;
                     ++next_erased_index;
@@ -563,8 +568,9 @@ namespace DoFRenumbering
                     translate_indices[i] = next_new_index;
                     ++next_new_index;
                   }
-              Assert(next_new_index == locally_owned_dofs.n_elements(),
-                     ExcInternalError());
+              Assert(
+                next_new_index DEAL_II_EQUALS locally_owned_dofs.n_elements(),
+                ExcInternalError());
             }
 
             // and then do the renumbering of the result of the
@@ -578,7 +584,8 @@ namespace DoFRenumbering
                          ExcInternalError());
                   new_indices.push_back(translate_indices[p]);
                 }
-            Assert(new_indices.size() == locally_owned_dofs.n_elements(),
+            Assert(new_indices.size()
+                     DEAL_II_EQUALS locally_owned_dofs.n_elements(),
                    ExcInternalError());
           }
         else
@@ -638,7 +645,7 @@ namespace DoFRenumbering
                                             dof_handler.end(),
                                             component_order_arg,
                                             false);
-    if (result == 0)
+    if (result DEAL_II_EQUALS 0)
       return;
 
     // verify that the last numbered
@@ -648,9 +655,9 @@ namespace DoFRenumbering
     // sequential case) or in the
     // distributed case at least
     // makes sense
-    Assert((result == dof_handler.n_locally_owned_dofs()) ||
-             ((dof_handler.n_locally_owned_dofs() < dof_handler.n_dofs()) &&
-              (result <= dof_handler.n_dofs())),
+    Assert((result DEAL_II_EQUALS dof_handler.n_locally_owned_dofs())DEAL_II_OR(
+             (dof_handler.n_locally_owned_dofs() < dof_handler.n_dofs())
+               DEAL_II_AND(result <= dof_handler.n_dofs())),
            ExcInternalError());
 
     dof_handler.renumber_dofs(renumbering);
@@ -680,10 +687,10 @@ namespace DoFRenumbering
       compute_component_wise<dim, spacedim>(
         renumbering, start, end, component_order_arg, true);
 
-    if (result == 0)
+    if (result DEAL_II_EQUALS 0)
       return;
 
-    Assert(result == dof_handler.n_dofs(level), ExcInternalError());
+    Assert(result DEAL_II_EQUALS dof_handler.n_dofs(level), ExcInternalError());
 
     if (renumbering.size() != 0)
       dof_handler.renumber_dofs(level, renumbering);
@@ -704,7 +711,7 @@ namespace DoFRenumbering
 
     // do nothing if the FE has only
     // one component
-    if (fe_collection.n_components() == 1)
+    if (fe_collection.n_components() DEAL_II_EQUALS 1)
       {
         new_indices.resize(0);
         return 0;
@@ -725,11 +732,11 @@ namespace DoFRenumbering
     // empty vector, set up things to
     // store components in the order
     // found in the system.
-    if (component_order.size() == 0)
+    if (component_order.size() DEAL_II_EQUALS 0)
       for (unsigned int i = 0; i < fe_collection.n_components(); ++i)
         component_order.push_back(i);
 
-    Assert(component_order.size() == fe_collection.n_components(),
+    Assert(component_order.size() DEAL_II_EQUALS fe_collection.n_components(),
            ExcDimensionMismatch(component_order.size(),
                                 fe_collection.n_components()));
 
@@ -806,7 +813,7 @@ namespace DoFRenumbering
 
         if (is_level_operation)
           Assert(
-            cell->level() == start->level(),
+            cell->level() DEAL_II_EQUALS start->level(),
             ExcMessage(
               "Multigrid renumbering in compute_component_wise() needs to be applied to a single level!"));
 
@@ -953,7 +960,7 @@ namespace DoFRenumbering
       typename DoFHandler<dim, spacedim>::active_cell_iterator,
       typename DoFHandler<dim, spacedim>::level_cell_iterator>(
       renumbering, dof_handler.begin_active(), dof_handler.end(), false);
-    if (result == 0)
+    if (result DEAL_II_EQUALS 0)
       return;
 
     // verify that the last numbered
@@ -963,9 +970,9 @@ namespace DoFRenumbering
     // sequential case) or in the
     // distributed case at least
     // makes sense
-    Assert((result == dof_handler.n_locally_owned_dofs()) ||
-             ((dof_handler.n_locally_owned_dofs() < dof_handler.n_dofs()) &&
-              (result <= dof_handler.n_dofs())),
+    Assert((result DEAL_II_EQUALS dof_handler.n_locally_owned_dofs())DEAL_II_OR(
+             (dof_handler.n_locally_owned_dofs() < dof_handler.n_dofs())
+               DEAL_II_AND(result <= dof_handler.n_dofs())),
            ExcInternalError());
 
     dof_handler.renumber_dofs(renumbering);
@@ -998,10 +1005,10 @@ namespace DoFRenumbering
                                                                end,
                                                                true);
 
-    if (result == 0)
+    if (result DEAL_II_EQUALS 0)
       return;
 
-    Assert(result == dof_handler.n_dofs(level), ExcInternalError());
+    Assert(result DEAL_II_EQUALS dof_handler.n_dofs(level), ExcInternalError());
 
     if (renumbering.size() != 0)
       dof_handler.renumber_dofs(level, renumbering);
@@ -1021,7 +1028,7 @@ namespace DoFRenumbering
 
     // do nothing if the FE has only
     // one component
-    if (fe_collection.n_blocks() == 1)
+    if (fe_collection.n_blocks() DEAL_II_EQUALS 1)
       {
         new_indices.resize(0);
         return 0;
@@ -1083,7 +1090,7 @@ namespace DoFRenumbering
 
         if (is_level_operation)
           Assert(
-            cell->level() == start->level(),
+            cell->level() DEAL_II_EQUALS start->level(),
             ExcMessage(
               "Multigrid renumbering in compute_block_wise() needs to be applied to a single level!"));
 
@@ -1286,7 +1293,8 @@ namespace DoFRenumbering
                     const unsigned int idx =
                       locally_owned_dof_indices.index_within_set(
                         local_dof_indices[i]);
-                    if (new_indices[idx] == numbers::invalid_dof_index)
+                    if (new_indices[idx] DEAL_II_EQUALS
+                          numbers::invalid_dof_index)
                       {
                         new_indices[idx] =
                           my_starting_index + current_next_free_dof_offset;
@@ -1389,15 +1397,17 @@ namespace DoFRenumbering
     // equal to the number of degrees of freedom in total (the
     // sequential case) or in the distributed case at least
     // makes sense
-    Assert((next_free_dof_offset == dof_handler.n_locally_owned_dofs()) ||
-             ((dof_handler.n_locally_owned_dofs() < dof_handler.n_dofs()) &&
-              (next_free_dof_offset <= dof_handler.n_dofs())),
-           ExcInternalError());
+    Assert(
+      (next_free_dof_offset DEAL_II_EQUALS dof_handler.n_locally_owned_dofs())
+        DEAL_II_OR((dof_handler.n_locally_owned_dofs() < dof_handler.n_dofs())
+                     DEAL_II_AND(next_free_dof_offset <= dof_handler.n_dofs())),
+      ExcInternalError());
 
     // make sure that all local DoFs got new numbers assigned
     Assert(std::find(renumbering.begin(),
                      renumbering.end(),
-                     numbers::invalid_dof_index) == renumbering.end(),
+                     numbers::invalid_dof_index)
+             DEAL_II_EQUALS renumbering.end(),
            ExcInternalError());
 
     dof_handler.renumber_dofs(renumbering);
@@ -1448,12 +1458,12 @@ namespace DoFRenumbering
     const std::vector<bool> &             selected_dofs)
   {
     const types::global_dof_index n_dofs = dof_handler.n_dofs();
-    Assert(selected_dofs.size() == n_dofs,
+    Assert(selected_dofs.size() DEAL_II_EQUALS n_dofs,
            ExcDimensionMismatch(selected_dofs.size(), n_dofs));
 
     // re-sort the dofs according to
     // their selection state
-    Assert(new_indices.size() == n_dofs,
+    Assert(new_indices.size() DEAL_II_EQUALS n_dofs,
            ExcDimensionMismatch(new_indices.size(), n_dofs));
 
     const types::global_dof_index n_selected_dofs =
@@ -1462,7 +1472,7 @@ namespace DoFRenumbering
     types::global_dof_index next_unselected = 0;
     types::global_dof_index next_selected   = n_selected_dofs;
     for (types::global_dof_index i = 0; i < n_dofs; ++i)
-      if (selected_dofs[i] == false)
+      if (selected_dofs[i] DEAL_II_EQUALS false)
         {
           new_indices[i] = next_unselected;
           ++next_unselected;
@@ -1472,8 +1482,8 @@ namespace DoFRenumbering
           new_indices[i] = next_selected;
           ++next_selected;
         }
-    Assert(next_unselected == n_selected_dofs, ExcInternalError());
-    Assert(next_selected == n_dofs, ExcInternalError());
+    Assert(next_unselected DEAL_II_EQUALS n_selected_dofs, ExcInternalError());
+    Assert(next_selected DEAL_II_EQUALS n_dofs, ExcInternalError());
   }
 
 
@@ -1490,12 +1500,12 @@ namespace DoFRenumbering
            ExcDoFHandlerNotInitialized());
 
     const unsigned int n_dofs = dof_handler.n_dofs(level);
-    Assert(selected_dofs.size() == n_dofs,
+    Assert(selected_dofs.size() DEAL_II_EQUALS n_dofs,
            ExcDimensionMismatch(selected_dofs.size(), n_dofs));
 
     // re-sort the dofs according to
     // their selection state
-    Assert(new_indices.size() == n_dofs,
+    Assert(new_indices.size() DEAL_II_EQUALS n_dofs,
            ExcDimensionMismatch(new_indices.size(), n_dofs));
 
     const unsigned int n_selected_dofs =
@@ -1504,7 +1514,7 @@ namespace DoFRenumbering
     unsigned int next_unselected = 0;
     unsigned int next_selected   = n_selected_dofs;
     for (unsigned int i = 0; i < n_dofs; ++i)
-      if (selected_dofs[i] == false)
+      if (selected_dofs[i] DEAL_II_EQUALS false)
         {
           new_indices[i] = next_unselected;
           ++next_unselected;
@@ -1514,8 +1524,8 @@ namespace DoFRenumbering
           new_indices[i] = next_selected;
           ++next_selected;
         }
-    Assert(next_unselected == n_selected_dofs, ExcInternalError());
-    Assert(next_selected == n_dofs, ExcInternalError());
+    Assert(next_unselected DEAL_II_EQUALS n_selected_dofs, ExcInternalError());
+    Assert(next_selected DEAL_II_EQUALS n_dofs, ExcInternalError());
   }
 
 
@@ -1590,15 +1600,15 @@ namespace DoFRenumbering
         for (const auto dof : cell_dofs)
           {
             const auto local_dof = owned_dofs.index_within_set(dof);
-            if (local_dof != numbers::invalid_dof_index &&
-                !already_sorted[local_dof])
+            if (local_dof != numbers::invalid_dof_index
+                               DEAL_II_AND !already_sorted[local_dof])
               {
                 already_sorted[local_dof] = true;
                 reverse[index++]          = local_dof;
               }
           }
       }
-    Assert(index == n_owned_dofs,
+    Assert(index DEAL_II_EQUALS n_owned_dofs,
            ExcMessage(
              "Traversing over the given set of cells did not cover all "
              "degrees of freedom in the DoFHandler. Does the set of cells "
@@ -1639,12 +1649,12 @@ namespace DoFRenumbering
     const typename std::vector<
       typename DoFHandler<dim, spacedim>::level_cell_iterator> &cells)
   {
-    Assert(cells.size() == dof.get_triangulation().n_cells(level),
+    Assert(cells.size() DEAL_II_EQUALS dof.get_triangulation().n_cells(level),
            ExcDimensionMismatch(cells.size(),
                                 dof.get_triangulation().n_cells(level)));
-    Assert(new_order.size() == dof.n_dofs(level),
+    Assert(new_order.size() DEAL_II_EQUALS dof.n_dofs(level),
            ExcDimensionMismatch(new_order.size(), dof.n_dofs(level)));
-    Assert(reverse.size() == dof.n_dofs(level),
+    Assert(reverse.size() DEAL_II_EQUALS dof.n_dofs(level),
            ExcDimensionMismatch(reverse.size(), dof.n_dofs(level)));
 
     unsigned int n_global_dofs = dof.n_dofs(level);
@@ -1657,7 +1667,8 @@ namespace DoFRenumbering
 
     for (const auto &cell : cells)
       {
-        Assert(cell->level() == static_cast<int>(level), ExcInternalError());
+        Assert(cell->level() DEAL_II_EQUALS static_cast<int>(level),
+               ExcInternalError());
 
         cell->get_active_or_mg_dof_indices(cell_dofs);
         std::sort(cell_dofs.begin(), cell_dofs.end());
@@ -1671,7 +1682,7 @@ namespace DoFRenumbering
               }
           }
       }
-    Assert(global_index == n_global_dofs,
+    Assert(global_index DEAL_II_EQUALS n_global_dofs,
            ExcMessage(
              "Traversing over the given set of cells did not cover all "
              "degrees of freedom in the DoFHandler. Does the set of cells "
@@ -1708,10 +1719,10 @@ namespace DoFRenumbering
                      const bool                            dof_wise_renumbering)
   {
     Assert((dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-              &dof.get_triangulation()) == nullptr),
+             &dof.get_triangulation()) DEAL_II_EQUALS nullptr),
            ExcNotImplemented());
 
-    if (dof_wise_renumbering == false)
+    if (dof_wise_renumbering DEAL_II_EQUALS false)
       {
         std::vector<typename DoFHandler<dim, spacedim>::active_cell_iterator>
           ordered_cells;
@@ -1816,7 +1827,7 @@ namespace DoFRenumbering
                      const Tensor<1, spacedim> &           direction,
                      const bool                            dof_wise_renumbering)
   {
-    if (dof_wise_renumbering == false)
+    if (dof_wise_renumbering DEAL_II_EQUALS false)
       {
         std::vector<typename DoFHandler<dim, spacedim>::level_cell_iterator>
           ordered_cells;
@@ -1946,7 +1957,7 @@ namespace DoFRenumbering
 
 
       /**
-       * Comparison operator for dim==1
+       * Comparison operator for dimDEAL_II_EQUALS 1
        * where this function makes no sense
        */
       template <class DHCellIterator>
@@ -2067,7 +2078,7 @@ namespace DoFRenumbering
                  const DoFHandler<dim, spacedim> &     dof_handler)
   {
     const types::global_dof_index n_dofs = dof_handler.n_dofs();
-    Assert(new_indices.size() == n_dofs,
+    Assert(new_indices.size() DEAL_II_EQUALS n_dofs,
            ExcDimensionMismatch(new_indices.size(), n_dofs));
 
     std::iota(new_indices.begin(),
@@ -2101,7 +2112,7 @@ namespace DoFRenumbering
                  const unsigned int                    level)
   {
     const types::global_dof_index n_dofs = dof_handler.n_dofs(level);
-    Assert(new_indices.size() == n_dofs,
+    Assert(new_indices.size() DEAL_II_EQUALS n_dofs,
            ExcDimensionMismatch(new_indices.size(), n_dofs));
 
     std::iota(new_indices.begin(),
@@ -2153,7 +2164,7 @@ namespace DoFRenumbering
                          const DoFHandler<dim, spacedim> &     dof_handler)
   {
     const types::global_dof_index n_dofs = dof_handler.n_dofs();
-    Assert(new_dof_indices.size() == n_dofs,
+    Assert(new_dof_indices.size() DEAL_II_EQUALS n_dofs,
            ExcDimensionMismatch(new_dof_indices.size(), n_dofs));
 
     // first get the association of each dof
@@ -2180,19 +2191,20 @@ namespace DoFRenumbering
     for (types::subdomain_id subdomain = 0; subdomain < n_subdomains;
          ++subdomain)
       for (types::global_dof_index i = 0; i < n_dofs; ++i)
-        if (subdomain_association[i] == subdomain)
+        if (subdomain_association[i] DEAL_II_EQUALS subdomain)
           {
-            Assert(new_dof_indices[i] == numbers::invalid_dof_index,
+            Assert(new_dof_indices[i] DEAL_II_EQUALS numbers::invalid_dof_index,
                    ExcInternalError());
             new_dof_indices[i] = next_free_index;
             ++next_free_index;
           }
 
     // we should have numbered all dofs
-    Assert(next_free_index == n_dofs, ExcInternalError());
+    Assert(next_free_index DEAL_II_EQUALS n_dofs, ExcInternalError());
     Assert(std::find(new_dof_indices.begin(),
                      new_dof_indices.end(),
-                     numbers::invalid_dof_index) == new_dof_indices.end(),
+                     numbers::invalid_dof_index)
+             DEAL_II_EQUALS new_dof_indices.end(),
            ExcInternalError());
   }
 

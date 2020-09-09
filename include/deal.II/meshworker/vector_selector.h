@@ -453,8 +453,10 @@ namespace MeshWorker
   inline bool
   VectorSelector::empty() const
   {
-    return (value_selection.size() == 0 && gradient_selection.size() == 0 &&
-            hessian_selection.size() == 0);
+    return (
+      value_selection.size() DEAL_II_EQUALS 0 DEAL_II_AND gradient_selection
+        .size() DEAL_II_EQUALS 0 DEAL_II_AND hessian_selection.size()
+          DEAL_II_EQUALS 0);
   }
 
 

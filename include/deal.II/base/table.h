@@ -445,7 +445,7 @@ public:
   /**
    * Move constructor. Transfers the contents of another Table.
    */
-  TableBase(TableBase<N, T> &&src) noexcept;
+  TableBase(TableBase<N, T> DEAL_II_AND src) noexcept;
 
   /**
    * Destructor. Free allocated memory.
@@ -479,13 +479,12 @@ public:
    * table.
    */
   TableBase<N, T> &
-  operator=(TableBase<N, T> &&src) noexcept;
+  operator=(TableBase<N, T> DEAL_II_AND src) noexcept;
 
   /**
    * Test for equality of two tables.
    */
-  bool
-  operator==(const TableBase<N, T> &T2) const;
+  bool operator DEAL_II_EQUALS(const TableBase<N, T> &T2) const;
 
   /**
    * Set all entries to their default value (i.e. copy them over with default
@@ -527,7 +526,7 @@ public:
 
   /**
    * Return whether the object is empty, i.e. one of the directions is zero.
-   * This is equivalent to <tt>n_elements()==0</tt>.
+   * This is equivalent to <tt>n_elements()DEAL_II_EQUALS 0</tt>.
    */
   bool
   empty() const;
@@ -902,13 +901,12 @@ namespace MatrixTableIterators
      * Comparison operator.
      */
     template <bool OtherConstness>
-    friend bool
-    operator==(
+    friend bool operator DEAL_II_EQUALS(
       const AccessorBase<TableType, Constness, storage_order> &     left,
       const AccessorBase<TableType, OtherConstness, storage_order> &right)
     {
-      return left.container == right.container &&
-             left.linear_index == right.linear_index;
+      return left.container DEAL_II_EQUALS right.container DEAL_II_AND
+        left.linear_index DEAL_II_EQUALS right.linear_index;
     }
 
     /**
@@ -2105,7 +2103,7 @@ TableBase<N, T>::TableBase(const TableBase<N, T2> &src)
 
 
 template <int N, typename T>
-TableBase<N, T>::TableBase(TableBase<N, T> &&src) noexcept
+TableBase<N, T>::TableBase(TableBase<N, T> DEAL_II_AND src) noexcept
   : Subscriptor(std::move(src))
   , values(std::move(src.values))
   , table_size(src.table_size)
@@ -2156,8 +2154,8 @@ namespace internal
 
       // access i-th
       // subobject. optimize on the
-      // case i==0
-      if (i == 0)
+      // case iDEAL_II_EQUALS 0
+      if (i DEAL_II_EQUALS 0)
         return Accessor<N, T, C, P - 1>(table, data);
       else
         {
@@ -2261,7 +2259,7 @@ TableBase<N, T>::operator=(const TableBase<N, T2> &m)
 
 template <int N, typename T>
 inline TableBase<N, T> &
-TableBase<N, T>::operator=(TableBase<N, T> &&m) noexcept
+TableBase<N, T>::operator=(TableBase<N, T> DEAL_II_AND m) noexcept
 {
   static_cast<Subscriptor &>(*this) = std::move(static_cast<Subscriptor &>(m));
   values                            = std::move(m.values);
@@ -2274,10 +2272,10 @@ TableBase<N, T>::operator=(TableBase<N, T> &&m) noexcept
 
 
 template <int N, typename T>
-inline bool
-TableBase<N, T>::operator==(const TableBase<N, T> &T2) const
+inline bool TableBase<N, T>::
+            operator DEAL_II_EQUALS(const TableBase<N, T> &T2) const
 {
-  return (values == T2.values);
+  return (values DEAL_II_EQUALS T2.values);
 }
 
 
@@ -2313,7 +2311,7 @@ TableBase<N, T>::reinit(const TableIndices<N> &new_sizes,
   const size_type new_size = n_elements();
 
   // if zero size was given: free all memory
-  if (new_size == 0)
+  if (new_size DEAL_II_EQUALS 0)
     {
       values.resize(0);
       // set all sizes to zero, even
@@ -2382,7 +2380,7 @@ template <int N, typename T>
 inline bool
 TableBase<N, T>::empty() const
 {
-  return (n_elements() == 0);
+  return (n_elements() DEAL_II_EQUALS 0);
 }
 
 
@@ -2864,8 +2862,8 @@ namespace MatrixTableIterators
     : container(table)
     , linear_index(index)
   {
-    Assert(0 <= linear_index &&
-             std::size_t(linear_index) < container->values.size() + 1,
+    Assert(0 <= linear_index DEAL_II_AND std::size_t(linear_index) <
+             container->values.size() + 1,
            ExcMessage("The current iterator points outside of the table and is "
                       "not the end iterator."));
   }
@@ -2928,8 +2926,8 @@ namespace MatrixTableIterators
                       "have a corresponding table."));
     Assert(!container->empty(),
            ExcMessage("An empty table has no rows or columns."));
-    Assert(0 <= linear_index &&
-             std::size_t(linear_index) < container->values.size(),
+    Assert(0 <= linear_index DEAL_II_AND std::size_t(linear_index) <
+             container->values.size(),
            ExcMessage("The current iterator points outside of the table."));
     const std::ptrdiff_t row_n =
       internal::get_row_index<TableType, storage_order>(linear_index,
@@ -2937,9 +2935,10 @@ namespace MatrixTableIterators
     const std::ptrdiff_t column_n =
       internal::get_column_index<TableType, storage_order>(linear_index,
                                                            container);
-    Assert(0 <= column_n && std::size_t(column_n) < container->n_cols(),
+    Assert(0 <= column_n DEAL_II_AND std::size_t(column_n) <
+             container->n_cols(),
            ExcMessage("The current iterator points outside the table."));
-    Assert(0 <= row_n && std::size_t(row_n) < container->n_rows(),
+    Assert(0 <= row_n DEAL_II_AND std::size_t(row_n) < container->n_rows(),
            ExcMessage("The current iterator points outside the table."));
 #  endif
   }
@@ -2962,7 +2961,8 @@ namespace MatrixTableIterators
   template <typename TableType, Storage storage_order>
   inline const Accessor<TableType, false, storage_order> &
   Accessor<TableType, false, storage_order>::operator=(
-    typename Accessor<TableType, false, storage_order>::value_type &&t) const
+    typename Accessor<TableType, false, storage_order>::value_type DEAL_II_AND
+                                                                   t) const
   {
     this->assert_valid_linear_index();
     this->container->values[this->linear_index] = t;
@@ -3024,7 +3024,7 @@ namespace MatrixTableIterators
     const size_type              row_n,
     const size_type              col_n)
     : Iterator(table,
-               storage_order == Storage::row_major ?
+               storage_order DEAL_II_EQUALS Storage::row_major ?
                  table->n_cols() * row_n + col_n :
                  table->n_rows() * col_n + row_n)
   {}

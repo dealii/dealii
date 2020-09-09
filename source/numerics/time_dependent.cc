@@ -66,13 +66,12 @@ TimeDependent::insert_timestep(const TimeStepBase *position,
                                TimeStepBase *      new_timestep)
 {
   Assert((std::find(timesteps.begin(), timesteps.end(), position) !=
-          timesteps.end()) ||
-           (position == nullptr),
+          timesteps.end()) DEAL_II_OR(position DEAL_II_EQUALS nullptr),
          ExcInvalidPosition());
   // first insert the new time step
   // into the doubly linked list
   // of timesteps
-  if (position == nullptr)
+  if (position DEAL_II_EQUALS nullptr)
     {
       // at the end
       new_timestep->set_next_timestep(nullptr);
@@ -84,7 +83,7 @@ TimeDependent::insert_timestep(const TimeStepBase *position,
       else
         new_timestep->set_previous_timestep(nullptr);
     }
-  else if (position == timesteps[0])
+  else if (position DEAL_II_EQUALS timesteps[0])
     {
       // at the beginning
       new_timestep->set_previous_timestep(nullptr);
@@ -104,8 +103,8 @@ TimeDependent::insert_timestep(const TimeStepBase *position,
           std::find(timesteps.begin(), timesteps.end(), position);
       // check iterators again to satisfy coverity: both insert_position and
       // insert_position - 1 must be valid iterators
-      Assert(insert_position != timesteps.begin() &&
-               insert_position != timesteps.end(),
+      Assert(insert_position != timesteps.begin() DEAL_II_AND insert_position !=
+               timesteps.end(),
              ExcInternalError());
 
       (*(insert_position - 1))->set_next_timestep(new_timestep);
@@ -116,7 +115,7 @@ TimeDependent::insert_timestep(const TimeStepBase *position,
 
   // finally enter it into the
   // array
-  timesteps.insert((position == nullptr ?
+  timesteps.insert((position DEAL_II_EQUALS nullptr ?
                       timesteps.end() :
                       std::find(timesteps.begin(), timesteps.end(), position)),
                    new_timestep);
@@ -148,7 +147,7 @@ TimeDependent::delete_timestep(const unsigned int position)
   // reset "next" pointer of previous
   // time step if possible
   //
-  // note that if now position==size,
+  // note that if now positionDEAL_II_EQUALS size,
   // then we deleted the last time step
   if (position != 0)
     timesteps[position - 1]->set_next_timestep(
@@ -459,7 +458,7 @@ TimeStepBase_Tria<dim>::~TimeStepBase_Tria()
       delete t;
     }
   else
-    AssertNothrow(tria == nullptr, ExcInternalError());
+    AssertNothrow(tria DEAL_II_EQUALS nullptr, ExcInternalError());
 
   coarse_grid = nullptr;
 }
@@ -472,8 +471,8 @@ TimeStepBase_Tria<dim>::wake_up(const unsigned int wakeup_level)
 {
   TimeStepBase::wake_up(wakeup_level);
 
-  if (wakeup_level == flags.wakeup_level_to_build_grid)
-    if (flags.delete_and_rebuild_tria || !tria)
+  if (wakeup_level DEAL_II_EQUALS flags.wakeup_level_to_build_grid)
+    if (flags.delete_and_rebuild_tria DEAL_II_OR !tria)
       restore_grid();
 }
 
@@ -483,7 +482,7 @@ template <int dim>
 void
 TimeStepBase_Tria<dim>::sleep(const unsigned int sleep_level)
 {
-  if (sleep_level == flags.sleep_level_to_delete_grid)
+  if (sleep_level DEAL_II_EQUALS flags.sleep_level_to_delete_grid)
     {
       Assert(tria != nullptr, ExcInternalError());
 
@@ -518,8 +517,9 @@ template <int dim>
 void
 TimeStepBase_Tria<dim>::restore_grid()
 {
-  Assert(tria == nullptr, ExcGridNotDeleted());
-  Assert(refine_flags.size() == coarsen_flags.size(), ExcInternalError());
+  Assert(tria DEAL_II_EQUALS nullptr, ExcGridNotDeleted());
+  Assert(refine_flags.size() DEAL_II_EQUALS coarsen_flags.size(),
+         ExcInternalError());
 
   // create a virgin triangulation and
   // set it to a copy of the coarse grid
@@ -585,7 +585,7 @@ namespace
     // will be refined below anyway.
     if (new_cell->is_active())
       {
-        if (new_cell->refine_flag_set() && old_cell->is_active())
+        if (new_cell->refine_flag_set() DEAL_II_AND old_cell->is_active())
           {
             if (old_cell->coarsen_flag_set())
               old_cell->clear_coarsen_flag();
@@ -596,9 +596,9 @@ namespace
         return;
       }
 
-    if (old_cell->has_children() && new_cell->has_children())
+    if (old_cell->has_children() DEAL_II_AND new_cell->has_children())
       {
-        Assert(old_cell->n_children() == new_cell->n_children(),
+        Assert(old_cell->n_children() DEAL_II_EQUALS new_cell->n_children(),
                ExcNotImplemented());
         for (unsigned int c = 0; c < new_cell->n_children(); ++c)
           dealii::mirror_refinement_flags<dim>(new_cell->child(c),
@@ -613,11 +613,12 @@ namespace
   adapt_grid_cells(const typename Triangulation<dim>::cell_iterator &cell1,
                    const typename Triangulation<dim>::cell_iterator &cell2)
   {
-    if (cell2->has_children() && cell1->has_children())
+    if (cell2->has_children() DEAL_II_AND cell1->has_children())
       {
         bool grids_changed = false;
 
-        Assert(cell2->n_children() == cell1->n_children(), ExcNotImplemented());
+        Assert(cell2->n_children() DEAL_II_EQUALS cell1->n_children(),
+               ExcNotImplemented());
         for (unsigned int c = 0; c < cell1->n_children(); ++c)
           grids_changed |=
             dealii::adapt_grid_cells<dim>(cell1->child(c), cell2->child(c));
@@ -625,18 +626,18 @@ namespace
       }
 
 
-    if (!cell1->has_children() && !cell2->has_children())
+    if (!cell1->has_children() DEAL_II_AND !cell2->has_children())
       // none of the two have children, so
       // make sure that not one is flagged
       // for refinement and the other for
       // coarsening
       {
-        if (cell1->refine_flag_set() && cell2->coarsen_flag_set())
+        if (cell1->refine_flag_set() DEAL_II_AND cell2->coarsen_flag_set())
           {
             cell2->clear_coarsen_flag();
             return true;
           }
-        else if (cell1->coarsen_flag_set() && cell2->refine_flag_set())
+        else if (cell1->coarsen_flag_set() DEAL_II_AND cell2->refine_flag_set())
           {
             cell1->clear_coarsen_flag();
             return true;
@@ -646,7 +647,7 @@ namespace
       }
 
 
-    if (cell1->has_children() && !cell2->has_children())
+    if (cell1->has_children() DEAL_II_AND !cell2->has_children())
       // cell1 has children, cell2 has not
       // -> cell2 needs to be refined if any
       // of cell1's children is flagged
@@ -674,8 +675,9 @@ namespace
 
         if (!cell2->refine_flag_set())
           for (unsigned int c = 0; c < cell1->n_children(); ++c)
-            if (cell1->child(c)->refine_flag_set() ||
-                cell1->child(c)->has_children())
+            if (cell1->child(c)
+                  ->refine_flag_set() DEAL_II_OR cell1->child(c)
+                  ->has_children())
               {
                 cell2->set_refine_flag();
                 changed_grid = true;
@@ -684,7 +686,7 @@ namespace
         return changed_grid;
       }
 
-    if (!cell1->has_children() && cell2->has_children())
+    if (!cell1->has_children() DEAL_II_AND cell2->has_children())
       // same thing, other way round...
       {
         bool changed_grid = false;
@@ -696,8 +698,9 @@ namespace
 
         if (!cell1->refine_flag_set())
           for (unsigned int c = 0; c < cell2->n_children(); ++c)
-            if (cell2->child(c)->refine_flag_set() ||
-                cell2->child(c)->has_children())
+            if (cell2->child(c)
+                  ->refine_flag_set() DEAL_II_OR cell2->child(c)
+                  ->has_children())
               {
                 cell1->set_refine_flag();
                 changed_grid = true;
@@ -721,7 +724,7 @@ namespace
     typename Triangulation<dim>::cell_iterator cell1 = tria1.begin(),
                                                cell2 = tria2.begin();
     typename Triangulation<dim>::cell_iterator endc;
-    endc = (tria1.n_levels() == 1 ?
+    endc = (tria1.n_levels() DEAL_II_EQUALS 1 ?
               typename Triangulation<dim>::cell_iterator(tria1.end()) :
               tria1.begin(1));
     for (; cell1 != endc; ++cell1, ++cell2)
@@ -774,9 +777,9 @@ TimeStepBase_Tria<dim>::refine_grid(const RefinementData refinement_data)
   // to changing the threshold such that the
   // number of cells flagged for refinement
   // or coarsening would be changed by one
-  if ((timestep_no != 0) &&
-      (sweep_no >= refinement_flags.first_sweep_with_correction) &&
-      (refinement_flags.cell_number_correction_steps > 0))
+  if ((timestep_no != 0)
+        DEAL_II_AND(sweep_no >= refinement_flags.first_sweep_with_correction)
+          DEAL_II_AND(refinement_flags.cell_number_correction_steps > 0))
     {
       sorted_criteria = criteria;
       std::sort(sorted_criteria.begin(), sorted_criteria.end());
@@ -827,8 +830,8 @@ TimeStepBase_Tria<dim>::refine_grid(const RefinementData refinement_data)
   // algorithm), but relax the conditions
   // for the correction to allow deviations
   // which are three times as high than
-  // allowed (sweep==1 || cell number<200)
-  // or twice as high (sweep==2 ||
+  // allowed (sweepDEAL_II_EQUALS 1 DEAL_II_OR  cell number<200)
+  // or twice as high (sweepDEAL_II_EQUALS 2 DEAL_II_OR
   // cell number<300). Also, since
   // refinement never does any harm other
   // than increased work, we allow for
@@ -839,8 +842,8 @@ TimeStepBase_Tria<dim>::refine_grid(const RefinementData refinement_data)
   // repeat this loop several times since
   // the first estimate may not be totally
   // correct
-  if ((timestep_no != 0) &&
-      (sweep_no >= refinement_flags.first_sweep_with_correction))
+  if ((timestep_no != 0)
+        DEAL_II_AND(sweep_no >= refinement_flags.first_sweep_with_correction))
     for (unsigned int loop = 0;
          loop < refinement_flags.cell_number_correction_steps;
          ++loop)
@@ -1055,7 +1058,7 @@ TimeStepBase_Tria<dim>::refine_grid(const RefinementData refinement_data)
           // stop correction steps
           break;
 
-        if (p_refinement_threshold == sorted_criteria.end())
+        if (p_refinement_threshold DEAL_II_EQUALS sorted_criteria.end())
           {
             Assert(p_coarsening_threshold != p_refinement_threshold,
                    ExcInternalError());
@@ -1093,7 +1096,7 @@ TimeStepBase_Tria<dim>::refine_grid(const RefinementData refinement_data)
   // it is always taken to be the first
   // grid and needs therefore no
   // treatment of its own.
-  if ((timestep_no >= 1) && (refinement_flags.adapt_grids))
+  if ((timestep_no >= 1) DEAL_II_AND(refinement_flags.adapt_grids))
     {
       Triangulation<dim> *previous_tria =
         dynamic_cast<const TimeStepBase_Tria<dim> *>(previous_timestep)->tria;
@@ -1178,9 +1181,11 @@ TimeStepBase_Tria_Flags::Flags<dim>::Flags(
   , wakeup_level_to_build_grid(wakeup_level_to_build_grid)
   , sleep_level_to_delete_grid(sleep_level_to_delete_grid)
 {
-  //   Assert (!delete_and_rebuild_tria || (wakeup_level_to_build_grid>=1),
+  //   Assert (!delete_and_rebuild_tria DEAL_II_OR
+  //   (wakeup_level_to_build_grid>=1),
   //        ExcInvalidParameter(wakeup_level_to_build_grid));
-  //   Assert (!delete_and_rebuild_tria || (sleep_level_to_delete_grid>=1),
+  //   Assert (!delete_and_rebuild_tria DEAL_II_OR
+  //   (sleep_level_to_delete_grid>=1),
   //        ExcInvalidParameter(sleep_level_to_delete_grid));
 }
 
@@ -1251,17 +1256,19 @@ TimeStepBase_Tria_Flags::RefinementData<dim>::RefinementData(
   // In these case we arbitrarily reduce the
   // bottom threshold by one permille below
   // the top threshold
-  coarsening_threshold((_coarsening_threshold == _refinement_threshold ?
-                          _coarsening_threshold :
-                          0.999 * _coarsening_threshold))
+  coarsening_threshold(
+    (_coarsening_threshold DEAL_II_EQUALS _refinement_threshold ?
+       _coarsening_threshold :
+       0.999 * _coarsening_threshold))
 {
   Assert(refinement_threshold >= 0, ExcInvalidValue(refinement_threshold));
   Assert(coarsening_threshold >= 0, ExcInvalidValue(coarsening_threshold));
   // allow both thresholds to be zero,
   // since this is needed in case all indicators
   // are zero
-  Assert((coarsening_threshold < refinement_threshold) ||
-           ((coarsening_threshold == 0) && (refinement_threshold == 0)),
+  Assert((coarsening_threshold < refinement_threshold)
+           DEAL_II_OR((coarsening_threshold DEAL_II_EQUALS 0)DEAL_II_AND(
+             refinement_threshold DEAL_II_EQUALS 0)),
          ExcInvalidValue(coarsening_threshold));
 }
 

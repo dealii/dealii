@@ -76,16 +76,22 @@ PolynomialsBernardiRaugel<dim>::evaluate(
   std::vector<Tensor<4, dim>> &third_derivatives,
   std::vector<Tensor<5, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == this->n() || values.size() == 0,
+  Assert(values.size() DEAL_II_EQUALS this->n() DEAL_II_OR values.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch(values.size(), this->n()));
-  Assert(grads.size() == this->n() || grads.size() == 0,
+  Assert(grads.size() DEAL_II_EQUALS this->n() DEAL_II_OR grads.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch(grads.size(), this->n()));
-  Assert(grad_grads.size() == this->n() || grad_grads.size() == 0,
+  Assert(grad_grads.size() DEAL_II_EQUALS this->n() DEAL_II_OR grad_grads.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch(grad_grads.size(), this->n()));
-  Assert(third_derivatives.size() == this->n() || third_derivatives.size() == 0,
+  Assert(third_derivatives.size()
+           DEAL_II_EQUALS this->n() DEAL_II_OR third_derivatives.size()
+             DEAL_II_EQUALS 0,
          ExcDimensionMismatch(third_derivatives.size(), this->n()));
-  Assert(fourth_derivatives.size() == this->n() ||
-           fourth_derivatives.size() == 0,
+  Assert(fourth_derivatives.size()
+           DEAL_II_EQUALS this->n() DEAL_II_OR fourth_derivatives.size()
+             DEAL_II_EQUALS 0,
          ExcDimensionMismatch(fourth_derivatives.size(), this->n()));
 
   std::vector<double>         Q_values;
@@ -104,18 +110,21 @@ PolynomialsBernardiRaugel<dim>::evaluate(
   constexpr int n_q = 1 << dim; // size for create_polynomials_q
 
   // don't resize if the provided vector has 0 length
-  Q_values.resize((values.size() == 0) ? 0 : n_q);
-  Q_grads.resize((grads.size() == 0) ? 0 : n_q);
-  Q_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_q);
-  Q_third_derivatives.resize((third_derivatives.size() == 0) ? 0 : n_q);
-  Q_fourth_derivatives.resize((fourth_derivatives.size() == 0) ? 0 : n_q);
-  bubble_values.resize((values.size() == 0) ? 0 : n_bubbles);
-  bubble_grads.resize((grads.size() == 0) ? 0 : n_bubbles);
-  bubble_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_bubbles);
-  bubble_third_derivatives.resize((third_derivatives.size() == 0) ? 0 :
-                                                                    n_bubbles);
+  Q_values.resize((values.size() DEAL_II_EQUALS 0) ? 0 : n_q);
+  Q_grads.resize((grads.size() DEAL_II_EQUALS 0) ? 0 : n_q);
+  Q_grad_grads.resize((grad_grads.size() DEAL_II_EQUALS 0) ? 0 : n_q);
+  Q_third_derivatives.resize((third_derivatives.size() DEAL_II_EQUALS 0) ? 0 :
+                                                                           n_q);
+  Q_fourth_derivatives.resize(
+    (fourth_derivatives.size() DEAL_II_EQUALS 0) ? 0 : n_q);
+  bubble_values.resize((values.size() DEAL_II_EQUALS 0) ? 0 : n_bubbles);
+  bubble_grads.resize((grads.size() DEAL_II_EQUALS 0) ? 0 : n_bubbles);
+  bubble_grad_grads.resize((grad_grads.size() DEAL_II_EQUALS 0) ? 0 :
+                                                                  n_bubbles);
+  bubble_third_derivatives.resize(
+    (third_derivatives.size() DEAL_II_EQUALS 0) ? 0 : n_bubbles);
   bubble_fourth_derivatives.resize(
-    (fourth_derivatives.size() == 0) ? 0 : n_bubbles);
+    (fourth_derivatives.size() DEAL_II_EQUALS 0) ? 0 : n_bubbles);
 
   // 1 normal vector per face, ordering consistent with GeometryInfo
   // Normal vectors point in the +x, +y, and +z directions for
@@ -140,14 +149,14 @@ PolynomialsBernardiRaugel<dim>::evaluate(
   // set indices for the anisotropic polynomials to find
   // them after polynomial_space_bubble.evaluate is called
   std::vector<int> aniso_indices;
-  if (dim == 2)
+  if (dim DEAL_II_EQUALS 2)
     {
       aniso_indices.push_back(6);
       aniso_indices.push_back(7);
       aniso_indices.push_back(2);
       aniso_indices.push_back(5);
     }
-  else if (dim == 3)
+  else if (dim DEAL_II_EQUALS 3)
     {
       aniso_indices.push_back(24);
       aniso_indices.push_back(25);
@@ -240,8 +249,8 @@ unsigned int
 PolynomialsBernardiRaugel<dim>::n_polynomials(const unsigned int k)
 {
   (void)k;
-  Assert(k == 1, ExcNotImplemented());
-  if (dim == 2 || dim == 3)
+  Assert(k DEAL_II_EQUALS 1, ExcNotImplemented());
+  if (dim DEAL_II_EQUALS 2 DEAL_II_OR dim DEAL_II_EQUALS 3)
     return dim * GeometryInfo<dim>::vertices_per_cell +
            GeometryInfo<dim>::faces_per_cell;
   // 2*4+4=12 polynomials in 2D and 3*8+6=30 polynomials in 3D

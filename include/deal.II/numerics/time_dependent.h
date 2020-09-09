@@ -1627,13 +1627,13 @@ TimeDependent::do_loop(InitFunctionObject      init_function,
       switch (direction)
         {
           case forward:
-            if ((step - look_back >= 0) &&
-                (step - look_back < static_cast<int>(n_timesteps)))
+            if ((step - look_back >= 0)
+                  DEAL_II_AND(step - look_back < static_cast<int>(n_timesteps)))
               timesteps[step - look_back]->sleep(look_back);
             break;
           case backward:
-            if ((step - look_back >= 0) &&
-                (step - look_back < static_cast<int>(n_timesteps)))
+            if ((step - look_back >= 0)
+                  DEAL_II_AND(step - look_back < static_cast<int>(n_timesteps)))
               timesteps[n_timesteps - (step - look_back) - 1]->sleep(look_back);
             break;
         };

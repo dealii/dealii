@@ -363,7 +363,8 @@ namespace parallel
        * In case allow_artificial_cells is false, this vector is
        * consistent with IDs stored in cell->subdomain_id() of the
        * triangulation class. When allow_artificial_cells is true, cells which
-       * are artificial will have cell->subdomain_id() == numbers::artificial;
+       * are artificial will have cell->subdomain_id() DEAL_II_EQUALS
+       * numbers::artificial;
        *
        * The original partition information is stored to allow using sequential
        * DoF distribution and partitioning functions with semi-artificial

@@ -128,7 +128,8 @@ BoundingBoxDataOut<dim>::build_patches(
   constexpr unsigned int boxdim =
     boost::geometry::dimension<typename Getter::result_type>::value;
   const unsigned int N = std::distance(begin, end);
-  static_assert(boxdim == dim, "Bounding boxes are of the wrong dimension!");
+  static_assert(boxdim DEAL_II_EQUALS dim,
+                "Bounding boxes are of the wrong dimension!");
 
   dataset_names.clear();
   patches.resize(N);

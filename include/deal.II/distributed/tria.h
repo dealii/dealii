@@ -420,7 +420,7 @@ namespace parallel
        * flags set.
        *
        * Since the current processor only has control over those cells it owns
-       * (i.e. the ones for which <code>cell-@>subdomain_id() ==
+       * (i.e. the ones for which <code>cell-@>subdomain_id() DEAL_II_EQUALS
        * this-@>locally_owned_subdomain()</code>), refinement and coarsening
        * flags are only respected for those locally owned cells. Flags may be
        * set on other cells as well (and may often, in fact, if you call

@@ -196,8 +196,8 @@ struct identity
  * the same.
  *
  * This class implements a comparison function that always returns @p false if
- * the types of its two arguments are different, and returns <tt>p1 == p2</tt>
- * otherwise.
+ * the types of its two arguments are different, and returns <tt>p1
+ * DEAL_II_EQUALS  p2</tt> otherwise.
  */
 struct PointerComparison
 {
@@ -209,14 +209,15 @@ struct PointerComparison
   static bool
   equal(const T *p1, const T *p2)
   {
-    return (p1 == p2);
+    return (p1 DEAL_II_EQUALS p2);
   }
 
 
   /**
    * Comparison function for pointers of different types. The C++ language
-   * does not allow comparing these pointers using <tt>operator==</tt>.
-   * However, since the two pointers have different types, we know that they
+   * does not allow comparing these pointers using <tt>operator DEAL_II_EQUALS
+   * </tt>. However, since the two pointers have different types, we know that
+   * they
    * can't be the same, so we always return @p false.
    */
   template <typename T, typename U>

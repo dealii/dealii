@@ -71,8 +71,8 @@ DEAL_II_NAMESPACE_OPEN
  * <tt>invert_diagblocks()</tt>. If you don't want to use the block inversion
  * as an exact solver, but rather as a preconditioner, you may probably want
  * to store the inverted blocks with less accuracy than the original matrix;
- * for example, <tt>number==double, inverse_type=float</tt> might be a viable
- * choice.
+ * for example, <tt>numberDEAL_II_EQUALS double, inverse_type=float</tt> might
+ * be a viable choice.
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
@@ -485,10 +485,9 @@ public:
     /**
      * Comparison. True, if both iterators point to the same matrix position.
      */
-    bool
-    operator==(const const_iterator &) const;
+    bool operator DEAL_II_EQUALS(const const_iterator &) const;
     /**
-     * Inverse of <tt>==</tt>.
+     * Inverse of <tt>DEAL_II_EQUALS </tt>.
      */
     bool
     operator!=(const const_iterator &) const;
@@ -897,7 +896,7 @@ template <typename MatrixType, typename inverse_type>
 inline bool
 PreconditionBlock<MatrixType, inverse_type>::empty() const
 {
-  if (A == nullptr)
+  if (A DEAL_II_EQUALS nullptr)
     return true;
   return A->empty();
 }
@@ -938,7 +937,7 @@ inline PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
 {
   // This is the end accessor, which
   // does not have a valid block.
-  if (a_block == matrix->size())
+  if (a_block DEAL_II_EQUALS matrix->size())
     return;
 
   const size_type r = row % bs;
@@ -1001,7 +1000,7 @@ inline
   Assert(*this != accessor.matrix->end(), ExcIteratorPastEnd());
 
   ++accessor.b_iterator;
-  if (accessor.b_iterator == accessor.b_end)
+  if (accessor.b_iterator DEAL_II_EQUALS accessor.b_end)
     {
       ++accessor.a_block;
 
@@ -1037,19 +1036,20 @@ inline const typename PreconditionBlockJacobi<MatrixType, inverse_type>::
 
 
 template <typename MatrixType, typename inverse_type>
-inline bool
-PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
-operator==(const const_iterator &other) const
+inline bool PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
+            operator DEAL_II_EQUALS(const const_iterator &other) const
 {
-  if (accessor.a_block == accessor.matrix->size() &&
-      accessor.a_block == other.accessor.a_block)
+  if (accessor.a_block DEAL_II_EQUALS
+                       accessor.matrix->size()
+          DEAL_II_AND accessor.a_block DEAL_II_EQUALS other.accessor.a_block)
     return true;
 
   if (accessor.a_block != other.accessor.a_block)
     return false;
 
-  return (accessor.row() == other.accessor.row() &&
-          accessor.column() == other.accessor.column());
+  return (
+    accessor.row() DEAL_II_EQUALS other.accessor.row()
+      DEAL_II_AND accessor.column() DEAL_II_EQUALS other.accessor.column());
 }
 
 
@@ -1058,7 +1058,7 @@ inline bool
 PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
 operator!=(const const_iterator &other) const
 {
-  return !(*this == other);
+  return !(*this DEAL_II_EQUALS other);
 }
 
 
@@ -1067,9 +1067,11 @@ inline bool
 PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
 operator<(const const_iterator &other) const
 {
-  return (accessor.row() < other.accessor.row() ||
-          (accessor.row() == other.accessor.row() &&
-           accessor.column() < other.accessor.column()));
+  return (accessor.row() <
+          other.accessor.row() DEAL_II_OR(
+            accessor.row()
+              DEAL_II_EQUALS other.accessor.row()
+                DEAL_II_AND  accessor.column() < other.accessor.column()));
 }
 
 

@@ -296,9 +296,9 @@ TridiagonalMatrix<number>::operator()(size_type i, size_type j) const
   Assert(i <= j + 1, ExcIndexRange(i, j - 1, j + 2));
   Assert(j <= i + 1, ExcIndexRange(j, i - 1, i + 2));
 
-  if (j == i)
+  if (j DEAL_II_EQUALS i)
     return diagonal[i];
-  if (j == i - 1)
+  if (j DEAL_II_EQUALS i - 1)
     {
       if (is_symmetric)
         return right[i - 1];
@@ -306,7 +306,7 @@ TridiagonalMatrix<number>::operator()(size_type i, size_type j) const
         return left[i];
     }
 
-  if (j == i + 1)
+  if (j DEAL_II_EQUALS i + 1)
     return right[i];
 
   Assert(false, ExcInternalError());
@@ -323,9 +323,9 @@ TridiagonalMatrix<number>::operator()(size_type i, size_type j)
   Assert(i <= j + 1, ExcIndexRange(i, j - 1, j + 2));
   Assert(j <= i + 1, ExcIndexRange(j, i - 1, i + 2));
 
-  if (j == i)
+  if (j DEAL_II_EQUALS i)
     return diagonal[i];
-  if (j == i - 1)
+  if (j DEAL_II_EQUALS i - 1)
     {
       if (is_symmetric)
         return right[i - 1];
@@ -333,7 +333,7 @@ TridiagonalMatrix<number>::operator()(size_type i, size_type j)
         return left[i];
     }
 
-  if (j == i + 1)
+  if (j DEAL_II_EQUALS i + 1)
     return right[i];
 
   Assert(false, ExcInternalError());

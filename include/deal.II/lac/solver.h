@@ -482,10 +482,11 @@ SolverBase<VectorType>::StateCombiner::
 operator()(const SolverControl::State state1,
            const SolverControl::State state2) const
 {
-  if ((state1 == SolverControl::failure) || (state2 == SolverControl::failure))
+  if ((state1 DEAL_II_EQUALS SolverControl::failure)DEAL_II_OR(
+        state2 DEAL_II_EQUALS SolverControl::failure))
     return SolverControl::failure;
-  else if ((state1 == SolverControl::iterate) ||
-           (state2 == SolverControl::iterate))
+  else if ((state1 DEAL_II_EQUALS SolverControl::iterate)DEAL_II_OR(
+             state2 DEAL_II_EQUALS SolverControl::iterate))
     return SolverControl::iterate;
   else
     return SolverControl::success;

@@ -561,7 +561,7 @@ namespace MeshWorker
       const BlockVector<double> &                 local,
       const std::vector<types::global_dof_index> &dof)
     {
-      if (constraints == 0)
+      if (constraints DEAL_II_EQUALS 0)
         {
           for (unsigned int b = 0; b < local.n_blocks(); ++b)
             for (unsigned int j = 0; j < local.block(b).size(); ++j)
@@ -668,7 +668,7 @@ namespace MeshWorker
       const std::vector<types::global_dof_index> &dof1,
       const std::vector<types::global_dof_index> &dof2)
     {
-      if (constraints == nullptr)
+      if (constraints DEAL_II_EQUALS nullptr)
         {
           for (unsigned int j = 0; j < local.n_rows(); ++j)
             for (unsigned int k = 0; k < local.n_cols(); ++k)
@@ -884,7 +884,7 @@ namespace MeshWorker
                                              .global_to_local(dof2[kcell])
                                              .second;
 
-              if (mg_constrained_dofs == 0)
+              if (mg_constrained_dofs DEAL_II_EQUALS 0)
                 {
                   if (transpose)
                     global.add(kglobal, jglobal, local(j, k));
@@ -893,21 +893,24 @@ namespace MeshWorker
                 }
               else
                 {
-                  if (!mg_constrained_dofs->at_refinement_edge(level1,
-                                                               jglobal) &&
-                      !mg_constrained_dofs->at_refinement_edge(level2, kglobal))
+                  if (!mg_constrained_dofs
+                         ->at_refinement_edge(level1, jglobal)
+                           DEAL_II_AND !mg_constrained_dofs->at_refinement_edge(
+                             level2, kglobal))
                     {
                       if (mg_constrained_dofs->set_boundary_values())
                         {
-                          if ((!mg_constrained_dofs->is_boundary_index(
-                                 level1, jglobal) &&
-                               !mg_constrained_dofs->is_boundary_index(
-                                 level2, kglobal)) ||
-                              (mg_constrained_dofs->is_boundary_index(
-                                 level1, jglobal) &&
-                               mg_constrained_dofs->is_boundary_index(
-                                 level2, kglobal) &&
-                               jglobal == kglobal))
+                          if ((!mg_constrained_dofs
+                                  ->is_boundary_index(level1, jglobal)
+                                    DEAL_II_AND !mg_constrained_dofs
+                                  ->is_boundary_index(level2, kglobal))
+                                DEAL_II_OR(
+                                  mg_constrained_dofs
+                                    ->is_boundary_index(level1, jglobal)
+                                      DEAL_II_AND mg_constrained_dofs
+                                    ->is_boundary_index(level2, kglobal)
+                                      DEAL_II_AND jglobal DEAL_II_EQUALS
+                                                          kglobal))
                             {
                               if (transpose)
                                 global.add(kglobal, jglobal, local(j, k));
@@ -972,19 +975,19 @@ namespace MeshWorker
                                              .global_to_local(dof2[kcell])
                                              .second;
 
-              if (mg_constrained_dofs == 0)
+              if (mg_constrained_dofs DEAL_II_EQUALS 0)
                 global.add(jglobal, kglobal, local(j, k));
               else
                 {
-                  if (!mg_constrained_dofs->non_refinement_edge_index(
-                        level1, jglobal) &&
-                      !mg_constrained_dofs->non_refinement_edge_index(level2,
-                                                                      kglobal))
+                  if (!mg_constrained_dofs
+                         ->non_refinement_edge_index(level1, jglobal)
+                           DEAL_II_AND !mg_constrained_dofs
+                         ->non_refinement_edge_index(level2, kglobal))
                     {
-                      if (!mg_constrained_dofs->at_refinement_edge(level1,
-                                                                   jglobal) &&
-                          !mg_constrained_dofs->at_refinement_edge(level2,
-                                                                   kglobal))
+                      if (!mg_constrained_dofs
+                             ->at_refinement_edge(level1, jglobal)
+                               DEAL_II_AND !mg_constrained_dofs
+                             ->at_refinement_edge(level2, kglobal))
                         global.add(jglobal, kglobal, local(j, k));
                     }
                 }
@@ -1035,19 +1038,19 @@ namespace MeshWorker
                                              .global_to_local(dof2[kcell])
                                              .second;
 
-              if (mg_constrained_dofs == 0)
+              if (mg_constrained_dofs DEAL_II_EQUALS 0)
                 global.add(jglobal, kglobal, local(j, k));
               else
                 {
-                  if (!mg_constrained_dofs->non_refinement_edge_index(
-                        level1, jglobal) &&
-                      !mg_constrained_dofs->non_refinement_edge_index(level2,
-                                                                      kglobal))
+                  if (!mg_constrained_dofs
+                         ->non_refinement_edge_index(level1, jglobal)
+                           DEAL_II_AND !mg_constrained_dofs
+                         ->non_refinement_edge_index(level2, kglobal))
                     {
-                      if (!mg_constrained_dofs->at_refinement_edge(level1,
-                                                                   jglobal) &&
-                          !mg_constrained_dofs->at_refinement_edge(level2,
-                                                                   kglobal))
+                      if (!mg_constrained_dofs
+                             ->at_refinement_edge(level1, jglobal)
+                               DEAL_II_AND !mg_constrained_dofs
+                             ->at_refinement_edge(level2, kglobal))
                         global.add(jglobal, kglobal, local(j, k));
                     }
                 }
@@ -1098,19 +1101,19 @@ namespace MeshWorker
                                              .global_to_local(dof2[kcell])
                                              .second;
 
-              if (mg_constrained_dofs == 0)
+              if (mg_constrained_dofs DEAL_II_EQUALS 0)
                 global.add(jglobal, kglobal, local(k, j));
               else
                 {
-                  if (!mg_constrained_dofs->non_refinement_edge_index(
-                        level1, jglobal) &&
-                      !mg_constrained_dofs->non_refinement_edge_index(level2,
-                                                                      kglobal))
+                  if (!mg_constrained_dofs
+                         ->non_refinement_edge_index(level1, jglobal)
+                           DEAL_II_AND !mg_constrained_dofs
+                         ->non_refinement_edge_index(level2, kglobal))
                     {
-                      if (!mg_constrained_dofs->at_refinement_edge(level1,
-                                                                   jglobal) &&
-                          !mg_constrained_dofs->at_refinement_edge(level2,
-                                                                   kglobal))
+                      if (!mg_constrained_dofs
+                             ->at_refinement_edge(level1, jglobal)
+                               DEAL_II_AND !mg_constrained_dofs
+                             ->at_refinement_edge(level2, kglobal))
                         global.add(jglobal, kglobal, local(k, j));
                     }
                 }
@@ -1164,25 +1167,28 @@ namespace MeshWorker
                                              .global_to_local(dof2[kcell])
                                              .second;
 
-              if (mg_constrained_dofs == 0)
+              if (mg_constrained_dofs DEAL_II_EQUALS 0)
                 global.add(jglobal, kglobal, local(j, k));
               else
                 {
-                  if (mg_constrained_dofs->at_refinement_edge(level1,
-                                                              jglobal) &&
-                      !mg_constrained_dofs->at_refinement_edge(level2, kglobal))
+                  if (mg_constrained_dofs
+                        ->at_refinement_edge(level1, jglobal)
+                          DEAL_II_AND !mg_constrained_dofs->at_refinement_edge(
+                            level2, kglobal))
                     {
                       if (mg_constrained_dofs->set_boundary_values())
                         {
-                          if ((!mg_constrained_dofs->is_boundary_index(
-                                 level1, jglobal) &&
-                               !mg_constrained_dofs->is_boundary_index(
-                                 level2, kglobal)) ||
-                              (mg_constrained_dofs->is_boundary_index(
-                                 level1, jglobal) &&
-                               mg_constrained_dofs->is_boundary_index(
-                                 level2, kglobal) &&
-                               jglobal == kglobal))
+                          if ((!mg_constrained_dofs
+                                  ->is_boundary_index(level1, jglobal)
+                                    DEAL_II_AND !mg_constrained_dofs
+                                  ->is_boundary_index(level2, kglobal))
+                                DEAL_II_OR(
+                                  mg_constrained_dofs
+                                    ->is_boundary_index(level1, jglobal)
+                                      DEAL_II_AND mg_constrained_dofs
+                                    ->is_boundary_index(level2, kglobal)
+                                      DEAL_II_AND jglobal DEAL_II_EQUALS
+                                                          kglobal))
                             global.add(jglobal, kglobal, local(j, k));
                         }
                       else
@@ -1239,25 +1245,28 @@ namespace MeshWorker
                                              .global_to_local(dof2[kcell])
                                              .second;
 
-              if (mg_constrained_dofs == 0)
+              if (mg_constrained_dofs DEAL_II_EQUALS 0)
                 global.add(jglobal, kglobal, local(k, j));
               else
                 {
-                  if (mg_constrained_dofs->at_refinement_edge(level1,
-                                                              jglobal) &&
-                      !mg_constrained_dofs->at_refinement_edge(level2, kglobal))
+                  if (mg_constrained_dofs
+                        ->at_refinement_edge(level1, jglobal)
+                          DEAL_II_AND !mg_constrained_dofs->at_refinement_edge(
+                            level2, kglobal))
                     {
                       if (mg_constrained_dofs->set_boundary_values())
                         {
-                          if ((!mg_constrained_dofs->is_boundary_index(
-                                 level1, jglobal) &&
-                               !mg_constrained_dofs->is_boundary_index(
-                                 level2, kglobal)) ||
-                              (mg_constrained_dofs->is_boundary_index(
-                                 level1, jglobal) &&
-                               mg_constrained_dofs->is_boundary_index(
-                                 level2, kglobal) &&
-                               jglobal == kglobal))
+                          if ((!mg_constrained_dofs
+                                  ->is_boundary_index(level1, jglobal)
+                                    DEAL_II_AND !mg_constrained_dofs
+                                  ->is_boundary_index(level2, kglobal))
+                                DEAL_II_OR(
+                                  mg_constrained_dofs
+                                    ->is_boundary_index(level1, jglobal)
+                                      DEAL_II_AND mg_constrained_dofs
+                                    ->is_boundary_index(level2, kglobal)
+                                      DEAL_II_AND jglobal DEAL_II_EQUALS
+                                                          kglobal))
                             global.add(jglobal, kglobal, local(k, j));
                         }
                       else
@@ -1352,9 +1361,9 @@ namespace MeshWorker
           const unsigned int row = o[level1].row;
           const unsigned int col = o[level1].column;
 
-          if (level1 == level2)
+          if (level1 DEAL_II_EQUALS level2)
             {
-              if (mg_constrained_dofs == 0)
+              if (mg_constrained_dofs DEAL_II_EQUALS 0)
                 {
                   assemble(o[level1].matrix,
                            info1.matrix(i, false).matrix,

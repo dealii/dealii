@@ -88,7 +88,7 @@ CellId::CellId(const CellId::binary_type &binary_representation)
           child_indices[child_level] =
             (binary_representation[binary_entry] >> (dim * j)) & child_mask;
           ++child_level;
-          if (child_level == n_child_indices)
+          if (child_level DEAL_II_EQUALS n_child_indices)
             break;
         }
       ++binary_entry;
@@ -133,7 +133,7 @@ CellId::to_binary() const
           // it
           binary_representation[binary_entry] |= (child_index << (j * dim));
           ++child_level;
-          if (child_level == n_child_indices)
+          if (child_level DEAL_II_EQUALS n_child_indices)
             break;
         }
       ++binary_entry;

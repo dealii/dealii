@@ -218,11 +218,10 @@ namespace TrilinosWrappers
        * Comparison. True, if both iterators point to the same matrix
        * position.
        */
-      bool
-      operator==(const Iterator &) const;
+      bool operator DEAL_II_EQUALS(const Iterator &) const;
 
       /**
-       * Inverse of <tt>==</tt>.
+       * Inverse of <tt>DEAL_II_EQUALS </tt>.
        */
       bool
       operator!=(const Iterator &) const;
@@ -329,7 +328,7 @@ namespace TrilinosWrappers
      * Move constructor. Create a new sparse matrix by stealing the internal
      * data.
      */
-    SparsityPattern(SparsityPattern &&other) noexcept;
+    SparsityPattern(SparsityPattern DEAL_II_AND other) noexcept;
 
     /**
      * Copy constructor. Sets the calling sparsity pattern to be the same as
@@ -1093,9 +1092,8 @@ namespace TrilinosWrappers
             {
               const auto row_length =
                 accessor.sparsity_pattern->row_length(accessor.a_row);
-              if (row_length == 0 ||
-                  !accessor.sparsity_pattern->row_is_stored_locally(
-                    accessor.a_row))
+              if (row_length DEAL_II_EQUALS 0 DEAL_II_OR !accessor
+                    .sparsity_pattern->row_is_stored_locally(accessor.a_row))
                 ++accessor.a_row;
               else
                 break;
@@ -1132,11 +1130,11 @@ namespace TrilinosWrappers
 
 
 
-    inline bool
-    Iterator::operator==(const Iterator &other) const
+    inline bool Iterator::operator DEAL_II_EQUALS(const Iterator &other) const
     {
-      return (accessor.a_row == other.accessor.a_row &&
-              accessor.a_index == other.accessor.a_index);
+      return (
+        accessor.a_row DEAL_II_EQUALS other.accessor.a_row DEAL_II_AND
+          accessor.a_index DEAL_II_EQUALS other.accessor.a_index);
     }
 
 
@@ -1144,7 +1142,7 @@ namespace TrilinosWrappers
     inline bool
     Iterator::operator!=(const Iterator &other) const
     {
-      return !(*this == other);
+      return !(*this DEAL_II_EQUALS other);
     }
 
 
@@ -1152,9 +1150,11 @@ namespace TrilinosWrappers
     inline bool
     Iterator::operator<(const Iterator &other) const
     {
-      return (accessor.row() < other.accessor.row() ||
-              (accessor.row() == other.accessor.row() &&
-               accessor.index() < other.accessor.index()));
+      return (accessor.row() <
+              other.accessor.row() DEAL_II_OR(
+                accessor.row()
+                  DEAL_II_EQUALS other.accessor.row()
+                    DEAL_II_AND  accessor.index() < other.accessor.index()));
     }
 
   } // namespace SparsityPatternIterators
@@ -1221,8 +1221,8 @@ namespace TrilinosWrappers
     end   = graph->RowMap().MaxMyGID64() + 1;
 #      endif
 
-    return ((index >= static_cast<size_type>(begin)) &&
-            (index < static_cast<size_type>(end)));
+    return ((index >= static_cast<size_type>(begin))
+              DEAL_II_AND(index < static_cast<size_type>(end)));
   }
 
 
@@ -1238,7 +1238,7 @@ namespace TrilinosWrappers
   inline bool
   SparsityPattern::empty() const
   {
-    return ((n_rows() == 0) && (n_cols() == 0));
+    return ((n_rows() DEAL_II_EQUALS 0)DEAL_II_AND(n_cols() DEAL_II_EQUALS 0));
   }
 
 
@@ -1258,7 +1258,7 @@ namespace TrilinosWrappers
                                ForwardIterator end,
                                const bool /*indices_are_sorted*/)
   {
-    if (begin == end)
+    if (begin DEAL_II_EQUALS end)
       return;
 
     // verify that the size of the data type Trilinos expects matches that the
@@ -1269,7 +1269,8 @@ namespace TrilinosWrappers
     // accessor class. consequently, we need to somehow get an actual value
     // from it which we can by evaluating an expression such as when
     // multiplying the value produced by 2
-    Assert(sizeof(TrilinosWrappers::types::int_type) == sizeof((*begin) * 2),
+    Assert(sizeof(TrilinosWrappers::types::int_type)
+             DEAL_II_EQUALS sizeof((*begin) * 2),
            ExcNotImplemented());
 
     TrilinosWrappers::types::int_type *col_index_ptr =

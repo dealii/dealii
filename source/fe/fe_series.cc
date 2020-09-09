@@ -32,7 +32,7 @@ namespace FESeries
     FullMatrix<double> K(2, 2), invK(2, 2);
     Vector<double>     X(2), B(2);
 
-    Assert(x.size() == y.size(),
+    Assert(x.size() DEAL_II_EQUALS y.size(),
            ExcMessage("x and y are expected to have the same size"));
 
     Assert(x.size() >= 2,

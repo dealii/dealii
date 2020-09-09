@@ -53,11 +53,11 @@ namespace parallel
          partition_custom_signal) &
         settings;
       (void)partition_settings;
-      Assert(partition_settings == partition_auto ||
-               partition_settings == partition_metis ||
-               partition_settings == partition_zoltan ||
-               partition_settings == partition_zorder ||
-               partition_settings == partition_custom_signal,
+      Assert(partition_settings DEAL_II_EQUALS partition_auto DEAL_II_OR
+               partition_settings DEAL_II_EQUALS partition_metis DEAL_II_OR
+                 partition_settings DEAL_II_EQUALS partition_zoltan DEAL_II_OR
+                   partition_settings DEAL_II_EQUALS partition_zorder DEAL_II_OR
+                     partition_settings DEAL_II_EQUALS partition_custom_signal,
              ExcMessage("Settings must contain exactly one type of the active "
                         "cell partitioning scheme."));
 
@@ -88,7 +88,7 @@ namespace parallel
       const unsigned int max_active_cells =
         Utilities::MPI::max(this->n_active_cells(), this->get_communicator());
       Assert(
-        max_active_cells == this->n_active_cells(),
+        max_active_cells DEAL_II_EQUALS this->n_active_cells(),
         ExcMessage(
           "A parallel::shared::Triangulation needs to be refined in the same "
           "way on all processors, but the participating processors don't "
@@ -98,7 +98,7 @@ namespace parallel
       auto partition_settings = (partition_zoltan | partition_metis |
                                  partition_zorder | partition_custom_signal) &
                                 settings;
-      if (partition_settings == partition_auto)
+      if (partition_settings DEAL_II_EQUALS partition_auto)
 #  ifdef DEAL_II_TRILINOS_WITH_ZOLTAN
         partition_settings = partition_zoltan;
 #  elif defined DEAL_II_WITH_METIS
@@ -107,7 +107,7 @@ namespace parallel
         partition_settings = partition_zorder;
 #  endif
 
-      if (partition_settings == partition_zoltan)
+      if (partition_settings DEAL_II_EQUALS partition_zoltan)
         {
 #  ifndef DEAL_II_TRILINOS_WITH_ZOLTAN
           AssertThrow(false,
@@ -122,7 +122,7 @@ namespace parallel
             this->n_subdomains, *this, SparsityTools::Partitioner::zoltan);
 #  endif
         }
-      else if (partition_settings == partition_metis)
+      else if (partition_settings DEAL_II_EQUALS partition_metis)
         {
 #  ifndef DEAL_II_WITH_METIS
           AssertThrow(false,
@@ -138,11 +138,11 @@ namespace parallel
                                              SparsityTools::Partitioner::metis);
 #  endif
         }
-      else if (partition_settings == partition_zorder)
+      else if (partition_settings DEAL_II_EQUALS partition_zorder)
         {
           GridTools::partition_triangulation_zorder(this->n_subdomains, *this);
         }
-      else if (partition_settings == partition_custom_signal)
+      else if (partition_settings DEAL_II_EQUALS partition_custom_signal)
         {
           // User partitions mesh manually
         }
@@ -153,8 +153,8 @@ namespace parallel
 
       // do not partition multigrid levels if user is
       // defining a custom partition
-      if ((settings & construct_multigrid_hierarchy) &&
-          !(settings & partition_custom_signal))
+      if ((settings & construct_multigrid_hierarchy)
+            DEAL_II_AND !(settings & partition_custom_signal))
         dealii::GridTools::partition_multigrid_levels(*this);
 
       true_subdomain_ids_of_cells.resize(this->n_active_cells());
@@ -190,8 +190,10 @@ namespace parallel
               // store original/true subdomain ids:
               true_subdomain_ids_of_cells[index] = cell->subdomain_id();
 
-              if (cell->is_locally_owned() == false &&
-                  active_halo_layer.find(cell) == active_halo_layer.end())
+              if (cell
+                    ->is_locally_owned()
+                      DEAL_II_EQUALS false DEAL_II_AND active_halo_layer
+                    .find(cell) DEAL_II_EQUALS         active_halo_layer.end())
                 cell->set_subdomain_id(numbers::artificial_subdomain_id);
             }
 
@@ -237,9 +239,8 @@ namespace parallel
                       // also keep its level subdomain id since it is either
                       // owned by this processor or in the ghost layer of the
                       // active mesh.
-                      if (cell->is_active() &&
-                          cell->subdomain_id() !=
-                            numbers::artificial_subdomain_id)
+                      if (cell->is_active() DEAL_II_AND cell->subdomain_id() !=
+                          numbers::artificial_subdomain_id)
                         continue;
 
                       // we must have knowledge of our parent in the hierarchy
@@ -249,8 +250,9 @@ namespace parallel
                           for (unsigned int c = 0;
                                c < GeometryInfo<dim>::max_children_per_cell;
                                ++c)
-                            if (cell->child(c)->level_subdomain_id() ==
-                                this->my_subdomain)
+                            if (cell->child(c)
+                                  ->level_subdomain_id()
+                                    DEAL_II_EQUALS this->my_subdomain)
                               {
                                 keep_cell = true;
                                 break;
@@ -261,8 +263,10 @@ namespace parallel
 
                       // we must have knowledge of our neighbors on the same
                       // level
-                      if (!cell->is_locally_owned_on_level() &&
-                          level_halo_layer.find(cell) != level_halo_layer.end())
+                      if (!cell
+                             ->is_locally_owned_on_level()
+                               DEAL_II_AND level_halo_layer.find(cell) !=
+                          level_halo_layer.end())
                         continue;
 
                       // mark all other cells to artificial
@@ -293,7 +297,7 @@ namespace parallel
 
         const unsigned int total_cells =
           Utilities::MPI::sum(n_my_cells, this->get_communicator());
-        Assert(total_cells == this->n_active_cells(),
+        Assert(total_cells DEAL_II_EQUALS this->n_active_cells(),
                ExcMessage("Not all cells are assigned to a processor."));
       }
 
@@ -311,7 +315,7 @@ namespace parallel
 
           const unsigned int total_cells =
             Utilities::MPI::sum(n_my_cells, this->get_communicator());
-          Assert(total_cells == this->n_cells(),
+          Assert(total_cells DEAL_II_EQUALS this->n_cells(),
                  ExcMessage("Not all cells are assigned to a processor."));
         }
 #  endif
@@ -344,9 +348,10 @@ namespace parallel
     {
       Assert(level < true_level_subdomain_ids_of_cells.size(),
              ExcInternalError());
-      Assert(true_level_subdomain_ids_of_cells[level].size() ==
-               this->n_cells(level),
-             ExcInternalError());
+      Assert(
+        true_level_subdomain_ids_of_cells[level].size()
+          DEAL_II_EQUALS this->n_cells(level),
+        ExcInternalError());
       return true_level_subdomain_ids_of_cells[level];
     }
 
@@ -409,8 +414,8 @@ namespace parallel
     {
       Assert(
         (dynamic_cast<
-           const dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
-           &other_tria) == nullptr),
+          const dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
+          &other_tria) DEAL_II_EQUALS nullptr),
         ExcMessage(
           "Cannot use this function on parallel::distributed::Triangulation."));
 

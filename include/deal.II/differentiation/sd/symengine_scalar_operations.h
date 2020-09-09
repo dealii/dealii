@@ -300,14 +300,15 @@ namespace Differentiation
      *         can be explicitly converted to a
      *         `const SymEngine::RCP<const SymEngine::Basic> &`.
      */
-    template <bool ignore_invalid_symbols = false,
-              typename ValueType          = double,
-              typename SymbolicType,
-              typename T = typename std::enable_if<
-                !std::is_base_of<Expression, SymbolicType>::value &&
-                dealii::internal::is_explicitly_convertible<
-                  SymbolicType,
-                  const SymEngine::RCP<const SymEngine::Basic> &>::value>::type>
+    template <
+      bool ignore_invalid_symbols = false,
+      typename ValueType          = double,
+      typename SymbolicType,
+      typename T = typename std::enable_if<
+        !std::is_base_of<Expression, SymbolicType>::value DEAL_II_AND
+                                                          dealii::internal::is_explicitly_convertible<
+            SymbolicType,
+            const SymEngine::RCP<const SymEngine::Basic> &>::value>::type>
     void
     add_to_symbol_map(types::substitution_map &symbol_map,
                       const SymbolicType &     symbol);
@@ -458,13 +459,14 @@ namespace Differentiation
      *         possible to construct an @p SymbolicType directly from the
      *         @p ValueType.
      */
-    template <typename SymbolicType,
-              typename ValueType,
-              typename T = typename std::enable_if<
-                dealii::internal::is_explicitly_convertible<
-                  SymbolicType,
-                  const SymEngine::RCP<const SymEngine::Basic> &>::value &&
-                std::is_constructible<SymbolicType, ValueType>::value>::type>
+    template <
+      typename SymbolicType,
+      typename ValueType,
+      typename T = typename std::enable_if<
+        dealii::internal::is_explicitly_convertible<
+          SymbolicType,
+          const SymEngine::RCP<const SymEngine::Basic> &>::value DEAL_II_AND
+                                                                 std::is_constructible<SymbolicType, ValueType>::value>::type>
     void
     set_value_in_symbol_map(types::substitution_map &substitution_map,
                             const SymbolicType &     symbol,
@@ -647,13 +649,14 @@ namespace Differentiation
      *         possible to construct an @p ExpressionType directly from the
      *         @p ValueType.
      */
-    template <typename ExpressionType,
-              typename ValueType,
-              typename T = typename std::enable_if<
-                dealii::internal::is_explicitly_convertible<
-                  ExpressionType,
-                  const SymEngine::RCP<const SymEngine::Basic> &>::value &&
-                std::is_constructible<ExpressionType, ValueType>::value>::type>
+    template <
+      typename ExpressionType,
+      typename ValueType,
+      typename T = typename std::enable_if<
+        dealii::internal::is_explicitly_convertible<
+          ExpressionType,
+          const SymEngine::RCP<const SymEngine::Basic> &>::value DEAL_II_AND
+                                                                 std::is_constructible<ExpressionType, ValueType>::value>::type>
     types::substitution_map
     make_substitution_map(const ExpressionType &symbol, const ValueType &value);
 
@@ -889,14 +892,15 @@ namespace Differentiation
      *         expression type or be a special type that a user-defined
      *         @p ExpressionType can be constructed from.
      */
-    template <bool ignore_invalid_symbols = false,
-              typename ExpressionType,
-              typename ValueType,
-              typename = typename std::enable_if<
-                dealii::internal::is_explicitly_convertible<
-                  ExpressionType,
-                  const SymEngine::RCP<const SymEngine::Basic> &>::value &&
-                std::is_constructible<ExpressionType, ValueType>::value>::type>
+    template <
+      bool ignore_invalid_symbols = false,
+      typename ExpressionType,
+      typename ValueType,
+      typename = typename std::enable_if<
+        dealii::internal::is_explicitly_convertible<
+          ExpressionType,
+          const SymEngine::RCP<const SymEngine::Basic> &>::value DEAL_II_AND
+                                                                 std::is_constructible<ExpressionType, ValueType>::value>::type>
     void
     add_to_substitution_map(types::substitution_map &substitution_map,
                             const ExpressionType &   symbol,
@@ -935,14 +939,15 @@ namespace Differentiation
      *         expression type or be a special type that a user-defined
      *         @p ExpressionType can be constructed from.
      */
-    template <bool ignore_invalid_symbols = false,
-              typename ExpressionType,
-              typename ValueType,
-              typename = typename std::enable_if<
-                dealii::internal::is_explicitly_convertible<
-                  ExpressionType,
-                  const SymEngine::RCP<const SymEngine::Basic> &>::value &&
-                std::is_constructible<ExpressionType, ValueType>::value>::type>
+    template <
+      bool ignore_invalid_symbols = false,
+      typename ExpressionType,
+      typename ValueType,
+      typename = typename std::enable_if<
+        dealii::internal::is_explicitly_convertible<
+          ExpressionType,
+          const SymEngine::RCP<const SymEngine::Basic> &>::value DEAL_II_AND
+                                                                 std::is_constructible<ExpressionType, ValueType>::value>::type>
     void
     add_to_substitution_map(types::substitution_map &          substitution_map,
                             const std::vector<ExpressionType> &symbols,
@@ -1280,14 +1285,14 @@ namespace Differentiation
      *
      * Examples:
      * <ol>
-     *   <li>If <tt>map["a"] == 1</tt> and <tt>map["b"] == "a" + 2</tt>, then
+     *   <li>If <tt>map["a"] DEAL_II_EQUALS  1</tt> and <tt>map["b"] DEAL_II_EQUALS  "a" + 2</tt>, then
      *   the function $f(a,b(a)) := a+b$ will be evaluated and the result
      *   $f\vert_{a=1,b=a+2} = 3+a$ is returned. This return is because the
      *   symbol "a" is substituted throughout the function first, and only
      *   then is the symbol "b(a)" substituted, by which time its explicit
      *   dependency on "a" cannot be resolved.</li>
      *
-     *   <li>If <tt>map["a"] == "b"+2</tt> and <tt>map["b"] == 1</tt>, then
+     *   <li>If <tt>map["a"] DEAL_II_EQUALS  "b"+2</tt> and <tt>map["b"] DEAL_II_EQUALS  1</tt>, then
      *   the function $f(a(b),b): = a+b$ will be evaluated and the result
      *   $f\vert_{a=b+2, b} = [b+2+b]_{b=1} = 4$ is returned. This is because
      *   the explicitly dependent symbol "a(b)" is substituted first followed
@@ -1526,7 +1531,7 @@ namespace Differentiation
            it != other_symbols.end();
            ++it)
         {
-          Assert(symbol_map.find(it->first) == symbol_map.end(),
+          Assert(symbol_map.find(it->first) DEAL_II_EQUALS symbol_map.end(),
                  ExcMessage("Entry already exists in symbol map"));
           add_to_symbol_map<ignore_invalid_symbols, ValueType>(
             symbol_map, Expression(it->first));
@@ -1570,7 +1575,7 @@ namespace Differentiation
                             const std::vector<SymbolicType> &symbols,
                             const std::vector<ValueType> &   values)
     {
-      Assert(symbols.size() == values.size(),
+      Assert(symbols.size() DEAL_II_EQUALS values.size(),
              ExcDimensionMismatch(symbols.size(), values.size()));
 
       typename std::vector<SymbolicType>::const_iterator it_symb =
@@ -1702,13 +1707,14 @@ namespace Differentiation
         const SymEngine::RCP<const SymEngine::Basic> &symbol,
         const SymEngine::RCP<const SymEngine::Basic> &value)
       {
-        if (ignore_invalid_symbols == false)
+        if (ignore_invalid_symbols DEAL_II_EQUALS false)
           {
             Assert(
               internal::is_valid_substitution_symbol(*symbol),
               ExcMessage(
                 "Substitution with a number that does not represent a symbol or symbolic derivative"));
-            Assert(substitution_map.find(symbol) == substitution_map.end(),
+            Assert(substitution_map.find(symbol)
+                     DEAL_II_EQUALS substitution_map.end(),
                    ExcMessage("This symbol is already in the map."));
             substitution_map[Expression(symbol)] = Expression(value);
           }
@@ -1716,8 +1722,10 @@ namespace Differentiation
           {
             if (internal::is_valid_substitution_symbol(*symbol))
               {
-                Assert(substitution_map.find(symbol) == substitution_map.end(),
-                       ExcMessage("This symbol is already in the map."));
+                Assert(
+                  substitution_map.find(symbol)
+                    DEAL_II_EQUALS substitution_map.end(),
+                  ExcMessage("This symbol is already in the map."));
                 substitution_map[Expression(symbol)] = Expression(value);
               }
           }
@@ -1763,7 +1771,7 @@ namespace Differentiation
                             const std::vector<ExpressionType> &symbols,
                             const std::vector<ValueType> &     values)
     {
-      Assert(symbols.size() == values.size(),
+      Assert(symbols.size() DEAL_II_EQUALS values.size(),
              ExcMessage(
                "Vector of symbols and values must be of equal length."));
 

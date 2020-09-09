@@ -56,7 +56,7 @@ namespace
           work.data(),
           &lwork,
           &info);
-    Assert(info == 0, LAPACKSupport::ExcErrorCode("gesvd", info));
+    Assert(info DEAL_II_EQUALS 0, LAPACKSupport::ExcErrorCode("gesvd", info));
     Assert(S.back() / S.front() > 1.e-10, LACExceptions::ExcSingular());
   }
 } // namespace

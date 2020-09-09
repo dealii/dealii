@@ -133,7 +133,8 @@ namespace GridOutFlags
      * It is not necessary if you only want to write the triangulation to view
      * or print it.
      *
-     * This is used only if <tt>dim==3</tt>, and ignored in all other cases.
+     * This is used only if <tt>dimDEAL_II_EQUALS 3</tt>, and ignored in all
+     * other cases.
      *
      * Default: @p false.
      */
@@ -1586,10 +1587,10 @@ private:
    *
    * This function unfortunately can not be included in the regular @p
    * write_msh function, since it needs special treatment for the case
-   * <tt>dim==1</tt>, in which case the face iterators are <tt>void*</tt>'s
-   * and lack the member functions which are called. We would not actually
-   * call these functions, but the compiler would complain anyway when
-   * compiling the function for <tt>dim==1</tt>. Bad luck.
+   * <tt>dimDEAL_II_EQUALS 1</tt>, in which case the face iterators are
+   * <tt>void*</tt>'s and lack the member functions which are called. We would
+   * not actually call these functions, but the compiler would complain anyway
+   * when compiling the function for <tt>dimDEAL_II_EQUALS 1</tt>. Bad luck.
    */
   template <int dim, int spacedim>
   unsigned int
@@ -1639,10 +1640,11 @@ private:
    *
    * This function unfortunately can not be included in the regular @p
    * write_msh function, since it needs special treatment for the case
-   * <tt>dim==1</tt> and <tt>dim==2</tt>, in which case the edge iterators are
-   * <tt>void*</tt>'s and lack the member functions which are called. We would
-   * not actually call these functions, but the compiler would complain anyway
-   * when compiling the function for <tt>dim==1/2</tt>. Bad luck.
+   * <tt>dimDEAL_II_EQUALS 1</tt> and <tt>dimDEAL_II_EQUALS 2</tt>, in which
+   * case the edge iterators are <tt>void*</tt>'s and lack the member functions
+   * which are called. We would not actually call these functions, but the
+   * compiler would complain anyway when compiling the function for
+   * <tt>dimDEAL_II_EQUALS 1/2</tt>. Bad luck.
    */
   template <int dim, int spacedim>
   unsigned int
@@ -1711,10 +1713,10 @@ private:
    *
    * This function unfortunately can not be included in the regular @p
    * write_ucd function, since it needs special treatment for the case
-   * <tt>dim==1</tt>, in which case the face iterators are <tt>void*</tt>'s
-   * and lack the member functions which are called. We would not actually
-   * call these functions, but the compiler would complain anyway when
-   * compiling the function for <tt>dim==1</tt>. Bad luck.
+   * <tt>dimDEAL_II_EQUALS 1</tt>, in which case the face iterators are
+   * <tt>void*</tt>'s and lack the member functions which are called. We would
+   * not actually call these functions, but the compiler would complain anyway
+   * when compiling the function for <tt>dimDEAL_II_EQUALS 1</tt>. Bad luck.
    */
   template <int dim, int spacedim>
   unsigned int
@@ -1764,10 +1766,10 @@ private:
    *
    * This function unfortunately can not be included in the regular @p
    * write_ucd function, since it needs special treatment for the case
-   * <tt>dim==1/2</tt>, in which case the edge iterators are <tt>void*</tt>'s
-   * and lack the member functions which are called. We would not actually
-   * call these functions, but the compiler would complain anyway when
-   * compiling the function for <tt>dim==1/2</tt>. Bad luck.
+   * <tt>dimDEAL_II_EQUALS 1/2</tt>, in which case the edge iterators are
+   * <tt>void*</tt>'s and lack the member functions which are called. We would
+   * not actually call these functions, but the compiler would complain anyway
+   * when compiling the function for <tt>dimDEAL_II_EQUALS 1/2</tt>. Bad luck.
    */
   template <int dim, int spacedim>
   unsigned int

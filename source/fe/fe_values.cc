@@ -89,7 +89,7 @@ namespace internal
         // otherwise it is mapped to the next free entry
         unsigned int nth_nonzero_component = 0;
         for (unsigned int c = 0; c < fe.n_components(); ++c)
-          if (fe.get_nonzero_components(i)[c] == true)
+          if (fe.get_nonzero_components(i)[c] DEAL_II_EQUALS true)
             {
               shape_function_to_row_table[i * fe.n_components() + c] =
                 row + nth_nonzero_component;
@@ -111,7 +111,8 @@ namespace internal
       static bool
       value(const Number &value)
       {
-        return value == dealii::internal::NumberType<Number>::value(0.0);
+        return value DEAL_II_EQUALS dealii::internal::NumberType<Number>::value(
+          0.0);
       }
     };
 
@@ -157,16 +158,18 @@ namespace FEValuesViews
 
     for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
       {
-        const bool is_primitive = fe.is_primitive() || fe.is_primitive(i);
+        const bool                     is_primitive =
+          fe.is_primitive() DEAL_II_OR fe.is_primitive(i);
 
-        if (is_primitive == true)
+        if (is_primitive DEAL_II_EQUALS true)
           shape_function_data[i].is_nonzero_shape_function_component =
-            (component == fe.system_to_component_index(i).first);
+            (component DEAL_II_EQUALS fe.system_to_component_index(i).first);
         else
           shape_function_data[i].is_nonzero_shape_function_component =
-            (fe.get_nonzero_components(i)[component] == true);
+            (fe.get_nonzero_components(i)[component] DEAL_II_EQUALS true);
 
-        if (shape_function_data[i].is_nonzero_shape_function_component == true)
+        if (shape_function_data[i]
+              .is_nonzero_shape_function_component DEAL_II_EQUALS true)
           shape_function_data[i].row_index =
             shape_function_to_row_table[i * fe.n_components() + component];
         else
@@ -206,17 +209,19 @@ namespace FEValuesViews
 
         for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
           {
-            const bool is_primitive = fe.is_primitive() || fe.is_primitive(i);
+            const bool                     is_primitive =
+              fe.is_primitive() DEAL_II_OR fe.is_primitive(i);
 
-            if (is_primitive == true)
+            if (is_primitive DEAL_II_EQUALS true)
               shape_function_data[i].is_nonzero_shape_function_component[d] =
-                (component == fe.system_to_component_index(i).first);
+                (component DEAL_II_EQUALS fe.system_to_component_index(i)
+                   .first);
             else
               shape_function_data[i].is_nonzero_shape_function_component[d] =
-                (fe.get_nonzero_components(i)[component] == true);
+                (fe.get_nonzero_components(i)[component] DEAL_II_EQUALS true);
 
-            if (shape_function_data[i].is_nonzero_shape_function_component[d] ==
-                true)
+            if (shape_function_data[i]
+                  .is_nonzero_shape_function_component[d] DEAL_II_EQUALS true)
               shape_function_data[i].row_index[d] =
                 shape_function_to_row_table[i * fe.n_components() + component];
             else
@@ -229,11 +234,11 @@ namespace FEValuesViews
       {
         unsigned int n_nonzero_components = 0;
         for (unsigned int d = 0; d < spacedim; ++d)
-          if (shape_function_data[i].is_nonzero_shape_function_component[d] ==
-              true)
+          if (shape_function_data[i]
+                .is_nonzero_shape_function_component[d] DEAL_II_EQUALS true)
             ++n_nonzero_components;
 
-        if (n_nonzero_components == 0)
+        if (n_nonzero_components DEAL_II_EQUALS 0)
           shape_function_data[i].single_nonzero_component = -2;
         else if (n_nonzero_components > 1)
           shape_function_data[i].single_nonzero_component = -1;
@@ -241,7 +246,7 @@ namespace FEValuesViews
           {
             for (unsigned int d = 0; d < spacedim; ++d)
               if (shape_function_data[i]
-                    .is_nonzero_shape_function_component[d] == true)
+                    .is_nonzero_shape_function_component[d] DEAL_II_EQUALS true)
                 {
                   shape_function_data[i].single_nonzero_component =
                     shape_function_data[i].row_index[d];
@@ -292,17 +297,19 @@ namespace FEValuesViews
 
         for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
           {
-            const bool is_primitive = fe.is_primitive() || fe.is_primitive(i);
+            const bool                     is_primitive =
+              fe.is_primitive() DEAL_II_OR fe.is_primitive(i);
 
-            if (is_primitive == true)
+            if (is_primitive DEAL_II_EQUALS true)
               shape_function_data[i].is_nonzero_shape_function_component[d] =
-                (component == fe.system_to_component_index(i).first);
+                (component DEAL_II_EQUALS fe.system_to_component_index(i)
+                   .first);
             else
               shape_function_data[i].is_nonzero_shape_function_component[d] =
-                (fe.get_nonzero_components(i)[component] == true);
+                (fe.get_nonzero_components(i)[component] DEAL_II_EQUALS true);
 
-            if (shape_function_data[i].is_nonzero_shape_function_component[d] ==
-                true)
+            if (shape_function_data[i]
+                  .is_nonzero_shape_function_component[d] DEAL_II_EQUALS true)
               shape_function_data[i].row_index[d] =
                 shape_function_to_row_table[i * fe.n_components() + component];
             else
@@ -317,11 +324,11 @@ namespace FEValuesViews
         for (unsigned int d = 0;
              d < dealii::SymmetricTensor<2, dim>::n_independent_components;
              ++d)
-          if (shape_function_data[i].is_nonzero_shape_function_component[d] ==
-              true)
+          if (shape_function_data[i]
+                .is_nonzero_shape_function_component[d] DEAL_II_EQUALS true)
             ++n_nonzero_components;
 
-        if (n_nonzero_components == 0)
+        if (n_nonzero_components DEAL_II_EQUALS 0)
           shape_function_data[i].single_nonzero_component = -2;
         else if (n_nonzero_components > 1)
           shape_function_data[i].single_nonzero_component = -1;
@@ -331,7 +338,7 @@ namespace FEValuesViews
                  d < dealii::SymmetricTensor<2, dim>::n_independent_components;
                  ++d)
               if (shape_function_data[i]
-                    .is_nonzero_shape_function_component[d] == true)
+                    .is_nonzero_shape_function_component[d] DEAL_II_EQUALS true)
                 {
                   shape_function_data[i].single_nonzero_component =
                     shape_function_data[i].row_index[d];
@@ -373,17 +380,19 @@ namespace FEValuesViews
 
         for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
           {
-            const bool is_primitive = fe.is_primitive() || fe.is_primitive(i);
+            const bool                     is_primitive =
+              fe.is_primitive() DEAL_II_OR fe.is_primitive(i);
 
-            if (is_primitive == true)
+            if (is_primitive DEAL_II_EQUALS true)
               shape_function_data[i].is_nonzero_shape_function_component[d] =
-                (component == fe.system_to_component_index(i).first);
+                (component DEAL_II_EQUALS fe.system_to_component_index(i)
+                   .first);
             else
               shape_function_data[i].is_nonzero_shape_function_component[d] =
-                (fe.get_nonzero_components(i)[component] == true);
+                (fe.get_nonzero_components(i)[component] DEAL_II_EQUALS true);
 
-            if (shape_function_data[i].is_nonzero_shape_function_component[d] ==
-                true)
+            if (shape_function_data[i]
+                  .is_nonzero_shape_function_component[d] DEAL_II_EQUALS true)
               shape_function_data[i].row_index[d] =
                 shape_function_to_row_table[i * fe.n_components() + component];
             else
@@ -396,11 +405,11 @@ namespace FEValuesViews
       {
         unsigned int n_nonzero_components = 0;
         for (unsigned int d = 0; d < dim * dim; ++d)
-          if (shape_function_data[i].is_nonzero_shape_function_component[d] ==
-              true)
+          if (shape_function_data[i]
+                .is_nonzero_shape_function_component[d] DEAL_II_EQUALS true)
             ++n_nonzero_components;
 
-        if (n_nonzero_components == 0)
+        if (n_nonzero_components DEAL_II_EQUALS 0)
           shape_function_data[i].single_nonzero_component = -2;
         else if (n_nonzero_components > 1)
           shape_function_data[i].single_nonzero_component = -1;
@@ -408,7 +417,7 @@ namespace FEValuesViews
           {
             for (unsigned int d = 0; d < dim * dim; ++d)
               if (shape_function_data[i]
-                    .is_nonzero_shape_function_component[d] == true)
+                    .is_nonzero_shape_function_component[d] DEAL_II_EQUALS true)
                 {
                   shape_function_data[i].single_nonzero_component =
                     shape_function_data[i].row_index[d];
@@ -462,7 +471,8 @@ namespace FEValuesViews
             // For auto-differentiable numbers, the fact that a DoF value is
             // zero does not imply that its derivatives are zero as well. So we
             // can't filter by value for these number types.
-            if (dealii::internal::CheckForZero<Number>::value(value) == true)
+            if (dealii::internal::CheckForZero<Number>::value(value)
+                  DEAL_II_EQUALS true)
               continue;
 
             const double *shape_value_ptr =
@@ -507,7 +517,8 @@ namespace FEValuesViews
             // For auto-differentiable numbers, the fact that a DoF value is
             // zero does not imply that its derivatives are zero as well. So we
             // can't filter by value for these number types.
-            if (dealii::internal::CheckForZero<Number>::value(value) == true)
+            if (dealii::internal::CheckForZero<Number>::value(value)
+                  DEAL_II_EQUALS true)
               continue;
 
             const dealii::Tensor<order, spacedim> *shape_derivative_ptr =
@@ -550,7 +561,8 @@ namespace FEValuesViews
             // For auto-differentiable numbers, the fact that a DoF value is
             // zero does not imply that its derivatives are zero as well. So we
             // can't filter by value for these number types.
-            if (dealii::internal::CheckForZero<Number>::value(value) == true)
+            if (dealii::internal::CheckForZero<Number>::value(value)
+                  DEAL_II_EQUALS true)
               continue;
 
             const dealii::Tensor<2, spacedim> *shape_hessian_ptr =
@@ -592,7 +604,7 @@ namespace FEValuesViews
           const int snc =
             shape_function_data[shape_function].single_nonzero_component;
 
-          if (snc == -2)
+          if (snc DEAL_II_EQUALS - 2)
             // shape function is zero for the selected components
             continue;
 
@@ -600,7 +612,8 @@ namespace FEValuesViews
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+          if (dealii::internal::CheckForZero<Number>::value(value)
+                DEAL_II_EQUALS true)
             continue;
 
           if (snc != -1)
@@ -656,7 +669,7 @@ namespace FEValuesViews
           const int snc =
             shape_function_data[shape_function].single_nonzero_component;
 
-          if (snc == -2)
+          if (snc DEAL_II_EQUALS - 2)
             // shape function is zero for the selected components
             continue;
 
@@ -664,7 +677,8 @@ namespace FEValuesViews
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+          if (dealii::internal::CheckForZero<Number>::value(value)
+                DEAL_II_EQUALS true)
             continue;
 
           if (snc != -1)
@@ -725,7 +739,7 @@ namespace FEValuesViews
           const int snc =
             shape_function_data[shape_function].single_nonzero_component;
 
-          if (snc == -2)
+          if (snc DEAL_II_EQUALS - 2)
             // shape function is zero for the selected components
             continue;
 
@@ -733,7 +747,8 @@ namespace FEValuesViews
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+          if (dealii::internal::CheckForZero<Number>::value(value)
+                DEAL_II_EQUALS true)
             continue;
 
           if (snc != -1)
@@ -794,7 +809,7 @@ namespace FEValuesViews
           const int snc =
             shape_function_data[shape_function].single_nonzero_component;
 
-          if (snc == -2)
+          if (snc DEAL_II_EQUALS - 2)
             // shape function is zero for the selected components
             continue;
 
@@ -802,7 +817,8 @@ namespace FEValuesViews
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+          if (dealii::internal::CheckForZero<Number>::value(value)
+                DEAL_II_EQUALS true)
             continue;
 
           if (snc != -1)
@@ -873,7 +889,7 @@ namespace FEValuesViews
                   const int snc = shape_function_data[shape_function]
                                     .single_nonzero_component;
 
-                  if (snc == -2)
+                  if (snc DEAL_II_EQUALS - 2)
                     // shape function is zero for the selected components
                     continue;
 
@@ -881,8 +897,8 @@ namespace FEValuesViews
                   // For auto-differentiable numbers, the fact that a DoF value
                   // is zero does not imply that its derivatives are zero as
                   // well. So we can't filter by value for these number types.
-                  if (dealii::internal::CheckForZero<Number>::value(value) ==
-                      true)
+                  if (dealii::internal::CheckForZero<Number>::value(value)
+                        DEAL_II_EQUALS true)
                     continue;
 
                   if (snc != -1)
@@ -895,7 +911,7 @@ namespace FEValuesViews
                              ExcInternalError());
                       // we're in 2d, so the formula for the curl is simple:
                       if (shape_function_data[shape_function]
-                            .single_nonzero_component_index == 0)
+                            .single_nonzero_component_index DEAL_II_EQUALS 0)
                         for (unsigned int q_point = 0;
                              q_point < n_quadrature_points;
                              ++q_point)
@@ -957,7 +973,7 @@ namespace FEValuesViews
                   const int snc = shape_function_data[shape_function]
                                     .single_nonzero_component;
 
-                  if (snc == -2)
+                  if (snc DEAL_II_EQUALS - 2)
                     // shape function is zero for the selected components
                     continue;
 
@@ -965,8 +981,8 @@ namespace FEValuesViews
                   // For auto-differentiable numbers, the fact that a DoF value
                   // is zero does not imply that its derivatives are zero as
                   // well. So we can't filter by value for these number types.
-                  if (dealii::internal::CheckForZero<Number>::value(value) ==
-                      true)
+                  if (dealii::internal::CheckForZero<Number>::value(value)
+                        DEAL_II_EQUALS true)
                     continue;
 
                   if (snc != -1)
@@ -1122,7 +1138,7 @@ namespace FEValuesViews
           const int snc =
             shape_function_data[shape_function].single_nonzero_component;
 
-          if (snc == -2)
+          if (snc DEAL_II_EQUALS - 2)
             // shape function is zero for the selected components
             continue;
 
@@ -1130,7 +1146,8 @@ namespace FEValuesViews
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+          if (dealii::internal::CheckForZero<Number>::value(value)
+                DEAL_II_EQUALS true)
             continue;
 
           if (snc != -1)
@@ -1194,7 +1211,7 @@ namespace FEValuesViews
           const int snc =
             shape_function_data[shape_function].single_nonzero_component;
 
-          if (snc == -2)
+          if (snc DEAL_II_EQUALS - 2)
             // shape function is zero for the selected components
             continue;
 
@@ -1202,7 +1219,8 @@ namespace FEValuesViews
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+          if (dealii::internal::CheckForZero<Number>::value(value)
+                DEAL_II_EQUALS true)
             continue;
 
           if (snc != -1)
@@ -1265,7 +1283,7 @@ namespace FEValuesViews
           const int snc =
             shape_function_data[shape_function].single_nonzero_component;
 
-          if (snc == -2)
+          if (snc DEAL_II_EQUALS - 2)
             // shape function is zero for the selected components
             continue;
 
@@ -1273,7 +1291,8 @@ namespace FEValuesViews
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+          if (dealii::internal::CheckForZero<Number>::value(value)
+                DEAL_II_EQUALS true)
             continue;
 
           if (snc != -1)
@@ -1374,7 +1393,7 @@ namespace FEValuesViews
           const int snc =
             shape_function_data[shape_function].single_nonzero_component;
 
-          if (snc == -2)
+          if (snc DEAL_II_EQUALS - 2)
             // shape function is zero for the selected components
             continue;
 
@@ -1382,7 +1401,8 @@ namespace FEValuesViews
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+          if (dealii::internal::CheckForZero<Number>::value(value)
+                DEAL_II_EQUALS true)
             continue;
 
           if (snc != -1)
@@ -1445,7 +1465,7 @@ namespace FEValuesViews
           const int snc =
             shape_function_data[shape_function].single_nonzero_component;
 
-          if (snc == -2)
+          if (snc DEAL_II_EQUALS - 2)
             // shape function is zero for the selected components
             continue;
 
@@ -1453,7 +1473,8 @@ namespace FEValuesViews
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+          if (dealii::internal::CheckForZero<Number>::value(value)
+                DEAL_II_EQUALS true)
             continue;
 
           if (snc != -1)
@@ -1516,7 +1537,7 @@ namespace FEValuesViews
           const int snc =
             shape_function_data[shape_function].single_nonzero_component;
 
-          if (snc == -2)
+          if (snc DEAL_II_EQUALS - 2)
             // shape function is zero for the selected components
             continue;
 
@@ -1524,7 +1545,8 @@ namespace FEValuesViews
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+          if (dealii::internal::CheckForZero<Number>::value(value)
+                DEAL_II_EQUALS true)
             continue;
 
           if (snc != -1)
@@ -2191,13 +2213,14 @@ namespace FEValuesViews
     Assert(fe_values->update_flags & update_hessians,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_hessians")));
-    Assert(laplacians.size() == fe_values->n_quadrature_points,
+    Assert(laplacians.size() DEAL_II_EQUALS fe_values->n_quadrature_points,
            ExcDimensionMismatch(laplacians.size(),
                                 fe_values->n_quadrature_points));
     Assert(fe_values->present_cell.get() != nullptr,
            ExcMessage("FEValues object is not reinit'ed to any cell"));
     Assert(
-      fe_function.size() == fe_values->present_cell->n_dofs_for_dof_handler(),
+      fe_function.size()
+        DEAL_II_EQUALS fe_values->present_cell->n_dofs_for_dof_handler(),
       ExcDimensionMismatch(fe_function.size(),
                            fe_values->present_cell->n_dofs_for_dof_handler()));
 
@@ -2227,7 +2250,7 @@ namespace FEValuesViews
     Assert(fe_values->update_flags & update_hessians,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_hessians")));
-    Assert(laplacians.size() == fe_values->n_quadrature_points,
+    Assert(laplacians.size() DEAL_II_EQUALS fe_values->n_quadrature_points,
            ExcDimensionMismatch(laplacians.size(),
                                 fe_values->n_quadrature_points));
     Assert(fe_values->present_cell.get() != nullptr,
@@ -3115,7 +3138,8 @@ namespace internal
                      const dealii::Table<2, double> &shape_values,
                      std::vector<Number> &           values)
   {
-    // scalar finite elements, so shape_values.size() == dofs_per_cell
+    // scalar finite elements, so shape_values.size() DEAL_II_EQUALS
+    // dofs_per_cell
     const unsigned int dofs_per_cell = shape_values.n_rows();
     const unsigned int n_quadrature_points =
       dofs_per_cell > 0 ? shape_values.n_cols() : values.size();
@@ -3140,7 +3164,8 @@ namespace internal
         // does not imply that its derivatives are zero as well. So we
         // can't filter by value for these number types.
         if (!Differentiation::AD::is_ad_number<Number2>::value)
-          if (value == dealii::internal::NumberType<Number2>::value(0.0))
+          if (value DEAL_II_EQUALS dealii::internal::NumberType<Number2>::value(
+                0.0))
             continue;
 
         const double *shape_value_ptr = &shape_values(shape_func, 0);
@@ -3172,7 +3197,7 @@ namespace internal
     // see if there the current cell has DoFs at all, and if not
     // then there is nothing else to do.
     const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
-    if (dofs_per_cell == 0)
+    if (dofs_per_cell DEAL_II_EQUALS 0)
       return;
 
     const unsigned int n_quadrature_points = shape_values.n_cols();
@@ -3205,7 +3230,8 @@ namespace internal
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+          if (dealii::internal::CheckForZero<Number>::value(value)
+                DEAL_II_EQUALS true)
             continue;
 
           if (fe.is_primitive(shape_func))
@@ -3233,7 +3259,8 @@ namespace internal
           else
             for (unsigned int c = 0; c < n_components; ++c)
               {
-                if (fe.get_nonzero_components(shape_func)[c] == false)
+                if (fe.get_nonzero_components(
+                      shape_func)[c] DEAL_II_EQUALS false)
                   continue;
 
                 const unsigned int row =
@@ -3291,7 +3318,8 @@ namespace internal
         // For auto-differentiable numbers, the fact that a DoF value is zero
         // does not imply that its derivatives are zero as well. So we
         // can't filter by value for these number types.
-        if (dealii::internal::CheckForZero<Number>::value(value) == true)
+        if (dealii::internal::CheckForZero<Number>::value(value)
+              DEAL_II_EQUALS true)
           continue;
 
         const Tensor<order, spacedim> *shape_derivative_ptr =
@@ -3323,7 +3351,7 @@ namespace internal
     // see if there the current cell has DoFs at all, and if not
     // then there is nothing else to do.
     const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
-    if (dofs_per_cell == 0)
+    if (dofs_per_cell DEAL_II_EQUALS 0)
       return;
 
 
@@ -3357,7 +3385,8 @@ namespace internal
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+          if (dealii::internal::CheckForZero<Number>::value(value)
+                DEAL_II_EQUALS true)
             continue;
 
           if (fe.is_primitive(shape_func))
@@ -3383,7 +3412,8 @@ namespace internal
           else
             for (unsigned int c = 0; c < n_components; ++c)
               {
-                if (fe.get_nonzero_components(shape_func)[c] == false)
+                if (fe.get_nonzero_components(
+                      shape_func)[c] DEAL_II_EQUALS false)
                   continue;
 
                 const unsigned int row =
@@ -3436,7 +3466,8 @@ namespace internal
         // does not imply that its derivatives are zero as well. So we
         // can't filter by value for these number types.
         if (!Differentiation::AD::is_ad_number<Number2>::value)
-          if (value == dealii::internal::NumberType<Number2>::value(0.0))
+          if (value DEAL_II_EQUALS dealii::internal::NumberType<Number2>::value(
+                0.0))
             continue;
 
         const Tensor<2, spacedim> *shape_hessian_ptr =
@@ -3468,7 +3499,7 @@ namespace internal
     // see if there the current cell has DoFs at all, and if not
     // then there is nothing else to do.
     const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
-    if (dofs_per_cell == 0)
+    if (dofs_per_cell DEAL_II_EQUALS 0)
       return;
 
 
@@ -3502,7 +3533,8 @@ namespace internal
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+          if (dealii::internal::CheckForZero<Number>::value(value)
+                DEAL_II_EQUALS true)
             continue;
 
           if (fe.is_primitive(shape_func))
@@ -3532,7 +3564,8 @@ namespace internal
           else
             for (unsigned int c = 0; c < n_components; ++c)
               {
-                if (fe.get_nonzero_components(shape_func)[c] == false)
+                if (fe.get_nonzero_components(
+                      shape_func)[c] DEAL_II_EQUALS false)
                   continue;
 
                 const unsigned int row =
@@ -3650,7 +3683,7 @@ FEValuesBase<dim, spacedim>::get_function_values(
   using Number = typename InputVector::value_type;
   // Size of indices must be a multiple of dofs_per_cell such that an integer
   // number of function values is generated in each point.
-  Assert(indices.size() % dofs_per_cell == 0,
+  Assert(indices.size() % dofs_per_cell DEAL_II_EQUALS 0,
          ExcNotMultiple(indices.size(), dofs_per_cell));
   Assert(this->update_flags & update_values,
          ExcAccessToUninitializedField("update_values"));
@@ -3685,7 +3718,7 @@ FEValuesBase<dim, spacedim>::get_function_values(
 
   // Size of indices must be a multiple of dofs_per_cell such that an integer
   // number of function values is generated in each point.
-  Assert(indices.size() % dofs_per_cell == 0,
+  Assert(indices.size() % dofs_per_cell DEAL_II_EQUALS 0,
          ExcNotMultiple(indices.size(), dofs_per_cell));
 
   boost::container::small_vector<Number, 200> dof_values(indices.size());
@@ -3796,7 +3829,7 @@ FEValuesBase<dim, spacedim>::get_function_gradients(
   using Number = typename InputVector::value_type;
   // Size of indices must be a multiple of dofs_per_cell such that an integer
   // number of function values is generated in each point.
-  Assert(indices.size() % dofs_per_cell == 0,
+  Assert(indices.size() % dofs_per_cell DEAL_II_EQUALS 0,
          ExcNotMultiple(indices.size(), dofs_per_cell));
   Assert(this->update_flags & update_gradients,
          ExcAccessToUninitializedField("update_gradients"));
@@ -3911,7 +3944,7 @@ FEValuesBase<dim, spacedim>::get_function_hessians(
   using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
-  Assert(indices.size() % dofs_per_cell == 0,
+  Assert(indices.size() % dofs_per_cell DEAL_II_EQUALS 0,
          ExcNotMultiple(indices.size(), dofs_per_cell));
 
   boost::container::small_vector<Number, 200> dof_values(indices.size());
@@ -4016,7 +4049,7 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
   using Number = typename InputVector::value_type;
   // Size of indices must be a multiple of dofs_per_cell such that an integer
   // number of function values is generated in each point.
-  Assert(indices.size() % dofs_per_cell == 0,
+  Assert(indices.size() % dofs_per_cell DEAL_II_EQUALS 0,
          ExcNotMultiple(indices.size(), dofs_per_cell));
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
@@ -4046,7 +4079,7 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
   bool quadrature_points_fastest) const
 {
   using Number = typename InputVector::value_type;
-  Assert(indices.size() % dofs_per_cell == 0,
+  Assert(indices.size() % dofs_per_cell DEAL_II_EQUALS 0,
          ExcNotMultiple(indices.size(), dofs_per_cell));
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
@@ -4163,7 +4196,7 @@ FEValuesBase<dim, spacedim>::get_function_third_derivatives(
   using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_3rd_derivatives,
          ExcAccessToUninitializedField("update_3rd_derivatives"));
-  Assert(indices.size() % dofs_per_cell == 0,
+  Assert(indices.size() % dofs_per_cell DEAL_II_EQUALS 0,
          ExcNotMultiple(indices.size(), dofs_per_cell));
 
   boost::container::small_vector<Number, 200> dof_values(indices.size());
@@ -4330,12 +4363,12 @@ FEValuesBase<dim, spacedim>::check_cell_similarity(
     }
 
   // case that there has not been any cell before
-  if (this->present_cell.get() == nullptr)
+  if (this->present_cell.get() DEAL_II_EQUALS nullptr)
     cell_similarity = CellSimilarity::none;
   else
     // in MappingQ, data can have been modified during the last call. Then, we
     // can't use that data on the new cell.
-    if (cell_similarity == CellSimilarity::invalid_next_cell)
+    if (cell_similarity DEAL_II_EQUALS CellSimilarity::invalid_next_cell)
     cell_similarity = CellSimilarity::none;
   else
     cell_similarity =
@@ -4345,7 +4378,8 @@ FEValuesBase<dim, spacedim>::check_cell_similarity(
          CellSimilarity::translation :
          CellSimilarity::none);
 
-  if ((dim < spacedim) && (cell_similarity == CellSimilarity::translation))
+  if ((dim < spacedim)
+        DEAL_II_AND(cell_similarity DEAL_II_EQUALS CellSimilarity::translation))
     {
       if (static_cast<const typename Triangulation<dim, spacedim>::cell_iterator
                         &>(*this->present_cell)
@@ -4422,7 +4456,7 @@ FEValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
   // You can compute normal vectors to the cells only in the
   // codimension one case.
   if (dim != spacedim - 1)
-    Assert((update_flags & update_normal_vectors) == false,
+    Assert((update_flags & update_normal_vectors) DEAL_II_EQUALS false,
            ExcMessage("You can only pass the 'update_normal_vectors' "
                       "flag to FEFaceValues or FESubfaceValues objects, "
                       "but not to an FEValues object unless the "
@@ -4483,7 +4517,8 @@ namespace
     // see if the existing pointer is non-null and if the type of
     // the old object pointed to matches that of the one we'd
     // like to create
-    if (present_cell.get() && (typeid(*present_cell.get()) == typeid(Type)))
+    if (present_cell.get()
+          DEAL_II_AND(typeid(*present_cell.get()) DEAL_II_EQUALS typeid(Type)))
       {
         // call destructor of the old object
         static_cast<const Type *>(present_cell.get())->~Type();
@@ -4530,8 +4565,9 @@ FEValues<dim, spacedim>::reinit(
 {
   // assert that the finite elements passed to the constructor and
   // used by the DoFHandler used by this cell, are the same
-  Assert(static_cast<const FiniteElementData<dim> &>(*this->fe) ==
-           static_cast<const FiniteElementData<dim> &>(cell->get_fe()),
+  Assert(static_cast<const FiniteElementData<dim> &>(*this->fe)
+           DEAL_II_EQUALS static_cast<const FiniteElementData<dim> &>(
+             cell->get_fe()),
          (typename FEValuesBase<dim, spacedim>::ExcFEDontMatch()));
 
   this->maybe_invalidate_previous_present_cell(cell);
@@ -4738,8 +4774,8 @@ FEFaceValues<dim, spacedim>::reinit(
 {
   // assert that the finite elements passed to the constructor and
   // used by the DoFHandler used by this cell, are the same
-  Assert(static_cast<const FiniteElementData<dim> &>(*this->fe) ==
-           static_cast<const FiniteElementData<dim> &>(
+  Assert(static_cast<const FiniteElementData<dim> &>(*this->fe)
+           DEAL_II_EQUALS static_cast<const FiniteElementData<dim> &>(
              cell->get_dof_handler().get_fe(cell->active_fe_index())),
          (typename FEValuesBase<dim, spacedim>::ExcFEDontMatch()));
 
@@ -4940,8 +4976,8 @@ FESubfaceValues<dim, spacedim>::reinit(
 {
   // assert that the finite elements passed to the constructor and
   // used by the DoFHandler used by this cell, are the same
-  Assert(static_cast<const FiniteElementData<dim> &>(*this->fe) ==
-           static_cast<const FiniteElementData<dim> &>(
+  Assert(static_cast<const FiniteElementData<dim> &>(*this->fe)
+           DEAL_II_EQUALS static_cast<const FiniteElementData<dim> &>(
              cell->get_dof_handler().get_fe(cell->active_fe_index())),
          (typename FEValuesBase<dim, spacedim>::ExcFEDontMatch()));
   AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
@@ -4949,17 +4985,17 @@ FESubfaceValues<dim, spacedim>::reinit(
   // but unfortunately the current function is also called for
   // faces without children (see tests/fe/mapping.cc). Therefore,
   // we must use following workaround of two separate assertions
-  Assert(cell->face(face_no)->has_children() ||
-           subface_no < GeometryInfo<dim>::max_children_per_face,
+  Assert(cell->face(face_no)->has_children()
+             DEAL_II_OR subface_no < GeometryInfo<dim>::max_children_per_face,
          ExcIndexRange(subface_no,
                        0,
                        GeometryInfo<dim>::max_children_per_face));
-  Assert(!cell->face(face_no)->has_children() ||
-           subface_no < cell->face(face_no)->number_of_children(),
+  Assert(!cell->face(face_no)->has_children()
+             DEAL_II_OR subface_no < cell->face(face_no)->number_of_children(),
          ExcIndexRange(subface_no,
                        0,
                        cell->face(face_no)->number_of_children()));
-  Assert(cell->has_children() == false,
+  Assert(cell->has_children() DEAL_II_EQUALS false,
          ExcMessage("You can't use subface data for cells that are "
                     "already refined. Iterate over their children "
                     "instead in these cases."));

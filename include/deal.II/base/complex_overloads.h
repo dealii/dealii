@@ -38,7 +38,7 @@ struct ProductType;
  */
 template <typename T, typename U>
 inline typename std::enable_if<
-  std::is_floating_point<T>::value && std::is_floating_point<U>::value,
+  std::is_floating_point<T>::value DEAL_II_AND std::is_floating_point<U>::value,
   typename ProductType<std::complex<T>, std::complex<U>>::type>::type
 operator*(const std::complex<T> &left, const std::complex<U> &right)
 {
@@ -56,7 +56,7 @@ operator*(const std::complex<T> &left, const std::complex<U> &right)
  */
 template <typename T, typename U>
 inline typename std::enable_if<
-  std::is_floating_point<T>::value && std::is_floating_point<U>::value,
+  std::is_floating_point<T>::value DEAL_II_AND std::is_floating_point<U>::value,
   typename ProductType<std::complex<T>, std::complex<U>>::type>::type
 operator/(const std::complex<T> &left, const std::complex<U> &right)
 {
@@ -73,11 +73,10 @@ operator/(const std::complex<T> &left, const std::complex<U> &right)
  * @relatesalso ProductType
  */
 template <typename T, typename U>
-inline
-  typename std::enable_if<std::is_floating_point<T>::value &&
-                            std::is_floating_point<U>::value,
-                          typename ProductType<std::complex<T>, U>::type>::type
-  operator*(const std::complex<T> &left, const U &right)
+inline typename std::enable_if<
+  std::is_floating_point<T>::value DEAL_II_AND std::is_floating_point<U>::value,
+  typename ProductType<std::complex<T>, U>::type>::type
+operator*(const std::complex<T> &left, const U &right)
 {
   using result_type = typename ProductType<std::complex<T>, U>::type;
   return static_cast<result_type>(left) * static_cast<result_type>(right);
@@ -91,11 +90,10 @@ inline
  * @relatesalso ProductType
  */
 template <typename T, typename U>
-inline
-  typename std::enable_if<std::is_floating_point<T>::value &&
-                            std::is_floating_point<U>::value,
-                          typename ProductType<std::complex<T>, U>::type>::type
-  operator/(const std::complex<T> &left, const U &right)
+inline typename std::enable_if<
+  std::is_floating_point<T>::value DEAL_II_AND std::is_floating_point<U>::value,
+  typename ProductType<std::complex<T>, U>::type>::type
+operator/(const std::complex<T> &left, const U &right)
 {
   using result_type = typename ProductType<std::complex<T>, U>::type;
   return static_cast<result_type>(left) / static_cast<result_type>(right);
@@ -111,8 +109,8 @@ inline
 template <typename T, typename U>
 inline typename
 
-  std::enable_if<std::is_floating_point<T>::value &&
-                   std::is_floating_point<U>::value,
+  std::enable_if<std::is_floating_point<T>::value DEAL_II_AND
+                                                  std::is_floating_point<U>::value,
                  typename ProductType<T, std::complex<U>>::type>::type
   operator*(const T &left, const std::complex<U> &right)
 {
@@ -128,11 +126,10 @@ inline typename
  * @relatesalso ProductType
  */
 template <typename T, typename U>
-inline
-  typename std::enable_if<std::is_floating_point<T>::value &&
-                            std::is_floating_point<U>::value,
-                          typename ProductType<T, std::complex<U>>::type>::type
-  operator/(const T &left, const std::complex<U> &right)
+inline typename std::enable_if<
+  std::is_floating_point<T>::value DEAL_II_AND std::is_floating_point<U>::value,
+  typename ProductType<T, std::complex<U>>::type>::type
+operator/(const T &left, const std::complex<U> &right)
 {
   using result_type = typename ProductType<T, std::complex<U>>::type;
   return static_cast<result_type>(left) / static_cast<result_type>(right);

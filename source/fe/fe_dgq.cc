@@ -200,7 +200,7 @@ FE_DGQ<dim, spacedim>::rotate_indices(std::vector<unsigned int> &numbers,
 
   unsigned int l = 0;
 
-  if (dim == 1)
+  if (dim DEAL_II_EQUALS 1)
     {
       // Mirror around midpoint
       for (unsigned int i = n; i > 0;)
@@ -283,10 +283,10 @@ FE_DGQ<dim, spacedim>::get_interpolation_matrix(
   const FE_DGQ<dim, spacedim> &source_fe =
     dynamic_cast<const FE_DGQ<dim, spacedim> &>(x_source_fe);
 
-  Assert(interpolation_matrix.m() == this->n_dofs_per_cell(),
+  Assert(interpolation_matrix.m() DEAL_II_EQUALS this->n_dofs_per_cell(),
          ExcDimensionMismatch(interpolation_matrix.m(),
                               this->n_dofs_per_cell()));
-  Assert(interpolation_matrix.n() == source_fe.n_dofs_per_cell(),
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS source_fe.n_dofs_per_cell(),
          ExcDimensionMismatch(interpolation_matrix.n(),
                               source_fe.n_dofs_per_cell()));
 
@@ -363,9 +363,9 @@ FE_DGQ<dim, spacedim>::get_face_interpolation_matrix(
                nullptr),
               typename FE::ExcInterpolationNotImplemented());
 
-  Assert(interpolation_matrix.m() == 0,
+  Assert(interpolation_matrix.m() DEAL_II_EQUALS 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
 }
 
@@ -391,9 +391,9 @@ FE_DGQ<dim, spacedim>::get_subface_interpolation_matrix(
                nullptr),
               typename FE::ExcInterpolationNotImplemented());
 
-  Assert(interpolation_matrix.m() == 0,
+  Assert(interpolation_matrix.m() DEAL_II_EQUALS 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
 }
 
@@ -413,20 +413,21 @@ FE_DGQ<dim, spacedim>::get_prolongation_matrix(
   AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
 
   // initialization upon first request
-  if (this->prolongation[refinement_case - 1][child].n() == 0)
+  if (this->prolongation[refinement_case - 1][child].n() DEAL_II_EQUALS 0)
     {
       std::lock_guard<std::mutex> lock(this->mutex);
 
       // if matrix got updated while waiting for the lock
-      if (this->prolongation[refinement_case - 1][child].n() ==
-          this->n_dofs_per_cell())
+      if (this->prolongation[refinement_case - 1][child]
+            .n() DEAL_II_EQUALS this->n_dofs_per_cell())
         return this->prolongation[refinement_case - 1][child];
 
       // now do the work. need to get a non-const version of data in order to
       // be able to modify them inside a const function
       FE_DGQ<dim, spacedim> &this_nonconst =
         const_cast<FE_DGQ<dim, spacedim> &>(*this);
-      if (refinement_case == RefinementCase<dim>::isotropic_refinement)
+      if (refinement_case DEAL_II_EQUALS
+                          RefinementCase<dim>::isotropic_refinement)
         {
           std::vector<std::vector<FullMatrix<double>>> isotropic_matrices(
             RefinementCase<dim>::isotropic_refinement);
@@ -434,7 +435,7 @@ FE_DGQ<dim, spacedim>::get_prolongation_matrix(
             GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
             FullMatrix<double>(this->n_dofs_per_cell(),
                                this->n_dofs_per_cell()));
-          if (dim == spacedim)
+          if (dim DEAL_II_EQUALS spacedim)
             FETools::compute_embedding_matrices(*this,
                                                 isotropic_matrices,
                                                 true);
@@ -451,7 +452,7 @@ FE_DGQ<dim, spacedim>::get_prolongation_matrix(
           // we only check for their size and the reinit call initializes them
           // all
           this_nonconst.reinit_restriction_and_prolongation_matrices();
-          if (dim == spacedim)
+          if (dim DEAL_II_EQUALS spacedim)
             {
               FETools::compute_embedding_matrices(*this,
                                                   this_nonconst.prolongation);
@@ -489,20 +490,21 @@ FE_DGQ<dim, spacedim>::get_restriction_matrix(
   AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
 
   // initialization upon first request
-  if (this->restriction[refinement_case - 1][child].n() == 0)
+  if (this->restriction[refinement_case - 1][child].n() DEAL_II_EQUALS 0)
     {
       std::lock_guard<std::mutex> lock(this->mutex);
 
       // if matrix got updated while waiting for the lock...
-      if (this->restriction[refinement_case - 1][child].n() ==
-          this->n_dofs_per_cell())
+      if (this->restriction[refinement_case - 1][child].n()
+            DEAL_II_EQUALS this->n_dofs_per_cell())
         return this->restriction[refinement_case - 1][child];
 
       // now do the work. need to get a non-const version of data in order to
       // be able to modify them inside a const function
       FE_DGQ<dim, spacedim> &this_nonconst =
         const_cast<FE_DGQ<dim, spacedim> &>(*this);
-      if (refinement_case == RefinementCase<dim>::isotropic_refinement)
+      if (refinement_case DEAL_II_EQUALS
+                          RefinementCase<dim>::isotropic_refinement)
         {
           std::vector<std::vector<FullMatrix<double>>> isotropic_matrices(
             RefinementCase<dim>::isotropic_refinement);
@@ -510,7 +512,7 @@ FE_DGQ<dim, spacedim>::get_restriction_matrix(
             GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
             FullMatrix<double>(this->n_dofs_per_cell(),
                                this->n_dofs_per_cell()));
-          if (dim == spacedim)
+          if (dim DEAL_II_EQUALS spacedim)
             FETools::compute_projection_matrices(*this,
                                                  isotropic_matrices,
                                                  true);
@@ -527,7 +529,7 @@ FE_DGQ<dim, spacedim>::get_restriction_matrix(
           // we only check for their size and the reinit call initializes them
           // all
           this_nonconst.reinit_restriction_and_prolongation_matrices();
-          if (dim == spacedim)
+          if (dim DEAL_II_EQUALS spacedim)
             {
               FETools::compute_embedding_matrices(*this,
                                                   this_nonconst.prolongation);
@@ -629,7 +631,7 @@ FE_DGQ<dim, spacedim>::compare_for_domination(
     {
       if (this->degree < fe_dgq_other->degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_dgq_other->degree)
+      else if (this->degree DEAL_II_EQUALS fe_dgq_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;
@@ -639,7 +641,7 @@ FE_DGQ<dim, spacedim>::compare_for_domination(
     {
       if (this->degree < fe_q_other->degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_q_other->degree)
+      else if (this->degree DEAL_II_EQUALS fe_q_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;
@@ -649,7 +651,7 @@ FE_DGQ<dim, spacedim>::compare_for_domination(
     {
       if (this->degree < fe_bernstein_other->degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_bernstein_other->degree)
+      else if (this->degree DEAL_II_EQUALS fe_bernstein_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;
@@ -659,7 +661,7 @@ FE_DGQ<dim, spacedim>::compare_for_domination(
     {
       if (this->degree < fe_bubbles_other->degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_bubbles_other->degree)
+      else if (this->degree DEAL_II_EQUALS fe_bubbles_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;
@@ -669,7 +671,7 @@ FE_DGQ<dim, spacedim>::compare_for_domination(
     {
       if (this->degree < fe_dg0_other->degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_dg0_other->degree)
+      else if (this->degree DEAL_II_EQUALS fe_dg0_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;
@@ -679,7 +681,7 @@ FE_DGQ<dim, spacedim>::compare_for_domination(
     {
       if (this->degree < fe_q_iso_q1_other->degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_q_iso_q1_other->degree)
+      else if (this->degree DEAL_II_EQUALS fe_q_iso_q1_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;
@@ -689,7 +691,7 @@ FE_DGQ<dim, spacedim>::compare_for_domination(
     {
       if (this->degree < fe_hierarchical_other->degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_hierarchical_other->degree)
+      else if (this->degree DEAL_II_EQUALS fe_hierarchical_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;
@@ -738,7 +740,7 @@ FE_DGQ<dim, spacedim>::has_support_on_face(const unsigned int shape_index,
   for (unsigned int d = 0; d < dim; ++d)
     if (std::abs(this->unit_support_points.back()[d] - 1.) > 1e-13)
       support_points_on_boundary = false;
-  if (support_points_on_boundary == false)
+  if (support_points_on_boundary DEAL_II_EQUALS false)
     return true;
 
   unsigned int n2 = n * n;
@@ -751,21 +753,27 @@ FE_DGQ<dim, spacedim>::has_support_on_face(const unsigned int shape_index,
           // there is only one degree of
           // freedom per vertex in this
           // class, the first is on vertex 0
-          // (==face 0 in some sense), the
+          // (DEAL_II_EQUALS face 0 in some sense), the
           // second on face 1:
-          return (((shape_index == 0) && (face_index == 0)) ||
-                  ((shape_index == this->degree) && (face_index == 1)));
+          return (
+            ((shape_index DEAL_II_EQUALS 0)DEAL_II_AND(
+              face_index DEAL_II_EQUALS 0))
+              DEAL_II_OR((shape_index DEAL_II_EQUALS this->degree)DEAL_II_AND(
+                face_index DEAL_II_EQUALS 1)));
         }
 
       case 2:
         {
-          if (face_index == 0 && (shape_index % n) == 0)
+          if (face_index DEAL_II_EQUALS 0 DEAL_II_AND(shape_index % n)
+                DEAL_II_EQUALS 0)
             return true;
-          if (face_index == 1 && (shape_index % n) == this->degree)
+          if (face_index DEAL_II_EQUALS 1 DEAL_II_AND(shape_index % n)
+                DEAL_II_EQUALS this->degree)
             return true;
-          if (face_index == 2 && shape_index < n)
+          if (face_index DEAL_II_EQUALS 2 DEAL_II_AND shape_index < n)
             return true;
-          if (face_index == 3 && shape_index >= this->n_dofs_per_cell() - n)
+          if (face_index DEAL_II_EQUALS 3 DEAL_II_AND shape_index >=
+              this->n_dofs_per_cell() - n)
             return true;
           return false;
         }
@@ -775,22 +783,26 @@ FE_DGQ<dim, spacedim>::has_support_on_face(const unsigned int shape_index,
           const unsigned int in2 = shape_index % n2;
 
           // x=0
-          if (face_index == 0 && (shape_index % n) == 0)
+          if (face_index DEAL_II_EQUALS 0 DEAL_II_AND(shape_index % n)
+                DEAL_II_EQUALS 0)
             return true;
           // x=1
-          if (face_index == 1 && (shape_index % n) == n - 1)
+          if (face_index       DEAL_II_EQUALS 1 DEAL_II_AND(shape_index % n)
+                DEAL_II_EQUALS n -
+              1)
             return true;
           // y=0
-          if (face_index == 2 && in2 < n)
+          if (face_index DEAL_II_EQUALS 2 DEAL_II_AND in2 < n)
             return true;
           // y=1
-          if (face_index == 3 && in2 >= n2 - n)
+          if (face_index DEAL_II_EQUALS 3 DEAL_II_AND in2 >= n2 - n)
             return true;
           // z=0
-          if (face_index == 4 && shape_index < n2)
+          if (face_index DEAL_II_EQUALS 4 DEAL_II_AND shape_index < n2)
             return true;
           // z=1
-          if (face_index == 5 && shape_index >= this->n_dofs_per_cell() - n2)
+          if (face_index DEAL_II_EQUALS 5 DEAL_II_AND shape_index >=
+              this->n_dofs_per_cell() - n2)
             return true;
           return false;
         }
@@ -855,10 +867,11 @@ FE_DGQArbitraryNodes<dim, spacedim>::get_name() const
         equidistant = false;
         break;
       }
-  if (this->degree == 0 && std::abs(points[0] - 0.5) < 1e-15)
+  if (this->degree DEAL_II_EQUALS 0 DEAL_II_AND std::abs(points[0] - 0.5) <
+      1e-15)
     equidistant = true;
 
-  if (equidistant == true)
+  if (equidistant DEAL_II_EQUALS true)
     {
       if (this->degree > 2)
         namebuf << "FE_DGQArbitraryNodes<"
@@ -880,7 +893,7 @@ FE_DGQArbitraryNodes<dim, spacedim>::get_name() const
         break;
       }
 
-  if (gauss_lobatto == true)
+  if (gauss_lobatto DEAL_II_EQUALS true)
     {
       namebuf << "FE_DGQ<" << Utilities::dim_string(dim, spacedim) << ">("
               << this->degree << ")";
@@ -897,7 +910,7 @@ FE_DGQArbitraryNodes<dim, spacedim>::get_name() const
         break;
       }
 
-  if (gauss == true)
+  if (gauss DEAL_II_EQUALS true)
     {
       namebuf << "FE_DGQArbitraryNodes<" << Utilities::dim_string(dim, spacedim)
               << ">(QGauss(" << this->degree + 1 << "))";
@@ -914,7 +927,7 @@ FE_DGQArbitraryNodes<dim, spacedim>::get_name() const
         break;
       }
 
-  if (gauss_log == true)
+  if (gauss_log DEAL_II_EQUALS true)
     {
       namebuf << "FE_DGQArbitraryNodes<" << Utilities::dim_string(dim, spacedim)
               << ">(QGaussLog(" << this->degree + 1 << "))";

@@ -61,7 +61,8 @@ namespace hp
                       p_flags.size());
 
       for (const auto &cell : dof_handler.active_cell_iterators())
-        if (cell->is_locally_owned() && p_flags[cell->active_cell_index()])
+        if (cell->is_locally_owned()
+              DEAL_II_AND p_flags[cell->active_cell_index()])
           {
             if (cell->refine_flag_set())
               {
@@ -106,13 +107,11 @@ namespace hp
         dof_handler.get_triangulation().n_active_cells(), false);
 
       for (const auto &cell : dof_handler.active_cell_iterators())
-        if (cell->is_locally_owned() &&
-            ((cell->refine_flag_set() &&
-              compare_refine(criteria[cell->active_cell_index()],
-                             p_refine_threshold)) ||
-             (cell->coarsen_flag_set() &&
-              compare_coarsen(criteria[cell->active_cell_index()],
-                              p_coarsen_threshold))))
+        if (cell->is_locally_owned() DEAL_II_AND(
+              (cell->refine_flag_set() DEAL_II_AND compare_refine(
+                criteria[cell->active_cell_index()], p_refine_threshold))
+                DEAL_II_OR(cell->coarsen_flag_set() DEAL_II_AND compare_coarsen(
+                  criteria[cell->active_cell_index()], p_coarsen_threshold))))
           p_flags[cell->active_cell_index()] = true;
 
       p_adaptivity_from_flags(dof_handler, p_flags);
@@ -133,9 +132,9 @@ namespace hp
     {
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
                       criteria.size());
-      Assert((p_refine_fraction >= 0) && (p_refine_fraction <= 1),
+      Assert((p_refine_fraction >= 0) DEAL_II_AND(p_refine_fraction <= 1),
              dealii::GridRefinement::ExcInvalidParameterValue());
-      Assert((p_coarsen_fraction >= 0) && (p_coarsen_fraction <= 1),
+      Assert((p_coarsen_fraction >= 0) DEAL_II_AND(p_coarsen_fraction <= 1),
              dealii::GridRefinement::ExcInvalidParameterValue());
 
       // We first have to determine the maximal and minimal values of the
@@ -171,9 +170,10 @@ namespace hp
       const parallel::TriangulationBase<dim, spacedim> *parallel_tria =
         dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
           &dof_handler.get_triangulation());
-      if (parallel_tria != nullptr &&
-          dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
-            &dof_handler.get_triangulation()) == nullptr)
+      if (parallel_tria !=
+          nullptr DEAL_II_AND dynamic_cast<
+            const parallel::shared::Triangulation<dim, spacedim> *>(
+            &dof_handler.get_triangulation()) DEAL_II_EQUALS nullptr)
         {
           max_criterion_refine =
             Utilities::MPI::max(max_criterion_refine,
@@ -223,9 +223,9 @@ namespace hp
     {
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
                       criteria.size());
-      Assert((p_refine_fraction >= 0) && (p_refine_fraction <= 1),
+      Assert((p_refine_fraction >= 0) DEAL_II_AND(p_refine_fraction <= 1),
              dealii::GridRefinement::ExcInvalidParameterValue());
-      Assert((p_coarsen_fraction >= 0) && (p_coarsen_fraction <= 1),
+      Assert((p_coarsen_fraction >= 0) DEAL_II_AND(p_coarsen_fraction <= 1),
              dealii::GridRefinement::ExcInvalidParameterValue());
 
       // ComparisonFunction returning 'true' or 'false' for any set of
@@ -247,7 +247,7 @@ namespace hp
         dof_handler.get_triangulation().n_active_cells());
       for (const auto &cell :
            dof_handler.get_triangulation().active_cell_iterators())
-        if (!cell->is_artificial() && cell->is_locally_owned())
+        if (!cell->is_artificial() DEAL_II_AND cell->is_locally_owned())
           {
             if (cell->refine_flag_set())
               indicators_refinement(n_flags_refinement++) =
@@ -283,9 +283,10 @@ namespace hp
       const parallel::TriangulationBase<dim, spacedim> *parallel_tria =
         dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
           &dof_handler.get_triangulation());
-      if (parallel_tria != nullptr &&
-          dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
-            &dof_handler.get_triangulation()) == nullptr)
+      if (parallel_tria !=
+          nullptr DEAL_II_AND dynamic_cast<
+            const parallel::shared::Triangulation<dim, spacedim> *>(
+            &dof_handler.get_triangulation()) DEAL_II_EQUALS nullptr)
         {
 #ifndef DEAL_II_WITH_P4EST
           Assert(false, ExcInternalError());
@@ -323,9 +324,10 @@ namespace hp
                                                  mpi_communicator);
 
           // 3.) Compute thresholds if necessary.
-          if (target_index_refinement == 0)
+          if (target_index_refinement DEAL_II_EQUALS 0)
             reference_compare_refine = std::cref(compare_false);
-          else if (target_index_refinement == n_global_flags_refinement)
+          else if (target_index_refinement DEAL_II_EQUALS
+                                           n_global_flags_refinement)
             reference_compare_refine = std::cref(compare_true);
           else
             threshold_refinement = dealii::internal::parallel::distributed::
@@ -335,9 +337,9 @@ namespace hp
                 target_index_refinement,
                 mpi_communicator);
 
-          if (target_index_coarsening == n_global_flags_coarsening)
+          if (target_index_coarsening DEAL_II_EQUALS n_global_flags_coarsening)
             reference_compare_coarsen = std::cref(compare_false);
-          else if (target_index_coarsening == 0)
+          else if (target_index_coarsening DEAL_II_EQUALS 0)
             reference_compare_coarsen = std::cref(compare_true);
           else
             threshold_coarsening = dealii::internal::parallel::distributed::
@@ -361,9 +363,9 @@ namespace hp
             std::floor(p_coarsen_fraction * n_flags_coarsening));
 
           // 3.) Compute thresholds if necessary.
-          if (n_p_refine_cells == 0)
+          if (n_p_refine_cells DEAL_II_EQUALS 0)
             reference_compare_refine = std::cref(compare_false);
-          else if (n_p_refine_cells == n_flags_refinement)
+          else if (n_p_refine_cells DEAL_II_EQUALS n_flags_refinement)
             reference_compare_refine = std::cref(compare_true);
           else
             {
@@ -376,9 +378,9 @@ namespace hp
                 *(indicators_refinement.begin() + n_p_refine_cells - 1);
             }
 
-          if (n_p_coarsen_cells == 0)
+          if (n_p_coarsen_cells DEAL_II_EQUALS 0)
             reference_compare_coarsen = std::cref(compare_false);
-          else if (n_p_coarsen_cells == n_flags_coarsening)
+          else if (n_p_coarsen_cells DEAL_II_EQUALS n_flags_coarsening)
             reference_compare_coarsen = std::cref(compare_true);
           else
             {
@@ -474,13 +476,13 @@ namespace hp
         dof_handler.get_triangulation().n_active_cells(), false);
 
       for (const auto &cell : dof_handler.active_cell_iterators())
-        if (cell->is_locally_owned() &&
-            ((cell->refine_flag_set() &&
-              compare_refine(criteria[cell->active_cell_index()],
-                             references[cell->active_cell_index()])) ||
-             (cell->coarsen_flag_set() &&
-              compare_coarsen(criteria[cell->active_cell_index()],
-                              references[cell->active_cell_index()]))))
+        if (cell->is_locally_owned() DEAL_II_AND(
+              (cell->refine_flag_set() DEAL_II_AND compare_refine(
+                criteria[cell->active_cell_index()],
+                references[cell->active_cell_index()]))
+                DEAL_II_OR(cell->coarsen_flag_set() DEAL_II_AND compare_coarsen(
+                  criteria[cell->active_cell_index()],
+                  references[cell->active_cell_index()]))))
           p_flags[cell->active_cell_index()] = true;
 
       p_adaptivity_from_flags(dof_handler, p_flags);
@@ -504,7 +506,7 @@ namespace hp
                       error_indicators.size());
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
                       predicted_errors.size());
-      Assert(0 < gamma_p && gamma_p < 1,
+      Assert(0 < gamma_p DEAL_II_AND gamma_p < 1,
              dealii::GridRefinement::ExcInvalidParameterValue());
       Assert(0 < gamma_h, dealii::GridRefinement::ExcInvalidParameterValue());
       Assert(0 < gamma_n, dealii::GridRefinement::ExcInvalidParameterValue());
@@ -525,8 +527,9 @@ namespace hp
         if (cell->is_locally_owned())
           {
             // current cell will not be adapted
-            if (!(cell->future_fe_index_set()) && !(cell->refine_flag_set()) &&
-                !(cell->coarsen_flag_set()))
+            if (!(cell->future_fe_index_set())
+                  DEAL_II_AND !(cell->refine_flag_set())DEAL_II_AND !(
+                    cell->coarsen_flag_set()))
               {
                 predicted_errors[cell->active_cell_index()] *= gamma_n;
                 continue;
@@ -539,8 +542,10 @@ namespace hp
                 // cell will be coarsened, thus determine future finite element
                 // on parent cell
                 const auto &parent = cell->parent();
-                if (future_fe_indices_on_coarsened_cells.find(parent) ==
-                    future_fe_indices_on_coarsened_cells.end())
+                if (future_fe_indices_on_coarsened_cells
+                      .find(parent)
+                        DEAL_II_EQUALS future_fe_indices_on_coarsened_cells
+                      .end())
                   {
                     std::set<unsigned int> fe_indices_children;
                     for (unsigned int child_index = 0;
@@ -548,7 +553,8 @@ namespace hp
                          ++child_index)
                       {
                         const auto &child = parent->child(child_index);
-                        Assert(child->is_active() && child->coarsen_flag_set(),
+                        Assert(child->is_active()
+                                 DEAL_II_AND child->coarsen_flag_set(),
                                typename dealii::Triangulation<
                                  dim>::ExcInconsistentCoarseningFlags());
 
@@ -624,7 +630,7 @@ namespace hp
     force_p_over_h(const dealii::DoFHandler<dim, spacedim> &dof_handler)
     {
       for (const auto &cell : dof_handler.active_cell_iterators())
-        if (cell->is_locally_owned() && cell->future_fe_index_set())
+        if (cell->is_locally_owned() DEAL_II_AND cell->future_fe_index_set())
           {
             cell->clear_refine_flag();
             cell->clear_coarsen_flag();
@@ -665,7 +671,7 @@ namespace hp
 
 
       for (const auto &cell : dof_handler.active_cell_iterators())
-        if (cell->is_locally_owned() && cell->future_fe_index_set())
+        if (cell->is_locally_owned() DEAL_II_AND cell->future_fe_index_set())
           {
             cell->clear_refine_flag();
 
@@ -711,8 +717,8 @@ namespace hp
                       }
                   }
 
-                if (h_flagged_children == n_children &&
-                    p_flagged_children != n_children)
+                if (h_flagged_children DEAL_II_EQUALS n_children DEAL_II_AND
+                                                                 p_flagged_children != n_children)
                   {
                     // Perform pure h coarsening and
                     // drop all p adaptation flags.
@@ -720,7 +726,7 @@ namespace hp
                          ++child_index)
                       {
                         const auto &child = parent->child(child_index);
-                        // h_flagged_children == n_children implies
+                        // h_flagged_children DEAL_II_EQUALS  n_children implies
                         // that all children are active
                         Assert(child->is_active(), ExcInternalError());
                         if (child->is_locally_owned())
@@ -735,7 +741,8 @@ namespace hp
                          ++child_index)
                       {
                         const auto &child = parent->child(child_index);
-                        if (child->is_active() && child->is_locally_owned())
+                        if (child->is_active()
+                              DEAL_II_AND child->is_locally_owned())
                           child->clear_coarsen_flag();
                       }
                   }

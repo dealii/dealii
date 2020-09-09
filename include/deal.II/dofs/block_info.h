@@ -271,7 +271,7 @@ BlockInfo::print(OS &os) const
     os << ' ' << std::setw(5) << global().block_size(i);
   os << std::endl;
 
-  if (local().size() == 0)
+  if (local().size() DEAL_II_EQUALS 0)
     {
       os << "local dofs not initialized" << std::endl;
     }

@@ -374,11 +374,11 @@ namespace internal
 
       unsigned int faces_per_cell = 1;
 
-      if (this->structdim == 1)
+      if (this->structdim DEAL_II_EQUALS 1)
         faces_per_cell = GeometryInfo<1>::faces_per_cell;
-      else if (this->structdim == 2)
+      else if (this->structdim DEAL_II_EQUALS 2)
         faces_per_cell = GeometryInfo<2>::faces_per_cell;
-      else if (this->structdim == 3)
+      else if (this->structdim DEAL_II_EQUALS 3)
         faces_per_cell = GeometryInfo<3>::faces_per_cell;
       else
         AssertThrow(false, ExcNotImplemented());
@@ -395,11 +395,11 @@ namespace internal
 
       unsigned int faces_per_cell = 1;
 
-      if (this->structdim == 1)
+      if (this->structdim DEAL_II_EQUALS 1)
         faces_per_cell = GeometryInfo<1>::faces_per_cell;
-      else if (this->structdim == 2)
+      else if (this->structdim DEAL_II_EQUALS 2)
         faces_per_cell = GeometryInfo<2>::faces_per_cell;
-      else if (this->structdim == 3)
+      else if (this->structdim DEAL_II_EQUALS 3)
         faces_per_cell = GeometryInfo<3>::faces_per_cell;
       else
         AssertThrow(false, ExcNotImplemented());
@@ -448,7 +448,8 @@ namespace internal
     inline void *&
     TriaObjects::user_pointer(const unsigned int i)
     {
-      Assert(user_data_type == data_unknown || user_data_type == data_pointer,
+      Assert(user_data_type DEAL_II_EQUALS data_unknown DEAL_II_OR
+               user_data_type DEAL_II_EQUALS data_pointer,
              ExcPointerIndexClash());
       user_data_type = data_pointer;
 
@@ -460,7 +461,8 @@ namespace internal
     inline const void *
     TriaObjects::user_pointer(const unsigned int i) const
     {
-      Assert(user_data_type == data_unknown || user_data_type == data_pointer,
+      Assert(user_data_type DEAL_II_EQUALS data_unknown DEAL_II_OR
+               user_data_type DEAL_II_EQUALS data_pointer,
              ExcPointerIndexClash());
       user_data_type = data_pointer;
 
@@ -472,7 +474,8 @@ namespace internal
     inline unsigned int &
     TriaObjects::user_index(const unsigned int i)
     {
-      Assert(user_data_type == data_unknown || user_data_type == data_index,
+      Assert(user_data_type DEAL_II_EQUALS data_unknown DEAL_II_OR
+               user_data_type DEAL_II_EQUALS data_index,
              ExcPointerIndexClash());
       user_data_type = data_index;
 
@@ -510,7 +513,8 @@ namespace internal
     inline unsigned int
     TriaObjects::user_index(const unsigned int i) const
     {
-      Assert(user_data_type == data_unknown || user_data_type == data_index,
+      Assert(user_data_type DEAL_II_EQUALS data_unknown DEAL_II_OR
+               user_data_type DEAL_II_EQUALS data_index,
              ExcPointerIndexClash());
       user_data_type = data_index;
 

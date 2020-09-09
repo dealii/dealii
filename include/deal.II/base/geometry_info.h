@@ -494,9 +494,9 @@ struct RefinementPossibilities
    * following relations hold (among others):
    *
    * @code
-   * cut_xy  == cut_x  | cut_y
-   * cut_xyz == cut_xy | cut_xz
-   * cut_x   == cut_xy & cut_xz
+   * cut_xy  DEAL_II_EQUALS  cut_x  | cut_y
+   * cut_xyz DEAL_II_EQUALS  cut_xy | cut_xz
+   * cut_x   DEAL_II_EQUALS  cut_xy & cut_xz
    * @endcode
    *
    * Only those cuts that are reasonable in a given space dimension are
@@ -564,9 +564,9 @@ struct RefinementPossibilities<1>
    * following relations hold (among others):
    *
    * @code
-   * cut_xy  == cut_x  | cut_y
-   * cut_xyz == cut_xy | cut_xz
-   * cut_x   == cut_xy & cut_xz
+   * cut_xy  DEAL_II_EQUALS  cut_x  | cut_y
+   * cut_xyz DEAL_II_EQUALS  cut_xy | cut_xz
+   * cut_x   DEAL_II_EQUALS  cut_xy & cut_xz
    * @endcode
    *
    * Only those cuts that are reasonable in a given space dimension are
@@ -630,9 +630,9 @@ struct RefinementPossibilities<2>
    * following relations hold (among others):
    *
    * @code
-   * cut_xy  == cut_x  | cut_y
-   * cut_xyz == cut_xy | cut_xz
-   * cut_x   == cut_xy & cut_xz
+   * cut_xy  DEAL_II_EQUALS  cut_x  | cut_y
+   * cut_xyz DEAL_II_EQUALS  cut_xy | cut_xz
+   * cut_x   DEAL_II_EQUALS  cut_xy & cut_xz
    * @endcode
    *
    * Only those cuts that are reasonable in a given space dimension are
@@ -705,9 +705,9 @@ struct RefinementPossibilities<3>
    * following relations hold (among others):
    *
    * @code
-   * cut_xy  == cut_x  | cut_y
-   * cut_xyz == cut_xy | cut_xz
-   * cut_x   == cut_xy & cut_xz
+   * cut_xy  DEAL_II_EQUALS  cut_x  | cut_y
+   * cut_xyz DEAL_II_EQUALS  cut_xy | cut_xz
+   * cut_x   DEAL_II_EQUALS  cut_xy & cut_xz
    * @endcode
    *
    * Only those cuts that are reasonable in a given space dimension are
@@ -1200,7 +1200,7 @@ namespace internal
      * Store the refinement case as a bit field with as many bits as are
      * necessary in any given dimension.
      */
-    std::uint8_t value : (dim == 3 ? 4 : 1);
+    std::uint8_t value : (dim DEAL_II_EQUALS 3 ? 4 : 1);
   };
 
 } // namespace internal
@@ -1258,7 +1258,7 @@ struct GeometryInfo<0>
    * Here, we are looping over all faces of all cells, with `face_index`
    * taking on all valid indices.
    *
-   * Of course, since this class is for the case `dim==0`, the
+   * Of course, since this class is for the case `dimDEAL_II_EQUALS 0`, the
    * returned object is actually an empty array.
    */
   static std::array<unsigned int, 0>
@@ -1299,7 +1299,7 @@ struct GeometryInfo<0>
    * Here, we are looping over all vertices of all cells, with `vertex_index`
    * taking on all valid indices.
    *
-   * Of course, since this class is for the case `dim==0`, the
+   * Of course, since this class is for the case `dimDEAL_II_EQUALS 0`, the
    * returned object is a array with just one entry: zero. That's
    * because an of dimension zero is really just a single point,
    * corresponding to a vertex itself.
@@ -1327,8 +1327,8 @@ struct GeometryInfo<0>
    * Hence this function is simply a wrapper of child_cell_on_face() giving it
    * a suggestive name.
    *
-   * Of course, since this class is for the case `dim==0`, this function
-   * is not implemented.
+   * Of course, since this class is for the case `dimDEAL_II_EQUALS 0`, this
+   * function is not implemented.
    */
   static unsigned int
   face_to_cell_vertices(const unsigned int face,
@@ -1348,8 +1348,8 @@ struct GeometryInfo<0>
    * defaults to <tt>true</tt>, <tt>face_flip</tt> and <tt>face_rotation</tt>
    * default to <tt>false</tt> (standard orientation) and has no effect in 2d.
    *
-   * Of course, since this class is for the case `dim==0`, this function
-   * is not implemented.
+   * Of course, since this class is for the case `dimDEAL_II_EQUALS 0`, this
+   * function is not implemented.
    */
   static unsigned int
   face_to_cell_lines(const unsigned int face,
@@ -1489,10 +1489,10 @@ struct GeometryInfo<0>
  * grid; however, it is automatically preserved upon refinement.
  *
  * Further we define that child lines have the same direction as their parent,
- * i.e. that <tt>line->child(0)->vertex(0)==line->vertex(0)</tt> and
- * <tt>line->child(1)->vertex(1)==line->vertex(1)</tt>. This also implies,
- * that the first sub-line (<tt>line->child(0)</tt>) is the one at vertex(0)
- * of the old line.
+ * i.e. that <tt>line->child(0)->vertex(0)DEAL_II_EQUALS line->vertex(0)</tt>
+ * and <tt>line->child(1)->vertex(1)DEAL_II_EQUALS line->vertex(1)</tt>. This
+ * also implies, that the first sub-line (<tt>line->child(0)</tt>) is the one at
+ * vertex(0) of the old line.
  *
  * Similarly we define, that the four children of a quad are adjacent to the
  * vertex with the same number of the old quad.
@@ -2506,28 +2506,28 @@ struct GeometryInfo
    * volume and normal vectors of the mapping from reference element to the
    * element described by the vertices.
    *
-   * For example, if dim==spacedim==2, then the alternating form is a scalar
-   * (because spacedim-dim=0) and its value equals $\mathbf v_1\wedge \mathbf
-   * v_2=\mathbf v_1^\perp \cdot\mathbf v_2$, where $\mathbf v_1^\perp$ is a
-   * vector that is rotated to the right by 90 degrees from $\mathbf v_1$. If
-   * dim==spacedim==3, then the result is again a scalar with value $\mathbf
-   * v_1\wedge \mathbf v_2 \wedge \mathbf v_3 = (\mathbf v_1\times \mathbf
-   * v_2)\cdot \mathbf v_3$, where $\mathbf v_1, \mathbf v_2, \mathbf v_3$ are
-   * the images of the unit vectors at a vertex of the unit dim-dimensional
-   * cell under transformation to the dim-dimensional cell in spacedim-
-   * dimensional space. In both cases, i.e. for dim==2 or 3, the result
-   * happens to equal the determinant of the Jacobian of the mapping from
-   * reference cell to cell in real space. Note that it is the actual
-   * determinant, not its absolute value as often used in transforming
-   * integrals from one coordinate system to another. In particular, if the
-   * object specified by the vertices is a parallelogram (i.e. a linear
-   * transformation of the reference cell) then the computed values are the
-   * same at all vertices and equal the (signed) area of the cell; similarly,
-   * for parallel-epipeds, it is the volume of the cell.
+   * For example, if dimDEAL_II_EQUALS spacedimDEAL_II_EQUALS 2, then the
+   * alternating form is a scalar (because spacedim-dim=0) and its value equals
+   * $\mathbf v_1\wedge \mathbf v_2=\mathbf v_1^\perp \cdot\mathbf v_2$, where
+   * $\mathbf v_1^\perp$ is a vector that is rotated to the right by 90 degrees
+   * from $\mathbf v_1$. If dimDEAL_II_EQUALS spacedimDEAL_II_EQUALS 3, then the
+   * result is again a scalar with value $\mathbf v_1\wedge \mathbf v_2 \wedge
+   * \mathbf v_3 = (\mathbf v_1\times \mathbf v_2)\cdot \mathbf v_3$, where
+   * $\mathbf v_1, \mathbf v_2, \mathbf v_3$ are the images of the unit vectors
+   * at a vertex of the unit dim-dimensional cell under transformation to the
+   * dim-dimensional cell in spacedim- dimensional space. In both cases, i.e.
+   * for dimDEAL_II_EQUALS 2 or 3, the result happens to equal the determinant
+   * of the Jacobian of the mapping from reference cell to cell in real space.
+   * Note that it is the actual determinant, not its absolute value as often
+   * used in transforming integrals from one coordinate system to another. In
+   * particular, if the object specified by the vertices is a parallelogram
+   * (i.e. a linear transformation of the reference cell) then the computed
+   * values are the same at all vertices and equal the (signed) area of the
+   * cell; similarly, for parallel-epipeds, it is the volume of the cell.
    *
-   * Likewise, if we have dim==spacedim-1 (e.g. we have a quad in 3d space, or
-   * a line in 2d), then the alternating product denotes the normal vector
-   * (i.e. a rank-1 tensor, since spacedim-dim=1) to the object at each
+   * Likewise, if we have dimDEAL_II_EQUALS spacedim-1 (e.g. we have a quad in
+   * 3d space, or a line in 2d), then the alternating product denotes the normal
+   * vector (i.e. a rank-1 tensor, since spacedim-dim=1) to the object at each
    * vertex, where the normal vector's magnitude denotes the area element of
    * the transformation from the reference object to the object given by the
    * vertices. In particular, if again the mapping from reference object to
@@ -2776,9 +2776,8 @@ inline RefinementCase<dim>::RefinementCase(
   // the given argument are set that
   // make sense for a given space
   // dimension
-  Assert((refinement_case &
-          RefinementPossibilities<dim>::isotropic_refinement) ==
-           refinement_case,
+  Assert((refinement_case & RefinementPossibilities<dim>::isotropic_refinement)
+           DEAL_II_EQUALS refinement_case,
          ExcInvalidRefinementCase(refinement_case));
 }
 
@@ -2792,9 +2791,8 @@ inline RefinementCase<dim>::RefinementCase(const std::uint8_t refinement_case)
   // the given argument are set that
   // make sense for a given space
   // dimension
-  Assert((refinement_case &
-          RefinementPossibilities<dim>::isotropic_refinement) ==
-           refinement_case,
+  Assert((refinement_case & RefinementPossibilities<dim>::isotropic_refinement)
+           DEAL_II_EQUALS refinement_case,
          ExcInvalidRefinementCase(refinement_case));
 }
 
@@ -2943,7 +2941,7 @@ template <>
 inline unsigned int
 GeometryInfo<1>::child_cell_from_point(const Point<1> &p)
 {
-  Assert((p[0] >= 0) && (p[0] <= 1), ExcInvalidCoordinate(p[0]));
+  Assert((p[0] >= 0) DEAL_II_AND(p[0] <= 1), ExcInvalidCoordinate(p[0]));
 
   return (p[0] <= 0.5 ? 0 : 1);
 }
@@ -2954,8 +2952,8 @@ template <>
 inline unsigned int
 GeometryInfo<2>::child_cell_from_point(const Point<2> &p)
 {
-  Assert((p[0] >= 0) && (p[0] <= 1), ExcInvalidCoordinate(p[0]));
-  Assert((p[1] >= 0) && (p[1] <= 1), ExcInvalidCoordinate(p[1]));
+  Assert((p[0] >= 0) DEAL_II_AND(p[0] <= 1), ExcInvalidCoordinate(p[0]));
+  Assert((p[1] >= 0) DEAL_II_AND(p[1] <= 1), ExcInvalidCoordinate(p[1]));
 
   return (p[0] <= 0.5 ? (p[1] <= 0.5 ? 0 : 2) : (p[1] <= 0.5 ? 1 : 3));
 }
@@ -2966,9 +2964,9 @@ template <>
 inline unsigned int
 GeometryInfo<3>::child_cell_from_point(const Point<3> &p)
 {
-  Assert((p[0] >= 0) && (p[0] <= 1), ExcInvalidCoordinate(p[0]));
-  Assert((p[1] >= 0) && (p[1] <= 1), ExcInvalidCoordinate(p[1]));
-  Assert((p[2] >= 0) && (p[2] <= 1), ExcInvalidCoordinate(p[2]));
+  Assert((p[0] >= 0) DEAL_II_AND(p[0] <= 1), ExcInvalidCoordinate(p[0]));
+  Assert((p[1] >= 0) DEAL_II_AND(p[1] <= 1), ExcInvalidCoordinate(p[1]));
+  Assert((p[2] >= 0) DEAL_II_AND(p[2] <= 1), ExcInvalidCoordinate(p[2]));
 
   return (p[0] <= 0.5 ?
             (p[1] <= 0.5 ? (p[2] <= 0.5 ? 0 : 4) : (p[2] <= 0.5 ? 2 : 6)) :
@@ -2995,7 +2993,8 @@ GeometryInfo<1>::cell_to_child_coordinates(const Point<1> &        p,
 
 {
   AssertIndexRange(child_index, 2);
-  Assert(refine_case == RefinementCase<1>::cut_x, ExcInternalError());
+  Assert(refine_case DEAL_II_EQUALS RefinementCase<1>::cut_x,
+         ExcInternalError());
   (void)refine_case; // removes -Wunused-parameter warning in optimized mode
 
   return Point<1>(p * 2.0 - unit_cell_vertex(child_index));
@@ -3017,12 +3016,12 @@ GeometryInfo<2>::cell_to_child_coordinates(const Point<2> &        p,
     {
       case RefinementCase<2>::cut_x:
         point[0] *= 2.0;
-        if (child_index == 1)
+        if (child_index DEAL_II_EQUALS 1)
           point[0] -= 1.0;
         break;
       case RefinementCase<2>::cut_y:
         point[1] *= 2.0;
-        if (child_index == 1)
+        if (child_index DEAL_II_EQUALS 1)
           point[1] -= 1.0;
         break;
       case RefinementCase<2>::cut_xy:
@@ -3057,25 +3056,25 @@ GeometryInfo<3>::cell_to_child_coordinates(const Point<3> &        p,
     {
       case RefinementCase<3>::cut_x:
         point[0] *= 2.0;
-        if (child_index == 1)
+        if (child_index DEAL_II_EQUALS 1)
           point[0] -= 1.0;
         break;
       case RefinementCase<3>::cut_y:
         point[1] *= 2.0;
-        if (child_index == 1)
+        if (child_index DEAL_II_EQUALS 1)
           point[1] -= 1.0;
         break;
       case RefinementCase<3>::cut_z:
         point[2] *= 2.0;
-        if (child_index == 1)
+        if (child_index DEAL_II_EQUALS 1)
           point[2] -= 1.0;
         break;
       case RefinementCase<3>::cut_xy:
         point[0] *= 2.0;
         point[1] *= 2.0;
-        if (child_index % 2 == 1)
+        if (child_index % 2 DEAL_II_EQUALS 1)
           point[0] -= 1.0;
-        if (child_index / 2 == 1)
+        if (child_index / 2 DEAL_II_EQUALS 1)
           point[1] -= 1.0;
         break;
       case RefinementCase<3>::cut_xz:
@@ -3085,17 +3084,17 @@ GeometryInfo<3>::cell_to_child_coordinates(const Point<3> &        p,
         // children!
         point[0] *= 2.0;
         point[2] *= 2.0;
-        if (child_index / 2 == 1)
+        if (child_index / 2 DEAL_II_EQUALS 1)
           point[0] -= 1.0;
-        if (child_index % 2 == 1)
+        if (child_index % 2 DEAL_II_EQUALS 1)
           point[2] -= 1.0;
         break;
       case RefinementCase<3>::cut_yz:
         point[1] *= 2.0;
         point[2] *= 2.0;
-        if (child_index % 2 == 1)
+        if (child_index % 2 DEAL_II_EQUALS 1)
           point[1] -= 1.0;
-        if (child_index / 2 == 1)
+        if (child_index / 2 DEAL_II_EQUALS 1)
           point[2] -= 1.0;
         break;
       case RefinementCase<3>::cut_xyz:
@@ -3133,7 +3132,8 @@ GeometryInfo<1>::child_to_cell_coordinates(const Point<1> &        p,
 
 {
   AssertIndexRange(child_index, 2);
-  Assert(refine_case == RefinementCase<1>::cut_x, ExcInternalError());
+  Assert(refine_case DEAL_II_EQUALS RefinementCase<1>::cut_x,
+         ExcInternalError());
   (void)refine_case; // removes -Wunused-parameter warning in optimized mode
 
   return (p + unit_cell_vertex(child_index)) * 0.5;
@@ -3159,24 +3159,24 @@ GeometryInfo<3>::child_to_cell_coordinates(const Point<3> &        p,
   switch (refine_case)
     {
       case RefinementCase<3>::cut_x:
-        if (child_index == 1)
+        if (child_index DEAL_II_EQUALS 1)
           point[0] += 1.0;
         point[0] *= 0.5;
         break;
       case RefinementCase<3>::cut_y:
-        if (child_index == 1)
+        if (child_index DEAL_II_EQUALS 1)
           point[1] += 1.0;
         point[1] *= 0.5;
         break;
       case RefinementCase<3>::cut_z:
-        if (child_index == 1)
+        if (child_index DEAL_II_EQUALS 1)
           point[2] += 1.0;
         point[2] *= 0.5;
         break;
       case RefinementCase<3>::cut_xy:
-        if (child_index % 2 == 1)
+        if (child_index % 2 DEAL_II_EQUALS 1)
           point[0] += 1.0;
-        if (child_index / 2 == 1)
+        if (child_index / 2 DEAL_II_EQUALS 1)
           point[1] += 1.0;
         point[0] *= 0.5;
         point[1] *= 0.5;
@@ -3186,17 +3186,17 @@ GeometryInfo<3>::child_to_cell_coordinates(const Point<3> &        p,
         // different from xy and yz due to
         // different internal numbering of
         // children!
-        if (child_index / 2 == 1)
+        if (child_index / 2 DEAL_II_EQUALS 1)
           point[0] += 1.0;
-        if (child_index % 2 == 1)
+        if (child_index % 2 DEAL_II_EQUALS 1)
           point[2] += 1.0;
         point[0] *= 0.5;
         point[2] *= 0.5;
         break;
       case RefinementCase<3>::cut_yz:
-        if (child_index % 2 == 1)
+        if (child_index % 2 DEAL_II_EQUALS 1)
           point[1] += 1.0;
-        if (child_index / 2 == 1)
+        if (child_index / 2 DEAL_II_EQUALS 1)
           point[2] += 1.0;
         point[1] *= 0.5;
         point[2] *= 0.5;
@@ -3226,12 +3226,12 @@ GeometryInfo<2>::child_to_cell_coordinates(const Point<2> &        p,
   switch (refine_case)
     {
       case RefinementCase<2>::cut_x:
-        if (child_index == 1)
+        if (child_index DEAL_II_EQUALS 1)
           point[0] += 1.0;
         point[0] *= 0.5;
         break;
       case RefinementCase<2>::cut_y:
-        if (child_index == 1)
+        if (child_index DEAL_II_EQUALS 1)
           point[1] += 1.0;
         point[1] *= 0.5;
         break;
@@ -3273,7 +3273,7 @@ template <>
 inline bool
 GeometryInfo<1>::is_inside_unit_cell(const Point<1> &p)
 {
-  return (p[0] >= 0.) && (p[0] <= 1.);
+  return (p[0] >= 0.) DEAL_II_AND(p[0] <= 1.);
 }
 
 
@@ -3282,7 +3282,8 @@ template <>
 inline bool
 GeometryInfo<2>::is_inside_unit_cell(const Point<2> &p)
 {
-  return (p[0] >= 0.) && (p[0] <= 1.) && (p[1] >= 0.) && (p[1] <= 1.);
+  return (p[0] >= 0.) DEAL_II_AND(p[0] <= 1.) DEAL_II_AND(p[1] >= 0.)
+    DEAL_II_AND(p[1] <= 1.);
 }
 
 
@@ -3291,8 +3292,8 @@ template <>
 inline bool
 GeometryInfo<3>::is_inside_unit_cell(const Point<3> &p)
 {
-  return (p[0] >= 0.) && (p[0] <= 1.) && (p[1] >= 0.) && (p[1] <= 1.) &&
-         (p[2] >= 0.) && (p[2] <= 1.);
+  return (p[0] >= 0.) DEAL_II_AND(p[0] <= 1.) DEAL_II_AND(p[1] >= 0.)
+    DEAL_II_AND(p[1] <= 1.) DEAL_II_AND(p[2] >= 0.) DEAL_II_AND(p[2] <= 1.);
 }
 
 
@@ -3309,7 +3310,7 @@ template <>
 inline bool
 GeometryInfo<1>::is_inside_unit_cell(const Point<1> &p, const double eps)
 {
-  return (p[0] >= -eps) && (p[0] <= 1. + eps);
+  return (p[0] >= -eps) DEAL_II_AND(p[0] <= 1. + eps);
 }
 
 
@@ -3319,7 +3320,8 @@ inline bool
 GeometryInfo<2>::is_inside_unit_cell(const Point<2> &p, const double eps)
 {
   const double l = -eps, u = 1 + eps;
-  return (p[0] >= l) && (p[0] <= u) && (p[1] >= l) && (p[1] <= u);
+  return (p[0] >= l) DEAL_II_AND(p[0] <= u) DEAL_II_AND(p[1] >= l)
+    DEAL_II_AND(p[1] <= u);
 }
 
 
@@ -3329,8 +3331,8 @@ inline bool
 GeometryInfo<3>::is_inside_unit_cell(const Point<3> &p, const double eps)
 {
   const double l = -eps, u = 1.0 + eps;
-  return (p[0] >= l) && (p[0] <= u) && (p[1] >= l) && (p[1] <= u) &&
-         (p[2] >= l) && (p[2] <= u);
+  return (p[0] >= l) DEAL_II_AND(p[0] <= u) DEAL_II_AND(p[1] >= l)
+    DEAL_II_AND(p[1] <= u) DEAL_II_AND(p[2] >= l) DEAL_II_AND(p[2] <= u);
 }
 
 
@@ -3490,7 +3492,7 @@ template <>
 inline unsigned int
 GeometryInfo<2>::n_subfaces(const internal::SubfaceCase<2> &subface_case)
 {
-  return (subface_case == internal::SubfaceCase<2>::case_x) ? 2 : 0;
+  return (subface_case DEAL_II_EQUALS internal::SubfaceCase<2>::case_x) ? 2 : 0;
 }
 
 
@@ -3605,7 +3607,7 @@ GeometryInfo<3>::subface_ratio(const internal::SubfaceCase<3> &subface_case,
         break;
       case internal::SubfaceCase<3>::case_x2y:
       case internal::SubfaceCase<3>::case_y2x:
-        if (subface_no == 0)
+        if (subface_no DEAL_II_EQUALS 0)
           ratio = 0.5;
         else
           ratio = 0.25;
@@ -3742,7 +3744,7 @@ GeometryInfo<3>::face_refinement_case(
   // and face_rotation. for face_orientation,
   // 'true' is the default value whereas for
   // face_rotation, 'false' is standard. If
-  // <tt>face_rotation==face_orientation</tt>,
+  // <tt>face_rotationDEAL_II_EQUALS face_orientation</tt>,
   // then one of them is non-standard and we
   // have to swap cut_x and cut_y, otherwise no
   // change is necessary.  face_flip has no
@@ -3750,7 +3752,8 @@ GeometryInfo<3>::face_refinement_case(
   // interface consistent with other functions,
   // we still include it as an argument to this
   // function
-  return (face_orientation == face_rotation) ? flip[ref_case] : ref_case;
+  return (face_orientation DEAL_II_EQUALS face_rotation) ? flip[ref_case] :
+                                                           ref_case;
 }
 
 
@@ -3869,7 +3872,7 @@ GeometryInfo<2>::min_cell_refinement_case_for_face_refinement(
                    RefinementCase<dim - 1>::isotropic_refinement + 1);
   AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
 
-  if (face_refinement_case == RefinementCase<dim>::cut_x)
+  if (face_refinement_case DEAL_II_EQUALS RefinementCase<dim>::cut_x)
     return (face_no / 2) ? RefinementCase<dim>::cut_x :
                            RefinementCase<dim>::cut_y;
   else
@@ -3901,7 +3904,7 @@ GeometryInfo<3>::min_cell_refinement_case_for_face_refinement(
   // face_orientation, 'true' is the default
   // value whereas for face_rotation, 'false'
   // is standard. If
-  // <tt>face_rotation==face_orientation</tt>,
+  // <tt>face_rotationDEAL_II_EQUALS face_orientation</tt>,
   // then one of them is non-standard and we
   // have to swap cut_x and cut_y, otherwise no
   // change is necessary.  face_flip has no
@@ -3910,8 +3913,9 @@ GeometryInfo<3>::min_cell_refinement_case_for_face_refinement(
   // we still include it as an argument to this
   // function
   const RefinementCase<dim - 1> std_face_ref =
-    (face_orientation == face_rotation) ? flip[face_refinement_case] :
-                                          face_refinement_case;
+    (face_orientation DEAL_II_EQUALS face_rotation) ?
+      flip[face_refinement_case] :
+      face_refinement_case;
 
   const RefinementCase<dim> face_to_cell[3][4] = {
     {RefinementCase<dim>::no_refinement, // faces 0 and 1
@@ -4379,8 +4383,8 @@ GeometryInfo<3>::child_cell_on_face(const RefinementCase<3> &ref_case,
   Assert(ref_case > RefinementCase<dim - 1>::no_refinement,
          ExcMessage("Cell has no children."));
   AssertIndexRange(face, faces_per_cell);
-  if (!(subface == 0 &&
-        face_ref_case == RefinementCase<dim - 1>::no_refinement))
+  if (!(subface DEAL_II_EQUALS 0 DEAL_II_AND face_ref_case DEAL_II_EQUALS
+                                                           RefinementCase<dim - 1>::no_refinement))
     {
       AssertIndexRange(subface,
                        GeometryInfo<dim - 1>::n_children(face_ref_case));
@@ -4412,12 +4416,13 @@ GeometryInfo<3>::child_cell_on_face(const RefinementCase<3> &ref_case,
   // for face_orientation, 'true' is the
   // default value whereas for face_rotation,
   // 'false' is standard. If
-  // <tt>face_rotation==face_orientation</tt>,
+  // <tt>face_rotationDEAL_II_EQUALS face_orientation</tt>,
   // then one of them is non-standard and we
   // have to swap cut_x and cut_y, otherwise no
   // change is necessary.
   const RefinementCase<dim - 1> std_face_ref =
-    (face_orientation == face_rotation) ? flip[face_ref_case] : face_ref_case;
+    (face_orientation DEAL_II_EQUALS face_rotation) ? flip[face_ref_case] :
+                                                      face_ref_case;
 
   // second step: convert the given subface
   // index to the one for a standard face
@@ -4549,8 +4554,8 @@ GeometryInfo<3>::child_cell_on_face(const RefinementCase<3> &ref_case,
   // face refinement cases here and thus must
   // not pass the given orientation, flip and
   // rotation flags
-  if ((std_face_ref & face_refinement_case(ref_case, face)) ==
-      face_refinement_case(ref_case, face))
+  if ((std_face_ref & face_refinement_case(ref_case, face))
+        DEAL_II_EQUALS face_refinement_case(ref_case, face))
     {
       // all is fine. for anisotropic face
       // refine cases, select one of the
@@ -4968,7 +4973,7 @@ GeometryInfo<dim>::alternating_form_at_vertices
   // of the mapped unit
   // vectors. consider for
   // example the case of a quad
-  // in spacedim==3: to do so, we
+  // in spacedimDEAL_II_EQUALS 3: to do so, we
   // need to see how the
   // infinitesimal vectors
   // (d\xi_1,0) and (0,d\xi_2)

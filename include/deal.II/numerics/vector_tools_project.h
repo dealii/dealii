@@ -95,7 +95,7 @@ namespace VectorTools
    * - the FiniteElement is supported by the MatrixFree class,
    * - the FiniteElement has less than five components
    * - the degree of the FiniteElement is less than nine.
-   * - dim==spacedim
+   * - dimDEAL_II_EQUALS spacedim
    *
    * In this case, this function performs numerical quadrature using the given
    * quadrature formula for integration of the right hand side $\Phi_i$ while a

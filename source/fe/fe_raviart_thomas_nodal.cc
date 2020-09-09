@@ -176,7 +176,7 @@ FE_RaviartThomasNodal<dim>::initialize_support_points(const unsigned int deg)
   if (dim > 1)
     {
       QGauss<dim - 1> face_points(deg + 1);
-      Assert(face_points.size() == this->n_dofs_per_face(face_no),
+      Assert(face_points.size() DEAL_II_EQUALS this->n_dofs_per_face(face_no),
              ExcInternalError());
       for (unsigned int k = 0; k < this->n_dofs_per_face(face_no); ++k)
         this->generalized_face_support_points[face_no][k] =
@@ -200,7 +200,7 @@ FE_RaviartThomasNodal<dim>::initialize_support_points(const unsigned int deg)
         this->n_dofs_per_face(face_no) * GeometryInfo<dim>::faces_per_cell;
     }
 
-  if (deg == 0)
+  if (deg DEAL_II_EQUALS 0)
     return;
   // In the interior, we need
   // anisotropic Gauss quadratures,
@@ -217,15 +217,15 @@ FE_RaviartThomasNodal<dim>::initialize_support_points(const unsigned int deg)
             quadrature = std::make_unique<QAnisotropic<dim>>(high);
             break;
           case 2:
-            quadrature =
-              std::make_unique<QAnisotropic<dim>>(((d == 0) ? low : high),
-                                                  ((d == 1) ? low : high));
+            quadrature = std::make_unique<QAnisotropic<dim>>(
+              ((d DEAL_II_EQUALS 0) ? low : high),
+              ((d DEAL_II_EQUALS 1) ? low : high));
             break;
           case 3:
-            quadrature =
-              std::make_unique<QAnisotropic<dim>>(((d == 0) ? low : high),
-                                                  ((d == 1) ? low : high),
-                                                  ((d == 2) ? low : high));
+            quadrature = std::make_unique<QAnisotropic<dim>>(
+              ((d DEAL_II_EQUALS 0) ? low : high),
+              ((d DEAL_II_EQUALS 1) ? low : high),
+              ((d DEAL_II_EQUALS 2) ? low : high));
             break;
           default:
             Assert(false, ExcNotImplemented());
@@ -234,7 +234,7 @@ FE_RaviartThomasNodal<dim>::initialize_support_points(const unsigned int deg)
       for (unsigned int k = 0; k < quadrature->size(); ++k)
         this->generalized_support_points[current++] = quadrature->point(k);
     }
-  Assert(current == this->n_dofs_per_cell(), ExcInternalError());
+  Assert(current DEAL_II_EQUALS this->n_dofs_per_cell(), ExcInternalError());
 }
 
 
@@ -330,12 +330,13 @@ FE_RaviartThomasNodal<dim>::
     const std::vector<Vector<double>> &support_point_values,
     std::vector<double> &              nodal_values) const
 {
-  Assert(support_point_values.size() == this->generalized_support_points.size(),
+  Assert(support_point_values.size()
+           DEAL_II_EQUALS this->generalized_support_points.size(),
          ExcDimensionMismatch(support_point_values.size(),
                               this->generalized_support_points.size()));
-  Assert(nodal_values.size() == this->n_dofs_per_cell(),
+  Assert(nodal_values.size() DEAL_II_EQUALS this->n_dofs_per_cell(),
          ExcDimensionMismatch(nodal_values.size(), this->n_dofs_per_cell()));
-  Assert(support_point_values[0].size() == this->n_components(),
+  Assert(support_point_values[0].size() DEAL_II_EQUALS this->n_components(),
          ExcDimensionMismatch(support_point_values[0].size(),
                               this->n_components()));
 
@@ -358,7 +359,8 @@ FE_RaviartThomasNodal<dim>::
   // The remaining points form dim
   // chunks, one for each component.
   const unsigned int istep = (this->n_dofs_per_cell() - fbase) / dim;
-  Assert((this->n_dofs_per_cell() - fbase) % dim == 0, ExcInternalError());
+  Assert((this->n_dofs_per_cell() - fbase) % dim DEAL_II_EQUALS 0,
+         ExcInternalError());
 
   f = 0;
   while (fbase < this->n_dofs_per_cell())
@@ -370,7 +372,7 @@ FE_RaviartThomasNodal<dim>::
       fbase += istep;
       ++f;
     }
-  Assert(fbase == this->n_dofs_per_cell(), ExcInternalError());
+  Assert(fbase DEAL_II_EQUALS this->n_dofs_per_cell(), ExcInternalError());
 }
 
 
@@ -453,11 +455,11 @@ FE_RaviartThomasNodal<dim>::hp_line_dof_identities(
 
       std::vector<std::pair<unsigned int, unsigned int>> identities;
 
-      if (p == q)
+      if (p DEAL_II_EQUALS q)
         for (unsigned int i = 0; i < p + 1; ++i)
           identities.emplace_back(i, i);
 
-      else if (p % 2 == 0 && q % 2 == 0)
+      else if (p % 2 DEAL_II_EQUALS 0 DEAL_II_AND q % 2 DEAL_II_EQUALS 0)
         identities.emplace_back(p / 2, q / 2);
 
       return identities;
@@ -503,11 +505,11 @@ FE_RaviartThomasNodal<dim>::hp_quad_dof_identities(
 
       std::vector<std::pair<unsigned int, unsigned int>> identities;
 
-      if (p == q)
+      if (p DEAL_II_EQUALS q)
         for (unsigned int i = 0; i < p; ++i)
           identities.emplace_back(i, i);
 
-      else if (p % 2 != 0 && q % 2 != 0)
+      else if (p % 2 != 0 DEAL_II_AND q % 2 != 0)
         identities.emplace_back(p / 2, q / 2);
 
       return identities;
@@ -542,7 +544,7 @@ FE_RaviartThomasNodal<dim>::compare_for_domination(
     {
       if (this->degree < fe_rt_nodal_other->degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_rt_nodal_other->degree)
+      else if (this->degree DEAL_II_EQUALS fe_rt_nodal_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;
@@ -599,15 +601,17 @@ FE_RaviartThomasNodal<dim>::get_face_interpolation_matrix(
   // this is only implemented, if the
   // source FE is also a
   // RaviartThomasNodal element
-  AssertThrow((x_source_fe.get_name().find("FE_RaviartThomasNodal<") == 0) ||
-                (dynamic_cast<const FE_RaviartThomasNodal<dim> *>(
-                   &x_source_fe) != nullptr),
+  AssertThrow((x_source_fe.get_name().find("FE_RaviartThomasNodal<")
+                 DEAL_II_EQUALS 0)
+                DEAL_II_OR(dynamic_cast<const FE_RaviartThomasNodal<dim> *>(
+                             &x_source_fe) != nullptr),
               typename FiniteElement<dim>::ExcInterpolationNotImplemented());
 
-  Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS this->n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.n(),
                               this->n_dofs_per_face(face_no)));
-  Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.m()
+           DEAL_II_EQUALS x_source_fe.n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.m(),
                               x_source_fe.n_dofs_per_face(face_no)));
 
@@ -707,15 +711,17 @@ FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix(
   // this is only implemented, if the
   // source FE is also a
   // RaviartThomasNodal element
-  AssertThrow((x_source_fe.get_name().find("FE_RaviartThomasNodal<") == 0) ||
-                (dynamic_cast<const FE_RaviartThomasNodal<dim> *>(
-                   &x_source_fe) != nullptr),
+  AssertThrow((x_source_fe.get_name().find("FE_RaviartThomasNodal<")
+                 DEAL_II_EQUALS 0)
+                DEAL_II_OR(dynamic_cast<const FE_RaviartThomasNodal<dim> *>(
+                             &x_source_fe) != nullptr),
               typename FiniteElement<dim>::ExcInterpolationNotImplemented());
 
-  Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS this->n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.n(),
                               this->n_dofs_per_face(face_no)));
-  Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.m()
+           DEAL_II_EQUALS x_source_fe.n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.m(),
                               x_source_fe.n_dofs_per_face(face_no)));
 

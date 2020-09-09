@@ -107,7 +107,7 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
   std::vector<DataOutBase::Patch<dimension + 1, space_dimension + 1>>
     &my_patches)
 {
-  if (dim == 3)
+  if (dim DEAL_II_EQUALS 3)
     {
       // would this function make any sense after all? who would want to
       // output/compute in four space dimensions?
@@ -213,7 +213,7 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
                   const UpdateFlags update_flags =
                     postprocessor->get_needed_update_flags();
 
-                  if (n_components == 1)
+                  if (n_components DEAL_II_EQUALS 1)
                     {
                       // at each point there is
                       // only one component of
@@ -328,7 +328,7 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
                         }
                     }
                 }
-              else if (n_components == 1)
+              else if (n_components DEAL_II_EQUALS 1)
                 {
                   this->dof_data[dataset]->get_function_values(
                     fe_patch_values,
@@ -459,7 +459,7 @@ DataOutRotation<dim, DoFHandlerType>::build_patches(
 {
   // Check consistency of redundant
   // template parameter
-  Assert(dim == dimension, ExcDimensionMismatch(dim, dimension));
+  Assert(dim DEAL_II_EQUALS dimension, ExcDimensionMismatch(dim, dimension));
   Assert(this->triangulation != nullptr,
          Exceptions::DataOutImplementation::ExcNoTriangulationSelected());
 

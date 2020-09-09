@@ -151,7 +151,8 @@ MappingFE<dim, spacedim>::InternalData::initialize_face(
                  std::vector<Tensor<1, spacedim>>(n_original_q_points));
 
       // Compute tangentials to the unit cell.
-      if (this->fe.reference_cell_type() == ReferenceCell::get_hypercube(dim))
+      if (this->fe.reference_cell_type()
+            DEAL_II_EQUALS ReferenceCell::get_hypercube(dim))
         {
           for (const unsigned int i : GeometryInfo<dim>::face_indices())
             {
@@ -172,7 +173,8 @@ MappingFE<dim, spacedim>::InternalData::initialize_face(
                 }
             }
         }
-      else if (this->fe.reference_cell_type() == ReferenceCell::Type::Tri)
+      else if (this->fe.reference_cell_type()
+                 DEAL_II_EQUALS ReferenceCell::Type::Tri)
         {
           Tensor<1, dim> t1;
           constexpr int  d0 = 0;
@@ -191,7 +193,8 @@ MappingFE<dim, spacedim>::InternalData::initialize_face(
           for (unsigned int i = 0; i < n_original_q_points; i++)
             unit_tangentials[2].emplace_back(t1);
         }
-      else if (this->fe.reference_cell_type() == ReferenceCell::Type::Tet)
+      else if (this->fe.reference_cell_type()
+                 DEAL_II_EQUALS ReferenceCell::Type::Tet)
         {
           Tensor<1, dim> t1;
           constexpr int  d0 = 0;
@@ -272,13 +275,14 @@ MappingFE<dim, spacedim>::InternalData::compute_shape_function_values(
   std::vector<Tensor<1, dim>> grads;
   if (shape_values.size() != 0)
     {
-      Assert(shape_values.size() == n_shape_functions * n_points,
+      Assert(shape_values.size() DEAL_II_EQUALS n_shape_functions * n_points,
              ExcInternalError());
       values.resize(n_shape_functions);
     }
   if (shape_derivatives.size() != 0)
     {
-      Assert(shape_derivatives.size() == n_shape_functions * n_points,
+      Assert(shape_derivatives.size() DEAL_II_EQUALS n_shape_functions *
+               n_points,
              ExcInternalError());
       grads.resize(n_shape_functions);
     }
@@ -286,7 +290,8 @@ MappingFE<dim, spacedim>::InternalData::compute_shape_function_values(
   std::vector<Tensor<2, dim>> grad2;
   if (shape_second_derivatives.size() != 0)
     {
-      Assert(shape_second_derivatives.size() == n_shape_functions * n_points,
+      Assert(shape_second_derivatives.size() DEAL_II_EQUALS n_shape_functions *
+               n_points,
              ExcInternalError());
       grad2.resize(n_shape_functions);
     }
@@ -294,7 +299,8 @@ MappingFE<dim, spacedim>::InternalData::compute_shape_function_values(
   std::vector<Tensor<3, dim>> grad3;
   if (shape_third_derivatives.size() != 0)
     {
-      Assert(shape_third_derivatives.size() == n_shape_functions * n_points,
+      Assert(shape_third_derivatives.size() DEAL_II_EQUALS n_shape_functions *
+               n_points,
              ExcInternalError());
       grad3.resize(n_shape_functions);
     }
@@ -302,16 +308,17 @@ MappingFE<dim, spacedim>::InternalData::compute_shape_function_values(
   std::vector<Tensor<4, dim>> grad4;
   if (shape_fourth_derivatives.size() != 0)
     {
-      Assert(shape_fourth_derivatives.size() == n_shape_functions * n_points,
+      Assert(shape_fourth_derivatives.size() DEAL_II_EQUALS n_shape_functions *
+               n_points,
              ExcInternalError());
       grad4.resize(n_shape_functions);
     }
 
 
-  if (shape_values.size() != 0 || shape_derivatives.size() != 0 ||
-      shape_second_derivatives.size() != 0 ||
-      shape_third_derivatives.size() != 0 ||
-      shape_fourth_derivatives.size() != 0)
+  if (shape_values.size() != 0 DEAL_II_OR shape_derivatives.size() !=
+      0 DEAL_II_OR                        shape_second_derivatives.size() !=
+      0 DEAL_II_OR                        shape_third_derivatives.size() !=
+      0 DEAL_II_OR                        shape_fourth_derivatives.size() != 0)
     for (unsigned int point = 0; point < n_points; ++point)
       {
         tensor_pols.evaluate(
@@ -926,8 +933,8 @@ MappingFE<dim, spacedim>::MappingFE(const FiniteElement<dim, spacedim> &fe)
   Assert(polynomial_degree >= 1,
          ExcMessage("It only makes sense to create polynomial mappings "
                     "with a polynomial degree greater or equal to one."));
-  Assert(fe.tensor_degree() == 1, ExcNotImplemented());
-  Assert(fe.n_components() == 1, ExcNotImplemented());
+  Assert(fe.tensor_degree() DEAL_II_EQUALS 1, ExcNotImplemented());
+  Assert(fe.n_components() DEAL_II_EQUALS 1, ExcNotImplemented());
 }
 
 
@@ -1137,7 +1144,8 @@ MappingFE<dim, spacedim>::fill_fe_values(
   // value is computed with just cell vertices and does not take into account
   // cell curvature.
   const CellSimilarity::Similarity computed_cell_similarity =
-    (polynomial_degree == 1 ? cell_similarity : CellSimilarity::none);
+    (polynomial_degree DEAL_II_EQUALS 1 ? cell_similarity :
+                                          CellSimilarity::none);
 
   internal::MappingFEImplementation::maybe_compute_q_points<dim, spacedim>(
     QProjector<dim>::DataSetDescriptor::cell(),
@@ -1198,8 +1206,8 @@ MappingFE<dim, spacedim>::fill_fe_values(
     {
       AssertDimension(output_data.JxW_values.size(), n_q_points);
 
-      Assert(!(update_flags & update_normal_vectors) ||
-               (output_data.normal_vectors.size() == n_q_points),
+      Assert(!(update_flags & update_normal_vectors) DEAL_II_OR(
+               output_data.normal_vectors.size() DEAL_II_EQUALS n_q_points),
              ExcDimensionMismatch(output_data.normal_vectors.size(),
                                   n_q_points));
 
@@ -1207,7 +1215,7 @@ MappingFE<dim, spacedim>::fill_fe_values(
       if (computed_cell_similarity != CellSimilarity::translation)
         for (unsigned int point = 0; point < n_q_points; ++point)
           {
-            if (dim == spacedim)
+            if (dim DEAL_II_EQUALS spacedim)
               {
                 const double det = data.contravariant[point].determinant();
 
@@ -1224,7 +1232,7 @@ MappingFE<dim, spacedim>::fill_fe_values(
 
                 output_data.JxW_values[point] = weights[point] * det;
               }
-            // if dim==spacedim, then there is no cell normal to
+            // if dimDEAL_II_EQUALS spacedim, then there is no cell normal to
             // compute. since this is for FEValues (and not FEFaceValues),
             // there are also no face normals to compute
             else // codim>0 case
@@ -1242,8 +1250,8 @@ MappingFE<dim, spacedim>::fill_fe_values(
                 output_data.JxW_values[point] =
                   std::sqrt(determinant(G)) * weights[point];
 
-                if (computed_cell_similarity ==
-                    CellSimilarity::inverted_translation)
+                if (computed_cell_similarity DEAL_II_EQUALS
+                                             CellSimilarity::inverted_translation)
                   {
                     // we only need to flip the normal
                     if (update_flags & update_normal_vectors)
@@ -1253,7 +1261,7 @@ MappingFE<dim, spacedim>::fill_fe_values(
                   {
                     if (update_flags & update_normal_vectors)
                       {
-                        Assert(spacedim == dim + 1,
+                        Assert(spacedim DEAL_II_EQUALS dim + 1,
                                ExcMessage(
                                  "There is no (unique) cell normal for " +
                                  Utilities::int_to_string(dim) +
@@ -1263,17 +1271,17 @@ MappingFE<dim, spacedim>::fill_fe_values(
                                  "space dimension is one greater than the "
                                  "dimensionality of the mesh cells."));
 
-                        if (dim == 1)
+                        if (dim DEAL_II_EQUALS 1)
                           output_data.normal_vectors[point] =
                             cross_product_2d(-DX_t[0]);
-                        else // dim == 2
+                        else // dim DEAL_II_EQUALS  2
                           output_data.normal_vectors[point] =
                             cross_product_3d(DX_t[0], DX_t[1]);
 
                         output_data.normal_vectors[point] /=
                           output_data.normal_vectors[point].norm();
 
-                        if (cell->direction_flag() == false)
+                        if (cell->direction_flag() DEAL_II_EQUALS false)
                           output_data.normal_vectors[point] *= -1.;
                       }
                   }
@@ -1377,9 +1385,10 @@ namespace internal
 
             if (update_flags & update_boundary_forms)
               {
-                // if dim==spacedim, we can use the unit tangentials to compute
-                // the boundary form by simply taking the cross product
-                if (dim == spacedim)
+                // if dimDEAL_II_EQUALS spacedim, we can use the unit
+                // tangentials to compute the boundary form by simply taking the
+                // cross product
+                if (dim DEAL_II_EQUALS spacedim)
                   {
                     for (unsigned int i = 0; i < n_q_points; ++i)
                       switch (dim)
@@ -1391,7 +1400,7 @@ namespace internal
                             // boundary form by simply looking at the number of
                             // the face
                             output_data.boundary_forms[i][0] =
-                              (face_no == 0 ? -1 : +1);
+                              (face_no DEAL_II_EQUALS 0 ? -1 : +1);
                             break;
                           case 2:
                             output_data.boundary_forms[i] =
@@ -1417,17 +1426,17 @@ namespace internal
 
                     for (unsigned int point = 0; point < n_q_points; ++point)
                       {
-                        if (dim == 1)
+                        if (dim DEAL_II_EQUALS 1)
                           {
                             // J is a tangent vector
                             output_data.boundary_forms[point] =
                               data.contravariant[point].transpose()[0];
                             output_data.boundary_forms[point] /=
-                              (face_no == 0 ? -1. : +1.) *
+                              (face_no DEAL_II_EQUALS 0 ? -1. : +1.) *
                               output_data.boundary_forms[point].norm();
                           }
 
-                        if (dim == 2)
+                        if (dim DEAL_II_EQUALS 2)
                           {
                             const DerivativeForm<1, spacedim, dim> DX_t =
                               data.contravariant[point].transpose();
@@ -1575,10 +1584,10 @@ MappingFE<dim, spacedim>::fill_fe_face_values(
   // cell (note that we need to first check the triangulation pointer, since
   // otherwise the second test might trigger an exception if the triangulations
   // are not the same)
-  if ((data.mapping_support_points.size() == 0) ||
-      (&cell->get_triangulation() !=
-       &data.cell_of_current_support_points->get_triangulation()) ||
-      (cell != data.cell_of_current_support_points))
+  if ((data.mapping_support_points.size() DEAL_II_EQUALS 0)DEAL_II_OR(
+        &cell->get_triangulation() !=
+        &data.cell_of_current_support_points->get_triangulation())
+        DEAL_II_OR(cell != data.cell_of_current_support_points))
     {
       data.mapping_support_points = this->compute_mapping_support_points(cell);
       data.cell_of_current_support_points = cell;
@@ -1622,10 +1631,10 @@ MappingFE<dim, spacedim>::fill_fe_subface_values(
   // cell (note that we need to first check the triangulation pointer, since
   // otherwise the second test might trigger an exception if the triangulations
   // are not the same)
-  if ((data.mapping_support_points.size() == 0) ||
-      (&cell->get_triangulation() !=
-       &data.cell_of_current_support_points->get_triangulation()) ||
-      (cell != data.cell_of_current_support_points))
+  if ((data.mapping_support_points.size() DEAL_II_EQUALS 0)DEAL_II_OR(
+        &cell->get_triangulation() !=
+        &data.cell_of_current_support_points->get_triangulation())
+        DEAL_II_OR(cell != data.cell_of_current_support_points))
     {
       data.mapping_support_points = this->compute_mapping_support_points(cell);
       data.cell_of_current_support_points = cell;
@@ -1702,7 +1711,7 @@ namespace internal
                   data.update_each & update_volume_elements,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_volume_elements"));
-                Assert(rank == 1, ExcMessage("Only for rank 1"));
+                Assert(rank DEAL_II_EQUALS 1, ExcMessage("Only for rank 1"));
                 if (rank != 1)
                   return;
 
@@ -1767,7 +1776,7 @@ namespace internal
                   data.update_each & update_contravariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_contravariant_transformation"));
-                Assert(rank == 2, ExcMessage("Only for rank 2"));
+                Assert(rank DEAL_II_EQUALS 2, ExcMessage("Only for rank 2"));
 
                 for (unsigned int i = 0; i < output.size(); ++i)
                   {
@@ -1787,7 +1796,7 @@ namespace internal
                   data.update_each & update_covariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_covariant_transformation"));
-                Assert(rank == 2, ExcMessage("Only for rank 2"));
+                Assert(rank DEAL_II_EQUALS 2, ExcMessage("Only for rank 2"));
 
                 for (unsigned int i = 0; i < output.size(); ++i)
                   {
@@ -1815,7 +1824,7 @@ namespace internal
                   data.update_each & update_volume_elements,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_volume_elements"));
-                Assert(rank == 2, ExcMessage("Only for rank 2"));
+                Assert(rank DEAL_II_EQUALS 2, ExcMessage("Only for rank 2"));
 
                 for (unsigned int i = 0; i < output.size(); ++i)
                   {

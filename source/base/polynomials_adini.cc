@@ -48,7 +48,7 @@ PolynomialsAdini<dim>::PolynomialsAdini()
   , dyy(12, 12)
   , dxy(12, 12)
 {
-  Assert(dim == 2, ExcNotImplemented());
+  Assert(dim DEAL_II_EQUALS 2, ExcNotImplemented());
 
   //                          1  x  y  xx yy xy 3x 3y xyy xxy 3xy x3y
   //                          0  1  2  3  4  5  6  7  8   9   10  11
@@ -146,20 +146,28 @@ PolynomialsAdini<dim>::evaluate(
   const unsigned int n_pols = this->n();
   (void)n_pols;
 
-  Assert(values.size() == n_pols || values.size() == 0,
+  Assert(values.size() DEAL_II_EQUALS n_pols DEAL_II_OR values.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch(values.size(), n_pols));
-  Assert(grads.size() == n_pols || grads.size() == 0,
+  Assert(grads.size() DEAL_II_EQUALS n_pols DEAL_II_OR grads.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch(grads.size(), n_pols));
-  Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
+  Assert(grad_grads.size() DEAL_II_EQUALS n_pols DEAL_II_OR grad_grads.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch(grad_grads.size(), n_pols));
   (void)third_derivatives;
-  Assert(third_derivatives.size() == n_pols || third_derivatives.size() == 0,
-         ExcDimensionMismatch(third_derivatives.size(), n_pols));
+  Assert(
+    third_derivatives.size()
+      DEAL_II_EQUALS n_pols DEAL_II_OR third_derivatives.size()
+        DEAL_II_EQUALS 0,
+    ExcDimensionMismatch(third_derivatives.size(), n_pols));
   (void)fourth_derivatives;
-  Assert(fourth_derivatives.size() == n_pols || fourth_derivatives.size() == 0,
+  Assert(fourth_derivatives
+           .size() DEAL_II_EQUALS n_pols DEAL_II_OR fourth_derivatives.size()
+             DEAL_II_EQUALS 0,
          ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
 
-  if (values.empty() == false) // do not bother if empty
+  if (values.empty() DEAL_II_EQUALS false) // do not bother if empty
     {
       for (unsigned int i = 0; i < values.size(); ++i)
         {
@@ -167,7 +175,7 @@ PolynomialsAdini<dim>::evaluate(
         }
     }
 
-  if (grads.empty() == false) // do not bother if empty
+  if (grads.empty() DEAL_II_EQUALS false) // do not bother if empty
     {
       for (unsigned int i = 0; i < grads.size(); ++i)
         {
@@ -175,7 +183,7 @@ PolynomialsAdini<dim>::evaluate(
         }
     }
 
-  if (grad_grads.empty() == false) // do not bother if empty
+  if (grad_grads.empty() DEAL_II_EQUALS false) // do not bother if empty
     {
       for (unsigned int i = 0; i < grad_grads.size(); ++i)
         {

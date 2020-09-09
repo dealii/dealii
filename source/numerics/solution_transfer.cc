@@ -51,7 +51,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::SolutionTransfer(
   Assert((dynamic_cast<const parallel::distributed::Triangulation<
             DoFHandlerType::dimension,
             DoFHandlerType::space_dimension> *>(
-            &dof_handler->get_triangulation()) == nullptr),
+           &dof_handler->get_triangulation()) DEAL_II_EQUALS nullptr),
          ExcMessage("You are calling the dealii::SolutionTransfer class "
                     "with a DoF handler that is built on a "
                     "parallel::distributed::Triangulation. This will not "
@@ -128,9 +128,10 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::refine_interpolate(
   const VectorType &in,
   VectorType &      out) const
 {
-  Assert(prepared_for == pure_refinement, ExcNotPrepared());
-  Assert(in.size() == n_dofs_old, ExcDimensionMismatch(in.size(), n_dofs_old));
-  Assert(out.size() == dof_handler->n_dofs(),
+  Assert(prepared_for DEAL_II_EQUALS pure_refinement, ExcNotPrepared());
+  Assert(in.size() DEAL_II_EQUALS n_dofs_old,
+         ExcDimensionMismatch(in.size(), n_dofs_old));
+  Assert(out.size() DEAL_II_EQUALS dof_handler->n_dofs(),
          ExcDimensionMismatch(out.size(), dof_handler->n_dofs()));
   Assert(&in != &out,
          ExcMessage("Vectors cannot be used as input and output"
@@ -167,7 +168,9 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::refine_interpolate(
           // make sure that the size of the stored indices is the same as
           // dofs_per_cell. since we store the desired fe_index, we know
           // what this size should be
-          Assert(dofs_per_cell == (*pointerstruct->second.indices_ptr).size(),
+          Assert(dofs_per_cell DEAL_II_EQUALS(
+                   *pointerstruct->second.indices_ptr)
+                   .size(),
                  ExcInternalError());
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             local_values(i) = internal::ElementAccess<VectorType>::get(
@@ -201,7 +204,7 @@ namespace internal
   extract_interpolation_matrices(const dealii::DoFHandler<dim, spacedim> &dof,
                                  dealii::Table<2, FullMatrix<double>> &matrices)
   {
-    if (dof.hp_capability_enabled == false)
+    if (dof.hp_capability_enabled DEAL_II_EQUALS false)
       return;
 
     const dealii::hp::FECollection<dim, spacedim> &fe = dof.get_fe_collection();
@@ -279,7 +282,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
 
   for (unsigned int i = 0; i < in_size; ++i)
     {
-      Assert(all_in[i].size() == n_dofs_old,
+      Assert(all_in[i].size() DEAL_II_EQUALS n_dofs_old,
              ExcDimensionMismatch(all_in[i].size(), n_dofs_old));
     }
 
@@ -295,14 +298,15 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
       else
         ++n_cells_to_stay_or_refine;
     }
-  Assert((n_cells_to_coarsen + n_cells_to_stay_or_refine) == n_active_cells,
+  Assert((n_cells_to_coarsen + n_cells_to_stay_or_refine)
+           DEAL_II_EQUALS n_active_cells,
          ExcInternalError());
 
   unsigned int n_coarsen_fathers = 0;
   for (typename DoFHandlerType::cell_iterator cell = dof_handler->begin();
        cell != dof_handler->end();
        ++cell)
-    if (!cell->is_active() && cell->child(0)->coarsen_flag_set())
+    if (!cell->is_active() DEAL_II_AND cell->child(0)->coarsen_flag_set())
       ++n_coarsen_fathers;
   Assert(n_cells_to_coarsen >= 2 * n_coarsen_fathers, ExcInternalError());
 
@@ -333,7 +337,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
        ++cell)
     {
       // CASE 1: active cell that remains as it is
-      if (cell->is_active() && !cell->coarsen_flag_set())
+      if (cell->is_active() DEAL_II_AND !cell->coarsen_flag_set())
         {
           const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
           indices_on_cell[n_sr].resize(dofs_per_cell);
@@ -348,7 +352,8 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
         }
 
       // CASE 2: cell is inactive but will become active
-      else if (cell->has_children() && cell->child(0)->coarsen_flag_set())
+      else if (cell->has_children() DEAL_II_AND cell->child(0)
+                 ->coarsen_flag_set())
         {
           // we will need to interpolate from the children of this cell
           // to the current one. in the hp context, this also means
@@ -361,7 +366,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
                ++child_index)
             {
               const auto &child = cell->child(child_index);
-              Assert(child->is_active() && child->coarsen_flag_set(),
+              Assert(child->is_active() DEAL_II_AND child->coarsen_flag_set(),
                      typename dealii::Triangulation<
                        dim>::ExcInconsistentCoarseningFlags());
 
@@ -399,8 +404,8 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
           ++n_cf;
         }
     }
-  Assert(n_sr == n_cells_to_stay_or_refine, ExcInternalError());
-  Assert(n_cf == n_coarsen_fathers, ExcInternalError());
+  Assert(n_sr DEAL_II_EQUALS n_cells_to_stay_or_refine, ExcInternalError());
+  Assert(n_cf DEAL_II_EQUALS n_coarsen_fathers, ExcInternalError());
 
   prepared_for = coarsening_and_refinement;
 }
@@ -424,14 +429,16 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
   const std::vector<VectorType> &all_in,
   std::vector<VectorType> &      all_out) const
 {
-  Assert(prepared_for == coarsening_and_refinement, ExcNotPrepared());
+  Assert(prepared_for DEAL_II_EQUALS coarsening_and_refinement,
+         ExcNotPrepared());
   const unsigned int size = all_in.size();
-  Assert(all_out.size() == size, ExcDimensionMismatch(all_out.size(), size));
+  Assert(all_out.size() DEAL_II_EQUALS size,
+         ExcDimensionMismatch(all_out.size(), size));
   for (unsigned int i = 0; i < size; ++i)
-    Assert(all_in[i].size() == n_dofs_old,
+    Assert(all_in[i].size() DEAL_II_EQUALS n_dofs_old,
            ExcDimensionMismatch(all_in[i].size(), n_dofs_old));
   for (unsigned int i = 0; i < all_out.size(); ++i)
-    Assert(all_out[i].size() == dof_handler->n_dofs(),
+    Assert(all_out[i].size() DEAL_II_EQUALS dof_handler->n_dofs(),
            ExcDimensionMismatch(all_out[i].size(), dof_handler->n_dofs()));
   for (unsigned int i = 0; i < size; ++i)
     for (unsigned int j = 0; j < size; ++j)
@@ -466,7 +473,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
           // cell stayed as it was or was refined
           if (indexptr)
             {
-              Assert(valuesptr == nullptr, ExcInternalError());
+              Assert(valuesptr DEAL_II_EQUALS nullptr, ExcInternalError());
 
               const unsigned int old_fe_index =
                 pointerstruct->second.active_fe_index;
@@ -491,7 +498,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
             // the children of this cell were deleted
             {
               Assert(!cell->has_children(), ExcInternalError());
-              Assert(indexptr == nullptr, ExcInternalError());
+              Assert(indexptr DEAL_II_EQUALS nullptr, ExcInternalError());
 
               const unsigned int dofs_per_cell =
                 cell->get_fe().n_dofs_per_cell();
@@ -554,8 +561,9 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
   const VectorType &in,
   VectorType &      out) const
 {
-  Assert(in.size() == n_dofs_old, ExcDimensionMismatch(in.size(), n_dofs_old));
-  Assert(out.size() == dof_handler->n_dofs(),
+  Assert(in.size() DEAL_II_EQUALS n_dofs_old,
+         ExcDimensionMismatch(in.size(), n_dofs_old));
+  Assert(out.size() DEAL_II_EQUALS dof_handler->n_dofs(),
          ExcDimensionMismatch(out.size(), dof_handler->n_dofs()));
 
   std::vector<VectorType> all_in(1);

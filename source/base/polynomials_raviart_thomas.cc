@@ -48,7 +48,7 @@ PolynomialsRaviartThomas<dim>::create_polynomials(const unsigned int k)
 {
   std::vector<std::vector<Polynomials::Polynomial<double>>> pols(dim);
   pols[0] = Polynomials::LagrangeEquidistant::generate_complete_basis(k + 1);
-  if (k == 0)
+  if (k DEAL_II_EQUALS 0)
     for (unsigned int d = 1; d < dim; ++d)
       pols[d] = Polynomials::Legendre::generate_complete_basis(0);
   else
@@ -69,16 +69,22 @@ PolynomialsRaviartThomas<dim>::evaluate(
   std::vector<Tensor<4, dim>> &third_derivatives,
   std::vector<Tensor<5, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == this->n() || values.size() == 0,
+  Assert(values.size() DEAL_II_EQUALS this->n() DEAL_II_OR values.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch(values.size(), this->n()));
-  Assert(grads.size() == this->n() || grads.size() == 0,
+  Assert(grads.size() DEAL_II_EQUALS this->n() DEAL_II_OR grads.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch(grads.size(), this->n()));
-  Assert(grad_grads.size() == this->n() || grad_grads.size() == 0,
+  Assert(grad_grads.size() DEAL_II_EQUALS this->n() DEAL_II_OR grad_grads.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch(grad_grads.size(), this->n()));
-  Assert(third_derivatives.size() == this->n() || third_derivatives.size() == 0,
+  Assert(third_derivatives.size()
+           DEAL_II_EQUALS this->n() DEAL_II_OR third_derivatives.size()
+             DEAL_II_EQUALS 0,
          ExcDimensionMismatch(third_derivatives.size(), this->n()));
-  Assert(fourth_derivatives.size() == this->n() ||
-           fourth_derivatives.size() == 0,
+  Assert(fourth_derivatives.size()
+           DEAL_II_EQUALS this->n() DEAL_II_OR fourth_derivatives.size()
+             DEAL_II_EQUALS 0,
          ExcDimensionMismatch(fourth_derivatives.size(), this->n()));
 
   // have a few scratch
@@ -104,11 +110,13 @@ PolynomialsRaviartThomas<dim>::evaluate(
   static std::vector<Tensor<4, dim>> p_fourth_derivatives;
 
   const unsigned int n_sub = polynomial_space.n();
-  p_values.resize((values.size() == 0) ? 0 : n_sub);
-  p_grads.resize((grads.size() == 0) ? 0 : n_sub);
-  p_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_sub);
-  p_third_derivatives.resize((third_derivatives.size() == 0) ? 0 : n_sub);
-  p_fourth_derivatives.resize((fourth_derivatives.size() == 0) ? 0 : n_sub);
+  p_values.resize((values.size() DEAL_II_EQUALS 0) ? 0 : n_sub);
+  p_grads.resize((grads.size() DEAL_II_EQUALS 0) ? 0 : n_sub);
+  p_grad_grads.resize((grad_grads.size() DEAL_II_EQUALS 0) ? 0 : n_sub);
+  p_third_derivatives.resize(
+    (third_derivatives.size() DEAL_II_EQUALS 0) ? 0 : n_sub);
+  p_fourth_derivatives.resize(
+    (fourth_derivatives.size() DEAL_II_EQUALS 0) ? 0 : n_sub);
 
   for (unsigned int d = 0; d < dim; ++d)
     {
@@ -172,11 +180,11 @@ template <int dim>
 unsigned int
 PolynomialsRaviartThomas<dim>::n_polynomials(const unsigned int k)
 {
-  if (dim == 1)
+  if (dim DEAL_II_EQUALS 1)
     return k + 1;
-  if (dim == 2)
+  if (dim DEAL_II_EQUALS 2)
     return 2 * (k + 1) * (k + 2);
-  if (dim == 3)
+  if (dim DEAL_II_EQUALS 3)
     return 3 * (k + 1) * (k + 1) * (k + 2);
 
   Assert(false, ExcNotImplemented());

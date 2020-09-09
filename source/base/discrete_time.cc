@@ -85,7 +85,7 @@ DiscreteTime::advance_time()
 {
   Assert(next_time > current_time,
          ExcMessage("You can't advance time further. "
-                    "Either dt==0 or you are at the "
+                    "Either dtDEAL_II_EQUALS 0 or you are at the "
                     "end of the simulation time."));
   const double step_size = get_next_step_size();
   previous_time          = current_time;

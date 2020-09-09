@@ -76,8 +76,7 @@ public:
   /**
    * Compare two index fields for equality.
    */
-  constexpr bool
-  operator==(const TableIndices<N> &other) const;
+  constexpr bool operator DEAL_II_EQUALS(const TableIndices<N> &other) const;
 
   /**
    * Compare two index fields for inequality.
@@ -119,7 +118,8 @@ constexpr TableIndices<N>::TableIndices(const T... args)
   static_assert(internal::TemplateConstraints::all_true<
                   std::is_integral<T>::value...>::value,
                 "Not all of the parameters have integral type!");
-  static_assert(sizeof...(T) == N, "Wrong number of constructor arguments!");
+  static_assert(sizeof...(T) DEAL_II_EQUALS N,
+                "Wrong number of constructor arguments!");
 }
 
 
@@ -142,8 +142,8 @@ DEAL_II_CONSTEXPR inline std::size_t &TableIndices<N>::
 
 
 template <int N>
-constexpr bool
-TableIndices<N>::operator==(const TableIndices<N> &other) const
+constexpr bool TableIndices<N>::
+               operator DEAL_II_EQUALS(const TableIndices<N> &other) const
 {
   return std::equal(std::begin(indices),
                     std::end(indices),
@@ -155,7 +155,7 @@ template <int N>
 constexpr bool
 TableIndices<N>::operator!=(const TableIndices<N> &other) const
 {
-  return !(*this == other);
+  return !(*this DEAL_II_EQUALS other);
 }
 
 

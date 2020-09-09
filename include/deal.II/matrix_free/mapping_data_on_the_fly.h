@@ -212,7 +212,7 @@ namespace internal
     MappingDataOnTheFly<dim, Number, VectorizedArrayType>::reinit(
       typename dealii::Triangulation<dim>::cell_iterator cell)
     {
-      if (present_cell == cell)
+      if (present_cell DEAL_II_EQUALS cell)
         return;
       present_cell = cell;
       fe_values.reinit(present_cell);

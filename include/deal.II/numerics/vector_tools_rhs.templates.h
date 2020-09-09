@@ -46,9 +46,9 @@ namespace VectorTools
     const std::set<types::boundary_id> &                       boundary_ids)
   {
     const FiniteElement<dim> &fe = dof_handler.get_fe();
-    Assert(fe.n_components() == rhs_function.n_components,
+    Assert(fe.n_components() DEAL_II_EQUALS rhs_function.n_components,
            ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
-    Assert(rhs_vector.size() == dof_handler.n_dofs(),
+    Assert(rhs_vector.size() DEAL_II_EQUALS dof_handler.n_dofs(),
            ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
 
     rhs_vector = 0;
@@ -68,16 +68,16 @@ namespace VectorTools
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
 
-    if (n_components == 1)
+    if (n_components DEAL_II_EQUALS 1)
       {
         std::vector<double> rhs_values(n_q_points);
 
         for (; cell != endc; ++cell)
           for (unsigned int face : cell->face_indices())
-            if (cell->face(face)->at_boundary() &&
-                (boundary_ids.empty() ||
-                 (boundary_ids.find(cell->face(face)->boundary_id()) !=
-                  boundary_ids.end())))
+            if (cell->face(face)->at_boundary()
+                  DEAL_II_AND(boundary_ids.empty() DEAL_II_OR(
+                    boundary_ids.find(cell->face(face)->boundary_id()) !=
+                    boundary_ids.end())))
               {
                 fe_values.reinit(cell, face);
 
@@ -105,10 +105,10 @@ namespace VectorTools
 
         for (; cell != endc; ++cell)
           for (unsigned int face : cell->face_indices())
-            if (cell->face(face)->at_boundary() &&
-                (boundary_ids.empty() ||
-                 (boundary_ids.find(cell->face(face)->boundary_id()) !=
-                  boundary_ids.end())))
+            if (cell->face(face)->at_boundary()
+                  DEAL_II_AND(boundary_ids.empty() DEAL_II_OR(
+                    boundary_ids.find(cell->face(face)->boundary_id()) !=
+                    boundary_ids.end())))
               {
                 fe_values.reinit(cell, face);
 
@@ -193,9 +193,9 @@ namespace VectorTools
     const std::set<types::boundary_id> &                       boundary_ids)
   {
     const hp::FECollection<dim> &fe = dof_handler.get_fe_collection();
-    Assert(fe.n_components() == rhs_function.n_components,
+    Assert(fe.n_components() DEAL_II_EQUALS rhs_function.n_components,
            ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
-    Assert(rhs_vector.size() == dof_handler.n_dofs(),
+    Assert(rhs_vector.size() DEAL_II_EQUALS dof_handler.n_dofs(),
            ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
 
     rhs_vector = 0;
@@ -213,16 +213,16 @@ namespace VectorTools
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
 
-    if (n_components == 1)
+    if (n_components DEAL_II_EQUALS 1)
       {
         std::vector<double> rhs_values;
 
         for (; cell != endc; ++cell)
           for (unsigned int face : cell->face_indices())
-            if (cell->face(face)->at_boundary() &&
-                (boundary_ids.empty() ||
-                 (boundary_ids.find(cell->face(face)->boundary_id()) !=
-                  boundary_ids.end())))
+            if (cell->face(face)->at_boundary()
+                  DEAL_II_AND(boundary_ids.empty() DEAL_II_OR(
+                    boundary_ids.find(cell->face(face)->boundary_id()) !=
+                    boundary_ids.end())))
               {
                 x_fe_values.reinit(cell, face);
 
@@ -257,10 +257,10 @@ namespace VectorTools
 
         for (; cell != endc; ++cell)
           for (unsigned int face : cell->face_indices())
-            if (cell->face(face)->at_boundary() &&
-                (boundary_ids.empty() ||
-                 (boundary_ids.find(cell->face(face)->boundary_id()) !=
-                  boundary_ids.end())))
+            if (cell->face(face)->at_boundary()
+                  DEAL_II_AND(boundary_ids.empty() DEAL_II_OR(
+                    boundary_ids.find(cell->face(face)->boundary_id()) !=
+                    boundary_ids.end())))
               {
                 x_fe_values.reinit(cell, face);
 
@@ -353,9 +353,9 @@ namespace VectorTools
     using Number = typename VectorType::value_type;
 
     const FiniteElement<dim, spacedim> &fe = dof_handler.get_fe();
-    Assert(fe.n_components() == rhs_function.n_components,
+    Assert(fe.n_components() DEAL_II_EQUALS rhs_function.n_components,
            ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
-    Assert(rhs_vector.size() == dof_handler.n_dofs(),
+    Assert(rhs_vector.size() DEAL_II_EQUALS dof_handler.n_dofs(),
            ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
     rhs_vector = typename VectorType::value_type(0.);
 
@@ -374,7 +374,7 @@ namespace VectorTools
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
 
-    if (n_components == 1)
+    if (n_components DEAL_II_EQUALS 1)
       {
         std::vector<Number> rhs_values(n_q_points);
 
@@ -493,9 +493,9 @@ namespace VectorTools
     using Number = typename VectorType::value_type;
 
     const hp::FECollection<dim, spacedim> &fe = dof_handler.get_fe_collection();
-    Assert(fe.n_components() == rhs_function.n_components,
+    Assert(fe.n_components() DEAL_II_EQUALS rhs_function.n_components,
            ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
-    Assert(rhs_vector.size() == dof_handler.n_dofs(),
+    Assert(rhs_vector.size() DEAL_II_EQUALS dof_handler.n_dofs(),
            ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
     rhs_vector = 0;
 
@@ -515,7 +515,7 @@ namespace VectorTools
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
 
-    if (n_components == 1)
+    if (n_components DEAL_II_EQUALS 1)
       {
         std::vector<Number> rhs_values;
 

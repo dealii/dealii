@@ -358,8 +358,7 @@ public:
    * amounts of computing time! It is most commonly used for internal
    * consistency checks of programs.
    */
-  bool
-  operator==(const FullMatrix<number> &) const;
+  bool operator DEAL_II_EQUALS(const FullMatrix<number> &) const;
 
   /**
    * Number of rows of this matrix.  Note that the matrix is of dimension <i>m
@@ -417,15 +416,16 @@ public:
                         const Vector<number2> &v) const;
 
   /**
-   * Return the <i>l<sub>1</sub></i>-norm of the matrix, where $||M||_1 =
-   * \max_j \sum_i |M_{ij}|$ (maximum of the sums over columns).
+   * Return the <i>l<sub>1</sub></i>-norm of the matrix, where $DEAL_II_OR
+   * MDEAL_II_OR _1 = \max_j \sum_i |M_{ij}|$ (maximum of the sums over
+   * columns).
    */
   real_type
   l1_norm() const;
 
   /**
-   * Return the $l_\infty$-norm of the matrix, where $||M||_\infty = \max_i
-   * \sum_j |M_{ij}|$ (maximum of the sums over rows).
+   * Return the $l_\infty$-norm of the matrix, where $DEAL_II_OR MDEAL_II_OR
+   * _\infty = \max_i \sum_j |M_{ij}|$ (maximum of the sums over rows).
    */
   real_type
   linfty_norm() const;
@@ -1128,7 +1128,7 @@ template <typename number>
 FullMatrix<number> &
 FullMatrix<number>::operator=(const number d)
 {
-  Assert(d == number(0), ExcScalarAssignmentOnlyForZeroValue());
+  Assert(d DEAL_II_EQUALS number(0), ExcScalarAssignmentOnlyForZeroValue());
   (void)d; // removes -Wunused-parameter warning in optimized mode
 
   if (this->n_elements() != 0)

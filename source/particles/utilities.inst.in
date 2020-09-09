@@ -17,7 +17,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
      Sparsity : SPARSITY_PATTERNS;
      scalar : REAL_SCALARS)
   {
-#if deal_II_dimension <= deal_II_space_dimension && deal_II_dimension > 1
+#if deal_II_dimension <= \
+  deal_II_space_dimension DEAL_II_AND deal_II_dimension > 1
     template void create_interpolation_sparsity_pattern<deal_II_dimension,
                                                         deal_II_space_dimension,
                                                         Sparsity,
@@ -36,7 +37,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
      Matrix : SPARSE_MATRICES)
   {
-#if deal_II_dimension <= deal_II_space_dimension && deal_II_dimension > 1
+#if deal_II_dimension <= \
+  deal_II_space_dimension DEAL_II_AND deal_II_dimension > 1
     template void create_interpolation_matrix<deal_II_dimension,
                                               deal_II_space_dimension,
                                               Matrix>(

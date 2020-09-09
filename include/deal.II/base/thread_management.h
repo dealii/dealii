@@ -195,10 +195,10 @@ namespace Threads
     using IteratorPair = std::pair<ForwardIterator, ForwardIterator>;
 
     // in non-multithreaded mode, we often have the case that this
-    // function is called with n_intervals==1, so have a shortcut here
-    // to handle that case efficiently
+    // function is called with n_intervalsDEAL_II_EQUALS 1, so have a shortcut
+    // here to handle that case efficiently
 
-    if (n_intervals == 1)
+    if (n_intervals DEAL_II_EQUALS 1)
       return (std::vector<IteratorPair>(1, IteratorPair(begin, end)));
 
     // if more than one interval requested, do the full work
@@ -278,7 +278,7 @@ namespace Threads
       }
 
       inline void
-      set(RT &&v)
+      set(RT DEAL_II_AND v)
       {
         value = std::move(v);
       }
@@ -508,11 +508,11 @@ namespace Threads
         // see if the thread hasn't been joined yet. if it has, then
         // join() is a no-op. use schmidt's double-checking strategy
         // to use the mutex only when necessary
-        if (thread_is_active == false)
+        if (thread_is_active DEAL_II_EQUALS false)
           return;
 
         std::lock_guard<std::mutex> lock(thread_is_active_mutex);
-        if (thread_is_active == true)
+        if (thread_is_active DEAL_II_EQUALS true)
           {
             Assert(thread.joinable(), ExcInternalError());
             thread.join();
@@ -677,10 +677,9 @@ namespace Threads
      * an implicit pointer to an object that exists exactly once for each
      * thread, the check is simply to compare these pointers.
      */
-    bool
-    operator==(const Thread &t) const
+    bool operator DEAL_II_EQUALS(const Thread &t) const
     {
-      return thread_descriptor == t.thread_descriptor;
+      return thread_descriptor DEAL_II_EQUALS t.thread_descriptor;
     }
 
   private:
@@ -1191,7 +1190,7 @@ namespace Threads
        * Constructor. Initializes an std::future object and assumes
        * that the task so set has not finished yet.
        */
-      TaskData(std::future<RT> &&future)
+      TaskData(std::future<RT> DEAL_II_AND future)
         : future(std::move(future))
         , task_has_finished(false)
       {}

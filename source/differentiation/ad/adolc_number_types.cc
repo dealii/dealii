@@ -54,7 +54,7 @@ namespace numbers
           "The type of the AD number is not that which was expected.");
         const ad_type result = comparator(value_1, value_2);
         return !(Differentiation::AD::ADNumberTraits<ad_type>::get_scalar_value(
-                   result) == 0.0);
+          result) DEAL_II_EQUALS 0.0);
       }
     } // namespace
   }   // namespace internal
@@ -64,7 +64,7 @@ namespace numbers
   {
     return internal::adouble_boolean_comparator(
       value_1, value_2, [](const adouble &a, const adouble &b) -> adouble {
-        return dealii::internal::NumberType<adouble>::value(a == b);
+        return dealii::internal::NumberType<adouble>::value(a DEAL_II_EQUALS b);
       });
   }
 

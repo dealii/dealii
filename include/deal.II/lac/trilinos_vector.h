@@ -315,7 +315,7 @@ namespace TrilinosWrappers
      *                   // do some additions to vector elements, but
      *                   // only for some elements
      *   for (size_type i=0; i<vector->size(); ++i)
-     *     if (some_condition(i) == true)
+     *     if (some_condition(i) DEAL_II_EQUALS  true)
      *       vector(i) += 1;
      *
      *                   // do another collective operation
@@ -507,7 +507,7 @@ namespace TrilinosWrappers
        * Move constructor. Creates a new vector by stealing the internal data
        * of the vector @p v.
        */
-      Vector(Vector &&v) noexcept;
+      Vector(Vector DEAL_II_AND v) noexcept;
 
       /**
        * Destructor.
@@ -660,7 +660,7 @@ namespace TrilinosWrappers
        * @p v by efficiently swapping the internal data structures.
        */
       Vector &
-      operator=(Vector &&v) noexcept;
+      operator=(Vector DEAL_II_AND v) noexcept;
 
       /**
        * Another copy function. This one takes a deal.II vector and copies it
@@ -711,8 +711,7 @@ namespace TrilinosWrappers
        * the one to compare with have the same size already, since comparing
        * vectors of different sizes makes not much sense anyway.
        */
-      bool
-      operator==(const Vector &v) const;
+      bool operator DEAL_II_EQUALS(const Vector &v) const;
 
       /**
        * Test for inequality. This function assumes that the present vector and
@@ -786,7 +785,8 @@ namespace TrilinosWrappers
        * Obviously, if a vector is created on only one processor, then the
        * result would satisfy
        * @code
-       *   vec.locally_owned_elements() == complete_index_set (vec.size())
+       *   vec.locally_owned_elements() DEAL_II_EQUALS  complete_index_set
+       * (vec.size())
        * @endcode
        */
       IndexSet
@@ -1006,7 +1006,7 @@ namespace TrilinosWrappers
        * is constructed from an IndexSet or other methods in deal.II (note that
        * an Epetra_Map can contain elements in arbitrary orders, though).
        *
-       * It holds that end() - begin() == local_size().
+       * It holds that end() - begin() DEAL_II_EQUALS  local_size().
        */
       iterator
       begin();
@@ -1441,7 +1441,7 @@ namespace TrilinosWrappers
     {
       std::pair<size_type, size_type> range = local_range();
 
-      return ((index >= range.first) && (index < range.second));
+      return ((index >= range.first) DEAL_II_AND(index < range.second));
     }
 
 
@@ -1449,7 +1449,7 @@ namespace TrilinosWrappers
     inline IndexSet
     Vector::locally_owned_elements() const
     {
-      Assert(owned_elements.size() == size(),
+      Assert(owned_elements.size() DEAL_II_EQUALS size(),
              ExcMessage(
                "The locally owned elements have not been properly initialized!"
                " This happens for example if this object has been initialized"
@@ -1561,7 +1561,7 @@ namespace TrilinosWrappers
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
-      Assert(indices.size() == values.size(),
+      Assert(indices.size() DEAL_II_EQUALS values.size(),
              ExcDimensionMismatch(indices.size(), values.size()));
 
       set(indices.size(), indices.data(), values.data());
@@ -1577,7 +1577,7 @@ namespace TrilinosWrappers
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
-      Assert(indices.size() == values.size(),
+      Assert(indices.size() DEAL_II_EQUALS values.size(),
              ExcDimensionMismatch(indices.size(), values.size()));
 
       set(indices.size(), indices.data(), values.begin());
@@ -1594,10 +1594,10 @@ namespace TrilinosWrappers
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
-      if (last_action == Add)
+      if (last_action DEAL_II_EQUALS Add)
         {
           const int ierr = vector->GlobalAssemble(Add);
-          AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+          AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
         }
 
       if (last_action != Insert)
@@ -1613,7 +1613,7 @@ namespace TrilinosWrappers
           else
             {
               const int ierr = vector->ReplaceGlobalValues(1, &row, &values[i]);
-              AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+              AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
               compressed = false;
             }
           // in set operation, do not use the pre-allocated vector for nonlocal
@@ -1633,7 +1633,7 @@ namespace TrilinosWrappers
       // if we have ghost values, do not allow
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
-      Assert(indices.size() == values.size(),
+      Assert(indices.size() DEAL_II_EQUALS values.size(),
              ExcDimensionMismatch(indices.size(), values.size()));
 
       add(indices.size(), indices.data(), values.data());
@@ -1648,7 +1648,7 @@ namespace TrilinosWrappers
       // if we have ghost values, do not allow
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
-      Assert(indices.size() == values.size(),
+      Assert(indices.size() DEAL_II_EQUALS values.size(),
              ExcDimensionMismatch(indices.size(), values.size()));
 
       add(indices.size(), indices.data(), values.begin());
@@ -1667,10 +1667,10 @@ namespace TrilinosWrappers
 
       if (last_action != Add)
         {
-          if (last_action == Insert)
+          if (last_action DEAL_II_EQUALS Insert)
             {
               const int ierr = vector->GlobalAssemble(Insert);
-              AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+              AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
             }
           last_action = Add;
         }
@@ -1682,14 +1682,14 @@ namespace TrilinosWrappers
             static_cast<TrilinosWrappers::types::int_type>(row));
           if (local_row != -1)
             (*vector)[0][local_row] += values[i];
-          else if (nonlocal_vector.get() == nullptr)
+          else if (nonlocal_vector.get() DEAL_II_EQUALS nullptr)
             {
               const int ierr = vector->SumIntoGlobalValues(
                 1,
                 reinterpret_cast<const TrilinosWrappers::types::int_type *>(
                   &row),
                 &values[i]);
-              AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+              AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
               compressed = false;
             }
           else
@@ -1747,7 +1747,7 @@ namespace TrilinosWrappers
 #    endif
 
       Assert(
-        end - begin == vector->Map().NumMyElements(),
+        end - begin DEAL_II_EQUALS vector->Map().NumMyElements(),
         ExcMessage(
           "This function only makes sense if the elements that this "
           "vector stores on the current processor form a contiguous range. "
@@ -1767,7 +1767,7 @@ namespace TrilinosWrappers
       TrilinosScalar result;
 
       const int ierr = vector->Dot(*(vec.vector), &result);
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
       return result;
     }
@@ -1790,7 +1790,7 @@ namespace TrilinosWrappers
 
       TrilinosScalar mean;
       const int      ierr = vector->MeanValue(&mean);
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
       return mean;
     }
@@ -1802,7 +1802,7 @@ namespace TrilinosWrappers
     {
       TrilinosScalar min_value;
       const int      ierr = vector->MinValue(&min_value);
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
       return min_value;
     }
@@ -1814,7 +1814,7 @@ namespace TrilinosWrappers
     {
       TrilinosScalar max_value;
       const int      ierr = vector->MaxValue(&max_value);
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
       return max_value;
     }
@@ -1828,7 +1828,7 @@ namespace TrilinosWrappers
 
       TrilinosScalar d;
       const int      ierr = vector->Norm1(&d);
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
       return d;
     }
@@ -1842,7 +1842,7 @@ namespace TrilinosWrappers
 
       TrilinosScalar d;
       const int      ierr = vector->Norm2(&d);
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
       return d;
     }
@@ -1880,7 +1880,7 @@ namespace TrilinosWrappers
       // presence of ghost elements
       TrilinosScalar d;
       const int      ierr = vector->NormInf(&d);
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
       return d;
     }
@@ -1909,7 +1909,7 @@ namespace TrilinosWrappers
       AssertIsFinite(a);
 
       const int ierr = vector->Scale(a);
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
       return *this;
     }
@@ -1926,7 +1926,7 @@ namespace TrilinosWrappers
       AssertIsFinite(factor);
 
       const int ierr = vector->Scale(factor);
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
       return *this;
     }
@@ -1936,12 +1936,13 @@ namespace TrilinosWrappers
     inline Vector &
     Vector::operator+=(const Vector &v)
     {
-      Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
+      Assert(size() DEAL_II_EQUALS v.size(),
+             ExcDimensionMismatch(size(), v.size()));
       Assert(vector->Map().SameAs(v.vector->Map()),
              ExcDifferentParallelPartitioning());
 
       const int ierr = vector->Update(1.0, *(v.vector), 1.0);
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
       return *this;
     }
@@ -1951,12 +1952,13 @@ namespace TrilinosWrappers
     inline Vector &
     Vector::operator-=(const Vector &v)
     {
-      Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
+      Assert(size() DEAL_II_EQUALS v.size(),
+             ExcDimensionMismatch(size(), v.size()));
       Assert(vector->Map().SameAs(v.vector->Map()),
              ExcDifferentParallelPartitioning());
 
       const int ierr = vector->Update(-1.0, *(v.vector), 1.0);
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
       return *this;
     }
@@ -1984,13 +1986,13 @@ namespace TrilinosWrappers
       // if we have ghost values, do not allow
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
-      Assert(local_size() == v.local_size(),
+      Assert(local_size() DEAL_II_EQUALS v.local_size(),
              ExcDimensionMismatch(local_size(), v.local_size()));
 
       AssertIsFinite(a);
 
       const int ierr = vector->Update(a, *(v.vector), 1.);
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
     }
 
 
@@ -2004,9 +2006,9 @@ namespace TrilinosWrappers
       // if we have ghost values, do not allow
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
-      Assert(local_size() == v.local_size(),
+      Assert(local_size() DEAL_II_EQUALS v.local_size(),
              ExcDimensionMismatch(local_size(), v.local_size()));
-      Assert(local_size() == w.local_size(),
+      Assert(local_size() DEAL_II_EQUALS w.local_size(),
              ExcDimensionMismatch(local_size(), w.local_size()));
 
       AssertIsFinite(a);
@@ -2014,7 +2016,7 @@ namespace TrilinosWrappers
 
       const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), 1.);
 
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
     }
 
 
@@ -2025,18 +2027,21 @@ namespace TrilinosWrappers
       // if we have ghost values, do not allow
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
-      Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
+      Assert(size() DEAL_II_EQUALS v.size(),
+             ExcDimensionMismatch(size(), v.size()));
 
       AssertIsFinite(s);
 
       // We assume that the vectors have the same Map
       // if the local size is the same and if the vectors are not ghosted
-      if (local_size() == v.local_size() && !v.has_ghost_elements())
+      if (local_size() DEAL_II_EQUALS v.local_size()
+            DEAL_II_AND !v.has_ghost_elements())
         {
-          Assert(this->vector->Map().SameAs(v.vector->Map()) == true,
+          Assert(this->vector->Map().SameAs(v.vector->Map())
+                   DEAL_II_EQUALS true,
                  ExcDifferentParallelPartitioning());
           const int ierr = vector->Update(1., *(v.vector), s);
-          AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+          AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
         }
       else
         {
@@ -2055,18 +2060,21 @@ namespace TrilinosWrappers
       // if we have ghost values, do not allow
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
-      Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
+      Assert(size() DEAL_II_EQUALS v.size(),
+             ExcDimensionMismatch(size(), v.size()));
       AssertIsFinite(s);
       AssertIsFinite(a);
 
       // We assume that the vectors have the same Map
       // if the local size is the same and if the vectors are not ghosted
-      if (local_size() == v.local_size() && !v.has_ghost_elements())
+      if (local_size() DEAL_II_EQUALS v.local_size()
+            DEAL_II_AND !v.has_ghost_elements())
         {
-          Assert(this->vector->Map().SameAs(v.vector->Map()) == true,
+          Assert(this->vector->Map().SameAs(v.vector->Map())
+                   DEAL_II_EQUALS true,
                  ExcDifferentParallelPartitioning());
           const int ierr = vector->Update(a, *(v.vector), s);
-          AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+          AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
         }
       else
         {
@@ -2085,11 +2093,11 @@ namespace TrilinosWrappers
       // if we have ghost values, do not allow
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
-      Assert(local_size() == factors.local_size(),
+      Assert(local_size() DEAL_II_EQUALS factors.local_size(),
              ExcDimensionMismatch(local_size(), factors.local_size()));
 
       const int ierr = vector->Multiply(1.0, *(factors.vector), *vector, 0.0);
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
     }
 
 
@@ -2103,7 +2111,7 @@ namespace TrilinosWrappers
       AssertIsFinite(a);
 
       // If we don't have the same map, copy.
-      if (vector->Map().SameAs(v.vector->Map()) == false)
+      if (vector->Map().SameAs(v.vector->Map()) DEAL_II_EQUALS false)
         {
           this->sadd(0., a, v);
         }
@@ -2111,7 +2119,7 @@ namespace TrilinosWrappers
         {
           // Otherwise, just update
           int ierr = vector->Update(a, *v.vector, 0.0);
-          AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+          AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
           last_action = Zero;
         }
@@ -2181,12 +2189,12 @@ namespace TrilinosWrappers
       AssertIsFinite(s);
 
       int ierr = vector->PutScalar(s);
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
 
       if (nonlocal_vector.get() != nullptr)
         {
           ierr = nonlocal_vector->PutScalar(0.);
-          AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+          AssertThrow(ierr DEAL_II_EQUALS 0, ExcTrilinosError(ierr));
         }
 
       return *this;

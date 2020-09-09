@@ -333,7 +333,8 @@ namespace MatrixFreeOperators
 
     /**
      * Return the value of the matrix entry (row,col). In matrix-free context
-     * this function is valid only for row==col when diagonal is initialized.
+     * this function is valid only for rowDEAL_II_EQUALS col when diagonal is
+     * initialized.
      */
     value_type
     el(const unsigned int row, const unsigned int col) const;
@@ -986,8 +987,8 @@ namespace MatrixFreeOperators
   {
     constexpr unsigned int dofs_per_component_on_cell =
       Utilities::pow(fe_degree + 1, dim);
-    Assert(inverse_jxw.size() > 0 &&
-             inverse_jxw.size() % dofs_per_component_on_cell == 0,
+    Assert(inverse_jxw.size() > 0 DEAL_II_AND inverse_jxw.size() %
+                                  dofs_per_component_on_cell DEAL_II_EQUALS 0,
            ExcMessage(
              "Expected diagonal to be a multiple of scalar dof per cells"));
 
@@ -1129,9 +1130,9 @@ namespace MatrixFreeOperators
                                                  const unsigned int col) const
   {
     (void)col;
-    Assert(row == col, ExcNotImplemented());
-    Assert(inverse_diagonal_entries.get() != nullptr &&
-             inverse_diagonal_entries->m() > 0,
+    Assert(row DEAL_II_EQUALS col, ExcNotImplemented());
+    Assert(inverse_diagonal_entries.get() !=
+             nullptr DEAL_II_AND inverse_diagonal_entries->m() > 0,
            ExcNotInitialized());
     return 1.0 / (*inverse_diagonal_entries)(row, row);
   }
@@ -1191,7 +1192,7 @@ namespace MatrixFreeOperators
             selected_rows.push_back(given_row_selection[i]);
           }
       }
-    if (given_column_selection.size() == 0)
+    if (given_column_selection.size() DEAL_II_EQUALS 0)
       selected_columns = selected_rows;
     else
       {
@@ -1369,17 +1370,21 @@ namespace MatrixFreeOperators
         const unsigned int mf_component =
           is_row ? selected_rows[i] : selected_columns[i];
         // If both vectors use the same partitioner -> done
-        if (BlockHelper::subblock(src, i).get_partitioner().get() ==
-            data->get_dof_info(mf_component).vector_partitioner.get())
+        if (BlockHelper::subblock(src, i)
+              .get_partitioner()
+              .get() DEAL_II_EQUALS data->get_dof_info(mf_component)
+              .vector_partitioner.get())
           continue;
 
         // If not, assert that the local ranges are the same and reset to the
         // current partitioner
-        Assert(
-          BlockHelper::subblock(src, i).get_partitioner()->local_size() ==
-            data->get_dof_info(mf_component).vector_partitioner->local_size(),
-          ExcMessage("The vector passed to the vmult() function does not have "
-                     "the correct size for compatibility with MatrixFree."));
+        Assert(BlockHelper::subblock(src, i)
+                 .get_partitioner()
+                 ->local_size() DEAL_II_EQUALS data->get_dof_info(mf_component)
+                 .vector_partitioner->local_size(),
+               ExcMessage(
+                 "The vector passed to the vmult() function does not have "
+                 "the correct size for compatibility with MatrixFree."));
 
         // copy the vector content to a temporary vector so that it does not get
         // lost
@@ -1615,8 +1620,8 @@ namespace MatrixFreeOperators
   Base<dim, VectorType, VectorizedArrayType>::get_matrix_diagonal_inverse()
     const
   {
-    Assert(inverse_diagonal_entries.get() != nullptr &&
-             inverse_diagonal_entries->m() > 0,
+    Assert(inverse_diagonal_entries.get() !=
+             nullptr DEAL_II_AND inverse_diagonal_entries->m() > 0,
            ExcNotInitialized());
     return inverse_diagonal_entries;
   }
@@ -1627,7 +1632,8 @@ namespace MatrixFreeOperators
   const std::shared_ptr<DiagonalMatrix<VectorType>> &
   Base<dim, VectorType, VectorizedArrayType>::get_matrix_diagonal() const
   {
-    Assert(diagonal_entries.get() != nullptr && diagonal_entries->m() > 0,
+    Assert(diagonal_entries.get() !=
+             nullptr DEAL_II_AND diagonal_entries->m() > 0,
            ExcNotInitialized());
     return diagonal_entries;
   }
@@ -1653,7 +1659,8 @@ namespace MatrixFreeOperators
     const typename Base<dim, VectorType, VectorizedArrayType>::value_type omega)
     const
   {
-    Assert(inverse_diagonal_entries.get() && inverse_diagonal_entries->m() > 0,
+    Assert(inverse_diagonal_entries.get()
+               DEAL_II_AND inverse_diagonal_entries->m() > 0,
            ExcNotInitialized());
     inverse_diagonal_entries->vmult(dst, src);
     dst *= omega;
@@ -2060,14 +2067,15 @@ namespace MatrixFreeOperators
     phi.evaluate(EvaluationFlags::gradients);
     if (scalar_coefficient.get())
       {
-        Assert(scalar_coefficient->size(1) == 1 ||
-                 scalar_coefficient->size(1) == phi.n_q_points,
+        Assert(scalar_coefficient
+                 ->size(1) DEAL_II_EQUALS 1 DEAL_II_OR scalar_coefficient
+                 ->size(1) DEAL_II_EQUALS              phi.n_q_points,
                ExcMessage("The number of columns in the coefficient table must "
                           "be either 1 or the number of quadrature points " +
                           std::to_string(phi.n_q_points) +
                           ", but the given value was " +
                           std::to_string(scalar_coefficient->size(1))));
-        if (scalar_coefficient->size(1) == phi.n_q_points)
+        if (scalar_coefficient->size(1) DEAL_II_EQUALS phi.n_q_points)
           for (unsigned int q = 0; q < phi.n_q_points; ++q)
             {
               Assert(Implementation::non_negative(

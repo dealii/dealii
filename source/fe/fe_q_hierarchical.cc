@@ -160,9 +160,9 @@ FE_Q_Hierarchical<dim>::get_interpolation_matrix(
     {
       // ok, source is a Q_Hierarchical element, so we will be able to do the
       // work
-      Assert(matrix.m() == this->n_dofs_per_cell(),
+      Assert(matrix.m() DEAL_II_EQUALS this->n_dofs_per_cell(),
              ExcDimensionMismatch(matrix.m(), this->n_dofs_per_cell()));
-      Assert(matrix.n() == source.n_dofs_per_cell(),
+      Assert(matrix.n() DEAL_II_EQUALS source.n_dofs_per_cell(),
              ExcDimensionMismatch(matrix.m(), source_fe->n_dofs_per_cell()));
 
       // Recall that DoFs are renumbered in the following order:
@@ -206,7 +206,7 @@ FE_Q_Hierarchical<dim>::get_prolongation_matrix(
   const RefinementCase<dim> &refinement_case) const
 {
   Assert(
-    refinement_case == RefinementCase<dim>::isotropic_refinement,
+    refinement_case DEAL_II_EQUALS RefinementCase<dim>::isotropic_refinement,
     ExcMessage(
       "Prolongation matrices are only available for isotropic refinement!"));
 
@@ -364,7 +364,7 @@ FE_Q_Hierarchical<dim>::compare_for_domination(
     {
       if (this->degree < fe_hierarchical_other->degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_hierarchical_other->degree)
+      else if (this->degree DEAL_II_EQUALS fe_hierarchical_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;
@@ -452,40 +452,50 @@ FE_Q_Hierarchical<dim>::build_dofs_cell(
       for (unsigned int k = 0; k < dofs_1d; ++k)
         {
           // upper diagonal block
-          if ((j <= 1) && (k <= 1))
+          if ((j <= 1) DEAL_II_AND(k <= 1))
             {
-              if (((c == 0) && (j == 0) && (k == 0)) ||
-                  ((c == 1) && (j == 1) && (k == 1)))
+              if (((c DEAL_II_EQUALS 0)DEAL_II_AND(j DEAL_II_EQUALS 0)
+                     DEAL_II_AND(k DEAL_II_EQUALS 0))
+                    DEAL_II_OR((c DEAL_II_EQUALS 1)DEAL_II_AND(
+                      j DEAL_II_EQUALS 1) DEAL_II_AND(k DEAL_II_EQUALS 1)))
                 dofs_cell[c](j, k) = 1.;
               else
                 dofs_cell[c](j, k) = 0.;
 
-              if (((c == 0) && (j == 1)) || ((c == 1) && (j == 0)))
+              if (((c DEAL_II_EQUALS 0)DEAL_II_AND(j DEAL_II_EQUALS 1))
+                    DEAL_II_OR(
+                      (c DEAL_II_EQUALS 1)DEAL_II_AND(j DEAL_II_EQUALS 0)))
                 dofs_subcell[c](j, k) = .5;
-              else if (((c == 0) && (k == 0)) || ((c == 1) && (k == 1)))
+              else if (((c DEAL_II_EQUALS 0)DEAL_II_AND(k DEAL_II_EQUALS 0))
+                         DEAL_II_OR(
+                           (c DEAL_II_EQUALS 1)DEAL_II_AND(k DEAL_II_EQUALS 1)))
                 dofs_subcell[c](j, k) = 1.;
               else
                 dofs_subcell[c](j, k) = 0.;
             }
           // upper right block
-          else if ((j <= 1) && (k >= 2))
+          else if ((j <= 1) DEAL_II_AND(k >= 2))
             {
-              if (((c == 0) && (j == 1) && ((k % 2) == 0)) ||
-                  ((c == 1) && (j == 0) && ((k % 2) == 0)))
+              if (((c DEAL_II_EQUALS 0)DEAL_II_AND(j DEAL_II_EQUALS 1)
+                     DEAL_II_AND((k % 2) DEAL_II_EQUALS 0))
+                    DEAL_II_OR(
+                      (c DEAL_II_EQUALS 1)DEAL_II_AND(j DEAL_II_EQUALS 0)
+                        DEAL_II_AND((k % 2) DEAL_II_EQUALS 0)))
                 dofs_subcell[c](j, k) = -1.;
             }
           // upper diagonal block
-          else if ((j >= 2) && (k >= 2) && (j <= k))
+          else if ((j >= 2) DEAL_II_AND(k >= 2) DEAL_II_AND(j <= k))
             {
               double factor = 1.;
               for (unsigned int i = 1; i <= j; ++i)
                 factor *=
                   (static_cast<double>(k - i + 1)) / (static_cast<double>(i));
-              // factor == k * (k-1) * ... * (k-j+1) / j! = k! / (k-j)! / j!
-              if (c == 0)
+              // factor DEAL_II_EQUALS  k * (k-1) * ... * (k-j+1) / j! = k! /
+              // (k-j)! / j!
+              if (c DEAL_II_EQUALS 0)
                 {
                   dofs_subcell[c](j, k) =
-                    ((k + j) % 2 == 0) ?
+                    ((k + j) % 2 DEAL_II_EQUALS 0) ?
                       std::pow(.5, static_cast<double>(k)) * factor :
                       -std::pow(.5, static_cast<double>(k)) * factor;
                   dofs_cell[c](j, k) =
@@ -496,7 +506,7 @@ FE_Q_Hierarchical<dim>::build_dofs_cell(
                   dofs_subcell[c](j, k) =
                     std::pow(.5, static_cast<double>(k)) * factor;
                   dofs_cell[c](j, k) =
-                    ((k + j) % 2 == 0) ?
+                    ((k + j) % 2 DEAL_II_EQUALS 0) ?
                       std::pow(2., static_cast<double>(j)) * factor :
                       -std::pow(2., static_cast<double>(j)) * factor;
                 }
@@ -702,7 +712,7 @@ FE_Q_Hierarchical<dim>::initialize_embedding_and_restriction(
 
   // the 1d case is particularly
   // simple, so special case it:
-  if (dim == 1)
+  if (dim DEAL_II_EQUALS 1)
     {
       for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
            ++c)
@@ -865,26 +875,26 @@ FE_Q_Hierarchical<dim>::initialize_generalized_support_points()
     for (unsigned int iy = 0; iy <= ((dim > 1) ? this->degree : 0); ++iy)
       for (unsigned int ix = 0; ix <= this->degree; ++ix)
         {
-          if (ix == 0)
+          if (ix DEAL_II_EQUALS 0)
             p(0) = 0.;
-          else if (ix == 1)
+          else if (ix DEAL_II_EQUALS 1)
             p(0) = 1.;
           else
             p(0) = .5;
           if (dim > 1)
             {
-              if (iy == 0)
+              if (iy DEAL_II_EQUALS 0)
                 p(1) = 0.;
-              else if (iy == 1)
+              else if (iy DEAL_II_EQUALS 1)
                 p(1) = 1.;
               else
                 p(1) = .5;
             }
           if (dim > 2)
             {
-              if (iz == 0)
+              if (iz DEAL_II_EQUALS 0)
                 p(2) = 0.;
-              else if (iz == 1)
+              else if (iz DEAL_II_EQUALS 1)
                 p(2) = 1.;
               else
                 p(2) = .5;
@@ -938,15 +948,17 @@ FE_Q_Hierarchical<dim>::get_face_interpolation_matrix(
   // source FE is also a
   // Q_Hierarchical element
   using FEQHierarchical = FE_Q_Hierarchical<dim>;
-  AssertThrow((x_source_fe.get_name().find("FE_Q_Hierarchical<") == 0) ||
-                (dynamic_cast<const FEQHierarchical *>(&x_source_fe) !=
-                 nullptr),
+  AssertThrow((x_source_fe.get_name().find("FE_Q_Hierarchical<")
+                 DEAL_II_EQUALS 0)
+                DEAL_II_OR(dynamic_cast<const FEQHierarchical *>(
+                             &x_source_fe) != nullptr),
               (typename FiniteElement<dim>::ExcInterpolationNotImplemented()));
 
-  Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS this->n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.n(),
                               this->n_dofs_per_face(face_no)));
-  Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.m()
+           DEAL_II_EQUALS x_source_fe.n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.m(),
                               x_source_fe.n_dofs_per_face(face_no)));
 
@@ -1027,15 +1039,17 @@ FE_Q_Hierarchical<dim>::get_subface_interpolation_matrix(
   // source FE is also a
   // Q_Hierarchical element
   using FEQHierarchical = FE_Q_Hierarchical<dim>;
-  AssertThrow((x_source_fe.get_name().find("FE_Q_Hierarchical<") == 0) ||
-                (dynamic_cast<const FEQHierarchical *>(&x_source_fe) !=
-                 nullptr),
+  AssertThrow((x_source_fe.get_name().find("FE_Q_Hierarchical<")
+                 DEAL_II_EQUALS 0)
+                DEAL_II_OR(dynamic_cast<const FEQHierarchical *>(
+                             &x_source_fe) != nullptr),
               (typename FiniteElement<dim>::ExcInterpolationNotImplemented()));
 
-  Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS this->n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.n(),
                               this->n_dofs_per_face(face_no)));
-  Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.m()
+           DEAL_II_EQUALS x_source_fe.n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.m(),
                               x_source_fe.n_dofs_per_face(face_no)));
 
@@ -1933,26 +1947,26 @@ FE_Q_Hierarchical<dim>::initialize_generalized_face_support_points()
     for (unsigned int iy = 0; iy <= ((codim > 1) ? this->degree : 0); ++iy)
       for (unsigned int ix = 0; ix <= this->degree; ++ix)
         {
-          if (ix == 0)
+          if (ix DEAL_II_EQUALS 0)
             p(0) = 0.;
-          else if (ix == 1)
+          else if (ix DEAL_II_EQUALS 1)
             p(0) = 1.;
           else
             p(0) = .5;
           if (codim > 1)
             {
-              if (iy == 0)
+              if (iy DEAL_II_EQUALS 0)
                 p(1) = 0.;
-              else if (iy == 1)
+              else if (iy DEAL_II_EQUALS 1)
                 p(1) = 1.;
               else
                 p(1) = .5;
             }
           if (codim > 2)
             {
-              if (iz == 0)
+              if (iz DEAL_II_EQUALS 0)
                 p(2) = 0.;
-              else if (iz == 1)
+              else if (iz DEAL_II_EQUALS 1)
                 p(2) = 1.;
               else
                 p(2) = .5;
@@ -1981,7 +1995,7 @@ std::vector<unsigned int>
 FE_Q_Hierarchical<dim>::hierarchic_to_fe_q_hierarchical_numbering(
   const FiniteElementData<dim> &fe)
 {
-  Assert(fe.n_components() == 1, ExcInternalError());
+  Assert(fe.n_components() DEAL_II_EQUALS 1, ExcInternalError());
   std::vector<unsigned int> h2l(fe.n_dofs_per_cell());
 
   // polynomial degree
@@ -2046,14 +2060,16 @@ FE_Q_Hierarchical<dim>::hierarchic_to_fe_q_hierarchical_numbering(
           for (unsigned int i = 0; i < fe.n_dofs_per_line(); ++i)
             h2l[next_index++] = n + 2 + i;
           // inside quad
-          Assert(fe.n_dofs_per_quad(0 /*only one quad in 2D*/) ==
-                   fe.n_dofs_per_line() * fe.n_dofs_per_line(),
+          Assert(fe.n_dofs_per_quad(0 /*only one quad in 2D*/)
+                     DEAL_II_EQUALS fe.n_dofs_per_line() *
+                   fe.n_dofs_per_line(),
                  ExcInternalError());
           for (unsigned int i = 0; i < fe.n_dofs_per_line(); ++i)
             for (unsigned int j = 0; j < fe.n_dofs_per_line(); ++j)
               h2l[next_index++] = (2 + i) * n + 2 + j;
 
-          Assert(next_index == fe.n_dofs_per_cell(), ExcInternalError());
+          Assert(next_index DEAL_II_EQUALS fe.n_dofs_per_cell(),
+                 ExcInternalError());
 
           break;
         }
@@ -2110,8 +2126,9 @@ FE_Q_Hierarchical<dim>::hierarchic_to_fe_q_hierarchical_numbering(
           (void)face_no;
 
           // inside quads
-          Assert(fe.n_dofs_per_quad(face_no) ==
-                   fe.n_dofs_per_line() * fe.n_dofs_per_line(),
+          Assert(fe.n_dofs_per_quad(face_no)
+                     DEAL_II_EQUALS fe.n_dofs_per_line() *
+                   fe.n_dofs_per_line(),
                  ExcInternalError());
           // left face
           for (unsigned int i = 0; i < fe.n_dofs_per_line(); ++i)
@@ -2139,15 +2156,17 @@ FE_Q_Hierarchical<dim>::hierarchic_to_fe_q_hierarchical_numbering(
               h2l[next_index++] = n2 + (2 + i) * n + 2 + j;
 
           // inside hex
-          Assert(fe.n_dofs_per_hex() ==
-                   fe.n_dofs_per_quad(face_no) * fe.n_dofs_per_line(),
+          Assert(fe.n_dofs_per_hex()
+                     DEAL_II_EQUALS fe.n_dofs_per_quad(face_no) *
+                   fe.n_dofs_per_line(),
                  ExcInternalError());
           for (unsigned int i = 0; i < fe.n_dofs_per_line(); ++i)
             for (unsigned int j = 0; j < fe.n_dofs_per_line(); ++j)
               for (unsigned int k = 0; k < fe.n_dofs_per_line(); ++k)
                 h2l[next_index++] = (2 + i) * n2 + (2 + j) * n + 2 + k;
 
-          Assert(next_index == fe.n_dofs_per_cell(), ExcInternalError());
+          Assert(next_index DEAL_II_EQUALS fe.n_dofs_per_cell(),
+                 ExcInternalError());
 
           break;
         }
@@ -2195,10 +2214,12 @@ FE_Q_Hierarchical<1>::has_support_on_face(const unsigned int shape_index,
   // there is only one degree of
   // freedom per vertex in this
   // class, the first is on vertex 0
-  // (==face 0 in some sense), the
+  // (DEAL_II_EQUALS face 0 in some sense), the
   // second on face 1:
-  return (((shape_index == 0) && (face_index == 0)) ||
-          ((shape_index == 1) && (face_index == 1)));
+  return (
+    ((shape_index DEAL_II_EQUALS 0)DEAL_II_AND(face_index DEAL_II_EQUALS 0))
+      DEAL_II_OR((shape_index DEAL_II_EQUALS 1)DEAL_II_AND(
+        face_index DEAL_II_EQUALS 1)));
 }
 
 
@@ -2215,9 +2236,10 @@ FE_Q_Hierarchical<dim>::has_support_on_face(const unsigned int shape_index,
   // shape functions, since they
   // have no support no-where on
   // the boundary
-  if (((dim == 2) && (shape_index >=
-                      this->get_first_quad_index(0 /*only one quad in 2D*/))) ||
-      ((dim == 3) && (shape_index >= this->get_first_hex_index())))
+  if (((dim DEAL_II_EQUALS 2)DEAL_II_AND(
+        shape_index >= this->get_first_quad_index(0 /*only one quad in 2D*/)))
+        DEAL_II_OR((dim DEAL_II_EQUALS 3)DEAL_II_AND(
+          shape_index >= this->get_first_hex_index())))
     return false;
 
   // let's see whether this is a
@@ -2226,15 +2248,15 @@ FE_Q_Hierarchical<dim>::has_support_on_face(const unsigned int shape_index,
     {
       // for Q elements, there is
       // one dof per vertex, so
-      // shape_index==vertex_number. check
+      // shape_indexDEAL_II_EQUALS vertex_number. check
       // whether this vertex is
       // on the given face.
       const unsigned int vertex_no = shape_index;
       Assert(vertex_no < GeometryInfo<dim>::vertices_per_cell,
              ExcInternalError());
       for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_face; ++i)
-        if (GeometryInfo<dim>::face_to_cell_vertices(face_index, i) ==
-            vertex_no)
+        if (GeometryInfo<dim>::face_to_cell_vertices(face_index, i)
+              DEAL_II_EQUALS vertex_no)
           return true;
       return false;
     }
@@ -2247,7 +2269,8 @@ FE_Q_Hierarchical<dim>::has_support_on_face(const unsigned int shape_index,
              ExcInternalError());
 
       for (unsigned int i = 0; i < GeometryInfo<dim>::lines_per_face; ++i)
-        if (GeometryInfo<dim>::face_to_cell_lines(face_index, i) == line_index)
+        if (GeometryInfo<dim>::face_to_cell_lines(face_index, i)
+              DEAL_II_EQUALS line_index)
           return true;
       return false;
     }
@@ -2269,8 +2292,8 @@ FE_Q_Hierarchical<dim>::has_support_on_face(const unsigned int shape_index,
 
       // in 3d,
       // quad_index=face_index
-      if (dim == 3)
-        return (quad_index == face_index);
+      if (dim DEAL_II_EQUALS 3)
+        return (quad_index DEAL_II_EQUALS face_index);
       else
         Assert(false, ExcNotImplemented());
     }
@@ -2295,10 +2318,10 @@ template <int dim>
 std::vector<unsigned int>
 FE_Q_Hierarchical<dim>::get_embedding_dofs(const unsigned int sub_degree) const
 {
-  Assert((sub_degree > 0) && (sub_degree <= this->degree),
+  Assert((sub_degree > 0) DEAL_II_AND(sub_degree <= this->degree),
          ExcIndexRange(sub_degree, 1, this->degree));
 
-  if (dim == 1)
+  if (dim DEAL_II_EQUALS 1)
     {
       std::vector<unsigned int> embedding_dofs(sub_degree + 1);
       for (unsigned int i = 0; i < (sub_degree + 1); ++i)
@@ -2307,7 +2330,7 @@ FE_Q_Hierarchical<dim>::get_embedding_dofs(const unsigned int sub_degree) const
       return embedding_dofs;
     }
 
-  if (sub_degree == 1)
+  if (sub_degree DEAL_II_EQUALS 1)
     {
       std::vector<unsigned int> embedding_dofs(
         GeometryInfo<dim>::vertices_per_cell);
@@ -2316,7 +2339,7 @@ FE_Q_Hierarchical<dim>::get_embedding_dofs(const unsigned int sub_degree) const
 
       return embedding_dofs;
     }
-  else if (sub_degree == this->degree)
+  else if (sub_degree DEAL_II_EQUALS this->degree)
     {
       std::vector<unsigned int> embedding_dofs(this->n_dofs_per_cell());
       for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
@@ -2325,14 +2348,15 @@ FE_Q_Hierarchical<dim>::get_embedding_dofs(const unsigned int sub_degree) const
       return embedding_dofs;
     }
 
-  if ((dim == 2) || (dim == 3))
+  if ((dim DEAL_II_EQUALS 2)DEAL_II_OR(dim DEAL_II_EQUALS 3))
     {
       std::vector<unsigned int> embedding_dofs(
-        (dim == 2) ? (sub_degree + 1) * (sub_degree + 1) :
-                     (sub_degree + 1) * (sub_degree + 1) * (sub_degree + 1));
+        (dim DEAL_II_EQUALS 2) ?
+          (sub_degree + 1) * (sub_degree + 1) :
+          (sub_degree + 1) * (sub_degree + 1) * (sub_degree + 1));
 
       for (unsigned int i = 0;
-           i < ((dim == 2) ?
+           i < ((dim DEAL_II_EQUALS 2) ?
                   (sub_degree + 1) * (sub_degree + 1) :
                   (sub_degree + 1) * (sub_degree + 1) * (sub_degree + 1));
            ++i)

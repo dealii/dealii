@@ -144,7 +144,7 @@ namespace MeshWorker
     inline void
     GnuplotPatch::write(const T &d) const
     {
-      if (os == nullptr)
+      if (os DEAL_II_EQUALS nullptr)
         deallog << d;
       else
         (*os) << d;
@@ -154,7 +154,7 @@ namespace MeshWorker
     inline void
     GnuplotPatch::write_endl() const
     {
-      if (os == nullptr)
+      if (os DEAL_II_EQUALS nullptr)
         deallog << std::endl;
       else
         (*os) << std::endl;
@@ -203,13 +203,15 @@ namespace MeshWorker
       const unsigned int np = info.n_quadrature_points();
       const unsigned int nv = info.n_quadrature_values();
       const unsigned int patch_dim =
-        (info.face_number == numbers::invalid_unsigned_int) ? dim : (dim - 1);
+        (info.face_number DEAL_II_EQUALS numbers::invalid_unsigned_int) ?
+          dim :
+          (dim - 1);
       const unsigned int row_length = n_points;
       // If patches are 1D, end the
       // patch after a row, else end
       // it after a square
       const unsigned int row_length2 =
-        (patch_dim == 1) ? row_length : (row_length * row_length);
+        (patch_dim DEAL_II_EQUALS 1) ? row_length : (row_length * row_length);
 
       //      AssertDimension(np, Utilities::fixed_power<dim>(n_points));
       AssertDimension(nv, n_vectors + dim);
@@ -217,9 +219,9 @@ namespace MeshWorker
 
       for (unsigned int k = 0; k < np; ++k)
         {
-          if (k % row_length == 0)
+          if (k % row_length DEAL_II_EQUALS 0)
             write_endl();
-          if (k % row_length2 == 0)
+          if (k % row_length2 DEAL_II_EQUALS 0)
             write_endl();
 
           for (unsigned int i = 0; i < nv; ++i)

@@ -326,13 +326,13 @@ namespace SUNDIALS
                           Patterns::Selection(
                             "newton|linesearch|fixed_point|picard"));
         prm.add_action("Solution strategy", [&](const std::string &value) {
-          if (value == "newton")
+          if (value DEAL_II_EQUALS "newton")
             strategy = newton;
-          else if (value == "linesearch")
+          else if (value DEAL_II_EQUALS "linesearch")
             strategy = linesearch;
-          else if (value == "fixed_point")
+          else if (value DEAL_II_EQUALS "fixed_point")
             strategy = fixed_point;
-          else if (value == "picard")
+          else if (value DEAL_II_EQUALS "picard")
             strategy = picard;
           else
             Assert(false, ExcInternalError());
@@ -432,7 +432,7 @@ namespace SUNDIALS
       /**
        * The maximum number of beta-condition failures in the
        * linesearch algorithm. Only used if
-       * strategy==SolutionStrategy::linesearch.
+       * strategyDEAL_II_EQUALS SolutionStrategy::linesearch.
        */
       unsigned int maximum_beta_failures;
 

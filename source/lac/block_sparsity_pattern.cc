@@ -49,7 +49,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::BlockSparsityPatternBase(
   , columns(0)
 {
   (void)s;
-  Assert(s.rows == 0 && s.columns == 0,
+  Assert(s.rows DEAL_II_EQUALS 0 DEAL_II_AND s.columns DEAL_II_EQUALS 0,
          ExcMessage(
            "This constructor can only be called if the provided argument "
            "is the sparsity pattern for an empty matrix. This constructor can "
@@ -110,8 +110,9 @@ BlockSparsityPatternBase<SparsityPatternBase> &
 BlockSparsityPatternBase<SparsityPatternBase>::
 operator=(const BlockSparsityPatternBase<SparsityPatternBase> &bsp)
 {
-  Assert(rows == bsp.rows, ExcDimensionMismatch(rows, bsp.rows));
-  Assert(columns == bsp.columns, ExcDimensionMismatch(columns, bsp.columns));
+  Assert(rows DEAL_II_EQUALS bsp.rows, ExcDimensionMismatch(rows, bsp.rows));
+  Assert(columns DEAL_II_EQUALS bsp.columns,
+         ExcDimensionMismatch(columns, bsp.columns));
   // copy objects
   for (size_type i = 0; i < rows; ++i)
     for (size_type j = 0; j < columns; ++j)
@@ -140,7 +141,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::collect_sizes()
   // sizes
   for (size_type c = 1; c < columns; ++c)
     for (size_type r = 0; r < rows; ++r)
-      Assert(row_sizes[r] == sub_objects[r][c]->n_rows(),
+      Assert(row_sizes[r] DEAL_II_EQUALS sub_objects[r][c]->n_rows(),
              ExcIncompatibleRowNumbers(r, 0, r, c));
 
   // finally initialize the row
@@ -153,7 +154,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::collect_sizes()
     col_sizes[c] = sub_objects[0][c]->n_cols();
   for (size_type r = 1; r < rows; ++r)
     for (size_type c = 0; c < columns; ++c)
-      Assert(col_sizes[c] == sub_objects[r][c]->n_cols(),
+      Assert(col_sizes[c] DEAL_II_EQUALS sub_objects[r][c]->n_cols(),
              ExcIncompatibleRowNumbers(0, c, r, c));
 
   // finally initialize the row
@@ -180,7 +181,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::empty() const
 {
   for (size_type i = 0; i < rows; ++i)
     for (size_type j = 0; j < columns; ++j)
-      if (sub_objects[i][j]->empty() == false)
+      if (sub_objects[i][j]->empty() DEAL_II_EQUALS false)
         return false;
   return true;
 }
@@ -288,8 +289,9 @@ BlockSparsityPatternBase<DynamicSparsityPattern>::print(std::ostream &out) const
           for (size_type jb = 0; jb < n_block_cols(); ++jb)
             {
               const DynamicSparsityPattern &b = block(ib, jb);
-              if (b.row_index_set().size() == 0 ||
-                  b.row_index_set().is_element(i))
+              if (b.row_index_set()
+                    .size() DEAL_II_EQUALS 0 DEAL_II_OR b.row_index_set()
+                    .is_element(i))
                 for (size_type j = 0; j < b.n_cols(); ++j)
                   if (b.exists(i, j))
                     out << ',' << l + j;
@@ -351,7 +353,7 @@ BlockSparsityPattern::reinit(
         const size_type start  = rows.local_to_global(i, 0);
         const size_type length = rows.block_size(i);
 
-        if (row_lengths[j].size() == 1)
+        if (row_lengths[j].size() DEAL_II_EQUALS 1)
           block(i, j).reinit(rows.block_size(i),
                              cols.block_size(j),
                              row_lengths[j][0]);
@@ -369,8 +371,8 @@ BlockSparsityPattern::reinit(
           }
       }
   this->collect_sizes();
-  Assert(this->row_indices == rows, ExcInternalError());
-  Assert(this->column_indices == cols, ExcInternalError());
+  Assert(this->row_indices DEAL_II_EQUALS rows, ExcInternalError());
+  Assert(this->column_indices DEAL_II_EQUALS cols, ExcInternalError());
 }
 
 
@@ -379,7 +381,7 @@ BlockSparsityPattern::is_compressed() const
 {
   for (size_type i = 0; i < rows; ++i)
     for (size_type j = 0; j < columns; ++j)
-      if (sub_objects[i][j]->is_compressed() == false)
+      if (sub_objects[i][j]->is_compressed() DEAL_II_EQUALS false)
         return false;
   return true;
 }

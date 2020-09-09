@@ -174,7 +174,9 @@ namespace LinearAlgebra
     {
       // we only allow assignment to vectors with the same number of blocks
       // or to an empty BlockVector
-      Assert(this->n_blocks() == 0 || this->n_blocks() == v.n_blocks(),
+      Assert(this->n_blocks()
+               DEAL_II_EQUALS 0 DEAL_II_OR this->n_blocks()
+                 DEAL_II_EQUALS v.n_blocks(),
              ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
 
       if (this->n_blocks() != v.n_blocks())
@@ -258,8 +260,9 @@ namespace LinearAlgebra
           // does not support overlapping (ghosted) PETSc vectors, which we need
           // for backward compatibility.
 
-          Assert(petsc_vec.block(i).locally_owned_elements() ==
-                   this->block(i).locally_owned_elements(),
+          Assert(petsc_vec.block(i)
+                   .locally_owned_elements() DEAL_II_EQUALS this->block(i)
+                   .locally_owned_elements(),
                  StandardExceptions::ExcInvalidState());
 
           // get a representation of the vector and copy it
@@ -267,7 +270,7 @@ namespace LinearAlgebra
           PetscErrorCode ierr =
             VecGetArray(static_cast<const Vec &>(petsc_vec.block(i)),
                         &start_ptr);
-          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
           const size_type vec_size = this->block(i).local_size();
           petsc_helpers::copy_petsc_vector(start_ptr,
@@ -277,11 +280,12 @@ namespace LinearAlgebra
           // restore the representation of the vector
           ierr = VecRestoreArray(static_cast<const Vec &>(petsc_vec.block(i)),
                                  &start_ptr);
-          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
           // spread ghost values between processes?
-          if (this->block(i).vector_is_ghosted ||
-              petsc_vec.block(i).has_ghost_elements())
+          if (this->block(i)
+                .vector_is_ghosted DEAL_II_OR petsc_vec.block(i)
+                .has_ghost_elements())
             this->block(i).update_ghost_values();
         }
 
@@ -309,8 +313,9 @@ namespace LinearAlgebra
           rw_vector.import(trilinos_vec.block(i), VectorOperation::insert);
           this->block(i).import(rw_vector, VectorOperation::insert);
 
-          if (this->block(i).has_ghost_elements() ||
-              trilinos_vec.block(i).has_ghost_elements())
+          if (this->block(i)
+                .has_ghost_elements() DEAL_II_OR trilinos_vec.block(i)
+                .has_ghost_elements())
             this->block(i).update_ghost_values();
         }
 
@@ -391,7 +396,7 @@ namespace LinearAlgebra
     {
       bool has_ghost_elements = false;
       for (unsigned int block = 0; block < this->n_blocks(); ++block)
-        if (this->block(block).has_ghost_elements() == true)
+        if (this->block(block).has_ghost_elements() DEAL_II_EQUALS true)
           has_ghost_elements = true;
       return has_ghost_elements;
     }
@@ -620,7 +625,8 @@ namespace LinearAlgebra
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
         local_result =
           std::max(local_result,
-                   (this->block(i).linfty_norm_local() == 0) ? -1 : 0);
+                   (this->block(i).linfty_norm_local() DEAL_II_EQUALS 0) ? -1 :
+                                                                           0);
 
       if (this->block(0).partitioner->n_mpi_processes() > 1)
         return -Utilities::MPI::max(
@@ -806,7 +812,7 @@ namespace LinearAlgebra
     inline void
     BlockVector<Number>::swap(BlockVector<Number> &v)
     {
-      Assert(this->n_blocks() == v.n_blocks(),
+      Assert(this->n_blocks() DEAL_II_EQUALS v.n_blocks(),
              ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
 
       for (size_type i = 0; i < this->n_blocks(); ++i)
@@ -912,11 +918,11 @@ namespace LinearAlgebra
       // FullMatrix resized to (m,n) will have 0 both in m() and n()
       // which is how TableBase<N,T>::reinit() works as of deal.ii@8.5.0.
       // Since in this case there is nothing to do anyway -- return immediately.
-      if (n == 0 || m == 0)
+      if (n DEAL_II_EQUALS 0 DEAL_II_OR m DEAL_II_EQUALS 0)
         return;
 
-      Assert(matrix.m() == m, ExcDimensionMismatch(matrix.m(), m));
-      Assert(matrix.n() == n, ExcDimensionMismatch(matrix.n(), n));
+      Assert(matrix.m() DEAL_II_EQUALS m, ExcDimensionMismatch(matrix.m(), m));
+      Assert(matrix.n() DEAL_II_EQUALS n, ExcDimensionMismatch(matrix.n(), n));
 
       // reset the matrix
       matrix = typename FullMatrixType::value_type(0.0);
@@ -924,7 +930,7 @@ namespace LinearAlgebra
       internal::set_symmetric(matrix, symmetric);
       if (symmetric)
         {
-          Assert(m == n, ExcDimensionMismatch(m, n));
+          Assert(m DEAL_II_EQUALS n, ExcDimensionMismatch(m, n));
 
           for (unsigned int i = 0; i < m; i++)
             for (unsigned int j = i; j < n; j++)
@@ -965,15 +971,15 @@ namespace LinearAlgebra
       // FullMatrix resized to (m,n) will have 0 both in m() and n()
       // which is how TableBase<N,T>::reinit() works.
       // Since in this case there is nothing to do anyway -- return immediately.
-      if (n == 0 || m == 0)
+      if (n DEAL_II_EQUALS 0 DEAL_II_OR m DEAL_II_EQUALS 0)
         return res;
 
-      Assert(matrix.m() == m, ExcDimensionMismatch(matrix.m(), m));
-      Assert(matrix.n() == n, ExcDimensionMismatch(matrix.n(), n));
+      Assert(matrix.m() DEAL_II_EQUALS m, ExcDimensionMismatch(matrix.m(), m));
+      Assert(matrix.n() DEAL_II_EQUALS n, ExcDimensionMismatch(matrix.n(), n));
 
       if (symmetric)
         {
-          Assert(m == n, ExcDimensionMismatch(m, n));
+          Assert(m DEAL_II_EQUALS n, ExcDimensionMismatch(m, n));
 
           for (unsigned int i = 0; i < m; i++)
             {
@@ -1012,16 +1018,17 @@ namespace LinearAlgebra
       // FullMatrix resized to (m,n) will have 0 both in m() and n()
       // which is how TableBase<N,T>::reinit() works.
       // Since in this case there is nothing to do anyway -- return immediately.
-      if (n == 0 || m == 0)
+      if (n DEAL_II_EQUALS 0 DEAL_II_OR m DEAL_II_EQUALS 0)
         return;
 
-      Assert(matrix.m() == m, ExcDimensionMismatch(matrix.m(), m));
-      Assert(matrix.n() == n, ExcDimensionMismatch(matrix.n(), n));
+      Assert(matrix.m() DEAL_II_EQUALS m, ExcDimensionMismatch(matrix.m(), m));
+      Assert(matrix.n() DEAL_II_EQUALS n, ExcDimensionMismatch(matrix.n(), n));
 
       for (unsigned int i = 0; i < n; i++)
         {
           // below we make this work gracefully for identity-like matrices in
-          // which case the two loops over j won't do any work as A(j,i)==0
+          // which case the two loops over j won't do any work as
+          // A(j,i)DEAL_II_EQUALS 0
           const unsigned int k = std::min(i, m - 1);
           V.block(i).sadd_local(s, matrix(k, i) * b, this->block(k));
           for (unsigned int j = 0; j < k; j++)

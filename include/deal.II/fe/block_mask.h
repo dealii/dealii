@@ -190,8 +190,7 @@ public:
   /**
    * Return whether this object and the argument are identical.
    */
-  bool
-  operator==(const BlockMask &mask) const;
+  bool operator DEAL_II_EQUALS(const BlockMask &mask) const;
 
   /**
    * Return whether this object and the argument are not identical.
@@ -257,7 +256,7 @@ inline bool BlockMask::operator[](const unsigned int block_index) const
 {
   // if the mask represents the all-block mask
   // then always return true
-  if (block_mask.size() == 0)
+  if (block_mask.size() DEAL_II_EQUALS 0)
     return true;
   else
     {
@@ -272,18 +271,19 @@ inline bool BlockMask::operator[](const unsigned int block_index) const
 inline bool
 BlockMask::represents_n_blocks(const unsigned int n) const
 {
-  return ((block_mask.size() == 0) || (block_mask.size() == n));
+  return ((block_mask.size() DEAL_II_EQUALS 0)DEAL_II_OR(block_mask.size()
+                                                           DEAL_II_EQUALS n));
 }
 
 
 inline unsigned int
 BlockMask::n_selected_blocks(const unsigned int n) const
 {
-  if ((n != numbers::invalid_unsigned_int) && (size() > 0))
+  if ((n != numbers::invalid_unsigned_int) DEAL_II_AND(size() > 0))
     AssertDimension(n, size());
 
   const unsigned int real_n = (n != numbers::invalid_unsigned_int ? n : size());
-  if (block_mask.size() == 0)
+  if (block_mask.size() DEAL_II_EQUALS 0)
     return real_n;
   else
     {
@@ -298,15 +298,15 @@ BlockMask::n_selected_blocks(const unsigned int n) const
 inline unsigned int
 BlockMask::first_selected_block(const unsigned int n) const
 {
-  if ((n != numbers::invalid_unsigned_int) && (size() > 0))
+  if ((n != numbers::invalid_unsigned_int) DEAL_II_AND(size() > 0))
     AssertDimension(n, size());
 
-  if (block_mask.size() == 0)
+  if (block_mask.size() DEAL_II_EQUALS 0)
     return 0;
   else
     {
       for (unsigned int c = 0; c < block_mask.size(); ++c)
-        if (block_mask[c] == true)
+        if (block_mask[c] DEAL_II_EQUALS true)
           return c;
 
       Assert(false, ExcMessage("No block is selected at all!"));
@@ -319,7 +319,7 @@ BlockMask::first_selected_block(const unsigned int n) const
 inline bool
 BlockMask::represents_the_all_selected_mask() const
 {
-  return (block_mask.size() == 0);
+  return (block_mask.size() DEAL_II_EQUALS 0);
 }
 
 
@@ -329,9 +329,9 @@ BlockMask::operator|(const BlockMask &mask) const
 {
   // if one of the two masks denotes the all-block mask,
   // then return the other one
-  if (block_mask.size() == 0)
+  if (block_mask.size() DEAL_II_EQUALS 0)
     return mask;
-  else if (mask.block_mask.size() == 0)
+  else if (mask.block_mask.size() DEAL_II_EQUALS 0)
     return *this;
   else
     {
@@ -340,7 +340,7 @@ BlockMask::operator|(const BlockMask &mask) const
       AssertDimension(block_mask.size(), mask.block_mask.size());
       std::vector<bool> new_mask(block_mask.size());
       for (unsigned int i = 0; i < block_mask.size(); ++i)
-        new_mask[i] = (block_mask[i] || mask.block_mask[i]);
+        new_mask[i] = (block_mask[i] DEAL_II_OR mask.block_mask[i]);
 
       return new_mask;
     }
@@ -351,9 +351,9 @@ inline BlockMask BlockMask::operator&(const BlockMask &mask) const
 {
   // if one of the two masks denotes the all-block mask,
   // then return the other one
-  if (block_mask.size() == 0)
+  if (block_mask.size() DEAL_II_EQUALS 0)
     return mask;
-  else if (mask.block_mask.size() == 0)
+  else if (mask.block_mask.size() DEAL_II_EQUALS 0)
     return *this;
   else
     {
@@ -362,17 +362,16 @@ inline BlockMask BlockMask::operator&(const BlockMask &mask) const
       AssertDimension(block_mask.size(), mask.block_mask.size());
       std::vector<bool> new_mask(block_mask.size());
       for (unsigned int i = 0; i < block_mask.size(); ++i)
-        new_mask[i] = (block_mask[i] && mask.block_mask[i]);
+        new_mask[i] = (block_mask[i] DEAL_II_AND mask.block_mask[i]);
 
       return new_mask;
     }
 }
 
 
-inline bool
-BlockMask::operator==(const BlockMask &mask) const
+inline bool BlockMask::operator DEAL_II_EQUALS(const BlockMask &mask) const
 {
-  return block_mask == mask.block_mask;
+  return block_mask DEAL_II_EQUALS mask.block_mask;
 }
 
 

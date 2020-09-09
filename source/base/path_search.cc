@@ -73,7 +73,7 @@ PathSearch::get_path_list(const std::string &cls)
     initialize_classes();
 
   // Modified by Luca Heltai. If a class is not there, add it
-  if (path_lists.count(cls) == 0)
+  if (path_lists.count(cls) DEAL_II_EQUALS 0)
     add_class(cls);
 
   // Assert(path_lists.count(cls) != 0, ExcNoClass(cls));
@@ -90,7 +90,7 @@ PathSearch::get_suffix_list(const std::string &cls)
   // add_path function with the path_list bit...
 
   // Modified by Luca Heltai. If a class is not there, add it
-  if (suffix_lists.count(cls) == 0)
+  if (suffix_lists.count(cls) DEAL_II_EQUALS 0)
     add_class(cls);
 
   // Assert(suffix_lists.count(cls) != 0, ExcNoClass(cls));
@@ -213,11 +213,11 @@ PathSearch::add_class(const std::string &cls)
 void
 PathSearch::add_path(const std::string &path, Position pos)
 {
-  if (pos == back)
+  if (pos DEAL_II_EQUALS back)
     my_path_list.push_back(path);
-  else if (pos == front)
+  else if (pos DEAL_II_EQUALS front)
     my_path_list.insert(my_path_list.begin(), path);
-  else if (pos == after_none)
+  else if (pos DEAL_II_EQUALS after_none)
     {
       std::vector<std::string>::iterator i =
         std::find(my_path_list.begin(), my_path_list.end(), empty);
@@ -231,11 +231,11 @@ PathSearch::add_path(const std::string &path, Position pos)
 void
 PathSearch::add_suffix(const std::string &suffix, Position pos)
 {
-  if (pos == back)
+  if (pos DEAL_II_EQUALS back)
     my_suffix_list.push_back(suffix);
-  else if (pos == front)
+  else if (pos DEAL_II_EQUALS front)
     my_suffix_list.insert(my_suffix_list.begin(), suffix);
-  else if (pos == after_none)
+  else if (pos DEAL_II_EQUALS after_none)
     {
       std::vector<std::string>::iterator i =
         std::find(my_suffix_list.begin(), my_suffix_list.end(), empty);

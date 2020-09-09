@@ -70,19 +70,20 @@ namespace DoFTools
     const types::global_dof_index n_dofs = dof.n_dofs();
     (void)n_dofs;
 
-    Assert(sparsity.n_rows() == n_dofs,
+    Assert(sparsity.n_rows() DEAL_II_EQUALS n_dofs,
            ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
-    Assert(sparsity.n_cols() == n_dofs,
+    Assert(sparsity.n_cols() DEAL_II_EQUALS n_dofs,
            ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
 
     // If we have a distributed::Triangulation only allow locally_owned
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
-    Assert((dof.get_triangulation().locally_owned_subdomain() ==
-            numbers::invalid_subdomain_id) ||
-             (subdomain_id == numbers::invalid_subdomain_id) ||
-             (subdomain_id ==
-              dof.get_triangulation().locally_owned_subdomain()),
+    Assert((dof.get_triangulation().locally_owned_subdomain()
+              DEAL_II_EQUALS numbers::invalid_subdomain_id)
+             DEAL_II_OR(
+               subdomain_id DEAL_II_EQUALS numbers::invalid_subdomain_id)
+               DEAL_II_OR(subdomain_id DEAL_II_EQUALS dof.get_triangulation()
+                            .locally_owned_subdomain()),
            ExcMessage(
              "For parallel::distributed::Triangulation objects and "
              "associated DoF handler objects, asking for any subdomain other "
@@ -98,9 +99,9 @@ namespace DoFTools
     // type, we only have to do the work if the current cell is owned by
     // the calling processor. Otherwise, just continue.
     for (; cell != endc; ++cell)
-      if (((subdomain_id == numbers::invalid_subdomain_id) ||
-           (subdomain_id == cell->subdomain_id())) &&
-          cell->is_locally_owned())
+      if (((subdomain_id DEAL_II_EQUALS numbers::invalid_subdomain_id)
+             DEAL_II_OR(subdomain_id DEAL_II_EQUALS cell->subdomain_id()))
+            DEAL_II_AND cell->is_locally_owned())
         {
           const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
           dofs_on_this_cell.resize(dofs_per_cell);
@@ -132,25 +133,26 @@ namespace DoFTools
     const types::global_dof_index n_dofs = dof.n_dofs();
     (void)n_dofs;
 
-    Assert(sparsity.n_rows() == n_dofs,
+    Assert(sparsity.n_rows() DEAL_II_EQUALS n_dofs,
            ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
-    Assert(sparsity.n_cols() == n_dofs,
+    Assert(sparsity.n_cols() DEAL_II_EQUALS n_dofs,
            ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
-    Assert(couplings.n_rows() == dof.get_fe(0).n_components(),
+    Assert(couplings.n_rows() DEAL_II_EQUALS dof.get_fe(0).n_components(),
            ExcDimensionMismatch(couplings.n_rows(),
                                 dof.get_fe(0).n_components()));
-    Assert(couplings.n_cols() == dof.get_fe(0).n_components(),
+    Assert(couplings.n_cols() DEAL_II_EQUALS dof.get_fe(0).n_components(),
            ExcDimensionMismatch(couplings.n_cols(),
                                 dof.get_fe(0).n_components()));
 
     // If we have a distributed::Triangulation only allow locally_owned
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
-    Assert((dof.get_triangulation().locally_owned_subdomain() ==
-            numbers::invalid_subdomain_id) ||
-             (subdomain_id == numbers::invalid_subdomain_id) ||
-             (subdomain_id ==
-              dof.get_triangulation().locally_owned_subdomain()),
+    Assert((dof.get_triangulation().locally_owned_subdomain()
+              DEAL_II_EQUALS numbers::invalid_subdomain_id)
+             DEAL_II_OR(
+               subdomain_id DEAL_II_EQUALS numbers::invalid_subdomain_id)
+               DEAL_II_OR(subdomain_id DEAL_II_EQUALS dof.get_triangulation()
+                            .locally_owned_subdomain()),
            ExcMessage(
              "For parallel::distributed::Triangulation objects and "
              "associated DoF handler objects, asking for any subdomain other "
@@ -187,9 +189,9 @@ namespace DoFTools
     // type, we only have to do the work if the current cell is owned by
     // the calling processor. Otherwise, just continue.
     for (; cell != endc; ++cell)
-      if (((subdomain_id == numbers::invalid_subdomain_id) ||
-           (subdomain_id == cell->subdomain_id())) &&
-          cell->is_locally_owned())
+      if (((subdomain_id DEAL_II_EQUALS numbers::invalid_subdomain_id)
+             DEAL_II_OR(subdomain_id DEAL_II_EQUALS cell->subdomain_id()))
+            DEAL_II_AND cell->is_locally_owned())
         {
           const unsigned int fe_index = cell->active_fe_index();
           const unsigned int dofs_per_cell =
@@ -222,9 +224,9 @@ namespace DoFTools
     (void)n_dofs_row;
     (void)n_dofs_col;
 
-    Assert(sparsity.n_rows() == n_dofs_row,
+    Assert(sparsity.n_rows() DEAL_II_EQUALS n_dofs_row,
            ExcDimensionMismatch(sparsity.n_rows(), n_dofs_row));
-    Assert(sparsity.n_cols() == n_dofs_col,
+    Assert(sparsity.n_cols() DEAL_II_EQUALS n_dofs_col,
            ExcDimensionMismatch(sparsity.n_cols(), n_dofs_col));
 
     // It doesn't make sense to assemble sparsity patterns when the
@@ -233,11 +235,13 @@ namespace DoFTools
     // assembling coupling terms between dofs on a cell owned by one processor
     // and dofs on a cell owned by a different processor.
     if (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-          &dof_row.get_triangulation()) != nullptr ||
-        dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+          &dof_row.get_triangulation()) !=
+        nullptr DEAL_II_OR dynamic_cast<
+          const parallel::TriangulationBase<dim, spacedim> *>(
           &dof_col.get_triangulation()) != nullptr)
       {
-        Assert(&dof_row.get_triangulation() == &dof_col.get_triangulation(),
+        Assert(&dof_row.get_triangulation() DEAL_II_EQUALS &
+                 dof_col.get_triangulation(),
                ExcMessage("This function can only be used with with parallel "
                           "Triangulations when the Triangulations are equal."));
       }
@@ -253,22 +257,24 @@ namespace DoFTools
     // for shared::Tria, but we don't want to assemble on cells that are not
     // locally owned so remove them
     if (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
-          &dof_row.get_triangulation()) != nullptr ||
-        dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
+          &dof_row.get_triangulation()) !=
+        nullptr DEAL_II_OR dynamic_cast<
+          const parallel::shared::Triangulation<dim, spacedim> *>(
           &dof_col.get_triangulation()) != nullptr)
       {
         const types::subdomain_id this_subdomain_id =
           dof_row.get_triangulation().locally_owned_subdomain();
-        Assert(this_subdomain_id ==
-                 dof_col.get_triangulation().locally_owned_subdomain(),
+        Assert(this_subdomain_id DEAL_II_EQUALS dof_col.get_triangulation()
+                 .locally_owned_subdomain(),
                ExcInternalError());
         cell_list.erase(
           std::remove_if(
             cell_list.begin(),
             cell_list.end(),
             [=](const std::pair<cell_iterator, cell_iterator> &pair) {
-              return pair.first->subdomain_id() != this_subdomain_id ||
-                     pair.second->subdomain_id() != this_subdomain_id;
+              return pair.first->subdomain_id() !=
+                     this_subdomain_id DEAL_II_OR pair.second->subdomain_id() !=
+                     this_subdomain_id;
             }),
           cell_list.end());
       }
@@ -279,7 +285,7 @@ namespace DoFTools
         const cell_iterator cell_row = cell_pair.first;
         const cell_iterator cell_col = cell_pair.second;
 
-        if (cell_row->is_active() && cell_col->is_active())
+        if (cell_row->is_active() DEAL_II_AND cell_col->is_active())
           {
             const unsigned int dofs_per_cell_row =
               cell_row->get_fe().n_dofs_per_cell();
@@ -362,7 +368,7 @@ namespace DoFTools
     const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
     SparsityPatternType &                       sparsity)
   {
-    if (dim == 1)
+    if (dim DEAL_II_EQUALS 1)
       {
         // there are only 2 boundary indicators in 1d, so it is no
         // performance problem to call the other function
@@ -386,7 +392,8 @@ namespace DoFTools
       {
         types::global_dof_index max_element = 0;
         for (const types::global_dof_index index : dof_to_boundary_mapping)
-          if ((index != numbers::invalid_dof_index) && (index > max_element))
+          if ((index != numbers::invalid_dof_index)
+                DEAL_II_AND(index > max_element))
             max_element = index;
         AssertDimension(max_element, sparsity.n_rows() - 1);
       }
@@ -434,13 +441,13 @@ namespace DoFTools
     const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
     SparsityPatternType &                       sparsity)
   {
-    if (dim == 1)
+    if (dim DEAL_II_EQUALS 1)
       {
         // first check left, then right boundary point
         for (unsigned int direction = 0; direction < 2; ++direction)
           {
             // if this boundary is not requested, then go on with next one
-            if (boundary_ids.find(direction) == boundary_ids.end())
+            if (boundary_ids.find(direction) DEAL_II_EQUALS boundary_ids.end())
               continue;
 
             // find active cell at that boundary: first go to left/right,
@@ -474,13 +481,14 @@ namespace DoFTools
     (void)n_dofs;
 
     AssertDimension(dof_to_boundary_mapping.size(), n_dofs);
-    Assert(boundary_ids.find(numbers::internal_face_boundary_id) ==
-             boundary_ids.end(),
+    Assert(boundary_ids
+             .find(numbers::internal_face_boundary_id)
+               DEAL_II_EQUALS boundary_ids.end(),
            (typename DoFHandler<dim, spacedim>::ExcInvalidBoundaryIndicator()));
-    Assert(sparsity.n_rows() == dof.n_boundary_dofs(boundary_ids),
+    Assert(sparsity.n_rows() DEAL_II_EQUALS dof.n_boundary_dofs(boundary_ids),
            ExcDimensionMismatch(sparsity.n_rows(),
                                 dof.n_boundary_dofs(boundary_ids)));
-    Assert(sparsity.n_cols() == dof.n_boundary_dofs(boundary_ids),
+    Assert(sparsity.n_cols() DEAL_II_EQUALS dof.n_boundary_dofs(boundary_ids),
            ExcDimensionMismatch(sparsity.n_cols(),
                                 dof.n_boundary_dofs(boundary_ids)));
 #ifdef DEBUG
@@ -488,7 +496,8 @@ namespace DoFTools
       {
         types::global_dof_index max_element = 0;
         for (const types::global_dof_index index : dof_to_boundary_mapping)
-          if ((index != numbers::invalid_dof_index) && (index > max_element))
+          if ((index != numbers::invalid_dof_index)
+                DEAL_II_AND(index > max_element))
             max_element = index;
         AssertDimension(max_element, sparsity.n_rows() - 1);
       }
@@ -542,11 +551,12 @@ namespace DoFTools
     // If we have a distributed::Triangulation only allow locally_owned
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
-    Assert((dof.get_triangulation().locally_owned_subdomain() ==
-            numbers::invalid_subdomain_id) ||
-             (subdomain_id == numbers::invalid_subdomain_id) ||
-             (subdomain_id ==
-              dof.get_triangulation().locally_owned_subdomain()),
+    Assert((dof.get_triangulation().locally_owned_subdomain()
+              DEAL_II_EQUALS numbers::invalid_subdomain_id)
+             DEAL_II_OR(
+               subdomain_id DEAL_II_EQUALS numbers::invalid_subdomain_id)
+               DEAL_II_OR(subdomain_id DEAL_II_EQUALS dof.get_triangulation()
+                            .locally_owned_subdomain()),
            ExcMessage(
              "For parallel::distributed::Triangulation objects and "
              "associated DoF handler objects, asking for any subdomain other "
@@ -569,9 +579,9 @@ namespace DoFTools
     // type, we only have to do the work if the current cell is owned by
     // the calling processor. Otherwise, just continue.
     for (; cell != endc; ++cell)
-      if (((subdomain_id == numbers::invalid_subdomain_id) ||
-           (subdomain_id == cell->subdomain_id())) &&
-          cell->is_locally_owned())
+      if (((subdomain_id DEAL_II_EQUALS numbers::invalid_subdomain_id)
+             DEAL_II_OR(subdomain_id DEAL_II_EQUALS cell->subdomain_id()))
+            DEAL_II_AND cell->is_locally_owned())
         {
           const unsigned int n_dofs_on_this_cell =
             cell->get_fe().n_dofs_per_cell();
@@ -590,7 +600,7 @@ namespace DoFTools
               typename DoFHandler<dim, spacedim>::face_iterator cell_face =
                 cell->face(face);
               const bool periodic_neighbor = cell->has_periodic_neighbor(face);
-              if (!cell->at_boundary(face) || periodic_neighbor)
+              if (!cell->at_boundary(face) DEAL_II_OR periodic_neighbor)
                 {
                   typename DoFHandler<dim, spacedim>::level_cell_iterator
                     neighbor = cell->neighbor_or_periodic_neighbor(face);
@@ -599,9 +609,9 @@ namespace DoFTools
                   // might have children and then loop over those children.
                   // rather, we may as well go straight to the cell behind
                   // this particular cell's most terminal child
-                  if (dim == 1)
+                  if (dim DEAL_II_EQUALS 1)
                     while (neighbor->has_children())
-                      neighbor = neighbor->child(face == 0 ? 1 : 0);
+                      neighbor = neighbor->child(face DEAL_II_EQUALS 0 ? 1 : 0);
 
                   if (neighbor->has_children())
                     {
@@ -646,11 +656,12 @@ namespace DoFTools
                     {
                       // Refinement edges are taken care of by coarser
                       // cells
-                      if ((!periodic_neighbor &&
-                           cell->neighbor_is_coarser(face)) ||
-                          (periodic_neighbor &&
-                           cell->periodic_neighbor_is_coarser(face)))
-                        if (neighbor->subdomain_id() == cell->subdomain_id())
+                      if ((!periodic_neighbor DEAL_II_AND
+                                              cell->neighbor_is_coarser(face))
+                            DEAL_II_OR(periodic_neighbor DEAL_II_AND cell
+                                         ->periodic_neighbor_is_coarser(face)))
+                        if (neighbor->subdomain_id()
+                              DEAL_II_EQUALS cell->subdomain_id())
                           continue;
 
                       const unsigned int n_dofs_on_neighbor =
@@ -670,8 +681,9 @@ namespace DoFTools
                       // face twice and hence put the indices the other way
                       // around
                       if (!cell->neighbor_or_periodic_neighbor(face)
-                             ->is_active() ||
-                          (neighbor->subdomain_id() != cell->subdomain_id()))
+                             ->is_active()
+                               DEAL_II_OR(neighbor->subdomain_id() !=
+                                          cell->subdomain_id()))
                         {
                           constraints.add_entries_local_to_global(
                             dofs_on_other_cell,
@@ -707,10 +719,10 @@ namespace DoFTools
     const FiniteElement<dim, spacedim> &fe,
     const Table<2, Coupling> &          component_couplings)
   {
-    Assert(component_couplings.n_rows() == fe.n_components(),
+    Assert(component_couplings.n_rows() DEAL_II_EQUALS fe.n_components(),
            ExcDimensionMismatch(component_couplings.n_rows(),
                                 fe.n_components()));
-    Assert(component_couplings.n_cols() == fe.n_components(),
+    Assert(component_couplings.n_cols() DEAL_II_EQUALS fe.n_components(),
            ExcDimensionMismatch(component_couplings.n_cols(),
                                 fe.n_components()));
 
@@ -781,7 +793,7 @@ namespace DoFTools
           bool(const typename DoFHandler<dim, spacedim>::active_cell_iterator &,
                const unsigned int)> &face_has_flux_coupling)
       {
-        if (dof.hp_capability_enabled == false)
+        if (dof.hp_capability_enabled DEAL_II_EQUALS false)
           {
             const FiniteElement<dim, spacedim> &fe = dof.get_fe();
 
@@ -816,9 +828,10 @@ namespace DoFTools
               cell = dof.begin_active(),
               endc = dof.end();
             for (; cell != endc; ++cell)
-              if (((subdomain_id == numbers::invalid_subdomain_id) ||
-                   (subdomain_id == cell->subdomain_id())) &&
-                  cell->is_locally_owned())
+              if (((subdomain_id DEAL_II_EQUALS numbers::invalid_subdomain_id)
+                     DEAL_II_OR(
+                       subdomain_id DEAL_II_EQUALS cell->subdomain_id()))
+                    DEAL_II_AND cell->is_locally_owned())
                 {
                   cell->get_dof_indices(dofs_on_this_cell);
                   // make sparsity pattern for this cell
@@ -835,7 +848,8 @@ namespace DoFTools
                       const bool periodic_neighbor =
                         cell->has_periodic_neighbor(face_n);
 
-                      if (cell->at_boundary(face_n) && (!periodic_neighbor))
+                      if (cell->at_boundary(face_n)
+                            DEAL_II_AND(!periodic_neighbor))
                         {
                           for (unsigned int i = 0; i < fe.n_dofs_per_cell();
                                ++i)
@@ -848,9 +862,12 @@ namespace DoFTools
                                   const bool j_non_zero_i =
                                     support_on_face(j, face_n);
 
-                                  if (flux_dof_mask(i, j) == always ||
-                                      (flux_dof_mask(i, j) == nonzero &&
-                                       i_non_zero_i && j_non_zero_i))
+                                  if (flux_dof_mask(i, j)
+                                        DEAL_II_EQUALS always DEAL_II_OR(
+                                          flux_dof_mask(i, j)
+                                            DEAL_II_EQUALS nonzero DEAL_II_AND
+                                              i_non_zero_i DEAL_II_AND
+                                                           j_non_zero_i))
                                     sparsity.add(dofs_on_this_cell[i],
                                                  dofs_on_this_cell[j]);
                                 }
@@ -869,10 +886,11 @@ namespace DoFTools
                           // active, locally-owned cells) then only add to the
                           // sparsity pattern if the current cell is 'greater'
                           // in the total ordering.
-                          if (neighbor->level() == cell->level() &&
-                              neighbor->index() > cell->index() &&
-                              neighbor->is_active() &&
-                              neighbor->is_locally_owned())
+                          if (neighbor->level() DEAL_II_EQUALS cell
+                                ->level() DEAL_II_AND   neighbor->index() >
+                              cell->index() DEAL_II_AND neighbor
+                                ->is_active()
+                                  DEAL_II_AND neighbor->is_locally_owned())
                             continue;
                           // If we are more refined then the neighbor, then we
                           // will automatically find the active neighbor cell
@@ -886,12 +904,15 @@ namespace DoFTools
                           //
                           // Like above, do not use this optimization if the
                           // neighbor is not locally owned.
-                          if (neighbor->level() != cell->level() &&
-                              ((!periodic_neighbor &&
-                                !cell->neighbor_is_coarser(face_n)) ||
-                               (periodic_neighbor &&
-                                !cell->periodic_neighbor_is_coarser(face_n))) &&
-                              neighbor->is_locally_owned())
+                          if (neighbor->level() !=
+                              cell
+                                ->level() DEAL_II_AND(
+                                  (!periodic_neighbor DEAL_II_AND !cell
+                                      ->neighbor_is_coarser(face_n))
+                                    DEAL_II_OR(
+                                      periodic_neighbor DEAL_II_AND !cell
+                                        ->periodic_neighbor_is_coarser(face_n)))
+                                  DEAL_II_AND neighbor->is_locally_owned())
                             continue; // (the neighbor is finer)
 
                           const unsigned int neighbor_face_n =
@@ -906,9 +927,10 @@ namespace DoFTools
                           // below. We need to do this since we otherwise
                           // iterate over the children of the face, which are
                           // always 0 in 1D.
-                          if (dim == 1)
+                          if (dim DEAL_II_EQUALS 1)
                             while (neighbor->has_children())
-                              neighbor = neighbor->child(face_n == 0 ? 1 : 0);
+                              neighbor = neighbor->child(
+                                face_n DEAL_II_EQUALS 0 ? 1 : 0);
 
                           if (neighbor->has_children())
                             {
@@ -944,7 +966,8 @@ namespace DoFTools
                                           const bool j_non_zero_e =
                                             support_on_face(j, neighbor_face_n);
 
-                                          if (flux_dof_mask(i, j) == always)
+                                          if (flux_dof_mask(i, j)
+                                                DEAL_II_EQUALS always)
                                             {
                                               sparsity.add(
                                                 dofs_on_this_cell[i],
@@ -959,28 +982,33 @@ namespace DoFTools
                                                 dofs_on_other_cell[i],
                                                 dofs_on_other_cell[j]);
                                             }
-                                          else if (flux_dof_mask(i, j) ==
-                                                   nonzero)
+                                          else if (flux_dof_mask(i, j)
+                                                     DEAL_II_EQUALS nonzero)
                                             {
-                                              if (i_non_zero_i && j_non_zero_e)
+                                              if (i_non_zero_i DEAL_II_AND
+                                                               j_non_zero_e)
                                                 sparsity.add(
                                                   dofs_on_this_cell[i],
                                                   dofs_on_other_cell[j]);
-                                              if (i_non_zero_e && j_non_zero_i)
+                                              if (i_non_zero_e DEAL_II_AND
+                                                               j_non_zero_i)
                                                 sparsity.add(
                                                   dofs_on_other_cell[i],
                                                   dofs_on_this_cell[j]);
-                                              if (i_non_zero_i && j_non_zero_i)
+                                              if (i_non_zero_i DEAL_II_AND
+                                                               j_non_zero_i)
                                                 sparsity.add(
                                                   dofs_on_this_cell[i],
                                                   dofs_on_this_cell[j]);
-                                              if (i_non_zero_e && j_non_zero_e)
+                                              if (i_non_zero_e DEAL_II_AND
+                                                               j_non_zero_e)
                                                 sparsity.add(
                                                   dofs_on_other_cell[i],
                                                   dofs_on_other_cell[j]);
                                             }
 
-                                          if (flux_dof_mask(j, i) == always)
+                                          if (flux_dof_mask(j, i)
+                                                DEAL_II_EQUALS always)
                                             {
                                               sparsity.add(
                                                 dofs_on_this_cell[j],
@@ -995,22 +1023,26 @@ namespace DoFTools
                                                 dofs_on_other_cell[j],
                                                 dofs_on_other_cell[i]);
                                             }
-                                          else if (flux_dof_mask(j, i) ==
-                                                   nonzero)
+                                          else if (flux_dof_mask(j, i)
+                                                     DEAL_II_EQUALS nonzero)
                                             {
-                                              if (j_non_zero_i && i_non_zero_e)
+                                              if (j_non_zero_i DEAL_II_AND
+                                                               i_non_zero_e)
                                                 sparsity.add(
                                                   dofs_on_this_cell[j],
                                                   dofs_on_other_cell[i]);
-                                              if (j_non_zero_e && i_non_zero_i)
+                                              if (j_non_zero_e DEAL_II_AND
+                                                               i_non_zero_i)
                                                 sparsity.add(
                                                   dofs_on_other_cell[j],
                                                   dofs_on_this_cell[i]);
-                                              if (j_non_zero_i && i_non_zero_i)
+                                              if (j_non_zero_i DEAL_II_AND
+                                                               i_non_zero_i)
                                                 sparsity.add(
                                                   dofs_on_this_cell[j],
                                                   dofs_on_this_cell[i]);
-                                              if (j_non_zero_e && i_non_zero_e)
+                                              if (j_non_zero_e DEAL_II_AND
+                                                               i_non_zero_e)
                                                 sparsity.add(
                                                   dofs_on_other_cell[j],
                                                   dofs_on_other_cell[i]);
@@ -1037,7 +1069,8 @@ namespace DoFTools
                                         support_on_face(j, face_n);
                                       const bool j_non_zero_e =
                                         support_on_face(j, neighbor_face_n);
-                                      if (flux_dof_mask(i, j) == always)
+                                      if (flux_dof_mask(i, j)
+                                            DEAL_II_EQUALS always)
                                         {
                                           sparsity.add(dofs_on_this_cell[i],
                                                        dofs_on_other_cell[j]);
@@ -1048,23 +1081,29 @@ namespace DoFTools
                                           sparsity.add(dofs_on_other_cell[i],
                                                        dofs_on_other_cell[j]);
                                         }
-                                      if (flux_dof_mask(i, j) == nonzero)
+                                      if (flux_dof_mask(i, j)
+                                            DEAL_II_EQUALS nonzero)
                                         {
-                                          if (i_non_zero_i && j_non_zero_e)
+                                          if (i_non_zero_i DEAL_II_AND
+                                                           j_non_zero_e)
                                             sparsity.add(dofs_on_this_cell[i],
                                                          dofs_on_other_cell[j]);
-                                          if (i_non_zero_e && j_non_zero_i)
+                                          if (i_non_zero_e DEAL_II_AND
+                                                           j_non_zero_i)
                                             sparsity.add(dofs_on_other_cell[i],
                                                          dofs_on_this_cell[j]);
-                                          if (i_non_zero_i && j_non_zero_i)
+                                          if (i_non_zero_i DEAL_II_AND
+                                                           j_non_zero_i)
                                             sparsity.add(dofs_on_this_cell[i],
                                                          dofs_on_this_cell[j]);
-                                          if (i_non_zero_e && j_non_zero_e)
+                                          if (i_non_zero_e DEAL_II_AND
+                                                           j_non_zero_e)
                                             sparsity.add(dofs_on_other_cell[i],
                                                          dofs_on_other_cell[j]);
                                         }
 
-                                      if (flux_dof_mask(j, i) == always)
+                                      if (flux_dof_mask(j, i)
+                                            DEAL_II_EQUALS always)
                                         {
                                           sparsity.add(dofs_on_this_cell[j],
                                                        dofs_on_other_cell[i]);
@@ -1075,18 +1114,23 @@ namespace DoFTools
                                           sparsity.add(dofs_on_other_cell[j],
                                                        dofs_on_other_cell[i]);
                                         }
-                                      if (flux_dof_mask(j, i) == nonzero)
+                                      if (flux_dof_mask(j, i)
+                                            DEAL_II_EQUALS nonzero)
                                         {
-                                          if (j_non_zero_i && i_non_zero_e)
+                                          if (j_non_zero_i DEAL_II_AND
+                                                           i_non_zero_e)
                                             sparsity.add(dofs_on_this_cell[j],
                                                          dofs_on_other_cell[i]);
-                                          if (j_non_zero_e && i_non_zero_i)
+                                          if (j_non_zero_e DEAL_II_AND
+                                                           i_non_zero_i)
                                             sparsity.add(dofs_on_other_cell[j],
                                                          dofs_on_this_cell[i]);
-                                          if (j_non_zero_i && i_non_zero_i)
+                                          if (j_non_zero_i DEAL_II_AND
+                                                           i_non_zero_i)
                                             sparsity.add(dofs_on_this_cell[j],
                                                          dofs_on_this_cell[i]);
-                                          if (j_non_zero_e && i_non_zero_e)
+                                          if (j_non_zero_e DEAL_II_AND
+                                                           i_non_zero_e)
                                             sparsity.add(dofs_on_other_cell[j],
                                                          dofs_on_other_cell[i]);
                                         }
@@ -1126,7 +1170,8 @@ namespace DoFTools
             Table<2, Coupling> int_and_flux_mask(n_components, n_components);
             for (unsigned int c1 = 0; c1 < n_components; ++c1)
               for (unsigned int c2 = 0; c2 < n_components; ++c2)
-                if (int_mask(c1, c2) != none || flux_mask(c1, c2) != none)
+                if (int_mask(c1, c2) != none DEAL_II_OR flux_mask(c1, c2) !=
+                    none)
                   int_and_flux_mask(c1, c2) = always;
 
             std::vector<Table<2, Coupling>> int_and_flux_dof_mask =
@@ -1152,9 +1197,10 @@ namespace DoFTools
               cell = dof.begin_active(),
               endc = dof.end();
             for (; cell != endc; ++cell)
-              if (((subdomain_id == numbers::invalid_subdomain_id) ||
-                   (subdomain_id == cell->subdomain_id())) &&
-                  cell->is_locally_owned())
+              if (((subdomain_id DEAL_II_EQUALS numbers::invalid_subdomain_id)
+                     DEAL_II_OR(
+                       subdomain_id DEAL_II_EQUALS cell->subdomain_id()))
+                    DEAL_II_AND cell->is_locally_owned())
                 {
                   dofs_on_this_cell.resize(cell->get_fe().n_dofs_per_cell());
                   cell->get_dof_indices(dofs_on_this_cell);
@@ -1178,7 +1224,8 @@ namespace DoFTools
                       const bool periodic_neighbor =
                         cell->has_periodic_neighbor(face);
 
-                      if ((!cell->at_boundary(face)) || periodic_neighbor)
+                      if ((!cell->at_boundary(
+                            face))DEAL_II_OR periodic_neighbor)
                         {
                           typename dealii::DoFHandler<dim, spacedim>::
                             level_cell_iterator neighbor =
@@ -1191,10 +1238,11 @@ namespace DoFTools
                           // level (and both are active, locally-owned cells)
                           // then only add to the sparsity pattern if the
                           // current cell is 'greater' in the total ordering.
-                          if (neighbor->level() == cell->level() &&
-                              neighbor->index() > cell->index() &&
-                              neighbor->is_active() &&
-                              neighbor->is_locally_owned())
+                          if (neighbor->level() DEAL_II_EQUALS cell
+                                ->level() DEAL_II_AND   neighbor->index() >
+                              cell->index() DEAL_II_AND neighbor
+                                ->is_active()
+                                  DEAL_II_AND neighbor->is_locally_owned())
                             continue;
                           // Again, like the non-hp case: If we are more refined
                           // then the neighbor, then we will automatically find
@@ -1208,12 +1256,15 @@ namespace DoFTools
                           //
                           // Like above, do not use this optimization if the
                           // neighbor is not locally owned.
-                          if (neighbor->level() != cell->level() &&
-                              ((!periodic_neighbor &&
-                                !cell->neighbor_is_coarser(face)) ||
-                               (periodic_neighbor &&
-                                !cell->periodic_neighbor_is_coarser(face))) &&
-                              neighbor->is_locally_owned())
+                          if (neighbor->level() !=
+                              cell
+                                ->level() DEAL_II_AND(
+                                  (!periodic_neighbor DEAL_II_AND !cell
+                                      ->neighbor_is_coarser(face))
+                                    DEAL_II_OR(
+                                      periodic_neighbor DEAL_II_AND !cell
+                                        ->periodic_neighbor_is_coarser(face)))
+                                  DEAL_II_AND neighbor->is_locally_owned())
                             continue; // (the neighbor is finer)
 
                           // In 1D, go straight to the cell behind this
@@ -1222,9 +1273,10 @@ namespace DoFTools
                           // below. We need to do this since we otherwise
                           // iterate over the children of the face, which are
                           // always 0 in 1D.
-                          if (dim == 1)
+                          if (dim DEAL_II_EQUALS 1)
                             while (neighbor->has_children())
-                              neighbor = neighbor->child(face == 0 ? 1 : 0);
+                              neighbor =
+                                neighbor->child(face DEAL_II_EQUALS 0 ? 1 : 0);
 
                           if (neighbor->has_children())
                             {
@@ -1281,16 +1333,22 @@ namespace DoFTools
                                                         .n_components(),
                                                  ExcInternalError());
 
-                                          if ((flux_mask(ii, jj) == always) ||
-                                              (flux_mask(ii, jj) == nonzero))
+                                          if ((flux_mask(ii, jj)
+                                                 DEAL_II_EQUALS always)
+                                                DEAL_II_OR(
+                                                  flux_mask(ii, jj)
+                                                    DEAL_II_EQUALS nonzero))
                                             {
                                               sparsity.add(
                                                 dofs_on_this_cell[i],
                                                 dofs_on_other_cell[j]);
                                             }
 
-                                          if ((flux_mask(jj, ii) == always) ||
-                                              (flux_mask(jj, ii) == nonzero))
+                                          if ((flux_mask(jj, ii)
+                                                 DEAL_II_EQUALS always)
+                                                DEAL_II_OR(
+                                                  flux_mask(jj, ii)
+                                                    DEAL_II_EQUALS nonzero))
                                             {
                                               sparsity.add(
                                                 dofs_on_other_cell[j],
@@ -1338,15 +1396,21 @@ namespace DoFTools
                                         jj < neighbor->get_fe().n_components(),
                                         ExcInternalError());
 
-                                      if ((flux_mask(ii, jj) == always) ||
-                                          (flux_mask(ii, jj) == nonzero))
+                                      if ((flux_mask(ii, jj)
+                                             DEAL_II_EQUALS always)
+                                            DEAL_II_OR(
+                                              flux_mask(ii, jj)
+                                                DEAL_II_EQUALS nonzero))
                                         {
                                           sparsity.add(dofs_on_this_cell[i],
                                                        dofs_on_other_cell[j]);
                                         }
 
-                                      if ((flux_mask(jj, ii) == always) ||
-                                          (flux_mask(jj, ii) == nonzero))
+                                      if ((flux_mask(jj, ii)
+                                             DEAL_II_EQUALS always)
+                                            DEAL_II_OR(
+                                              flux_mask(jj, ii)
+                                                DEAL_II_EQUALS nonzero))
                                         {
                                           sparsity.add(dofs_on_other_cell[j],
                                                        dofs_on_this_cell[i]);
@@ -1413,27 +1477,28 @@ namespace DoFTools
     const unsigned int n_comp = dof.get_fe(0).n_components();
     (void)n_comp;
 
-    Assert(sparsity.n_rows() == n_dofs,
+    Assert(sparsity.n_rows() DEAL_II_EQUALS n_dofs,
            ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
-    Assert(sparsity.n_cols() == n_dofs,
+    Assert(sparsity.n_cols() DEAL_II_EQUALS n_dofs,
            ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
-    Assert(int_mask.n_rows() == n_comp,
+    Assert(int_mask.n_rows() DEAL_II_EQUALS n_comp,
            ExcDimensionMismatch(int_mask.n_rows(), n_comp));
-    Assert(int_mask.n_cols() == n_comp,
+    Assert(int_mask.n_cols() DEAL_II_EQUALS n_comp,
            ExcDimensionMismatch(int_mask.n_cols(), n_comp));
-    Assert(flux_mask.n_rows() == n_comp,
+    Assert(flux_mask.n_rows() DEAL_II_EQUALS n_comp,
            ExcDimensionMismatch(flux_mask.n_rows(), n_comp));
-    Assert(flux_mask.n_cols() == n_comp,
+    Assert(flux_mask.n_cols() DEAL_II_EQUALS n_comp,
            ExcDimensionMismatch(flux_mask.n_cols(), n_comp));
 
     // If we have a distributed::Triangulation only allow locally_owned
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
-    Assert((dof.get_triangulation().locally_owned_subdomain() ==
-            numbers::invalid_subdomain_id) ||
-             (subdomain_id == numbers::invalid_subdomain_id) ||
-             (subdomain_id ==
-              dof.get_triangulation().locally_owned_subdomain()),
+    Assert((dof.get_triangulation().locally_owned_subdomain()
+              DEAL_II_EQUALS numbers::invalid_subdomain_id)
+             DEAL_II_OR(
+               subdomain_id DEAL_II_EQUALS numbers::invalid_subdomain_id)
+               DEAL_II_OR(subdomain_id DEAL_II_EQUALS dof.get_triangulation()
+                            .locally_owned_subdomain()),
            ExcMessage(
              "For parallel::distributed::Triangulation objects and "
              "associated DoF handler objects, asking for any subdomain other "

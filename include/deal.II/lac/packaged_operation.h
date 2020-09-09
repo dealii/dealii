@@ -368,7 +368,7 @@ PackagedOperation<Range> operator*(const PackagedOperation<Range> &comp,
   return_comp.reinit_vector = comp.reinit_vector;
 
   // the trivial case: number is zero
-  if (number == 0.)
+  if (number DEAL_II_EQUALS 0.)
     {
       return_comp.apply = [](Range &v) { v = 0.; };
 

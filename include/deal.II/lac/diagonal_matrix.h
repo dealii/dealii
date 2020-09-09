@@ -115,7 +115,7 @@ public:
 
   /**
    * Read-only access to a value. This is restricted to the case where
-   * <i>i==j</i> due to the matrix storage.
+   * <i>iDEAL_II_EQUALS j</i> due to the matrix storage.
    *
    * If the vector representing the diagonal is distributed with MPI, not all
    * of the indices <i>i</i> might actually be accessible. Refer to the method
@@ -127,7 +127,7 @@ public:
 
   /**
    * Read-write access to a value. This is restricted to the case where
-   * <i>i==j</i> due to the matrix storage.
+   * <i>iDEAL_II_EQUALS j</i> due to the matrix storage.
    *
    * If the vector representing the diagonal is distributed with MPI, not all
    * of the indices <i>i</i> might actually be accessible. Refer to the method
@@ -316,7 +316,7 @@ typename VectorType::value_type
 DiagonalMatrix<VectorType>::operator()(const size_type i,
                                        const size_type j) const
 {
-  Assert(i == j, ExcIndexRange(j, i, i + 1));
+  Assert(i DEAL_II_EQUALS j, ExcIndexRange(j, i, i + 1));
   (void)j;
   return diagonal(i);
 }
@@ -327,7 +327,7 @@ template <typename VectorType>
 typename VectorType::value_type &
 DiagonalMatrix<VectorType>::operator()(const size_type i, const size_type j)
 {
-  Assert(i == j, ExcIndexRange(j, i, i + 1));
+  Assert(i DEAL_II_EQUALS j, ExcIndexRange(j, i, i + 1));
   (void)j;
   return diagonal(i);
 }
@@ -345,7 +345,7 @@ DiagonalMatrix<VectorType>::add(const size_type  row,
                                 const bool)
 {
   for (size_type i = 0; i < n_cols; ++i)
-    if (col_indices[i] == row)
+    if (col_indices[i] DEAL_II_EQUALS row)
       diagonal(row) += values[i];
 }
 
@@ -357,7 +357,7 @@ DiagonalMatrix<VectorType>::add(const size_type  i,
                                 const size_type  j,
                                 const value_type value)
 {
-  if (i == j)
+  if (i DEAL_II_EQUALS j)
     diagonal(i) += value;
 }
 

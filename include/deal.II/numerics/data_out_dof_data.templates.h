@@ -101,7 +101,7 @@ namespace internal
       , update_flags(update_flags)
     {
       unsigned int n_q_points = 0;
-      if (use_face_values == false)
+      if (use_face_values DEAL_II_EQUALS false)
         {
           const bool do_simplex =
             std::any_of(finite_elements.begin(),
@@ -114,27 +114,26 @@ namespace internal
                           return false;
                         });
 
-          const bool do_hex =
-            std::any_of(finite_elements.begin(),
-                        finite_elements.end(),
-                        [](const auto &fe) {
-                          for (unsigned int i = 0; i < fe->size(); ++i)
-                            if ((*fe)[i].reference_cell_type() ==
-                                ReferenceCell::get_hypercube(dim))
-                              return true;
-                          return false;
-                        });
+          const bool do_hex = std::any_of(
+            finite_elements.begin(), finite_elements.end(), [](const auto &fe) {
+              for (unsigned int i = 0; i < fe->size(); ++i)
+                if ((*fe)[i].reference_cell_type()
+                      DEAL_II_EQUALS ReferenceCell::get_hypercube(dim))
+                  return true;
+              return false;
+            });
 
           std::unique_ptr<dealii::Quadrature<dim>> quadrature1;
           std::unique_ptr<dealii::Quadrature<dim>> quadrature2;
 
           if (do_simplex)
             {
-              Assert(1 <= n_subdivisions && n_subdivisions <= 2,
+              Assert(1 <= n_subdivisions DEAL_II_AND n_subdivisions <= 2,
                      ExcNotImplemented());
-              quadrature1.reset(new Quadrature<dim>(
-                Simplex::FE_P<dim, spacedim>(n_subdivisions == 1 ? 1 : 2)
-                  .get_unit_support_points()));
+              quadrature1.reset(
+                new Quadrature<dim>(Simplex::FE_P<dim, spacedim>(
+                                      n_subdivisions DEAL_II_EQUALS 1 ? 1 : 2)
+                                      .get_unit_support_points()));
             }
 
           if (do_hex)
@@ -152,13 +151,14 @@ namespace internal
               // check if there is a finite element that is equal to the present
               // one, then we can re-use the FEValues object
               for (unsigned int j = 0; j < i; ++j)
-                if (this->finite_elements[i].get() ==
-                    this->finite_elements[j].get())
+                if (this->finite_elements[i]
+                      .get() DEAL_II_EQUALS this->finite_elements[j]
+                      .get())
                   {
                     x_fe_values[i] = x_fe_values[j];
                     break;
                   }
-              if (x_fe_values[i].get() == nullptr)
+              if (x_fe_values[i].get() DEAL_II_EQUALS nullptr)
                 {
                   dealii::hp::QCollection<dim> quadrature;
 
@@ -191,13 +191,14 @@ namespace internal
               // check if there is a finite element that is equal to the present
               // one, then we can re-use the FEValues object
               for (unsigned int j = 0; j < i; ++j)
-                if (this->finite_elements[i].get() ==
-                    this->finite_elements[j].get())
+                if (this->finite_elements[i]
+                      .get() DEAL_II_EQUALS this->finite_elements[j]
+                      .get())
                   {
                     x_fe_face_values[i] = x_fe_face_values[j];
                     break;
                   }
-              if (x_fe_face_values[i].get() == nullptr)
+              if (x_fe_face_values[i].get() DEAL_II_EQUALS nullptr)
                 x_fe_face_values[i] =
                   std::make_shared<dealii::hp::FEFaceValues<dim, spacedim>>(
                     this->mapping_collection,
@@ -238,9 +239,10 @@ namespace internal
       , finite_elements(data.finite_elements)
       , update_flags(data.update_flags)
     {
-      if (data.x_fe_values.empty() == false)
+      if (data.x_fe_values.empty() DEAL_II_EQUALS false)
         {
-          Assert(data.x_fe_face_values.empty() == true, ExcInternalError());
+          Assert(data.x_fe_face_values.empty() DEAL_II_EQUALS true,
+                 ExcInternalError());
 
           const bool do_simplex =
             std::any_of(finite_elements.begin(),
@@ -253,27 +255,26 @@ namespace internal
                           return false;
                         });
 
-          const bool do_hex =
-            std::any_of(finite_elements.begin(),
-                        finite_elements.end(),
-                        [](const auto &fe) {
-                          for (unsigned int i = 0; i < fe->size(); ++i)
-                            if ((*fe)[i].reference_cell_type() ==
-                                ReferenceCell::get_hypercube(dim))
-                              return true;
-                          return false;
-                        });
+          const bool do_hex = std::any_of(
+            finite_elements.begin(), finite_elements.end(), [](const auto &fe) {
+              for (unsigned int i = 0; i < fe->size(); ++i)
+                if ((*fe)[i].reference_cell_type()
+                      DEAL_II_EQUALS ReferenceCell::get_hypercube(dim))
+                  return true;
+              return false;
+            });
 
           std::unique_ptr<dealii::Quadrature<dim>> quadrature1;
           std::unique_ptr<dealii::Quadrature<dim>> quadrature2;
 
           if (do_simplex)
             {
-              Assert(1 <= n_subdivisions && n_subdivisions <= 2,
+              Assert(1 <= n_subdivisions DEAL_II_AND n_subdivisions <= 2,
                      ExcNotImplemented());
-              quadrature1.reset(new Quadrature<dim>(
-                Simplex::FE_P<dim, spacedim>(n_subdivisions == 1 ? 1 : 2)
-                  .get_unit_support_points()));
+              quadrature1.reset(
+                new Quadrature<dim>(Simplex::FE_P<dim, spacedim>(
+                                      n_subdivisions DEAL_II_EQUALS 1 ? 1 : 2)
+                                      .get_unit_support_points()));
             }
 
           if (do_hex)
@@ -289,13 +290,14 @@ namespace internal
               // check if there is a finite element that is equal to the present
               // one, then we can re-use the FEValues object
               for (unsigned int j = 0; j < i; ++j)
-                if (this->finite_elements[i].get() ==
-                    this->finite_elements[j].get())
+                if (this->finite_elements[i]
+                      .get() DEAL_II_EQUALS this->finite_elements[j]
+                      .get())
                   {
                     x_fe_values[i] = x_fe_values[j];
                     break;
                   }
-              if (x_fe_values[i].get() == nullptr)
+              if (x_fe_values[i].get() DEAL_II_EQUALS nullptr)
                 {
                   dealii::hp::QCollection<dim> quadrature;
 
@@ -327,13 +329,14 @@ namespace internal
               // check if there is a finite element that is equal to the present
               // one, then we can re-use the FEValues object
               for (unsigned int j = 0; j < i; ++j)
-                if (this->finite_elements[i].get() ==
-                    this->finite_elements[j].get())
+                if (this->finite_elements[i]
+                      .get() DEAL_II_EQUALS this->finite_elements[j]
+                      .get())
                   {
                     x_fe_face_values[i] = x_fe_face_values[j];
                     break;
                   }
-              if (x_fe_face_values[i].get() == nullptr)
+              if (x_fe_face_values[i].get() DEAL_II_EQUALS nullptr)
                 x_fe_face_values[i] =
                   std::make_shared<dealii::hp::FEFaceValues<dim, spacedim>>(
                     this->mapping_collection,
@@ -360,8 +363,10 @@ namespace internal
             finite_elements.cbegin(),
             finite_elements.cbegin() + dataset,
             [&](const std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>
-                  &fe) { return finite_elements[dataset].get() == fe.get(); });
-          if (is_duplicate == false)
+                  &fe) {
+              return finite_elements[dataset].get() DEAL_II_EQUALS fe.get();
+            });
+          if (is_duplicate DEAL_II_EQUALS false)
             {
               if (cell->active())
                 {
@@ -421,7 +426,8 @@ namespace internal
                       patch_values_system.solution_gradients.size());
       AssertDimension(patch_values_system.solution_values.size(),
                       patch_values_system.solution_hessians.size());
-      if (patch_values_system.solution_values[0].size() == n_components)
+      if (patch_values_system.solution_values[0].size()
+            DEAL_II_EQUALS n_components)
         return;
       for (unsigned int k = 0; k < patch_values_system.solution_values.size();
            ++k)
@@ -466,9 +472,9 @@ namespace internal
     {
       (void)extract_component;
       static_assert(
-        numbers::NumberTraits<NumberType>::is_complex == false,
+        numbers::NumberTraits<NumberType>::is_complex DEAL_II_EQUALS false,
         "This function must not be called for complex-valued data types.");
-      Assert(extract_component == ComponentExtractor::real_part,
+      Assert(extract_component DEAL_II_EQUALS ComponentExtractor::real_part,
              ExcMessage("You cannot extract anything other than the real "
                         "part from a real number."));
       return value;
@@ -507,7 +513,7 @@ namespace internal
     get_component(const Tensor<rank, dim, NumberType> &value,
                   const ComponentExtractor             extract_component)
     {
-      Assert(extract_component == ComponentExtractor::real_part,
+      Assert(extract_component DEAL_II_EQUALS ComponentExtractor::real_part,
              ExcMessage("You cannot extract anything other than the real "
                         "part from a real number."));
 
@@ -568,7 +574,7 @@ namespace internal
 
 
 
-#if defined(DEAL_II_TRILINOS_WITH_TPETRA) && defined(DEAL_II_WITH_MPI)
+#if defined(DEAL_II_TRILINOS_WITH_TPETRA) DEAL_II_AND defined(DEAL_II_WITH_MPI)
     template <>
     inline void
     VectorHelper<LinearAlgebra::TpetraWrappers::Vector<double>>::extract(
@@ -614,7 +620,7 @@ namespace internal
       , postprocessor(nullptr, typeid(*this).name())
       , n_output_variables(names.size())
     {
-      Assert(names.size() == data_component_interpretation.size(),
+      Assert(names.size() DEAL_II_EQUALS data_component_interpretation.size(),
              ExcDimensionMismatch(data_component_interpretation.size(),
                                   names.size()));
 
@@ -624,7 +630,8 @@ namespace internal
           (void)name;
           Assert(name.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
                                         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                        "0123456789_<>()") == std::string::npos,
+                                        "0123456789_<>()")
+                   DEAL_II_EQUALS std::string::npos,
                  Exceptions::DataOutImplementation::ExcInvalidCharacter(
                    name,
                    name.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
@@ -652,8 +659,10 @@ namespace internal
       , postprocessor(data_postprocessor, typeid(*this).name())
       , n_output_variables(names.size())
     {
-      Assert(data_postprocessor->get_names().size() ==
-               data_postprocessor->get_data_component_interpretation().size(),
+      Assert(data_postprocessor->get_names()
+               .size() DEAL_II_EQUALS data_postprocessor
+               ->get_data_component_interpretation()
+               .size(),
              ExcDimensionMismatch(
                data_postprocessor->get_names().size(),
                data_postprocessor->get_data_component_interpretation().size()));
@@ -664,7 +673,8 @@ namespace internal
           (void)name;
           Assert(name.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
                                         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                        "0123456789_<>()") == std::string::npos,
+                                        "0123456789_<>()")
+                   DEAL_II_EQUALS std::string::npos,
                  Exceptions::DataOutImplementation::ExcInvalidCharacter(
                    name,
                    name.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
@@ -867,9 +877,9 @@ namespace internal
       const ComponentExtractor                             extract_component,
       std::vector<dealii::Vector<double>> &patch_values_system) const
     {
-      if (typeid(typename VectorType::value_type) == typeid(double))
+      if (typeid(typename VectorType::value_type) DEAL_II_EQUALS typeid(double))
         {
-          Assert(extract_component == ComponentExtractor::real_part,
+          Assert(extract_component DEAL_II_EQUALS ComponentExtractor::real_part,
                  ExcMessage("You cannot extract anything other than the real "
                             "part from a real number."));
 
@@ -924,9 +934,9 @@ namespace internal
       const ComponentExtractor                             extract_component,
       std::vector<double> &                                patch_values) const
     {
-      if (typeid(typename VectorType::value_type) == typeid(double))
+      if (typeid(typename VectorType::value_type) DEAL_II_EQUALS typeid(double))
         {
-          Assert(extract_component == ComponentExtractor::real_part,
+          Assert(extract_component DEAL_II_EQUALS ComponentExtractor::real_part,
                  ExcMessage("You cannot extract anything other than the real "
                             "part from a real number."));
 
@@ -961,9 +971,9 @@ namespace internal
       std::vector<std::vector<Tensor<1, DoFHandlerType::space_dimension>>>
         &patch_gradients_system) const
     {
-      if (typeid(typename VectorType::value_type) == typeid(double))
+      if (typeid(typename VectorType::value_type) DEAL_II_EQUALS typeid(double))
         {
-          Assert(extract_component == ComponentExtractor::real_part,
+          Assert(extract_component DEAL_II_EQUALS ComponentExtractor::real_part,
                  ExcMessage("You cannot extract anything other than the real "
                             "part from a real number."));
 
@@ -1023,9 +1033,9 @@ namespace internal
       std::vector<Tensor<1, DoFHandlerType::space_dimension>> &patch_gradients)
       const
     {
-      if (typeid(typename VectorType::value_type) == typeid(double))
+      if (typeid(typename VectorType::value_type) DEAL_II_EQUALS typeid(double))
         {
-          Assert(extract_component == ComponentExtractor::real_part,
+          Assert(extract_component DEAL_II_EQUALS ComponentExtractor::real_part,
                  ExcMessage("You cannot extract anything other than the real "
                             "part from a real number."));
 
@@ -1067,9 +1077,9 @@ namespace internal
       std::vector<std::vector<Tensor<2, DoFHandlerType::space_dimension>>>
         &patch_hessians_system) const
     {
-      if (typeid(typename VectorType::value_type) == typeid(double))
+      if (typeid(typename VectorType::value_type) DEAL_II_EQUALS typeid(double))
         {
-          Assert(extract_component == ComponentExtractor::real_part,
+          Assert(extract_component DEAL_II_EQUALS ComponentExtractor::real_part,
                  ExcMessage("You cannot extract anything other than the real "
                             "part from a real number."));
 
@@ -1129,9 +1139,9 @@ namespace internal
       std::vector<Tensor<2, DoFHandlerType::space_dimension>> &patch_hessians)
       const
     {
-      if (typeid(typename VectorType::value_type) == typeid(double))
+      if (typeid(typename VectorType::value_type) DEAL_II_EQUALS typeid(double))
         {
-          Assert(extract_component == ComponentExtractor::real_part,
+          Assert(extract_component DEAL_II_EQUALS ComponentExtractor::real_part,
                  ExcMessage("You cannot extract anything other than the real "
                             "part from a real number."));
 
@@ -1314,8 +1324,8 @@ namespace internal
       is_complex_valued() const override
       {
         Assert(
-          numbers::NumberTraits<typename VectorType::value_type>::is_complex ==
-            false,
+          numbers::NumberTraits<typename VectorType::value_type>::is_complex
+            DEAL_II_EQUALS false,
           ExcNotImplemented());
         return numbers::NumberTraits<
           typename VectorType::value_type>::is_complex;
@@ -1369,7 +1379,7 @@ namespace internal
       const ComponentExtractor                             extract_component,
       std::vector<double> &                                patch_values) const
     {
-      Assert(extract_component == ComponentExtractor::real_part,
+      Assert(extract_component DEAL_II_EQUALS ComponentExtractor::real_part,
              ExcNotImplemented());
 
       const typename DoFHandlerType::level_cell_iterator dof_cell(
@@ -1408,7 +1418,7 @@ namespace internal
       const ComponentExtractor                             extract_component,
       std::vector<dealii::Vector<double>> &patch_values_system) const
     {
-      Assert(extract_component == ComponentExtractor::real_part,
+      Assert(extract_component DEAL_II_EQUALS ComponentExtractor::real_part,
              ExcNotImplemented());
 
       typename DoFHandlerType::level_cell_iterator dof_cell(
@@ -1475,9 +1485,9 @@ void
 DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::attach_dof_handler(
   const DoFHandlerType &d)
 {
-  Assert(dof_data.size() == 0,
+  Assert(dof_data.size() DEAL_II_EQUALS 0,
          Exceptions::DataOutImplementation::ExcOldDataStillPresent());
-  Assert(cell_data.size() == 0,
+  Assert(cell_data.size() DEAL_II_EQUALS 0,
          Exceptions::DataOutImplementation::ExcOldDataStillPresent());
 
   triangulation =
@@ -1496,9 +1506,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
     const Triangulation<DoFHandlerType::dimension,
                         DoFHandlerType::space_dimension> &tria)
 {
-  Assert(dof_data.size() == 0,
+  Assert(dof_data.size() DEAL_II_EQUALS 0,
          Exceptions::DataOutImplementation::ExcOldDataStillPresent());
-  Assert(cell_data.size() == 0,
+  Assert(cell_data.size() DEAL_II_EQUALS 0,
          Exceptions::DataOutImplementation::ExcOldDataStillPresent());
 
   triangulation =
@@ -1523,7 +1533,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
   // stuff and use a different constructor of DataEntry
   if (triangulation != nullptr)
     {
-      Assert(&dof_handler.get_triangulation() == triangulation,
+      Assert(&dof_handler.get_triangulation() DEAL_II_EQUALS triangulation,
              ExcMessage("The triangulation attached to the DoFHandler does not "
                         "match with the one set previously"));
     }
@@ -1535,7 +1545,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
           &dof_handler.get_triangulation(), typeid(*this).name());
     }
 
-  Assert(vec.size() == dof_handler.n_dofs(),
+  Assert(vec.size() DEAL_II_EQUALS dof_handler.n_dofs(),
          Exceptions::DataOutImplementation::ExcInvalidVectorSize(
            vec.size(),
            dof_handler.n_dofs(),
@@ -1564,7 +1574,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
     const bool deduce_output_names)
 {
   // Check available mesh information:
-  if (triangulation == nullptr)
+  if (triangulation DEAL_II_EQUALS nullptr)
     {
       Assert(dof_handler != nullptr, ExcInternalError());
       triangulation =
@@ -1575,35 +1585,36 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
 
   if (dof_handler != nullptr)
     {
-      Assert(&dof_handler->get_triangulation() == triangulation,
+      Assert(&dof_handler->get_triangulation() DEAL_II_EQUALS triangulation,
              ExcMessage("The triangulation attached to the DoFHandler does not "
                         "match with the one set previously"));
     }
 
   // Figure out the data type:
   DataVectorType actual_type = type;
-  if (type == type_automatic)
+  if (type DEAL_II_EQUALS type_automatic)
     {
       Assert(
-        (dof_handler == nullptr) ||
-          (triangulation->n_active_cells() != dof_handler->n_dofs()),
+        (dof_handler DEAL_II_EQUALS nullptr)DEAL_II_OR(
+          triangulation->n_active_cells() != dof_handler->n_dofs()),
         ExcMessage(
           "Unable to determine the type of vector automatically because the number of DoFs "
           "is equal to the number of cells. Please specify DataVectorType."));
 
-      if (data_vector.size() == triangulation->n_active_cells())
+      if (data_vector.size() DEAL_II_EQUALS triangulation->n_active_cells())
         actual_type = type_cell_data;
       else
         actual_type = type_dof_data;
     }
-  Assert(actual_type == type_cell_data || actual_type == type_dof_data,
+  Assert(actual_type DEAL_II_EQUALS type_cell_data DEAL_II_OR actual_type
+           DEAL_II_EQUALS type_dof_data,
          ExcInternalError());
 
   // If necessary, append '_1', '_2', etc. to component names:
   std::vector<std::string> deduced_names;
-  if (deduce_output_names && actual_type == type_dof_data)
+  if (deduce_output_names DEAL_II_AND actual_type DEAL_II_EQUALS type_dof_data)
     {
-      Assert(names.size() == 1, ExcInternalError());
+      Assert(names.size() DEAL_II_EQUALS 1, ExcInternalError());
       Assert(dof_handler != nullptr, ExcInternalError());
       Assert(dof_handler->n_dofs() > 0,
              ExcMessage("The DoF handler attached to the current output vector "
@@ -1633,22 +1644,24 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
   switch (actual_type)
     {
       case type_cell_data:
-        Assert(data_vector.size() == triangulation->n_active_cells(),
+        Assert(data_vector.size()
+                 DEAL_II_EQUALS triangulation->n_active_cells(),
                ExcDimensionMismatch(data_vector.size(),
                                     triangulation->n_active_cells()));
-        Assert(deduced_names.size() == 1,
+        Assert(deduced_names.size() DEAL_II_EQUALS 1,
                Exceptions::DataOutImplementation::ExcInvalidNumberOfNames(
                  deduced_names.size(), 1));
         break;
       case type_dof_data:
         Assert(dof_handler != nullptr,
                Exceptions::DataOutImplementation::ExcNoDoFHandlerSelected());
-        Assert(data_vector.size() == dof_handler->n_dofs(),
+        Assert(data_vector.size() DEAL_II_EQUALS dof_handler->n_dofs(),
                Exceptions::DataOutImplementation::ExcInvalidVectorSize(
                  data_vector.size(),
                  dof_handler->n_dofs(),
                  triangulation->n_active_cells()));
-        Assert(deduced_names.size() == dof_handler->get_fe(0).n_components(),
+        Assert(deduced_names.size() DEAL_II_EQUALS dof_handler->get_fe(0)
+                 .n_components(),
                Exceptions::DataOutImplementation::ExcInvalidNumberOfNames(
                  deduced_names.size(), dof_handler->get_fe(0).n_components()));
         break;
@@ -1668,7 +1681,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
     internal::DataOutImplementation::DataEntry<DoFHandlerType, VectorType>>(
     dof_handler, &data_vector, deduced_names, data_component_interpretation);
 
-  if (actual_type == type_dof_data)
+  if (actual_type DEAL_II_EQUALS type_dof_data)
     dof_data.emplace_back(std::move(new_entry));
   else
     cell_data.emplace_back(std::move(new_entry));
@@ -1701,20 +1714,20 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_mg_data_vector(
   const std::vector<DataComponentInterpretation::DataComponentInterpretation>
     &data_component_interpretation_)
 {
-  if (triangulation == nullptr)
+  if (triangulation DEAL_II_EQUALS nullptr)
     triangulation =
       SmartPointer<const Triangulation<DoFHandlerType::dimension,
                                        DoFHandlerType::space_dimension>>(
         &dof_handler.get_triangulation(), typeid(*this).name());
 
-  Assert(&dof_handler.get_triangulation() == triangulation,
+  Assert(&dof_handler.get_triangulation() DEAL_II_EQUALS triangulation,
          ExcMessage("The triangulation attached to the DoFHandler does not "
                     "match with the one set previously"));
 
   const unsigned int       n_components  = dof_handler.get_fe(0).n_components();
   std::vector<std::string> deduced_names = names;
 
-  if (names.size() == 1 && n_components > 1)
+  if (names.size() DEAL_II_EQUALS 1 DEAL_II_AND n_components > 1)
     {
       deduced_names.resize(n_components);
       for (unsigned int i = 0; i < n_components; ++i)
@@ -1723,7 +1736,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_mg_data_vector(
         }
     }
 
-  Assert(deduced_names.size() == n_components,
+  Assert(deduced_names.size() DEAL_II_EQUALS n_components,
          ExcMessage("Invalid number of names given."));
 
   const std::vector<DataComponentInterpretation::DataComponentInterpretation>
@@ -1733,7 +1746,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_mg_data_vector(
          std::vector<DataComponentInterpretation::DataComponentInterpretation>(
            n_components, DataComponentInterpretation::component_is_scalar));
 
-  Assert(data_component_interpretation.size() == n_components,
+  Assert(data_component_interpretation.size() DEAL_II_EQUALS n_components,
          ExcMessage(
            "Invalid number of entries in data_component_interpretation."));
 
@@ -1822,8 +1835,8 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_dataset_names()
   // This sort of logic is also explained in some detail in
   //   DataOut::build_one_patch().
   for (const auto &input_data : dof_data)
-    if (input_data->is_complex_valued() == false ||
-        (input_data->postprocessor != nullptr))
+    if (input_data->is_complex_valued()
+          DEAL_II_EQUALS false DEAL_II_OR(input_data->postprocessor != nullptr))
       {
         for (const auto &name : input_data->names)
           names.push_back(name);
@@ -1897,9 +1910,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_dataset_names()
   // components together form vectors or tensors.
   for (const auto &input_data : cell_data)
     {
-      Assert(input_data->names.size() == 1, ExcInternalError());
-      if ((input_data->is_complex_valued() == false) ||
-          (input_data->postprocessor != nullptr))
+      Assert(input_data->names.size() DEAL_II_EQUALS 1, ExcInternalError());
+      if ((input_data->is_complex_valued() DEAL_II_EQUALS false)DEAL_II_OR(
+            input_data->postprocessor != nullptr))
         names.push_back(input_data->names[0]);
       else
         {
@@ -1945,10 +1958,11 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
               // postprocessor)
               // -- postprocessors always return real-valued things)
               ++i;
-              output_component += (input_data->is_complex_valued() &&
-                                       (input_data->postprocessor == nullptr) ?
-                                     2 :
-                                     1);
+              output_component +=
+                (input_data->is_complex_valued() DEAL_II_AND(
+                   input_data->postprocessor DEAL_II_EQUALS nullptr) ?
+                   2 :
+                   1);
 
               break;
             }
@@ -1963,8 +1977,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
                   i, input_data->names[i]));
               for (unsigned int dd = 1; dd < patch_space_dim; ++dd)
                 Assert(
-                  input_data->data_component_interpretation[i + dd] ==
-                    DataComponentInterpretation::component_is_part_of_vector,
+                  input_data
+                    ->data_component_interpretation[i + dd] DEAL_II_EQUALS
+                      DataComponentInterpretation::component_is_part_of_vector,
                   Exceptions::DataOutImplementation::
                     ExcInvalidVectorDeclaration(i, input_data->names[i]));
 
@@ -1987,8 +2002,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
               //
               // This sort of logic is also explained in some detail in
               //   DataOut::build_one_patch().
-              if (input_data->is_complex_valued() == false ||
-                  (input_data->postprocessor != nullptr))
+              if (input_data->is_complex_valued()
+                    DEAL_II_EQUALS false DEAL_II_OR(input_data->postprocessor !=
+                                                    nullptr))
                 {
                   ranges.emplace_back(std::forward_as_tuple(
                     output_component,
@@ -2036,8 +2052,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
                   i, input_data->names[i]));
               for (unsigned int dd = 1; dd < size; ++dd)
                 Assert(
-                  input_data->data_component_interpretation[i + dd] ==
-                    DataComponentInterpretation::component_is_part_of_tensor,
+                  input_data
+                    ->data_component_interpretation[i + dd] DEAL_II_EQUALS
+                      DataComponentInterpretation::component_is_part_of_tensor,
                   Exceptions::DataOutImplementation::
                     ExcInvalidTensorDeclaration(i, input_data->names[i]));
 
@@ -2060,8 +2077,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
               //
               // This sort of logic is also explained in some detail in
               //   DataOut::build_one_patch().
-              if (input_data->is_complex_valued() == false ||
-                  (input_data->postprocessor != nullptr))
+              if (input_data->is_complex_valued()
+                    DEAL_II_EQUALS false DEAL_II_OR(input_data->postprocessor !=
+                                                    nullptr))
                 {
                   ranges.emplace_back(std::forward_as_tuple(
                     output_component,
@@ -2141,12 +2159,12 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_fes() const
       // handlers.
       bool duplicate = false;
       for (unsigned int j = 0; j < i; ++j)
-        if (dof_data[i]->dof_handler == dof_data[j]->dof_handler)
+        if (dof_data[i]->dof_handler DEAL_II_EQUALS dof_data[j]->dof_handler)
           {
             finite_elements[i] = finite_elements[j];
             duplicate          = true;
           }
-      if (duplicate == false)
+      if (duplicate DEAL_II_EQUALS false)
         finite_elements[i] =
           std::make_shared<dealii::hp::FECollection<dhdim, dhspacedim>>(
             this->dof_data[i]->dof_handler->get_fe_collection());

@@ -57,9 +57,9 @@ template <typename number>
 BlockSparseMatrix<number> &
 BlockSparseMatrix<number>::operator=(const BlockSparseMatrix<number> &m)
 {
-  Assert(this->row_block_indices == m.row_block_indices,
+  Assert(this->row_block_indices DEAL_II_EQUALS m.row_block_indices,
          ExcBlockDimensionMismatch());
-  Assert(this->column_block_indices == m.column_block_indices,
+  Assert(this->column_block_indices DEAL_II_EQUALS m.column_block_indices,
          ExcBlockDimensionMismatch());
 
   // this operator does not do
@@ -121,7 +121,7 @@ BlockSparseMatrix<number>::empty() const
 {
   for (size_type r = 0; r < this->n_block_rows(); ++r)
     for (size_type c = 0; c < this->n_block_cols(); ++c)
-      if (this->block(r, c).empty() == false)
+      if (this->block(r, c).empty() DEAL_II_EQUALS false)
         return false;
 
   return true;

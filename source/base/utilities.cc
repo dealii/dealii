@@ -54,7 +54,7 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #include <sstream>
 #include <string>
 
-#if defined(DEAL_II_HAVE_UNISTD_H) && defined(DEAL_II_HAVE_GETHOSTNAME)
+#if defined(DEAL_II_HAVE_UNISTD_H) DEAL_II_AND defined(DEAL_II_HAVE_GETHOSTNAME)
 #  include <unistd.h>
 #endif
 
@@ -129,7 +129,7 @@ namespace Utilities
                 const LongDouble v = (static_cast<LongDouble>(points[i][d]) -
                                       static_cast<LongDouble>(bl[d])) /
                                      extents[d];
-                Assert(v >= 0. && v <= 1., ExcInternalError());
+                Assert(v >= 0. DEAL_II_AND v <= 1., ExcInternalError());
                 AssertIndexRange(eff_d, effective_dim);
                 int_points[i][eff_d] =
                   static_cast<Integer>(v * static_cast<LongDouble>(max_int));
@@ -154,7 +154,7 @@ namespace Utilities
     using LongDouble = long double;
 
     // return if there is nothing to do
-    if (points.size() == 0)
+    if (points.size() DEAL_II_EQUALS 0)
       return std::vector<std::array<std::uint64_t, dim>>();
 
     // get bounding box:
@@ -184,12 +184,13 @@ namespace Utilities
                         std::numeric_limits<LongDouble>::digits));
 
     // based on that get the maximum integer:
-    const Integer max_int = (min_bits == std::numeric_limits<Integer>::digits ?
-                               std::numeric_limits<Integer>::max() :
-                               (Integer(1) << min_bits) - 1);
+    const Integer max_int =
+      (min_bits DEAL_II_EQUALS std::numeric_limits<Integer>::digits ?
+         std::numeric_limits<Integer>::max() :
+         (Integer(1) << min_bits) - 1);
 
     const unsigned int effective_dim = valid_extents.count();
-    if (effective_dim == dim)
+    if (effective_dim DEAL_II_EQUALS dim)
       {
         return inverse_Hilbert_space_filling_curve_effective<dim,
                                                              Number,
@@ -205,8 +206,9 @@ namespace Utilities
       zero_ind[d] = 0;
 
     std::vector<std::array<std::uint64_t, dim>> ind(points.size(), zero_ind);
-    // manually check effective_dim == 1 and effective_dim == 2
-    if (dim == 3 && effective_dim == 2)
+    // manually check effective_dim DEAL_II_EQUALS  1 and effective_dim
+    // DEAL_II_EQUALS  2
+    if (dim DEAL_II_EQUALS 3 DEAL_II_AND effective_dim DEAL_II_EQUALS 2)
       {
         const auto ind2 =
           inverse_Hilbert_space_filling_curve_effective<dim,
@@ -222,7 +224,7 @@ namespace Utilities
 
         return ind;
       }
-    else if (effective_dim == 1)
+    else if (effective_dim DEAL_II_EQUALS 1)
       {
         const auto ind1 =
           inverse_Hilbert_space_filling_curve_effective<dim,
@@ -238,8 +240,8 @@ namespace Utilities
         return ind;
       }
 
-    // we should get here only if effective_dim == 0
-    Assert(effective_dim == 0, ExcInternalError());
+    // we should get here only if effective_dim DEAL_II_EQUALS  0
+    Assert(effective_dim DEAL_II_EQUALS 0, ExcInternalError());
 
     // if the bounding box is degenerate in all dimensions,
     // can't do much but exit gracefully by setting index according
@@ -348,7 +350,7 @@ namespace Utilities
                 {
                   if (X[j] & p)
                     L[i] |= q;
-                  if (++j == dim)
+                  if (++j DEAL_II_EQUALS dim)
                     {
                       j = 0;
                       p >>= 1;
@@ -456,12 +458,14 @@ namespace Utilities
                                              It(base64_input.end()));
     // Remove padding.
     auto length = base64_input.size();
-    if (binary.size() > 2 && base64_input[length - 1] == '=' &&
-        base64_input[length - 2] == '=')
+    if (binary.size() >
+        2 DEAL_II_AND base64_input[length - 1] DEAL_II_EQUALS '=' DEAL_II_AND
+                      base64_input[length - 2] DEAL_II_EQUALS '=')
       {
         binary.erase(binary.end() - 2, binary.end());
       }
-    else if (binary.size() > 1 && base64_input[length - 1] == '=')
+    else if (binary.size() >
+             1 DEAL_II_AND base64_input[length - 1] DEAL_II_EQUALS '=')
       {
         binary.erase(binary.end() - 1, binary.end());
       }
@@ -494,11 +498,12 @@ namespace Utilities
                                std::to_string(value) :
                                boost::lexical_cast<std::string>(value));
 
-    if ((digits != numbers::invalid_unsigned_int) &&
-        (lc_string.size() < digits))
+    if ((digits != numbers::invalid_unsigned_int)
+          DEAL_II_AND(lc_string.size() < digits))
       {
         // We have to add the padding zeroes in front of the number
-        const unsigned int padding_position = (lc_string[0] == '-') ? 1 : 0;
+        const unsigned int padding_position =
+          (lc_string[0] DEAL_II_EQUALS '-') ? 1 : 0;
 
         const std::string padding(digits - lc_string.size(), '0');
         lc_string.insert(padding_position, padding);
@@ -558,7 +563,7 @@ namespace Utilities
   std::string
   dim_string(const int dim, const int spacedim)
   {
-    if (dim == spacedim)
+    if (dim DEAL_II_EQUALS spacedim)
       return int_to_string(dim);
     else
       return int_to_string(dim) + "," + int_to_string(spacedim);
@@ -610,17 +615,17 @@ namespace Utilities
   {
     // trim whitespace on either side of the text if necessary
     std::string s = s_;
-    while ((s.size() > 0) && (s[0] == ' '))
+    while ((s.size() > 0) DEAL_II_AND(s[0] DEAL_II_EQUALS ' '))
       s.erase(s.begin());
-    while ((s.size() > 0) && (s[s.size() - 1] == ' '))
+    while ((s.size() > 0) DEAL_II_AND(s[s.size() - 1] DEAL_II_EQUALS ' '))
       s.erase(s.end() - 1);
 
     // Now convert and see whether we succeed. Note that strtol only
     // touches errno if an error occurred, so if we want to check
-    // whether an error happened, we need to make sure that errno==0
-    // before calling strtol since otherwise it may be that the
-    // conversion succeeds and that errno remains at the value it
-    // was before, whatever that was.
+    // whether an error happened, we need to make sure that errnoDEAL_II_EQUALS
+    // 0 before calling strtol since otherwise it may be that the conversion
+    // succeeds and that errno remains at the value it was before, whatever that
+    // was.
     char *p;
     errno       = 0;
     const int i = std::strtol(s.c_str(), &p, 10);
@@ -633,8 +638,8 @@ namespace Utilities
     //   first part to something useful, but stopped converting short
     //   of the terminating '\0' character. This happens, for example,
     //   if the given string is "1234 abc".
-    AssertThrow(!((errno != 0) || (s.size() == 0) ||
-                  ((s.size() > 0) && (*p != '\0'))),
+    AssertThrow(!((errno != 0) DEAL_II_OR(s.size() DEAL_II_EQUALS 0)
+                    DEAL_II_OR((s.size() > 0) DEAL_II_AND(*p != '\0'))),
                 ExcMessage("Can't convert <" + s + "> to an integer."));
 
     return i;
@@ -658,17 +663,17 @@ namespace Utilities
   {
     // trim whitespace on either side of the text if necessary
     std::string s = s_;
-    while ((s.size() > 0) && (s[0] == ' '))
+    while ((s.size() > 0) DEAL_II_AND(s[0] DEAL_II_EQUALS ' '))
       s.erase(s.begin());
-    while ((s.size() > 0) && (s[s.size() - 1] == ' '))
+    while ((s.size() > 0) DEAL_II_AND(s[s.size() - 1] DEAL_II_EQUALS ' '))
       s.erase(s.end() - 1);
 
     // Now convert and see whether we succeed. Note that strtol only
     // touches errno if an error occurred, so if we want to check
-    // whether an error happened, we need to make sure that errno==0
-    // before calling strtol since otherwise it may be that the
-    // conversion succeeds and that errno remains at the value it
-    // was before, whatever that was.
+    // whether an error happened, we need to make sure that errnoDEAL_II_EQUALS
+    // 0 before calling strtol since otherwise it may be that the conversion
+    // succeeds and that errno remains at the value it was before, whatever that
+    // was.
     char *p;
     errno          = 0;
     const double d = std::strtod(s.c_str(), &p);
@@ -681,8 +686,8 @@ namespace Utilities
     //   first part to something useful, but stopped converting short
     //   of the terminating '\0' character. This happens, for example,
     //   if the given string is "1.234 abc".
-    AssertThrow(!((errno != 0) || (s.size() == 0) ||
-                  ((s.size() > 0) && (*p != '\0'))),
+    AssertThrow(!((errno != 0) DEAL_II_OR(s.size() DEAL_II_EQUALS 0)
+                    DEAL_II_OR((s.size() > 0) DEAL_II_AND(*p != '\0'))),
                 ExcMessage("Can't convert <" + s + "> to a double."));
 
     return d;
@@ -710,7 +715,8 @@ namespace Utilities
 
     // as discussed in the documentation, eat whitespace from the end
     // of the string
-    while (tmp.length() != 0 && tmp[tmp.length() - 1] == ' ')
+    while (tmp.length() !=
+           0 DEAL_II_AND tmp[tmp.length() - 1] DEAL_II_EQUALS ' ')
       tmp.erase(tmp.length() - 1, 1);
 
     // split the input list until it is empty. since in every iteration
@@ -734,9 +740,10 @@ namespace Utilities
           tmp = "";
 
         // strip spaces from this element's front and end
-        while ((name.length() != 0) && (name[0] == ' '))
+        while ((name.length() != 0) DEAL_II_AND(name[0] DEAL_II_EQUALS ' '))
           name.erase(0, 1);
-        while (name.length() != 0 && name[name.length() - 1] == ' ')
+        while (name.length() !=
+               0 DEAL_II_AND name[name.length() - 1] DEAL_II_EQUALS ' ')
           name.erase(name.length() - 1, 1);
 
         split_list.push_back(name);
@@ -764,7 +771,8 @@ namespace Utilities
     std::vector<std::string> lines;
 
     // remove trailing spaces
-    while ((text.length() != 0) && (text[text.length() - 1] == delimiter))
+    while ((text.length() != 0)
+             DEAL_II_AND(text[text.length() - 1] DEAL_II_EQUALS delimiter))
       text.erase(text.length() - 1, 1);
 
     // then split the text into lines
@@ -772,15 +780,16 @@ namespace Utilities
       {
         // in each iteration, first remove
         // leading spaces
-        while ((text.length() != 0) && (text[0] == delimiter))
+        while ((text.length() != 0)
+                 DEAL_II_AND(text[0] DEAL_II_EQUALS delimiter))
           text.erase(0, 1);
 
         std::size_t pos_newline = text.find_first_of('\n', 0);
-        if (pos_newline != std::string::npos && pos_newline <= width)
+        if (pos_newline != std::string::npos DEAL_II_AND pos_newline <= width)
           {
             std::string line(text, 0, pos_newline);
-            while ((line.length() != 0) &&
-                   (line[line.length() - 1] == delimiter))
+            while ((line.length() != 0) DEAL_II_AND(
+              line[line.length() - 1] DEAL_II_EQUALS delimiter))
               line.erase(line.length() - 1, 1);
             lines.push_back(line);
             text.erase(0, pos_newline + 1);
@@ -793,8 +802,8 @@ namespace Utilities
         if (text.length() < width)
           {
             // remove trailing spaces
-            while ((text.length() != 0) &&
-                   (text[text.length() - 1] == delimiter))
+            while ((text.length() != 0) DEAL_II_AND(
+              text[text.length() - 1] DEAL_II_EQUALS delimiter))
               text.erase(text.length() - 1, 1);
             lines.push_back(text);
             text = "";
@@ -806,24 +815,24 @@ namespace Utilities
             // that we can break around there
             int location = std::min<int>(width, text.length() - 1);
             for (; location > 0; --location)
-              if (text[location] == delimiter)
+              if (text[location] DEAL_II_EQUALS delimiter)
                 break;
 
             // if there are no spaces, then try if
             // there are spaces coming up
-            if (location == 0)
+            if (location DEAL_II_EQUALS 0)
               for (location = std::min<int>(width, text.length() - 1);
                    location < static_cast<int>(text.length());
                    ++location)
-                if (text[location] == delimiter)
+                if (text[location] DEAL_II_EQUALS delimiter)
                   break;
 
             // now take the text up to the found
             // location and put it into a single
             // line, and remove it from 'text'
             std::string line(text, 0, location);
-            while ((line.length() != 0) &&
-                   (line[line.length() - 1] == delimiter))
+            while ((line.length() != 0) DEAL_II_AND(
+              line[line.length() - 1] DEAL_II_EQUALS delimiter))
               line.erase(line.length() - 1, 1);
             lines.push_back(line);
             text.erase(0, location);
@@ -896,7 +905,7 @@ namespace Utilities
   generate_normal_random_number(const double a, const double sigma)
   {
     // if no noise: return now
-    if (sigma == 0)
+    if (sigma DEAL_II_EQUALS 0)
       return a;
 
     // we would want to use rand(), but that function is not reentrant
@@ -982,13 +991,13 @@ namespace Utilities
       while (!file.eof())
         {
           file >> name;
-          if (name == "VmPeak:")
+          if (name DEAL_II_EQUALS "VmPeak:")
             file >> stats.VmPeak;
-          else if (name == "VmSize:")
+          else if (name DEAL_II_EQUALS "VmSize:")
             file >> stats.VmSize;
-          else if (name == "VmHWM:")
+          else if (name DEAL_II_EQUALS "VmHWM:")
             file >> stats.VmHWM;
-          else if (name == "VmRSS:")
+          else if (name DEAL_II_EQUALS "VmRSS:")
             {
               file >> stats.VmRSS;
               break; // this is always the last entry
@@ -1004,7 +1013,7 @@ namespace Utilities
     std::string
     get_hostname()
     {
-#if defined(DEAL_II_HAVE_UNISTD_H) && defined(DEAL_II_HAVE_GETHOSTNAME)
+#if defined(DEAL_II_HAVE_UNISTD_H) DEAL_II_AND defined(DEAL_II_HAVE_GETHOSTNAME)
       const unsigned int N = 1024;
       char               hostname[N];
       gethostname(&(hostname[0]), N - 1);
@@ -1053,7 +1062,7 @@ namespace Utilities
 #ifndef DEAL_II_MSVC
       const int ierr = ::posix_memalign(memptr, alignment, size);
 
-      AssertThrow(ierr == 0, ExcOutOfMemory(size));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcOutOfMemory(size));
       AssertThrow(*memptr != nullptr, ExcOutOfMemory(size));
 #else
       // Windows does not appear to have posix_memalign. just use the
@@ -1190,7 +1199,7 @@ namespace Utilities
     Epetra_Map
     duplicate_map(const Epetra_BlockMap &map, const Epetra_Comm &comm)
     {
-      if (map.LinearMap() == true)
+      if (map.LinearMap() DEAL_II_EQUALS true)
         {
           // each processor stores a
           // contiguous range of

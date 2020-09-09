@@ -92,7 +92,7 @@ namespace Gmsh
             << log_file_name << " 2> " << warnings_file_name;
 
     const auto ret_value = std::system(command.str().c_str());
-    AssertThrow(ret_value == 0,
+    AssertThrow(ret_value DEAL_II_EQUALS 0,
                 ExcMessage("Gmsh failed to run. Check the " + log_file_name +
                            " file."));
 
@@ -120,11 +120,11 @@ namespace Gmsh
         for (const std::string *filename : filenames)
           {
             const auto ret_value = std::remove(filename->c_str());
-            AssertThrow(ret_value == 0,
+            AssertThrow(ret_value DEAL_II_EQUALS 0,
                         ExcMessage("Failed to remove " + *filename));
           }
         const auto ret_value = std::remove(dir_template);
-        AssertThrow(ret_value == 0,
+        AssertThrow(ret_value DEAL_II_EQUALS 0,
                     ExcMessage("Failed to remove " +
                                std::string(dir_template)));
       }

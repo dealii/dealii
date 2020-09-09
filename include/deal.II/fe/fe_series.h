@@ -170,8 +170,7 @@ namespace FESeries
     /**
      * Test for equality of two series expansion objects.
      */
-    bool
-    operator==(const Fourier<dim, spacedim> &fourier) const;
+    bool operator DEAL_II_EQUALS(const Fourier<dim, spacedim> &fourier) const;
 
   private:
     /**
@@ -335,8 +334,7 @@ namespace FESeries
     /**
      * Test for equality of two series expansion objects.
      */
-    bool
-    operator==(const Legendre<dim, spacedim> &legendre) const;
+    bool operator DEAL_II_EQUALS(const Legendre<dim, spacedim> &legendre) const;
 
   private:
     /**
@@ -426,7 +424,7 @@ namespace internal
     {
       const std::pair<bool, unsigned int> pred_pair = predicate(ind);
       // don't add a value if predicate is false
-      if (pred_pair.first == false)
+      if (pred_pair.first DEAL_II_EQUALS false)
         return;
 
       const unsigned int     pred_value  = pred_pair.second;
@@ -629,7 +627,7 @@ FESeries::Fourier<dim, spacedim>::load_transformation_matrices(
   // mode vector
   std::vector<unsigned int> compare_coefficients;
   ar &                      compare_coefficients;
-  Assert(compare_coefficients == n_coefficients_per_direction,
+  Assert(compare_coefficients DEAL_II_EQUALS n_coefficients_per_direction,
          ExcMessage("A different number of coefficients vector has been used "
                     "to generate the transformation matrices you are about "
                     "to load!"));
@@ -642,7 +640,7 @@ FESeries::Fourier<dim, spacedim>::load_transformation_matrices(
   for (unsigned int i = 0; i < size; ++i)
     {
       ar &name;
-      Assert(name.compare((*fe_collection)[i].get_name()) == 0,
+      Assert(name.compare((*fe_collection)[i].get_name()) DEAL_II_EQUALS 0,
              ExcMessage("A different FECollection has been used to generate "
                         "the transformation matrices you are about to load!"));
     }
@@ -654,7 +652,7 @@ FESeries::Fourier<dim, spacedim>::load_transformation_matrices(
   for (unsigned int i = 0; i < size; ++i)
     {
       ar &quadrature;
-      Assert(quadrature == q_collection[i],
+      Assert(quadrature DEAL_II_EQUALS q_collection[i],
              ExcMessage("A different QCollection has been used to generate "
                         "the transformation matrices you are about to load!"));
     }
@@ -707,7 +705,7 @@ FESeries::Legendre<dim, spacedim>::load_transformation_matrices(
   // mode vector
   std::vector<unsigned int> compare_coefficients;
   ar &                      compare_coefficients;
-  Assert(compare_coefficients == n_coefficients_per_direction,
+  Assert(compare_coefficients DEAL_II_EQUALS n_coefficients_per_direction,
          ExcMessage("A different number of coefficients vector has been used "
                     "to generate the transformation matrices you are about "
                     "to load!"));
@@ -720,7 +718,7 @@ FESeries::Legendre<dim, spacedim>::load_transformation_matrices(
   for (unsigned int i = 0; i < size; ++i)
     {
       ar &name;
-      Assert(name.compare((*fe_collection)[i].get_name()) == 0,
+      Assert(name.compare((*fe_collection)[i].get_name()) DEAL_II_EQUALS 0,
              ExcMessage("A different FECollection has been used to generate "
                         "the transformation matrices you are about to load!"));
     }
@@ -732,7 +730,7 @@ FESeries::Legendre<dim, spacedim>::load_transformation_matrices(
   for (unsigned int i = 0; i < size; ++i)
     {
       ar &quadrature;
-      Assert(quadrature == q_collection[i],
+      Assert(quadrature DEAL_II_EQUALS q_collection[i],
              ExcMessage("A different QCollection has been used to generate "
                         "the transformation matrices you are about to load!"));
     }

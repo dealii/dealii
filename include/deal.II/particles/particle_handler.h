@@ -398,8 +398,8 @@ namespace Particles
      */
     template <class VectorType>
     typename std::enable_if<
-      std::is_convertible<VectorType *, Function<spacedim> *>::value ==
-      false>::type
+      std::is_convertible<VectorType *, Function<spacedim> *>::value
+        DEAL_II_EQUALS false>::type
     set_particle_positions(const VectorType &input_vector,
                            const bool        displace_particles = true);
 
@@ -437,7 +437,7 @@ namespace Particles
      *
      * The function is evaluated at the current location of the particles.
      *
-     * @param [in] function A function that has n_components==spacedim that
+     * @param [in] function A function that has n_componentsDEAL_II_EQUALS spacedim that
      * describes either the displacement or the new position of the particles as
      * a function of the current location of the particle.
      *
@@ -887,8 +887,8 @@ namespace Particles
   template <int dim, int spacedim>
   template <class VectorType>
   typename std::enable_if<
-    std::is_convertible<VectorType *, Function<spacedim> *>::value ==
-    false>::type
+    std::is_convertible<VectorType *, Function<spacedim> *>::value
+      DEAL_II_EQUALS false>::type
   ParticleHandler<dim, spacedim>::set_particle_positions(
     const VectorType &input_vector,
     const bool        displace_particles)

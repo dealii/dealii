@@ -42,7 +42,7 @@ for (scalar : REAL_AND_COMPLEX_SCALARS; SP : SPARSITY_PATTERNS;
 
 #endif
 
-#if deal_II_dimension == 1
+#if deal_II_dimension DEAL_II_EQUALS 1
     template void
     DoFTools::make_boundary_sparsity_pattern<deal_II_dimension,
                                              deal_II_dimension + 2,
@@ -119,7 +119,7 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
 
 #endif
 
-#if deal_II_dimension == 3
+#if deal_II_dimension DEAL_II_EQUALS 3
 
     template void DoFTools::make_sparsity_pattern<1, 3, SP>(
       const DoFHandler<1, 3> &dof,
@@ -196,7 +196,7 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
 #endif
 
 
-#if deal_II_dimension == 3
+#if deal_II_dimension DEAL_II_EQUALS 3
 
     template void DoFTools::make_sparsity_pattern<1, 3, SP>(
       const DoFHandler<1, 3> &dof_row,

@@ -101,7 +101,7 @@ namespace Utilities
      * the arguments as a tuple.
      */
     template <class FunctionType>
-    MutableBind(FunctionType function, TupleType &&arguments);
+    MutableBind(FunctionType function, TupleType DEAL_II_AND arguments);
 
     /**
      * Construct a MutableBind object specifying only the function. By default,
@@ -122,7 +122,7 @@ namespace Utilities
      * operator()() is called, using move semantic.
      */
     void
-    set_arguments(TupleType &&arguments);
+    set_arguments(TupleType DEAL_II_AND arguments);
 
     /**
      * Set the arguments to use in @p function, for next time
@@ -234,7 +234,8 @@ namespace Utilities
   template <typename ReturnType, class... FunctionArgs>
   template <class FunctionType>
   MutableBind<ReturnType, FunctionArgs...>::MutableBind(FunctionType function,
-                                                        TupleType && arguments)
+                                                        TupleType    DEAL_II_AND
+                                                                     arguments)
     : function(function)
     , arguments(std::move(arguments))
   {}
@@ -270,7 +271,8 @@ namespace Utilities
 
   template <typename ReturnType, class... FunctionArgs>
   void
-  MutableBind<ReturnType, FunctionArgs...>::set_arguments(TupleType &&args)
+  MutableBind<ReturnType, FunctionArgs...>::set_arguments(
+    TupleType DEAL_II_AND args)
   {
     arguments = std::move(args);
   }

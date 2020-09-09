@@ -54,7 +54,7 @@ template <typename VectorType>
 inline GrowingVectorMemory<VectorType>::Pool::~Pool()
 {
   // Nothing to do if memory was unused.
-  if (data == nullptr)
+  if (data DEAL_II_EQUALS nullptr)
     return;
 
   // delete the 'data' object. this also releases all vectors
@@ -68,7 +68,7 @@ template <typename VectorType>
 inline void
 GrowingVectorMemory<VectorType>::Pool::initialize(const size_type size)
 {
-  if (data == nullptr)
+  if (data DEAL_II_EQUALS nullptr)
     {
       data = new std::vector<entry_type>(size);
 
@@ -100,7 +100,7 @@ inline GrowingVectorMemory<VectorType>::GrowingVectorMemory(
 template <typename VectorType>
 inline GrowingVectorMemory<VectorType>::~GrowingVectorMemory()
 {
-  AssertNothrow(current_alloc == 0,
+  AssertNothrow(current_alloc DEAL_II_EQUALS 0,
                 StandardExceptions::ExcMemoryLeak(current_alloc));
   if (log_statistics)
     {
@@ -127,7 +127,7 @@ GrowingVectorMemory<VectorType>::alloc()
        i != get_pool().data->end();
        ++i)
     {
-      if (i->first == false)
+      if (i->first DEAL_II_EQUALS false)
         {
           i->first = true;
           return i->second.get();
@@ -152,7 +152,7 @@ GrowingVectorMemory<VectorType>::free(const VectorType *const v)
        i != get_pool().data->end();
        ++i)
     {
-      if (v == i->second.get())
+      if (v DEAL_II_EQUALS i->second.get())
         {
           i->first = false;
           --current_alloc;

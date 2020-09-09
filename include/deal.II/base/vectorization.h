@@ -50,11 +50,12 @@
 // very strange errors as the size of data structures differs between the
 // compiled deal.II code sitting in libdeal_II.so and the user code if not
 // detected.
-#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && !defined(__AVX__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 DEAL_II_AND !defined(__AVX__)
 #    error \
       "Mismatch in vectorization capabilities: AVX was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
 #  endif
-#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512 && !defined(__AVX512F__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= \
+    512 DEAL_II_AND !defined(__AVX512F__)
 #    error \
       "Mismatch in vectorization capabilities: AVX-512F was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
 #  endif
@@ -111,13 +112,12 @@ public:
   /**
    * Compare for equality.
    */
-  bool
-  operator==(const VectorizedArrayIterator<T> &other) const
+  bool operator DEAL_II_EQUALS(const VectorizedArrayIterator<T> &other) const
   {
-    Assert(this->data == other.data,
+    Assert(this->data DEAL_II_EQUALS other.data,
            ExcMessage(
              "You are trying to compare iterators into different arrays."));
-    return this->lane == other.lane;
+    return this->lane DEAL_II_EQUALS other.lane;
   }
 
   /**
@@ -126,7 +126,7 @@ public:
   bool
   operator!=(const VectorizedArrayIterator<T> &other) const
   {
-    Assert(this->data == other.data,
+    Assert(this->data DEAL_II_EQUALS other.data,
            ExcMessage(
              "You are trying to compare iterators into different arrays."));
     return this->lane != other.lane;
@@ -404,7 +404,7 @@ public:
    */
   DEAL_II_DEPRECATED static const unsigned int n_array_elements = 1;
 
-  static_assert(width == 1,
+  static_assert(width DEAL_II_EQUALS 1,
                 "You specified an illegal width that is not supported.");
 
   /**
@@ -848,8 +848,8 @@ vectorized_load_and_transpose(const unsigned int                 n_entries,
  *
  * The argument @p add_into selects where the entries should only be written
  * into the output arrays or the result should be added into the existing
- * entries in the output. For <code>add_into == false</code>, the following
- * code is assumed:
+ * entries in the output. For <code>add_into DEAL_II_EQUALS  false</code>, the
+ * following code is assumed:
  *
  * @code
  * for (unsigned int i=0; i<n_entries; ++i)
@@ -857,8 +857,8 @@ vectorized_load_and_transpose(const unsigned int                 n_entries,
  *     out[offsets[v]+i] = in[i][v];
  * @endcode
  *
- * For <code>add_into == true</code>, the code implements the following
- * action:
+ * For <code>add_into DEAL_II_EQUALS  true</code>, the code implements the
+ * following action:
  * @code
  * for (unsigned int i=0; i<n_entries; ++i)
  *   for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
@@ -926,7 +926,8 @@ vectorized_transpose_and_store(const bool                            add_into,
 // for safety, also check that __AVX512F__ is defined in case the user manually
 // set some conflicting compile flags which prevent compilation
 
-#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512 && defined(__AVX512F__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= \
+    512 DEAL_II_AND defined(__AVX512F__)
 
 /**
  * Specialization of VectorizedArray class for double and AVX-512.
@@ -1089,7 +1090,7 @@ public:
   void
   streaming_store(double *ptr) const
   {
-    Assert(reinterpret_cast<std::size_t>(ptr) % 64 == 0,
+    Assert(reinterpret_cast<std::size_t>(ptr) % 64 DEAL_II_EQUALS 0,
            ExcMessage("Memory not aligned"));
     _mm512_stream_pd(ptr, data);
   }
@@ -1643,7 +1644,7 @@ public:
   void
   streaming_store(float *ptr) const
   {
-    Assert(reinterpret_cast<std::size_t>(ptr) % 64 == 0,
+    Assert(reinterpret_cast<std::size_t>(ptr) % 64 DEAL_II_EQUALS 0,
            ExcMessage("Memory not aligned"));
     _mm512_stream_ps(ptr, data);
   }
@@ -2130,7 +2131,7 @@ vectorized_transpose_and_store(const bool                        add_into,
 
 #  endif
 
-#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && defined(__AVX__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 DEAL_II_AND defined(__AVX__)
 
 /**
  * Specialization of VectorizedArray class for double and AVX.
@@ -2293,7 +2294,7 @@ public:
   void
   streaming_store(double *ptr) const
   {
-    Assert(reinterpret_cast<std::size_t>(ptr) % 32 == 0,
+    Assert(reinterpret_cast<std::size_t>(ptr) % 32 DEAL_II_EQUALS 0,
            ExcMessage("Memory not aligned"));
     _mm256_stream_pd(ptr, data);
   }
@@ -2806,7 +2807,7 @@ public:
   void
   streaming_store(float *ptr) const
   {
-    Assert(reinterpret_cast<std::size_t>(ptr) % 32 == 0,
+    Assert(reinterpret_cast<std::size_t>(ptr) % 32 DEAL_II_EQUALS 0,
            ExcMessage("Memory not aligned"));
     _mm256_stream_ps(ptr, data);
   }
@@ -3190,7 +3191,7 @@ vectorized_transpose_and_store(const bool                       add_into,
 
 #  endif
 
-#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__SSE2__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 DEAL_II_AND defined(__SSE2__)
 
 /**
  * Specialization for double and SSE2.
@@ -3349,7 +3350,7 @@ public:
   void
   streaming_store(double *ptr) const
   {
-    Assert(reinterpret_cast<std::size_t>(ptr) % 16 == 0,
+    Assert(reinterpret_cast<std::size_t>(ptr) % 16 DEAL_II_EQUALS 0,
            ExcMessage("Memory not aligned"));
     _mm_stream_pd(ptr, data);
   }
@@ -3793,7 +3794,7 @@ public:
   void
   streaming_store(float *ptr) const
   {
-    Assert(reinterpret_cast<std::size_t>(ptr) % 16 == 0,
+    Assert(reinterpret_cast<std::size_t>(ptr) % 16 DEAL_II_EQUALS 0,
            ExcMessage("Memory not aligned"));
     _mm_stream_ps(ptr, data);
   }
@@ -4114,10 +4115,11 @@ vectorized_transpose_and_store(const bool                       add_into,
 
 
 
-#  endif // if DEAL_II_VECTORIZATION_WIDTH_IN_BITS > 0 && defined(__SSE2__)
+#  endif // if DEAL_II_VECTORIZATION_WIDTH_IN_BITS > 0 DEAL_II_AND
+         // defined(__SSE2__)
 
-#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__ALTIVEC__) && \
-    defined(__VSX__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= \
+    128 DEAL_II_AND defined(__ALTIVEC__) DEAL_II_AND defined(__VSX__)
 
 template <>
 class VectorizedArray<double, 2>
@@ -4599,8 +4601,8 @@ private:
            const VectorizedArray<Number2, width2> &);
 };
 
-#  endif // if DEAL_II_VECTORIZATION_LEVEL >=1 && defined(__ALTIVEC__) &&
-         // defined(__VSX__)
+#  endif // if DEAL_II_VECTORIZATION_LEVEL >=1 DEAL_II_AND  defined(__ALTIVEC__)
+         // DEAL_II_AND defined(__VSX__)
 
 
 #endif // DOXYGEN
@@ -4611,14 +4613,14 @@ private:
 //@{
 
 /**
- * Relational operator == for VectorizedArray
+ * Relational operator DEAL_II_EQUALS  for VectorizedArray
  *
  * @relatesalso VectorizedArray
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE bool
-operator==(const VectorizedArray<Number, width> &lhs,
-           const VectorizedArray<Number, width> &rhs)
+operator DEAL_II_EQUALS(const VectorizedArray<Number, width> &lhs,
+                        const VectorizedArray<Number, width> &rhs)
 {
   for (unsigned int i = 0; i < VectorizedArray<Number, width>::size(); ++i)
     if (lhs[i] != rhs[i])
@@ -4980,7 +4982,7 @@ operator<<(std::ostream &out, const VectorizedArray<Number, width> &p)
  */
 enum class SIMDComparison : int
 {
-#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && defined(__AVX__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 DEAL_II_AND defined(__AVX__)
   equal                 = _CMP_EQ_OQ,
   not_equal             = _CMP_NEQ_OQ,
   less_than             = _CMP_LT_OQ,
@@ -5072,7 +5074,7 @@ compare_and_apply_mask(const Number &left,
   switch (predicate)
     {
       case SIMDComparison::equal:
-        mask = (left == right);
+        mask = (left DEAL_II_EQUALS right);
         break;
       case SIMDComparison::not_equal:
         mask = (left != right);
@@ -5117,7 +5119,8 @@ compare_and_apply_mask(const VectorizedArray<Number, 1> &left,
 //@}
 
 #ifndef DOXYGEN
-#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512 && defined(__AVX512F__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= \
+    512 DEAL_II_AND defined(__AVX512F__)
 
 template <SIMDComparison predicate>
 DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, 16>
@@ -5151,7 +5154,7 @@ compare_and_apply_mask(const VectorizedArray<double, 8> &left,
 
 #  endif
 
-#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && defined(__AVX__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 DEAL_II_AND defined(__AVX__)
 
 template <SIMDComparison predicate>
 DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, 8>
@@ -5188,7 +5191,7 @@ compare_and_apply_mask(const VectorizedArray<double, 4> &left,
 
 #  endif
 
-#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__SSE2__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 DEAL_II_AND defined(__SSE2__)
 
 template <SIMDComparison predicate>
 DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, 4>

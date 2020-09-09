@@ -74,7 +74,7 @@ MappingQ1Eulerian<dim, VectorType, spacedim>::get_vertices(
 
   // We require the cell to be active since we can only then get nodal
   // values for the shifts
-  Assert(dof_cell->is_active() == true, ExcInactiveCell());
+  Assert(dof_cell->is_active() DEAL_II_EQUALS true, ExcInactiveCell());
 
   // now get the values of the shift vectors at the vertices
   Vector<typename VectorType::value_type> mapping_values(

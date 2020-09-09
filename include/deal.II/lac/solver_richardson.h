@@ -215,7 +215,7 @@ SolverRichardson<VectorType>::solve(const MatrixType &        A,
   LogStream::Prefix prefix("Richardson");
 
   // Main loop
-  while (conv == SolverControl::iterate)
+  while (conv DEAL_II_EQUALS SolverControl::iterate)
     {
       // Do not use residual,
       // but do it in 2 steps
@@ -271,7 +271,7 @@ SolverRichardson<VectorType>::Tsolve(const MatrixType &        A,
   LogStream::Prefix prefix("RichardsonT");
 
   // Main loop
-  while (conv == SolverControl::iterate)
+  while (conv DEAL_II_EQUALS SolverControl::iterate)
     {
       // Do not use Tresidual,
       // but do it in 2 steps

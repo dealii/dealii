@@ -16,6 +16,9 @@
 #ifndef dealii_config_h
 #define dealii_config_h
 
+#define DEAL_II_AND  &&
+#define DEAL_II_OR  ||
+#define DEAL_II_EQUALS  ==
 
 /***********************************************************************
  * Information about deal.II:
@@ -99,7 +102,7 @@
  * A variable to tell if the compiler used in the current compilation process
  * understands CUDA code.
  */
-#if defined(DEAL_II_WITH_CUDA) && defined(__CUDACC__)
+#if defined(DEAL_II_WITH_CUDA) DEAL_II_AND  defined(__CUDACC__)
 #  define DEAL_II_COMPILER_CUDA_AWARE
 #endif
 
@@ -121,11 +124,11 @@
 /*
  * Backward compatibility setting
  */
-#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS == 512
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS DEAL_II_EQUALS  512
 #define DEAL_II_COMPILER_VECTORIZATION_LEVEL 3
-#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS == 256
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS DEAL_II_EQUALS  256
 #define DEAL_II_COMPILER_VECTORIZATION_LEVEL 2
-#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS == 128
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS DEAL_II_EQUALS  128
 #define DEAL_II_COMPILER_VECTORIZATION_LEVEL 1
 #else
 #define DEAL_II_COMPILER_VECTORIZATION_LEVEL 0
@@ -444,7 +447,7 @@ _Pragma("GCC diagnostic pop")
  * Some systems require including mpi.h before stdio.h which happens in
  * types.h
  */
-#if defined(DEAL_II_WITH_MPI) || defined(DEAL_II_WITH_PETSC)
+#if defined(DEAL_II_WITH_MPI) DEAL_II_OR  defined(DEAL_II_WITH_PETSC)
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <mpi.h>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS

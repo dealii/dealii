@@ -85,11 +85,10 @@ public:
   /**
    * Comparison. True, if both accessors are equal.
    */
-  bool
-  operator==(const MatrixIterator &) const;
+  bool operator DEAL_II_EQUALS(const MatrixIterator &) const;
 
   /**
-   * Inverse of <tt>==</tt>.
+   * Inverse of <tt>DEAL_II_EQUALS </tt>.
    */
   bool
   operator!=(const MatrixIterator &) const;
@@ -174,10 +173,10 @@ inline const ACCESSOR *MatrixIterator<ACCESSOR>::operator->() const
 
 
 template <class ACCESSOR>
-inline bool
-MatrixIterator<ACCESSOR>::operator==(const MatrixIterator &other) const
+inline bool MatrixIterator<ACCESSOR>::
+            operator DEAL_II_EQUALS(const MatrixIterator &other) const
 {
-  return (accessor == other.accessor);
+  return (accessor DEAL_II_EQUALS other.accessor);
 }
 
 
@@ -185,7 +184,7 @@ template <class ACCESSOR>
 inline bool
 MatrixIterator<ACCESSOR>::operator!=(const MatrixIterator &other) const
 {
-  return !(*this == other);
+  return !(*this DEAL_II_EQUALS other);
 }
 
 
@@ -193,7 +192,7 @@ template <class ACCESSOR>
 inline bool
 MatrixIterator<ACCESSOR>::operator<(const MatrixIterator &other) const
 {
-  Assert(&accessor.get_matrix() == &other.accessor.get_matrix(),
+  Assert(&accessor.get_matrix() DEAL_II_EQUALS & other.accessor.get_matrix(),
          ExcInternalError());
 
   return (accessor < other.accessor);

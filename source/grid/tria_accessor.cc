@@ -110,13 +110,13 @@ namespace
     // third index: does the first subface have children? -> no and yes
     static const unsigned int translated_subface_no[2][2][2] = {
       {{e, 0},   // first  subface, first  subsubface,
-                 // first_child_has_children==no and yes
+                 // first_child_has_childrenDEAL_II_EQUALS no and yes
        {e, 1}},  // first  subface, second subsubface,
-                 // first_child_has_children==no and yes
+                 // first_child_has_childrenDEAL_II_EQUALS no and yes
       {{1, 2},   // second subface, first  subsubface,
-                 // first_child_has_children==no and yes
+                 // first_child_has_childrenDEAL_II_EQUALS no and yes
        {2, 3}}}; // second subface, second subsubface,
-                 // first_child_has_children==no and yes
+                 // first_child_has_childrenDEAL_II_EQUALS no and yes
 
     Assert(translated_subface_no[subface_no][subsubface_no]
                                 [first_child_has_children] != e,
@@ -1316,8 +1316,8 @@ namespace
         // consider a bilinear quad x(u,v) = (1-v)((1-u)v_0 + u v_1) +
         // v((1-u)v_2 + u v_3), consequently we compute the normal vector as
         // n(u,v) = t_u x t_v = w_1 + u w_2 + v w_3. The integrand function is
-        // || n(u,v) || = sqrt(a + b u^2 + c v^2 + d u + e v + f uv).
-        // We integrate it using a QGauss<2> (4) computed explicitly.
+        // DEAL_II_OR  n(u,v) DEAL_II_OR  = sqrt(a + b u^2 + c v^2 + d u + e v +
+        // f uv). We integrate it using a QGauss<2> (4) computed explicitly.
         const Tensor<1, 3> w_1 =
           cross_product_3d(accessor.vertex(1) - accessor.vertex(0),
                            accessor.vertex(2) - accessor.vertex(0));
@@ -1831,9 +1831,9 @@ TriaAccessor<structdim, dim, spacedim>::center(
   const bool respect_manifold,
   const bool use_interpolation) const
 {
-  if (respect_manifold == false)
+  if (respect_manifold DEAL_II_EQUALS false)
     {
-      Assert(use_interpolation == false, ExcNotImplemented());
+      Assert(use_interpolation DEAL_II_EQUALS false, ExcNotImplemented());
       Point<spacedim> p;
       for (const unsigned int v : this->vertex_indices())
         p += vertex(v);
@@ -1852,7 +1852,7 @@ template <>
 bool
 CellAccessor<1>::point_inside(const Point<1> &p) const
 {
-  return (this->vertex(0)[0] <= p[0]) && (p[0] <= this->vertex(1)[0]);
+  return (this->vertex(0)[0] <= p[0]) DEAL_II_AND(p[0] <= this->vertex(1)[0]);
 }
 
 
@@ -1950,7 +1950,7 @@ CellAccessor<3>::point_inside(const Point<3> &p) const
   // rule out points outside the
   // bounding box of this cell
   for (unsigned int d = 0; d < dim; d++)
-    if ((p[d] < minp[d]) || (p[d] > maxp[d]))
+    if ((p[d] < minp[d]) DEAL_II_OR(p[d] > maxp[d]))
       return false;
 
   // now we need to check more carefully: transform to the
@@ -2115,7 +2115,7 @@ bool
 CellAccessor<dim, spacedim>::direction_flag() const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  if (dim == spacedim)
+  if (dim DEAL_II_EQUALS spacedim)
     return true;
   else
     return this->tria->levels[this->present_level]
@@ -2134,9 +2134,11 @@ CellAccessor<dim, spacedim>::set_direction_flag(
     this->tria->levels[this->present_level]
       ->direction_flags[this->present_index] = new_direction_flag;
   else
-    Assert(new_direction_flag == true,
-           ExcMessage("If dim==spacedim, direction flags are always true and "
-                      "can not be set to anything else."));
+    Assert(
+      new_direction_flag DEAL_II_EQUALS true,
+      ExcMessage(
+        "If dimDEAL_II_EQUALS spacedim, direction flags are always true and "
+        "can not be set to anything else."));
 }
 
 
@@ -2228,7 +2230,7 @@ CellAccessor<dim, spacedim>::set_neighbor(
 {
   AssertIndexRange(i, this->n_faces());
 
-  if (pointer.state() == IteratorState::valid)
+  if (pointer.state() DEAL_II_EQUALS IteratorState::valid)
     {
       this->tria->levels[this->present_level]
         ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell + i]
@@ -2268,7 +2270,7 @@ CellAccessor<dim, spacedim>::id() const
       unsigned char v = static_cast<unsigned char>(-1);
       for (unsigned int c = 0; c < n_children; ++c)
         {
-          if (parent->child_index(c) == ptr.index())
+          if (parent->child_index(c) DEAL_II_EQUALS ptr.index())
             {
               v = c;
               break;
@@ -2281,7 +2283,7 @@ CellAccessor<dim, spacedim>::id() const
       ptr.copy_from(*parent);
     }
 
-  Assert(ptr.level() == 0, ExcInternalError());
+  Assert(ptr.level() DEAL_II_EQUALS 0, ExcInternalError());
   const unsigned int coarse_index = ptr.index();
 
   return {this->tria->coarse_cell_index_to_coarse_cell_id(coarse_index),
@@ -2307,7 +2309,7 @@ CellAccessor<dim, spacedim>::neighbor_of_neighbor_internal(
   // dimensional space, so we have to
   // fall back onto the generic code
   // below
-  if ((dim == 1) && (spacedim == dim))
+  if ((dim DEAL_II_EQUALS 1)DEAL_II_AND(spacedim DEAL_II_EQUALS dim))
     return GeometryInfo<dim>::opposite_face[neighbor];
 
   const TriaIterator<CellAccessor<dim, spacedim>> neighbor_cell =
@@ -2320,7 +2322,7 @@ CellAccessor<dim, spacedim>::neighbor_of_neighbor_internal(
   // this cell. for example in 2d, if
   // we want to know the
   // neighbor_of_neighbor if
-  // neighbor==1 (the right
+  // neighborDEAL_II_EQUALS 1 (the right
   // neighbor), then we will get 3
   // (the left neighbor) in most
   // cases. look up this relationship
@@ -2331,8 +2333,9 @@ CellAccessor<dim, spacedim>::neighbor_of_neighbor_internal(
   const unsigned int neighbor_guess =
     GeometryInfo<dim>::opposite_face[neighbor];
 
-  if (neighbor_guess < neighbor_cell->n_faces() &&
-      neighbor_cell->face_index(neighbor_guess) == this_face_index)
+  if (neighbor_guess < neighbor_cell->n_faces()
+                         DEAL_II_AND neighbor_cell->face_index(neighbor_guess)
+                           DEAL_II_EQUALS this_face_index)
     return neighbor_guess;
   else
     // if the guess was false, then
@@ -2341,7 +2344,7 @@ CellAccessor<dim, spacedim>::neighbor_of_neighbor_internal(
     // the hard way
     {
       for (const unsigned int face_no : neighbor_cell->face_indices())
-        if (neighbor_cell->face_index(face_no) == this_face_index)
+        if (neighbor_cell->face_index(face_no) DEAL_II_EQUALS this_face_index)
           return face_no;
 
       // running over all neighbors
@@ -2376,8 +2379,8 @@ bool
 CellAccessor<dim, spacedim>::neighbor_is_coarser(
   const unsigned int neighbor) const
 {
-  return neighbor_of_neighbor_internal(neighbor) ==
-         numbers::invalid_unsigned_int;
+  return neighbor_of_neighbor_internal(neighbor)
+    DEAL_II_EQUALS numbers::invalid_unsigned_int;
 }
 
 
@@ -2408,7 +2411,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
           // this cell. for example in 2d, if
           // we want to know the
           // neighbor_of_neighbor if
-          // neighbor==1 (the right
+          // neighborDEAL_II_EQUALS 1 (the right
           // neighbor), then we will get 0
           // (the left neighbor) in most
           // cases. look up this relationship
@@ -2424,7 +2427,8 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
             for (unsigned int subface_no = 0;
                  subface_no < face_guess->n_children();
                  ++subface_no)
-              if (face_guess->child_index(subface_no) == this_face_index)
+              if (face_guess->child_index(subface_no)
+                    DEAL_II_EQUALS this_face_index)
                 return std::make_pair(face_no_guess, subface_no);
 
           // if the guess was false, then
@@ -2441,7 +2445,8 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
                     for (unsigned int subface_no = 0;
                          subface_no < face->n_children();
                          ++subface_no)
-                      if (face->child_index(subface_no) == this_face_index)
+                      if (face->child_index(subface_no)
+                            DEAL_II_EQUALS this_face_index)
                         return std::make_pair(face_no, subface_no);
                 }
             }
@@ -2463,9 +2468,9 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
           // usually, on regular patches of the grid, this cell is just on the
           // opposite side of the neighbor that the neighbor is of this cell.
           // for example in 2d, if we want to know the neighbor_of_neighbor if
-          // neighbor==1 (the right neighbor), then we will get 0 (the left
-          // neighbor) in most cases. look up this relationship in the table
-          // provided by GeometryInfo and try it
+          // neighborDEAL_II_EQUALS 1 (the right neighbor), then we will get 0
+          // (the left neighbor) in most cases. look up this relationship in the
+          // table provided by GeometryInfo and try it
           const unsigned int face_no_guess =
             GeometryInfo<3>::opposite_face[neighbor];
 
@@ -2477,7 +2482,8 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
                  subface_no < face_guess->n_children();
                  ++subface_no)
               {
-                if (face_guess->child_index(subface_no) == this_face_index)
+                if (face_guess->child_index(subface_no)
+                      DEAL_II_EQUALS this_face_index)
                   // call a helper function, that translates the current
                   // subface number to a subface number for the current
                   // FaceRefineCase
@@ -2489,8 +2495,9 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
                   for (unsigned int subsub_no = 0;
                        subsub_no < face_guess->child(subface_no)->n_children();
                        ++subsub_no)
-                    if (face_guess->child(subface_no)->child_index(subsub_no) ==
-                        this_face_index)
+                    if (face_guess->child(subface_no)
+                          ->child_index(subsub_no)
+                            DEAL_II_EQUALS this_face_index)
                       // call a helper function, that translates the current
                       // subface number and subsubface number to a subface
                       // number for the current FaceRefineCase
@@ -2504,7 +2511,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
           // subfaces and find the number the hard way
           for (const unsigned int face_no : neighbor_cell->face_indices())
             {
-              if (face_no == face_no_guess)
+              if (face_no DEAL_II_EQUALS face_no_guess)
                 continue;
 
               const TriaIterator<TriaAccessor<dim - 1, dim, spacedim>> face =
@@ -2516,7 +2523,8 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
               for (unsigned int subface_no = 0; subface_no < face->n_children();
                    ++subface_no)
                 {
-                  if (face->child_index(subface_no) == this_face_index)
+                  if (face->child_index(subface_no)
+                        DEAL_II_EQUALS this_face_index)
                     // call a helper function, that translates the current
                     // subface number to a subface number for the current
                     // FaceRefineCase
@@ -2528,8 +2536,9 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
                     for (unsigned int subsub_no = 0;
                          subsub_no < face->child(subface_no)->n_children();
                          ++subsub_no)
-                      if (face->child(subface_no)->child_index(subsub_no) ==
-                          this_face_index)
+                      if (face->child(subface_no)
+                            ->child_index(subsub_no)
+                              DEAL_II_EQUALS this_face_index)
                         // call a helper function, that translates the current
                         // subface number and subsubface number to a subface
                         // number for the current FaceRefineCase
@@ -2749,7 +2758,7 @@ CellAccessor<dim, spacedim>::periodic_neighbor_of_coarser_periodic_neighbor(
     p_nb_of_p_nb->face(nb_face_pair->second.first.second);
   for (unsigned int i_subface = 0; i_subface < parent_face_it->n_children();
        ++i_subface)
-    if (parent_face_it->child_index(i_subface) == my_face_index)
+    if (parent_face_it->child_index(i_subface) DEAL_II_EQUALS my_face_index)
       return (std::pair<unsigned int, unsigned int>(face_num_of_nb, i_subface));
   /*
    * Obviously, if the execution reaches to this point, some of our assumptions
@@ -2891,7 +2900,7 @@ CellAccessor<dim, spacedim>::at_boundary(const unsigned int i) const
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   AssertIndexRange(i, this->n_faces());
 
-  return (neighbor_index(i) == -1);
+  return (neighbor_index(i) DEAL_II_EQUALS - 1);
 }
 
 
@@ -2900,7 +2909,7 @@ template <int dim, int spacedim>
 bool
 CellAccessor<dim, spacedim>::has_boundary_lines() const
 {
-  if (dim == 1)
+  if (dim DEAL_II_EQUALS 1)
     return at_boundary();
   else
     {
@@ -2924,7 +2933,7 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
          ExcMessage("The present cell must not have children!"));
   Assert(!this->at_boundary(face),
          ExcMessage("The present cell must have a valid neighbor!"));
-  Assert(this->neighbor(face)->has_children() == true,
+  Assert(this->neighbor(face)->has_children() DEAL_II_EQUALS true,
          ExcMessage("The neighbor must have children!"));
 
   switch (dim)
@@ -2949,8 +2958,8 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
           while (sub_neighbor->has_children())
             {
               Assert((GeometryInfo<dim>::face_refinement_case(
-                        sub_neighbor->refinement_case(), neighbor_neighbor) ==
-                      RefinementCase<dim>::no_refinement),
+                       sub_neighbor->refinement_case(), neighbor_neighbor)
+                        DEAL_II_EQUALS RefinementCase<dim>::no_refinement),
                      ExcInternalError());
               sub_neighbor =
                 sub_neighbor->child(GeometryInfo<dim>::child_cell_on_face(
@@ -3032,9 +3041,9 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
 
           const RefinementCase<dim - 1> mother_face_ref_case =
             mother_face->refinement_case();
-          if (mother_face_ref_case ==
-              static_cast<RefinementCase<dim - 1>>(
-                RefinementCase<2>::cut_xy)) // total_children==4
+          if (mother_face_ref_case
+                DEAL_II_EQUALS static_cast<RefinementCase<dim - 1>>(
+                  RefinementCase<2>::cut_xy)) // total_childrenDEAL_II_EQUALS 4
             {
               // this case is quite easy. we are sure,
               // that the neighbor is not coarser.
@@ -3057,9 +3066,10 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
 
               // make sure that the neighbor child cell we
               // have found shares the desired subface.
-              Assert((this->face(face)->child(subface) ==
-                      neighbor_child->face(neighbor_neighbor)),
-                     ExcInternalError());
+              Assert(
+                (this->face(face)->child(subface)
+                   DEAL_II_EQUALS neighbor_child->face(neighbor_neighbor)),
+                ExcInternalError());
             }
           else //-> the face is refined anisotropically
             {
@@ -3070,13 +3080,14 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
               // these we need.
               unsigned int first_child_to_find;
               unsigned int neighbor_child_index;
-              if (total_children == 2)
+              if (total_children DEAL_II_EQUALS 2)
                 first_child_to_find = subface;
               else
                 {
                   first_child_to_find = subface / 2;
-                  if (total_children == 3 && subface == 1 &&
-                      !mother_face->child(0)->has_children())
+                  if (total_children DEAL_II_EQUALS 3 DEAL_II_AND subface
+                                                                  DEAL_II_EQUALS 1 DEAL_II_AND !mother_face->child(0)
+                          ->has_children())
                     first_child_to_find = 1;
                 }
               if (neighbor_is_coarser(face))
@@ -3129,15 +3140,16 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
                   // |       |
                   // *-------*
                   unsigned int iso_subface;
-                  if (neighbor->face(neighbor_neighbor)->refinement_case() ==
-                      RefinementCase<2>::cut_x)
+                  if (neighbor->face(neighbor_neighbor)
+                        ->refinement_case()
+                          DEAL_II_EQUALS RefinementCase<2>::cut_x)
                     iso_subface = 2 * first_child_to_find + indices.second;
                   else
                     {
-                      Assert(
-                        neighbor->face(neighbor_neighbor)->refinement_case() ==
-                          RefinementCase<2>::cut_y,
-                        ExcInternalError());
+                      Assert(neighbor->face(neighbor_neighbor)
+                               ->refinement_case()
+                                 DEAL_II_EQUALS RefinementCase<2>::cut_y,
+                             ExcInternalError());
                       iso_subface = first_child_to_find + 2 * indices.second;
                     }
                   neighbor_child_index = GeometryInfo<dim>::child_cell_on_face(
@@ -3166,10 +3178,10 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
               // has children, which are not refined
               // along the given subface. go down that
               // list and deliver the last of those.
-              while (neighbor_child->has_children() &&
-                     GeometryInfo<dim>::face_refinement_case(
-                       neighbor_child->refinement_case(), neighbor_neighbor) ==
-                       RefinementCase<2>::no_refinement)
+              while (neighbor_child->has_children()
+                       DEAL_II_AND GeometryInfo<dim>::face_refinement_case(
+                         neighbor_child->refinement_case(), neighbor_neighbor)
+                         DEAL_II_EQUALS RefinementCase<2>::no_refinement)
                 neighbor_child =
                   neighbor_child->child(GeometryInfo<dim>::child_cell_on_face(
                     neighbor_child->refinement_case(), neighbor_neighbor, 0));
@@ -3180,7 +3192,7 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
               // neighbor_child. If there are three,
               // we have to check which of the two
               // possibilities applies.
-              if (total_children == 3)
+              if (total_children DEAL_II_EQUALS 3)
                 {
                   if (mother_face->child(0)->has_children())
                     {
@@ -3211,7 +3223,7 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
                             mother_face->child(1)->refinement_case()));
                     }
                 }
-              else if (total_children == 4)
+              else if (total_children DEAL_II_EQUALS 4)
                 {
                   neighbor_child =
                     neighbor_child->child(GeometryInfo<dim>::child_cell_on_face(
@@ -3284,7 +3296,8 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
                 Assert(false, ExcInternalError());
                 break;
             }
-          Assert(requested == neighbor_child->face(neighbor_neighbor),
+          Assert(requested DEAL_II_EQUALS neighbor_child->face(
+                   neighbor_neighbor),
                  ExcInternalError());
 #endif
 

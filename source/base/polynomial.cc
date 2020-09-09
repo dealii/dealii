@@ -113,7 +113,7 @@ namespace Polynomials
                             number *           values) const
   {
     // evaluate Lagrange polynomial and derivatives
-    if (in_lagrange_product_form == true)
+    if (in_lagrange_product_form DEAL_II_EQUALS true)
       {
         // to compute the value and all derivatives of a polynomial of the
         // form (x-x_1)*(x-x_2)*...*(x-x_n), expand the derivatives like
@@ -207,7 +207,7 @@ namespace Polynomials
     // if we only need the value, then call the other function since that is
     // significantly faster (there is no need to allocate and free memory,
     // which is really expensive compared to all the other operations!)
-    if (n_derivatives == 0)
+    if (n_derivatives DEAL_II_EQUALS 0)
       {
         values[0] = value(x);
         return;
@@ -244,12 +244,12 @@ namespace Polynomials
   Polynomial<number>::transform_into_standard_form()
   {
     // should only be called when the product form is active
-    Assert(in_lagrange_product_form == true, ExcInternalError());
-    Assert(coefficients.size() == 0, ExcInternalError());
+    Assert(in_lagrange_product_form DEAL_II_EQUALS true, ExcInternalError());
+    Assert(coefficients.size() DEAL_II_EQUALS 0, ExcInternalError());
 
     // compute coefficients by expanding the product (x-x_i) term by term
     coefficients.resize(lagrange_support_points.size() + 1);
-    if (lagrange_support_points.size() == 0)
+    if (lagrange_support_points.size() DEAL_II_EQUALS 0)
       coefficients[0] = 1.;
     else
       {
@@ -300,7 +300,7 @@ namespace Polynomials
     // to scale (x-x_0)*(x-x_1)*...*(x-x_n), scale
     // support points by 1./factor and the weight
     // likewise
-    if (in_lagrange_product_form == true)
+    if (in_lagrange_product_form DEAL_II_EQUALS true)
       {
         number inv_fact         = number(1.) / factor;
         number accumulated_fact = 1.;
@@ -335,7 +335,7 @@ namespace Polynomials
   Polynomial<number> &
   Polynomial<number>::operator*=(const double s)
   {
-    if (in_lagrange_product_form == true)
+    if (in_lagrange_product_form DEAL_II_EQUALS true)
       lagrange_weight *= s;
     else
       {
@@ -355,7 +355,8 @@ namespace Polynomials
   {
     // if we are in Lagrange form, just append the
     // new points
-    if (in_lagrange_product_form == true && p.in_lagrange_product_form == true)
+    if (in_lagrange_product_form DEAL_II_EQUALS true DEAL_II_AND p
+          .in_lagrange_product_form DEAL_II_EQUALS true)
       {
         lagrange_weight *= p.lagrange_weight;
         lagrange_support_points.insert(lagrange_support_points.end(),
@@ -364,7 +365,7 @@ namespace Polynomials
       }
 
     // cannot retain product form, recompute...
-    else if (in_lagrange_product_form == true)
+    else if (in_lagrange_product_form DEAL_II_EQUALS true)
       transform_into_standard_form();
 
     // need to transform p into standard form as
@@ -372,7 +373,7 @@ namespace Polynomials
     // do this
     std::unique_ptr<Polynomial<number>> q_data;
     const Polynomial<number> *          q = nullptr;
-    if (p.in_lagrange_product_form == true)
+    if (p.in_lagrange_product_form DEAL_II_EQUALS true)
       {
         q_data = std::make_unique<Polynomial<number>>(p);
         q_data->transform_into_standard_form();
@@ -408,7 +409,7 @@ namespace Polynomials
     // currently (r23974) assume that the addition
     // of a zero polynomial changes the state and
     // tests equivalence.
-    if (in_lagrange_product_form == true)
+    if (in_lagrange_product_form DEAL_II_EQUALS true)
       transform_into_standard_form();
 
     // need to transform p into standard form as
@@ -416,7 +417,7 @@ namespace Polynomials
     // do this
     std::unique_ptr<Polynomial<number>> q_data;
     const Polynomial<number> *          q = nullptr;
-    if (p.in_lagrange_product_form == true)
+    if (p.in_lagrange_product_form DEAL_II_EQUALS true)
       {
         q_data = std::make_unique<Polynomial<number>>(p);
         q_data->transform_into_standard_form();
@@ -444,7 +445,7 @@ namespace Polynomials
   {
     // Lagrange product form cannot reasonably be
     // retained after polynomial addition
-    if (in_lagrange_product_form == true)
+    if (in_lagrange_product_form DEAL_II_EQUALS true)
       transform_into_standard_form();
 
     // need to transform p into standard form as
@@ -452,7 +453,7 @@ namespace Polynomials
     // do this
     std::unique_ptr<Polynomial<number>> q_data;
     const Polynomial<number> *          q = nullptr;
-    if (p.in_lagrange_product_form == true)
+    if (p.in_lagrange_product_form DEAL_II_EQUALS true)
       {
         q_data = std::make_unique<Polynomial<number>>(p);
         q_data->transform_into_standard_form();
@@ -475,31 +476,32 @@ namespace Polynomials
 
 
   template <typename number>
-  bool
-  Polynomial<number>::operator==(const Polynomial<number> &p) const
+  bool Polynomial<number>::
+       operator DEAL_II_EQUALS(const Polynomial<number> &p) const
   {
     // need to distinguish a few cases based on
     // whether we are in product form or not. two
     // polynomials can still be the same when they
     // are on different forms, but the expansion
     // is the same
-    if (in_lagrange_product_form == true && p.in_lagrange_product_form == true)
-      return ((lagrange_weight == p.lagrange_weight) &&
-              (lagrange_support_points == p.lagrange_support_points));
-    else if (in_lagrange_product_form == true)
+    if (in_lagrange_product_form DEAL_II_EQUALS true DEAL_II_AND p
+          .in_lagrange_product_form DEAL_II_EQUALS true)
+      return ((lagrange_weight DEAL_II_EQUALS p.lagrange_weight)DEAL_II_AND(
+        lagrange_support_points DEAL_II_EQUALS p.lagrange_support_points));
+    else if (in_lagrange_product_form DEAL_II_EQUALS true)
       {
         Polynomial<number> q = *this;
         q.transform_into_standard_form();
-        return (q.coefficients == p.coefficients);
+        return (q.coefficients DEAL_II_EQUALS p.coefficients);
       }
-    else if (p.in_lagrange_product_form == true)
+    else if (p.in_lagrange_product_form DEAL_II_EQUALS true)
       {
         Polynomial<number> q = p;
         q.transform_into_standard_form();
-        return (q.coefficients == coefficients);
+        return (q.coefficients DEAL_II_EQUALS coefficients);
       }
     else
-      return (p.coefficients == coefficients);
+      return (p.coefficients DEAL_II_EQUALS coefficients);
   }
 
 
@@ -557,7 +559,7 @@ namespace Polynomials
         // should have gone through a
         // whole row of Pascal's
         // triangle.
-        Assert(binomial_coefficient == 1, ExcInternalError());
+        Assert(binomial_coefficient DEAL_II_EQUALS 1, ExcInternalError());
       }
 
     // copy new elements to old vector
@@ -574,7 +576,7 @@ namespace Polynomials
     // shift is simple for a polynomial in product
     // form, (x-x_0)*(x-x_1)*...*(x-x_n). just add
     // offset to all shifts
-    if (in_lagrange_product_form == true)
+    if (in_lagrange_product_form DEAL_II_EQUALS true)
       {
         for (unsigned int i = 0; i < lagrange_support_points.size(); ++i)
           lagrange_support_points[i] -= offset;
@@ -592,12 +594,12 @@ namespace Polynomials
   {
     // no simple form possible for Lagrange
     // polynomial on product form
-    if (degree() == 0)
+    if (degree() DEAL_II_EQUALS 0)
       return Monomial<number>(0, 0.);
 
     std::unique_ptr<Polynomial<number>> q_data;
     const Polynomial<number> *          q = nullptr;
-    if (in_lagrange_product_form == true)
+    if (in_lagrange_product_form DEAL_II_EQUALS true)
       {
         q_data = std::make_unique<Polynomial<number>>(*this);
         q_data->transform_into_standard_form();
@@ -623,7 +625,7 @@ namespace Polynomials
     // polynomial on product form
     std::unique_ptr<Polynomial<number>> q_data;
     const Polynomial<number> *          q = nullptr;
-    if (in_lagrange_product_form == true)
+    if (in_lagrange_product_form DEAL_II_EQUALS true)
       {
         q_data = std::make_unique<Polynomial<number>>(*this);
         q_data->transform_into_standard_form();
@@ -646,7 +648,7 @@ namespace Polynomials
   void
   Polynomial<number>::print(std::ostream &out) const
   {
-    if (in_lagrange_product_form == true)
+    if (in_lagrange_product_form DEAL_II_EQUALS true)
       {
         out << lagrange_weight;
         for (unsigned int i = 0; i < lagrange_support_points.size(); ++i)
@@ -732,7 +734,7 @@ namespace Polynomials
                            generate_equidistant_unit_points(n),
                          support_point)
   {
-    Assert(coefficients.size() == 0, ExcInternalError());
+    Assert(coefficients.size() DEAL_II_EQUALS 0, ExcInternalError());
 
     // For polynomial order up to 3, we have precomputed weights. Use these
     // weights instead of the product form
@@ -810,7 +812,7 @@ namespace Polynomials
   std::vector<Polynomial<double>>
   LagrangeEquidistant::generate_complete_basis(const unsigned int degree)
   {
-    if (degree == 0)
+    if (degree DEAL_II_EQUALS 0)
       // create constant polynomial
       return std::vector<Polynomial<double>>(
         1, Polynomial<double>(std::vector<double>(1, 1.)));
@@ -1021,12 +1023,12 @@ namespace Polynomials
 
     // The first 2 coefficients
     // are hard-coded
-    if (k == 0)
+    if (k DEAL_II_EQUALS 0)
       k = 1;
     // check: does the information
     // already exist?
-    if ((recursive_coefficients.size() < k + 1) ||
-        (recursive_coefficients[k].get() == nullptr))
+    if ((recursive_coefficients.size() < k + 1)
+          DEAL_II_OR(recursive_coefficients[k].get() DEAL_II_EQUALS nullptr))
       // no, then generate the
       // respective coefficients
       {
@@ -1075,7 +1077,7 @@ namespace Polynomials
             recursive_coefficients[1] =
               std::make_unique<const std::vector<double>>(std::move(c1));
           }
-        else if (k == 2)
+        else if (k DEAL_II_EQUALS 2)
           {
             coefficients_lock.unlock();
             compute_coefficients(1);
@@ -1120,7 +1122,7 @@ namespace Polynomials
             // for even degrees, we need
             // to add a multiple of
             // basis fcn phi_2
-            if ((k % 2) == 0)
+            if ((k % 2) DEAL_II_EQUALS 0)
               {
                 double b = 1.; // 8.;
                 // for (unsigned int i=1; i<=k; i++)
@@ -1160,7 +1162,7 @@ namespace Polynomials
   std::vector<Polynomial<double>>
   Hierarchical::generate_complete_basis(const unsigned int degree)
   {
-    if (degree == 0)
+    if (degree DEAL_II_EQUALS 0)
       // create constant
       // polynomial. note that we
       // can't use the other branch
@@ -1193,27 +1195,27 @@ namespace Polynomials
     this->in_lagrange_product_form = true;
 
     this->lagrange_support_points.resize(3);
-    if (p == 0)
+    if (p DEAL_II_EQUALS 0)
       {
         this->lagrange_support_points[0] = -0.5;
         this->lagrange_support_points[1] = 1.;
         this->lagrange_support_points[2] = 1.;
         this->lagrange_weight            = 2.;
       }
-    else if (p == 1)
+    else if (p DEAL_II_EQUALS 1)
       {
         this->lagrange_support_points[0] = 0.;
         this->lagrange_support_points[1] = 0.;
         this->lagrange_support_points[2] = 1.5;
         this->lagrange_weight            = -2.;
       }
-    else if (p == 2)
+    else if (p DEAL_II_EQUALS 2)
       {
         this->lagrange_support_points[0] = 0.;
         this->lagrange_support_points[1] = 1.;
         this->lagrange_support_points[2] = 1.;
       }
-    else if (p == 3)
+    else if (p DEAL_II_EQUALS 3)
       {
         this->lagrange_support_points[0] = 0.;
         this->lagrange_support_points[1] = 0.;
@@ -1315,11 +1317,11 @@ namespace Polynomials
 
     this->lagrange_support_points.resize(degree);
 
-    if (degree == 0)
+    if (degree DEAL_II_EQUALS 0)
       this->lagrange_weight = 1.;
-    else if (degree == 1)
+    else if (degree DEAL_II_EQUALS 1)
       {
-        if (index == 0)
+        if (index DEAL_II_EQUALS 0)
           {
             this->lagrange_support_points[0] = 1.;
             this->lagrange_weight            = -1.;
@@ -1330,15 +1332,15 @@ namespace Polynomials
             this->lagrange_weight            = 1.;
           }
       }
-    else if (degree == 2)
+    else if (degree DEAL_II_EQUALS 2)
       {
-        if (index == 0)
+        if (index DEAL_II_EQUALS 0)
           {
             this->lagrange_support_points[0] = 1.;
             this->lagrange_support_points[1] = 1.;
             this->lagrange_weight            = 1.;
           }
-        else if (index == 1)
+        else if (index DEAL_II_EQUALS 1)
           {
             this->lagrange_support_points[0] = 0;
             this->lagrange_support_points[1] = 1;
@@ -1351,7 +1353,7 @@ namespace Polynomials
             this->lagrange_weight            = 1.;
           }
       }
-    else if (degree == 3)
+    else if (degree DEAL_II_EQUALS 3)
       {
         // 4 Polynomials with degree 3
         // entries (1,0) and (3,2) of the mass matrix will be equal to 0
@@ -1361,14 +1363,14 @@ namespace Polynomials
         // M = | x  x  x  0 |
         //     | x  x  0  x |
         //
-        if (index == 0)
+        if (index DEAL_II_EQUALS 0)
           {
             this->lagrange_support_points[0] = 2. / 7.;
             this->lagrange_support_points[1] = 1.;
             this->lagrange_support_points[2] = 1.;
             this->lagrange_weight            = -3.5;
           }
-        else if (index == 1)
+        else if (index DEAL_II_EQUALS 1)
           {
             this->lagrange_support_points[0] = 0.;
             this->lagrange_support_points[1] = 1.;
@@ -1378,14 +1380,14 @@ namespace Polynomials
             // formula below for the degree=3 case
             this->lagrange_weight = 5.5;
           }
-        else if (index == 2)
+        else if (index DEAL_II_EQUALS 2)
           {
             this->lagrange_support_points[0] = 0.;
             this->lagrange_support_points[1] = 0.;
             this->lagrange_support_points[2] = 1.;
             this->lagrange_weight            = -5.5;
           }
-        else if (index == 3)
+        else if (index DEAL_II_EQUALS 3)
           {
             this->lagrange_support_points[0] = 0.;
             this->lagrange_support_points[1] = 0.;
@@ -1424,7 +1426,7 @@ namespace Polynomials
         // initial values
 
         this->lagrange_support_points.resize(degree);
-        if (index == 0)
+        if (index DEAL_II_EQUALS 0)
           {
             const double auxiliary_zero =
               find_support_point_x_star(jacobi_roots);
@@ -1437,7 +1439,7 @@ namespace Polynomials
             // ensure that the polynomial evaluates to one at x=0
             this->lagrange_weight = 1. / this->value(0);
           }
-        else if (index == 1)
+        else if (index DEAL_II_EQUALS 1)
           {
             this->lagrange_support_points[0] = 0.;
             for (unsigned int m = 0; m < degree - 3; m++)
@@ -1473,7 +1475,7 @@ namespace Polynomials
               (1. / auxiliary_zero - value_and_grad[1] / value_and_grad[0]) /
               ratio;
           }
-        else if (index >= 2 && index < degree - 1)
+        else if (index >= 2 DEAL_II_AND index < degree - 1)
           {
             this->lagrange_support_points[0] = 0.;
             this->lagrange_support_points[1] = 0.;
@@ -1487,7 +1489,7 @@ namespace Polynomials
             // nodal point
             this->lagrange_weight = 1. / this->value(jacobi_roots[index - 2]);
           }
-        else if (index == degree - 1)
+        else if (index DEAL_II_EQUALS degree - 1)
           {
             this->lagrange_support_points[0] = 0.;
             this->lagrange_support_points[1] = 0.;
@@ -1515,7 +1517,7 @@ namespace Polynomials
               (-1. / auxiliary_zero - value_and_grad[1] / value_and_grad[0]) /
               ratio;
           }
-        else if (index == degree)
+        else if (index DEAL_II_EQUALS degree)
           {
             const double auxiliary_zero =
               find_support_point_x_star(jacobi_roots);

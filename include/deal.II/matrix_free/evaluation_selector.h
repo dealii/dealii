@@ -35,14 +35,15 @@ namespace internal
     // 1. Start with fe_degree=0, n_q_points_1d=0 and DEPTH=0.
     // 2. If the current assumption on fe_degree doesn't match the runtime
     //    parameter, increase fe_degree  by one and try again.
-    //    If fe_degree==10 use the class Default which serves as a fallback.
+    //    If fe_degreeDEAL_II_EQUALS 10 use the class Default which serves as a
+    //    fallback.
     // 3. After fixing the fe_degree, DEPTH is increased (DEPTH=1) and we start
     // with
     //    n_q_points=fe_degree+1.
     // 4. If the current assumption on n_q_points_1d doesn't match the runtime
     //    parameter, increase n_q_points_1d by one and try again.
-    //    If n_q_points_1d==degree+3 use the class Default which serves as a
-    //    fallback.
+    //    If n_q_points_1dDEAL_II_EQUALS degree+3 use the class Default which
+    //    serves as a fallback.
 
     /**
      * This class serves as a fallback in case we don't have the appropriate
@@ -132,12 +133,13 @@ namespace internal
      * runtime.
      */
     template <int degree, int n_q_points_1d, int dim, typename Number>
-    struct Factory<dim,
-                   Number,
-                   1,
-                   degree,
-                   n_q_points_1d,
-                   typename std::enable_if<n_q_points_1d == degree + 3>::type>
+    struct Factory<
+      dim,
+      Number,
+      1,
+      degree,
+      n_q_points_1d,
+      typename std::enable_if<n_q_points_1d DEAL_II_EQUALS degree + 3>::type>
       : Default<dim, Number>
     {};
 
@@ -160,7 +162,7 @@ namespace internal
       {
         const unsigned int runtime_degree = shape_info.data.front().fe_degree;
         constexpr unsigned int start_n_q_points = degree + 1;
-        if (runtime_degree == degree)
+        if (runtime_degree DEAL_II_EQUALS degree)
           Factory<dim, Number, 1, degree, start_n_q_points>::evaluate(
             n_components,
             evaluation_flag,
@@ -195,7 +197,7 @@ namespace internal
       {
         const int runtime_degree = shape_info.data.front().fe_degree;
         constexpr unsigned int start_n_q_points = degree + 1;
-        if (runtime_degree == degree)
+        if (runtime_degree DEAL_II_EQUALS degree)
           Factory<dim, Number, 1, degree, start_n_q_points>::integrate(
             n_components,
             integration_flag,
@@ -237,9 +239,9 @@ namespace internal
        * to initialize the fields in shape_info.templates.h from the
        * polynomials (third condition).
        */
-      static constexpr bool      use_collocation =
-        n_q_points_1d > degree &&n_q_points_1d <= 3 * degree / 2 + 1 &&
-        n_q_points_1d < 200;
+      static constexpr bool    use_collocation =
+        n_q_points_1d > degree DEAL_II_AND n_q_points_1d <=
+        3 * degree / 2 + 1 DEAL_II_AND     n_q_points_1d < 200;
 
       static inline void
       evaluate(
@@ -253,11 +255,11 @@ namespace internal
         Number *scratch_data)
       {
         const int runtime_n_q_points_1d = shape_info.data.front().n_q_points_1d;
-        if (runtime_n_q_points_1d == n_q_points_1d)
+        if (runtime_n_q_points_1d DEAL_II_EQUALS n_q_points_1d)
           {
-            if (n_q_points_1d == degree + 1 &&
-                shape_info.element_type ==
-                  internal::MatrixFreeFunctions::tensor_symmetric_collocation)
+            if (n_q_points_1d DEAL_II_EQUALS degree +
+                1 DEAL_II_AND shape_info.element_type DEAL_II_EQUALS
+                                                      internal::MatrixFreeFunctions::tensor_symmetric_collocation)
               internal::FEEvaluationImplCollocation<dim, degree, Number>::
                 evaluate(n_components,
                          evaluation_flag,
@@ -319,11 +321,11 @@ namespace internal
         const bool sum_into_values_array)
       {
         const int runtime_n_q_points_1d = shape_info.data.front().n_q_points_1d;
-        if (runtime_n_q_points_1d == n_q_points_1d)
+        if (runtime_n_q_points_1d DEAL_II_EQUALS n_q_points_1d)
           {
-            if (n_q_points_1d == degree + 1 &&
-                shape_info.element_type ==
-                  internal::MatrixFreeFunctions::tensor_symmetric_collocation)
+            if (n_q_points_1d DEAL_II_EQUALS degree +
+                1 DEAL_II_AND shape_info.element_type DEAL_II_EQUALS
+                                                      internal::MatrixFreeFunctions::tensor_symmetric_collocation)
               internal::FEEvaluationImplCollocation<dim, degree, Number>::
                 integrate(n_components,
                           integration_flag,
@@ -461,9 +463,9 @@ struct SelectEvaluator
    * initialize the fields in shape_info.templates.h from the polynomials
    * (third condition).
    */
-  static constexpr bool         use_collocation =
-    n_q_points_1d > fe_degree &&n_q_points_1d <= 3 * fe_degree / 2 + 1 &&
-    n_q_points_1d < 200;
+  static constexpr bool       use_collocation =
+    n_q_points_1d > fe_degree DEAL_II_AND n_q_points_1d <=
+    3 * fe_degree / 2 + 1 DEAL_II_AND     n_q_points_1d < 200;
 
   /**
    * Chooses an appropriate evaluation strategy for the evaluate function, i.e.
@@ -565,11 +567,12 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::evaluate(
   Number *                                                hessians_quad,
   Number *                                                scratch_data)
 {
-  Assert(fe_degree >= 0 && n_q_points_1d > 0, ExcInternalError());
+  Assert(fe_degree >= 0 DEAL_II_AND n_q_points_1d > 0, ExcInternalError());
 
-  if (fe_degree + 1 == n_q_points_1d &&
-      shape_info.element_type ==
-        internal::MatrixFreeFunctions::tensor_symmetric_collocation)
+  if (fe_degree +
+      1 DEAL_II_EQUALS n_q_points_1d DEAL_II_AND
+        shape_info.element_type DEAL_II_EQUALS
+                                internal::MatrixFreeFunctions::tensor_symmetric_collocation)
     {
       internal::FEEvaluationImplCollocation<dim, fe_degree, Number>::evaluate(
         n_components,
@@ -583,8 +586,8 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::evaluate(
     }
   // '<=' on type means tensor_symmetric or tensor_symmetric_hermite, see
   // shape_info.h for more details
-  else if (use_collocation && shape_info.element_type <=
-                                internal::MatrixFreeFunctions::tensor_symmetric)
+  else if (use_collocation DEAL_II_AND shape_info.element_type <=
+           internal::MatrixFreeFunctions::tensor_symmetric)
     {
       internal::FEEvaluationImplTransformToCollocation<
         dim,
@@ -616,8 +619,8 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::evaluate(
                           hessians_quad,
                           scratch_data);
     }
-  else if (shape_info.element_type ==
-           internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
+  else if (shape_info.element_type DEAL_II_EQUALS
+                                   internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
     {
       internal::FEEvaluationImpl<
         internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
@@ -633,8 +636,8 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::evaluate(
                           hessians_quad,
                           scratch_data);
     }
-  else if (shape_info.element_type ==
-           internal::MatrixFreeFunctions::truncated_tensor)
+  else if (shape_info.element_type DEAL_II_EQUALS
+                                   internal::MatrixFreeFunctions::truncated_tensor)
     {
       internal::FEEvaluationImpl<
         internal::MatrixFreeFunctions::truncated_tensor,
@@ -650,8 +653,8 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::evaluate(
                           hessians_quad,
                           scratch_data);
     }
-  else if (shape_info.element_type ==
-           internal::MatrixFreeFunctions::tensor_general)
+  else if (shape_info.element_type DEAL_II_EQUALS
+                                   internal::MatrixFreeFunctions::tensor_general)
     {
       internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
                                  dim,
@@ -684,11 +687,12 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::integrate(
   Number *                                                scratch_data,
   const bool                                              sum_into_values_array)
 {
-  Assert(fe_degree >= 0 && n_q_points_1d > 0, ExcInternalError());
+  Assert(fe_degree >= 0 DEAL_II_AND n_q_points_1d > 0, ExcInternalError());
 
-  if (fe_degree + 1 == n_q_points_1d &&
-      shape_info.element_type ==
-        internal::MatrixFreeFunctions::tensor_symmetric_collocation)
+  if (fe_degree +
+      1 DEAL_II_EQUALS n_q_points_1d DEAL_II_AND
+        shape_info.element_type DEAL_II_EQUALS
+                                internal::MatrixFreeFunctions::tensor_symmetric_collocation)
     {
       internal::FEEvaluationImplCollocation<dim, fe_degree, Number>::integrate(
         n_components,
@@ -702,8 +706,8 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::integrate(
     }
   // '<=' on type means tensor_symmetric or tensor_symmetric_hermite, see
   // shape_info.h for more details
-  else if (use_collocation && shape_info.element_type <=
-                                internal::MatrixFreeFunctions::tensor_symmetric)
+  else if (use_collocation DEAL_II_AND shape_info.element_type <=
+           internal::MatrixFreeFunctions::tensor_symmetric)
     {
       internal::FEEvaluationImplTransformToCollocation<
         dim,
@@ -735,8 +739,8 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::integrate(
                            scratch_data,
                            sum_into_values_array);
     }
-  else if (shape_info.element_type ==
-           internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
+  else if (shape_info.element_type DEAL_II_EQUALS
+                                   internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
     {
       internal::FEEvaluationImpl<
         internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
@@ -752,8 +756,8 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::integrate(
                            scratch_data,
                            sum_into_values_array);
     }
-  else if (shape_info.element_type ==
-           internal::MatrixFreeFunctions::truncated_tensor)
+  else if (shape_info.element_type DEAL_II_EQUALS
+                                   internal::MatrixFreeFunctions::truncated_tensor)
     {
       internal::FEEvaluationImpl<
         internal::MatrixFreeFunctions::truncated_tensor,
@@ -769,8 +773,8 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::integrate(
                            scratch_data,
                            sum_into_values_array);
     }
-  else if (shape_info.element_type ==
-           internal::MatrixFreeFunctions::tensor_general)
+  else if (shape_info.element_type DEAL_II_EQUALS
+                                   internal::MatrixFreeFunctions::tensor_general)
     {
       internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
                                  dim,
@@ -803,8 +807,8 @@ SelectEvaluator<dim, -1, dummy, Number>::evaluate(
   Number *                                                hessians_quad,
   Number *                                                scratch_data)
 {
-  if (shape_info.element_type ==
-      internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
+  if (shape_info.element_type DEAL_II_EQUALS
+                              internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
     {
       internal::FEEvaluationImpl<
         internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
@@ -820,8 +824,8 @@ SelectEvaluator<dim, -1, dummy, Number>::evaluate(
                           hessians_quad,
                           scratch_data);
     }
-  else if (shape_info.element_type ==
-           internal::MatrixFreeFunctions::truncated_tensor)
+  else if (shape_info.element_type DEAL_II_EQUALS
+                                   internal::MatrixFreeFunctions::truncated_tensor)
     {
       internal::FEEvaluationImpl<
         internal::MatrixFreeFunctions::truncated_tensor,
@@ -837,8 +841,8 @@ SelectEvaluator<dim, -1, dummy, Number>::evaluate(
                           hessians_quad,
                           scratch_data);
     }
-  else if (shape_info.element_type ==
-           internal::MatrixFreeFunctions::tensor_general)
+  else if (shape_info.element_type DEAL_II_EQUALS
+                                   internal::MatrixFreeFunctions::tensor_general)
     internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
                                dim,
                                -1,
@@ -877,8 +881,8 @@ SelectEvaluator<dim, -1, dummy, Number>::integrate(
   Number *                                                scratch_data,
   const bool                                              sum_into_values_array)
 {
-  if (shape_info.element_type ==
-      internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
+  if (shape_info.element_type DEAL_II_EQUALS
+                              internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
     {
       internal::FEEvaluationImpl<
         internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
@@ -894,8 +898,8 @@ SelectEvaluator<dim, -1, dummy, Number>::integrate(
                            scratch_data,
                            sum_into_values_array);
     }
-  else if (shape_info.element_type ==
-           internal::MatrixFreeFunctions::truncated_tensor)
+  else if (shape_info.element_type DEAL_II_EQUALS
+                                   internal::MatrixFreeFunctions::truncated_tensor)
     {
       internal::FEEvaluationImpl<
         internal::MatrixFreeFunctions::truncated_tensor,
@@ -911,8 +915,8 @@ SelectEvaluator<dim, -1, dummy, Number>::integrate(
                            scratch_data,
                            sum_into_values_array);
     }
-  else if (shape_info.element_type ==
-           internal::MatrixFreeFunctions::tensor_general)
+  else if (shape_info.element_type DEAL_II_EQUALS
+                                   internal::MatrixFreeFunctions::tensor_general)
     internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
                                dim,
                                -1,

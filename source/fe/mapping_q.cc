@@ -65,11 +65,12 @@ MappingQ<dim, spacedim>::MappingQ(const unsigned int degree,
 
   // see whether we want to use *this* mapping objects on *all* cells,
   // or defer to an explicit Q1 mapping on interior cells. if
-  // degree==1, then we are already that Q1 mapping, so we don't need
-  // it; if dim!=spacedim, there is also no need for anything because
-  // we're most likely on a curved manifold
-  use_mapping_q_on_all_cells(degree == 1 || use_mapping_q_on_all_cells ||
-                             (dim != spacedim))
+  // degreeDEAL_II_EQUALS 1, then we are already that Q1 mapping, so we don't
+  // need it; if dim!=spacedim, there is also no need for anything because we're
+  // most likely on a curved manifold
+  use_mapping_q_on_all_cells(
+    degree DEAL_II_EQUALS 1 DEAL_II_OR use_mapping_q_on_all_cells DEAL_II_OR(
+      dim != spacedim))
   ,
   // create a Q1 mapping for use on interior cells (if necessary)
   // or to create a good initial guess in transform_real_to_unit_cell()
@@ -97,10 +98,10 @@ MappingQ<dim, spacedim>::MappingQ(const MappingQ<dim, spacedim> &mapping)
   q1_mapping = std::dynamic_pointer_cast<const MappingQGeneric<dim, spacedim>>(
     other_q1_map);
   Assert(q1_mapping != nullptr, ExcInternalError());
-  Assert(q1_mapping->get_degree() == 1, ExcInternalError());
+  Assert(q1_mapping->get_degree() DEAL_II_EQUALS 1, ExcInternalError());
 
   // Same as the other constructor: if possible reuse the Q1 mapping
-  if (this->polynomial_degree == 1)
+  if (this->polynomial_degree DEAL_II_EQUALS 1)
     {
       qp_mapping = q1_mapping;
     }
@@ -262,7 +263,7 @@ MappingQ<dim, spacedim>::fill_fe_values(
   // check whether this cell needs the full mapping or can be treated by a
   // reduced Q1 mapping, e.g. if the cell is in the interior of the domain
   data.use_mapping_q1_on_current_cell =
-    !(use_mapping_q_on_all_cells || cell->has_boundary_lines());
+    !(use_mapping_q_on_all_cells DEAL_II_OR cell->has_boundary_lines());
 
 
   // call the base class. we need to ensure that the flag indicating whether
@@ -272,8 +273,8 @@ MappingQ<dim, spacedim>::fill_fe_values(
   // variable here. this also affects the calculation of the next cell -- if
   // we use Q1 data on the next cell, the data will still be invalid.
   const CellSimilarity::Similarity updated_cell_similarity =
-    ((data.use_mapping_q1_on_current_cell == false) &&
-         (this->polynomial_degree > 1) ?
+    ((data.use_mapping_q1_on_current_cell DEAL_II_EQUALS false)DEAL_II_AND(
+       this->polynomial_degree > 1) ?
        CellSimilarity::invalid_next_cell :
        cell_similarity);
 
@@ -320,7 +321,7 @@ MappingQ<dim, spacedim>::fill_fe_face_values(
   // the cell, which in turn depends on the fact whether _any_ of the faces of
   // this cell is at the boundary, not only the present face
   data.use_mapping_q1_on_current_cell =
-    !(use_mapping_q_on_all_cells || cell->has_boundary_lines());
+    !(use_mapping_q_on_all_cells DEAL_II_OR cell->has_boundary_lines());
 
   // depending on the results above, decide whether the Q1 mapping or
   // the Qp mapping needs to handle this cell
@@ -357,7 +358,7 @@ MappingQ<dim, spacedim>::fill_fe_subface_values(
   // the cell, which in turn depends on the fact whether _any_ of the faces of
   // this cell is at the boundary, not only the present face
   data.use_mapping_q1_on_current_cell =
-    !(use_mapping_q_on_all_cells || cell->has_boundary_lines());
+    !(use_mapping_q_on_all_cells DEAL_II_OR cell->has_boundary_lines());
 
   // depending on the results above, decide whether the Q1 mapping or
   // the Qp mapping needs to handle this cell
@@ -507,7 +508,7 @@ MappingQ<dim, spacedim>::transform_unit_to_real_cell(
   // first see, whether we want to use a linear or a higher order
   // mapping, then either use our own facilities or that of the Q1
   // mapping we store
-  if (use_mapping_q_on_all_cells || cell->has_boundary_lines())
+  if (use_mapping_q_on_all_cells DEAL_II_OR cell->has_boundary_lines())
     return qp_mapping->transform_unit_to_real_cell(cell, p);
   else
     return q1_mapping->transform_unit_to_real_cell(cell, p);
@@ -521,8 +522,8 @@ MappingQ<dim, spacedim>::transform_real_to_unit_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const Point<spacedim> &                                     p) const
 {
-  if (cell->has_boundary_lines() || use_mapping_q_on_all_cells ||
-      (dim != spacedim))
+  if (cell->has_boundary_lines()
+        DEAL_II_OR use_mapping_q_on_all_cells DEAL_II_OR(dim != spacedim))
     return qp_mapping->transform_real_to_unit_cell(cell, p);
   else
     return q1_mapping->transform_real_to_unit_cell(cell, p);

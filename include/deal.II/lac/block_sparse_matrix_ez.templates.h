@@ -48,9 +48,9 @@ template <typename number>
 BlockSparseMatrixEZ<number> &
 BlockSparseMatrixEZ<number>::operator=(const BlockSparseMatrixEZ<number> &m)
 {
-  Assert(n_block_rows() == m.n_block_rows(),
+  Assert(n_block_rows() DEAL_II_EQUALS m.n_block_rows(),
          ExcDimensionMismatch(n_block_rows(), m.n_block_rows()));
-  Assert(n_block_cols() == m.n_block_cols(),
+  Assert(n_block_cols() DEAL_II_EQUALS m.n_block_cols(),
          ExcDimensionMismatch(n_block_cols(), m.n_block_cols()));
   // this operator does not do
   // anything except than checking
@@ -69,7 +69,7 @@ BlockSparseMatrixEZ<number> &
 BlockSparseMatrixEZ<number>::operator=(const double d)
 {
   (void)d;
-  Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
+  Assert(d DEAL_II_EQUALS 0, ExcScalarAssignmentOnlyForZeroValue());
 
   for (unsigned int r = 0; r < n_block_rows(); ++r)
     for (unsigned int c = 0; c < n_block_cols(); ++c)
@@ -120,7 +120,7 @@ BlockSparseMatrixEZ<number>::empty() const
 {
   for (unsigned int r = 0; r < n_block_rows(); ++r)
     for (unsigned int c = 0; c < n_block_cols(); ++c)
-      if (block(r, c).empty() == false)
+      if (block(r, c).empty() DEAL_II_EQUALS false)
         return false;
   return true;
 }
@@ -145,7 +145,7 @@ BlockSparseMatrixEZ<number>::collect_sizes()
   // sizes
   for (unsigned int c = 1; c < columns; ++c)
     for (unsigned int r = 0; r < rows; ++r)
-      Assert(row_sizes[r] == blocks[r][c].m(),
+      Assert(row_sizes[r] DEAL_II_EQUALS blocks[r][c].m(),
              ExcDimensionMismatch(row_sizes[r], blocks[r][c].m()));
 
   // finally initialize the row
@@ -158,7 +158,7 @@ BlockSparseMatrixEZ<number>::collect_sizes()
     col_sizes[c] = blocks[0][c].n();
   for (unsigned int r = 1; r < rows; ++r)
     for (unsigned int c = 0; c < columns; ++c)
-      Assert(col_sizes[c] == blocks[r][c].n(),
+      Assert(col_sizes[c] DEAL_II_EQUALS blocks[r][c].n(),
              ExcDimensionMismatch(col_sizes[c], blocks[r][c].n()));
 
   // finally initialize the row

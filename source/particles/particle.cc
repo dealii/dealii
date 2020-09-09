@@ -107,7 +107,8 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  Particle<dim, spacedim>::Particle(Particle<dim, spacedim> &&particle) noexcept
+  Particle<dim, spacedim>::Particle(
+    Particle<dim, spacedim> DEAL_II_AND particle) noexcept
     : location(std::move(particle.location))
     , reference_location(std::move(particle.reference_location))
     , id(std::move(particle.id))
@@ -153,7 +154,7 @@ namespace Particles
   template <int dim, int spacedim>
   Particle<dim, spacedim> &
   Particle<dim, spacedim>::
-  operator=(Particle<dim, spacedim> &&particle) noexcept
+  operator=(Particle<dim, spacedim> DEAL_II_AND particle) noexcept
   {
     if (this != &particle)
       {
@@ -172,7 +173,8 @@ namespace Particles
   template <int dim, int spacedim>
   Particle<dim, spacedim>::~Particle()
   {
-    if (property_pool != nullptr && properties != PropertyPool::invalid_handle)
+    if (property_pool != nullptr DEAL_II_AND properties !=
+        PropertyPool::invalid_handle)
       property_pool->deallocate_properties_array(properties);
   }
 
@@ -297,13 +299,13 @@ namespace Particles
   {
     Assert(property_pool != nullptr, ExcInternalError());
 
-    if (properties == PropertyPool::invalid_handle)
+    if (properties DEAL_II_EQUALS PropertyPool::invalid_handle)
       properties = property_pool->allocate_properties_array();
 
     const ArrayView<double> old_properties =
       property_pool->get_properties(properties);
 
-    Assert(new_properties.size() == old_properties.size(),
+    Assert(new_properties.size() DEAL_II_EQUALS old_properties.size(),
            ExcMessage(
              "You are trying to assign properties with an incompatible length. "
              "The particle has space to store " +
@@ -338,7 +340,7 @@ namespace Particles
     Assert(property_pool != nullptr, ExcInternalError());
 
     // If this particle has no properties yet, allocate and initialize them.
-    if (properties == PropertyPool::invalid_handle)
+    if (properties DEAL_II_EQUALS PropertyPool::invalid_handle)
       {
         properties = property_pool->allocate_properties_array();
 
@@ -357,8 +359,8 @@ namespace Particles
   bool
   Particle<dim, spacedim>::has_properties() const
   {
-    return (property_pool != nullptr) &&
-           (properties != PropertyPool::invalid_handle);
+    return (property_pool != nullptr)
+      DEAL_II_AND(properties != PropertyPool::invalid_handle);
   }
 } // namespace Particles
 

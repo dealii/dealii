@@ -182,7 +182,7 @@ Householder<number>::initialize(const FullMatrix<number2> &M)
     {
       number2   sigma = 0;
       size_type i;
-      // sigma = ||v||^2
+      // sigma = DEAL_II_OR vDEAL_II_OR ^2
       for (i = j; i < m; ++i)
         sigma += storage(i, j) * storage(i, j);
       // We are ready if the column is

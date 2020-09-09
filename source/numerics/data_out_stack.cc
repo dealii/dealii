@@ -64,11 +64,11 @@ DataOutStack<dim, spacedim, DoFHandlerType>::new_parameter_value(
   for (typename std::vector<DataVector>::const_iterator i = dof_data.begin();
        i != dof_data.end();
        ++i)
-    Assert(i->data.size() == 0, ExcDataNotCleared());
+    Assert(i->data.size() DEAL_II_EQUALS 0, ExcDataNotCleared());
   for (typename std::vector<DataVector>::const_iterator i = cell_data.begin();
        i != cell_data.end();
        ++i)
-    Assert(i->data.size() == 0, ExcDataNotCleared());
+    Assert(i->data.size() DEAL_II_EQUALS 0, ExcDataNotCleared());
 }
 
 
@@ -79,7 +79,7 @@ DataOutStack<dim, spacedim, DoFHandlerType>::attach_dof_handler(
 {
   // Check consistency of redundant
   // template parameter
-  Assert(dim == DoFHandlerType::dimension,
+  Assert(dim DEAL_II_EQUALS DoFHandlerType::dimension,
          ExcDimensionMismatch(dim, DoFHandlerType::dimension));
 
   dof_handler = &dof;
@@ -109,7 +109,7 @@ DataOutStack<dim, spacedim, DoFHandlerType>::declare_data_vector(
   // not called after some parameter
   // values have already been
   // processed
-  Assert(patches.size() == 0, ExcDataAlreadyAdded());
+  Assert(patches.size() DEAL_II_EQUALS 0, ExcDataAlreadyAdded());
 
   // also make sure that no name is
   // used twice
@@ -153,8 +153,9 @@ DataOutStack<dim, spacedim, DoFHandlerType>::add_data_vector(
   // if only one component or vector
   // is cell vector: we only need one
   // name
-  if ((n_components == 1) ||
-      (vec.size() == dof_handler->get_triangulation().n_active_cells()))
+  if ((n_components DEAL_II_EQUALS 1)DEAL_II_OR(
+        vec.size() DEAL_II_EQUALS dof_handler->get_triangulation()
+          .n_active_cells()))
     {
       names.resize(1, name);
     }
@@ -186,18 +187,20 @@ DataOutStack<dim, spacedim, DoFHandlerType>::add_data_vector(
          Exceptions::DataOutImplementation::ExcNoDoFHandlerSelected());
   // either cell data and one name,
   // or dof data and n_components names
-  Assert(((vec.size() == dof_handler->get_triangulation().n_active_cells()) &&
-          (names.size() == 1)) ||
-           ((vec.size() == dof_handler->n_dofs()) &&
-            (names.size() == dof_handler->get_fe(0).n_components())),
-         Exceptions::DataOutImplementation::ExcInvalidNumberOfNames(
-           names.size(), dof_handler->get_fe(0).n_components()));
+  Assert(
+    ((vec.size() DEAL_II_EQUALS dof_handler->get_triangulation()
+        .n_active_cells())DEAL_II_AND(names.size() DEAL_II_EQUALS 1))
+      DEAL_II_OR((vec.size() DEAL_II_EQUALS dof_handler->n_dofs())DEAL_II_AND(
+        names.size() DEAL_II_EQUALS dof_handler->get_fe(0).n_components())),
+    Exceptions::DataOutImplementation::ExcInvalidNumberOfNames(
+      names.size(), dof_handler->get_fe(0).n_components()));
   for (const auto &name : names)
     {
       (void)name;
       Assert(name.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
                                     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                    "0123456789_<>()") == std::string::npos,
+                                    "0123456789_<>()")
+               DEAL_II_EQUALS std::string::npos,
              Exceptions::DataOutImplementation::ExcInvalidCharacter(
                name,
                name.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
@@ -205,11 +208,11 @@ DataOutStack<dim, spacedim, DoFHandlerType>::add_data_vector(
                                       "0123456789_<>()")));
     }
 
-  if (vec.size() == dof_handler->n_dofs())
+  if (vec.size() DEAL_II_EQUALS dof_handler->n_dofs())
     {
       typename std::vector<DataVector>::iterator data_vector = dof_data.begin();
       for (; data_vector != dof_data.end(); ++data_vector)
-        if (data_vector->names == names)
+        if (data_vector->names DEAL_II_EQUALS names)
           {
             data_vector->data.reinit(vec.size());
             std::copy(vec.begin(), vec.end(), data_vector->data.begin());
@@ -218,7 +221,7 @@ DataOutStack<dim, spacedim, DoFHandlerType>::add_data_vector(
 
       // ok. not found. there is a
       // slight chance that
-      // n_dofs==n_cells, so only
+      // n_dofsDEAL_II_EQUALS n_cells, so only
       // bomb out if the next if
       // statement will not be run
       if (dof_handler->n_dofs() !=
@@ -227,14 +230,14 @@ DataOutStack<dim, spacedim, DoFHandlerType>::add_data_vector(
     }
 
   // search cell data
-  if ((vec.size() != dof_handler->n_dofs()) ||
-      (dof_handler->n_dofs() ==
-       dof_handler->get_triangulation().n_active_cells()))
+  if ((vec.size() != dof_handler->n_dofs()) DEAL_II_OR(
+        dof_handler->n_dofs() DEAL_II_EQUALS dof_handler->get_triangulation()
+          .n_active_cells()))
     {
       typename std::vector<DataVector>::iterator data_vector =
         cell_data.begin();
       for (; data_vector != cell_data.end(); ++data_vector)
-        if (data_vector->names == names)
+        if (data_vector->names DEAL_II_EQUALS names)
           {
             data_vector->data.reinit(vec.size());
             std::copy(vec.begin(), vec.end(), data_vector->data.begin());
@@ -398,7 +401,7 @@ DataOutStack<dim, spacedim, DoFHandlerType>::build_patches(
           // first fill dof_data
           for (unsigned int dataset = 0; dataset < dof_data.size(); ++dataset)
             {
-              if (n_components == 1)
+              if (n_components DEAL_II_EQUALS 1)
                 {
                   fe_patch_values.get_function_values(dof_data[dataset].data,
                                                       patch_values);

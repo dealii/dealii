@@ -90,7 +90,7 @@ Function<dim, RangeNumberType>::value_list(
 {
   // check whether component is in the valid range is up to the derived
   // class
-  Assert(values.size() == points.size(),
+  Assert(values.size() DEAL_II_EQUALS points.size(),
          ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
@@ -106,7 +106,7 @@ Function<dim, RangeNumberType>::vector_value_list(
 {
   // check whether component is in the valid range is up to the derived
   // class
-  Assert(values.size() == points.size(),
+  Assert(values.size() DEAL_II_EQUALS points.size(),
          ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
@@ -156,7 +156,7 @@ Function<dim, RangeNumberType>::gradient_list(
   std::vector<Tensor<1, dim, RangeNumberType>> &gradients,
   const unsigned int                            component) const
 {
-  Assert(gradients.size() == points.size(),
+  Assert(gradients.size() DEAL_II_EQUALS points.size(),
          ExcDimensionMismatch(gradients.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
@@ -170,12 +170,12 @@ Function<dim, RangeNumberType>::vector_gradient_list(
   const std::vector<Point<dim>> &                            points,
   std::vector<std::vector<Tensor<1, dim, RangeNumberType>>> &gradients) const
 {
-  Assert(gradients.size() == points.size(),
+  Assert(gradients.size() DEAL_II_EQUALS points.size(),
          ExcDimensionMismatch(gradients.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
     {
-      Assert(gradients[i].size() == n_components,
+      Assert(gradients[i].size() DEAL_II_EQUALS n_components,
              ExcDimensionMismatch(gradients[i].size(), n_components));
       vector_gradient(points[i], gradients[i]);
     }
@@ -226,7 +226,7 @@ Function<dim, RangeNumberType>::laplacian_list(
 {
   // check whether component is in the valid range is up to the derived
   // class
-  Assert(laplacians.size() == points.size(),
+  Assert(laplacians.size() DEAL_II_EQUALS points.size(),
          ExcDimensionMismatch(laplacians.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
@@ -242,7 +242,7 @@ Function<dim, RangeNumberType>::vector_laplacian_list(
 {
   // check whether component is in the valid range is up to the derived
   // class
-  Assert(laplacians.size() == points.size(),
+  Assert(laplacians.size() DEAL_II_EQUALS points.size(),
          ExcDimensionMismatch(laplacians.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
@@ -279,7 +279,7 @@ Function<dim, RangeNumberType>::hessian_list(
   std::vector<SymmetricTensor<2, dim, RangeNumberType>> &hessians,
   const unsigned int                                     component) const
 {
-  Assert(hessians.size() == points.size(),
+  Assert(hessians.size() DEAL_II_EQUALS points.size(),
          ExcDimensionMismatch(hessians.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
@@ -294,12 +294,12 @@ Function<dim, RangeNumberType>::vector_hessian_list(
   std::vector<std::vector<SymmetricTensor<2, dim, RangeNumberType>>> &hessians)
   const
 {
-  Assert(hessians.size() == points.size(),
+  Assert(hessians.size() DEAL_II_EQUALS points.size(),
          ExcDimensionMismatch(hessians.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
     {
-      Assert(hessians[i].size() == n_components,
+      Assert(hessians[i].size() DEAL_II_EQUALS n_components,
              ExcDimensionMismatch(hessians[i].size(), n_components));
       vector_hessian(points[i], hessians[i]);
     }
@@ -355,7 +355,7 @@ namespace Functions
     : Function<dim, RangeNumberType>(values.size())
     , function_value_vector(values.size())
   {
-    Assert(values.size() == function_value_vector.size(),
+    Assert(values.size() DEAL_II_EQUALS function_value_vector.size(),
            ExcDimensionMismatch(values.size(), function_value_vector.size()));
     std::copy(values.begin(), values.end(), function_value_vector.begin());
   }
@@ -394,7 +394,7 @@ namespace Functions
     const Point<dim> &,
     Vector<RangeNumberType> &return_value) const
   {
-    Assert(return_value.size() == this->n_components,
+    Assert(return_value.size() DEAL_II_EQUALS this->n_components,
            ExcDimensionMismatch(return_value.size(), this->n_components));
 
     std::copy(function_value_vector.begin(),
@@ -414,7 +414,7 @@ namespace Functions
     // To avoid warning of unused parameter
     (void)points;
     AssertIndexRange(component, this->n_components);
-    Assert(return_values.size() == points.size(),
+    Assert(return_values.size() DEAL_II_EQUALS points.size(),
            ExcDimensionMismatch(return_values.size(), points.size()))
 
       std::fill(return_values.begin(),
@@ -430,12 +430,12 @@ namespace Functions
     const std::vector<Point<dim>> &       points,
     std::vector<Vector<RangeNumberType>> &return_values) const
   {
-    Assert(return_values.size() == points.size(),
+    Assert(return_values.size() DEAL_II_EQUALS points.size(),
            ExcDimensionMismatch(return_values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        Assert(return_values[i].size() == this->n_components,
+        Assert(return_values[i].size() DEAL_II_EQUALS this->n_components,
                ExcDimensionMismatch(return_values[i].size(),
                                     this->n_components));
         std::copy(function_value_vector.begin(),
@@ -471,7 +471,7 @@ namespace Functions
     const Point<dim> &,
     std::vector<Tensor<1, dim, RangeNumberType>> &gradients) const
   {
-    Assert(gradients.size() == this->n_components,
+    Assert(gradients.size() DEAL_II_EQUALS this->n_components,
            ExcDimensionMismatch(gradients.size(), this->n_components));
 
     for (unsigned int c = 0; c < this->n_components; ++c)
@@ -486,7 +486,7 @@ namespace Functions
     std::vector<Tensor<1, dim, RangeNumberType>> &gradients,
     const unsigned int /*component*/) const
   {
-    Assert(gradients.size() == points.size(),
+    Assert(gradients.size() DEAL_II_EQUALS points.size(),
            ExcDimensionMismatch(gradients.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
@@ -500,11 +500,11 @@ namespace Functions
     const std::vector<Point<dim>> &                            points,
     std::vector<std::vector<Tensor<1, dim, RangeNumberType>>> &gradients) const
   {
-    Assert(gradients.size() == points.size(),
+    Assert(gradients.size() DEAL_II_EQUALS points.size(),
            ExcDimensionMismatch(gradients.size(), points.size()));
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        Assert(gradients[i].size() == this->n_components,
+        Assert(gradients[i].size() DEAL_II_EQUALS this->n_components,
                ExcDimensionMismatch(gradients[i].size(), this->n_components));
         for (unsigned int c = 0; c < this->n_components; ++c)
           gradients[i][c].clear();
@@ -592,7 +592,7 @@ ComponentSelectFunction<dim, RangeNumberType>::vector_value(
   const Point<dim> &,
   Vector<RangeNumberType> &return_value) const
 {
-  Assert(return_value.size() == this->n_components,
+  Assert(return_value.size() DEAL_II_EQUALS this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
 
   return_value = 0;
@@ -609,7 +609,7 @@ ComponentSelectFunction<dim, RangeNumberType>::vector_value_list(
   const std::vector<Point<dim>> &       points,
   std::vector<Vector<RangeNumberType>> &values) const
 {
-  Assert(values.size() == points.size(),
+  Assert(values.size() DEAL_II_EQUALS points.size(),
          ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
@@ -650,7 +650,7 @@ ScalarFunctionFromFunctionObject<dim, RangeNumberType>::value(
   const unsigned int component) const
 {
   (void)component;
-  Assert(component == 0,
+  Assert(component DEAL_II_EQUALS 0,
          ExcMessage("This object represents only scalar functions"));
   return function_object(p);
 }
@@ -680,7 +680,7 @@ VectorFunctionFromScalarFunctionObject<dim, RangeNumberType>::value(
 {
   AssertIndexRange(component, this->n_components);
 
-  if (component == selected_component)
+  if (component DEAL_II_EQUALS selected_component)
     return function_object(p);
   else
     return 0;
@@ -735,8 +735,8 @@ VectorFunctionFromTensorFunction<dim, RangeNumberType>::value(
 
   // if the requested component is out of the range selected, then we can
   // return early
-  if ((component < selected_component) ||
-      (component >= selected_component + dim))
+  if ((component < selected_component)
+        DEAL_II_OR(component >= selected_component + dim))
     return 0;
 
   // otherwise retrieve the values from the <tt>tensor_function</tt> to be
@@ -755,7 +755,7 @@ VectorFunctionFromTensorFunction<dim, RangeNumberType>::vector_value(
   const Point<dim> &       p,
   Vector<RangeNumberType> &values) const
 {
-  Assert(values.size() == this->n_components,
+  Assert(values.size() DEAL_II_EQUALS this->n_components,
          ExcDimensionMismatch(values.size(), this->n_components));
 
   // Retrieve the values from the <tt>tensor_function</tt> to be placed at
@@ -787,7 +787,7 @@ VectorFunctionFromTensorFunction<dim, RangeNumberType>::vector_value_list(
   const std::vector<Point<dim>> &       points,
   std::vector<Vector<RangeNumberType>> &value_list) const
 {
-  Assert(value_list.size() == points.size(),
+  Assert(value_list.size() DEAL_II_EQUALS points.size(),
          ExcDimensionMismatch(value_list.size(), points.size()));
 
   const unsigned int n_points = points.size();

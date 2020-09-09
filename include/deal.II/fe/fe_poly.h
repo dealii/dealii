@@ -299,9 +299,9 @@ protected:
     // quadrature points summed over *all* faces or subfaces, whereas
     // the number of output slots equals the number of quadrature
     // points on only *one* face)
-    if ((update_flags & update_values) &&
-        !((output_data.shape_values.n_rows() > 0) &&
-          (output_data.shape_values.n_cols() == n_q_points)))
+    if ((update_flags & update_values)
+          DEAL_II_AND !((output_data.shape_values.n_rows() > 0) DEAL_II_AND(
+            output_data.shape_values.n_cols() DEAL_II_EQUALS n_q_points)))
       data.shape_values.reinit(this->n_dofs_per_cell(), n_q_points);
 
     if (update_flags & update_gradients)
@@ -337,7 +337,7 @@ protected:
           if (update_flags & update_values)
             if (output_data.shape_values.n_rows() > 0)
               {
-                if (output_data.shape_values.n_cols() == n_q_points)
+                if (output_data.shape_values.n_cols() DEAL_II_EQUALS n_q_points)
                   for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
                     output_data.shape_values[k][i] = values[k];
                 else

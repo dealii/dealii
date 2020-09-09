@@ -87,7 +87,7 @@ namespace
 
     // make sure only processor zero got something
     if (Utilities::MPI::this_mpi_process(mpi_communicator) != 0)
-      Assert(result == 0, ExcInternalError());
+      Assert(result DEAL_II_EQUALS 0, ExcInternalError());
 
     return result;
   }
@@ -105,19 +105,19 @@ namespace
     const dealii::Vector<Number> &                             criteria,
     Vector<Number> &locally_owned_indicators)
   {
-    Assert(locally_owned_indicators.size() ==
-             tria.n_locally_owned_active_cells(),
+    Assert(locally_owned_indicators.size()
+             DEAL_II_EQUALS tria.n_locally_owned_active_cells(),
            ExcInternalError());
 
     unsigned int owned_index = 0;
     for (const auto &cell : tria.active_cell_iterators())
-      if (cell->subdomain_id() == tria.locally_owned_subdomain())
+      if (cell->subdomain_id() DEAL_II_EQUALS tria.locally_owned_subdomain())
         {
           locally_owned_indicators(owned_index) =
             criteria(cell->active_cell_index());
           ++owned_index;
         }
-    Assert(owned_index == tria.n_locally_owned_active_cells(),
+    Assert(owned_index DEAL_II_EQUALS tria.n_locally_owned_active_cells(),
            ExcInternalError());
   }
 
@@ -221,7 +221,9 @@ namespace internal
 
           // make sure only processor zero got something
           if (Utilities::MPI::this_mpi_process(mpi_communicator) != 0)
-            Assert((result[0] == 0) && (result[1] == 0), ExcInternalError());
+            Assert((result[0] DEAL_II_EQUALS 0)DEAL_II_AND(
+                     result[1] DEAL_II_EQUALS 0),
+                   ExcInternalError());
 
           return std::make_pair(result[0], -result[1]);
         }
@@ -253,7 +255,7 @@ namespace internal
                                      mpi_communicator);
                 AssertThrowMPI(ierr);
 
-                if (interesting_range[0] == interesting_range[1])
+                if (interesting_range[0] DEAL_II_EQUALS interesting_range[1])
                   return interesting_range[0];
 
                 const double test_threshold =
@@ -299,7 +301,7 @@ namespace internal
                 // the number of cells flagged if indicators are perfectly
                 // equidistributed
                 ++iteration;
-                if (iteration == 25)
+                if (iteration DEAL_II_EQUALS 25)
                   interesting_range[0] = interesting_range[1] = test_threshold;
               }
             while (true);
@@ -336,7 +338,7 @@ namespace internal
                                      mpi_communicator);
                 AssertThrowMPI(ierr);
 
-                if (interesting_range[0] == interesting_range[1])
+                if (interesting_range[0] DEAL_II_EQUALS interesting_range[1])
                   {
                     // so we have found our threshold. since we adjust the range
                     // at the top of the function to be slightly larger than the
@@ -405,7 +407,7 @@ namespace internal
                 // 1/2^25 in the number of cells flagged if indicators are
                 // perfectly equidistributed
                 ++iteration;
-                if (iteration == 25)
+                if (iteration DEAL_II_EQUALS 25)
                   interesting_range[0] = interesting_range[1] = test_threshold;
               }
             while (true);
@@ -436,12 +438,13 @@ namespace parallel
         const double                   bottom_fraction_of_cells,
         const types::global_cell_index max_n_cells)
       {
-        Assert(criteria.size() == tria.n_active_cells(),
+        Assert(criteria.size() DEAL_II_EQUALS tria.n_active_cells(),
                ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
-        Assert((top_fraction_of_cells >= 0) && (top_fraction_of_cells <= 1),
+        Assert((top_fraction_of_cells >= 0)
+                 DEAL_II_AND(top_fraction_of_cells <= 1),
                dealii::GridRefinement::ExcInvalidParameterValue());
-        Assert((bottom_fraction_of_cells >= 0) &&
-                 (bottom_fraction_of_cells <= 1),
+        Assert((bottom_fraction_of_cells >= 0)
+                 DEAL_II_AND(bottom_fraction_of_cells <= 1),
                dealii::GridRefinement::ExcInvalidParameterValue());
         Assert(top_fraction_of_cells + bottom_fraction_of_cells <= 1,
                dealii::GridRefinement::ExcInvalidParameterValue());
@@ -507,12 +510,13 @@ namespace parallel
         const double top_fraction_of_error,
         const double bottom_fraction_of_error)
       {
-        Assert(criteria.size() == tria.n_active_cells(),
+        Assert(criteria.size() DEAL_II_EQUALS tria.n_active_cells(),
                ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
-        Assert((top_fraction_of_error >= 0) && (top_fraction_of_error <= 1),
+        Assert((top_fraction_of_error >= 0)
+                 DEAL_II_AND(top_fraction_of_error <= 1),
                dealii::GridRefinement::ExcInvalidParameterValue());
-        Assert((bottom_fraction_of_error >= 0) &&
-                 (bottom_fraction_of_error <= 1),
+        Assert((bottom_fraction_of_error >= 0)
+                 DEAL_II_AND(bottom_fraction_of_error <= 1),
                dealii::GridRefinement::ExcInvalidParameterValue());
         Assert(top_fraction_of_error + bottom_fraction_of_error <= 1,
                dealii::GridRefinement::ExcInvalidParameterValue());

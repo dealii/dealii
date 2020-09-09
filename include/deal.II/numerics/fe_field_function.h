@@ -153,7 +153,7 @@ namespace Functions
    *       point_found = false;
    *     }
    *
-   *   if (point_found == true)
+   *   if (point_found DEAL_II_EQUALS  true)
    *     ...do something...;
    * @endcode
    *

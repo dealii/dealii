@@ -23,11 +23,11 @@ DEAL_II_NAMESPACE_OPEN
 // and it is trivial (can be statically default initialized)
 // Here, the trait std::is_pod cannot be used because it is deprecated
 // in C++20.
-static_assert(std::is_standard_layout<VectorizedArray<double>>::value &&
-                std::is_trivial<VectorizedArray<double>>::value,
+static_assert(std::is_standard_layout<VectorizedArray<double>>::value
+                DEAL_II_AND std::is_trivial<VectorizedArray<double>>::value,
               "VectorizedArray<double> must be a POD type");
-static_assert(std::is_standard_layout<VectorizedArray<float>>::value &&
-                std::is_trivial<VectorizedArray<float>>::value,
+static_assert(std::is_standard_layout<VectorizedArray<float>>::value DEAL_II_AND
+                                                                     std::is_trivial<VectorizedArray<float>>::value,
               "VectorizedArray<float> must be a POD type");
 
 // For the specializations of VectorizedArray, we need to instantiate the
@@ -36,7 +36,8 @@ static_assert(std::is_standard_layout<VectorizedArray<float>>::value &&
 // specialization 'const unsigned int
 // dealii::VectorizedArray<double, 2>::n_array_elements' has already been
 // instantiated".
-#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && !defined(DEAL_II_MSVC)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= \
+  128 DEAL_II_AND !defined(DEAL_II_MSVC)
 #  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512
 const unsigned int VectorizedArray<double, 8>::n_array_elements;
 const unsigned int VectorizedArray<float, 16>::n_array_elements;

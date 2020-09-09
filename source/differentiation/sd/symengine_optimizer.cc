@@ -74,12 +74,12 @@ namespace Differentiation
       const enum OptimizationFlags &optimization_flags)
     {
       Assert(
-        optimized() == false,
+        optimized() DEAL_II_EQUALS false,
         ExcMessage(
           "Cannot call set_optimization_method() once the optimizer is finalized."));
 
 #  ifndef HAVE_SYMENGINE_LLVM
-      if (optimization_method == OptimizerType::llvm)
+      if (optimization_method DEAL_II_EQUALS OptimizerType::llvm)
         {
           AssertThrow(false, ExcSymEngineLLVMNotAvailable());
         }
@@ -123,8 +123,8 @@ namespace Differentiation
     {
       if (dependent_variables_output.size() > 0)
         {
-          Assert(dependent_variables_output.size() ==
-                   dependent_variables_functions.size(),
+          Assert(dependent_variables_output
+                   .size() DEAL_II_EQUALS dependent_variables_functions.size(),
                  ExcInternalError());
           return true;
         }
@@ -148,7 +148,7 @@ namespace Differentiation
     BatchOptimizer<ReturnType>::register_symbols(
       const SD::types::substitution_map &substitution_map)
     {
-      Assert(optimized() == false,
+      Assert(optimized() DEAL_II_EQUALS false,
              ExcMessage(
                "Cannot register symbols once the optimizer is finalized."));
 
@@ -186,14 +186,15 @@ namespace Differentiation
     BatchOptimizer<ReturnType>::register_symbols(
       const SD::types::symbol_vector &symbols)
     {
-      Assert(optimized() == false,
+      Assert(optimized() DEAL_II_EQUALS false,
              ExcMessage(
                "Cannot register symbols once the optimizer is finalized."));
 
       for (const auto &symbol : symbols)
         {
-          Assert(independent_variables_symbols.find(symbol) ==
-                   independent_variables_symbols.end(),
+          Assert(independent_variables_symbols
+                   .find(symbol)
+                     DEAL_II_EQUALS independent_variables_symbols.end(),
                  ExcMessage("Symbol is already in the map."));
           independent_variables_symbols.insert(
             std::make_pair(symbol, SD::Expression(0.0)));
@@ -235,7 +236,7 @@ namespace Differentiation
     void
     BatchOptimizer<ReturnType>::register_function(const Expression &function)
     {
-      Assert(optimized() == false,
+      Assert(optimized() DEAL_II_EQUALS false,
              ExcMessage(
                "Cannot register functions once the optimizer is finalized."));
 
@@ -249,7 +250,7 @@ namespace Differentiation
     BatchOptimizer<ReturnType>::register_functions(
       const SD::types::symbol_vector &functions)
     {
-      Assert(optimized() == false,
+      Assert(optimized() DEAL_II_EQUALS false,
              ExcMessage(
                "Cannot register functions once the optimizer is finalized."));
 
@@ -282,12 +283,12 @@ namespace Differentiation
     std::size_t
     BatchOptimizer<ReturnType>::n_dependent_variables(void) const
     {
-      if (has_been_serialized == false)
+      if (has_been_serialized DEAL_II_EQUALS false)
         {
           // If we've had to augment our map after serialization, then
           // this check, unfortunately, cannot be performed.
-          Assert(map_dep_expr_vec_entry.size() ==
-                   dependent_variables_functions.size(),
+          Assert(map_dep_expr_vec_entry
+                   .size() DEAL_II_EQUALS dependent_variables_functions.size(),
                  ExcInternalError());
         }
       return dependent_variables_functions.size();
@@ -299,7 +300,7 @@ namespace Differentiation
     void
     BatchOptimizer<ReturnType>::optimize()
     {
-      Assert(optimized() == false,
+      Assert(optimized() DEAL_II_EQUALS false,
              ExcMessage("Cannot call optimize() more than once."));
 
       // Create and configure the optimizer
@@ -312,7 +313,7 @@ namespace Differentiation
             *opt = dynamic_cast<typename internal::DictionaryOptimizer<
               ReturnType>::OptimizerType *>(optimizer.get()))
         {
-          Assert(optimization_method() == OptimizerType::dictionary,
+          Assert(optimization_method() DEAL_II_EQUALS OptimizerType::dictionary,
                  ExcInternalError());
           internal::OptimizerHelper<ReturnType,
                                     internal::DictionaryOptimizer<ReturnType>>::
@@ -327,7 +328,7 @@ namespace Differentiation
                  *opt = dynamic_cast<typename internal::LambdaOptimizer<
                    ReturnType>::OptimizerType *>(optimizer.get()))
         {
-          Assert(optimization_method() == OptimizerType::lambda,
+          Assert(optimization_method() DEAL_II_EQUALS OptimizerType::lambda,
                  ExcInternalError());
           internal::OptimizerHelper<ReturnType,
                                     internal::LambdaOptimizer<ReturnType>>::
@@ -343,7 +344,7 @@ namespace Differentiation
                  *opt = dynamic_cast<typename internal::LLVMOptimizer<
                    ReturnType>::OptimizerType *>(optimizer.get()))
         {
-          Assert(optimization_method() == OptimizerType::llvm,
+          Assert(optimization_method() DEAL_II_EQUALS OptimizerType::llvm,
                  ExcInternalError());
           internal::OptimizerHelper<ReturnType,
                                     internal::LLVMOptimizer<ReturnType>>::
@@ -363,10 +364,10 @@ namespace Differentiation
       // The size of the outputs is now fixed, as is the number and
       // order of the symbols to be substituted.
       // Note: When no optimisation is actually used (i.e. optimization_method()
-      // == off and use_symbolic_CSE() == false), we could conceptually go
-      // without this data structure. However, since the user expects to perform
-      // substitution of all dependent variables in one go, we still require it
-      // for intermediate storage of results.
+      // DEAL_II_EQUALS  off and use_symbolic_CSE() DEAL_II_EQUALS  false), we
+      // could conceptually go without this data structure. However, since the
+      // user expects to perform substitution of all dependent variables in one
+      // go, we still require it for intermediate storage of results.
       dependent_variables_output.resize(n_dependent_variables());
     }
 
@@ -378,7 +379,7 @@ namespace Differentiation
       const SD::types::substitution_map &substitution_map) const
     {
       Assert(
-        optimized() == true,
+        optimized() DEAL_II_EQUALS true,
         ExcMessage(
           "The optimizer is not configured to perform substitution. "
           "This action can only performed after optimize() has been called."));
@@ -391,7 +392,7 @@ namespace Differentiation
         Utilities::extract_symbols(substitution_map);
       const SD::types::symbol_vector symbol_vec =
         Utilities::extract_symbols(independent_variables_symbols);
-      Assert(symbol_sub_vec.size() == symbol_vec.size(),
+      Assert(symbol_sub_vec.size() DEAL_II_EQUALS symbol_vec.size(),
              ExcDimensionMismatch(symbol_sub_vec.size(), symbol_vec.size()));
       for (unsigned int i = 0; i < symbol_sub_vec.size(); ++i)
         {
@@ -455,20 +456,22 @@ namespace Differentiation
       const std::vector<ReturnType> &substitution_values) const
     {
       Assert(
-        optimized() == true,
+        optimized() DEAL_II_EQUALS true,
         ExcMessage(
           "The optimizer is not configured to perform substitution. "
           "This action can only performed after optimize() has been called."));
       Assert(optimizer, ExcNotInitialized());
-      Assert(substitution_values.size() == independent_variables_symbols.size(),
-             ExcDimensionMismatch(substitution_values.size(),
-                                  independent_variables_symbols.size()));
+      Assert(
+        substitution_values.size()
+          DEAL_II_EQUALS independent_variables_symbols.size(),
+        ExcDimensionMismatch(substitution_values.size(),
+                             independent_variables_symbols.size()));
 
       if (typename internal::DictionaryOptimizer<ReturnType>::OptimizerType
             *opt = dynamic_cast<typename internal::DictionaryOptimizer<
               ReturnType>::OptimizerType *>(optimizer.get()))
         {
-          Assert(optimization_method() == OptimizerType::dictionary,
+          Assert(optimization_method() DEAL_II_EQUALS OptimizerType::dictionary,
                  ExcInternalError());
           internal::OptimizerHelper<ReturnType,
                                     internal::DictionaryOptimizer<ReturnType>>::
@@ -478,7 +481,7 @@ namespace Differentiation
                  *opt = dynamic_cast<typename internal::LambdaOptimizer<
                    ReturnType>::OptimizerType *>(optimizer.get()))
         {
-          Assert(optimization_method() == OptimizerType::lambda,
+          Assert(optimization_method() DEAL_II_EQUALS OptimizerType::lambda,
                  ExcInternalError());
           internal::OptimizerHelper<ReturnType,
                                     internal::LambdaOptimizer<ReturnType>>::
@@ -489,7 +492,7 @@ namespace Differentiation
                  *opt = dynamic_cast<typename internal::LLVMOptimizer<
                    ReturnType>::OptimizerType *>(optimizer.get()))
         {
-          Assert(optimization_method() == OptimizerType::llvm,
+          Assert(optimization_method() DEAL_II_EQUALS OptimizerType::llvm,
                  ExcInternalError());
           internal::OptimizerHelper<ReturnType,
                                     internal::LLVMOptimizer<ReturnType>>::
@@ -511,7 +514,7 @@ namespace Differentiation
     BatchOptimizer<ReturnType>::evaluate() const
     {
       Assert(
-        values_substituted() == true,
+        values_substituted() DEAL_II_EQUALS true,
         ExcMessage(
           "The optimizer is not configured to perform evaluation. "
           "This action can only performed after substitute() has been called."));
@@ -526,7 +529,7 @@ namespace Differentiation
     BatchOptimizer<ReturnType>::evaluate(const Expression &func) const
     {
       Assert(
-        values_substituted() == true,
+        values_substituted() DEAL_II_EQUALS true,
         ExcMessage(
           "The optimizer is not configured to perform evaluation. "
           "This action can only performed after substitute() has been called."));
@@ -543,7 +546,8 @@ namespace Differentiation
 
       // But instead we are forced to live with this abomination, and its
       // knock-on effects:
-      if (has_been_serialized && it == map_dep_expr_vec_entry.end())
+      if (has_been_serialized DEAL_II_AND it DEAL_II_EQUALS
+                                             map_dep_expr_vec_entry.end())
         {
           // Some SymEngine operations might return results with a zero leading
           // coefficient. Upon serialization, this might be dropped, meaning
@@ -595,8 +599,9 @@ namespace Differentiation
               // return a valid entry. Note that we must do a string comparison,
               // because the data structures that form the expressions might
               // still be different.
-              if (new_func.get_value().__str__() ==
-                  new_map_expr.get_value().__str__())
+              if (new_func.get_value()
+                    .__str__() DEAL_II_EQUALS new_map_expr.get_value()
+                    .__str__())
                 {
                   map_dep_expr_vec_entry[func] = e.second;
                   return evaluate(func);
@@ -655,21 +660,21 @@ namespace Differentiation
       // https://github.com/symengine/symengine/blob/master/symengine/constants.h
       if (SymEngine::is_a<SymEngine::Constant>(*func))
         return true;
-      if (&*func == &*SymEngine::zero)
+      if (&*func DEAL_II_EQUALS & *SymEngine::zero)
         return true;
-      if (&*func == &*SymEngine::one)
+      if (&*func DEAL_II_EQUALS & *SymEngine::one)
         return true;
-      if (&*func == &*SymEngine::minus_one)
+      if (&*func DEAL_II_EQUALS & *SymEngine::minus_one)
         return true;
-      if (&*func == &*SymEngine::I)
+      if (&*func DEAL_II_EQUALS & *SymEngine::I)
         return true;
-      if (&*func == &*SymEngine::Inf)
+      if (&*func DEAL_II_EQUALS & *SymEngine::Inf)
         return true;
-      if (&*func == &*SymEngine::NegInf)
+      if (&*func DEAL_II_EQUALS & *SymEngine::NegInf)
         return true;
-      if (&*func == &*SymEngine::ComplexInf)
+      if (&*func DEAL_II_EQUALS & *SymEngine::ComplexInf)
         return true;
-      if (&*func == &*SymEngine::Nan)
+      if (&*func DEAL_II_EQUALS & *SymEngine::Nan)
         return true;
 
       return false;
@@ -683,19 +688,19 @@ namespace Differentiation
       const SD::Expression &func)
     {
       Assert(
-        dependent_variables_output.size() == 0,
+        dependent_variables_output.size() DEAL_II_EQUALS 0,
         ExcMessage(
           "Cannot register function as the optimizer has already been finalized."));
       dependent_variables_output.reserve(n_dependent_variables() + 1);
       const bool entry_registered =
         (map_dep_expr_vec_entry.find(func) != map_dep_expr_vec_entry.end());
 #  ifdef DEBUG
-      if (entry_registered == true &&
-          is_valid_nonunique_dependent_variable(func) == false)
+      if (entry_registered DEAL_II_EQUALS true DEAL_II_AND
+                           is_valid_nonunique_dependent_variable(func) DEAL_II_EQUALS false)
         Assert(entry_registered,
                ExcMessage("Function has already been registered."));
 #  endif
-      if (entry_registered == false)
+      if (entry_registered DEAL_II_EQUALS false)
         {
           dependent_variables_functions.push_back(func);
           map_dep_expr_vec_entry[func] =
@@ -711,7 +716,7 @@ namespace Differentiation
       const SD::types::symbol_vector &funcs)
     {
       Assert(
-        dependent_variables_output.size() == 0,
+        dependent_variables_output.size() DEAL_II_EQUALS 0,
         ExcMessage(
           "Cannot register function as the optimizer has already been finalized."));
       const std::size_t n_dependents_old = n_dependent_variables();
@@ -723,12 +728,13 @@ namespace Differentiation
           const bool entry_registered =
             (map_dep_expr_vec_entry.find(func) != map_dep_expr_vec_entry.end());
 #  ifdef DEBUG
-          if (entry_registered == true &&
-              is_valid_nonunique_dependent_variable(func) == false)
+          if (entry_registered DEAL_II_EQUALS true DEAL_II_AND
+                               is_valid_nonunique_dependent_variable(func)
+                  DEAL_II_EQUALS false)
             Assert(entry_registered,
                    ExcMessage("Function has already been registered."));
 #  endif
-          if (entry_registered == false)
+          if (entry_registered DEAL_II_EQUALS false)
             {
               dependent_variables_functions.push_back(func);
               map_dep_expr_vec_entry[func] =
@@ -746,20 +752,21 @@ namespace Differentiation
     {
       Assert(!optimizer, ExcMessage("Optimizer has already been created."));
 
-      if (optimization_method() == OptimizerType::dictionary ||
-          optimization_method() == OptimizerType::dictionary)
+      if (optimization_method()
+            DEAL_II_EQUALS OptimizerType::dictionary DEAL_II_OR
+              optimization_method() DEAL_II_EQUALS OptimizerType::dictionary)
         {
           using Optimizer_t =
             typename internal::DictionaryOptimizer<ReturnType>::OptimizerType;
           optimizer.reset(new Optimizer_t());
         }
-      else if (optimization_method() == OptimizerType::lambda)
+      else if (optimization_method() DEAL_II_EQUALS OptimizerType::lambda)
         {
           using Optimizer_t =
             typename internal::LambdaOptimizer<ReturnType>::OptimizerType;
           optimizer.reset(new Optimizer_t());
         }
-      else if (optimization_method() == OptimizerType::llvm)
+      else if (optimization_method() DEAL_II_EQUALS OptimizerType::llvm)
         {
 #  ifdef HAVE_SYMENGINE_LLVM
           if (internal::LLVMOptimizer<ReturnType>::supported_by_LLVM)

@@ -263,10 +263,9 @@ public:
     /**
      * Comparison. True, if both iterators point to the same matrix position.
      */
-    bool
-    operator==(const const_iterator &) const;
+    bool operator DEAL_II_EQUALS(const const_iterator &) const;
     /**
-     * Inverse of <tt>==</tt>.
+     * Inverse of <tt>DEAL_II_EQUALS </tt>.
      */
     bool
     operator!=(const const_iterator &) const;
@@ -987,7 +986,7 @@ inline SparseMatrixEZ<number>::const_iterator::const_iterator(
   : accessor(matrix, r, i)
 {
   // Finish if this is the end()
-  if (r == accessor.matrix->m() && i == 0)
+  if (r DEAL_II_EQUALS accessor.matrix->m() DEAL_II_AND i DEAL_II_EQUALS 0)
     return;
 
   // Make sure we never construct an
@@ -1007,8 +1006,9 @@ inline SparseMatrixEZ<number>::const_iterator::const_iterator(
       // empty, iterate until a
       // non-empty row is found or we
       // hit the end of the matrix.
-      while (accessor.a_row < accessor.matrix->m() &&
-             accessor.matrix->row_info[accessor.a_row].length == 0);
+      while (accessor.a_row < accessor.matrix->m() DEAL_II_AND accessor.matrix
+                                ->row_info[accessor.a_row]
+                                .length DEAL_II_EQUALS 0);
     }
 }
 
@@ -1033,8 +1033,9 @@ SparseMatrixEZ<number>::const_iterator::operator++()
         {
           ++accessor.a_row;
         }
-      while (accessor.a_row < accessor.matrix->m() &&
-             accessor.matrix->row_info[accessor.a_row].length == 0);
+      while (accessor.a_row < accessor.matrix->m() DEAL_II_AND accessor.matrix
+                                ->row_info[accessor.a_row]
+                                .length DEAL_II_EQUALS 0);
     }
   return *this;
 }
@@ -1057,12 +1058,12 @@ inline const typename SparseMatrixEZ<number>::const_iterator::Accessor *
 
 
 template <typename number>
-inline bool
-SparseMatrixEZ<number>::const_iterator::
-operator==(const const_iterator &other) const
+inline bool SparseMatrixEZ<number>::const_iterator::
+            operator DEAL_II_EQUALS(const const_iterator &other) const
 {
-  return (accessor.row() == other.accessor.row() &&
-          accessor.index() == other.accessor.index());
+  return (
+    accessor.row() DEAL_II_EQUALS other.accessor.row()
+      DEAL_II_AND accessor.index() DEAL_II_EQUALS other.accessor.index());
 }
 
 
@@ -1071,7 +1072,7 @@ inline bool
 SparseMatrixEZ<number>::const_iterator::
 operator!=(const const_iterator &other) const
 {
-  return !(*this == other);
+  return !(*this DEAL_II_EQUALS other);
 }
 
 
@@ -1080,9 +1081,11 @@ inline bool
 SparseMatrixEZ<number>::const_iterator::
 operator<(const const_iterator &other) const
 {
-  return (accessor.row() < other.accessor.row() ||
-          (accessor.row() == other.accessor.row() &&
-           accessor.index() < other.accessor.index()));
+  return (accessor.row() <
+          other.accessor.row() DEAL_II_OR(
+            accessor.row()
+              DEAL_II_EQUALS other.accessor.row()
+                DEAL_II_AND  accessor.index() < other.accessor.index()));
 }
 
 
@@ -1115,9 +1118,9 @@ SparseMatrixEZ<number>::locate(const size_type row, const size_type col)
   for (size_type i = r.start; i < end; ++i)
     {
       Entry *const entry = &data[i];
-      if (entry->column == col)
+      if (entry->column DEAL_II_EQUALS col)
         return entry;
-      if (entry->column == Entry::invalid)
+      if (entry->column DEAL_II_EQUALS Entry::invalid)
         return nullptr;
     }
   return nullptr;
@@ -1148,14 +1151,14 @@ SparseMatrixEZ<number>::allocate(const size_type row, const size_type col)
   // If diagonal exists and this
   // column is higher, start only
   // after diagonal.
-  if (r.diagonal != RowInfo::invalid_diagonal && col >= row)
+  if (r.diagonal != RowInfo::invalid_diagonal DEAL_II_AND col >= row)
     i += r.diagonal;
   // Find position of entry
-  while (i < end && data[i].column < col)
+  while (i < end DEAL_II_AND data[i].column < col)
     ++i;
 
   // entry found
-  if (i != end && data[i].column == col)
+  if (i != end DEAL_II_AND data[i].column DEAL_II_EQUALS col)
     return &data[i];
 
   // Now, we must insert the new
@@ -1203,12 +1206,12 @@ SparseMatrixEZ<number>::allocate(const size_type row, const size_type col)
   entry->value  = 0;
   // Update row_info
   ++r.length;
-  if (col == row)
+  if (col DEAL_II_EQUALS row)
     r.diagonal = i - r.start;
-  else if (col < row && r.diagonal != RowInfo::invalid_diagonal)
+  else if (col < row DEAL_II_AND r.diagonal != RowInfo::invalid_diagonal)
     ++r.diagonal;
 
-  if (i == end)
+  if (i DEAL_II_EQUALS end)
     return entry;
 
   // Move all entries in this
@@ -1223,7 +1226,7 @@ SparseMatrixEZ<number>::allocate(const size_type row, const size_type col)
       // top rather than swapping starting at the bottom
       std::swap(data[j], temp);
     }
-  Assert(data[end].column == Entry::invalid, ExcInternalError());
+  Assert(data[end].column DEAL_II_EQUALS Entry::invalid, ExcInternalError());
 
   data[end] = temp;
 
@@ -1244,7 +1247,7 @@ SparseMatrixEZ<number>::set(const size_type i,
   AssertIndexRange(i, m());
   AssertIndexRange(j, n());
 
-  if (elide_zero_values && value == 0.)
+  if (elide_zero_values DEAL_II_AND value DEAL_II_EQUALS 0.)
     {
       Entry *entry = locate(i, j);
       if (entry != nullptr)
@@ -1271,7 +1274,7 @@ SparseMatrixEZ<number>::add(const size_type i,
   AssertIndexRange(j, n());
 
   // ignore zero additions
-  if (std::abs(value) == 0.)
+  if (std::abs(value) DEAL_II_EQUALS 0.)
     return;
 
   Entry *entry = allocate(i, j);
@@ -1289,7 +1292,8 @@ SparseMatrixEZ<number>::add(const std::vector<size_type> &indices,
   // TODO: This function can surely be made more efficient
   for (size_type i = 0; i < indices.size(); ++i)
     for (size_type j = 0; j < indices.size(); ++j)
-      if ((full_matrix(i, j) != 0) || (elide_zero_values == false))
+      if ((full_matrix(i, j) != 0)
+            DEAL_II_OR(elide_zero_values DEAL_II_EQUALS false))
         add(indices[i], indices[j], full_matrix(i, j));
 }
 
@@ -1306,7 +1310,8 @@ SparseMatrixEZ<number>::add(const std::vector<size_type> &row_indices,
   // TODO: This function can surely be made more efficient
   for (size_type i = 0; i < row_indices.size(); ++i)
     for (size_type j = 0; j < col_indices.size(); ++j)
-      if ((full_matrix(i, j) != 0) || (elide_zero_values == false))
+      if ((full_matrix(i, j) != 0)
+            DEAL_II_OR(elide_zero_values DEAL_II_EQUALS false))
         add(row_indices[i], col_indices[j], full_matrix(i, j));
 }
 
@@ -1322,7 +1327,7 @@ SparseMatrixEZ<number>::add(const size_type               row,
 {
   // TODO: This function can surely be made more efficient
   for (size_type j = 0; j < col_indices.size(); ++j)
-    if ((values[j] != 0) || (elide_zero_values == false))
+    if ((values[j] != 0) DEAL_II_OR(elide_zero_values DEAL_II_EQUALS false))
       add(row, col_indices[j], values[j]);
 }
 
@@ -1340,7 +1345,8 @@ SparseMatrixEZ<number>::add(const size_type  row,
 {
   // TODO: This function can surely be made more efficient
   for (size_type j = 0; j < n_cols; ++j)
-    if ((std::abs(values[j]) != 0) || (elide_zero_values == false))
+    if ((std::abs(values[j]) != 0)
+          DEAL_II_OR(elide_zero_values DEAL_II_EQUALS false))
       add(row, col_indices[j], values[j]);
 }
 
@@ -1431,10 +1437,10 @@ template <typename MatrixType>
 inline void
 SparseMatrixEZ<number>::add(const number factor, const MatrixType &M)
 {
-  Assert(M.m() == m(), ExcDimensionMismatch(M.m(), m()));
-  Assert(M.n() == n(), ExcDimensionMismatch(M.n(), n()));
+  Assert(M.m() DEAL_II_EQUALS m(), ExcDimensionMismatch(M.m(), m()));
+  Assert(M.n() DEAL_II_EQUALS n(), ExcDimensionMismatch(M.n(), n()));
 
-  if (factor == 0.)
+  if (factor DEAL_II_EQUALS 0.)
     return;
 
   // loop over the elements of the argument matrix row by row, as suggested
@@ -1463,10 +1469,11 @@ SparseMatrixEZ<number>::conjugate_add(const MatrixTypeA &A,
   // Compute the result
   // r_ij = \sum_kl b_ik b_jl a_kl
 
-  //    Assert (n() == B.m(), ExcDimensionMismatch(n(), B.m()));
-  //    Assert (m() == B.m(), ExcDimensionMismatch(m(), B.m()));
-  //    Assert (A.n() == B.n(), ExcDimensionMismatch(A.n(), B.n()));
-  //    Assert (A.m() == B.n(), ExcDimensionMismatch(A.m(), B.n()));
+  //    Assert (n() DEAL_II_EQUALS  B.m(), ExcDimensionMismatch(n(), B.m()));
+  //    Assert (m() DEAL_II_EQUALS  B.m(), ExcDimensionMismatch(m(), B.m()));
+  //    Assert (A.n() DEAL_II_EQUALS  B.n(), ExcDimensionMismatch(A.n(),
+  //    B.n())); Assert (A.m() DEAL_II_EQUALS  B.n(),
+  //    ExcDimensionMismatch(A.m(), B.n()));
 
   // Somehow, we have to avoid making
   // this an operation of complexity
@@ -1523,7 +1530,7 @@ SparseMatrixEZ<number>::conjugate_add(const MatrixTypeA &A,
           const typename MatrixTypeA::value_type a = ai->value();
           // Don't do anything if
           // this entry is zero.
-          if (a == 0.)
+          if (a DEAL_II_EQUALS 0.)
             continue;
 
           // Now, loop over all rows
@@ -1543,7 +1550,7 @@ SparseMatrixEZ<number>::conjugate_add(const MatrixTypeA &A,
               // of both. If it is
               // zero, we can save
               // the work
-              if (b1->column() == ai->row() && (b1v != 0.))
+              if (b1->column() DEAL_II_EQUALS ai->row() DEAL_II_AND(b1v != 0.))
                 {
                   const size_type i = b1->row();
 
@@ -1551,7 +1558,7 @@ SparseMatrixEZ<number>::conjugate_add(const MatrixTypeA &A,
                     B.begin(minrow[ai->column()]);
                   while (b2 != be2)
                     {
-                      if (b2->column() == ai->column())
+                      if (b2->column() DEAL_II_EQUALS ai->column())
                         {
                           const size_type j = b2->row();
                           add(i, j, a * b1v * b2->value());

@@ -42,7 +42,7 @@ MultithreadInfo::n_cores()
   // in contrast to a 1 that n_cores() used to do. For compatibility, let's
   // translate to our numbering scheme:
   const unsigned int n_cores = std::thread::hardware_concurrency();
-  return n_cores == 0 ? 1 : n_cores;
+  return n_cores     DEAL_II_EQUALS 0 ? 1 : n_cores;
 }
 
 
@@ -88,7 +88,7 @@ MultithreadInfo::set_thread_limit(const unsigned int max_threads)
 
   // If we have not set the number of allowed threads yet, just default to
   // the number of available cores
-  if (n_max_threads == numbers::invalid_unsigned_int)
+  if (n_max_threads DEAL_II_EQUALS numbers::invalid_unsigned_int)
     n_max_threads = n_cores();
 
 #ifdef DEAL_II_WITH_TBB
@@ -118,7 +118,7 @@ MultithreadInfo::n_threads()
 bool
 MultithreadInfo::is_running_single_threaded()
 {
-  return n_threads() == 1;
+  return n_threads() DEAL_II_EQUALS 1;
 }
 
 

@@ -183,12 +183,11 @@ FE_Nothing<dim, spacedim>::is_dominating() const
 
 
 template <int dim, int spacedim>
-bool
-FE_Nothing<dim, spacedim>::
-operator==(const FiniteElement<dim, spacedim> &f) const
+bool FE_Nothing<dim, spacedim>::
+     operator DEAL_II_EQUALS(const FiniteElement<dim, spacedim> &f) const
 {
   // Compare fields stored in the base class
-  if (!(this->FiniteElement<dim, spacedim>::operator==(f)))
+  if (!(this->FiniteElement<dim, spacedim>::operator DEAL_II_EQUALS(f)))
     return false;
 
   // Then make sure the other object is really of type FE_Nothing,
@@ -196,8 +195,8 @@ operator==(const FiniteElement<dim, spacedim> &f) const
   // constructors.
   if (const FE_Nothing<dim, spacedim> *f_nothing =
         dynamic_cast<const FE_Nothing<dim, spacedim> *>(&f))
-    return ((dominate == f_nothing->dominate) &&
-            (this->components == f_nothing->components));
+    return ((dominate DEAL_II_EQUALS f_nothing->dominate)DEAL_II_AND(
+      this->components DEAL_II_EQUALS f_nothing->components));
   else
     return false;
 }
@@ -284,9 +283,9 @@ FE_Nothing<dim, spacedim>::get_interpolation_matrix(
   // the interpolation matrix is necessarily empty.
   (void)interpolation_matrix;
 
-  Assert(interpolation_matrix.m() == 0,
+  Assert(interpolation_matrix.m() DEAL_II_EQUALS 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS 0,
          ExcDimensionMismatch(interpolation_matrix.n(), 0));
 }
 
@@ -303,9 +302,9 @@ FE_Nothing<dim, spacedim>::get_face_interpolation_matrix(
   // interpolation matrix is necessarily empty
   (void)interpolation_matrix;
 
-  Assert(interpolation_matrix.m() == 0,
+  Assert(interpolation_matrix.m() DEAL_II_EQUALS 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
 }
 
@@ -322,9 +321,9 @@ FE_Nothing<dim, spacedim>::get_subface_interpolation_matrix(
   // interpolation matrix is necessarily empty
 
   (void)interpolation_matrix;
-  Assert(interpolation_matrix.m() == 0,
+  Assert(interpolation_matrix.m() DEAL_II_EQUALS 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
+  Assert(interpolation_matrix.n() DEAL_II_EQUALS 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
 }
 

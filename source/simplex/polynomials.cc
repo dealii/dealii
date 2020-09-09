@@ -25,25 +25,25 @@ namespace Simplex
     unsigned int
     compute_n_polynomials(const unsigned int dim, const unsigned int degree)
     {
-      if (dim == 1)
+      if (dim DEAL_II_EQUALS 1)
         {
-          if (degree == 1)
+          if (degree DEAL_II_EQUALS 1)
             return 2;
-          if (degree == 2)
+          if (degree DEAL_II_EQUALS 2)
             return 3;
         }
-      else if (dim == 2)
+      else if (dim DEAL_II_EQUALS 2)
         {
-          if (degree == 1)
+          if (degree DEAL_II_EQUALS 1)
             return 3;
-          if (degree == 2)
+          if (degree DEAL_II_EQUALS 2)
             return 6;
         }
-      else if (dim == 3)
+      else if (dim DEAL_II_EQUALS 3)
         {
-          if (degree == 1)
+          if (degree DEAL_II_EQUALS 1)
             return 4;
-          if (degree == 2)
+          if (degree DEAL_II_EQUALS 2)
             return 10;
         }
 
@@ -67,94 +67,94 @@ namespace Simplex
   ScalarPolynomial<dim>::compute_value(const unsigned int i,
                                        const Point<dim> & p) const
   {
-    if (dim == 1)
+    if (dim DEAL_II_EQUALS 1)
       {
-        if (this->degree() == 1)
+        if (this->degree() DEAL_II_EQUALS 1)
           {
-            if (i == 0)
+            if (i DEAL_II_EQUALS 0)
               return 1.0 - p[0];
-            else if (i == 1)
+            else if (i DEAL_II_EQUALS 1)
               return p[0];
           }
-        else if (this->degree() == 2)
+        else if (this->degree() DEAL_II_EQUALS 2)
           {
-            if (i == 0)
+            if (i DEAL_II_EQUALS 0)
               return 2.0 * p[0] * p[0] - 3.0 * p[0] + 1;
-            else if (i == 1)
+            else if (i DEAL_II_EQUALS 1)
               return 2.0 * p[0] * p[0] - p[0];
-            else if (i == 2)
+            else if (i DEAL_II_EQUALS 2)
               return -4.0 * p[0] * p[0] + 4.0 * p[0];
           }
       }
-    else if (dim == 2)
+    else if (dim DEAL_II_EQUALS 2)
       {
-        if (this->degree() == 1)
+        if (this->degree() DEAL_II_EQUALS 1)
           {
-            if (i == 0)
+            if (i DEAL_II_EQUALS 0)
               return 1.0 - p[0] - p[1];
-            else if (i == 1)
+            else if (i DEAL_II_EQUALS 1)
               return p[0];
-            else if (i == 2)
+            else if (i DEAL_II_EQUALS 2)
               return p[1];
           }
-        else if (this->degree() == 2)
+        else if (this->degree() DEAL_II_EQUALS 2)
           {
             const double t1 = 1.0 - p[0] - p[1];
             const double t2 = p[0];
             const double t3 = p[1];
 
-            if (i == 0)
+            if (i DEAL_II_EQUALS 0)
               return t1 * (2.0 * t1 - 1.0);
-            else if (i == 1)
+            else if (i DEAL_II_EQUALS 1)
               return t2 * (2.0 * t2 - 1.0);
-            else if (i == 2)
+            else if (i DEAL_II_EQUALS 2)
               return t3 * (2.0 * t3 - 1.0);
-            else if (i == 3)
+            else if (i DEAL_II_EQUALS 3)
               return 4.0 * t2 * t1;
-            else if (i == 4)
+            else if (i DEAL_II_EQUALS 4)
               return 4.0 * t2 * t3;
-            else if (i == 5)
+            else if (i DEAL_II_EQUALS 5)
               return 4.0 * t3 * t1;
           }
       }
-    else if (dim == 3)
+    else if (dim DEAL_II_EQUALS 3)
       {
-        if (this->degree() == 1)
+        if (this->degree() DEAL_II_EQUALS 1)
           {
-            if (i == 0)
+            if (i DEAL_II_EQUALS 0)
               return 1.0 - p[0] - p[1] - p[2];
-            else if (i == 1)
+            else if (i DEAL_II_EQUALS 1)
               return p[0];
-            else if (i == 2)
+            else if (i DEAL_II_EQUALS 2)
               return p[1];
-            else if (i == 3)
+            else if (i DEAL_II_EQUALS 3)
               return p[2];
           }
-        else if (this->degree() == 2)
+        else if (this->degree() DEAL_II_EQUALS 2)
           {
             const double r = p[0];
             const double s = p[1];
             const double t = p[2];
             const double u = 1.0 - p[0] - p[1] - p[2];
-            if (i == 0)
+            if (i DEAL_II_EQUALS 0)
               return u * (2.0 * u - 1.0);
-            else if (i == 1)
+            else if (i DEAL_II_EQUALS 1)
               return r * (2.0 * r - 1.0);
-            else if (i == 2)
+            else if (i DEAL_II_EQUALS 2)
               return s * (2.0 * s - 1.0);
-            else if (i == 3)
+            else if (i DEAL_II_EQUALS 3)
               return t * (2.0 * t - 1.0);
-            else if (i == 4)
+            else if (i DEAL_II_EQUALS 4)
               return 4.0 * r * u;
-            else if (i == 5)
+            else if (i DEAL_II_EQUALS 5)
               return 4.0 * r * s;
-            else if (i == 6)
+            else if (i DEAL_II_EQUALS 6)
               return 4.0 * s * u;
-            else if (i == 7)
+            else if (i DEAL_II_EQUALS 7)
               return 4.0 * t * u;
-            else if (i == 8)
+            else if (i DEAL_II_EQUALS 8)
               return 4.0 * r * t;
-            else if (i == 9)
+            else if (i DEAL_II_EQUALS 9)
               return 4.0 * s * t;
           }
       }
@@ -173,22 +173,22 @@ namespace Simplex
   {
     Tensor<1, dim> grad;
 
-    if (dim == 1)
+    if (dim DEAL_II_EQUALS 1)
       {
-        if (this->degree() == 1)
+        if (this->degree() DEAL_II_EQUALS 1)
           {
-            if (i == 0)
+            if (i DEAL_II_EQUALS 0)
               grad[0] = -1.0;
-            else if (i == 1)
+            else if (i DEAL_II_EQUALS 1)
               grad[0] = 1.0;
           }
-        else if (this->degree() == 2)
+        else if (this->degree() DEAL_II_EQUALS 2)
           {
-            if (i == 0)
+            if (i DEAL_II_EQUALS 0)
               grad[0] = 4.0 * p[0] - 3.0;
-            else if (i == 1)
+            else if (i DEAL_II_EQUALS 1)
               grad[0] = 4.0 * p[0] - 1.0;
-            else if (i == 2)
+            else if (i DEAL_II_EQUALS 2)
               grad[0] = -8.0 * p[0] + 4.0;
           }
         else
@@ -196,21 +196,21 @@ namespace Simplex
             Assert(false, ExcNotImplemented());
           }
       }
-    else if (dim == 2)
+    else if (dim DEAL_II_EQUALS 2)
       {
-        if (this->degree() == 1)
+        if (this->degree() DEAL_II_EQUALS 1)
           {
-            if (i == 0)
+            if (i DEAL_II_EQUALS 0)
               {
                 grad[0] = -1.0;
                 grad[1] = -1.0;
               }
-            else if (i == 1)
+            else if (i DEAL_II_EQUALS 1)
               {
                 grad[0] = +1.0;
                 grad[1] = +0.0;
               }
-            else if (i == 2)
+            else if (i DEAL_II_EQUALS 2)
               {
                 grad[0] = +0.0;
                 grad[1] = +1.0;
@@ -220,34 +220,34 @@ namespace Simplex
                 Assert(false, ExcNotImplemented());
               }
           }
-        else if (this->degree() == 2)
+        else if (this->degree() DEAL_II_EQUALS 2)
           {
-            if (i == 0)
+            if (i DEAL_II_EQUALS 0)
               {
                 grad[0] = -3.0 + 4.0 * (p[0] + p[1]);
                 grad[1] = -3.0 + 4.0 * (p[0] + p[1]);
               }
-            else if (i == 1)
+            else if (i DEAL_II_EQUALS 1)
               {
                 grad[0] = 4.0 * p[0] - 1.0;
                 grad[1] = 0.0;
               }
-            else if (i == 2)
+            else if (i DEAL_II_EQUALS 2)
               {
                 grad[0] = 0.0;
                 grad[1] = 4.0 * p[1] - 1.0;
               }
-            else if (i == 3)
+            else if (i DEAL_II_EQUALS 3)
               {
                 grad[0] = 4.0 * (1.0 - 2.0 * p[0] - p[1]);
                 grad[1] = -4.0 * p[0];
               }
-            else if (i == 4)
+            else if (i DEAL_II_EQUALS 4)
               {
                 grad[0] = 4.0 * p[1];
                 grad[1] = 4.0 * p[0];
               }
-            else if (i == 5)
+            else if (i DEAL_II_EQUALS 5)
               {
                 grad[0] = -4.0 * p[1];
                 grad[1] = 4.0 * (1.0 - p[0] - 2.0 * p[1]);
@@ -262,97 +262,97 @@ namespace Simplex
             Assert(false, ExcNotImplemented());
           }
       }
-    else if (dim == 3)
+    else if (dim DEAL_II_EQUALS 3)
       {
-        if (this->degree() == 1)
+        if (this->degree() DEAL_II_EQUALS 1)
           {
-            if (i == 0)
+            if (i DEAL_II_EQUALS 0)
               {
                 grad[0] = -1.0;
                 grad[1] = -1.0;
                 grad[2] = -1.0;
               }
-            else if (i == 1)
+            else if (i DEAL_II_EQUALS 1)
               {
                 grad[0] = +1.0;
                 grad[1] = +0.0;
                 grad[2] = +0.0;
               }
-            else if (i == 2)
+            else if (i DEAL_II_EQUALS 2)
               {
                 grad[0] = +0.0;
                 grad[1] = +1.0;
                 grad[2] = +0.0;
               }
-            else if (i == 3)
+            else if (i DEAL_II_EQUALS 3)
               {
                 grad[0] = +0.0;
                 grad[1] = +0.0;
                 grad[2] = +1.0;
               }
           }
-        else if (this->degree() == 2)
+        else if (this->degree() DEAL_II_EQUALS 2)
           {
             const double r = p[0];
             const double s = p[1];
             const double t = p[2];
             const double u = 1.0 - p[0] - p[1] - p[2];
 
-            if (i == 0)
+            if (i DEAL_II_EQUALS 0)
               {
                 grad[0] = -4.0 * u + 1.;
                 grad[1] = grad[0];
                 grad[2] = grad[0];
               }
-            else if (i == 1)
+            else if (i DEAL_II_EQUALS 1)
               {
                 grad[0] = +4.0 * r - 1.;
                 grad[1] = +0.0;
                 grad[2] = +0.0;
               }
-            else if (i == 2)
+            else if (i DEAL_II_EQUALS 2)
               {
                 grad[0] = +0.0;
                 grad[1] = +4.0 * s - 1.;
                 grad[2] = +0.0;
               }
-            else if (i == 3)
+            else if (i DEAL_II_EQUALS 3)
               {
                 grad[0] = +0.0;
                 grad[1] = +0.0;
                 grad[2] = +4.0 * t - 1.;
               }
-            else if (i == 4)
+            else if (i DEAL_II_EQUALS 4)
               {
                 grad[0] = +4.0 * (u - r);
                 grad[1] = -4.0 * r;
                 grad[2] = -4.0 * r;
               }
-            else if (i == 5)
+            else if (i DEAL_II_EQUALS 5)
               {
                 grad[0] = +4.0 * s;
                 grad[1] = +4.0 * r;
                 grad[2] = +0.0;
               }
-            else if (i == 6)
+            else if (i DEAL_II_EQUALS 6)
               {
                 grad[0] = -4.0 * s;
                 grad[1] = +4.0 * (u - s);
                 grad[2] = -4.0 * s;
               }
-            else if (i == 7)
+            else if (i DEAL_II_EQUALS 7)
               {
                 grad[0] = -4.0 * t;
                 grad[1] = -4.0 * t;
                 grad[2] = +4.0 * (u - t);
               }
-            else if (i == 8)
+            else if (i DEAL_II_EQUALS 8)
               {
                 grad[0] = +4.0 * t;
                 grad[1] = +0.0;
                 grad[2] = +4.0 * r;
               }
-            else if (i == 9)
+            else if (i DEAL_II_EQUALS 9)
               {
                 grad[0] = +0.0;
                 grad[1] = +4.0 * t;
@@ -403,11 +403,11 @@ namespace Simplex
     (void)third_derivatives;
     (void)fourth_derivatives;
 
-    if (values.size() == this->n())
+    if (values.size() DEAL_II_EQUALS this->n())
       for (unsigned int i = 0; i < this->n(); i++)
         values[i] = compute_value(i, unit_point);
 
-    if (grads.size() == this->n())
+    if (grads.size() DEAL_II_EQUALS this->n())
       for (unsigned int i = 0; i < this->n(); i++)
         grads[i] = compute_grad(i, unit_point);
   }

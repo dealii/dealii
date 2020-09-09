@@ -92,7 +92,8 @@ public:
 
   /**
    * Converts a DerivativeForm <order, dim, dim, Number> to Tensor<order+1, dim,
-   * Number>. In particular, if order == 1 and the derivative is the Jacobian of
+   * Number>. In particular, if order DEAL_II_EQUALS  1 and the derivative is
+   * the Jacobian of
    * $\mathbf F(\mathbf x)$, then Tensor[i] = $\nabla F_i(\mathbf x)$.
    */
   operator Tensor<order + 1, dim, Number>() const;
@@ -175,9 +176,9 @@ template <int order, int dim, int spacedim, typename Number>
 inline DerivativeForm<order, dim, spacedim, Number>::DerivativeForm(
   const Tensor<order + 1, dim, Number> &T)
 {
-  Assert((dim == spacedim),
-         ExcMessage("Only allowed for forms with dim==spacedim."));
-  if (dim == spacedim)
+  Assert((dim DEAL_II_EQUALS spacedim),
+         ExcMessage("Only allowed for forms with dimDEAL_II_EQUALS spacedim."));
+  if (dim DEAL_II_EQUALS spacedim)
     for (unsigned int j = 0; j < dim; ++j)
       (*this)[j] = T[j];
 }
@@ -189,9 +190,10 @@ inline DerivativeForm<order, dim, spacedim, Number> &
 DerivativeForm<order, dim, spacedim, Number>::
 operator=(const Tensor<order + 1, dim, Number> &ta)
 {
-  Assert((dim == spacedim), ExcMessage("Only allowed when dim==spacedim."));
+  Assert((dim DEAL_II_EQUALS spacedim),
+         ExcMessage("Only allowed when dimDEAL_II_EQUALS spacedim."));
 
-  if (dim == spacedim)
+  if (dim DEAL_II_EQUALS spacedim)
     for (unsigned int j = 0; j < dim; ++j)
       (*this)[j] = ta[j];
   return *this;
@@ -204,8 +206,10 @@ inline DerivativeForm<order, dim, spacedim, Number> &
 DerivativeForm<order, dim, spacedim, Number>::
 operator=(const Tensor<1, dim, Number> &T)
 {
-  Assert((1 == spacedim) && (order == 1),
-         ExcMessage("Only allowed for spacedim==1 and order==1."));
+  Assert(
+    (1 DEAL_II_EQUALS spacedim)DEAL_II_AND(order DEAL_II_EQUALS 1),
+    ExcMessage(
+      "Only allowed for spacedimDEAL_II_EQUALS 1 and orderDEAL_II_EQUALS 1."));
 
   (*this)[0] = T;
 
@@ -241,8 +245,8 @@ template <int order, int dim, int spacedim, typename Number>
 inline DerivativeForm<order, dim, spacedim, Number>::
 operator Tensor<1, dim, Number>() const
 {
-  Assert((1 == spacedim) && (order == 1),
-         ExcMessage("Only allowed for spacedim==1."));
+  Assert((1 DEAL_II_EQUALS spacedim)DEAL_II_AND(order DEAL_II_EQUALS 1),
+         ExcMessage("Only allowed for spacedimDEAL_II_EQUALS 1."));
 
   return (*this)[0];
 }
@@ -253,11 +257,12 @@ template <int order, int dim, int spacedim, typename Number>
 inline DerivativeForm<order, dim, spacedim, Number>::
 operator Tensor<order + 1, dim, Number>() const
 {
-  Assert((dim == spacedim), ExcMessage("Only allowed when dim==spacedim."));
+  Assert((dim DEAL_II_EQUALS spacedim),
+         ExcMessage("Only allowed when dimDEAL_II_EQUALS spacedim."));
 
   Tensor<order + 1, dim, Number> t;
 
-  if (dim == spacedim)
+  if (dim DEAL_II_EQUALS spacedim)
     for (unsigned int j = 0; j < dim; ++j)
       t[j] = (*this)[j];
 
@@ -270,7 +275,8 @@ template <int order, int dim, int spacedim, typename Number>
 inline DerivativeForm<1, spacedim, dim, Number>
 DerivativeForm<order, dim, spacedim, Number>::transpose() const
 {
-  Assert(order == 1, ExcMessage("Only for rectangular DerivativeForm."));
+  Assert(order DEAL_II_EQUALS 1,
+         ExcMessage("Only for rectangular DerivativeForm."));
   DerivativeForm<1, spacedim, dim, Number> tt;
 
   for (unsigned int i = 0; i < spacedim; ++i)
@@ -287,7 +293,8 @@ inline DerivativeForm<1, dim, spacedim, Number>
 DerivativeForm<order, dim, spacedim, Number>::times_T_t(
   const Tensor<2, dim, Number> &T) const
 {
-  Assert(order == 1, ExcMessage("Only for order == 1."));
+  Assert(order DEAL_II_EQUALS 1,
+         ExcMessage("Only for order DEAL_II_EQUALS  1."));
   DerivativeForm<1, dim, spacedim, Number> dest;
   for (unsigned int i = 0; i < spacedim; ++i)
     for (unsigned int j = 0; j < dim; ++j)
@@ -314,8 +321,9 @@ template <int order, int dim, int spacedim, typename Number>
 inline Number
 DerivativeForm<order, dim, spacedim, Number>::determinant() const
 {
-  Assert(order == 1, ExcMessage("Only for order == 1."));
-  if (dim == spacedim)
+  Assert(order DEAL_II_EQUALS 1,
+         ExcMessage("Only for order DEAL_II_EQUALS  1."));
+  if (dim DEAL_II_EQUALS spacedim)
     {
       const Tensor<2, dim, Number> T =
         static_cast<Tensor<2, dim, Number>>(*this);
@@ -340,7 +348,7 @@ template <int order, int dim, int spacedim, typename Number>
 inline DerivativeForm<1, dim, spacedim, Number>
 DerivativeForm<order, dim, spacedim, Number>::covariant_form() const
 {
-  if (dim == spacedim)
+  if (dim DEAL_II_EQUALS spacedim)
     {
       const Tensor<2, dim, Number> DF_t =
         dealii::transpose(invert(static_cast<Tensor<2, dim, Number>>(*this)));

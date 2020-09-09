@@ -149,7 +149,7 @@ class DataOut : public DataOut_DoFData<DoFHandlerType,
                                        DoFHandlerType::space_dimension>
 {
 public:
-  static_assert(dim == DoFHandlerType::dimension,
+  static_assert(dim DEAL_II_EQUALS DoFHandlerType::dimension,
                 "The dimension given explicitly as a template argument to "
                 "this class must match the dimension of the DoFHandler "
                 "template argument");
@@ -398,7 +398,8 @@ public:
    *   DataOut<dim> data_out;
    *   data_out.set_cell_selection(
    *          [](const typename Triangulation<dim>::cell_iterator &cell) {
-   *              return (cell->is_active() && cell->subdomain_id() == 0);
+   *              return (cell->is_active() DEAL_II_AND  cell->subdomain_id()
+   * DEAL_II_EQUALS  0);
    *          });
    * @endcode
    * In this case, the lambda function selects all of those cells that are

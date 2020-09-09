@@ -53,7 +53,7 @@ namespace GeometricUtilities
         scoord[1] += 2.0 * numbers::PI;
 
       // polar angle \phi:
-      if (dim == 3)
+      if (dim DEAL_II_EQUALS 3)
         {
           // acos returns the angle in the range [0,\pi]
           if (scoord[0] > std::numeric_limits<double>::min())
@@ -72,7 +72,7 @@ namespace GeometricUtilities
 
       Assert(scoord[0] >= 0., NegativeRadius(scoord[0]));
 
-      Assert(scoord[1] >= 0. && scoord[1] < 2. * numbers::PI,
+      Assert(scoord[1] >= 0. DEAL_II_AND scoord[1] < 2. * numbers::PI,
              SphericalAzimuth(scoord[1]));
 
       switch (dim)
@@ -85,7 +85,7 @@ namespace GeometricUtilities
             }
           case 3:
             {
-              Assert(scoord[2] >= 0. && scoord[2] <= numbers::PI,
+              Assert(scoord[2] >= 0. DEAL_II_AND scoord[2] <= numbers::PI,
                      SphericalPolar(scoord[2]));
 
               ccoord[0] = scoord[0] * std::sin(scoord[2]) * std::cos(scoord[1]);

@@ -149,8 +149,7 @@ public:
   /**
    * Compare two CellId objects for equality.
    */
-  bool
-  operator==(const CellId &other) const;
+  bool operator DEAL_II_EQUALS(const CellId &other) const;
 
   /**
    * Compare two CellIds for inequality.
@@ -272,10 +271,10 @@ operator>>(std::istream &is, CellId &cid)
   cid.coarse_cell_id = cellid;
   char dummy;
   is >> dummy;
-  Assert(dummy == '_', ExcMessage("invalid CellId"));
+  Assert(dummy DEAL_II_EQUALS '_', ExcMessage("invalid CellId"));
   is >> cid.n_child_indices;
   is >> dummy;
-  Assert(dummy == ':', ExcMessage("invalid CellId"));
+  Assert(dummy DEAL_II_EQUALS ':', ExcMessage("invalid CellId"));
 
   unsigned char value;
   for (unsigned int i = 0; i < cid.n_child_indices; ++i)
@@ -290,8 +289,7 @@ operator>>(std::istream &is, CellId &cid)
 
 
 
-inline bool
-CellId::operator==(const CellId &other) const
+inline bool CellId::operator DEAL_II_EQUALS(const CellId &other) const
 {
   if (this->coarse_cell_id != other.coarse_cell_id)
     return false;
@@ -310,7 +308,7 @@ CellId::operator==(const CellId &other) const
 inline bool
 CellId::operator!=(const CellId &other) const
 {
-  return !(*this == other);
+  return !(*this DEAL_II_EQUALS other);
 }
 
 
@@ -333,7 +331,7 @@ CellId::operator<(const CellId &other) const
       ++idx;
     }
 
-  if (n_child_indices == other.n_child_indices)
+  if (n_child_indices DEAL_II_EQUALS other.n_child_indices)
     return false;
   return true; // other.id is longer
 }

@@ -94,7 +94,8 @@ public:
 
   /**
    * Set the ordering of the polynomials. Requires
-   * <tt>renumber.size()==n()</tt>.  Stores a copy of <tt>renumber</tt>.
+   * <tt>renumber.size()DEAL_II_EQUALS n()</tt>.  Stores a copy of
+   * <tt>renumber</tt>.
    */
   void
   set_numbering(const std::vector<unsigned int> &renumber);
@@ -140,8 +141,8 @@ public:
    * polynomials is not efficient, because then each point value of the
    * underlying (one-dimensional) polynomials is (unnecessarily) computed
    * several times.  Instead use the evaluate() function with
-   * <tt>values.size()==</tt>n() to get the point values of all tensor
-   * polynomials all at once and in a much more efficient way.
+   * <tt>values.size()DEAL_II_EQUALS </tt>n() to get the point values of all
+   * tensor polynomials all at once and in a much more efficient way.
    */
   double
   compute_value(const unsigned int i, const Point<dim> &p) const override;
@@ -201,8 +202,8 @@ public:
    * polynomials is not efficient, because then each derivative value of the
    * underlying (one-dimensional) polynomials is (unnecessarily) computed
    * several times.  Instead use the evaluate() function, see above, with
-   * <tt>grads.size()==</tt>n() to get the point value of all tensor
-   * polynomials all at once and in a much more efficient way.
+   * <tt>grads.size()DEAL_II_EQUALS </tt>n() to get the point value of all
+   * tensor polynomials all at once and in a much more efficient way.
    */
   Tensor<1, dim>
   compute_grad(const unsigned int i, const Point<dim> &p) const override;
@@ -216,8 +217,8 @@ public:
    * polynomials is not efficient, because then each derivative value of the
    * underlying (one-dimensional) polynomials is (unnecessarily) computed
    * several times.  Instead use the evaluate() function, see above, with
-   * <tt>grad_grads.size()==</tt>n() to get the point value of all tensor
-   * polynomials all at once and in a much more efficient way.
+   * <tt>grad_grads.size()DEAL_II_EQUALS </tt>n() to get the point value of all
+   * tensor polynomials all at once and in a much more efficient way.
    */
   Tensor<2, dim>
   compute_grad_grad(const unsigned int i, const Point<dim> &p) const override;
@@ -299,7 +300,7 @@ protected:
  *
  * The resulting @p dim-dimensional tensor product polynomials are
  * ordered as follows: We iterate over the $x$ coordinates running
- * fastest, then the $y$ coordinate, etc. For example, for @p dim==2,
+ * fastest, then the $y$ coordinate, etc. For example, for @p dimDEAL_II_EQUALS 2,
  * the first few polynomials are thus
  * $P^x_1(x)P^y_1(y)$,
  * $P^x_2(x)P^y_1(y)$, $P^x_3(x)P^y_1(y)$, ...,
@@ -359,8 +360,8 @@ public:
    * polynomials is not efficient, because then each point value of the
    * underlying (one-dimensional) polynomials is (unnecessarily) computed
    * several times.  Instead use the <tt>compute</tt> function, see above,
-   * with <tt>values.size()==this->n()</tt> to get the point values of all
-   * tensor polynomials all at once and in a much more efficient way.
+   * with <tt>values.size()DEAL_II_EQUALS this->n()</tt> to get the point values
+   * of all tensor polynomials all at once and in a much more efficient way.
    */
   double
   compute_value(const unsigned int i, const Point<dim> &p) const override;
@@ -420,8 +421,8 @@ public:
    * polynomials is not efficient, because then each derivative value of the
    * underlying (one-dimensional) polynomials is (unnecessarily) computed
    * several times.  Instead use the <tt>compute</tt> function, see above,
-   * with <tt>grads.size()==this->n()</tt> to get the point value of all
-   * tensor polynomials all at once and in a much more efficient way.
+   * with <tt>grads.size()DEAL_II_EQUALS this->n()</tt> to get the point value
+   * of all tensor polynomials all at once and in a much more efficient way.
    */
   Tensor<1, dim>
   compute_grad(const unsigned int i, const Point<dim> &p) const override;
@@ -435,8 +436,9 @@ public:
    * polynomials is not efficient, because then each derivative value of the
    * underlying (one-dimensional) polynomials is (unnecessarily) computed
    * several times.  Instead use the <tt>compute</tt> function, see above,
-   * with <tt>grad_grads.size()==this->n()</tt> to get the point value of
-   * all tensor polynomials all at once and in a much more efficient way.
+   * with <tt>grad_grads.size()DEAL_II_EQUALS this->n()</tt> to get the point
+   * value of all tensor polynomials all at once and in a much more efficient
+   * way.
    */
   Tensor<2, dim>
   compute_grad_grad(const unsigned int i, const Point<dim> &p) const override;
@@ -565,7 +567,7 @@ TensorProductPolynomials<dim, PolynomialType>::compute_derivative(
               for (unsigned int x = 0; x < dim; ++x)
                 {
                   unsigned int x_order = 0;
-                  if (d == x)
+                  if (d DEAL_II_EQUALS x)
                     ++x_order;
 
                   derivative_1[d] *= v[x][x_order];
@@ -585,9 +587,9 @@ TensorProductPolynomials<dim, PolynomialType>::compute_derivative(
                 for (unsigned int x = 0; x < dim; ++x)
                   {
                     unsigned int x_order = 0;
-                    if (d1 == x)
+                    if (d1 DEAL_II_EQUALS x)
                       ++x_order;
-                    if (d2 == x)
+                    if (d2 DEAL_II_EQUALS x)
                       ++x_order;
 
                     derivative_2[d1][d2] *= v[x][x_order];
@@ -608,11 +610,11 @@ TensorProductPolynomials<dim, PolynomialType>::compute_derivative(
                   for (unsigned int x = 0; x < dim; ++x)
                     {
                       unsigned int x_order = 0;
-                      if (d1 == x)
+                      if (d1 DEAL_II_EQUALS x)
                         ++x_order;
-                      if (d2 == x)
+                      if (d2 DEAL_II_EQUALS x)
                         ++x_order;
-                      if (d3 == x)
+                      if (d3 DEAL_II_EQUALS x)
                         ++x_order;
 
                       derivative_3[d1][d2][d3] *= v[x][x_order];
@@ -634,13 +636,13 @@ TensorProductPolynomials<dim, PolynomialType>::compute_derivative(
                     for (unsigned int x = 0; x < dim; ++x)
                       {
                         unsigned int x_order = 0;
-                        if (d1 == x)
+                        if (d1 DEAL_II_EQUALS x)
                           ++x_order;
-                        if (d2 == x)
+                        if (d2 DEAL_II_EQUALS x)
                           ++x_order;
-                        if (d3 == x)
+                        if (d3 DEAL_II_EQUALS x)
                           ++x_order;
-                        if (d4 == x)
+                        if (d4 DEAL_II_EQUALS x)
                           ++x_order;
 
                         derivative_4[d1][d2][d3][d4] *= v[x][x_order];
@@ -743,7 +745,7 @@ AnisotropicPolynomials<dim>::compute_derivative(const unsigned int i,
               for (unsigned int x = 0; x < dim; ++x)
                 {
                   unsigned int x_order = 0;
-                  if (d == x)
+                  if (d DEAL_II_EQUALS x)
                     ++x_order;
 
                   derivative_1[d] *= v[x][x_order];
@@ -763,9 +765,9 @@ AnisotropicPolynomials<dim>::compute_derivative(const unsigned int i,
                 for (unsigned int x = 0; x < dim; ++x)
                   {
                     unsigned int x_order = 0;
-                    if (d1 == x)
+                    if (d1 DEAL_II_EQUALS x)
                       ++x_order;
-                    if (d2 == x)
+                    if (d2 DEAL_II_EQUALS x)
                       ++x_order;
 
                     derivative_2[d1][d2] *= v[x][x_order];
@@ -786,11 +788,11 @@ AnisotropicPolynomials<dim>::compute_derivative(const unsigned int i,
                   for (unsigned int x = 0; x < dim; ++x)
                     {
                       unsigned int x_order = 0;
-                      if (d1 == x)
+                      if (d1 DEAL_II_EQUALS x)
                         ++x_order;
-                      if (d2 == x)
+                      if (d2 DEAL_II_EQUALS x)
                         ++x_order;
-                      if (d3 == x)
+                      if (d3 DEAL_II_EQUALS x)
                         ++x_order;
 
                       derivative_3[d1][d2][d3] *= v[x][x_order];
@@ -812,13 +814,13 @@ AnisotropicPolynomials<dim>::compute_derivative(const unsigned int i,
                     for (unsigned int x = 0; x < dim; ++x)
                       {
                         unsigned int x_order = 0;
-                        if (d1 == x)
+                        if (d1 DEAL_II_EQUALS x)
                           ++x_order;
-                        if (d2 == x)
+                        if (d2 DEAL_II_EQUALS x)
                           ++x_order;
-                        if (d3 == x)
+                        if (d3 DEAL_II_EQUALS x)
                           ++x_order;
-                        if (d4 == x)
+                        if (d4 DEAL_II_EQUALS x)
                           ++x_order;
 
                         derivative_4[d1][d2][d3][d4] *= v[x][x_order];

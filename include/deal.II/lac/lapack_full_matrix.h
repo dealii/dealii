@@ -584,9 +584,10 @@ public:
 
   /**
    * Estimate the reciprocal of the condition number $1/k(\mathbf A)$ in $L_1$
-   * norm ($1/(||\mathbf A||_1 \, ||\mathbf A^{-1}||_1)$) of a symmetric
-   * positive definite matrix using Cholesky factorization. This function can
-   * only be called if the matrix is already factorized.
+   * norm ($1/(DEAL_II_OR \mathbf ADEAL_II_OR _1 \, DEAL_II_OR \mathbf
+   * A^{-1}DEAL_II_OR _1)$) of a symmetric positive definite matrix using
+   * Cholesky factorization. This function can only be called if the matrix is
+   * already factorized.
    *
    * @note The condition number $k(\mathbf A)$ can be used to estimate the numerical
    * error related to the matrix inversion or the solution of the
@@ -1079,7 +1080,7 @@ LAPACKFullMatrix<number>::fill(const MatrixType &M,
 
           const size_type dst_i = dst_offset_i + i - src_offset_i;
           const size_type dst_j = dst_offset_j + j - src_offset_j;
-          if (dst_i < this->n_rows() && dst_j < this->n_cols())
+          if (dst_i < this->n_rows() DEAL_II_AND dst_j < this->n_cols())
             (*this)(dst_i, dst_j) = factor * entry->value();
         }
     }
@@ -1144,8 +1145,8 @@ inline std::complex<number>
 LAPACKFullMatrix<number>::eigenvalue(const size_type i) const
 {
   Assert(state & LAPACKSupport::eigenvalues, ExcInvalidState());
-  Assert(wr.size() == this->n_rows(), ExcInternalError());
-  Assert(wi.size() == this->n_rows(), ExcInternalError());
+  Assert(wr.size() DEAL_II_EQUALS this->n_rows(), ExcInternalError());
+  Assert(wi.size() DEAL_II_EQUALS this->n_rows(), ExcInternalError());
   AssertIndexRange(i, this->n_rows());
 
   if (numbers::NumberTraits<number>::is_complex)
@@ -1159,7 +1160,8 @@ template <typename number>
 inline number
 LAPACKFullMatrix<number>::singular_value(const size_type i) const
 {
-  Assert(state == LAPACKSupport::svd || state == LAPACKSupport::inverse_svd,
+  Assert(state DEAL_II_EQUALS LAPACKSupport::svd DEAL_II_OR state DEAL_II_EQUALS
+                                                                  LAPACKSupport::inverse_svd,
          LAPACKSupport::ExcState(state));
   AssertIndexRange(i, wr.size());
 
@@ -1171,7 +1173,8 @@ template <typename number>
 inline const LAPACKFullMatrix<number> &
 LAPACKFullMatrix<number>::get_svd_u() const
 {
-  Assert(state == LAPACKSupport::svd || state == LAPACKSupport::inverse_svd,
+  Assert(state DEAL_II_EQUALS LAPACKSupport::svd DEAL_II_OR state DEAL_II_EQUALS
+                                                                  LAPACKSupport::inverse_svd,
          LAPACKSupport::ExcState(state));
 
   return *svd_u;
@@ -1182,7 +1185,8 @@ template <typename number>
 inline const LAPACKFullMatrix<number> &
 LAPACKFullMatrix<number>::get_svd_vt() const
 {
-  Assert(state == LAPACKSupport::svd || state == LAPACKSupport::inverse_svd,
+  Assert(state DEAL_II_EQUALS LAPACKSupport::svd DEAL_II_OR state DEAL_II_EQUALS
+                                                                  LAPACKSupport::inverse_svd,
          LAPACKSupport::ExcState(state));
 
   return *svd_vt;

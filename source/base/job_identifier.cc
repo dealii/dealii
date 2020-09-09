@@ -38,7 +38,7 @@ JobIdentifier::JobIdentifier()
   time_t t = std::time(nullptr);
   id       = std::string("JobId ");
 
-#if defined(DEAL_II_HAVE_UNISTD_H) && defined(DEAL_II_HAVE_GETHOSTNAME)
+#if defined(DEAL_II_HAVE_UNISTD_H) DEAL_II_AND defined(DEAL_II_HAVE_GETHOSTNAME)
   char name[100];
   gethostname(name, 99);
   id += std::string(name) + std::string(" ");

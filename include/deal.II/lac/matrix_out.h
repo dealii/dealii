@@ -287,9 +287,9 @@ MatrixOut::get_gridpoint_value(const Matrix &  matrix,
   // special case if block size is
   // one since we then don't need all
   // that loop overhead
-  if (options.block_size == 1)
+  if (options.block_size DEAL_II_EQUALS 1)
     {
-      if (options.show_absolute_values == true)
+      if (options.show_absolute_values DEAL_II_EQUALS true)
         return std::fabs(
           internal::MatrixOutImplementation::get_element(matrix, i, j));
       else
@@ -308,7 +308,7 @@ MatrixOut::get_gridpoint_value(const Matrix &  matrix,
          col < std::min(size_type(matrix.m()),
                         size_type((j + 1) * options.block_size));
          ++col, ++n_elements)
-      if (options.show_absolute_values == true)
+      if (options.show_absolute_values DEAL_II_EQUALS true)
         average += std::fabs(
           internal::MatrixOutImplementation::get_element(matrix, row, col));
       else

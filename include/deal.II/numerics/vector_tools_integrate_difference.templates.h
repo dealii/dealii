@@ -387,7 +387,7 @@ namespace VectorTools
                 diff += sum * fe_values.JxW(q);
               }
             // Compute the root only, if no derivative values are added later
-            if (norm == L2_norm)
+            if (norm DEAL_II_EQUALS L2_norm)
               diff = std::sqrt(diff);
             break;
 
@@ -496,7 +496,7 @@ namespace VectorTools
             break;
         }
 
-      if (norm == mean)
+      if (norm DEAL_II_EQUALS mean)
         diff = internal::mean_to_double(diff_mean);
 
       // append result of this cell to the end of the vector
@@ -677,7 +677,7 @@ namespace VectorTools
                 diff += sum * fe_values.JxW(q);
               }
             // Compute the root only, if no derivative values are added later
-            if (norm == L2_norm)
+            if (norm DEAL_II_EQUALS L2_norm)
               diff = std::sqrt(diff);
             break;
 
@@ -786,7 +786,7 @@ namespace VectorTools
             break;
         }
 
-      if (norm == mean)
+      if (norm DEAL_II_EQUALS mean)
         diff = internal::mean_to_double(diff_mean);
 
       // append result of this cell to the end of the vector
@@ -817,13 +817,13 @@ namespace VectorTools
 
       const unsigned int n_components = dof.get_fe(0).n_components();
 
-      Assert(exact_solution.n_components == n_components,
+      Assert(exact_solution.n_components DEAL_II_EQUALS n_components,
              ExcDimensionMismatch(exact_solution.n_components, n_components));
 
       if (weight != nullptr)
         {
-          Assert((weight->n_components == 1) ||
-                   (weight->n_components == n_components),
+          Assert((weight->n_components DEAL_II_EQUALS 1)DEAL_II_OR(
+                   weight->n_components DEAL_II_EQUALS n_components),
                  ExcDimensionMismatch(weight->n_components, n_components));
         }
 
@@ -855,7 +855,7 @@ namespace VectorTools
           case W1p_seminorm:
           case W1infty_seminorm:
             update_flags |= UpdateFlags(update_gradients);
-            if (spacedim == dim + 1)
+            if (spacedim DEAL_II_EQUALS dim + 1)
               update_flags |= UpdateFlags(update_normal_vectors);
 
             break;
@@ -864,7 +864,7 @@ namespace VectorTools
           case W1p_norm:
           case W1infty_norm:
             update_flags |= UpdateFlags(update_gradients);
-            if (spacedim == dim + 1)
+            if (spacedim DEAL_II_EQUALS dim + 1)
               update_flags |= UpdateFlags(update_normal_vectors);
             DEAL_II_FALLTHROUGH;
 
@@ -935,13 +935,13 @@ namespace VectorTools
 
       const unsigned int n_components = dof.get_fe(0).n_components();
 
-      Assert(exact_solution.n_components == n_components,
+      Assert(exact_solution.n_components DEAL_II_EQUALS n_components,
              ExcDimensionMismatch(exact_solution.n_components, n_components));
 
       if (weight != nullptr)
         {
-          Assert((weight->n_components == 1) ||
-                   (weight->n_components == n_components),
+          Assert((weight->n_components DEAL_II_EQUALS 1)DEAL_II_OR(
+                   weight->n_components DEAL_II_EQUALS n_components),
                  ExcDimensionMismatch(weight->n_components, n_components));
         }
 
@@ -973,7 +973,7 @@ namespace VectorTools
           case W1p_seminorm:
           case W1infty_seminorm:
             update_flags |= UpdateFlags(update_gradients);
-            if (spacedim == dim + 1)
+            if (spacedim DEAL_II_EQUALS dim + 1)
               update_flags |= UpdateFlags(update_normal_vectors);
 
             break;
@@ -982,7 +982,7 @@ namespace VectorTools
           case W1p_norm:
           case W1infty_norm:
             update_flags |= UpdateFlags(update_gradients);
-            if (spacedim == dim + 1)
+            if (spacedim DEAL_II_EQUALS dim + 1)
               update_flags |= UpdateFlags(update_normal_vectors);
             DEAL_II_FALLTHROUGH;
 
@@ -1242,7 +1242,7 @@ namespace VectorTools
                        const NormType &                    norm,
                        const double                        exponent)
   {
-    Assert(cellwise_error.size() == tria.n_active_cells(),
+    Assert(cellwise_error.size() DEAL_II_EQUALS tria.n_active_cells(),
            ExcMessage("input vector cell_error has invalid size!"));
 #ifdef DEBUG
     {

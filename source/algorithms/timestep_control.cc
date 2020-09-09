@@ -101,7 +101,7 @@ TimestepControl::advance()
 bool
 TimestepControl::print()
 {
-  if (print_step == 0.)
+  if (print_step DEAL_II_EQUALS 0.)
     return false;
   if (print_step < 0.)
     return true;

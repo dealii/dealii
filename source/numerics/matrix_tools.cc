@@ -85,16 +85,16 @@ namespace MatrixTools
     Vector<number> &                                 right_hand_side,
     const bool                                       eliminate_columns)
   {
-    Assert(matrix.n() == right_hand_side.size(),
+    Assert(matrix.n() DEAL_II_EQUALS right_hand_side.size(),
            ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
-    Assert(matrix.n() == solution.size(),
+    Assert(matrix.n() DEAL_II_EQUALS solution.size(),
            ExcDimensionMismatch(matrix.n(), solution.size()));
-    Assert(matrix.n() == matrix.m(),
+    Assert(matrix.n() DEAL_II_EQUALS matrix.m(),
            ExcDimensionMismatch(matrix.n(), matrix.m()));
 
     // if no boundary values are to be applied
     // simply return
-    if (boundary_values.size() == 0)
+    if (boundary_values.size() DEAL_II_EQUALS 0)
       return;
 
 
@@ -204,8 +204,8 @@ namespace MatrixTools
                                          comp);
 
                 // check whether this line has an entry in the
-                // regarding column (check for ==dof_number and !=
-                // next_row, since if row==dof_number-1, *p is a
+                // regarding column (check for DEAL_II_EQUALS dof_number and !=
+                // next_row, since if rowDEAL_II_EQUALS dof_number-1, *p is a
                 // past-the-end pointer but points to dof_number
                 // anyway...)
                 //
@@ -213,7 +213,8 @@ namespace MatrixTools
                 // we have assumed that the sparsity pattern is
                 // symmetric and we only walk over those rows for
                 // which the current row has a column entry
-                Assert((p != matrix.end(row)) && (p->column() == dof_number),
+                Assert((p != matrix.end(row))
+                         DEAL_II_AND(p->column() DEAL_II_EQUALS dof_number),
                        ExcMessage(
                          "This function is trying to access an element of the "
                          "matrix that doesn't seem to exist. Are you using a "
@@ -248,24 +249,28 @@ namespace MatrixTools
   {
     const unsigned int blocks = matrix.n_block_rows();
 
-    Assert(matrix.n() == right_hand_side.size(),
+    Assert(matrix.n() DEAL_II_EQUALS right_hand_side.size(),
            ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
-    Assert(matrix.n() == solution.size(),
+    Assert(matrix.n() DEAL_II_EQUALS solution.size(),
            ExcDimensionMismatch(matrix.n(), solution.size()));
-    Assert(matrix.n_block_rows() == matrix.n_block_cols(), ExcNotQuadratic());
-    Assert(matrix.get_sparsity_pattern().get_row_indices() ==
-             matrix.get_sparsity_pattern().get_column_indices(),
+    Assert(matrix.n_block_rows() DEAL_II_EQUALS matrix.n_block_cols(),
            ExcNotQuadratic());
-    Assert(matrix.get_sparsity_pattern().get_column_indices() ==
-             solution.get_block_indices(),
-           ExcBlocksDontMatch());
-    Assert(matrix.get_sparsity_pattern().get_row_indices() ==
-             right_hand_side.get_block_indices(),
+    Assert(matrix.get_sparsity_pattern()
+             .get_row_indices() DEAL_II_EQUALS matrix.get_sparsity_pattern()
+             .get_column_indices(),
+           ExcNotQuadratic());
+    Assert(
+      matrix.get_sparsity_pattern().get_column_indices()
+        DEAL_II_EQUALS solution.get_block_indices(),
+      ExcBlocksDontMatch());
+    Assert(matrix.get_sparsity_pattern()
+             .get_row_indices()
+               DEAL_II_EQUALS right_hand_side.get_block_indices(),
            ExcBlocksDontMatch());
 
     // if no boundary values are to be applied
     // simply return
-    if (boundary_values.size() == 0)
+    if (boundary_values.size() DEAL_II_EQUALS 0)
       return;
 
 
@@ -296,7 +301,7 @@ namespace MatrixTools
       }
     // nothing found on all diagonal
     // blocks? if so, use 1.0 instead
-    if (first_nonzero_diagonal_entry == 0)
+    if (first_nonzero_diagonal_entry DEAL_II_EQUALS 0)
       first_nonzero_diagonal_entry = 1;
 
 
@@ -335,7 +340,7 @@ namespace MatrixTools
         // in a row for square matrices
         for (unsigned int block_col = 0; block_col < blocks; ++block_col)
           for (typename SparseMatrix<number>::iterator p =
-                 (block_col == block_index.first ?
+                 (block_col DEAL_II_EQUALS block_index.first ?
                     matrix.block(block_index.first, block_col)
                         .begin(block_index.second) +
                       1 :
@@ -429,7 +434,7 @@ namespace MatrixTools
                 // interesting rows in the present block.  don't use the
                 // diagonal element of the diagonal block
                 for (typename SparseMatrix<number>::iterator q =
-                       (block_index.first == block_row ?
+                       (block_index.first DEAL_II_EQUALS block_row ?
                           transpose_matrix.begin(block_index.second) + 1 :
                           transpose_matrix.begin(block_index.second));
                      q != transpose_matrix.end(block_index.second);
@@ -452,10 +457,11 @@ namespace MatrixTools
                     typename SparseMatrix<number>::iterator p =
                       this_matrix.end();
 
-                    if (this_sparsity.n_rows() == this_sparsity.n_cols())
+                    if (this_sparsity.n_rows()
+                          DEAL_II_EQUALS this_sparsity.n_cols())
                       {
-                        if (this_matrix.begin(row)->column() ==
-                            block_index.second)
+                        if (this_matrix.begin(row)
+                              ->column() DEAL_II_EQUALS block_index.second)
                           p = this_matrix.begin(row);
                         else
                           p = Utilities::lower_bound(this_matrix.begin(row) + 1,
@@ -470,17 +476,17 @@ namespace MatrixTools
                                                  comp);
 
                     // check whether this line has an entry in the
-                    // regarding column (check for ==dof_number and !=
-                    // next_row, since if row==dof_number-1, *p is a
-                    // past-the-end pointer but points to dof_number
+                    // regarding column (check for DEAL_II_EQUALS dof_number and
+                    // != next_row, since if rowDEAL_II_EQUALS dof_number-1, *p
+                    // is a past-the-end pointer but points to dof_number
                     // anyway...)
                     //
                     // there should be such an entry! we know this because
                     // we have assumed that the sparsity pattern is
                     // symmetric and we only walk over those rows for
                     // which the current row has a column entry
-                    Assert((p->column() == block_index.second) &&
-                             (p != this_matrix.end(row)),
+                    Assert((p->column() DEAL_II_EQUALS block_index.second)
+                             DEAL_II_AND(p != this_matrix.end(row)),
                            ExcInternalError());
 
                     // correct right hand side
@@ -509,16 +515,16 @@ namespace MatrixTools
     Vector<number> &                                 local_rhs,
     const bool                                       eliminate_columns)
   {
-    Assert(local_dof_indices.size() == local_matrix.m(),
+    Assert(local_dof_indices.size() DEAL_II_EQUALS local_matrix.m(),
            ExcDimensionMismatch(local_dof_indices.size(), local_matrix.m()));
-    Assert(local_dof_indices.size() == local_matrix.n(),
+    Assert(local_dof_indices.size() DEAL_II_EQUALS local_matrix.n(),
            ExcDimensionMismatch(local_dof_indices.size(), local_matrix.n()));
-    Assert(local_dof_indices.size() == local_rhs.size(),
+    Assert(local_dof_indices.size() DEAL_II_EQUALS local_rhs.size(),
            ExcDimensionMismatch(local_dof_indices.size(), local_rhs.size()));
 
     // if there is nothing to do, then exit
     // right away
-    if (boundary_values.size() == 0)
+    if (boundary_values.size() DEAL_II_EQUALS 0)
       return;
 
     // otherwise traverse all the dofs used in
@@ -563,11 +569,11 @@ namespace MatrixTools
             // everything remains positive, or
             // by the average diagonal value if
             // zero
-            if (local_matrix(i, i) == 0.)
+            if (local_matrix(i, i) DEAL_II_EQUALS 0.)
               {
                 // if average diagonal hasn't
                 // yet been computed, do so now
-                if (average_diagonal == 0.)
+                if (average_diagonal DEAL_II_EQUALS 0.)
                   {
                     unsigned int nonzero_diagonals = 0;
                     for (unsigned int k = 0; k < n_local_dofs; ++k)
@@ -585,7 +591,7 @@ namespace MatrixTools
                 // only if all diagonal entries
                 // are zero, then resort to the
                 // last measure: choose one
-                if (average_diagonal == 0.)
+                if (average_diagonal DEAL_II_EQUALS 0.)
                   average_diagonal = 1.;
 
                 local_matrix(i, i) = average_diagonal;
@@ -599,7 +605,7 @@ namespace MatrixTools
 
             // finally do the elimination step
             // if requested
-            if (eliminate_columns == true)
+            if (eliminate_columns DEAL_II_EQUALS true)
               {
                 for (unsigned int row = 0; row < n_local_dofs; ++row)
                   if (row != i)

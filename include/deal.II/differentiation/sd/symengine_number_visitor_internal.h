@@ -670,8 +670,9 @@ namespace Differentiation
               intermediate_symbols_exprs[i].first;
             const SymEngine::RCP<const SymEngine::Basic> &cse_expr =
               intermediate_symbols_exprs[i].second;
-            Assert(substitution_value_map.find(cse_symbol) ==
-                     substitution_value_map.end(),
+            Assert(substitution_value_map
+                     .find(cse_symbol)
+                       DEAL_II_EQUALS substitution_value_map.end(),
                    ExcMessage(
                      "Reduced symbol already appears in substitution map. "
                      "Is there a clash between the reduced symbol name and "
@@ -760,8 +761,8 @@ namespace Differentiation
         // ownership of the dependent function expression definition
         // to the entries in reduced_exprs. So its size thus determines
         // whether CSE has been executed or not.
-        return (n_reduced_expressions() > 0) ||
-               (n_intermediate_expressions() > 0);
+        return (n_reduced_expressions() > 0)
+          DEAL_II_OR(n_intermediate_expressions() > 0);
       }
 
 
@@ -846,7 +847,7 @@ namespace Differentiation
         // dependent_functions and cse.reduced_exprs should be
         // the same. We could keep the former so that we can print
         // out the original expressions if we wish to do so.
-        if (use_cse == false)
+        if (use_cse DEAL_II_EQUALS false)
           dependent_functions = outputs;
         else
           {
@@ -862,11 +863,11 @@ namespace Differentiation
         const std::vector<ReturnType> &substitution_values)
       {
         Assert(
-          dependent_functions.size() == 1,
+          dependent_functions.size() DEAL_II_EQUALS 1,
           ExcMessage(
             "Cannot use this call function when more than one symbolic expression is to be evaluated."));
         Assert(
-          substitution_values.size() == independent_symbols.size(),
+          substitution_values.size() DEAL_II_EQUALS independent_symbols.size(),
           ExcMessage(
             "Input substitution vector does not match size of symbol vector."));
 
@@ -942,9 +943,11 @@ namespace Differentiation
         Archive &          ar,
         const unsigned int version)
       {
-        Assert(cse.executed() == false, ExcInternalError());
-        Assert(cse.n_intermediate_expressions() == 0, ExcInternalError());
-        Assert(cse.n_reduced_expressions() == 0, ExcInternalError());
+        Assert(cse.executed() DEAL_II_EQUALS false, ExcInternalError());
+        Assert(cse.n_intermediate_expressions() DEAL_II_EQUALS 0,
+               ExcInternalError());
+        Assert(cse.n_reduced_expressions() DEAL_II_EQUALS 0,
+               ExcInternalError());
 
         // CSE and dependent variables both require the independent
         // symbols, so we deserialize them first. The dependent variables
@@ -976,7 +979,7 @@ namespace Differentiation
           }
 
         // Check to see if CSE has been performed
-        if (print_cse_reductions && cse.executed())
+        if (print_cse_reductions DEAL_II_AND cse.executed())
           {
             cse.print(stream);
           }

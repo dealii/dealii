@@ -181,7 +181,7 @@ for (scalar : REAL_AND_COMPLEX_SCALARS; deal_II_dimension : DIMENSIONS;
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
-#if deal_II_dimension == deal_II_space_dimension
+#if deal_II_dimension DEAL_II_EQUALS deal_II_space_dimension
 
     // non-hp versions of create_laplace_matrix
     template void MatrixCreator::create_laplace_matrix<deal_II_dimension>(

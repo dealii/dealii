@@ -117,7 +117,7 @@ public:
    * Move constructor. Creates a new vector by stealing the internal data of
    * the given argument vector.
    */
-  BlockVector(BlockVector<Number> && /*v*/) noexcept = default;
+  BlockVector(BlockVector<Number> DEAL_II_AND /*v*/) noexcept = default;
 
   /**
    * Copy constructor taking a BlockVector of another data type. This will
@@ -215,7 +215,7 @@ public:
    * the contents of the given argument vector.
    */
   BlockVector<Number> &
-  operator=(BlockVector<Number> && /*v*/) = default; // NOLINT
+  operator=(BlockVector<Number> DEAL_II_AND /*v*/) = default; // NOLINT
 
   /**
    * Copy operator for template arguments of different types. Resize the
@@ -250,7 +250,8 @@ public:
    * collect_sizes() to update the block system's knowledge of its individual
    * block's sizes.
    *
-   * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
+   * If <tt>omit_zeroing_entriesDEAL_II_EQUALS false</tt>, the vector is filled
+   * with zeros.
    */
   void
   reinit(const unsigned int n_blocks,
@@ -265,7 +266,8 @@ public:
    * If the number of blocks is the same as before this function was called,
    * all vectors remain the same and reinit() is called for each vector.
    *
-   * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
+   * If <tt>omit_zeroing_entriesDEAL_II_EQUALS false</tt>, the vector is filled
+   * with zeros.
    *
    * Note that you must call this (or the other reinit() functions) function,
    * rather than calling the reinit() functions of an individual block, to
@@ -284,7 +286,8 @@ public:
    * If the number of blocks is the same as before this function was called,
    * all vectors remain the same and reinit() is called for each vector.
    *
-   * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
+   * If <tt>omit_zeroing_entriesDEAL_II_EQUALS false</tt>, the vector is filled
+   * with zeros.
    */
   void
   reinit(const BlockIndices &block_indices,
@@ -399,7 +402,7 @@ BlockVector<Number>::BlockVector(const std::vector<size_type> &block_sizes,
       std::copy(start, end, this->block(b).begin());
       start = end;
     };
-  Assert(start == end, ExcIteratorRangeDoesNotMatchVectorSize());
+  Assert(start DEAL_II_EQUALS end, ExcIteratorRangeDoesNotMatchVectorSize());
 }
 
 

@@ -81,8 +81,7 @@ namespace Particles
     /**
      * Compare for equality.
      */
-    bool
-    operator==(const ParticleIterator<dim, spacedim> &) const;
+    bool operator DEAL_II_EQUALS(const ParticleIterator<dim, spacedim> &) const;
 
     /**
      * Compare for inequality.

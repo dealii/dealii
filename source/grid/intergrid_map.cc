@@ -92,7 +92,8 @@ InterGridMap<MeshType>::make_mapping(const MeshType &source_grid,
 
   // little assertion that the two grids
   // are indeed related:
-  Assert(dst_cell == destination_grid.end(0), ExcIncompatibleGrids());
+  Assert(dst_cell DEAL_II_EQUALS destination_grid.end(0),
+         ExcIncompatibleGrids());
 }
 
 
@@ -107,22 +108,23 @@ InterGridMap<MeshType>::set_mapping(const cell_iterator &src_cell,
 
   // if both cells have children, we may
   // recurse further into the hierarchy
-  if (src_cell->has_children() && dst_cell->has_children())
+  if (src_cell->has_children() DEAL_II_AND dst_cell->has_children())
     {
-      Assert(src_cell->n_children() ==
+      Assert(src_cell->n_children() DEAL_II_EQUALS
                GeometryInfo<MeshType::dimension>::max_children_per_cell,
              ExcNotImplemented());
-      Assert(dst_cell->n_children() ==
+      Assert(dst_cell->n_children() DEAL_II_EQUALS
                GeometryInfo<MeshType::dimension>::max_children_per_cell,
              ExcNotImplemented());
-      Assert(src_cell->refinement_case() == dst_cell->refinement_case(),
+      Assert(src_cell->refinement_case()
+               DEAL_II_EQUALS dst_cell->refinement_case(),
              ExcNotImplemented());
       for (unsigned int c = 0;
            c < GeometryInfo<MeshType::dimension>::max_children_per_cell;
            ++c)
         set_mapping(src_cell->child(c), dst_cell->child(c));
     }
-  else if (src_cell->has_children() && !dst_cell->has_children())
+  else if (src_cell->has_children() DEAL_II_AND !dst_cell->has_children())
     // src grid is more refined here.
     // set entries for all children
     // of this cell to the one
@@ -156,7 +158,7 @@ template <class MeshType>
 typename InterGridMap<MeshType>::cell_iterator InterGridMap<MeshType>::
                                                operator[](const cell_iterator &source_cell) const
 {
-  Assert(source_cell.state() == IteratorState::valid,
+  Assert(source_cell.state() DEAL_II_EQUALS IteratorState::valid,
          ExcInvalidKey(source_cell));
   Assert(source_cell->level() <= static_cast<int>(mapping.size()),
          ExcInvalidKey(source_cell));

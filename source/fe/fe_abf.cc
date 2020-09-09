@@ -201,7 +201,8 @@ FE_ABF<dim>::initialize_support_points(const unsigned int deg)
 
       boundary_weights.reinit(n_face_points, legendre.n());
 
-      //       Assert (face_points.size() == this->n_dofs_per_face(),
+      //       Assert (face_points.size() DEAL_II_EQUALS
+      //       this->n_dofs_per_face(),
       //            ExcInternalError());
 
       for (unsigned int k = 0; k < n_face_points; ++k)
@@ -308,7 +309,7 @@ FE_ABF<dim>::initialize_support_points(const unsigned int deg)
         }
     }
 
-  Assert(current == this->generalized_support_points.size(),
+  Assert(current DEAL_II_EQUALS this->generalized_support_points.size(),
          ExcInternalError());
 }
 
@@ -328,7 +329,7 @@ template <int dim>
 void
 FE_ABF<dim>::initialize_restriction()
 {
-  if (dim == 1)
+  if (dim DEAL_II_EQUALS 1)
     {
       unsigned int iso = RefinementCase<dim>::isotropic_refinement - 1;
       for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_cell;
@@ -409,7 +410,7 @@ FE_ABF<dim>::initialize_restriction()
         }
     }
 
-  if (rt_order == 0)
+  if (rt_order DEAL_II_EQUALS 0)
     return;
 
   // Create Legendre basis for the
@@ -477,7 +478,7 @@ template <int dim>
 std::vector<unsigned int>
 FE_ABF<dim>::get_dpo_vector(const unsigned int rt_order)
 {
-  if (dim == 1)
+  if (dim DEAL_II_EQUALS 1)
     {
       Assert(false, ExcImpossibleInDim(1));
       return std::vector<unsigned int>();
@@ -554,13 +555,14 @@ FE_ABF<dim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &support_point_values,
   std::vector<double> &              nodal_values) const
 {
-  Assert(support_point_values.size() == this->generalized_support_points.size(),
+  Assert(support_point_values.size()
+           DEAL_II_EQUALS this->generalized_support_points.size(),
          ExcDimensionMismatch(support_point_values.size(),
                               this->generalized_support_points.size()));
-  Assert(support_point_values[0].size() == this->n_components(),
+  Assert(support_point_values[0].size() DEAL_II_EQUALS this->n_components(),
          ExcDimensionMismatch(support_point_values[0].size(),
                               this->n_components()));
-  Assert(nodal_values.size() == this->n_dofs_per_cell(),
+  Assert(nodal_values.size() DEAL_II_EQUALS this->n_dofs_per_cell(),
          ExcDimensionMismatch(nodal_values.size(), this->n_dofs_per_cell()));
 
   std::fill(nodal_values.begin(), nodal_values.end(), 0.);

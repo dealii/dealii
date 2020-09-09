@@ -130,12 +130,13 @@ SparseDirectUMFPACK::sort_arrays(const SparseMatrix<number> &matrix)
       // that the row has at least two entries and that the diagonal entry
       // is really in the wrong place
       long int cursor = Ap[row];
-      while ((cursor < Ap[row + 1] - 1) && (Ai[cursor] > Ai[cursor + 1]))
+      while ((cursor < Ap[row + 1] - 1)
+               DEAL_II_AND(Ai[cursor] > Ai[cursor + 1]))
         {
           std::swap(Ai[cursor], Ai[cursor + 1]);
 
           std::swap(Ax[cursor], Ax[cursor + 1]);
-          if (numbers::NumberTraits<number>::is_complex == true)
+          if (numbers::NumberTraits<number>::is_complex DEAL_II_EQUALS true)
             std::swap(Az[cursor], Az[cursor + 1]);
 
           ++cursor;
@@ -153,12 +154,13 @@ SparseDirectUMFPACK::sort_arrays(const SparseMatrixEZ<number> &matrix)
   for (size_type row = 0; row < matrix.m(); ++row)
     {
       long int cursor = Ap[row];
-      while ((cursor < Ap[row + 1] - 1) && (Ai[cursor] > Ai[cursor + 1]))
+      while ((cursor < Ap[row + 1] - 1)
+               DEAL_II_AND(Ai[cursor] > Ai[cursor + 1]))
         {
           std::swap(Ai[cursor], Ai[cursor + 1]);
 
           std::swap(Ax[cursor], Ax[cursor + 1]);
-          if (numbers::NumberTraits<number>::is_complex == true)
+          if (numbers::NumberTraits<number>::is_complex DEAL_II_EQUALS true)
             std::swap(Az[cursor], Az[cursor + 1]);
 
           ++cursor;
@@ -183,22 +185,24 @@ SparseDirectUMFPACK::sort_arrays(const BlockSparseMatrix<number> &matrix)
       for (size_type block = 0; block < matrix.n_block_cols(); ++block)
         {
           // find the next out-of-order element
-          while ((cursor < Ap[row + 1] - 1) && (Ai[cursor] < Ai[cursor + 1]))
+          while ((cursor < Ap[row + 1] - 1)
+                   DEAL_II_AND(Ai[cursor] < Ai[cursor + 1]))
             ++cursor;
 
           // if there is none, then just go on
-          if (cursor == Ap[row + 1] - 1)
+          if (cursor DEAL_II_EQUALS Ap[row + 1] - 1)
             break;
 
           // otherwise swap this entry with successive ones as long as
           // necessary
           long int element = cursor;
-          while ((element < Ap[row + 1] - 1) && (Ai[element] > Ai[element + 1]))
+          while ((element < Ap[row + 1] - 1)
+                   DEAL_II_AND(Ai[element] > Ai[element + 1]))
             {
               std::swap(Ai[element], Ai[element + 1]);
 
               std::swap(Ax[element], Ax[element + 1]);
-              if (numbers::NumberTraits<number>::is_complex == true)
+              if (numbers::NumberTraits<number>::is_complex DEAL_II_EQUALS true)
                 std::swap(Az[cursor], Az[cursor + 1]);
 
               ++element;
@@ -213,7 +217,7 @@ template <class Matrix>
 void
 SparseDirectUMFPACK::factorize(const Matrix &matrix)
 {
-  Assert(matrix.m() == matrix.n(), ExcNotQuadratic());
+  Assert(matrix.m() DEAL_II_EQUALS matrix.n(), ExcNotQuadratic());
 
   clear();
 
@@ -245,14 +249,15 @@ SparseDirectUMFPACK::factorize(const Matrix &matrix)
   Ap.resize(N + 1);
   Ai.resize(matrix.n_nonzero_elements());
   Ax.resize(matrix.n_nonzero_elements());
-  if (numbers::NumberTraits<number>::is_complex == true)
+  if (numbers::NumberTraits<number>::is_complex DEAL_II_EQUALS true)
     Az.resize(matrix.n_nonzero_elements());
 
   // first fill row lengths array
   Ap[0] = 0;
   for (size_type row = 1; row <= N; ++row)
     Ap[row] = Ap[row - 1] + matrix.get_row_length(row - 1);
-  Assert(static_cast<size_type>(Ap.back()) == Ai.size(), ExcInternalError());
+  Assert(static_cast<size_type>(Ap.back()) DEAL_II_EQUALS Ai.size(),
+         ExcInternalError());
 
   // then copy over matrix elements. note that for sparse matrices,
   // iterators are sorted so that they traverse each row from start to end
@@ -274,7 +279,7 @@ SparseDirectUMFPACK::factorize(const Matrix &matrix)
             // write entry into the first free one for this row
             Ai[row_pointers[row]] = p->column();
             Ax[row_pointers[row]] = std::real(p->value());
-            if (numbers::NumberTraits<number>::is_complex == true)
+            if (numbers::NumberTraits<number>::is_complex DEAL_II_EQUALS true)
               Az[row_pointers[row]] = std::imag(p->value());
 
             // then move pointer ahead
@@ -284,7 +289,7 @@ SparseDirectUMFPACK::factorize(const Matrix &matrix)
 
     // at the end, we should have written all rows completely
     for (size_type i = 0; i < Ap.size() - 1; ++i)
-      Assert(row_pointers[i] == Ap[i + 1], ExcInternalError());
+      Assert(row_pointers[i] DEAL_II_EQUALS Ap[i + 1], ExcInternalError());
   }
 
   // make sure that the elements in each row are sorted. we have to be more
@@ -293,7 +298,7 @@ SparseDirectUMFPACK::factorize(const Matrix &matrix)
   sort_arrays(matrix);
 
   int status;
-  if (numbers::NumberTraits<number>::is_complex == false)
+  if (numbers::NumberTraits<number>::is_complex DEAL_II_EQUALS false)
     status = umfpack_dl_symbolic(N,
                                  N,
                                  Ap.data(),
@@ -312,10 +317,10 @@ SparseDirectUMFPACK::factorize(const Matrix &matrix)
                                  &symbolic_decomposition,
                                  control.data(),
                                  nullptr);
-  AssertThrow(status == UMFPACK_OK,
+  AssertThrow(status DEAL_II_EQUALS UMFPACK_OK,
               ExcUMFPACKError("umfpack_dl_symbolic", status));
 
-  if (numbers::NumberTraits<number>::is_complex == false)
+  if (numbers::NumberTraits<number>::is_complex DEAL_II_EQUALS false)
     status = umfpack_dl_numeric(Ap.data(),
                                 Ai.data(),
                                 Ax.data(),
@@ -332,7 +337,7 @@ SparseDirectUMFPACK::factorize(const Matrix &matrix)
                                 &numeric_decomposition,
                                 control.data(),
                                 nullptr);
-  AssertThrow(status == UMFPACK_OK,
+  AssertThrow(status DEAL_II_EQUALS UMFPACK_OK,
               ExcUMFPACKError("umfpack_dl_numeric", status));
 
   umfpack_dl_free_symbolic(&symbolic_decomposition);
@@ -347,9 +352,9 @@ SparseDirectUMFPACK::solve(Vector<double> &rhs_and_solution,
   // make sure that some kind of factorize() call has happened before
   Assert(Ap.size() != 0, ExcNotInitialized());
   Assert(Ai.size() != 0, ExcNotInitialized());
-  Assert(Ai.size() == Ax.size(), ExcNotInitialized());
+  Assert(Ai.size() DEAL_II_EQUALS Ax.size(), ExcNotInitialized());
 
-  Assert(Az.size() == 0,
+  Assert(Az.size() DEAL_II_EQUALS 0,
          ExcMessage("You have previously factored a matrix using this class "
                     "that had complex-valued entries. This then requires "
                     "applying the factored matrix to a complex-valued "
@@ -374,7 +379,7 @@ SparseDirectUMFPACK::solve(Vector<double> &rhs_and_solution,
                                       numeric_decomposition,
                                       control.data(),
                                       nullptr);
-  AssertThrow(status == UMFPACK_OK,
+  AssertThrow(status DEAL_II_EQUALS UMFPACK_OK,
               ExcUMFPACKError("umfpack_dl_solve", status));
 }
 
@@ -388,13 +393,13 @@ SparseDirectUMFPACK::solve(Vector<std::complex<double>> &rhs_and_solution,
   // make sure that some kind of factorize() call has happened before
   Assert(Ap.size() != 0, ExcNotInitialized());
   Assert(Ai.size() != 0, ExcNotInitialized());
-  Assert(Ai.size() == Ax.size(), ExcNotInitialized());
+  Assert(Ai.size() DEAL_II_EQUALS Ax.size(), ExcNotInitialized());
 
   // First see whether the matrix that was factorized was complex-valued.
   // If so, just apply the complex factorization to the vector.
   if (Az.size() != 0)
     {
-      Assert(Ax.size() == Az.size(), ExcInternalError());
+      Assert(Ax.size() DEAL_II_EQUALS Az.size(), ExcInternalError());
 
       // It would be nice if we could just present a pointer to the
       // first element of the complex-valued solution vector and let
@@ -444,7 +449,7 @@ SparseDirectUMFPACK::solve(Vector<std::complex<double>> &rhs_and_solution,
                                           numeric_decomposition,
                                           control.data(),
                                           nullptr);
-      AssertThrow(status == UMFPACK_OK,
+      AssertThrow(status DEAL_II_EQUALS UMFPACK_OK,
                   ExcUMFPACKError("umfpack_dl_solve", status));
 
       // Now put things back together into the output vector

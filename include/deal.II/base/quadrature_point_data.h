@@ -105,7 +105,7 @@ public:
   /**
    * Same as above but for a range of iterators starting at @p cell_start
    * until, but not including, @p cell_end for all locally owned cells, i.e.
-   * for which `cell->is_locally_owned()==true` .
+   * for which `cell->is_locally_owned()DEAL_II_EQUALS true` .
    */
   template <typename T = DataType>
   void
@@ -373,14 +373,14 @@ namespace parallel
      *   // a function to pack scalars into a vector
      *   void pack_values(std::vector<double> &values) const
      *   {
-     *     Assert (values.size()==2, ExcInternalError());
+     *     Assert (values.size()DEAL_II_EQUALS 2, ExcInternalError());
      *     values[0] = elasticity_parameter_lambda;
      *     values[1] = elasticity_parameter_mu;
      *   }
      *
      *   void unpack_values(const std::vector<double> &values)
      *   {
-     *     Assert (values.size() ==2, ExcInternalError());
+     *     Assert (values.size() DEAL_II_EQUALS 2, ExcInternalError());
      *     elasticity_parameter_lambda = values[0];
      *     elasticity_parameter_mu     = values[1];
      *   }
@@ -610,10 +610,11 @@ CellDataStorage<CellIteratorType, DataType>::initialize(
   // to the triangulation object
   if (!tria)
     tria = &cell->get_triangulation();
-  Assert(&cell->get_triangulation() == tria, ExcTriangulationMismatch());
+  Assert(&cell->get_triangulation() DEAL_II_EQUALS tria,
+         ExcTriangulationMismatch());
 
   const auto key = cell->id();
-  if (map.find(key) == map.end())
+  if (map.find(key) DEAL_II_EQUALS map.end())
     {
       map[key] = std::vector<std::shared_ptr<DataType>>(n_q_points);
       // we need to initialize one-by-one as the std::vector<>(q, T())
@@ -648,9 +649,10 @@ CellDataStorage<CellIteratorType, DataType>::erase(const CellIteratorType &cell)
 {
   const auto key = cell->id();
   const auto it  = map.find(key);
-  if (it == map.end())
+  if (it DEAL_II_EQUALS map.end())
     return false;
-  Assert(&cell->get_triangulation() == tria, ExcTriangulationMismatch());
+  Assert(&cell->get_triangulation() DEAL_II_EQUALS tria,
+         ExcTriangulationMismatch());
   for (unsigned int i = 0; i < it->second.size(); i++)
     {
       Assert(
@@ -659,7 +661,7 @@ CellDataStorage<CellIteratorType, DataType>::erase(const CellIteratorType &cell)
           "Can not erase the cell data multiple objects reference its data."));
     }
 
-  return (map.erase(key) == 1);
+  return (map.erase(key) DEAL_II_EQUALS 1);
 }
 
 
@@ -696,16 +698,17 @@ CellDataStorage<CellIteratorType, DataType>::get_data(
 {
   static_assert(std::is_base_of<DataType, T>::value,
                 "User's T class should be derived from user's DataType class");
-  Assert(&cell->get_triangulation() == tria, ExcTriangulationMismatch());
+  Assert(&cell->get_triangulation() DEAL_II_EQUALS tria,
+         ExcTriangulationMismatch());
 
   const auto it = map.find(cell->id());
   Assert(it != map.end(), ExcMessage("Could not find data for the cell"));
 
   // It would be nice to have a specialized version of this function for
-  // T==DataType. However explicit (i.e full) specialization of a member
-  // template is only allowed when the enclosing class is also explicitly (i.e
-  // fully) specialized. Thus, stick with copying of shared pointers even when
-  // the T==DataType:
+  // TDEAL_II_EQUALS DataType. However explicit (i.e full) specialization of a
+  // member template is only allowed when the enclosing class is also explicitly
+  // (i.e fully) specialized. Thus, stick with copying of shared pointers even
+  // when the TDEAL_II_EQUALS DataType:
   std::vector<std::shared_ptr<T>> res(it->second.size());
   for (unsigned int q = 0; q < res.size(); q++)
     {
@@ -725,14 +728,15 @@ CellDataStorage<CellIteratorType, DataType>::get_data(
 {
   static_assert(std::is_base_of<DataType, T>::value,
                 "User's T class should be derived from user's DataType class");
-  Assert(&cell->get_triangulation() == tria, ExcTriangulationMismatch());
+  Assert(&cell->get_triangulation() DEAL_II_EQUALS tria,
+         ExcTriangulationMismatch());
 
   const auto it = map.find(cell->id());
   Assert(it != map.end(), ExcMessage("Could not find QP data for the cell"));
 
   // Cast base class to the desired class. This has to be done irrespectively of
-  // T==DataType as we need to return shared_ptr<const T> to make sure the user
-  // does not modify the content of QP objects
+  // TDEAL_II_EQUALS DataType as we need to return shared_ptr<const T> to make
+  // sure the user does not modify the content of QP objects
   std::vector<std::shared_ptr<const T>> res(it->second.size());
   for (unsigned int q = 0; q < res.size(); q++)
     {
@@ -750,13 +754,14 @@ CellDataStorage<CellIteratorType, DataType>::try_get_data(
 {
   static_assert(std::is_base_of<DataType, T>::value,
                 "User's T class should be derived from user's DataType class");
-  Assert(&cell->get_triangulation() == tria, ExcTriangulationMismatch());
+  Assert(&cell->get_triangulation() DEAL_II_EQUALS tria,
+         ExcTriangulationMismatch());
 
   const auto it = map.find(cell->id());
   if (it != map.end())
     {
       // Cast base class to the desired class. This has to be done
-      // irrespectively of T==DataType as we need to return
+      // irrespectively of TDEAL_II_EQUALS DataType as we need to return
       // shared_ptr<const T> to make sure the user
       // does not modify the content of QP objects
       std::vector<std::shared_ptr<T>> result(it->second.size());
@@ -781,13 +786,14 @@ CellDataStorage<CellIteratorType, DataType>::try_get_data(
 {
   static_assert(std::is_base_of<DataType, T>::value,
                 "User's T class should be derived from user's DataType class");
-  Assert(&cell->get_triangulation() == tria, ExcTriangulationMismatch());
+  Assert(&cell->get_triangulation() DEAL_II_EQUALS tria,
+         ExcTriangulationMismatch());
 
   const auto it = map.find(cell->id());
   if (it != map.end())
     {
       // Cast base class to the desired class. This has to be done
-      // irrespectively of T==DataType as we need to return
+      // irrespectively of TDEAL_II_EQUALS DataType as we need to return
       // shared_ptr<const T> to make sure the user
       // does not modify the content of QP objects
       std::vector<std::shared_ptr<const T>> result(it->second.size());
@@ -904,7 +910,7 @@ namespace parallel
       , triangulation(nullptr)
     {
       Assert(
-        projection_fe->n_components() == 1,
+        projection_fe->n_components() DEAL_II_EQUALS 1,
         ExcMessage(
           "ContinuousQuadratureDataTransfer requires scalar FiniteElement"));
 
@@ -927,7 +933,7 @@ namespace parallel
         parallel::distributed::Triangulation<dim> &  tr_,
         CellDataStorage<CellIteratorType, DataType> &data_storage_)
     {
-      Assert(data_storage == nullptr,
+      Assert(data_storage DEAL_II_EQUALS nullptr,
              ExcMessage("This function can be called only once"));
       triangulation = &tr_;
       data_storage  = &data_storage_;
@@ -1005,7 +1011,7 @@ namespace parallel
                                               data_range.end(),
                                               /*allow_compression=*/false);
       const unsigned int number_of_values = matrix_dofs.n();
-      if (number_of_values == 0)
+      if (number_of_values DEAL_II_EQUALS 0)
         return;
 
       matrix_quadrature.reinit(n_q_points, number_of_values);

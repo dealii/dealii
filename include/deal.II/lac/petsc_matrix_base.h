@@ -213,10 +213,9 @@ namespace PETScWrappers
        * Comparison. True, if both iterators point to the same matrix
        * position.
        */
-      bool
-      operator==(const const_iterator &) const;
+      bool operator DEAL_II_EQUALS(const const_iterator &) const;
       /**
-       * Inverse of <tt>==</tt>.
+       * Inverse of <tt>DEAL_II_EQUALS </tt>.
        */
       bool
       operator!=(const const_iterator &) const;
@@ -953,9 +952,13 @@ namespace PETScWrappers
                    int,
                    int,
                    << "You tried to do a "
-                   << (arg1 == 1 ? "'set'" : (arg1 == 2 ? "'add'" : "???"))
+                   << (arg1 DEAL_II_EQUALS 1 ?
+                         "'set'" :
+                         (arg1 DEAL_II_EQUALS 2 ? "'add'" : "???"))
                    << " operation but the matrix is currently in "
-                   << (arg2 == 1 ? "'set'" : (arg2 == 2 ? "'add'" : "???"))
+                   << (arg2 DEAL_II_EQUALS 1 ?
+                         "'set'" :
+                         (arg2 DEAL_II_EQUALS 2 ? "'add'" : "???"))
                    << " mode. You first have to call 'compress()'.");
 
   protected:
@@ -1150,9 +1153,10 @@ namespace PETScWrappers
           accessor.a_index = 0;
           ++accessor.a_row;
 
-          while ((accessor.a_row < accessor.matrix->m()) &&
-                 (accessor.a_row < accessor.matrix->local_range().second) &&
-                 (accessor.matrix->row_length(accessor.a_row) == 0))
+          while ((accessor.a_row < accessor.matrix->m()) DEAL_II_AND(
+            accessor.a_row < accessor.matrix->local_range().second)
+                   DEAL_II_AND(accessor.matrix->row_length(accessor.a_row)
+                                 DEAL_II_EQUALS 0))
             ++accessor.a_row;
 
           accessor.visit_present_row();
@@ -1182,27 +1186,30 @@ namespace PETScWrappers
     }
 
 
-    inline bool
-    const_iterator::operator==(const const_iterator &other) const
+    inline bool const_iterator::
+                operator DEAL_II_EQUALS(const const_iterator &other) const
     {
-      return (accessor.a_row == other.accessor.a_row &&
-              accessor.a_index == other.accessor.a_index);
+      return (
+        accessor.a_row DEAL_II_EQUALS other.accessor.a_row DEAL_II_AND
+          accessor.a_index DEAL_II_EQUALS other.accessor.a_index);
     }
 
 
     inline bool
     const_iterator::operator!=(const const_iterator &other) const
     {
-      return !(*this == other);
+      return !(*this DEAL_II_EQUALS other);
     }
 
 
     inline bool
     const_iterator::operator<(const const_iterator &other) const
     {
-      return (accessor.row() < other.accessor.row() ||
-              (accessor.row() == other.accessor.row() &&
-               accessor.index() < other.accessor.index()));
+      return (accessor.row() <
+              other.accessor.row() DEAL_II_OR(
+                accessor.row()
+                  DEAL_II_EQUALS other.accessor.row()
+                    DEAL_II_AND  accessor.index() < other.accessor.index()));
     }
 
   } // namespace MatrixIterators
@@ -1231,9 +1238,9 @@ namespace PETScWrappers
                   const FullMatrix<PetscScalar> &values,
                   const bool                     elide_zero_values)
   {
-    Assert(indices.size() == values.m(),
+    Assert(indices.size() DEAL_II_EQUALS values.m(),
            ExcDimensionMismatch(indices.size(), values.m()));
-    Assert(values.m() == values.n(), ExcNotQuadratic());
+    Assert(values.m() DEAL_II_EQUALS values.n(), ExcNotQuadratic());
 
     for (size_type i = 0; i < indices.size(); ++i)
       set(indices[i],
@@ -1251,9 +1258,9 @@ namespace PETScWrappers
                   const FullMatrix<PetscScalar> &values,
                   const bool                     elide_zero_values)
   {
-    Assert(row_indices.size() == values.m(),
+    Assert(row_indices.size() DEAL_II_EQUALS values.m(),
            ExcDimensionMismatch(row_indices.size(), values.m()));
-    Assert(col_indices.size() == values.n(),
+    Assert(col_indices.size() DEAL_II_EQUALS values.n(),
            ExcDimensionMismatch(col_indices.size(), values.n()));
 
     for (size_type i = 0; i < row_indices.size(); ++i)
@@ -1272,7 +1279,7 @@ namespace PETScWrappers
                   const std::vector<PetscScalar> &values,
                   const bool                      elide_zero_values)
   {
-    Assert(col_indices.size() == values.size(),
+    Assert(col_indices.size() DEAL_II_EQUALS values.size(),
            ExcDimensionMismatch(col_indices.size(), values.size()));
 
     set(row,
@@ -1300,7 +1307,7 @@ namespace PETScWrappers
     int                n_columns;
 
     // If we don't elide zeros, the pointers are already available...
-    if (elide_zero_values == false)
+    if (elide_zero_values DEAL_II_EQUALS false)
       {
         col_index_ptr = reinterpret_cast<const PetscInt *>(col_indices);
         col_value_ptr = values;
@@ -1341,7 +1348,7 @@ namespace PETScWrappers
                                              col_index_ptr,
                                              col_value_ptr,
                                              INSERT_VALUES);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
   }
 
 
@@ -1351,7 +1358,7 @@ namespace PETScWrappers
   {
     AssertIsFinite(value);
 
-    if (value == PetscScalar())
+    if (value DEAL_II_EQUALS PetscScalar())
       {
         // we have to check after using Insert/Add in any case to be
         // consistent with the MPI communication model, but we can save
@@ -1372,9 +1379,9 @@ namespace PETScWrappers
                   const FullMatrix<PetscScalar> &values,
                   const bool                     elide_zero_values)
   {
-    Assert(indices.size() == values.m(),
+    Assert(indices.size() DEAL_II_EQUALS values.m(),
            ExcDimensionMismatch(indices.size(), values.m()));
-    Assert(values.m() == values.n(), ExcNotQuadratic());
+    Assert(values.m() DEAL_II_EQUALS values.n(), ExcNotQuadratic());
 
     for (size_type i = 0; i < indices.size(); ++i)
       add(indices[i],
@@ -1392,9 +1399,9 @@ namespace PETScWrappers
                   const FullMatrix<PetscScalar> &values,
                   const bool                     elide_zero_values)
   {
-    Assert(row_indices.size() == values.m(),
+    Assert(row_indices.size() DEAL_II_EQUALS values.m(),
            ExcDimensionMismatch(row_indices.size(), values.m()));
-    Assert(col_indices.size() == values.n(),
+    Assert(col_indices.size() DEAL_II_EQUALS values.n(),
            ExcDimensionMismatch(col_indices.size(), values.n()));
 
     for (size_type i = 0; i < row_indices.size(); ++i)
@@ -1413,7 +1420,7 @@ namespace PETScWrappers
                   const std::vector<PetscScalar> &values,
                   const bool                      elide_zero_values)
   {
-    Assert(col_indices.size() == values.size(),
+    Assert(col_indices.size() DEAL_II_EQUALS values.size(),
            ExcDimensionMismatch(col_indices.size(), values.size()));
 
     add(row,
@@ -1444,7 +1451,7 @@ namespace PETScWrappers
     int                n_columns;
 
     // If we don't elide zeros, the pointers are already available...
-    if (elide_zero_values == false)
+    if (elide_zero_values DEAL_II_EQUALS false)
       {
         col_index_ptr = reinterpret_cast<const PetscInt *>(col_indices);
         col_value_ptr = values;
@@ -1480,7 +1487,7 @@ namespace PETScWrappers
 
     const PetscErrorCode ierr = MatSetValues(
       matrix, 1, &petsc_i, n_columns, col_index_ptr, col_value_ptr, ADD_VALUES);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
   }
 
 
@@ -1497,14 +1504,15 @@ namespace PETScWrappers
   MatrixBase::begin() const
   {
     Assert(
-      (in_local_range(0) && in_local_range(m() - 1)),
+      (in_local_range(0) DEAL_II_AND in_local_range(m() - 1)),
       ExcMessage(
         "begin() and end() can only be called on a processor owning the entire matrix. If this is a distributed matrix, use begin(row) and end(row) instead."));
 
     // find the first non-empty row in order to make sure that the returned
     // iterator points to something useful
     size_type first_nonempty_row = 0;
-    while ((first_nonempty_row < m()) && (row_length(first_nonempty_row) == 0))
+    while ((first_nonempty_row < m())
+             DEAL_II_AND(row_length(first_nonempty_row) DEAL_II_EQUALS 0))
       ++first_nonempty_row;
 
     return const_iterator(this, first_nonempty_row, 0);
@@ -1515,7 +1523,7 @@ namespace PETScWrappers
   MatrixBase::end() const
   {
     Assert(
-      (in_local_range(0) && in_local_range(m() - 1)),
+      (in_local_range(0) DEAL_II_AND in_local_range(m() - 1)),
       ExcMessage(
         "begin() and end() can only be called on a processor owning the entire matrix. If this is a distributed matrix, use begin(row) and end(row) instead."));
 
@@ -1553,7 +1561,7 @@ namespace PETScWrappers
     // row since the latter query leads to an exception in case we ask
     // for a row that is not locally owned
     for (size_type i = r + 1; i < m(); ++i)
-      if (i == local_range().second || (row_length(i) > 0))
+      if (i DEAL_II_EQUALS local_range().second DEAL_II_OR(row_length(i) > 0))
         return const_iterator(this, i, 0);
 
     // if there is no such line, then take the
@@ -1572,10 +1580,10 @@ namespace PETScWrappers
 
     const PetscErrorCode ierr =
       MatGetOwnershipRange(static_cast<const Mat &>(matrix), &begin, &end);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
-    return ((index >= static_cast<size_type>(begin)) &&
-            (index < static_cast<size_type>(end)));
+    return ((index >= static_cast<size_type>(begin))
+              DEAL_II_AND(index < static_cast<size_type>(end)));
   }
 
 
@@ -1583,10 +1591,11 @@ namespace PETScWrappers
   inline void
   MatrixBase::prepare_action(const VectorOperation::values new_action)
   {
-    if (last_action == VectorOperation::unknown)
+    if (last_action DEAL_II_EQUALS VectorOperation::unknown)
       last_action = new_action;
 
-    Assert(last_action == new_action, ExcWrongMode(last_action, new_action));
+    Assert(last_action DEAL_II_EQUALS new_action,
+           ExcWrongMode(last_action, new_action));
   }
 
 
@@ -1596,7 +1605,7 @@ namespace PETScWrappers
   {
     // compress() sets the last action to none, which allows us to check if
     // there are pending add/insert operations:
-    AssertThrow(last_action == VectorOperation::unknown,
+    AssertThrow(last_action DEAL_II_EQUALS VectorOperation::unknown,
                 ExcMessage("Error: missing compress() call."));
   }
 

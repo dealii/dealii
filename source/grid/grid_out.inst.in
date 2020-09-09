@@ -70,7 +70,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #if deal_II_dimension <= deal_II_space_dimension
     // Instantiate write_svg exception for the <2,2> case for which there
     // is an overload that takes care of that case.
-#  if !(deal_II_dimension == 2 && deal_II_space_dimension == 2)
+#  if !(deal_II_dimension DEAL_II_EQUALS 2 DEAL_II_AND deal_II_space_dimension \
+                                                       DEAL_II_EQUALS 2)
     template void GridOut::write_svg(
       const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
       std::ostream &) const;

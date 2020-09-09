@@ -24,29 +24,29 @@ Quadrature<dim>
 QuadratureSelector<dim>::create_quadrature(const std::string &s,
                                            const unsigned int order)
 {
-  if (s == "gauss")
+  if (s DEAL_II_EQUALS "gauss")
     return QGauss<dim>(order);
-  else if (s == "gauss_lobatto")
+  else if (s DEAL_II_EQUALS "gauss_lobatto")
     return QGaussLobatto<dim>(order);
-  else if (s == "gauss_chebyshev")
+  else if (s DEAL_II_EQUALS "gauss_chebyshev")
     return QGaussChebyshev<dim>(order);
-  else if (s == "gauss_radau_chebyshev")
+  else if (s DEAL_II_EQUALS "gauss_radau_chebyshev")
     return QGaussRadauChebyshev<dim>(order);
-  else if (s == "gauss_lobatto_chebyshev")
+  else if (s DEAL_II_EQUALS "gauss_lobatto_chebyshev")
     return QGaussLobattoChebyshev<dim>(order);
   else
     {
-      AssertThrow(order == 0, ExcInvalidOrder(s, order));
+      AssertThrow(order DEAL_II_EQUALS 0, ExcInvalidOrder(s, order));
 
-      if (s == "midpoint")
+      if (s DEAL_II_EQUALS "midpoint")
         return QMidpoint<dim>();
-      else if (s == "milne")
+      else if (s DEAL_II_EQUALS "milne")
         return QMilne<dim>();
-      else if (s == "simpson")
+      else if (s DEAL_II_EQUALS "simpson")
         return QSimpson<dim>();
-      else if (s == "trapez")
+      else if (s DEAL_II_EQUALS "trapez")
         return QTrapez<dim>();
-      else if (s == "weddle")
+      else if (s DEAL_II_EQUALS "weddle")
         return QWeddle<dim>();
     }
 

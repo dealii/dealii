@@ -81,8 +81,8 @@ SparseLUDecomposition<number>::initialize(
 
   if (data.use_this_sparsity)
     sparsity_pattern_to_use = data.use_this_sparsity;
-  else if (data.use_previous_sparsity && !this->empty() &&
-           (this->m() == matrix.m()))
+  else if (data.use_previous_sparsity DEAL_II_AND !this->empty()
+             DEAL_II_AND(this->m() DEAL_II_EQUALS matrix.m()))
     {
       // Use the sparsity that was
       // previously used. This is
@@ -94,7 +94,7 @@ SparseLUDecomposition<number>::initialize(
       // unchanged grid.
       sparsity_pattern_to_use = &this->get_sparsity_pattern();
     }
-  else if (data.extra_off_diagonals == 0)
+  else if (data.extra_off_diagonals DEAL_II_EQUALS 0)
     {
       // Use same sparsity as matrix
       sparsity_pattern_to_use = &matrix_sparsity;
@@ -125,10 +125,11 @@ SparseLUDecomposition<number>::initialize(
     }
 
   // now use this sparsity pattern
-  Assert(sparsity_pattern_to_use->n_rows() == sparsity_pattern_to_use->n_cols(),
-         ExcMessage(
-           "It is not possible to compute this matrix decomposition for "
-           "matrices that are not square."));
+  Assert(
+    sparsity_pattern_to_use->n_rows()
+      DEAL_II_EQUALS sparsity_pattern_to_use->n_cols(),
+    ExcMessage("It is not possible to compute this matrix decomposition for "
+               "matrices that are not square."));
   {
     std::vector<const size_type *> tmp;
     tmp.swap(prebuilt_lower_bound);
@@ -166,12 +167,13 @@ SparseLUDecomposition<number>::copy_from(const SparseMatrix<somenumber> &matrix)
 {
   // check whether we use the same sparsity
   // pattern as the input matrix
-  if (&this->get_sparsity_pattern() == &matrix.get_sparsity_pattern())
+  if (&this->get_sparsity_pattern() DEAL_II_EQUALS &
+      matrix.get_sparsity_pattern())
     {
       const somenumber *  input_ptr = matrix.val.get();
       number *            this_ptr  = this->val.get();
       const number *const end_ptr   = this_ptr + this->n_nonzero_elements();
-      if (std::is_same<somenumber, number>::value == true)
+      if (std::is_same<somenumber, number>::value DEAL_II_EQUALS true)
         std::memcpy(this_ptr,
                     input_ptr,
                     this->n_nonzero_elements() * sizeof(number));
@@ -193,12 +195,13 @@ SparseLUDecomposition<number>::copy_from(const SparseMatrix<somenumber> &matrix)
         matrix.begin(row);
       index->value() = in_index->value();
       ++index, ++in_index;
-      while (index < this->end(row) && in_index < matrix.end(row))
+      while (index < this->end(row) DEAL_II_AND in_index < matrix.end(row))
         {
-          while (index->column() < in_index->column() && index < this->end(row))
+          while (index->column() < in_index->column()
+                                     DEAL_II_AND index < this->end(row))
             ++index;
-          while (in_index->column() < index->column() &&
-                 in_index < matrix.end(row))
+          while (in_index->column() < index->column()
+                                        DEAL_II_AND in_index < matrix.end(row))
             ++in_index;
 
           index->value() = in_index->value();
@@ -217,7 +220,7 @@ SparseLUDecomposition<number>::strengthen_diagonal_impl()
     {
       // get the global index of the first
       // non-diagonal element in this row
-      Assert(this->m() == this->n(), ExcNotImplemented());
+      Assert(this->m() DEAL_II_EQUALS this->n(), ExcNotImplemented());
       typename SparseMatrix<number>::iterator diagonal_element =
         this->begin(row);
 

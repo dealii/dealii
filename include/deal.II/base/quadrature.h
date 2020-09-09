@@ -118,8 +118,8 @@ public:
    * with <i>x</i> running fastest.
    *
    * In order to avoid a conflict with the copy constructor in 1d, we let the
-   * argument be a 0d quadrature formula for dim==1, and a 1d quadrature
-   * formula for all other space dimensions.
+   * argument be a 0d quadrature formula for dimDEAL_II_EQUALS 1, and a 1d
+   * quadrature formula for all other space dimensions.
    *
    * This constructor does not require that constant functions are integrated
    * exactly. Therefore, it is appropriate if the one-dimensional formula
@@ -183,8 +183,7 @@ public:
   /**
    * Test for equality of two quadratures.
    */
-  bool
-  operator==(const Quadrature<dim> &p) const;
+  bool operator DEAL_II_EQUALS(const Quadrature<dim> &p) const;
 
   /**
    * Set the quadrature points and weights to the values provided in the
@@ -258,7 +257,7 @@ public:
    *
    * @note The actual return type of this function is
    * @code
-   * std::conditional<dim == 1,
+   * std::conditional<dim DEAL_II_EQUALS  1,
    *                  std::array<Quadrature<1>, dim>,
    *                  const std::array<Quadrature<1>, dim> &>::type
    * @endcode
@@ -266,7 +265,7 @@ public:
    * readability of this page.
    */
 #ifndef DOXYGEN
-  typename std::conditional<dim == 1,
+  typename std::conditional<dim DEAL_II_EQUALS 1,
                             std::array<Quadrature<1>, dim>,
                             const std::array<Quadrature<1>, dim> &>::type
 #else
@@ -290,9 +289,9 @@ protected:
   /**
    * Indicates if this object represents quadrature formula that is a tensor
    * product of one-dimensional formulas.
-   * This flag is set if dim==1 or the constructors taking a Quadrature<1>
-   * (and possibly a Quadrature<dim-1> object) is called. This implies
-   * that the quadrature points are sorted lexicographically.
+   * This flag is set if dimDEAL_II_EQUALS 1 or the constructors taking a
+   * Quadrature<1> (and possibly a Quadrature<dim-1> object) is called. This
+   * implies that the quadrature points are sorted lexicographically.
    */
   bool is_tensor_product_flag;
 

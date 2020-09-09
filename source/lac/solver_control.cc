@@ -54,18 +54,18 @@ SolverControl::check(const unsigned int step, const double check_value)
   // if this is the first time we
   // come here, then store the
   // residual for later comparisons
-  if (step == 0)
+  if (step DEAL_II_EQUALS 0)
     {
       initial_val = check_value;
     }
 
-  if (m_log_history && ((step % m_log_frequency) == 0))
+  if (m_log_history DEAL_II_AND((step % m_log_frequency) DEAL_II_EQUALS 0))
     deallog << "Check " << step << "\t" << check_value << std::endl;
 
   lstep  = step;
   lvalue = check_value;
 
-  if (step == 0)
+  if (step DEAL_II_EQUALS 0)
     {
       if (check_failure)
         failure_residual = relative_failure_residual * check_value;
@@ -86,8 +86,8 @@ SolverControl::check(const unsigned int step, const double check_value)
       return success;
     }
 
-  if ((step >= maxsteps) || std::isnan(check_value) ||
-      (check_failure && (check_value > failure_residual)))
+  if ((step >= maxsteps) DEAL_II_OR std::isnan(check_value)
+        DEAL_II_OR(check_failure DEAL_II_AND(check_value > failure_residual)))
     {
       if (m_log_result)
         deallog << "Failure step " << step << " value " << check_value
@@ -133,7 +133,7 @@ SolverControl::last_step() const
 unsigned int
 SolverControl::log_frequency(unsigned int f)
 {
-  if (f == 0)
+  if (f DEAL_II_EQUALS 0)
     f = 1;
   unsigned int old = m_log_frequency;
   m_log_frequency  = f;
@@ -168,7 +168,7 @@ SolverControl::get_history_data() const
 double
 SolverControl::average_reduction() const
 {
-  if (lstep == 0)
+  if (lstep DEAL_II_EQUALS 0)
     return 0.;
 
   Assert(history_data_enabled, ExcHistoryDataRequired());
@@ -260,7 +260,7 @@ ReductionControl::check(const unsigned int step, const double check_value)
   // if this is the first time we
   // come here, then store the
   // residual for later comparisons
-  if (step == 0)
+  if (step DEAL_II_EQUALS 0)
     {
       initial_val = check_value;
       reduced_tol = check_value * reduce;
@@ -380,23 +380,23 @@ SolverControl::State
 ConsecutiveControl::check(const unsigned int step, const double check_value)
 {
   // reset the counter if ConsecutiveControl is being reused
-  if (step == 0)
+  if (step DEAL_II_EQUALS 0)
     n_converged_iterations = 0;
   else
     {
       // check two things:
       // (i)  steps are ascending without repetitions
       // (ii) user started from zero even when solver is being reused.
-      Assert(step - 1 == lstep,
+      Assert(step - 1 DEAL_II_EQUALS lstep,
              ExcMessage("steps should be ascending integers."));
     }
 
   SolverControl::State state = SolverControl::check(step, check_value);
   // check if we need to override the success:
-  if (state == success)
+  if (state DEAL_II_EQUALS success)
     {
       n_converged_iterations++;
-      if (n_converged_iterations == n_consecutive_iterations)
+      if (n_converged_iterations DEAL_II_EQUALS n_consecutive_iterations)
         {
           return success;
         }

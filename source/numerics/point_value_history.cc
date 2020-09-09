@@ -466,7 +466,7 @@ PointValueHistory<dim>::add_field_name(const std::string &  vector_name,
   AssertThrow(!triangulation_changed, ExcDoFHandlerChanged());
 
   // insert a component mask that is always of the right size
-  if (mask.represents_the_all_selected_mask() == false)
+  if (mask.represents_the_all_selected_mask() DEAL_II_EQUALS false)
     component_mask.insert(std::make_pair(vector_name, mask));
   else
     component_mask.insert(
@@ -486,7 +486,7 @@ PointValueHistory<dim>::add_field_name(const std::string &  vector_name,
   std::pair<std::string, std::vector<std::vector<double>>> pair_data;
   pair_data.first = vector_name;
   const unsigned int n_stored =
-    (mask.represents_the_all_selected_mask() == false ?
+    (mask.represents_the_all_selected_mask() DEAL_II_EQUALS false ?
        mask.n_selected_components() :
        dof_handler->get_fe(0).n_components());
 
@@ -525,7 +525,7 @@ PointValueHistory<dim>::add_component_names(
   Assert(mask != component_mask.end(), ExcMessage("vector_name not in class"));
   unsigned int n_stored = mask->second.n_selected_components();
   (void)n_stored;
-  Assert(component_names.size() == n_stored,
+  Assert(component_names.size() DEAL_II_EQUALS n_stored,
          ExcDimensionMismatch(component_names.size(), n_stored));
 
   names->second = component_names;
@@ -537,7 +537,7 @@ void
 PointValueHistory<dim>::add_independent_names(
   const std::vector<std::string> &independent_names)
 {
-  Assert(independent_names.size() == n_indep,
+  Assert(independent_names.size() DEAL_II_EQUALS n_indep,
          ExcDimensionMismatch(independent_names.size(), n_indep));
 
   indep_names = independent_names;
@@ -741,7 +741,7 @@ PointValueHistory<dim>::evaluate_field(
 
 
       // The case of a scalar FE
-      if (n_components == 1)
+      if (n_components DEAL_II_EQUALS 1)
         {
           // Extract data for the DataPostprocessor object
           DataPostprocessorInputs::Scalar<dim> postprocessor_input;
@@ -979,7 +979,7 @@ PointValueHistory<dim>::push_back_independent(
   // members.
   Assert(closed, ExcInvalidState());
   Assert(!cleared, ExcInvalidState());
-  Assert(indep_values.size() == n_indep,
+  Assert(indep_values.size() DEAL_II_EQUALS n_indep,
          ExcDimensionMismatch(indep_values.size(), n_indep));
   Assert(n_indep != 0, ExcNoIndependent());
   Assert(std::abs(static_cast<int>(dataset_key.size()) -
@@ -1050,9 +1050,9 @@ PointValueHistory<dim>::write_gnuplot(
   if (have_dof_handler)
     {
       AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
-      AssertThrow(postprocessor_locations.size() == 0 ||
-                    postprocessor_locations.size() ==
-                      point_geometry_data.size(),
+      AssertThrow(postprocessor_locations
+                    .size() DEAL_II_EQUALS 0 DEAL_II_OR postprocessor_locations
+                    .size() DEAL_II_EQUALS point_geometry_data.size(),
                   ExcDimensionMismatch(postprocessor_locations.size(),
                                        point_geometry_data.size()));
       // We previously required the
@@ -1142,7 +1142,7 @@ PointValueHistory<dim>::write_gnuplot(
 
               if (names.size() > 0)
                 {
-                  AssertThrow(names.size() == n_stored,
+                  AssertThrow(names.size() DEAL_II_EQUALS n_stored,
                               ExcDimensionMismatch(names.size(), n_stored));
                   for (const auto &name : names)
                     {
@@ -1316,7 +1316,7 @@ PointValueHistory<dim>::status(std::ostream &out)
   typename std::vector<
     internal::PointValueHistoryImplementation::PointGeometryData<dim>>::iterator
     point = point_geometry_data.begin();
-  if (point == point_geometry_data.end())
+  if (point DEAL_II_EQUALS point_geometry_data.end())
     {
       out << "No points stored currently\n";
     }

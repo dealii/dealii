@@ -42,7 +42,7 @@ namespace LACExceptions
     const PetscErrorCode ierr = PetscErrorMessage(error_code,
                                                   &petsc_message,
                                                   /*specific=*/nullptr);
-    if (ierr == 0 && petsc_message != nullptr)
+    if (ierr DEAL_II_EQUALS 0 DEAL_II_AND petsc_message != nullptr)
       {
         out << "The description of the error provided by PETSc is \""
             << petsc_message << "\"." << std::endl;

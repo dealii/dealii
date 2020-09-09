@@ -140,11 +140,11 @@ namespace Differentiation
 
 
       template <typename ADNumberType>
-      struct Marking<
-        ADNumberType,
-        typename std::enable_if<
-          ADNumberTraits<ADNumberType>::type_code == NumberTypes::adolc_taped &&
-          ADNumberTraits<ADNumberType>::is_real_valued>::type>
+      struct Marking<ADNumberType,
+                     typename std::enable_if<
+                       ADNumberTraits<ADNumberType>::type_code DEAL_II_EQUALS
+                         NumberTypes::adolc_taped DEAL_II_AND
+                                                  ADNumberTraits<ADNumberType>::is_real_valued>::type>
       {
         using scalar_type = typename ADNumberTraits<ADNumberType>::scalar_type;
 
@@ -180,9 +180,9 @@ namespace Differentiation
       template <typename ADNumberType>
       struct Marking<ADNumberType,
                      typename std::enable_if<
-                       ADNumberTraits<ADNumberType>::type_code ==
-                         NumberTypes::adolc_tapeless &&
-                       ADNumberTraits<ADNumberType>::is_real_valued>::type>
+                       ADNumberTraits<ADNumberType>::type_code DEAL_II_EQUALS
+                         NumberTypes::adolc_tapeless DEAL_II_AND
+                                                     ADNumberTraits<ADNumberType>::is_real_valued>::type>
       {
         using scalar_type = typename ADNumberTraits<ADNumberType>::scalar_type;
 
@@ -336,7 +336,8 @@ namespace Differentiation
     {
       static_assert(std::is_same<ad_type, adouble>::value,
                     "Incorrect template type selected for taped ad_type");
-      static_assert(is_taped == true, "Incorrect setting for taping");
+      static_assert(is_taped DEAL_II_EQUALS true,
+                    "Incorrect setting for taping");
     };
 
 
@@ -359,7 +360,8 @@ namespace Differentiation
     {
       static_assert(std::is_same<ad_type, std::complex<adouble>>::value,
                     "Incorrect template type selected for taped ad_type");
-      static_assert(is_taped == true, "Incorrect setting for taping");
+      static_assert(is_taped DEAL_II_EQUALS true,
+                    "Incorrect setting for taping");
     };
 
 
@@ -381,7 +383,8 @@ namespace Differentiation
     {
       static_assert(std::is_same<ad_type, adtl::adouble>::value,
                     "Incorrect template type selected for tapeless ad_type");
-      static_assert(is_tapeless == true, "Incorrect setting for taping");
+      static_assert(is_tapeless DEAL_II_EQUALS true,
+                    "Incorrect setting for taping");
     };
 
 
@@ -404,7 +407,8 @@ namespace Differentiation
     {
       static_assert(std::is_same<ad_type, std::complex<adtl::adouble>>::value,
                     "Incorrect template type selected for tapeless ad_type");
-      static_assert(is_tapeless == true, "Incorrect setting for taping");
+      static_assert(is_tapeless DEAL_II_EQUALS true,
+                    "Incorrect setting for taping");
     };
 
 
@@ -464,8 +468,8 @@ namespace Differentiation
     struct is_adolc_taped_number<
       NumberType,
       typename std::enable_if<
-        ADNumberTraits<typename std::decay<NumberType>::type>::type_code ==
-        NumberTypes::adolc_taped>::type> : std::true_type
+        ADNumberTraits<typename std::decay<NumberType>::type>::type_code
+          DEAL_II_EQUALS NumberTypes::adolc_taped>::type> : std::true_type
     {};
 
 
@@ -477,8 +481,8 @@ namespace Differentiation
     struct is_adolc_tapeless_number<
       NumberType,
       typename std::enable_if<
-        ADNumberTraits<typename std::decay<NumberType>::type>::type_code ==
-        NumberTypes::adolc_tapeless>::type> : std::true_type
+        ADNumberTraits<typename std::decay<NumberType>::type>::type_code
+          DEAL_II_EQUALS NumberTypes::adolc_tapeless>::type> : std::true_type
     {};
 
 
@@ -487,11 +491,11 @@ namespace Differentiation
      * parameter is a (real or complex; taped or tapeless) ADOL-C number.
      */
     template <typename NumberType>
-    struct is_adolc_number<NumberType,
-                           typename std::enable_if<
-                             is_adolc_taped_number<NumberType>::value ||
-                             is_adolc_tapeless_number<NumberType>::value>::type>
-      : std::true_type
+    struct is_adolc_number<
+      NumberType,
+      typename std::enable_if<
+        is_adolc_taped_number<NumberType>::value DEAL_II_OR
+                                                 is_adolc_tapeless_number<NumberType>::value>::type> : std::true_type
     {};
 
   } // namespace AD

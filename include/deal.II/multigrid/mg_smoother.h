@@ -711,7 +711,7 @@ namespace mg
       steps2 *= (1 << (maxlevel - level));
 
     bool T = this->transpose;
-    if (this->symmetric && (steps2 % 2 == 0))
+    if (this->symmetric DEAL_II_AND(steps2 % 2 DEAL_II_EQUALS 0))
       T = false;
     if (this->debug > 0)
       deallog << 'S' << level << ' ';
@@ -742,7 +742,7 @@ namespace mg
       steps2 *= (1 << (maxlevel - level));
 
     bool T = this->transpose;
-    if (this->symmetric && (steps2 % 2 == 0))
+    if (this->symmetric DEAL_II_AND(steps2 % 2 DEAL_II_EQUALS 0))
       T = false;
     if (this->debug > 0)
       deallog << 'S' << level << ' ';
@@ -835,8 +835,10 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize(
   const unsigned int min = m.min_level();
   const unsigned int max = m.max_level();
 
-  Assert(data.min_level() == min, ExcDimensionMismatch(data.min_level(), min));
-  Assert(data.max_level() == max, ExcDimensionMismatch(data.max_level(), max));
+  Assert(data.min_level() DEAL_II_EQUALS min,
+         ExcDimensionMismatch(data.min_level(), min));
+  Assert(data.max_level() DEAL_II_EQUALS max,
+         ExcDimensionMismatch(data.max_level(), max));
 
   matrices.resize(min, max);
   smoothers.resize(min, max);
@@ -890,8 +892,10 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize(
   const unsigned int min = m.min_level();
   const unsigned int max = m.max_level();
 
-  Assert(data.min_level() == min, ExcDimensionMismatch(data.min_level(), min));
-  Assert(data.max_level() == max, ExcDimensionMismatch(data.max_level(), max));
+  Assert(data.min_level() DEAL_II_EQUALS min,
+         ExcDimensionMismatch(data.min_level(), min));
+  Assert(data.max_level() DEAL_II_EQUALS max,
+         ExcDimensionMismatch(data.max_level(), max));
 
   matrices.resize(min, max);
   smoothers.resize(min, max);
@@ -922,7 +926,7 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::smooth(
     steps2 *= (1 << (maxlevel - level));
 
   bool T = this->transpose;
-  if (this->symmetric && (steps2 % 2 == 0))
+  if (this->symmetric DEAL_II_AND(steps2 % 2 DEAL_II_EQUALS 0))
     T = false;
   if (this->debug > 0)
     deallog << 'S' << level << ' ';
@@ -953,7 +957,7 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::apply(
     steps2 *= (1 << (maxlevel - level));
 
   bool T = this->transpose;
-  if (this->symmetric && (steps2 % 2 == 0))
+  if (this->symmetric DEAL_II_AND(steps2 % 2 DEAL_II_EQUALS 0))
     T = false;
   if (this->debug > 0)
     deallog << 'S' << level << ' ';
@@ -1050,8 +1054,10 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize(
   const unsigned int min = m.min_level();
   const unsigned int max = m.max_level();
 
-  Assert(data.min_level() == min, ExcDimensionMismatch(data.min_level(), min));
-  Assert(data.max_level() == max, ExcDimensionMismatch(data.max_level(), max));
+  Assert(data.min_level() DEAL_II_EQUALS min,
+         ExcDimensionMismatch(data.min_level(), min));
+  Assert(data.max_level() DEAL_II_EQUALS max,
+         ExcDimensionMismatch(data.max_level(), max));
 
   matrices.resize(min, max);
   smoothers.resize(min, max);
@@ -1105,8 +1111,10 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize(
   const unsigned int min = m.min_level();
   const unsigned int max = m.max_level();
 
-  Assert(data.min_level() == min, ExcDimensionMismatch(data.min_level(), min));
-  Assert(data.max_level() == max, ExcDimensionMismatch(data.max_level(), max));
+  Assert(data.min_level() DEAL_II_EQUALS min,
+         ExcDimensionMismatch(data.min_level(), min));
+  Assert(data.max_level() DEAL_II_EQUALS max,
+         ExcDimensionMismatch(data.max_level(), max));
 
   matrices.resize(min, max);
   smoothers.resize(min, max);
@@ -1140,7 +1148,7 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::smooth(
   d->reinit(u, true);
 
   bool T = this->transpose;
-  if (this->symmetric && (steps2 % 2 == 0))
+  if (this->symmetric DEAL_II_AND(steps2 % 2 DEAL_II_EQUALS 0))
     T = false;
   if (this->debug > 0)
     deallog << 'S' << level << ' ';
@@ -1195,7 +1203,7 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::apply(
     steps2 *= (1 << (maxlevel - level));
 
   bool T = this->transpose;
-  if (this->symmetric && (steps2 % 2 == 0))
+  if (this->symmetric DEAL_II_AND(steps2 % 2 DEAL_II_EQUALS 0))
     T = false;
   if (this->debug > 0)
     deallog << 'S' << level << ' ';

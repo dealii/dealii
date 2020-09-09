@@ -315,7 +315,8 @@ namespace MeshWorker
   DoFInfo<dim, spacedim, number>::get_indices(const DHCellIterator &c)
   {
     indices.resize(c->get_fe().n_dofs_per_cell());
-    if (block_info == nullptr || block_info->local().size() == 0)
+    if (block_info DEAL_II_EQUALS nullptr DEAL_II_OR block_info->local().size()
+          DEAL_II_EQUALS 0)
       c->get_active_or_mg_dof_indices(indices);
     else
       {
@@ -363,8 +364,8 @@ namespace MeshWorker
                                          const DHFaceIterator &f,
                                          const unsigned int    face_no)
   {
-    if ((cell.state() != IteratorState::valid) ||
-        cell != typename Triangulation<dim, spacedim>::cell_iterator(*c))
+    if ((cell.state() != IteratorState::valid) DEAL_II_OR cell !=
+        typename Triangulation<dim, spacedim>::cell_iterator(*c))
       get_indices(c);
     level_cell = c->is_level_cell();
 
@@ -399,9 +400,8 @@ namespace MeshWorker
                                          const unsigned int    face_no,
                                          const unsigned int    subface_no)
   {
-    if (cell.state() != IteratorState::valid ||
-        cell !=
-          static_cast<typename Triangulation<dim, spacedim>::cell_iterator>(c))
+    if (cell.state() != IteratorState::valid DEAL_II_OR cell !=
+        static_cast<typename Triangulation<dim, spacedim>::cell_iterator>(c))
       get_indices(c);
     level_cell = c->is_level_cell();
 

@@ -943,7 +943,7 @@ namespace StandardExceptions
     int,
     << "Index " << arg1 << " is not in the half-open range [" << arg2 << ","
     << arg3 << ")."
-    << (arg2 == arg3 ?
+    << (arg2 DEAL_II_EQUALS arg3 ?
           " In the current case, this half-open range is in fact empty, "
           "suggesting that you are accessing an element of an empty "
           "collection such as a vector that has not been set to the "
@@ -973,7 +973,7 @@ namespace StandardExceptions
     T,
     << "Index " << arg1 << " is not in the half-open range [" << arg2 << ","
     << arg3 << ")."
-    << (arg2 == arg3 ?
+    << (arg2 DEAL_II_EQUALS arg3 ?
           " In the current case, this half-open range is in fact empty, "
           "suggesting that you are accessing an element of an empty "
           "collection such as a vector that has not been set to the "
@@ -1144,7 +1144,7 @@ namespace StandardExceptions
    * functions. For example:
    * @code
    * const int ierr = MPI_Isend(...);
-   * AssertThrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
+   * AssertThrow(ierr DEAL_II_EQUALS  MPI_SUCCESS, ExcMPI(ierr));
    * @endcode
    * or, using the convenience macro <code>AssertThrowMPI</code>,
    * @code
@@ -1565,14 +1565,15 @@ namespace deal_II_exceptions
  *
  * @ingroup Exceptions
  */
-#define AssertDimension(dim1, dim2)                                            \
-  Assert(static_cast<typename ::dealii::internal::argument_type<void(          \
-             typename std::common_type<decltype(dim1),                         \
-                                       decltype(dim2)>::type)>::type>(dim1) == \
-           static_cast<typename ::dealii::internal::argument_type<void(        \
-             typename std::common_type<decltype(dim1),                         \
-                                       decltype(dim2)>::type)>::type>(dim2),   \
-         dealii::ExcDimensionMismatch((dim1), (dim2)))
+#define AssertDimension(dim1, dim2)                                          \
+  Assert(                                                                    \
+    static_cast<typename ::dealii::internal::argument_type<void(             \
+      typename std::common_type<decltype(dim1), decltype(dim2)>::type)>::    \
+                  type>(dim1)                                                \
+      DEAL_II_EQUALS static_cast<typename ::dealii::internal::argument_type< \
+        void(typename std::common_type<decltype(dim1),                       \
+                                       decltype(dim2)>::type)>::type>(dim2), \
+    dealii::ExcDimensionMismatch((dim1), (dim2)))
 
 
 /**
@@ -1689,8 +1690,9 @@ namespace internal
  * @note Active only if deal.II is compiled with MPI
  * @ingroup Exceptions
  */
-#  define AssertThrowMPI(error_code) \
-    AssertThrow(error_code == MPI_SUCCESS, dealii::ExcMPI(error_code))
+#  define AssertThrowMPI(error_code)                   \
+    AssertThrow(error_code DEAL_II_EQUALS MPI_SUCCESS, \
+                dealii::ExcMPI(error_code))
 #else
 #  define AssertThrowMPI(error_code) \
     {}
@@ -1715,8 +1717,8 @@ namespace internal
  * @ingroup Exceptions
  */
 #  ifdef DEBUG
-#    define AssertCuda(error_code)      \
-      Assert(error_code == cudaSuccess, \
+#    define AssertCuda(error_code)                  \
+      Assert(error_code DEAL_II_EQUALS cudaSuccess, \
              dealii::ExcCudaError(cudaGetErrorString(error_code)))
 #  else
 #    define AssertCuda(error_code) \
@@ -1742,8 +1744,8 @@ namespace internal
  * @ingroup Exceptions
  */
 #  ifdef DEBUG
-#    define AssertNothrowCuda(error_code)      \
-      AssertNothrow(error_code == cudaSuccess, \
+#    define AssertNothrowCuda(error_code)                  \
+      AssertNothrow(error_code DEAL_II_EQUALS cudaSuccess, \
                     dealii::ExcCudaError(cudaGetErrorString(error_code)))
 #  else
 #    define AssertNothrowCuda(error_code) \
@@ -1802,7 +1804,7 @@ namespace internal
 #  ifdef DEBUG
 #    define AssertCusparse(error_code)                                      \
       Assert(                                                               \
-        error_code == CUSPARSE_STATUS_SUCCESS,                              \
+        error_code DEAL_II_EQUALS CUSPARSE_STATUS_SUCCESS,                  \
         dealii::ExcCusparseError(                                           \
           dealii::deal_II_exceptions::internals::get_cusparse_error_string( \
             error_code)))
@@ -1832,7 +1834,7 @@ namespace internal
 #  ifdef DEBUG
 #    define AssertNothrowCusparse(error_code)                               \
       AssertNothrow(                                                        \
-        error_code == CUSPARSE_STATUS_SUCCESS,                              \
+        error_code DEAL_II_EQUALS CUSPARSE_STATUS_SUCCESS,                  \
         dealii::ExcCusparseError(                                           \
           dealii::deal_II_exceptions::internals::get_cusparse_error_string( \
             error_code)))
@@ -1863,7 +1865,7 @@ namespace internal
 #  ifdef DEBUG
 #    define AssertCusolver(error_code)                                      \
       Assert(                                                               \
-        error_code == CUSOLVER_STATUS_SUCCESS,                              \
+        error_code DEAL_II_EQUALS CUSOLVER_STATUS_SUCCESS,                  \
         dealii::ExcCusparseError(                                           \
           dealii::deal_II_exceptions::internals::get_cusolver_error_string( \
             error_code)))

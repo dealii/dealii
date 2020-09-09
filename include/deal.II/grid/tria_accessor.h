@@ -63,8 +63,8 @@ namespace internal
 
     /**
      * Implementation of a type with which to store the level of an accessor
-     * object. We only need it for the case that <tt>structdim == dim</tt>.
-     * Otherwise, an empty object is sufficient.
+     * object. We only need it for the case that <tt>structdim DEAL_II_EQUALS
+     * dim</tt>. Otherwise, an empty object is sufficient.
      */
     template <int structdim, int dim>
     struct PresentLevelType
@@ -81,7 +81,7 @@ namespace internal
          */
         type(const int level)
         {
-          Assert(level == 0, ExcInternalError());
+          Assert(level DEAL_II_EQUALS 0, ExcInternalError());
           (void)level; // removes -Wunused-parameter warning in optimized mode
         }
 
@@ -110,8 +110,8 @@ namespace internal
 
     /**
      * Implementation of a type with which to store the level of an accessor
-     * object. We only need it for the case that <tt>structdim == dim</tt>.
-     * Otherwise, an empty object is sufficient.
+     * object. We only need it for the case that <tt>structdim DEAL_II_EQUALS
+     * dim</tt>. Otherwise, an empty object is sufficient.
      */
     template <int dim>
     struct PresentLevelType<dim, dim>
@@ -210,9 +210,10 @@ namespace TriaAccessorExceptions
                  << "You tried to dereference an iterator for which this "
                  << "is not possible. More information on this iterator: "
                  << "index=" << arg1.index() << ", state="
-                 << (arg1.state() == IteratorState::valid ?
+                 << (arg1.state() DEAL_II_EQUALS IteratorState::valid ?
                        "valid" :
-                       (arg1.state() == IteratorState::past_the_end ?
+                       (arg1.state()
+                            DEAL_II_EQUALS IteratorState::past_the_end ?
                           "past_the_end" :
                           "invalid")));
   /**
@@ -269,7 +270,7 @@ namespace TriaAccessorExceptions
  * in the derived classes.
  *
  * In the implementation, the behavior of this class differs between the cases
- * where <tt>structdim==dim</tt> (cells of a mesh) and
+ * where <tt>structdimDEAL_II_EQUALS dim</tt> (cells of a mesh) and
  * <tt>structdim&lt;dim</tt> (faces and edges). For the latter, #present_level
  * is always equal to zero and the constructors may not receive a positive
  * value there. For cells, any level is possible, but only those within the
@@ -375,8 +376,7 @@ protected:
   /**
    * Compare for equality.
    */
-  bool
-  operator==(const TriaAccessorBase &) const;
+  bool operator DEAL_II_EQUALS(const TriaAccessorBase &) const;
 
   /**
    * Compare for inequality.
@@ -501,8 +501,8 @@ public:
    */
 protected:
   /**
-   * The level if this is a cell (<tt>structdim==dim</tt>). Else, contains
-   * zero.
+   * The level if this is a cell (<tt>structdimDEAL_II_EQUALS dim</tt>). Else,
+   * contains zero.
    */
   typename dealii::internal::TriaAccessorImplementation::
     PresentLevelType<structdim, dim>::type present_level;
@@ -596,8 +596,7 @@ public:
   /**
    * Dummy comparison operators.
    */
-  bool
-  operator==(const InvalidAccessor &) const;
+  bool operator DEAL_II_EQUALS(const InvalidAccessor &) const;
   bool
   operator!=(const InvalidAccessor &) const;
 
@@ -680,8 +679,8 @@ public:
  * <code>dim</code> (i.e. 1 for a triangulation of lines, 2 for a
  * triangulation of quads, and 3 for a triangulation of hexes) that is
  * embedded in a space of dimensionality <code>spacedim</code> (for
- * <code>spacedim==dim</code> the triangulation represents a domain in
- * $R^{dim}$, for <code>spacedim@>dim</code> the triangulation is of a
+ * <code>spacedimDEAL_II_EQUALS dim</code> the triangulation represents a domain
+ * in $R^{dim}$, for <code>spacedim@>dim</code> the triangulation is of a
  * manifold embedded in a higher dimensional space).
  *
  * There is a specialization of this class for the case where
@@ -1108,9 +1107,9 @@ public:
   /**
    * Return whether this object is at the boundary. Obviously, the use of this
    * function is only possible for <tt>dim@>structdim</tt>; however, for
-   * <tt>dim==structdim</tt>, an object is a cell and the CellAccessor class
-   * offers another possibility to determine whether a cell is at the boundary
-   * or not.
+   * <tt>dimDEAL_II_EQUALS structdim</tt>, an object is a cell and the
+   * CellAccessor class offers another possibility to determine whether a cell
+   * is at the boundary or not.
    */
   bool
   at_boundary() const;
@@ -1627,7 +1626,7 @@ public:
   /**
    * Number of faces.
    *
-   * @note Only implemented for cells (dim==spacedim).
+   * @note Only implemented for cells (dimDEAL_II_EQUALS spacedim).
    */
   unsigned int
   n_faces() const;
@@ -1650,7 +1649,7 @@ public:
    * Return an object that can be thought of as an array containing all indices
    * from zero to n_faces().
    *
-   * @note Only implemented for cells (dim==spacedim).
+   * @note Only implemented for cells (dimDEAL_II_EQUALS spacedim).
    */
   std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   face_indices() const;
@@ -1698,7 +1697,7 @@ private:
    * return.
    *
    * It is only possible to set the line_orientation of faces in 3d (i.e.
-   * <code>structdim==2 && dim==3</code>).
+   * <code>structdimDEAL_II_EQUALS 2 DEAL_II_AND  dimDEAL_II_EQUALS 3</code>).
    */
   void
   set_line_orientation(const unsigned int line, const bool orientation) const;
@@ -1720,7 +1719,7 @@ private:
    * Set the flag indicating, what <code>face_flip()</code> will return.
    *
    * It is only possible to set the face_orientation of cells in 3d (i.e.
-   * <code>structdim==3 && dim==3</code>).
+   * <code>structdimDEAL_II_EQUALS 3 DEAL_II_AND  dimDEAL_II_EQUALS 3</code>).
    */
   void
   set_face_flip(const unsigned int face, const bool flip) const;
@@ -1729,7 +1728,7 @@ private:
    * Set the flag indicating, what <code>face_rotation()</code> will return.
    *
    * It is only possible to set the face_orientation of cells in 3d (i.e.
-   * <code>structdim==3 && dim==3</code>).
+   * <code>structdimDEAL_II_EQUALS 3 DEAL_II_AND  dimDEAL_II_EQUALS 3</code>).
    */
   void
   set_face_rotation(const unsigned int face, const bool rotation) const;
@@ -1801,7 +1800,8 @@ private:
  * <code>dim</code> (i.e. 1 for a triangulation of lines, 2 for a
  * triangulation of quads, and 3 for a triangulation of hexes) that is
  * embedded in a space of dimensionality <code>spacedim</code> (for
- * <code>spacedim==dim</code> the triangulation represents a domain in
+ * <code>spacedimDEAL_II_EQUALS dim</code> the triangulation represents a domain
+ * in
  * ${\mathbb R}^\text{dim}$, for <code>spacedim@>dim</code> the triangulation
  * is of a manifold embedded in a higher dimensional space).
  *
@@ -1917,8 +1917,7 @@ public:
   /**
    * Compare for equality.
    */
-  bool
-  operator==(const TriaAccessor &) const;
+  bool operator DEAL_II_EQUALS(const TriaAccessor &) const;
 
   /**
    * Compare for inequality.
@@ -2205,13 +2204,14 @@ private:
  * for the case that @p structdim is zero and @p dim is one. This
  * class represents vertices in a one-dimensional triangulation that is
  * embedded in a space of dimensionality <code>spacedim</code> (for
- * <code>spacedim==dim==1</code> the triangulation represents a domain in
- * ${\mathbb R}^\text{dim}$, for <code>spacedim@>dim==1</code> the triangulation
- * is of a manifold embedded in a higher dimensional space).
+ * <code>spacedimDEAL_II_EQUALS dimDEAL_II_EQUALS 1</code> the triangulation
+ * represents a domain in
+ * ${\mathbb R}^\text{dim}$, for <code>spacedim@>dimDEAL_II_EQUALS 1</code> the
+ * triangulation is of a manifold embedded in a higher dimensional space).
  *
  * The current specialization of the TriaAccessor<0,dim,spacedim> class
  * for vertices of a one-dimensional triangulation exists
- * since in the @p dim == 1 case vertices are also faces.
+ * since in the @p dim DEAL_II_EQUALS  1 case vertices are also faces.
  *
  * @ingroup Accessors
  */
@@ -2360,8 +2360,7 @@ public:
   /**
    * Compare for equality.
    */
-  bool
-  operator==(const TriaAccessor &) const;
+  bool operator DEAL_II_EQUALS(const TriaAccessor &) const;
 
   /**
    * Compare for inequality.
@@ -2896,8 +2895,8 @@ public:
    * asking for a cell behind subface <tt>sf</tt>, then this means that we are
    * considering the subface for the face in the natural direction for the
    * present cell. However, if the face as seen from this cell has
-   * <tt>face_orientation()==false</tt>, then the child of the face that
-   * separates the present cell from the neighboring cell's child is not
+   * <tt>face_orientation()DEAL_II_EQUALS false</tt>, then the child of the face
+   * that separates the present cell from the neighboring cell's child is not
    * necessarily the @p sf-th child of the face of this cell. This is so
    * because the @p subface_no on a cell corresponds to the subface with
    * respect to the intrinsic ordering of the present cell, whereas children
@@ -2905,9 +2904,9 @@ public:
    * faces; these two orderings are only identical if the face orientation is
    * @p true, and reversed otherwise.
    *
-   * Similarly, effects of <tt>face_flip()==true</tt> and
-   * <tt>face_rotation()==true()</tt>, both of which indicate a non-standard
-   * face have to be considered.
+   * Similarly, effects of <tt>face_flip()DEAL_II_EQUALS true</tt> and
+   * <tt>face_rotation()DEAL_II_EQUALS true()</tt>, both of which indicate a
+   * non-standard face have to be considered.
    *
    * Fortunately, this is only very rarely of concern, since usually one
    * simply wishes to loop over all finer neighbors at a given face of an
@@ -2964,9 +2963,9 @@ public:
   /**
    * Return the how-many'th neighbor this cell is of
    * <tt>cell->neighbor(neighbor)</tt>, i.e. return the @p face_no such that
-   * <tt>cell->neighbor(neighbor)->neighbor(face_no)==cell</tt>. This function
-   * is the right one if you want to know how to get back from a neighbor to
-   * the present cell.
+   * <tt>cell->neighbor(neighbor)->neighbor(face_no)DEAL_II_EQUALS cell</tt>.
+   * This function is the right one if you want to know how to get back from a
+   * neighbor to the present cell.
    *
    * Note that this operation is only useful if the neighbor is not coarser
    * than the present cell. If the neighbor is coarser this function throws an
@@ -2993,14 +2992,14 @@ public:
    * for the case of a coarser neighbor. It returns a pair of numbers, face_no
    * and subface_no, with the following property, if the neighbor is not
    * refined: <tt>cell->neighbor(neighbor)->neighbor_child_on_subface(face_no,
-   * subface_no)==cell</tt>. In 3D, a coarser neighbor can still be refined.
-   * In that case subface_no denotes the child index of the neighbors face
-   * that relates to our face:
-   * <tt>cell->neighbor(neighbor)->face(face_no)->child(subface_no)==cell->face(neighbor)</tt>.
-   * This case in 3d and how it can happen is discussed in the introduction of
-   * the step-30 tutorial program.
+   * subface_no)DEAL_II_EQUALS cell</tt>. In 3D, a coarser neighbor can still be
+   * refined. In that case subface_no denotes the child index of the neighbors
+   * face that relates to our face:
+   * <tt>cell->neighbor(neighbor)->face(face_no)->child(subface_no)DEAL_II_EQUALS
+   * cell->face(neighbor)</tt>. This case in 3d and how it can happen is
+   * discussed in the introduction of the step-30 tutorial program.
    *
-   * This function is impossible for <tt>dim==1</tt>.
+   * This function is impossible for <tt>dimDEAL_II_EQUALS 1</tt>.
    */
   std::pair<unsigned int, unsigned int>
   neighbor_of_coarser_neighbor(const unsigned int neighbor) const;
@@ -3091,7 +3090,7 @@ public:
    * to get back to the current cell. In other words, the following
    * assertion should be true, for a cell with coarser periodic neighbor:
    * cell->periodic_neighbor(i)->periodic_neighbor_child_on_subface(face_no,
-   * subface_no)==cell
+   * subface_no)DEAL_II_EQUALS cell
    */
   std::pair<unsigned int, unsigned int>
   periodic_neighbor_of_coarser_periodic_neighbor(const unsigned face_no) const;
@@ -3120,8 +3119,8 @@ public:
    * neighbor with the same or a higher level of refinement as the current
    * cell:
    * @c {cell->periodic_neighbor(i)->
-   *     periodic_neighbor(cell->periodic_neighbor_of_periodic_neighbor(i))==cell}
-   * For the cells with a coarser periodic neighbor, one should use
+   *     periodic_neighbor(cell->periodic_neighbor_of_periodic_neighbor(i))DEAL_II_EQUALS
+   * cell} For the cells with a coarser periodic neighbor, one should use
    * periodic_neighbor_of_coarser_periodic_neighbor() and
    * periodic_neighbor_child_on_subface()
    * to get back to the current cell.
@@ -3540,7 +3539,7 @@ public:
    * @ref distributed
    * module for more information.
    *
-   * @post The returned value is equal to <code>!is_ghost() &&
+   * @post The returned value is equal to <code>!is_ghost() DEAL_II_AND
    * !is_artificial()</code>.
    *
    * @note Whether a cell is a ghost cell, artificial, or is locally owned or
@@ -3573,7 +3572,7 @@ public:
    * @ref distributed
    * module for more information.
    *
-   * @post The returned value is equal to <code>!is_locally_owned() &&
+   * @post The returned value is equal to <code>!is_locally_owned() DEAL_II_AND
    * !is_artificial()</code>.
    *
    * @note Whether a cell is a ghost cell, artificial, or is locally owned or
@@ -3602,7 +3601,7 @@ public:
    * @ref distributed
    * module for more information.
    *
-   * @post The returned value is equal to <code>!is_ghost() &&
+   * @post The returned value is equal to <code>!is_ghost() DEAL_II_AND
    * !is_locally_owned()</code>.
    *
    * @note Whether a cell is a ghost cell, artificial, or is locally owned is

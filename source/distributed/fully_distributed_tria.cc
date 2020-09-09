@@ -63,7 +63,7 @@ namespace parallel
     {
       // check if the communicator of this parallel triangulation has been used
       // to construct the TriangulationDescription::Description
-      Assert(construction_data.comm == this->mpi_communicator,
+      Assert(construction_data.comm DEAL_II_EQUALS this->mpi_communicator,
              ExcMessage("MPI communicators do not match!"));
 
       // store internally the settings
@@ -249,7 +249,7 @@ namespace parallel
       // check if other triangulation is not a parallel one, which needs to be
       // partitioned
       if (dynamic_cast<const dealii::parallel::TriangulationBase<dim, spacedim>
-                         *>(&other_tria) == nullptr)
+                         *>(&other_tria) DEAL_II_EQUALS nullptr)
         {
           serial_tria =
             std::make_unique<dealii::Triangulation<dim, spacedim>>();

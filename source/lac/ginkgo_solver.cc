@@ -36,15 +36,16 @@ namespace GinkgoWrappers
     : solver_control(solver_control)
     , exec_type(exec_type)
   {
-    if (exec_type == "reference")
+    if (exec_type DEAL_II_EQUALS "reference")
       {
         executor = gko::ReferenceExecutor::create();
       }
-    else if (exec_type == "omp")
+    else if (exec_type DEAL_II_EQUALS "omp")
       {
         executor = gko::OmpExecutor::create();
       }
-    else if (exec_type == "cuda" && gko::CudaExecutor::get_num_devices() > 0)
+    else if (exec_type          DEAL_II_EQUALS
+             "cuda" DEAL_II_AND gko::CudaExecutor::get_num_devices() > 0)
       {
         executor = gko::CudaExecutor::create(0, gko::OmpExecutor::create());
       }
@@ -94,7 +95,7 @@ namespace GinkgoWrappers
 
     Assert(system_matrix, ExcNotInitialized());
     Assert(executor, ExcNotInitialized());
-    Assert(rhs.size() == solution.size(),
+    Assert(rhs.size() DEAL_II_EQUALS solution.size(),
            ExcDimensionMismatch(rhs.size(), solution.size()));
 
     // Generate the solver from the solver using the system matrix.
@@ -219,7 +220,7 @@ namespace GinkgoWrappers
     const SparseMatrix<ValueType> &matrix)
   {
     // Needs to be a square matrix
-    Assert(matrix.m() == matrix.n(), ExcNotQuadratic());
+    Assert(matrix.m() DEAL_II_EQUALS matrix.n(), ExcNotQuadratic());
 
     using size_type   = dealii::types::global_dof_index;
     const size_type N = matrix.m();
@@ -278,7 +279,8 @@ namespace GinkgoWrappers
 
       // At the end, we should have written all rows completely
       for (size_type i = 0; i < N - 1; ++i)
-        Assert(row_pointers[i] == mat_row_ptrs[i + 1], ExcInternalError());
+        Assert(row_pointers[i] DEAL_II_EQUALS mat_row_ptrs[i + 1],
+               ExcInternalError());
     }
     system_matrix =
       mtx::create(executor, gko::dim<2>(N), matrix.n_nonzero_elements());

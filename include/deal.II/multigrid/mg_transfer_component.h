@@ -439,7 +439,8 @@ MGTransferSelect<number>::select(const unsigned int component,
 {
   selected_component = component;
   mg_selected_component =
-    (mg_component == numbers::invalid_unsigned_int) ? component : mg_component;
+    (mg_component DEAL_II_EQUALS numbers::invalid_unsigned_int) ? component :
+                                                                  mg_component;
 }
 
 DEAL_II_NAMESPACE_CLOSE

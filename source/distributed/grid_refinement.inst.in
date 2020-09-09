@@ -84,7 +84,7 @@ for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
     \}
 
 
-#if deal_II_dimension == 3
+#if deal_II_dimension DEAL_II_EQUALS 3
 
     namespace parallel
     \{

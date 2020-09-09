@@ -17,7 +17,7 @@
 for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : SPACE_DIMENSIONS)
   {
-#if deal_II_dimension == deal_II_space_dimension
+#if deal_II_dimension DEAL_II_EQUALS deal_II_space_dimension
     namespace VectorTools
     \{
 

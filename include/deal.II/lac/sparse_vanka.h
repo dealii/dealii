@@ -469,8 +469,9 @@ private:
  * which leads to a series of saddle point problems, each of which is solved
  * using GMRES with Vanka as preconditioner. The equation had approx. 850
  * degrees of freedom. With the non-blocked version @p SparseVanka (or @p
- * SparseBlockVanka with <tt>n_blocks==1</tt>), the following numbers of
- * iterations is needed to solver the linear system in each nonlinear step:
+ * SparseBlockVanka with <tt>n_blocksDEAL_II_EQUALS 1</tt>), the following
+ * numbers of iterations is needed to solver the linear system in each nonlinear
+ * step:
  * @verbatim
  *   101 68 64 53 35 21
  * @endverbatim
@@ -564,7 +565,7 @@ private:
 
   /**
    * In this field, we precompute for each block which degrees of freedom
-   * belong to it. Thus, if <tt>dof_masks[i][j]==true</tt>, then DoF @p j
+   * belong to it. Thus, if <tt>dof_masks[i][j]DEAL_II_EQUALS true</tt>, then DoF @p j
    * belongs to block @p i. Of course, no other <tt>dof_masks[l][j]</tt> may
    * be @p true for <tt>l!=i</tt>. This computation is done in the
    * constructor, to avoid recomputing each time the preconditioner is called.

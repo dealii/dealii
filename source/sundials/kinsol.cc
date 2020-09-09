@@ -172,11 +172,11 @@ namespace SUNDIALS
     if (kinsol_mem)
       KINFree(&kinsol_mem);
 #  ifdef DEAL_II_WITH_MPI
-    if (is_serial_vector<VectorType>::value == false)
+    if (is_serial_vector<VectorType>::value DEAL_II_EQUALS false)
       {
         const int ierr = MPI_Comm_free(&communicator);
         (void)ierr;
-        AssertNothrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
+        AssertNothrow(ierr DEAL_II_EQUALS MPI_SUCCESS, ExcMPI(ierr));
       }
 #  endif
   }
@@ -193,7 +193,7 @@ namespace SUNDIALS
     // solution. Here we take only a
     // view of it.
 #  ifdef DEAL_II_WITH_MPI
-    if (is_serial_vector<VectorType>::value == false)
+    if (is_serial_vector<VectorType>::value DEAL_II_EQUALS false)
       {
         const IndexSet is = initial_guess_and_solution.locally_owned_elements();
         const unsigned int local_system_size = is.n_elements();
@@ -296,12 +296,12 @@ namespace SUNDIALS
         AssertKINSOL(status);
       }
 
-    if (data.strategy == AdditionalData::newton ||
-        data.strategy == AdditionalData::linesearch)
+    if (data.strategy DEAL_II_EQUALS AdditionalData::newton DEAL_II_OR
+          data.strategy DEAL_II_EQUALS AdditionalData::linesearch)
       Assert(residual, ExcFunctionNotProvided("residual"));
 
-    if (data.strategy == AdditionalData::fixed_point ||
-        data.strategy == AdditionalData::picard)
+    if (data.strategy DEAL_II_EQUALS AdditionalData::fixed_point DEAL_II_OR
+          data.strategy DEAL_II_EQUALS AdditionalData::picard)
       Assert(iteration_function, ExcFunctionNotProvided("iteration_function"));
 
     // call to KINSol
@@ -312,7 +312,7 @@ namespace SUNDIALS
 
     // Free the vectors which are no longer used.
 #  ifdef DEAL_II_WITH_MPI
-    if (is_serial_vector<VectorType>::value == false)
+    if (is_serial_vector<VectorType>::value DEAL_II_EQUALS false)
       {
         N_VDestroy_Parallel(solution);
         N_VDestroy_Parallel(u_scale);

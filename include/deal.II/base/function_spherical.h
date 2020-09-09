@@ -36,7 +36,7 @@ namespace Functions
    * (specifically svalue(), sgradient() and shessian() ). The convention for
    * angles is the same as in GeometricUtilities::Coordinates.
    *
-   * @note This function is currently only implemented for dim==3 .
+   * @note This function is currently only implemented for dimDEAL_II_EQUALS 3 .
    *
    * @ingroup functions
    */

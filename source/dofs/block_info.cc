@@ -31,17 +31,17 @@ BlockInfo::initialize(const DoFHandler<dim, spacedim> &dof,
                       bool                             levels_only,
                       bool                             active_only)
 {
-  Assert(dof.hp_capability_enabled == false,
+  Assert(dof.hp_capability_enabled DEAL_II_EQUALS false,
          (typename DoFHandler<dim, spacedim>::ExcNotImplementedWithHP()));
 
-  if (!levels_only && dof.has_active_dofs())
+  if (!levels_only DEAL_II_AND dof.has_active_dofs())
     {
       const std::vector<types::global_dof_index> sizes =
         DoFTools::count_dofs_per_fe_block(dof);
       bi_global.reinit(sizes);
     }
 
-  if (!active_only && dof.has_level_dofs())
+  if (!active_only DEAL_II_AND dof.has_level_dofs())
     {
       std::vector<std::vector<types::global_dof_index>> sizes(
         dof.get_triangulation().n_levels(),
@@ -61,7 +61,7 @@ template <int dim, int spacedim>
 void
 BlockInfo::initialize_local(const DoFHandler<dim, spacedim> &dof)
 {
-  Assert(dof.hp_capability_enabled == false,
+  Assert(dof.hp_capability_enabled DEAL_II_EQUALS false,
          (typename DoFHandler<dim, spacedim>::ExcNotImplementedWithHP()));
 
   const FiniteElement<dim, spacedim> & fe = dof.get_fe();

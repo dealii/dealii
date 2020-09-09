@@ -130,7 +130,7 @@ namespace TrilinosWrappers
        * Move constructor. Creates a new vector by stealing the internal data
        * of the vector @p v.
        */
-      BlockVector(BlockVector &&v) noexcept;
+      BlockVector(BlockVector DEAL_II_AND v) noexcept;
 
       /**
        * Creates a block vector consisting of <tt>num_blocks</tt> components,
@@ -162,7 +162,7 @@ namespace TrilinosWrappers
        * @p v by efficiently swapping the internal data structures.
        */
       BlockVector &
-      operator=(BlockVector &&v) noexcept;
+      operator=(BlockVector DEAL_II_AND v) noexcept;
 
       /**
        * Another copy function. This one takes a deal.II block vector and
@@ -183,8 +183,8 @@ namespace TrilinosWrappers
        * index sets given in the input argument, according to the parallel
        * distribution of the individual components described in the maps.
        *
-       * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with
-       * zeros.
+       * If <tt>omit_zeroing_entriesDEAL_II_EQUALS false</tt>, the vector is
+       * filled with zeros.
        */
       void
       reinit(const std::vector<IndexSet> &parallel_partitioning,
@@ -356,7 +356,7 @@ namespace TrilinosWrappers
 
 
 
-    inline BlockVector::BlockVector(BlockVector &&v) noexcept
+    inline BlockVector::BlockVector(BlockVector DEAL_II_AND v) noexcept
     {
       // initialize a minimal, valid object and swap
       reinit(0);
@@ -393,7 +393,8 @@ namespace TrilinosWrappers
       bool ghosted = block(0).has_ghost_elements();
 #  ifdef DEBUG
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
-        Assert(block(i).has_ghost_elements() == ghosted, ExcInternalError());
+        Assert(block(i).has_ghost_elements() DEAL_II_EQUALS ghosted,
+               ExcInternalError());
 #  endif
       return ghosted;
     }

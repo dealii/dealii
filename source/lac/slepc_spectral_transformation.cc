@@ -32,7 +32,7 @@ namespace SLEPcWrappers
   TransformationBase::TransformationBase(const MPI_Comm &mpi_communicator)
   {
     const PetscErrorCode ierr = STCreate(mpi_communicator, &st);
-    AssertThrow(ierr == 0, SolverBase::ExcSLEPcError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, SolverBase::ExcSLEPcError(ierr));
   }
 
   TransformationBase::~TransformationBase()
@@ -41,7 +41,7 @@ namespace SLEPcWrappers
       {
         const PetscErrorCode ierr = STDestroy(&st);
         (void)ierr;
-        AssertNothrow(ierr == 0, SolverBase::ExcSLEPcError(ierr));
+        AssertNothrow(ierr DEAL_II_EQUALS 0, SolverBase::ExcSLEPcError(ierr));
       }
   }
 
@@ -49,14 +49,14 @@ namespace SLEPcWrappers
   TransformationBase::set_matrix_mode(const STMatMode mode)
   {
     const PetscErrorCode ierr = STSetMatMode(st, mode);
-    AssertThrow(ierr == 0, SolverBase::ExcSLEPcError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, SolverBase::ExcSLEPcError(ierr));
   }
 
   void
   TransformationBase::set_solver(const PETScWrappers::SolverBase &solver)
   {
     PetscErrorCode ierr = STSetKSP(st, solver.solver_data->ksp);
-    AssertThrow(ierr == 0, SolverBase::ExcSLEPcError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, SolverBase::ExcSLEPcError(ierr));
   }
 
   /* ------------------- TransformationShift --------------------- */
@@ -72,10 +72,10 @@ namespace SLEPcWrappers
     , additional_data(data)
   {
     PetscErrorCode ierr = STSetType(st, const_cast<char *>(STSHIFT));
-    AssertThrow(ierr == 0, SolverBase::ExcSLEPcError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, SolverBase::ExcSLEPcError(ierr));
 
     ierr = STSetShift(st, additional_data.shift_parameter);
-    AssertThrow(ierr == 0, SolverBase::ExcSLEPcError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, SolverBase::ExcSLEPcError(ierr));
   }
 
   /* ---------------- TransformationShiftInvert ------------------ */
@@ -92,10 +92,10 @@ namespace SLEPcWrappers
     , additional_data(data)
   {
     PetscErrorCode ierr = STSetType(st, const_cast<char *>(STSINVERT));
-    AssertThrow(ierr == 0, SolverBase::ExcSLEPcError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, SolverBase::ExcSLEPcError(ierr));
 
     ierr = STSetShift(st, additional_data.shift_parameter);
-    AssertThrow(ierr == 0, SolverBase::ExcSLEPcError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, SolverBase::ExcSLEPcError(ierr));
   }
 
   /* --------------- TransformationSpectrumFolding ----------------- */
@@ -113,10 +113,10 @@ namespace SLEPcWrappers
   {
 #  if DEAL_II_PETSC_VERSION_LT(3, 5, 0)
     PetscErrorCode ierr = STSetType(st, const_cast<char *>(STFOLD));
-    AssertThrow(ierr == 0, SolverBase::ExcSLEPcError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, SolverBase::ExcSLEPcError(ierr));
 
     ierr = STSetShift(st, additional_data.shift_parameter);
-    AssertThrow(ierr == 0, SolverBase::ExcSLEPcError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, SolverBase::ExcSLEPcError(ierr));
 #  else
     // PETSc/SLEPc version must be < 3.5.0.
     (void)st;
@@ -142,13 +142,13 @@ namespace SLEPcWrappers
     , additional_data(data)
   {
     PetscErrorCode ierr = STSetType(st, const_cast<char *>(STCAYLEY));
-    AssertThrow(ierr == 0, SolverBase::ExcSLEPcError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, SolverBase::ExcSLEPcError(ierr));
 
     ierr = STSetShift(st, additional_data.shift_parameter);
-    AssertThrow(ierr == 0, SolverBase::ExcSLEPcError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, SolverBase::ExcSLEPcError(ierr));
 
     ierr = STCayleySetAntishift(st, additional_data.antishift_parameter);
-    AssertThrow(ierr == 0, SolverBase::ExcSLEPcError(ierr));
+    AssertThrow(ierr DEAL_II_EQUALS 0, SolverBase::ExcSLEPcError(ierr));
   }
 
 } // namespace SLEPcWrappers

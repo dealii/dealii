@@ -34,12 +34,12 @@ namespace GridGenerator
   {
     AssertDimension(dim, spacedim);
 
-    AssertThrow(colorize == false, ExcNotImplemented());
+    AssertThrow(colorize DEAL_II_EQUALS false, ExcNotImplemented());
 
     std::vector<Point<spacedim>> vertices;
     std::vector<CellData<dim>>   cells;
 
-    if (dim == 2)
+    if (dim DEAL_II_EQUALS 2)
       {
         // determine cell sizes
         const Point<dim> dx((p2[0] - p1[0]) / repetitions[0],
@@ -78,7 +78,7 @@ namespace GridGenerator
               }
             }
       }
-    else if (dim == 3)
+    else if (dim DEAL_II_EQUALS 3)
       {
         // determine cell sizes
         const Point<dim> dx((p2[0] - p1[0]) / repetitions[0],
@@ -120,7 +120,7 @@ namespace GridGenerator
                 // TET cell 0
                 {
                   CellData<dim> cell;
-                  if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
+                  if (((i % 2) + (j % 2) + (k % 2)) % 2 DEAL_II_EQUALS 0)
                     cell.vertices = {{quad[0], quad[1], quad[2], quad[4]}};
                   else
                     cell.vertices = {{quad[0], quad[1], quad[3], quad[5]}};
@@ -131,7 +131,7 @@ namespace GridGenerator
                 // TET cell 1
                 {
                   CellData<dim> cell;
-                  if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
+                  if (((i % 2) + (j % 2) + (k % 2)) % 2 DEAL_II_EQUALS 0)
                     cell.vertices = {{quad[2], quad[1], quad[3], quad[7]}};
                   else
                     cell.vertices = {{quad[0], quad[3], quad[2], quad[6]}};
@@ -141,7 +141,7 @@ namespace GridGenerator
                 // TET cell 2
                 {
                   CellData<dim> cell;
-                  if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
+                  if (((i % 2) + (j % 2) + (k % 2)) % 2 DEAL_II_EQUALS 0)
                     cell.vertices = {{quad[1], quad[4], quad[5], quad[7]}};
                   else
                     cell.vertices = {{quad[0], quad[4], quad[5], quad[6]}};
@@ -151,7 +151,7 @@ namespace GridGenerator
                 // TET cell 3
                 {
                   CellData<dim> cell;
-                  if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
+                  if (((i % 2) + (j % 2) + (k % 2)) % 2 DEAL_II_EQUALS 0)
                     cell.vertices = {{quad[2], quad[4], quad[7], quad[6]}};
                   else
                     cell.vertices = {{quad[3], quad[5], quad[7], quad[6]}};
@@ -161,7 +161,7 @@ namespace GridGenerator
                 // TET cell 4
                 {
                   CellData<dim> cell;
-                  if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
+                  if (((i % 2) + (j % 2) + (k % 2)) % 2 DEAL_II_EQUALS 0)
                     cell.vertices = {{quad[1], quad[2], quad[4], quad[7]}};
                   else
                     cell.vertices = {{quad[0], quad[3], quad[6], quad[5]}};
@@ -171,7 +171,7 @@ namespace GridGenerator
       }
     else
       {
-        AssertThrow(colorize == false, ExcNotImplemented());
+        AssertThrow(colorize DEAL_II_EQUALS false, ExcNotImplemented());
       }
 
     // actually create triangulation
@@ -186,12 +186,12 @@ namespace GridGenerator
                                        const double       p2,
                                        const bool         colorize)
   {
-    if (dim == 2)
+    if (dim DEAL_II_EQUALS 2)
       {
         subdivided_hyper_rectangle_with_simplices(
           tria, {{repetitions, repetitions}}, {p1, p1}, {p2, p2}, colorize);
       }
-    else if (dim == 3)
+    else if (dim DEAL_II_EQUALS 3)
       {
         subdivided_hyper_rectangle_with_simplices(
           tria,

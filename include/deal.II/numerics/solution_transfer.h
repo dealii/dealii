@@ -338,7 +338,7 @@ template <int dim,
 class SolutionTransfer
 {
 #  ifndef DEAL_II_MSVC
-  static_assert(dim == DoFHandlerType::dimension,
+  static_assert(dim DEAL_II_EQUALS DoFHandlerType::dimension,
                 "The dimension explicitly provided as a template "
                 "argument, and the dimension of the DoFHandlerType "
                 "template argument must match.");
@@ -390,8 +390,8 @@ public:
    * This function interpolates the discrete function @p in, which is a vector
    * on the grid before the refinement, to the function @p out which then is a
    * vector on the refined grid. It assumes the vectors having the right sizes
-   * (i.e. <tt>in.size()==n_dofs_old</tt>,
-   * <tt>out.size()==n_dofs_refined</tt>)
+   * (i.e. <tt>in.size()DEAL_II_EQUALS n_dofs_old</tt>,
+   * <tt>out.size()DEAL_II_EQUALS n_dofs_refined</tt>)
    *
    * Calling this function is allowed only if @p prepare_for_pure_refinement
    * is called and the refinement is executed before. Multiple calling of this
@@ -426,7 +426,8 @@ public:
   /**
    * Same as the previous function. It interpolates only one function. It
    * assumes the vectors having the right sizes (i.e.
-   * <tt>in.size()==n_dofs_old</tt>, <tt>out.size()==n_dofs_refined</tt>)
+   * <tt>in.size()DEAL_II_EQUALS n_dofs_old</tt>, <tt>out.size()DEAL_II_EQUALS
+   * n_dofs_refined</tt>)
    *
    * Multiple calling of this function is NOT allowed. Interpolating several
    * functions can be performed in one step by using <tt>interpolate (all_in,

@@ -239,7 +239,7 @@ namespace Particles
      * Equality operator.
      */
     bool
-    operator==(const ParticleAccessor<dim, spacedim> &other) const;
+    operator DEAL_II_EQUALS(const ParticleAccessor<dim, spacedim> &other) const;
 
   protected:
     /**

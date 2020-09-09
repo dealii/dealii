@@ -71,11 +71,11 @@ namespace MatrixTools
     const bool                                            eliminate_columns)
   {
     (void)eliminate_columns;
-    Assert(eliminate_columns == false, ExcNotImplemented());
+    Assert(eliminate_columns DEAL_II_EQUALS false, ExcNotImplemented());
 
-    Assert(matrix.n() == right_hand_side.size(),
+    Assert(matrix.n() DEAL_II_EQUALS right_hand_side.size(),
            ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
-    Assert(matrix.n() == solution.size(),
+    Assert(matrix.n() DEAL_II_EQUALS solution.size(),
            ExcDimensionMismatch(matrix.n(), solution.size()));
 
     // if no boundary values are to be applied, then
@@ -85,9 +85,10 @@ namespace MatrixTools
       {
         const std::pair<types::global_dof_index, types::global_dof_index>
           local_range = matrix.local_range();
-        Assert(local_range == right_hand_side.local_range(),
+        Assert(local_range DEAL_II_EQUALS right_hand_side.local_range(),
                ExcInternalError());
-        Assert(local_range == solution.local_range(), ExcInternalError());
+        Assert(local_range DEAL_II_EQUALS solution.local_range(),
+               ExcInternalError());
 
         // determine the first nonzero diagonal
         // entry from within the part of the
@@ -107,8 +108,8 @@ namespace MatrixTools
         // have to eliminate on this processor
         std::vector<types::global_dof_index> constrained_rows;
         for (const auto &boundary_value : boundary_values)
-          if ((boundary_value.first >= local_range.first) &&
-              (boundary_value.first < local_range.second))
+          if ((boundary_value.first >= local_range.first)
+                DEAL_II_AND(boundary_value.first < local_range.second))
             constrained_rows.push_back(boundary_value.first);
 
         // then eliminate these rows and set
@@ -127,8 +128,8 @@ namespace MatrixTools
         std::vector<types::global_dof_index> indices;
         std::vector<PetscScalar>             solution_values;
         for (const auto &boundary_value : boundary_values)
-          if ((boundary_value.first >= local_range.first) &&
-              (boundary_value.first < local_range.second))
+          if ((boundary_value.first >= local_range.first)
+                DEAL_II_AND(boundary_value.first < local_range.second))
             {
               indices.push_back(boundary_value.first);
               solution_values.push_back(boundary_value.second);
@@ -163,11 +164,12 @@ namespace MatrixTools
     PETScWrappers::MPI::BlockVector &                     right_hand_side,
     const bool                                            eliminate_columns)
   {
-    Assert(matrix.n() == right_hand_side.size(),
+    Assert(matrix.n() DEAL_II_EQUALS right_hand_side.size(),
            ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
-    Assert(matrix.n() == solution.size(),
+    Assert(matrix.n() DEAL_II_EQUALS solution.size(),
            ExcDimensionMismatch(matrix.n(), solution.size()));
-    Assert(matrix.n_block_rows() == matrix.n_block_cols(), ExcNotQuadratic());
+    Assert(matrix.n_block_rows() DEAL_II_EQUALS matrix.n_block_cols(),
+           ExcNotQuadratic());
 
     const unsigned int n_blocks = matrix.n_block_rows();
 
@@ -218,8 +220,8 @@ namespace MatrixTools
                dof = block_boundary_values[block_m].begin();
              dof != block_boundary_values[block_m].end();
              ++dof)
-          if ((dof->first >= local_range.first) &&
-              (dof->first < local_range.second))
+          if ((dof->first >= local_range.first)
+                DEAL_II_AND(dof->first < local_range.second))
             constrained_rows.push_back(dof->first);
 
         for (unsigned int block_n = 0; block_n < n_blocks; ++block_n)
@@ -247,12 +249,12 @@ namespace MatrixTools
                             TrilinosVector &                right_hand_side,
                             const bool                      eliminate_columns)
       {
-        Assert(eliminate_columns == false, ExcNotImplemented());
+        Assert(eliminate_columns DEAL_II_EQUALS false, ExcNotImplemented());
         (void)eliminate_columns;
 
-        Assert(matrix.n() == right_hand_side.size(),
+        Assert(matrix.n() DEAL_II_EQUALS right_hand_side.size(),
                ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
-        Assert(matrix.n() == solution.size(),
+        Assert(matrix.n() DEAL_II_EQUALS solution.size(),
                ExcDimensionMismatch(matrix.m(), solution.size()));
 
         // if no boundary values are to be applied, then
@@ -262,9 +264,10 @@ namespace MatrixTools
           {
             const std::pair<types::global_dof_index, types::global_dof_index>
               local_range = matrix.local_range();
-            Assert(local_range == right_hand_side.local_range(),
+            Assert(local_range DEAL_II_EQUALS right_hand_side.local_range(),
                    ExcInternalError());
-            Assert(local_range == solution.local_range(), ExcInternalError());
+            Assert(local_range DEAL_II_EQUALS solution.local_range(),
+                   ExcInternalError());
 
             // determine the first nonzero diagonal
             // entry from within the part of the
@@ -285,8 +288,8 @@ namespace MatrixTools
             // have to eliminate on this processor
             std::vector<types::global_dof_index> constrained_rows;
             for (const auto &boundary_value : boundary_values)
-              if ((boundary_value.first >= local_range.first) &&
-                  (boundary_value.first < local_range.second))
+              if ((boundary_value.first >= local_range.first)
+                    DEAL_II_AND(boundary_value.first < local_range.second))
                 constrained_rows.push_back(boundary_value.first);
 
             // then eliminate these rows and
@@ -301,8 +304,8 @@ namespace MatrixTools
             std::vector<types::global_dof_index> indices;
             std::vector<TrilinosScalar>          solution_values;
             for (const auto &boundary_value : boundary_values)
-              if ((boundary_value.first >= local_range.first) &&
-                  (boundary_value.first < local_range.second))
+              if ((boundary_value.first >= local_range.first)
+                    DEAL_II_AND(boundary_value.first < local_range.second))
                 {
                   indices.push_back(boundary_value.first);
                   solution_values.push_back(boundary_value.second);
@@ -342,13 +345,13 @@ namespace MatrixTools
         TrilinosBlockVector &right_hand_side,
         const bool           eliminate_columns)
       {
-        Assert(eliminate_columns == false, ExcNotImplemented());
+        Assert(eliminate_columns DEAL_II_EQUALS false, ExcNotImplemented());
 
-        Assert(matrix.n() == right_hand_side.size(),
+        Assert(matrix.n() DEAL_II_EQUALS right_hand_side.size(),
                ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
-        Assert(matrix.n() == solution.size(),
+        Assert(matrix.n() DEAL_II_EQUALS solution.size(),
                ExcDimensionMismatch(matrix.n(), solution.size()));
-        Assert(matrix.n_block_rows() == matrix.n_block_cols(),
+        Assert(matrix.n_block_rows() DEAL_II_EQUALS matrix.n_block_cols(),
                ExcNotQuadratic());
 
         const unsigned int n_blocks = matrix.n_block_rows();
@@ -402,8 +405,8 @@ namespace MatrixTools
                    block_boundary_values[block_m].begin();
                  dof != block_boundary_values[block_m].end();
                  ++dof)
-              if ((dof->first >= local_range.first) &&
-                  (dof->first < local_range.second))
+              if ((dof->first >= local_range.first)
+                    DEAL_II_AND(dof->first < local_range.second))
                 constrained_rows.push_back(dof->first);
 
             for (unsigned int block_n = 0; block_n < n_blocks; ++block_n)

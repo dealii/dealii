@@ -49,7 +49,7 @@ DEAL_II_NAMESPACE_OPEN
  * Let's say that you loop over all of the time steps by using a `for` loop
  * @code
  *   for (DiscreteTime time(0., 1., 0.3);
- *        time.is_at_end() == false;
+ *        time.is_at_end() DEAL_II_EQUALS  false;
  *        time.advance_time())
  *   {
  *     // Insert simulation code here
@@ -58,7 +58,7 @@ DEAL_II_NAMESPACE_OPEN
  * or, if you like this better, the equivalent `while` loop:
  * @code
  *   DiscreteTime time(0., 1., 0.3);
- *   while (time.is_at_end() == false)
+ *   while (time.is_at_end() DEAL_II_EQUALS  false)
  *   {
  *     // Insert simulation code here
  *
@@ -85,7 +85,7 @@ DEAL_II_NAMESPACE_OPEN
  * end time:
  * @code
  *   for (DiscreteTime time(0., 1.21, 0.3);
- *        time.is_at_end() == false;
+ *        time.is_at_end() DEAL_II_EQUALS  false;
  *        time.advance_time())
  *   {
  *     // Insert simulation code here
@@ -198,7 +198,7 @@ DEAL_II_NAMESPACE_OPEN
  * make_grid();
  * setup_system();
  * for (DiscreteTime time(0., 1., 0.1);  // } end pre-processing/setup stage
- *      time.is_at_end() == false;
+ *      time.is_at_end() DEAL_II_EQUALS  false;
  *      time.advance_time())             // part of the update stage, runs at
  *                                       // the end of the loop body
  * {
@@ -463,7 +463,7 @@ DiscreteTime::get_end_time() const
 inline bool
 DiscreteTime::is_at_start() const
 {
-  return step_number == 0;
+  return step_number DEAL_II_EQUALS 0;
 }
 
 
@@ -471,7 +471,7 @@ DiscreteTime::is_at_start() const
 inline bool
 DiscreteTime::is_at_end() const
 {
-  return current_time == end_time;
+  return current_time DEAL_II_EQUALS end_time;
 }
 
 

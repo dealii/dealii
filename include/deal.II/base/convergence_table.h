@@ -160,8 +160,8 @@ public:
    * Omit this column <tt>key</tt> (not supercolumn!) from the evaluation of
    * the convergence rates of `all' columns (see the following two functions).
    *
-   * The Column::flag==1 is reserved for omitting the column from convergence
-   * rate evaluation.
+   * The Column::flagDEAL_II_EQUALS 1 is reserved for omitting the column from
+   * convergence rate evaluation.
    */
   void
   omit_column_from_convergence_rate_evaluation(const std::string &key);

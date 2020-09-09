@@ -695,8 +695,8 @@ namespace Differentiation
     template <typename ADNumberType>
     struct Types<
       ADNumberType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>
+      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code
+                                DEAL_II_EQUALS NumberTypes::adolc_taped>::type>
     {
       /**
        * Typedef for tape indices. ADOL-C uses short integers, so
@@ -717,8 +717,8 @@ namespace Differentiation
     template <typename ADNumberType>
     struct Numbers<
       ADNumberType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>
+      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code
+                                DEAL_II_EQUALS NumberTypes::adolc_taped>::type>
     {
       /**
        * A tape index that is unusable and can be used to invalidate recording
@@ -765,8 +765,8 @@ namespace Differentiation
     struct TapedDrivers<
       ADNumberType,
       double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>
+      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code
+                                DEAL_II_EQUALS NumberTypes::adolc_taped>::type>
     {
       using scalar_type = double;
 
@@ -972,8 +972,8 @@ namespace Differentiation
     struct TapedDrivers<
       ADNumberType,
       double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>
+      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code
+                                DEAL_II_EQUALS NumberTypes::adolc_taped>::type>
     {
       using scalar_type = double;
 
@@ -1090,8 +1090,8 @@ namespace Differentiation
     struct TapedDrivers<
       ADNumberType,
       float,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>
+      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code
+                                DEAL_II_EQUALS NumberTypes::adolc_taped>::type>
     {
       using scalar_type = float;
 
@@ -1224,10 +1224,10 @@ namespace Differentiation
     struct TapelessDrivers<
       ADNumberType,
       ScalarType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad_dfad>::type>
+      typename std::enable_if<
+        ADNumberTraits<ADNumberType>::type_code DEAL_II_EQUALS
+          NumberTypes::sacado_rad DEAL_II_OR ADNumberTraits<ADNumberType>::
+            type_code DEAL_II_EQUALS NumberTypes::sacado_rad_dfad>::type>
     {
       /**
        * Constructor
@@ -1314,12 +1314,12 @@ namespace Differentiation
     struct TapelessDrivers<
       ADNumberType,
       ScalarType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::adolc_tapeless ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_dfad ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_dfad_dfad>::type>
+      typename std::enable_if<
+        ADNumberTraits<ADNumberType>::type_code DEAL_II_EQUALS
+          NumberTypes::adolc_tapeless DEAL_II_OR ADNumberTraits<
+            ADNumberType>::type_code DEAL_II_EQUALS NumberTypes::sacado_dfad
+            DEAL_II_OR ADNumberTraits<ADNumberType>::type_code DEAL_II_EQUALS
+                                                               NumberTypes::sacado_dfad_dfad>::type>
     {
       /**
        * Constructor

@@ -49,7 +49,7 @@ PersistentTriangulation<dim, spacedim>::PersistentTriangulation(
   , refine_flags(old_tria.refine_flags)
   , coarsen_flags(old_tria.coarsen_flags)
 {
-  Assert(old_tria.n_levels() == 0, ExcTriaNotEmpty());
+  Assert(old_tria.n_levels() DEAL_II_EQUALS 0, ExcTriaNotEmpty());
 }
 
 
@@ -89,7 +89,7 @@ template <int dim, int spacedim>
 void
 PersistentTriangulation<dim, spacedim>::restore(const unsigned int step)
 {
-  if (step == 0)
+  if (step DEAL_II_EQUALS 0)
     // copy the old triangulation.
     // this will yield an error if
     // the underlying triangulation
@@ -202,13 +202,14 @@ template <int dim, int spacedim>
 void
 PersistentTriangulation<dim, spacedim>::read_flags(std::istream &in)
 {
-  Assert(refine_flags.size() == 0 && coarsen_flags.size() == 0,
+  Assert(refine_flags.size() DEAL_II_EQUALS 0 DEAL_II_AND coarsen_flags.size()
+           DEAL_II_EQUALS 0,
          ExcFlagsNotCleared());
   AssertThrow(in, ExcIO());
 
   unsigned int magic_number;
   in >> magic_number;
-  AssertThrow(magic_number == mn_persistent_tria_flags_begin,
+  AssertThrow(magic_number DEAL_II_EQUALS mn_persistent_tria_flags_begin,
               typename Triangulation<dim>::ExcGridReadError());
 
   unsigned int n_flag_levels;
@@ -228,7 +229,7 @@ PersistentTriangulation<dim, spacedim>::read_flags(std::istream &in)
     }
 
   in >> magic_number;
-  AssertThrow(magic_number == mn_persistent_tria_flags_end,
+  AssertThrow(magic_number DEAL_II_EQUALS mn_persistent_tria_flags_end,
               typename Triangulation<dim>::ExcGridReadError());
 
   AssertThrow(in, ExcIO());

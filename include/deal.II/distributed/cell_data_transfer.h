@@ -162,8 +162,8 @@ namespace parallel
           for (unsigned int child_index = 1; child_index < parent->n_children();
                ++child_index)
             Assert(
-              value ==
-                input_vector[parent->child(child_index)->active_cell_index()],
+              value DEAL_II_EQUALS
+                    input_vector[parent->child(child_index)->active_cell_index()],
               ExcMessage(
                 "Values on cells that will be coarsened are not equal!"));
 

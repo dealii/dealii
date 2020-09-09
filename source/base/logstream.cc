@@ -107,7 +107,7 @@ LogStream::~LogStream()
         // (note that we can't issue an assertion here either since Assert
         // may want to write to 'deallog' itself, and AssertThrow will
         // throw an exception that can't be caught)
-        if ((this == &deallog) && file)
+        if ((this DEAL_II_EQUALS & deallog) DEAL_II_AND file)
           *std_out << ("You still have content that was written to 'deallog' "
                        "but not flushed to the screen or a file while the "
                        "program is being terminated. This would lead to a "
@@ -140,7 +140,7 @@ LogStream::operator<<(std::ostream &(*p)(std::ostream &))
   //
   // The obvious idea to compare function pointers,
   //   std::ostream & (* const p_flush) (std::ostream &) = &std::flush;
-  //   p == p_flush ? ...,
+  //   p DEAL_II_EQUALS  p_flush ? ...,
   // is wrong as there doesn't has to be a _single_ std::flush instance...
   // there could be multiple of it. And in fact, LLVM's libc++ implements
   // std::flush and std::endl in a way that every shared library and
@@ -204,7 +204,7 @@ LogStream::operator<<(std::ostream &(*p)(std::ostream &))
       if (get_prefixes().size() <= std_depth)
         *std_out << stream.str();
 
-      if (file && (get_prefixes().size() <= file_depth))
+      if (file DEAL_II_AND(get_prefixes().size() <= file_depth))
         *file << stream.str() << std::flush;
 
       // Start a new string:
@@ -255,7 +255,7 @@ LogStream::get_stream()
   // note that in all of this we need not worry about thread-safety
   // because we operate on a thread-local object and by definition
   // there can only be one access at a time
-  if (outstreams.get().get() == nullptr)
+  if (outstreams.get().get() DEAL_II_EQUALS nullptr)
     {
       outstreams.get() = std::make_shared<std::ostringstream>();
       outstreams.get()->setf(std::ios::showpoint | std::ios::left);
@@ -414,7 +414,7 @@ LogStream::print_line_head()
         *std_out << head << ':';
     }
 
-  if (file && (get_prefixes().size() <= file_depth))
+  if (file DEAL_II_AND(get_prefixes().size() <= file_depth))
     {
       if (print_thread_id)
         *file << '[' << thread << ']';

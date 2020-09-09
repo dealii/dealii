@@ -63,7 +63,7 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::initialize(
   Assert(parameters.invert_diagonal, ExcNotImplemented());
 
   clear();
-  //  Assert (M.m() == M.n(), ExcNotQuadratic());
+  //  Assert (M.m() DEAL_II_EQUALS  M.n(), ExcNotQuadratic());
   A               = &M;
   additional_data = &parameters;
   this->inversion = parameters.inversion;
@@ -187,7 +187,7 @@ namespace internal
     // If the following Assertion triggers, you either set temp_ghost_vector
     // for a serial computation (don't!), or nobody implemented, instantiated,
     // and tested the parallel version for your vector type.
-    Assert(other == nullptr, ExcNotImplemented());
+    Assert(other DEAL_II_EQUALS nullptr, ExcNotImplemented());
     (void)other;
     return prev;
   }
@@ -205,7 +205,7 @@ namespace internal
       other != nullptr,
       ExcMessage(
         "You need to provide a ghosted vector in RelaxationBlock::AdditionalData::temp_trilinos_ghost_vector."));
-    Assert(other->size() == prev.size(), ExcInternalError());
+    Assert(other->size() DEAL_II_EQUALS prev.size(), ExcInternalError());
 
     // import ghost values:
     *other = prev;
@@ -230,7 +230,7 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::do_step(
   const MatrixType &                      M = *this->A;
   Vector<typename VectorType::value_type> b_cell, x_cell;
 
-  const bool         permutation_empty = additional_data->order.size() == 0;
+  const bool permutation_empty = additional_data->order.size() DEAL_II_EQUALS 0;
   const unsigned int n_permutations =
     (permutation_empty) ? 1U : additional_data->order.size();
   const size_type n_blocks = additional_data->block_list.n_rows();

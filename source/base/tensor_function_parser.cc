@@ -72,8 +72,9 @@ TensorFunctionParser<rank, dim, Number>::TensorFunctionParser(
   initialize(variable_names,
              expression,
              constants_map,
-             Utilities::split_string_list(variable_names, ",").size() ==
-               dim + 1);
+             Utilities::split_string_list(variable_names, ",")
+                 .size() DEAL_II_EQUALS dim +
+               1);
 }
 
 
@@ -99,7 +100,8 @@ TensorFunctionParser<rank, dim, Number>::initialize(
   this->constants   = constants;
   this->var_names   = Utilities::split_string_list(variables, ',');
   this->expressions = expressions;
-  AssertThrow(((time_dependent) ? dim + 1 : dim) == var_names.size(),
+  AssertThrow(((time_dependent) ? dim + 1 : dim)
+                DEAL_II_EQUALS var_names.size(),
               ExcMessage("Wrong number of variables"));
 
   // We check that the number of
@@ -107,7 +109,7 @@ TensorFunctionParser<rank, dim, Number>::initialize(
   // matches the number of components
   // passed in as a vector of
   // strings.
-  AssertThrow(this->n_components == expressions.size(),
+  AssertThrow(this->n_components DEAL_II_EQUALS expressions.size(),
               ExcInvalidExpressionSize(this->n_components, expressions.size()));
 
   // Now we define how many variables
@@ -148,7 +150,7 @@ TensorFunctionParser<rank, dim, Number>::init_muparser() const
   // check that we have not already initialized the parser on the
   // current thread, i.e., that the current function is only called
   // once per thread
-  Assert(tfp.get().size() == 0, ExcInternalError());
+  Assert(tfp.get().size() DEAL_II_EQUALS 0, ExcInternalError());
 
   // initialize the objects for the current thread (tfp.get() and
   // vars.get())
@@ -230,16 +232,19 @@ TensorFunctionParser<rank, dim, Number>::init_muparser() const
                 {
                   // try to find any occurrences of the function name
                   pos = transformed_expression.find(current_function_name, pos);
-                  if (pos == std::string::npos)
+                  if (pos DEAL_II_EQUALS std::string::npos)
                     break;
 
                   // replace whitespace until there no longer is any
-                  while ((pos + function_name_length <
-                          transformed_expression.size()) &&
-                         ((transformed_expression[pos + function_name_length] ==
-                           ' ') ||
-                          (transformed_expression[pos + function_name_length] ==
-                           '\t')))
+                  while (
+                    (pos + function_name_length < transformed_expression.size())
+                      DEAL_II_AND(
+                        (transformed_expression
+                           [pos + function_name_length] DEAL_II_EQUALS ' ')
+                          DEAL_II_OR(
+                            transformed_expression
+                              [pos +
+                               function_name_length] DEAL_II_EQUALS '\t')))
                     transformed_expression.erase(
                       transformed_expression.begin() + pos +
                       function_name_length);
@@ -287,10 +292,10 @@ template <int rank, int dim, typename Number>
 Tensor<rank, dim, Number>
 TensorFunctionParser<rank, dim, Number>::value(const Point<dim> &p) const
 {
-  Assert(initialized == true, ExcNotInitialized());
+  Assert(initialized DEAL_II_EQUALS true, ExcNotInitialized());
 
   // initialize the parser if that hasn't happened yet on the current thread
-  if (tfp.get().size() == 0)
+  if (tfp.get().size() DEAL_II_EQUALS 0)
     init_muparser();
 
   for (unsigned int i = 0; i < dim; ++i)
@@ -334,7 +339,7 @@ TensorFunctionParser<rank, dim, Number>::value_list(
   const std::vector<Point<dim>> &         p,
   std::vector<Tensor<rank, dim, Number>> &values) const
 {
-  Assert(p.size() == values.size(),
+  Assert(p.size() DEAL_II_EQUALS values.size(),
          ExcDimensionMismatch(p.size(), values.size()));
 
   for (unsigned int i = 0; i < p.size(); ++i)

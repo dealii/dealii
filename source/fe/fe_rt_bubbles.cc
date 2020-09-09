@@ -157,7 +157,7 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
   if (dim > 1)
     {
       QGaussLobatto<dim - 1> face_points(deg + 1);
-      Assert(face_points.size() == this->n_dofs_per_face(face_no),
+      Assert(face_points.size() DEAL_II_EQUALS this->n_dofs_per_face(face_no),
              ExcInternalError());
       for (unsigned int k = 0; k < this->n_dofs_per_face(face_no); ++k)
         this->generalized_face_support_points[face_no][k] =
@@ -181,7 +181,7 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
         this->n_dofs_per_face(face_no) * GeometryInfo<dim>::faces_per_cell;
     }
 
-  if (deg == 1)
+  if (deg DEAL_II_EQUALS 1)
     return;
 
   // In the interior, we need anisotropic Gauss-Lobatto quadratures,
@@ -203,15 +203,15 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
             quadrature = std::make_unique<QAnisotropic<dim>>(high);
             break;
           case 2:
-            quadrature =
-              std::make_unique<QAnisotropic<dim>>(((d == 0) ? low : high),
-                                                  ((d == 1) ? low : high));
+            quadrature = std::make_unique<QAnisotropic<dim>>(
+              ((d DEAL_II_EQUALS 0) ? low : high),
+              ((d DEAL_II_EQUALS 1) ? low : high));
             break;
           case 3:
-            quadrature =
-              std::make_unique<QAnisotropic<dim>>(((d == 0) ? low : high),
-                                                  ((d == 1) ? low : high),
-                                                  ((d == 2) ? low : high));
+            quadrature = std::make_unique<QAnisotropic<dim>>(
+              ((d DEAL_II_EQUALS 0) ? low : high),
+              ((d DEAL_II_EQUALS 1) ? low : high),
+              ((d DEAL_II_EQUALS 2) ? low : high));
             break;
           default:
             Assert(false, ExcNotImplemented());
@@ -220,7 +220,7 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
       for (unsigned int k = 0; k < quadrature->size(); ++k)
         this->generalized_support_points[current++] = quadrature->point(k);
     }
-  Assert(current == this->n_dofs_per_cell(), ExcInternalError());
+  Assert(current DEAL_II_EQUALS this->n_dofs_per_cell(), ExcInternalError());
 }
 
 
@@ -286,12 +286,13 @@ FE_RT_Bubbles<dim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &support_point_values,
   std::vector<double> &              nodal_values) const
 {
-  Assert(support_point_values.size() == this->generalized_support_points.size(),
+  Assert(support_point_values.size()
+           DEAL_II_EQUALS this->generalized_support_points.size(),
          ExcDimensionMismatch(support_point_values.size(),
                               this->generalized_support_points.size()));
-  Assert(nodal_values.size() == this->n_dofs_per_cell(),
+  Assert(nodal_values.size() DEAL_II_EQUALS this->n_dofs_per_cell(),
          ExcDimensionMismatch(nodal_values.size(), this->n_dofs_per_cell()));
-  Assert(support_point_values[0].size() == this->n_components(),
+  Assert(support_point_values[0].size() DEAL_II_EQUALS this->n_components(),
          ExcDimensionMismatch(support_point_values[0].size(),
                               this->n_components()));
 
@@ -311,7 +312,8 @@ FE_RT_Bubbles<dim>::convert_generalized_support_point_values_to_dof_values(
 
   // The remaining points form dim chunks, one for each component.
   const unsigned int istep = (this->n_dofs_per_cell() - fbase) / dim;
-  Assert((this->n_dofs_per_cell() - fbase) % dim == 0, ExcInternalError());
+  Assert((this->n_dofs_per_cell() - fbase) % dim DEAL_II_EQUALS 0,
+         ExcInternalError());
 
   f = 0;
   while (fbase < this->n_dofs_per_cell())
@@ -323,7 +325,7 @@ FE_RT_Bubbles<dim>::convert_generalized_support_point_values_to_dof_values(
       fbase += istep;
       ++f;
     }
-  Assert(fbase == this->n_dofs_per_cell(), ExcInternalError());
+  Assert(fbase DEAL_II_EQUALS this->n_dofs_per_cell(), ExcInternalError());
 }
 
 

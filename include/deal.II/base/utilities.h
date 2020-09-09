@@ -460,7 +460,7 @@ namespace Utilities
   constexpr T
   pow(const T base, const int iexp)
   {
-#if defined(DEBUG) && !defined(DEAL_II_CXX14_CONSTEXPR_BUG)
+#if defined(DEBUG) DEAL_II_AND !defined(DEAL_II_CXX14_CONSTEXPR_BUG)
     // Up to __builtin_expect this is the same code as in the 'Assert' macro.
     // The call to __builtin_expect turns out to be problematic.
     if (!(iexp >= 0))
@@ -482,12 +482,12 @@ namespace Utilities
     //   return 1;
     //
     // // avoid overflow of one additional recursion with pow(base * base, 0)
-    // if (iexp == 1)
+    // if (iexp DEAL_II_EQUALS  1)
     //   return base;
     //
     // // if the current exponent is not divisible by two,
     // // we need to account for that.
-    // const unsigned int prefactor = (iexp % 2 == 1) ? base : 1;
+    // const unsigned int prefactor = (iexp % 2 DEAL_II_EQUALS  1) ? base : 1;
     //
     // // a^b = (a*a)^(b/2)      for b even
     // // a^b = a*(a*a)^((b-1)/2 for b odd
@@ -496,10 +496,10 @@ namespace Utilities
 
     static_assert(std::is_integral<T>::value, "Only integral types supported");
 
-    return iexp <= 0 ?
-             1 :
-             (iexp == 1 ? base :
-                          (((iexp % 2 == 1) ? base : 1) *
+    return iexp <= 0 ? 1 :
+                       (iexp DEAL_II_EQUALS 1 ?
+                          base :
+                          (((iexp % 2 DEAL_II_EQUALS 1) ? base : 1) *
                            dealii::Utilities::pow(base * base, iexp / 2)));
   }
 
@@ -749,7 +749,7 @@ namespace Utilities
    */
   template <typename To, typename From>
   std::unique_ptr<To>
-  dynamic_unique_cast(std::unique_ptr<From> &&p)
+  dynamic_unique_cast(std::unique_ptr<From> DEAL_II_AND p)
   {
     // Let's see if we can cast from 'From' to 'To'. If so, do the cast,
     // and then release the pointer from the old
@@ -1045,18 +1045,18 @@ namespace Utilities
   fixed_power(const T x)
   {
     Assert(
-      !std::is_integral<T>::value || (N >= 0),
+      !std::is_integral<T>::value DEAL_II_OR(N >= 0),
       ExcMessage(
         "The non-type template parameter N must be a non-negative integer for integral type T"));
 
-    if (N == 0)
+    if (N DEAL_II_EQUALS 0)
       return T(1.);
     else if (N < 0)
       return T(1.) / fixed_power<-N>(x);
     else
       // Use exponentiation by squaring:
-      return ((N % 2 == 1) ? x * fixed_power<N / 2>(x * x) :
-                             fixed_power<N / 2>(x * x));
+      return ((N % 2 DEAL_II_EQUALS 1) ? x * fixed_power<N / 2>(x * x) :
+                                         fixed_power<N / 2>(x * x));
   }
 
 
@@ -1092,7 +1092,7 @@ namespace Utilities
 
     unsigned int len = static_cast<unsigned int>(last - first);
 
-    if (len == 0)
+    if (len DEAL_II_EQUALS 0)
       return first;
 
     while (true)
@@ -1146,7 +1146,7 @@ namespace Utilities
                   // sorted
                   // correctly!? or
                   // did len
-                  // become==0
+                  // becomeDEAL_II_EQUALS 0
                   // somehow? that
                   // shouldn't have
                   // happened
@@ -1195,13 +1195,13 @@ namespace Utilities
     // we have to work around the fact that GCC 4.8.x claims to be C++
     // conforming, but is not actually as it does not implement
     // std::is_trivially_copyable.
-#if __GNUG__ && __GNUC__ < 5
-    if (__has_trivial_copy(T) && sizeof(T) < 256)
+#if __GNUG__ DEAL_II_AND __GNUC__ < 5
+    if (__has_trivial_copy(T) DEAL_II_AND sizeof(T) < 256)
 #else
 #  ifdef DEAL_II_HAVE_CXX17
-    if constexpr (std::is_trivially_copyable<T>() && sizeof(T) < 256)
+    if constexpr (std::is_trivially_copyable<T>() DEAL_II_AND sizeof(T) < 256)
 #  else
-    if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
+    if (std::is_trivially_copyable<T>() DEAL_II_AND sizeof(T) < 256)
 #  endif
 #endif
       {
@@ -1277,17 +1277,18 @@ namespace Utilities
     // we have to work around the fact that GCC 4.8.x claims to be C++
     // conforming, but is not actually as it does not implement
     // std::is_trivially_copyable.
-#if __GNUG__ && __GNUC__ < 5
-    if (__has_trivial_copy(T) && sizeof(T) < 256)
+#if __GNUG__ DEAL_II_AND __GNUC__ < 5
+    if (__has_trivial_copy(T) DEAL_II_AND sizeof(T) < 256)
 #else
 #  ifdef DEAL_II_HAVE_CXX17
-    if constexpr (std::is_trivially_copyable<T>() && sizeof(T) < 256)
+    if constexpr (std::is_trivially_copyable<T>() DEAL_II_AND sizeof(T) < 256)
 #  else
-    if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
+    if (std::is_trivially_copyable<T>() DEAL_II_AND sizeof(T) < 256)
 #  endif
 #endif
       {
-        Assert(std::distance(cbegin, cend) == sizeof(T), ExcInternalError());
+        Assert(std::distance(cbegin, cend) DEAL_II_EQUALS sizeof(T),
+               ExcInternalError());
         std::memcpy(&object, &*cbegin, sizeof(T));
       }
     else
@@ -1344,14 +1345,16 @@ namespace Utilities
     // conforming, but is not actually as it does not implement
     // std::is_trivially_copyable.
     if (
-#if __GNUG__ && __GNUC__ < 5
+#if __GNUG__ DEAL_II_AND __GNUC__ < 5
       __has_trivial_copy(T)
 #else
       std::is_trivially_copyable<T>()
 #endif
-      && sizeof(T) * N < 256)
+          DEAL_II_AND sizeof(T) *
+        N <
+      256)
       {
-        Assert(std::distance(cbegin, cend) == sizeof(T) * N,
+        Assert(std::distance(cbegin, cend) DEAL_II_EQUALS sizeof(T) * N,
                ExcInternalError());
         std::memcpy(unpacked_object, &*cbegin, sizeof(T) * N);
       }

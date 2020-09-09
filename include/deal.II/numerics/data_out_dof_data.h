@@ -1175,7 +1175,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::merge_patches(
   const Point<patch_space_dim> &                                      shift)
 {
   const std::vector<Patch> &source_patches = source.get_patches();
-  Assert((patches.size() != 0) && (source_patches.size() != 0),
+  Assert((patches.size() != 0) DEAL_II_AND(source_patches.size() != 0),
          ExcMessage("When calling this function, both the current "
                     "object and the one being merged need to have a "
                     "nonzero number of patches associated with it. "
@@ -1183,7 +1183,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::merge_patches(
                     "are empty, or you may have forgotten to call "
                     "the 'build_patches()' function."));
   // Check equality of component names
-  Assert(get_dataset_names() == source.get_dataset_names(),
+  Assert(get_dataset_names() DEAL_II_EQUALS source.get_dataset_names(),
          Exceptions::DataOutImplementation::ExcIncompatibleDatasetNames());
 
   // Make sure patches are compatible. Ideally, we would check that all input
@@ -1200,34 +1200,41 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::merge_patches(
   // number of rows may or may not include coordinates for the points,
   // and the comparison has to account for that because in each source
   // stream, the patches may include some that have points included.
-  Assert(patches[0].n_subdivisions == source_patches[0].n_subdivisions,
-         Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
-  Assert(patches[0].data.n_cols() == source_patches[0].data.n_cols(),
-         Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
+  Assert(
+    patches[0].n_subdivisions DEAL_II_EQUALS source_patches[0].n_subdivisions,
+    Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
+  Assert(
+    patches[0].data.n_cols() DEAL_II_EQUALS source_patches[0].data.n_cols(),
+    Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
   Assert((patches[0].data.n_rows() +
-          (patches[0].points_are_available ? 0 : patch_space_dim)) ==
-           (source_patches[0].data.n_rows() +
-            (source_patches[0].points_are_available ? 0 : patch_space_dim)),
+          (patches[0].points_are_available ? 0 : patch_space_dim))
+           DEAL_II_EQUALS(
+             source_patches[0].data.n_rows() +
+             (source_patches[0].points_are_available ? 0 : patch_space_dim)),
          Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
 
   // check equality of the vector data
   // specifications
-  Assert(get_nonscalar_data_ranges().size() ==
-           source.get_nonscalar_data_ranges().size(),
+  Assert(get_nonscalar_data_ranges()
+           .size() DEAL_II_EQUALS source.get_nonscalar_data_ranges()
+           .size(),
          ExcMessage("Both sources need to declare the same components "
                     "as vectors."));
   for (unsigned int i = 0; i < get_nonscalar_data_ranges().size(); ++i)
     {
-      Assert(std::get<0>(get_nonscalar_data_ranges()[i]) ==
-               std::get<0>(source.get_nonscalar_data_ranges()[i]),
+      Assert(std::get<0>(get_nonscalar_data_ranges()[i])
+               DEAL_II_EQUALS std::get<0>(
+                 source.get_nonscalar_data_ranges()[i]),
              ExcMessage("Both sources need to declare the same components "
                         "as vectors."));
-      Assert(std::get<1>(get_nonscalar_data_ranges()[i]) ==
-               std::get<1>(source.get_nonscalar_data_ranges()[i]),
+      Assert(std::get<1>(get_nonscalar_data_ranges()[i])
+               DEAL_II_EQUALS std::get<1>(
+                 source.get_nonscalar_data_ranges()[i]),
              ExcMessage("Both sources need to declare the same components "
                         "as vectors."));
-      Assert(std::get<2>(get_nonscalar_data_ranges()[i]) ==
-               std::get<2>(source.get_nonscalar_data_ranges()[i]),
+      Assert(std::get<2>(get_nonscalar_data_ranges()[i])
+               DEAL_II_EQUALS std::get<2>(
+                 source.get_nonscalar_data_ranges()[i]),
              ExcMessage("Both sources need to declare the same components "
                         "as vectors."));
     }

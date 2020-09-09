@@ -51,23 +51,24 @@ namespace internal
   {
     std::string policy_name;
     if (dynamic_cast<const typename dealii::internal::DoFHandlerImplementation::
-                       Policy::Sequential<dim, spacedim> *>(&policy) ||
-        dynamic_cast<const typename dealii::internal::DoFHandlerImplementation::
-                       Policy::Sequential<dim, spacedim> *>(&policy))
+                       Policy::Sequential<dim, spacedim> *>(&policy)
+          DEAL_II_OR dynamic_cast<
+            const typename dealii::internal::DoFHandlerImplementation::Policy::
+              Sequential<dim, spacedim> *>(&policy))
       policy_name = "Policy::Sequential<";
     else if (dynamic_cast<
                const typename dealii::internal::DoFHandlerImplementation::
-                 Policy::ParallelDistributed<dim, spacedim> *>(&policy) ||
-             dynamic_cast<
-               const typename dealii::internal::DoFHandlerImplementation::
-                 Policy::ParallelDistributed<dim, spacedim> *>(&policy))
+                 Policy::ParallelDistributed<dim, spacedim> *>(&policy)
+               DEAL_II_OR dynamic_cast<
+                 const typename dealii::internal::DoFHandlerImplementation::
+                   Policy::ParallelDistributed<dim, spacedim> *>(&policy))
       policy_name = "Policy::ParallelDistributed<";
     else if (dynamic_cast<
                const typename dealii::internal::DoFHandlerImplementation::
-                 Policy::ParallelShared<dim, spacedim> *>(&policy) ||
-             dynamic_cast<
-               const typename dealii::internal::DoFHandlerImplementation::
-                 Policy::ParallelShared<dim, spacedim> *>(&policy))
+                 Policy::ParallelShared<dim, spacedim> *>(&policy)
+               DEAL_II_OR dynamic_cast<
+                 const typename dealii::internal::DoFHandlerImplementation::
+                   Policy::ParallelShared<dim, spacedim> *>(&policy))
       policy_name = "Policy::ParallelShared<";
     else
       AssertThrow(false, ExcNotImplemented());
@@ -428,13 +429,11 @@ namespace internal
 
                     // make sure that either the face has not been visited or
                     // the face has the same number of dofs assigned
-                    Assert(
-                      (n_dofs_per_quad_target ==
-                         static_cast<
-                           typename DoFHandler<dim, spacedim>::offset_type>(
-                           -1) ||
-                       n_dofs_per_quad_target == n_dofs_per_quad),
-                      ExcNotImplemented());
+                    Assert((n_dofs_per_quad_target DEAL_II_EQUALS static_cast<
+                             typename DoFHandler<dim, spacedim>::offset_type>(
+                             -1) DEAL_II_OR n_dofs_per_quad_target
+                              DEAL_II_EQUALS n_dofs_per_quad),
+                           ExcNotImplemented());
 
                     n_dofs_per_quad_target = n_dofs_per_quad;
                   }
@@ -444,9 +443,9 @@ namespace internal
               for (unsigned int i = 1; i < dof_handler.tria->n_raw_quads() + 1;
                    i++)
                 {
-                  if (dof_handler.object_dof_ptr[0][2][i] ==
-                      static_cast<
-                        typename DoFHandler<dim, spacedim>::offset_type>(-1))
+                  if (dof_handler
+                        .object_dof_ptr[0][2][i] DEAL_II_EQUALS static_cast<
+                          typename DoFHandler<dim, spacedim>::offset_type>(-1))
                     dof_handler.object_dof_ptr[0][2][i] =
                       dof_handler.object_dof_ptr[0][2][i - 1];
                   else
@@ -525,8 +524,9 @@ namespace internal
 
           else
             {
-              Assert(min_level[vertex] == n_levels, ExcInternalError());
-              Assert(max_level[vertex] == 0, ExcInternalError());
+              Assert(min_level[vertex] DEAL_II_EQUALS n_levels,
+                     ExcInternalError());
+              Assert(max_level[vertex] DEAL_II_EQUALS 0, ExcInternalError());
               dof_handler.mg_vertex_dofs[vertex].init(1, 0, 0);
             }
       }
@@ -600,8 +600,9 @@ namespace internal
 
           else
             {
-              Assert(min_level[vertex] == n_levels, ExcInternalError());
-              Assert(max_level[vertex] == 0, ExcInternalError());
+              Assert(min_level[vertex] DEAL_II_EQUALS n_levels,
+                     ExcInternalError());
+              Assert(max_level[vertex] DEAL_II_EQUALS 0, ExcInternalError());
               dof_handler.mg_vertex_dofs[vertex].init(1, 0, 0);
             }
       }
@@ -679,8 +680,9 @@ namespace internal
 
           else
             {
-              Assert(min_level[vertex] == n_levels, ExcInternalError());
-              Assert(max_level[vertex] == 0, ExcInternalError());
+              Assert(min_level[vertex] DEAL_II_EQUALS n_levels,
+                     ExcInternalError());
+              Assert(max_level[vertex] DEAL_II_EQUALS 0, ExcInternalError());
               dof_handler.mg_vertex_dofs[vertex].init(1, 0, 0);
             }
       }
@@ -698,7 +700,7 @@ namespace internal
         const unsigned int local_index,
         const std::integral_constant<int, 1>)
       {
-        Assert(dof_handler.hp_capability_enabled == false,
+        Assert(dof_handler.hp_capability_enabled DEAL_II_EQUALS false,
                (typename DoFHandler<1, spacedim>::ExcNotImplementedWithHP()));
 
         return mg_level->dof_object.get_dof_index(
@@ -741,7 +743,7 @@ namespace internal
         const unsigned int local_index,
         const std::integral_constant<int, 2>)
       {
-        Assert(dof_handler.hp_capability_enabled == false,
+        Assert(dof_handler.hp_capability_enabled DEAL_II_EQUALS false,
                (typename DoFHandler<2, spacedim>::ExcNotImplementedWithHP()));
         return mg_level->dof_object.get_dof_index(
           static_cast<const DoFHandler<2, spacedim> &>(dof_handler),
@@ -763,7 +765,7 @@ namespace internal
         const unsigned int local_index,
         const std::integral_constant<int, 1>)
       {
-        Assert(dof_handler.hp_capability_enabled == false,
+        Assert(dof_handler.hp_capability_enabled DEAL_II_EQUALS false,
                (typename DoFHandler<3, spacedim>::ExcNotImplementedWithHP()));
         return mg_faces->lines.get_dof_index(
           static_cast<const DoFHandler<3, spacedim> &>(dof_handler),
@@ -785,7 +787,7 @@ namespace internal
         const unsigned int local_index,
         const std::integral_constant<int, 2>)
       {
-        Assert(dof_handler.hp_capability_enabled == false,
+        Assert(dof_handler.hp_capability_enabled DEAL_II_EQUALS false,
                (typename DoFHandler<3, spacedim>::ExcNotImplementedWithHP()));
         return mg_faces->quads.get_dof_index(
           static_cast<const DoFHandler<3, spacedim> &>(dof_handler),
@@ -807,7 +809,7 @@ namespace internal
         const unsigned int local_index,
         const std::integral_constant<int, 3>)
       {
-        Assert(dof_handler.hp_capability_enabled == false,
+        Assert(dof_handler.hp_capability_enabled DEAL_II_EQUALS false,
                (typename DoFHandler<3, spacedim>::ExcNotImplementedWithHP()));
         return mg_level->dof_object.get_dof_index(
           static_cast<const DoFHandler<3, spacedim> &>(dof_handler),
@@ -830,7 +832,7 @@ namespace internal
         const types::global_dof_index global_index,
         const std::integral_constant<int, 1>)
       {
-        Assert(dof_handler.hp_capability_enabled == false,
+        Assert(dof_handler.hp_capability_enabled DEAL_II_EQUALS false,
                (typename DoFHandler<1, spacedim>::ExcNotImplementedWithHP()));
         mg_level->dof_object.set_dof_index(
           static_cast<const DoFHandler<1, spacedim> &>(dof_handler),
@@ -854,7 +856,7 @@ namespace internal
         const types::global_dof_index global_index,
         const std::integral_constant<int, 1>)
       {
-        Assert(dof_handler.hp_capability_enabled == false,
+        Assert(dof_handler.hp_capability_enabled DEAL_II_EQUALS false,
                (typename DoFHandler<2, spacedim>::ExcNotImplementedWithHP()));
         mg_faces->lines.set_dof_index(
           static_cast<const DoFHandler<2, spacedim> &>(dof_handler),
@@ -878,7 +880,7 @@ namespace internal
         const types::global_dof_index global_index,
         const std::integral_constant<int, 2>)
       {
-        Assert(dof_handler.hp_capability_enabled == false,
+        Assert(dof_handler.hp_capability_enabled DEAL_II_EQUALS false,
                (typename DoFHandler<2, spacedim>::ExcNotImplementedWithHP()));
         mg_level->dof_object.set_dof_index(
           static_cast<const DoFHandler<2, spacedim> &>(dof_handler),
@@ -902,7 +904,7 @@ namespace internal
         const types::global_dof_index global_index,
         const std::integral_constant<int, 1>)
       {
-        Assert(dof_handler.hp_capability_enabled == false,
+        Assert(dof_handler.hp_capability_enabled DEAL_II_EQUALS false,
                (typename DoFHandler<3, spacedim>::ExcNotImplementedWithHP()));
         mg_faces->lines.set_dof_index(
           static_cast<const DoFHandler<3, spacedim> &>(dof_handler),
@@ -926,7 +928,7 @@ namespace internal
         const types::global_dof_index global_index,
         const std::integral_constant<int, 2>)
       {
-        Assert(dof_handler.hp_capability_enabled == false,
+        Assert(dof_handler.hp_capability_enabled DEAL_II_EQUALS false,
                (typename DoFHandler<3, spacedim>::ExcNotImplementedWithHP()));
         mg_faces->quads.set_dof_index(
           static_cast<const DoFHandler<3, spacedim> &>(dof_handler),
@@ -950,7 +952,7 @@ namespace internal
         const types::global_dof_index global_index,
         const std::integral_constant<int, 3>)
       {
-        Assert(dof_handler.hp_capability_enabled == false,
+        Assert(dof_handler.hp_capability_enabled DEAL_II_EQUALS false,
                (typename DoFHandler<3, spacedim>::ExcNotImplementedWithHP()));
         mg_level->dof_object.set_dof_index(
           static_cast<const DoFHandler<3, spacedim> &>(dof_handler),
@@ -1090,12 +1092,12 @@ namespace internal
                 // ghost or locally owned cells
 #ifdef DEBUG
           for (unsigned int v = 0; v < dof_handler.tria->n_vertices(); ++v)
-            if (locally_used_vertices[v] == true)
-              if (dof_handler.tria->vertex_used(v) == true)
+            if (locally_used_vertices[v] DEAL_II_EQUALS true)
+              if (dof_handler.tria->vertex_used(v) DEAL_II_EQUALS true)
                 {
                   unsigned int fe = 0;
                   for (; fe < dof_handler.fe_collection.size(); ++fe)
-                    if (vertex_fe_association[fe][v] == true)
+                    if (vertex_fe_association[fe][v] DEAL_II_EQUALS true)
                       break;
                   Assert(fe != dof_handler.fe_collection.size(),
                          ExcInternalError());
@@ -1120,12 +1122,13 @@ namespace internal
             {
               dof_handler.hp_object_fe_ptr[d].push_back(fe_slots_needed);
 
-              if (dof_handler.tria->vertex_used(v) && locally_used_vertices[v])
+              if (dof_handler.tria->vertex_used(v)
+                    DEAL_II_AND locally_used_vertices[v])
                 {
                   for (unsigned int fe = 0;
                        fe < dof_handler.fe_collection.size();
                        ++fe)
-                    if (vertex_fe_association[fe][v] == true)
+                    if (vertex_fe_association[fe][v] DEAL_II_EQUALS true)
                       {
                         fe_slots_needed++;
                         vertex_slots_needed +=
@@ -1142,11 +1145,12 @@ namespace internal
           dof_handler.object_dof_indices[l][d].reserve(vertex_slots_needed);
 
           for (unsigned int v = 0; v < dof_handler.tria->n_vertices(); ++v)
-            if (dof_handler.tria->vertex_used(v) && locally_used_vertices[v])
+            if (dof_handler.tria->vertex_used(v)
+                  DEAL_II_AND locally_used_vertices[v])
               {
                 for (unsigned int fe = 0; fe < dof_handler.fe_collection.size();
                      ++fe)
-                  if (vertex_fe_association[fe][v] == true)
+                  if (vertex_fe_association[fe][v] DEAL_II_EQUALS true)
                     {
                       dof_handler.hp_object_fe_indices[d].push_back(fe);
                       dof_handler.object_dof_ptr[l][d].push_back(
@@ -1215,7 +1219,7 @@ namespace internal
 
               for (auto cell :
                    dof_handler.active_cell_iterators_on_level(level))
-                if (cell->is_active() && !cell->is_artificial())
+                if (cell->is_active() DEAL_II_AND !cell->is_artificial())
                   {
                     dof_handler.object_dof_ptr[level][dim][cell->index()] =
                       next_free_dof;
@@ -1314,19 +1318,23 @@ namespace internal
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
                 for (const auto face : cell->face_indices())
-                  if (cell->face(face)->user_flag_set() == false)
+                  if (cell->face(face)->user_flag_set() DEAL_II_EQUALS false)
                     {
                       unsigned int fe_slots_needed = 0;
 
-                      if (cell->at_boundary(face) ||
-                          cell->face(face)->has_children() ||
-                          cell->neighbor_is_coarser(face) ||
-                          (!cell->at_boundary(face) &&
-                           cell->neighbor(face)->is_artificial()) ||
-                          (!cell->at_boundary(face) &&
-                           !cell->neighbor(face)->is_artificial() &&
-                           (cell->active_fe_index() ==
-                            cell->neighbor(face)->active_fe_index())))
+                      if (cell->at_boundary(face) DEAL_II_OR cell->face(face)
+                            ->has_children() DEAL_II_OR      cell
+                            ->neighbor_is_coarser(face) DEAL_II_OR(
+                              !cell->at_boundary(face)
+                                 DEAL_II_AND cell->neighbor(face)
+                                   ->is_artificial())
+                              DEAL_II_OR(
+                                !cell->at_boundary(face) DEAL_II_AND !cell
+                                   ->neighbor(face)
+                                   ->is_artificial() DEAL_II_AND(
+                                     cell->active_fe_index()
+                                       DEAL_II_EQUALS cell->neighbor(face)
+                                         ->active_fe_index())))
                         {
                           fe_slots_needed = 1;
                           n_face_slots +=
@@ -1399,15 +1407,19 @@ namespace internal
                   if (!cell->face(face)->user_flag_set())
                     {
                       // Same decision tree as before
-                      if (cell->at_boundary(face) ||
-                          cell->face(face)->has_children() ||
-                          cell->neighbor_is_coarser(face) ||
-                          (!cell->at_boundary(face) &&
-                           cell->neighbor(face)->is_artificial()) ||
-                          (!cell->at_boundary(face) &&
-                           !cell->neighbor(face)->is_artificial() &&
-                           (cell->active_fe_index() ==
-                            cell->neighbor(face)->active_fe_index())))
+                      if (cell->at_boundary(face) DEAL_II_OR cell->face(face)
+                            ->has_children() DEAL_II_OR      cell
+                            ->neighbor_is_coarser(face) DEAL_II_OR(
+                              !cell->at_boundary(face)
+                                 DEAL_II_AND cell->neighbor(face)
+                                   ->is_artificial())
+                              DEAL_II_OR(
+                                !cell->at_boundary(face) DEAL_II_AND !cell
+                                   ->neighbor(face)
+                                   ->is_artificial() DEAL_II_AND(
+                                     cell->active_fe_index()
+                                       DEAL_II_EQUALS cell->neighbor(face)
+                                         ->active_fe_index())))
                         {
                           const unsigned int fe = cell->active_fe_index();
                           const unsigned int n_dofs =
@@ -1517,8 +1529,8 @@ namespace internal
                  (typename dealii::DoFHandler<1, spacedim>::ExcNoFESelected()));
           Assert(dof_handler.tria->n_levels() > 0,
                  ExcMessage("The current Triangulation must not be empty."));
-          Assert(dof_handler.tria->n_levels() ==
-                   dof_handler.hp_cell_future_fe_indices.size(),
+          Assert(dof_handler.tria->n_levels()
+                   DEAL_II_EQUALS dof_handler.hp_cell_future_fe_indices.size(),
                  ExcInternalError());
 
           reserve_space_release_space(dof_handler);
@@ -1540,8 +1552,8 @@ namespace internal
                  (typename dealii::DoFHandler<1, spacedim>::ExcNoFESelected()));
           Assert(dof_handler.tria->n_levels() > 0,
                  ExcMessage("The current Triangulation must not be empty."));
-          Assert(dof_handler.tria->n_levels() ==
-                   dof_handler.hp_cell_future_fe_indices.size(),
+          Assert(dof_handler.tria->n_levels()
+                   DEAL_II_EQUALS dof_handler.hp_cell_future_fe_indices.size(),
                  ExcInternalError());
 
           reserve_space_release_space(dof_handler);
@@ -1565,8 +1577,8 @@ namespace internal
                  (typename dealii::DoFHandler<1, spacedim>::ExcNoFESelected()));
           Assert(dof_handler.tria->n_levels() > 0,
                  ExcMessage("The current Triangulation must not be empty."));
-          Assert(dof_handler.tria->n_levels() ==
-                   dof_handler.hp_cell_future_fe_indices.size(),
+          Assert(dof_handler.tria->n_levels()
+                   DEAL_II_EQUALS dof_handler.hp_cell_future_fe_indices.size(),
                  ExcInternalError());
 
           reserve_space_release_space(dof_handler);
@@ -1612,7 +1624,7 @@ namespace internal
                  ++line)
               for (unsigned int fe = 0; fe < dof_handler.fe_collection.size();
                    ++fe)
-                if (line_fe_association[fe][line] == true)
+                if (line_fe_association[fe][line] DEAL_II_EQUALS true)
                   {
                     line_is_used[line] = true;
                     break;
@@ -1639,12 +1651,12 @@ namespace internal
               {
                 dof_handler.hp_object_fe_ptr[d].push_back(fe_slots_needed);
 
-                if (line_is_used[line] == true)
+                if (line_is_used[line] DEAL_II_EQUALS true)
                   {
                     for (unsigned int fe = 0;
                          fe < dof_handler.fe_collection.size();
                          ++fe)
-                      if (line_fe_association[fe][line] == true)
+                      if (line_fe_association[fe][line] DEAL_II_EQUALS true)
                         {
                           fe_slots_needed++;
                           line_slots_needed +=
@@ -1666,12 +1678,12 @@ namespace internal
 
             for (unsigned int line = 0; line < dof_handler.tria->n_raw_lines();
                  ++line)
-              if (line_is_used[line] == true)
+              if (line_is_used[line] DEAL_II_EQUALS true)
                 {
                   for (unsigned int fe = 0;
                        fe < dof_handler.fe_collection.size();
                        ++fe)
-                    if (line_fe_association[fe][line] == true)
+                    if (line_fe_association[fe][line] DEAL_II_EQUALS true)
                       {
                         dof_handler.hp_object_fe_indices[d].push_back(fe);
                         dof_handler.object_dof_ptr[l][d].push_back(
@@ -1719,7 +1731,7 @@ namespace internal
         communicate_active_fe_indices(DoFHandler<dim, spacedim> &dof_handler)
         {
           Assert(
-            dof_handler.hp_capability_enabled == true,
+            dof_handler.hp_capability_enabled DEAL_II_EQUALS true,
             (typename DoFHandler<dim, spacedim>::ExcNotAvailableWithoutHP()));
 
           if (const dealii::parallel::shared::Triangulation<dim, spacedim> *tr =
@@ -1803,8 +1815,8 @@ namespace internal
               // a sequential triangulation. there is nothing we need to do here
               Assert(
                 (dynamic_cast<
-                   const dealii::parallel::TriangulationBase<dim, spacedim> *>(
-                   &dof_handler.get_triangulation()) == nullptr),
+                  const dealii::parallel::TriangulationBase<dim, spacedim> *>(
+                  &dof_handler.get_triangulation()) DEAL_II_EQUALS nullptr),
                 ExcInternalError());
             }
         }
@@ -1860,8 +1872,9 @@ namespace internal
 
                     // Check if the active_fe_index for the current cell has
                     // been determined already.
-                    if (fe_transfer->coarsened_cells_fe_index.find(parent) ==
-                        fe_transfer->coarsened_cells_fe_index.end())
+                    if (fe_transfer->coarsened_cells_fe_index
+                          .find(parent) DEAL_II_EQUALS fe_transfer
+                          ->coarsened_cells_fe_index.end())
                       {
                         // Find a suitable active_fe_index for the parent cell
                         // based on the 'least dominant finite element' of its
@@ -1873,8 +1886,8 @@ namespace internal
                              ++child_index)
                           {
                             const auto sibling = parent->child(child_index);
-                            Assert(sibling->is_active() &&
-                                     sibling->coarsen_flag_set(),
+                            Assert(sibling->is_active()
+                                     DEAL_II_AND sibling->coarsen_flag_set(),
                                    typename dealii::Triangulation<
                                      dim>::ExcInconsistentCoarseningFlags());
 
@@ -1901,7 +1914,7 @@ namespace internal
                     // No h-refinement is scheduled for this cell.
                     // However, it may have p-refinement indicators, so we
                     // choose a new active_fe_index based on its flags.
-                    if (cell->future_fe_index_set() == true)
+                    if (cell->future_fe_index_set() DEAL_II_EQUALS true)
                       fe_transfer->persisting_cells_fe_index.insert(
                         {cell, cell->future_fe_index()});
                   }
@@ -1944,7 +1957,8 @@ namespace internal
                    ++child_index)
                 {
                   const auto &child = parent->child(child_index);
-                  Assert(child->is_locally_owned() && child->is_active(),
+                  Assert(child->is_locally_owned()
+                           DEAL_II_AND child->is_active(),
                          ExcInternalError());
                   child->set_active_fe_index(refine.second);
                 }
@@ -1955,7 +1969,7 @@ namespace internal
           for (const auto &coarsen : fe_transfer->coarsened_cells_fe_index)
             {
               const auto &cell = coarsen.first;
-              Assert(cell->is_locally_owned() && cell->is_active(),
+              Assert(cell->is_locally_owned() DEAL_II_AND cell->is_active(),
                      ExcInternalError());
               cell->set_active_fe_index(coarsen.second);
             }
@@ -2119,7 +2133,7 @@ DoFHandler<dim, spacedim>::begin(const unsigned int level) const
 {
   typename Triangulation<dim, spacedim>::cell_iterator cell =
     this->get_triangulation().begin(level);
-  if (cell == this->get_triangulation().end(level))
+  if (cell DEAL_II_EQUALS this->get_triangulation().end(level))
     return end(level);
   return cell_iterator(*cell, this);
 }
@@ -2186,7 +2200,7 @@ DoFHandler<dim, spacedim>::begin_mg(const unsigned int level) const
                     "levels if mg dofs got distributed."));
   typename Triangulation<dim, spacedim>::cell_iterator cell =
     this->get_triangulation().begin(level);
-  if (cell == this->get_triangulation().end(level))
+  if (cell DEAL_II_EQUALS this->get_triangulation().end(level))
     return end_mg(level);
   return level_cell_iterator(*cell, this);
 }
@@ -2291,7 +2305,8 @@ template <int dim, int spacedim>
 types::global_dof_index
 DoFHandler<dim, spacedim>::n_boundary_dofs() const
 {
-  Assert(!(dim == 2 && spacedim == 3) || hp_capability_enabled == false,
+  Assert(!(dim DEAL_II_EQUALS 2 DEAL_II_AND spacedim DEAL_II_EQUALS 3)
+           DEAL_II_OR hp_capability_enabled DEAL_II_EQUALS false,
          ExcNotImplementedWithHP());
 
   Assert(this->fe_collection.size() > 0, ExcNoFESelected());
@@ -2308,7 +2323,7 @@ DoFHandler<dim, spacedim>::n_boundary_dofs() const
   // not support boundaries of dimension dim-2, and so every
   // boundary line is also part of a boundary face.
   for (const auto &cell : this->active_cell_iterators())
-    if (cell->is_locally_owned() && cell->at_boundary())
+    if (cell->is_locally_owned() DEAL_II_AND cell->at_boundary())
       {
         for (const auto iface : cell->face_indices())
           {
@@ -2341,12 +2356,14 @@ types::global_dof_index
 DoFHandler<dim, spacedim>::n_boundary_dofs(
   const std::set<types::boundary_id> &boundary_ids) const
 {
-  Assert(!(dim == 2 && spacedim == 3) || hp_capability_enabled == false,
+  Assert(!(dim DEAL_II_EQUALS 2 DEAL_II_AND spacedim DEAL_II_EQUALS 3)
+           DEAL_II_OR hp_capability_enabled DEAL_II_EQUALS false,
          ExcNotImplementedWithHP());
 
   Assert(this->fe_collection.size() > 0, ExcNoFESelected());
-  Assert(boundary_ids.find(numbers::internal_face_boundary_id) ==
-           boundary_ids.end(),
+  Assert(boundary_ids
+           .find(numbers::internal_face_boundary_id)
+             DEAL_II_EQUALS boundary_ids.end(),
          ExcInvalidBoundaryIndicator());
 
   // same as above, but with additional checks for set of boundary
@@ -2358,14 +2375,14 @@ DoFHandler<dim, spacedim>::n_boundary_dofs(
   const IndexSet &owned_dofs = locally_owned_dofs();
 
   for (const auto &cell : this->active_cell_iterators())
-    if (cell->is_locally_owned() && cell->at_boundary())
+    if (cell->is_locally_owned() DEAL_II_AND cell->at_boundary())
       {
         for (const auto iface : cell->face_indices())
           {
             const auto         face        = cell->face(iface);
             const unsigned int boundary_id = face->boundary_id();
-            if (face->at_boundary() &&
-                (boundary_ids.find(boundary_id) != boundary_ids.end()))
+            if (face->at_boundary() DEAL_II_AND(
+                  boundary_ids.find(boundary_id) != boundary_ids.end()))
               {
                 const unsigned int dofs_per_face =
                   cell->get_fe().n_dofs_per_face();
@@ -2516,7 +2533,8 @@ DoFHandler<dim, spacedim>::distribute_dofs(
       const parallel::shared::Triangulation<dim, spacedim> *shared_tria =
         (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
           &this->get_triangulation()));
-      if (shared_tria != nullptr && shared_tria->with_artificial_cells())
+      if (shared_tria !=
+          nullptr DEAL_II_AND shared_tria->with_artificial_cells())
         {
           saved_subdomain_ids.resize(shared_tria->n_active_cells());
 
@@ -2536,7 +2554,8 @@ DoFHandler<dim, spacedim>::distribute_dofs(
         reserve_space(*this);
 
       // now undo the subdomain modification
-      if (shared_tria != nullptr && shared_tria->with_artificial_cells())
+      if (shared_tria !=
+          nullptr DEAL_II_AND shared_tria->with_artificial_cells())
         for (const auto &cell : shared_tria->active_cell_iterators())
           cell->set_subdomain_id(
             saved_subdomain_ids[cell->active_cell_index()]);
@@ -2600,7 +2619,7 @@ DoFHandler<dim, spacedim>::distribute_dofs(
       // triangulation. it doesn't work correctly yet if it is parallel
       if (dynamic_cast<
             const parallel::DistributedTriangulationBase<dim, spacedim> *>(
-            &*this->tria) == nullptr)
+            &*this->tria) DEAL_II_EQUALS nullptr)
         this->block_info_object.initialize(*this, false, true);
     }
 }
@@ -2611,7 +2630,8 @@ template <int dim, int spacedim>
 void
 DoFHandler<dim, spacedim>::distribute_mg_dofs()
 {
-  AssertThrow(hp_capability_enabled == false, ExcNotImplementedWithHP());
+  AssertThrow(hp_capability_enabled DEAL_II_EQUALS false,
+              ExcNotImplementedWithHP());
 
   Assert(
     this->object_dof_indices.size() > 0,
@@ -2633,7 +2653,7 @@ DoFHandler<dim, spacedim>::distribute_mg_dofs()
   // initialize the block info object only if this is a sequential
   // triangulation. it doesn't work correctly yet if it is parallel
   if (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-        &*this->tria) == nullptr)
+        &*this->tria) DEAL_II_EQUALS nullptr)
     this->block_info_object.initialize(*this, true, false);
 }
 
@@ -2643,7 +2663,8 @@ template <int dim, int spacedim>
 void
 DoFHandler<dim, spacedim>::initialize_local_block_info()
 {
-  AssertThrow(hp_capability_enabled == false, ExcNotImplementedWithHP());
+  AssertThrow(hp_capability_enabled DEAL_II_EQUALS false,
+              ExcNotImplementedWithHP());
 
   this->block_info_object.initialize_local(*this);
 }
@@ -2661,7 +2682,7 @@ DoFHandler<dim, spacedim>::setup_policy()
                                       ParallelShared<dim, spacedim>>(*this);
   else if (dynamic_cast<
              const dealii::parallel::DistributedTriangulationBase<dim, spacedim>
-               *>(&this->get_triangulation()) == nullptr)
+               *>(&this->get_triangulation()) DEAL_II_EQUALS nullptr)
     this->policy = std::make_unique<
       internal::DoFHandlerImplementation::Policy::Sequential<dim, spacedim>>(
       *this);
@@ -2753,14 +2774,14 @@ DoFHandler<dim, spacedim>::renumber_dofs(
       // working on a single processor. this doesn't need to
       // hold in the case of a parallel mesh since we map the interval
       // [0...n_dofs()) into itself but only globally, not on each processor
-      if (this->n_locally_owned_dofs() == this->n_dofs())
+      if (this->n_locally_owned_dofs() DEAL_II_EQUALS this->n_dofs())
         {
           std::vector<types::global_dof_index> tmp(new_numbers);
           std::sort(tmp.begin(), tmp.end());
           std::vector<types::global_dof_index>::const_iterator p = tmp.begin();
           types::global_dof_index                              i = 0;
           for (; p != tmp.end(); ++p, ++i)
-            Assert(*p == i, ExcNewNumbersNotConsecutive(i));
+            Assert(*p DEAL_II_EQUALS i, ExcNewNumbersNotConsecutive(i));
         }
       else
         for (const auto new_number : new_numbers)
@@ -2806,8 +2827,10 @@ DoFHandler<dim, spacedim>::renumber_dofs(
       if (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
             &*this->tria) != nullptr)
         {
-          Assert(new_numbers.size() == this->n_dofs() ||
-                   new_numbers.size() == this->n_locally_owned_dofs(),
+          Assert(new_numbers.size()
+                   DEAL_II_EQUALS this->n_dofs()
+                     DEAL_II_OR new_numbers.size()
+                       DEAL_II_EQUALS this->n_locally_owned_dofs(),
                  ExcMessage("Incorrect size of the input array."));
         }
       else if (dynamic_cast<
@@ -2825,14 +2848,14 @@ DoFHandler<dim, spacedim>::renumber_dofs(
       // working on a single processor. this doesn't need to
       // hold in the case of a parallel mesh since we map the interval
       // [0...n_dofs()) into itself but only globally, not on each processor
-      if (this->n_locally_owned_dofs() == this->n_dofs())
+      if (this->n_locally_owned_dofs() DEAL_II_EQUALS this->n_dofs())
         {
           std::vector<types::global_dof_index> tmp(new_numbers);
           std::sort(tmp.begin(), tmp.end());
           std::vector<types::global_dof_index>::const_iterator p = tmp.begin();
           types::global_dof_index                              i = 0;
           for (; p != tmp.end(); ++p, ++i)
-            Assert(*p == i, ExcNewNumbersNotConsecutive(i));
+            Assert(*p DEAL_II_EQUALS i, ExcNewNumbersNotConsecutive(i));
         }
       else
         for (const auto new_number : new_numbers)
@@ -2853,10 +2876,11 @@ DoFHandler<dim, spacedim>::renumber_dofs(
   const unsigned int                          level,
   const std::vector<types::global_dof_index> &new_numbers)
 {
-  AssertThrow(hp_capability_enabled == false, ExcNotImplementedWithHP());
+  AssertThrow(hp_capability_enabled DEAL_II_EQUALS false,
+              ExcNotImplementedWithHP());
 
   Assert(
-    this->mg_levels.size() > 0 && this->object_dof_indices.size() > 0,
+    this->mg_levels.size() > 0 DEAL_II_AND this->object_dof_indices.size() > 0,
     ExcMessage(
       "You need to distribute active and level DoFs before you can renumber level DoFs."));
   AssertIndexRange(level, this->get_triangulation().n_global_levels());
@@ -2868,14 +2892,14 @@ DoFHandler<dim, spacedim>::renumber_dofs(
   // on a single processor. this doesn't need to hold in the case of a
   // parallel mesh since we map the interval [0...n_dofs(level)) into itself
   // but only globally, not on each processor
-  if (this->n_locally_owned_dofs() == this->n_dofs())
+  if (this->n_locally_owned_dofs() DEAL_II_EQUALS this->n_dofs())
     {
       std::vector<types::global_dof_index> tmp(new_numbers);
       std::sort(tmp.begin(), tmp.end());
       std::vector<types::global_dof_index>::const_iterator p = tmp.begin();
       types::global_dof_index                              i = 0;
       for (; p != tmp.end(); ++p, ++i)
-        Assert(*p == i, ExcNewNumbersNotConsecutive(i));
+        Assert(*p DEAL_II_EQUALS i, ExcNewNumbersNotConsecutive(i));
     }
   else
     for (const auto new_number : new_numbers)
@@ -2999,7 +3023,8 @@ void
 DoFHandler<dim, spacedim>::set_active_fe_indices(
   const std::vector<unsigned int> &active_fe_indices)
 {
-  Assert(active_fe_indices.size() == this->get_triangulation().n_active_cells(),
+  Assert(active_fe_indices.size() DEAL_II_EQUALS this->get_triangulation()
+           .n_active_cells(),
          ExcDimensionMismatch(active_fe_indices.size(),
                               this->get_triangulation().n_active_cells()));
 
@@ -3125,7 +3150,8 @@ template <int dim, int spacedim>
 void
 DoFHandler<dim, spacedim>::create_active_fe_table()
 {
-  AssertThrow(hp_capability_enabled == true, ExcNotAvailableWithoutHP());
+  AssertThrow(hp_capability_enabled DEAL_II_EQUALS true,
+              ExcNotAvailableWithoutHP());
 
 
   // Create sufficiently many hp::DoFLevels.
@@ -3143,8 +3169,10 @@ DoFHandler<dim, spacedim>::create_active_fe_table()
   for (unsigned int level = 0; level < this->hp_cell_future_fe_indices.size();
        ++level)
     {
-      if (this->hp_cell_active_fe_indices[level].size() == 0 &&
-          this->hp_cell_future_fe_indices[level].size() == 0)
+      if (this->hp_cell_active_fe_indices[level]
+            .size() DEAL_II_EQUALS 0 DEAL_II_AND this
+            ->hp_cell_future_fe_indices[level]
+            .size() DEAL_II_EQUALS 0)
         {
           this->hp_cell_active_fe_indices[level].resize(
             this->tria->n_raw_cells(level), 0);
@@ -3156,11 +3184,13 @@ DoFHandler<dim, spacedim>::create_active_fe_table()
           // Either the active_fe_indices have size zero because
           // they were just created, or the correct size. Other
           // sizes indicate that something went wrong.
-          Assert(this->hp_cell_active_fe_indices[level].size() ==
-                     this->tria->n_raw_cells(level) &&
-                   this->hp_cell_future_fe_indices[level].size() ==
-                     this->tria->n_raw_cells(level),
-                 ExcInternalError());
+          Assert(
+            this->hp_cell_active_fe_indices[level]
+              .size()
+                DEAL_II_EQUALS this->tria->n_raw_cells(level)
+                  DEAL_II_AND this->hp_cell_future_fe_indices[level]
+              .size() DEAL_II_EQUALS this->tria->n_raw_cells(level),
+            ExcInternalError());
         }
 
       // it may be that the previous table was compressed; in that
@@ -3214,7 +3244,8 @@ DoFHandler<dim, spacedim>::post_refinement_action()
 
 
 
-  Assert(this->hp_cell_future_fe_indices.size() == this->tria->n_levels(),
+  Assert(this->hp_cell_future_fe_indices.size()
+           DEAL_II_EQUALS this->tria->n_levels(),
          ExcInternalError());
   for (unsigned int i = 0; i < this->hp_cell_future_fe_indices.size(); ++i)
     {
@@ -3240,7 +3271,8 @@ DoFHandler<dim, spacedim>::pre_active_fe_index_transfer()
   // distribute_dofs() first to make this functionality available.
   if (this->fe_collection.size() > 0)
     {
-      Assert(this->active_fe_index_transfer == nullptr, ExcInternalError());
+      Assert(this->active_fe_index_transfer DEAL_II_EQUALS nullptr,
+             ExcInternalError());
 
       this->active_fe_index_transfer =
         std::make_unique<ActiveFEIndexTransfer>();
@@ -3273,7 +3305,8 @@ DoFHandler<dim, spacedim>::pre_distributed_active_fe_index_transfer()
   // distribute_dofs() first to make this functionality available.
   if (fe_collection.size() > 0)
     {
-      Assert(active_fe_index_transfer == nullptr, ExcInternalError());
+      Assert(active_fe_index_transfer DEAL_II_EQUALS nullptr,
+             ExcInternalError());
 
       active_fe_index_transfer = std::make_unique<ActiveFEIndexTransfer>();
 
@@ -3408,7 +3441,8 @@ DoFHandler<dim, spacedim>::prepare_for_serialization_of_active_fe_indices()
   // distribute_dofs() first to make this functionality available.
   if (fe_collection.size() > 0)
     {
-      Assert(active_fe_index_transfer == nullptr, ExcInternalError());
+      Assert(active_fe_index_transfer DEAL_II_EQUALS nullptr,
+             ExcInternalError());
 
       active_fe_index_transfer = std::make_unique<ActiveFEIndexTransfer>();
 
@@ -3494,7 +3528,8 @@ DoFHandler<dim, spacedim>::deserialize_active_fe_indices()
   // distribute_dofs() first to make this functionality available.
   if (fe_collection.size() > 0)
     {
-      Assert(active_fe_index_transfer == nullptr, ExcInternalError());
+      Assert(active_fe_index_transfer DEAL_II_EQUALS nullptr,
+             ExcInternalError());
 
       active_fe_index_transfer = std::make_unique<ActiveFEIndexTransfer>();
 

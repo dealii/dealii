@@ -73,7 +73,7 @@ namespace internal
   }
 
   // helper function to compute a vector orthogonal to a given one.
-  // does nothing unless spacedim == 3.
+  // does nothing unless spacedim DEAL_II_EQUALS  3.
   template <int spacedim>
   Point<spacedim>
   compute_normal(const Tensor<1, spacedim> & /*vector*/,
@@ -88,15 +88,15 @@ namespace internal
     Assert(vector.norm_square() != 0.,
            ExcMessage("The direction parameter must not be zero!"));
     Point<3> normal;
-    if (std::abs(vector[0]) >= std::abs(vector[1]) &&
-        std::abs(vector[0]) >= std::abs(vector[2]))
+    if (std::abs(vector[0]) >= std::abs(vector[1]) DEAL_II_AND std::abs(
+                                 vector[0]) >= std::abs(vector[2]))
       {
         normal[1] = -1.;
         normal[2] = -1.;
         normal[0] = (vector[1] + vector[2]) / vector[0];
       }
-    else if (std::abs(vector[1]) >= std::abs(vector[0]) &&
-             std::abs(vector[1]) >= std::abs(vector[2]))
+    else if (std::abs(vector[1]) >= std::abs(vector[0]) DEAL_II_AND std::abs(
+                                      vector[1]) >= std::abs(vector[2]))
       {
         normal[0] = -1.;
         normal[2] = -1.;
@@ -116,9 +116,19 @@ namespace internal
 
 
 
-// ============================================================
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
 // PolarManifold
-// ============================================================
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
 
 template <int dim, int spacedim>
 PolarManifold<dim, spacedim>::PolarManifold(const Point<spacedim> center)
@@ -347,9 +357,19 @@ PolarManifold<dim, spacedim>::normal_vector(
 
 
 
-// ============================================================
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
 // SphericalManifold
-// ============================================================
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
 
 template <int dim, int spacedim>
 SphericalManifold<dim, spacedim>::SphericalManifold(
@@ -378,14 +398,14 @@ SphericalManifold<dim, spacedim>::get_intermediate_point(
 {
   const double tol = 1e-10;
 
-  if ((p1 - p2).norm_square() < tol * tol || std::abs(w) < tol)
+  if ((p1 - p2).norm_square() < tol * tol DEAL_II_OR std::abs(w) < tol)
     return p1;
   else if (std::abs(w - 1.0) < tol)
     return p2;
 
   // If the points are one dimensional then there is no need for anything but
   // a linear combination.
-  if (spacedim == 1)
+  if (spacedim DEAL_II_EQUALS 1)
     return Point<spacedim>(w * p2 + (1 - w) * p1);
 
   const Tensor<1, spacedim> v1 = p1 - center;
@@ -393,7 +413,7 @@ SphericalManifold<dim, spacedim>::get_intermediate_point(
   const double              r1 = v1.norm();
   const double              r2 = v2.norm();
 
-  Assert(r1 > tol && r2 > tol,
+  Assert(r1 > tol DEAL_II_AND r2 > tol,
          ExcMessage("p1 and p2 cannot coincide with the center."));
 
   const Tensor<1, spacedim> e1 = v1 / r1;
@@ -420,8 +440,9 @@ SphericalManifold<dim, spacedim>::get_intermediate_point(
   Tensor<1, spacedim> n      = v2 - (v2 * e1) * e1;
   const double        n_norm = n.norm();
   Assert(n_norm > 0,
-         ExcInternalError("n should be different from the null vector. "
-                          "Probably, this means v1==v2 or v2==0."));
+         ExcInternalError(
+           "n should be different from the null vector. "
+           "Probably, this means v1DEAL_II_EQUALS v2 or v2DEAL_II_EQUALS 0."));
 
   n /= n_norm;
 
@@ -473,8 +494,9 @@ SphericalManifold<dim, spacedim>::get_tangent_vector(
   Tensor<1, spacedim> n      = v2 - (v2 * e1) * e1;
   const double        n_norm = n.norm();
   Assert(n_norm > 0,
-         ExcInternalError("n should be different from the null vector. "
-                          "Probably, this means v1==v2 or v2==0."));
+         ExcInternalError(
+           "n should be different from the null vector. "
+           "Probably, this means v1DEAL_II_EQUALS v2 or v2DEAL_II_EQUALS 0."));
 
   n /= n_norm;
 
@@ -612,7 +634,7 @@ SphericalManifold<dim, spacedim>::get_new_points(
   const unsigned int weight_rows    = new_points.size();
   const unsigned int weight_columns = surrounding_points.size();
 
-  if (surrounding_points.size() == 2)
+  if (surrounding_points.size() DEAL_II_EQUALS 2)
     {
       for (unsigned int row = 0; row < weight_rows; ++row)
         new_points[row] =
@@ -670,7 +692,7 @@ SphericalManifold<dim, spacedim>::get_new_points(
 
       // If the candidate is the center, mark it as found to avoid entering
       // the Newton iteration in step 2, which would crash.
-      if (new_candidates[row].first == 0.0)
+      if (new_candidates[row].first DEAL_II_EQUALS 0.0)
         {
           new_points[row]               = center;
           accurate_point_was_found[row] = true;
@@ -726,7 +748,7 @@ SphericalManifold<dim, spacedim>::get_new_points(
         {
           const double squared_distance =
             (directions[i] - directions[j]).norm_square();
-          if (!found_duplicate && squared_distance < 1e-28)
+          if (!found_duplicate DEAL_II_AND squared_distance < 1e-28)
             {
               found_duplicate = true;
               for (unsigned int row = 0; row < weight_rows; ++row)
@@ -735,7 +757,7 @@ SphericalManifold<dim, spacedim>::get_new_points(
             }
         }
 
-      if (found_duplicate == false)
+      if (found_duplicate DEAL_II_EQUALS false)
         {
           merged_directions[n_unique_directions] = directions[i];
           merged_distances[n_unique_directions]  = distances[i];
@@ -788,7 +810,8 @@ SphericalManifold<dim, spacedim>::get_new_points(
   for (unsigned int row = 0; row < weight_rows; ++row)
     if (!accurate_point_was_found[row])
       {
-        if (merged_weights_index[row] == numbers::invalid_unsigned_int)
+        if (merged_weights_index[row] DEAL_II_EQUALS
+              numbers::invalid_unsigned_int)
           {
             const ArrayView<const double> array_merged_weights(
               &merged_weights[row * weight_columns], n_unique_directions);
@@ -835,7 +858,7 @@ SphericalManifold<dim, spacedim>::guess_new_point(
 
   // ... and normalize if the candidate is different from the origin.
   const double norm = candidate.norm();
-  if (norm == 0.)
+  if (norm DEAL_II_EQUALS 0.)
     return std::make_pair(0.0, Point<spacedim>());
   candidate /= norm;
   rho /= total_weights;
@@ -887,7 +910,7 @@ namespace
 
       // check if we only have two points now, in which case we can use the
       // get_intermediate_point function
-      if (n_merged_points == 2)
+      if (n_merged_points DEAL_II_EQUALS 2)
         {
           SphericalManifold<3, 3> unit_manifold;
           Assert(std::abs(weights[0] + weights[1] - 1.0) < 1e-13,
@@ -1033,9 +1056,19 @@ SphericalManifold<3, 3>::get_new_point(
 
 
 
-// ============================================================
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
 // CylindricalManifold
-// ============================================================
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
 template <int dim, int spacedim>
 CylindricalManifold<dim, spacedim>::CylindricalManifold(const unsigned int axis,
                                                         const double tolerance)
@@ -1045,8 +1078,10 @@ CylindricalManifold<dim, spacedim>::CylindricalManifold(const unsigned int axis,
 {
   // do not use static_assert to make dimension-independent programming
   // easier.
-  Assert(spacedim == 3,
-         ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
+  Assert(
+    spacedim DEAL_II_EQUALS 3,
+    ExcMessage(
+      "CylindricalManifold can only be used for spacedimDEAL_II_EQUALS 3!"));
 }
 
 
@@ -1064,8 +1099,10 @@ CylindricalManifold<dim, spacedim>::CylindricalManifold(
 {
   // do not use static_assert to make dimension-independent programming
   // easier.
-  Assert(spacedim == 3,
-         ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
+  Assert(
+    spacedim DEAL_II_EQUALS 3,
+    ExcMessage(
+      "CylindricalManifold can only be used for spacedimDEAL_II_EQUALS 3!"));
 }
 
 
@@ -1087,8 +1124,10 @@ CylindricalManifold<dim, spacedim>::get_new_point(
   const ArrayView<const Point<spacedim>> &surrounding_points,
   const ArrayView<const double> &         weights) const
 {
-  Assert(spacedim == 3,
-         ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
+  Assert(
+    spacedim DEAL_II_EQUALS 3,
+    ExcMessage(
+      "CylindricalManifold can only be used for spacedimDEAL_II_EQUALS 3!"));
 
   // First check if the average in space lies on the axis.
   Point<spacedim> middle;
@@ -1115,8 +1154,10 @@ Point<3>
 CylindricalManifold<dim, spacedim>::pull_back(
   const Point<spacedim> &space_point) const
 {
-  Assert(spacedim == 3,
-         ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
+  Assert(
+    spacedim DEAL_II_EQUALS 3,
+    ExcMessage(
+      "CylindricalManifold can only be used for spacedimDEAL_II_EQUALS 3!"));
 
   // First find the projection of the given point to the axis.
   const Tensor<1, spacedim> normalized_point = space_point - point_on_axis;
@@ -1141,8 +1182,10 @@ Point<spacedim>
 CylindricalManifold<dim, spacedim>::push_forward(
   const Point<3> &chart_point) const
 {
-  Assert(spacedim == 3,
-         ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
+  Assert(
+    spacedim DEAL_II_EQUALS 3,
+    ExcMessage(
+      "CylindricalManifold can only be used for spacedimDEAL_II_EQUALS 3!"));
 
   // Rotate the orthogonal direction by the given angle
   const double sine_r           = std::sin(chart_point(1)) * chart_point(0);
@@ -1162,8 +1205,10 @@ DerivativeForm<1, 3, spacedim>
 CylindricalManifold<dim, spacedim>::push_forward_gradient(
   const Point<3> &chart_point) const
 {
-  Assert(spacedim == 3,
-         ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
+  Assert(
+    spacedim DEAL_II_EQUALS 3,
+    ExcMessage(
+      "CylindricalManifold can only be used for spacedimDEAL_II_EQUALS 3!"));
 
   Tensor<2, 3> derivatives;
 
@@ -1199,9 +1244,19 @@ CylindricalManifold<dim, spacedim>::push_forward_gradient(
 
 
 
-// ============================================================
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
 // EllipticalManifold
-// ============================================================
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
 template <int dim, int spacedim>
 EllipticalManifold<dim, spacedim>::EllipticalManifold(
   const Point<spacedim> &    center,
@@ -1214,10 +1269,11 @@ EllipticalManifold<dim, spacedim>::EllipticalManifold(
   , cosh_u(1.0 / eccentricity)
   , sinh_u(std::sqrt(cosh_u * cosh_u - 1.0))
 {
-  // Throws an exception if dim!=2 || spacedim!=2.
-  Assert(dim == 2 && spacedim == 2, ExcNotImplemented());
+  // Throws an exception if dim!=2 DEAL_II_OR  spacedim!=2.
+  Assert(dim DEAL_II_EQUALS 2 DEAL_II_AND spacedim DEAL_II_EQUALS 2,
+         ExcNotImplemented());
   // Throws an exception if eccentricity is not in range.
-  Assert(std::signbit(cosh_u * cosh_u - 1.0) == false,
+  Assert(std::signbit(cosh_u * cosh_u - 1.0) DEAL_II_EQUALS false,
          ExcMessage(
            "Invalid eccentricity: It must satisfy 0 < eccentricity < 1."));
   const double direction_norm = direction.norm();
@@ -1304,7 +1360,7 @@ EllipticalManifold<2, 2>::pull_back(const Point<2> &space_point) const
   const double pt0 =
     std::sqrt((x * x) / (cosh_u * cosh_u) + (y * y) / (sinh_u * sinh_u));
   // If the radius is exactly zero, the point coincides with the origin.
-  if (pt0 == 0.0)
+  if (pt0 DEAL_II_EQUALS 0.0)
     {
       return center;
     }
@@ -1357,9 +1413,19 @@ EllipticalManifold<2, 2>::push_forward_gradient(
 
 
 
-// ============================================================
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
 // FunctionManifold
-// ============================================================
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
 template <int dim, int spacedim, int chartdim>
 FunctionManifold<dim, spacedim, chartdim>::FunctionManifold(
   const Function<chartdim> & push_forward_function,
@@ -1433,7 +1499,7 @@ FunctionManifold<dim, spacedim, chartdim>::FunctionManifold(
 template <int dim, int spacedim, int chartdim>
 FunctionManifold<dim, spacedim, chartdim>::~FunctionManifold()
 {
-  if (owns_pointers == true)
+  if (owns_pointers DEAL_II_EQUALS true)
     {
       const Function<chartdim> *pf = push_forward_function;
       push_forward_function        = nullptr;
@@ -1463,7 +1529,8 @@ FunctionManifold<dim, spacedim, chartdim>::clone() const
   // function or that the newly generated manifold creates internally the
   // push_forward and pull_back functions using the same expressions that were
   // used to construct this class.
-  if (!(push_forward_expression.empty() && pull_back_expression.empty()))
+  if (!(push_forward_expression.empty()
+          DEAL_II_AND pull_back_expression.empty()))
     {
       return std::make_unique<FunctionManifold<dim, spacedim, chartdim>>(
         push_forward_expression,
@@ -1503,9 +1570,10 @@ FunctionManifold<dim, spacedim, chartdim>::push_forward(
   pull_back_function->vector_value(result, pb);
   for (unsigned int i = 0; i < chartdim; ++i)
     Assert(
-      (chart_point.norm() > tolerance &&
-       (std::abs(pb[i] - chart_point[i]) < tolerance * chart_point.norm())) ||
-        (std::abs(pb[i] - chart_point[i]) < tolerance),
+      (chart_point.norm() >
+       tolerance DEAL_II_AND(std::abs(pb[i] - chart_point[i]) <
+                             tolerance * chart_point.norm()))
+        DEAL_II_OR(std::abs(pb[i] - chart_point[i]) < tolerance),
       ExcMessage(
         "The push forward is not the inverse of the pull back! Bailing out."));
 #endif
@@ -1547,9 +1615,19 @@ FunctionManifold<dim, spacedim, chartdim>::pull_back(
 
 
 
-// ============================================================
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
 // TorusManifold
-// ============================================================
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
 template <int dim>
 Point<3>
 TorusManifold<dim>::pull_back(const Point<3> &p) const
@@ -1632,9 +1710,19 @@ TorusManifold<dim>::push_forward_gradient(const Point<3> &chart_point) const
 
 
 
-// ============================================================
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
 // TransfiniteInterpolationManifold
-// ============================================================
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
+// DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS DEAL_II_EQUALS
 template <int dim, int spacedim>
 TransfiniteInterpolationManifold<dim,
                                  spacedim>::TransfiniteInterpolationManifold()
@@ -1689,13 +1777,15 @@ TransfiniteInterpolationManifold<dim, spacedim>::initialize(
     {
       bool cell_is_flat = true;
       for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
-        if (cell->line(l)->manifold_id() != cell->manifold_id() &&
-            cell->line(l)->manifold_id() != numbers::flat_manifold_id)
+        if (cell->line(l)->manifold_id() !=
+            cell->manifold_id() DEAL_II_AND cell->line(l)->manifold_id() !=
+            numbers::flat_manifold_id)
           cell_is_flat = false;
       if (dim > 2)
         for (unsigned int q = 0; q < GeometryInfo<dim>::quads_per_cell; ++q)
-          if (cell->quad(q)->manifold_id() != cell->manifold_id() &&
-              cell->quad(q)->manifold_id() != numbers::flat_manifold_id)
+          if (cell->quad(q)->manifold_id() !=
+              cell->manifold_id() DEAL_II_AND cell->quad(q)->manifold_id() !=
+              numbers::flat_manifold_id)
             cell_is_flat = false;
       AssertIndexRange(static_cast<unsigned int>(cell->index()),
                        coarse_cell_is_flat.size());
@@ -1781,8 +1871,8 @@ namespace
             // negative weight applied to the vertex
             const types::manifold_id line_manifold_id =
               cell.line(line)->manifold_id();
-            if (line_manifold_id == my_manifold_id ||
-                line_manifold_id == numbers::flat_manifold_id)
+            if (line_manifold_id DEAL_II_EQUALS my_manifold_id DEAL_II_OR
+                  line_manifold_id DEAL_II_EQUALS numbers::flat_manifold_id)
               {
                 weights_vertices[GeometryInfo<2>::line_to_cell_vertices(line,
                                                                         0)] -=
@@ -1909,8 +1999,8 @@ namespace
             // -> face will interpolate from the surrounding lines and vertices
             const types::manifold_id face_manifold_id =
               cell.face(face)->manifold_id();
-            if (face_manifold_id == my_manifold_id ||
-                face_manifold_id == numbers::flat_manifold_id)
+            if (face_manifold_id DEAL_II_EQUALS my_manifold_id DEAL_II_OR
+                  face_manifold_id DEAL_II_EQUALS numbers::flat_manifold_id)
               {
                 for (unsigned int line = 0;
                      line < GeometryInfo<2>::lines_per_cell;
@@ -1982,8 +2072,8 @@ namespace
 
             const types::manifold_id line_manifold_id =
               cell.line(line)->manifold_id();
-            if (line_manifold_id == my_manifold_id ||
-                line_manifold_id == numbers::flat_manifold_id)
+            if (line_manifold_id DEAL_II_EQUALS my_manifold_id DEAL_II_OR
+                  line_manifold_id DEAL_II_EQUALS numbers::flat_manifold_id)
               {
                 weights_vertices[GeometryInfo<3>::line_to_cell_vertices(line,
                                                                         0)] -=
@@ -2119,7 +2209,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::pull_back(
       // much as 3 more iterations). this usually happens close to convergence
       // and one more step with the finite-differenced Jacobian leads to
       // convergence
-      if (must_recompute_jacobian || i % 9 == 0)
+      if (must_recompute_jacobian DEAL_II_OR i % 9 DEAL_II_EQUALS 0)
         {
           // if the determinant is zero or negative, the mapping is either not
           // invertible or already has inverted and we are outside the valid
@@ -2147,8 +2237,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::pull_back(
       // hitting points very far away from valid ones in the manifolds
       while (
         !GeometryInfo<dim>::is_inside_unit_cell(chart_point + alpha * update,
-                                                0.2) &&
-        alpha > 1e-7)
+                                                0.2) DEAL_II_AND alpha > 1e-7)
         alpha *= 0.5;
 
       const Tensor<1, spacedim> old_residual = residual;
@@ -2273,7 +2362,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::
             inside_circle = false;
             break;
           }
-      if (inside_circle == false)
+      if (inside_circle DEAL_II_EQUALS false)
         continue;
 
       // slightly more expensive search
@@ -2293,7 +2382,8 @@ TransfiniteInterpolationManifold<dim, spacedim>::
   std::sort(distances_and_cells.begin(), distances_and_cells.end());
   std::array<unsigned int, 20> cells;
   cells.fill(numbers::invalid_unsigned_int);
-  for (unsigned int i = 0; i < distances_and_cells.size() && i < cells.size();
+  for (unsigned int                               i = 0;
+       i < distances_and_cells.size() DEAL_II_AND i < cells.size();
        ++i)
     cells[i] = distances_and_cells[i].second;
 
@@ -2308,7 +2398,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
   const ArrayView<const Point<spacedim>> &surrounding_points,
   ArrayView<Point<dim>>                   chart_points) const
 {
-  Assert(surrounding_points.size() == chart_points.size(),
+  Assert(surrounding_points.size() DEAL_II_EQUALS chart_points.size(),
          ExcMessage("The chart points array view must be as large as the "
                     "surrounding points array view."));
 
@@ -2320,10 +2410,10 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
   // is known (i.e., if there are eight surrounding points, then they will
   // almost surely be either eight points around a quadrilateral or the eight
   // vertices of a cube). Hence, making this assumption, we use two
-  // optimizations (one for structdim == 2 and one for structdim == 3) that
-  // guess the locations of some of the chart points more efficiently than the
-  // affine map approximation. The affine map approximation is used whenever
-  // we don't have a cheaper guess available.
+  // optimizations (one for structdim DEAL_II_EQUALS  2 and one for structdim
+  // DEAL_II_EQUALS  3) that guess the locations of some of the chart points
+  // more efficiently than the affine map approximation. The affine map
+  // approximation is used whenever we don't have a cheaper guess available.
 
   // Function that can guess the location of a chart point by assuming that
   // the eight surrounding points are points on a two-dimensional object
@@ -2338,7 +2428,8 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
   // This function assumes that the first three chart points have been
   // computed since there is no effective way to guess them.
   auto guess_chart_point_structdim_2 = [&](const unsigned int i) -> Point<dim> {
-    Assert(surrounding_points.size() == 8 && 2 < i && i < 8,
+    Assert(surrounding_points.size()
+               DEAL_II_EQUALS 8 DEAL_II_AND 2 < i DEAL_II_AND i < 8,
            ExcMessage("This function assumes that there are eight surrounding "
                       "points around a two-dimensional object. It also assumes "
                       "that the first three chart points have already been "
@@ -2389,7 +2480,8 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
   // This function assumes that the first five chart points have been computed
   // since there is no effective way to guess them.
   auto guess_chart_point_structdim_3 = [&](const unsigned int i) -> Point<dim> {
-    Assert(surrounding_points.size() == 8 && 4 < i && i < 8,
+    Assert(surrounding_points.size()
+               DEAL_II_EQUALS 8 DEAL_II_AND 4 < i DEAL_II_AND i < 8,
            ExcMessage("This function assumes that there are eight surrounding "
                       "points around a three-dimensional object. It also "
                       "assumes that the first five chart points have already "
@@ -2404,7 +2496,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
   // parallel, while in the structdim 3 case, 0 - 6 and 2 - 7 should be roughly
   // orthogonal. Use the angle between these two vectors to figure out if we
   // should turn on either structdim optimization.
-  if (surrounding_points.size() == 8)
+  if (surrounding_points.size() DEAL_II_EQUALS 8)
     {
       const Tensor<1, spacedim> v06 =
         surrounding_points[6] - surrounding_points[0];
@@ -2418,14 +2510,14 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
         // the angle is less than pi/4, so these vectors are roughly parallel:
         // enable the structdim 2 optimization
         use_structdim_2_guesses = true;
-      else if (spacedim == 3)
+      else if (spacedim DEAL_II_EQUALS 3)
         // otherwise these vectors are roughly orthogonal: enable the
         // structdim 3 optimization if we are in 3D
         use_structdim_3_guesses = true;
     }
   // we should enable at most one of the optimizations
-  Assert((!use_structdim_2_guesses && !use_structdim_3_guesses) ||
-           (use_structdim_2_guesses ^ use_structdim_3_guesses),
+  Assert((!use_structdim_2_guesses DEAL_II_AND !use_structdim_3_guesses)
+           DEAL_II_OR(use_structdim_2_guesses ^ use_structdim_3_guesses),
          ExcInternalError());
 
 
@@ -2441,13 +2533,15 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
       bool used_affine_approximation = false;
       // if we have already computed three points, we can guess the fourth
       // to be the missing corner point of a rectangle
-      if (point_index == 3 && surrounding_points.size() >= 8)
+      if (point_index DEAL_II_EQUALS 3 DEAL_II_AND surrounding_points.size() >=
+          8)
         guess = chart_points[1] + (chart_points[2] - chart_points[0]);
-      else if (use_structdim_2_guesses && 3 < point_index)
+      else if (use_structdim_2_guesses DEAL_II_AND 3 < point_index)
         guess = guess_chart_point_structdim_2(point_index);
-      else if (use_structdim_3_guesses && 4 < point_index)
+      else if (use_structdim_3_guesses DEAL_II_AND 4 < point_index)
         guess = guess_chart_point_structdim_3(point_index);
-      else if (dim == 3 && point_index > 7 && surrounding_points.size() == 26)
+      else if (dim DEAL_II_EQUALS 3 DEAL_II_AND point_index >
+               7 DEAL_II_AND surrounding_points.size() DEAL_II_EQUALS 26)
         {
           if (point_index < 20)
             guess =
@@ -2478,9 +2572,9 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
       // the initial guess may not have been good enough: if applicable,
       // try again with the affine approximation (which is more accurate
       // than the cheap methods used above)
-      if (chart_points[point_index][0] ==
-            internal::invalid_pull_back_coordinate &&
-          !used_affine_approximation)
+      if (chart_points[point_index][0] DEAL_II_EQUALS
+              internal::invalid_pull_back_coordinate
+              DEAL_II_AND !used_affine_approximation)
         {
           guess = cell->real_to_unit_cell_affine_approximation(
             surrounding_points[point_index]);
@@ -2488,8 +2582,8 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
             pull_back(cell, surrounding_points[point_index], guess);
         }
 
-      if (chart_points[point_index][0] ==
-          internal::invalid_pull_back_coordinate)
+      if (chart_points[point_index][0] DEAL_II_EQUALS
+            internal::invalid_pull_back_coordinate)
         {
           for (unsigned int d = 0; d < dim; ++d)
             guess[d] = 0.5;
@@ -2510,22 +2604,23 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
 
           // Tolerance 5e-4 chosen that the method also works with manifolds
           // that have some discretization error like SphericalManifold
-          if (GeometryInfo<dim>::is_inside_unit_cell(chart_points[i], 5e-4) ==
-              false)
+          if (GeometryInfo<dim>::is_inside_unit_cell(chart_points[i], 5e-4)
+                DEAL_II_EQUALS false)
             {
               inside_unit_cell = false;
               break;
             }
         }
-      if (inside_unit_cell == true)
+      if (inside_unit_cell DEAL_II_EQUALS true)
         {
           return cell;
         }
 
       // if we did not find a point and this was the last valid cell (the next
       // iterate being the end of the array or an invalid tag), we must stop
-      if (c == nearby_cells.size() - 1 ||
-          nearby_cells[c + 1] == numbers::invalid_unsigned_int)
+      if (c DEAL_II_EQUALS nearby_cells.size() -
+          1 DEAL_II_OR     nearby_cells[c + 1] DEAL_II_EQUALS
+                           numbers::invalid_unsigned_int)
         {
           // generate additional information to help debugging why we did not
           // get a point

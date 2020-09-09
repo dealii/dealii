@@ -388,8 +388,10 @@ namespace internal
       op.vmult = [&op](Range &v, const Domain &u) {
         const unsigned int m = op.n_block_rows();
         const unsigned int n = op.n_block_cols();
-        Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
-        Assert(u.n_blocks() == n, ExcDimensionMismatch(u.n_blocks(), n));
+        Assert(v.n_blocks() DEAL_II_EQUALS m,
+               ExcDimensionMismatch(v.n_blocks(), m));
+        Assert(u.n_blocks() DEAL_II_EQUALS n,
+               ExcDimensionMismatch(u.n_blocks(), n));
 
         if (PointerComparison::equal(&v, &u))
           {
@@ -423,8 +425,10 @@ namespace internal
       op.vmult_add = [&op](Range &v, const Domain &u) {
         const unsigned int m = op.n_block_rows();
         const unsigned int n = op.n_block_cols();
-        Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
-        Assert(u.n_blocks() == n, ExcDimensionMismatch(u.n_blocks(), n));
+        Assert(v.n_blocks() DEAL_II_EQUALS m,
+               ExcDimensionMismatch(v.n_blocks(), m));
+        Assert(u.n_blocks() DEAL_II_EQUALS n,
+               ExcDimensionMismatch(u.n_blocks(), n));
 
         if (PointerComparison::equal(&v, &u))
           {
@@ -455,8 +459,10 @@ namespace internal
       op.Tvmult = [&op](Domain &v, const Range &u) {
         const unsigned int n = op.n_block_cols();
         const unsigned int m = op.n_block_rows();
-        Assert(v.n_blocks() == n, ExcDimensionMismatch(v.n_blocks(), n));
-        Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+        Assert(v.n_blocks() DEAL_II_EQUALS n,
+               ExcDimensionMismatch(v.n_blocks(), n));
+        Assert(u.n_blocks() DEAL_II_EQUALS m,
+               ExcDimensionMismatch(u.n_blocks(), m));
 
         if (PointerComparison::equal(&v, &u))
           {
@@ -490,8 +496,10 @@ namespace internal
       op.Tvmult_add = [&op](Domain &v, const Range &u) {
         const unsigned int n = op.n_block_cols();
         const unsigned int m = op.n_block_rows();
-        Assert(v.n_blocks() == n, ExcDimensionMismatch(v.n_blocks(), n));
-        Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+        Assert(v.n_blocks() DEAL_II_EQUALS n,
+               ExcDimensionMismatch(v.n_blocks(), n));
+        Assert(u.n_blocks() DEAL_II_EQUALS m,
+               ExcDimensionMismatch(u.n_blocks(), m));
 
         if (PointerComparison::equal(&v, &u))
           {
@@ -656,7 +664,7 @@ block_operator(
                               n>,
                    m> &ops)
 {
-  static_assert(m > 0 && n > 0,
+  static_assert(m > 0 DEAL_II_AND n > 0,
                 "a blocked LinearOperator must consist of at least one block");
 
   using BlockType =
@@ -724,11 +732,11 @@ block_diagonal_operator(const BlockMatrixType &block_matrix)
 #ifdef DEBUG
     const unsigned int m = block_matrix.n_block_rows();
     const unsigned int n = block_matrix.n_block_cols();
-    Assert(m == n, ExcDimensionMismatch(m, n));
+    Assert(m DEAL_II_EQUALS n, ExcDimensionMismatch(m, n));
     AssertIndexRange(i, m);
     AssertIndexRange(j, n);
 #endif
-    if (i == j)
+    if (i DEAL_II_EQUALS j)
       return BlockType(block_matrix.block(i, j));
     else
       return null_operator(BlockType(block_matrix.block(i, j)));
@@ -779,7 +787,7 @@ block_diagonal_operator(
   // reinit_range_vector functions.
   for (unsigned int i = 0; i < m; ++i)
     for (unsigned int j = 0; j < m; ++j)
-      if (i == j)
+      if (i DEAL_II_EQUALS j)
         {
           // diagonal elements are easy:
           new_ops[i][j] = ops[i];
@@ -886,16 +894,18 @@ block_forward_substitution(
   return_op.vmult = [block_operator, diagonal_inverse](Range &      v,
                                                        const Range &u) {
     const unsigned int m = block_operator.n_block_rows();
-    Assert(block_operator.n_block_cols() == m,
+    Assert(block_operator.n_block_cols() DEAL_II_EQUALS m,
            ExcDimensionMismatch(block_operator.n_block_cols(), m));
-    Assert(diagonal_inverse.n_block_rows() == m,
+    Assert(diagonal_inverse.n_block_rows() DEAL_II_EQUALS m,
            ExcDimensionMismatch(diagonal_inverse.n_block_rows(), m));
-    Assert(diagonal_inverse.n_block_cols() == m,
+    Assert(diagonal_inverse.n_block_cols() DEAL_II_EQUALS m,
            ExcDimensionMismatch(diagonal_inverse.n_block_cols(), m));
-    Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
-    Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+    Assert(v.n_blocks() DEAL_II_EQUALS m,
+           ExcDimensionMismatch(v.n_blocks(), m));
+    Assert(u.n_blocks() DEAL_II_EQUALS m,
+           ExcDimensionMismatch(u.n_blocks(), m));
 
-    if (m == 0)
+    if (m DEAL_II_EQUALS 0)
       return;
 
     diagonal_inverse.block(0, 0).vmult(v.block(0), u.block(0));
@@ -915,16 +925,18 @@ block_forward_substitution(
   return_op.vmult_add = [block_operator, diagonal_inverse](Range &      v,
                                                            const Range &u) {
     const unsigned int m = block_operator.n_block_rows();
-    Assert(block_operator.n_block_cols() == m,
+    Assert(block_operator.n_block_cols() DEAL_II_EQUALS m,
            ExcDimensionMismatch(block_operator.n_block_cols(), m));
-    Assert(diagonal_inverse.n_block_rows() == m,
+    Assert(diagonal_inverse.n_block_rows() DEAL_II_EQUALS m,
            ExcDimensionMismatch(diagonal_inverse.n_block_rows(), m));
-    Assert(diagonal_inverse.n_block_cols() == m,
+    Assert(diagonal_inverse.n_block_cols() DEAL_II_EQUALS m,
            ExcDimensionMismatch(diagonal_inverse.n_block_cols(), m));
-    Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
-    Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+    Assert(v.n_blocks() DEAL_II_EQUALS m,
+           ExcDimensionMismatch(v.n_blocks(), m));
+    Assert(u.n_blocks() DEAL_II_EQUALS m,
+           ExcDimensionMismatch(u.n_blocks(), m));
 
-    if (m == 0)
+    if (m DEAL_II_EQUALS 0)
       return;
 
     GrowingVectorMemory<typename Range::BlockType>            vector_memory;
@@ -1004,16 +1016,18 @@ block_back_substitution(
   return_op.vmult = [block_operator, diagonal_inverse](Range &      v,
                                                        const Range &u) {
     const unsigned int m = block_operator.n_block_rows();
-    Assert(block_operator.n_block_cols() == m,
+    Assert(block_operator.n_block_cols() DEAL_II_EQUALS m,
            ExcDimensionMismatch(block_operator.n_block_cols(), m));
-    Assert(diagonal_inverse.n_block_rows() == m,
+    Assert(diagonal_inverse.n_block_rows() DEAL_II_EQUALS m,
            ExcDimensionMismatch(diagonal_inverse.n_block_rows(), m));
-    Assert(diagonal_inverse.n_block_cols() == m,
+    Assert(diagonal_inverse.n_block_cols() DEAL_II_EQUALS m,
            ExcDimensionMismatch(diagonal_inverse.n_block_cols(), m));
-    Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
-    Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+    Assert(v.n_blocks() DEAL_II_EQUALS m,
+           ExcDimensionMismatch(v.n_blocks(), m));
+    Assert(u.n_blocks() DEAL_II_EQUALS m,
+           ExcDimensionMismatch(u.n_blocks(), m));
 
-    if (m == 0)
+    if (m DEAL_II_EQUALS 0)
       return;
 
     diagonal_inverse.block(m - 1, m - 1).vmult(v.block(m - 1), u.block(m - 1));
@@ -1034,19 +1048,21 @@ block_back_substitution(
   return_op.vmult_add = [block_operator, diagonal_inverse](Range &      v,
                                                            const Range &u) {
     const unsigned int m = block_operator.n_block_rows();
-    Assert(block_operator.n_block_cols() == m,
+    Assert(block_operator.n_block_cols() DEAL_II_EQUALS m,
            ExcDimensionMismatch(block_operator.n_block_cols(), m));
-    Assert(diagonal_inverse.n_block_rows() == m,
+    Assert(diagonal_inverse.n_block_rows() DEAL_II_EQUALS m,
            ExcDimensionMismatch(diagonal_inverse.n_block_rows(), m));
-    Assert(diagonal_inverse.n_block_cols() == m,
+    Assert(diagonal_inverse.n_block_cols() DEAL_II_EQUALS m,
            ExcDimensionMismatch(diagonal_inverse.n_block_cols(), m));
-    Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
-    Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+    Assert(v.n_blocks() DEAL_II_EQUALS m,
+           ExcDimensionMismatch(v.n_blocks(), m));
+    Assert(u.n_blocks() DEAL_II_EQUALS m,
+           ExcDimensionMismatch(u.n_blocks(), m));
     GrowingVectorMemory<typename Range::BlockType>            vector_memory;
     typename VectorMemory<typename Range::BlockType>::Pointer tmp(
       vector_memory);
 
-    if (m == 0)
+    if (m DEAL_II_EQUALS 0)
       return;
 
     diagonal_inverse.block(m - 1, m - 1)

@@ -53,7 +53,7 @@ TensorFunction<rank, dim, Number>::value_list(
   const std::vector<Point<dim>> &points,
   std::vector<value_type> &      values) const
 {
-  Assert(values.size() == points.size(),
+  Assert(values.size() DEAL_II_EQUALS points.size(),
          ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
@@ -76,7 +76,7 @@ TensorFunction<rank, dim, Number>::gradient_list(
   const std::vector<Point<dim>> &points,
   std::vector<gradient_type> &   gradients) const
 {
-  Assert(gradients.size() == points.size(),
+  Assert(gradients.size() DEAL_II_EQUALS points.size(),
          ExcDimensionMismatch(gradients.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
@@ -113,7 +113,7 @@ ConstantTensorFunction<rank, dim, Number>::value_list(
   const
 {
   (void)points;
-  Assert(values.size() == points.size(),
+  Assert(values.size() DEAL_II_EQUALS points.size(),
          ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i = 0; i < values.size(); ++i)
@@ -138,7 +138,7 @@ ConstantTensorFunction<rank, dim, Number>::gradient_list(
     &gradients) const
 {
   (void)points;
-  Assert(gradients.size() == points.size(),
+  Assert(gradients.size() DEAL_II_EQUALS points.size(),
          ExcDimensionMismatch(gradients.size(), points.size()));
 
   // Return an array of zero tensors.

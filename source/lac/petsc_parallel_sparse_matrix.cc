@@ -40,7 +40,7 @@ namespace PETScWrappers
       const int            m = 0, n = 0, n_nonzero_per_row = 0;
       const PetscErrorCode ierr = MatCreateSeqAIJ(
         PETSC_COMM_SELF, m, n, n_nonzero_per_row, nullptr, &matrix);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
     }
 
 
@@ -113,16 +113,16 @@ namespace PETScWrappers
     void
     SparseMatrix::reinit(const SparseMatrix &other)
     {
-      if (&other == this)
+      if (&other DEAL_II_EQUALS this)
         return;
 
       this->communicator = other.communicator;
 
       PetscErrorCode ierr = destroy_matrix(matrix);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       ierr = MatDuplicate(other.matrix, MAT_DO_NOT_COPY_VALUES, &matrix);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
     }
 
 
@@ -136,14 +136,14 @@ namespace PETScWrappers
     void
     SparseMatrix::copy_from(const SparseMatrix &other)
     {
-      if (&other == this)
+      if (&other DEAL_II_EQUALS this)
         return;
 
       this->communicator = other.communicator;
 
       const PetscErrorCode ierr =
         MatCopy(other.matrix, matrix, SAME_NONZERO_PATTERN);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
     }
 
     void
@@ -160,7 +160,7 @@ namespace PETScWrappers
 
       // get rid of old matrix and generate a new one
       const PetscErrorCode ierr = destroy_matrix(matrix);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       do_reinit(m,
                 n,
@@ -188,7 +188,7 @@ namespace PETScWrappers
       // get rid of old matrix and generate a
       // new one
       const PetscErrorCode ierr = destroy_matrix(matrix);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       do_reinit(m,
                 n,
@@ -215,7 +215,7 @@ namespace PETScWrappers
 
       // get rid of old matrix and generate a new one
       const PetscErrorCode ierr = destroy_matrix(matrix);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
 
       do_reinit(sparsity_pattern,
@@ -236,7 +236,7 @@ namespace PETScWrappers
 
       // get rid of old matrix and generate a new one
       const PetscErrorCode ierr = destroy_matrix(matrix);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       do_reinit(local_rows, local_columns, sparsity_pattern);
     }
@@ -266,10 +266,10 @@ namespace PETScWrappers
                                                nullptr,
                                                &matrix);
       set_matrix_option(matrix, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       // set symmetric flag, if so requested
-      if (is_symmetric == true)
+      if (is_symmetric DEAL_II_EQUALS true)
         {
           set_matrix_option(matrix, MAT_SYMMETRIC, PETSC_TRUE);
         }
@@ -288,7 +288,7 @@ namespace PETScWrappers
     {
       Assert(local_rows <= m, ExcLocalRowsTooLarge(local_rows, m));
 
-      Assert(row_lengths.size() == m,
+      Assert(row_lengths.size() DEAL_II_EQUALS m,
              ExcDimensionMismatch(row_lengths.size(), m));
 
       // For the case that local_columns is smaller than one of the row lengths
@@ -337,10 +337,10 @@ namespace PETScWrappers
       // way to prevent a different number nonzero elements being allocated in
       // the first place. (See also previous TODO).
       set_matrix_option(matrix, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       // set symmetric flag, if so requested
-      if (is_symmetric == true)
+      if (is_symmetric DEAL_II_EQUALS true)
         {
           set_matrix_option(matrix, MAT_SYMMETRIC, PETSC_TRUE);
         }
@@ -353,14 +353,15 @@ namespace PETScWrappers
                             const IndexSet &           local_columns,
                             const SparsityPatternType &sparsity_pattern)
     {
-      Assert(sparsity_pattern.n_rows() == local_rows.size(),
+      Assert(sparsity_pattern.n_rows() DEAL_II_EQUALS local_rows.size(),
              ExcMessage(
                "SparsityPattern and IndexSet have different number of rows"));
       Assert(
-        sparsity_pattern.n_cols() == local_columns.size(),
+        sparsity_pattern.n_cols() DEAL_II_EQUALS local_columns.size(),
         ExcMessage(
           "SparsityPattern and IndexSet have different number of columns"));
-      Assert(local_rows.is_contiguous() && local_columns.is_contiguous(),
+      Assert(local_rows.is_contiguous()
+               DEAL_II_AND local_columns.is_contiguous(),
              ExcMessage("PETSc only supports contiguous row/column ranges"));
       Assert(local_rows.is_ascending_and_one_to_one(communicator),
              ExcNotImplemented());
@@ -372,7 +373,7 @@ namespace PETScWrappers
           Utilities::MPI::sum(local_rows.n_elements(), communicator);
         types::global_dof_index col_owners =
           Utilities::MPI::sum(local_columns.n_elements(), communicator);
-        Assert(row_owners == sparsity_pattern.n_rows(),
+        Assert(row_owners DEAL_II_EQUALS sparsity_pattern.n_rows(),
                ExcMessage(
                  std::string(
                    "Each row has to be owned by exactly one owner (n_rows()=") +
@@ -380,7 +381,7 @@ namespace PETScWrappers
                  " but sum(local_rows.n_elements())=" +
                  std::to_string(row_owners) + ")"));
         Assert(
-          col_owners == sparsity_pattern.n_cols(),
+          col_owners DEAL_II_EQUALS sparsity_pattern.n_cols(),
           ExcMessage(
             std::string(
               "Each column has to be owned by exactly one owner (n_cols()=") +
@@ -394,17 +395,17 @@ namespace PETScWrappers
       // create the matrix. We do not set row length but set the
       // correct SparsityPattern later.
       PetscErrorCode ierr = MatCreate(communicator, &matrix);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       ierr = MatSetSizes(matrix,
                          local_rows.n_elements(),
                          local_columns.n_elements(),
                          sparsity_pattern.n_rows(),
                          sparsity_pattern.n_cols());
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       ierr = MatSetType(matrix, MATMPIAIJ);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
 
       // next preset the exact given matrix
@@ -419,7 +420,7 @@ namespace PETScWrappers
       // for the usefulness of this option
       // read the documentation of this
       // class.
-      // if (preset_nonzero_locations == true)
+      // if (preset_nonzero_locations DEAL_II_EQUALS  true)
       if (local_rows.n_elements() > 0)
         {
           // MatMPIAIJSetPreallocationCSR
@@ -473,13 +474,13 @@ namespace PETScWrappers
                                               rowstart_in_window.data(),
                                               colnums_in_window.data(),
                                               nullptr);
-          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
         }
       else
         {
           PetscInt i = 0;
           ierr       = MatMPIAIJSetPreallocationCSR(matrix, &i, &i, nullptr);
-          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
         }
       compress(dealii::VectorOperation::insert);
 
@@ -499,9 +500,11 @@ namespace PETScWrappers
       const unsigned int            this_process,
       const bool                    preset_nonzero_locations)
     {
-      Assert(local_rows_per_process.size() == local_columns_per_process.size(),
-             ExcDimensionMismatch(local_rows_per_process.size(),
-                                  local_columns_per_process.size()));
+      Assert(
+        local_rows_per_process.size()
+          DEAL_II_EQUALS local_columns_per_process.size(),
+        ExcDimensionMismatch(local_rows_per_process.size(),
+                             local_columns_per_process.size()));
       Assert(this_process < local_rows_per_process.size(), ExcInternalError());
       assert_is_compressed();
 
@@ -526,17 +529,17 @@ namespace PETScWrappers
       // do not set row length but set the
       // correct SparsityPattern later.
       PetscErrorCode ierr = MatCreate(communicator, &matrix);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       ierr = MatSetSizes(matrix,
                          local_rows_per_process[this_process],
                          local_columns_per_process[this_process],
                          sparsity_pattern.n_rows(),
                          sparsity_pattern.n_cols());
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       ierr = MatSetType(matrix, MATMPIAIJ);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       // next preset the exact given matrix
       // entries with zeros, if the user
@@ -551,7 +554,7 @@ namespace PETScWrappers
       // for the usefulness of this option
       // read the documentation of this
       // class.
-      if (preset_nonzero_locations == true)
+      if (preset_nonzero_locations DEAL_II_EQUALS true)
         {
           // MatMPIAIJSetPreallocationCSR
           // can be used to allocate the sparsity
@@ -600,7 +603,7 @@ namespace PETScWrappers
                                               rowstart_in_window.data(),
                                               colnums_in_window.data(),
                                               nullptr);
-          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
           close_matrix(matrix);
           set_keep_zero_rows(matrix);
@@ -700,15 +703,15 @@ namespace PETScWrappers
       PetscErrorCode ierr;
 
       ierr = MatGetSize(matrix, &n_rows, &n_cols);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       ierr = MatGetLocalSize(matrix, &n_loc_rows, &n_loc_cols);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       ierr = MatGetOwnershipRangeColumn(matrix, &min, &max);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
-      Assert(n_loc_cols == max - min,
+      Assert(n_loc_cols DEAL_II_EQUALS max - min,
              ExcMessage(
                "PETSc is requiring non contiguous memory allocation."));
 
@@ -726,15 +729,15 @@ namespace PETScWrappers
       PetscErrorCode ierr;
 
       ierr = MatGetSize(matrix, &n_rows, &n_cols);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       ierr = MatGetLocalSize(matrix, &n_loc_rows, &n_loc_cols);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
       ierr = MatGetOwnershipRange(matrix, &min, &max);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 
-      Assert(n_loc_rows == max - min,
+      Assert(n_loc_rows DEAL_II_EQUALS max - min,
              ExcMessage(
                "PETSc is requiring non contiguous memory allocation."));
 

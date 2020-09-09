@@ -136,7 +136,7 @@ namespace internal
       {
         (void)e;
 
-        if (d == 1)
+        if (d DEAL_II_EQUALS 1)
           {
             static const std::array<unsigned int, 2> table = {{0, 1}};
 
@@ -155,7 +155,7 @@ namespace internal
       {
         (void)e;
 
-        if (d == 1)
+        if (d DEAL_II_EQUALS 1)
           return ReferenceCell::Type::Line;
 
         Assert(false, ExcNotImplemented());
@@ -182,7 +182,7 @@ namespace internal
       vertices_of_entity(const unsigned int d,
                          const unsigned int e) const override
       {
-        if (d == 2)
+        if (d DEAL_II_EQUALS 2)
           {
             static const std::array<unsigned int, 3> table = {{0, 1, 2}};
 
@@ -191,7 +191,7 @@ namespace internal
             return {table};
           }
 
-        if (d == 1)
+        if (d DEAL_II_EQUALS 1)
           {
             static const std::array<std::array<unsigned int, 2>, 3> table = {
               {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
@@ -209,10 +209,10 @@ namespace internal
       {
         (void)e;
 
-        if (d == 2)
+        if (d DEAL_II_EQUALS 2)
           return ReferenceCell::Type::Tri;
 
-        if (d == 1)
+        if (d DEAL_II_EQUALS 1)
           return ReferenceCell::Type::Line;
 
         Assert(false, ExcNotImplemented());
@@ -239,7 +239,7 @@ namespace internal
       vertices_of_entity(const unsigned int d,
                          const unsigned int e) const override
       {
-        if (d == 2)
+        if (d DEAL_II_EQUALS 2)
           {
             static const std::array<unsigned int, 4> table = {{0, 1, 2, 3}};
 
@@ -248,7 +248,7 @@ namespace internal
             return {table};
           }
 
-        if (d == 1)
+        if (d DEAL_II_EQUALS 1)
           {
             static const std::array<std::array<unsigned int, 2>, 4> table = {
               {{{0, 2}}, {{1, 3}}, {{0, 1}}, {{2, 3}}}};
@@ -266,10 +266,10 @@ namespace internal
       {
         (void)e;
 
-        if (d == 2)
+        if (d DEAL_II_EQUALS 2)
           return ReferenceCell::Type::Quad;
 
-        if (d == 1)
+        if (d DEAL_II_EQUALS 1)
           return ReferenceCell::Type::Line;
 
         Assert(false, ExcNotImplemented());
@@ -296,7 +296,7 @@ namespace internal
       vertices_of_entity(const unsigned int d,
                          const unsigned int e) const override
       {
-        if (d == 3)
+        if (d DEAL_II_EQUALS 3)
           {
             static const std::array<unsigned int, 4> table = {{0, 1, 2, 3}};
 
@@ -305,7 +305,7 @@ namespace internal
             return {table};
           }
 
-        if (d == 2)
+        if (d DEAL_II_EQUALS 2)
           {
             static const std::array<std::array<unsigned int, 3>, 4> table = {
               {{{0, 1, 2}}, {{1, 0, 3}}, {{0, 2, 3}}, {{2, 1, 3}}}};
@@ -313,7 +313,7 @@ namespace internal
             return {table[e]};
           }
 
-        if (d == 1)
+        if (d DEAL_II_EQUALS 1)
           {
             static const std::array<std::array<unsigned int, 2>, 6> table = {
               {{{0, 1}}, {{1, 2}}, {{2, 0}}, {{0, 3}}, {{1, 3}}, {{2, 3}}}};
@@ -331,13 +331,13 @@ namespace internal
       {
         (void)e;
 
-        if (d == 3)
+        if (d DEAL_II_EQUALS 3)
           return ReferenceCell::Type::Tet;
 
-        if (d == 2)
+        if (d DEAL_II_EQUALS 2)
           return ReferenceCell::Type::Tri;
 
-        if (d == 1)
+        if (d DEAL_II_EQUALS 1)
           return ReferenceCell::Type::Line;
 
         Assert(false, ExcNotImplemented());
@@ -394,7 +394,7 @@ namespace internal
       vertices_of_entity(const unsigned int d,
                          const unsigned int e) const override
       {
-        if (d == 3)
+        if (d DEAL_II_EQUALS 3)
           {
             static const std::array<unsigned int, 5> table = {{0, 1, 2, 3, 4}};
 
@@ -403,9 +403,9 @@ namespace internal
             return {table};
           }
 
-        if (d == 2)
+        if (d DEAL_II_EQUALS 2)
           {
-            if (e == 0)
+            if (e DEAL_II_EQUALS 0)
               {
                 static const std::array<unsigned int, 4> table = {{0, 1, 2, 3}};
                 return {table};
@@ -417,7 +417,7 @@ namespace internal
             return {table[e - 1]};
           }
 
-        if (d == 1)
+        if (d DEAL_II_EQUALS 1)
           {
             static const std::array<std::array<unsigned int, 2>, 8> table = {
               {{{0, 2}},
@@ -442,15 +442,15 @@ namespace internal
       {
         (void)e;
 
-        if (d == 3)
+        if (d DEAL_II_EQUALS 3)
           return ReferenceCell::Type::Pyramid;
 
-        if (d == 2 && e == 0)
+        if (d DEAL_II_EQUALS 2 DEAL_II_AND e DEAL_II_EQUALS 0)
           return ReferenceCell::Type::Quad;
-        else if (d == 2)
+        else if (d DEAL_II_EQUALS 2)
           return ReferenceCell::Type::Tri;
 
-        if (d == 1)
+        if (d DEAL_II_EQUALS 1)
           return ReferenceCell::Type::Line;
 
         Assert(false, ExcNotImplemented());
@@ -468,7 +468,7 @@ namespace internal
       unsigned int
       n_lines_of_surface(const unsigned int surface) const override
       {
-        if (surface == 0)
+        if (surface DEAL_II_EQUALS 0)
           return 4;
 
         return 3;
@@ -516,7 +516,7 @@ namespace internal
       vertices_of_entity(const unsigned int d,
                          const unsigned int e) const override
       {
-        if (d == 3)
+        if (d DEAL_II_EQUALS 3)
           {
             static const std::array<unsigned int, 6> table = {
               {0, 1, 2, 3, 4, 5}};
@@ -526,9 +526,9 @@ namespace internal
             return {table};
           }
 
-        if (d == 2)
+        if (d DEAL_II_EQUALS 2)
           {
-            if (e == 0 || e == 1)
+            if (e DEAL_II_EQUALS 0 DEAL_II_OR e DEAL_II_EQUALS 1)
               {
                 static const std::array<std::array<unsigned int, 3>, 2> table =
                   {{{{1, 0, 2}}, {{3, 4, 5}}}};
@@ -542,7 +542,7 @@ namespace internal
             return {table[e - 2]};
           }
 
-        if (d == 1)
+        if (d DEAL_II_EQUALS 1)
           {
             static const std::array<std::array<unsigned int, 2>, 9> table = {
               {{{0, 1}},
@@ -568,15 +568,15 @@ namespace internal
       {
         (void)e;
 
-        if (d == 3)
+        if (d DEAL_II_EQUALS 3)
           return ReferenceCell::Type::Wedge;
 
-        if (d == 2 && e > 1)
+        if (d DEAL_II_EQUALS 2 DEAL_II_AND e > 1)
           return ReferenceCell::Type::Quad;
-        else if (d == 2)
+        else if (d DEAL_II_EQUALS 2)
           return ReferenceCell::Type::Tri;
 
-        if (d == 1)
+        if (d DEAL_II_EQUALS 1)
           return ReferenceCell::Type::Line;
 
         Assert(false, ExcNotImplemented());
@@ -644,7 +644,7 @@ namespace internal
       vertices_of_entity(const unsigned int d,
                          const unsigned int e) const override
       {
-        if (d == 3)
+        if (d DEAL_II_EQUALS 3)
           {
             static const std::array<unsigned int, 8> table = {
               {0, 1, 2, 3, 4, 5, 6, 7}};
@@ -654,7 +654,7 @@ namespace internal
             return {table};
           }
 
-        if (d == 2)
+        if (d DEAL_II_EQUALS 2)
           {
             static const std::array<std::array<unsigned int, 4>, 6> table = {
               {{{0, 2, 4, 6}},
@@ -667,7 +667,7 @@ namespace internal
             return {table[e]};
           }
 
-        if (d == 1)
+        if (d DEAL_II_EQUALS 1)
           {
             static const std::array<std::array<unsigned int, 2>, 12> table = {
               {{{0, 2}},
@@ -696,13 +696,13 @@ namespace internal
       {
         (void)e;
 
-        if (d == 3)
+        if (d DEAL_II_EQUALS 3)
           return ReferenceCell::Type::Hex;
 
-        if (d == 2)
+        if (d DEAL_II_EQUALS 2)
           return ReferenceCell::Type::Quad;
 
-        if (d == 1)
+        if (d DEAL_II_EQUALS 1)
           return ReferenceCell::Type::Line;
 
         Assert(false, ExcNotImplemented());
@@ -829,7 +829,7 @@ namespace internal
       inline std::vector<unsigned char> &
       entity_orientations(const unsigned int structdim)
       {
-        if (structdim == 1)
+        if (structdim DEAL_II_EQUALS 1)
           return line_orientation;
 
         AssertDimension(structdim, 2);
@@ -840,7 +840,7 @@ namespace internal
       inline const std::vector<unsigned char> &
       entity_orientations(const unsigned int structdim) const
       {
-        if (structdim == 1)
+        if (structdim DEAL_II_EQUALS 1)
           return line_orientation;
 
         AssertDimension(structdim, 2);
@@ -851,7 +851,7 @@ namespace internal
       inline std::vector<ReferenceCell::Type> &
       entity_types(const unsigned int structdim)
       {
-        if (structdim == dim)
+        if (structdim DEAL_II_EQUALS dim)
           return cell_types;
 
         // for vertices/lines the entity types are clear (0/1)
@@ -864,7 +864,7 @@ namespace internal
       inline const std::vector<ReferenceCell::Type> &
       entity_types(const unsigned int structdim) const
       {
-        if (structdim == dim)
+        if (structdim DEAL_II_EQUALS dim)
           return cell_types;
 
         // for vertices/lines the entity types are clear (0/1)
@@ -877,15 +877,17 @@ namespace internal
       inline CRS<T> &
       entity_to_entities(const unsigned int from, const unsigned int to)
       {
-        if (from == dim && to == dim)
+        if (from DEAL_II_EQUALS dim DEAL_II_AND to DEAL_II_EQUALS dim)
           return neighbors;
-        else if (from == dim && to == dim - 1)
+        else if (from DEAL_II_EQUALS dim DEAL_II_AND to DEAL_II_EQUALS dim - 1)
           return cell_entities;
-        else if (dim == 3 && from == 2 && to == 0)
+        else if (dim DEAL_II_EQUALS 3 DEAL_II_AND from
+                   DEAL_II_EQUALS 2 DEAL_II_AND to DEAL_II_EQUALS 0)
           return quad_vertices;
-        else if (dim == 3 && from == 2 && to == 1)
+        else if (dim DEAL_II_EQUALS 3 DEAL_II_AND from
+                   DEAL_II_EQUALS 2 DEAL_II_AND to DEAL_II_EQUALS 1)
           return quad_lines;
-        else if (from == 1 && to == 0)
+        else if (from DEAL_II_EQUALS 1 DEAL_II_AND to DEAL_II_EQUALS 0)
           return line_vertices;
 
         Assert(false, ExcNotImplemented());
@@ -896,15 +898,17 @@ namespace internal
       inline const CRS<T> &
       entity_to_entities(const unsigned int from, const unsigned int to) const
       {
-        if (from == dim && to == dim)
+        if (from DEAL_II_EQUALS dim DEAL_II_AND to DEAL_II_EQUALS dim)
           return neighbors;
-        else if (from == dim && to == dim - 1)
+        else if (from DEAL_II_EQUALS dim DEAL_II_AND to DEAL_II_EQUALS dim - 1)
           return cell_entities;
-        else if (dim == 3 && from == 2 && to == 0)
+        else if (dim DEAL_II_EQUALS 3 DEAL_II_AND from
+                   DEAL_II_EQUALS 2 DEAL_II_AND to DEAL_II_EQUALS 0)
           return quad_vertices;
-        else if (dim == 3 && from == 2 && to == 1)
+        else if (dim DEAL_II_EQUALS 3 DEAL_II_AND from
+                   DEAL_II_EQUALS 2 DEAL_II_AND to DEAL_II_EQUALS 1)
           return quad_lines;
-        else if (from == 1 && to == 0)
+        else if (from DEAL_II_EQUALS 1 DEAL_II_AND to DEAL_II_EQUALS 0)
           return line_vertices;
 
         Assert(false, ExcNotImplemented());
@@ -966,7 +970,8 @@ namespace internal
           // ... and all its faces
           for (std::size_t j_0 = ptr_cf[i_0]; j_0 < ptr_cf[i_0 + 1]; j_0++)
             {
-              if (neighbors[col_cf[j_0]].first == static_cast<unsigned int>(-1))
+              if (neighbors[col_cf[j_0]]
+                    .first DEAL_II_EQUALS static_cast<unsigned int>(-1))
                 {
                   // face is visited the first time -> save the visiting cell
                   // and the face pointer
@@ -996,20 +1001,20 @@ namespace internal
                         const std::array<T, N> &  vertices_0,
                         const std::array<T, N> &  vertices_1)
     {
-      if (entity_type == ReferenceCell::Type::Line)
+      if (entity_type DEAL_II_EQUALS ReferenceCell::Type::Line)
         {
           const std::array<T, 2> i{{vertices_0[0], vertices_0[1]}};
           const std::array<T, 3> j{{vertices_1[0], vertices_1[1]}};
 
           // line_orientation=true
-          if (i == std::array<T, 2>{{j[0], j[1]}})
+          if (i DEAL_II_EQUALS std::array<T, 2>{{j[0], j[1]}})
             return 1;
 
           // line_orientation=false
-          if (i == std::array<T, 2>{{j[1], j[0]}})
+          if (i DEAL_II_EQUALS std::array<T, 2>{{j[1], j[0]}})
             return 0;
         }
-      else if (entity_type == ReferenceCell::Type::Tri)
+      else if (entity_type DEAL_II_EQUALS ReferenceCell::Type::Tri)
         {
           const std::array<T, 3> i{
             {vertices_0[0], vertices_0[1], vertices_0[2]}};
@@ -1017,30 +1022,30 @@ namespace internal
             {vertices_1[0], vertices_1[1], vertices_1[2]}};
 
           // face_orientation=true, face_rotation=false, face_flip=false
-          if (i == std::array<T, 3>{{j[0], j[1], j[2]}})
+          if (i DEAL_II_EQUALS std::array<T, 3>{{j[0], j[1], j[2]}})
             return 1;
 
           // face_orientation=true, face_rotation=true, face_flip=false
-          if (i == std::array<T, 3>{{j[1], j[0], j[2]}})
+          if (i DEAL_II_EQUALS std::array<T, 3>{{j[1], j[0], j[2]}})
             return 3;
 
           // face_orientation=true, face_rotation=false, face_flip=true
-          if (i == std::array<T, 3>{{j[2], j[0], j[1]}})
+          if (i DEAL_II_EQUALS std::array<T, 3>{{j[2], j[0], j[1]}})
             return 5;
 
           // face_orientation=false, face_rotation=false, face_flip=false
-          if (i == std::array<T, 3>{{j[0], j[2], j[1]}})
+          if (i DEAL_II_EQUALS std::array<T, 3>{{j[0], j[2], j[1]}})
             return 0;
 
           // face_orientation=false, face_rotation=true, face_flip=false
-          if (i == std::array<T, 3>{{j[1], j[2], j[0]}})
+          if (i DEAL_II_EQUALS std::array<T, 3>{{j[1], j[2], j[0]}})
             return 2;
 
           // face_orientation=false, face_rotation=false, face_flip=true
-          if (i == std::array<T, 3>{{j[2], j[1], j[0]}})
+          if (i DEAL_II_EQUALS std::array<T, 3>{{j[2], j[1], j[0]}})
             return 4;
         }
-      else if (entity_type == ReferenceCell::Type::Quad)
+      else if (entity_type DEAL_II_EQUALS ReferenceCell::Type::Quad)
         {
           const std::array<T, 4> i{
             {vertices_0[0], vertices_0[1], vertices_0[2], vertices_0[3]}};
@@ -1048,35 +1053,35 @@ namespace internal
             {vertices_1[0], vertices_1[1], vertices_1[2], vertices_1[3]}};
 
           // face_orientation=true, face_rotation=false, face_flip=false
-          if (i == std::array<T, 4>{{j[0], j[1], j[2], j[3]}})
+          if (i DEAL_II_EQUALS std::array<T, 4>{{j[0], j[1], j[2], j[3]}})
             return 1;
 
           // face_orientation=true, face_rotation=true, face_flip=false
-          if (i == std::array<T, 4>{{j[1], j[3], j[0], j[2]}})
+          if (i DEAL_II_EQUALS std::array<T, 4>{{j[1], j[3], j[0], j[2]}})
             return 3;
 
           // face_orientation=true, face_rotation=false, face_flip=true
-          if (i == std::array<T, 4>{{j[3], j[2], j[1], j[0]}})
+          if (i DEAL_II_EQUALS std::array<T, 4>{{j[3], j[2], j[1], j[0]}})
             return 5;
 
           // face_orientation=true, face_rotation=true, face_flip=true
-          if (i == std::array<T, 4>{{j[2], j[0], j[3], j[1]}})
+          if (i DEAL_II_EQUALS std::array<T, 4>{{j[2], j[0], j[3], j[1]}})
             return 7;
 
           // face_orientation=false, face_rotation=false, face_flip=false
-          if (i == std::array<T, 4>{{j[0], j[2], j[1], j[3]}})
+          if (i DEAL_II_EQUALS std::array<T, 4>{{j[0], j[2], j[1], j[3]}})
             return 0;
 
           // face_orientation=false, face_rotation=true, face_flip=false
-          if (i == std::array<T, 4>{{j[2], j[3], j[0], j[1]}})
+          if (i DEAL_II_EQUALS std::array<T, 4>{{j[2], j[3], j[0], j[1]}})
             return 2;
 
           // face_orientation=false, face_rotation=false, face_flip=true
-          if (i == std::array<T, 4>{{j[3], j[1], j[2], j[0]}})
+          if (i DEAL_II_EQUALS std::array<T, 4>{{j[3], j[1], j[2], j[0]}})
             return 4;
 
           // face_orientation=false, face_rotation=true, face_flip=true
-          if (i == std::array<T, 4>{{j[1], j[0], j[3], j[2]}})
+          if (i DEAL_II_EQUALS std::array<T, 4>{{j[1], j[0], j[3], j[2]}})
             return 6;
         }
 
@@ -1301,7 +1306,7 @@ namespace internal
               std::max(key_length, cell_type->vertices_of_entity(d, e).size());
         }
 
-      if (key_length == 2)
+      if (key_length DEAL_II_EQUALS 2)
         build_entity_templated<2>(d,
                                   cell_types,
                                   cell_types_index,
@@ -1310,7 +1315,7 @@ namespace internal
                                   crs_0,
                                   orientations,
                                   second_key_function);
-      else if (key_length == 3)
+      else if (key_length DEAL_II_EQUALS 3)
         build_entity_templated<3>(d,
                                   cell_types,
                                   cell_types_index,
@@ -1319,7 +1324,7 @@ namespace internal
                                   crs_0,
                                   orientations,
                                   second_key_function);
-      else if (key_length == 4)
+      else if (key_length DEAL_II_EQUALS 4)
         build_entity_templated<4>(d,
                                   cell_types,
                                   cell_types_index,
@@ -1466,10 +1471,10 @@ namespace internal
 
       CRS<T> temp1; // needed for 3D
 
-      if (dim == 1)
+      if (dim DEAL_II_EQUALS 1)
         connectivity.entity_to_entities(1, 0) = con_cv;
 
-      if (dim == 2 || dim == 3) // build lines
+      if (dim DEAL_II_EQUALS 2 DEAL_II_OR dim DEAL_II_EQUALS 3) // build lines
         {
           std::vector<unsigned char> dummy;
 
@@ -1477,16 +1482,20 @@ namespace internal
                        cell_t,
                        connectivity.entity_types(dim),
                        con_cv,
-                       dim == 2 ? connectivity.entity_to_entities(2, 1) : temp1,
+                       dim DEAL_II_EQUALS 2 ?
+                         connectivity.entity_to_entities(2, 1) :
+                         temp1,
                        connectivity.entity_to_entities(1, 0),
-                       dim == 2 ? connectivity.entity_orientations(1) : dummy,
+                       dim DEAL_II_EQUALS 2 ?
+                         connectivity.entity_orientations(1) :
+                         dummy,
                        [](auto key, const auto &, const auto &, const auto &) {
                          //  to ensure same enumeration as in deal.II
                          return key;
                        });
         }
 
-      if (dim == 3) // build quads
+      if (dim DEAL_II_EQUALS 3) // build quads
         {
           build_entity(
             2,

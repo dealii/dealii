@@ -107,7 +107,7 @@ namespace MGTools
                             std::vector<unsigned int> &      row_lengths,
                             const DoFTools::Coupling         flux_coupling)
   {
-    Assert(row_lengths.size() == dofs.n_dofs(),
+    Assert(row_lengths.size() DEAL_II_EQUALS dofs.n_dofs(),
            ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
 
     // Function starts here by
@@ -291,7 +291,7 @@ namespace MGTools
                             const Table<2, DoFTools::Coupling> &couplings,
                             const Table<2, DoFTools::Coupling> &flux_couplings)
   {
-    Assert(row_lengths.size() == dofs.n_dofs(),
+    Assert(row_lengths.size() DEAL_II_EQUALS dofs.n_dofs(),
            ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
 
     // Function starts here by
@@ -333,14 +333,14 @@ namespace MGTools
         const FiniteElement<dim> &fe       = cell->get_fe();
         const unsigned int        fe_index = cell->active_fe_index();
 
-        Assert(couplings.n_rows() == fe.n_components(),
+        Assert(couplings.n_rows() DEAL_II_EQUALS fe.n_components(),
                ExcDimensionMismatch(couplings.n_rows(), fe.n_components()));
-        Assert(couplings.n_cols() == fe.n_components(),
+        Assert(couplings.n_cols() DEAL_II_EQUALS fe.n_components(),
                ExcDimensionMismatch(couplings.n_cols(), fe.n_components()));
-        Assert(flux_couplings.n_rows() == fe.n_components(),
+        Assert(flux_couplings.n_rows() DEAL_II_EQUALS fe.n_components(),
                ExcDimensionMismatch(flux_couplings.n_rows(),
                                     fe.n_components()));
-        Assert(flux_couplings.n_cols() == fe.n_components(),
+        Assert(flux_couplings.n_cols() DEAL_II_EQUALS fe.n_components(),
                ExcDimensionMismatch(flux_couplings.n_cols(),
                                     fe.n_components()));
 
@@ -581,9 +581,9 @@ namespace MGTools
     const types::global_dof_index n_dofs = dof.n_dofs(level);
     (void)n_dofs;
 
-    Assert(sparsity.n_rows() == n_dofs,
+    Assert(sparsity.n_rows() DEAL_II_EQUALS n_dofs,
            ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
-    Assert(sparsity.n_cols() == n_dofs,
+    Assert(sparsity.n_cols() DEAL_II_EQUALS n_dofs,
            ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
 
     const unsigned int dofs_per_cell = dof.get_fe().n_dofs_per_cell();
@@ -591,10 +591,11 @@ namespace MGTools
     typename DoFHandler<dim, spacedim>::cell_iterator cell = dof.begin(level),
                                                       endc = dof.end(level);
     for (; cell != endc; ++cell)
-      if (dof.get_triangulation().locally_owned_subdomain() ==
-            numbers::invalid_subdomain_id ||
-          cell->level_subdomain_id() ==
-            dof.get_triangulation().locally_owned_subdomain())
+      if (dof.get_triangulation()
+            .locally_owned_subdomain()
+              DEAL_II_EQUALS numbers::invalid_subdomain_id DEAL_II_OR cell
+            ->level_subdomain_id() DEAL_II_EQUALS dof.get_triangulation()
+            .locally_owned_subdomain())
         {
           cell->get_mg_dof_indices(dofs_on_this_cell);
           constraints.add_entries_local_to_global(dofs_on_this_cell,
@@ -614,9 +615,9 @@ namespace MGTools
     const types::global_dof_index n_dofs = dof.n_dofs(level);
     (void)n_dofs;
 
-    Assert(sparsity.n_rows() == n_dofs,
+    Assert(sparsity.n_rows() DEAL_II_EQUALS n_dofs,
            ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
-    Assert(sparsity.n_cols() == n_dofs,
+    Assert(sparsity.n_cols() DEAL_II_EQUALS n_dofs,
            ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
 
     const unsigned int dofs_per_cell = dof.get_fe().n_dofs_per_cell();
@@ -639,13 +640,12 @@ namespace MGTools
         for (const unsigned int face : GeometryInfo<dim>::face_indices())
           {
             bool use_face = false;
-            if ((!cell->at_boundary(face)) &&
-                (static_cast<unsigned int>(cell->neighbor_level(face)) ==
-                 level))
+            if ((!cell->at_boundary(face))DEAL_II_AND(static_cast<unsigned int>(
+                  cell->neighbor_level(face)) DEAL_II_EQUALS level))
               use_face = true;
-            else if (cell->has_periodic_neighbor(face) &&
-                     (static_cast<unsigned int>(
-                        cell->periodic_neighbor_level(face)) == level))
+            else if (cell->has_periodic_neighbor(face) DEAL_II_AND(
+                       static_cast<unsigned int>(cell->periodic_neighbor_level(
+                         face)) DEAL_II_EQUALS level))
               use_face = true;
 
             if (use_face)
@@ -664,7 +664,7 @@ namespace MGTools
                                      dofs_on_other_cell[j]);
                       }
                   }
-                if (neighbor->is_locally_owned_on_level() == false)
+                if (neighbor->is_locally_owned_on_level() DEAL_II_EQUALS false)
                   for (unsigned int i = 0; i < dofs_per_cell; ++i)
                     for (unsigned int j = 0; j < dofs_per_cell; ++j)
                       {
@@ -686,7 +686,8 @@ namespace MGTools
                                   SparsityPatternType &            sparsity,
                                   const unsigned int               level)
   {
-    Assert((level >= 1) && (level < dof.get_triangulation().n_global_levels()),
+    Assert((level >= 1)
+             DEAL_II_AND(level < dof.get_triangulation().n_global_levels()),
            ExcIndexRange(level, 1, dof.get_triangulation().n_global_levels()));
 
     const types::global_dof_index fine_dofs   = dof.n_dofs(level);
@@ -696,9 +697,9 @@ namespace MGTools
 
     // Matrix maps from fine level to coarse level
 
-    Assert(sparsity.n_rows() == coarse_dofs,
+    Assert(sparsity.n_rows() DEAL_II_EQUALS coarse_dofs,
            ExcDimensionMismatch(sparsity.n_rows(), coarse_dofs));
-    Assert(sparsity.n_cols() == fine_dofs,
+    Assert(sparsity.n_cols() DEAL_II_EQUALS fine_dofs,
            ExcDimensionMismatch(sparsity.n_cols(), fine_dofs));
 
     const unsigned int dofs_per_cell = dof.get_fe().n_dofs_per_cell();
@@ -717,13 +718,13 @@ namespace MGTools
           {
             // Neighbor is coarser
             bool use_face = false;
-            if ((!cell->at_boundary(face)) &&
-                (static_cast<unsigned int>(cell->neighbor_level(face)) !=
-                 level))
+            if ((!cell->at_boundary(face))DEAL_II_AND(
+                  static_cast<unsigned int>(cell->neighbor_level(face)) !=
+                  level))
               use_face = true;
-            else if (cell->has_periodic_neighbor(face) &&
-                     (static_cast<unsigned int>(
-                        cell->periodic_neighbor_level(face)) != level))
+            else if (cell->has_periodic_neighbor(face) DEAL_II_AND(
+                       static_cast<unsigned int>(
+                         cell->periodic_neighbor_level(face)) != level))
               use_face = true;
 
             if (use_face)
@@ -763,17 +764,17 @@ namespace MGTools
     (void)n_dofs;
     (void)n_comp;
 
-    Assert(sparsity.n_rows() == n_dofs,
+    Assert(sparsity.n_rows() DEAL_II_EQUALS n_dofs,
            ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
-    Assert(sparsity.n_cols() == n_dofs,
+    Assert(sparsity.n_cols() DEAL_II_EQUALS n_dofs,
            ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
-    Assert(int_mask.n_rows() == n_comp,
+    Assert(int_mask.n_rows() DEAL_II_EQUALS n_comp,
            ExcDimensionMismatch(int_mask.n_rows(), n_comp));
-    Assert(int_mask.n_cols() == n_comp,
+    Assert(int_mask.n_cols() DEAL_II_EQUALS n_comp,
            ExcDimensionMismatch(int_mask.n_cols(), n_comp));
-    Assert(flux_mask.n_rows() == n_comp,
+    Assert(flux_mask.n_rows() DEAL_II_EQUALS n_comp,
            ExcDimensionMismatch(flux_mask.n_rows(), n_comp));
-    Assert(flux_mask.n_cols() == n_comp,
+    Assert(flux_mask.n_cols() DEAL_II_EQUALS n_comp,
            ExcDimensionMismatch(flux_mask.n_cols(), n_comp));
 
     const unsigned int                   total_dofs = fe.n_dofs_per_cell();
@@ -828,7 +829,8 @@ namespace MGTools
             if (cell_face->user_flag_set())
               continue;
 
-            if (cell->at_boundary(face) && !cell->has_periodic_neighbor(face))
+            if (cell->at_boundary(face)
+                  DEAL_II_AND !cell->has_periodic_neighbor(face))
               {
                 for (unsigned int i = 0; i < total_dofs; ++i)
                   {
@@ -837,11 +839,12 @@ namespace MGTools
                       {
                         const bool j_non_zero_i = support_on_face(j, face);
 
-                        if (flux_dof_mask(i, j) == DoFTools::always)
+                        if (flux_dof_mask(i, j) DEAL_II_EQUALS DoFTools::always)
                           sparsity.add(dofs_on_this_cell[i],
                                        dofs_on_this_cell[j]);
-                        if (flux_dof_mask(i, j) == DoFTools::nonzero &&
-                            i_non_zero_i && j_non_zero_i)
+                        if (flux_dof_mask(i, j)
+                              DEAL_II_EQUALS DoFTools::nonzero DEAL_II_AND
+                                i_non_zero_i DEAL_II_AND j_non_zero_i)
                           sparsity.add(dofs_on_this_cell[i],
                                        dofs_on_this_cell[j]);
                       }
@@ -870,7 +873,7 @@ namespace MGTools
                         const bool j_non_zero_i = support_on_face(j, face);
                         const bool j_non_zero_e =
                           support_on_face(j, neighbor_face);
-                        if (flux_dof_mask(i, j) == DoFTools::always)
+                        if (flux_dof_mask(i, j) DEAL_II_EQUALS DoFTools::always)
                           {
                             sparsity.add(dofs_on_this_cell[i],
                                          dofs_on_other_cell[j]);
@@ -881,23 +884,24 @@ namespace MGTools
                             sparsity.add(dofs_on_other_cell[i],
                                          dofs_on_other_cell[j]);
                           }
-                        if (flux_dof_mask(i, j) == DoFTools::nonzero)
+                        if (flux_dof_mask(i, j)
+                              DEAL_II_EQUALS DoFTools::nonzero)
                           {
-                            if (i_non_zero_i && j_non_zero_e)
+                            if (i_non_zero_i DEAL_II_AND j_non_zero_e)
                               sparsity.add(dofs_on_this_cell[i],
                                            dofs_on_other_cell[j]);
-                            if (i_non_zero_e && j_non_zero_i)
+                            if (i_non_zero_e DEAL_II_AND j_non_zero_i)
                               sparsity.add(dofs_on_other_cell[i],
                                            dofs_on_this_cell[j]);
-                            if (i_non_zero_i && j_non_zero_i)
+                            if (i_non_zero_i DEAL_II_AND j_non_zero_i)
                               sparsity.add(dofs_on_this_cell[i],
                                            dofs_on_this_cell[j]);
-                            if (i_non_zero_e && j_non_zero_e)
+                            if (i_non_zero_e DEAL_II_AND j_non_zero_e)
                               sparsity.add(dofs_on_other_cell[i],
                                            dofs_on_other_cell[j]);
                           }
 
-                        if (flux_dof_mask(j, i) == DoFTools::always)
+                        if (flux_dof_mask(j, i) DEAL_II_EQUALS DoFTools::always)
                           {
                             sparsity.add(dofs_on_this_cell[j],
                                          dofs_on_other_cell[i]);
@@ -908,18 +912,19 @@ namespace MGTools
                             sparsity.add(dofs_on_other_cell[j],
                                          dofs_on_other_cell[i]);
                           }
-                        if (flux_dof_mask(j, i) == DoFTools::nonzero)
+                        if (flux_dof_mask(j, i)
+                              DEAL_II_EQUALS DoFTools::nonzero)
                           {
-                            if (j_non_zero_i && i_non_zero_e)
+                            if (j_non_zero_i DEAL_II_AND i_non_zero_e)
                               sparsity.add(dofs_on_this_cell[j],
                                            dofs_on_other_cell[i]);
-                            if (j_non_zero_e && i_non_zero_i)
+                            if (j_non_zero_e DEAL_II_AND i_non_zero_i)
                               sparsity.add(dofs_on_other_cell[j],
                                            dofs_on_this_cell[i]);
-                            if (j_non_zero_i && i_non_zero_i)
+                            if (j_non_zero_i DEAL_II_AND i_non_zero_i)
                               sparsity.add(dofs_on_this_cell[j],
                                            dofs_on_this_cell[i]);
-                            if (j_non_zero_e && i_non_zero_e)
+                            if (j_non_zero_e DEAL_II_AND i_non_zero_e)
                               sparsity.add(dofs_on_other_cell[j],
                                            dofs_on_other_cell[i]);
                           }
@@ -948,7 +953,8 @@ namespace MGTools
     const unsigned int        n_comp = fe.n_components();
     (void)n_comp;
 
-    Assert((level >= 1) && (level < dof.get_triangulation().n_global_levels()),
+    Assert((level >= 1)
+             DEAL_II_AND(level < dof.get_triangulation().n_global_levels()),
            ExcIndexRange(level, 1, dof.get_triangulation().n_global_levels()));
 
     const types::global_dof_index fine_dofs   = dof.n_dofs(level);
@@ -958,13 +964,13 @@ namespace MGTools
 
     // Matrix maps from fine level to coarse level
 
-    Assert(sparsity.n_rows() == coarse_dofs,
+    Assert(sparsity.n_rows() DEAL_II_EQUALS coarse_dofs,
            ExcDimensionMismatch(sparsity.n_rows(), coarse_dofs));
-    Assert(sparsity.n_cols() == fine_dofs,
+    Assert(sparsity.n_cols() DEAL_II_EQUALS fine_dofs,
            ExcDimensionMismatch(sparsity.n_cols(), fine_dofs));
-    Assert(flux_mask.n_rows() == n_comp,
+    Assert(flux_mask.n_rows() DEAL_II_EQUALS n_comp,
            ExcDimensionMismatch(flux_mask.n_rows(), n_comp));
-    Assert(flux_mask.n_cols() == n_comp,
+    Assert(flux_mask.n_cols() DEAL_II_EQUALS n_comp,
            ExcDimensionMismatch(flux_mask.n_cols(), n_comp));
 
     const unsigned int dofs_per_cell = dof.get_fe().n_dofs_per_cell();
@@ -994,13 +1000,13 @@ namespace MGTools
           {
             // Neighbor is coarser
             bool use_face = false;
-            if ((!cell->at_boundary(face)) &&
-                (static_cast<unsigned int>(cell->neighbor_level(face)) !=
-                 level))
+            if ((!cell->at_boundary(face))DEAL_II_AND(
+                  static_cast<unsigned int>(cell->neighbor_level(face)) !=
+                  level))
               use_face = true;
-            else if (cell->has_periodic_neighbor(face) &&
-                     (static_cast<unsigned int>(
-                        cell->periodic_neighbor_level(face)) != level))
+            else if (cell->has_periodic_neighbor(face) DEAL_II_AND(
+                       static_cast<unsigned int>(
+                         cell->periodic_neighbor_level(face)) != level))
               use_face = true;
 
             if (use_face)
@@ -1039,9 +1045,9 @@ namespace MGTools
     const types::global_dof_index n_dofs = dof.n_dofs(level);
     (void)n_dofs;
 
-    Assert(sparsity.n_rows() == n_dofs,
+    Assert(sparsity.n_rows() DEAL_II_EQUALS n_dofs,
            ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
-    Assert(sparsity.n_cols() == n_dofs,
+    Assert(sparsity.n_cols() DEAL_II_EQUALS n_dofs,
            ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
 
     const unsigned int dofs_per_cell = dof.get_fe().n_dofs_per_cell();
@@ -1075,17 +1081,17 @@ namespace MGTools
     const unsigned int        nlevels =
       dof_handler.get_triangulation().n_global_levels();
 
-    Assert(result.size() == nlevels,
+    Assert(result.size() DEAL_II_EQUALS nlevels,
            ExcDimensionMismatch(result.size(), nlevels));
 
-    if (target_component.size() == 0)
+    if (target_component.size() DEAL_II_EQUALS 0)
       {
         target_component.resize(n_components);
         for (unsigned int i = 0; i < n_components; ++i)
           target_component[i] = i;
       }
 
-    Assert(target_component.size() == n_components,
+    Assert(target_component.size() DEAL_II_EQUALS n_components,
            ExcDimensionMismatch(target_component.size(), n_components));
 
     for (unsigned int l = 0; l < nlevels; ++l)
@@ -1097,7 +1103,7 @@ namespace MGTools
         // component. treat this first
         // since it does not require any
         // computations
-        if (n_components == 1)
+        if (n_components DEAL_II_EQUALS 1)
           {
             result[l][0] = dof_handler.n_dofs(l);
           }
@@ -1142,7 +1148,8 @@ namespace MGTools
                   {
                     for (unsigned int dd = 0; dd < d; ++dd)
                       {
-                        if (base.is_primitive() || (!only_once || dd == 0))
+                        if (base.is_primitive() DEAL_II_OR(
+                              !only_once DEAL_II_OR dd DEAL_II_EQUALS 0))
                           result[l][target_component[component]] +=
                             std::count(dofs_in_component[component].begin(),
                                        dofs_in_component[component].end(),
@@ -1152,11 +1159,12 @@ namespace MGTools
                   }
               }
             // finally sanity check
-            Assert(!dof_handler.get_fe().is_primitive() ||
-                     std::accumulate(result[l].begin(),
-                                     result[l].end(),
-                                     types::global_dof_index(0)) ==
-                       dof_handler.n_dofs(l),
+            Assert(!dof_handler.get_fe()
+                      .is_primitive()
+                        DEAL_II_OR       std::accumulate(result[l].begin(),
+                                                   result[l].end(),
+                                                   types::global_dof_index(0))
+                          DEAL_II_EQUALS dof_handler.n_dofs(l),
                    ExcInternalError());
           }
       }
@@ -1183,13 +1191,13 @@ namespace MGTools
     // If the empty vector was given as
     // default argument, set up this
     // vector as identity.
-    if (target_block.size() == 0)
+    if (target_block.size() DEAL_II_EQUALS 0)
       {
         target_block.resize(n_blocks);
         for (unsigned int i = 0; i < n_blocks; ++i)
           target_block[i] = i;
       }
-    Assert(target_block.size() == n_blocks,
+    Assert(target_block.size() DEAL_II_EQUALS n_blocks,
            ExcDimensionMismatch(target_block.size(), n_blocks));
 
     const unsigned int max_block =
@@ -1204,7 +1212,7 @@ namespace MGTools
     // block. treat this first
     // since it does not require any
     // computations
-    if (n_blocks == 1)
+    if (n_blocks DEAL_II_EQUALS 1)
       {
         for (unsigned int l = 0; l < n_levels; ++l)
           dofs_per_block[l][0] = dof_handler.n_dofs(l);
@@ -1256,7 +1264,8 @@ namespace MGTools
     std::vector<std::set<types::global_dof_index>> &boundary_indices,
     const ComponentMask &                           component_mask)
   {
-    Assert(boundary_indices.size() == dof.get_triangulation().n_global_levels(),
+    Assert(boundary_indices.size() DEAL_II_EQUALS dof.get_triangulation()
+             .n_global_levels(),
            ExcDimensionMismatch(boundary_indices.size(),
                                 dof.get_triangulation().n_global_levels()));
 
@@ -1280,7 +1289,8 @@ namespace MGTools
                      std::vector<IndexSet> &boundary_indices,
                      const ComponentMask &  component_mask)
   {
-    Assert(boundary_indices.size() == dof.get_triangulation().n_global_levels(),
+    Assert(boundary_indices.size() DEAL_II_EQUALS dof.get_triangulation()
+             .n_global_levels(),
            ExcDimensionMismatch(boundary_indices.size(),
                                 dof.get_triangulation().n_global_levels()));
 
@@ -1303,11 +1313,11 @@ namespace MGTools
     boundary_indices.resize(dof.get_triangulation().n_global_levels());
 
     // if for whatever reason we were passed an empty set, return immediately
-    if (boundary_ids.size() == 0)
+    if (boundary_ids.size() DEAL_II_EQUALS 0)
       return;
 
     for (unsigned int i = 0; i < dof.get_triangulation().n_global_levels(); ++i)
-      if (boundary_indices[i].size() == 0)
+      if (boundary_indices[i].size() DEAL_II_EQUALS 0)
         boundary_indices[i] = IndexSet(dof.n_dofs(i));
 
     const unsigned int n_components = dof.get_fe_collection().n_components();
@@ -1322,20 +1332,22 @@ namespace MGTools
 
     // First, deal with the simpler case when we have to identify all boundary
     // dofs
-    if (component_mask.n_selected_components(n_components) == n_components)
+    if (component_mask.n_selected_components(n_components)
+          DEAL_II_EQUALS n_components)
       {
         for (const auto &cell : dof.cell_iterators())
           {
             if (dof.get_triangulation().locally_owned_subdomain() !=
-                  numbers::invalid_subdomain_id &&
-                cell->level_subdomain_id() == numbers::artificial_subdomain_id)
+                numbers::invalid_subdomain_id DEAL_II_AND
+                                              cell->level_subdomain_id()
+                    DEAL_II_EQUALS            numbers::artificial_subdomain_id)
               continue;
             const FiniteElement<dim> &fe    = cell->get_fe();
             const unsigned int        level = cell->level();
             local_dofs.resize(fe.n_dofs_per_face());
 
             for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
-              if (cell->at_boundary(face_no) == true)
+              if (cell->at_boundary(face_no) DEAL_II_EQUALS true)
                 {
                   const typename DoFHandler<dim, spacedim>::face_iterator face =
                     cell->face(face_no);
@@ -1358,12 +1370,13 @@ namespace MGTools
                  "It's probably worthwhile to select at least one component."));
 
         for (const auto &cell : dof.cell_iterators())
-          if (dof.get_triangulation().locally_owned_subdomain() ==
-                numbers::invalid_subdomain_id ||
-              cell->level_subdomain_id() != numbers::artificial_subdomain_id)
+          if (dof.get_triangulation()
+                .locally_owned_subdomain()
+                  DEAL_II_EQUALS numbers::invalid_subdomain_id DEAL_II_OR cell
+                ->level_subdomain_id() != numbers::artificial_subdomain_id)
             for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
               {
-                if (cell->at_boundary(face_no) == false)
+                if (cell->at_boundary(face_no) DEAL_II_EQUALS false)
                   continue;
 
                 const FiniteElement<dim> &fe    = cell->get_fe();
@@ -1387,8 +1400,9 @@ namespace MGTools
 
                         bool selected = false;
                         for (unsigned int c = 0; c < n_components; ++c)
-                          if (nonzero_component_array[c] == true &&
-                              component_mask[c] == true)
+                          if (nonzero_component_array
+                                [c] DEAL_II_EQUALS true DEAL_II_AND
+                                  component_mask[c] DEAL_II_EQUALS true)
                             {
                               selected = true;
                               break;
@@ -1396,8 +1410,9 @@ namespace MGTools
                         if (selected)
                           for (unsigned int c = 0; c < n_components; ++c)
                             Assert(
-                              nonzero_component_array[c] == false ||
-                                component_mask[c] == true,
+                              nonzero_component_array
+                                [c] DEAL_II_EQUALS false DEAL_II_OR
+                                  component_mask[c] DEAL_II_EQUALS true,
                               ExcMessage(
                                 "You are using a non-primitive FiniteElement "
                                 "and try to constrain just some of its components!"));
@@ -1424,7 +1439,8 @@ namespace MGTools
                                 const ComponentMask &nonzero_component_array =
                                   cell->get_fe().get_nonzero_components(i);
                                 for (unsigned int c = 0; c < n_components; ++c)
-                                  if (nonzero_component_array[c] == true)
+                                  if (nonzero_component_array
+                                        [c] DEAL_II_EQUALS true)
                                     {
                                       component = c;
                                       break;
@@ -1432,7 +1448,7 @@ namespace MGTools
                               }
                             Assert(component != numbers::invalid_unsigned_int,
                                    ExcInternalError());
-                            if (component_mask[component] == true)
+                            if (component_mask[component] DEAL_II_EQUALS true)
                               dofs_by_level[level].push_back(local_dofs[i]);
                           }
                       }
@@ -1461,8 +1477,9 @@ namespace MGTools
   extract_inner_interface_dofs(const DoFHandler<dim, spacedim> &mg_dof_handler,
                                std::vector<IndexSet> &          interface_dofs)
   {
-    Assert(interface_dofs.size() ==
-             mg_dof_handler.get_triangulation().n_global_levels(),
+    Assert(interface_dofs.size()
+             DEAL_II_EQUALS mg_dof_handler.get_triangulation()
+               .n_global_levels(),
            ExcDimensionMismatch(
              interface_dofs.size(),
              mg_dof_handler.get_triangulation().n_global_levels()));
@@ -1487,8 +1504,8 @@ namespace MGTools
         // Do not look at artificial level cells (in a serial computation we
         // need to ignore the level_subdomain_id() because it is never set).
         if (mg_dof_handler.get_triangulation().locally_owned_subdomain() !=
-              numbers::invalid_subdomain_id &&
-            cell->level_subdomain_id() == numbers::artificial_subdomain_id)
+            numbers::invalid_subdomain_id DEAL_II_AND cell->level_subdomain_id()
+              DEAL_II_EQUALS numbers::artificial_subdomain_id)
           continue;
 
         bool has_coarser_neighbor = false;
@@ -1499,7 +1516,8 @@ namespace MGTools
           {
             const typename DoFHandler<dim, spacedim>::face_iterator face =
               cell->face(face_nr);
-            if (!face->at_boundary() || cell->has_periodic_neighbor(face_nr))
+            if (!face->at_boundary()
+                   DEAL_II_OR cell->has_periodic_neighbor(face_nr))
               {
                 // interior face
                 const typename DoFHandler<dim>::cell_iterator neighbor =
@@ -1508,10 +1526,10 @@ namespace MGTools
                 // only process cell pairs if one or both of them are owned by
                 // me (ignore if running in serial)
                 if (mg_dof_handler.get_triangulation()
-                        .locally_owned_subdomain() !=
-                      numbers::invalid_subdomain_id &&
-                    neighbor->level_subdomain_id() ==
-                      numbers::artificial_subdomain_id)
+                      .locally_owned_subdomain() !=
+                    numbers::invalid_subdomain_id DEAL_II_AND
+                                                  neighbor->level_subdomain_id()
+                        DEAL_II_EQUALS numbers::artificial_subdomain_id)
                   continue;
 
                 // Do refinement face from the coarse side
@@ -1525,7 +1543,7 @@ namespace MGTools
               }
           }
 
-        if (has_coarser_neighbor == false)
+        if (has_coarser_neighbor DEAL_II_EQUALS false)
           continue;
 
         const unsigned int level = cell->level();

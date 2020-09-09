@@ -85,11 +85,11 @@ namespace LinearAlgebra
     {
       Tpetra::Map<int, types::global_dof_index> input_map =
         parallel_partitioner.make_tpetra_map(communicator, false);
-      if (vector->getMap()->isSameAs(input_map) == false)
+      if (vector->getMap()->isSameAs(input_map) DEAL_II_EQUALS false)
         vector = std::make_unique<
           Tpetra::Vector<Number, int, types::global_dof_index>>(Teuchos::rcp(
           new Tpetra::Map<int, types::global_dof_index>(input_map)));
-      else if (omit_zeroing_entries == false)
+      else if (omit_zeroing_entries DEAL_II_EQUALS false)
         {
           vector->putScalar(0.);
         }
@@ -128,7 +128,7 @@ namespace LinearAlgebra
         *vector = V.trilinos_vector();
       else
         {
-          if (size() == V.size())
+          if (size() DEAL_II_EQUALS V.size())
             {
               Tpetra::Import<int, types::global_dof_index> data_exchange(
                 vector->getMap(), V.trilinos_vector().getMap());
@@ -152,7 +152,7 @@ namespace LinearAlgebra
     Vector<Number> &
     Vector<Number>::operator=(const Number s)
     {
-      Assert(s == Number(0.),
+      Assert(s DEAL_II_EQUALS Number(0.),
              ExcMessage("Only 0 can be assigned to a vector."));
 
       vector->putScalar(s);
@@ -171,14 +171,13 @@ namespace LinearAlgebra
     {
       // If no communication pattern is given, create one. Otherwise, use the
       // one given.
-      if (communication_pattern == nullptr)
+      if (communication_pattern DEAL_II_EQUALS nullptr)
         {
           // The first time import is called, a communication pattern is
           // created. Check if the communication pattern already exists and if
           // it can be reused.
-          if ((source_stored_elements.size() !=
-               V.get_stored_elements().size()) ||
-              (source_stored_elements != V.get_stored_elements()))
+          if ((source_stored_elements.size() != V.get_stored_elements().size())
+                DEAL_II_OR(source_stored_elements != V.get_stored_elements()))
             {
               const Teuchos::MpiComm<int> *mpi_comm =
                 dynamic_cast<const Teuchos::MpiComm<int> *>(
@@ -215,9 +214,9 @@ namespace LinearAlgebra
       source_vector.template sync<
         typename Tpetra::Vector<Number, int, types::global_dof_index>::
           device_type::memory_space>();
-      if (operation == VectorOperation::insert)
+      if (operation DEAL_II_EQUALS VectorOperation::insert)
         vector->doExport(source_vector, tpetra_export, Tpetra::REPLACE);
-      else if (operation == VectorOperation::add)
+      else if (operation DEAL_II_EQUALS VectorOperation::add)
         vector->doExport(source_vector, tpetra_export, Tpetra::ADD);
       else
         AssertThrow(false, ExcNotImplemented());
@@ -267,7 +266,7 @@ namespace LinearAlgebra
         }
       else
         {
-          Assert(this->size() == down_V.size(),
+          Assert(this->size() DEAL_II_EQUALS down_V.size(),
                  ExcDimensionMismatch(this->size(), down_V.size()));
 
           // TODO: Tpetra doesn't have a combine mode that also updates local
@@ -309,7 +308,7 @@ namespace LinearAlgebra
 
       // Downcast V. If fails, throws an exception.
       const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-      Assert(this->size() == down_V.size(),
+      Assert(this->size() DEAL_II_EQUALS down_V.size(),
              ExcDimensionMismatch(this->size(), down_V.size()));
       Assert(vector->getMap()->isSameAs(*down_V.trilinos_vector().getMap()),
              ExcDifferentParallelPartitioning());
@@ -445,8 +444,8 @@ namespace LinearAlgebra
       // Downcast V. If fails, throws an exception.
       const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
       // If we don't have the same map, copy.
-      if (vector->getMap()->isSameAs(*down_V.trilinos_vector().getMap()) ==
-          false)
+      if (vector->getMap()->isSameAs(*down_V.trilinos_vector().getMap())
+            DEAL_II_EQUALS false)
         this->sadd(0., a, V);
       else
         {
@@ -485,7 +484,7 @@ namespace LinearAlgebra
       unsigned int num_nonzero =
         Utilities::MPI::sum(flag, *(mpi_comm->getRawMpiComm())());
 
-      return num_nonzero == 0;
+      return num_nonzero DEAL_II_EQUALS 0;
     }
 
 

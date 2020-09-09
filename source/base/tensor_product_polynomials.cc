@@ -141,7 +141,7 @@ void
 TensorProductPolynomials<dim, PolynomialType>::set_numbering(
   const std::vector<unsigned int> &renumber)
 {
-  Assert(renumber.size() == index_map.size(),
+  Assert(renumber.size() DEAL_II_EQUALS index_map.size(),
          ExcDimensionMismatch(renumber.size(), index_map.size()));
 
   index_map = renumber;
@@ -225,7 +225,7 @@ TensorProductPolynomials<dim, PolynomialType>::compute_grad(
     {
       grad[d] = 1.;
       for (unsigned int x = 0; x < dim; ++x)
-        grad[d] *= v[x][d == x];
+        grad[d] *= v[x][d DEAL_II_EQUALS x];
     }
 
   return grad;
@@ -276,9 +276,9 @@ TensorProductPolynomials<dim, PolynomialType>::compute_grad_grad(
         for (unsigned int x = 0; x < dim; ++x)
           {
             unsigned int derivative = 0;
-            if (d1 == x || d2 == x)
+            if (d1 DEAL_II_EQUALS x DEAL_II_OR d2 DEAL_II_EQUALS x)
               {
-                if (d1 == d2)
+                if (d1 DEAL_II_EQUALS d2)
                   derivative = 2;
                 else
                   derivative = 1;
@@ -314,23 +314,31 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
   std::vector<Tensor<4, dim>> &fourth_derivatives) const
 {
   Assert(dim <= 3, ExcNotImplemented());
-  Assert(values.size() == this->n() || values.size() == 0,
+  Assert(values.size() DEAL_II_EQUALS this->n() DEAL_II_OR values.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(values.size(), this->n(), 0));
-  Assert(grads.size() == this->n() || grads.size() == 0,
+  Assert(grads.size() DEAL_II_EQUALS this->n() DEAL_II_OR grads.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(grads.size(), this->n(), 0));
-  Assert(grad_grads.size() == this->n() || grad_grads.size() == 0,
+  Assert(grad_grads.size() DEAL_II_EQUALS this->n() DEAL_II_OR grad_grads.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(grad_grads.size(), this->n(), 0));
-  Assert(third_derivatives.size() == this->n() || third_derivatives.size() == 0,
+  Assert(third_derivatives.size()
+           DEAL_II_EQUALS this->n() DEAL_II_OR third_derivatives.size()
+             DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(third_derivatives.size(), this->n(), 0));
-  Assert(fourth_derivatives.size() == this->n() ||
-           fourth_derivatives.size() == 0,
+  Assert(fourth_derivatives.size()
+           DEAL_II_EQUALS this->n() DEAL_II_OR fourth_derivatives.size()
+             DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(fourth_derivatives.size(), this->n(), 0));
 
-  const bool update_values          = (values.size() == this->n()),
-             update_grads           = (grads.size() == this->n()),
-             update_grad_grads      = (grad_grads.size() == this->n()),
-             update_3rd_derivatives = (third_derivatives.size() == this->n()),
-             update_4th_derivatives = (fourth_derivatives.size() == this->n());
+  const bool update_values     = (values.size() DEAL_II_EQUALS this->n()),
+             update_grads      = (grads.size() DEAL_II_EQUALS this->n()),
+             update_grad_grads = (grad_grads.size() DEAL_II_EQUALS this->n()),
+             update_3rd_derivatives =
+               (third_derivatives.size() DEAL_II_EQUALS this->n()),
+             update_4th_derivatives =
+               (fourth_derivatives.size() DEAL_II_EQUALS this->n());
 
   // check how many values/derivatives we have to compute
   unsigned int n_values_and_derivatives = 0;
@@ -353,7 +361,7 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
   const unsigned int n_polynomials = polynomials.size();
   boost::container::small_vector<std::array<std::array<double, 5>, dim>, 20>
     values_1d(n_polynomials);
-  if (n_values_and_derivatives == 1)
+  if (n_values_and_derivatives DEAL_II_EQUALS 1)
     for (unsigned int i = 0; i < n_polynomials; ++i)
       for (unsigned int d = 0; d < dim; ++d)
         values_1d[i][d][0] = polynomials[i].value(p(d));
@@ -369,7 +377,7 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
   for (indices[2] = 0; indices[2] < (dim > 2 ? n_polynomials : 1); ++indices[2])
     for (indices[1] = 0; indices[1] < (dim > 1 ? n_polynomials : 1);
          ++indices[1])
-      if (n_values_and_derivatives == 1)
+      if (n_values_and_derivatives DEAL_II_EQUALS 1)
         for (indices[0] = 0; indices[0] < n_polynomials; ++indices[0], ++ind)
           {
             double value = values_1d[indices[0]][0][0];
@@ -395,7 +403,8 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
                 {
                   double grad = 1.;
                   for (unsigned int x = 0; x < dim; ++x)
-                    grad *= values_1d[indices[x]][x][(d == x) ? 1 : 0];
+                    grad *=
+                      values_1d[indices[x]][x][(d DEAL_II_EQUALS x) ? 1 : 0];
                   grads[i][d] = grad;
                 }
 
@@ -407,9 +416,9 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
                     for (unsigned int x = 0; x < dim; ++x)
                       {
                         unsigned int derivative = 0;
-                        if (d1 == x)
+                        if (d1 DEAL_II_EQUALS x)
                           ++derivative;
-                        if (d2 == x)
+                        if (d2 DEAL_II_EQUALS x)
                           ++derivative;
 
                         der2 *= values_1d[indices[x]][x][derivative];
@@ -426,11 +435,11 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
                       for (unsigned int x = 0; x < dim; ++x)
                         {
                           unsigned int derivative = 0;
-                          if (d1 == x)
+                          if (d1 DEAL_II_EQUALS x)
                             ++derivative;
-                          if (d2 == x)
+                          if (d2 DEAL_II_EQUALS x)
                             ++derivative;
-                          if (d3 == x)
+                          if (d3 DEAL_II_EQUALS x)
                             ++derivative;
 
                           der3 *= values_1d[indices[x]][x][derivative];
@@ -448,13 +457,13 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
                         for (unsigned int x = 0; x < dim; ++x)
                           {
                             unsigned int derivative = 0;
-                            if (d1 == x)
+                            if (d1 DEAL_II_EQUALS x)
                               ++derivative;
-                            if (d2 == x)
+                            if (d2 DEAL_II_EQUALS x)
                               ++derivative;
-                            if (d3 == x)
+                            if (d3 DEAL_II_EQUALS x)
                               ++derivative;
-                            if (d4 == x)
+                            if (d4 DEAL_II_EQUALS x)
                               ++derivative;
 
                             der4 *= values_1d[indices[x]][x][derivative];
@@ -511,7 +520,8 @@ AnisotropicPolynomials<dim>::AnisotropicPolynomials(
   : ScalarPolynomialsBase<dim>(1, get_n_tensor_pols(pols))
   , polynomials(pols)
 {
-  Assert(pols.size() == dim, ExcDimensionMismatch(pols.size(), dim));
+  Assert(pols.size() DEAL_II_EQUALS dim,
+         ExcDimensionMismatch(pols.size(), dim));
   for (const auto &pols_d : pols)
     {
       (void)pols_d;
@@ -536,10 +546,10 @@ AnisotropicPolynomials<dim>::compute_index(
   Assert(i < n_poly, ExcInternalError());
 #endif
 
-  if (dim == 0)
+  if (dim DEAL_II_EQUALS 0)
     {
     }
-  else if (dim == 1)
+  else if (dim DEAL_II_EQUALS 1)
     internal::compute_tensor_index(i,
                                    polynomials[0].size(),
                                    0 /*not used*/,
@@ -615,7 +625,7 @@ AnisotropicPolynomials<dim>::compute_grad(const unsigned int i,
     {
       grad[d] = 1.;
       for (unsigned int x = 0; x < dim; ++x)
-        grad[d] *= v[x][d == x];
+        grad[d] *= v[x][d DEAL_II_EQUALS x];
     }
 
   return grad;
@@ -656,9 +666,9 @@ AnisotropicPolynomials<dim>::compute_grad_grad(const unsigned int i,
         for (unsigned int x = 0; x < dim; ++x)
           {
             unsigned int derivative = 0;
-            if (d1 == x || d2 == x)
+            if (d1 DEAL_II_EQUALS x DEAL_II_OR d2 DEAL_II_EQUALS x)
               {
-                if (d1 == d2)
+                if (d1 DEAL_II_EQUALS d2)
                   derivative = 2;
                 else
                   derivative = 1;
@@ -695,23 +705,31 @@ AnisotropicPolynomials<dim>::evaluate(
   std::vector<Tensor<3, dim>> &third_derivatives,
   std::vector<Tensor<4, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == this->n() || values.size() == 0,
+  Assert(values.size() DEAL_II_EQUALS this->n() DEAL_II_OR values.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(values.size(), this->n(), 0));
-  Assert(grads.size() == this->n() || grads.size() == 0,
+  Assert(grads.size() DEAL_II_EQUALS this->n() DEAL_II_OR grads.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(grads.size(), this->n(), 0));
-  Assert(grad_grads.size() == this->n() || grad_grads.size() == 0,
+  Assert(grad_grads.size() DEAL_II_EQUALS this->n() DEAL_II_OR grad_grads.size()
+           DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(grad_grads.size(), this->n(), 0));
-  Assert(third_derivatives.size() == this->n() || third_derivatives.size() == 0,
+  Assert(third_derivatives.size()
+           DEAL_II_EQUALS this->n() DEAL_II_OR third_derivatives.size()
+             DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(third_derivatives.size(), this->n(), 0));
-  Assert(fourth_derivatives.size() == this->n() ||
-           fourth_derivatives.size() == 0,
+  Assert(fourth_derivatives.size()
+           DEAL_II_EQUALS this->n() DEAL_II_OR fourth_derivatives.size()
+             DEAL_II_EQUALS 0,
          ExcDimensionMismatch2(fourth_derivatives.size(), this->n(), 0));
 
-  const bool update_values          = (values.size() == this->n()),
-             update_grads           = (grads.size() == this->n()),
-             update_grad_grads      = (grad_grads.size() == this->n()),
-             update_3rd_derivatives = (third_derivatives.size() == this->n()),
-             update_4th_derivatives = (fourth_derivatives.size() == this->n());
+  const bool update_values     = (values.size() DEAL_II_EQUALS this->n()),
+             update_grads      = (grads.size() DEAL_II_EQUALS this->n()),
+             update_grad_grads = (grad_grads.size() DEAL_II_EQUALS this->n()),
+             update_3rd_derivatives =
+               (third_derivatives.size() DEAL_II_EQUALS this->n()),
+             update_4th_derivatives =
+               (fourth_derivatives.size() DEAL_II_EQUALS this->n());
 
   // check how many
   // values/derivatives we have to
@@ -765,7 +783,7 @@ AnisotropicPolynomials<dim>::evaluate(
           {
             grads[i][d] = 1.;
             for (unsigned int x = 0; x < dim; ++x)
-              grads[i][d] *= v(x, indices[x])[d == x ? 1 : 0];
+              grads[i][d] *= v(x, indices[x])[d DEAL_II_EQUALS x ? 1 : 0];
           }
 
       if (update_grad_grads)
@@ -776,9 +794,9 @@ AnisotropicPolynomials<dim>::evaluate(
               for (unsigned int x = 0; x < dim; ++x)
                 {
                   unsigned int derivative = 0;
-                  if (d1 == x)
+                  if (d1 DEAL_II_EQUALS x)
                     ++derivative;
-                  if (d2 == x)
+                  if (d2 DEAL_II_EQUALS x)
                     ++derivative;
 
                   grad_grads[i][d1][d2] *= v(x, indices[x])[derivative];
@@ -794,11 +812,11 @@ AnisotropicPolynomials<dim>::evaluate(
                 for (unsigned int x = 0; x < dim; ++x)
                   {
                     unsigned int derivative = 0;
-                    if (d1 == x)
+                    if (d1 DEAL_II_EQUALS x)
                       ++derivative;
-                    if (d2 == x)
+                    if (d2 DEAL_II_EQUALS x)
                       ++derivative;
-                    if (d3 == x)
+                    if (d3 DEAL_II_EQUALS x)
                       ++derivative;
 
                     third_derivatives[i][d1][d2][d3] *=
@@ -816,13 +834,13 @@ AnisotropicPolynomials<dim>::evaluate(
                   for (unsigned int x = 0; x < dim; ++x)
                     {
                       unsigned int derivative = 0;
-                      if (d1 == x)
+                      if (d1 DEAL_II_EQUALS x)
                         ++derivative;
-                      if (d2 == x)
+                      if (d2 DEAL_II_EQUALS x)
                         ++derivative;
-                      if (d3 == x)
+                      if (d3 DEAL_II_EQUALS x)
                         ++derivative;
-                      if (d4 == x)
+                      if (d4 DEAL_II_EQUALS x)
                         ++derivative;
 
                       fourth_derivatives[i][d1][d2][d3][d4] *=

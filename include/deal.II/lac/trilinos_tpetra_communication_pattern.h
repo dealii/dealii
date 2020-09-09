@@ -19,7 +19,7 @@
 
 #include <deal.II/base/config.h>
 
-#if defined(DEAL_II_TRILINOS_WITH_TPETRA) && defined(DEAL_II_WITH_MPI)
+#if defined(DEAL_II_TRILINOS_WITH_TPETRA) DEAL_II_AND defined(DEAL_II_WITH_MPI)
 
 #  include <deal.II/lac/communication_pattern_base.h>
 

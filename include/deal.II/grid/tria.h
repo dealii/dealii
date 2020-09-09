@@ -325,7 +325,7 @@ namespace internal
  * spacedim is not specified it takes the default value @p spacedim=dim).
  *
  * Thus, for example, an object of type @p Triangulation<1,1> (or simply @p
- * Triangulation<1> since @p spacedim==dim by default) is used to represent
+ * Triangulation<1> since @p spacedimDEAL_II_EQUALS dim by default) is used to represent
  * and handle the usual one-dimensional triangulation used in the finite
  * element method (so, segments on a straight line). On the other hand,
  * objects such as @p Triangulation<1,2> or @p Triangulation<2,3> (that are
@@ -364,12 +364,12 @@ namespace internal
  * <li> <tt>active_cell_iterator</tt>: loop over all active cells
  * </ul>
  *
- * For <tt>dim==1</tt>, these iterators are mapped as follows:
+ * For <tt>dimDEAL_II_EQUALS 1</tt>, these iterators are mapped as follows:
  *  @code
  *    using cell_iterator = line_iterator;
  *    using active_cell_iterator = active_line_iterator;
  *  @endcode
- * while for @p dim==2 we have the additional face iterator:
+ * while for @p dimDEAL_II_EQUALS 2 we have the additional face iterator:
  *  @code
  *    using cell_iterator = quad_iterator;
  *    using active_cell_iterator = active_quad_iterator;
@@ -415,7 +415,7 @@ namespace internal
  *      {
  *        int n=0;
  *        distance (begin(level),
- *                  (level == levels.size()-1 ?
+ *                  (level DEAL_II_EQUALS  levels.size()-1 ?
  *                   cell_iterator(end()) :
  *                   begin (level+1)),
  *                  n);
@@ -1569,13 +1569,13 @@ public:
    * Create a new triangulation by stealing the internal data of another
    * triangulation.
    */
-  Triangulation(Triangulation<dim, spacedim> &&tria) noexcept;
+  Triangulation(Triangulation<dim, spacedim> DEAL_II_AND tria) noexcept;
 
   /**
    * Move assignment operator.
    */
   Triangulation &
-  operator=(Triangulation<dim, spacedim> &&tria) noexcept;
+  operator=(Triangulation<dim, spacedim> DEAL_II_AND tria) noexcept;
 
   /**
    * Delete the object and all levels of the hierarchy.
@@ -1807,7 +1807,7 @@ public:
    * @note This function triggers the create signal after doing its work. See
    * the section on signals in the general documentation of this class.
    *
-   * @note The check for distorted cells is only done if dim==spacedim, as
+   * @note The check for distorted cells is only done if dimDEAL_II_EQUALS spacedim, as
    * otherwise cells can legitimately be twisted if the manifold they describe
    * is twisted.
    */
@@ -4062,7 +4062,7 @@ Triangulation<dim, spacedim>::save(Archive &ar, const unsigned int) const
   // boost dereferences a nullptr when serializing a nullptr
   // at least up to 1.65.1. This causes problems with clang-5.
   // Therefore, work around it.
-  bool faces_is_nullptr = (faces.get() == nullptr);
+  bool faces_is_nullptr = (faces.get() DEAL_II_EQUALS nullptr);
   ar & faces_is_nullptr;
   if (!faces_is_nullptr)
     ar &faces;
@@ -4075,7 +4075,7 @@ Triangulation<dim, spacedim>::save(Archive &ar, const unsigned int) const
 
   ar &check_for_distorted_cells;
 
-  if (dim == 1)
+  if (dim DEAL_II_EQUALS 1)
     {
       ar &vertex_to_boundary_id_map_1d;
       ar &vertex_to_manifold_id_map_1d;
@@ -4131,12 +4131,12 @@ Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
   bool my_check_for_distorted_cells;
   ar & my_check_for_distorted_cells;
 
-  Assert(my_check_for_distorted_cells == check_for_distorted_cells,
+  Assert(my_check_for_distorted_cells DEAL_II_EQUALS check_for_distorted_cells,
          ExcMessage("The triangulation loaded into here must have the "
                     "same setting with regard to reporting distorted "
                     "cell as the one previously stored."));
 
-  if (dim == 1)
+  if (dim DEAL_II_EQUALS 1)
     {
       ar &vertex_to_boundary_id_map_1d;
       ar &vertex_to_manifold_id_map_1d;

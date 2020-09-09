@@ -36,7 +36,7 @@ namespace Particles
       const AffineConstraints<number> &                constraints,
       const ComponentMask &                            space_comps)
     {
-      if (particle_handler.n_locally_owned_particles() == 0)
+      if (particle_handler.n_locally_owned_particles() DEAL_II_EQUALS 0)
         return; // nothing to do here
 
       const auto &tria = space_dh.get_triangulation();
@@ -45,9 +45,9 @@ namespace Particles
         particle_handler.n_global_max_particles_per_cell();
 
       // Take care of components
-      const ComponentMask comps =
-        (space_comps.size() == 0 ? ComponentMask(fe.n_components(), true) :
-                                   space_comps);
+      const ComponentMask comps = (space_comps.size() DEAL_II_EQUALS 0 ?
+                                     ComponentMask(fe.n_components(), true) :
+                                     space_comps);
       AssertDimension(comps.size(), fe.n_components());
 
       const auto n_comps = comps.n_selected_components();
@@ -87,7 +87,7 @@ namespace Particles
           const auto pic         = particle_handler.particles_in_cell(cell);
           const auto n_particles = particle_handler.n_particles_in_cell(cell);
           particle_indices.resize(n_particles * n_comps);
-          Assert(pic.begin() == particle, ExcInternalError());
+          Assert(pic.begin() DEAL_II_EQUALS particle, ExcInternalError());
           for (unsigned int i = 0; particle != pic.end(); ++particle, ++i)
             {
               const auto p_id = particle->get_id();
@@ -119,7 +119,7 @@ namespace Particles
       const AffineConstraints<typename MatrixType::value_type> &constraints,
       const ComponentMask &                                     space_comps)
     {
-      if (particle_handler.n_locally_owned_particles() == 0)
+      if (particle_handler.n_locally_owned_particles() DEAL_II_EQUALS 0)
         {
           matrix.compress(VectorOperation::add);
           return; // nothing else to do here
@@ -133,9 +133,9 @@ namespace Particles
         particle_handler.n_global_max_particles_per_cell();
 
       // Take care of components
-      const ComponentMask comps =
-        (space_comps.size() == 0 ? ComponentMask(fe.n_components(), true) :
-                                   space_comps);
+      const ComponentMask comps = (space_comps.size() DEAL_II_EQUALS 0 ?
+                                     ComponentMask(fe.n_components(), true) :
+                                     space_comps);
       AssertDimension(comps.size(), fe.n_components());
       const auto n_comps = comps.n_selected_components();
 
@@ -182,7 +182,7 @@ namespace Particles
           const auto n_particles = particle_handler.n_particles_in_cell(cell);
           particle_indices.resize(n_particles * n_comps);
           local_matrix.reinit({n_particles * n_comps, fe.n_dofs_per_cell()});
-          Assert(pic.begin() == particle, ExcInternalError());
+          Assert(pic.begin() DEAL_II_EQUALS particle, ExcInternalError());
           for (unsigned int i = 0; particle != pic.end(); ++particle, ++i)
             {
               const auto &reference_location =

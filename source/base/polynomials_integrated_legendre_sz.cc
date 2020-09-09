@@ -30,12 +30,12 @@ IntegratedLegendreSZ::get_coefficients(const unsigned int k)
   std::vector<double> coefficients(k + 1);
 
   // first two polynomials are hard-coded:
-  if (k == 0)
+  if (k DEAL_II_EQUALS 0)
     {
       coefficients[0] = -1.;
       return coefficients;
     }
-  else if (k == 1)
+  else if (k DEAL_II_EQUALS 1)
     {
       coefficients[0] = 0.;
       coefficients[1] = 1.;

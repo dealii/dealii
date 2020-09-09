@@ -157,8 +157,8 @@ namespace Utilities
                                  0,
                                  mpi_communicator);
               AssertThrowMPI(ierr2);
-              if (rank == 0)
-                Assert(size_min == size_max,
+              if (rank DEAL_II_EQUALS 0)
+                Assert(size_min DEAL_II_EQUALS size_max,
                        ExcMessage(
                          "values has different size across MPI processes."));
             }
@@ -314,7 +314,8 @@ namespace Utilities
         SparseMatrix<Number> &      global)
     {
       Assert(
-        local.get_sparsity_pattern() == global.get_sparsity_pattern(),
+        local.get_sparsity_pattern()
+          DEAL_II_EQUALS global.get_sparsity_pattern(),
         ExcMessage(
           "The sparsity pattern of the local and the global matrices should match."));
 #ifdef DEAL_II_WITH_MPI
@@ -424,7 +425,7 @@ namespace Utilities
       // 1) collect vector entries and create union
       std::vector<T> result = vec;
 
-      if (this_mpi_process(comm) == 0)
+      if (this_mpi_process(comm) DEAL_II_EQUALS 0)
         {
           for (unsigned int i = 1; i < n_mpi_processes(comm); i++)
             {

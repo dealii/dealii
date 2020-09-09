@@ -237,7 +237,7 @@ namespace Algorithms
    * void Explicit::operator()(AnyData &out, const AnyData &in)
    * {
    *   const double timestep = *in.read_ptr<double>("Timestep");
-   *   if (this->notifications.test(Events::initial) ||
+   *   if (this->notifications.test(Events::initial) DEAL_II_OR
    *       this->notifications.test(Events::new_timestep_size))
    *     {
    *       m.equ(-timestep, *matrix);
@@ -269,7 +269,7 @@ namespace Algorithms
    * void Implicit::operator()(AnyData &out, const AnyData &in)
    * {
    *   const double timestep = *in.read_ptr<double>("Timestep");
-   *   if (this->notifications.test(Events::initial) ||
+   *   if (this->notifications.test(Events::initial) DEAL_II_OR
    *       this->notifications.test(Events::new_timestep_size))
    *     {
    *       m.equ(timestep, *matrix);

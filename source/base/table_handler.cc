@@ -93,7 +93,7 @@ namespace internal
     ss << value;
 
     cached_value = ss.str();
-    if (cached_value.size() == 0)
+    if (cached_value.size() DEAL_II_EQUALS 0)
       cached_value = "\"\"";
   }
 
@@ -203,7 +203,7 @@ void
 TableHandler::declare_column(const std::string &key)
 {
   // see if the column already exists; insert it if not
-  Assert(columns.find(key) == columns.end(),
+  Assert(columns.find(key) DEAL_II_EQUALS columns.end(),
          ExcMessage("You are trying to declare a column with key <" + key +
                     "> but such a column already exists."));
 
@@ -261,7 +261,7 @@ TableHandler::add_column_to_supercolumn(const std::string &key,
       // replace key in column_order
       // by superkey
       for (auto &column : column_order)
-        if (column == key)
+        if (column DEAL_II_EQUALS key)
           {
             column = superkey;
             break;
@@ -297,7 +297,8 @@ TableHandler::set_column_order(const std::vector<std::string> &new_order)
   for (const auto &new_column : new_order)
     {
       (void)new_column;
-      Assert(supercolumns.count(new_column) || columns.count(new_column),
+      Assert(supercolumns.count(new_column)
+               DEAL_II_OR columns.count(new_column),
              ExcColumnOrSuperColumnNotExistent(new_column));
     }
 
@@ -347,7 +348,8 @@ TableHandler::set_tex_format(const std::string &key,
                              const std::string &tex_format)
 {
   Assert(columns.count(key), ExcColumnNotExistent(key));
-  Assert(tex_format == "l" || tex_format == "c" || tex_format == "r",
+  Assert(tex_format DEAL_II_EQUALS "l" DEAL_II_OR tex_format DEAL_II_EQUALS
+                                   "c" DEAL_II_OR tex_format DEAL_II_EQUALS "r",
          ExcUndefinedTexFormat(tex_format));
   columns[key].tex_format = tex_format;
 }
@@ -386,7 +388,7 @@ TableHandler::write_text(std::ostream &out, const TextOutputFormat format) const
   boost::io::ios_flags_saver restore_flags(out);
 
   // first pad the table from below if necessary
-  if (auto_fill_mode == true)
+  if (auto_fill_mode DEAL_II_EQUALS true)
     {
       unsigned int max_rows = 0;
       for (std::map<std::string, Column>::const_iterator p = columns.begin();
@@ -545,7 +547,7 @@ TableHandler::write_text(std::ostream &out, const TextOutputFormat format) const
                   // find column and change output width
                   for (unsigned int i = 0; i < n_cols; ++i)
                     {
-                      if (sel_columns[i] == colname)
+                      if (sel_columns[i] DEAL_II_EQUALS colname)
                         {
                           column_widths[i] += key.length() - width;
                           break;
@@ -613,7 +615,7 @@ TableHandler::write_tex(std::ostream &out, const bool with_header) const
       << "\\begin{tabular}{|";
 
   // first pad the table from below if necessary
-  if (auto_fill_mode == true)
+  if (auto_fill_mode DEAL_II_EQUALS true)
     {
       unsigned int max_rows = 0;
       for (std::map<std::string, Column>::const_iterator p = columns.begin();
@@ -753,7 +755,7 @@ TableHandler::clear()
 unsigned int
 TableHandler::n_rows() const
 {
-  if (columns.size() == 0)
+  if (columns.size() DEAL_II_EQUALS 0)
     return 0;
 
   std::map<std::string, Column>::const_iterator col_iter = columns.begin();
@@ -762,7 +764,7 @@ TableHandler::n_rows() const
 #ifdef DEBUG
   std::string first_name = col_iter->first;
   for (++col_iter; col_iter != columns.end(); ++col_iter)
-    Assert(col_iter->second.entries.size() == n,
+    Assert(col_iter->second.entries.size() DEAL_II_EQUALS n,
            ExcWrongNumberOfDataEntries(
              col_iter->first, col_iter->second.entries.size(), first_name, n));
 #endif
@@ -814,7 +816,7 @@ TableHandler::clear_current_row()
   // shave the top most element
   if (n != 0)
     for (auto &column : columns)
-      if (column.second.entries.size() == n)
+      if (column.second.entries.size() DEAL_II_EQUALS n)
         column.second.entries.pop_back();
 }
 

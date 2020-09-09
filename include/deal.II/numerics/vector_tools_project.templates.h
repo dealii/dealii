@@ -116,7 +116,7 @@ namespace VectorTools
       const bool                                 project_to_boundary_first,
       std::map<types::global_dof_index, number> &boundary_values)
     {
-      if (enforce_zero_boundary == true)
+      if (enforce_zero_boundary DEAL_II_EQUALS true)
         // no need to project boundary
         // values, but enforce
         // homogeneous boundary values
@@ -125,7 +125,7 @@ namespace VectorTools
 
       else
         // no homogeneous boundary values
-        if (project_to_boundary_first == true)
+        if (project_to_boundary_first DEAL_II_EQUALS true)
         // boundary projection required
         {
           // set up a list of boundary
@@ -171,19 +171,21 @@ namespace VectorTools
       const Quadrature<dim - 1> &                 q_boundary,
       const bool                                  project_to_boundary_first)
     {
-      Assert(project_to_boundary_first == false, ExcNotImplemented());
-      Assert(enforce_zero_boundary == false, ExcNotImplemented());
+      Assert(project_to_boundary_first DEAL_II_EQUALS false,
+             ExcNotImplemented());
+      Assert(enforce_zero_boundary DEAL_II_EQUALS false, ExcNotImplemented());
       (void)enforce_zero_boundary;
       (void)project_to_boundary_first;
       (void)q_boundary;
 
-      Assert(dof.get_fe(0).n_components() == function.n_components,
+      Assert(dof.get_fe(0).n_components() DEAL_II_EQUALS function.n_components,
              ExcDimensionMismatch(dof.get_fe(0).n_components(),
                                   function.n_components));
-      Assert(fe_degree == -1 ||
-               dof.get_fe().degree == static_cast<unsigned int>(fe_degree),
+      Assert(fe_degree      DEAL_II_EQUALS -
+               1 DEAL_II_OR dof.get_fe()
+                 .degree    DEAL_II_EQUALS static_cast<unsigned int>(fe_degree),
              ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
-      Assert(dof.get_fe(0).n_components() == components,
+      Assert(dof.get_fe(0).n_components() DEAL_II_EQUALS components,
              ExcDimensionMismatch(components, dof.get_fe(0).n_components()));
 
       // set up mass matrix and right hand side
@@ -423,7 +425,7 @@ namespace VectorTools
       const Quadrature<dim - 1> &q_boundary,
       const bool                 project_to_boundary_first)
     {
-      Assert(vec_result.size() == dof.n_dofs(),
+      Assert(vec_result.size() DEAL_II_EQUALS dof.n_dofs(),
              ExcDimensionMismatch(vec_result.size(), dof.n_dofs()));
 
       LinearAlgebra::distributed::Vector<typename VectorType::value_type>
@@ -459,12 +461,13 @@ namespace VectorTools
     {
       for (const auto &boundary_value : boundary_values)
         if (constraints.is_constrained(boundary_value.first))
-          // TODO: This looks wrong -- shouldn't it be ==0 in the first
-          // condition and && ?
+          // TODO: This looks wrong -- shouldn't it be DEAL_II_EQUALS 0 in the
+          // first condition and DEAL_II_AND  ?
           if (!(constraints.get_constraint_entries(boundary_value.first)
-                    ->size() > 0 ||
-                (constraints.get_inhomogeneity(boundary_value.first) ==
-                 boundary_value.second)))
+                  ->size() >
+                0 DEAL_II_OR(constraints
+                               .get_inhomogeneity(boundary_value.first)
+                                 DEAL_II_EQUALS boundary_value.second)))
             return false;
 
       return true;
@@ -493,10 +496,10 @@ namespace VectorTools
       const bool              project_to_boundary_first)
     {
       using number = typename VectorType::value_type;
-      Assert(dof.get_fe(0).n_components() == function.n_components,
+      Assert(dof.get_fe(0).n_components() DEAL_II_EQUALS function.n_components,
              ExcDimensionMismatch(dof.get_fe(0).n_components(),
                                   function.n_components));
-      Assert(vec_result.size() == dof.n_dofs(),
+      Assert(vec_result.size() DEAL_II_EQUALS dof.n_dofs(),
              ExcDimensionMismatch(vec_result.size(), dof.n_dofs()));
 
       // make up boundary values
@@ -594,12 +597,13 @@ namespace VectorTools
       VectorType &                                              vec_result)
     {
       using Number = typename VectorType::value_type;
-      Assert(dof.get_fe(0).n_components() == 1,
+      Assert(dof.get_fe(0).n_components() DEAL_II_EQUALS 1,
              ExcDimensionMismatch(dof.get_fe(0).n_components(), 1));
-      Assert(vec_result.size() == dof.n_dofs(),
+      Assert(vec_result.size() DEAL_II_EQUALS dof.n_dofs(),
              ExcDimensionMismatch(vec_result.size(), dof.n_dofs()));
-      Assert(fe_degree == -1 ||
-               dof.get_fe().degree == static_cast<unsigned int>(fe_degree),
+      Assert(fe_degree      DEAL_II_EQUALS -
+               1 DEAL_II_OR dof.get_fe()
+                 .degree    DEAL_II_EQUALS static_cast<unsigned int>(fe_degree),
              ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
 
       // set up mass matrix and right hand side
@@ -716,12 +720,13 @@ namespace VectorTools
         matrix_free->get_dof_handler(fe_component);
 
       using Number = typename VectorType::value_type;
-      Assert(dof.get_fe(0).n_components() == 1,
+      Assert(dof.get_fe(0).n_components() DEAL_II_EQUALS 1,
              ExcDimensionMismatch(dof.get_fe(0).n_components(), 1));
-      Assert(vec_result.size() == dof.n_dofs(),
+      Assert(vec_result.size() DEAL_II_EQUALS dof.n_dofs(),
              ExcDimensionMismatch(vec_result.size(), dof.n_dofs()));
-      Assert(fe_degree == -1 ||
-               dof.get_fe().degree == static_cast<unsigned int>(fe_degree),
+      Assert(fe_degree      DEAL_II_EQUALS -
+               1 DEAL_II_OR dof.get_fe()
+                 .degree    DEAL_II_EQUALS static_cast<unsigned int>(fe_degree),
              ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
 
       using MatrixType = MatrixFreeOperators::MassOperator<
@@ -788,7 +793,7 @@ namespace VectorTools
     }
 
     /**
-     * Specialization of project() for the case dim==spacedim.
+     * Specialization of project() for the case dimDEAL_II_EQUALS spacedim.
      * Check if we can use the MatrixFree implementation or need
      * to use the matrix based one.
      */
@@ -814,8 +819,9 @@ namespace VectorTools
       // are not yet supported.
       // We have explicit instantiations only if
       // the number of components is not too high.
-      if (enforce_zero_boundary || project_to_boundary_first ||
-          dof.get_fe(0).n_components() > 4)
+      if (enforce_zero_boundary DEAL_II_OR project_to_boundary_first DEAL_II_OR
+                                                                     dof.get_fe(0)
+              .n_components() > 4)
         use_matrix_free = false;
 
       if (use_matrix_free)
@@ -831,7 +837,7 @@ namespace VectorTools
       else
         {
           Assert((dynamic_cast<const parallel::TriangulationBase<dim> *>(
-                    &(dof.get_triangulation())) == nullptr),
+                   &(dof.get_triangulation())) DEAL_II_EQUALS nullptr),
                  ExcNotImplemented());
           do_project(mapping,
                      dof,
@@ -896,7 +902,7 @@ namespace VectorTools
     const unsigned int fe_degree =
       matrix_free->get_dof_handler(fe_component).get_fe().degree;
 
-    if (fe_degree + 1 == n_q_points_1d)
+    if (fe_degree + 1 DEAL_II_EQUALS n_q_points_1d)
       switch (fe_degree)
         {
           case 1:
@@ -957,7 +963,7 @@ namespace VectorTools
           const Quadrature<dim - 1> &q_boundary,
           const bool                 project_to_boundary_first)
   {
-    if (dim == spacedim)
+    if (dim DEAL_II_EQUALS spacedim)
       {
         const Mapping<dim> *const mapping_ptr =
           dynamic_cast<const Mapping<dim> *>(&mapping);
@@ -983,7 +989,7 @@ namespace VectorTools
       {
         Assert(
           (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-             &(dof.get_triangulation())) == nullptr),
+            &(dof.get_triangulation())) DEAL_II_EQUALS nullptr),
           ExcNotImplemented());
         internal::do_project(mapping,
                              dof,
@@ -1042,7 +1048,7 @@ namespace VectorTools
           const bool                      project_to_boundary_first)
   {
     Assert((dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-              &(dof.get_triangulation())) == nullptr),
+             &(dof.get_triangulation())) DEAL_II_EQUALS nullptr),
            ExcNotImplemented());
 
     internal::do_project(mapping,

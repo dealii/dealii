@@ -96,7 +96,7 @@ namespace LinearAlgebra
        * Move assignment operator.
        */
       Vector &
-      operator=(Vector<Number> &&v) noexcept = default;
+      operator=(Vector<Number> DEAL_II_AND v) noexcept = default;
 
       /**
        * Swap the contents of this vector and the other vector @p v. One could do

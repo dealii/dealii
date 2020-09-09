@@ -25,7 +25,7 @@ namespace std_cxx17
 #ifndef DEAL_II_HAVE_CXX17
   template <typename F, typename Tuple, size_t... S>
   auto
-  apply_impl(F &&fn, Tuple &&t, std::index_sequence<S...>)
+  apply_impl(F DEAL_II_AND fn, Tuple DEAL_II_AND t, std::index_sequence<S...>)
     -> decltype(std::forward<F>(fn)(std::get<S>(std::forward<Tuple>(t))...))
   {
     return std::forward<F>(fn)(std::get<S>(std::forward<Tuple>(t))...);
@@ -33,7 +33,7 @@ namespace std_cxx17
 
   template <typename F, typename Tuple>
   auto
-  apply(F &&fn, Tuple &&t) -> decltype(apply_impl(
+  apply(F DEAL_II_AND fn, Tuple DEAL_II_AND t) -> decltype(apply_impl(
     std::forward<F>(fn),
     std::forward<Tuple>(t),
     std::make_index_sequence<

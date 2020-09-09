@@ -172,7 +172,7 @@ namespace Utilities
       int grp_rank;
       ierr = MPI_Group_rank(group, &grp_rank);
       AssertThrowMPI(ierr);
-      if (grp_rank == MPI_UNDEFINED)
+      if (grp_rank DEAL_II_EQUALS MPI_UNDEFINED)
         {
           *new_comm = MPI_COMM_NULL;
           return MPI_SUCCESS;
@@ -204,7 +204,7 @@ namespace Utilities
         {
           const int gid = grp_rank / merge_sz;
           comm_old      = *new_comm;
-          if (gid % 2 == 0)
+          if (gid % 2 DEAL_II_EQUALS 0)
             {
               if ((gid + 1) * merge_sz < grp_size)
                 {
@@ -431,7 +431,7 @@ namespace Utilities
       const unsigned int max_n_destinations =
         Utilities::MPI::max(destinations.size(), mpi_comm);
 
-      if (max_n_destinations == 0)
+      if (max_n_destinations DEAL_II_EQUALS 0)
         // all processes have nothing to send/receive:
         return std::vector<unsigned int>();
 
@@ -463,10 +463,10 @@ namespace Utilities
       std::vector<unsigned int> origins;
       for (unsigned int i = 0; i < n_procs; ++i)
         for (unsigned int j = 0; j < max_n_destinations; ++j)
-          if (all_destinations[i * max_n_destinations + j] == myid)
+          if (all_destinations[i * max_n_destinations + j] DEAL_II_EQUALS myid)
             origins.push_back(i);
-          else if (all_destinations[i * max_n_destinations + j] ==
-                   numbers::invalid_unsigned_int)
+          else if (all_destinations[i * max_n_destinations + j] DEAL_II_EQUALS
+                     numbers::invalid_unsigned_int)
             break;
 
       return origins;
@@ -556,7 +556,7 @@ namespace Utilities
                 inout_rhs[i].min       = in_lhs[i].min;
                 inout_rhs[i].min_index = in_lhs[i].min_index;
               }
-            else if (inout_rhs[i].min == in_lhs[i].min)
+            else if (inout_rhs[i].min DEAL_II_EQUALS in_lhs[i].min)
               {
                 // choose lower cpu index when tied to make operator commutative
                 if (inout_rhs[i].min_index > in_lhs[i].min_index)
@@ -568,7 +568,7 @@ namespace Utilities
                 inout_rhs[i].max       = in_lhs[i].max;
                 inout_rhs[i].max_index = in_lhs[i].max_index;
               }
-            else if (inout_rhs[i].max == in_lhs[i].max)
+            else if (inout_rhs[i].max DEAL_II_EQUALS in_lhs[i].max)
               {
                 // choose lower cpu index when tied to make operator commutative
                 if (inout_rhs[i].max_index > in_lhs[i].max_index)
@@ -587,8 +587,9 @@ namespace Utilities
     {
       // If MPI was not started, we have a serial computation and cannot run
       // the other MPI commands
-      if (job_supports_mpi() == false ||
-          Utilities::MPI::n_mpi_processes(mpi_communicator) <= 1)
+      if (job_supports_mpi()
+            DEAL_II_EQUALS false DEAL_II_OR Utilities::MPI::n_mpi_processes(
+              mpi_communicator) <= 1)
         {
           for (unsigned int i = 0; i < my_values.size(); i++)
             {
@@ -744,7 +745,7 @@ namespace Utilities
     {
       static bool constructor_has_already_run = false;
       (void)constructor_has_already_run;
-      Assert(constructor_has_already_run == false,
+      Assert(constructor_has_already_run DEAL_II_EQUALS false,
              ExcMessage("You can only create a single object of this class "
                         "in a program since it initializes the MPI system."));
 
@@ -756,7 +757,7 @@ namespace Utilities
       int MPI_has_been_started = 0;
       ierr                     = MPI_Initialized(&MPI_has_been_started);
       AssertThrowMPI(ierr);
-      AssertThrow(MPI_has_been_started == 0,
+      AssertThrow(MPI_has_been_started DEAL_II_EQUALS 0,
                   ExcMessage("MPI error. You can only start MPI once!"));
 
       int provided;
@@ -770,7 +771,8 @@ namespace Utilities
 
       // disable for now because at least some implementations always return
       // MPI_THREAD_SINGLE.
-      // Assert(max_num_threads==1 || provided != MPI_THREAD_SINGLE,
+      // Assert(max_num_threadsDEAL_II_EQUALS 1 DEAL_II_OR  provided !=
+      // MPI_THREAD_SINGLE,
       //    ExcMessage("MPI reports that we are not allowed to use multiple
       //    threads."));
 #else
@@ -786,11 +788,12 @@ namespace Utilities
 #  ifdef DEAL_II_WITH_SLEPC
       // Initialize SLEPc (with PETSc):
       ierr = SlepcInitialize(&argc, &argv, nullptr, nullptr);
-      AssertThrow(ierr == 0, SLEPcWrappers::SolverBase::ExcSLEPcError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0,
+                  SLEPcWrappers::SolverBase::ExcSLEPcError(ierr));
 #  else
       // or just initialize PETSc alone:
       ierr = PetscInitialize(&argc, &argv, nullptr, nullptr);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr DEAL_II_EQUALS 0, ExcPETScError(ierr));
 #  endif
 
       // Disable PETSc exception handling. This just prints a large wall
@@ -864,8 +867,8 @@ namespace Utilities
           unsigned int nth_process_on_host = 0;
           for (unsigned int i = 0; i < MPI::n_mpi_processes(MPI_COMM_WORLD);
                ++i)
-            if (std::string(all_hostnames.data() + i * max_hostname_size) ==
-                hostname)
+            if (std::string(all_hostnames.data() + i * max_hostname_size)
+                  DEAL_II_EQUALS hostname)
               {
                 ++n_local_processes;
                 if (i <= MPI::this_mpi_process(MPI_COMM_WORLD))
@@ -962,8 +965,8 @@ namespace Utilities
       // Now deal with PETSc (with or without MPI). Only delete the vectors if
       // finalize hasn't been called yet, otherwise this will lead to errors.
 #ifdef DEAL_II_WITH_PETSC
-      if ((PetscInitializeCalled == PETSC_TRUE) &&
-          (PetscFinalizeCalled == PETSC_FALSE))
+      if ((PetscInitializeCalled DEAL_II_EQUALS PETSC_TRUE)DEAL_II_AND(
+            PetscFinalizeCalled DEAL_II_EQUALS PETSC_FALSE))
         {
           GrowingVectorMemory<
             PETScWrappers::MPI::Vector>::release_unused_memory();
@@ -1003,13 +1006,13 @@ namespace Utilities
       // when running PETSc, because we initialize MPI ourselves before
       // calling PetscInitialize
 #ifdef DEAL_II_WITH_MPI
-      if (job_supports_mpi() == true)
+      if (job_supports_mpi() DEAL_II_EQUALS true)
         {
 #  if __cpp_lib_uncaught_exceptions >= 201411
           // std::uncaught_exception() is deprecated in c++17
           if (std::uncaught_exceptions() > 0)
 #  else
-          if (std::uncaught_exception() == true)
+          if (std::uncaught_exception() DEAL_II_EQUALS true)
 #  endif
             {
               // do not try to call MPI_Finalize to avoid a deadlock.
@@ -1018,7 +1021,8 @@ namespace Utilities
             {
               const int ierr = MPI_Finalize();
               (void)ierr;
-              AssertNothrow(ierr == MPI_SUCCESS, dealii::ExcMPI(ierr));
+              AssertNothrow(ierr DEAL_II_EQUALS MPI_SUCCESS,
+                            dealii::ExcMPI(ierr));
             }
         }
 #endif
@@ -1047,12 +1051,13 @@ namespace Utilities
                         const IndexSet &indices_to_look_up,
                         const MPI_Comm &comm)
     {
-      Assert(owned_indices.size() == indices_to_look_up.size(),
+      Assert(owned_indices.size() DEAL_II_EQUALS indices_to_look_up.size(),
              ExcMessage("IndexSets have to have the same sizes."));
 
-      Assert(
-        owned_indices.size() == Utilities::MPI::max(owned_indices.size(), comm),
-        ExcMessage("IndexSets have to have the same size on all processes."));
+      Assert(owned_indices.size()
+               DEAL_II_EQUALS Utilities::MPI::max(owned_indices.size(), comm),
+             ExcMessage(
+               "IndexSets have to have the same size on all processes."));
 
       std::vector<unsigned int> owning_ranks(indices_to_look_up.n_elements());
 
@@ -1119,7 +1124,7 @@ namespace Utilities
       const int ierr = MPI_Barrier(comm);
       AssertThrowMPI(ierr);
 
-#  if 0 && DEAL_II_MPI_VERSION_GTE(3, 0)
+#  if 0 DEAL_II_AND DEAL_II_MPI_VERSION_GTE(3, 0)
       // wait for non-blocking barrier to finish. This is a noop the
       // first time we lock().
       const int ierr = MPI_Wait(&request, MPI_STATUS_IGNORE);
@@ -1150,7 +1155,7 @@ namespace Utilities
       // in the lock and unlock. It needs to be tested, if we can move
       // to a nonblocking barrier (code disabled below):
 
-#  if 0 && DEAL_II_MPI_VERSION_GTE(3, 0)
+#  if 0 DEAL_II_AND DEAL_II_MPI_VERSION_GTE(3, 0)
       const int ierr = MPI_Ibarrier(comm, &request);
       AssertThrowMPI(ierr);
 #  else

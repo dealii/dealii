@@ -123,8 +123,8 @@ namespace FETools
             multiplied_n_components +=
               fes[i]->n_components() * multiplicities[i];
 
-            Assert(do_tensor_product ||
-                     (n_components == fes[i]->n_components()),
+            Assert(do_tensor_product DEAL_II_OR(
+                     n_components DEAL_II_EQUALS fes[i]->n_components()),
                    ExcDimensionMismatch(n_components, fes[i]->n_components()));
 
             degree = std::max(degree, fes[i]->tensor_degree());
@@ -281,12 +281,13 @@ namespace FETools
 
       // 3. Quads
       for (unsigned int quad_number = 0;
-           quad_number < (dim == 2 ?
-                            1 :
-                            (dim == 3 ? ReferenceCell::internal::Info::get_cell(
-                                          fes.front()->reference_cell_type())
-                                          .n_faces() :
-                                        0));
+           quad_number <
+           (dim DEAL_II_EQUALS 2 ?
+              1 :
+              (dim DEAL_II_EQUALS 3 ? ReferenceCell::internal::Info::get_cell(
+                                        fes.front()->reference_cell_type())
+                                        .n_faces() :
+                                      0));
            ++quad_number)
         {
           for (unsigned int base = 0; base < fes.size(); ++base)
@@ -306,7 +307,7 @@ namespace FETools
         }
 
       // 4. Hexes
-      if (dim == 3)
+      if (dim DEAL_II_EQUALS 3)
         {
           for (unsigned int base = 0; base < fes.size(); ++base)
             for (unsigned int m = 0; m < multiplicities[base]; ++m)
@@ -324,7 +325,7 @@ namespace FETools
                 }
         }
 
-      Assert(total_index == n_shape_functions, ExcInternalError());
+      Assert(total_index DEAL_II_EQUALS n_shape_functions, ExcInternalError());
 
       return retval;
     }
@@ -407,7 +408,7 @@ namespace FETools
           // Now check that all FEs have the same number of components:
           for (unsigned int i = 0; i < fes.size(); ++i)
             if (multiplicities[i] > 0) // needed because fe might be nullptr
-              Assert(n_components == fes[i]->n_components(),
+              Assert(n_components DEAL_II_EQUALS fes[i]->n_components(),
                      ExcDimensionMismatch(n_components,
                                           fes[i]->n_components()));
         }
@@ -498,12 +499,13 @@ namespace FETools
 
       // 3. Quads
       for (unsigned int quad_number = 0;
-           quad_number < (dim == 2 ?
-                            1 :
-                            (dim == 3 ? ReferenceCell::internal::Info::get_cell(
-                                          fes.front()->reference_cell_type())
-                                          .n_faces() :
-                                        0));
+           quad_number <
+           (dim DEAL_II_EQUALS 2 ?
+              1 :
+              (dim DEAL_II_EQUALS 3 ? ReferenceCell::internal::Info::get_cell(
+                                        fes.front()->reference_cell_type())
+                                        .n_faces() :
+                                      0));
            ++quad_number)
         {
           unsigned int comp_start = 0;
@@ -535,7 +537,7 @@ namespace FETools
         }
 
       // 4. Hexes
-      if (dim == 3)
+      if (dim DEAL_II_EQUALS 3)
         {
           unsigned int comp_start = 0;
           for (unsigned int base = 0; base < fes.size(); ++base)
@@ -565,7 +567,7 @@ namespace FETools
                 }
         }
 
-      Assert(total_index == n_shape_functions, ExcInternalError());
+      Assert(total_index DEAL_II_EQUALS n_shape_functions, ExcInternalError());
 
       // now copy the vector<vector<bool> > into a vector<ComponentMask>.
       // this appears complicated but we do it this way since it's just
@@ -646,7 +648,7 @@ namespace FETools
                   component_to_base_table[total_index++] =
                     std::make_pair(std::make_pair(base, k), m);
               }
-          Assert(total_index == component_to_base_table.size(),
+          Assert(total_index DEAL_II_EQUALS component_to_base_table.size(),
                  ExcInternalError());
         }
       else
@@ -760,12 +762,13 @@ namespace FETools
 
       // 3. Quads
       for (unsigned int quad_number = 0;
-           quad_number < (dim == 2 ?
-                            1 :
-                            (dim == 3 ? ReferenceCell::internal::Info::get_cell(
-                                          fe.reference_cell_type())
-                                          .n_faces() :
-                                        0));
+           quad_number <
+           (dim DEAL_II_EQUALS 2 ?
+              1 :
+              (dim DEAL_II_EQUALS 3 ? ReferenceCell::internal::Info::get_cell(
+                                        fe.reference_cell_type())
+                                        .n_faces() :
+                                      0));
            ++quad_number)
         {
           unsigned int comp_start = 0;
@@ -808,7 +811,7 @@ namespace FETools
         }
 
       // 4. Hexes
-      if (dim == 3)
+      if (dim DEAL_II_EQUALS 3)
         {
           unsigned int comp_start = 0;
           for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
@@ -985,7 +988,7 @@ namespace FETools
         }
 
       // 3. Quads
-      if (dim == 3)
+      if (dim DEAL_II_EQUALS 3)
         {
           unsigned int comp_start = 0;
           for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
@@ -1031,10 +1034,11 @@ namespace FETools
                       non_primitive_index;
                 }
         }
-      Assert(total_index == fe.n_dofs_per_face(face_no), ExcInternalError());
-      Assert(total_index == face_system_to_component_table.size(),
+      Assert(total_index DEAL_II_EQUALS fe.n_dofs_per_face(face_no),
              ExcInternalError());
-      Assert(total_index == face_system_to_base_table.size(),
+      Assert(total_index DEAL_II_EQUALS face_system_to_component_table.size(),
+             ExcInternalError());
+      Assert(total_index DEAL_II_EQUALS face_system_to_base_table.size(),
              ExcInternalError());
     }
   } // namespace Compositing
@@ -1347,7 +1351,7 @@ namespace FETools
       // not be changed. so have a
       // forwarder function that calls
       // that function directly if
-      // T==double, and otherwise uses a
+      // TDEAL_II_EQUALS double, and otherwise uses a
       // temporary
       template <int dim, int spacedim>
       inline void
@@ -1382,7 +1386,7 @@ namespace FETools
                          std::vector<unsigned int> &             renumbering,
                          std::vector<std::vector<unsigned int>> &comp_start)
   {
-    Assert(renumbering.size() == element.n_dofs_per_cell(),
+    Assert(renumbering.size() DEAL_II_EQUALS element.n_dofs_per_cell(),
            ExcDimensionMismatch(renumbering.size(), element.n_dofs_per_cell()));
 
     comp_start.resize(element.n_base_elements());
@@ -1424,9 +1428,9 @@ namespace FETools
                             std::vector<types::global_dof_index> &block_data,
                             bool return_start_indices)
   {
-    Assert(renumbering.size() == element.n_dofs_per_cell(),
+    Assert(renumbering.size() DEAL_II_EQUALS element.n_dofs_per_cell(),
            ExcDimensionMismatch(renumbering.size(), element.n_dofs_per_cell()));
-    Assert(block_data.size() == element.n_blocks(),
+    Assert(block_data.size() DEAL_II_EQUALS element.n_blocks(),
            ExcDimensionMismatch(block_data.size(), element.n_blocks()));
 
     types::global_dof_index k     = 0;
@@ -1439,7 +1443,7 @@ namespace FETools
                                   (element.base_element(b).n_dofs_per_cell());
           k += element.base_element(b).n_dofs_per_cell();
         }
-    Assert(count == element.n_blocks(), ExcInternalError());
+    Assert(count DEAL_II_EQUALS element.n_blocks(), ExcInternalError());
 
     std::vector<types::global_dof_index> start_indices(block_data.size());
     k = 0;
@@ -1468,14 +1472,17 @@ namespace FETools
                            const FiniteElement<dim, spacedim> &fe2,
                            FullMatrix<number> &interpolation_matrix)
   {
-    Assert(fe1.n_components() == fe2.n_components(),
+    Assert(fe1.n_components() DEAL_II_EQUALS fe2.n_components(),
            ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
-    Assert(interpolation_matrix.m() == fe2.n_dofs_per_cell() &&
-             interpolation_matrix.n() == fe1.n_dofs_per_cell(),
-           ExcMatrixDimensionMismatch(interpolation_matrix.m(),
-                                      interpolation_matrix.n(),
-                                      fe2.n_dofs_per_cell(),
-                                      fe1.n_dofs_per_cell()));
+    Assert(
+      interpolation_matrix.m()
+        DEAL_II_EQUALS     fe2.n_dofs_per_cell()
+          DEAL_II_AND      interpolation_matrix.n()
+            DEAL_II_EQUALS fe1.n_dofs_per_cell(),
+      ExcMatrixDimensionMismatch(interpolation_matrix.m(),
+                                 interpolation_matrix.n(),
+                                 fe2.n_dofs_per_cell(),
+                                 fe1.n_dofs_per_cell()));
 
     // first try the easy way: maybe the FE wants to implement things itself:
     try
@@ -1495,8 +1502,8 @@ namespace FETools
     // way. note that this will only
     // work if the element is
     // primitive, so check this first
-    Assert(fe1.is_primitive() == true, ExcFENotPrimitive());
-    Assert(fe2.is_primitive() == true, ExcFENotPrimitive());
+    Assert(fe1.is_primitive() DEAL_II_EQUALS true, ExcFENotPrimitive());
+    Assert(fe2.is_primitive() DEAL_II_EQUALS true, ExcFENotPrimitive());
 
     // Initialize FEValues for fe1 at
     // the unit support points of the
@@ -1504,7 +1511,7 @@ namespace FETools
     const std::vector<Point<dim>> &fe2_support_points =
       fe2.get_unit_support_points();
 
-    Assert(fe2_support_points.size() == fe2.n_dofs_per_cell(),
+    Assert(fe2_support_points.size() DEAL_II_EQUALS fe2.n_dofs_per_cell(),
            (typename FiniteElement<dim, spacedim>::ExcFEHasNoSupportPoints()));
 
     for (unsigned int i = 0; i < fe2.n_dofs_per_cell(); ++i)
@@ -1513,7 +1520,7 @@ namespace FETools
         for (unsigned int j = 0; j < fe1.n_dofs_per_cell(); ++j)
           {
             const unsigned int j1 = fe1.system_to_component_index(j).first;
-            if (i1 == j1)
+            if (i1 DEAL_II_EQUALS j1)
               interpolation_matrix(i, j) =
                 fe1.shape_value(j, fe2_support_points[i]);
             else
@@ -1530,14 +1537,17 @@ namespace FETools
                                 const FiniteElement<dim, spacedim> &fe2,
                                 FullMatrix<number> &interpolation_matrix)
   {
-    Assert(fe1.n_components() == fe2.n_components(),
+    Assert(fe1.n_components() DEAL_II_EQUALS fe2.n_components(),
            ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
-    Assert(interpolation_matrix.m() == fe1.n_dofs_per_cell() &&
-             interpolation_matrix.n() == fe1.n_dofs_per_cell(),
-           ExcMatrixDimensionMismatch(interpolation_matrix.m(),
-                                      interpolation_matrix.n(),
-                                      fe1.n_dofs_per_cell(),
-                                      fe1.n_dofs_per_cell()));
+    Assert(
+      interpolation_matrix.m()
+        DEAL_II_EQUALS     fe1.n_dofs_per_cell()
+          DEAL_II_AND      interpolation_matrix.n()
+            DEAL_II_EQUALS fe1.n_dofs_per_cell(),
+      ExcMatrixDimensionMismatch(interpolation_matrix.m(),
+                                 interpolation_matrix.n(),
+                                 fe1.n_dofs_per_cell(),
+                                 fe1.n_dofs_per_cell()));
 
     FullMatrix<number> first_matrix(fe2.n_dofs_per_cell(),
                                     fe1.n_dofs_per_cell());
@@ -1559,10 +1569,12 @@ namespace FETools
                                       const FiniteElement<dim, spacedim> &fe2,
                                       FullMatrix<number> &difference_matrix)
   {
-    Assert(fe1.n_components() == fe2.n_components(),
+    Assert(fe1.n_components() DEAL_II_EQUALS fe2.n_components(),
            ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
-    Assert(difference_matrix.m() == fe1.n_dofs_per_cell() &&
-             difference_matrix.n() == fe1.n_dofs_per_cell(),
+    Assert(difference_matrix.m()
+             DEAL_II_EQUALS     fe1.n_dofs_per_cell()
+               DEAL_II_AND      difference_matrix.n()
+                 DEAL_II_EQUALS fe1.n_dofs_per_cell(),
            ExcMatrixDimensionMismatch(difference_matrix.m(),
                                       difference_matrix.n(),
                                       fe1.n_dofs_per_cell(),
@@ -1584,11 +1596,11 @@ namespace FETools
                         const FiniteElement<dim, spacedim> &fe2,
                         FullMatrix<number> &                matrix)
   {
-    Assert(fe1.n_components() == 1, ExcNotImplemented());
-    Assert(fe1.n_components() == fe2.n_components(),
+    Assert(fe1.n_components() DEAL_II_EQUALS 1, ExcNotImplemented());
+    Assert(fe1.n_components() DEAL_II_EQUALS fe2.n_components(),
            ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
-    Assert(matrix.m() == fe2.n_dofs_per_cell() &&
-             matrix.n() == fe1.n_dofs_per_cell(),
+    Assert(matrix.m() DEAL_II_EQUALS fe2.n_dofs_per_cell()
+             DEAL_II_AND matrix.n() DEAL_II_EQUALS fe1.n_dofs_per_cell(),
            ExcMatrixDimensionMismatch(matrix.m(),
                                       matrix.n(),
                                       fe2.n_dofs_per_cell(),
@@ -1669,7 +1681,7 @@ namespace FETools
     FullMatrix<double> N(n_dofs, n_dofs);
 
     Assert(fe.has_generalized_support_points(), ExcNotInitialized());
-    Assert(fe.n_components() == dim, ExcNotImplemented());
+    Assert(fe.n_components() DEAL_II_EQUALS dim, ExcNotImplemented());
 
     const std::vector<Point<dim>> &points = fe.get_generalized_support_points();
 
@@ -1790,9 +1802,9 @@ namespace FETools
           GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
         for (unsigned int i = 0; i < nc; ++i)
           {
-            Assert(matrices[i].n() == n,
+            Assert(matrices[i].n() DEAL_II_EQUALS n,
                    ExcDimensionMismatch(matrices[i].n(), n));
-            Assert(matrices[i].m() == n,
+            Assert(matrices[i].m() DEAL_II_EQUALS n,
                    ExcDimensionMismatch(matrices[i].m(), n));
           }
 
@@ -1948,8 +1960,8 @@ namespace FETools
   {
     const unsigned int face_no = face_coarse;
 
-    Assert(face_coarse == 0, ExcNotImplemented());
-    Assert(face_fine == 0, ExcNotImplemented());
+    Assert(face_coarse DEAL_II_EQUALS 0, ExcNotImplemented());
+    Assert(face_fine DEAL_II_EQUALS 0, ExcNotImplemented());
 
     const unsigned int nc     = GeometryInfo<dim>::max_children_per_face;
     const unsigned int n      = fe.n_dofs_per_face(face_no);
@@ -1961,8 +1973,10 @@ namespace FETools
 
     for (unsigned int i = 0; i < nc; ++i)
       {
-        Assert(matrices[i].n() == n, ExcDimensionMismatch(matrices[i].n(), n));
-        Assert(matrices[i].m() == n, ExcDimensionMismatch(matrices[i].m(), n));
+        Assert(matrices[i].n() DEAL_II_EQUALS n,
+               ExcDimensionMismatch(matrices[i].n(), n));
+        Assert(matrices[i].m() DEAL_II_EQUALS n,
+               ExcDimensionMismatch(matrices[i].m(), n));
       }
 
     // In order to make the loops below
@@ -2015,7 +2029,7 @@ namespace FETools
             }
         }
 
-      if (dim == 3)
+      if (dim DEAL_II_EQUALS 3)
         {
           const unsigned int offset_c = fe.get_first_quad_index(face_coarse);
           const unsigned int offset_f = fe.get_first_quad_index(face_fine);
@@ -2026,7 +2040,8 @@ namespace FETools
               ++face_dof;
             }
         }
-      Assert(face_dof == fe.n_dofs_per_face(face_no), ExcInternalError());
+      Assert(face_dof DEAL_II_EQUALS fe.n_dofs_per_face(face_no),
+             ExcInternalError());
     }
 
     // Set up meshes, one with a single
@@ -2237,9 +2252,9 @@ namespace FETools
           {
             Assert(matrices[i].
 
-                     n()
+                   n()
 
-                     == n,
+                     DEAL_II_EQUALS n,
                    ExcDimensionMismatch(matrices[i].
 
                                         n(),
@@ -2248,9 +2263,9 @@ namespace FETools
                                         ));
             Assert(matrices[i].
 
-                     m()
+                   m()
 
-                     == n,
+                     DEAL_II_EQUALS n,
                    ExcDimensionMismatch(matrices[i].
 
                                         m(),
@@ -2408,10 +2423,10 @@ namespace FETools
       internal::FEToolsAddFENameHelper::fe_name_map_lock);
 
     Assert(
-      internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim].find(
-        name) ==
-        internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim]
-          .end(),
+      internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim]
+        .find(name) DEAL_II_EQUALS
+          internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim]
+        .end(),
       ExcMessage("Cannot change existing element in finite element name list"));
 
     // Insert the normalized name into
@@ -2452,7 +2467,7 @@ namespace FETools
         // have to figure out what the
         // base elements are. this can
         // only be done recursively
-        if (name_part == "FESystem")
+        if (name_part DEAL_II_EQUALS "FESystem")
           {
             // next we have to get at the
             // base elements. start with
@@ -2469,7 +2484,7 @@ namespace FETools
 
             // Now, just the [...]
             // part should be left.
-            if (name.size() == 0 || name[0] != '[')
+            if (name.size() DEAL_II_EQUALS 0 DEAL_II_OR name[0] != '[')
               throw(std::string("Invalid first character in ") + name);
             do
               {
@@ -2485,7 +2500,7 @@ namespace FETools
                 // FESystem placed a
                 // multiplicity after
                 // the element name
-                if (name[0] == '^')
+                if (name[0] DEAL_II_EQUALS '^')
                   {
                     // yes. Delete the '^'
                     // and read this
@@ -2516,19 +2531,19 @@ namespace FETools
                 // next character is
                 // '-'
               }
-            while (name[0] == '-');
+            while (name[0] DEAL_II_EQUALS '-');
 
             // so we got to the end
             // of the '-' separated
             // list. make sure that
             // we actually had a ']'
             // there
-            if (name.size() == 0 || name[0] != ']')
+            if (name.size() DEAL_II_EQUALS 0 DEAL_II_OR name[0] != ']')
               throw(std::string("Invalid first character in ") + name);
             name.erase(0, 1);
             // just one more sanity check
-            Assert((base_fes.size() == base_multiplicities.size()) &&
-                     (base_fes.size() > 0),
+            Assert((base_fes.size() DEAL_II_EQUALS base_multiplicities.size())
+                     DEAL_II_AND(base_fes.size() > 0),
                    ExcInternalError());
 
             // this is a workaround since the constructor for FESystem
@@ -2543,7 +2558,7 @@ namespace FETools
             return std::make_unique<FESystem<dim, spacedim>>(
               raw_base_fes, base_multiplicities);
           }
-        else if (name_part == "FE_Nothing")
+        else if (name_part DEAL_II_EQUALS "FE_Nothing")
           {
             // remove the () from FE_Nothing()
             name.erase(0, 2);
@@ -2571,7 +2586,7 @@ namespace FETools
             // Now, just the (degree)
             // or (Quadrature<1>(degree+1))
             // part should be left.
-            if (name.size() == 0 || name[0] != '(')
+            if (name.size() DEAL_II_EQUALS 0 DEAL_II_OR name[0] != '(')
               throw(std::string("Invalid first character in ") + name);
             name.erase(0, 1);
             if (name[0] != 'Q')
@@ -2591,7 +2606,7 @@ namespace FETools
                 unsigned int      position = name.find('(');
                 const std::string quadrature_name(name, 0, position);
                 name.erase(0, position + 1);
-                if (quadrature_name.compare("QGaussLobatto") == 0)
+                if (quadrature_name.compare("QGaussLobatto") DEAL_II_EQUALS 0)
                   {
                     const std::pair<int, unsigned int> tmp =
                       Utilities::get_integer_at_position(name, 0);
@@ -2604,7 +2619,7 @@ namespace FETools
                         const FETools::FEFactoryBase<dim, spacedim> *>(ptr);
                     return fef->get(QGaussLobatto<1>(tmp.first));
                   }
-                else if (quadrature_name.compare("QGauss") == 0)
+                else if (quadrature_name.compare("QGauss") DEAL_II_EQUALS 0)
                   {
                     const std::pair<int, unsigned int> tmp =
                       Utilities::get_integer_at_position(name, 0);
@@ -2617,15 +2632,15 @@ namespace FETools
                         const FETools::FEFactoryBase<dim, spacedim> *>(ptr);
                     return fef->get(QGauss<1>(tmp.first));
                   }
-                else if (quadrature_name.compare("QIterated") == 0)
+                else if (quadrature_name.compare("QIterated") DEAL_II_EQUALS 0)
                   {
                     // find sub-quadrature
                     position = name.find('(');
                     const std::string subquadrature_name(name, 0, position);
-                    AssertThrow(subquadrature_name.compare("QTrapez") == 0,
-                                ExcNotImplemented(
-                                  "Could not detect quadrature of name " +
-                                  subquadrature_name));
+                    AssertThrow(
+                      subquadrature_name.compare("QTrapez") DEAL_II_EQUALS 0,
+                      ExcNotImplemented("Could not detect quadrature of name " +
+                                        subquadrature_name));
                     // delete "QTrapez(),"
                     name.erase(0, position + 3);
                     const std::pair<int, unsigned int> tmp =
@@ -2681,11 +2696,13 @@ namespace FETools
     std::size_t index = 1;
     // remove spaces that are not between two word (things that match the
     // regular expression [A-Za-z0-9_]) characters.
-    while (2 < name.size() && index < name.size() - 1)
+    while (2 < name.size() DEAL_II_AND index < name.size() - 1)
       {
-        if (name[index] == ' ' &&
-            (!(std::isalnum(name[index - 1]) || name[index - 1] == '_') ||
-             !(std::isalnum(name[index + 1]) || name[index + 1] == '_')))
+        if (name[index] DEAL_II_EQUALS ' ' DEAL_II_AND(
+              !(std::isalnum(name[index - 1])
+                  DEAL_II_OR name[index - 1] DEAL_II_EQUALS '_')
+                DEAL_II_OR !(std::isalnum(name[index + 1])
+                               DEAL_II_OR name[index + 1] DEAL_II_EQUALS '_')))
           {
             name.erase(index, 1);
           }
@@ -2706,18 +2723,18 @@ namespace FETools
         // character between those two,
         // it should be 'd' or the number
         // representing the dimension.
-        if (pos2 - pos1 == 2)
+        if (pos2 - pos1 DEAL_II_EQUALS 2)
           {
             const char dimchar = '0' + dim;
             (void)dimchar;
             if (name.at(pos1 + 1) != 'd')
-              Assert(name.at(pos1 + 1) == dimchar,
+              Assert(name.at(pos1 + 1) DEAL_II_EQUALS dimchar,
                      ExcInvalidFEDimension(name.at(pos1 + 1), dim));
           }
         else
-          Assert(pos2 - pos1 == 4, ExcInvalidFEName(name));
+          Assert(pos2 - pos1 DEAL_II_EQUALS 4, ExcInvalidFEName(name));
 
-        // If pos1==pos2, then we are
+        // If pos1DEAL_II_EQUALS pos2, then we are
         // probably at the end of the
         // string
         if (pos2 != pos1)
@@ -2743,7 +2760,7 @@ namespace FETools
 
         // Make sure the auxiliary function
         // ate up all characters of the name.
-        AssertThrow(name.size() == 0,
+        AssertThrow(name.size() DEAL_II_EQUALS 0,
                     ExcInvalidFEName(parameter_name +
                                      std::string(" extra characters after "
                                                  "end of name")));
@@ -2768,7 +2785,7 @@ namespace FETools
     const Quadrature<dim> &             rhs_quadrature,
     FullMatrix<double> &                X)
   {
-    Assert(fe.n_components() == 1, ExcNotImplemented());
+    Assert(fe.n_components() DEAL_II_EQUALS 1, ExcNotImplemented());
 
     // first build the matrices M and Q
     // described in the documentation
@@ -2795,8 +2812,8 @@ namespace FETools
     X.reinit(fe.n_dofs_per_cell(), rhs_quadrature.size());
     M_inverse.mmult(X, Q);
 
-    Assert(X.m() == fe.n_dofs_per_cell(), ExcInternalError());
-    Assert(X.n() == rhs_quadrature.size(), ExcInternalError());
+    Assert(X.m() DEAL_II_EQUALS fe.n_dofs_per_cell(), ExcInternalError());
+    Assert(X.n() DEAL_II_EQUALS rhs_quadrature.size(), ExcInternalError());
   }
 
 
@@ -2808,9 +2825,11 @@ namespace FETools
     const Quadrature<dim> &             quadrature,
     FullMatrix<double> &                I_q)
   {
-    Assert(fe.n_components() == 1, ExcNotImplemented());
-    Assert(I_q.m() == quadrature.size(), ExcMessage("Wrong matrix size"));
-    Assert(I_q.n() == fe.n_dofs_per_cell(), ExcMessage("Wrong matrix size"));
+    Assert(fe.n_components() DEAL_II_EQUALS 1, ExcNotImplemented());
+    Assert(I_q.m() DEAL_II_EQUALS quadrature.size(),
+           ExcMessage("Wrong matrix size"));
+    Assert(I_q.n() DEAL_II_EQUALS fe.n_dofs_per_cell(),
+           ExcMessage("Wrong matrix size"));
 
     for (unsigned int q = 0; q < quadrature.size(); ++q)
       for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
@@ -2828,13 +2847,15 @@ namespace FETools
   {
     // check that the number columns of the projection_matrix
     // matches the size of the vector_of_tensors_at_qp
-    Assert(projection_matrix.n_cols() == vector_of_tensors_at_qp.size(),
+    Assert(projection_matrix.n_cols()
+             DEAL_II_EQUALS vector_of_tensors_at_qp.size(),
            ExcDimensionMismatch(projection_matrix.n_cols(),
                                 vector_of_tensors_at_qp.size()));
 
     // check that the number rows of the projection_matrix
     // matches the size of the vector_of_tensors_at_nodes
-    Assert(projection_matrix.n_rows() == vector_of_tensors_at_nodes.size(),
+    Assert(projection_matrix.n_rows()
+             DEAL_II_EQUALS vector_of_tensors_at_nodes.size(),
            ExcDimensionMismatch(projection_matrix.n_rows(),
                                 vector_of_tensors_at_nodes.size()));
 
@@ -2887,13 +2908,15 @@ namespace FETools
   {
     // check that the number columns of the projection_matrix
     // matches the size of the vector_of_tensors_at_qp
-    Assert(projection_matrix.n_cols() == vector_of_tensors_at_qp.size(),
+    Assert(projection_matrix.n_cols()
+             DEAL_II_EQUALS vector_of_tensors_at_qp.size(),
            ExcDimensionMismatch(projection_matrix.n_cols(),
                                 vector_of_tensors_at_qp.size()));
 
     // check that the number rows of the projection_matrix
     // matches the size of the vector_of_tensors_at_nodes
-    Assert(projection_matrix.n_rows() == vector_of_tensors_at_nodes.size(),
+    Assert(projection_matrix.n_rows()
+             DEAL_II_EQUALS vector_of_tensors_at_nodes.size(),
            ExcDimensionMismatch(projection_matrix.n_rows(),
                                 vector_of_tensors_at_nodes.size()));
 
@@ -2959,7 +2982,7 @@ namespace FETools
     const unsigned int                                              face,
     FullMatrix<double> &                                            X)
   {
-    Assert(fe.n_components() == 1, ExcNotImplemented());
+    Assert(fe.n_components() DEAL_II_EQUALS 1, ExcNotImplemented());
     Assert(lhs_quadrature.size() > fe.degree,
            ExcNotGreaterThan(lhs_quadrature.size(), fe.degree));
 
@@ -2984,7 +3007,7 @@ namespace FETools
                        lhs_quadrature.weight(q);
       for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
         {
-          M(i, i) = (M(i, i) == 0 ? 1 : M(i, i));
+          M(i, i) = (M(i, i) DEAL_II_EQUALS 0 ? 1 : M(i, i));
         }
     }
 
@@ -3005,8 +3028,8 @@ namespace FETools
     X.reinit(fe.n_dofs_per_cell(), rhs_quadrature.size());
     M_inverse.mmult(X, Q);
 
-    Assert(X.m() == fe.n_dofs_per_cell(), ExcInternalError());
-    Assert(X.n() == rhs_quadrature.size(), ExcInternalError());
+    Assert(X.m() DEAL_II_EQUALS fe.n_dofs_per_cell(), ExcInternalError());
+    Assert(X.n() DEAL_II_EQUALS rhs_quadrature.size(), ExcInternalError());
   }
 
 
@@ -3207,7 +3230,7 @@ namespace FETools
               for (unsigned int j = 0; j < dofs_per_line; ++j)
                 h2l[next_index++] = n * (i + 1) + j + 1;
 
-            Assert(next_index == dofs_per_cell, ExcInternalError());
+            Assert(next_index DEAL_II_EQUALS dofs_per_cell, ExcInternalError());
 
             break;
           }
@@ -3297,7 +3320,7 @@ namespace FETools
                 for (unsigned int k = 0; k < dofs_per_line; ++k)
                   h2l[next_index++] = n * n * (i + 1) + n * (j + 1) + k + 1;
 
-            Assert(next_index == dofs_per_cell, ExcInternalError());
+            Assert(next_index DEAL_II_EQUALS dofs_per_cell, ExcInternalError());
 
             break;
           }
@@ -3327,7 +3350,7 @@ namespace FETools
   hierarchic_to_lexicographic_numbering(const FiniteElementData<dim> &fe,
                                         std::vector<unsigned int> &   h2l)
   {
-    Assert(h2l.size() == fe.n_dofs_per_cell(),
+    Assert(h2l.size() DEAL_II_EQUALS fe.n_dofs_per_cell(),
            ExcDimensionMismatch(h2l.size(), fe.n_dofs_per_cell()));
     hierarchic_to_lexicographic_numbering<dim>(fe.n_dofs_per_line() + 1, h2l);
   }
@@ -3338,7 +3361,7 @@ namespace FETools
   std::vector<unsigned int>
   hierarchic_to_lexicographic_numbering(const FiniteElementData<dim> &fe)
   {
-    Assert(fe.n_components() == 1, ExcInvalidFE());
+    Assert(fe.n_components() DEAL_II_EQUALS 1, ExcInvalidFE());
     return hierarchic_to_lexicographic_numbering<dim>(fe.n_dofs_per_line() + 1);
   }
 

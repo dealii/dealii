@@ -977,7 +977,8 @@ namespace MeshWorker
 
     AssertDimension(independent_local_dofs.size(), n_dofs);
 
-    if (Differentiation::AD::is_tapeless_ad_number<Number>::value == true)
+    if (Differentiation::AD::is_tapeless_ad_number<Number>::value
+          DEAL_II_EQUALS true)
       for (unsigned int i = 0; i < n_dofs; ++i)
         Differentiation::AD::internal::Marking<Number>::independent_variable(
           input_vector(local_dof_indices[i]),

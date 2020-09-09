@@ -17,7 +17,8 @@
 for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : SPACE_DIMENSIONS)
   {
-#if deal_II_dimension == 1 && deal_II_dimension <= deal_II_space_dimension
+#if deal_II_dimension DEAL_II_EQUALS 1 DEAL_II_AND deal_II_dimension <= \
+  deal_II_space_dimension
 
     template void
     KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::estimate<

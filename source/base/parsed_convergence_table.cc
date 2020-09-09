@@ -168,7 +168,7 @@ ParsedConvergenceTable::prepare_table_for_output()
           bool has_key = false;
           for (const auto &col : extra_columns)
             {
-              if (rate_key == col)
+              if (rate_key DEAL_II_EQUALS col)
                 has_key = true;
 
               if (col != "")
@@ -176,9 +176,9 @@ ParsedConvergenceTable::prepare_table_for_output()
             }
 
           for (const auto &extra_col : extra_column_functions)
-            if (extra_col.second.second == false)
+            if (extra_col.second.second DEAL_II_EQUALS false)
               {
-                if (rate_key == extra_col.first)
+                if (rate_key DEAL_II_EQUALS extra_col.first)
                   has_key = true;
                 table.omit_column_from_convergence_rate_evaluation(
                   extra_col.first);
@@ -186,10 +186,10 @@ ParsedConvergenceTable::prepare_table_for_output()
 
           if (has_key)
             {
-              if (rate_mode == "reduction_rate_log2")
+              if (rate_mode DEAL_II_EQUALS "reduction_rate_log2")
                 table.evaluate_all_convergence_rates(
                   rate_key, ConvergenceTable::reduction_rate_log2);
-              else if (rate_mode == "reduction_rate")
+              else if (rate_mode DEAL_II_EQUALS "reduction_rate")
                 table.evaluate_all_convergence_rates(
                   rate_key, ConvergenceTable::reduction_rate);
               else
@@ -227,7 +227,7 @@ ParsedConvergenceTable::output_table(std::ostream &out)
 void
 ParsedConvergenceTable::output_table()
 {
-  if (compute_error && error_file_name != "")
+  if (compute_error DEAL_II_AND error_file_name != "")
     {
       prepare_table_for_output();
 
@@ -236,14 +236,14 @@ ParsedConvergenceTable::output_table()
 
       std::ofstream table_file(error_file_name);
 
-      if (error_file_format == "tex")
+      if (error_file_format DEAL_II_EQUALS "tex")
         table.write_tex(table_file);
-      else if (error_file_format == "txt")
+      else if (error_file_format DEAL_II_EQUALS "txt")
         table.write_text(table_file);
-      else if (error_file_format == "gpl")
+      else if (error_file_format DEAL_II_EQUALS "gpl")
         table.write_text(table_file,
                          TableHandler::table_with_separate_column_description);
-      else if (error_file_format == "org")
+      else if (error_file_format DEAL_II_EQUALS "org")
         table.write_text(table_file, TableHandler::org_mode_table);
       else
         {

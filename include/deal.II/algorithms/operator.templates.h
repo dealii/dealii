@@ -46,13 +46,13 @@ namespace Algorithms
   OutputOperator<VectorType> &
   OutputOperator<VectorType>::operator<<(const AnyData &vectors)
   {
-    if (os == nullptr)
+    if (os DEAL_II_EQUALS nullptr)
       {
         deallog << "Step " << step << std::endl;
         for (unsigned int i = 0; i < vectors.size(); ++i)
           {
             const VectorType *v = vectors.try_read_ptr<VectorType>(i);
-            if (v == nullptr)
+            if (v DEAL_II_EQUALS nullptr)
               continue;
             deallog << vectors.name(i);
             for (unsigned int j = 0; j < v->size(); ++j)
@@ -69,7 +69,7 @@ namespace Algorithms
         for (unsigned int i = 0; i < vectors.size(); ++i)
           {
             const VectorType *v = vectors.try_read_ptr<VectorType>(i);
-            if (v == nullptr)
+            if (v DEAL_II_EQUALS nullptr)
               continue;
             for (unsigned int j = 0; j < v->size(); ++j)
               (*os) << ' '

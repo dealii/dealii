@@ -215,7 +215,8 @@ namespace CUDAWrappers
                                 x_host,
                                 &singularity);
       AssertCusolver(cusolver_error_code);
-      Assert(singularity == -1, ExcMessage("Coarse matrix is singular"));
+      Assert(singularity DEAL_II_EQUALS - 1,
+             ExcMessage("Coarse matrix is singular"));
     }
 
 
@@ -246,7 +247,8 @@ namespace CUDAWrappers
                                 x_host,
                                 &singularity);
       AssertCusolver(cusolver_error_code);
-      Assert(singularity == -1, ExcMessage("Coarse matrix is singular"));
+      Assert(singularity DEAL_II_EQUALS - 1,
+             ExcMessage("Coarse matrix is singular"));
     }
 
 
@@ -274,7 +276,8 @@ namespace CUDAWrappers
                               x,
                               &singularity);
       AssertCusolver(cusolver_error_code);
-      Assert(singularity == -1, ExcMessage("Coarse matrix is not SPD"));
+      Assert(singularity DEAL_II_EQUALS - 1,
+             ExcMessage("Coarse matrix is not SPD"));
     }
 
 
@@ -302,7 +305,8 @@ namespace CUDAWrappers
                               x,
                               &singularity);
       AssertCusolver(cusolver_error_code);
-      Assert(singularity == -1, ExcMessage("Coarse matrix is not SPD"));
+      Assert(singularity DEAL_II_EQUALS - 1,
+             ExcMessage("Coarse matrix is not SPD"));
     }
 
 
@@ -318,7 +322,7 @@ namespace CUDAWrappers
       // Change the format of the matrix from sparse to dense
       unsigned int const m = matrix.m();
       unsigned int const n = matrix.n();
-      Assert(m == n, ExcMessage("The matrix is not square"));
+      Assert(m DEAL_II_EQUALS n, ExcMessage("The matrix is not square"));
       Number *dense_matrix_dev;
       Utilities::CUDA::malloc(dense_matrix_dev, m * n);
 
@@ -352,7 +356,7 @@ namespace CUDAWrappers
       cudaError_t cuda_error_code_debug =
         cudaMemcpy(&info, info_dev, sizeof(int), cudaMemcpyDeviceToHost);
       AssertCuda(cuda_error_code_debug);
-      Assert(info == 0,
+      Assert(info DEAL_II_EQUALS 0,
              ExcMessage("There was a problem during the LU factorization"));
 #endif
 
@@ -366,7 +370,8 @@ namespace CUDAWrappers
       cuda_error_code =
         cudaMemcpy(&info, info_dev, sizeof(int), cudaMemcpyDeviceToHost);
       AssertCuda(cuda_error_code);
-      Assert(info == 0, ExcMessage("There was a problem during the LU solve"));
+      Assert(info DEAL_II_EQUALS 0,
+             ExcMessage("There was a problem during the LU solve"));
 #endif
 
       // Free the memory allocated
@@ -455,18 +460,18 @@ namespace CUDAWrappers
     LinearAlgebra::CUDAWrappers::Vector<Number> &      x,
     const LinearAlgebra::CUDAWrappers::Vector<Number> &b)
   {
-    if (additional_data.solver_type == "Cholesky")
+    if (additional_data.solver_type DEAL_II_EQUALS "Cholesky")
       cholesky_factorization(cuda_handle.cusolver_sp_handle,
                              A,
                              b.get_values(),
                              x.get_values());
-    else if (additional_data.solver_type == "LU_dense")
+    else if (additional_data.solver_type DEAL_II_EQUALS "LU_dense")
       lu_factorization(cuda_handle.cusparse_handle,
                        cuda_handle.cusolver_dn_handle,
                        A,
                        b.get_values(),
                        x.get_values());
-    else if (additional_data.solver_type == "LU_host")
+    else if (additional_data.solver_type DEAL_II_EQUALS "LU_host")
       lu_factorization(cuda_handle.cusolver_sp_handle,
                        A,
                        b.get_values(),

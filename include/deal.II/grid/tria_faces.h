@@ -110,10 +110,10 @@ namespace internal
     {
       ar &dim;
 
-      if (dim == 2)
+      if (dim DEAL_II_EQUALS 2)
         ar &lines;
 
-      if (dim == 3)
+      if (dim DEAL_II_EQUALS 3)
         ar &quads &lines &quads_line_orientations &quad_reference_cell_type;
     }
   } // namespace TriangulationImplementation

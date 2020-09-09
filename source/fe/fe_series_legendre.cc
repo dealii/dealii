@@ -47,7 +47,8 @@ namespace
     for (unsigned int d = 0; d < dim; d++)
       {
         const double x = 2.0 * (x_q[d] - 0.5);
-        Assert((x_q[d] <= 1.0) && (x_q[d] >= 0.), ExcLegendre(d, x_q[d]));
+        Assert((x_q[d] <= 1.0) DEAL_II_AND(x_q[d] >= 0.),
+               ExcLegendre(d, x_q[d]));
         const int ind = indices[d];
         res *= std::sqrt(2.0) * gsl_sf_legendre_Pl(ind, x);
       }
@@ -116,7 +117,7 @@ namespace
   {
     AssertIndexRange(fe, fe_collection.size());
 
-    if (legendre_transform_matrices[fe].m() == 0)
+    if (legendre_transform_matrices[fe].m() DEAL_II_EQUALS 0)
       {
         legendre_transform_matrices[fe].reinit(
           n_coefficients_per_direction[fe],
@@ -140,7 +141,7 @@ namespace
   {
     AssertIndexRange(fe, fe_collection.size());
 
-    if (legendre_transform_matrices[fe].m() == 0)
+    if (legendre_transform_matrices[fe].m() DEAL_II_EQUALS 0)
       {
         legendre_transform_matrices[fe].reinit(
           Utilities::fixed_power<2>(n_coefficients_per_direction[fe]),
@@ -171,7 +172,7 @@ namespace
   {
     AssertIndexRange(fe, fe_collection.size());
 
-    if (legendre_transform_matrices[fe].m() == 0)
+    if (legendre_transform_matrices[fe].m() DEAL_II_EQUALS 0)
       {
         legendre_transform_matrices[fe].reinit(
           Utilities::fixed_power<3>(n_coefficients_per_direction[fe]),
@@ -207,8 +208,9 @@ namespace FESeries
     , q_collection(q_collection)
     , legendre_transform_matrices(fe_collection.size())
   {
-    Assert(n_coefficients_per_direction.size() == fe_collection.size() &&
-             n_coefficients_per_direction.size() == q_collection.size(),
+    Assert(n_coefficients_per_direction.size() DEAL_II_EQUALS fe_collection
+             .size() DEAL_II_AND    n_coefficients_per_direction
+             .size() DEAL_II_EQUALS q_collection.size(),
            ExcMessage("All parameters are supposed to have the same size."));
 
     // reserve sufficient memory
@@ -236,15 +238,16 @@ namespace FESeries
 
 
   template <int dim, int spacedim>
-  inline bool
-  Legendre<dim, spacedim>::
-  operator==(const Legendre<dim, spacedim> &legendre) const
+  inline bool Legendre<dim, spacedim>::
+              operator DEAL_II_EQUALS(const Legendre<dim, spacedim> &legendre) const
   {
     return (
-      (n_coefficients_per_direction == legendre.n_coefficients_per_direction) &&
-      (*fe_collection == *(legendre.fe_collection)) &&
-      (q_collection == legendre.q_collection) &&
-      (legendre_transform_matrices == legendre.legendre_transform_matrices));
+      (n_coefficients_per_direction DEAL_II_EQUALS
+                                    legendre.n_coefficients_per_direction)
+        DEAL_II_AND(*fe_collection DEAL_II_EQUALS * (legendre.fe_collection))
+          DEAL_II_AND(q_collection DEAL_II_EQUALS legendre.q_collection)
+            DEAL_II_AND(legendre_transform_matrices DEAL_II_EQUALS
+                                                    legendre.legendre_transform_matrices));
   }
 
 
@@ -305,9 +308,10 @@ namespace FESeries
               unrolled_coefficients.end(),
               CoefficientType(0.));
 
-    Assert(unrolled_coefficients.size() == matrix.m(), ExcInternalError());
+    Assert(unrolled_coefficients.size() DEAL_II_EQUALS matrix.m(),
+           ExcInternalError());
 
-    Assert(local_dof_values.size() == matrix.n(),
+    Assert(local_dof_values.size() DEAL_II_EQUALS matrix.n(),
            ExcDimensionMismatch(local_dof_values.size(), matrix.n()));
 
     for (unsigned int i = 0; i < unrolled_coefficients.size(); i++)

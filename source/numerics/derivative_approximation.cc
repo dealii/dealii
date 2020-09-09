@@ -139,7 +139,7 @@ namespace DerivativeApproximation
       const InputVector &            solution,
       const unsigned int             component)
     {
-      if (fe_values.get_fe().n_components() == 1)
+      if (fe_values.get_fe().n_components() DEAL_II_EQUALS 1)
         {
           std::vector<typename InputVector::value_type> values(1);
           fe_values.get_function_values(solution, values);
@@ -254,7 +254,7 @@ namespace DerivativeApproximation
       const InputVector &            solution,
       const unsigned int             component)
     {
-      if (fe_values.get_fe().n_components() == 1)
+      if (fe_values.get_fe().n_components() DEAL_II_EQUALS 1)
         {
           std::vector<Tensor<1, dim, typename InputVector::value_type>> values(
             1);
@@ -332,8 +332,8 @@ namespace DerivativeApproximation
       Fortunately, Roger Young provided the following Fortran code, which
       is transcribed below to C. The code uses an algorithm that uses the
       invariants of a symmetric matrix. (The translated algorithm is
-      augmented by a test for R>0, since R==0 indicates that all three
-      eigenvalues are equal.)
+      augmented by a test for R>0, since RDEAL_II_EQUALS 0 indicates that all
+      three eigenvalues are equal.)
 
 
           PROGRAM MAIN
@@ -489,7 +489,7 @@ namespace DerivativeApproximation
     {
       // computing the spectral norm is
       // not so simple in general. it is
-      // feasible for dim==3 as shown
+      // feasible for dimDEAL_II_EQUALS 3 as shown
       // above, since then there are
       // still closed form expressions of
       // the roots of the characteristic
@@ -591,7 +591,7 @@ namespace DerivativeApproximation
       const InputVector &            solution,
       const unsigned int             component)
     {
-      if (fe_values.get_fe().n_components() == 1)
+      if (fe_values.get_fe().n_components() DEAL_II_EQUALS 1)
         {
           std::vector<Tensor<2, dim, typename InputVector::value_type>> values(
             1);
@@ -919,7 +919,7 @@ namespace DerivativeApproximation
       const unsigned int                            component)
     {
       // if the cell is not locally owned, then there is nothing to do
-      if (std::get<0>(*cell)->is_locally_owned() == false)
+      if (std::get<0>(*cell)->is_locally_owned() DEAL_II_EQUALS false)
         *std::get<1>(*cell) = 0;
       else
         {
@@ -963,8 +963,9 @@ namespace DerivativeApproximation
                            const unsigned int               component,
                            Vector<float> &                  derivative_norm)
     {
-      Assert(derivative_norm.size() ==
-               dof_handler.get_triangulation().n_active_cells(),
+      Assert(derivative_norm.size()
+               DEAL_II_EQUALS dof_handler.get_triangulation()
+                 .n_active_cells(),
              ExcVectorLengthVsNActiveCells(
                derivative_norm.size(),
                dof_handler.get_triangulation().n_active_cells()));

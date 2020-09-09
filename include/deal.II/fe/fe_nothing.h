@@ -261,13 +261,13 @@ public:
 
   /**
    * Comparison operator. In addition to the fields already checked by
-   * FiniteElement::operator==(), this operator also checks for equality
-   * of the arguments passed to the constructors of the current object
+   * FiniteElement::operator DEAL_II_EQUALS (), this operator also checks for
+   * equality of the arguments passed to the constructors of the current object
    * as well as the object against which the comparison is done (which
    * for this purpose obviously also needs to be of type FE_Nothing).
    */
-  virtual bool
-  operator==(const FiniteElement<dim, spacedim> &fe) const override;
+  virtual bool operator DEAL_II_EQUALS(
+    const FiniteElement<dim, spacedim> &fe) const override;
 
 private:
   /**

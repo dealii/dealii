@@ -683,8 +683,9 @@ MatrixBlock<MatrixType>::add(const size_type                       gi,
   const std::pair<unsigned int, size_type> bj =
     column_indices.global_to_local(gj);
 
-  Assert(bi.first == row, ExcBlockIndexMismatch(bi.first, row));
-  Assert(bj.first == column, ExcBlockIndexMismatch(bj.first, column));
+  Assert(bi.first DEAL_II_EQUALS row, ExcBlockIndexMismatch(bi.first, row));
+  Assert(bj.first DEAL_II_EQUALS column,
+         ExcBlockIndexMismatch(bj.first, column));
 
   matrix.add(bi.second, bj.second, value);
 }
@@ -738,13 +739,14 @@ MatrixBlock<MatrixType>::add(const size_type  b_row,
   // not be the most efficient way,
   // it is at least thread safe.
   //#ifdef DEBUG
-  Assert(bi.first == row, ExcBlockIndexMismatch(bi.first, row));
+  Assert(bi.first DEAL_II_EQUALS row, ExcBlockIndexMismatch(bi.first, row));
 
   for (size_type j = 0; j < n_cols; ++j)
     {
       const std::pair<unsigned int, size_type> bj =
         column_indices.global_to_local(col_indices[j]);
-      Assert(bj.first == column, ExcBlockIndexMismatch(bj.first, column));
+      Assert(bj.first DEAL_II_EQUALS column,
+             ExcBlockIndexMismatch(bj.first, column));
 
       matrix.add(bi.second, bj.second, values[j]);
     }
@@ -763,7 +765,7 @@ MatrixBlock<MatrixType>::add(const std::vector<size_type> &indices,
   Assert(column_indices.size() != 0, ExcNotInitialized());
 
   AssertDimension(indices.size(), values.m());
-  Assert(values.n() == values.m(), ExcNotQuadratic());
+  Assert(values.n() DEAL_II_EQUALS values.m(), ExcNotQuadratic());
 
   for (size_type i = 0; i < indices.size(); ++i)
     add(indices[i],

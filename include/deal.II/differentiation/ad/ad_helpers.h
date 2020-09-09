@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#if defined(DEAL_II_WITH_ADOLC) || defined(DEAL_II_TRILINOS_WITH_SACADO)
+#if defined(DEAL_II_WITH_ADOLC) DEAL_II_OR defined(DEAL_II_TRILINOS_WITH_SACADO)
 
 #  include <deal.II/base/numbers.h>
 #  include <deal.II/base/symmetric_tensor.h>
@@ -119,7 +119,7 @@ namespace Differentiation
      *   // load the tape and reuse this data.
      *   const bool is_recording
      *     = ad_helper.start_recording_operations(tape_index);
-     *   if (is_recording == true)
+     *   if (is_recording DEAL_II_EQUALS  true)
      *   {
      *     // This is the "recording" phase of the operations.
      *     // In this block one places the majority of the operations described
@@ -1122,7 +1122,7 @@ namespace Differentiation
      *
      *     // The steps that follow in the recording phase are required for
      *     // tapeless methods as well.
-     *     if (is_recording == true)
+     *     if (is_recording DEAL_II_EQUALS  true)
      *     {
      *       // This is the "recording" phase of the operations.
      *       // First, we set the values for all DoFs.
@@ -1474,7 +1474,7 @@ namespace Differentiation
      *           const unsigned int block_I =
      *             fe.system_to_base_index(I).first.first;
      *
-     *           if (block_I == u_block) // u-terms
+     *           if (block_I DEAL_II_EQUALS  u_block) // u-terms
      *           {
      *             // Variation of the Green-Lagrange strain tensor
      *             // associated with the I'th vector-valued basis function.
@@ -1484,7 +1484,7 @@ namespace Differentiation
      *
      *             residual_ad[I] += (dE_I*S) * JxW;
      *           }
-     *           else if (block_I == msp_block)
+     *           else if (block_I DEAL_II_EQUALS  msp_block)
      *           {
      *             // Variation of the magnetic field vector associated with
      *             // the I'th scalar-valued basis function
@@ -1677,10 +1677,11 @@ namespace Differentiation
         using tensor_type = Tensor<rank, dim, NumberType>;
 
         static_assert(
-          n_components == tensor_type<double>::n_independent_components,
+          n_components DEAL_II_EQUALS
+                       tensor_type<double>::n_independent_components,
           "The number of components doesn't match that of the corresponding tensor type.");
         static_assert(
-          rank == tensor_type<double>::rank,
+          rank DEAL_II_EQUALS tensor_type<double>::rank,
           "The rank doesn't match that of the corresponding tensor type.");
 
         /**
@@ -1767,10 +1768,11 @@ namespace Differentiation
         using tensor_type = Tensor<rank, dim, NumberType>;
 
         static_assert(
-          n_components == tensor_type<double>::n_independent_components,
+          n_components DEAL_II_EQUALS
+                       tensor_type<double>::n_independent_components,
           "The number of components doesn't match that of the corresponding tensor type.");
         static_assert(
-          rank == tensor_type<double>::rank,
+          rank DEAL_II_EQUALS tensor_type<double>::rank,
           "The rank doesn't match that of the corresponding tensor type.");
 
         /**
@@ -2387,7 +2389,7 @@ namespace Differentiation
         using ExtractorType = FEValuesExtractors::SymmetricTensor<2>;
         const IndexType n_components =
           internal::Extractor<dim, ExtractorType>::n_components;
-        if (ignore_symmetries == true)
+        if (ignore_symmetries DEAL_II_EQUALS true)
           {
             const IndexType comp_first =
               internal::Extractor<dim, ExtractorType>::first_component(
@@ -2969,7 +2971,7 @@ namespace Differentiation
      *
      *   // The steps that follow in the recording phase are required for
      *   // tapeless methods as well.
-     *   if (is_recording == true)
+     *   if (is_recording DEAL_II_EQUALS  true)
      *   {
      *     // This is the "recording" phase of the operations.
      *
@@ -3368,7 +3370,7 @@ namespace Differentiation
      *
      *   // The steps that follow in the recording phase are required for
      *   // tapeless methods as well.
-     *   if (is_recording == true)
+     *   if (is_recording DEAL_II_EQUALS  true)
      *   {
      *     // This is the "recording" phase of the operations.
      *
@@ -3730,13 +3732,15 @@ namespace Differentiation
       // with a meaningful number. However, in this case we need to double check
       // that we're not registering these variables twice
       Assert(
-        local_dof_indices.size() == this->n_independent_variables(),
+        local_dof_indices.size() DEAL_II_EQUALS this->n_independent_variables(),
         ExcMessage(
           "Degree of freedom index vector size does not match number of independent variables"));
       for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
         {
-          Assert(this->registered_independent_variable_values[i] == false,
-                 ExcMessage("Independent variables already registered."));
+          Assert(
+            this
+              ->registered_independent_variable_values[i] DEAL_II_EQUALS false,
+            ExcMessage("Independent variables already registered."));
         }
       set_dof_values(values, local_dof_indices);
     }
@@ -3750,7 +3754,8 @@ namespace Differentiation
       const VectorType &                                  values,
       const std::vector<dealii::types::global_dof_index> &local_dof_indices)
     {
-      Assert(local_dof_indices.size() == this->n_independent_variables(),
+      Assert(local_dof_indices.size()
+               DEAL_II_EQUALS this->n_independent_variables(),
              ExcMessage(
                "Vector size does not match number of independent variables"));
       for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
@@ -3783,7 +3788,8 @@ namespace Differentiation
       for (const unsigned int index : index_set)
         {
           Assert(
-            this->registered_independent_variable_values[index] == false,
+            this->registered_independent_variable_values
+              [index] DEAL_II_EQUALS false,
             ExcMessage(
               "Overlapping indices for independent variables. "
               "One or more indices associated with the field that "
@@ -3832,7 +3838,7 @@ namespace Differentiation
     PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
       get_sensitive_variables(const ExtractorType &extractor) const
     {
-      if (ADNumberTraits<ad_type>::is_taped == true)
+      if (ADNumberTraits<ad_type>::is_taped DEAL_II_EQUALS true)
         {
           Assert(this->active_tape_index() !=
                    Numbers<ad_type>::invalid_tape_index,
@@ -3842,8 +3848,8 @@ namespace Differentiation
       // If necessary, finalize the internally stored vector of
       // AD numbers that represents the independent variables
       this->finalize_sensitive_independent_variables();
-      Assert(this->independent_variables.size() ==
-               this->n_independent_variables(),
+      Assert(this->independent_variables.size()
+               DEAL_II_EQUALS this->n_independent_variables(),
              ExcDimensionMismatch(this->independent_variables.size(),
                                   this->n_independent_variables()));
 
@@ -3857,7 +3863,8 @@ namespace Differentiation
         {
           const unsigned int index = index_set[i];
           Assert(index < this->n_independent_variables(), ExcInternalError());
-          Assert(this->registered_independent_variable_values[index] == true,
+          Assert(this->registered_independent_variable_values
+                   [index] DEAL_II_EQUALS true,
                  ExcInternalError());
           internal::get_tensor_entry(out, i) =
             this->independent_variables[index];
@@ -3893,7 +3900,7 @@ namespace Differentiation
       // gradient values
       const std::vector<unsigned int> row_index_set(
         internal::extract_field_component_indices<dim>(extractor_row));
-      Assert(out.n_independent_components == row_index_set.size(),
+      Assert(out.n_independent_components DEAL_II_EQUALS row_index_set.size(),
              ExcMessage("Not all tensor components have been extracted!"));
       for (unsigned int r = 0; r < row_index_set.size(); ++r)
         internal::set_tensor_entry(out, r, gradient[row_index_set[r]]);
@@ -3984,8 +3991,8 @@ namespace Differentiation
         internal::extract_field_component_indices<dim>(extractor));
       for (unsigned int i = 0; i < index_set.size(); ++i)
         {
-          Assert(this->registered_marked_dependent_variables[index_set[i]] ==
-                   false,
+          Assert(this->registered_marked_dependent_variables
+                   [index_set[i]] DEAL_II_EQUALS false,
                  ExcMessage("Overlapping indices for dependent variables."));
           HelperBase<ADNumberTypeCode, ScalarType>::register_dependent_variable(
             index_set[i], internal::get_tensor_entry(funcs, i));
@@ -4015,7 +4022,7 @@ namespace Differentiation
       // gradient values
       const std::vector<unsigned int> row_index_set(
         internal::extract_field_component_indices<dim>(extractor_row));
-      Assert(out.n_independent_components == row_index_set.size(),
+      Assert(out.n_independent_components DEAL_II_EQUALS row_index_set.size(),
              ExcMessage("Not all tensor components have been extracted!"));
       for (unsigned int r = 0; r < row_index_set.size(); ++r)
         internal::set_tensor_entry(out, r, values[row_index_set[r]]);
@@ -4097,6 +4104,7 @@ namespace Differentiation
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // defined(DEAL_II_WITH_ADOLC) || defined(DEAL_II_TRILINOS_WITH_SACADO)
+#endif // defined(DEAL_II_WITH_ADOLC) DEAL_II_OR
+       // defined(DEAL_II_TRILINOS_WITH_SACADO)
 
 #endif // dealii_differentiation_ad_ad_helpers_h

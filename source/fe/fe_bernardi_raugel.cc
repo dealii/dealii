@@ -49,8 +49,9 @@ FE_BernardiRaugel<dim>::FE_BernardiRaugel(const unsigned int p)
                                    p),
                                  std::vector<bool>(dim, true)))
 {
-  Assert(dim == 2 || dim == 3, ExcImpossibleInDim(dim));
-  Assert(p == 1, ExcMessage("Only BR1 elements are available"));
+  Assert(dim DEAL_II_EQUALS 2 DEAL_II_OR dim DEAL_II_EQUALS 3,
+         ExcImpossibleInDim(dim));
+  Assert(p DEAL_II_EQUALS 1, ExcMessage("Only BR1 elements are available"));
 
   // const unsigned int n_dofs = this->n_dofs_per_cell();
 
@@ -93,11 +94,12 @@ FE_BernardiRaugel<dim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &support_point_values,
   std::vector<double> &              nodal_values) const
 {
-  Assert(support_point_values.size() == this->generalized_support_points.size(),
+  Assert(support_point_values.size()
+           DEAL_II_EQUALS this->generalized_support_points.size(),
          ExcDimensionMismatch(support_point_values.size(),
                               this->generalized_support_points.size()));
   AssertDimension(support_point_values[0].size(), dim);
-  Assert(nodal_values.size() == this->n_dofs_per_cell(),
+  Assert(nodal_values.size() DEAL_II_EQUALS this->n_dofs_per_cell(),
          ExcDimensionMismatch(nodal_values.size(), this->n_dofs_per_cell()));
 
   std::vector<Tensor<1, dim>> normals;
@@ -166,7 +168,7 @@ FE_BernardiRaugel<dim>::initialize_support_points()
           Point<dim> p;
           p[0] = 0.5;
           p[1] = 0.5;
-          if (dim == 3)
+          if (dim DEAL_II_EQUALS 3)
             p[2] = 0.5;
           p[i] = j;
 

@@ -58,8 +58,8 @@ SparseVanka<number>::SparseVanka(const SparseMatrix<number> &M,
   , _m(M.m())
   , _n(M.n())
 {
-  Assert(M.m() == M.n(), ExcNotQuadratic());
-  Assert(M.m() == selected->size(),
+  Assert(M.m() DEAL_II_EQUALS M.n(), ExcNotQuadratic());
+  Assert(M.m() DEAL_II_EQUALS selected->size(),
          ExcDimensionMismatch(M.m(), selected->size()));
 
   compute_inverses();
@@ -92,8 +92,8 @@ SparseVanka<number>::initialize(const SparseMatrix<number> &M,
   _m = M.m();
   _n = M.n();
 
-  Assert(M.m() == M.n(), ExcNotQuadratic());
-  Assert(M.m() == selected->size(),
+  Assert(M.m() DEAL_II_EQUALS M.n(), ExcNotQuadratic());
+  Assert(M.m() DEAL_II_EQUALS selected->size(),
          ExcDimensionMismatch(M.m(), selected->size()));
 
   compute_inverses();
@@ -139,11 +139,12 @@ SparseVanka<number>::compute_inverses()
   unsigned int task_n = 0;
   blocking[0].first   = 0;
 
-  for (size_type i = 0; (i < matrix->m()) && (task_n + 1 < n_tasks); ++i)
+  for (size_type i = 0; (i < matrix->m()) DEAL_II_AND(task_n + 1 < n_tasks);
+       ++i)
     {
-      if ((*selected)[i] == true)
+      if ((*selected)[i] DEAL_II_EQUALS true)
         ++c;
-      if (c == n_inverses_per_task)
+      if (c DEAL_II_EQUALS n_inverses_per_task)
         {
           blocking[task_n].second    = i;
           blocking[task_n + 1].first = i;
@@ -178,7 +179,7 @@ SparseVanka<number>::compute_inverses(const size_type begin,
   // traverse all rows of the matrix
   // which are selected
   for (size_type row = begin; row < end; ++row)
-    if ((*selected)[row] == true)
+    if ((*selected)[row] DEAL_II_EQUALS true)
       compute_inverse(row, local_indices);
 }
 
@@ -240,9 +241,9 @@ SparseVanka<number>::apply_preconditioner(
   const Vector<number2> &        src,
   const std::vector<bool> *const dof_mask) const
 {
-  Assert(dst.size() == src.size(),
+  Assert(dst.size() DEAL_II_EQUALS src.size(),
          ExcDimensionMismatch(dst.size(), src.size()));
-  Assert(dst.size() == matrix->m(),
+  Assert(dst.size() DEAL_II_EQUALS matrix->m(),
          ExcDimensionMismatch(dst.size(), src.size()));
 
   // first define an alias to the sparsity
@@ -275,8 +276,9 @@ SparseVanka<number>::apply_preconditioner(
   // which are selected
   const size_type n = matrix->m();
   for (size_type row = 0; row < n; ++row)
-    if (((*selected)[row] == true) &&
-        ((range_is_restricted == false) || ((*dof_mask)[row] == true)))
+    if (((*selected)[row] DEAL_II_EQUALS true)DEAL_II_AND(
+          (range_is_restricted DEAL_II_EQUALS false)DEAL_II_OR(
+            (*dof_mask)[row] DEAL_II_EQUALS true)))
       {
         const size_type row_length = structure.row_length(row);
 
@@ -339,10 +341,10 @@ SparseVanka<number>::apply_preconditioner(
                 //
                 // note that if so, we already
                 // have copied the entry above
-                if (js == local_index.end())
+                if (js DEAL_II_EQUALS local_index.end())
                   {
-                    if (!range_is_restricted ||
-                        ((*dof_mask)[p->column()] == true))
+                    if (!range_is_restricted DEAL_II_OR(
+                          (*dof_mask)[p->column()] DEAL_II_EQUALS true))
                       b(i) -= p->value() * dst(p->column());
                   }
               }
@@ -360,7 +362,8 @@ SparseVanka<number>::apply_preconditioner(
             const size_type irow = is->first;
             const size_type i    = is->second;
 
-            if (!range_is_restricted || ((*dof_mask)[irow] == true))
+            if (!range_is_restricted DEAL_II_OR(
+                  (*dof_mask)[irow] DEAL_II_EQUALS true))
               dst(irow) = x(i);
             // do nothing if not in
             // the range
@@ -467,11 +470,11 @@ SparseBlockVanka<number>::compute_dof_masks(
     unsigned int block = 0;
     intervals[0].first = 0;
 
-    for (size_type i = 0; (i < M.m()) && (block + 1 < n_blocks); ++i)
+    for (size_type i = 0; (i < M.m()) DEAL_II_AND(block + 1 < n_blocks); ++i)
       {
-        if (selected[i] == true)
+        if (selected[i] DEAL_II_EQUALS true)
           ++c;
-        if (c == n_inverses_per_block)
+        if (c DEAL_II_EQUALS n_inverses_per_block)
           {
             intervals[block].second    = i;
             intervals[block + 1].first = i;
@@ -524,7 +527,7 @@ SparseBlockVanka<number>::compute_dof_masks(
           const SparsityPattern &structure = M.get_sparsity_pattern();
 
           for (size_type row = 0; row < M.m(); ++row)
-            if (selected[row] == true)
+            if (selected[row] DEAL_II_EQUALS true)
               {
                 // first find out to
                 // which block the
@@ -558,7 +561,7 @@ SparseBlockVanka<number>::compute_dof_masks(
           // to the block we put it
           // into in the first place
           for (size_type row = 0; row < M.m(); ++row)
-            if (selected[row] == true)
+            if (selected[row] DEAL_II_EQUALS true)
               {
                 unsigned int block_number = 0;
                 while (row >= intervals[block_number].second)

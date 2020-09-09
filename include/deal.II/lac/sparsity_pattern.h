@@ -202,8 +202,7 @@ namespace SparsityPatternIterators
     /**
      * Comparison. True, if both iterators point to the same matrix position.
      */
-    bool
-    operator==(const Accessor &) const;
+    bool operator DEAL_II_EQUALS(const Accessor &) const;
 
     /**
      * Comparison operator. Result is true if either the first row number is
@@ -395,7 +394,7 @@ public:
    * entries for each row is taken from the array @p row_lengths which
    * has to give this number of each row $i=1\ldots m$.
    *
-   * If <tt>m*n==0</tt> all memory is freed, resulting in a total
+   * If <tt>m*nDEAL_II_EQUALS 0</tt> all memory is freed, resulting in a total
    * reinitialization of the object. If it is nonzero, new memory is only
    * allocated if the new size extends the old one. This is done to save time
    * and to avoid fragmentation of the heap.
@@ -494,8 +493,7 @@ public:
   /**
    * Test for equality of two SparsityPatterns.
    */
-  bool
-  operator==(const SparsityPatternBase &) const;
+  bool operator DEAL_II_EQUALS(const SparsityPatternBase &) const;
 
   /**
    * Return whether the object is empty. It is empty if no memory is
@@ -585,7 +583,7 @@ public:
    * Access to column number field.  Return the column number of the
    * <tt>index</tt>th entry in <tt>row</tt>. Note that if diagonal elements
    * are optimized, the first element in each row is the diagonal element,
-   * i.e. <tt>column_number(row,0)==row</tt>.
+   * i.e. <tt>column_number(row,0)DEAL_II_EQUALS row</tt>.
    *
    * If the sparsity pattern is already compressed, then (except for the
    * diagonal element), the entries are sorted by columns, i.e.
@@ -838,13 +836,13 @@ protected:
  * SparseMatrix objects can store nonzero entries, are stored row-by-row.
  * Within each row, elements are generally stored left-to-right in increasing
  * column index order; the exception to this rule is that if the matrix is
- * square (n_rows() == n_columns()), then the diagonal entry is stored as the
- * first element in each row to make operations like applying a Jacobi or SSOR
- * preconditioner faster. As a consequence, if you traverse the elements of a
- * row of a SparsityPattern with the help of iterators into this object (using
- * SparsityPattern::begin and SparsityPattern::end) you will find that the
- * elements are not sorted by column index within each row whenever the matrix
- * is square (the first item will be the diagonal, followed by the other
+ * square (n_rows() DEAL_II_EQUALS  n_columns()), then the diagonal entry is
+ * stored as the first element in each row to make operations like applying a
+ * Jacobi or SSOR preconditioner faster. As a consequence, if you traverse the
+ * elements of a row of a SparsityPattern with the help of iterators into this
+ * object (using SparsityPattern::begin and SparsityPattern::end) you will find
+ * that the elements are not sorted by column index within each row whenever the
+ * matrix is square (the first item will be the diagonal, followed by the other
  * entries sorted by column index).
  *
  * @note While this class forms the basis upon which SparseMatrix objects base
@@ -1156,8 +1154,7 @@ public:
   /**
    * Test for equality of two SparsityPatterns.
    */
-  bool
-  operator==(const SparsityPattern &) const;
+  bool operator DEAL_II_EQUALS(const SparsityPattern &) const;
 
   /**
    * Return whether this object stores only those entries that have been added
@@ -1358,8 +1355,10 @@ namespace SparsityPatternIterators
   Accessor::is_valid_entry() const
   {
     Assert(container != nullptr, DummyAccessor());
-    return (linear_index < container->rowstart[container->rows] &&
-            container->colnums[linear_index] != SparsityPattern::invalid_entry);
+    return (linear_index <
+              container->rowstart[container->rows] DEAL_II_AND container
+                ->colnums[linear_index] !=
+            SparsityPattern::invalid_entry);
   }
 
 
@@ -1367,7 +1366,7 @@ namespace SparsityPatternIterators
   inline size_type
   Accessor::row() const
   {
-    Assert(is_valid_entry() == true, ExcInvalidIterator());
+    Assert(is_valid_entry() DEAL_II_EQUALS true, ExcInvalidIterator());
 
     const std::size_t *insert_point =
       std::upper_bound(container->rowstart.get(),
@@ -1381,7 +1380,7 @@ namespace SparsityPatternIterators
   inline size_type
   Accessor::column() const
   {
-    Assert(is_valid_entry() == true, ExcInvalidIterator());
+    Assert(is_valid_entry() DEAL_II_EQUALS true, ExcInvalidIterator());
 
     return (container->colnums[linear_index]);
   }
@@ -1391,7 +1390,7 @@ namespace SparsityPatternIterators
   inline size_type
   Accessor::index() const
   {
-    Assert(is_valid_entry() == true, ExcInvalidIterator());
+    Assert(is_valid_entry() DEAL_II_EQUALS true, ExcInvalidIterator());
 
     return linear_index - container->rowstart[row()];
   }
@@ -1401,17 +1400,18 @@ namespace SparsityPatternIterators
   inline size_type
   Accessor::global_index() const
   {
-    Assert(is_valid_entry() == true, ExcInvalidIterator());
+    Assert(is_valid_entry() DEAL_II_EQUALS true, ExcInvalidIterator());
 
     return linear_index;
   }
 
 
 
-  inline bool
-  Accessor::operator==(const Accessor &other) const
+  inline bool Accessor::operator DEAL_II_EQUALS(const Accessor &other) const
   {
-    return (container == other.container && linear_index == other.linear_index);
+    return (
+      container DEAL_II_EQUALS other
+        .container DEAL_II_AND linear_index DEAL_II_EQUALS other.linear_index);
   }
 
 
@@ -1421,7 +1421,7 @@ namespace SparsityPatternIterators
   {
     Assert(container != nullptr, DummyAccessor());
     Assert(other.container != nullptr, DummyAccessor());
-    Assert(container == other.container, ExcInternalError());
+    Assert(container DEAL_II_EQUALS other.container, ExcInternalError());
 
     return linear_index < other.linear_index;
   }
@@ -1522,7 +1522,7 @@ SparsityPatternBase::is_compressed() const
 inline bool
 SparsityPattern::stores_only_added_elements() const
 {
-  return (store_diagonal_first_in_row == false);
+  return (store_diagonal_first_in_row DEAL_II_EQUALS false);
 }
 
 
@@ -1553,7 +1553,7 @@ SparsityPatternBase::n_nonzero_elements() const
 {
   Assert(compressed, ExcNotCompressed());
 
-  if ((rowstart != nullptr) && (colnums != nullptr))
+  if ((rowstart != nullptr) DEAL_II_AND(colnums != nullptr))
     return rowstart[rows] - rowstart[0];
   else
     // the object is empty or has zero size
@@ -1617,14 +1617,15 @@ SparsityPattern::load(Archive &ar, const unsigned int)
 
 
 
-inline bool
-SparsityPatternBase::operator==(const SparsityPatternBase &sp2) const
+inline bool SparsityPatternBase::
+            operator DEAL_II_EQUALS(const SparsityPatternBase &sp2) const
 {
   // it isn't quite necessary to compare *all* member variables. by only
   // comparing the essential ones, we can say that two sparsity patterns are
   // equal even if one is compressed and the other is not (in which case some
   // of the member variables are not yet set correctly)
-  if (rows != sp2.rows || cols != sp2.cols || compressed != sp2.compressed)
+  if (rows != sp2.rows DEAL_II_OR cols != sp2.cols DEAL_II_OR compressed !=
+      sp2.compressed)
     return false;
 
   for (size_type i = 0; i < rows + 1; ++i)
@@ -1640,11 +1641,13 @@ SparsityPatternBase::operator==(const SparsityPatternBase &sp2) const
 
 
 
-inline bool
-SparsityPattern::operator==(const SparsityPattern &sp2) const
+inline bool SparsityPattern::
+            operator DEAL_II_EQUALS(const SparsityPattern &sp2) const
 {
-  return (static_cast<const SparsityPatternBase &>(*this) == sp2) &&
-         (store_diagonal_first_in_row == sp2.store_diagonal_first_in_row);
+  return (
+    static_cast<const SparsityPatternBase &>(*this)
+      DEAL_II_EQUALS sp2)DEAL_II_AND(store_diagonal_first_in_row DEAL_II_EQUALS
+                                                                 sp2.store_diagonal_first_in_row);
 }
 
 
@@ -1693,14 +1696,15 @@ SparsityPattern::copy_from(const size_type       n_rows,
                            const ForwardIterator begin,
                            const ForwardIterator end)
 {
-  Assert(static_cast<size_type>(std::distance(begin, end)) == n_rows,
+  Assert(static_cast<size_type>(std::distance(begin, end))
+           DEAL_II_EQUALS n_rows,
          ExcIteratorRange(std::distance(begin, end), n_rows));
 
   // first determine row lengths for each row. if the matrix is quadratic,
   // then we might have to add an additional entry for the diagonal, if that
   // is not yet present. as we have to call compress anyway later on, don't
   // bother to check whether that diagonal entry is in a certain row or not
-  const bool                is_square = (n_rows == n_cols);
+  const bool                is_square = (n_rows DEAL_II_EQUALS n_cols);
   std::vector<unsigned int> row_lengths;
   row_lengths.reserve(n_rows);
   for (ForwardIterator i = begin; i != end; ++i)
@@ -1726,7 +1730,7 @@ SparsityPattern::copy_from(const size_type       n_rows,
             internal::SparsityPatternTools::get_column_index_from_iterator(*j);
           AssertIndexRange(col, n_cols);
 
-          if ((col != row) || !is_square)
+          if ((col != row) DEAL_II_OR !is_square)
             *cols++ = col;
         }
     }
