@@ -3756,6 +3756,42 @@ namespace GridTools
 
 
   template <int dim, int spacedim>
+  std::vector<types::global_cell_index>
+  assign_boundary_ids(
+    Triangulation<dim, spacedim> &tria,
+    const std::vector<std::pair<types::boundary_id,
+                                std::function<bool(const Point<spacedim> &)>>>
+      &boundary_specifiers)
+  {
+    const std::size_t n_boundary = boundary_specifiers.size();
+    if (n_boundary == 0)
+      return {};
+
+    std::vector<types::global_cell_index> n_assigned_boundaries(n_boundary);
+    for (const auto &cell : tria.active_cell_iterators())
+      if (cell->is_locally_owned())
+        for (auto face : cell->face_iterators())
+          if (face->at_boundary())
+            {
+              const auto center = face->center();
+              for (std::size_t i = 0; i < n_boundary; ++i)
+                {
+                  const auto &predicate = boundary_specifiers[i].second;
+                  if (predicate(center))
+                    {
+                      const auto assigned_id = boundary_specifiers[i].first;
+                      face->set_boundary_id(assigned_id);
+                      ++n_assigned_boundaries[i];
+                      break;
+                    }
+                }
+            }
+    return n_assigned_boundaries;
+  }
+
+
+
+  template <int dim, int spacedim>
   std::pair<unsigned int, double>
   get_longest_direction(
     typename Triangulation<dim, spacedim>::active_cell_iterator cell)

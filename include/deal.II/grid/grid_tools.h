@@ -2806,6 +2806,35 @@ namespace GridTools
           return numbers::flat_manifold_id;
       },
     bool overwrite_only_flat_manifold_ids = true);
+
+  /**
+   * Assign a series of boundary ids to a triangulation based on a list of
+   * predicates.
+   * @param tria a triangulation object.
+   * @param boundary_specifiers describes which faces should be assigned to
+   *   specific boundary id values. It is a vector of pairs. The first
+   *   component is the desired boundary id for the faces. The second
+   *   component is the predicate that receives the coordinate of the face
+   *   center and decides whether that face is part of the boundary.
+   * @return a vector `V` where `V[i]` represents the number of faces that
+   *   matched the predicate
+   *   `boundary_specifiers[i].second(face->center()) == true` and have been
+   *   assigned the boundary id `boundary_specifiers[i].first`.
+   * @note In many cases, the return value is not needed and can be ignored,
+   *   but in some situations, it could extremely useful for error chacking,
+   *   debugging, and gathering statistics on the mesh faces.
+   * @note If a face matches more than one of the predicates, the earlier
+   *   predicate will determine the assigned boundary id.
+   * @post The size of the returned vector is the same as the size of
+   *   @boundary_specifiers.
+   */
+  template <int dim, int spacedim>
+  std::vector<types::global_cell_index>
+  assign_boundary_ids(
+    Triangulation<dim, spacedim> &tria,
+    const std::vector<std::pair<types::boundary_id,
+                                std::function<bool(const Point<spacedim> &)>>>
+      &boundary_specifiers);
   /*@}*/
 
   /**

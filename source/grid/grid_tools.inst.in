@@ -403,6 +403,13 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           types::manifold_id(const std::set<types::manifold_id> &)> &,
         bool);
 
+      template std::vector<types::global_cell_index>
+      assign_boundary_ids(
+        Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+        const std::vector<std::pair<
+          types::boundary_id,
+          std::function<bool(const Point<deal_II_space_dimension> &)>>> &);
+
       template void
       regularize_corner_cells(
         Triangulation<deal_II_dimension, deal_II_space_dimension> &,
