@@ -96,6 +96,15 @@ GridIn<dim, spacedim>::GridIn()
 {}
 
 
+
+template <int dim, int spacedim>
+GridIn<dim, spacedim>::GridIn(Triangulation<dim, spacedim> &t)
+  : tria(&t, typeid(*this).name())
+  , default_format(ucd)
+{}
+
+
+
 template <int dim, int spacedim>
 void
 GridIn<dim, spacedim>::attach_triangulation(Triangulation<dim, spacedim> &t)
