@@ -3036,7 +3036,6 @@ GridIn<dim, spacedim>::read(const std::string &filename, Format format)
   else
     name = search.find(filename, default_suffix(format));
 
-  std::ifstream in(name.c_str());
 
   if (format == Default)
     {
@@ -3049,7 +3048,16 @@ GridIn<dim, spacedim>::read(const std::string &filename, Format format)
           format          = parse_format(ext);
         }
     }
-  read(in, format);
+
+  if (format == assimp)
+    {
+      read_assimp(name);
+    }
+  else
+    {
+      std::ifstream in(name.c_str());
+      read(in, format);
+    }
 }
 
 
