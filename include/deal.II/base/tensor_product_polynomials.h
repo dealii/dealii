@@ -665,8 +665,7 @@ Tensor<order, 0>
 TensorProductPolynomials<0, Polynomials::Polynomial<double>>::
   compute_derivative(const unsigned int, const Point<0> &) const
 {
-  constexpr int dim = 0;
-  AssertThrow(dim > 0, ExcNotImplemented());
+  AssertThrow(false, ExcNotImplemented());
 
   return {};
 }
@@ -843,8 +842,7 @@ Tensor<order, 0>
 AnisotropicPolynomials<0>::compute_derivative(const unsigned int,
                                               const Point<0> &) const
 {
-  constexpr int dim = 0;
-  AssertThrow(dim > 0, ExcNotImplemented());
+  AssertThrow(false, ExcNotImplemented());
 
   return {};
 }
