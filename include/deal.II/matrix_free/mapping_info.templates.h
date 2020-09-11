@@ -2126,13 +2126,9 @@ namespace internal
 
               // now let the matrix-free evaluators provide us with the
               // data on faces
-              FEFaceEvaluationSelector<dim,
-                                       -1,
-                                       0,
-                                       dim,
-                                       double,
-                                       VectorizedDouble>::
-                evaluate(shape_info,
+              FEFaceEvaluationSelector<dim, -1, 0, double, VectorizedDouble>::
+                evaluate(dim,
+                         shape_info,
                          cell_points.data(),
                          face_quads.data(),
                          face_grads.data(),
@@ -2250,10 +2246,10 @@ namespace internal
                   FEFaceEvaluationSelector<dim,
                                            -1,
                                            0,
-                                           dim,
                                            Number,
                                            VectorizedDouble>::
-                    evaluate(shape_info,
+                    evaluate(dim,
+                             shape_info,
                              cell_points.data(),
                              face_quads.data(),
                              face_grads.data(),
