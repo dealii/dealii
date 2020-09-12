@@ -2360,9 +2360,9 @@ CellAccessor<dim, spacedim>::neighbor_of_neighbor_internal(
 template <int dim, int spacedim>
 unsigned int
 CellAccessor<dim, spacedim>::neighbor_of_neighbor(
-  const unsigned int neighbor) const
+  const unsigned int face_no) const
 {
-  const unsigned int n2 = neighbor_of_neighbor_internal(neighbor);
+  const unsigned int n2 = neighbor_of_neighbor_internal(face_no);
   Assert(n2 != numbers::invalid_unsigned_int,
          TriaAccessorExceptions::ExcNeighborIsCoarser());
 
@@ -2374,9 +2374,9 @@ CellAccessor<dim, spacedim>::neighbor_of_neighbor(
 template <int dim, int spacedim>
 bool
 CellAccessor<dim, spacedim>::neighbor_is_coarser(
-  const unsigned int neighbor) const
+  const unsigned int face_no) const
 {
-  return neighbor_of_neighbor_internal(neighbor) ==
+  return neighbor_of_neighbor_internal(face_no) ==
          numbers::invalid_unsigned_int;
 }
 

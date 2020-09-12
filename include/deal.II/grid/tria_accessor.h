@@ -2924,9 +2924,12 @@ public:
                             const unsigned int subface_no) const;
 
   /**
-   * Return a pointer to the @p ith neighbor.  If the neighbor does not exist,
+   * Return an iterator to the neighboring cell on the other side of the face
+   * with number @p face_no. If the neighbor does not exist,
    * i.e., if the @p ith face of the current object is at the boundary, then
    * an invalid iterator is returned.
+   *
+   * Consequently, the index @p face_no must be less than n_faces().
    *
    * The neighbor of a cell has at most the same level as this cell. For
    * example, consider the following situation:
@@ -2940,40 +2943,46 @@ public:
    *
    * On the other hand, if you were at the top right cell of the four small
    * cells at the top left, and you asked for the right neighbor (which is
-   * associated with index <code>i=1</code>), then you would get the large
+   * associated with index <code>face_no=1</code>), then you would get the large
    * cell at the top right which in this case has a lower refinement level and
    * no children of its own.
    */
   TriaIterator<CellAccessor<dim, spacedim>>
-  neighbor(const unsigned int i) const;
+  neighbor(const unsigned int face_no) const;
 
   /**
-   * Return the index of the @p ith neighbor.  If the neighbor does not exist,
-   * its index is -1.
+   * Return the cell index of the neighboring cell on the other side of the face
+   * with index @p face_no. If the neighbor does not exist, this function returns -1.
+   *
+   * This function is equivalent to <tt>cell->neighbor(face_no)->index()</tt>.
+   * See neighbor() for more details.
    */
   int
-  neighbor_index(const unsigned int i) const;
+  neighbor_index(const unsigned int face_no) const;
 
   /**
-   * Return the level of the @p ith neighbor.  If the neighbor does not exist,
-   * its level is -1.
+   * Return the level of the neighboring cell on the other side of the face with
+   * number @p face_no. If the neighbor does not exist, this function returns -1.
+   *
+   * This function is equivalent to <tt>cell->neighbor(face_no)->level()</tt>.
+   * See neighbor() for more details.
    */
   int
-  neighbor_level(const unsigned int i) const;
+  neighbor_level(const unsigned int face_no) const;
 
   /**
    * Return the how-many'th neighbor this cell is of
-   * <tt>cell->neighbor(neighbor)</tt>, i.e. return the @p face_no such that
-   * <tt>cell->neighbor(neighbor)->neighbor(face_no)==cell</tt>. This function
-   * is the right one if you want to know how to get back from a neighbor to
-   * the present cell.
+   * <tt>cell->neighbor(face_no)</tt>, i.e. return the @p other_face_no such that
+   * <tt>cell->neighbor(face_no)->neighbor(other_face_no)==cell</tt>. This
+   * function is the right one if you want to know how to get back from a
+   * neighbor to the present cell.
    *
    * Note that this operation is only useful if the neighbor is not coarser
    * than the present cell. If the neighbor is coarser this function throws an
    * exception. Use the @p neighbor_of_coarser_neighbor function in that case.
    */
   unsigned int
-  neighbor_of_neighbor(const unsigned int neighbor) const;
+  neighbor_of_neighbor(const unsigned int face_no) const;
 
   /**
    * Return, whether the neighbor is coarser then the present cell. This is
@@ -2986,7 +2995,7 @@ public:
    * the finer face is either a child or a grandchild of the coarser face.
    */
   bool
-  neighbor_is_coarser(const unsigned int neighbor) const;
+  neighbor_is_coarser(const unsigned int face_no) const;
 
   /**
    * This function is a generalization of the @p neighbor_of_neighbor function
