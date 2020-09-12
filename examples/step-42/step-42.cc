@@ -919,15 +919,8 @@ namespace Step42
     // @endcode
     // In other words, the boundary indicators of the sides of the cube are 8.
     // The boundary indicator of the bottom is 6 and the top has indicator 1.
-    // We set these by looping over all cells of all faces and looking at
-    // coordinate values of the cell center, and will make use of these
-    // indicators later when evaluating which boundary will carry Dirichlet
-    // boundary conditions or will be subject to potential contact.
-    // (In the current case, the mesh contains only a single cell, and all of
-    // its faces are on the boundary, so both the loop over all cells and the
-    // query whether a face is on the boundary are, strictly speaking,
-    // unnecessary; we retain them simply out of habit: this kind of code can
-    // be found in many programs in essentially this form.)
+    // We set these by calling GridTools::assign_boundary_ids() similar to its
+    // usage in step-18.
     else
       {
         const Point<dim> p1(0, 0, 0);
@@ -935,20 +928,18 @@ namespace Step42
 
         GridGenerator::hyper_rectangle(triangulation, p1, p2);
 
-        for (const auto &cell : triangulation.active_cell_iterators())
-          for (const auto &face : cell->face_iterators())
-            if (face->at_boundary())
-              {
-                if (std::fabs(face->center()[2] - p2[2]) < 1e-12)
-                  face->set_boundary_id(1);
-                if (std::fabs(face->center()[0] - p1[0]) < 1e-12 ||
-                    std::fabs(face->center()[0] - p2[0]) < 1e-12 ||
-                    std::fabs(face->center()[1] - p1[1]) < 1e-12 ||
-                    std::fabs(face->center()[1] - p2[1]) < 1e-12)
-                  face->set_boundary_id(8);
-                if (std::fabs(face->center()[2] - p1[2]) < 1e-12)
-                  face->set_boundary_id(6);
-              }
+        const double tol = 1e-12;
+        GridTools::assign_boundary_ids(
+          triangulation,
+          {{1, [&](const auto &p) { return std::fabs(p[2] - p2[2]) < tol; }},
+           {8,
+            [&](const auto &p) {
+              return (std::fabs(p[0] - p1[0]) < tol ||
+                      std::fabs(p[0] - p2[0]) < tol ||
+                      std::fabs(p[1] - p1[1]) < tol ||
+                      std::fabs(p[1] - p2[1]) < tol);
+            }},
+           {6, [&](const auto &p) { return std::fabs(p[2] - p1[2]) < tol; }}});
       }
 
     triangulation.refine_global(n_initial_global_refinements);

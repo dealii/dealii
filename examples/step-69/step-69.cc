@@ -59,6 +59,7 @@
 #include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
@@ -637,25 +638,13 @@ namespace Step69
           }
       }
 
-    for (const auto &cell : triangulation.active_cell_iterators())
-      {
-        for (const auto f : cell->face_indices())
-          {
-            const auto face = cell->face(f);
-
-            if (face->at_boundary())
-              {
-                const auto center = face->center();
-
-                if (center[0] > length - disk_position - 1.e-6)
-                  face->set_boundary_id(Boundaries::do_nothing);
-                else if (center[0] < -disk_position + 1.e-6)
-                  face->set_boundary_id(Boundaries::dirichlet);
-                else
-                  face->set_boundary_id(Boundaries::free_slip);
-              }
-          }
-      }
+    GridTools::assign_boundary_ids(
+      triangulation,
+      {{Boundaries::do_nothing,
+        [&](const auto &p) { return p[0] > length - disk_position - 1.e-6; }},
+       {Boundaries::dirichlet,
+        [&](const auto &p) { return p[0] < -disk_position + 1.e-6; }},
+       {Boundaries::free_slip, [](const auto &) { return true; }}});
 
     triangulation.refine_global(refinement);
   }

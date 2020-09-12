@@ -29,6 +29,7 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
@@ -659,15 +660,10 @@ namespace Step52
     GridGenerator::hyper_cube(triangulation, 0., 5.);
     triangulation.refine_global(4);
 
-    for (const auto &cell : triangulation.active_cell_iterators())
-      for (const auto &face : cell->face_iterators())
-        if (face->at_boundary())
-          {
-            if ((face->center()[0] == 0.) || (face->center()[0] == 5.))
-              face->set_boundary_id(1);
-            else
-              face->set_boundary_id(0);
-          }
+    GridTools::assign_boundary_ids(triangulation, {{1, [](const auto &p) {
+                                                      return p[0] == 0. ||
+                                                             p[0] == 5.;
+                                                    }}});
 
     // Next, we set up the linear systems and fill them with content so that
     // they can be used throughout the time stepping process:
