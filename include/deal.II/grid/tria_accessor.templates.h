@@ -3230,11 +3230,12 @@ CellAccessor<dim, spacedim>::face_index(const unsigned int i) const
 
 template <int dim, int spacedim>
 inline int
-CellAccessor<dim, spacedim>::neighbor_index(const unsigned int i) const
+CellAccessor<dim, spacedim>::neighbor_index(const unsigned int face_no) const
 {
-  AssertIndexRange(i, this->n_faces());
+  AssertIndexRange(face_no, this->n_faces());
   return this->tria->levels[this->present_level]
-    ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell + i]
+    ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell +
+                face_no]
     .second;
 }
 
@@ -3242,11 +3243,12 @@ CellAccessor<dim, spacedim>::neighbor_index(const unsigned int i) const
 
 template <int dim, int spacedim>
 inline int
-CellAccessor<dim, spacedim>::neighbor_level(const unsigned int i) const
+CellAccessor<dim, spacedim>::neighbor_level(const unsigned int face_no) const
 {
-  AssertIndexRange(i, this->n_faces());
+  AssertIndexRange(face_no, this->n_faces());
   return this->tria->levels[this->present_level]
-    ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell + i]
+    ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell +
+                face_no]
     .first;
 }
 
@@ -3521,11 +3523,11 @@ CellAccessor<dim, spacedim>::clear_coarsen_flag() const
 
 template <int dim, int spacedim>
 inline TriaIterator<CellAccessor<dim, spacedim>>
-CellAccessor<dim, spacedim>::neighbor(const unsigned int i) const
+CellAccessor<dim, spacedim>::neighbor(const unsigned int face_no) const
 {
   TriaIterator<CellAccessor<dim, spacedim>> q(this->tria,
-                                              neighbor_level(i),
-                                              neighbor_index(i));
+                                              neighbor_level(face_no),
+                                              neighbor_index(face_no));
 
   Assert((q.state() == IteratorState::past_the_end) || q->used(),
          ExcInternalError());
