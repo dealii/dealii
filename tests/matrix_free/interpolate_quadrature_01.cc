@@ -117,9 +117,9 @@ test(const unsigned int n_refinements = 1)
 
               internal::FEFaceNormalEvaluationImpl<dim,
                                                    n_points - 1,
-                                                   1,
                                                    VectorizedArrayType>::
                 template interpolate_quadrature<true, false>(
+                  1,
                   matrix_free.get_shape_info(),
                   phi.begin_values(),
                   temp.data(),
