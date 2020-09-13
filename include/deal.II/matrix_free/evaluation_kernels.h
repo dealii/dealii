@@ -32,6 +32,11 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+// forward declaration
+template <int, typename, bool, typename>
+class FEEvaluationBaseData;
+
+
 
 namespace internal
 {
@@ -3165,12 +3170,14 @@ namespace internal
   template <int dim, int fe_degree, typename Number>
   struct CellwiseInverseMassMatrixImpl
   {
-    template <typename FEEvaluationType>
     static void
-    apply(const unsigned int      n_components,
-          const FEEvaluationType &fe_eval,
-          const Number *          in_array,
-          Number *                out_array)
+    apply(const unsigned int                  n_components,
+          const FEEvaluationBaseData<dim,
+                                     typename Number::value_type,
+                                     false,
+                                     Number> &fe_eval,
+          const Number *                      in_array,
+          Number *                            out_array)
     {
       constexpr unsigned int dofs_per_component =
         Utilities::pow(fe_degree + 1, dim);
