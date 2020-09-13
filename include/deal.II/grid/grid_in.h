@@ -342,6 +342,11 @@ public:
   GridIn();
 
   /**
+   * Constructor. Attach this triangulation to be fed with the grid data.
+   */
+  GridIn(Triangulation<dim, spacedim> &tria);
+
+  /**
    * Attach this triangulation to be fed with the grid data.
    */
   void
