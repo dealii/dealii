@@ -103,6 +103,29 @@ namespace Particles
                const unsigned int                  n_properties = 0);
 
     /**
+     * Copy the state of particle handler @p particle_handler into the
+     * current object. This will copy
+     * all particles and properties and leave this object
+     * as an identical copy of @p particle_handler. Existing
+     * particles in this object are deleted. Be aware that this
+     * does not copy functions that are connected to the signals of
+     * @p particle_handler, nor does it connect the current object's member
+     * functions to triangulation signals, which must be done by the caller
+     * if necessary, that is if the @p particle_handler had
+     * connected functions.
+     *
+     * This function is expensive as it has to duplicate all data
+     * in @p particle_handler, and insert it into this object,
+     * which may be a significant amount of data. However, it can
+     * be useful to save the state of a particle
+     * collection at a certain point in time and reset this
+     * state later under certain conditions, for example if
+     * a timestep has to be undone and repeated.
+     */
+    void
+    copy_from(const ParticleHandler<dim, spacedim> &particle_handler);
+
+    /**
      * Clear all particle related data.
      */
     void
