@@ -565,7 +565,8 @@ public:
   /**
    * Move constructor
    */
-  AffineConstraints(AffineConstraints &&affine_constraints) = default; // NOLINT
+  AffineConstraints(AffineConstraints &&affine_constraints) noexcept =
+    default; // NOLINT
 
   /**
    * Copy operator. Like for many other large objects, this operator
@@ -583,7 +584,8 @@ public:
    * Move assignment operator
    */
   AffineConstraints &
-  operator=(AffineConstraints &&affine_constraints) = default; // NOLINT
+  operator=(AffineConstraints &&affine_constraints) noexcept =
+    default; // NOLINT
 
   /**
    * Copy the given object to the current one.
