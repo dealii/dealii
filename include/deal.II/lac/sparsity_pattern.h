@@ -847,13 +847,20 @@ protected:
  * is square (the first item will be the diagonal, followed by the other
  * entries sorted by column index).
  *
- * @note While this class forms the basis upon which SparseMatrix objects base
+ * While this class forms the basis upon which SparseMatrix objects base
  * their storage format, and thus plays a central role in setting up linear
  * systems, it is rarely set up directly due to the way it stores its
  * information. Rather, one typically goes through an intermediate format
  * first, see for example the step-2 tutorial program as well as the
  * documentation module
  * @ref Sparsity.
+ *
+ * You can iterate over entries in the pattern using begin(), end(),
+ * begin(row), and end(row). These functions return an iterator of type
+ * SparsityPatternIterators::Iterator. When dereferencing an iterator @p it,
+ * you have access to the member functions in
+ * SparsityPatternIterators::Accessor, like <tt>it->column()</tt> and
+ * <tt>it->row()</tt>.
  */
 class SparsityPattern : public SparsityPatternBase
 {
