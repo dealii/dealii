@@ -39,11 +39,24 @@ namespace MatrixFreeTools
   categorize_by_boundary_ids(
     const Triangulation<dim> &tria,
     AdditionalData &          additional_data,
-    const unsigned int        level = numbers::invalid_unsigned_int)
-  {
-    bool is_mg = (level != numbers::invalid_unsigned_int);
+    const unsigned int        level = numbers::invalid_unsigned_int);
 
-    // ... create list for the category of each cell
+
+
+  // implementations
+
+
+
+  template <int dim, typename AdditionalData>
+  void
+  categorize_by_boundary_ids(const Triangulation<dim> &tria,
+                             AdditionalData &          additional_data,
+                             const unsigned int        level)
+  {
+    // ... determine if we are on an active or a multigrid level
+    const bool is_mg = (level != numbers::invalid_unsigned_int);
+
+    // ... create empty list for the category of each cell
     if (is_mg)
       additional_data.cell_vectorization_category.resize(
         std::distance(tria.begin(level), tria.end(level)));
@@ -51,28 +64,30 @@ namespace MatrixFreeTools
       additional_data.cell_vectorization_category.resize(tria.n_active_cells());
 
     // ... set up scaling factor
-    std::vector<unsigned int> factors(dim * 2);
+    std::vector<unsigned int> factors(GeometryInfo<dim>::faces_per_cell);
 
-    const auto bids = tria.get_boundary_ids();
-
-    std::map<unsigned int, unsigned int> bid_map;
-    for (const auto id : tria.get_boundary_ids())
-      bid_map[id] = bid_map.size() + 1;
+    auto bids = tria.get_boundary_ids();
+    std::sort(bids.begin(), bids.end());
 
     {
       unsigned int n_bids = bids.size() + 1;
       int          offset = 1;
-      for (unsigned int i = 0; i < dim * 2; i++, offset = offset * n_bids)
+      for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell;
+           i++, offset = offset * n_bids)
         factors[i] = offset;
     }
 
-    auto to_category = [&](auto &cell) {
+    const auto to_category = [&](const auto &cell) {
       unsigned int c_num = 0;
-      for (unsigned int i = 0; i < dim * 2; i++)
+      for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; i++)
         {
           auto &face = *cell->face(i);
-          if (face.at_boundary())
-            c_num += factors[i] * bid_map[face.boundary_id()];
+          if (face.at_boundary() && !cell->has_periodic_neighbor(i))
+            c_num +=
+              factors[i] * (1 + std::distance(bids.begin(),
+                                              std::find(bids.begin(),
+                                                        bids.end(),
+                                                        face.boundary_id())));
         }
       return c_num;
     };
