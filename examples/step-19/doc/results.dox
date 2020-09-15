@@ -270,7 +270,12 @@ are
 This corresponds to a simple forward-Euler time discretization -- a method of
 first order accuracy in the time step size $\Delta t$ that we know we should
 avoid because we can do better. Rather, one might want to consider a scheme such
-as the leapfrog scheme, or even better a Runge-Kutta integrator.
+as the
+[leapfrog scheme](https://en.wikipedia.org/wiki/Leapfrog_integration)
+or more generally
+[symplectic integrators](https://en.wikipedia.org/wiki/Symplectic_integrator)
+such as the
+[Verlet scheme](https://en.wikipedia.org/wiki/Verlet_integration).
 
 
 <h4> Parallelization </h4>

@@ -74,6 +74,17 @@ using namespace dealii;
 // @ref GlossBoundaryIndicator "boundary indicators"
 // for the various parts of the geometry, as well as the physical properties
 // of electrons and other specifics of the setup we use here.
+//
+// For the boundary indicators, let us start enumerating at some
+// random value 101. The principle here is to use numbers that are
+// *uncommon*. If there are pre-defined boundary indicators previously
+// set by the `GridGenerator` functions, they will likely be small
+// integers starting from zero, but not in this rather randomly chosen
+// range. Using numbers such as those below avoids the possibility for
+// conflicts, and also reduces the temptation to just spell these
+// numbers out in the program (because you will probably never
+// remember which is which, whereas you might have been tempted if
+// they had started at 0).
 namespace Step19
 {
   namespace BoundaryIds
@@ -172,7 +183,7 @@ namespace Step19
   // each particle has and that the Particles::ParticleHandler class
   // automatically and always makes sure are available; in particular,
   // these are the current location of a particle, the cell it is on,
-  // and a particle's ID.
+  // it's reference location within that cell, and the particle's ID.
   //
   // The only other variable of interest is `time`, an object of type
   // DiscreteTime. It keeps track of the current time we are in a

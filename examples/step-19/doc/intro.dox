@@ -25,7 +25,10 @@ this simply leads to a set of ordinary differential equations, for example
 if you want to track the positions of the planets in the solar system over
 time, then deal.II is clearly not your right tool. On the other hand, if
 this evolution is due to the interaction with the solution of partial differential
-equation, then deal.II has support for you.
+equation, or if having a mesh to determine which particles interact
+with others (such as in the
+[smoothed particle hydrodynamics (SMH)](https://en.wikipedia.org/wiki/Smoothed-particle_hydrodynamics)
+method), then deal.II has support for you.
 
 The case we will consider here is how electrically charged particles move through
 an electric field. As motivation, we will consider
