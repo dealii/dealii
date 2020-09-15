@@ -1399,7 +1399,7 @@ void LaplaceProblem<dim, degree>::estimate()
 
   const double global_error_estimate =
     std::sqrt(Utilities::MPI::sum(estimated_error_square_per_cell.l1_norm(),
-                                  MPI_COMM_WORLD));
+                                  mpi_communicator));
   pcout << "   Global error estimate:        " << global_error_estimate
         << std::endl;
 }
