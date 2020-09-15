@@ -1396,6 +1396,12 @@ void LaplaceProblem<dim, degree>::estimate()
                           MeshWorker::assemble_own_interior_faces_once,
                         /*boundary_worker=*/nullptr,
                         face_worker);
+
+  const double global_error_estimate =
+    std::sqrt(Utilities::MPI::sum(estimated_error_square_per_cell.l1_norm(),
+                                  MPI_COMM_WORLD));
+  pcout << "   Global error estimate:        " << global_error_estimate
+        << std::endl;
 }
 
 
