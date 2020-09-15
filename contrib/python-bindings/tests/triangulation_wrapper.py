@@ -356,10 +356,21 @@ class TestTriangulationWrapper(unittest.TestCase):
             else:
                 triangulation_2.shift([1., 0., 0.])
             triangulation = Triangulation(dim[0], dim[1])
-            triangulation.merge_triangulations(triangulation_1,
-                                               triangulation_2)
+            triangulation.merge_triangulations([triangulation_1,
+                                                triangulation_2])
             n_cells = triangulation.n_active_cells()
             self.assertEqual(n_cells, 2)
+
+    def test_replicate(self):
+        for dim in self.restricted_dim:
+            triangulation_in = self.build_hyper_cube_triangulation(dim)
+            triangulation_out = Triangulation(dim[0])
+            if (dim[0] == '2D'):
+                triangulation_out.replicate_triangulation(triangulation_in, [3, 2]);
+            else:
+                triangulation_out.replicate_triangulation(triangulation_in, [3, 2, 1]);
+            n_cells = triangulation_out.n_active_cells()
+            self.assertEqual(n_cells, 6)
 
     def test_flatten(self):
         for dim in self.dim:
