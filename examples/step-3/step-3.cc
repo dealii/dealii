@@ -451,7 +451,7 @@ void Step3::assemble_system()
           // be considered in the following programs).
           for (const unsigned int i : fe_values.dof_indices())
             cell_rhs(i) += (fe_values.shape_value(i, q_index) * // phi_i(x_q)
-                            1 *                                 // f(x_q)
+                            1. *                                // f(x_q)
                             fe_values.JxW(q_index));            // dx
         }
       // Now that we have the contribution of this cell, we have to transfer
