@@ -868,15 +868,30 @@ namespace Step7
                                         VectorTools::H1_seminorm);
 
     // Finally, we compute the maximum norm. Of course, we can't actually
-    // compute the true maximum, but only the maximum at the quadrature
-    // points. Since this depends quite sensitively on the quadrature rule
-    // being used, and since we would like to avoid false results due to
-    // super-convergence effects at some points, we use a special quadrature
-    // rule that is obtained by iterating the trapezoidal rule by the degree of
-    // the finite element times two plus one in each space direction.
-    // Note that the constructor of the QIterated class
-    // takes a one-dimensional quadrature rule and a number that tells it how
-    // often it shall use this rule in each space direction.
+    // compute the true maximum of the error over *all* points in the domain,
+    // but only the maximum over a finite set of evaluation points that, for
+    // convenience, we will still call "quadrature points" and represent by
+    // an object of type Quadrature even though we do not actually perform any
+    // integration.
+    //
+    // There is then the question of what points precisely we want to evaluate
+    // at. It turns out that the result we get depends quite sensitively on the
+    // "quadrature" points being used. There is also the issue of
+    // superconvergence: Finite element solutions are, on some meshes and for
+    // polynomial degrees $k\ge 2$, particularly accurate at the node points as
+    // well as at Gauss-Lobatto points, much more accurate than at randomly
+    // chosen points. (See
+    // @cite Li2019 and the discussion and references in Section 1.2 for more
+    // information on this.) In other words, if we are interested in finding
+    // the largest difference $u(\mathbf x)-u_h(\mathbf x)$, then we ought to
+    // look at points $\mathbf x$ that are specifically not of this "special"
+    // kind of points and we should specifically not use
+    // `QGauss(fe->degree+1)` to define where we evaluate. Rather, we use a
+    // special quadrature rule that is obtained by iterating the trapezoidal
+    // rule by the degree of the finite element times two plus one in each space
+    // direction. Note that the constructor of the QIterated class takes a
+    // one-dimensional quadrature rule and a number that tells it how often it
+    // shall repeat this rule in each space direction.
     //
     // Using this special quadrature rule, we can then try to find the maximal
     // error on each cell. Finally, we compute the global L infinity error
