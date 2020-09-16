@@ -64,11 +64,13 @@
 
 // Since the particles do not form a triangulation, they have their
 // own specific DataOut class which will enable us to write them
-// to commonly used parallel vtu format:
+// to commonly used parallel vtu format (or any number of other file formats):
 #include <deal.II/particles/data_out.h>
 
 #include <cmath>
 #include <iostream>
+
+
 
 namespace Step68
 {
@@ -82,10 +84,10 @@ namespace Step68
   //
   // The ParameterAcceptor paradigm requires all parameters to be writable by
   // the ParameterAcceptor methods. In order to avoid bugs that would be very
-  // difficult to track down (such as writing things like `time = 0` instead of
-  // `time == 0`), we declare all the parameters in an external class, which is
-  // initialized before the actual `ParticleTracking` class, and pass it to
-  // the main class as a `const` reference.
+  // difficult to track down (such as writing things like `if (time = 0)`
+  // instead of `if(time == 0)`), we declare all the parameters in an external
+  // class, which is initialized before the actual `ParticleTracking` class, and
+  // pass it to the main class as a `const` reference.
   //
   // The constructor of the class is responsible for the connection between the
   // members of this class and the corresponding entries in the
@@ -100,9 +102,9 @@ namespace Step68
     // This class consists largely of member variables that
     // describe the details of the particle tracking simulation and its
     // discretization. The following parameters are about where output should
-    // land, the spatial discretization of the velocity (the default is $Q_1$),
-    // the time step and the output frequency (how many time steps should
-    // elapse before we generate graphical output again):
+    // written to, the spatial discretization of the velocity (the default is
+    // $Q_1$), the time step and the output frequency (how many time steps
+    // should elapse before we generate graphical output again):
     std::string output_directory = "./";
 
     unsigned int velocity_degree       = 1;
@@ -118,6 +120,8 @@ namespace Step68
     unsigned int particle_insertion_refinement = 3;
   };
 
+
+
   // There remains the task of declaring what run-time parameters we can accept
   // in input files. Since we have a very limited number of parameters, all
   // parameters are declared in the same section.
@@ -125,31 +129,45 @@ namespace Step68
     : ParameterAcceptor("Particle Tracking Problem/")
   {
     add_parameter(
-      "Velocity degree", velocity_degree, "", this->prm, Patterns::Integer(1));
+      "Velocity degree", velocity_degree, "", prm, Patterns::Integer(1));
 
     add_parameter("Output frequency",
                   output_frequency,
-                  "Iteration frequency at which output results are written");
+                  "Iteration frequency at which output results are written",
+                  prm,
+                  Patterns::Integer(1));
 
     add_parameter("Repartition frequency",
                   repartition_frequency,
-                  "Iteration frequency at which the mesh is load balanced");
+                  "Iteration frequency at which the mesh is load balanced",
+                  prm,
+                  Patterns::Integer(1));
 
     add_parameter("Output directory", output_directory);
 
-    add_parameter("Time step", time_step);
+    add_parameter("Time step", time_step, "", prm, Patterns::Double());
 
-    add_parameter("Final time", final_time, "End time of the simulation");
+    add_parameter("Final time",
+                  final_time,
+                  "End time of the simulation",
+                  prm,
+                  Patterns::Double());
 
     add_parameter("Fluid refinement",
                   fluid_refinement,
-                  "Refinement level of the fluid domain");
+                  "Refinement level of the fluid domain",
+                  prm,
+                  Patterns::Integer(0));
 
     add_parameter(
       "Particle insertion refinement",
       particle_insertion_refinement,
-      "Refinement of the volumetric mesh used to insert the particles");
+      "Refinement of the volumetric mesh used to insert the particles",
+      prm,
+      Patterns::Integer(0));
   }
+
+
 
   // @sect3{Velocity profile}
 
@@ -163,18 +181,21 @@ namespace Step68
     Vortex()
       : Function<dim>(dim)
     {}
+
+
     virtual void vector_value(const Point<dim> &point,
                               Vector<double> &  values) const override;
   };
 
+
+  // The velocity profile for the Rayleigh-Kothe vertex is time-dependent.
+  // Consequently, the current time in the
+  // simulation (t) must be gathered from the Function object.
   template <int dim>
   void Vortex<dim>::vector_value(const Point<dim> &point,
                                  Vector<double> &  values) const
   {
     const double T = 4;
-    // The velocity profile for the Rayleigh-Kothe vertex is time-dependent.
-    // Consequently, the current time in the
-    // simulation (t) must be gathered from the Function object.
     const double t = this->get_time();
 
     const double px = numbers::PI * point(0);
@@ -189,6 +210,8 @@ namespace Step68
       }
   }
 
+
+
   // @sect3{The <code>ParticleTracking</code> class declaration}
 
   // We are now ready to introduce the main class of our tutorial program.
@@ -201,17 +224,17 @@ namespace Step68
     void run();
 
   private:
-    // The particles_generation function is responsible for the initial
-    // generation of the particles on top of the background grid
-    void particles_generation();
+    // This function is responsible for the initial
+    // generation of the particles on top of the background grid.
+    void generate_particles();
 
     // When the velocity profile is interpolated to the position of the
     // particles, it must first be stored using degrees of freedom.
     // Consequently, as is the case for other parallel case (e.g. step-40) we
-    // initialize the degrees of freedom on the background grid
+    // initialize the degrees of freedom on the background grid.
     void setup_background_dofs();
 
-    // In one of the test case, the function is mapped to the background grid
+    // In one of the test cases, the function is mapped to the background grid
     // and a finite element interpolation is used to calculate the velocity
     // at the particle location. This function calculates the value of the
     // function at the support point of the triangulation.
@@ -220,16 +243,17 @@ namespace Step68
     // The next two functions are responsible for carrying out step of explicit
     // Euler time integration for the cases where the velocity field is
     // interpolated at the positions of the particles or calculated
-    // analytically, respectively
-    void euler_step_interpolated(double dt);
-    void euler_step_analytical(double dt);
+    // analytically, respectively.
+    void euler_step_interpolated(const double dt);
+    void euler_step_analytical(const double dt);
 
-    // The cell_weight() function indicates to the triangulation how much
+    // The `cell_weight()` function indicates to the triangulation how much
     // computational work is expected to happen on this cell, and consequently
     // how the domain needs to be partitioned so that every MPI rank receives a
     // roughly equal amount of work (potentially not an equal number of cells).
     // While the function is called from the outside, it is connected to the
-    // corresponding signal from inside this class, therefore it can be private.
+    // corresponding signal from inside this class, therefore it can be
+    // `private`.
     unsigned int cell_weight(
       const typename parallel::distributed::Triangulation<dim>::cell_iterator
         &cell,
@@ -239,12 +263,12 @@ namespace Step68
     // The following two functions are responsible for outputting the simulation
     // results for the particles and for the velocity profile on the background
     // mesh, respectively.
-    void output_particles(unsigned int it);
-    void output_background(unsigned int it);
+    void output_particles(const unsigned int it);
+    void output_background(const unsigned int it);
 
     // The private members of this class are similar to other parallel deal.II
-    // examples. The parameters are stored as a const member. It is important
-    // to note that we keep the Vortex class as a member since its time
+    // examples. The parameters are stored as a `const` member. It is important
+    // to note that we keep the `Vortex` class as a member since its time
     // must be modified as the simulation proceeds.
 
     const ParticleTrackingParameters &par;
@@ -266,13 +290,15 @@ namespace Step68
     bool interpolated_velocity;
   };
 
+
+
   // @sect3{The <code>PatricleTracking</code> class implementation}
 
   // @sect4{Constructor}
 
   // The constructors and destructors are rather trivial. They are very similar
   // to what is done in step-40. We set the processors we want to work on
-  // to all machines available (MPI_COMM_WORLD) and
+  // to all machines available (`MPI_COMM_WORLD`) and
   // initialize the <code>pcout</code> variable to only allow processor zero
   // to output anything to the standard output.
 
@@ -285,11 +311,12 @@ namespace Step68
     , fluid_dh(background_triangulation)
     , fluid_fe(FE_Q<dim>(par.velocity_degree), dim)
     , mapping(par.velocity_degree)
-    , pcout(
-        {std::cout, Utilities::MPI::this_mpi_process(mpi_communicator) == 0})
+    , pcout(std::cout, Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
     , interpolated_velocity(interpolated_velocity)
 
   {}
+
+
 
   // @sect4{Cell weight}
 
@@ -303,7 +330,7 @@ namespace Step68
   // connected to the cell_weight() signal inside the triangulation, and will be
   // called once per cell, whenever the triangulation repartitions the domain
   // between ranks (the connection is created inside the
-  // particles_generation() function of this class).
+  // generate_particles() function of this class).
   template <int dim>
   unsigned int ParticleTracking<dim>::cell_weight(
     const typename parallel::distributed::Triangulation<dim>::cell_iterator
@@ -327,7 +354,7 @@ namespace Step68
     const unsigned int particle_weight = 10000;
 
     // This example does not use adaptive refinement, therefore every cell
-    // should have the status CELL_PERSIST. However this function can also
+    // should have the status `CELL_PERSIST`. However this function can also
     // be used to distribute load during refinement, therefore we consider
     // refined or coarsened cells as well.
     if (status == parallel::distributed::Triangulation<dim>::CELL_PERSIST ||
@@ -341,8 +368,7 @@ namespace Step68
       {
         unsigned int n_particles_in_cell = 0;
 
-        for (unsigned int child_index = 0;
-             child_index < GeometryInfo<dim>::max_children_per_cell;
+        for (unsigned int child_index = 0; child_index < cell->n_children();
              ++child_index)
           n_particles_in_cell +=
             particle_handler.n_particles_in_cell(cell->child(child_index));
@@ -354,15 +380,17 @@ namespace Step68
     return 0;
   }
 
+
+
   // @sect4{Particles generation}
 
   // This function generates the tracer particles and the background
   // triangulation on which these particles evolve.
   template <int dim>
-  void ParticleTracking<dim>::particles_generation()
+  void ParticleTracking<dim>::generate_particles()
   {
-    // We create an hyper_cube triangulation which we globally define. This
-    // triangulation englobes the full trajectory of the particles.
+    // We create a hyper cube triangulation which we globally refine. This
+    // triangulation covers the full trajectory of the particles.
     GridGenerator::hyper_cube(background_triangulation, 0, 1);
     background_triangulation.refine_global(par.fluid_refinement);
 
@@ -370,9 +398,9 @@ namespace Step68
     // the algorithm needs to know three things:
     //
     // 1. How much weight to assign to each cell (how many particles are in
-    // there)
-    // 2. How to pack the particles before shipping data around
-    // 3. How to unpack the particles after repartitioning
+    // there);
+    // 2. How to pack the particles before shipping data around;
+    // 3. How to unpack the particles after repartitioning.
     //
     // We attach the correct functions to the signals inside
     // parallel::distributed::Triangulation. These signal will be called every
@@ -404,7 +432,7 @@ namespace Step68
 
     // We create a particle triangulation which is solely used to generate
     // the points which will be used to insert the particles. This
-    // triangulation is an hyper_shell which is off-set from the
+    // triangulation is a hyper shell which is offset from the
     // center of the simulation domain. This will be used to generate a
     // disk filled with particles which will allow an easy monitoring
     // of the motion due to the vortex.
@@ -412,9 +440,7 @@ namespace Step68
     center[0] = 0.5;
     center[1] = 0.75;
     if (dim == 3)
-      {
-        center[2] = 0.5;
-      }
+      center[2] = 0.5;
 
     const double outer_radius = 0.15;
     const double inner_radius = 0.01;
@@ -428,32 +454,23 @@ namespace Step68
 
     // We generate the necessary bounding boxes for the particles generator
     // These bounding boxes are required to quickly identify in which
-    // processors and which cell the inserted particle lies.
+    // process's subdomain the inserted particle lies, and which cell owns it.
     const auto my_bounding_box = GridTools::compute_mesh_predicate_bounding_box(
       background_triangulation, IteratorFilters::LocallyOwnedCell());
     const auto global_bounding_boxes =
       Utilities::MPI::all_gather(MPI_COMM_WORLD, my_bounding_box);
 
-    // The quadrature points particle generator generates particles only
-    // on locally owned active cells. We therefore count how many of those
-    // are present in the triangulation, as this will be required to
-    // initialize the properties.
-    unsigned int n_locally_owned_cells = 0;
-    for (const auto &cell : particle_triangulation.active_cell_iterators())
-      if (cell->is_locally_owned())
-        n_locally_owned_cells++;
-
     // We generate an empty vector of properties. We will attribute the
     // properties to the particles once they are generated.
-    std::vector<std::vector<double>> properties(n_locally_owned_cells,
-                                                std::vector<double>(dim + 1,
-                                                                    0.));
+    std::vector<std::vector<double>> properties(
+      particle_triangulation.n_locally_owned_active_cells(),
+      std::vector<double>(dim + 1, 0.));
 
     // We generate the particles at the position of a single
-    // points quadrature. Consequently, one particle will be generated
+    // point quadrature. Consequently, one particle will be generated
     // at the centroid of each cell.
     Particles::Generators::quadrature_points(particle_triangulation,
-                                             QGauss<dim>(1),
+                                             QMidpoint<dim>(),
                                              global_bounding_boxes,
                                              particle_handler,
                                              mapping,
@@ -463,17 +480,19 @@ namespace Step68
           << particle_handler.n_global_particles() << std::endl;
   }
 
+
+
   // @sect4{Background DOFs and interpolation}
 
-  // This function sets up the background degree of freedom used for the
+  // This function sets up the background degrees of freedom used for the
   // velocity interpolation and allocates the field vector where the entire
   // solution of the velocity field is stored.
   template <int dim>
   void ParticleTracking<dim>::setup_background_dofs()
   {
     fluid_dh.distribute_dofs(fluid_fe);
-    IndexSet locally_owned_dofs = fluid_dh.locally_owned_dofs();
-    IndexSet locally_relevant_dofs;
+    const IndexSet locally_owned_dofs = fluid_dh.locally_owned_dofs();
+    IndexSet       locally_relevant_dofs;
     DoFTools::extract_locally_relevant_dofs(fluid_dh, locally_relevant_dofs);
 
     field_owned.reinit(locally_owned_dofs, mpi_communicator);
@@ -482,9 +501,11 @@ namespace Step68
                           mpi_communicator);
   }
 
+
+
   // This function takes care of interpolating the
   // vortex velocity field to the field vector. This is achieved rather easily
-  // by using the <code>VectorTools::interpolate</code> function.
+  // by using the VectorTools::interpolate() function.
   template <int dim>
   void ParticleTracking<dim>::interpolate_function_to_field()
   {
@@ -494,24 +515,24 @@ namespace Step68
     field_relevant = field_owned;
   }
 
+
+
   // @sect4{Time integration of the trajectories}
 
   // We integrate the particle trajectories
   // using an analytically defined velocity field. This demonstrates a
   // relatively trivial usage of the particles.
   template <int dim>
-  void ParticleTracking<dim>::euler_step_analytical(double dt)
+  void ParticleTracking<dim>::euler_step_analytical(const double dt)
   {
     Vector<double> particle_velocity(dim);
 
     // Looping over all particles in the domain using a particle iterator
-    for (auto particle = particle_handler.begin();
-         particle != particle_handler.end();
-         ++particle)
+    for (auto &particle : particle_handler)
       {
         // We calculate the velocity of the particles using their current
         // location.
-        Point<dim> particle_location = particle->get_location();
+        Point<dim> particle_location = particle.get_location();
         velocity.vector_value(particle_location, particle_velocity);
 
         // This updates the position of the particles and sets the old position
@@ -519,55 +540,48 @@ namespace Step68
         for (int d = 0; d < dim; ++d)
           particle_location[d] += particle_velocity[d] * dt;
 
-        particle->set_location(particle_location);
+        particle.set_location(particle_location);
 
         // We store the processor id (a scalar) and the particle velocity (a
         // vector) in the particle properties. In this example, this is done
         // purely for visualization purposes.
-        ArrayView<double> properties = particle->get_properties();
+        ArrayView<double> properties = particle.get_properties();
         for (int d = 0; d < dim; ++d)
           properties[d] = particle_velocity[d];
         properties[dim] = Utilities::MPI::this_mpi_process(mpi_communicator);
       }
   }
 
-  // We integrate the particle trajectories by interpolating the value of the
-  // velocity field at the degrees of freedom to the position of the particles.
+
+
+  // In contrast to the previous function in this function we
+  // integrate the particle trajectories by interpolating the value of
+  // the velocity field at the degrees of freedom to the position of
+  // the particles.
   template <int dim>
-  void ParticleTracking<dim>::euler_step_interpolated(double dt)
+  void ParticleTracking<dim>::euler_step_interpolated(const double dt)
   {
-    std::vector<types::global_dof_index> dof_indices(fluid_fe.dofs_per_cell);
-    Vector<double> dof_data_per_cell(fluid_fe.dofs_per_cell);
+    Vector<double> local_dof_values(fluid_fe.dofs_per_cell);
 
     // We loop over all the local particles. Although this could be achieved
     // directly by looping over all the cells, this would force us
     // to loop over numerous cells which do not contain particles.
-    // Consequently, we loop over all the particles, but, we get the reference
+    // Rather, we loop over all the particles, but, we get the reference
     // of the cell in which the particle lies and then loop over all particles
     // within that cell. This enables us to gather the values of the velocity
-    // out of the field_relevant vector once and use them for all particles
-    // that lie within the cell. Once we are done with all particles on one
-    // cell, we advance the `particle` iterator to the particle past the end of
-    // the ones on the current cell (this is the last line of the `while` loop's
-    // body).
+    // out of the `field_relevant` vector once and use them for all particles
+    // that lie within the cell.
     auto particle = particle_handler.begin();
     while (particle != particle_handler.end())
       {
-        const auto &cell =
+        const auto cell =
           particle->get_surrounding_cell(background_triangulation);
-        const auto &dh_cell =
+        const auto dh_cell =
           typename DoFHandler<dim>::cell_iterator(*cell, &fluid_dh);
-        dh_cell->get_dof_indices(dof_indices);
 
-        // This gathers the velocity information in a local vector to prevent
-        // dynamically re-accessing everything when there are multiple particles
-        // in a cell.
-        for (unsigned int j = 0; j < fluid_fe.dofs_per_cell; ++j)
-          {
-            dof_data_per_cell[j] = field_relevant(dof_indices[j]);
-          }
+        dh_cell->get_dof_values(field_relevant, local_dof_values);
 
-        // This compute the velocity at the particle locations by evaluating
+        // Next, compute the velocity at the particle locations by evaluating
         // the finite element solution at the position of the particles.
         // This is essentially an optimized version of the particle advection
         // functionality in step 19, but instead of creating quadrature
@@ -575,10 +589,10 @@ namespace Step68
         // evaluation by hand, which is somewhat more efficient and only
         // matters for this tutorial, because the particle work is the
         // dominant cost of the whole program.
-        const auto pic = particle_handler.particles_in_cell(cell);
-        for (; particle != pic.end(); ++particle)
+        while (particle->get_surrounding_cell(background_triangulation) == cell)
           {
-            const auto &reference_location = particle->get_reference_location();
+            const Point<dim> reference_location =
+              particle->get_reference_location();
             Tensor<1, dim> particle_velocity;
             for (unsigned int j = 0; j < fluid_fe.dofs_per_cell; ++j)
               {
@@ -586,7 +600,7 @@ namespace Step68
 
                 particle_velocity[comp_j.first] +=
                   fluid_fe.shape_value(j, reference_location) *
-                  dof_data_per_cell[j];
+                  local_dof_values[j];
               }
 
             Point<dim> particle_location = particle->get_location();
@@ -602,18 +616,22 @@ namespace Step68
 
             properties[dim] =
               Utilities::MPI::this_mpi_process(mpi_communicator);
+
+            ++particle;
           }
       }
   }
 
+
+
   // @sect4{Data output}
 
-  // These two functions take care of writing both the particles
+  // The next two functions take care of writing both the particles
   // and the background mesh to vtu with a pvtu record. This ensures
   // that the simulation results can be visualized when the simulation is
   // launched in parallel.
   template <int dim>
-  void ParticleTracking<dim>::output_particles(unsigned int it)
+  void ParticleTracking<dim>::output_particles(const unsigned int it)
   {
     Particles::DataOut<dim, dim> particle_output;
 
@@ -631,9 +649,10 @@ namespace Step68
     particle_output.build_patches(particle_handler,
                                   solution_names,
                                   data_component_interpretation);
-    std::string output_folder(par.output_directory);
-    std::string file_name(interpolated_velocity ? "interpolated-particles" :
-                                                  "analytical-particles");
+    const std::string output_folder(par.output_directory);
+    const std::string file_name(interpolated_velocity ?
+                                  "interpolated-particles" :
+                                  "analytical-particles");
 
     pcout << "Writing particle output file: " << file_name << "-" << it
           << std::endl;
@@ -642,8 +661,10 @@ namespace Step68
       output_folder, file_name, it, mpi_communicator, 6);
   }
 
+
+
   template <int dim>
-  void ParticleTracking<dim>::output_background(unsigned int it)
+  void ParticleTracking<dim>::output_background(const unsigned int it)
   {
     std::vector<std::string> solution_names(dim, "velocity");
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
@@ -667,8 +688,8 @@ namespace Step68
 
     data_out.build_patches(mapping);
 
-    std::string output_folder(par.output_directory);
-    std::string file_name("background");
+    const std::string output_folder(par.output_directory);
+    const std::string file_name("background");
 
     pcout << "Writing background field file: " << file_name << "-" << it
           << std::endl;
@@ -676,6 +697,8 @@ namespace Step68
     data_out.write_vtu_with_pvtu_record(
       output_folder, file_name, it, mpi_communicator, 6);
   }
+
+
 
   // @sect4{Running the simulation}
   // This function orchestrates the entire simulation. It is very similar
@@ -689,7 +712,7 @@ namespace Step68
   {
     DiscreteTime discrete_time(0, par.final_time, par.time_step);
 
-    particles_generation();
+    generate_particles();
 
     pcout << "Repartitioning triangulation after particle generation"
           << std::endl;
@@ -746,6 +769,8 @@ namespace Step68
   }
 
 } // namespace Step68
+
+
 
 // @sect3{The main() function}
 
