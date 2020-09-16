@@ -80,7 +80,8 @@ void make_grid(Triangulation<2> &triangulation)
             const double distance_from_center =
               center.distance(cell->vertex(v));
 
-            if (std::fabs(distance_from_center - inner_radius) < 1e-10)
+            if (std::fabs(distance_from_center - inner_radius) <=
+                1e-6 * inner_radius)
               {
                 cell->set_refine_flag();
                 break;
