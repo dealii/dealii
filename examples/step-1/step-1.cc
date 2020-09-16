@@ -31,7 +31,7 @@
 // This is needed for C++ output:
 #include <iostream>
 #include <fstream>
-// And this for the declarations of the `sqrt` and `fabs` functions:
+// And this for the declarations of the `std::sqrt` and `std::fabs` functions:
 #include <cmath>
 
 // The final step in importing deal.II is this: All deal.II functions and
@@ -200,11 +200,13 @@ void second_grid()
           // range-based for loops and the `auto` keyword.
           //
           // Next, we loop over all vertices of the cells. For that purpose
-          // we query an iterator over indices from zero to four, which happens
-          // to be the number of vertices in 2d. Since the upper bound is
-          // automatically adjusted in all dimensions this enables us a
-          // dimension-independent programming. This will later enable us to
-          // get the program to also run in 3d.
+          // we query an iterator over the vertex indices (in 2d, this is an
+          // array that contains the elements `{0,1,2,3}`, but since
+          // `cell->vertex_indices()` knows the dimension the cell lives in, the
+          // array so returned is correct in all dimensions and this enables
+          // this code to be correct whether we run it in 2d or 3d, i.e., it
+          // enables "dimension-independent programming" -- a big part of what
+          // we will discuss in step-4).
           for (const auto v : cell->vertex_indices())
             {
               // If this cell is at the inner boundary, then at least one of its
