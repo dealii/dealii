@@ -2251,7 +2251,7 @@ namespace internal
                                temp1,
                                values_quad + comp * n_q_points,
                                gradients_quad + comp * dim * n_q_points,
-                               scratch_data + 2 * n_components * dofs_per_face,
+                               scratch_data + 2 * dofs_per_face,
                                evaluate_values,
                                evaluate_gradients,
                                subface_index);
@@ -2266,7 +2266,7 @@ namespace internal
                                temp1,
                                values_quad + comp * n_q_points,
                                gradients_quad + comp * dim * n_q_points,
-                               scratch_data + 2 * n_components * dofs_per_face,
+                               scratch_data + 2 * dofs_per_face,
                                evaluate_values,
                                evaluate_gradients,
                                subface_index);
@@ -2421,7 +2421,7 @@ namespace internal
                                 temp1,
                                 values_quad + comp * n_q_points,
                                 gradients_quad + dim * comp * n_q_points,
-                                scratch_data + 2 * n_components * dofs_per_face,
+                                scratch_data + 2 * dofs_per_face,
                                 integrate_values,
                                 integrate_gradients,
                                 subface_index);
@@ -2436,7 +2436,7 @@ namespace internal
                                 temp1,
                                 values_quad + comp * n_q_points,
                                 gradients_quad + dim * comp * n_q_points,
-                                scratch_data + 2 * n_components * dofs_per_face,
+                                scratch_data + 2 * dofs_per_face,
                                 integrate_values,
                                 integrate_gradients,
                                 subface_index);
@@ -2651,6 +2651,11 @@ namespace internal
                  i :
                  orientation[v][i];
       };
+
+      // this variable keeps track of whether we are able to directly write
+      // the results into the result (function returns true) or not, requiring
+      // an additional call to another function
+      bool accesses_global_vector = true;
 
       for (unsigned int comp = 0; comp < n_components; ++comp)
         {
@@ -3081,15 +3086,28 @@ namespace internal
               else
                 {
                   // case 5: default vector access
+
+                  // for the integrate_scatter path (integrate == true), we
+                  // need to only prepare the data in this function for all
+                  // components to later call distribute_local_to_global();
+                  // for the gather_evaluate path (integrate == false), we
+                  // instead want to leave early because we need to get the
+                  // vector data from somewhere else
                   function_5(temp1, comp);
-                  return false;
+                  if (integrate)
+                    accesses_global_vector = false;
+                  else
+                    return false;
                 }
             }
           else
             {
               // case 5: default vector access
               function_5(temp1, comp);
-              return false;
+              if (integrate)
+                accesses_global_vector = false;
+              else
+                return false;
             }
 
           if (!integrate)
@@ -3113,7 +3131,7 @@ namespace internal
                                       gradients_quad);
         }
 
-      return true;
+      return accesses_global_vector;
     }
 
     static void
