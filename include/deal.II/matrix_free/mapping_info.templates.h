@@ -2126,21 +2126,21 @@ namespace internal
 
               // now let the matrix-free evaluators provide us with the
               // data on faces
-              FEFaceEvaluationSelector<dim, -1, 0, double, VectorizedDouble>::
-                evaluate(dim,
-                         shape_info,
-                         cell_points.data(),
-                         face_quads.data(),
-                         face_grads.data(),
-                         scratch_data.data(),
-                         true,
-                         true,
-                         face_no,
-                         GeometryInfo<dim>::max_children_per_cell,
-                         faces[face].face_orientation > 8 ?
-                           faces[face].face_orientation - 8 :
-                           0,
-                         my_data.descriptor[0].face_orientations);
+              FEFaceEvaluationImplEvaluateSelector<dim, VectorizedDouble>::
+                template run<-1, 0>(dim,
+                                    shape_info,
+                                    cell_points.data(),
+                                    face_quads.data(),
+                                    face_grads.data(),
+                                    scratch_data.data(),
+                                    true,
+                                    true,
+                                    face_no,
+                                    GeometryInfo<dim>::max_children_per_cell,
+                                    faces[face].face_orientation > 8 ?
+                                      faces[face].face_orientation - 8 :
+                                      0,
+                                    my_data.descriptor[0].face_orientations);
 
 
               if (update_flags_faces & update_quadrature_points)
@@ -2243,25 +2243,22 @@ namespace internal
                                                 start_indices,
                                                 cell_points.data());
 
-                  FEFaceEvaluationSelector<dim,
-                                           -1,
-                                           0,
-                                           Number,
-                                           VectorizedDouble>::
-                    evaluate(dim,
-                             shape_info,
-                             cell_points.data(),
-                             face_quads.data(),
-                             face_grads.data(),
-                             scratch_data.data(),
-                             false,
-                             true,
-                             faces[face].exterior_face_no,
-                             faces[face].subface_index,
-                             faces[face].face_orientation < 8 ?
-                               faces[face].face_orientation :
-                               0,
-                             my_data.descriptor[0].face_orientations);
+                  FEFaceEvaluationImplEvaluateSelector<dim, VectorizedDouble>::
+                    template run<-1, 0>(
+                      dim,
+                      shape_info,
+                      cell_points.data(),
+                      face_quads.data(),
+                      face_grads.data(),
+                      scratch_data.data(),
+                      false,
+                      true,
+                      faces[face].exterior_face_no,
+                      faces[face].subface_index,
+                      faces[face].face_orientation < 8 ?
+                        faces[face].face_orientation :
+                        0,
+                      my_data.descriptor[0].face_orientations);
 
                   for (unsigned int q = 0; q < n_points_compute; ++q)
                     {
