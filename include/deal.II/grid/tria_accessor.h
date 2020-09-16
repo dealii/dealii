@@ -2926,7 +2926,7 @@ public:
   /**
    * Return an iterator to the neighboring cell on the other side of the face
    * with number @p face_no. If the neighbor does not exist,
-   * i.e., if the @p ith face of the current object is at the boundary, then
+   * i.e., if the face with number @p face_no of the current object is at the boundary, then
    * an invalid iterator is returned.
    *
    * Consequently, the index @p face_no must be less than n_faces().
@@ -2964,7 +2964,7 @@ public:
    * Return the level of the neighboring cell on the other side of the face with
    * number @p face_no. If the neighbor does not exist, this function returns -1.
    *
-   * This function is equivalent to <tt>cell->neighbor(face_no)->level()</tt>.
+   * This function is equivalent to `cell->neighbor(face_no)->level()`.
    * See neighbor() for more details.
    */
   int
@@ -2972,7 +2972,7 @@ public:
 
   /**
    * Return the how-many'th neighbor this cell is of
-   * <tt>cell->neighbor(face_no)</tt>, i.e. return the @p other_face_no such that
+   * <tt>cell->neighbor(face_no)</tt>, i.e. return @p other_face_no such that
    * <tt>cell->neighbor(face_no)->neighbor(other_face_no)==cell</tt>. This
    * function is the right one if you want to know how to get back from a
    * neighbor to the present cell.
@@ -2986,7 +2986,7 @@ public:
 
   /**
    * Return, whether the neighbor is coarser then the present cell. This is
-   * important in case of ansiotropic refinement where this information does
+   * important in case of anisotropic refinement where this information does
    * not depend on the levels of the cells.
    *
    * Note, that in an anisotropic setting, a cell can only be coarser than
