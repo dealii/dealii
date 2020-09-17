@@ -1500,8 +1500,7 @@ namespace internal
                               hessians_quad,
                               scratch_data);
         }
-      else if (shape_info.element_type ==
-               internal::MatrixFreeFunctions::tensor_general)
+      else
         {
           internal::FEEvaluationImpl<
             internal::MatrixFreeFunctions::tensor_general,
@@ -1517,8 +1516,6 @@ namespace internal
                               hessians_quad,
                               scratch_data);
         }
-      else
-        AssertThrow(false, ExcNotImplemented());
 
       return false;
     }
@@ -1649,8 +1646,7 @@ namespace internal
                                scratch_data,
                                sum_into_values_array);
         }
-      else if (shape_info.element_type ==
-               internal::MatrixFreeFunctions::tensor_general)
+      else
         {
           internal::FEEvaluationImpl<
             internal::MatrixFreeFunctions::tensor_general,
@@ -1666,8 +1662,6 @@ namespace internal
                                scratch_data,
                                sum_into_values_array);
         }
-      else
-        AssertThrow(false, ExcNotImplemented());
 
       return false;
     }
