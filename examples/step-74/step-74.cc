@@ -351,7 +351,7 @@ namespace Step74
           {
             for (unsigned int j = 0; j < fe_v.dofs_per_cell; ++j)
               copy_data.cell_matrix(i, j) +=
-                // nu \nabla u \nabla v
+                // \nu \nabla u \nabla v
                 diffusion_coefficient * fe_v.shape_grad(i, point) *
                 fe_v.shape_grad(j, point) * JxW[point];
 
@@ -389,16 +389,16 @@ namespace Step74
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               copy_data.cell_matrix(i, j) +=
                 (
-                  // - nu (\nabla u . n) v
+                  // - \nu (\nabla u . n) v
                   -diffusion_coefficient *
                     (fe_fv.shape_grad(j, point) * normals[point]) *
                     fe_fv.shape_value(i, point)
 
-                  // - nu u (\nabla v . n)
+                  // - \nu u (\nabla v . n)
                   - diffusion_coefficient * fe_fv.shape_value(j, point) *
                       (fe_fv.shape_grad(i, point) * normals[point])
 
-                  // + nu * penalty u v
+                  // + \nu * penalty u v
                   +
                   diffusion_coefficient * penalty *
                     fe_fv.shape_value(j, point) * fe_fv.shape_value(i, point)) *
@@ -407,11 +407,11 @@ namespace Step74
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             copy_data.cell_rhs(i) +=
               (
-                // -nu g (\nabla v . n)
+                // -\nu g (\nabla v . n)
                 -diffusion_coefficient * g[point] *
                   (fe_fv.shape_grad(i, point) * normals[point])
 
-                // +nu penalty g v
+                // +\nu penalty g v
                 + diffusion_coefficient * penalty * g[point] *
                     fe_fv.shape_value(i, point)) *
               JxW[point];
@@ -457,16 +457,16 @@ namespace Step74
             for (unsigned int j = 0; j < n_dofs_face; ++j)
               copy_data_face.cell_matrix(i, j) +=
                 (
-                  // - nu {\nabla u}.n [v] (consistency)
+                  // - \nu {\nabla u}.n [v] (consistency)
                   -diffusion_coefficient *
                     (fe_iv.average_gradient(j, point) * normals[point]) *
                     fe_iv.jump(i, point)
 
-                  // - nu [u] {\nabla v}.n  (symmetry) // NIPG: use +
+                  // - \nu [u] {\nabla v}.n  (symmetry) // NIPG: use +
                   - diffusion_coefficient * fe_iv.jump(j, point) *
                       (fe_iv.average_gradient(i, point) * normals[point])
 
-                  // nu sigma [u] [v] (penalty)
+                  // \nu sigma [u] [v] (penalty)
                   + diffusion_coefficient * penalty * fe_iv.jump(j, point) *
                       fe_iv.jump(i, point)
 

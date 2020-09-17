@@ -64,7 +64,7 @@ The discretization using the SIPG is given by the following weak formula
   \biggr\}
   \\
   - \sum_{F \in F_h^b} \biggl\{
-    \bigl<v_h, \nv \nabla u_h\cdot \mathbf n \bigr>_F
+    \bigl<v_h, \nu v \nabla u_h\cdot \mathbf n \bigr>_F
   + \bigl< \nabla v_h \cdot \mathbb n , \nu u_h\bigr>_F
   - \bigl< v_h,\nu \sigma u_h\bigr>_F
   \biggr\}

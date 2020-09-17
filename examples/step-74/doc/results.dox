@@ -184,7 +184,7 @@ freedom, then $h$ is of order $1/\sqrt{n}$. Combining the theoretical
 results in the previous case,
 we see that the error in $L_2$ norm is of order $O(n^{-\frac{p+1}{2}})$
 and in $H_1$ seminorm is $O(n^{-\frac{p}{2}})$. From the figure, we see
-that the SIPG with adaptive mesh refinement produces desirable resutls
+that the SIPG with adaptive mesh refinement produces desirable results
 that match theoretical ones.
 
 In addition, we observe that the error estimator decreases
