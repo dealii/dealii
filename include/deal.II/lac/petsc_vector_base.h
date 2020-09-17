@@ -280,7 +280,7 @@ namespace PETScWrappers
     operator=(const VectorBase &) = delete;
 
     /**
-     * Destructor
+     * Destructor.
      */
     virtual ~VectorBase() override;
 
