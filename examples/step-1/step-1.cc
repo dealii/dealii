@@ -212,14 +212,39 @@ void second_grid()
               // If this cell is at the inner boundary, then at least one of its
               // vertices must sit on the inner ring and therefore have a radial
               // distance from the center of exactly 0.5, up to floating point
-              // accuracy. Compute this distance, and if we have found a vertex
-              // with this property flag this cell for later refinement. We can
-              // then also break the loop over all vertices and move on to the
-              // next cell.
+              // accuracy. So we compute this distance, and if we find a vertex
+              // with this property, we flag this cell for later refinement. We
+              // can then also break the loop over all vertices and move on to
+              // the next cell.
+              //
+              // Because the distance from the center is computed as a floating
+              // point number, we have to expect that whatever we compute is
+              // only accurate to within
+              // [round-off](https://en.wikipedia.org/wiki/Round-off_error). As
+              // a consequence, we can never expect to compare the distance
+              // with the inner radius by equality: A statement such as
+              // `if (distance_from_center == inner_radius)` will fail
+              // unless we get exceptionally lucky. Rather, we need to do this
+              // comparison with a certain tolerance, and the usual way to do
+              // this is to write it as `if (std::abs(distance_from_center -
+              // inner_radius) <= tolerance)`
+              // where `tolerance` is some small number larger
+              // than round-off. The question is how to choose it: We could just
+              // pick, say, `1e-10`, but this is only appropriate if the objects
+              // we compare are of size one. If we had created a mesh with cells
+              // of size `1e+10`, then `1e-10` would be far lower than round-off
+              // and, as before, the comparison will only succeed if we get
+              // exceptionally lucky. Rather, it is almost always useful to make
+              // the tolerance *relative* to a typical "scale" of the objects
+              // being compared. Here, the "scale" would be the inner radius, or
+              // maybe the diameter of cells. We choose the former and set the
+              // tolerance equal to $10^{-6}$ times the inner radius of the
+              // annulus.
               const double distance_from_center =
                 center.distance(cell->vertex(v));
 
-              if (std::fabs(distance_from_center - inner_radius) < 1e-10)
+              if (std::fabs(distance_from_center - inner_radius) <=
+                  1e-6 * inner_radius)
                 {
                   cell->set_refine_flag();
                   break;
