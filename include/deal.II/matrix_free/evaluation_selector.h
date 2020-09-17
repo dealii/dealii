@@ -567,107 +567,15 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::evaluate(
 {
   Assert(fe_degree >= 0 && n_q_points_1d > 0, ExcInternalError());
 
-  if (fe_degree + 1 == n_q_points_1d &&
-      shape_info.element_type ==
-        internal::MatrixFreeFunctions::tensor_symmetric_collocation)
-    {
-      internal::FEEvaluationImplCollocation<dim, fe_degree, Number>::evaluate(
-        n_components,
-        evaluation_flag,
-        shape_info,
-        values_dofs_actual,
-        values_quad,
-        gradients_quad,
-        hessians_quad,
-        scratch_data);
-    }
-  // '<=' on type means tensor_symmetric or tensor_symmetric_hermite, see
-  // shape_info.h for more details
-  else if (use_collocation && shape_info.element_type <=
-                                internal::MatrixFreeFunctions::tensor_symmetric)
-    {
-      internal::FEEvaluationImplTransformToCollocation<
-        dim,
-        fe_degree,
-        n_q_points_1d,
-        Number>::evaluate(n_components,
-                          evaluation_flag,
-                          shape_info,
-                          values_dofs_actual,
-                          values_quad,
-                          gradients_quad,
-                          hessians_quad,
-                          scratch_data);
-    }
-  else if (shape_info.element_type <=
-           internal::MatrixFreeFunctions::tensor_symmetric)
-    {
-      internal::FEEvaluationImpl<
-        internal::MatrixFreeFunctions::tensor_symmetric,
-        dim,
-        fe_degree,
-        n_q_points_1d,
-        Number>::evaluate(n_components,
-                          evaluation_flag,
-                          shape_info,
-                          values_dofs_actual,
-                          values_quad,
-                          gradients_quad,
-                          hessians_quad,
-                          scratch_data);
-    }
-  else if (shape_info.element_type ==
-           internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
-    {
-      internal::FEEvaluationImpl<
-        internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
-        dim,
-        fe_degree,
-        n_q_points_1d,
-        Number>::evaluate(n_components,
-                          evaluation_flag,
-                          shape_info,
-                          values_dofs_actual,
-                          values_quad,
-                          gradients_quad,
-                          hessians_quad,
-                          scratch_data);
-    }
-  else if (shape_info.element_type ==
-           internal::MatrixFreeFunctions::truncated_tensor)
-    {
-      internal::FEEvaluationImpl<
-        internal::MatrixFreeFunctions::truncated_tensor,
-        dim,
-        fe_degree,
-        n_q_points_1d,
-        Number>::evaluate(n_components,
-                          evaluation_flag,
-                          shape_info,
-                          values_dofs_actual,
-                          values_quad,
-                          gradients_quad,
-                          hessians_quad,
-                          scratch_data);
-    }
-  else if (shape_info.element_type ==
-           internal::MatrixFreeFunctions::tensor_general)
-    {
-      internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
-                                 dim,
-                                 fe_degree,
-                                 n_q_points_1d,
-                                 Number>::evaluate(n_components,
-                                                   evaluation_flag,
-                                                   shape_info,
-                                                   values_dofs_actual,
-                                                   values_quad,
-                                                   gradients_quad,
-                                                   hessians_quad,
-                                                   scratch_data);
-    }
-  else
-    AssertThrow(false, ExcNotImplemented());
+  internal::FEEvaluationImplEvaluateSelector<dim, Number>::
+    template run<fe_degree, n_q_points_1d>(n_components,
+                                           evaluation_flag,
+                                           shape_info,
+                                           values_dofs_actual,
+                                           values_quad,
+                                           gradients_quad,
+                                           hessians_quad,
+                                           scratch_data);
 }
 
 
@@ -686,107 +594,15 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::integrate(
 {
   Assert(fe_degree >= 0 && n_q_points_1d > 0, ExcInternalError());
 
-  if (fe_degree + 1 == n_q_points_1d &&
-      shape_info.element_type ==
-        internal::MatrixFreeFunctions::tensor_symmetric_collocation)
-    {
-      internal::FEEvaluationImplCollocation<dim, fe_degree, Number>::integrate(
-        n_components,
-        integration_flag,
-        shape_info,
-        values_dofs_actual,
-        values_quad,
-        gradients_quad,
-        scratch_data,
-        sum_into_values_array);
-    }
-  // '<=' on type means tensor_symmetric or tensor_symmetric_hermite, see
-  // shape_info.h for more details
-  else if (use_collocation && shape_info.element_type <=
-                                internal::MatrixFreeFunctions::tensor_symmetric)
-    {
-      internal::FEEvaluationImplTransformToCollocation<
-        dim,
-        fe_degree,
-        n_q_points_1d,
-        Number>::integrate(n_components,
-                           integration_flag,
-                           shape_info,
-                           values_dofs_actual,
-                           values_quad,
-                           gradients_quad,
-                           scratch_data,
-                           sum_into_values_array);
-    }
-  else if (shape_info.element_type <=
-           internal::MatrixFreeFunctions::tensor_symmetric)
-    {
-      internal::FEEvaluationImpl<
-        internal::MatrixFreeFunctions::tensor_symmetric,
-        dim,
-        fe_degree,
-        n_q_points_1d,
-        Number>::integrate(n_components,
-                           integration_flag,
-                           shape_info,
-                           values_dofs_actual,
-                           values_quad,
-                           gradients_quad,
-                           scratch_data,
-                           sum_into_values_array);
-    }
-  else if (shape_info.element_type ==
-           internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
-    {
-      internal::FEEvaluationImpl<
-        internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
-        dim,
-        fe_degree,
-        n_q_points_1d,
-        Number>::integrate(n_components,
-                           integration_flag,
-                           shape_info,
-                           values_dofs_actual,
-                           values_quad,
-                           gradients_quad,
-                           scratch_data,
-                           sum_into_values_array);
-    }
-  else if (shape_info.element_type ==
-           internal::MatrixFreeFunctions::truncated_tensor)
-    {
-      internal::FEEvaluationImpl<
-        internal::MatrixFreeFunctions::truncated_tensor,
-        dim,
-        fe_degree,
-        n_q_points_1d,
-        Number>::integrate(n_components,
-                           integration_flag,
-                           shape_info,
-                           values_dofs_actual,
-                           values_quad,
-                           gradients_quad,
-                           scratch_data,
-                           sum_into_values_array);
-    }
-  else if (shape_info.element_type ==
-           internal::MatrixFreeFunctions::tensor_general)
-    {
-      internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
-                                 dim,
-                                 fe_degree,
-                                 n_q_points_1d,
-                                 Number>::integrate(n_components,
-                                                    integration_flag,
-                                                    shape_info,
-                                                    values_dofs_actual,
-                                                    values_quad,
-                                                    gradients_quad,
-                                                    scratch_data,
-                                                    sum_into_values_array);
-    }
-  else
-    AssertThrow(false, ExcNotImplemented());
+  internal::FEEvaluationImplIntegrateSelector<dim, Number>::
+    template run<fe_degree, n_q_points_1d>(n_components,
+                                           integration_flag,
+                                           shape_info,
+                                           values_dofs_actual,
+                                           values_quad,
+                                           gradients_quad,
+                                           scratch_data,
+                                           sum_into_values_array);
 }
 
 

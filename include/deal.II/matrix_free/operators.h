@@ -1016,9 +1016,8 @@ namespace MatrixFreeOperators
     VectorizedArrayType>::apply(const VectorizedArrayType *in_array,
                                 VectorizedArrayType *      out_array) const
   {
-    internal::
-      CellwiseInverseMassMatrixImpl<dim, fe_degree, VectorizedArrayType>::apply(
-        n_components, fe_eval, in_array, out_array);
+    internal::CellwiseInverseMassMatrixImplBasic<dim, VectorizedArrayType>::
+      template run<fe_degree>(n_components, fe_eval, in_array, out_array);
   }
 
 
@@ -1039,8 +1038,8 @@ namespace MatrixFreeOperators
           const VectorizedArrayType *               in_array,
           VectorizedArrayType *                     out_array) const
   {
-    internal::
-      CellwiseInverseMassMatrixImpl<dim, fe_degree, VectorizedArrayType>::apply(
+    internal::CellwiseInverseMassMatrixImplFlexible<dim, VectorizedArrayType>::
+      template run<fe_degree>(
         n_actual_components,
         fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
         inverse_coefficients,
@@ -1065,13 +1064,14 @@ namespace MatrixFreeOperators
                                      const VectorizedArrayType *in_array,
                                      VectorizedArrayType *      out_array) const
   {
-    internal::
-      CellwiseInverseMassMatrixImpl<dim, fe_degree, VectorizedArrayType>::
-        transform_from_q_points_to_basis(
-          n_actual_components,
-          fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
-          in_array,
-          out_array);
+    internal::CellwiseInverseMassMatrixImplTransformFromQPoints<
+      dim,
+      VectorizedArrayType>::template run<fe_degree>(n_actual_components,
+                                                    fe_eval.get_shape_info()
+                                                      .data.front()
+                                                      .inverse_shape_values_eo,
+                                                    in_array,
+                                                    out_array);
   }
 
 
