@@ -1396,7 +1396,7 @@ namespace internal
   struct FEEvaluationImplEvaluateSelector
   {
     template <int fe_degree, int n_q_points_1d>
-    static void
+    static bool
     run(const unsigned int                                      n_components,
         const EvaluationFlags::EvaluationFlags                  evaluation_flag,
         const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
@@ -1519,6 +1519,8 @@ namespace internal
         }
       else
         AssertThrow(false, ExcNotImplemented());
+
+      return false;
     }
   };
 
@@ -1543,7 +1545,7 @@ namespace internal
   struct FEEvaluationImplIntegrateSelector
   {
     template <int fe_degree, int n_q_points_1d>
-    static void
+    static bool
     run(const unsigned int                     n_components,
         const EvaluationFlags::EvaluationFlags integration_flag,
         const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
@@ -1666,6 +1668,8 @@ namespace internal
         }
       else
         AssertThrow(false, ExcNotImplemented());
+
+      return false;
     }
   };
 
@@ -2313,7 +2317,7 @@ namespace internal
   struct FEFaceEvaluationImplEvaluateSelector
   {
     template <int fe_degree, int n_q_points_1d>
-    static void
+    static bool
     run(const unsigned int                                         n_components,
         const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
         const VectorizedArrayType *                                values_array,
@@ -2392,6 +2396,8 @@ namespace internal
                                     scratch_data,
                                     values_quad,
                                     gradients_quad);
+
+      return false;
     }
   };
 
@@ -2401,7 +2407,7 @@ namespace internal
   struct FEFaceEvaluationImplIntegrateSelector
   {
     template <int fe_degree, int n_q_points_1d>
-    static void
+    static bool
     run(const unsigned int                                         n_components,
         const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
         VectorizedArrayType *                                      values_array,
@@ -2484,6 +2490,7 @@ namespace internal
                                            values_array,
                                            integrate_gradients,
                                            face_no);
+      return false;
     }
   };
 
@@ -3515,18 +3522,20 @@ namespace internal
 
   /**
    * This struct implements the action of the inverse mass matrix operation
+   * using an FEEvaluationBaseData argument.
    */
-  template <int dim, int fe_degree, typename Number>
-  struct CellwiseInverseMassMatrixImpl
+  template <int dim, typename Number>
+  struct CellwiseInverseMassMatrixImplBasic
   {
-    static void
-    apply(const unsigned int                  n_components,
-          const FEEvaluationBaseData<dim,
-                                     typename Number::value_type,
-                                     false,
-                                     Number> &fe_eval,
-          const Number *                      in_array,
-          Number *                            out_array)
+    template <int fe_degree, int = 0>
+    static bool
+    run(const unsigned int                  n_components,
+        const FEEvaluationBaseData<dim,
+                                   typename Number::value_type,
+                                   false,
+                                   Number> &fe_eval,
+        const Number *                      in_array,
+        Number *                            out_array)
     {
       constexpr unsigned int dofs_per_component =
         Utilities::pow(fe_degree + 1, dim);
@@ -3573,14 +3582,26 @@ namespace internal
             evaluator.template hessians<1, false, false>(out, out);
           evaluator.template hessians<0, false, false>(out, out);
         }
+      return false;
     }
+  };
 
-    static void
-    apply(const unsigned int           n_desired_components,
-          const AlignedVector<Number> &inverse_shape,
-          const AlignedVector<Number> &inverse_coefficients,
-          const Number *               in_array,
-          Number *                     out_array)
+
+
+  /**
+   * This struct implements the action of the inverse mass matrix operation
+   * using an FEEvaluationBaseData argument.
+   */
+  template <int dim, typename Number>
+  struct CellwiseInverseMassMatrixImplFlexible
+  {
+    template <int fe_degree, int = 0>
+    static bool
+    run(const unsigned int           n_desired_components,
+        const AlignedVector<Number> &inverse_shape,
+        const AlignedVector<Number> &inverse_coefficients,
+        const Number *               in_array,
+        Number *                     out_array)
     {
       constexpr unsigned int dofs_per_component =
         Utilities::pow(fe_degree + 1, dim);
@@ -3630,13 +3651,25 @@ namespace internal
 
           inv_coefficient += shift_coefficient;
         }
+      return false;
     }
+  };
 
-    static void
-    transform_from_q_points_to_basis(const unsigned int n_desired_components,
-                                     const AlignedVector<Number> &inverse_shape,
-                                     const Number *               in_array,
-                                     Number *                     out_array)
+
+
+  /**
+   * This struct implements the action of the inverse mass matrix operation
+   * using an FEEvaluationBaseData argument.
+   */
+  template <int dim, typename Number>
+  struct CellwiseInverseMassMatrixImplTransformFromQPoints
+  {
+    template <int fe_degree, int = 0>
+    static bool
+    run(const unsigned int           n_desired_components,
+        const AlignedVector<Number> &inverse_shape,
+        const Number *               in_array,
+        Number *                     out_array)
     {
       constexpr unsigned int dofs_per_cell = Utilities::pow(fe_degree + 1, dim);
       internal::EvaluatorTensorProduct<internal::evaluate_evenodd,
@@ -3667,6 +3700,7 @@ namespace internal
           if (dim == 1)
             evaluator.template hessians<0, false, false>(in, out);
         }
+      return false;
     }
   };
 
