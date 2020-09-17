@@ -230,6 +230,18 @@ public:
   ArrayView<VectorizedArrayType>
   get_scratch_data() const;
 
+  /**
+   * Return the number of the quadrature formula of the present cell.
+   */
+  unsigned int
+  get_quadrature_index() const;
+
+  /**
+   * Return index of the current cell or face.
+   */
+  unsigned int
+  get_current_cell_index() const;
+
 protected:
   /**
    * Constructor. Made protected to prevent users from directly using this
@@ -642,6 +654,17 @@ public:
                  const unsigned int first_index = 0,
                  const std::bitset<VectorizedArrayType::size()> &mask =
                    std::bitset<VectorizedArrayType::size()>().flip()) const;
+
+  /**
+   * Same as set_dof_values(), but without resolving constraints.
+   */
+  template <typename VectorType>
+  void
+  set_dof_values_plain(
+    VectorType &                                    dst,
+    const unsigned int                              first_index = 0,
+    const std::bitset<VectorizedArrayType::size()> &mask =
+      std::bitset<VectorizedArrayType::size()>().flip()) const;
 
   //@}
 
@@ -3779,6 +3802,30 @@ FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
 }
 
 
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline unsigned int
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  get_quadrature_index() const
+{
+  return this->quad_no;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline unsigned int
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  get_current_cell_index() const
+{
+  if (is_face && this->dof_access_index ==
+                   internal::MatrixFreeFunctions::DoFInfo::dof_access_cell)
+    return this->cell * GeometryInfo<dim>::faces_per_cell + this->face_no;
+  else
+    return this->cell;
+}
+
+
 /*----------------------- FEEvaluationBase ----------------------------------*/
 
 template <int dim,
@@ -4857,6 +4904,41 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   internal::VectorSetter<Number, VectorizedArrayType> setter;
   read_write_operation(setter, dst_data, mask);
+}
+
+
+
+template <int dim,
+          int n_components_,
+          typename Number,
+          bool is_face,
+          typename VectorizedArrayType>
+template <typename VectorType>
+inline void
+FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
+  set_dof_values_plain(
+    VectorType &                                    dst,
+    const unsigned int                              first_index,
+    const std::bitset<VectorizedArrayType::size()> &mask) const
+{
+#  ifdef DEBUG
+  Assert(dof_values_initialized == true,
+         internal::ExcAccessToUninitializedField());
+#  endif
+
+  // select between block vectors and non-block vectors. Note that the number
+  // of components is checked in the internal data
+  typename internal::BlockVectorSelector<
+    VectorType,
+    IsBlockVector<VectorType>::value>::BaseVectorType *dst_data[n_components];
+  for (unsigned int d = 0; d < n_components; ++d)
+    dst_data[d] = internal::BlockVectorSelector<
+      VectorType,
+      IsBlockVector<VectorType>::value>::get_vector_component(dst,
+                                                              d + first_index);
+
+  internal::VectorSetter<Number, VectorizedArrayType> setter;
+  read_write_operation(setter, dst_data, mask, false);
 }
 
 
