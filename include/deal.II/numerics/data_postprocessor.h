@@ -696,7 +696,9 @@ private:
  * <h3> An example </h3>
  *
  * A common example of what one wants to do with postprocessors is to visualize
- * not just the value of the solution, but the gradient. Let's, for simplicity,
+ * not just the value of the solution, but the gradient. This is, in fact,
+ * precisely what step-19 needs, and it consequently uses the code below almost
+ * verbatim. Let's, for simplicity,
  * assume that you have only a scalar solution. In fact, because it's readily
  * available, let us simply take the step-6 solver to produce such a scalar
  * solution. The gradient is a vector (with exactly @p dim components), so the

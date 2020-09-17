@@ -1802,9 +1802,9 @@ public:
    * the geometry of the domain, and in this case ignoring the exception is
    * probably unwise.
    *
-   * @note This function is used in step-14 .
+   * @note This function is used in step-14 and step-19.
    *
-   * @note This function triggers the create signal after doing its work. See
+   * @note This function triggers the "create" signal after doing its work. See
    * the section on signals in the general documentation of this class.
    *
    * @note The check for distorted cells is only done if dim==spacedim, as

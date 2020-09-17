@@ -256,6 +256,12 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-19</td>
+ *       <td> Coupling particles to the solution of partial differential equations.
+ *       <br/> Keywords: Particles
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-20</td>
  *       <td> Mixed finite elements. Using block
  *       matrices and block vectors to define more complicated solvers and
