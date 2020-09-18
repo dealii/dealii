@@ -320,7 +320,7 @@ namespace Step74
     system_rhs.reinit(dof_handler.n_dofs());
   }
 
-  // sect3{The assemble_system function}
+  // @sect3{The assemble_system function}
   // The assemble function here is similar to that in step-12.
   // Different from assembling by hand, we just need to focus
   // on assembling on each cell, each boundary face, and each
@@ -351,12 +351,12 @@ namespace Step74
           {
             for (unsigned int j = 0; j < fe_v.dofs_per_cell; ++j)
               copy_data.cell_matrix(i, j) +=
-                // \nu \nabla u \nabla v
-                diffusion_coefficient * fe_v.shape_grad(i, point) *
-                fe_v.shape_grad(j, point) * JxW[point];
+                diffusion_coefficient *
+                fe_v.shape_grad(i, point) *             // nu grad v_h
+                fe_v.shape_grad(j, point) * JxW[point]; // grad u_h dx
 
-            copy_data.cell_rhs(i) +=
-              rhs[point] * fe_v.shape_value(i, point) * JxW[point];
+            copy_data.cell_rhs(i) += rhs[point] * fe_v.shape_value(i, point) *
+                                     JxW[point]; // f * v_h * dx
           }
     };
 
@@ -378,7 +378,6 @@ namespace Step74
       std::vector<double> g(n_q_points);
       exact_solution->value_list(q_points, g);
 
-
       const double extent1 = cell->extent_in_direction(
         GeometryInfo<dim>::unit_normal_direction[face_no]);
       const double penalty = compute_penalty(fe.get_degree(), extent1, extent1);
@@ -388,33 +387,30 @@ namespace Step74
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               copy_data.cell_matrix(i, j) +=
-                (
-                  // - \nu (\nabla u . n) v
-                  -diffusion_coefficient *
-                    (fe_fv.shape_grad(j, point) * normals[point]) *
-                    fe_fv.shape_value(i, point)
+                (-diffusion_coefficient * // - nu
+                   (fe_fv.shape_grad(j, point) *
+                    normals[point]) *          // (grad u_h . n)
+                   fe_fv.shape_value(i, point) // v_h
 
-                  // - \nu u (\nabla v . n)
-                  - diffusion_coefficient * fe_fv.shape_value(j, point) *
-                      (fe_fv.shape_grad(i, point) * normals[point])
+                 - diffusion_coefficient *
+                     fe_fv.shape_value(j, point) * // - nu u_h
+                     (fe_fv.shape_grad(i, point) *
+                      normals[point]) // (grad v_h . n)
 
-                  // + \nu * penalty u v
-                  +
-                  diffusion_coefficient * penalty *
-                    fe_fv.shape_value(j, point) * fe_fv.shape_value(i, point)) *
-                JxW[point];
+                 +                                 // +
+                 diffusion_coefficient * penalty * // nu sigma
+                   fe_fv.shape_value(j, point) *
+                   fe_fv.shape_value(i, point)) * // u_h v_h
+                JxW[point];                       // dx
 
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             copy_data.cell_rhs(i) +=
-              (
-                // -\nu g (\nabla v . n)
-                -diffusion_coefficient * g[point] *
-                  (fe_fv.shape_grad(i, point) * normals[point])
+              (-diffusion_coefficient * g[point] *             // -nu g
+                 (fe_fv.shape_grad(i, point) * normals[point]) // (grad v_h . n)
 
-                // +\nu penalty g v
-                + diffusion_coefficient * penalty * g[point] *
-                    fe_fv.shape_value(i, point)) *
-              JxW[point];
+               + diffusion_coefficient * penalty * g[point] * // + nu sigma g
+                   fe_fv.shape_value(i, point)) *             // v_h
+              JxW[point];                                     // dx
         }
     };
 
@@ -456,22 +452,21 @@ namespace Step74
           for (unsigned int i = 0; i < n_dofs_face; ++i)
             for (unsigned int j = 0; j < n_dofs_face; ++j)
               copy_data_face.cell_matrix(i, j) +=
-                (
-                  // - \nu {\nabla u}.n [v] (consistency)
-                  -diffusion_coefficient *
-                    (fe_iv.average_gradient(j, point) * normals[point]) *
-                    fe_iv.jump(i, point)
+                (-diffusion_coefficient * // - nu
+                   (fe_iv.average_gradient(j, point) *
+                    normals[point]) *   // ({grad u_h} . n)
+                   fe_iv.jump(i, point) // [v_h]
 
-                  // - \nu [u] {\nabla v}.n  (symmetry) // NIPG: use +
-                  - diffusion_coefficient * fe_iv.jump(j, point) *
-                      (fe_iv.average_gradient(i, point) * normals[point])
+                 - diffusion_coefficient * fe_iv.jump(j, point) * // -nu [u_h]
+                     (fe_iv.average_gradient(i, point) *
+                      normals[point]) // (grad v_h . n)
 
-                  // \nu sigma [u] [v] (penalty)
-                  + diffusion_coefficient * penalty * fe_iv.jump(j, point) *
-                      fe_iv.jump(i, point)
+                 + diffusion_coefficient * penalty *
+                     fe_iv.jump(j, point) * // + nu sigma [u_h]
+                     fe_iv.jump(i, point)   // [v_h]
 
-                    ) *
-                JxW[point];
+                 ) *
+                JxW[point]; // dx
         }
     };
 

@@ -50,7 +50,7 @@ and
 @f[
 \average{v} = \frac{v^0 + v^1}{2}
 @f]
-respectively. Note that when $f\in \partial Omega$, we define $\jump{v} = v$ and
+respectively. Note that when $f\in \partial \Omega$, we define $\jump{v} = v$ and
 $\average{v}=v$.
 The discretization using the SIPG is given by the following weak formula
 (more details can be found in @cite di2011mathematical and the references therein)
@@ -64,8 +64,8 @@ The discretization using the SIPG is given by the following weak formula
   \biggr\}
   \\
   - \sum_{F \in F_h^b} \biggl\{
-    \bigl<v_h, \nu v \nabla u_h\cdot \mathbf n \bigr>_F
-  + \bigl< \nabla v_h \cdot \mathbb n , \nu u_h\bigr>_F
+    \bigl<v_h, \nu  \nabla u_h\cdot \mathbf n \bigr>_F
+  + \bigl< \nabla v_h \cdot \mathbf n , \nu u_h\bigr>_F
   - \bigl< v_h,\nu \sigma u_h\bigr>_F
   \biggr\}
   \\
@@ -121,5 +121,5 @@ Then the error estimate square per cell is
 @f[
 \eta_{local}^2 =\eta_{c}^2+0.5\eta_{f}^2+\eta_{b}^2.
 @f]
-Note that we compute $\eta_{local}^2$ instead of $\eta_{local}^2$ to simplify the implementation.
+Note that we compute $\eta_{local}^2$ instead of $\eta_{local}$ to simplify the implementation.
 The error estimate square per cell is store in a global vector, whose $L_1$ norm is equal to $\eta^2$.
