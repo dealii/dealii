@@ -402,8 +402,9 @@ namespace Step74
                  +                                 // +
                  diffusion_coefficient * penalty * // nu sigma
                    fe_fv.shape_value(j, point) *   // u_h
-                   fe_fv.shape_value(i, point)) *  // v_h
-                JxW[point];                        // dx
+                   fe_fv.shape_value(i, point)     // v_h
+                 ) *
+                JxW[point]; // dx
 
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             copy_data.cell_rhs(i) +=
@@ -411,8 +412,9 @@ namespace Step74
                  (fe_fv.shape_grad(i, point) * normals[point]) // (grad v_h . n)
 
                + diffusion_coefficient * penalty * g[point] * // + nu sigma g
-                   fe_fv.shape_value(i, point)) *             // v_h
-              JxW[point];                                     // dx
+                   fe_fv.shape_value(i, point)                // v_h
+               ) *
+              JxW[point]; // dx
         }
     };
 
