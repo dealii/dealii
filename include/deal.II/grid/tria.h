@@ -2146,6 +2146,8 @@ public:
      * expensive for a process to handle this particular cell. If several
      * functions are connected to this signal, their return values will be
      * summed to calculate the final weight.
+     *
+     * This function is used in step-68.
      */
     boost::signals2::signal<unsigned int(const cell_iterator &,
                                          const CellStatus),

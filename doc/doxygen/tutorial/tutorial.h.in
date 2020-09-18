@@ -274,7 +274,7 @@
  *       <td>step-21</td>
  *       <td> The time dependent two-phase flow in
  *       porous media. Extensions of mixed Laplace discretizations. More
- *       complicated block solvers. Simple explicit (forward Euler) time 
+ *       complicated block solvers. Simple explicit (forward Euler) time
  *       stepping.
  *       <br/> Keywords: TensorFunction, FE_RaviartThomas,
  *       VectorTools::project(), DiscreteTime
@@ -293,7 +293,7 @@
  *   <tr valign="top">
  *       <td>step-23</td>
  *       <td> Finally a "real" time dependent problem, the wave equation.
- *       Fractional time stepping (explicit, fully implicit and Crank-Nicholson 
+ *       Fractional time stepping (explicit, fully implicit and Crank-Nicholson
  *       method).
  *       <br/> Keywords: MatrixCreator, VectorTools::project()
  *       </td></tr>
@@ -576,9 +576,15 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-68</td>
+ *        <td> Simulation of the motion of massless tracer particles in a vortical flow.
+ *             Parallel simulation of the advection of particles with load balancing.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-69</td>
  *        <td> Hyperbolic conservation laws: a first-order guaranteed maximum
- *        wavespeed method for the compressible Euler equations. Explicit time 
+ *        wavespeed method for the compressible Euler equations. Explicit time
  *        stepping.
  *       </td></tr>
  *
@@ -919,6 +925,15 @@
  *     </td>
  *     <td>
  *       step-62
+ *     </td>
+ *   </tr>
+ *
+ *   <tr valign="top">
+ *     <td> Particles
+ *     </td>
+ *     <td>
+ *     step-19,
+ *     step-68
  *     </td>
  *   </tr>
  *
