@@ -351,12 +351,14 @@ namespace Step74
           {
             for (unsigned int j = 0; j < fe_v.dofs_per_cell; ++j)
               copy_data.cell_matrix(i, j) +=
-                diffusion_coefficient *
-                fe_v.shape_grad(i, point) *             // nu grad v_h
-                fe_v.shape_grad(j, point) * JxW[point]; // grad u_h dx
+                diffusion_coefficient *     // nu
+                fe_v.shape_grad(i, point) * // grad v_h
+                fe_v.shape_grad(j, point) * // grad u_h
+                JxW[point];                 // dx
 
-            copy_data.cell_rhs(i) += rhs[point] * fe_v.shape_value(i, point) *
-                                     JxW[point]; // f * v_h * dx
+            copy_data.cell_rhs(i) += rhs[point] *                 // f
+                                     fe_v.shape_value(i, point) * // v_h
+                                     JxW[point];                  // dx
           }
     };
 
@@ -387,25 +389,25 @@ namespace Step74
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               copy_data.cell_matrix(i, j) +=
-                (-diffusion_coefficient * // - nu
-                   (fe_fv.shape_grad(j, point) *
-                    normals[point]) *          // (grad u_h . n)
-                   fe_fv.shape_value(i, point) // v_h
+                (-diffusion_coefficient *        // - nu
+                   (fe_fv.shape_grad(j, point) * // (grad u_h .
+                    normals[point]) *            //  n)
+                   fe_fv.shape_value(i, point)   // v_h
 
-                 - diffusion_coefficient *
-                     fe_fv.shape_value(j, point) * // - nu u_h
-                     (fe_fv.shape_grad(i, point) *
-                      normals[point]) // (grad v_h . n)
+                 - diffusion_coefficient *         // - nu
+                     fe_fv.shape_value(j, point) * // u_h
+                     (fe_fv.shape_grad(i, point) * // (grad v_h .
+                      normals[point])              //  n)
 
                  +                                 // +
                  diffusion_coefficient * penalty * // nu sigma
-                   fe_fv.shape_value(j, point) *
-                   fe_fv.shape_value(i, point)) * // u_h v_h
-                JxW[point];                       // dx
+                   fe_fv.shape_value(j, point) *   // u_h
+                   fe_fv.shape_value(i, point)) *  // v_h
+                JxW[point];                        // dx
 
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             copy_data.cell_rhs(i) +=
-              (-diffusion_coefficient * g[point] *             // -nu g
+              (-diffusion_coefficient * g[point] *             // - nu g
                  (fe_fv.shape_grad(i, point) * normals[point]) // (grad v_h . n)
 
                + diffusion_coefficient * penalty * g[point] * // + nu sigma g
@@ -452,18 +454,18 @@ namespace Step74
           for (unsigned int i = 0; i < n_dofs_face; ++i)
             for (unsigned int j = 0; j < n_dofs_face; ++j)
               copy_data_face.cell_matrix(i, j) +=
-                (-diffusion_coefficient * // - nu
-                   (fe_iv.average_gradient(j, point) *
-                    normals[point]) *   // ({grad u_h} . n)
-                   fe_iv.jump(i, point) // [v_h]
+                (-diffusion_coefficient *              // - nu
+                   (fe_iv.average_gradient(j, point) * // ({grad u_h} .
+                    normals[point]) *                  //  n)
+                   fe_iv.jump(i, point)                // [v_h]
 
-                 - diffusion_coefficient * fe_iv.jump(j, point) * // -nu [u_h]
-                     (fe_iv.average_gradient(i, point) *
-                      normals[point]) // (grad v_h . n)
+                 - diffusion_coefficient * fe_iv.jump(j, point) * // - nu [u_h]
+                     (fe_iv.average_gradient(i, point) *          // (grad v_h .
+                      normals[point])                             //  n)
 
-                 + diffusion_coefficient * penalty *
-                     fe_iv.jump(j, point) * // + nu sigma [u_h]
-                     fe_iv.jump(i, point)   // [v_h]
+                 + diffusion_coefficient * penalty * // + nu sigma
+                     fe_iv.jump(j, point) *          // [u_h]
+                     fe_iv.jump(i, point)            // [v_h]
 
                  ) *
                 JxW[point]; // dx
@@ -946,9 +948,12 @@ namespace Step74
                   {
                     refine_grid();
                   }
+                break;
               }
             default:
-              Assert(false, ExcNotImplemented());
+              {
+                Assert(false, ExcNotImplemented());
+              }
           }
         std::cout << "Number of active cells:       "
                   << triangulation.n_active_cells() << std::endl;
