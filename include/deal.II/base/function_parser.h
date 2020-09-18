@@ -45,10 +45,10 @@ class Vector;
 /**
  * This class implements a function object that gets its value by parsing a
  * string describing this function. It is a wrapper class for the muparser
- * library (see http://muparser.beltoforion.de/). This class lets you evaluate
- * strings such as "sqrt(1-x^2+y^2)" for given values of 'x' and 'y'.  Please
- * refer to the muparser documentation for more information.  This class is
- * used in the step-33 and step-36 tutorial programs (the latter being much
+ * library (see https://beltoforion.de/en/muparser/). This class lets you
+ * evaluate strings such as "sqrt(1-x^2+y^2)" for given values of 'x' and 'y'.
+ * Please refer to the muparser documentation for more information.  This class
+ * is used in the step-33 and step-36 tutorial programs (the latter being much
  * simpler to understand).
  *
  * In addition to the built-in functions of muparser, namely
@@ -159,7 +159,7 @@ class Vector;
  *
  * The syntax to describe a function follows usual programming practice, and
  * is explained in detail at the homepage of the underlying muparser library
- * at http://muparser.beltoforion.de/ .
+ * at https://beltoforion.de/en/muparser/.
  *
  * For a wrapper of the FunctionParser class that supports ParameterHandler,
  * see Functions::ParsedFunction.
