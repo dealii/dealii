@@ -26,9 +26,9 @@ DEAL_II_NAMESPACE_OPEN
  * $T_{\text{start}}$ to an end time $T_{\text{end}}$. It also allows adjusting
  * the time step size during the simulation. This class provides the necessary
  * interface to be incorporated in any time-dependent simulation. As an
- * example, the usage of this class is demonstrated in step-21 and step-68.
- * This class attempts to replace the usage of TimestepControl with a better
- * and more modern interface.
+ * example, the usage of this class is demonstrated in step-21. This class
+ * attempts to replace the usage of TimestepControl with a better and more
+ * modern interface.
  *
  * This class provides a number of invariants that are guaranteed to be
  * true at all times.

@@ -280,8 +280,7 @@ namespace Step68
     DoFHandler<dim>                            fluid_dh;
     FESystem<dim>                              fluid_fe;
     MappingQ<dim>                              mapping;
-    LinearAlgebra::distributed::Vector<double> field_owned;
-    LinearAlgebra::distributed::Vector<double> field_relevant;
+    LinearAlgebra::distributed::Vector<double> velocity_field;
 
     Vortex<dim> velocity;
 
@@ -416,15 +415,10 @@ namespace Step68
           status) -> unsigned int { return this->cell_weight(cell, status); });
 
     background_triangulation.signals.pre_distributed_repartition.connect(
-      std::bind(
-        &Particles::ParticleHandler<dim>::register_store_callback_function,
-        &particle_handler));
+      [this]() { this->particle_handler.register_store_callback_function(); });
 
     background_triangulation.signals.post_distributed_repartition.connect(
-      std::bind(
-        &Particles::ParticleHandler<dim>::register_load_callback_function,
-        &particle_handler,
-        false));
+      [&]() { this->particle_handler.register_load_callback_function(false); });
 
     // This initializes the background triangulation where the particles are
     // living and the number of properties of the particles.
@@ -495,8 +489,7 @@ namespace Step68
     IndexSet       locally_relevant_dofs;
     DoFTools::extract_locally_relevant_dofs(fluid_dh, locally_relevant_dofs);
 
-    field_owned.reinit(locally_owned_dofs, mpi_communicator);
-    field_relevant.reinit(locally_owned_dofs,
+    velocity_field.reinit(locally_owned_dofs,
                           locally_relevant_dofs,
                           mpi_communicator);
   }
@@ -511,8 +504,9 @@ namespace Step68
   {
     const MappingQ<dim> mapping(fluid_fe.degree);
 
-    VectorTools::interpolate(mapping, fluid_dh, velocity, field_owned);
-    field_relevant = field_owned;
+    velocity_field.zero_out_ghosts();
+    VectorTools::interpolate(mapping, fluid_dh, velocity, velocity_field);
+    velocity_field.update_ghost_values();
   }
 
 
@@ -569,7 +563,7 @@ namespace Step68
     // Rather, we loop over all the particles, but, we get the reference
     // of the cell in which the particle lies and then loop over all particles
     // within that cell. This enables us to gather the values of the velocity
-    // out of the `field_relevant` vector once and use them for all particles
+    // out of the `velocity_field` vector once and use them for all particles
     // that lie within the cell.
     auto particle = particle_handler.begin();
     while (particle != particle_handler.end())
@@ -579,7 +573,7 @@ namespace Step68
         const auto dh_cell =
           typename DoFHandler<dim>::cell_iterator(*cell, &fluid_dh);
 
-        dh_cell->get_dof_values(field_relevant, local_dof_values);
+        dh_cell->get_dof_values(velocity_field, local_dof_values);
 
         // Next, compute the velocity at the particle locations by evaluating
         // the finite element solution at the position of the particles.
@@ -589,11 +583,12 @@ namespace Step68
         // evaluation by hand, which is somewhat more efficient and only
         // matters for this tutorial, because the particle work is the
         // dominant cost of the whole program.
-        while (particle->get_surrounding_cell(background_triangulation) == cell)
+        const auto pic = particle_handler.particles_in_cell(cell);
+        Assert(pic.begin() == particle, ExcInternalError());
+        for (auto &p : pic)
           {
-            const Point<dim> reference_location =
-              particle->get_reference_location();
-            Tensor<1, dim> particle_velocity;
+            const Point<dim> reference_location = p.get_reference_location();
+            Tensor<1, dim>   particle_velocity;
             for (unsigned int j = 0; j < fluid_fe.dofs_per_cell; ++j)
               {
                 const auto comp_j = fluid_fe.system_to_component_index(j);
@@ -606,11 +601,11 @@ namespace Step68
             Point<dim> particle_location = particle->get_location();
             for (int d = 0; d < dim; ++d)
               particle_location[d] += particle_velocity[d] * dt;
-            particle->set_location(particle_location);
+            p.set_location(particle_location);
 
             // Again, we store the particle velocity and the processor id in the
             // particle properties for visualization purposes.
-            ArrayView<double> properties = particle->get_properties();
+            ArrayView<double> properties = p.get_properties();
             for (int d = 0; d < dim; ++d)
               properties[d] = particle_velocity[d];
 
@@ -675,7 +670,7 @@ namespace Step68
 
     // Attach the solution data to data_out object
     data_out.attach_dof_handler(fluid_dh);
-    data_out.add_data_vector(field_relevant,
+    data_out.add_data_vector(velocity_field,
                              solution_names,
                              DataOut<dim>::type_dof_data,
                              data_component_interpretation);
@@ -732,7 +727,8 @@ namespace Step68
       euler_step_analytical(0.);
 
     output_particles(discrete_time.get_step_number());
-    output_background(discrete_time.get_step_number());
+    if (interpolated_velocity)
+      output_background(discrete_time.get_step_number());
 
     // The particles are advected by looping over time.
     while (!discrete_time.is_at_end())
