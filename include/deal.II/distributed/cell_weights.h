@@ -137,8 +137,8 @@ namespace parallel
      * Triangulation associated with the @p dof_handler.
      */
     static std::function<unsigned int(
-      const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-      const typename Triangulation<dim, spacedim>::CellStatus     status)>
+      const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell,
+      const typename dealii::Triangulation<dim, spacedim>::CellStatus status)>
     make_weighting_callback(const DoFHandler<dim, spacedim> &dof_handler,
                             const WeightingFunction &weighting_function);
 
