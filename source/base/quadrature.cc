@@ -13,16 +13,16 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/geometry_info.h>
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/utilities.h>
 
+#include <algorithm>
+#include <array>
 #include <cmath>
-#include <cstdlib>
-#include <iterator>
+#include <limits>
 #include <memory>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
