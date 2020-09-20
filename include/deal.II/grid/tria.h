@@ -1697,7 +1697,9 @@ public:
 
   /**
    * Return a constant reference to a Manifold object used for this
-   * triangulation.  Number is the same as in @p set_manifold
+   * triangulation. @p number is the same as in set_manifold().
+   *
+   * @note If no manifold could be found, the default flat manifold is returned.
    *
    * @ingroup manifold
    *
@@ -1820,8 +1822,11 @@ public:
    * Create a triangulation from the provided
    * TriangulationDescription::Description.
    *
+   * @note Don't forget to attach the manifolds with set_manifold() before
+   *   calling this function if manifolds are needed.
+   *
    * @note The namespace TriangulationDescription::Utilities contains functions
-   *       to create TriangulationDescription::Description.
+   *   to create TriangulationDescription::Description.
    *
    * @param construction_data The data needed for this process.
    */
