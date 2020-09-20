@@ -97,6 +97,7 @@ Quadrature<dim>::Quadrature(const Point<dim> &point)
 }
 
 
+
 #ifndef DOXYGEN
 template <>
 Quadrature<1>::Quadrature(const Point<1> &point)
@@ -104,6 +105,15 @@ Quadrature<1>::Quadrature(const Point<1> &point)
   , weights(std::vector<double>(1, 1.))
   , is_tensor_product_flag(true)
 {}
+
+
+
+template <>
+Quadrature<0>::Quadrature(const Point<0> &)
+  : is_tensor_product_flag(false)
+{
+  Assert(false, ExcImpossibleInDim(0));
+}
 
 
 
