@@ -94,7 +94,7 @@ test(const unsigned int size,
     NumberType vl = 0, vu = 0;
     int        il = 1, iu = size;
     char       sign   = 'S';
-    NumberType abstol = lamch(&sign);
+    NumberType abstol = lamch<NumberType>(&sign);
     abstol *= 2;
     int                     m = 0;
     std::vector<NumberType> eigenvectors(size * size); // will not be referenced
