@@ -155,6 +155,17 @@ IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
 
   ENDFOREACH()
 
+  # Now also install the directory in which the script puts copies of everything
+  # that isn't explicitly annotated and sent through doxygen.
+  INSTALL(DIRECTORY
+    ${CMAKE_CURRENT_BINARY_DIR}
+    DESTINATION ${DEAL_II_DOCHTML_RELDIR}/doxygen
+    COMPONENT documentation
+    PATTERN CMakeFiles EXCLUDE
+    PATTERN cmake_install.cmake EXCLUDE
+    )
+
+
 ELSE()
 
   # no copy of the code gallery is available. say so. but also
