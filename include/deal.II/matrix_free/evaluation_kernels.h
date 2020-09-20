@@ -3248,50 +3248,52 @@ namespace internal
         dof_access_index,
         face_orientations,
         orientation_map,
-        [](auto &      temp_1,
-           auto &      temp_2,
-           const auto  src_ptr_1,
-           const auto  src_ptr_2,
-           const auto &grad_weight) {
+        [](VectorizedArrayType &      temp_1,
+           VectorizedArrayType &      temp_2,
+           const Number *             src_ptr_1,
+           const Number *             src_ptr_2,
+           const VectorizedArrayType &grad_weight) {
           // case 1a)
           do_vectorized_read(src_ptr_1, temp_1);
           do_vectorized_read(src_ptr_2, temp_2);
           temp_2 = grad_weight * (temp_1 - temp_2);
         },
-        [](auto &temp, const auto src_ptr) {
+        [](VectorizedArrayType &temp, const Number *src_ptr) {
           // case 1b)
           do_vectorized_read(src_ptr, temp);
         },
-        [](auto &      temp_1,
-           auto &      temp_2,
-           const auto  src_ptr_1,
-           const auto  src_ptr_2,
-           const auto &grad_weight,
-           const auto &indices_1,
-           const auto &indices_2) {
+        [](VectorizedArrayType &      temp_1,
+           VectorizedArrayType &      temp_2,
+           const Number *             src_ptr_1,
+           const Number *             src_ptr_2,
+           const VectorizedArrayType &grad_weight,
+           const unsigned int *       indices_1,
+           const unsigned int *       indices_2) {
           // case 2a)
           do_vectorized_gather(src_ptr_1, indices_1, temp_1);
           do_vectorized_gather(src_ptr_2, indices_2, temp_2);
           temp_2 = grad_weight * (temp_1 - temp_2);
         },
-        [](auto &temp, const auto src_ptr, const auto &indices) {
+        [](VectorizedArrayType &temp,
+           const Number *       src_ptr,
+           const unsigned int * indices) {
           // case 2b)
           do_vectorized_gather(src_ptr, indices, temp);
         },
-        [](auto &      temp_1,
-           auto &      temp_2,
-           const auto &src_ptr_1,
-           const auto &src_ptr_2,
-           const auto &grad_weight) {
+        [](Number &     temp_1,
+           Number &     temp_2,
+           const Number src_ptr_1,
+           const Number src_ptr_2,
+           Number       grad_weight) {
           // case 3a)
           temp_1 = src_ptr_1;
           temp_2 = grad_weight * (temp_1 - src_ptr_2);
         },
-        [](auto &temp, const auto &src_ptr) {
+        [](Number &temp, const Number src_ptr) {
           // case 3b)
           temp = src_ptr;
         },
-        [&](const auto &, const unsigned int) {
+        [&](const VectorizedArrayType *, const unsigned int) {
           // case 5)
         },
         [&](auto &temp1, const unsigned int comp) {
@@ -3411,11 +3413,11 @@ namespace internal
         dof_access_index,
         face_orientations,
         orientation_map,
-        [](const auto &temp_1,
-           const auto &temp_2,
-           auto        dst_ptr_1,
-           auto        dst_ptr_2,
-           const auto &grad_weight) {
+        [](const VectorizedArrayType &temp_1,
+           const VectorizedArrayType &temp_2,
+           Number *                   dst_ptr_1,
+           Number *                   dst_ptr_2,
+           const VectorizedArrayType &grad_weight) {
           // case 1a)
           const VectorizedArrayType val  = temp_1 - grad_weight * temp_2;
           const VectorizedArrayType grad = grad_weight * temp_2;
@@ -3426,39 +3428,41 @@ namespace internal
           // case 1b)
           do_vectorized_add(temp, dst_ptr);
         },
-        [](const auto &temp_1,
-           const auto &temp_2,
-           auto        dst_ptr_1,
-           auto        dst_ptr_2,
-           const auto &grad_weight,
-           const auto &indices_1,
-           const auto &indices_2) {
+        [](VectorizedArrayType &      temp_1,
+           VectorizedArrayType &      temp_2,
+           Number *                   dst_ptr_1,
+           Number *                   dst_ptr_2,
+           const VectorizedArrayType &grad_weight,
+           const unsigned int *       indices_1,
+           const unsigned int *       indices_2) {
           // case 2a)
           const VectorizedArrayType val  = temp_1 - grad_weight * temp_2;
           const VectorizedArrayType grad = grad_weight * temp_2;
           do_vectorized_scatter_add(val, indices_1, dst_ptr_1);
           do_vectorized_scatter_add(grad, indices_2, dst_ptr_2);
         },
-        [](const auto &temp, auto dst_ptr, const auto &indices) {
+        [](const VectorizedArrayType &temp,
+           Number *                   dst_ptr,
+           const unsigned int *       indices) {
           // case 2b)
           do_vectorized_scatter_add(temp, indices, dst_ptr);
         },
-        [](const auto &temp_1,
-           const auto &temp_2,
-           auto &      dst_ptr_1,
-           auto &      dst_ptr_2,
-           const auto &grad_weight) {
+        [](const Number temp_1,
+           const Number temp_2,
+           Number &     dst_ptr_1,
+           Number &     dst_ptr_2,
+           const Number grad_weight) {
           // case 3a)
           const Number val  = temp_1 - grad_weight * temp_2;
           const Number grad = grad_weight * temp_2;
           dst_ptr_1 += val;
           dst_ptr_2 += grad;
         },
-        [](const auto &temp, auto &dst_ptr) {
+        [](const Number temp, Number &dst_ptr) {
           // case 3b)
           dst_ptr += temp;
         },
-        [&](const auto &temp1, const unsigned int comp) {
+        [&](const VectorizedArrayType *temp1, const unsigned int comp) {
           // case 5: default vector access, must be handled separately, just do
           // the face-normal interpolation
 
