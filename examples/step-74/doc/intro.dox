@@ -50,7 +50,7 @@ and
 @f[
 \average{v} = \frac{v^0 + v^1}{2}
 @f]
-respectively. Note that when $f\in \partial \Omega$, we define $\jump{v} = v$ and
+respectively. Note that when $f\subset \partial \Omega$, we define $\jump{v} = v$ and
 $\average{v}=v$.
 The discretization using the SIPG is given by the following weak formula
 (more details can be found in @cite di2011mathematical and the references therein)
