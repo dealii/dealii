@@ -459,108 +459,6 @@ namespace internal
   }   // namespace QIteratedImplementation
 } // namespace internal
 
-// template <>
-// void
-// QIterated<1>::fill(Quadrature<1>& dst,
-//                 const Quadrature<1> &base_quadrature,
-//                 const unsigned int   n_copies)
-// {
-//   Assert (n_copies > 0, ExcZero());
-//   Assert (base_quadrature.size() > 0, ExcZero());
-
-//   const unsigned int np =
-//     uses_both_endpoints(base_quadrature)
-//     ? (base_quadrature.size()-1) * n_copies + 1
-//     : base_quadrature.size() * n_copies;
-
-//   dst.quadrature_points.resize(np);
-//   dst.weights.resize(np);
-
-//   if (!uses_both_endpoints(base_quadrature))
-//                                   // we don't have to skip some
-//                                   // points in order to get a
-//                                   // reasonable quadrature formula
-//     {
-//       unsigned int next_point = 0;
-//       for (unsigned int copy=0; copy<n_copies; ++copy)
-//      for (unsigned int q_point=0; q_point<base_quadrature.size(); ++q_point)
-//        {
-//          dst.quadrature_points[next_point](0)
-//            = (copy + base_quadrature.point(q_point)(0)) / n_copies;
-//          dst.weights[next_point]
-//            = base_quadrature.weight(q_point) / n_copies;
-//          ++next_point;
-//        }
-//     }
-//   else
-//                                   // skip doubly available points
-//     {
-//       unsigned int next_point = 0;
-
-//                                     // first find out the weights of
-//                                     // the left and the right boundary
-//                                     // points. note that these usually
-//                                     // are but need not necessarily be
-//                                     // the same
-//       double double_point_weight = 0;
-//       unsigned int n_end_points = 0;
-//       for (unsigned int i=0; i<base_quadrature.size(); ++i)
-//                                       // add up the weight if this
-//                                       // is an endpoint
-//      if ((base_quadrature.point(i)(0) == 0.) ||
-//          (base_quadrature.point(i)(0) == 1.))
-//        {
-//          double_point_weight += base_quadrature.weight(i);
-//          ++n_end_points;
-//        }
-//                                     // scale the weight correctly
-//       double_point_weight /= n_copies;
-
-//                                     // make sure the base quadrature formula
-//                                     // has only one quadrature point
-//                                     // per end point
-//       Assert (n_end_points == 2, ExcInvalidQuadratureFormula());
-
-
-//       for (unsigned int copy=0; copy<n_copies; ++copy)
-//      for (unsigned int q_point=0; q_point<base_quadrature.size(); ++q_point)
-//        {
-//                                           // skip the left point of
-//                                           // this copy since we
-//                                           // have already entered
-//                                           // it the last time
-//          if ((copy > 0) &&
-//              (base_quadrature.point(q_point)(0) == 0.))
-//            continue;
-
-//          dst.quadrature_points[next_point](0)
-//            = (copy+base_quadrature.point(q_point)(0)) / n_copies;
-
-//                                           // if this is the
-//                                           // rightmost point of one
-//                                           // of the non-last
-//                                           // copies: give it the
-//                                           // double weight
-//          if ((copy != n_copies-1) &&
-//              (base_quadrature.point(q_point)(0) == 1.))
-//            dst.weights[next_point] = double_point_weight;
-//          else
-//            dst.weights[next_point] = base_quadrature.weight(q_point) /
-//                                        n_copies;
-
-//          ++next_point;
-//        }
-//     }
-
-// #if DEBUG
-//   double sum_of_weights = 0;
-//   for (unsigned int i=0; i<dst.size(); ++i)
-//     sum_of_weights += dst.weight(i);
-//   Assert (std::fabs(sum_of_weights-1) < 1e-15,
-//        ExcInternalError());
-// #endif
-
-// }
 
 
 template <>
@@ -580,7 +478,6 @@ QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
         (base_quadrature.size() - 1) * n_copies + 1 :
         base_quadrature.size() * n_copies)
 {
-  //  fill(*this, base_quadrature, n_copies);
   Assert(base_quadrature.size() > 0, ExcNotInitialized());
   Assert(n_copies > 0, ExcZero());
 
@@ -672,13 +569,6 @@ QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
 #endif
 }
 
-
-// template <int dim>
-// void
-// QIterated<dim>::fill(Quadrature<dim>&, const Quadrature<1>&, unsigned int)
-// {
-//   Assert(false, ExcNotImplemented());
-// }
 
 
 // construct higher dimensional quadrature formula by tensor product
