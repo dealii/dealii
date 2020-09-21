@@ -27,7 +27,7 @@ time, then deal.II is clearly not your right tool. On the other hand, if
 this evolution is due to the interaction with the solution of partial differential
 equation, or if having a mesh to determine which particles interact
 with others (such as in the
-[smoothed particle hydrodynamics (SMH)](https://en.wikipedia.org/wiki/Smoothed-particle_hydrodynamics)
+[smoothed particle hydrodynamics (SPH)](https://en.wikipedia.org/wiki/Smoothed-particle_hydrodynamics)
 method), then deal.II has support for you.
 
 The case we will consider here is how electrically charged particles move through
@@ -60,7 +60,7 @@ density. This is augmented by boundary conditions that we will choose as follows
    && \text{on}\; \partial\Omega\setminus\Gamma_\text{cathode}\setminus\Gamma_\text{anode}.
 @f}
 In other words, we prescribe voltages $+V_0$ and $-V_0$ at the two electrodes
-and isolating (Neumann) boundary conditions elsewhere. Since the dynamics of the
+and insulating (Neumann) boundary conditions elsewhere. Since the dynamics of the
 particles are purely due to the electric field $\mathbf E=\nabla V$, we could
 as well have prescribed $2V_0$ and $0$ at the two electrodes -- all that matters
 is the voltage difference at the two electrodes.
@@ -426,7 +426,7 @@ electrons are then accelerated towards the (green) anode which has a
 hole in the middle through which the electrons can escape the device and
 fly on to hit the screen, where they excite the "phosphor" to then emit
 the light that we see from these old-style TV screens. The non-heated
-part of the cathode is not heated, and consequently not subject
+part of the cathode is not subject
 to the emission of electrons -- in the code, we will mark this as the
 "focussing element" of the tube, because its negative electric voltage
 repels the electrons and makes sure that they do not just fly
