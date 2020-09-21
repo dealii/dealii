@@ -50,7 +50,7 @@ namespace Step48
 
 
 
-  template <int dim, int fe_degree>
+  template <int dim>
   class SineGordonOperation
   {
   public:
@@ -77,8 +77,8 @@ namespace Step48
 
 
 
-  template <int dim, int fe_degree>
-  SineGordonOperation<dim, fe_degree>::SineGordonOperation(
+  template <int dim>
+  SineGordonOperation<dim>::SineGordonOperation(
     const MatrixFree<dim, double> &data_in,
     const double                   time_step)
     : data(data_in)
@@ -88,8 +88,8 @@ namespace Step48
 
     data.initialize_dof_vector(inv_mass_matrix);
 
-    FEEvaluation<dim, fe_degree> fe_eval(data);
-    const unsigned int           n_q_points = fe_eval.n_q_points;
+    FEEvaluation<dim, -1> fe_eval(data);
+    const unsigned int    n_q_points = fe_eval.n_q_points;
 
     for (unsigned int cell = 0; cell < data.n_macro_cells(); ++cell)
       {
@@ -111,16 +111,16 @@ namespace Step48
 
 
 
-  template <int dim, int fe_degree>
+  template <int dim>
   void
-  SineGordonOperation<dim, fe_degree>::local_apply(
+  SineGordonOperation<dim>::local_apply(
     const MatrixFree<dim> &                                          data,
     LinearAlgebra::distributed::Vector<double> &                     dst,
     const std::vector<LinearAlgebra::distributed::Vector<double> *> &src,
     const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     AssertDimension(src.size(), 2);
-    FEEvaluation<dim, fe_degree> current(data), old(data);
+    FEEvaluation<dim, -1> current(data), old(data);
     deallog << "submit / sine values: ";
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
@@ -164,17 +164,14 @@ namespace Step48
 
 
 
-  template <int dim, int fe_degree>
+  template <int dim>
   void
-  SineGordonOperation<dim, fe_degree>::apply(
+  SineGordonOperation<dim>::apply(
     LinearAlgebra::distributed::Vector<double> &                     dst,
     const std::vector<LinearAlgebra::distributed::Vector<double> *> &src) const
   {
     dst = 0;
-    data.cell_loop(&SineGordonOperation<dim, fe_degree>::local_apply,
-                   this,
-                   dst,
-                   src);
+    data.cell_loop(&SineGordonOperation<dim>::local_apply, this, dst, src);
     dst.scale(inv_mass_matrix);
   }
 
@@ -335,8 +332,7 @@ namespace Step48
     previous_solutions.push_back(&old_solution);
     previous_solutions.push_back(&old_old_solution);
 
-    SineGordonOperation<dim, fe_degree> sine_gordon_op(matrix_free_data,
-                                                       time_step);
+    SineGordonOperation<dim> sine_gordon_op(matrix_free_data, time_step);
 
     unsigned int timestep_number = 1;
 
