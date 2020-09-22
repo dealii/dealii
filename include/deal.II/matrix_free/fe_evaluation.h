@@ -8470,36 +8470,53 @@ FEFaceEvaluation<dim,
         return internal::FEFaceEvaluationImplGatherEvaluateSelector<
           dim,
           Number,
-          VectorizedArrayType>::
-          template run<fe_degree, n_q_points_1d, VectorizedArrayType::size()>(
-            n_components,
-            internal::get_beginning<Number>(input_vector),
-            *this->data,
-            *this->dof_info,
-            this->begin_values(),
-            this->begin_gradients(),
-            this->scratch_data,
-            evaluation_flag & EvaluationFlags::values,
-            evaluation_flag & EvaluationFlags::gradients,
-            this->active_fe_index,
-            this->first_selected_component,
-            cells,
-            face_nos,
-            this->subface_index,
-            this->dof_access_index,
-            face_orientations,
-            this->mapping_data->descriptor[this->active_fe_index]
-              .face_orientations);
+          VectorizedArrayType>::template run<fe_degree,
+                                             n_q_points_1d>(
+          n_components,
+          VectorizedArrayType::size(),
+          internal::get_beginning<Number>(input_vector),
+          *this->data,
+          *this->dof_info,
+          this->begin_values(),
+          this->begin_gradients(),
+          this->scratch_data,
+          evaluation_flag & EvaluationFlags::values,
+          evaluation_flag & EvaluationFlags::gradients,
+          this->active_fe_index,
+          this->first_selected_component,
+          cells,
+          face_nos,
+          this->subface_index,
+          this->dof_access_index,
+          face_orientations,
+          this->mapping_data->descriptor[this->active_fe_index]
+            .face_orientations);
       }
     else
       {
+        // TODO: this copying should not be necessary once we have introduced
+        // an internal-data structure
+        std::array<unsigned int, VectorizedArrayType::size()> cells_;
+        std::array<unsigned int, VectorizedArrayType::size()> face_no_;
+        std::array<unsigned int, VectorizedArrayType::size()> face_orientation_;
+
+        std::fill(cells_.begin(), cells_.end(), -1);
+        std::fill(face_no_.begin(), face_no_.end(), -1);
+        std::fill(face_orientation_.begin(), face_orientation_.end(), -1);
+
+        cells_[0]            = this->cell;
+        face_no_[0]          = this->face_no;
+        face_orientation_[0] = this->face_orientation;
+
         if (fe_degree > -1)
-          return internal::FEFaceEvaluationImplGatherEvaluateSelector<
-            dim,
-            Number,
-            VectorizedArrayType>::
-            template run<fe_degree, n_q_points_1d, 1>(
+          {
+            return internal::FEFaceEvaluationImplGatherEvaluateSelector<
+              dim,
+              Number,
+              VectorizedArrayType>::template run<fe_degree,
+                                                 n_q_points_1d>(
               n_components,
+              1,
               internal::get_beginning<Number>(input_vector),
               *this->data,
               *this->dof_info,
@@ -8510,35 +8527,37 @@ FEFaceEvaluation<dim,
               evaluation_flag & EvaluationFlags::gradients,
               this->active_fe_index,
               this->first_selected_component,
-              std::array<unsigned int, 1>{{this->cell}},
-              std::array<unsigned int, 1>{{this->face_no}},
+              cells_,
+              face_no_,
               this->subface_index,
               this->dof_access_index,
-              std::array<unsigned int, 1>{{this->face_orientation}},
+              face_orientation_,
               this->mapping_data->descriptor[this->active_fe_index]
                 .face_orientations);
+          }
         else
           return internal::
             FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::
-              gather_evaluate(
-                n_components,
-                internal::get_beginning<Number>(input_vector),
-                *this->data,
-                *this->dof_info,
-                this->begin_values(),
-                this->begin_gradients(),
-                this->scratch_data,
-                evaluation_flag & EvaluationFlags::values,
-                evaluation_flag & EvaluationFlags::gradients,
-                this->active_fe_index,
-                this->first_selected_component,
-                std::array<unsigned int, 1>{{this->cell}},
-                std::array<unsigned int, 1>{{this->face_no}},
-                this->subface_index,
-                this->dof_access_index,
-                std::array<unsigned int, 1>{{this->face_orientation}},
-                this->mapping_data->descriptor[this->active_fe_index]
-                  .face_orientations);
+              gather_evaluate(n_components,
+                              1,
+                              internal::get_beginning<Number>(input_vector),
+                              *this->data,
+                              *this->dof_info,
+                              this->begin_values(),
+                              this->begin_gradients(),
+                              this->scratch_data,
+                              evaluation_flag & EvaluationFlags::values,
+                              evaluation_flag & EvaluationFlags::gradients,
+                              this->active_fe_index,
+                              this->first_selected_component,
+                              cells_,
+                              face_no_,
+                              this->subface_index,
+                              this->dof_access_index,
+                              face_orientation_,
+                              this->mapping_data
+                                ->descriptor[this->active_fe_index]
+                                .face_orientations);
       }
   };
 
@@ -8608,32 +8627,47 @@ FEFaceEvaluation<dim,
           this->is_interior_face == false) == false,
          ExcNotImplemented());
 
+  // TODO: this copying should not be necessary once we have introduced
+  // an internal-data structure
+  std::array<unsigned int, VectorizedArrayType::size()> cells_;
+  std::array<unsigned int, VectorizedArrayType::size()> face_no_;
+  std::array<unsigned int, VectorizedArrayType::size()> face_orientation_;
+
+  std::fill(cells_.begin(), cells_.end(), -1);
+  std::fill(face_no_.begin(), face_no_.end(), -1);
+  std::fill(face_orientation_.begin(), face_orientation_.end(), -1);
+
+  cells_[0]            = this->cell;
+  face_no_[0]          = this->face_no;
+  face_orientation_[0] = this->face_orientation;
+
   if (fe_degree > -1)
     {
       if (!internal::FEFaceEvaluationImplIntegrateScatterSelector<
             dim,
             Number,
-            VectorizedArrayType>::
-            template run<fe_degree, n_q_points_1d, 1>(
-              n_components,
-              internal::get_beginning<Number>(destination),
-              *this->data,
-              *this->dof_info,
-              this->begin_dof_values(),
-              this->begin_values(),
-              this->begin_gradients(),
-              this->scratch_data,
-              evaluation_flag & EvaluationFlags::values,
-              evaluation_flag & EvaluationFlags::gradients,
-              this->active_fe_index,
-              this->first_selected_component,
-              std::array<unsigned int, 1>{{this->cell}},
-              std::array<unsigned int, 1>{{this->face_no}},
-              this->subface_index,
-              this->dof_access_index,
-              std::array<unsigned int, 1>{{this->face_orientation}},
-              this->mapping_data->descriptor[this->active_fe_index]
-                .face_orientations))
+            VectorizedArrayType>::template run<fe_degree,
+                                               n_q_points_1d>(
+            n_components,
+            1,
+            internal::get_beginning<Number>(destination),
+            *this->data,
+            *this->dof_info,
+            this->begin_dof_values(),
+            this->begin_values(),
+            this->begin_gradients(),
+            this->scratch_data,
+            evaluation_flag & EvaluationFlags::values,
+            evaluation_flag & EvaluationFlags::gradients,
+            this->active_fe_index,
+            this->first_selected_component,
+            cells_,
+            face_no_,
+            this->subface_index,
+            this->dof_access_index,
+            face_orientation_,
+            this->mapping_data->descriptor[this->active_fe_index]
+              .face_orientations))
         {
           // if we arrive here, writing into the destination vector did not
           // succeed because some of the assumptions in integrate_scatter were
@@ -8645,26 +8679,27 @@ FEFaceEvaluation<dim,
   else
     {
       if (!internal::FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::
-            integrate_scatter(
-              n_components,
-              internal::get_beginning<Number>(destination),
-              *this->data,
-              *this->dof_info,
-              this->begin_dof_values(),
-              this->begin_values(),
-              this->begin_gradients(),
-              this->scratch_data,
-              evaluation_flag & EvaluationFlags::values,
-              evaluation_flag & EvaluationFlags::gradients,
-              this->active_fe_index,
-              this->first_selected_component,
-              std::array<unsigned int, 1>{{this->cell}},
-              std::array<unsigned int, 1>{{this->face_no}},
-              this->subface_index,
-              this->dof_access_index,
-              std::array<unsigned int, 1>{{this->face_orientation}},
-              this->mapping_data->descriptor[this->active_fe_index]
-                .face_orientations))
+            integrate_scatter(n_components,
+                              1,
+                              internal::get_beginning<Number>(destination),
+                              *this->data,
+                              *this->dof_info,
+                              this->begin_dof_values(),
+                              this->begin_values(),
+                              this->begin_gradients(),
+                              this->scratch_data,
+                              evaluation_flag & EvaluationFlags::values,
+                              evaluation_flag & EvaluationFlags::gradients,
+                              this->active_fe_index,
+                              this->first_selected_component,
+                              cells_,
+                              face_no_,
+                              this->subface_index,
+                              this->dof_access_index,
+                              face_orientation_,
+                              this->mapping_data
+                                ->descriptor[this->active_fe_index]
+                                .face_orientations))
         {
           this->distribute_local_to_global(destination);
         }
