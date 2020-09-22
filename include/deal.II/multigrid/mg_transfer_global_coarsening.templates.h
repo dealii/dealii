@@ -1289,7 +1289,7 @@ namespace internal
         });
       }
 
-      for (const auto fe_index_pair : fe_index_pairs)
+      for (const auto &fe_index_pair : fe_index_pairs)
         {
           transfer.schemes[fe_index_pair.second].dofs_per_cell_coarse =
             dof_handler_coarse.get_fe(fe_index_pair.first.first).dofs_per_cell;
@@ -1340,7 +1340,7 @@ namespace internal
         std::vector<std::vector<types::global_dof_index>>
           local_dof_indices_fine(fe_index_pairs.size());
 
-        for (const auto fe_index_pair : fe_index_pairs)
+        for (const auto &fe_index_pair : fe_index_pairs)
           {
             local_dof_indices_coarse[fe_index_pair.second].resize(
               transfer.schemes[fe_index_pair.second].dofs_per_cell_coarse);
