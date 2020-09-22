@@ -55,10 +55,7 @@
 
 
 
-template <int dim,
-          int fe_degree,
-          int n_q_points_1d = fe_degree + 1,
-          typename number   = double>
+template <int dim, typename number = double>
 class LaplaceOperator : public Subscriptor
 {
 public:
@@ -69,8 +66,11 @@ public:
   void
   initialize(const Mapping<dim> &   mapping,
              const DoFHandler<dim> &dof_handler,
+             const unsigned int     n_q_points_1d,
              const unsigned int     level = numbers::invalid_unsigned_int)
   {
+    fe_degree = dof_handler.get_fe().degree;
+
     const QGauss<1>                                  quad(n_q_points_1d);
     typename MatrixFree<dim, number>::AdditionalData addit_data;
     addit_data.tasks_parallel_scheme =
@@ -185,7 +185,7 @@ private:
               const LinearAlgebra::distributed::Vector<number> &src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
-    FEEvaluation<dim, fe_degree, n_q_points_1d, 1, number> phi(data);
+    FEEvaluation<dim, -1, 0, 1, number> phi(data);
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
@@ -206,10 +206,8 @@ private:
     const LinearAlgebra::distributed::Vector<number> &src,
     const std::pair<unsigned int, unsigned int> &     face_range) const
   {
-    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, 1, number> fe_eval(data,
-                                                                       true);
-    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, 1, number> fe_eval_neighbor(
-      data, false);
+    FEFaceEvaluation<dim, -1, 0, 1, number> fe_eval(data, true);
+    FEFaceEvaluation<dim, -1, 0, 1, number> fe_eval_neighbor(data, false);
 
     for (unsigned int face = face_range.first; face < face_range.second; face++)
       {
@@ -257,8 +255,7 @@ private:
     const LinearAlgebra::distributed::Vector<number> &src,
     const std::pair<unsigned int, unsigned int> &     face_range) const
   {
-    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, 1, number> fe_eval(data,
-                                                                       true);
+    FEFaceEvaluation<dim, -1, 0, 1, number> fe_eval(data, true);
     for (unsigned int face = face_range.first; face < face_range.second; face++)
       {
         fe_eval.reinit(face);
@@ -307,14 +304,15 @@ private:
     const unsigned int &,
     const std::pair<unsigned int, unsigned int> &cell_range) const
   {
-    FEEvaluation<dim, fe_degree, n_q_points_1d, 1, number>     phi(data);
-    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, 1, number> phif(data);
+    FEEvaluation<dim, -1, 0, 1, number>     phi(data);
+    FEFaceEvaluation<dim, -1, 0, 1, number> phif(data);
+    AlignedVector<VectorizedArray<number>>  local_diagonal_vector(
+      phi.dofs_per_cell);
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         phi.reinit(cell);
 
-        VectorizedArray<number> local_diagonal_vector[phi.static_dofs_per_cell];
         for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
           {
             for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
@@ -366,7 +364,7 @@ private:
                 local_diagonal_vector[i] += phif.begin_dof_values()[i];
               }
           }
-        for (unsigned int i = 0; i < phi.static_dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
           phi.begin_dof_values()[i] = local_diagonal_vector[i];
         phi.distribute_local_to_global(dst);
       }
@@ -374,6 +372,7 @@ private:
 
   MatrixFree<dim, number>                    data;
   LinearAlgebra::distributed::Vector<number> inverse_diagonal_entries;
+  int                                        fe_degree;
 };
 
 
@@ -442,17 +441,17 @@ private:
 
 
 
-template <int dim, int fe_degree, int n_q_points_1d, typename number>
+template <int dim, typename number>
 void
-do_test(const DoFHandler<dim> &dof, const bool also_test_parallel = false)
+do_test(const DoFHandler<dim> &dof, const unsigned int n_q_points_1d)
 {
   deallog << "Testing " << dof.get_fe().get_name();
   deallog << std::endl;
   deallog << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
 
-  MappingQ<dim>                                          mapping(fe_degree + 1);
-  LaplaceOperator<dim, fe_degree, n_q_points_1d, number> fine_matrix;
-  fine_matrix.initialize(mapping, dof);
+  MappingQ<dim>                mapping(n_q_points_1d);
+  LaplaceOperator<dim, number> fine_matrix;
+  fine_matrix.initialize(mapping, dof, n_q_points_1d);
 
   LinearAlgebra::distributed::Vector<number> in, sol;
   fine_matrix.initialize_dof_vector(in);
@@ -461,8 +460,7 @@ do_test(const DoFHandler<dim> &dof, const bool also_test_parallel = false)
   in = 1.;
 
   // set up multigrid in analogy to step-37
-  typedef LaplaceOperator<dim, fe_degree, n_q_points_1d, number>
-    LevelMatrixType;
+  typedef LaplaceOperator<dim, number> LevelMatrixType;
 
   MGLevelObject<LevelMatrixType> mg_matrices;
   mg_matrices.resize(0, dof.get_triangulation().n_global_levels() - 1);
@@ -470,7 +468,7 @@ do_test(const DoFHandler<dim> &dof, const bool also_test_parallel = false)
        level < dof.get_triangulation().n_global_levels();
        ++level)
     {
-      mg_matrices[level].initialize(mapping, dof, level);
+      mg_matrices[level].initialize(mapping, dof, n_q_points_1d, level);
     }
 
   MGCoarseIterative<LevelMatrixType, number> mg_coarse;
@@ -526,11 +524,11 @@ do_test(const DoFHandler<dim> &dof, const bool also_test_parallel = false)
 
 
 
-template <int dim, int fe_degree>
+template <int dim>
 void
-test()
+test(const unsigned int fe_degree)
 {
-  for (int i = 5; i < 9 - fe_degree; ++i)
+  for (unsigned int i = 5; i < 9 - fe_degree; ++i)
     {
       parallel::distributed::Triangulation<dim> tria(
         MPI_COMM_WORLD,
@@ -545,7 +543,7 @@ test()
       dof.distribute_dofs(fe);
       dof.distribute_mg_dofs();
 
-      do_test<dim, fe_degree, fe_degree + 1, double>(dof, true);
+      do_test<dim, double>(dof, fe_degree + 1);
     }
 }
 
@@ -560,12 +558,12 @@ main(int argc, char **argv)
 
   {
     deallog.push("2d");
-    test<2, 1>();
-    test<2, 2>();
+    test<2>(1);
+    test<2>(2);
     deallog.pop();
     deallog.push("3d");
-    test<3, 1>();
-    test<3, 2>();
+    test<3>(1);
+    test<3>(2);
     deallog.pop();
   }
 }

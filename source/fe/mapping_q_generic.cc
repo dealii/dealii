@@ -36,8 +36,7 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/tensor_product_matrix.h>
 
-#include <deal.II/matrix_free/evaluation_kernels.h>
-#include <deal.II/matrix_free/evaluation_selector.h>
+#include <deal.II/matrix_free/evaluation_template_factory.h>
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/tensor_product_kernels.h>
 
@@ -1541,15 +1540,17 @@ namespace internal
                 }
 
             // do the actual tensorized evaluation
-            SelectEvaluator<dim, -1, 0, VectorizedArray<double>>::evaluate(
-              n_comp,
-              evaluation_flag,
-              data.shape_info,
-              data.values_dofs.begin(),
-              data.values_quad.begin(),
-              data.gradients_quad.begin(),
-              data.hessians_quad.begin(),
-              data.scratch.begin());
+            internal::FEEvaluationFactory<
+              dim,
+              double,
+              VectorizedArray<double>>::evaluate(n_comp,
+                                                 evaluation_flag,
+                                                 data.shape_info,
+                                                 data.values_dofs.begin(),
+                                                 data.values_quad.begin(),
+                                                 data.gradients_quad.begin(),
+                                                 data.hessians_quad.begin(),
+                                                 data.scratch.begin());
           }
 
         // do the postprocessing

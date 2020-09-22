@@ -1500,8 +1500,7 @@ namespace internal
                               hessians_quad,
                               scratch_data);
         }
-      else if (shape_info.element_type ==
-               internal::MatrixFreeFunctions::tensor_general)
+      else
         {
           internal::FEEvaluationImpl<
             internal::MatrixFreeFunctions::tensor_general,
@@ -1517,8 +1516,6 @@ namespace internal
                               hessians_quad,
                               scratch_data);
         }
-      else
-        AssertThrow(false, ExcNotImplemented());
 
       return false;
     }
@@ -1649,8 +1646,7 @@ namespace internal
                                scratch_data,
                                sum_into_values_array);
         }
-      else if (shape_info.element_type ==
-               internal::MatrixFreeFunctions::tensor_general)
+      else
         {
           internal::FEEvaluationImpl<
             internal::MatrixFreeFunctions::tensor_general,
@@ -1666,8 +1662,6 @@ namespace internal
                                scratch_data,
                                sum_into_values_array);
         }
-      else
-        AssertThrow(false, ExcNotImplemented());
 
       return false;
     }
@@ -3539,7 +3533,8 @@ namespace internal
                                    false,
                                    Number> &fe_eval,
         const Number *                      in_array,
-        Number *                            out_array)
+        Number *                            out_array,
+        typename std::enable_if<fe_degree != -1>::type * = nullptr)
     {
       constexpr unsigned int dofs_per_component =
         Utilities::pow(fe_degree + 1, dim);
@@ -3588,6 +3583,61 @@ namespace internal
         }
       return false;
     }
+
+    template <int fe_degree, int = 0>
+    static bool
+    run(const unsigned int                  n_components,
+        const FEEvaluationBaseData<dim,
+                                   typename Number::value_type,
+                                   false,
+                                   Number> &fe_eval,
+        const Number *                      in_array,
+        Number *                            out_array,
+        typename std::enable_if<fe_degree == -1>::type * = nullptr)
+    {
+      static_assert(fe_degree == -1, "Only usable for degree -1");
+      const unsigned int dofs_per_component =
+        fe_eval.get_shape_info().dofs_per_component_on_cell;
+
+      Assert(dim >= 1 || dim <= 3, ExcNotImplemented());
+
+      internal::
+        EvaluatorTensorProduct<internal::evaluate_general, dim, 0, 0, Number>
+          evaluator(fe_eval.get_shape_info().data.front().inverse_shape_values,
+                    AlignedVector<Number>(),
+                    AlignedVector<Number>(),
+                    fe_eval.get_shape_info().data.front().fe_degree + 1,
+                    fe_eval.get_shape_info().data.front().fe_degree + 1);
+
+      for (unsigned int d = 0; d < n_components; ++d)
+        {
+          const Number *in  = in_array + d * dofs_per_component;
+          Number *      out = out_array + d * dofs_per_component;
+          // Need to select 'apply' method with hessian slot because values
+          // assume symmetries that do not exist in the inverse shapes
+          evaluator.template values<0, true, false>(in, out);
+          if (dim > 1)
+            evaluator.template values<1, true, false>(out, out);
+          if (dim > 2)
+            evaluator.template values<2, true, false>(out, out);
+        }
+      for (unsigned int q = 0; q < dofs_per_component; ++q)
+        {
+          const Number inverse_JxW_q = Number(1.) / fe_eval.JxW(q);
+          for (unsigned int d = 0; d < n_components; ++d)
+            out_array[q + d * dofs_per_component] *= inverse_JxW_q;
+        }
+      for (unsigned int d = 0; d < n_components; ++d)
+        {
+          Number *out = out_array + d * dofs_per_component;
+          if (dim > 2)
+            evaluator.template values<2, false, false>(out, out);
+          if (dim > 1)
+            evaluator.template values<1, false, false>(out, out);
+          evaluator.template values<0, false, false>(out, out);
+        }
+      return false;
+    }
   };
 
 
@@ -3605,7 +3655,8 @@ namespace internal
         const AlignedVector<Number> &inverse_shape,
         const AlignedVector<Number> &inverse_coefficients,
         const Number *               in_array,
-        Number *                     out_array)
+        Number *                     out_array,
+        typename std::enable_if<fe_degree != -1>::type * = nullptr)
     {
       constexpr unsigned int dofs_per_component =
         Utilities::pow(fe_degree + 1, dim);
@@ -3657,6 +3708,23 @@ namespace internal
         }
       return false;
     }
+
+    /**
+     * Version for degree = -1
+     */
+    template <int fe_degree, int = 0>
+    static bool
+    run(const unsigned int,
+        const AlignedVector<Number> &,
+        const AlignedVector<Number> &,
+        const Number *,
+        Number *,
+        typename std::enable_if<fe_degree == -1>::type * = nullptr)
+    {
+      static_assert(fe_degree == -1, "Only usable for degree -1");
+      Assert(false, ExcNotImplemented());
+      return false;
+    }
   };
 
 
@@ -3673,7 +3741,8 @@ namespace internal
     run(const unsigned int           n_desired_components,
         const AlignedVector<Number> &inverse_shape,
         const Number *               in_array,
-        Number *                     out_array)
+        Number *                     out_array,
+        typename std::enable_if<fe_degree != -1>::type * = nullptr)
     {
       constexpr unsigned int dofs_per_cell = Utilities::pow(fe_degree + 1, dim);
       internal::EvaluatorTensorProduct<internal::evaluate_evenodd,
@@ -3704,6 +3773,19 @@ namespace internal
           if (dim == 1)
             evaluator.template hessians<0, false, false>(in, out);
         }
+      return false;
+    }
+
+    template <int fe_degree, int = 0>
+    static bool
+    run(const unsigned int,
+        const AlignedVector<Number> &,
+        const Number *,
+        Number *,
+        typename std::enable_if<fe_degree == -1>::type * = nullptr)
+    {
+      static_assert(fe_degree == -1, "Only usable for degree -1");
+      Assert(false, ExcNotImplemented());
       return false;
     }
   };

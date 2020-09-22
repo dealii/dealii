@@ -28,8 +28,7 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q_generic.h>
 
-#include <deal.II/matrix_free/evaluation_kernels.h>
-#include <deal.II/matrix_free/evaluation_selector.h>
+#include <deal.II/matrix_free/evaluation_template_factory.h>
 #include <deal.II/matrix_free/mapping_info.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -1302,7 +1301,7 @@ namespace internal
                                                 start_indices,
                                                 cell_points.data());
 
-                  SelectEvaluator<dim, -1, 0, VectorizedDouble>::evaluate(
+                  FEEvaluationFactory<dim, double, VectorizedDouble>::evaluate(
                     dim,
                     EvaluationFlags::values | EvaluationFlags::gradients |
                       (update_flags_cells & update_jacobian_grads ?
@@ -2126,21 +2125,21 @@ namespace internal
 
               // now let the matrix-free evaluators provide us with the
               // data on faces
-              FEFaceEvaluationImplEvaluateSelector<dim, VectorizedDouble>::
-                template run<-1, 0>(dim,
-                                    shape_info,
-                                    cell_points.data(),
-                                    face_quads.data(),
-                                    face_grads.data(),
-                                    scratch_data.data(),
-                                    true,
-                                    true,
-                                    face_no,
-                                    GeometryInfo<dim>::max_children_per_cell,
-                                    faces[face].face_orientation > 8 ?
-                                      faces[face].face_orientation - 8 :
-                                      0,
-                                    my_data.descriptor[0].face_orientations);
+              FEFaceEvaluationFactory<dim, double, VectorizedDouble>::evaluate(
+                dim,
+                shape_info,
+                cell_points.data(),
+                face_quads.data(),
+                face_grads.data(),
+                scratch_data.data(),
+                true,
+                true,
+                face_no,
+                GeometryInfo<dim>::max_children_per_cell,
+                faces[face].face_orientation > 8 ?
+                  faces[face].face_orientation - 8 :
+                  0,
+                my_data.descriptor[0].face_orientations);
 
 
               if (update_flags_faces & update_quadrature_points)
@@ -2243,22 +2242,21 @@ namespace internal
                                                 start_indices,
                                                 cell_points.data());
 
-                  FEFaceEvaluationImplEvaluateSelector<dim, VectorizedDouble>::
-                    template run<-1, 0>(
-                      dim,
-                      shape_info,
-                      cell_points.data(),
-                      face_quads.data(),
-                      face_grads.data(),
-                      scratch_data.data(),
-                      false,
-                      true,
-                      faces[face].exterior_face_no,
-                      faces[face].subface_index,
-                      faces[face].face_orientation < 8 ?
-                        faces[face].face_orientation :
-                        0,
-                      my_data.descriptor[0].face_orientations);
+                  FEFaceEvaluationFactory<dim, double, VectorizedDouble>::
+                    evaluate(dim,
+                             shape_info,
+                             cell_points.data(),
+                             face_quads.data(),
+                             face_grads.data(),
+                             scratch_data.data(),
+                             false,
+                             true,
+                             faces[face].exterior_face_no,
+                             faces[face].subface_index,
+                             faces[face].face_orientation < 8 ?
+                               faces[face].face_orientation :
+                               0,
+                             my_data.descriptor[0].face_orientations);
 
                   for (unsigned int q = 0; q < n_points_compute; ++q)
                     {
