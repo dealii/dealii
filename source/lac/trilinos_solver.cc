@@ -718,7 +718,7 @@ namespace TrilinosWrappers
                                     additional_data.output_solver_details);
 
     // Next allocate the Amesos solver, this is done in two steps, first we
-    // create a solver Factory and and generate with that the concrete Amesos
+    // create a solver Factory and generate with that the concrete Amesos
     // solver, if possible.
     Amesos Factory;
 
@@ -818,7 +818,7 @@ namespace TrilinosWrappers
                                     additional_data.output_solver_details);
 
     // Next allocate the Amesos solver, this is done in two steps, first we
-    // create a solver Factory and and generate with that the concrete Amesos
+    // create a solver Factory and generate with that the concrete Amesos
     // solver, if possible.
     Amesos Factory;
 
