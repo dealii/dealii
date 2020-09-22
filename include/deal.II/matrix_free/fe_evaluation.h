@@ -2136,9 +2136,10 @@ protected:
  *
  * <h4>Degree of finite element as a compile-time parameter</h4>
  *
- * The default usage model of FEEvaluation expects the polynomial degree to be
- * given as a template parameter. This requirement guarantees maximum
- * efficiency: The sum factorization evaluation performs a number of nested
+ * The class FEEvaluation as two usage models. The first usage model is to
+ * specify the polynomial degree as a template parameter. This guarantees
+ * maximum
+ * efficiency: The evaluation with sum factorization performs a number of nested
  * short 1D loops of length equal to the polynomial degree plus one. If the
  * loop bounds are known at compile time, the compiler can unroll loops as
  * deemed most efficient by its heuristics. At least the innermost loop is
@@ -2148,43 +2149,50 @@ protected:
  * points) as a template parameter makes things more complicated in codes
  * where different polynomial degrees should be considered, e.g. in
  * application codes where the polynomial degree is given through an input
- * file. The recommended approach for good performance is to create different
- * cell functions, possibly through different operator classes that are
- * derived from a common base class with virtual functions to access the
- * operator evaluation. The program then keeps only a pointer to the common
- * base class after initializing templated derived classes with fixed
- * polynomial degree that are selected from the detected polynomial
- * degree. This approach requires a-priori knowledge of the range of valid
- * degrees and can lead to rather long compile times in programs with many
- * apply functions.
- *
- * A flexible choice of the polynomial degree based on the information in the
- * element passed to the initialization is also supported by FEEvaluation,
- * even though it runs two to three times more slowly. For this, set the
- * template parameter for the polynomial degree to -1 (and choose an arbitrary
- * number for the number of quadrature points), which switches to the other
- * code path. Internally, an evaluator object with template specialization for
- * -1 is invoked that runs according to run-time bounds, whereas the default
- * case with compile-time bounds given through fe_degree selects another
- * template class without compromising efficiency.
+ * file. The second usage model is to rely on pre-compiled code for polynomial
+ * degrees. While a user code can use different functions for the cells (that
+ * get e.g. invoked by some dynamic dispatch mechanism for the various degree
+ * templates), deal.II also supports usage of this class based on the
+ * information in the element passed to the initialization. For this usage
+ * model, set the template parameter for the polynomial degree to -1 and
+ * choose an arbitrary number for the number of quadrature points. That code
+ * part contains pre-compiled templated code for polynomial degrees between 1
+ * and 6 and common quadrature formulas, which runs almost as fast as the
+ * templated version. In case the chosen degree is not pre-compiled, an
+ * evaluator object with template specialization for -1 is invoked that runs
+ * according to run-time bounds.
  *
  * An overview of the performance of FEEvaluation is given in the following
  * figure. It considers the time spent per degree of freedom for evaluating
  * the Laplacian with continuous finite elements using a code similar to the
  * step-37 tutorial program for single-precision arithmetics. The time is
  * based on an experiment on a single core of an Intel Xeon E5-2687W v4,
- * running at 3.4 GHz and measured at problem sizes around 10 million. The
+ * running at 3.4 GHz and measured at problem sizes of around 10 million. The
  * plot lists the computational time (around 0.1 seconds) divided by the
  * number of degrees freedom.
  *
  * @image html fe_evaluation_laplacian_time_per_dof.png
  *
- * The figure shows that the templated version is between 2.5 and 3 times
- * faster. The fastest turnaround on this setup is for polynomial degree 5 at
- * 7.4e-9 seconds per degree of freedom or 134 million degrees of freedom per
- * second - on a single core. The non-templated version is also fastest at
- * polynomial degree 5 with 2.1e-9 seconds per degree of freedom or 48 million
- * degrees of freedom per second.
+ * The figure shows that the templated computational kernels are between 2.5
+ * and 3 times faster than the non-templated ones. The fastest turnaround on
+ * this setup is for polynomial degree 5 at 7.4e-9 seconds per degree of
+ * freedom or 134 million degrees of freedom per second - on a single
+ * core. The non-templated version is also fastest at polynomial degree 5 with
+ * 2.1e-9 seconds per degree of freedom or 48 million degrees of freedom per
+ * second. Note that using FEEvaluation with template `degree=-1` selects the
+ * fast path for degrees between one and six, and the slow path for other
+ * degrees.
+ *
+ * <h4>Pre-compiling code for more polynomial degrees</h4>
+ *
+ * It is also possible to pre-compile the code in FEEvaluation for a different
+ * maximal polynomial degree. This is controlled by the class
+ * internal::FEEvaluationFactory and the implementation in
+ * `include/deal.II/matrix_free/evaluation_template_factory.templates.h`. By
+ * setting the macro `FE_EVAL_FACTORY_DEGREE_MAX` to the desired integer and
+ * instantiating the classes FEEvaluationFactory and FEFaceEvaluationFactory
+ * (the latter for FEFaceEvaluation) creates paths to templated functions for
+ * a possibly larger set of degrees.
  *
  * <h3>Handling multi-component systems</h3>
  *

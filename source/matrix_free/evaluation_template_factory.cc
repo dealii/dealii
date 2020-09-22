@@ -14,8 +14,6 @@
 // ---------------------------------------------------------------------
 
 
-#define FE_EVAL_FACTORY_DEGREE_MAX 6
-
 #include <deal.II/matrix_free/evaluation_template_factory.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
