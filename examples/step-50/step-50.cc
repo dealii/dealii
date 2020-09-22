@@ -439,7 +439,7 @@ private:
   MatrixFreeActiveMatrix mf_system_matrix;
   VectorType             solution;
   VectorType             right_hand_side;
-  Vector<double>         estimated_error_per_cell;
+  Vector<double>         estimated_error_square_per_cell;
 
   MGLevelObject<MatrixType> mg_matrix;
   MGLevelObject<MatrixType> mg_interface_in;
@@ -1279,11 +1279,11 @@ void LaplaceProblem<dim, degree>::estimate()
 
   const Coefficient<dim> coefficient;
 
-  estimated_error_per_cell.reinit(triangulation.n_active_cells());
+  estimated_error_square_per_cell.reinit(triangulation.n_active_cells());
 
   using Iterator = typename DoFHandler<dim>::active_cell_iterator;
 
-  // Assembler for cell residual $h \| f + \epsilon \triangle u \|_K$
+  // Assembler for cell residual $h^2 \| f + \epsilon \triangle u \|_K^2$
   auto cell_worker = [&](const Iterator &  cell,
                          ScratchData<dim> &scratch_data,
                          CopyData &        copy_data) {
@@ -1307,7 +1307,8 @@ void LaplaceProblem<dim, degree>::estimate()
         residual_norm_square += residual * residual * fe_values.JxW(k);
       }
 
-    copy_data.value = cell->diameter() * std::sqrt(residual_norm_square);
+    copy_data.value =
+      cell->diameter() * cell->diameter() * residual_norm_square;
   };
 
   // Assembler for face term $\sum_F h_F \| \jump{\epsilon \nabla u \cdot n}
@@ -1356,17 +1357,17 @@ void LaplaceProblem<dim, degree>::estimate()
       }
 
     const double h           = cell->face(f)->measure();
-    copy_data_face.values[0] = 0.5 * h * std::sqrt(jump_norm_square);
+    copy_data_face.values[0] = 0.5 * h * jump_norm_square;
     copy_data_face.values[1] = copy_data_face.values[0];
   };
 
   auto copier = [&](const CopyData &copy_data) {
     if (copy_data.cell_index != numbers::invalid_unsigned_int)
-      estimated_error_per_cell[copy_data.cell_index] += copy_data.value;
+      estimated_error_square_per_cell[copy_data.cell_index] += copy_data.value;
 
     for (auto &cdf : copy_data.face_data)
       for (unsigned int j = 0; j < 2; ++j)
-        estimated_error_per_cell[cdf.cell_indices[j]] += cdf.values[j];
+        estimated_error_square_per_cell[cdf.cell_indices[j]] += cdf.values[j];
   };
 
   const unsigned int n_gauss_points = degree + 1;
@@ -1395,6 +1396,12 @@ void LaplaceProblem<dim, degree>::estimate()
                           MeshWorker::assemble_own_interior_faces_once,
                         /*boundary_worker=*/nullptr,
                         face_worker);
+
+  const double global_error_estimate =
+    std::sqrt(Utilities::MPI::sum(estimated_error_square_per_cell.l1_norm(),
+                                  mpi_communicator));
+  pcout << "   Global error estimate:        " << global_error_estimate
+        << std::endl;
 }
 
 
@@ -1410,7 +1417,7 @@ void LaplaceProblem<dim, degree>::refine_grid()
 
   const double refinement_fraction = 1. / (std::pow(2.0, dim) - 1.);
   parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
-    triangulation, estimated_error_per_cell, refinement_fraction, 0.0);
+    triangulation, estimated_error_square_per_cell, refinement_fraction, 0.0);
 
   triangulation.execute_coarsening_and_refinement();
 }
@@ -1445,9 +1452,9 @@ void LaplaceProblem<dim, degree>::output_results(const unsigned int cycle)
     level(cell->active_cell_index()) = cell->level();
   data_out.add_data_vector(level, "level");
 
-  if (estimated_error_per_cell.size() > 0)
-    data_out.add_data_vector(estimated_error_per_cell,
-                             "estimated_error_per_cell");
+  if (estimated_error_square_per_cell.size() > 0)
+    data_out.add_data_vector(estimated_error_square_per_cell,
+                             "estimated_error_square_per_cell");
 
   data_out.build_patches();
 
