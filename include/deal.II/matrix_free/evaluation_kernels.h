@@ -2614,11 +2614,11 @@ namespace internal
     // `scratch_data` variable to not risk a stack overflow.
     constexpr unsigned int stack_array_size_threshold = 100;
 
+    VectorizedArrayType *DEAL_II_RESTRICT temp1;
     VectorizedArrayType
       temp_data[static_dofs_per_face < stack_array_size_threshold ?
                   2 * dofs_per_face :
                   1];
-    VectorizedArrayType *__restrict temp1;
     if (static_dofs_per_face < stack_array_size_threshold)
       temp1 = &temp_data[0];
     else
