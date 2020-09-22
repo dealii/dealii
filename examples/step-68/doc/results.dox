@@ -48,7 +48,7 @@ flow, the particle go back to their initial configuration as is expected.
 
 @htmlonly
 <p align="center">
-  <iframe width="560" height="315" src="https://www.youtube.com/embed/EbgS5Ch35Xs"
+  <iframe width="560" height="500" src="https://www.youtube.com/embed/EbgS5Ch35Xs"
    frameborder="0"
    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
    allowfullscreen></iframe>
@@ -64,7 +64,7 @@ the coarseness of the background mesh.
 
 @htmlonly
 <p align="center">
-  <iframe width="560" height="315" src="https://www.youtube.com/embed/ubUcsR4ECj4"
+  <iframe width="560" height="500" src="https://www.youtube.com/embed/ubUcsR4ECj4"
    frameborder="0"
    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
    allowfullscreen></iframe>
