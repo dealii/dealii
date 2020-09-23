@@ -17,6 +17,8 @@
 
 // Test DataOut with HDF5 for simplex meshes.
 
+#include <deal.II/base/mpi.h>
+
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_system.h>
@@ -117,6 +119,8 @@ int
 main(int argc, char **argv)
 {
   initlog();
+
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   {
     const unsigned int dim = 2;
