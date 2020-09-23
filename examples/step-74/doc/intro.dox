@@ -78,16 +78,10 @@ The discretization using the SIPG is given by the following weak formula
 <h3>The penalty parameter</h3>
 The parameter is defined as $\sigma = \gamma/h_f$, where $h_f$ a local length scale associated
 with the cell face, here we choose the length of the cell in the direction normal to the face,
-and $\gamma$ is the penalization constant. The lower bound of $\gamma$ @cite ainsworth2007posteriori
-is given by
-@f[
-\gamma > 4\max_{K\in \Gamma_h}\rho\left( S_K \right).
-@f]
-Here $[S_K]_{i,j} = (\nu \nabla \phi_i, \nabla\phi_j)_K$.
-
-To ensure the discrete coercivity, the penalization constant has to be large enough.
-There is no consensus in the literature on how to determine $\gamma$ in practice. One can just pick a large constant,
-while other options could be the multiples of $(p+1)^2$ or $p(p+1)$. In this code,
+and $\gamma$ is the penalization constant.
+To ensure the discrete coercivity, the penalization constant has to be large enough @cite ainsworth2007posteriori.
+People do not really have consensus on which precise formula to choose, among what was proposed in the literature.
+One can just pick a large constant, while other options could be the multiples of $(p+1)^2$ or $p(p+1)$. In this code,
 we follow step-39 and use $\gamma = p(p+1)$.
 
 <h3>Posteriori error estimator</h3>
