@@ -8496,13 +8496,10 @@ FEFaceEvaluation<dim,
       {
         // TODO: this copying should not be necessary once we have introduced
         // an internal-data structure
-        std::array<unsigned int, VectorizedArrayType::size()> cells_;
-        std::array<unsigned int, VectorizedArrayType::size()> face_no_;
-        std::array<unsigned int, VectorizedArrayType::size()> face_orientation_;
-
-        std::fill(cells_.begin(), cells_.end(), -1);
-        std::fill(face_no_.begin(), face_no_.end(), -1);
-        std::fill(face_orientation_.begin(), face_orientation_.end(), -1);
+        std::array<unsigned int, VectorizedArrayType::size()> cells_   = {};
+        std::array<unsigned int, VectorizedArrayType::size()> face_no_ = {};
+        std::array<unsigned int, VectorizedArrayType::size()>
+          face_orientation_ = {};
 
         cells_[0]            = this->cell;
         face_no_[0]          = this->face_no;
@@ -8629,13 +8626,9 @@ FEFaceEvaluation<dim,
 
   // TODO: this copying should not be necessary once we have introduced
   // an internal-data structure
-  std::array<unsigned int, VectorizedArrayType::size()> cells_;
-  std::array<unsigned int, VectorizedArrayType::size()> face_no_;
-  std::array<unsigned int, VectorizedArrayType::size()> face_orientation_;
-
-  std::fill(cells_.begin(), cells_.end(), -1);
-  std::fill(face_no_.begin(), face_no_.end(), -1);
-  std::fill(face_orientation_.begin(), face_orientation_.end(), -1);
+  std::array<unsigned int, VectorizedArrayType::size()> cells_            = {};
+  std::array<unsigned int, VectorizedArrayType::size()> face_no_          = {};
+  std::array<unsigned int, VectorizedArrayType::size()> face_orientation_ = {};
 
   cells_[0]            = this->cell;
   face_no_[0]          = this->face_no;

@@ -2586,8 +2586,7 @@ namespace internal
     const unsigned int dummy = 0;
 
     // re-orientation
-    std::array<const unsigned int *, n_face_orientations> orientation;
-    std::fill(orientation.begin(), orientation.end(), nullptr);
+    std::array<const unsigned int *, n_face_orientations> orientation = {};
 
     if (n_face_orientations == 1)
       orientation[0] = (data.data.front().nodal_at_cell_boundaries == true) ?
@@ -2611,8 +2610,8 @@ namespace internal
       }
 
     // face_to_cell_index_hermite
-    std::array<const unsigned int *, n_face_orientations> index_array_hermite;
-    std::fill(index_array_hermite.begin(), index_array_hermite.end(), nullptr);
+    std::array<const unsigned int *, n_face_orientations> index_array_hermite =
+      {};
 
     if (n_face_orientations == 1)
       index_array_hermite[0] =
@@ -2641,8 +2640,8 @@ namespace internal
       }
 
     // face_to_cell_index_nodal
-    std::array<const unsigned int *, n_face_orientations> index_array_nodal;
-    std::fill(index_array_nodal.begin(), index_array_nodal.end(), nullptr);
+    std::array<const unsigned int *, n_face_orientations> index_array_nodal =
+      {};
 
     if (n_face_orientations == 1)
       index_array_nodal[0] =
