@@ -299,7 +299,7 @@ namespace Step19
       }
 
     triangulation.create_triangulation(
-      {std::begin(vertices), std::end(vertices)},
+      vertices,
       cells,
       SubCellData()); // No boundary information
 
@@ -378,9 +378,8 @@ namespace Step19
 
   // @sect4{The <code>CathodeRaySimulator::assemble_system</code> function}
 
-  // The same is true for the function that assembles the linear system to be
-  // solved in each time step. At least that is true for the computation
-  // of the matrix entries, which is again in essence a copy of the
+  // The function that computes
+  // the matrix entries is again in essence a copy of the
   // corresponding function in step-6:
   template <int dim>
   void CathodeRaySimulator<dim>::assemble_system()
@@ -452,11 +451,11 @@ namespace Step19
         // particles on the current cell, then we first obtain an iterator range
         // pointing to the first particle of that cell as well as the particle
         // past the last one on this cell (or the end iterator) -- i.e., a
-        // half-open range as is common for C++ functions. Knowing now the
-        // number of particles, we can start to collect their reference
-        // locations (with respect to the reference cell), which we have stored
-        // with each particle when they were created or when it was last moved
-        // (see below).
+        // half-open range as is common for C++ functions. Knowing now the list
+        // of particles, we query their reference locations (with respect to
+        // the reference cell), evaluate the shape functions in these reference
+        // locations, and compute the force according to the formula above
+        // (without any FEValues::JxW).
         //
         // @note It is worth pointing out that calling the
         //   Particles::ParticleHandler::particles_in_cell() and
@@ -468,52 +467,16 @@ namespace Step19
         //   <a href="#extensions">"possibilities for extensions" section</a>
         //   below, and use a better approach in step-70, for example.
         if (particle_handler.n_particles_in_cell(cell) > 0)
-          {
-            std::vector<Point<dim>> particle_reference_locations;
-
-            const typename Particles::ParticleHandler<
-              dim>::particle_iterator_range particles_in_cell =
-              particle_handler.particles_in_cell(cell);
-
-            const unsigned int n_particles_in_cell =
-              particle_handler.n_particles_in_cell(cell);
-
-            particle_reference_locations.resize(n_particles_in_cell);
-
+          for (const auto &particle : particle_handler.particles_in_cell(cell))
             {
-              typename Particles::ParticleHandler<dim>::particle_iterator
-                particle = particles_in_cell.begin();
-              for (unsigned int particle_index = 0;
-                   particle != particles_in_cell.end();
-                   ++particle, ++particle_index)
-                particle_reference_locations[particle_index] =
-                  particle->get_reference_location();
-            }
-
-            // Now that we know where the particles on the current cell are
-            // located with regard to the reference cell's coordinate system, we
-            // can create a Quadrature object with these locations and then an
-            // FEValues object that we will use to evaluate the shape functions
-            // at these locations. The contribution to the right hand side
-            // vector then immediately follows from the formula shown above.
-            // Note again the absence of the call to FEValues::JxW that would
-            // have to be present if we were evaluating an integral.
-            const Quadrature<dim> quadrature_formula(
-              particle_reference_locations);
-            FEValues<dim> fe_value(mapping,
-                                   fe,
-                                   quadrature_formula,
-                                   update_values);
-
-            for (const unsigned int q_index :
-                 fe_values.quadrature_point_indices())
+              const Point<dim> reference_location =
+                particle.get_reference_location();
               for (const unsigned int i : fe_values.dof_indices())
                 cell_rhs(i) +=
-                  (fe_values.shape_value(i, q_index) *   // phi_i(x_p)
-                   (-Constants::electrons_per_particle * // N
-                    Constants::electron_charge));        // e
-          }
-
+                  (fe.shape_value(i, reference_location) * // phi_i(x_p)
+                   (-Constants::electrons_per_particle *   // N
+                    Constants::electron_charge));          // e
+            }
 
         // Finally, we can copy the contributions of this cell into
         // the global matrix and right hand side vector:
@@ -687,8 +650,6 @@ namespace Step19
   {
     const double dt = time.get_next_step_size();
 
-    std::vector<Point<dim>>     particle_positions;
-    std::vector<Tensor<1, dim>> field_gradients;
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (particle_handler.n_particles_in_cell(cell) > 0)
@@ -697,33 +658,25 @@ namespace Step19
             dim>::particle_iterator_range particles_in_cell =
             particle_handler.particles_in_cell(cell);
 
-          const unsigned int n_particles_in_cell =
-            particle_handler.n_particles_in_cell(cell);
-
-          particle_positions.resize(n_particles_in_cell);
-          {
-            typename Particles::ParticleHandler<dim>::particle_iterator
-              particle = particles_in_cell.begin();
-            for (unsigned int particle_index = 0;
-                 particle != particles_in_cell.end();
-                 ++particle, ++particle_index)
-              particle_positions[particle_index] =
-                particle->get_reference_location();
-          }
+          std::vector<Point<dim>> particle_positions;
+          for (const auto &particle : particles_in_cell)
+            particle_positions.push_back(particle.get_reference_location());
 
           const Quadrature<dim> quadrature_formula(particle_positions);
-          FEValues<dim>         fe_value(mapping,
-                                 fe,
-                                 quadrature_formula,
-                                 update_gradients);
+          FEValues<dim>         particle_position_fe_values(mapping,
+                                                    fe,
+                                                    quadrature_formula,
+                                                    update_gradients);
 
-          fe_value.reinit(cell);
+          particle_position_fe_values.reinit(cell);
 
           // Then we can ask the FEValues object for the gradients of the
           // solution (i.e., the electric field $\mathbf E$) at these locations
           // and loop over the individual particles:
-          field_gradients.resize(n_particles_in_cell);
-          fe_value.get_function_gradients(solution, field_gradients);
+          std::vector<Tensor<1, dim>> field_gradients(
+            quadrature_formula.size());
+          particle_position_fe_values.get_function_gradients(solution,
+                                                             field_gradients);
 
           {
             typename Particles::ParticleHandler<dim>::particle_iterator
@@ -760,9 +713,9 @@ namespace Step19
                 particle->set_properties(make_array_view(new_velocity));
 
                 // With the new velocity, we can then also update the location
-                // of the particle and set tell the particle about it.
+                // of the particle and tell the particle about it.
                 const Point<dim> new_location =
-                  particle->get_location() + dt * old_velocity;
+                  particle->get_location() + dt * new_velocity;
                 particle->set_location(new_location);
               }
           }
