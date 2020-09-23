@@ -992,20 +992,14 @@ namespace Step69
   //
   // @f{align*}
   // \widehat{\boldsymbol{\nu}}_i \dealcoloneq
-  // \frac{\boldsymbol{\nu}_i}{|\boldsymbol{\nu}_i|} \ \text{ where }
-  // \boldsymbol{\nu}_i \dealcoloneq \sum_{T \subset \text{supp}(\phi_i)}
-  // \sum_{F \subset \partial T \cap \partial \Omega}
-  // \sum_{\mathbf{x}_{q,F}} \nu(\mathbf{x}_{q,F})
-  // \phi_i(\mathbf{x}_{q,F}).
+  //  \frac{\int_{\partial\Omega} \phi_i \widehat{\boldsymbol{\nu}} \,
+  //  \, \mathrm{d}\mathbf{s}}{\big|\int_{\partial\Omega} \phi_i
+  //  \widehat{\boldsymbol{\nu}} \, \mathrm{d}\mathbf{s}\big|}
   // @f}
   //
-  // Here $T$ denotes elements,
-  // $\text{supp}(\phi_i)$ the support of the shape function $\phi_i$,
-  // $F$ are faces of the element $T$, and $\mathbf{x}_{q,F}$
-  // are quadrature points on such face. Note that this formula for
-  // $\widehat{\boldsymbol{\nu}}_i$ is nothing else than some form of
-  // weighted averaging. Other more sophisticated definitions for $\nu_i$
-  // are possible but none of them have much influence in theory or practice.
+  // We will compute the numerator of this expression first and store it in
+  // <code>OfflineData<dim>::BoundaryNormalMap</code>. We will normalize these
+  // vectors in a posterior loop.
 
   template <int dim>
   void OfflineData<dim>::assemble()
@@ -1294,122 +1288,6 @@ namespace Step69
           auto &normal = std::get<0>(it.second);
           normal /= (normal.norm() + std::numeric_limits<double>::epsilon());
         }
-    }
-
-    // As commented in the introduction (see section titled "Stable boundary
-    // conditions and conservation properties") we use three different types of
-    // boundary conditions: essential-like boundary conditions (we prescribe a
-    // state in the left portion of our domain), outflow boundary conditions
-    // (also called "do-nothing" boundary conditions) in the right portion of
-    // the domain, and "reflecting" boundary conditions (also called "free
-    // slip" boundary conditions). With these boundary conditions we should
-    // not expect any form of conservation to hold.
-    //
-    // However, if we were to use reflecting boundary conditions
-    // $\mathbf{m} \cdot \boldsymbol{\nu}_i =0$ on the entirety of the
-    // boundary we should preserve the density and total (mechanical)
-    // energy. This requires us to modify the $\mathbf{c}_{ij}$ vectors at
-    // the boundary as follows @cite GuermondEtAl2018 :
-    //
-    // @f{align*}
-    // \mathbf{c}_{ij} \, +\!\!= \int_{\partial \Omega}
-    // (\boldsymbol{\nu}_j - \boldsymbol{\nu}(\mathbf{s})) \phi_i \phi_j \,
-    // \mathrm{d}\mathbf{s} \ \text{whenever} \ \mathbf{x}_i \text{ and }
-    // \mathbf{x}_j \text{ lie in the boundary.}
-    // @f}
-    //
-    // The ideas repeat themselves: we use WorkStream in order to compute
-    // this correction, most of the following code is about the definition
-    // of the worker <code>local_assemble_system()</code>.
-    {
-      TimerOutput::Scope scope(computing_timer,
-                               "offline_data - fix slip boundary c_ij");
-
-      const auto local_assemble_system = //
-        [&](const typename DoFHandler<dim>::cell_iterator &cell,
-            MeshWorker::ScratchData<dim> &                 scratch,
-            CopyData<dim> &                                copy) {
-          copy.is_artificial = cell->is_artificial();
-
-          if (copy.is_artificial)
-            return;
-
-          for (auto &matrix : copy.cell_cij_matrix)
-            matrix.reinit(dofs_per_cell, dofs_per_cell);
-
-          copy.local_dof_indices.resize(dofs_per_cell);
-          cell->get_dof_indices(copy.local_dof_indices);
-          std::transform(copy.local_dof_indices.begin(),
-                         copy.local_dof_indices.end(),
-                         copy.local_dof_indices.begin(),
-                         [&](types::global_dof_index index) {
-                           return partitioner->global_to_local(index);
-                         });
-
-          for (auto &matrix : copy.cell_cij_matrix)
-            matrix = 0.;
-
-          for (const auto f : cell->face_indices())
-            {
-              const auto face = cell->face(f);
-              const auto id   = face->boundary_id();
-
-              if (!face->at_boundary())
-                continue;
-
-              if (id != Boundaries::free_slip)
-                continue;
-
-              const auto &fe_face_values = scratch.reinit(cell, f);
-
-              const unsigned int n_face_q_points =
-                fe_face_values.get_quadrature().size();
-
-              for (unsigned int q = 0; q < n_face_q_points; ++q)
-                {
-                  const auto JxW      = fe_face_values.JxW(q);
-                  const auto normal_q = fe_face_values.normal_vector(q);
-
-                  for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                    {
-                      if (!discretization->finite_element.has_support_on_face(
-                            j, f))
-                        continue;
-
-                      const auto &normal_j = std::get<0>(
-                        boundary_normal_map[copy.local_dof_indices[j]]);
-
-                      const auto value_JxW =
-                        fe_face_values.shape_value(j, q) * JxW;
-
-                      for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                        {
-                          const auto value = fe_face_values.shape_value(i, q);
-
-                          /* This is the correction of the boundary c_ij */
-                          for (unsigned int d = 0; d < dim; ++d)
-                            copy.cell_cij_matrix[d](i, j) +=
-                              (normal_j[d] - normal_q[d]) * (value * value_JxW);
-                        } /* i */
-                    }     /* j */
-                }         /* q */
-            }             /* f */
-        };
-
-      const auto copy_local_to_global = [&](const CopyData<dim> &copy) {
-        if (copy.is_artificial)
-          return;
-
-        for (int k = 0; k < dim; ++k)
-          cij_matrix[k].add(copy.local_dof_indices, copy.cell_cij_matrix[k]);
-      };
-
-      WorkStream::run(dof_handler.begin_active(),
-                      dof_handler.end(),
-                      local_assemble_system,
-                      copy_local_to_global,
-                      scratch_data,
-                      CopyData<dim>());
     }
   }
 
