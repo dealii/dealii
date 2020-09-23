@@ -103,6 +103,14 @@ public:
   operator=(Subscriptor &&) noexcept;
 
   /**
+   * @name Subscriptor functionality
+   *
+   * Classes derived from Subscriptor provide a facility to subscribe to this
+   * object. This is mostly used by the SmartPointer class.
+   */
+  // @{
+
+  /**
    * Subscribes a user of the object by storing the pointer @p validity. The
    * subscriber may be identified by text supplied as @p identifier.
    */
@@ -140,6 +148,8 @@ public:
    */
   void
   list_subscribers() const;
+
+  // @}
 
   /**
    * @addtogroup Exceptions
