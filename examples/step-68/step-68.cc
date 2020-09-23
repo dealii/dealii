@@ -279,7 +279,7 @@ namespace Step68
 
     DoFHandler<dim>                            fluid_dh;
     FESystem<dim>                              fluid_fe;
-    MappingQ<dim>                              mapping;
+    MappingQ1<dim>                             mapping;
     LinearAlgebra::distributed::Vector<double> velocity_field;
 
     Vortex<dim> velocity;
@@ -309,7 +309,6 @@ namespace Step68
     , background_triangulation(mpi_communicator)
     , fluid_dh(background_triangulation)
     , fluid_fe(FE_Q<dim>(par.velocity_degree), dim)
-    , mapping(par.velocity_degree)
     , pcout(std::cout, Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
     , interpolated_velocity(interpolated_velocity)
 
@@ -337,7 +336,8 @@ namespace Step68
     const typename parallel::distributed::Triangulation<dim>::CellStatus status)
     const
   {
-    // We do not assign any weight to cells we do not own (i.e artificial cells)
+    // We do not assign any weight to cells we do not own (i.e., artificial
+    // or ghost cells)
     if (!cell->is_locally_owned())
       return 0;
 
@@ -345,7 +345,7 @@ namespace Step68
     // work (by default every cell has a weight of 1000).
     // We set the weight per particle much higher to indicate that
     // the particle load is the only one that is important to distribute the
-    // cells. in this example. The optimal value of this number depends on the
+    // cells in this example. The optimal value of this number depends on the
     // application and can range from 0 (cheap particle operations,
     // expensive cell operations) to much larger than 1000 (expensive
     // particle operations, cheap cell operations, like presumed in this
@@ -446,7 +446,7 @@ namespace Step68
       particle_triangulation, center, inner_radius, outer_radius, 6);
     particle_triangulation.refine_global(par.particle_insertion_refinement);
 
-    // We generate the necessary bounding boxes for the particles generator
+    // We generate the necessary bounding boxes for the particles generator.
     // These bounding boxes are required to quickly identify in which
     // process's subdomain the inserted particle lies, and which cell owns it.
     const auto my_bounding_box = GridTools::compute_mesh_predicate_bounding_box(
@@ -502,8 +502,6 @@ namespace Step68
   template <int dim>
   void ParticleTracking<dim>::interpolate_function_to_field()
   {
-    const MappingQ<dim> mapping(fluid_fe.degree);
-
     velocity_field.zero_out_ghosts();
     VectorTools::interpolate(mapping, fluid_dh, velocity, velocity_field);
     velocity_field.update_ghost_values();
@@ -519,6 +517,8 @@ namespace Step68
   template <int dim>
   void ParticleTracking<dim>::euler_step_analytical(const double dt)
   {
+    const unsigned int this_mpi_rank =
+      Utilities::MPI::this_mpi_process(mpi_communicator);
     Vector<double> particle_velocity(dim);
 
     // Looping over all particles in the domain using a particle iterator
@@ -542,7 +542,7 @@ namespace Step68
         ArrayView<double> properties = particle.get_properties();
         for (int d = 0; d < dim; ++d)
           properties[d] = particle_velocity[d];
-        properties[dim] = Utilities::MPI::this_mpi_process(mpi_communicator);
+        properties[dim] = this_mpi_rank;
       }
   }
 
@@ -679,8 +679,6 @@ namespace Step68
       subdomain(i) = background_triangulation.locally_owned_subdomain();
     data_out.add_data_vector(subdomain, "subdomain");
 
-    MappingQ<dim> mapping(fluid_fe.degree);
-
     data_out.build_patches(mapping);
 
     const std::string output_folder(par.output_directory);
@@ -713,13 +711,12 @@ namespace Step68
           << std::endl;
     background_triangulation.repartition();
 
-    setup_background_dofs();
-
     // We set the initial property of the particles by doing an
     // explicit Euler iteration with a time-step of 0 both in the case
     // of the analytical and the interpolated approach.
     if (interpolated_velocity)
       {
+        setup_background_dofs();
         interpolate_function_to_field();
         euler_step_interpolated(0.);
       }
@@ -739,7 +736,8 @@ namespace Step68
         if ((discrete_time.get_step_number() % par.repartition_frequency) == 0)
           {
             background_triangulation.repartition();
-            setup_background_dofs();
+            if (interpolated_velocity)
+              setup_background_dofs();
           }
 
         if (interpolated_velocity)

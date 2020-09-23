@@ -130,11 +130,11 @@ also be different (non-matching) from the triangulation of the background grid,
 which is useful to generate particles in particular shapes (as in this
 example), or to transfer information between two different computational grids
 (as in step-70).  Furthermore, the Particles::ParticleHandler class provides the
-Particles::ParticleHandler::insert_global_particles function() which enables the
+Particles::ParticleHandler::insert_global_particles() function which enables the
 global insertion of particles from a vector of arbitrary points and a global
 vector of bounding boxes. In the present step, we use the
 Particles::Generators::quadrature_points() function on a non-matching triangulation to
-insert particle located at positions in the shape of a disk.
+insert particles located at positions in the shape of a disk.
 
 <h4>Particle exchange</h4>
 
@@ -183,7 +183,7 @@ finite-element problems already discussed in other examples.
 <h3>The testcase</h3>
 
 In the present step, we use particles as massless tracers to illustrate
-the dynamics of a particular vortical flow: the Rayleigh-Kothe Vortex. This flow pattern
+the dynamics of a particular vortical flow: the Rayleigh--Kothe vortex. This flow pattern
 is generally used as a complex test case for interface tracking methods
 (e.g., volume-of-fluid and level set approaches) since
 it leads to strong rotation and elongation of the fluid @cite Blais2013.
@@ -191,7 +191,7 @@ it leads to strong rotation and elongation of the fluid @cite Blais2013.
 The stream function $\Psi$ of this Rayleigh-Kothe vortex is defined as:
 
 @f[
-\Psi = \frac{1}{\pi} sin^2 (\pi x) \sin^2 (\pi y) \cos \left( \pi \frac{t}{T} \right)
+\Psi = \frac{1}{\pi} \sin^2 (\pi x) \sin^2 (\pi y) \cos \left( \pi \frac{t}{T} \right)
 @f]
 where $T$ is half the period of the flow. The velocity profile in 2D ($\textbf{u}=[u,v]^T$) is :
 @f{eqnarray*}
