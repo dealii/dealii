@@ -992,20 +992,14 @@ namespace Step69
   //
   // @f{align*}
   // \widehat{\boldsymbol{\nu}}_i \dealcoloneq
-  // \frac{\boldsymbol{\nu}_i}{|\boldsymbol{\nu}_i|} \ \text{ where }
-  // \boldsymbol{\nu}_i \dealcoloneq \sum_{T \subset \text{supp}(\phi_i)}
-  // \sum_{F \subset \partial T \cap \partial \Omega}
-  // \sum_{\mathbf{x}_{q,F}} \nu(\mathbf{x}_{q,F})
-  // \phi_i(\mathbf{x}_{q,F}).
+  //  \frac{\int_{\partial\Omega} \phi_i \widehat{\boldsymbol{\nu}} \,
+  //  \, \mathrm{d}\mathbf{s}}{\big|\int_{\partial\Omega} \phi_i
+  //  \widehat{\boldsymbol{\nu}} \, \mathrm{d}\mathbf{s}\big|}
   // @f}
   //
-  // Here $T$ denotes elements,
-  // $\text{supp}(\phi_i)$ the support of the shape function $\phi_i$,
-  // $F$ are faces of the element $T$, and $\mathbf{x}_{q,F}$
-  // are quadrature points on such face. Note that this formula for
-  // $\widehat{\boldsymbol{\nu}}_i$ is nothing else than some form of
-  // weighted averaging. Other more sophisticated definitions for $\nu_i$
-  // are possible but none of them have much influence in theory or practice.
+  // We will compute the numerator of this expression first and store it in
+  // <code>OfflineData<dim>::BoundaryNormalMap</code>. We will normalize these
+  // vectors in a posterior loop.
 
   template <int dim>
   void OfflineData<dim>::assemble()
