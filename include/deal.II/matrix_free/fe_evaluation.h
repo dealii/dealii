@@ -4246,7 +4246,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   unsigned int        n_vectorization_actual =
     this->dof_info
       ->n_vectorization_lanes_filled[this->dof_access_index][this->cell];
-  bool has_constraints = false;
+  bool               has_constraints   = false;
+  const unsigned int n_components_read = n_fe_components > 1 ? n_components : 1;
   if (is_face)
     {
       if (this->dof_access_index ==
@@ -4271,7 +4272,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           // check whether any of the SIMD lanes has constraints, i.e., the
           // constraint indicator which is the second entry of row_starts
           // increments on this cell
-          if (my_index_start[n_components].second != my_index_start[0].second)
+          if (my_index_start[n_components_read].second !=
+              my_index_start[0].second)
             has_constraints = true;
 
           dof_indices[v] =
@@ -4284,8 +4286,6 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     {
       AssertIndexRange((this->cell + 1) * n_lanes * n_fe_components,
                        this->dof_info->row_starts.size());
-      const unsigned int n_components_read =
-        n_fe_components > 1 ? n_components : 1;
       for (unsigned int v = 0; v < n_vectorization_actual; ++v)
         {
           const std::pair<unsigned int, unsigned int> *my_index_start =
