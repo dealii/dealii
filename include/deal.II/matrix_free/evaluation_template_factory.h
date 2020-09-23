@@ -97,11 +97,11 @@ namespace internal
               const unsigned int            face_orientation,
               const Table<2, unsigned int> &orientation_map);
 
-    template <std::size_t n_face_orientations>
     static bool
     gather_evaluate(
-      const unsigned int                                         n_components,
-      const Number *                                             src_ptr,
+      const unsigned int n_components,
+      const std::size_t  n_face_orientations,
+      const Number *     src_ptr,
       const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
       const MatrixFreeFunctions::DoFInfo &                       dof_info,
       VectorizedArrayType *                                      values_quad,
@@ -111,18 +111,19 @@ namespace internal
       const bool         evaluate_gradients,
       const unsigned int active_fe_index,
       const unsigned int first_selected_component,
-      const std::array<unsigned int, n_face_orientations> cells,
-      const std::array<unsigned int, n_face_orientations> face_nos,
-      const unsigned int                                  subface_index,
-      const MatrixFreeFunctions::DoFInfo::DoFAccessIndex  dof_access_index,
-      const std::array<unsigned int, n_face_orientations> face_orientations,
-      const Table<2, unsigned int> &                      orientation_map);
+      const std::array<unsigned int, VectorizedArrayType::size()> cells,
+      const std::array<unsigned int, VectorizedArrayType::size()> face_nos,
+      const unsigned int                                          subface_index,
+      const MatrixFreeFunctions::DoFInfo::DoFAccessIndex dof_access_index,
+      const std::array<unsigned int, VectorizedArrayType::size()>
+                                    face_orientations,
+      const Table<2, unsigned int> &orientation_map);
 
-    template <std::size_t n_face_orientations>
     static bool
     integrate_scatter(
-      const unsigned int                                         n_components,
-      Number *                                                   dst_ptr,
+      const unsigned int n_components,
+      const std::size_t  n_face_orientations,
+      Number *           dst_ptr,
       const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
       const MatrixFreeFunctions::DoFInfo &                       dof_info,
       VectorizedArrayType *                                      values_array,
@@ -133,12 +134,13 @@ namespace internal
       const bool         integrate_gradients,
       const unsigned int active_fe_index,
       const unsigned int first_selected_component,
-      const std::array<unsigned int, n_face_orientations> cells,
-      const std::array<unsigned int, n_face_orientations> face_nos,
-      const unsigned int                                  subface_index,
-      const MatrixFreeFunctions::DoFInfo::DoFAccessIndex  dof_access_index,
-      const std::array<unsigned int, n_face_orientations> face_orientations,
-      const Table<2, unsigned int> &                      orientation_map);
+      const std::array<unsigned int, VectorizedArrayType::size()> cells,
+      const std::array<unsigned int, VectorizedArrayType::size()> face_nos,
+      const unsigned int                                          subface_index,
+      const MatrixFreeFunctions::DoFInfo::DoFAccessIndex dof_access_index,
+      const std::array<unsigned int, VectorizedArrayType::size()>
+                                    face_orientations,
+      const Table<2, unsigned int> &orientation_map);
   };
 
 
