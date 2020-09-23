@@ -182,8 +182,8 @@ namespace internal
     get_mpi_comm(const MeshType &mesh)
     {
       const auto *tria_parallel = dynamic_cast<
-        const parallel::TriangulationBase<MeshType::dimension,
-                                          MeshType::space_dimension> *>(
+        const dealii::parallel::TriangulationBase<MeshType::dimension,
+                                                  MeshType::space_dimension> *>(
         &(mesh.get_triangulation()));
 
       return tria_parallel != nullptr ? tria_parallel->get_communicator() :
