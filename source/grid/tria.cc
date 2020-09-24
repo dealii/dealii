@@ -2199,10 +2199,9 @@ namespace internal
               // throw an exception if no such cells should exist.
               if (tria.check_for_distorted_cells)
                 {
-                  const double cell_measure =
-                    GridTools::cell_measure<dim>(vertices,
-                                                 ArrayView<const unsigned int>(
-                                                   cells[cell_no].vertices));
+                  const double cell_measure = GridTools::cell_measure<spacedim>(
+                    vertices,
+                    ArrayView<const unsigned int>(cells[cell_no].vertices));
                   AssertThrow(cell_measure > 0, ExcGridHasInvalidCell(cell_no));
                 }
             }
