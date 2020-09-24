@@ -129,8 +129,9 @@ public:
 
 
   /**
-   * Standard constructor. The standard output stream to
-   * <tt>std::cout</tt>.
+   * Standard constructor. The constructor sets the output stream to
+   * <tt>std::cout</tt> and the depth to zero. (Use attach() and
+   * depth_console() to change this.)
    */
   LogStream();
 

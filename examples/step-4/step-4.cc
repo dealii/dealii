@@ -537,7 +537,6 @@ void Step4<dim>::run()
 // could actually use it.
 int main()
 {
-  deallog.depth_console(0);
   {
     Step4<2> laplace_problem_2d;
     laplace_problem_2d.run();
