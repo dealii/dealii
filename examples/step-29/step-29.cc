@@ -414,7 +414,7 @@ namespace Step29
   {
     // First we generate some logging output and start a timer so we can
     // compute execution time when this function is done:
-    deallog << "Generating grid... ";
+    std::cout << "Generating grid... ";
     Timer timer;
 
     // Then we query the values for the focal distance of the transducer lens
@@ -475,10 +475,10 @@ namespace Step29
     // query the number of CPU seconds elapsed since the beginning of the
     // function:
     timer.stop();
-    deallog << "done (" << timer.cpu_time() << "s)" << std::endl;
+    std::cout << "done (" << timer.cpu_time() << "s)" << std::endl;
 
-    deallog << "  Number of active cells:  " << triangulation.n_active_cells()
-            << std::endl;
+    std::cout << "  Number of active cells:  " << triangulation.n_active_cells()
+              << std::endl;
   }
 
 
@@ -491,7 +491,7 @@ namespace Step29
   template <int dim>
   void UltrasoundProblem<dim>::setup_system()
   {
-    deallog << "Setting up system... ";
+    std::cout << "Setting up system... ";
     Timer timer;
 
     dof_handler.distribute_dofs(fe);
@@ -505,10 +505,10 @@ namespace Step29
     solution.reinit(dof_handler.n_dofs());
 
     timer.stop();
-    deallog << "done (" << timer.cpu_time() << "s)" << std::endl;
+    std::cout << "done (" << timer.cpu_time() << "s)" << std::endl;
 
-    deallog << "  Number of degrees of freedom: " << dof_handler.n_dofs()
-            << std::endl;
+    std::cout << "  Number of degrees of freedom: " << dof_handler.n_dofs()
+              << std::endl;
   }
 
 
@@ -519,7 +519,7 @@ namespace Step29
   template <int dim>
   void UltrasoundProblem<dim>::assemble_system()
   {
-    deallog << "Assembling system matrix... ";
+    std::cout << "Assembling system matrix... ";
     Timer timer;
 
     // First we query wavespeed and frequency from the ParameterHandler object
@@ -734,7 +734,7 @@ namespace Step29
                                        system_rhs);
 
     timer.stop();
-    deallog << "done (" << timer.cpu_time() << "s)" << std::endl;
+    std::cout << "done (" << timer.cpu_time() << "s)" << std::endl;
   }
 
 
@@ -756,7 +756,7 @@ namespace Step29
   template <int dim>
   void UltrasoundProblem<dim>::solve()
   {
-    deallog << "Solving linear system... ";
+    std::cout << "Solving linear system... ";
     Timer timer;
 
     // The code to solve the linear system is short: First, we allocate an
@@ -774,7 +774,7 @@ namespace Step29
     A_direct.vmult(solution, system_rhs);
 
     timer.stop();
-    deallog << "done (" << timer.cpu_time() << "s)" << std::endl;
+    std::cout << "done (" << timer.cpu_time() << "s)" << std::endl;
   }
 
 
@@ -790,7 +790,7 @@ namespace Step29
   template <int dim>
   void UltrasoundProblem<dim>::output_results() const
   {
-    deallog << "Generating output... ";
+    std::cout << "Generating output... ";
     Timer timer;
 
     // Define objects of our <code>ComputeIntensity</code> class and a DataOut
@@ -841,7 +841,7 @@ namespace Step29
     data_out.write(output);
 
     timer.stop();
-    deallog << "done (" << timer.cpu_time() << "s)" << std::endl;
+    std::cout << "done (" << timer.cpu_time() << "s)" << std::endl;
   }
 
 
@@ -876,8 +876,6 @@ int main()
     {
       using namespace dealii;
       using namespace Step29;
-
-      deallog.depth_console(5);
 
       ParameterHandler prm;
       ParameterReader  param(prm);
