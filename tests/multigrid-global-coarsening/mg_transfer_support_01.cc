@@ -28,7 +28,7 @@ test()
     {
       for (unsigned int j = 1; j < 25; j++)
         if (MGTwoLevelTransfer<2, LinearAlgebra::distributed::Vector<double>>::
-              polynomial_transfer_supported(i, j))
+              fast_polynomial_transfer_supported(i, j))
           deallog << 1 << " ";
         else
           deallog << "  ";
