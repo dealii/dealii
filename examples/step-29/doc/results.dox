@@ -46,13 +46,13 @@ Here's the console output of the program in debug mode:
 > make run
 [ 66%] Built target step-29
 [100%] Run step-29 with Debug configuration
-DEAL::Generating grid... done (0.832682s)
-DEAL::  Number of active cells:  25600
-DEAL::Setting up system... done (0.614761s)
-DEAL::  Number of degrees of freedom: 51842
-DEAL::Assembling system matrix... done (2.82536s)
-DEAL::Solving linear system... done (2.27971s)
-DEAL::Generating output... done (1.84418s)
+Generating grid... done (0.820449s)
+  Number of active cells:  25600
+Setting up system... done (1.18392s)
+  Number of degrees of freedom: 51842
+Assembling system matrix... done (2.33291s)
+Solving linear system... done (1.34837s)
+Generating output... done (2.05782s)
 [100%] Built target run
 @endcode
 
