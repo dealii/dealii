@@ -23,6 +23,7 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/magic_numbers.h>
 #include <deal.II/grid/manifold.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_faces.h>
@@ -9275,6 +9276,7 @@ Triangulation<dim, spacedim>::Triangulation(
   , number_cache(std::move(tria.number_cache))
   , vertex_to_boundary_id_map_1d(std::move(tria.vertex_to_boundary_id_map_1d))
   , vertex_to_manifold_id_map_1d(std::move(tria.vertex_to_manifold_id_map_1d))
+  , currently_processing_create_triangulation_with_description(false)
 {
   tria.number_cache = internal::TriangulationImplementation::NumberCache<dim>();
 }
@@ -9825,7 +9827,8 @@ Triangulation<dim, spacedim>::create_triangulation(
     }
 
   // inform all listeners that the triangulation has been created
-  signals.create();
+  if (currently_processing_create_triangulation_with_description == false)
+    signals.create();
 }
 
 
@@ -9835,10 +9838,12 @@ void
 Triangulation<dim, spacedim>::create_triangulation(
   const TriangulationDescription::Description<dim, spacedim> &construction_data)
 {
-  // 1) create coarse grid
+  // 1) create coarse grid and postpone the send of the create singnal
+  this->currently_processing_create_triangulation_with_description = true;
   create_triangulation(construction_data.coarse_cell_vertices,
                        construction_data.coarse_cells,
                        SubCellData());
+  this->currently_processing_create_triangulation_with_description = false;
 
   // create a copy of cell_infos such that we can sort them
   auto cell_infos = construction_data.cell_infos;
@@ -9894,6 +9899,9 @@ Triangulation<dim, spacedim>::create_triangulation(
             cell->set_manifold_id(cell_info->manifold_id);
           }
       }
+
+      if (level == 0)
+        signals.create(); // notify that the triangulation has been created
 
       // b) perform refinement on all levels but on the finest
       if (level + 1 != cell_infos.size())

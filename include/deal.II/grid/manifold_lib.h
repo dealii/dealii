@@ -1138,6 +1138,7 @@ private:
    * this class goes out of scope.
    */
   boost::signals2::connection clear_signal;
+  boost::signals2::connection create_signal;
 };
 
 DEAL_II_NAMESPACE_CLOSE

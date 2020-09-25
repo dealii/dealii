@@ -1652,6 +1652,8 @@ TransfiniteInterpolationManifold<dim,
 {
   if (clear_signal.connected())
     clear_signal.disconnect();
+  if (create_signal.connected())
+    create_signal.disconnect();
 }
 
 
@@ -1676,31 +1678,42 @@ TransfiniteInterpolationManifold<dim, spacedim>::initialize(
   this->triangulation = &triangulation;
   // in case the triangulation is cleared, remove the pointers by a signal
   clear_signal.disconnect();
-  clear_signal = triangulation.signals.clear.connect([&]() -> void {
+  clear_signal = triangulation.signals.clear.connect([&]() {
     this->triangulation = nullptr;
     this->level_coarse  = -1;
   });
-  level_coarse = triangulation.last()->level();
-  coarse_cell_is_flat.resize(triangulation.n_cells(level_coarse), false);
-  typename Triangulation<dim, spacedim>::active_cell_iterator
-    cell = triangulation.begin(level_coarse),
-    endc = triangulation.end(level_coarse);
-  for (; cell != endc; ++cell)
-    {
-      bool cell_is_flat = true;
-      for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
-        if (cell->line(l)->manifold_id() != cell->manifold_id() &&
-            cell->line(l)->manifold_id() != numbers::flat_manifold_id)
-          cell_is_flat = false;
-      if (dim > 2)
-        for (unsigned int q = 0; q < GeometryInfo<dim>::quads_per_cell; ++q)
-          if (cell->quad(q)->manifold_id() != cell->manifold_id() &&
-              cell->quad(q)->manifold_id() != numbers::flat_manifold_id)
+
+  const auto create_function = [&]() {
+    level_coarse = triangulation.last()->level();
+    coarse_cell_is_flat.resize(triangulation.n_cells(level_coarse), false);
+    typename Triangulation<dim, spacedim>::active_cell_iterator
+      cell = triangulation.begin(level_coarse),
+      endc = triangulation.end(level_coarse);
+    for (; cell != endc; ++cell)
+      {
+        bool cell_is_flat = true;
+        for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
+          if (cell->line(l)->manifold_id() != cell->manifold_id() &&
+              cell->line(l)->manifold_id() != numbers::flat_manifold_id)
             cell_is_flat = false;
-      AssertIndexRange(static_cast<unsigned int>(cell->index()),
-                       coarse_cell_is_flat.size());
-      coarse_cell_is_flat[cell->index()] = cell_is_flat;
+        if (dim > 2)
+          for (unsigned int q = 0; q < GeometryInfo<dim>::quads_per_cell; ++q)
+            if (cell->quad(q)->manifold_id() != cell->manifold_id() &&
+                cell->quad(q)->manifold_id() != numbers::flat_manifold_id)
+              cell_is_flat = false;
+        AssertIndexRange(static_cast<unsigned int>(cell->index()),
+                         coarse_cell_is_flat.size());
+        coarse_cell_is_flat[cell->index()] = cell_is_flat;
+      }
+  };
+
+  if (triangulation.n_global_levels() == 0)
+    {
+      create_signal.disconnect();
+      create_signal = triangulation.signals.create.connect(create_function);
     }
+  else
+    create_function();
 }
 
 
