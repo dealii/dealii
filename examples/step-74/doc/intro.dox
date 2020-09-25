@@ -26,7 +26,7 @@ This tutorial includes the following topics.
 </ol>
 
 <h3>The equation</h3>
-In this example, we consider Poisson's equation with a Dirichlet boundary condition
+In this example, we consider Poisson's equation
 @f[
 - \nu  \Delta u = f  \qquad   \mbox{in } \Omega,
 @f]
