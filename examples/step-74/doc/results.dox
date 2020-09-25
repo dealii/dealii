@@ -68,7 +68,7 @@ degree = 3
 | 4     | 4096  | 65536  | 2.179e-08 | 4.00               | 1.327e-05 | 3.01               | 1.331e-05 |
 | 5     | 16384 | 262144 | 1.363e-09 | 4.00               | 1.656e-06 | 3.00               | 1.657e-06 |
 @endcode
-Thearetically, for polynomial degree $p$, the order of convergece in $L_2$
+Theoretically, for polynomial degree $p$, the order of convergence in $L_2$
 norm and $H_1$ seminorm should be $p+1$ and $p$, respectively. Our numerical
 results are in good agreement with theory.
 
