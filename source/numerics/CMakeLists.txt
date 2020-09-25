@@ -56,8 +56,6 @@ SET(_separate_src
   vector_tools_interpolate.cc
   vector_tools_point_value.cc
   vector_tools_project.cc
-  vector_tools_project_inst2.cc
-  vector_tools_project_inst3.cc
   vector_tools_project_hp.cc
   vector_tools_project_codim.cc
   vector_tools_project_qp.cc
