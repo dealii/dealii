@@ -70,7 +70,7 @@ degree = 3
 @endcode
 Thearetically, for polynomial degree $p$, the order of convergece in $L_2$
 norm and $H_1$ seminorm should be $p+1$ and $p$, respectively. Our numerical
-results are in good agreement with the theories.
+results are in good agreement with theory.
 
 Errors of the singular case with polynomial degree 3.
 @code
