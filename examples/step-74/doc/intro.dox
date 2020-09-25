@@ -116,4 +116,4 @@ Then the error estimate square per cell is
 \eta_{local}^2 =\eta_{c}^2+0.5\eta_{f}^2+\eta_{b}^2.
 @f]
 Note that we compute $\eta_{local}^2$ instead of $\eta_{local}$ to simplify the implementation.
-The error estimate square per cell is store in a global vector, whose $L_1$ norm is equal to $\eta^2$.
+The error estimate square per cell is stored in a global vector, whose $L_1$ norm is equal to $\eta^2$.
