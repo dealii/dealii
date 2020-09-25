@@ -303,6 +303,7 @@ BlockSparsityPatternBase<DynamicSparsityPattern>::print(std::ostream &out) const
 #endif
 
 
+
 template <class SparsityPatternBase>
 void
 BlockSparsityPatternBase<SparsityPatternBase>::print_gnuplot(
@@ -326,6 +327,47 @@ BlockSparsityPatternBase<SparsityPatternBase>::print_gnuplot(
         }
       k += block(ib, 0).n_rows();
     }
+}
+
+
+
+template <class SparsityPatternBase>
+void
+BlockSparsityPatternBase<SparsityPatternBase>::print_svg(
+  std::ostream &out) const
+{
+  const unsigned int m = this->n_rows();
+  const unsigned int n = this->n_cols();
+  out
+    << "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 "
+    << n + 2 << " " << m + 2
+    << " \">\n"
+       "<style type=\"text/css\" >\n"
+       "     <![CDATA[\n"
+       "      rect.pixel {\n"
+       "          fill:   #ff0000;\n"
+       "      }\n"
+       "    ]]>\n"
+       "  </style>\n\n"
+       "   <rect width=\""
+    << n + 2 << "\" height=\"" << m + 2
+    << "\" fill=\"rgb(128, 128, 128)\"/>\n"
+       "   <rect x=\"1\" y=\"1\" width=\""
+    << n + 0.1 << "\" height=\"" << m + 0.1
+    << "\" fill=\"rgb(255, 255, 255)\"/>\n\n";
+
+  for (unsigned int block_i = 0; block_i < n_block_rows(); ++block_i)
+    for (unsigned int block_j = 0; block_j < n_block_rows(); ++block_j)
+      for (const auto &entry : block(block_i, block_j))
+        {
+          out << "  <rect class=\"pixel\" x=\""
+              << column_indices.local_to_global(block_j, entry.column()) + 1
+              << "\" y=\""
+              << row_indices.local_to_global(block_i, entry.row()) + 1
+              << "\" width=\".9\" height=\".9\"/>\n";
+        }
+
+  out << "</svg>" << std::endl;
 }
 
 
@@ -443,6 +485,7 @@ BlockDynamicSparsityPattern::BlockDynamicSparsityPattern(
 }
 
 
+
 BlockDynamicSparsityPattern::BlockDynamicSparsityPattern(
   const std::vector<IndexSet> &partitioning)
   : BlockSparsityPatternBase<DynamicSparsityPattern>(partitioning.size(),
@@ -457,12 +500,14 @@ BlockDynamicSparsityPattern::BlockDynamicSparsityPattern(
 }
 
 
+
 BlockDynamicSparsityPattern::BlockDynamicSparsityPattern(
   const BlockIndices &row_indices,
   const BlockIndices &col_indices)
 {
   reinit(row_indices, col_indices);
 }
+
 
 
 void
@@ -478,6 +523,8 @@ BlockDynamicSparsityPattern::reinit(
   this->collect_sizes();
 }
 
+
+
 void
 BlockDynamicSparsityPattern::reinit(const std::vector<IndexSet> &partitioning)
 {
@@ -490,6 +537,8 @@ BlockDynamicSparsityPattern::reinit(const std::vector<IndexSet> &partitioning)
                                partitioning[i]);
   this->collect_sizes();
 }
+
+
 
 void
 BlockDynamicSparsityPattern::reinit(const BlockIndices &row_indices,

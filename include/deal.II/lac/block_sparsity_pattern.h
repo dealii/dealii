@@ -308,6 +308,14 @@ public:
   print_gnuplot(std::ostream &out) const;
 
   /**
+   * Print the sparsity of the matrix in <tt>svg</tt> format. This is the same
+   * functionality implemented for usual sparsity patterns, see
+   * @ref SparsityPattern.
+   */
+  void
+  print_svg(std::ostream &out) const;
+
+  /**
    * @addtogroup Exceptions
    * @{
    */
