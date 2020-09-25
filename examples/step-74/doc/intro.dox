@@ -84,7 +84,7 @@ People do not really have consensus on which precise formula to choose, among wh
 One can just pick a large constant, while other options could be the multiples of $(p+1)^2$ or $p(p+1)$. In this code,
 we follow step-39 and use $\gamma = p(p+1)$.
 
-<h3>Posteriori error estimator</h3>
+<h3>A posteriori error estimator</h3>
 In this example, we use the error estimator by Karakashian and Pascal @cite karakashian2003posteriori
 @f[
 \eta^2 = \sum_{K \in \Gamma_h} \eta^2_{K} +  \sum_{f_i \in F^i_h}  \eta^2_{f_i} + \sum_{f_b \in F^i_b}\eta^2_{f_b}
