@@ -19,7 +19,7 @@ which is designed for assembling face terms arising from discontinuous Galerkin 
 The FEInterfaceValues class provides an easy way to obtain the jump and the average of the solution across cell faces.
 This tutorial includes the following topics.
 <ol>
-  <li> The SIPG method for Poisson's equation, which has been used in step-39 and step-59.
+  <li> The SIPG method for Poisson's equation, which has already been used in step-39 and step-59.
   <li> Assembling of face terms using FEInterfaceValues and the system matrix using MeshWorker::mesh_loop(), which is similar to step-12.
   <li> Adaptive mesh refinement using an error estimator.
   <li> Two test cases: convergence test for a smooth function and adaptive mesh refinement test for a singular solution.
