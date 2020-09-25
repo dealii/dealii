@@ -913,8 +913,8 @@ SparsityPatternBase::print_gnuplot(std::ostream &out) const
 void
 SparsityPatternBase::print_svg(std::ostream &out) const
 {
-  unsigned int m = this->n_rows();
-  unsigned int n = this->n_cols();
+  const unsigned int m = this->n_rows();
+  const unsigned int n = this->n_cols();
   out
     << "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 "
     << n + 2 << " " << m + 2
@@ -933,11 +933,10 @@ SparsityPatternBase::print_svg(std::ostream &out) const
     << n + 0.1 << "\" height=\"" << m + 0.1
     << "\" fill=\"rgb(255, 255, 255)\"/>\n\n";
 
-  SparsityPattern::iterator it = this->begin(), end = this->end();
-  for (; it != end; ++it)
+  for (const auto &entry : *this)
     {
-      out << "  <rect class=\"pixel\" x=\"" << it->column() + 1 << "\" y=\""
-          << it->row() + 1 << "\" width=\".9\" height=\".9\"/>\n";
+      out << "  <rect class=\"pixel\" x=\"" << entry.column() + 1 << "\" y=\""
+          << entry.row() + 1 << "\" width=\".9\" height=\".9\"/>\n";
     }
   out << "</svg>" << std::endl;
 }
