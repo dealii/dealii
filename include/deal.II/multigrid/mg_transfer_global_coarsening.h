@@ -227,6 +227,11 @@ private:
    */
   AffineConstraints<Number> constraint_coarse;
 
+  /**
+   * Number of components.
+   */
+  unsigned int n_components;
+
   friend class internal::MGTwoLevelTransferImplementation;
 };
 
