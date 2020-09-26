@@ -46,18 +46,26 @@ namespace
   public:
     CellTransfer(const unsigned int degree_fine,
                  const unsigned int degree_coarse)
-      : n(100 * degree_fine + degree_coarse)
+      : degree_fine(degree_fine)
+      , degree_coarse(degree_coarse)
+      , n(100 * degree_fine + degree_coarse)
     {}
 
     template <typename Fu>
     bool
     run(Fu &fu)
     {
-      return do_run_degree<1>(fu) || do_run_degree<2>(fu) ||
-             do_run_degree<3>(fu) || do_run_degree<4>(fu) ||
-             do_run_degree<5>(fu) || do_run_degree<6>(fu) ||
-             do_run_degree<7>(fu) || do_run_degree<8>(fu) ||
-             do_run_degree<9>(fu);
+      // try to run fast templated evaluation
+      if (do_run_degree<1>(fu) || do_run_degree<2>(fu) ||
+          do_run_degree<3>(fu) || do_run_degree<4>(fu) ||
+          do_run_degree<5>(fu) || do_run_degree<6>(fu) ||
+          do_run_degree<7>(fu) || do_run_degree<8>(fu) || do_run_degree<9>(fu))
+        return true;
+
+      // fast version has not been instantiated -> run non-templated version
+      fu.template run<-1, -1>(degree_fine, degree_coarse);
+
+      return false;
     }
 
     template <int degree, typename Fu>
@@ -80,7 +88,10 @@ namespace
       return true;
     }
 
-    const int n;
+  private:
+    const unsigned int degree_fine;
+    const unsigned int degree_coarse;
+    const int          n; // 100 * degree_fine + degree_coarse
   };
 
   /**
@@ -100,7 +111,8 @@ namespace
 
     template <int degree_fine, int degree_coarse>
     void
-    run()
+    run(const unsigned int degree_fine_   = numbers::invalid_unsigned_int,
+        const unsigned int degree_coarse_ = numbers::invalid_unsigned_int)
     {
       internal::FEEvaluationImplBasisChange<
         internal::evaluate_general,
@@ -112,7 +124,9 @@ namespace
         Number>::do_forward(1,
                             prolongation_matrix_1d,
                             evaluation_data_coarse,
-                            evaluation_data_fine);
+                            evaluation_data_fine,
+                            degree_coarse_ + 1,
+                            degree_fine_ + 1);
     }
 
   private:
@@ -138,20 +152,23 @@ namespace
 
     template <int degree_fine, int degree_coarse>
     void
-    run()
+    run(const unsigned int degree_fine_   = numbers::invalid_unsigned_int,
+        const unsigned int degree_coarse_ = numbers::invalid_unsigned_int)
     {
       internal::FEEvaluationImplBasisChange<
         internal::evaluate_general,
         internal::EvaluatorQuantity::value,
         dim,
-        degree_coarse + 1,
-        degree_fine + 1,
+        degree_coarse == 0 ? -1 : (degree_coarse + 1),
+        degree_fine == 0 ? -1 : (degree_fine + 1),
         Number,
         Number>::do_backward(1,
                              prolongation_matrix_1d,
                              false,
                              evaluation_data_fine,
-                             evaluation_data_coarse);
+                             evaluation_data_coarse,
+                             degree_coarse_ + 1,
+                             degree_fine_ + 1);
     }
 
   private:
@@ -165,7 +182,8 @@ namespace
   public:
     template <int degree_fine, int degree_coarse>
     void
-    run()
+    run(const unsigned int = numbers::invalid_unsigned_int,
+        const unsigned int = numbers::invalid_unsigned_int)
     {}
   };
 
@@ -1643,13 +1661,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
           }
 
           // ---------------------------- coarse -----------------------------
-          const auto ierr = cell_transfer.run(cell_prolongator);
-          (void)ierr;
-          Assert(ierr,
-                 ExcMessage("Prolongation " +
-                            std::to_string(scheme.degree_coarse) + " -> " +
-                            std::to_string(scheme.degree_fine) +
-                            " not instantiated!"));
+          cell_transfer.run(cell_prolongator);
           // ------------------------------ fine -----------------------------
 
           if (scheme.fine_element_is_continuous)
@@ -1751,13 +1763,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
             }
 
           // ------------------------------ fine -----------------------------
-          const auto ierr = cell_transfer.run(cell_restrictor);
-          (void)ierr;
-          Assert(ierr,
-                 ExcMessage("Restriction " +
-                            std::to_string(scheme.degree_fine) + " -> " +
-                            std::to_string(scheme.degree_coarse) +
-                            " not instantiated!"));
+          cell_transfer.run(cell_restrictor);
           // ----------------------------- coarse ----------------------------
 
 
@@ -1826,8 +1832,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 template <int dim, typename Number>
 bool
 MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
-  polynomial_transfer_supported(const unsigned int fe_degree_fine,
-                                const unsigned int fe_degree_coarse)
+  fast_polynomial_transfer_supported(const unsigned int fe_degree_fine,
+                                     const unsigned int fe_degree_coarse)
 {
   CellTransfer        cell_transfer(fe_degree_fine, fe_degree_coarse);
   CellProlongatorTest cell_transfer_test;

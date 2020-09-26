@@ -92,15 +92,16 @@ public:
     const AffineConstraints<Number> &constraint_coarse);
 
   /**
-   * Check if the polynomial transfer between @p fe_degree_fine and
-   * @p fe_degree_coarse is supported.
+   * Check if a fast templated version of the polynomial transfer between
+   * @p fe_degree_fine and @p fe_degree_coarse is available.
    *
    * @note Currently, the polynomial coarsening strategies: 1) go-to-one,
-   *   2) bisect, and 3) decrease-by-one is supported.
+   *   2) bisect, and 3) decrease-by-one are precompiled with templates for
+   *   degrees up to 9.
    */
   static bool
-  polynomial_transfer_supported(const unsigned int fe_degree_fine,
-                                const unsigned int fe_degree_coarse);
+  fast_polynomial_transfer_supported(const unsigned int fe_degree_fine,
+                                     const unsigned int fe_degree_coarse);
 
   /**
    * Perform prolongation.
