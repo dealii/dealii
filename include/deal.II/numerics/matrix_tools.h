@@ -631,14 +631,22 @@ namespace MatrixCreator
  *
  * <h3>Boundary conditions</h3>
  *
- * The apply_boundary_values() function inserts boundary conditions into a
- * system of equations.  To actually do this you have to specify a list of
- * degree of freedom indices along with the values these degrees of freedom
- * shall assume. To see how to get such a list, see the discussion of the
- * VectorTools::interpolate_boundary_values function.
+ * The apply_boundary_values() functions modifies a linear system to incorporate
+ * the constraints that result from Dirichlet-type boundary conditions (or, more
+ * specifically: "strong" boundary conditions). To actually do this, the
+ * functions of this name in the current namespace require a list of degree of
+ * freedom indices along with the values these degrees of freedom should have.
+ * To see how to get such a list, see the discussion of the
+ * VectorTools::interpolate_boundary_values() function as one example.
  *
  * There are two ways to incorporate fixed degrees of freedom such as boundary
- * nodes into a linear system, as discussed below.
+ * nodes into a linear system, as discussed below. Both operate at either the
+ * level of local contributions to the global linear system, or the global
+ * system itself. A third way, using
+ * AffineConstraints::copy_local_to_global(), performs the same process as part
+ * of adding the local contributions of one cell into the global linear system
+ * (the "assembly" step) and is the method predominantly used in the tutorial
+ * programs today.
  *
  * @dealiiVideoLecture{21.6,21.65}
  *
@@ -727,11 +735,19 @@ namespace MatrixCreator
  * other diagonal entries, but this seems to be too expensive.
  *
  * In some cases, it might be interesting to solve several times with the same
- * matrix, but for different right hand sides or boundary values. However,
+ * matrix, but for different right hand sides or boundary values. A typical
+ * case would be the solution of a time-dependent problem in which the boundary
+ * values or right hand side change, but the matrix itself does not. One
+ * may then be tempted to just assemble the matrix once and just call the
+ * MatrixTools::apply_boundary_values() function repeatedly on the same
+ * matrix object, with a right hand side vector newly formed in each time step.
+ * However,
  * since the modification for boundary values of the right hand side vector
  * depends on the original matrix, this is not possible without storing the
- * original matrix somewhere and applying the @p apply_boundary_conditions
- * function to a copy of it each time we want to solve. In that case, you can
+ * original matrix somewhere, and in every time step initializing the system
+ * matrix with the unmodified matrix stored elsewhere. step-26 does a variation
+ * of this process by storing building blocks from which the system matrix is
+ * composed, but the general principle is the same. Alternatively, one can
  * use the constrained_linear_operator() function. In its documentation you can
  * also find a formal (mathematical) description of the process of modifying the
  * matrix and right hand side vectors for boundary values.
@@ -825,7 +841,7 @@ namespace MatrixTools
 
   /**
    * Apply Dirichlet boundary conditions to the system matrix and vectors as
-   * described in the general documentation.
+   * described in the general documentation of this namespace.
    */
   template <typename number>
   void
@@ -838,8 +854,8 @@ namespace MatrixTools
 
   /**
    * Apply Dirichlet boundary conditions to the system matrix and vectors as
-   * described in the general documentation. This function works for block
-   * sparse matrices and block vectors
+   * described in the general documentation of this namespace. This function
+   * works for block sparse matrices and block vectors.
    */
   template <typename number>
   void
@@ -853,8 +869,8 @@ namespace MatrixTools
 #ifdef DEAL_II_WITH_PETSC
   /**
    * Apply Dirichlet boundary conditions to the system matrix and vectors as
-   * described in the general documentation. This function works on the
-   * classes that are used to wrap PETSc objects.
+   * described in the general documentation of this namespace. This function
+   * works on the classes that are used to wrap PETSc objects.
    *
    * <b>Important:</b> This function is not very efficient: it needs to
    * alternatingly read and write into the matrix, a situation that PETSc does
@@ -910,8 +926,8 @@ namespace MatrixTools
 #ifdef DEAL_II_WITH_TRILINOS
   /**
    * Apply Dirichlet boundary conditions to the system matrix and vectors as
-   * described in the general documentation. This function works on the
-   * classes that are used to wrap Trilinos objects.
+   * described in the general documentation of this namespace. This function
+   * works on the classes that are used to wrap Trilinos objects.
    *
    * <b>Important:</b> This function is not very efficient: it needs to
    * alternatingly read and write into the matrix, a situation that Trilinos
