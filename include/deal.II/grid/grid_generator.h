@@ -1748,8 +1748,10 @@ namespace GridGenerator
     Triangulation<dim, spacedim> &result);
 
   /**
-   * Extrude @p input in the $z$ direction from $z = 0$ to $z =
-   * \text{height}$. The number of <em>slices</em>, or layers of cells
+   * Extrude the Triangulation @p input in the $z$ direction from $z = 0$ to $z =
+   * \text{height}$ and store it in @p result.
+   *
+   * The number of <em>slices</em>, or layers of cells
    * perpendicular to the $z = 0$ plane, will be @p n_slices slices (minimum is
    * 2). The boundary indicators of the faces of @p input will be assigned to
    * the corresponding side walls in $z$ direction. The bottom and top get the
