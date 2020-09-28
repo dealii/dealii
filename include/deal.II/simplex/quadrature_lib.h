@@ -38,13 +38,13 @@ namespace Simplex
    * @ingroup simplex
    */
   template <int dim>
-  class PGauss : public QSimplex<dim>
+  class QGauss : public QSimplex<dim>
   {
   public:
     /**
      * Constructor taking the number of quadrature points @p n_points.
      */
-    explicit PGauss(const unsigned int n_points);
+    explicit QGauss(const unsigned int n_points);
   };
 } // namespace Simplex
 

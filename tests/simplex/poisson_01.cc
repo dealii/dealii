@@ -336,10 +336,10 @@ test_tet(const MPI_Comm &comm, const Parameters<dim> &params)
   // 3) Select components
   Simplex::FE_P<dim> fe(params.degree);
 
-  Simplex::PGauss<dim> quad(dim == 2 ? (params.degree == 1 ? 3 : 7) :
+  Simplex::QGauss<dim> quad(dim == 2 ? (params.degree == 1 ? 3 : 7) :
                                        (params.degree == 1 ? 4 : 10));
 
-  Simplex::PGauss<dim - 1> face_quad(dim == 2 ? (params.degree == 1 ? 2 : 3) :
+  Simplex::QGauss<dim - 1> face_quad(dim == 2 ? (params.degree == 1 ? 2 : 3) :
                                                 (params.degree == 1 ? 3 : 7));
 
   Simplex::FE_P<dim> fe_mapping(1);

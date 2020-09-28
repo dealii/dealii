@@ -189,9 +189,9 @@ public:
       false,
       new Simplex::FE_DGP<dim>(degree),
       new MappingFE<dim>(Simplex::FE_P<dim>(1)),
-      new Simplex::PGauss<dim>(dim == 2 ? (degree == 1 ? 3 : 7) :
+      new Simplex::QGauss<dim>(dim == 2 ? (degree == 1 ? 3 : 7) :
                                           (degree == 1 ? 4 : 10)),
-      new Simplex::PGauss<dim - 1>(dim == 2 ? (degree == 1 ? 2 : 3) :
+      new Simplex::QGauss<dim - 1>(dim == 2 ? (degree == 1 ? 2 : 3) :
                                               (degree == 1 ? 3 : 7)),
       initial_refinement,
       number_refinement);

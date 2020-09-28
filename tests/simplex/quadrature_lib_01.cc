@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Test Simplex::PGauss: output its quadrature points and weights.
+// Test Simplex::QGauss: output its quadrature points and weights.
 
 
 #include <deal.II/simplex/quadrature_lib.h>
@@ -27,7 +27,7 @@ template <int dim>
 void
 test(const unsigned int n_points)
 {
-  Simplex::PGauss<dim> quad(n_points);
+  Simplex::QGauss<dim> quad(n_points);
 
   for (unsigned int q = 0; q < quad.size(); ++q)
     {
