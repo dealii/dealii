@@ -40,58 +40,49 @@ namespace
 {
   /**
    * Helper class to select the right templated implementation.
+   *
+   * @note This class is similar to internal::FEEvaluationFactory
    */
-  class CellTransfer
+  class CellTransferFactory
   {
   public:
-    CellTransfer(const unsigned int degree_fine,
-                 const unsigned int degree_coarse)
+    static const unsigned int max_degree = 9;
+
+    CellTransferFactory(const unsigned int degree_fine,
+                        const unsigned int degree_coarse)
       : degree_fine(degree_fine)
       , degree_coarse(degree_coarse)
-      , n(100 * degree_fine + degree_coarse)
     {}
 
-    template <typename Fu>
+    template <typename Fu, unsigned int deg = 1>
     bool
     run(Fu &fu)
     {
-      // try to run fast templated evaluation
-      if (do_run_degree<1>(fu) || do_run_degree<2>(fu) ||
-          do_run_degree<3>(fu) || do_run_degree<4>(fu) ||
-          do_run_degree<5>(fu) || do_run_degree<6>(fu) ||
-          do_run_degree<7>(fu) || do_run_degree<8>(fu) || do_run_degree<9>(fu))
-        return true;
-
-      // fast version has not been instantiated -> run non-templated version
-      fu.template run<-1, -1>(degree_fine, degree_coarse);
-
-      return false;
-    }
-
-    template <int degree, typename Fu>
-    bool
-    do_run_degree(Fu &fu)
-    {
-      if (n == 100 * (2 * degree + 1) + degree) // h-MG
-        fu.template run<2 * degree + 1, degree>();
-      else if (n == 100 * degree + std::max(degree / 2, 1)) // p-MG: bisection
-        fu.template run<degree, std::max(degree / 2, 1)>();
-      else if (n == 100 * degree + degree) // identity (nothing to do)
-        fu.template run<degree, degree>();
-      else if (n == 100 * degree + std::max(degree - 1, 1)) // p-MG: --
-        fu.template run<degree, std::max(degree - 1, 1)>();
-      else if (n == 100 * degree + 1) // p-MG: jump to 1
-        fu.template run<degree, 1>();
+      if ((degree_fine == (2 * deg + 1)) && (degree_coarse == deg))
+        fu.template run<2 * deg + 1, deg>(); // h-MG
+      else if ((degree_fine == deg) && (degree_coarse == std::max(deg / 2, 1u)))
+        fu.template run<deg, std::max(deg / 2u, 1u)>(); // p-MG: bisection
+      else if ((degree_fine == deg) && (degree_coarse == deg))
+        fu.template run<deg, deg>(); // identity (nothing to do)
+      else if ((degree_fine == deg) && (degree_coarse == std::max(deg - 1, 1u)))
+        fu.template run<deg, std::max(deg - 1u, 1u)>(); // p-MG: --
+      else if ((degree_fine == deg) && (degree_coarse == 1))
+        fu.template run<deg, 1>(); // p-MG: jump to 1
+      else if (deg < max_degree)
+        return run<Fu, std::min(deg + 1, max_degree)>(fu); // try next degree
       else
-        return false;
+        {
+          // no match -> slow path
+          fu.template run<-1, -1>(degree_fine, degree_coarse);
+          return false; // indicate that slow path has been taken
+        }
 
-      return true;
+      return true; // indicate that fast path has been taken
     }
 
   private:
     const unsigned int degree_fine;
     const unsigned int degree_coarse;
-    const int          n; // 100 * degree_fine + degree_coarse
   };
 
   /**
@@ -1682,7 +1673,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
       evaluation_data_fine.resize(scheme.dofs_per_cell_fine);
       evaluation_data_coarse.resize(scheme.dofs_per_cell_fine);
 
-      CellTransfer cell_transfer(scheme.degree_fine, scheme.degree_coarse);
+      CellTransferFactory cell_transfer(scheme.degree_fine,
+                                        scheme.degree_coarse);
 
       const unsigned int n_scalar_dofs_fine =
         Utilities::pow(scheme.degree_fine + 1, dim);
@@ -1813,7 +1805,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
       evaluation_data_fine.resize(scheme.dofs_per_cell_fine);
       evaluation_data_coarse.resize(scheme.dofs_per_cell_fine);
 
-      CellTransfer cell_transfer(scheme.degree_fine, scheme.degree_coarse);
+      CellTransferFactory cell_transfer(scheme.degree_fine,
+                                        scheme.degree_coarse);
 
       const unsigned int n_scalar_dofs_fine =
         Utilities::pow(scheme.degree_fine + 1, dim);
@@ -1931,7 +1924,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   fast_polynomial_transfer_supported(const unsigned int fe_degree_fine,
                                      const unsigned int fe_degree_coarse)
 {
-  CellTransfer        cell_transfer(fe_degree_fine, fe_degree_coarse);
+  CellTransferFactory cell_transfer(fe_degree_fine, fe_degree_coarse);
   CellProlongatorTest cell_transfer_test;
 
   return cell_transfer.run(cell_transfer_test);
