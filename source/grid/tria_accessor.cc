@@ -2568,29 +2568,17 @@ CellAccessor<dim, spacedim>::has_periodic_neighbor(
    * faces we mainly use the Triangulation::periodic_face_map to find the
    * information about periodically connected faces. So, we actually search in
    * this std::map and return the cell_face on the other side of the periodic
-   * boundary. For this search process, we have two options:
+   * boundary.
    *
-   * 1- Using the [] operator of std::map: This option results in a more
-   * readalbe code, but requires an extra iteration in the map. Because when we
-   * call [] on std::map, with a key which does not exist in the std::map, that
-   * key will be created and the default value will be returned by []. This is
-   * not desirable. So, one has to first check if the key exists in the std::map
-   * and if it exists, then use the [] operator. The existence check is possible
-   * using std::map::find() or std::map::count(). Using this option will result
-   * in two iteration cycles through the map. First, existence check, then
-   * returning the value.
-   *
-   * 2- Using std::map::find(): This option is less readable, but theoretically
-   *    faster, because it results in one iteration through std::map object.
-   *
-   * We decided to use the 2nd option.
+   * We can not use operator[] as this would insert non-existing entries or
+   * would require guarding with an extra std::map::find() or count().
    */
   AssertIndexRange(i_face, this->n_faces());
   using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
-  // my_it : is the iterator to the current cell.
-  cell_iterator my_it(*this);
+
+  cell_iterator current_cell(*this);
   if (this->tria->periodic_face_map.find(
-        std::pair<cell_iterator, unsigned int>(my_it, i_face)) !=
+        std::make_pair(current_cell, i_face)) !=
       this->tria->periodic_face_map.end())
     return true;
   return false;
@@ -2612,14 +2600,12 @@ CellAccessor<dim, spacedim>::periodic_neighbor(const unsigned int i_face) const
    */
   AssertIndexRange(i_face, this->n_faces());
   using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
-  cell_iterator my_it(*this);
+  cell_iterator current_cell(*this);
 
-  const typename std::map<std::pair<cell_iterator, unsigned int>,
-                          std::pair<std::pair<cell_iterator, unsigned int>,
-                                    std::bitset<3>>>::const_iterator
-    my_face_pair = this->tria->periodic_face_map.find(
-      std::pair<cell_iterator, unsigned int>(my_it, i_face));
-  // Assertion is required to check that we are actually on a periodic boundary.
+  auto my_face_pair =
+    this->tria->periodic_face_map.find(std::make_pair(current_cell, i_face));
+
+  // Make sure we are actually on a periodic boundary:
   Assert(my_face_pair != this->tria->periodic_face_map.end(),
          TriaAccessorExceptions::ExcNoPeriodicNeighbor());
   return my_face_pair->second.first.first;
@@ -2665,11 +2651,9 @@ CellAccessor<dim, spacedim>::periodic_neighbor_child_on_subface(
   AssertIndexRange(i_face, this->n_faces());
   using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
   cell_iterator my_it(*this);
-  const typename std::map<std::pair<cell_iterator, unsigned int>,
-                          std::pair<std::pair<cell_iterator, unsigned int>,
-                                    std::bitset<3>>>::const_iterator
-    my_face_pair = this->tria->periodic_face_map.find(
-      std::pair<cell_iterator, unsigned int>(my_it, i_face));
+
+  auto my_face_pair =
+    this->tria->periodic_face_map.find(std::make_pair(my_it, i_face));
   /*
    * There should be an assertion, which tells the user that this function
    * should not be used for a cell which is not located at a periodic boundary.
@@ -2719,11 +2703,9 @@ CellAccessor<dim, spacedim>::periodic_neighbor_of_coarser_periodic_neighbor(
   using cell_iterator         = TriaIterator<CellAccessor<dim, spacedim>>;
   const int     my_face_index = this->face_index(i_face);
   cell_iterator my_it(*this);
-  const typename std::map<std::pair<cell_iterator, unsigned int>,
-                          std::pair<std::pair<cell_iterator, unsigned int>,
-                                    std::bitset<3>>>::const_iterator
-    my_face_pair = this->tria->periodic_face_map.find(
-      std::pair<cell_iterator, unsigned int>(my_it, i_face));
+
+  auto my_face_pair =
+    this->tria->periodic_face_map.find(std::make_pair(my_it, i_face));
   /*
    * There should be an assertion, which tells the user that this function
    * should not be used for a cell which is not located at a periodic boundary.
@@ -2732,11 +2714,9 @@ CellAccessor<dim, spacedim>::periodic_neighbor_of_coarser_periodic_neighbor(
          TriaAccessorExceptions::ExcNoPeriodicNeighbor());
   cell_iterator nb_it          = my_face_pair->second.first.first;
   unsigned int  face_num_of_nb = my_face_pair->second.first.second;
-  const typename std::map<std::pair<cell_iterator, unsigned int>,
-                          std::pair<std::pair<cell_iterator, unsigned int>,
-                                    std::bitset<3>>>::const_iterator
-    nb_face_pair = this->tria->periodic_face_map.find(
-      std::pair<cell_iterator, unsigned int>(nb_it, face_num_of_nb));
+
+  auto nb_face_pair =
+    this->tria->periodic_face_map.find(std::make_pair(nb_it, face_num_of_nb));
   /*
    * Since, we store periodic neighbors for every cell (either active or
    * artificial or inactive) the nb_face_pair should also be mapped to some
@@ -2750,15 +2730,15 @@ CellAccessor<dim, spacedim>::periodic_neighbor_of_coarser_periodic_neighbor(
   for (unsigned int i_subface = 0; i_subface < parent_face_it->n_children();
        ++i_subface)
     if (parent_face_it->child_index(i_subface) == my_face_index)
-      return (std::pair<unsigned int, unsigned int>(face_num_of_nb, i_subface));
+      return std::make_pair(face_num_of_nb, i_subface);
   /*
    * Obviously, if the execution reaches to this point, some of our assumptions
    * should have been false. The most important one is, the user has called this
    * function on a face which does not have a coarser periodic neighbor.
    */
   Assert(false, TriaAccessorExceptions::ExcNeighborIsNotCoarser());
-  return std::pair<unsigned int, unsigned int>(numbers::invalid_unsigned_int,
-                                               numbers::invalid_unsigned_int);
+  return std::make_pair(numbers::invalid_unsigned_int,
+                        numbers::invalid_unsigned_int);
 }
 
 
@@ -2809,11 +2789,9 @@ CellAccessor<dim, spacedim>::periodic_neighbor_face_no(
   AssertIndexRange(i_face, this->n_faces());
   using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
   cell_iterator my_it(*this);
-  const typename std::map<std::pair<cell_iterator, unsigned int>,
-                          std::pair<std::pair<cell_iterator, unsigned int>,
-                                    std::bitset<3>>>::const_iterator
-    my_face_pair = this->tria->periodic_face_map.find(
-      std::pair<cell_iterator, unsigned int>(my_it, i_face));
+
+  auto my_face_pair =
+    this->tria->periodic_face_map.find(std::make_pair(my_it, i_face));
   /*
    * There should be an assertion, which tells the user that this function
    * should not be called for a cell which is not located at a periodic boundary
@@ -2851,24 +2829,21 @@ CellAccessor<dim, spacedim>::periodic_neighbor_is_coarser(
   AssertIndexRange(i_face, this->n_faces());
   using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
   cell_iterator my_it(*this);
-  const typename std::map<std::pair<cell_iterator, unsigned int>,
-                          std::pair<std::pair<cell_iterator, unsigned int>,
-                                    std::bitset<3>>>::const_iterator
-    my_face_pair = this->tria->periodic_face_map.find(
-      std::pair<cell_iterator, unsigned int>(my_it, i_face));
+
+  auto my_face_pair =
+    this->tria->periodic_face_map.find(std::make_pair(my_it, i_face));
   /*
    * There should be an assertion, which tells the user that this function
    * should not be used for a cell which is not located at a periodic boundary.
    */
   Assert(my_face_pair != this->tria->periodic_face_map.end(),
          TriaAccessorExceptions::ExcNoPeriodicNeighbor());
+
   cell_iterator nb_it          = my_face_pair->second.first.first;
   unsigned int  face_num_of_nb = my_face_pair->second.first.second;
-  const typename std::map<std::pair<cell_iterator, unsigned int>,
-                          std::pair<std::pair<cell_iterator, unsigned int>,
-                                    std::bitset<3>>>::const_iterator
-    nb_face_pair = this->tria->periodic_face_map.find(
-      std::pair<cell_iterator, unsigned int>(nb_it, face_num_of_nb));
+
+  auto nb_face_pair =
+    this->tria->periodic_face_map.find(std::make_pair(nb_it, face_num_of_nb));
   /*
    * Since, we store periodic neighbors for every cell (either active or
    * artificial or inactive) the nb_face_pair should also be mapped to some
