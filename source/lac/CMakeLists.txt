@@ -46,7 +46,6 @@ SET(_unity_include_src
   sparsity_pattern.cc
   sparsity_tools.cc
   superlu_mt.cc
-  swappable_vector.cc
   vector.cc
   vector_memory.cc
   )
