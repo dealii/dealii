@@ -320,9 +320,12 @@ namespace internal
 
 
 /**
- * Triangulations denote a hierarchy of levels of elements which together form
- * a @p dim -dimensional manifold in @p spacedim spatial dimensions (if
- * spacedim is not specified it takes the default value @p spacedim=dim).
+ * A triangulation is a collection of cells that, jointly, cover the domain
+ * on which one typically wants to solve a partial differential equation.
+ * This domain, and the mesh that covers it, represents a @p dim -dimensional manifold
+ * and lives in @p spacedim spatial dimensions, where @p dim and @p spacedim
+ * are the template arguments of this class. (If @p spacedim is not specified,
+ * it takes the default value `spacedim=dim`.)
  *
  * Thus, for example, an object of type @p Triangulation<1,1> (or simply @p
  * Triangulation<1> since @p spacedim==dim by default) is used to represent
@@ -331,6 +334,16 @@ namespace internal
  * objects such as @p Triangulation<1,2> or @p Triangulation<2,3> (that are
  * associated with curves in 2D or surfaces in 3D) are the ones one wants to
  * use in the boundary element method.
+ *
+ * The name of the class is mostly hierarchical and is not meant to imply that
+ * a Triangulation can only consist of triangles. Instead, triangulations
+ * consist of line segments in 1d (i.e., if `dim==1`), and of three-dimensional
+ * cells (if `dim==3`). Moreover, historically, deal.II only supported
+ * quadrilaterals (cells with four vertices: deformed rectangles) in 2d
+ * and hexahedra (cells with six sides and eight vertices that are deformed
+ * boxes), neither of which are triangles. In other words, the term
+ * "triangulation" in the deal.II language is synonymous with "mesh" and is
+ * to be understood separate from its linguistic origin.
  *
  * This class is written to be as independent of the dimension as possible
  * (thus the complex construction of the
