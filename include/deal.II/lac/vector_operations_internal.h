@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/memory_space.h>
+#include <deal.II/base/memory_space_data.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/types.h>
