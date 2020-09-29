@@ -30,7 +30,7 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * This class implements the quadrature rule passed to its constructor as a
  * string. Supported quadratures are QGauss (of all orders), QMidpoint,
- * QMilne, QSimpson, QTrapez and QWeddle.
+ * QMilne, QSimpson, QTrapezoid and QWeddle.
  *
  * This class is useful if you want to use flexible quadrature rules, that are
  * read from a parameter file (see ParameterHandler for this).

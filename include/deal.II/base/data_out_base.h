@@ -296,7 +296,7 @@ namespace DataOutBase
      * output point <tt>j</tt>, where <tt>j</tt> denotes the usual
      * lexicographic ordering in deal.II. This is also the order of points as
      * provided by the <tt>QIterated</tt> class when used with the
-     * <tt>QTrapez</tt> class as subquadrature.
+     * <tt>QTrapezoid</tt> class as subquadrature.
      *
      * Since the number of data vectors is usually the same for all patches to
      * be printed, <tt>data.size()</tt> should yield the same value for all

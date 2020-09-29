@@ -140,7 +140,7 @@ namespace internal
           if (do_hex)
             {
               quadrature2.reset(new Quadrature<dim>(
-                QIterated<dim>(QTrapez<1>(), n_subdivisions)));
+                QIterated<dim>(QTrapezoid<1>(), n_subdivisions)));
             }
 
           n_q_points = std::max(do_simplex ? quadrature1->size() : 0,
@@ -183,7 +183,7 @@ namespace internal
       else
         {
           dealii::hp::QCollection<dim - 1> quadrature(
-            QIterated<dim - 1>(QTrapez<1>(), n_subdivisions));
+            QIterated<dim - 1>(QTrapezoid<1>(), n_subdivisions));
           n_q_points = quadrature[0].size();
           x_fe_face_values.resize(this->finite_elements.size());
           for (unsigned int i = 0; i < this->finite_elements.size(); ++i)
@@ -279,7 +279,7 @@ namespace internal
           if (do_hex)
             {
               quadrature2.reset(new Quadrature<dim>(
-                QIterated<dim>(QTrapez<1>(), n_subdivisions)));
+                QIterated<dim>(QTrapezoid<1>(), n_subdivisions)));
             }
 
           x_fe_values.resize(this->finite_elements.size());
@@ -320,7 +320,7 @@ namespace internal
       else
         {
           dealii::hp::QCollection<dim - 1> quadrature(
-            QIterated<dim - 1>(QTrapez<1>(), n_subdivisions));
+            QIterated<dim - 1>(QTrapezoid<1>(), n_subdivisions));
           x_fe_face_values.resize(this->finite_elements.size());
           for (unsigned int i = 0; i < this->finite_elements.size(); ++i)
             {

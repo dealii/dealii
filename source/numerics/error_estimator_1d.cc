@@ -415,7 +415,7 @@ KellyErrorEstimator<1, spacedim>::estimate(
     for (unsigned int c = 0; c < n_components; ++c)
       coefficient_values(c) = 1;
 
-  const QTrapez<1>         quadrature;
+  const QTrapezoid<1>      quadrature;
   const hp::QCollection<1> q_collection(quadrature);
   const QGauss<0>          face_quadrature(1);
   const hp::QCollection<0> q_face_collection(face_quadrature);
