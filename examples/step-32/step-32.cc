@@ -1830,9 +1830,10 @@ namespace Step32
   {
     TimerOutput::Scope timing_section(computing_timer, "Setup dof systems");
 
+    stokes_dof_handler.distribute_dofs(stokes_fe);
+
     std::vector<unsigned int> stokes_sub_blocks(dim + 1, 0);
     stokes_sub_blocks[dim] = 1;
-    stokes_dof_handler.distribute_dofs(stokes_fe);
     DoFRenumbering::component_wise(stokes_dof_handler, stokes_sub_blocks);
 
     temperature_dof_handler.distribute_dofs(temperature_fe);
