@@ -71,7 +71,7 @@ test_hyper_sphere()
   for (unsigned int degree = 1; degree < 4; ++degree)
     {
       hp::FECollection<dim> fe(
-        FESystem<dim>(FE_Q<dim>(QIterated<1>(QTrapez<1>(), degree)), dim));
+        FESystem<dim>(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), degree)), dim));
       test(tr, fe);
     }
 }

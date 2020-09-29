@@ -53,8 +53,8 @@ test()
   hp::FECollection<dim> fe_collection;
   fe_collection.push_back(FE_Q<dim>(1));
   fe_collection.push_back(FE_Q<dim>(2));
-  fe_collection.push_back(FE_Q<dim>(QIterated<1>(QTrapez<1>(), 3)));
-  fe_collection.push_back(FE_Q<dim>(QIterated<1>(QTrapez<1>(), 4)));
+  fe_collection.push_back(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), 3)));
+  fe_collection.push_back(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), 4)));
 
   hp::DoFHandler<dim> dof_handler(tria);
 

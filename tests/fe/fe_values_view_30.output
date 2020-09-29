@@ -1,5 +1,5 @@
 
-DEAL::FE=FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))^2]
+DEAL::FE=FESystem<2>[FE_Q<2>(QIterated(QTrapezoid(),3))^2]
 DEAL::component=0
 DEAL::6.00, 0; 0; 0; 0; 0; 0; 0; 
 DEAL::0, 0; 0; 2.00; 0; 2.00; 2.00; 0; 
@@ -51,7 +51,7 @@ DEAL::6.00, 0; 0; 0; 0; 0; 0; 0;
 DEAL::0, 0; 0; 2.00; 0; 2.00; 2.00; 0; 
 DEAL::6.00, 0; 0; 0; 0; 0; 0; 0; 
 DEAL::0, 0; 0; 2.00; 0; 2.00; 2.00; 0; 
-DEAL::FE=FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))^3]
+DEAL::FE=FESystem<3>[FE_Q<3>(QIterated(QTrapezoid(),3))^3]
 DEAL::component=0
 DEAL::6.00, 0, 0; 0, 0, 0; 0; 0; 0; 0, 0, 0; 0, 0, 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 
 DEAL::0, 0, 0; 0, 2.00, 0; 0; 0; 0; 0, 2.00, 0; 2.00, 0, 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 

@@ -216,7 +216,7 @@ test_neumann(const NeumanBC<dim> &func)
 
   const unsigned int p = 3;
 
-  fe_collection.push_back(dealii::FE_Q<dim>(QIterated<1>(QTrapez<1>(), p)));
+  fe_collection.push_back(dealii::FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), p)));
   quadrature_formula.push_back(dealii::QGauss<dim>(p + 5));
   face_quadrature_formula.push_back(dealii::QGauss<dim - 1>(p + 5));
 
@@ -308,7 +308,8 @@ test_regular(const MyFunction<dim> &func)
   for (unsigned int i = 0; i < p_degree.size(); i++)
     {
       const unsigned int &p = p_degree[i];
-      fe_collection.push_back(dealii::FE_Q<dim>(QIterated<1>(QTrapez<1>(), p)));
+      fe_collection.push_back(
+        dealii::FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), p)));
       quadrature_formula.push_back(dealii::QGauss<dim>(p + 5));
       face_quadrature_formula.push_back(dealii::QGauss<dim - 1>(p + 5));
     }
@@ -424,7 +425,8 @@ test_irregular(const MyFunction<dim> &func)
   for (unsigned int i = 0; i < p_degree.size(); i++)
     {
       const unsigned int &p = p_degree[i];
-      fe_collection.push_back(dealii::FE_Q<dim>(QIterated<1>(QTrapez<1>(), p)));
+      fe_collection.push_back(
+        dealii::FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), p)));
       quadrature_formula.push_back(dealii::QGauss<dim>(p + 5));
       face_quadrature_formula.push_back(dealii::QGauss<dim - 1>(p + 5));
     }
@@ -597,7 +599,8 @@ test(const MySecondFunction<dim> &func)
   dealii::AffineConstraints<double> constraints;
   for (unsigned int p = 1; p <= 3; p++)
     {
-      fe_collection.push_back(dealii::FE_Q<dim>(QIterated<1>(QTrapez<1>(), p)));
+      fe_collection.push_back(
+        dealii::FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), p)));
       quadrature_formula.push_back(dealii::QGauss<dim>(p + 1));
       face_quadrature_formula.push_back(dealii::QGauss<dim - 1>(p + 1));
     }

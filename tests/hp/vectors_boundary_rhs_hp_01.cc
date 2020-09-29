@@ -94,9 +94,9 @@ check()
   hp::FECollection<dim> element;
   for (unsigned int i = 1; i < 7 - dim; ++i)
     element.push_back(
-      FESystem<dim>(FE_Q<dim>(QIterated<1>(QTrapez<1>(), i)),
+      FESystem<dim>(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), i)),
                     1,
-                    FE_Q<dim>(QIterated<1>(QTrapez<1>(), i + 1)),
+                    FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), i + 1)),
                     1));
   hp::DoFHandler<dim> dof(tr);
   for (typename hp::DoFHandler<dim>::active_cell_iterator cell =

@@ -58,7 +58,7 @@ test(const unsigned int degree)
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe_rt);
 
-  QTrapez<1>         q_trapez;
+  QTrapezoid<1>      q_trapez;
   const unsigned int div = 4;
   QIterated<dim>     q(q_trapez, div);
 

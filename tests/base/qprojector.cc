@@ -174,7 +174,7 @@ main()
   QGauss<1> midpoint(1);
   check(midpoint);
 
-  QTrapez<1> trapez;
+  QTrapezoid<1> trapez;
   check(trapez);
 
   QSimpson<1> simpson;

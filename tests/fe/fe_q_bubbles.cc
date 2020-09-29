@@ -292,7 +292,7 @@ Step3<dim>::output_results(unsigned int i) const
                                     QGauss<dim>(m_degree + 2),
                                     VectorTools::H1_seminorm);
   const double         H1_error = difference_per_cell.l2_norm();
-  const QTrapez<1>     q_trapez;
+  const QTrapezoid<1>  q_trapez;
   const QIterated<dim> q_iterated(q_trapez, 5);
   VectorTools::integrate_difference(dof_handler,
                                     solution,

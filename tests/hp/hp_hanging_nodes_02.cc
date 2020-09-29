@@ -59,10 +59,10 @@ run(bool random_p, unsigned int *indx)
   hp::DoFHandler<dim>       dof_handler(triangulation);
   AffineConstraints<double> hanging_node_constraints;
 
-  FE_Q<dim> fe_1(QIterated<1>(QTrapez<1>(), indx[0])),
-    fe_2(QIterated<1>(QTrapez<1>(), indx[1])),
-    fe_3(QIterated<1>(QTrapez<1>(), indx[2])),
-    fe_4(QIterated<1>(QTrapez<1>(), indx[3]));
+  FE_Q<dim> fe_1(QIterated<1>(QTrapezoid<1>(), indx[0])),
+    fe_2(QIterated<1>(QTrapezoid<1>(), indx[1])),
+    fe_3(QIterated<1>(QTrapezoid<1>(), indx[2])),
+    fe_4(QIterated<1>(QTrapezoid<1>(), indx[3]));
 
   fe.push_back(fe_1);
   fe.push_back(fe_2);

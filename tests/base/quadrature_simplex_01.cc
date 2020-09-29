@@ -28,7 +28,7 @@ template <int dim>
 void
 test(int n)
 {
-  QSimplex<dim> quad(QIterated<dim>(QTrapez<1>(), n));
+  QSimplex<dim> quad(QIterated<dim>(QTrapezoid<1>(), n));
 
   deallog << "# dim = " << dim << std::endl;
 

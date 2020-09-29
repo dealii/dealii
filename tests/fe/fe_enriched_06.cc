@@ -115,7 +115,7 @@ test5()
   {
     const unsigned int    global_dof = 11;
     const Vector<double> &solution   = shape_functions[global_dof];
-    QTrapez<dim>          quadrature;
+    QTrapezoid<dim>       quadrature;
     FEValues<dim>         fe_values(fe, quadrature, update_values);
 
     const unsigned int  n_q_points = quadrature.size();

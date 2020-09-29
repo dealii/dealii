@@ -351,7 +351,7 @@ BEM<spacedim>::solve()
   tangential_derivative.reinit(tria.n_active_cells());
   error.reinit(tria.n_active_cells());
   QMidpoint<spacedim - 1>       q_midpoint;
-  QTrapez<spacedim - 1>         q_trapez;
+  QTrapezoid<spacedim - 1>      q_trapez;
   const QIterated<spacedim - 1> q_iterated(q_midpoint, 1);
 
   FEValues<spacedim - 1, spacedim> fe_values_q(

@@ -52,7 +52,7 @@ test()
   triangulation.refine_global(1);
 
   // define DoFhandler and FEs
-  FE_Q<2> u(2), u2(QIterated<1>(QTrapez<1>(), 3));
+  FE_Q<2> u(2), u2(QIterated<1>(QTrapezoid<1>(), 3));
 
   hp::FECollection<2> fe_collection;
   fe_collection.push_back(u);

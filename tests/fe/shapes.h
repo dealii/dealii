@@ -59,7 +59,7 @@ plot_shape_functions(Mapping<dim> &      mapping,
 
   const unsigned int div = 4;
 
-  QTrapez<1>     q_trapez;
+  QTrapezoid<1>  q_trapez;
   QIterated<dim> q(q_trapez, div);
   FEValues<dim>  fe(mapping,
                    finel,
@@ -146,7 +146,7 @@ plot_face_shape_functions(Mapping<dim> &      mapping,
 
   const unsigned int div = 4;
 
-  QTrapez<1>           q_trapez;
+  QTrapezoid<1>        q_trapez;
   QIterated<dim - 1>   q(q_trapez, div);
   FEFaceValues<dim>    fe(mapping,
                        finel,

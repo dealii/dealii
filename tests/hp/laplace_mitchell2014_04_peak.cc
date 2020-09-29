@@ -134,7 +134,7 @@ Problem4<dim>::Problem4(const Function<dim> &force_function,
 
       quadrature_face.push_back(QSorted<dim - 1>(QGauss<dim - 1>(p + 1)));
 
-      const QTrapez<1>     q_trapez;
+      const QTrapezoid<1>  q_trapez;
       const QIterated<dim> q_iterated(q_trapez, p + 3);
       Laplace<dim>::quadrature_infty.push_back(QSorted<dim>(q_iterated));
     }

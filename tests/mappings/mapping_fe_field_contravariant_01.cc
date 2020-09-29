@@ -77,7 +77,7 @@ test(const unsigned int degree)
   VectorTools::get_position_vector(dof_sys, euler, mask);
   MappingFEField<dim, spacedim> map_fe(dof_sys, euler, mask);
 
-  QIterated<dim> quadrature_formula(QTrapez<1>(), fe.degree);
+  QIterated<dim> quadrature_formula(QTrapezoid<1>(), fe.degree);
 
   FEValues<dim, spacedim> fe_values(map_fe,
                                     fe_sys,

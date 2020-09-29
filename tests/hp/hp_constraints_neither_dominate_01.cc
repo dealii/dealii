@@ -100,9 +100,9 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
     FESystem<dim>(FE_Q<dim>(p2), 1, FE_Nothing<dim>(1, true), 1));
 
   hp::QCollection<dim - 1> q_face_collection;
-  q_face_collection.push_back(QIterated<dim - 1>(QTrapez<1>(), 2));
-  q_face_collection.push_back(QIterated<dim - 1>(QTrapez<1>(), 2));
-  q_face_collection.push_back(QIterated<dim - 1>(QTrapez<1>(), 2));
+  q_face_collection.push_back(QIterated<dim - 1>(QTrapezoid<1>(), 2));
+  q_face_collection.push_back(QIterated<dim - 1>(QTrapezoid<1>(), 2));
+  q_face_collection.push_back(QIterated<dim - 1>(QTrapezoid<1>(), 2));
 
   deallog << "2cells: " << fe_collection[0].get_name() << " vs "
           << fe_collection[1].get_name() << std::endl;

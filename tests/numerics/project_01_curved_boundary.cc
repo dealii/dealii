@@ -153,7 +153,7 @@ test()
   }
 
 
-  // same as above, but use a projection with a QTrapez formula. this happens
+  // same as above, but use a projection with a QTrapezoid formula. this happens
   // to evaluate the function only at points where it is zero, and
   // consequently the values at the boundary should be zero
   {
@@ -164,7 +164,7 @@ test()
                          F<dim>(),
                          v,
                          false,
-                         QTrapez<dim - 1>(),
+                         QTrapezoid<dim - 1>(),
                          true);
     deallog << v.l2_norm() << std::endl;
     Assert(v.l2_norm() != 0, ExcInternalError());

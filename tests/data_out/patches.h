@@ -82,9 +82,9 @@ create_continuous_patches(std::vector<DataOutBase::Patch<dim, dim>> &patches,
   unsigned int n2 = (dim >= 2) ? n_cells : 1;
   unsigned int n3 = (dim >= 3) ? n_cells : 1;
 
-  QTrapez<dim>   trapez;
-  QTrapez<1>     trapez1d;
-  QIterated<dim> trapezsub(trapez1d, n_sub);
+  QTrapezoid<dim> trapez;
+  QTrapezoid<1>   trapez1d;
+  QIterated<dim>  trapezsub(trapez1d, n_sub);
 
   Point<dim> midpoint;
   for (unsigned int d = 0; d < dim; ++d)

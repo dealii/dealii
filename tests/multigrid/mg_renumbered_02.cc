@@ -248,7 +248,7 @@ LaplaceProblem<dim>::output_gpl(const DoFHandler<dim> &        dof,
 {
   MeshWorker::IntegrationInfoBox<dim> info_box;
   const unsigned int n_gauss_points = dof.get_fe().tensor_degree();
-  QTrapez<1>         trapez;
+  QTrapezoid<1>      trapez;
   QIterated<dim>     quadrature(trapez, n_gauss_points);
   info_box.cell_quadrature = quadrature;
   info_box.initialize_update_flags();

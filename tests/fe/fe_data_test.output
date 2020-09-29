@@ -7,7 +7,7 @@ DEAL::FE_Q_Hierarchical<1>(2)
 DEAL::FE_Q_Hierarchical<1>(4)
 DEAL::FE_DGQ<1>(1)
 DEAL::FE_DGQ<1>(2)
-DEAL::FE_DGQArbitraryNodes<1>(QIterated(QTrapez(),4))
+DEAL::FE_DGQArbitraryNodes<1>(QIterated(QTrapezoid(),4))
 DEAL::FE_DGQ<1>(4)
 DEAL::FE_DGQArbitraryNodes<1>(QGauss(3))
 DEAL::FE_DGQLegendre<1>(1)
@@ -240,7 +240,7 @@ DEAL::face_to_cell_index:
 DEAL::support on face 0:	0
 DEAL::support on face 1:	2
 DEAL::
-DEAL::fe_data[8]:FE_DGQArbitraryNodes<1>(QIterated(QTrapez(),4))
+DEAL::fe_data[8]:FE_DGQArbitraryNodes<1>(QIterated(QTrapezoid(),4))
 DEAL::dofs_per_vertex=0
 DEAL::dofs_per_line=5
 DEAL::dofs_per_quad=0
@@ -846,7 +846,7 @@ DEAL::FE_Q_Hierarchical<2>(2)
 DEAL::FE_Q_Hierarchical<2>(4)
 DEAL::FE_DGQ<2>(1)
 DEAL::FE_DGQ<2>(2)
-DEAL::FE_DGQArbitraryNodes<2>(QIterated(QTrapez(),4))
+DEAL::FE_DGQArbitraryNodes<2>(QIterated(QTrapezoid(),4))
 DEAL::FE_DGQ<2>(4)
 DEAL::FE_DGQArbitraryNodes<2>(QGauss(3))
 DEAL::FE_DGQLegendre<2>(1)
@@ -1130,7 +1130,7 @@ DEAL::support on face 1:	2	5	8
 DEAL::support on face 2:	0	1	2
 DEAL::support on face 3:	6	7	8
 DEAL::
-DEAL::fe_data[8]:FE_DGQArbitraryNodes<2>(QIterated(QTrapez(),4))
+DEAL::fe_data[8]:FE_DGQArbitraryNodes<2>(QIterated(QTrapezoid(),4))
 DEAL::dofs_per_vertex=0
 DEAL::dofs_per_line=0
 DEAL::dofs_per_quad=25
@@ -2398,7 +2398,7 @@ DEAL::FE_Q_Hierarchical<3>(2)
 DEAL::FE_Q_Hierarchical<3>(4)
 DEAL::FE_DGQ<3>(1)
 DEAL::FE_DGQ<3>(2)
-DEAL::FE_DGQArbitraryNodes<3>(QIterated(QTrapez(),4))
+DEAL::FE_DGQArbitraryNodes<3>(QIterated(QTrapezoid(),4))
 DEAL::FE_DGQ<3>(4)
 DEAL::FE_DGQArbitraryNodes<3>(QGauss(3))
 DEAL::FE_DGQLegendre<3>(1)
@@ -2709,7 +2709,7 @@ DEAL::support on face 3:	6	7	8	15	16	17	24	25	26
 DEAL::support on face 4:	0	1	2	3	4	5	6	7	8
 DEAL::support on face 5:	18	19	20	21	22	23	24	25	26
 DEAL::
-DEAL::fe_data[8]:FE_DGQArbitraryNodes<3>(QIterated(QTrapez(),4))
+DEAL::fe_data[8]:FE_DGQArbitraryNodes<3>(QIterated(QTrapezoid(),4))
 DEAL::dofs_per_vertex=0
 DEAL::dofs_per_line=0
 DEAL::dofs_per_quad=0
