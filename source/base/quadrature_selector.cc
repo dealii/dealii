@@ -46,6 +46,8 @@ QuadratureSelector<dim>::create_quadrature(const std::string &s,
         return QSimpson<dim>();
       else if (s == "trapez")
         return QTrapezoid<dim>();
+      else if (s == "trapezoid")
+        return QTrapezoid<dim>();
       else if (s == "weddle")
         return QWeddle<dim>();
     }
