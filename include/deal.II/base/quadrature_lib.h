@@ -108,20 +108,33 @@ public:
 
 /**
  * The trapezoidal rule for numerical quadrature. This formula with two
- * quadrature points is exact for linear polynomials.
+ * quadrature points is exact for linear polynomials and uses the
+ * end points of an interval for function evaluation in 1d, see
+ * https://en.wikipedia.org/wiki/Trapezoidal_rule . In higher dimensions,
+ * the class is constructed via a tensor product and then uses the
+ * vertices of a quadrilateral or hexahedron for function evaluation.
+ */
+template <int dim>
+class QTrapezoid : public Quadrature<dim>
+{
+public:
+  QTrapezoid();
+};
+
+
+/**
+ * An alias for QTrapezoid available for historic reasons. This name is
+ * deprecated.
  *
- * The class is poorly named since the proper name of the quadrature formula
+ * The class was originally named QTrapez, a poorly named choice since the
+ * proper name of the quadrature formula
  * is "trapezoidal rule", or sometimes also called the "trapezoid rule". The
- * misnomer results from the fact that its original authors' poor English
+ * misnomer resulted from the fact that its original authors' poor English
  * language skills led them to translate the name incorrectly from the German
  * "Trapezregel".
  */
 template <int dim>
-class QTrapez : public Quadrature<dim>
-{
-public:
-  QTrapez();
-};
+using QTrapez DEAL_II_DEPRECATED = QTrapezoid<dim>;
 
 
 
@@ -799,7 +812,7 @@ QGaussLog<1>::get_quadrature_weights(const unsigned int);
 template <>
 QMidpoint<1>::QMidpoint();
 template <>
-QTrapez<1>::QTrapez();
+QTrapezoid<1>::QTrapezoid();
 template <>
 QSimpson<1>::QSimpson();
 template <>

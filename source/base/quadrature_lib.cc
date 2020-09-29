@@ -171,7 +171,7 @@ QMidpoint<1>::QMidpoint()
 
 
 template <>
-QTrapez<1>::QTrapez()
+QTrapezoid<1>::QTrapezoid()
   : Quadrature<1>(2)
 {
   static const double xpts[] = {0.0, 1.0};
@@ -829,8 +829,8 @@ QMidpoint<dim>::QMidpoint()
 
 
 template <int dim>
-QTrapez<dim>::QTrapez()
-  : Quadrature<dim>(QTrapez<dim - 1>(), QTrapez<1>())
+QTrapezoid<dim>::QTrapezoid()
+  : Quadrature<dim>(QTrapezoid<dim - 1>(), QTrapezoid<1>())
 {}
 
 
@@ -1355,7 +1355,7 @@ QSplit<dim>::QSplit(const QSimplex<dim> &base, const Point<dim> &split_point)
 template class QGauss<2>;
 template class QGaussLobatto<2>;
 template class QMidpoint<2>;
-template class QTrapez<2>;
+template class QTrapezoid<2>;
 template class QSimpson<2>;
 template class QMilne<2>;
 template class QWeddle<2>;
@@ -1363,7 +1363,7 @@ template class QWeddle<2>;
 template class QGauss<3>;
 template class QGaussLobatto<3>;
 template class QMidpoint<3>;
-template class QTrapez<3>;
+template class QTrapezoid<3>;
 template class QSimpson<3>;
 template class QMilne<3>;
 template class QWeddle<3>;
