@@ -897,7 +897,7 @@ namespace Step7
     // error on each cell. Finally, we compute the global L infinity error
     // from the L infinity errors on each cell with a call to
     // VectorTools::compute_global_error.
-    const QTrapez<1>     q_trapez;
+    const QTrapezoid<1>  q_trapez;
     const QIterated<dim> q_iterated(q_trapez, fe->degree * 2 + 1);
     VectorTools::integrate_difference(dof_handler,
                                       solution,

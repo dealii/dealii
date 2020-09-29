@@ -345,8 +345,8 @@ namespace Step41
   {
     Assert(fe.degree == 1, ExcNotImplemented());
 
-    const QTrapez<dim> quadrature_formula;
-    FEValues<dim>      fe_values(fe,
+    const QTrapezoid<dim> quadrature_formula;
+    FEValues<dim>         fe_values(fe,
                             quadrature_formula,
                             update_values | update_JxW_values);
 

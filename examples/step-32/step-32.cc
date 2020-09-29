@@ -1264,7 +1264,7 @@ namespace Step32
   template <int dim>
   double BoussinesqFlowProblem<dim>::get_maximal_velocity() const
   {
-    const QIterated<dim> quadrature_formula(QTrapez<1>(),
+    const QIterated<dim> quadrature_formula(QTrapezoid<1>(),
                                             parameters.stokes_velocity_degree);
     const unsigned int   n_q_points = quadrature_formula.size();
 
@@ -1306,7 +1306,7 @@ namespace Step32
   template <int dim>
   double BoussinesqFlowProblem<dim>::get_cfl_number() const
   {
-    const QIterated<dim> quadrature_formula(QTrapez<1>(),
+    const QIterated<dim> quadrature_formula(QTrapezoid<1>(),
                                             parameters.stokes_velocity_degree);
     const unsigned int   n_q_points = quadrature_formula.size();
 
@@ -1461,7 +1461,7 @@ namespace Step32
   std::pair<double, double>
   BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range() const
   {
-    const QIterated<dim> quadrature_formula(QTrapez<1>(),
+    const QIterated<dim> quadrature_formula(QTrapezoid<1>(),
                                             parameters.temperature_degree);
     const unsigned int   n_q_points = quadrature_formula.size();
 

@@ -826,8 +826,8 @@ namespace Step19
     // discussion in the introduction.
     else
       {
-        const QTrapez<dim> vertex_quadrature;
-        FEValues<dim>      fe_values(fe, vertex_quadrature, update_gradients);
+        const QTrapezoid<dim> vertex_quadrature;
+        FEValues<dim> fe_values(fe, vertex_quadrature, update_gradients);
 
         std::vector<Tensor<1, dim>> field_gradients(vertex_quadrature.size());
 

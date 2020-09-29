@@ -582,7 +582,7 @@ namespace Step31
   // on each cell. To this end, recall that if we had a single $Q_1$ field
   // (rather than the vector-valued field of higher order) then the maximum
   // would be attained at a vertex of the mesh. In other words, we should use
-  // the QTrapez class that has quadrature points only at the vertices of
+  // the QTrapezoid class that has quadrature points only at the vertices of
   // cells.
   //
   // For higher order shape functions, the situation is more complicated: the
@@ -600,15 +600,15 @@ namespace Step31
   // FiniteElement::get_unit_support_points() function, reduce the output to a
   // unique set of points to avoid duplicate function evaluations, and create
   // a Quadrature object using these points. Another option, chosen here, is
-  // to use the QTrapez class and combine it with the QIterated class that
-  // repeats the QTrapez formula on a number of sub-cells in each coordinate
+  // to use the QTrapezoid class and combine it with the QIterated class that
+  // repeats the QTrapezoid formula on a number of sub-cells in each coordinate
   // direction. To cover all support points, we need to iterate it
   // <code>stokes_degree+1</code> times since this is the polynomial degree of
   // the Stokes element in use:
   template <int dim>
   double BoussinesqFlowProblem<dim>::get_maximal_velocity() const
   {
-    const QIterated<dim> quadrature_formula(QTrapez<1>(), stokes_degree + 1);
+    const QIterated<dim> quadrature_formula(QTrapezoid<1>(), stokes_degree + 1);
     const unsigned int   n_q_points = quadrature_formula.size();
 
     FEValues<dim> fe_values(stokes_fe, quadrature_formula, update_values);
@@ -661,7 +661,8 @@ namespace Step31
   std::pair<double, double>
   BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range() const
   {
-    const QIterated<dim> quadrature_formula(QTrapez<1>(), temperature_degree);
+    const QIterated<dim> quadrature_formula(QTrapezoid<1>(),
+                                            temperature_degree);
     const unsigned int   n_q_points = quadrature_formula.size();
 
     FEValues<dim> fe_values(temperature_fe, quadrature_formula, update_values);

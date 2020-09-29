@@ -206,7 +206,7 @@ namespace Step14
 
       // ...then have some objects of which the meaning will become clear
       // below...
-      QTrapez<dim>                vertex_quadrature;
+      QTrapezoid<dim>             vertex_quadrature;
       FEValues<dim>               fe_values(dof_handler.get_fe(),
                               vertex_quadrature,
                               update_gradients | update_quadrature_points);
