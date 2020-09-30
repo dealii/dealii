@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/derivative_form.h>
+#include <deal.II/base/polynomial.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/vectorization.h>
@@ -597,15 +598,28 @@ protected:
   const unsigned int polynomial_degree;
 
   /*
-   * The default line support points. These are used when computing
-   * the location in real space of the support points on lines and
-   * quads, which are asked to the Manifold<dim,spacedim> class.
+   * The default line support points. These are used when computing the
+   * location in real space of the support points on lines and quads, which
+   * are asked to the Manifold<dim,spacedim> class.
    *
-   * The number of quadrature points depends on the degree of this
-   * class, and it matches the number of degrees of freedom of an
-   * FE_Q<1>(this->degree).
+   * The number of points depends on the degree of this class, and it matches
+   * the number of degrees of freedom of an FE_Q<1>(this->degree).
    */
-  QGaussLobatto<1> line_support_points;
+  std::vector<Point<1>> line_support_points;
+
+  /*
+   * The one-dimensional polynomials defined as Lagrange polynomials from the
+   * line support points. These are used for point evaluations and match the
+   * polynomial space of an FE_Q<1>(this->degree).
+   */
+  std::vector<Polynomials::Polynomial<double>> polynomials_1d;
+
+  /*
+   * The numbering from the lexicographic to the hierarchical ordering used
+   * when expanding the tensor product with the mapping support points (which
+   * come in hierarchical numbers).
+   */
+  std::vector<unsigned int> renumber_lexicographic_to_hierarchic;
 
   /**
    * A vector of tables of weights by which we multiply the locations of the

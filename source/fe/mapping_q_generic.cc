@@ -1149,26 +1149,108 @@ namespace internal
 
 
       /**
+       * Using the given 1D polynomial basis and the position of the mapping
+       * support points, compute the mapped location of that point in real
+       * space. This function is much faster than the other implementation
+       * going via the expanded shape functions in InternalData because it
+       * directly works in the tensor product form. This also gives the
+       * derivative almost for free (less than 2x the cost of simply the
+       * values), so we always compute it.
+       */
+      template <int dim, int spacedim>
+      std::pair<Point<spacedim>, Tensor<2, spacedim>>
+      compute_mapped_location_of_point(
+        const std::vector<Point<spacedim>> &                points,
+        const std::vector<Polynomials::Polynomial<double>> &poly,
+        const std::vector<unsigned int> &                   renumber,
+        const Point<dim> &                                  p)
+      {
+        const unsigned int n_shapes = poly.size();
+
+        // Put up to 32 shape functions per dimension on stack, else on heap
+        boost::container::small_vector<double, 64 * dim> shapes(2 * dim *
+                                                                n_shapes);
+
+        // Evaluate 1D polynomials and their derivatives
+        for (unsigned int d = 0; d < dim; ++d)
+          for (unsigned int i = 0; i < n_shapes; ++i)
+            poly[i].value(p[d], 1, shapes.data() + 2 * (d * n_shapes + i));
+
+        // Go through the tensor product of shape functions and interpolate
+        // with optimal algorithm
+        std::pair<Point<spacedim>, Tensor<2, spacedim>> result;
+        for (unsigned int i2 = 0, i = 0; i2 < (dim > 2 ? n_shapes : 1); ++i2)
+          {
+            Point<spacedim> value_y, deriv_x, deriv_y;
+            for (unsigned int i1 = 0; i1 < (dim > 1 ? n_shapes : 1); ++i1)
+              {
+                // interpolation + derivative x direction
+                Point<spacedim> value, deriv;
+                for (unsigned int i0 = 0; i0 < n_shapes; ++i0, ++i)
+                  {
+                    value += shapes[2 * i0] * points[renumber[i]];
+                    deriv += shapes[2 * i0 + 1] * points[renumber[i]];
+                  }
+
+                // interpolation + derivative in y direction
+                if (dim > 1)
+                  {
+                    value_y += value * shapes[2 * n_shapes + 2 * i1];
+                    deriv_x += deriv * shapes[2 * n_shapes + 2 * i1];
+                    deriv_y += value * shapes[2 * n_shapes + 2 * i1 + 1];
+                  }
+                else
+                  {
+                    result.first     = value;
+                    result.second[0] = deriv;
+                  }
+              }
+            if (dim == 3)
+              {
+                // interpolation + derivative in z direction
+                result.first += value_y * shapes[4 * n_shapes + 2 * i2];
+                for (unsigned int d = 0; d < spacedim; ++d)
+                  {
+                    result.second[d][0] +=
+                      deriv_x[d] * shapes[4 * n_shapes + 2 * i2];
+                    result.second[d][1] +=
+                      deriv_y[d] * shapes[4 * n_shapes + 2 * i2];
+                    result.second[d][2] +=
+                      value_y[d] * shapes[4 * n_shapes + 2 * i2 + 1];
+                  }
+              }
+            else if (dim == 2)
+              {
+                result.first = value_y;
+                for (unsigned int d = 0; d < spacedim; ++d)
+                  {
+                    result.second[d][0] = deriv_x[d];
+                    result.second[d][1] = deriv_y[d];
+                  }
+              }
+          }
+
+        return result;
+      }
+
+
+
+      /**
        * Implementation of transform_real_to_unit_cell for dim==spacedim
        */
       template <int dim>
       Point<dim>
       do_transform_real_to_unit_cell_internal(
-        const typename dealii::Triangulation<dim, dim>::cell_iterator &cell,
-        const Point<dim> &                                             p,
-        const Point<dim> &initial_p_unit,
-        typename dealii::MappingQGeneric<dim, dim>::InternalData &mdata)
+        const Point<dim> &                                  p,
+        const Point<dim> &                                  initial_p_unit,
+        const std::vector<Point<dim>> &                     points,
+        const std::vector<Polynomials::Polynomial<double>> &polynomials_1d,
+        const std::vector<unsigned int> &                   renumber)
       {
         const unsigned int spacedim = dim;
 
-        const unsigned int n_shapes = mdata.shape_values.size();
-        (void)n_shapes;
-        Assert(n_shapes != 0, ExcInternalError());
-        AssertDimension(mdata.shape_derivatives.size(), n_shapes);
-
-        std::vector<Point<spacedim>> &points = mdata.mapping_support_points;
-        AssertDimension(points.size(), n_shapes);
-
+        AssertDimension(points.size(),
+                        Utilities::pow(polynomials_1d.size(), dim));
 
         // Newton iteration to solve
         //    f(x)=p(x)-p=0
@@ -1180,16 +1262,17 @@ namespace internal
         // The shape values and derivatives of the mapping at this point are
         // previously computed.
 
-        Point<dim> p_unit = initial_p_unit;
+        Point<dim>                            p_unit = initial_p_unit;
+        std::pair<Point<dim>, Tensor<2, dim>> p_real =
+          compute_mapped_location_of_point(points,
+                                           polynomials_1d,
+                                           renumber,
+                                           p_unit);
 
-        mdata.compute_shape_function_values(std::vector<Point<dim>>(1, p_unit));
-
-        Point<spacedim> p_real =
-          compute_mapped_location_of_point<dim, spacedim>(mdata);
-        Tensor<1, spacedim> f = p_real - p;
+        Tensor<1, spacedim> f = p_real.first - p;
 
         // early out if we already have our point
-        if (f.norm_square() < 1e-24 * cell->diameter() * cell->diameter())
+        if (f.norm_square() < 1e-24 * p_real.second.norm_square())
           return p_unit;
 
         // we need to compare the position of the computed p(x) against the
@@ -1222,14 +1305,15 @@ namespace internal
         //    \| p(x) - p \|_A  =  \| f \|  <=  eps
         //
         // Note that using this norm is a bit dangerous since the norm changes
-        // in every iteration (A isn't fixed by depends on xk). However, if the
-        // cell is not too deformed (it may be stretched, but not twisted) then
-        // the mapping is almost linear and A is indeed constant or nearly so.
+        // in every iteration (A isn't fixed by depending on xk). However, if
+        // the cell is not too deformed (it may be stretched, but not twisted)
+        // then the mapping is almost linear and A is indeed constant or
+        // nearly so.
         const double       eps                    = 1.e-11;
         const unsigned int newton_iteration_limit = 20;
 
         unsigned int newton_iteration = 0;
-        double       last_f_weighted_norm;
+        double       last_f_weighted_norm_square;
         do
           {
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
@@ -1237,24 +1321,14 @@ namespace internal
 #endif
 
             // f'(x)
-            Tensor<2, spacedim> df;
-            for (unsigned int k = 0; k < mdata.n_shape_functions; ++k)
-              {
-                const Tensor<1, dim> & grad_transform = mdata.derivative(0, k);
-                const Point<spacedim> &point          = points[k];
-
-                for (unsigned int i = 0; i < spacedim; ++i)
-                  for (unsigned int j = 0; j < dim; ++j)
-                    df[i][j] += point[i] * grad_transform[j];
-              }
+            const Tensor<2, spacedim> &df = p_real.second;
 
             // Solve  [f'(x)]d=f(x)
             AssertThrow(
               determinant(df) > 0,
               (typename Mapping<dim, spacedim>::ExcTransformationFailed()));
-            Tensor<2, spacedim>       df_inverse = invert(df);
-            const Tensor<1, spacedim> delta =
-              df_inverse * static_cast<const Tensor<1, spacedim> &>(f);
+            const Tensor<2, spacedim> df_inverse = invert(df);
+            const Tensor<1, spacedim> delta      = df_inverse * f;
 
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
             std::cout << "   delta=" << delta << std::endl;
@@ -1274,14 +1348,12 @@ namespace internal
 
                 // shape values and derivatives
                 // at new p_unit point
-                mdata.compute_shape_function_values(
-                  std::vector<Point<dim>>(1, p_unit_trial));
-
-                // f(x)
-                Point<spacedim> p_real_trial =
-                  internal::MappingQGenericImplementation::
-                    compute_mapped_location_of_point<dim, spacedim>(mdata);
-                const Tensor<1, spacedim> f_trial = p_real_trial - p;
+                std::pair<Point<spacedim>, Tensor<2, spacedim>> p_real_trial =
+                  compute_mapped_location_of_point(points,
+                                                   polynomials_1d,
+                                                   renumber,
+                                                   p_unit_trial);
+                const Tensor<1, spacedim> f_trial = p_real_trial.first - p;
 
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
                 std::cout << "     step_length=" << step_length << std::endl
@@ -1298,7 +1370,7 @@ namespace internal
                 // use for the outer algorithm. in practice, line search is just
                 // a crutch to find a "reasonable" step length, and so using the
                 // l2 norm is probably just fine
-                if (f_trial.norm() < f.norm())
+                if (f_trial.norm_square() < f.norm_square())
                   {
                     p_real = p_real_trial;
                     p_unit = p_unit_trial;
@@ -1320,9 +1392,9 @@ namespace internal
               AssertThrow(
                 false,
                 (typename Mapping<dim, spacedim>::ExcTransformationFailed()));
-            last_f_weighted_norm = (df_inverse * f).norm();
+            last_f_weighted_norm_square = (df_inverse * f).norm_square();
           }
-        while (last_f_weighted_norm > eps);
+        while (last_f_weighted_norm_square > eps * eps);
 
         return p_unit;
       }
@@ -2225,7 +2297,12 @@ namespace internal
 template <int dim, int spacedim>
 MappingQGeneric<dim, spacedim>::MappingQGeneric(const unsigned int p)
   : polynomial_degree(p)
-  , line_support_points(this->polynomial_degree + 1)
+  , line_support_points(
+      QGaussLobatto<1>(this->polynomial_degree + 1).get_points())
+  , polynomials_1d(
+      Polynomials::generate_complete_Lagrange_basis(line_support_points))
+  , renumber_lexicographic_to_hierarchic(
+      FETools::lexicographic_to_hierarchic_numbering<dim>(p))
   , support_point_weights_perimeter_to_interior(
       internal::MappingQGenericImplementation::
         compute_support_point_weights_perimeter_to_interior(
@@ -2247,6 +2324,9 @@ MappingQGeneric<dim, spacedim>::MappingQGeneric(
   const MappingQGeneric<dim, spacedim> &mapping)
   : polynomial_degree(mapping.polynomial_degree)
   , line_support_points(mapping.line_support_points)
+  , polynomials_1d(mapping.polynomials_1d)
+  , renumber_lexicographic_to_hierarchic(
+      mapping.renumber_lexicographic_to_hierarchic)
   , support_point_weights_perimeter_to_interior(
       mapping.support_point_weights_perimeter_to_interior)
   , support_point_weights_cell(mapping.support_point_weights_cell)
@@ -2278,27 +2358,12 @@ MappingQGeneric<dim, spacedim>::transform_unit_to_real_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const Point<dim> &                                          p) const
 {
-  // set up the polynomial space
-  const TensorProductPolynomials<dim> tensor_pols(
-    Polynomials::generate_complete_Lagrange_basis(
-      line_support_points.get_points()));
-  Assert(tensor_pols.n() == Utilities::fixed_power<dim>(polynomial_degree + 1),
-         ExcInternalError());
-
-  // then also construct the mapping from lexicographic to the Qp shape function
-  // numbering
-  const std::vector<unsigned int> renumber =
-    FETools::hierarchic_to_lexicographic_numbering<dim>(polynomial_degree);
-
-  const std::vector<Point<spacedim>> support_points =
-    this->compute_mapping_support_points(cell);
-
-  Point<spacedim> mapped_point;
-  for (unsigned int i = 0; i < tensor_pols.n(); ++i)
-    mapped_point +=
-      support_points[i] * tensor_pols.compute_value(renumber[i], p);
-
-  return mapped_point;
+  return internal::MappingQGenericImplementation::
+    compute_mapped_location_of_point(this->compute_mapping_support_points(cell),
+                                     polynomials_1d,
+                                     renumber_lexicographic_to_hierarchic,
+                                     p)
+      .first;
 }
 
 
@@ -2333,6 +2398,8 @@ MappingQGeneric<dim, spacedim>::transform_real_to_unit_cell_internal(
   return Point<dim>();
 }
 
+
+
 template <>
 Point<1>
 MappingQGeneric<1, 1>::transform_real_to_unit_cell_internal(
@@ -2340,24 +2407,18 @@ MappingQGeneric<1, 1>::transform_real_to_unit_cell_internal(
   const Point<1> &                          p,
   const Point<1> &                          initial_p_unit) const
 {
-  const int dim      = 1;
-  const int spacedim = 1;
-
-  const Quadrature<dim> point_quadrature(initial_p_unit);
-
-  UpdateFlags update_flags = update_quadrature_points | update_jacobians;
-  if (spacedim > dim)
-    update_flags |= update_jacobian_grads;
-  auto mdata = Utilities::dynamic_unique_cast<InternalData>(
-    get_data(update_flags, point_quadrature));
-
-  mdata->mapping_support_points = this->compute_mapping_support_points(cell);
-
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
   return internal::MappingQGenericImplementation::
-    do_transform_real_to_unit_cell_internal<1>(cell, p, initial_p_unit, *mdata);
+    do_transform_real_to_unit_cell_internal<1>(
+      p,
+      initial_p_unit,
+      this->compute_mapping_support_points(cell),
+      polynomials_1d,
+      renumber_lexicographic_to_hierarchic);
 }
+
+
 
 template <>
 Point<2>
@@ -2366,24 +2427,16 @@ MappingQGeneric<2, 2>::transform_real_to_unit_cell_internal(
   const Point<2> &                          p,
   const Point<2> &                          initial_p_unit) const
 {
-  const int dim      = 2;
-  const int spacedim = 2;
-
-  const Quadrature<dim> point_quadrature(initial_p_unit);
-
-  UpdateFlags update_flags = update_quadrature_points | update_jacobians;
-  if (spacedim > dim)
-    update_flags |= update_jacobian_grads;
-  auto mdata = Utilities::dynamic_unique_cast<InternalData>(
-    get_data(update_flags, point_quadrature));
-
-  mdata->mapping_support_points = this->compute_mapping_support_points(cell);
-
-  // dispatch to the various specializations for spacedim=dim,
-  // spacedim=dim+1, etc
   return internal::MappingQGenericImplementation::
-    do_transform_real_to_unit_cell_internal<2>(cell, p, initial_p_unit, *mdata);
+    do_transform_real_to_unit_cell_internal<2>(
+      p,
+      initial_p_unit,
+      this->compute_mapping_support_points(cell),
+      polynomials_1d,
+      renumber_lexicographic_to_hierarchic);
 }
+
+
 
 template <>
 Point<3>
@@ -2392,23 +2445,13 @@ MappingQGeneric<3, 3>::transform_real_to_unit_cell_internal(
   const Point<3> &                          p,
   const Point<3> &                          initial_p_unit) const
 {
-  const int dim      = 3;
-  const int spacedim = 3;
-
-  const Quadrature<dim> point_quadrature(initial_p_unit);
-
-  UpdateFlags update_flags = update_quadrature_points | update_jacobians;
-  if (spacedim > dim)
-    update_flags |= update_jacobian_grads;
-  auto mdata = Utilities::dynamic_unique_cast<InternalData>(
-    get_data(update_flags, point_quadrature));
-
-  mdata->mapping_support_points = this->compute_mapping_support_points(cell);
-
-  // dispatch to the various specializations for spacedim=dim,
-  // spacedim=dim+1, etc
   return internal::MappingQGenericImplementation::
-    do_transform_real_to_unit_cell_internal<3>(cell, p, initial_p_unit, *mdata);
+    do_transform_real_to_unit_cell_internal<3>(
+      p,
+      initial_p_unit,
+      this->compute_mapping_support_points(cell),
+      polynomials_1d,
+      renumber_lexicographic_to_hierarchic);
 }
 
 
@@ -2577,47 +2620,27 @@ MappingQGeneric<dim, spacedim>::transform_real_to_unit_cell(
   // of the cell
   Point<dim> initial_p_unit;
   if (this->preserves_vertex_locations())
-    initial_p_unit = cell->real_to_unit_cell_affine_approximation(p);
-  else
     {
-      // for the MappingQEulerian type classes, we want to still call the cell
-      // iterator's affine approximation. do so by creating a dummy
-      // triangulation with just the first vertices.
-      //
-      // we do this by first getting all support points, then
-      // throwing away all but the vertices, and finally calling
-      // the same function as above
-      std::vector<Point<spacedim>> a =
-        this->compute_mapping_support_points(cell);
-      a.resize(GeometryInfo<dim>::vertices_per_cell);
-      std::vector<CellData<dim>> cells(1);
-      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
-        cells[0].vertices[i] = i;
-      Triangulation<dim, spacedim> tria;
-      tria.create_triangulation(a, cells, SubCellData());
-      initial_p_unit =
-        tria.begin_active()->real_to_unit_cell_affine_approximation(p);
-    }
-  // in 1d with spacedim > 1 the affine approximation is exact
-  if (dim == 1 && polynomial_degree == 1)
-    {
-      return initial_p_unit;
+      initial_p_unit = cell->real_to_unit_cell_affine_approximation(p);
+      // in 1d with spacedim > 1 the affine approximation is exact
+      if (dim == 1 && polynomial_degree == 1)
+        return initial_p_unit;
     }
   else
     {
-      // in case the function above should have given us something back that
-      // lies outside the unit cell, then project it back into the reference
-      // cell in hopes that this gives a better starting point to the
-      // following iteration
-      initial_p_unit = GeometryInfo<dim>::project_to_unit_cell(initial_p_unit);
+      // else, we simply use the mid point
+      for (unsigned int d = 0; d < dim; ++d)
+        initial_p_unit[d] = 0.5;
+    }
 
-      // perform the Newton iteration and return the result. note that this
-      // statement may throw an exception, which we simply pass up to the
-      // caller
-      return this->transform_real_to_unit_cell_internal(cell,
-                                                        p,
-                                                        initial_p_unit);
-    }
+  // in case the function above should have given us something back that lies
+  // outside the unit cell, then project it back into the reference cell in
+  // hopes that this gives a better starting point to the following iteration
+  initial_p_unit = GeometryInfo<dim>::project_to_unit_cell(initial_p_unit);
+
+  // perform the Newton iteration and return the result. note that this
+  // statement may throw an exception, which we simply pass up to the caller
+  return this->transform_real_to_unit_cell_internal(cell, p, initial_p_unit);
 }
 
 
@@ -3989,8 +4012,8 @@ MappingQGeneric<2, 3>::add_quad_support_points(
   for (unsigned int q = 0, q2 = 0; q2 < polynomial_degree - 1; ++q2)
     for (unsigned int q1 = 0; q1 < polynomial_degree - 1; ++q1, ++q)
       {
-        Point<2> point(line_support_points.point(q1 + 1)[0],
-                       line_support_points.point(q2 + 1)[0]);
+        Point<2> point(line_support_points[q1 + 1][0],
+                       line_support_points[q2 + 1][0]);
         for (const unsigned int i : GeometryInfo<2>::vertex_indices())
           weights(q, i) = GeometryInfo<2>::d_linear_shape_function(point, i);
       }
