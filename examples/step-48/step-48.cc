@@ -460,11 +460,11 @@ namespace Step48
   // data that is needed in the VectorTools::integrate_difference() function
   // as well as in DataOut. The only action to take at this point is to make
   // sure that the vector updates its ghost values before we read from
-  // them. This is a feature present only in the
-  // LinearAlgebra::distributed::Vector class. Distributed vectors with PETSc
-  // and Trilinos, on the other hand, need to be copied to special vectors
-  // including ghost values (see the relevant section in step-40). If we also
-  // wanted to access all degrees of freedom on ghost cells (e.g. when
+  // them, and to reset ghost values once done. This is a feature present only
+  // in the LinearAlgebra::distributed::Vector class. Distributed vectors with
+  // PETSc and Trilinos, on the other hand, need to be copied to special
+  // vectors including ghost values (see the relevant section in step-40). If
+  // we also wanted to access all degrees of freedom on ghost cells (e.g. when
   // computing error estimators that use the jump of solution over cell
   // boundaries), we would need more information and create a vector
   // initialized with locally relevant dofs just as in step-40. Observe also
@@ -502,6 +502,8 @@ namespace Step48
 
     data_out.write_vtu_with_pvtu_record(
       "./", "solution", timestep_number, MPI_COMM_WORLD, 3);
+
+    solution.zero_out_ghosts();
   }
 
 
