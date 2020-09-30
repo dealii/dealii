@@ -50,8 +50,8 @@ FE_Q_iso_Q1<dim, spacedim>::FE_Q_iso_Q1(const unsigned int subdivisions)
          ExcMessage("This element can only be used with a positive number of "
                     "subelements"));
 
-  QTrapez<1>   trapez;
-  QIterated<1> points(trapez, subdivisions);
+  QTrapezoid<1> trapez;
+  QIterated<1>  points(trapez, subdivisions);
 
   this->initialize(points.get_points());
 }

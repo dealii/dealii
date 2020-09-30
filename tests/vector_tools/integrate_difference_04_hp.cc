@@ -100,7 +100,7 @@ test(VectorTools::NormType norm, double value, double exp = 2.0)
   solution = interpolated;
 
   Vector<double>       cellwise_errors(tria.n_active_cells());
-  hp::QCollection<dim> quadrature(QIterated<dim>(QTrapez<1>(), 5));
+  hp::QCollection<dim> quadrature(QIterated<dim>(QTrapezoid<1>(), 5));
 
   const dealii::Function<dim, double> *w = nullptr;
   VectorTools::integrate_difference(dofh,

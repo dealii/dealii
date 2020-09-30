@@ -289,7 +289,7 @@ DataOutStack<dim, spacedim, DoFHandlerType>::build_patches(
   // patch, and an object that
   // extracts the data on each
   // cell to these points
-  QTrapez<1>     q_trapez;
+  QTrapezoid<1>  q_trapez;
   QIterated<dim> patch_points(q_trapez, n_subdivisions);
 
   // create collection objects from

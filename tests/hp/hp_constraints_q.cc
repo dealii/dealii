@@ -32,7 +32,7 @@ test()
   std::vector<unsigned int> degrees;
   for (unsigned int i = 1; i < 4; ++i)
     {
-      fe.push_back(FE_Q<dim>(QIterated<1>(QTrapez<1>(), i)));
+      fe.push_back(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), i)));
       degrees.push_back(i);
     }
 

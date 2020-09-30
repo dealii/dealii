@@ -118,7 +118,7 @@ FE_Q<dim, spacedim>::get_name() const
     {
       if (this->degree > 2)
         namebuf << "FE_Q<" << Utilities::dim_string(dim, spacedim)
-                << ">(QIterated(QTrapez()," << this->degree << "))";
+                << ">(QIterated(QTrapezoid()," << this->degree << "))";
       else
         namebuf << "FE_Q<" << Utilities::dim_string(dim, spacedim) << ">("
                 << this->degree << ")";

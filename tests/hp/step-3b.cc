@@ -248,9 +248,10 @@ LaplaceProblem::output_results() const
 void
 LaplaceProblem::run()
 {
-  FE_Q<2> fe_1(1), fe_2(2), fe_3(QIterated<1>(QTrapez<1>(), 3)),
-    fe_4(QIterated<1>(QTrapez<1>(), 4)), fe_5(QIterated<1>(QTrapez<1>(), 5)),
-    fe_6(QIterated<1>(QTrapez<1>(), 6));
+  FE_Q<2> fe_1(1), fe_2(2), fe_3(QIterated<1>(QTrapezoid<1>(), 3)),
+    fe_4(QIterated<1>(QTrapezoid<1>(), 4)),
+    fe_5(QIterated<1>(QTrapezoid<1>(), 5)),
+    fe_6(QIterated<1>(QTrapezoid<1>(), 6));
 
   fe.push_back(fe_1);
   fe.push_back(fe_2);

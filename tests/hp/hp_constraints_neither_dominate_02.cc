@@ -127,7 +127,7 @@ test2cells(const FiniteElement<dim> &fe_0,
   fe_collection.push_back(fe_2);
   fe_collection.push_back(fe_common);
 
-  const QIterated<dim - 1> quad_formula(QTrapez<1>(), 2);
+  const QIterated<dim - 1> quad_formula(QTrapezoid<1>(), 2);
 
   hp::QCollection<dim - 1> q_face_collection;
   q_face_collection.push_back(quad_formula);

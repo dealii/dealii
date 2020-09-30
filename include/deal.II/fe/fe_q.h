@@ -563,7 +563,7 @@ public:
    * <tt>FE_Q<dim>(QGaussLobatto<1>(fe_degree+1))</tt> is equivalent to the
    * constructor that specifies the polynomial degree only. For selecting
    * equidistant nodes at <tt>fe_degree > 2</tt>, construct
-   * <tt>FE_Q<dim>(QIterated<1>(QTrapez<1>(),fe_degree))</tt>.
+   * <tt>FE_Q<dim>(QIterated<1>(QTrapezoid<1>(),fe_degree))</tt>.
    */
   FE_Q(const Quadrature<1> &points);
 

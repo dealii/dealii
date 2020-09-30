@@ -129,7 +129,7 @@ transfer(std::ostream &out)
     q_solution = 0.;
 
     hp::QCollection<dim> quad;
-    quad.push_back(QTrapez<dim>());
+    quad.push_back(QTrapezoid<dim>());
     hp::FEValues<dim>                                  hp_fe_val(fe_q,
                                 quad,
                                 update_values | update_quadrature_points);

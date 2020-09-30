@@ -863,7 +863,7 @@ FE_DGQArbitraryNodes<dim, spacedim>::get_name() const
       if (this->degree > 2)
         namebuf << "FE_DGQArbitraryNodes<"
                 << Utilities::dim_string(dim, spacedim)
-                << ">(QIterated(QTrapez()," << this->degree << "))";
+                << ">(QIterated(QTrapezoid()," << this->degree << "))";
       else
         namebuf << "FE_DGQ<" << Utilities::dim_string(dim, spacedim) << ">("
                 << this->degree << ")";

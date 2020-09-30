@@ -1463,7 +1463,7 @@ namespace Step18
   // In this context, it is instructive to point out what a more general way
   // would be. For general finite elements, the way to go would be to take a
   // quadrature formula with the quadrature points in the vertices of a
-  // cell. The <code>QTrapez</code> formula for the trapezoidal rule does
+  // cell. The <code>QTrapezoid</code> formula for the trapezoidal rule does
   // exactly this. With this quadrature formula, we would then initialize an
   // <code>FEValues</code> object in each cell, and use the
   // <code>FEValues::get_function_values</code> function to obtain the values

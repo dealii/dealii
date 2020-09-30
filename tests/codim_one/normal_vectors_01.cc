@@ -52,7 +52,7 @@ test()
 
   FEFaceValues<dim - 1, dim> fe_face_values(mapping,
                                             fe,
-                                            QTrapez<dim - 2>(),
+                                            QTrapezoid<dim - 2>(),
                                             update_normal_vectors);
 
   for (typename DoFHandler<dim - 1, dim>::active_cell_iterator cell =

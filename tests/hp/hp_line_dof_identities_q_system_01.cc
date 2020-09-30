@@ -36,7 +36,7 @@ test()
   hp::FECollection<dim> fe_collection;
   for (unsigned int i = 1; i < 8 - dim; ++i)
     fe_collection.push_back(
-      FESystem<dim>(FE_Q<dim>(QIterated<1>(QTrapez<1>(), i)), 3));
+      FESystem<dim>(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), i)), 3));
 
   for (unsigned int i = 0; i < fe_collection.size(); ++i)
     for (unsigned int j = 0; j < fe_collection.size(); ++j)

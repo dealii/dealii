@@ -385,8 +385,8 @@ MinimizationProblem<1>::refine_grid()
 
   Vector<float> error_indicators(triangulation.n_active_cells());
 
-  QTrapez<dim>  quadrature;
-  FEValues<dim> fe_values(fe,
+  QTrapezoid<dim> quadrature;
+  FEValues<dim>   fe_values(fe,
                           quadrature,
                           update_values | update_gradients | update_hessians |
                             update_quadrature_points | update_JxW_values);

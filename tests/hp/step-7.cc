@@ -457,7 +457,7 @@ HelmholtzProblem<dim>::process_solution(const unsigned int cycle)
                                     VectorTools::H1_seminorm);
   const double H1_error = difference_per_cell.l2_norm();
 
-  const QTrapez<1>     q_trapez;
+  const QTrapezoid<1>  q_trapez;
   const QIterated<dim> q_iterated(q_trapez, 5);
   VectorTools::integrate_difference(dof_handler,
                                     solution,

@@ -139,7 +139,7 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
                                 spacedim>::ExcInterpolationNotImplemented()));
 
       const Quadrature<dim - 1> quad_face_support(
-        FE_Q<dim, spacedim>(QIterated<1>(QTrapez<1>(), source_fe->degree))
+        FE_Q<dim, spacedim>(QIterated<1>(QTrapezoid<1>(), source_fe->degree))
           .get_unit_face_support_points(face_no));
 
       // Rule of thumb for FP accuracy, that can be expected for a given

@@ -398,7 +398,7 @@ MinimizationProblem<1>::refine_grid()
 
   Vector<float> error_indicators(triangulation.n_active_cells());
 
-  QTrapez<dim>         q;
+  QTrapezoid<dim>      q;
   hp::QCollection<dim> quadrature(q);
   hp::FEValues<dim>    fe_values(fe,
                               quadrature,

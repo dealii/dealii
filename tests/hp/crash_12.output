@@ -9,7 +9,7 @@ DEAL::Testing FE_Q<2>(1) vs. FE_Q<2>(2)
     7 3:  0.2500000
     19 1:  0.2500000
     19 3:  0.7500000
-DEAL::Testing FE_Q<2>(1) vs. FE_Q<2>(QIterated(QTrapez(),3))
+DEAL::Testing FE_Q<2>(1) vs. FE_Q<2>(QIterated(QTrapezoid(),3))
     5 1:  0.5000000
     5 3:  0.5000000
     7 1:  0.8333333
@@ -20,7 +20,7 @@ DEAL::Testing FE_Q<2>(1) vs. FE_Q<2>(QIterated(QTrapez(),3))
     32 3:  0.6666667
     33 1:  0.1666667
     33 3:  0.8333333
-DEAL::Testing FE_Q<2>(1) vs. FE_Q<2>(QIterated(QTrapez(),4))
+DEAL::Testing FE_Q<2>(1) vs. FE_Q<2>(QIterated(QTrapezoid(),4))
     5 1:  0.5000000
     5 3:  0.5000000
     7 1:  0.8750000
@@ -35,7 +35,7 @@ DEAL::Testing FE_Q<2>(1) vs. FE_Q<2>(QIterated(QTrapez(),4))
     50 3:  0.7500000
     51 1:  0.1250000
     51 3:  0.8750000
-DEAL::Testing FE_Q<2>(1) vs. FE_Q<2>(QIterated(QTrapez(),5))
+DEAL::Testing FE_Q<2>(1) vs. FE_Q<2>(QIterated(QTrapezoid(),5))
     5 1:  0.5000000
     5 3:  0.5000000
     7 1:  0.9000000
@@ -67,7 +67,7 @@ DEAL::Testing FE_Q<2>(2) vs. FE_Q<2>(2)
     24 1:  -0.1250000
     24 3:  0.3750000
     24 5:  0.7500000
-DEAL::Testing FE_Q<2>(2) vs. FE_Q<2>(QIterated(QTrapez(),3))
+DEAL::Testing FE_Q<2>(2) vs. FE_Q<2>(QIterated(QTrapezoid(),3))
     10 5:  1.000000
     12 1:  0.5555556
     12 3:  -0.1111111
@@ -81,7 +81,7 @@ DEAL::Testing FE_Q<2>(2) vs. FE_Q<2>(QIterated(QTrapez(),3))
     38 1:  -0.1111111
     38 3:  0.5555556
     38 5:  0.5555556
-DEAL::Testing FE_Q<2>(2) vs. FE_Q<2>(QIterated(QTrapez(),4))
+DEAL::Testing FE_Q<2>(2) vs. FE_Q<2>(QIterated(QTrapezoid(),4))
     10 5:  1.000000
     12 1:  0.6562500
     12 3:  -0.09375000
@@ -101,7 +101,7 @@ DEAL::Testing FE_Q<2>(2) vs. FE_Q<2>(QIterated(QTrapez(),4))
     56 1:  -0.09375000
     56 3:  0.6562500
     56 5:  0.4375000
-DEAL::Testing FE_Q<2>(2) vs. FE_Q<2>(QIterated(QTrapez(),5))
+DEAL::Testing FE_Q<2>(2) vs. FE_Q<2>(QIterated(QTrapezoid(),5))
     10 5:  1.000000
     12 1:  0.7200000
     12 3:  -0.08000000
@@ -127,14 +127,14 @@ DEAL::Testing FE_Q<2>(2) vs. FE_Q<2>(QIterated(QTrapez(),5))
     78 1:  -0.08000000
     78 3:  0.7200000
     78 5:  0.3600000
-DEAL::Testing FE_Q<2>(QIterated(QTrapez(),3)) vs. FE_Q<2>(1)
+DEAL::Testing FE_Q<2>(QIterated(QTrapezoid(),3)) vs. FE_Q<2>(1)
     4 14:  0.6666667
     4 20:  0.3333333
     5 14:  0.3333333
     5 20:  0.6666667
     16 14:  0.5000000
     16 20:  0.5000000
-DEAL::Testing FE_Q<2>(QIterated(QTrapez(),3)) vs. FE_Q<2>(2)
+DEAL::Testing FE_Q<2>(QIterated(QTrapezoid(),3)) vs. FE_Q<2>(2)
     5 4:  1.000000
     5 14:  -0.3333333
     5 29:  0.3333333
@@ -147,7 +147,7 @@ DEAL::Testing FE_Q<2>(QIterated(QTrapez(),3)) vs. FE_Q<2>(2)
     31 4:  0.8437500
     31 14:  -0.3125000
     31 29:  0.4687500
-DEAL::Testing FE_Q<2>(QIterated(QTrapez(),3)) vs. FE_Q<2>(QIterated(QTrapez(),3))
+DEAL::Testing FE_Q<2>(QIterated(QTrapezoid(),3)) vs. FE_Q<2>(QIterated(QTrapezoid(),3))
     17 1:  -0.06250000
     17 3:  -0.06250000
     17 6:  0.5625000
@@ -162,7 +162,7 @@ DEAL::Testing FE_Q<2>(QIterated(QTrapez(),3)) vs. FE_Q<2>(QIterated(QTrapez(),3)
     45 3:  0.3125000
     45 6:  -0.3125000
     45 7:  0.9375000
-DEAL::Testing FE_Q<2>(QIterated(QTrapez(),3)) vs. FE_Q<2>(QIterated(QTrapez(),4))
+DEAL::Testing FE_Q<2>(QIterated(QTrapezoid(),3)) vs. FE_Q<2>(QIterated(QTrapezoid(),4))
     17 1:  -0.06250000
     17 3:  -0.06250000
     17 6:  0.5625000
@@ -191,7 +191,7 @@ DEAL::Testing FE_Q<2>(QIterated(QTrapez(),3)) vs. FE_Q<2>(QIterated(QTrapez(),4)
     63 3:  0.4443359
     63 6:  -0.3076172
     63 7:  0.7998047
-DEAL::Testing FE_Q<2>(QIterated(QTrapez(),3)) vs. FE_Q<2>(QIterated(QTrapez(),5))
+DEAL::Testing FE_Q<2>(QIterated(QTrapezoid(),3)) vs. FE_Q<2>(QIterated(QTrapezoid(),5))
     17 1:  -0.06250000
     17 3:  -0.06250000
     17 6:  0.5625000
@@ -228,7 +228,7 @@ DEAL::Testing FE_Q<2>(QIterated(QTrapez(),3)) vs. FE_Q<2>(QIterated(QTrapez(),5)
     85 3:  0.5355000
     85 6:  -0.2835000
     85 7:  0.6885000
-DEAL::Testing FE_Q<2>(QIterated(QTrapez(),4)) vs. FE_Q<2>(1)
+DEAL::Testing FE_Q<2>(QIterated(QTrapezoid(),4)) vs. FE_Q<2>(1)
     5 23:  0.7500000
     5 29:  0.2500000
     6 23:  0.5000000
@@ -237,7 +237,7 @@ DEAL::Testing FE_Q<2>(QIterated(QTrapez(),4)) vs. FE_Q<2>(1)
     7 29:  0.7500000
     25 23:  0.5000000
     25 29:  0.5000000
-DEAL::Testing FE_Q<2>(QIterated(QTrapez(),4)) vs. FE_Q<2>(2)
+DEAL::Testing FE_Q<2>(QIterated(QTrapezoid(),4)) vs. FE_Q<2>(2)
     6 5:  1.333333
     6 23:  -0.5000000
     6 38:  0.1666667
@@ -251,7 +251,7 @@ DEAL::Testing FE_Q<2>(QIterated(QTrapez(),4)) vs. FE_Q<2>(2)
     40 5:  1.000000
     40 23:  -0.5000000
     40 38:  0.5000000
-DEAL::Testing FE_Q<2>(QIterated(QTrapez(),4)) vs. FE_Q<2>(QIterated(QTrapez(),3))
+DEAL::Testing FE_Q<2>(QIterated(QTrapezoid(),4)) vs. FE_Q<2>(QIterated(QTrapezoid(),3))
     7 5:  -1.000000
     7 6:  1.500000
     7 23:  0.2500000
@@ -273,7 +273,7 @@ DEAL::Testing FE_Q<2>(QIterated(QTrapez(),4)) vs. FE_Q<2>(QIterated(QTrapez(),3)
     54 6:  1.296296
     54 23:  0.2592593
     54 51:  0.4320988
-DEAL::Testing FE_Q<2>(QIterated(QTrapez(),4)) vs. FE_Q<2>(QIterated(QTrapez(),4))
+DEAL::Testing FE_Q<2>(QIterated(QTrapezoid(),4)) vs. FE_Q<2>(QIterated(QTrapezoid(),4))
     26 8:  1.000000
     28 1:  0.2734375
     28 3:  -0.03906250
@@ -297,7 +297,7 @@ DEAL::Testing FE_Q<2>(QIterated(QTrapez(),4)) vs. FE_Q<2>(QIterated(QTrapez(),4)
     72 7:  0.2187500
     72 8:  -0.5468750
     72 9:  1.093750
-DEAL::Testing FE_Q<2>(QIterated(QTrapez(),4)) vs. FE_Q<2>(QIterated(QTrapez(),5))
+DEAL::Testing FE_Q<2>(QIterated(QTrapezoid(),4)) vs. FE_Q<2>(QIterated(QTrapezoid(),5))
     26 8:  1.000000
     28 1:  0.3744000
     28 3:  -0.04160000
@@ -339,7 +339,7 @@ DEAL::Testing FE_Q<2>(QIterated(QTrapez(),4)) vs. FE_Q<2>(QIterated(QTrapez(),5)
     94 7:  0.2304000
     94 8:  -0.5616000
     94 9:  0.9984000
-DEAL::Testing FE_Q<2>(QIterated(QTrapez(),5)) vs. FE_Q<2>(1)
+DEAL::Testing FE_Q<2>(QIterated(QTrapezoid(),5)) vs. FE_Q<2>(1)
     6 34:  0.8000000
     6 40:  0.2000000
     7 34:  0.6000000
@@ -350,7 +350,7 @@ DEAL::Testing FE_Q<2>(QIterated(QTrapez(),5)) vs. FE_Q<2>(1)
     9 40:  0.8000000
     36 34:  0.5000000
     36 40:  0.5000000
-DEAL::Testing FE_Q<2>(QIterated(QTrapez(),5)) vs. FE_Q<2>(2)
+DEAL::Testing FE_Q<2>(QIterated(QTrapezoid(),5)) vs. FE_Q<2>(2)
     7 6:  1.500000
     7 34:  -0.6000000
     7 49:  0.1000000
@@ -369,7 +369,7 @@ DEAL::Testing FE_Q<2>(QIterated(QTrapez(),5)) vs. FE_Q<2>(2)
     51 6:  1.171875
     51 34:  -0.6875000
     51 49:  0.5156250
-DEAL::Testing FE_Q<2>(QIterated(QTrapez(),5)) vs. FE_Q<2>(QIterated(QTrapez(),3))
+DEAL::Testing FE_Q<2>(QIterated(QTrapezoid(),5)) vs. FE_Q<2>(QIterated(QTrapezoid(),3))
     8 6:  -1.500000
     8 7:  2.000000
     8 34:  0.4000000
@@ -398,7 +398,7 @@ DEAL::Testing FE_Q<2>(QIterated(QTrapez(),5)) vs. FE_Q<2>(QIterated(QTrapez(),3)
     65 7:  1.832562
     65 34:  0.5717593
     65 62:  0.4764660
-DEAL::Testing FE_Q<2>(QIterated(QTrapez(),5)) vs. FE_Q<2>(QIterated(QTrapez(),4))
+DEAL::Testing FE_Q<2>(QIterated(QTrapezoid(),5)) vs. FE_Q<2>(QIterated(QTrapezoid(),4))
     9 6:  1.000000
     9 7:  -2.000000
     9 8:  2.000000
@@ -439,7 +439,7 @@ DEAL::Testing FE_Q<2>(QIterated(QTrapez(),5)) vs. FE_Q<2>(QIterated(QTrapez(),4)
     83 8:  1.826477
     83 34:  -0.2296143
     83 79:  0.4018250
-DEAL::Testing FE_Q<2>(QIterated(QTrapez(),5)) vs. FE_Q<2>(QIterated(QTrapez(),5))
+DEAL::Testing FE_Q<2>(QIterated(QTrapezoid(),5)) vs. FE_Q<2>(QIterated(QTrapezoid(),5))
     37 1:  0.01171875
     37 3:  0.01171875
     37 8:  -0.09765625
@@ -548,7 +548,7 @@ DEAL::Testing FE_Q<3>(1) vs. FE_Q<3>(2)
     116 3:  0.1875000
     116 5:  0.1875000
     116 7:  0.5625000
-DEAL::Testing FE_Q<3>(1) vs. FE_Q<3>(QIterated(QTrapez(),3))
+DEAL::Testing FE_Q<3>(1) vs. FE_Q<3>(QIterated(QTrapezoid(),3))
     9 1:  0.5000000
     9 3:  0.5000000
     11 1:  0.5000000
@@ -689,7 +689,7 @@ DEAL::Testing FE_Q<3>(1) vs. FE_Q<3>(QIterated(QTrapez(),3))
     299 3:  0.1388889
     299 5:  0.1388889
     299 7:  0.6944444
-DEAL::Testing FE_Q<3>(1) vs. FE_Q<3>(QIterated(QTrapez(),4))
+DEAL::Testing FE_Q<3>(1) vs. FE_Q<3>(QIterated(QTrapezoid(),4))
     9 1:  0.5000000
     9 3:  0.5000000
     11 1:  0.5000000
@@ -942,7 +942,7 @@ DEAL::Testing FE_Q<3>(1) vs. FE_Q<3>(QIterated(QTrapez(),4))
     614 3:  0.1093750
     614 5:  0.1093750
     614 7:  0.7656250
-DEAL::Testing FE_Q<3>(1) vs. FE_Q<3>(QIterated(QTrapez(),5))
+DEAL::Testing FE_Q<3>(1) vs. FE_Q<3>(QIterated(QTrapezoid(),5))
     9 1:  0.5000000
     9 3:  0.5000000
     11 1:  0.5000000
@@ -1442,7 +1442,7 @@ DEAL::Testing FE_Q<3>(2) vs. FE_Q<3>(2)
     135 17:  -0.09375000
     135 19:  0.2812500
     135 21:  0.5625000
-DEAL::Testing FE_Q<3>(2) vs. FE_Q<3>(QIterated(QTrapez(),3))
+DEAL::Testing FE_Q<3>(2) vs. FE_Q<3>(QIterated(QTrapezoid(),3))
     28 9:  1.000000
     30 17:  1.000000
     32 21:  1.000000
@@ -1664,7 +1664,7 @@ DEAL::Testing FE_Q<3>(2) vs. FE_Q<3>(QIterated(QTrapez(),3))
     318 17:  -0.06172840
     318 19:  0.3086420
     318 21:  0.3086420
-DEAL::Testing FE_Q<3>(2) vs. FE_Q<3>(QIterated(QTrapez(),4))
+DEAL::Testing FE_Q<3>(2) vs. FE_Q<3>(QIterated(QTrapezoid(),4))
     28 9:  1.000000
     30 17:  1.000000
     32 21:  1.000000
@@ -2102,7 +2102,7 @@ DEAL::Testing FE_Q<3>(2) vs. FE_Q<3>(QIterated(QTrapez(),4))
     633 17:  -0.04101562
     633 19:  0.2871094
     633 21:  0.1914062
-DEAL::Testing FE_Q<3>(2) vs. FE_Q<3>(QIterated(QTrapez(),5))
+DEAL::Testing FE_Q<3>(2) vs. FE_Q<3>(QIterated(QTrapezoid(),5))
     28 9:  1.000000
     30 17:  1.000000
     32 21:  1.000000
@@ -2828,7 +2828,7 @@ DEAL::Testing FE_Q<3>(2) vs. FE_Q<3>(QIterated(QTrapez(),5))
     1116 17:  -0.02880000
     1116 19:  0.2592000
     1116 21:  0.1296000
-DEAL::Testing FE_Q<3>(QIterated(QTrapez(),3)) vs. FE_Q<3>(1)
+DEAL::Testing FE_Q<3>(QIterated(QTrapezoid(),3)) vs. FE_Q<3>(1)
     6 60:  0.6666667
     6 72:  0.3333333
     7 60:  0.3333333
@@ -2873,7 +2873,7 @@ DEAL::Testing FE_Q<3>(QIterated(QTrapez(),3)) vs. FE_Q<3>(1)
     74 84:  0.5000000
     80 78:  0.5000000
     80 84:  0.5000000
-DEAL::Testing FE_Q<3>(QIterated(QTrapez(),3)) vs. FE_Q<3>(2)
+DEAL::Testing FE_Q<3>(QIterated(QTrapezoid(),3)) vs. FE_Q<3>(2)
     7 6:  1.000000
     7 60:  -0.3333333
     7 105:  0.3333333
@@ -3018,7 +3018,7 @@ DEAL::Testing FE_Q<3>(QIterated(QTrapez(),3)) vs. FE_Q<3>(2)
     172 105:  -0.1464844
     172 135:  -0.1464844
     172 165:  0.2197266
-DEAL::Testing FE_Q<3>(QIterated(QTrapez(),3)) vs. FE_Q<3>(QIterated(QTrapez(),3))
+DEAL::Testing FE_Q<3>(QIterated(QTrapezoid(),3)) vs. FE_Q<3>(QIterated(QTrapezoid(),3))
     65 1:  -0.06250000
     65 3:  -0.06250000
     65 10:  0.5625000
@@ -3271,7 +3271,7 @@ DEAL::Testing FE_Q<3>(QIterated(QTrapez(),3)) vs. FE_Q<3>(QIterated(QTrapez(),3)
     355 37:  -0.2929688
     355 38:  -0.2929688
     355 39:  0.8789063
-DEAL::Testing FE_Q<3>(QIterated(QTrapez(),3)) vs. FE_Q<3>(QIterated(QTrapez(),4))
+DEAL::Testing FE_Q<3>(QIterated(QTrapezoid(),3)) vs. FE_Q<3>(QIterated(QTrapezoid(),4))
     65 1:  -0.06250000
     65 3:  -0.06250000
     65 10:  0.5625000
@@ -4168,7 +4168,7 @@ DEAL::Testing FE_Q<3>(QIterated(QTrapez(),3)) vs. FE_Q<3>(QIterated(QTrapez(),4)
     670 37:  -0.2460337
     670 38:  -0.2460337
     670 39:  0.6396875
-DEAL::Testing FE_Q<3>(QIterated(QTrapez(),3)) vs. FE_Q<3>(QIterated(QTrapez(),5))
+DEAL::Testing FE_Q<3>(QIterated(QTrapezoid(),3)) vs. FE_Q<3>(QIterated(QTrapezoid(),5))
     65 1:  -0.06250000
     65 3:  -0.06250000
     65 10:  0.5625000
@@ -5609,7 +5609,7 @@ DEAL::Testing FE_Q<3>(QIterated(QTrapez(),3)) vs. FE_Q<3>(QIterated(QTrapez(),5)
     1153 37:  -0.1951897
     1153 38:  -0.1951897
     1153 39:  0.4740322
-DEAL::Testing FE_Q<3>(QIterated(QTrapez(),4)) vs. FE_Q<3>(1)
+DEAL::Testing FE_Q<3>(QIterated(QTrapezoid(),4)) vs. FE_Q<3>(1)
     7 121:  0.7500000
     7 133:  0.2500000
     8 121:  0.5000000
@@ -5682,7 +5682,7 @@ DEAL::Testing FE_Q<3>(QIterated(QTrapez(),4)) vs. FE_Q<3>(1)
     135 145:  0.5000000
     141 139:  0.5000000
     141 145:  0.5000000
-DEAL::Testing FE_Q<3>(QIterated(QTrapez(),4)) vs. FE_Q<3>(2)
+DEAL::Testing FE_Q<3>(QIterated(QTrapezoid(),4)) vs. FE_Q<3>(2)
     8 7:  1.333333
     8 121:  -0.5000000
     8 166:  0.1666667
@@ -5832,7 +5832,7 @@ DEAL::Testing FE_Q<3>(QIterated(QTrapez(),4)) vs. FE_Q<3>(2)
     233 166:  -0.2500000
     233 196:  -0.2500000
     233 226:  0.2500000
-DEAL::Testing FE_Q<3>(QIterated(QTrapez(),4)) vs. FE_Q<3>(QIterated(QTrapez(),3))
+DEAL::Testing FE_Q<3>(QIterated(QTrapezoid(),4)) vs. FE_Q<3>(QIterated(QTrapezoid(),3))
     9 7:  -1.000000
     9 8:  1.500000
     9 121:  0.2500000
@@ -6238,7 +6238,7 @@ DEAL::Testing FE_Q<3>(QIterated(QTrapez(),4)) vs. FE_Q<3>(QIterated(QTrapez(),3)
     416 233:  0.1120256
     416 317:  0.1120256
     416 401:  0.1867093
-DEAL::Testing FE_Q<3>(QIterated(QTrapez(),4)) vs. FE_Q<3>(QIterated(QTrapez(),4))
+DEAL::Testing FE_Q<3>(QIterated(QTrapezoid(),4)) vs. FE_Q<3>(QIterated(QTrapezoid(),4))
     126 12:  1.000000
     128 36:  1.000000
     130 57:  1.000000
@@ -6860,7 +6860,7 @@ DEAL::Testing FE_Q<3>(QIterated(QTrapez(),4)) vs. FE_Q<3>(QIterated(QTrapez(),4)
     731 59:  0.2392578
     731 60:  -0.5981445
     731 61:  1.196289
-DEAL::Testing FE_Q<3>(QIterated(QTrapez(),4)) vs. FE_Q<3>(QIterated(QTrapez(),5))
+DEAL::Testing FE_Q<3>(QIterated(QTrapezoid(),4)) vs. FE_Q<3>(QIterated(QTrapezoid(),5))
     126 12:  1.000000
     128 36:  1.000000
     130 57:  1.000000
@@ -8706,7 +8706,7 @@ DEAL::Testing FE_Q<3>(QIterated(QTrapez(),4)) vs. FE_Q<3>(QIterated(QTrapez(),5)
     1214 59:  0.2300314
     1214 60:  -0.5607014
     1214 61:  0.9968026
-DEAL::Testing FE_Q<3>(QIterated(QTrapez(),5)) vs. FE_Q<3>(1)
+DEAL::Testing FE_Q<3>(QIterated(QTrapezoid(),5)) vs. FE_Q<3>(1)
     8 212:  0.8000000
     8 224:  0.2000000
     9 212:  0.6000000
@@ -8815,7 +8815,7 @@ DEAL::Testing FE_Q<3>(QIterated(QTrapez(),5)) vs. FE_Q<3>(1)
     226 236:  0.5000000
     232 230:  0.5000000
     232 236:  0.5000000
-DEAL::Testing FE_Q<3>(QIterated(QTrapez(),5)) vs. FE_Q<3>(2)
+DEAL::Testing FE_Q<3>(QIterated(QTrapezoid(),5)) vs. FE_Q<3>(2)
     9 8:  1.500000
     9 212:  -0.6000000
     9 257:  0.1000000
@@ -9068,7 +9068,7 @@ DEAL::Testing FE_Q<3>(QIterated(QTrapez(),5)) vs. FE_Q<3>(2)
     324 257:  -0.3544922
     324 287:  -0.3544922
     324 317:  0.2658691
-DEAL::Testing FE_Q<3>(QIterated(QTrapez(),5)) vs. FE_Q<3>(QIterated(QTrapez(),3))
+DEAL::Testing FE_Q<3>(QIterated(QTrapezoid(),5)) vs. FE_Q<3>(QIterated(QTrapezoid(),3))
     10 8:  -1.500000
     10 9:  2.000000
     10 212:  0.4000000
@@ -9677,7 +9677,7 @@ DEAL::Testing FE_Q<3>(QIterated(QTrapez(),5)) vs. FE_Q<3>(QIterated(QTrapez(),3)
     507 324:  0.2724239
     507 408:  0.2724239
     507 492:  0.2270199
-DEAL::Testing FE_Q<3>(QIterated(QTrapez(),5)) vs. FE_Q<3>(QIterated(QTrapez(),4))
+DEAL::Testing FE_Q<3>(QIterated(QTrapezoid(),5)) vs. FE_Q<3>(QIterated(QTrapezoid(),4))
     11 8:  1.000000
     11 9:  -2.000000
     11 10:  2.000000
@@ -11118,7 +11118,7 @@ DEAL::Testing FE_Q<3>(QIterated(QTrapez(),5)) vs. FE_Q<3>(QIterated(QTrapez(),4)
     822 437:  -0.09226474
     822 617:  -0.09226474
     822 797:  0.1614633
-DEAL::Testing FE_Q<3>(QIterated(QTrapez(),5)) vs. FE_Q<3>(QIterated(QTrapez(),5))
+DEAL::Testing FE_Q<3>(QIterated(QTrapezoid(),5)) vs. FE_Q<3>(QIterated(QTrapezoid(),5))
     217 1:  0.01171875
     217 3:  0.01171875
     217 12:  -0.09765625

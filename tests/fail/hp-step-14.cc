@@ -189,7 +189,7 @@ namespace Evaluation
   {
     double point_derivative = 0;
 
-    QTrapez<dim>                vertex_quadrature;
+    QTrapezoid<dim>             vertex_quadrature;
     hp::FEValues<dim>           fe_values(dof_handler.get_fe(),
                                 vertex_quadrature,
                                 update_gradients | update_quadrature_points);

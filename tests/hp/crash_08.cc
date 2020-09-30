@@ -69,7 +69,7 @@ main()
   hp::FECollection<2> fe;
   fe.push_back(FE_Q<2>(1));
   fe.push_back(FE_Q<2>(2));
-  fe.push_back(FE_Q<2>(QIterated<1>(QTrapez<1>(), 3)));
+  fe.push_back(FE_Q<2>(QIterated<1>(QTrapezoid<1>(), 3)));
 
   hp::DoFHandler<2> dof_handler(triangulation);
 

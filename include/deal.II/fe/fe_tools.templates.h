@@ -2622,11 +2622,12 @@ namespace FETools
                     // find sub-quadrature
                     position = name.find('(');
                     const std::string subquadrature_name(name, 0, position);
-                    AssertThrow(subquadrature_name.compare("QTrapez") == 0,
+                    AssertThrow(subquadrature_name == "QTrapez" ||
+                                  subquadrature_name == "QTrapezoid",
                                 ExcNotImplemented(
                                   "Could not detect quadrature of name " +
                                   subquadrature_name));
-                    // delete "QTrapez(),"
+                    // delete "QTrapezoid(),"
                     name.erase(0, position + 3);
                     const std::pair<int, unsigned int> tmp =
                       Utilities::get_integer_at_position(name, 0);
@@ -2637,7 +2638,7 @@ namespace FETools
                     const FETools::FEFactoryBase<dim, spacedim> *fef =
                       dynamic_cast<
                         const FETools::FEFactoryBase<dim, spacedim> *>(ptr);
-                    return fef->get(QIterated<1>(QTrapez<1>(), tmp.first));
+                    return fef->get(QIterated<1>(QTrapezoid<1>(), tmp.first));
                   }
                 else
                   {

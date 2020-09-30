@@ -112,9 +112,9 @@ test(VectorTools::NormType norm, double value, double exp = 2.0)
 
   Vector<double>       cellwise_errors(tria.n_active_cells());
   hp::QCollection<dim> quadrature;
-  quadrature.push_back(QIterated<dim>(QTrapez<1>(), 5));
-  quadrature.push_back(QIterated<dim>(QTrapez<1>(), 6));
-  quadrature.push_back(QIterated<dim>(QTrapez<1>(), 7));
+  quadrature.push_back(QIterated<dim>(QTrapezoid<1>(), 5));
+  quadrature.push_back(QIterated<dim>(QTrapezoid<1>(), 6));
+  quadrature.push_back(QIterated<dim>(QTrapezoid<1>(), 7));
 
   const dealii::Function<dim, double> *w = nullptr;
   VectorTools::integrate_difference(dofh,

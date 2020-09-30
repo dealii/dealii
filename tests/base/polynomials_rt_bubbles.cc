@@ -29,7 +29,7 @@ template <int dim>
 void
 plot(const PolynomialsRT_Bubbles<dim> &poly)
 {
-  QTrapez<1>                  base_quadrature;
+  QTrapezoid<1>               base_quadrature;
   QIterated<dim>              quadrature(base_quadrature, poly.degree() + 2);
   std::vector<Tensor<1, dim>> values(poly.n());
   std::vector<Tensor<2, dim>> grads;

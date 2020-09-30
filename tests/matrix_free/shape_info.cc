@@ -103,9 +103,9 @@ main()
   test(FE_DGQHermite<2>(25), gauss8);
   test(FE_DGQHermite<2>(45), gauss8);
 
-  test(FE_DGQArbitraryNodes<2>(QIterated<1>(QTrapez<1>(), 1)), gauss3);
-  test(FE_DGQArbitraryNodes<3>(QIterated<1>(QTrapez<1>(), 6)), gauss3);
-  test(FE_DGQArbitraryNodes<2>(QIterated<1>(QTrapez<1>(), 13)), gauss8);
+  test(FE_DGQArbitraryNodes<2>(QIterated<1>(QTrapezoid<1>(), 1)), gauss3);
+  test(FE_DGQArbitraryNodes<3>(QIterated<1>(QTrapezoid<1>(), 6)), gauss3);
+  test(FE_DGQArbitraryNodes<2>(QIterated<1>(QTrapezoid<1>(), 13)), gauss8);
   test(FE_DGQArbitraryNodes<2>(QGauss<1>(8)), gauss8);
   test(FE_DGQArbitraryNodes<2>(QGauss<1>(6)), gauss8);
 

@@ -160,7 +160,7 @@ check()
 {
   FE_Q<dim, spacedim> fe_1(1);
   FE_Q<dim, spacedim> fe_2(2);
-  FE_Q<dim, spacedim> fe_3(QIterated<1>(QTrapez<1>(), 3));
+  FE_Q<dim, spacedim> fe_3(QIterated<1>(QTrapezoid<1>(), 3));
 
   hp::FECollection<dim, spacedim> fe_coll2;
   fe_coll2.push_back(fe_3);

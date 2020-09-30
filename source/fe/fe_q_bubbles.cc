@@ -315,7 +315,7 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
     {
       if (this->degree > 3)
         namebuf << "FE_Q_Bubbles<" << Utilities::dim_string(dim, spacedim)
-                << ">(QIterated(QTrapez()," << this->degree - 1 << "))";
+                << ">(QIterated(QTrapezoid()," << this->degree - 1 << "))";
       else
         namebuf << "FE_Q_Bubbles<" << Utilities::dim_string(dim, spacedim)
                 << ">(" << this->degree - 1 << ")";

@@ -67,7 +67,7 @@ main()
     test(fe);
   }
   {
-    QIterated<1>               quadrature(QTrapez<1>(), 3);
+    QIterated<1>               quadrature(QTrapezoid<1>(), 3);
     FE_DGQArbitraryNodes<2, 3> fe(quadrature);
     test(fe);
   }

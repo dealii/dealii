@@ -45,8 +45,8 @@ test()
   hp::DoFHandler<dim>       dof_handler(triangulation);
   AffineConstraints<double> hanging_node_constraints;
 
-  FE_Q<dim> fe_1(1), fe_2(2), fe_3(QIterated<1>(QTrapez<1>(), 3)),
-    fe_4(QIterated<1>(QTrapez<1>(), 4));
+  FE_Q<dim> fe_1(1), fe_2(2), fe_3(QIterated<1>(QTrapezoid<1>(), 3)),
+    fe_4(QIterated<1>(QTrapezoid<1>(), 4));
 
   fe.push_back(fe_1);
   fe.push_back(fe_2);
