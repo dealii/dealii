@@ -44,6 +44,8 @@ QuadratureSelector<dim>::create_quadrature(const std::string &s,
         return QMilne<dim>();
       else if (s == "simpson")
         return QSimpson<dim>();
+      // The following name is DEAL_II_DEPRECATED and should be
+      // removed once the 'using' declaration is removed.
       else if (s == "trapez")
         return QTrapezoid<dim>();
       else if (s == "trapezoid")
