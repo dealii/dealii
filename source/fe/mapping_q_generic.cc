@@ -1165,7 +1165,54 @@ namespace internal
         const std::vector<unsigned int> &                   renumber,
         const Point<dim> &                                  p)
       {
+        static_assert(dim >= 1 && dim <= 3, "Only dim=1,2,3 implemented");
+
         const unsigned int n_shapes = poly.size();
+
+        // shortcut for linear interpolation to speed up evaluation
+        if (n_shapes == 2)
+          {
+            if (dim == 1)
+              {
+                Tensor<2, spacedim> derivative;
+                derivative[0] = points[1] - points[0];
+                return std::make_pair((1. - p[0]) * points[0] +
+                                        p[0] * points[1],
+                                      derivative);
+              }
+            else if (dim == 2)
+              {
+                const double          x0 = 1. - p[0], x1 = p[0];
+                const Point<spacedim> tmp0   = x0 * points[0] + x1 * points[1];
+                const Point<spacedim> tmp1   = x0 * points[2] + x1 * points[3];
+                const Point<spacedim> mapped = (1. - p[1]) * tmp0 + p[1] * tmp1;
+                Tensor<2, spacedim>   derivative;
+                derivative[0] = (1. - p[1]) * (points[1] - points[0]) +
+                                p[1] * (points[3] - points[2]);
+                derivative[1] = tmp1 - tmp0;
+                return std::make_pair(mapped, transpose(derivative));
+              }
+            else if (dim == 3)
+              {
+                const double x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1],
+                             y1 = p[1], z0 = 1. - p[2], z1 = p[2];
+                const Point<spacedim> tmp0   = x0 * points[0] + x1 * points[1];
+                const Point<spacedim> tmp1   = x0 * points[2] + x1 * points[3];
+                const Point<spacedim> tmpy0  = y0 * tmp0 + y1 * tmp1;
+                const Point<spacedim> tmp2   = x0 * points[4] + x1 * points[5];
+                const Point<spacedim> tmp3   = x0 * points[6] + x1 * points[7];
+                const Point<spacedim> tmpy1  = y0 * tmp2 + y1 * tmp3;
+                const Point<spacedim> mapped = z0 * tmpy0 + z1 * tmpy1;
+                Tensor<2, spacedim>   derivative;
+                derivative[2] = tmpy1 - tmpy0;
+                derivative[1] = z0 * (tmp1 - tmp0) + z1 * (tmp3 - tmp2);
+                derivative[0] = z0 * (y0 * (points[1] - points[0]) +
+                                      y1 * (points[3] - points[2])) +
+                                z1 * (y0 * (points[5] - points[4]) +
+                                      y1 * (points[7] - points[6]));
+                return std::make_pair(mapped, transpose(derivative));
+              }
+          }
 
         // Put up to 32 shape functions per dimension on stack, else on heap
         boost::container::small_vector<double, 64 * dim> shapes(2 * dim *
