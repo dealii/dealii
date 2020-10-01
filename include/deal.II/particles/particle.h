@@ -457,7 +457,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   template <class Archive>
-  void
+  inline void
   Particle<dim, spacedim>::load(Archive &ar, const unsigned int)
   {
     unsigned int n_properties = 0;
@@ -471,9 +471,11 @@ namespace Particles
       }
   }
 
+
+
   template <int dim, int spacedim>
   template <class Archive>
-  void
+  inline void
   Particle<dim, spacedim>::save(Archive &ar, const unsigned int) const
   {
     unsigned int n_properties = 0;
@@ -486,6 +488,91 @@ namespace Particles
     if (n_properties > 0)
       ar &boost::serialization::make_array(properties, n_properties);
   }
+
+
+
+  template <int dim, int spacedim>
+  inline void
+  Particle<dim, spacedim>::set_location(const Point<spacedim> &new_loc)
+  {
+    location = new_loc;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline const Point<spacedim> &
+  Particle<dim, spacedim>::get_location() const
+  {
+    return location;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline void
+  Particle<dim, spacedim>::set_reference_location(const Point<dim> &new_loc)
+  {
+    reference_location = new_loc;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline const Point<dim> &
+  Particle<dim, spacedim>::get_reference_location() const
+  {
+    return reference_location;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline types::particle_index
+  Particle<dim, spacedim>::get_id() const
+  {
+    return id;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline void
+  Particle<dim, spacedim>::set_id(const types::particle_index &new_id)
+  {
+    id = new_id;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline void
+  Particle<dim, spacedim>::set_property_pool(PropertyPool &new_property_pool)
+  {
+    property_pool = &new_property_pool;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline const ArrayView<const double>
+  Particle<dim, spacedim>::get_properties() const
+  {
+    Assert(has_properties(), ExcInternalError());
+
+    return property_pool->get_properties(properties);
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline bool
+  Particle<dim, spacedim>::has_properties() const
+  {
+    return (property_pool != nullptr) &&
+           (properties != PropertyPool::invalid_handle);
+  }
+
 } // namespace Particles
 
 DEAL_II_NAMESPACE_CLOSE

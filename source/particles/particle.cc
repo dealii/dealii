@@ -229,69 +229,6 @@ namespace Particles
 
   template <int dim, int spacedim>
   void
-  Particle<dim, spacedim>::set_location(const Point<spacedim> &new_loc)
-  {
-    location = new_loc;
-  }
-
-
-
-  template <int dim, int spacedim>
-  const Point<spacedim> &
-  Particle<dim, spacedim>::get_location() const
-  {
-    return location;
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  Particle<dim, spacedim>::set_reference_location(const Point<dim> &new_loc)
-  {
-    reference_location = new_loc;
-  }
-
-
-
-  template <int dim, int spacedim>
-  const Point<dim> &
-  Particle<dim, spacedim>::get_reference_location() const
-  {
-    return reference_location;
-  }
-
-
-
-  template <int dim, int spacedim>
-  types::particle_index
-  Particle<dim, spacedim>::get_id() const
-  {
-    return id;
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  Particle<dim, spacedim>::set_id(const types::particle_index &new_id)
-  {
-    id = new_id;
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  Particle<dim, spacedim>::set_property_pool(PropertyPool &new_property_pool)
-  {
-    property_pool = &new_property_pool;
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
   Particle<dim, spacedim>::set_properties(
     const ArrayView<const double> &new_properties)
   {
@@ -321,17 +258,6 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  const ArrayView<const double>
-  Particle<dim, spacedim>::get_properties() const
-  {
-    Assert(has_properties(), ExcInternalError());
-
-    return property_pool->get_properties(properties);
-  }
-
-
-
-  template <int dim, int spacedim>
   const ArrayView<double>
   Particle<dim, spacedim>::get_properties()
   {
@@ -349,16 +275,6 @@ namespace Particles
       }
 
     return property_pool->get_properties(properties);
-  }
-
-
-
-  template <int dim, int spacedim>
-  bool
-  Particle<dim, spacedim>::has_properties() const
-  {
-    return (property_pool != nullptr) &&
-           (properties != PropertyPool::invalid_handle);
   }
 } // namespace Particles
 
