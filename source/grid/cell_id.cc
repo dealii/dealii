@@ -97,6 +97,14 @@ CellId::CellId(const CellId::binary_type &binary_representation)
 
 
 
+CellId::CellId(const std::string &string_representation)
+{
+  std::istringstream ss(string_representation);
+  ss >> *this;
+}
+
+
+
 template <int dim>
 CellId::binary_type
 CellId::to_binary() const
