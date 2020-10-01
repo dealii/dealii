@@ -49,9 +49,9 @@ test1()
   B.precede(C);
 
   auto p =
-    taskflow.parallel_for(1, 11, 1, [&](int idx) { counter.fetch_add(idx); });
+    taskflow.for_each_index(1, 11, 1, [&](int idx) { counter.fetch_add(idx); });
 
-  C.precede(p.first);
+  C.precede(p);
 
   executor.run(taskflow).wait();
 
