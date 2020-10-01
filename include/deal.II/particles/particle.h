@@ -457,7 +457,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   template <class Archive>
-  void
+  inline void
   Particle<dim, spacedim>::load(Archive &ar, const unsigned int)
   {
     unsigned int n_properties = 0;
@@ -475,7 +475,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   template <class Archive>
-  void
+  inline void
   Particle<dim, spacedim>::save(Archive &ar, const unsigned int) const
   {
     unsigned int n_properties = 0;
@@ -492,7 +492,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  void
+  inline void
   Particle<dim, spacedim>::set_location(const Point<spacedim> &new_loc)
   {
     location = new_loc;
@@ -501,7 +501,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  const Point<spacedim> &
+  inline const Point<spacedim> &
   Particle<dim, spacedim>::get_location() const
   {
     return location;
@@ -510,7 +510,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  void
+  inline void
   Particle<dim, spacedim>::set_reference_location(const Point<dim> &new_loc)
   {
     reference_location = new_loc;
@@ -519,7 +519,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  const Point<dim> &
+  inline const Point<dim> &
   Particle<dim, spacedim>::get_reference_location() const
   {
     return reference_location;
@@ -528,7 +528,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  types::particle_index
+  inline types::particle_index
   Particle<dim, spacedim>::get_id() const
   {
     return id;
@@ -537,7 +537,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  void
+  inline void
   Particle<dim, spacedim>::set_id(const types::particle_index &new_id)
   {
     id = new_id;
@@ -546,7 +546,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  void
+  inline void
   Particle<dim, spacedim>::set_property_pool(PropertyPool &new_property_pool)
   {
     property_pool = &new_property_pool;
@@ -555,7 +555,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  const ArrayView<const double>
+  inline const ArrayView<const double>
   Particle<dim, spacedim>::get_properties() const
   {
     Assert(has_properties(), ExcInternalError());
@@ -566,7 +566,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  bool
+  inline bool
   Particle<dim, spacedim>::has_properties() const
   {
     return (property_pool != nullptr) &&

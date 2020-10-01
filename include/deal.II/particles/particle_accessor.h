@@ -293,8 +293,9 @@ namespace Particles
 
 
   // ------------------------- inline functions ------------------------------
+
   template <int dim, int spacedim>
-  ParticleAccessor<dim, spacedim>::ParticleAccessor()
+  inline ParticleAccessor<dim, spacedim>::ParticleAccessor()
     : map(nullptr)
     , particle()
   {}
@@ -302,7 +303,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  ParticleAccessor<dim, spacedim>::ParticleAccessor(
+  inline ParticleAccessor<dim, spacedim>::ParticleAccessor(
     const std::multimap<internal::LevelInd, Particle<dim, spacedim>> &map,
     const typename std::multimap<internal::LevelInd,
                                  Particle<dim, spacedim>>::iterator & particle)
@@ -314,7 +315,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  void
+  inline void
   ParticleAccessor<dim, spacedim>::write_data(void *&data) const
   {
     Assert(particle != map->end(), ExcInternalError());
@@ -325,7 +326,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  void
+  inline void
   ParticleAccessor<dim, spacedim>::set_location(const Point<spacedim> &new_loc)
   {
     Assert(particle != map->end(), ExcInternalError());
@@ -336,7 +337,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  const Point<spacedim> &
+  inline const Point<spacedim> &
   ParticleAccessor<dim, spacedim>::get_location() const
   {
     Assert(particle != map->end(), ExcInternalError());
@@ -347,7 +348,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  void
+  inline void
   ParticleAccessor<dim, spacedim>::set_reference_location(
     const Point<dim> &new_loc)
   {
@@ -359,7 +360,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  const Point<dim> &
+  inline const Point<dim> &
   ParticleAccessor<dim, spacedim>::get_reference_location() const
   {
     Assert(particle != map->end(), ExcInternalError());
@@ -370,7 +371,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  types::particle_index
+  inline types::particle_index
   ParticleAccessor<dim, spacedim>::get_id() const
   {
     Assert(particle != map->end(), ExcInternalError());
@@ -381,7 +382,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  void
+  inline void
   ParticleAccessor<dim, spacedim>::set_property_pool(
     PropertyPool &new_property_pool)
   {
@@ -393,7 +394,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  bool
+  inline bool
   ParticleAccessor<dim, spacedim>::has_properties() const
   {
     Assert(particle != map->end(), ExcInternalError());
@@ -404,7 +405,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  void
+  inline void
   ParticleAccessor<dim, spacedim>::set_properties(
     const std::vector<double> &new_properties)
   {
@@ -416,7 +417,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  void
+  inline void
   ParticleAccessor<dim, spacedim>::set_properties(
     const ArrayView<const double> &new_properties)
   {
@@ -428,7 +429,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  const ArrayView<const double>
+  inline const ArrayView<const double>
   ParticleAccessor<dim, spacedim>::get_properties() const
   {
     Assert(particle != map->end(), ExcInternalError());
@@ -439,7 +440,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  typename Triangulation<dim, spacedim>::cell_iterator
+  inline typename Triangulation<dim, spacedim>::cell_iterator
   ParticleAccessor<dim, spacedim>::get_surrounding_cell(
     const Triangulation<dim, spacedim> &triangulation) const
   {
@@ -453,7 +454,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  const ArrayView<double>
+  inline const ArrayView<double>
   ParticleAccessor<dim, spacedim>::get_properties()
   {
     Assert(particle != map->end(), ExcInternalError());
@@ -464,7 +465,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  std::size_t
+  inline std::size_t
   ParticleAccessor<dim, spacedim>::serialized_size_in_bytes() const
   {
     Assert(particle != map->end(), ExcInternalError());
@@ -475,7 +476,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  void
+  inline void
   ParticleAccessor<dim, spacedim>::next()
   {
     Assert(particle != map->end(), ExcInternalError());
@@ -485,7 +486,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  void
+  inline void
   ParticleAccessor<dim, spacedim>::prev()
   {
     Assert(particle != map->begin(), ExcInternalError());
@@ -495,7 +496,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  bool
+  inline bool
   ParticleAccessor<dim, spacedim>::
   operator!=(const ParticleAccessor<dim, spacedim> &other) const
   {
@@ -505,7 +506,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  bool
+  inline bool
   ParticleAccessor<dim, spacedim>::
   operator==(const ParticleAccessor<dim, spacedim> &other) const
   {

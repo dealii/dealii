@@ -145,7 +145,7 @@ namespace Particles
   // ------------------------------ inline functions -------------------------
 
   template <int dim, int spacedim>
-  ParticleIterator<dim, spacedim>::ParticleIterator(
+  inline ParticleIterator<dim, spacedim>::ParticleIterator(
     const std::multimap<internal::LevelInd, Particle<dim, spacedim>> &map,
     const typename std::multimap<internal::LevelInd,
                                  Particle<dim, spacedim>>::iterator & particle)
@@ -155,7 +155,8 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  ParticleAccessor<dim, spacedim> &ParticleIterator<dim, spacedim>::operator*()
+  inline ParticleAccessor<dim, spacedim> &ParticleIterator<dim, spacedim>::
+                                          operator*()
   {
     return accessor;
   }
@@ -163,7 +164,8 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  ParticleAccessor<dim, spacedim> *ParticleIterator<dim, spacedim>::operator->()
+  inline ParticleAccessor<dim, spacedim> *ParticleIterator<dim, spacedim>::
+                                          operator->()
   {
     return &(this->operator*());
   }
@@ -171,8 +173,8 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  const ParticleAccessor<dim, spacedim> &ParticleIterator<dim, spacedim>::
-                                         operator*() const
+  inline const ParticleAccessor<dim, spacedim> &
+    ParticleIterator<dim, spacedim>::operator*() const
   {
     return accessor;
   }
@@ -180,8 +182,8 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  const ParticleAccessor<dim, spacedim> *ParticleIterator<dim, spacedim>::
-                                         operator->() const
+  inline const ParticleAccessor<dim, spacedim> *
+    ParticleIterator<dim, spacedim>::operator->() const
   {
     return &(this->operator*());
   }
@@ -189,7 +191,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  bool
+  inline bool
   ParticleIterator<dim, spacedim>::
   operator!=(const ParticleIterator<dim, spacedim> &other) const
   {
@@ -199,7 +201,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  bool
+  inline bool
   ParticleIterator<dim, spacedim>::
   operator==(const ParticleIterator<dim, spacedim> &other) const
   {
@@ -209,7 +211,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  ParticleIterator<dim, spacedim> &
+  inline ParticleIterator<dim, spacedim> &
   ParticleIterator<dim, spacedim>::operator++()
   {
     accessor.next();
@@ -219,7 +221,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  ParticleIterator<dim, spacedim>
+  inline ParticleIterator<dim, spacedim>
   ParticleIterator<dim, spacedim>::operator++(int)
   {
     ParticleIterator tmp(*this);
@@ -231,7 +233,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  ParticleIterator<dim, spacedim> &
+  inline ParticleIterator<dim, spacedim> &
   ParticleIterator<dim, spacedim>::operator--()
   {
     accessor.prev();
@@ -241,7 +243,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  ParticleIterator<dim, spacedim>
+  inline ParticleIterator<dim, spacedim>
   ParticleIterator<dim, spacedim>::operator--(int)
   {
     ParticleIterator tmp(*this);
