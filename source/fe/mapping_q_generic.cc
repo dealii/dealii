@@ -201,424 +201,6 @@ namespace internal
         Assert(false, ExcInternalError());
         return Point<3>();
       }
-
-
-
-      template <int dim, int spacedim>
-      void
-      compute_shape_function_values_general(
-        const unsigned int             n_shape_functions,
-        const std::vector<Point<dim>> &unit_points,
-        typename dealii::MappingQGeneric<dim, spacedim>::InternalData &data)
-      {
-        const unsigned int n_points = unit_points.size();
-
-        // Construct the tensor product polynomials used as shape functions for
-        // the Qp mapping of cells at the boundary.
-        const TensorProductPolynomials<dim> tensor_pols(
-          Polynomials::generate_complete_Lagrange_basis(
-            data.line_support_points.get_points()));
-        Assert(n_shape_functions == tensor_pols.n(), ExcInternalError());
-
-        // then also construct the mapping from lexicographic to the Qp shape
-        // function numbering
-        const std::vector<unsigned int> renumber =
-          FETools::hierarchic_to_lexicographic_numbering<dim>(
-            data.polynomial_degree);
-
-        std::vector<double>         values;
-        std::vector<Tensor<1, dim>> grads;
-        if (data.shape_values.size() != 0)
-          {
-            Assert(data.shape_values.size() == n_shape_functions * n_points,
-                   ExcInternalError());
-            values.resize(n_shape_functions);
-          }
-        if (data.shape_derivatives.size() != 0)
-          {
-            Assert(data.shape_derivatives.size() ==
-                     n_shape_functions * n_points,
-                   ExcInternalError());
-            grads.resize(n_shape_functions);
-          }
-
-        std::vector<Tensor<2, dim>> grad2;
-        if (data.shape_second_derivatives.size() != 0)
-          {
-            Assert(data.shape_second_derivatives.size() ==
-                     n_shape_functions * n_points,
-                   ExcInternalError());
-            grad2.resize(n_shape_functions);
-          }
-
-        std::vector<Tensor<3, dim>> grad3;
-        if (data.shape_third_derivatives.size() != 0)
-          {
-            Assert(data.shape_third_derivatives.size() ==
-                     n_shape_functions * n_points,
-                   ExcInternalError());
-            grad3.resize(n_shape_functions);
-          }
-
-        std::vector<Tensor<4, dim>> grad4;
-        if (data.shape_fourth_derivatives.size() != 0)
-          {
-            Assert(data.shape_fourth_derivatives.size() ==
-                     n_shape_functions * n_points,
-                   ExcInternalError());
-            grad4.resize(n_shape_functions);
-          }
-
-
-        if (data.shape_values.size() != 0 ||
-            data.shape_derivatives.size() != 0 ||
-            data.shape_second_derivatives.size() != 0 ||
-            data.shape_third_derivatives.size() != 0 ||
-            data.shape_fourth_derivatives.size() != 0)
-          for (unsigned int point = 0; point < n_points; ++point)
-            {
-              tensor_pols.evaluate(
-                unit_points[point], values, grads, grad2, grad3, grad4);
-
-              if (data.shape_values.size() != 0)
-                for (unsigned int i = 0; i < n_shape_functions; ++i)
-                  data.shape(point, i) = values[renumber[i]];
-
-              if (data.shape_derivatives.size() != 0)
-                for (unsigned int i = 0; i < n_shape_functions; ++i)
-                  data.derivative(point, i) = grads[renumber[i]];
-
-              if (data.shape_second_derivatives.size() != 0)
-                for (unsigned int i = 0; i < n_shape_functions; ++i)
-                  data.second_derivative(point, i) = grad2[renumber[i]];
-
-              if (data.shape_third_derivatives.size() != 0)
-                for (unsigned int i = 0; i < n_shape_functions; ++i)
-                  data.third_derivative(point, i) = grad3[renumber[i]];
-
-              if (data.shape_fourth_derivatives.size() != 0)
-                for (unsigned int i = 0; i < n_shape_functions; ++i)
-                  data.fourth_derivative(point, i) = grad4[renumber[i]];
-            }
-      }
-
-
-      void
-      compute_shape_function_values_hardcode(
-        const unsigned int                           n_shape_functions,
-        const std::vector<Point<1>> &                unit_points,
-        dealii::MappingQGeneric<1, 1>::InternalData &data)
-      {
-        (void)n_shape_functions;
-        const unsigned int n_points = unit_points.size();
-        for (unsigned int k = 0; k < n_points; ++k)
-          {
-            double x = unit_points[k](0);
-
-            if (data.shape_values.size() != 0)
-              {
-                Assert(data.shape_values.size() == n_shape_functions * n_points,
-                       ExcInternalError());
-                data.shape(k, 0) = 1. - x;
-                data.shape(k, 1) = x;
-              }
-            if (data.shape_derivatives.size() != 0)
-              {
-                Assert(data.shape_derivatives.size() ==
-                         n_shape_functions * n_points,
-                       ExcInternalError());
-                data.derivative(k, 0)[0] = -1.;
-                data.derivative(k, 1)[0] = 1.;
-              }
-            if (data.shape_second_derivatives.size() != 0)
-              {
-                Assert(data.shape_second_derivatives.size() ==
-                         n_shape_functions * n_points,
-                       ExcInternalError());
-                data.second_derivative(k, 0)[0][0] = 0;
-                data.second_derivative(k, 1)[0][0] = 0;
-              }
-            if (data.shape_third_derivatives.size() != 0)
-              {
-                Assert(data.shape_third_derivatives.size() ==
-                         n_shape_functions * n_points,
-                       ExcInternalError());
-
-                Tensor<3, 1> zero;
-                data.third_derivative(k, 0) = zero;
-                data.third_derivative(k, 1) = zero;
-              }
-            if (data.shape_fourth_derivatives.size() != 0)
-              {
-                Assert(data.shape_fourth_derivatives.size() ==
-                         n_shape_functions * n_points,
-                       ExcInternalError());
-
-                Tensor<4, 1> zero;
-                data.fourth_derivative(k, 0) = zero;
-                data.fourth_derivative(k, 1) = zero;
-              }
-          }
-      }
-
-
-      void
-      compute_shape_function_values_hardcode(
-        const unsigned int                           n_shape_functions,
-        const std::vector<Point<2>> &                unit_points,
-        dealii::MappingQGeneric<2, 2>::InternalData &data)
-      {
-        (void)n_shape_functions;
-        const unsigned int n_points = unit_points.size();
-        for (unsigned int k = 0; k < n_points; ++k)
-          {
-            double x = unit_points[k](0);
-            double y = unit_points[k](1);
-
-            if (data.shape_values.size() != 0)
-              {
-                Assert(data.shape_values.size() == n_shape_functions * n_points,
-                       ExcInternalError());
-                data.shape(k, 0) = (1. - x) * (1. - y);
-                data.shape(k, 1) = x * (1. - y);
-                data.shape(k, 2) = (1. - x) * y;
-                data.shape(k, 3) = x * y;
-              }
-            if (data.shape_derivatives.size() != 0)
-              {
-                Assert(data.shape_derivatives.size() ==
-                         n_shape_functions * n_points,
-                       ExcInternalError());
-                data.derivative(k, 0)[0] = (y - 1.);
-                data.derivative(k, 1)[0] = (1. - y);
-                data.derivative(k, 2)[0] = -y;
-                data.derivative(k, 3)[0] = y;
-                data.derivative(k, 0)[1] = (x - 1.);
-                data.derivative(k, 1)[1] = -x;
-                data.derivative(k, 2)[1] = (1. - x);
-                data.derivative(k, 3)[1] = x;
-              }
-            if (data.shape_second_derivatives.size() != 0)
-              {
-                Assert(data.shape_second_derivatives.size() ==
-                         n_shape_functions * n_points,
-                       ExcInternalError());
-                data.second_derivative(k, 0)[0][0] = 0;
-                data.second_derivative(k, 1)[0][0] = 0;
-                data.second_derivative(k, 2)[0][0] = 0;
-                data.second_derivative(k, 3)[0][0] = 0;
-                data.second_derivative(k, 0)[0][1] = 1.;
-                data.second_derivative(k, 1)[0][1] = -1.;
-                data.second_derivative(k, 2)[0][1] = -1.;
-                data.second_derivative(k, 3)[0][1] = 1.;
-                data.second_derivative(k, 0)[1][0] = 1.;
-                data.second_derivative(k, 1)[1][0] = -1.;
-                data.second_derivative(k, 2)[1][0] = -1.;
-                data.second_derivative(k, 3)[1][0] = 1.;
-                data.second_derivative(k, 0)[1][1] = 0;
-                data.second_derivative(k, 1)[1][1] = 0;
-                data.second_derivative(k, 2)[1][1] = 0;
-                data.second_derivative(k, 3)[1][1] = 0;
-              }
-            if (data.shape_third_derivatives.size() != 0)
-              {
-                Assert(data.shape_third_derivatives.size() ==
-                         n_shape_functions * n_points,
-                       ExcInternalError());
-
-                Tensor<3, 2> zero;
-                for (unsigned int i = 0; i < 4; ++i)
-                  data.third_derivative(k, i) = zero;
-              }
-            if (data.shape_fourth_derivatives.size() != 0)
-              {
-                Assert(data.shape_fourth_derivatives.size() ==
-                         n_shape_functions * n_points,
-                       ExcInternalError());
-                Tensor<4, 2> zero;
-                for (unsigned int i = 0; i < 4; ++i)
-                  data.fourth_derivative(k, i) = zero;
-              }
-          }
-      }
-
-
-
-      void
-      compute_shape_function_values_hardcode(
-        const unsigned int                           n_shape_functions,
-        const std::vector<Point<3>> &                unit_points,
-        dealii::MappingQGeneric<3, 3>::InternalData &data)
-      {
-        (void)n_shape_functions;
-        const unsigned int n_points = unit_points.size();
-        for (unsigned int k = 0; k < n_points; ++k)
-          {
-            double x = unit_points[k](0);
-            double y = unit_points[k](1);
-            double z = unit_points[k](2);
-
-            if (data.shape_values.size() != 0)
-              {
-                Assert(data.shape_values.size() == n_shape_functions * n_points,
-                       ExcInternalError());
-                data.shape(k, 0) = (1. - x) * (1. - y) * (1. - z);
-                data.shape(k, 1) = x * (1. - y) * (1. - z);
-                data.shape(k, 2) = (1. - x) * y * (1. - z);
-                data.shape(k, 3) = x * y * (1. - z);
-                data.shape(k, 4) = (1. - x) * (1. - y) * z;
-                data.shape(k, 5) = x * (1. - y) * z;
-                data.shape(k, 6) = (1. - x) * y * z;
-                data.shape(k, 7) = x * y * z;
-              }
-            if (data.shape_derivatives.size() != 0)
-              {
-                Assert(data.shape_derivatives.size() ==
-                         n_shape_functions * n_points,
-                       ExcInternalError());
-                data.derivative(k, 0)[0] = (y - 1.) * (1. - z);
-                data.derivative(k, 1)[0] = (1. - y) * (1. - z);
-                data.derivative(k, 2)[0] = -y * (1. - z);
-                data.derivative(k, 3)[0] = y * (1. - z);
-                data.derivative(k, 4)[0] = (y - 1.) * z;
-                data.derivative(k, 5)[0] = (1. - y) * z;
-                data.derivative(k, 6)[0] = -y * z;
-                data.derivative(k, 7)[0] = y * z;
-                data.derivative(k, 0)[1] = (x - 1.) * (1. - z);
-                data.derivative(k, 1)[1] = -x * (1. - z);
-                data.derivative(k, 2)[1] = (1. - x) * (1. - z);
-                data.derivative(k, 3)[1] = x * (1. - z);
-                data.derivative(k, 4)[1] = (x - 1.) * z;
-                data.derivative(k, 5)[1] = -x * z;
-                data.derivative(k, 6)[1] = (1. - x) * z;
-                data.derivative(k, 7)[1] = x * z;
-                data.derivative(k, 0)[2] = (x - 1) * (1. - y);
-                data.derivative(k, 1)[2] = x * (y - 1.);
-                data.derivative(k, 2)[2] = (x - 1.) * y;
-                data.derivative(k, 3)[2] = -x * y;
-                data.derivative(k, 4)[2] = (1. - x) * (1. - y);
-                data.derivative(k, 5)[2] = x * (1. - y);
-                data.derivative(k, 6)[2] = (1. - x) * y;
-                data.derivative(k, 7)[2] = x * y;
-              }
-            if (data.shape_second_derivatives.size() != 0)
-              {
-                Assert(data.shape_second_derivatives.size() ==
-                         n_shape_functions * n_points,
-                       ExcInternalError());
-                data.second_derivative(k, 0)[0][0] = 0;
-                data.second_derivative(k, 1)[0][0] = 0;
-                data.second_derivative(k, 2)[0][0] = 0;
-                data.second_derivative(k, 3)[0][0] = 0;
-                data.second_derivative(k, 4)[0][0] = 0;
-                data.second_derivative(k, 5)[0][0] = 0;
-                data.second_derivative(k, 6)[0][0] = 0;
-                data.second_derivative(k, 7)[0][0] = 0;
-                data.second_derivative(k, 0)[1][1] = 0;
-                data.second_derivative(k, 1)[1][1] = 0;
-                data.second_derivative(k, 2)[1][1] = 0;
-                data.second_derivative(k, 3)[1][1] = 0;
-                data.second_derivative(k, 4)[1][1] = 0;
-                data.second_derivative(k, 5)[1][1] = 0;
-                data.second_derivative(k, 6)[1][1] = 0;
-                data.second_derivative(k, 7)[1][1] = 0;
-                data.second_derivative(k, 0)[2][2] = 0;
-                data.second_derivative(k, 1)[2][2] = 0;
-                data.second_derivative(k, 2)[2][2] = 0;
-                data.second_derivative(k, 3)[2][2] = 0;
-                data.second_derivative(k, 4)[2][2] = 0;
-                data.second_derivative(k, 5)[2][2] = 0;
-                data.second_derivative(k, 6)[2][2] = 0;
-                data.second_derivative(k, 7)[2][2] = 0;
-
-                data.second_derivative(k, 0)[0][1] = (1. - z);
-                data.second_derivative(k, 1)[0][1] = -(1. - z);
-                data.second_derivative(k, 2)[0][1] = -(1. - z);
-                data.second_derivative(k, 3)[0][1] = (1. - z);
-                data.second_derivative(k, 4)[0][1] = z;
-                data.second_derivative(k, 5)[0][1] = -z;
-                data.second_derivative(k, 6)[0][1] = -z;
-                data.second_derivative(k, 7)[0][1] = z;
-                data.second_derivative(k, 0)[1][0] = (1. - z);
-                data.second_derivative(k, 1)[1][0] = -(1. - z);
-                data.second_derivative(k, 2)[1][0] = -(1. - z);
-                data.second_derivative(k, 3)[1][0] = (1. - z);
-                data.second_derivative(k, 4)[1][0] = z;
-                data.second_derivative(k, 5)[1][0] = -z;
-                data.second_derivative(k, 6)[1][0] = -z;
-                data.second_derivative(k, 7)[1][0] = z;
-
-                data.second_derivative(k, 0)[0][2] = (1. - y);
-                data.second_derivative(k, 1)[0][2] = -(1. - y);
-                data.second_derivative(k, 2)[0][2] = y;
-                data.second_derivative(k, 3)[0][2] = -y;
-                data.second_derivative(k, 4)[0][2] = -(1. - y);
-                data.second_derivative(k, 5)[0][2] = (1. - y);
-                data.second_derivative(k, 6)[0][2] = -y;
-                data.second_derivative(k, 7)[0][2] = y;
-                data.second_derivative(k, 0)[2][0] = (1. - y);
-                data.second_derivative(k, 1)[2][0] = -(1. - y);
-                data.second_derivative(k, 2)[2][0] = y;
-                data.second_derivative(k, 3)[2][0] = -y;
-                data.second_derivative(k, 4)[2][0] = -(1. - y);
-                data.second_derivative(k, 5)[2][0] = (1. - y);
-                data.second_derivative(k, 6)[2][0] = -y;
-                data.second_derivative(k, 7)[2][0] = y;
-
-                data.second_derivative(k, 0)[1][2] = (1. - x);
-                data.second_derivative(k, 1)[1][2] = x;
-                data.second_derivative(k, 2)[1][2] = -(1. - x);
-                data.second_derivative(k, 3)[1][2] = -x;
-                data.second_derivative(k, 4)[1][2] = -(1. - x);
-                data.second_derivative(k, 5)[1][2] = -x;
-                data.second_derivative(k, 6)[1][2] = (1. - x);
-                data.second_derivative(k, 7)[1][2] = x;
-                data.second_derivative(k, 0)[2][1] = (1. - x);
-                data.second_derivative(k, 1)[2][1] = x;
-                data.second_derivative(k, 2)[2][1] = -(1. - x);
-                data.second_derivative(k, 3)[2][1] = -x;
-                data.second_derivative(k, 4)[2][1] = -(1. - x);
-                data.second_derivative(k, 5)[2][1] = -x;
-                data.second_derivative(k, 6)[2][1] = (1. - x);
-                data.second_derivative(k, 7)[2][1] = x;
-              }
-            if (data.shape_third_derivatives.size() != 0)
-              {
-                Assert(data.shape_third_derivatives.size() ==
-                         n_shape_functions * n_points,
-                       ExcInternalError());
-
-                for (unsigned int i = 0; i < 3; ++i)
-                  for (unsigned int j = 0; j < 3; ++j)
-                    for (unsigned int l = 0; l < 3; ++l)
-                      if ((i == j) || (j == l) || (l == i))
-                        {
-                          for (unsigned int m = 0; m < 8; ++m)
-                            data.third_derivative(k, m)[i][j][l] = 0;
-                        }
-                      else
-                        {
-                          data.third_derivative(k, 0)[i][j][l] = -1.;
-                          data.third_derivative(k, 1)[i][j][l] = 1.;
-                          data.third_derivative(k, 2)[i][j][l] = 1.;
-                          data.third_derivative(k, 3)[i][j][l] = -1.;
-                          data.third_derivative(k, 4)[i][j][l] = 1.;
-                          data.third_derivative(k, 5)[i][j][l] = -1.;
-                          data.third_derivative(k, 6)[i][j][l] = -1.;
-                          data.third_derivative(k, 7)[i][j][l] = 1.;
-                        }
-              }
-            if (data.shape_fourth_derivatives.size() != 0)
-              {
-                Assert(data.shape_fourth_derivatives.size() ==
-                         n_shape_functions * n_points,
-                       ExcInternalError());
-                Tensor<4, 3> zero;
-                for (unsigned int i = 0; i < 8; ++i)
-                  data.fourth_derivative(k, i) = zero;
-              }
-          }
-      }
     } // namespace
   }   // namespace MappingQ1
 } // namespace internal
@@ -842,70 +424,96 @@ MappingQGeneric<dim, spacedim>::InternalData::initialize_face(
 
 
 
-template <>
-void
-MappingQGeneric<1, 1>::InternalData::compute_shape_function_values(
-  const std::vector<Point<1>> &unit_points)
-{
-  // if the polynomial degree is one, then we can simplify code a bit
-  // by using hard-coded shape functions.
-  if (polynomial_degree == 1)
-    internal::MappingQ1::compute_shape_function_values_hardcode(
-      n_shape_functions, unit_points, *this);
-  else
-    {
-      // otherwise ask an object that describes the polynomial space
-      internal::MappingQ1::compute_shape_function_values_general<1, 1>(
-        n_shape_functions, unit_points, *this);
-    }
-}
-
-template <>
-void
-MappingQGeneric<2, 2>::InternalData::compute_shape_function_values(
-  const std::vector<Point<2>> &unit_points)
-{
-  // if the polynomial degree is one, then we can simplify code a bit
-  // by using hard-coded shape functions.
-  if (polynomial_degree == 1)
-    internal::MappingQ1::compute_shape_function_values_hardcode(
-      n_shape_functions, unit_points, *this);
-  else
-    {
-      // otherwise ask an object that describes the polynomial space
-      internal::MappingQ1::compute_shape_function_values_general<2, 2>(
-        n_shape_functions, unit_points, *this);
-    }
-}
-
-template <>
-void
-MappingQGeneric<3, 3>::InternalData::compute_shape_function_values(
-  const std::vector<Point<3>> &unit_points)
-{
-  // if the polynomial degree is one, then we can simplify code a bit
-  // by using hard-coded shape functions.
-  if (polynomial_degree == 1)
-    internal::MappingQ1::compute_shape_function_values_hardcode(
-      n_shape_functions, unit_points, *this);
-  else
-    {
-      // otherwise ask an object that describes the polynomial space
-      internal::MappingQ1::compute_shape_function_values_general<3, 3>(
-        n_shape_functions, unit_points, *this);
-    }
-}
-
 template <int dim, int spacedim>
 void
 MappingQGeneric<dim, spacedim>::InternalData::compute_shape_function_values(
   const std::vector<Point<dim>> &unit_points)
 {
-  // for non-matching combinations of dim and spacedim, just run the general
-  // case
-  internal::MappingQ1::compute_shape_function_values_general<dim, spacedim>(
-    n_shape_functions, unit_points, *this);
+  const unsigned int n_points = unit_points.size();
+
+  // Construct the tensor product polynomials used as shape functions for
+  // the Qp mapping of cells at the boundary.
+  const TensorProductPolynomials<dim> tensor_pols(
+    Polynomials::generate_complete_Lagrange_basis(
+      line_support_points.get_points()));
+  Assert(n_shape_functions == tensor_pols.n(), ExcInternalError());
+
+  // then also construct the mapping from lexicographic to the Qp shape
+  // function numbering
+  const std::vector<unsigned int> renumber =
+    FETools::hierarchic_to_lexicographic_numbering<dim>(polynomial_degree);
+
+  std::vector<double>         values;
+  std::vector<Tensor<1, dim>> grads;
+  if (shape_values.size() != 0)
+    {
+      Assert(shape_values.size() == n_shape_functions * n_points,
+             ExcInternalError());
+      values.resize(n_shape_functions);
+    }
+  if (shape_derivatives.size() != 0)
+    {
+      Assert(shape_derivatives.size() == n_shape_functions * n_points,
+             ExcInternalError());
+      grads.resize(n_shape_functions);
+    }
+
+  std::vector<Tensor<2, dim>> grad2;
+  if (shape_second_derivatives.size() != 0)
+    {
+      Assert(shape_second_derivatives.size() == n_shape_functions * n_points,
+             ExcInternalError());
+      grad2.resize(n_shape_functions);
+    }
+
+  std::vector<Tensor<3, dim>> grad3;
+  if (shape_third_derivatives.size() != 0)
+    {
+      Assert(shape_third_derivatives.size() == n_shape_functions * n_points,
+             ExcInternalError());
+      grad3.resize(n_shape_functions);
+    }
+
+  std::vector<Tensor<4, dim>> grad4;
+  if (shape_fourth_derivatives.size() != 0)
+    {
+      Assert(shape_fourth_derivatives.size() == n_shape_functions * n_points,
+             ExcInternalError());
+      grad4.resize(n_shape_functions);
+    }
+
+
+  if (shape_values.size() != 0 || shape_derivatives.size() != 0 ||
+      shape_second_derivatives.size() != 0 ||
+      shape_third_derivatives.size() != 0 ||
+      shape_fourth_derivatives.size() != 0)
+    for (unsigned int point = 0; point < n_points; ++point)
+      {
+        tensor_pols.evaluate(
+          unit_points[point], values, grads, grad2, grad3, grad4);
+
+        if (shape_values.size() != 0)
+          for (unsigned int i = 0; i < n_shape_functions; ++i)
+            shape(point, i) = values[renumber[i]];
+
+        if (shape_derivatives.size() != 0)
+          for (unsigned int i = 0; i < n_shape_functions; ++i)
+            derivative(point, i) = grads[renumber[i]];
+
+        if (shape_second_derivatives.size() != 0)
+          for (unsigned int i = 0; i < n_shape_functions; ++i)
+            second_derivative(point, i) = grad2[renumber[i]];
+
+        if (shape_third_derivatives.size() != 0)
+          for (unsigned int i = 0; i < n_shape_functions; ++i)
+            third_derivative(point, i) = grad3[renumber[i]];
+
+        if (shape_fourth_derivatives.size() != 0)
+          for (unsigned int i = 0; i < n_shape_functions; ++i)
+            fourth_derivative(point, i) = grad4[renumber[i]];
+      }
 }
+
 
 
 namespace internal
