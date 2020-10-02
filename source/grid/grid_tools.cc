@@ -188,6 +188,122 @@ namespace GridTools
 
 
 
+  namespace
+  {
+    /**
+     * The algorithm to compute the affine approximation to a cell finds an
+     * affine map A x_hat + b from the reference cell to the real space.
+     *
+     * Some details about how we compute the least square plane. We look
+     * for a spacedim x (dim + 1) matrix X such that X * M = Y where M is
+     * a (dim+1) x n_vertices matrix and Y a spacedim x n_vertices.  And:
+     * The i-th column of M is unit_vertex[i] and the last row all
+     * 1's. The i-th column of Y is real_vertex[i].  If we split X=[A|b],
+     * the least square approx is A x_hat+b Classically X = Y * (M^t (M
+     * M^t)^{-1}) Let K = M^t * (M M^t)^{-1} = [KA Kb] this can be
+     * precomputed, and that is exactly what we do.  Finally A = Y*KA and
+     * b = Y*Kb.
+     */
+    template <int dim>
+    struct TransformR2UAffine
+    {
+      static const double KA[GeometryInfo<dim>::vertices_per_cell][dim];
+      static const double Kb[GeometryInfo<dim>::vertices_per_cell];
+    };
+
+
+    /*
+      Octave code:
+      M=[0 1; 1 1];
+      K1 = transpose(M) * inverse (M*transpose(M));
+      printf ("{%f, %f},\n", K1' );
+    */
+    template <>
+    const double TransformR2UAffine<1>::KA[GeometryInfo<1>::vertices_per_cell]
+                                          [1] = {{-1.000000}, {1.000000}};
+
+    template <>
+    const double TransformR2UAffine<1>::Kb[GeometryInfo<1>::vertices_per_cell] =
+      {1.000000, 0.000000};
+
+
+    /*
+      Octave code:
+      M=[0 1 0 1;0 0 1 1;1 1 1 1];
+      K2 = transpose(M) * inverse (M*transpose(M));
+      printf ("{%f, %f, %f},\n", K2' );
+    */
+    template <>
+    const double TransformR2UAffine<2>::KA[GeometryInfo<2>::vertices_per_cell]
+                                          [2] = {{-0.500000, -0.500000},
+                                                 {0.500000, -0.500000},
+                                                 {-0.500000, 0.500000},
+                                                 {0.500000, 0.500000}};
+
+    /*
+      Octave code:
+      M=[0 1 0 1 0 1 0 1;0 0 1 1 0 0 1 1; 0 0 0 0 1 1 1 1; 1 1 1 1 1 1 1 1];
+      K3 = transpose(M) * inverse (M*transpose(M))
+      printf ("{%f, %f, %f, %f},\n", K3' );
+    */
+    template <>
+    const double TransformR2UAffine<2>::Kb[GeometryInfo<2>::vertices_per_cell] =
+      {0.750000, 0.250000, 0.250000, -0.250000};
+
+
+    template <>
+    const double TransformR2UAffine<3>::KA[GeometryInfo<3>::vertices_per_cell]
+                                          [3] = {
+                                            {-0.250000, -0.250000, -0.250000},
+                                            {0.250000, -0.250000, -0.250000},
+                                            {-0.250000, 0.250000, -0.250000},
+                                            {0.250000, 0.250000, -0.250000},
+                                            {-0.250000, -0.250000, 0.250000},
+                                            {0.250000, -0.250000, 0.250000},
+                                            {-0.250000, 0.250000, 0.250000},
+                                            {0.250000, 0.250000, 0.250000}
+
+    };
+
+
+    template <>
+    const double TransformR2UAffine<3>::Kb[GeometryInfo<3>::vertices_per_cell] =
+      {0.500000,
+       0.250000,
+       0.250000,
+       0.000000,
+       0.250000,
+       0.000000,
+       0.000000,
+       -0.250000};
+  } // namespace
+
+
+
+  template <int dim, int spacedim>
+  std::pair<DerivativeForm<1, dim, spacedim>, Tensor<1, spacedim>>
+  affine_cell_approximation(const ArrayView<const Point<spacedim>> &vertices)
+  {
+    AssertDimension(vertices.size(), GeometryInfo<dim>::vertices_per_cell);
+
+    // A = vertex * KA
+    DerivativeForm<1, dim, spacedim> A;
+
+    for (unsigned int d = 0; d < spacedim; ++d)
+      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (unsigned int e = 0; e < dim; ++e)
+          A[d][e] += vertices[v][d] * TransformR2UAffine<dim>::KA[v][e];
+
+    // b = vertex * Kb
+    Tensor<1, spacedim> b;
+    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      b += vertices[v] * TransformR2UAffine<dim>::Kb[v];
+
+    return std::make_pair(A, b);
+  }
+
+
+
   template <int dim>
   Vector<double>
   compute_aspect_ratio_of_cells(const Mapping<dim> &      mapping,

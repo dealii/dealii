@@ -248,6 +248,32 @@ namespace GridTools
   cell_measure(const T &, ...);
 
   /**
+   * This function computes an affine approximation of the map from the unit
+   * coordinates to the real coordinates of the form $p_\text{real} = A
+   * p_\text{unit} + b $ by a least squares fit of this affine function to the
+   * $2^\text{dim}$ vertices representing a quadrilateral or hexahedral cell
+   * in `spacedim` dimensions. The result is returned as a pair with the
+   * matrix <i>A</i> as the first argument and the vector <i>b</i> describing
+   * distance of the plane to the origin.
+   *
+   * For any valid mesh cell whose geometry is not degenerate, this operation
+   * results in a unique affine mapping, even in cases where the actual
+   * transformation by a bi-/trilinear or higher order mapping might be
+   * singular. The result is exact in case the transformation from the unit to
+   * the real cell is indeed affine, such as in one dimension or for Cartesian
+   * and affine (parallelogram) meshes in 2D/3D.
+   *
+   * This approximation is underlying the function
+   * TriaAccessor::real_to_unit_cell_affine_approximation() function.
+   *
+   * For exact transformations to the unit cell, use
+   * Mapping::transform_real_to_unit_cell().
+   */
+  template <int dim, int spacedim>
+  std::pair<DerivativeForm<1, dim, spacedim>, Tensor<1, spacedim>>
+  affine_cell_approximation(const ArrayView<const Point<spacedim>> &vertices);
+
+  /**
    * Computes an aspect ratio measure for all locally-owned active cells and
    * fills a vector with one entry per cell, given a @p triangulation and
    * @p mapping. The size of the vector that is returned equals the number of

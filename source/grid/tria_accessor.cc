@@ -1700,129 +1700,24 @@ TriaAccessor<structdim, dim, spacedim>::intermediate_point(
 }
 
 
-namespace
-{
-  /**
-   * The algorithm to compute the affine approximation to the point on the
-   * unit cell does the following steps:
-   * <ul>
-   * <li> find the least square dim-dimensional plane approximating the cell
-   * vertices, i.e. we find an affine map A x_hat + b from the reference cell
-   * to the real space.
-   * <li> Solve the equation A x_hat + b = p for x_hat
-   * </ul>
-   *
-   * Some details about how we compute the least square plane. We look
-   * for a spacedim x (dim + 1) matrix X such that X * M = Y where M is
-   * a (dim+1) x n_vertices matrix and Y a spacedim x n_vertices.  And:
-   * The i-th column of M is unit_vertex[i] and the last row all
-   * 1's. The i-th column of Y is real_vertex[i].  If we split X=[A|b],
-   * the least square approx is A x_hat+b Classically X = Y * (M^t (M
-   * M^t)^{-1}) Let K = M^t * (M M^t)^{-1} = [KA Kb] this can be
-   * precomputed, and that is exactly what we do.  Finally A = Y*KA and
-   * b = Y*Kb.
-   */
-  template <int dim>
-  struct TransformR2UAffine
-  {
-    static const double KA[GeometryInfo<dim>::vertices_per_cell][dim];
-    static const double Kb[GeometryInfo<dim>::vertices_per_cell];
-  };
-
-
-  /*
-    Octave code:
-    M=[0 1; 1 1];
-    K1 = transpose(M) * inverse (M*transpose(M));
-    printf ("{%f, %f},\n", K1' );
-  */
-  template <>
-  const double TransformR2UAffine<1>::KA[GeometryInfo<1>::vertices_per_cell]
-                                        [1] = {{-1.000000}, {1.000000}};
-
-  template <>
-  const double TransformR2UAffine<1>::Kb[GeometryInfo<1>::vertices_per_cell] =
-    {1.000000, 0.000000};
-
-
-  /*
-    Octave code:
-    M=[0 1 0 1;0 0 1 1;1 1 1 1];
-    K2 = transpose(M) * inverse (M*transpose(M));
-    printf ("{%f, %f, %f},\n", K2' );
-  */
-  template <>
-  const double TransformR2UAffine<2>::KA[GeometryInfo<2>::vertices_per_cell]
-                                        [2] = {{-0.500000, -0.500000},
-                                               {0.500000, -0.500000},
-                                               {-0.500000, 0.500000},
-                                               {0.500000, 0.500000}};
-
-  /*
-    Octave code:
-    M=[0 1 0 1 0 1 0 1;0 0 1 1 0 0 1 1; 0 0 0 0 1 1 1 1; 1 1 1 1 1 1 1 1];
-    K3 = transpose(M) * inverse (M*transpose(M))
-    printf ("{%f, %f, %f, %f},\n", K3' );
-  */
-  template <>
-  const double TransformR2UAffine<2>::Kb[GeometryInfo<2>::vertices_per_cell] =
-    {0.750000, 0.250000, 0.250000, -0.250000};
-
-
-  template <>
-  const double TransformR2UAffine<3>::KA[GeometryInfo<3>::vertices_per_cell]
-                                        [3] = {
-                                          {-0.250000, -0.250000, -0.250000},
-                                          {0.250000, -0.250000, -0.250000},
-                                          {-0.250000, 0.250000, -0.250000},
-                                          {0.250000, 0.250000, -0.250000},
-                                          {-0.250000, -0.250000, 0.250000},
-                                          {0.250000, -0.250000, 0.250000},
-                                          {-0.250000, 0.250000, 0.250000},
-                                          {0.250000, 0.250000, 0.250000}
-
-  };
-
-
-  template <>
-  const double TransformR2UAffine<3>::Kb[GeometryInfo<3>::vertices_per_cell] = {
-    0.500000,
-    0.250000,
-    0.250000,
-    0.000000,
-    0.250000,
-    0.000000,
-    0.000000,
-    -0.250000};
-} // namespace
-
 
 template <int structdim, int dim, int spacedim>
 Point<structdim>
 TriaAccessor<structdim, dim, spacedim>::real_to_unit_cell_affine_approximation(
   const Point<spacedim> &point) const
 {
-  // A = vertex * KA
-  DerivativeForm<1, structdim, spacedim> A;
-
-  // copy vertices to avoid expensive resolution of vertex index inside loop
   std::array<Point<spacedim>, GeometryInfo<structdim>::vertices_per_cell>
     vertices;
   for (const unsigned int v : this->vertex_indices())
     vertices[v] = this->vertex(v);
-  for (unsigned int d = 0; d < spacedim; ++d)
-    for (const unsigned int v : this->vertex_indices())
-      for (unsigned int e = 0; e < structdim; ++e)
-        A[d][e] += vertices[v][d] * TransformR2UAffine<structdim>::KA[v][e];
 
-  // b = vertex * Kb
-  Tensor<1, spacedim> b = point;
-  for (const unsigned int v : this->vertex_indices())
-    b -= vertices[v] * TransformR2UAffine<structdim>::Kb[v];
-
-  DerivativeForm<1, spacedim, structdim> A_inv = A.covariant_form().transpose();
-  return Point<structdim>(apply_transformation(A_inv, b));
+  const auto A_b =
+    GridTools::affine_cell_approximation<structdim, spacedim>(vertices);
+  DerivativeForm<1, spacedim, structdim> A_inv =
+    A_b.first.covariant_form().transpose();
+  return Point<structdim>(apply_transformation(A_inv, point - A_b.second));
 }
+
 
 
 template <int structdim, int dim, int spacedim>
