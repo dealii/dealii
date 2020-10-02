@@ -113,6 +113,12 @@ public:
   CellId(const binary_type &binary_representation);
 
   /**
+   * Create a CellId from a string with the same format that is produced by
+   * to_string().
+   */
+  explicit CellId(const std::string &string_representation);
+
+  /**
    * Construct an invalid CellId.
    */
   CellId();
