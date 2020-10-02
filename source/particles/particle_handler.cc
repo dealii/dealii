@@ -925,29 +925,38 @@ namespace Particles
     particles_out_of_cell.reserve(n_locally_owned_particles());
 
     // Now update the reference locations of the moved particles
-    for (particle_iterator it = begin(); it != end(); ++it)
+    std::vector<Point<spacedim>> real_locations;
+    std::vector<Point<dim>>      reference_locations;
+    for (auto particle = begin(); particle != end();)
       {
-        const typename Triangulation<dim, spacedim>::cell_iterator cell =
-          it->get_surrounding_cell(*triangulation);
+        const auto cell = particle->get_surrounding_cell(*triangulation);
+        real_locations.clear();
 
-        try
+        // Since we might also work on artificial cells when we initialize the
+        // particles on a remote processor, we cannot use the
+        // particles_in_cell method. Thus, We instead simply go through the
+        // particles and check if the next one belongs to the same cell as the
+        // current one.
+        for (auto it = particle;
+             it != end() && it->get_surrounding_cell(*triangulation) == cell;
+             ++it)
+          real_locations.push_back(it->get_location());
+
+        reference_locations.resize(real_locations.size());
+        ArrayView<Point<dim>> reference(reference_locations.data(),
+                                        reference_locations.size());
+        mapping->transform_points_real_to_unit_cell(cell,
+                                                    real_locations,
+                                                    reference);
+
+        for (const auto &p_unit : reference_locations)
           {
-            const Point<dim> p_unit =
-              mapping->transform_real_to_unit_cell(cell, it->get_location());
-            if (GeometryInfo<dim>::is_inside_unit_cell(p_unit))
-              {
-                it->set_reference_location(p_unit);
-              }
+            if (p_unit[0] == std::numeric_limits<double>::infinity() ||
+                !GeometryInfo<dim>::is_inside_unit_cell(p_unit))
+              particles_out_of_cell.push_back(particle);
             else
-              {
-                // The particle has left the cell
-                particles_out_of_cell.push_back(it);
-              }
-          }
-        catch (typename Mapping<dim>::ExcTransformationFailed &)
-          {
-            // The particle has left the cell
-            particles_out_of_cell.push_back(it);
+              particle->set_reference_location(p_unit);
+            ++particle;
           }
       }
 
