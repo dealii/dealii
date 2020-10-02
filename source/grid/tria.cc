@@ -9986,6 +9986,22 @@ Triangulation<dim, spacedim>::refine_global(const unsigned int times)
 
 
 
+template <int dim, int spacedim>
+void
+Triangulation<dim, spacedim>::coarsen_global(const unsigned int times)
+{
+  for (unsigned int i = 0; i < times; ++i)
+    {
+      for (const auto &cell : this->active_cell_iterators())
+        {
+          cell->clear_refine_flag();
+          cell->set_coarsen_flag();
+        }
+      execute_coarsening_and_refinement();
+    }
+}
+
+
 /*-------------------- refine/coarsen flags -------------------------*/
 
 

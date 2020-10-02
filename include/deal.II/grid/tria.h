@@ -1911,6 +1911,21 @@ public:
   refine_global(const unsigned int times = 1);
 
   /**
+   * Coarsen all cells the given number of times.
+   *
+   * In each of one of the @p times iterations, all cells will be marked for
+   * coarsening. If an active cell is already on the coarsest level, it will
+   * be ignored.
+   *
+   * @note This function triggers the pre- and post-refinement signals before
+   * and after doing each individual coarsening cycle (i.e. more than once if
+   * `times > 1`) . See the section on signals in the general documentation of
+   * this class.
+   */
+  void
+  coarsen_global(const unsigned int times = 1);
+
+  /**
    * Execute both refinement and coarsening of the triangulation.
    *
    * The function resets all refinement and coarsening flags to false. It uses
