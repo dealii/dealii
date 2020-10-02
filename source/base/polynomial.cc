@@ -119,6 +119,7 @@ namespace Polynomials
         // form (x-x_1)*(x-x_2)*...*(x-x_n), expand the derivatives like
         // automatic differentiation does.
         const unsigned int n_supp = lagrange_support_points.size();
+        const number       weight = lagrange_weight;
         switch (n_derivatives)
           {
             default:
@@ -151,7 +152,7 @@ namespace Polynomials
                 number k_faculty = 1;
                 for (unsigned int k = 0; k <= n_derivatives; ++k)
                   {
-                    values[k] *= k_faculty * lagrange_weight;
+                    values[k] *= k_faculty * weight;
                     k_faculty *= static_cast<number>(k + 1);
                   }
               }
@@ -159,45 +160,53 @@ namespace Polynomials
 
             // manually implement case 0 (values only), case 1 (value + first
             // derivative), and case 2 (up to second derivative) since they
-            // might be called often. then, we can unroll the loop.
+            // might be called often. then, we can unroll the inner loop and
+            // keep the temporary results as local variables to help the
+            // compiler with the pointer aliasing analysis.
             case 0:
-              values[0] = 1;
-              for (unsigned int i = 0; i < n_supp; ++i)
-                {
-                  const number v = x - lagrange_support_points[i];
-                  values[0] *= v;
-                }
-              values[0] *= lagrange_weight;
-              break;
+              {
+                number value = 1;
+                for (unsigned int i = 0; i < n_supp; ++i)
+                  {
+                    const number v = x - lagrange_support_points[i];
+                    value *= v;
+                  }
+                values[0] = weight * value;
+                break;
+              }
 
             case 1:
-              values[0] = 1;
-              values[1] = 0;
-              for (unsigned int i = 0; i < n_supp; ++i)
-                {
-                  const number v = x - lagrange_support_points[i];
-                  values[1]      = values[1] * v + values[0];
-                  values[0] *= v;
-                }
-              values[0] *= lagrange_weight;
-              values[1] *= lagrange_weight;
-              break;
+              {
+                number value      = 1;
+                number derivative = 0;
+                for (unsigned int i = 0; i < n_supp; ++i)
+                  {
+                    const number v = x - lagrange_support_points[i];
+                    derivative     = derivative * v + value;
+                    value *= v;
+                  }
+                values[0] = weight * value;
+                values[1] = weight * derivative;
+                break;
+              }
 
             case 2:
-              values[0] = 1;
-              values[1] = 0;
-              values[2] = 0;
-              for (unsigned int i = 0; i < n_supp; ++i)
-                {
-                  const number v = x - lagrange_support_points[i];
-                  values[2]      = values[2] * v + values[1];
-                  values[1]      = values[1] * v + values[0];
-                  values[0] *= v;
-                }
-              values[0] *= lagrange_weight;
-              values[1] *= lagrange_weight;
-              values[2] *= static_cast<number>(2) * lagrange_weight;
-              break;
+              {
+                number value      = 1;
+                number derivative = 0;
+                number second     = 0;
+                for (unsigned int i = 0; i < n_supp; ++i)
+                  {
+                    const number v = x - lagrange_support_points[i];
+                    second         = second * v + derivative;
+                    derivative     = derivative * v + value;
+                    value *= v;
+                  }
+                values[0] = weight * value;
+                values[1] = weight * derivative;
+                values[2] = static_cast<number>(2) * weight * second;
+                break;
+              }
           }
         return;
       }
