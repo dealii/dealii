@@ -274,7 +274,7 @@ namespace parallel
                            const std::vector<CellData<dim>> &  cells,
                            const SubCellData &subcelldata) override;
 
-      /*
+      /**
        * @copydoc Triangulation::create_triangulation()
        *
        * @note Not implemented yet.
