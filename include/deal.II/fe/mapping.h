@@ -453,6 +453,23 @@ public:
     const Point<spacedim> &                                     p) const = 0;
 
   /**
+   * Map multiple points from the real point locations to points in reference
+   * locations. The functionality is essentially the same as looping over all
+   * points and calling the Mapping::transform_real_to_unit_cell() function
+   * for each point individually, but it can be much faster for certain
+   * mappings that implement a more specialized version such as
+   * MappingQGeneric. The only difference in behavior is that this function
+   * will never throw an ExcTransformationFailed() exception. If the
+   * transformation fails for `real_points[i]`, the returned `unit_points[i]`
+   * contains std::numeric_limits<double>::infinity() as the first entry.
+   */
+  virtual void
+  transform_points_real_to_unit_cell(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const ArrayView<const Point<spacedim>> &                    real_points,
+    ArrayView<Point<dim>> &unit_points) const;
+
+  /**
    * Transform the point @p p on the real @p cell to the corresponding point
    * on the reference cell, and then project this point to a (dim-1)-dimensional
    * point in the coordinate system of the face with
