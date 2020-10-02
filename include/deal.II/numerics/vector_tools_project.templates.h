@@ -83,10 +83,10 @@ namespace VectorTools
         for (auto f : GeometryInfo<dim>::face_indices())
           if (cell->at_boundary(f))
             {
-              face_dof_indices.resize(cell->get_fe().n_dofs_per_face());
+              face_dof_indices.resize(cell->get_fe().n_dofs_per_face(f));
               cell->face(f)->get_dof_indices(face_dof_indices,
                                              cell->active_fe_index());
-              for (unsigned int i = 0; i < cell->get_fe().n_dofs_per_face();
+              for (unsigned int i = 0; i < cell->get_fe().n_dofs_per_face(f);
                    ++i)
                 // enter zero boundary values
                 // for all boundary nodes

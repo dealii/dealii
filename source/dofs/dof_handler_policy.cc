@@ -145,8 +145,12 @@ namespace internal
         ensure_existence_and_return_dof_identities(
           const FiniteElement<dim, spacedim> &fe1,
           const FiniteElement<dim, spacedim> &fe2,
-          std::unique_ptr<DoFIdentities> &    identities)
+          std::unique_ptr<DoFIdentities> &    identities,
+          const unsigned int face_no = numbers::invalid_unsigned_int)
         {
+          Assert(structdim == 2 || face_no == numbers::invalid_unsigned_int,
+                 ExcInternalError());
+
           // see if we need to fill this entry, or whether it already
           // exists
           if (identities.get() == nullptr)
@@ -170,7 +174,7 @@ namespace internal
                   case 2:
                     {
                       identities = std::make_unique<DoFIdentities>(
-                        fe1.hp_quad_dof_identities(fe2));
+                        fe1.hp_quad_dof_identities(fe2, face_no));
                       break;
                     }
 
@@ -183,10 +187,10 @@ namespace internal
               for (unsigned int i = 0; i < identities->size(); ++i)
                 {
                   Assert((*identities)[i].first <
-                           fe1.template n_dofs_per_object<structdim>(),
+                           fe1.template n_dofs_per_object<structdim>(face_no),
                          ExcInternalError());
                   Assert((*identities)[i].second <
-                           fe2.template n_dofs_per_object<structdim>(),
+                           fe2.template n_dofs_per_object<structdim>(face_no),
                          ExcInternalError());
                 }
             }
@@ -807,6 +811,11 @@ namespace internal
                       fe_indices,
                       /*codim=*/dim - 2);
 
+                  const unsigned int most_dominating_fe_index_face_no =
+                    cell->active_fe_index() == most_dominating_fe_index ?
+                      q :
+                      cell->neighbor_face_no(q);
+
                   // if we found the most dominating element, then use
                   // this to eliminate some of the degrees of freedom
                   // by identification. otherwise, the code that
@@ -829,7 +838,8 @@ namespace internal
                                 quad_dof_identities
                                   [most_dominating_fe_index][other_fe_index]
                                   [cell->quad(q)->reference_cell_type() ==
-                                   ReferenceCell::Type::Quad]);
+                                   ReferenceCell::Type::Quad],
+                                most_dominating_fe_index_face_no);
 
                             for (const auto &identity : identities)
                               {
@@ -1558,6 +1568,11 @@ namespace internal
                       fe_indices,
                       /*codim=*/dim - 2);
 
+                  const unsigned int most_dominating_fe_index_face_no =
+                    cell->active_fe_index() == most_dominating_fe_index ?
+                      q :
+                      cell->neighbor_face_no(q);
+
                   // if we found the most dominating element, then use
                   // this to eliminate some of the degrees of freedom
                   // by identification. otherwise, the code that
@@ -1580,7 +1595,8 @@ namespace internal
                                 quad_dof_identities
                                   [most_dominating_fe_index][other_fe_index]
                                   [cell->quad(q)->reference_cell_type() ==
-                                   ReferenceCell::Type::Quad]);
+                                   ReferenceCell::Type::Quad],
+                                most_dominating_fe_index_face_no);
 
                             for (const auto &identity : identities)
                               {
@@ -2312,7 +2328,7 @@ namespace internal
 
                           for (unsigned int d = 0;
                                d <
-                               dof_handler.get_fe(fe_index).n_dofs_per_quad();
+                               dof_handler.get_fe(fe_index).n_dofs_per_quad(q);
                                ++d)
                             {
                               const types::global_dof_index old_dof_index =
@@ -2674,7 +2690,7 @@ namespace internal
                   if (cell->quad(l)->user_flag_set())
                     {
                       for (unsigned int d = 0;
-                           d < dof_handler.get_fe().n_dofs_per_quad();
+                           d < dof_handler.get_fe().n_dofs_per_quad(l);
                            ++d)
                         {
                           const dealii::types::global_dof_index idx =

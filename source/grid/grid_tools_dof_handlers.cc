@@ -1830,7 +1830,7 @@ namespace GridTools
                                ExcInternalError());
 
                         const unsigned int n_dofs_per_face =
-                          cell->get_fe().n_dofs_per_face();
+                          cell->get_fe().n_dofs_per_face(f, c);
                         local_face_dof_indices.resize(n_dofs_per_face);
 
                         cell->face(f)->child(c)->get_dof_indices(
@@ -1865,7 +1865,7 @@ namespace GridTools
                     unsigned int subface = neighbor_face_no_subface_no.second;
 
                     const unsigned int n_dofs_per_face =
-                      cell->get_fe().n_dofs_per_face();
+                      cell->get_fe().n_dofs_per_face(face_no);
                     local_face_dof_indices.resize(n_dofs_per_face);
 
                     cell->neighbor(f)->face(face_no)->get_dof_indices(
@@ -1884,7 +1884,7 @@ namespace GridTools
                                           // original cell
                           {
                             const unsigned int n_dofs_per_face =
-                              cell->get_fe().n_dofs_per_face();
+                              cell->get_fe().n_dofs_per_face(face_no, c);
                             local_face_dof_indices.resize(n_dofs_per_face);
 
                             Assert(cell->neighbor(f)

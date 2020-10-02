@@ -407,7 +407,8 @@ namespace DoFTools
       for (const unsigned int f : cell->face_indices())
         if (cell->at_boundary(f))
           {
-            const unsigned int dofs_per_face = cell->get_fe().n_dofs_per_face();
+            const unsigned int dofs_per_face =
+              cell->get_fe().n_dofs_per_face(f);
             dofs_on_this_face.resize(dofs_per_face);
             cell->face(f)->get_dof_indices(dofs_on_this_face,
                                            cell->active_fe_index());
@@ -504,7 +505,8 @@ namespace DoFTools
         if (boundary_ids.find(cell->face(f)->boundary_id()) !=
             boundary_ids.end())
           {
-            const unsigned int dofs_per_face = cell->get_fe().n_dofs_per_face();
+            const unsigned int dofs_per_face =
+              cell->get_fe().n_dofs_per_face(f);
             dofs_on_this_face.resize(dofs_per_face);
             cell->face(f)->get_dof_indices(dofs_on_this_face,
                                            cell->active_fe_index());

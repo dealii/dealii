@@ -140,25 +140,31 @@ namespace CUDAWrappers
       void
       setup_constraint_weigths(unsigned int fe_degree)
       {
+        const unsigned int face_no =
+          0; // we assume that all faces have the same number of dofs
+
         FE_Q<2>            fe_q(fe_degree);
-        FullMatrix<double> interpolation_matrix(fe_q.n_dofs_per_face(),
-                                                fe_q.n_dofs_per_face());
-        fe_q.get_subface_interpolation_matrix(fe_q, 0, interpolation_matrix);
+        FullMatrix<double> interpolation_matrix(fe_q.n_dofs_per_face(face_no),
+                                                fe_q.n_dofs_per_face(face_no));
+        fe_q.get_subface_interpolation_matrix(fe_q,
+                                              0,
+                                              interpolation_matrix,
+                                              face_no);
 
         std::vector<unsigned int> mapping =
           FETools::lexicographic_to_hierarchic_numbering<1>(fe_degree);
 
-        FullMatrix<double> mapped_matrix(fe_q.n_dofs_per_face(),
-                                         fe_q.n_dofs_per_face());
-        for (unsigned int i = 0; i < fe_q.n_dofs_per_face(); ++i)
-          for (unsigned int j = 0; j < fe_q.n_dofs_per_face(); ++j)
+        FullMatrix<double> mapped_matrix(fe_q.n_dofs_per_face(face_no),
+                                         fe_q.n_dofs_per_face(face_no));
+        for (unsigned int i = 0; i < fe_q.n_dofs_per_face(face_no); ++i)
+          for (unsigned int j = 0; j < fe_q.n_dofs_per_face(face_no); ++j)
             mapped_matrix(i, j) = interpolation_matrix(mapping[i], mapping[j]);
 
         cudaError_t error_code =
           cudaMemcpyToSymbol(internal::constraint_weights,
                              &mapped_matrix[0][0],
-                             sizeof(double) * fe_q.n_dofs_per_face() *
-                               fe_q.n_dofs_per_face());
+                             sizeof(double) * fe_q.n_dofs_per_face(face_no) *
+                               fe_q.n_dofs_per_face(face_no));
         AssertCuda(error_code);
       }
     } // namespace internal

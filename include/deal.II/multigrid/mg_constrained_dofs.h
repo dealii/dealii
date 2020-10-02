@@ -273,7 +273,7 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
                     }
 
                   const unsigned int dofs_per_face =
-                    cell->face(f)->get_fe(0).n_dofs_per_face();
+                    dof.get_fe(0).n_dofs_per_face(f);
                   std::vector<types::global_dof_index> dofs_1(dofs_per_face);
                   std::vector<types::global_dof_index> dofs_2(dofs_per_face);
 
