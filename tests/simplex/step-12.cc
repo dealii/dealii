@@ -391,10 +391,10 @@ namespace Step12
 
     QGauss<dim - 1> face_quad(degree + 1);
 #else
-    Simplex::PGauss<dim> quad(dim == 2 ? (degree == 1 ? 3 : 7) :
+    Simplex::QGauss<dim> quad(dim == 2 ? (degree == 1 ? 3 : 7) :
                                          (degree == 1 ? 4 : 10));
 
-    Simplex::PGauss<dim - 1> face_quad(dim == 2 ? (degree == 1 ? 2 : 3) :
+    Simplex::QGauss<dim - 1> face_quad(dim == 2 ? (degree == 1 ? 2 : 3) :
                                                   (degree == 1 ? 3 : 7));
 #endif
 

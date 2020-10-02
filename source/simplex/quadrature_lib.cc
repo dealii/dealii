@@ -29,7 +29,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace Simplex
 {
   template <int dim>
-  PGauss<dim>::PGauss(const unsigned int n_points)
+  QGauss<dim>::QGauss(const unsigned int n_points)
     : QSimplex<dim>(Quadrature<dim>())
   {
     // fill quadrature points and quadrature weights
@@ -146,8 +146,8 @@ namespace Simplex
 } // namespace Simplex
 
 
-template class Simplex::PGauss<1>;
-template class Simplex::PGauss<2>;
-template class Simplex::PGauss<3>;
+template class Simplex::QGauss<1>;
+template class Simplex::QGauss<2>;
+template class Simplex::QGauss<3>;
 
 DEAL_II_NAMESPACE_CLOSE

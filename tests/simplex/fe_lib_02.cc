@@ -49,12 +49,12 @@ main()
 {
   initlog();
 
-  test(Simplex::FE_P<2>(1), Simplex::PGauss<2>(3));
-  test(Simplex::FE_P<2>(2), Simplex::PGauss<2>(7));
-  test(Simplex::FE_P<3>(1), Simplex::PGauss<3>(4));
-  test(Simplex::FE_P<3>(2), Simplex::PGauss<3>(10));
-  test(Simplex::FE_DGP<2>(1), Simplex::PGauss<2>(3));
-  test(Simplex::FE_DGP<2>(2), Simplex::PGauss<2>(7));
-  test(Simplex::FE_DGP<3>(1), Simplex::PGauss<3>(4));
-  test(Simplex::FE_DGP<3>(2), Simplex::PGauss<3>(10));
+  test(Simplex::FE_P<2>(1), Simplex::QGauss<2>(3));
+  test(Simplex::FE_P<2>(2), Simplex::QGauss<2>(7));
+  test(Simplex::FE_P<3>(1), Simplex::QGauss<3>(4));
+  test(Simplex::FE_P<3>(2), Simplex::QGauss<3>(10));
+  test(Simplex::FE_DGP<2>(1), Simplex::QGauss<2>(3));
+  test(Simplex::FE_DGP<2>(2), Simplex::QGauss<2>(7));
+  test(Simplex::FE_DGP<3>(1), Simplex::QGauss<3>(4));
+  test(Simplex::FE_DGP<3>(2), Simplex::QGauss<3>(10));
 }

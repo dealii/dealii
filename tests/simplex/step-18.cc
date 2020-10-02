@@ -419,7 +419,7 @@ namespace Step18
     : triangulation()
     , fe(Simplex::FE_P<dim>(degree), dim)
     , dof_handler(triangulation)
-    , quadrature_formula(Simplex::PGauss<dim>(fe.degree == 1 ? 4 : 10))
+    , quadrature_formula(Simplex::QGauss<dim>(fe.degree == 1 ? 4 : 10))
     , mapping(Simplex::FE_P<dim>(1))
     , present_time(0.0)
     , present_timestep(1.0)
