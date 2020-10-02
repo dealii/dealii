@@ -295,7 +295,6 @@ public:
     void
     compute_shape_function_values(const std::vector<Point<dim>> &unit_points);
 
-
     /**
      * Shape function at quadrature point. Shape functions are in tensor
      * product order, so vertices must be reordered to obtain transformation.
