@@ -149,11 +149,11 @@ namespace Polynomials
               // multiply derivatives by k! to transform the product p_n =
               // p^(n)(x)/k! into the actual form of the derivative
               {
-                number k_faculty = 1;
+                number k_factorial = 1;
                 for (unsigned int k = 0; k <= n_derivatives; ++k)
                   {
-                    values[k] *= k_faculty * weight;
-                    k_faculty *= static_cast<number>(k + 1);
+                    values[k] *= k_factorial * weight;
+                    k_factorial *= static_cast<number>(k + 1);
                   }
               }
               break;
@@ -226,7 +226,7 @@ namespace Polynomials
     // scheme
     const unsigned int  m = coefficients.size();
     std::vector<number> a(coefficients);
-    unsigned int        j_faculty = 1;
+    unsigned int        j_factorial = 1;
 
     // loop over all requested derivatives. note that derivatives @p{j>m} are
     // necessarily zero, as they differentiate the polynomial more often than
@@ -236,9 +236,9 @@ namespace Polynomials
       {
         for (int k = m - 2; k >= static_cast<int>(j); --k)
           a[k] += x * a[k + 1];
-        values[j] = static_cast<number>(j_faculty) * a[j];
+        values[j] = static_cast<number>(j_factorial) * a[j];
 
-        j_faculty *= j + 1;
+        j_factorial *= j + 1;
       }
 
     // fill higher derivatives by zero
