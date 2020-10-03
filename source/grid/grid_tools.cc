@@ -5712,10 +5712,6 @@ namespace GridTools
 
 
 // explicit instantiations
-#define SPLIT_INSTANTIATIONS_COUNT 2
-#ifndef SPLIT_INSTANTIATIONS_INDEX
-#  define SPLIT_INSTANTIATIONS_INDEX 0
-#endif
 #include "grid_tools.inst"
 
 DEAL_II_NAMESPACE_CLOSE
