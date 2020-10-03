@@ -80,6 +80,10 @@ namespace LinearAlgebra
                              const MPI_Comm &comm,
                              const MPI_Comm &comm_sm)
       : PartitionerBase(false)
+      , recv_remote_ptr{0}
+      , recv_sm_ptr{0}
+      , send_remote_ptr{0}
+      , send_sm_ptr{0}
     {
       reinit(is_locally_owned, is_locally_ghost, comm, comm_sm);
     }
@@ -91,7 +95,7 @@ namespace LinearAlgebra
     }
 
     const MPI_Comm &
-    PartitionerBase::get_sm_mpi_communicator() const
+    PartitionerBase::get_shared_mpi_communicator() const
     {
       return comm_sm;
     }
@@ -125,7 +129,7 @@ namespace LinearAlgebra
       this->n_local_elements = is_locally_owned.n_elements();
       this->n_ghost_elements = is_locally_ghost.n_elements();
 
-      this->n_mpi_processes_ = Utilities::MPI::n_mpi_processes(comm);
+      this->number_of_mpi_processes = Utilities::MPI::n_mpi_processes(comm);
 
       std::vector<unsigned int> sm_ranks(
         Utilities::MPI::n_mpi_processes(comm_sm));
@@ -747,7 +751,7 @@ namespace LinearAlgebra
     std::size_t
     PartitionerBase::n_mpi_processes() const
     {
-      return n_mpi_processes_;
+      return number_of_mpi_processes;
     }
 
     std::size_t

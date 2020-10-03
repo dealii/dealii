@@ -72,8 +72,8 @@ namespace LinearAlgebra
           const unsigned int rank_sm =
             Utilities::MPI::this_mpi_process(comm_shared);
 
-          MPI_Win *win       = new MPI_Win;
-          Number * data_this = (Number *)malloc(0);
+          MPI_Win *win = new MPI_Win;
+          Number * data_this;
           data.others.resize(size_sm);
 
           MPI_Info info;
@@ -90,10 +90,10 @@ namespace LinearAlgebra
                            sizeof(Number)) *
                           sizeof(Number);
 
-          data.memory_constumption_values = s;
+          data.memory_consumption_values = s;
 
           MPI_Win_allocate_shared(
-            s, sizeof(Number), info, comm_shared, data_this, win);
+            s, sizeof(Number), info, comm_shared, &data_this, win);
 
           for (unsigned int i = 0; i < size_sm; i++)
             {
@@ -223,7 +223,7 @@ namespace LinearAlgebra
             partitioner->local_size() +
             (setup_ghosts ? partitioner->n_ghost_indices() : 0);
           resize_val(new_allocated_size,
-                     partitioner->get_sm_mpi_communicator());
+                     partitioner->get_shared_mpi_communicator());
         }
 
       if (omit_zeroing_entries == false)
@@ -261,7 +261,8 @@ namespace LinearAlgebra
       const size_type new_allocated_size =
         this->partitioner->local_size() +
         (setup_ghosts ? this->partitioner->n_ghost_indices() : 0);
-      resize_val(new_allocated_size, partitioner->get_sm_mpi_communicator());
+      resize_val(new_allocated_size,
+                 partitioner->get_shared_mpi_communicator());
 
       // initialize to zero
       this->operator=(Number());

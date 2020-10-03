@@ -3779,49 +3779,10 @@ namespace internal
     reset_ghost_values(
       const LinearAlgebra::SharedMPI::Vector<Number> &vec) const
     {
-      return; // TODO: why do we need this function?
-              // I am reseting the ghost_values during compression
-
-
       if (ghosts_were_set == true)
         return;
 
-      if (vector_face_access ==
-            dealii::MatrixFree<dim, Number, VectorizedArrayType>::
-              DataAccessOnFaces::unspecified ||
-          vec.size() == 0)
-        vec.zero_out_ghosts();
-      else
-        {
-#  ifdef DEAL_II_WITH_MPI
-          AssertDimension(requests.size(), tmp_data.size());
-
-          const unsigned int mf_component = find_vector_in_mf(vec);
-          const Utilities::MPI::Partitioner &part =
-            get_partitioner(mf_component);
-          if (&part ==
-              matrix_free.get_dof_info(mf_component).vector_partitioner.get())
-            vec.zero_out_ghosts();
-          else if (part.n_ghost_indices() > 0)
-            {
-              for (std::vector<std::pair<unsigned int, unsigned int>>::
-                     const_iterator my_ghosts =
-                       part.ghost_indices_within_larger_ghost_set().begin();
-                   my_ghosts !=
-                   part.ghost_indices_within_larger_ghost_set().end();
-                   ++my_ghosts)
-                for (unsigned int j = my_ghosts->first; j < my_ghosts->second;
-                     j++)
-                  {
-                    const_cast<LinearAlgebra::SharedMPI::Vector<Number> &>(vec)
-                      .local_element(j + part.local_size()) = 0.;
-                  }
-            }
-
-          // let vector know that it's not ghosted anymore
-          vec.set_ghost_state(false);
-#  endif
-        }
+      vec.zero_out_ghosts();
     }
 
 

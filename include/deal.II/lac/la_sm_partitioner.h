@@ -45,14 +45,14 @@ namespace LinearAlgebra
       /**
        * Return global communicator.
        */
-      virtual const MPI_Comm &
-      get_mpi_communicator() const override final;
+      const MPI_Comm &
+      get_mpi_communicator() const override;
 
       /**
        * Return shared-memory communicator.
        */
-      virtual const MPI_Comm &
-      get_sm_mpi_communicator() const final;
+      const MPI_Comm &
+      get_shared_mpi_communicator() const;
 
       /**
        * Return if the partitioner implementation has been enabled with
@@ -62,22 +62,23 @@ namespace LinearAlgebra
       contiguous_allocation_enabled() const;
 
       /**
-       * Return number of locally-owned vector entries.
+       * Return number of vector entries that are locally owned by this MPI
+       * process.
        */
-      virtual std::size_t
-      local_size() const final;
+      std::size_t
+      local_size() const;
 
       /**
        * Return number of ghost vector entries.
        */
-      virtual std::size_t
-      n_ghost_indices() const final;
+      std::size_t
+      n_ghost_indices() const;
 
       /**
        * Return number of processes in the global communicator.
        */
-      virtual std::size_t
-      n_mpi_processes() const final;
+      std::size_t
+      n_mpi_processes() const;
 
       /**
        * Return an estimate for the memory consumption, in bytes, of this
@@ -193,7 +194,7 @@ namespace LinearAlgebra
       /**
        * Number of processes in comm.
        */
-      unsigned int n_mpi_processes_;
+      unsigned int number_of_mpi_processes;
 
       /**
        * Number of locally-owned vector entries.
@@ -208,7 +209,7 @@ namespace LinearAlgebra
 
     /**
      * Partitioner implementation that is built around index-sets similar to
-     * Utilities::MPI::Partitioner, however, distinguishes between remote and
+     * Utilities::MPI::Partitioner but distinguishes between remote and
      * shared ghost vector entries.
      */
     class Partitioner : public PartitionerBase
@@ -388,87 +389,87 @@ namespace LinearAlgebra
 
     private:
       /**
-       * TODO
+       * Remote ranks from where data is received.
        */
       std::vector<unsigned int> recv_remote_ranks;
 
       /**
-       * TODO
+       * Pointer into the receive buffer.
        */
-      std::vector<types::global_dof_index> recv_remote_ptr = {0};
+      std::vector<types::global_dof_index> recv_remote_ptr;
 
       /**
-       * TODO
+       * Shared-memory ranks from where data is copied.
        */
       std::vector<unsigned int> recv_sm_ranks;
 
       /**
-       * TODO
+       * Pointer into the receive buffer.
        */
-      std::vector<unsigned int> recv_sm_ptr = {0};
+      std::vector<unsigned int> recv_sm_ptr;
 
       /**
-       * TODO
+       * Indices to be copied from shared-memory neighbor.
        */
       std::vector<unsigned int> recv_sm_indices;
 
       /**
-       * TODO
+       * The same as above, but, compressed: number of entries to be copied.
        */
       std::vector<unsigned int> recv_sm_len;
 
       /**
-       * TODO
+       * The same as above, but, compressed: offset.
        */
       std::vector<unsigned int> recv_sm_offset;
 
       /**
-       * TODO
+       * Remote ranks to where data is sent.
        */
       std::vector<unsigned int> send_remote_ranks;
 
       /**
-       * TODO
+       * Pointer into the send buffer.
        */
-      std::vector<unsigned int> send_remote_ptr = {0};
+      std::vector<unsigned int> send_remote_ptr;
 
       /**
-       * TODO
+       * Indices to be sent.
        */
       std::vector<unsigned int> send_remote_indices;
 
       /**
-       * TODO
+       * The same as above, but, compressed: number of entries to be copied.
        */
       std::vector<unsigned int> send_remote_len;
 
       /**
-       * TODO
+       * The same as above, but, compressed: offset.
        */
       std::vector<unsigned int> send_remote_offset;
 
       /**
-       * TODO
+       * Shared-memory ranks from where data is copied during compress.
        */
       std::vector<unsigned int> send_sm_ranks;
 
       /**
-       * TODO
+       * Pointer into buffer.
        */
-      std::vector<unsigned int> send_sm_ptr = {0};
+      std::vector<unsigned int> send_sm_ptr;
 
       /**
-       * TODO
+       * Indices to be read during compress.
        */
       std::vector<unsigned int> send_sm_indices;
 
       /**
-       * TODO
+       * The same as above, but, compressed: number of entries to be copied.
        */
       std::vector<unsigned int> send_sm_len;
 
       /**
-       * TODO
+       * The same as above, but, compressed: offset.
        */
       std::vector<unsigned int> send_sm_offset;
     };

@@ -83,8 +83,8 @@ namespace LinearAlgebra
         // note: values_win is not accounted for
         return MemoryConsumption::memory_consumption(others) +
                MemoryConsumption::memory_consumption(
-                 memory_constumption_values) +
-               memory_constumption_values;
+                 memory_consumption_values) +
+               memory_consumption_values;
       }
 
       /**
@@ -93,7 +93,7 @@ namespace LinearAlgebra
        *
        * @note It also includes added memory for alignment.
        */
-      std::size_t memory_constumption_values;
+      std::size_t memory_consumption_values;
 
 #ifdef DEAL_II_WITH_MPI
       /**
@@ -176,7 +176,7 @@ namespace LinearAlgebra
        * TODO: name of the function?
        */
       const std::vector<Number *> &
-      other_values() const;
+      shared_vector_data() const;
 
       /**
        * Swap the contents of this vector and the other vector @p v.
@@ -1096,7 +1096,7 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpace>
     const std::vector<Number *> &
-    Vector<Number, MemorySpace>::other_values() const
+    Vector<Number, MemorySpace>::shared_vector_data() const
     {
       return data.others;
     }
