@@ -606,9 +606,9 @@ namespace Particles
     const auto &calling_process_indices =
       std::get<4>(cells_positions_and_index_maps);
 
-    // Create the map of cpu to indices, indicating who sent us what
-    // particle.
-    std::map<unsigned int, IndexSet> original_process_to_local_particle_indices;
+    // Create the map of cpu to indices, indicating who sent us what particle
+    std::map<unsigned int, std::vector<unsigned int>>
+      original_process_to_local_particle_indices_tmp;
     for (unsigned int i_cell = 0;
          i_cell < local_cells_containing_particles.size();
          ++i_cell)
@@ -622,21 +622,24 @@ namespace Particles
             const unsigned int calling_process =
               calling_process_indices[i_cell][i_particle];
 
-            if (original_process_to_local_particle_indices.find(
-                  calling_process) ==
-                original_process_to_local_particle_indices.end())
-              original_process_to_local_particle_indices.insert(
-                {calling_process,
-                 IndexSet(n_particles_per_proc[calling_process])});
-
-            original_process_to_local_particle_indices[calling_process]
-              .add_index(local_id_on_calling_process);
+            original_process_to_local_particle_indices_tmp[calling_process]
+              .push_back(local_id_on_calling_process);
           }
       }
+    std::map<unsigned int, IndexSet> original_process_to_local_particle_indices;
     for (auto &process_and_particle_indices :
-         original_process_to_local_particle_indices)
-      process_and_particle_indices.second.compress();
-
+         original_process_to_local_particle_indices_tmp)
+      {
+        const unsigned int calling_process = process_and_particle_indices.first;
+        original_process_to_local_particle_indices.insert(
+          {calling_process, IndexSet(n_particles_per_proc[calling_process])});
+        std::sort(process_and_particle_indices.second.begin(),
+                  process_and_particle_indices.second.end());
+        original_process_to_local_particle_indices[calling_process].add_indices(
+          process_and_particle_indices.second.begin(),
+          process_and_particle_indices.second.end());
+        original_process_to_local_particle_indices[calling_process].compress();
+      }
 
     // A map from mpi process to properties, ordered as in the IndexSet.
     // Notice that this ordering may be different from the ordering in the
