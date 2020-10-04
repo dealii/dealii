@@ -204,6 +204,12 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       volume(const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
              const Mapping<deal_II_dimension, deal_II_space_dimension> &);
 
+      template std::pair<
+        DerivativeForm<1, deal_II_dimension, deal_II_space_dimension>,
+        Tensor<1, deal_II_space_dimension>>
+      affine_cell_approximation<deal_II_dimension, deal_II_space_dimension>(
+        const ArrayView<const Point<deal_II_space_dimension>> &);
+
       template BoundingBox<deal_II_space_dimension>
       compute_bounding_box(
         const Triangulation<deal_II_dimension, deal_II_space_dimension> &);

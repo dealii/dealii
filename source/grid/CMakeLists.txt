@@ -36,7 +36,6 @@ SET(_separate_src
   grid_out.cc
   grid_generator.cc
   grid_tools.cc
-  grid_tools_2.cc
   grid_tools_cache.cc
   grid_tools_nontemplates.cc
   grid_tools_dof_handlers.cc
