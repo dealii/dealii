@@ -220,7 +220,8 @@ namespace Particles
     typename Triangulation<dim, spacedim>::active_cell_iterator current_cell =
       triangulation->begin_active();
 
-    for (particle_iterator particle = begin(); particle != end(); ++particle)
+    const particle_iterator end = this->end();
+    for (particle_iterator particle = begin(); particle != end; ++particle)
       {
         locally_highest_index =
           std::max(locally_highest_index, particle->get_id());
@@ -260,78 +261,6 @@ namespace Particles
           global_number_of_particles == 0 ? 0 : locally_highest_index + 1;
         global_max_particles_per_cell = local_max_particles_per_cell;
       }
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename ParticleHandler<dim, spacedim>::particle_iterator
-  ParticleHandler<dim, spacedim>::begin() const
-  {
-    return (const_cast<ParticleHandler<dim, spacedim> *>(this))->begin();
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename ParticleHandler<dim, spacedim>::particle_iterator
-  ParticleHandler<dim, spacedim>::begin()
-  {
-    return particle_iterator(particles, particles.begin());
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename ParticleHandler<dim, spacedim>::particle_iterator
-  ParticleHandler<dim, spacedim>::end() const
-  {
-    return (const_cast<ParticleHandler<dim, spacedim> *>(this))->end();
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename ParticleHandler<dim, spacedim>::particle_iterator
-  ParticleHandler<dim, spacedim>::end()
-  {
-    return particle_iterator(particles, particles.end());
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename ParticleHandler<dim, spacedim>::particle_iterator
-  ParticleHandler<dim, spacedim>::begin_ghost() const
-  {
-    return (const_cast<ParticleHandler<dim, spacedim> *>(this))->begin_ghost();
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename ParticleHandler<dim, spacedim>::particle_iterator
-  ParticleHandler<dim, spacedim>::begin_ghost()
-  {
-    return particle_iterator(ghost_particles, ghost_particles.begin());
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename ParticleHandler<dim, spacedim>::particle_iterator
-  ParticleHandler<dim, spacedim>::end_ghost() const
-  {
-    return (const_cast<ParticleHandler<dim, spacedim> *>(this))->end_ghost();
-  }
-
-
-
-  template <int dim, int spacedim>
-  typename ParticleHandler<dim, spacedim>::particle_iterator
-  ParticleHandler<dim, spacedim>::end_ghost()
-  {
-    return particle_iterator(ghost_particles, ghost_particles.end());
   }
 
 
