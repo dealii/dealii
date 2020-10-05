@@ -949,11 +949,81 @@ namespace Particles
   /* ---------------------- inline and template functions ------------------
    */
 
+  template <int dim, int spacedim>
+  inline typename ParticleHandler<dim, spacedim>::particle_iterator
+  ParticleHandler<dim, spacedim>::begin() const
+  {
+    return (const_cast<ParticleHandler<dim, spacedim> *>(this))->begin();
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline typename ParticleHandler<dim, spacedim>::particle_iterator
+  ParticleHandler<dim, spacedim>::begin()
+  {
+    return particle_iterator(particles, particles.begin());
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline typename ParticleHandler<dim, spacedim>::particle_iterator
+  ParticleHandler<dim, spacedim>::end() const
+  {
+    return (const_cast<ParticleHandler<dim, spacedim> *>(this))->end();
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline typename ParticleHandler<dim, spacedim>::particle_iterator
+  ParticleHandler<dim, spacedim>::end()
+  {
+    return particle_iterator(particles, particles.end());
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline typename ParticleHandler<dim, spacedim>::particle_iterator
+  ParticleHandler<dim, spacedim>::begin_ghost() const
+  {
+    return (const_cast<ParticleHandler<dim, spacedim> *>(this))->begin_ghost();
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline typename ParticleHandler<dim, spacedim>::particle_iterator
+  ParticleHandler<dim, spacedim>::begin_ghost()
+  {
+    return particle_iterator(ghost_particles, ghost_particles.begin());
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline typename ParticleHandler<dim, spacedim>::particle_iterator
+  ParticleHandler<dim, spacedim>::end_ghost() const
+  {
+    return (const_cast<ParticleHandler<dim, spacedim> *>(this))->end_ghost();
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline typename ParticleHandler<dim, spacedim>::particle_iterator
+  ParticleHandler<dim, spacedim>::end_ghost()
+  {
+    return particle_iterator(ghost_particles, ghost_particles.end());
+  }
+
 
 
   template <int dim, int spacedim>
   template <class Archive>
-  void
+  inline void
   ParticleHandler<dim, spacedim>::serialize(Archive &ar, const unsigned int)
   {
     // Note that we do not serialize the particle data itself. Instead we
@@ -969,7 +1039,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   template <class VectorType>
-  typename std::enable_if<
+  inline typename std::enable_if<
     std::is_convertible<VectorType *, Function<spacedim> *>::value ==
     false>::type
   ParticleHandler<dim, spacedim>::set_particle_positions(
@@ -994,7 +1064,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   template <class VectorType>
-  void
+  inline void
   ParticleHandler<dim, spacedim>::get_particle_positions(
     VectorType &output_vector,
     const bool  add_to_output_vector)
