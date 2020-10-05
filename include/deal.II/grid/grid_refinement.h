@@ -21,6 +21,8 @@
 
 #include <deal.II/base/exceptions.h>
 
+#include <deal.II/numerics/vector_tools_common.h>
+
 #include <limits>
 
 DEAL_II_NAMESPACE_OPEN
@@ -219,6 +221,12 @@ namespace GridRefinement
    * through proliferation of refinement due to Triangulation::MeshSmoothing,
    * this number is only an indicator. The default value of this argument is
    * to impose no limit on the number of cells.
+   *
+   * @param[in] norm_type To determine thresholds, combined errors on
+   * subsets of cells are calculated as norms of the criteria on these
+   * cells. Different types of norms can be used for this purpose, from
+   * which VectorTools::NormType::L1_norm and
+   * VectorTools::NormType::L2_norm are currently supported.
    */
   template <int dim, typename Number, int spacedim>
   void
@@ -227,7 +235,8 @@ namespace GridRefinement
     const Vector<Number> &        criteria,
     const double                  top_fraction,
     const double                  bottom_fraction,
-    const unsigned int max_n_cells = std::numeric_limits<unsigned int>::max());
+    const unsigned int max_n_cells = std::numeric_limits<unsigned int>::max(),
+    const VectorTools::NormType norm_type = VectorTools::NormType::L1_norm);
 
 
 
