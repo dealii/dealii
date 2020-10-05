@@ -350,8 +350,8 @@ namespace internal
   class CellIDTranslator
   {
   public:
-    CellIDTranslator(const unsigned int n_coarse_cells,
-                     const unsigned int n_global_levels)
+    CellIDTranslator(const types::global_dof_index n_coarse_cells,
+                     const types::global_dof_index n_global_levels)
       : n_coarse_cells(n_coarse_cells)
       , n_global_levels(n_global_levels)
     {
@@ -363,7 +363,7 @@ namespace internal
             n_coarse_cells);
     }
 
-    unsigned int
+    types::global_dof_index
     size() const
     {
       return n_coarse_cells *
@@ -373,10 +373,10 @@ namespace internal
     }
 
     template <typename T>
-    unsigned int
+    types::global_dof_index
     translate(const T &cell) const
     {
-      unsigned int id = 0;
+      types::global_dof_index id = 0;
 
       id += convert_cell_id_binary_type_to_level_coarse_cell_id<dim>(
         cell->id().template to_binary<dim>());
@@ -387,8 +387,8 @@ namespace internal
     }
 
     template <typename T>
-    unsigned int
-    translate(const T &cell, const unsigned int i) const
+    types::global_dof_index
+    translate(const T &cell, const types::global_dof_index i) const
     {
       return (translate(cell) - tree_sizes[cell->level()]) *
                GeometryInfo<dim>::max_children_per_cell +
@@ -396,13 +396,13 @@ namespace internal
     }
 
     CellId
-    to_cell_id(const unsigned int id) const
+    to_cell_id(const types::global_dof_index id) const
     {
       std::vector<std::uint8_t> child_indices;
 
-      unsigned int id_temp = id;
+      types::global_dof_index id_temp = id;
 
-      unsigned int level = 0;
+      types::global_dof_index level = 0;
 
       for (; level < n_global_levels; ++level)
         if (id < tree_sizes[level])
@@ -411,7 +411,7 @@ namespace internal
 
       id_temp -= tree_sizes[level];
 
-      for (unsigned int l = 0; l < level; ++l)
+      for (types::global_dof_index l = 0; l < level; ++l)
         {
           child_indices.push_back(id_temp %
                                   GeometryInfo<dim>::max_children_per_cell);
@@ -424,9 +424,9 @@ namespace internal
     }
 
   private:
-    const unsigned int        n_coarse_cells;
-    const unsigned int        n_global_levels;
-    std::vector<unsigned int> tree_sizes;
+    const types::global_dof_index        n_coarse_cells;
+    const types::global_dof_index        n_global_levels;
+    std::vector<types::global_dof_index> tree_sizes;
   };
 
   template <typename MeshType>
@@ -536,8 +536,9 @@ namespace internal
 
       const auto targets_with_indexset = process.get_requesters();
 
-      std::map<unsigned int, std::vector<unsigned int>> indices_to_be_sent;
-      std::vector<MPI_Request>                          requests;
+      std::map<unsigned int, std::vector<types::global_dof_index>>
+                               indices_to_be_sent;
+      std::vector<MPI_Request> requests;
       requests.reserve(targets_with_indexset.size());
 
       {
@@ -562,7 +563,7 @@ namespace internal
 
             MPI_Isend(buffer.data(),
                       buffer.size(),
-                      MPI_UNSIGNED,
+                      Utilities::MPI::internal::mpi_type_id(buffer.data()),
                       i.first,
                       11,
                       communicator,
@@ -570,8 +571,7 @@ namespace internal
           }
       }
 
-
-      std::vector<unsigned int> ghost_indices;
+      std::vector<types::global_dof_index> ghost_indices;
 
       // process local cells
       {
@@ -593,7 +593,8 @@ namespace internal
       }
 
       {
-        std::map<unsigned int, std::vector<unsigned int>> rank_to_ids;
+        std::map<unsigned int, std::vector<types::global_dof_index>>
+          rank_to_ids;
 
         std::set<unsigned int> ranks;
 
@@ -616,11 +617,11 @@ namespace internal
             int message_length;
             MPI_Get_count(&status, MPI_UNSIGNED, &message_length);
 
-            std::vector<unsigned int> buffer(message_length);
+            std::vector<types::global_dof_index> buffer(message_length);
 
             MPI_Recv(buffer.data(),
                      buffer.size(),
-                     MPI_UNSIGNED,
+                     Utilities::MPI::internal::mpi_type_id(buffer.data()),
                      status.MPI_SOURCE,
                      11,
                      communicator,
