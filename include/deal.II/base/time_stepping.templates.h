@@ -112,6 +112,29 @@ namespace TimeStepping
 
             break;
           }
+        case (SSP_THIRD_ORDER):
+          {
+            this->n_stages = 3;
+            this->b.reserve(this->n_stages);
+            this->c.reserve(this->n_stages);
+            this->b.push_back(1.0 / 6.0);
+            this->b.push_back(1.0 / 6.0);
+            this->b.push_back(2.0 / 3.0);
+            this->c.push_back(0.0);
+            this->c.push_back(1.0);
+            this->c.push_back(0.5);
+            std::vector<double> tmp;
+            this->a.push_back(tmp);
+            tmp.resize(1);
+            tmp[0] = 1.0;
+            this->a.push_back(tmp);
+            tmp.resize(2);
+            tmp[0] = 1.0 / 4.0;
+            tmp[1] = 1.0 / 4.0;
+            this->a.push_back(tmp);
+
+            break;
+          }
         case (RK_CLASSIC_FOURTH_ORDER):
           {
             this->n_stages = 4;

@@ -37,6 +37,7 @@ namespace TimeStepping
    * - Explicit methods (see ExplicitRungeKutta::initialize):
    *   - FORWARD_EULER (first order)
    *   - RK_THIRD_ORDER (third order Runge-Kutta)
+   *   - SSP_THIRD_ORDER (third order SSP Runge-Kutta)
    *   - RK_CLASSIC_FOURTH_ORDER (classical fourth order Runge-Kutta)
    * - Implicit methods (see ImplicitRungeKutta::initialize):
    *   - BACKWARD_EULER (first order)
@@ -61,6 +62,12 @@ namespace TimeStepping
      * Third order Runge-Kutta method.
      */
     RK_THIRD_ORDER,
+    /**
+     * Third order Strong Stability Preserving (SSP) Runge-Kutta method
+     * (SSP time discretizations are also called Total Variation Diminishing
+     * (TVD) methods in the literature, see @cite gottlieb2001strong).
+     */
+    SSP_THIRD_ORDER,
     /**
      * Classical fourth order Runge-Kutta method.
      */
@@ -514,7 +521,7 @@ namespace TimeStepping
 
 
   /**
-   * This is class is derived from RungeKutta and implement embedded explicit
+   * This class is derived from RungeKutta and implements embedded explicit
    * methods.
    */
   template <typename VectorType>

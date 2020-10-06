@@ -3,6 +3,8 @@ DEAL::Forward Euler
 DEAL::0
 DEAL::Runge-Kutta third order
 DEAL::0
+DEAL::Strong Stability Preserving Runge-Kutta third order
+DEAL::0
 DEAL::Runge-Kutta fourth order
 DEAL::0
 DEAL::Backward Euler
@@ -23,3 +25,91 @@ DEAL::Fehlberg
 DEAL::0
 DEAL::Cash-Karp
 DEAL::0
+DEAL::Forward Euler first order
+DEAL::convergence rate
+DEAL::0.496119
+DEAL::0.634657
+DEAL::0.763742
+DEAL::0.862050
+DEAL::0.924783
+DEAL::0.960617
+DEAL::0.979834
+DEAL::0.989794
+DEAL::0.994866
+DEAL::Runge-Kutta third order
+DEAL::convergence rate
+DEAL::7.01207
+DEAL::0.0523936
+DEAL::2.00049
+DEAL::2.55207
+DEAL::2.78347
+DEAL::2.89332
+DEAL::2.94704
+DEAL::2.97361
+DEAL::2.98681
+DEAL::Strong Stability Preserving Runge-Kutta third order
+DEAL::convergence rate
+DEAL::2.44463
+DEAL::2.72007
+DEAL::2.86894
+DEAL::2.93941
+DEAL::2.97135
+DEAL::2.98614
+DEAL::2.99319
+DEAL::2.99663
+DEAL::2.99832
+DEAL::Runge-Kutta fourth order
+DEAL::convergence rate
+DEAL::3.32883
+DEAL::3.64708
+DEAL::3.86926
+DEAL::3.95478
+DEAL::3.98399
+DEAL::3.99389
+DEAL::3.99745
+DEAL::3.99887
+DEAL::3.99923
+DEAL::Backward Euler first order
+DEAL::convergence rate
+DEAL::94.3469
+DEAL::6.54344
+DEAL::1.54696
+DEAL::1.20584
+DEAL::1.09169
+DEAL::1.04347
+DEAL::1.02119
+DEAL::1.01048
+DEAL::1.00519
+DEAL::Implicit midpoint second order
+DEAL::convergence rate
+DEAL::1.35296
+DEAL::1.96494
+DEAL::1.99730
+DEAL::1.99994
+DEAL::2.00083
+DEAL::2.00283
+DEAL::2.01821
+DEAL::2.00827
+DEAL::2.18675
+DEAL::Crank-Nicolson second order
+DEAL::convergence rate
+DEAL::7.33468
+DEAL::2.34239
+DEAL::2.07462
+DEAL::2.01811
+DEAL::2.00462
+DEAL::2.00144
+DEAL::2.00230
+DEAL::2.00201
+DEAL::2.01221
+DEAL::SDIRK second order
+DEAL::convergence rate
+DEAL::2.55970
+DEAL::2.11577
+DEAL::2.02903
+DEAL::2.00817
+DEAL::2.00306
+DEAL::2.00408
+DEAL::2.00486
+DEAL::2.02211
+DEAL::2.24289
