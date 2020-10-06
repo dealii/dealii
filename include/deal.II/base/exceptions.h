@@ -743,7 +743,19 @@ namespace StandardExceptions
    */
   DeclException1(ExcFileNotOpen,
                  std::string,
-                 << "Could not open file " << arg1 << ".");
+                 << "Could not open file " << arg1
+                 << "."
+                    "\n\n"
+                    "If this happens during an operation that tries to read "
+                    "data: you may be "
+                    "trying to read from a file that doesn't exist or that is "
+                    "not readable given its file permissions."
+                    "\n\n"
+                    "If this happens during an operation that tries to write "
+                    "data: you may be trying to write to a file to which file "
+                    "or directory permissions do not allow you to write. A "
+                    "typical example is where you specify an output file in "
+                    "a directory that does not exist.");
 
   /**
    * Exception denoting a part of the library or application program that has
