@@ -1951,11 +1951,8 @@ namespace internal
             {
               const auto &parent = refine.first;
 
-              for (unsigned int child_index = 0;
-                   child_index < parent->n_children();
-                   ++child_index)
+              for (const auto &child : parent->child_iterators())
                 {
-                  const auto &child = parent->child(child_index);
                   Assert(child->is_locally_owned() && child->is_active(),
                          ExcInternalError());
                   child->set_active_fe_index(refine.second);

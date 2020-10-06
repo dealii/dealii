@@ -3160,6 +3160,23 @@ CellAccessor<dim, spacedim>::child(const unsigned int i) const
 
 
 template <int dim, int spacedim>
+inline boost::container::small_vector<TriaIterator<CellAccessor<dim, spacedim>>,
+                                      GeometryInfo<dim>::max_children_per_cell>
+CellAccessor<dim, spacedim>::child_iterators() const
+{
+  boost::container::small_vector<TriaIterator<CellAccessor<dim, spacedim>>,
+                                 GeometryInfo<dim>::max_children_per_cell>
+    child_iterators(this->n_children());
+
+  for (unsigned int i = 0; i < this->n_children(); ++i)
+    child_iterators[i] = this->child(i);
+
+  return child_iterators;
+}
+
+
+
+template <int dim, int spacedim>
 inline TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>
 CellAccessor<dim, spacedim>::face(const unsigned int i) const
 {

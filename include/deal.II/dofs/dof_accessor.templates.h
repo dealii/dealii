@@ -2446,6 +2446,26 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::child(
 
 
 template <int dimension_, int space_dimension_, bool level_dof_access>
+inline boost::container::small_vector<
+  TriaIterator<DoFCellAccessor<dimension_, space_dimension_, level_dof_access>>,
+  GeometryInfo<dimension_>::max_children_per_cell>
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  child_iterators() const
+{
+  boost::container::small_vector<
+    TriaIterator<
+      DoFCellAccessor<dimension_, space_dimension_, level_dof_access>>,
+    GeometryInfo<dimension_>::max_children_per_cell>
+    child_iterators(this->n_children());
+
+  for (unsigned int i = 0; i < this->n_children(); ++i)
+    child_iterators[i] = this->child(i);
+
+  return child_iterators;
+}
+
+
+template <int dimension_, int space_dimension_, bool level_dof_access>
 inline TriaIterator<
   DoFCellAccessor<dimension_, space_dimension_, level_dof_access>>
 DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::parent() const

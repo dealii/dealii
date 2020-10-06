@@ -357,10 +357,8 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
           // case. we choose the 'least dominant fe' on all children from
           // the associated FECollection.
           std::set<unsigned int> fe_indices_children;
-          for (unsigned int child_index = 0; child_index < cell->n_children();
-               ++child_index)
+          for (const auto &child : cell->child_iterators())
             {
-              const auto &child = cell->child(child_index);
               Assert(child->is_active() && child->coarsen_flag_set(),
                      typename dealii::Triangulation<
                        dim>::ExcInconsistentCoarseningFlags());

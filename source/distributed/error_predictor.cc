@@ -258,12 +258,8 @@ namespace parallel
                 float sqrsum_of_predicted_errors = 0.;
                 float predicted_error            = 0.;
                 int   degree_difference          = 0;
-                for (unsigned int child_index = 0;
-                     child_index < cell->n_children();
-                     ++child_index)
+                for (const auto &child : cell->child_iterators())
                   {
-                    const auto child = cell->child(child_index);
-
                     predicted_error =
                       (**estimated_error_it)[child->active_cell_index()] /
                       (gamma_h * std::pow(.5, future_fe_degree));
@@ -336,10 +332,8 @@ namespace parallel
 
             case parallel::distributed::Triangulation<dim,
                                                       spacedim>::CELL_REFINE:
-              for (unsigned int child_index = 0;
-                   child_index < cell->n_children();
-                   ++child_index)
-                (**it_output)[cell->child(child_index)->active_cell_index()] =
+              for (const auto &child : cell->child_iterators())
+                (**it_output)[child->active_cell_index()] =
                   (*it_input) / std::sqrt(cell->n_children());
               break;
 

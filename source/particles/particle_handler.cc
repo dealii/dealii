@@ -1693,23 +1693,15 @@ namespace Particles
           {
             unsigned int n_particles = 0;
 
-            for (unsigned int child_index = 0;
-                 child_index < GeometryInfo<dim>::max_children_per_cell;
-                 ++child_index)
+            for (const auto &child : cell->child_iterators())
               {
-                const typename Triangulation<dim, spacedim>::cell_iterator
-                  child = cell->child(child_index);
                 n_particles += n_particles_in_cell(child);
               }
 
             stored_particles_on_cell.reserve(n_particles);
 
-            for (unsigned int child_index = 0;
-                 child_index < GeometryInfo<dim>::max_children_per_cell;
-                 ++child_index)
+            for (const auto &child : cell->child_iterators())
               {
-                const typename Triangulation<dim, spacedim>::cell_iterator
-                                         child       = cell->child(child_index);
                 const internal::LevelInd level_index = {child->level(),
                                                         child->index()};
                 const auto               particles_in_cell =
