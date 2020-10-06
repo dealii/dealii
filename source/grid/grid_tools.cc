@@ -1125,7 +1125,8 @@ namespace GridTools
   void
   distort_random(const double                  factor,
                  Triangulation<dim, spacedim> &triangulation,
-                 const bool                    keep_boundary)
+                 const bool                    keep_boundary,
+                 const unsigned int            seed)
   {
     // if spacedim>dim we need to make sure that we perturb
     // points but keep them on
@@ -1201,14 +1202,8 @@ namespace GridTools
             }
         }
 
-    // create a random number generator for the interval [-1,1]. we use
-    // this to make sure the distribution we get is repeatable, i.e.,
-    // if you call the function twice on the same mesh, then you will
-    // get the same mesh. this would not be the case if you used
-    // the rand() function, which carries around some internal state
-    // we could use std::mt19937 but doing so results in compiler-dependent
-    // output.
-    boost::random::mt19937                     rng;
+    // create a random number generator for the interval [-1,1]
+    boost::random::mt19937                     rng(seed);
     boost::random::uniform_real_distribution<> uniform_distribution(-1, 1);
 
     // If the triangulation is distributed, we need to
