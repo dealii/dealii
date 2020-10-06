@@ -311,28 +311,14 @@ namespace parallel
                   // In case of coarsening, we need to find a suitable fe index
                   // for the parent cell. We choose the 'least dominant fe'
                   // on all children from the associated FECollection.
-                  std::set<unsigned int> fe_indices_children;
-                  for (unsigned int child_index = 0;
-                       child_index < cell->n_children();
-                       ++child_index)
-                    {
-                      const auto &child = cell->child(child_index);
-                      Assert(child->is_active() && child->coarsen_flag_set(),
-                             typename dealii::Triangulation<
-                               dim>::ExcInconsistentCoarseningFlags());
+#  ifdef DEBUG
+                  for (const auto &child : cell->child_iterators())
+                    Assert(child->is_active() && child->coarsen_flag_set(),
+                           typename dealii::Triangulation<
+                             dim>::ExcInconsistentCoarseningFlags());
+#  endif
 
-                      fe_indices_children.insert(child->future_fe_index());
-                    }
-                  Assert(!fe_indices_children.empty(), ExcInternalError());
-
-                  fe_index =
-                    dof_handler->get_fe_collection().find_dominated_fe_extended(
-                      fe_indices_children, /*codim=*/0);
-
-                  Assert(fe_index != numbers::invalid_unsigned_int,
-                         typename dealii::hp::FECollection<
-                           dim>::ExcNoDominatedFiniteElementAmongstChildren());
-
+                  fe_index = cell->dominated_future_fe_on_children();
                   break;
                 }
 

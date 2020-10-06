@@ -2921,6 +2921,40 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
 
 
 template <int dimension_, int space_dimension_, bool level_dof_access>
+inline unsigned int
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  dominated_future_fe_on_children() const
+{
+  Assert(!this->is_active(),
+         ExcMessage(
+           "You ask for information on children of this cell which is only "
+           "available for active cells. This cell has no children."));
+
+  std::set<unsigned int> future_fe_indices_children;
+  for (const auto &child : this->child_iterators())
+    {
+      Assert(
+        child->is_active(),
+        ExcMessage(
+          "You ask for information on children of this cell which is only "
+          "available for active cells. One of its children is not active."));
+      future_fe_indices_children.insert(child->future_fe_index());
+    }
+  Assert(!future_fe_indices_children.empty(), ExcInternalError());
+
+  const unsigned int future_fe_index =
+    this->dof_handler->get_fe_collection().find_dominated_fe_extended(
+      future_fe_indices_children, /*codim=*/0);
+
+  Assert(future_fe_index != numbers::invalid_unsigned_int,
+         ExcNoDominatedFiniteElementOnChildren());
+
+  return future_fe_index;
+}
+
+
+
+template <int dimension_, int space_dimension_, bool level_dof_access>
 template <typename number, typename OutputVector>
 inline void
 DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::

@@ -1879,30 +1879,16 @@ namespace internal
                         // based on the 'least dominant finite element' of its
                         // children. Consider the childrens' hypothetical future
                         // index when they have been flagged for p-refinement.
-                        std::set<unsigned int> fe_indices_children;
-                        for (unsigned int child_index = 0;
-                             child_index < parent->n_children();
-                             ++child_index)
-                          {
-                            const auto sibling = parent->child(child_index);
-                            Assert(sibling->is_active() &&
-                                     sibling->coarsen_flag_set(),
-                                   typename dealii::Triangulation<
-                                     dim>::ExcInconsistentCoarseningFlags());
-
-                            fe_indices_children.insert(
-                              sibling->future_fe_index());
-                          }
-                        Assert(!fe_indices_children.empty(),
-                               ExcInternalError());
+#ifdef DEBUG
+                        for (const auto &child : parent->child_iterators())
+                          Assert(child->is_active() &&
+                                   child->coarsen_flag_set(),
+                                 typename dealii::Triangulation<
+                                   dim>::ExcInconsistentCoarseningFlags());
+#endif
 
                         const unsigned int fe_index =
-                          dof_handler.fe_collection.find_dominated_fe_extended(
-                            fe_indices_children, /*codim=*/0);
-
-                        Assert(fe_index != numbers::invalid_unsigned_int,
-                               typename dealii::hp::FECollection<dim>::
-                                 ExcNoDominatedFiniteElementAmongstChildren());
+                          parent->dominated_future_fe_on_children();
 
                         fe_transfer->coarsened_cells_fe_index.insert(
                           {parent, fe_index});
@@ -1999,8 +1985,8 @@ namespace internal
                                                      /*codim=*/0);
 
           Assert(dominated_fe_index != numbers::invalid_unsigned_int,
-                 typename dealii::hp::FECollection<
-                   dim>::ExcNoDominatedFiniteElementAmongstChildren());
+                 (typename dealii::DoFCellAccessor<dim, spacedim, false>::
+                    ExcNoDominatedFiniteElementOnChildren()));
 
           return dominated_fe_index;
         }
