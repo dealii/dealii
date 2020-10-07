@@ -285,7 +285,7 @@ where
     (\mathbf{U}_i^{n},\mathbf{U}_j^{n}, \textbf{n}_{ij}),
     \lambda_{\text{max}} (\mathbf{U}_j^{n}, \mathbf{U}_i^{n},
     \textbf{n}_{ji}) \} \|\mathbf{c}_{ij}\|$ if $i \not = j$ is the so
-    called <i>graph-viscosity</i>. The graph-viscosity serves as a
+    called <i>graph viscosity</i>. The graph viscosity serves as a
     stabilization term, it is somewhat the discrete counterpart of
     $\epsilon \Delta \mathbf{u}$ that appears in the notion of viscosity
     solution described above. We will base our construction of $d_{ij}$ on
