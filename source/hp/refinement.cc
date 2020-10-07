@@ -679,10 +679,8 @@ namespace hp
                 const unsigned int n_children = parent->n_children();
 
                 unsigned int h_flagged_children = 0, p_flagged_children = 0;
-                for (unsigned int child_index = 0; child_index < n_children;
-                     ++child_index)
+                for (const auto &child : parent->child_iterators())
                   {
-                    const auto &child = parent->child(child_index);
                     if (child->is_active())
                       {
                         if (child->is_locally_owned())
@@ -716,10 +714,8 @@ namespace hp
                   {
                     // Perform pure h coarsening and
                     // drop all p adaptation flags.
-                    for (unsigned int child_index = 0; child_index < n_children;
-                         ++child_index)
+                    for (const auto &child : parent->child_iterators())
                       {
-                        const auto &child = parent->child(child_index);
                         // h_flagged_children == n_children implies
                         // that all children are active
                         Assert(child->is_active(), ExcInternalError());
@@ -731,10 +727,8 @@ namespace hp
                   {
                     // Perform p adaptation on all children and
                     // drop all h coarsening flags.
-                    for (unsigned int child_index = 0; child_index < n_children;
-                         ++child_index)
+                    for (const auto &child : parent->child_iterators())
                       {
-                        const auto &child = parent->child(child_index);
                         if (child->is_active() && child->is_locally_owned())
                           child->clear_coarsen_flag();
                       }

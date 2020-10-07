@@ -1471,6 +1471,15 @@ public:
   child(const unsigned int i) const;
 
   /**
+   * Return an array of iterators to all children of this cell.
+   */
+  boost::container::small_vector<
+    TriaIterator<
+      DoFCellAccessor<dimension_, space_dimension_, level_dof_access>>,
+    GeometryInfo<dimension_>::max_children_per_cell>
+  child_iterators() const;
+
+  /**
    * Return an iterator to the @p ith face of this cell.
    *
    * This function returns a DoFAccessor with <code>structdim == 0</code> in

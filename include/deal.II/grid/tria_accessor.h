@@ -2839,6 +2839,13 @@ public:
   child(const unsigned int i) const;
 
   /**
+   * Return an array of iterators to all children of this cell.
+   */
+  boost::container::small_vector<TriaIterator<CellAccessor<dim, spacedim>>,
+                                 GeometryInfo<dim>::max_children_per_cell>
+  child_iterators() const;
+
+  /**
    * Return an iterator to the @p ith face of this cell.
    */
   TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>
