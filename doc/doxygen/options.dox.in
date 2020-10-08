@@ -52,7 +52,7 @@ SORT_MEMBER_DOCS       = NO
 SORT_BRIEF_DOCS        = NO
 SORT_BY_SCOPE_NAME     = NO
 GENERATE_TODOLIST      = YES
-GENERATE_DEPRECATEDLIST= NO
+GENERATE_DEPRECATEDLIST= YES
 SHOW_USED_FILES        = YES
 
 #---------------------------------------------------------------------------
