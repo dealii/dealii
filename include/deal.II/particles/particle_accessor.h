@@ -70,7 +70,7 @@ namespace Particles
      *   particles on the latter are *copies* of particles owned on other
      *   processors, and should therefore be treated in the same way as
      *   ghost entries in @ref GlossGhostedVector "vectors with ghost elements"
-     *   or @ref GlossGhostCells "ghost cells": In both cases, one should
+     *   or @ref GlossGhostCell "ghost cells": In both cases, one should
      *   treat the ghost elements or cells as `const` objects that shouldn't
      *   be modified even if the objects allow for calls that modify
      *   properties. Rather, properties should only be modified on processors
@@ -98,7 +98,7 @@ namespace Particles
      *   particles on the latter are *copies* of particles owned on other
      *   processors, and should therefore be treated in the same way as
      *   ghost entries in @ref GlossGhostedVector "vectors with ghost elements"
-     *   or @ref GlossGhostCells "ghost cells": In both cases, one should
+     *   or @ref GlossGhostCell "ghost cells": In both cases, one should
      *   treat the ghost elements or cells as `const` objects that shouldn't
      *   be modified even if the objects allow for calls that modify
      *   properties. Rather, properties should only be modified on processors
@@ -147,7 +147,7 @@ namespace Particles
      *   particles on the latter are *copies* of particles owned on other
      *   processors, and should therefore be treated in the same way as
      *   ghost entries in @ref GlossGhostedVector "vectors with ghost elements"
-     *   or @ref GlossGhostCells "ghost cells": In both cases, one should
+     *   or @ref GlossGhostCell "ghost cells": In both cases, one should
      *   treat the ghost elements or cells as `const` objects that shouldn't
      *   be modified even if the objects allow for calls that modify
      *   properties. Rather, properties should only be modified on processors
@@ -167,7 +167,7 @@ namespace Particles
      *   particles on the latter are *copies* of particles owned on other
      *   processors, and should therefore be treated in the same way as
      *   ghost entries in @ref GlossGhostedVector "vectors with ghost elements"
-     *   or @ref GlossGhostCells "ghost cells": In both cases, one should
+     *   or @ref GlossGhostCell "ghost cells": In both cases, one should
      *   treat the ghost elements or cells as `const` objects that shouldn't
      *   be modified even if the objects allow for calls that modify
      *   properties. Rather, properties should only be modified on processors
