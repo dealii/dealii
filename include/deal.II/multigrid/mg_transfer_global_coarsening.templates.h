@@ -350,8 +350,8 @@ namespace internal
   class CellIDTranslator
   {
   public:
-    CellIDTranslator(const types::global_dof_index n_coarse_cells,
-                     const types::global_dof_index n_global_levels)
+    CellIDTranslator(const types::global_cell_index n_coarse_cells,
+                     const types::global_cell_index n_global_levels)
       : n_coarse_cells(n_coarse_cells)
       , n_global_levels(n_global_levels)
     {
@@ -363,7 +363,7 @@ namespace internal
             n_coarse_cells);
     }
 
-    types::global_dof_index
+    types::global_cell_index
     size() const
     {
       return n_coarse_cells *
@@ -373,10 +373,10 @@ namespace internal
     }
 
     template <typename T>
-    types::global_dof_index
+    types::global_cell_index
     translate(const T &cell) const
     {
-      types::global_dof_index id = 0;
+      types::global_cell_index id = 0;
 
       id += convert_cell_id_binary_type_to_level_coarse_cell_id<dim>(
         cell->id().template to_binary<dim>());
@@ -387,8 +387,8 @@ namespace internal
     }
 
     template <typename T>
-    types::global_dof_index
-    translate(const T &cell, const types::global_dof_index i) const
+    types::global_cell_index
+    translate(const T &cell, const types::global_cell_index i) const
     {
       return (translate(cell) - tree_sizes[cell->level()]) *
                GeometryInfo<dim>::max_children_per_cell +
@@ -396,13 +396,13 @@ namespace internal
     }
 
     CellId
-    to_cell_id(const types::global_dof_index id) const
+    to_cell_id(const types::global_cell_index id) const
     {
       std::vector<std::uint8_t> child_indices;
 
-      types::global_dof_index id_temp = id;
+      types::global_cell_index id_temp = id;
 
-      types::global_dof_index level = 0;
+      types::global_cell_index level = 0;
 
       for (; level < n_global_levels; ++level)
         if (id < tree_sizes[level])
@@ -411,7 +411,7 @@ namespace internal
 
       id_temp -= tree_sizes[level];
 
-      for (types::global_dof_index l = 0; l < level; ++l)
+      for (types::global_cell_index l = 0; l < level; ++l)
         {
           child_indices.push_back(id_temp %
                                   GeometryInfo<dim>::max_children_per_cell);
@@ -424,9 +424,9 @@ namespace internal
     }
 
   private:
-    const types::global_dof_index        n_coarse_cells;
-    const types::global_dof_index        n_global_levels;
-    std::vector<types::global_dof_index> tree_sizes;
+    const types::global_cell_index        n_coarse_cells;
+    const types::global_cell_index        n_global_levels;
+    std::vector<types::global_cell_index> tree_sizes;
   };
 
   template <typename MeshType>
@@ -480,7 +480,7 @@ namespace internal
                 false);
 
             Utilities::MPI::ConsensusAlgorithms::Selector<
-              std::pair<types::global_dof_index, types::global_dof_index>,
+              std::pair<types::global_cell_index, types::global_cell_index>,
               unsigned int>
               consensus_algorithm(process, communicator);
             consensus_algorithm.run();
@@ -506,7 +506,7 @@ namespace internal
                 true);
 
       Utilities::MPI::ConsensusAlgorithms::Selector<
-        std::pair<types::global_dof_index, types::global_dof_index>,
+        std::pair<types::global_cell_index, types::global_cell_index>,
         unsigned int>
         consensus_algorithm(process, communicator);
       consensus_algorithm.run();
