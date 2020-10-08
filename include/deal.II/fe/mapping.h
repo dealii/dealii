@@ -467,7 +467,7 @@ public:
   transform_points_real_to_unit_cell(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const ArrayView<const Point<spacedim>> &                    real_points,
-    ArrayView<Point<dim>> &unit_points) const;
+    const ArrayView<Point<dim>> &unit_points) const;
 
   /**
    * Transform the point @p p on the real @p cell to the corresponding point

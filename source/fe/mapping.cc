@@ -81,7 +81,7 @@ void
 Mapping<dim, spacedim>::transform_points_real_to_unit_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const ArrayView<const Point<spacedim>> &                    real_points,
-  ArrayView<Point<dim>> &                                     unit_points) const
+  const ArrayView<Point<dim>> &                               unit_points) const
 {
   AssertDimension(real_points.size(), unit_points.size());
   for (unsigned int i = 0; i < real_points.size(); ++i)
