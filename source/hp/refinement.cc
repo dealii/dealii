@@ -542,29 +542,15 @@ namespace hp
                 if (future_fe_indices_on_coarsened_cells.find(parent) ==
                     future_fe_indices_on_coarsened_cells.end())
                   {
-                    std::set<unsigned int> fe_indices_children;
-                    for (unsigned int child_index = 0;
-                         child_index < parent->n_children();
-                         ++child_index)
-                      {
-                        const auto &child = parent->child(child_index);
-                        Assert(child->is_active() && child->coarsen_flag_set(),
-                               typename dealii::Triangulation<
-                                 dim>::ExcInconsistentCoarseningFlags());
-
-                        fe_indices_children.insert(child->future_fe_index());
-                      }
-                    Assert(!fe_indices_children.empty(), ExcInternalError());
+#ifdef DEBUG
+                    for (const auto &child : parent->child_iterators())
+                      Assert(child->is_active() && child->coarsen_flag_set(),
+                             typename dealii::Triangulation<
+                               dim>::ExcInconsistentCoarseningFlags());
+#endif
 
                     parent_future_fe_index =
-                      dof_handler.get_fe_collection()
-                        .find_dominated_fe_extended(fe_indices_children,
-                                                    /*codim=*/0);
-
-                    Assert(
-                      parent_future_fe_index != numbers::invalid_unsigned_int,
-                      typename dealii::hp::FECollection<
-                        dim>::ExcNoDominatedFiniteElementAmongstChildren());
+                      parent->dominated_future_fe_on_children();
 
                     future_fe_indices_on_coarsened_cells.insert(
                       {parent, parent_future_fe_index});

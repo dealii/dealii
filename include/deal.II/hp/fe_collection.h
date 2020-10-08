@@ -736,16 +736,6 @@ namespace hp
     DeclException0(ExcNoFiniteElements);
 
     /**
-     * Exception
-     *
-     * @ingroup Exceptions
-     */
-    DeclExceptionMsg(
-      ExcNoDominatedFiniteElementAmongstChildren,
-      "No FiniteElement has been found in your FECollection that is "
-      "dominated by all children of a cell you are trying to coarsen!");
-
-    /**
      * @}
      */
 
