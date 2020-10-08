@@ -254,7 +254,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       distort_random<deal_II_dimension>(
         const double,
         Triangulation<deal_II_dimension, deal_II_space_dimension> &,
-        const bool);
+        const bool,
+        const unsigned int);
 
       template void
       get_face_connectivity_of_cells(

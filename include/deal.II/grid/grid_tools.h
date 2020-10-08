@@ -45,6 +45,7 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <boost/archive/binary_iarchive.hpp>
 #  include <boost/archive/binary_oarchive.hpp>
 #  include <boost/geometry/index/rtree.hpp>
+#  include <boost/random/mersenne_twister.hpp>
 #  include <boost/serialization/array.hpp>
 #  include <boost/serialization/vector.hpp>
 
@@ -628,12 +629,18 @@ namespace GridTools
    *
    * If @p keep_boundary is set to @p true (which is the default), then
    * boundary vertices are not moved.
+   *
+   * @p seed is used for the initialization of the random engine. Its
+   * default value initializes the engine with the same state as in
+   * previous versions of deal.II.
    */
   template <int dim, int spacedim>
   void
-  distort_random(const double                  factor,
-                 Triangulation<dim, spacedim> &triangulation,
-                 const bool                    keep_boundary = true);
+  distort_random(
+    const double                  factor,
+    Triangulation<dim, spacedim> &triangulation,
+    const bool                    keep_boundary = true,
+    const unsigned int            seed = boost::random::mt19937::default_seed);
 
   /**
    * Remove hanging nodes from a grid. If the @p isotropic parameter is set
