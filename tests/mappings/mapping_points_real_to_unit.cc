@@ -95,8 +95,7 @@ test_real_to_unit_cell(const Mapping<dim, spacedim> &mapping)
   for (unsigned int i = 0; i < unit_points.size(); ++i)
     real_points[i] = mapping.transform_unit_to_real_cell(cell, unit_points[i]);
   std::vector<Point<dim>> new_points(unit_points.size());
-  ArrayView<Point<dim>>   points_view(new_points);
-  mapping.transform_points_real_to_unit_cell(cell, real_points, points_view);
+  mapping.transform_points_real_to_unit_cell(cell, real_points, new_points);
   for (unsigned int i = 0; i < unit_points.size(); ++i)
     {
       // for each of the points, verify that applying the forward map and
