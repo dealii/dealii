@@ -29,6 +29,7 @@
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/mapping_q_generic.h>
 
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -893,17 +894,15 @@ namespace internal
       /**
        * Implementation of transform_real_to_unit_cell for dim==spacedim
        */
-      template <int dim>
+      template <int dim, int spacedim>
       Point<dim>
       do_transform_real_to_unit_cell_internal(
-        const Point<dim> &                                  p,
+        const Point<spacedim> &                             p,
         const Point<dim> &                                  initial_p_unit,
-        const std::vector<Point<dim>> &                     points,
+        const std::vector<Point<spacedim>> &                points,
         const std::vector<Polynomials::Polynomial<double>> &polynomials_1d,
         const std::vector<unsigned int> &                   renumber)
       {
-        const unsigned int spacedim = dim;
-
         AssertDimension(points.size(),
                         Utilities::pow(polynomials_1d.size(), dim));
 
@@ -917,8 +916,8 @@ namespace internal
         // The shape values and derivatives of the mapping at this point are
         // previously computed.
 
-        Point<dim>                            p_unit = initial_p_unit;
-        std::pair<Point<dim>, Tensor<2, dim>> p_real =
+        Point<dim>                                      p_unit = initial_p_unit;
+        std::pair<Point<spacedim>, Tensor<2, spacedim>> p_real =
           compute_mapped_location_of_point(points,
                                            polynomials_1d,
                                            renumber,
@@ -967,6 +966,9 @@ namespace internal
         const double       eps                    = 1.e-11;
         const unsigned int newton_iteration_limit = 20;
 
+        Point<dim> invalid_point;
+        invalid_point[0] = std::numeric_limits<double>::infinity();
+
         unsigned int newton_iteration = 0;
         double       last_f_weighted_norm_square;
         do
@@ -979,9 +981,9 @@ namespace internal
             const Tensor<2, spacedim> &df = p_real.second;
 
             // Solve  [f'(x)]d=f(x)
-            AssertThrow(
-              determinant(df) > 0,
-              (typename Mapping<dim, spacedim>::ExcTransformationFailed()));
+            if (determinant(df) <= 0)
+              return invalid_point;
+
             const Tensor<2, spacedim> df_inverse = invert(df);
             const Tensor<1, spacedim> delta      = df_inverse * f;
 
@@ -1035,18 +1037,13 @@ namespace internal
                 else if (step_length > 0.05)
                   step_length /= 2;
                 else
-                  AssertThrow(
-                    false,
-                    (typename Mapping<dim,
-                                      spacedim>::ExcTransformationFailed()));
+                  return invalid_point;
               }
             while (true);
 
             ++newton_iteration;
             if (newton_iteration > newton_iteration_limit)
-              AssertThrow(
-                false,
-                (typename Mapping<dim, spacedim>::ExcTransformationFailed()));
+              return invalid_point;
             last_f_weighted_norm_square = (df_inverse * f).norm_square();
           }
         while (last_f_weighted_norm_square > eps * eps);
@@ -2295,7 +2292,58 @@ MappingQGeneric<dim, spacedim>::transform_real_to_unit_cell(
 
   // perform the Newton iteration and return the result. note that this
   // statement may throw an exception, which we simply pass up to the caller
-  return this->transform_real_to_unit_cell_internal(cell, p, initial_p_unit);
+  const Point<dim> p_unit =
+    this->transform_real_to_unit_cell_internal(cell, p, initial_p_unit);
+  if (p_unit[0] == std::numeric_limits<double>::infinity())
+    AssertThrow(false,
+                (typename Mapping<dim, spacedim>::ExcTransformationFailed()));
+  return p_unit;
+}
+
+
+
+template <int dim, int spacedim>
+void
+MappingQGeneric<dim, spacedim>::transform_points_real_to_unit_cell(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const ArrayView<const Point<spacedim>> &                    real_points,
+  ArrayView<Point<dim>> &                                     unit_points) const
+{
+  AssertDimension(real_points.size(), unit_points.size());
+  const std::vector<Point<spacedim>> support_points =
+    this->compute_mapping_support_points(cell);
+
+  // From the chosen (high-order) support points, now only pick the first
+  // 2^dim points and construct an affine approximation from those.
+  const std::pair<DerivativeForm<1, dim, spacedim>, Tensor<1, spacedim>>
+    affine_factors = GridTools::affine_cell_approximation<dim>(
+      ArrayView<const Point<spacedim>>(support_points.data(),
+                                       GeometryInfo<dim>::vertices_per_cell));
+  const DerivativeForm<1, spacedim, dim> A_inv =
+    affine_factors.first.covariant_form().transpose();
+
+  for (unsigned int i = 0; i < real_points.size(); ++i)
+    {
+      try
+        {
+          // Compute an initial guess by inverting the affine approximation
+          // A * x_unit + b = x_real
+          Point<dim> initial_guess(
+            apply_transformation(A_inv,
+                                 real_points[i] - affine_factors.second));
+          unit_points[i] = internal::MappingQGenericImplementation::
+            do_transform_real_to_unit_cell_internal<dim, spacedim>(
+              real_points[i],
+              GeometryInfo<dim>::project_to_unit_cell(initial_guess),
+              support_points,
+              polynomials_1d,
+              renumber_lexicographic_to_hierarchic);
+        }
+      catch (typename Mapping<dim>::ExcTransformationFailed &)
+        {
+          unit_points[i][0] = std::numeric_limits<double>::infinity();
+        }
+    }
 }
 
 

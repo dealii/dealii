@@ -77,6 +77,30 @@ Mapping<dim, spacedim>::get_bounding_box(
 
 
 template <int dim, int spacedim>
+void
+Mapping<dim, spacedim>::transform_points_real_to_unit_cell(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const ArrayView<const Point<spacedim>> &                    real_points,
+  ArrayView<Point<dim>> &                                     unit_points) const
+{
+  AssertDimension(real_points.size(), unit_points.size());
+  for (unsigned int i = 0; i < real_points.size(); ++i)
+    {
+      try
+        {
+          unit_points[i] = transform_real_to_unit_cell(cell, real_points[i]);
+        }
+      catch (typename Mapping<dim>::ExcTransformationFailed &)
+        {
+          unit_points[i]    = Point<dim>();
+          unit_points[i][0] = std::numeric_limits<double>::infinity();
+        }
+    }
+}
+
+
+
+template <int dim, int spacedim>
 Point<dim - 1>
 Mapping<dim, spacedim>::project_real_point_to_unit_point_on_face(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
