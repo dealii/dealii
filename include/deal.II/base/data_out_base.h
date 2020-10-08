@@ -3329,7 +3329,8 @@ public:
    * Get the XDMF content associated with this entry.
    * If the entry is not valid, this returns an empty string.
    *
-   * @deprecated Use @ref get_xdmf_content(const unsigned int, const ReferenceCell::Type &) instead.
+   * @deprecated Use the overload taking an `unsigned int` and a
+   * `const ReferenceCell::Type &` instead.
    */
   DEAL_II_DEPRECATED
   std::string

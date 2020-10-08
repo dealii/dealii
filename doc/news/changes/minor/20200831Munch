@@ -1,4 +1,5 @@
-New: The methods FEEvaluation/FEEFacevaluation::gather_evaluate/integrate_scatter() 
-can now also accept block vectors.
+New: The methods FEEvaluation::gather_evaluate(),
+FEEFaceEvaluation::gather_evaluate(), FEEvaluation::integrate_scatter() and
+FEfaceEvaluation::integrate_scatter() can now also accept block vectors.
 <br>
 (Peter Munch, Magdalena Schreter, Martin Kronbichler, 2020/08/31)
