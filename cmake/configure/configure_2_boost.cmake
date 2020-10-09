@@ -92,6 +92,20 @@ MACRO(FEATURE_BOOST_CONFIGURE_BUNDLED)
   # We need to set this path before calling the configure function
   # to be able to use the include paths in the checks.
   SET(BOOST_BUNDLED_INCLUDE_DIRS ${BOOST_FOLDER}/include)
+  #
+  # We still need the version information, which is set up in the FindBoost
+  # module in the non-bundled case:
+  #
+  FILE(STRINGS "${BOOST_BUNDLED_INCLUDE_DIRS}/boost/version.hpp"
+    BOOST_VERSION_STRING
+    REGEX "#define.*BOOST_VERSION")
+
+  STRING(REGEX REPLACE "^.*BOOST_VERSION.* ([0-9]+).*" "\\1"
+    BOOST_VERSION_NUMBER "${BOOST_VERSION_STRING}"
+    )
+  MATH(EXPR Boost_MAJOR_VERSION "${BOOST_VERSION_NUMBER} / 100000")
+  MATH(EXPR Boost_MINOR_VERSION "${BOOST_VERSION_NUMBER} / 100 % 1000")
+  MATH(EXPR Boost_SUBMINOR_VERSION "${BOOST_VERSION_NUMBER} % 100")
 
   FEATURE_BOOST_CONFIGURE_COMMON()
 
