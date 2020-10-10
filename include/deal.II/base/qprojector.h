@@ -89,9 +89,9 @@ public:
    * is used on face <tt>face_no</tt>. For further details, see the general
    * doc for this class.
    *
-   * @deprecated This function makes an implicit assumption that the cell is
-   *   a line (1D), a quad (2D), or a hex (3D). Use the other version of
-   *   this function that takes the reference cell type instead.
+   * @note This function is deprecated since it makes an implicit assumption
+   * that the cell is a line (1D), a quad (2D), or a hex (3D). Use the other
+   * version of this function that takes the reference cell type instead.
    */
   DEAL_II_DEPRECATED static void
   project_to_face(const SubQuadrature &    quadrature,
@@ -114,9 +114,9 @@ public:
    * <tt>quadrature</tt> on face <tt>face_no</tt>. For further details, see
    * the general doc for this class.
    *
-   * @deprecated This function makes an implicit assumption that the cell is
-   *   a line (1D), a quad (2D), or a hex (3D). Use the other version of
-   *   this function that takes the reference cell type instead.
+   * @note This function is deprecated since it makes an implicit assumption
+   * that the cell is a line (1D), a quad (2D), or a hex (3D). Use the other
+   * version of this function that takes the reference cell type instead.
    */
   DEAL_II_DEPRECATED static Quadrature<dim>
   project_to_face(const SubQuadrature &quadrature, const unsigned int face_no);
@@ -140,9 +140,9 @@ public:
    * @note Only the points are transformed. The quadrature weights are the
    * same as those of the original rule.
    *
-   * @deprecated This function makes an implicit assumption that the cell is
-   *   a line (1D), a quad (2D), or a hex (3D). Use the other version of
-   *   this function that takes the reference cell type instead.
+   * @note This function is deprecated since it makes an implicit assumption
+   * that the cell is a line (1D), a quad (2D), or a hex (3D). Use the other
+   * version of this function that takes the reference cell type instead.
    */
   DEAL_II_DEPRECATED static void
   project_to_subface(const SubQuadrature &          quadrature,
@@ -179,9 +179,9 @@ public:
    * @note Only the points are transformed. The quadrature weights are the
    * same as those of the original rule.
    *
-   * @deprecated This function makes an implicit assumption that the cell is
-   *   a line (1D), a quad (2D), or a hex (3D). Use the other version of
-   *   this function that takes the reference cell type instead.
+   * @note This function is deprecated since it makes an implicit assumption
+   * that the cell is a line (1D), a quad (2D), or a hex (3D). Use the other
+   * version of this function that takes the reference cell type instead.
    */
   DEAL_II_DEPRECATED static Quadrature<dim>
   project_to_subface(const SubQuadrature &          quadrature,
@@ -199,9 +199,9 @@ public:
    * @note Only the points are transformed. The quadrature weights are the
    * same as those of the original rule.
    *
-   * @deprecated This function makes an implicit assumption that the cell is
-   *   a line (1D), a quad (2D), or a hex (3D). Use the other version of
-   *   this function that takes the reference cell type instead.
+   * @note This function is deprecated since it makes an implicit assumption
+   * that the cell is a line (1D), a quad (2D), or a hex (3D). Use the other
+   * version of this function that takes the reference cell type instead.
    */
   static Quadrature<dim>
   project_to_subface(const ReferenceCell::Type      reference_cell_type,
@@ -227,9 +227,9 @@ public:
    * @note In 3D, this function produces eight sets of quadrature points for
    * each face, in order to cope possibly different orientations of the mesh.
    *
-   * @deprecated This function makes an implicit assumption that the cell is
-   *   a line (1D), a quad (2D), or a hex (3D). Use the other version of
-   *   this function that takes the reference cell type instead.
+   * @note This function is deprecated since it makes an implicit assumption
+   * that the cell is a line (1D), a quad (2D), or a hex (3D). Use the other
+   * version of this function that takes the reference cell type instead.
    */
   DEAL_II_DEPRECATED static Quadrature<dim>
   project_to_all_faces(const SubQuadrature &quadrature);
@@ -267,9 +267,9 @@ public:
    * to a single subface and use it as a quadrature on this face, as is done
    * in FESubfaceValues.
    *
-   * @deprecated This function makes an implicit assumption that the cell is
-   *   a line (1D), a quad (2D), or a hex (3D). Use the other version of
-   *   this function that takes the reference cell type instead.
+   * @note This function is deprecated since it makes an implicit assumption
+   * that the cell is a line (1D), a quad (2D), or a hex (3D). Use the other
+   * version of this function that takes the reference cell type instead.
    */
   DEAL_II_DEPRECATED static Quadrature<dim>
   project_to_all_subfaces(const SubQuadrature &quadrature);
@@ -301,9 +301,9 @@ public:
    * fraction of the cell, the weights of the resulting object are divided by
    * GeometryInfo<dim>::children_per_cell.
    *
-   * @deprecated This function makes an implicit assumption that the cell is
-   *   a line (1D), a quad (2D), or a hex (3D). Use the other version of
-   *   this function that takes the reference cell type instead.
+   * @note This function is deprecated since it makes an implicit assumption
+   * that the cell is a line (1D), a quad (2D), or a hex (3D). Use the other
+   * version of this function that takes the reference cell type instead.
    */
   DEAL_II_DEPRECATED static Quadrature<dim>
   project_to_child(const Quadrature<dim> &quadrature,
@@ -333,9 +333,9 @@ public:
    * The child numbering is the same as the children would be numbered upon
    * refinement of the cell.
    *
-   * @deprecated This function makes an implicit assumption that the cell is
-   *   a line (1D), a quad (2D), or a hex (3D). Use the other version of
-   *   this function that takes the reference cell type instead.
+   * @note This function is deprecated since it makes an implicit assumption
+   * that the cell is a line (1D), a quad (2D), or a hex (3D). Use the other
+   * version of this function that takes the reference cell type instead.
    */
   DEAL_II_DEPRECATED static Quadrature<dim>
   project_to_all_children(const Quadrature<dim> &quadrature);
@@ -357,9 +357,9 @@ public:
    * Project the one dimensional rule <tt>quadrature</tt> to the straight line
    * connecting the points <tt>p1</tt> and <tt>p2</tt>.
    *
-   * @deprecated This function makes an implicit assumption that the cell is
-   *   a line (1D), a quad (2D), or a hex (3D). Use the other version of
-   *   this function that takes the reference cell type instead.
+   * @note This function is deprecated since it makes an implicit assumption
+   * that the cell is a line (1D), a quad (2D), or a hex (3D). Use the other
+   * version of this function that takes the reference cell type instead.
    */
   DEAL_II_DEPRECATED static Quadrature<dim>
   project_to_line(const Quadrature<1> &quadrature,
@@ -415,9 +415,9 @@ public:
      * dimensional face quadrature formula (the one that has been projected
      * onto the faces) has.
      *
-     * @deprecated This function makes an implicit assumption that the cell is
-     *   a line (1D), a quad (2D), or a hex (3D). Use the other version of
-     *   this function that takes the reference cell type instead.
+     * @note This function is deprecated since it makes an implicit assumption
+     * that the cell is a line (1D), a quad (2D), or a hex (3D). Use the other
+     * version of this function that takes the reference cell type instead.
      */
     DEAL_II_DEPRECATED static DataSetDescriptor
     face(const unsigned int face_no,
@@ -456,9 +456,9 @@ public:
      *
      * Through the last argument anisotropic refinement can be respected.
      *
-     * @deprecated This function makes an implicit assumption that the cell is
-     *   a line (1D), a quad (2D), or a hex (3D). Use the other version of
-     *   this function that takes the reference cell type instead.
+     * @note This function is deprecated since it makes an implicit assumption
+     * that the cell is a line (1D), a quad (2D), or a hex (3D). Use the other
+     * version of this function that takes the reference cell type instead.
      */
     DEAL_II_DEPRECATED static DataSetDescriptor
     subface(const unsigned int               face_no,

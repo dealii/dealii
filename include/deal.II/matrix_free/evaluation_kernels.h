@@ -667,6 +667,7 @@ namespace internal
      * coefficient array, generating values along the columns of the
      * coefficient array.
      *
+     * @param n_components The number of vector components.
      * @param transformation_matrix The coefficient matrix handed in as a
      *                     vector, using @p basis_size_1 rows and @p basis_size_2
      *                     columns if interpreted as a matrix.
@@ -782,6 +783,7 @@ namespace internal
      * coefficient array, generating values along the rows of the coefficient
      * array.
      *
+     * @param n_components The number of vector components.
      * @param transformation_matrix The coefficient matrix handed in as a
      *                     vector, using @p basis_size_1 rows and @p basis_size_2
      *                     columns if interpreted as a matrix.
@@ -944,16 +946,17 @@ namespace internal
      * do_forward() operation, multiplication by the coefficients in the
      * quadrature points, and the do_backward() operation.
      *
+     * @param n_components The number of vector components.
      * @param transformation_matrix The coefficient matrix handed in as a
      *                     vector, using @p basis_size_1 rows and @p basis_size_2
      *                     columns if interpreted as a matrix.
      * @param coefficients The array of coefficients by which the result is
      *                     multiplied. Its length must be either
-     *                     basis_size_2^dim or n_components*basis_size_2^dim
+     *                     basis_size_2^dim or n_components*basis_size_2^dim.
      * @param values_in    The array of the input of size basis_size_2^dim. It
-     *                     may alias with values_out
+     *                     may alias with values_out.
      * @param scratch_data Array to hold temporary data during the operation.
-     *                     Must be of length basis_size_2^dim
+     *                     Must be of length basis_size_2^dim.
      * @param values_out   The array of size basis_size_1^dim where the results
      *                     of the transformation are stored. It may alias with
      *                     the values_in array.

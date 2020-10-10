@@ -57,7 +57,7 @@ namespace Simplex
     /**
      * @copydoc ScalarPolynomialsBase::evaluate()
      *
-     * @note Currently, only the vectors @p values and @grads are filled.
+     * @note Currently, only the vectors @p values and @p grads are filled.
      */
     void
     evaluate(const Point<dim> &           unit_point,

@@ -253,13 +253,15 @@ protected:
   virtual std::unique_ptr<
     typename FiniteElement<dim, spacedim>::InternalDataBase>
   get_data(
-    const UpdateFlags update_flags,
-    const Mapping<dim, spacedim> & /*mapping*/,
-    const Quadrature<dim> &quadrature,
+    const UpdateFlags             update_flags,
+    const Mapping<dim, spacedim> &mapping,
+    const Quadrature<dim> &       quadrature,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
       &output_data) const override
   {
+    (void)mapping;
+
     // generate a new data object and
     // initialize some fields
     std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>

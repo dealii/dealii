@@ -128,7 +128,7 @@ namespace hp
     /**
      * Default Constructor.
      *
-     * @deprecated Use dealii::DoFHandler(true) instead.
+     * @deprecated Use the overload taking a `bool` instead.
      */
     DEAL_II_DEPRECATED
     DoFHandler();
@@ -136,7 +136,8 @@ namespace hp
     /**
      * Constructor. Take @p tria as the triangulation to work on.
      *
-     * @deprecated Use dealii::DoFHandler(tria, true) instead.
+     * @deprecated Use the overload taking a
+     * `const Triangulation<dim, spacedim>&` and a `bool` instead.
      */
     DEAL_II_DEPRECATED
     DoFHandler(const Triangulation<dim, spacedim> &tria);

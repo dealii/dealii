@@ -27,7 +27,8 @@ jobs:
         cd build
         cmake -DDEAL_II_COMPONENT_DOCUMENTATION=ON -DDEAL_II_DOXYGEN_USE_MATHJAX=ON ..
         make -j 2 documentation
-        cat doxygen.log && ! [ -s doxygen.log ]
+        cat doxygen.log
+        ! [ -s doxygen.log ] || exit 1
         tar -czf doxygen_documentation.tar.gz doc/doxygen
     - name: archive documentation
       uses: actions/upload-artifact@v1
