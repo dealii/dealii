@@ -2518,8 +2518,13 @@ MappingQGeneric<dim, spacedim>::transform_real_to_unit_cell(
       //   cell and that value is returned.
       // * In 3D there is no (known to the authors) exact formula, so the Newton
       //   algorithm is used.
-      const std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-        vertices = this->get_vertices(cell);
+      const auto vertices_ = this->get_vertices(cell);
+
+      std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+        vertices;
+      for (unsigned int i = 0; i < vertices.size(); ++i)
+        vertices[i] = vertices_[i];
+
       try
         {
           switch (dim)

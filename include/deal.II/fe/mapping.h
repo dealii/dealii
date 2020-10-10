@@ -332,7 +332,8 @@ public:
    * information stored by the triangulation, i.e.,
    * <code>cell-@>vertex(v)</code>.
    */
-  virtual std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+  virtual boost::container::small_vector<Point<spacedim>,
+                                         GeometryInfo<dim>::vertices_per_cell>
   get_vertices(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell) const;
 

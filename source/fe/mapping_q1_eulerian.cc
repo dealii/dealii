@@ -50,11 +50,14 @@ MappingQ1Eulerian<dim, VectorType, spacedim>::MappingQ1Eulerian(
 
 
 template <int dim, class VectorType, int spacedim>
-std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+boost::container::small_vector<Point<spacedim>,
+                               GeometryInfo<dim>::vertices_per_cell>
 MappingQ1Eulerian<dim, VectorType, spacedim>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
-  std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertices;
+  boost::container::small_vector<Point<spacedim>,
+                                 GeometryInfo<dim>::vertices_per_cell>
+    vertices(GeometryInfo<dim>::vertices_per_cell);
   // The assertions can not be in the constructor, since this would
   // require to call dof_handler.distribute_dofs(fe) *before* the mapping
   // object is constructed, which is not necessarily what we want.
@@ -105,8 +108,7 @@ std::vector<Point<spacedim>>
 MappingQ1Eulerian<dim, VectorType, spacedim>::compute_mapping_support_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
-  const std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-    vertices = this->get_vertices(cell);
+  const auto vertices = this->get_vertices(cell);
 
   std::vector<Point<spacedim>> a(GeometryInfo<dim>::vertices_per_cell);
   for (const unsigned int i : GeometryInfo<dim>::vertex_indices())

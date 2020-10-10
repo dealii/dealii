@@ -121,7 +121,8 @@ MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
 // .... COMPUTE MAPPING SUPPORT POINTS
 
 template <int dim, class VectorType, int spacedim>
-std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+boost::container::small_vector<Point<spacedim>,
+                               GeometryInfo<dim>::vertices_per_cell>
 MappingQEulerian<dim, VectorType, spacedim>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
@@ -130,11 +131,10 @@ MappingQEulerian<dim, VectorType, spacedim>::get_vertices(
     dynamic_cast<const MappingQEulerianGeneric &>(*this->qp_mapping)
       .compute_mapping_support_points(cell);
 
-  std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-    vertex_locations;
-  std::copy(a.begin(),
-            a.begin() + GeometryInfo<dim>::vertices_per_cell,
-            vertex_locations.begin());
+  boost::container::small_vector<Point<spacedim>,
+                                 GeometryInfo<dim>::vertices_per_cell>
+    vertex_locations(a.begin(),
+                     a.begin() + GeometryInfo<dim>::vertices_per_cell);
 
   return vertex_locations;
 }
@@ -142,7 +142,8 @@ MappingQEulerian<dim, VectorType, spacedim>::get_vertices(
 
 
 template <int dim, class VectorType, int spacedim>
-std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+boost::container::small_vector<Point<spacedim>,
+                               GeometryInfo<dim>::vertices_per_cell>
 MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
   get_vertices(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
