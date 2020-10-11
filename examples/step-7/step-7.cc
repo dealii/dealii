@@ -336,8 +336,6 @@ namespace Step7
     HelmholtzProblem(const FiniteElement<dim> &fe,
                      const RefinementMode      refinement_mode);
 
-    ~HelmholtzProblem();
-
     void run();
 
   private:
@@ -453,16 +451,6 @@ namespace Step7
     , fe(&fe)
     , refinement_mode(refinement_mode)
   {}
-
-
-  // @sect4{HelmholtzProblem::~HelmholtzProblem destructor}
-
-  // This is no different than before:
-  template <int dim>
-  HelmholtzProblem<dim>::~HelmholtzProblem()
-  {
-    dof_handler.clear();
-  }
 
 
   // @sect4{HelmholtzProblem::setup_system}
@@ -587,8 +575,8 @@ namespace Step7
     // Note that the operations we will do with the right hand side object are
     // only querying data, never changing the object. We can therefore declare
     // it <code>const</code>:
-    RightHandSide<dim>  right_hand_side;
-    std::vector<double> rhs_values(n_q_points);
+    const RightHandSide<dim> right_hand_side;
+    std::vector<double>      rhs_values(n_q_points);
 
     // Finally we define an object denoting the exact solution function. We
     // will use it to compute the Neumann values at the boundary from
