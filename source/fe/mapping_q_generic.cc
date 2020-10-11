@@ -758,140 +758,6 @@ namespace internal
 
 
       /**
-       * Using the given 1D polynomial basis and the position of the mapping
-       * support points, compute the mapped location of that point in real
-       * space. This function is much faster than the other implementation
-       * going via the expanded shape functions in InternalData because it
-       * directly works in the tensor product form. This also gives the
-       * derivative almost for free (less than 2x the cost of simply the
-       * values), so we always compute it.
-       */
-      template <int dim, int spacedim>
-      std::pair<Point<spacedim>, Tensor<2, spacedim>>
-      compute_mapped_location_of_point(
-        const std::vector<Point<spacedim>> &                points,
-        const std::vector<Polynomials::Polynomial<double>> &poly,
-        const std::vector<unsigned int> &                   renumber,
-        const Point<dim> &                                  p)
-      {
-        static_assert(dim >= 1 && dim <= 3, "Only dim=1,2,3 implemented");
-
-        const unsigned int n_shapes = poly.size();
-
-        // shortcut for linear interpolation to speed up evaluation
-        if (n_shapes == 2)
-          {
-            if (dim == 1)
-              {
-                Tensor<2, spacedim> derivative;
-                derivative[0] = points[1] - points[0];
-                return std::make_pair((1. - p[0]) * points[0] +
-                                        p[0] * points[1],
-                                      derivative);
-              }
-            else if (dim == 2)
-              {
-                const double          x0 = 1. - p[0], x1 = p[0];
-                const Point<spacedim> tmp0   = x0 * points[0] + x1 * points[1];
-                const Point<spacedim> tmp1   = x0 * points[2] + x1 * points[3];
-                const Point<spacedim> mapped = (1. - p[1]) * tmp0 + p[1] * tmp1;
-                Tensor<2, spacedim>   derivative;
-                derivative[0] = (1. - p[1]) * (points[1] - points[0]) +
-                                p[1] * (points[3] - points[2]);
-                derivative[1] = tmp1 - tmp0;
-                return std::make_pair(mapped, transpose(derivative));
-              }
-            else if (dim == 3)
-              {
-                const double x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1],
-                             y1 = p[1], z0 = 1. - p[2], z1 = p[2];
-                const Point<spacedim> tmp0   = x0 * points[0] + x1 * points[1];
-                const Point<spacedim> tmp1   = x0 * points[2] + x1 * points[3];
-                const Point<spacedim> tmpy0  = y0 * tmp0 + y1 * tmp1;
-                const Point<spacedim> tmp2   = x0 * points[4] + x1 * points[5];
-                const Point<spacedim> tmp3   = x0 * points[6] + x1 * points[7];
-                const Point<spacedim> tmpy1  = y0 * tmp2 + y1 * tmp3;
-                const Point<spacedim> mapped = z0 * tmpy0 + z1 * tmpy1;
-                Tensor<2, spacedim>   derivative;
-                derivative[2] = tmpy1 - tmpy0;
-                derivative[1] = z0 * (tmp1 - tmp0) + z1 * (tmp3 - tmp2);
-                derivative[0] = z0 * (y0 * (points[1] - points[0]) +
-                                      y1 * (points[3] - points[2])) +
-                                z1 * (y0 * (points[5] - points[4]) +
-                                      y1 * (points[7] - points[6]));
-                return std::make_pair(mapped, transpose(derivative));
-              }
-          }
-
-        // Put up to 32 shape functions per dimension on stack, else on heap
-        boost::container::small_vector<double, 64 * dim> shapes(2 * dim *
-                                                                n_shapes);
-
-        // Evaluate 1D polynomials and their derivatives
-        for (unsigned int d = 0; d < dim; ++d)
-          for (unsigned int i = 0; i < n_shapes; ++i)
-            poly[i].value(p[d], 1, shapes.data() + 2 * (d * n_shapes + i));
-
-        // Go through the tensor product of shape functions and interpolate
-        // with optimal algorithm
-        std::pair<Point<spacedim>, Tensor<2, spacedim>> result;
-        for (unsigned int i2 = 0, i = 0; i2 < (dim > 2 ? n_shapes : 1); ++i2)
-          {
-            Point<spacedim> value_y, deriv_x, deriv_y;
-            for (unsigned int i1 = 0; i1 < (dim > 1 ? n_shapes : 1); ++i1)
-              {
-                // interpolation + derivative x direction
-                Point<spacedim> value, deriv;
-                for (unsigned int i0 = 0; i0 < n_shapes; ++i0, ++i)
-                  {
-                    value += shapes[2 * i0] * points[renumber[i]];
-                    deriv += shapes[2 * i0 + 1] * points[renumber[i]];
-                  }
-
-                // interpolation + derivative in y direction
-                if (dim > 1)
-                  {
-                    value_y += value * shapes[2 * n_shapes + 2 * i1];
-                    deriv_x += deriv * shapes[2 * n_shapes + 2 * i1];
-                    deriv_y += value * shapes[2 * n_shapes + 2 * i1 + 1];
-                  }
-                else
-                  {
-                    result.first     = value;
-                    result.second[0] = deriv;
-                  }
-              }
-            if (dim == 3)
-              {
-                // interpolation + derivative in z direction
-                result.first += value_y * shapes[4 * n_shapes + 2 * i2];
-                for (unsigned int d = 0; d < spacedim; ++d)
-                  {
-                    result.second[d][0] +=
-                      deriv_x[d] * shapes[4 * n_shapes + 2 * i2];
-                    result.second[d][1] +=
-                      deriv_y[d] * shapes[4 * n_shapes + 2 * i2];
-                    result.second[d][2] +=
-                      value_y[d] * shapes[4 * n_shapes + 2 * i2 + 1];
-                  }
-              }
-            else if (dim == 2)
-              {
-                result.first = value_y;
-                for (unsigned int d = 0; d < spacedim; ++d)
-                  {
-                    result.second[d][0] = deriv_x[d];
-                    result.second[d][1] = deriv_y[d];
-                  }
-              }
-          }
-
-        return result;
-      }
-
-
-
-      /**
        * Implementation of transform_real_to_unit_cell
        */
       template <int dim, int spacedim>
@@ -916,17 +782,14 @@ namespace internal
         // The shape values and derivatives of the mapping at this point are
         // previously computed.
 
-        Point<dim>                                      p_unit = initial_p_unit;
-        std::pair<Point<spacedim>, Tensor<2, spacedim>> p_real =
-          compute_mapped_location_of_point(points,
-                                           polynomials_1d,
-                                           renumber,
-                                           p_unit);
+        Point<dim> p_unit = initial_p_unit;
+        auto p_real = internal::evaluate_tensor_product_value_and_gradient(
+          polynomials_1d, points, p_unit, polynomials_1d.size() == 2, renumber);
 
         Tensor<1, spacedim> f = p_real.first - p;
 
         // early out if we already have our point
-        if (f.norm_square() < 1e-24 * p_real.second.norm_square())
+        if (f.norm_square() < 1e-24 * p_real.second[0].norm_square())
           return p_unit;
 
         // we need to compare the position of the computed p(x) against the
@@ -978,7 +841,10 @@ namespace internal
 #endif
 
             // f'(x)
-            const Tensor<2, spacedim> &df = p_real.second;
+            Tensor<2, spacedim> df;
+            for (unsigned int d = 0; d < spacedim; ++d)
+              for (unsigned int e = 0; e < dim; ++e)
+                df[d][e] = p_real.second[e][d];
 
             // Solve  [f'(x)]d=f(x)
             if (determinant(df) <= 0)
@@ -1005,11 +871,13 @@ namespace internal
 
                 // shape values and derivatives
                 // at new p_unit point
-                std::pair<Point<spacedim>, Tensor<2, spacedim>> p_real_trial =
-                  compute_mapped_location_of_point(points,
-                                                   polynomials_1d,
-                                                   renumber,
-                                                   p_unit_trial);
+                const auto p_real_trial =
+                  internal::evaluate_tensor_product_value_and_gradient(
+                    polynomials_1d,
+                    points,
+                    p_unit_trial,
+                    polynomials_1d.size() == 2,
+                    renumber);
                 const Tensor<1, spacedim> f_trial = p_real_trial.first - p;
 
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
@@ -2010,12 +1878,13 @@ MappingQGeneric<dim, spacedim>::transform_unit_to_real_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const Point<dim> &                                          p) const
 {
-  return internal::MappingQGenericImplementation::
-    compute_mapped_location_of_point(this->compute_mapping_support_points(cell),
-                                     polynomials_1d,
-                                     renumber_lexicographic_to_hierarchic,
-                                     p)
-      .first;
+  return Point<spacedim>(internal::evaluate_tensor_product_value_and_gradient(
+                           polynomials_1d,
+                           this->compute_mapping_support_points(cell),
+                           p,
+                           polynomials_1d.size() == 2,
+                           renumber_lexicographic_to_hierarchic)
+                           .first);
 }
 
 
