@@ -495,12 +495,10 @@ public:
    */
   constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
                                   Tensor()
-#ifdef DEAL_II_MSVC
+    // We would like to use =default, but this causes compile errors with some
+    // MSVC versions and internal compiler errors with -O1 in gcc 5.4.
     : values{}
   {}
-#else
-    = default;
-#endif
 
   /**
    * A constructor where the data is copied from a C-style array.
