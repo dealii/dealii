@@ -2549,7 +2549,7 @@ namespace internal
                MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
                  contiguous)))))
       {
-        AssertDimension(face_orientations.size(), 1);
+        AssertDimension(n_face_orientations, 1);
         adjust_for_face_orientation(dim,
                                     n_components,
                                     face_orientations[0],
