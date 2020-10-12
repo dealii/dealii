@@ -104,6 +104,9 @@ namespace internal
       univariate_shape_data.fe_degree     = fe->degree;
       univariate_shape_data.n_q_points_1d = quad.size();
 
+      if ((fe->n_dofs_per_cell() == 0) || (quad.size() == 0))
+        return;
+
       // grant write access to common univariate shape data
       auto &shape_values    = univariate_shape_data.shape_values;
       auto &shape_gradients = univariate_shape_data.shape_gradients;
