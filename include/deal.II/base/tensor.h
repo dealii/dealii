@@ -494,13 +494,7 @@ public:
    * @note This function can also be used in CUDA device code.
    */
   constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
-                                  Tensor()
-#ifdef DEAL_II_MSVC
-    : values{}
-  {}
-#else
-    = default;
-#endif
+                                  Tensor();
 
   /**
    * A constructor where the data is copied from a C-style array.
@@ -1163,6 +1157,17 @@ constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
   static_assert(sizeof...(indices) == dim,
                 "dim should match the number of indices");
 }
+
+
+
+template <int rank_, int dim, typename Number>
+constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
+                                Tensor<rank_, dim, Number>::Tensor()
+  // We would like to use =default, but this causes compile errors with some
+  // MSVC versions and internal compiler errors with -O1 in gcc 5.4.
+  : values{}
+{}
+
 
 
 template <int rank_, int dim, typename Number>
