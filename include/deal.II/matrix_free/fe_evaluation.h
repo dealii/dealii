@@ -135,10 +135,15 @@ public:
   JxW(const unsigned int q_point) const;
 
   /**
-   * Return the inverse and transposed version of Jacobian of the mapping
-   * between the unit to the real cell (representing the covariant
-   * transformation). This is exactly the matrix used internally to transform
-   * the unit cell gradients to gradients on the real cell.
+   * Return the inverse and transposed version $J^{-\mathrm T}$ of the
+   * Jacobian of the mapping between the unit to the real cell defined as
+   * $J_{ij} = d x_i / d\hat x_j$. The $(i,j)$ entry of the returned tensor
+   * contains $d\hat x_j/dx_i$, i.e., columns refer to reference space
+   * coordinates and rows to real cell coordinates. Thus, the returned tensor
+   * represents a covariant transformation, which is used in the
+   * FEEvaluationBase::get_gradient() function to transform the unit cell
+   * gradients to gradients on the real cell by a multiplication $J^{-\mathrm
+   * T} \hat{\nabla} u_h$.
    */
   Tensor<2, dim, VectorizedArrayType>
   inverse_jacobian(const unsigned int q_point) const;
