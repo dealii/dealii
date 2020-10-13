@@ -231,7 +231,7 @@ namespace
         else
           // if the neighbor is refined, then it
           // is also refined at our current
-          // face. He will stay so without
+          // face. It will stay so without
           // coarsening, so return true in that
           // case.
           {
