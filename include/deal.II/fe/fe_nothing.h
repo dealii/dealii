@@ -39,10 +39,7 @@ DEAL_II_NAMESPACE_OPEN
  * degrees of freedom to the FE_Nothing cells, and this subregion is therefore
  * implicitly deleted from the computation. step-10 and step-46 show use cases
  * for this element. An interesting application for this element is also
- * presented in the paper A. Cangiani, J. Chapman, E. Georgoulis, M. Jensen:
- * <b>Implementation of the Continuous-Discontinuous Galerkin Finite Element
- * Method</b>, arXiv:1201.2878v1 [math.NA], 2012 (see
- * http://arxiv.org/abs/1201.2878).
+ * presented in the paper @cite Cangiani2012.
  *
  * Note that some care must be taken that the resulting mesh topology
  * continues to make sense when FE_Nothing elements are introduced. This is
