@@ -799,8 +799,15 @@ namespace internal
         // FEValues
         std::vector<std::vector<std::shared_ptr<dealii::FEValues<dim>>>>
           fe_values(mapping_info.cell_data.size());
+
+        const unsigned int n_active_fe_indices =
+          active_fe_index.size() > 0 ?
+            (*std::max_element(active_fe_index.begin(), active_fe_index.end()) +
+             1) :
+            1;
+
         for (unsigned int i = 0; i < fe_values.size(); ++i)
-          fe_values[i].resize(mapping_info.cell_data[i].descriptor.size());
+          fe_values[i].resize(n_active_fe_indices);
         const UpdateFlags update_flags = mapping_info.update_flags_cells;
         const UpdateFlags update_flags_feval =
           (update_flags & update_jacobians ? update_jacobians :
@@ -823,15 +830,19 @@ namespace internal
               // fill this data in
               const unsigned int fe_index =
                 active_fe_index.size() > 0 ? active_fe_index[cell] : 0;
-              const unsigned int n_q_points =
-                mapping_info.cell_data[my_q].descriptor[fe_index].n_q_points;
+              const unsigned int hp_quad_index =
+                mapping_info.cell_data[my_q].descriptor.size() == 1 ? 0 :
+                                                                      fe_index;
+              const unsigned int n_q_points = mapping_info.cell_data[my_q]
+                                                .descriptor[hp_quad_index]
+                                                .n_q_points;
               if (fe_values[my_q][fe_index].get() == nullptr)
                 fe_values[my_q][fe_index] =
                   std::make_shared<dealii::FEValues<dim>>(
                     mapping,
                     dummy_fe,
                     mapping_info.cell_data[my_q]
-                      .descriptor[fe_index]
+                      .descriptor[hp_quad_index]
                       .quadrature,
                     update_flags_feval);
               dealii::FEValues<dim> &fe_val = *fe_values[my_q][fe_index];
