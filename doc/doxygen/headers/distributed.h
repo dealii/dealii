@@ -25,7 +25,7 @@
  *
  * <h3>Overview</h3>
  *
- * deal.II can use multiple machine connected via MPI to parallelize
+ * deal.II can use multiple machines connected via MPI to parallelize
  * computations, in addition to the parallelization within a shared
  * memory machine discussed in the @ref threads module. There are
  * essentially two ways to utilize multiple machines:
