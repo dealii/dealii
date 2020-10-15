@@ -245,6 +245,20 @@ public:
   unsigned int
   get_current_cell_index() const;
 
+  /**
+   * Return the active fe index for this class for efficient indexing in the hp
+   * case.
+   */
+  unsigned int
+  get_active_fe_index() const;
+
+  /**
+   * Return the active quadrature index for this class for efficient indexing in
+   * the hp case.
+   */
+  unsigned int
+  get_active_quadrature_index() const;
+
 protected:
   /**
    * Constructor. Made protected to prevent users from directly using this
@@ -3834,6 +3848,26 @@ FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
     return this->cell * GeometryInfo<dim>::faces_per_cell + this->face_no;
   else
     return this->cell;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline unsigned int
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  get_active_fe_index() const
+{
+  return active_fe_index;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline unsigned int
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  get_active_quadrature_index() const
+{
+  return active_quad_index;
 }
 
 
