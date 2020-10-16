@@ -30,7 +30,6 @@
 #include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/matrix_free/evaluation_kernels.h>
-#include <deal.II/matrix_free/fe_evaluation.h>
 
 #include <deal.II/multigrid/mg_transfer_global_coarsening.h>
 
