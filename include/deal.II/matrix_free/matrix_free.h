@@ -3135,7 +3135,7 @@ namespace internal
     template <typename VectorType>
     unsigned int
     find_vector_in_mf(const VectorType &vec,
-                      const bool        check_global_compatibility = true) const
+                      const bool check_global_compatibility = false) const
     {
       unsigned int mf_component = numbers::invalid_unsigned_int;
       (void)check_global_compatibility;
@@ -3187,11 +3187,13 @@ namespace internal
                  DataAccessOnFaces::values_all_faces)
         return *matrix_free.get_dof_info(mf_component)
                   .vector_partitioner_face_variants[3];
-      else /*if (vector_face_access ==
-               dealii::MatrixFree<dim,
-              Number>::DataAccessOnFaces::gradients_all_faces)*/
+      else if (vector_face_access ==
+               dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+                 DataAccessOnFaces::gradients_all_faces)
         return *matrix_free.get_dof_info(mf_component)
                   .vector_partitioner_face_variants[4];
+      else
+        return *matrix_free.get_dof_info(mf_component).vector_partitioner.get();
     }
 
 
@@ -3277,26 +3279,17 @@ namespace internal
       bool ghosts_set = vec.has_ghost_elements();
       if (ghosts_set)
         ghosts_were_set = true;
-      if (vector_face_access ==
-            dealii::MatrixFree<dim, Number, VectorizedArrayType>::
-              DataAccessOnFaces::unspecified ||
-          vec.size() == 0)
-        vec.update_ghost_values_start(component_in_block_vector +
-                                      channel_shift);
-      else
+
+      if (vec.size() != 0)
         {
 #  ifdef DEAL_II_WITH_MPI
           const unsigned int mf_component = find_vector_in_mf(vec);
-          if (&get_partitioner(mf_component) ==
-              matrix_free.get_dof_info(mf_component).vector_partitioner.get())
-            {
-              vec.update_ghost_values_start(component_in_block_vector +
-                                            channel_shift);
-              return;
-            }
 
-          const Utilities::MPI::Partitioner &part =
-            get_partitioner(mf_component);
+          Assert(mf_component != numbers::invalid_unsigned_int,
+                 ExcNotImplemented());
+
+          const auto &part = get_partitioner(mf_component);
+
           if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0)
             return;
 
@@ -3312,8 +3305,9 @@ namespace internal
             ArrayView<Number>(tmp_data[component_in_block_vector]->begin(),
                               part.n_import_indices()),
             ArrayView<Number>(const_cast<Number *>(vec.begin()) +
-                                vec.get_partitioner()->local_size(),
-                              vec.get_partitioner()->n_ghost_indices()),
+                                part.local_size(),
+                              matrix_free.get_dof_info(mf_component)
+                                .vector_partitioner->n_ghost_indices()),
             this->requests[component_in_block_vector]);
 #  endif
         }
@@ -3375,46 +3369,38 @@ namespace internal
         std::is_same<Number, typename VectorType::value_type>::value,
         "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
-      if (vector_face_access ==
-            dealii::MatrixFree<dim, Number, VectorizedArrayType>::
-              DataAccessOnFaces::unspecified ||
-          vec.size() == 0)
-        vec.update_ghost_values_finish();
-      else
+
+      if (vec.size() != 0)
         {
 #  ifdef DEAL_II_WITH_MPI
-
           AssertIndexRange(component_in_block_vector, tmp_data.size());
           AssertDimension(requests.size(), tmp_data.size());
 
           const unsigned int mf_component = find_vector_in_mf(vec);
-          const Utilities::MPI::Partitioner &part =
-            get_partitioner(mf_component);
-          if (&part ==
-              matrix_free.get_dof_info(mf_component).vector_partitioner.get())
+
+          Assert(mf_component != numbers::invalid_unsigned_int,
+                 ExcNotImplemented());
+
+          const auto &part = get_partitioner(mf_component);
+
+          if (part.n_ghost_indices() != 0 || part.n_import_indices() != 0)
             {
-              vec.update_ghost_values_finish();
-              return;
+              part.export_to_ghosted_array_finish(
+                ArrayView<Number>(const_cast<Number *>(vec.begin()) +
+                                    part.local_size(),
+                                  matrix_free.get_dof_info(mf_component)
+                                    .vector_partitioner->n_ghost_indices()),
+                this->requests[component_in_block_vector]);
+
+              matrix_free.release_scratch_data_non_threadsafe(
+                tmp_data[component_in_block_vector]);
+              tmp_data[component_in_block_vector] = nullptr;
             }
-
-          if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0)
-            return;
-
-          part.export_to_ghosted_array_finish(
-            ArrayView<Number>(const_cast<Number *>(vec.begin()) +
-                                vec.get_partitioner()->local_size(),
-                              vec.get_partitioner()->n_ghost_indices()),
-            this->requests[component_in_block_vector]);
-
-          matrix_free.release_scratch_data_non_threadsafe(
-            tmp_data[component_in_block_vector]);
-          tmp_data[component_in_block_vector] = nullptr;
-
-          // let vector know that ghosts are being updated and we can read from
-          // them
-          vec.set_ghost_state(true);
 #  endif
         }
+      // let vector know that ghosts are being updated and we can read from
+      // them
+      vec.set_ghost_state(true);
     }
 
 
@@ -3492,24 +3478,15 @@ namespace internal
         "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
       Assert(vec.has_ghost_elements() == false, ExcNotImplemented());
-      if (vector_face_access ==
-            dealii::MatrixFree<dim, Number, VectorizedArrayType>::
-              DataAccessOnFaces::unspecified ||
-          vec.size() == 0)
-        vec.compress_start(component_in_block_vector + channel_shift);
-      else
+
+      if (vec.size() != 0)
         {
 #  ifdef DEAL_II_WITH_MPI
-
           const unsigned int mf_component = find_vector_in_mf(vec);
-          const Utilities::MPI::Partitioner &part =
-            get_partitioner(mf_component);
-          if (&part ==
-              matrix_free.get_dof_info(mf_component).vector_partitioner.get())
-            {
-              vec.compress_start(component_in_block_vector + channel_shift);
-              return;
-            }
+          Assert(mf_component != numbers::invalid_unsigned_int,
+                 ExcNotImplemented());
+
+          const auto &part = get_partitioner(mf_component);
 
           if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0)
             return;
@@ -3523,8 +3500,9 @@ namespace internal
           part.import_from_ghosted_array_start(
             dealii::VectorOperation::add,
             component_in_block_vector + channel_shift,
-            ArrayView<Number>(vec.begin() + vec.get_partitioner()->local_size(),
-                              vec.get_partitioner()->n_ghost_indices()),
+            ArrayView<Number>(vec.begin() + part.local_size(),
+                              matrix_free.get_dof_info(mf_component)
+                                .vector_partitioner->n_ghost_indices()),
             ArrayView<Number>(tmp_data[component_in_block_vector]->begin(),
                               part.n_import_indices()),
             this->requests[component_in_block_vector]);
@@ -3587,12 +3565,7 @@ namespace internal
         std::is_same<Number, typename VectorType::value_type>::value,
         "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
-      if (vector_face_access ==
-            dealii::MatrixFree<dim, Number, VectorizedArrayType>::
-              DataAccessOnFaces::unspecified ||
-          vec.size() == 0)
-        vec.compress_finish(dealii::VectorOperation::add);
-      else
+      if (vec.size() != 0)
         {
 #  ifdef DEAL_II_WITH_MPI
           AssertIndexRange(component_in_block_vector, tmp_data.size());
@@ -3600,14 +3573,10 @@ namespace internal
 
           const unsigned int mf_component = find_vector_in_mf(vec);
 
-          const Utilities::MPI::Partitioner &part =
-            get_partitioner(mf_component);
-          if (&part ==
-              matrix_free.get_dof_info(mf_component).vector_partitioner.get())
-            {
-              vec.compress_finish(dealii::VectorOperation::add);
-              return;
-            }
+          Assert(mf_component != numbers::invalid_unsigned_int,
+                 ExcNotImplemented());
+
+          const auto &part = get_partitioner(mf_component);
 
           if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0)
             return;
@@ -3618,8 +3587,9 @@ namespace internal
               tmp_data[component_in_block_vector]->begin(),
               part.n_import_indices()),
             ArrayView<Number>(vec.begin(), part.local_size()),
-            ArrayView<Number>(vec.begin() + vec.get_partitioner()->local_size(),
-                              vec.get_partitioner()->n_ghost_indices()),
+            ArrayView<Number>(vec.begin() + part.local_size(),
+                              matrix_free.get_dof_info(mf_component)
+                                .vector_partitioner->n_ghost_indices()),
             this->requests[component_in_block_vector]);
 
           matrix_free.release_scratch_data_non_threadsafe(
