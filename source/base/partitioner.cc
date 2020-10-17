@@ -359,9 +359,7 @@ namespace Utilities
       if (larger_ghost_index_set.size() == 0)
         {
           ghost_indices_subset_chunks_by_rank_data.clear();
-          ghost_indices_subset_data.emplace_back(local_size(),
-                                                 local_size() +
-                                                   n_ghost_indices());
+          ghost_indices_subset_data.emplace_back(0, n_ghost_indices());
           n_ghost_indices_in_larger_set = n_ghost_indices_data;
         }
       else
