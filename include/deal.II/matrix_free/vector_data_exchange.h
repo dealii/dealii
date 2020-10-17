@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2020 by the deal.II authors
+// Copyright (C) 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -281,6 +281,256 @@ namespace internal
 
       private:
         const std::shared_ptr<const Utilities::MPI::Partitioner> partitioner;
+      };
+
+      class Full : public Base
+      {
+      public:
+        Full(const IndexSet &is_locally_owned,
+             const IndexSet &is_locally_ghost,
+             const MPI_Comm &comm,
+             const MPI_Comm &comm_sm);
+
+        unsigned int
+        local_size() const override;
+
+        unsigned int
+        n_ghost_indices() const override;
+
+        unsigned int
+        n_import_indices() const override
+        {
+          return 0; // TODO
+        }
+
+        const std::vector<std::pair<unsigned int, unsigned int>> &
+        ghost_indices_within_larger_ghost_set() const override
+        {
+          return dummy; // TODO
+        }
+
+        void
+        export_to_ghosted_array_start(
+          const unsigned int                          communication_channel,
+          const ArrayView<const double> &             locally_owned_array,
+          const std::vector<ArrayView<const double>> &shared_arrays,
+          const ArrayView<double> &                   ghost_array,
+          const ArrayView<double> &                   temporary_storage,
+          std::vector<MPI_Request> &                  requests) const override;
+
+        void
+        export_to_ghosted_array_finish(
+          const ArrayView<const double> &             locally_owned_array,
+          const std::vector<ArrayView<const double>> &shared_arrays,
+          const ArrayView<double> &                   ghost_array,
+          std::vector<MPI_Request> &                  requests) const override;
+
+        void
+        import_from_ghosted_array_start(
+          const VectorOperation::values               vector_operation,
+          const unsigned int                          communication_channel,
+          const ArrayView<const double> &             locally_owned_array,
+          const std::vector<ArrayView<const double>> &shared_arrays,
+          const ArrayView<double> &                   ghost_array,
+          const ArrayView<double> &                   temporary_storage,
+          std::vector<MPI_Request> &                  requests) const override;
+
+        void
+        import_from_ghosted_array_finish(
+          const VectorOperation::values               vector_operation,
+          const ArrayView<double> &                   locally_owned_storage,
+          const std::vector<ArrayView<const double>> &shared_arrays,
+          const ArrayView<double> &                   ghost_array,
+          const ArrayView<const double> &             temporary_storage,
+          std::vector<MPI_Request> &                  requests) const override;
+
+        void
+        export_to_ghosted_array_start(
+          const unsigned int                         communication_channel,
+          const ArrayView<const float> &             locally_owned_array,
+          const std::vector<ArrayView<const float>> &shared_arrays,
+          const ArrayView<float> &                   ghost_array,
+          const ArrayView<float> &                   temporary_storage,
+          std::vector<MPI_Request> &                 requests) const override;
+
+        void
+        export_to_ghosted_array_finish(
+          const ArrayView<const float> &             locally_owned_array,
+          const std::vector<ArrayView<const float>> &shared_arrays,
+          const ArrayView<float> &                   ghost_array,
+          std::vector<MPI_Request> &                 requests) const override;
+
+        void
+        import_from_ghosted_array_start(
+          const VectorOperation::values              vector_operation,
+          const unsigned int                         communication_channel,
+          const ArrayView<const float> &             locally_owned_array,
+          const std::vector<ArrayView<const float>> &shared_arrays,
+          const ArrayView<float> &                   ghost_array,
+          const ArrayView<float> &                   temporary_storage,
+          std::vector<MPI_Request> &                 requests) const override;
+
+        void
+        import_from_ghosted_array_finish(
+          const VectorOperation::values              vector_operation,
+          const ArrayView<float> &                   locally_owned_storage,
+          const std::vector<ArrayView<const float>> &shared_arrays,
+          const ArrayView<float> &                   ghost_array,
+          const ArrayView<const float> &             temporary_storage,
+          std::vector<MPI_Request> &                 requests) const override;
+
+      private:
+        template <typename Number>
+        void
+        export_to_ghosted_array_start_impl(
+          const unsigned int                          communication_channel,
+          const ArrayView<const Number> &             locally_owned_array,
+          const std::vector<ArrayView<const Number>> &shared_arrays,
+          const ArrayView<Number> &                   ghost_array,
+          const ArrayView<Number> &                   temporary_storage,
+          std::vector<MPI_Request> &                  requests) const;
+
+        template <typename Number>
+        void
+        export_to_ghosted_array_finish_impl(
+          const ArrayView<const Number> &             locally_owned_array,
+          const std::vector<ArrayView<const Number>> &shared_arrays,
+          const ArrayView<Number> &                   ghost_array,
+          std::vector<MPI_Request> &                  requests) const;
+
+        template <typename Number>
+        void
+        import_from_ghosted_array_start_impl(
+          const VectorOperation::values               vector_operation,
+          const unsigned int                          communication_channel,
+          const ArrayView<const Number> &             locally_owned_array,
+          const std::vector<ArrayView<const Number>> &shared_arrays,
+          const ArrayView<Number> &                   ghost_array,
+          const ArrayView<Number> &                   temporary_storage,
+          std::vector<MPI_Request> &                  requests) const;
+
+        template <typename Number>
+        void
+        import_from_ghosted_array_finish_impl(
+          const VectorOperation::values               vector_operation,
+          const ArrayView<Number> &                   locally_owned_storage,
+          const std::vector<ArrayView<const Number>> &shared_arrays,
+          const ArrayView<Number> &                   ghost_array,
+          const ArrayView<const Number> &             temporary_storage,
+          std::vector<MPI_Request> &                  requests) const;
+
+      private:
+        /**
+         * Global communicator.
+         */
+        MPI_Comm comm;
+
+        /**
+         * Shared-memory sub-communicator.
+         */
+        MPI_Comm comm_sm;
+
+        /**
+         * Number of processes in comm.
+         */
+        unsigned int n_mpi_processes_;
+
+        /**
+         * Number of locally-owned vector entries.
+         */
+        unsigned int n_local_elements;
+
+        /**
+         * Number of ghost vector entries.
+         */
+        unsigned int n_ghost_elements;
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> recv_remote_ranks;
+
+        /**
+         * TODO
+         */
+        std::vector<types::global_dof_index> recv_remote_ptr = {0};
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> recv_sm_ranks;
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> recv_sm_ptr = {0};
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> recv_sm_indices;
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> recv_sm_len;
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> recv_sm_offset;
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> send_remote_ranks;
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> send_remote_ptr = {0};
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> send_remote_indices;
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> send_remote_len;
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> send_remote_offset;
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> send_sm_ranks;
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> send_sm_ptr = {0};
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> send_sm_indices;
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> send_sm_len;
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> send_sm_offset;
+
+        std::vector<std::pair<unsigned int, unsigned int>> dummy;
       };
 
     } // namespace VectorDataExchange
