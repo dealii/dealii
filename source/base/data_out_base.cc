@@ -52,6 +52,7 @@
 
 // we use uint32_t and uint8_t below, which are declared here:
 #include <cstdint>
+#include <vector>
 
 #ifdef DEAL_II_WITH_ZLIB
 #  include <zlib.h>
@@ -585,6 +586,67 @@ namespace
     72, // VTK_LAGRANGE_HEXAHEDRON
     static_cast<unsigned int>(-1)};
 
+
+  /**
+   * Return the tuple (vtk cell type, number of cells, number of vertices)
+   * for a patch.
+   */
+  template <int dim, int spacedim>
+  std::array<unsigned int, 3>
+  extract_vtk_patch_info(const DataOutBase::Patch<dim, spacedim> &patch,
+                         const bool write_higher_order_cells)
+  {
+    std::array<unsigned int, 3> vtk_cell_id{};
+
+    if (write_higher_order_cells &&
+        patch.reference_cell_type == ReferenceCell::get_hypercube(dim))
+      {
+        vtk_cell_id[0] = vtk_lagrange_cell_type[dim];
+        vtk_cell_id[1] = 1;
+      }
+    else if (patch.reference_cell_type == ReferenceCell::Type::Tri &&
+             patch.data.n_cols() == 3)
+      {
+        vtk_cell_id[0] = 5;
+        vtk_cell_id[1] = 1;
+      }
+    else if (patch.reference_cell_type == ReferenceCell::Type::Tri &&
+             patch.data.n_cols() == 6)
+      {
+        vtk_cell_id[0] = 22;
+        vtk_cell_id[1] = 1;
+      }
+    else if (patch.reference_cell_type == ReferenceCell::Type::Tet &&
+             patch.data.n_cols() == 4)
+      {
+        vtk_cell_id[0] = 10;
+        vtk_cell_id[1] = 1;
+      }
+    else if (patch.reference_cell_type == ReferenceCell::Type::Tet &&
+             patch.data.n_cols() == 10)
+      {
+        vtk_cell_id[0] = 24;
+        vtk_cell_id[1] = 1;
+      }
+    else if (patch.reference_cell_type == ReferenceCell::get_hypercube(dim))
+      {
+        vtk_cell_id[0] = vtk_cell_type[dim];
+        vtk_cell_id[1] = Utilities::pow(patch.n_subdivisions, dim);
+      }
+    else
+      {
+        Assert(false, ExcNotImplemented());
+      }
+
+    if (patch.reference_cell_type != ReferenceCell::get_hypercube(dim) ||
+        write_higher_order_cells)
+      vtk_cell_id[2] = patch.data.n_cols();
+    else
+      vtk_cell_id[2] = GeometryInfo<dim>::vertices_per_cell;
+
+    return vtk_cell_id;
+  }
+
   //----------------------------------------------------------------------//
   // Auxiliary functions
   //----------------------------------------------------------------------//
@@ -824,6 +886,48 @@ namespace
               patch.reference_cell_type);
             n_nodes += info.n_vertices();
             n_cells += 1;
+          }
+      }
+  }
+
+  template <int dim, int spacedim>
+  static void
+  compute_sizes(const std::vector<DataOutBase::Patch<dim, spacedim>> &patches,
+                const bool    write_higher_order_cells,
+                unsigned int &n_nodes,
+                unsigned int &n_cells,
+                unsigned int &n_points_and_n_cells)
+  {
+    n_nodes              = 0;
+    n_cells              = 0;
+    n_points_and_n_cells = 0;
+
+    for (const auto &patch : patches)
+      {
+        // The following formulas don't hold for non-tensor products.
+        if (patch.reference_cell_type == ReferenceCell::get_hypercube(dim))
+          {
+            n_nodes += Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
+
+            if (write_higher_order_cells)
+              {
+                n_cells += 1;
+                n_points_and_n_cells +=
+                  1 + Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
+              }
+            else
+              {
+                n_cells += Utilities::fixed_power<dim>(patch.n_subdivisions);
+                n_points_and_n_cells +=
+                  Utilities::fixed_power<dim>(patch.n_subdivisions) *
+                  (1 + GeometryInfo<dim>::vertices_per_cell);
+              }
+          }
+        else
+          {
+            n_nodes += patch.data.n_cols();
+            n_cells += 1;
+            n_points_and_n_cells += patch.data.n_cols() + 1;
           }
       }
   }
@@ -1168,6 +1272,14 @@ namespace
                const unsigned int x_offset,
                const unsigned int y_offset,
                const unsigned int z_offset);
+
+    /**
+     * Print vertices [start, start+n_points[
+     */
+    void
+    write_cell_single(const unsigned int index,
+                      const unsigned int start,
+                      const unsigned int n_points);
 
     /**
      * Write a high-order cell type, i.e., a Lagrange cell
@@ -1624,6 +1736,23 @@ namespace
               }
           }
       }
+#endif
+  }
+
+  void
+  VtuStream::write_cell_single(const unsigned int index,
+                               const unsigned int start,
+                               const unsigned int n_points)
+  {
+    (void)index;
+
+#if !defined(DEAL_II_WITH_ZLIB)
+    for (unsigned int i = 0; i < n_points; ++i)
+      stream << '\t' << start + i;
+    stream << '\n';
+#else
+    for (unsigned int i = 0; i < n_points; ++i)
+      cells.push_back(start + i);
 #endif
   }
 
@@ -4950,40 +5079,12 @@ namespace DataOutBase
     }
 
     // first count the number of cells and cells for later use
-    unsigned int n_nodes            = 0;
-    unsigned int n_cells            = 0;
-    unsigned int n_points_an_n_cell = 0;
-
-    // compute_sizes<dim, spacedim>(patches, n_nodes, n_cells);
-
-    for (const auto &patch : patches)
-      {
-        // The following formulas don't hold for non-tensor products.
-        if (patch.reference_cell_type == ReferenceCell::get_hypercube(dim))
-          {
-            n_nodes += Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
-
-            if (flags.write_higher_order_cells)
-              {
-                n_cells += 1;
-                n_points_an_n_cell +=
-                  1 + Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
-              }
-            else
-              {
-                n_cells += Utilities::fixed_power<dim>(patch.n_subdivisions);
-                n_points_an_n_cell +=
-                  Utilities::fixed_power<dim>(patch.n_subdivisions) *
-                  (1 + GeometryInfo<dim>::vertices_per_cell);
-              }
-          }
-        else
-          {
-            n_nodes += patch.data.n_cols();
-            n_cells += 1;
-            n_points_an_n_cell += patch.data.n_cols() + 1;
-          }
-      }
+    unsigned int n_nodes, n_cells, n_points_and_n_cells;
+    compute_sizes(patches,
+                  flags.write_higher_order_cells,
+                  n_nodes,
+                  n_cells,
+                  n_points_and_n_cells);
 
     // in gmv format the vertex coordinates and the data have an order that is a
     // bit unpleasant (first all x coordinates, then all y coordinate, ...;
@@ -5014,7 +5115,7 @@ namespace DataOutBase
     out << '\n';
     /////////////////////////////////
     // now for the cells
-    out << "CELLS " << n_cells << ' ' << n_points_an_n_cell << '\n';
+    out << "CELLS " << n_cells << ' ' << n_points_and_n_cells << '\n';
     if (flags.write_higher_order_cells)
       write_high_order_cells(patches, vtk_out);
     else
@@ -5028,33 +5129,11 @@ namespace DataOutBase
     // quadratic), and  high order cells
     for (const auto &patch : patches)
       {
-        std::pair<unsigned int, unsigned int> vtk_cell_id = {-1, -1};
+        const auto vtk_cell_id =
+          extract_vtk_patch_info(patch, flags.write_higher_order_cells);
 
-        if (flags.write_higher_order_cells &&
-            patch.reference_cell_type == ReferenceCell::get_hypercube(dim))
-          vtk_cell_id = {vtk_lagrange_cell_type[dim], 1};
-        else if (patch.reference_cell_type == ReferenceCell::Type::Tri &&
-                 patch.data.n_cols() == 3)
-          vtk_cell_id = {5, 1};
-        else if (patch.reference_cell_type == ReferenceCell::Type::Tri &&
-                 patch.data.n_cols() == 6)
-          vtk_cell_id = {22, 1};
-        else if (patch.reference_cell_type == ReferenceCell::Type::Tet &&
-                 patch.data.n_cols() == 4)
-          vtk_cell_id = {10, 1};
-        else if (patch.reference_cell_type == ReferenceCell::Type::Tet &&
-                 patch.data.n_cols() == 10)
-          vtk_cell_id = {24, 1};
-        else if (patch.reference_cell_type == ReferenceCell::get_hypercube(dim))
-          vtk_cell_id = {vtk_cell_type[dim],
-                         Utilities::pow(patch.n_subdivisions, dim)};
-        else
-          {
-            Assert(false, ExcNotImplemented());
-          }
-
-        for (unsigned int i = 0; i < vtk_cell_id.second; ++i)
-          out << ' ' << vtk_cell_id.first;
+        for (unsigned int i = 0; i < vtk_cell_id[1]; ++i)
+          out << ' ' << vtk_cell_id[0];
       }
 
     out << '\n';
@@ -5362,25 +5441,17 @@ namespace DataOutBase
 #ifdef DEAL_II_WITH_ZLIB
     const char *ascii_or_binary = "binary";
 #else
-    const char *ascii_or_binary = "ascii";
+    const char *              ascii_or_binary = "ascii";
 #endif
 
 
     // first count the number of cells and cells for later use
-    unsigned int n_nodes;
-    unsigned int n_cells;
-    compute_sizes<dim, spacedim>(patches, n_nodes, n_cells);
-
-    // If a user set to output high order cells, we treat n_subdivisions
-    // as a cell order and adjust variables accordingly, otherwise
-    // each patch is written as a linear cell.
-    const unsigned int n_points_per_cell =
-      (flags.write_higher_order_cells == false ?
-         ReferenceCell::internal::Info::get_cell(patches[0].reference_cell_type)
-           .n_vertices() :
-         n_nodes / patches.size());
-    if (flags.write_higher_order_cells)
-      n_cells = patches.size();
+    unsigned int n_nodes, n_cells, n_points_and_n_cells;
+    compute_sizes(patches,
+                  flags.write_higher_order_cells,
+                  n_nodes,
+                  n_cells,
+                  n_points_and_n_cells);
 
     // in gmv format the vertex coordinates and the data have an order that is a
     // bit unpleasant (first all x coordinates, then all y coordinate, ...;
@@ -5431,9 +5502,33 @@ namespace DataOutBase
     out << "    <DataArray type=\"Int32\" Name=\"offsets\" format=\""
         << ascii_or_binary << "\">\n";
 
-    std::vector<int32_t> offsets(n_cells);
-    for (unsigned int i = 0; i < n_cells; ++i)
-      offsets[i] = (i + 1) * n_points_per_cell;
+    std::vector<int32_t> offsets;
+    offsets.reserve(n_cells);
+
+    // uint8_t might be an alias to unsigned char which is then not printed
+    // as ascii integers
+#ifdef DEAL_II_WITH_ZLIB
+    std::vector<uint8_t> cell_types;
+#else
+    std::vector<unsigned int> cell_types;
+#endif
+    cell_types.reserve(n_cells);
+
+    unsigned int first_vertex_of_patch = 0;
+
+    for (const auto &patch : patches)
+      {
+        const auto vtk_cell_id =
+          extract_vtk_patch_info(patch, flags.write_higher_order_cells);
+
+        for (unsigned int i = 0; i < vtk_cell_id[1]; ++i)
+          {
+            cell_types.push_back(vtk_cell_id[0]);
+            first_vertex_of_patch += vtk_cell_id[2];
+            offsets.push_back(first_vertex_of_patch);
+          }
+      }
+
     vtu_out << offsets;
     out << "\n";
     out << "    </DataArray>\n";
@@ -5443,23 +5538,8 @@ namespace DataOutBase
     out << "    <DataArray type=\"UInt8\" Name=\"types\" format=\""
         << ascii_or_binary << "\">\n";
 
-    {
-      // need to distinguish between linear and high order cells
-      const unsigned int vtk_cell_id = flags.write_higher_order_cells ?
-                                         vtk_lagrange_cell_type[dim] :
-                                         vtk_cell_type[dim];
-
-      // uint8_t might be an alias to unsigned char which is then not printed
-      // as ascii integers
-#ifdef DEAL_II_WITH_ZLIB
-      std::vector<uint8_t> cell_types(n_cells,
-                                      static_cast<uint8_t>(vtk_cell_id));
-#else
-      std::vector<unsigned int> cell_types(n_cells, vtk_cell_id);
-#endif
-      // this should compress well :-)
-      vtu_out << cell_types;
-    }
+    // this should compress well :-)
+    vtu_out << cell_types;
     out << "\n";
     out << "    </DataArray>\n";
     out << "  </Cells>\n";
