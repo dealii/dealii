@@ -631,7 +631,7 @@ namespace internal
         const ArrayView<const Number> &             temporary_storage,
         std::vector<MPI_Request> &                  requests) const
       {
-        (void)temporary_storage;
+        (void)buffer;
 
 #ifndef DEAL_II_WITH_MPI
         Assert(false, ExcNeedsMPI());
@@ -639,7 +639,7 @@ namespace internal
         (void)operation;
         (void)data_this;
         (void)data_others;
-        (void)buffer;
+        (void)temporary_storage;
         (void)requests;
 #else
         (void)operation;
@@ -716,12 +716,13 @@ namespace internal
                      j < send_remote_ptr[i + 1];
                      j++)
                   for (unsigned int l = 0; l < send_remote_len[j]; l++)
-                    data_this[send_remote_indices[j] + l] += buffer[k++];
+                    data_this[send_remote_indices[j] + l] +=
+                      temporary_storage[k++];
 #  else
                 for (unsigned int j = send_remote_ptr[i];
                      j < send_remote_ptr[i + 1];
                      j++)
-                  data_this[send_remote_indices[j]] += buffer[j];
+                  data_this[send_remote_indices[j]] += temporary_storage[j];
 #  endif
               }
             else /*if (s.first == 2)*/
