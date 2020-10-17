@@ -347,6 +347,15 @@ namespace LinearAlgebra
              const MPI_Comm  communicator);
 
       /**
+       * TODO
+       */
+      void
+      reinit(const size_type local_size,
+             const size_type ghost_size,
+             const MPI_Comm  comm,
+             const MPI_Comm  comm_sm);
+
+      /**
        * Same as above, but without ghost entries.
        */
       void

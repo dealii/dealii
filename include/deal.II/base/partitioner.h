@@ -205,6 +205,13 @@ namespace Utilities
       Partitioner(const unsigned int size);
 
       /**
+       * TODO
+       */
+      Partitioner(const unsigned int size,
+                  const unsigned int ghost_size,
+                  const MPI_Comm     communicator);
+
+      /**
        * Constructor with index set arguments. This constructor creates a
        * distributed layout based on a given communicators, an IndexSet
        * describing the locally owned range and another one for describing
