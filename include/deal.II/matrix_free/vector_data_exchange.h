@@ -43,9 +43,6 @@ namespace internal
         virtual unsigned int
         n_import_indices() const = 0;
 
-        virtual const std::vector<std::pair<unsigned int, unsigned int>> &
-        ghost_indices_within_larger_ghost_set() const = 0;
-
         virtual void
         export_to_ghosted_array_start(
           const unsigned int                          communication_channel,
@@ -148,12 +145,6 @@ namespace internal
         n_import_indices() const override
         {
           return partitioner->n_import_indices();
-        }
-
-        const std::vector<std::pair<unsigned int, unsigned int>> &
-        ghost_indices_within_larger_ghost_set() const override
-        {
-          return partitioner->ghost_indices_within_larger_ghost_set();
         }
 
         void
@@ -327,16 +318,7 @@ namespace internal
         n_ghost_indices() const override;
 
         unsigned int
-        n_import_indices() const override
-        {
-          return 0; // TODO
-        }
-
-        const std::vector<std::pair<unsigned int, unsigned int>> &
-        ghost_indices_within_larger_ghost_set() const override
-        {
-          return dummy; // TODO
-        }
+        n_import_indices() const override;
 
         void
         export_to_ghosted_array_start(
@@ -374,11 +356,7 @@ namespace internal
           std::vector<MPI_Request> &                  requests) const override;
 
         void
-        reset_ghost_values(const ArrayView<double> &ghost_array) const override
-        {
-          (void)ghost_array;
-          // nothing to do
-        }
+        reset_ghost_values(const ArrayView<double> &ghost_array) const override;
 
         void
         export_to_ghosted_array_start(
@@ -416,11 +394,7 @@ namespace internal
           std::vector<MPI_Request> &                 requests) const override;
 
         void
-        reset_ghost_values(const ArrayView<float> &ghost_array) const override
-        {
-          (void)ghost_array;
-          // nothing to do
-        }
+        reset_ghost_values(const ArrayView<float> &ghost_array) const override;
 
       private:
         template <typename Number>
@@ -572,8 +546,6 @@ namespace internal
          * TODO
          */
         std::vector<unsigned int> send_sm_offset;
-
-        std::vector<std::pair<unsigned int, unsigned int>> dummy;
       };
 
     } // namespace VectorDataExchange

@@ -424,17 +424,13 @@ namespace internal
 #ifndef DEAL_II_WITH_MPI
         Assert(false, ExcNeedsMPI());
 
-        (void)temporary_storage; // TODO
+        (void)temporary_storage;
         (void)communication_channel;
         (void)data_others;
         (void)buffer;
         (void)requests;
 #else
         (void)data_others;
-
-        // TODO!!!
-        // if (send_remote_offset.back() != buffer.size())
-        //  buffer.resize(send_remote_offset.back());
 
         requests.resize(send_sm_ranks.size() + recv_sm_ranks.size() +
                         recv_remote_ranks.size() + send_remote_ranks.size());
@@ -584,10 +580,6 @@ namespace internal
 
         requests.resize(recv_sm_ranks.size() + send_sm_ranks.size() +
                         recv_remote_ranks.size() + send_remote_ranks.size());
-
-        // TODO!!!
-        // if (send_remote_offset.back() != temporary_storage.size())
-        //  temporary_storage.resize(send_remote_offset.back());
 
         int dummy;
         for (unsigned int i = 0; i < recv_sm_ranks.size(); i++)
@@ -758,6 +750,26 @@ namespace internal
       Full::n_ghost_indices() const
       {
         return n_ghost_elements;
+      }
+
+      unsigned int
+      Full::n_import_indices() const
+      {
+        return send_remote_offset.back();
+      }
+
+      void
+      Full::reset_ghost_values(const ArrayView<double> &ghost_array) const
+      {
+        (void)ghost_array;
+        // nothing to do
+      }
+
+      void
+      Full::reset_ghost_values(const ArrayView<float> &ghost_array) const
+      {
+        (void)ghost_array;
+        // nothing to do
       }
 
     } // namespace VectorDataExchange
