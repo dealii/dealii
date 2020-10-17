@@ -3299,15 +3299,18 @@ namespace internal
             part.n_import_indices());
           AssertDimension(requests.size(), tmp_data.size());
 
+          const std::vector<ArrayView<const Number>> shared_arrays; // TODO
+
           part.export_to_ghosted_array_start(
             component_in_block_vector + channel_shift,
             ArrayView<const Number>(vec.begin(), part.local_size()),
-            ArrayView<Number>(tmp_data[component_in_block_vector]->begin(),
-                              part.n_import_indices()),
+            shared_arrays,
             ArrayView<Number>(const_cast<Number *>(vec.begin()) +
                                 part.local_size(),
                               matrix_free.get_dof_info(mf_component)
                                 .vector_partitioner->n_ghost_indices()),
+            ArrayView<Number>(tmp_data[component_in_block_vector]->begin(),
+                              part.n_import_indices()),
             this->requests[component_in_block_vector]);
 #  endif
         }
@@ -3385,7 +3388,11 @@ namespace internal
 
           if (part.n_ghost_indices() != 0 || part.n_import_indices() != 0)
             {
+              const std::vector<ArrayView<const Number>> shared_arrays; // TODO
+
               part.export_to_ghosted_array_finish(
+                ArrayView<const Number>(vec.begin(), part.local_size()),
+                shared_arrays,
                 ArrayView<Number>(const_cast<Number *>(vec.begin()) +
                                     part.local_size(),
                                   matrix_free.get_dof_info(mf_component)
@@ -3497,9 +3504,13 @@ namespace internal
             part.n_import_indices());
           AssertDimension(requests.size(), tmp_data.size());
 
+          const std::vector<ArrayView<const Number>> shared_arrays; // TODO
+
           part.import_from_ghosted_array_start(
             dealii::VectorOperation::add,
             component_in_block_vector + channel_shift,
+            ArrayView<Number>(vec.begin(), part.local_size()),
+            shared_arrays,
             ArrayView<Number>(vec.begin() + part.local_size(),
                               matrix_free.get_dof_info(mf_component)
                                 .vector_partitioner->n_ghost_indices()),
@@ -3581,15 +3592,18 @@ namespace internal
           if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0)
             return;
 
+          const std::vector<ArrayView<const Number>> shared_arrays; // TODO
+
           part.import_from_ghosted_array_finish(
             VectorOperation::add,
-            ArrayView<const Number>(
-              tmp_data[component_in_block_vector]->begin(),
-              part.n_import_indices()),
             ArrayView<Number>(vec.begin(), part.local_size()),
+            shared_arrays,
             ArrayView<Number>(vec.begin() + part.local_size(),
                               matrix_free.get_dof_info(mf_component)
                                 .vector_partitioner->n_ghost_indices()),
+            ArrayView<const Number>(
+              tmp_data[component_in_block_vector]->begin(),
+              part.n_import_indices()),
             this->requests[component_in_block_vector]);
 
           matrix_free.release_scratch_data_non_threadsafe(
