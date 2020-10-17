@@ -756,15 +756,15 @@ namespace internal
       }
 
 
-
       /**
-       * Implementation of transform_real_to_unit_cell
+       * Implementation of transform_real_to_unit_cell for either type double
+       * or VectorizedArray<double>
        */
-      template <int dim, int spacedim>
-      Point<dim>
+      template <int dim, int spacedim, typename Number>
+      Point<dim, Number>
       do_transform_real_to_unit_cell_internal(
-        const Point<spacedim> &                             p,
-        const Point<dim> &                                  initial_p_unit,
+        const Point<spacedim, Number> &                     p,
+        const Point<dim, Number> &                          initial_p_unit,
         const std::vector<Point<spacedim>> &                points,
         const std::vector<Polynomials::Polynomial<double>> &polynomials_1d,
         const std::vector<unsigned int> &                   renumber)
@@ -782,14 +782,19 @@ namespace internal
         // The shape values and derivatives of the mapping at this point are
         // previously computed.
 
-        Point<dim> p_unit = initial_p_unit;
+        Point<dim, Number> p_unit = initial_p_unit;
         auto p_real = internal::evaluate_tensor_product_value_and_gradient(
           polynomials_1d, points, p_unit, polynomials_1d.size() == 2, renumber);
 
-        Tensor<1, spacedim> f = p_real.first - p;
+        Tensor<1, spacedim, Number> f = p_real.first - p;
 
-        // early out if we already have our point
-        if (f.norm_square() < 1e-24 * p_real.second[0].norm_square())
+        // early out if we already have our point in all SIMD lanes, i.e.,
+        // f.norm_square() < 1e-24 * p_real.second[0].norm_square(). To enable
+        // this step also for VectorizedArray where we do not have operator <,
+        // compare the result to zero which is defined for SIMD types
+        if (std::max(Number(0.),
+                     f.norm_square() -
+                       1e-24 * p_real.second[0].norm_square()) == Number(0.))
           return p_unit;
 
         // we need to compare the position of the computed p(x) against the
@@ -829,11 +834,11 @@ namespace internal
         const double       eps                    = 1.e-11;
         const unsigned int newton_iteration_limit = 20;
 
-        Point<dim> invalid_point;
+        Point<dim, Number> invalid_point;
         invalid_point[0] = std::numeric_limits<double>::infinity();
 
-        unsigned int newton_iteration = 0;
-        double       last_f_weighted_norm_square;
+        unsigned int newton_iteration            = 0;
+        Number       last_f_weighted_norm_square = 0.;
         do
           {
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
@@ -841,17 +846,21 @@ namespace internal
 #endif
 
             // f'(x)
-            Tensor<2, spacedim> df;
+            Tensor<2, spacedim, Number> df;
             for (unsigned int d = 0; d < spacedim; ++d)
               for (unsigned int e = 0; e < dim; ++e)
                 df[d][e] = p_real.second[e][d];
 
-            // Solve  [f'(x)]d=f(x)
-            if (determinant(df) <= 0)
+            // check if the determinant is positive on all SIMD lanes
+            if (!(std::min(determinant(df),
+                           Number(std::numeric_limits<double>::min())) ==
+                  Number(std::numeric_limits<double>::min())))
               return invalid_point;
 
-            const Tensor<2, spacedim> df_inverse = invert(df);
-            const Tensor<1, spacedim> delta      = df_inverse * f;
+            // Solve  [f'(x)]d=f(x)
+            const Tensor<2, spacedim, Number> df_inverse = invert(df);
+            const Tensor<1, spacedim, Number> delta      = df_inverse * f;
+            last_f_weighted_norm_square = (df_inverse * f).norm_square();
 
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
             std::cout << "   delta=" << delta << std::endl;
@@ -865,12 +874,11 @@ namespace internal
                 // point is simply ignored in codimension one case. When this
                 // component is not zero, then we are projecting the point to
                 // the surface or curve identified by the cell.
-                Point<dim> p_unit_trial = p_unit;
+                Point<dim, Number> p_unit_trial = p_unit;
                 for (unsigned int i = 0; i < dim; ++i)
                   p_unit_trial[i] -= step_length * delta[i];
 
-                // shape values and derivatives
-                // at new p_unit point
+                // shape values and derivatives at new p_unit point
                 const auto p_real_trial =
                   internal::evaluate_tensor_product_value_and_gradient(
                     polynomials_1d,
@@ -878,7 +886,8 @@ namespace internal
                     p_unit_trial,
                     polynomials_1d.size() == 2,
                     renumber);
-                const Tensor<1, spacedim> f_trial = p_real_trial.first - p;
+                const Tensor<1, spacedim, Number> f_trial =
+                  p_real_trial.first - p;
 
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
                 std::cout << "     step_length=" << step_length << std::endl
@@ -895,7 +904,20 @@ namespace internal
                 // use for the outer algorithm. in practice, line search is just
                 // a crutch to find a "reasonable" step length, and so using the
                 // l2 norm is probably just fine
-                if (f_trial.norm_square() < f.norm_square())
+                //
+                // due to the possible use of VectorizedArray<double>, we must
+                // turn the check f_trial.norm() < f.norm() into a more
+                // complicated statement. We are done if either
+                // last_f_weighted_norm_square is less than the Newton
+                // tolerance (i.e., that particular SIMD lane is already
+                // converged in the previous the Newton iteration, so we might
+                // not be able to decrease the right hand side norm any more)
+                // or if the norm did not increase in the line search
+                if (std::max(last_f_weighted_norm_square - eps * eps,
+                             Number(0.)) *
+                      std::max(f_trial.norm_square() - f.norm_square(),
+                               Number(0.)) ==
+                    Number(0.))
                   {
                     p_real = p_real_trial;
                     p_unit = p_unit_trial;
@@ -903,7 +925,7 @@ namespace internal
                     break;
                   }
                 else if (step_length > 0.05)
-                  step_length /= 2;
+                  step_length *= 0.5;
                 else
                   return invalid_point;
               }
@@ -912,9 +934,9 @@ namespace internal
             ++newton_iteration;
             if (newton_iteration > newton_iteration_limit)
               return invalid_point;
-            last_f_weighted_norm_square = (df_inverse * f).norm_square();
           }
-        while (last_f_weighted_norm_square > eps * eps);
+        while (std::max(eps * eps - last_f_weighted_norm_square, Number(0.)) ==
+               Number(0.));
 
         return p_unit;
       }
@@ -2191,28 +2213,76 @@ MappingQGeneric<dim, spacedim>::transform_points_real_to_unit_cell(
   const DerivativeForm<1, spacedim, dim> A_inv =
     affine_factors.first.covariant_form().transpose();
 
-  for (unsigned int i = 0; i < real_points.size(); ++i)
-    {
-      try
-        {
-          // Compute an initial guess by inverting the affine approximation
-          // A * x_unit + b = x_real
-          Point<dim> initial_guess(
-            apply_transformation(A_inv,
-                                 real_points[i] - affine_factors.second));
-          unit_points[i] = internal::MappingQGenericImplementation::
+  const unsigned int n_points = real_points.size();
+  const unsigned int n_lanes  = VectorizedArray<double>::size();
+
+  // Use the more heavy VectorizedArray code path if there is more than
+  // one point left to compute
+  for (unsigned int i = 0; i < n_points; i += n_lanes)
+    if (n_points - i > 1)
+      {
+        Point<spacedim, VectorizedArray<double>> p_vec;
+        for (unsigned int j = 0; j < n_lanes; ++j)
+          if (i + j < n_points)
+            for (unsigned int d = 0; d < spacedim; ++d)
+              p_vec[d][j] = real_points[i + j][d];
+          else
+            for (unsigned int d = 0; d < spacedim; ++d)
+              p_vec[d][j] = real_points[i][d];
+
+        // Compute an initial guess by inverting the affine approximation
+        // A * x_unit + b = x_real
+        Tensor<1, spacedim, VectorizedArray<double>> rhs;
+        for (unsigned int d = 0; d < spacedim; ++d)
+          rhs[d] = affine_factors.second[d];
+        rhs = p_vec - rhs;
+
+        Point<dim, VectorizedArray<double>> initial_guess;
+        for (unsigned int d = 0; d < dim; ++d)
+          {
+            initial_guess[d] = A_inv[d][0] * rhs[0];
+            for (unsigned int e = 1; e < spacedim; ++e)
+              initial_guess[d] += A_inv[d][e] * rhs[e];
+          }
+        Point<dim, VectorizedArray<double>> unit_point =
+          internal::MappingQGenericImplementation::
             do_transform_real_to_unit_cell_internal<dim, spacedim>(
-              real_points[i],
+              p_vec,
               GeometryInfo<dim>::project_to_unit_cell(initial_guess),
               support_points,
               polynomials_1d,
               renumber_lexicographic_to_hierarchic);
-        }
-      catch (typename Mapping<dim>::ExcTransformationFailed &)
-        {
-          unit_points[i][0] = std::numeric_limits<double>::infinity();
-        }
-    }
+
+        // If the vectorized computation failed, it could be that only some of
+        // the lanes failed but others would have succeeded if we had let them
+        // compute alone without interference (like negative Jacobian
+        // determinants) from other SIMD lanes. Repeat the computation in this
+        // unlikely case with scalar arguments.
+        for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
+          if (unit_point[0][j] == std::numeric_limits<double>::infinity())
+            unit_points[i + j] = internal::MappingQGenericImplementation::
+              do_transform_real_to_unit_cell_internal<dim, spacedim>(
+                real_points[i + j],
+                GeometryInfo<dim>::project_to_unit_cell(
+                  Point<dim>(apply_transformation(
+                    A_inv, real_points[i + j] - affine_factors.second))),
+                support_points,
+                polynomials_1d,
+                renumber_lexicographic_to_hierarchic);
+          else
+            for (unsigned int d = 0; d < dim; ++d)
+              unit_points[i + j][d] = unit_point[d][j];
+      }
+    else
+      unit_points[i] = internal::MappingQGenericImplementation::
+        do_transform_real_to_unit_cell_internal<dim, spacedim>(
+          real_points[i],
+          GeometryInfo<dim>::project_to_unit_cell(Point<dim>(
+            apply_transformation(A_inv,
+                                 real_points[i] - affine_factors.second))),
+          support_points,
+          polynomials_1d,
+          renumber_lexicographic_to_hierarchic);
 }
 
 
