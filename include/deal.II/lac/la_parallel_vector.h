@@ -360,7 +360,8 @@ namespace LinearAlgebra
        */
       void
       reinit(
-        const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
+        const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
+        const MPI_Comm &comm_sm = MPI_COMM_SELF);
 
       /**
        * Swap the contents of this vector and the other vector @p v. One could
@@ -1311,7 +1312,8 @@ namespace LinearAlgebra
        * A helper function that is used to resize the val array.
        */
       void
-      resize_val(const size_type new_allocated_size);
+      resize_val(const size_type new_allocated_size,
+                 const MPI_Comm &comm_sm = MPI_COMM_SELF);
 
       // Make all other vector types friends.
       template <typename Number2, typename MemorySpace2>

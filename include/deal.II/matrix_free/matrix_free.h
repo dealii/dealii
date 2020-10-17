@@ -227,8 +227,7 @@ public:
       const bool         initialize_mapping  = true,
       const bool         overlap_communication_computation    = true,
       const bool         hold_all_faces_to_owned_cells        = false,
-      const bool         cell_vectorization_categories_strict = false,
-      const MPI_Comm     communicator_sm                      = MPI_COMM_SELF)
+      const bool         cell_vectorization_categories_strict = false)
       : tasks_parallel_scheme(tasks_parallel_scheme)
       , tasks_block_size(tasks_block_size)
       , mapping_update_flags(mapping_update_flags)
@@ -244,7 +243,9 @@ public:
       , hold_all_faces_to_owned_cells(hold_all_faces_to_owned_cells)
       , cell_vectorization_categories_strict(
           cell_vectorization_categories_strict)
-    {}
+    {
+      this->communicator_sm = MPI_COMM_SELF;
+    }
 
     /**
      * Copy constructor.
@@ -2178,7 +2179,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_vector(
   const unsigned int                           comp) const
 {
   AssertIndexRange(comp, n_components());
-  vec.reinit(dof_info[comp].vector_partitioner);
+  vec.reinit(dof_info[comp].vector_partitioner, task_info.communicator_sm);
 }
 
 
