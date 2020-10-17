@@ -3591,8 +3591,8 @@ namespace internal
             ArrayView<Number>(vec.begin(), part.local_size()),
             vec.shared_vector_data(),
             ArrayView<Number>(vec.begin() + part.local_size(),
-                              matrix_free.get_dof_info(mf_component)
-                                .vector_partitioner->n_ghost_indices()),
+               matrix_free.get_dof_info(mf_component)
+                .vector_partitioner->n_ghost_indices()),
             ArrayView<const Number>(
               tmp_data[component_in_block_vector]->begin(),
               part.n_import_indices()),

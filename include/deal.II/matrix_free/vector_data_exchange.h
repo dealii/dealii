@@ -436,6 +436,11 @@ namespace internal
           const ArrayView<const Number> &             temporary_storage,
           std::vector<MPI_Request> &                  requests) const;
 
+        template <typename Number>
+        void
+        reset_ghost_values_impl(
+          const ArrayView<Number> &ghost_array) const;
+
       private:
         /**
          * Global communicator.
@@ -520,7 +525,7 @@ namespace internal
         /**
          * TODO
          */
-        std::vector<unsigned int> send_remote_offset;
+        std::vector<unsigned int> send_remote_offset = {0};
 
         /**
          * TODO

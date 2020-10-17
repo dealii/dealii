@@ -87,6 +87,9 @@ namespace internal
         this->n_local_elements = is_locally_owned.n_elements();
         this->n_ghost_elements = is_locally_ghost.n_elements();
 
+        if (Utilities::MPI::job_supports_mpi() == false)
+          return; // nothing to do in serial case
+
         this->n_mpi_processes_ = Utilities::MPI::n_mpi_processes(comm);
 
         std::vector<unsigned int> sm_ranks(
@@ -146,7 +149,8 @@ namespace internal
                   recv_sm_ranks.push_back(std::distance(sm_ranks.begin(), ptr));
                   recv_sm_ptr.push_back(recv_sm_ptr.back() +
                                         rank_and_local_indices.second.size());
-                  recv_sm_offset.push_back(offset);
+                  recv_sm_offset.push_back(is_locally_owned.n_elements() +
+                                           offset);
                 }
               offset += rank_and_local_indices.second.size();
             }
@@ -418,15 +422,14 @@ namespace internal
         const ArrayView<Number> &                   temporary_storage,
         std::vector<MPI_Request> &                  requests) const
       {
-        (void)data_this;
-
 #ifndef DEAL_II_WITH_MPI
         Assert(false, ExcNeedsMPI());
 
-        (void)temporary_storage;
         (void)communication_channel;
+        (void)data_this;
         (void)data_others;
         (void)buffer;
+        (void)temporary_storage;
         (void)requests;
 #else
         (void)data_others;
@@ -459,7 +462,7 @@ namespace internal
         for (unsigned int i = 0; i < recv_remote_ranks.size(); i++)
           MPI_Irecv(buffer.data() + recv_remote_ptr[i],
                     recv_remote_ptr[i + 1] - recv_remote_ptr[i],
-                    Utilities::MPI::internal::mpi_type_id(data_this.data()),
+                    Utilities::MPI::internal::mpi_type_id(buffer.data()),
                     recv_remote_ranks[i],
                     communication_channel + 3,
                     comm,
@@ -510,8 +513,8 @@ namespace internal
 #ifndef DEAL_II_WITH_MPI
         Assert(false, ExcNeedsMPI());
 
-        (void)ghost_array;
         (void)data_others;
+        (void)ghost_array;
         (void)requests;
 #else
         AssertDimension(requests.size(),
@@ -631,14 +634,13 @@ namespace internal
         const ArrayView<const Number> &             temporary_storage,
         std::vector<MPI_Request> &                  requests) const
       {
-        (void)buffer;
-
 #ifndef DEAL_II_WITH_MPI
         Assert(false, ExcNeedsMPI());
 
         (void)operation;
         (void)data_this;
         (void)data_others;
+        (void)buffer;
         (void)temporary_storage;
         (void)requests;
 #else
@@ -727,9 +729,8 @@ namespace internal
               }
             else /*if (s.first == 2)*/
               {
-                std::memset(data_this.data() + recv_remote_ptr[i] +
-                              n_local_elements,
-                            0,
+                std::memset(buffer.data() + recv_remote_ptr[i],
+                            0.0,
                             (recv_remote_ptr[i + 1] - recv_remote_ptr[i]) *
                               sizeof(Number));
               }
@@ -760,15 +761,22 @@ namespace internal
       void
       Full::reset_ghost_values(const ArrayView<double> &ghost_array) const
       {
-        (void)ghost_array;
-        // nothing to do
+        reset_ghost_values_impl(ghost_array);
       }
 
       void
       Full::reset_ghost_values(const ArrayView<float> &ghost_array) const
       {
-        (void)ghost_array;
-        // nothing to do
+        reset_ghost_values_impl(ghost_array);
+      }
+
+      template <typename Number>
+      void
+      Full::reset_ghost_values_impl(const ArrayView<Number> &ghost_array) const
+      {
+        std::memset(ghost_array.data(),
+                    0.0,
+                    recv_remote_ptr.back() * sizeof(Number));
       }
 
     } // namespace VectorDataExchange

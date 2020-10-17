@@ -496,12 +496,18 @@ namespace internal
       Utilities::MPI::Partitioner *vec_part =
         const_cast<Utilities::MPI::Partitioner *>(vector_partitioner.get());
       vec_part->set_ghost_indices(ghost_indices);
-      vector_exchanger = std::make_shared<
-        internal::MatrixFreeFunctions::VectorDataExchange::Full>(
-        vector_partitioner->locally_owned_range(),
-        vector_partitioner->ghost_indices(),
-        vector_partitioner->get_mpi_communicator(),
-        MPI_COMM_SELF /*TODO*/);
+
+      if (false)
+        vector_exchanger =
+          std::make_shared<internal::MatrixFreeFunctions::VectorDataExchange::
+                             PartitionerWrapper>(vector_partitioner);
+      else
+        vector_exchanger = std::make_shared<
+          internal::MatrixFreeFunctions::VectorDataExchange::Full>(
+          vector_partitioner->locally_owned_range(),
+          vector_partitioner->ghost_indices(),
+          vector_partitioner->get_mpi_communicator(),
+          MPI_COMM_SELF /*TODO*/);
     }
 
 
