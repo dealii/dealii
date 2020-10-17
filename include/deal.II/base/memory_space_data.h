@@ -75,6 +75,16 @@ namespace MemorySpace
      * Pointer to data on the device.
      */
     std::unique_ptr<Number[]> values_dev;
+
+    /**
+     * TODO
+     */
+    MPI_Win *values_win = nullptr;
+
+    /**
+     * TODO
+     */
+    std::vector<ArrayView<const Number>> others;
   };
 
 
@@ -125,6 +135,10 @@ namespace MemorySpace
     // This is not used but it allows to simplify the code until we start using
     // CUDA-aware MPI.
     std::unique_ptr<Number[]> values_dev;
+
+    MPI_Win *values_win = nullptr;
+
+    std::vector<ArrayView<const Number>> others;
   };
 
 
@@ -179,6 +193,8 @@ namespace MemorySpace
 
     std::unique_ptr<Number[], std::function<void(Number *)>> values;
     std::unique_ptr<Number[], void (*)(Number *)>            values_dev;
+    MPI_Win *                            values_win = nullptr;
+    std::vector<ArrayView<const Number>> others;
   };
 
 

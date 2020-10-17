@@ -150,6 +150,8 @@ namespace LinearAlgebra
               data.values.reset();
               allocated_size = 0;
             }
+          data.others = {
+            ArrayView<const Number>(data.values.get(), new_alloc_size)};
         }
 
         static void
