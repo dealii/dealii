@@ -82,6 +82,9 @@ namespace internal
           std::vector<MPI_Request> &                  requests) const = 0;
 
         virtual void
+        reset_ghost_values(const ArrayView<double> &ghost_array) const = 0;
+
+        virtual void
         export_to_ghosted_array_start(
           const unsigned int                         communication_channel,
           const ArrayView<const float> &             locally_owned_array,
@@ -115,6 +118,9 @@ namespace internal
           const ArrayView<float> &                   ghost_array,
           const ArrayView<const float> &             temporary_storage,
           std::vector<MPI_Request> &                 requests) const = 0;
+
+        virtual void
+        reset_ghost_values(const ArrayView<float> &ghost_array) const = 0;
       };
 
       class PartitionerWrapper : public Base
@@ -214,6 +220,13 @@ namespace internal
                                                         ghost_array,
                                                         requests);
         }
+
+        void
+        reset_ghost_values(const ArrayView<double> &ghost_array) const override
+        {
+          reset_ghost_values_impl(ghost_array);
+        }
+
         void
         export_to_ghosted_array_start(
           const unsigned int                         communication_channel,
@@ -279,7 +292,23 @@ namespace internal
                                                         requests);
         }
 
+        void
+        reset_ghost_values(const ArrayView<float> &ghost_array) const override
+        {
+          reset_ghost_values_impl(ghost_array);
+        }
+
       private:
+        template <typename Number>
+        void
+        reset_ghost_values_impl(const ArrayView<Number> &ghost_array) const
+        {
+          for (const auto &my_ghosts :
+               partitioner->ghost_indices_within_larger_ghost_set())
+            for (unsigned int j = my_ghosts.first; j < my_ghosts.second; ++j)
+              ghost_array[j] = 0.;
+        }
+
         const std::shared_ptr<const Utilities::MPI::Partitioner> partitioner;
       };
 
@@ -345,6 +374,13 @@ namespace internal
           std::vector<MPI_Request> &                  requests) const override;
 
         void
+        reset_ghost_values(const ArrayView<double> &ghost_array) const override
+        {
+          (void)ghost_array;
+          // nothing to do
+        }
+
+        void
         export_to_ghosted_array_start(
           const unsigned int                         communication_channel,
           const ArrayView<const float> &             locally_owned_array,
@@ -378,6 +414,13 @@ namespace internal
           const ArrayView<float> &                   ghost_array,
           const ArrayView<const float> &             temporary_storage,
           std::vector<MPI_Request> &                 requests) const override;
+
+        void
+        reset_ghost_values(const ArrayView<float> &ghost_array) const override
+        {
+          (void)ghost_array;
+          // nothing to do
+        }
 
       private:
         template <typename Number>

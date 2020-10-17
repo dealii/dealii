@@ -3678,18 +3678,12 @@ namespace internal
 
           if (part.n_ghost_indices() > 0)
             {
-              ArrayView<Number> array(
+              part.reset_ghost_values(ArrayView<Number>(
                 const_cast<LinearAlgebra::distributed::Vector<Number> &>(vec)
                     .begin() +
                   part.local_size(),
                 matrix_free.get_dof_info(mf_component)
-                  .vector_partitioner->n_ghost_indices());
-
-              for (const auto &my_ghosts :
-                   part.ghost_indices_within_larger_ghost_set())
-                for (unsigned int j = my_ghosts.first; j < my_ghosts.second;
-                     ++j)
-                  array[j] = 0.;
+                  .vector_partitioner->n_ghost_indices()));
             }
 
 #  endif
