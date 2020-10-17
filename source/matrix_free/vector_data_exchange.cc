@@ -146,8 +146,7 @@ namespace internal
                   recv_sm_ranks.push_back(std::distance(sm_ranks.begin(), ptr));
                   recv_sm_ptr.push_back(recv_sm_ptr.back() +
                                         rank_and_local_indices.second.size());
-                  recv_sm_offset.push_back(is_locally_owned.n_elements() +
-                                           offset);
+                  recv_sm_offset.push_back(offset);
                 }
               offset += rank_and_local_indices.second.size();
             }
@@ -536,13 +535,12 @@ namespace internal
                  j < recv_sm_ptr[i + 1];
                  j++)
               for (unsigned int l = 0; l < recv_sm_len[j]; l++, k++)
-                data_this_ptr[k] =
-                  data_others_ptr[recv_sm_indices[j] + l]; // TODO!!!
+                data_this_ptr[k] = data_others_ptr[recv_sm_indices[j] + l];
 #  else
             for (unsigned int j = recv_sm_ptr[i], k = recv_sm_offset[i];
                  j < recv_sm_ptr[i + 1];
                  j++, k++)
-              data_this_ptr[k] = data_others_ptr[recv_sm_indices[j]]; // TODO!!!
+              data_this_ptr[k] = data_others_ptr[recv_sm_indices[j]];
 #  endif
           }
 
