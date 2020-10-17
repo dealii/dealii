@@ -333,6 +333,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
           task_info.communicator = dist_tria != nullptr ?
                                      dist_tria->get_communicator() :
                                      MPI_COMM_SELF;
+          task_info.communicator_sm = additional_data.communicator_sm;
           task_info.my_pid =
             Utilities::MPI::this_mpi_process(task_info.communicator);
           task_info.n_procs =
@@ -340,9 +341,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
         }
       else
         {
-          task_info.communicator = MPI_COMM_SELF;
-          task_info.my_pid       = 0;
-          task_info.n_procs      = 1;
+          task_info.communicator    = MPI_COMM_SELF;
+          task_info.communicator_sm = MPI_COMM_SELF;
+          task_info.my_pid          = 0;
+          task_info.n_procs         = 1;
         }
 
       initialize_dof_handlers(dof_handler, additional_data);

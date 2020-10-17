@@ -227,7 +227,8 @@ public:
       const bool         initialize_mapping  = true,
       const bool         overlap_communication_computation    = true,
       const bool         hold_all_faces_to_owned_cells        = false,
-      const bool         cell_vectorization_categories_strict = false)
+      const bool         cell_vectorization_categories_strict = false,
+      const MPI_Comm     communicator_sm                      = MPI_COMM_SELF)
       : tasks_parallel_scheme(tasks_parallel_scheme)
       , tasks_block_size(tasks_block_size)
       , mapping_update_flags(mapping_update_flags)
@@ -268,6 +269,7 @@ public:
       , cell_vectorization_category(other.cell_vectorization_category)
       , cell_vectorization_categories_strict(
           other.cell_vectorization_categories_strict)
+      , communicator_sm(other.communicator_sm)
     {}
 
     // remove with level_mg_handler
@@ -297,6 +299,7 @@ public:
       cell_vectorization_category   = other.cell_vectorization_category;
       cell_vectorization_categories_strict =
         other.cell_vectorization_categories_strict;
+      communicator_sm = other.communicator_sm;
 
       return *this;
     }
@@ -529,6 +532,11 @@ public:
      * them in a single vectorized array.
      */
     bool cell_vectorization_categories_strict;
+
+    /**
+     * Shared-memory MPI communicator. Default: MPI_COMM_SELF.
+     */
+    MPI_Comm communicator_sm;
   };
 
   /**
@@ -3591,8 +3599,8 @@ namespace internal
             ArrayView<Number>(vec.begin(), part.local_size()),
             vec.shared_vector_data(),
             ArrayView<Number>(vec.begin() + part.local_size(),
-               matrix_free.get_dof_info(mf_component)
-                .vector_partitioner->n_ghost_indices()),
+                              matrix_free.get_dof_info(mf_component)
+                                .vector_partitioner->n_ghost_indices()),
             ArrayView<const Number>(
               tmp_data[component_in_block_vector]->begin(),
               part.n_import_indices()),
