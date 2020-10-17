@@ -3670,19 +3670,26 @@ namespace internal
           AssertDimension(requests.size(), tmp_data.size());
 
           const unsigned int mf_component = find_vector_in_mf(vec);
-          const auto &       part         = get_partitioner(mf_component);
+
+          Assert(mf_component != numbers::invalid_unsigned_int,
+                 ExcNotImplemented());
+
+          const auto &part = get_partitioner(mf_component);
 
           if (part.n_ghost_indices() > 0)
             {
-              Number *array =
+              ArrayView<Number> array(
                 const_cast<LinearAlgebra::distributed::Vector<Number> &>(vec)
-                  .begin();
+                    .begin() +
+                  part.local_size(),
+                matrix_free.get_dof_info(mf_component)
+                  .vector_partitioner->n_ghost_indices());
 
               for (const auto &my_ghosts :
                    part.ghost_indices_within_larger_ghost_set())
                 for (unsigned int j = my_ghosts.first; j < my_ghosts.second;
                      ++j)
-                  array[j + part.local_size()] = 0.;
+                  array[j] = 0.;
             }
 
 #  endif
