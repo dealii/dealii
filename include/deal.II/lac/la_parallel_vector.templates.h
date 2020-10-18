@@ -240,6 +240,7 @@ namespace LinearAlgebra
                             MPI_UNSIGNED,
                             comm_shared);
 
+              data.others.resize(size_sm);
               for (unsigned int i = 0; i < size_sm; i++)
                 data.others[i] =
                   ArrayView<const Number>(others[i], new_alloc_sizes[i]);
