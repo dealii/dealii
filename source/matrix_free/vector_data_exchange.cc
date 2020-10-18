@@ -289,11 +289,8 @@ namespace internal
                       MPI_STATUSES_IGNORE);
         }
 
-#  if DO_COMPRESS
         internal::compress(recv_sm_ptr, recv_sm_indices, recv_sm_len);
-#  endif
 
-#  if DO_COMPRESS
         internal::compress(send_remote_ptr,
                            send_remote_indices,
                            send_remote_len);
@@ -308,13 +305,8 @@ namespace internal
               c += send_remote_len[i];
             send_remote_offset.push_back(c);
           }
-#  else
-        send_remote_offset = send_remote_ptr;
-#  endif
 
-#  if DO_COMPRESS
         internal::compress(send_sm_ptr, send_sm_indices, send_sm_len);
-#  endif
 
 #endif
       }
@@ -508,8 +500,7 @@ namespace internal
                     requests.data() + send_sm_ranks.size() +
                       recv_sm_ranks.size() + i);
 
-          // send data to remote processes
-#  if DO_COMPRESS
+        // send data to remote processes
         for (unsigned int i = 0, k = 0; i < send_remote_ranks.size(); i++)
           {
             for (unsigned int j = send_remote_ptr[i];
@@ -517,14 +508,6 @@ namespace internal
                  j++)
               for (unsigned int l = 0; l < send_remote_len[j]; l++, k++)
                 temporary_storage[k] = data_this[send_remote_indices[j] + l];
-#  else
-        for (unsigned int i = 0; i < send_remote_ranks.size(); i++)
-          {
-            for (unsigned int j = send_remote_ptr[i];
-                 j < send_remote_ptr[i + 1];
-                 j++)
-              temporary_storage[j] = data_this[send_remote_indices[j]];
-#  endif
 
             // send data away
             MPI_Isend(temporary_storage.data() + send_remote_offset[i],
@@ -572,18 +555,11 @@ namespace internal
               data_others[recv_sm_ranks[i]].data();
             Number *__restrict__ data_this_ptr = ghost_array.data();
 
-#  if DO_COMPRESS
             for (unsigned int j = recv_sm_ptr[i], k = recv_sm_offset[i];
                  j < recv_sm_ptr[i + 1];
                  j++)
               for (unsigned int l = 0; l < recv_sm_len[j]; l++, k++)
                 data_this_ptr[k] = data_others_ptr[recv_sm_indices[j] + l];
-#  else
-            for (unsigned int j = recv_sm_ptr[i], k = recv_sm_offset[i];
-                 j < recv_sm_ptr[i + 1];
-                 j++, k++)
-              data_this_ptr[k] = data_others_ptr[recv_sm_indices[j]];
-#  endif
           }
 
         MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
@@ -727,7 +703,6 @@ namespace internal
                   const_cast<Number *>(data_others[send_sm_ranks[i]].data());
                 Number *__restrict__ data_this_ptr = data_this.data();
 
-#  if DO_COMPRESS
                 for (unsigned int j = send_sm_ptr[i], k = send_sm_offset[i];
                      j < send_sm_ptr[i + 1];
                      j++)
@@ -739,19 +714,9 @@ namespace internal
                         data_others_ptr[k] = 0.0;
                       }
                   }
-#  else
-                for (unsigned int j = send_sm_ptr[i], k = send_sm_offset[i];
-                     j < send_sm_ptr[i + 1];
-                     j++, k++)
-                  {
-                    data_this_ptr[send_sm_indices[j]] += data_others_ptr[k];
-                    data_others_ptr[k] = 0.0;
-                  }
-#  endif
               }
             else if (s.first == 1)
               {
-#  if DO_COMPRESS
                 for (unsigned int j = send_remote_ptr[i],
                                   k = send_remote_offset[i];
                      j < send_remote_ptr[i + 1];
@@ -759,12 +724,6 @@ namespace internal
                   for (unsigned int l = 0; l < send_remote_len[j]; l++)
                     data_this[send_remote_indices[j] + l] +=
                       temporary_storage[k++];
-#  else
-                for (unsigned int j = send_remote_ptr[i];
-                     j < send_remote_ptr[i + 1];
-                     j++)
-                  data_this[send_remote_indices[j]] += temporary_storage[j];
-#  endif
               }
             else /*if (s.first == 2)*/
               {
