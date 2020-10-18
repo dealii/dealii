@@ -161,7 +161,7 @@ namespace internal
         std::vector<MPI_Request> send_sm_req;
 
         for (const auto &pair : ghost_indices_within_larger_ghost_set)
-          for (unsigned int c = 0, k = pair.first; c < pair.second; ++c, ++k)
+          for (unsigned int c = 0, k = pair.first; k < pair.second; ++c, ++k)
             shifts.push_back(k);
 
         {
@@ -588,6 +588,8 @@ namespace internal
                 if (idx_1 == idx_2)
                   continue;
 
+                AssertIndexRange(idx_2, idx_1);
+
                 ghost_array[idx_1] = ghost_array[idx_2];
                 ghost_array[idx_2] = 0.0;
               }
@@ -649,13 +651,15 @@ namespace internal
 
         for (unsigned int i = 0; i < recv_remote_ranks.size(); i++)
           {
-            for (unsigned int c = 0; c < recv_remote_ptr[i].second - 1; ++c)
+            for (unsigned int c = 0; c < recv_remote_ptr[i].second; ++c)
               {
                 const unsigned int idx_1 = shifts[shifts_ptr[i] + c];
                 const unsigned int idx_2 = recv_remote_ptr[i].first + c;
 
                 if (idx_1 == idx_2)
                   continue;
+
+                Assert(idx_2 < idx_1, ExcNotImplemented());
 
                 buffer[idx_2] = buffer[idx_1];
                 buffer[idx_1] = 0.0;

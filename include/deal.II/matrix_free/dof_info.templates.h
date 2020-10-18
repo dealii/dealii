@@ -1235,9 +1235,23 @@ namespace internal
               ->set_ghost_indices(compressed_set, part.ghost_indices());
           }
 
-        vector_partitioner_face_variants[0] =
-          std::make_shared<internal::MatrixFreeFunctions::VectorDataExchange::
-                             PartitionerWrapper>(temp_0);
+        if (false)
+          {
+            vector_partitioner_face_variants[0] =
+              std::make_shared<internal::MatrixFreeFunctions::
+                                 VectorDataExchange::PartitionerWrapper>(
+                temp_0);
+          }
+        else
+          {
+            vector_partitioner_face_variants[0] = std::make_shared<
+              internal::MatrixFreeFunctions::VectorDataExchange::Full>(
+              temp_0->locally_owned_range(),
+              temp_0->ghost_indices(),
+              temp_0->get_mpi_communicator(),
+              MPI_COMM_SELF /*TODO*/,
+              temp_0->ghost_indices_within_larger_ghost_set());
+          }
       }
 
       // construct a numbering of faces
@@ -1476,18 +1490,52 @@ namespace internal
             part.locally_owned_range(), part.get_mpi_communicator());
         }
 
-      vector_partitioner_face_variants[1] = std::make_shared<
-        internal::MatrixFreeFunctions::VectorDataExchange::PartitionerWrapper>(
-        temp_1);
-      vector_partitioner_face_variants[2] = std::make_shared<
-        internal::MatrixFreeFunctions::VectorDataExchange::PartitionerWrapper>(
-        temp_2);
-      vector_partitioner_face_variants[3] = std::make_shared<
-        internal::MatrixFreeFunctions::VectorDataExchange::PartitionerWrapper>(
-        temp_3);
-      vector_partitioner_face_variants[4] = std::make_shared<
-        internal::MatrixFreeFunctions::VectorDataExchange::PartitionerWrapper>(
-        temp_4);
+      if (false)
+        {
+          vector_partitioner_face_variants[1] =
+            std::make_shared<internal::MatrixFreeFunctions::VectorDataExchange::
+                               PartitionerWrapper>(temp_1);
+          vector_partitioner_face_variants[2] =
+            std::make_shared<internal::MatrixFreeFunctions::VectorDataExchange::
+                               PartitionerWrapper>(temp_2);
+          vector_partitioner_face_variants[3] =
+            std::make_shared<internal::MatrixFreeFunctions::VectorDataExchange::
+                               PartitionerWrapper>(temp_3);
+          vector_partitioner_face_variants[4] =
+            std::make_shared<internal::MatrixFreeFunctions::VectorDataExchange::
+                               PartitionerWrapper>(temp_4);
+        }
+      else
+        {
+          vector_partitioner_face_variants[1] = std::make_shared<
+            internal::MatrixFreeFunctions::VectorDataExchange::Full>(
+            temp_1->locally_owned_range(),
+            temp_1->ghost_indices(),
+            temp_1->get_mpi_communicator(),
+            MPI_COMM_SELF /*TODO*/,
+            temp_1->ghost_indices_within_larger_ghost_set());
+          vector_partitioner_face_variants[2] = std::make_shared<
+            internal::MatrixFreeFunctions::VectorDataExchange::Full>(
+            temp_2->locally_owned_range(),
+            temp_2->ghost_indices(),
+            temp_2->get_mpi_communicator(),
+            MPI_COMM_SELF /*TODO*/,
+            temp_2->ghost_indices_within_larger_ghost_set());
+          vector_partitioner_face_variants[3] = std::make_shared<
+            internal::MatrixFreeFunctions::VectorDataExchange::Full>(
+            temp_3->locally_owned_range(),
+            temp_3->ghost_indices(),
+            temp_3->get_mpi_communicator(),
+            MPI_COMM_SELF /*TODO*/,
+            temp_3->ghost_indices_within_larger_ghost_set());
+          vector_partitioner_face_variants[4] = std::make_shared<
+            internal::MatrixFreeFunctions::VectorDataExchange::Full>(
+            temp_4->locally_owned_range(),
+            temp_4->ghost_indices(),
+            temp_4->get_mpi_communicator(),
+            MPI_COMM_SELF /*TODO*/,
+            temp_4->ghost_indices_within_larger_ghost_set());
+        }
     }
 
 
