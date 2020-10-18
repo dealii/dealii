@@ -313,7 +313,9 @@ namespace internal
         Full(const IndexSet &is_locally_owned,
              const IndexSet &is_locally_ghost,
              const MPI_Comm &comm,
-             const MPI_Comm &comm_sm);
+             const MPI_Comm &comm_sm,
+             const std::vector<std::pair<unsigned int, unsigned int>>
+               &ghost_indices_within_larger_ghost_set);
 
         unsigned int
         local_size() const override;
@@ -478,7 +480,11 @@ namespace internal
         /**
          * TODO
          */
-        std::vector<types::global_dof_index> recv_remote_ptr = {0};
+        std::vector<std::pair<types::global_dof_index, types::global_dof_index>>
+          recv_remote_ptr;
+
+        std::vector<unsigned int> shifts;
+        std::vector<unsigned int> shifts_ptr;
 
         /**
          * TODO

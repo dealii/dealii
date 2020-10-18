@@ -112,7 +112,9 @@ namespace internal
       Full::Full(const IndexSet &is_locally_owned,
                  const IndexSet &is_locally_ghost,
                  const MPI_Comm &communicator,
-                 const MPI_Comm &communicator_sm)
+                 const MPI_Comm &communicator_sm,
+                 const std::vector<std::pair<unsigned int, unsigned int>>
+                   &ghost_indices_within_larger_ghost_set)
       {
         this->comm    = communicator;
         this->comm_sm = communicator_sm;
@@ -158,6 +160,10 @@ namespace internal
         std::vector<MPI_Request> recv_sm_req;
         std::vector<MPI_Request> send_sm_req;
 
+        for (const auto &pair : ghost_indices_within_larger_ghost_set)
+          for (unsigned int c = 0, k = pair.first; c < pair.second; ++c, ++k)
+            shifts.push_back(k);
+
         {
           std::map<unsigned int, std::vector<types::global_dof_index>>
             rank_to_local_indices;
@@ -178,9 +184,10 @@ namespace internal
                 {
                   // remote process
                   recv_remote_ranks.push_back(rank_and_local_indices.first);
-                  recv_remote_ptr.push_back(
-                    recv_remote_ptr.back() +
-                    rank_and_local_indices.second.size());
+                  recv_remote_ptr.emplace_back(
+                    shifts[offset], rank_and_local_indices.second.size());
+
+                  shifts_ptr.push_back(offset);
                 }
               else
                 {
@@ -491,8 +498,8 @@ namespace internal
 
         // receive data from remote processes
         for (unsigned int i = 0; i < recv_remote_ranks.size(); i++)
-          MPI_Irecv(buffer.data() + recv_remote_ptr[i],
-                    recv_remote_ptr[i + 1] - recv_remote_ptr[i],
+          MPI_Irecv(buffer.data() + recv_remote_ptr[i].first,
+                    recv_remote_ptr[i].second,
                     Utilities::MPI::internal::mpi_type_id(buffer.data()),
                     recv_remote_ranks[i],
                     communication_channel + 3,
@@ -562,6 +569,30 @@ namespace internal
                 data_this_ptr[k] = data_others_ptr[recv_sm_indices[j] + l];
           }
 
+        for (unsigned int c = 0; c < recv_remote_ranks.size(); c++)
+          {
+            int i;
+            MPI_Waitany(recv_remote_ranks.size(),
+                        requests.data() + send_sm_ranks.size() +
+                          recv_sm_ranks.size(),
+                        &i,
+                        MPI_STATUS_IGNORE);
+
+            for (unsigned int c = recv_remote_ptr[i].second - 1;
+                 c != numbers::invalid_unsigned_int;
+                 c--)
+              {
+                const unsigned int idx_1 = shifts[shifts_ptr[i] + c];
+                const unsigned int idx_2 = recv_remote_ptr[i].first + c;
+
+                if (idx_1 == idx_2)
+                  continue;
+
+                ghost_array[idx_1] = ghost_array[idx_2];
+                ghost_array[idx_2] = 0.0;
+              }
+          }
+
         MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
 #endif
       }
@@ -617,14 +648,28 @@ namespace internal
                     requests.data() + recv_sm_ranks.size() + i);
 
         for (unsigned int i = 0; i < recv_remote_ranks.size(); i++)
-          MPI_Isend(buffer.data() + recv_remote_ptr[i],
-                    recv_remote_ptr[i + 1] - recv_remote_ptr[i],
-                    Utilities::MPI::internal::mpi_type_id(buffer.data()),
-                    recv_remote_ranks[i],
-                    communication_channel + 0,
-                    comm,
-                    requests.data() + recv_sm_ranks.size() +
-                      send_sm_ranks.size() + i);
+          {
+            for (unsigned int c = 0; c < recv_remote_ptr[i].second - 1; ++c)
+              {
+                const unsigned int idx_1 = shifts[shifts_ptr[i] + c];
+                const unsigned int idx_2 = recv_remote_ptr[i].first + c;
+
+                if (idx_1 == idx_2)
+                  continue;
+
+                buffer[idx_2] = buffer[idx_1];
+                buffer[idx_1] = 0.0;
+              }
+
+            MPI_Isend(buffer.data() + recv_remote_ptr[i].first,
+                      recv_remote_ptr[i].second,
+                      Utilities::MPI::internal::mpi_type_id(buffer.data()),
+                      recv_remote_ranks[i],
+                      communication_channel + 0,
+                      comm,
+                      requests.data() + recv_sm_ranks.size() +
+                        send_sm_ranks.size() + i);
+          }
 
         for (unsigned int i = 0; i < send_remote_ranks.size(); i++)
           MPI_Irecv(temporary_storage.data() + send_remote_offset[i],
@@ -727,10 +772,9 @@ namespace internal
               }
             else /*if (s.first == 2)*/
               {
-                std::memset(buffer.data() + recv_remote_ptr[i],
+                std::memset(buffer.data() + recv_remote_ptr[i].first,
                             0.0,
-                            (recv_remote_ptr[i + 1] - recv_remote_ptr[i]) *
-                              sizeof(Number));
+                            (recv_remote_ptr[i].second) * sizeof(Number));
               }
           }
 
@@ -772,9 +816,10 @@ namespace internal
       void
       Full::reset_ghost_values_impl(const ArrayView<Number> &ghost_array) const
       {
+        // TODO
         std::memset(ghost_array.data(),
                     0.0,
-                    recv_remote_ptr.back() * sizeof(Number));
+                    ghost_array.size() * sizeof(Number));
       }
 
       unsigned int

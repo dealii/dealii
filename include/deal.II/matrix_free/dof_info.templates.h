@@ -507,7 +507,8 @@ namespace internal
           vector_partitioner->locally_owned_range(),
           vector_partitioner->ghost_indices(),
           vector_partitioner->get_mpi_communicator(),
-          MPI_COMM_SELF /*TODO*/);
+          MPI_COMM_SELF /*TODO*/,
+          vector_partitioner->ghost_indices_within_larger_ghost_set());
     }
 
 
