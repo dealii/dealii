@@ -382,7 +382,8 @@ namespace internal
 
 
     void
-    DoFInfo::assign_ghosts(const std::vector<unsigned int> &boundary_cells)
+    DoFInfo::assign_ghosts(const std::vector<unsigned int> &boundary_cells,
+                           const MPI_Comm                   communicator_sm)
     {
       Assert(boundary_cells.size() < row_starts.size(), ExcInternalError());
 
@@ -507,7 +508,7 @@ namespace internal
           vector_partitioner->locally_owned_range(),
           vector_partitioner->ghost_indices(),
           vector_partitioner->get_mpi_communicator(),
-          MPI_COMM_SELF /*TODO*/,
+          communicator_sm,
           vector_partitioner->ghost_indices_within_larger_ghost_set());
     }
 
@@ -1182,7 +1183,8 @@ namespace internal
       const unsigned int                        n_lanes,
       const std::vector<FaceToCellTopology<1>> &inner_faces,
       const std::vector<FaceToCellTopology<1>> &ghosted_faces,
-      const bool                                fill_cell_centric)
+      const bool                                fill_cell_centric,
+      const MPI_Comm                            communicator_sm)
     {
       const Utilities::MPI::Partitioner &part = *vector_partitioner;
 
@@ -1249,7 +1251,7 @@ namespace internal
               temp_0->locally_owned_range(),
               temp_0->ghost_indices(),
               temp_0->get_mpi_communicator(),
-              MPI_COMM_SELF /*TODO*/,
+              communicator_sm,
               temp_0->ghost_indices_within_larger_ghost_set());
           }
       }
@@ -1512,28 +1514,28 @@ namespace internal
             temp_1->locally_owned_range(),
             temp_1->ghost_indices(),
             temp_1->get_mpi_communicator(),
-            MPI_COMM_SELF /*TODO*/,
+            communicator_sm,
             temp_1->ghost_indices_within_larger_ghost_set());
           vector_partitioner_face_variants[2] = std::make_shared<
             internal::MatrixFreeFunctions::VectorDataExchange::Full>(
             temp_2->locally_owned_range(),
             temp_2->ghost_indices(),
             temp_2->get_mpi_communicator(),
-            MPI_COMM_SELF /*TODO*/,
+            communicator_sm,
             temp_2->ghost_indices_within_larger_ghost_set());
           vector_partitioner_face_variants[3] = std::make_shared<
             internal::MatrixFreeFunctions::VectorDataExchange::Full>(
             temp_3->locally_owned_range(),
             temp_3->ghost_indices(),
             temp_3->get_mpi_communicator(),
-            MPI_COMM_SELF /*TODO*/,
+            communicator_sm,
             temp_3->ghost_indices_within_larger_ghost_set());
           vector_partitioner_face_variants[4] = std::make_shared<
             internal::MatrixFreeFunctions::VectorDataExchange::Full>(
             temp_4->locally_owned_range(),
             temp_4->ghost_indices(),
             temp_4->get_mpi_communicator(),
-            MPI_COMM_SELF /*TODO*/,
+            communicator_sm,
             temp_4->ghost_indices_within_larger_ghost_set());
         }
     }

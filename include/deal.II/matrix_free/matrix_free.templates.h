@@ -813,10 +813,21 @@ namespace internal
         dof_info[no].vector_partitioner =
           std::make_shared<Utilities::MPI::Partitioner>(locally_owned_dofs[no],
                                                         task_info.communicator);
-        dof_info[no].vector_exchanger =
-          std::make_shared<internal::MatrixFreeFunctions::VectorDataExchange::
-                             PartitionerWrapper>(
-            dof_info[no].vector_partitioner);
+
+        if (false)
+          dof_info[no].vector_exchanger =
+            std::make_shared<internal::MatrixFreeFunctions::VectorDataExchange::
+                               PartitionerWrapper>(
+              dof_info[no].vector_partitioner);
+        else
+          dof_info[no].vector_exchanger = std::make_shared<
+            internal::MatrixFreeFunctions::VectorDataExchange::Full>(
+            dof_info[no].vector_partitioner->locally_owned_range(),
+            dof_info[no].vector_partitioner->ghost_indices(),
+            dof_info[no].vector_partitioner->get_mpi_communicator(),
+            task_info.communicator_sm,
+            dof_info[no]
+              .vector_partitioner->ghost_indices_within_larger_ghost_set());
 
         // initialize the arrays for indices
         const unsigned int n_components_total =
@@ -956,7 +967,8 @@ namespace internal
                             dof_info[no].ghost_dofs.push_back(dof_index);
                         }
             }
-          dof_info[no].assign_ghosts(cells_with_ghosts);
+          dof_info[no].assign_ghosts(cells_with_ghosts,
+                                     task_info.communicator_sm);
         }
     }
 
@@ -1497,7 +1509,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
           VectorizedArrayType::size(),
           face_setup.inner_faces,
           face_setup.inner_ghost_faces,
-          is_fe_dg[count++] && additional_data.hold_all_faces_to_owned_cells);
+          is_fe_dg[count++] && additional_data.hold_all_faces_to_owned_cells,
+          task_info.communicator_sm);
     }
 
   for (auto &di : dof_info)
