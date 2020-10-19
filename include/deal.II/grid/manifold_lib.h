@@ -1112,7 +1112,7 @@ private:
   /**
    * The underlying triangulation.
    */
-  const Triangulation<dim, spacedim> *triangulation;
+  Triangulation<dim, spacedim> triangulation;
 
   /**
    * The level of the mesh cells where the transfinite approximation is
@@ -1132,12 +1132,6 @@ private:
    * use a FlatManifold description.
    */
   FlatManifold<dim> chart_manifold;
-
-  /**
-   * The connection to Triangulation::signals::clear that must be reset once
-   * this class goes out of scope.
-   */
-  boost::signals2::connection clear_signal;
 };
 
 DEAL_II_NAMESPACE_CLOSE

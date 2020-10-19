@@ -1638,8 +1638,7 @@ TorusManifold<dim>::push_forward_gradient(const Point<3> &chart_point) const
 template <int dim, int spacedim>
 TransfiniteInterpolationManifold<dim,
                                  spacedim>::TransfiniteInterpolationManifold()
-  : triangulation(nullptr)
-  , level_coarse(-1)
+  : level_coarse(-1)
 {
   AssertThrow(dim > 1, ExcNotImplemented());
 }
@@ -1649,10 +1648,7 @@ TransfiniteInterpolationManifold<dim,
 template <int dim, int spacedim>
 TransfiniteInterpolationManifold<dim,
                                  spacedim>::~TransfiniteInterpolationManifold()
-{
-  if (clear_signal.connected())
-    clear_signal.disconnect();
-}
+{}
 
 
 
@@ -1661,8 +1657,8 @@ std::unique_ptr<Manifold<dim, spacedim>>
 TransfiniteInterpolationManifold<dim, spacedim>::clone() const
 {
   auto ptr = new TransfiniteInterpolationManifold<dim, spacedim>();
-  if (triangulation)
-    ptr->initialize(*triangulation);
+  if (triangulation.n_levels() != 0)
+    ptr->initialize(triangulation);
   return std::unique_ptr<Manifold<dim, spacedim>>(ptr);
 }
 
@@ -1671,15 +1667,11 @@ TransfiniteInterpolationManifold<dim, spacedim>::clone() const
 template <int dim, int spacedim>
 void
 TransfiniteInterpolationManifold<dim, spacedim>::initialize(
-  const Triangulation<dim, spacedim> &triangulation)
+  const Triangulation<dim, spacedim> &external_triangulation)
 {
-  this->triangulation = &triangulation;
-  // in case the triangulation is cleared, remove the pointers by a signal
-  clear_signal.disconnect();
-  clear_signal = triangulation.signals.clear.connect([&]() -> void {
-    this->triangulation = nullptr;
-    this->level_coarse  = -1;
-  });
+  this->triangulation.clear();
+  this->triangulation.copy_triangulation(external_triangulation);
+
   level_coarse = triangulation.last()->level();
   coarse_cell_is_flat.resize(triangulation.n_cells(level_coarse), false);
   typename Triangulation<dim, spacedim>::active_cell_iterator
@@ -2225,29 +2217,21 @@ TransfiniteInterpolationManifold<dim, spacedim>::
   // The methods to identify cells around points in GridTools are all written
   // for the active cells, but we are here looking at some cells at the coarse
   // level.
-  Assert(triangulation != nullptr, ExcNotInitialized());
-  Assert(triangulation->begin_active()->level() >= level_coarse,
-         ExcMessage("The manifold was initialized with level " +
-                    std::to_string(level_coarse) + " but there are now" +
-                    "active cells on a lower level. Coarsening the mesh is " +
-                    "currently not supported"));
+
+  // FIXME IMPROVE
+
+  Assert(triangulation.n_levels() != 0, ExcNotInitialized());
+  Assert(triangulation.begin_active()->level() == level_coarse,
+         ExcInternalError());
 
   // This computes the distance of the surrounding points transformed to the
   // unit cell from the unit cell.
-  typename Triangulation<dim, spacedim>::cell_iterator cell =
-                                                         triangulation->begin(
-                                                           level_coarse),
-                                                       endc =
-                                                         triangulation->end(
-                                                           level_coarse);
+  auto       cell = triangulation.begin(level_coarse);
+  const auto endc = triangulation.end(level_coarse);
   boost::container::small_vector<std::pair<double, unsigned int>, 200>
     distances_and_cells;
   for (; cell != endc; ++cell)
     {
-      // only consider cells where the current manifold is attached
-      if (&cell->get_manifold() != this)
-        continue;
-
       std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
         vertices;
       for (const unsigned int vertex_n : GeometryInfo<dim>::vertex_indices())
@@ -2502,7 +2486,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
   for (unsigned int c = 0; c < nearby_cells.size(); ++c)
     {
       typename Triangulation<dim, spacedim>::cell_iterator cell(
-        triangulation, level_coarse, nearby_cells[c]);
+        &triangulation, level_coarse, nearby_cells[c]);
       bool inside_unit_cell = true;
       for (unsigned int i = 0; i < surrounding_points.size(); ++i)
         {
@@ -2533,7 +2517,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
           for (unsigned int b = 0; b <= c; ++b)
             {
               typename Triangulation<dim, spacedim>::cell_iterator cell(
-                triangulation, level_coarse, nearby_cells[b]);
+                &triangulation, level_coarse, nearby_cells[b]);
               message << "Looking at cell " << cell->id()
                       << " with vertices: " << std::endl;
               for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
