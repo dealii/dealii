@@ -315,6 +315,16 @@ namespace internal
 
         internal::compress(send_sm_ptr, send_sm_indices, send_sm_len);
 
+        // std::cout << rank << std::endl;
+        //
+        // for(const auto i : recv_sm_ranks)
+        //    std::cout << i << " ";
+        // std::cout << std::endl;
+        //
+        // for(const auto i : send_sm_ranks)
+        //    std::cout << i << " ";
+        // std::cout << std::endl;
+
 #endif
       }
 
@@ -472,6 +482,8 @@ namespace internal
 #else
         (void)data_others;
 
+        // std::cout << "AA1" << std::endl;
+
         requests.resize(send_sm_ranks.size() + recv_sm_ranks.size() +
                         recv_remote_ranks.size() + send_remote_ranks.size());
 
@@ -546,6 +558,8 @@ namespace internal
         (void)ghost_array;
         (void)requests;
 #else
+
+        // std::cout << "AA2" << std::endl;
         AssertDimension(requests.size(),
                         send_sm_ranks.size() + recv_sm_ranks.size() +
                           recv_remote_ranks.size() + send_remote_ranks.size());
@@ -558,6 +572,8 @@ namespace internal
                         &i,
                         MPI_STATUS_IGNORE);
 
+            continue;
+
             const Number *__restrict__ data_others_ptr =
               data_others[recv_sm_ranks[i]].data();
             Number *__restrict__ data_this_ptr = ghost_array.data();
@@ -568,6 +584,7 @@ namespace internal
               for (unsigned int l = 0; l < recv_sm_len[j]; l++, k++)
                 data_this_ptr[k] = data_others_ptr[recv_sm_indices[j] + l];
           }
+        // std::cout << "AA2_" << std::endl;
 
         for (unsigned int c = 0; c < recv_remote_ranks.size(); c++)
           {
@@ -594,6 +611,7 @@ namespace internal
                 ghost_array[idx_2] = 0.0;
               }
           }
+        // std::cout << "AA2__" << std::endl;
 
         MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
 #endif
@@ -622,6 +640,9 @@ namespace internal
         (void)temporary_storage;
         (void)requests;
 #else
+        // return;
+
+        // std::cout << "AA3" << std::endl;
         (void)data_others;
         (void)operation;
 
@@ -708,6 +729,9 @@ namespace internal
         (void)temporary_storage;
         (void)requests;
 #else
+        // return;
+
+        // std::cout << "AA4" << std::endl;
         (void)operation;
 
         Assert(operation == dealii::VectorOperation::add, ExcNotImplemented());
@@ -731,6 +755,8 @@ namespace internal
               1, i - send_sm_ranks.size() - recv_remote_ranks.size()};
         };
 
+        // std::cout << "AA4_" << std::endl;
+
         for (unsigned int c = 0;
              c < send_sm_ranks.size() + send_remote_ranks.size() +
                    recv_remote_ranks.size();
@@ -748,6 +774,9 @@ namespace internal
 
             if (s.first == 0)
               {
+                continue;
+
+                // std::cout << "AA4_a" << std::endl;
                 Number *__restrict__ data_others_ptr =
                   const_cast<Number *>(data_others[send_sm_ranks[i]].data());
                 Number *__restrict__ data_this_ptr = data_this.data();
@@ -763,9 +792,11 @@ namespace internal
                         data_others_ptr[k] = 0.0;
                       }
                   }
+                // std::cout << "AA4_aa" << std::endl;
               }
             else if (s.first == 1)
               {
+                // std::cout << "AA4_b" << std::endl;
                 for (unsigned int j = send_remote_ptr[i],
                                   k = send_remote_offset[i];
                      j < send_remote_ptr[i + 1];
@@ -776,11 +807,14 @@ namespace internal
               }
             else /*if (s.first == 2)*/
               {
+                // std::cout << "AA4_c" << std::endl;
                 std::memset(buffer.data() + recv_remote_ptr[i].first,
                             0.0,
                             (recv_remote_ptr[i].second) * sizeof(Number));
               }
           }
+
+        // std::cout << "AA4__" << std::endl;
 
         MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
 #endif
@@ -820,6 +854,8 @@ namespace internal
       void
       Full::reset_ghost_values_impl(const ArrayView<Number> &ghost_array) const
       {
+        // std::cout << "AA5" << std::endl;
+
         // TODO
         std::memset(ghost_array.data(),
                     0.0,

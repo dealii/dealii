@@ -333,11 +333,26 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
           task_info.communicator = dist_tria != nullptr ?
                                      dist_tria->get_communicator() :
                                      MPI_COMM_SELF;
-          task_info.communicator_sm = additional_data.communicator_sm;
+
           task_info.my_pid =
             Utilities::MPI::this_mpi_process(task_info.communicator);
           task_info.n_procs =
             Utilities::MPI::n_mpi_processes(task_info.communicator);
+
+          if (false)
+            {
+              task_info.communicator_sm = additional_data.communicator_sm;
+            }
+          else
+            {
+              MPI_Comm comm_sm;
+              MPI_Comm_split_type(task_info.communicator,
+                                  MPI_COMM_TYPE_SHARED,
+                                  task_info.my_pid,
+                                  MPI_INFO_NULL,
+                                  &comm_sm);
+              task_info.communicator_sm = comm_sm;
+            }
         }
       else
         {

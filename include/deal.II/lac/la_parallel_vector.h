@@ -1310,6 +1310,8 @@ namespace LinearAlgebra
        */
       mutable std::mutex mutex;
 
+      mutable MPI_Comm comm_sm = MPI_COMM_SELF;
+
       /**
        * A helper function that clears the compress_requests and
        * update_ghost_values_requests field. Used in reinit() functions.

@@ -43,6 +43,12 @@ namespace internal
         virtual unsigned int
         n_import_indices() const = 0;
 
+        virtual unsigned int
+        n_import_sm_procs() const
+        {
+          return 0; // TODO
+        }
+
         virtual void
         export_to_ghosted_array_start(
           const unsigned int                          communication_channel,
@@ -325,6 +331,12 @@ namespace internal
 
         unsigned int
         n_import_indices() const override;
+
+        virtual unsigned int
+        n_import_sm_procs() const override
+        {
+          return send_sm_ranks.size(); // TODO
+        }
 
         void
         export_to_ghosted_array_start(

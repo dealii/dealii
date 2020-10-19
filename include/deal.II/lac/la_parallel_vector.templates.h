@@ -245,10 +245,19 @@ namespace LinearAlgebra
                 data.others[i] =
                   ArrayView<const Number>(others[i], new_alloc_sizes[i]);
 
-              data.values     = {ptr_aligned, [&data](Number *) {
+              data.values = {ptr_aligned, [&data](Number *) {
                                MPI_Win_free(data.values_win);
                              }};
+
               data.values_win = win;
+
+#ifdef DEBUG
+              Number temp = 0;
+
+              for (const auto &other : data.others)
+                for (const auto &o : other)
+                  temp += o;
+#endif
             }
         }
 
@@ -528,7 +537,7 @@ namespace LinearAlgebra
       clear_mpi_requests();
 
       // check whether we need to reallocate
-      resize_val(size);
+      resize_val(size, comm_sm);
 
       // delete previous content in import data
       import_data.values.reset();
@@ -554,6 +563,8 @@ namespace LinearAlgebra
                                             const MPI_Comm  comm_sm)
     {
       clear_mpi_requests();
+
+      this->comm_sm = comm_sm;
 
       // check whether we need to reallocate
       resize_val(local_size + ghost_size, comm_sm);
@@ -582,6 +593,8 @@ namespace LinearAlgebra
       clear_mpi_requests();
       Assert(v.partitioner.get() != nullptr, ExcNotInitialized());
 
+      this->comm_sm = v.comm_sm;
+
       // check whether the partitioners are
       // different (check only if the are allocated
       // differently, not if the actual data is
@@ -591,7 +604,7 @@ namespace LinearAlgebra
           partitioner = v.partitioner;
           const size_type new_allocated_size =
             partitioner->local_size() + partitioner->n_ghost_indices();
-          resize_val(new_allocated_size);
+          resize_val(new_allocated_size, this->comm_sm);
         }
 
       if (omit_zeroing_entries == false)
@@ -647,6 +660,8 @@ namespace LinearAlgebra
     {
       clear_mpi_requests();
       partitioner = partitioner_in;
+
+      this->comm_sm = comm_sm;
 
       // set vector size and allocate memory
       const size_type new_allocated_size =
@@ -784,6 +799,8 @@ namespace LinearAlgebra
       // already held ghost values or when we import data from a vector with
       // the same local range but different ghost layout
       bool must_update_ghost_values = c.vector_is_ghosted;
+
+      this->comm_sm = c.comm_sm;
 
       // check whether the two vectors use the same parallel partitioner. if
       // not, check if all local ranges are the same (that way, we can

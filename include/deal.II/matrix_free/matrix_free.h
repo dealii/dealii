@@ -3299,7 +3299,8 @@ namespace internal
 
           const auto &part = get_partitioner(mf_component);
 
-          if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0)
+          if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0 &&
+              part.n_import_sm_procs() == 0)
             return;
 
           tmp_data[component_in_block_vector] =
@@ -3393,7 +3394,8 @@ namespace internal
 
           const auto &part = get_partitioner(mf_component);
 
-          if (part.n_ghost_indices() != 0 || part.n_import_indices() != 0)
+          if (true || part.n_ghost_indices() != 0 ||
+              part.n_import_indices() != 0 && part.n_import_sm_procs() != 0)
             {
               part.export_to_ghosted_array_finish(
                 ArrayView<const Number>(vec.begin(), part.local_size()),
@@ -3500,7 +3502,8 @@ namespace internal
 
           const auto &part = get_partitioner(mf_component);
 
-          if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0)
+          if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0 &&
+              part.n_import_sm_procs() == 0)
             return;
 
           tmp_data[component_in_block_vector] =
@@ -3592,7 +3595,8 @@ namespace internal
 
           const auto &part = get_partitioner(mf_component);
 
-          if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0)
+          if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0 &&
+              part.n_import_sm_procs() == 0)
             return;
 
           part.import_from_ghosted_array_finish(
