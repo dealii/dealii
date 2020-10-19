@@ -1768,6 +1768,11 @@ namespace DoFTools
   make_hanging_node_constraints(const DoFHandler<dim, spacedim> &dof_handler,
                                 AffineConstraints<number> &      constraints)
   {
+    Assert(dof_handler.has_active_dofs(),
+           ExcMessage(
+             "The given DoFHandler does not have any DoFs. Did you forget to "
+             "call dof_handler.distribute_dofs()?"));
+
     // Decide whether to use the new or old make_hanging_node_constraints
     // function. If all the FiniteElement or all elements in a FECollection
     // support the new face constraint matrix, the new code will be used.
