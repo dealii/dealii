@@ -87,22 +87,25 @@ namespace Functions
    * DoFHandler<dim> dh1 (tria_1);
    * Vector<double> solution_1;
    *
-   * // Do the same with the second
+   * // On this first domain, set up the various data structures,
+   * // assemble matrices, solve the linear system, and get a Nobel
+   * // prize for the work we have done here:
+   * [...]
+   *
+   * // Then create a DoFHandler and solution vector for the second domain:
    * DoFHandler<dim> dh2 (tria_2);
    * Vector<double> solution_2;
    *
-   * // Setup the system, assemble matrices, solve problems and get the
-   * // nobel prize on the first domain...
-   *
-   * // Now project it to the second domain
+   * // Finally, project the solution on the first domain onto the
+   * // second domain, assuming that this does not require querying
+   * // values from outside the first domain:
    * FEFieldFunction<dim> fe_function_1 (dh_1, solution_1);
    * VectorTools::project (dh_2, constraints_2, quad,
    *                       fe_function_1, solution_2);
    *
-   * // Or interpolate it...
+   * // Alternatively, we could have also interpolated it:
    * Vector<double> solution_3;
    * VectorTools::interpolate (dh_2, fe_function_1, solution_3);
-   *
    * @endcode
    *
    * The snippet of code above will work assuming that the second
