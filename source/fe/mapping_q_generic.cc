@@ -835,14 +835,18 @@ namespace internal
         const unsigned int newton_iteration_limit = 20;
 
         Point<dim, Number> invalid_point;
-        invalid_point[0] = std::numeric_limits<double>::infinity();
+        invalid_point[0]              = std::numeric_limits<double>::infinity();
+        bool try_project_to_unit_cell = false;
 
         unsigned int newton_iteration            = 0;
-        Number       last_f_weighted_norm_square = 0.;
+        Number       f_weighted_norm_square      = 1.;
+        Number       last_f_weighted_norm_square = 1.;
+
         do
           {
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
-            std::cout << "Newton iteration " << newton_iteration << std::endl;
+            std::cout << "Newton iteration " << newton_iteration
+                      << " point guess " << p_unit << std::endl;
 #endif
 
             // f'(x)
@@ -851,16 +855,41 @@ namespace internal
               for (unsigned int e = 0; e < dim; ++e)
                 df[d][e] = p_real.second[e][d];
 
-            // check if the determinant is positive on all SIMD lanes
+            // check determinand(df) > 0 on all SIMD lanes
             if (!(std::min(determinant(df),
                            Number(std::numeric_limits<double>::min())) ==
                   Number(std::numeric_limits<double>::min())))
-              return invalid_point;
+              {
+                // We allow to enter this function with an initial guess
+                // outside the unit cell. We might have run into invalid
+                // Jacobians due to that, so we should at least try once to go
+                // back to the unit cell and go on with the Newton iteration
+                // from there. Since the outside case is unlikely, we can
+                // afford spending the extra effort at this place.
+                if (try_project_to_unit_cell == false)
+                  {
+                    p_unit = GeometryInfo<dim>::project_to_unit_cell(p_unit);
+                    p_real =
+                      internal::evaluate_tensor_product_value_and_gradient(
+                        polynomials_1d,
+                        points,
+                        p_unit,
+                        polynomials_1d.size() == 2,
+                        renumber);
+                    f                           = p_real.first - p;
+                    f_weighted_norm_square      = 1.;
+                    last_f_weighted_norm_square = 1;
+                    try_project_to_unit_cell    = true;
+                    continue;
+                  }
+                else
+                  return invalid_point;
+              }
 
             // Solve  [f'(x)]d=f(x)
             const Tensor<2, spacedim, Number> df_inverse = invert(df);
             const Tensor<1, spacedim, Number> delta      = df_inverse * f;
-            last_f_weighted_norm_square = (df_inverse * f).norm_square();
+            last_f_weighted_norm_square                  = delta.norm_square();
 
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
             std::cout << "   delta=" << delta << std::endl;
@@ -888,33 +917,34 @@ namespace internal
                     renumber);
                 const Tensor<1, spacedim, Number> f_trial =
                   p_real_trial.first - p;
+                f_weighted_norm_square = (df_inverse * f_trial).norm_square();
 
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
                 std::cout << "     step_length=" << step_length << std::endl
                           << "       ||f ||   =" << f.norm() << std::endl
                           << "       ||f*||   =" << f_trial.norm() << std::endl
                           << "       ||f*||_A ="
-                          << (df_inverse * f_trial).norm() << std::endl;
+                          << std::sqrt(f_weighted_norm_square) << std::endl;
 #endif
 
-                // see if we are making progress with the current step length
-                // and if not, reduce it by a factor of two and try again
+                // See if we are making progress with the current step length
+                // and if not, reduce it by a factor of two and try again.
                 //
-                // strictly speaking, we should probably use the same norm as we
-                // use for the outer algorithm. in practice, line search is just
+                // Strictly speaking, we should probably use the same norm as we
+                // use for the outer algorithm. In practice, line search is just
                 // a crutch to find a "reasonable" step length, and so using the
-                // l2 norm is probably just fine
+                // l2 norm is probably just fine.
                 //
-                // due to the possible use of VectorizedArray<double>, we must
-                // turn the check f_trial.norm() < f.norm() into a more
-                // complicated statement. We are done if either
-                // last_f_weighted_norm_square is less than the Newton
-                // tolerance (i.e., that particular SIMD lane is already
-                // converged in the previous the Newton iteration, so we might
-                // not be able to decrease the right hand side norm any more)
-                // or if the norm did not increase in the line search
-                if (std::max(last_f_weighted_norm_square - eps * eps,
-                             Number(0.)) *
+                // check f_trial.norm() < f.norm() in SIMD form. This is a bit
+                // more complicated because some SIMD lanes might not be doing
+                // any progress any more as they have already reached roundoff
+                // accuracy. We define that as the case of updates less than
+                // 1e-6. The tolerance might seem coarse but since we are
+                // dealing with a Newton iteration of a polynomial function we
+                // either converge quadratically or not any more. Thus, our
+                // selection is to terminate if either the norm of f is
+                // decreasing or that threshold of 1e-6 is reached.
+                if (std::max(f_weighted_norm_square - 1e-6 * 1e-6, Number(0.)) *
                       std::max(f_trial.norm_square() - f.norm_square(),
                                Number(0.)) ==
                     Number(0.))
@@ -927,16 +957,48 @@ namespace internal
                 else if (step_length > 0.05)
                   step_length *= 0.5;
                 else
-                  return invalid_point;
+                  break;
               }
             while (true);
+
+            // In case we terminated the line search due to the step becoming
+            // too small, we give the iteration another try with the
+            // projection of the initial guess to the unit cell before we give
+            // up, just like for the negative determinant case.
+            if (step_length <= 0.05 && try_project_to_unit_cell == false)
+              {
+                p_unit = GeometryInfo<dim>::project_to_unit_cell(p_unit);
+                p_real = internal::evaluate_tensor_product_value_and_gradient(
+                  polynomials_1d,
+                  points,
+                  p_unit,
+                  polynomials_1d.size() == 2,
+                  renumber);
+                f                           = p_real.first - p;
+                f_weighted_norm_square      = 1.;
+                last_f_weighted_norm_square = 1;
+                try_project_to_unit_cell    = true;
+                continue;
+              }
+            else if (step_length <= 0.05)
+              return invalid_point;
 
             ++newton_iteration;
             if (newton_iteration > newton_iteration_limit)
               return invalid_point;
           }
-        while (std::max(eps * eps - last_f_weighted_norm_square, Number(0.)) ==
-               Number(0.));
+        // Stop if f_weighted_norm_square <= eps^2 on all SIMD lanes or if the
+        // weighted norm is less than 1e-6 and the improvement against the
+        // previous step was less than a factor of 10 (in that regime, we
+        // either have quadratic convergence or roundoff errors due to a bad
+        // mapping)
+        while (
+          !(std::max(f_weighted_norm_square - eps * eps, Number(0.)) *
+              std::max(last_f_weighted_norm_square -
+                         std::min(f_weighted_norm_square, Number(1e-6 * 1e-6)) *
+                           100.,
+                       Number(0.)) ==
+            Number(0.)));
 
         return p_unit;
       }
@@ -2176,11 +2238,6 @@ MappingQGeneric<dim, spacedim>::transform_real_to_unit_cell(
         initial_p_unit[d] = 0.5;
     }
 
-  // in case the function above should have given us something back that lies
-  // outside the unit cell, then project it back into the reference cell in
-  // hopes that this gives a better starting point to the following iteration
-  initial_p_unit = GeometryInfo<dim>::project_to_unit_cell(initial_p_unit);
-
   // perform the Newton iteration and return the result. note that this
   // statement may throw an exception, which we simply pass up to the caller
   const Point<dim> p_unit =
@@ -2204,7 +2261,7 @@ MappingQGeneric<dim, spacedim>::transform_points_real_to_unit_cell(
   const std::vector<Point<spacedim>> support_points =
     this->compute_mapping_support_points(cell);
 
-  // From the chosen (high-order) support points, now only pick the first
+  // From the given (high-order) support points, now only pick the first
   // 2^dim points and construct an affine approximation from those.
   const std::pair<DerivativeForm<1, dim, spacedim>, Tensor<1, spacedim>>
     affine_factors = GridTools::affine_cell_approximation<dim>(
@@ -2248,7 +2305,7 @@ MappingQGeneric<dim, spacedim>::transform_points_real_to_unit_cell(
           internal::MappingQGenericImplementation::
             do_transform_real_to_unit_cell_internal<dim, spacedim>(
               p_vec,
-              GeometryInfo<dim>::project_to_unit_cell(initial_guess),
+              initial_guess,
               support_points,
               polynomials_1d,
               renumber_lexicographic_to_hierarchic);
@@ -2263,9 +2320,8 @@ MappingQGeneric<dim, spacedim>::transform_points_real_to_unit_cell(
             unit_points[i + j] = internal::MappingQGenericImplementation::
               do_transform_real_to_unit_cell_internal<dim, spacedim>(
                 real_points[i + j],
-                GeometryInfo<dim>::project_to_unit_cell(
-                  Point<dim>(apply_transformation(
-                    A_inv, real_points[i + j] - affine_factors.second))),
+                Point<dim>(apply_transformation(
+                  A_inv, real_points[i + j] - affine_factors.second)),
                 support_points,
                 polynomials_1d,
                 renumber_lexicographic_to_hierarchic);
@@ -2277,9 +2333,8 @@ MappingQGeneric<dim, spacedim>::transform_points_real_to_unit_cell(
       unit_points[i] = internal::MappingQGenericImplementation::
         do_transform_real_to_unit_cell_internal<dim, spacedim>(
           real_points[i],
-          GeometryInfo<dim>::project_to_unit_cell(Point<dim>(
-            apply_transformation(A_inv,
-                                 real_points[i] - affine_factors.second))),
+          Point<dim>(apply_transformation(
+            A_inv, real_points[i] - affine_factors.second)),
           support_points,
           polynomials_1d,
           renumber_lexicographic_to_hierarchic);
