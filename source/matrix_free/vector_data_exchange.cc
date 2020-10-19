@@ -572,8 +572,6 @@ namespace internal
                         &i,
                         MPI_STATUS_IGNORE);
 
-            continue;
-
             const Number *__restrict__ data_others_ptr =
               data_others[recv_sm_ranks[i]].data();
             Number *__restrict__ data_this_ptr = ghost_array.data();
@@ -582,7 +580,8 @@ namespace internal
                  j < recv_sm_ptr[i + 1];
                  j++)
               for (unsigned int l = 0; l < recv_sm_len[j]; l++, k++)
-                data_this_ptr[k] = data_others_ptr[recv_sm_indices[j] + l];
+                data_this_ptr[k - n_local_elements] =
+                  data_others_ptr[recv_sm_indices[j] + l];
           }
         // std::cout << "AA2_" << std::endl;
 
@@ -774,8 +773,6 @@ namespace internal
 
             if (s.first == 0)
               {
-                continue;
-
                 // std::cout << "AA4_a" << std::endl;
                 Number *__restrict__ data_others_ptr =
                   const_cast<Number *>(data_others[send_sm_ranks[i]].data());

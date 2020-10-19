@@ -3394,8 +3394,8 @@ namespace internal
 
           const auto &part = get_partitioner(mf_component);
 
-          if (true || part.n_ghost_indices() != 0 ||
-              part.n_import_indices() != 0 && part.n_import_sm_procs() != 0)
+          if (part.n_ghost_indices() != 0 || part.n_import_indices() != 0 ||
+              part.n_import_sm_procs() != 0)
             {
               part.export_to_ghosted_array_finish(
                 ArrayView<const Number>(vec.begin(), part.local_size()),
@@ -3595,25 +3595,28 @@ namespace internal
 
           const auto &part = get_partitioner(mf_component);
 
-          if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0 &&
-              part.n_import_sm_procs() == 0)
-            return;
+          if (part.n_ghost_indices() != 0 || part.n_import_indices() != 0 ||
+              part.n_import_sm_procs() != 0)
+            {
+              part.import_from_ghosted_array_finish(
+                VectorOperation::add,
+                ArrayView<Number>(vec.begin(), part.local_size()),
+                vec.shared_vector_data(),
+                ArrayView<Number>(vec.begin() + part.local_size(),
+                                  matrix_free.get_dof_info(mf_component)
+                                    .vector_partitioner->n_ghost_indices()),
+                ArrayView<const Number>(
+                  tmp_data[component_in_block_vector]->begin(),
+                  part.n_import_indices()),
+                this->requests[component_in_block_vector]);
 
-          part.import_from_ghosted_array_finish(
-            VectorOperation::add,
-            ArrayView<Number>(vec.begin(), part.local_size()),
-            vec.shared_vector_data(),
-            ArrayView<Number>(vec.begin() + part.local_size(),
-                              matrix_free.get_dof_info(mf_component)
-                                .vector_partitioner->n_ghost_indices()),
-            ArrayView<const Number>(
-              tmp_data[component_in_block_vector]->begin(),
-              part.n_import_indices()),
-            this->requests[component_in_block_vector]);
+              matrix_free.release_scratch_data_non_threadsafe(
+                tmp_data[component_in_block_vector]);
+              tmp_data[component_in_block_vector] = nullptr;
+            }
 
-          matrix_free.release_scratch_data_non_threadsafe(
-            tmp_data[component_in_block_vector]);
-          tmp_data[component_in_block_vector] = nullptr;
+          if (Utilities::MPI::job_supports_mpi())
+            MPI_Barrier(matrix_free.get_task_info().communicator_sm);
 #  endif
         }
     }

@@ -335,7 +335,7 @@ namespace internal
         virtual unsigned int
         n_import_sm_procs() const override
         {
-          return send_sm_ranks.size(); // TODO
+          return send_sm_ranks.size() + recv_sm_ranks.size(); // TODO
         }
 
         void

@@ -161,9 +161,9 @@ namespace LinearAlgebra
           else
             {
               // TODO: is assert fine?
-              Assert(((allocated_size > 0 && data.values != nullptr) ||
-                      data.values == nullptr),
-                     ExcInternalError());
+              // Assert(((allocated_size > 0 && data.values != nullptr) ||
+              //        data.values == nullptr),
+              //       ExcInternalError());
 
               allocated_size = new_alloc_size;
 
@@ -252,6 +252,11 @@ namespace LinearAlgebra
               data.values_win = win;
 
 #ifdef DEBUG
+              for (unsigned int i = 0; i < new_alloc_size; ++i)
+                ptr_aligned[i] = 0.0;
+
+              MPI_Barrier(comm_shared);
+
               Number temp = 0;
 
               for (const auto &other : data.others)
