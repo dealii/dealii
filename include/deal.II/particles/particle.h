@@ -334,6 +334,11 @@ namespace Particles
      * since the particle does not know about the properties,
      * we want to do it not at construction time. Another use for this
      * function is after particle transfer to a new process.
+     *
+     * If a particle already stores properties in a property pool, then
+     * these are released and the particle will not store any properties
+     * after this call (though new properties can be assigned to it using
+     * the set_properties() call).
      */
     void
     set_property_pool(PropertyPool &property_pool);
@@ -549,7 +554,15 @@ namespace Particles
   inline void
   Particle<dim, spacedim>::set_property_pool(PropertyPool &new_property_pool)
   {
+    // If the particle currently has a reference to properties, then
+    // release those
+    if (property_pool != nullptr && properties != PropertyPool::invalid_handle)
+      property_pool->deallocate_properties_array(properties);
+
+    // Then start from scratch, with no properties associated with the current
+    // particle
     property_pool = &new_property_pool;
+    properties    = PropertyPool::invalid_handle;
   }
 
 
