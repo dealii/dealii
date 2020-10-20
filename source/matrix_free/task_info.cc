@@ -309,14 +309,20 @@ namespace internal
     class MPICommunication : public tbb::task
     {
     public:
-      MPICommunication(MFWorkerInterface &worker_in, const bool do_compress)
+      MPICommunication(MFWorkerInterface &worker_in,
+                       const bool         do_compress,
+                       const bool         dummy = false)
         : worker(worker_in)
         , do_compress(do_compress)
+        , dummy(dummy)
       {}
 
       tbb::task *
       execute() override
       {
+        if (dummy)
+          return nullptr;
+
         if (do_compress == false)
           worker.vector_update_ghosts_finish();
         else
@@ -327,6 +333,7 @@ namespace internal
     private:
       MFWorkerInterface &worker;
       const bool         do_compress;
+      const bool         dummy;
     };
 
 #endif // DEAL_II_WITH_TBB
@@ -355,14 +362,15 @@ namespace internal
           funct.zero_dst_vector_range(numbers::invalid_unsigned_int);
           if (scheme == partition_partition)
             {
+              funct.vector_update_ghosts_finish();
               tbb::empty_task *root =
                 new (tbb::task::allocate_root()) tbb::empty_task;
               root->set_ref_count(evens + 1);
               std::vector<partition::PartitionWork *> worker(n_workers);
               std::vector<partition::PartitionWork *> blocked_worker(
                 n_blocked_workers);
-              MPICommunication *worker_compr =
-                new (root->allocate_child()) MPICommunication(funct, true);
+              MPICommunication *worker_compr = new (root->allocate_child())
+                MPICommunication(funct, true, true);
               worker_compr->set_ref_count(1);
               for (unsigned int j = 0; j < evens; j++)
                 {
@@ -382,7 +390,7 @@ namespace internal
                       worker[j]->set_ref_count(2);
                       MPICommunication *worker_dist =
                         new (worker[j]->allocate_child())
-                          MPICommunication(funct, false);
+                          MPICommunication(funct, false, true);
                       tbb::task::spawn(*worker_dist);
                     }
                   if (j < evens - 1)
@@ -412,6 +420,8 @@ namespace internal
 
               root->wait_for_all();
               root->destroy(*root);
+
+              funct.vector_compress_start();
             }
           else // end of partition-partition, start of partition-color
             {
