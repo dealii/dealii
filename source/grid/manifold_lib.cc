@@ -1646,13 +1646,6 @@ TransfiniteInterpolationManifold<dim,
 
 
 template <int dim, int spacedim>
-TransfiniteInterpolationManifold<dim,
-                                 spacedim>::~TransfiniteInterpolationManifold()
-{}
-
-
-
-template <int dim, int spacedim>
 std::unique_ptr<Manifold<dim, spacedim>>
 TransfiniteInterpolationManifold<dim, spacedim>::clone() const
 {

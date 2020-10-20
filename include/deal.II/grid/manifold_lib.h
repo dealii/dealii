@@ -962,7 +962,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~TransfiniteInterpolationManifold() override;
+  virtual ~TransfiniteInterpolationManifold() override = default;
 
   /**
    * Make a clone of this Manifold object.
