@@ -20,6 +20,9 @@
 
 #include <deal.II/base/array_view.h>
 
+#include <set>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace Particles
@@ -59,6 +62,13 @@ namespace Particles
      * Constructor. Stores the number of properties per reserved slot.
      */
     PropertyPool(const unsigned int n_properties_per_slot);
+
+    /**
+     * Destructor. This function ensures that all memory that had
+     * previously been allocated using allocate_properties_array()
+     * has also been returned via deallocate_properties_array().
+     */
+    ~PropertyPool();
 
     /**
      * Return a new handle that allows accessing the reserved block
@@ -101,6 +111,13 @@ namespace Particles
      * The number of properties that are reserved per particle.
      */
     const unsigned int n_properties;
+
+    /**
+     * A collection of handles that have been created by
+     * allocate_properties_array() and have not been destroyed by
+     * deallocate_properties_array().
+     */
+    std::set<Handle> currently_open_handles;
   };
 
 
