@@ -28,13 +28,27 @@ namespace Particles
   {}
 
 
+  PropertyPool::~PropertyPool()
+  {
+    Assert(currently_open_handles.size() == 0,
+           ExcMessage("This property pool currently still holds " +
+                      std::to_string(currently_open_handles.size()) +
+                      " open handles to memory that was allocated "
+                      "via allocate_properties_array() but that has "
+                      "not been returned via deallocate_properties_array()."));
+  }
+
+
 
   PropertyPool::Handle
   PropertyPool::allocate_properties_array()
   {
     PropertyPool::Handle handle = PropertyPool::invalid_handle;
     if (n_properties > 0)
-      handle = new double[n_properties];
+      {
+        handle = new double[n_properties];
+        currently_open_handles.insert(handle);
+      }
 
     return handle;
   }
@@ -44,6 +58,8 @@ namespace Particles
   void
   PropertyPool::deallocate_properties_array(Handle handle)
   {
+    Assert(currently_open_handles.count(handle) == 1, ExcInternalError());
+    currently_open_handles.erase(handle);
     delete[] handle;
   }
 
