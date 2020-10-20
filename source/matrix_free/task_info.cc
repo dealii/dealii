@@ -353,7 +353,7 @@ namespace internal
       if (scheme != none)
         {
           funct.zero_dst_vector_range(numbers::invalid_unsigned_int);
-          if (scheme == partition_partition)
+          if (scheme == partition_partition && evens > 0)
             {
               tbb::empty_task *root =
                 new (tbb::task::allocate_root()) tbb::empty_task;
@@ -412,6 +412,14 @@ namespace internal
 
               root->wait_for_all();
               root->destroy(*root);
+            }
+          else if (scheme == partition_partition)
+            {
+              // catch the case of empty partition list: we still need to call
+              // the vector communication routines to clean up and initiate
+              // things
+              funct.vector_update_ghosts_finish();
+              funct.vector_compress_start();
             }
           else // end of partition-partition, start of partition-color
             {

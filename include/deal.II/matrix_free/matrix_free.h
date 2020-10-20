@@ -3135,7 +3135,7 @@ namespace internal
     template <typename VectorType>
     unsigned int
     find_vector_in_mf(const VectorType &vec,
-                      const bool check_global_compatibility = false) const
+                      const bool        check_global_compatibility = true) const
     {
       unsigned int mf_component = numbers::invalid_unsigned_int;
       (void)check_global_compatibility;
@@ -3565,6 +3565,7 @@ namespace internal
         std::is_same<Number, typename VectorType::value_type>::value,
         "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
+
       if (vec.size() != 0)
         {
 #  ifdef DEAL_II_WITH_MPI
