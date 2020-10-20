@@ -787,6 +787,16 @@ namespace Particles
       mapping;
 
     /**
+     * This object owns and organizes the memory for all particle
+     * properties. Since particles reference the property pool, the
+     * latter has to be destroyed *after* the particles are destroyed.
+     * This is achieved by making sure the `property_pool` member variable
+     * precedes the declaration of the `particles` and `ghost_particles`
+     * members.
+     */
+    std::unique_ptr<PropertyPool> property_pool;
+
+    /**
      * Set of particles currently living in the local domain, organized by
      * the level/index of the cell they are in.
      */
@@ -820,12 +830,6 @@ namespace Particles
      * globally in case new particles need to be generated.
      */
     types::particle_index next_free_particle_index;
-
-    /**
-     * This object owns and organizes the memory for all particle
-     * properties.
-     */
-    std::unique_ptr<PropertyPool> property_pool;
 
     /**
      * A function that can be registered by calling
