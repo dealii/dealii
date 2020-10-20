@@ -157,11 +157,15 @@ namespace Particles
   {
     if (this != &particle)
       {
-        location            = particle.location;
-        reference_location  = particle.reference_location;
-        id                  = particle.id;
-        property_pool       = particle.property_pool;
-        properties          = particle.properties;
+        location           = particle.location;
+        reference_location = particle.reference_location;
+        id                 = particle.id;
+        property_pool      = particle.property_pool;
+        properties         = particle.properties;
+
+        // We stole the rhs's properties, so we need to invalidate
+        // the handle the rhs holds lest it releases the memory that
+        // we still reference here.
         particle.properties = PropertyPool::invalid_handle;
       }
     return *this;
