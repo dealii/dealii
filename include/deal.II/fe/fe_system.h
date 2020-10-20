@@ -84,13 +84,23 @@ class FE_Enriched;
  * object is simply the sum of all multiplicities of base elements and is
  * given by n_blocks().
  *
- * For example, the FESystem for the Taylor-Hood element for the three-
- * dimensional Stokes problem can be built using the code
- *
+ * For example, the FESystem for the Taylor-Hood element for the
+ * three-dimensional Stokes problem can be built using the code
  * @code
- * FE_Q<3> u(2);
- * FE_Q<3> p(1);
+ * const FE_Q<3> u(2);
+ * const FE_Q<3> p(1);
  * FESystem<3> sys1(u,3, p,1);
+ * @endcode
+ * or more concisely via
+ * @code
+ * FESystem<3> sys1(FE_Q<3>(2),3,
+ *                  FE_Q<3>(1),1);
+ * @endcode
+ * or even shorter (mimicking the mathematical notation that we are dealing
+ * with a $Q_2^3 \times Q_1$ element):
+ * @code
+ * FESystem<3> sys1(FE_Q<3>(2)^3,
+ *                  FE_Q<3>(1));
  * @endcode
  *
  * This example creates an FESystem @p sys1 with four components, three for
@@ -103,7 +113,7 @@ class FE_Enriched;
  *
  * @code
  * FESystem<3> U(u,3);
- * FESystem<3> sys2(U,1, p,1);
+ * FESystem<3> sys2(U, p);
  * @endcode
  *
  * The FESystem @p sys2 created here has the same four components, but the
@@ -120,7 +130,7 @@ class FE_Enriched;
  * @code
  * FE_RaviartThomas<3> u(1);
  * FE_DGQ<3> p(1);
- * FESystem<3> sys3(u,1, p,1);
+ * FESystem<3> sys3(u, p);
  * @endcode
  *
  * This example also produces a system with four components, but only two
@@ -457,10 +467,10 @@ public:
    * @code
    *   FiniteElementType1<dim,spacedim> fe_1;
    *   FiniteElementType1<dim,spacedim> fe_2;
-   *   FESystem<dim,spacedim> fe_system = ( fe_1^dim, fe_2^1 );
+   *   FESystem<dim,spacedim> fe_system ( fe_1^dim, fe_2 );
    * @endcode
    *
-   * The FiniteElement objects are not actually used for anything other than
+   * The `fe_1` and `fe_2` objects are not actually used for anything other than
    * creating a copy that will then be owned by the current object. In other
    * words, it is completely fine to call this constructor with a temporary
    * object for the finite element, as in this code snippet:
