@@ -49,6 +49,9 @@ namespace internal
           return 0; // TODO
         }
 
+        virtual types::global_dof_index
+        size() const = 0;
+
         virtual void
         export_to_ghosted_array_start(
           const unsigned int                          communication_channel,
@@ -153,6 +156,12 @@ namespace internal
         n_import_indices() const override
         {
           return partitioner->n_import_indices();
+        }
+
+        virtual types::global_dof_index
+        size() const override
+        {
+          return partitioner->size();
         }
 
         void
@@ -338,6 +347,12 @@ namespace internal
           return send_sm_ranks.size() + recv_sm_ranks.size(); // TODO
         }
 
+        virtual types::global_dof_index
+        size() const override
+        {
+          return n_global_elements;
+        }
+
         void
         export_to_ghosted_array_start(
           const unsigned int                          communication_channel,
@@ -478,6 +493,11 @@ namespace internal
          * Number of locally-owned vector entries.
          */
         unsigned int n_local_elements;
+        
+        /**
+         * Number of global vector entries.
+         */
+        types::global_dof_index n_global_elements;
 
         /**
          * Number of ghost vector entries.

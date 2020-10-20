@@ -245,11 +245,11 @@ namespace LinearAlgebra
                 data.others[i] =
                   ArrayView<const Number>(others[i], new_alloc_sizes[i]);
 
-              data.values = {ptr_aligned, [&data](Number *) {
-                               MPI_Win_free(data.values_win);
+              data.values = {ptr_aligned, [win](Number *) {
+                              std::cout << "MPI_FREE" << std::endl; 
+                               MPI_Win_free(win);
+                              std::cout << "MPI_FREE_" << std::endl; 
                              }};
-
-              data.values_win = win;
 
 #ifdef DEBUG
               for (unsigned int i = 0; i < new_alloc_size; ++i)

@@ -327,14 +327,14 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
   LogStream::Prefix prefix("cg");
 
   // Memory allocation
-  typename VectorMemory<VectorType>::Pointer g_pointer(this->memory);
-  typename VectorMemory<VectorType>::Pointer d_pointer(this->memory);
-  typename VectorMemory<VectorType>::Pointer h_pointer(this->memory);
+  //typename VectorMemory<VectorType>::Pointer g_pointer(this->memory);
+  //typename VectorMemory<VectorType>::Pointer d_pointer(this->memory);
+  //typename VectorMemory<VectorType>::Pointer h_pointer(this->memory);
 
   // define some aliases for simpler access
-  VectorType &g = *g_pointer;
-  VectorType &d = *d_pointer;
-  VectorType &h = *h_pointer;
+  VectorType g;
+  VectorType d;
+  VectorType h;
 
   // Should we build the matrix for eigenvalue computations?
   const bool do_eigenvalues =

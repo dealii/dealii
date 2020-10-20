@@ -1386,7 +1386,7 @@ namespace MatrixFreeOperators
         LinearAlgebra::distributed::Vector<Number> copy_vec(
           BlockHelper::subblock(src, i));
         BlockHelper::subblock(const_cast<VectorType &>(src), i)
-          .reinit(data->get_dof_info(mf_component).vector_partitioner);
+          .reinit(data->get_dof_info(mf_component).vector_partitioner, this->data->get_task_info().communicator_sm);
         BlockHelper::subblock(const_cast<VectorType &>(src), i)
           .copy_locally_owned_data_from(copy_vec);
       }

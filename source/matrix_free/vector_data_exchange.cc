@@ -127,6 +127,7 @@ namespace internal
 #else
         this->n_local_elements = is_locally_owned.n_elements();
         this->n_ghost_elements = is_locally_ghost.n_elements();
+        this->n_global_elements = is_locally_owned.size();
 
         if (Utilities::MPI::job_supports_mpi() == false)
           return; // nothing to do in serial case

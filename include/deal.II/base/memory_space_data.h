@@ -136,8 +136,6 @@ namespace MemorySpace
     // CUDA-aware MPI.
     std::unique_ptr<Number[]> values_dev;
 
-    MPI_Win *values_win = nullptr;
-
     std::vector<ArrayView<const Number>> others;
   };
 
