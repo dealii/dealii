@@ -590,7 +590,7 @@ namespace Step43
     , global_Omega_diameter(std::numeric_limits<double>::quiet_NaN())
     , degree(degree)
     , darcy_degree(degree)
-    , darcy_fe(FE_Q<dim>(darcy_degree + 1), dim, FE_Q<dim>(darcy_degree), 1)
+    , darcy_fe(FE_Q<dim>(darcy_degree + 1) ^ dim, FE_Q<dim>(darcy_degree))
     , darcy_dof_handler(triangulation)
     ,
 

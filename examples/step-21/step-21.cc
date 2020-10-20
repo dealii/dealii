@@ -509,11 +509,8 @@ namespace Step21
   TwoPhaseFlowProblem<dim>::TwoPhaseFlowProblem(const unsigned int degree)
     : degree(degree)
     , fe(FE_RaviartThomas<dim>(degree),
-         1,
          FE_DGQ<dim>(degree),
-         1,
-         FE_DGQ<dim>(degree),
-         1)
+         FE_DGQ<dim>(degree))
     , dof_handler(triangulation)
     , n_refinement_steps(5)
     , time(/*start time*/ 0., /*end time*/ 1.)

@@ -814,7 +814,7 @@ namespace Step42
         prm.get_integer("number of initial refinements"))
     , triangulation(mpi_communicator)
     , fe_degree(prm.get_integer("polynomial degree"))
-    , fe(FE_Q<dim>(QGaussLobatto<1>(fe_degree + 1)), dim)
+    , fe(FE_Q<dim>(QGaussLobatto<1>(fe_degree + 1)) ^ dim)
     , dof_handler(triangulation)
 
     , e_modulus(200000)

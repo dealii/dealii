@@ -265,7 +265,7 @@ namespace Step57
     , gamma(1.0)
     , degree(degree)
     , triangulation(Triangulation<dim>::maximum_smoothing)
-    , fe(FE_Q<dim>(degree + 1), dim, FE_Q<dim>(degree), 1)
+    , fe(FE_Q<dim>(degree + 1) ^ dim, FE_Q<dim>(degree))
     , dof_handler(triangulation)
   {}
 

@@ -405,7 +405,7 @@ namespace Step22
   StokesProblem<dim>::StokesProblem(const unsigned int degree)
     : degree(degree)
     , triangulation(Triangulation<dim>::maximum_smoothing)
-    , fe(FE_Q<dim>(degree + 1), dim, FE_Q<dim>(degree), 1)
+    , fe(FE_Q<dim>(degree + 1) ^ dim, FE_Q<dim>(degree))
     , dof_handler(triangulation)
   {}
 

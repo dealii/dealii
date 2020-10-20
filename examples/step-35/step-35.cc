@@ -1291,9 +1291,8 @@ namespace Step35
   void NavierStokesProjection<dim>::output_results(const unsigned int step)
   {
     assemble_vorticity((step == 1));
-    const FESystem<dim> joint_fe(
-      fe_velocity, dim, fe_pressure, 1, fe_velocity, 1);
-    DoFHandler<dim> joint_dof_handler(triangulation);
+    const FESystem<dim> joint_fe(fe_velocity ^ dim, fe_pressure, fe_velocity);
+    DoFHandler<dim>     joint_dof_handler(triangulation);
     joint_dof_handler.distribute_dofs(joint_fe);
     Assert(joint_dof_handler.n_dofs() ==
              ((dim + 1) * dof_handler_velocity.n_dofs() +

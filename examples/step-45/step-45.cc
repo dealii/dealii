@@ -291,7 +291,7 @@ namespace Step45
     : degree(degree)
     , mpi_communicator(MPI_COMM_WORLD)
     , triangulation(mpi_communicator)
-    , fe(FE_Q<dim>(degree + 1), dim, FE_Q<dim>(degree), 1)
+    , fe(FE_Q<dim>(degree + 1) ^ dim, FE_Q<dim>(degree))
     , dof_handler(triangulation)
     , pcout(std::cout, Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
     , mapping(degree + 1)

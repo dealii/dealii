@@ -305,7 +305,7 @@ namespace Step68
     , mpi_communicator(MPI_COMM_WORLD)
     , background_triangulation(mpi_communicator)
     , fluid_dh(background_triangulation)
-    , fluid_fe(FE_Q<dim>(par.velocity_degree), dim)
+    , fluid_fe(FE_Q<dim>(par.velocity_degree) ^ dim)
     , pcout(std::cout, Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
     , interpolated_velocity(interpolated_velocity)
 
