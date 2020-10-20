@@ -3135,9 +3135,8 @@ namespace internal
     template <typename VectorType>
     unsigned int
     find_vector_in_mf(const VectorType &vec,
-                      const bool check_global_compatibility = false) const
+                      const bool        check_global_compatibility = true) const
     {
-      unsigned int mf_component = numbers::invalid_unsigned_int;
       (void)check_global_compatibility;
       for (unsigned int c = 0; c < matrix_free.n_components(); ++c)
         if (
@@ -3148,11 +3147,12 @@ namespace internal
 #  endif
             vec.get_partitioner()->is_compatible(
               *matrix_free.get_dof_info(c).vector_partitioner))
-          {
-            mf_component = c;
-            break;
-          }
-      return mf_component;
+          return c;
+
+      Assert(false,
+             ExcNotImplemented("Could not find partitioner that fits vector"));
+
+      return numbers::invalid_unsigned_int;
     }
 
 
@@ -3285,9 +3285,6 @@ namespace internal
 #  ifdef DEAL_II_WITH_MPI
           const unsigned int mf_component = find_vector_in_mf(vec);
 
-          Assert(mf_component != numbers::invalid_unsigned_int,
-                 ExcNotImplemented());
-
           const auto &part = get_partitioner(mf_component);
 
           if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0)
@@ -3377,9 +3374,6 @@ namespace internal
           AssertDimension(requests.size(), tmp_data.size());
 
           const unsigned int mf_component = find_vector_in_mf(vec);
-
-          Assert(mf_component != numbers::invalid_unsigned_int,
-                 ExcNotImplemented());
 
           const auto &part = get_partitioner(mf_component);
 
@@ -3483,8 +3477,6 @@ namespace internal
         {
 #  ifdef DEAL_II_WITH_MPI
           const unsigned int mf_component = find_vector_in_mf(vec);
-          Assert(mf_component != numbers::invalid_unsigned_int,
-                 ExcNotImplemented());
 
           const auto &part = get_partitioner(mf_component);
 
@@ -3565,6 +3557,7 @@ namespace internal
         std::is_same<Number, typename VectorType::value_type>::value,
         "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
+
       if (vec.size() != 0)
         {
 #  ifdef DEAL_II_WITH_MPI
@@ -3572,9 +3565,6 @@ namespace internal
           AssertDimension(requests.size(), tmp_data.size());
 
           const unsigned int mf_component = find_vector_in_mf(vec);
-
-          Assert(mf_component != numbers::invalid_unsigned_int,
-                 ExcNotImplemented());
 
           const auto &part = get_partitioner(mf_component);
 
