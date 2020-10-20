@@ -238,25 +238,26 @@ namespace Particles
   {
     Assert(property_pool != nullptr, ExcInternalError());
 
+    // If we haven't allocated memory yet, do so now
     if (properties == PropertyPool::invalid_handle)
       properties = property_pool->allocate_properties_array();
 
-    const ArrayView<double> old_properties =
+    const ArrayView<double> property_values =
       property_pool->get_properties(properties);
 
-    Assert(new_properties.size() == old_properties.size(),
+    Assert(new_properties.size() == property_values.size(),
            ExcMessage(
              "You are trying to assign properties with an incompatible length. "
              "The particle has space to store " +
-             std::to_string(old_properties.size()) +
+             std::to_string(property_values.size()) +
              " properties, but you are trying to assign " +
              std::to_string(new_properties.size()) +
              " properties. This is not allowed."));
 
-    if (old_properties.size() > 0)
+    if (property_values.size() > 0)
       std::copy(new_properties.begin(),
                 new_properties.end(),
-                old_properties.begin());
+                property_values.begin());
   }
 
 
