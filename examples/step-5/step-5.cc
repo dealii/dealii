@@ -179,7 +179,7 @@ void Step5<dim>::assemble_system()
   // Next is the typical loop over all cells to compute local contributions
   // and then to transfer them into the global matrix and vector. The only
   // change in this part, compared to step-4, is that we will use the
-  // <code>coefficient</code> function defined above to compute the
+  // <code>coefficient()</code> function defined above to compute the
   // coefficient value at each quadrature point.
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
@@ -191,7 +191,7 @@ void Step5<dim>::assemble_system()
       for (const unsigned int q_index : fe_values.quadrature_point_indices())
         {
           const double current_coefficient =
-            coefficient<dim>(fe_values.quadrature_point(q_index));
+            coefficient(fe_values.quadrature_point(q_index));
           for (const unsigned int i : fe_values.dof_indices())
             {
               for (const unsigned int j : fe_values.dof_indices())
