@@ -593,66 +593,78 @@ namespace internal
                         send_sm_ranks.size() + recv_sm_ranks.size() +
                           recv_remote_ranks.size() + send_remote_ranks.size());
 
-        for (unsigned int c = 0; c < recv_sm_ranks.size(); c++)
+        const auto split = [&](const unsigned int i) {
+          AssertIndexRange(i,
+                           (recv_sm_ranks.size() + recv_remote_ranks.size()));
+
+          if (i < recv_sm_ranks.size())
+            return std::pair<unsigned int, unsigned int>{0, i};
+          else
+            return std::pair<unsigned int, unsigned int>{
+              1, i - recv_sm_ranks.size()};
+        };
+
+        for (unsigned int c = 0;
+             c < recv_sm_ranks.size() + recv_remote_ranks.size();
+             c++)
           {
             int i;
-            MPI_Waitany(recv_sm_ranks.size(),
+            MPI_Waitany(recv_sm_ranks.size() + recv_remote_ranks.size(),
                         requests.data() + send_sm_ranks.size(),
                         &i,
                         MPI_STATUS_IGNORE);
 
-            const Number *__restrict__ data_others_ptr =
-              data_others[recv_sm_ranks[i]].data();
-            Number *__restrict__ data_this_ptr = ghost_array.data();
+            const auto s = split(i);
+            i            = s.second;
 
-            for (unsigned int lo = recv_sm_ptr[i],
-                              ko = recv_sm_ptr_[i],
-                              li = 0,
-                              ki = 0;
-                 (lo < recv_sm_ptr[i + 1]) && (ko < recv_sm_ptr_[i + 1]);)
+            if (s.first == 0)
               {
-                for (; (li < recv_sm_len[lo]) && (ki < recv_sm_len_[ko]);
-                     ++li, ++ki)
-                  data_this_ptr[recv_sm_indices_[ko] + ki - n_local_elements] =
-                    data_others_ptr[recv_sm_indices[lo] + li];
+                const Number *__restrict__ data_others_ptr =
+                  data_others[recv_sm_ranks[i]].data();
+                Number *__restrict__ data_this_ptr = ghost_array.data();
 
-                if (li == recv_sm_len[lo])
+                for (unsigned int lo = recv_sm_ptr[i],
+                                  ko = recv_sm_ptr_[i],
+                                  li = 0,
+                                  ki = 0;
+                     (lo < recv_sm_ptr[i + 1]) && (ko < recv_sm_ptr_[i + 1]);)
                   {
-                    lo++;   // increment outer counter
-                    li = 0; // reset inner counter
-                  }
+                    for (; (li < recv_sm_len[lo]) && (ki < recv_sm_len_[ko]);
+                         ++li, ++ki)
+                      data_this_ptr[recv_sm_indices_[ko] + ki -
+                                    n_local_elements] =
+                        data_others_ptr[recv_sm_indices[lo] + li];
 
-                if (ki == recv_sm_len_[ko])
-                  {
-                    ko++;   // increment outer counter
-                    ki = 0; // reset inner counter
+                    if (li == recv_sm_len[lo])
+                      {
+                        lo++;   // increment outer counter
+                        li = 0; // reset inner counter
+                      }
+
+                    if (ki == recv_sm_len_[ko])
+                      {
+                        ko++;   // increment outer counter
+                        ki = 0; // reset inner counter
+                      }
                   }
               }
-          }
-
-        for (unsigned int c = 0; c < recv_remote_ranks.size(); c++)
-          {
-            int i;
-            MPI_Waitany(recv_remote_ranks.size(),
-                        requests.data() + send_sm_ranks.size() +
-                          recv_sm_ranks.size(),
-                        &i,
-                        MPI_STATUS_IGNORE);
-
-            for (unsigned int c = recv_remote_ptr[i].second - 1;
-                 c != numbers::invalid_unsigned_int;
-                 c--)
+            else /*if(s.second == 1)*/
               {
-                const unsigned int idx_1 = shifts[shifts_ptr[i] + c];
-                const unsigned int idx_2 = recv_remote_ptr[i].first + c;
+                for (unsigned int c = recv_remote_ptr[i].second - 1;
+                     c != numbers::invalid_unsigned_int;
+                     c--)
+                  {
+                    const unsigned int idx_1 = shifts[shifts_ptr[i] + c];
+                    const unsigned int idx_2 = recv_remote_ptr[i].first + c;
 
-                if (idx_1 == idx_2)
-                  continue;
+                    if (idx_1 == idx_2)
+                      continue;
 
-                AssertIndexRange(idx_2, idx_1);
+                    AssertIndexRange(idx_2, idx_1);
 
-                ghost_array[idx_1] = ghost_array[idx_2];
-                ghost_array[idx_2] = 0.0;
+                    ghost_array[idx_1] = ghost_array[idx_2];
+                    ghost_array[idx_2] = 0.0;
+                  }
               }
           }
 
