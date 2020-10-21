@@ -75,6 +75,11 @@ namespace MemorySpace
      * Pointer to data on the device.
      */
     std::unique_ptr<Number[]> values_dev;
+
+    /**
+     * Pointers to the data of the processes sharing the same memory.
+     */
+    std::vector<ArrayView<const Number>> values_sm;
   };
 
 
@@ -118,6 +123,8 @@ namespace MemorySpace
     // This is not used but it allows to simplify the code until we start using
     // CUDA-aware MPI.
     std::unique_ptr<Number[]> values_dev;
+
+    std::vector<ArrayView<const Number>> values_sm;
   };
 
 
@@ -165,6 +172,11 @@ namespace MemorySpace
 
     std::unique_ptr<Number[], std::function<void(Number *)>> values;
     std::unique_ptr<Number[], void (*)(Number *)>            values_dev;
+
+    /**
+     * This is currently not used.
+     */
+    std::vector<ArrayView<const Number>> values_sm;
   };
 
 

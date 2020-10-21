@@ -218,6 +218,25 @@ namespace LinearAlgebra
      * device_id = my_rank % n_devices;
      * cudaSetDevice(device_id);
      * </code>
+     *
+     * <h4>MPI-3 shared-memory support</h4>
+     *
+     * In Host mode, this class allows to use MPI-3 shared-memory features
+     * by providing a separate MPI communicator that consists of processes on
+     * the same shared-memory domain. By calling
+     * <code> vector.shared_vector_data();
+     * </code>
+     * users have read-only access to both locally-owned and ghost values of
+     * processes combined in the shared-memory communicator (@p comm_sm in
+     * reinit()).
+     *
+     * You can create a communicator consisting of all processes on
+     * the same shared-memory domain with:
+     * <code> MPI_Comm comm_sm;
+     * MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, rank, MPI_INFO_NULL,
+     * &comm_sm);
+     * </code>
+     *
      * @see CUDAWrappers
      */
     template <typename Number, typename MemorySpace = MemorySpace::Host>
@@ -291,7 +310,7 @@ namespace LinearAlgebra
 
       /**
        * Create the vector based on the parallel partitioning described in @p
-       * partitioner. The input argument is a shared pointer, which store the
+       * partitioner. The input argument is a shared pointer, which stores the
        * partitioner data only once and share it between several vectors with
        * the same layout.
        */
@@ -354,17 +373,28 @@ namespace LinearAlgebra
 
       /**
        * Initialize the vector given to the parallel partitioning described in
-       * @p partitioner. The input argument is a shared pointer, which store
+       * @p partitioner. The input argument is a shared pointer, which stores
        * the partitioner data only once and share it between several vectors
        * with the same layout.
+       *
+       * The optional argument @p comm_sm, which consists of processes on
+       * the same shared-memory domain, allows users have read-only access to
+       * both locally-owned and ghost values of processes combined in the
+       * shared-memory communicator.
        */
       void
       reinit(
-        const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
+        const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
+        const MPI_Comm &comm_sm = MPI_COMM_SELF);
 
       /**
        * Initialize vector with @p local_size locally-owned and @p ghost_size
        * ghost degrees of freedoms.
+       *
+       * The optional argument @p comm_sm, which consists of processes on
+       * the same shared-memory domain, allows users have read-only access to
+       * both locally-owned and ghost values of processes combined in the
+       * shared-memory communicator.
        *
        * @note In the created underlying partitioner, the local index range is
        *   translated to global indices in an ascending and one-to-one fashion,
@@ -378,7 +408,8 @@ namespace LinearAlgebra
       void
       reinit(const types::global_dof_index local_size,
              const types::global_dof_index ghost_size,
-             const MPI_Comm                comm);
+             const MPI_Comm &              comm,
+             const MPI_Comm &              comm_sm = MPI_COMM_SELF);
 
       /**
        * Swap the contents of this vector and the other vector @p v. One could
@@ -1138,6 +1169,13 @@ namespace LinearAlgebra
       void
       set_ghost_state(const bool ghosted) const;
 
+      /**
+       * Get pointers to the beginning of the values of the other
+       * processes of the same shared-memory domain.
+       */
+      const std::vector<ArrayView<const Number>> &
+      shared_vector_data() const;
+
       //@}
 
       /**
@@ -1313,6 +1351,11 @@ namespace LinearAlgebra
       mutable std::mutex mutex;
 
       /**
+       * Communicator to be used for the shared-memory domain.
+       */
+      MPI_Comm comm_sm;
+
+      /**
        * A helper function that clears the compress_requests and
        * update_ghost_values_requests field. Used in reinit() functions.
        */
@@ -1323,7 +1366,8 @@ namespace LinearAlgebra
        * A helper function that is used to resize the val array.
        */
       void
-      resize_val(const size_type new_allocated_size);
+      resize_val(const size_type new_allocated_size,
+                 const MPI_Comm &comm_sm = MPI_COMM_SELF);
 
       // Make all other vector types friends.
       template <typename Number2, typename MemorySpace2>
@@ -1511,6 +1555,15 @@ namespace LinearAlgebra
     {
       return internal::Policy<Number, MemorySpace>::begin(data) +
              partitioner->local_size();
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    const std::vector<ArrayView<const Number>> &
+    Vector<Number, MemorySpace>::shared_vector_data() const
+    {
+      return data.values_sm;
     }
 
 
