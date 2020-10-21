@@ -48,7 +48,7 @@ namespace MemorySpace
      * Copy the active data (values for Host and values_dev for CUDA) to @p begin.
      * If the data is on the device it is moved to the host.
      */
-    virtual void
+    void
     copy_to(Number *begin, std::size_t n_elements)
     {
       (void)begin;
@@ -59,7 +59,7 @@ namespace MemorySpace
      * Copy the data in @p begin to the active data of the structure (values for
      * Host and values_dev for CUDA). The pointer @p begin must be on the host.
      */
-    virtual void
+    void
     copy_from(Number *begin, std::size_t n_elements)
     {
       (void)begin;
@@ -75,11 +75,6 @@ namespace MemorySpace
      * Pointer to data on the device.
      */
     std::unique_ptr<Number[]> values_dev;
-
-    /**
-     * TODO
-     */
-    MPI_Win *values_win = nullptr;
 
     /**
      * TODO
@@ -111,20 +106,13 @@ namespace MemorySpace
       : values(nullptr, &std::free)
     {}
 
-    virtual ~MemorySpaceData() = default;
-
-    MemorySpaceData(MemorySpaceData &&) noexcept = default;
-
-    MemorySpaceData &
-    operator=(MemorySpaceData &&) noexcept = default;
-
-    virtual void
+    void
     copy_to(Number *begin, std::size_t n_elements)
     {
       std::copy(values.get(), values.get() + n_elements, begin);
     }
 
-    virtual void
+    void
     copy_from(Number *begin, std::size_t n_elements)
     {
       std::copy(begin, begin + n_elements, values.get());
@@ -160,14 +148,7 @@ namespace MemorySpace
       , values_dev(nullptr, Utilities::CUDA::delete_device_data<Number>)
     {}
 
-    virtual ~MemorySpaceData() = default;
-
-    MemorySpaceData(MemorySpaceData &&) noexcept = default;
-
-    MemorySpaceData &
-    operator=(MemorySpaceData &&) noexcept = default;
-
-    virtual void
+    void
     copy_to(Number *begin, std::size_t n_elements)
     {
       const cudaError_t cuda_error_code =
@@ -178,7 +159,7 @@ namespace MemorySpace
       AssertCuda(cuda_error_code);
     }
 
-    virtual void
+    void
     copy_from(Number *begin, std::size_t n_elements)
     {
       const cudaError_t cuda_error_code =
@@ -191,8 +172,7 @@ namespace MemorySpace
 
     std::unique_ptr<Number[], std::function<void(Number *)>> values;
     std::unique_ptr<Number[], void (*)(Number *)>            values_dev;
-    MPI_Win *                            values_win = nullptr;
-    std::vector<ArrayView<const Number>> others;
+    std::vector<ArrayView<const Number>>                     others;
   };
 
 
