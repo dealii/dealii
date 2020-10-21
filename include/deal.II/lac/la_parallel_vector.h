@@ -1120,6 +1120,13 @@ namespace LinearAlgebra
       void
       set_ghost_state(const bool ghosted) const;
 
+      /**
+       * Get pointers to the beginning of the values of the other
+       * processes of the same shared-memory domain.
+       */
+      const std::vector<ArrayView<const Number>> &
+      shared_vector_data() const;
+
       //@}
 
       /**
@@ -1493,6 +1500,15 @@ namespace LinearAlgebra
     {
       return internal::Policy<Number, MemorySpace>::begin(data) +
              partitioner->local_size();
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    const std::vector<ArrayView<const Number>> &
+    Vector<Number, MemorySpace>::shared_vector_data() const
+    {
+      return data.values_sm;
     }
 
 

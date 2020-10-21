@@ -33,6 +33,7 @@
 #include <deal.II/matrix_free/mapping_info.h>
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/task_info.h>
+#include <deal.II/matrix_free/vector_data_exchange.h>
 
 #include <array>
 #include <memory>
@@ -517,7 +518,15 @@ namespace internal
       std::shared_ptr<const Utilities::MPI::Partitioner> vector_partitioner;
 
       /**
-       * This partitioning selects a subset of ghost indices to the full
+       * Vector exchanger compatible with vector_partitioner.
+       */
+      std::shared_ptr<
+        const internal::MatrixFreeFunctions::VectorDataExchange::Base>
+        vector_exchanger;
+
+      /**
+       * Vector exchanger compatible with partitioners that select a subset of
+       * ghost indices to the full
        * vector partitioner stored in @p vector_partitioner. These
        * partitioners are used in specialized loops that only import parts of
        * the ghosted region for reducing the amount of communication. There
@@ -534,8 +543,11 @@ namespace internal
        *   values and the gradients on all faces adjacent to the locally owned
        *   cells.
        */
-      std::array<std::shared_ptr<const Utilities::MPI::Partitioner>, 5>
-        vector_partitioner_face_variants;
+      std::array<
+        std::shared_ptr<
+          const internal::MatrixFreeFunctions::VectorDataExchange::Base>,
+        5>
+        vector_exchanger_face_variants;
 
       /**
        * This stores a (sorted) list of all locally owned degrees of freedom
