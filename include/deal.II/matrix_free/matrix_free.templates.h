@@ -343,6 +343,15 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
             {
               task_info.communicator_sm = additional_data.communicator_sm;
             }
+          else if (true)
+            {
+              MPI_Comm comm_sm;
+              MPI_Comm_split(task_info.communicator,
+                             task_info.my_pid == 2,
+                             task_info.my_pid,
+                             &comm_sm);
+              task_info.communicator_sm = comm_sm;
+            }
           else
             {
               MPI_Comm comm_sm;
