@@ -493,7 +493,7 @@ namespace internal
          * Number of locally-owned vector entries.
          */
         unsigned int n_local_elements;
-        
+
         /**
          * Number of global vector entries.
          */
@@ -592,6 +592,36 @@ namespace internal
          * TODO
          */
         std::vector<unsigned int> send_sm_offset;
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> recv_sm_indices_;
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> recv_sm_ptr_;
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> recv_sm_len_;
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> send_sm_indices_;
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> send_sm_ptr_;
+
+        /**
+         * TODO
+         */
+        std::vector<unsigned int> send_sm_len_;
       };
 
 

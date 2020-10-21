@@ -174,6 +174,7 @@ namespace internal
 
           unsigned int offset = 0;
 
+          recv_sm_ptr_ = {0};
 
           for (const auto &rank_and_local_indices : rank_to_local_indices)
             {
@@ -198,6 +199,13 @@ namespace internal
                                         rank_and_local_indices.second.size());
                   recv_sm_offset.push_back(is_locally_owned.n_elements() +
                                            offset);
+
+                  for (unsigned int i = offset, c = 0;
+                       c < rank_and_local_indices.second.size();
+                       ++c, ++i)
+                    recv_sm_indices_.push_back(shifts[i] +
+                                               is_locally_owned.n_elements());
+                  recv_sm_ptr_.push_back(recv_sm_indices_.size());
                 }
               offset += rank_and_local_indices.second.size();
             }
@@ -239,6 +247,37 @@ namespace internal
                 }
             }
           send_sm_req.resize(send_sm_ranks.size());
+
+          send_sm_ptr_ = send_sm_ptr;
+          send_sm_indices_.resize(send_sm_ptr.back());
+        }
+
+
+        {
+          for (unsigned int i = 0; i < recv_sm_ranks.size(); i++)
+            MPI_Isend(recv_sm_indices_.data() + recv_sm_ptr_[i],
+                      recv_sm_ptr_[i + 1] - recv_sm_ptr_[i],
+                      MPI_UNSIGNED,
+                      recv_sm_ranks[i],
+                      4,
+                      comm_sm,
+                      recv_sm_req.data() + i);
+
+          for (unsigned int i = 0; i < send_sm_ranks.size(); i++)
+            MPI_Irecv(send_sm_indices_.data() + send_sm_ptr_[i],
+                      send_sm_ptr_[i + 1] - send_sm_ptr_[i],
+                      MPI_UNSIGNED,
+                      send_sm_ranks[i],
+                      4,
+                      comm_sm,
+                      send_sm_req.data() + i);
+
+          MPI_Waitall(recv_sm_req.size(),
+                      recv_sm_req.data(),
+                      MPI_STATUSES_IGNORE);
+          MPI_Waitall(send_sm_req.size(),
+                      send_sm_req.data(),
+                      MPI_STATUSES_IGNORE);
         }
 
         {
@@ -315,6 +354,8 @@ namespace internal
           }
 
         internal::compress(send_sm_ptr, send_sm_indices, send_sm_len);
+        internal::compress(recv_sm_ptr_, recv_sm_indices_, recv_sm_len_);
+        internal::compress(send_sm_ptr_, send_sm_indices_, send_sm_len_);
 
         // std::cout << rank << std::endl;
         //
@@ -578,18 +619,26 @@ namespace internal
             Number *__restrict__ data_this_ptr = ghost_array.data();
 
             for (unsigned int lo = recv_sm_ptr[i],
-                              k  = recv_sm_offset[i],
-                              li = 0;
-                 lo < recv_sm_ptr[i + 1];)
+                              ko = recv_sm_ptr_[i],
+                              li = 0,
+                              ki = 0;
+                 (lo < recv_sm_ptr[i + 1]) && (ko < recv_sm_ptr_[i + 1]);)
               {
-                for (; li < recv_sm_len[lo]; ++li, ++k)
-                  data_this_ptr[k - n_local_elements] =
+                for (; (li < recv_sm_len[lo]) && (ki < recv_sm_len_[ko]);
+                     ++li, ++ki)
+                  data_this_ptr[recv_sm_indices_[ko] + ki - n_local_elements] =
                     data_others_ptr[recv_sm_indices[lo] + li];
 
                 if (li == recv_sm_len[lo])
                   {
                     lo++;   // increment outer counter
                     li = 0; // reset inner counter
+                  }
+
+                if (ki == recv_sm_len_[ko])
+                  {
+                    ko++;   // increment outer counter
+                    ki = 0; // reset inner counter
                   }
               }
           }
@@ -789,21 +838,28 @@ namespace internal
                 Number *__restrict__ data_this_ptr = data_this.data();
 
                 for (unsigned int lo = send_sm_ptr[i],
-                                  k  = send_sm_offset[i],
-                                  li = 0;
-                     lo < send_sm_ptr[i + 1];)
+                                  ko = send_sm_ptr_[i],
+                                  li = 0,
+                                  ki = 0;
+                     (lo < send_sm_ptr[i + 1]) && (ko < send_sm_ptr_[i + 1]);)
                   {
-                    for (; li < send_sm_len[lo]; ++li, ++k)
+                    for (; (li < send_sm_len[lo]) && (ki < send_sm_len_[ko]);
+                         ++li, ++ki)
                       {
                         data_this_ptr[send_sm_indices[lo] + li] +=
-                          data_others_ptr[k];
-                        data_others_ptr[k] = 0.0;
+                          data_others_ptr[send_sm_indices_[ko] + ki];
+                        data_others_ptr[send_sm_indices_[ko] + ki] = 0.0;
                       }
 
                     if (li == send_sm_len[lo])
                       {
                         lo++;   // increment outer counter
                         li = 0; // reset inner counter
+                      }
+                    if (ki == send_sm_len_[ko])
+                      {
+                        ko++;   // increment outer counter
+                        ki = 0; // reset inner counter
                       }
                   }
                 // std::cout << "AA4_aa" << std::endl;
