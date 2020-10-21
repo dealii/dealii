@@ -327,9 +327,9 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
   LogStream::Prefix prefix("cg");
 
   // Memory allocation
-  //typename VectorMemory<VectorType>::Pointer g_pointer(this->memory);
-  //typename VectorMemory<VectorType>::Pointer d_pointer(this->memory);
-  //typename VectorMemory<VectorType>::Pointer h_pointer(this->memory);
+  // typename VectorMemory<VectorType>::Pointer g_pointer(this->memory);
+  // typename VectorMemory<VectorType>::Pointer d_pointer(this->memory);
+  // typename VectorMemory<VectorType>::Pointer h_pointer(this->memory);
 
   // define some aliases for simpler access
   VectorType g;

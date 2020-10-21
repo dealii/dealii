@@ -167,7 +167,8 @@ private:
                       "the correct size for compatibility with MatrixFree."));
     LinearAlgebra::distributed::Vector<Number> copy_vec(vec);
     const_cast<LinearAlgebra::distributed::Vector<Number> &>(vec).reinit(
-      this->data->get_dof_info(0).vector_partitioner, this->data->get_task_info().communicator_sm);
+      this->data->get_dof_info(0).vector_partitioner,
+      this->data->get_task_info().communicator_sm);
     const_cast<LinearAlgebra::distributed::Vector<Number> &>(vec)
       .copy_locally_owned_data_from(copy_vec);
   }
