@@ -44,7 +44,7 @@ std::ofstream logfile("output");
 //                                 const std::vector<bool>  &,
 //                                 bool, bool, bool)
 //
-// for correct behaviour with hanging nodes. This is done by additionally
+// for correct behavior with hanging nodes. This is done by additionally
 // refining the second cube once. Test that constraining face_1 -> face_2
 // and the opposite direction face_2 -> face_1 give the exact same result.
 //

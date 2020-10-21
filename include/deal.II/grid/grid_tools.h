@@ -763,7 +763,7 @@ namespace GridTools
    * GridTools::regularize_corner_cells(tria);
    * tria.refine_global(2);
    * @endcode
-   * generates a mesh that has a much better behaviour w.r.t. the jacobian of
+   * generates a mesh that has a much better behavior w.r.t. the jacobian of
    * the Mapping:
    *
    * <p ALIGN="center">

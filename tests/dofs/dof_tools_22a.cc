@@ -15,7 +15,7 @@
 //
 // This test was written by Sam Cox.
 
-// Tests the behaviour of DoFTools::make_flux_sparsity_pattern (DoFHandler,
+// Tests the behavior of DoFTools::make_flux_sparsity_pattern (DoFHandler,
 //                          SparsityPattern, AffineConstraints<double>, bool,
 //                          coupling, flux_coupling, subdomain_id)
 

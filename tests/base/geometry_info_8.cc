@@ -22,7 +22,7 @@
 
 //
 // Test GeometryInfo<dim>::face_to_cell_vertices
-// for correct behaviour under face_orientation face_flip and face_rotation
+// for correct behavior under face_orientation face_flip and face_rotation
 //
 
 

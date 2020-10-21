@@ -21,7 +21,7 @@
 //                                 dealii::AffineConstraints<double> &,
 //                                 const std::vector<bool>  &,
 //                                 bool, bool, bool)
-// for correct behaviour on non standard oriented meshes.
+// for correct behavior on non standard oriented meshes.
 //
 // a redux of why the 21_b test failed starting in r29525. in essence,
 // what it boils down is that the new code did not implement the

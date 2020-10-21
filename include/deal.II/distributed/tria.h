@@ -301,7 +301,7 @@ namespace parallel
          * every time a repartitioning in p4est happens. This can be a bit more
          * expensive, but guarantees the same memory layout and therefore cell
          * ordering in the deal.II mesh. As assembly is done in the deal.II
-         * cell ordering, this flag is required to get reproducible behaviour
+         * cell ordering, this flag is required to get reproducible behavior
          * after snapshot/resume.
          */
         mesh_reconstruction_after_repartitioning = 0x1,

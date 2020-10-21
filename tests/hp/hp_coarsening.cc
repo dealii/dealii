@@ -83,7 +83,7 @@ test()
 
   deallog << "full h&p flags" << std::endl;
   {
-    deallog << " default behaviour: ";
+    deallog << " default behavior: ";
     {
       Triangulation<dim>  tria;
       hp::DoFHandler<dim> dh;
@@ -122,7 +122,7 @@ test()
 
   deallog << "full p flags" << std::endl;
   {
-    deallog << " default behaviour: ";
+    deallog << " default behavior: ";
     {
       Triangulation<dim>  tria;
       hp::DoFHandler<dim> dh;
@@ -164,7 +164,7 @@ test()
 
   deallog << "full h flags" << std::endl;
   {
-    deallog << " default behaviour: ";
+    deallog << " default behavior: ";
     {
       Triangulation<dim>  tria;
       hp::DoFHandler<dim> dh;

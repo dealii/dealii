@@ -835,7 +835,7 @@ public:
   /**
    * Compute the time difference to the last time step. If this timestep is
    * the first one, this function will result in an exception. Though this
-   * behaviour seems a bit drastic, it is appropriate in most cases since if
+   * behavior seems a bit drastic, it is appropriate in most cases since if
    * there is no previous time step you will need special treatment anyway and
    * this way no invalid value is returned which could lead to wrong but
    * unnoticed results of your computation. (The only sensible value to return
@@ -1297,7 +1297,7 @@ namespace TimeStepBase_Tria_Flags
  * change in the grids between subsequent time levels, while also trying to
  * retain the freedom of refining each grid separately. There are lots of
  * flags and numbers controlling this function, which might drastically change
- * the behaviour of the function -- see the description of the flags for
+ * the behavior of the function -- see the description of the flags for
  * further information.
  */
 template <int dim>
@@ -1339,7 +1339,7 @@ public:
 
   /**
    * Constructor. Takes a coarse grid from which the grids on this time level
-   * will be derived and some flags steering the behaviour of this object.
+   * will be derived and some flags steering the behavior of this object.
    *
    * The ownership of the coarse grid stays with the creator of this object.
    * However, it is locked from destruction to guarantee the lifetime of the
@@ -1465,7 +1465,7 @@ protected:
    * Triangulation used at this time level. Since this is something that every
    * time stepping scheme needs to have, we can safely put it into the base
    * class. Note that the triangulation is frequently deleted and rebuilt by
-   * the functions @p sleep and @p wake_up to save memory, if such a behaviour
+   * the functions @p sleep and @p wake_up to save memory, if such a behavior
    * is specified in the @p flags structure.
    */
   SmartPointer<Triangulation<dim, dim>, TimeStepBase_Tria<dim>> tria;

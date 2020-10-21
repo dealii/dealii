@@ -290,7 +290,7 @@ namespace hp
      * method does return true, this does not imply that the hp method will
      * work!
      *
-     * This behaviour is related to the fact, that FiniteElement classes,
+     * This behavior is related to the fact, that FiniteElement classes,
      * which provide the new style hanging node constraints might still not
      * provide them for all possible cases. If FE_Q and FE_RaviartThomas
      * elements are included in the FECollection and both properly implement

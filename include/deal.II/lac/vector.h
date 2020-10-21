@@ -274,7 +274,7 @@ public:
    * waste some memory, so keep this in mind.  However, if <tt>N==0</tt> all
    * memory is freed, i.e. if you want to resize the vector and release the
    * memory not needed, you have to first call <tt>reinit(0)</tt> and then
-   * <tt>reinit(N)</tt>. This cited behaviour is analogous to that of the
+   * <tt>reinit(N)</tt>. This cited behavior is analogous to that of the
    * standard library containers.
    *
    * If @p omit_zeroing_entries is false, the vector is filled by zeros.
