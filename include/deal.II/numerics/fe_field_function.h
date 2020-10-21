@@ -56,11 +56,12 @@ namespace Functions
    * needs to find out where the points lie.
    *
    * If you know in advance in which cell your points lie, you can accelerate
-   * things a bit, by calling set_active_cell before asking for values or
+   * things a bit, by calling set_active_cell() before asking for values or
    * gradients of the function. If you don't do this, and your points don't
    * lie in the cell that is currently stored, the function
-   * GridTools::find_cell_around_point is called to find out where the point
-   * is. You can specify an optional mapping to use when looking for points in
+   * GridTools::find_active_cell_around_point is called to find out where the
+   * point is.
+   * You can specify an optional mapping to use when looking for points in
    * the grid. If you don't do so, this function uses a Q1 mapping.
    *
    * Once the FEFieldFunction knows where the points lie, it creates a
@@ -70,7 +71,7 @@ namespace Functions
    *
    * If you only need the quadrature points but not the values of the finite
    * element function (you might want this for the adjoint interpolation), you
-   * can also use the function @p compute_point_locations alone.
+   * can also use the function compute_point_locations() alone.
    *
    * An example of how to use this function is the following:
    *
@@ -99,7 +100,7 @@ namespace Functions
    * // Finally, project the solution on the first domain onto the
    * // second domain, assuming that this does not require querying
    * // values from outside the first domain:
-   * FEFieldFunction<dim> fe_function_1 (dh_1, solution_1);
+   * Functions::FEFieldFunction<dim> fe_function_1 (dh_1, solution_1);
    * VectorTools::project (dh_2, constraints_2, quad,
    *                       fe_function_1, solution_2);
    *
@@ -215,7 +216,7 @@ namespace Functions
      * only one component (i.e. the function is scalar), you should state the
      * component you want to have evaluated; it defaults to zero, i.e. the
      * first component. It is inefficient to use single points. If you need
-     * more than one at a time, use the vector_value_list function. For
+     * more than one at a time, use the vector_value_list() function. For
      * efficiency reasons, it is better if all the points lie on the same
      * cell. This is not mandatory, however it does speed things up.
      *
@@ -274,7 +275,7 @@ namespace Functions
     /**
      * Return the gradient of all components of the function at the given
      * point.  It is inefficient to use single points. If you need more than
-     * one at a time, use the vector_value_list function. For efficiency
+     * one at a time, use the vector_value_list() function. For efficiency
      * reasons, it is better if all the points lie on the same cell. This is
      * not mandatory, however it does speed things up.
      *
@@ -294,7 +295,7 @@ namespace Functions
     /**
      * Return the gradient of the specified component of the function at the
      * given point. It is inefficient to use single points. If you need more
-     * than one at a time, use the vector_value_list function. For efficiency
+     * than one at a time, use the vector_value_list() function. For efficiency
      * reasons, it is better if all the points lie on the same cell. This is
      * not mandatory, however it does speed things up.
      *
