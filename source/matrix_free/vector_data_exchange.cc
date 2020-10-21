@@ -540,14 +540,21 @@ namespace internal
 
         // receive data from remote processes
         for (unsigned int i = 0; i < recv_remote_ranks.size(); i++)
-          MPI_Irecv(buffer.data() + recv_remote_ptr[i].first,
-                    recv_remote_ptr[i].second,
-                    Utilities::MPI::internal::mpi_type_id(buffer.data()),
-                    recv_remote_ranks[i],
-                    communication_channel + 3,
-                    comm,
-                    requests.data() + send_sm_ranks.size() +
-                      recv_sm_ranks.size() + i);
+          {
+            const unsigned int offset =
+              (shifts[shifts_ptr[i] + (recv_remote_ptr[i].second - 1)] -
+               shifts[shifts_ptr[i]]) +
+              1 - recv_remote_ptr[i].second;
+
+            MPI_Irecv(buffer.data() + recv_remote_ptr[i].first + offset,
+                      recv_remote_ptr[i].second,
+                      Utilities::MPI::internal::mpi_type_id(buffer.data()),
+                      recv_remote_ranks[i],
+                      communication_channel + 3,
+                      comm,
+                      requests.data() + send_sm_ranks.size() +
+                        recv_sm_ranks.size() + i);
+          }
 
         // send data to remote processes
         for (unsigned int i = 0, k = 0; i < send_remote_ranks.size(); i++)
@@ -650,17 +657,21 @@ namespace internal
               }
             else /*if(s.second == 1)*/
               {
-                for (unsigned int c = recv_remote_ptr[i].second - 1;
-                     c != numbers::invalid_unsigned_int;
-                     c--)
+                const unsigned int offset =
+                  (shifts[shifts_ptr[i] + (recv_remote_ptr[i].second - 1)] -
+                   shifts[shifts_ptr[i]]) +
+                  1 - recv_remote_ptr[i].second;
+
+                for (unsigned int c = 0; c < recv_remote_ptr[i].second; ++c)
                   {
                     const unsigned int idx_1 = shifts[shifts_ptr[i] + c];
-                    const unsigned int idx_2 = recv_remote_ptr[i].first + c;
+                    const unsigned int idx_2 =
+                      recv_remote_ptr[i].first + c + offset;
 
                     if (idx_1 == idx_2)
                       continue;
 
-                    AssertIndexRange(idx_2, idx_1);
+                    AssertIndexRange(idx_1, idx_2);
 
                     ghost_array[idx_1] = ghost_array[idx_2];
                     ghost_array[idx_2] = 0.0;
