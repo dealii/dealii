@@ -160,6 +160,9 @@ namespace LinearAlgebra
             }
           else
             {
+#ifndef DEAL_II_WITH_MPI
+              Assert(false, ExcInternalError());
+#else
               // TODO: is assert fine?
               // Assert(((allocated_size > 0 && data.values != nullptr) ||
               //        data.values == nullptr),
@@ -248,7 +251,7 @@ namespace LinearAlgebra
               data.values = {ptr_aligned,
                              [win](Number *) { MPI_Win_free(win); }};
 
-#ifdef DEBUG
+#  ifdef DEBUG
               for (unsigned int i = 0; i < new_alloc_size; ++i)
                 ptr_aligned[i] = 0.0;
 
@@ -259,6 +262,7 @@ namespace LinearAlgebra
               for (const auto &other : data.others)
                 for (const auto &o : other)
                   temp += o;
+#  endif
 #endif
             }
         }

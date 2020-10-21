@@ -339,6 +339,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
           task_info.n_procs =
             Utilities::MPI::n_mpi_processes(task_info.communicator);
 
+#ifndef DEAL_II_WITH_MPI
+          Assert(false, ExcInternalError());
+#else
           if (false)
             {
               task_info.communicator_sm = additional_data.communicator_sm;
@@ -362,6 +365,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
                                   &comm_sm);
               task_info.communicator_sm = comm_sm;
             }
+#endif
         }
       else
         {

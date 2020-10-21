@@ -174,11 +174,19 @@ namespace internal
           std::vector<MPI_Request> &                  requests) const override
         {
           (void)shared_arrays;
+#ifndef DEAL_II_WITH_MPI
+          (void)communication_channel;
+          (void)locally_owned_array;
+          (void)ghost_array;
+          (void)temporary_storage;
+          (void)requests;
+#else
           partitioner->export_to_ghosted_array_start(communication_channel,
                                                      locally_owned_array,
                                                      temporary_storage,
                                                      ghost_array,
                                                      requests);
+#endif
         }
 
         void
@@ -190,7 +198,12 @@ namespace internal
         {
           (void)locally_owned_array;
           (void)shared_arrays;
+#ifndef DEAL_II_WITH_MPI
+          (void)ghost_array;
+          (void)requests;
+#else
           partitioner->export_to_ghosted_array_finish(ghost_array, requests);
+#endif
         }
 
         void
@@ -205,11 +218,19 @@ namespace internal
         {
           (void)locally_owned_array;
           (void)shared_arrays;
+#ifndef DEAL_II_WITH_MPI
+          (void)vector_operation;
+          (void)communication_channel;
+          (void)ghost_array;
+          (void)temporary_storage;
+          (void)requests;
+#else
           partitioner->import_from_ghosted_array_start(vector_operation,
                                                        communication_channel,
                                                        ghost_array,
                                                        temporary_storage,
                                                        requests);
+#endif
         }
 
         void
@@ -222,11 +243,19 @@ namespace internal
           std::vector<MPI_Request> &                  requests) const override
         {
           (void)shared_arrays;
+#ifndef DEAL_II_WITH_MPI
+          (void)vector_operation;
+          (void)locally_owned_storage;
+          (void)ghost_array;
+          (void)temporary_storage;
+          (void)requests;
+#else
           partitioner->import_from_ghosted_array_finish(vector_operation,
                                                         temporary_storage,
                                                         locally_owned_storage,
                                                         ghost_array,
                                                         requests);
+#endif
         }
 
         void
@@ -245,11 +274,19 @@ namespace internal
           std::vector<MPI_Request> &                 requests) const override
         {
           (void)shared_arrays;
+#ifndef DEAL_II_WITH_MPI
+          (void)communication_channel;
+          (void)locally_owned_array;
+          (void)ghost_array;
+          (void)temporary_storage;
+          (void)requests;
+#else
           partitioner->export_to_ghosted_array_start(communication_channel,
                                                      locally_owned_array,
                                                      temporary_storage,
                                                      ghost_array,
                                                      requests);
+#endif
         }
 
         void
@@ -261,7 +298,12 @@ namespace internal
         {
           (void)locally_owned_array;
           (void)shared_arrays;
+#ifndef DEAL_II_WITH_MPI
+          (void)ghost_array;
+          (void)requests;
+#else
           partitioner->export_to_ghosted_array_finish(ghost_array, requests);
+#endif
         }
 
         void
@@ -276,11 +318,19 @@ namespace internal
         {
           (void)locally_owned_array;
           (void)shared_arrays;
+#ifndef DEAL_II_WITH_MPI
+          (void)vector_operation;
+          (void)communication_channel;
+          (void)ghost_array;
+          (void)temporary_storage;
+          (void)requests;
+#else
           partitioner->import_from_ghosted_array_start(vector_operation,
                                                        communication_channel,
                                                        ghost_array,
                                                        temporary_storage,
                                                        requests);
+#endif
         }
 
         void
@@ -293,11 +343,19 @@ namespace internal
           std::vector<MPI_Request> &                 requests) const override
         {
           (void)shared_arrays;
+#ifndef DEAL_II_WITH_MPI
+          (void)vector_operation;
+          (void)locally_owned_storage;
+          (void)ghost_array;
+          (void)temporary_storage;
+          (void)requests;
+#else
           partitioner->import_from_ghosted_array_finish(vector_operation,
                                                         temporary_storage,
                                                         locally_owned_storage,
                                                         ghost_array,
                                                         requests);
+#endif
         }
 
         void

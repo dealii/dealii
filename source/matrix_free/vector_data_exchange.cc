@@ -83,6 +83,13 @@ namespace internal
         std::vector<unsigned int>
         procs_of_sm(const MPI_Comm &comm, const MPI_Comm &comm_shared)
         {
+          std::vector<unsigned int> ranks_shared;
+
+#ifndef DEAL_II_WITH_MPI
+          Assert(false, ExcNeedsMPI());
+          (void)comm;
+          (void)comm_shared;
+#else
           // extract information from comm
           int rank_;
           MPI_Comm_rank(comm, &rank_);
@@ -94,7 +101,7 @@ namespace internal
           MPI_Comm_size(comm_shared, &size_shared);
 
           // gather ranks
-          std::vector<unsigned int> ranks_shared(size_shared);
+          ranks_shared.resize(size_shared);
           MPI_Allgather(&rank,
                         1,
                         MPI_UNSIGNED,
@@ -102,6 +109,7 @@ namespace internal
                         1,
                         MPI_INT,
                         comm_shared);
+#endif
 
           return ranks_shared;
         }
@@ -124,9 +132,10 @@ namespace internal
 
         (void)is_locally_owned;
         (void)is_locally_ghost;
+        (void)ghost_indices_within_larger_ghost_set;
 #else
-        this->n_local_elements  = is_locally_owned.n_elements();
-        this->n_ghost_elements  = is_locally_ghost.n_elements();
+        this->n_local_elements = is_locally_owned.n_elements();
+        this->n_ghost_elements = is_locally_ghost.n_elements();
         this->n_global_elements = is_locally_owned.size();
 
         if (Utilities::MPI::job_supports_mpi() == false)
@@ -622,7 +631,7 @@ namespace internal
                         MPI_STATUS_IGNORE);
 
             const auto s = split(i);
-            i            = s.second;
+            i = s.second;
 
             if (s.first == 0)
               {
@@ -830,7 +839,7 @@ namespace internal
                         MPI_STATUS_IGNORE);
 
             const auto &s = split(i);
-            i             = s.second;
+            i = s.second;
 
             if (s.first == 0)
               {
@@ -1113,6 +1122,10 @@ namespace internal
       void
       Contiguous::sync(const unsigned int tag) const
       {
+#ifndef DEAL_II_WITH_MPI
+        Assert(false, ExcNeedsMPI());
+        (void)tag;
+#else
         std::vector<MPI_Request> req(sm_targets.size() + sm_sources.size());
 
         for (unsigned int i = 0; i < sm_targets.size(); i++)
@@ -1140,6 +1153,7 @@ namespace internal
           }
 
         MPI_Waitall(req.size(), req.data(), MPI_STATUSES_IGNORE);
+#endif
       }
 
 
@@ -1151,6 +1165,11 @@ namespace internal
         MPI_Allgather_Pairs(const std::vector<std::pair<T, U>> &src,
                             const MPI_Comm &                    comm)
         {
+#ifndef DEAL_II_WITH_MPI
+          Assert(false, ExcNeedsMPI());
+
+          return {};
+#else
           int size;
           MPI_Comm_size(comm, &size);
 
@@ -1164,7 +1183,7 @@ namespace internal
             }
 
 
-          unsigned int     len_local = src_1.size();
+          unsigned int len_local = src_1.size();
           std::vector<int> len_global(
             size); // actually unsigned int but MPI wants int
           MPI_Allgather(&len_local,
@@ -1215,6 +1234,7 @@ namespace internal
             dst[i] = {dst_1[i], dst_2[i]};
 
           return dst;
+#endif
         }
       } // namespace internal
 
@@ -1230,9 +1250,18 @@ namespace internal
         const MPI_Comm comm_sm,
         const bool     do_buffering)
       {
+#ifndef DEAL_II_WITH_MPI
+        Assert(false, ExcNeedsMPI());
+        (void)local_cells;
+        (void)local_ghost_faces;
+        (void)comm;
+        (void)comm_sm;
+        (void)do_buffering;
+#else
+
         // fill some information needed by PartitionerBase
-        this->comm             = comm;
-        this->comm_sm          = comm_sm;
+        this->comm = comm;
+        this->comm_sm = comm_sm;
         this->n_mpi_processes_ = dealii::Utilities::MPI::n_mpi_processes(comm);
 
         this->do_buffering = do_buffering;
@@ -1257,7 +1286,7 @@ namespace internal
 
         // const auto this->comm_sm  = create_sm(comm);
         const auto sm_procs = internal::procs_of_sm(comm, this->comm_sm);
-        const auto sm_rank  = [&]() {
+        const auto sm_rank = [&]() {
           const auto ptr =
             std::find(sm_procs.begin(),
                       sm_procs.end(),
@@ -1361,13 +1390,13 @@ namespace internal
                 },
                 [&](const auto &other_rank,
                     const auto &buffer_recv,
-                    auto &      request_buffer) {
+                    auto &request_buffer) {
                   request_buffer.resize(buffer_recv.size());
 
                   for (unsigned int i = 0; i < buffer_recv.size(); i++)
                     {
                       const auto value = buffer_recv[i];
-                      const auto ptr   = std::find(local_cells.begin(),
+                      const auto ptr = std::find(local_cells.begin(),
                                                  local_cells.end(),
                                                  value);
 
@@ -1445,7 +1474,7 @@ namespace internal
               std::pair<dealii::types::global_dof_index, unsigned int>>>
               result(sm_procs.size());
 
-            unsigned int       counter = 0;
+            unsigned int counter = 0;
             const unsigned int faces_per_process =
               (local_ghost_faces_remote_pairs_global.size() + sm_procs.size() -
                1) /
@@ -1632,8 +1661,8 @@ namespace internal
          &sm_rank,
          &comm,
          &dofs_per_ghost,
-         this](auto &      requests_from_relevant_precomp,
-               auto &      receive_info,
+         this](auto &requests_from_relevant_precomp,
+               auto &receive_info,
                const auto &maps,
                const auto &maps_ghost) {
           // determine of the owner of cells of remote ghost faces
@@ -1693,7 +1722,7 @@ namespace internal
                                               dealii::types::global_dof_index>>>
               send_data(send_ranks.size());
 
-            unsigned int index      = 0;
+            unsigned int index = 0;
             unsigned int index_cell = dealii::numbers::invalid_unsigned_int;
 
             for (const auto &ghost_faces :
@@ -1746,12 +1775,12 @@ namespace internal
             {
               // wait for any request
               MPI_Status status;
-              auto       ierr = MPI_Probe(MPI_ANY_SOURCE, 105, comm, &status);
+              auto ierr = MPI_Probe(MPI_ANY_SOURCE, 105, comm, &status);
               AssertThrowMPI(ierr);
 
               // determine number of ghost faces * 2 (since we are considering
               // pairs)
-              int                             len;
+              int len;
               dealii::types::global_dof_index dummy;
               MPI_Get_count(&status,
                             dealii::Utilities::MPI::internal::mpi_type_id(
@@ -1784,7 +1813,7 @@ namespace internal
                 for (unsigned int i = 0; i < static_cast<unsigned int>(len) / 2;
                      i++)
                   {
-                    const CellIdType   cell    = recv_data[i].first;
+                    const CellIdType cell = recv_data[i].first;
                     const unsigned int face_no = recv_data[i].second;
 
                     const auto ptr = maps.find(cell);
@@ -1945,6 +1974,7 @@ namespace internal
             AssertThrow(sm_recv_rank.size() == sm_targets.size(),
                         dealii::StandardExceptions::ExcNotImplemented());
           }
+#endif
       }
 
 
@@ -1959,6 +1989,15 @@ namespace internal
         const dealii::ArrayView<Number> &                   temporary_storage,
         std::vector<MPI_Request> &                          requests) const
       {
+#ifndef DEAL_II_WITH_MPI
+        Assert(false, ExcNeedsMPI());
+        (void)locally_owned_array;
+        (void)communication_channel;
+        (void)shared_arrays;
+        (void)ghost_array;
+        (void)temporary_storage;
+        (void)requests;
+#else
         (void)shared_arrays;
 
         AssertThrow(temporary_storage.size() ==
@@ -2040,6 +2079,7 @@ namespace internal
                        requests.data() + c + sm_sources.size() +
                          sm_targets.size() + recv_ranks.size());
           }
+#endif
       }
 
 
@@ -2052,6 +2092,13 @@ namespace internal
         const dealii::ArrayView<Number> &                   ghost_array,
         std::vector<MPI_Request> &                          requests) const
       {
+#ifndef DEAL_II_WITH_MPI
+        Assert(false, ExcNeedsMPI());
+        (void)locally_owned_array;
+        (void)shared_arrays;
+        (void)ghost_array;
+        (void)requests;
+#else
         (void)locally_owned_array;
 
         AssertDimension(requests.size(),
@@ -2063,7 +2110,7 @@ namespace internal
             // update ghost values of shared cells (if requested)
             for (unsigned int c = 0; c < sm_sources.size(); c++)
               {
-                int        i;
+                int i;
                 MPI_Status status;
                 const auto ierr =
                   MPI_Waitany(sm_sources.size(), requests.data(), &i, &status);
@@ -2093,6 +2140,7 @@ namespace internal
           }
 
         MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
+#endif
       }
 
 
@@ -2105,6 +2153,13 @@ namespace internal
         const dealii::ArrayView<Number> &                   ghost_array,
         std::vector<MPI_Request> &                          requests) const
       {
+#ifndef DEAL_II_WITH_MPI
+        Assert(false, ExcNeedsMPI());
+        (void)locally_owned_array;
+        (void)shared_arrays;
+        (void)ghost_array;
+        (void)requests;
+#else
         (void)locally_owned_array;
 
         AssertDimension(requests.size(),
@@ -2116,7 +2171,7 @@ namespace internal
             // update ghost values of shared cells (if requested)
             for (unsigned int c = 0; c < sm_sources.size(); c++)
               {
-                int        i;
+                int i;
                 MPI_Status status;
                 const auto ierr =
                   MPI_Waitany(sm_sources.size(), requests.data(), &i, &status);
@@ -2150,6 +2205,7 @@ namespace internal
                         requests.data(),
                         MPI_STATUSES_IGNORE);
           }
+#endif
       }
 
 
@@ -2165,12 +2221,17 @@ namespace internal
         (void)locally_owned_array;
         (void)shared_arrays;
         (void)ghost_array;
+#ifndef DEAL_II_WITH_MPI
+        Assert(false, ExcNeedsMPI());
+        (void)requests;
+#else
 
         AssertDimension(requests.size(),
                         sm_sources.size() + sm_targets.size() +
                           recv_ranks.size() + send_ranks.size());
 
         MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
+#endif
       }
 
 
@@ -2190,6 +2251,13 @@ namespace internal
         (void)shared_arrays;
         (void)communication_channel;
         (void)ghost_array;
+
+#ifndef DEAL_II_WITH_MPI
+        Assert(false, ExcNeedsMPI());
+        (void)operation;
+        (void)temporary_storage;
+        (void)requests;
+#else
 
         AssertThrow(operation == dealii::VectorOperation::add,
                     dealii::ExcMessage("Not yet implemented."));
@@ -2250,6 +2318,7 @@ namespace internal
                     comm,
                     requests.data() + i + sm_sources.size() +
                       sm_targets.size() + recv_ranks.size());
+#endif
       }
 
 
@@ -2265,6 +2334,16 @@ namespace internal
         std::vector<MPI_Request> &                          requests) const
       {
         (void)ghost_array;
+
+#ifndef DEAL_II_WITH_MPI
+        Assert(false, ExcNeedsMPI());
+
+        (void)operation;
+        (void)locally_owned_array;
+        (void)shared_arrays;
+        (void)temporary_storage;
+        (void)requests;
+#else
 
         AssertThrow(operation == dealii::VectorOperation::add,
                     dealii::ExcMessage("Not yet implemented."));
@@ -2284,7 +2363,7 @@ namespace internal
           {
             for (unsigned int c = 0; c < sm_targets.size(); c++)
               {
-                int        i;
+                int i;
                 MPI_Status status;
                 const auto ierr =
                   MPI_Waitany(sm_targets.size(),
@@ -2319,7 +2398,7 @@ namespace internal
         // 2) receive data and compress for remote faces
         for (unsigned int c = 0; c < send_ranks.size(); c++)
           {
-            int        r;
+            int r;
             MPI_Status status;
             const auto ierr =
               MPI_Waitany(send_ranks.size(),
@@ -2353,6 +2432,7 @@ namespace internal
           }
 
         MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
+#endif
       }
 
 
