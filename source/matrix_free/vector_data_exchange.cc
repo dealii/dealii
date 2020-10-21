@@ -125,8 +125,8 @@ namespace internal
         (void)is_locally_owned;
         (void)is_locally_ghost;
 #else
-        this->n_local_elements = is_locally_owned.n_elements();
-        this->n_ghost_elements = is_locally_ghost.n_elements();
+        this->n_local_elements  = is_locally_owned.n_elements();
+        this->n_ghost_elements  = is_locally_ghost.n_elements();
         this->n_global_elements = is_locally_owned.size();
 
         if (Utilities::MPI::job_supports_mpi() == false)
@@ -577,12 +577,21 @@ namespace internal
               data_others[recv_sm_ranks[i]].data();
             Number *__restrict__ data_this_ptr = ghost_array.data();
 
-            for (unsigned int j = recv_sm_ptr[i], k = recv_sm_offset[i];
-                 j < recv_sm_ptr[i + 1];
-                 j++)
-              for (unsigned int l = 0; l < recv_sm_len[j]; l++, k++)
-                data_this_ptr[k - n_local_elements] =
-                  data_others_ptr[recv_sm_indices[j] + l];
+            for (unsigned int lo = recv_sm_ptr[i],
+                              k  = recv_sm_offset[i],
+                              li = 0;
+                 lo < recv_sm_ptr[i + 1];)
+              {
+                for (; li < recv_sm_len[lo]; ++li, ++k)
+                  data_this_ptr[k - n_local_elements] =
+                    data_others_ptr[recv_sm_indices[lo] + li];
+
+                if (li == recv_sm_len[lo])
+                  {
+                    lo++;   // increment outer counter
+                    li = 0; // reset inner counter
+                  }
+              }
           }
         // std::cout << "AA2_" << std::endl;
 
