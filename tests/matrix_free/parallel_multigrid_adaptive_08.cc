@@ -166,8 +166,8 @@ private:
            ExcMessage("The vector passed to the vmult() function does not have "
                       "the correct size for compatibility with MatrixFree."));
     LinearAlgebra::distributed::Vector<Number> copy_vec(vec);
-    const_cast<LinearAlgebra::distributed::Vector<Number> &>(vec).reinit(
-      this->data->get_dof_info(0).vector_partitioner);
+    this->data->initialize_dof_vector(
+      const_cast<LinearAlgebra::distributed::Vector<Number> &>(vec), 0);
     const_cast<LinearAlgebra::distributed::Vector<Number> &>(vec)
       .copy_locally_owned_data_from(copy_vec);
   }

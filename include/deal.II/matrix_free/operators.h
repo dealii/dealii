@@ -1385,8 +1385,9 @@ namespace MatrixFreeOperators
         // lost
         LinearAlgebra::distributed::Vector<Number> copy_vec(
           BlockHelper::subblock(src, i));
-        BlockHelper::subblock(const_cast<VectorType &>(src), i)
-          .reinit(data->get_dof_info(mf_component).vector_partitioner);
+        this->data->initialize_dof_vector(
+          BlockHelper::subblock(const_cast<VectorType &>(src), i),
+          mf_component);
         BlockHelper::subblock(const_cast<VectorType &>(src), i)
           .copy_locally_owned_data_from(copy_vec);
       }
