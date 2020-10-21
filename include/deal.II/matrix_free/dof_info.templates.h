@@ -473,7 +473,7 @@ namespace internal
                         (cell_active_fe_index.size() == 0 ||
                          dofs_per_cell.size() == 1) ?
                           0 :
-                          cell_active_fe_index[i];
+                          cell_active_fe_index[boundary_cells[i]];
                       AssertIndexRange(fe_index, dofs_per_cell.size());
                       const unsigned int *row_end =
                         data_ptr + dofs_per_cell[fe_index];
