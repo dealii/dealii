@@ -287,7 +287,7 @@ namespace BlockMatrixIterators
 
 
 /**
- * Blocked matrix class. The behaviour of objects of this type is almost as
+ * Blocked matrix class. The behavior of objects of this type is almost as
  * for the usual matrix objects, with most of the functions being implemented
  * in both classes. The main difference is that the matrix represented by this
  * object is composed of an array of matrices (e.g. of type

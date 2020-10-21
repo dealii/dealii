@@ -410,7 +410,7 @@ namespace SUNDIALS
        * a parameter file using `prm`. The values of the parameter will be
        * updated whenever the content of `prm` is updated.
        *
-       * Make sure that this class lives longer than `prm`. Undefined behaviour
+       * Make sure that this class lives longer than `prm`. Undefined behavior
        * will occur if you destroy this class, and then parse a parameter file
        * using `prm`.
        */

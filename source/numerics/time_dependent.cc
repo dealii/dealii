@@ -816,7 +816,7 @@ TimeStepBase_Tria<dim>::refine_grid(const RefinementData refinement_data)
   // refinement; in this case it often
   // happens that the number of cells
   // does not grow between sweeps, which
-  // clearly is not the wanted behaviour)
+  // clearly is not the wanted behavior)
   //
   // however, if we do not do anything, we
   // can get into trouble somewhen later.

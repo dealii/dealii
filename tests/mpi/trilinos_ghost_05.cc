@@ -15,7 +15,7 @@
 
 
 
-// check correct behaviour of Trilinos ghosted vectors
+// check correct behavior of Trilinos ghosted vectors
 // check if assignment from a normal vector works correctly and updates the
 // ghost values
 

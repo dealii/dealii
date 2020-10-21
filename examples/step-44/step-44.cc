@@ -488,7 +488,7 @@ namespace Step44
 
   // As discussed in the Introduction, Neo-Hookean materials are a type of
   // hyperelastic materials.  The entire domain is assumed to be composed of a
-  // compressible neo-Hookean material.  This class defines the behaviour of
+  // compressible neo-Hookean material.  This class defines the behavior of
   // this material within a three-field formulation.  Compressible neo-Hookean
   // materials can be described by a strain-energy function (SEF) $ \Psi =
   // \Psi_{\text{iso}}(\overline{\mathbf{b}}) + \Psi_{\text{vol}}(\widetilde{J})

@@ -223,11 +223,11 @@ DEAL_II_NAMESPACE_OPEN
  * a preconditioner then the preconditioning operation is not a linear
  * operation. Here a flexible solver like SolverFGMRES (flexible GMRES) is
  * best employed as an outer solver in order to deal with the variable
- * behaviour of the preconditioner. Otherwise the iterative solver can
+ * behavior of the preconditioner. Otherwise the iterative solver can
  * stagnate somewhere near the tolerance of the preconditioner or generally
  * behave erratically. Alternatively, using a ReductionControl would ensure
  * that the preconditioner always solves to the same tolerance, thereby
- * rendering its behaviour constant.
+ * rendering its behavior constant.
  *
  * Further examples of this functionality can be found in the test-suite, such
  * as <code>tests/lac/schur_complement_01.cc</code> . The solution of a multi-

@@ -15,7 +15,7 @@
 
 
 
-// check correct behaviour of Trilinos ghosted vectors
+// check correct behavior of Trilinos ghosted vectors
 
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
