@@ -593,15 +593,15 @@ namespace internal
                         send_sm_ranks.size() + recv_sm_ranks.size() +
                           recv_remote_ranks.size() + send_remote_ranks.size());
 
-        const auto split = [&](const unsigned int i) {
+        const auto split =
+          [&](const unsigned int i) -> std::pair<unsigned int, unsigned int> {
           AssertIndexRange(i,
                            (recv_sm_ranks.size() + recv_remote_ranks.size()));
 
           if (i < recv_sm_ranks.size())
-            return std::pair<unsigned int, unsigned int>{0, i};
+            return {0, i};
           else
-            return std::pair<unsigned int, unsigned int>{
-              1, i - recv_sm_ranks.size()};
+            return {1, i - recv_sm_ranks.size()};
         };
 
         for (unsigned int c = 0;
@@ -792,19 +792,18 @@ namespace internal
                         recv_sm_ranks.size() + send_sm_ranks.size() +
                           recv_remote_ranks.size() + send_remote_ranks.size());
 
-        const auto split = [&](const unsigned int i) {
+        const auto split =
+          [&](const unsigned int i) -> std::pair<unsigned int, unsigned int> {
           AssertIndexRange(i,
                            (send_sm_ranks.size() + recv_remote_ranks.size() +
                             send_remote_ranks.size()));
 
           if (i < send_sm_ranks.size())
-            return std::pair<unsigned int, unsigned int>{0, i};
+            return {0, i};
           else if (i < (send_sm_ranks.size() + recv_remote_ranks.size()))
-            return std::pair<unsigned int, unsigned int>{
-              2, i - send_sm_ranks.size()};
+            return {2, i - send_sm_ranks.size()};
           else
-            return std::pair<unsigned int, unsigned int>{
-              1, i - send_sm_ranks.size() - recv_remote_ranks.size()};
+            return {1, i - send_sm_ranks.size() - recv_remote_ranks.size()};
         };
 
         for (unsigned int c = 0;
