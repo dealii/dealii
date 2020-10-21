@@ -440,6 +440,32 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpaceType>
+    void
+    Vector<Number, MemorySpaceType>::reinit(
+      const types::global_dof_index local_size,
+      const types::global_dof_index ghost_size,
+      const MPI_Comm                comm)
+    {
+      clear_mpi_requests();
+
+      // check whether we need to reallocate
+      resize_val(local_size + ghost_size);
+
+      // delete previous content in import data
+      import_data.values.reset();
+      import_data.values_dev.reset();
+
+      // create partitioner
+      partitioner = std::make_shared<Utilities::MPI::Partitioner>(local_size,
+                                                                  ghost_size,
+                                                                  comm);
+
+      this->operator=(Number());
+    }
+
+
+
+    template <typename Number, typename MemorySpaceType>
     template <typename Number2>
     void
     Vector<Number, MemorySpaceType>::reinit(
