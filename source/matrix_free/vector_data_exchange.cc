@@ -788,15 +788,22 @@ namespace internal
                   const_cast<Number *>(data_others[send_sm_ranks[i]].data());
                 Number *__restrict__ data_this_ptr = data_this.data();
 
-                for (unsigned int j = send_sm_ptr[i], k = send_sm_offset[i];
-                     j < send_sm_ptr[i + 1];
-                     j++)
+                for (unsigned int lo = send_sm_ptr[i],
+                                  k  = send_sm_offset[i],
+                                  li = 0;
+                     lo < send_sm_ptr[i + 1];)
                   {
-                    for (unsigned int l = 0; l < send_sm_len[j]; l++, k++)
+                    for (; li < send_sm_len[lo]; ++li, ++k)
                       {
-                        data_this_ptr[send_sm_indices[j] + l] +=
+                        data_this_ptr[send_sm_indices[lo] + li] +=
                           data_others_ptr[k];
                         data_others_ptr[k] = 0.0;
+                      }
+
+                    if (li == send_sm_len[lo])
+                      {
+                        lo++;   // increment outer counter
+                        li = 0; // reset inner counter
                       }
                   }
                 // std::cout << "AA4_aa" << std::endl;
