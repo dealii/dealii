@@ -2994,14 +2994,45 @@ namespace internal
                     .component_dof_indices_offset[active_fe_index]
                                                  [first_selected_component];
 
+                const unsigned int n_filled_lanes =
+                  dof_info.n_vectorization_lanes_filled[dof_access_index][cell];
+
+                const bool vectorization_possible =
+                  (n_face_orientations == 1) &&
+                  (n_filled_lanes == VectorizedArrayType::size());
+
+                std::array<Number2_ *, VectorizedArrayType::size()>
+                  vector_ptrs = {};
+
+                if (vectorization_possible == false)
+                  {
+                    if (n_face_orientations == 1)
+                      {
+                        for (unsigned int v = 0; v < n_filled_lanes; ++v)
+                          vector_ptrs[v] = vector_ptr + indices[v];
+                      }
+                    else if (n_face_orientations == VectorizedArrayType::size())
+                      {
+                        for (unsigned int v = 0;
+                             v < VectorizedArrayType::size();
+                             ++v)
+                          if (cells[v] != numbers::invalid_unsigned_int)
+                            vector_ptrs[v] =
+                              vector_ptr +
+                              dof_info.dof_indices_contiguous[dof_access_index]
+                                                             [cells[v]];
+                      }
+                    else
+                      {
+                        Assert(false, ExcNotImplemented());
+                      }
+                  }
+
                 if (do_gradients == true &&
                     data.element_type ==
                       MatrixFreeFunctions::tensor_symmetric_hermite)
                   {
-                    if (n_face_orientations == 1 &&
-                        dof_info.n_vectorization_lanes_filled[dof_access_index]
-                                                             [cell] ==
-                          VectorizedArrayType::size())
+                    if (vectorization_possible)
                       for (unsigned int i = 0; i < dofs_per_face; ++i)
                         {
                           const unsigned int ind1 =
@@ -3028,16 +3059,11 @@ namespace internal
                             index_array_hermite[0][2 * i + 1];
                           const unsigned int i_ = reorientate(0, i);
 
-                          const unsigned int n_filled_lanes =
-                            dof_info
-                              .n_vectorization_lanes_filled[dof_access_index]
-                                                           [cell];
-
                           for (unsigned int v = 0; v < n_filled_lanes; ++v)
                             proc.hermite_grad(temp1[i_][v],
                                               temp1[i_ + dofs_per_face][v],
-                                              vector_ptr[ind1 + indices[v]],
-                                              vector_ptr[ind2 + indices[v]],
+                                              vector_ptrs[v][ind1],
+                                              vector_ptrs[v][ind2],
                                               grad_weight[v]);
 
                           if (integrate == false)
@@ -3051,31 +3077,19 @@ namespace internal
                         }
                     else
                       {
-                        Assert(false, ExcNotImplemented());
-
-                        const unsigned int n_filled_lanes =
-                          dof_info
-                            .n_vectorization_lanes_filled[dof_access_index]
-                                                         [cell];
-
                         for (unsigned int v = 0; v < n_filled_lanes; ++v)
                           for (unsigned int i = 0; i < dofs_per_face; ++i)
                             proc.hermite_grad(
                               temp1[reorientate(v, i)][v],
                               temp1[reorientate(v, i) + dofs_per_face][v],
-                              vector_ptr[index_array_hermite[v][2 * i] +
-                                         indices[v]],
-                              vector_ptr[index_array_hermite[v][2 * i + 1] +
-                                         indices[v]],
+                              vector_ptrs[v][index_array_hermite[v][2 * i]],
+                              vector_ptrs[v][index_array_hermite[v][2 * i + 1]],
                               grad_weight[v]);
                       }
                   }
                 else
                   {
-                    if (n_face_orientations == 1 &&
-                        dof_info.n_vectorization_lanes_filled[dof_access_index]
-                                                             [cell] ==
-                          VectorizedArrayType::size())
+                    if (vectorization_possible)
                       for (unsigned int i = 0; i < dofs_per_face; ++i)
                         {
                           const unsigned int ind = index_array_nodal[0][i];
@@ -3091,14 +3105,8 @@ namespace internal
                           const unsigned int ind = index_array_nodal[0][i];
                           const unsigned int i_  = reorientate(0, i);
 
-                          const unsigned int n_filled_lanes =
-                            dof_info
-                              .n_vectorization_lanes_filled[dof_access_index]
-                                                           [cell];
-
                           for (unsigned int v = 0; v < n_filled_lanes; ++v)
-                            proc.value(temp1[i_][v],
-                                       vector_ptr[ind + indices[v]]);
+                            proc.value(temp1[i_][v], vector_ptrs[v][ind]);
 
                           if (integrate == false)
                             for (unsigned int v = n_filled_lanes;
@@ -3115,9 +3123,7 @@ namespace internal
                             if (cells[v] != numbers::invalid_unsigned_int)
                               proc.value(
                                 temp1[reorientate(v, i)][v],
-                                vector_ptr[index_array_nodal[v][i] +
-                                           dof_info.dof_indices_contiguous
-                                             [dof_access_index][cells[v]]]);
+                                vector_ptrs[v][index_array_nodal[v][i]]);
                         }
                   }
               }
