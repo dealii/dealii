@@ -723,18 +723,27 @@ MappingQGeneric<dim, spacedim>::transform_points_real_to_unit_cell(
   const ArrayView<const Point<spacedim>> &                    real_points,
   const ArrayView<Point<dim>> &                               unit_points) const
 {
+  // Go to base class functions for dim < spacedim because it is not yet
+  // implemented with optimized code.
+  if (dim < spacedim)
+    {
+      Mapping<dim, spacedim>::transform_points_real_to_unit_cell(cell,
+                                                                 real_points,
+                                                                 unit_points);
+      return;
+    }
+
   AssertDimension(real_points.size(), unit_points.size());
   const std::vector<Point<spacedim>> support_points =
     this->compute_mapping_support_points(cell);
 
   // From the given (high-order) support points, now only pick the first
   // 2^dim points and construct an affine approximation from those.
-  const std::pair<DerivativeForm<1, dim, spacedim>, Tensor<1, spacedim>>
-    affine_factors = GridTools::affine_cell_approximation<dim>(
-      ArrayView<const Point<spacedim>>(support_points.data(),
-                                       GeometryInfo<dim>::vertices_per_cell));
-  const DerivativeForm<1, spacedim, dim> A_inv =
-    affine_factors.first.covariant_form().transpose();
+  internal::MappingQGenericImplementation::
+    InverseQuadraticApproximation<dim, spacedim>
+      inverse_approximation(support_points,
+                            line_support_points,
+                            renumber_lexicographic_to_hierarchic);
 
   const unsigned int n_points = real_points.size();
   const unsigned int n_lanes  = VectorizedArray<double>::size();
@@ -753,25 +762,11 @@ MappingQGeneric<dim, spacedim>::transform_points_real_to_unit_cell(
             for (unsigned int d = 0; d < spacedim; ++d)
               p_vec[d][j] = real_points[i][d];
 
-        // Compute an initial guess by inverting the affine approximation
-        // A * x_unit + b = x_real
-        Tensor<1, spacedim, VectorizedArray<double>> rhs;
-        for (unsigned int d = 0; d < spacedim; ++d)
-          rhs[d] = affine_factors.second[d];
-        rhs = p_vec - rhs;
-
-        Point<dim, VectorizedArray<double>> initial_guess;
-        for (unsigned int d = 0; d < dim; ++d)
-          {
-            initial_guess[d] = A_inv[d][0] * rhs[0];
-            for (unsigned int e = 1; e < spacedim; ++e)
-              initial_guess[d] += A_inv[d][e] * rhs[e];
-          }
         Point<dim, VectorizedArray<double>> unit_point =
           internal::MappingQGenericImplementation::
             do_transform_real_to_unit_cell_internal<dim, spacedim>(
               p_vec,
-              initial_guess,
+              inverse_approximation.compute(p_vec),
               support_points,
               polynomials_1d,
               renumber_lexicographic_to_hierarchic);
@@ -786,8 +781,7 @@ MappingQGeneric<dim, spacedim>::transform_points_real_to_unit_cell(
             unit_points[i + j] = internal::MappingQGenericImplementation::
               do_transform_real_to_unit_cell_internal<dim, spacedim>(
                 real_points[i + j],
-                Point<dim>(apply_transformation(
-                  A_inv, real_points[i + j] - affine_factors.second)),
+                inverse_approximation.compute(real_points[i + j]),
                 support_points,
                 polynomials_1d,
                 renumber_lexicographic_to_hierarchic);
@@ -799,8 +793,7 @@ MappingQGeneric<dim, spacedim>::transform_points_real_to_unit_cell(
       unit_points[i] = internal::MappingQGenericImplementation::
         do_transform_real_to_unit_cell_internal<dim, spacedim>(
           real_points[i],
-          Point<dim>(apply_transformation(
-            A_inv, real_points[i] - affine_factors.second)),
+          inverse_approximation.compute(real_points[i]),
           support_points,
           polynomials_1d,
           renumber_lexicographic_to_hierarchic);
