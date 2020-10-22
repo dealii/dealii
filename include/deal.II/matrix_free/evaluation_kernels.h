@@ -2682,7 +2682,7 @@ namespace internal
     for (unsigned int comp = 0; comp < n_components; ++comp)
       {
         if (integrate)
-          proc.function_0(temp1, comp);
+          proc.in_face_operation(temp1, comp);
 
         // we can only use the fast functions if we know the polynomial degree
         // as a template parameter (fe_degree != -1), and it only makes sense
@@ -2733,7 +2733,7 @@ namespace internal
                             AssertIndexRange(ind2,
                                              data.dofs_per_component_on_cell);
                             const unsigned int i_ = reorientate(0, i);
-                            proc.function_1a(
+                            proc.hermite_grad_vectorized(
                               temp1[i_],
                               temp1[i_ + dofs_per_face],
                               vector_ptr + ind1 * VectorizedArrayType::size(),
@@ -2754,10 +2754,9 @@ namespace internal
                           {
                             const unsigned int i_  = reorientate(0, i);
                             const unsigned int ind = index_array_nodal[0][i];
-                            proc.function_1b(temp1[i_],
-                                             vector_ptr +
-                                               ind *
-                                                 VectorizedArrayType::size());
+                            proc.value_vectorized(
+                              temp1[i_],
+                              vector_ptr + ind * VectorizedArrayType::size());
                           }
                         else
                           {
@@ -2802,13 +2801,14 @@ namespace internal
                             const unsigned int ind2 =
                               index_array_hermite[0][2 * i + 1] *
                               VectorizedArrayType::size();
-                            proc.function_2a(temp1[i_],
-                                             temp1[i_ + dofs_per_face],
-                                             vector_ptr + ind1,
-                                             vector_ptr + ind2,
-                                             grad_weight,
-                                             indices,
-                                             indices);
+                            proc.hermite_grad_vectorized_indexed(
+                              temp1[i_],
+                              temp1[i_ + dofs_per_face],
+                              vector_ptr + ind1,
+                              vector_ptr + ind2,
+                              grad_weight,
+                              indices,
+                              indices);
                           }
                         else
                           {
@@ -2826,9 +2826,9 @@ namespace internal
                             const unsigned int ind =
                               index_array_nodal[0][i] *
                               VectorizedArrayType::size();
-                            proc.function_2b(temp1[i_],
-                                             vector_ptr + ind,
-                                             indices);
+                            proc.value_vectorized_indexed(temp1[i_],
+                                                          vector_ptr + ind,
+                                                          indices);
                           }
                         else
                           {
@@ -2889,13 +2889,14 @@ namespace internal
                                   indices[v] +
                                   index_array_hermite[0 /*TODO*/][2 * i + 1] *
                                     strides[v];
-                              proc.function_2a(temp1[i_],
-                                               temp1[i_ + dofs_per_face],
-                                               global_vector_ptr,
-                                               global_vector_ptr,
-                                               grad_weight,
-                                               ind1,
-                                               ind2);
+                              proc.hermite_grad_vectorized_indexed(
+                                temp1[i_],
+                                temp1[i_ + dofs_per_face],
+                                global_vector_ptr,
+                                global_vector_ptr,
+                                grad_weight,
+                                ind1,
+                                ind2);
                             }
                           else
                             {
@@ -2914,7 +2915,7 @@ namespace internal
                               const unsigned int i_ =
                                 reorientate(n_face_orientations == 1 ? 0 : v,
                                             i);
-                              proc.function_3a(
+                              proc.hermite_grad(
                                 temp1[i_][v],
                                 temp1[i_ + dofs_per_face][v],
                                 global_vector_ptr
@@ -2948,9 +2949,9 @@ namespace internal
                                 ind[v] = indices[v] +
                                          index_array_nodal[0][i] * strides[v];
                               const unsigned int i_ = reorientate(0, i);
-                              proc.function_2b(temp1[i_],
-                                               global_vector_ptr,
-                                               ind);
+                              proc.value_vectorized_indexed(temp1[i_],
+                                                            global_vector_ptr,
+                                                            ind);
                             }
                           else
                             {
@@ -2965,7 +2966,7 @@ namespace internal
 
                         for (unsigned int v = 0; v < n_filled_lanes; ++v)
                           for (unsigned int i = 0; i < dofs_per_face; ++i)
-                            proc.function_3b(
+                            proc.value(
                               temp1[reorientate(
                                 n_face_orientations == 1 ? 0 : v, i)][v],
                               global_vector_ptr
@@ -3009,13 +3010,14 @@ namespace internal
                             index_array_hermite[0][2 * i + 1];
                           const unsigned int i_ = reorientate(0, i);
 
-                          proc.function_2a(temp1[i_],
-                                           temp1[i_ + dofs_per_face],
-                                           vector_ptr + ind1,
-                                           vector_ptr + ind2,
-                                           grad_weight,
-                                           indices,
-                                           indices);
+                          proc.hermite_grad_vectorized_indexed(
+                            temp1[i_],
+                            temp1[i_ + dofs_per_face],
+                            vector_ptr + ind1,
+                            vector_ptr + ind2,
+                            grad_weight,
+                            indices,
+                            indices);
                         }
                     else if (n_face_orientations == 1)
                       for (unsigned int i = 0; i < dofs_per_face; ++i)
@@ -3032,11 +3034,11 @@ namespace internal
                                                            [cell];
 
                           for (unsigned int v = 0; v < n_filled_lanes; ++v)
-                            proc.function_3a(temp1[i_][v],
-                                             temp1[i_ + dofs_per_face][v],
-                                             vector_ptr[ind1 + indices[v]],
-                                             vector_ptr[ind2 + indices[v]],
-                                             grad_weight[v]);
+                            proc.hermite_grad(temp1[i_][v],
+                                              temp1[i_ + dofs_per_face][v],
+                                              vector_ptr[ind1 + indices[v]],
+                                              vector_ptr[ind2 + indices[v]],
+                                              grad_weight[v]);
 
                           if (integrate == false)
                             for (unsigned int v = n_filled_lanes;
@@ -3058,7 +3060,7 @@ namespace internal
 
                         for (unsigned int v = 0; v < n_filled_lanes; ++v)
                           for (unsigned int i = 0; i < dofs_per_face; ++i)
-                            proc.function_3a(
+                            proc.hermite_grad(
                               temp1[reorientate(v, i)][v],
                               temp1[reorientate(v, i) + dofs_per_face][v],
                               vector_ptr[index_array_hermite[v][2 * i] +
@@ -3079,9 +3081,9 @@ namespace internal
                           const unsigned int ind = index_array_nodal[0][i];
                           const unsigned int i_  = reorientate(0, i);
 
-                          proc.function_2b(temp1[i_],
-                                           vector_ptr + ind,
-                                           indices);
+                          proc.value_vectorized_indexed(temp1[i_],
+                                                        vector_ptr + ind,
+                                                        indices);
                         }
                     else if (n_face_orientations == 1)
                       for (unsigned int i = 0; i < dofs_per_face; ++i)
@@ -3095,8 +3097,8 @@ namespace internal
                                                            [cell];
 
                           for (unsigned int v = 0; v < n_filled_lanes; ++v)
-                            proc.function_3b(temp1[i_][v],
-                                             vector_ptr[ind + indices[v]]);
+                            proc.value(temp1[i_][v],
+                                       vector_ptr[ind + indices[v]]);
 
                           if (integrate == false)
                             for (unsigned int v = n_filled_lanes;
@@ -3111,7 +3113,7 @@ namespace internal
                                v < VectorizedArrayType::size();
                                ++v)
                             if (cells[v] != numbers::invalid_unsigned_int)
-                              proc.function_3b(
+                              proc.value(
                                 temp1[reorientate(v, i)][v],
                                 vector_ptr[index_array_nodal[v][i] +
                                            dof_info.dof_indices_contiguous
@@ -3130,7 +3132,7 @@ namespace internal
                 // for the gather_evaluate path (integrate == false), we
                 // instead want to leave early because we need to get the
                 // vector data from somewhere else
-                proc.function_5(temp1, comp);
+                proc.default_operation(temp1, comp);
                 if (integrate)
                   accesses_global_vector = false;
                 else
@@ -3142,7 +3144,7 @@ namespace internal
             // case 5: default vector access
             AssertDimension(n_face_orientations, 1);
 
-            proc.function_5(temp1, comp);
+            proc.default_operation(temp1, comp);
             if (integrate)
               accesses_global_vector = false;
             else
@@ -3150,7 +3152,7 @@ namespace internal
           }
 
         if (!integrate)
-          proc.function_0(temp1, comp);
+          proc.in_face_operation(temp1, comp);
       }
 
     if (!integrate &&
@@ -3287,13 +3289,12 @@ namespace internal
 
       template <typename T0, typename T1, typename T2>
       void
-      function_1a(T0 &      temp_1,
-                  T0 &      temp_2,
-                  const T1  src_ptr_1,
-                  const T1  src_ptr_2,
-                  const T2 &grad_weight)
+      hermite_grad_vectorized(T0 &      temp_1,
+                              T0 &      temp_2,
+                              const T1  src_ptr_1,
+                              const T1  src_ptr_2,
+                              const T2 &grad_weight)
       {
-        // case 1a)
         do_vectorized_read(src_ptr_1, temp_1);
         do_vectorized_read(src_ptr_2, temp_2);
         temp_2 = grad_weight * (temp_1 - temp_2);
@@ -3301,23 +3302,21 @@ namespace internal
 
       template <typename T1, typename T2>
       void
-      function_1b(T1 &temp, const T2 src_ptr)
+      value_vectorized(T1 &temp, const T2 src_ptr)
       {
-        // case 1b)
         do_vectorized_read(src_ptr, temp);
       }
 
       template <typename T0, typename T1, typename T2, typename T3>
       void
-      function_2a(T0 &      temp_1,
-                  T0 &      temp_2,
-                  const T1  src_ptr_1,
-                  const T1  src_ptr_2,
-                  const T2 &grad_weight,
-                  const T3 &indices_1,
-                  const T3 &indices_2)
+      hermite_grad_vectorized_indexed(T0 &      temp_1,
+                                      T0 &      temp_2,
+                                      const T1  src_ptr_1,
+                                      const T1  src_ptr_2,
+                                      const T2 &grad_weight,
+                                      const T3 &indices_1,
+                                      const T3 &indices_2)
       {
-        // case 2a)
         do_vectorized_gather(src_ptr_1, indices_1, temp_1);
         do_vectorized_gather(src_ptr_2, indices_2, temp_2);
         temp_2 = grad_weight * (temp_1 - temp_2);
@@ -3325,19 +3324,18 @@ namespace internal
 
       template <typename T0, typename T1, typename T2>
       void
-      function_2b(T0 &temp, const T1 src_ptr, const T2 &indices)
+      value_vectorized_indexed(T0 &temp, const T1 src_ptr, const T2 &indices)
       {
-        // case 2b)
         do_vectorized_gather(src_ptr, indices, temp);
       }
 
       template <typename T0, typename T1, typename T2>
       void
-      function_3a(T0 &      temp_1,
-                  T0 &      temp_2,
-                  const T1 &src_ptr_1,
-                  const T2 &src_ptr_2,
-                  const T2 &grad_weight)
+      hermite_grad(T0 &      temp_1,
+                   T0 &      temp_2,
+                   const T1 &src_ptr_1,
+                   const T2 &src_ptr_2,
+                   const T2 &grad_weight)
       {
         // case 3a)
         temp_1 = src_ptr_1;
@@ -3346,7 +3344,7 @@ namespace internal
 
       template <typename T1, typename T2>
       void
-      function_3b(T1 &temp, const T2 &src_ptr)
+      value(T1 &temp, const T2 &src_ptr)
       {
         // case 3b)
         temp = src_ptr;
@@ -3354,14 +3352,14 @@ namespace internal
 
       template <typename T1>
       void
-      function_5(const T1 &, const unsigned int)
+      default_operation(const T1 &, const unsigned int)
       {
         // case 5)
       }
 
       template <typename T1>
       void
-      function_0(T1 &temp1, const unsigned int comp)
+      in_face_operation(T1 &temp1, const unsigned int comp)
       {
         const unsigned int dofs_per_face =
           fe_degree > -1 ?
@@ -3562,11 +3560,11 @@ namespace internal
 
       template <typename T0, typename T1, typename T2, typename T3, typename T4>
       void
-      function_1a(const T0 &temp_1,
-                  const T1 &temp_2,
-                  T2        dst_ptr_1,
-                  T3        dst_ptr_2,
-                  const T4 &grad_weight)
+      hermite_grad_vectorized(const T0 &temp_1,
+                              const T1 &temp_2,
+                              T2        dst_ptr_1,
+                              T3        dst_ptr_2,
+                              const T4 &grad_weight)
       {
         // case 1a)
         const VectorizedArrayType val  = temp_1 - grad_weight * temp_2;
@@ -3577,7 +3575,7 @@ namespace internal
 
       template <typename T0, typename T1>
       void
-      function_1b(const T0 &temp, T1 dst_ptr)
+      value_vectorized(const T0 &temp, T1 dst_ptr)
       {
         // case 1b)
         do_vectorized_add(temp, dst_ptr);
@@ -3585,13 +3583,13 @@ namespace internal
 
       template <typename T0, typename T1, typename T2, typename T3>
       void
-      function_2a(const T0 &temp_1,
-                  const T0 &temp_2,
-                  T1        dst_ptr_1,
-                  T1        dst_ptr_2,
-                  const T2 &grad_weight,
-                  const T3 &indices_1,
-                  const T3 &indices_2)
+      hermite_grad_vectorized_indexed(const T0 &temp_1,
+                                      const T0 &temp_2,
+                                      T1        dst_ptr_1,
+                                      T1        dst_ptr_2,
+                                      const T2 &grad_weight,
+                                      const T3 &indices_1,
+                                      const T3 &indices_2)
       {
         // case 2a)
         const VectorizedArrayType val  = temp_1 - grad_weight * temp_2;
@@ -3602,7 +3600,7 @@ namespace internal
 
       template <typename T0, typename T1, typename T2>
       void
-      function_2b(const T0 &temp, T1 dst_ptr, const T2 &indices)
+      value_vectorized_indexed(const T0 &temp, T1 dst_ptr, const T2 &indices)
       {
         // case 2b)
         do_vectorized_scatter_add(temp, indices, dst_ptr);
@@ -3610,11 +3608,11 @@ namespace internal
 
       template <typename T0, typename T1, typename T2>
       void
-      function_3a(const T0 &temp_1,
-                  const T0 &temp_2,
-                  T1 &      dst_ptr_1,
-                  T1 &      dst_ptr_2,
-                  const T2 &grad_weight)
+      hermite_grad(const T0 &temp_1,
+                   const T0 &temp_2,
+                   T1 &      dst_ptr_1,
+                   T1 &      dst_ptr_2,
+                   const T2 &grad_weight)
       {
         // case 3a)
         const Number val  = temp_1 - grad_weight * temp_2;
@@ -3625,7 +3623,7 @@ namespace internal
 
       template <typename T0, typename T1>
       void
-      function_3b(const T0 &temp, T1 &dst_ptr)
+      value(const T0 &temp, T1 &dst_ptr)
       {
         // case 3b)
         dst_ptr += temp;
@@ -3633,7 +3631,7 @@ namespace internal
 
       template <typename T0>
       void
-      function_5(const T0 &temp1, const unsigned int comp)
+      default_operation(const T0 &temp1, const unsigned int comp)
       {
         // case 5: default vector access, must be handled separately, just do
         // the face-normal interpolation
@@ -3650,7 +3648,7 @@ namespace internal
 
       template <typename T0>
       void
-      function_0(T0 &temp1, const unsigned int comp)
+      in_face_operation(T0 &temp1, const unsigned int comp)
       {
         const unsigned int dofs_per_face =
           fe_degree > -1 ?
