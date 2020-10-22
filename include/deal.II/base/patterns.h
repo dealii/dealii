@@ -1792,9 +1792,10 @@ namespace Patterns
         auto                     base_p = p->get_base_pattern().clone();
         std::vector<std::string> vec(t.size());
 
-        unsigned int i = 0;
-        for (const auto &entry : t)
-          vec[i++] = Convert<typename T::value_type>::to_string(entry, base_p);
+        std::transform(
+          t.cbegin(), t.cend(), vec.begin(), [&base_p](const auto &entry) {
+            return Convert<typename T::value_type>::to_string(entry, base_p);
+          });
 
         std::string s;
         if (vec.size() > 0)
