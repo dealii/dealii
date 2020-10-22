@@ -3223,14 +3223,13 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
     for (const auto &face : faces)
       {
         out << face->n_vertices();
+        constexpr int face_dim = dim > 1 ? dim - 1 : 1;
         for (const unsigned int i : face->vertex_indices())
           {
             out << ' '
                 << face->vertex_index(GeometryInfo<dim>::vertices_per_face ==
                                           face->n_vertices() ?
-                                        GeometryInfo < (dim > 1) ?
-                                        dim - 1 :
-                                        dim > ::ucd_to_deal[i] :
+                                        GeometryInfo<face_dim>::ucd_to_deal[i] :
                                         i);
           }
         out << '\n';
