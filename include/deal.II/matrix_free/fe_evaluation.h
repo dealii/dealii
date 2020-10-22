@@ -7516,7 +7516,7 @@ FEEvaluation<
 namespace internal
 {
   /**
-   * Implementation for vectors that have the begin() methods.
+   * Implementation for standard vectors (that have the begin() methods).
    */
   template <typename Number,
             typename VectorizedArrayType,
@@ -7573,7 +7573,7 @@ namespace internal
   }
 
   /**
-   * Implementation for all other vectors like block vectors.
+   * Implementation for block vectors.
    */
   template <typename Number,
             typename VectorizedArrayType,
@@ -7711,17 +7711,8 @@ namespace internal
 
   template <typename Number,
             typename VectorType,
-            typename std::enable_if<
-              internal::has_begin<VectorType>::value &&
-                (std::is_same<decltype(std::declval<VectorType>().begin()),
-                              const double *>::value ||
-                 std::is_same<decltype(std::declval<VectorType>().begin()),
-                              double *>::value ||
-                 std::is_same<decltype(std::declval<VectorType>().begin()),
-                              const float *>::value ||
-                 std::is_same<decltype(std::declval<VectorType>().begin()),
-                              float *>::value),
-              VectorType>::type * = nullptr>
+            typename std::enable_if<!IsBlockVector<VectorType>::value,
+                                    VectorType>::type * = nullptr>
   decltype(std::declval<VectorType>().begin())
   get_beginning(VectorType &vec)
   {
@@ -7730,17 +7721,8 @@ namespace internal
 
   template <typename Number,
             typename VectorType,
-            typename std::enable_if<
-              !internal::has_begin<VectorType>::value ||
-                !(std::is_same<decltype(std::declval<VectorType>().begin()),
-                               const double *>::value ||
-                  std::is_same<decltype(std::declval<VectorType>().begin()),
-                               double *>::value ||
-                  std::is_same<decltype(std::declval<VectorType>().begin()),
-                               const float *>::value ||
-                  std::is_same<decltype(std::declval<VectorType>().begin()),
-                               float *>::value),
-              VectorType>::type * = nullptr>
+            typename std::enable_if<IsBlockVector<VectorType>::value,
+                                    VectorType>::type * = nullptr>
   typename VectorType::value_type *
   get_beginning(VectorType &)
   {
