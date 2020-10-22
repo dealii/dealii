@@ -706,7 +706,8 @@ namespace VectorTools
       // If we can, use the matrix-free implementation
       bool use_matrix_free =
         MatrixFree<dim, typename VectorType::value_type>::is_supported(
-          dof.get_fe());
+          dof.get_fe()) &&
+        dof.get_fe().n_base_elements() == 1;
 
       // enforce_zero_boundary and project_to_boundary_first
       // are not yet supported.

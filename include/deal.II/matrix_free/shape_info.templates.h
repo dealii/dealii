@@ -61,12 +61,16 @@ namespace internal
       return a;
     }
 
+
+
     template <typename Number, std::size_t width>
     Number
     get_first_array_element(const VectorizedArray<Number, width> a)
     {
       return a[0];
     }
+
+
 
     template <typename Number>
     ShapeInfo<Number>::ShapeInfo()
@@ -78,6 +82,48 @@ namespace internal
       , n_q_points_face(0)
       , dofs_per_component_on_face(0)
     {}
+
+
+
+    template <typename Number>
+    template <int dim, int spacedim>
+    bool
+    ShapeInfo<Number>::is_supported(const FiniteElement<dim, spacedim> &fe)
+    {
+      if (dim != spacedim)
+        return false;
+
+      for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
+        {
+          const FiniteElement<dim, spacedim> *fe_ptr = &(fe.base_element(base));
+          if (fe_ptr->n_components() != 1)
+            return false;
+
+          // then check if the base element is supported or not
+          if (dynamic_cast<const FE_Poly<dim, spacedim> *>(fe_ptr) != nullptr)
+            {
+              const FE_Poly<dim, spacedim> *fe_poly_ptr =
+                dynamic_cast<const FE_Poly<dim, spacedim> *>(fe_ptr);
+              if (dynamic_cast<const TensorProductPolynomials<dim> *>(
+                    &fe_poly_ptr->get_poly_space()) == nullptr &&
+                  dynamic_cast<const TensorProductPolynomials<
+                      dim,
+                      Polynomials::PiecewisePolynomial<double>> *>(
+                    &fe_poly_ptr->get_poly_space()) == nullptr &&
+                  dynamic_cast<const FE_DGP<dim, spacedim> *>(fe_ptr) ==
+                    nullptr &&
+                  dynamic_cast<const FE_Q_DG0<dim, spacedim> *>(fe_ptr) ==
+                    nullptr)
+                return false;
+            }
+          else
+            return false;
+        }
+
+      // if we arrived here, all base elements were supported so we can
+      // support the present element
+      return true;
+    }
 
 
 
