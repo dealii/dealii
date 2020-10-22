@@ -4597,8 +4597,6 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       n_components_> &                              vectors_sm,
     const std::bitset<VectorizedArrayType::size()> &mask) const
 {
-  (void)vectors_sm; // TODO: use it
-
   // This functions processes the functions read_dof_values,
   // distribute_local_to_global, and set_dof_values with the same code for
   // contiguous cell indices (DG case). The distinction between these three
@@ -4664,6 +4662,96 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   for (unsigned int v = n_filled_lanes; v < VectorizedArrayType::size(); ++v)
     dof_indices[v] = numbers::invalid_unsigned_int;
+
+  if (vectors_sm[0] != nullptr)
+    {
+      const auto compute_vector_ptrs = [&](const unsigned int comp) {
+        std::array<typename VectorType::value_type *,
+                   VectorizedArrayType::size()>
+          vector_ptrs = {};
+
+        (void)comp;
+
+        /*
+        for (unsigned int v = 0; v < n_filled_lanes; ++v)
+          {
+            const auto &temp =
+              this->dof_info->dof_indices_contiguous_sm
+                [ind][this->cell * VectorizedArrayType::size() + v];
+
+            if (temp.first != numbers::invalid_unsigned_int)
+              vector_ptrs[v] = const_cast<typename VectorType::value_type *>(
+                vectors_sm[comp]->operator[](temp.first).data() + temp.second);
+            else
+              vector_ptrs[v] = nullptr;
+          }
+        for (unsigned int v = n_filled_lanes; v < VectorizedArrayType::size();
+             ++v)
+          vector_ptrs[v] = nullptr;
+         */
+
+        return vector_ptrs;
+      };
+
+      if (n_filled_lanes == VectorizedArrayType::size() &&
+          n_lanes == VectorizedArrayType::size())
+        {
+          if (n_components == 1 || n_fe_components == 1)
+            for (unsigned int comp = 0; comp < n_components; ++comp)
+              {
+                auto vector_ptrs = compute_vector_ptrs(comp);
+
+                operation.process_dofs_vectorized_transpose(
+                  this->data->dofs_per_component_on_cell,
+                  vector_ptrs,
+                  values_dofs[comp],
+                  vector_selector);
+              }
+          else
+            {
+              auto vector_ptrs = compute_vector_ptrs(0);
+              operation.process_dofs_vectorized_transpose(
+                this->data->dofs_per_component_on_cell * n_components,
+                vector_ptrs,
+                &values_dofs[0][0],
+                vector_selector);
+            }
+        }
+      else
+        for (unsigned int comp = 0; comp < n_components; ++comp)
+          {
+            auto vector_ptrs = compute_vector_ptrs(comp);
+
+            for (unsigned int i = 0; i < this->data->dofs_per_component_on_cell;
+                 ++i)
+              operation.process_empty(values_dofs[comp][i]);
+
+            if (n_components == 1 || n_fe_components == 1)
+              {
+                for (unsigned int v = 0; v < n_filled_lanes; ++v)
+                  if (mask[v] == true)
+                    for (unsigned int i = 0;
+                         i < this->data->dofs_per_component_on_cell;
+                         ++i)
+                      operation.process_dof(vector_ptrs[v][i],
+                                            values_dofs[comp][i][v]);
+              }
+            else
+              {
+                for (unsigned int v = 0; v < n_filled_lanes; ++v)
+                  if (mask[v] == true)
+                    for (unsigned int i = 0;
+                         i < this->data->dofs_per_component_on_cell;
+                         ++i)
+                      operation.process_dof(
+                        vector_ptrs[v]
+                                   [i + comp * this->data
+                                                 ->dofs_per_component_on_cell],
+                        values_dofs[comp][i][v]);
+              }
+          }
+      return;
+    }
 
   // In the case with contiguous cell indices, we know that there are no
   // constraints and that the indices within each element are contiguous
@@ -4859,7 +4947,9 @@ namespace internal
   const std::vector<ArrayView<const typename VectorType::value_type>> *
   get_shared_vector_data(VectorType &vec /*other parameters?*/)
   {
-    return &vec.shared_vector_data();
+    // return &vec.shared_vector_data();
+    (void)vec;
+    return nullptr;
   }
 
   template <typename VectorType,
