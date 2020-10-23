@@ -29,6 +29,7 @@ SET(_src
   matrix_free.cc
   shape_info.cc
   task_info.cc
+  vector_data_exchange.cc
   )
 
 SET(_inst

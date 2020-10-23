@@ -3108,7 +3108,7 @@ namespace internal
             DataAccessOnFaces::unspecified)
         for (unsigned int c = 0; c < matrix_free.n_components(); ++c)
           AssertDimension(
-            matrix_free.get_dof_info(c).vector_partitioner_face_variants.size(),
+            matrix_free.get_dof_info(c).vector_exchanger_face_variants.size(),
             5);
     }
 
@@ -3161,39 +3161,39 @@ namespace internal
      * Get partitioner for the given @p mf_component taking into
      * account vector_face_access set in constructor.
      */
-    const Utilities::MPI::Partitioner &
+    const internal::MatrixFreeFunctions::VectorDataExchange::Base &
     get_partitioner(const unsigned int mf_component) const
     {
       AssertDimension(matrix_free.get_dof_info(mf_component)
-                        .vector_partitioner_face_variants.size(),
+                        .vector_exchanger_face_variants.size(),
                       5);
       if (vector_face_access ==
           dealii::MatrixFree<dim, Number, VectorizedArrayType>::
             DataAccessOnFaces::none)
         return *matrix_free.get_dof_info(mf_component)
-                  .vector_partitioner_face_variants[0];
+                  .vector_exchanger_face_variants[0];
       else if (vector_face_access ==
                dealii::MatrixFree<dim, Number, VectorizedArrayType>::
                  DataAccessOnFaces::values)
         return *matrix_free.get_dof_info(mf_component)
-                  .vector_partitioner_face_variants[1];
+                  .vector_exchanger_face_variants[1];
       else if (vector_face_access ==
                dealii::MatrixFree<dim, Number, VectorizedArrayType>::
                  DataAccessOnFaces::gradients)
         return *matrix_free.get_dof_info(mf_component)
-                  .vector_partitioner_face_variants[2];
+                  .vector_exchanger_face_variants[2];
       else if (vector_face_access ==
                dealii::MatrixFree<dim, Number, VectorizedArrayType>::
                  DataAccessOnFaces::values_all_faces)
         return *matrix_free.get_dof_info(mf_component)
-                  .vector_partitioner_face_variants[3];
+                  .vector_exchanger_face_variants[3];
       else if (vector_face_access ==
                dealii::MatrixFree<dim, Number, VectorizedArrayType>::
                  DataAccessOnFaces::gradients_all_faces)
         return *matrix_free.get_dof_info(mf_component)
-                  .vector_partitioner_face_variants[4];
+                  .vector_exchanger_face_variants[4];
       else
-        return *matrix_free.get_dof_info(mf_component).vector_partitioner.get();
+        return *matrix_free.get_dof_info(mf_component).vector_exchanger.get();
     }
 
 
@@ -3299,12 +3299,13 @@ namespace internal
           part.export_to_ghosted_array_start(
             component_in_block_vector + channel_shift,
             ArrayView<const Number>(vec.begin(), part.local_size()),
-            ArrayView<Number>(tmp_data[component_in_block_vector]->begin(),
-                              part.n_import_indices()),
+            vec.shared_vector_data(),
             ArrayView<Number>(const_cast<Number *>(vec.begin()) +
                                 part.local_size(),
                               matrix_free.get_dof_info(mf_component)
                                 .vector_partitioner->n_ghost_indices()),
+            ArrayView<Number>(tmp_data[component_in_block_vector]->begin(),
+                              part.n_import_indices()),
             this->requests[component_in_block_vector]);
 #  endif
         }
@@ -3377,9 +3378,12 @@ namespace internal
 
           const auto &part = get_partitioner(mf_component);
 
-          if (part.n_ghost_indices() != 0 || part.n_import_indices() != 0)
+          if (part.n_ghost_indices() != 0 || part.n_import_indices() != 0 ||
+              part.n_import_sm_procs() != 0)
             {
               part.export_to_ghosted_array_finish(
+                ArrayView<const Number>(vec.begin(), part.local_size()),
+                vec.shared_vector_data(),
                 ArrayView<Number>(const_cast<Number *>(vec.begin()) +
                                     part.local_size(),
                                   matrix_free.get_dof_info(mf_component)
@@ -3480,7 +3484,8 @@ namespace internal
 
           const auto &part = get_partitioner(mf_component);
 
-          if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0)
+          if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0 &&
+              part.n_import_sm_procs() == 0)
             return;
 
           tmp_data[component_in_block_vector] =
@@ -3492,6 +3497,8 @@ namespace internal
           part.import_from_ghosted_array_start(
             dealii::VectorOperation::add,
             component_in_block_vector + channel_shift,
+            ArrayView<Number>(vec.begin(), part.local_size()),
+            vec.shared_vector_data(),
             ArrayView<Number>(vec.begin() + part.local_size(),
                               matrix_free.get_dof_info(mf_component)
                                 .vector_partitioner->n_ghost_indices()),
@@ -3557,7 +3564,6 @@ namespace internal
         std::is_same<Number, typename VectorType::value_type>::value,
         "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
-
       if (vec.size() != 0)
         {
 #  ifdef DEAL_II_WITH_MPI
@@ -3568,23 +3574,25 @@ namespace internal
 
           const auto &part = get_partitioner(mf_component);
 
-          if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0)
-            return;
+          if (part.n_ghost_indices() != 0 || part.n_import_indices() != 0 ||
+              part.n_import_sm_procs() != 0)
+            {
+              part.import_from_ghosted_array_finish(
+                VectorOperation::add,
+                ArrayView<Number>(vec.begin(), part.local_size()),
+                vec.shared_vector_data(),
+                ArrayView<Number>(vec.begin() + part.local_size(),
+                                  matrix_free.get_dof_info(mf_component)
+                                    .vector_partitioner->n_ghost_indices()),
+                ArrayView<const Number>(
+                  tmp_data[component_in_block_vector]->begin(),
+                  part.n_import_indices()),
+                this->requests[component_in_block_vector]);
 
-          part.import_from_ghosted_array_finish(
-            VectorOperation::add,
-            ArrayView<const Number>(
-              tmp_data[component_in_block_vector]->begin(),
-              part.n_import_indices()),
-            ArrayView<Number>(vec.begin(), part.local_size()),
-            ArrayView<Number>(vec.begin() + part.local_size(),
-                              matrix_free.get_dof_info(mf_component)
-                                .vector_partitioner->n_ghost_indices()),
-            this->requests[component_in_block_vector]);
-
-          matrix_free.release_scratch_data_non_threadsafe(
-            tmp_data[component_in_block_vector]);
-          tmp_data[component_in_block_vector] = nullptr;
+              matrix_free.release_scratch_data_non_threadsafe(
+                tmp_data[component_in_block_vector]);
+              tmp_data[component_in_block_vector] = nullptr;
+            }
 #  endif
         }
     }
@@ -3640,43 +3648,29 @@ namespace internal
       if (ghosts_were_set == true)
         return;
 
-      if (vector_face_access ==
-            dealii::MatrixFree<dim, Number, VectorizedArrayType>::
-              DataAccessOnFaces::unspecified ||
-          vec.size() == 0)
-        vec.zero_out_ghosts();
-      else
+      if (vec.size() != 0)
         {
 #  ifdef DEAL_II_WITH_MPI
           AssertDimension(requests.size(), tmp_data.size());
 
           const unsigned int mf_component = find_vector_in_mf(vec);
-          const Utilities::MPI::Partitioner &part =
-            get_partitioner(mf_component);
-          if (&part ==
-              matrix_free.get_dof_info(mf_component).vector_partitioner.get())
-            vec.zero_out_ghosts();
-          else if (part.n_ghost_indices() > 0)
+
+          const auto &part = get_partitioner(mf_component);
+
+          if (part.n_ghost_indices() > 0)
             {
-              for (std::vector<std::pair<unsigned int, unsigned int>>::
-                     const_iterator my_ghosts =
-                       part.ghost_indices_within_larger_ghost_set().begin();
-                   my_ghosts !=
-                   part.ghost_indices_within_larger_ghost_set().end();
-                   ++my_ghosts)
-                for (unsigned int j = my_ghosts->first; j < my_ghosts->second;
-                     j++)
-                  {
-                    const_cast<LinearAlgebra::distributed::Vector<Number> &>(
-                      vec)
-                      .local_element(j + part.local_size()) = 0.;
-                  }
+              part.reset_ghost_values(ArrayView<Number>(
+                const_cast<LinearAlgebra::distributed::Vector<Number> &>(vec)
+                    .begin() +
+                  part.local_size(),
+                matrix_free.get_dof_info(mf_component)
+                  .vector_partitioner->n_ghost_indices()));
             }
 
-          // let vector know that it's not ghosted anymore
-          vec.set_ghost_state(false);
 #  endif
         }
+      // let vector know that it's not ghosted anymore
+      vec.set_ghost_state(false);
     }
 
 

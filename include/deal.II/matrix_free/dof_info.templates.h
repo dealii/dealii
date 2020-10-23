@@ -496,6 +496,10 @@ namespace internal
       Utilities::MPI::Partitioner *vec_part =
         const_cast<Utilities::MPI::Partitioner *>(vector_partitioner.get());
       vec_part->set_ghost_indices(ghost_indices);
+
+      vector_exchanger = std::make_shared<
+        internal::MatrixFreeFunctions::VectorDataExchange::PartitionerWrapper>(
+        vector_partitioner);
     }
 
 
@@ -1209,17 +1213,22 @@ namespace internal
           Utilities::MPI::min<int>(compressed_set.n_elements() ==
                                      part.ghost_indices().n_elements(),
                                    part.get_mpi_communicator()) != 0;
+
+        std::shared_ptr<const Utilities::MPI::Partitioner> temp_0;
+
         if (all_ghosts_equal)
-          vector_partitioner_face_variants[0] = vector_partitioner;
+          temp_0 = vector_partitioner;
         else
           {
-            vector_partitioner_face_variants[0] =
-              std::make_shared<Utilities::MPI::Partitioner>(
-                part.locally_owned_range(), part.get_mpi_communicator());
-            const_cast<Utilities::MPI::Partitioner *>(
-              vector_partitioner_face_variants[0].get())
+            temp_0 = std::make_shared<Utilities::MPI::Partitioner>(
+              part.locally_owned_range(), part.get_mpi_communicator());
+            const_cast<Utilities::MPI::Partitioner *>(temp_0.get())
               ->set_ghost_indices(compressed_set, part.ghost_indices());
           }
+
+        vector_exchanger_face_variants[0] =
+          std::make_shared<internal::MatrixFreeFunctions::VectorDataExchange::
+                             PartitionerWrapper>(temp_0);
       }
 
       // construct a numbering of faces
@@ -1433,34 +1442,43 @@ namespace internal
             }
         };
 
+      std::shared_ptr<const Utilities::MPI::Partitioner> temp_1, temp_2, temp_3,
+        temp_4;
+
       // partitioner 1: values on faces
-      process_values(vector_partitioner_face_variants[1], loop_over_faces);
+      process_values(temp_1, loop_over_faces);
 
       // partitioner 2: values and gradients on faces
-      process_gradients(vector_partitioner_face_variants[1],
-                        vector_partitioner_face_variants[2],
-                        loop_over_faces);
+      process_gradients(temp_1, temp_2, loop_over_faces);
 
       if (fill_cell_centric)
         {
           ghost_indices.clear();
           // partitioner 3: values on all faces
-          process_values(vector_partitioner_face_variants[3],
-                         loop_over_all_faces);
+          process_values(temp_3, loop_over_all_faces);
           // partitioner 4: values and gradients on faces
-          process_gradients(vector_partitioner_face_variants[3],
-                            vector_partitioner_face_variants[4],
-                            loop_over_all_faces);
+          process_gradients(temp_3, temp_4, loop_over_all_faces);
         }
       else
         {
-          vector_partitioner_face_variants[3] =
-            std::make_shared<Utilities::MPI::Partitioner>(
-              part.locally_owned_range(), part.get_mpi_communicator());
-          vector_partitioner_face_variants[4] =
-            std::make_shared<Utilities::MPI::Partitioner>(
-              part.locally_owned_range(), part.get_mpi_communicator());
+          temp_3 = std::make_shared<Utilities::MPI::Partitioner>(
+            part.locally_owned_range(), part.get_mpi_communicator());
+          temp_4 = std::make_shared<Utilities::MPI::Partitioner>(
+            part.locally_owned_range(), part.get_mpi_communicator());
         }
+
+      vector_exchanger_face_variants[1] = std::make_shared<
+        internal::MatrixFreeFunctions::VectorDataExchange::PartitionerWrapper>(
+        temp_1);
+      vector_exchanger_face_variants[2] = std::make_shared<
+        internal::MatrixFreeFunctions::VectorDataExchange::PartitionerWrapper>(
+        temp_2);
+      vector_exchanger_face_variants[3] = std::make_shared<
+        internal::MatrixFreeFunctions::VectorDataExchange::PartitionerWrapper>(
+        temp_3);
+      vector_exchanger_face_variants[4] = std::make_shared<
+        internal::MatrixFreeFunctions::VectorDataExchange::PartitionerWrapper>(
+        temp_4);
     }
 
 

@@ -781,6 +781,11 @@ namespace internal
           std::make_shared<Utilities::MPI::Partitioner>(locally_owned_dofs[no],
                                                         task_info.communicator);
 
+        dof_info[no].vector_exchanger =
+          std::make_shared<internal::MatrixFreeFunctions::VectorDataExchange::
+                             PartitionerWrapper>(
+            dof_info[no].vector_partitioner);
+
         // initialize the arrays for indices
         const unsigned int n_components_total =
           dof_info[no].start_components.back();
