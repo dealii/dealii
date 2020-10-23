@@ -1170,8 +1170,8 @@ protected:
    */
   template <typename VectorType, typename VectorOperation>
   void
-  read_write_operation(const VectorOperation &operation,
-                       VectorType *           vectors[],
+  read_write_operation(const VectorOperation &                        operation,
+                       const std::array<VectorType *, n_components_> &vectors,
                        const std::bitset<VectorizedArrayType::size()> &mask,
                        const bool apply_constraints = true) const;
 
@@ -1186,7 +1186,7 @@ protected:
   void
   read_write_operation_contiguous(
     const VectorOperation &                         operation,
-    VectorType *                                    vectors[],
+    const std::array<VectorType *, n_components_> & vectors,
     const std::bitset<VectorizedArrayType::size()> &mask) const;
 
   /**
@@ -1198,8 +1198,9 @@ protected:
    */
   template <typename VectorType, typename VectorOperation>
   void
-  read_write_operation_global(const VectorOperation &operation,
-                              VectorType *           vectors[]) const;
+  read_write_operation_global(
+    const VectorOperation &                        operation,
+    const std::array<VectorType *, n_components_> &vectors) const;
 
   /**
    * This field stores the values for local degrees of freedom (e.g. after
@@ -4180,8 +4181,8 @@ template <int dim,
 template <typename VectorType, typename VectorOperation>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  read_write_operation(const VectorOperation &operation,
-                       VectorType *           src[],
+  read_write_operation(const VectorOperation &                        operation,
+                       const std::array<VectorType *, n_components_> &src,
                        const std::bitset<VectorizedArrayType::size()> &mask,
                        const bool apply_constraints) const
 {
@@ -4545,8 +4546,9 @@ template <int dim,
 template <typename VectorType, typename VectorOperation>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  read_write_operation_global(const VectorOperation &operation,
-                              VectorType *           src[]) const
+  read_write_operation_global(
+    const VectorOperation &                        operation,
+    const std::array<VectorType *, n_components_> &src) const
 {
   Assert(!local_dof_indices.empty(), ExcNotInitialized());
 
@@ -4578,7 +4580,7 @@ inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   read_write_operation_contiguous(
     const VectorOperation &                         operation,
-    VectorType *                                    src[],
+    const std::array<VectorType *, n_components_> & src,
     const std::bitset<VectorizedArrayType::size()> &mask) const
 {
   // This functions processes the functions read_dof_values,
@@ -4813,6 +4815,56 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       }
 }
 
+namespace internal
+{
+  template <typename Number,
+            typename VectorType,
+            typename std::enable_if<!IsBlockVector<VectorType>::value,
+                                    VectorType>::type * = nullptr>
+  decltype(std::declval<VectorType>().begin())
+  get_beginning(VectorType &vec)
+  {
+    return vec.begin();
+  }
+
+  template <typename Number,
+            typename VectorType,
+            typename std::enable_if<IsBlockVector<VectorType>::value,
+                                    VectorType>::type * = nullptr>
+  typename VectorType::value_type *
+  get_beginning(VectorType &)
+  {
+    return nullptr;
+  }
+
+  template <int n_components, typename VectorType>
+  std::array<typename internal::BlockVectorSelector<
+               typename std::remove_const<VectorType>::type,
+               IsBlockVector<typename std::remove_const<VectorType>::type>::
+                 value>::BaseVectorType *,
+             n_components>
+  get_vector_data(VectorType &src, const unsigned int first_index)
+  {
+    // select between block vectors and non-block vectors. Note that the number
+    // of components is checked in the internal data
+    std::array<typename internal::BlockVectorSelector<
+                 typename std::remove_const<VectorType>::type,
+                 IsBlockVector<typename std::remove_const<VectorType>::type>::
+                   value>::BaseVectorType *,
+               n_components>
+      src_data;
+    for (unsigned int d = 0; d < n_components; ++d)
+      src_data[d] = internal::BlockVectorSelector<
+        typename std::remove_const<VectorType>::type,
+        IsBlockVector<typename std::remove_const<VectorType>::type>::value>::
+        get_vector_component(
+          const_cast<typename std::remove_const<VectorType>::type &>(src),
+          d + first_index);
+
+    return src_data;
+  }
+} // namespace internal
+
 
 
 template <int dim,
@@ -4825,16 +4877,8 @@ inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   read_dof_values(const VectorType &src, const unsigned int first_index)
 {
-  // select between block vectors and non-block vectors. Note that the number
-  // of components is checked in the internal data
-  typename internal::BlockVectorSelector<
-    VectorType,
-    IsBlockVector<VectorType>::value>::BaseVectorType *src_data[n_components];
-  for (unsigned int d = 0; d < n_components; ++d)
-    src_data[d] =
-      internal::BlockVectorSelector<VectorType,
-                                    IsBlockVector<VectorType>::value>::
-        get_vector_component(const_cast<VectorType &>(src), d + first_index);
+  const auto src_data =
+    internal::get_vector_data<n_components_>(src, first_index);
 
   internal::VectorReader<Number, VectorizedArrayType> reader;
   read_write_operation(reader,
@@ -4859,16 +4903,8 @@ inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   read_dof_values_plain(const VectorType &src, const unsigned int first_index)
 {
-  // select between block vectors and non-block vectors. Note that the number
-  // of components is checked in the internal data
-  typename internal::BlockVectorSelector<
-    VectorType,
-    IsBlockVector<VectorType>::value>::BaseVectorType *src_data[n_components];
-  for (unsigned int d = 0; d < n_components; ++d)
-    src_data[d] =
-      internal::BlockVectorSelector<VectorType,
-                                    IsBlockVector<VectorType>::value>::
-        get_vector_component(const_cast<VectorType &>(src), d + first_index);
+  const auto src_data =
+    internal::get_vector_data<n_components_>(src, first_index);
 
   internal::VectorReader<Number, VectorizedArrayType> reader;
   read_write_operation(reader,
@@ -4901,16 +4937,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
          internal::ExcAccessToUninitializedField());
 #  endif
 
-  // select between block vectors and non-block vectors. Note that the number
-  // of components is checked in the internal data
-  typename internal::BlockVectorSelector<
-    VectorType,
-    IsBlockVector<VectorType>::value>::BaseVectorType *dst_data[n_components];
-  for (unsigned int d = 0; d < n_components; ++d)
-    dst_data[d] = internal::BlockVectorSelector<
-      VectorType,
-      IsBlockVector<VectorType>::value>::get_vector_component(dst,
-                                                              d + first_index);
+  const auto dst_data =
+    internal::get_vector_data<n_components_>(dst, first_index);
 
   internal::VectorDistributorLocalToGlobal<Number, VectorizedArrayType>
     distributor;
@@ -4936,16 +4964,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
          internal::ExcAccessToUninitializedField());
 #  endif
 
-  // select between block vectors and non-block vectors. Note that the number
-  // of components is checked in the internal data
-  typename internal::BlockVectorSelector<
-    VectorType,
-    IsBlockVector<VectorType>::value>::BaseVectorType *dst_data[n_components];
-  for (unsigned int d = 0; d < n_components; ++d)
-    dst_data[d] = internal::BlockVectorSelector<
-      VectorType,
-      IsBlockVector<VectorType>::value>::get_vector_component(dst,
-                                                              d + first_index);
+  const auto dst_data =
+    internal::get_vector_data<n_components_>(dst, first_index);
 
   internal::VectorSetter<Number, VectorizedArrayType> setter;
   read_write_operation(setter, dst_data, mask);
@@ -4971,16 +4991,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
          internal::ExcAccessToUninitializedField());
 #  endif
 
-  // select between block vectors and non-block vectors. Note that the number
-  // of components is checked in the internal data
-  typename internal::BlockVectorSelector<
-    VectorType,
-    IsBlockVector<VectorType>::value>::BaseVectorType *dst_data[n_components];
-  for (unsigned int d = 0; d < n_components; ++d)
-    dst_data[d] = internal::BlockVectorSelector<
-      VectorType,
-      IsBlockVector<VectorType>::value>::get_vector_component(dst,
-                                                              d + first_index);
+  const auto dst_data =
+    internal::get_vector_data<n_components_>(dst, first_index);
 
   internal::VectorSetter<Number, VectorizedArrayType> setter;
   read_write_operation(setter, dst_data, mask, false);
@@ -7707,26 +7719,6 @@ namespace internal
     const EvaluationFlags::EvaluationFlags)
   {
     return false;
-  }
-
-  template <typename Number,
-            typename VectorType,
-            typename std::enable_if<!IsBlockVector<VectorType>::value,
-                                    VectorType>::type * = nullptr>
-  decltype(std::declval<VectorType>().begin())
-  get_beginning(VectorType &vec)
-  {
-    return vec.begin();
-  }
-
-  template <typename Number,
-            typename VectorType,
-            typename std::enable_if<IsBlockVector<VectorType>::value,
-                                    VectorType>::type * = nullptr>
-  typename VectorType::value_type *
-  get_beginning(VectorType &)
-  {
-    return nullptr;
   }
 } // namespace internal
 
