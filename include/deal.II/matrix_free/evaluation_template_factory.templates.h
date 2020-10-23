@@ -200,9 +200,10 @@ namespace internal
   template <int dim, typename Number, typename VectorizedArrayType>
   bool
   FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::gather_evaluate(
-    const unsigned int n_components,
-    const std::size_t  n_face_orientations,
-    const Number *     src_ptr,
+    const unsigned int                          n_components,
+    const std::size_t                           n_face_orientations,
+    const Number *                              src_ptr,
+    const std::vector<ArrayView<const Number>> *sm_ptr,
     const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
     const MatrixFreeFunctions::DoFInfo &                       dof_info,
     VectorizedArrayType *                                      values_quad,
@@ -230,6 +231,7 @@ namespace internal
       n_components,
       n_face_orientations,
       src_ptr,
+      sm_ptr,
       data,
       dof_info,
       values_quad,
@@ -252,9 +254,10 @@ namespace internal
   template <int dim, typename Number, typename VectorizedArrayType>
   bool
   FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::integrate_scatter(
-    const unsigned int n_components,
-    const std::size_t  n_face_orientations,
-    Number *           dst_ptr,
+    const unsigned int                          n_components,
+    const std::size_t                           n_face_orientations,
+    Number *                                    dst_ptr,
+    const std::vector<ArrayView<const Number>> *sm_ptr,
     const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
     const MatrixFreeFunctions::DoFInfo &                       dof_info,
     VectorizedArrayType *                                      values_array,
@@ -283,6 +286,7 @@ namespace internal
       n_components,
       n_face_orientations,
       dst_ptr,
+      sm_ptr,
       data,
       dof_info,
       values_array,
