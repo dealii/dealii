@@ -363,6 +363,24 @@ namespace LinearAlgebra
         const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
 
       /**
+       * Initialize vector with @p local_size locally-owned and @p ghost_size
+       * ghost degrees of freedoms.
+       *
+       * @note In the created underlying partitioner, the local index range is
+       *   translated to global indices in an ascending and one-to-one fashion,
+       *   i.e., the indices of process $p$ sit exactly between the indices of
+       *   the processes $p-1$ and $p+1$, respectively. Setting the
+       *   @p ghost_size variable to an appropriate value provides memory space
+       *   for the ghost data in a vector's memory allocation as and allows
+       *   access to it via local_element(). However, the associated global
+       *   indices must be handled externally in this case.
+       */
+      void
+      reinit(const types::global_dof_index local_size,
+             const types::global_dof_index ghost_size,
+             const MPI_Comm                comm);
+
+      /**
        * Swap the contents of this vector and the other vector @p v. One could
        * do this operation with a temporary variable and copying over the data
        * elements, but this function is significantly more efficient since it

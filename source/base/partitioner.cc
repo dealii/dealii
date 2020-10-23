@@ -58,6 +58,40 @@ namespace Utilities
 
 
 
+    Partitioner::Partitioner(const types::global_dof_index local_size,
+                             const types::global_dof_index ghost_size,
+                             const MPI_Comm                communicator)
+      : global_size(Utilities::MPI::sum<types::global_dof_index>(local_size,
+                                                                 communicator))
+      , locally_owned_range_data(global_size)
+      , local_range_data{0, local_size}
+      , n_ghost_indices_data(ghost_size)
+      , n_import_indices_data(0)
+      , n_ghost_indices_in_larger_set(0)
+      , my_pid(Utilities::MPI::this_mpi_process(communicator))
+      , n_procs(Utilities::MPI::n_mpi_processes(communicator))
+      , communicator(communicator)
+      , have_ghost_indices(true)
+    {
+      types::global_dof_index prefix_sum = 0;
+
+#ifdef DEAL_II_WITH_MPI
+      MPI_Exscan(&local_size,
+                 &prefix_sum,
+                 1,
+                 Utilities::MPI::internal::mpi_type_id(&prefix_sum),
+                 MPI_SUM,
+                 communicator);
+#endif
+
+      local_range_data = {prefix_sum, prefix_sum + local_size};
+
+      locally_owned_range_data.add_range(prefix_sum, prefix_sum + local_size);
+      locally_owned_range_data.compress();
+    }
+
+
+
     Partitioner::Partitioner(const IndexSet &locally_owned_indices,
                              const IndexSet &ghost_indices_in,
                              const MPI_Comm  communicator_in)
