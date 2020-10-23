@@ -1170,10 +1170,14 @@ protected:
    */
   template <typename VectorType, typename VectorOperation>
   void
-  read_write_operation(const VectorOperation &                        operation,
-                       const std::array<VectorType *, n_components_> &vectors,
-                       const std::bitset<VectorizedArrayType::size()> &mask,
-                       const bool apply_constraints = true) const;
+  read_write_operation(
+    const VectorOperation &                        operation,
+    const std::array<VectorType *, n_components_> &vectors,
+    const std::array<
+      const std::vector<ArrayView<const typename VectorType::value_type>> *,
+      n_components_> &                              vectors_sm,
+    const std::bitset<VectorizedArrayType::size()> &mask,
+    const bool apply_constraints = true) const;
 
   /**
    * A unified function to read from and write into vectors based on the given
@@ -1185,8 +1189,11 @@ protected:
   template <typename VectorType, typename VectorOperation>
   void
   read_write_operation_contiguous(
-    const VectorOperation &                         operation,
-    const std::array<VectorType *, n_components_> & vectors,
+    const VectorOperation &                        operation,
+    const std::array<VectorType *, n_components_> &vectors,
+    const std::array<
+      const std::vector<ArrayView<const typename VectorType::value_type>> *,
+      n_components_> &                              vectors_sm,
     const std::bitset<VectorizedArrayType::size()> &mask) const;
 
   /**
@@ -4181,10 +4188,14 @@ template <int dim,
 template <typename VectorType, typename VectorOperation>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  read_write_operation(const VectorOperation &                        operation,
-                       const std::array<VectorType *, n_components_> &src,
-                       const std::bitset<VectorizedArrayType::size()> &mask,
-                       const bool apply_constraints) const
+  read_write_operation(
+    const VectorOperation &                        operation,
+    const std::array<VectorType *, n_components_> &src,
+    const std::array<
+      const std::vector<ArrayView<const typename VectorType::value_type>> *,
+      n_components_> &                              src_sm,
+    const std::bitset<VectorizedArrayType::size()> &mask,
+    const bool                                      apply_constraints) const
 {
   // Case 1: No MatrixFree object given, simple case because we do not need to
   // process constraints and need not care about vectorization -> go to
@@ -4226,7 +4237,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         [this->cell] >=
       internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::contiguous)
     {
-      read_write_operation_contiguous(operation, src, mask);
+      read_write_operation_contiguous(operation, src, src_sm, mask);
       return;
     }
 
@@ -4579,10 +4590,15 @@ template <typename VectorType, typename VectorOperation>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   read_write_operation_contiguous(
-    const VectorOperation &                         operation,
-    const std::array<VectorType *, n_components_> & src,
+    const VectorOperation &                        operation,
+    const std::array<VectorType *, n_components_> &src,
+    const std::array<
+      const std::vector<ArrayView<const typename VectorType::value_type>> *,
+      n_components_> &                              vectors_sm,
     const std::bitset<VectorizedArrayType::size()> &mask) const
 {
+  (void)vectors_sm; // TODO: use it
+
   // This functions processes the functions read_dof_values,
   // distribute_local_to_global, and set_dof_values with the same code for
   // contiguous cell indices (DG case). The distinction between these three
@@ -4837,29 +4853,66 @@ namespace internal
     return nullptr;
   }
 
-  template <int n_components, typename VectorType>
-  std::array<typename internal::BlockVectorSelector<
-               typename std::remove_const<VectorType>::type,
-               IsBlockVector<typename std::remove_const<VectorType>::type>::
-                 value>::BaseVectorType *,
-             n_components>
-  get_vector_data(VectorType &src, const unsigned int first_index)
+  template <typename VectorType,
+            typename std::enable_if<has_shared_vector_data<VectorType>::value,
+                                    VectorType>::type * = nullptr>
+  const std::vector<ArrayView<const typename VectorType::value_type>> *
+  get_shared_vector_data(VectorType &vec /*other parameters?*/)
   {
-    // select between block vectors and non-block vectors. Note that the number
-    // of components is checked in the internal data
+    return vec.shared_vector_data();
+  }
+
+  template <typename VectorType,
+            typename std::enable_if<!has_shared_vector_data<VectorType>::value,
+                                    VectorType>::type * = nullptr>
+  const std::vector<ArrayView<const typename VectorType::value_type>> *
+  get_shared_vector_data(VectorType &)
+  {
+    return nullptr;
+  }
+
+  template <int n_components, typename VectorType>
+  std::pair<
     std::array<typename internal::BlockVectorSelector<
                  typename std::remove_const<VectorType>::type,
                  IsBlockVector<typename std::remove_const<VectorType>::type>::
                    value>::BaseVectorType *,
-               n_components>
+               n_components>,
+    std::array<
+      const std::vector<ArrayView<const typename internal::BlockVectorSelector<
+        typename std::remove_const<VectorType>::type,
+        IsBlockVector<typename std::remove_const<VectorType>::type>::value>::
+                                    BaseVectorType::value_type>> *,
+      n_components>>
+  get_vector_data(VectorType &src, const unsigned int first_index)
+  {
+    // select between block vectors and non-block vectors. Note that the number
+    // of components is checked in the internal data
+    std::pair<
+      std::array<typename internal::BlockVectorSelector<
+                   typename std::remove_const<VectorType>::type,
+                   IsBlockVector<typename std::remove_const<VectorType>::type>::
+                     value>::BaseVectorType *,
+                 n_components>,
+      std::array<
+        const std::vector<
+          ArrayView<const typename internal::BlockVectorSelector<
+            typename std::remove_const<VectorType>::type,
+            IsBlockVector<typename std::remove_const<VectorType>::type>::
+              value>::BaseVectorType::value_type>> *,
+        n_components>>
       src_data;
+
     for (unsigned int d = 0; d < n_components; ++d)
-      src_data[d] = internal::BlockVectorSelector<
+      src_data.first[d] = internal::BlockVectorSelector<
         typename std::remove_const<VectorType>::type,
         IsBlockVector<typename std::remove_const<VectorType>::type>::value>::
         get_vector_component(
           const_cast<typename std::remove_const<VectorType>::type &>(src),
           d + first_index);
+
+    for (unsigned int d = 0; d < n_components; ++d)
+      src_data.second[d] = get_shared_vector_data(*src_data.first[d]);
 
     return src_data;
   }
@@ -4882,7 +4935,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   internal::VectorReader<Number, VectorizedArrayType> reader;
   read_write_operation(reader,
-                       src_data,
+                       src_data.first,
+                       src_data.second,
                        std::bitset<VectorizedArrayType::size()>().flip(),
                        true);
 
@@ -4908,7 +4962,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   internal::VectorReader<Number, VectorizedArrayType> reader;
   read_write_operation(reader,
-                       src_data,
+                       src_data.first,
+                       src_data.second,
                        std::bitset<VectorizedArrayType::size()>().flip(),
                        false);
 
@@ -4942,7 +4997,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   internal::VectorDistributorLocalToGlobal<Number, VectorizedArrayType>
     distributor;
-  read_write_operation(distributor, dst_data, mask);
+  read_write_operation(distributor, dst_data.first, dst_data.second, mask);
 }
 
 
@@ -4968,7 +5023,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     internal::get_vector_data<n_components_>(dst, first_index);
 
   internal::VectorSetter<Number, VectorizedArrayType> setter;
-  read_write_operation(setter, dst_data, mask);
+  read_write_operation(setter, dst_data.first, dst_data.second, mask);
 }
 
 
@@ -4995,7 +5050,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     internal::get_vector_data<n_components_>(dst, first_index);
 
   internal::VectorSetter<Number, VectorizedArrayType> setter;
-  read_write_operation(setter, dst_data, mask, false);
+  read_write_operation(setter, dst_data.first, dst_data.second, mask, false);
 }
 
 
@@ -8472,6 +8527,10 @@ FEFaceEvaluation<dim,
       "Only EvaluationFlags::values and EvaluationFlags::gradients are supported."));
 
   const auto fu = [&]() {
+    // TODO
+    const auto shared_vector_data =
+      internal::get_shared_vector_data(input_vector);
+
     if (this->dof_access_index ==
           internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
         this->is_interior_face == false)
@@ -8488,6 +8547,7 @@ FEFaceEvaluation<dim,
           n_components,
           VectorizedArrayType::size(),
           internal::get_beginning<Number>(input_vector),
+          shared_vector_data,
           *this->data,
           *this->dof_info,
           this->begin_values(),
@@ -8528,6 +8588,7 @@ FEFaceEvaluation<dim,
               n_components,
               1,
               internal::get_beginning<Number>(input_vector),
+              shared_vector_data,
               *this->data,
               *this->dof_info,
               this->begin_values(),
@@ -8551,6 +8612,7 @@ FEFaceEvaluation<dim,
               gather_evaluate(n_components,
                               1,
                               internal::get_beginning<Number>(input_vector),
+                              shared_vector_data,
                               *this->data,
                               *this->dof_info,
                               this->begin_values(),
@@ -8637,6 +8699,9 @@ FEFaceEvaluation<dim,
           this->is_interior_face == false) == false,
          ExcNotImplemented());
 
+  // TODO
+  const auto shared_vector_data = internal::get_shared_vector_data(destination);
+
   // TODO: this copying should not be necessary once we have introduced
   // an internal-data structure
   std::array<unsigned int, VectorizedArrayType::size()> cells_            = {};
@@ -8657,6 +8722,7 @@ FEFaceEvaluation<dim,
             n_components,
             1,
             internal::get_beginning<Number>(destination),
+            shared_vector_data,
             *this->data,
             *this->dof_info,
             this->begin_dof_values(),
@@ -8688,6 +8754,7 @@ FEFaceEvaluation<dim,
             integrate_scatter(n_components,
                               1,
                               internal::get_beginning<Number>(destination),
+                              shared_vector_data,
                               *this->data,
                               *this->dof_info,
                               this->begin_dof_values(),

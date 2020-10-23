@@ -3192,9 +3192,10 @@ namespace internal
   {
     template <int fe_degree, int n_q_points_1d>
     static bool
-    run(const unsigned int n_components,
-        const unsigned int n_face_orientations,
-        const Number2 *    src_ptr,
+    run(const unsigned int                          n_components,
+        const unsigned int                          n_face_orientations,
+        const Number2 *                             src_ptr,
+        const std::vector<ArrayView<const Number>> *sm_ptr,
         const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
         const MatrixFreeFunctions::DoFInfo &                       dof_info,
         VectorizedArrayType *                                      values_quad,
@@ -3217,9 +3218,12 @@ namespace internal
           return false;
         }
 
+      (void)sm_ptr;
+
       Processor<fe_degree, n_q_points_1d> p(n_components,
                                             false,
                                             src_ptr,
+                                            sm_ptr,
                                             data,
                                             dof_info,
                                             values_quad,
@@ -3254,9 +3258,10 @@ namespace internal
       using Number2_                  = const Number2;
 
       Processor(
-        const unsigned int n_components,
-        const bool         integrate,
-        const Number2 *    global_vector_ptr,
+        const unsigned int                          n_components,
+        const bool                                  integrate,
+        const Number2 *                             global_vector_ptr,
+        const std::vector<ArrayView<const Number>> *sm_ptr,
         const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
         const MatrixFreeFunctions::DoFInfo &                       dof_info,
         VectorizedArrayType *                                      values_quad,
@@ -3276,6 +3281,7 @@ namespace internal
         : n_components(n_components)
         , integrate(integrate)
         , global_vector_ptr(global_vector_ptr)
+        , sm_ptr(sm_ptr)
         , data(data)
         , dof_info(dof_info)
         , values_quad(values_quad)
@@ -3408,9 +3414,10 @@ namespace internal
                              subface_index);
       }
 
-      const unsigned int n_components;
-      const bool         integrate;
-      const Number2 *    global_vector_ptr;
+      const unsigned int                          n_components;
+      const bool                                  integrate;
+      const Number2 *                             global_vector_ptr;
+      const std::vector<ArrayView<const Number>> *sm_ptr;
       const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data;
       const MatrixFreeFunctions::DoFInfo &                       dof_info;
       VectorizedArrayType *                                      values_quad;
@@ -3438,9 +3445,10 @@ namespace internal
   {
     template <int fe_degree, int n_q_points_1d>
     static bool
-    run(const unsigned int n_components,
-        const unsigned int n_face_orientations,
-        Number2 *          dst_ptr,
+    run(const unsigned int                           n_components,
+        const unsigned int                           n_face_orientations,
+        Number2 *                                    dst_ptr,
+        const std::vector<ArrayView<const Number2>> *sm_ptr,
         const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
         const MatrixFreeFunctions::DoFInfo &                       dof_info,
         VectorizedArrayType *                                      values_array,
@@ -3459,6 +3467,8 @@ namespace internal
                                       face_orientations,
         const Table<2, unsigned int> &orientation_map)
     {
+      (void)sm_ptr;
+
       if (dst_ptr == nullptr)
         {
           AssertDimension(n_face_orientations, 1);
@@ -3488,6 +3498,7 @@ namespace internal
                                             n_components,
                                             true,
                                             dst_ptr,
+                                            sm_ptr,
                                             data,
                                             dof_info,
                                             values_quad,
@@ -3523,10 +3534,11 @@ namespace internal
 
 
       Processor(
-        VectorizedArrayType *values_array,
-        const unsigned int   n_components,
-        const bool           integrate,
-        Number2 *            global_vector_ptr,
+        VectorizedArrayType *                       values_array,
+        const unsigned int                          n_components,
+        const bool                                  integrate,
+        Number2 *                                   global_vector_ptr,
+        const std::vector<ArrayView<const Number>> *sm_ptr,
         const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
         const MatrixFreeFunctions::DoFInfo &                       dof_info,
         VectorizedArrayType *                                      values_quad,
@@ -3547,6 +3559,7 @@ namespace internal
         , n_components(n_components)
         , integrate(integrate)
         , global_vector_ptr(global_vector_ptr)
+        , sm_ptr(sm_ptr)
         , data(data)
         , dof_info(dof_info)
         , values_quad(values_quad)
@@ -3701,9 +3714,10 @@ namespace internal
       VectorizedArrayType *values_array;
 
 
-      const unsigned int n_components;
-      const bool         integrate;
-      Number2 *          global_vector_ptr;
+      const unsigned int                          n_components;
+      const bool                                  integrate;
+      Number2 *                                   global_vector_ptr;
+      const std::vector<ArrayView<const Number>> *sm_ptr;
       const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data;
       const MatrixFreeFunctions::DoFInfo &                       dof_info;
       VectorizedArrayType *                                      values_quad;

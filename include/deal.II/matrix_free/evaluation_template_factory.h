@@ -99,9 +99,10 @@ namespace internal
 
     static bool
     gather_evaluate(
-      const unsigned int n_components,
-      const std::size_t  n_face_orientations,
-      const Number *     src_ptr,
+      const unsigned int                          n_components,
+      const std::size_t                           n_face_orientations,
+      const Number *                              src_ptr,
+      const std::vector<ArrayView<const Number>> *sm_ptr,
       const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
       const MatrixFreeFunctions::DoFInfo &                       dof_info,
       VectorizedArrayType *                                      values_quad,
@@ -121,9 +122,10 @@ namespace internal
 
     static bool
     integrate_scatter(
-      const unsigned int n_components,
-      const std::size_t  n_face_orientations,
-      Number *           dst_ptr,
+      const unsigned int                          n_components,
+      const std::size_t                           n_face_orientations,
+      Number *                                    dst_ptr,
+      const std::vector<ArrayView<const Number>> *sm_ptr,
       const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
       const MatrixFreeFunctions::DoFInfo &                       dof_info,
       VectorizedArrayType *                                      values_array,
