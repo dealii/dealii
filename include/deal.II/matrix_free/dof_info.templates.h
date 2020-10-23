@@ -1483,6 +1483,33 @@ namespace internal
 
 
 
+    void
+    DoFInfo::compute_shared_memory_contiguous_indices(
+      std::array<std::vector<std::pair<unsigned int, unsigned int>>, 3>
+        &cell_indices_contiguous_sm)
+    {
+      AssertDimension(dofs_per_cell.size(), 1);
+
+      for (unsigned int i = 0; i < 3; ++i)
+        {
+          dof_indices_contiguous_sm[i].resize(
+            cell_indices_contiguous_sm[i].size());
+
+          for (unsigned int j = 0; j < cell_indices_contiguous_sm[i].size();
+               ++j)
+            if (cell_indices_contiguous_sm[i][j].first !=
+                numbers::invalid_unsigned_int)
+              dof_indices_contiguous_sm[i][j] = {
+                cell_indices_contiguous_sm[i][j].first,
+                cell_indices_contiguous_sm[i][j].second * dofs_per_cell[0]};
+            else
+              dof_indices_contiguous_sm[i][j] = {numbers::invalid_unsigned_int,
+                                                 numbers::invalid_unsigned_int};
+        }
+    }
+
+
+
     template <int length>
     void
     DoFInfo::compute_vector_zero_access_pattern(

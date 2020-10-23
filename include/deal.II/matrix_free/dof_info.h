@@ -243,6 +243,16 @@ namespace internal
         const bool                                fill_cell_centric);
 
       /**
+       * Given @p cell_indices_contiguous_sm containing the local index of
+       * cells of macro faces (inner/outer) and macro faces compute
+       * dof_indices_contiguous_sm.
+       */
+      void
+      compute_shared_memory_contiguous_indices(
+        std::array<std::vector<std::pair<unsigned int, unsigned int>>, 3>
+          &cell_indices_contiguous_sm);
+
+      /**
        * Compute a renumbering of the degrees of freedom to improve the data
        * access patterns for this class that can be utilized by the categories
        * in the IndexStorageVariants enum. For example, the index ordering can
@@ -487,6 +497,17 @@ namespace internal
        * cells (2) according to CellOrFaceAccess.
        */
       std::array<std::vector<unsigned int>, 3> dof_indices_contiguous;
+
+      /**
+       * The same as above but for shared-memory usage. The first value of the
+       * pair is identifying the owning process and the second the index
+       * within that locally-owned data of that process.
+       *
+       * @note This data structure is only set up if all entries in
+       *   index_storage_variants[2] are IndexStorageVariants::contiguous.
+       */
+      std::array<std::vector<std::pair<unsigned int, unsigned int>>, 3>
+        dof_indices_contiguous_sm;
 
       /**
        * Compressed index storage for faster access than through @p

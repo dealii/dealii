@@ -566,6 +566,11 @@ namespace internal
       MPI_Comm communicator;
 
       /**
+       * Shared-memory MPI communicator
+       */
+      MPI_Comm communicator_sm;
+
+      /**
        * Rank of MPI process
        */
       unsigned int my_pid;

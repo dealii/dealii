@@ -48,6 +48,17 @@ namespace Utilities
         std::pair<types::global_dof_index, types::global_dof_index>,
         unsigned int>;
 
+#ifdef DEAL_II_WITH_64BIT_INDICES
+      template class Process<types::global_dof_index, unsigned int>;
+
+      template class NBX<types::global_dof_index, unsigned int>;
+
+      template class PEX<types::global_dof_index, unsigned int>;
+
+      template class Selector<types::global_dof_index, unsigned int>;
+#endif
+
+
     } // namespace ConsensusAlgorithms
   }   // end of namespace MPI
 } // end of namespace Utilities
