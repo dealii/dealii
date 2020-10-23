@@ -4859,7 +4859,7 @@ namespace internal
   const std::vector<ArrayView<const typename VectorType::value_type>> *
   get_shared_vector_data(VectorType &vec /*other parameters?*/)
   {
-    return vec.shared_vector_data();
+    return &vec.shared_vector_data();
   }
 
   template <typename VectorType,
