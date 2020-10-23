@@ -332,6 +332,13 @@ namespace internal
              const unsigned int        base_element = 0);
 
       /**
+       * Return which kinds of elements are supported by MatrixFree.
+       */
+      template <int dim, int spacedim>
+      static bool
+      is_supported(const FiniteElement<dim, spacedim> &fe);
+
+      /**
        * Return data of univariate shape functions which defines the
        * dimension @p dimension of tensor product shape functions
        * regarding vector component @p component of the underlying
