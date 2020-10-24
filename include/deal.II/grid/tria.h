@@ -1009,17 +1009,19 @@ namespace internal
  * following information is not stored:
  *   - signals
  *   - pointers to Manifold objects previously set using
- * Triangulation::set_manifold On the other hand, since these are objects that
+ *     Triangulation::set_manifold()
+ *
+ * On the other hand, since these are objects that
  * are usually set in user code, they can typically easily be set again in that
  * part of your code in which you re-load triangulations.
  *
  * In a sense, this approach to serialization means that re-loading a
  * triangulation is more akin to calling the
- * Triangulation::create_triangulation function and filling it with some
+ * Triangulation::create_triangulation() function and filling it with some
  * additional content, as that function also does not touch the signals and
- * boundary objects that belong to this triangulation. In keeping with this
- * analogy, the Triangulation::load function also triggers the same kinds of
- * signal as Triangulation::create_triangulation.
+ * Manifold objects that belong to this triangulation. In keeping with this
+ * analogy, the Triangulation::load() function also triggers the same kinds of
+ * signal as Triangulation::create_triangulation().
  *
  *
  * <h3>Technical details</h3>
@@ -1629,7 +1631,7 @@ public:
    * A copy of @p manifold_object is created using
    * Manifold<dim, spacedim>::clone() and stored internally.
    *
-   * It is possible to remove or replace the boundary object during the
+   * It is possible to remove or replace a Manifold object during the
    * lifetime of a non-empty triangulation. Usually, this is done before the
    * first refinement and is dangerous afterwards. Removal of a manifold
    * object is done by reset_manifold(). This operation then replaces the
