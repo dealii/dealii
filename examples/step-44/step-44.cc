@@ -841,8 +841,8 @@ namespace Step44
 
     void determine_component_extractors();
 
-    // Apply Dirichlet boundary conditions on the displacement field
-    void make_constraints(const int &it_nr);
+    // Create Dirichlet constraints for the incremental displacement field:
+    void make_constraints(const int it_nr);
 
     // Several functions to assemble the system and right hand side matrices
     // using multithreading. Each of them comes as a wrapper function, one
@@ -855,8 +855,6 @@ namespace Step44
       const typename DoFHandler<dim>::active_cell_iterator &cell,
       ScratchData_ASM &                                     scratch,
       PerTaskData_ASM &                                     data) const;
-
-    void copy_local_to_global_system(const PerTaskData_ASM &data);
 
     // And similar to perform global static condensation:
     void assemble_sc();
@@ -1699,7 +1697,7 @@ namespace Step44
     // Although for this particular problem we could potentially construct the
     // RHS vector before assembling the system matrix, for the sake of
     // extensibility we choose not to do so. The benefit to assembling the RHS
-    // vector and system matrix seperately is that latter is an expensive
+    // vector and system matrix separately is that the latter is an expensive
     // operation and we can potentially avoid an extra assembly process by not
     // assembling the tangent matrix when convergence is attained. However, this
     // makes parallelizing the code using MPI more difficult. Furthermore, when
@@ -1961,12 +1959,11 @@ namespace Step44
 
   // Since we use TBB for assembly, we simply setup a copy of the
   // data structures required for the process and pass them, along
-  // with the memory addresses of the assembly functions to the
-  // WorkStream object for processing. Note that we must ensure that
-  // the matrix and RHS vector are reset before any assembly operations can
-  // occur. Furthermore, since we are describing a problem with Neumann BCs, we
-  // will need the face normals and so must specify this in the face update
-  // flags.
+  // with the assembly functions to the WorkStream object for processing. Note
+  // that we must ensure that the matrix and RHS vector are reset before any
+  // assembly operations can occur. Furthermore, since we are describing a
+  // problem with Neumann BCs, we will need the face normals and so must specify
+  // this in the face update flags.
   template <int dim>
   void Solid<dim>::assemble_system()
   {
@@ -1994,26 +1991,16 @@ namespace Step44
         this->assemble_system_one_cell(cell, scratch, data);
       },
       [this](const PerTaskData_ASM &data) {
-        this->copy_local_to_global_system(data);
+        this->constraints.distribute_local_to_global(data.cell_matrix,
+                                                     data.cell_rhs,
+                                                     data.local_dof_indices,
+                                                     tangent_matrix,
+                                                     system_rhs);
       },
       scratch_data,
       per_task_data);
 
     timer.leave_subsection();
-  }
-
-  // This function adds the local contribution to the system matrix.
-  // Note that we choose not to use the constraint matrix to do the
-  // job for us because the tangent matrix and residual processes have
-  // been split up into two separate functions.
-  template <int dim>
-  void Solid<dim>::copy_local_to_global_system(const PerTaskData_ASM &data)
-  {
-    constraints.distribute_local_to_global(data.cell_matrix,
-                                           data.cell_rhs,
-                                           data.local_dof_indices,
-                                           tangent_matrix,
-                                           system_rhs);
   }
 
   // Of course, we still have to define how we assemble the tangent matrix
@@ -2092,8 +2079,13 @@ namespace Step44
         const SymmetricTensor<2, dim> &I =
           Physics::Elasticity::StandardTensors<dim>::I;
 
+        // These two tensors store some precomputed data. Their use will
+        // explained shortly.
+        SymmetricTensor<2, dim> symm_grad_Nx_i_x_Jc;
+        Tensor<1, dim>          grad_Nx_i_comp_i_x_tau;
+
         // Next we define some aliases to make the assembly process easier to
-        // follow
+        // follow.
         const std::vector<double> &                 N = scratch.Nx[q_point];
         const std::vector<SymmetricTensor<2, dim>> &symm_grad_Nx =
           scratch.symm_grad_Nx[q_point];
@@ -2120,7 +2112,35 @@ namespace Step44
             else
               Assert(i_group <= J_dof, ExcInternalError());
 
-            // Next comes the tangent matrix contributions:
+            // Before we go into the inner loop, we have one final chance to
+            // introduce some optimizations. We've already taken into account
+            // the symmetry of the system, and we can now precompute some
+            // common terms that are repeatedly applied in the inner loop.
+            // We won't be excessive here, but will rather focus on expensive
+            // operations, namely those involving the rank-4 material stiffness
+            // tensor and the rank-2 stress tensor.
+            //
+            // What we may observe is that both of these tensors are contracted
+            // with shape function gradients indexed on the "i" DoF. This
+            // implies that this particular operation remains constant as we
+            // loop over the "j" DoF. For that reason, we can extract this from
+            // the inner loop and save the many operations that, for each
+            // quadrature point and DoF index "i" and repeated over index "j"
+            // are required to double contract a rank-2 symmetric tensor with a
+            // rank-4 symmetric tensor, and a rank-1 tensor with a rank-2
+            // tensor.
+            //
+            // At the loss of some readability, this small change will reduce
+            // the assembly time of the symmetrized system by about half when
+            // using the simulation default parameters, and becomes more
+            // significant as the h-refinement level increases.
+            if (i_group == u_dof)
+              {
+                symm_grad_Nx_i_x_Jc    = symm_grad_Nx[i] * Jc;
+                grad_Nx_i_comp_i_x_tau = grad_Nx[i][component_i] * tau_ns;
+              }
+
+            // Now we're prepared to compute the tangent matrix contributions:
             for (const unsigned int j :
                  scratch.fe_values.dof_indices_ending_at(i))
               {
@@ -2136,14 +2156,13 @@ namespace Step44
                 if ((i_group == j_group) && (i_group == u_dof))
                   {
                     // The material contribution:
-                    data.cell_matrix(i, j) += symm_grad_Nx[i] * Jc * //
+                    data.cell_matrix(i, j) += symm_grad_Nx_i_x_Jc *  //
                                               symm_grad_Nx[j] * JxW; //
 
                     // The geometrical stress contribution:
                     if (component_i == component_j)
-                      data.cell_matrix(i, j) += grad_Nx[i][component_i] *
-                                                tau_ns *
-                                                grad_Nx[j][component_j] * JxW;
+                      data.cell_matrix(i, j) +=
+                        grad_Nx_i_comp_i_x_tau * grad_Nx[j][component_j] * JxW;
                   }
                 // Next is the $\mathsf{\mathbf{k}}_{ \widetilde{p} u}$
                 // contribution
@@ -2236,7 +2255,7 @@ namespace Step44
   // additional contributions are to be made since the constraints
   // are already exactly satisfied.
   template <int dim>
-  void Solid<dim>::make_constraints(const int &it_nr)
+  void Solid<dim>::make_constraints(const int it_nr)
   {
     std::cout << " CST " << std::flush;
 
