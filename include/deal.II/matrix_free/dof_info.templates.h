@@ -382,7 +382,9 @@ namespace internal
 
 
     void
-    DoFInfo::assign_ghosts(const std::vector<unsigned int> &boundary_cells)
+    DoFInfo::assign_ghosts(const std::vector<unsigned int> &boundary_cells,
+                           const MPI_Comm &                 communicator_sm,
+                           const bool use_vector_data_exchanger_full)
     {
       Assert(boundary_cells.size() < row_starts.size(), ExcInternalError());
 
@@ -497,9 +499,14 @@ namespace internal
         const_cast<Utilities::MPI::Partitioner *>(vector_partitioner.get());
       vec_part->set_ghost_indices(ghost_indices);
 
-      vector_exchanger = std::make_shared<
-        internal::MatrixFreeFunctions::VectorDataExchange::PartitionerWrapper>(
-        vector_partitioner);
+      if (use_vector_data_exchanger_full == false)
+        vector_exchanger =
+          std::make_shared<internal::MatrixFreeFunctions::VectorDataExchange::
+                             PartitionerWrapper>(vector_partitioner);
+      else
+        vector_exchanger = std::make_shared<
+          internal::MatrixFreeFunctions::VectorDataExchange::Full>(
+          vector_partitioner, communicator_sm);
     }
 
 
@@ -1173,7 +1180,9 @@ namespace internal
       const unsigned int                        n_lanes,
       const std::vector<FaceToCellTopology<1>> &inner_faces,
       const std::vector<FaceToCellTopology<1>> &ghosted_faces,
-      const bool                                fill_cell_centric)
+      const bool                                fill_cell_centric,
+      const MPI_Comm &                          communicator_sm,
+      const bool                                use_vector_data_exchanger_full)
     {
       const Utilities::MPI::Partitioner &part = *vector_partitioner;
 
@@ -1226,9 +1235,14 @@ namespace internal
               ->set_ghost_indices(compressed_set, part.ghost_indices());
           }
 
-        vector_exchanger_face_variants[0] =
-          std::make_shared<internal::MatrixFreeFunctions::VectorDataExchange::
-                             PartitionerWrapper>(temp_0);
+        if (use_vector_data_exchanger_full == false)
+          vector_exchanger_face_variants[0] =
+            std::make_shared<internal::MatrixFreeFunctions::VectorDataExchange::
+                               PartitionerWrapper>(temp_0);
+        else
+          vector_exchanger_face_variants[0] = std::make_shared<
+            internal::MatrixFreeFunctions::VectorDataExchange::Full>(
+            temp_0, communicator_sm);
       }
 
       // construct a numbering of faces
@@ -1467,18 +1481,36 @@ namespace internal
             part.locally_owned_range(), part.get_mpi_communicator());
         }
 
-      vector_exchanger_face_variants[1] = std::make_shared<
-        internal::MatrixFreeFunctions::VectorDataExchange::PartitionerWrapper>(
-        temp_1);
-      vector_exchanger_face_variants[2] = std::make_shared<
-        internal::MatrixFreeFunctions::VectorDataExchange::PartitionerWrapper>(
-        temp_2);
-      vector_exchanger_face_variants[3] = std::make_shared<
-        internal::MatrixFreeFunctions::VectorDataExchange::PartitionerWrapper>(
-        temp_3);
-      vector_exchanger_face_variants[4] = std::make_shared<
-        internal::MatrixFreeFunctions::VectorDataExchange::PartitionerWrapper>(
-        temp_4);
+      if (use_vector_data_exchanger_full == false)
+        {
+          vector_exchanger_face_variants[1] =
+            std::make_shared<internal::MatrixFreeFunctions::VectorDataExchange::
+                               PartitionerWrapper>(temp_1);
+          vector_exchanger_face_variants[2] =
+            std::make_shared<internal::MatrixFreeFunctions::VectorDataExchange::
+                               PartitionerWrapper>(temp_2);
+          vector_exchanger_face_variants[3] =
+            std::make_shared<internal::MatrixFreeFunctions::VectorDataExchange::
+                               PartitionerWrapper>(temp_3);
+          vector_exchanger_face_variants[4] =
+            std::make_shared<internal::MatrixFreeFunctions::VectorDataExchange::
+                               PartitionerWrapper>(temp_4);
+        }
+      else
+        {
+          vector_exchanger_face_variants[1] = std::make_shared<
+            internal::MatrixFreeFunctions::VectorDataExchange::Full>(
+            temp_1, communicator_sm);
+          vector_exchanger_face_variants[2] = std::make_shared<
+            internal::MatrixFreeFunctions::VectorDataExchange::Full>(
+            temp_2, communicator_sm);
+          vector_exchanger_face_variants[3] = std::make_shared<
+            internal::MatrixFreeFunctions::VectorDataExchange::Full>(
+            temp_3, communicator_sm);
+          vector_exchanger_face_variants[4] = std::make_shared<
+            internal::MatrixFreeFunctions::VectorDataExchange::Full>(
+            temp_4, communicator_sm);
+        }
     }
 
 

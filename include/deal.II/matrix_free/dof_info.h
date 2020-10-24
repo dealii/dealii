@@ -187,7 +187,9 @@ namespace internal
        * access to all vector entries.
        */
       void
-      assign_ghosts(const std::vector<unsigned int> &boundary_cells);
+      assign_ghosts(const std::vector<unsigned int> &boundary_cells,
+                    const MPI_Comm &                 communicator_sm,
+                    const bool use_vector_data_exchanger_full);
 
       /**
        * This method reorders the way cells are gone through based on a given
@@ -240,7 +242,9 @@ namespace internal
         const unsigned int                        n_lanes,
         const std::vector<FaceToCellTopology<1>> &inner_faces,
         const std::vector<FaceToCellTopology<1>> &ghosted_faces,
-        const bool                                fill_cell_centric);
+        const bool                                fill_cell_centric,
+        const MPI_Comm &                          communicator_sm,
+        const bool use_vector_data_exchanger_full);
 
       /**
        * Given @p cell_indices_contiguous_sm containing the local index of

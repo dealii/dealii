@@ -244,6 +244,7 @@ public:
       , cell_vectorization_categories_strict(
           cell_vectorization_categories_strict)
       , communicator_sm(MPI_COMM_SELF)
+      , use_vector_data_exchanger_full(false)
     {}
 
     /**
@@ -270,6 +271,7 @@ public:
       , cell_vectorization_categories_strict(
           other.cell_vectorization_categories_strict)
       , communicator_sm(other.communicator_sm)
+      , use_vector_data_exchanger_full(other.use_vector_data_exchanger_full)
     {}
 
     // remove with level_mg_handler
@@ -299,7 +301,8 @@ public:
       cell_vectorization_category   = other.cell_vectorization_category;
       cell_vectorization_categories_strict =
         other.cell_vectorization_categories_strict;
-      communicator_sm = other.communicator_sm;
+      communicator_sm                = other.communicator_sm;
+      use_vector_data_exchanger_full = other.use_vector_data_exchanger_full;
 
       return *this;
     }
@@ -537,6 +540,13 @@ public:
      * Shared-memory MPI communicator. Default: MPI_COMM_SELF.
      */
     MPI_Comm communicator_sm;
+
+    /**
+     * Experimental: flag to switch between
+     * internal::MatrixFreeFunctions::VectorDataExchange::PartitionerWrapper and
+     * internal::MatrixFreeFunctions::VectorDataExchange::Full.
+     */
+    bool use_vector_data_exchanger_full;
   };
 
   /**
@@ -3295,7 +3305,8 @@ namespace internal
 
           const auto &part = get_partitioner(mf_component);
 
-          if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0)
+          if (part.n_ghost_indices() == 0 && part.n_import_indices() == 0 &&
+              part.n_import_sm_procs() == 0)
             return;
 
           tmp_data[component_in_block_vector] =
@@ -3305,7 +3316,7 @@ namespace internal
           AssertDimension(requests.size(), tmp_data.size());
 
           part.export_to_ghosted_array_start(
-            component_in_block_vector + channel_shift,
+            component_in_block_vector * 2 + channel_shift,
             ArrayView<const Number>(vec.begin(), part.local_size()),
             vec.shared_vector_data(),
             ArrayView<Number>(const_cast<Number *>(vec.begin()) +
@@ -3504,7 +3515,7 @@ namespace internal
 
           part.import_from_ghosted_array_start(
             dealii::VectorOperation::add,
-            component_in_block_vector + channel_shift,
+            component_in_block_vector * 2 + channel_shift,
             ArrayView<Number>(vec.begin(), part.local_size()),
             vec.shared_vector_data(),
             ArrayView<Number>(vec.begin() + part.local_size(),
@@ -3601,6 +3612,9 @@ namespace internal
                 tmp_data[component_in_block_vector]);
               tmp_data[component_in_block_vector] = nullptr;
             }
+
+          if (Utilities::MPI::job_supports_mpi())
+            MPI_Barrier(matrix_free.get_task_info().communicator_sm);
 #  endif
         }
     }

@@ -338,6 +338,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
             Utilities::MPI::this_mpi_process(task_info.communicator);
           task_info.n_procs =
             Utilities::MPI::n_mpi_processes(task_info.communicator);
+
+          Assert(additional_data.communicator_sm == MPI_COMM_SELF,
+                 ExcNotImplemented());
+
           task_info.communicator_sm = additional_data.communicator_sm;
         }
       else
@@ -679,7 +683,8 @@ namespace internal
     std::vector<std::pair<unsigned int, unsigned int>> &cell_level_index,
     std::vector<MatrixFreeFunctions::DoFInfo> &         dof_info,
     MatrixFreeFunctions::FaceSetup<dim> &               face_setup,
-    MatrixFreeFunctions::ConstraintValues<double> &     constraint_values)
+    MatrixFreeFunctions::ConstraintValues<double> &     constraint_values,
+    const bool use_vector_data_exchanger_full)
   {
     if (do_face_integrals)
       face_setup.initialize(dof_handler[0]->get_triangulation(),
@@ -784,10 +789,15 @@ namespace internal
           std::make_shared<Utilities::MPI::Partitioner>(locally_owned_dofs[no],
                                                         task_info.communicator);
 
-        dof_info[no].vector_exchanger =
-          std::make_shared<internal::MatrixFreeFunctions::VectorDataExchange::
-                             PartitionerWrapper>(
-            dof_info[no].vector_partitioner);
+        if (use_vector_data_exchanger_full == false)
+          dof_info[no].vector_exchanger =
+            std::make_shared<internal::MatrixFreeFunctions::VectorDataExchange::
+                               PartitionerWrapper>(
+              dof_info[no].vector_partitioner);
+        else
+          dof_info[no].vector_exchanger = std::make_shared<
+            internal::MatrixFreeFunctions::VectorDataExchange::Full>(
+            dof_info[no].vector_partitioner, task_info.communicator_sm);
 
         // initialize the arrays for indices
         const unsigned int n_components_total =
@@ -927,7 +937,9 @@ namespace internal
                             dof_info[no].ghost_dofs.push_back(dof_index);
                         }
             }
-          dof_info[no].assign_ghosts(cells_with_ghosts);
+          dof_info[no].assign_ghosts(cells_with_ghosts,
+                                     task_info.communicator_sm,
+                                     use_vector_data_exchanger_full);
         }
     }
 
@@ -1313,7 +1325,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
     cell_level_index,
     dof_info,
     face_setup,
-    constraint_values);
+    constraint_values,
+    additional_data.use_vector_data_exchanger_full);
 
   // set constraint pool from the std::map and reorder the indices
   std::vector<const std::vector<double> *> constraints(
@@ -1469,7 +1482,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
           VectorizedArrayType::size(),
           face_setup.inner_faces,
           face_setup.inner_ghost_faces,
-          is_fe_dg[count++] && additional_data.hold_all_faces_to_owned_cells);
+          is_fe_dg[count++] && additional_data.hold_all_faces_to_owned_cells,
+          task_info.communicator_sm,
+          additional_data.use_vector_data_exchanger_full);
     }
 
   for (auto &di : dof_info)
