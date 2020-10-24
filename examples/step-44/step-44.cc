@@ -2391,194 +2391,183 @@ namespace Step44
 
   // @sect4{Solid::make_constraints}
   // The constraints for this problem are simple to describe.
-  // However, since we are dealing with an iterative Newton method,
-  // it should be noted that any displacement constraints should only
-  // be specified at the zeroth iteration and subsequently no
-  // additional contributions are to be made since the constraints
-  // are already exactly satisfied.
+  // In this particular example, the boundary values will be calculated for
+  // the two first iterations of Newton's algorithm. In general, one would
+  // build non-homogeneous constraints in the zeroth iteration (that is, when
+  // `apply_dirichlet_bc == true` in the code block that follows) and build
+  // only the corresponding homogeneous constraints in the following step. While
+  // the current example has only homogeneous constraints, previous experiences
+  // have shown that a common error is forgetting to add the extra condition
+  // when refactoring the code to specific uses. This could lead to errors that
+  // are hard to debug. In this spirit, we choose to make the code more verbose
+  // in terms of what operations are performed at each Newton step.
   template <int dim>
   void Solid<dim>::make_constraints(const int &it_nr)
   {
-    std::cout << " CST " << std::flush;
-
-    // Since the constraints are different at different Newton iterations, we
-    // need to clear the constraints matrix and completely rebuild
-    // it. However, after the first iteration, the constraints remain the same
-    // and we can simply skip the rebuilding step if we do not clear it.
-    if (it_nr > 1)
-      return;
-    constraints.clear();
+    // Since we (a) are dealing with an iterative Newton method, (b) are using
+    // an incremental formulation for the displacement, and (c) apply the
+    // constraints to the incremental displacement field, any non-homogeneous
+    // constraints on the displacement update should only be specified at the
+    // zeroth iteration. No subsequent contributions are to be made since the
+    // constraints will be exactly satisfied after that iteration.
     const bool apply_dirichlet_bc = (it_nr == 0);
 
-    // In this particular example, the boundary values will be calculated for
-    // the two first iterations of Newton's algorithm. In general, one would
-    // build non-homogeneous constraints in the zeroth iteration (that is, when
-    // `apply_dirichlet_bc == true`) and build only the corresponding
-    // homogeneous constraints in the following step. While the current
-    // example has only homogeneous constraints, previous experiences have
-    // shown that a common error is forgetting to add the extra condition when
-    // refactoring the code to specific uses. This could lead errors that are
-    // hard to debug. In this spirit, we choose to make the code more verbose
-    // in terms of what operations are performed at each Newton step.
-    //
-    // The boundary conditions for the indentation problem are as follows: On
-    // the -x, -y and -z faces (IDs 0,2,4) we set up a symmetry condition to
-    // allow only planar movement while the +x and +z faces (IDs 1,5) are
-    // traction free. In this contrived problem, part of the +y face (ID 3) is
-    // set to have no motion in the x- and z-component. Finally, as described
-    // earlier, the other part of the +y face has an the applied pressure but
-    // is also constrained in the x- and z-directions.
-    //
-    // In the following, we will have to tell the function interpolation
-    // boundary values which components of the solution vector should be
-    // constrained (i.e., whether it's the x-, y-, z-displacements or
-    // combinations thereof). This is done using ComponentMask objects (see
-    // @ref GlossComponentMask) which we can get from the finite element if we
-    // provide it with an extractor object for the component we wish to
-    // select. To this end we first set up such extractor objects and later
-    // use it when generating the relevant component masks:
-    const FEValuesExtractors::Scalar x_displacement(0);
-    const FEValuesExtractors::Scalar y_displacement(1);
-
-    {
-      const int boundary_id = 0;
-
-      if (apply_dirichlet_bc == true)
-        VectorTools::interpolate_boundary_values(
-          dof_handler,
-          boundary_id,
-          Functions::ZeroFunction<dim>(n_components),
-          constraints,
-          fe.component_mask(x_displacement));
-      else
-        VectorTools::interpolate_boundary_values(
-          dof_handler,
-          boundary_id,
-          Functions::ZeroFunction<dim>(n_components),
-          constraints,
-          fe.component_mask(x_displacement));
-    }
-    {
-      const int boundary_id = 2;
-
-      if (apply_dirichlet_bc == true)
-        VectorTools::interpolate_boundary_values(
-          dof_handler,
-          boundary_id,
-          Functions::ZeroFunction<dim>(n_components),
-          constraints,
-          fe.component_mask(y_displacement));
-      else
-        VectorTools::interpolate_boundary_values(
-          dof_handler,
-          boundary_id,
-          Functions::ZeroFunction<dim>(n_components),
-          constraints,
-          fe.component_mask(y_displacement));
-    }
-
-    if (dim == 3)
+    // Furthermore, after the first Newton iteration within a timestep, the
+    // constraints remain the same and we do not need to modify or rebuild them
+    // so long as we do not clear the @p constraints object.
+    if (it_nr > 1)
       {
-        const FEValuesExtractors::Scalar z_displacement(2);
+        std::cout << " --- " << std::flush;
+        return;
+      }
+
+    std::cout << " CST " << std::flush;
+
+    if (apply_dirichlet_bc)
+      {
+        // At the zeroth Newton iteration we wish to apply the full set of
+        // non-homogeneous and homogeneous constraints that represent the
+        // boundary conditions on the displacement increment. Since in general
+        // the constraints may be different at each time step, we need to clear
+        // the constraints matrix and completely rebuild it. An example case
+        // would be if a surface is accelerating; in such a scenario the change
+        // in displacement is non-constant between each time step.
+        constraints.clear();
+
+        // The boundary conditions for the indentation problem in 3D are as
+        // follows: On the -x, -y and -z faces (IDs 0,2,4) we set up a symmetry
+        // condition to allow only planar movement while the +x and +z faces
+        // (IDs 1,5) are traction free. In this contrived problem, part of the
+        // +y face (ID 3) is set to have no motion in the x- and z-component.
+        // Finally, as described earlier, the other part of the +y face has an
+        // the applied pressure but is also constrained in the x- and
+        // z-directions.
+        //
+        // In the following, we will have to tell the function interpolation
+        // boundary values which components of the solution vector should be
+        // constrained (i.e., whether it's the x-, y-, z-displacements or
+        // combinations thereof). This is done using ComponentMask objects (see
+        // @ref GlossComponentMask) which we can get from the finite element if we
+        // provide it with an extractor object for the component we wish to
+        // select. To this end we first set up such extractor objects and later
+        // use it when generating the relevant component masks:
+        const FEValuesExtractors::Scalar x_displacement(0);
+        const FEValuesExtractors::Scalar y_displacement(1);
 
         {
-          const int boundary_id = 3;
+          const int boundary_id = 0;
 
-          if (apply_dirichlet_bc == true)
-            VectorTools::interpolate_boundary_values(
-              dof_handler,
-              boundary_id,
-              Functions::ZeroFunction<dim>(n_components),
-              constraints,
-              (fe.component_mask(x_displacement) |
-               fe.component_mask(z_displacement)));
-          else
-            VectorTools::interpolate_boundary_values(
-              dof_handler,
-              boundary_id,
-              Functions::ZeroFunction<dim>(n_components),
-              constraints,
-              (fe.component_mask(x_displacement) |
-               fe.component_mask(z_displacement)));
+          VectorTools::interpolate_boundary_values(
+            dof_handler,
+            boundary_id,
+            Functions::ZeroFunction<dim>(n_components),
+            constraints,
+            fe.component_mask(x_displacement));
         }
         {
-          const int boundary_id = 4;
+          const int boundary_id = 2;
 
-          if (apply_dirichlet_bc == true)
-            VectorTools::interpolate_boundary_values(
-              dof_handler,
-              boundary_id,
-              Functions::ZeroFunction<dim>(n_components),
-              constraints,
-              fe.component_mask(z_displacement));
-          else
-            VectorTools::interpolate_boundary_values(
-              dof_handler,
-              boundary_id,
-              Functions::ZeroFunction<dim>(n_components),
-              constraints,
-              fe.component_mask(z_displacement));
+          VectorTools::interpolate_boundary_values(
+            dof_handler,
+            boundary_id,
+            Functions::ZeroFunction<dim>(n_components),
+            constraints,
+            fe.component_mask(y_displacement));
         }
 
-        {
-          const int boundary_id = 6;
+        if (dim == 3)
+          {
+            const FEValuesExtractors::Scalar z_displacement(2);
 
-          if (apply_dirichlet_bc == true)
-            VectorTools::interpolate_boundary_values(
-              dof_handler,
-              boundary_id,
-              Functions::ZeroFunction<dim>(n_components),
-              constraints,
-              (fe.component_mask(x_displacement) |
-               fe.component_mask(z_displacement)));
-          else
-            VectorTools::interpolate_boundary_values(
-              dof_handler,
-              boundary_id,
-              Functions::ZeroFunction<dim>(n_components),
-              constraints,
-              (fe.component_mask(x_displacement) |
-               fe.component_mask(z_displacement)));
-        }
+            {
+              const int boundary_id = 3;
+
+              VectorTools::interpolate_boundary_values(
+                dof_handler,
+                boundary_id,
+                Functions::ZeroFunction<dim>(n_components),
+                constraints,
+                (fe.component_mask(x_displacement) |
+                 fe.component_mask(z_displacement)));
+            }
+            {
+              const int boundary_id = 4;
+
+              VectorTools::interpolate_boundary_values(
+                dof_handler,
+                boundary_id,
+                Functions::ZeroFunction<dim>(n_components),
+                constraints,
+                fe.component_mask(z_displacement));
+            }
+
+            {
+              const int boundary_id = 6;
+
+              VectorTools::interpolate_boundary_values(
+                dof_handler,
+                boundary_id,
+                Functions::ZeroFunction<dim>(n_components),
+                constraints,
+                (fe.component_mask(x_displacement) |
+                 fe.component_mask(z_displacement)));
+            }
+          }
+        else
+          {
+            {
+              const int boundary_id = 3;
+
+              VectorTools::interpolate_boundary_values(
+                dof_handler,
+                boundary_id,
+                Functions::ZeroFunction<dim>(n_components),
+                constraints,
+                (fe.component_mask(x_displacement)));
+            }
+            {
+              const int boundary_id = 6;
+
+              VectorTools::interpolate_boundary_values(
+                dof_handler,
+                boundary_id,
+                Functions::ZeroFunction<dim>(n_components),
+                constraints,
+                (fe.component_mask(x_displacement)));
+            }
+          }
       }
     else
       {
-        {
-          const int boundary_id = 3;
+        // As all Dirichlet constraints are fulfilled exactly after the zeroth
+        // Newton iteration, we want to ensure that no further modification are
+        // made to those entries. This implies that we want to convert
+        // all non-homogeneous Dirichlet constraints into homogeneous ones.
+        //
+        // In this example the procedure to do this is quite straightforward,
+        // and in fact we can (and will) circumvent any unnecessary operations
+        // when only homogeneous boundary conditions are applied.
+        // In a more general problem one should be mindful of hanging node
+        // and periodic constraints, which may also introduce some
+        // inhomogeneities. It might then be advantageous to keep disparate
+        // objects for the different types of constraints, and merge them
+        // together once the homogeneous Dirichlet constraints have been
+        // constructed.
+        if (constraints.has_inhomogeneities())
+          {
+            // Since the affine constraints were finalized at the previous
+            // Newton iteration, they may not be modified directly. So
+            // we need to copy them to another temporary object and make
+            // modification there. Once we're done, we'll transfer them
+            // back to the main @p constraints object.
+            AffineConstraints<double> homogeneous_constraints(constraints);
+            for (unsigned int dof = 0; dof != dof_handler.n_dofs(); ++dof)
+              if (homogeneous_constraints.is_inhomogeneously_constrained(dof))
+                homogeneous_constraints.set_inhomogeneity(dof, 0.0);
 
-          if (apply_dirichlet_bc == true)
-            VectorTools::interpolate_boundary_values(
-              dof_handler,
-              boundary_id,
-              Functions::ZeroFunction<dim>(n_components),
-              constraints,
-              (fe.component_mask(x_displacement)));
-          else
-            VectorTools::interpolate_boundary_values(
-              dof_handler,
-              boundary_id,
-              Functions::ZeroFunction<dim>(n_components),
-              constraints,
-              (fe.component_mask(x_displacement)));
-        }
-        {
-          const int boundary_id = 6;
-
-          if (apply_dirichlet_bc == true)
-            VectorTools::interpolate_boundary_values(
-              dof_handler,
-              boundary_id,
-              Functions::ZeroFunction<dim>(n_components),
-              constraints,
-              (fe.component_mask(x_displacement)));
-          else
-            VectorTools::interpolate_boundary_values(
-              dof_handler,
-              boundary_id,
-              Functions::ZeroFunction<dim>(n_components),
-              constraints,
-              (fe.component_mask(x_displacement)));
-        }
+            constraints.clear();
+            constraints.copy_from(homogeneous_constraints);
+          }
       }
 
     constraints.close();
