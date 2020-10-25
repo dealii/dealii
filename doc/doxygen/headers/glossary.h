@@ -337,23 +337,6 @@
  * on each of the selected faces. To query the boundary indicator of a particular
  * face or edge, use TriaAccessor::boundary_id.
  *
- * In older versions of the library (prior to 8.2), if you wanted also
- * to change the way the Triangulation class treated the boundary for
- * the purposes of mesh refinement, you could call
- * Triangulation::set_boundary to associate a boundary object with a
- * particular boundary indicator. This method is still supported, and
- * it allows the Triangulation object to use a different method of
- * finding new points on faces and edges to be refined; the default is
- * to use a FlatManifold object for all faces and edges. The
- * results section of step-49 has a worked example that shows all of
- * this in action.
- *
- * The suggested method from version 8.2 onwards, is to split the
- * geometrical description of the boundary from its physical meaning,
- * by using separately manifold_ids and boundary_ids. The former are
- * used to describe how the geometry changes, and the latter are used
- * to identify the boundary conditions.
- *
  * Many of the functions in namespaces DoFTools and VectorTools take
  * arguments that specify which part of the boundary to work on, and
  * they specifically refer to boundary_ids. Examples are
