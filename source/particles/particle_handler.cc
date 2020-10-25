@@ -1679,8 +1679,8 @@ namespace Particles
 
     switch (status)
       {
-          case parallel::distributed::Triangulation<dim,
-                                                    spacedim>::CELL_PERSIST: {
+        case parallel::distributed::Triangulation<dim, spacedim>::CELL_PERSIST:
+          {
             auto position_hint = particles.end();
             for (const auto &particle : loaded_particles_on_cell)
               {
@@ -1699,8 +1699,8 @@ namespace Particles
           }
           break;
 
-          case parallel::distributed::Triangulation<dim,
-                                                    spacedim>::CELL_COARSEN: {
+        case parallel::distributed::Triangulation<dim, spacedim>::CELL_COARSEN:
+          {
             typename std::multimap<internal::LevelInd,
                                    Particle<dim, spacedim>>::iterator
               position_hint = particles.end();
@@ -1725,8 +1725,8 @@ namespace Particles
           }
           break;
 
-          case parallel::distributed::Triangulation<dim,
-                                                    spacedim>::CELL_REFINE: {
+        case parallel::distributed::Triangulation<dim, spacedim>::CELL_REFINE:
+          {
             std::vector<
               typename std::multimap<internal::LevelInd,
                                      Particle<dim, spacedim>>::iterator>
