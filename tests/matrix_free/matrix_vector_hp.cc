@@ -142,6 +142,9 @@ test()
   hp::QCollection<dim>  quadrature_collection;
   hp::QCollection<1>    quadrature_collection_mf;
 
+  fe_collection.push_back(FE_Nothing<dim>());
+  quadrature_collection.push_back(QGauss<dim>(1));
+  quadrature_collection_mf.push_back(QGauss<1>(1));
   for (unsigned int deg = 1; deg <= max_degree; ++deg)
     {
       fe_collection.push_back(FE_Q<dim>(QGaussLobatto<1>(deg + 1)));
@@ -158,8 +161,13 @@ test()
     for (; cell != endc; ++cell)
       {
         const unsigned int fe_index = Testing::rand() % max_degree;
-        cell->set_active_fe_index(fe_index);
+        cell->set_active_fe_index(fe_index + 1);
       }
+    // We cannot set random cells to FE_Nothing. We get the following error
+    // The violated condition was: dominating_fe.n_dofs_per_face(face) <=
+    // subface_fe.n_dofs_per_face(face)
+    cell = dof.begin_active();
+    cell->set_active_fe_index(0);
   }
 
   // setup DoFs

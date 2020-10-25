@@ -949,9 +949,12 @@ namespace internal
       {
         const bool strict_categories =
           cell_vectorization_categories_strict || hp_functionality_enabled;
-        unsigned int dofs_per_cell = 0;
+        // Use max dofs per cell in create_blocks_serial. This is necessary
+        // to use FE_Nothing.
+        unsigned int max_dofs_per_cell = 0;
         for (const auto &info : dof_info)
-          dofs_per_cell = std::max(dofs_per_cell, info.dofs_per_cell[0]);
+          for (const auto &dofs : info.dofs_per_cell)
+            max_dofs_per_cell = std::max(max_dofs_per_cell, dofs);
 
         // Detect cells with the same parent to make sure they get scheduled
         // together in the loop, which increases data locality.
@@ -978,7 +981,7 @@ namespace internal
               ++position;
             }
         task_info.create_blocks_serial(subdomain_boundary_cells,
-                                       dofs_per_cell,
+                                       max_dofs_per_cell,
                                        hp_functionality_enabled,
                                        dof_info[0].cell_active_fe_index,
                                        strict_categories,

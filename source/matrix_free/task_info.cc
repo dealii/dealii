@@ -792,6 +792,7 @@ namespace internal
       std::vector<unsigned int> &      renumbering,
       std::vector<unsigned char> &     incompletely_filled_vectorization)
     {
+      Assert(dofs_per_cell > 0, ExcInternalError());
       // This function is decomposed into several steps to determine a good
       // ordering that satisfies the following constraints:
       // a. Only cells belonging to the same category (or next higher if the
