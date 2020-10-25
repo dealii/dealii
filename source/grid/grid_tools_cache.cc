@@ -199,6 +199,25 @@ namespace GridTools
     return covering_rtree[level];
   }
 
+  template <int dim, int spacedim>
+  const std::vector<std::set<unsigned int>> &
+  Cache<dim, spacedim>::get_vertex_to_neighbor_subdomain() const
+  {
+    if (update_flags & update_vertex_to_neighbor_subdomain)
+      {
+        vertex_to_neighbor_subdomain.clear();
+        vertex_to_neighbor_subdomain.resize(tria->n_vertices());
+        for (const auto &cell : tria->active_cell_iterators())
+          {
+            if (cell->is_ghost())
+              for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+                vertex_to_neighbor_subdomain[cell->vertex_index(v)].insert(
+                  cell->subdomain_id());
+          }
+      }
+    return vertex_to_neighbor_subdomain;
+  }
+
 #include "grid_tools_cache.inst"
 
 } // namespace GridTools

@@ -152,6 +152,15 @@ namespace GridTools
                 typename Triangulation<dim, spacedim>::active_cell_iterator>> &
     get_locally_owned_cell_bounding_boxes_rtree() const;
 
+
+    /** Returns the vector of set of integer containing the subdomain id
+     * to which each vertex is connected to. This feature is used extensively
+     * in the particle_handler to detect on which processors ghost particles
+     * must be built
+     */
+    const std::vector<std::set<unsigned int>> &
+    get_vertex_to_neighbor_subdomain() const;
+
     /**
      * Return a reference to the stored triangulation.
      */
@@ -268,6 +277,13 @@ namespace GridTools
       std::pair<BoundingBox<spacedim>,
                 typename Triangulation<dim, spacedim>::active_cell_iterator>>
       locally_owned_cell_bounding_boxes_rtree;
+
+
+    /**
+     * Store an std::vector of std::set of integer containing the id of all
+     * subdomain to which a vertex is connected to
+     */
+    mutable std::vector<std::set<unsigned int>> vertex_to_neighbor_subdomain;
 
     /**
      * Storage for the status of the triangulation signal.

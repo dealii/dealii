@@ -80,6 +80,11 @@ namespace GridTools
     update_locally_owned_cell_bounding_boxes_rtree = 0x080,
 
     /**
+     * Update vertex to neighbhor subdomain
+     */
+    update_vertex_to_neighbor_subdomain = 0x100,
+
+    /**
      * Update all objects.
      */
     update_all = 0x0FF,
@@ -163,8 +168,8 @@ namespace GridTools
    *
    * @ref CacheUpdateFlags
    */
-  inline CacheUpdateFlags operator&(const CacheUpdateFlags f1,
-                                    const CacheUpdateFlags f2)
+  inline CacheUpdateFlags
+  operator&(const CacheUpdateFlags f1, const CacheUpdateFlags f2)
   {
     return static_cast<CacheUpdateFlags>(static_cast<unsigned int>(f1) &
                                          static_cast<unsigned int>(f2));

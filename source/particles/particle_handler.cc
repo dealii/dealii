@@ -1186,16 +1186,8 @@ namespace Particles
         static_cast<typename std::vector<particle_iterator>::size_type>(
           particles.size() * 0.25));
 
-    std::vector<std::set<unsigned int>> vertex_to_neighbor_subdomain(
-      triangulation->n_vertices());
-
-    for (const auto &cell : triangulation->active_cell_iterators())
-      {
-        if (cell->is_ghost())
-          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
-            vertex_to_neighbor_subdomain[cell->vertex_index(v)].insert(
-              cell->subdomain_id());
-      }
+    const std::vector<std::set<unsigned int>> vertex_to_neighbor_subdomain =
+      triangulation_cache->get_vertex_to_neighbor_subdomain();
 
     for (const auto &cell : triangulation->active_cell_iterators())
       {
@@ -1687,8 +1679,8 @@ namespace Particles
 
     switch (status)
       {
-        case parallel::distributed::Triangulation<dim, spacedim>::CELL_PERSIST:
-          {
+          case parallel::distributed::Triangulation<dim,
+                                                    spacedim>::CELL_PERSIST: {
             auto position_hint = particles.end();
             for (const auto &particle : loaded_particles_on_cell)
               {
@@ -1707,8 +1699,8 @@ namespace Particles
           }
           break;
 
-        case parallel::distributed::Triangulation<dim, spacedim>::CELL_COARSEN:
-          {
+          case parallel::distributed::Triangulation<dim,
+                                                    spacedim>::CELL_COARSEN: {
             typename std::multimap<internal::LevelInd,
                                    Particle<dim, spacedim>>::iterator
               position_hint = particles.end();
@@ -1733,8 +1725,8 @@ namespace Particles
           }
           break;
 
-        case parallel::distributed::Triangulation<dim, spacedim>::CELL_REFINE:
-          {
+          case parallel::distributed::Triangulation<dim,
+                                                    spacedim>::CELL_REFINE: {
             std::vector<
               typename std::multimap<internal::LevelInd,
                                      Particle<dim, spacedim>>::iterator>
