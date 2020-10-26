@@ -103,6 +103,16 @@ namespace internal
       std::vector<unsigned int> active_cell_indices;
 
       /**
+       * Global cell index of each active cell.
+       */
+      std::vector<types::global_cell_index> global_active_cell_indices;
+
+      /**
+       * Global cell index of each cell on the given level.
+       */
+      std::vector<types::global_cell_index> global_level_cell_indices;
+
+      /**
        * Levels and indices of the neighbors of the cells. Convention is, that
        * the neighbors of the cell with index @p i are stored in the fields
        * following $i*(2*real\_space\_dimension)$, e.g. in one spatial
