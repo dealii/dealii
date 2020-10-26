@@ -100,7 +100,7 @@ namespace TriangulationDescription
     Description<dim, spacedim>
     create_description_from_triangulation(
       const dealii::Triangulation<dim, spacedim> &tria,
-      const MPI_Comm                              comm,
+      const MPI_Comm &                            comm,
       const TriangulationDescription::Settings    settings,
       const unsigned int                          my_rank_in)
     {
@@ -405,7 +405,7 @@ namespace TriangulationDescription
       const std::function<void(dealii::Triangulation<dim, spacedim> &,
                                const MPI_Comm,
                                const unsigned int)> &serial_grid_partitioner,
-      const MPI_Comm                                 comm,
+      const MPI_Comm &                               comm,
       const int                                      group_size,
       const typename Triangulation<dim, spacedim>::MeshSmoothing smoothing,
       const TriangulationDescription::Settings                   settings)

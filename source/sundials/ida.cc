@@ -153,7 +153,7 @@ namespace SUNDIALS
   } // namespace
 
   template <typename VectorType>
-  IDA<VectorType>::IDA(const AdditionalData &data, const MPI_Comm mpi_comm)
+  IDA<VectorType>::IDA(const AdditionalData &data, const MPI_Comm &mpi_comm)
     : data(data)
     , ida_mem(nullptr)
     , yy(nullptr)

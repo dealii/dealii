@@ -627,7 +627,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::reinit(
       const IndexSet &locally_owned_indices,
       const IndexSet &ghost_indices,
-      const MPI_Comm  communicator)
+      const MPI_Comm &communicator)
     {
       // set up parallel partitioner with index sets and communicator
       reinit(std::make_shared<Utilities::MPI::Partitioner>(
@@ -640,7 +640,7 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::reinit(
       const IndexSet &locally_owned_indices,
-      const MPI_Comm  communicator)
+      const MPI_Comm &communicator)
     {
       // set up parallel partitioner with index sets and communicator
       reinit(
@@ -719,7 +719,7 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     Vector<Number, MemorySpaceType>::Vector(const IndexSet &local_range,
                                             const IndexSet &ghost_indices,
-                                            const MPI_Comm  communicator)
+                                            const MPI_Comm &communicator)
       : allocated_size(0)
       , vector_is_ghosted(false)
       , comm_sm(MPI_COMM_SELF)
@@ -731,7 +731,7 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     Vector<Number, MemorySpaceType>::Vector(const IndexSet &local_range,
-                                            const MPI_Comm  communicator)
+                                            const MPI_Comm &communicator)
       : allocated_size(0)
       , vector_is_ghosted(false)
       , comm_sm(MPI_COMM_SELF)

@@ -301,12 +301,12 @@ namespace LinearAlgebra
        */
       Vector(const IndexSet &local_range,
              const IndexSet &ghost_indices,
-             const MPI_Comm  communicator);
+             const MPI_Comm &communicator);
 
       /**
        * Same constructor as above but without any ghost indices.
        */
-      Vector(const IndexSet &local_range, const MPI_Comm communicator);
+      Vector(const IndexSet &local_range, const MPI_Comm &communicator);
 
       /**
        * Create the vector based on the parallel partitioning described in @p
@@ -363,13 +363,13 @@ namespace LinearAlgebra
       void
       reinit(const IndexSet &local_range,
              const IndexSet &ghost_indices,
-             const MPI_Comm  communicator);
+             const MPI_Comm &communicator);
 
       /**
        * Same as above, but without ghost entries.
        */
       void
-      reinit(const IndexSet &local_range, const MPI_Comm communicator);
+      reinit(const IndexSet &local_range, const MPI_Comm &communicator);
 
       /**
        * Initialize the vector given to the parallel partitioning described in

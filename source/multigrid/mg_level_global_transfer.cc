@@ -165,7 +165,7 @@ namespace
       const MGConstrainedDoFs,
       MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>>
                                                 mg_constrained_dofs,
-    const MPI_Comm                              mpi_communicator,
+    const MPI_Comm &                            mpi_communicator,
     const bool                                  transfer_solution_vectors,
     std::vector<Table<2, unsigned int>> &       copy_indices,
     std::vector<Table<2, unsigned int>> &       copy_indices_global_mine,

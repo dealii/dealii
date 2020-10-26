@@ -2311,7 +2311,7 @@ namespace DataOutBase
   write_hdf5_parallel(const std::vector<Patch<dim, spacedim>> &patches,
                       const DataOutFilter &                    data_filter,
                       const std::string &                      filename,
-                      MPI_Comm                                 comm);
+                      const MPI_Comm &                         comm);
 
   /**
    * Write the data in @p data_filter to HDF5 file(s). If @p write_mesh_file is
@@ -2327,7 +2327,7 @@ namespace DataOutBase
                       const bool                               write_mesh_file,
                       const std::string &                      mesh_filename,
                       const std::string &solution_filename,
-                      MPI_Comm           comm);
+                      const MPI_Comm &   comm);
 
   /**
    * DataOutFilter is an intermediate data format that reduces the amount of
@@ -2658,7 +2658,8 @@ public:
    * DataOutInterface::write_vtu().
    */
   void
-  write_vtu_in_parallel(const std::string &filename, MPI_Comm comm) const;
+  write_vtu_in_parallel(const std::string &filename,
+                        const MPI_Comm &   comm) const;
 
   /**
    * Some visualization programs, such as ParaView, can read several separate
@@ -2793,7 +2794,7 @@ public:
   create_xdmf_entry(const DataOutBase::DataOutFilter &data_filter,
                     const std::string &               h5_filename,
                     const double                      cur_time,
-                    MPI_Comm                          comm) const;
+                    const MPI_Comm &                  comm) const;
 
   /**
    * Create an XDMFEntry based on the data in the data_filter. This assumes
@@ -2805,7 +2806,7 @@ public:
                     const std::string &               h5_mesh_filename,
                     const std::string &               h5_solution_filename,
                     const double                      cur_time,
-                    MPI_Comm                          comm) const;
+                    const MPI_Comm &                  comm) const;
 
   /**
    * Write an XDMF file based on the provided vector of XDMFEntry objects.
@@ -2834,7 +2835,7 @@ public:
   void
   write_xdmf_file(const std::vector<XDMFEntry> &entries,
                   const std::string &           filename,
-                  MPI_Comm                      comm) const;
+                  const MPI_Comm &              comm) const;
 
   /**
    * Write the data in @p data_filter to a single HDF5 file containing both the
@@ -2853,7 +2854,7 @@ public:
   void
   write_hdf5_parallel(const DataOutBase::DataOutFilter &data_filter,
                       const std::string &               filename,
-                      MPI_Comm                          comm) const;
+                      const MPI_Comm &                  comm) const;
 
   /**
    * Write the data in data_filter to HDF5 file(s). If write_mesh_file is
@@ -2867,7 +2868,7 @@ public:
                       const bool                        write_mesh_file,
                       const std::string &               mesh_filename,
                       const std::string &               solution_filename,
-                      MPI_Comm                          comm) const;
+                      const MPI_Comm &                  comm) const;
 
   /**
    * DataOutFilter is an intermediate data format that reduces the amount of

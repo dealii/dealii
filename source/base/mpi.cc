@@ -1101,7 +1101,7 @@ namespace Utilities
 
 
     void
-    CollectiveMutex::lock(MPI_Comm comm)
+    CollectiveMutex::lock(const MPI_Comm &comm)
     {
       (void)comm;
 
@@ -1135,7 +1135,7 @@ namespace Utilities
 
 
     void
-    CollectiveMutex::unlock(MPI_Comm comm)
+    CollectiveMutex::unlock(const MPI_Comm &comm)
     {
       (void)comm;
 

@@ -37,7 +37,7 @@ namespace parallel
   {
     template <int dim, int spacedim>
     Triangulation<dim, spacedim>::Triangulation(
-      MPI_Comm mpi_communicator,
+      const MPI_Comm &mpi_communicator,
       const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                      smooth_grid,
       const bool     allow_artificial_cells,

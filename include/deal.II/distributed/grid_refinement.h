@@ -47,7 +47,7 @@ namespace internal
         std::pair<number, number>
         compute_global_min_and_max_at_root(
           const dealii::Vector<number> &criteria,
-          MPI_Comm                      mpi_communicator);
+          const MPI_Comm &              mpi_communicator);
 
         namespace RefineAndCoarsenFixedNumber
         {
@@ -60,7 +60,7 @@ namespace internal
           compute_threshold(const dealii::Vector<number> &   criteria,
                             const std::pair<double, double> &global_min_and_max,
                             const types::global_cell_index   n_target_cells,
-                            MPI_Comm                         mpi_communicator);
+                            const MPI_Comm &                 mpi_communicator);
         } // namespace RefineAndCoarsenFixedNumber
 
         namespace RefineAndCoarsenFixedFraction
@@ -76,7 +76,7 @@ namespace internal
           compute_threshold(const dealii::Vector<number> &   criteria,
                             const std::pair<double, double> &global_min_and_max,
                             const double                     target_error,
-                            MPI_Comm                         mpi_communicator);
+                            const MPI_Comm &                 mpi_communicator);
         } // namespace RefineAndCoarsenFixedFraction
       }   // namespace GridRefinement
     }     // namespace distributed

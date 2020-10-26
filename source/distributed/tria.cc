@@ -1123,7 +1123,7 @@ namespace parallel
 
     template <int dim, int spacedim>
     Triangulation<dim, spacedim>::DataTransfer::DataTransfer(
-      MPI_Comm mpi_communicator)
+      const MPI_Comm &mpi_communicator)
       : mpi_communicator(mpi_communicator)
       , variable_size_data_stored(false)
     {}
@@ -2110,7 +2110,7 @@ namespace parallel
 
     template <int dim, int spacedim>
     Triangulation<dim, spacedim>::Triangulation(
-      MPI_Comm mpi_communicator,
+      const MPI_Comm &mpi_communicator,
       const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                      smooth_grid,
       const Settings settings)
@@ -4967,7 +4967,7 @@ namespace parallel
 
     template <int spacedim>
     Triangulation<1, spacedim>::Triangulation(
-      MPI_Comm mpi_communicator,
+      const MPI_Comm &mpi_communicator,
       const typename dealii::Triangulation<1, spacedim>::MeshSmoothing
         smooth_grid,
       const Settings /*settings*/)

@@ -151,7 +151,7 @@ namespace SUNDIALS
 
   template <typename VectorType>
   KINSOL<VectorType>::KINSOL(const AdditionalData &data,
-                             const MPI_Comm        mpi_comm)
+                             const MPI_Comm &      mpi_comm)
     : data(data)
     , kinsol_mem(nullptr)
     , solution(nullptr)

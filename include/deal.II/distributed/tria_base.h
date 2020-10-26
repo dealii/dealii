@@ -82,7 +82,7 @@ namespace parallel
      * Constructor.
      */
     TriangulationBase(
-      MPI_Comm mpi_communicator,
+      const MPI_Comm &mpi_communicator,
       const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                  smooth_grid = (dealii::Triangulation<dim, spacedim>::none),
       const bool check_for_distorted_cells = false);
@@ -357,7 +357,7 @@ namespace parallel
      * Constructor.
      */
     DistributedTriangulationBase(
-      MPI_Comm mpi_communicator,
+      const MPI_Comm &mpi_communicator,
       const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                  smooth_grid = (dealii::Triangulation<dim, spacedim>::none),
       const bool check_for_distorted_cells = false);
