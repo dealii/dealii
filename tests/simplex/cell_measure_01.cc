@@ -17,7 +17,12 @@
 
 // Test TriaAccessor::measure() and TriaAccessor::diameter().
 
+#include <deal.II/fe/mapping_fe.h>
+
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
+
+#include <deal.II/simplex/fe_lib.h>
 
 #include "../tests.h"
 
@@ -35,6 +40,13 @@ process(const std::vector<Point<spacedim>> &vertices,
       deallog << "measure:  " << cell->measure() << std::endl;
       deallog << "diameter: " << cell->diameter() << std::endl;
     }
+
+  const MappingFE<dim> mapping(Simplex::FE_P<dim>(1));
+
+  deallog << "diameter_min: " << GridTools::minimal_cell_diameter(tria, mapping)
+          << std::endl;
+  deallog << "diameter_max: " << GridTools::maximal_cell_diameter(tria, mapping)
+          << std::endl;
   deallog << std::endl;
 }
 

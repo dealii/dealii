@@ -3099,15 +3099,29 @@ namespace GridTools
     diameter(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
              const Mapping<dim, spacedim> &mapping)
     {
+      // see also TriaAccessor::diameter()
+
       const auto vertices = mapping.get_vertices(cell);
-      switch (dim)
+      switch (cell->reference_cell_type())
         {
-          case 1:
+          case ReferenceCell::Type::Line:
             return (vertices[1] - vertices[0]).norm();
-          case 2:
+          case ReferenceCell::Type::Tri:
+            return std::max(std::max((vertices[1] - vertices[0]).norm(),
+                                     (vertices[2] - vertices[1]).norm()),
+                            (vertices[2] - vertices[0]).norm());
+          case ReferenceCell::Type::Quad:
             return std::max((vertices[3] - vertices[0]).norm(),
                             (vertices[2] - vertices[1]).norm());
-          case 3:
+          case ReferenceCell::Type::Tet:
+            return std::max(
+              std::max(std::max((vertices[1] - vertices[0]).norm(),
+                                (vertices[2] - vertices[0]).norm()),
+                       std::max((vertices[2] - vertices[1]).norm(),
+                                (vertices[3] - vertices[0]).norm())),
+              std::max((vertices[3] - vertices[1]).norm(),
+                       (vertices[3] - vertices[2]).norm()));
+          case ReferenceCell::Type::Hex:
             return std::max(std::max((vertices[7] - vertices[0]).norm(),
                                      (vertices[6] - vertices[1]).norm()),
                             std::max((vertices[2] - vertices[5]).norm(),

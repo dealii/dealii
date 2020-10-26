@@ -24,15 +24,17 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim>
-std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+boost::container::small_vector<Point<spacedim>,
+                               GeometryInfo<dim>::vertices_per_cell>
 Mapping<dim, spacedim>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
-  std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertices;
-  for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
-    {
-      vertices[i] = cell->vertex(i);
-    }
+  boost::container::small_vector<Point<spacedim>,
+                                 GeometryInfo<dim>::vertices_per_cell>
+    vertices;
+  for (const unsigned int i : cell->vertex_indices())
+    vertices.push_back(cell->vertex(i));
+
   return vertices;
 }
 

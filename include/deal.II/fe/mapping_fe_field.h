@@ -169,7 +169,8 @@ public:
    * and constructs the position of the vertices according to the @p euler_vector
    * that was passed at construction time.
    */
-  virtual std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+  virtual boost::container::small_vector<Point<spacedim>,
+                                         GeometryInfo<dim>::vertices_per_cell>
   get_vertices(const typename Triangulation<dim, spacedim>::cell_iterator &cell)
     const override;
 

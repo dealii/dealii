@@ -357,7 +357,8 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::
 
 
 template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
-std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+boost::container::small_vector<Point<spacedim>,
+                               GeometryInfo<dim>::vertices_per_cell>
 MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
@@ -395,7 +396,9 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::get_vertices(
   const VectorType &vector =
     uses_level_dofs ? *euler_vector[cell->level()] : *euler_vector[0];
 
-  std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertices;
+  boost::container::small_vector<Point<spacedim>,
+                                 GeometryInfo<dim>::vertices_per_cell>
+    vertices(GeometryInfo<dim>::vertices_per_cell);
   for (unsigned int i = 0; i < dofs_per_cell; ++i)
     {
       const unsigned int comp = fe_to_real
