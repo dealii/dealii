@@ -1572,30 +1572,6 @@ namespace internal
                         ReferenceCell::Type::Hex)]
         .reset(new CellTypeHex());
 
-      // jump table to pick the right entity type
-      static const ReferenceCell::Type X = ReferenceCell::Type::Invalid;
-      static const std::array<const std::array<ReferenceCell::Type, 9>, 4>
-        table = {{{{X, ReferenceCell::Type::Vertex, X, X, X, X, X, X, X}},
-                  {{X, X, ReferenceCell::Type::Line, X, X, X, X, X, X}},
-                  {{X,
-                    X,
-                    X,
-                    ReferenceCell::Type::Tri,
-                    ReferenceCell::Type::Quad,
-                    X,
-                    X,
-                    X,
-                    X}},
-                  {{X,
-                    X,
-                    X,
-                    X,
-                    ReferenceCell::Type::Tet,
-                    ReferenceCell::Type::Pyramid,
-                    ReferenceCell::Type::Wedge,
-                    X,
-                    ReferenceCell::Type::Hex}}}};
-
       // determine cell types and process vertices
       std::vector<T> cell_vertices;
       cell_vertices.reserve(
@@ -1616,9 +1592,8 @@ namespace internal
       // loop over cells and create CRS
       for (const auto &cell : cells)
         {
-          // determine cell type
           const ReferenceCell::Type cell_type =
-            table[dim][cell.vertices.size()];
+            ReferenceCell::n_vertices_to_type(dim, cell.vertices.size());
 
           Assert(cell_type != ReferenceCell::Type::Invalid,
                  ExcNotImplemented());

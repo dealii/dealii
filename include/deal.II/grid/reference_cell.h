@@ -91,6 +91,29 @@ namespace ReferenceCell
       }
   }
 
+  /**
+   * Retrieve the correct ReferenceCell::Type for a given structural dimension
+   * and number of vertices.
+   */
+  inline Type
+  n_vertices_to_type(const int dim, const unsigned int n_vertices)
+  {
+    AssertIndexRange(dim, 4);
+    AssertIndexRange(n_vertices, 9);
+    const auto X = Type::Invalid;
+
+    static constexpr std::array<std::array<ReferenceCell::Type, 9>, 4> table = {
+      {// dim 0
+       {{X, Type::Vertex, X, X, X, X, X, X, X}},
+       // dim 1
+       {{X, X, Type::Line, X, X, X, X, X, X}},
+       // dim 2
+       {{X, X, X, Type::Tri, Type::Quad, X, X, X, X}},
+       // dim 3
+       {{X, X, X, X, Type::Tet, Type::Pyramid, Type::Wedge, X, Type::Hex}}}};
+    return table[dim][n_vertices];
+  }
+
   namespace internal
   {
     /**
