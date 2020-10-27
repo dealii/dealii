@@ -78,7 +78,8 @@ for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
             parallel::distributed::Triangulation<deal_II_dimension> &,
             const dealii::Vector<S> &,
             const double,
-            const double);
+            const double,
+            const VectorTools::NormType);
         \}
       \}
     \}
@@ -109,7 +110,8 @@ for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
                                                  deal_II_dimension> &,
             const dealii::Vector<S> &,
             const double,
-            const double);
+            const double,
+            const VectorTools::NormType);
         \}
       \}
     \}
