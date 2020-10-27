@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2018 by the deal.II authors
+//    Copyright (C) 2020 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -16,15 +16,20 @@
 #include <deal.II/base/parameter_handler.h>
 
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/sundials/arkode.h>
 
+#include <arkode/arkode_arkstep.h>
+
 #include "../tests.h"
 
 
-// Test implicit-explicit time stepper. Only solve_jacobian_system.
-// Brusselator benchmark
+// Test implicit-explicit time stepper. jac_times_vector/setup +
+// custom linear solver
 
 /**
  * This test problem is called "brusselator", and is a typical benchmark for
@@ -49,7 +54,9 @@
 int
 main(int argc, char **argv)
 {
-  std::ofstream out("output");
+  initlog();
+  // restrict output to highest level
+  deallog.depth_file(1);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, numbers::invalid_unsigned_int);
@@ -62,12 +69,12 @@ main(int argc, char **argv)
 
   if (false)
     {
-      std::ofstream ofile(SOURCE_DIR "/harmonic_oscillator_05.prm");
+      std::ofstream ofile(SOURCE_DIR "/arkode_06.prm");
       prm.print_parameters(ofile, ParameterHandler::ShortText);
       ofile.close();
     }
 
-  std::ifstream ifile(SOURCE_DIR "/harmonic_oscillator_05.prm");
+  std::ifstream ifile(SOURCE_DIR "/arkode_06.prm");
   prm.parse_input(ifile);
 
   SUNDIALS::ARKode<VectorType> ode(data);
@@ -99,27 +106,49 @@ main(int argc, char **argv)
     return 0;
   };
 
-  ode.solve_jacobian_system = [&](const double t,
-                                  const double gamma,
-                                  const VectorType &,
-                                  const VectorType &,
-                                  const VectorType &src,
-                                  VectorType &      dst) -> int {
+
+  ode.jacobian_times_setup =
+    [&](realtype t, const VectorType &y, const VectorType &fy) -> int {
     J       = 0;
-    J(0, 0) = 1;
-    J(1, 1) = 1;
-    J(2, 2) = 1 + gamma / eps;
-    J.gauss_jordan();
-    J.vmult(dst, src);
+    J(2, 2) = -1.0 / eps;
+    return 0;
+  };
+
+  ode.jacobian_times_vector = [&](const VectorType &v,
+                                  VectorType &      Jv,
+                                  double            t,
+                                  const VectorType &y,
+                                  const VectorType &fy) -> int {
+    J.vmult(Jv, v);
+    return 0;
+  };
+
+  ode.solve_linearized_system =
+    [&](SUNDIALS::SundialsOperator<VectorType> &op,
+        SUNDIALS::SundialsPreconditioner<VectorType> &,
+        VectorType &      x,
+        const VectorType &b,
+        double            tol) -> int {
+    ReductionControl     control;
+    SolverCG<VectorType> solver_cg(control);
+    solver_cg.solve(op, x, b, PreconditionIdentity());
     return 0;
   };
 
   ode.output_step = [&](const double       t,
                         const VectorType & sol,
                         const unsigned int step_number) -> int {
-    out << t << " " << sol[0] << " " << sol[1] << " " << sol[2] << std::endl;
+    deallog << t << " " << sol[0] << " " << sol[1] << " " << sol[2]
+            << std::endl;
     return 0;
   };
+
+  // after 5.2.0 a special interpolation mode should be used for stiff problems
+#if DEAL_II_SUNDIALS_VERSION_GTE(5, 2, 0)
+  ode.custom_setup = [&](void *arkode_mem) {
+    ARKStepSetInterpolantType(arkode_mem, ARK_INTERP_LAGRANGE);
+  };
+#endif
 
   Vector<double> y(3);
   y[0] = u0;

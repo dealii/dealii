@@ -52,7 +52,7 @@
 int
 main(int argc, char **argv)
 {
-  std::ofstream out("output");
+  initlog();
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, numbers::invalid_unsigned_int);
@@ -63,8 +63,8 @@ main(int argc, char **argv)
   SUNDIALS::ARKode<VectorType>::AdditionalData data;
   data.add_parameters(prm);
 
-  // Use the same parameters of test 2.
-  std::ifstream ifile(SOURCE_DIR "/harmonic_oscillator_02.prm");
+  // Use the same parameters of test 1.
+  std::ifstream ifile(SOURCE_DIR "/arkode_01.prm");
   prm.parse_input(ifile);
 
   SUNDIALS::ARKode<VectorType> ode(data);
@@ -86,8 +86,8 @@ main(int argc, char **argv)
     // limit the output to every 10th step and increase the precision to make
     // the test more robust
     if (step_number % 10 == 0)
-      out << t << " " << std::setprecision(7) << sol[0] << " " << sol[1]
-          << std::endl;
+      deallog << t << " " << std::setprecision(7) << sol[0] << " " << sol[1]
+              << std::endl;
     return 0;
   };
 

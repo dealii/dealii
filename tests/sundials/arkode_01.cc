@@ -52,7 +52,7 @@
 int
 main(int argc, char **argv)
 {
-  std::ofstream out("output");
+  initlog();
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, numbers::invalid_unsigned_int);
@@ -66,12 +66,12 @@ main(int argc, char **argv)
   // Set to true to reset input file.
   if (false)
     {
-      std::ofstream ofile(SOURCE_DIR "/harmonic_oscillator_02.prm");
+      std::ofstream ofile(SOURCE_DIR "/arkode_01.prm");
       prm.print_parameters(ofile, ParameterHandler::ShortText);
       ofile.close();
     }
 
-  std::ifstream ifile(SOURCE_DIR "/harmonic_oscillator_02.prm");
+  std::ifstream ifile(SOURCE_DIR "/arkode_01.prm");
   prm.parse_input(ifile);
 
   SUNDIALS::ARKode<VectorType> ode(data);
@@ -90,7 +90,7 @@ main(int argc, char **argv)
   ode.output_step = [&](const double       t,
                         const VectorType & sol,
                         const unsigned int step_number) -> int {
-    out << t << " " << sol[0] << " " << sol[1] << std::endl;
+    deallog << t << " " << sol[0] << " " << sol[1] << std::endl;
     return 0;
   };
 

@@ -20,28 +20,30 @@
 
 #ifdef DEAL_II_WITH_SUNDIALS
 
-#  include <deal.II/base/utilities.h>
+#  if DEAL_II_SUNDIALS_VERSION_LT(4, 0, 0)
 
-#  include <deal.II/lac/block_vector.h>
-#  ifdef DEAL_II_WITH_TRILINOS
-#    include <deal.II/lac/trilinos_parallel_block_vector.h>
-#    include <deal.II/lac/trilinos_vector.h>
-#  endif
-#  ifdef DEAL_II_WITH_PETSC
-#    include <deal.II/lac/petsc_block_vector.h>
-#    include <deal.II/lac/petsc_vector.h>
-#  endif
+#    include <deal.II/base/utilities.h>
 
-#  include <deal.II/sundials/copy.h>
+#    include <deal.II/lac/block_vector.h>
+#    ifdef DEAL_II_WITH_TRILINOS
+#      include <deal.II/lac/trilinos_parallel_block_vector.h>
+#      include <deal.II/lac/trilinos_vector.h>
+#    endif
+#    ifdef DEAL_II_WITH_PETSC
+#      include <deal.II/lac/petsc_block_vector.h>
+#      include <deal.II/lac/petsc_vector.h>
+#    endif
 
-#  ifdef DEAL_II_SUNDIALS_WITH_IDAS
-#    include <idas/idas_impl.h>
-#  else
-#    include <ida/ida_impl.h>
-#  endif
+#    include <deal.II/sundials/copy.h>
 
-#  include <iomanip>
-#  include <iostream>
+#    ifdef DEAL_II_SUNDIALS_WITH_IDAS
+#      include <idas/idas_impl.h>
+#    else
+#      include <ida/ida_impl.h>
+#    endif
+
+#    include <iomanip>
+#    include <iostream>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -172,14 +174,14 @@ namespace SUNDIALS
   {
     if (ida_mem)
       IDAFree(&ida_mem);
-#  ifdef DEAL_II_WITH_MPI
+#    ifdef DEAL_II_WITH_MPI
     if (is_serial_vector<VectorType>::value == false)
       {
         const int ierr = MPI_Comm_free(&communicator);
         (void)ierr;
         AssertNothrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
       }
-#  endif
+#    endif
   }
 
 
@@ -200,7 +202,7 @@ namespace SUNDIALS
     // The solution is stored in
     // solution. Here we take only a
     // view of it.
-#  ifdef DEAL_II_WITH_MPI
+#    ifdef DEAL_II_WITH_MPI
     if (is_serial_vector<VectorType>::value == false)
       {
         const IndexSet    is                = solution.locally_owned_elements();
@@ -216,7 +218,7 @@ namespace SUNDIALS
           N_VNew_Parallel(communicator, local_system_size, system_size);
       }
     else
-#  endif
+#    endif
       {
         Assert(is_serial_vector<VectorType>::value,
                ExcInternalError(
@@ -254,7 +256,7 @@ namespace SUNDIALS
       }
 
       // Free the vectors which are no longer used.
-#  ifdef DEAL_II_WITH_MPI
+#    ifdef DEAL_II_WITH_MPI
     if (is_serial_vector<VectorType>::value == false)
       {
         N_VDestroy_Parallel(yy);
@@ -263,7 +265,7 @@ namespace SUNDIALS
         N_VDestroy_Parallel(diff_id);
       }
     else
-#  endif
+#    endif
       {
         N_VDestroy_Serial(yy);
         N_VDestroy_Serial(yp);
@@ -293,7 +295,7 @@ namespace SUNDIALS
     // Free the vectors which are no longer used.
     if (yy)
       {
-#  ifdef DEAL_II_WITH_MPI
+#    ifdef DEAL_II_WITH_MPI
         if (is_serial_vector<VectorType>::value == false)
           {
             N_VDestroy_Parallel(yy);
@@ -302,7 +304,7 @@ namespace SUNDIALS
             N_VDestroy_Parallel(diff_id);
           }
         else
-#  endif
+#    endif
           {
             N_VDestroy_Serial(yy);
             N_VDestroy_Serial(yp);
@@ -314,7 +316,7 @@ namespace SUNDIALS
     int status;
     (void)status;
     system_size = solution.size();
-#  ifdef DEAL_II_WITH_MPI
+#    ifdef DEAL_II_WITH_MPI
     if (is_serial_vector<VectorType>::value == false)
       {
         const IndexSet    is                = solution.locally_owned_elements();
@@ -330,7 +332,7 @@ namespace SUNDIALS
           N_VNew_Parallel(communicator, local_system_size, system_size);
       }
     else
-#  endif
+#    endif
       {
         yy        = N_VNew_Serial(system_size);
         yp        = N_VNew_Serial(system_size);
@@ -394,9 +396,9 @@ namespace SUNDIALS
 
     IDA_mem->ida_lsetup = t_dae_lsetup<VectorType>;
     IDA_mem->ida_lsolve = t_dae_solve<VectorType>;
-#  if DEAL_II_SUNDIALS_VERSION_LT(3, 0, 0)
+#    if DEAL_II_SUNDIALS_VERSION_LT(3, 0, 0)
     IDA_mem->ida_setupNonNull = true;
-#  endif
+#    endif
 
     status = IDASetMaxOrd(ida_mem, data.maximum_order);
     AssertIDA(status);
@@ -490,24 +492,26 @@ namespace SUNDIALS
   template class IDA<Vector<double>>;
   template class IDA<BlockVector<double>>;
 
-#  ifdef DEAL_II_WITH_MPI
+#    ifdef DEAL_II_WITH_MPI
 
-#    ifdef DEAL_II_WITH_TRILINOS
+#      ifdef DEAL_II_WITH_TRILINOS
   template class IDA<TrilinosWrappers::MPI::Vector>;
   template class IDA<TrilinosWrappers::MPI::BlockVector>;
-#    endif // DEAL_II_WITH_TRILINOS
+#      endif // DEAL_II_WITH_TRILINOS
 
-#    ifdef DEAL_II_WITH_PETSC
-#      ifndef PETSC_USE_COMPLEX
+#      ifdef DEAL_II_WITH_PETSC
+#        ifndef PETSC_USE_COMPLEX
   template class IDA<PETScWrappers::MPI::Vector>;
   template class IDA<PETScWrappers::MPI::BlockVector>;
-#      endif // PETSC_USE_COMPLEX
-#    endif   // DEAL_II_WITH_PETSC
+#        endif // PETSC_USE_COMPLEX
+#      endif   // DEAL_II_WITH_PETSC
 
-#  endif // DEAL_II_WITH_MPI
+#    endif // DEAL_II_WITH_MPI
 
 } // namespace SUNDIALS
 
 DEAL_II_NAMESPACE_CLOSE
+
+#  endif
 
 #endif // DEAL_II_WITH_SUNDIALS
