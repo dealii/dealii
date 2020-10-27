@@ -214,6 +214,7 @@ namespace GridTools
                 vertex_to_neighbor_subdomain[cell->vertex_index(v)].insert(
                   cell->subdomain_id());
           }
+        update_flags = update_flags & ~update_vertex_to_neighbor_subdomain;
       }
     return vertex_to_neighbor_subdomain;
   }
