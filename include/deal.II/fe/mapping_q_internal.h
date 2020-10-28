@@ -207,6 +207,34 @@ namespace internal
   namespace MappingQGenericImplementation
   {
     /**
+     * This function generates the reference cell support points from the 1d
+     * support points by expanding the tensor product.
+     */
+    template <int dim>
+    std::vector<Point<dim>>
+    unit_support_points(const std::vector<Point<1>> &    line_support_points,
+                        const std::vector<unsigned int> &renumbering)
+    {
+      AssertDimension(Utilities::pow(line_support_points.size(), dim),
+                      renumbering.size());
+      std::vector<Point<dim>> points(renumbering.size());
+      const unsigned int      n1 = line_support_points.size();
+      for (unsigned int q2 = 0, q = 0; q2 < (dim > 2 ? n1 : 1); ++q2)
+        for (unsigned int q1 = 0; q1 < (dim > 1 ? n1 : 1); ++q1)
+          for (unsigned int q0 = 0; q0 < n1; ++q0, ++q)
+            {
+              points[renumbering[q]][0] = line_support_points[q0][0];
+              if (dim > 1)
+                points[renumbering[q]][1] = line_support_points[q1][0];
+              if (dim > 2)
+                points[renumbering[q]][2] = line_support_points[q2][0];
+            }
+      return points;
+    }
+
+
+
+    /**
      * This function is needed by the constructor of
      * <tt>MappingQ<dim,spacedim></tt> for <tt>dim=</tt> 2 and 3.
      *
@@ -844,30 +872,36 @@ namespace internal
 
       /**
        * Constructor.
+       *
+       * @param real_support_points The position of the mapping support points
+       * in real space, queried by
+       * MappingQGeneric::compute_mapping_support_points().
+       *
+       * @param unit_support_points The location of the support points in
+       * reference coordinates $[0, 1]^d$ that map to the mapping support
+       * points in real space by a polynomial map.
        */
       InverseQuadraticApproximation(
-        const std::vector<Point<spacedim>> &mapping_support_points,
-        const std::vector<Point<1>> &       line_support_points,
-        const std::vector<unsigned int> &   renumber)
-        : p_shift(mapping_support_points[0])
-        , scale(1. /
-                mapping_support_points[0].distance(mapping_support_points[1]))
+        const std::vector<Point<spacedim>> &real_support_points,
+        const std::vector<Point<dim>> &     unit_support_points)
+        : normalization_shift(real_support_points[0])
+        , normalization_length(
+            1. / real_support_points[0].distance(real_support_points[1]))
+        , is_affine(true)
       {
-        AssertDimension(mapping_support_points.size(), renumber.size());
-        AssertDimension(mapping_support_points.size(),
-                        Utilities::pow(line_support_points.size(), dim));
-
-        const unsigned int n1 = line_support_points.size();
+        AssertDimension(real_support_points.size(), unit_support_points.size());
 
         // For the bi-/trilinear approximation, we cannot build a quadratic
         // polynomial due to a lack of points (interpolation matrix would get
         // singular), so pick the affine approximation. Similarly, it is not
         // entirely clear how to gather enough information for the case dim <
         // spacedim
-        if (n1 == 2 || dim < spacedim)
+        if (real_support_points.size() ==
+              GeometryInfo<dim>::vertices_per_cell ||
+            dim < spacedim)
           {
             const auto affine = GridTools::affine_cell_approximation<dim>(
-              make_array_view(mapping_support_points));
+              make_array_view(real_support_points));
             DerivativeForm<1, spacedim, dim> A_inv =
               affine.first.covariant_form().transpose();
             coefficients[0] = apply_transformation(A_inv, affine.second);
@@ -880,40 +914,32 @@ namespace internal
 
         SymmetricTensor<2, n_functions> matrix;
         std::array<double, n_functions> shape_values;
-        for (unsigned int q2 = 0, q = 0; q2 < (dim > 2 ? n1 : 1); ++q2)
-          for (unsigned int q1 = 0; q1 < (dim > 1 ? n1 : 1); ++q1)
-            for (unsigned int q0 = 0; q0 < n1; ++q0, ++q)
-              {
-                // Evaluate quadratic shape functions in point, shifted to the
-                // first support point and scaled by the length between the
-                // first two support points to avoid roundoff issues with
-                // scaling far away from 1.
-                shape_values[0] = 1.;
-                const Tensor<1, spacedim> p_scaled =
-                  (mapping_support_points[renumber[q]] - p_shift) * scale;
-                for (unsigned int d = 0; d < spacedim; ++d)
-                  shape_values[1 + d] = p_scaled[d];
-                for (unsigned int d = 0, c = 0; d < spacedim; ++d)
-                  for (unsigned int e = 0; e <= d; ++e, ++c)
-                    shape_values[1 + spacedim + c] = p_scaled[d] * p_scaled[e];
+        for (unsigned int q = 0; q < unit_support_points.size(); ++q)
+          {
+            // Evaluate quadratic shape functions in point, with the
+            // normalization applied in order to avoid roundoff issues with
+            // scaling far away from 1.
+            shape_values[0] = 1.;
+            const Tensor<1, spacedim> p_scaled =
+              normalization_length *
+              (real_support_points[q] - normalization_shift);
+            for (unsigned int d = 0; d < spacedim; ++d)
+              shape_values[1 + d] = p_scaled[d];
+            for (unsigned int d = 0, c = 0; d < spacedim; ++d)
+              for (unsigned int e = 0; e <= d; ++e, ++c)
+                shape_values[1 + spacedim + c] = p_scaled[d] * p_scaled[e];
 
-                // Build lower diagonal of least squares matrix and rhs, the
-                // essential part being that we construct the matrix with the
-                // real points and the right hand side by comparing to the
-                // reference point positions which sets up an inverse
-                // interpolation.
-                for (unsigned int i = 0; i < n_functions; ++i)
-                  for (unsigned int j = 0; j <= i; ++j)
-                    matrix[i][j] += shape_values[i] * shape_values[j];
-                Point<dim> reference_point;
-                reference_point[0] = line_support_points[q0][0];
-                if (dim > 1)
-                  reference_point[1] = line_support_points[q1][0];
-                if (dim > 2)
-                  reference_point[2] = line_support_points[q2][0];
-                for (unsigned int i = 0; i < n_functions; ++i)
-                  coefficients[i] += shape_values[i] * reference_point;
-              }
+            // Build lower diagonal of least squares matrix and rhs, the
+            // essential part being that we construct the matrix with the
+            // real points and the right hand side by comparing to the
+            // reference point positions which sets up an inverse
+            // interpolation.
+            for (unsigned int i = 0; i < n_functions; ++i)
+              for (unsigned int j = 0; j <= i; ++j)
+                matrix[i][j] += shape_values[i] * shape_values[j];
+            for (unsigned int i = 0; i < n_functions; ++i)
+              coefficients[i] += shape_values[i] * unit_support_points[q];
+          }
 
         // Factorize the matrix A = L * L^T in-place with the
         // Cholesky-Banachiewicz algorithm. The implementation is similar to
@@ -981,11 +1007,13 @@ namespace internal
         for (unsigned int d = 0; d < dim; ++d)
           result[d] = coefficients[0][d];
 
-        // Shift point to avoid roundoff problems. Spell out the loop
-        // because Number might be a vectorized array.
+        // Apply the normalization to ensure a good conditioning. Since Number
+        // might be a vectorized array whereas the normalization is a point of
+        // doubles, we cannot use the overload of operator- and must instead
+        // loop over the components of the point.
         Point<spacedim, Number> p_scaled;
         for (unsigned int d = 0; d < spacedim; ++d)
-          p_scaled[d] = (p[d] - p_shift[d]) * scale;
+          p_scaled[d] = (p[d] - normalization_shift[d]) * normalization_length;
 
         for (unsigned int d = 0; d < spacedim; ++d)
           result += coefficients[1 + d] * p_scaled[d];
@@ -1001,10 +1029,31 @@ namespace internal
       }
 
     private:
-      const Point<spacedim>               p_shift;
-      const double                        scale;
+      /**
+       * In order to guarantee a good conditioning, we need to apply a
+       * transformation to the points in real space that is computed by a
+       * shift vector normalization_shift (first point of the mapping support
+       * points in real space) and an inverse length scale called
+       * `length_normalization` as the distance between the first two points.
+       */
+      const Point<spacedim> normalization_shift;
+
+      /**
+       * See the documentation of `normalization_shift` above.
+       */
+      const double normalization_length;
+
+      /**
+       * The vector of coefficients in the quadratic approximation.
+       */
       std::array<Point<dim>, n_functions> coefficients;
-      bool                                is_affine;
+
+      /**
+       * In case the quadratic approximation is not possible due to an
+       * insufficient number of support points, we switch to an affine
+       * approximation that always works but is less accurate.
+       */
+      bool is_affine;
     };
 
 

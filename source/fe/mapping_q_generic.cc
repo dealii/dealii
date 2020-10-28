@@ -368,6 +368,10 @@ MappingQGeneric<dim, spacedim>::MappingQGeneric(const unsigned int p)
       Polynomials::generate_complete_Lagrange_basis(line_support_points))
   , renumber_lexicographic_to_hierarchic(
       FETools::lexicographic_to_hierarchic_numbering<dim>(p))
+  , unit_cell_support_points(
+      internal::MappingQGenericImplementation::unit_support_points<dim>(
+        line_support_points,
+        renumber_lexicographic_to_hierarchic))
   , support_point_weights_perimeter_to_interior(
       internal::MappingQGenericImplementation::
         compute_support_point_weights_perimeter_to_interior(
@@ -741,9 +745,7 @@ MappingQGeneric<dim, spacedim>::transform_points_real_to_unit_cell(
   // 2^dim points and construct an affine approximation from those.
   internal::MappingQGenericImplementation::
     InverseQuadraticApproximation<dim, spacedim>
-      inverse_approximation(support_points,
-                            line_support_points,
-                            renumber_lexicographic_to_hierarchic);
+      inverse_approximation(support_points, unit_cell_support_points);
 
   const unsigned int n_points = real_points.size();
   const unsigned int n_lanes  = VectorizedArray<double>::size();

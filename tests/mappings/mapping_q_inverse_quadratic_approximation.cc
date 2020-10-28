@@ -59,6 +59,9 @@ print_result(const unsigned int                  mapping_degree,
     QGaussLobatto<1>(mapping_degree + 1).get_points());
   std::vector<unsigned int> renumber =
     FETools::lexicographic_to_hierarchic_numbering<dim>(mapping_degree);
+  std::vector<Point<dim>> mapping_unit_support_points =
+    internal::MappingQGenericImplementation::unit_support_points<dim>(
+      mapping_points, renumber);
 
   for (const auto &cell : tria.active_cell_iterators())
     {
@@ -76,8 +79,7 @@ print_result(const unsigned int                  mapping_degree,
           internal::MappingQGenericImplementation::
             InverseQuadraticApproximation<dim, spacedim>
               approx(fe_values.get_quadrature_points(),
-                     mapping_points,
-                     renumber);
+                     mapping_unit_support_points);
           deallog << "Inverse quadratic approximation: " << approx.compute(p)
                   << std::endl
                   << std::endl;
