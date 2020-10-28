@@ -336,9 +336,9 @@ namespace Particles
      * function is after particle transfer to a new process.
      *
      * If a particle already stores properties in a property pool, then
-     * these are released and the particle will not store any properties
-     * after this call (though new properties can be assigned to it using
-     * the set_properties() call).
+     * their values are saved, the memory is released in the previous
+     * property pool, and a copy of the particle's properties will be
+     * allocated in the new property pool.
      */
     void
     set_property_pool(PropertyPool &property_pool);
@@ -554,15 +554,32 @@ namespace Particles
   inline void
   Particle<dim, spacedim>::set_property_pool(PropertyPool &new_property_pool)
   {
+    // First, we do want to save any properties that may
+    // have previously been set, and copy them over to the memory allocated
+    // on the new pool
+    PropertyPool::Handle new_handle = PropertyPool::invalid_handle;
+    if (property_pool != nullptr && properties != PropertyPool::invalid_handle)
+      {
+        new_handle = new_property_pool.allocate_properties_array();
+
+        ArrayView<double> old_properties = this->get_properties();
+        ArrayView<double> new_properties =
+          property_pool->get_properties(new_handle);
+        std::copy(old_properties.cbegin(),
+                  old_properties.cend(),
+                  new_properties.begin());
+      }
+
     // If the particle currently has a reference to properties, then
-    // release those
+    // release those.
     if (property_pool != nullptr && properties != PropertyPool::invalid_handle)
       property_pool->deallocate_properties_array(properties);
 
-    // Then start from scratch, with no properties associated with the current
-    // particle
+
+    // Then set the pointer to the property pool we want to use. Also set the
+    // handle to any properties, if we have copied any above.
     property_pool = &new_property_pool;
-    properties    = PropertyPool::invalid_handle;
+    properties    = new_handle;
   }
 
 
