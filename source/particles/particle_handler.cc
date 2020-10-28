@@ -692,7 +692,7 @@ namespace Particles
               }
 
             particles.emplace(local_cells_containing_particles[i_cell],
-                              particle);
+                              std::move(particle));
           }
       }
 
