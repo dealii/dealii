@@ -87,7 +87,7 @@ namespace GridTools
     /**
      * Update all objects.
      */
-    update_all = 0x0FF,
+    update_all = 0xFFF,
   };
 
 
