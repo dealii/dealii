@@ -43,19 +43,54 @@ class FE_Enriched;
 
 /**
  * This class provides an interface to group several elements together into
- * one. To the outside world, the resulting object looks just like a usual
- * finite element object, which is composed of several other finite elements
- * that are possibly of different type. The result is then a vector-valued
- * finite element. An example is given in the documentation of namespace
- * FETools::Compositing, when using the "tensor product" strategy.
+ * one, vector-valued element. As example, consider the Taylor-Hood element
+ * that is used for the solution of the Stokes and Navier-Stokes equations:
+ * There, the velocity (of which there are as many components as the dimension
+ * $d$ of the domain) is discretized with $Q_2$ elements and the pressure with
+ * $Q_1$ elements. Mathematically, the finite element space for the coupled
+ * problem is then often written as $V_h = Q_2^d \times Q_1$ where the
+ * exponentiation is understood to be the tensor product of spaces -- i.e.,
+ * in 2d, we have $V_h=Q_2\times Q_2\times Q_1$ -- and tensor products
+ * lead to vectors where each component of the vector-valued function
+ * space corresponds to a scalar function in one of the $Q_2$ or $Q_1$
+ * spaces. Using the FESystem class, this space is created using
+ * @code
+ *   FESystem<dim> taylor_hood_fe (FE_Q<dim>(2)^dim,   // velocity components
+ *                                 FE_Q<dim>(1));      // pressure component
+ * @endcode
+ * The creation of this element here corresponds to taking tensor-product
+ * powers of the $Q_2$ element in the first line of the list of arguments
+ * to the FESystem constructor, and then concatenation via another tensor
+ * product with the element in the second line. This kind of construction
+ * is used, for example, in the step-22 tutorial program.
+ *
+ * Similarly, step-8 solves an elasticity equation where we need to solve
+ * for the displacement of a solid object. The displacement again has
+ * $d$ components if the domain is $d$-dimensional, and so the combined
+ * finite element is created using
+ * @code
+ *   FESystem<dim> displacement_fe (FE_Q<dim>(1)^dim);
+ * @endcode
+ * where now each (vector) component of the combined element corresponds to
+ * a $Q_1$ space.
+ *
+ * To the outside world, FESystem objects look just like a usual
+ * finite element object, they just happen to be composed of several other
+ * finite elements that are possibly of different type. These "base elements"
+ * can themselves have multiple components and, in particular, could
+ * also be vector-valued -- for example, if one of the base elements
+ * is an FESystem itself (see also below). An example is given in the
+ * documentation of namespace FETools::Compositing, when using the
+ * "tensor product" strategy.
  *
  * %Vector valued elements are discussed in a number of
- * tutorial programs, for example step-8, step-20, step-21, and in particular
- * in the
+ * tutorial programs, for example step-8, step-20, step-21, step-22, and in
+ * particular in the
  * @ref vector_valued
  * module.
  *
  * @dealiiVideoLecture{19,20}
+ *
  *
  * <h3>FESystem, components and blocks</h3>
  *
