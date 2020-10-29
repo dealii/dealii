@@ -912,7 +912,7 @@ namespace internal
             return;
           }
 
-        SymmetricTensor<2, n_functions> matrix;
+        Tensor<2, n_functions>          matrix;
         std::array<double, n_functions> shape_values;
         for (unsigned int q = 0; q < unit_support_points.size(); ++q)
           {
@@ -935,7 +935,7 @@ namespace internal
             // reference point positions which sets up an inverse
             // interpolation.
             for (unsigned int i = 0; i < n_functions; ++i)
-              for (unsigned int j = 0; j <= i; ++j)
+              for (unsigned int j = 0; j < n_functions; ++j)
                 matrix[i][j] += shape_values[i] * shape_values[j];
             for (unsigned int i = 0; i < n_functions; ++i)
               coefficients[i] += shape_values[i] * unit_support_points[q];
