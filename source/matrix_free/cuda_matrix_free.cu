@@ -19,8 +19,15 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+
+
 namespace CUDAWrappers
 {
+  namespace internal
+  {
+    extern std::array<std::atomic_bool, mf_n_concurrent_objects> used_objects;
+  }
+
   // Do not instantiate for dim = 1
   template class MatrixFree<2, float>;
   template class MatrixFree<2, double>;
