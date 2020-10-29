@@ -1584,7 +1584,8 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
   // (, and level subdomain id).
   for (const auto &cell : tria.cell_iterators())
     {
-      for (unsigned int vertex_index = 0; vertex_index < 4; vertex_index++)
+      for (unsigned int vertex_index = 0; vertex_index < cell->n_vertices();
+           ++vertex_index)
         {
           if (cell->vertex(vertex_index)[0] < x_min)
             x_min = cell->vertex(vertex_index)[0];
@@ -1834,24 +1835,27 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
       if (y_min_perspective > projection_decomposition[1])
         y_min_perspective = projection_decomposition[1];
 
-      point[0] = cell->vertex(3)[0];
-      point[1] = cell->vertex(3)[1];
+      if (cell->n_vertices() == 4) // in case of quadrilateral
+        {
+          point[0] = cell->vertex(3)[0];
+          point[1] = cell->vertex(3)[1];
 
-      projection_decomposition = svg_project_point(point,
-                                                   camera_position,
-                                                   camera_direction,
-                                                   camera_horizontal,
-                                                   camera_focus);
+          projection_decomposition = svg_project_point(point,
+                                                       camera_position,
+                                                       camera_direction,
+                                                       camera_horizontal,
+                                                       camera_focus);
 
-      if (x_max_perspective < projection_decomposition[0])
-        x_max_perspective = projection_decomposition[0];
-      if (x_min_perspective > projection_decomposition[0])
-        x_min_perspective = projection_decomposition[0];
+          if (x_max_perspective < projection_decomposition[0])
+            x_max_perspective = projection_decomposition[0];
+          if (x_min_perspective > projection_decomposition[0])
+            x_min_perspective = projection_decomposition[0];
 
-      if (y_max_perspective < projection_decomposition[1])
-        y_max_perspective = projection_decomposition[1];
-      if (y_min_perspective > projection_decomposition[1])
-        y_min_perspective = projection_decomposition[1];
+          if (y_max_perspective < projection_decomposition[1])
+            y_max_perspective = projection_decomposition[1];
+          if (y_min_perspective > projection_decomposition[1])
+            y_min_perspective = projection_decomposition[1];
+        }
 
       if (static_cast<unsigned int>(cell->level()) == min_level)
         min_level_min_vertex_distance = cell->minimum_vertex_distance();
@@ -2175,29 +2179,32 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
 
           out << " L ";
 
-          point[0] = cell->vertex(3)[0];
-          point[1] = cell->vertex(3)[1];
+          if (cell->n_vertices() == 4) // in case of quadrilateral
+            {
+              point[0] = cell->vertex(3)[0];
+              point[1] = cell->vertex(3)[1];
 
-          projection_decomposition = svg_project_point(point,
-                                                       camera_position,
-                                                       camera_direction,
-                                                       camera_horizontal,
-                                                       camera_focus);
+              projection_decomposition = svg_project_point(point,
+                                                           camera_position,
+                                                           camera_direction,
+                                                           camera_horizontal,
+                                                           camera_focus);
 
-          out << static_cast<unsigned int>(
-                   .5 +
-                   ((projection_decomposition[0] - x_min_perspective) /
-                    x_dimension_perspective) *
-                     (width - (width / 100.) * 2. * margin_in_percent) +
-                   ((width / 100.) * margin_in_percent))
-              << ' '
-              << static_cast<unsigned int>(
-                   .5 + height - (height / 100.) * margin_in_percent -
-                   ((projection_decomposition[1] - y_min_perspective) /
-                    y_dimension_perspective) *
-                     (height - (height / 100.) * 2. * margin_in_percent));
+              out << static_cast<unsigned int>(
+                       .5 +
+                       ((projection_decomposition[0] - x_min_perspective) /
+                        x_dimension_perspective) *
+                         (width - (width / 100.) * 2. * margin_in_percent) +
+                       ((width / 100.) * margin_in_percent))
+                  << ' '
+                  << static_cast<unsigned int>(
+                       .5 + height - (height / 100.) * margin_in_percent -
+                       ((projection_decomposition[1] - y_min_perspective) /
+                        y_dimension_perspective) *
+                         (height - (height / 100.) * 2. * margin_in_percent));
 
-          out << " L ";
+              out << " L ";
+            }
 
           point[0] = cell->vertex(2)[0];
           point[1] = cell->vertex(2)[1];
@@ -2354,8 +2361,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
           // the additional boundary line
           if (svg_flags.boundary_line_thickness)
             {
-              for (const unsigned int faceIndex :
-                   GeometryInfo<2>::face_indices())
+              for (auto faceIndex : cell->face_indices())
                 {
                   if (cell->at_boundary(faceIndex))
                     {
