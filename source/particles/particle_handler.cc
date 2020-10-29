@@ -603,7 +603,7 @@ namespace Particles
                   it.second.n_elements(),
                   std::vector<double>(n_properties_per_particle()));
                 unsigned int index = 0;
-                for (const auto &el : it.second)
+                for (const auto el : it.second)
                   properties_to_send[index++] = properties[el];
                 non_locally_owned_properties.insert(
                   {it.first, properties_to_send});
@@ -628,7 +628,7 @@ namespace Particles
                 std::vector<types::particle_index> ids_to_send(
                   it.second.n_elements());
                 unsigned int index = 0;
-                for (const auto &el : it.second)
+                for (const auto el : it.second)
                   ids_to_send[index++] = ids[el];
                 non_locally_owned_ids.insert({it.first, ids_to_send});
               }
