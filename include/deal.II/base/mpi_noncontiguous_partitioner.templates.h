@@ -135,7 +135,7 @@ namespace Utilities
           {
             recv_ranks.push_back(target_with_indexset.first);
 
-            for (const auto &cell_index : target_with_indexset.second)
+            for (const auto cell_index : target_with_indexset.second)
               recv_indices.push_back(cell_index);
 
             recv_ptr.push_back(recv_indices.size());
@@ -150,7 +150,7 @@ namespace Utilities
           {
             send_ranks.push_back(target_with_indexset.first);
 
-            for (const auto &cell_index : target_with_indexset.second)
+            for (const auto cell_index : target_with_indexset.second)
               send_indices.push_back(indexset_has.index_within_set(cell_index));
 
             send_ptr.push_back(send_indices.size() + recv_ptr.back());
@@ -171,14 +171,14 @@ namespace Utilities
       std::vector<types::global_dof_index> indices_has_clean;
       indices_has_clean.reserve(indices_has.size());
 
-      for (const auto &i : indices_has)
+      for (const auto i : indices_has)
         if (i != numbers::invalid_dof_index)
           indices_has_clean.push_back(i);
 
       std::vector<types::global_dof_index> indices_want_clean;
       indices_want_clean.reserve(indices_want.size());
 
-      for (const auto &i : indices_want)
+      for (const auto i : indices_want)
         if (i != numbers::invalid_dof_index)
           indices_want_clean.push_back(i);
 
