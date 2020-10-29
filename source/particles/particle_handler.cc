@@ -1186,16 +1186,8 @@ namespace Particles
         static_cast<typename std::vector<particle_iterator>::size_type>(
           particles.size() * 0.25));
 
-    std::vector<std::set<unsigned int>> vertex_to_neighbor_subdomain(
-      triangulation->n_vertices());
-
-    for (const auto &cell : triangulation->active_cell_iterators())
-      {
-        if (cell->is_ghost())
-          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
-            vertex_to_neighbor_subdomain[cell->vertex_index(v)].insert(
-              cell->subdomain_id());
-      }
+    const std::vector<std::set<unsigned int>> vertex_to_neighbor_subdomain =
+      triangulation_cache->get_vertex_to_neighbor_subdomain();
 
     for (const auto &cell : triangulation->active_cell_iterators())
       {

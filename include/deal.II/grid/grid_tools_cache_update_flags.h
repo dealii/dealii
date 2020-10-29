@@ -80,9 +80,14 @@ namespace GridTools
     update_locally_owned_cell_bounding_boxes_rtree = 0x080,
 
     /**
+     * Update vertex to neighbhor subdomain
+     */
+    update_vertex_to_neighbor_subdomain = 0x100,
+
+    /**
      * Update all objects.
      */
-    update_all = 0x0FF,
+    update_all = 0xFFF,
   };
 
 
