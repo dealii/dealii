@@ -94,7 +94,8 @@ namespace LinearAlgebra
           const types::global_dof_index /*new_alloc_size*/,
           types::global_dof_index & /*allocated_size*/,
           ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpaceType>
-            & /*data*/)
+            & /*data*/,
+          const MPI_Comm & /*comm_sm*/)
         {}
 
         static void
@@ -128,27 +129,132 @@ namespace LinearAlgebra
         resize_val(const types::global_dof_index new_alloc_size,
                    types::global_dof_index &     allocated_size,
                    ::dealii::MemorySpace::
-                     MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+                     MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data,
+                   const MPI_Comm &comm_shared)
         {
-          if (new_alloc_size > allocated_size)
+          if (comm_shared == MPI_COMM_SELF)
             {
-              Assert(((allocated_size > 0 && data.values != nullptr) ||
-                      data.values == nullptr),
-                     ExcInternalError());
+              if (new_alloc_size > allocated_size)
+                {
+                  Assert(((allocated_size > 0 && data.values != nullptr) ||
+                          data.values == nullptr),
+                         ExcInternalError());
 
-              Number *new_val;
-              Utilities::System::posix_memalign(
-                reinterpret_cast<void **>(&new_val),
-                64,
-                sizeof(Number) * new_alloc_size);
-              data.values = {new_val, [](Number *data) { std::free(data); }};
+                  Number *new_val;
+                  Utilities::System::posix_memalign(
+                    reinterpret_cast<void **>(&new_val),
+                    64,
+                    sizeof(Number) * new_alloc_size);
+                  data.values = {new_val,
+                                 [](Number *data) { std::free(data); }};
 
-              allocated_size = new_alloc_size;
+                  allocated_size = new_alloc_size;
+                }
+              else if (new_alloc_size == 0)
+                {
+                  data.values.reset();
+                  allocated_size = 0;
+                }
+              data.values_sm = {
+                ArrayView<const Number>(data.values.get(), new_alloc_size)};
             }
-          else if (new_alloc_size == 0)
+          else
             {
-              data.values.reset();
-              allocated_size = 0;
+#ifdef DEAL_II_WITH_MPI
+#  if DEAL_II_MPI_VERSION_GTE(3, 0)
+              allocated_size = new_alloc_size;
+
+              const unsigned int size_sm =
+                Utilities::MPI::n_mpi_processes(comm_shared);
+              const unsigned int rank_sm =
+                Utilities::MPI::this_mpi_process(comm_shared);
+
+              MPI_Win mpi_window;
+              Number *data_this;
+
+
+              std::vector<Number *> others(size_sm);
+
+              MPI_Info info;
+              MPI_Info_create(&info);
+
+              MPI_Info_set(info, "alloc_shared_noncontig", "true");
+
+              const std::size_t align_by = 64;
+
+              std::size_t s =
+                ((new_alloc_size * sizeof(Number) + align_by - 1) /
+                 sizeof(Number)) *
+                sizeof(Number);
+
+              auto ierr = MPI_Win_allocate_shared(
+                s, sizeof(Number), info, comm_shared, &data_this, &mpi_window);
+              AssertThrowMPI(ierr);
+
+              for (unsigned int i = 0; i < size_sm; i++)
+                {
+                  int        disp_unit;
+                  MPI_Aint   ssize;
+                  const auto ierr = MPI_Win_shared_query(
+                    mpi_window, i, &ssize, &disp_unit, &others[i]);
+                  AssertThrowMPI(ierr);
+                }
+
+              Number *ptr_unaligned = others[rank_sm];
+              Number *ptr_aligned   = ptr_unaligned;
+
+              AssertThrow(std::align(align_by,
+                                     new_alloc_size * sizeof(Number),
+                                     reinterpret_cast<void *&>(ptr_aligned),
+                                     s) != nullptr,
+                          ExcNotImplemented());
+
+              unsigned int n_align_local = ptr_aligned - ptr_unaligned;
+              std::vector<unsigned int> n_align_sm(size_sm);
+
+              ierr = MPI_Allgather(&n_align_local,
+                                   1,
+                                   MPI_UNSIGNED,
+                                   n_align_sm.data(),
+                                   1,
+                                   MPI_UNSIGNED,
+                                   comm_shared);
+              AssertThrowMPI(ierr);
+
+              for (unsigned int i = 0; i < size_sm; i++)
+                others[i] += n_align_sm[i];
+
+              std::vector<unsigned int> new_alloc_sizes(size_sm);
+
+              ierr = MPI_Allgather(&new_alloc_size,
+                                   1,
+                                   MPI_UNSIGNED,
+                                   new_alloc_sizes.data(),
+                                   1,
+                                   MPI_UNSIGNED,
+                                   comm_shared);
+              AssertThrowMPI(ierr);
+
+              data.values_sm.resize(size_sm);
+              for (unsigned int i = 0; i < size_sm; i++)
+                data.values_sm[i] =
+                  ArrayView<const Number>(others[i], new_alloc_sizes[i]);
+
+              data.values = {ptr_aligned, [mpi_window](Number *) mutable {
+                               // note: we are creating here a copy of the
+                               // window other approaches led to segmentation
+                               // faults
+                               const auto ierr = MPI_Win_free(&mpi_window);
+                               AssertThrowMPI(ierr);
+                             }};
+#  else
+              AssertThrow(false,
+                          ExcMessage(
+                            "Sorry, this feature requires MPI 3.0 support"));
+#  endif
+#else
+              Assert(false, ExcInternalError());
+#endif
             }
         }
 
@@ -230,8 +336,11 @@ namespace LinearAlgebra
         resize_val(const types::global_dof_index new_alloc_size,
                    types::global_dof_index &     allocated_size,
                    ::dealii::MemorySpace::
-                     MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+                     MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data,
+                   const MPI_Comm &comm_sm)
         {
+          (void)comm_sm;
+
           static_assert(
             std::is_same<Number, float>::value ||
               std::is_same<Number, double>::value,
@@ -401,11 +510,15 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpaceType>::resize_val(const size_type new_alloc_size)
+    Vector<Number, MemorySpaceType>::resize_val(const size_type new_alloc_size,
+                                                const MPI_Comm &comm_sm)
     {
       internal::la_parallel_vector_templates_functions<
         Number,
-        MemorySpaceType>::resize_val(new_alloc_size, allocated_size, data);
+        MemorySpaceType>::resize_val(new_alloc_size,
+                                     allocated_size,
+                                     data,
+                                     comm_sm);
 
       thread_loop_partitioner =
         std::make_shared<::dealii::parallel::internal::TBBPartitioner>();
@@ -421,7 +534,7 @@ namespace LinearAlgebra
       clear_mpi_requests();
 
       // check whether we need to reallocate
-      resize_val(size);
+      resize_val(size, comm_sm);
 
       // delete previous content in import data
       import_data.values.reset();
@@ -444,12 +557,15 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::reinit(
       const types::global_dof_index local_size,
       const types::global_dof_index ghost_size,
-      const MPI_Comm                comm)
+      const MPI_Comm &              comm,
+      const MPI_Comm &              comm_sm)
     {
       clear_mpi_requests();
 
+      this->comm_sm = comm_sm;
+
       // check whether we need to reallocate
-      resize_val(local_size + ghost_size);
+      resize_val(local_size + ghost_size, comm_sm);
 
       // delete previous content in import data
       import_data.values.reset();
@@ -475,6 +591,8 @@ namespace LinearAlgebra
       clear_mpi_requests();
       Assert(v.partitioner.get() != nullptr, ExcNotInitialized());
 
+      this->comm_sm = v.comm_sm;
+
       // check whether the partitioners are
       // different (check only if the are allocated
       // differently, not if the actual data is
@@ -484,7 +602,7 @@ namespace LinearAlgebra
           partitioner = v.partitioner;
           const size_type new_allocated_size =
             partitioner->local_size() + partitioner->n_ghost_indices();
-          resize_val(new_allocated_size);
+          resize_val(new_allocated_size, this->comm_sm);
         }
 
       if (omit_zeroing_entries == false)
@@ -535,15 +653,18 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     void
     Vector<Number, MemorySpaceType>::reinit(
-      const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_in)
+      const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_in,
+      const MPI_Comm &                                          comm_sm)
     {
       clear_mpi_requests();
       partitioner = partitioner_in;
 
+      this->comm_sm = comm_sm;
+
       // set vector size and allocate memory
       const size_type new_allocated_size =
         partitioner->local_size() + partitioner->n_ghost_indices();
-      resize_val(new_allocated_size);
+      resize_val(new_allocated_size, comm_sm);
 
       // initialize to zero
       *this = Number();
@@ -565,6 +686,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::Vector()
       : partitioner(std::make_shared<Utilities::MPI::Partitioner>())
       , allocated_size(0)
+      , comm_sm(MPI_COMM_SELF)
     {
       reinit(0);
     }
@@ -577,6 +699,7 @@ namespace LinearAlgebra
       : Subscriptor()
       , allocated_size(0)
       , vector_is_ghosted(false)
+      , comm_sm(MPI_COMM_SELF)
     {
       reinit(v, true);
 
@@ -599,6 +722,7 @@ namespace LinearAlgebra
                                             const MPI_Comm  communicator)
       : allocated_size(0)
       , vector_is_ghosted(false)
+      , comm_sm(MPI_COMM_SELF)
     {
       reinit(local_range, ghost_indices, communicator);
     }
@@ -610,6 +734,7 @@ namespace LinearAlgebra
                                             const MPI_Comm  communicator)
       : allocated_size(0)
       , vector_is_ghosted(false)
+      , comm_sm(MPI_COMM_SELF)
     {
       reinit(local_range, communicator);
     }
@@ -620,6 +745,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::Vector(const size_type size)
       : allocated_size(0)
       , vector_is_ghosted(false)
+      , comm_sm(MPI_COMM_SELF)
     {
       reinit(size, false);
     }
@@ -631,6 +757,7 @@ namespace LinearAlgebra
       const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner)
       : allocated_size(0)
       , vector_is_ghosted(false)
+      , comm_sm(MPI_COMM_SELF)
     {
       reinit(partitioner);
     }
@@ -676,6 +803,8 @@ namespace LinearAlgebra
       // already held ghost values or when we import data from a vector with
       // the same local range but different ghost layout
       bool must_update_ghost_values = c.vector_is_ghosted;
+
+      this->comm_sm = c.comm_sm;
 
       // check whether the two vectors use the same parallel partitioner. if
       // not, check if all local ranges are the same (that way, we can
