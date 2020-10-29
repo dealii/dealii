@@ -599,7 +599,7 @@ namespace VectorTools
 
     // Compute the mean value of the sum which has been placed in
     // each entry of the output vector only at locally owned elements.
-    for (const auto &i : data_2.locally_owned_elements())
+    for (const auto i : data_2.locally_owned_elements())
       {
         const number touch_count_i =
           ::dealii::internal::ElementAccess<OutVector>::get(touch_count, i);
