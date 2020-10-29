@@ -92,7 +92,7 @@ def parse_arguments():
                                      "in a list of directories "
                                      "that satisfy a given regex."
                                      "This program requires "
-                                     "clang-format version 6.0.0 or 6.0.1.")
+                                     "clang-format version 11.0.")
 
     parser.add_argument("-b", "--clang-format-binary", metavar="PATH",
                         default=distutils.spawn.find_executable("clang-format"))
@@ -289,11 +289,11 @@ if __name__ == "__main__":
 
     #
     # If clang-format-binary is not found, search again in
-    # contrib/utlitlies/programs/clang-6/bin
+    # contrib/utlitlies/programs/clang-11/bin
     #
     if not PARSED_ARGUMENTS.clang_format_binary:
         os.environ["PATH"] += ':' + \
-            os.getcwd() + "/contrib/utilities/programs/clang-6/bin"
+            os.getcwd() + "/contrib/utilities/programs/clang-11/bin"
         PARSED_ARGUMENTS.clang_format_binary = distutils.spawn.find_executable(
             "clang-format")
 
@@ -306,7 +306,7 @@ if __name__ == "__main__":
         logging.basicConfig(level=logging.INFO)
 
     check_clang_format_version(PARSED_ARGUMENTS.clang_format_binary,
-                               ['6.0.0', '6.0.1'])
+                               ['11.0.0', '11.0.1'])
     process(PARSED_ARGUMENTS)
     FINISH = time.time()
 
