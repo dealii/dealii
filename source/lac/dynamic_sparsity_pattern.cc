@@ -622,7 +622,7 @@ DynamicSparsityPattern::nonempty_rows() const
   std::vector<types::global_dof_index> rows;
   auto                                 line = lines.begin();
   AssertDimension(locally_stored_rows.n_elements(), lines.size());
-  for (const auto &row : locally_stored_rows)
+  for (const auto row : locally_stored_rows)
     {
       if (line->entries.size() > 0)
         rows.push_back(row);
