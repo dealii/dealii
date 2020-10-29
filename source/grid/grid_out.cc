@@ -889,7 +889,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
 
       for (const auto &cell : tria.active_cell_iterators())
         {
-          for (const auto f : cell->face_indices())
+          for (const unsigned int f : cell->face_indices())
             {
               typename Triangulation<dim, spacedim>::face_iterator face =
                 cell->face(f);
@@ -919,7 +919,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
       for (const auto &cell : tria.active_cell_iterators())
         {
           // Little trick to get -1 for the interior
-          for (auto f : GeometryInfo<dim>::face_indices())
+          for (unsigned int f : GeometryInfo<dim>::face_indices())
             {
               out << ' '
                   << static_cast<std::make_signed<types::boundary_id>::type>(
@@ -4438,7 +4438,7 @@ namespace internal
           case 2:
             {
               for (const auto &cell : tria.active_cell_iterators())
-                for (const auto &line_no : cell->line_indices())
+                for (const unsigned int line_no : cell->line_indices())
                   {
                     typename dealii::Triangulation<dim, spacedim>::line_iterator
                       line = cell->line(line_no);
@@ -4608,7 +4608,7 @@ namespace internal
 
 
               for (const auto &cell : tria.active_cell_iterators())
-                for (const auto &line_no : cell->line_indices())
+                for (const unsigned int line_no : cell->line_indices())
                   {
                     typename dealii::Triangulation<dim, spacedim>::line_iterator
                       line = cell->line(line_no);
@@ -4797,7 +4797,7 @@ namespace internal
           // doing this multiply
           std::set<unsigned int> treated_vertices;
           for (const auto &cell : tria.active_cell_iterators())
-            for (const auto &vertex_no : cell->vertex_indices())
+            for (const unsigned int vertex_no : cell->vertex_indices())
               if (treated_vertices.find(cell->vertex_index(vertex_no)) ==
                   treated_vertices.end())
                 {
