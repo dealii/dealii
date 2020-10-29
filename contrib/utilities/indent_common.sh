@@ -57,7 +57,7 @@ checks() {
   CLANG_FORMAT_MAJOR_VERSION=$(echo "${CLANG_FORMAT_VERSION}" | sed 's/^[^0-9]*\([0-9]*\).*$/\1/g')
   CLANG_FORMAT_MINOR_VERSION=$(echo "${CLANG_FORMAT_VERSION}" | sed 's/^[^0-9]*[0-9]*\.\([0-9]*\).*$/\1/g')
 
-  if [ "${CLANG_FORMAT_MAJOR_VERSION}" -ne 6 ] || [ "${CLANG_FORMAT_MINOR_VERSION}" -ne 0 ]; then
+  if [ "${CLANG_FORMAT_MAJOR_VERSION}" -ne 11 ] || [ "${CLANG_FORMAT_MINOR_VERSION}" -ne 0 ]; then
     echo "***   This indent script requires clang-format version 6.0,"
     echo "***   but version ${CLANG_FORMAT_MAJOR_VERSION}.${CLANG_FORMAT_MINOR_VERSION} was found instead."
     echo "***"
