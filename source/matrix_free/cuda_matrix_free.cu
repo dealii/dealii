@@ -25,7 +25,7 @@ namespace CUDAWrappers
 {
   namespace internal
   {
-    extern std::array<std::atomic_bool, mf_n_concurrent_objects> used_objects;
+    std::array<std::atomic_bool, mf_n_concurrent_objects> used_objects;
   }
 
   // Do not instantiate for dim = 1
