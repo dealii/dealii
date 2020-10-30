@@ -50,7 +50,6 @@
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 
@@ -70,7 +69,7 @@ namespace Step46
 
   // This is the main class. It is, if you want, a combination of step-8 and
   // step-22 in that it has member variables that either address the global
-  // problem (the Triangulation and hp::DoFHandler objects, as well as the
+  // problem (the Triangulation and DoFHandler objects, as well as the
   // hp::FECollection and various linear algebra objects) or that pertain to
   // either the elasticity or Stokes sub-problems. The general structure of
   // the class, however, is like that of most of the other programs
@@ -236,7 +235,7 @@ namespace Step46
                     1,
                     FE_Q<dim>(elasticity_degree),
                     dim)
-    , dof_handler(triangulation, /*enable_hp_capability */ true)
+    , dof_handler(triangulation)
     , viscosity(2)
     , lambda(1)
     , mu(1)
@@ -840,8 +839,7 @@ namespace Step46
   // Generating graphical output is rather trivial here: all we have to do is
   // identify which components of the solution vector belong to scalars and/or
   // vectors (see, for example, step-22 for a previous example), and then pass
-  // it all on to the DataOut class (with the second template argument equal
-  // to hp::DoFHandler instead of the usual default DoFHandler):
+  // it all on to the DataOut class:
   template <int dim>
   void FluidStructureProblem<dim>::output_results(
     const unsigned int refinement_cycle) const
@@ -860,12 +858,12 @@ namespace Step46
       data_component_interpretation.push_back(
         DataComponentInterpretation::component_is_part_of_vector);
 
-    DataOut<dim, DoFHandler<dim>> data_out;
+    DataOut<dim> data_out;
     data_out.attach_dof_handler(dof_handler);
 
     data_out.add_data_vector(solution,
                              solution_names,
-                             DataOut<dim, DoFHandler<dim>>::type_dof_data,
+                             DataOut<dim>::type_dof_data,
                              data_component_interpretation);
     data_out.build_patches();
 

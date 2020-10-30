@@ -464,7 +464,7 @@ namespace DoFTools
       unsigned int
       n_finite_elements(const DoFHandler<dim, spacedim> &dof_handler)
       {
-        if (dof_handler.hp_capability_enabled == true)
+        if (dof_handler.has_hp_capabilities() == true)
           return dof_handler.get_fe_collection().size();
         else
           return 1;
@@ -1118,7 +1118,7 @@ namespace DoFTools
                 std::set<unsigned int> fe_ind_face_subface;
                 fe_ind_face_subface.insert(cell->active_fe_index());
 
-                if (dof_handler.hp_capability_enabled)
+                if (dof_handler.has_hp_capabilities())
                   for (unsigned int c = 0;
                        c < cell->face(face)->number_of_children();
                        ++c)
@@ -1260,7 +1260,7 @@ namespace DoFTools
                         //
                         // since this is something that can only happen for hp
                         // dof handlers, add a check here...
-                        Assert(dof_handler.hp_capability_enabled == true,
+                        Assert(dof_handler.has_hp_capabilities() == true,
                                ExcInternalError());
 
                         const dealii::hp::FECollection<dim, spacedim>
@@ -1481,7 +1481,7 @@ namespace DoFTools
 
                 // Only if there is a neighbor with a different active_fe_index
                 // and the same h-level, some action has to be taken.
-                if ((dof_handler.hp_capability_enabled) &&
+                if ((dof_handler.has_hp_capabilities()) &&
                     !cell->face(face)->at_boundary() &&
                     (cell->neighbor(face)->active_fe_index() !=
                      cell->active_fe_index()) &&

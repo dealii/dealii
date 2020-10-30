@@ -33,9 +33,9 @@ main()
 
   Triangulation<2> tria;
 
-  MGLevelObject<DoFHandler<2>> dof_handlers(0, 3, tria, true);
+  MGLevelObject<DoFHandler<2>> dof_handlers(0, 3, tria);
 
-  dof_handlers.resize(0, 5, tria, true);
+  dof_handlers.resize(0, 5, tria);
 
   deallog << "OK!" << std::endl;
 }

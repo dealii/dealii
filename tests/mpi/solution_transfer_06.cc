@@ -60,7 +60,7 @@ transfer(const MPI_Comm &comm)
 
   // create a DoFHandler on which we have both cells with FE_Q as well as
   // FE_Nothing
-  DoFHandler<dim> dof_handler(tria, true);
+  DoFHandler<dim> dof_handler(tria);
   dof_handler.begin(0)->child(0)->set_active_fe_index(1);
 
   IndexSet locally_relevant_dofs;

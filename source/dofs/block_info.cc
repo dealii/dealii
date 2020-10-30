@@ -31,7 +31,7 @@ BlockInfo::initialize(const DoFHandler<dim, spacedim> &dof,
                       bool                             levels_only,
                       bool                             active_only)
 {
-  Assert(dof.hp_capability_enabled == false,
+  Assert(dof.has_hp_capabilities() == false,
          (typename DoFHandler<dim, spacedim>::ExcNotImplementedWithHP()));
 
   if (!levels_only && dof.has_active_dofs())
@@ -61,7 +61,7 @@ template <int dim, int spacedim>
 void
 BlockInfo::initialize_local(const DoFHandler<dim, spacedim> &dof)
 {
-  Assert(dof.hp_capability_enabled == false,
+  Assert(dof.has_hp_capabilities() == false,
          (typename DoFHandler<dim, spacedim>::ExcNotImplementedWithHP()));
 
   const FiniteElement<dim, spacedim> & fe = dof.get_fe();

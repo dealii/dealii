@@ -1998,8 +1998,8 @@ namespace internal
 
 
 template <int dim, int spacedim>
-DoFHandler<dim, spacedim>::DoFHandler(const bool hp_capability_enabled)
-  : hp_capability_enabled(hp_capability_enabled)
+DoFHandler<dim, spacedim>::DoFHandler()
+  : hp_capability_enabled(true)
   , tria(nullptr, typeid(*this).name())
   , mg_faces(nullptr)
 {}
@@ -2007,53 +2007,39 @@ DoFHandler<dim, spacedim>::DoFHandler(const bool hp_capability_enabled)
 
 
 template <int dim, int spacedim>
-DoFHandler<dim, spacedim>::DoFHandler(const Triangulation<dim, spacedim> &tria,
-                                      const bool hp_capability_enabled)
-  : hp_capability_enabled(hp_capability_enabled)
+DoFHandler<dim, spacedim>::DoFHandler(const Triangulation<dim, spacedim> &tria)
+  : hp_capability_enabled(true)
   , tria(&tria, typeid(*this).name())
   , mg_faces(nullptr)
 {
-  if (hp_capability_enabled)
-    {
-      this->setup_policy_and_listeners();
-      this->create_active_fe_table();
-    }
-  else
-    {
-      this->setup_policy();
-    }
+  this->setup_policy();
+
+  // provide all hp functionalities before finite elements are registered
+  this->connect_to_triangulation_signals();
+  this->create_active_fe_table();
 }
+
+
 
 template <int dim, int spacedim>
 DoFHandler<dim, spacedim>::~DoFHandler()
 {
-  if (hp_capability_enabled)
-    {
-      // unsubscribe as a listener to refinement of the underlying
-      // triangulation
-      for (auto &connection : this->tria_listeners)
-        connection.disconnect();
-      this->tria_listeners.clear();
+  // unsubscribe all attachments to refinement signals of the underlying
+  // triangulation
+  for (auto &connection : this->tria_listeners)
+    connection.disconnect();
+  this->tria_listeners.clear();
 
-      // ...and release allocated memory
-      // virtual functions called in constructors and destructors never use the
-      // override in a derived class
-      // for clarity be explicit on which function is called
-      DoFHandler<dim, spacedim>::clear();
-    }
-  else
-    {
-      // release allocated memory
-      // virtual functions called in constructors and destructors never use the
-      // override in a derived class
-      // for clarity be explicit on which function is called
-      DoFHandler<dim, spacedim>::clear();
+  // release allocated memory
+  // virtual functions called in constructors and destructors never use the
+  // override in a derived class
+  // for clarity be explicit on which function is called
+  DoFHandler<dim, spacedim>::clear();
 
-      // also release the policy. this needs to happen before the
-      // current object disappears because the policy objects
-      // store references to the DoFhandler object they work on
-      this->policy.reset();
-    }
+  // also release the policy. this needs to happen before the
+  // current object disappears because the policy objects
+  // store references to the DoFhandler object they work on
+  this->policy.reset();
 }
 
 
@@ -2079,29 +2065,31 @@ DoFHandler<dim, spacedim>::initialize(const Triangulation<dim, spacedim> &tria,
 
       if (this->tria != &tria)
         {
+          // remove association with old triangulation
           for (auto &connection : this->tria_listeners)
             connection.disconnect();
           this->tria_listeners.clear();
-
-          this->tria = &tria;
-
-          this->setup_policy_and_listeners();
         }
-
-      this->create_active_fe_table();
-
-      this->distribute_dofs(fe);
     }
   else
     {
-      this->tria = &tria;
       // this->faces                      = nullptr;
       this->number_cache.n_global_dofs = 0;
+    }
 
+  if (this->tria != &tria)
+    {
+      // establish connection to new triangulation
+      this->tria = &tria;
       this->setup_policy();
 
-      this->distribute_dofs(fe);
+      // start in hp-mode and let distribute_dofs toggle it if necessary
+      hp_capability_enabled = true;
+      this->connect_to_triangulation_signals();
+      this->create_active_fe_table();
     }
+
+  this->distribute_dofs(fe);
 }
 
 
@@ -2453,13 +2441,39 @@ DoFHandler<dim, spacedim>::set_fe(const hp::FECollection<dim, spacedim> &ff)
 
   // don't create a new object if the one we have is already appropriate
   if (this->fe_collection != ff)
-    this->fe_collection = hp::FECollection<dim, spacedim>(ff);
+    {
+      this->fe_collection = hp::FECollection<dim, spacedim>(ff);
+
+      const bool contains_multiple_fes = (this->fe_collection.size() > 1);
+
+      // disable hp-mode if only a single finite element has been registered
+      if (hp_capability_enabled && !contains_multiple_fes)
+        {
+          hp_capability_enabled = false;
+
+          // unsubscribe connections to signals
+          for (auto &connection : this->tria_listeners)
+            connection.disconnect();
+          this->tria_listeners.clear();
+
+          // release active and future finite element tables
+          this->hp_cell_active_fe_indices.clear();
+          this->hp_cell_active_fe_indices.shrink_to_fit();
+          this->hp_cell_future_fe_indices.clear();
+          this->hp_cell_future_fe_indices.shrink_to_fit();
+        }
+
+      // re-enabling hp-mode is not permitted since the active and future fe
+      // tables are no longer available
+      AssertThrow(
+        hp_capability_enabled || !contains_multiple_fes,
+        ExcMessage(
+          "You cannot re-enable hp capabilities after you registered a single "
+          "finite element. Please create a new DoFHandler object instead."));
+    }
 
   if (hp_capability_enabled)
     {
-      // ensure that the active_fe_indices vectors are initialized correctly
-      this->create_active_fe_table();
-
       // make sure every processor knows the active_fe_indices
       // on both its own cells and all ghost cells
       dealii::internal::hp::DoFHandlerImplementation::Implementation::
@@ -2492,16 +2506,14 @@ void
 DoFHandler<dim, spacedim>::distribute_dofs(
   const hp::FECollection<dim, spacedim> &ff)
 {
+  this->set_fe(ff);
+
   if (hp_capability_enabled)
     {
       object_dof_indices.resize(this->tria->n_levels());
       object_dof_ptr.resize(this->tria->n_levels());
       cell_dof_cache_indices.resize(this->tria->n_levels());
       cell_dof_cache_ptr.resize(this->tria->n_levels());
-      hp_cell_active_fe_indices.resize(this->tria->n_levels());
-      hp_cell_future_fe_indices.resize(this->tria->n_levels());
-      // assign the fe_collection and initialize all active_fe_indices
-      this->set_fe(ff);
 
       // If an underlying shared::Tria allows artificial cells,
       // then save the current set of subdomain ids, and set
@@ -2571,9 +2583,6 @@ DoFHandler<dim, spacedim>::distribute_dofs(
     }
   else
     {
-      // first, assign the finite_element
-      this->set_fe(ff);
-
       // delete all levels and set them up newly. note that we still have to
       // allocate space for all degrees of freedom on this mesh (including ghost
       // and cells that are entirely stored on different processors), though we
@@ -2702,9 +2711,9 @@ DoFHandler<dim, spacedim>::clear_space()
   if (hp_capability_enabled)
     {
       this->hp_cell_active_fe_indices.clear();
+      this->hp_cell_active_fe_indices.shrink_to_fit();
       this->hp_cell_future_fe_indices.clear();
-
-      object_dof_indices.clear();
+      this->hp_cell_future_fe_indices.shrink_to_fit();
     }
   else
     {
@@ -3029,7 +3038,7 @@ DoFHandler<dim, spacedim>::get_active_fe_indices(
 
 template <int dim, int spacedim>
 void
-DoFHandler<dim, spacedim>::setup_policy_and_listeners()
+DoFHandler<dim, spacedim>::connect_to_triangulation_signals()
 {
   // connect functions to signals of the underlying triangulation
   this->tria_listeners.push_back(this->tria->signals.pre_refinement.connect(
@@ -3046,10 +3055,6 @@ DoFHandler<dim, spacedim>::setup_policy_and_listeners()
         const dealii::parallel::DistributedTriangulationBase<dim, spacedim> *>(
         &this->get_triangulation()))
     {
-      this->policy =
-        std::make_unique<internal::DoFHandlerImplementation::Policy::
-                           ParallelDistributed<dim, spacedim>>(*this);
-
       // repartitioning signals
       this->tria_listeners.push_back(
         this->tria->signals.pre_distributed_repartition.connect([this]() {
@@ -3081,10 +3086,6 @@ DoFHandler<dim, spacedim>::setup_policy_and_listeners()
              const dealii::parallel::shared::Triangulation<dim, spacedim> *>(
              &this->get_triangulation()) != nullptr)
     {
-      this->policy =
-        std::make_unique<internal::DoFHandlerImplementation::Policy::
-                           ParallelShared<dim, spacedim>>(*this);
-
       // partitioning signals
       this->tria_listeners.push_back(
         this->tria->signals.pre_partition.connect([this]() {
@@ -3101,10 +3102,6 @@ DoFHandler<dim, spacedim>::setup_policy_and_listeners()
     }
   else
     {
-      this->policy = std::make_unique<
-        internal::DoFHandlerImplementation::Policy::Sequential<dim, spacedim>>(
-        *this);
-
       // refinement signals
       this->tria_listeners.push_back(this->tria->signals.pre_refinement.connect(
         [this] { this->pre_active_fe_index_transfer(); }));

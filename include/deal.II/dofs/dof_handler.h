@@ -419,12 +419,6 @@ public:
   static const unsigned int space_dimension = spacedim;
 
   /**
-   * Boolean indicating whether or not the current DoFHander has hp
-   * capabilities.
-   */
-  const bool hp_capability_enabled;
-
-  /**
    * The default index of the finite element to be used on a given cell.
    */
   static const unsigned int default_fe_index = 0;
@@ -456,13 +450,12 @@ public:
    * object with this constructor, use initialize() to make a valid
    * DoFHandler.
    */
-  DoFHandler(const bool hp_capability_enabled = false);
+  DoFHandler();
 
   /**
    * Constructor. Take @p tria as the triangulation to work on.
    */
-  DoFHandler(const Triangulation<dim, spacedim> &tria,
-             const bool                          hp_capability_enabled = false);
+  DoFHandler(const Triangulation<dim, spacedim> &tria);
 
   /**
    * Copy constructor. DoFHandler objects are large and expensive.
@@ -591,6 +584,12 @@ public:
    */
   void
   distribute_mg_dofs();
+
+  /**
+   * Returns whether this DoFHandler has hp capabilities.
+   */
+  bool
+  has_hp_capabilities() const;
 
   /**
    * This function returns whether this DoFHandler has DoFs distributed on
@@ -1409,6 +1408,12 @@ private:
   BlockInfo block_info_object;
 
   /**
+   * Boolean indicating whether or not the current DoFHandler has hp
+   * capabilities.
+   */
+  bool hp_capability_enabled;
+
+  /**
    * Address of the triangulation to work on.
    */
   SmartPointer<const Triangulation<dim, spacedim>, DoFHandler<dim, spacedim>>
@@ -1575,10 +1580,11 @@ private:
   setup_policy();
 
   /**
-   * Setup DoFHandler policy and listeners (in the hp-context).
+   * Setup connections to refinement signals of the underlying triangulation.
+   * Necessary for the hp-mode.
    */
   void
-  setup_policy_and_listeners();
+  connect_to_triangulation_signals();
 
   /**
    * Create default tables for the active_fe_indices.
@@ -1696,6 +1702,15 @@ private:
 
 /* ----------------------- Inline functions ----------------------------------
  */
+
+
+template <int dim, int spacedim>
+inline bool
+DoFHandler<dim, spacedim>::has_hp_capabilities() const
+{
+  return hp_capability_enabled;
+}
+
 
 
 template <int dim, int spacedim>
