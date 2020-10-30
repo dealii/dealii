@@ -812,7 +812,7 @@ namespace ReferenceCell
         unsigned int
         n_faces() const override
         {
-          return 6;
+          return 5;
         }
 
         std::array<unsigned int, 2>
