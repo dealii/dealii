@@ -783,10 +783,37 @@ namespace ReferenceCell
         {
           AssertIndexRange(face_no, n_faces());
 
-          if (face_no == 1)
+          if (face_no == 0)
             return ReferenceCell::Type::Quad;
           else
             return ReferenceCell::Type::Tri;
+        }
+
+        unsigned int
+        face_to_cell_vertices(
+          const unsigned int  face,
+          const unsigned int  vertex,
+          const unsigned char face_orientation) const override
+        {
+          AssertIndexRange(face, n_faces());
+          if (face == 0)
+            {
+              AssertIndexRange(vertex, 4);
+            }
+          else
+            {
+              AssertIndexRange(vertex, 3);
+            }
+          constexpr auto X = numbers::invalid_unsigned_int;
+          static const std::array<std::array<unsigned int, 4>, 5> table = {
+            {{{0, 1, 2, 3}},
+             {{0, 2, 4, X}},
+             {{3, 1, 4, X}},
+             {{1, 0, 4, X}},
+             {{2, 3, 4, X}}}};
+
+          return table[face][standard_to_real_face_vertex(
+            vertex, face, face_orientation)];
         }
       };
 
@@ -907,6 +934,33 @@ namespace ReferenceCell
             return ReferenceCell::Type::Quad;
           else
             return ReferenceCell::Type::Tri;
+        }
+
+        unsigned int
+        face_to_cell_vertices(
+          const unsigned int  face,
+          const unsigned int  vertex,
+          const unsigned char face_orientation) const override
+        {
+          AssertIndexRange(face, n_faces());
+          if (face < 2)
+            {
+              AssertIndexRange(vertex, 3);
+            }
+          else
+            {
+              AssertIndexRange(vertex, 4);
+            }
+          constexpr auto X = numbers::invalid_unsigned_int;
+          static const std::array<std::array<unsigned int, 4>, 6> table = {
+            {{{1, 0, 2, X}},
+             {{3, 4, 5, X}},
+             {{0, 1, 3, 4}},
+             {{1, 2, 4, 5}},
+             {{2, 0, 5, 3}}}};
+
+          return table[face][standard_to_real_face_vertex(
+            vertex, face, face_orientation)];
         }
       };
 
