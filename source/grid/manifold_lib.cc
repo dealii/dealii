@@ -17,6 +17,7 @@
 #include <deal.II/base/tensor.h>
 
 #include <deal.II/fe/mapping.h>
+#include <deal.II/fe/mapping_q_internal.h>
 
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
@@ -1682,10 +1683,13 @@ TransfiniteInterpolationManifold<dim, spacedim>::initialize(
   });
   level_coarse = triangulation.last()->level();
   coarse_cell_is_flat.resize(triangulation.n_cells(level_coarse), false);
-  typename Triangulation<dim, spacedim>::active_cell_iterator
-    cell = triangulation.begin(level_coarse),
-    endc = triangulation.end(level_coarse);
-  for (; cell != endc; ++cell)
+  quadratic_approximation.clear();
+
+  std::vector<Point<dim>> unit_points =
+    QIterated<dim>(QTrapez<1>(), 2).get_points();
+  std::vector<Point<spacedim>> real_points(unit_points.size());
+
+  for (const auto &cell : triangulation.active_cell_iterators())
     {
       bool cell_is_flat = true;
       for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
@@ -1700,6 +1704,11 @@ TransfiniteInterpolationManifold<dim, spacedim>::initialize(
       AssertIndexRange(static_cast<unsigned int>(cell->index()),
                        coarse_cell_is_flat.size());
       coarse_cell_is_flat[cell->index()] = cell_is_flat;
+
+      // build quadratic interpolation
+      for (unsigned int i = 0; i < unit_points.size(); ++i)
+        real_points[i] = push_forward(cell, unit_points[i]);
+      quadratic_approximation.emplace_back(real_points, unit_points);
     }
 }
 
@@ -2281,7 +2290,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::
       for (unsigned int i = 0; i < points.size(); ++i)
         {
           Point<dim> point =
-            cell->real_to_unit_cell_affine_approximation(points[i]);
+            quadratic_approximation[cell->index()].compute(points[i]);
           current_distance += GeometryInfo<dim>::distance_to_unit_cell(point);
         }
       distances_and_cells.push_back(
@@ -2434,11 +2443,11 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
     [&](const typename Triangulation<dim, spacedim>::cell_iterator &cell,
         const unsigned int point_index) {
       Point<dim> guess;
-      // an optimization: keep track of whether or not we used the affine
+      // an optimization: keep track of whether or not we used the quadratic
       // approximation so that we don't call pull_back with the same
       // initial guess twice (i.e., if pull_back fails the first time,
       // don't try again with the same function arguments).
-      bool used_affine_approximation = false;
+      bool used_quadratic_approximation = false;
       // if we have already computed three points, we can guess the fourth
       // to be the missing corner point of a rectangle
       if (point_index == 3 && surrounding_points.size() >= 8)
@@ -2468,9 +2477,9 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
         }
       else
         {
-          guess = cell->real_to_unit_cell_affine_approximation(
+          guess = quadratic_approximation[cell->index()].compute(
             surrounding_points[point_index]);
-          used_affine_approximation = true;
+          used_quadratic_approximation = true;
         }
       chart_points[point_index] =
         pull_back(cell, surrounding_points[point_index], guess);
@@ -2480,9 +2489,9 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
       // than the cheap methods used above)
       if (chart_points[point_index][0] ==
             internal::invalid_pull_back_coordinate &&
-          !used_affine_approximation)
+          !used_quadratic_approximation)
         {
-          guess = cell->real_to_unit_cell_affine_approximation(
+          guess = quadratic_approximation[cell->index()].compute(
             surrounding_points[point_index]);
           chart_points[point_index] =
             pull_back(cell, surrounding_points[point_index], guess);
