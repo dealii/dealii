@@ -4561,7 +4561,7 @@ namespace internal
 
         NumberCache number_cache;
         number_cache.locally_owned_dofs = index_set;
-        number_cache.n_global_dofs      = dof_handler->n_dofs();
+        number_cache.n_global_dofs      = dof_handler->n_dofs(level);
         number_cache.n_locally_owned_dofs =
           number_cache.locally_owned_dofs.n_elements();
         return number_cache;
