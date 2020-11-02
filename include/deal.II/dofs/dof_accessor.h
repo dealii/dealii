@@ -2060,6 +2060,27 @@ public:
    */
   unsigned int
   dominated_future_fe_on_children() const;
+
+  /**
+   * Return the fe_index of the finite element that was assigned to this
+   * cell before the triangulation gets refined and coarsened.
+   */
+  unsigned int
+  past_fe_index() const;
+
+  /**
+   * Set the fe_index of the finite element that was assigned to this
+   * cell next time the triangulation gets refined and coarsened. A previously
+   * assigned past finite element will be overwritten.
+   */
+  void
+  set_past_fe_index(const unsigned int i) const;
+
+  /**
+   * Return whether a past finite element has been set.
+   */
+  bool
+  past_fe_index_set() const;
   /**
    * @}
    */

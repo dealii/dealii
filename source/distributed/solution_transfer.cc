@@ -252,10 +252,16 @@ namespace parallel
           this->unpack_callback(cell_, status, data_range, all_out);
         });
 
+      MPI_Barrier(MPI_COMM_WORLD);
+      std::cout << "Ready to compress" << std::endl;
       for (typename std::vector<VectorType *>::iterator it = all_out.begin();
            it != all_out.end();
            ++it)
-        (*it)->compress(::dealii::VectorOperation::insert);
+        {
+          (*it)->print(std::cout);
+          MPI_Barrier(MPI_COMM_WORLD);
+          (*it)->compress(::dealii::VectorOperation::insert);
+        }
 
       input_vectors.clear();
     }
@@ -288,9 +294,11 @@ namespace parallel
       std::vector<::dealii::Vector<typename VectorType::value_type>> dof_values(
         input_vectors.size());
 
-      unsigned int fe_index = 0;
+      unsigned int fe_index        = cell->active_fe_index();
+      unsigned int future_fe_index = 0;
       if (dof_handler->hp_capability_enabled)
         {
+          cell->set_past_fe_index(fe_index);
           switch (status)
             {
               case parallel::distributed::Triangulation<
@@ -300,7 +308,7 @@ namespace parallel
                 dim,
                 DoFHandlerType::space_dimension>::CELL_REFINE:
                 {
-                  fe_index = cell->future_fe_index();
+                  future_fe_index = cell->future_fe_index();
                   break;
                 }
 
@@ -318,7 +326,7 @@ namespace parallel
                              dim>::ExcInconsistentCoarseningFlags());
 #  endif
 
-                  fe_index = cell->dominated_future_fe_on_children();
+                  future_fe_index = cell->dominated_future_fe_on_children();
                   break;
                 }
 
@@ -330,20 +338,25 @@ namespace parallel
 
       const unsigned int dofs_per_cell =
         dof_handler->get_fe(fe_index).n_dofs_per_cell();
+      const unsigned int future_dofs_per_cell =
+        dof_handler->get_fe(future_fe_index).n_dofs_per_cell();
 
-      if (dofs_per_cell == 0)
+
+      if ((dofs_per_cell == 0) || (future_dofs_per_cell == 0))
         return std::vector<char>(); // nothing to do for FE_Nothing
 
       auto it_input  = input_vectors.cbegin();
       auto it_output = dof_values.begin();
       for (; it_input != input_vectors.cend(); ++it_input, ++it_output)
         {
-          it_output->reinit(dofs_per_cell);
-          cell->get_interpolated_dof_values(*(*it_input), *it_output, fe_index);
+          it_output->reinit(future_dofs_per_cell);
+          cell->get_interpolated_dof_values(*(*it_input),
+                                            *it_output,
+                                            future_fe_index);
         }
 
-      return pack_dof_values<typename VectorType::value_type>(dof_values,
-                                                              dofs_per_cell);
+      return pack_dof_values<typename VectorType::value_type>(
+        dof_values, future_dofs_per_cell);
     }
 
 
@@ -362,7 +375,8 @@ namespace parallel
     {
       typename DoFHandlerType::cell_iterator cell(*cell_, dof_handler);
 
-      unsigned int fe_index = 0;
+      unsigned int past_fe_index = 0;
+      unsigned int fe_index      = 0;
       if (dof_handler->hp_capability_enabled)
         {
           switch (status)
@@ -374,7 +388,8 @@ namespace parallel
                 dim,
                 DoFHandlerType::space_dimension>::CELL_COARSEN:
                 {
-                  fe_index = cell->active_fe_index();
+                  fe_index      = cell->active_fe_index();
+                  past_fe_index = cell->past_fe_index();
                   break;
                 }
 
@@ -387,7 +402,8 @@ namespace parallel
                   // unpack the data on the old cell, we need to recover its fe
                   // index from one of the children. Just to be sure, we also
                   // check if all children have the same fe index.
-                  fe_index = cell->child(0)->active_fe_index();
+                  fe_index      = cell->child(0)->active_fe_index();
+                  past_fe_index = cell->child(0)->past_fe_index();
                   for (unsigned int child_index = 1;
                        child_index < cell->n_children();
                        ++child_index)
@@ -405,8 +421,12 @@ namespace parallel
 
       const unsigned int dofs_per_cell =
         dof_handler->get_fe(fe_index).n_dofs_per_cell();
+      const unsigned int past_dofs_per_cell =
+        dof_handler->hp_capability_enabled ?
+          dof_handler->get_fe(past_fe_index).n_dofs_per_cell() :
+          0;
 
-      if (dofs_per_cell == 0)
+      if ((past_dofs_per_cell == 0) || (dofs_per_cell == 0))
         return; // nothing to do for FE_Nothing
 
       const std::vector<::dealii::Vector<typename VectorType::value_type>>
@@ -429,12 +449,20 @@ namespace parallel
             "currently registered FE object assigned to the DoFHandler has."));
 
       // distribute data for each registered vector on mesh
-      auto it_input  = dof_values.cbegin();
-      auto it_output = all_out.begin();
+      auto                      it_input  = dof_values.cbegin();
+      auto                      it_output = all_out.begin();
+      std::vector<unsigned int> dof_indices(dofs_per_cell);
       for (; it_input != dof_values.cend(); ++it_input, ++it_output)
-        cell->set_dof_values_by_interpolation(*it_input,
-                                              *(*it_output),
-                                              fe_index);
+        {
+          cell->set_dof_values_by_interpolation(*it_input,
+                                                *(*it_output),
+                                                fe_index);
+          std::cout << cell->center()[0] << " " << cell->center()[1]
+                    << std::endl;
+          cell->get_dof_indices(dof_indices);
+          for (auto v : dof_indices)
+            std::cout << "dof index " << v << std::endl;
+        }
     }
   } // namespace distributed
 } // namespace parallel

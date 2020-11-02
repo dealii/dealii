@@ -1013,7 +1013,8 @@ namespace internal
             std::vector<std::vector<
               typename DoFHandler<dim, spacedim>::active_fe_index_type>>
               active_fe_backup(dof_handler.hp_cell_active_fe_indices.size()),
-              future_fe_backup(dof_handler.hp_cell_future_fe_indices.size());
+              future_fe_backup(dof_handler.hp_cell_future_fe_indices.size()),
+              past_fe_backup(dof_handler.hp_cell_past_fe_indices.size());
             for (unsigned int level = 0;
                  level < dof_handler.hp_cell_future_fe_indices.size();
                  ++level)
@@ -1022,6 +1023,8 @@ namespace internal
                   std::move(dof_handler.hp_cell_active_fe_indices[level]);
                 future_fe_backup[level] =
                   std::move(dof_handler.hp_cell_future_fe_indices[level]);
+                past_fe_backup[level] =
+                  std::move(dof_handler.hp_cell_past_fe_indices[level]);
               }
 
             // delete all levels and set them up newly, since vectors
@@ -1037,6 +1040,8 @@ namespace internal
               dof_handler.tria->n_levels());
             dof_handler.hp_cell_future_fe_indices.resize(
               dof_handler.tria->n_levels());
+            dof_handler.hp_cell_past_fe_indices.resize(
+              dof_handler.tria->n_levels());
 
             for (unsigned int level = 0; level < dof_handler.tria->n_levels();
                  ++level)
@@ -1046,6 +1051,8 @@ namespace internal
                   std::move(active_fe_backup[level]);
                 dof_handler.hp_cell_future_fe_indices[level] =
                   std::move(future_fe_backup[level]);
+                dof_handler.hp_cell_past_fe_indices[level] =
+                  std::move(past_fe_backup[level]);
               }
           }
         }
@@ -1532,6 +1539,9 @@ namespace internal
           Assert(dof_handler.tria->n_levels() ==
                    dof_handler.hp_cell_future_fe_indices.size(),
                  ExcInternalError());
+          Assert(dof_handler.tria->n_levels() ==
+                   dof_handler.hp_cell_past_fe_indices.size(),
+                 ExcInternalError());
 
           reserve_space_release_space(dof_handler);
 
@@ -1554,6 +1564,9 @@ namespace internal
                  ExcMessage("The current Triangulation must not be empty."));
           Assert(dof_handler.tria->n_levels() ==
                    dof_handler.hp_cell_future_fe_indices.size(),
+                 ExcInternalError());
+          Assert(dof_handler.tria->n_levels() ==
+                   dof_handler.hp_cell_past_fe_indices.size(),
                  ExcInternalError());
 
           reserve_space_release_space(dof_handler);
@@ -1579,6 +1592,9 @@ namespace internal
                  ExcMessage("The current Triangulation must not be empty."));
           Assert(dof_handler.tria->n_levels() ==
                    dof_handler.hp_cell_future_fe_indices.size(),
+                 ExcInternalError());
+          Assert(dof_handler.tria->n_levels() ==
+                   dof_handler.hp_cell_past_fe_indices.size(),
                  ExcInternalError());
 
           reserve_space_release_space(dof_handler);
@@ -2398,7 +2414,8 @@ DoFHandler<dim, spacedim>::memory_consumption() const
          MemoryConsumption::memory_consumption(hp_object_fe_indices) +
          MemoryConsumption::memory_consumption(hp_object_fe_ptr) +
          MemoryConsumption::memory_consumption(hp_cell_active_fe_indices) +
-         MemoryConsumption::memory_consumption(hp_cell_future_fe_indices);
+         MemoryConsumption::memory_consumption(hp_cell_future_fe_indices) +
+         MemoryConsumption::memory_consumption(hp_cell_past_fe_indices);
 
 
   if (hp_capability_enabled)
@@ -2500,6 +2517,7 @@ DoFHandler<dim, spacedim>::distribute_dofs(
       cell_dof_cache_ptr.resize(this->tria->n_levels());
       hp_cell_active_fe_indices.resize(this->tria->n_levels());
       hp_cell_future_fe_indices.resize(this->tria->n_levels());
+      hp_cell_past_fe_indices.resize(this->tria->n_levels());
       // assign the fe_collection and initialize all active_fe_indices
       this->set_fe(ff);
 
@@ -2703,6 +2721,7 @@ DoFHandler<dim, spacedim>::clear_space()
     {
       this->hp_cell_active_fe_indices.clear();
       this->hp_cell_future_fe_indices.clear();
+      this->hp_cell_past_fe_indices.clear();
 
       object_dof_indices.clear();
     }
@@ -3133,18 +3152,24 @@ DoFHandler<dim, spacedim>::create_active_fe_table()
   while (this->hp_cell_future_fe_indices.size() < this->tria->n_levels())
     this->hp_cell_future_fe_indices.push_back({});
 
+  while (this->hp_cell_past_fe_indices.size() < this->tria->n_levels())
+    this->hp_cell_past_fe_indices.push_back({});
+
   // then make sure that on each level we have the appropriate size
   // of active_fe_indices; preset them to zero, i.e. the default FE
   for (unsigned int level = 0; level < this->hp_cell_future_fe_indices.size();
        ++level)
     {
       if (this->hp_cell_active_fe_indices[level].size() == 0 &&
-          this->hp_cell_future_fe_indices[level].size() == 0)
+          this->hp_cell_future_fe_indices[level].size() == 0 &&
+          this->hp_cell_past_fe_indices[level].size() == 0)
         {
           this->hp_cell_active_fe_indices[level].resize(
             this->tria->n_raw_cells(level), 0);
           this->hp_cell_future_fe_indices[level].resize(
             this->tria->n_raw_cells(level), invalid_active_fe_index);
+          this->hp_cell_past_fe_indices[level].resize(
+            this->tria->n_raw_cells(level), 0);
         }
       else
         {
@@ -3154,6 +3179,8 @@ DoFHandler<dim, spacedim>::create_active_fe_table()
           Assert(this->hp_cell_active_fe_indices[level].size() ==
                      this->tria->n_raw_cells(level) &&
                    this->hp_cell_future_fe_indices[level].size() ==
+                     this->tria->n_raw_cells(level) &&
+                   this->hp_cell_past_fe_indices[level].size() ==
                      this->tria->n_raw_cells(level),
                  ExcInternalError());
         }
@@ -3207,6 +3234,11 @@ DoFHandler<dim, spacedim>::post_refinement_action()
   while (this->hp_cell_future_fe_indices.size() > this->tria->n_levels())
     this->hp_cell_future_fe_indices.pop_back();
 
+  while (this->hp_cell_past_fe_indices.size() < this->tria->n_levels())
+    this->hp_cell_past_fe_indices.push_back({});
+
+  while (this->hp_cell_past_fe_indices.size() > this->tria->n_levels())
+    this->hp_cell_past_fe_indices.pop_back();
 
 
   Assert(this->hp_cell_future_fe_indices.size() == this->tria->n_levels(),
@@ -3223,6 +3255,9 @@ DoFHandler<dim, spacedim>::post_refinement_action()
       // before refinement happened, thus we are safe to clear them now.
       this->hp_cell_future_fe_indices[i].assign(this->tria->n_raw_cells(i),
                                                 invalid_active_fe_index);
+
+      // Resize past_fe_indices vectors. Use zero indicator to extend.
+      this->hp_cell_past_fe_indices[i].resize(this->tria->n_raw_cells(i), 0);
     }
 }
 

@@ -2370,6 +2370,98 @@ namespace internal
                                      [accessor.present_index] =
           invalid_active_fe_index;
       }
+
+
+
+      /**
+       * Do what the past_fe_index function in the parent class is supposed to
+       * do.
+       */
+      template <int dim, int spacedim, bool level_dof_access>
+      static unsigned int
+      past_fe_index(
+        const DoFCellAccessor<dim, spacedim, level_dof_access> &accessor)
+      {
+        if (accessor.dof_handler->hp_capability_enabled == false)
+          return DoFHandler<dim, spacedim>::
+            default_fe_index; // ::DoFHandler only supports
+                              // a single active fe with
+                              // index zero
+
+        Assert(
+          accessor.dof_handler != nullptr,
+          (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
+        Assert(static_cast<unsigned int>(accessor.level()) <
+                 accessor.dof_handler->hp_cell_past_fe_indices.size(),
+               ExcMessage("DoFHandler not initialized"));
+
+        if (past_fe_index_set(accessor))
+          return accessor.dof_handler
+            ->hp_cell_past_fe_indices[accessor.level()][accessor.present_index];
+        else
+          return accessor.dof_handler
+            ->hp_cell_active_fe_indices[accessor.level()]
+                                       [accessor.present_index];
+      }
+
+
+
+      /**
+       * Do what the set_past_fe_index function in the parent class is
+       * supposed to do.
+       */
+      template <int dim, int spacedim, bool level_dof_access>
+      static void
+      set_past_fe_index(
+        const DoFCellAccessor<dim, spacedim, level_dof_access> &accessor,
+        const unsigned int                                      i)
+      {
+        if (accessor.dof_handler->hp_capability_enabled == false)
+          {
+            // ::DoFHandler only supports a single active fe with index zero
+            AssertDimension(i, (DoFHandler<dim, spacedim>::default_fe_index));
+            return;
+          }
+
+        Assert(
+          accessor.dof_handler != nullptr,
+          (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
+        Assert(static_cast<unsigned int>(accessor.level()) <
+                 accessor.dof_handler->hp_cell_past_fe_indices.size(),
+               ExcMessage("DoFHandler not initialized"));
+
+        accessor.dof_handler
+          ->hp_cell_past_fe_indices[accessor.level()][accessor.present_index] =
+          i;
+      }
+
+
+
+      /**
+       * Do what the past_fe_index_set function in the parent class is
+       * supposed to do.
+       */
+      template <int dim, int spacedim, bool level_dof_access>
+      static bool
+      past_fe_index_set(
+        const DoFCellAccessor<dim, spacedim, level_dof_access> &accessor)
+      {
+        if (accessor.dof_handler->hp_capability_enabled == false)
+          return false; // ::DoFHandler only supports a single active fe with
+                        // index zero
+
+        Assert(
+          accessor.dof_handler != nullptr,
+          (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
+        Assert(static_cast<unsigned int>(accessor.level()) <
+                 accessor.dof_handler->hp_cell_past_fe_indices.size(),
+               ExcMessage("DoFHandler not initialized"));
+
+        return accessor.dof_handler
+                 ->hp_cell_past_fe_indices[accessor.level()]
+                                          [accessor.present_index] !=
+               DoFHandler<dim, spacedim>::invalid_active_fe_index;
+      }
     };
   } // namespace DoFCellAccessorImplementation
 } // namespace internal
@@ -2950,6 +3042,54 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
          ExcNoDominatedFiniteElementOnChildren());
 
   return future_fe_index;
+}
+
+
+
+template <int dimension_, int space_dimension_, bool level_dof_access>
+inline unsigned int
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::past_fe_index()
+  const
+{
+  Assert((this->dof_handler->hp_capability_enabled == false) ||
+           (this->is_locally_owned()),
+         ExcMessage("You can only query past_fe_index information on cells "
+                    "that are locally owned."));
+
+  return dealii::internal::DoFCellAccessorImplementation::Implementation::
+    past_fe_index(*this);
+}
+
+
+
+template <int dimension_, int space_dimension_, bool level_dof_access>
+inline void
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  set_past_fe_index(const unsigned int i) const
+{
+  Assert((this->dof_handler->hp_capability_enabled == false) ||
+           this->is_locally_owned(),
+         ExcMessage("You can only set past_fe_index information on cells "
+                    "that are locally owned."));
+
+  dealii::internal::DoFCellAccessorImplementation::Implementation::
+    set_past_fe_index(*this, i);
+}
+
+
+
+template <int dimension_, int space_dimension_, bool level_dof_access>
+inline bool
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  past_fe_index_set() const
+{
+  Assert((this->dof_handler->hp_capability_enabled == false) ||
+           (this->is_locally_owned()),
+         ExcMessage("You can only query past_fe_index information on cells "
+                    "that are locally owned."));
+
+  return dealii::internal::DoFCellAccessorImplementation::Implementation::
+    past_fe_index_set(*this);
 }
 
 

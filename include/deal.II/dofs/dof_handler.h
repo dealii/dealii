@@ -1505,6 +1505,13 @@ private:
     hp_cell_future_fe_indices;
 
   /**
+   * Past fe index of an active cell (identified by level and level index).
+   * This vector is only used in hp mode.
+   */
+  mutable std::vector<std::vector<active_fe_index_type>>
+    hp_cell_past_fe_indices;
+
+  /**
    * An array to store the indices for level degrees of freedom located at
    * vertices.
    */
@@ -1966,6 +1973,7 @@ DoFHandler<dim, spacedim>::save(Archive &ar, const unsigned int) const
 
       ar & this->hp_cell_active_fe_indices;
       ar & this->hp_cell_future_fe_indices;
+      ar & this->hp_cell_past_fe_indices;
 
       ar &hp_object_fe_ptr;
       ar &hp_object_fe_indices;
@@ -2022,6 +2030,7 @@ DoFHandler<dim, spacedim>::load(Archive &ar, const unsigned int)
 
       ar & this->hp_cell_active_fe_indices;
       ar & this->hp_cell_future_fe_indices;
+      ar & this->hp_cell_past_fe_indices;
 
       ar &hp_object_fe_ptr;
       ar &hp_object_fe_indices;
