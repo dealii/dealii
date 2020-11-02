@@ -997,11 +997,17 @@ namespace internal
       }
 
       /**
+       * Copy constructor.
+       */
+      InverseQuadraticApproximation(const InverseQuadraticApproximation &) =
+        default;
+
+      /**
        * Evaluate the quadratic approximation.
        */
       template <typename Number>
       Point<dim, Number>
-      compute(const Point<spacedim, Number> &p)
+      compute(const Point<spacedim, Number> &p) const
       {
         Point<dim, Number> result;
         for (unsigned int d = 0; d < dim; ++d)
