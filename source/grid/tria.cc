@@ -1777,6 +1777,127 @@ namespace internal
         }
     }
 
+
+
+    /**
+     * An interface for algorithms that implement Triangulation-specific tasks
+     * related to creation, refinement, and coarsening.
+     */
+    template <int dim, int spacedim>
+    class Policy
+    {
+    public:
+      /**
+       * Destructor.
+       */
+      virtual ~Policy() = default;
+
+      /**
+       * Delete children of given cell.
+       */
+      virtual void
+      delete_children(
+        Triangulation<dim, spacedim> &                        triangulation,
+        typename Triangulation<dim, spacedim>::cell_iterator &cell,
+        std::vector<unsigned int> &                           line_cell_count,
+        std::vector<unsigned int> &quad_cell_count) = 0;
+
+      /**
+       * Execute refinement.
+       */
+      virtual typename Triangulation<dim, spacedim>::DistortedCellList
+      execute_refinement(Triangulation<dim, spacedim> &triangulation,
+                         const bool check_for_distorted_cells) = 0;
+
+      /**
+       * Prevent distorted boundary cells.
+       */
+      virtual void
+      prevent_distorted_boundary_cells(
+        Triangulation<dim, spacedim> &triangulation) = 0;
+
+      /**
+       * Prepare refinement.
+       */
+      virtual void
+      prepare_refinement_dim_dependent(
+        Triangulation<dim, spacedim> &triangulation) = 0;
+
+      /**
+       * Check if coarsening is allowed for the given cell.
+       */
+      virtual bool
+      coarsening_allowed(
+        const typename Triangulation<dim, spacedim>::cell_iterator &cell) = 0;
+
+      /**
+       * A sort of virtual copy constructor, this function returns a copy of
+       * the policy object. Derived classes need to override the function here
+       * in this base class and return an object of the same type as the derived
+       * class.
+       */
+      virtual std::unique_ptr<Policy<dim, spacedim>>
+      clone() = 0;
+    };
+
+
+
+    /**
+     * A simple implementation of the interface Policy. It simply delegates the
+     * task to the functions with the same name provided by class specified by
+     * the template argument T.
+     */
+    template <int dim, int spacedim, typename T>
+    class PolicyWrapper : public Policy<dim, spacedim>
+    {
+    public:
+      void
+      delete_children(
+        Triangulation<dim, spacedim> &                        tria,
+        typename Triangulation<dim, spacedim>::cell_iterator &cell,
+        std::vector<unsigned int> &                           line_cell_count,
+        std::vector<unsigned int> &quad_cell_count) override
+      {
+        T::delete_children(tria, cell, line_cell_count, quad_cell_count);
+      }
+
+      typename Triangulation<dim, spacedim>::DistortedCellList
+      execute_refinement(Triangulation<dim, spacedim> &triangulation,
+                         const bool check_for_distorted_cells) override
+      {
+        return T::execute_refinement(triangulation, check_for_distorted_cells);
+      }
+
+      void
+      prevent_distorted_boundary_cells(
+        Triangulation<dim, spacedim> &triangulation) override
+      {
+        T::prevent_distorted_boundary_cells(triangulation);
+      }
+
+      void
+      prepare_refinement_dim_dependent(
+        Triangulation<dim, spacedim> &triangulation) override
+      {
+        T::prepare_refinement_dim_dependent(triangulation);
+      }
+
+      bool
+      coarsening_allowed(
+        const typename Triangulation<dim, spacedim>::cell_iterator &cell)
+        override
+      {
+        return T::template coarsening_allowed<dim, spacedim>(cell);
+      }
+
+      std::unique_ptr<Policy<dim, spacedim>>
+      clone() override
+      {
+        return std::unique_ptr<Policy<dim, spacedim>>(
+          new PolicyWrapper<dim, spacedim, T>());
+      }
+    };
+
     /**
      * A class into which we put many of the functions that implement
      * functionality of the Triangulation class. The main reason for this
@@ -8860,8 +8981,9 @@ namespace internal
        * specialization).
        */
       template <int spacedim>
-      static void
-      prevent_distorted_boundary_cells(const Triangulation<1, spacedim> &);
+      static void prevent_distorted_boundary_cells(Triangulation<1, spacedim> &)
+      {}
+
 
 
       template <int dim, int spacedim>
@@ -9604,6 +9726,9 @@ Triangulation<dim, spacedim>::copy_triangulation(
           *other_tria.vertex_to_manifold_id_map_1d);
     }
 
+  if (other_tria.policy)
+    this->policy = other_tria.policy->clone();
+
   // inform those who are listening on other_tria of the copy operation
   other_tria.signals.copy(*this);
   // also inform all listeners of the current triangulation that the
@@ -9648,6 +9773,12 @@ Triangulation<dim, spacedim>::create_triangulation(
   // check that no forbidden arrays
   // are used
   Assert(subcelldata.check_consistency(dim), ExcInternalError());
+
+  this->policy =
+    std::make_unique<internal::TriangulationImplementation::PolicyWrapper<
+      dim,
+      spacedim,
+      internal::TriangulationImplementation::Implementation>>();
 
   // try to create a triangulation; if this fails, we still want to
   // throw an exception but if we just do so we'll get into trouble
@@ -12621,8 +12752,7 @@ typename Triangulation<dim, spacedim>::DistortedCellList
 Triangulation<dim, spacedim>::execute_refinement()
 {
   const DistortedCellList cells_with_distorted_children =
-    internal::TriangulationImplementation::Implementation::execute_refinement(
-      *this, check_for_distorted_cells);
+    this->policy->execute_refinement(*this, check_for_distorted_cells);
 
 
 
@@ -12705,8 +12835,10 @@ Triangulation<dim, spacedim>::execute_coarsening()
           // inform all listeners that cell coarsening is going to happen
           signals.pre_coarsening_on_cell(cell);
           // use a separate function, since this is dimension specific
-          internal::TriangulationImplementation::Implementation::
-            delete_children(*this, cell, line_cell_count, quad_cell_count);
+          this->policy->delete_children(*this,
+                                        cell,
+                                        line_cell_count,
+                                        quad_cell_count);
         }
 
   // re-compute number of lines and quads
@@ -12903,8 +13035,7 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
         if (cell->user_flag_set())
           // if allowed: flag the
           // children for coarsening
-          if (internal::TriangulationImplementation::Implementation::
-                template coarsening_allowed<dim, spacedim>(cell))
+          if (this->policy->coarsening_allowed(cell))
             for (unsigned int c = 0; c < cell->n_children(); ++c)
               {
                 Assert(cell->child(c)->refine_flag_set() == false,
@@ -13688,8 +13819,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
       //  volume or at least with a part, that is negative, if the
       //  cell is refined anisotropically. we have to check, whether
       //  that can happen
-      internal::TriangulationImplementation::Implementation::
-        prevent_distorted_boundary_cells(*this);
+      this->policy->prevent_distorted_boundary_cells(*this);
 
       /////////////////////////////////
       // STEP 6:
@@ -14151,8 +14281,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
       //    take care that no double refinement
       //    is done at each line in 3d or higher
       //    dimensions.
-      internal::TriangulationImplementation::Implementation::
-        prepare_refinement_dim_dependent(*this);
+      this->policy->prepare_refinement_dim_dependent(*this);
 
       //////////////////////////////////////
       // STEP 8:

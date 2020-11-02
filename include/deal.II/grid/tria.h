@@ -90,6 +90,9 @@ namespace internal
 
     class TriaObjects;
 
+    template <int, int>
+    class Policy;
+
     /**
      * Forward declaration of a class into which we put much of the
      * implementation of the Triangulation class. See the .cc file for more
@@ -3502,6 +3505,14 @@ protected:
 
 
 private:
+  /**
+   * Policy with the Triangulation-specific tasks related to creation,
+   * refinement, and coarsening.
+   */
+  std::unique_ptr<
+    dealii::internal::TriangulationImplementation::Policy<dim, spacedim>>
+    policy;
+
   /**
    * If add_periodicity() is called, this variable stores the given periodic
    * face pairs on level 0 for later access during the identification of ghost
