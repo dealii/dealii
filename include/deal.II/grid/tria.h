@@ -3359,6 +3359,20 @@ public:
     std::pair<std::pair<cell_iterator, unsigned int>, std::bitset<3>>> &
   get_periodic_face_map() const;
 
+  /**
+   * Return vector filled with the used reference-cell types of this
+   * triangulation.
+   */
+  const std::vector<ReferenceCell::Type> &
+  get_reference_cell_types() const;
+
+  /**
+   * Indicate if the triangulation only consists of hypercube-like cells, i.e.,
+   * lines, quadrilaterals, or hexahedrons.
+   */
+  bool
+  all_reference_cell_types_are_hyper_cube() const;
+
 #ifdef DOXYGEN
   /**
    * Write and read the data of this object from a stream for the purpose
@@ -3468,6 +3482,12 @@ protected:
   MeshSmoothing smooth_grid;
 
   /**
+   * Vector caching all reference-cell types of the given triangulation
+   * (also in the distributed case).
+   */
+  std::vector<ReferenceCell::Type> reference_cell_types;
+
+  /**
    * Write a bool vector to the given stream, writing a pre- and a postfix
    * magic number. The vector is written in an almost binary format, i.e. the
    * bool flags are packed but the data is written as ASCII text.
@@ -3502,6 +3522,12 @@ protected:
    */
   void
   update_periodic_face_map();
+
+  /**
+   * Update the internal reference_cell_types vector.
+   */
+  virtual void
+  update_reference_cell_types();
 
 
 private:
