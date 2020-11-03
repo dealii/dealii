@@ -29,26 +29,26 @@ DEAL_II_NAMESPACE_OPEN
 namespace Simplex
 {
   template <int dim>
-  QGauss<dim>::QGauss(const unsigned int n_points)
+  QGauss<dim>::QGauss(const unsigned int n_points_1D)
     : QSimplex<dim>(Quadrature<dim>())
   {
     // fill quadrature points and quadrature weights
     if (dim == 1)
       {
-        const dealii::QGauss<dim> quad(n_points);
+        const dealii::QGauss<dim> quad(n_points_1D);
 
         this->quadrature_points = quad.get_points();
         this->weights           = quad.get_weights();
       }
     else if (dim == 2)
       {
-        if (n_points == 1)
+        if (n_points_1D == 1)
           {
             const double p = 1.0 / 3.0;
             this->quadrature_points.emplace_back(p, p);
             this->weights.emplace_back(1.0);
           }
-        else if (n_points == 3)
+        else if (n_points_1D == 2)
           {
             const double Q23 = 2.0 / 3.0;
             const double Q16 = 1.0 / 6.0;
@@ -60,7 +60,7 @@ namespace Simplex
             this->weights.emplace_back(Q16);
             this->weights.emplace_back(Q16);
           }
-        else if (n_points == 7)
+        else if (n_points_1D == 3)
           {
             const double q12 = 0.5;
 
@@ -85,7 +85,7 @@ namespace Simplex
       }
     else if (dim == 3)
       {
-        if (n_points == 1)
+        if (n_points_1D == 1)
           {
             const double Q14 = 1.0 / 4.0;
             const double Q16 = 1.0 / 6.0;
@@ -93,7 +93,7 @@ namespace Simplex
             this->quadrature_points.emplace_back(Q14, Q14, Q14);
             this->weights.emplace_back(Q16);
           }
-        else if (n_points == 4)
+        else if (n_points_1D == 2)
           {
             const double Q124 = 1.0 / 6.0 / 4.0;
 
@@ -108,7 +108,7 @@ namespace Simplex
             this->weights.emplace_back(Q124);
             this->weights.emplace_back(Q124);
           }
-        else if (n_points == 10)
+        else if (n_points_1D == 3)
           {
             const double Q16 = 1.0 / 6.0;
 

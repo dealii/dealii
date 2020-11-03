@@ -54,7 +54,7 @@ main()
   }
   {
     deallog.push("1d-3");
-    test<1>(2);
+    test<1>(3);
     deallog.pop();
   }
   {
@@ -64,12 +64,12 @@ main()
   }
   {
     deallog.push("2d-3");
-    test<2>(3);
+    test<2>(2);
     deallog.pop();
   }
   {
     deallog.push("2d-7");
-    test<2>(7);
+    test<2>(3);
     deallog.pop();
   }
 
@@ -80,12 +80,12 @@ main()
   }
   {
     deallog.push("3d-4");
-    test<3>(4);
+    test<3>(2);
     deallog.pop();
   }
   {
     deallog.push("3d-10");
-    test<3>(10);
+    test<3>(3);
     deallog.pop();
   }
 }

@@ -56,8 +56,8 @@ test<2>(const unsigned int n_points)
                                                       face_orientation,
                                                       false,
                                                       false,
-                                                      n_points);
-         q < n_points;
+                                                      quad_ref.size());
+         q < quad_ref.size();
          ++q, ++i)
       {
         deallog << quad.point(i) << " ";
@@ -102,8 +102,8 @@ test<3>(const unsigned int n_points)
                                                       face_orientation,
                                                       face_flip,
                                                       face_rotation,
-                                                      n_points);
-         q < n_points;
+                                                      quad_ref.size());
+         q < quad_ref.size();
          ++q, ++i)
       {
         deallog << quad.point(i) << " ";
@@ -152,12 +152,12 @@ main()
   }
   {
     deallog.push("3d-4");
-    test<3>(3);
+    test<3>(2);
     deallog.pop();
   }
   {
     deallog.push("3d-10");
-    test<3>(7);
+    test<3>(3);
     deallog.pop();
   }
 }
