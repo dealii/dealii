@@ -1233,14 +1233,12 @@ namespace Particles
     const auto parallel_triangulation =
       dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
         &*triangulation);
-    if (parallel_triangulation != nullptr)
+    if (parallel_triangulation == nullptr ||
+        dealii::Utilities::MPI::n_mpi_processes(
+          parallel_triangulation->get_communicator()) == 1)
       {
-        if (dealii::Utilities::MPI::n_mpi_processes(
-              parallel_triangulation->get_communicator()) == 1)
-          return;
+        return;
       }
-    else
-      return;
 
 #ifdef DEAL_II_WITH_MPI
     // First clear the current ghost_particle information
@@ -1707,8 +1705,8 @@ namespace Particles
 
     switch (status)
       {
-          case parallel::distributed::Triangulation<dim,
-                                                    spacedim>::CELL_PERSIST: {
+        case parallel::distributed::Triangulation<dim, spacedim>::CELL_PERSIST:
+          {
             auto position_hint = particles.end();
             for (const auto &particle : loaded_particles_on_cell)
               {
@@ -1727,8 +1725,8 @@ namespace Particles
           }
           break;
 
-          case parallel::distributed::Triangulation<dim,
-                                                    spacedim>::CELL_COARSEN: {
+        case parallel::distributed::Triangulation<dim, spacedim>::CELL_COARSEN:
+          {
             typename std::multimap<internal::LevelInd,
                                    Particle<dim, spacedim>>::iterator
               position_hint = particles.end();
@@ -1753,8 +1751,8 @@ namespace Particles
           }
           break;
 
-          case parallel::distributed::Triangulation<dim,
-                                                    spacedim>::CELL_REFINE: {
+        case parallel::distributed::Triangulation<dim, spacedim>::CELL_REFINE:
+          {
             std::vector<
               typename std::multimap<internal::LevelInd,
                                      Particle<dim, spacedim>>::iterator>

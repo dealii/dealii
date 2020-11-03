@@ -709,7 +709,10 @@ namespace Particles
 
     /**
      * Update all particles that live in cells that are ghost cells to
-     * other processes.
+     * other processes. In this context, update means to update the
+     * location and the properties of the ghost particles assuming that
+     * the ghost particles have not changed cells. Consquently, this will
+     * not update the reference location of the particles.
      */
     void
     update_ghost_particles();
