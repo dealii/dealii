@@ -149,7 +149,7 @@ main()
   std::vector<double> weights{0.5, 0.5};
   ArrayView<double>   weights_view{weights.data(), 2};
 
-  transfinite.get_new_point(points_view, weights_view);
+  deallog << transfinite.get_new_point(points_view, weights_view) << std::endl;
 
   return 0;
 }
