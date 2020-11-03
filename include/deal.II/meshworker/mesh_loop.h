@@ -394,12 +394,13 @@ namespace MeshWorker
                   cell->has_periodic_neighbor(face_no);
 
                 if (dim > 1 && ((!periodic_neighbor &&
-                                 cell->neighbor_is_coarser(face_no)) ||
+                                 cell->neighbor_is_coarser(face_no) &&
+                                 neighbor->is_active()) ||
                                 (periodic_neighbor &&
-                                 cell->periodic_neighbor_is_coarser(face_no))))
+                                 cell->periodic_neighbor_is_coarser(face_no) &&
+                                 neighbor->is_active())))
                   {
                     Assert(cell->is_active(), ExcInternalError());
-                    Assert(neighbor->is_active(), ExcInternalError());
 
                     // skip if only one processor needs to assemble the face
                     // to a ghost cell and the fine cell is not ours.
@@ -481,8 +482,9 @@ namespace MeshWorker
                         neighbor->has_children())
                       continue;
 
-                    // Now neighbor is on same level, double-check this:
-                    Assert(cell->level() == neighbor->level(),
+                    // Now neighbor is on the same refinement level.
+                    // Double check.
+                    Assert(!cell->neighbor_is_coarser(face_no),
                            ExcInternalError());
 
                     // If we own both cells only do faces from one side (unless
