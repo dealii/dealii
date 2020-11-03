@@ -542,8 +542,7 @@ public:
 
   /**
    * Standard constructor, not initializing any data. After constructing an
-   * object with this constructor, use initialize() to make a valid
-   * DoFHandler.
+   * object with this constructor, use reinit() to get a valid DoFHandler.
    */
   DoFHandler();
 
@@ -577,14 +576,20 @@ public:
   /**
    * Assign a Triangulation and a FiniteElement to the DoFHandler and compute
    * the distribution of degrees of freedom over the mesh.
+   *
+   * @deprecated Use reinit() and distribute_dofs() instead.
    */
+  DEAL_II_DEPRECATED
   void
   initialize(const Triangulation<dim, spacedim> &tria,
              const FiniteElement<dim, spacedim> &fe);
 
   /**
    * Same as above but taking an hp::FECollection object.
+   *
+   * @deprecated Use reinit() and distribute_dofs() instead.
    */
+  DEAL_II_DEPRECATED
   void
   initialize(const Triangulation<dim, spacedim> &   tria,
              const hp::FECollection<dim, spacedim> &fe);
@@ -609,13 +614,19 @@ public:
    * either not been distributed yet, or are distributed using a previously set
    * element. In both cases, accessing degrees of freedom will lead to invalid
    * results. To restore consistency, call distribute_dofs().
+   *
+   * @deprecated Use distribute_dofs() instead.
    */
+  DEAL_II_DEPRECATED
   void
   set_fe(const FiniteElement<dim, spacedim> &fe);
 
   /**
    * Same as above but taking an hp::FECollection object.
+   *
+   * @deprecated Use distribute_dofs() instead.
    */
+  DEAL_II_DEPRECATED
   void
   set_fe(const hp::FECollection<dim, spacedim> &fe);
 
@@ -633,6 +644,16 @@ public:
    */
   void
   get_active_fe_indices(std::vector<unsigned int> &active_fe_indices) const;
+
+  /**
+   * Assign a Triangulation to the DoFHandler.
+   *
+   * Remove all associations with the previous Triangulation object and
+   * establish connections with the new one. All information about previous
+   * degrees of freedom will be removed. Activates hp-mode.
+   */
+  void
+  reinit(const Triangulation<dim, spacedim> &tria);
 
   /**
    * Go through the triangulation and "distribute" the degrees of

@@ -2008,15 +2008,9 @@ DoFHandler<dim, spacedim>::DoFHandler()
 
 template <int dim, int spacedim>
 DoFHandler<dim, spacedim>::DoFHandler(const Triangulation<dim, spacedim> &tria)
-  : hp_capability_enabled(true)
-  , tria(&tria, typeid(*this).name())
-  , mg_faces(nullptr)
+  : DoFHandler()
 {
-  this->setup_policy();
-
-  // provide all hp functionalities before finite elements are registered
-  this->connect_to_triangulation_signals();
-  this->create_active_fe_table();
+  reinit(tria);
 }
 
 
@@ -2059,37 +2053,39 @@ void
 DoFHandler<dim, spacedim>::initialize(const Triangulation<dim, spacedim> &tria,
                                       const hp::FECollection<dim, spacedim> &fe)
 {
-  if (hp_capability_enabled)
-    {
-      this->clear();
-
-      if (this->tria != &tria)
-        {
-          // remove association with old triangulation
-          for (auto &connection : this->tria_listeners)
-            connection.disconnect();
-          this->tria_listeners.clear();
-        }
-    }
-  else
-    {
-      // this->faces                      = nullptr;
-      this->number_cache.n_global_dofs = 0;
-    }
-
-  if (this->tria != &tria)
-    {
-      // establish connection to new triangulation
-      this->tria = &tria;
-      this->setup_policy();
-
-      // start in hp-mode and let distribute_dofs toggle it if necessary
-      hp_capability_enabled = true;
-      this->connect_to_triangulation_signals();
-      this->create_active_fe_table();
-    }
-
+  this->reinit(tria);
   this->distribute_dofs(fe);
+}
+
+
+
+template <int dim, int spacedim>
+void
+DoFHandler<dim, spacedim>::reinit(const Triangulation<dim, spacedim> &tria)
+{
+  //
+  // call destructor
+  //
+  // remove association with old triangulation
+  for (auto &connection : this->tria_listeners)
+    connection.disconnect();
+  this->tria_listeners.clear();
+
+  // release allocated memory and policy
+  DoFHandler<dim, spacedim>::clear();
+  this->policy.reset();
+
+  //
+  // call constructor
+  //
+  // establish connection to new triangulation
+  this->tria = &tria;
+  this->setup_policy();
+
+  // start in hp-mode and let distribute_dofs toggle it if necessary
+  hp_capability_enabled = true;
+  this->connect_to_triangulation_signals();
+  this->create_active_fe_table();
 }
 
 
@@ -2681,17 +2677,9 @@ template <int dim, int spacedim>
 void
 DoFHandler<dim, spacedim>::clear()
 {
-  if (hp_capability_enabled)
-    {
-      // release memory
-      this->clear_space();
-    }
-  else
-    {
-      // release memory
-      this->clear_space();
-      this->clear_mg_space();
-    }
+  // release memory
+  this->clear_space();
+  this->clear_mg_space();
 }
 
 
@@ -2708,17 +2696,10 @@ DoFHandler<dim, spacedim>::clear_space()
 
   object_dof_ptr.clear();
 
-  if (hp_capability_enabled)
-    {
-      this->hp_cell_active_fe_indices.clear();
-      this->hp_cell_active_fe_indices.shrink_to_fit();
-      this->hp_cell_future_fe_indices.clear();
-      this->hp_cell_future_fe_indices.shrink_to_fit();
-    }
-  else
-    {
-      this->number_cache.clear();
-    }
+  this->number_cache.clear();
+
+  this->hp_cell_active_fe_indices.clear();
+  this->hp_cell_future_fe_indices.clear();
 }
 
 
