@@ -672,6 +672,7 @@ namespace Step69
                                 const Discretization<dim> &discretization,
                                 const std::string &        subsection)
     : ParameterAcceptor(subsection)
+    , dof_handler(discretization.triangulation)
     , mpi_communicator(mpi_communicator)
     , computing_timer(computing_timer)
     , discretization(&discretization)
@@ -691,8 +692,7 @@ namespace Step69
       TimerOutput::Scope scope(computing_timer,
                                "offline_data - distribute dofs");
 
-      dof_handler.initialize(discretization->triangulation,
-                             discretization->finite_element);
+      dof_handler.distribute_dofs(discretization->finite_element);
 
       locally_owned   = dof_handler.locally_owned_dofs();
       n_locally_owned = locally_owned.n_elements();
