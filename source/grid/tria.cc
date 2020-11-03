@@ -1432,6 +1432,18 @@ namespace internal
             total_cells - tria_level.level_subdomain_ids.size(),
             0);
 
+          tria_level.global_active_cell_indices.reserve(total_cells);
+          tria_level.global_active_cell_indices.insert(
+            tria_level.global_active_cell_indices.end(),
+            total_cells - tria_level.global_active_cell_indices.size(),
+            numbers::invalid_unsigned_int);
+
+          tria_level.global_level_cell_indices.reserve(total_cells);
+          tria_level.global_level_cell_indices.insert(
+            tria_level.global_level_cell_indices.end(),
+            total_cells - tria_level.global_level_cell_indices.size(),
+            numbers::invalid_unsigned_int);
+
           if (dimension < space_dimension)
             {
               tria_level.direction_flags.reserve(total_cells);
@@ -2679,6 +2691,11 @@ namespace internal
 
         if (orientation_needed)
           level.face_orientations.assign(size * faces_per_cell, -1);
+
+        level.global_active_cell_indices.assign(size,
+                                                numbers::invalid_unsigned_int);
+        level.global_level_cell_indices.assign(size,
+                                               numbers::invalid_unsigned_int);
       }
 
 
@@ -9811,6 +9828,7 @@ Triangulation<dim, spacedim>::create_triangulation(
   internal::TriangulationImplementation::Implementation::compute_number_cache(
     *this, levels.size(), number_cache);
   reset_active_cell_indices();
+  reset_global_cell_indices();
 
   // now verify that there are indeed no distorted cells. as per the
   // documentation of this class, we first collect all distorted cells
@@ -12639,6 +12657,8 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
   update_neighbors(*this);
   reset_active_cell_indices();
 
+  reset_global_cell_indices(); // TODO: better place?
+
   // Inform all listeners about end of refinement.
   signals.post_refinement();
 
@@ -12666,6 +12686,27 @@ Triangulation<dim, spacedim>::reset_active_cell_indices()
 
   Assert(active_cell_index == n_active_cells(), ExcInternalError());
 }
+
+
+
+template <int dim, int spacedim>
+void
+Triangulation<dim, spacedim>::reset_global_cell_indices()
+{
+  {
+    types::global_cell_index cell_index = 0;
+    for (const auto &cell : active_cell_iterators())
+      cell->set_active_cell_index(cell_index++);
+  }
+
+  for (unsigned int l = 0; l < levels.size(); ++l)
+    {
+      types::global_cell_index cell_index = 0;
+      for (const auto &cell : cell_iterators_on_level(l))
+        cell->set_global_level_cell_index(cell_index++);
+    }
+}
+
 
 
 template <int dim, int spacedim>

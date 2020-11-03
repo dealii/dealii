@@ -1,0 +1,31 @@
+
+DEAL:0:2d:level=0::0_0: -> 0 0
+DEAL:0:2d:level=0::{0}
+DEAL:0:2d:level=0::{}
+DEAL:0:2d:level=0::
+DEAL:0:2d:level=0:level=1::0_1:0 -> 0 0
+DEAL:0:2d:level=0:level=1::0_1:1 -> 0 1
+DEAL:0:2d:level=0:level=1::0_1:2 -> 0 2
+DEAL:0:2d:level=0:level=1::0_1:3 -> 0 3
+DEAL:0:2d:level=0:level=1::{[0,3]}
+DEAL:0:2d:level=0:level=1::{}
+DEAL:0:2d:level=0:level=1::
+DEAL:0:2d:level=0:level=1:level=2::0_2:00 -> 0 0
+DEAL:0:2d:level=0:level=1:level=2::0_2:01 -> 0 1
+DEAL:0:2d:level=0:level=1:level=2::0_2:02 -> 0 2
+DEAL:0:2d:level=0:level=1:level=2::0_2:03 -> 0 3
+DEAL:0:2d:level=0:level=1:level=2::0_2:10 -> 0 4
+DEAL:0:2d:level=0:level=1:level=2::0_2:11 -> 0 5
+DEAL:0:2d:level=0:level=1:level=2::0_2:12 -> 0 6
+DEAL:0:2d:level=0:level=1:level=2::0_2:13 -> 0 7
+DEAL:0:2d:level=0:level=1:level=2::0_2:20 -> 0 8
+DEAL:0:2d:level=0:level=1:level=2::0_2:21 -> 0 9
+DEAL:0:2d:level=0:level=1:level=2::0_2:22 -> 0 10
+DEAL:0:2d:level=0:level=1:level=2::0_2:23 -> 0 11
+DEAL:0:2d:level=0:level=1:level=2::0_2:30 -> 0 12
+DEAL:0:2d:level=0:level=1:level=2::0_2:31 -> 0 13
+DEAL:0:2d:level=0:level=1:level=2::0_2:32 -> 0 14
+DEAL:0:2d:level=0:level=1:level=2::0_2:33 -> 0 15
+DEAL:0:2d:level=0:level=1:level=2::{[0,15]}
+DEAL:0:2d:level=0:level=1:level=2::{}
+DEAL:0:2d:level=0:level=1:level=2::
