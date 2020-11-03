@@ -1552,12 +1552,16 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
               {
                 const unsigned int index = cell * n_lanes + v;
 
+                const auto cell_iterator = get_cell_iterator(cell, v, di_index);
+
                 // determine global cell index
                 const unsigned int local_dof_index =
                   di.dof_indices_contiguous[2][index];
+
                 const types::global_cell_index global_cell_index =
-                  di.vector_partitioner->local_to_global(local_dof_index) /
-                  this->get_dofs_per_cell(di_index);
+                  (additional_data.mg_level == numbers::invalid_unsigned_int) ?
+                    cell_iterator->global_active_cell_index() :
+                    cell_iterator->global_level_cell_index();
 
                 // determine sm rank
                 unsigned int sm_rank = my_sm_pid;
@@ -1570,14 +1574,13 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                 else
                   {
                     // ghost cell
-                    const auto ptr = std::find(
-                      sm_procs.begin(),
-                      sm_procs.end(),
-                      additional_data.mg_level ==
-                          numbers::invalid_unsigned_int ?
-                        get_cell_iterator(cell, v, di_index)->subdomain_id() :
-                        get_cell_iterator(cell, v, di_index)
-                          ->level_subdomain_id());
+                    const auto ptr =
+                      std::find(sm_procs.begin(),
+                                sm_procs.end(),
+                                additional_data.mg_level ==
+                                    numbers::invalid_unsigned_int ?
+                                  cell_iterator->subdomain_id() :
+                                  cell_iterator->level_subdomain_id());
 
                     if (ptr != sm_procs.end())
                       {
