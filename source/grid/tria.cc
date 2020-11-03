@@ -12696,7 +12696,7 @@ Triangulation<dim, spacedim>::reset_global_cell_indices()
   {
     types::global_cell_index cell_index = 0;
     for (const auto &cell : active_cell_iterators())
-      cell->set_active_cell_index(cell_index++);
+      cell->set_global_active_cell_index(cell_index++);
   }
 
   for (unsigned int l = 0; l < levels.size(); ++l)
