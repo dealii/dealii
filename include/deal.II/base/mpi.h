@@ -153,6 +153,14 @@ namespace Utilities
     this_mpi_process(const MPI_Comm &mpi_communicator);
 
     /**
+     * Return a vector of the ranks (within @p comm_large) of a subset of
+     * processes specified by @p comm_small.
+     */
+    const std::vector<unsigned int>
+    mpi_processes_within_communicator(const MPI_Comm &comm_large,
+                                      const MPI_Comm &comm_small);
+
+    /**
      * Consider an unstructured communication pattern where every process in
      * an MPI universe wants to send some data to a subset of the other
      * processors. To do that, the other processors need to know who to expect

@@ -1510,26 +1510,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
 
     if (is_non_buffering_sm_supported)
       {
-        // TODO: move into Utilities::MPI
-        const auto procs_of_sm = [](const MPI_Comm &comm,
-                                    const MPI_Comm &comm_shared) {
-          if (Utilities::MPI::job_supports_mpi() == false)
-            return std::vector<unsigned int>{0};
-
-          const unsigned int rank = Utilities::MPI::this_mpi_process(comm);
-          const unsigned int size =
-            Utilities::MPI::n_mpi_processes(comm_shared);
-
-          std::vector<unsigned int> ranks(size);
-          MPI_Allgather(
-            &rank, 1, MPI_UNSIGNED, ranks.data(), 1, MPI_UNSIGNED, comm_shared);
-
-          return ranks;
-        };
-
         // gather the ranks of the shared-memory domain
-        const std::vector<unsigned int> sm_procs =
-          procs_of_sm(task_info.communicator, communicator_sm);
+        const auto sm_procs = Utilities::MPI::mpi_processes_within_communicator(
+          task_info.communicator, communicator_sm);
 
         // get my rank within the shared-memory domain
         const unsigned int my_sm_pid = std::distance(

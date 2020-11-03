@@ -135,6 +135,26 @@ namespace Utilities
     }
 
 
+
+    const std::vector<unsigned int>
+    mpi_processes_within_communicator(const MPI_Comm &comm_large,
+                                      const MPI_Comm &comm_small)
+    {
+      if (Utilities::MPI::job_supports_mpi() == false)
+        return std::vector<unsigned int>{0};
+
+      const unsigned int rank = Utilities::MPI::this_mpi_process(comm_large);
+      const unsigned int size = Utilities::MPI::n_mpi_processes(comm_small);
+
+      std::vector<unsigned int> ranks(size);
+      MPI_Allgather(
+        &rank, 1, MPI_UNSIGNED, ranks.data(), 1, MPI_UNSIGNED, comm_small);
+
+      return ranks;
+    }
+
+
+
     MPI_Comm
     duplicate_communicator(const MPI_Comm &mpi_communicator)
     {
@@ -682,6 +702,14 @@ namespace Utilities
     this_mpi_process(const MPI_Comm &)
     {
       return 0;
+    }
+
+
+
+    const std::vector<unsigned int>
+    mpi_processes_within_communicator(const MPI_Comm &, const MPI_Comm &)
+    {
+      return std::vector<unsigned int>{0};
     }
 
 
