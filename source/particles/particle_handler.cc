@@ -90,6 +90,7 @@ namespace Particles
     , property_pool(std::make_unique<PropertyPool>(0))
     , particles()
     , ghost_particles()
+    , ghost_particles_by_domain()
     , global_number_of_particles(0)
     , global_max_particles_per_cell(0)
     , next_free_particle_index(0)
@@ -111,6 +112,7 @@ namespace Particles
     , property_pool(std::make_unique<PropertyPool>(n_properties))
     , particles()
     , ghost_particles()
+    , ghost_particles_by_domain()
     , global_number_of_particles(0)
     , global_max_particles_per_cell(0)
     , next_free_particle_index(0)
@@ -164,10 +166,11 @@ namespace Particles
     global_number_of_particles = particle_handler.global_number_of_particles;
     global_max_particles_per_cell =
       particle_handler.global_max_particles_per_cell;
-    next_free_particle_index = particle_handler.next_free_particle_index;
-    particles                = particle_handler.particles;
-    ghost_particles          = particle_handler.ghost_particles;
-    handle                   = particle_handler.handle;
+    next_free_particle_index  = particle_handler.next_free_particle_index;
+    particles                 = particle_handler.particles;
+    ghost_particles           = particle_handler.ghost_particles;
+    ghost_particles_by_domain = particle_handler.ghost_particles_by_domain;
+    handle                    = particle_handler.handle;
 
     // copy dynamic properties
     auto from_particle = particle_handler.begin();
@@ -1176,8 +1179,8 @@ namespace Particles
     // First clear the current ghost_particle information
     ghost_particles.clear();
 
-    std::map<types::subdomain_id, std::vector<particle_iterator>>
-      ghost_particles_by_domain;
+    ghost_particles_by_domain.clear();
+
 
     const std::set<types::subdomain_id> ghost_owners =
       parallel_triangulation->ghost_owners();
@@ -1217,6 +1220,29 @@ namespace Particles
               }
           }
       }
+
+    send_recv_particles(ghost_particles_by_domain, ghost_particles);
+#endif
+  }
+
+  template <int dim, int spacedim>
+  void
+  ParticleHandler<dim, spacedim>::update_ghost_particles()
+  {
+    // Nothing to do in serial computations
+    const auto parallel_triangulation =
+      dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+        &*triangulation);
+    if (parallel_triangulation == nullptr ||
+        dealii::Utilities::MPI::n_mpi_processes(
+          parallel_triangulation->get_communicator()) == 1)
+      {
+        return;
+      }
+
+#ifdef DEAL_II_WITH_MPI
+    // First clear the current ghost_particle information
+    ghost_particles.clear();
 
     send_recv_particles(ghost_particles_by_domain, ghost_particles);
 #endif

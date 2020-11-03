@@ -708,6 +708,16 @@ namespace Particles
     exchange_ghost_particles();
 
     /**
+     * Update all particles that live in cells that are ghost cells to
+     * other processes. In this context, update means to update the
+     * location and the properties of the ghost particles assuming that
+     * the ghost particles have not changed cells. Consquently, this will
+     * not update the reference location of the particles.
+     */
+    void
+    update_ghost_particles();
+
+    /**
      * Callback function that should be called before every refinement
      * and when writing checkpoints. This function is used to
      * register store_particles() with the triangulation. This function
@@ -808,6 +818,14 @@ namespace Particles
      * particles are equivalent to the ghost entries in distributed vectors.
      */
     std::multimap<internal::LevelInd, Particle<dim, spacedim>> ghost_particles;
+
+    /**
+     * Set of particles that currently live in the ghost cells of the local
+     * domain, organized by the subdomain_id. These
+     * particles are equivalent to the ghost entries in distributed vectors.
+     */
+    std::map<types::subdomain_id, std::vector<particle_iterator>>
+      ghost_particles_by_domain;
 
     /**
      * This variable stores how many particles are stored globally. It is
