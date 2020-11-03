@@ -35,7 +35,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -48,9 +47,9 @@
  * Call the version of make_flux_sparsity_pattern that takes both cell and face
  * integral couplings. Print the constructed sparsity pattern to deallog.
  */
-template <class DoFHandlerType>
+template <int dim>
 void
-create_and_print_flux_sparsity_pattern(const DoFHandlerType &dof_handler)
+create_and_print_flux_sparsity_pattern(const DoFHandler<dim> &dof_handler)
 {
   AffineConstraints<double> constraints;
   constraints.close();
@@ -120,7 +119,7 @@ main()
   deallog << "hp::DoFHandler" << std::endl;
   {
     hp::FECollection<dim> fe_collection(element);
-    hp::DoFHandler<dim>   dof_handler(triangulation);
+    DoFHandler<dim>       dof_handler(triangulation);
     dof_handler.distribute_dofs(fe_collection);
     create_and_print_flux_sparsity_pattern(dof_handler);
   }

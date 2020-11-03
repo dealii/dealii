@@ -48,9 +48,9 @@ test(Function<spacedim> &probability_density_function)
     GridGenerator::hyper_cube(tr);
     tr.refine_global(1);
 
-    DoFHandler<dim, spacedim> dof_handler;
+    DoFHandler<dim, spacedim> dof_handler(tr);
     FE_Nothing<dim, spacedim> fe_nothing;
-    dof_handler.initialize(tr, fe_nothing);
+    dof_handler.distribute_dofs(fe_nothing);
 
     MappingQ<dim, spacedim> mapping(1);
 

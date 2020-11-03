@@ -19,7 +19,6 @@
 #include "../tests.h"
 
 #include "dof_tools_common.h"
-#include "dof_tools_common_fake_hp.h"
 
 // check
 //   DoFTools::
@@ -45,9 +44,9 @@ make_masks(const unsigned int            n,
 
 
 
-template <typename DoFHandlerType>
+template <int dim>
 void
-check_this(const DoFHandlerType &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
   // we split up the matrix into
   // blocks according to the number

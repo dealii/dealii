@@ -22,13 +22,13 @@
  * function if cell and color of the function are provided.
  */
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_enriched.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/grid_tools.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <map>
 
@@ -90,9 +90,9 @@ main(int argc, char **argv)
   MPILogInitAll                    all;
 
   // Make basic grid
-  const unsigned int  dim = 2;
-  Triangulation<dim>  triangulation;
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  const unsigned int dim = 2;
+  Triangulation<dim> triangulation;
+  DoFHandler<dim>    dof_handler(triangulation);
   GridGenerator::hyper_cube(triangulation, -2, 2);
   triangulation.refine_global(2);
 

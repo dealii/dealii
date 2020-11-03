@@ -23,11 +23,12 @@
 
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/refinement.h>
 
@@ -39,7 +40,7 @@
 
 template <int dim>
 void
-validate(const hp::DoFHandler<dim> &dh)
+validate(const DoFHandler<dim> &dh)
 {
   deallog << " (cellid,feidx):";
   for (const auto &cell : dh.active_cell_iterators())
@@ -59,15 +60,11 @@ validate(const hp::DoFHandler<dim> &dh)
 
 template <int dim>
 void
-setup(Triangulation<dim> &         tria,
-      hp::DoFHandler<dim> &        dh,
-      const hp::FECollection<dim> &fes)
+setup(Triangulation<dim> &tria, const DoFHandler<dim> &dh)
 {
-  // Initialize triangulation and dofhandler.
+  // Initialize triangulation.
   GridGenerator::subdivided_hyper_cube(tria, 4);
   Assert(tria.n_cells(0) == tria.n_global_active_cells(), ExcInternalError());
-
-  dh.initialize(tria, fes);
 
   // Set all active fe indices to 1.
   // Flag first half of cells for refinement, and the other half for coarsening.
@@ -98,8 +95,9 @@ test()
     fes.push_back(FE_Q<dim>(d));
 
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
-  hp::DoFHandler<dim>                       dh;
-  setup(tria, dh, fes);
+  DoFHandler<dim>                           dh(tria);
+  setup(tria, dh);
+  dh.distribute_dofs(fes);
 
   deallog << "starting situation" << std::endl;
   validate(dh);

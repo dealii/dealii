@@ -17,16 +17,15 @@
 #include "../tests.h"
 
 #include "dof_tools_common.h"
-#include "dof_tools_common_fake_hp.h"
 
 // check
 //   DoFTools::extract_boundary_dofs
 
 
 
-template <typename DoFHandlerType>
+template <int dim>
 void
-check_this(const DoFHandlerType &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
   std::vector<bool> component_select(dof_handler.get_fe().n_components(), true);
   std::vector<bool> boundary_dofs(dof_handler.n_dofs());

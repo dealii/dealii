@@ -21,6 +21,8 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/component_mask.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_series.h>
@@ -28,7 +30,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/lac/vector.h>
@@ -194,8 +195,7 @@ test(const LegendreFunction<dim> &func, const unsigned int poly_degree)
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube(triangulation, 0.0, 1.0); // reference cell
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
-  dof_handler.set_fe(fe_collection);
+  DoFHandler<dim> dof_handler(triangulation);
   dof_handler.begin_active()->set_active_fe_index(fe_index);
   dof_handler.distribute_dofs(fe_collection);
 
@@ -208,7 +208,7 @@ test(const LegendreFunction<dim> &func, const unsigned int poly_degree)
 
   Vector<double> local_dof_values;
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  typename DoFHandler<dim>::active_cell_iterator cell =
     dof_handler.begin_active();
   {
     const unsigned int cell_n_dofs          = cell->get_fe().dofs_per_cell;

@@ -41,8 +41,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
-
 #include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/lac/trilinos_precondition.h>
 #include <deal.II/lac/trilinos_solver.h>
@@ -83,7 +81,7 @@ namespace Step4
 
     parallel::distributed::Triangulation<dim> triangulation;
     hp::FECollection<dim>                     fe;
-    hp::DoFHandler<dim>                       dof_handler;
+    DoFHandler<dim>                           dof_handler;
     hp::QCollection<dim>                      q_collection;
 
     IndexSet locally_owned_dofs;

@@ -23,6 +23,7 @@
  * results in the correct constraints despite the bug.
  */
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -36,7 +37,6 @@
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/numerics/data_out.h>
@@ -52,7 +52,7 @@
 // used only for debugging
 template <int dim>
 void
-plot_shape_function(hp::DoFHandler<dim> &dof_handler, unsigned int patches = 5)
+plot_shape_function(DoFHandler<dim> &dof_handler, unsigned int patches = 5)
 {
   deallog << "...start plotting shape function" << std::endl;
   deallog << "Patches for output: " << patches << std::endl;
@@ -141,7 +141,7 @@ plot_shape_function(hp::DoFHandler<dim> &dof_handler, unsigned int patches = 5)
       deallog << "...finished printing support points" << std::endl;
     }
 
-  DataOut<dim, hp::DoFHandler<dim>> data_out;
+  DataOut<dim, DoFHandler<dim>> data_out;
   data_out.attach_dof_handler(dof_handler);
 
   // get material ids:
@@ -222,10 +222,10 @@ main(int argc, char **argv)
   MPILogInitAll                    all;
 
   // Make basic grid
-  const unsigned int  dim = 2;
-  Triangulation<dim>  triangulation;
-  hp::DoFHandler<dim> dof_handler(triangulation);
-  Point<dim>          p1(0, 0), p2(3, 1);
+  const unsigned int dim = 2;
+  Triangulation<dim> triangulation;
+  DoFHandler<dim>    dof_handler(triangulation);
+  Point<dim>         p1(0, 0), p2(3, 1);
   GridGenerator::subdivided_hyper_rectangle(triangulation, {3, 1}, p1, p2);
 
   // Make predicates resulting in three adjacent domains

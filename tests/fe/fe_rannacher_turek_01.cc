@@ -52,8 +52,8 @@ test_n_dofs()
   GridGenerator::hyper_cube(tria, -1, 1);
   tria.refine_global(1);
 
-  DoFHandler<2> dofh;
-  dofh.initialize(tria, fe_ratu);
+  DoFHandler<2> dofh(tria);
+  dofh.distribute_dofs(fe_ratu);
 
   deallog << dofh.n_dofs() - 12 << std::endl;
 }
@@ -112,8 +112,8 @@ test_interpolation()
   FE_RannacherTurek<2> fe;
   const unsigned int   n_dofs = fe.dofs_per_cell;
 
-  DoFHandler<2> dofh;
-  dofh.initialize(tr, fe);
+  DoFHandler<2> dofh(tr);
+  dofh.distribute_dofs(fe);
 
   Vector<double> input_vector(dofh.n_dofs());
   for (unsigned int i = 0; i < input_vector.size(); ++i)

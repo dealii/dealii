@@ -174,8 +174,7 @@ test(unsigned int n_ref)
 
   FE_Q<dim>               fe_q(fe_degree);
   FESystem<dim, dim>      fe_system(fe_q, dim);
-  dealii::DoFHandler<dim> dofh;
-  dofh.initialize(tria, fe_system);
+  dealii::DoFHandler<dim> dofh(tria);
   dofh.distribute_dofs(fe_system);
 
   const ComponentMask mask(dim, true);

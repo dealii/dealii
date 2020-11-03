@@ -42,13 +42,14 @@ print([i,j,k],fullratsimp(C3(i,j,k)))));
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/table.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_series.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/lac/vector.h>
@@ -264,7 +265,7 @@ test(const unsigned int poly_degree)
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria, 0.0, 1.0); // reference cell
 
-  hp::DoFHandler<dim> dof_handler(tria);
+  DoFHandler<dim> dof_handler(tria);
   dof_handler.begin_active()->set_active_fe_index(fe_index);
   dof_handler.distribute_dofs(fe_collection);
 

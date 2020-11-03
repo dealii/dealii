@@ -22,8 +22,6 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
-
 #include "../tests.h"
 
 
@@ -52,11 +50,11 @@ test()
   tria[1].last_active()->set_refine_flag();
   tria[1].execute_coarsening_and_refinement();
 
-  hp::DoFHandler<dim> dh0(tria[0]);
-  hp::DoFHandler<dim> dh1(tria[1]);
+  DoFHandler<dim> dh0(tria[0]);
+  DoFHandler<dim> dh1(tria[1]);
 
-  typedef std::list<std::pair<typename hp::DoFHandler<dim>::cell_iterator,
-                              typename hp::DoFHandler<dim>::cell_iterator>>
+  typedef std::list<std::pair<typename DoFHandler<dim>::cell_iterator,
+                              typename DoFHandler<dim>::cell_iterator>>
     CellList;
 
   const CellList cell_list = GridTools::get_finest_common_cells(dh0, dh1);

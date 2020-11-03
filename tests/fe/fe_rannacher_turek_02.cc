@@ -40,8 +40,8 @@ test_values()
   GridGenerator::hyper_cube(tria, 0.0, 1.0);
 
   FE_RannacherTurek<2> fe;
-  DoFHandler<2>        dofh;
-  dofh.initialize(tria, fe);
+  DoFHandler<2>        dofh(tria);
+  dofh.distribute_dofs(fe);
 
   QGauss<2>   quadrature(8);
   FEValues<2> fev(fe,

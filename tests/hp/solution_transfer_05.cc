@@ -18,6 +18,7 @@
 // testcase by Minh Do-Quang: a case where SolutionTransfer got into trouble
 // in a couple of places when using FE_Nothing and FESystem.
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_nothing.h>
@@ -28,7 +29,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/numerics/data_out.h>
@@ -55,11 +55,11 @@ main()
   fe_collection.push_back(FESystem<2>(FE_Q<2>(1), 1, FE_Q<2>(1), 1));
   fe_collection.push_back(FESystem<2>(FE_Nothing<2>(), 1, FE_Nothing<2>(), 1));
 
-  hp::DoFHandler<2> dof_handler(triangulation);
+  DoFHandler<2> dof_handler(triangulation);
 
   // Assign FE to cells
-  hp::DoFHandler<2>::active_cell_iterator cell;
-  hp::DoFHandler<2>::active_cell_iterator endc = dof_handler.end();
+  DoFHandler<2>::active_cell_iterator cell;
+  DoFHandler<2>::active_cell_iterator endc = dof_handler.end();
 
 
   cell = dof_handler.begin_active();
@@ -79,7 +79,7 @@ main()
   solution = 1.0;
 
 
-  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2>> solultion_trans(
+  SolutionTransfer<2, Vector<double>, DoFHandler<2>> solultion_trans(
     dof_handler);
   solultion_trans.prepare_for_coarsening_and_refinement(solution);
 
@@ -91,7 +91,7 @@ main()
 
   // a follow-up error to the one fixed with _04 was that DataOut also got
   // itself confused
-  DataOut<2, hp::DoFHandler<2>> data_out2;
+  DataOut<2, DoFHandler<2>> data_out2;
   data_out2.attach_dof_handler(dof_handler);
   data_out2.add_data_vector(new_solution, "Solution");
   data_out2.build_patches();

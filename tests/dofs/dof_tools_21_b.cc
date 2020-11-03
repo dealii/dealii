@@ -314,12 +314,12 @@ main()
       // Generate a triangulation and match:
       Triangulation<2> triangulation;
       FE_Q<2>          fe(1);
-      DoFHandler<2>    dof_handler;
+      DoFHandler<2>    dof_handler(triangulation);
 
       deallog << "Triangulation:" << i << std::endl;
 
       generate_grid(triangulation, i);
-      dof_handler.initialize(triangulation, fe);
+      dof_handler.distribute_dofs(fe);
       print_matching(dof_handler);
     }
 
@@ -330,12 +330,12 @@ main()
       // Generate a triangulation and match:
       Triangulation<3> triangulation;
       FE_Q<3>          fe(1);
-      DoFHandler<3>    dof_handler;
+      DoFHandler<3>    dof_handler(triangulation);
 
       deallog << "Triangulation:" << i << std::endl;
 
       generate_grid(triangulation, i);
-      dof_handler.initialize(triangulation, fe);
+      dof_handler.distribute_dofs(fe);
       print_matching(dof_handler);
     }
 
@@ -348,13 +348,13 @@ main()
       // Generate a triangulation and match:
       Triangulation<3> triangulation;
       FE_Q<3>          fe(1);
-      DoFHandler<3>    dof_handler;
+      DoFHandler<3>    dof_handler(triangulation);
 
       deallog << "Triangulation:" << i << std::endl;
 
       generate_grid(triangulation, i);
       triangulation.refine_global(1);
-      dof_handler.initialize(triangulation, fe);
+      dof_handler.distribute_dofs(fe);
       print_matching(dof_handler);
     }
 
@@ -370,12 +370,12 @@ main()
       FE_Q<3>          p(1);
       FESystem<3>      taylor_hood(u, 3, p, 1);
 
-      DoFHandler<3> dof_handler;
+      DoFHandler<3> dof_handler(triangulation);
 
       deallog << "Triangulation:" << i << std::endl;
 
       generate_grid(triangulation, i);
-      dof_handler.initialize(triangulation, taylor_hood);
+      dof_handler.distribute_dofs(taylor_hood);
       print_matching(dof_handler, true);
     }
 

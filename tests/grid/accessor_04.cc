@@ -47,8 +47,8 @@ test()
   fes.push_back(FE_Q<dim>(2));
 
   DoFHandler<dim> dofh(tria);
-  dofh.set_fe(fes);
   dofh.begin_active()->set_active_fe_index(1);
+  dofh.distribute_dofs(fes);
 
   const auto &       parent = dofh.begin(/*level=*/0);
   const unsigned int parent_future_fe =
