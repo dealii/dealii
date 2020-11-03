@@ -1587,35 +1587,33 @@ private:
   connect_to_triangulation_signals();
 
   /**
-   * Create default tables for the active_fe_indices.
-   * They are initialized with a zero
-   * indicator, meaning that fe[0] is going to be used by default. This
-   * method is called before refinement and while setting the finite elements
-   * via set_fe(). It ensures each cell has a valid active_fe_index.
+   * Create default tables for the active and future fe_indices.
+   *
+   * Active indices are initialized with a zero indicator, meaning that fe[0] is
+   * going to be used by default. Future indices are initialized with an invalid
+   * indicator, meaning that no p-adaptation is scheduled by default.
+   *
+   * This method is called upon construction and whenever the underlying
+   * triangulation gets created. This ensures that each cell has a valid active
+   * and future fe_index.
    */
   void
   create_active_fe_table();
 
   /**
-   * A function that will be triggered through a triangulation
-   * signal just before the triangulation is modified.
+   * Update tables for active and future fe_indices.
    *
-   * The function that stores the active_fe_flags of all cells that will
-   * be refined or coarsened before the refinement happens, so that
-   * they can be set again after refinement.
+   * Whenever the underlying triangulation changes (either by adaptation or
+   * deserialization), active and future fe index tables will be adjusted to the
+   * current structure of the triangulation. Missing values of active and future
+   * indices will be initialized with their defaults (see
+   * create_active_fe_table()).
+   *
+   * This method is called post refinement and post deserialization. This
+   * ensures that each cell has a valid active and future fe_index.
    */
   void
-  pre_refinement_action();
-
-  /**
-   * A function that will be triggered through a triangulation
-   * signal just after the triangulation is modified.
-   *
-   * The function that restores the active_fe_flags of all cells that
-   * were refined.
-   */
-  void
-  post_refinement_action();
+  update_active_fe_table();
 
   /**
    * A function that will be triggered through a triangulation
@@ -1627,18 +1625,7 @@ private:
    * they can be set again after refinement.
    */
   void
-  pre_active_fe_index_transfer();
-
-  /**
-   * A function that will be triggered through a triangulation
-   * signal just before the associated parallel::distributed::Triangulation is
-   * modified.
-   *
-   * The function that stores all active_fe_indices on locally owned cells for
-   * distribution over all participating processors.
-   */
-  void
-  pre_distributed_active_fe_index_transfer();
+  pre_transfer_action();
 
   /**
    * A function that will be triggered through a triangulation
@@ -1649,7 +1636,18 @@ private:
    * were refined or coarsened.
    */
   void
-  post_active_fe_index_transfer();
+  post_transfer_action();
+
+  /**
+   * A function that will be triggered through a triangulation
+   * signal just before the associated parallel::distributed::Triangulation is
+   * modified.
+   *
+   * The function that stores all active_fe_indices on locally owned cells for
+   * distribution over all participating processors.
+   */
+  void
+  pre_distributed_transfer_action();
 
   /**
    * A function that will be triggered through a triangulation
@@ -1660,18 +1658,7 @@ private:
    * that have been communicated.
    */
   void
-  post_distributed_active_fe_index_transfer();
-
-  /**
-   * A function that will be triggered through a triangulation
-   * signal just after the associated parallel::distributed::Triangulation has
-   * been saved.
-   *
-   * The function frees all memory related to the transfer of
-   * active_fe_indices.
-   */
-  void
-  post_distributed_serialization_of_active_fe_indices();
+  post_distributed_transfer_action();
 
 
   // Make accessor objects friends.
