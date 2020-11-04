@@ -254,7 +254,7 @@ namespace Step7
         // add up multiples of this distance vector, where the factor is given
         // by the exponentials.
         return_value +=
-          (-2 / (this->width * this->width) *
+          (-2. / (this->width * this->width) *
            std::exp(-x_minus_xi.norm_square() / (this->width * this->width)) *
            x_minus_xi);
       }
@@ -293,8 +293,8 @@ namespace Step7
 
         // The first contribution is the Laplacian:
         return_value +=
-          ((2 * dim -
-            4 * x_minus_xi.norm_square() / (this->width * this->width)) /
+          ((2. * dim -
+            4. * x_minus_xi.norm_square() / (this->width * this->width)) /
            (this->width * this->width) *
            std::exp(-x_minus_xi.norm_square() / (this->width * this->width)));
         // And the second is the solution itself:
@@ -967,15 +967,15 @@ namespace Step7
       {
         if (cycle == 0)
           {
-            GridGenerator::hyper_cube(triangulation, -1, 1);
+            GridGenerator::hyper_cube(triangulation, -1., 1.);
             triangulation.refine_global(3);
 
             for (const auto &cell : triangulation.cell_iterators())
               for (const auto &face : cell->face_iterators())
                 {
                   const auto center = face->center();
-                  if ((std::fabs(center(0) - (-1)) < 1e-12) ||
-                      (std::fabs(center(1) - (-1)) < 1e-12))
+                  if ((std::fabs(center(0) - (-1.0)) < 1e-12) ||
+                      (std::fabs(center(1) - (-1.0)) < 1e-12))
                     face->set_boundary_id(1);
                 }
           }
