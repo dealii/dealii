@@ -9354,6 +9354,68 @@ namespace internal
     };
 
 
+    /**
+     * Same as above but for mixed meshes (and simplex meshes).
+     */
+    struct ImplementationMixedMesh
+    {
+      template <int dim, int spacedim>
+      static void
+      delete_children(
+        Triangulation<dim, spacedim> &                        triangulation,
+        typename Triangulation<dim, spacedim>::cell_iterator &cell,
+        std::vector<unsigned int> &                           line_cell_count,
+        std::vector<unsigned int> &                           quad_cell_count)
+      {
+        AssertThrow(false, ExcNotImplemented());
+        (void)triangulation;
+        (void)cell;
+        (void)line_cell_count;
+        (void)quad_cell_count;
+      }
+
+      template <int dim, int spacedim>
+      static typename Triangulation<dim, spacedim>::DistortedCellList
+      execute_refinement(Triangulation<dim, spacedim> &triangulation,
+                         const bool check_for_distorted_cells)
+      {
+        AssertThrow(false, ExcNotImplemented());
+        (void)triangulation;
+        (void)check_for_distorted_cells;
+
+        return {};
+      }
+
+      template <int dim, int spacedim>
+      static void
+      prevent_distorted_boundary_cells(
+        Triangulation<dim, spacedim> &triangulation)
+      {
+        AssertThrow(false, ExcNotImplemented());
+        (void)triangulation;
+      }
+
+      template <int dim, int spacedim>
+      static void
+      prepare_refinement_dim_dependent(
+        Triangulation<dim, spacedim> &triangulation)
+      {
+        AssertThrow(false, ExcNotImplemented());
+        (void)triangulation;
+      }
+
+      template <int dim, int spacedim>
+      static bool
+      coarsening_allowed(
+        const typename Triangulation<dim, spacedim>::cell_iterator &cell)
+      {
+        AssertThrow(false, ExcNotImplemented());
+        (void)cell;
+
+        return false;
+      }
+    };
+
 
     template <int dim, int spacedim>
     const Manifold<dim, spacedim> &
@@ -9795,12 +9857,6 @@ Triangulation<dim, spacedim>::create_triangulation(
   // are used
   Assert(subcelldata.check_consistency(dim), ExcInternalError());
 
-  this->policy =
-    std::make_unique<internal::TriangulationImplementation::PolicyWrapper<
-      dim,
-      spacedim,
-      internal::TriangulationImplementation::Implementation>>();
-
   // try to create a triangulation; if this fails, we still want to
   // throw an exception but if we just do so we'll get into trouble
   // because sometimes other objects are already attached to it:
@@ -9810,17 +9866,32 @@ Triangulation<dim, spacedim>::create_triangulation(
         create_triangulation(v, cells, subcelldata, *this);
 
       this->update_reference_cell_types();
-
-#ifndef DEAL_II_WITH_SIMPLEX_SUPPORT
-      Assert(this->all_reference_cell_types_are_hyper_cube(),
-             ExcMessage(
-               "A cell with invalid number of vertices has been provided."));
-#endif
     }
   catch (...)
     {
       clear_despite_subscriptions();
       throw;
+    }
+
+  if (this->all_reference_cell_types_are_hyper_cube())
+    {
+      this->policy =
+        std::make_unique<internal::TriangulationImplementation::PolicyWrapper<
+          dim,
+          spacedim,
+          internal::TriangulationImplementation::Implementation>>();
+    }
+  else
+    {
+#ifndef DEAL_II_WITH_SIMPLEX_SUPPORT
+      Assert(false, ExcNeedsSimplexSupport());
+#endif
+
+      this->policy =
+        std::make_unique<internal::TriangulationImplementation::PolicyWrapper<
+          dim,
+          spacedim,
+          internal::TriangulationImplementation::ImplementationMixedMesh>>();
     }
 
   // update our counts of the various elements of a triangulation, and set
