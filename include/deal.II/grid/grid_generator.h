@@ -800,7 +800,7 @@ namespace GridGenerator
                     const double           radius = 1.);
 
   /**
-   * This class produces a hyper-ball intersected with the positive orthant
+   * This function produces a hyper-ball intersected with the positive orthant
    * relative to @p center, which contains three elements in 2d and four in
    * 3d. The interior points of the mesh are chosen to balance the minimal
    * singular value of the Jacobian of the mapping from reference to real
@@ -839,7 +839,7 @@ namespace GridGenerator
                      const double        radius = 1.);
 
   /**
-   * This class produces a half hyper-ball around @p center, which contains
+   * This function produces a half hyper-ball around @p center, which contains
    * four elements in 2d and 6 in 3d. The cut plane is perpendicular to the
    * <i>x</i>-axis.
    *
@@ -1174,7 +1174,7 @@ namespace GridGenerator
    * triangulation.  However, opposed to the previous function, it does not
    * produce a whole shell, but only one half of it, namely that part for
    * which the first component is restricted to non-negative values. The
-   * purpose of this class is to enable computations for solutions which have
+   * purpose of this function is to enable computations for solutions which have
    * rotational symmetry, in which case the half shell in 2d represents a
    * shell in 3d.
    *
