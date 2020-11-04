@@ -180,6 +180,14 @@ namespace Particles
       property_pool->deallocate_properties_array(properties);
   }
 
+  template <int dim, int spacedim>
+  void
+  Particle<dim, spacedim>::free_properties()
+  {
+    if (property_pool != nullptr && properties != PropertyPool::invalid_handle)
+      property_pool->deallocate_properties_array(properties);
+  }
+
 
 
   template <int dim, int spacedim>

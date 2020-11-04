@@ -45,35 +45,45 @@ test()
 
     Particles::ParticleHandler<dim, spacedim> particle_handler(tr, mapping, 2);
 
+    unsigned int    n_particles = 3;
     Point<spacedim> position;
     Point<dim>      reference_position;
 
-    if (Utilities::MPI::this_mpi_process(tr.get_communicator()) == 0)
-      for (unsigned int i = 0; i < dim; ++i)
-        position(i) = 0.475;
-    else
-      for (unsigned int i = 0; i < dim; ++i)
-        position(i) = 0.525;
+    for (unsigned int p = 0; p < n_particles; ++p)
+      {
+        if (Utilities::MPI::this_mpi_process(tr.get_communicator()) == 0)
+          {
+            for (unsigned int i = 0; i < dim; ++i)
+              position(i) = 0.410 + 0.01 * p;
 
-    Particles::Particle<dim, spacedim> particle(
-      position,
-      reference_position,
-      Utilities::MPI::this_mpi_process(tr.get_communicator()));
-    typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-      tr.begin_active();
-    particle_handler.insert_particle(particle, cell);
+            Particles::Particle<dim, spacedim> particle(
+              position,
+              reference_position,
+              Utilities::MPI::this_mpi_process(tr.get_communicator()) *
+                  n_particles +
+                p);
+            typename Triangulation<dim, spacedim>::active_cell_iterator cell =
+              tr.begin_active();
+            particle_handler.insert_particle(particle, cell);
+          }
+      }
 
     particle_handler.sort_particles_into_subdomains_and_cells();
 
+
+    unsigned int counter = 0;
     // Set the properties of the particle to be a unique number
     for (auto particle = particle_handler.begin();
          particle != particle_handler.end();
          ++particle)
       {
         particle->get_properties()[0] =
-          10 + Utilities::MPI::this_mpi_process(tr.get_communicator());
+          1000 + 100 * Utilities::MPI::this_mpi_process(tr.get_communicator()) +
+          10 * particle->get_id();
         particle->get_properties()[1] =
-          100 + Utilities::MPI::this_mpi_process(tr.get_communicator());
+          2000 + 100 * Utilities::MPI::this_mpi_process(tr.get_communicator()) +
+          10 * particle->get_id();
+        counter++;
       }
 
 
@@ -109,8 +119,8 @@ test()
       {
         auto location = particle->get_location();
         location[0] += 0.1;
-        particle->get_properties()[0] += 10;
-        particle->get_properties()[1] += 100;
+        particle->get_properties()[0] += 10000;
+        particle->get_properties()[1] += 10000;
         particle->set_location(location);
       }
 
