@@ -288,6 +288,32 @@ namespace parallel
 #endif
 
   template <int dim, int spacedim>
+  void
+  TriangulationBase<dim, spacedim>::update_reference_cell_types()
+  {
+    // run algorithm for locally-owned cells
+    dealii::Triangulation<dim, spacedim>::update_reference_cell_types();
+
+    // translate ReferenceCell::Type to unsigned int (needed by
+    // Utilities::MPI::compute_set_union)
+    std::vector<unsigned int> reference_cell_types_ui;
+
+    for (const auto &i : this->reference_cell_types)
+      reference_cell_types_ui.push_back(static_cast<unsigned int>(i));
+
+    // create union
+    reference_cell_types_ui =
+      Utilities::MPI::compute_set_union(reference_cell_types_ui,
+                                        this->mpi_communicator);
+
+    // transform back and store result
+    this->reference_cell_types.clear();
+    for (const auto &i : reference_cell_types_ui)
+      this->reference_cell_types.push_back(static_cast<ReferenceCell::Type>(i));
+  }
+
+
+  template <int dim, int spacedim>
   types::subdomain_id
   TriangulationBase<dim, spacedim>::locally_owned_subdomain() const
   {

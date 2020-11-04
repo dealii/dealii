@@ -9402,6 +9402,7 @@ Triangulation<dim, spacedim>::Triangulation(
   Triangulation<dim, spacedim> &&tria) noexcept
   : Subscriptor(std::move(tria))
   , smooth_grid(tria.smooth_grid)
+  , reference_cell_types(std::move(tria.reference_cell_types))
   , periodic_face_pairs_level_0(std::move(tria.periodic_face_pairs_level_0))
   , periodic_face_map(std::move(tria.periodic_face_map))
   , levels(std::move(tria.levels))
@@ -9427,6 +9428,7 @@ operator=(Triangulation<dim, spacedim> &&tria) noexcept
   Subscriptor::operator=(std::move(tria));
 
   smooth_grid                  = tria.smooth_grid;
+  reference_cell_types         = std::move(tria.reference_cell_types);
   periodic_face_pairs_level_0  = std::move(tria.periodic_face_pairs_level_0);
   periodic_face_map            = std::move(tria.periodic_face_map);
   levels                       = std::move(tria.levels);
@@ -9485,6 +9487,7 @@ Triangulation<dim, spacedim>::clear()
   clear_despite_subscriptions();
   periodic_face_pairs_level_0.clear();
   periodic_face_map.clear();
+  reference_cell_types.clear();
 }
 
 
@@ -9714,6 +9717,7 @@ Triangulation<dim, spacedim>::copy_triangulation(
   vertices_used          = other_tria.vertices_used;
   anisotropic_refinement = other_tria.anisotropic_refinement;
   smooth_grid            = other_tria.smooth_grid;
+  reference_cell_types   = other_tria.reference_cell_types;
 
   if (dim > 1)
     faces = std::make_unique<internal::TriangulationImplementation::TriaFaces>(
@@ -9802,20 +9806,16 @@ Triangulation<dim, spacedim>::create_triangulation(
   // because sometimes other objects are already attached to it:
   try
     {
-#ifndef DEAL_II_WITH_SIMPLEX_SUPPORT
-      AssertThrow(
-        std::any_of(cells.begin(),
-                    cells.end(),
-                    [](const auto &cell) {
-                      return cell.vertices.size() !=
-                             GeometryInfo<dim>::vertices_per_cell;
-                    }) == false,
-        ExcMessage(
-          "A cell with invalid number of vertices has been provided."));
-#endif
-
       internal::TriangulationImplementation::Implementation::
         create_triangulation(v, cells, subcelldata, *this);
+
+      this->update_reference_cell_types();
+
+#ifndef DEAL_II_WITH_SIMPLEX_SUPPORT
+      Assert(this->all_reference_cell_types_are_hyper_cube(),
+             ExcMessage(
+               "A cell with invalid number of vertices has been provided."));
+#endif
     }
   catch (...)
     {
@@ -12774,6 +12774,43 @@ Triangulation<dim, spacedim>::update_periodic_face_map()
 
 template <int dim, int spacedim>
 void
+Triangulation<dim, spacedim>::update_reference_cell_types()
+{
+  std::set<ReferenceCell::Type> reference_cell_types_set;
+  for (auto cell : active_cell_iterators())
+    if (cell->is_locally_owned())
+      reference_cell_types_set.insert(cell->reference_cell_type());
+
+  std::vector<ReferenceCell::Type> reference_cell_types(
+    reference_cell_types_set.begin(), reference_cell_types_set.end());
+
+  this->reference_cell_types = reference_cell_types;
+}
+
+
+
+template <int dim, int spacedim>
+const std::vector<ReferenceCell::Type> &
+Triangulation<dim, spacedim>::get_reference_cell_types() const
+{
+  return this->reference_cell_types;
+}
+
+
+
+template <int dim, int spacedim>
+bool
+Triangulation<dim, spacedim>::all_reference_cell_types_are_hyper_cube() const
+{
+  return (this->reference_cell_types.size() == 0) ||
+         (this->reference_cell_types.size() == 1 &&
+          this->reference_cell_types[0] == ReferenceCell::get_hypercube(dim));
+}
+
+
+
+template <int dim, int spacedim>
+void
 Triangulation<dim, spacedim>::clear_despite_subscriptions()
 {
   levels.clear();
@@ -12786,6 +12823,7 @@ Triangulation<dim, spacedim>::clear_despite_subscriptions()
 
   number_cache = internal::TriangulationImplementation::NumberCache<dim>();
 }
+
 
 
 template <int dim, int spacedim>
