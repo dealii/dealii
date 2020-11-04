@@ -300,7 +300,7 @@ InvalidAccessor<structdim, dim, spacedim>::InvalidAccessor(
   const AccessorData *)
 {
   Assert(false,
-         ExcMessage("You are attempting an illegal conversion between "
+         ExcMessage("You are attempting an invalid conversion between "
                     "iterator/accessor types. The constructor you call "
                     "only exists to make certain template constructs "
                     "easier to write as dimension independent code but "
@@ -316,7 +316,7 @@ InvalidAccessor<structdim, dim, spacedim>::InvalidAccessor(
       static_cast<const TriaAccessorBase<structdim, dim, spacedim> &>(i))
 {
   Assert(false,
-         ExcMessage("You are attempting an illegal conversion between "
+         ExcMessage("You are attempting an invalid conversion between "
                     "iterator/accessor types. The constructor you call "
                     "only exists to make certain template constructs "
                     "easier to write as dimension independent code but "
@@ -1749,14 +1749,12 @@ TriaAccessor<structdim, dim, spacedim>::set_boundary_id(
 {
   Assert(structdim < dim, ExcImpossibleInDim(dim));
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(
-    boundary_ind != numbers::internal_face_boundary_id,
-    ExcMessage(
-      "You are trying to set the boundary_id to an illegal value (numbers::internal_face_boundary_id is reserved)."));
-  Assert(
-    this->at_boundary(),
-    ExcMessage(
-      "You are trying to set the boundary_id of an internal object, which is illegal!"));
+  Assert(boundary_ind != numbers::internal_face_boundary_id,
+         ExcMessage("You are trying to set the boundary_id to an invalid "
+                    "value (numbers::internal_face_boundary_id is reserved)."));
+  Assert(this->at_boundary(),
+         ExcMessage("You are trying to set the boundary_id of an "
+                    "internal object, which is not allowed!"));
 
   this->objects().boundary_or_material_id[this->present_index].boundary_id =
     boundary_ind;
