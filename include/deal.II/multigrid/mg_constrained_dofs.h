@@ -65,21 +65,18 @@ public:
    * not support rotation matrices in the periodicity definition, i.e., the
    * respective argument in the GridTools::collect_periodic_faces() may not
    * be different from the identity matrix.
-   */
-  template <int dim, int spacedim>
-  void
-  initialize(const DoFHandler<dim, spacedim> &dof);
-
-  /**
-   * Same as the function above, but here the internal AffineConstraints objects
-   * on each level are initialized with the argument level_relevant_dofs.
-   * This should define a superset of locally relevant DoFs and allows the user
-   * to add additional indices to the set of constrained DoFs.
+   * If no level_relevant_dofs are passed as second argument the function uses
+   * the locally relevant level DoFs, extracted by
+   * DoFTools::extract_locally_relevant_level_dofs(). Otherwise the user
+   * provided IndexSets are used on each level, which should define a superset
+   * of locally relevant DoFs and allows the user to add additional indices to
+   * the set of constrained DoFs.
    */
   template <int dim, int spacedim>
   void
   initialize(const DoFHandler<dim, spacedim> &dof,
-             const MGLevelObject<IndexSet> &  level_relevant_dofs);
+             const MGLevelObject<IndexSet> &  level_relevant_dofs =
+               MGLevelObject<IndexSet>());
 
   /**
    * Fill the internal data structures with information
@@ -236,93 +233,6 @@ private:
 
 template <int dim, int spacedim>
 inline void
-MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
-{
-  boundary_indices.clear();
-  refinement_edge_indices.clear();
-  level_constraints.clear();
-  user_constraints.clear();
-
-  const unsigned int nlevels = dof.get_triangulation().n_global_levels();
-
-  // At this point level_constraint and refinement_edge_indices are empty.
-  refinement_edge_indices.resize(nlevels);
-  level_constraints.resize(nlevels);
-  user_constraints.resize(nlevels);
-  for (unsigned int l = 0; l < nlevels; ++l)
-    {
-      IndexSet relevant_dofs;
-      DoFTools::extract_locally_relevant_level_dofs(dof, l, relevant_dofs);
-      level_constraints[l].reinit(relevant_dofs);
-
-      // Loop through relevant cells and faces finding those which are periodic
-      // neighbors.
-      typename DoFHandler<dim, spacedim>::cell_iterator cell = dof.begin(l),
-                                                        endc = dof.end(l);
-      for (; cell != endc; ++cell)
-        if (cell->level_subdomain_id() != numbers::artificial_subdomain_id)
-          {
-            for (auto f : cell->face_indices())
-              if (cell->has_periodic_neighbor(f) &&
-                  cell->periodic_neighbor(f)->level() == cell->level())
-                {
-                  if (cell->is_locally_owned_on_level())
-                    {
-                      Assert(
-                        cell->periodic_neighbor(f)->level_subdomain_id() !=
-                          numbers::artificial_subdomain_id,
-                        ExcMessage(
-                          "Periodic neighbor of a locally owned cell must either be owned or ghost."));
-                    }
-                  // Cell is a level-ghost and its neighbor is a
-                  // level-artificial cell nothing to do here
-                  else if (cell->periodic_neighbor(f)->level_subdomain_id() ==
-                           numbers::artificial_subdomain_id)
-                    {
-                      Assert(cell->is_locally_owned_on_level() == false,
-                             ExcInternalError());
-                      continue;
-                    }
-
-                  const unsigned int dofs_per_face =
-                    dof.get_fe(0).n_dofs_per_face(f);
-                  std::vector<types::global_dof_index> dofs_1(dofs_per_face);
-                  std::vector<types::global_dof_index> dofs_2(dofs_per_face);
-
-                  cell->periodic_neighbor(f)
-                    ->face(cell->periodic_neighbor_face_no(f))
-                    ->get_mg_dof_indices(l, dofs_1, 0);
-                  cell->face(f)->get_mg_dof_indices(l, dofs_2, 0);
-                  // Store periodicity information in the level
-                  // AffineConstraints object. Skip DoFs for which we've
-                  // previously entered periodicity constraints already; this
-                  // can happen, for example, for a vertex dof at a periodic
-                  // boundary that we visit from more than one cell
-                  for (unsigned int i = 0; i < dofs_per_face; ++i)
-                    if (level_constraints[l].can_store_line(dofs_2[i]) &&
-                        level_constraints[l].can_store_line(dofs_1[i]) &&
-                        !level_constraints[l].is_constrained(dofs_2[i]) &&
-                        !level_constraints[l].is_constrained(dofs_1[i]))
-                      {
-                        level_constraints[l].add_line(dofs_2[i]);
-                        level_constraints[l].add_entry(dofs_2[i],
-                                                       dofs_1[i],
-                                                       1.);
-                      }
-                }
-          }
-      level_constraints[l].close();
-
-      // Initialize with empty IndexSet of correct size
-      refinement_edge_indices[l] = IndexSet(dof.n_dofs(l));
-    }
-
-  MGTools::extract_inner_interface_dofs(dof, refinement_edge_indices);
-}
-
-
-template <int dim, int spacedim>
-inline void
 MGConstrainedDoFs::initialize(
   const DoFHandler<dim, spacedim> &dof,
   const MGLevelObject<IndexSet> &  level_relevant_dofs)
@@ -332,17 +242,30 @@ MGConstrainedDoFs::initialize(
   level_constraints.clear();
   user_constraints.clear();
 
-  const unsigned int nlevels = dof.get_triangulation().n_global_levels();
+  const unsigned int nlevels   = dof.get_triangulation().n_global_levels();
+  const unsigned int min_level = level_relevant_dofs.min_level();
+  const unsigned int max_level = (level_relevant_dofs.max_level() == 0) ?
+                                   nlevels - 1 :
+                                   level_relevant_dofs.max_level();
+  const bool user_level_dofs =
+    (level_relevant_dofs.max_level() == 0) ? false : true;
 
   // At this point level_constraint and refinement_edge_indices are empty.
   refinement_edge_indices.resize(nlevels);
   level_constraints.resize(nlevels);
   user_constraints.resize(nlevels);
-  for (unsigned int l = level_relevant_dofs.min_level();
-       l <= level_relevant_dofs.max_level();
-       ++l)
+  for (unsigned int l = min_level; l <= max_level; ++l)
     {
-      level_constraints[l].reinit(level_relevant_dofs[l]);
+      if (user_level_dofs)
+        {
+          level_constraints[l].reinit(level_relevant_dofs[l]);
+        }
+      else
+        {
+          IndexSet relevant_dofs;
+          DoFTools::extract_locally_relevant_level_dofs(dof, l, relevant_dofs);
+          level_constraints[l].reinit(relevant_dofs);
+        }
 
       // Loop through relevant cells and faces finding those which are periodic
       // neighbors.
