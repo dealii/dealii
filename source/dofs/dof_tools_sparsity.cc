@@ -783,7 +783,7 @@ namespace DoFTools
           bool(const typename DoFHandler<dim, spacedim>::active_cell_iterator &,
                const unsigned int)> &face_has_flux_coupling)
       {
-        if (dof.hp_capability_enabled == false)
+        if (dof.has_hp_capabilities() == false)
           {
             const FiniteElement<dim, spacedim> &fe = dof.get_fe();
 

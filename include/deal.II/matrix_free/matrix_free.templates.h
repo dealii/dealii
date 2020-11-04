@@ -434,7 +434,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
         dof_handler[0]->get_triangulation(),
         cell_level_index,
         face_info,
-        dof_handler[0]->hp_capability_enabled ?
+        dof_handler[0]->has_hp_capabilities() ?
           dof_info[0].cell_active_fe_index :
           std::vector<unsigned int>(),
         mapping,

@@ -118,7 +118,7 @@ used elements can then be created as follows:
 
 
 
-<h3>The hp::DoFHandler class, associating cells with finite elements, and constraints</h3>
+<h3>The DoFHandler class in <i>hp</i>-mode, associating cells with finite elements, and constraints</h3>
 
 The next task we have to consider is what to do with the list of
 finite element objects we want to use. In previous tutorial programs,
@@ -134,11 +134,11 @@ elements on different cells. We therefore need two things: (i) a
 version of the DoFHandler class that can deal with this situation, and
 (ii) a way to tell the DoF handler which element to use on which cell.
 
-The first of these two things is implemented in the hp::DoFHandler
-class: rather than associating it with a triangulation and a single
-finite element object, it is associated with a triangulation and a
-finite element collection. The second part is achieved by a loop over
-all cells of this hp::DoFHandler and for each cell setting the index
+The first of these two things is implemented in the <i>hp</i>-mode of
+the DoFHandler class: rather than associating it with a triangulation
+and a single finite element object, it is associated with a triangulation
+and a finite element collection. The second part is achieved by a loop
+over all cells of this DoFHandler and for each cell setting the index
 of the finite element within the collection that shall be used on this
 cell. We call the index of the finite element object within the
 collection that shall be used on a cell the cell's <i>active FE
@@ -147,7 +147,7 @@ on this cell, whereas all the other elements of the collection are
 inactive on it. The general outline of this reads like this:
 
 @code
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
   for (auto &cell: dof_handler.active_cell_iterators())
     cell->set_active_fe_index(...);
   dof_handler.distribute_dofs(fe_collection);

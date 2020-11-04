@@ -161,7 +161,7 @@ namespace parallel
             cell_iterator &cell_,
           const typename Triangulation<dim, DoFHandlerType::space_dimension>::
             CellStatus status) { return this->pack_callback(cell_, status); },
-        /*returns_variable_size_data=*/dof_handler->hp_capability_enabled);
+        /*returns_variable_size_data=*/dof_handler->has_hp_capabilities());
     }
 
 
@@ -289,7 +289,7 @@ namespace parallel
         input_vectors.size());
 
       unsigned int fe_index = 0;
-      if (dof_handler->hp_capability_enabled)
+      if (dof_handler->has_hp_capabilities())
         {
           switch (status)
             {
@@ -363,7 +363,7 @@ namespace parallel
       typename DoFHandlerType::cell_iterator cell(*cell_, dof_handler);
 
       unsigned int fe_index = 0;
-      if (dof_handler->hp_capability_enabled)
+      if (dof_handler->has_hp_capabilities())
         {
           switch (status)
             {
