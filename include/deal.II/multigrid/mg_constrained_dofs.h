@@ -65,11 +65,11 @@ public:
    * not support rotation matrices in the periodicity definition, i.e., the
    * respective argument in the GridTools::collect_periodic_faces() may not
    * be different from the identity matrix.
-   * If no level_relevant_dofs are passed as second argument the function uses
-   * the locally relevant level DoFs, extracted by
-   * DoFTools::extract_locally_relevant_level_dofs(). Otherwise the user
-   * provided IndexSets are used on each level, which should define a superset
-   * of locally relevant DoFs and allows the user to add additional indices to
+   * If no level_relevant_dofs are passed as the second argument, the function
+   * uses the locally relevant level DoFs, extracted by
+   * DoFTools::extract_locally_relevant_level_dofs(). Otherwise, the
+   * user-provided IndexSets, which should define a superset of locally relevant
+   * DoFs, are used on each level to allow the user to add additional indices to
    * the set of constrained DoFs.
    */
   template <int dim, int spacedim>
@@ -352,6 +352,7 @@ MGConstrainedDoFs::make_zero_boundary_constraints(
                               boundary_indices,
                               component_mask);
 }
+
 
 
 template <int dim, int spacedim>
