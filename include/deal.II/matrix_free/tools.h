@@ -40,10 +40,8 @@ namespace MatrixFreeTools
    */
   template <int dim, typename AdditionalData>
   void
-  categorize_by_boundary_ids(
-    const Triangulation<dim> &tria,
-    AdditionalData &          additional_data,
-    const unsigned int        level = numbers::invalid_unsigned_int);
+  categorize_by_boundary_ids(const Triangulation<dim> &tria,
+                             AdditionalData &          additional_data);
 
   /**
    * Compute the diagonal of a linear operator (@p diagonal_global), given
@@ -81,18 +79,19 @@ namespace MatrixFreeTools
   template <int dim, typename AdditionalData>
   void
   categorize_by_boundary_ids(const Triangulation<dim> &tria,
-                             AdditionalData &          additional_data,
-                             const unsigned int        level)
+                             AdditionalData &          additional_data)
   {
     // ... determine if we are on an active or a multigrid level
-    const bool is_mg = (level != numbers::invalid_unsigned_int);
+    const unsigned int level = additional_data.mg_level;
+    const bool         is_mg = (level != numbers::invalid_unsigned_int);
 
     // ... create empty list for the category of each cell
     if (is_mg)
-      additional_data.cell_vectorization_category.resize(
-        std::distance(tria.begin(level), tria.end(level)));
+      additional_data.cell_vectorization_category.assign(
+        std::distance(tria.begin(level), tria.end(level)), 0);
     else
-      additional_data.cell_vectorization_category.resize(tria.n_active_cells());
+      additional_data.cell_vectorization_category.assign(tria.n_active_cells(),
+                                                         0);
 
     // ... set up scaling factor
     std::vector<unsigned int> factors(GeometryInfo<dim>::faces_per_cell);
