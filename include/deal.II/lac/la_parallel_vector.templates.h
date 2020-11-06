@@ -134,27 +134,15 @@ namespace LinearAlgebra
         {
           if (comm_shared == MPI_COMM_SELF)
             {
-              if (new_alloc_size > allocated_size)
-                {
-                  Assert(((allocated_size > 0 && data.values != nullptr) ||
-                          data.values == nullptr),
-                         ExcInternalError());
+              Number *new_val;
+              Utilities::System::posix_memalign(
+                reinterpret_cast<void **>(&new_val),
+                64,
+                sizeof(Number) * new_alloc_size);
+              data.values = {new_val, [](Number *data) { std::free(data); }};
 
-                  Number *new_val;
-                  Utilities::System::posix_memalign(
-                    reinterpret_cast<void **>(&new_val),
-                    64,
-                    sizeof(Number) * new_alloc_size);
-                  data.values = {new_val,
-                                 [](Number *data) { std::free(data); }};
+              allocated_size = new_alloc_size;
 
-                  allocated_size = new_alloc_size;
-                }
-              else if (new_alloc_size == 0)
-                {
-                  data.values.reset();
-                  allocated_size = 0;
-                }
               data.values_sm = {
                 ArrayView<const Number>(data.values.get(), new_alloc_size)};
             }
