@@ -4670,25 +4670,33 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                    VectorizedArrayType::size()>
           vector_ptrs = {};
 
-        (void)comp;
-
-        /*
         for (unsigned int v = 0; v < n_filled_lanes; ++v)
           {
+            Assert(ind < this->dof_info->dof_indices_contiguous_sm.size(),
+                   ExcIndexRange(
+                     ind, 0, this->dof_info->dof_indices_contiguous_sm.size()));
+            Assert(this->cell * VectorizedArrayType::size() + v <
+                     this->dof_info->dof_indices_contiguous_sm[ind].size(),
+                   ExcIndexRange(
+                     this->cell * VectorizedArrayType::size() + v,
+                     0,
+                     this->dof_info->dof_indices_contiguous_sm[ind].size()));
+
             const auto &temp =
               this->dof_info->dof_indices_contiguous_sm
                 [ind][this->cell * VectorizedArrayType::size() + v];
 
             if (temp.first != numbers::invalid_unsigned_int)
               vector_ptrs[v] = const_cast<typename VectorType::value_type *>(
-                vectors_sm[comp]->operator[](temp.first).data() + temp.second);
+                vectors_sm[comp]->operator[](temp.first).data() + temp.second +
+                this->dof_info->component_dof_indices_offset
+                  [this->active_fe_index][this->first_selected_component]);
             else
               vector_ptrs[v] = nullptr;
           }
         for (unsigned int v = n_filled_lanes; v < VectorizedArrayType::size();
              ++v)
           vector_ptrs[v] = nullptr;
-         */
 
         return vector_ptrs;
       };
@@ -4697,16 +4705,17 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           n_lanes == VectorizedArrayType::size())
         {
           if (n_components == 1 || n_fe_components == 1)
-            for (unsigned int comp = 0; comp < n_components; ++comp)
-              {
-                auto vector_ptrs = compute_vector_ptrs(comp);
-
-                operation.process_dofs_vectorized_transpose(
-                  this->data->dofs_per_component_on_cell,
-                  vector_ptrs,
-                  values_dofs[comp],
-                  vector_selector);
-              }
+            {
+              for (unsigned int comp = 0; comp < n_components; ++comp)
+                {
+                  auto vector_ptrs = compute_vector_ptrs(comp);
+                  operation.process_dofs_vectorized_transpose(
+                    this->data->dofs_per_component_on_cell,
+                    vector_ptrs,
+                    values_dofs[comp],
+                    vector_selector);
+                }
+            }
           else
             {
               auto vector_ptrs = compute_vector_ptrs(0);
@@ -4720,7 +4729,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       else
         for (unsigned int comp = 0; comp < n_components; ++comp)
           {
-            auto vector_ptrs = compute_vector_ptrs(comp);
+            auto vector_ptrs = compute_vector_ptrs(
+              (n_components == 1 || n_fe_components == 1) ? comp : 0);
 
             for (unsigned int i = 0; i < this->data->dofs_per_component_on_cell;
                  ++i)
@@ -4945,18 +4955,29 @@ namespace internal
             typename std::enable_if<has_shared_vector_data<VectorType>::value,
                                     VectorType>::type * = nullptr>
   const std::vector<ArrayView<const typename VectorType::value_type>> *
-  get_shared_vector_data(VectorType &vec /*other parameters?*/)
+  get_shared_vector_data(VectorType &       vec,
+                         const bool         is_valid_mode_for_sm,
+                         const unsigned int active_fe_index,
+                         const internal::MatrixFreeFunctions::DoFInfo *dof_info)
   {
-    // return &vec.shared_vector_data();
-    (void)vec;
-    return nullptr;
+    // note: no hp is supported
+    if (is_valid_mode_for_sm &&
+        dof_info->dof_indices_contiguous_sm[0 /*any index (<3) should work*/]
+            .size() > 0 &&
+        active_fe_index == 0)
+      return &vec.shared_vector_data();
+    else
+      return nullptr;
   }
 
   template <typename VectorType,
             typename std::enable_if<!has_shared_vector_data<VectorType>::value,
                                     VectorType>::type * = nullptr>
   const std::vector<ArrayView<const typename VectorType::value_type>> *
-  get_shared_vector_data(VectorType &)
+  get_shared_vector_data(VectorType &,
+                         const bool,
+                         const unsigned int,
+                         const internal::MatrixFreeFunctions::DoFInfo *)
   {
     return nullptr;
   }
@@ -4974,7 +4995,11 @@ namespace internal
         IsBlockVector<typename std::remove_const<VectorType>::type>::value>::
                                     BaseVectorType::value_type>> *,
       n_components>>
-  get_vector_data(VectorType &src, const unsigned int first_index)
+  get_vector_data(VectorType &       src,
+                  const unsigned int first_index,
+                  const bool         is_valid_mode_for_sm,
+                  const unsigned int active_fe_index,
+                  const internal::MatrixFreeFunctions::DoFInfo *dof_info)
   {
     // select between block vectors and non-block vectors. Note that the number
     // of components is checked in the internal data
@@ -5002,7 +5027,10 @@ namespace internal
           d + first_index);
 
     for (unsigned int d = 0; d < n_components; ++d)
-      src_data.second[d] = get_shared_vector_data(*src_data.first[d]);
+      src_data.second[d] = get_shared_vector_data(*src_data.first[d],
+                                                  is_valid_mode_for_sm,
+                                                  active_fe_index,
+                                                  dof_info);
 
     return src_data;
   }
@@ -5020,8 +5048,13 @@ inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   read_dof_values(const VectorType &src, const unsigned int first_index)
 {
-  const auto src_data =
-    internal::get_vector_data<n_components_>(src, first_index);
+  const auto src_data = internal::get_vector_data<n_components_>(
+    src,
+    first_index,
+    this->dof_access_index ==
+      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell,
+    this->active_fe_index,
+    this->dof_info);
 
   internal::VectorReader<Number, VectorizedArrayType> reader;
   read_write_operation(reader,
@@ -5047,8 +5080,13 @@ inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   read_dof_values_plain(const VectorType &src, const unsigned int first_index)
 {
-  const auto src_data =
-    internal::get_vector_data<n_components_>(src, first_index);
+  const auto src_data = internal::get_vector_data<n_components_>(
+    src,
+    first_index,
+    this->dof_access_index ==
+      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell,
+    this->active_fe_index,
+    this->dof_info);
 
   internal::VectorReader<Number, VectorizedArrayType> reader;
   read_write_operation(reader,
@@ -5082,8 +5120,13 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
          internal::ExcAccessToUninitializedField());
 #  endif
 
-  const auto dst_data =
-    internal::get_vector_data<n_components_>(dst, first_index);
+  const auto dst_data = internal::get_vector_data<n_components_>(
+    dst,
+    first_index,
+    this->dof_access_index ==
+      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell,
+    this->active_fe_index,
+    this->dof_info);
 
   internal::VectorDistributorLocalToGlobal<Number, VectorizedArrayType>
     distributor;
@@ -5109,8 +5152,13 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
          internal::ExcAccessToUninitializedField());
 #  endif
 
-  const auto dst_data =
-    internal::get_vector_data<n_components_>(dst, first_index);
+  const auto dst_data = internal::get_vector_data<n_components_>(
+    dst,
+    first_index,
+    this->dof_access_index ==
+      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell,
+    this->active_fe_index,
+    this->dof_info);
 
   internal::VectorSetter<Number, VectorizedArrayType> setter;
   read_write_operation(setter, dst_data.first, dst_data.second, mask);
@@ -5136,8 +5184,13 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
          internal::ExcAccessToUninitializedField());
 #  endif
 
-  const auto dst_data =
-    internal::get_vector_data<n_components_>(dst, first_index);
+  const auto dst_data = internal::get_vector_data<n_components_>(
+    dst,
+    first_index,
+    this->dof_access_index ==
+      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell,
+    this->active_fe_index,
+    this->dof_info);
 
   internal::VectorSetter<Number, VectorizedArrayType> setter;
   read_write_operation(setter, dst_data.first, dst_data.second, mask, false);
@@ -8617,9 +8670,12 @@ FEFaceEvaluation<dim,
       "Only EvaluationFlags::values and EvaluationFlags::gradients are supported."));
 
   const auto fu = [&]() {
-    // TODO
-    const auto shared_vector_data =
-      internal::get_shared_vector_data(input_vector);
+    const auto shared_vector_data = internal::get_shared_vector_data(
+      input_vector,
+      this->dof_access_index ==
+        internal::MatrixFreeFunctions::DoFInfo::dof_access_cell,
+      this->active_fe_index,
+      this->dof_info);
 
     if (this->dof_access_index ==
           internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
@@ -8789,8 +8845,12 @@ FEFaceEvaluation<dim,
           this->is_interior_face == false) == false,
          ExcNotImplemented());
 
-  // TODO
-  const auto shared_vector_data = internal::get_shared_vector_data(destination);
+  const auto shared_vector_data = internal::get_shared_vector_data(
+    destination,
+    this->dof_access_index ==
+      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell,
+    this->active_fe_index,
+    this->dof_info);
 
   // TODO: this copying should not be necessary once we have introduced
   // an internal-data structure

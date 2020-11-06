@@ -2496,6 +2496,7 @@ namespace internal
     auto  n_components             = proc.n_components;
     auto  integrate                = proc.integrate;
     auto  global_vector_ptr        = proc.global_vector_ptr;
+    auto &sm_ptr                   = proc.sm_ptr;
     auto &data                     = proc.data;
     auto &dof_info                 = proc.dof_info;
     auto  values_quad              = proc.values_quad;
@@ -2516,6 +2517,7 @@ namespace internal
     static const int fe_degree = Processor::fe_degree_;
     using VectorizedArrayType  = typename Processor::VectorizedArrayType_;
 
+    using Number   = typename Processor::Number_;
     using Number2_ = typename Processor::Number2_;
 
     const unsigned int cell = cells[0];
@@ -2999,7 +3001,8 @@ namespace internal
 
                 const bool vectorization_possible =
                   (n_face_orientations == 1) &&
-                  (n_filled_lanes == VectorizedArrayType::size());
+                  (n_filled_lanes == VectorizedArrayType::size()) &&
+                  (sm_ptr != nullptr);
 
                 std::array<Number2_ *, VectorizedArrayType::size()>
                   vector_ptrs = {};
@@ -3009,7 +3012,20 @@ namespace internal
                     if (n_face_orientations == 1)
                       {
                         for (unsigned int v = 0; v < n_filled_lanes; ++v)
-                          vector_ptrs[v] = vector_ptr + indices[v];
+                          if (sm_ptr == nullptr)
+                            {
+                              vector_ptrs[v] = vector_ptr + indices[v];
+                            }
+                          else
+                            {
+                              const auto &temp =
+                                dof_info.dof_indices_contiguous_sm
+                                  [dof_access_index]
+                                  [cell * VectorizedArrayType::size() + v];
+                              vector_ptrs[v] = const_cast<Number *>(
+                                sm_ptr->operator[](temp.first).data() +
+                                temp.second);
+                            }
                       }
                     else if (n_face_orientations == VectorizedArrayType::size())
                       {
@@ -3017,10 +3033,25 @@ namespace internal
                              v < VectorizedArrayType::size();
                              ++v)
                           if (cells[v] != numbers::invalid_unsigned_int)
-                            vector_ptrs[v] =
-                              vector_ptr +
-                              dof_info.dof_indices_contiguous[dof_access_index]
+                            {
+                              if (sm_ptr == nullptr)
+                                {
+                                  vector_ptrs[v] =
+                                    vector_ptr +
+                                    dof_info
+                                      .dof_indices_contiguous[dof_access_index]
                                                              [cells[v]];
+                                }
+                              else
+                                {
+                                  const auto &temp =
+                                    dof_info.dof_indices_contiguous_sm
+                                      [dof_access_index][cells[v]];
+                                  vector_ptrs[v] = const_cast<Number *>(
+                                    sm_ptr->operator[](temp.first).data() +
+                                    temp.second);
+                                }
+                            }
                       }
                     else
                       {
@@ -3255,6 +3286,7 @@ namespace internal
       static const int fe_degree_     = fe_degree;
       static const int n_q_points_1d_ = n_q_points_1d;
       using VectorizedArrayType_      = VectorizedArrayType;
+      using Number_                   = Number;
       using Number2_                  = const Number2;
 
       Processor(
@@ -3530,6 +3562,7 @@ namespace internal
       static const int fe_degree_     = fe_degree;
       static const int n_q_points_1d_ = n_q_points_1d;
       using VectorizedArrayType_      = VectorizedArrayType;
+      using Number_                   = Number;
       using Number2_                  = Number2;
 
 
