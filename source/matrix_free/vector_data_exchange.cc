@@ -426,17 +426,8 @@ namespace internal
         std::vector<unsigned int> sm_import_data_this_indices;
 
         // collect ranks of processes of shared-memory domain
-        const auto sm_ranks = [&]() {
-          std::vector<unsigned int> sm_ranks(
-            Utilities::MPI::n_mpi_processes(comm_sm));
-
-          const unsigned int rank = Utilities::MPI::this_mpi_process(comm);
-
-          MPI_Allgather(
-            &rank, 1, MPI_UNSIGNED, sm_ranks.data(), 1, MPI_UNSIGNED, comm_sm);
-
-          return sm_ranks;
-        }();
+        const auto sm_ranks =
+          Utilities::MPI::mpi_processes_within_communicator(comm, comm_sm);
 
         // determine owners of ghost indices and determine requesters
         std::vector<unsigned int> owning_ranks_of_ghosts(
