@@ -173,13 +173,13 @@ namespace LinearAlgebra
        */
       BlockVector(const std::vector<IndexSet> &local_ranges,
                   const std::vector<IndexSet> &ghost_indices,
-                  const MPI_Comm               communicator);
+                  const MPI_Comm &             communicator);
 
       /**
        * Same as above but the ghost indices are assumed to be empty.
        */
       BlockVector(const std::vector<IndexSet> &local_ranges,
-                  const MPI_Comm               communicator);
+                  const MPI_Comm &             communicator);
 
       /**
        * Destructor.

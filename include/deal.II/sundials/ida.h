@@ -580,7 +580,7 @@ namespace SUNDIALS
      * @param mpi_comm MPI communicator
      */
     IDA(const AdditionalData &data     = AdditionalData(),
-        const MPI_Comm        mpi_comm = MPI_COMM_WORLD);
+        const MPI_Comm &      mpi_comm = MPI_COMM_WORLD);
 
     /**
      * Destructor.

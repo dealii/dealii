@@ -41,7 +41,8 @@ namespace parallel
   namespace fullydistributed
   {
     template <int dim, int spacedim>
-    Triangulation<dim, spacedim>::Triangulation(MPI_Comm mpi_communicator)
+    Triangulation<dim, spacedim>::Triangulation(
+      const MPI_Comm &mpi_communicator)
       : parallel::DistributedTriangulationBase<dim, spacedim>(mpi_communicator)
       , settings(TriangulationDescription::Settings::default_setting)
       , partitioner([](dealii::Triangulation<dim, spacedim> &tria,

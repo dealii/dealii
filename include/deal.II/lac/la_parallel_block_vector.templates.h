@@ -60,7 +60,7 @@ namespace LinearAlgebra
     template <typename Number>
     BlockVector<Number>::BlockVector(const std::vector<IndexSet> &local_ranges,
                                      const std::vector<IndexSet> &ghost_indices,
-                                     const MPI_Comm               communicator)
+                                     const MPI_Comm &             communicator)
     {
       std::vector<size_type> sizes(local_ranges.size());
       for (unsigned int i = 0; i < local_ranges.size(); ++i)
@@ -76,7 +76,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     BlockVector<Number>::BlockVector(const std::vector<IndexSet> &local_ranges,
-                                     const MPI_Comm               communicator)
+                                     const MPI_Comm &             communicator)
     {
       std::vector<size_type> sizes(local_ranges.size());
       for (unsigned int i = 0; i < local_ranges.size(); ++i)

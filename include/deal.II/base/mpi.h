@@ -384,7 +384,7 @@ namespace Utilities
        * in the communicator.
        */
       void
-      lock(MPI_Comm comm);
+      lock(const MPI_Comm &comm);
 
       /**
        * Release the lock.
@@ -393,7 +393,7 @@ namespace Utilities
        * in the communicator.
        */
       void
-      unlock(MPI_Comm comm);
+      unlock(const MPI_Comm &comm);
 
     private:
       /**

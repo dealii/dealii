@@ -157,7 +157,8 @@ for (deal_II_space_dimension : SPACE_DIMENSIONS)
 
     template std::vector<std::vector<BoundingBox<deal_II_space_dimension>>>
     GridTools::exchange_local_bounding_boxes(
-      const std::vector<BoundingBox<deal_II_space_dimension>> &, MPI_Comm);
+      const std::vector<BoundingBox<deal_II_space_dimension>> &,
+      const MPI_Comm &);
 
     template std::tuple<std::vector<std::vector<unsigned int>>,
                         std::map<unsigned int, unsigned int>,
@@ -177,7 +178,8 @@ for (deal_II_space_dimension : SPACE_DIMENSIONS)
     template RTree<
       std::pair<BoundingBox<deal_II_space_dimension>, unsigned int>>
     GridTools::build_global_description_tree(
-      const std::vector<BoundingBox<deal_II_space_dimension>> &, MPI_Comm);
+      const std::vector<BoundingBox<deal_II_space_dimension>> &,
+      const MPI_Comm &);
 
     template Vector<double> GridTools::compute_aspect_ratio_of_cells(
       const Mapping<deal_II_space_dimension> &,

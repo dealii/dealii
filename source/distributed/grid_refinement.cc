@@ -71,7 +71,7 @@ namespace
   template <typename number>
   double
   compute_global_sum(const dealii::Vector<number> &criteria,
-                     MPI_Comm                      mpi_communicator)
+                     const MPI_Comm &              mpi_communicator)
   {
     double my_sum =
       std::accumulate(criteria.begin(),
@@ -263,7 +263,7 @@ namespace internal
         std::pair<number, number>
         compute_global_min_and_max_at_root(
           const dealii::Vector<number> &criteria,
-          MPI_Comm                      mpi_communicator)
+          const MPI_Comm &              mpi_communicator)
         {
           // we'd like to compute the global max and min from the local ones in
           // one MPI communication. we can do that by taking the elementwise
@@ -296,7 +296,7 @@ namespace internal
           compute_threshold(const dealii::Vector<number> &   criteria,
                             const std::pair<double, double> &global_min_and_max,
                             const types::global_cell_index   n_target_cells,
-                            MPI_Comm                         mpi_communicator)
+                            const MPI_Comm &                 mpi_communicator)
           {
             double interesting_range[2] = {global_min_and_max.first,
                                            global_min_and_max.second};
@@ -379,7 +379,7 @@ namespace internal
           compute_threshold(const dealii::Vector<number> &   criteria,
                             const std::pair<double, double> &global_min_and_max,
                             const double                     target_error,
-                            MPI_Comm                         mpi_communicator)
+                            const MPI_Comm &                 mpi_communicator)
           {
             double interesting_range[2] = {global_min_and_max.first,
                                            global_min_and_max.second};

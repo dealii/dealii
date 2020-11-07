@@ -353,7 +353,7 @@ namespace parallel
        * triangulation is partitioned.
        */
       explicit Triangulation(
-        MPI_Comm mpi_communicator,
+        const MPI_Comm &mpi_communicator,
         const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                        smooth_grid = (dealii::Triangulation<dim, spacedim>::none),
         const Settings settings    = default_setting);
@@ -967,7 +967,7 @@ namespace parallel
       class DataTransfer
       {
       public:
-        DataTransfer(MPI_Comm mpi_communicator);
+        DataTransfer(const MPI_Comm &mpi_communicator);
 
         /**
          * Prepare data transfer by calling the pack callback functions on each
@@ -1247,7 +1247,7 @@ namespace parallel
        * the triangulation.
        */
       Triangulation(
-        MPI_Comm mpi_communicator,
+        const MPI_Comm &mpi_communicator,
         const typename dealii::Triangulation<1, spacedim>::MeshSmoothing
                        smooth_grid = (dealii::Triangulation<1, spacedim>::none),
         const Settings settings    = default_setting);

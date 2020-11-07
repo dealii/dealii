@@ -42,7 +42,7 @@ namespace parallel
 {
   template <int dim, int spacedim>
   TriangulationBase<dim, spacedim>::TriangulationBase(
-    MPI_Comm mpi_communicator,
+    const MPI_Comm &mpi_communicator,
     const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                smooth_grid,
     const bool check_for_distorted_cells)
@@ -547,7 +547,7 @@ namespace parallel
 
   template <int dim, int spacedim>
   DistributedTriangulationBase<dim, spacedim>::DistributedTriangulationBase(
-    MPI_Comm mpi_communicator,
+    const MPI_Comm &mpi_communicator,
     const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                smooth_grid,
     const bool check_for_distorted_cells)

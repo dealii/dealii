@@ -164,7 +164,7 @@ namespace PETScWrappers
      * Intended to be used with SLEPc objects.
      */
     PreconditionJacobi(
-      const MPI_Comm        communicator,
+      const MPI_Comm &      communicator,
       const AdditionalData &additional_data = AdditionalData());
 
     /**
@@ -246,7 +246,7 @@ namespace PETScWrappers
      * Intended to be used with SLEPc objects.
      */
     PreconditionBlockJacobi(
-      const MPI_Comm        communicator,
+      const MPI_Comm &      communicator,
       const AdditionalData &additional_data = AdditionalData());
 
 
@@ -753,7 +753,7 @@ namespace PETScWrappers
      * Intended to be used with SLEPc objects.
      */
     PreconditionBoomerAMG(
-      const MPI_Comm        communicator,
+      const MPI_Comm &      communicator,
       const AdditionalData &additional_data = AdditionalData());
 
 

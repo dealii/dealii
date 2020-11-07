@@ -123,7 +123,7 @@ namespace PETScWrappers
 
 
   /* ----------------- PreconditionJacobi -------------------- */
-  PreconditionJacobi::PreconditionJacobi(const MPI_Comm        comm,
+  PreconditionJacobi::PreconditionJacobi(const MPI_Comm &      comm,
                                          const AdditionalData &additional_data_)
   {
     additional_data = additional_data_;
@@ -173,7 +173,7 @@ namespace PETScWrappers
 
   /* ----------------- PreconditionBlockJacobi -------------------- */
   PreconditionBlockJacobi::PreconditionBlockJacobi(
-    const MPI_Comm        comm,
+    const MPI_Comm &      comm,
     const AdditionalData &additional_data_)
   {
     additional_data = additional_data_;
@@ -450,7 +450,7 @@ namespace PETScWrappers
 
 
   PreconditionBoomerAMG::PreconditionBoomerAMG(
-    const MPI_Comm        comm,
+    const MPI_Comm &      comm,
     const AdditionalData &additional_data_)
   {
     additional_data = additional_data_;

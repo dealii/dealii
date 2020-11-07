@@ -354,7 +354,7 @@ namespace HDF5
 
   File::File(const std::string &  name,
              const FileAccessMode mode,
-             const MPI_Comm       mpi_communicator)
+             const MPI_Comm &     mpi_communicator)
     : File(name, mode, true, mpi_communicator)
   {}
 
@@ -363,7 +363,7 @@ namespace HDF5
   File::File(const std::string &  name,
              const FileAccessMode mode,
              const bool           mpi,
-             const MPI_Comm       mpi_communicator)
+             const MPI_Comm &     mpi_communicator)
     : Group(name, mpi)
   {
     hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {

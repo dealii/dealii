@@ -129,7 +129,7 @@ namespace parallel
        * @param mpi_communicator The MPI communicator to be used for the
        *                         triangulation.
        */
-      explicit Triangulation(MPI_Comm mpi_communicator);
+      explicit Triangulation(const MPI_Comm &mpi_communicator);
 
       /**
        * Destructor.

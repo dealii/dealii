@@ -60,7 +60,7 @@ namespace Utilities
 
     Partitioner::Partitioner(const types::global_dof_index local_size,
                              const types::global_dof_index ghost_size,
-                             const MPI_Comm                communicator)
+                             const MPI_Comm &              communicator)
       : global_size(Utilities::MPI::sum<types::global_dof_index>(local_size,
                                                                  communicator))
       , locally_owned_range_data(global_size)
@@ -94,7 +94,7 @@ namespace Utilities
 
     Partitioner::Partitioner(const IndexSet &locally_owned_indices,
                              const IndexSet &ghost_indices_in,
-                             const MPI_Comm  communicator_in)
+                             const MPI_Comm &communicator_in)
       : global_size(
           static_cast<types::global_dof_index>(locally_owned_indices.size()))
       , n_ghost_indices_data(0)
@@ -112,7 +112,7 @@ namespace Utilities
 
 
     Partitioner::Partitioner(const IndexSet &locally_owned_indices,
-                             const MPI_Comm  communicator_in)
+                             const MPI_Comm &communicator_in)
       : global_size(
           static_cast<types::global_dof_index>(locally_owned_indices.size()))
       , n_ghost_indices_data(0)
