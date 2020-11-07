@@ -1553,8 +1553,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                 const auto cell_iterator = get_cell_iterator(cell, v, di_index);
 
                 // determine global cell index
-                const unsigned int local_dof_index =
-                  di.dof_indices_contiguous[2][index];
+                const unsigned int local_cell_index =
+                  di.dof_indices_contiguous[2][index] /
+                  this->get_dofs_per_cell(di_index);
 
                 const types::global_cell_index global_cell_index =
                   (additional_data.mg_level == numbers::invalid_unsigned_int) ?
@@ -1567,7 +1568,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                 if (cell < n_cell_batches())
                   {
                     // locally-owned cell
-                    cells_locally_owned.emplace_back(index, global_cell_index);
+                    cells_locally_owned.emplace_back(local_cell_index,
+                                                     global_cell_index);
                   }
                 else
                   {
@@ -1595,8 +1597,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                   }
 
                 // write back result
-                cells[cell * n_lanes + v] = {
-                  sm_rank, local_dof_index / this->get_dofs_per_cell(di_index)};
+                cells[cell * n_lanes + v] = {sm_rank, local_cell_index};
               }
 
           std::sort(cells_locally_owned.begin(),
