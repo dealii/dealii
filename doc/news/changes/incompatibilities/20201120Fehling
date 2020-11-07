@@ -1,0 +1,26 @@
+Deprecation announcement: The template arguments of the following
+classes will change in a future release:
+<ul>
+  <li>SolutionTransfer and parallel::distributed::SolutionTransfer
+  <li>Functions::FEFieldFunction
+  <li>DataOut
+  <li>DataOut_DoFData
+  <li>DataOutFaces
+  <li>DataOutRotation
+</ul>
+To make sure your code continues to compile when upgrading deal.II to 
+the upcoming release, you need to either update the template arguments
+according to the changes made in pull request
+[#11221](https://github.com/dealii/dealii/pull/11221),
+or fall back to legacy classes introduced in Legacy
+namespaces.
+<br>
+You can achieve the latter with a *search and replace* script like the
+following made for the *bash* shell:
+@code{.sh}
+classes=(SolutionTransfer FEFieldFunction DataOut DataOut_DoFData DataOutFaces DataOutRotation)
+for c in \${classes[@]}; do
+  find /path/to/your/code -type f -exec sed -i -E "/(\w\${c}|\${c}[^<]|Particles::\${c}|^\s*(\/\/|\*))/! s/\${c}/Legacy::\${c}/g" {} \;
+done
+@endcode
+(Marc Fehling, 2020/11/20)

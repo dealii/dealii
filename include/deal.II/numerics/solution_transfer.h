@@ -574,6 +574,23 @@ private:
     dof_values_on_cell;
 };
 
+namespace Legacy
+{
+  /**
+   * @deprecated Use dealii::SolutionTransfer without the DoFHandlerType
+   * template instead.
+   */
+  template <int dim,
+            typename VectorType     = Vector<double>,
+            typename DoFHandlerType = DoFHandler<dim>>
+  class DEAL_II_DEPRECATED SolutionTransfer
+    : public dealii::SolutionTransfer<dim, VectorType, DoFHandlerType>
+  {
+    using dealii::SolutionTransfer<dim, VectorType, DoFHandlerType>::
+      SolutionTransfer;
+  };
+} // namespace Legacy
+
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -18,7 +18,10 @@
 for (DoFHandler : DOFHANDLER_TEMPLATES; VECTOR : VECTOR_TYPES;
      deal_II_dimension : DIMENSIONS)
   {
-    template class FEFieldFunction<deal_II_dimension,
-                                   DoFHandler<deal_II_dimension>,
-                                   VECTOR>;
+    namespace Functions
+    \{
+      template class FEFieldFunction<deal_II_dimension,
+                                     DoFHandler<deal_II_dimension>,
+                                     VECTOR>;
+    \}
   }

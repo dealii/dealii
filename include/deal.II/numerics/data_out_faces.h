@@ -250,6 +250,20 @@ private:
     DataOutBase::Patch<dimension - 1, space_dimension> &patch);
 };
 
+namespace Legacy
+{
+  /**
+   * @deprecated Use dealii::DataOutFaces without the DoFHandlerType template
+   * instead.
+   */
+  template <int dim, typename DoFHandlerType = DoFHandler<dim>>
+  class DEAL_II_DEPRECATED DataOutFaces
+    : public dealii::DataOutFaces<dim, DoFHandlerType>
+  {
+    using dealii::DataOutFaces<dim, DoFHandlerType>::DataOutFaces;
+  };
+} // namespace Legacy
+
 
 DEAL_II_NAMESPACE_CLOSE
 

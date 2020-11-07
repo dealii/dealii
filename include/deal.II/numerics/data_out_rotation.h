@@ -215,6 +215,20 @@ private:
       &my_patches);
 };
 
+namespace Legacy
+{
+  /**
+   * @deprecated Use dealii::DataOutRotation without the DoFHandlerType
+   * template instead.
+   */
+  template <int dim, typename DoFHandlerType = DoFHandler<dim>>
+  class DEAL_II_DEPRECATED DataOutRotation
+    : dealii::DataOutRotation<dim, DoFHandlerType>
+  {
+    using dealii::DataOutRotation<dim, DoFHandlerType>::DataOutRotation;
+  };
+} // namespace Legacy
+
 
 DEAL_II_NAMESPACE_CLOSE
 
