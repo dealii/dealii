@@ -232,8 +232,8 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                     cell_and_index->first->level(),
                     cell_and_index->first->index(),
                     dataset->dof_handler);
-                  scratch_data.patch_values_scalar
-                    .template set_cell<DoFHandlerType>(dh_cell);
+                  scratch_data.patch_values_scalar.template set_cell<dim>(
+                    dh_cell);
 
                   // Finally call the postprocessor's function that
                   // deals with scalar inputs.
@@ -656,8 +656,8 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                     cell_and_index->first->level(),
                     cell_and_index->first->index(),
                     dataset->dof_handler);
-                  scratch_data.patch_values_system
-                    .template set_cell<DoFHandlerType>(dh_cell);
+                  scratch_data.patch_values_system.template set_cell<dim>(
+                    dh_cell);
 
                   // Whether the solution was complex-scalar or
                   // complex-vector-valued doesn't matter -- we took it apart
