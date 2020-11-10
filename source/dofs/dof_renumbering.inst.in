@@ -39,7 +39,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const bool,
         const bool,
-        const std::vector<types::global_dof_index> &);
+        const std::vector<types::global_dof_index> &,
+        const unsigned int);
 
       template void
       component_wise<deal_II_dimension, deal_II_space_dimension>(
