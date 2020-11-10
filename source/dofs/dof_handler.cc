@@ -2429,7 +2429,7 @@ DoFHandler<dim, spacedim>::set_fe(const hp::FECollection<dim, spacedim> &ff)
   Assert(
     this->tria != nullptr,
     ExcMessage(
-      "You need to set the Triangulation in the DoFHandler using initialize() or "
+      "You need to set the Triangulation in the DoFHandler using reinit() or "
       "in the constructor before you can distribute DoFs."));
   Assert(this->tria->n_levels() > 0,
          ExcMessage("The Triangulation you are using is empty!"));
@@ -2502,10 +2502,74 @@ void
 DoFHandler<dim, spacedim>::distribute_dofs(
   const hp::FECollection<dim, spacedim> &ff)
 {
-  this->set_fe(ff);
+  Assert(
+    this->tria != nullptr,
+    ExcMessage(
+      "You need to set the Triangulation in the DoFHandler using reinit() or "
+      "in the constructor before you can distribute DoFs."));
+  Assert(this->tria->n_levels() > 0,
+         ExcMessage("The Triangulation you are using is empty!"));
+  Assert(ff.size() > 0, ExcMessage("The hp::FECollection given is empty!"));
 
+  // register the new finite element collection
+  // don't create a new object if the one we have is identical
+  if (this->fe_collection != ff)
+    {
+      this->fe_collection = hp::FECollection<dim, spacedim>(ff);
+
+      const bool contains_multiple_fes = (this->fe_collection.size() > 1);
+
+      // disable hp-mode if only a single finite element has been registered
+      if (hp_capability_enabled && !contains_multiple_fes)
+        {
+          hp_capability_enabled = false;
+
+          // unsubscribe connections to signals
+          for (auto &connection : this->tria_listeners)
+            connection.disconnect();
+          this->tria_listeners.clear();
+
+          // release active and future finite element tables
+          this->hp_cell_active_fe_indices.clear();
+          this->hp_cell_active_fe_indices.shrink_to_fit();
+          this->hp_cell_future_fe_indices.clear();
+          this->hp_cell_future_fe_indices.shrink_to_fit();
+        }
+
+      // re-enabling hp-mode is not permitted since the active and future fe
+      // tables are no longer available
+      AssertThrow(
+        hp_capability_enabled || !contains_multiple_fes,
+        ExcMessage(
+          "You cannot re-enable hp capabilities after you registered a single "
+          "finite element. Please call reinit() or create a new DoFHandler "
+          "object instead."));
+    }
+
+  // enumerate all degrees of freedom
   if (hp_capability_enabled)
     {
+      // make sure every processor knows the active_fe_indices
+      // on both its own cells and all ghost cells
+      dealii::internal::hp::DoFHandlerImplementation::Implementation::
+        communicate_active_fe_indices(*this);
+
+#ifdef DEBUG
+      // make sure that the fe collection is large enough to
+      // cover all fe indices presently in use on the mesh
+      for (const auto &cell : this->active_cell_iterators())
+        {
+          if (!cell->is_artificial())
+            Assert(cell->active_fe_index() < this->fe_collection.size(),
+                   ExcInvalidFEIndex(cell->active_fe_index(),
+                                     this->fe_collection.size()));
+          if (cell->is_locally_owned())
+            Assert(cell->future_fe_index() < this->fe_collection.size(),
+                   ExcInvalidFEIndex(cell->future_fe_index(),
+                                     this->fe_collection.size()));
+        }
+#endif
+
       object_dof_indices.resize(this->tria->n_levels());
       object_dof_ptr.resize(this->tria->n_levels());
       cell_dof_cache_indices.resize(this->tria->n_levels());
