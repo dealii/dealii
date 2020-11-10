@@ -410,28 +410,29 @@ namespace DoFRenumbering
     //
     // note that if constraints are not requested, then the 'constraints'
     // object will be empty and using it has no effect
-    IndexSet locally_relevant_dofs;
-    IndexSet const *ptr_locally_owned_dofs;
-    if (reorder_level_dofs == false)
-      {
-        DoFTools::extract_locally_relevant_dofs(dof_handler,
-                                                locally_relevant_dofs);
-        ptr_locally_owned_dofs = &dof_handler.locally_owned_dofs();
-      }
-    else
-      {
-        Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
-               ExcDoFHandlerNotInitialized());
-        DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                      level,
-                                                      locally_relevant_dofs);
-        ptr_locally_owned_dofs = &dof_handler.locally_owned_mg_dofs(level);
-      }
+    IndexSet       locally_relevant_dofs;
+    const IndexSet locally_owned_dofs = [&]() {
+      if (reorder_level_dofs == false)
+        {
+          DoFTools::extract_locally_relevant_dofs(dof_handler,
+                                                  locally_relevant_dofs);
+          return dof_handler.locally_owned_dofs();
+        }
+      else
+        {
+          Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
+                 ExcDoFHandlerNotInitialized());
+          DoFTools::extract_locally_relevant_level_dofs(dof_handler,
+                                                        level,
+                                                        locally_relevant_dofs);
+          return dof_handler.locally_owned_mg_dofs(level);
+        }
+    }();
 
     AffineConstraints<double> constraints;
     if (use_constraints)
       {
-        // regarding constraints is not yet implemented on a level basis
+        // reordering with constraints is not yet implemented on a level basis
         Assert(reorder_level_dofs == false, ExcNotImplemented());
 
         constraints.reinit(locally_relevant_dofs);
@@ -440,13 +441,12 @@ namespace DoFRenumbering
     constraints.close();
 
     // see if we can get away with the sequential algorithm
-    if (ptr_locally_owned_dofs->n_elements() == ptr_locally_owned_dofs->size())
+    if (locally_owned_dofs.n_elements() == locally_owned_dofs.size())
       {
-        AssertDimension(new_indices.size(),
-                        ptr_locally_owned_dofs->n_elements());
+        AssertDimension(new_indices.size(), locally_owned_dofs.n_elements());
 
-        DynamicSparsityPattern dsp(ptr_locally_owned_dofs->size(),
-                                   ptr_locally_owned_dofs->size());
+        DynamicSparsityPattern dsp(locally_owned_dofs.size(),
+                                   locally_owned_dofs.size());
         if (reorder_level_dofs == false)
           {
             DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
@@ -490,7 +490,7 @@ namespace DoFRenumbering
           {
             if ((needs_locally_active ==
                  /* previously already set to */ true) ||
-                (ptr_locally_owned_dofs->is_element(starting_index) == false))
+                (locally_owned_dofs.is_element(starting_index) == false))
               {
                 Assert(
                   locally_active_dofs.is_element(starting_index),
@@ -505,8 +505,7 @@ namespace DoFRenumbering
           }
 
         const IndexSet index_set_to_use =
-          (needs_locally_active ? locally_active_dofs :
-                                  *ptr_locally_owned_dofs);
+          (needs_locally_active ? locally_active_dofs : locally_owned_dofs);
 
         // if this process doesn't own any DoFs (on this level), there is
         // nothing to do
@@ -557,8 +556,7 @@ namespace DoFRenumbering
             index_set_to_use.index_within_set(starting_indices[i]);
 
         // then do the renumbering on the locally owned portion
-        AssertDimension(new_indices.size(),
-                        ptr_locally_owned_dofs->n_elements());
+        AssertDimension(new_indices.size(), locally_owned_dofs.n_elements());
         std::vector<types::global_dof_index> my_new_indices(
           index_set_to_use.n_elements());
         SparsityTools::reorder_Cuthill_McKee(local_sparsity,
@@ -577,7 +575,7 @@ namespace DoFRenumbering
           {
             // first step: figure out which DoF indices to eliminate
             IndexSet active_but_not_owned_dofs = locally_active_dofs;
-            active_but_not_owned_dofs.subtract_set(*ptr_locally_owned_dofs);
+            active_but_not_owned_dofs.subtract_set(locally_owned_dofs);
 
             std::set<types::global_dof_index> erase_these_indices;
             for (const auto p : active_but_not_owned_dofs)
@@ -617,14 +615,14 @@ namespace DoFRenumbering
                     translate_indices[i] = next_new_index;
                     ++next_new_index;
                   }
-              Assert(next_new_index == ptr_locally_owned_dofs->n_elements(),
+              Assert(next_new_index == locally_owned_dofs.n_elements(),
                      ExcInternalError());
             }
 
             // and then do the renumbering of the result of the
             // Cuthill-McKee algorithm above, right into the output array
             new_indices.clear();
-            new_indices.reserve(ptr_locally_owned_dofs->n_elements());
+            new_indices.reserve(locally_owned_dofs.n_elements());
             for (const auto &p : my_new_indices)
               if (p != numbers::invalid_dof_index)
                 {
@@ -632,7 +630,7 @@ namespace DoFRenumbering
                          ExcInternalError());
                   new_indices.push_back(translate_indices[p]);
                 }
-            Assert(new_indices.size() == ptr_locally_owned_dofs->n_elements(),
+            Assert(new_indices.size() == locally_owned_dofs.n_elements(),
                    ExcInternalError());
           }
         else
@@ -643,7 +641,7 @@ namespace DoFRenumbering
         // indices of the locally-owned DoFs. so that's where we get the
         // indices
         for (types::global_dof_index &new_index : new_indices)
-          new_index = ptr_locally_owned_dofs->nth_index_in_set(new_index);
+          new_index = locally_owned_dofs.nth_index_in_set(new_index);
       }
   }
 

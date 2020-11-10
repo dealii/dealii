@@ -1658,11 +1658,10 @@ namespace DoFTools
                               IndexSet &                       dof_set);
 
   /**
-   * Same function as above, but on a certain level in a multigrid scenarion.
-   * Strictly speaking we don't talk about active DoFs in such a multigrid
-   * scenario. Nevertheless this function returns all DoF indices that live on
-   * all locally owned cells (including on the interface to ghost cells) on a
-   * certain level, as the function above.
+   * Same function as above but for a certain (multigrid-)level.
+   * This function returns all DoF indices that live on
+   * all locally owned cells (including on the interface to ghost cells) on the
+   * given level.
    */
   template <int dim, int spacedim>
   void

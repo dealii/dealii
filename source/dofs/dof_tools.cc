@@ -1149,19 +1149,18 @@ namespace DoFTools
     std::vector<types::global_dof_index> dof_indices;
     std::set<types::global_dof_index>    global_dof_indices;
 
-    typename DoFHandler<dim, spacedim>::level_cell_iterator
-      cell = dof_handler.begin_mg(level),
-      endc = dof_handler.end_mg(level);
-    for (; cell != endc; ++cell)
-      if (cell->is_locally_owned_on_level())
-        {
-          dof_indices.resize(cell->get_fe().n_dofs_per_cell());
-          cell->get_mg_dof_indices(dof_indices);
+    const auto filtered_iterators_range =
+      filter_iterators(dof_handler.cell_iterators_on_level(level),
+                       dealii::IteratorFilters::LocallyOwnedLevelCell());
+    for (const auto &cell : filtered_iterators_range)
+      {
+        dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+        cell->get_mg_dof_indices(dof_indices);
 
-          for (const types::global_dof_index dof_index : dof_indices)
-            if (!dof_set.is_element(dof_index))
-              global_dof_indices.insert(dof_index);
-        }
+        for (const types::global_dof_index dof_index : dof_indices)
+          if (!dof_set.is_element(dof_index))
+            global_dof_indices.insert(dof_index);
+      }
 
     dof_set.add_indices(global_dof_indices.begin(), global_dof_indices.end());
 
