@@ -1344,10 +1344,18 @@ namespace internal
       void
       Full::reset_ghost_values_impl(const ArrayView<Number> &ghost_array) const
       {
-        // TODO
-        std::memset(ghost_array.data(),
-                    0.0,
-                    ghost_array.size() * sizeof(Number));
+        // reset ghost values coming from shared-memory neighbors
+        // TODO: only needed if values are buffered
+        for (const auto &i : sm_export_data_this.second)
+          std::memset(ghost_array.data() + (i.first - n_local_elements),
+                      0,
+                      sizeof(Number) * i.second);
+
+        // reset ghost values coming from remote neighbors
+        for (const auto &i : ghost_indices_subset_data.second)
+          std::memset(ghost_array.data() + i.first,
+                      0,
+                      sizeof(Number) * i.second);
       }
 
 
