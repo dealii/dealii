@@ -2943,7 +2943,7 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
   Assert(!future_fe_indices_children.empty(), ExcInternalError());
 
   const unsigned int future_fe_index =
-    this->dof_handler->get_fe_collection().find_dominated_fe_extended(
+    this->dof_handler->fe_collection.find_dominated_fe_extended(
       future_fe_indices_children, /*codim=*/0);
 
   Assert(future_fe_index != numbers::invalid_unsigned_int,

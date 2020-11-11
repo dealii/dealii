@@ -28,13 +28,13 @@ namespace hp
     const std::set<unsigned int> &fes,
     const unsigned int            codim) const
   {
+#ifdef DEBUG
     // Validate user inputs.
     Assert(codim <= dim, ExcImpossibleInDim(dim));
+    Assert(size() > 0, ExcEmptyObject());
     for (const auto &fe : fes)
-      {
-        (void)fe;
-        AssertIndexRange(fe, finite_elements.size());
-      }
+      AssertIndexRange(fe, finite_elements.size());
+#endif
 
     // Check if any element of this FECollection is able to dominate all
     // elements of @p fes. If one was found, we add it to the set of
@@ -68,13 +68,13 @@ namespace hp
     const std::set<unsigned int> &fes,
     const unsigned int            codim) const
   {
+#ifdef DEBUG
     // Validate user inputs.
     Assert(codim <= dim, ExcImpossibleInDim(dim));
+    Assert(size() > 0, ExcEmptyObject());
     for (const auto &fe : fes)
-      {
-        (void)fe;
-        AssertIndexRange(fe, finite_elements.size());
-      }
+      AssertIndexRange(fe, finite_elements.size());
+#endif
 
     // Check if any element of this FECollection is dominated by all
     // elements of @p fes. If one was found, we add it to the set of
@@ -108,18 +108,18 @@ namespace hp
     const std::set<unsigned int> &fes,
     const unsigned int            codim) const
   {
-    // Validate user inputs.
-    Assert(codim <= dim, ExcImpossibleInDim(dim));
-    for (const auto &fe : fes)
-      {
-        (void)fe;
-        AssertIndexRange(fe, finite_elements.size());
-      }
-
     // If the set of elements contains only a single element,
     // then this very element is considered to be the dominating one.
     if (fes.size() == 1)
       return *fes.begin();
+
+#ifdef DEBUG
+    // Validate user inputs.
+    Assert(codim <= dim, ExcImpossibleInDim(dim));
+    Assert(size() > 0, ExcEmptyObject());
+    for (const auto &fe : fes)
+      AssertIndexRange(fe, finite_elements.size());
+#endif
 
     // There may also be others, in which case we'll check if any of these
     // elements is able to dominate all others. If one was found, we stop
@@ -154,18 +154,18 @@ namespace hp
     const std::set<unsigned int> &fes,
     const unsigned int            codim) const
   {
-    // Validate user inputs.
-    Assert(codim <= dim, ExcImpossibleInDim(dim));
-    for (const auto &fe : fes)
-      {
-        (void)fe;
-        AssertIndexRange(fe, finite_elements.size());
-      }
-
     // If the set of elements contains only a single element,
     // then this very element is considered to be the dominated one.
     if (fes.size() == 1)
       return *fes.begin();
+
+#ifdef DEBUG
+    // Validate user inputs.
+    Assert(codim <= dim, ExcImpossibleInDim(dim));
+    Assert(size() > 0, ExcEmptyObject());
+    for (const auto &fe : fes)
+      AssertIndexRange(fe, finite_elements.size());
+#endif
 
     // There may also be others, in which case we'll check if any of these
     // elements is dominated by all others. If one was found, we stop
