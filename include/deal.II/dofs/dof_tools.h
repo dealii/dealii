@@ -1670,7 +1670,6 @@ namespace DoFTools
     IndexSet &                       dof_set,
     const unsigned int               level);
 
-
   /**
    * Extract the set of global DoF indices that are active on the current
    * DoFHandler. For regular DoFHandlers, these are all DoF indices, but for
