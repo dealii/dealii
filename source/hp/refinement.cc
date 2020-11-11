@@ -43,6 +43,11 @@ namespace hp
     void
     full_p_adaptivity(const dealii::DoFHandler<dim, spacedim> &dof_handler)
     {
+      Assert(
+        dof_handler.has_hp_capabilities(),
+        (typename dealii::DoFHandler<dim,
+                                     spacedim>::ExcNotAvailableWithoutHP()));
+
       std::vector<bool> p_flags(
         dof_handler.get_triangulation().n_active_cells(), true);
 
@@ -57,6 +62,10 @@ namespace hp
       const dealii::DoFHandler<dim, spacedim> &dof_handler,
       const std::vector<bool> &                p_flags)
     {
+      Assert(
+        dof_handler.has_hp_capabilities(),
+        (typename dealii::DoFHandler<dim,
+                                     spacedim>::ExcNotAvailableWithoutHP()));
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
                       p_flags.size());
 
@@ -99,6 +108,10 @@ namespace hp
       const ComparisonFunction<typename identity<Number>::type>
         &compare_coarsen)
     {
+      Assert(
+        dof_handler.has_hp_capabilities(),
+        (typename dealii::DoFHandler<dim,
+                                     spacedim>::ExcNotAvailableWithoutHP()));
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
                       criteria.size());
 
@@ -131,6 +144,10 @@ namespace hp
       const ComparisonFunction<typename identity<Number>::type>
         &compare_coarsen)
     {
+      Assert(
+        dof_handler.has_hp_capabilities(),
+        (typename dealii::DoFHandler<dim,
+                                     spacedim>::ExcNotAvailableWithoutHP()));
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
                       criteria.size());
       Assert((p_refine_fraction >= 0) && (p_refine_fraction <= 1),
@@ -221,6 +238,10 @@ namespace hp
       const ComparisonFunction<typename identity<Number>::type>
         &compare_coarsen)
     {
+      Assert(
+        dof_handler.has_hp_capabilities(),
+        (typename dealii::DoFHandler<dim,
+                                     spacedim>::ExcNotAvailableWithoutHP()));
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
                       criteria.size());
       Assert((p_refine_fraction >= 0) && (p_refine_fraction <= 1),
@@ -410,6 +431,10 @@ namespace hp
       const dealii::DoFHandler<dim, spacedim> &dof_handler,
       const Vector<Number> &                   sobolev_indices)
     {
+      Assert(
+        dof_handler.has_hp_capabilities(),
+        (typename dealii::DoFHandler<dim,
+                                     spacedim>::ExcNotAvailableWithoutHP()));
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
                       sobolev_indices.size());
 
@@ -465,6 +490,10 @@ namespace hp
       const ComparisonFunction<typename identity<Number>::type>
         &compare_coarsen)
     {
+      Assert(
+        dof_handler.has_hp_capabilities(),
+        (typename dealii::DoFHandler<dim,
+                                     spacedim>::ExcNotAvailableWithoutHP()));
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
                       criteria.size());
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
@@ -609,6 +638,11 @@ namespace hp
     void
     force_p_over_h(const dealii::DoFHandler<dim, spacedim> &dof_handler)
     {
+      Assert(
+        dof_handler.has_hp_capabilities(),
+        (typename dealii::DoFHandler<dim,
+                                     spacedim>::ExcNotAvailableWithoutHP()));
+
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (cell->is_locally_owned() && cell->future_fe_index_set())
           {
@@ -623,6 +657,11 @@ namespace hp
     void
     choose_p_over_h(const dealii::DoFHandler<dim, spacedim> &dof_handler)
     {
+      Assert(
+        dof_handler.has_hp_capabilities(),
+        (typename dealii::DoFHandler<dim,
+                                     spacedim>::ExcNotAvailableWithoutHP()));
+
       // Siblings of cells to be coarsened may not be owned by the same
       // processor. We will exchange coarsening flags on ghost cells and
       // temporarily store them.
