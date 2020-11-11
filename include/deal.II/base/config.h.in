@@ -357,6 +357,8 @@
     DEAL_II_MPI_VERSION_MINOR) \
     >=  \
     (major)*100 + (minor))
+#else
+#  define DEAL_II_MPI_VERSION_GTE(major,minor) false
 #endif
 
 #cmakedefine DEAL_II_MPI_WITH_CUDA_SUPPORT
