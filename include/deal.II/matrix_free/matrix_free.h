@@ -591,9 +591,11 @@ public:
   /**
    * Initializes the data structures. Same as above, but using a $Q_1$
    * mapping.
+   *
+   * @deprecated Use the overload taking a Mapping object instead.
    */
   template <typename QuadratureType, typename number2>
-  void
+  DEAL_II_DEPRECATED void
   reinit(const DoFHandler<dim> &           dof_handler,
          const AffineConstraints<number2> &constraint,
          const QuadratureType &            quad,
@@ -644,9 +646,11 @@ public:
   /**
    * Initializes the data structures. Same as above, but  using a $Q_1$
    * mapping.
+   *
+   * @deprecated Use the overload taking a Mapping object instead.
    */
   template <typename QuadratureType, typename number2>
-  void
+  DEAL_II_DEPRECATED void
   reinit(const std::vector<const DoFHandler<dim> *> &           dof_handler,
          const std::vector<const AffineConstraints<number2> *> &constraint,
          const std::vector<QuadratureType> &                    quad,
@@ -658,7 +662,7 @@ public:
    * @deprecated Use the overload taking a DoFHandler object instead.
    */
   template <typename QuadratureType, typename number2>
-  void
+  DEAL_II_DEPRECATED void
   reinit(const std::vector<const hp::DoFHandler<dim> *> &       dof_handler_hp,
          const std::vector<const AffineConstraints<number2> *> &constraint,
          const std::vector<QuadratureType> &                    quad,
@@ -695,9 +699,11 @@ public:
   /**
    * Initializes the data structures. Same as above, but  using a $Q_1$
    * mapping.
+   *
+   * @deprecated Use the overload taking a Mapping object instead.
    */
   template <typename QuadratureType, typename number2>
-  void
+  DEAL_II_DEPRECATED void
   reinit(const std::vector<const DoFHandler<dim> *> &           dof_handler,
          const std::vector<const AffineConstraints<number2> *> &constraint,
          const QuadratureType &                                 quad,

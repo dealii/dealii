@@ -688,6 +688,8 @@ namespace Step37
     FE_Q<dim>       fe;
     DoFHandler<dim> dof_handler;
 
+    MappingQ1<dim> mapping;
+
     AffineConstraints<double> constraints;
     using SystemMatrixType =
       LaplaceOperator<dim, degree_finite_element, double>;
@@ -796,10 +798,8 @@ namespace Step37
     constraints.clear();
     constraints.reinit(locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-    VectorTools::interpolate_boundary_values(dof_handler,
-                                             0,
-                                             Functions::ZeroFunction<dim>(),
-                                             constraints);
+    VectorTools::interpolate_boundary_values(
+      mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
     constraints.close();
     setup_time += time.wall_time();
     time_details << "Distribute DoFs & B.C.     (CPU/wall) " << time.cpu_time()
@@ -814,7 +814,8 @@ namespace Step37
         (update_gradients | update_JxW_values | update_quadrature_points);
       std::shared_ptr<MatrixFree<dim, double>> system_mf_storage(
         new MatrixFree<dim, double>());
-      system_mf_storage->reinit(dof_handler,
+      system_mf_storage->reinit(mapping,
+                                dof_handler,
                                 constraints,
                                 QGauss<1>(fe.degree + 1),
                                 additional_data);
@@ -869,7 +870,8 @@ namespace Step37
         additional_data.mg_level = level;
         std::shared_ptr<MatrixFree<dim, float>> mg_mf_storage_level(
           new MatrixFree<dim, float>());
-        mg_mf_storage_level->reinit(dof_handler,
+        mg_mf_storage_level->reinit(mapping,
+                                    dof_handler,
                                     level_constraints,
                                     QGauss<1>(fe.degree + 1),
                                     additional_data);
@@ -1126,7 +1128,7 @@ namespace Step37
     solution.update_ghost_values();
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(solution, "solution");
-    data_out.build_patches();
+    data_out.build_patches(mapping);
 
     DataOutBase::VtkFlags flags;
     flags.compression_level = DataOutBase::VtkFlags::best_speed;

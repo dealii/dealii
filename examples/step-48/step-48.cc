@@ -308,8 +308,11 @@ namespace Step48
 #else
     Triangulation<dim> triangulation;
 #endif
-    FE_Q<dim>                 fe;
-    DoFHandler<dim>           dof_handler;
+    FE_Q<dim>       fe;
+    DoFHandler<dim> dof_handler;
+
+    MappingQ1<dim> mapping;
+
     AffineConstraints<double> constraints;
     IndexSet                  locally_relevant_dofs;
 
@@ -434,7 +437,8 @@ namespace Step48
     additional_data.tasks_parallel_scheme =
       MatrixFree<dim>::AdditionalData::TasksParallelScheme::partition_partition;
 
-    matrix_free_data.reinit(dof_handler,
+    matrix_free_data.reinit(mapping,
+                            dof_handler,
                             constraints,
                             QGaussLobatto<1>(fe_degree + 1),
                             additional_data);
@@ -479,7 +483,8 @@ namespace Step48
 
     Vector<float> norm_per_cell(triangulation.n_active_cells());
     solution.update_ghost_values();
-    VectorTools::integrate_difference(dof_handler,
+    VectorTools::integrate_difference(mapping,
+                                      dof_handler,
                                       solution,
                                       Functions::ZeroFunction<dim>(),
                                       norm_per_cell,
@@ -498,7 +503,7 @@ namespace Step48
 
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(solution, "solution");
-    data_out.build_patches();
+    data_out.build_patches(mapping);
 
     data_out.write_vtu_with_pvtu_record(
       "./", "solution", timestep_number, MPI_COMM_WORLD, 3);
@@ -563,10 +568,12 @@ namespace Step48
     // get later consumed by the SineGordonOperation::apply() function. Next,
     // an instance of the <code> SineGordonOperation class </code> based on
     // the finite element degree specified at the top of this file is set up.
-    VectorTools::interpolate(dof_handler,
+    VectorTools::interpolate(mapping,
+                             dof_handler,
                              InitialCondition<dim>(1, time),
                              solution);
-    VectorTools::interpolate(dof_handler,
+    VectorTools::interpolate(mapping,
+                             dof_handler,
                              InitialCondition<dim>(1, time - time_step),
                              old_solution);
     output_results(0);

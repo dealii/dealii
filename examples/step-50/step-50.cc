@@ -513,7 +513,8 @@ void LaplaceProblem<dim, degree>::setup_system()
             (update_gradients | update_JxW_values | update_quadrature_points);
           std::shared_ptr<MatrixFree<dim, double>> mf_storage =
             std::make_shared<MatrixFree<dim, double>>();
-          mf_storage->reinit(dof_handler,
+          mf_storage->reinit(mapping,
+                             dof_handler,
                              constraints,
                              QGauss<1>(degree + 1),
                              additional_data);
@@ -615,7 +616,8 @@ void LaplaceProblem<dim, degree>::setup_multigrid()
               additional_data.mg_level = level;
               std::shared_ptr<MatrixFree<dim, float>> mf_storage_level(
                 new MatrixFree<dim, float>());
-              mf_storage_level->reinit(dof_handler,
+              mf_storage_level->reinit(mapping,
+                                       dof_handler,
                                        level_constraints,
                                        QGauss<1>(degree + 1),
                                        additional_data);
