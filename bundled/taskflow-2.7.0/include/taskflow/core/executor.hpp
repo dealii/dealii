@@ -5,6 +5,9 @@
 #include "observer.hpp"
 #include "taskflow.hpp"
 
+#include <thread>
+#include <map>
+
 namespace tf {
 
 
@@ -494,8 +497,11 @@ Executor::async(F&& f, ArgsT&&... args) {
 
 // Function: _per_thread
 inline Executor::PerThread& Executor::_per_thread() const {
-  thread_local PerThread pt;
-  return pt;
+  static std::mutex m;
+  std::lock_guard<std::mutex> lock(m);
+
+  static std::map<std::thread::id,PerThread> pt;
+  return pt[std::this_thread::get_id()];
 }
 
 // Function: this_worker_id
