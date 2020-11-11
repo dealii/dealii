@@ -725,6 +725,10 @@ convective form $(\mathbf v, \tilde{\mathbf{F}}(\mathbf w)\nabla
 the equation and the integration formula, and can in some cases by understood
 by special skew-symmetric finite difference schemes.
 
+To get started, interested readers could take a look at
+https://github.com/kronbichler/advection_miniapp, where a
+skew-symmetric DG formulation is implemented with deal.II for a simple advection
+equation.
 
 <h4>Equipping the code for supersonic calculations</h4>
 
