@@ -3024,7 +3024,9 @@ namespace internal
                                   [cell * VectorizedArrayType::size() + v];
                               vector_ptrs[v] = const_cast<Number *>(
                                 sm_ptr->operator[](temp.first).data() +
-                                temp.second);
+                                temp.second + comp * static_dofs_per_component +
+                                dof_info.component_dof_indices_offset
+                                  [active_fe_index][first_selected_component]);
                             }
                       }
                     else if (n_face_orientations == VectorizedArrayType::size())
@@ -3049,7 +3051,11 @@ namespace internal
                                       [dof_access_index][cells[v]];
                                   vector_ptrs[v] = const_cast<Number *>(
                                     sm_ptr->operator[](temp.first).data() +
-                                    temp.second);
+                                    temp.second +
+                                    comp * static_dofs_per_component +
+                                    dof_info.component_dof_indices_offset
+                                      [active_fe_index]
+                                      [first_selected_component]);
                                 }
                             }
                       }
