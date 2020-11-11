@@ -2342,7 +2342,7 @@ protected:
  *   {
  *     VectorizedArray<double> val1 = phi1.get_value(q);
  *     Tensor<1,dim,VectorizedArray<double> > grad2 = phi2.get_gradient(q);
- *     Point<dim,VectorizedArray<double> > point = phi1.get_quadrature_point(q);
+ *     Point<dim,VectorizedArray<double> > point = phi1.quadrature_point(q);
  *     // ... some complicated formula combining those three...
  *   }
  * @endcode
