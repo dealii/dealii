@@ -334,6 +334,8 @@ public:
     vtu,
     /// Use read_assimp()
     assimp,
+    /// Use read_exodusii()
+    exodusii,
   };
 
   /**
@@ -566,6 +568,83 @@ public:
               const bool         remove_duplicates                = true,
               const double       tol                              = 1e-12,
               const bool         ignore_unsupported_element_types = true);
+
+  /**
+   * A structure containing some of the information provided by ExodusII that
+   * doesn't have a direct representation in the Triangulation object.
+   *
+   * @note This struct exists to enable forward compatibility with future
+   * versions of read_exodusii that may provide additional output data, but for
+   * now it has a single field.
+   */
+  struct ExodusIIData
+  {
+    /**
+     * A vector containing a mapping from deal.II boundary ids (or manifold ids)
+     * to the provided ExodusII sideset ids.
+     */
+    std::vector<std::vector<int>> id_to_sideset_ids;
+  };
+
+  /**
+   * Read in a mesh stored in the ExodusII file format.
+   *
+   * ExodusII is a feature-rich file format that supports many more features
+   * (like node sets, finite element fields, quality assurance data, and more)
+   * than most other grid formats supported by this class. Many of these
+   * features do not have equivalent representations in deal.II and are
+   * therefore not supported (for example, deal.II does not assign degrees of
+   * freedom directly to nodes, so data stored in a nodal format is not loaded
+   * by this function). At the current time only the following information is
+   * extracted from the input file:
+   *
+   * <ol>
+   *   <li>Block ids: the block id of an element is loaded as its material
+   *     id.</li>
+   *   <li>Elements and vertices: the core geometric information stored in the
+   *     ExodusII file populates the attached Triangulation object. Higher-order
+   *     elements are automatically truncated to lower-order elements since
+   *     deal.II does not support this feature (e.g., there is no equivalent to
+   *     the <code>QUAD9</code> element in deal.II since all quadrilaterals have
+   *     four vertices and additional geometric information is either stored in
+   *     a Manifold or something like MappingQEulerian).</li>
+   *   <li>Sideset ids: these are interpreted as boundary ids or manifold ids
+   *     (see the note on the output value below). An error will occur if you
+   *     attempt to read an ExodusII file that assigns a sideset id to an
+   *     internal face boundary id.</li>
+   * </ol>
+   *
+   * Sideset ids are not translated for Triangulations with nonzero codimension
+   * since those Triangulations do not support the setting of boundary ids.
+   *
+   * @param filename The name of the file to read from.
+   *
+   * @param apply_all_indicators_to_manifolds Boolean determining if the sideset
+   * ids should be interpreted as manifold ids or boundary ids. The default
+   * value is <tt>false</tt>, i.e., treat all sideset ids as boundary ids. If
+   * your mesh sets sideset ids on internal faces then it will be necessary to
+   * set this argument to <code>true</code> and then do some postprocessing to
+   * set the boundary ids correctly.
+   *
+   * @return This function returns a struct containing some extra data stored by
+   * the ExodusII file that cannot be loaded into a Triangulation - see
+   * ExodusIIData for more information.
+   *
+   * A cell face in ExodusII can be in an arbitrary number of sidesets (i.e., it
+   * can have an arbitrary number of sideset ids) - however, a boundary cell
+   * face in deal.II has exactly one boundary id. All boundary faces that are
+   * not in a sideset are given the (default) boundary id of $0$. This function
+   * then groups sidesets together into unique sets and gives each one a
+   * boundary id. For example: Consider a single-quadrilateral mesh whose left
+   * side has no sideset id, right side has sideset ids $0$ and $1$, and whose
+   * bottom and top sides have sideset ids of $0$. The left face will have a
+   * boundary id of $0$, the top and bottom faces boundary ids of $1$, and the
+   * right face a boundary id of $2$. Hence the vector returned by this function
+   * in that case will be $\{\{\}, \{0\}, \{0, 1\}\}$.
+   */
+  ExodusIIData
+  read_exodusii(const std::string &filename,
+                const bool         apply_all_indicators_to_manifolds = false);
 
   /**
    * Return the standard suffix for a file in this format.

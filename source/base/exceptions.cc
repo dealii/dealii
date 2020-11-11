@@ -28,6 +28,10 @@
 #  include <mpi.h>
 #endif
 
+#ifdef DEAL_II_TRILINOS_WITH_SEACAS
+#  include <exodusII.h>
+#endif
+
 #ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
 #  include <execinfo.h>
 #endif
@@ -347,9 +351,9 @@ ExceptionBase::generate_message() const
 
 
 
-#ifdef DEAL_II_WITH_MPI
 namespace StandardExceptions
 {
+#ifdef DEAL_II_WITH_MPI
   ExcMPI::ExcMPI(const int error_code)
     : error_code(error_code)
   {}
@@ -397,8 +401,30 @@ namespace StandardExceptions
     out << "The numerical value of the original error code is " << error_code
         << "." << std::endl;
   }
-} // namespace StandardExceptions
 #endif // DEAL_II_WITH_MPI
+
+
+
+#ifdef DEAL_II_TRILINOS_WITH_SEACAS
+  ExcExodusII::ExcExodusII(const int error_code)
+    : error_code(error_code)
+  {
+    // To avoid including yet another header in exceptions.h we assume that
+    // EX_NOERR is zero. Check that here:
+    static_assert(EX_NOERR == 0,
+                  "EX_NOERR is assumed to be zero in all versions of ExodusII");
+  }
+
+
+
+  void
+  ExcExodusII::print_info(std::ostream &out) const
+  {
+    out << "Error code is " << error_code << '\n';
+    out << "String description: " << ex_strerror(error_code) << '\n';
+  }
+#endif // DEAL_II_TRILINOS_WITH_SEACAS
+} // namespace StandardExceptions
 
 namespace deal_II_exceptions
 {

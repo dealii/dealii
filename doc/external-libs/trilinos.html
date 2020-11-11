@@ -67,6 +67,7 @@
         <li> MueLu (optional, required for TrilinosWrappers::PreconditionAMGMueLu),
         <li> ROL (optional),
         <li> Sacado (optional),
+        <li> SEACAS (optional, required for GridIn::read_exodusii()),
         <li> Teuchos,
         <li> Tpetra (optional),
         <li> Zoltan (optional).
@@ -90,6 +91,7 @@
     -DTrilinos_ENABLE_Ifpack=ON                      \
     -DTrilinos_ENABLE_AztecOO=ON                     \
     -DTrilinos_ENABLE_Sacado=ON                      \
+    -DTrilinos_ENABLE_SEACAS=ON                      \
     -DTrilinos_ENABLE_Teuchos=ON                     \
     -DTrilinos_ENABLE_MueLu=ON                       \
     -DTrilinos_ENABLE_ML=ON                          \
