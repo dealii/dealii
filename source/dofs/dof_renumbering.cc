@@ -410,8 +410,8 @@ namespace DoFRenumbering
     //
     // note that if constraints are not requested, then the 'constraints'
     // object will be empty and using it has no effect
-    IndexSet       locally_relevant_dofs;
-    const IndexSet locally_owned_dofs = [&]() {
+    IndexSet        locally_relevant_dofs;
+    const IndexSet &locally_owned_dofs = [&]() -> const IndexSet & {
       if (reorder_level_dofs == false)
         {
           DoFTools::extract_locally_relevant_dofs(dof_handler,
