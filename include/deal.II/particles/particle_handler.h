@@ -705,7 +705,7 @@ namespace Particles
      * member variable.
      */
     void
-    exchange_ghost_particles();
+    exchange_ghost_particles(const bool enable_ghost_cache = false);
 
     /**
      * Update all particles that live in cells that are ghost cells to
@@ -820,14 +820,6 @@ namespace Particles
     std::multimap<internal::LevelInd, Particle<dim, spacedim>> ghost_particles;
 
     /**
-     * Set of particles that currently live in the ghost cells of the local
-     * domain, organized by the subdomain_id. These
-     * particles are equivalent to the ghost entries in distributed vectors.
-     */
-    std::map<types::subdomain_id, std::vector<particle_iterator>>
-      ghost_particles_by_domain;
-
-    /**
      * This variable stores how many particles are stored globally. It is
      * calculated by update_cached_numbers().
      */
@@ -927,6 +919,13 @@ namespace Particles
      * particle to be send in which the particle belongs. This parameter
      * is necessary if the cell information of the particle iterator is
      * outdated (e.g. after particle movement).
+     *
+     * @param [in] enable_cache Optional bool that enables updating
+     * the ghost particles without rebuilding them from scratch by
+     * building a cache of type GhostParticlePartitioner which
+     * stores the necessary information to update the ghost particles.
+     * Once this cache is built, the ghost particles can be updated
+     * by a call to send_recv_particles_properties_and_location().
      */
     void
     send_recv_particles(
@@ -941,8 +940,110 @@ namespace Particles
         &new_cells_for_particles = std::map<
           types::subdomain_id,
           std::vector<
-            typename Triangulation<dim, spacedim>::active_cell_iterator>>());
+            typename Triangulation<dim, spacedim>::active_cell_iterator>>(),
+      const bool enable_cache = false);
+
+    /**
+     * Transfer particles position and properties assuming that
+     * the particles have not changed cells. This routine uses the
+     * GhostParticlePartitioner as a caching structure to update the particles.
+     * It inherently assumes that particles cannot have changed cell.
+     * All updated particles will be appended to the
+     * @p received_particles vector.
+     *
+     * @param [in] particles_to_send All particles for which information
+     * should be sent and their new subdomain_ids are in this map.
+     *
+     * @param [in,out] received_particles A map with all received
+     * particles. Note that it is not required nor checked that the list
+     * is empty, received particles are simply attached to the end of
+     * the vector.
+     *
+     */
+    void
+    send_recv_particles_properties_and_location(
+      const std::map<types::subdomain_id, std::vector<particle_iterator>>
+        &particles_to_send,
+      std::multimap<internal::LevelInd, Particle<dim, spacedim>>
+        &received_particles);
+
+
 #endif
+
+
+    /**
+     * Cache structure used to store the elements which are required to
+     * exchange the particle information (location and properties) accross
+     * processors in order to update the ghost particles.
+     *
+     * This structure should only be used when one wishes to carry out work
+     * using the particles without calling
+     * sort_particles_into_subdomain_and_cells at every iteration. This is
+     * useful when particle-particle interaction occur at a different time
+     * scale than particle-FEM interaction.
+     *
+     * This structure is similar to Utilities::MPI::Partitioner::import_targets
+     * when combined with neighbors.
+     */
+    struct GhostParticlePartitioner
+    {
+      /**
+       * Indicates if the cache has been built to prevent updating particles
+       * with an invalid cache.
+       */
+      bool valid = false;
+
+      /**
+       * Vector of the subdomain id of all possible neighbors of the current
+       * subdomain.
+       */
+      std::vector<types::subdomain_id> neighbors;
+
+      /**
+       * Vector of size (neighbors.size()+1) used to store the start and the
+       * end point of the data that must go from the current subdomain to the
+       * neighbors. For neighbor i, send_pointers[i] indicates the beginning
+       * and send_pointers[i+1] indicates the end of the data that must be
+       * sent.
+       */
+      std::vector<unsigned int> send_pointers;
+
+      /**
+       * Set of particles that currently live in the ghost cells of the local
+       * domain, organized by the subdomain_id. These
+       * particles are equivalent to the ghost entries in distributed vectors.
+       */
+      std::map<types::subdomain_id, std::vector<particle_iterator>>
+        ghost_particles_by_domain;
+
+      /**
+       * Vector of size (neighbors.size()+1) used to store the start and the
+       * end point of the data that must be received from neighbor[i] on
+       * the current subdomain. For neighbor i, recv_pointers[i] indicate the
+       * beggining and reicv_pointers[i+1] indicates the end of the data that
+       * must be received.
+       */
+      std::vector<unsigned int> recv_pointers;
+
+      /**
+       * Vector of ghost particles in the order in which they are inserted
+       * in the multimap used to store particles on the triangulation. This
+       * information is used to update the ghost particle information
+       * without clearing the multimap of ghost particles, thus greatly
+       * reducing the cost of exchanging the ghost particles information.
+       */
+      std::vector<typename std::multimap<internal::LevelInd,
+                                         Particle<dim, spacedim>>::iterator>
+        ghost_particles_iterators;
+    };
+
+    /**
+     * Cache structure used to store the elements which are required to
+     * exchange the particle information (location and properties) accross
+     * processors in order to update the ghost particles. This structure
+     * is only used to update the ghost particles.
+     */
+    GhostParticlePartitioner ghost_particles_cache;
 
     /**
      * Called by listener functions from Triangulation for every cell

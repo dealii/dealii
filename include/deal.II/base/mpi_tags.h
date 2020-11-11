@@ -109,6 +109,8 @@ namespace Utilities
           /// ParticleHandler<dim, spacedim>::send_recv_particles
           particle_handler_send_recv_particles_setup,
           /// ParticleHandler<dim, spacedim>::send_recv_particles
+          particle_handler_send_recv_particles_cache_setup,
+          /// ParticleHandler<dim, spacedim>::send_recv_particles
           particle_handler_send_recv_particles_send,
 
           /// ScaLAPACKMatrix<NumberType>::copy_to

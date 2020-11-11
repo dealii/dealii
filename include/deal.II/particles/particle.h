@@ -416,6 +416,12 @@ namespace Particles
     void
     load(Archive &ar, const unsigned int version);
 
+    /**
+     * Free the memory of the property pool
+     */
+    void
+    free_properties();
+
 #ifdef DOXYGEN
     /**
      * Write and read the data of this object from a stream for the purpose
