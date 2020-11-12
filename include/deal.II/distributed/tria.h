@@ -828,7 +828,7 @@ namespace parallel
        * This returns a pointer to the internally stored p4est object (of type
        * p4est_t or p8est_t depending on @p dim).
        *
-       * @warning: If you modify the p4est object, internal data structures
+       * @warning If you modify the p4est object, internal data structures
        * can become inconsistent.
        */
       const typename dealii::internal::p4est::types<dim>::forest *
