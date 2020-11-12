@@ -3331,7 +3331,7 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   ,
   // select the correct base element from the given FE component
   data(new internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>(
-    quadrature,
+    Quadrature<dim - is_face>(quadrature),
     fe,
     fe.component_to_base_index(first_selected_component).first))
   , jacobian(nullptr)

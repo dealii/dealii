@@ -128,12 +128,15 @@ namespace internal
 
 
     template <typename Number>
-    template <int dim>
+    template <int dim, int dim_q>
     void
-    ShapeInfo<Number>::reinit(const Quadrature<1> &     quad,
+    ShapeInfo<Number>::reinit(const Quadrature<dim_q> & quad_in,
                               const FiniteElement<dim> &fe_in,
                               const unsigned int        base_element_number)
     {
+      Assert(quad_in.is_tensor_product(), ExcNotImplemented());
+      const auto quad = quad_in.get_tensor_basis()[0];
+
       const FiniteElement<dim> *fe = &fe_in.base_element(base_element_number);
       n_dimensions                 = dim;
       n_components                 = fe_in.n_components();

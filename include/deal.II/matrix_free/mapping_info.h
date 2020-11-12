@@ -320,17 +320,17 @@ namespace internal
        * CellIterator::level() and CellIterator::index(), in order to allow
        * for different kinds of iterators, e.g. standard DoFHandler,
        * multigrid, etc.)  on a fixed Triangulation. In addition, a mapping
-       * and several quadrature formulas are given.
+       * and several 1D quadrature formulas are given.
        */
       void
       initialize(
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
         const FaceInfo<VectorizedArrayType::size()> &             faces,
-        const std::vector<unsigned int> &              active_fe_index,
-        const Mapping<dim> &                           mapping,
-        const std::vector<dealii::hp::QCollection<1>> &quad,
-        const UpdateFlags                              update_flags_cells,
+        const std::vector<unsigned int> &                active_fe_index,
+        const Mapping<dim> &                             mapping,
+        const std::vector<dealii::hp::QCollection<dim>> &quad,
+        const UpdateFlags                                update_flags_cells,
         const UpdateFlags update_flags_boundary_faces,
         const UpdateFlags update_flags_inner_faces,
         const UpdateFlags update_flags_faces_by_cells);
@@ -506,9 +506,10 @@ namespace internal
        * internal functions to initialize all data as requested by the user.
        */
       static UpdateFlags
-      compute_update_flags(const UpdateFlags update_flags,
-                           const std::vector<dealii::hp::QCollection<1>> &quad =
-                             std::vector<dealii::hp::QCollection<1>>());
+      compute_update_flags(
+        const UpdateFlags                                update_flags,
+        const std::vector<dealii::hp::QCollection<dim>> &quad =
+          std::vector<dealii::hp::QCollection<dim>>());
     };
 
 

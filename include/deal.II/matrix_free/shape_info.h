@@ -312,8 +312,8 @@ namespace internal
       /**
        * Constructor that initializes the data fields using the reinit method.
        */
-      template <int dim>
-      ShapeInfo(const Quadrature<1> &     quad,
+      template <int dim, int dim_q>
+      ShapeInfo(const Quadrature<dim_q> & quad,
                 const FiniteElement<dim> &fe,
                 const unsigned int        base_element = 0);
 
@@ -325,9 +325,9 @@ namespace internal
        * dimensional element by a tensor product and that the zeroth shape
        * function in zero evaluates to one.
        */
-      template <int dim>
+      template <int dim, int dim_q>
       void
-      reinit(const Quadrature<1> &     quad,
+      reinit(const Quadrature<dim_q> & quad,
              const FiniteElement<dim> &fe_dim,
              const unsigned int        base_element = 0);
 
@@ -519,8 +519,8 @@ namespace internal
     // ------------------------------------------ inline functions
 
     template <typename Number>
-    template <int dim>
-    inline ShapeInfo<Number>::ShapeInfo(const Quadrature<1> &     quad,
+    template <int dim, int dim_q>
+    inline ShapeInfo<Number>::ShapeInfo(const Quadrature<dim_q> & quad,
                                         const FiniteElement<dim> &fe_in,
                                         const unsigned int base_element_number)
       : element_type(tensor_general)
