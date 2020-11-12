@@ -48,7 +48,18 @@ DEAL_II_NAMESPACE_OPEN
 namespace internal
 {
   DeclException0(ExcAccessToUninitializedField);
-}
+
+  DeclException1(
+    ExcMatrixFreeAccessToUninitializedMappingField,
+    std::string,
+    << "You are requesting information from an FEEvaluation/FEFaceEvaluation "
+    << "object for which this kind of information has not been computed. What "
+    << "information these objects compute is determined by the update_* flags you "
+    << "pass to MatrixFree::reinit() via MatrixFree::AdditionalData. Here, "
+    << "the operation you are attempting requires the <" << arg1
+    << "> flag to be set, but it was apparently not specified "
+    << "upon initialization.");
+} // namespace internal
 
 template <int dim,
           int fe_degree,
@@ -3546,7 +3557,9 @@ inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, VectorizedArrayType>
   get_normal_vector(const unsigned int q_point) const
 {
   AssertIndexRange(q_point, n_quadrature_points);
-  Assert(normal_vectors != nullptr, ExcMessage("Did not call reinit()!"));
+  Assert(normal_vectors != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_normal_vectors"));
   if (this->cell_type <= internal::MatrixFreeFunctions::flat_faces)
     return normal_vectors[0];
   else
@@ -3561,7 +3574,9 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
   const unsigned int q_point) const
 {
   AssertIndexRange(q_point, n_quadrature_points);
-  Assert(J_value != nullptr, ExcNotInitialized());
+  Assert(J_value != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_values|update_gradients"));
   if (this->cell_type <= internal::MatrixFreeFunctions::affine)
     {
       Assert(this->quadrature_weights != nullptr, ExcInternalError());
@@ -3579,7 +3594,9 @@ inline DEAL_II_ALWAYS_INLINE Tensor<2, dim, VectorizedArrayType>
   inverse_jacobian(const unsigned int q_point) const
 {
   AssertIndexRange(q_point, n_quadrature_points);
-  Assert(this->jacobian != nullptr, ExcNotImplemented());
+  Assert(this->jacobian != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_gradients"));
   if (this->cell_type <= internal::MatrixFreeFunctions::affine)
     return jacobian[0];
   else
@@ -5396,7 +5413,9 @@ inline DEAL_II_ALWAYS_INLINE
 #  endif
 
   AssertIndexRange(q_point, this->n_quadrature_points);
-  Assert(this->jacobian != nullptr, ExcNotInitialized());
+  Assert(this->jacobian != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_gradients"));
   const std::size_t nqp = this->n_quadrature_points;
   Tensor<1, n_components_, Tensor<1, dim, VectorizedArrayType>> grad_out;
 
@@ -5445,7 +5464,9 @@ inline DEAL_II_ALWAYS_INLINE Tensor<1, n_components_, VectorizedArrayType>
          internal::ExcAccessToUninitializedField());
 #  endif
 
-  Assert(this->normal_x_jacobian != nullptr, ExcNotInitialized());
+  Assert(this->normal_x_jacobian != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_gradients"));
 
   const std::size_t                            nqp = this->n_quadrature_points;
   Tensor<1, n_components, VectorizedArrayType> grad_out;
@@ -5541,7 +5562,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 #  endif
   AssertIndexRange(q_point, this->n_quadrature_points);
 
-  Assert(this->jacobian != nullptr, ExcNotImplemented());
+  Assert(this->jacobian != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_hessian"));
   const Tensor<2, dim, VectorizedArrayType> &jac =
     this->jacobian[this->cell_type <= internal::MatrixFreeFunctions::affine ?
                      0 :
@@ -5819,7 +5842,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 {
   Assert(this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
   AssertIndexRange(q_point, this->n_quadrature_points);
-  Assert(this->J_value != nullptr, ExcNotInitialized());
+  Assert(this->J_value != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_values"));
 #  ifdef DEBUG
   this->values_quad_submitted = true;
 #  endif
@@ -5855,8 +5880,12 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 {
   Assert(this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
   AssertIndexRange(q_point, this->n_quadrature_points);
-  Assert(this->J_value != nullptr, ExcNotInitialized());
-  Assert(this->jacobian != nullptr, ExcNotInitialized());
+  Assert(this->J_value != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_gradients"));
+  Assert(this->jacobian != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_gradients"));
 #  ifdef DEBUG
   this->gradients_quad_submitted = true;
 #  endif
@@ -5909,7 +5938,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     const unsigned int                                  q_point)
 {
   AssertIndexRange(q_point, this->n_quadrature_points);
-  Assert(this->normal_x_jacobian != nullptr, ExcNotInitialized());
+  Assert(this->normal_x_jacobian != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_gradients"));
 #  ifdef DEBUG
   this->gradients_quad_submitted = true;
 #  endif
@@ -6198,7 +6229,9 @@ inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, VectorizedArrayType>
 #  endif
   AssertIndexRange(q_point, this->n_quadrature_points);
 
-  Assert(this->jacobian != nullptr, ExcNotInitialized());
+  Assert(this->jacobian != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_gradients"));
 
   Tensor<1, dim, VectorizedArrayType> grad_out;
 
@@ -6280,7 +6313,9 @@ inline void DEAL_II_ALWAYS_INLINE
 {
   Assert(this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
   AssertIndexRange(q_point, this->n_quadrature_points);
-  Assert(this->J_value != nullptr, ExcNotInitialized());
+  Assert(this->J_value != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_value"));
 #  ifdef DEBUG
   this->values_quad_submitted = true;
 #  endif
@@ -6331,8 +6366,12 @@ FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::
 {
   Assert(this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
   AssertIndexRange(q_point, this->n_quadrature_points);
-  Assert(this->J_value != nullptr, ExcNotInitialized());
-  Assert(this->jacobian != nullptr, ExcNotInitialized());
+  Assert(this->J_value != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_gradients"));
+  Assert(this->jacobian != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_gradients"));
 #  ifdef DEBUG
   this->gradients_quad_submitted = true;
 #  endif
@@ -6468,7 +6507,9 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
          internal::ExcAccessToUninitializedField());
 #  endif
   AssertIndexRange(q_point, this->n_quadrature_points);
-  Assert(this->jacobian != nullptr, ExcNotInitialized());
+  Assert(this->jacobian != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_gradients"));
 
   VectorizedArrayType divergence;
   const std::size_t   nqp = this->n_quadrature_points;
@@ -6624,8 +6665,12 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
 {
   Assert(this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
   AssertIndexRange(q_point, this->n_quadrature_points);
-  Assert(this->J_value != nullptr, ExcNotInitialized());
-  Assert(this->jacobian != nullptr, ExcNotInitialized());
+  Assert(this->J_value != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_gradients"));
+  Assert(this->jacobian != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_gradients"));
 #  ifdef DEBUG
   this->gradients_quad_submitted = true;
 #  endif
@@ -6682,8 +6727,12 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
   // that saves some operations
   Assert(this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
   AssertIndexRange(q_point, this->n_quadrature_points);
-  Assert(this->J_value != nullptr, ExcNotInitialized());
-  Assert(this->jacobian != nullptr, ExcNotInitialized());
+  Assert(this->J_value != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_gradients"));
+  Assert(this->jacobian != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_gradients"));
 #  ifdef DEBUG
   this->gradients_quad_submitted = true;
 #  endif
@@ -7519,12 +7568,14 @@ FEEvaluation<dim,
     {
       Assert((this->mapped_geometry->get_fe_values().get_update_flags() |
               update_quadrature_points),
-             ExcNotInitialized());
+             internal::ExcMatrixFreeAccessToUninitializedMappingField(
+               "update_quadrature_points"));
     }
   else
     {
       Assert(this->mapping_data->quadrature_point_offsets.empty() == false,
-             ExcNotInitialized());
+             internal::ExcMatrixFreeAccessToUninitializedMappingField(
+               "update_quadrature_points"));
     }
 
   AssertIndexRange(q, n_q_points);
@@ -8950,7 +9001,8 @@ FEFaceEvaluation<dim,
   if (this->dof_access_index < 2)
     {
       Assert(this->mapping_data->quadrature_point_offsets.empty() == false,
-             ExcNotImplemented());
+             internal::ExcMatrixFreeAccessToUninitializedMappingField(
+               "update_quadrature_points"));
       AssertIndexRange(this->cell,
                        this->mapping_data->quadrature_point_offsets.size());
       return this->mapping_data->quadrature_points
@@ -8961,7 +9013,8 @@ FEFaceEvaluation<dim,
       Assert(this->matrix_info->get_mapping_info()
                  .face_data_by_cells[this->quad_no]
                  .quadrature_point_offsets.empty() == false,
-             ExcNotImplemented());
+             internal::ExcMatrixFreeAccessToUninitializedMappingField(
+               "update_quadrature_points"));
       const unsigned int index =
         this->cell * GeometryInfo<dim>::faces_per_cell + this->face_no;
       AssertIndexRange(index,
