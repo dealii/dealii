@@ -584,7 +584,7 @@ namespace internal
                        const unsigned int)
       {
         /*
-         * Default implementation used in 1d and 2d
+         * Default implementation used in 1d
          *
          * In 1d, face_orientation is always true
          */
