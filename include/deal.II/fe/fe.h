@@ -837,9 +837,12 @@ public:
    * operator[] accepts this zero argument, by returning the finite element
    * with index zero within its collection (that, of course, consists only of
    * the present finite element anyway).
+   *
+   * @deprecated With DoFHandler::get_fe(int) and the deprecation of the
+   * hp::DoFHandler class, there is no more use of this operator.
    */
-  const FiniteElement<dim, spacedim> &
-  operator[](const unsigned int fe_index) const;
+  DEAL_II_DEPRECATED const FiniteElement<dim, spacedim> &
+                           operator[](const unsigned int fe_index) const;
 
   /**
    * @name Shape function access
