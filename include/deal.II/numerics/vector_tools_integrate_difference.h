@@ -247,7 +247,7 @@ namespace VectorTools
   /**
    * Same as above for hp.
    *
-   * @deprecated Use integrate_difference(const hp::MappingCollection<dim, spacedim> &, const hp::DoFHandler<dim, spacedim> &, const InVector &, const Function<spacedim, typename InVector::value_type> &, OutVector &, const hp::QCollection<dim> &, const NormType &, const Function<spacedim, double> *, const double) instead.
+   * @deprecated Use integrate_difference(const hp::MappingCollection<dim, spacedim> &, const DoFHandler<dim, spacedim> &, const InVector &, const Function<spacedim, typename InVector::value_type> &, OutVector &, const hp::QCollection<dim> &, const NormType &, const Function<spacedim, double> *, const double) instead.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   DEAL_II_DEPRECATED typename std::enable_if<
@@ -266,7 +266,7 @@ namespace VectorTools
    * Call the integrate_difference() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    *
-   * @deprecated Use integrate_difference(const hp::DoFHandler<dim, spacedim> &, const InVector &, const Function<spacedim, typename InVector::value_type> &, OutVector &, const hp::QCollection<dim> &, const NormType &, const Function<spacedim, double> *, const double) instead.
+   * @deprecated Use integrate_difference(const DoFHandler<dim, spacedim> &, const InVector &, const Function<spacedim, typename InVector::value_type> &, OutVector &, const hp::QCollection<dim> &, const NormType &, const Function<spacedim, double> *, const double) instead.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   DEAL_II_DEPRECATED typename std::enable_if<

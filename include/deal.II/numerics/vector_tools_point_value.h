@@ -138,17 +138,7 @@ namespace VectorTools
                              Vector<double> &                 rhs_vector);
 
   /**
-   * Call the create_point_source_vector() function, see above, with
-   * an implied default $Q_1$ mapping object.
-   */
-  template <int dim, int spacedim>
-  void
-  create_point_source_vector(const DoFHandler<dim, spacedim> &dof_handler,
-                             const Point<spacedim, double> &  p,
-                             Vector<double> &                 rhs_vector);
-
-  /**
-   * Like the previous set of functions, but for hp objects.
+   * Like the previous function, but for hp-objects.
    */
   template <int dim, int spacedim>
   void
@@ -159,10 +149,12 @@ namespace VectorTools
     Vector<double> &                            rhs_vector);
 
   /**
-   * Like the previous set of functions, but for hp objects. The function uses
-   * an implied default $Q_1$ mapping object. Note that if your hp::DoFHandler
-   * uses any active fe index other than zero, then you need to call the
-   * function above that provides a mapping object for each active fe index.
+   * Call the create_point_source_vector() function, see above, with
+   * an implied default $Q_1$ mapping object.
+   *
+   * Note that if your DoFHandler uses any active fe index other than zero, then
+   * you need to call the function above that provides a mapping object for each
+   * active fe index.
    */
   template <int dim, int spacedim>
   void
@@ -197,18 +189,7 @@ namespace VectorTools
                              Vector<double> &                 rhs_vector);
 
   /**
-   * Call the create_point_source_vector() function for vector-valued finite
-   * elements, see above, with an implied default $Q_1$ mapping object.
-   */
-  template <int dim, int spacedim>
-  void
-  create_point_source_vector(const DoFHandler<dim, spacedim> &dof_handler,
-                             const Point<spacedim, double> &  p,
-                             const Point<dim, double> &       direction,
-                             Vector<double> &                 rhs_vector);
-
-  /**
-   * Like the previous set of functions, but for hp objects.
+   * Like the previous function, but for hp-objects.
    */
   template <int dim, int spacedim>
   void
@@ -220,10 +201,12 @@ namespace VectorTools
     Vector<double> &                            rhs_vector);
 
   /**
-   * Like the previous set of functions, but for hp objects. The function uses
-   * an implied default $Q_1$ mapping object. Note that if your hp::DoFHandler
-   * uses any active fe index other than zero, then you need to call the
-   * function above that provides a mapping object for each active fe index.
+   * Call the create_point_source_vector() function for vector-valued finite
+   * elements, see above, with an implied default $Q_1$ mapping object.
+   *
+   * Note that if your DoFHandler uses any active fe index other than zero, then
+   * you need to call the function above that provides a mapping object for each
+   * active fe index.
    */
   template <int dim, int spacedim>
   void
@@ -231,7 +214,6 @@ namespace VectorTools
                              const Point<spacedim, double> &  p,
                              const Point<dim, double> &       direction,
                              Vector<double> &                 rhs_vector);
-
   // @}
 
   /**

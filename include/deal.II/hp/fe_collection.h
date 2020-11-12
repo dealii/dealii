@@ -30,8 +30,7 @@ namespace hp
 {
   /**
    * This class acts as a collection of finite element objects used in the
-   * hp::DoFHandler. It is thus to a hp::DoFHandler what a FiniteElement is to
-   * a ::DoFHandler.
+   * DoFHandler.
    *
    * It implements the concepts stated in the
    * @ref hpcollection

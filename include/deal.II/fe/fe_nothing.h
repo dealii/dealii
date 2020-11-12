@@ -29,17 +29,17 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * Definition of a finite element space with zero degrees of freedom and that,
  * consequently, can only represent a single function: the zero function.
- * This class is
- * useful (in the context of an hp method) to represent empty cells in the
- * triangulation on which no degrees of freedom should be allocated, or to
- * describe a field that is extended by zero to a part of the domain where we
- * don't need it.  Thus a triangulation may be divided into two regions: an
- * active region where normal elements are used, and an inactive region where
- * FE_Nothing elements are used.  The hp::DoFHandler will therefore assign no
- * degrees of freedom to the FE_Nothing cells, and this subregion is therefore
- * implicitly deleted from the computation. step-10 and step-46 show use cases
- * for this element. An interesting application for this element is also
- * presented in the paper @cite Cangiani2012.
+ *
+ * This class is useful (in the context of an hp method) to represent empty
+ * cells in the triangulation on which no degrees of freedom should be
+ * allocated, or to describe a field that is extended by zero to a part of the
+ * domain where we don't need it. Thus a triangulation may be divided into two
+ * regions: an active region where normal elements are used, and an inactive
+ * region where FE_Nothing elements are used. The DoFHandler will therefore
+ * assign no degrees of freedom to the FE_Nothing cells, and this subregion is
+ * therefore implicitly deleted from the computation. step-10 and step-46 show
+ * use cases for this element. An interesting application for this element is
+ * also presented in the paper @cite Cangiani2012.
  *
  * Note that some care must be taken that the resulting mesh topology
  * continues to make sense when FE_Nothing elements are introduced. This is

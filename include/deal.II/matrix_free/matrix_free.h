@@ -145,7 +145,7 @@ public:
    * the indices are to be used. If the level is set to
    * numbers::invalid_unsigned_int, the active cells are traversed, and
    * otherwise the cells in the given level. This option has no effect in case
-   * a DoFHandler or hp::DoFHandler is given.
+   * a DoFHandler is given.
    *
    * The parameter @p initialize_plain_indices indicates whether the DoFInfo
    * class should also allow for access to vectors without resolving

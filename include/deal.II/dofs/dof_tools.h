@@ -250,24 +250,7 @@ namespace DoFTools
 
   /**
    * Map a coupling table from the user friendly organization by components to
-   * the organization by blocks. Specializations of this function for
-   * DoFHandler and hp::DoFHandler are required due to the different results
-   * of their finite element access.
-   *
-   * The return vector will be initialized to the correct length inside this
-   * function.
-   */
-  template <int dim, int spacedim>
-  void
-  convert_couplings_to_blocks(const DoFHandler<dim, spacedim> &dof_handler,
-                              const Table<2, Coupling> &table_by_component,
-                              std::vector<Table<2, Coupling>> &tables_by_block);
-
-  /**
-   * Map a coupling table from the user friendly organization by components to
-   * the organization by blocks. Specializations of this function for
-   * DoFHandler and hp::DoFHandler are required due to the different results
-   * of their finite element access.
+   * the organization by blocks.
    *
    * The return vector will be initialized to the correct length inside this
    * function.
@@ -362,8 +345,8 @@ namespace DoFTools
    * methods for building the sparsity patterns that depend on the exact
    * formulation of the problem. You will have to do this yourself then.
    *
-   * @param[in] dof_handler The DoFHandler or hp::DoFHandler object that
-   * describes which degrees of freedom live on which cells.
+   * @param[in] dof_handler The DoFHandler object that describes which degrees
+   * of freedom live on which cells.
    *
    * @param[out] sparsity_pattern The sparsity pattern to be filled with
    * entries.
@@ -562,8 +545,8 @@ namespace DoFTools
    * strict super-set of nonzero entries compared to the work done by
    * make_sparsity_pattern().
    *
-   * @param[in] dof_handler The DoFHandler or hp::DoFHandler object that
-   * describes which degrees of freedom live on which cells.
+   * @param[in] dof_handler The DoFHandler object that describes which degrees
+   * of freedom live on which cells.
    *
    * @param[out] sparsity_pattern The sparsity pattern to be filled with
    * entries.
@@ -770,14 +753,11 @@ namespace DoFTools
    * This function does not close the object since you may want to
    * enter other constraints later on yourself.
    *
-   * In the hp-case, i.e. when the argument is of type hp::DoFHandler, we
-   * consider constraints due to different finite elements used on two sides
-   * of a face between cells as hanging nodes as well. In other words, for hp
-   * finite elements, this function computes all constraints due to differing
-   * mesh sizes (h) or polynomial degrees (p) between adjacent cells.
-   *
-   * The template argument (and by consequence the type of the first argument
-   * to this function) can be either ::DoFHandler or hp::DoFHandler.
+   * Using a DoFHandler with hp-capabilities, we consider constraints due to
+   * different finite elements used on two sides of a face between cells as
+   * hanging nodes as well. In other words, in hp-mode, this function computes
+   * all constraints due to differing mesh sizes (h) or polynomial degrees (p)
+   * between adjacent cells.
    *
    * @ingroup constraints
    */
@@ -2221,14 +2201,13 @@ namespace DoFTools
                          std::vector<unsigned int>());
 
   /**
-   * For each active cell of a DoFHandler or hp::DoFHandler, extract the
-   * active finite element index and fill the vector given as second argument.
-   * This vector is assumed to have as many entries as there are active cells.
+   * For each active cell of a DoFHandler, extract the active finite element
+   * index and fill the vector given as second argument. This vector is assumed
+   * to have as many entries as there are active cells.
    *
-   * For non-hp DoFHandler objects given as first argument, the returned
-   * vector will consist of only zeros, indicating that all cells use the same
-   * finite element. For a hp::DoFHandler, the values may be different,
-   * though.
+   * For DoFHandler objects without hp-capabilities given as first argument, the
+   * returned vector will consist of only zeros, indicating that all cells use
+   * the same finite element. In hp-mode, the values may be different, though.
    */
   template <int dim, int spacedim>
   void
@@ -2667,8 +2646,8 @@ namespace DoFTools
    */
   DeclException0(ExcGridsDontMatch);
   /**
-   * The ::DoFHandler or hp::DoFHandler was not initialized with a finite
-   * element. Please call DoFHandler::distribute_dofs() etc. first.
+   * The DoFHandler was not initialized with a finite element. Please call
+   * DoFHandler::distribute_dofs() first.
    *
    * @ingroup Exceptions
    */

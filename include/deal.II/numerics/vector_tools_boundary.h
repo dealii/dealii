@@ -107,8 +107,8 @@ namespace VectorTools
     const ComponentMask &component_mask = ComponentMask());
 
   /**
-   * Like the previous function, but take a mapping collection to go with the
-   * hp::DoFHandler object.
+   * Like the previous function, but take a mapping collection to go with
+   * DoFHandler objects with hp-capabilities.
    */
   template <int dim, int spacedim, typename number>
   void
@@ -395,7 +395,7 @@ namespace VectorTools
     std::vector<unsigned int>                  component_mapping = {});
 
   /**
-   * Same as above, but for objects of type hp::DoFHandler
+   * Same as above, but with hp-capabilities.
    */
   template <int dim, int spacedim, typename number>
   void

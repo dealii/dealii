@@ -1505,8 +1505,8 @@ namespace GridTools
    * GridTools::compute_active_cell_halo_layer(
    *   tria, IteratorFilters::MaterialIdEqualTo(1, true));
    * @endcode
-   * or around all cells with one of a set of active FE indices for an
-   * hp::DoFHandler
+   * or around all cells with one of a set of active FE indices for a DoFHandler
+   * with hp-capabilities
    * @code
    * GridTools::compute_active_cell_halo_layer(
    *   hp_dof_handler, IteratorFilters::ActiveFEIndexEqualTo({1,2}, true));
@@ -1517,8 +1517,7 @@ namespace GridTools
    *
    * @tparam MeshType A type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".
-   * @param[in] mesh A mesh (i.e. objects of type Triangulation, DoFHandler,
-   * or hp::DoFHandler).
+   * @param[in] mesh A mesh (i.e. objects of type Triangulation or DoFHandler).
    * @param[in] predicate A function  (or object of a type with an operator())
    * defining the subdomain around which the halo layer is to be extracted. It
    * is a function that takes in an active cell and returns a boolean.
@@ -1558,8 +1557,7 @@ namespace GridTools
    *
    * @tparam MeshType A type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".
-   * @param[in] mesh A mesh (i.e. objects of type Triangulation, DoFHandler,
-   * or hp::DoFHandler).
+   * @param[in] mesh A mesh (i.e. objects of type Triangulation or DoFHandler).
    * @return A list of ghost cells
    */
   template <class MeshType>
@@ -1598,8 +1596,7 @@ namespace GridTools
    *
    * @tparam MeshType A type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".
-   * @param mesh A mesh (i.e. objects of type Triangulation, DoFHandler,
-   * or hp::DoFHandler).
+   * @param mesh A mesh (i.e. objects of type Triangulation or DoFHandler).
    * @param predicate A function  (or object of a type with an operator())
    * defining the subdomain around which the halo layer is to be extracted. It
    * is a function that takes in an active cell and returns a boolean.
@@ -1636,8 +1633,7 @@ namespace GridTools
    *
    * @tparam MeshType A type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".
-   * @param mesh A mesh (i.e. objects of type Triangulation, DoFHandler,
-   * or hp::DoFHandler).
+   * @param mesh A mesh (i.e. objects of type Triangulation or DoFHandler).
    * @param layer_thickness specifies the geometric distance within
    * which the function searches for active cells from the locally owned cells.
    * @return A subset of ghost cells within a given geometric distance of @p
@@ -2180,12 +2176,12 @@ namespace GridTools
   /*@{*/
 
   /**
-   * Given two meshes (i.e. objects of type Triangulation, DoFHandler, or
-   * hp::DoFHandler) that are based on the same coarse mesh, this function
-   * figures out a set of cells that are matched between the two meshes and
-   * where at most one of the meshes is more refined on this cell. In other
-   * words, it finds the smallest cells that are common to both meshes, and
-   * that together completely cover the domain.
+   * Given two meshes (i.e. objects of type Triangulation or DoFHandler) that
+   * are based on the same coarse mesh, this function figures out a set of cells
+   * that are matched between the two meshes and where at most one of the meshes
+   * is more refined on this cell. In other words, it finds the smallest cells
+   * that are common to both meshes, and that together completely cover the
+   * domain.
    *
    * This function is useful, for example, in time-dependent or nonlinear
    * application, where one has to integrate a solution defined on one mesh
@@ -2232,10 +2228,10 @@ namespace GridTools
                         const Triangulation<dim, spacedim> &mesh_2);
 
   /**
-   * The same function as above, but working on arguments of type DoFHandler,
-   * or hp::DoFHandler. This function is provided to allow calling
-   * have_same_coarse_mesh for all types of containers representing
-   * triangulations or the classes built on triangulations.
+   * The same function as above, but working on arguments of type DoFHandler.
+   * This function is provided to allow calling have_same_coarse_mesh for all
+   * types of containers representing triangulations or the classes built on
+   * triangulations.
    *
    * @tparam MeshType A type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".
@@ -2889,12 +2885,12 @@ namespace GridTools
    * in a concrete context. It is taken from the code that makes
    * sure that the @p active_fe_index (a single unsigned integer) is
    * transported from locally owned cells where one can set it in
-   * hp::DoFHandler objects, to the corresponding ghost cells on
-   * other processors to ensure that one can query the right value
-   * also on those processors:
+   * DoFHandler objects with hp-capabilities, to the corresponding ghost cells
+   * on other processors to ensure that one can query the right value also on
+   * those processors:
    * @code
    * using active_cell_iterator =
-   *   typename dealii::hp::DoFHandler<dim,spacedim>::active_cell_iterator;
+   *   typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator;
    * auto pack = [] (const active_cell_iterator &cell) -> unsigned int
    *             {
    *               return cell->active_fe_index();
@@ -2907,9 +2903,9 @@ namespace GridTools
    *               };
    *
    * GridTools::exchange_cell_data_to_ghosts<
-   *   unsigned int, dealii::hp::DoFHandler<dim,spacedim>> (dof_handler,
-   *                                                        pack,
-   *                                                        unpack);
+   *   unsigned int, dealii::DoFHandler<dim,spacedim>> (dof_handler,
+   *                                                    pack,
+   *                                                    unpack);
    * @endcode
    *
    * You will notice that the @p pack lambda function returns an `unsigned int`,
