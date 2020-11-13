@@ -119,45 +119,13 @@ namespace hp
    * @ingroup dofs
    * @ingroup hp
    *
-   * @note Task is delegated to the base class dealii::DoFHandler.
+   * @deprecated The basic dealii::DoFHandler is capable of hp-adaptation now.
    */
   template <int dim, int spacedim = dim>
-  class DoFHandler : public dealii::DoFHandler<dim, spacedim>
+  class DEAL_II_DEPRECATED DoFHandler : public dealii::DoFHandler<dim, spacedim>
   {
-  public:
-    /**
-     * Default Constructor.
-     *
-     * @deprecated Use the overload taking a `bool` instead.
-     */
-    DEAL_II_DEPRECATED
-    DoFHandler();
-
-    /**
-     * Constructor. Take @p tria as the triangulation to work on.
-     *
-     * @deprecated Use the overload taking a
-     * `const Triangulation<dim, spacedim>&` and a `bool` instead.
-     */
-    DEAL_II_DEPRECATED
-    DoFHandler(const Triangulation<dim, spacedim> &tria);
-
-    /**
-     * Copy constructor. DoFHandler objects are large and expensive.
-     * They should not be copied, in particular not by accident, but
-     * rather deliberately constructed. As a consequence, this constructor
-     * is explicitly removed from the interface of this class.
-     */
-    DoFHandler(const DoFHandler &) = delete;
-
-    /**
-     * Copy operator. DoFHandler objects are large and expensive.
-     * They should not be copied, in particular not by accident, but
-     * rather deliberately constructed. As a consequence, this operator
-     * is explicitly removed from the interface of this class.
-     */
-    DoFHandler &
-    operator=(const DoFHandler &) = delete;
+    using dealii::DoFHandler<dim, spacedim>::DoFHandler;
+    using dealii::DoFHandler<dim, spacedim>::operator=;
   };
 
 } // namespace hp
