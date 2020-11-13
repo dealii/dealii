@@ -931,6 +931,8 @@ namespace Step59
     FE_DGQHermite<dim> fe;
     DoFHandler<dim>    dof_handler;
 
+    MappingQ1<dim> mapping;
+
     using SystemMatrixType = LaplaceOperator<dim, fe_degree, double>;
     SystemMatrixType system_matrix;
 
@@ -1022,10 +1024,8 @@ namespace Step59
          update_quadrature_points);
       const auto system_mf_storage =
         std::make_shared<MatrixFree<dim, double>>();
-      system_mf_storage->reinit(dof_handler,
-                                dummy,
-                                QGauss<1>(fe.degree + 1),
-                                additional_data);
+      system_mf_storage->reinit(
+        mapping, dof_handler, dummy, QGauss<1>(fe.degree + 1), additional_data);
       system_matrix.initialize(system_mf_storage);
     }
 
@@ -1054,7 +1054,8 @@ namespace Step59
         additional_data.mg_level = level;
         const auto mg_mf_storage_level =
           std::make_shared<MatrixFree<dim, float>>();
-        mg_mf_storage_level->reinit(dof_handler,
+        mg_mf_storage_level->reinit(mapping,
+                                    dof_handler,
                                     dummy,
                                     QGauss<1>(fe.degree + 1),
                                     additional_data);
@@ -1290,7 +1291,8 @@ namespace Step59
   void LaplaceProblem<dim, fe_degree>::analyze_results() const
   {
     Vector<float> error_per_cell(triangulation.n_active_cells());
-    VectorTools::integrate_difference(dof_handler,
+    VectorTools::integrate_difference(mapping,
+                                      dof_handler,
                                       solution,
                                       Solution<dim>(),
                                       error_per_cell,
