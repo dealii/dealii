@@ -543,8 +543,7 @@ namespace hp
       unsigned int parent_future_fe_index = numbers::invalid_unsigned_int;
       // store all determined future finite element indices on parent cells for
       // coarsening
-      std::map<typename hp::DoFHandler<dim, spacedim>::cell_iterator,
-               unsigned int>
+      std::map<typename DoFHandler<dim, spacedim>::cell_iterator, unsigned int>
         future_fe_indices_on_coarsened_cells;
 
       // deep copy error indicators
@@ -670,16 +669,17 @@ namespace hp
       if (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
             &dof_handler.get_triangulation()))
         {
-          auto pack = [](
-                        const typename dealii::hp::DoFHandler<dim, spacedim>::
-                          active_cell_iterator &cell) -> std::pair<bool, bool> {
+          auto pack =
+            [](const typename dealii::DoFHandler<dim,
+                                                 spacedim>::active_cell_iterator
+                 &cell) -> std::pair<bool, bool> {
             return {cell->coarsen_flag_set(), cell->future_fe_index_set()};
           };
 
-          auto unpack = [&ghost_buffer](
-                          const typename dealii::hp::DoFHandler<dim, spacedim>::
-                            active_cell_iterator &    cell,
-                          const std::pair<bool, bool> pair) -> void {
+          auto unpack =
+            [&ghost_buffer](const typename dealii::DoFHandler<dim, spacedim>::
+                              active_cell_iterator &    cell,
+                            const std::pair<bool, bool> pair) -> void {
             ghost_buffer.emplace(cell->id(), pair);
           };
 

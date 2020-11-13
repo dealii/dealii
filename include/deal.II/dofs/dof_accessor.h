@@ -736,8 +736,6 @@ private:
   // functions.
   template <int, int>
   friend class DoFHandler;
-  template <int, int>
-  friend class hp::DoFHandler;
 
   friend struct dealii::internal::DoFHandlerImplementation::Policy::
     Implementation;
@@ -1208,8 +1206,6 @@ protected:
   // functions.
   template <int, int>
   friend class DoFHandler;
-  template <int, int>
-  friend class hp::DoFHandler;
 
   friend struct dealii::internal::DoFHandlerImplementation::Policy::
     Implementation;

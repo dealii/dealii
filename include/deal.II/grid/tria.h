@@ -4023,8 +4023,6 @@ private:
 
   friend struct dealii::internal::TriaAccessorImplementation::Implementation;
 
-  friend class hp::DoFHandler<dim, spacedim>;
-
   friend struct dealii::internal::TriangulationImplementation::Implementation;
   friend struct dealii::internal::TriangulationImplementation::
     ImplementationMixedMesh;

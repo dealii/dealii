@@ -30,6 +30,9 @@ DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
 #ifndef DOXYGEN
+template <int dim, int spacedim>
+class DoFHandler;
+
 template <typename Number>
 class Vector;
 
@@ -41,12 +44,6 @@ namespace parallel
     class Triangulation;
   }
 } // namespace parallel
-
-namespace hp
-{
-  template <int dim, int spacedim>
-  class DoFHandler;
-}
 #endif
 
 
@@ -129,12 +126,12 @@ namespace parallel
       /**
        * Constructor.
        *
-       * @param[in] dof The hp::DoFHandler on which all operations will
+       * @param[in] dof The DoFHandler on which all operations will
        *   happen. At the time when this constructor is called, the
        *   DoFHandler still points to the triangulation before the
        *   refinement in question happens.
        */
-      ErrorPredictor(const hp::DoFHandler<dim, spacedim> &dof);
+      ErrorPredictor(const DoFHandler<dim, spacedim> &dof);
 
       /**
        * Prepare the current object for coarsening and refinement.
@@ -191,7 +188,7 @@ namespace parallel
       /**
        * Pointer to the degree of freedom handler to work with.
        */
-      SmartPointer<const hp::DoFHandler<dim, spacedim>,
+      SmartPointer<const DoFHandler<dim, spacedim>,
                    ErrorPredictor<dim, spacedim>>
         dof_handler;
 
