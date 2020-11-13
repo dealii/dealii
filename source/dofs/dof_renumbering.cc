@@ -39,6 +39,7 @@
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparsity_tools.h>
 
+#include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/multigrid/mg_tools.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
@@ -391,8 +392,12 @@ namespace DoFRenumbering
     const DoFHandler<dim, spacedim> &           dof_handler,
     const bool                                  reversed_numbering,
     const bool                                  use_constraints,
-    const std::vector<types::global_dof_index> &starting_indices)
+    const std::vector<types::global_dof_index> &starting_indices,
+    const unsigned int                          level)
   {
+    const bool reorder_level_dofs =
+      (level == numbers::invalid_unsigned_int) ? false : true;
+
     // see if there is anything to do at all or whether we can skip the work on
     // this processor
     if (dof_handler.locally_owned_dofs().n_elements() == 0)
@@ -405,26 +410,51 @@ namespace DoFRenumbering
     //
     // note that if constraints are not requested, then the 'constraints'
     // object will be empty and using it has no effect
-    IndexSet locally_relevant_dofs;
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+    IndexSet        locally_relevant_dofs;
+    const IndexSet &locally_owned_dofs = [&]() -> const IndexSet & {
+      if (reorder_level_dofs == false)
+        {
+          DoFTools::extract_locally_relevant_dofs(dof_handler,
+                                                  locally_relevant_dofs);
+          return dof_handler.locally_owned_dofs();
+        }
+      else
+        {
+          Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
+                 ExcDoFHandlerNotInitialized());
+          DoFTools::extract_locally_relevant_level_dofs(dof_handler,
+                                                        level,
+                                                        locally_relevant_dofs);
+          return dof_handler.locally_owned_mg_dofs(level);
+        }
+    }();
 
     AffineConstraints<double> constraints;
     if (use_constraints)
       {
+        // reordering with constraints is not yet implemented on a level basis
+        Assert(reorder_level_dofs == false, ExcNotImplemented());
+
         constraints.reinit(locally_relevant_dofs);
         DoFTools::make_hanging_node_constraints(dof_handler, constraints);
       }
     constraints.close();
 
-    const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
-
     // see if we can get away with the sequential algorithm
     if (locally_owned_dofs.n_elements() == locally_owned_dofs.size())
       {
-        AssertDimension(new_indices.size(), dof_handler.n_dofs());
+        AssertDimension(new_indices.size(), locally_owned_dofs.n_elements());
 
-        DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
-        DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
+        DynamicSparsityPattern dsp(locally_owned_dofs.size(),
+                                   locally_owned_dofs.size());
+        if (reorder_level_dofs == false)
+          {
+            DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
+          }
+        else
+          {
+            MGTools::make_sparsity_pattern(dof_handler, dsp, level);
+          }
 
         SparsityTools::reorder_Cuthill_McKee(dsp,
                                              new_indices,
@@ -443,7 +473,17 @@ namespace DoFRenumbering
         // relevant. in the process, also check that all indices
         // really belong to at least the locally relevant ones
         IndexSet locally_active_dofs;
-        DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
+        if (reorder_level_dofs == false)
+          {
+            DoFTools::extract_locally_active_dofs(dof_handler,
+                                                  locally_active_dofs);
+          }
+        else
+          {
+            DoFTools::extract_locally_active_level_dofs(dof_handler,
+                                                        locally_active_dofs,
+                                                        level);
+          }
 
         bool needs_locally_active = false;
         for (const auto starting_index : starting_indices)
@@ -467,13 +507,25 @@ namespace DoFRenumbering
         const IndexSet index_set_to_use =
           (needs_locally_active ? locally_active_dofs : locally_owned_dofs);
 
+        // if this process doesn't own any DoFs (on this level), there is
+        // nothing to do
+        if (index_set_to_use.n_elements() == 0)
+          return;
+
         // then create first the global sparsity pattern, and then the local
         // sparsity pattern from the global one by transferring its indices to
         // processor-local (locally owned or locally active) index space
-        DynamicSparsityPattern dsp(dof_handler.n_dofs(),
-                                   dof_handler.n_dofs(),
+        DynamicSparsityPattern dsp(index_set_to_use.size(),
+                                   index_set_to_use.size(),
                                    index_set_to_use);
-        DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
+        if (reorder_level_dofs == false)
+          {
+            DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
+          }
+        else
+          {
+            MGTools::make_sparsity_pattern(dof_handler, dsp, level);
+          }
 
         DynamicSparsityPattern local_sparsity(index_set_to_use.n_elements(),
                                               index_set_to_use.n_elements());
@@ -605,16 +657,16 @@ namespace DoFRenumbering
     Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
            ExcDoFHandlerNotInitialized());
 
-    // make the connection graph
-    DynamicSparsityPattern dsp(dof_handler.n_dofs(level),
-                               dof_handler.n_dofs(level));
-    MGTools::make_sparsity_pattern(dof_handler, dsp, level);
+    std::vector<types::global_dof_index> new_indices(
+      dof_handler.locally_owned_mg_dofs(level).n_elements(),
+      numbers::invalid_dof_index);
 
-    std::vector<types::global_dof_index> new_indices(dsp.n_rows());
-    SparsityTools::reorder_Cuthill_McKee(dsp, new_indices, starting_indices);
-
-    if (reversed_numbering)
-      new_indices = Utilities::reverse_permutation(new_indices);
+    compute_Cuthill_McKee(new_indices,
+                          dof_handler,
+                          reversed_numbering,
+                          false,
+                          starting_indices,
+                          level);
 
     // actually perform renumbering;
     // this is dimension specific and

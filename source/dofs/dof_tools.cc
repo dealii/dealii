@@ -1135,6 +1135,42 @@ namespace DoFTools
 
   template <int dim, int spacedim>
   void
+  extract_locally_active_level_dofs(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    IndexSet &                       dof_set,
+    const unsigned int               level)
+  {
+    // collect all the locally owned dofs
+    dof_set = dof_handler.locally_owned_mg_dofs(level);
+
+    // add the DoF on the adjacent ghost cells to the IndexSet, cache them
+    // in a set. need to check each dof manually because we can't be sure
+    // that the dof range of locally_owned_dofs is really contiguous.
+    std::vector<types::global_dof_index> dof_indices;
+    std::set<types::global_dof_index>    global_dof_indices;
+
+    const auto filtered_iterators_range =
+      filter_iterators(dof_handler.cell_iterators_on_level(level),
+                       dealii::IteratorFilters::LocallyOwnedLevelCell());
+    for (const auto &cell : filtered_iterators_range)
+      {
+        dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+        cell->get_mg_dof_indices(dof_indices);
+
+        for (const types::global_dof_index dof_index : dof_indices)
+          if (!dof_set.is_element(dof_index))
+            global_dof_indices.insert(dof_index);
+      }
+
+    dof_set.add_indices(global_dof_indices.begin(), global_dof_indices.end());
+
+    dof_set.compress();
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
   extract_locally_relevant_dofs(const DoFHandler<dim, spacedim> &dof_handler,
                                 IndexSet &                       dof_set)
   {

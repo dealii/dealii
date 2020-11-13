@@ -590,7 +590,9 @@ namespace DoFRenumbering
    * This function does not perform the renumbering on the DoFHandler DoFs but
    * only returns the renumbering vector.
    *
-   * See the Cuthill_McKee() function for an explanation of the arguments.
+   * If a valid level is passed as parameter, the renumbering vector for this
+   * grid level is returned.
+   * See the Cuthill_McKee() function for an explanation of the other arguments.
    */
   template <int dim, int spacedim>
   void
@@ -600,7 +602,8 @@ namespace DoFRenumbering
     const bool                                  reversed_numbering = false,
     const bool                                  use_constraints    = false,
     const std::vector<types::global_dof_index> &starting_indices =
-      std::vector<types::global_dof_index>());
+      std::vector<types::global_dof_index>(),
+    const unsigned int level = numbers::invalid_unsigned_int);
 
   /**
    * Renumber the degrees of freedom according to the Cuthill-McKee method,

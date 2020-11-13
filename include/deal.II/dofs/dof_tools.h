@@ -1658,6 +1658,19 @@ namespace DoFTools
                               IndexSet &                       dof_set);
 
   /**
+   * Same function as above but for a certain (multigrid-)level.
+   * This function returns all DoF indices that live on
+   * all locally owned cells (including on the interface to ghost cells) on the
+   * given level.
+   */
+  template <int dim, int spacedim>
+  void
+  extract_locally_active_level_dofs(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    IndexSet &                       dof_set,
+    const unsigned int               level);
+
+  /**
    * Extract the set of global DoF indices that are active on the current
    * DoFHandler. For regular DoFHandlers, these are all DoF indices, but for
    * DoFHandler objects built on parallel::distributed::Triangulation this set
