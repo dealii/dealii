@@ -252,8 +252,8 @@ namespace internal
     template <int dim, typename Number, typename VectorizedArrayType>
     UpdateFlags
     MappingInfo<dim, Number, VectorizedArrayType>::compute_update_flags(
-      const UpdateFlags                              update_flags,
-      const std::vector<dealii::hp::QCollection<1>> &quad)
+      const UpdateFlags                                update_flags,
+      const std::vector<dealii::hp::QCollection<dim>> &quad)
     {
       // this class is build around the evaluation of jacobians, so compute
       // them in any case. The Jacobians will be inverted manually. Since we
@@ -304,7 +304,7 @@ namespace internal
       const FaceInfo<VectorizedArrayType::size()> &             face_info,
       const std::vector<unsigned int> &                         active_fe_index,
       const Mapping<dim> &                                      mapping,
-      const std::vector<dealii::hp::QCollection<1>> &           quad,
+      const std::vector<dealii::hp::QCollection<dim>> &         quad,
       const UpdateFlags update_flags_cells,
       const UpdateFlags update_flags_boundary_faces,
       const UpdateFlags update_flags_inner_faces,
@@ -337,18 +337,49 @@ namespace internal
           AssertIndexRange(0, n_hp_quads);
           cell_data[my_q].descriptor.resize(n_hp_quads);
           for (unsigned int q = 0; q < n_hp_quads; ++q)
-            cell_data[my_q].descriptor[q].initialize(quad[my_q][q],
-                                                     update_default);
+            {
+              Assert(quad[my_q][q].is_tensor_product(), ExcNotImplemented());
+              for (unsigned int i = 1; i < dim; ++i)
+                {
+                  Assert(quad[my_q][q].get_tensor_basis()[0] ==
+                           quad[my_q][q].get_tensor_basis()[i],
+                         ExcNotImplemented());
+                }
+
+              cell_data[my_q].descriptor[q].initialize(
+                quad[my_q][q].get_tensor_basis()[0], update_default);
+            }
 
           face_data[my_q].descriptor.resize(n_hp_quads);
           for (unsigned int hpq = 0; hpq < n_hp_quads; ++hpq)
-            face_data[my_q].descriptor[hpq].initialize(
-              quad[my_q][hpq], update_flags_boundary_faces);
+            {
+              Assert(quad[my_q][hpq].is_tensor_product(), ExcNotImplemented());
+              for (unsigned int i = 1; i < dim; ++i)
+                {
+                  Assert(quad[my_q][hpq].get_tensor_basis()[0] ==
+                           quad[my_q][hpq].get_tensor_basis()[i],
+                         ExcNotImplemented());
+                }
+
+              face_data[my_q].descriptor[hpq].initialize(
+                quad[my_q][hpq].get_tensor_basis()[0],
+                update_flags_boundary_faces);
+            }
 
           face_data_by_cells[my_q].descriptor.resize(n_hp_quads);
           for (unsigned int hpq = 0; hpq < n_hp_quads; ++hpq)
-            face_data_by_cells[my_q].descriptor[hpq].initialize(quad[my_q][hpq],
-                                                                update_default);
+            {
+              Assert(quad[my_q][hpq].is_tensor_product(), ExcNotImplemented());
+              for (unsigned int i = 1; i < dim; ++i)
+                {
+                  Assert(quad[my_q][hpq].get_tensor_basis()[0] ==
+                           quad[my_q][hpq].get_tensor_basis()[i],
+                         ExcNotImplemented());
+                }
+
+              face_data_by_cells[my_q].descriptor[hpq].initialize(
+                quad[my_q][hpq].get_tensor_basis()[0], update_default);
+            }
         }
 
       // In case we have no hp adaptivity (active_fe_index is empty), we have
@@ -2588,7 +2619,7 @@ namespace internal
       {
         FE_DGQ<dim> fe_geometry(mapping_degree);
         for (unsigned int my_q = 0; my_q < cell_data.size(); ++my_q)
-          shape_infos[my_q].reinit(cell_data[my_q].descriptor[0].quadrature_1d,
+          shape_infos[my_q].reinit(cell_data[my_q].descriptor[0].quadrature,
                                    fe_geometry);
       }
 

@@ -2031,14 +2031,14 @@ private:
    * This is the actual reinit function that sets up the indices for the
    * DoFHandler case.
    */
-  template <typename number2>
+  template <typename number2, int q_dim>
   void
   internal_reinit(
     const Mapping<dim> &                                   mapping,
     const std::vector<const DoFHandler<dim, dim> *> &      dof_handlers,
     const std::vector<const AffineConstraints<number2> *> &constraint,
     const std::vector<IndexSet> &                          locally_owned_set,
-    const std::vector<hp::QCollection<1>> &                quad,
+    const std::vector<hp::QCollection<q_dim>> &            quad,
     const AdditionalData &                                 additional_data);
 
   /**
@@ -2849,7 +2849,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
       dof_handlers, additional_data.mg_level);
 
-  std::vector<hp::QCollection<1>> quad_hp;
+  std::vector<hp::QCollection<dim>> quad_hp;
   quad_hp.emplace_back(quad);
 
   internal_reinit(StaticMappingQ1<dim>::mapping,
@@ -2883,7 +2883,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
       dof_handlers, additional_data.mg_level);
 
-  std::vector<hp::QCollection<1>> quad_hp;
+  std::vector<hp::QCollection<dim>> quad_hp;
   quad_hp.emplace_back(quad);
 
   internal_reinit(mapping,
@@ -2909,7 +2909,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
       dof_handler, additional_data.mg_level);
-  std::vector<hp::QCollection<1>> quad_hp;
+  std::vector<hp::QCollection<dim>> quad_hp;
   for (unsigned int q = 0; q < quad.size(); ++q)
     quad_hp.emplace_back(quad[q]);
   internal_reinit(StaticMappingQ1<dim>::mapping,
@@ -2955,7 +2955,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
       dof_handler, additional_data.mg_level);
-  std::vector<hp::QCollection<1>> quad_hp;
+  std::vector<hp::QCollection<dim>> quad_hp;
   quad_hp.emplace_back(quad);
   internal_reinit(StaticMappingQ1<dim>::mapping,
                   dof_handler,
@@ -3000,7 +3000,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
       dof_handler, additional_data.mg_level);
-  std::vector<hp::QCollection<1>> quad_hp;
+  std::vector<hp::QCollection<dim>> quad_hp;
   quad_hp.emplace_back(quad);
   internal_reinit(mapping,
                   dof_handler,
@@ -3026,7 +3026,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
       dof_handler, additional_data.mg_level);
-  std::vector<hp::QCollection<1>> quad_hp;
+  std::vector<hp::QCollection<dim>> quad_hp;
   for (unsigned int q = 0; q < quad.size(); ++q)
     quad_hp.emplace_back(quad[q]);
   internal_reinit(mapping,

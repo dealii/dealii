@@ -40,7 +40,7 @@ for (deal_II_dimension : DIMENSIONS;
         const std::vector<
           const AffineConstraints<deal_II_scalar_vectorized::value_type> *> &,
         const std::vector<IndexSet> &,
-        const std::vector<hp::QCollection<1>> &,
+        const std::vector<hp::QCollection<deal_II_dimension>> &,
         const AdditionalData &);
 
     template const DoFHandler<deal_II_dimension> &
@@ -62,7 +62,7 @@ for (deal_II_dimension : DIMENSIONS;
         const std::vector<const DoFHandler<deal_II_dimension> *> &,
         const std::vector<const AffineConstraints<double> *> &,
         const std::vector<IndexSet> &,
-        const std::vector<hp::QCollection<1>> &,
+        const std::vector<hp::QCollection<deal_II_dimension>> &,
         const AdditionalData &);
   }
 
