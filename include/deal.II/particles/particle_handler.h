@@ -33,6 +33,7 @@
 
 #include <deal.II/particles/particle.h>
 #include <deal.II/particles/particle_iterator.h>
+#include <deal.II/particles/partitioner.h>
 #include <deal.II/particles/property_pool.h>
 
 #include <boost/range/iterator_range.hpp>
@@ -970,80 +971,13 @@ namespace Particles
 
 #endif
 
-
-    /**
-     * Cache structure used to store the elements which are required to
-     * exchange the particle information (location and properties) accross
-     * processors in order to update the ghost particles.
-     *
-     * This structure should only be used when one wishes to carry out work
-     * using the particles without calling
-     * sort_particles_into_subdomain_and_cells at every iteration. This is
-     * useful when particle-particle interaction occur at a different time
-     * scale than particle-FEM interaction.
-     *
-     * This structure is similar to Utilities::MPI::Partitioner::import_targets
-     * when combined with neighbors.
-     */
-    struct GhostParticlePartitioner
-    {
-      /**
-       * Indicates if the cache has been built to prevent updating particles
-       * with an invalid cache.
-       */
-      bool valid = false;
-
-      /**
-       * Vector of the subdomain id of all possible neighbors of the current
-       * subdomain.
-       */
-      std::vector<types::subdomain_id> neighbors;
-
-      /**
-       * Vector of size (neighbors.size()+1) used to store the start and the
-       * end point of the data that must go from the current subdomain to the
-       * neighbors. For neighbor i, send_pointers[i] indicates the beginning
-       * and send_pointers[i+1] indicates the end of the data that must be
-       * sent.
-       */
-      std::vector<unsigned int> send_pointers;
-
-      /**
-       * Set of particles that currently live in the ghost cells of the local
-       * domain, organized by the subdomain_id. These
-       * particles are equivalent to the ghost entries in distributed vectors.
-       */
-      std::map<types::subdomain_id, std::vector<particle_iterator>>
-        ghost_particles_by_domain;
-
-      /**
-       * Vector of size (neighbors.size()+1) used to store the start and the
-       * end point of the data that must be received from neighbor[i] on
-       * the current subdomain. For neighbor i, recv_pointers[i] indicate the
-       * beggining and reicv_pointers[i+1] indicates the end of the data that
-       * must be received.
-       */
-      std::vector<unsigned int> recv_pointers;
-
-      /**
-       * Vector of ghost particles in the order in which they are inserted
-       * in the multimap used to store particles on the triangulation. This
-       * information is used to update the ghost particle information
-       * without clearing the multimap of ghost particles, thus greatly
-       * reducing the cost of exchanging the ghost particles information.
-       */
-      std::vector<typename std::multimap<internal::LevelInd,
-                                         Particle<dim, spacedim>>::iterator>
-        ghost_particles_iterators;
-    };
-
     /**
      * Cache structure used to store the elements which are required to
      * exchange the particle information (location and properties) accross
      * processors in order to update the ghost particles. This structure
      * is only used to update the ghost particles.
      */
-    GhostParticlePartitioner ghost_particles_cache;
+    internal::GhostParticlePartitioner<dim, spacedim> ghost_particles_cache;
 
     /**
      * Called by listener functions from Triangulation for every cell
