@@ -403,7 +403,7 @@ namespace TriangulationDescription
       const std::function<void(dealii::Triangulation<dim, spacedim> &)>
         &                                            serial_grid_generator,
       const std::function<void(dealii::Triangulation<dim, spacedim> &,
-                               const MPI_Comm,
+                               const MPI_Comm &,
                                const unsigned int)> &serial_grid_partitioner,
       const MPI_Comm &                               comm,
       const int                                      group_size,
