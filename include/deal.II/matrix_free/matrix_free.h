@@ -1691,15 +1691,24 @@ public:
 
   /**
    * Return the DoFHandler with the index as given to the respective
+   * `std::vector` argument in the reinit() function.
+   */
+  const DoFHandler<dim> &
+  get_dof_handler(const unsigned int dof_handler_index = 0) const;
+
+  /**
+   * Return the DoFHandler with the index as given to the respective
    * `std::vector` argument in the reinit() function. Note that if you want to
    * call this function with a template parameter different than the default
    * one, you will need to use the `template` before the function call, i.e.,
    * you will have something like `matrix_free.template
    * get_dof_handler<hp::DoFHandler<dim>>()`.
+   *
+   * @deprecated Use the non-templated equivalent of this function.
    */
-  template <typename DoFHandlerType = DoFHandler<dim>>
-  const DoFHandlerType &
-  get_dof_handler(const unsigned int dof_handler_index = 0) const;
+  template <typename DoFHandlerType>
+  DEAL_II_DEPRECATED const DoFHandlerType &
+                           get_dof_handler(const unsigned int dof_handler_index = 0) const;
 
   /**
    * Return the cell iterator in deal.II speak to a given cell in the

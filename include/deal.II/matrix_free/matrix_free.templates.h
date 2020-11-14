@@ -135,6 +135,18 @@ MatrixFree<dim, Number, VectorizedArrayType>::renumber_dofs(
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
+const DoFHandler<dim> &
+MatrixFree<dim, Number, VectorizedArrayType>::get_dof_handler(
+  const unsigned int dof_handler_index) const
+{
+  AssertIndexRange(dof_handler_index, n_components());
+
+  return *(dof_handlers[dof_handler_index]);
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
 template <typename DoFHandlerType>
 const DoFHandlerType &
 MatrixFree<dim, Number, VectorizedArrayType>::get_dof_handler(
