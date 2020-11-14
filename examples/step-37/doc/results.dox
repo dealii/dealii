@@ -569,7 +569,7 @@ void LaplaceProblem<dim>::assemble_rhs()
   const Table<2, VectorizedArray<double>> &coefficient = system_matrix.get_coefficient();
   FEEvaluation<dim, degree_finite_element> phi(*system_matrix.get_matrix_free());
   for (unsigned int cell = 0;
-       cell < system_matrix.get_matrix_free()->n_macro_cells();
+       cell < system_matrix.get_matrix_free()->n_cell_batches();
        ++cell)
     {
       phi.reinit(cell);
@@ -656,7 +656,7 @@ void LaplaceProblem<dim>::assemble_rhs()
   FEEvaluation<dim, degree_finite_element> phi(
     *inhomogeneous_operator.get_matrix_free());
   for (unsigned int cell = 0;
-       cell < inhomogeneous_operator.get_matrix_free()->n_macro_cells();
+       cell < inhomogeneous_operator.get_matrix_free()->n_cell_batches();
        ++cell)
     {
       phi.reinit(cell);

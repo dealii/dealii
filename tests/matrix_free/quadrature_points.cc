@@ -83,7 +83,7 @@ test()
   }
 
   double                       error_points = 0, abs_points = 0;
-  const unsigned int           n_cells = mf_data.n_macro_cells();
+  const unsigned int           n_cells = mf_data.n_cell_batches();
   FEEvaluation<dim, fe_degree> fe_eval(mf_data);
   FEValues<dim>                fe_values(mapping,
                           fe,

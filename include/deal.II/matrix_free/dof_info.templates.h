@@ -1978,12 +1978,12 @@ namespace internal
 
       types::global_dof_index counter      = 0;
       const unsigned int      n_components = start_components.back();
-      const unsigned int      n_macro_cells =
+      const unsigned int      n_cell_batches =
         n_vectorization_lanes_filled[dof_access_cell].size();
-      Assert(n_macro_cells <=
+      Assert(n_cell_batches <=
                (row_starts.size() - 1) / vectorization_length / n_components,
              ExcInternalError());
-      for (unsigned int cell_no = 0; cell_no < n_macro_cells; ++cell_no)
+      for (unsigned int cell_no = 0; cell_no < n_cell_batches; ++cell_no)
         {
           // do not renumber in case we have constraints
           if (row_starts[cell_no * n_components * vectorization_length]

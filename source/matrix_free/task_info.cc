@@ -1076,17 +1076,17 @@ namespace internal
       std::vector<unsigned int> &      renumbering,
       std::vector<unsigned char> &     incompletely_filled_vectorization)
     {
-      const unsigned int n_macro_cells =
+      const unsigned int n_cell_batches =
         (n_active_cells + vectorization_length - 1) / vectorization_length;
       const unsigned int n_ghost_slots =
         (n_ghost_cells + vectorization_length - 1) / vectorization_length;
-      incompletely_filled_vectorization.resize(n_macro_cells + n_ghost_slots);
-      if (n_macro_cells * vectorization_length > n_active_cells)
-        incompletely_filled_vectorization[n_macro_cells - 1] =
+      incompletely_filled_vectorization.resize(n_cell_batches + n_ghost_slots);
+      if (n_cell_batches * vectorization_length > n_active_cells)
+        incompletely_filled_vectorization[n_cell_batches - 1] =
           vectorization_length -
-          (n_macro_cells * vectorization_length - n_active_cells);
+          (n_cell_batches * vectorization_length - n_active_cells);
       if (n_ghost_slots * vectorization_length > n_ghost_cells)
-        incompletely_filled_vectorization[n_macro_cells + n_ghost_slots - 1] =
+        incompletely_filled_vectorization[n_cell_batches + n_ghost_slots - 1] =
           vectorization_length -
           (n_ghost_slots * vectorization_length - n_ghost_cells);
 
@@ -1116,13 +1116,13 @@ namespace internal
             (boundary_cells.size() + vectorization_length - 1) /
             vectorization_length;
           cell_partition_data.push_back(
-            (n_macro_cells - n_macro_boundary_cells) / 2);
+            (n_cell_batches - n_macro_boundary_cells) / 2);
           cell_partition_data.push_back(cell_partition_data[1] +
                                         n_macro_boundary_cells);
         }
       else
         AssertDimension(boundary_cells.size(), 0);
-      cell_partition_data.push_back(n_macro_cells);
+      cell_partition_data.push_back(n_cell_batches);
       cell_partition_data.push_back(cell_partition_data.back() + n_ghost_slots);
       partition_row_index.resize(n_procs > 1 ? 4 : 2);
       partition_row_index[0] = 0;
@@ -1171,8 +1171,8 @@ namespace internal
       std::vector<unsigned char> &irregular_cells,
       const bool)
     {
-      const unsigned int n_macro_cells = *(cell_partition_data.end() - 2);
-      if (n_macro_cells == 0)
+      const unsigned int n_cell_batches = *(cell_partition_data.end() - 2);
+      if (n_cell_batches == 0)
         return;
 
       Assert(vectorization_length > 0, ExcInternalError());
@@ -1238,8 +1238,8 @@ namespace internal
 
       // set the start list for each block and compute the renumbering of
       // cells
-      std::vector<unsigned int>  block_start(n_macro_cells + 1);
-      std::vector<unsigned char> irregular(n_macro_cells);
+      std::vector<unsigned int>  block_start(n_cell_batches + 1);
+      std::vector<unsigned char> irregular(n_cell_batches);
 
       unsigned int mcell_start = 0;
       block_start[0]           = 0;
@@ -1247,7 +1247,7 @@ namespace internal
         {
           block_start[block + 1] = block_start[block];
           for (unsigned int mcell = mcell_start;
-               mcell < std::min(mcell_start + block_size, n_macro_cells);
+               mcell < std::min(mcell_start + block_size, n_cell_batches);
                ++mcell)
             {
               unsigned int n_comp = (irregular_cells[mcell] > 0) ?
@@ -1261,7 +1261,7 @@ namespace internal
       counter                    = 0;
       unsigned int counter_macro = 0;
       unsigned int block_size_last =
-        n_macro_cells - block_size * (n_blocks - 1);
+        n_cell_batches - block_size * (n_blocks - 1);
       if (block_size_last == 0)
         block_size_last = block_size;
 
@@ -1290,7 +1290,7 @@ namespace internal
 
       irregular_cells.swap(irregular);
       AssertDimension(counter, n_active_cells);
-      AssertDimension(counter_macro, n_macro_cells);
+      AssertDimension(counter_macro, n_cell_batches);
 
       // check that the renumbering is one-to-one
 #ifdef DEBUG
@@ -1306,7 +1306,7 @@ namespace internal
       update_task_info(
         partition); // Actually sets too much for partition color case
 
-      AssertDimension(cell_partition_data.back(), n_macro_cells);
+      AssertDimension(cell_partition_data.back(), n_cell_batches);
     }
 
 
@@ -1319,8 +1319,8 @@ namespace internal
       std::vector<unsigned char> &     irregular_cells,
       const bool                       hp_bool)
     {
-      const unsigned int n_macro_cells = *(cell_partition_data.end() - 2);
-      if (n_macro_cells == 0)
+      const unsigned int n_cell_batches = *(cell_partition_data.end() - 2);
+      if (n_cell_batches == 0)
         return;
 
       Assert(vectorization_length > 0, ExcInternalError());
@@ -1435,8 +1435,8 @@ namespace internal
         {
           // set the start list for each block and compute the renumbering of
           // cells
-          std::vector<unsigned int>  block_start(n_macro_cells + 1);
-          std::vector<unsigned char> irregular(n_macro_cells);
+          std::vector<unsigned int>  block_start(n_cell_batches + 1);
+          std::vector<unsigned char> irregular(n_cell_batches);
 
           unsigned int counter     = 0;
           unsigned int mcell_start = 0;
@@ -1445,7 +1445,7 @@ namespace internal
             {
               block_start[block + 1] = block_start[block];
               for (unsigned int mcell = mcell_start;
-                   mcell < std::min(mcell_start + block_size, n_macro_cells);
+                   mcell < std::min(mcell_start + block_size, n_cell_batches);
                    ++mcell)
                 {
                   unsigned int n_comp = (irregular_cells[mcell] > 0) ?
@@ -1459,7 +1459,7 @@ namespace internal
           counter                    = 0;
           unsigned int counter_macro = 0;
           unsigned int block_size_last =
-            n_macro_cells - block_size * (n_blocks - 1);
+            n_cell_batches - block_size * (n_blocks - 1);
           if (block_size_last == 0)
             block_size_last = block_size;
 
@@ -1488,7 +1488,7 @@ namespace internal
 
           irregular_cells.swap(irregular);
           AssertDimension(counter, n_active_cells);
-          AssertDimension(counter_macro, n_macro_cells);
+          AssertDimension(counter_macro, n_cell_batches);
           // check that the renumbering is one-to-one
 #ifdef DEBUG
           {
@@ -1514,8 +1514,8 @@ namespace internal
       std::vector<unsigned char> &     irregular_cells,
       const bool                       hp_bool)
     {
-      const unsigned int n_macro_cells = *(cell_partition_data.end() - 2);
-      if (n_macro_cells == 0)
+      const unsigned int n_cell_batches = *(cell_partition_data.end() - 2);
+      if (n_cell_batches == 0)
         return;
 
       const unsigned int cluster_size = block_size * vectorization_length;
@@ -1523,7 +1523,7 @@ namespace internal
       // Create cell-block  partitioning.
 
       // For each block of cells, this variable saves to which partitions the
-      // block belongs. Initialize all to n_macro_cells to mark them as not
+      // block belongs. Initialize all to n_cell_batches to mark them as not
       // yet assigned a partition.
       std::vector<unsigned int> cell_partition(n_active_cells,
                                                numbers::invalid_unsigned_int);
@@ -1631,9 +1631,9 @@ namespace internal
       std::vector<unsigned int> &      partition_partition_list,
       std::vector<unsigned char> &     irregular_cells)
     {
-      const unsigned int n_macro_cells = *(cell_partition_data.end() - 2);
+      const unsigned int n_cell_batches = *(cell_partition_data.end() - 2);
       const unsigned int n_ghost_slots =
-        *(cell_partition_data.end() - 1) - n_macro_cells;
+        *(cell_partition_data.end() - 1) - n_cell_batches;
 
       // List of cells in previous partition
       std::vector<unsigned int> neighbor_list;
@@ -1658,7 +1658,7 @@ namespace internal
         // Create partitioning within partitions.
 
         // For each block of cells, this variable saves to which partitions
-        // the block belongs. Initialize all to n_macro_cells to mark them as
+        // the block belongs. Initialize all to n_cell_batches to mark them as
         // not yet assigned a partition.
         std::vector<unsigned int> cell_partition_l2(
           n_active_cells, numbers::invalid_unsigned_int);
@@ -1948,8 +1948,8 @@ namespace internal
       const std::vector<unsigned int> &partition_size,
       std::vector<unsigned int> &      partition_color_list)
     {
-      const unsigned int n_macro_cells = *(cell_partition_data.end() - 2);
-      std::vector<unsigned int> cell_color(n_blocks, n_macro_cells);
+      const unsigned int n_cell_batches = *(cell_partition_data.end() - 2);
+      std::vector<unsigned int> cell_color(n_blocks, n_cell_batches);
       std::vector<bool>         color_finder;
 
       partition_row_index.resize(partition + 1);
@@ -2025,7 +2025,7 @@ namespace internal
 
     {
       // For each block of cells, this variable saves to which partitions the
-      // block belongs. Initialize all to n_macro_cells to mark them as not
+      // block belongs. Initialize all to n_cell_batches to mark them as not
       // yet assigned a partition.
       // std::vector<unsigned int> cell_partition (n_active_cells,
       //                                          numbers::invalid_unsigned_int);
@@ -2050,11 +2050,11 @@ namespace internal
             (cell_partition_data[2] - cell_partition_data[1]) :
           0;
 
-      const unsigned int n_macro_cells = *(cell_partition_data.end() - 2);
-      if (n_macro_cells == 0)
+      const unsigned int n_cell_batches = *(cell_partition_data.end() - 2);
+      if (n_cell_batches == 0)
         return;
       if (scheme == color)
-        start_nonboundary = n_macro_cells;
+        start_nonboundary = n_cell_batches;
       if (scheme == partition_color ||
           scheme == color) // blocking_connectivity == true
         start_nonboundary = ((start_nonboundary + block_size - 1) / block_size);

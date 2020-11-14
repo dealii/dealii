@@ -351,7 +351,7 @@ namespace Step37
     FEEvaluation<dim, degree_finite_element> phi(
       *system_matrix.get_matrix_free());
     for (unsigned int cell = 0;
-         cell < system_matrix.get_matrix_free()->n_macro_cells();
+         cell < system_matrix.get_matrix_free()->n_cell_batches();
          ++cell)
       {
         phi.reinit(cell);

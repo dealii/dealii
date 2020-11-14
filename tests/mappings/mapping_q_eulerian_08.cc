@@ -237,8 +237,8 @@ test(const unsigned int n_ref = 0)
         matrix_free_euler);
       FEEvaluation<dim, fe_degree, n_q_points, 1, NumberType> fe_eval(
         matrix_free);
-      const unsigned int n_cells = matrix_free_euler.n_macro_cells();
-      Assert(matrix_free_euler.n_macro_cells() == matrix_free.n_macro_cells(),
+      const unsigned int n_cells = matrix_free_euler.n_cell_batches();
+      Assert(matrix_free_euler.n_cell_batches() == matrix_free.n_cell_batches(),
              ExcInternalError());
       const unsigned int nqp = fe_eval.n_q_points;
       for (unsigned int cell = 0; cell < n_cells; ++cell)
@@ -315,8 +315,8 @@ test(const unsigned int n_ref = 0)
           mg_level_euler);
         FEEvaluation<dim, fe_degree, n_q_points, 1, NumberType> fe_eval(
           mg_level);
-        const unsigned int n_cells = mg_level_euler.n_macro_cells();
-        Assert(mg_level_euler.n_macro_cells() == mg_level.n_macro_cells(),
+        const unsigned int n_cells = mg_level_euler.n_cell_batches();
+        Assert(mg_level_euler.n_cell_batches() == mg_level.n_cell_batches(),
                ExcInternalError());
         const unsigned int nqp = fe_eval.n_q_points;
         for (unsigned int cell = 0; cell < n_cells; ++cell)

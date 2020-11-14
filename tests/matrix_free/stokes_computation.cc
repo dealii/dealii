@@ -474,7 +474,7 @@ namespace StokesClass
   StokesOperator<dim, degree_v, number>::evaluate_2_x_viscosity(
     const Viscosity<dim> &viscosity_function)
   {
-    const unsigned int n_cells = this->data->n_macro_cells();
+    const unsigned int n_cells = this->data->n_cell_batches();
     FEEvaluation<dim, degree_v, degree_v + 1, dim, number> velocity(*this->data,
                                                                     0);
     viscosity_x_2.reinit(n_cells, velocity.n_q_points);
@@ -609,7 +609,7 @@ namespace StokesClass
   MassMatrixOperator<dim, degree_p, number>::evaluate_1_over_viscosity(
     const Viscosity<dim> &viscosity_function)
   {
-    const unsigned int n_cells = this->data->n_macro_cells();
+    const unsigned int n_cells = this->data->n_cell_batches();
     FEEvaluation<dim, degree_p, degree_p + 2, 1, number> pressure(*this->data,
                                                                   0);
     one_over_viscosity.reinit(n_cells, pressure.n_q_points);
@@ -643,7 +643,7 @@ namespace StokesClass
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
-        AssertDimension(one_over_viscosity.size(0), data.n_macro_cells());
+        AssertDimension(one_over_viscosity.size(0), data.n_cell_batches());
         AssertDimension(one_over_viscosity.size(1), pressure.n_q_points);
 
         pressure.reinit(cell);
@@ -787,7 +787,7 @@ namespace StokesClass
   ABlockOperator<dim, degree_v, number>::evaluate_2_x_viscosity(
     const Viscosity<dim> &viscosity_function)
   {
-    const unsigned int n_cells = this->data->n_macro_cells();
+    const unsigned int n_cells = this->data->n_cell_batches();
     FEEvaluation<dim, degree_v, degree_v + 1, dim, number> velocity(*this->data,
                                                                     0);
     viscosity_x_2.reinit(n_cells, velocity.n_q_points);
@@ -823,7 +823,7 @@ namespace StokesClass
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
-        AssertDimension(viscosity_x_2.size(0), data.n_macro_cells());
+        AssertDimension(viscosity_x_2.size(0), data.n_cell_batches());
         AssertDimension(viscosity_x_2.size(1), velocity.n_q_points);
 
         velocity.reinit(cell);
@@ -1210,7 +1210,7 @@ namespace StokesClass
       pressure(*stokes_matrix.get_matrix_free(), 1);
 
     for (unsigned int cell = 0;
-         cell < stokes_matrix.get_matrix_free()->n_macro_cells();
+         cell < stokes_matrix.get_matrix_free()->n_cell_batches();
          ++cell)
       {
         velocity.reinit(cell);

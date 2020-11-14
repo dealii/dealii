@@ -165,8 +165,8 @@ public:
 
   /**
    * Provides a unified interface to access data in a vector of
-   * VectorizedArray fields of length MatrixFree::n_macro_cells() +
-   * MatrixFree::n_macro_ghost_cells() for both cells (plain read) and faces
+   * VectorizedArray fields of length MatrixFree::n_cell_batches() +
+   * MatrixFree::n_ghost_cell_batches() for both cells (plain read) and faces
    * (indirect addressing).
    */
   VectorizedArrayType
@@ -174,8 +174,8 @@ public:
 
   /**
    * Provides a unified interface to set data in a vector of
-   * VectorizedArray fields of length MatrixFree::n_macro_cells() +
-   * MatrixFree::n_macro_ghost_cells() for both cells (plain read) and faces
+   * VectorizedArray fields of length MatrixFree::n_cell_batches() +
+   * MatrixFree::n_ghost_cell_batches() for both cells (plain read) and faces
    * (indirect addressing).
    */
   void

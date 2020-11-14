@@ -159,7 +159,7 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
       {
         FEEvaluation<dim, fe_degree, n_q_points_1d, 1, double> fe_eval(
           *data, fe_index);
-        const unsigned int n_cells    = data->n_macro_cells();
+        const unsigned int n_cells    = data->n_cell_batches();
         const unsigned int n_q_points = fe_eval.n_q_points;
 
         qp_data.reinit(n_cells, n_q_points);
