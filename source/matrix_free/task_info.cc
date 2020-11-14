@@ -1654,7 +1654,7 @@ namespace internal
              ExcInternalError());
 
       {
-        unsigned int n_macro_cells_before = 0;
+        unsigned int n_cell_batches_before = 0;
         // Create partitioning within partitions.
 
         // For each block of cells, this variable saves to which partitions
@@ -1741,7 +1741,7 @@ namespace internal
                       // put the cells into separate lists for each FE index
                       // within one partition-partition
                       missing_macros = 0;
-                      std::vector<unsigned int> remaining_per_macro_cell(
+                      std::vector<unsigned int> remaining_per_cell_batch(
                         max_fe_index + 1);
                       std::vector<std::vector<unsigned int>>
                                    renumbering_fe_index;
@@ -1764,10 +1764,10 @@ namespace internal
                           // check how many more cells are needed in the lists
                           for (unsigned int j = 0; j < max_fe_index + 1; j++)
                             {
-                              remaining_per_macro_cell[j] =
+                              remaining_per_cell_batch[j] =
                                 renumbering_fe_index[j].size() %
                                 vectorization_length;
-                              if (remaining_per_macro_cell[j] != 0)
+                              if (remaining_per_cell_batch[j] != 0)
                                 filled = false;
                               missing_macros +=
                                 ((renumbering_fe_index[j].size() +
@@ -1777,12 +1777,12 @@ namespace internal
                         }
                       else
                         {
-                          remaining_per_macro_cell.resize(1);
-                          remaining_per_macro_cell[0] =
+                          remaining_per_cell_batch.resize(1);
+                          remaining_per_cell_batch[0] =
                             partition_counter % vectorization_length;
                           missing_macros =
                             partition_counter / vectorization_length;
-                          if (remaining_per_macro_cell[0] != 0)
+                          if (remaining_per_cell_batch[0] != 0)
                             {
                               filled = false;
                               missing_macros++;
@@ -1840,7 +1840,7 @@ namespace internal
                                   // a macro cell with the FE index that is
                                   // not yet fully populated
                                   if (missing_macros > 0 ||
-                                      remaining_per_macro_cell[this_index] > 0)
+                                      remaining_per_cell_batch[this_index] > 0)
                                     {
                                       cell_partition_l2[neighbor->column()] =
                                         partition_l2;
@@ -1853,16 +1853,16 @@ namespace internal
                                         neighbor->column();
                                       counter++;
                                       partition_counter++;
-                                      if (remaining_per_macro_cell
+                                      if (remaining_per_cell_batch
                                               [this_index] == 0 &&
                                           missing_macros > 0)
                                         missing_macros--;
-                                      remaining_per_macro_cell[this_index]++;
-                                      if (remaining_per_macro_cell
+                                      remaining_per_cell_batch[this_index]++;
+                                      if (remaining_per_cell_batch
                                             [this_index] ==
                                           vectorization_length)
                                         {
-                                          remaining_per_macro_cell[this_index] =
+                                          remaining_per_cell_batch[this_index] =
                                             0;
                                         }
                                       if (missing_macros == 0)
@@ -1871,7 +1871,7 @@ namespace internal
                                           for (unsigned int fe_ind = 0;
                                                fe_ind < max_fe_index + 1;
                                                ++fe_ind)
-                                            if (remaining_per_macro_cell
+                                            if (remaining_per_cell_batch
                                                   [fe_ind] != 0)
                                               filled = false;
                                         }
@@ -1897,10 +1897,10 @@ namespace internal
                                   0)
                                 irregular_cells[renumbering_fe_index[j].size() /
                                                   vectorization_length +
-                                                n_macro_cells_before] =
+                                                n_cell_batches_before] =
                                   renumbering_fe_index[j].size() %
                                   vectorization_length;
-                              n_macro_cells_before +=
+                              n_cell_batches_before +=
                                 (renumbering_fe_index[j].size() +
                                  vectorization_length - 1) /
                                 vectorization_length;
@@ -1909,17 +1909,17 @@ namespace internal
                         }
                       else
                         {
-                          n_macro_cells_before +=
+                          n_cell_batches_before +=
                             partition_counter / vectorization_length;
                           if (partition_counter % vectorization_length != 0)
                             {
-                              irregular_cells[n_macro_cells_before] =
+                              irregular_cells[n_cell_batches_before] =
                                 partition_counter % vectorization_length;
-                              n_macro_cells_before++;
+                              n_cell_batches_before++;
                             }
                         }
                     }
-                    cell_partition_data.push_back(n_macro_cells_before);
+                    cell_partition_data.push_back(n_cell_batches_before);
                     partition_l2++;
                   }
                 neighbor_list = neighbor_neighbor_list;

@@ -1614,7 +1614,7 @@ public:
   /**
    * @deprecated Use n_cell_batches() instead.
    */
-  unsigned int
+  DEAL_II_DEPRECATED unsigned int
   n_macro_cells() const;
 
   /**
@@ -1680,7 +1680,7 @@ public:
    * sorting by lanes in the VectorizedArray.
    */
   std::array<types::boundary_id, VectorizedArrayType::size()>
-  get_faces_by_cells_boundary_id(const unsigned int macro_cell,
+  get_faces_by_cells_boundary_id(const unsigned int cell_batch_index,
                                  const unsigned int face_number) const;
 
   /**
@@ -1705,34 +1705,36 @@ public:
                            get_dof_handler(const unsigned int dof_handler_index = 0) const;
 
   /**
-   * Return the cell iterator in deal.II speak to a given cell in the
-   * renumbering of this structure.
+   * Return the cell iterator in deal.II speak to a given cell batch
+   * (populating several lanes in a VectorizedArray) and the lane index within
+   * the vectorization across cells in the renumbering of this structure.
    *
    * Note that the cell iterators in deal.II go through cells differently to
    * what the cell loop of this class does. This is because several cells are
-   * worked on together (vectorization), and since cells with neighbors on
-   * different MPI processors need to be accessed at a certain time when
-   * accessing remote data and overlapping communication with computation.
+   * processed together (vectorization across cells), and since cells with
+   * neighbors on different MPI processors need to be accessed at a certain
+   * time when accessing remote data and overlapping communication with
+   * computation.
    */
   typename DoFHandler<dim>::cell_iterator
-  get_cell_iterator(const unsigned int macro_cell_number,
-                    const unsigned int vector_number,
+  get_cell_iterator(const unsigned int cell_batch_index,
+                    const unsigned int lane_index,
                     const unsigned int dof_handler_index = 0) const;
 
   /**
-   * This returns the level and index for the cell that would be
-   * returned by get_cell_iterator() for the same arguments @p
-   * macro_cell_number and @p vector_number.
+   * This returns the level and index for the cell that would be returned by
+   * get_cell_iterator() for the same arguments `cell_batch_index` and
+   * `lane_index`.
    */
   std::pair<int, int>
-  get_cell_level_and_index(const unsigned int macro_cell_number,
-                           const unsigned int vector_number) const;
+  get_cell_level_and_index(const unsigned int cell_batch_index,
+                           const unsigned int lane_index) const;
 
   /**
-   * Return the cell iterator in deal.II speak to a interior/exterior cell of
-   * given face  in the renumbering of this structure. The second element
-   * of the pair is the face number so that the face iterator can be accessed:
-   * pair.first()->face(pair.second() );
+   * Return the cell iterator in deal.II speak to an interior/exterior cell of
+   * a face in a pair of a face batch and lane index. The second element of
+   * the pair is the face number so that the face iterator can be accessed:
+   * `pair.first()->face(pair.second());`
    *
    * Note that the face iterators in deal.II go through cells differently to
    * what the face/boundary loop of this class does. This is because several
@@ -1741,25 +1743,17 @@ public:
    * when accessing remote data and overlapping communication with computation.
    */
   std::pair<typename DoFHandler<dim>::cell_iterator, unsigned int>
-  get_face_iterator(const unsigned int face_batch_number,
-                    const unsigned int vector_number,
+  get_face_iterator(const unsigned int face_batch_index,
+                    const unsigned int lane_index,
                     const bool         interior     = true,
                     const unsigned int fe_component = 0) const;
 
   /**
-   * This returns the cell iterator in deal.II speak to a given cell in the
-   * renumbering of this structure. This function returns an exception in case
-   * the structure was not constructed based on an hp::DoFHandler.
-   *
-   * Note that the cell iterators in deal.II go through cells differently to
-   * what the cell loop of this class does. This is because several cells are
-   * worked on together (vectorization), and since cells with neighbors on
-   * different MPI processors need to be accessed at a certain time when
-   * accessing remote data and overlapping communication with computation.
+   * @deprecated Use get_cell_iterator() instead.
    */
-  typename DoFHandler<dim>::active_cell_iterator
-  get_hp_cell_iterator(const unsigned int macro_cell_number,
-                       const unsigned int vector_number,
+  DEAL_II_DEPRECATED typename DoFHandler<dim>::active_cell_iterator
+  get_hp_cell_iterator(const unsigned int cell_batch_index,
+                       const unsigned int lane_index,
                        const unsigned int dof_handler_index = 0) const;
 
   /**
@@ -1769,34 +1763,31 @@ public:
    * using only this class, one usually does not need to bother about that
    * fact since the values are padded with zeros. However, when this class is
    * mixed with deal.II access to cells, care needs to be taken. This function
-   * returns @p true if not all @p vectorization_length cells for the given @p
-   * macro_cell are real cells. To find out how many cells are actually used,
-   * use the function @p n_active_entries_per_cell_batch.
+   * returns @p true if not all `n_lanes` cells for the given
+   * `cell_batch_index` correspond to actual cells of the mesh and some are
+   * merely present for padding reasons. To find out how many cells are
+   * actually used, use the function n_active_entries_per_cell_batch().
    */
   bool
-  at_irregular_cell(const unsigned int macro_cell_number) const;
+  at_irregular_cell(const unsigned int cell_batch_index) const;
 
   /**
-   * This query returns how many cells over the length of vectorization data
-   * types correspond to actual cells in the mesh. For most given @p
-   * cell_batch_number, this is just @p vectorization_length many, but there
-   * might be one or a few meshes (where the numbers do not add up) where
-   * there are less such components filled, indicated by the function @p
-   * at_irregular_cell.
+   * @deprecated Use n_active_entries_per_cell_batch() instead.
    */
-  unsigned int
+  DEAL_II_DEPRECATED unsigned int
   n_components_filled(const unsigned int cell_batch_number) const;
 
   /**
-   * This query returns how many cells over the length of vectorization data
-   * types correspond to actual cells in the mesh. For most given cell batches
-   * in n_cell_batches(), this is just @p vectorization_length many, but there
-   * might be one or a few meshes (where the numbers do not add up) where
-   * there are less such components filled, indicated by the function @p
-   * at_irregular_cell.
+   * This query returns how many cells among the `VectorizedArrayType::size()`
+   * many cells within a cell batch to actual cells in the mesh, rather than
+   * being present for padding reasons. For most given cell batches in
+   * n_cell_batches(), this number is equal to `VectorizedArrayType::size()`,
+   * but there might be one or a few cell batches in the mesh (where the
+   * numbers do not add up) where only some of the cells within a batch are
+   * used, indicated by the function at_irregular_cell().
    */
   unsigned int
-  n_active_entries_per_cell_batch(const unsigned int cell_batch_number) const;
+  n_active_entries_per_cell_batch(const unsigned int cell_batch_index) const;
 
   /**
    * Use this function to find out how many faces over the length of
@@ -1808,7 +1799,7 @@ public:
    * where there are less such lanes filled.
    */
   unsigned int
-  n_active_entries_per_face_batch(const unsigned int face_batch_number) const;
+  n_active_entries_per_face_batch(const unsigned int face_batch_index) const;
 
   /**
    * Return the number of degrees of freedom per cell for a given hp index.
@@ -1861,7 +1852,7 @@ public:
    * and return the active FE index in the hp-adaptive case.
    */
   unsigned int
-  get_cell_category(const unsigned int macro_cell) const;
+  get_cell_category(const unsigned int cell_batch_index) const;
 
   /**
    * Return the category on the cells on the two sides of the current batch of
@@ -1975,7 +1966,7 @@ public:
    */
   const internal::MatrixFreeFunctions::FaceToCellTopology<
     VectorizedArrayType::size()> &
-  get_face_info(const unsigned int face_batch_number) const;
+  get_face_info(const unsigned int face_batch_index) const;
 
 
   /**
@@ -2344,17 +2335,20 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_boundary_id(
 template <int dim, typename Number, typename VectorizedArrayType>
 inline std::array<types::boundary_id, VectorizedArrayType::size()>
 MatrixFree<dim, Number, VectorizedArrayType>::get_faces_by_cells_boundary_id(
-  const unsigned int macro_cell,
+  const unsigned int cell_batch_index,
   const unsigned int face_number) const
 {
-  AssertIndexRange(macro_cell, n_cell_batches());
+  AssertIndexRange(cell_batch_index, n_cell_batches());
   AssertIndexRange(face_number, GeometryInfo<dim>::faces_per_cell);
   Assert(face_info.cell_and_face_boundary_id.size(0) >= n_cell_batches(),
          ExcNotInitialized());
   std::array<types::boundary_id, VectorizedArrayType::size()> result;
   result.fill(numbers::invalid_boundary_id);
-  for (unsigned int v = 0; v < n_active_entries_per_cell_batch(macro_cell); ++v)
-    result[v] = face_info.cell_and_face_boundary_id(macro_cell, face_number, v);
+  for (unsigned int v = 0;
+       v < n_active_entries_per_cell_batch(cell_batch_index);
+       ++v)
+    result[v] =
+      face_info.cell_and_face_boundary_id(cell_batch_index, face_number, v);
   return result;
 }
 
@@ -2450,12 +2444,14 @@ MatrixFree<dim, Number, VectorizedArrayType>::create_cell_subrange_hp(
 template <int dim, typename Number, typename VectorizedArrayType>
 inline bool
 MatrixFree<dim, Number, VectorizedArrayType>::at_irregular_cell(
-  const unsigned int macro_cell) const
+  const unsigned int cell_batch_index) const
 {
-  AssertIndexRange(macro_cell, task_info.cell_partition_data.back());
+  AssertIndexRange(cell_batch_index, task_info.cell_partition_data.back());
   return VectorizedArrayType::size() > 1 &&
-         cell_level_index[(macro_cell + 1) * VectorizedArrayType::size() - 1] ==
-           cell_level_index[(macro_cell + 1) * VectorizedArrayType::size() - 2];
+         cell_level_index[(cell_batch_index + 1) * VectorizedArrayType::size() -
+                          1] == cell_level_index[(cell_batch_index + 1) *
+                                                   VectorizedArrayType::size() -
+                                                 2];
 }
 
 
@@ -2463,9 +2459,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::at_irregular_cell(
 template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
 MatrixFree<dim, Number, VectorizedArrayType>::n_components_filled(
-  const unsigned int cell_batch_number) const
+  const unsigned int cell_batch_index) const
 {
-  return n_active_entries_per_cell_batch(cell_batch_number);
+  return n_active_entries_per_cell_batch(cell_batch_index);
 }
 
 
@@ -2473,14 +2469,14 @@ MatrixFree<dim, Number, VectorizedArrayType>::n_components_filled(
 template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
 MatrixFree<dim, Number, VectorizedArrayType>::n_active_entries_per_cell_batch(
-  const unsigned int cell_batch_number) const
+  const unsigned int cell_batch_index) const
 {
-  AssertIndexRange(cell_batch_number, task_info.cell_partition_data.back());
+  AssertIndexRange(cell_batch_index, task_info.cell_partition_data.back());
   unsigned int n_lanes = VectorizedArrayType::size();
   while (n_lanes > 1 &&
-         cell_level_index[cell_batch_number * VectorizedArrayType::size() +
+         cell_level_index[cell_batch_index * VectorizedArrayType::size() +
                           n_lanes - 1] ==
-           cell_level_index[cell_batch_number * VectorizedArrayType::size() +
+           cell_level_index[cell_batch_index * VectorizedArrayType::size() +
                             n_lanes - 2])
     --n_lanes;
   AssertIndexRange(n_lanes - 1, VectorizedArrayType::size());
@@ -2492,12 +2488,12 @@ MatrixFree<dim, Number, VectorizedArrayType>::n_active_entries_per_cell_batch(
 template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
 MatrixFree<dim, Number, VectorizedArrayType>::n_active_entries_per_face_batch(
-  const unsigned int face_batch_number) const
+  const unsigned int face_batch_index) const
 {
-  AssertIndexRange(face_batch_number, face_info.faces.size());
+  AssertIndexRange(face_batch_index, face_info.faces.size());
   unsigned int n_lanes = VectorizedArrayType::size();
   while (n_lanes > 1 &&
-         face_info.faces[face_batch_number].cells_interior[n_lanes - 1] ==
+         face_info.faces[face_batch_index].cells_interior[n_lanes - 1] ==
            numbers::invalid_unsigned_int)
     --n_lanes;
   AssertIndexRange(n_lanes - 1, VectorizedArrayType::size());
@@ -2650,14 +2646,14 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_quadrature(
 template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
 MatrixFree<dim, Number, VectorizedArrayType>::get_cell_category(
-  const unsigned int macro_cell) const
+  const unsigned int cell_batch_index) const
 {
   AssertIndexRange(0, dof_info.size());
-  AssertIndexRange(macro_cell, dof_info[0].cell_active_fe_index.size());
+  AssertIndexRange(cell_batch_index, dof_info[0].cell_active_fe_index.size());
   if (dof_info[0].cell_active_fe_index.empty())
     return 0;
   else
-    return dof_info[0].cell_active_fe_index[macro_cell];
+    return dof_info[0].cell_active_fe_index[cell_batch_index];
 }
 
 
