@@ -42,7 +42,7 @@ template <int dim, typename number>
 void
 compare_indices(const MatrixFree<dim, number> *mf_data)
 {
-  const unsigned int n_batches = mf_data->n_macro_cells();
+  const unsigned int n_batches = mf_data->n_cell_batches();
   for (unsigned int batch_no = 0; batch_no < n_batches; ++batch_no)
     {
       const unsigned int n_lanes_filled =

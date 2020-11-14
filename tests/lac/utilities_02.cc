@@ -141,7 +141,7 @@ test()
     mf_data->initialize_dof_vector(inv_mass_matrix);
     FEEvaluation<dim, fe_degree> fe_eval(*mf_data);
     const unsigned int           n_q_points = fe_eval.n_q_points;
-    for (unsigned int cell = 0; cell < mf_data->n_macro_cells(); ++cell)
+    for (unsigned int cell = 0; cell < mf_data->n_cell_batches(); ++cell)
       {
         fe_eval.reinit(cell);
         for (unsigned int q = 0; q < n_q_points; ++q)

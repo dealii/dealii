@@ -159,7 +159,7 @@ test()
                                 mg_additional_data[level]);
     }
 
-  for (unsigned int i = 0; i < mf_data.n_macro_cells(); ++i)
+  for (unsigned int i = 0; i < mf_data.n_cell_batches(); ++i)
     {
       const unsigned int m_id = mf_data.get_cell_iterator(i, 0)->material_id();
       for (unsigned int c = 0; c < mf_data.n_components_filled(i); ++c)
@@ -173,7 +173,7 @@ test()
   for (unsigned int level = 0; level <= max_level; ++level)
     {
       const auto &level_data = mg_mf_data[level];
-      for (unsigned int i = 0; i < level_data->n_macro_cells(); ++i)
+      for (unsigned int i = 0; i < level_data->n_cell_batches(); ++i)
         {
           const unsigned int m_id =
             level_data->get_cell_iterator(i, 0)->material_id();

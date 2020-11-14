@@ -281,7 +281,7 @@ namespace Step37
   void LaplaceOperator<dim, fe_degree, number>::evaluate_coefficient(
     const Coefficient<dim> &coefficient_function)
   {
-    const unsigned int n_cells = this->data->n_macro_cells();
+    const unsigned int n_cells = this->data->n_cell_batches();
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(*this->data);
 
     coefficient.reinit(n_cells, phi.n_q_points);
@@ -314,7 +314,7 @@ namespace Step37
   // actually seeing a group of quadrature points of several cells as one
   // block. This is done to enable a higher degree of vectorization.  The
   // number of such "cells" or "cell batches" is stored in MatrixFree and can
-  // be queried through MatrixFree::n_macro_cells(). Compared to the deal.II
+  // be queried through MatrixFree::n_cell_batches(). Compared to the deal.II
   // cell iterators, in this class all cells are laid out in a plain array
   // with no direct knowledge of level or neighborship relations, which makes
   // it possible to index the cells by unsigned integers.
@@ -398,7 +398,7 @@ namespace Step37
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
-        AssertDimension(coefficient.size(0), data.n_macro_cells());
+        AssertDimension(coefficient.size(0), data.n_cell_batches());
         AssertDimension(coefficient.size(1), phi.n_q_points);
 
         phi.reinit(cell);
@@ -423,7 +423,7 @@ namespace Step37
   // @code
   // src.update_ghost_values();
   // local_apply(*this->data, dst, src, std::make_pair(0U,
-  //                                                   data.n_macro_cells()));
+  //                                                   data.n_cell_batches()));
   // dst.compress(VectorOperation::add);
   // @endcode
   //
@@ -437,7 +437,7 @@ namespace Step37
   // one hand, it will split the update_ghost_values() and compress() calls in
   // a way to allow for overlapping communication and computation. The
   // local_apply function is then called with three cell ranges representing
-  // partitions of the cell range from 0 to MatrixFree::n_macro_cells(). On
+  // partitions of the cell range from 0 to MatrixFree::n_cell_batches(). On
   // the other hand, cell_loop also supports thread parallelism in which case
   // the cell ranges are split into smaller chunks and scheduled in an
   // advanced way that avoids access to the same vector entry by several
@@ -620,7 +620,7 @@ namespace Step37
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
-        AssertDimension(coefficient.size(0), data.n_macro_cells());
+        AssertDimension(coefficient.size(0), data.n_cell_batches());
         AssertDimension(coefficient.size(1), phi.n_q_points);
 
         phi.reinit(cell);
@@ -907,7 +907,7 @@ namespace Step37
     FEEvaluation<dim, degree_finite_element> phi(
       *system_matrix.get_matrix_free());
     for (unsigned int cell = 0;
-         cell < system_matrix.get_matrix_free()->n_macro_cells();
+         cell < system_matrix.get_matrix_free()->n_cell_batches();
          ++cell)
       {
         phi.reinit(cell);

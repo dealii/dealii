@@ -88,8 +88,9 @@ test()
   data.cell_vectorization_categories_strict = false;
   mf_data.reinit(dof, constraints, QGauss<1>(2), data);
 
-  deallog << "Number of cell batches: " << mf_data.n_macro_cells() << std::endl;
-  for (unsigned int i = 0; i < mf_data.n_macro_cells(); ++i)
+  deallog << "Number of cell batches: " << mf_data.n_cell_batches()
+          << std::endl;
+  for (unsigned int i = 0; i < mf_data.n_cell_batches(); ++i)
     for (unsigned int c = 0; c < mf_data.n_components_filled(i); ++c)
       deallog << mf_data.get_cell_iterator(i, c)->id() << " with "
               << mf_data.get_cell_category(i) << std::endl;
@@ -97,8 +98,9 @@ test()
 
   data.cell_vectorization_categories_strict = true;
   mf_data.reinit(dof, constraints, QGauss<1>(2), data);
-  deallog << "Number of cell batches: " << mf_data.n_macro_cells() << std::endl;
-  for (unsigned int i = 0; i < mf_data.n_macro_cells(); ++i)
+  deallog << "Number of cell batches: " << mf_data.n_cell_batches()
+          << std::endl;
+  for (unsigned int i = 0; i < mf_data.n_cell_batches(); ++i)
     for (unsigned int c = 0; c < mf_data.n_components_filled(i); ++c)
       deallog << mf_data.get_cell_iterator(i, c)->id() << " with "
               << mf_data.get_cell_category(i) << std::endl;
@@ -112,8 +114,9 @@ test()
 
   data.cell_vectorization_categories_strict = false;
   mf_data.reinit(dof, constraints, QGauss<1>(2), data);
-  deallog << "Number of cell batches: " << mf_data.n_macro_cells() << std::endl;
-  for (unsigned int i = 0; i < mf_data.n_macro_cells(); ++i)
+  deallog << "Number of cell batches: " << mf_data.n_cell_batches()
+          << std::endl;
+  for (unsigned int i = 0; i < mf_data.n_cell_batches(); ++i)
     for (unsigned int c = 0; c < mf_data.n_components_filled(i); ++c)
       deallog << mf_data.get_cell_iterator(i, c)->id() << " with "
               << mf_data.get_cell_category(i) << std::endl;

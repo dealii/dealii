@@ -216,7 +216,8 @@ namespace VectorTools
         // account for inhomogeneous constraints
         inhomogeneities.update_ghost_values();
         FEEvaluation<dim, -1, 0, components, Number> phi(*matrix_free);
-        for (unsigned int cell = 0; cell < matrix_free->n_macro_cells(); ++cell)
+        for (unsigned int cell = 0; cell < matrix_free->n_cell_batches();
+             ++cell)
           {
             phi.reinit(cell);
             phi.read_dof_values_plain(inhomogeneities);

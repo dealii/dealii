@@ -853,7 +853,7 @@ namespace MatrixFreeOperators
      * coefficient = std::make_shared<Table<2, VectorizedArray<double> > >();
      * {
      *   FEEvaluation<dim,fe_degree,n_q_points_1d,1,double> fe_eval(mf_data);
-     *   const unsigned int n_cells = mf_data.n_macro_cells();
+     *   const unsigned int n_cells = mf_data.n_cell_batches();
      *   const unsigned int n_q_points = fe_eval.n_q_points;
      *   coefficient->reinit(n_cells, n_q_points);
      *   for (unsigned int cell=0; cell<n_cells; ++cell)
@@ -1274,7 +1274,7 @@ namespace MatrixFreeOperators
 
     for (unsigned int j = 0; j < selected_rows.size(); ++j)
       {
-        if (data_->n_macro_cells() > 0)
+        if (data_->n_cell_batches() > 0)
           {
             AssertDimension(level, data_->get_cell_iterator(0, 0, j)->level());
           }

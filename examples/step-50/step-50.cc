@@ -251,7 +251,7 @@ Coefficient<dim>::make_coefficient_table(
 
   FEEvaluation<dim, -1, 0, 1, number> fe_eval(mf_storage);
 
-  const unsigned int n_cells    = mf_storage.n_macro_cells();
+  const unsigned int n_cells    = mf_storage.n_cell_batches();
   const unsigned int n_q_points = fe_eval.n_q_points;
 
   coefficient_table->reinit(n_cells, 1);
@@ -948,7 +948,7 @@ void LaplaceProblem<dim, degree>::assemble_rhs()
     *mf_system_matrix.get_matrix_free());
 
   for (unsigned int cell = 0;
-       cell < mf_system_matrix.get_matrix_free()->n_macro_cells();
+       cell < mf_system_matrix.get_matrix_free()->n_cell_batches();
        ++cell)
     {
       phi.reinit(cell);

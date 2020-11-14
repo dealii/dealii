@@ -1470,16 +1470,16 @@ namespace internal
       const unsigned int n_cells = cells.size();
       const unsigned int n_lanes = VectorizedArrayType::size();
       Assert(n_cells % n_lanes == 0, ExcInternalError());
-      const unsigned int n_macro_cells = n_cells / n_lanes;
-      cell_type.resize(n_macro_cells);
+      const unsigned int n_cell_batches = n_cells / n_lanes;
+      cell_type.resize(n_cell_batches);
 
-      if (n_macro_cells == 0)
+      if (n_cell_batches == 0)
         return;
 
       // Create as many chunks of cells as we have threads and spawn the work
       unsigned int work_per_chunk =
         std::max(8U,
-                 (n_macro_cells + MultithreadInfo::n_threads() - 1) /
+                 (n_cell_batches + MultithreadInfo::n_threads() - 1) /
                    MultithreadInfo::n_threads());
 
       std::vector<std::pair<
@@ -1494,7 +1494,7 @@ namespace internal
       {
         Threads::TaskGroup<>                  tasks;
         std::pair<unsigned int, unsigned int> cell_range(0U, work_per_chunk);
-        while (cell_range.first < n_macro_cells)
+        while (cell_range.first < n_cell_batches)
           {
             data_cells_local.push_back(std::make_pair(
               std::vector<

@@ -211,7 +211,7 @@ namespace Step37
   LaplaceOperator<dim, fe_degree, number>::evaluate_coefficient(
     const Coefficient<dim> &coefficient_function)
   {
-    const unsigned int n_cells = this->data->n_macro_cells();
+    const unsigned int n_cells = this->data->n_cell_batches();
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(*this->data);
 
     coefficient.reinit(n_cells, phi.n_q_points);
@@ -238,7 +238,7 @@ namespace Step37
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
-        AssertDimension(coefficient.size(0), data.n_macro_cells());
+        AssertDimension(coefficient.size(0), data.n_cell_batches());
         AssertDimension(coefficient.size(1), phi.n_q_points);
 
         phi.reinit(cell);
@@ -307,7 +307,7 @@ namespace Step37
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
-        AssertDimension(coefficient.size(0), data.n_macro_cells());
+        AssertDimension(coefficient.size(0), data.n_cell_batches());
         AssertDimension(coefficient.size(1), phi.n_q_points);
 
         phi.reinit(cell);
@@ -490,7 +490,7 @@ namespace Step37
     FEEvaluation<dim, degree_finite_element> phi(
       *system_matrix.get_matrix_free());
     for (unsigned int cell = 0;
-         cell < system_matrix.get_matrix_free()->n_macro_cells();
+         cell < system_matrix.get_matrix_free()->n_cell_batches();
          ++cell)
       {
         phi.reinit(cell);
