@@ -145,24 +145,3 @@ for (deal_II_dimension : DIMENSIONS)
       \}
     \}
   }
-
-
-for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
-  {
-    namespace internal
-    \{
-      namespace DataOutImplementation
-      \{
-        template void
-        ParallelDataBase<deal_II_dimension, deal_II_dimension>::
-          reinit_all_fe_values<
-            dealii::DH<deal_II_dimension, deal_II_dimension>>(
-            std::vector<std::shared_ptr<
-              DataEntryBase<dealii::DH<deal_II_dimension, deal_II_dimension>>>>
-              &dof_data,
-            const dealii::Triangulation<deal_II_dimension,
-                                        deal_II_dimension>::cell_iterator &cell,
-            const unsigned int face);
-      \}
-    \}
-  }
