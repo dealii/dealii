@@ -166,17 +166,17 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_dof_handler(
 template <int dim, typename Number, typename VectorizedArrayType>
 typename DoFHandler<dim>::cell_iterator
 MatrixFree<dim, Number, VectorizedArrayType>::get_cell_iterator(
-  const unsigned int macro_cell_number,
-  const unsigned int vector_number,
+  const unsigned int cell_batch_index,
+  const unsigned int lane_index,
   const unsigned int dof_handler_index) const
 {
   AssertIndexRange(dof_handler_index, dof_handlers.size());
-  AssertIndexRange(macro_cell_number, task_info.cell_partition_data.back());
-  AssertIndexRange(vector_number, n_components_filled(macro_cell_number));
+  AssertIndexRange(cell_batch_index, task_info.cell_partition_data.back());
+  AssertIndexRange(lane_index, n_components_filled(cell_batch_index));
 
   std::pair<unsigned int, unsigned int> index =
-    cell_level_index[macro_cell_number * VectorizedArrayType::size() +
-                     vector_number];
+    cell_level_index[cell_batch_index * VectorizedArrayType::size() +
+                     lane_index];
   return typename DoFHandler<dim>::cell_iterator(
     &dof_handlers[dof_handler_index]->get_triangulation(),
     index.first,
@@ -189,15 +189,15 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_cell_iterator(
 template <int dim, typename Number, typename VectorizedArrayType>
 std::pair<int, int>
 MatrixFree<dim, Number, VectorizedArrayType>::get_cell_level_and_index(
-  const unsigned int macro_cell_number,
-  const unsigned int vector_number) const
+  const unsigned int cell_batch_index,
+  const unsigned int lane_index) const
 {
-  AssertIndexRange(macro_cell_number, task_info.cell_partition_data.back());
-  AssertIndexRange(vector_number, n_components_filled(macro_cell_number));
+  AssertIndexRange(cell_batch_index, task_info.cell_partition_data.back());
+  AssertIndexRange(lane_index, n_components_filled(cell_batch_index));
 
   std::pair<int, int> level_index_pair =
-    cell_level_index[macro_cell_number * VectorizedArrayType::size() +
-                     vector_number];
+    cell_level_index[cell_batch_index * VectorizedArrayType::size() +
+                     lane_index];
   return level_index_pair;
 }
 
@@ -206,26 +206,26 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_cell_level_and_index(
 template <int dim, typename Number, typename VectorizedArrayType>
 std::pair<typename DoFHandler<dim>::cell_iterator, unsigned int>
 MatrixFree<dim, Number, VectorizedArrayType>::get_face_iterator(
-  const unsigned int face_batch_number,
-  const unsigned int vector_number,
+  const unsigned int face_batch_index,
+  const unsigned int lane_index,
   const bool         interior,
   const unsigned int fe_component) const
 {
   AssertIndexRange(fe_component, dof_handlers.size());
-  AssertIndexRange(face_batch_number,
+  AssertIndexRange(face_batch_index,
                    n_inner_face_batches() +
                      (interior ? n_boundary_face_batches() : 0));
 
-  AssertIndexRange(vector_number,
-                   n_active_entries_per_face_batch(face_batch_number));
+  AssertIndexRange(lane_index,
+                   n_active_entries_per_face_batch(face_batch_index));
 
   const internal::MatrixFreeFunctions::FaceToCellTopology<
     VectorizedArrayType::size()>
-    face2cell_info = get_face_info(face_batch_number);
+    face2cell_info = get_face_info(face_batch_index);
 
-  const unsigned int cell_index =
-    interior ? face2cell_info.cells_interior[vector_number] :
-               face2cell_info.cells_exterior[vector_number];
+  const unsigned int cell_index = interior ?
+                                    face2cell_info.cells_interior[lane_index] :
+                                    face2cell_info.cells_exterior[lane_index];
 
   std::pair<unsigned int, unsigned int> index = cell_level_index[cell_index];
 
@@ -243,17 +243,17 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_iterator(
 template <int dim, typename Number, typename VectorizedArrayType>
 typename DoFHandler<dim>::active_cell_iterator
 MatrixFree<dim, Number, VectorizedArrayType>::get_hp_cell_iterator(
-  const unsigned int macro_cell_number,
-  const unsigned int vector_number,
+  const unsigned int cell_batch_index,
+  const unsigned int lane_index,
   const unsigned int dof_handler_index) const
 {
   AssertIndexRange(dof_handler_index, dof_handlers.size());
-  AssertIndexRange(macro_cell_number, task_info.cell_partition_data.back());
-  AssertIndexRange(vector_number, n_components_filled(macro_cell_number));
+  AssertIndexRange(cell_batch_index, task_info.cell_partition_data.back());
+  AssertIndexRange(lane_index, n_components_filled(cell_batch_index));
 
   std::pair<unsigned int, unsigned int> index =
-    cell_level_index[macro_cell_number * VectorizedArrayType::size() +
-                     vector_number];
+    cell_level_index[cell_batch_index * VectorizedArrayType::size() +
+                     lane_index];
   return typename DoFHandler<dim>::cell_iterator(
     &dof_handlers[dof_handler_index]->get_triangulation(),
     index.first,
@@ -1027,10 +1027,10 @@ namespace internal
                                              irregular_cells);
         task_info.guess_block_size(dof_info[0].dofs_per_cell[0]);
 
-        unsigned int n_macro_cells_before =
+        unsigned int n_cell_batches_before =
           *(task_info.cell_partition_data.end() - 2);
         unsigned int n_ghost_slots =
-          *(task_info.cell_partition_data.end() - 1) - n_macro_cells_before;
+          *(task_info.cell_partition_data.end() - 1) - n_cell_batches_before;
 
         unsigned int start_nonboundary = numbers::invalid_unsigned_int;
         if (task_info.scheme ==
@@ -1072,7 +1072,7 @@ namespace internal
                 std::vector<std::vector<unsigned int>> renumbering_fe_index;
                 renumbering_fe_index.resize(dof_info[0].max_fe_index);
                 unsigned int counter;
-                n_macro_cells_before = 0;
+                n_cell_batches_before = 0;
                 for (counter = 0;
                      counter < std::min(start_nonboundary * n_lanes,
                                         task_info.n_active_cells);
@@ -1091,9 +1091,9 @@ namespace internal
                     for (const auto jj : renumbering_fe_index[j])
                       renumbering[counter++] = jj;
                     irregular_cells[renumbering_fe_index[j].size() / n_lanes +
-                                    n_macro_cells_before] =
+                                    n_cell_batches_before] =
                       renumbering_fe_index[j].size() % n_lanes;
-                    n_macro_cells_before +=
+                    n_cell_batches_before +=
                       (renumbering_fe_index[j].size() + n_lanes - 1) / n_lanes;
                     renumbering_fe_index[j].resize(0);
                   }
@@ -1114,19 +1114,19 @@ namespace internal
                     for (const auto jj : renumbering_fe_index[j])
                       renumbering[counter++] = jj;
                     irregular_cells[renumbering_fe_index[j].size() / n_lanes +
-                                    n_macro_cells_before] =
+                                    n_cell_batches_before] =
                       renumbering_fe_index[j].size() % n_lanes;
-                    n_macro_cells_before +=
+                    n_cell_batches_before +=
                       (renumbering_fe_index[j].size() + n_lanes - 1) / n_lanes;
                   }
-                AssertIndexRange(n_macro_cells_before,
+                AssertIndexRange(n_cell_batches_before,
                                  task_info.cell_partition_data.back() +
                                    2 * dof_info[0].max_fe_index + 1);
-                irregular_cells.resize(n_macro_cells_before + n_ghost_slots);
+                irregular_cells.resize(n_cell_batches_before + n_ghost_slots);
                 *(task_info.cell_partition_data.end() - 2) =
-                  n_macro_cells_before;
+                  n_cell_batches_before;
                 *(task_info.cell_partition_data.end() - 1) =
-                  n_macro_cells_before + n_ghost_slots;
+                  n_cell_batches_before + n_ghost_slots;
               }
           }
 
