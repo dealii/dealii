@@ -34,6 +34,8 @@
 
 #include <deal.II/matrix_free/shape_info.h>
 
+#include <deal.II/simplex/fe_lib.h>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -134,7 +136,99 @@ namespace internal
                               const FiniteElement<dim> &fe_in,
                               const unsigned int        base_element_number)
     {
+#ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
+      if (quad_in.is_tensor_product() == false ||
+          dynamic_cast<const Simplex::FE_P<dim> *>(&fe_in) ||
+          dynamic_cast<const Simplex::FE_DGP<dim> *>(&fe_in))
+        {
+          // specialization for arbitrary finite elements and quadrature rules
+          // as needed in the context, e.g., of simplices
+
+          AssertDimension(dim, dim_q);
+
+          const auto quad            = Quadrature<dim>(quad_in);
+          const auto fe              = &fe_in.base_element(base_element_number);
+          n_dimensions               = dim;
+          n_components               = fe_in.n_components();
+          n_q_points                 = quad.size();
+          dofs_per_component_on_cell = fe->n_dofs_per_cell();
+          n_q_points_face            = 0; // not implemented yet
+          dofs_per_component_on_face = 0; //
+
+          Assert(fe->n_components() == 1,
+                 ExcMessage(
+                   "FEEvaluation only works for scalar finite elements."));
+
+          data.resize(1);
+          UnivariateShapeData<Number> &univariate_shape_data = data.front();
+          data_access.reinit(n_dimensions, n_components);
+          data_access.fill(&univariate_shape_data);
+
+          // note: we cannot write `univariate_shape_data.quadrature = quad`,
+          // since the quadrature rule within UnivariateShapeData expects
+          // a 1D quadrature rule. However, in this case we are not able to
+          // define that rule anyway so other code cannot use this information.
+
+          univariate_shape_data.fe_degree     = fe->degree;
+          univariate_shape_data.n_q_points_1d = quad.size();
+
+          if ((fe->n_dofs_per_cell() == 0) || (quad.size() == 0))
+            return;
+
+          // grant write access to common univariate shape data
+          auto &shape_values    = univariate_shape_data.shape_values;
+          auto &shape_gradients = univariate_shape_data.shape_gradients;
+
+          const unsigned int n_dofs = fe->n_dofs_per_cell();
+
+          const unsigned int array_size = n_dofs * n_q_points;
+
+          shape_values.resize_fast(array_size);
+          shape_gradients.resize_fast(array_size * dim);
+
+          for (unsigned int i = 0; i < n_dofs; ++i)
+            for (unsigned int q = 0; q < n_q_points; ++q)
+              {
+                shape_values[i * n_q_points + q] =
+                  fe->shape_value(i, quad.point(q));
+
+                const auto grad = fe->shape_grad(i, quad.point(q));
+
+                for (int d = 0; d < dim; ++d)
+                  shape_gradients[d * n_dofs * n_q_points + i * n_q_points +
+                                  q] = grad[d];
+              }
+
+          // TODO: also fill shape_hessians, inverse_shape_values,
+          //   shape_data_on_face, quadrature_data_on_face,
+          //   values_within_subface, gradients_within_subface,
+          //   hessians_within_subface
+
+          // note: shape_gradients_collocation, shape_hessians_collocation,
+          //  shape_values_eo, shape_gradients_eo, shape_hessians_eo,
+          //  shape_gradients_collocation_eo, shape_hessians_collocation_eo,
+          //  inverse_shape_values_eo cannot be filled
+
+          // indicate that no tensor product properties could be exploited
+          element_type                       = tensor_none;
+          univariate_shape_data.element_type = this->element_type;
+
+          univariate_shape_data.nodal_at_cell_boundaries = true;
+
+          lexicographic_numbering.resize(n_dofs);
+
+          for (unsigned int i = 0; i < n_dofs; ++i)
+            lexicographic_numbering[i] = i;
+
+          // TODO: setup face_to_cell_index_nodal, face_to_cell_index_hermite,
+          //  face_orientations
+
+          return;
+        }
+#else
       Assert(quad_in.is_tensor_product(), ExcNotImplemented());
+#endif
+
       const auto quad = quad_in.get_tensor_basis()[0];
 
       const FiniteElement<dim> *fe = &fe_in.base_element(base_element_number);
