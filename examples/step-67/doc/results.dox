@@ -795,7 +795,7 @@ matched layers</a> -- where the solution is damped without reflection
 -- are common.
 
 
-<h4>Extension to the compressible Navier-Stokes equation</h4>
+<h4>Extension to the compressible Navier-Stokes equations</h4>
 
 The solver presented in this tutorial program can also be extended to the
 compressible Navier--Stokes equations by adding viscous terms, as described in
