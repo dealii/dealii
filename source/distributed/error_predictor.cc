@@ -22,12 +22,11 @@
 #  include <deal.II/distributed/tria.h>
 
 #  include <deal.II/dofs/dof_accessor.h>
+#  include <deal.II/dofs/dof_handler.h>
 #  include <deal.II/dofs/dof_tools.h>
 
 #  include <deal.II/grid/tria_accessor.h>
 #  include <deal.II/grid/tria_iterator.h>
-
-#  include <deal.II/hp/dof_handler.h>
 
 #  include <deal.II/lac/block_vector.h>
 #  include <deal.II/lac/la_parallel_block_vector.h>
@@ -51,18 +50,18 @@ namespace parallel
   {
     template <int dim, int spacedim>
     ErrorPredictor<dim, spacedim>::ErrorPredictor(
-      const hp::DoFHandler<dim, spacedim> &dof)
+      const DoFHandler<dim, spacedim> &dof)
       : dof_handler(&dof, typeid(*this).name())
       , handle(numbers::invalid_unsigned_int)
       , gamma_p(0.)
       , gamma_h(0.)
       , gamma_n(0.)
     {
-      Assert(
-        (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
-                        *>(&dof_handler->get_triangulation()) != nullptr),
-        ExcMessage(
-          "parallel::distributed::ErrorPredictor requires a parallel::distributed::Triangulation object."));
+      Assert((dynamic_cast<
+                const parallel::distributed::Triangulation<dim, spacedim> *>(
+                &dof_handler->get_triangulation()) != nullptr),
+             ExcMessage("parallel::distributed::ErrorPredictor requires a "
+                        "parallel::distributed::Triangulation object."));
     }
 
 
@@ -167,8 +166,8 @@ namespace parallel
       const typename Triangulation<dim, spacedim>::cell_iterator &cell_,
       const typename Triangulation<dim, spacedim>::CellStatus     status)
     {
-      typename hp::DoFHandler<dim, spacedim>::cell_iterator cell(*cell_,
-                                                                 dof_handler);
+      typename DoFHandler<dim, spacedim>::cell_iterator cell(*cell_,
+                                                             dof_handler);
 
       // create buffer for each individual input vector
       std::vector<float> predicted_errors(error_indicators.size());
