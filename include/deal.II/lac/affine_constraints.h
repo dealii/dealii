@@ -704,7 +704,10 @@ public:
   add_lines(const IndexSet &lines);
 
   /**
-   * Add an entry to a given line. The list of lines is searched from the back
+   * Add an entry to a given line. In other words, this function adds
+   * a term $a_{ij} x_j$ to the constraints for the $i$th degree of freedom.
+   *
+   * This function searches existing constraints from the back
    * to the front, so clever programming would add a new line (which is pushed
    * to the back) and immediately afterwards fill the entries of that line.
    * This way, no expensive searching is needed.
@@ -713,27 +716,41 @@ public:
    * already exists, then this function simply returns provided that the value
    * of the entry is the same. Thus, it does no harm to enter a constraint
    * twice.
+   *
+   * @param[in] constrained_dof_index The index $i$ of the degree of freedom
+   *   that is being constrained.
+   * @param[in] column The index $j$ of the degree of freedom being entered
+   *   into the constraint for degree of freedom $i$.
+   * @param[in] weight The factor $a_{ij}$ that multiplies $x_j$.
    */
   void
-  add_entry(const size_type line_n, const size_type column, const number value);
+  add_entry(const size_type constrained_dof_index,
+            const size_type column,
+            const number    weight);
 
   /**
    * Add a whole series of entries, denoted by pairs of column indices and
-   * values, to a line of constraints. This function is equivalent to calling
-   * the preceding function several times, but is faster.
+   * weight values, to a line of constraints. This function is equivalent to
+   * calling the preceding function several times, but is faster.
    */
   void
-  add_entries(const size_type                                  line_n,
-              const std::vector<std::pair<size_type, number>> &col_val_pairs);
+  add_entries(
+    const size_type                                  constrained_dof_index,
+    const std::vector<std::pair<size_type, number>> &col_weight_pairs);
 
   /**
-   * Set an inhomogeneity to the constraint line @p line_n, according to the
-   * discussion in the general class description.
+   * Set an inhomogeneity to the constraint for a degree of freedom. In other
+   * words, it adds a constant $b_i$ to the constraint for degree of freedom
+   * $i$. For this to work, you need to call add_line() first for the given
+   * degree of freedom.
    *
-   * @note the line needs to be added with one of the add_line() calls first.
+   * @param[in] constrained_dof_index The index $i$ of the degree of freedom
+   *   that is being constrained.
+   * @param[in] value The right hand side value $b_i$ for the constraint on
+   *   the degree of freedom $i$.
    */
   void
-  set_inhomogeneity(const size_type line_n, const number value);
+  set_inhomogeneity(const size_type constrained_dof_index, const number value);
 
   /**
    * Close the filling of entries. Since the lines of a matrix of this type
@@ -752,8 +769,9 @@ public:
    * while degree of freedom 7 is itself constrained as $u_{7} = \frac{u_2}{2}
    * + \frac{u_4}{2}$. Then, the resolution will be that $u_{13} =
    * \frac{u_3}{2} + \frac{u_2}{4} + \frac{u_4}{4}$. Note, however, that
-   * cycles in this graph of constraints are not allowed, i.e. for example
-   * $u_4$ may not be constrained, directly or indirectly, to $u_{13}$ again.
+   * cycles in this graph of constraints are not allowed, i.e., for example
+   * $u_4$ may not itself be constrained, directly or indirectly, to $u_{13}$
+   * again.
    */
   void
   close();
@@ -1974,18 +1992,20 @@ AffineConstraints<number>::add_line(const size_type line_n)
   lines_cache[line_index]    = lines.size() - 1;
 }
 
+
+
 template <typename number>
 inline void
-AffineConstraints<number>::add_entry(const size_type line_n,
+AffineConstraints<number>::add_entry(const size_type constrained_dof_index,
                                      const size_type column,
-                                     const number    value)
+                                     const number    weight)
 {
   Assert(sorted == false, ExcMatrixIsClosed());
-  Assert(line_n != column,
+  Assert(constrained_dof_index != column,
          ExcMessage("Can't constrain a degree of freedom to itself"));
 
   // Ensure that the current line is present in the cache:
-  const size_type line_index = calculate_line_index(line_n);
+  const size_type line_index = calculate_line_index(constrained_dof_index);
   Assert(line_index < lines_cache.size(),
          ExcMessage("The current AffineConstraints does not contain the line "
                     "for the current entry. Call AffineConstraints::add_line "
@@ -1999,26 +2019,30 @@ AffineConstraints<number>::add_entry(const size_type line_n,
   Assert(lines_cache[line_index] != numbers::invalid_size_type,
          ExcInternalError());
   Assert(!local_lines.size() || local_lines.is_element(column),
-         ExcColumnNotStoredHere(line_n, column));
+         ExcColumnNotStoredHere(constrained_dof_index, column));
   ConstraintLine *line_ptr = &lines[lines_cache[line_index]];
-  Assert(line_ptr->index == line_n, ExcInternalError());
+  Assert(line_ptr->index == constrained_dof_index, ExcInternalError());
   for (const auto &p : line_ptr->entries)
     if (p.first == column)
       {
-        Assert(std::abs(p.second - value) < 1.e-14,
-               ExcEntryAlreadyExists(line_n, column, p.second, value));
+        Assert(std::abs(p.second - weight) < 1.e-14,
+               ExcEntryAlreadyExists(
+                 constrained_dof_index, column, p.second, weight));
         return;
       }
 
-  line_ptr->entries.emplace_back(column, value);
+  line_ptr->entries.emplace_back(column, weight);
 }
+
+
 
 template <typename number>
 inline void
-AffineConstraints<number>::set_inhomogeneity(const size_type line_n,
-                                             const number    value)
+AffineConstraints<number>::set_inhomogeneity(
+  const size_type constrained_dof_index,
+  const number    value)
 {
-  const size_type line_index = calculate_line_index(line_n);
+  const size_type line_index = calculate_line_index(constrained_dof_index);
   Assert(line_index < lines_cache.size() &&
            lines_cache[line_index] != numbers::invalid_size_type,
          ExcMessage("call add_line() before calling set_inhomogeneity()"));
@@ -2026,6 +2050,8 @@ AffineConstraints<number>::set_inhomogeneity(const size_type line_n,
   ConstraintLine *line_ptr = &lines[lines_cache[line_index]];
   line_ptr->inhomogeneity  = value;
 }
+
+
 
 template <typename number>
 template <class VectorType>
