@@ -137,6 +137,40 @@ namespace internal
 
 
 
+  /**
+   * Specialization for MatrixFreeFunctions::tensor_none, which cannot use the
+   * sum-factorization kernels.
+   */
+  template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+  struct FEEvaluationImpl<MatrixFreeFunctions::tensor_none,
+                          dim,
+                          fe_degree,
+                          n_q_points_1d,
+                          Number>
+  {
+    static void
+    evaluate(const unsigned int                            n_components,
+             const EvaluationFlags::EvaluationFlags        evaluation_flag,
+             const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+             const Number *                                values_dofs_actual,
+             Number *                                      values_quad,
+             Number *                                      gradients_quad,
+             Number *                                      hessians_quad,
+             Number *                                      scratch_data);
+
+    static void
+    integrate(const unsigned int                            n_components,
+              const EvaluationFlags::EvaluationFlags        integration_flag,
+              const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+              Number *                                      values_dofs_actual,
+              Number *                                      values_quad,
+              Number *                                      gradients_quad,
+              Number *                                      scratch_data,
+              const bool add_into_values_array);
+  };
+
+
+
   template <MatrixFreeFunctions::ElementType type,
             int                              dim,
             int                              fe_degree,
@@ -636,6 +670,120 @@ namespace internal
                 }
               count_q += i * (degree + 1);
             }
+      }
+  }
+
+
+
+  template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+  inline void
+  FEEvaluationImpl<
+    MatrixFreeFunctions::tensor_none,
+    dim,
+    fe_degree,
+    n_q_points_1d,
+    Number>::evaluate(const unsigned int                     n_components,
+                      const EvaluationFlags::EvaluationFlags evaluation_flag,
+                      const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+                      const Number *values_dofs_actual,
+                      Number *      values_quad,
+                      Number *      gradients_quad,
+                      Number *      hessians_quad,
+                      Number *      scratch_data)
+  {
+    (void)scratch_data;
+
+    const unsigned int n_dofs     = shape_info.dofs_per_component_on_cell;
+    const unsigned int n_q_points = shape_info.n_q_points;
+
+    if (evaluation_flag & EvaluationFlags::values)
+      {
+        const auto shape_values = shape_info.data.front().shape_values.data();
+        for (unsigned int c = 0; c < n_components; ++c)
+          for (unsigned int q = 0; q < n_q_points; ++q)
+            {
+              values_quad[n_q_points * c + q] = 0.0;
+              for (unsigned int i = 0; i < n_dofs; ++i)
+                values_quad[n_q_points * c + q] +=
+                  shape_values[i * n_q_points + q] *
+                  values_dofs_actual[n_dofs * c + i];
+            }
+      }
+
+    if (evaluation_flag & EvaluationFlags::gradients)
+      {
+        const auto shape_gradients =
+          shape_info.data.front().shape_gradients.data();
+        for (unsigned int c = 0; c < n_components; ++c)
+          for (unsigned int d = 0; d < dim; ++d)
+            for (unsigned int q = 0; q < n_q_points; ++q)
+              {
+                gradients_quad[n_q_points * dim * c + n_q_points * d + q] = 0.0;
+                for (unsigned int i = 0; i < n_dofs; ++i)
+                  gradients_quad[n_q_points * dim * c + n_q_points * d + q] +=
+                    shape_gradients[d * n_dofs * n_q_points + i * n_q_points +
+                                    q] *
+                    values_dofs_actual[n_dofs * dim * c + i];
+              }
+      }
+
+    if (evaluation_flag & EvaluationFlags::hessians)
+      {
+        Assert(false, ExcNotImplemented());
+        (void)hessians_quad;
+      }
+  }
+
+
+
+  template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+  inline void
+  FEEvaluationImpl<
+    MatrixFreeFunctions::tensor_none,
+    dim,
+    fe_degree,
+    n_q_points_1d,
+    Number>::integrate(const unsigned int                     n_components,
+                       const EvaluationFlags::EvaluationFlags integration_flag,
+                       const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+                       Number *   values_dofs_actual,
+                       Number *   values_quad,
+                       Number *   gradients_quad,
+                       Number *   scratch_data,
+                       const bool add_into_values_array)
+  {
+    (void)scratch_data;
+
+    const unsigned int n_dofs     = shape_info.dofs_per_component_on_cell;
+    const unsigned int n_q_points = shape_info.n_q_points;
+
+    if (add_into_values_array == false)
+      for (unsigned int i = 0; i < n_components * n_dofs; ++i)
+        values_dofs_actual[i] = 0.0;
+
+    if (integration_flag & EvaluationFlags::values)
+      {
+        const auto shape_values = shape_info.data.front().shape_values.data();
+        for (unsigned int c = 0; c < n_components; ++c)
+          for (unsigned int q = 0; q < n_q_points; ++q)
+            for (unsigned int i = 0; i < n_dofs; ++i)
+              values_dofs_actual[n_dofs * c + i] +=
+                shape_values[i * n_q_points + q] *
+                values_quad[n_q_points * c + q];
+      }
+
+    if (integration_flag & EvaluationFlags::gradients)
+      {
+        const auto shape_gradients =
+          shape_info.data.front().shape_gradients.data();
+        for (unsigned int c = 0; c < n_components; ++c)
+          for (unsigned int d = 0; d < dim; ++d)
+            for (unsigned int q = 0; q < n_q_points; ++q)
+              for (unsigned int i = 0; i < n_dofs; ++i)
+                values_dofs_actual[n_dofs * dim * c + i] +=
+                  shape_gradients[d * n_dofs * n_q_points + i * n_q_points +
+                                  q] *
+                  gradients_quad[n_q_points * dim * c + n_q_points * d + q];
       }
   }
 
@@ -1499,6 +1647,22 @@ namespace internal
                               hessians_quad,
                               scratch_data);
         }
+      else if (shape_info.element_type ==
+               internal::MatrixFreeFunctions::tensor_none)
+        {
+          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_none,
+                                     dim,
+                                     fe_degree,
+                                     n_q_points_1d,
+                                     Number>::evaluate(n_components,
+                                                       evaluation_flag,
+                                                       shape_info,
+                                                       values_dofs_actual,
+                                                       values_quad,
+                                                       gradients_quad,
+                                                       hessians_quad,
+                                                       scratch_data);
+        }
       else
         {
           internal::FEEvaluationImpl<
@@ -1644,6 +1808,22 @@ namespace internal
                                gradients_quad,
                                scratch_data,
                                sum_into_values_array);
+        }
+      else if (shape_info.element_type ==
+               internal::MatrixFreeFunctions::tensor_none)
+        {
+          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_none,
+                                     dim,
+                                     fe_degree,
+                                     n_q_points_1d,
+                                     Number>::integrate(n_components,
+                                                        integration_flag,
+                                                        shape_info,
+                                                        values_dofs_actual,
+                                                        values_quad,
+                                                        gradients_quad,
+                                                        scratch_data,
+                                                        sum_into_values_array);
         }
       else
         {
