@@ -1,0 +1,9 @@
+
+DEAL::dim=2 degree=1 Type=Possion   : Convergence step 15 value 0.000430255.
+DEAL::dim=2 degree=1 Type=Helmholtz : Convergence step 14 value 0.000558792.
+DEAL::dim=2 degree=2 Type=Possion   : Convergence step 36 value 0.000319106.
+DEAL::dim=2 degree=2 Type=Helmholtz : Convergence step 36 value 0.000294440.
+DEAL::dim=3 degree=1 Type=Possion   : Convergence step 7 value 0.000281643.
+DEAL::dim=3 degree=1 Type=Helmholtz : Convergence step 7 value 0.000268188.
+DEAL::dim=3 degree=2 Type=Possion   : Convergence step 20 value 0.000146315.
+DEAL::dim=3 degree=2 Type=Helmholtz : Convergence step 20 value 0.000137731.
