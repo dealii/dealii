@@ -128,6 +128,14 @@ namespace internal
         /**
          * Set up the lengths in the various members of this struct.
          */
+        template <int dim_q>
+        void
+        initialize(const Quadrature<dim_q> &quadrature,
+                   const UpdateFlags update_flags_inner_faces = update_default);
+
+        /**
+         * Set up the lengths in the various members of this struct.
+         */
         void
         initialize(const Quadrature<1> &quadrature_1d,
                    const UpdateFlags update_flags_inner_faces = update_default);
