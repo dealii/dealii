@@ -351,26 +351,38 @@ namespace FEValuesViews
         &values) const;
 
     /**
-     * Same as above, but using a vector of local degree-of-freedom values.
-     *
-     * The @p dof_values vector must have a length equal to number of DoFs on
-     * a cell, and  each entry @p dof_values[i] is the value of the local DoF
-     * @p i. The fundamental prerequisite for the @p InputVector is that it must
-     * be possible to create an ArrayView from it; this is satisfied by the
-     * @p std::vector class.
-     *
-     * The DoF values typically would be obtained in the following way:
+     * Same as above, but using a vector of local degree-of-freedom values. In
+     * other words, instead of extracting the nodal values of the degrees of
+     * freedom located on the current cell from a global vector associated with
+     * a DoFHandler object (as the function above does), this function instead
+     * takes these local nodal values through its first argument. A typical
+     * way to obtain such a vector is by calling code such as
      * @code
-     * Vector<double> local_dof_values(cell->get_fe().n_dofs_per_cell());
-     * cell->get_dof_values(solution, local_dof_values);
+     *   cell->get_dof_values (dof_values, local_dof_values);
      * @endcode
-     * or, for a generic @p Number type,
-     * @code
-     * std::vector<Number> local_dof_values(cell->get_fe().n_dofs_per_cell());
-     * cell->get_dof_values(solution,
-     *                      local_dof_values.begin(),
-     *                      local_dof_values.end());
-     * @endcode
+     * (See DoFCellAccessor::get_dof_values() for more information on this
+     * function.) The point of the current function is then that one could
+     * modify these local values first, for example by applying a limiter
+     * or by ensuring that all nodal values are positive, before evaluating
+     * the finite element field that corresponds to these local values on the
+     * current cell. Another application is where one wants to postprocess
+     * the solution on a cell into a different finite element space on every
+     * cell, without actually creating a corresponding DoFHandler -- in that
+     * case, all one would compute is a local representation of that
+     * postprocessed function, characterized by its nodal values; this function
+     * then allows the evaluation of that representation at quadrature points.
+     *
+     * @param[in] dof_values A vector of local nodal values. This vector must
+     *   have a length equal to number of DoFs on the current cell, and must
+     *   be ordered in the same order as degrees of freedom are numbered on
+     *   the reference cell.
+     *
+     * @param[out] values A vector of values of the given finite element field,
+     *   at the quadrature points on the current object.
+     *
+     * @tparam InputVector The @p InputVector type must allow creation
+     *   of an ArrayView object from it; this is satisfied by the
+     *   `std::vector` class, among others.
      */
     template <class InputVector>
     void
@@ -406,7 +418,10 @@ namespace FEValuesViews
         &gradients) const;
 
     /**
-     * @copydoc FEValuesViews::Scalar::get_function_values_from_local_dof_values()
+     * This function relates to get_function_gradients() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -442,7 +457,10 @@ namespace FEValuesViews
         &hessians) const;
 
     /**
-     * @copydoc FEValuesViews::Scalar::get_function_values_from_local_dof_values()
+     * This function relates to get_function_hessians() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -480,7 +498,10 @@ namespace FEValuesViews
         &laplacians) const;
 
     /**
-     * @copydoc FEValuesViews::Scalar::get_function_values_from_local_dof_values()
+     * This function relates to get_function_laplacians() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -518,7 +539,10 @@ namespace FEValuesViews
         &third_derivatives) const;
 
     /**
-     * @copydoc FEValuesViews::Scalar::get_function_values_from_local_dof_values()
+     * This function relates to get_function_third_derivatives() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -919,26 +943,38 @@ namespace FEValuesViews
         &values) const;
 
     /**
-     * Same as above, but using a vector of local degree-of-freedom values.
-     *
-     * The @p dof_values vector must have a length equal to number of DoFs on
-     * a cell, and  each entry @p dof_values[i] is the value of the local DoF
-     * @p i. The fundamental prerequisite for the @p InputVector is that it must
-     * be possible to create an ArrayView from it; this is satisfied by the
-     * @p std::vector class.
-     *
-     * The DoF values typically would be obtained in the following way:
+     * Same as above, but using a vector of local degree-of-freedom values. In
+     * other words, instead of extracting the nodal values of the degrees of
+     * freedom located on the current cell from a global vector associated with
+     * a DoFHandler object (as the function above does), this function instead
+     * takes these local nodal values through its first argument. A typical
+     * way to obtain such a vector is by calling code such as
      * @code
-     * Vector<double> local_dof_values(cell->get_fe().n_dofs_per_cell());
-     * cell->get_dof_values(solution, local_dof_values);
+     *   cell->get_dof_values (dof_values, local_dof_values);
      * @endcode
-     * or, for a generic @p Number type,
-     * @code
-     * std::vector<Number> local_dof_values(cell->get_fe().n_dofs_per_cell());
-     * cell->get_dof_values(solution,
-     *                      local_dof_values.begin(),
-     *                      local_dof_values.end());
-     * @endcode
+     * (See DoFCellAccessor::get_dof_values() for more information on this
+     * function.) The point of the current function is then that one could
+     * modify these local values first, for example by applying a limiter
+     * or by ensuring that all nodal values are positive, before evaluating
+     * the finite element field that corresponds to these local values on the
+     * current cell. Another application is where one wants to postprocess
+     * the solution on a cell into a different finite element space on every
+     * cell, without actually creating a corresponding DoFHandler -- in that
+     * case, all one would compute is a local representation of that
+     * postprocessed function, characterized by its nodal values; this function
+     * then allows the evaluation of that representation at quadrature points.
+     *
+     * @param[in] dof_values A vector of local nodal values. This vector must
+     *   have a length equal to number of DoFs on the current cell, and must
+     *   be ordered in the same order as degrees of freedom are numbered on
+     *   the reference cell.
+     *
+     * @param[out] values A vector of values of the given finite element field,
+     *   at the quadrature points on the current object.
+     *
+     * @tparam InputVector The @p InputVector type must allow creation
+     *   of an ArrayView object from it; this is satisfied by the
+     *   `std::vector` class, among others.
      */
     template <class InputVector>
     void
@@ -974,7 +1010,10 @@ namespace FEValuesViews
         &gradients) const;
 
     /**
-     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     * This function relates to get_function_gradients() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -1016,7 +1055,10 @@ namespace FEValuesViews
         &symmetric_gradients) const;
 
     /**
-     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     * This function relates to get_function_symmetric_gradients() in the same
+     * way as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -1052,7 +1094,10 @@ namespace FEValuesViews
         &divergences) const;
 
     /**
-     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     * This function relates to get_function_divergences() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -1089,7 +1134,10 @@ namespace FEValuesViews
         &curls) const;
 
     /**
-     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     * This function relates to get_function_curls() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -1125,7 +1173,10 @@ namespace FEValuesViews
         &hessians) const;
 
     /**
-     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     * This function relates to get_function_hessians() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -1162,7 +1213,10 @@ namespace FEValuesViews
         &laplacians) const;
 
     /**
-     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     * This function relates to get_function_laplacians() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -1199,7 +1253,10 @@ namespace FEValuesViews
         &third_derivatives) const;
 
     /**
-     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     * This function relates to get_function_third_derivatives() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -1430,26 +1487,38 @@ namespace FEValuesViews
         &values) const;
 
     /**
-     * Same as above, but using a vector of local degree-of-freedom values.
-     *
-     * The @p dof_values vector must have a length equal to number of DoFs on
-     * a cell, and  each entry @p dof_values[i] is the value of the local DoF
-     * @p i. The fundamental prerequisite for the @p InputVector is that it must
-     * be possible to create an ArrayView from it; this is satisfied by the
-     * @p std::vector class.
-     *
-     * The DoF values typically would be obtained in the following way:
+     * Same as above, but using a vector of local degree-of-freedom values. In
+     * other words, instead of extracting the nodal values of the degrees of
+     * freedom located on the current cell from a global vector associated with
+     * a DoFHandler object (as the function above does), this function instead
+     * takes these local nodal values through its first argument. A typical
+     * way to obtain such a vector is by calling code such as
      * @code
-     * Vector<double> local_dof_values(cell->get_fe().n_dofs_per_cell());
-     * cell->get_dof_values(solution, local_dof_values);
+     *   cell->get_dof_values (dof_values, local_dof_values);
      * @endcode
-     * or, for a generic @p Number type,
-     * @code
-     * std::vector<Number> local_dof_values(cell->get_fe().n_dofs_per_cell());
-     * cell->get_dof_values(solution,
-     *                      local_dof_values.begin(),
-     *                      local_dof_values.end());
-     * @endcode
+     * (See DoFCellAccessor::get_dof_values() for more information on this
+     * function.) The point of the current function is then that one could
+     * modify these local values first, for example by applying a limiter
+     * or by ensuring that all nodal values are positive, before evaluating
+     * the finite element field that corresponds to these local values on the
+     * current cell. Another application is where one wants to postprocess
+     * the solution on a cell into a different finite element space on every
+     * cell, without actually creating a corresponding DoFHandler -- in that
+     * case, all one would compute is a local representation of that
+     * postprocessed function, characterized by its nodal values; this function
+     * then allows the evaluation of that representation at quadrature points.
+     *
+     * @param[in] dof_values A vector of local nodal values. This vector must
+     *   have a length equal to number of DoFs on the current cell, and must
+     *   be ordered in the same order as degrees of freedom are numbered on
+     *   the reference cell.
+     *
+     * @param[out] values A vector of values of the given finite element field,
+     *   at the quadrature points on the current object.
+     *
+     * @tparam InputVector The @p InputVector type must allow creation
+     *   of an ArrayView object from it; this is satisfied by the
+     *   `std::vector` class, among others.
      */
     template <class InputVector>
     void
@@ -1489,7 +1558,10 @@ namespace FEValuesViews
         &divergences) const;
 
     /**
-     * @copydoc FEValuesViews::SymmetricTensor<2,dim,spacedim>::get_function_values_from_local_dof_values()
+     * This function relates to get_function_divergences() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -1740,26 +1812,38 @@ namespace FEValuesViews
         &values) const;
 
     /**
-     * Same as above, but using a vector of local degree-of-freedom values.
-     *
-     * The @p dof_values vector must have a length equal to number of DoFs on
-     * a cell, and  each entry @p dof_values[i] is the value of the local DoF
-     * @p i. The fundamental prerequisite for the @p InputVector is that it must
-     * be possible to create an ArrayView from it; this is satisfied by the
-     * @p std::vector class.
-     *
-     * The DoF values typically would be obtained in the following way:
+     * Same as above, but using a vector of local degree-of-freedom values. In
+     * other words, instead of extracting the nodal values of the degrees of
+     * freedom located on the current cell from a global vector associated with
+     * a DoFHandler object (as the function above does), this function instead
+     * takes these local nodal values through its first argument. A typical
+     * way to obtain such a vector is by calling code such as
      * @code
-     * Vector<double> local_dof_values(cell->get_fe().n_dofs_per_cell());
-     * cell->get_dof_values(solution, local_dof_values);
+     *   cell->get_dof_values (dof_values, local_dof_values);
      * @endcode
-     * or, for a generic @p Number type,
-     * @code
-     * std::vector<Number> local_dof_values(cell->get_fe().n_dofs_per_cell());
-     * cell->get_dof_values(solution,
-     *                      local_dof_values.begin(),
-     *                      local_dof_values.end());
-     * @endcode
+     * (See DoFCellAccessor::get_dof_values() for more information on this
+     * function.) The point of the current function is then that one could
+     * modify these local values first, for example by applying a limiter
+     * or by ensuring that all nodal values are positive, before evaluating
+     * the finite element field that corresponds to these local values on the
+     * current cell. Another application is where one wants to postprocess
+     * the solution on a cell into a different finite element space on every
+     * cell, without actually creating a corresponding DoFHandler -- in that
+     * case, all one would compute is a local representation of that
+     * postprocessed function, characterized by its nodal values; this function
+     * then allows the evaluation of that representation at quadrature points.
+     *
+     * @param[in] dof_values A vector of local nodal values. This vector must
+     *   have a length equal to number of DoFs on the current cell, and must
+     *   be ordered in the same order as degrees of freedom are numbered on
+     *   the reference cell.
+     *
+     * @param[out] values A vector of values of the given finite element field,
+     *   at the quadrature points on the current object.
+     *
+     * @tparam InputVector The @p InputVector type must allow creation
+     *   of an ArrayView object from it; this is satisfied by the
+     *   `std::vector` class, among others.
      */
     template <class InputVector>
     void
@@ -1799,7 +1883,10 @@ namespace FEValuesViews
         &divergences) const;
 
     /**
-     * @copydoc FEValuesViews::Tensor<2,dim,spacedim>::get_function_values_from_local_dof_values()
+     * This function relates to get_function_divergences() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -1834,7 +1921,10 @@ namespace FEValuesViews
         &gradients) const;
 
     /**
-     * @copydoc FEValuesViews::Tensor<2,dim,spacedim>::get_function_values_from_local_dof_values()
+     * This function relates to get_function_gradients() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
