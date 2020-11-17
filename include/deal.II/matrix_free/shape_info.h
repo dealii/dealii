@@ -91,7 +91,12 @@ namespace internal
        * of the unit interval 0.5 that additionally add a constant shape
        * function according to FE_Q_DG0.
        */
-      tensor_symmetric_plus_dg0 = 5
+      tensor_symmetric_plus_dg0 = 5,
+
+      /**
+       * Shape functions without an tensor product properties.
+       */
+      tensor_none = 6
     };
 
 
