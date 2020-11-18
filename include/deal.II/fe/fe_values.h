@@ -2477,20 +2477,58 @@ public:
     std::vector<Vector<typename InputVector::value_type>> &values) const;
 
   /**
-   * Generate function values from an arbitrary vector.
+   * Generate function values from an arbitrary vector. This function
+   * does in essence the same as the first function of this name above,
+   * except that it does not make the assumption that the input vector
+   * corresponds to a DoFHandler that describes the unknowns of a finite
+   * element field (and for which we would then assume that
+   * `fe_function.size() == dof_handler.n_dofs()`). Rather, the nodal
+   * values corresponding to the current cell are elements of an otherwise
+   * arbitrary vector, and these elements are indexed by the second
+   * argument to this function. What the rest of the `fe_function` input
+   * argument corresponds to is of no consequence to this function.
    *
-   * This function offers the possibility to extract function values in
-   * quadrature points from vectors not corresponding to a whole
-   * discretization.
+   * Given this, the function above corresponds to passing `fe_function`
+   * as first argument to the current function, and using the
+   * `local_dof_indices` array that results from the following call as
+   * second argument to the current function:
+   * @code
+   *   cell->get_dof_indices (local_dof_indices);
+   * @endcode
+   * (See DoFCellAccessor::get_dof_indices() for more information.)
    *
-   * The vector <tt>indices</tt> corresponds to the degrees of freedom on a
-   * single cell. Its length may even be a multiple of the number of dofs per
-   * cell. Then, the vectors in <tt>value</tt> should allow for the same
-   * multiple of the components of the finite element.
+   * Likewise, the function above is equivalent to calling
+   * @code
+   *   cell->get_dof_values (fe_function, local_dof_values);
+   * @endcode
+   * and then calling the current function with `local_dof_values` as
+   * first argument, and an array with indices `{0,...,fe.dofs_per_cell-1}`
+   * as second argument.
    *
-   * You may want to use this function, if you want to access just a single
-   * block from a BlockVector, if you have a multi-level vector or if you
-   * already have a local representation of your finite element data.
+   * The point of the current function is that one sometimes wants to
+   * evaluate finite element functions at quadrature points with nodal
+   * values that are not stored in a global vector -- for example, one could
+   * modify these local values first, such as by applying a limiter
+   * or by ensuring that all nodal values are positive, before evaluating
+   * the finite element field that corresponds to these local values on the
+   * current cell. Another application is where one wants to postprocess
+   * the solution on a cell into a different finite element space on every
+   * cell, without actually creating a corresponding DoFHandler -- in that
+   * case, all one would compute is a local representation of that
+   * postprocessed function, characterized by its nodal values; this function
+   * then allows the evaluation of that representation at quadrature points.
+   *
+   * @param[in] fe_function A vector of nodal values. This vector can have
+   *   an arbitrary size, as long as all elements index by `indices` can
+   *   actually be accessed.
+   *
+   * @param[in] indices A vector of indices into `fe_function`. This vector
+   *   must have length equal to the number of degrees of freedom on the
+   *   current cell, and must identify elements in `fe_function` in the
+   *   order in which degrees of freedom are indexed on the reference cell.
+   *
+   * @param[out] values A vector of values of the given finite element field,
+   *   at the quadrature points on the current object.
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
@@ -2504,21 +2542,8 @@ public:
   /**
    * Generate vector function values from an arbitrary vector.
    *
-   * This function offers the possibility to extract function values in
-   * quadrature points from vectors not corresponding to a whole
-   * discretization.
-   *
-   * The vector <tt>indices</tt> corresponds to the degrees of freedom on a
-   * single cell. Its length may even be a multiple of the number of dofs per
-   * cell. Then, the vectors in <tt>value</tt> should allow for the same
-   * multiple of the components of the finite element.
-   *
-   * You may want to use this function, if you want to access just a single
-   * block from a BlockVector, if you have a multi-level vector or if you
-   * already have a local representation of your finite element data.
-   *
-   * Since this function allows for fairly general combinations of argument
-   * sizes, be aware that the checks on the arguments may not detect errors.
+   * This function corresponds to the previous one, just for the vector-valued
+   * case.
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
@@ -2531,14 +2556,9 @@ public:
 
 
   /**
-   * Generate vector function values from an arbitrary vector.
-   *
-   * This function offers the possibility to extract function values in
-   * quadrature points from vectors not corresponding to a whole
-   * discretization.
-   *
-   * The vector <tt>indices</tt> corresponds to the degrees of freedom on a
-   * single cell. Its length may even be a multiple of the number of dofs per
+   * Generate vector function values from an arbitrary vector. This
+   * function is similar to the previous one, but the `indices`
+   * vector may also be a multiple of the number of dofs per
    * cell. Then, the vectors in <tt>value</tt> should allow for the same
    * multiple of the components of the finite element.
    *
@@ -2550,10 +2570,6 @@ public:
    * component of the solution desired, the access to <tt>values</tt> is
    * <tt>values[p][i]</tt> if <tt>quadrature_points_fastest == false</tt>, and
    * <tt>values[i][p]</tt> otherwise.
-   *
-   * You may want to use this function, if you want to access just a single
-   * block from a BlockVector, if you have a multi-level vector or if you
-   * already have a local representation of your finite element data.
    *
    * Since this function allows for fairly general combinations of argument
    * sizes, be aware that the checks on the arguments may not detect errors.
@@ -2640,8 +2656,10 @@ public:
       &gradients) const;
 
   /**
-   * Function gradient access with more flexibility. See get_function_values()
-   * with corresponding arguments.
+   * This function relates to the first of the get_function_gradients() function
+   * above in the same way as the get_function_values() with similar arguments
+   * relates to the first of the get_function_values() functions. See there for
+   * more information.
    *
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
@@ -2654,8 +2672,10 @@ public:
       &gradients) const;
 
   /**
-   * Function gradient access with more flexibility. See get_function_values()
-   * with corresponding arguments.
+   * This function relates to the first of the get_function_gradients() function
+   * above in the same way as the get_function_values() with similar arguments
+   * relates to the first of the get_function_values() functions. See there for
+   * more information.
    *
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
@@ -2666,8 +2686,8 @@ public:
     const ArrayView<const types::global_dof_index> &indices,
     ArrayView<
       std::vector<Tensor<1, spacedim, typename InputVector::value_type>>>
-         gradients,
-    bool quadrature_points_fastest = false) const;
+               gradients,
+    const bool quadrature_points_fastest = false) const;
 
   //@}
   /// @name Access to second derivatives
@@ -2742,12 +2762,16 @@ public:
     const InputVector &fe_function,
     std::vector<
       std::vector<Tensor<2, spacedim, typename InputVector::value_type>>>
-      &  hessians,
-    bool quadrature_points_fastest = false) const;
+      &        hessians,
+    const bool quadrature_points_fastest = false) const;
 
   /**
-   * Access to the second derivatives of a function with more flexibility. See
-   * get_function_values() with corresponding arguments.
+   * This function relates to the first of the get_function_hessians() function
+   * above in the same way as the get_function_values() with similar arguments
+   * relates to the first of the get_function_values() functions. See there for
+   * more information.
+   *
+   * @dealiiRequiresUpdateFlags{update_hessians}
    */
   template <class InputVector>
   void
@@ -2758,8 +2782,10 @@ public:
       &hessians) const;
 
   /**
-   * Access to the second derivatives of a function with more flexibility. See
-   * get_function_values() with corresponding arguments.
+   * This function relates to the first of the get_function_hessians() function
+   * above in the same way as the get_function_values() with similar arguments
+   * relates to the first of the get_function_values() functions. See there for
+   * more information.
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
@@ -2770,8 +2796,8 @@ public:
     const ArrayView<const types::global_dof_index> &indices,
     ArrayView<
       std::vector<Tensor<2, spacedim, typename InputVector::value_type>>>
-         hessians,
-    bool quadrature_points_fastest = false) const;
+               hessians,
+    const bool quadrature_points_fastest = false) const;
 
   /**
    * Compute the (scalar) Laplacian (i.e. the trace of the tensor of second
@@ -2845,8 +2871,10 @@ public:
     std::vector<Vector<typename InputVector::value_type>> &laplacians) const;
 
   /**
-   * Access to the second derivatives of a function with more flexibility. See
-   * get_function_values() with corresponding arguments.
+   * This function relates to the first of the get_function_laplacians()
+   * function above in the same way as the get_function_values() with similar
+   * arguments relates to the first of the get_function_values() functions. See
+   * there for more information.
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
@@ -2858,8 +2886,10 @@ public:
     std::vector<typename InputVector::value_type> & laplacians) const;
 
   /**
-   * Access to the second derivatives of a function with more flexibility. See
-   * get_function_values() with corresponding arguments.
+   * This function relates to the first of the get_function_laplacians()
+   * function above in the same way as the get_function_values() with similar
+   * arguments relates to the first of the get_function_values() functions. See
+   * there for more information.
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
@@ -2871,8 +2901,10 @@ public:
     std::vector<Vector<typename InputVector::value_type>> &laplacians) const;
 
   /**
-   * Access to the second derivatives of a function with more flexibility. See
-   * get_function_values() with corresponding arguments.
+   * This function relates to the first of the get_function_laplacians()
+   * function above in the same way as the get_function_values() with similar
+   * arguments relates to the first of the get_function_values() functions. See
+   * there for more information.
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
@@ -2882,7 +2914,7 @@ public:
     const InputVector &                                         fe_function,
     const ArrayView<const types::global_dof_index> &            indices,
     std::vector<std::vector<typename InputVector::value_type>> &laplacians,
-    bool quadrature_points_fastest = false) const;
+    const bool quadrature_points_fastest = false) const;
 
   //@}
   /// @name Access to third derivatives of global finite element fields
@@ -2957,12 +2989,16 @@ public:
     const InputVector &fe_function,
     std::vector<
       std::vector<Tensor<3, spacedim, typename InputVector::value_type>>>
-      &  third_derivatives,
-    bool quadrature_points_fastest = false) const;
+      &        third_derivatives,
+    const bool quadrature_points_fastest = false) const;
 
   /**
-   * Access to the third derivatives of a function with more flexibility. See
-   * get_function_values() with corresponding arguments.
+   * This function relates to the first of the get_function_third_derivatives()
+   * function above in the same way as the get_function_values() with similar
+   * arguments relates to the first of the get_function_values() functions. See
+   * there for more information.
+   *
+   * @dealiiRequiresUpdateFlags{update_3rd_derivatives}
    */
   template <class InputVector>
   void
@@ -2973,8 +3009,10 @@ public:
       &third_derivatives) const;
 
   /**
-   * Access to the third derivatives of a function with more flexibility. See
-   * get_function_values() with corresponding arguments.
+   * This function relates to the first of the get_function_third_derivatives()
+   * function above in the same way as the get_function_values() with similar
+   * arguments relates to the first of the get_function_values() functions. See
+   * there for more information.
    *
    * @dealiiRequiresUpdateFlags{update_3rd_derivatives}
    */
@@ -2985,8 +3023,8 @@ public:
     const ArrayView<const types::global_dof_index> &indices,
     ArrayView<
       std::vector<Tensor<3, spacedim, typename InputVector::value_type>>>
-         third_derivatives,
-    bool quadrature_points_fastest = false) const;
+               third_derivatives,
+    const bool quadrature_points_fastest = false) const;
   //@}
 
   /// @name Cell degrees of freedom
