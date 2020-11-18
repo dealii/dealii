@@ -26,6 +26,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
+#include <array>
 #include <cmath>
 #include <limits>
 
@@ -7086,6 +7087,206 @@ namespace GridGenerator
           }
       }
     out_tria.create_triangulation(v, cells, subcelldata);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  convert_hypercube_to_simplex_mesh(const Triangulation<dim, spacedim> &in_tria,
+                                    Triangulation<dim, spacedim> &out_tria)
+  {
+    Assert(in_tria.n_global_levels() == 1,
+           ExcMessage("Number of global levels has to be 1."));
+
+    Assert(dim > 1, ExcNotImplemented());
+
+    // static tables with the definitions of cells and boundary faces for 2D
+    // and 3D
+    static const std::array<std::array<unsigned int, 3>, 8> table_2D_cell = {
+      {{{0, 6, 4}},
+       {{8, 4, 6}},
+       {{8, 6, 5}},
+       {{1, 5, 6}},
+       {{2, 4, 7}},
+       {{8, 7, 4}},
+       {{8, 5, 7}},
+       {{3, 7, 5}}}};
+
+    static const std::array<std::array<unsigned int, 4>, 24> table_3D_cell = {
+      {{{0, 1, 12, 10}},  {{2, 3, 11, 12}},  {{7, 6, 11, 13}},
+       {{5, 4, 13, 10}},  {{0, 2, 8, 12}},   {{4, 6, 13, 8}},
+       {{5, 13, 7, 9}},   {{1, 9, 3, 12}},   {{0, 8, 4, 10}},
+       {{1, 5, 9, 10}},   {{3, 7, 11, 9}},   {{2, 6, 8, 11}},
+       {{12, 13, 10, 9}}, {{12, 13, 9, 11}}, {{12, 13, 11, 8}},
+       {{12, 13, 8, 10}}, {{13, 8, 10, 4}},  {{13, 10, 9, 5}},
+       {{13, 9, 11, 7}},  {{13, 11, 8, 6}},  {{10, 12, 9, 1}},
+       {{9, 12, 11, 3}},  {{11, 12, 8, 2}},  {{8, 12, 10, 0}}}};
+
+    static const std::array<std::array<std::array<unsigned int, 2>, 2>, 4>
+      table_2D_boundary_faces = {{{{{{0, 4}}, {{4, 2}}}},
+                                  {{{{1, 5}}, {{5, 3}}}},
+                                  {{{{0, 6}}, {{6, 1}}}},
+                                  {{{{2, 7}}, {{7, 3}}}}}};
+
+    static const std::array<std::array<std::array<unsigned int, 3>, 4>, 6>
+      table_3D_boundary_faces = {
+        {{{{{0, 4, 8}}, {{4, 8, 6}}, {{8, 6, 2}}, {{0, 2, 8}}}},
+         {{{{1, 3, 9}}, {{3, 9, 7}}, {{9, 7, 5}}, {{1, 9, 5}}}},
+         {{{{0, 1, 10}}, {{1, 10, 5}}, {{10, 5, 4}}, {{0, 10, 4}}}},
+         {{{{2, 3, 11}}, {{3, 11, 7}}, {{11, 7, 6}}, {{2, 11, 6}}}},
+         {{{{0, 1, 12}}, {{1, 12, 3}}, {{12, 3, 2}}, {{0, 12, 2}}}},
+         {{{{4, 5, 13}}, {{5, 13, 7}}, {{13, 7, 6}}, {{4, 13, 6}}}}}};
+
+    std::vector<Point<spacedim>> vertices;
+    std::vector<CellData<dim>>   cells;
+    SubCellData                  subcell_data;
+
+    // store for each vertex and face the assigned index so that we only
+    // assign them a value once
+    std::vector<unsigned int> old_to_new_vertex_indices(
+      in_tria.n_vertices(), numbers::invalid_unsigned_int);
+    std::vector<unsigned int> face_to_new_vertex_indices(
+      in_tria.n_faces(), numbers::invalid_unsigned_int);
+
+    // We first have to create all of the new vertices. To do this, we loop over
+    // all cells and on each cell
+    // (i) copy the existing vertex locations (and record their new indices in
+    // the 'old_to_new_vertex_indices' vector),
+    // (ii) create new midpoint vertex locations for each face (and record their
+    // new indices in the 'face_to_new_vertex_indices' vector),
+    // (iii) create new midpoint vertex locations for each cell (dim = 2 only)
+    for (const auto &cell : in_tria)
+      {
+        // temporary array storing the global indices of each cell entity in the
+        // sequence: vertices, edges/faces, cell
+        std::array<unsigned int, dim == 2 ? 9 : 14> local_vertex_indices;
+
+        // (i) copy the existing vertex locations
+        for (const auto v : cell.vertex_indices())
+          {
+            const auto v_global = cell.vertex_index(v);
+
+            if (old_to_new_vertex_indices[v_global] ==
+                numbers::invalid_unsigned_int)
+              {
+                old_to_new_vertex_indices[v_global] = vertices.size();
+                vertices.push_back(cell.vertex(v));
+              }
+
+            local_vertex_indices[v] = old_to_new_vertex_indices[v_global];
+          }
+
+        // (ii) create new midpoint vertex locations for each face
+        for (const auto f : cell.face_indices())
+          {
+            const auto f_global = cell.face_index(f);
+
+            if (face_to_new_vertex_indices[f_global] ==
+                numbers::invalid_unsigned_int)
+              {
+                face_to_new_vertex_indices[f_global] = vertices.size();
+                vertices.push_back(
+                  cell.face(f)->center(/*respect_manifold*/ true));
+              }
+
+            local_vertex_indices[cell.n_vertices() + f] =
+              face_to_new_vertex_indices[f_global];
+          }
+
+        // (iii) create new midpoint vertex locations for each cell
+        if (dim == 2)
+          {
+            local_vertex_indices[cell.n_vertices() + cell.n_faces()] =
+              vertices.size();
+            vertices.push_back(cell.center(/*respect_manifold*/ true));
+          }
+
+        // helper function for creating cells and subcells
+        const auto add_cell = [&](const unsigned int struct_dim,
+                                  const auto &       index_vertices,
+                                  const unsigned int material_or_boundary_id) {
+          if (struct_dim == dim) // cells
+            {
+              CellData<dim> cell_data(index_vertices.size());
+              for (unsigned int i = 0; i < index_vertices.size(); ++i)
+                {
+                  cell_data.vertices[i] =
+                    local_vertex_indices[index_vertices[i]];
+                  cell_data.material_id = material_or_boundary_id;
+                }
+              cells.push_back(cell_data);
+            }
+          else if (dim == 2 && struct_dim == 1) // an edge of a triangle
+            {
+              CellData<1> boundary_line(2);
+              boundary_line.boundary_id = material_or_boundary_id;
+              for (unsigned int i = 0; i < index_vertices.size(); ++i)
+                {
+                  boundary_line.vertices[i] =
+                    local_vertex_indices[index_vertices[i]];
+                }
+              subcell_data.boundary_lines.push_back(boundary_line);
+            }
+          else if (dim == 3 && struct_dim == 2) // a face of a thetrahedron
+            {
+              CellData<2> boundary_quad(3);
+              boundary_quad.boundary_id = material_or_boundary_id;
+              for (unsigned int i = 0; i < index_vertices.size(); ++i)
+                {
+                  boundary_quad.vertices[i] =
+                    local_vertex_indices[index_vertices[i]];
+                }
+              subcell_data.boundary_quads.push_back(boundary_quad);
+            }
+          else
+            {
+              Assert(false, ExcNotImplemented());
+            }
+        };
+
+        const auto current_material_id = cell.material_id();
+
+        // create cells one by one
+
+        if (dim == 2)
+          for (const auto &cell : table_2D_cell)
+            add_cell(dim, cell, current_material_id);
+        else if (dim == 3)
+          for (const auto &cell : table_3D_cell)
+            add_cell(dim, cell, current_material_id);
+        else
+          Assert(false, ExcNotImplemented());
+
+        // Set up sub-cell data.
+        for (const auto f : cell.face_indices())
+          if (cell.face(f)->boundary_id() !=
+              numbers::internal_face_boundary_id) // face at boundary
+            {
+              const auto current_boundary_id = cell.face(f)->boundary_id();
+              if (dim == 2) // 2D boundary_lines
+                for (const auto &face : table_2D_boundary_faces[f])
+                  add_cell(1, face, current_boundary_id);
+              else if (dim == 3) // 3D boundary_quads
+                for (const auto &face : table_3D_boundary_faces[f])
+                  add_cell(2, face, current_boundary_id);
+              else
+                Assert(false, ExcNotImplemented());
+            }
+      }
+
+    out_tria.create_triangulation(vertices, cells, subcell_data);
+  }
+
+
+
+  template <int spacedim>
+  void
+  convert_hypercube_to_simplex_mesh(const Triangulation<1, spacedim> &in_tria,
+                                    Triangulation<1, spacedim> &      out_tria)
+  {
+    out_tria.copy_triangulation(in_tria);
+    return;
   }
 
 
