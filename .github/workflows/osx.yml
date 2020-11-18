@@ -50,7 +50,7 @@ jobs:
         ./contrib/utilities/download_clang_format
     - name: info
       run: |
-        g++-9 -v
+        g++-10 -v
         mpicxx -v
         cmake --version
     - name: configure
