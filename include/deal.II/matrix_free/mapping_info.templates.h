@@ -55,6 +55,34 @@ namespace internal
               int spacedim,
               typename Number,
               typename VectorizedArrayType>
+    template <int dim_q>
+    void
+    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
+      QuadratureDescriptor::initialize(
+        const Quadrature<dim_q> &quadrature,
+        const UpdateFlags        update_flags_inner_faces)
+    {
+      Assert(structdim + 1 <= spacedim ||
+               update_flags_inner_faces == update_default,
+             ExcMessage("Volume cells do not allow for setting inner faces"));
+      this->quadrature = quadrature;
+      n_q_points       = quadrature.size();
+      quadrature_weights.resize(n_q_points);
+      for (unsigned int i = 0; i < n_q_points; ++i)
+        quadrature_weights[i] = quadrature.weight(i);
+
+      // note: quadrature_1 and tensor_quadrature_weights are not set up
+
+      // TODO: set up face_orientations
+      (void)update_flags_inner_faces;
+    }
+
+
+
+    template <int structdim,
+              int spacedim,
+              typename Number,
+              typename VectorizedArrayType>
     void
     MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
       QuadratureDescriptor::initialize(
@@ -338,27 +366,41 @@ namespace internal
           cell_data[my_q].descriptor.resize(n_hp_quads);
           for (unsigned int q = 0; q < n_hp_quads; ++q)
             {
-              Assert(quad[my_q][q].is_tensor_product(), ExcNotImplemented());
-              for (unsigned int i = 1; i < dim; ++i)
-                {
-                  Assert(quad[my_q][q].get_tensor_basis()[0] ==
-                           quad[my_q][q].get_tensor_basis()[i],
-                         ExcNotImplemented());
-                }
+              bool flag = quad[my_q][q].is_tensor_product();
 
-              cell_data[my_q].descriptor[q].initialize(
-                quad[my_q][q].get_tensor_basis()[0], update_default);
+              if (flag)
+                for (unsigned int i = 1; i < dim; ++i)
+                  {
+                    flag &= quad[my_q][q].get_tensor_basis()[0] ==
+                            quad[my_q][q].get_tensor_basis()[i];
+                  }
+#ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
+              if (flag == false)
+                cell_data[my_q].descriptor[q].initialize(quad[my_q][q],
+                                                         update_default);
+              else
+#endif
+                cell_data[my_q].descriptor[q].initialize(
+                  quad[my_q][q].get_tensor_basis()[0], update_default);
             }
 
           face_data[my_q].descriptor.resize(n_hp_quads);
           for (unsigned int hpq = 0; hpq < n_hp_quads; ++hpq)
             {
-              Assert(quad[my_q][hpq].is_tensor_product(), ExcNotImplemented());
-              for (unsigned int i = 1; i < dim; ++i)
+              bool flag = quad[my_q][hpq].is_tensor_product();
+
+              if (flag)
+                for (unsigned int i = 1; i < dim; ++i)
+                  flag &= quad[my_q][hpq].get_tensor_basis()[0] ==
+                          quad[my_q][hpq].get_tensor_basis()[i];
+
+              if (flag == false)
                 {
-                  Assert(quad[my_q][hpq].get_tensor_basis()[0] ==
-                           quad[my_q][hpq].get_tensor_basis()[i],
-                         ExcNotImplemented());
+#ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
+                  continue; // TODO: face data is not set up
+#else
+                  Assert(false, ExcNotImplemented());
+#endif
                 }
 
               face_data[my_q].descriptor[hpq].initialize(
@@ -369,12 +411,20 @@ namespace internal
           face_data_by_cells[my_q].descriptor.resize(n_hp_quads);
           for (unsigned int hpq = 0; hpq < n_hp_quads; ++hpq)
             {
-              Assert(quad[my_q][hpq].is_tensor_product(), ExcNotImplemented());
-              for (unsigned int i = 1; i < dim; ++i)
+              bool flag = quad[my_q][hpq].is_tensor_product();
+
+              if (flag)
+                for (unsigned int i = 1; i < dim; ++i)
+                  flag &= quad[my_q][hpq].get_tensor_basis()[0] ==
+                          quad[my_q][hpq].get_tensor_basis()[i];
+
+              if (flag == false)
                 {
-                  Assert(quad[my_q][hpq].get_tensor_basis()[0] ==
-                           quad[my_q][hpq].get_tensor_basis()[i],
-                         ExcNotImplemented());
+#ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
+                  continue; // TODO: face data is not set up
+#else
+                  Assert(false, ExcNotImplemented());
+#endif
                 }
 
               face_data_by_cells[my_q].descriptor[hpq].initialize(
