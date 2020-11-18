@@ -1649,9 +1649,9 @@ namespace Particles
 
     for (auto &recv_particle : ghost_particles_iterators)
       {
-        recv_particle->second.free_properties();
-        recv_particle->second =
-          Particle<dim, spacedim>(recv_data_it, property_pool.get());
+        // Update particle data using previously allocated memory space
+        // for efficiency reasons
+        recv_particle->second.update_particle_data(recv_data_it);
 
         if (load_callback)
           recv_data_it =
