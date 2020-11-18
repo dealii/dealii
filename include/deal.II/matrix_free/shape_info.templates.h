@@ -106,6 +106,14 @@ namespace internal
             {
               const FE_Poly<dim, spacedim> *fe_poly_ptr =
                 dynamic_cast<const FE_Poly<dim, spacedim> *>(fe_ptr);
+#ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
+              // Simplices are a special case since the polynomial family is not
+              // indicative of their support
+              if (dynamic_cast<const Simplex::FE_P<dim> *>(fe_poly_ptr) ||
+                  dynamic_cast<const Simplex::FE_DGP<dim> *>(fe_poly_ptr))
+                return true;
+#endif
+
               if (dynamic_cast<const TensorProductPolynomials<dim> *>(
                     &fe_poly_ptr->get_poly_space()) == nullptr &&
                   dynamic_cast<const TensorProductPolynomials<
