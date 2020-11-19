@@ -237,40 +237,42 @@ AffineConstraints<number>::add_lines(const IndexSet &lines)
 template <typename number>
 void
 AffineConstraints<number>::add_entries(
-  const size_type                                  line_n,
-  const std::vector<std::pair<size_type, number>> &col_val_pairs)
+  const size_type                                  constrained_dof_index,
+  const std::vector<std::pair<size_type, number>> &col_weight_pairs)
 {
   Assert(sorted == false, ExcMatrixIsClosed());
-  Assert(is_constrained(line_n), ExcLineInexistant(line_n));
+  Assert(is_constrained(constrained_dof_index),
+         ExcLineInexistant(constrained_dof_index));
 
-  ConstraintLine &line = lines[lines_cache[calculate_line_index(line_n)]];
-  Assert(line.index == line_n, ExcInternalError());
+  ConstraintLine &line =
+    lines[lines_cache[calculate_line_index(constrained_dof_index)]];
+  Assert(line.index == constrained_dof_index, ExcInternalError());
 
   // if in debug mode, check whether an entry for this column already
   // exists and if its the same as the one entered at present
   //
   // in any case: skip this entry if an entry for this column already
   // exists, since we don't want to enter it twice
-  for (const std::pair<size_type, number> &col_val_pair : col_val_pairs)
+  for (const std::pair<size_type, number> &col_weight_pair : col_weight_pairs)
     {
-      Assert(line_n != col_val_pair.first,
+      Assert(constrained_dof_index != col_weight_pair.first,
              ExcMessage("Can't constrain a degree of freedom to itself"));
       bool entry_exists = false;
       for (const std::pair<size_type, number> &entry : line.entries)
-        if (entry.first == col_val_pair.first)
+        if (entry.first == col_weight_pair.first)
           {
             // entry exists, break innermost loop
-            Assert(entry.second == col_val_pair.second,
-                   ExcEntryAlreadyExists(line_n,
-                                         col_val_pair.first,
+            Assert(entry.second == col_weight_pair.second,
+                   ExcEntryAlreadyExists(constrained_dof_index,
+                                         col_weight_pair.first,
                                          entry.second,
-                                         col_val_pair.second));
+                                         col_weight_pair.second));
             entry_exists = true;
             break;
           }
 
       if (entry_exists == false)
-        line.entries.push_back(col_val_pair);
+        line.entries.push_back(col_weight_pair);
     }
 }
 
