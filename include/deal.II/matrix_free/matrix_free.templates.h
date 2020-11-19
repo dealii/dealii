@@ -290,7 +290,7 @@ template <int dim, typename Number, typename VectorizedArrayType>
 template <typename number2, int q_dim>
 void
 MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
-  const Mapping<dim> &                                   mapping,
+  const std::shared_ptr<hp::MappingCollection<dim>> &    mapping,
   const std::vector<const DoFHandler<dim, dim> *> &      dof_handler,
   const std::vector<const AffineConstraints<number2> *> &constraint,
   const std::vector<IndexSet> &                          locally_owned_dofs,
@@ -466,6 +466,16 @@ template <int dim, typename Number, typename VectorizedArrayType>
 void
 MatrixFree<dim, Number, VectorizedArrayType>::update_mapping(
   const Mapping<dim> &mapping)
+{
+  update_mapping(std::make_shared<hp::MappingCollection<dim>>(mapping));
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+void
+MatrixFree<dim, Number, VectorizedArrayType>::update_mapping(
+  const std::shared_ptr<hp::MappingCollection<dim>> &mapping)
 {
   AssertDimension(shape_info.size(1), mapping_info.cell_data.size());
   mapping_info.update_mapping(dof_handlers[0]->get_triangulation(),

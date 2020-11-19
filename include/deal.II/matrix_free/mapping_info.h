@@ -27,6 +27,7 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/mapping.h>
 
+#include <deal.II/hp/mapping_collection.h>
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/matrix_free/face_info.h>
@@ -335,10 +336,10 @@ namespace internal
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
         const FaceInfo<VectorizedArrayType::size()> &             faces,
-        const std::vector<unsigned int> &                active_fe_index,
-        const Mapping<dim> &                             mapping,
-        const std::vector<dealii::hp::QCollection<dim>> &quad,
-        const UpdateFlags                                update_flags_cells,
+        const std::vector<unsigned int> &active_fe_index,
+        const std::shared_ptr<dealii::hp::MappingCollection<dim>> &mapping,
+        const std::vector<dealii::hp::QCollection<dim>> &          quad,
+        const UpdateFlags update_flags_cells,
         const UpdateFlags update_flags_boundary_faces,
         const UpdateFlags update_flags_inner_faces,
         const UpdateFlags update_flags_faces_by_cells);
@@ -355,7 +356,7 @@ namespace internal
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
         const FaceInfo<VectorizedArrayType::size()> &             faces,
         const std::vector<unsigned int> &active_fe_index,
-        const Mapping<dim> &             mapping);
+        const std::shared_ptr<dealii::hp::MappingCollection<dim>> &mapping);
 
       /**
        * Return the type of a given cell as detected during initialization.
@@ -444,7 +445,12 @@ namespace internal
         face_data_by_cells;
 
       /**
-       * The pointer to the underlying Mapping object.
+       * The pointer to the underlying hp::MappingCollection object.
+       */
+      std::shared_ptr<dealii::hp::MappingCollection<dim>> mapping_collection;
+
+      /**
+       * The pointer to the first entry of mapping_collection.
        */
       SmartPointer<const Mapping<dim>> mapping;
 
@@ -484,8 +490,8 @@ namespace internal
       initialize_cells(
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const std::vector<unsigned int> &active_fe_index,
-        const Mapping<dim> &             mapping);
+        const std::vector<unsigned int> &         active_fe_index,
+        const dealii::hp::MappingCollection<dim> &mapping);
 
       /**
        * Computes the information in the given faces, called within
@@ -496,8 +502,8 @@ namespace internal
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
         const std::vector<FaceToCellTopology<VectorizedArrayType::size()>>
-          &                 faces,
-        const Mapping<dim> &mapping);
+          &                                       faces,
+        const dealii::hp::MappingCollection<dim> &mapping);
 
       /**
        * Computes the information in the given faces, called within
@@ -507,7 +513,7 @@ namespace internal
       initialize_faces_by_cells(
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const Mapping<dim> &                                      mapping);
+        const dealii::hp::MappingCollection<dim> &                mapping);
 
       /**
        * Helper function to determine which update flags must be set in the
