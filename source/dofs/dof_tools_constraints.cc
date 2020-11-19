@@ -149,7 +149,7 @@ namespace DoFTools
       /**
        * When restricting, on a face, the degrees of freedom of fe1 to the space
        * described by fe2 (for example for the complex case described
-       * in the @ref hp_paper "hp paper"), we have to select fe2.dofs_per_face
+       * in the @ref hp_paper "hp-paper"), we have to select fe2.dofs_per_face
        * out of the fe1.dofs_per_face face DoFs as the
        * primary dofs, and the rest become dependent dofs. This function selects
        * which ones will be primary, and which ones will be dependents.
@@ -395,7 +395,7 @@ namespace DoFTools
       /**
        * Given the face interpolation matrix between two elements, split it into
        * its primary and dependent parts and invert the primary part as
-       * explained in the @ref hp_paper "hp paper".
+       * explained in the @ref hp_paper "hp-paper".
        */
       void
       ensure_existence_of_split_face_matrix(
@@ -457,7 +457,7 @@ namespace DoFTools
 
       /**
        * A function that returns how many different finite elements a dof
-       * handler uses. This is one for non-hp DoFHandlers and
+       * handler uses. This is one for non-hp-DoFHandlers and
        * dof_handler.get_fe().size() for the hp-versions.
        */
       template <int dim, int spacedim>
@@ -476,7 +476,7 @@ namespace DoFTools
        * Copy constraints into an AffineConstraints object.
        *
        * This function removes zero constraints and those, which constrain a DoF
-       * which was already eliminated in one of the previous steps of the hp
+       * which was already eliminated in one of the previous steps of the hp-
        * hanging node procedure.
        *
        * It also suppresses very small entries in the AffineConstraints object
@@ -1016,7 +1016,7 @@ namespace DoFTools
       AffineConstraints<number> &      constraints)
     {
       // note: this function is going to be hard to understand if you haven't
-      // read the hp paper. however, we try to follow the notation laid out
+      // read the hp-paper. however, we try to follow the notation laid out
       // there, so go read the paper before you try to understand what is going
       // on here
 
@@ -1046,7 +1046,7 @@ namespace DoFTools
       // primary and dependent parts, and for which the primary part is
       // inverted. these two matrices are derived from the face interpolation
       // matrix
-      // as described in the @ref hp_paper "hp paper"
+      // as described in the @ref hp_paper "hp-paper"
       Table<2,
             std::unique_ptr<std::pair<FullMatrix<double>, FullMatrix<double>>>>
         split_face_interpolation_matrices(n_finite_elements(dof_handler),
@@ -1104,7 +1104,7 @@ namespace DoFTools
                            ExcInternalError());
 
                 // first find out whether we can constrain each of the subfaces
-                // to the mother face. in the lingo of the hp paper, this would
+                // to the mother face. in the lingo of the hp-paper, this would
                 // be the simple case. note that we can short-circuit this
                 // decision if the dof_handler doesn't support hp at all
                 //
@@ -1142,7 +1142,7 @@ namespace DoFTools
                     case FiniteElementDomination::either_element_can_dominate:
                       {
                         // Case 1 (the simple case and the only case that can
-                        // happen for non-hp DoFHandlers): The coarse element
+                        // happen for non-hp-DoFHandlers): The coarse element
                         // dominates the elements on the subfaces (or they are
                         // all the same)
                         //
@@ -1255,10 +1255,10 @@ namespace DoFTools
                       {
                         // Case 2 (the "complex" case): at least one (the
                         // neither_... case) of the finer elements or all of
-                        // them (the other_... case) is dominating. See the hp
+                        // them (the other_... case) is dominating. See the hp-
                         // paper for a way how to deal with this situation
                         //
-                        // since this is something that can only happen for hp
+                        // since this is something that can only happen for hp-
                         // dof handlers, add a check here...
                         Assert(dof_handler.has_hp_capabilities() == true,
                                ExcInternalError());
@@ -1389,7 +1389,7 @@ namespace DoFTools
 
 
                         // next we have to deal with the subfaces. do as
-                        // discussed in the hp paper
+                        // discussed in the hp-paper
                         for (unsigned int sf = 0;
                              sf < cell->face(face)->n_children();
                              ++sf)
@@ -1581,7 +1581,7 @@ namespace DoFTools
                             // our best bet is to find the common space among
                             // other FEs in FECollection and then constrain both
                             // FEs to that one. More precisely, we follow the
-                            // strategy outlined on page 17 of the hp paper:
+                            // strategy outlined on page 17 of the hp-paper:
                             // First we find the dominant FE space S. Then we
                             // divide our dofs in primary and dependent such
                             // that I^{face,primary}_{S^{face}->S} is
@@ -3156,7 +3156,7 @@ namespace DoFTools
     Assert(coarse_grid.get_fe_collection().size() == 1 &&
              fine_grid.get_fe_collection().size() == 1,
            ExcMessage("This function is not yet implemented for DoFHandlers "
-                      "using hp capabilities."));
+                      "using hp-capabilities."));
     // store the weights with which a dof on the parameter grid contributes to a
     // dof on the fine grid. see the long doc below for more info
     //
@@ -3340,7 +3340,7 @@ namespace DoFTools
     Assert(coarse_grid.get_fe_collection().size() == 1 &&
              fine_grid.get_fe_collection().size() == 1,
            ExcMessage("This function is not yet implemented for DoFHandlers "
-                      "using hp capabilities."));
+                      "using hp-capabilities."));
     // store the weights with which a dof on the parameter grid contributes to a
     // dof on the fine grid. see the long doc below for more info
     //

@@ -257,7 +257,7 @@ public:
   get_current_cell_index() const;
 
   /**
-   * Return the active fe index for this class for efficient indexing in the hp
+   * Return the active fe index for this class for efficient indexing in the hp-
    * case.
    */
   unsigned int
@@ -265,7 +265,7 @@ public:
 
   /**
    * Return the active quadrature index for this class for efficient indexing in
-   * the hp case.
+   * the hp-case.
    */
   unsigned int
   get_active_quadrature_index() const;
@@ -360,13 +360,13 @@ protected:
     VectorizedArrayType> *mapping_data;
 
   /**
-   * The active fe index for this class for efficient indexing in the hp case.
+   * The active fe index for this class for efficient indexing in the hp-case.
    */
   const unsigned int active_fe_index;
 
   /**
    * The active quadrature index for this class for efficient indexing in the
-   * hp case.
+   * hp-case.
    */
   const unsigned int active_quad_index;
 

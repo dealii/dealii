@@ -16,7 +16,7 @@
 
 // verify that we can do things like cell->face() in 1d as well. here:
 // test cell->face(0)->get_dof_indices()
-// compared to _06, we now test for an hp DoFHandler
+// compared to _06, we now test for an hp-DoFHandler
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>

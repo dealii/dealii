@@ -15,11 +15,11 @@
 
 
 
-// have a 2x1 coarse mesh (or 2x1x1) and verify DoF indices in the hp
+// have a 2x1 coarse mesh (or 2x1x1) and verify DoF indices in the hp-
 // case with a FECollection that contains two finite elements that do
 // not dominate each other. Here, a (FE_Q(1) x FE_Q(2)) and a
 // (FE_Q(2) x FE_Q(1)) element on two separate subdomains face each
-// other. the hp code will unify DoF indices on boundaries between all
+// other. the hp-code will unify DoF indices on boundaries between all
 // subdomains.
 
 

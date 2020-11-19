@@ -129,9 +129,9 @@ namespace internal
       clear();
 
       /**
-       * Return the FE index for a given finite element degree. If not in hp
+       * Return the FE index for a given finite element degree. If not in hp-
        * mode, this function always returns index 0. If an index is not found
-       * in hp mode, it returns numbers::invalid_unsigned_int.
+       * in hp-mode, it returns numbers::invalid_unsigned_int.
        */
       unsigned int
       fe_index_from_degree(const unsigned int first_selected_component,
@@ -634,7 +634,7 @@ namespace internal
        * account. This information is encoded in the row_starts variables
        * directly.
        *
-       * The outer vector goes through the various fe indices in the hp case,
+       * The outer vector goes through the various fe indices in the hp-case,
        * similarly to the @p dofs_per_cell variable.
        */
       std::vector<std::vector<unsigned int>> component_dof_indices_offset;
@@ -655,20 +655,20 @@ namespace internal
       bool store_plain_indices;
 
       /**
-       * Stores the index of the active finite element in the hp case.
+       * Stores the index of the active finite element in the hp-case.
        */
       std::vector<unsigned int> cell_active_fe_index;
 
       /**
-       * Stores the maximum degree of different finite elements for the hp
+       * Stores the maximum degree of different finite elements for the hp-
        * case.
        */
       unsigned int max_fe_index;
 
       /**
-       * To each of the slots in an hp adaptive case, the inner vector stores
+       * To each of the slots in an hp-adaptive case, the inner vector stores
        * the corresponding element degree. This is used by the constructor of
-       * FEEvaluationBase to identify the correct data slot in the hp case.
+       * FEEvaluationBase to identify the correct data slot in the hp-case.
        */
       std::vector<std::vector<unsigned int>> fe_index_conversion;
 

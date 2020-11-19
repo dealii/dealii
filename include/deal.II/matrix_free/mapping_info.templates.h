@@ -460,7 +460,7 @@ namespace internal
             }
         }
 
-      // In case we have no hp adaptivity (active_fe_index is empty), we have
+      // In case we have no hp-adaptivity (active_fe_index is empty), we have
       // cells, and the mapping is MappingQGeneric or a derived class, we can
       // use the fast method.
       if (active_fe_index.empty() && !cells.empty() && mapping->size() == 1 &&
@@ -904,7 +904,7 @@ namespace internal
         GeometryType cell_t_prev = general;
 
         // fe_values object that is used to compute the mapping data. for
-        // the hp case there might be more than one finite element. since we
+        // the hp-case there might be more than one finite element. since we
         // manually select the active FE index and not via a
         // DoFHandler<dim>::active_cell_iterator, we need to manually
         // select the correct finite element, so just hold a vector of
@@ -1840,7 +1840,7 @@ namespace internal
                ++my_q)
             {
 #ifndef DEAL_II_WITH_SIMPLEX_SUPPORT
-              // currently only non-hp case...
+              // currently only non-hp-case...
               AssertDimension(mapping_in.size(), 1);
               AssertDimension(mapping_info.face_data[my_q].descriptor.size(),
                               1);

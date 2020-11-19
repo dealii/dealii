@@ -96,7 +96,7 @@ test6(const bool         do_href,
   fe_collection.push_back(FE_Enriched<dim>(FE_Q<dim>(p_feq)));
   fe_collection.push_back(
     FE_Enriched<dim>(FE_Q<dim>(p_feen), FE_Q<dim>(1), &function));
-  // push back to be able to resolve hp constrains:
+  // push back to be able to resolve hp-constrains:
   fe_collection.push_back(FE_Enriched<dim>(FE_Q<dim>(p_feen)));
 
   GridGenerator::hyper_cube(triangulation);

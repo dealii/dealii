@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// common framework to check hp constraints
+// common framework to check hp-constraints
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/function_lib.h>

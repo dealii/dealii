@@ -45,7 +45,7 @@ namespace hp
    * The whole process of working with objects of this type is explained in
    * step-27. Many of the algorithms this class implements are described in
    * the
-   * @ref hp_paper "hp paper".
+   * @ref hp_paper "hp-paper".
    *
    *
    * <h3>Active FE indices and their behavior under mesh refinement</h3>

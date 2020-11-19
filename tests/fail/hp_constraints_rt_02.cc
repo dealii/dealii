@@ -15,7 +15,7 @@
 
 
 
-// check that computation of hp constraints works for RT elements correctly
+// check that computation of hp-constraints works for RT elements correctly
 
 char logname[] = "output";
 

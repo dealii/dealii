@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// check constraints on hp dofhandler with 2 neighboring cells where one
+// check constraints on hp-dofhandler with 2 neighboring cells where one
 // cell is enriched and nother is not.
 
 #include <deal.II/base/function.h>
@@ -110,7 +110,7 @@ test2cells(const unsigned int p_feq = 2, const unsigned int p_feen = 1)
   fe_collection.push_back(FE_Enriched<dim>(FE_Q<dim>(p_feq)));
   fe_collection.push_back(
     FE_Enriched<dim>(FE_Q<dim>(p_feen), FE_Q<dim>(1), &function));
-  // push back to be able to resolve hp constrains:
+  // push back to be able to resolve hp-constrains:
   fe_collection.push_back(FE_Enriched<dim>(FE_Q<dim>(p_feen)));
 
   dof_handler.begin_active()->set_active_fe_index(1); // POU

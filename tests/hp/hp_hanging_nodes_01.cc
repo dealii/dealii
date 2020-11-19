@@ -48,7 +48,7 @@
 #include "../tests.h"
 
 
-// This a test for the hp capable version of the make_hanging_node_constraints
+// This a test for the hp-capable version of the make_hanging_node_constraints
 // method. It uses a triangulation with one refined element beside an
 // unrefined element to create the constraints for this configuration.
 

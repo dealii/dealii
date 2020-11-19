@@ -3800,7 +3800,7 @@ public:
    *
    * Though it seems that it is not very useful, this function is there to
    * provide capability to the hp::FEValues class, in which case it provides
-   * the FEValues object for the present cell (remember that for hp finite
+   * the FEValues object for the present cell (remember that for hp-finite
    * elements, the actual FE object used may change from cell to cell, so we
    * also need different FEValues objects for different cells; once you
    * reinitialize the hp::FEValues object for a specific cell, it retrieves
@@ -4039,7 +4039,7 @@ public:
    *
    * Though it seems that it is not very useful, this function is there to
    * provide capability to the hp::FEValues class, in which case it provides
-   * the FEValues object for the present cell (remember that for hp finite
+   * the FEValues object for the present cell (remember that for hp-finite
    * elements, the actual FE object used may change from cell to cell, so we
    * also need different FEValues objects for different cells; once you
    * reinitialize the hp::FEValues object for a specific cell, it retrieves
@@ -4194,7 +4194,7 @@ public:
    *
    * Though it seems that it is not very useful, this function is there to
    * provide capability to the hp::FEValues class, in which case it provides
-   * the FEValues object for the present cell (remember that for hp finite
+   * the FEValues object for the present cell (remember that for hp-finite
    * elements, the actual FE object used may change from cell to cell, so we
    * also need different FEValues objects for different cells; once you
    * reinitialize the hp::FEValues object for a specific cell, it retrieves

@@ -60,7 +60,7 @@ namespace hp
    * second the dimensionality of the object that we integrate on, i.e. for
    * usual @p hp::FEValues it is equal to the first one, while for face
    * integration it is one less. The third template parameter indicates the
-   * type of underlying non-hp FE*Values base type, i.e. it could either be
+   * type of underlying non-hp-FE*Values base type, i.e. it could either be
    * ::FEValues, ::FEFaceValues, or ::FESubfaceValues.
    *
    * @ingroup hp
@@ -231,11 +231,11 @@ namespace hp
 namespace hp
 {
   /**
-   * An hp equivalent of the ::FEValues class. See the step-27 tutorial
+   * An hp-equivalent of the ::FEValues class. See the step-27 tutorial
    * program for examples of use.
    *
    * The idea of this class is as follows: when one assembled matrices in the
-   * hp finite element method, there may be different finite elements on
+   * hp-finite element method, there may be different finite elements on
    * different cells, and consequently one may also want to use different
    * quadrature formulas for different cells. On the other hand, the
    * ::FEValues efficiently handles pre-evaluating whatever information is
@@ -255,7 +255,7 @@ namespace hp
    * ::FEValues object that then fits the finite element and quadrature
    * formula for the current cell can then be accessed using the
    * get_present_fe_values() function, and one would work with it just like
-   * with any ::FEValues object for non-hp DoF handler objects.
+   * with any ::FEValues object for non-hp-DoFHandler objects.
    *
    * The reinit() functions have additional arguments with default values. If
    * not specified, the function takes the index into the hp::FECollection,
@@ -336,7 +336,7 @@ namespace hp
      * quadrature formula for each finite element in the hp::FECollection. As
      * a special case, if the quadrature collection contains only a single
      * element (a frequent case if one wants to use the same quadrature object
-     * for all finite elements in an hp discretization, even if that may not
+     * for all finite elements in an hp-discretization, even if that may not
      * be the most efficient), then this single quadrature is used unless a
      * different value for this argument is specified. On the other hand, if a
      * value is given for this argument, it overrides the choice of
@@ -349,7 +349,7 @@ namespace hp
      * <code>cell-@>active_fe_index()</code>, i.e. the same index as that of
      * the finite element. As above, if the mapping collection contains only a
      * single element (a frequent case if one wants to use a $Q_1$ mapping for
-     * all finite elements in an hp discretization), then this single mapping
+     * all finite elements in an hp-discretization), then this single mapping
      * is used unless a different value for this argument is specified.
      */
     template <bool lda>
@@ -455,7 +455,7 @@ namespace hp
      * quadrature formula for each finite element in the hp::FECollection. As
      * a special case, if the quadrature collection contains only a single
      * element (a frequent case if one wants to use the same quadrature object
-     * for all finite elements in an hp discretization, even if that may not
+     * for all finite elements in an hp-discretization, even if that may not
      * be the most efficient), then this single quadrature is used unless a
      * different value for this argument is specified. On the other hand, if a
      * value is given for this argument, it overrides the choice of
@@ -468,7 +468,7 @@ namespace hp
      * <code>cell-@>active_fe_index()</code>, i.e. the same index as that of
      * the finite element. As above, if the mapping collection contains only a
      * single element (a frequent case if one wants to use a $Q_1$ mapping for
-     * all finite elements in an hp discretization), then this single mapping
+     * all finite elements in an hp-discretization), then this single mapping
      * is used unless a different value for this argument is specified.
      */
     template <bool lda>
@@ -576,7 +576,7 @@ namespace hp
      * quadrature formula for each finite element in the hp::FECollection. As
      * a special case, if the quadrature collection contains only a single
      * element (a frequent case if one wants to use the same quadrature object
-     * for all finite elements in an hp discretization, even if that may not
+     * for all finite elements in an hp-discretization, even if that may not
      * be the most efficient), then this single quadrature is used unless a
      * different value for this argument is specified. On the other hand, if a
      * value is given for this argument, it overrides the choice of
@@ -589,7 +589,7 @@ namespace hp
      * <code>cell-@>active_fe_index()</code>, i.e. the same index as that of
      * the finite element. As above, if the mapping collection contains only a
      * single element (a frequent case if one wants to use a $Q_1$ mapping for
-     * all finite elements in an hp discretization), then this single mapping
+     * all finite elements in an hp-discretization), then this single mapping
      * is used unless a different value for this argument is specified.
      */
     template <bool lda>

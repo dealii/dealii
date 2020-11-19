@@ -15,7 +15,7 @@
 
 
 
-// check the complex case described in the hp paper by playing through all
+// check the complex case described in the hp-paper by playing through all
 // sorts of arrangements of finite elements on one coarse and one refined cell
 //
 // this code in particular tests some compensating code in

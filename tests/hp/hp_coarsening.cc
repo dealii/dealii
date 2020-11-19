@@ -15,8 +15,8 @@
 
 
 
-// validate hp decision algorithms on grid coarsening
-// that depend on the composition of h and p adaptivity flags
+// validate hp-decision algorithms on grid coarsening
+// that depend on the composition of h- and p-adaptivity flags
 
 
 #include <deal.II/dofs/dof_handler.h>
@@ -53,7 +53,7 @@ setup(Triangulation<dim> &tria, const DoFHandler<dim> &dh)
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
 
-  // Set h and p flags on all cells.
+  // Set h- and p-flags on all cells.
   for (const auto &cell : dh.active_cell_iterators())
     {
       cell->set_coarsen_flag();

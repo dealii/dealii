@@ -46,9 +46,9 @@ namespace FiniteElementDomination
    * Q(k') if $k\le k'$.
    *
    * This enum is used in the FiniteElement::compare_for_domination() function
-   * that is used in the context of hp finite element methods when determining
+   * that is used in the context of hp-finite element methods when determining
    * what to do at faces where two different finite elements meet (see the
-   * @ref hp_paper "hp paper"
+   * @ref hp_paper "hp-paper"
    * for a more detailed description of the following). In that case, the
    * degrees of freedom of one side need to be constrained to those on the
    * other side. The determination which side is which is based on the outcome
@@ -56,7 +56,7 @@ namespace FiniteElementDomination
    * to the dominating one.
    *
    * Note that there are situations where neither side dominates. The
-   * @ref hp_paper "hp paper"
+   * @ref hp_paper "hp-paper"
    * lists two case, with the simpler one being that a $Q_2\times Q_1$ vector-
    * valued element (i.e. a <code>FESystem(FE_Q(2),1,FE_Q(1),1)</code>) meets
    * a $Q_1\times Q_2$ element: here, for each of the two vector-components,
@@ -80,7 +80,7 @@ namespace FiniteElementDomination
    * could also be used by discontinuous elements, for example.
    *
    * More details on domination can be found in the
-   * @ref hp_paper "hp paper".
+   * @ref hp_paper "hp-paper".
    */
   enum Domination
   {

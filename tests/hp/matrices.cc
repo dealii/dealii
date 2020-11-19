@@ -15,7 +15,7 @@
 
 
 
-// like deal.II/matrices, but for hp objects. here, each hp object has only a
+// like deal.II/matrices, but for hp-objects. here, each hp-object has only a
 // single component, so we expect exactly the same output as for the old test.
 // matrices_hp tests for different finite elements
 

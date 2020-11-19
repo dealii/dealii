@@ -233,7 +233,7 @@ namespace parallel
  * The whole process of working with objects of this type is explained in
  * step-27. Many of the algorithms this class implements are described in
  * the
- * @ref hp_paper "hp paper".
+ * @ref hp_paper "hp-paper".
  *
  *
  * <h3>Active FE indices and their behavior under mesh refinement</h3>
@@ -702,7 +702,7 @@ public:
   distribute_mg_dofs();
 
   /**
-   * Returns whether this DoFHandler has hp capabilities.
+   * Returns whether this DoFHandler has hp-capabilities.
    */
   bool
   has_hp_capabilities() const;
@@ -1382,19 +1382,19 @@ public:
 
   /**
    * Exception used when a certain feature doesn't make sense when
-   * DoFHandler does not hp capabilities.
+   * DoFHandler does not hp-capabilities.
    */
   DeclExceptionMsg(ExcNotAvailableWithoutHP,
                    "The current function doesn't make sense when used with a "
-                   "DoFHandler without hp capabilities.");
+                   "DoFHandler without hp-capabilities.");
 
   /**
    * Exception used when a certain feature is not implemented when the
-   * DoFHandler has hp capabilities.
+   * DoFHandler has hp-capabilities.
    */
   DeclExceptionMsg(ExcNotImplementedWithHP,
                    "The current function has not yet been implemented for a "
-                   "DoFHandler with hp capabilities.");
+                   "DoFHandler with hp-capabilities.");
 
 private:
   /**
@@ -1525,7 +1525,7 @@ private:
   BlockInfo block_info_object;
 
   /**
-   * Boolean indicating whether or not the current DoFHandler has hp
+   * Boolean indicating whether or not the current DoFHandler has hp-
    * capabilities.
    */
   bool hp_capability_enabled;
@@ -1593,7 +1593,7 @@ private:
    * relevant active finite elements.
    *
    * @note In normal mode it is possible to access this data strucutre directly.
-   *   In hp mode, an indirection via hp_object_fe_indices/hp_object_fe_ptr is
+   *   In hp-mode, an indirection via hp_object_fe_indices/hp_object_fe_ptr is
    * necessary.
    */
   mutable std::vector<std::array<std::vector<offset_type>, dim + 1>>
@@ -1614,14 +1614,14 @@ private:
 
   /**
    * Active fe index of an active cell (identified by level and level index).
-   * This vector is only used in hp mode.
+   * This vector is only used in hp-mode.
    */
   mutable std::vector<std::vector<active_fe_index_type>>
     hp_cell_active_fe_indices;
 
   /**
    * Future fe index of an active cell (identified by level and level index).
-   * This vector is only used in hp mode.
+   * This vector is only used in hp-mode.
    */
   mutable std::vector<std::vector<active_fe_index_type>>
     hp_cell_future_fe_indices;

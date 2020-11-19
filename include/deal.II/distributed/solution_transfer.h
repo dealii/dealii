@@ -153,9 +153,9 @@ namespace parallel
      * @endcode
      *
      *
-     * <h3>Note on usage with DoFHandler with hp capabilities</h3>
+     * <h3>Note on usage with DoFHandler with hp-capabilities</h3>
      *
-     * Since data on DoFHandler objects with hp capabilities is associated with
+     * Since data on DoFHandler objects with hp-capabilities is associated with
      * many different FiniteElement objects, each cell's data has to be
      * processed with its corresponding `future_fe_index`. Further, if
      * refinement is involved, data will be packed on the parent cell with its
@@ -166,11 +166,11 @@ namespace parallel
      * hp::FECollection::find_dominated_fe_extended() for more information).
      *
      * Transferring a solution across refinement works exactly like in the
-     * non-hp case. However, when considering serialization, we also have to
+     * non-hp-case. However, when considering serialization, we also have to
      * store the active_fe_indices in an additional step. A code snippet
      * demonstrating serialization with the
      * parallel::distributed::SolutionTransfer class with DoFHandler objects
-     * with hp capabilities is provided in the following. Here VectorType is
+     * with hp-capabilities is provided in the following. Here VectorType is
      * your favorite vector type, e.g. PETScWrappers::MPI::Vector,
      * TrilinosWrappers::MPI::Vector, or corresponding block vectors.
      *

@@ -16,7 +16,7 @@
 
 
 // a test adapted from little programs by Markus Buerg that makes sure
-// we compute the same solution for hp and non-hp cases
+// we compute the same solution for hp- and non-hp-cases
 
 
 #include <deal.II/base/function.h>

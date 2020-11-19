@@ -118,7 +118,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * In most applications it is beneficial to introduce enrichments only in
  * some part of the domain (e.g. around a crack tip) and use standard FE (e.g.
- * FE_Q) elsewhere. This can be achieved by using the hp finite element
+ * FE_Q) elsewhere. This can be achieved by using the hp-finite element
  * framework in deal.II that allows for the use of different elements on
  * different cells. To make the resulting space $C^0$ continuous, it is then
  * necessary for the DoFHandler class and
@@ -194,7 +194,7 @@ public:
    * element within a DoFHandler with hp-capabilities.
    *
    * See the discussion in the class documentation on how to use this element
-   * in the context of hp finite element methods.
+   * in the context of hp-finite element methods.
    */
   FE_Enriched(const FiniteElement<dim, spacedim> &fe_base);
 
@@ -336,7 +336,7 @@ public:
    */
 
   /**
-   * Return whether this element implements hp constraints.
+   * Return whether this element implements hp-constraints.
    *
    * This function returns @p true if and only if all its base elements return @p true
    * for this function.
@@ -381,7 +381,7 @@ public:
     const unsigned int                  face_no = 0) const override;
 
   /**
-   * If, on a vertex, several finite elements are active, the hp code first
+   * If, on a vertex, several finite elements are active, the hp-code first
    * assigns the degrees of freedom of each of these FEs different global
    * indices. It then calls this function to find out which of them should get
    * identical values, and consequently can receive the same global DoF index.

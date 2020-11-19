@@ -99,8 +99,8 @@ test()
 
 
   // We flag the first half of all cells to be refined and the last half of all
-  // cells to be coarsened for p adapativity. Ultimately, the first quarter of
-  // all cells will be flagged for p refinement, and the last quarter for p
+  // cells to be coarsened for p-adapativity. Ultimately, the first quarter of
+  // all cells will be flagged for p-refinement, and the last quarter for p-
   // coarsening.
 
   const unsigned int n_active = tria.n_active_cells();

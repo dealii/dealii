@@ -16,7 +16,7 @@
 
 
 // a test where a degree of freedom was constrained multiple times,
-// but with different weights. see the hp paper for more on this
+// but with different weights. see the hp-paper for more on this
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>

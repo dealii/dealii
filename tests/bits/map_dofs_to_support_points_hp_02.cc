@@ -32,7 +32,7 @@
 // check
 //   DoFTools::
 //   map_dofs_to_support_points(...);
-// for the hp case with different finite elements
+// for the hp-case with different finite elements
 // on different cells.
 
 

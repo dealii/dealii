@@ -16,7 +16,7 @@
 
 
 // Like hp/matrices, but only the boundary mass matrices for vector-valued
-// (non-primitive) hp objects are being tested.
+// (non-primitive) hp-objects are being tested.
 
 
 #include <deal.II/base/function_lib.h>

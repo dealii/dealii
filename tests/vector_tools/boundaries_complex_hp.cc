@@ -16,7 +16,7 @@
 
 
 // check interpolation of boundary values for complex-valued
-// objects and the hp case
+// objects and the hp-case
 
 
 #include <deal.II/base/function_lib.h>

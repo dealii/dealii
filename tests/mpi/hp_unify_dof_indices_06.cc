@@ -15,9 +15,9 @@
 
 
 
-// have a 2x2 coarse mesh (or 2x2x1) and verify DoF indices in the hp
+// have a 2x2 coarse mesh (or 2x2x1) and verify DoF indices in the hp-
 // case with an FECollection that contains multiple copies of the same
-// FE_Q(2) element. the hp code will unify DoF indices on boundaries
+// FE_Q(2) element. the hp-code will unify DoF indices on boundaries
 // between all subdomains.
 //
 // in this testcase, the dominating FE object is located on a cell

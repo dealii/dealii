@@ -32,7 +32,7 @@
 // check
 //   DoFTools::
 //   count_dofs_per_component (...);
-// for the hp case
+// for the hp-case
 //
 // in contrast to the _01 test also check that this works if the element
 // collection has more than one element

@@ -351,9 +351,9 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
       else if (cell->has_children() && cell->child(0)->coarsen_flag_set())
         {
           // we will need to interpolate from the children of this cell
-          // to the current one. in the hp context, this also means
+          // to the current one. in the hp-context, this also means
           // we need to figure out which finite element space to interpolate
-          // to since that is not implied by the global FE as in the non-hp
+          // to since that is not implied by the global FE as in the non-hp-
           // case. we choose the 'least dominant fe' on all children from
           // the associated FECollection.
           std::set<unsigned int> fe_indices_children;
@@ -505,7 +505,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
                 {
                   // make sure that the size of the stored indices is the same
                   // as dofs_per_cell. this is kind of a test if we use the same
-                  // fe in the hp case. to really do that test we would have to
+                  // fe in the hp-case. to really do that test we would have to
                   // store the fe_index of all cells
                   const Vector<typename VectorType::value_type> *data = nullptr;
                   const unsigned int active_fe_index = cell->active_fe_index();

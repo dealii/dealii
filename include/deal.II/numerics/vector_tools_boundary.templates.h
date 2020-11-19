@@ -2928,13 +2928,13 @@ namespace VectorTools
       // compute_face_projection_curl_conforming_l2
       //
       // For details see (for example) section 4.2:
-      // Electromagnetic scattering simulation using an H (curl) conforming hp
+      // Electromagnetic scattering simulation using an H (curl) conforming hp-
       // finite element method in three dimensions, PD Ledger, K Morgan, O
       // Hassan, Int. J.  Num. Meth. Fluids, Volume 53, Issue 8, pages
       // 1267-1296, 20 March 2007:
       // http://onlinelibrary.wiley.com/doi/10.1002/fld.1223/abstract
 
-      // Create hp FEcollection, dof_handler can be either hp or standard type.
+      // Create hp-FEcollection, dof_handler can be either hp- or standard type.
       // From here on we can treat it like a hp-namespace object.
       const hp::FECollection<dim> &fe_collection(
         dof_handler.get_fe_collection());
@@ -3216,7 +3216,7 @@ namespace VectorTools
     AffineConstraints<number> &  constraints,
     const Mapping<dim> &         mapping)
   {
-    // non-hp version - calls the internal
+    // non-hp-version - calls the internal
     // compute_project_boundary_values_curl_conforming_l2() function
     // above after recasting the mapping.
 
@@ -3240,7 +3240,7 @@ namespace VectorTools
     AffineConstraints<number> &            constraints,
     const hp::MappingCollection<dim, dim> &mapping_collection)
   {
-    // hp version - calls the internal
+    // hp-version - calls the internal
     // compute_project_boundary_values_curl_conforming_l2() function above.
     internals::compute_project_boundary_values_curl_conforming_l2(
       dof_handler,

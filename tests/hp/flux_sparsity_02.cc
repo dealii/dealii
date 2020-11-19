@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 // A second test that checks make_flux_sparsity_pattern
-// with scalar valued hp objects.
+// with scalar valued hp-objects.
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>

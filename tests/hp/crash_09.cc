@@ -16,7 +16,7 @@
 
 
 // a test where a degree of freedom was constrained multiple times,
-// but with different weights. see the hp paper for more on this
+// but with different weights. see the hp-paper for more on this
 
 char logname[] = "output";
 

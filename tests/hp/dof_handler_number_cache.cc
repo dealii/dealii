@@ -16,7 +16,7 @@
 
 
 // Check the consistency of the number cache of DoFHandler for a sequential
-// object. Like deal.II/dof_handler_number_cache but for an hp object
+// object. Like deal.II/dof_handler_number_cache but for an hp-object
 
 
 #include <deal.II/base/tensor.h>

@@ -570,11 +570,11 @@ public:
 
   /**
    * Return whether this element implements its hanging node constraints in
-   * the new way, which has to be used to make elements "hp compatible".
+   * the new way, which has to be used to make elements "hp-compatible".
    *
    * For the FE_Q_Hierarchical class the result is always true (independent of
    * the degree of the element), as it implements the complete set of
-   * functions necessary for hp capability.
+   * functions necessary for hp-capability.
    */
   virtual bool
   hp_constraints_are_implemented() const override;
@@ -597,7 +597,7 @@ public:
       RefinementCase<dim>::isotropic_refinement) const override;
 
   /**
-   * If, on a vertex, several finite elements are active, the hp code first
+   * If, on a vertex, several finite elements are active, the hp-code first
    * assigns the degrees of freedom of each of these FEs different global
    * indices. It then calls this function to find out which of them should get
    * identical values, and consequently can receive the same global DoF index.

@@ -181,7 +181,7 @@ FE_FaceQ<dim, spacedim>::get_subface_interpolation_matrix(
       // Make sure that the element for which the DoFs should be constrained
       // is the one with the higher polynomial degree.  Actually the procedure
       // will work also if this assertion is not satisfied. But the matrices
-      // produced in that case might lead to problems in the hp procedures,
+      // produced in that case might lead to problems in the hp-procedures,
       // which use this method.
       Assert(
         this->n_dofs_per_face(face_no) <= source_fe->n_dofs_per_face(face_no),
@@ -910,7 +910,7 @@ FE_FaceP<dim, spacedim>::get_subface_interpolation_matrix(
       // Make sure that the element for which the DoFs should be constrained
       // is the one with the higher polynomial degree.  Actually the procedure
       // will work also if this assertion is not satisfied. But the matrices
-      // produced in that case might lead to problems in the hp procedures,
+      // produced in that case might lead to problems in the hp-procedures,
       // which use this method.
       Assert(
         this->n_dofs_per_face(face_no) <= source_fe->n_dofs_per_face(face_no),

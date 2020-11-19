@@ -287,7 +287,7 @@ DataOutStack<dim, spacedim, void>::build_patches(
   // create collection objects from
   // single quadratures,
   // and finite elements. if we have
-  // an hp DoFHandler,
+  // an hp-DoFHandler,
   // dof_handler.get_fe() returns a
   // collection of which we do a
   // shallow copy instead

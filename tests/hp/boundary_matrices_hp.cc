@@ -16,7 +16,7 @@
 
 
 // Same as hp/boundary_matrices, but with different FE objects. Tests
-// the boundary mass matrces for vector-valued (non-primiteve) hp
+// the boundary mass matrces for vector-valued (non-primiteve) hp-
 // FE objects.
 
 

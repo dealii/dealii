@@ -208,7 +208,7 @@ transfer(std::ostream &out)
               std::fabs(func.value(fe_val.quadrature_point(q), 0) - vals[q]);
           }
       }
-    deallog << "Error in interpolating hp FE_Q: " << error << std::endl;
+    deallog << "Error in interpolating hp-FE_Q: " << error << std::endl;
   }
   {
     double                                         error = 0;
@@ -231,7 +231,7 @@ transfer(std::ostream &out)
               std::fabs(func.value(fe_val.quadrature_point(q), 0) - vals[q]);
           }
       }
-    deallog << "Error in interpolating hp FE_DGQ: " << error << std::endl;
+    deallog << "Error in interpolating hp-FE_DGQ: " << error << std::endl;
   }
 }
 

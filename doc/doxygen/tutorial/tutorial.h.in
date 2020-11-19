@@ -325,7 +325,7 @@
  *
  *   <tr valign="top">
  *       <td>step-27</td>
- *       <td> The hp finite element method.
+ *       <td> The hp-finite element method.
  *       <br/> Keywords: hp::DoFHandler, hp::FECollection, hp::QCollection,
  *       FESeries::Fourier, Triangulation::create_triangulation()
  *       </td></tr>
@@ -840,7 +840,7 @@
  *   </tr>
  *
  *   <tr valign="top">
- *     <td> hp finite elements
+ *     <td> hp-finite elements
  *     </td>
  *     <td>
  *       step-27,

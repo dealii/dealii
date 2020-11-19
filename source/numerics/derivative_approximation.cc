@@ -752,7 +752,7 @@ namespace DerivativeApproximation
       // create collection objects from
       // single quadratures, mappings,
       // and finite elements. if we have
-      // an hp DoFHandler,
+      // an hp-DoFHandler,
       // dof_handler.get_fe() returns a
       // collection of which we do a
       // shallow copy instead

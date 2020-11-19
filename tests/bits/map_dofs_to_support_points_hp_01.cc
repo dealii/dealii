@@ -31,7 +31,7 @@
 // check
 //   DoFTools::
 //   map_dofs_to_support_points(...);
-// for the hp case
+// for the hp-case
 
 
 using namespace std;

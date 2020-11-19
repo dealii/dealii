@@ -82,7 +82,7 @@ namespace VectorTools
       AffineConstraints<typename VectorType::value_type>());
 
   /**
-   * Like the previous set of functions, but for hp objects.
+   * Like the previous set of functions, but for hp-objects.
    */
   template <int dim, int spacedim, typename VectorType>
   void
@@ -96,7 +96,7 @@ namespace VectorTools
       AffineConstraints<typename VectorType::value_type>());
 
   /**
-   * Like the previous set of functions, but for hp objects.
+   * Like the previous set of functions, but for hp-objects.
    */
   template <int dim, int spacedim, typename VectorType>
   void
@@ -146,7 +146,7 @@ namespace VectorTools
       std::set<types::boundary_id>());
 
   /**
-   * Same as the set of functions above, but for hp objects.
+   * Same as the set of functions above, but for hp-objects.
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"

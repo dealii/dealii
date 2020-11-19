@@ -2445,7 +2445,7 @@ DoFHandler<dim, spacedim>::set_fe(const hp::FECollection<dim, spacedim> &ff)
       AssertThrow(
         hp_capability_enabled || !contains_multiple_fes,
         ExcMessage(
-          "You cannot re-enable hp capabilities after you registered a single "
+          "You cannot re-enable hp-capabilities after you registered a single "
           "finite element. Please create a new DoFHandler object instead."));
     }
 
@@ -2524,7 +2524,7 @@ DoFHandler<dim, spacedim>::distribute_dofs(
       AssertThrow(
         hp_capability_enabled || !contains_multiple_fes,
         ExcMessage(
-          "You cannot re-enable hp capabilities after you registered a single "
+          "You cannot re-enable hp-capabilities after you registered a single "
           "finite element. Please call reinit() or create a new DoFHandler "
           "object instead."));
     }

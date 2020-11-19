@@ -15,9 +15,9 @@
 
 
 
-// have a 2x2 coarse mesh (or 2x2x1) and verify DoF indices in the hp
+// have a 2x2 coarse mesh (or 2x2x1) and verify DoF indices in the hp-
 // case with an FECollection that contains a FE_Q(4) and a FE_Q(2) element.
-// the hp code will unify DoF indices on boundaries between all subdomains.
+// the hp-code will unify DoF indices on boundaries between all subdomains.
 //
 // in this testcase, each cell has a face neighbor with a different
 // active_fe_index, which is either locally owned or a ghost cell.

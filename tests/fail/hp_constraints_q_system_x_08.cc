@@ -15,7 +15,7 @@
 
 
 
-// check that computation of hp constraints works for FESystem(FE_Q) elements
+// check that computation of hp-constraints works for FESystem(FE_Q) elements
 // correctly on a uniformly refined mesh for functions of degree q
 
 // these tests check that we can deal with FESystem(FE_Q(p),FE_DGQ(q)) for

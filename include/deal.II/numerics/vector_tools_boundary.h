@@ -625,7 +625,7 @@ namespace VectorTools
    * a problem when using the previous function in conjunction with non-
    * rectangular geometries (i.e. elements with non-rectangular faces). The
    * L2-projection method used has been taken from the paper "Electromagnetic
-   * scattering simulation using an H (curl) conforming hp finite element
+   * scattering simulation using an H (curl) conforming hp-finite element
    * method in three dimensions" by PD Ledger, K Morgan and O Hassan ( Int. J.
    * Num. Meth. Fluids, Volume 53, Issue 8, pages 1267-1296).
    *

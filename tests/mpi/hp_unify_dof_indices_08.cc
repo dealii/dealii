@@ -15,12 +15,12 @@
 
 
 
-// Read in a large grid from a file and distribute hp DoFs on it using
+// Read in a large grid from a file and distribute hp-DoFs on it using
 // FE_Q elements of different orders on different cells. The
 // active_fe_index on each cell is determined in a mostly random way,
 // but so that it is the same regardless of the number of processors.
 //
-// We used to treat hp DoF unification on vertices and faces
+// We used to treat hp-DoF unification on vertices and faces
 // differently depending on whether we are in the interior of a
 // subdomain or at a processor boundary. But later versions of the
 // code did away with this distinction, and now the total number of

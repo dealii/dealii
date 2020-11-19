@@ -97,7 +97,7 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
     // children recursively.
     {
       // we are on a non-active cell. these do not have any finite
-      // element associated with them in the hp context (in the non-hp
+      // element associated with them in the hp-context (in the non-hp-
       // context, we can simply assume that the FE space to which we
       // want to interpolate is the same as for all elements in the
       // mesh). consequently, we cannot interpolate from children's FE

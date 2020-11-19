@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// common framework to check hp constraints for fe without support points
+// common framework to check hp-constraints for fe without support points
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/function_lib.h>

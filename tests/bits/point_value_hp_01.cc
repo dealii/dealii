@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// check VectorTools::point_value for a hp dofhandler.
+// check VectorTools::point_value for a hp-dofhandler.
 
 
 

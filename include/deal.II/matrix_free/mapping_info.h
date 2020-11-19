@@ -104,7 +104,7 @@ namespace internal
      * The third component is a descriptor of data from the unit cells, called
      * QuadratureDescriptor, which contains the quadrature weights and
      * permutations of how to go through quadrature points in case of face
-     * data. The latter comes in a vector for the support of hp adaptivity,
+     * data. The latter comes in a vector for the support of hp-adaptivity,
      * with several data fields for the individual quadrature formulas.
      *
      * @ingroup matrixfree
@@ -188,7 +188,7 @@ namespace internal
       /**
        * A class describing the layout of the sections in the @p data_storage
        * field and also includes some data that depends on the number of
-       * quadrature points in the hp context such as the inner quadrature
+       * quadrature points in the hp-context such as the inner quadrature
        * formula and re-indexing for faces that are not in the standard
        * orientation.
        */
@@ -289,7 +289,7 @@ namespace internal
 
       /**
        * Returns the quadrature index for a given number of quadrature
-       * points. If not in hp mode or if the index is not found, this
+       * points. If not in hp-mode or if the index is not found, this
        * function always returns index 0. Hence, this function does not
        * check whether the given degree is actually present.
        */
@@ -456,7 +456,7 @@ namespace internal
 
       /**
        * Internal function to compute the geometry for the case the mapping is
-       * a MappingQ and a single quadrature formula per slot (non-hp case) is
+       * a MappingQ and a single quadrature formula per slot (non-hp-case) is
        * used. This method computes all data from the underlying cell
        * quadrature points using the fast operator evaluation techniques from
        * the matrix-free framework itself, i.e., it uses a polynomial

@@ -427,7 +427,7 @@ Laplace<dim>::refine_grid(const unsigned int cycle)
   // 3.2. Mark cells for h-refinement
   mark_h_cells();
 
-  // 3.3. Substitute h for p refinement
+  // 3.3. Substitute h- for p-refinement
   substitute_h_for_p();
 
   // prepare refinement and store number of flagged cells
@@ -457,7 +457,7 @@ Laplace<dim>::refine_grid(const unsigned int cycle)
   // 3.5. h-refinement and p-refinement
   triangulation.execute_coarsening_and_refinement();
 
-  // FIXME: some hp strategies might need:
+  // FIXME: some hp-strategies might need:
   // post_execute_coarsening_and_refinement();
 
   // 3.6. Setup

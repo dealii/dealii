@@ -16,7 +16,7 @@
 
 
 // SolutionTransfer wanted to compute interpolation matrices between
-// all pairs of elements used on a mesh in the hp case. unfortunately,
+// all pairs of elements used on a mesh in the hp-case. unfortunately,
 // not all pairs are actually supported, e.g. between FE_Nothing and
 // FE_Q, but that shouldn't matter as long as these combinations are
 // never exercised on actual cells

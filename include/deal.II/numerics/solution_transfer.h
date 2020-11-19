@@ -291,7 +291,7 @@ DEAL_II_NAMESPACE_OPEN
  * necessary to call AffineConstraints::distribute().
  *
  *
- * <h3>Implementation in the context of hp finite elements</h3>
+ * <h3>Implementation in the context of hp-finite elements</h3>
  *
  * In the case of DoFHandlers with hp-capabilities, nothing defines which of the
  * finite elements that are part of the hp::FECollection associated with the
@@ -323,7 +323,7 @@ DEAL_II_NAMESPACE_OPEN
  *   active_fe_index for a different space post-refinement and before calling
  *   DoFHandler::distribute_dofs()).
  *
- * @note In the context of hp refinement, if cells are coarsened or the
+ * @note In the context of hp-refinement, if cells are coarsened or the
  * polynomial degree is lowered on some cells, then the old finite element
  * space is not a subspace of the new space and you may run into the same
  * situation as discussed above with hanging nodes. You may want to consider

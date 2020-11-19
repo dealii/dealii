@@ -16,7 +16,7 @@
 
 
 // validate combination of error prediction and cell data transfer algorithms
-// for hp adaptive methods
+// for hp-adaptive methods
 
 
 #include <deal.II/dofs/dof_handler.h>
