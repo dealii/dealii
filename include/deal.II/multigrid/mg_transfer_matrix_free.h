@@ -505,6 +505,12 @@ MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
 
   const FiniteElement<dim, spacedim> &fe = dof_handler.get_fe();
 
+  for (unsigned int level = min_level; level <= max_level; ++level)
+    if (dst[level].size() != dof_handler.n_dofs(level) ||
+        dst[level].local_size() !=
+          dof_handler.locally_owned_mg_dofs(level).n_elements())
+      dst[level].reinit(this->vector_partitioners[level]);
+
   // copy fine level vector to active cells in MG hierarchy
   this->copy_to_mg(dof_handler, dst, src, true);
 
@@ -513,15 +519,22 @@ MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
   // constraints...
 
   // do the transfer from level to level-1:
+  dst[max_level].update_ghost_values();
   for (unsigned int level = max_level; level > min_level; --level)
     {
       // auxiliary vector which always has ghost elements
-      LinearAlgebra::distributed::Vector<Number> ghosted_fine(
-        this->vector_partitioners[level]);
-      ghosted_fine.copy_locally_owned_data_from(dst[level]);
-      ghosted_fine.update_ghost_values();
-      LinearAlgebra::distributed::Vector<Number> ghosted_coarse(
-        this->vector_partitioners[level - 1]);
+      const LinearAlgebra::distributed::Vector<Number> *input = nullptr;
+      LinearAlgebra::distributed::Vector<Number>        ghosted_fine;
+      if (dst[level].get_partitioner().get() ==
+          this->vector_partitioners[level].get())
+        input = &dst[level];
+      else
+        {
+          ghosted_fine.reinit(this->vector_partitioners[level]);
+          ghosted_fine.copy_locally_owned_data_from(dst[level]);
+          ghosted_fine.update_ghost_values();
+          input = &ghosted_fine;
+        }
 
       std::vector<Number> dof_values_coarse(fe.n_dofs_per_cell());
       Vector<Number>      dof_values_fine(fe.n_dofs_per_cell());
@@ -541,7 +554,7 @@ MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
               {
                 cell->child(child)->get_mg_dof_indices(dof_indices);
                 for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
-                  dof_values_fine(i) = ghosted_fine(dof_indices[i]);
+                  dof_values_fine(i) = (*input)(dof_indices[i]);
                 fe.get_restriction_matrix(child, cell->refinement_case())
                   .vmult(tmp, dof_values_fine);
                 for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
@@ -552,9 +565,12 @@ MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
               }
             cell->get_mg_dof_indices(dof_indices);
             for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
-              ghosted_coarse(dof_indices[i]) = dof_values_coarse[i];
+              if (dof_handler.locally_owned_mg_dofs(level - 1).is_element(
+                    dof_indices[i]))
+                dst[level - 1](dof_indices[i]) = dof_values_coarse[i];
           }
-      dst[level - 1].copy_locally_owned_data_from(ghosted_coarse);
+
+      dst[level - 1].update_ghost_values();
     }
 }
 

@@ -199,7 +199,7 @@ test(const unsigned int n_ref = 0)
 
   MGTransferMatrixFree<dim, LevelNumberType> mg_transfer_euler(
     mg_constrained_dofs_euler);
-  mg_transfer_euler.build(dof_handler);
+  mg_transfer_euler.build(dof_handler_euler);
 
   // now the core of the test:
   const unsigned int max_level =
