@@ -707,11 +707,6 @@ public:
    * Add an entry to a given line. In other words, this function adds
    * a term $a_{ij} x_j$ to the constraints for the $i$th degree of freedom.
    *
-   * This function searches existing constraints from the back
-   * to the front, so clever programming would add a new line (which is pushed
-   * to the back) and immediately afterwards fill the entries of that line.
-   * This way, no expensive searching is needed.
-   *
    * If an entry with the same indices as the one this function call denotes
    * already exists, then this function simply returns provided that the value
    * of the entry is the same. Thus, it does no harm to enter a constraint
