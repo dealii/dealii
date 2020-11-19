@@ -846,15 +846,12 @@ namespace internal
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
         const std::vector<unsigned int> &              active_fe_index,
-        const dealii::hp::MappingCollection<dim> &     mapping_in,
+        const dealii::hp::MappingCollection<dim> &     mapping,
         MappingInfo<dim, Number, VectorizedArrayType> &mapping_info,
         std::pair<std::vector<
                     MappingInfoStorage<dim, dim, Number, VectorizedArrayType>>,
                   CompressedCellData<dim, Number, VectorizedArrayType>> &data)
       {
-        AssertDimension(mapping_in.size(), 1);
-        const auto &mapping = mapping_in[0];
-
         FE_Nothing<dim> dummy_fe;
 
         // when we make comparisons about the size of Jacobians we need to
@@ -920,13 +917,15 @@ namespace internal
               const unsigned int hp_quad_index =
                 mapping_info.cell_data[my_q].descriptor.size() == 1 ? 0 :
                                                                       fe_index;
+              const unsigned int hp_mapping_index =
+                mapping.size() == 1 ? 0 : fe_index;
               const unsigned int n_q_points = mapping_info.cell_data[my_q]
                                                 .descriptor[hp_quad_index]
                                                 .n_q_points;
               if (fe_values[my_q][fe_index].get() == nullptr)
                 fe_values[my_q][fe_index] =
                   std::make_shared<dealii::FEValues<dim>>(
-                    mapping,
+                    mapping[hp_mapping_index],
                     dummy_fe,
                     mapping_info.cell_data[my_q]
                       .descriptor[hp_quad_index]
@@ -1076,8 +1075,9 @@ namespace internal
                               cells[cell * VectorizedArrayType::size() + v]
                                 .second);
                           const Point<dim> p =
-                            mapping.transform_unit_to_real_cell(cell_it,
-                                                                Point<dim>());
+                            mapping[hp_mapping_index]
+                              .transform_unit_to_real_cell(cell_it,
+                                                           Point<dim>());
                           for (unsigned int d = 0; d < dim; ++d)
                             quad_point[d][v] = p[d];
                         }
