@@ -220,6 +220,34 @@ namespace Particles
   }
 
 
+  template <int dim, int spacedim>
+  void
+  Particle<dim, spacedim>::update_particle_data(const void *&data)
+  {
+    const types::particle_index *id_data =
+      static_cast<const types::particle_index *>(data);
+    id                  = *id_data++;
+    const double *pdata = reinterpret_cast<const double *>(id_data);
+
+    for (unsigned int i = 0; i < spacedim; ++i)
+      location(i) = *pdata++;
+
+    for (unsigned int i = 0; i < dim; ++i)
+      reference_location(i) = *pdata++;
+
+    // See if there are properties to load
+    if (has_properties())
+      {
+        const ArrayView<double> particle_properties =
+          property_pool->get_properties(properties);
+        const unsigned int size = particle_properties.size();
+        for (unsigned int i = 0; i < size; ++i)
+          particle_properties[i] = *pdata++;
+      }
+
+    data = static_cast<const void *>(pdata);
+  }
+
 
   template <int dim, int spacedim>
   std::size_t
