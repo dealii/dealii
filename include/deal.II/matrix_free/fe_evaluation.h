@@ -3266,20 +3266,27 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
                                      .cell_data[quad_no_in]
                                      .quad_index_from_n_q_points(n_q_points)) :
                         0)
-  , n_quadrature_points(fe_degree != numbers::invalid_unsigned_int ?
-                          n_q_points :
-                          (is_face ? data_in
-                                       .get_shape_info(dof_no,
-                                                       quad_no_in,
-                                                       active_fe_index,
-                                                       active_quad_index)
-                                       .n_q_points_face :
-                                     data_in
-                                       .get_shape_info(dof_no,
-                                                       quad_no_in,
-                                                       active_fe_index,
-                                                       active_quad_index)
-                                       .n_q_points))
+  , n_quadrature_points(
+      fe_degree != numbers::invalid_unsigned_int ?
+        n_q_points :
+        (is_face ? data_in
+                     .get_shape_info(
+                       dof_no,
+                       quad_no_in,
+                       data_in.get_dof_info(dof_no)
+                         .component_to_base_index[first_selected_component],
+                       active_fe_index,
+                       active_quad_index)
+                     .n_q_points_face :
+                   data_in
+                     .get_shape_info(
+                       dof_no,
+                       quad_no_in,
+                       data_in.get_dof_info(dof_no)
+                         .component_to_base_index[first_selected_component],
+                       active_fe_index,
+                       active_quad_index)
+                     .n_q_points))
   , matrix_info(&data_in)
   , dof_info(&data_in.get_dof_info(dof_no))
   , mapping_data(
