@@ -534,8 +534,8 @@ public:
   using offset_type = unsigned int;
 
   /**
-   * Invalid active_fe_index which will be used as a default value to determine
-   *  whether a future_fe_index has been set or not.
+   * Invalid active FE index which will be used as a default value to determine
+   *  whether a future FE index has been set or not.
    */
   static const active_fe_index_type invalid_active_fe_index =
     static_cast<active_fe_index_type>(-1);
@@ -1270,7 +1270,7 @@ public:
   /**
    * Whenever serialization with a parallel::distributed::Triangulation as the
    * underlying triangulation is considered, we also need to consider storing
-   * the active_fe_indices on all active cells as well.
+   * the active FE indices on all active cells as well.
    *
    * This function registers that these indices are to be stored whenever the
    * parallel::distributed::Triangulation::save() function is called on the
@@ -1289,10 +1289,10 @@ public:
   /**
    * Whenever serialization with a parallel::distributed::Triangulation as the
    * underlying triangulation is considered, we also need to consider storing
-   * the active_fe_indices on all active cells as well.
+   * the active FE indices on all active cells as well.
    *
    * This function deserializes and distributes the previously stored
-   * active_fe_indices on all active cells.
+   * active FE indices on all active cells.
    *
    * @note Currently only implemented for triangulations of type
    *   parallel::distributed::Triangulation. An assertion will be triggered if
@@ -1376,7 +1376,7 @@ public:
   DeclException2(ExcInvalidFEIndex,
                  int,
                  int,
-                 << "The mesh contains a cell with an active_fe_index of "
+                 << "The mesh contains a cell with an active FE index of "
                  << arg1 << ", but the finite element collection only has "
                  << arg2 << " elements");
 
@@ -1477,7 +1477,7 @@ private:
 
   /**
    * Whenever the underlying triangulation changes by either
-   * h/p refinement/coarsening and serialization, the active_fe_index of cells
+   * h/p-refinement/coarsening and serialization, the active FE index of cells
    * needs to be transferred. This structure stores all temporary information
    * required during that process.
    */
@@ -1502,14 +1502,14 @@ private:
     std::map<const cell_iterator, const unsigned int> coarsened_cells_fe_index;
 
     /**
-     * Container to temporarily store the active_fe_index of every locally
+     * Container to temporarily store the active FE index of every locally
      * owned cell for transfer across parallel::distributed::Triangulation
      * objects.
      */
     std::vector<unsigned int> active_fe_indices;
 
     /**
-     * Helper object to transfer all active_fe_indices on
+     * Helper object to transfer all active FE indices on
      * parallel::distributed::Triangulation objects during
      * refinement/coarsening and serialization.
      */
@@ -1600,7 +1600,7 @@ private:
     object_dof_ptr;
 
   /**
-   * Active fe indices of each geometric object. Identification
+   * Active FE indices of each geometric object. Identification
    * of the appropriate position of a cell in the vectors is done via
    * hp_object_fe_ptr (CRS scheme).
    */
@@ -1608,19 +1608,19 @@ private:
     hp_object_fe_indices;
 
   /**
-   * Pointer to the first fe index of a geometric object.
+   * Pointer to the first FE index of a geometric object.
    */
   mutable std::array<std::vector<offset_type>, dim + 1> hp_object_fe_ptr;
 
   /**
-   * Active fe index of an active cell (identified by level and level index).
+   * Active FE index of an active cell (identified by level and level index).
    * This vector is only used in hp-mode.
    */
   mutable std::vector<std::vector<active_fe_index_type>>
     hp_cell_active_fe_indices;
 
   /**
-   * Future fe index of an active cell (identified by level and level index).
+   * Future FE index of an active cell (identified by level and level index).
    * This vector is only used in hp-mode.
    */
   mutable std::vector<std::vector<active_fe_index_type>>
@@ -1721,7 +1721,7 @@ private:
    * Update tables for active and future fe_indices.
    *
    * Whenever the underlying triangulation changes (either by adaptation or
-   * deserialization), active and future fe index tables will be adjusted to the
+   * deserialization), active and future FE index tables will be adjusted to the
    * current structure of the triangulation. Missing values of active and future
    * indices will be initialized with their defaults (see
    * create_active_fe_table()).
@@ -1737,7 +1737,7 @@ private:
    * signal just before the associated Triangulation or
    * parallel::shared::Triangulation is modified.
    *
-   * The function that stores the active_fe_indices of all cells that will
+   * The function that stores the active FE indices of all cells that will
    * be refined or coarsened before the refinement happens, so that
    * they can be set again after refinement.
    */
@@ -1749,7 +1749,7 @@ private:
    * signal just after the associated Triangulation or
    * parallel::shared::Triangulation is modified.
    *
-   * The function that restores the active_fe_indices of all cells that
+   * The function that restores the active FE indices of all cells that
    * were refined or coarsened.
    */
   void
@@ -1760,7 +1760,7 @@ private:
    * signal just before the associated parallel::distributed::Triangulation is
    * modified.
    *
-   * The function that stores all active_fe_indices on locally owned cells for
+   * The function that stores all active FE indices on locally owned cells for
    * distribution over all participating processors.
    */
   void
@@ -1771,7 +1771,7 @@ private:
    * signal just after the associated parallel::distributed::Triangulation is
    * modified.
    *
-   * The function that restores all active_fe_indices on locally owned cells
+   * The function that restores all active FE indices on locally owned cells
    * that have been communicated.
    */
   void

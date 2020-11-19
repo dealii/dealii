@@ -60,7 +60,7 @@ test()
 
   DoFHandler<dim> dgq_dof_handler(tria);
 
-  // randomly assign fes
+  // randomly assign FEs
   for (const auto &cell : dgq_dof_handler.active_cell_iterators())
     if (cell->is_locally_owned())
       cell->set_active_fe_index(Testing::rand() % max_degree);

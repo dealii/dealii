@@ -116,7 +116,7 @@ main()
   // out the numbers of the dofs that
   // belong to the shared edge
   // (that's the one that has three
-  // different fe indices associated
+  // different FE indices associated
   // with it). note that there is
   // only one such line so we can
   // quit the loop once we find it

@@ -167,7 +167,7 @@ namespace parallel
      *
      * Transferring a solution across refinement works exactly like in the
      * non-hp-case. However, when considering serialization, we also have to
-     * store the active_fe_indices in an additional step. A code snippet
+     * store the active FE indices in an additional step. A code snippet
      * demonstrating serialization with the
      * parallel::distributed::SolutionTransfer class with DoFHandler objects
      * with hp-capabilities is provided in the following. Here VectorType is
@@ -197,7 +197,7 @@ namespace parallel
      *
      * DoFHandler<dim,spacedim> hp_dof_handler(triangulation);
      * // We need to introduce our dof_handler to the fe_collection
-     * // before setting all active_fe_indices.
+     * // before setting all active FE indices.
      * hp_dof_handler.deserialize_active_fe_indices();
      * hp_dof_handler.distribute_dofs(fe_collection);
      *

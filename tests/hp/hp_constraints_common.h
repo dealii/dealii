@@ -369,7 +369,7 @@ test_interpolation_base(const hp::FECollection<dim> &    fe,
         deallog << "Testing " << fe[fe1].get_name() << " vs. "
                 << fe[fe2].get_name() << std::endl;
 
-        // set fe on coarse cell to 'i', on
+        // set FE on coarse cell to 'i', on
         // all fine cells to 'j'
         typename DoFHandler<dim>::active_cell_iterator cell =
           dof_handler.begin_active();

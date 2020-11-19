@@ -100,7 +100,7 @@ namespace hp
 
     /**
      * Return the mapping object which was specified by the user for the
-     * active_fe_index which is provided as a parameter to this method.
+     * active FE index which is provided as a parameter to this method.
      *
      * @pre @p index must be between zero and the number of elements of the
      * collection.

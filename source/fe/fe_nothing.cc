@@ -220,7 +220,7 @@ FE_Nothing<dim, spacedim>::compare_for_domination(
     // if it does and the other is FE_Nothing, either can dominate
     return FiniteElementDomination::either_element_can_dominate;
   else
-    // otherwise we dominate whatever fe is provided
+    // otherwise we dominate whatever FE is provided
     return FiniteElementDomination::this_element_dominates;
 }
 

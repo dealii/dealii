@@ -260,7 +260,7 @@ std::vector<std::pair<unsigned int, unsigned int>>
 FE_Bernstein<dim, spacedim>::hp_line_dof_identities(
   const FiniteElement<dim, spacedim> &) const
 {
-  // Since this fe is not interpolatory but on the vertices, we can
+  // Since this FE is not interpolatory but on the vertices, we can
   // not identify dofs on lines and on quads even if there are dofs
   // on lines and on quads.
   //
@@ -276,7 +276,7 @@ FE_Bernstein<dim, spacedim>::hp_quad_dof_identities(
   const FiniteElement<dim, spacedim> &,
   const unsigned int) const
 {
-  // Since this fe is not interpolatory but on the vertices, we can
+  // Since this FE is not interpolatory but on the vertices, we can
   // not identify dofs on lines and on quads even if there are dofs
   // on lines and on quads.
   //

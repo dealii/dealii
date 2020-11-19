@@ -520,7 +520,7 @@ namespace internal
     {
       (void)constraint_pool_row_index;
 
-      // first reorder the active fe index.
+      // first reorder the active FE index.
       const bool have_hp = dofs_per_cell.size() > 1;
       if (cell_active_fe_index.size() > 0)
         {

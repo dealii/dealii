@@ -223,7 +223,7 @@ namespace internal
 
           // Note: we may wish to have something here similar to what
           // we do for lines and quads, namely that we only identify
-          // dofs for any fe towards the most dominating one. however,
+          // dofs for any FE towards the most dominating one. however,
           // it is not clear whether this is actually necessary for
           // vertices at all, I can't think of a finite element that
           // would make that necessary...
@@ -297,7 +297,7 @@ namespace internal
                           // are not yet constrained to anything else,
                           // except for to each other. use the rule that
                           // we will always constrain the dof with the
-                          // higher fe index to the one with the lower,
+                          // higher FE index to the one with the lower,
                           // to avoid circular reasoning.
                           for (const auto &identity : identities)
                             {
@@ -1070,7 +1070,7 @@ namespace internal
 
           // Note: we may wish to have something here similar to what
           // we do for lines and quads, namely that we only identify
-          // dofs for any fe towards the most dominating one. however,
+          // dofs for any FE towards the most dominating one. however,
           // it is not clear whether this is actually necessary for
           // vertices at all, I can't think of a finite element that
           // would make that necessary...
@@ -1157,7 +1157,7 @@ namespace internal
                           // are not yet constrained to anything else,
                           // except for to each other. use the rule that
                           // we will always constrain the dof with the
-                          // higher fe index to the one with the lower,
+                          // higher FE index to the one with the lower,
                           // to avoid circular reasoning.
                           for (const auto &identity : identities)
                             {
@@ -1186,7 +1186,7 @@ namespace internal
                               // we need to work on.
                               //
                               // all degrees of freedom belonging to
-                              // dominating fe indices or to a processor
+                              // dominating FE indices or to a processor
                               // with a higher rank have been set at this
                               // point (either in Phase 2, or after the
                               // first ghost exchange in Phase 5). thus,
@@ -1459,7 +1459,7 @@ namespace internal
                                     // we need to work on.
                                     //
                                     // all degrees of freedom belonging to
-                                    // dominating fe indices or to a processor
+                                    // dominating FE indices or to a processor
                                     // with a higher rank have been set at this
                                     // point (either in Phase 2, or after the
                                     // first ghost exchange in Phase 5). thus,
@@ -1614,7 +1614,7 @@ namespace internal
                                 // we need to work on.
                                 //
                                 // all degrees of freedom belonging to
-                                // dominating fe indices or to a processor with
+                                // dominating FE indices or to a processor with
                                 // a higher rank have been set at this point
                                 // (either in Phase 2, or after the first ghost
                                 // exchange in Phase 5). thus, we only have to
@@ -1935,7 +1935,7 @@ namespace internal
                       // the previous indices were all valid. this really should
                       // be the case: we allocated space for these vertex dofs,
                       // i.e., at least one adjacent cell has a valid
-                      // active_fe_index, so there are DoFs that really live
+                      // active FE index, so there are DoFs that really live
                       // on this vertex. if check_validity is set, then we
                       // must make sure that they have been set to something
                       // useful
@@ -3919,7 +3919,7 @@ namespace internal
 
           // If the DoFHandler has hp-capabilities enabled, then we may have
           // received valid indices of degrees of freedom that are dominated
-          // by a fe object adjacent to a ghost interface.  thus, we overwrite
+          // by a FE object adjacent to a ghost interface.  thus, we overwrite
           // the remaining invalid indices with the valid ones in this step.
           Implementation::merge_invalid_dof_indices_on_ghost_interfaces(
             *dof_handler);
@@ -4432,7 +4432,7 @@ namespace internal
 
               // if the DoFHandler has hp-capabilities then we may have
               // received valid indices of degrees of freedom that are
-              // dominated by a fe object adjacent to a ghost interface.
+              // dominated by a FE object adjacent to a ghost interface.
               // thus, we overwrite the remaining invalid indices with the
               // valid ones in this step.
               Implementation::merge_invalid_dof_indices_on_ghost_interfaces(

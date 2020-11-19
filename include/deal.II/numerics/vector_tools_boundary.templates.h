@@ -367,7 +367,7 @@ namespace VectorTools
                             }
                         }
                       else
-                        // fe has only one component, so save some computations
+                        // FE has only one component, so save some computations
                         {
                           // get only the one component that this function has
                           dof_values_scalar.resize(fe.n_dofs_per_face(face_no));

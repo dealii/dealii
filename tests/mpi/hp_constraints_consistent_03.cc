@@ -86,7 +86,7 @@ test(const unsigned int degree_center,
       {
         if (cell->id().to_string() == "1_0:")
           {
-            // set different fe on center cell
+            // set different FE on center cell
             cell->set_active_fe_index(1);
 
 #ifdef DEBUG

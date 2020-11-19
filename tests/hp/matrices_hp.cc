@@ -15,7 +15,7 @@
 
 
 
-// like hp/matrices, but with different fe objects
+// like hp/matrices, but with different FE objects
 
 
 #include <deal.II/base/function_lib.h>

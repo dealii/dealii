@@ -961,7 +961,7 @@ namespace internal
               dealii::FEValues<dim> &fe_val = *fe_values[my_q][fe_index];
               cell_data.resize(n_q_points);
 
-              // if the fe index has changed from the previous cell, set the
+              // if the FE index has changed from the previous cell, set the
               // old cell type to invalid (otherwise, we might detect
               // similarity due to some cells further ahead)
               if (my_q > 0)
@@ -1846,9 +1846,9 @@ namespace internal
                               1);
 #endif
 
-              // We assume that we have the faces sorted by the active fe
-              // indices so that the active fe index of the interior side of the
-              // face batch is the same as the fe index of the interior side of
+              // We assume that we have the faces sorted by the active FE
+              // indices so that the active FE index of the interior side of the
+              // face batch is the same as the FE index of the interior side of
               // its first entry.
               const unsigned int fe_index =
                 active_fe_index.size() > 0 ?
@@ -2026,9 +2026,9 @@ namespace internal
                           GeometryInfo<dim>::max_children_per_cell)
                         {
                           // We assume that we have the faces sorted by the
-                          // active fe indices so that the active fe index of
+                          // active FE indices so that the active FE index of
                           // the exterior side of the face batch is the same as
-                          // the fe index of the exterior side of its first
+                          // the FE index of the exterior side of its first
                           // entry.
                           const unsigned int fe_index =
                             active_fe_index.size() > 0 ?

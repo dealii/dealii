@@ -57,7 +57,7 @@ test()
 
   for (cell = dh.begin_active(); cell != dh.end(); ++cell)
     {
-      // set active fe index
+      // set active FE index
       if (i >= fe_collection.size())
         i = 0;
       cell->set_active_fe_index(i++);

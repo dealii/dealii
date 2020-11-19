@@ -428,7 +428,7 @@ FE_Enriched<dim, spacedim>::initialize(
   Assert(fes.size() == multiplicities.size(),
          ExcDimensionMismatch(fes.size(), multiplicities.size()));
 
-  // Note that we need to skip every fe with multiplicity 0 in the following
+  // Note that we need to skip every FE with multiplicity 0 in the following
   // block of code
   this->base_to_block_indices.reinit(0, 0);
 
@@ -475,7 +475,7 @@ FE_Enriched<dim, spacedim>::initialize(
   // However, functions like interpolate_boundary_values() need all FEs inside
   // FECollection to be able to provide support points irrespectively whether
   // this FE sits on the boundary or not. Thus for moment just copy support
-  // points from fe system:
+  // points from FE system:
   {
     this->unit_support_points      = fe_system->unit_support_points;
     this->unit_face_support_points = fe_system->unit_face_support_points;
@@ -1296,8 +1296,8 @@ namespace ColorEnriched
        * on adjacent cells, an enriched FE [0 0 1] should exist and is
        * found as the least dominating finite element for the two cells by
        * DoFTools::make_hanging_node_constraints, using the above mentioned
-       * hp::FECollection functions. Denoting the fe set in adjacent cells as
-       * {1,3} and {2,3}, this implies that an fe set {3} needs to be added!
+       * hp::FECollection functions. Denoting the FE set in adjacent cells as
+       * {1,3} and {2,3}, this implies that an FE set {3} needs to be added!
        * Based on the predicate configuration, this may not be automatically
        * done without the following special treatment.
        */
@@ -1319,10 +1319,10 @@ namespace ColorEnriched
                   const auto nbr_fe_index =
                     cell->neighbor(face)->active_fe_index();
 
-                  // find corresponding fe set
+                  // find corresponding FE set
                   const auto nbr_fe_set = fe_sets.at(nbr_fe_index);
 
-                  // find intersection of the fe sets: fe_set and nbr_fe_set
+                  // find intersection of the FE sets: fe_set and nbr_fe_set
                   std::set<unsigned int> intersection_set;
                   std::set_intersection(
                     fe_set.begin(),

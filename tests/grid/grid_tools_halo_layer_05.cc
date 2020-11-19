@@ -119,7 +119,7 @@ test()
     write_vtk(dof_handler, filename.c_str());
   }
 
-  // Compute a halo layer around active fe indices 2,3 and set it to active fe
+  // Compute a halo layer around active FE indices 2,3 and set it to active FE
   // index 4
   std::set<unsigned int> index_set;
   index_set.insert(2);

@@ -634,7 +634,7 @@ namespace internal
        * account. This information is encoded in the row_starts variables
        * directly.
        *
-       * The outer vector goes through the various fe indices in the hp-case,
+       * The outer vector goes through the various FE indices in the hp-case,
        * similarly to the @p dofs_per_cell variable.
        */
       std::vector<std::vector<unsigned int>> component_dof_indices_offset;

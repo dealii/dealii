@@ -539,8 +539,8 @@ public:
   n_active_fe_indices() const;
 
   /**
-   * Return the @p n-th active fe index on this object. For cells and all non-
-   * hp-objects, there is only a single active fe index, so the argument must
+   * Return the @p n-th active FE index on this object. For cells and all non-
+   * hp-objects, there is only a single active FE index, so the argument must
    * be equal to zero. For lower-dimensional hp-objects, there are
    * n_active_fe_indices() active finite elements, and this function can be
    * queried for their indices.
@@ -549,7 +549,7 @@ public:
   nth_active_fe_index(const unsigned int n) const;
 
   /**
-   * Returns all active fe indices on this object.
+   * Returns all active FE indices on this object.
    *
    * The size of the returned set equals the number of finite elements that
    * are active on this object.
@@ -1047,7 +1047,7 @@ public:
   n_active_fe_indices() const;
 
   /**
-   * Return the @p n-th active fe index on this object.
+   * Return the @p n-th active FE index on this object.
    *
    * Since vertices do not store the information necessary for this to be
    * calculated, this method just raises an exception and only exists to

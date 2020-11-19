@@ -1484,8 +1484,8 @@ public:
   /**
    * In the hp-adaptive case, a subrange of internal faces as computed during
    * loop() might contain internal faces with elements of different active
-   * fe indices. Use this function to compute what the subrange for a given pair
-   * of active fe indices is.
+   * FE indices. Use this function to compute what the subrange for a given pair
+   * of active FE indices is.
    */
   std::pair<unsigned int, unsigned int>
   create_inner_face_subrange_hp_by_index(
@@ -1497,8 +1497,8 @@ public:
   /**
    * In the hp-adaptive case, a subrange of boundary faces as computed during
    * loop() might contain boundary faces with elements of different active
-   * fe indices. Use this function to compute what the subrange for a given
-   * active fe indices is.
+   * FE indices. Use this function to compute what the subrange for a given
+   * active FE indices is.
    */
   std::pair<unsigned int, unsigned int>
   create_boundary_face_subrange_hp_by_index(

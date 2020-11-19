@@ -247,7 +247,7 @@ main(int argc, char **argv)
         std::make_shared<Functions::ConstantFunction<dim>>(func));
     }
 
-  // Construct helper class to construct fe collection
+  // Construct helper class to construct FE collection
   FE_Q<dim> fe_base(2);
   FE_Q<dim> fe_enriched(1);
 

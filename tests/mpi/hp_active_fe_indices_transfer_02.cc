@@ -15,7 +15,7 @@
 
 
 
-// active fe indices transfer on serialization
+// active FE indices transfer on serialization
 
 
 #include <deal.II/distributed/tria.h>
@@ -54,7 +54,7 @@ test()
     for (auto &cell : dh.active_cell_iterators())
       if (cell->is_locally_owned())
         {
-          // set active fe index
+          // set active FE index
           if (!(cell->is_artificial()))
             {
               if (i >= fe_collection.size())

@@ -256,7 +256,7 @@ namespace Step36
     // enriched elements (active_fe_index==1):
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(2), 1, FE_Q<dim>(1), 1));
 
-    // assign fe index in the constructor so that FE/FE+POU is determined
+    // assign FE index in the constructor so that FE/FE+POU is determined
     // on the coarsest mesh to avoid issues like
     // +---------+----+----+
     // |         | fe |    |

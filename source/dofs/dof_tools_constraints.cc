@@ -646,7 +646,7 @@ namespace DoFTools
           for (const unsigned int face : cell->face_indices())
             if (cell->face(face)->has_children())
               {
-                // in any case, faces can have at most two active fe indices,
+                // in any case, faces can have at most two active FE indices,
                 // but here the face can have only one (namely the same as that
                 // from the cell we're sitting on), and each of the children can
                 // have only one as well. check this
@@ -664,7 +664,7 @@ namespace DoFTools
                            ExcInternalError());
 
                 // right now, all that is implemented is the case that both
-                // sides use the same fe
+                // sides use the same FE
                 for (unsigned int c = 0; c < cell->face(face)->n_children();
                      ++c)
                   if (!cell->neighbor_child_on_subface(face, c)
@@ -747,7 +747,7 @@ namespace DoFTools
             else
               {
                 // this face has no children, but it could still be that it is
-                // shared by two cells that use a different fe index. check a
+                // shared by two cells that use a different FE index. check a
                 // couple of things, but ignore the case that the neighbor is an
                 // artificial cell
                 if (!cell->at_boundary(face) &&
@@ -808,7 +808,7 @@ namespace DoFTools
                          RefinementCase<dim - 1>::isotropic_refinement,
                        ExcNotImplemented());
 
-                // in any case, faces can have at most two active fe indices,
+                // in any case, faces can have at most two active FE indices,
                 // but here the face can have only one (namely the same as that
                 // from the cell we're sitting on), and each of the children can
                 // have only one as well. check this
@@ -825,7 +825,7 @@ namespace DoFTools
 
                 // right now, all that is implemented is the case that both
                 // sides use the same fe, and not only that but also that all
-                // lines bounding this face and the children have the same fe
+                // lines bounding this face and the children have the same FE
                 for (unsigned int c = 0; c < cell->face(face)->n_children();
                      ++c)
                   if (!cell->neighbor_child_on_subface(face, c)
@@ -991,7 +991,7 @@ namespace DoFTools
             else
               {
                 // this face has no children, but it could still be that it is
-                // shared by two cells that use a different fe index. check a
+                // shared by two cells that use a different FE index. check a
                 // couple of things, but ignore the case that the neighbor is an
                 // artificial cell
                 if (!cell->at_boundary(face) &&
@@ -1086,7 +1086,7 @@ namespace DoFTools
                 // so now we've found a face of an active cell that has
                 // children. that means that there are hanging nodes here.
 
-                // in any case, faces can have at most two sets of active fe
+                // in any case, faces can have at most two sets of active FE
                 // indices, but here the face can have only one (namely the same
                 // as that from the cell we're sitting on), and each of the
                 // children can have only one as well. check this
@@ -1466,7 +1466,7 @@ namespace DoFTools
             else
               {
                 // this face has no children, but it could still be that it is
-                // shared by two cells that use a different fe index
+                // shared by two cells that use a different FE index
                 Assert(cell->face(face)->fe_index_is_active(
                          cell->active_fe_index()) == true,
                        ExcInternalError());
@@ -1474,12 +1474,12 @@ namespace DoFTools
                 // see if there is a neighbor that is an artificial cell. in
                 // that case, we're not interested in this interface. we test
                 // this case first since artificial cells may not have an
-                // active_fe_index set, etc
+                // active FE index set, etc
                 if (!cell->at_boundary(face) &&
                     cell->neighbor(face)->is_artificial())
                   continue;
 
-                // Only if there is a neighbor with a different active_fe_index
+                // Only if there is a neighbor with a different active FE index
                 // and the same h-level, some action has to be taken.
                 if ((dof_handler.has_hp_capabilities()) &&
                     !cell->face(face)->at_boundary() &&

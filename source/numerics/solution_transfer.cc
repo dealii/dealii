@@ -505,7 +505,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
                 {
                   // make sure that the size of the stored indices is the same
                   // as dofs_per_cell. this is kind of a test if we use the same
-                  // fe in the hp-case. to really do that test we would have to
+                  // FE in the hp-case. to really do that test we would have to
                   // store the fe_index of all cells
                   const Vector<typename VectorType::value_type> *data = nullptr;
                   const unsigned int active_fe_index = cell->active_fe_index();

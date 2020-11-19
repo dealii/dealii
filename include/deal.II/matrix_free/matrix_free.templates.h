@@ -106,7 +106,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::create_cell_subrange_hp_by_index(
         Assert(
           fe_indices[i] >= fe_indices[i - 1],
           ExcMessage(
-            "Cell range must be over sorted range of fe indices in hp-case!"));
+            "Cell range must be over sorted range of FE indices in hp-case!"));
       AssertIndexRange(range.first, fe_indices.size() + 1);
       AssertIndexRange(range.second, fe_indices.size() + 1);
 #endif

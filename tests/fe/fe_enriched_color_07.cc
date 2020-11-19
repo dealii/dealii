@@ -1350,7 +1350,7 @@ LaplaceProblem<dim>::build_fe_space()
         {
           pcout << "...start print fe indices" << std::endl;
 
-          // print fe index
+          // print FE index
           const std::string base_filename =
             "fe_indices" + dealii::Utilities::int_to_string(dim) + "_p" +
             dealii::Utilities::int_to_string(0);
@@ -1739,7 +1739,7 @@ LaplaceProblem<dim>::run()
   pcout << "...run problem" << std::endl;
   double norm_soln_old(0), norm_rel_change_old(1);
 
-  // Run making grids and building fe space only once.
+  // Run making grids and building FE space only once.
   initialize();
   build_fe_space();
 

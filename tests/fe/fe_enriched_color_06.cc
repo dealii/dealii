@@ -118,7 +118,7 @@ main(int argc, char **argv)
       vec_enrichments.push_back(std::make_shared<ConstantFunction<dim>>(func));
     }
 
-  // Construct helper class to construct fe collection
+  // Construct helper class to construct FE collection
   FE_Q<dim>                         fe_base(2);
   FE_Q<dim>                         fe_enriched(1);
   static ColorEnriched::Helper<dim> fe_space(fe_base,

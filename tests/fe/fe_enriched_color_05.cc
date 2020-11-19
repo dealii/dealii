@@ -233,7 +233,7 @@ main(int argc, char **argv)
     fe_nothing,
     fe_collection);
 
-  // print all the different fe sets needed by different cells
+  // print all the different FE sets needed by different cells
   deallog << "fe sets:" << std::endl;
   for (auto fe_set : fe_sets)
     {

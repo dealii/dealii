@@ -102,9 +102,9 @@ test()
             }
 
 
-          // if there are multiple active fe
+          // if there are multiple active FE
           // indices, make sure that all their
-          // fe indices were unified
+          // FE indices were unified
           for (unsigned int i = 0; i < cell->line(line)->n_active_fe_indices();
                ++i)
             for (unsigned int j = i + 1;

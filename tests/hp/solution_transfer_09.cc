@@ -15,7 +15,7 @@
 
 
 
-// Like _07 but with all same fe indices. This triggered yet another place
+// Like _07 but with all same FE indices. This triggered yet another place
 // where we had the same kind of error.
 
 #include <deal.II/dofs/dof_handler.h>

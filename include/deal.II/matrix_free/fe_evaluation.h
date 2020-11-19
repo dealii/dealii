@@ -257,7 +257,7 @@ public:
   get_current_cell_index() const;
 
   /**
-   * Return the active fe index for this class for efficient indexing in the hp-
+   * Return the active FE index for this class for efficient indexing in the hp-
    * case.
    */
   unsigned int
@@ -360,7 +360,7 @@ protected:
     VectorizedArrayType> *mapping_data;
 
   /**
-   * The active fe index for this class for efficient indexing in the hp-case.
+   * The active FE index for this class for efficient indexing in the hp-case.
    */
   const unsigned int active_fe_index;
 

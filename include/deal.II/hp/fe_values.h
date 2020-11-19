@@ -248,7 +248,7 @@ namespace hp
    * hp::FECollection and hp::QCollection. Later on, when one sits on a
    * concrete cell, one would call the reinit() function for this particular
    * cell, just as one does for a regular ::FEValues object. The difference is
-   * that this time, the reinit() function looks up the active_fe_index of
+   * that this time, the reinit() function looks up the active FE index of
    * that cell, if necessary creates a ::FEValues object that matches the
    * finite element and quadrature formulas with that particular index in
    * their collections, and then re-initializes it for the current cell. The
@@ -260,7 +260,7 @@ namespace hp
    * The reinit() functions have additional arguments with default values. If
    * not specified, the function takes the index into the hp::FECollection,
    * hp::QCollection, and hp::MappingCollection objects from the
-   * active_fe_index of the cell, as explained above. However, one can also
+   * active FE index of the cell, as explained above. However, one can also
    * select different indices for a current cell. For example, by specifying a
    * different index into the hp::QCollection class, one does not need to sort
    * the quadrature objects in the quadrature collection so that they match

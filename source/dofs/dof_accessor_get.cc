@@ -111,7 +111,7 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
                "finite element index because they do not have naturally "
                "associated finite element spaces associated: degrees "
                "of freedom are only distributed on active cells for which "
-               "the active_fe_index has been set."));
+               "the active FE index has been set."));
 
       const FiniteElement<dim, spacedim> &fe =
         this->get_dof_handler().get_fe(fe_index);

@@ -297,7 +297,7 @@ DEAL_II_NAMESPACE_OPEN
  * finite elements that are part of the hp::FECollection associated with the
  * DoFHandler, should be considered on cells that are not active (i.e., that
  * have children). This is because degrees of freedom are only allocated for
- * active cells and, in fact, it is not allowed to set an active_fe_index on
+ * active cells and, in fact, it is not allowed to set an active FE index on
  * non- active cells using DoFAccessor::set_active_fe_index().
  *
  * It is, thus, not entirely natural what should happen if, for example, a few
@@ -320,7 +320,7 @@ DEAL_II_NAMESPACE_OPEN
  *   cell. After refinement, this Q3 function on the mother cell is then
  *   interpolated into the space the user has selected for this cell (which may
  *   be different from Q3, in this example, if the user has set the
- *   active_fe_index for a different space post-refinement and before calling
+ *   active FE index for a different space post-refinement and before calling
  *   DoFHandler::distribute_dofs()).
  *
  * @note In the context of hp-refinement, if cells are coarsened or the

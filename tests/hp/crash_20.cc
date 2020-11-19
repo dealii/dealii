@@ -16,8 +16,8 @@
 
 
 // if the mesh is generated after the hp::DoFHandler is attached to the
-// triangulation object, then we can't set active fe indices -- which is
-// somewhat tragic since we have to assign active fe indices before we can
+// triangulation object, then we can't set active FE indices -- which is
+// somewhat tragic since we have to assign active FE indices before we can
 // call distribute_dofs
 //
 // originally, this problem was avoided because the hp::DoFHandler listens to

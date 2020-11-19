@@ -266,7 +266,7 @@ test_with_hanging_nodes(const FiniteElement<dim> &fe, const unsigned int p)
 }
 
 
-// same as above but for multiple fes
+// same as above but for multiple FEs
 template <int fe_degree, int n_q_points_1d, int dim>
 void
 test_with_hanging_nodes(const std::vector<const FiniteElement<dim> *> &fes,

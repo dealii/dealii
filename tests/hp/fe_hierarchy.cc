@@ -35,7 +35,7 @@ test()
 
   while (fe_collection.size() < 3)
     {
-      // add dummy fe to collection
+      // add dummy FE to collection
       fe_collection.push_back(FE_Q<dim>(1));
       deallog << "size:" << fe_collection.size() << std::endl;
 
