@@ -151,7 +151,7 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
   fine_projection.update_ghost_values();
 
   // output for debug purposes:
-  if (true)
+  if (false)
     {
       DataOut<dim> data_out;
       data_out.attach_dof_handler(dof_handler);
@@ -190,6 +190,14 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
   const unsigned int min_level = 0;
   MGLevelObject<LinearAlgebra::distributed::Vector<LevelNumberType>>
     level_projection(min_level, max_level);
+  for (unsigned int level = min_level; level <= max_level; ++level)
+    {
+      IndexSet set;
+      DoFTools::extract_locally_relevant_level_dofs(dof_handler, level, set);
+      level_projection[level].reinit(dof_handler.locally_owned_mg_dofs(level),
+                                     set,
+                                     mpi_communicator);
+    }
   mg_transfer.interpolate_to_mg(dof_handler, level_projection, fine_projection);
 
   // now go through all GMG levels and make sure FE field can represent
