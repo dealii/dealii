@@ -284,7 +284,9 @@ protected:
     const unsigned int quad_no,
     const unsigned int fe_degree,
     const unsigned int n_q_points,
-    const bool         is_interior_face);
+    const bool         is_interior_face,
+    const unsigned int active_fe_index,
+    const unsigned int active_quad_index);
 
   /**
    * Constructor that comes with reduced functionality and works similar as
@@ -1110,7 +1112,9 @@ protected:
     const unsigned int quad_no,
     const unsigned int fe_degree,
     const unsigned int n_q_points,
-    const bool         is_interior_face);
+    const bool         is_interior_face,
+    const unsigned int active_fe_index,
+    const unsigned int active_quad_index);
 
   /**
    * Constructor that comes with reduced functionality and works similar as
@@ -1393,7 +1397,9 @@ protected:
     const unsigned int quad_no,
     const unsigned int fe_degree,
     const unsigned int n_q_points,
-    const bool         is_interior_face = true);
+    const bool         is_interior_face  = true,
+    const unsigned int active_fe_index   = numbers::invalid_unsigned_int,
+    const unsigned int active_quad_index = numbers::invalid_unsigned_int);
 
   /**
    * Constructor with reduced functionality for similar usage of FEEvaluation
@@ -1528,7 +1534,9 @@ protected:
     const unsigned int quad_no,
     const unsigned int fe_degree,
     const unsigned int n_q_points,
-    const bool         is_interior_face = true);
+    const bool         is_interior_face  = true,
+    const unsigned int active_fe_index   = numbers::invalid_unsigned_int,
+    const unsigned int active_quad_index = numbers::invalid_unsigned_int);
 
   /**
    * Constructor with reduced functionality for similar usage of FEEvaluation
@@ -1687,7 +1695,9 @@ protected:
     const unsigned int quad_no,
     const unsigned int dofs_per_cell,
     const unsigned int n_q_points,
-    const bool         is_interior_face = true);
+    const bool         is_interior_face  = true,
+    const unsigned int active_fe_index   = numbers::invalid_unsigned_int,
+    const unsigned int active_quad_index = numbers::invalid_unsigned_int);
 
   /**
    * Constructor with reduced functionality for similar usage of FEEvaluation
@@ -1833,7 +1843,9 @@ protected:
     const unsigned int                                quad_no,
     const unsigned int                                fe_degree,
     const unsigned int                                n_q_points,
-    const bool                                        is_interior_face = true);
+    const bool                                        is_interior_face = true,
+    const unsigned int active_fe_index   = numbers::invalid_unsigned_int,
+    const unsigned int active_quad_index = numbers::invalid_unsigned_int);
 
   /**
    * Constructor with reduced functionality for similar usage of FEEvaluation
@@ -2528,11 +2540,23 @@ public:
    * same base element of a FESystem needs to be set for the components
    * between @p first_selected_component and
    * <code>first_selected_component+n_components_</code>.
+   *
+   * @param active_fe_index If matrix_free was set up with DoFHandler
+   * objects with hp::FECollections, this parameter selects to which
+   * DoFHandler/AffineConstraints pair the given evaluator should be attached
+   * to.
+   *
+   * @param active_quad_index If matrix_free was set up with hp::Collection
+   * objects, this parameter selects the appropriate number of the quadrature
+   * formula.
    */
-  FEEvaluation(const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-               const unsigned int                                  dof_no  = 0,
-               const unsigned int                                  quad_no = 0,
-               const unsigned int first_selected_component                 = 0);
+  FEEvaluation(
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+    const unsigned int                                  dof_no  = 0,
+    const unsigned int                                  quad_no = 0,
+    const unsigned int first_selected_component                 = 0,
+    const unsigned int active_fe_index   = numbers::invalid_unsigned_int,
+    const unsigned int active_quad_index = numbers::invalid_unsigned_int);
 
   /**
    * Constructor that comes with reduced functionality and works similar as
@@ -2999,13 +3023,24 @@ public:
    * selects the number of the base element in FESystem. Note that this does
    * not directly relate to the component of the respective element due to the
    * possibility for a multiplicity in the element.
+   *
+   * @param active_fe_index If matrix_free was set up with DoFHandler
+   * objects with hp::FECollections, this parameter selects to which
+   * DoFHandler/AffineConstraints pair the given evaluator should be attached
+   * to.
+   *
+   * @param active_quad_index If matrix_free was set up with hp::Collection
+   * objects, this parameter selects the appropriate number of the quadrature
+   * formula.
    */
   FEFaceEvaluation(
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
     const bool                                          is_interior_face = true,
     const unsigned int                                  dof_no           = 0,
     const unsigned int                                  quad_no          = 0,
-    const unsigned int first_selected_component                          = 0);
+    const unsigned int first_selected_component                          = 0,
+    const unsigned int active_fe_index   = numbers::invalid_unsigned_int,
+    const unsigned int active_quad_index = numbers::invalid_unsigned_int);
 
   /**
    * Initializes the operation pointer to the current face. This method is the
@@ -3250,14 +3285,18 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
     const unsigned int quad_no_in,
     const unsigned int fe_degree,
     const unsigned int n_q_points,
-    const bool         is_interior_face)
+    const bool         is_interior_face,
+    const unsigned int active_fe_index_in,
+    const unsigned int active_quad_index_in)
   : scratch_data_array(data_in.acquire_scratch_data())
   , quad_no(quad_no_in)
   , active_fe_index(fe_degree != numbers::invalid_unsigned_int ?
                       data_in.get_dof_info(dof_no).fe_index_from_degree(
                         first_selected_component,
                         fe_degree) :
-                      0)
+                      (active_fe_index_in != numbers::invalid_unsigned_int ?
+                         active_fe_index_in :
+                         0))
   , active_quad_index(fe_degree != numbers::invalid_unsigned_int ?
                         (is_face ? data_in.get_mapping_info()
                                      .face_data[quad_no_in]
@@ -3265,7 +3304,9 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
                                    data_in.get_mapping_info()
                                      .cell_data[quad_no_in]
                                      .quad_index_from_n_q_points(n_q_points)) :
-                        0)
+                        (active_quad_index_in != numbers::invalid_unsigned_int ?
+                           active_quad_index_in :
+                           0))
   , n_quadrature_points(
       fe_degree != numbers::invalid_unsigned_int ?
         n_q_points :
@@ -3921,7 +3962,9 @@ inline FEEvaluationBase<dim,
                    const unsigned int quad_no_in,
                    const unsigned int fe_degree,
                    const unsigned int n_q_points,
-                   const bool         is_interior_face)
+                   const bool         is_interior_face,
+                   const unsigned int active_fe_index,
+                   const unsigned int active_quad_index)
   : FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>(
       data_in,
       dof_no,
@@ -3929,7 +3972,9 @@ inline FEEvaluationBase<dim,
       quad_no_in,
       fe_degree,
       n_q_points,
-      is_interior_face)
+      is_interior_face,
+      active_fe_index,
+      active_quad_index)
   , n_fe_components(data_in.get_dof_info(dof_no).start_components.back())
   , dof_values_initialized(false)
   , values_quad_initialized(false)
@@ -6028,7 +6073,9 @@ inline FEEvaluationAccess<dim,
     const unsigned int quad_no_in,
     const unsigned int fe_degree,
     const unsigned int n_q_points,
-    const bool         is_interior_face)
+    const bool         is_interior_face,
+    const unsigned int active_fe_index,
+    const unsigned int active_quad_index)
   : FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>(
       data_in,
       dof_no,
@@ -6036,7 +6083,9 @@ inline FEEvaluationAccess<dim,
       quad_no_in,
       fe_degree,
       n_q_points,
-      is_interior_face)
+      is_interior_face,
+      active_fe_index,
+      active_quad_index)
 {}
 
 
@@ -6130,7 +6179,9 @@ inline FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::
     const unsigned int quad_no_in,
     const unsigned int fe_degree,
     const unsigned int n_q_points,
-    const bool         is_interior_face)
+    const bool         is_interior_face,
+    const unsigned int active_fe_index,
+    const unsigned int active_quad_index)
   : FEEvaluationBase<dim, 1, Number, is_face, VectorizedArrayType>(
       data_in,
       dof_no,
@@ -6138,7 +6189,9 @@ inline FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::
       quad_no_in,
       fe_degree,
       n_q_points,
-      is_interior_face)
+      is_interior_face,
+      active_fe_index,
+      active_quad_index)
 {}
 
 
@@ -6437,7 +6490,9 @@ inline FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
     const unsigned int quad_no_in,
     const unsigned int fe_degree,
     const unsigned int n_q_points,
-    const bool         is_interior_face)
+    const bool         is_interior_face,
+    const unsigned int active_fe_index,
+    const unsigned int active_quad_index)
   : FEEvaluationBase<dim, dim, Number, is_face, VectorizedArrayType>(
       data_in,
       dof_no,
@@ -6445,7 +6500,9 @@ inline FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
       quad_no_in,
       fe_degree,
       n_q_points,
-      is_interior_face)
+      is_interior_face,
+      active_fe_index,
+      active_quad_index)
 {}
 
 
@@ -6842,7 +6899,9 @@ inline FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::
                      const unsigned int quad_no_in,
                      const unsigned int fe_degree,
                      const unsigned int n_q_points,
-                     const bool         is_interior_face)
+                     const bool         is_interior_face,
+                     const unsigned int active_fe_index,
+                     const unsigned int active_quad_index)
   : FEEvaluationBase<1, 1, Number, is_face, VectorizedArrayType>(
       data_in,
       dof_no,
@@ -6850,7 +6909,9 @@ inline FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::
       quad_no_in,
       fe_degree,
       n_q_points,
-      is_interior_face)
+      is_interior_face,
+      active_fe_index,
+      active_quad_index)
 {}
 
 
@@ -7130,13 +7191,18 @@ inline FEEvaluation<dim,
   FEEvaluation(const MatrixFree<dim, Number, VectorizedArrayType> &data_in,
                const unsigned int                                  fe_no,
                const unsigned int                                  quad_no,
-               const unsigned int first_selected_component)
+               const unsigned int first_selected_component,
+               const unsigned int active_fe_index,
+               const unsigned int active_quad_index)
   : BaseClass(data_in,
               fe_no,
               first_selected_component,
               quad_no,
               fe_degree,
-              static_n_q_points)
+              static_n_q_points,
+              true /*note: this is not a face*/,
+              active_fe_index,
+              active_quad_index)
   , dofs_per_component(this->data->dofs_per_component_on_cell)
   , dofs_per_cell(this->data->dofs_per_component_on_cell * n_components_)
   , n_q_points(this->data->n_q_points)
@@ -8238,14 +8304,18 @@ inline FEFaceEvaluation<dim,
     const bool                                          is_interior_face,
     const unsigned int                                  dof_no,
     const unsigned int                                  quad_no,
-    const unsigned int first_selected_component)
+    const unsigned int first_selected_component,
+    const unsigned int active_fe_index,
+    const unsigned int active_quad_index)
   : BaseClass(matrix_free,
               dof_no,
               first_selected_component,
               quad_no,
               fe_degree,
               static_n_q_points,
-              is_interior_face)
+              is_interior_face,
+              active_fe_index,
+              active_quad_index)
   , dofs_per_component(this->data->dofs_per_component_on_cell)
   , dofs_per_cell(this->data->dofs_per_component_on_cell * n_components_)
   , n_q_points(this->data->n_q_points_face)
