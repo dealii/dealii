@@ -98,6 +98,45 @@ namespace MeshWorker
     };
   } // namespace internal
 
+#ifdef DOXYGEN
+  /**
+   * This alias introduces a friendly and short name for the function type
+   * for the cell worker used in mesh_loop().
+   */
+  using CellWorkerFunctionType = std::function<
+    void(const CellIteratorBaseType &, ScratchData &, CopyData &)>;
+
+  /**
+   * This alias introduces a friendly and short name for the function type
+   * for the cell worker used in mesh_loop().
+   */
+  using CopierFunctionType = std::function<void(const CopyData &)>;
+
+  /**
+   * This alias introduces a friendly and short name for the function type
+   * for the boundary worker used in mesh_loop().
+   */
+  using BoundaryWorkerFunctionType =
+    std::function<void(const CellIteratorBaseType &,
+                       const unsigned int,
+                       ScratchData &,
+                       CopyData &)>;
+
+  /**
+   * This alias introduces a friendly and short name for the function type
+   * for the face worker used in mesh_loop().
+   */
+  using FaceWorkerFunctionType =
+    std::function<void(const CellIteratorBaseType &,
+                       const unsigned int,
+                       const unsigned int,
+                       const CellIteratorBaseType &,
+                       const unsigned int,
+                       const unsigned int,
+                       ScratchData &,
+                       CopyData &)>;
+#endif
+
   /**
    * This function extends the WorkStream concept to work on meshes
    * (cells and/or faces) and handles the complicated logic for
@@ -221,6 +260,10 @@ namespace MeshWorker
    * helpful to keep in mind that queue_length copies of the ScratchData object
    * and `queue_length*chunk_size` copies of the CopyData object are generated.
    *
+   * @note The types of the function arguments and the default values (empty worker functions)
+   * displayed in the Doxygen documentation here are slightly simplified
+   * compared to the real types.
+   *
    * @note More information about requirements on template types and meaning
    * of @p queue_length and @p chunk_size can be found in the documentation of the
    * WorkStream namespace and its members.
@@ -234,6 +277,25 @@ namespace MeshWorker
               typename internal::CellIteratorBaseType<CellIteratorType>::type>
   void
   mesh_loop(
+#ifdef DOXYGEN
+    const CellIteratorType &begin,
+    const CellIteratorType &end,
+
+    const CellWorkerFunctionType &cell_worker,
+    const CopierType &            copier,
+
+    const ScratchData &sample_scratch_data,
+    const CopyData &   sample_copy_data,
+
+    const AssembleFlags flags = assemble_own_cells,
+
+    const BoundaryWorkerFunctionType &boundary_worker =
+      BoundaryWorkerFunctionType(),
+
+    const FaceWorkerFunctionType &face_worker = FaceWorkerFunctionType(),
+    const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
+    const unsigned int chunk_size   = 8
+#else
     const CellIteratorType &                         begin,
     const typename identity<CellIteratorType>::type &end,
 
@@ -275,7 +337,9 @@ namespace MeshWorker
                                         CopyData &)>(),
 
     const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
-    const unsigned int chunk_size   = 8)
+    const unsigned int chunk_size   = 8
+#endif
+  )
   {
     Assert(
       (!cell_worker) == !(flags & work_on_cells),
