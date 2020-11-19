@@ -44,13 +44,12 @@ jobs:
         brew install openmpi
         cmake --version
         # uncomment these for a gcc based build
-        #export OMPI_CXX=g++-9
-        #export OMPI_CC=gcc-9
-        #export OMPI_FC=gfortran-9
+        #export OMPI_CXX=g++
+        #export OMPI_CC=gcc
+        #export OMPI_FC=gfortran
         ./contrib/utilities/download_clang_format
     - name: info
       run: |
-        g++-10 -v
         mpicxx -v
         cmake --version
     - name: configure
