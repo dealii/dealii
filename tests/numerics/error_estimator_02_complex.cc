@@ -185,7 +185,7 @@ output(const std::string                   name,
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
     for (unsigned int index = 0; cell != endc; ++cell, ++index)
-      fe_degrees(index) = dof_handler.get_fe()[cell->active_fe_index()].degree;
+      fe_degrees(index) = dof_handler.get_fe(cell->active_fe_index()).degree;
   }
 
   dealii::DataOut<dim, dealii::DoFHandler<dim>> data_out;
