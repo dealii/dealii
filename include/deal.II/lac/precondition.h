@@ -47,6 +47,8 @@ namespace LinearAlgebra
   {
     template <typename, typename>
     class Vector;
+    template <typename>
+    class BlockVector;
   } // namespace distributed
 } // namespace LinearAlgebra
 #endif
@@ -2105,6 +2107,15 @@ namespace internal
 
       const Number mean_value = vector.mean_value();
       vector.add(-mean_value);
+    }
+
+    template <typename Number>
+    void
+    set_initial_guess(
+      ::dealii::LinearAlgebra::distributed::BlockVector<Number> &vector)
+    {
+      for (unsigned int block = 0; block < vector.n_blocks(); ++block)
+        set_initial_guess(vector.block(block));
     }
 
 
