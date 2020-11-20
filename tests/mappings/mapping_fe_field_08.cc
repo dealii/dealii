@@ -182,9 +182,7 @@ test(unsigned int n_ref)
   nodes.reinit(dofh.n_dofs());
 
   VectorTools::get_position_vector(dofh, nodes, mask);
-  MappingFEField<dim, dim, Vector<double>, DoFHandler<dim>> mapping(dofh,
-                                                                    nodes,
-                                                                    mask);
+  MappingFEField<dim, dim, Vector<double>> mapping(dofh, nodes, mask);
 
   deallog << "Test with MappingQGeneric in " << dim << "D on "
           << tria.n_active_cells() << " cells:" << std::endl;
