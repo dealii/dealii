@@ -35,6 +35,7 @@
 #include <deal.II/grid/grid_tools.h>
 
 #include <deal.II/hp/dof_handler.h>
+#include <deal.II/hp/mapping_collection.h>
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -580,9 +581,9 @@ public:
    * not allowed. In that case, use the initialization function with
    * several DoFHandler arguments.
    */
-  template <typename QuadratureType, typename number2>
+  template <typename QuadratureType, typename number2, typename MappingType>
   void
-  reinit(const Mapping<dim> &              mapping,
+  reinit(const MappingType &               mapping,
          const DoFHandler<dim> &           dof_handler,
          const AffineConstraints<number2> &constraint,
          const QuadratureType &            quad,
@@ -622,9 +623,9 @@ public:
    * can be sets independently from the number of DoFHandlers, when several
    * elements are always integrated with the same quadrature formula.
    */
-  template <typename QuadratureType, typename number2>
+  template <typename QuadratureType, typename number2, typename MappingType>
   void
-  reinit(const Mapping<dim> &                                   mapping,
+  reinit(const MappingType &                                    mapping,
          const std::vector<const DoFHandler<dim> *> &           dof_handler,
          const std::vector<const AffineConstraints<number2> *> &constraint,
          const std::vector<QuadratureType> &                    quad,
@@ -635,9 +636,12 @@ public:
    *
    * @deprecated Use the overload taking a DoFHandler object instead.
    */
-  template <typename QuadratureType, typename number2, typename DoFHandlerType>
+  template <typename QuadratureType,
+            typename number2,
+            typename DoFHandlerType,
+            typename MappingType>
   DEAL_II_DEPRECATED void
-  reinit(const Mapping<dim> &                                   mapping,
+  reinit(const MappingType &                                    mapping,
          const std::vector<const DoFHandlerType *> &            dof_handler,
          const std::vector<const AffineConstraints<number2> *> &constraint,
          const std::vector<QuadratureType> &                    quad,
@@ -675,9 +679,9 @@ public:
    * as might be necessary when several components in a vector-valued problem
    * are integrated together based on the same quadrature formula.
    */
-  template <typename QuadratureType, typename number2>
+  template <typename QuadratureType, typename number2, typename MappingType>
   void
-  reinit(const Mapping<dim> &                                   mapping,
+  reinit(const MappingType &                                    mapping,
          const std::vector<const DoFHandler<dim> *> &           dof_handler,
          const std::vector<const AffineConstraints<number2> *> &constraint,
          const QuadratureType &                                 quad,
@@ -688,9 +692,12 @@ public:
    *
    * @deprecated Use the overload taking a DoFHandler object instead.
    */
-  template <typename QuadratureType, typename number2, typename DoFHandlerType>
+  template <typename QuadratureType,
+            typename number2,
+            typename DoFHandlerType,
+            typename MappingType>
   DEAL_II_DEPRECATED void
-  reinit(const Mapping<dim> &                                   mapping,
+  reinit(const MappingType &                                    mapping,
          const std::vector<const DoFHandlerType *> &            dof_handler,
          const std::vector<const AffineConstraints<number2> *> &constraint,
          const QuadratureType &                                 quad,
@@ -741,6 +748,12 @@ public:
    */
   void
   update_mapping(const Mapping<dim> &mapping);
+
+  /**
+   * Same as above but with hp::MappingCollection.
+   */
+  void
+  update_mapping(const std::shared_ptr<hp::MappingCollection<dim>> &mapping);
 
   /**
    * Clear all data fields and brings the class into a condition similar to
@@ -2030,7 +2043,7 @@ private:
   template <typename number2, int q_dim>
   void
   internal_reinit(
-    const Mapping<dim> &                                   mapping,
+    const std::shared_ptr<hp::MappingCollection<dim>> &    mapping,
     const std::vector<const DoFHandler<dim, dim> *> &      dof_handlers,
     const std::vector<const AffineConstraints<number2> *> &constraint,
     const std::vector<IndexSet> &                          locally_owned_set,
@@ -2853,7 +2866,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   std::vector<hp::QCollection<dim>> quad_hp;
   quad_hp.emplace_back(quad);
 
-  internal_reinit(StaticMappingQ1<dim>::mapping,
+  internal_reinit(std::make_shared<hp::MappingCollection<dim>>(
+                    StaticMappingQ1<dim>::mapping),
                   dof_handlers,
                   constraints,
                   locally_owned_sets,
@@ -2864,10 +2878,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
-template <typename QuadratureType, typename number2>
+template <typename QuadratureType, typename number2, typename MappingType>
 void
 MatrixFree<dim, Number, VectorizedArrayType>::reinit(
-  const Mapping<dim> &              mapping,
+  const MappingType &               mapping,
   const DoFHandler<dim> &           dof_handler,
   const AffineConstraints<number2> &constraints_in,
   const QuadratureType &            quad,
@@ -2887,7 +2901,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   std::vector<hp::QCollection<dim>> quad_hp;
   quad_hp.emplace_back(quad);
 
-  internal_reinit(mapping,
+  internal_reinit(std::make_shared<hp::MappingCollection<dim>>(mapping),
                   dof_handlers,
                   constraints,
                   locally_owned_sets,
@@ -2913,7 +2927,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   std::vector<hp::QCollection<dim>> quad_hp;
   for (unsigned int q = 0; q < quad.size(); ++q)
     quad_hp.emplace_back(quad[q]);
-  internal_reinit(StaticMappingQ1<dim>::mapping,
+
+  internal_reinit(std::make_shared<hp::MappingCollection<dim>>(
+                    StaticMappingQ1<dim>::mapping),
                   dof_handler,
                   constraint,
                   locally_owned_set,
@@ -2924,10 +2940,13 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
-template <typename QuadratureType, typename number2, typename DoFHandlerType>
+template <typename QuadratureType,
+          typename number2,
+          typename DoFHandlerType,
+          typename MappingType>
 void
 MatrixFree<dim, Number, VectorizedArrayType>::reinit(
-  const Mapping<dim> &                                   mapping,
+  const MappingType &                                    mapping,
   const std::vector<const DoFHandlerType *> &            dof_handler,
   const std::vector<const AffineConstraints<number2> *> &constraint,
   const std::vector<QuadratureType> &                    quad,
@@ -2961,7 +2980,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
       dof_handler, additional_data.mg_level);
   std::vector<hp::QCollection<dim>> quad_hp;
   quad_hp.emplace_back(quad);
-  internal_reinit(StaticMappingQ1<dim>::mapping,
+
+  internal_reinit(std::make_shared<hp::MappingCollection<dim>>(
+                    StaticMappingQ1<dim>::mapping),
                   dof_handler,
                   constraint,
                   locally_owned_set,
@@ -2994,10 +3015,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
-template <typename QuadratureType, typename number2>
+template <typename QuadratureType, typename number2, typename MappingType>
 void
 MatrixFree<dim, Number, VectorizedArrayType>::reinit(
-  const Mapping<dim> &                                   mapping,
+  const MappingType &                                    mapping,
   const std::vector<const DoFHandler<dim> *> &           dof_handler,
   const std::vector<const AffineConstraints<number2> *> &constraint,
   const QuadratureType &                                 quad,
@@ -3009,7 +3030,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
       dof_handler, additional_data.mg_level);
   std::vector<hp::QCollection<dim>> quad_hp;
   quad_hp.emplace_back(quad);
-  internal_reinit(mapping,
+
+  internal_reinit(std::make_shared<hp::MappingCollection<dim>>(mapping),
                   dof_handler,
                   constraint,
                   locally_owned_set,
@@ -3020,10 +3042,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
-template <typename QuadratureType, typename number2>
+template <typename QuadratureType, typename number2, typename MappingType>
 void
 MatrixFree<dim, Number, VectorizedArrayType>::reinit(
-  const Mapping<dim> &                                   mapping,
+  const MappingType &                                    mapping,
   const std::vector<const DoFHandler<dim> *> &           dof_handler,
   const std::vector<const AffineConstraints<number2> *> &constraint,
   const std::vector<QuadratureType> &                    quad,
@@ -3036,7 +3058,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   std::vector<hp::QCollection<dim>> quad_hp;
   for (unsigned int q = 0; q < quad.size(); ++q)
     quad_hp.emplace_back(quad[q]);
-  internal_reinit(mapping,
+
+  internal_reinit(std::make_shared<hp::MappingCollection<dim>>(mapping),
                   dof_handler,
                   constraint,
                   locally_owned_set,
@@ -3047,10 +3070,13 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
-template <typename QuadratureType, typename number2, typename DoFHandlerType>
+template <typename QuadratureType,
+          typename number2,
+          typename DoFHandlerType,
+          typename MappingType>
 void
 MatrixFree<dim, Number, VectorizedArrayType>::reinit(
-  const Mapping<dim> &                                   mapping,
+  const MappingType &                                    mapping,
   const std::vector<const DoFHandlerType *> &            dof_handler,
   const std::vector<const AffineConstraints<number2> *> &constraint,
   const QuadratureType &                                 quad,

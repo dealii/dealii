@@ -272,7 +272,8 @@ namespace internal
       face_data_by_cells.clear();
       cell_type.clear();
       face_type.clear();
-      mapping = nullptr;
+      mapping_collection = nullptr;
+      mapping            = nullptr;
     }
 
 
@@ -331,15 +332,16 @@ namespace internal
       const std::vector<std::pair<unsigned int, unsigned int>> &cells,
       const FaceInfo<VectorizedArrayType::size()> &             face_info,
       const std::vector<unsigned int> &                         active_fe_index,
-      const Mapping<dim> &                                      mapping,
-      const std::vector<dealii::hp::QCollection<dim>> &         quad,
+      const std::shared_ptr<dealii::hp::MappingCollection<dim>> &mapping,
+      const std::vector<dealii::hp::QCollection<dim>> &          quad,
       const UpdateFlags update_flags_cells,
       const UpdateFlags update_flags_boundary_faces,
       const UpdateFlags update_flags_inner_faces,
       const UpdateFlags update_flags_faces_by_cells)
     {
       clear();
-      this->mapping = &mapping;
+      this->mapping_collection = mapping;
+      this->mapping            = &mapping->operator[](0);
 
       cell_data.resize(quad.size());
       face_data.resize(quad.size());
@@ -435,16 +437,16 @@ namespace internal
       // In case we have no hp adaptivity (active_fe_index is empty), we have
       // cells, and the mapping is MappingQGeneric or a derived class, we can
       // use the fast method.
-      if (active_fe_index.empty() && !cells.empty() &&
-          dynamic_cast<const MappingQGeneric<dim> *>(&mapping))
+      if (active_fe_index.empty() && !cells.empty() && mapping->size() == 1 &&
+          dynamic_cast<const MappingQGeneric<dim> *>(&mapping->operator[](0)))
         compute_mapping_q(tria, cells, face_info.faces);
       else
         {
           // Could call these functions in parallel, but not useful because
           // the work inside is nicely split up already
-          initialize_cells(tria, cells, active_fe_index, mapping);
-          initialize_faces(tria, cells, face_info.faces, mapping);
-          initialize_faces_by_cells(tria, cells, mapping);
+          initialize_cells(tria, cells, active_fe_index, *mapping);
+          initialize_faces(tria, cells, face_info.faces, *mapping);
+          initialize_faces_by_cells(tria, cells, *mapping);
         }
     }
 
@@ -457,7 +459,7 @@ namespace internal
       const std::vector<std::pair<unsigned int, unsigned int>> &cells,
       const FaceInfo<VectorizedArrayType::size()> &             face_info,
       const std::vector<unsigned int> &                         active_fe_index,
-      const Mapping<dim> &                                      mapping)
+      const std::shared_ptr<dealii::hp::MappingCollection<dim>> &mapping)
     {
       AssertDimension(cells.size() / VectorizedArrayType::size(),
                       cell_type.size());
@@ -469,18 +471,19 @@ namespace internal
       for (auto &data : face_data_by_cells)
         data.clear_data_fields();
 
-      this->mapping = &mapping;
+      this->mapping_collection = mapping;
+      this->mapping            = &mapping->operator[](0);
 
-      if (active_fe_index.empty() && !cells.empty() &&
-          dynamic_cast<const MappingQGeneric<dim> *>(&mapping))
+      if (active_fe_index.empty() && !cells.empty() && mapping->size() == 1 &&
+          dynamic_cast<const MappingQGeneric<dim> *>(&mapping->operator[](0)))
         compute_mapping_q(tria, cells, face_info.faces);
       else
         {
           // Could call these functions in parallel, but not useful because
           // the work inside is nicely split up already
-          initialize_cells(tria, cells, active_fe_index, mapping);
-          initialize_faces(tria, cells, face_info.faces, mapping);
-          initialize_faces_by_cells(tria, cells, mapping);
+          initialize_cells(tria, cells, active_fe_index, *mapping);
+          initialize_faces(tria, cells, face_info.faces, *mapping);
+          initialize_faces_by_cells(tria, cells, *mapping);
         }
     }
 
@@ -843,12 +846,15 @@ namespace internal
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
         const std::vector<unsigned int> &              active_fe_index,
-        const Mapping<dim> &                           mapping,
+        const dealii::hp::MappingCollection<dim> &     mapping_in,
         MappingInfo<dim, Number, VectorizedArrayType> &mapping_info,
         std::pair<std::vector<
                     MappingInfoStorage<dim, dim, Number, VectorizedArrayType>>,
                   CompressedCellData<dim, Number, VectorizedArrayType>> &data)
       {
+        AssertDimension(mapping_in.size(), 1);
+        const auto &mapping = mapping_in[0];
+
         FE_Nothing<dim> dummy_fe;
 
         // when we make comparisons about the size of Jacobians we need to
@@ -1515,7 +1521,7 @@ namespace internal
       const dealii::Triangulation<dim> &                        tria,
       const std::vector<std::pair<unsigned int, unsigned int>> &cells,
       const std::vector<unsigned int> &                         active_fe_index,
-      const Mapping<dim> &                                      mapping)
+      const dealii::hp::MappingCollection<dim> &                mapping)
     {
       const unsigned int n_cells = cells.size();
       const unsigned int n_lanes = VectorizedArrayType::size();
@@ -1748,13 +1754,16 @@ namespace internal
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
         const std::vector<FaceToCellTopology<VectorizedArrayType::size()>>
           &                                            faces,
-        const Mapping<dim> &                           mapping,
+        const dealii::hp::MappingCollection<dim> &     mapping_in,
         MappingInfo<dim, Number, VectorizedArrayType> &mapping_info,
         std::pair<
           std::vector<
             MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType>>,
           CompressedFaceData<dim, Number, VectorizedArrayType>> &data)
       {
+        AssertDimension(mapping_in.size(), 1);
+        const auto &mapping = mapping_in[0];
+
         FE_Nothing<dim> dummy_fe;
 
         std::vector<std::vector<std::shared_ptr<FEFaceValues<dim>>>>
@@ -2392,7 +2401,7 @@ namespace internal
       const dealii::Triangulation<dim> &                                  tria,
       const std::vector<std::pair<unsigned int, unsigned int>> &          cells,
       const std::vector<FaceToCellTopology<VectorizedArrayType::size()>> &faces,
-      const Mapping<dim> &mapping)
+      const dealii::hp::MappingCollection<dim> &mapping)
     {
       face_type.resize(faces.size(), general);
 
@@ -2591,8 +2600,11 @@ namespace internal
     {
       // step 1: extract quadrature point data with the data appropriate for
       // MappingQGeneric
+      AssertDimension(this->mapping_collection->size(), 1);
+
       const MappingQGeneric<dim> *mapping_q =
-        dynamic_cast<const MappingQGeneric<dim> *>(&*this->mapping);
+        dynamic_cast<const MappingQGeneric<dim> *>(
+          &this->mapping_collection->operator[](0));
       Assert(mapping_q != nullptr, ExcInternalError());
 
       const unsigned int mapping_degree = mapping_q->get_degree();
@@ -2937,7 +2949,7 @@ namespace internal
       // transitioned to extracting the information from cell quadrature
       // points but we need to figure out the correct indices of neighbors
       // within the list of arrays still
-      initialize_faces_by_cells(tria, cell_array, *this->mapping);
+      initialize_faces_by_cells(tria, cell_array, *this->mapping_collection);
     }
 
 
@@ -2947,10 +2959,14 @@ namespace internal
     MappingInfo<dim, Number, VectorizedArrayType>::initialize_faces_by_cells(
       const dealii::Triangulation<dim> &                        tria,
       const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-      const Mapping<dim> &                                      mapping)
+      const dealii::hp::MappingCollection<dim> &                mapping_in)
     {
       if (update_flags_faces_by_cells == update_default)
         return;
+
+
+      AssertDimension(mapping_in.size(), 1);
+      const auto &mapping = mapping_in[0];
 
       const unsigned int n_quads = face_data_by_cells.size();
       const unsigned int n_lanes = VectorizedArrayType::size();
