@@ -110,7 +110,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
   // (e.g. MappingQEulerian), we need to compute the offset of the vertex for
   // the graphical output. Otherwise, we can just use the vertex info.
   for (const unsigned int vertex : cell_and_index->first->vertex_indices())
-    if (fe_patch_values.get_mapping().preserves_vertex_locations())
+    if (scratch_data.mapping_collection[0].preserves_vertex_locations())
       patch.vertices[vertex] = cell_and_index->first->vertex(vertex);
     else
       patch.vertices[vertex] =
@@ -119,6 +119,19 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
           GeometryInfo<DoFHandlerType::dimension>::unit_cell_vertex(vertex));
 
   const unsigned int n_q_points = fe_patch_values.n_quadrature_points;
+
+  scratch_data.patch_values_scalar.solution_values.resize(n_q_points);
+  scratch_data.patch_values_scalar.solution_gradients.resize(n_q_points);
+  scratch_data.patch_values_scalar.solution_hessians.resize(n_q_points);
+  scratch_data.patch_values_system.solution_values.resize(n_q_points);
+  scratch_data.patch_values_system.solution_gradients.resize(n_q_points);
+  scratch_data.patch_values_system.solution_hessians.resize(n_q_points);
+
+  for (unsigned int dataset = 0;
+       dataset < scratch_data.postprocessed_values.size();
+       ++dataset)
+    if (scratch_data.postprocessed_values[dataset].size() != 0)
+      scratch_data.postprocessed_values[dataset].resize(n_q_points);
 
   // First fill the geometric information for the patch: Where are the
   // nodes in question located.
