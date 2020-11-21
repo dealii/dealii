@@ -3740,7 +3740,7 @@ GridOut::write_mesh_per_processor_as_vtu(
             (filename_without_extension + ".pvtu");
           std::ofstream pvtu_output(pvtu_filename.c_str());
 
-          DataOut<dim, DoFHandler<dim, spacedim>> data_out;
+          DataOut<dim, spacedim> data_out;
           data_out.attach_triangulation(*tr);
 
           // We need a dummy vector with the names of the data values in the

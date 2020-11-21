@@ -98,14 +98,12 @@ namespace internal
 
 
 
-template <int dim, typename DoFHandlerType>
+template <int dim, int spacedim>
 void
-DataOutRotation<dim, DoFHandlerType>::build_one_patch(
-  const cell_iterator *                                                   cell,
-  internal::DataOutRotationImplementation::ParallelData<dimension,
-                                                        space_dimension> &data,
-  std::vector<DataOutBase::Patch<dimension + 1, space_dimension + 1>>
-    &my_patches)
+DataOutRotation<dim, spacedim>::build_one_patch(
+  const cell_iterator *                                                 cell,
+  internal::DataOutRotationImplementation::ParallelData<dim, spacedim> &data,
+  std::vector<DataOutBase::Patch<dim + 1, spacedim + 1>> &my_patches)
 {
   if (dim == 3)
     {
@@ -126,21 +124,21 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
   // which we will put points in the whole domain (not the rotationally
   // reduced one in which the computation took place. for simplicity add the
   // initial direction at the end again
-  std::vector<Point<dimension + 1>> angle_directions(n_patches_per_circle + 1);
+  std::vector<Point<dim + 1>> angle_directions(n_patches_per_circle + 1);
   for (unsigned int i = 0; i <= n_patches_per_circle; ++i)
     {
-      angle_directions[i][dimension - 1] =
+      angle_directions[i][dim - 1] =
         std::cos(2 * numbers::PI * i / n_patches_per_circle);
-      angle_directions[i][dimension] =
+      angle_directions[i][dim] =
         std::sin(2 * numbers::PI * i / n_patches_per_circle);
     }
 
   for (unsigned int angle = 0; angle < n_patches_per_circle; ++angle)
     {
       // first compute the vertices of the patch. note that they will have to
-      // be computed from the vertices of the cell, which has one dimension
+      // be computed from the vertices of the cell, which has one dim
       // less, however.
-      switch (dimension)
+      switch (dim)
         {
           case 1:
             {
@@ -160,9 +158,9 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
           case 2:
             {
               for (const unsigned int vertex :
-                   GeometryInfo<dimension>::vertex_indices())
+                   GeometryInfo<dim>::vertex_indices())
                 {
-                  const Point<dimension> v = (*cell)->vertex(vertex);
+                  const Point<dim> v = (*cell)->vertex(vertex);
 
                   // make sure that the radial variable is nonnegative
                   Assert(v(0) >= 0, ExcRadialVariableHasNegativeValues(v(0)));
@@ -173,13 +171,11 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
                   my_patches[angle].vertices[vertex][0] = v(1);
 
                   my_patches[angle]
-                    .vertices[vertex +
-                              GeometryInfo<dimension>::vertices_per_cell] =
+                    .vertices[vertex + GeometryInfo<dim>::vertices_per_cell] =
                     v(0) * angle_directions[angle + 1];
                   my_patches[angle]
-                    .vertices[vertex +
-                              GeometryInfo<dimension>::vertices_per_cell][0] =
-                    v(1);
+                    .vertices[vertex + GeometryInfo<dim>::vertices_per_cell]
+                             [0] = v(1);
                 }
 
               break;
@@ -199,7 +195,7 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
           for (unsigned int dataset = 0; dataset < this->dof_data.size();
                ++dataset)
             {
-              const FEValuesBase<dimension> &fe_patch_values =
+              const FEValuesBase<dim> &fe_patch_values =
                 data.get_present_fe_values(dataset);
               const unsigned int n_components =
                 fe_patch_values.get_fe().n_components();
@@ -241,13 +237,13 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
                         data.patch_values_scalar.evaluation_points =
                           fe_patch_values.get_quadrature_points();
 
-                      const typename DoFHandlerType::active_cell_iterator
+                      const typename DoFHandler<dim,
+                                                spacedim>::active_cell_iterator
                         dh_cell(&(*cell)->get_triangulation(),
                                 (*cell)->level(),
                                 (*cell)->index(),
                                 this->dof_data[dataset]->dof_handler);
-                      data.patch_values_scalar
-                        .template set_cell<DoFHandlerType>(dh_cell);
+                      data.patch_values_scalar.template set_cell<dim>(dh_cell);
 
                       postprocessor->evaluate_scalar_field(
                         data.patch_values_scalar,
@@ -282,13 +278,13 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
                         data.patch_values_system.evaluation_points =
                           fe_patch_values.get_quadrature_points();
 
-                      const typename DoFHandlerType::active_cell_iterator
+                      const typename DoFHandler<dim,
+                                                spacedim>::active_cell_iterator
                         dh_cell(&(*cell)->get_triangulation(),
                                 (*cell)->level(),
                                 (*cell)->index(),
                                 this->dof_data[dataset]->dof_handler);
-                      data.patch_values_system
-                        .template set_cell<DoFHandlerType>(dh_cell);
+                      data.patch_values_system.template set_cell<dim>(dh_cell);
 
                       postprocessor->evaluate_vector_field(
                         data.patch_values_system,
@@ -299,7 +295,7 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
                        component < this->dof_data[dataset]->n_output_variables;
                        ++component)
                     {
-                      switch (dimension)
+                      switch (dim)
                         {
                           case 1:
                             for (unsigned int x = 0; x < n_points; ++x)
@@ -336,7 +332,7 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
                       real_part,
                     data.patch_values_scalar.solution_values);
 
-                  switch (dimension)
+                  switch (dim)
                     {
                       case 1:
                         for (unsigned int x = 0; x < n_points; ++x)
@@ -373,7 +369,7 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
                   for (unsigned int component = 0; component < n_components;
                        ++component)
                     {
-                      switch (dimension)
+                      switch (dim)
                         {
                           case 1:
                             for (unsigned int x = 0; x < n_points; ++x)
@@ -416,14 +412,14 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
                      ExcMessage("Cell must be active for cell data"));
               const unsigned int cell_number = std::distance(
                 this->triangulation->begin_active(),
-                typename Triangulation<dimension, space_dimension>::
-                  active_cell_iterator(*cell));
+                typename Triangulation<dim, spacedim>::active_cell_iterator(
+                  *cell));
               const double value =
                 this->cell_data[dataset]->get_cell_data_value(
                   cell_number,
                   internal::DataOutImplementation::ComponentExtractor::
                     real_part);
-              switch (dimension)
+              switch (dim)
                 {
                   case 1:
                     for (unsigned int x = 0; x < n_points; ++x)
@@ -451,15 +447,12 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
 
 
 
-template <int dim, typename DoFHandlerType>
+template <int dim, int spacedim>
 void
-DataOutRotation<dim, DoFHandlerType>::build_patches(
+DataOutRotation<dim, spacedim>::build_patches(
   const unsigned int n_patches_per_circle,
   const unsigned int nnnn_subdivisions)
 {
-  // Check consistency of redundant
-  // template parameter
-  Assert(dim == dimension, ExcDimensionMismatch(dim, dimension));
   Assert(this->triangulation != nullptr,
          Exceptions::DataOutImplementation::ExcNoTriangulationSelected());
 
@@ -512,22 +505,21 @@ DataOutRotation<dim, DoFHandlerType>::build_patches(
     else
       n_postprocessor_outputs[dataset] = 0;
 
-  internal::DataOutRotationImplementation::ParallelData<dimension,
-                                                        space_dimension>
-    thread_data(n_datasets,
+  internal::DataOutRotationImplementation::ParallelData<dim, spacedim>
+                                                         thread_data(n_datasets,
                 n_subdivisions,
                 n_patches_per_circle,
                 n_postprocessor_outputs,
-                StaticMappingQ1<dimension, space_dimension>::mapping,
+                StaticMappingQ1<dim, spacedim>::mapping,
                 this->get_fes(),
                 update_flags);
-  std::vector<DataOutBase::Patch<dimension + 1, space_dimension + 1>>
-    new_patches(n_patches_per_circle);
+  std::vector<DataOutBase::Patch<dim + 1, spacedim + 1>> new_patches(
+    n_patches_per_circle);
   for (unsigned int i = 0; i < new_patches.size(); ++i)
     {
       new_patches[i].n_subdivisions = n_subdivisions;
       new_patches[i].data.reinit(
-        n_datasets, Utilities::fixed_power<dimension + 1>(n_subdivisions + 1));
+        n_datasets, Utilities::fixed_power<dim + 1>(n_subdivisions + 1));
     }
 
   // now build the patches in parallel
@@ -535,16 +527,16 @@ DataOutRotation<dim, DoFHandlerType>::build_patches(
     all_cells.data(),
     all_cells.data() + all_cells.size(),
     [this](const cell_iterator *cell,
-           internal::DataOutRotationImplementation::
-             ParallelData<dimension, space_dimension> &data,
-           std::vector<DataOutBase::Patch<dimension + 1, space_dimension + 1>>
-             &my_patches) { this->build_one_patch(cell, data, my_patches); },
-    [this](
-      const std::vector<DataOutBase::Patch<dimension + 1, space_dimension + 1>>
-        &new_patches) {
-      internal::DataOutRotationImplementation::
-        append_patch_to_list<dimension, space_dimension>(new_patches,
-                                                         this->patches);
+           internal::DataOutRotationImplementation::ParallelData<dim, spacedim>
+             &                                                     data,
+           std::vector<DataOutBase::Patch<dim + 1, spacedim + 1>> &my_patches) {
+      this->build_one_patch(cell, data, my_patches);
+    },
+    [this](const std::vector<DataOutBase::Patch<dim + 1, spacedim + 1>>
+             &new_patches) {
+      internal::DataOutRotationImplementation::append_patch_to_list<dim,
+                                                                    spacedim>(
+        new_patches, this->patches);
     },
     thread_data,
     new_patches);
@@ -552,23 +544,23 @@ DataOutRotation<dim, DoFHandlerType>::build_patches(
 
 
 
-template <int dim, typename DoFHandlerType>
-typename DataOutRotation<dim, DoFHandlerType>::cell_iterator
-DataOutRotation<dim, DoFHandlerType>::first_cell()
+template <int dim, int spacedim>
+typename DataOutRotation<dim, spacedim>::cell_iterator
+DataOutRotation<dim, spacedim>::first_cell()
 {
   return this->triangulation->begin_active();
 }
 
 
-template <int dim, typename DoFHandlerType>
-typename DataOutRotation<dim, DoFHandlerType>::cell_iterator
-DataOutRotation<dim, DoFHandlerType>::next_cell(const cell_iterator &cell)
+template <int dim, int spacedim>
+typename DataOutRotation<dim, spacedim>::cell_iterator
+DataOutRotation<dim, spacedim>::next_cell(const cell_iterator &cell)
 {
   // convert the iterator to an
   // active_iterator and advance
   // this to the next active cell
-  typename Triangulation<dimension, space_dimension>::active_cell_iterator
-    active_cell = cell;
+  typename Triangulation<dim, spacedim>::active_cell_iterator active_cell =
+    cell;
   ++active_cell;
   return active_cell;
 }

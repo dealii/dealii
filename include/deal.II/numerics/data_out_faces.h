@@ -112,31 +112,16 @@ namespace internal
  *
  * @ingroup output
  */
-template <int dim, typename DoFHandlerType = DoFHandler<dim>>
-class DataOutFaces : public DataOut_DoFData<DoFHandlerType,
-                                            DoFHandlerType::dimension - 1,
-                                            DoFHandlerType::dimension>
+template <int dim, int spacedim = dim>
+class DataOutFaces : public DataOut_DoFData<dim, dim - 1, spacedim, dim>
 {
 public:
-  /**
-   * An abbreviation for the dimension of the DoFHandler object we work with.
-   * Faces are then <code>dimension-1</code> dimensional objects.
-   */
-  static const unsigned int dimension = DoFHandlerType::dimension;
-
-  /**
-   * An abbreviation for the spatial dimension within which the triangulation
-   * and DoFHandler are embedded in.
-   */
-  static const unsigned int space_dimension = DoFHandlerType::space_dimension;
-
   /**
    * Alias to the iterator type of the dof handler class under
    * consideration.
    */
-  using cell_iterator = typename DataOut_DoFData<DoFHandlerType,
-                                                 dimension - 1,
-                                                 dimension>::cell_iterator;
+  using cell_iterator =
+    typename DataOut_DoFData<dim, dim - 1, spacedim, dim>::cell_iterator;
 
   /**
    * Constructor determining whether a surface mesh (default) or the whole
@@ -182,8 +167,8 @@ public:
    * hp::MappingCollection in case of a DoFHandler with hp-capabilities.
    */
   virtual void
-  build_patches(const Mapping<dimension> &mapping,
-                const unsigned int        n_subdivisions = 0);
+  build_patches(const Mapping<dim> &mapping,
+                const unsigned int  n_subdivisions = 0);
 
   /**
    * Declare a way to describe a face which we would like to generate output
@@ -244,10 +229,9 @@ private:
    */
   void
   build_one_patch(
-    const FaceDescriptor *cell_and_face,
-    internal::DataOutFacesImplementation::ParallelData<dimension, dimension>
-      &                                                 data,
-    DataOutBase::Patch<dimension - 1, space_dimension> &patch);
+    const FaceDescriptor *                                        cell_and_face,
+    internal::DataOutFacesImplementation::ParallelData<dim, dim> &data,
+    DataOutBase::Patch<dim - 1, spacedim> &                       patch);
 };
 
 namespace Legacy
@@ -258,7 +242,7 @@ namespace Legacy
    */
   template <int dim, typename DoFHandlerType = DoFHandler<dim>>
   using DataOutFaces DEAL_II_DEPRECATED =
-    dealii::DataOutFaces<dim, DoFHandlerType>;
+    dealii::DataOutFaces<dim, DoFHandlerType::space_dimension>;
 } // namespace Legacy
 
 

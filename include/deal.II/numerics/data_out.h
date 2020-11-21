@@ -143,26 +143,16 @@ namespace internal
  *
  * @ingroup output
  */
-template <int dim, typename DoFHandlerType = DoFHandler<dim>>
-class DataOut : public DataOut_DoFData<DoFHandlerType,
-                                       DoFHandlerType::dimension,
-                                       DoFHandlerType::space_dimension>
+template <int dim, int spacedim = dim>
+class DataOut : public DataOut_DoFData<dim, dim, spacedim, spacedim>
 {
 public:
-  static_assert(dim == DoFHandlerType::dimension,
-                "The dimension given explicitly as a template argument to "
-                "this class must match the dimension of the DoFHandler "
-                "template argument");
-  static constexpr unsigned int spacedim = DoFHandlerType::space_dimension;
-
   /**
    * Typedef to the iterator type of the dof handler class under
    * consideration.
    */
   using cell_iterator =
-    typename DataOut_DoFData<DoFHandlerType,
-                             DoFHandlerType::dimension,
-                             DoFHandlerType::space_dimension>::cell_iterator;
+    typename DataOut_DoFData<dim, dim, spacedim, spacedim>::cell_iterator;
 
   /**
    * The type of the function object returning the first cell as used in
@@ -317,20 +307,17 @@ public:
    * deformation of each vertex.
    */
   virtual void
-  build_patches(const Mapping<DoFHandlerType::dimension,
-                              DoFHandlerType::space_dimension> &mapping,
-                const unsigned int     n_subdivisions = 0,
-                const CurvedCellRegion curved_region  = curved_boundary);
+  build_patches(const Mapping<dim, spacedim> &mapping,
+                const unsigned int            n_subdivisions = 0,
+                const CurvedCellRegion        curved_region  = curved_boundary);
 
   /**
    * Same as above, but for hp::MappingCollection.
    */
   virtual void
-  build_patches(
-    const hp::MappingCollection<DoFHandlerType::dimension,
-                                DoFHandlerType::space_dimension> &mapping,
-    const unsigned int     n_subdivisions = 0,
-    const CurvedCellRegion curved_region  = curved_boundary);
+  build_patches(const hp::MappingCollection<dim, spacedim> &mapping,
+                const unsigned int                          n_subdivisions = 0,
+                const CurvedCellRegion curved_region = curved_boundary);
 
   /**
    * A function that allows selecting for which cells output should be
@@ -508,12 +495,11 @@ private:
    * reasons.
    */
   void
-  build_one_patch(const std::pair<cell_iterator, unsigned int> *cell_and_index,
-                  internal::DataOutImplementation::ParallelData<
-                    DoFHandlerType::dimension,
-                    DoFHandlerType::space_dimension> &scratch_data,
-                  const unsigned int                  n_subdivisions,
-                  const CurvedCellRegion              curved_cell_region);
+  build_one_patch(
+    const std::pair<cell_iterator, unsigned int> *cell_and_index,
+    internal::DataOutImplementation::ParallelData<dim, spacedim> &scratch_data,
+    const unsigned int     n_subdivisions,
+    const CurvedCellRegion curved_cell_region);
 };
 
 namespace Legacy
@@ -523,7 +509,8 @@ namespace Legacy
    * instead.
    */
   template <int dim, typename DoFHandlerType = DoFHandler<dim>>
-  using DataOut DEAL_II_DEPRECATED = dealii::DataOut<dim, DoFHandlerType>;
+  using DataOut DEAL_II_DEPRECATED =
+    dealii::DataOut<dim, DoFHandlerType::space_dimension>;
 } // namespace Legacy
 
 

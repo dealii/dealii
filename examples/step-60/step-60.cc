@@ -1008,7 +1008,7 @@ namespace Step60
     // embedded_mapping to the DataOut::build_patches function. The mapping will
     // take care of outputting the result on the actual deformed configuration.
 
-    DataOut<dim, DoFHandler<dim, spacedim>> embedded_out;
+    DataOut<dim, spacedim> embedded_out;
 
     std::ofstream embedded_out_file("embedded.vtu");
 
