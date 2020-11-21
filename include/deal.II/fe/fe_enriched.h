@@ -144,47 +144,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <h3>References</h3>
  *
- * When using this class, please cite
- * @code{.bib}
- * @article{Davydov2017,
- *   author  = {Denis Davydov and Tymofiy Gerasimov and Jean-Paul Pelteret and
- *              Paul Steinmann},
- *   title   = {Convergence study of the h-adaptive PUM and the hp-adaptive FEM
- *              applied to eigenvalue problems in quantum mechanics},
- *   journal = {Advanced Modeling and Simulation in Engineering Sciences},
- *   year    = {2017},
- *   volume  = {4},
- *   number  = {1},
- *   pages   = {7},
- *   month   = {Dec},
- *   issn    = {2213-7467},
- *   day     = {12},
- *   doi     = {10.1186/s40323-017-0093-0},
- *   url     = {https://doi.org/10.1186/s40323-017-0093-0},
- * }
- * @endcode
- * The PUM was introduced in
- * @code{.bib}
- * @article{Melenk1996,
- *   title   = {The partition of unity finite element method: Basic theory and
- *              applications},
- *   author  = {Melenk, J.M. and Babu\v{s}ka, I.},
- *   journal = {Computer Methods in Applied Mechanics and Engineering},
- *   year    = {1996},
- *   number  = {1--4},
- *   pages   = {289 -- 314},
- *   volume  = {139},
- * }
- * @article{Babuska1997,
- *   title   = {The partition of unity method},
- *   author  = {Babu\v{s}ka, I. and Melenk, J. M.},
- *   journal = {International Journal for Numerical Methods in Engineering},
- *   year    = {1997},
- *   number  = {4},
- *   pages   = {727--758},
- *   volume  = {40},
- * }
- * @endcode
+ * When using this class, please cite @cite davydov2017hp .
+ * The PUM was introduced in @cite melenk1996 and @cite babuska1997 .
  *
  * <h3>Implementation</h3>
  *
