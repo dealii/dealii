@@ -17,5 +17,72 @@
 /**
  * @defgroup simplex Simplex support (experimental)
  *
- * This module describes the experimental simplex support in deal.II.
+ * @brief This module describes the experimental simplex support in deal.II.
+ *
+ * @section simplex_reference_cells Reference cells
+ *
+ * In 2D, we provide triangles and quadrilaterals with the following possible
+ * orientations in 3D:
+ *
+ * <div class="twocolumn" style="width: 100%">
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       @image html reference_cells_0.png
+ *     </div>
+ *     <div class="text" align="center">
+ *       2D: triangle and quadrilateral
+ *     </div>
+ *   </div>
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       @image html reference_cells_1.png
+ *     </div>
+ *     <div class="text" align="center">
+ *       Possible orientations of triangles and quadrilaterals in 3D
+ *     </div>
+ *   </div>
+ * </div>
+ *
+ * In 3D, tetrahedrons, pyramids, wedges, and hexahedrons are available:
+ *
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       @image html reference_cells_2.png
+ *     </div>
+ *     <div class="text" align="center">
+ *       3D: Tetrahedron
+ *     </div>
+ *   </div>
+ *
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       @image html reference_cells_3.png
+ *     </div>
+ *     <div class="text" align="center">
+ *       3D: Pyramid
+ *     </div>
+ *   </div>
+ *
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       @image html reference_cells_4.png
+ *     </div>
+ *     <div class="text" align="center">
+ *       3D: Wedge
+ *     </div>
+ *   </div>
+ *
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       @image html reference_cells_5.png
+ *     </div>
+ *     <div class="text" align="center">
+ *       3D: Hexahedron
+ *     </div>
+ *   </div>
+ *
+ * Each surface of a 3D reference cell consists of 2D reference cells. The
+ * documentation of the enumeration of the numbering of their vertices and
+ * lines are given in the right columns.
+ *
  */
