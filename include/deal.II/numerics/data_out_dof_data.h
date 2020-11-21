@@ -591,19 +591,18 @@ namespace internal
  *
  * @ingroup output
  */
-template <typename DoFHandlerType,
+template <int dim,
           int patch_dim,
-          int patch_space_dim = patch_dim>
-class DataOut_DoFData : public DataOutInterface<patch_dim, patch_space_dim>
+          int spacedim       = dim,
+          int patch_spacedim = patch_dim>
+class DataOut_DoFData : public DataOutInterface<patch_dim, patch_spacedim>
 {
 public:
   /**
    * Typedef to the iterator type of the dof handler class under
    * consideration.
    */
-  using cell_iterator =
-    typename Triangulation<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension>::cell_iterator;
+  using cell_iterator = typename Triangulation<dim, spacedim>::cell_iterator;
 
 public:
   /**
@@ -651,7 +650,7 @@ public:
    * object, then that contains all information needed to generate the output.
    */
   void
-  attach_dof_handler(const DoFHandlerType &);
+  attach_dof_handler(const DoFHandler<dim, spacedim> &);
 
   /**
    * Designate a triangulation to be used to extract geometry data and the
@@ -663,8 +662,7 @@ public:
    * at all, in which case it provides the geometry.
    */
   void
-  attach_triangulation(const Triangulation<DoFHandlerType::dimension,
-                                           DoFHandlerType::space_dimension> &);
+  attach_triangulation(const Triangulation<dim, spacedim> &);
 
   /**
    * Add a data vector together with its name.
@@ -788,9 +786,9 @@ public:
   template <class VectorType>
   void
   add_data_vector(
-    const DoFHandlerType &          dof_handler,
-    const VectorType &              data,
-    const std::vector<std::string> &names,
+    const DoFHandler<dim, spacedim> &dof_handler,
+    const VectorType &               data,
+    const std::vector<std::string> & names,
     const std::vector<DataComponentInterpretation::DataComponentInterpretation>
       &data_component_interpretation = std::vector<
         DataComponentInterpretation::DataComponentInterpretation>());
@@ -803,9 +801,9 @@ public:
   template <class VectorType>
   void
   add_data_vector(
-    const DoFHandlerType &dof_handler,
-    const VectorType &    data,
-    const std::string &   name,
+    const DoFHandler<dim, spacedim> &dof_handler,
+    const VectorType &               data,
+    const std::string &              name,
     const std::vector<DataComponentInterpretation::DataComponentInterpretation>
       &data_component_interpretation = std::vector<
         DataComponentInterpretation::DataComponentInterpretation>());
@@ -838,9 +836,8 @@ public:
    */
   template <class VectorType>
   void
-  add_data_vector(const VectorType &data,
-                  const DataPostprocessor<DoFHandlerType::space_dimension>
-                    &data_postprocessor);
+  add_data_vector(const VectorType &                 data,
+                  const DataPostprocessor<spacedim> &data_postprocessor);
 
   /**
    * Same function as above, but with a DoFHandler object that does not need
@@ -850,10 +847,9 @@ public:
    */
   template <class VectorType>
   void
-  add_data_vector(const DoFHandlerType &dof_handler,
-                  const VectorType &    data,
-                  const DataPostprocessor<DoFHandlerType::space_dimension>
-                    &data_postprocessor);
+  add_data_vector(const DoFHandler<dim, spacedim> &  dof_handler,
+                  const VectorType &                 data,
+                  const DataPostprocessor<spacedim> &data_postprocessor);
 
   /**
    * Add a multilevel data vector.
@@ -875,7 +871,7 @@ public:
   template <class VectorType>
   void
   add_mg_data_vector(
-    const DoFHandlerType &           dof_handler,
+    const DoFHandler<dim, spacedim> &dof_handler,
     const MGLevelObject<VectorType> &data,
     const std::vector<std::string> & names,
     const std::vector<DataComponentInterpretation::DataComponentInterpretation>
@@ -887,7 +883,7 @@ public:
    */
   template <class VectorType>
   void
-  add_mg_data_vector(const DoFHandlerType &           dof_handler,
+  add_mg_data_vector(const DoFHandler<dim, spacedim> &dof_handler,
                      const MGLevelObject<VectorType> &data,
                      const std::string &              name);
 
@@ -936,11 +932,23 @@ public:
    * This function will fail if either this or the other object did not yet
    * set up any patches.
    */
-  template <typename DoFHandlerType2>
+  template <int dim2, int spacedim2>
   void
   merge_patches(
-    const DataOut_DoFData<DoFHandlerType2, patch_dim, patch_space_dim> &source,
-    const Point<patch_space_dim> &shift = Point<patch_space_dim>());
+    const DataOut_DoFData<dim2, patch_dim, spacedim2, patch_spacedim> &source,
+    const Point<patch_spacedim> &shift = Point<patch_spacedim>());
+
+  /**
+   * @deprecated Use merge_patches() without the DoFHandlerType2 template
+   * instead.
+   */
+  template <typename DoFHandlerType2>
+  DEAL_II_DEPRECATED void
+  merge_patches(const DataOut_DoFData<DoFHandlerType2::dimension,
+                                      patch_dim,
+                                      DoFHandlerType2::space_dimension,
+                                      patch_spacedim> &source,
+                const Point<patch_spacedim> &shift = Point<patch_spacedim>());
 
   /**
    * Release the pointers to the data vectors and the DoF handler. You have to
@@ -962,34 +970,30 @@ protected:
   /**
    * Abbreviate the somewhat lengthy name for the Patch class.
    */
-  using Patch = dealii::DataOutBase::Patch<patch_dim, patch_space_dim>;
+  using Patch = dealii::DataOutBase::Patch<patch_dim, patch_spacedim>;
 
   /**
    * Pointer to the triangulation object.
    */
-  SmartPointer<const Triangulation<DoFHandlerType::dimension,
-                                   DoFHandlerType::space_dimension>>
-    triangulation;
+  SmartPointer<const Triangulation<dim, spacedim>> triangulation;
 
   /**
    * Pointer to the optional handler object.
    */
-  SmartPointer<const DoFHandlerType> dofs;
+  SmartPointer<const DoFHandler<dim, spacedim>> dofs;
 
   /**
    * List of data elements with vectors of values for each degree of freedom.
    */
-  std::vector<std::shared_ptr<internal::DataOutImplementation::DataEntryBase<
-    DoFHandlerType::dimension,
-    DoFHandlerType::space_dimension>>>
+  std::vector<std::shared_ptr<
+    internal::DataOutImplementation::DataEntryBase<dim, spacedim>>>
     dof_data;
 
   /**
    * List of data elements with vectors of values for each cell.
    */
-  std::vector<std::shared_ptr<internal::DataOutImplementation::DataEntryBase<
-    DoFHandlerType::dimension,
-    DoFHandlerType::space_dimension>>>
+  std::vector<std::shared_ptr<
+    internal::DataOutImplementation::DataEntryBase<dim, spacedim>>>
     cell_data;
 
   /**
@@ -1017,9 +1021,7 @@ protected:
    * Extracts the finite elements stored in the dof_data object, including a
    * dummy object of FE_DGQ<dim>(0) in case only the triangulation is used.
    */
-  std::vector<
-    std::shared_ptr<dealii::hp::FECollection<DoFHandlerType::dimension,
-                                             DoFHandlerType::space_dimension>>>
+  std::vector<std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
   get_fes() const;
 
   /**
@@ -1035,7 +1037,7 @@ protected:
 
   // Make all template siblings friends. Needed for the merge_patches()
   // function.
-  template <class, int, int>
+  template <int, int, int, int>
   friend class DataOut_DoFData;
 
   /**
@@ -1050,10 +1052,10 @@ private:
   template <class VectorType>
   void
   add_data_vector_internal(
-    const DoFHandlerType *          dof_handler,
-    const VectorType &              data,
-    const std::vector<std::string> &names,
-    const DataVectorType            type,
+    const DoFHandler<dim, spacedim> *dof_handler,
+    const VectorType &               data,
+    const std::vector<std::string> & names,
+    const DataVectorType             type,
     const std::vector<DataComponentInterpretation::DataComponentInterpretation>
       &        data_component_interpretation,
     const bool deduce_output_names);
@@ -1062,10 +1064,10 @@ private:
 
 
 // -------------------- template and inline functions ------------------------
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
 template <typename VectorType>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::add_data_vector(
   const VectorType &   vec,
   const std::string &  name,
   const DataVectorType type,
@@ -1081,10 +1083,10 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
 template <typename VectorType>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::add_data_vector(
   const VectorType &              vec,
   const std::vector<std::string> &names,
   const DataVectorType            type,
@@ -1099,13 +1101,13 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
 template <typename VectorType>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
-  const DoFHandlerType &dof_handler,
-  const VectorType &    data,
-  const std::string &   name,
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::add_data_vector(
+  const DoFHandler<dim, spacedim> &dof_handler,
+  const VectorType &               data,
+  const std::string &              name,
   const std::vector<DataComponentInterpretation::DataComponentInterpretation>
     &data_component_interpretation)
 {
@@ -1120,13 +1122,13 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
 template <typename VectorType>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
-  const DoFHandlerType &          dof_handler,
-  const VectorType &              data,
-  const std::vector<std::string> &names,
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::add_data_vector(
+  const DoFHandler<dim, spacedim> &dof_handler,
+  const VectorType &               data,
+  const std::vector<std::string> & names,
   const std::vector<DataComponentInterpretation::DataComponentInterpretation>
     &data_component_interpretation)
 {
@@ -1140,12 +1142,12 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
 template <typename VectorType>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
-  const VectorType &                                        vec,
-  const DataPostprocessor<DoFHandlerType::space_dimension> &data_postprocessor)
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::add_data_vector(
+  const VectorType &                 vec,
+  const DataPostprocessor<spacedim> &data_postprocessor)
 {
   Assert(dofs != nullptr,
          Exceptions::DataOutImplementation::ExcNoDoFHandlerSelected());
@@ -1154,12 +1156,12 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
-template <typename DoFHandlerType2>
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
+template <int dim2, int spacedim2>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::merge_patches(
-  const DataOut_DoFData<DoFHandlerType2, patch_dim, patch_space_dim> &source,
-  const Point<patch_space_dim> &                                      shift)
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::merge_patches(
+  const DataOut_DoFData<dim2, patch_dim, spacedim2, patch_spacedim> &source,
+  const Point<patch_spacedim> &                                      shift)
 {
   const std::vector<Patch> &source_patches = source.get_patches();
   Assert((patches.size() != 0) && (source_patches.size() != 0),
@@ -1192,9 +1194,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::merge_patches(
   Assert(patches[0].data.n_cols() == source_patches[0].data.n_cols(),
          Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
   Assert((patches[0].data.n_rows() +
-          (patches[0].points_are_available ? 0 : patch_space_dim)) ==
+          (patches[0].points_are_available ? 0 : patch_spacedim)) ==
            (source_patches[0].data.n_rows() +
-            (source_patches[0].points_are_available ? 0 : patch_space_dim)),
+            (source_patches[0].points_are_available ? 0 : patch_spacedim)),
          Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
 
   // check equality of the vector data
@@ -1227,7 +1229,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::merge_patches(
   patches.insert(patches.end(), source_patches.begin(), source_patches.end());
 
   // perform shift, if so desired
-  if (shift != Point<patch_space_dim>())
+  if (shift != Point<patch_spacedim>())
     for (unsigned int i = old_n_patches; i < patches.size(); ++i)
       for (const unsigned int v : GeometryInfo<patch_dim>::vertex_indices())
         patches[i].vertices[v] += shift;
@@ -1243,6 +1245,24 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::merge_patches(
         patches[i].neighbors[n] += old_n_patches;
 }
 
+
+
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
+template <typename DoFHandlerType2>
+void
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::merge_patches(
+  const DataOut_DoFData<DoFHandlerType2::dimension,
+                        patch_dim,
+                        DoFHandlerType2::space_dimension,
+                        patch_spacedim> &source,
+  const Point<patch_spacedim> &          shift)
+{
+  this->merge_patches<DoFHandlerType2::dimension,
+                      DoFHandlerType2::space_dimension>(source, shift);
+}
+
+
+
 namespace Legacy
 {
   /**
@@ -1253,7 +1273,10 @@ namespace Legacy
             int patch_dim,
             int patch_space_dim = patch_dim>
   using DataOut_DoFData DEAL_II_DEPRECATED =
-    dealii::DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>;
+    dealii::DataOut_DoFData<DoFHandlerType::dimension,
+                            patch_dim,
+                            DoFHandlerType::space_dimension,
+                            patch_space_dim>;
 } // namespace Legacy
 
 
