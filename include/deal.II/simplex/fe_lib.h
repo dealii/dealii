@@ -84,6 +84,27 @@ namespace Simplex
      */
     std::string
     get_name() const override;
+
+    /**
+     * @copydoc dealii::FiniteElement::compare_for_domination()
+     */
+    FiniteElementDomination::Domination
+    compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
+                           const unsigned int codim) const override;
+
+    /**
+     * @copydoc dealii::FiniteElement::hp_vertex_dof_identities()
+     */
+    std::vector<std::pair<unsigned int, unsigned int>>
+    hp_vertex_dof_identities(
+      const FiniteElement<dim, spacedim> &fe_other) const override;
+
+    /**
+     * @copydoc dealii::FiniteElement::hp_line_dof_identities()
+     */
+    std::vector<std::pair<unsigned int, unsigned int>>
+    hp_line_dof_identities(
+      const FiniteElement<dim, spacedim> &fe_other) const override;
   };
 
 
