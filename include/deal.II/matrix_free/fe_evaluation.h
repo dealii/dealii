@@ -1732,8 +1732,6 @@ protected:
  * gradients.
  *
  * @ingroup matrixfree
- *
- * Rudraraju, 2014
  */
 template <typename Number, bool is_face, typename VectorizedArrayType>
 class FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>
