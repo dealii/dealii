@@ -625,6 +625,21 @@ namespace internal
              ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
     }
 
+    /**
+     * Constructor, taking the data from ShapeInfo
+     */
+    EvaluatorTensorProduct(const Number2 *    shape_values,
+                           const Number2 *    shape_gradients,
+                           const Number2 *    shape_hessians,
+                           const unsigned int n_rows,
+                           const unsigned int n_columns)
+      : shape_values(shape_values)
+      , shape_gradients(shape_gradients)
+      , shape_hessians(shape_hessians)
+      , n_rows(n_rows)
+      , n_columns(n_columns)
+    {}
+
     template <int direction, bool contract_over_rows, bool add>
     void
     values(const Number *in, Number *out) const
