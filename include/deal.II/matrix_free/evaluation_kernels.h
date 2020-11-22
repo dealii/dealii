@@ -2504,6 +2504,9 @@ namespace internal
         const unsigned int            face_orientation,
         const Table<2, unsigned int> &orientation_map)
     {
+      Assert(data.element_type != MatrixFreeFunctions::tensor_none,
+             ExcNotImplemented());
+
       constexpr unsigned int static_dofs_per_face =
         fe_degree > -1 ? Utilities::pow(fe_degree + 1, dim - 1) :
                          numbers::invalid_unsigned_int;
@@ -2594,6 +2597,9 @@ namespace internal
         const unsigned int            face_orientation,
         const Table<2, unsigned int> &orientation_map)
     {
+      Assert(data.element_type != MatrixFreeFunctions::tensor_none,
+             ExcNotImplemented());
+
       if (face_orientation)
         adjust_for_face_orientation(dim,
                                     n_components,

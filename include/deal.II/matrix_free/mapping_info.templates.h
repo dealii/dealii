@@ -376,12 +376,17 @@ namespace internal
                     flag &= quad[my_q][q].get_tensor_basis()[0] ==
                             quad[my_q][q].get_tensor_basis()[i];
                   }
-#ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
+
               if (flag == false)
-                cell_data[my_q].descriptor[q].initialize(quad[my_q][q],
-                                                         update_default);
-              else
+                {
+#ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
+                  cell_data[my_q].descriptor[q].initialize(quad[my_q][q],
+                                                           update_default);
+#else
+                  Assert(false, ExcNotImplemented());
 #endif
+                }
+              else
                 cell_data[my_q].descriptor[q].initialize(
                   quad[my_q][q].get_tensor_basis()[0], update_default);
             }
