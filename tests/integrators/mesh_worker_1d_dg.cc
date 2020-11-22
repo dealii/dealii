@@ -408,11 +408,10 @@ namespace Advection
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
       interpretation(1, DataComponentInterpretation::component_is_scalar);
 
-    data_out.add_data_vector(
-      solution,
-      solution_names,
-      Legacy::DataOut<dim, DoFHandler<dim>>::type_dof_data,
-      interpretation);
+    data_out.add_data_vector(solution,
+                             solution_names,
+                             DataOut<dim>::type_dof_data,
+                             interpretation);
 
     data_out.build_patches(fe.degree);
     data_out.write_gnuplot(deallog.get_file_stream());

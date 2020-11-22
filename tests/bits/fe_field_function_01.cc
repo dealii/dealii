@@ -64,8 +64,8 @@ test()
   VectorTools::interpolate(dh, ff, v1);
   deallog << "V norm: " << v1.l2_norm() << std::endl;
 
-  Legacy::Functions::FEFieldFunction<dim, DoFHandler<dim>, Vector<double>> fef(
-    dh, v1);
+  Functions::FEFieldFunction<dim, Vector<double>> fef(dh, v1);
+
 
   VectorTools::interpolate(dh, fef, v2);
 

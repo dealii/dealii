@@ -84,18 +84,16 @@ test(const unsigned int refs,
 
   MappingFEField<dim, spacedim> mapping(map_dh, euler_vec);
   ;
-  Legacy::DataOut<dim, DoFHandler<dim, spacedim>> data_out_scal;
+  DataOut<dim, spacedim> data_out_scal;
   data_out_scal.attach_dof_handler(dof_handler);
 
-  data_out_scal.add_data_vector(
-    scal_sol,
-    "scalar_data",
-    Legacy::DataOut<dim, DoFHandler<dim, spacedim>>::type_dof_data);
+  data_out_scal.add_data_vector(scal_sol,
+                                "scalar_data",
+                                DataOut<dim, spacedim>::type_dof_data);
 
-  data_out_scal.build_patches(
-    mapping,
-    subdivisions,
-    Legacy::DataOut<dim, DoFHandler<dim, spacedim>>::curved_inner_cells);
+  data_out_scal.build_patches(mapping,
+                              subdivisions,
+                              DataOut<dim, spacedim>::curved_inner_cells);
 
   std::string filename_scal =
     ("scal_check_" + Utilities::int_to_string(id) + ".vtu");
@@ -108,18 +106,16 @@ test(const unsigned int refs,
     data_component_interpretation(
       spacedim, DataComponentInterpretation::component_is_part_of_vector);
 
-  Legacy::DataOut<dim, DoFHandler<dim, spacedim>> data_out_euler;
+  DataOut<dim, spacedim> data_out_euler;
   data_out_euler.attach_dof_handler(map_dh);
 
-  data_out_euler.add_data_vector(
-    euler_vec,
-    "euler_vec",
-    Legacy::DataOut<dim, DoFHandler<dim, spacedim>>::type_dof_data,
-    data_component_interpretation);
-  data_out_euler.build_patches(
-    mapping,
-    degree,
-    Legacy::DataOut<dim, DoFHandler<dim, spacedim>>::curved_inner_cells);
+  data_out_euler.add_data_vector(euler_vec,
+                                 "euler_vec",
+                                 DataOut<dim, spacedim>::type_dof_data,
+                                 data_component_interpretation);
+  data_out_euler.build_patches(mapping,
+                               degree,
+                               DataOut<dim, spacedim>::curved_inner_cells);
 
   std::string filename_euler =
     ("euler_check_" + Utilities::int_to_string(id) + ".vtu");

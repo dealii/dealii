@@ -163,7 +163,7 @@ test6(const bool         do_href,
       shape_functions.push_back(shape_function);
     }
 
-  Legacy::DataOut<dim, DoFHandler<dim>> data_out;
+  DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
 
   // get material ids:

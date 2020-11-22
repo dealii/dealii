@@ -79,8 +79,7 @@ main()
   solution = 1.0;
 
 
-  Legacy::SolutionTransfer<2, Vector<double>, DoFHandler<2>> solultion_trans(
-    dof_handler);
+  SolutionTransfer<2, Vector<double>> solultion_trans(dof_handler);
   solultion_trans.prepare_for_coarsening_and_refinement(solution);
 
   triangulation.execute_coarsening_and_refinement();
@@ -91,7 +90,7 @@ main()
 
   // a follow-up error to the one fixed with _04 was that DataOut also got
   // itself confused
-  Legacy::DataOut<2, DoFHandler<2>> data_out2;
+  DataOut<2> data_out2;
   data_out2.attach_dof_handler(dof_handler);
   data_out2.add_data_vector(new_solution, "Solution");
   data_out2.build_patches();

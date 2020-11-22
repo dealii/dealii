@@ -126,7 +126,7 @@ test(const bool apply_constrains, const unsigned int hp)
         }
 
 #ifdef FEQH_DEBUG_OUTPUT
-      Legacy::DataOut<dim, DoFHandler<dim>> data_out;
+      DataOut<dim> data_out;
       data_out.attach_dof_handler(dof_handler);
 
       data_out.add_data_vector(v, "shape_function");

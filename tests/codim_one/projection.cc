@@ -72,7 +72,7 @@ test(std::string filename, unsigned int n)
   constraints.close();
   VectorTools::project(dof_handler, constraints, quad, cosine, projected_one);
 
-  Legacy::DataOut<dim, DoFHandler<dim, spacedim>> dataout;
+  DataOut<dim, spacedim> dataout;
   dataout.add_data_vector(dof_handler, projected_one, "projection");
   dataout.build_patches();
   dataout.write_vtk(deallog.get_file_stream());

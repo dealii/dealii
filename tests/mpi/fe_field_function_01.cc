@@ -81,9 +81,9 @@ test()
   TrilinosWrappers::MPI::Vector x_rel(relevant_set, MPI_COMM_WORLD);
   x_rel = interpolated;
 
-  Legacy::Functions::
-    FEFieldFunction<dim, DoFHandler<dim>, TrilinosWrappers::MPI::Vector>
-      field_function(dofh, x_rel);
+  Functions::FEFieldFunction<dim, TrilinosWrappers::MPI::Vector> field_function(
+    dofh, x_rel);
+
 
   for (unsigned int test = 0; test < 4; ++test)
     {

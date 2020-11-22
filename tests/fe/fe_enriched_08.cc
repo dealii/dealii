@@ -151,7 +151,7 @@ test2cells(const unsigned int p_feq = 2, const unsigned int p_feen = 1)
       shape_functions.push_back(shape_function);
     }
 
-  Legacy::DataOut<dim, DoFHandler<dim>> data_out;
+  DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
 
   // get material ids:

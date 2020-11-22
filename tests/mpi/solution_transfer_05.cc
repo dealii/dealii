@@ -82,11 +82,11 @@ test()
                            dgq_solution);
   dgq_solution.update_ghost_values();
 
-  Legacy::parallel::distributed::SolutionTransfer<
-    dim,
-    LinearAlgebra::distributed::Vector<double>,
-    DoFHandler<dim>>
-    dgq_soltrans(dgq_dof_handler);
+  parallel::distributed::
+    SolutionTransfer<dim, LinearAlgebra::distributed::Vector<double>>
+
+
+      dgq_soltrans(dgq_dof_handler);
   dgq_soltrans.prepare_for_coarsening_and_refinement(dgq_solution);
 
   // refine and transfer

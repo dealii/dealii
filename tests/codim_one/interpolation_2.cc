@@ -66,7 +66,7 @@ test(std::string filename)
   Functions::CosineFunction<spacedim> cosine;
   VectorTools::interpolate(dof_handler, cosine, interpolated_one);
 
-  Legacy::DataOut<dim, DoFHandler<dim, spacedim>> dataout;
+  DataOut<dim, spacedim> dataout;
   dataout.add_data_vector(dof_handler, interpolated_one, "numbering");
   dataout.build_patches();
   dataout.write_vtk(deallog.get_file_stream());

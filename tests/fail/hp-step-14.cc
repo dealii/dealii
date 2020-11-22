@@ -648,7 +648,7 @@ namespace LaplaceSolver
   void
   PrimalSolver<dim>::output_solution() const
   {
-    DataOut<dim, DoFHandler<dim>> data_out;
+    DataOut<dim> data_out;
     data_out.attach_dof_handler(this->dof_handler);
     data_out.add_data_vector(this->solution, "solution");
     data_out.build_patches();
@@ -1383,6 +1383,7 @@ namespace LaplaceSolver
       typename std::map<typename DoFHandler<dim>::face_iterator, double>;
 
 
+
     struct CellData
     {
       hp::FEValues<dim>                       fe_values;
@@ -1604,7 +1605,7 @@ namespace LaplaceSolver
                          primal_hanging_node_constraints,
                          dual_solution);
 
-    Legacy::DataOut<dim, DoFHandler<dim>> data_out;
+    DataOut<dim> data_out;
     data_out.attach_dof_handler(primal_solver.dof_handler);
 
     data_out.add_data_vector(primal_solver.solution, "primal_solution");

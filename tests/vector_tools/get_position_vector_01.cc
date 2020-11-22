@@ -66,14 +66,14 @@ test()
   {
     DataOutBase::VtkFlags flags;
 
-    Legacy::DataOut<dim, DoFHandler<dim, spacedim>> data_out;
+    DataOut<dim, spacedim> data_out;
     data_out.set_flags(flags);
     data_out.attach_dof_handler(dof_handler);
 
-    data_out.build_patches(MappingQGeneric<dim, spacedim>(4),
-                           fe_degree + 1,
-                           Legacy::DataOut<dim, DoFHandler<dim, spacedim>>::
-                             CurvedCellRegion::curved_inner_cells);
+    data_out.build_patches(
+      MappingQGeneric<dim, spacedim>(4),
+      fe_degree + 1,
+      DataOut<dim, spacedim>::CurvedCellRegion::curved_inner_cells);
 
 #if false
     std::ofstream output("test.0.vtk");
@@ -93,14 +93,14 @@ test()
     MappingFEField<dim, spacedim> mapping(dof_handler_dim, euler_vector);
     DataOutBase::VtkFlags         flags;
 
-    Legacy::DataOut<dim, DoFHandler<dim, spacedim>> data_out;
+    DataOut<dim, spacedim> data_out;
     data_out.set_flags(flags);
     data_out.attach_dof_handler(dof_handler);
 
-    data_out.build_patches(mapping,
-                           fe_degree + 1,
-                           Legacy::DataOut<dim, DoFHandler<dim, spacedim>>::
-                             CurvedCellRegion::curved_inner_cells);
+    data_out.build_patches(
+      mapping,
+      fe_degree + 1,
+      DataOut<dim, spacedim>::CurvedCellRegion::curved_inner_cells);
 
 #if false
     std::ofstream output("test.1.vtk");

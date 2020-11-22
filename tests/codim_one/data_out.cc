@@ -62,7 +62,7 @@ test(std::string filename)
   for (unsigned int i = 0; i < numbering.size(); ++i)
     numbering(i) = i;
 
-  Legacy::DataOut<dim, DoFHandler<dim, spacedim>> dataout;
+  DataOut<dim, spacedim> dataout;
   dataout.add_data_vector(dof_handler, numbering, "numbering");
   dataout.build_patches();
   dataout.write_vtk(deallog.get_file_stream());

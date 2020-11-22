@@ -157,8 +157,8 @@ transfer(std::ostream &out)
       }
   }
 
-  Legacy::SolutionTransfer<dim, Vector<double>, DoFHandler<dim>> q_soltrans(
-    q_dof_handler);
+  SolutionTransfer<dim, Vector<double>> q_soltrans(q_dof_handler);
+
 
 
   // test b): do some coarsening and

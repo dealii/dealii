@@ -186,7 +186,7 @@ namespace Evaluation
   SolutionOutput<dim>::operator()(const DoFHandler<dim> &dof_handler,
                                   const Vector<double> & solution) const
   {
-    Legacy::DataOut<dim, DoFHandler<dim>> data_out;
+    DataOut<dim> data_out;
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(solution, "solution");
     data_out.build_patches();

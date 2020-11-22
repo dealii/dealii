@@ -92,9 +92,8 @@ test()
                                        locally_relevant_dofs,
                                        com_small);
 
-      Legacy::parallel::distributed::
-        SolutionTransfer<dim, PETScWrappers::MPI::Vector, DoFHandler<dim>>
-          soltrans(dh);
+      parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector>
+        soltrans(dh);
 
       for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); ++i)
         {
@@ -146,9 +145,8 @@ test()
     PETScWrappers::MPI::Vector solution(locally_owned_dofs, com_all);
     solution = PetscScalar();
 
-    Legacy::parallel::distributed::
-      SolutionTransfer<dim, PETScWrappers::MPI::Vector, DoFHandler<dim>>
-        soltrans(dh);
+    parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector>
+      soltrans(dh);
 
     soltrans.deserialize(solution);
 

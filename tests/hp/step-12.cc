@@ -895,7 +895,7 @@ DGMethod<dim>::output_results(const unsigned int cycle) const
   deallog << "Writing solution to <" << filename << ">..." << std::endl
           << std::endl;
 
-  Legacy::DataOut<dim, DoFHandler<dim>> data_out;
+  DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
   data_out.add_data_vector(solution2, "u");
 

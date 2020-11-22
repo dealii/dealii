@@ -753,8 +753,7 @@ namespace Step18
     data_out.add_data_vector(
       incremental_displacement,
       solution_names,
-      Legacy::DataOut_DoFData<DoFHandler<dim, dim>, dim, dim>::DataVectorType::
-        type_automatic,
+      DataOut_DoFData<dim, dim>::DataVectorType::type_automatic,
       solution_interpretation);
 
 

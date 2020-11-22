@@ -100,7 +100,7 @@ test(const Triangulation<dim> &tr, const hp::FECollection<dim> &fe)
     if (std::fabs(v(i)) < 1e-12)
       v(i) = 0;
 
-  Legacy::DataOut<dim, DoFHandler<dim>> data_out;
+  DataOut<dim> data_out;
   data_out.attach_dof_handler(dh);
 
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
@@ -108,8 +108,9 @@ test(const Triangulation<dim> &tr, const hp::FECollection<dim> &fe)
       dim, DataComponentInterpretation::component_is_part_of_vector);
 
   data_out.add_data_vector(v,
+
                            "x",
-                           Legacy::DataOut<dim, DoFHandler<dim>>::type_dof_data,
+                           DataOut<dim>::type_dof_data,
                            data_component_interpretation);
   data_out.build_patches(fe[0].degree);
 

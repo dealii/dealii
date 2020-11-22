@@ -377,7 +377,7 @@ template <int dim>
 void
 MinimizationProblem<dim>::output_results() const
 {
-  Legacy::DataOut<dim, DoFHandler<dim>> data_out;
+  DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
   data_out.add_data_vector(present_solution, "solution");
   data_out.build_patches();

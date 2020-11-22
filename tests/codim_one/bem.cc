@@ -406,19 +406,15 @@ template <int spacedim>
 void
 BEM<spacedim>::output_results()
 {
-  Legacy::DataOut<spacedim - 1, DoFHandler<spacedim - 1, spacedim>> dataout;
+  DataOut<spacedim - 1, spacedim> dataout;
   dataout.attach_dof_handler(dof_handler_q);
   dataout.add_data_vector(dof_handler_q, smooth_solution, "linear_potential");
-  dataout.add_data_vector(
-    tangential_derivative,
-    "tangential_velocity",
-    Legacy::DataOut<spacedim - 1,
-                    DoFHandler<spacedim - 1, spacedim>>::type_cell_data);
-  dataout.add_data_vector(
-    error,
-    "error",
-    Legacy::DataOut<spacedim - 1,
-                    DoFHandler<spacedim - 1, spacedim>>::type_cell_data);
+  dataout.add_data_vector(tangential_derivative,
+                          "tangential_velocity",
+                          DataOut<spacedim - 1, spacedim>::type_cell_data);
+  dataout.add_data_vector(error,
+                          "error",
+                          DataOut<spacedim - 1, spacedim>::type_cell_data);
   dataout.build_patches();
   dataout.write_vtk(deallog.get_file_stream());
 }

@@ -129,10 +129,9 @@ transfer(std::ostream &out)
   VectorTools::interpolate(mapping, q_dof_handler, function, q_solution);
   VectorTools::interpolate(mapping, dgq_dof_handler, function, dgq_solution);
 
-  Legacy::SolutionTransfer<dim, Vector<double>, DoFHandler<dim>> q_soltrans(
-    q_dof_handler);
-  Legacy::SolutionTransfer<dim, Vector<double>, DoFHandler<dim>> dgq_soltrans(
-    dgq_dof_handler);
+  SolutionTransfer<dim, Vector<double>> q_soltrans(q_dof_handler);
+  SolutionTransfer<dim, Vector<double>> dgq_soltrans(dgq_dof_handler);
+
 
 
   // test b): do some coarsening and

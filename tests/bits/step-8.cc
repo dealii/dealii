@@ -358,7 +358,7 @@ ElasticProblem<dim>::output_results(const unsigned int cycle) const
 
   filename += ".gmv";
 
-  Legacy::DataOut<dim, DoFHandler<dim>> data_out;
+  DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
 
 

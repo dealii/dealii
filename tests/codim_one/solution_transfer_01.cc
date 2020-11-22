@@ -76,8 +76,7 @@ main()
   // Do some refinement
   boundary_mesh.begin_active()->set_refine_flag();
 
-  Legacy::SolutionTransfer<dim, Vector<double>, DoFHandler<dim, spacedim>>
-    soltrans(dh);
+  SolutionTransfer<dim, Vector<double>, spacedim> soltrans(dh);
 
   boundary_mesh.prepare_coarsening_and_refinement();
 
