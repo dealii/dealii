@@ -128,7 +128,7 @@ namespace SmoothnessEstimator
      * This object needs to be initialized to have at least $p+1$ coefficients
      * in each direction for every finite element in the collection, where $p$
      * is its polynomial degree.
-     * @param [in] dof_handler An hp::DoFHandler.
+     * @param [in] dof_handler A DoFHandler.
      * @param [in] solution A solution vector.
      * @param [out] smoothness_indicators A vector for smoothness indicators.
      * @param [in] regression_strategy Determines which norm will be used on the
@@ -180,7 +180,7 @@ namespace SmoothnessEstimator
      * @param [in] fe_legendre FESeries::Legendre object to calculate coefficients.
      * This object needs to be initialized to have at least $p+1$ coefficients
      * in each direction, where $p$ is the maximum polynomial degree to be used.
-     * @param [in] dof_handler An hp::DoFHandler
+     * @param [in] dof_handler A DoFHandler
      * @param [in] solution A solution vector
      * @param [out] smoothness_indicators A vector for smoothness indicators
      * @param [in] coefficients_predicate A predicate to select Legendre

@@ -878,7 +878,7 @@ namespace internal
         // fe_values object that is used to compute the mapping data. for
         // the hp case there might be more than one finite element. since we
         // manually select the active FE index and not via a
-        // hp::DoFHandler<dim>::active_cell_iterator, we need to manually
+        // DoFHandler<dim>::active_cell_iterator, we need to manually
         // select the correct finite element, so just hold a vector of
         // FEValues
         std::vector<std::vector<std::shared_ptr<dealii::FEValues<dim>>>>

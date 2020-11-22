@@ -191,7 +191,7 @@ public:
    * As for the enriched finite element space, FE_Nothing is used.
    * Continuity constraints will be automatically generated when
    * this non-enriched element is used in conjunction with enriched finite
-   * element within the hp::DoFHandler.
+   * element within a DoFHandler with hp-capabilities.
    *
    * See the discussion in the class documentation on how to use this element
    * in the context of hp finite element methods.
@@ -677,7 +677,7 @@ private:
 /**
  * This namespace consists of a class needed to create a collection
  * of FE_Enriched finite elements (hp::FECollection)
- * to be used with hp::DoFHandler in a domain with multiple, possibly
+ * to be used with DoFHandler in hp-mode on a domain with multiple, possibly
  * overlapping, sub-domains with individual enrichment functions.
  *
  * To create hp::FECollection, a graph coloring algorithm is used to assign
@@ -702,7 +702,7 @@ namespace ColorEnriched
   {
     /**
      * Returns true if there is a connection between subdomains in the mesh
-     * associated with @p hp::DoFHandler i.e., if the subdomains share at least
+     * associated with @p dof_handler i.e., if the subdomains share at least
      * a vertex. The two subdomains are defined by predicates provided by
      * @p predicate_1 and @p predicate_2. A predicate is a function (or
      * object of a type with an operator()) which takes in a cell iterator and
@@ -739,7 +739,7 @@ namespace ColorEnriched
      *  predicate<dim>(Point<dim>(2,2), 1));
      * @endcode
      *
-     * @param[in] hp::DoFHandler object
+     * @param[in] dof_handler DoFHandler object
      * @param[in] predicate_1 A function (or object of a type with an
      * operator()) defining the subdomain 1. The function takes in a cell and
      * returns a boolean.
@@ -760,7 +760,7 @@ namespace ColorEnriched
      * subdomain
      * is defined using a predicate function of @p predicates.
      *
-     * @param[in] dof_handler a hp::DoFHandler object
+     * @param[in] dof_handler a DoFHandler object
      * @param[in] predicates predicates defining the subdomains
      * @param[out] predicate_colors Colors (unsigned int) associated with each
      * subdomain.
@@ -774,7 +774,7 @@ namespace ColorEnriched
 
     /**
      * Used to construct data members @p cellwise_color_predicate_map and
-     * @p fe_sets of Helper class. Inputs are hp::DoFHandler object,
+     * @p fe_sets of Helper class. Inputs are DoFHandler object,
      * vector of predicates and colors associated with them. Before calling
      * this function, colors can be assigned to predicates (i.e subdomains)
      * using the function color_predicates.
@@ -802,7 +802,7 @@ namespace ColorEnriched
      * the map will insert pairs (1, 4) and (2, 5) at key 100 (i.e unique id
      * of cell is mapped with a map which associates color with predicate id).
      *
-     * @param[in] dof_handler hp::DoFHandler object
+     * @param[in] dof_handler DoFHandler object
      * @param[in] predicates vector of predicates defining the subdomains.
      * <code>@p predicates[i]</code> returns true for a cell if it
      * belongs to subdomain with index i.
@@ -892,7 +892,7 @@ namespace ColorEnriched
 
   /**
    * ColorEnriched::Helper class creates a collection of FE_Enriched finite
-   * elements (hp::FECollection) to be used with hp::DoFHandler in a domain
+   * elements (hp::FECollection) to be used with DoFHandler in a domain
    * with multiple, possibly overlapping, sub-domains with individual
    * enrichment functions. Note that the overlapping regions may have
    * multiple enrichment functions associated with them. This is implemented
@@ -964,9 +964,9 @@ namespace ColorEnriched
    * enrichment functions), a vector of predicate
    * functions (used to define sub-domains) as well as the corresponding
    * enrichment functions. The FECollection object, a collection of FE_Enriched
-   * objects to be used with an hp::DoFHandler object, can be retrieved
+   * objects to be used with a DoFHandler object, can be retrieved
    * using the member function build_fe_collection which also modifies the
-   * active FE indices of the hp::DoFHandler object (provided as an argument
+   * active FE indices of the DoFHandler object (provided as an argument
    * to the build_fe_collection function).
    *
    * <h3>Simple example</h3>
@@ -1045,8 +1045,8 @@ namespace ColorEnriched
    * std::vector< predicate_function<dim> > predicates;
    * std::vector< std::shared_ptr<Function<dim>> > enrichments;
    *
-   * Triangulation<dim>  triangulation;
-   * hp::DoFHandler<dim> dof_handler(triangulation);
+   * Triangulation<dim> triangulation;
+   * DoFHandler<dim>    dof_handler(triangulation);
    *
    * static ColorEnriched::Helper<dim> FE_helper(fe_base,
    *                                             fe_enriched,
@@ -1075,11 +1075,11 @@ namespace ColorEnriched
            const std::vector<std::shared_ptr<Function<spacedim>>> &enrichments);
 
     /**
-     * Prepares an hp::DoFHandler object. The active FE indices of
+     * Prepares a DoFHandler object. The active FE indices of
      * mesh cells are initialized to work with
      * ColorEnriched::Helper<dim,spacedim>::fe_collection.
      *
-     * @param dof_handler an hp::DoFHandler object
+     * @param dof_handler a DoFHandler object
      * @return hp::FECollection, a collection of
      * finite elements needed by @p dof_handler.
      */
@@ -1088,8 +1088,8 @@ namespace ColorEnriched
 
   private:
     /**
-     * Contains a collection of FiniteElement objects needed by an
-     * hp::DoFHandler object.
+     * Contains a collection of FiniteElement objects needed by a DoFHandler
+     * object.
      */
     hp::FECollection<dim, spacedim> fe_collection;
 
@@ -1171,7 +1171,7 @@ namespace ColorEnriched
 
     /**
      * A vector of different possible color sets for a given set of
-     * predicates and hp::DoFHandler object
+     * predicates and DoFHandler object
      */
     std::vector<std::set<unsigned int>> fe_sets;
   };

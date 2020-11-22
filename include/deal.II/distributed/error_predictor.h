@@ -53,7 +53,7 @@ namespace parallel
   {
     /**
      * Predict how current error indicators will change after refinement and
-     * coarsening were to happen on the provided hp::DoFHandler in context of a
+     * coarsening were to happen on the provided DoFHandler in context of a
      * parallel::distributed::Triangulation.
      *
      * This algorithm follows the same logic as the error prediction algorithm

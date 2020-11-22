@@ -179,7 +179,7 @@ public:
    * deformation of each vertex.
    *
    * @todo The @p mapping argument should be replaced by a
-   * hp::MappingCollection in case of a hp::DoFHandler.
+   * hp::MappingCollection in case of a DoFHandler with hp-capabilities.
    */
   virtual void
   build_patches(const Mapping<dimension> &mapping,

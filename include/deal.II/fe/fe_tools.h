@@ -653,11 +653,11 @@ namespace FETools
 
   /**
    * Compute the interpolation of a the @p dof1-function @p u1 to a @p
-   * dof2-function @p u2. @p dof1 and @p dof2 need to be DoFHandlers (or
-   * hp::DoFHandlers) based on the same triangulation.  @p constraints is a
-   * hanging node constraints object corresponding to @p dof2. This object is
-   * particular important when interpolating onto continuous elements on grids
-   * with hanging nodes (locally refined grids).
+   * dof2-function @p u2. @p dof1 and @p dof2 need to be DoFHandlers based on
+   * the same triangulation. @p constraints is a hanging node constraints object
+   * corresponding to @p dof2. This object is particular important when
+   * interpolating onto continuous elements on grids with hanging nodes (locally
+   * refined grids).
    *
    * If the elements @p fe1 and @p fe2 are either both continuous or both
    * discontinuous then this interpolation is the usual point interpolation.
@@ -684,8 +684,6 @@ namespace FETools
    * Note, that this function does not work on continuous elements at hanging
    * nodes. For that case use the @p back_interpolate function, below, that
    * takes an additional @p AffineConstraints object.
-   *
-   * @p dof1 might be a DoFHandler or a hp::DoFHandler onject.
    *
    * Furthermore note, that for the specific case when the finite element
    * space corresponding to @p fe1 is a subset of the finite element space

@@ -72,7 +72,7 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
         {
           // well, here we need to first get the values from the current
           // cell and then interpolate it to the element requested. this
-          // can clearly only happen for hp::DoFHandler objects
+          // can clearly only happen for DoFHandler objects in hp-mode
           const unsigned int dofs_per_cell = this->get_fe().n_dofs_per_cell();
           if (dofs_per_cell == 0)
             {

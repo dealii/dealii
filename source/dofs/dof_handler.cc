@@ -1716,9 +1716,9 @@ namespace internal
 
 
         /**
-         * Given a hp::DoFHandler object, make sure that the active_fe_indices
-         * that a user has set for locally owned cells are communicated to all
-         * other relevant cells as well.
+         * Given a DoFHandler object in hp-mode, make sure that the
+         * active_fe_indices that a user has set for locally owned cells are
+         * communicated to all other relevant cells as well.
          *
          * For parallel::shared::Triangulation objects,
          * this information is distributed on both ghost and artificial cells.

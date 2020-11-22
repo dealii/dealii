@@ -91,9 +91,9 @@ namespace parallel
      * including ways that are dictated by the application and not by the
      * desire to minimize the length of the interface between subdomains owned
      * by processors (as is done by the METIS and Zoltan packages, both of
-     * which are options for partitioning). Both the DoFHandler and
-     * hp::DoFHandler classes know how to enumerate degrees of freedom in ways
-     * appropriate for the partitioned mesh.
+     * which are options for partitioning). The DoFHandler class knows how to
+     * enumerate degrees of freedom in ways appropriate for the partitioned
+     * mesh.
      *
      * @ingroup distributed
      */
