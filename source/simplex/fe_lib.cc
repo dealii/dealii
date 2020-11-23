@@ -15,6 +15,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/fe/fe_q.h>
+
 #include <deal.II/simplex/fe_lib.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -237,6 +239,65 @@ namespace Simplex
 
     return namebuf.str();
   }
+
+
+
+  template <int dim, int spacedim>
+  FiniteElementDomination::Domination
+  FE_P<dim, spacedim>::compare_for_domination(
+    const FiniteElement<dim, spacedim> &fe_other,
+    const unsigned int                  codim) const
+  {
+    (void)fe_other;
+    (void)codim;
+
+    Assert((dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
+           ExcNotImplemented());
+    AssertDimension(dim, 2);
+    AssertDimension(this->degree, fe_other.tensor_degree());
+
+    return FiniteElementDomination::either_element_can_dominate;
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<std::pair<unsigned int, unsigned int>>
+  FE_P<dim, spacedim>::hp_vertex_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const
+  {
+    (void)fe_other;
+
+    Assert((dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
+           ExcNotImplemented());
+    AssertDimension(dim, 2);
+    AssertDimension(this->degree, fe_other.tensor_degree());
+
+    return {{0, 0}};
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<std::pair<unsigned int, unsigned int>>
+  FE_P<dim, spacedim>::hp_line_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const
+  {
+    (void)fe_other;
+
+    Assert((dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
+           ExcNotImplemented());
+    AssertDimension(dim, 2);
+    AssertDimension(this->degree, fe_other.tensor_degree());
+
+    std::vector<std::pair<unsigned int, unsigned int>> result;
+
+    for (unsigned int i = 0; i < this->degree - 1; ++i)
+      result.emplace_back(i, i);
+
+    return result;
+  }
+
 
 
   template <int dim, int spacedim>
