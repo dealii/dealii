@@ -696,35 +696,50 @@ namespace internal
     const unsigned int n_dofs     = shape_info.dofs_per_component_on_cell;
     const unsigned int n_q_points = shape_info.n_q_points;
 
+    using Eval =
+      EvaluatorTensorProduct<evaluate_general, 1, 0, 0, Number, Number>;
+
     if (evaluation_flag & EvaluationFlags::values)
       {
         const auto shape_values = shape_info.data.front().shape_values.data();
+        auto       values_quad_ptr        = values_quad;
+        auto       values_dofs_actual_ptr = values_dofs_actual;
+
+        Eval eval(shape_values, nullptr, nullptr, n_dofs, n_q_points);
         for (unsigned int c = 0; c < n_components; ++c)
-          for (unsigned int q = 0; q < n_q_points; ++q)
-            {
-              values_quad[n_q_points * c + q] = 0.0;
-              for (unsigned int i = 0; i < n_dofs; ++i)
-                values_quad[n_q_points * c + q] +=
-                  shape_values[i * n_q_points + q] *
-                  values_dofs_actual[n_dofs * c + i];
-            }
+          {
+            eval.template values<0, true, false>(values_dofs_actual_ptr,
+                                                 values_quad_ptr);
+
+            values_quad_ptr += n_q_points;
+            values_dofs_actual_ptr += n_dofs;
+          }
       }
 
     if (evaluation_flag & EvaluationFlags::gradients)
       {
         const auto shape_gradients =
           shape_info.data.front().shape_gradients.data();
+        auto gradients_quad_ptr     = gradients_quad;
+        auto values_dofs_actual_ptr = values_dofs_actual;
+
         for (unsigned int c = 0; c < n_components; ++c)
-          for (unsigned int d = 0; d < dim; ++d)
-            for (unsigned int q = 0; q < n_q_points; ++q)
+          {
+            for (unsigned int d = 0; d < dim; ++d)
               {
-                gradients_quad[n_q_points * dim * c + n_q_points * d + q] = 0.0;
-                for (unsigned int i = 0; i < n_dofs; ++i)
-                  gradients_quad[n_q_points * dim * c + n_q_points * d + q] +=
-                    shape_gradients[d * n_dofs * n_q_points + i * n_q_points +
-                                    q] *
-                    values_dofs_actual[n_dofs * dim * c + i];
+                Eval eval(nullptr,
+                          shape_gradients + n_q_points * n_dofs * d,
+                          nullptr,
+                          n_dofs,
+                          n_q_points);
+
+                eval.template gradients<0, true, false>(values_dofs_actual_ptr,
+                                                        gradients_quad_ptr);
+
+                gradients_quad_ptr += n_q_points;
               }
+            values_dofs_actual_ptr += n_dofs;
+          }
       }
 
     if (evaluation_flag & EvaluationFlags::hessians)
@@ -757,33 +772,60 @@ namespace internal
     const unsigned int n_dofs     = shape_info.dofs_per_component_on_cell;
     const unsigned int n_q_points = shape_info.n_q_points;
 
-    if (add_into_values_array == false)
-      for (unsigned int i = 0; i < n_components * n_dofs; ++i)
-        values_dofs_actual[i] = 0.0;
+    using Eval =
+      EvaluatorTensorProduct<evaluate_general, 1, 0, 0, Number, Number>;
 
     if (integration_flag & EvaluationFlags::values)
       {
         const auto shape_values = shape_info.data.front().shape_values.data();
+        auto       values_quad_ptr        = values_quad;
+        auto       values_dofs_actual_ptr = values_dofs_actual;
+
+        Eval eval(shape_values, nullptr, nullptr, n_dofs, n_q_points);
         for (unsigned int c = 0; c < n_components; ++c)
-          for (unsigned int q = 0; q < n_q_points; ++q)
-            for (unsigned int i = 0; i < n_dofs; ++i)
-              values_dofs_actual[n_dofs * c + i] +=
-                shape_values[i * n_q_points + q] *
-                values_quad[n_q_points * c + q];
+          {
+            if (add_into_values_array == false)
+              eval.template values<0, false, false>(values_quad_ptr,
+                                                    values_dofs_actual_ptr);
+            else
+              eval.template values<0, false, true>(values_quad_ptr,
+                                                   values_dofs_actual_ptr);
+
+            values_quad_ptr += n_q_points;
+            values_dofs_actual_ptr += n_dofs;
+          }
       }
 
     if (integration_flag & EvaluationFlags::gradients)
       {
         const auto shape_gradients =
           shape_info.data.front().shape_gradients.data();
+        auto gradients_quad_ptr     = gradients_quad;
+        auto values_dofs_actual_ptr = values_dofs_actual;
+
         for (unsigned int c = 0; c < n_components; ++c)
-          for (unsigned int d = 0; d < dim; ++d)
-            for (unsigned int q = 0; q < n_q_points; ++q)
-              for (unsigned int i = 0; i < n_dofs; ++i)
-                values_dofs_actual[n_dofs * dim * c + i] +=
-                  shape_gradients[d * n_dofs * n_q_points + i * n_q_points +
-                                  q] *
-                  gradients_quad[n_q_points * dim * c + n_q_points * d + q];
+          {
+            for (unsigned int d = 0; d < dim; ++d)
+              {
+                Eval eval(nullptr,
+                          shape_gradients + n_q_points * n_dofs * d,
+                          nullptr,
+                          n_dofs,
+                          n_q_points);
+
+                if ((add_into_values_array == false &&
+                     (integration_flag & EvaluationFlags::values) == false) &&
+                    d == 0)
+                  eval.template gradients<0, false, false>(
+                    gradients_quad_ptr, values_dofs_actual_ptr);
+                else
+                  eval.template gradients<0, false, true>(
+                    gradients_quad_ptr, values_dofs_actual_ptr);
+
+                gradients_quad_ptr += n_q_points;
+              }
+            values_dofs_actual_ptr += n_dofs;
+          }
       }
   }
 
