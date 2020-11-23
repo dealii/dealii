@@ -18,8 +18,6 @@
 // continuous elements and compare results between matrix-free and matrix-based
 // implementations.
 
-#include <deal.II/distributed/tria.h>
-
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -54,7 +52,7 @@ template <int dim>
 class PoissonOperator
 {
 public:
-  using VectorType = LinearAlgebra::distributed::Vector<double>;
+  using VectorType = Vector<double>;
 
   PoissonOperator(const MatrixFree<dim, double> &matrix_free,
                   const bool                     do_helmholtz)
@@ -179,7 +177,7 @@ test(const unsigned int degree, const bool do_helmholtz)
 
     PoissonOperator<dim> poisson_operator(matrix_free, do_helmholtz);
 
-    LinearAlgebra::distributed::Vector<double> x, b;
+    Vector<double> x, b;
     poisson_operator.initialize_dof_vector(x);
     poisson_operator.initialize_dof_vector(b);
 
