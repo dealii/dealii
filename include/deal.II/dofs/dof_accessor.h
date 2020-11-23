@@ -1523,9 +1523,12 @@ public:
    */
 
   /**
-   * Return the values of the given vector restricted to the dofs of this cell
+   * Collect the values of the given vector restricted to the dofs of this cell
    * in the standard ordering: dofs on vertex 0, dofs on vertex 1, etc, dofs
-   * on line 0, dofs on line 1, etc, dofs on quad 0, etc.
+   * on line 0, dofs on line 1, etc, dofs on quad 0, etc. In other
+   * words, this function implements a
+   * [gather
+   * operation](https://en.wikipedia.org/wiki/Gather-scatter_(vector_addressing)).
    *
    * The vector has to have the right size before being passed to this
    * function. This function is only callable for active cells.
@@ -1541,9 +1544,12 @@ public:
   get_dof_values(const InputVector &values, Vector<number> &local_values) const;
 
   /**
-   * Return the values of the given vector restricted to the dofs of this cell
+   * Collect the values of the given vector restricted to the dofs of this cell
    * in the standard ordering: dofs on vertex 0, dofs on vertex 1, etc, dofs
-   * on line 0, dofs on line 1, etc, dofs on quad 0, etc.
+   * on line 0, dofs on line 1, etc, dofs on quad 0, etc. In other
+   * words, this function implements a
+   * [gather
+   * operation](https://en.wikipedia.org/wiki/Gather-scatter_(vector_addressing)).
    *
    * The vector has to have the right size before being passed to this
    * function. This function is only callable for active cells.
@@ -1561,9 +1567,12 @@ public:
                  ForwardIterator    local_values_end) const;
 
   /**
-   * Return the values of the given vector restricted to the dofs of this cell
+   * Collect the values of the given vector restricted to the dofs of this cell
    * in the standard ordering: dofs on vertex 0, dofs on vertex 1, etc, dofs
-   * on line 0, dofs on line 1, etc, dofs on quad 0, etc.
+   * on line 0, dofs on line 1, etc, dofs on quad 0, etc. In other
+   * words, this function implements a
+   * [gather
+   * operation](https://en.wikipedia.org/wiki/Gather-scatter_(vector_addressing)).
    *
    * The vector has to have the right size before being passed to this
    * function. This function is only callable for active cells.
@@ -1589,6 +1598,9 @@ public:
    * This function is the counterpart to get_dof_values(): it takes a vector
    * of values for the degrees of freedom of the cell pointed to by this
    * iterator and writes these values into the global data vector @p values.
+   * In other words, this function implements a
+   * [scatter
+   * operation](https://en.wikipedia.org/wiki/Gather-scatter_(vector_addressing)).
    * This function is only callable for active cells.
    *
    * Note that for continuous finite elements, calling this function affects
@@ -1713,10 +1725,16 @@ public:
   /**
    * Distribute a local (cell based) vector to a global one by mapping the
    * local numbering of the degrees of freedom to the global one and entering
-   * the local values into the global vector.
+   * the local values into the global vector. In other words, this function
+   * implements a
+   * [scatter
+   * operation](https://en.wikipedia.org/wiki/Gather-scatter_(vector_addressing)).
    *
-   * The elements are <em>added</em> up to the elements in the global vector,
-   * rather than just set, since this is usually what one wants.
+   * The elements are <em>added</em> to the existing elements in the global
+   * vector, rather than just set, since this is usually what one wants. You may
+   * also want to take a look at the
+   * AffineConstraints::distribute_local_to_global() function if you need to
+   * deal with constraints.
    */
   template <typename number, typename OutputVector>
   void
@@ -1727,9 +1745,15 @@ public:
    * Distribute a local (cell based) vector in iterator format to a global one
    * by mapping the local numbering of the degrees of freedom to the global
    * one and entering the local values into the global vector.
+   * In other words, this function implements a
+   * [scatter
+   * operation](https://en.wikipedia.org/wiki/Gather-scatter_(vector_addressing)).
    *
-   * The elements are <em>added</em> up to the elements in the global vector,
-   * rather than just set, since this is usually what one wants.
+   * The elements are <em>added</em> to the existing elements in the global
+   * vector, rather than just set, since this is usually what one wants. You may
+   * also want to take a look at the
+   * AffineConstraints::distribute_local_to_global() function if you need to
+   * deal with constraints.
    */
   template <typename ForwardIterator, typename OutputVector>
   void
@@ -1741,6 +1765,9 @@ public:
    * Distribute a local (cell based) vector in iterator format to a global one
    * by mapping the local numbering of the degrees of freedom to the global
    * one and entering the local values into the global vector.
+   * In other words, this function implements a
+   * [scatter
+   * operation](https://en.wikipedia.org/wiki/Gather-scatter_(vector_addressing)).
    *
    * The elements are <em>added</em> up to the elements in the global vector,
    * rather than just set, since this is usually what one wants. Moreover, the

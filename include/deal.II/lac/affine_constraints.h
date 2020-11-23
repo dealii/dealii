@@ -1108,7 +1108,11 @@ public:
   /**
    * This function takes a vector of local contributions (@p local_vector)
    * corresponding to the degrees of freedom indices given in @p
-   * local_dof_indices and distributes them to the global vector. In most
+   * local_dof_indices and distributes them to the global vector. In other
+   * words, this function implements a
+   * [scatter
+   * operation](https://en.wikipedia.org/wiki/Gather-scatter_(vector_addressing)).
+   * In most
    * cases, these local contributions will be the result of an integration
    * over a cell or face of a cell. However, as long as @p local_vector and @p
    * local_dof_indices have the same number of elements, this function is
@@ -1156,7 +1160,11 @@ public:
   /**
    * This function takes a vector of local contributions (@p local_vector)
    * corresponding to the degrees of freedom indices given in @p
-   * local_dof_indices and distributes them to the global vector. In most
+   * local_dof_indices and distributes them to the global vector. In other
+   * words, this function implements a
+   * [scatter
+   * operation](https://en.wikipedia.org/wiki/Gather-scatter_(vector_addressing)).
+   * In most
    * cases, these local contributions will be the result of an integration
    * over a cell or face of a cell. However, as long as @p local_vector and @p
    * local_dof_indices have the same number of elements, this function is
@@ -1244,7 +1252,11 @@ public:
   /**
    * This function takes a pointer to a vector of local contributions (@p
    * local_vector) corresponding to the degrees of freedom indices given in @p
-   * local_dof_indices and distributes them to the global vector. In most
+   * local_dof_indices and distributes them to the global vector. In other
+   * words, this function implements a
+   * [scatter
+   * operation](https://en.wikipedia.org/wiki/Gather-scatter_(vector_addressing)).
+   * In most
    * cases, these local contributions will be the result of an integration
    * over a cell or face of a cell. However, as long as the entries in @p
    * local_dof_indices indicate reasonable global vector entries, this
@@ -1281,7 +1293,11 @@ public:
   /**
    * This function takes a matrix of local contributions (@p local_matrix)
    * corresponding to the degrees of freedom indices given in @p
-   * local_dof_indices and distributes them to the global matrix. In most
+   * local_dof_indices and distributes them to the global matrix. In other
+   * words, this function implements a
+   * [scatter
+   * operation](https://en.wikipedia.org/wiki/Gather-scatter_(vector_addressing)).
+   * In most
    * cases, these local contributions will be the result of an integration
    * over a cell or face of a cell. However, as long as @p local_matrix and @p
    * local_dof_indices have the same number of elements, this function is
@@ -1332,10 +1348,10 @@ public:
                              MatrixType &                  global_matrix) const;
 
   /**
-   * Does almost the same as the function above but can treat general
-   * rectangular matrices.  The main difference to achieve this is that the
-   * diagonal entries in constrained rows are left untouched instead of being
-   * filled with arbitrary values.
+   * This function does almost the same as the function above but can treat
+   * general rectangular matrices. The main difference to achieve this is that
+   * the diagonal entries in constrained rows are left untouched instead of
+   * being filled with arbitrary values.
    *
    * Since the diagonal entries corresponding to eliminated degrees of freedom
    * are not set, the result may have a zero eigenvalue, if applied to a
@@ -1366,9 +1382,9 @@ public:
                              MatrixType &                  global_matrix) const;
 
   /**
-   * Does almost the same as the function above for general rectangular
-   * matrices but uses different AffineConstraints objects on the row and
-   * column indices. The convention is that row indices are constrained
+   * This function does almost the same as the function above for general
+   * rectangular matrices but uses different AffineConstraints objects on the
+   * row and column indices. The convention is that row indices are constrained
    * according to the calling AffineConstraints <code>*this</code>, whereas
    * column indices are constrained according to the given AffineConstraints
    * <code>column_affine_constraints</code>. This function allows to handle the
@@ -1392,6 +1408,10 @@ public:
   /**
    * This function simultaneously writes elements into matrix and vector,
    * according to the constraints specified by the calling AffineConstraints.
+   * In other words, it performs the
+   * [scatter
+   * operation](https://en.wikipedia.org/wiki/Gather-scatter_(vector_addressing))
+   * of the corresponding functions for matrices and vectors at the same time.
    * This function can correctly handle inhomogeneous constraints as well. For
    * the parameter use_inhomogeneities_for_rhs see the documentation in
    * @ref constraints
