@@ -669,10 +669,7 @@ namespace Step18
     assemble_system();
     deallog << " norm of rhs is " << system_rhs.l2_norm() << std::endl;
 
-    const unsigned int n_iterations = solve_linear_problem();
-
-    deallog << "    Solver converged in " << n_iterations << " iterations."
-            << std::endl;
+    solve_linear_problem();
 
     deallog << "    Updating quadrature point data..." << std::flush;
     update_quadrature_point_history();
@@ -684,6 +681,9 @@ namespace Step18
   unsigned int
   TopLevel<dim>::solve_linear_problem()
   {
+    // avoid output of iterative solver:
+    const unsigned int previous_depth = deallog.depth_file(0);
+
 #ifdef DEAL_II_WITH_PETSC
     PETScWrappers::MPI::Vector distributed_incremental_displacement(
       locally_owned_dofs, mpi_communicator);
@@ -712,6 +712,8 @@ namespace Step18
                  system_rhs,
                  PreconditionIdentity());
 #endif
+
+    deallog.depth_file(previous_depth);
 
     deallog << "norm: " << distributed_incremental_displacement.linfty_norm()
             << " " << distributed_incremental_displacement.l1_norm() << " "
@@ -1011,6 +1013,8 @@ int
 main(int argc, char **argv)
 {
   initlog();
+
+  deallog.depth_file(1);
 
   try
     {
