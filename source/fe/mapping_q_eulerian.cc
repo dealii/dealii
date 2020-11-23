@@ -88,7 +88,7 @@ std::unique_ptr<Mapping<dim, spacedim>>
 MappingQEulerian<dim, VectorType, spacedim>::clone() const
 {
   return std::make_unique<MappingQEulerian<dim, VectorType, spacedim>>(
-    this->get_degree(), *euler_dof_handler, *euler_vector);
+    this->get_degree(), *euler_dof_handler, *euler_vector, this->level);
 }
 
 
