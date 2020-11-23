@@ -4,91 +4,61 @@ DEAL::  Cycle 0:
 DEAL::    Number of active cells:       1875 (by partition: 1875)
 DEAL::    Number of degrees of freedom: 1728 (by partition: 1728)
 DEAL::    Assembling system... norm of rhs is 2.45750e+10
-DEAL:cg::Starting value 1.95453e+10
-DEAL:cg::Convergence step 126 value 2.13799e-06
 DEAL::norm: 0.0800000 25.2034 1.12390
-DEAL::    Solver converged in 126 iterations.
 DEAL::    Updating quadrature point data...
 DEAL::    Moving mesh...
 DEAL::
 DEAL::Timestep 2 at time 2.00000
 DEAL::    Assembling system... norm of rhs is 2.49844e+10
-DEAL:cg::Starting value 2.03490e+10
-DEAL:cg::Convergence step 127 value 1.74037e-06
 DEAL::norm: 0.0800000 25.3187 1.12498
-DEAL::    Solver converged in 127 iterations.
 DEAL::    Updating quadrature point data...
 DEAL::    Moving mesh...
 DEAL::
 DEAL::Timestep 3 at time 3.00000
 DEAL::    Assembling system... norm of rhs is 2.54414e+10
-DEAL:cg::Starting value 2.12110e+10
-DEAL:cg::Convergence step 127 value 2.31040e-06
 DEAL::norm: 0.0800000 25.4405 1.12611
-DEAL::    Solver converged in 127 iterations.
 DEAL::    Updating quadrature point data...
 DEAL::    Moving mesh...
 DEAL::
 DEAL::Timestep 4 at time 4.00000
 DEAL::    Assembling system... norm of rhs is 2.59506e+10
-DEAL:cg::Starting value 2.21374e+10
-DEAL:cg::Convergence step 127 value 2.50495e-06
 DEAL::norm: 0.0800000 25.5693 1.12729
-DEAL::    Solver converged in 127 iterations.
 DEAL::    Updating quadrature point data...
 DEAL::    Moving mesh...
 DEAL::
 DEAL::Timestep 5 at time 5.00000
 DEAL::    Assembling system... norm of rhs is 2.65175e+10
-DEAL:cg::Starting value 2.31346e+10
-DEAL:cg::Convergence step 128 value 2.04181e-06
 DEAL::norm: 0.0800000 25.7059 1.12851
-DEAL::    Solver converged in 128 iterations.
 DEAL::    Updating quadrature point data...
 DEAL::    Moving mesh...
 DEAL::
 DEAL::Timestep 6 at time 6.00000
 DEAL::    Assembling system... norm of rhs is 2.71482e+10
-DEAL:cg::Starting value 2.42104e+10
-DEAL:cg::Convergence step 129 value 2.29400e-06
 DEAL::norm: 0.0800000 25.8512 1.12979
-DEAL::    Solver converged in 129 iterations.
 DEAL::    Updating quadrature point data...
 DEAL::    Moving mesh...
 DEAL::
 DEAL::Timestep 7 at time 7.00000
 DEAL::    Assembling system... norm of rhs is 2.78496e+10
-DEAL:cg::Starting value 2.53733e+10
-DEAL:cg::Convergence step 131 value 2.19345e-06
 DEAL::norm: 0.0800000 26.0062 1.13114
-DEAL::    Solver converged in 131 iterations.
 DEAL::    Updating quadrature point data...
 DEAL::    Moving mesh...
 DEAL::
 DEAL::Timestep 8 at time 8.00000
 DEAL::    Assembling system... norm of rhs is 2.86298e+10
-DEAL:cg::Starting value 2.66332e+10
-DEAL:cg::Convergence step 132 value 2.63526e-06
 DEAL::norm: 0.0800000 26.1724 1.13256
-DEAL::    Solver converged in 132 iterations.
 DEAL::    Updating quadrature point data...
 DEAL::    Moving mesh...
 DEAL::
 DEAL::Timestep 9 at time 9.00000
 DEAL::    Assembling system... norm of rhs is 2.94979e+10
-DEAL:cg::Starting value 2.80016e+10
-DEAL:cg::Convergence step 135 value 2.78060e-06
 DEAL::norm: 0.0800000 26.3512 1.13406
-DEAL::    Solver converged in 135 iterations.
 DEAL::    Updating quadrature point data...
 DEAL::    Moving mesh...
 DEAL::
 DEAL::Timestep 10 at time 10.0000
 DEAL::    Assembling system... norm of rhs is 3.04646e+10
-DEAL:cg::Starting value 2.94916e+10
-DEAL:cg::Convergence step 137 value 2.61758e-06
 DEAL::norm: 0.0800000 26.5447 1.13566
-DEAL::    Solver converged in 137 iterations.
 DEAL::    Updating quadrature point data...
 DEAL::    Moving mesh...
 DEAL::
