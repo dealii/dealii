@@ -677,10 +677,7 @@ namespace Step60
           embedded_configuration);
     else
       embedded_mapping =
-        std::make_unique<MappingFEField<dim,
-                                        spacedim,
-                                        Vector<double>,
-                                        DoFHandler<dim, spacedim>>>(
+        std::make_unique<MappingFEField<dim, spacedim, Vector<double>>>(
           *embedded_configuration_dh, embedded_configuration);
 
     setup_embedded_dofs();
