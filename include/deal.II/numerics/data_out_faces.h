@@ -113,7 +113,7 @@ namespace internal
  * @ingroup output
  */
 template <int dim, int spacedim = dim>
-class DataOutFaces : public DataOut_DoFData<dim, dim - 1, spacedim, dim>
+class DataOutFaces : public DataOut_DoFData<dim, dim - 1, spacedim, spacedim>
 {
 public:
   /**
@@ -121,7 +121,7 @@ public:
    * consideration.
    */
   using cell_iterator =
-    typename DataOut_DoFData<dim, dim - 1, spacedim, dim>::cell_iterator;
+    typename DataOut_DoFData<dim, dim - 1, spacedim, spacedim>::cell_iterator;
 
   /**
    * Constructor determining whether a surface mesh (default) or the whole
