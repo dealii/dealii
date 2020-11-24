@@ -32,6 +32,7 @@
 #include <cmath>
 #include <cstddef>
 #include <iterator>
+#include <type_traits>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -65,28 +66,19 @@ template <typename VectorType>
 struct IsBlockVector
 {
 private:
-  struct yes_type
-  {
-    char c[1];
-  };
-  struct no_type
-  {
-    char c[2];
-  };
-
   /**
    * Overload returning true if the class is derived from BlockVectorBase,
    * which is what block vectors do.
    */
   template <typename T>
-  static yes_type
+  static std::true_type
   check_for_block_vector(const BlockVectorBase<T> *);
 
   /**
    * Catch all for all other potential vector types that are not block
    * matrices.
    */
-  static no_type
+  static std::false_type
   check_for_block_vector(...);
 
 public:
@@ -96,8 +88,8 @@ public:
    * derived from BlockVectorBase<T>).
    */
   static const bool value =
-    (sizeof(check_for_block_vector(static_cast<VectorType *>(nullptr))) ==
-     sizeof(yes_type));
+    std::is_same<decltype(check_for_block_vector(std::declval<VectorType *>())),
+                 std::true_type>::value;
 };
 
 
