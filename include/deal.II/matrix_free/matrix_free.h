@@ -3797,12 +3797,8 @@ namespace internal
     void
     zero_vector_region(const unsigned int range_index, VectorType &vec) const
     {
-      if (range_index == numbers::invalid_unsigned_int)
+      if (range_index == numbers::invalid_unsigned_int || range_index == 0)
         vec = typename VectorType::value_type();
-      else
-        {
-          Assert(false, ExcNotImplemented());
-        }
     }
 
 
