@@ -750,11 +750,11 @@ namespace Step18
       DataComponentInterpretation::DataComponentInterpretation::
         component_is_part_of_vector);
 
-    data_out.add_data_vector(incremental_displacement,
-                             solution_names,
-                             DataOut_DoFData<DoFHandler<dim, dim>, dim, dim>::
-                               DataVectorType::type_automatic,
-                             solution_interpretation);
+    data_out.add_data_vector(
+      incremental_displacement,
+      solution_names,
+      DataOut_DoFData<dim, dim>::DataVectorType::type_automatic,
+      solution_interpretation);
 
 
     Vector<double> norm_of_stress(triangulation.n_active_cells());
