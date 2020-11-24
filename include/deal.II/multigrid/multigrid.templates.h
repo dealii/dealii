@@ -251,12 +251,17 @@ void
 Multigrid<VectorType>::cycle()
 {
   // The defect vector has been initialized by copy_to_mg. Now adjust the
-  // other vectors.
-  solution.resize(minlevel, maxlevel);
-  t.resize(minlevel, maxlevel);
-  if (cycle_type != v_cycle)
+  // other vectors. First out a check if we have the right number of levels.
+  if (solution.min_level() != minlevel || solution.max_level() != maxlevel)
+    {
+      solution.resize(minlevel, maxlevel);
+      t.resize(minlevel, maxlevel);
+    }
+  if (cycle_type != v_cycle &&
+      (defect2.min_level() != minlevel || defect2.max_level() != maxlevel))
     defect2.resize(minlevel, maxlevel);
 
+  // And now we go and reinit the vectors on the levels.
   for (unsigned int level = minlevel; level <= maxlevel; ++level)
     {
       // the vectors for level>minlevel will be overwritten by the apply()
@@ -280,10 +285,14 @@ void
 Multigrid<VectorType>::vcycle()
 {
   // The defect vector has been initialized by copy_to_mg. Now adjust the
-  // other vectors.
-  solution.resize(minlevel, maxlevel);
-  t.resize(minlevel, maxlevel);
+  // other vectors. First out a check if we have the right number of levels.
+  if (solution.min_level() != minlevel || solution.max_level() != maxlevel)
+    {
+      solution.resize(minlevel, maxlevel);
+      t.resize(minlevel, maxlevel);
+    }
 
+  // And now we go and reinit the vectors on the levels.
   for (unsigned int level = minlevel; level <= maxlevel; ++level)
     {
       solution[level].reinit(defect[level], level > minlevel);
