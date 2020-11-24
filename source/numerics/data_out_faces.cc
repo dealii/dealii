@@ -69,8 +69,13 @@ namespace internal
     template <int dim, int spacedim>
     void
     append_patch_to_list(
-      const DataOutBase::Patch<dim - 1, spacedim> &       patch,
-      std::vector<DataOutBase::Patch<dim - 1, spacedim>> &patches)
+      const DataOutBase::Patch<DataOutFaces<dim, spacedim>::patch_dim,
+                               DataOutFaces<dim, spacedim>::patch_spacedim>
+        &patch,
+      std::vector<
+        DataOutBase::Patch<DataOutFaces<dim, spacedim>::patch_dim,
+                           DataOutFaces<dim, spacedim>::patch_spacedim>>
+        &patches)
     {
       patches.push_back(patch);
       patches.back().patch_index = patches.size() - 1;
@@ -90,9 +95,9 @@ DataOutFaces<dim, spacedim>::DataOutFaces(const bool so)
 template <int dim, int spacedim>
 void
 DataOutFaces<dim, spacedim>::build_one_patch(
-  const FaceDescriptor *                                        cell_and_face,
-  internal::DataOutFacesImplementation::ParallelData<dim, dim> &data,
-  DataOutBase::Patch<dim - 1, spacedim> &                       patch)
+  const FaceDescriptor *cell_and_face,
+  internal::DataOutFacesImplementation::ParallelData<dim, spacedim> &data,
+  DataOutBase::Patch<patch_dim, patch_spacedim> &                    patch)
 {
   Assert(cell_and_face->first->is_locally_owned(), ExcNotImplemented());
 
@@ -314,15 +319,16 @@ template <int dim, int spacedim>
 void
 DataOutFaces<dim, spacedim>::build_patches(const unsigned int n_subdivisions_)
 {
-  build_patches(StaticMappingQ1<dim>::mapping, n_subdivisions_);
+  build_patches(StaticMappingQ1<dim, spacedim>::mapping, n_subdivisions_);
 }
 
 
 
 template <int dim, int spacedim>
 void
-DataOutFaces<dim, spacedim>::build_patches(const Mapping<dim> &mapping,
-                                           const unsigned int  n_subdivisions_)
+DataOutFaces<dim, spacedim>::build_patches(
+  const Mapping<dim, spacedim> &mapping,
+  const unsigned int            n_subdivisions_)
 {
   const unsigned int n_subdivisions =
     (n_subdivisions_ != 0) ? n_subdivisions_ : this->default_subdivisions;
@@ -379,21 +385,23 @@ DataOutFaces<dim, spacedim>::build_patches(const Mapping<dim> &mapping,
     mapping,
     this->get_fes(),
     update_flags);
-  DataOutBase::Patch<dim - 1, spacedim> sample_patch;
+  DataOutBase::Patch<patch_dim, patch_spacedim> sample_patch;
   sample_patch.n_subdivisions = n_subdivisions;
   sample_patch.data.reinit(n_datasets,
-                           Utilities::fixed_power<dim - 1>(n_subdivisions + 1));
+                           Utilities::fixed_power<patch_dim>(n_subdivisions +
+                                                             1));
 
   // now build the patches in parallel
   WorkStream::run(
     all_faces.data(),
     all_faces.data() + all_faces.size(),
-    [this](const FaceDescriptor *cell_and_face,
-           internal::DataOutFacesImplementation::ParallelData<dim, dim> &data,
-           DataOutBase::Patch<dim - 1, spacedim> &patch) {
+    [this](
+      const FaceDescriptor *cell_and_face,
+      internal::DataOutFacesImplementation::ParallelData<dim, spacedim> &data,
+      DataOutBase::Patch<patch_dim, patch_spacedim> &patch) {
       this->build_one_patch(cell_and_face, data, patch);
     },
-    [this](const DataOutBase::Patch<dim - 1, spacedim> &patch) {
+    [this](const DataOutBase::Patch<patch_dim, patch_spacedim> &patch) {
       internal::DataOutFacesImplementation::append_patch_to_list<dim, spacedim>(
         patch, this->patches);
     },

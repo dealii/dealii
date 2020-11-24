@@ -2456,8 +2456,8 @@ namespace DataOutBase
  * This class is thought as a base class to classes actually generating data
  * for output. It has two abstract virtual functions, get_patches() and
  * get_dataset_names() produce the data which is actually needed. These are
- * the only functions that need to be overloaded by a derived class.  In
- * additional to that, it has a function for each output format supported by
+ * the only functions that need to be overloaded by a derived class. In
+ * addition to that, it has a function for each output format supported by
  * the underlying base class which gets the output data using these two
  * virtual functions and passes them to the raw output functions.
  *
