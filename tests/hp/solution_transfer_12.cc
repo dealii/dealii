@@ -105,6 +105,7 @@ transfer(std::ostream &out)
     typename DoFHandler<dim>::active_cell_iterator cell = q_dof_handler
                                                             .begin_active(),
                                                    endc = q_dof_handler.end();
+
     for (; cell != endc; ++cell, ++counter)
       {
         if (counter < 15)
@@ -136,6 +137,7 @@ transfer(std::ostream &out)
     typename DoFHandler<dim>::active_cell_iterator cell = q_dof_handler
                                                             .begin_active(),
                                                    endc = q_dof_handler.end();
+
     for (; cell != endc; ++cell)
       {
         hp_fe_val.reinit(cell, 0);
@@ -155,7 +157,7 @@ transfer(std::ostream &out)
       }
   }
 
-  SolutionTransfer<dim, Vector<double>, DoFHandler<dim>> q_soltrans(
+  Legacy::SolutionTransfer<dim, Vector<double>, DoFHandler<dim>> q_soltrans(
     q_dof_handler);
 
 
@@ -186,6 +188,7 @@ transfer(std::ostream &out)
     typename DoFHandler<dim>::active_cell_iterator cell = q_dof_handler
                                                             .begin_active(),
                                                    endc = q_dof_handler.end();
+
     for (; cell != endc; ++cell, ++counter)
       {
         if (counter > 20 && counter < 90)
@@ -211,6 +214,7 @@ transfer(std::ostream &out)
     typename DoFHandler<dim>::active_cell_iterator cell = q_dof_handler
                                                             .begin_active(),
                                                    endc = q_dof_handler.end();
+
     for (; cell != endc; ++cell)
       {
         hp_fe_val.reinit(cell, 0);

@@ -74,7 +74,7 @@ test(std::string filename, unsigned int n)
   VectorTools::project(
     dof_handler, constraints, quad, cosine, interpolated_one);
 
-  DataOut<dim, DoFHandler<dim, spacedim>> dataout;
+  Legacy::DataOut<dim, DoFHandler<dim, spacedim>> dataout;
   dataout.attach_dof_handler(dof_handler);
   dataout.add_data_vector(interpolated_one, "numbering");
   dataout.build_patches();

@@ -71,7 +71,7 @@ main()
   triangulation.prepare_coarsening_and_refinement();
 
   // Interpolate solution
-  SolutionTransfer<2, Vector<double>, DoFHandler<2>> solution_trans(
+  Legacy::SolutionTransfer<2, Vector<double>, DoFHandler<2>> solution_trans(
     dof_handler);
   solution_trans.prepare_for_coarsening_and_refinement(solution);
 

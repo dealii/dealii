@@ -59,11 +59,13 @@ main()
   soln = 0;
   for (unsigned int i = 0; i < soln.size(); ++i)
     soln(i) = i;
-  DataOut<dim, DoFHandler<dim, dim + 1>> data_out;
+  Legacy::DataOut<dim, DoFHandler<dim, dim + 1>> data_out;
   data_out.attach_dof_handler(dof_handler);
 
   data_out.add_data_vector(
-    soln, "scalar_data", DataOut<dim, DoFHandler<dim, dim + 1>>::type_dof_data);
+    soln,
+    "scalar_data",
+    Legacy::DataOut<dim, DoFHandler<dim, dim + 1>>::type_dof_data);
   data_out.build_patches();
   data_out.write_vtk(deallog.get_file_stream());
 

@@ -509,14 +509,14 @@ test()
       DataOutBase::VtkFlags flags;
       // flags.write_higher_order_cells = true;
 
-      DataOut<dim, DoFHandler<dim, spacedim>> data_out;
+      Legacy::DataOut<dim, DoFHandler<dim, spacedim>> data_out;
       data_out.set_flags(flags);
       data_out.add_data_vector(dof_handler, curvature_vector, "curvature");
       data_out.add_data_vector(dof_handler_dim, normal_vector, "normal");
 
       data_out.build_patches(mapping,
                              fe_degree + 1,
-                             DataOut<dim, DoFHandler<dim, spacedim>>::
+                             Legacy::DataOut<dim, DoFHandler<dim, spacedim>>::
                                CurvedCellRegion::curved_inner_cells);
       data_out.write_vtu_with_pvtu_record("./",
                                           "data_surface",

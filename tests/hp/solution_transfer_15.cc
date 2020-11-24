@@ -132,8 +132,9 @@ transfer(const MPI_Comm &mpi_communicator)
     if (locally_owned_dofs.is_element(i))
       solution(i) = i;
 
-  SolutionTransfer<dim, TrilinosWrappers::MPI::BlockVector, DoFHandler<dim>>
-    soltrans(dof_handler);
+  Legacy::
+    SolutionTransfer<dim, TrilinosWrappers::MPI::BlockVector, DoFHandler<dim>>
+      soltrans(dof_handler);
 
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
                                                     endc = tria.end();

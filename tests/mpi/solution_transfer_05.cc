@@ -82,7 +82,7 @@ test()
                            dgq_solution);
   dgq_solution.update_ghost_values();
 
-  parallel::distributed::SolutionTransfer<
+  Legacy::parallel::distributed::SolutionTransfer<
     dim,
     LinearAlgebra::distributed::Vector<double>,
     DoFHandler<dim>>

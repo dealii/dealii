@@ -443,7 +443,7 @@ Laplace<dim>::refine_grid(const unsigned int cycle)
     }
 
   // 3.4. Solution Transfer
-  SolutionTransfer<dim, TrilinosWrappers::MPI::Vector, DoFHandler<dim>>
+  Legacy::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector, DoFHandler<dim>>
     soltrans(dof_handler);
 
   // copy current functions

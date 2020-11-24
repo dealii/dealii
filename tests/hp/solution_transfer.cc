@@ -129,9 +129,9 @@ transfer(std::ostream &out)
   VectorTools::interpolate(mapping, q_dof_handler, function, q_solution);
   VectorTools::interpolate(mapping, dgq_dof_handler, function, dgq_solution);
 
-  SolutionTransfer<dim, Vector<double>, DoFHandler<dim>> q_soltrans(
+  Legacy::SolutionTransfer<dim, Vector<double>, DoFHandler<dim>> q_soltrans(
     q_dof_handler);
-  SolutionTransfer<dim, Vector<double>, DoFHandler<dim>> dgq_soltrans(
+  Legacy::SolutionTransfer<dim, Vector<double>, DoFHandler<dim>> dgq_soltrans(
     dgq_dof_handler);
 
 
@@ -197,6 +197,7 @@ transfer(std::ostream &out)
     typename DoFHandler<dim>::active_cell_iterator cell = q_dof_handler
                                                             .begin_active(),
                                                    endc = q_dof_handler.end();
+
     for (; cell != endc; ++cell)
       {
         hp_fe_val.reinit(cell, 0);

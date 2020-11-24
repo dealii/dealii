@@ -111,11 +111,11 @@ main()
 
   std::vector<std::string> solution_names(3, "position");
 
-  DataOut<2, DoFHandler<2, 3>> data_out;
+  Legacy::DataOut<2, DoFHandler<2, 3>> data_out;
   data_out.attach_dof_handler(dh_test);
   data_out.add_data_vector(position,
                            solution_names,
-                           DataOut<2, DoFHandler<2, 3>>::type_dof_data,
+                           Legacy::DataOut<2, DoFHandler<2, 3>>::type_dof_data,
                            data_component_interpretation);
   data_out.build_patches(mapping, 2);
 

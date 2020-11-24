@@ -439,6 +439,7 @@ namespace LaplaceSolver
   {
     using active_cell_iterator = typename DoFHandler<dim>::active_cell_iterator;
 
+
     const unsigned int n_threads = MultithreadInfo::n_threads();
     std::vector<std::pair<active_cell_iterator, active_cell_iterator>>
       thread_ranges =
@@ -524,6 +525,7 @@ namespace LaplaceSolver
 
   template <int dim>
   Solver<dim>::LinearSystem::LinearSystem(const DoFHandler<dim> &dof_handler)
+
   {
     hanging_node_constraints.clear();
 
@@ -1127,6 +1129,7 @@ namespace DualFunctional
     virtual void
     assemble_rhs(const DoFHandler<dim> &dof_handler, Vector<double> &rhs) const;
 
+
     DeclException1(ExcEvaluationPointNotFound,
                    Point<dim>,
                    << "The evaluation point " << arg1
@@ -1147,7 +1150,8 @@ namespace DualFunctional
   template <int dim>
   void
   PointValueEvaluation<dim>::assemble_rhs(const DoFHandler<dim> &dof_handler,
-                                          Vector<double> &       rhs) const
+
+                                          Vector<double> &rhs) const
   {
     rhs.reinit(dof_handler.n_dofs());
 
@@ -1176,6 +1180,7 @@ namespace DualFunctional
 
     virtual void
     assemble_rhs(const DoFHandler<dim> &dof_handler, Vector<double> &rhs) const;
+
 
     DeclException1(ExcEvaluationPointNotFound,
                    Point<dim>,
@@ -1373,8 +1378,10 @@ namespace LaplaceSolver
 
     using active_cell_iterator = typename DoFHandler<dim>::active_cell_iterator;
 
+
     using FaceIntegrals =
       typename std::map<typename DoFHandler<dim>::face_iterator, double>;
+
 
     struct CellData
     {
@@ -1597,7 +1604,7 @@ namespace LaplaceSolver
                          primal_hanging_node_constraints,
                          dual_solution);
 
-    DataOut<dim, DoFHandler<dim>> data_out;
+    Legacy::DataOut<dim, DoFHandler<dim>> data_out;
     data_out.attach_dof_handler(primal_solver.dof_handler);
 
     data_out.add_data_vector(primal_solver.solution, "primal_solution");
@@ -1864,6 +1871,7 @@ namespace LaplaceSolver
 
     const typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
     const typename DoFHandler<dim>::cell_iterator neighbor =
+
       cell->neighbor(face_no);
     Assert(neighbor.state() == IteratorState::valid, ExcInternalError());
     Assert(neighbor->has_children(), ExcInternalError());

@@ -99,7 +99,7 @@ test()
 
 
   // ----- transfer -----
-  parallel::distributed::
+  Legacy::parallel::distributed::
     SolutionTransfer<dim, TrilinosWrappers::MPI::Vector, DoFHandler<dim>>
       soltrans(dh);
 

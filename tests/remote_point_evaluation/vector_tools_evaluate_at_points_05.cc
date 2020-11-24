@@ -84,7 +84,7 @@ print(const Mapping<dim, spacedim> &                    mapping,
   if (dim == spacedim)
     flags.write_higher_order_cells = true;
 
-  DataOut<dim, DoFHandler<dim, spacedim>> data_out;
+  Legacy::DataOut<dim, DoFHandler<dim, spacedim>> data_out;
   data_out.set_flags(flags);
   data_out.attach_dof_handler(dof_handler);
 

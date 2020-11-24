@@ -175,7 +175,7 @@ test(std::string filename)
     }
 
   //  write graphical output
-  DataOut<dim, DoFHandler<dim, spacedim>> dataout;
+  Legacy::DataOut<dim, DoFHandler<dim, spacedim>> dataout;
   dataout.attach_triangulation(triangulation);
   dataout.add_data_vector(projected_directional_derivative, "derivative");
   dataout.build_patches();

@@ -80,7 +80,7 @@ test(std::ostream & /*out*/)
   dh.distribute_dofs(fe);
   deallog << "dofs " << dh.n_dofs() << std::endl;
 
-  DataOut<dim, DoFHandler<dim, spacedim>> data_out;
+  Legacy::DataOut<dim, DoFHandler<dim, spacedim>> data_out;
   data_out.attach_triangulation(tr);
   Vector<float> subdomain(tr.n_active_cells());
   for (unsigned int i = 0; i < subdomain.size(); ++i)

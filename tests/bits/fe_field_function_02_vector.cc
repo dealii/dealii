@@ -85,7 +85,8 @@ test()
   VectorTools::interpolate(dh, ff, v1);
   deallog << "V norm: " << v1.l2_norm() << std::endl;
 
-  Functions::FEFieldFunction<dim, DoFHandler<dim>, Vector<double>> fef(dh, v1);
+  Legacy::Functions::FEFieldFunction<dim, DoFHandler<dim>, Vector<double>> fef(
+    dh, v1);
 
   // project the discrete function fef back
   // onto the finite element space. this

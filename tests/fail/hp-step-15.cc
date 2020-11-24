@@ -121,6 +121,7 @@ private:
   energy(const DoFHandler<dim> &dof_handler, const Vector<double> &function);
 
 
+
   const unsigned int run_number;
 
   Triangulation<dim> triangulation;
@@ -376,7 +377,7 @@ template <int dim>
 void
 MinimizationProblem<dim>::output_results() const
 {
-  DataOut<dim, DoFHandler<dim>> data_out;
+  Legacy::DataOut<dim, DoFHandler<dim>> data_out;
   data_out.attach_dof_handler(dof_handler);
   data_out.add_data_vector(present_solution, "solution");
   data_out.build_patches();

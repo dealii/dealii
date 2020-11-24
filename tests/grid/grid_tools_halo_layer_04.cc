@@ -61,12 +61,13 @@ write_vtk(const DoFHandler<dim> &dof_handler, const std::string filename)
       1, DataComponentInterpretation::component_is_scalar);
   const std::vector<std::string> data_names(1, "active_fe_index");
 
-  DataOut<dim, DoFHandler<dim>> data_out;
+  Legacy::DataOut<dim, DoFHandler<dim>> data_out;
   data_out.attach_dof_handler(dof_handler);
-  data_out.add_data_vector(active_fe_index,
-                           data_names,
-                           DataOut<dim, DoFHandler<dim>>::type_cell_data,
-                           data_component_interpretation);
+  data_out.add_data_vector(
+    active_fe_index,
+    data_names,
+    Legacy::DataOut<dim, DoFHandler<dim>>::type_cell_data,
+    data_component_interpretation);
   data_out.build_patches();
 
   std::ofstream output(filename.c_str());

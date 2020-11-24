@@ -129,7 +129,7 @@ plot_shape_function(DoFHandler<dim> &dof_handler, unsigned int patches = 5)
       shape_functions.push_back(shape_function);
     }
 
-  DataOut<dim, DoFHandler<dim>> data_out;
+  Legacy::DataOut<dim, DoFHandler<dim>> data_out;
   data_out.attach_dof_handler(dof_handler);
 
   // get material ids:

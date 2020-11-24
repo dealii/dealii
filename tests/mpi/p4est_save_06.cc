@@ -92,7 +92,7 @@ test()
                                        locally_relevant_dofs,
                                        com_small);
 
-      parallel::distributed::
+      Legacy::parallel::distributed::
         SolutionTransfer<dim, PETScWrappers::MPI::Vector, DoFHandler<dim>>
           soltrans(dh);
 
@@ -134,6 +134,7 @@ test()
     for (unsigned int i = 0; i < max_degree; ++i)
       fe_collection.push_back(FE_Q<dim>(max_degree - i));
 
+
     dh.deserialize_active_fe_indices();
     dh.distribute_dofs(fe_collection);
 
@@ -145,7 +146,7 @@ test()
     PETScWrappers::MPI::Vector solution(locally_owned_dofs, com_all);
     solution = PetscScalar();
 
-    parallel::distributed::
+    Legacy::parallel::distributed::
       SolutionTransfer<dim, PETScWrappers::MPI::Vector, DoFHandler<dim>>
         soltrans(dh);
 

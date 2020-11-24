@@ -359,12 +359,11 @@ namespace Step38
   void
   LaplaceBeltramiProblem<spacedim>::output_results() const
   {
-    DataOut<dim, DoFHandler<dim, spacedim>> data_out;
+    DataOut<dim, spacedim> data_out;
     data_out.attach_dof_handler(dof_handler);
-    data_out.add_data_vector(
-      solution,
-      "solution",
-      DataOut<dim, DoFHandler<dim, spacedim>>::type_dof_data);
+    data_out.add_data_vector(solution,
+                             "solution",
+                             DataOut<dim, spacedim>::type_dof_data);
     data_out.build_patches(mapping, mapping.get_degree());
 
     const std::string filename =

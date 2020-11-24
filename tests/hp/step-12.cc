@@ -540,6 +540,7 @@ DGMethod<dim>::assemble_system1()
         {
           typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
 
+
           ue_vi_matrix = 0;
 
           if (face->at_boundary())
@@ -716,6 +717,7 @@ DGMethod<dim>::assemble_system2()
         {
           typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
 
+
           if (face->at_boundary())
             {
               fe_v_face.reinit(cell, face_no);
@@ -738,6 +740,7 @@ DGMethod<dim>::assemble_system2()
                        ++subface_no)
                     {
                       typename DoFHandler<dim>::cell_iterator neighbor_child =
+
                         cell->neighbor_child_on_subface(face_no, subface_no);
                       Assert(neighbor_child->face(neighbor2) ==
                                face->child(subface_no),
@@ -892,7 +895,7 @@ DGMethod<dim>::output_results(const unsigned int cycle) const
   deallog << "Writing solution to <" << filename << ">..." << std::endl
           << std::endl;
 
-  DataOut<dim, DoFHandler<dim>> data_out;
+  Legacy::DataOut<dim, DoFHandler<dim>> data_out;
   data_out.attach_dof_handler(dof_handler);
   data_out.add_data_vector(solution2, "u");
 
