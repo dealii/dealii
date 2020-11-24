@@ -99,7 +99,7 @@ namespace LinearAlgebra
         {}
 
         static void
-        import(
+        import_elements(
           const ::dealii::LinearAlgebra::ReadWriteVector<Number> & /*V*/,
           ::dealii::VectorOperation::values /*operation*/,
           const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner> &
@@ -247,7 +247,7 @@ namespace LinearAlgebra
         }
 
         static void
-        import(
+        import_elements(
           const ::dealii::LinearAlgebra::ReadWriteVector<Number> &V,
           ::dealii::VectorOperation::values                       operation,
           const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
@@ -354,13 +354,15 @@ namespace LinearAlgebra
         }
 
         static void
-        import(const ReadWriteVector<Number> &V,
-               VectorOperation::values        operation,
-               std::shared_ptr<const Utilities::MPI::Partitioner>
-                               communication_pattern,
-               const IndexSet &locally_owned_elem,
-               ::dealii::MemorySpace::
-                 MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+        import_elements(
+          const ReadWriteVector<Number> &V,
+          VectorOperation::values        operation,
+          std::shared_ptr<const Utilities::MPI::Partitioner>
+                          communication_pattern,
+          const IndexSet &locally_owned_elem,
+          ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                 ::dealii::MemorySpace::CUDA>
+            &data)
         {
           Assert(
             (operation == ::dealii::VectorOperation::add) ||
@@ -884,7 +886,7 @@ namespace LinearAlgebra
       Assert(partitioner->ghost_indices() == src.partitioner->ghost_indices(),
              ExcMessage("Ghost indices should be identical."));
       ::dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpaceType>::import(
+        functions<Number, Number, MemorySpaceType>::import_elements(
           thread_loop_partitioner, allocated_size, operation, src.data, data);
     }
 
