@@ -2277,9 +2277,6 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   solution_old.reinit(src);
   temp_vector1.reinit(src, true);
 
-  // calculate largest eigenvalue using a hand-tuned CG iteration on the
-  // matrix weighted by its diagonal. we start with a vector that consists of
-  // ones only, weighted by the length.
   if (data.eig_cg_n_iterations > 0)
     {
       Assert(data.eig_cg_n_iterations > 2,
@@ -2303,8 +2300,9 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
           eigenvalue_tracker.slot(eigenvalues);
         });
 
-      // set an initial guess which is close to the constant vector but where
-      // one entry is different to trigger high frequencies
+      // set an initial guess that contains some high-frequency parts (to the
+      // extent possible without knowing the discretization and the numbering)
+      // to trigger high eigenvalues according to the external function
       internal::PreconditionChebyshevImplementation::set_initial_guess(
         temp_vector1);
       data.constraints.set_zero(temp_vector1);
@@ -2362,9 +2360,9 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
         1 + static_cast<unsigned int>(
               std::log(1. / eps + std::sqrt(1. / eps / eps - 1.)) /
               std::log(1. / sigma));
-
-      info.degree = data.degree;
     }
+
+  info.degree = data.degree;
 
   const_cast<
     PreconditionChebyshev<MatrixType, VectorType, PreconditionerType> *>(this)
