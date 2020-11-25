@@ -442,6 +442,26 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
   // determined in @p extract_local_to_global_indices.
   if (additional_data.initialize_mapping == true)
     {
+      if (dof_handler.size() > 1)
+        {
+          // check if all DoHandlers are in the same hp mode; and if hp
+          // capabilities are enabled: check if active_fe_indices of all
+          // DoFHandler are the same.
+          for (unsigned int i = 1; i < dof_handler.size(); ++i)
+            {
+              Assert(dof_handler[0]->has_hp_capabilities() ==
+                       dof_handler[i]->has_hp_capabilities(),
+                     ExcNotImplemented());
+
+              if (dof_handler[0]->has_hp_capabilities())
+                {
+                  Assert(dof_info[0].cell_active_fe_index ==
+                           dof_info[i].cell_active_fe_index,
+                         ExcNotImplemented());
+                }
+            }
+        }
+
       mapping_info.initialize(
         dof_handler[0]->get_triangulation(),
         cell_level_index,
