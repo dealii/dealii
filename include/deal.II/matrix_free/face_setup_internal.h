@@ -1023,8 +1023,11 @@ namespace internal
      * to batch similar faces together for vectorization.
      */
     inline bool
-    compare_faces_for_vectorization(const FaceToCellTopology<1> &face1,
-                                    const FaceToCellTopology<1> &face2)
+    compare_faces_for_vectorization(
+      const FaceToCellTopology<1> &    face1,
+      const FaceToCellTopology<1> &    face2,
+      const std::vector<unsigned int> &active_fe_indices,
+      const unsigned int               length)
     {
       if (face1.interior_face_no != face2.interior_face_no)
         return false;
@@ -1034,6 +1037,19 @@ namespace internal
         return false;
       if (face1.face_orientation != face2.face_orientation)
         return false;
+
+      if (active_fe_indices.size() > 0)
+        {
+          if (active_fe_indices[face1.cells_interior[0] / length] !=
+              active_fe_indices[face2.cells_interior[0] / length])
+            return false;
+
+          if (face2.cells_exterior[0] != numbers::invalid_unsigned_int)
+            if (active_fe_indices[face1.cells_exterior[0] / length] !=
+                active_fe_indices[face2.cells_exterior[0] / length])
+              return false;
+        }
+
       return true;
     }
 
@@ -1048,10 +1064,37 @@ namespace internal
     template <int length>
     struct FaceComparator
     {
+      FaceComparator(const std::vector<unsigned int> &active_fe_indices)
+        : active_fe_indices(active_fe_indices)
+      {}
+
       bool
       operator()(const FaceToCellTopology<length> &face1,
                  const FaceToCellTopology<length> &face2) const
       {
+        // check if active fe indices match
+        if (active_fe_indices.size() > 0)
+          {
+            // ... for interior faces
+            if (active_fe_indices[face1.cells_interior[0] / length] <
+                active_fe_indices[face2.cells_interior[0] / length])
+              return true;
+            else if (active_fe_indices[face1.cells_interior[0] / length] >
+                     active_fe_indices[face2.cells_interior[0] / length])
+              return false;
+
+            // ... for exterior faces
+            if (face2.cells_exterior[0] != numbers::invalid_unsigned_int)
+              {
+                if (active_fe_indices[face1.cells_exterior[0] / length] <
+                    active_fe_indices[face2.cells_exterior[0] / length])
+                  return true;
+                else if (active_fe_indices[face1.cells_exterior[0] / length] >
+                         active_fe_indices[face2.cells_exterior[0] / length])
+                  return false;
+              }
+          }
+
         for (unsigned int i = 0; i < length; ++i)
           if (face1.cells_interior[i] < face2.cells_interior[i])
             return true;
@@ -1079,6 +1122,9 @@ namespace internal
 
         return false;
       }
+
+    private:
+      const std::vector<unsigned int> &active_fe_indices;
     };
 
 
@@ -1089,7 +1135,8 @@ namespace internal
       const std::vector<FaceToCellTopology<1>> &faces_in,
       const std::vector<bool> &                 hard_vectorization_boundary,
       std::vector<unsigned int> &               face_partition_data,
-      std::vector<FaceToCellTopology<vectorization_width>> &faces_out)
+      std::vector<FaceToCellTopology<vectorization_width>> &faces_out,
+      const std::vector<unsigned int> &                     active_fe_indices)
     {
       FaceToCellTopology<vectorization_width> macro_face;
       std::vector<std::vector<unsigned int>>  faces_type;
@@ -1119,7 +1166,9 @@ namespace internal
                 {
                   // Compare current face with first face of type type
                   if (compare_faces_for_vectorization(faces_in[face],
-                                                      faces_in[face_type[0]]))
+                                                      faces_in[face_type[0]],
+                                                      active_fe_indices,
+                                                      vectorization_width))
                     {
                       face_type.push_back(face);
                       goto face_found;
@@ -1131,9 +1180,11 @@ namespace internal
             }
 
           // insert new faces in sorted list to get good data locality
+          FaceComparator<vectorization_width> face_comparator(
+            active_fe_indices);
           std::set<FaceToCellTopology<vectorization_width>,
                    FaceComparator<vectorization_width>>
-            new_faces;
+            new_faces(face_comparator);
           for (const auto &face_type : faces_type)
             {
               macro_face.interior_face_no =

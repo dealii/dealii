@@ -1403,7 +1403,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
         face_setup.inner_faces,
         hard_vectorization_boundary,
         task_info.face_partition_data,
-        face_info.faces);
+        face_info.faces,
+        dof_info[0].cell_active_fe_index);
 
       // on boundary faces, we must also respect the vectorization boundary of
       // the inner faces because we might have dependencies on ghosts of
@@ -1412,7 +1413,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
         face_setup.boundary_faces,
         hard_vectorization_boundary,
         task_info.boundary_partition_data,
-        face_info.faces);
+        face_info.faces,
+        dof_info[0].cell_active_fe_index);
 
       // for the other ghosted faces, there are no scheduling restrictions
       hard_vectorization_boundary.clear();
@@ -1422,7 +1424,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
         face_setup.inner_ghost_faces,
         hard_vectorization_boundary,
         task_info.ghost_face_partition_data,
-        face_info.faces);
+        face_info.faces,
+        dof_info[0].cell_active_fe_index);
       hard_vectorization_boundary.clear();
       hard_vectorization_boundary.resize(
         task_info.refinement_edge_face_partition_data.size(), false);
@@ -1430,7 +1433,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
         face_setup.refinement_edge_faces,
         hard_vectorization_boundary,
         task_info.refinement_edge_face_partition_data,
-        face_info.faces);
+        face_info.faces,
+        dof_info[0].cell_active_fe_index);
 
       cell_level_index.resize(
         cell_level_index.size() +
