@@ -712,7 +712,7 @@ namespace Particles
      * Update all particles that live in cells that are ghost cells to
      * other processes. In this context, update means to update the
      * location and the properties of the ghost particles assuming that
-     * the ghost particles have not changed cells. Consquently, this will
+     * the ghost particles have not changed cells. Consequently, this will
      * not update the reference location of the particles.
      */
     void
@@ -923,7 +923,7 @@ namespace Particles
      *
      * @param [in] enable_cache Optional bool that enables updating
      * the ghost particles without rebuilding them from scratch by
-     * building a cache of type GhostParticlePartitioner which
+     * building a cache of type GhostParticlePartitioner, which
      * stores the necessary information to update the ghost particles.
      * Once this cache is built, the ghost particles can be updated
      * by a call to send_recv_particles_properties_and_location().
@@ -950,15 +950,15 @@ namespace Particles
      * GhostParticlePartitioner as a caching structure to update the particles.
      * It inherently assumes that particles cannot have changed cell.
      * All updated particles will be appended to the
-     * @p received_particles vector.
+     * @p received_particles container.
      *
      * @param [in] particles_to_send All particles for which information
      * should be sent and their new subdomain_ids are in this map.
      *
      * @param [in,out] received_particles A map with all received
-     * particles. Note that it is not required nor checked that the list
-     * is empty, received particles are simply attached to the end of
-     * the vector.
+     * particles. Note that it is not required nor checked that the container
+     * is empty, received particles are simply inserted into
+     * the map.
      *
      */
     void

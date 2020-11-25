@@ -34,8 +34,8 @@ namespace Particles
      * This structure should only be used when one wishes to carry out work
      * using the particles without calling
      * sort_particles_into_subdomain_and_cells at every iteration. This is
-     * useful when particle-particle interaction occur at a different time
-     * scale than particle-FEM interaction.
+     * useful when particle-particle interaction occurs at a different time
+     * scale than particle-mesh interaction.
      */
     template <int dim, int spacedim>
     struct GhostParticlePartitioner
@@ -78,7 +78,7 @@ namespace Particles
        * Vector of size (neighbors.size()+1) used to store the start and the
        * end point of the data that must be received from neighbor[i] on
        * the current subdomain. For neighbor i, recv_pointers[i] indicate the
-       * beggining and reicv_pointers[i+1] indicates the end of the data that
+       * beginning and recv_pointers[i+1] indicates the end of the data that
        * must be received.
        *
        * This structure is similar to
