@@ -31,6 +31,7 @@
 #include <boost/range/iterator_range.hpp>
 
 #include <set>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -2280,11 +2281,11 @@ class BlockSparseMatrixEZ;
 
 /**
  * A class that can be used to determine whether a given type is a block
- * matrix type or not. For example,
+ * matrix or block sparsity pattern type or not. For example,
  * @code
  *   IsBlockMatrix<SparseMatrix<number> >::value
  * @endcode
- * has the value false, whereas
+ * has the value `false`, whereas
  * @code
  *   IsBlockMatrix<BlockSparseMatrix<number> >::value
  * @endcode
@@ -2299,56 +2300,48 @@ template <typename MatrixType>
 struct IsBlockMatrix
 {
 private:
-  struct yes_type
-  {
-    char c[1];
-  };
-  struct no_type
-  {
-    char c[2];
-  };
-
   /**
    * Overload returning true if the class is derived from BlockMatrixBase,
    * which is what block matrices do (with the exception of
    * BlockSparseMatrixEZ).
    */
   template <typename T>
-  static yes_type
-  check_for_block_matrix(const BlockMatrixBase<T> *);
+  static std::true_type
+  check(const BlockMatrixBase<T> *);
 
   /**
    * Overload returning true if the class is derived from
    * BlockSparsityPatternBase, which is what block sparsity patterns do.
    */
   template <typename T>
-  static yes_type
-  check_for_block_matrix(const BlockSparsityPatternBase<T> *);
+  static std::true_type
+  check(const BlockSparsityPatternBase<T> *);
 
   /**
    * Overload for BlockSparseMatrixEZ, which is the only block matrix not
    * derived from BlockMatrixBase at the time of writing this class.
    */
   template <typename T>
-  static yes_type
-  check_for_block_matrix(const BlockSparseMatrixEZ<T> *);
+  static std::true_type
+  check(const BlockSparseMatrixEZ<T> *);
 
   /**
    * Catch all for all other potential matrix types that are not block
    * matrices.
    */
-  static no_type
-  check_for_block_matrix(...);
+  static std::false_type
+  check(...);
 
 public:
   /**
    * A statically computable value that indicates whether the template
    * argument to this class is a block matrix (in fact whether the type is
-   * derived from BlockMatrixBase<T>).
+   * derived from BlockMatrixBase<T> or is one of the other block matrix
+   * or block sparsity pattern types).
    */
   static const bool value =
-    (sizeof(check_for_block_matrix(static_cast<MatrixType *>(nullptr))) ==
-     sizeof(yes_type));
+    std::is_same<decltype(check(std::declval<MatrixType *>())),
+                 std::true_type>::value;
 };
 
 // instantiation of the static member
