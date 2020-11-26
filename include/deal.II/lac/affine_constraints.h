@@ -1663,11 +1663,12 @@ public:
    * operation and will return @p true only if all processors are consistent.
    *
    * Please supply the owned DoFs per processor as returned by
-   * DoFHandler::locally_owned_dofs_per_processor() as @p locally_owned_dofs
-   * and the result of DoFTools::extract_locally_active_dofs() as
-   * @p locally_active_dofs. The
-   * former is used to determine ownership of the specific DoF, while the latter
-   * is used as the set of rows that need to be checked.
+   * Utilities::MPI::all_gather(MPI_Comm, DoFHandler::locally_owned_dofs()) as
+   * @p locally_owned_dofs and the result of
+   * DoFTools::extract_locally_active_dofs() as
+   * @p locally_active_dofs. The former is used to determine ownership of the
+   * specific DoF, while the latter is used as the set of rows that need to be
+   * checked.
    *
    * If @p verbose is set to @p true, additional debug information is written
    * to std::cout.
