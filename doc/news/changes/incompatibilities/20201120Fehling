@@ -18,9 +18,9 @@ namespaces.
 You can achieve the latter with a *search and replace* script like the
 following made for the *bash* shell:
 @code{.sh}
-classes=(SolutionTransfer FEFieldFunction DataOut DataOut_DoFData DataOutFaces DataOutRotation)
+classes=(SolutionTransfer parallel::distributed::SolutionTransfer Functions::FEFieldFunction DataOut DataOut_DoFData DataOutFaces DataOutRotation)
 for c in \${classes[@]}; do
-  find /path/to/your/code -type f -exec sed -i -E "/(\w\${c}|\${c}[^<]|Particles::\${c}|^\s*(\/\/|\*))/! s/\${c}/Legacy::\${c}/g" {} \;
+  find /path/to/your/code -type f -exec sed -i -E "/(\w\${c}|\${c}[^<]|Particles::\${c}|distributed::\${c}|^\s*(\/\/|\*))/! s/\${c}/Legacy::\${c}/g" {} \;
 done
 @endcode
 (Marc Fehling, 2020/11/20)

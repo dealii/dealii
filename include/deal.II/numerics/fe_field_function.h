@@ -487,8 +487,11 @@ namespace Functions
       const typename DoFHandlerType::active_cell_iterator &cell,
       const Point<dim> &                                   point) const;
   };
+} // namespace Functions
 
-  namespace Legacy
+namespace Legacy
+{
+  namespace Functions
   {
     /**
      * @deprecated Use dealii::Functions::FEFieldFunction without the
@@ -499,8 +502,8 @@ namespace Functions
               typename VectorType     = Vector<double>>
     using FEFieldFunction DEAL_II_DEPRECATED =
       dealii::Functions::FEFieldFunction<dim, DoFHandlerType, VectorType>;
-  } // namespace Legacy
-} // namespace Functions
+  } // namespace Functions
+} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -372,8 +372,14 @@ namespace parallel
       void
       register_data_attach();
     };
+  } // namespace distributed
+} // namespace parallel
 
-    namespace Legacy
+namespace Legacy
+{
+  namespace parallel
+  {
+    namespace distributed
     {
       /**
        * @deprecated Use dealii::parallel::distributed::SolutionTransfer
@@ -384,9 +390,9 @@ namespace parallel
                 typename DoFHandlerType = DoFHandler<dim>>
       using SolutionTransfer DEAL_II_DEPRECATED = dealii::parallel::
         distributed::SolutionTransfer<dim, VectorType, DoFHandlerType>;
-    } // namespace Legacy
-  }   // namespace distributed
-} // namespace parallel
+    } // namespace distributed
+  }   // namespace parallel
+} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE
