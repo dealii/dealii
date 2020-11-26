@@ -1198,11 +1198,12 @@ public:
    * @deprecated As of deal.II version 9.2, we do not populate a vector with
    * the index sets of all processors by default any more due to a possibly
    * large memory footprint on many processors. As a consequence, this
-   * function needs to call `Utilities::all_gather(comm, locally_owned_dofs())`
-   * upon the first invocation, including global communication. Use
-   * `Utilities::all_gather(comm, dof_handler.locally_owned_dofs())` instead if
-   * using up to a few thousands of MPI ranks or some variant involving local
-   * communication with more processors.
+   * function needs to call `Utilities::MPI::all_gather(comm,
+   * locally_owned_dofs())` upon the first invocation, including global
+   * communication. Use `Utilities::MPI::all_gather(comm,
+   * dof_handler.locally_owned_dofs())` instead if using up to a few thousands
+   * of MPI ranks or some variant involving local communication with more
+   * processors.
    */
   DEAL_II_DEPRECATED const std::vector<IndexSet> &
                            locally_owned_dofs_per_processor() const;
@@ -1216,9 +1217,9 @@ public:
    * @deprecated As of deal.II version 9.2, we do not populate a vector with
    * the numbers of dofs of all processors by default any more due to a
    * possibly large memory footprint on many processors. As a consequence,
-   * this function needs to call `Utilities::all_gather(comm,
+   * this function needs to call `Utilities::MPI::all_gather(comm,
    * n_locally_owned_dofs()` upon the first invocation, including global
-   * communication. Use `Utilities::all_gather(comm,
+   * communication. Use `Utilities::MPI::all_gather(comm,
    * dof_handler.n_locally_owned_dofs()` instead if using up to a few thousands
    * of MPI ranks or some variant involving local communication with more
    * processors.
@@ -1233,9 +1234,9 @@ public:
    * @deprecated As of deal.II version 9.2, we do not populate a vector with
    * the index sets of all processors by default any more due to a possibly
    * large memory footprint on many processors. As a consequence, this
-   * function needs to call `Utilities::all_gather(comm,
+   * function needs to call `Utilities::MPI::all_gather(comm,
    * locally_owned_dofs_mg())` upon the first invocation, including global
-   * communication. Use `Utilities::all_gather(comm,
+   * communication. Use `Utilities::MPI::all_gather(comm,
    * dof_handler.locally_owned_dofs_mg())` instead if using up to a few
    * thousands of MPI ranks or some variant involving local communication with
    * more processors.
