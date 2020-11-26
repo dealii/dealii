@@ -1725,10 +1725,24 @@ namespace internal
       // indices of the Jacobian appropriately.
       template <int dim>
       unsigned int
-      reorder_face_derivative_indices(const unsigned int face_no,
-                                      const unsigned int index)
+      reorder_face_derivative_indices(
+        const unsigned int        face_no,
+        const unsigned int        index,
+        const ReferenceCell::Type reference_cell_type =
+          ReferenceCell::Type::Invalid)
       {
         Assert(index < dim, ExcInternalError());
+
+        if ((reference_cell_type == ReferenceCell::Type::Invalid ||
+             reference_cell_type == ReferenceCell::get_hypercube(dim)) == false)
+          {
+#ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
+            return index;
+#else
+            Assert(false, ExcNotImplemented());
+#endif
+          }
+
         if (dim == 3)
           {
             unsigned int table[3][3] = {{1, 2, 0}, {2, 0, 1}, {0, 1, 2}};
@@ -1890,7 +1904,9 @@ namespace internal
                                   JxW_is_similar = false;
                                 const unsigned int ee =
                                   reorder_face_derivative_indices<dim>(
-                                    faces[face].interior_face_no, e);
+                                    faces[face].interior_face_no,
+                                    e,
+                                    cell_it->reference_cell_type());
                                 face_data.general_jac[q][d][e][v] =
                                   inv_jac[d][ee];
                               }
@@ -2001,7 +2017,9 @@ namespace internal
                                   JxW_is_similar = false;
                                 const unsigned int ee =
                                   reorder_face_derivative_indices<dim>(
-                                    faces[face].exterior_face_no, e);
+                                    faces[face].exterior_face_no,
+                                    e,
+                                    cell_it->reference_cell_type());
                                 face_data.general_jac[n_q_points + q][d][e][v] =
                                   inv_jac[d][ee];
                               }
