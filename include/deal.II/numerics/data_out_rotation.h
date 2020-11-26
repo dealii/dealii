@@ -222,11 +222,8 @@ namespace Legacy
    * template instead.
    */
   template <int dim, typename DoFHandlerType = DoFHandler<dim>>
-  class DEAL_II_DEPRECATED DataOutRotation
-    : dealii::DataOutRotation<dim, DoFHandlerType>
-  {
-    using dealii::DataOutRotation<dim, DoFHandlerType>::DataOutRotation;
-  };
+  using DataOutRotation DEAL_II_DEPRECATED =
+    dealii::DataOutRotation<dim, DoFHandlerType>;
 } // namespace Legacy
 
 

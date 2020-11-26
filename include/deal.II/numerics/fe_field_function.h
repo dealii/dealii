@@ -497,13 +497,8 @@ namespace Functions
     template <int dim,
               typename DoFHandlerType = DoFHandler<dim>,
               typename VectorType     = Vector<double>>
-    class DEAL_II_DEPRECATED FEFieldFunction
-      : public dealii::Functions::
-          FEFieldFunction<dim, DoFHandlerType, VectorType>
-    {
-      using dealii::Functions::
-        FEFieldFunction<dim, DoFHandlerType, VectorType>::FEFieldFunction;
-    };
+    using FEFieldFunction DEAL_II_DEPRECATED =
+      dealii::Functions::FEFieldFunction<dim, DoFHandlerType, VectorType>;
   } // namespace Legacy
 } // namespace Functions
 

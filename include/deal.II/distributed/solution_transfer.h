@@ -382,13 +382,8 @@ namespace parallel
       template <int dim,
                 typename VectorType,
                 typename DoFHandlerType = DoFHandler<dim>>
-      class DEAL_II_DEPRECATED SolutionTransfer
-        : public dealii::parallel::distributed::
-            SolutionTransfer<dim, VectorType, DoFHandlerType>
-      {
-        using dealii::parallel::distributed::
-          SolutionTransfer<dim, VectorType, DoFHandlerType>::SolutionTransfer;
-      };
+      using SolutionTransfer DEAL_II_DEPRECATED = dealii::parallel::
+        distributed::SolutionTransfer<dim, VectorType, DoFHandlerType>;
     } // namespace Legacy
   }   // namespace distributed
 } // namespace parallel

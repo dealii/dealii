@@ -1252,12 +1252,8 @@ namespace Legacy
   template <typename DoFHandlerType,
             int patch_dim,
             int patch_space_dim = patch_dim>
-  class DEAL_II_DEPRECATED DataOut_DoFData
-    : public dealii::DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>
-  {
-    using dealii::DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
-      DataOut_DoFData;
-  };
+  using DataOut_DoFData DEAL_II_DEPRECATED =
+    dealii::DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>;
 } // namespace Legacy
 
 
