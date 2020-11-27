@@ -183,8 +183,7 @@ public:
 
     matrix_free.template cell_loop<VectorType, int>(
       [&](const auto &data, auto &dst, const auto &, const auto range) {
-        const auto       i = data.get_cell_active_fe_index(range);
-        FECellIntegrator phi(matrix_free, 0, 0, 0, i, i);
+        FECellIntegrator phi(matrix_free, range);
 
         for (unsigned int cell = range.first; cell < range.second; ++cell)
           {
@@ -206,8 +205,7 @@ public:
   {
     matrix_free.template cell_loop<VectorType, VectorType>(
       [&](const auto &data, auto &dst, const auto &src, const auto range) {
-        const auto       i = data.get_cell_active_fe_index(range);
-        FECellIntegrator phi(matrix_free, 0, 0, 0, i, i);
+        FECellIntegrator phi(matrix_free, range);
 
         for (unsigned int cell = range.first; cell < range.second; ++cell)
           {
