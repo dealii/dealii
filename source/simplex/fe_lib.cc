@@ -15,6 +15,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/simplex/fe_lib.h>
@@ -324,6 +325,48 @@ namespace Simplex
     namebuf << "FE_DGP<" << dim << ">(" << this->degree << ")";
 
     return namebuf.str();
+  }
+
+
+  template <int dim, int spacedim>
+  FiniteElementDomination::Domination
+  FE_DGP<dim, spacedim>::compare_for_domination(
+    const FiniteElement<dim, spacedim> &fe_other,
+    const unsigned int                  codim) const
+  {
+    (void)fe_other;
+    (void)codim;
+
+    Assert((dynamic_cast<const FE_DGQ<dim, spacedim> *>(&fe_other)),
+           ExcNotImplemented());
+    AssertDimension(dim, 2);
+    AssertDimension(this->degree, fe_other.tensor_degree());
+
+    return FiniteElementDomination::either_element_can_dominate;
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<std::pair<unsigned int, unsigned int>>
+  FE_DGP<dim, spacedim>::hp_vertex_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const
+  {
+    (void)fe_other;
+
+    return {};
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<std::pair<unsigned int, unsigned int>>
+  FE_DGP<dim, spacedim>::hp_line_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const
+  {
+    (void)fe_other;
+
+    return {};
   }
 
 

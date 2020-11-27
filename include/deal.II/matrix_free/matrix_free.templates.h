@@ -442,6 +442,26 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
   // determined in @p extract_local_to_global_indices.
   if (additional_data.initialize_mapping == true)
     {
+      if (dof_handler.size() > 1)
+        {
+          // check if all DoHandlers are in the same hp mode; and if hp
+          // capabilities are enabled: check if active_fe_indices of all
+          // DoFHandler are the same.
+          for (unsigned int i = 1; i < dof_handler.size(); ++i)
+            {
+              Assert(dof_handler[0]->has_hp_capabilities() ==
+                       dof_handler[i]->has_hp_capabilities(),
+                     ExcNotImplemented());
+
+              if (dof_handler[0]->has_hp_capabilities())
+                {
+                  Assert(dof_info[0].cell_active_fe_index ==
+                           dof_info[i].cell_active_fe_index,
+                         ExcNotImplemented());
+                }
+            }
+        }
+
       mapping_info.initialize(
         dof_handler[0]->get_triangulation(),
         cell_level_index,
@@ -1403,7 +1423,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
         face_setup.inner_faces,
         hard_vectorization_boundary,
         task_info.face_partition_data,
-        face_info.faces);
+        face_info.faces,
+        dof_info[0].cell_active_fe_index);
 
       // on boundary faces, we must also respect the vectorization boundary of
       // the inner faces because we might have dependencies on ghosts of
@@ -1412,7 +1433,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
         face_setup.boundary_faces,
         hard_vectorization_boundary,
         task_info.boundary_partition_data,
-        face_info.faces);
+        face_info.faces,
+        dof_info[0].cell_active_fe_index);
 
       // for the other ghosted faces, there are no scheduling restrictions
       hard_vectorization_boundary.clear();
@@ -1422,7 +1444,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
         face_setup.inner_ghost_faces,
         hard_vectorization_boundary,
         task_info.ghost_face_partition_data,
-        face_info.faces);
+        face_info.faces,
+        dof_info[0].cell_active_fe_index);
       hard_vectorization_boundary.clear();
       hard_vectorization_boundary.resize(
         task_info.refinement_edge_face_partition_data.size(), false);
@@ -1430,7 +1453,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
         face_setup.refinement_edge_faces,
         hard_vectorization_boundary,
         task_info.refinement_edge_face_partition_data,
-        face_info.faces);
+        face_info.faces,
+        dof_info[0].cell_active_fe_index);
 
       cell_level_index.resize(
         cell_level_index.size() +
@@ -1515,13 +1539,16 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
 #ifdef DEAL_II_WITH_MPI
   {
     // non-buffering mode is only supported if the indices of all cells are
-    // contiguous for all dof_info objects.
+    // contiguous for all dof_info objects and hp is not enabled.
     bool is_non_buffering_sm_supported = true;
     for (const auto &di : dof_info)
-      for (const auto &v : di.index_storage_variants[2])
-        is_non_buffering_sm_supported &=
-          (v == internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
-                  contiguous);
+      {
+        is_non_buffering_sm_supported &= di.dofs_per_cell.size() == 1;
+        for (const auto &v : di.index_storage_variants[2])
+          is_non_buffering_sm_supported &=
+            (v == internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+                    contiguous);
+      }
 
     is_non_buffering_sm_supported =
       Utilities::MPI::min(static_cast<unsigned int>(
