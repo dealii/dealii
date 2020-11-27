@@ -46,11 +46,12 @@ test()
           << IsBlockMatrix<BlockSparseMatrixEZ<double>>::value << ' '
           << IsBlockMatrix<BlockSparseMatrixEZ<float>>::value << std::endl;
 
-  deallog << IsBlockMatrix<SparsityPattern>::value << ' '
-          << IsBlockMatrix<DynamicSparsityPattern>::value << std::endl;
+  deallog << IsBlockSparsityPattern<SparsityPattern>::value << ' '
+          << IsBlockSparsityPattern<DynamicSparsityPattern>::value << std::endl;
 
-  deallog << IsBlockMatrix<BlockSparsityPattern>::value << ' '
-          << IsBlockMatrix<BlockDynamicSparsityPattern>::value << std::endl;
+  deallog << IsBlockSparsityPattern<BlockSparsityPattern>::value << ' '
+          << IsBlockSparsityPattern<BlockDynamicSparsityPattern>::value
+          << std::endl;
 }
 
 
