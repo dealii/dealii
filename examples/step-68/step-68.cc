@@ -632,8 +632,6 @@ namespace Step68
 
     std::vector<std::string> solution_names(dim, "velocity");
     solution_names.push_back("process_id");
-    std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      data_interpretations;
 
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
       data_component_interpretation(
