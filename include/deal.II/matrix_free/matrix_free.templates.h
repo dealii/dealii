@@ -41,6 +41,8 @@
 #include <deal.II/matrix_free/face_setup_internal.h>
 #include <deal.II/matrix_free/matrix_free.h>
 
+#include <deal.II/simplex/quadrature_lib.h>
+
 #ifdef DEAL_II_WITH_TBB
 #  include <deal.II/base/parallel.h>
 
@@ -1335,7 +1337,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
   Table<2, internal::MatrixFreeFunctions::ShapeInfo<double>> shape_info_dummy(
     shape_info.size(0), shape_info.size(2));
   {
-    QGauss<dim> quad(1);
+    Quadrature<dim> quad(QGauss<dim>(1));
+    Quadrature<dim> quad_simplex(Simplex::QGauss<dim>(1));
     for (unsigned int no = 0, c = 0; no < dof_handlers.size(); no++)
       for (unsigned int b = 0;
            b < dof_handlers[no]->get_fe(0).n_base_elements();
@@ -1343,9 +1346,13 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
         for (unsigned int fe_no = 0;
              fe_no < dof_handlers[no]->get_fe_collection().size();
              ++fe_no)
-          shape_info_dummy(c, fe_no).reinit(quad,
-                                            dof_handlers[no]->get_fe(fe_no),
-                                            b);
+          shape_info_dummy(c, fe_no).reinit(
+            dof_handlers[no]->get_fe(fe_no).reference_cell_type() ==
+                ReferenceCell::get_hypercube(dim) ?
+              quad :
+              quad_simplex,
+            dof_handlers[no]->get_fe(fe_no),
+            b);
   }
 
   const unsigned int n_lanes     = VectorizedArrayType::size();

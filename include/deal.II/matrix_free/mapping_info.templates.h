@@ -30,6 +30,7 @@
 
 #include <deal.II/matrix_free/evaluation_template_factory.h>
 #include <deal.II/matrix_free/mapping_info.h>
+#include <deal.II/matrix_free/util.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -71,7 +72,7 @@ namespace internal
       for (unsigned int i = 0; i < n_q_points; ++i)
         quadrature_weights[i] = quadrature.weight(i);
 
-      // note: quadrature_1 and tensor_quadrature_weights are not set up
+      // note: quadrature_1d and tensor_quadrature_weights are not set up
 
       // TODO: set up face_orientations
       (void)update_flags_inner_faces;
@@ -404,15 +405,17 @@ namespace internal
               if (flag == false)
                 {
 #ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
-                  continue; // TODO: face data is not set up
+                  const auto quad_face = get_face_quadrature(quad[my_q][hpq]);
+                  face_data[my_q].descriptor[hpq].initialize(quad_face,
+                                                             update_default);
 #else
                   Assert(false, ExcNotImplemented());
 #endif
                 }
-
-              face_data[my_q].descriptor[hpq].initialize(
-                quad[my_q][hpq].get_tensor_basis()[0],
-                update_flags_boundary_faces);
+              else
+                face_data[my_q].descriptor[hpq].initialize(
+                  quad[my_q][hpq].get_tensor_basis()[0],
+                  update_flags_boundary_faces);
             }
 
           face_data_by_cells[my_q].descriptor.resize(n_hp_quads);
@@ -428,14 +431,16 @@ namespace internal
               if (flag == false)
                 {
 #ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
-                  continue; // TODO: face data is not set up
+                  const auto quad_face = get_face_quadrature(quad[my_q][hpq]);
+                  face_data_by_cells[my_q].descriptor[hpq].initialize(
+                    quad_face, update_default);
 #else
                   Assert(false, ExcNotImplemented());
 #endif
                 }
-
-              face_data_by_cells[my_q].descriptor[hpq].initialize(
-                quad[my_q][hpq].get_tensor_basis()[0], update_default);
+              else
+                face_data_by_cells[my_q].descriptor[hpq].initialize(
+                  quad[my_q][hpq].get_tensor_basis()[0], update_default);
             }
         }
 
