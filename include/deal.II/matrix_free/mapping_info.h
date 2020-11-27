@@ -503,6 +503,7 @@ namespace internal
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
         const std::vector<FaceToCellTopology<VectorizedArrayType::size()>>
           &                                       faces,
+        const std::vector<unsigned int> &         active_fe_index,
         const dealii::hp::MappingCollection<dim> &mapping);
 
       /**
