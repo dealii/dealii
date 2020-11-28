@@ -22,6 +22,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomials_piecewise.h>
+#include <deal.II/base/qprojector.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/utilities.h>
 
@@ -30,9 +31,12 @@
 #include <deal.II/fe/fe_poly.h>
 #include <deal.II/fe/fe_q_dg0.h>
 
+#include <deal.II/grid/reference_cell.h>
+
 #include <deal.II/lac/householder.h>
 
 #include <deal.II/matrix_free/shape_info.h>
+#include <deal.II/matrix_free/util.h>
 
 #include <deal.II/simplex/fe_lib.h>
 
@@ -184,8 +188,11 @@ namespace internal
             return;
 
           // grant write access to common univariate shape data
-          auto &shape_values    = univariate_shape_data.shape_values;
-          auto &shape_gradients = univariate_shape_data.shape_gradients;
+          auto &shape_values      = univariate_shape_data.shape_values;
+          auto &shape_values_face = univariate_shape_data.shape_values_face;
+          auto &shape_gradients   = univariate_shape_data.shape_gradients;
+          auto &shape_gradients_face =
+            univariate_shape_data.shape_gradients_face;
 
           const unsigned int n_dofs = fe->n_dofs_per_cell();
 
@@ -206,6 +213,64 @@ namespace internal
                   shape_gradients[d * n_dofs * n_q_points + i * n_q_points +
                                   q] = grad[d];
               }
+
+          const auto reference_cell_type = ReferenceCell::get_simplex(dim);
+
+          try
+            {
+              const auto quad_face  = get_face_quadrature(quad);
+              this->n_q_points_face = quad_face.size();
+
+              const unsigned int n_face_orientations = dim == 2 ? 2 : 6;
+              const unsigned int n_faces =
+                ReferenceCell::internal::Info::get_cell(reference_cell_type)
+                  .n_faces();
+
+              const auto projected_quad_face =
+                QProjector<dim>::project_to_all_faces(reference_cell_type,
+                                                      quad_face);
+
+              shape_values_face.reinit(
+                {n_faces, n_face_orientations, n_dofs * n_q_points_face});
+
+              shape_gradients_face.reinit(
+                {n_faces, n_face_orientations, dim, n_dofs * n_q_points_face});
+
+              for (unsigned int f = 0; f < n_faces; ++f)
+                for (unsigned int o = 0; o < n_face_orientations; ++o)
+                  {
+                    const auto offset =
+                      QProjector<dim>::DataSetDescriptor::face(
+                        reference_cell_type,
+                        f,
+                        (o ^ 1) & 1,  // face_orientation
+                        (o >> 1) & 1, // face_flip
+                        (o >> 2) & 1, // face_rotation
+                        n_q_points_face);
+
+                    for (unsigned int i = 0; i < n_dofs; ++i)
+                      for (unsigned int q = 0; q < n_q_points_face; ++q)
+                        {
+                          const auto point =
+                            projected_quad_face.point(q + offset);
+
+                          shape_values_face(f, o, i * n_q_points_face + q) =
+                            fe->shape_value(i, point);
+
+                          const auto grad = fe->shape_grad(i, point);
+
+                          for (int d = 0; d < dim; ++d)
+                            shape_gradients_face(
+                              f, o, d, i * n_q_points_face + q) = grad[d];
+                        }
+                  }
+            }
+          catch (...)
+            {
+              // TODO: this might happen if the quadrature rule and the
+              // the FE do not match
+              this->n_q_points_face = 0;
+            }
 
           // TODO: also fill shape_hessians, inverse_shape_values,
           //   shape_data_on_face, quadrature_data_on_face,

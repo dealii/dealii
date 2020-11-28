@@ -282,6 +282,20 @@ namespace internal
        * end points of the unit cell.
        */
       bool nodal_at_cell_boundaries;
+
+      /**
+       * Stores the shape values of the finite element evaluated on all
+       * quadrature points for all faces and orientations (no tensor-product
+       * structure exploited).
+       */
+      Table<3, Number> shape_values_face;
+
+      /**
+       * Stores the shape gradients of the finite element evaluated on all
+       * quadrature points for all faces, orientations, and directions
+       * (no tensor-product structure  exploited).
+       */
+      Table<4, Number> shape_gradients_face;
     };
 
 
