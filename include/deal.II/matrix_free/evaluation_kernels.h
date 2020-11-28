@@ -2546,8 +2546,70 @@ namespace internal
         const unsigned int            face_orientation,
         const Table<2, unsigned int> &orientation_map)
     {
-      Assert(data.element_type != MatrixFreeFunctions::tensor_none,
-             ExcNotImplemented());
+      if (data.element_type == MatrixFreeFunctions::tensor_none)
+        {
+          const unsigned int n_dofs     = data.dofs_per_component_on_cell;
+          const unsigned int n_q_points = data.n_q_points_face;
+          const auto         shape_info = data.data.front();
+
+          using Eval = EvaluatorTensorProduct<evaluate_general,
+                                              1,
+                                              0,
+                                              0,
+                                              VectorizedArrayType,
+                                              VectorizedArrayType>;
+
+          if (evaluate_values)
+            {
+              const auto shape_values =
+                &shape_info.shape_values_face(face_no, face_orientation, 0);
+
+              auto values_quad_ptr        = values_quad;
+              auto values_dofs_actual_ptr = values_array;
+
+              Eval eval(shape_values, nullptr, nullptr, n_dofs, n_q_points);
+              for (unsigned int c = 0; c < n_components; ++c)
+                {
+                  eval.template values<0, true, false>(values_dofs_actual_ptr,
+                                                       values_quad_ptr);
+
+                  values_quad_ptr += n_q_points;
+                  values_dofs_actual_ptr += n_dofs;
+                }
+            }
+
+          if (evaluate_gradients)
+            {
+              auto gradients_quad_ptr     = gradients_quad;
+              auto values_dofs_actual_ptr = values_array;
+
+              std::array<const VectorizedArrayType *, dim> shape_gradients;
+              for (unsigned int d = 0; d < dim; ++d)
+                shape_gradients[d] = &shape_info.shape_gradients_face(
+                  face_no, face_orientation, d, 0);
+
+              for (unsigned int c = 0; c < n_components; ++c)
+                {
+                  for (unsigned int d = 0; d < dim; ++d)
+                    {
+                      Eval eval(nullptr,
+                                shape_gradients[d],
+                                nullptr,
+                                n_dofs,
+                                n_q_points);
+
+                      eval.template gradients<0, true, false>(
+                        values_dofs_actual_ptr, gradients_quad_ptr);
+
+                      gradients_quad_ptr += n_q_points;
+                    }
+                  values_dofs_actual_ptr += n_dofs;
+                }
+            }
+
+
+          return true;
+        }
 
       constexpr unsigned int static_dofs_per_face =
         fe_degree > -1 ? Utilities::pow(fe_degree + 1, dim - 1) :
@@ -2639,8 +2701,74 @@ namespace internal
         const unsigned int            face_orientation,
         const Table<2, unsigned int> &orientation_map)
     {
-      Assert(data.element_type != MatrixFreeFunctions::tensor_none,
-             ExcNotImplemented());
+      if (data.element_type == MatrixFreeFunctions::tensor_none)
+        {
+          const unsigned int n_dofs     = data.dofs_per_component_on_cell;
+          const unsigned int n_q_points = data.n_q_points_face;
+          const auto         shape_info = data.data.front();
+
+          using Eval = EvaluatorTensorProduct<evaluate_general,
+                                              1,
+                                              0,
+                                              0,
+                                              VectorizedArrayType,
+                                              VectorizedArrayType>;
+
+          if (integrate_values)
+            {
+              const auto shape_values =
+                &shape_info.shape_values_face(face_no, face_orientation, 0);
+
+              auto values_quad_ptr        = values_quad;
+              auto values_dofs_actual_ptr = values_array;
+
+              Eval eval(shape_values, nullptr, nullptr, n_dofs, n_q_points);
+              for (unsigned int c = 0; c < n_components; ++c)
+                {
+                  eval.template values<0, false, false>(values_quad_ptr,
+                                                        values_dofs_actual_ptr);
+
+                  values_quad_ptr += n_q_points;
+                  values_dofs_actual_ptr += n_dofs;
+                }
+            }
+
+          if (integrate_gradients)
+            {
+              auto gradients_quad_ptr     = gradients_quad;
+              auto values_dofs_actual_ptr = values_array;
+
+              std::array<const VectorizedArrayType *, dim> shape_gradients;
+              for (unsigned int d = 0; d < dim; ++d)
+                shape_gradients[d] = &shape_info.shape_gradients_face(
+                  face_no, face_orientation, d, 0);
+
+              for (unsigned int c = 0; c < n_components; ++c)
+                {
+                  for (unsigned int d = 0; d < dim; ++d)
+                    {
+                      Eval eval(nullptr,
+                                shape_gradients[d],
+                                nullptr,
+                                n_dofs,
+                                n_q_points);
+
+                      if ((integrate_values == false) && d == 0)
+                        eval.template gradients<0, false, false>(
+                          gradients_quad_ptr, values_dofs_actual_ptr);
+                      else
+                        eval.template gradients<0, false, true>(
+                          gradients_quad_ptr, values_dofs_actual_ptr);
+
+                      gradients_quad_ptr += n_q_points;
+                    }
+                  values_dofs_actual_ptr += n_dofs;
+                }
+            }
+
+
+          return true;
+        }
 
       if (face_orientation)
         adjust_for_face_orientation(dim,
@@ -3479,9 +3607,10 @@ namespace internal
         const Table<2, unsigned int> &orientation_map)
     {
       if (src_ptr == nullptr)
-        {
-          return false;
-        }
+        return false;
+
+      if (data.element_type == MatrixFreeFunctions::tensor_none)
+        return false;
 
       (void)sm_ptr;
 
@@ -3735,9 +3864,9 @@ namespace internal
     {
       (void)sm_ptr;
 
-      if (dst_ptr == nullptr)
+      if (dst_ptr == nullptr ||
+          data.element_type == MatrixFreeFunctions::tensor_none)
         {
-          AssertDimension(n_face_orientations, 1);
           AssertDimension(n_face_orientations, 1);
 
           // for block vectors simply integrate
