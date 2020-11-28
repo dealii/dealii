@@ -80,6 +80,41 @@ namespace Simplex
 
       return dpo;
     }
+
+    /**
+     * Helper function to set up the dpo vector of FE_WedgeP for a given @p degree.
+     */
+    internal::GenericDoFsPerObject
+    get_dpo_vector_fe_wedge(const unsigned int degree)
+    {
+      internal::GenericDoFsPerObject dpo;
+
+      // all dofs are internal
+      if (degree == 1)
+        {
+          dpo.dofs_per_object_exclusive  = {{1}, {0}, {0, 0, 0, 0, 0}, {0}};
+          dpo.dofs_per_object_inclusive  = {{1}, {2}, {3, 3, 4, 4, 4}, {6}};
+          dpo.object_index               = {{}, {6}, {6}, {6}};
+          dpo.first_object_index_on_face = {{},
+                                            {3, 3, 4, 4, 4},
+                                            {3, 3, 4, 4, 4}};
+        }
+      else if (degree == 2)
+        {
+          dpo.dofs_per_object_exclusive = {{1}, {1}, {0, 0, 1, 1, 1}, {0}};
+          dpo.dofs_per_object_inclusive = {{1}, {3}, {6, 6, 9, 9, 9}, {18}};
+          dpo.object_index              = {{}, {6}, {15, 15, 15, 16, 17}, {18}};
+          dpo.first_object_index_on_face = {{},
+                                            {3, 3, 4, 4, 4},
+                                            {6, 6, 8, 8, 8}};
+        }
+      else
+        {
+          Assert(false, ExcNotImplemented());
+        }
+
+      return dpo;
+    }
   } // namespace
 
 
@@ -367,6 +402,159 @@ namespace Simplex
     (void)fe_other;
 
     return {};
+  }
+
+
+
+  template <int dim, int spacedim>
+  FE_WedgeP<dim, spacedim>::FE_WedgeP(const unsigned int degree)
+    : dealii::FE_Poly<dim, spacedim>(
+        Simplex::ScalarWedgePolynomial<dim>(degree),
+        FiniteElementData<dim>(get_dpo_vector_fe_wedge(degree),
+                               ReferenceCell::Type::Wedge,
+                               1,
+                               degree,
+                               FiniteElementData<dim>::L2),
+        std::vector<bool>(FiniteElementData<dim>(get_dpo_vector_fe_wedge(
+                                                   degree),
+                                                 ReferenceCell::Type::Wedge,
+                                                 1,
+                                                 degree)
+                            .dofs_per_cell,
+                          true),
+        std::vector<ComponentMask>(
+          FiniteElementData<dim>(get_dpo_vector_fe_wedge(degree),
+                                 ReferenceCell::Type::Wedge,
+                                 1,
+                                 degree)
+            .dofs_per_cell,
+          std::vector<bool>(1, true)))
+  {
+    AssertDimension(dim, 3);
+
+
+    if (degree == 1)
+      {
+        this->unit_support_points.emplace_back(1.0, 0.0, 0.0);
+        this->unit_support_points.emplace_back(0.0, 1.0, 0.0);
+        this->unit_support_points.emplace_back(0.0, 0.0, 0.0);
+        this->unit_support_points.emplace_back(1.0, 0.0, 1.0);
+        this->unit_support_points.emplace_back(0.0, 1.0, 1.0);
+        this->unit_support_points.emplace_back(0.0, 0.0, 1.0);
+
+        // TODO
+        this->unit_face_support_points[0].emplace_back(1.0, 0.0);
+        this->unit_face_support_points[0].emplace_back(0.0, 1.0);
+        this->unit_face_support_points[0].emplace_back(0.0, 0.0);
+      }
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::unique_ptr<FiniteElement<dim, spacedim>>
+  FE_WedgeP<dim, spacedim>::clone() const
+  {
+    return std::make_unique<FE_WedgeP<dim, spacedim>>(*this);
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::string
+  FE_WedgeP<dim, spacedim>::get_name() const
+  {
+    std::ostringstream namebuf;
+    namebuf << "FE_WedgeP<" << dim << ">(" << this->degree << ")";
+
+    return namebuf.str();
+  }
+
+
+
+  template <int dim, int spacedim>
+  FiniteElementDomination::Domination
+  FE_WedgeP<dim, spacedim>::compare_for_domination(
+    const FiniteElement<dim, spacedim> &fe_other,
+    const unsigned int                  codim) const
+  {
+    (void)fe_other;
+    (void)codim;
+
+    Assert((dynamic_cast<const Simplex::FE_P<dim, spacedim> *>(&fe_other)) ||
+             (dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
+           ExcNotImplemented());
+
+    return FiniteElementDomination::this_element_dominates;
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<std::pair<unsigned int, unsigned int>>
+  FE_WedgeP<dim, spacedim>::hp_vertex_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const
+  {
+    (void)fe_other;
+
+    Assert((dynamic_cast<const Simplex::FE_P<dim, spacedim> *>(&fe_other)) ||
+             (dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
+           ExcNotImplemented());
+
+    return {{0, 0}};
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<std::pair<unsigned int, unsigned int>>
+  FE_WedgeP<dim, spacedim>::hp_line_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const
+  {
+    (void)fe_other;
+
+    Assert((dynamic_cast<const Simplex::FE_P<dim, spacedim> *>(&fe_other)) ||
+             (dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
+           ExcNotImplemented());
+
+    std::vector<std::pair<unsigned int, unsigned int>> result;
+
+    for (unsigned int i = 0; i < this->degree - 1; ++i)
+      result.emplace_back(i, i);
+
+    return result;
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<std::pair<unsigned int, unsigned int>>
+  FE_WedgeP<dim, spacedim>::hp_quad_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other,
+    const unsigned int                  face_no) const
+  {
+    (void)fe_other;
+
+
+    AssertIndexRange(face_no, 5);
+
+    if (face_no < 2)
+      {
+        Assert((dynamic_cast<const Simplex::FE_P<dim, spacedim> *>(&fe_other)),
+               ExcNotImplemented());
+      }
+    else
+      {
+        Assert((dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
+               ExcNotImplemented());
+      }
+
+    std::vector<std::pair<unsigned int, unsigned int>> result;
+
+    for (unsigned int i = 0; i < this->n_dofs_per_quad(face_no); ++i)
+      result.emplace_back(i, i);
+
+    return result;
   }
 
 
