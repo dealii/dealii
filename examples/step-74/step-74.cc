@@ -393,8 +393,7 @@ namespace Step74
       std::vector<double> g(n_q_points);
       exact_solution->value_list(q_points, g);
 
-      const double extent1 = cell->extent_in_direction(
-        GeometryInfo<dim>::unit_normal_direction[face_no]);
+      const double extent1 = cell->measure() / cell->face(face_no)->measure();
       const double penalty = compute_penalty(degree, extent1, extent1);
 
       for (unsigned int point = 0; point < n_q_points; ++point)
@@ -462,10 +461,8 @@ namespace Step74
       const std::vector<double> &        JxW     = fe_iv.get_JxW_values();
       const std::vector<Tensor<1, dim>> &normals = fe_iv.get_normal_vectors();
 
-      const double extent1 =
-        cell->extent_in_direction(GeometryInfo<dim>::unit_normal_direction[f]);
-      const double extent2 = ncell->extent_in_direction(
-        GeometryInfo<dim>::unit_normal_direction[nf]);
+      const double extent1 = cell->measure() / cell->face(f)->measure();
+      const double extent2 = ncell->measure() / ncell->face(nf)->measure();
       const double penalty = compute_penalty(degree, extent1, extent2);
 
       for (unsigned int point = 0; point < n_q_points; ++point)
@@ -560,7 +557,7 @@ namespace Step74
     DataOut<dim> data_out;
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(solution, "u", DataOut<dim>::type_dof_data);
-    data_out.build_patches();
+    data_out.build_patches(mapping);
     data_out.write_vtu(output);
   }
 
