@@ -28,13 +28,6 @@
 
 #include <deal.II/numerics/rtree.h>
 
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/optional.hpp>
-#include <boost/serialization/array.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/signals2.hpp>
-
 #include <algorithm>
 #include <utility>
 
