@@ -218,13 +218,12 @@ private:
 namespace Legacy
 {
   /**
-   * The template arguments of the original dealii::DataOutRotation class will
-   * change in a future release. If for some reason, you need a code that is
-   * compatible with deal.II 9.3 and the subsequent release, use this alias
-   * instead.
+   * @deprecated Use dealii::DataOutRotation without the DoFHandlerType
+   * template instead.
    */
   template <int dim, typename DoFHandlerType = DoFHandler<dim>>
-  using DataOutRotation = dealii::DataOutRotation<dim, DoFHandlerType>;
+  using DataOutRotation DEAL_II_DEPRECATED =
+    dealii::DataOutRotation<dim, DoFHandlerType>;
 } // namespace Legacy
 
 

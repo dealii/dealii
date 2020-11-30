@@ -382,16 +382,14 @@ namespace Legacy
     namespace distributed
     {
       /**
-       * The template arguments of the original
-       * dealii::parallel::distributed::SolutionTransfer class will change in a
-       * future release. If for some reason, you need a code that is compatible
-       * with deal.II 9.3 and the subsequent release, use this alias instead.
+       * @deprecated Use dealii::parallel::distributed::SolutionTransfer
+       * without the DoFHandlerType template instead.
        */
       template <int dim,
                 typename VectorType,
                 typename DoFHandlerType = DoFHandler<dim>>
-      using SolutionTransfer = dealii::parallel::distributed::
-        SolutionTransfer<dim, VectorType, DoFHandlerType>;
+      using SolutionTransfer DEAL_II_DEPRECATED = dealii::parallel::
+        distributed::SolutionTransfer<dim, VectorType, DoFHandlerType>;
     } // namespace distributed
   }   // namespace parallel
 } // namespace Legacy

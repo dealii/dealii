@@ -1246,15 +1246,13 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::merge_patches(
 namespace Legacy
 {
   /**
-   * The template arguments of the original dealii::DataOut_DoFData class will
-   * change in a future release. If for some reason, you need a code that is
-   * compatible with deal.II 9.3 and the subsequent release, use this alias
-   * instead.
+   * @deprecated Use dealii::DataOut_DoFData without the DoFHandlerType
+   * template instead.
    */
   template <typename DoFHandlerType,
             int patch_dim,
             int patch_space_dim = patch_dim>
-  using DataOut_DoFData =
+  using DataOut_DoFData DEAL_II_DEPRECATED =
     dealii::DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>;
 } // namespace Legacy
 

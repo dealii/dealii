@@ -577,15 +577,13 @@ private:
 namespace Legacy
 {
   /**
-   * The template arguments of the original dealii::SolutionTransfer class will
-   * change in a future release. If for some reason, you need a code that is
-   * compatible with deal.II 9.3 and the subsequent release, use this alias
-   * instead.
+   * @deprecated Use dealii::SolutionTransfer without the DoFHandlerType
+   * template instead.
    */
   template <int dim,
             typename VectorType     = Vector<double>,
             typename DoFHandlerType = DoFHandler<dim>>
-  using SolutionTransfer =
+  using SolutionTransfer DEAL_II_DEPRECATED =
     dealii::SolutionTransfer<dim, VectorType, DoFHandlerType>;
 } // namespace Legacy
 
