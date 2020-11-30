@@ -71,9 +71,16 @@ public:
    * @pre minlevel <= maxlevel
    */
   template <class... Args>
-  MGLevelObject(const unsigned int minlevel = 0,
-                const unsigned int maxlevel = 0,
+  MGLevelObject(const unsigned int minlevel,
+                const unsigned int maxlevel,
                 Args &&... args);
+
+  /**
+   * Constructor. Same as above but without arguments to be forwarded to the
+   * constructor of the underlying object.
+   */
+  MGLevelObject(const unsigned int minlevel = 0,
+                const unsigned int maxlevel = 0);
 
   /**
    * Access object on level @p level.
@@ -183,6 +190,15 @@ MGLevelObject<Object>::MGLevelObject(const unsigned int min,
   : minlevel(0)
 {
   resize(min, max, std::forward<Args>(args)...);
+}
+
+
+template <class Object>
+MGLevelObject<Object>::MGLevelObject(const unsigned int min,
+                                     const unsigned int max)
+  : minlevel(0)
+{
+  resize(min, max);
 }
 
 
