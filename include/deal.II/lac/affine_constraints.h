@@ -1877,8 +1877,8 @@ private:
                              const std::vector<size_type> &local_dof_indices,
                              MatrixType &                  global_matrix,
                              VectorType &                  global_vector,
-                             bool use_inhomogeneities_for_rhs,
-                             std::integral_constant<bool, false>) const;
+                             const bool use_inhomogeneities_for_rhs,
+                             const std::integral_constant<bool, false>) const;
 
   /**
    * This function actually implements the local_to_global function for block
@@ -1891,8 +1891,8 @@ private:
                              const std::vector<size_type> &local_dof_indices,
                              MatrixType &                  global_matrix,
                              VectorType &                  global_vector,
-                             bool use_inhomogeneities_for_rhs,
-                             std::integral_constant<bool, true>) const;
+                             const bool use_inhomogeneities_for_rhs,
+                             const std::integral_constant<bool, true>) const;
 
   /**
    * This function actually implements the local_to_global function for
@@ -1904,7 +1904,7 @@ private:
                               SparsityPatternType &         sparsity_pattern,
                               const bool            keep_constrained_entries,
                               const Table<2, bool> &dof_mask,
-                              std::integral_constant<bool, false>) const;
+                              const std::integral_constant<bool, false>) const;
 
   /**
    * This function actually implements the local_to_global function for block
@@ -1916,7 +1916,7 @@ private:
                               SparsityPatternType &         sparsity_pattern,
                               const bool            keep_constrained_entries,
                               const Table<2, bool> &dof_mask,
-                              std::integral_constant<bool, true>) const;
+                              const std::integral_constant<bool, true>) const;
 
   /**
    * Internal helper function for distribute_local_to_global function.

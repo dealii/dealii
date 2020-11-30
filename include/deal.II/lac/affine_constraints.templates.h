@@ -3361,6 +3361,8 @@ namespace internal
   } // end of namespace AffineConstraints
 } // end of namespace internal
 
+
+
 // Basic idea of setting up a list of
 // all global dofs: first find all rows and columns
 // that we are going to write touch,
@@ -3428,6 +3430,8 @@ AffineConstraints<number>::make_sorted_row_list(
     }
 }
 
+
+
 // Same function as before, but now do only extract the global indices that
 // come from the local ones without storing their origin. Used for sparsity
 // pattern generation.
@@ -3482,6 +3486,8 @@ AffineConstraints<number>::make_sorted_row_list(
     }
 }
 
+
+
 // Resolve the constraints from the vector and apply inhomogeneities.
 template <typename number>
 template <typename MatrixScalar, typename VectorScalar>
@@ -3526,6 +3532,8 @@ AffineConstraints<number>::resolve_vector_entry(
   return val;
 }
 
+
+
 // internal implementation for distribute_local_to_global for standard
 // (non-block) matrices
 template <typename number>
@@ -3537,8 +3545,8 @@ AffineConstraints<number>::distribute_local_to_global(
   const std::vector<size_type> &local_dof_indices,
   MatrixType &                  global_matrix,
   VectorType &                  global_vector,
-  bool                          use_inhomogeneities_for_rhs,
-  std::integral_constant<bool, false>) const
+  const bool                    use_inhomogeneities_for_rhs,
+  const std::integral_constant<bool, false>) const
 {
   // FIXME: static_assert MatrixType::value_type == number
 
@@ -3681,6 +3689,8 @@ AffineConstraints<number>::distribute_local_to_global(
     use_inhomogeneities_for_rhs);
 }
 
+
+
 // similar function as above, but now specialized for block matrices. See the
 // other function for additional comments.
 template <typename number>
@@ -3692,8 +3702,8 @@ AffineConstraints<number>::distribute_local_to_global(
   const std::vector<size_type> &local_dof_indices,
   MatrixType &                  global_matrix,
   VectorType &                  global_vector,
-  bool                          use_inhomogeneities_for_rhs,
-  std::integral_constant<bool, true>) const
+  const bool                    use_inhomogeneities_for_rhs,
+  const std::integral_constant<bool, true>) const
 {
   const bool use_vectors =
     (local_vector.size() == 0 && global_vector.size() == 0) ? false : true;
@@ -3818,6 +3828,7 @@ AffineConstraints<number>::distribute_local_to_global(
 }
 
 
+
 template <typename number>
 template <typename MatrixType>
 void
@@ -3830,6 +3841,7 @@ AffineConstraints<number>::distribute_local_to_global(
   distribute_local_to_global(
     local_matrix, row_indices, *this, col_indices, global_matrix);
 }
+
 
 
 template <typename number>
@@ -3895,6 +3907,8 @@ AffineConstraints<number>::distribute_local_to_global(
     }
 }
 
+
+
 template <typename number>
 template <typename SparsityPatternType>
 void
@@ -3903,7 +3917,7 @@ AffineConstraints<number>::add_entries_local_to_global(
   SparsityPatternType &         sparsity_pattern,
   const bool                    keep_constrained_entries,
   const Table<2, bool> &        dof_mask,
-  std::integral_constant<bool, false>) const
+  const std::integral_constant<bool, false>) const
 {
   Assert(sparsity_pattern.n_rows() == sparsity_pattern.n_cols(),
          ExcNotQuadratic());
@@ -3990,6 +4004,8 @@ AffineConstraints<number>::add_entries_local_to_global(
                                                       sparsity_pattern);
 }
 
+
+
 template <typename number>
 template <typename SparsityPatternType>
 void
@@ -4045,6 +4061,8 @@ AffineConstraints<number>::add_entries_local_to_global(
   Assert(false, ExcNotImplemented());
 }
 
+
+
 template <typename number>
 template <typename SparsityPatternType>
 void
@@ -4053,7 +4071,7 @@ AffineConstraints<number>::add_entries_local_to_global(
   SparsityPatternType &         sparsity_pattern,
   const bool                    keep_constrained_entries,
   const Table<2, bool> &        dof_mask,
-  std::integral_constant<bool, true>) const
+  const std::integral_constant<bool, true>) const
 {
   // just as the other add_entries_local_to_global function, but now
   // specialized for block matrices.
