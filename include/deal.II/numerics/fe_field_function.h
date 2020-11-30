@@ -493,10 +493,14 @@ namespace Legacy
 {
   namespace Functions
   {
+    /**
+     * @deprecated Use dealii::Functions::FEFieldFunction without the
+     * DoFHandlerType template instead.
+     */
     template <int dim,
               typename DoFHandlerType = DoFHandler<dim>,
               typename VectorType     = Vector<double>>
-    using FEFieldFunction =
+    using FEFieldFunction DEAL_II_DEPRECATED =
       dealii::Functions::FEFieldFunction<dim, DoFHandlerType, VectorType>;
   } // namespace Functions
 } // namespace Legacy

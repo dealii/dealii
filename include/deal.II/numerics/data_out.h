@@ -518,8 +518,12 @@ private:
 
 namespace Legacy
 {
+  /**
+   * @deprecated Use dealii::DataOut without the DoFHandlerType template
+   * instead.
+   */
   template <int dim, typename DoFHandlerType = DoFHandler<dim>>
-  using DataOut = dealii::DataOut<dim, DoFHandlerType>;
+  using DataOut DEAL_II_DEPRECATED = dealii::DataOut<dim, DoFHandlerType>;
 } // namespace Legacy
 
 
