@@ -500,7 +500,7 @@ namespace Legacy
     template <int dim,
               typename DoFHandlerType = DoFHandler<dim>,
               typename VectorType     = Vector<double>>
-    using FEFieldFunction DEAL_II_DEPRECATED =
+    using FEFieldFunction =
       dealii::Functions::FEFieldFunction<dim, DoFHandlerType, VectorType>;
   } // namespace Functions
 } // namespace Legacy

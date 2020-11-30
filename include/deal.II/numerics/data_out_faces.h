@@ -257,8 +257,7 @@ namespace Legacy
    * instead.
    */
   template <int dim, typename DoFHandlerType = DoFHandler<dim>>
-  using DataOutFaces DEAL_II_DEPRECATED =
-    dealii::DataOutFaces<dim, DoFHandlerType>;
+  using DataOutFaces = dealii::DataOutFaces<dim, DoFHandlerType>;
 } // namespace Legacy
 
 

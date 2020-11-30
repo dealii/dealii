@@ -388,8 +388,8 @@ namespace Legacy
       template <int dim,
                 typename VectorType,
                 typename DoFHandlerType = DoFHandler<dim>>
-      using SolutionTransfer DEAL_II_DEPRECATED = dealii::parallel::
-        distributed::SolutionTransfer<dim, VectorType, DoFHandlerType>;
+      using SolutionTransfer = dealii::parallel::distributed::
+        SolutionTransfer<dim, VectorType, DoFHandlerType>;
     } // namespace distributed
   }   // namespace parallel
 } // namespace Legacy

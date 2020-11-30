@@ -583,7 +583,7 @@ namespace Legacy
   template <int dim,
             typename VectorType     = Vector<double>,
             typename DoFHandlerType = DoFHandler<dim>>
-  using SolutionTransfer DEAL_II_DEPRECATED =
+  using SolutionTransfer =
     dealii::SolutionTransfer<dim, VectorType, DoFHandlerType>;
 } // namespace Legacy
 
