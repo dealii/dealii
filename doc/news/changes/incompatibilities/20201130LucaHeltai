@@ -1,0 +1,4 @@
+Changed: GridTools::find_active_cell_around_point() no longer throws an exception, but returns an invalid iterator.
+User codes should check that the returned cell is valid instead of relying on exceptions. This solves issues with MPI, and HDF5.
+<br>
+(Luca Heltai, 2020/11/30)
