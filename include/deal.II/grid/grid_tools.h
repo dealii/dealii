@@ -861,7 +861,10 @@ namespace GridTools
   /*@{*/
 
   /**
-   * Given a Triangulation's @p cache and a list of @p points create the quadrature rules.
+   * Given a Triangulation's @p cache and a list of @p points, call
+   * find_active_cell_around_point() on each element of @p points , and return
+   * @p cells , referece positions @p qpoints , and a mapping @p maps from local
+   * to global indices into @p points .
    *
    * @param[in] cache The triangulation's GridTools::Cache .
    * @param[in] points The point's vector.
@@ -883,14 +886,14 @@ namespace GridTools
    * Mapping::transform_unit_to_real(qpoints[c][0])
    * returns @p points[a].
    *
-   * The algorithm assumes it's easier to look for a point in the cell that was
-   * used previously. For this reason random points are, computationally
-   * speaking, the worst case scenario while points grouped by the cell to which
-   * they belong are the best case. Pre-sorting points, trying to minimize
-   * distances between them, might make the function extremely faster.
+   * The algorithm builds an rtree of @p points to sort them spatially, before
+   * attempting to call find_active_cell_around_point().
    *
    * @note If a point is not found inside the mesh, or is lying inside an
-   * artificial cell of a parallel::TriangulationBase, an exception is thrown.
+   * artificial cell of a parallel::TriangulationBase, the point is silently
+   * igored. If you want to infer for which points the search failed, use the
+   * function compute_point_locations_try_all() that also returns a vector of
+   * indices indicating the points for which the search failed.
    *
    * @note The actual return type of this function, i.e., the type referenced
    * above as @p return_type, is
@@ -927,7 +930,10 @@ namespace GridTools
 
   /**
    * This function is similar to GridTools::compute_point_locations(),
-   * but it tries to find and transform every point of @p points.
+   * but while compute_point_locations() silently ignores all points for which
+   * find_active_cell_around_point() fails, this function also returns a
+   * vector containing the indices of the points for which
+   * find_active_cell_around_point() failed.
    *
    * @return A tuple containing four elements; the first three
    * are documented in GridTools::compute_point_locations().
@@ -1280,11 +1286,6 @@ namespace GridTools
    * adjacent cells.
    * @return A vector of cells that lie adjacent to the given vertex.
    *
-   * @note If the point requested does not lie in any of the cells of the mesh
-   * given, then this function throws an exception of type
-   * GridTools::ExcPointNotFound. You can catch this exception and decide what
-   * to do in that case.
-   *
    * @note It isn't entirely clear at this time whether the function does the
    * right thing with anisotropically refined meshes. It needs to be checked
    * for this case.
@@ -1318,14 +1319,8 @@ namespace GridTools
    * tries to identify the cell that is of highest refinement level.
    *
    * If the point requested does not lie in a locally-owned or ghost cell,
-   * then this function throws an exception of type GridTools::ExcPointNotFound.
-   * You can catch this exception and decide what to do in that case. Hence,
-   * for programs that work with partitioned (parallel) triangulations, this
-   * function should always be called inside a `try`-block unless it is a
-   * priori clear that the point with which it is called must be inside
-   * a locally owned or ghost cell (and not close enough to the boundary
-   * between ghost and artificial cells so that decision which cell it is
-   * on depends on floating point accuracy).
+   * then this function will return the (invalid) MeshType<dim, spacedim>::end()
+   * iterator.
    *
    * @param mapping The mapping used to determine whether the given point is
    *   inside a given cell.
@@ -1447,18 +1442,15 @@ namespace GridTools
    *
    * for(auto p : points)
    * {
-   *   try
-   *   {
-   *     auto cell_and_ref_point = GridTools::find_active_cell_around_point(
-   *       cache, p, cell_hint, marked_vertices, tolerance);
+   *   auto cell_and_ref_point = GridTools::find_active_cell_around_point(
+   *     cache, p, cell_hint, marked_vertices, tolerance);
    *
-   *     // use current cell as hint for the next point
-   *     cell_hint = cell_and_ref_point.first;
+   *   if(cell_and_ref_point.first != triangulation.end()) {
+   *      // use current cell as hint for the next point
+   *      cell_hint = cell_and_ref_point.first;
+   *      // do something with cell_and_ref_point
+   *      ...
    *   }
-   *   catch(...)
-   *   {
-   *   }
-   *
    *   ...
    * }
    * @endcode
@@ -1525,9 +1517,9 @@ namespace GridTools
    *
    * This function is used as follows
    * @code
-   *   auto first_cell = GridTools::find_active_cell_around_point(...);
+   *   auto first_pair = GridTools::find_active_cell_around_point(...);
    *   auto all_cells  = GridTools::find_all_active_cells_around_point(
-   *   			   mapping, mesh, p, tolerance, first_cell);
+   *   			   mapping, mesh, p, tolerance, first_pair);
    * @endcode
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
@@ -3426,24 +3418,6 @@ namespace GridTools
                  double,
                  << "The scaling factor must be positive, but it is " << arg1
                  << ".");
-  /**
-   * Exception
-   */
-  template <int N>
-  DeclException1(ExcPointNotFoundInCoarseGrid,
-                 Point<N>,
-                 << "The point <" << arg1
-                 << "> could not be found inside any of the "
-                 << "coarse grid cells.");
-  /**
-   * Exception
-   */
-  template <int N>
-  DeclException1(ExcPointNotFound,
-                 Point<N>,
-                 << "The point <" << arg1
-                 << "> could not be found inside any of the "
-                 << "subcells of a coarse grid cell.");
 
   /**
    * Exception

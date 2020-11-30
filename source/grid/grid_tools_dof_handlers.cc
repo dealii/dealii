@@ -550,9 +550,6 @@ namespace GridTools
           }
       }
 
-    AssertThrow(best_cell.first.state() == IteratorState::valid,
-                ExcPointNotFound<spacedim>(p));
-
     return best_cell;
   }
 
@@ -574,18 +571,14 @@ namespace GridTools
                                      const double                   tolerance,
                                      const std::vector<bool> &marked_vertices)
   {
-    try
-      {
-        const auto cell_and_point = find_active_cell_around_point(
-          mapping, mesh, p, marked_vertices, tolerance);
+    const auto cell_and_point = find_active_cell_around_point(
+      mapping, mesh, p, marked_vertices, tolerance);
 
-        return find_all_active_cells_around_point(
-          mapping, mesh, p, tolerance, cell_and_point);
-      }
-    catch (ExcPointNotFound<spacedim> &)
-      {}
+    if (cell_and_point.first.state() != IteratorState::valid)
+      return {};
 
-    return {};
+    return find_all_active_cells_around_point(
+      mapping, mesh, p, tolerance, cell_and_point);
   }
 
 
@@ -1383,9 +1376,6 @@ namespace GridTools
               }
           }
       }
-
-    AssertThrow(best_cell.first.state() == IteratorState::valid,
-                ExcPointNotFound<spacedim>(p));
 
     return best_cell;
   }
