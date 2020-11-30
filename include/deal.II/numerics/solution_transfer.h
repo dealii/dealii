@@ -576,10 +576,6 @@ private:
 
 namespace Legacy
 {
-  /**
-   * @deprecated Use dealii::SolutionTransfer without the DoFHandlerType
-   * template instead.
-   */
   template <int dim,
             typename VectorType     = Vector<double>,
             typename DoFHandlerType = DoFHandler<dim>>

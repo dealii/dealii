@@ -381,10 +381,6 @@ namespace Legacy
   {
     namespace distributed
     {
-      /**
-       * @deprecated Use dealii::parallel::distributed::SolutionTransfer
-       * without the DoFHandlerType template instead.
-       */
       template <int dim,
                 typename VectorType,
                 typename DoFHandlerType = DoFHandler<dim>>
