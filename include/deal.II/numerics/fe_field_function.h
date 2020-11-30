@@ -494,15 +494,13 @@ namespace Legacy
   namespace Functions
   {
     /**
-     * The template arguments of the original dealii::Functions::FEFieldFunction
-     * class will change in a future release. If for some reason, you need a
-     * code that is compatible with deal.II 9.3 and the subsequent release, use
-     * this alias instead.
+     * @deprecated Use dealii::Functions::FEFieldFunction without the
+     * DoFHandlerType template instead.
      */
     template <int dim,
               typename DoFHandlerType = DoFHandler<dim>,
               typename VectorType     = Vector<double>>
-    using FEFieldFunction =
+    using FEFieldFunction DEAL_II_DEPRECATED =
       dealii::Functions::FEFieldFunction<dim, DoFHandlerType, VectorType>;
   } // namespace Functions
 } // namespace Legacy
