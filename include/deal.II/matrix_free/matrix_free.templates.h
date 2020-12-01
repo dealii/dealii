@@ -353,9 +353,6 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
           task_info.n_procs =
             Utilities::MPI::n_mpi_processes(task_info.communicator);
 
-          Assert(additional_data.communicator_sm == MPI_COMM_SELF,
-                 ExcNotImplemented());
-
           task_info.communicator_sm = additional_data.communicator_sm;
         }
       else
