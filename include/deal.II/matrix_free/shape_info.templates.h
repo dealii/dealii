@@ -375,13 +375,12 @@ namespace internal
           //  inverse_shape_values_eo cannot be filled
 
           std::vector<unsigned int> scalar_lexicographic;
-          internal::MatrixFreeFunctions::get_element_type_specific_information(
-            fe_in,
-            fe,
-            base_element_number,
-            element_type,
-            scalar_lexicographic,
-            lexicographic_numbering);
+          get_element_type_specific_information(fe_in,
+                                                fe,
+                                                base_element_number,
+                                                element_type,
+                                                scalar_lexicographic,
+                                                lexicographic_numbering);
 
           univariate_shape_data.element_type = this->element_type;
 
@@ -452,13 +451,12 @@ namespace internal
         Assert(fe->n_components() == 1,
                ExcMessage("Expected a scalar element"));
 
-        internal::MatrixFreeFunctions::get_element_type_specific_information(
-          fe_in,
-          fe,
-          base_element_number,
-          element_type,
-          scalar_lexicographic,
-          lexicographic_numbering);
+        get_element_type_specific_information(fe_in,
+                                              fe,
+                                              base_element_number,
+                                              element_type,
+                                              scalar_lexicographic,
+                                              lexicographic_numbering);
 
         // to evaluate 1D polynomials, evaluate along the line with the first
         // unit support point, assuming that fe.shape_value(0,unit_point) ==
