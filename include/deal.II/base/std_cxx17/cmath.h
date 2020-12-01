@@ -28,12 +28,29 @@ DEAL_II_NAMESPACE_OPEN
 namespace std_cxx17
 {
 #ifndef DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
-  constexpr double (&cyl_bessel_j)(double, double) =
-    boost::math::cyl_bessel_j<double, double>;
-  constexpr float (&cyl_bessel_jf)(float, float) =
-    boost::math::cyl_bessel_j<float, float>;
-  constexpr long double (&cyl_bessel_jl)(long double, long double) =
-    boost::math::cyl_bessel_j<long double, long double>;
+
+  inline double
+  cyl_bessel_j(double x, double y)
+  {
+    return boost::math::cyl_bessel_j(x, y);
+  }
+
+
+
+  inline float
+  cyl_bessel_jf(float x, float y)
+  {
+    return boost::math::cyl_bessel_j(x, y);
+  }
+
+
+
+  inline long double
+  cyl_bessel_jl(long double x, long double y)
+  {
+    return boost::math::cyl_bessel_j(x, y);
+  }
+
 #else
   using std::cyl_bessel_j;
   using std::cyl_bessel_jf;
