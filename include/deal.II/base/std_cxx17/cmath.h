@@ -17,38 +17,50 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
+#if defined(DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS) || \
+  defined(DEAL_II_HAVE_CXX17_LEGENDRE_FUNCTIONS)
 #  include <cmath>
-#else
+#endif
+
+#ifndef DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
 #  include <boost/math/special_functions/bessel.hpp>
+#endif
+
+#ifndef DEAL_II_HAVE_CXX17_LEGENDRE_FUNCTIONS
+#  include <deal.II/base/exceptions.h>
+
+#  include <boost/math/special_functions/legendre.hpp>
+
+#  include <limits>
 #endif
 
 
 DEAL_II_NAMESPACE_OPEN
+
 namespace std_cxx17
 {
 #ifndef DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
 
   inline double
-  cyl_bessel_j(double x, double y)
+  cyl_bessel_j(double nu, double x)
   {
-    return boost::math::cyl_bessel_j(x, y);
+    return boost::math::cyl_bessel_j(nu, x);
   }
 
 
 
   inline float
-  cyl_bessel_jf(float x, float y)
+  cyl_bessel_jf(float nu, float x)
   {
-    return boost::math::cyl_bessel_j(x, y);
+    return boost::math::cyl_bessel_j(nu, x);
   }
 
 
 
   inline long double
-  cyl_bessel_jl(long double x, long double y)
+  cyl_bessel_jl(long double nu, long double x)
   {
-    return boost::math::cyl_bessel_j(x, y);
+    return boost::math::cyl_bessel_j(nu, x);
   }
 
 #else
@@ -56,7 +68,65 @@ namespace std_cxx17
   using std::cyl_bessel_jf;
   using std::cyl_bessel_jl;
 #endif
+
+#ifndef DEAL_II_HAVE_CXX17_LEGENDRE_FUNCTIONS
+
+  inline double
+  legendre(unsigned int l, double x)
+  {
+    Assert(static_cast<int>(l) >= 0,
+           ExcIndexRange(l, 0, std::numeric_limits<int>::max()));
+    return boost::math::legendre_p(static_cast<int>(l), x);
+  }
+
+
+
+  inline float
+  legendre(unsigned int l, float x)
+  {
+    Assert(static_cast<int>(l) >= 0,
+           ExcIndexRange(l, 0, std::numeric_limits<int>::max()));
+    return boost::math::legendre_p(static_cast<int>(l), x);
+  }
+
+
+
+  inline long double
+  legendre(unsigned int l, long double x)
+  {
+    Assert(static_cast<int>(l) >= 0,
+           ExcIndexRange(l, 0, std::numeric_limits<int>::max()));
+    return boost::math::legendre_p(static_cast<int>(l), x);
+  }
+
+
+
+  inline float
+  legendref(unsigned int l, float x)
+  {
+    Assert(static_cast<int>(l) >= 0,
+           ExcIndexRange(l, 0, std::numeric_limits<int>::max()));
+    return boost::math::legendre_p(static_cast<int>(l), x);
+  }
+
+
+
+  inline long double
+  legendrel(unsigned int l, long double x)
+  {
+    Assert(static_cast<int>(l) >= 0,
+           ExcIndexRange(l, 0, std::numeric_limits<int>::max()));
+    return boost::math::legendre_p(static_cast<int>(l), x);
+  }
+
+#else
+  using std::legendre;
+  using std::legendref;
+  using std::legendrel;
+#endif
 } // namespace std_cxx17
+
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // dealii_cxx17_cmath_h
