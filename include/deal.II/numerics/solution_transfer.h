@@ -574,6 +574,21 @@ private:
     dof_values_on_cell;
 };
 
+namespace Legacy
+{
+  /**
+   * The template arguments of the original dealii::SolutionTransfer class will
+   * change in a future release. If for some reason, you need a code that is
+   * compatible with deal.II 9.3 and the subsequent release, use this alias
+   * instead.
+   */
+  template <int dim,
+            typename VectorType     = Vector<double>,
+            typename DoFHandlerType = DoFHandler<dim>>
+  using SolutionTransfer =
+    dealii::SolutionTransfer<dim, VectorType, DoFHandlerType>;
+} // namespace Legacy
+
 
 DEAL_II_NAMESPACE_CLOSE
 

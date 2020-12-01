@@ -372,11 +372,29 @@ namespace parallel
       void
       register_data_attach();
     };
-
-
   } // namespace distributed
 } // namespace parallel
 
+namespace Legacy
+{
+  namespace parallel
+  {
+    namespace distributed
+    {
+      /**
+       * The template arguments of the original
+       * dealii::parallel::distributed::SolutionTransfer class will change in a
+       * future release. If for some reason, you need a code that is compatible
+       * with deal.II 9.3 and the subsequent release, use this alias instead.
+       */
+      template <int dim,
+                typename VectorType,
+                typename DoFHandlerType = DoFHandler<dim>>
+      using SolutionTransfer = dealii::parallel::distributed::
+        SolutionTransfer<dim, VectorType, DoFHandlerType>;
+    } // namespace distributed
+  }   // namespace parallel
+} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE

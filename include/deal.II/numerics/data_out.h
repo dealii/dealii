@@ -516,6 +516,17 @@ private:
                   const CurvedCellRegion              curved_cell_region);
 };
 
+namespace Legacy
+{
+  /**
+   * The template arguments of the original dealii::DataOut class will
+   * change in a future release. If for some reason, you need a code that is
+   * compatible with deal.II 9.3 and the subsequent release, use this alias
+   * instead.
+   */
+  template <int dim, typename DoFHandlerType = DoFHandler<dim>>
+  using DataOut = dealii::DataOut<dim, DoFHandlerType>;
+} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE
