@@ -1912,14 +1912,23 @@ TriaAccessor<structdim, dim, spacedim>::diameter() const
                          (this->vertex(3) - this->vertex(2)).norm()});
 
       case ReferenceCell::Type::Wedge:
-        // Return the longest of the 2*3=6 diagonals of the three quadrilateral
-        // sides of the wedge
-        return std::max({(this->vertex(4) - this->vertex(0)).norm(),
+        // Return ...
+        return std::max({// the longest of the 2*3=6 diagonals of the three
+                         // quadrilateral sides of the wedge or ...
+                         (this->vertex(4) - this->vertex(0)).norm(),
                          (this->vertex(3) - this->vertex(1)).norm(),
                          (this->vertex(5) - this->vertex(1)).norm(),
                          (this->vertex(4) - this->vertex(2)).norm(),
                          (this->vertex(5) - this->vertex(0)).norm(),
-                         (this->vertex(3) - this->vertex(2)).norm()});
+                         (this->vertex(3) - this->vertex(2)).norm(),
+                         // the longest of the 3*2=6 edges of the two triangular
+                         // faces of the wedge
+                         (this->vertex(1) - this->vertex(0)).norm(),
+                         (this->vertex(2) - this->vertex(1)).norm(),
+                         (this->vertex(2) - this->vertex(0)).norm(),
+                         (this->vertex(4) - this->vertex(3)).norm(),
+                         (this->vertex(5) - this->vertex(4)).norm(),
+                         (this->vertex(5) - this->vertex(3)).norm()});
 
       case ReferenceCell::Type::Hex:
         // Return the longest of the four diagonals of the hexahedron
