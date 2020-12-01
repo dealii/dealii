@@ -71,8 +71,10 @@ struct UUID {
 // Constructor
 inline UUID::UUID() {
 
-  static thread_local std::random_device rd;
-  static thread_local std::mt19937 engine {rd()};
+  static std::mutex mutex;
+  std::lock_guard<std::mutex> lock(mutex);
+  
+  static std::mt19937 engine {std::random_device()()};
 
   std::uniform_int_distribution<unsigned long> distribution(
     std::numeric_limits<unsigned long>::min(),
