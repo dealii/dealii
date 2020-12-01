@@ -280,7 +280,7 @@ public:
   void
   prolongate(const unsigned int to_level,
              VectorType &       dst,
-             const VectorType & src) const;
+             const VectorType & src) const override;
 
   /**
    * Perform restriction.
@@ -288,7 +288,7 @@ public:
   virtual void
   restrict_and_add(const unsigned int from_level,
                    VectorType &       dst,
-                   const VectorType & src) const;
+                   const VectorType & src) const override;
 
   /**
    * Initialize internal vectors and copy @p src vector to the finest
