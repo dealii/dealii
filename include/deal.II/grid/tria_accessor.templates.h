@@ -1888,35 +1888,46 @@ TriaAccessor<structdim, dim, spacedim>::diameter() const
   switch (this->reference_cell_type())
     {
       case ReferenceCell::Type::Line:
+        // Return the distance between the two vertices
         return (this->vertex(1) - this->vertex(0)).norm();
+
       case ReferenceCell::Type::Tri:
-        return std::max(std::max((this->vertex(1) - this->vertex(0)).norm(),
-                                 (this->vertex(2) - this->vertex(1)).norm()),
-                        (this->vertex(2) - this->vertex(0)).norm());
+        // Return the longest of the three edges
+        return std::max({(this->vertex(1) - this->vertex(0)).norm(),
+                         (this->vertex(2) - this->vertex(1)).norm(),
+                         (this->vertex(2) - this->vertex(0)).norm()});
+
       case ReferenceCell::Type::Quad:
-        return std::max((this->vertex(3) - this->vertex(0)).norm(),
-                        (this->vertex(2) - this->vertex(1)).norm());
+        // Return the longer one of the two diagonals of the quadrilateral
+        return std::max({(this->vertex(3) - this->vertex(0)).norm(),
+                         (this->vertex(2) - this->vertex(1)).norm()});
+
       case ReferenceCell::Type::Tet:
-        return std::max(
-          std::max(std::max((this->vertex(1) - this->vertex(0)).norm(),
-                            (this->vertex(2) - this->vertex(0)).norm()),
-                   std::max((this->vertex(2) - this->vertex(1)).norm(),
-                            (this->vertex(3) - this->vertex(0)).norm())),
-          std::max((this->vertex(3) - this->vertex(1)).norm(),
-                   (this->vertex(3) - this->vertex(2)).norm()));
+        // Return the longest of the six edges of the tetrahedron
+        return std::max({(this->vertex(1) - this->vertex(0)).norm(),
+                         (this->vertex(2) - this->vertex(0)).norm(),
+                         (this->vertex(2) - this->vertex(1)).norm(),
+                         (this->vertex(3) - this->vertex(0)).norm(),
+                         (this->vertex(3) - this->vertex(1)).norm(),
+                         (this->vertex(3) - this->vertex(2)).norm()});
+
       case ReferenceCell::Type::Wedge:
-        return std::max(
-          std::max(std::max((this->vertex(4) - this->vertex(0)).norm(),
-                            (this->vertex(3) - this->vertex(1)).norm()),
-                   std::max((this->vertex(5) - this->vertex(1)).norm(),
-                            (this->vertex(4) - this->vertex(2)).norm())),
-          std::max((this->vertex(5) - this->vertex(0)).norm(),
-                   (this->vertex(3) - this->vertex(2)).norm()));
+        // Return the longest of the 2*3=6 diagonals of the three quadrilateral
+        // sides of the wedge
+        return std::max({(this->vertex(4) - this->vertex(0)).norm(),
+                         (this->vertex(3) - this->vertex(1)).norm(),
+                         (this->vertex(5) - this->vertex(1)).norm(),
+                         (this->vertex(4) - this->vertex(2)).norm(),
+                         (this->vertex(5) - this->vertex(0)).norm(),
+                         (this->vertex(3) - this->vertex(2)).norm()});
+
       case ReferenceCell::Type::Hex:
-        return std::max(std::max((this->vertex(7) - this->vertex(0)).norm(),
-                                 (this->vertex(6) - this->vertex(1)).norm()),
-                        std::max((this->vertex(2) - this->vertex(5)).norm(),
-                                 (this->vertex(3) - this->vertex(4)).norm()));
+        // Return the longest of the four diagonals of the hexahedron
+        return std::max({(this->vertex(7) - this->vertex(0)).norm(),
+                         (this->vertex(6) - this->vertex(1)).norm(),
+                         (this->vertex(2) - this->vertex(5)).norm(),
+                         (this->vertex(3) - this->vertex(4)).norm()});
+
       default:
         Assert(false, ExcNotImplemented());
         return -1e10;
