@@ -1481,6 +1481,51 @@ public:
     const unsigned int                           fe_index,
     const unsigned int                           dof_handler_index = 0) const;
 
+  /**
+   * In the hp adaptive case, a subrange of internal faces as computed during
+   * loop() might contain internal faces with elements of different active
+   * fe indices. Use this function to compute what the subrange for a given pair
+   * of active fe indices is.
+   */
+  std::pair<unsigned int, unsigned int>
+  create_inner_face_subrange_hp_by_index(
+    const std::pair<unsigned int, unsigned int> &range,
+    const unsigned int                           fe_index_interior,
+    const unsigned int                           fe_index_exterior,
+    const unsigned int                           dof_handler_index = 0) const;
+
+  /**
+   * In the hp adaptive case, a subrange of boundary faces as computed during
+   * loop() might contain boundary faces with elements of different active
+   * fe indices. Use this function to compute what the subrange for a given
+   * active fe indices is.
+   */
+  std::pair<unsigned int, unsigned int>
+  create_boundary_face_subrange_hp_by_index(
+    const std::pair<unsigned int, unsigned int> &range,
+    const unsigned int                           fe_index,
+    const unsigned int                           dof_handler_index = 0) const;
+
+  /**
+   * In the hp adaptive case, return number of active_fe_indices.
+   */
+  unsigned int
+  n_active_fe_indices() const;
+
+  /**
+   * In the hp adaptive case, return the active_fe_index of a cell range.
+   */
+  unsigned int
+  get_cell_active_fe_index(
+    const std::pair<unsigned int, unsigned int> range) const;
+
+  /**
+   * In the hp adaptive case, return the active_fe_index of a face range.
+   */
+  unsigned int
+  get_face_active_fe_index(const std::pair<unsigned int, unsigned int> range,
+                           const bool is_interior_face = true) const;
+
   //@}
 
   /**
@@ -2467,6 +2512,75 @@ MatrixFree<dim, Number, VectorizedArrayType>::at_irregular_cell(
                           1] == cell_level_index[(cell_batch_index + 1) *
                                                    VectorizedArrayType::size() -
                                                  2];
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+unsigned int
+MatrixFree<dim, Number, VectorizedArrayType>::n_active_fe_indices() const
+{
+  return shape_info.size(2);
+}
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+unsigned int
+MatrixFree<dim, Number, VectorizedArrayType>::get_cell_active_fe_index(
+  const std::pair<unsigned int, unsigned int> range) const
+{
+  const auto &fe_indices = dof_info[0].cell_active_fe_index;
+
+  if (fe_indices.empty() == true)
+    return 0;
+
+  const auto index = fe_indices[range.first];
+
+  for (unsigned int i = range.first; i < range.second; ++i)
+    AssertDimension(index, fe_indices[i]);
+
+  return index;
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+unsigned int
+MatrixFree<dim, Number, VectorizedArrayType>::get_face_active_fe_index(
+  const std::pair<unsigned int, unsigned int> range,
+  const bool                                  is_interior_face) const
+{
+  const auto &fe_indices = dof_info[0].cell_active_fe_index;
+
+  if (fe_indices.empty() == true)
+    return 0;
+
+  if (is_interior_face)
+    {
+      const unsigned int index =
+        fe_indices[face_info.faces[range.first].cells_interior[0] /
+                   VectorizedArrayType::size()];
+
+      for (unsigned int i = range.first; i < range.second; ++i)
+        AssertDimension(index,
+                        fe_indices[face_info.faces[i].cells_interior[0] /
+                                   VectorizedArrayType::size()]);
+
+      return index;
+    }
+  else
+    {
+      const unsigned int index =
+        fe_indices[face_info.faces[range.first].cells_exterior[0] /
+                   VectorizedArrayType::size()];
+
+      for (unsigned int i = range.first; i < range.second; ++i)
+        AssertDimension(index,
+                        fe_indices[face_info.faces[i].cells_exterior[0] /
+                                   VectorizedArrayType::size()]);
+
+      return index;
+    }
 }
 
 
@@ -4525,8 +4639,17 @@ namespace internal
     cell(const std::pair<unsigned int, unsigned int> &cell_range) override
     {
       if (cell_function != nullptr && cell_range.second > cell_range.first)
-        (container.*
-         cell_function)(matrix_free, this->dst, this->src, cell_range);
+        for (unsigned int i = 0; i < matrix_free.n_active_fe_indices(); ++i)
+          {
+            const auto cell_subrange =
+              matrix_free.create_cell_subrange_hp_by_index(cell_range, i);
+
+            if (cell_subrange.second <= cell_subrange.first)
+              continue;
+
+            (container.*
+             cell_function)(matrix_free, this->dst, this->src, cell_subrange);
+          }
     }
 
     // Runs the assembler on interior faces. If no function is given, nothing
@@ -4535,8 +4658,19 @@ namespace internal
     face(const std::pair<unsigned int, unsigned int> &face_range) override
     {
       if (face_function != nullptr && face_range.second > face_range.first)
-        (container.*
-         face_function)(matrix_free, this->dst, this->src, face_range);
+        for (unsigned int i = 0; i < matrix_free.n_active_fe_indices(); ++i)
+          for (unsigned int j = 0; j < matrix_free.n_active_fe_indices(); ++j)
+            {
+              const auto face_subrange =
+                matrix_free.create_inner_face_subrange_hp_by_index(face_range,
+                                                                   i,
+                                                                   j);
+
+              if (face_subrange.second <= face_subrange.first)
+                continue;
+              (container.*
+               face_function)(matrix_free, this->dst, this->src, face_subrange);
+            }
     }
 
     // Runs the assembler on boundary faces. If no function is given, nothing
@@ -4545,8 +4679,20 @@ namespace internal
     boundary(const std::pair<unsigned int, unsigned int> &face_range) override
     {
       if (boundary_function != nullptr && face_range.second > face_range.first)
-        (container.*
-         boundary_function)(matrix_free, this->dst, this->src, face_range);
+        for (unsigned int i = 0; i < matrix_free.n_active_fe_indices(); ++i)
+          {
+            const auto face_subrange =
+              matrix_free.create_boundary_face_subrange_hp_by_index(face_range,
+                                                                    i);
+
+            if (face_subrange.second <= face_subrange.first)
+              continue;
+
+            (container.*boundary_function)(matrix_free,
+                                           this->dst,
+                                           this->src,
+                                           face_subrange);
+          }
     }
 
     // Starts the communication for the update ghost values operation. We
