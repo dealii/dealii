@@ -1402,9 +1402,25 @@ public:
   /**
    * Diameter of the object.
    *
-   * The diameter of an object is computed to be the largest diagonal. This is
-   * not necessarily the true diameter for objects that may use higher order
-   * mappings, but completely sufficient for most computations.
+   * The diameter of an object is computed to be the largest diagonal of the
+   * current object. If this object is a quadrilateral, then there are two
+   * such diagonal, and if it is a hexahedron, then there are four diagonals
+   * that connect "opposite" points. For triangles and tetrahedra, the function
+   * simply returns the length of the longest edge.
+   *
+   * The situation is more difficult for wedges and pyramids: For wedges, we
+   * return the length of the longest diagonal of the three quadrilateral faces
+   * or the longest edge length of the two triangular faces. For pyramids,
+   * the same principle is applied.
+   *
+   * In all of these cases, this definition of "diameter" is
+   * not necessarily the true diameter in the sense of the largest distance
+   * between points inside the object. Indeed, one can often construct objects
+   * for which it is not, though these are generally quite deformed compared to
+   * the reference shape. Furthermore, for objects that may use higher order
+   * mappings, one may have bulging faces that also create trouble for
+   * computing an exact representation of the diameter of the object. That said,
+   * the definition used above is completely sufficient for most computations.
    */
   double
   diameter() const;
