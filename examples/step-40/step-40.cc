@@ -38,7 +38,7 @@
 // But there may be cases where you want to use Trilinos, even though
 // deal.II has *also* been configured with PETSc, for example to
 // compare the performance of these two libraries. To do this,
-// add the following `\#define` to the source code:
+// add the following \#define to the source code:
 // @code
 // #define FORCE_USE_OF_TRILINOS
 // @endcode
