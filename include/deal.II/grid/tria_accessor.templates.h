@@ -1904,6 +1904,14 @@ TriaAccessor<structdim, dim, spacedim>::diameter() const
                             (this->vertex(3) - this->vertex(0)).norm())),
           std::max((this->vertex(3) - this->vertex(1)).norm(),
                    (this->vertex(3) - this->vertex(2)).norm()));
+      case ReferenceCell::Type::Wedge:
+        return std::max(
+          std::max(std::max((this->vertex(4) - this->vertex(0)).norm(),
+                            (this->vertex(3) - this->vertex(1)).norm()),
+                   std::max((this->vertex(5) - this->vertex(1)).norm(),
+                            (this->vertex(4) - this->vertex(2)).norm())),
+          std::max((this->vertex(5) - this->vertex(0)).norm(),
+                   (this->vertex(3) - this->vertex(2)).norm()));
       case ReferenceCell::Type::Hex:
         return std::max(std::max((this->vertex(7) - this->vertex(0)).norm(),
                                  (this->vertex(6) - this->vertex(1)).norm()),
