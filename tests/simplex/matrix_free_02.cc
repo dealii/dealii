@@ -47,15 +47,122 @@
 
 #include "../tests.h"
 
-#include "./simplex_grids.h"
-
 using namespace dealii;
+
+namespace dealii
+{
+  namespace GridGenerator
+  {
+    template <int dim, int spacedim>
+    void
+    subdivided_hyper_rectangle_with_simplices_mix(
+      Triangulation<dim, spacedim> &   tria,
+      const std::vector<unsigned int> &repetitions,
+      const Point<dim> &               p1,
+      const Point<dim> &               p2,
+      const bool                       colorize = false)
+    {
+      AssertDimension(dim, spacedim);
+
+      AssertThrow(colorize == false, ExcNotImplemented());
+
+      std::vector<Point<spacedim>> vertices;
+      std::vector<CellData<dim>>   cells;
+
+      if (dim == 2)
+        {
+          // determine cell sizes
+          const Point<dim> dx((p2[0] - p1[0]) / repetitions[0],
+                              (p2[1] - p1[1]) / repetitions[1]);
+
+          // create vertices
+          for (unsigned int j = 0; j <= repetitions[1]; ++j)
+            for (unsigned int i = 0; i <= repetitions[0]; ++i)
+              vertices.push_back(
+                Point<spacedim>(p1[0] + dx[0] * i, p1[1] + dx[1] * j));
+
+          // create cells
+          for (unsigned int j = 0; j < repetitions[1]; ++j)
+            for (unsigned int i = 0; i < repetitions[0]; ++i)
+              {
+                // create reference QUAD cell
+                std::array<unsigned int, 4> quad{{
+                  (j + 0) * (repetitions[0] + 1) + i + 0, //
+                  (j + 0) * (repetitions[0] + 1) + i + 1, //
+                  (j + 1) * (repetitions[0] + 1) + i + 0, //
+                  (j + 1) * (repetitions[0] + 1) + i + 1  //
+                }};                                       //
+
+                if (j < repetitions[1] / 2 && i < repetitions[0] / 2)
+                  {
+                    CellData<dim> quad_;
+                    quad_.vertices = {quad[0], quad[1], quad[2], quad[3]};
+                    cells.push_back(quad_);
+
+                    continue;
+                  }
+
+                // TRI cell 0
+                {
+                  CellData<dim> tri;
+                  tri.vertices = {quad[0], quad[1], quad[2]};
+                  cells.push_back(tri);
+                }
+
+                // TRI cell 1
+                {
+                  CellData<dim> tri;
+                  tri.vertices = {quad[3], quad[2], quad[1]};
+                  cells.push_back(tri);
+                }
+              }
+        }
+      else
+        {
+          AssertThrow(colorize == false, ExcNotImplemented());
+        }
+
+      // actually create triangulation
+      tria.create_triangulation(vertices, cells, SubCellData());
+    }
+
+
+    template <int dim, int spacedim>
+    void
+    subdivided_hyper_cube_with_simplices_mix(Triangulation<dim, spacedim> &tria,
+                                             const unsigned int repetitions,
+                                             const double       p1 = 0.0,
+                                             const double       p2 = 1.0,
+                                             const bool colorize   = false)
+    {
+      if (dim == 2)
+        {
+          subdivided_hyper_rectangle_with_simplices_mix(
+            tria, {{repetitions, repetitions}}, {p1, p1}, {p2, p2}, colorize);
+        }
+      else if (dim == 3)
+        {
+          subdivided_hyper_rectangle_with_simplices_mix(
+            tria,
+            {{repetitions, repetitions, repetitions}},
+            {p1, p1, p1},
+            {p2, p2, p2},
+            colorize);
+        }
+      else
+        {
+          AssertThrow(false, ExcNotImplemented())
+        }
+    }
+  } // namespace GridGenerator
+} // namespace dealii
 
 template <int dim>
 class PoissonOperator
 {
 public:
-  using VectorType = LinearAlgebra::distributed::Vector<double>;
+  using VectorType       = LinearAlgebra::distributed::Vector<double>;
+  using FECellIntegrator = FEEvaluation<dim, -1, 0, 1, double>;
 
   PoissonOperator(const MatrixFree<dim, double> &matrix_free,
                   const bool                     do_helmholtz)
@@ -75,24 +182,17 @@ public:
     const int dummy = 0;
 
     matrix_free.template cell_loop<VectorType, int>(
-      [&](const auto &data, auto &dst, const auto &, const auto cell_range) {
-        for (unsigned int i = 0; i < 2; ++i)
+      [&](const auto &data, auto &dst, const auto &, const auto range) {
+        const auto       i = data.get_cell_active_fe_index(range);
+        FECellIntegrator phi(matrix_free, 0, 0, 0, i, i);
+
+        for (unsigned int cell = range.first; cell < range.second; ++cell)
           {
-            const auto cell_subrange =
-              data.create_cell_subrange_hp_by_index(cell_range, i);
+            phi.reinit(cell);
+            for (unsigned int q = 0; q < phi.n_q_points; ++q)
+              phi.submit_value(1.0, q);
 
-            FEEvaluation<dim, -1, 0, 1, double> phi(matrix_free, 0, 0, 0, i, i);
-
-            for (unsigned int cell = cell_subrange.first;
-                 cell < cell_subrange.second;
-                 ++cell)
-              {
-                phi.reinit(cell);
-                for (unsigned int q = 0; q < phi.n_q_points; ++q)
-                  phi.submit_value(1.0, q);
-
-                phi.integrate_scatter(true, false, dst);
-              }
+            phi.integrate_scatter(true, false, dst);
           }
       },
       vec,
@@ -105,30 +205,24 @@ public:
   vmult(VectorType &dst, const VectorType &src) const
   {
     matrix_free.template cell_loop<VectorType, VectorType>(
-      [&](const auto &data, auto &dst, const auto &src, const auto cell_range) {
-        for (unsigned int i = 0; i < 2; ++i)
+      [&](const auto &data, auto &dst, const auto &src, const auto range) {
+        const auto       i = data.get_cell_active_fe_index(range);
+        FECellIntegrator phi(matrix_free, 0, 0, 0, i, i);
+
+        for (unsigned int cell = range.first; cell < range.second; ++cell)
           {
-            const auto cell_subrange =
-              data.create_cell_subrange_hp_by_index(cell_range, i);
+            phi.reinit(cell);
+            phi.gather_evaluate(src, do_helmholtz, true);
 
-            FEEvaluation<dim, -1, 0, 1, double> phi(matrix_free, 0, 0, 0, i, i);
-            for (unsigned int cell = cell_subrange.first;
-                 cell < cell_subrange.second;
-                 ++cell)
+            for (unsigned int q = 0; q < phi.n_q_points; ++q)
               {
-                phi.reinit(cell);
-                phi.gather_evaluate(src, do_helmholtz, true);
+                if (do_helmholtz)
+                  phi.submit_value(phi.get_value(q), q);
 
-                for (unsigned int q = 0; q < phi.n_q_points; ++q)
-                  {
-                    if (do_helmholtz)
-                      phi.submit_value(phi.get_value(q), q);
-
-                    phi.submit_gradient(phi.get_gradient(q), q);
-                  }
-
-                phi.integrate_scatter(do_helmholtz, true, dst);
+                phi.submit_gradient(phi.get_gradient(q), q);
               }
+
+            phi.integrate_scatter(do_helmholtz, true, dst);
           }
       },
       dst,
