@@ -3107,25 +3107,37 @@ namespace GridTools
           case ReferenceCell::Type::Line:
             return (vertices[1] - vertices[0]).norm();
           case ReferenceCell::Type::Tri:
-            return std::max(std::max((vertices[1] - vertices[0]).norm(),
-                                     (vertices[2] - vertices[1]).norm()),
-                            (vertices[2] - vertices[0]).norm());
+            return std::max({(vertices[1] - vertices[0]).norm(),
+                             (vertices[2] - vertices[1]).norm(),
+                             (vertices[2] - vertices[0]).norm()});
           case ReferenceCell::Type::Quad:
-            return std::max((vertices[3] - vertices[0]).norm(),
-                            (vertices[2] - vertices[1]).norm());
+            return std::max({(vertices[3] - vertices[0]).norm(),
+                             (vertices[2] - vertices[1]).norm()});
           case ReferenceCell::Type::Tet:
-            return std::max(
-              std::max(std::max((vertices[1] - vertices[0]).norm(),
-                                (vertices[2] - vertices[0]).norm()),
-                       std::max((vertices[2] - vertices[1]).norm(),
-                                (vertices[3] - vertices[0]).norm())),
-              std::max((vertices[3] - vertices[1]).norm(),
-                       (vertices[3] - vertices[2]).norm()));
+            return std::max({(vertices[1] - vertices[0]).norm(),
+                             (vertices[2] - vertices[0]).norm(),
+                             (vertices[2] - vertices[1]).norm(),
+                             (vertices[3] - vertices[0]).norm(),
+                             (vertices[3] - vertices[1]).norm(),
+                             (vertices[3] - vertices[2]).norm()});
+          case ReferenceCell::Type::Wedge:
+            return std::max({(vertices[4] - vertices[0]).norm(),
+                             (vertices[3] - vertices[1]).norm(),
+                             (vertices[5] - vertices[1]).norm(),
+                             (vertices[4] - vertices[2]).norm(),
+                             (vertices[5] - vertices[0]).norm(),
+                             (vertices[3] - vertices[2]).norm(),
+                             (vertices[1] - vertices[0]).norm(),
+                             (vertices[2] - vertices[1]).norm(),
+                             (vertices[2] - vertices[0]).norm(),
+                             (vertices[4] - vertices[3]).norm(),
+                             (vertices[5] - vertices[4]).norm(),
+                             (vertices[5] - vertices[3]).norm()});
           case ReferenceCell::Type::Hex:
-            return std::max(std::max((vertices[7] - vertices[0]).norm(),
-                                     (vertices[6] - vertices[1]).norm()),
-                            std::max((vertices[2] - vertices[5]).norm(),
-                                     (vertices[3] - vertices[4]).norm()));
+            return std::max({(vertices[7] - vertices[0]).norm(),
+                             (vertices[6] - vertices[1]).norm(),
+                             (vertices[2] - vertices[5]).norm(),
+                             (vertices[3] - vertices[4]).norm()});
           default:
             Assert(false, ExcNotImplemented());
             return -1e10;
