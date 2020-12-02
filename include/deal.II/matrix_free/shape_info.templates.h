@@ -77,6 +77,96 @@ namespace internal
     }
 
 
+    template <int dim>
+    void
+    get_element_type_specific_information(
+      const FiniteElement<dim, dim> &fe_in,
+      const FiniteElement<dim, dim> *fe,
+      const unsigned int             base_element_number,
+      ElementType &                  element_type,
+      std::vector<unsigned int> &    scalar_lexicographic,
+      std::vector<unsigned int> &    lexicographic_numbering)
+    {
+      element_type = tensor_general;
+
+      const auto fe_poly = dynamic_cast<const FE_Poly<dim, dim> *>(fe);
+
+      if (dynamic_cast<const Simplex::FE_P<dim, dim> *>(fe) != nullptr ||
+          dynamic_cast<const Simplex::FE_DGP<dim, dim> *>(fe) != nullptr)
+        {
+          scalar_lexicographic.resize(fe->n_dofs_per_cell());
+          for (unsigned int i = 0; i < scalar_lexicographic.size(); ++i)
+            scalar_lexicographic[i] = i;
+          element_type = tensor_none;
+        }
+      else if (fe_poly != nullptr &&
+               (dynamic_cast<const TensorProductPolynomials<dim> *>(
+                  &fe_poly->get_poly_space()) != nullptr ||
+                dynamic_cast<const TensorProductPolynomials<
+                    dim,
+                    Polynomials::PiecewisePolynomial<double>> *>(
+                  &fe_poly->get_poly_space()) != nullptr))
+        scalar_lexicographic = fe_poly->get_poly_space_numbering_inverse();
+      else if (const auto fe_dgp = dynamic_cast<const FE_DGP<dim> *>(fe))
+        {
+          scalar_lexicographic.resize(fe_dgp->n_dofs_per_cell());
+          for (unsigned int i = 0; i < fe_dgp->n_dofs_per_cell(); ++i)
+            scalar_lexicographic[i] = i;
+          element_type = truncated_tensor;
+        }
+      else if (const auto fe_q_dg0 = dynamic_cast<const FE_Q_DG0<dim> *>(fe))
+        {
+          scalar_lexicographic = fe_q_dg0->get_poly_space_numbering_inverse();
+          element_type         = tensor_symmetric_plus_dg0;
+        }
+      else if (fe->n_dofs_per_cell() == 0)
+        {
+          // FE_Nothing case -> nothing to do here
+        }
+      else
+        Assert(false, ExcNotImplemented());
+
+      // Finally store the renumbering into the member variable of this
+      // class
+      if (fe_in.n_components() == 1)
+        lexicographic_numbering = scalar_lexicographic;
+      else
+        {
+          // have more than one component, get the inverse
+          // permutation, invert it, sort the components one after one,
+          // and invert back
+          std::vector<unsigned int> scalar_inv =
+            Utilities::invert_permutation(scalar_lexicographic);
+          std::vector<unsigned int> lexicographic(
+            fe_in.n_dofs_per_cell(), numbers::invalid_unsigned_int);
+          unsigned int components_before = 0;
+          for (unsigned int e = 0; e < base_element_number; ++e)
+            components_before += fe_in.element_multiplicity(e);
+          for (unsigned int comp = 0;
+               comp < fe_in.element_multiplicity(base_element_number);
+               ++comp)
+            for (unsigned int i = 0; i < scalar_inv.size(); ++i)
+              lexicographic[fe_in.component_to_system_index(
+                comp + components_before, i)] =
+                scalar_inv.size() * comp + scalar_inv[i];
+
+          // invert numbering again. Need to do it manually because we might
+          // have undefined blocks
+          lexicographic_numbering.resize(fe_in.element_multiplicity(
+                                           base_element_number) *
+                                           fe->n_dofs_per_cell(),
+                                         numbers::invalid_unsigned_int);
+          for (unsigned int i = 0; i < lexicographic.size(); ++i)
+            if (lexicographic[i] != numbers::invalid_unsigned_int)
+              {
+                AssertIndexRange(lexicographic[i],
+                                 lexicographic_numbering.size());
+                lexicographic_numbering[lexicographic[i]] = i;
+              }
+        }
+    }
+
+
 
     template <typename Number>
     ShapeInfo<Number>::ShapeInfo()
@@ -150,8 +240,10 @@ namespace internal
     {
 #ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
       if (quad_in.is_tensor_product() == false ||
-          dynamic_cast<const Simplex::FE_P<dim> *>(&fe_in) ||
-          dynamic_cast<const Simplex::FE_DGP<dim> *>(&fe_in))
+          dynamic_cast<const Simplex::FE_P<dim> *>(
+            &fe_in.base_element(base_element_number)) ||
+          dynamic_cast<const Simplex::FE_DGP<dim> *>(
+            &fe_in.base_element(base_element_number)))
         {
           // specialization for arbitrary finite elements and quadrature rules
           // as needed in the context, e.g., of simplices
@@ -282,16 +374,18 @@ namespace internal
           //  shape_gradients_collocation_eo, shape_hessians_collocation_eo,
           //  inverse_shape_values_eo cannot be filled
 
-          // indicate that no tensor product properties could be exploited
-          element_type                       = tensor_none;
+          std::vector<unsigned int> scalar_lexicographic;
+          internal::MatrixFreeFunctions::get_element_type_specific_information(
+            fe_in,
+            fe,
+            base_element_number,
+            element_type,
+            scalar_lexicographic,
+            lexicographic_numbering);
+
           univariate_shape_data.element_type = this->element_type;
 
           univariate_shape_data.nodal_at_cell_boundaries = true;
-
-          lexicographic_numbering.resize(n_dofs);
-
-          for (unsigned int i = 0; i < n_dofs; ++i)
-            lexicographic_numbering[i] = i;
 
           // TODO: setup face_to_cell_index_nodal, face_to_cell_index_hermite,
           //  face_orientations
@@ -358,79 +452,13 @@ namespace internal
         Assert(fe->n_components() == 1,
                ExcMessage("Expected a scalar element"));
 
-        const FE_Poly<dim, dim> *fe_poly =
-          dynamic_cast<const FE_Poly<dim, dim> *>(fe);
-
-        const FE_DGP<dim> *fe_dgp = dynamic_cast<const FE_DGP<dim> *>(fe);
-
-        const FE_Q_DG0<dim> *fe_q_dg0 = dynamic_cast<const FE_Q_DG0<dim> *>(fe);
-
-        element_type = tensor_general;
-        if (fe_poly != nullptr &&
-            (dynamic_cast<const TensorProductPolynomials<dim> *>(
-               &fe_poly->get_poly_space()) != nullptr ||
-             dynamic_cast<const TensorProductPolynomials<
-                 dim,
-                 Polynomials::PiecewisePolynomial<double>> *>(
-               &fe_poly->get_poly_space()) != nullptr))
-          scalar_lexicographic = fe_poly->get_poly_space_numbering_inverse();
-        else if (fe_dgp != nullptr)
-          {
-            scalar_lexicographic.resize(fe_dgp->n_dofs_per_cell());
-            for (unsigned int i = 0; i < fe_dgp->n_dofs_per_cell(); ++i)
-              scalar_lexicographic[i] = i;
-            element_type = truncated_tensor;
-          }
-        else if (fe_q_dg0 != nullptr)
-          {
-            scalar_lexicographic = fe_q_dg0->get_poly_space_numbering_inverse();
-            element_type         = tensor_symmetric_plus_dg0;
-          }
-        else if (fe->n_dofs_per_cell() == 0)
-          {
-            // FE_Nothing case -> nothing to do here
-          }
-        else
-          Assert(false, ExcNotImplemented());
-
-        // Finally store the renumbering into the member variable of this
-        // class
-        if (fe_in.n_components() == 1)
-          lexicographic_numbering = scalar_lexicographic;
-        else
-          {
-            // have more than one component, get the inverse
-            // permutation, invert it, sort the components one after one,
-            // and invert back
-            std::vector<unsigned int> scalar_inv =
-              Utilities::invert_permutation(scalar_lexicographic);
-            std::vector<unsigned int> lexicographic(
-              fe_in.n_dofs_per_cell(), numbers::invalid_unsigned_int);
-            unsigned int components_before = 0;
-            for (unsigned int e = 0; e < base_element_number; ++e)
-              components_before += fe_in.element_multiplicity(e);
-            for (unsigned int comp = 0;
-                 comp < fe_in.element_multiplicity(base_element_number);
-                 ++comp)
-              for (unsigned int i = 0; i < scalar_inv.size(); ++i)
-                lexicographic[fe_in.component_to_system_index(
-                  comp + components_before, i)] =
-                  scalar_inv.size() * comp + scalar_inv[i];
-
-            // invert numbering again. Need to do it manually because we might
-            // have undefined blocks
-            lexicographic_numbering.resize(fe_in.element_multiplicity(
-                                             base_element_number) *
-                                             fe->n_dofs_per_cell(),
-                                           numbers::invalid_unsigned_int);
-            for (unsigned int i = 0; i < lexicographic.size(); ++i)
-              if (lexicographic[i] != numbers::invalid_unsigned_int)
-                {
-                  AssertIndexRange(lexicographic[i],
-                                   lexicographic_numbering.size());
-                  lexicographic_numbering[lexicographic[i]] = i;
-                }
-          }
+        internal::MatrixFreeFunctions::get_element_type_specific_information(
+          fe_in,
+          fe,
+          base_element_number,
+          element_type,
+          scalar_lexicographic,
+          lexicographic_numbering);
 
         // to evaluate 1D polynomials, evaluate along the line with the first
         // unit support point, assuming that fe.shape_value(0,unit_point) ==
