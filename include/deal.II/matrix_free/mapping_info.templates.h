@@ -405,9 +405,17 @@ namespace internal
               if (flag == false)
                 {
 #ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
-                  const auto quad_face = get_face_quadrature(quad[my_q][hpq]);
-                  face_data[my_q].descriptor[hpq].initialize(quad_face,
-                                                             update_default);
+                  try
+                    {
+                      const auto quad_face =
+                        get_face_quadrature(quad[my_q][hpq]);
+                      face_data[my_q].descriptor[hpq].initialize(
+                        quad_face, update_default);
+                    }
+                  catch (...)
+                    {
+                      // TODO: nothing to do for now for wedges and pyramids.
+                    }
 #else
                   Assert(false, ExcNotImplemented());
 #endif
@@ -431,9 +439,17 @@ namespace internal
               if (flag == false)
                 {
 #ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
-                  const auto quad_face = get_face_quadrature(quad[my_q][hpq]);
-                  face_data_by_cells[my_q].descriptor[hpq].initialize(
-                    quad_face, update_default);
+                  try
+                    {
+                      const auto quad_face =
+                        get_face_quadrature(quad[my_q][hpq]);
+                      face_data_by_cells[my_q].descriptor[hpq].initialize(
+                        quad_face, update_default);
+                    }
+                  catch (...)
+                    {
+                      // TODO: nothing to do for now for wedges and pyramids.
+                    }
 #else
                   Assert(false, ExcNotImplemented());
 #endif
