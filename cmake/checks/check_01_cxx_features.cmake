@@ -25,6 +25,7 @@
 #   DEAL_II_HAVE_FP_EXCEPTIONS
 #   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
 #   DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
+#   DEAL_II_HAVE_CXX17_LEGENDRE_FUNCTIONS
 #   DEAL_II_FALLTHROUGH
 #   DEAL_II_DEPRECATED
 #   DEAL_II_CONSTEXPR
@@ -355,6 +356,7 @@ UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
   DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH
   DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
   DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
+  DEAL_II_HAVE_CXX17_LEGENDRE_FUNCTIONS
   DEAL_II_CXX14_CONSTEXPR_BUG_OK
   )
 
@@ -551,7 +553,7 @@ ENDIF()
 
 
 #
-# Check for c++17 bessel function support. Unfortunately libc++ version 10
+# Check for c++17 Bessel function support. Unfortunately libc++ version 10
 # does not have those.
 #
 
@@ -566,6 +568,24 @@ CHECK_CXX_SOURCE_COMPILES(
   }
   "
   DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
+  )
+
+
+#
+# Check for c++17 Legendre function support.
+#
+
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  #include <cmath>
+  using std::legendre;
+  using std::legendref;
+  using std::legendrel;
+  int main()
+  {
+  }
+  "
+  DEAL_II_HAVE_CXX17_LEGENDRE_FUNCTIONS
   )
 
 
