@@ -24,6 +24,7 @@
 #include <deal.II/base/smartpointer.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -36,7 +37,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -202,8 +202,8 @@ private:
   void
   process_solution(const unsigned int cycle);
 
-  Triangulation<dim>  triangulation;
-  hp::DoFHandler<dim> dof_handler;
+  Triangulation<dim> triangulation;
+  DoFHandler<dim>    dof_handler;
 
   SmartPointer<const hp::FECollection<dim>> fe;
 
@@ -301,9 +301,9 @@ HelmholtzProblem<dim>::assemble_system()
 
   const Solution<dim> exact_solution;
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
       cell_matrix = 0;
@@ -547,7 +547,7 @@ HelmholtzProblem<dim>::run()
 
       gmv_filename += ".gmv";
 
-      DataOut<dim, hp::DoFHandler<dim>> data_out;
+      DataOut<dim, DoFHandler<dim>> data_out;
       data_out.attach_dof_handler(dof_handler);
       data_out.add_data_vector(solution, "solution");
 

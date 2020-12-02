@@ -28,6 +28,7 @@
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_dgq.h>
@@ -39,7 +40,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -67,7 +67,7 @@ namespace Step
   private:
     Triangulation<dim> triangulation;
 
-    hp::DoFHandler<dim>      dof_handler;
+    DoFHandler<dim>          dof_handler;
     hp::FECollection<dim>    fe_collection;
     hp::QCollection<dim>     quadrature_collection;
     hp::QCollection<dim - 1> face_quadrature_collection;

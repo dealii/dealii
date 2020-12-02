@@ -46,7 +46,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/q_collection.h>
 #include <deal.II/hp/refinement.h>
@@ -97,7 +96,7 @@ public:
   void
   run();
 
-  hp::DoFHandler<dim> &
+  DoFHandler<dim> &
   get_dof_handler();
 
   void
@@ -152,7 +151,7 @@ protected:
 
   Triangulation<dim>    triangulation;
   hp::FECollection<dim> fe;
-  hp::DoFHandler<dim>   dof_handler;
+  DoFHandler<dim>       dof_handler;
   hp::QCollection<dim>  quadrature;
   hp::QCollection<dim>  quadrature_infty;
 
@@ -225,7 +224,7 @@ Laplace<dim>::~Laplace()
 
 
 template <int dim>
-hp::DoFHandler<dim> &
+DoFHandler<dim> &
 Laplace<dim>::get_dof_handler()
 {
   return dof_handler;
@@ -444,7 +443,7 @@ Laplace<dim>::refine_grid(const unsigned int cycle)
     }
 
   // 3.4. Solution Transfer
-  SolutionTransfer<dim, TrilinosWrappers::MPI::Vector, hp::DoFHandler<dim>>
+  SolutionTransfer<dim, TrilinosWrappers::MPI::Vector, DoFHandler<dim>>
     soltrans(dof_handler);
 
   // copy current functions

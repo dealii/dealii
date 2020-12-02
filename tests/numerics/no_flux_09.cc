@@ -32,14 +32,14 @@
 //(none)
 
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/lac/affine_constraints.h>
 

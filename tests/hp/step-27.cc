@@ -26,6 +26,7 @@
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -37,7 +38,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
 #include <deal.II/hp/refinement.h>
@@ -91,7 +91,7 @@ namespace Step27
 
     Triangulation<dim> triangulation;
 
-    hp::DoFHandler<dim>      dof_handler;
+    DoFHandler<dim>          dof_handler;
     hp::FECollection<dim>    fe_collection;
     hp::QCollection<dim>     quadrature_collection;
     hp::QCollection<dim - 1> face_quadrature_collection;
@@ -213,9 +213,9 @@ namespace Step27
 
     std::vector<types::global_dof_index> local_dof_indices;
 
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
-                                                       endc = dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
+                                                   endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
         const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
@@ -312,7 +312,7 @@ namespace Step27
       {
         Vector<float> fe_degrees(triangulation.n_active_cells());
         {
-          typename hp::DoFHandler<dim>::active_cell_iterator
+          typename DoFHandler<dim>::active_cell_iterator
             cell = dof_handler.begin_active(),
             endc = dof_handler.end();
           for (; cell != endc; ++cell)
@@ -320,7 +320,7 @@ namespace Step27
               fe_collection[cell->active_fe_index()].degree;
         }
 
-        DataOut<dim, hp::DoFHandler<dim>> data_out;
+        DataOut<dim, DoFHandler<dim>> data_out;
 
         data_out.attach_dof_handler(dof_handler);
         data_out.add_data_vector(solution, "solution");

@@ -28,6 +28,7 @@
 
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_dgq.h>
 
@@ -37,8 +38,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
-
 #include "../tests.h"
 
 
@@ -47,12 +46,12 @@ template <int dim>
 void
 test()
 {
-  Triangulation<dim>  tria;
-  hp::DoFHandler<dim> dof_handler(tria);
+  Triangulation<dim> tria;
+  DoFHandler<dim>    dof_handler(tria);
 
   GridGenerator::hyper_cube(tria);
 
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  for (typename DoFHandler<dim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)

@@ -20,13 +20,14 @@
 //
 // This test is inspired by 'mpi/hp_active_fe_indices_transfer_01.cc'.
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include "../tests.h"
@@ -43,7 +44,7 @@ test()
   tria.refine_global(1);
   deallog << "cells before: " << tria.n_active_cells() << std::endl;
 
-  hp::DoFHandler<dim>   dh(tria);
+  DoFHandler<dim>       dh(tria);
   hp::FECollection<dim> fe_collection;
 
   // prepare FECollection with arbitrary number of entries
@@ -51,8 +52,8 @@ test()
   for (unsigned int i = 0; i < max_degree; ++i)
     fe_collection.push_back(FE_Q<dim>(max_degree - i));
 
-  typename hp::DoFHandler<dim, dim>::active_cell_iterator cell;
-  unsigned int                                            i = 0;
+  typename DoFHandler<dim, dim>::active_cell_iterator cell;
+  unsigned int                                        i = 0;
 
   for (cell = dh.begin_active(); cell != dh.end(); ++cell)
     {

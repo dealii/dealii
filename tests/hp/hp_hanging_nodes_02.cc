@@ -56,7 +56,7 @@ run(bool random_p, unsigned int *indx)
 {
   Triangulation<dim>        triangulation;
   hp::FECollection<dim>     fe;
-  hp::DoFHandler<dim>       dof_handler(triangulation);
+  DoFHandler<dim>           dof_handler(triangulation);
   AffineConstraints<double> hanging_node_constraints;
 
   FE_Q<dim> fe_1(QIterated<1>(QTrapezoid<1>(), indx[0])),
@@ -78,9 +78,9 @@ run(bool random_p, unsigned int *indx)
   // Now to the p-Method. Assign
   // random active_fe_indices to the
   // different cells.
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   if (random_p)
     {
       for (; cell != endc; ++cell)

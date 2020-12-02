@@ -52,9 +52,9 @@
 
 
 
-template <typename DoFHandlerType>
+template <int dim>
 void
-check_this(const DoFHandlerType &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
   // create sparsity pattern
   SparsityPattern sp(dof_handler.n_dofs(),
@@ -110,7 +110,7 @@ check_this()
   DoFHandler<dim> dof_handler(tr);
   dof_handler.distribute_dofs(fe);
 
-  check_this<DoFHandler<dim>>(dof_handler);
+  check_this(dof_handler);
 }
 
 

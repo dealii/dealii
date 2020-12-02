@@ -25,7 +25,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include "../tests.h"
@@ -61,7 +60,7 @@ test()
   fe_collection.push_back(fe_system1);
   fe_collection.push_back(fe_system2);
 
-  hp::DoFHandler<dim> hp_dof_handler(triangulation);
+  DoFHandler<dim> hp_dof_handler(triangulation);
   hp_dof_handler.begin_active()->set_active_fe_index(1);
 
   // distribute dofs
@@ -74,8 +73,7 @@ test()
   for (unsigned int i = 0; i < 3; i++)
     {
       deallog << "DoFs in the " << i
-              << ". component for hp FE: " << dofs_per_component_hp.at(i)
-              << std::endl;
+              << ". component: " << dofs_per_component_hp.at(i) << std::endl;
     }
 }
 

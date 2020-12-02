@@ -30,6 +30,7 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -39,7 +40,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 
@@ -88,7 +88,7 @@ namespace Step40
 
     parallel::distributed::Triangulation<dim> triangulation;
 
-    hp::DoFHandler<dim>   dof_handler;
+    DoFHandler<dim>       dof_handler;
     hp::FECollection<dim> fe;
 
     IndexSet locally_owned_dofs;
@@ -199,9 +199,9 @@ namespace Step40
 
     std::vector<types::global_dof_index> local_dof_indices;
 
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
-                                                       endc = dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
+                                                   endc = dof_handler.end();
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
         {

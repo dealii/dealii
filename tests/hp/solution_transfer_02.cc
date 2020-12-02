@@ -61,7 +61,7 @@ transfer(std::ostream &out)
   // create a DoFHandler on which we
   // have both cells with FE_Q as
   // well as FE_Nothing
-  hp::DoFHandler<dim> dof_handler(tria);
+  DoFHandler<dim> dof_handler(tria);
   dof_handler.begin(0)->child(0)->set_active_fe_index(1);
 
   Vector<double>            solution;
@@ -74,8 +74,7 @@ transfer(std::ostream &out)
   for (unsigned int i = 0; i < solution.size(); ++i)
     solution(i) = i;
 
-  SolutionTransfer<dim, Vector<double>, hp::DoFHandler<dim>> soltrans(
-    dof_handler);
+  SolutionTransfer<dim, Vector<double>, DoFHandler<dim>> soltrans(dof_handler);
 
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
                                                     endc = tria.end();

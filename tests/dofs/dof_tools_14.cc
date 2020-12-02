@@ -19,22 +19,21 @@
 #include "../tests.h"
 
 #include "dof_tools_common.h"
-#include "dof_tools_common_fake_hp.h"
 
 // check
 //   DoFTools::count_boundary_dofs
 
 
 
-template <typename DoFHandlerType>
+template <int dim>
 void
-check_this(const DoFHandlerType &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
   // no other args
   deallog << dof_handler.n_boundary_dofs() << std::endl;
 
   // with std::map
-  std::map<types::boundary_id, const Function<DoFHandlerType::dimension> *> fm;
+  std::map<types::boundary_id, const Function<dim> *> fm;
   fm[0] = nullptr;
   deallog << dof_handler.n_boundary_dofs(fm) << std::endl;
 

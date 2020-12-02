@@ -21,11 +21,12 @@
 
 #include <deal.II/distributed/shared_tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/refinement.h>
 
@@ -66,8 +67,7 @@ test()
   for (unsigned int d = 1; d <= 2; ++d)
     fes.push_back(FE_Q<dim>(d));
 
-  hp::DoFHandler<dim> dh(tr);
-  dh.set_fe(fes);
+  DoFHandler<dim> dh(tr);
 
   // set flags
   for (auto cell = dh.begin(0); cell != dh.end(0); ++cell)
@@ -103,6 +103,8 @@ test()
             }
         }
     }
+
+  dh.distribute_dofs(fes);
 
   // decide between p and h flags
   hp::Refinement::choose_p_over_h(dh);

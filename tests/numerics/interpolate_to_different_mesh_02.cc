@@ -17,12 +17,13 @@
 
 #include <deal.II/base/quadrature_lib.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q_generic.h>
 
 #include <deal.II/grid/grid_generator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/numerics/vector_tools.h>
@@ -61,8 +62,8 @@ check(const unsigned int refinement_1, const unsigned int refinement_2)
   tria_1.refine_global(refinement_1);
   tria_2.refine_global(refinement_2);
 
-  hp::DoFHandler<spacedim> dof_handler_1(tria_1);
-  hp::DoFHandler<spacedim> dof_handler_2(tria_2);
+  DoFHandler<spacedim> dof_handler_1(tria_1);
+  DoFHandler<spacedim> dof_handler_2(tria_2);
 
   hp::FECollection<spacedim> fe_collection;
   fe_collection.push_back(FE_Q<spacedim>(2));

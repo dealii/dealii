@@ -59,9 +59,9 @@ const unsigned int dim = 2; // run in 2d to save time
 
 const double eps = 1e-10;
 
-template <typename DoFHandlerType>
+template <int dim>
 std::vector<dealii::IndexSet>
-locally_owned_dofs_per_subdomain(const DoFHandlerType &dof_handler)
+locally_owned_dofs_per_subdomain(const DoFHandler<dim> &dof_handler)
 {
   std::vector<dealii::types::subdomain_id> subdomain_association(
     dof_handler.n_dofs());

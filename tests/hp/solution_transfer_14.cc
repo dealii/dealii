@@ -20,6 +20,7 @@
 #include <deal.II/base/function.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -30,8 +31,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/lac/trilinos_vector.h>
 
@@ -62,7 +61,7 @@ transfer(const MPI_Comm &mpi_communicator)
   fe.push_back(FE_Q<dim>(1));
   fe.push_back(FE_Q<dim>(2));
 
-  hp::DoFHandler<dim> dof_handler(tria);
+  DoFHandler<dim> dof_handler(tria);
   dof_handler.begin(0)->child(0)->set_active_fe_index(1);
 
   TrilinosWrappers::MPI::Vector solution;
@@ -79,7 +78,7 @@ transfer(const MPI_Comm &mpi_communicator)
     if (locally_owned_dofs.is_element(i))
       solution(i) = i;
 
-  SolutionTransfer<dim, TrilinosWrappers::MPI::Vector, hp::DoFHandler<dim>>
+  SolutionTransfer<dim, TrilinosWrappers::MPI::Vector, DoFHandler<dim>>
     soltrans(dof_handler);
 
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),

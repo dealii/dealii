@@ -18,6 +18,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 
 #include <deal.II/fe/fe_dgp.h>
@@ -28,7 +29,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -44,7 +44,7 @@ template <int dim>
 void
 test(const Triangulation<dim> &tr, const hp::FECollection<dim> &fe)
 {
-  hp::DoFHandler<dim> dof(tr);
+  DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
 
   DoFRenumbering::component_wise(dof);

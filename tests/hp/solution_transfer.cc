@@ -18,6 +18,7 @@
 #include <deal.II/base/function.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_dgq.h>
@@ -30,7 +31,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 
@@ -83,8 +83,8 @@ transfer(std::ostream &out)
       fe_q.push_back(FE_Q<dim>(deg));
       fe_dgq.push_back(FE_DGQ<dim>(deg));
     }
-  hp::DoFHandler<dim>  q_dof_handler(tria);
-  hp::DoFHandler<dim>  dgq_dof_handler(tria);
+  DoFHandler<dim>      q_dof_handler(tria);
+  DoFHandler<dim>      dgq_dof_handler(tria);
   Vector<double>       q_solution;
   Vector<double>       dgq_solution;
   MappingQGeneric<dim> mapping(1);
@@ -102,7 +102,7 @@ transfer(std::ostream &out)
   // randomly assign FE orders
   unsigned int counter = 0;
   {
-    typename hp::DoFHandler<dim>::active_cell_iterator
+    typename DoFHandler<dim>::active_cell_iterator
       cell   = q_dof_handler.begin_active(),
       celldg = dgq_dof_handler.begin_active(), endc = q_dof_handler.end();
     for (; cell != endc; ++cell, ++celldg, ++counter)
@@ -129,9 +129,9 @@ transfer(std::ostream &out)
   VectorTools::interpolate(mapping, q_dof_handler, function, q_solution);
   VectorTools::interpolate(mapping, dgq_dof_handler, function, dgq_solution);
 
-  SolutionTransfer<dim, Vector<double>, hp::DoFHandler<dim>> q_soltrans(
+  SolutionTransfer<dim, Vector<double>, DoFHandler<dim>> q_soltrans(
     q_dof_handler);
-  SolutionTransfer<dim, Vector<double>, hp::DoFHandler<dim>> dgq_soltrans(
+  SolutionTransfer<dim, Vector<double>, DoFHandler<dim>> dgq_soltrans(
     dgq_dof_handler);
 
 
@@ -161,7 +161,7 @@ transfer(std::ostream &out)
 
   counter = 0;
   {
-    typename hp::DoFHandler<dim>::active_cell_iterator
+    typename DoFHandler<dim>::active_cell_iterator
       cell   = q_dof_handler.begin_active(),
       celldg = dgq_dof_handler.begin_active(), endc = q_dof_handler.end();
     for (; cell != endc; ++cell, ++celldg, ++counter)
@@ -188,16 +188,15 @@ transfer(std::ostream &out)
   // on points of QGauss of order 2.
   MyFunction<dim> func;
   {
-    double                                             error = 0;
-    const hp::QCollection<dim>                         quad(QGauss<dim>(2));
-    hp::FEValues<dim>                                  hp_fe_val(fe_q,
+    double                                         error = 0;
+    const hp::QCollection<dim>                     quad(QGauss<dim>(2));
+    hp::FEValues<dim>                              hp_fe_val(fe_q,
                                 quad,
                                 update_values | update_quadrature_points);
-    std::vector<double>                                vals(quad[0].size());
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = q_dof_handler
-                                                                .begin_active(),
-                                                       endc =
-                                                         q_dof_handler.end();
+    std::vector<double>                            vals(quad[0].size());
+    typename DoFHandler<dim>::active_cell_iterator cell = q_dof_handler
+                                                            .begin_active(),
+                                                   endc = q_dof_handler.end();
     for (; cell != endc; ++cell)
       {
         hp_fe_val.reinit(cell, 0);
@@ -212,15 +211,15 @@ transfer(std::ostream &out)
     deallog << "Error in interpolating hp FE_Q: " << error << std::endl;
   }
   {
-    double                     error = 0;
-    const hp::QCollection<dim> quad(QGauss<dim>(2));
-    hp::FEValues<dim>          hp_fe_val(fe_dgq,
+    double                                         error = 0;
+    const hp::QCollection<dim>                     quad(QGauss<dim>(2));
+    hp::FEValues<dim>                              hp_fe_val(fe_dgq,
                                 quad,
                                 update_values | update_quadrature_points);
-    std::vector<double>        vals(quad[0].size());
-    typename hp::DoFHandler<dim>::active_cell_iterator
-      celldg = dgq_dof_handler.begin_active(),
-      endc   = dgq_dof_handler.end();
+    std::vector<double>                            vals(quad[0].size());
+    typename DoFHandler<dim>::active_cell_iterator celldg = dgq_dof_handler
+                                                              .begin_active(),
+                                                   endc = dgq_dof_handler.end();
     for (; celldg != endc; ++celldg)
       {
         hp_fe_val.reinit(celldg, 0);

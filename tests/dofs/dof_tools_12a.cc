@@ -21,9 +21,9 @@
 // extracted vector of the global DoF, which has to be mapped with the locally
 // owned IndexSet first.
 
-template <typename DoFHandlerType>
+template <int dim>
 void
-check_this(const DoFHandlerType &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
   std::vector<bool> mask(dof_handler.get_fe_collection().n_components(), false);
 

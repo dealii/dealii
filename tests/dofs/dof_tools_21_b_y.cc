@@ -177,10 +177,10 @@ main()
   // Generate a triangulation and match:
   Triangulation<2> triangulation;
   FE_Q<2>          fe(1);
-  DoFHandler<2>    dof_handler;
+  DoFHandler<2>    dof_handler(triangulation);
 
   generate_grid(triangulation);
-  dof_handler.initialize(triangulation, fe);
+  dof_handler.distribute_dofs(fe);
   print_matching(dof_handler);
 
   return 0;

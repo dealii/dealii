@@ -98,10 +98,7 @@ test()
       level_vectors[level].update_ghost_values();
     }
 
-  MappingFEField<dim,
-                 spacedim,
-                 LinearAlgebra::distributed::Vector<double>,
-                 DoFHandler<dim>>
+  MappingFEField<dim, spacedim, LinearAlgebra::distributed::Vector<double>>
     mapping(dh, level_vectors);
 
   QGauss<dim>   quad(1);

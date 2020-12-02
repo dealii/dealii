@@ -21,11 +21,12 @@
 
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include "../tests.h"
@@ -46,8 +47,7 @@ test()
   for (unsigned int i = 0; i < std::pow(2, dim); ++i)
     fe.push_back(FE_Q<dim>(1));
 
-  hp::DoFHandler<dim> dh(tria);
-  dh.set_fe(fe);
+  DoFHandler<dim> dh(tria);
 
   // set future_fe_indices
   unsigned int future_feidx = 0;
@@ -61,6 +61,7 @@ test()
         future_feidx = ((future_feidx + 1) < fe.size()) ? future_feidx + 1 : 0;
       }
 
+  dh.distribute_dofs(fe);
   tria.execute_coarsening_and_refinement();
 
   // check if all flags were cleared and verify fe_indices

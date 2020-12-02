@@ -30,6 +30,8 @@
 
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
@@ -37,7 +39,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <numeric>
@@ -70,7 +71,7 @@ test()
   fe.push_back(FE_Q<dim>(2));
   fe.push_back(FE_Q<dim>(2));
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
   for (auto &cell : dof_handler.active_cell_iterators())
     {
       if (cell->is_locally_owned())

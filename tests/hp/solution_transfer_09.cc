@@ -18,6 +18,7 @@
 // Like _07 but with all same fe indices. This triggered yet another place
 // where we had the same kind of error.
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_nothing.h>
@@ -28,7 +29,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/numerics/data_out.h>
@@ -52,7 +52,7 @@ test()
   fe_collection.push_back(FE_Q<dim>(1));
   fe_collection.push_back(FE_Q<dim>(2));
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
   dof_handler.begin_active()->set_active_fe_index(0);
   dof_handler.distribute_dofs(fe_collection);
 
@@ -62,7 +62,7 @@ test()
 
 
   // set refine flag for the only cell we have, then do the refinement
-  SolutionTransfer<dim, Vector<double>, hp::DoFHandler<dim>> solution_trans(
+  SolutionTransfer<dim, Vector<double>, DoFHandler<dim>> solution_trans(
     dof_handler);
   dof_handler.begin_active()->set_refine_flag();
   solution_trans.prepare_for_pure_refinement();

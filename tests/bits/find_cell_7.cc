@@ -21,6 +21,8 @@
 // the bug here is the same as in find_cell_6 but when calling the
 // function with hp:: arguments
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q1.h>
 
@@ -32,7 +34,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/mapping_collection.h>
 
@@ -80,7 +81,7 @@ check2()
   fes.push_back(FE_Q<3>(1));
   fes.push_back(FE_Q<3>(1));
 
-  hp::DoFHandler<3> dof_handler(tria);
+  DoFHandler<3> dof_handler(tria);
   dof_handler.distribute_dofs(fes);
 
   GridTools::find_active_cell_around_point(mappings,

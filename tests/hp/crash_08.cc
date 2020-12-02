@@ -23,6 +23,7 @@
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -33,8 +34,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
@@ -71,10 +70,10 @@ main()
   fe.push_back(FE_Q<2>(2));
   fe.push_back(FE_Q<2>(QIterated<1>(QTrapezoid<1>(), 3)));
 
-  hp::DoFHandler<2> dof_handler(triangulation);
+  DoFHandler<2> dof_handler(triangulation);
 
   // subdivide cells 1, 3, 5, 7
-  hp::DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active();
+  DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active();
   ++cell;
   cell->set_refine_flag();
   ++cell;

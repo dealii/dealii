@@ -17,6 +17,7 @@
 
 // a hp-ified version of step-2
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -28,8 +29,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/lac/sparse_matrix.h>
 
@@ -72,7 +71,7 @@ void make_grid(Triangulation<2> &triangulation)
 }
 
 
-void distribute_dofs(hp::DoFHandler<2> &dof_handler)
+void distribute_dofs(DoFHandler<2> &dof_handler)
 {
   static const hp::FECollection<2> finite_element(FE_Q<2>(1));
   dof_handler.distribute_dofs(finite_element);
@@ -89,7 +88,7 @@ void distribute_dofs(hp::DoFHandler<2> &dof_handler)
 
 
 
-void renumber_dofs(hp::DoFHandler<2> &dof_handler)
+void renumber_dofs(DoFHandler<2> &dof_handler)
 {
   DoFRenumbering::Cuthill_McKee(dof_handler);
   SparsityPattern sparsity_pattern(dof_handler.n_dofs(), dof_handler.n_dofs());
@@ -111,7 +110,7 @@ main()
   Triangulation<2> triangulation;
   make_grid(triangulation);
 
-  hp::DoFHandler<2> dof_handler(triangulation);
+  DoFHandler<2> dof_handler(triangulation);
 
   distribute_dofs(dof_handler);
   renumber_dofs(dof_handler);

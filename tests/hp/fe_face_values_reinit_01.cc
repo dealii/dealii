@@ -19,6 +19,7 @@
 
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_nothing.h>
@@ -31,7 +32,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 
@@ -50,7 +50,7 @@ test()
   hp::QCollection<dim - 1>   quad_collection(QGauss<dim - 1>(2));
   hp::MappingCollection<dim> mapping_collection(MappingQ<dim, spacedim>(1));
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   dof_handler.distribute_dofs(fe_collection);
 

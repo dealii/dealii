@@ -21,6 +21,7 @@
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_nothing.h>
@@ -34,7 +35,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/lac/sparsity_pattern.h>
@@ -71,11 +71,9 @@ private:
   };
 
   static bool
-  cell_is_in_omega1_domain(
-    const typename hp::DoFHandler<dim>::cell_iterator &cell);
+  cell_is_in_omega1_domain(const typename DoFHandler<dim>::cell_iterator &cell);
   static bool
-  cell_is_in_omega2_domain(
-    const typename hp::DoFHandler<dim>::cell_iterator &cell);
+  cell_is_in_omega2_domain(const typename DoFHandler<dim>::cell_iterator &cell);
   void
   set_active_fe_indices();
   void
@@ -90,7 +88,7 @@ private:
   FESystem<dim>                             omega1_fe;
   FESystem<dim>                             omega2_fe;
   hp::FECollection<dim>                     fe_collection;
-  hp::DoFHandler<dim>                       dof_handler;
+  DoFHandler<dim>                           dof_handler;
   QGauss<dim>                               quadrature_formula;
   QGauss<dim - 1>                           face_quadrature_formula;
   SparsityPattern                           sparsity_pattern;
@@ -156,14 +154,14 @@ public:
 template <int dim>
 bool
 diffusionMechanics<dim>::cell_is_in_omega1_domain(
-  const typename hp::DoFHandler<dim>::cell_iterator &cell)
+  const typename DoFHandler<dim>::cell_iterator &cell)
 {
   return (cell->material_id() == omega1_domain_id);
 }
 template <int dim>
 bool
 diffusionMechanics<dim>::cell_is_in_omega2_domain(
-  const typename hp::DoFHandler<dim>::cell_iterator &cell)
+  const typename DoFHandler<dim>::cell_iterator &cell)
 {
   return (cell->material_id() == omega2_domain_id);
 }
@@ -173,7 +171,7 @@ template <int dim>
 void
 diffusionMechanics<dim>::set_active_fe_indices()
 {
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  for (typename DoFHandler<dim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
