@@ -78,15 +78,20 @@ namespace internal
     virtual void
     cell(const std::pair<unsigned int, unsigned int> &cell_range) = 0;
 
+    /// Runs the cell work specified by MatrixFree::loop or
+    /// MatrixFree::cell_loop
+    virtual void
+    cell(const unsigned int range_index) = 0;
+
     /// Runs the body of the work on interior faces specified by
     /// MatrixFree::loop
     virtual void
-    face(const std::pair<unsigned int, unsigned int> &face_range) = 0;
+    face(const unsigned int range_index) = 0;
 
     /// Runs the body of the work on boundary faces specified by
     /// MatrixFree::loop
     virtual void
-    boundary(const std::pair<unsigned int, unsigned int> &face_range) = 0;
+    boundary(const unsigned int range_index) = 0;
   };
 
 
@@ -469,6 +474,19 @@ namespace internal
       std::vector<unsigned int> cell_partition_data;
 
       /**
+       * Like cell_partition_data but with precomputed subranges for each
+       * active fe index. The start and end point of a partition is given
+       * by cell_partition_data_hp_ptr.
+       */
+      std::vector<unsigned int> cell_partition_data_hp;
+
+      /**
+       * Pointers within cell_partition_data_hp, indicating the start and end
+       * of a partition.
+       */
+      std::vector<unsigned int> cell_partition_data_hp_ptr;
+
+      /**
        * This is a linear storage of all partitions of inner faces, building a
        * range of indices of the form face_partition_data[idx] to
        * face_partition_data[idx+1] within the integer list of all interior
@@ -478,6 +496,19 @@ namespace internal
       std::vector<unsigned int> face_partition_data;
 
       /**
+       * Like face_partition_data but with precomputed subranges for each
+       * active fe index pair. The start and end point of a partition is given
+       * by face_partition_data_hp_ptr.
+       */
+      std::vector<unsigned int> face_partition_data_hp;
+
+      /**
+       * Pointers within face_partition_data_hp, indicating the start and end
+       * of a partition.
+       */
+      std::vector<unsigned int> face_partition_data_hp_ptr;
+
+      /**
        * This is a linear storage of all partitions of boundary faces,
        * building a range of indices of the form boundary_partition_data[idx]
        * to boundary_partition_data[idx+1] within the integer list of all
@@ -485,6 +516,19 @@ namespace internal
        * partition_row_index.
        */
       std::vector<unsigned int> boundary_partition_data;
+
+      /**
+       * Like boundary_partition_data but with precomputed subranges for each
+       * active fe index. The start and end point of a partition is given
+       * by boundary_partition_data_hp_ptr.
+       */
+      std::vector<unsigned int> boundary_partition_data_hp;
+
+      /**
+       * Pointers within boundary_partition_data_hp, indicating the start and
+       * end of a partition.
+       */
+      std::vector<unsigned int> boundary_partition_data_hp_ptr;
 
       /**
        * This is a linear storage of all partitions of interior faces on

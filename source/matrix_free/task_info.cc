@@ -77,19 +77,12 @@ namespace internal
           MFWorkerInterface *used_worker =
             worker != nullptr ? worker : *worker_pointer;
           Assert(used_worker != nullptr, ExcInternalError());
-          used_worker->cell(
-            std::make_pair(task_info.cell_partition_data[partition],
-                           task_info.cell_partition_data[partition + 1]));
+          used_worker->cell(partition);
 
           if (task_info.face_partition_data.empty() == false)
             {
-              used_worker->face(
-                std::make_pair(task_info.face_partition_data[partition],
-                               task_info.face_partition_data[partition + 1]));
-
-              used_worker->boundary(std::make_pair(
-                task_info.boundary_partition_data[partition],
-                task_info.boundary_partition_data[partition + 1]));
+              used_worker->face(partition);
+              used_worker->boundary(partition);
             }
         }
 
@@ -607,20 +600,16 @@ namespace internal
                   AssertIndexRange(i + 1, cell_partition_data.size());
                   if (cell_partition_data[i + 1] > cell_partition_data[i])
                     {
-                      funct.cell(std::make_pair(cell_partition_data[i],
-                                                cell_partition_data[i + 1]));
+                      funct.cell(i);
                     }
 
                   if (face_partition_data.empty() == false)
                     {
                       if (face_partition_data[i + 1] > face_partition_data[i])
-                        funct.face(std::make_pair(face_partition_data[i],
-                                                  face_partition_data[i + 1]));
+                        funct.face(i);
                       if (boundary_partition_data[i + 1] >
                           boundary_partition_data[i])
-                        funct.boundary(
-                          std::make_pair(boundary_partition_data[i],
-                                         boundary_partition_data[i + 1]));
+                        funct.boundary(i);
                     }
                   funct.cell_loop_post_range(i);
                 }
