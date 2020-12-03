@@ -28,7 +28,7 @@ MACRO(ENABLE_IF_SUPPORTED _variable _flag)
   # actual errors with the -Werror switch:
   #
   IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    SET(_werror_string "-Werror ")
+    SET(_werror_string "")
   ELSE()
     SET(_werror_string "")
   ENDIF()

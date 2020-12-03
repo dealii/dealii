@@ -20,7 +20,7 @@ jobs:
         cmake --version
     - name: configure
       run: |
-        cmake -D CMAKE_BUILD_TYPE=Debug -D DEAL_II_CXX_FLAGS='-Werror' .
+        cmake CXX=g++ -D CMAKE_BUILD_TYPE=Debug -D CMAKE_CXX_FLAGS="-std=c++14" -D DEAL_II_CXX_FLAGS='-Werror' .
     - name: archive
       uses: actions/upload-artifact@v1
       with:
@@ -54,7 +54,7 @@ jobs:
         cmake --version
     - name: configure
       run: |
-        CC=mpicc CXX=mpic++ cmake -D CMAKE_BUILD_TYPE=Debug -D DEAL_II_WITH_64BIT_INDICES=ON -D DEAL_II_CXX_FLAGS='-Werror' -D DEAL_II_WITH_MPI=on .
+        CC=mpicc CXX=mpic++ cmake -D CMAKE_BUILD_TYPE=Debug -D DEAL_II_WITH_64BIT_INDICES=ON -D CMAKE_CXX_FLAGS="-std=c++14" -D DEAL_II_CXX_FLAGS='-Werror' -D DEAL_II_WITH_MPI=on .
     - name: archive
       uses: actions/upload-artifact@v1
       with:
