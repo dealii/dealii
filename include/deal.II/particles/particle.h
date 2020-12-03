@@ -429,7 +429,10 @@ namespace Particles
 
     /**
      * Read the data of this object from a stream for the purpose of
-     * serialization.
+     * serialization. Note that in order to store the properties
+     * correctly, the property pool of this particle has to
+     * be known at the time of reading, i.e. set_property_pool()
+     * has to have been called, before this function is called.
      */
     template <class Archive>
     void
@@ -496,8 +499,18 @@ namespace Particles
 
     if (n_properties > 0)
       {
-        properties = new double[n_properties];
-        ar &boost::serialization::make_array(properties, n_properties);
+        ArrayView<double> properties(get_properties());
+        Assert(
+          properties.size() == n_properties,
+          ExcMessage(
+            "This particle was serialized with " +
+            std::to_string(n_properties) +
+            " properties, but the new property handler provides space for " +
+            std::to_string(properties.size()) +
+            " properties. Deserializing a particle only works for matching property sizes."));
+
+        ar &boost::serialization::make_array(get_properties().data(),
+                                             n_properties);
       }
   }
 
@@ -516,7 +529,8 @@ namespace Particles
     ar &location &reference_location &id &n_properties;
 
     if (n_properties > 0)
-      ar &boost::serialization::make_array(properties, n_properties);
+      ar &boost::serialization::make_array(get_properties().data(),
+                                           n_properties);
   }
 
 
@@ -589,7 +603,7 @@ namespace Particles
 
         ArrayView<double> old_properties = this->get_properties();
         ArrayView<double> new_properties =
-          property_pool->get_properties(new_handle);
+          new_property_pool.get_properties(new_handle);
         std::copy(old_properties.cbegin(),
                   old_properties.cend(),
                   new_properties.begin());

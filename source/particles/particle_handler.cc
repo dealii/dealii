@@ -87,6 +87,7 @@ namespace Particles
   template <int dim, int spacedim>
   ParticleHandler<dim, spacedim>::ParticleHandler()
     : triangulation()
+    , mapping()
     , property_pool(std::make_unique<PropertyPool>(0))
     , particles()
     , ghost_particles()
@@ -159,6 +160,8 @@ namespace Particles
     initialize(*particle_handler.triangulation,
                *particle_handler.mapping,
                n_properties);
+    property_pool->reserve(particle_handler.particles.size() +
+                           particle_handler.ghost_particles.size());
 
     // copy static members
     global_number_of_particles = particle_handler.global_number_of_particles;
@@ -177,7 +180,6 @@ namespace Particles
     for (auto &particle : *this)
       {
         particle.set_property_pool(*property_pool);
-        particle.set_properties(from_particle->get_properties());
         ++from_particle;
       }
 
@@ -186,7 +188,6 @@ namespace Particles
          ++ghost, ++from_ghost)
       {
         ghost->set_property_pool(*property_pool);
-        ghost->set_properties(from_ghost->get_properties());
       }
   }
 
@@ -209,6 +210,11 @@ namespace Particles
   ParticleHandler<dim, spacedim>::clear_particles()
   {
     particles.clear();
+    ghost_particles.clear();
+
+    // the particle properties have already been deleted by their destructor,
+    // but the memory is still allocated. Return the memory as well.
+    property_pool->clear();
   }
 
 

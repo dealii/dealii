@@ -63,6 +63,12 @@ test()
     Particles::ParticleHandler<dim, spacedim> particle_handler_copy;
     particle_handler_copy.copy_from(particle_handler);
 
+    // Make sure the old particle handler and the property pool
+    // are cleared. This catches problems if the new particles try to access
+    // old memory addresses (this was a bug, fixed in
+    // https://github.com/dealii/dealii/pull/11314)
+    particle_handler.clear();
+
     for (const auto &particle : particle_handler_copy)
       deallog << "After copying particle id " << particle.get_id()
               << " has first property " << particle.get_properties()[0]
