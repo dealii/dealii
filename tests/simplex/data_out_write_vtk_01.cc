@@ -31,6 +31,7 @@
 
 #include <deal.II/simplex/fe_lib.h>
 #include <deal.II/simplex/grid_generator.h>
+#include <deal.II/simplex/quadrature_lib.h>
 
 #include "../tests.h"
 
@@ -66,10 +67,15 @@ test(const FiniteElement<dim, spacedim> &fe, const unsigned int n_components)
 
   MappingFE<dim> mapping(Simplex::FE_P<dim>(1));
 
-  VectorTools::interpolate(mapping,
-                           dof_handler,
-                           RightHandSideFunction<dim>(n_components),
-                           solution);
+  AffineConstraints<double> dummy;
+  dummy.close();
+
+  VectorTools::project(mapping,
+                       dof_handler,
+                       dummy,
+                       Simplex::QGauss<dim>(fe.tensor_degree() + 1),
+                       RightHandSideFunction<dim>(n_components),
+                       solution);
 
   static unsigned int counter = 0;
 
