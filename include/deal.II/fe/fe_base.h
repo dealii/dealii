@@ -511,7 +511,9 @@ public:
                     const BlockIndices &block_indices = BlockIndices());
 
   /**
-   * Return type of reference cell.
+   * Return the kind of reference cell this element is defined on: For
+   * example, whether the element's reference cell is a square or
+   * triangle, or similar choices in higher dimensions.
    */
   ReferenceCell::Type
   reference_cell_type() const;
