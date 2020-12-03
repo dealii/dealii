@@ -71,6 +71,31 @@ namespace MatrixFreeTools
     const unsigned int                                              quad_no = 0,
     const unsigned int first_selected_component = 0);
 
+  /**
+   * Same as above but with a class and a function pointer.
+   */
+  template <typename CLASS,
+            int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components,
+            typename Number,
+            typename VectorizedArrayType>
+  void
+  compute_diagonal(
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+    LinearAlgebra::distributed::Vector<Number> &        diagonal_global,
+    void (CLASS::*cell_operation)(FEEvaluation<dim,
+                                               fe_degree,
+                                               n_q_points_1d,
+                                               n_components,
+                                               Number,
+                                               VectorizedArrayType> &) const,
+    CLASS *            owning_class,
+    const unsigned int dof_no                   = 0,
+    const unsigned int quad_no                  = 0,
+    const unsigned int first_selected_component = 0);
+
 
   /**
    * Compute the matrix representation of a linear operator (@p matrix), given
@@ -565,6 +590,42 @@ namespace MatrixFreeTools
       diagonal_global,
       dummy,
       false);
+  }
+
+  template <typename CLASS,
+            int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components,
+            typename Number,
+            typename VectorizedArrayType>
+  void
+  compute_diagonal(
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+    LinearAlgebra::distributed::Vector<Number> &        diagonal_global,
+    void (CLASS::*cell_operation)(FEEvaluation<dim,
+                                               fe_degree,
+                                               n_q_points_1d,
+                                               n_components,
+                                               Number,
+                                               VectorizedArrayType> &) const,
+    CLASS *            owning_class,
+    const unsigned int dof_no,
+    const unsigned int quad_no,
+    const unsigned int first_selected_component)
+  {
+    compute_diagonal<dim,
+                     fe_degree,
+                     n_q_points_1d,
+                     n_components,
+                     Number,
+                     VectorizedArrayType>(
+      matrix_free,
+      diagonal_global,
+      [&](auto &feeval) { (owning_class->*cell_operation)(feeval); },
+      dof_no,
+      quad_no,
+      first_selected_component);
   }
 
   template <int dim,
