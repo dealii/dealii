@@ -1412,9 +1412,7 @@ namespace Differentiation
      *       ad_helper.register_dof_values(solution, local_dof_indices);
      *
      *       // Then we get the complete set of degree of freedom values as
-     *       // represented by auto-differentiable numbers. The operations
-     *       // performed with these variables are tracked by the AD library
-     *       // from this point until stop_recording_operations() is called.
+     *       // represented by auto-differentiable numbers.
      *       const std::vector<ADNumberType> dof_values_ad
      *         = ad_helper.get_sensitive_dof_values();
      *
@@ -3013,7 +3011,7 @@ namespace Differentiation
      *       0.5*mu_0*mu_r*J*H_AD*C_inv_AD*H_AD;
      *
      *     // Register the definition of the total stored energy
-     *     ad_helper.register_dependent_variable(psi_CH);
+     *     ad_helper.register_dependent_variable(psi);
      *
      *     // Indicate that we have completed tracing the operations onto
      *     // the tape.
