@@ -2557,6 +2557,19 @@ public:
     const unsigned int active_quad_index = numbers::invalid_unsigned_int);
 
   /**
+   * Constructor. Takes all data stored in MatrixFree for a given cell range,
+   * which allows to automatically identify the active_fe_index and
+   * active_quad_index in case of a p-adaptive strategy.
+   *
+   * The rest of the arguments are the same as in the constructor above.
+   */
+  FEEvaluation(const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+               const std::pair<unsigned int, unsigned int> &       range,
+               const unsigned int                                  dof_no  = 0,
+               const unsigned int                                  quad_no = 0,
+               const unsigned int first_selected_component                 = 0);
+
+  /**
    * Constructor that comes with reduced functionality and works similar as
    * FEValues. The arguments are similar to the ones passed to the constructor
    * of FEValues, with the notable difference that FEEvaluation expects a one-
@@ -3041,6 +3054,21 @@ public:
     const unsigned int active_quad_index = numbers::invalid_unsigned_int);
 
   /**
+   * Constructor. Takes all data stored in MatrixFree for a given face range,
+   * which allows to automatically identify the active_fe_index and
+   * active_quad_index in case of a p-adaptive strategy.
+   *
+   * The rest of the arguments are the same as in the constructor above.
+   */
+  FEFaceEvaluation(
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+    const std::pair<unsigned int, unsigned int> &       range,
+    const bool                                          is_interior_face = true,
+    const unsigned int                                  dof_no           = 0,
+    const unsigned int                                  quad_no          = 0,
+    const unsigned int first_selected_component                          = 0);
+
+  /**
    * Initializes the operation pointer to the current face. This method is the
    * default choice for face integration as the data stored in MappingInfo is
    * stored according to this numbering. Unlike the reinit functions taking a
@@ -3295,16 +3323,24 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
                       (active_fe_index_in != numbers::invalid_unsigned_int ?
                          active_fe_index_in :
                          0))
-  , active_quad_index(fe_degree != numbers::invalid_unsigned_int ?
-                        (is_face ? data_in.get_mapping_info()
-                                     .face_data[quad_no_in]
-                                     .quad_index_from_n_q_points(n_q_points) :
-                                   data_in.get_mapping_info()
-                                     .cell_data[quad_no_in]
-                                     .quad_index_from_n_q_points(n_q_points)) :
-                        (active_quad_index_in != numbers::invalid_unsigned_int ?
-                           active_quad_index_in :
-                           0))
+  , active_quad_index(
+      fe_degree != numbers::invalid_unsigned_int ?
+        (is_face ? data_in.get_mapping_info()
+                     .face_data[quad_no_in]
+                     .quad_index_from_n_q_points(n_q_points) :
+                   data_in.get_mapping_info()
+                     .cell_data[quad_no_in]
+                     .quad_index_from_n_q_points(n_q_points)) :
+        (active_quad_index_in != numbers::invalid_unsigned_int ?
+           active_quad_index_in :
+           std::min<unsigned int>(active_fe_index,
+                                  (is_face ? data_in.get_mapping_info()
+                                               .face_data[quad_no_in]
+                                               .descriptor.size() :
+                                             data_in.get_mapping_info()
+                                               .cell_data[quad_no_in]
+                                               .descriptor.size()) -
+                                    1)))
   , n_quadrature_points(
       fe_degree != numbers::invalid_unsigned_int ?
         n_q_points :
@@ -7222,6 +7258,32 @@ inline FEEvaluation<dim,
                     n_components_,
                     Number,
                     VectorizedArrayType>::
+  FEEvaluation(const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+               const std::pair<unsigned int, unsigned int> &       range,
+               const unsigned int                                  dof_no,
+               const unsigned int                                  quad_no,
+               const unsigned int first_selected_component)
+  : FEEvaluation(matrix_free,
+                 dof_no,
+                 quad_no,
+                 first_selected_component,
+                 matrix_free.get_cell_active_fe_index(range))
+{}
+
+
+
+template <int dim,
+          int fe_degree,
+          int n_q_points_1d,
+          int n_components_,
+          typename Number,
+          typename VectorizedArrayType>
+inline FEEvaluation<dim,
+                    fe_degree,
+                    n_q_points_1d,
+                    n_components_,
+                    Number,
+                    VectorizedArrayType>::
   FEEvaluation(const Mapping<dim> &      mapping,
                const FiniteElement<dim> &fe,
                const Quadrature<1> &     quadrature,
@@ -8317,6 +8379,36 @@ inline FEFaceEvaluation<dim,
   , dofs_per_component(this->data->dofs_per_component_on_cell)
   , dofs_per_cell(this->data->dofs_per_component_on_cell * n_components_)
   , n_q_points(this->data->n_q_points_face)
+{}
+
+
+
+template <int dim,
+          int fe_degree,
+          int n_q_points_1d,
+          int n_components_,
+          typename Number,
+          typename VectorizedArrayType>
+inline FEFaceEvaluation<dim,
+                        fe_degree,
+                        n_q_points_1d,
+                        n_components_,
+                        Number,
+                        VectorizedArrayType>::
+  FEFaceEvaluation(
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+    const std::pair<unsigned int, unsigned int> &       range,
+    const bool                                          is_interior_face,
+    const unsigned int                                  dof_no,
+    const unsigned int                                  quad_no,
+    const unsigned int first_selected_component)
+  : FEFaceEvaluation(matrix_free,
+                     is_interior_face,
+                     dof_no,
+                     quad_no,
+                     first_selected_component,
+                     matrix_free.get_face_active_fe_index(range,
+                                                          is_interior_face))
 {}
 
 
