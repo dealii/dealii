@@ -81,7 +81,7 @@ namespace internal
     void
     get_element_type_specific_information(
       const FiniteElement<dim, dim> &fe_in,
-      const FiniteElement<dim, dim> *fe,
+      const FiniteElement<dim, dim> &fe,
       const unsigned int             base_element_number,
       ElementType &                  element_type,
       std::vector<unsigned int> &    scalar_lexicographic,
@@ -89,13 +89,13 @@ namespace internal
     {
       element_type = tensor_general;
 
-      const auto fe_poly = dynamic_cast<const FE_Poly<dim, dim> *>(fe);
+      const auto fe_poly = dynamic_cast<const FE_Poly<dim, dim> *>(&fe);
 
-      if (dynamic_cast<const Simplex::FE_P<dim, dim> *>(fe) != nullptr ||
-          dynamic_cast<const Simplex::FE_DGP<dim, dim> *>(fe) != nullptr ||
-          dynamic_cast<const Simplex::FE_WedgeP<dim, dim> *>(fe) != nullptr)
+      if (dynamic_cast<const Simplex::FE_P<dim, dim> *>(&fe) != nullptr ||
+          dynamic_cast<const Simplex::FE_DGP<dim, dim> *>(&fe) != nullptr ||
+          dynamic_cast<const Simplex::FE_WedgeP<dim, dim> *>(&fe) != nullptr)
         {
-          scalar_lexicographic.resize(fe->n_dofs_per_cell());
+          scalar_lexicographic.resize(fe.n_dofs_per_cell());
           for (unsigned int i = 0; i < scalar_lexicographic.size(); ++i)
             scalar_lexicographic[i] = i;
           element_type = tensor_none;
@@ -108,19 +108,19 @@ namespace internal
                     Polynomials::PiecewisePolynomial<double>> *>(
                   &fe_poly->get_poly_space()) != nullptr))
         scalar_lexicographic = fe_poly->get_poly_space_numbering_inverse();
-      else if (const auto fe_dgp = dynamic_cast<const FE_DGP<dim> *>(fe))
+      else if (const auto fe_dgp = dynamic_cast<const FE_DGP<dim> *>(&fe))
         {
           scalar_lexicographic.resize(fe_dgp->n_dofs_per_cell());
           for (unsigned int i = 0; i < fe_dgp->n_dofs_per_cell(); ++i)
             scalar_lexicographic[i] = i;
           element_type = truncated_tensor;
         }
-      else if (const auto fe_q_dg0 = dynamic_cast<const FE_Q_DG0<dim> *>(fe))
+      else if (const auto fe_q_dg0 = dynamic_cast<const FE_Q_DG0<dim> *>(&fe))
         {
           scalar_lexicographic = fe_q_dg0->get_poly_space_numbering_inverse();
           element_type         = tensor_symmetric_plus_dg0;
         }
-      else if (fe->n_dofs_per_cell() == 0)
+      else if (fe.n_dofs_per_cell() == 0)
         {
           // FE_Nothing case -> nothing to do here
         }
@@ -155,7 +155,7 @@ namespace internal
           // have undefined blocks
           lexicographic_numbering.resize(fe_in.element_multiplicity(
                                            base_element_number) *
-                                           fe->n_dofs_per_cell(),
+                                           fe.n_dofs_per_cell(),
                                          numbers::invalid_unsigned_int);
           for (unsigned int i = 0; i < lexicographic.size(); ++i)
             if (lexicographic[i] != numbers::invalid_unsigned_int)
@@ -380,7 +380,7 @@ namespace internal
 
           std::vector<unsigned int> scalar_lexicographic;
           get_element_type_specific_information(fe_in,
-                                                fe,
+                                                *fe,
                                                 base_element_number,
                                                 element_type,
                                                 scalar_lexicographic,
@@ -456,7 +456,7 @@ namespace internal
                ExcMessage("Expected a scalar element"));
 
         get_element_type_specific_information(fe_in,
-                                              fe,
+                                              *fe,
                                               base_element_number,
                                               element_type,
                                               scalar_lexicographic,
