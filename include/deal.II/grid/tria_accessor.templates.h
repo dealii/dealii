@@ -38,6 +38,79 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 DEAL_II_NAMESPACE_OPEN
 
 
+namespace internal
+{
+  /**
+   * Compute the diameter for a given set of vertices. The vertices are
+   * interpreted, depending on their count, as the vertices of a particular
+   * reference cell.
+   */
+  template <int dim, int spacedim>
+  inline double
+  diameter(
+    const boost::container::small_vector<Point<spacedim>,
+                                         GeometryInfo<dim>::vertices_per_cell>
+      vertices)
+  {
+    switch (ReferenceCell::n_vertices_to_type(dim, vertices.size()))
+      {
+        case ReferenceCell::Type::Line:
+          // Return the distance between the two vertices
+          return (vertices[1] - vertices[0]).norm();
+
+        case ReferenceCell::Type::Tri:
+          // Return the longest of the three edges
+          return std::max({(vertices[1] - vertices[0]).norm(),
+                           (vertices[2] - vertices[1]).norm(),
+                           (vertices[2] - vertices[0]).norm()});
+
+        case ReferenceCell::Type::Quad:
+          // Return the longer one of the two diagonals of the quadrilateral
+          return std::max({(vertices[3] - vertices[0]).norm(),
+                           (vertices[2] - vertices[1]).norm()});
+
+        case ReferenceCell::Type::Tet:
+          // Return the longest of the six edges of the tetrahedron
+          return std::max({(vertices[1] - vertices[0]).norm(),
+                           (vertices[2] - vertices[0]).norm(),
+                           (vertices[2] - vertices[1]).norm(),
+                           (vertices[3] - vertices[0]).norm(),
+                           (vertices[3] - vertices[1]).norm(),
+                           (vertices[3] - vertices[2]).norm()});
+
+        case ReferenceCell::Type::Wedge:
+          // Return ...
+          return std::max({// the longest of the 2*3=6 diagonals of the three
+                           // quadrilateral sides of the wedge or ...
+                           (vertices[4] - vertices[0]).norm(),
+                           (vertices[3] - vertices[1]).norm(),
+                           (vertices[5] - vertices[1]).norm(),
+                           (vertices[4] - vertices[2]).norm(),
+                           (vertices[5] - vertices[0]).norm(),
+                           (vertices[3] - vertices[2]).norm(),
+                           // the longest of the 3*2=6 edges of the two
+                           // triangular faces of the wedge
+                           (vertices[1] - vertices[0]).norm(),
+                           (vertices[2] - vertices[1]).norm(),
+                           (vertices[2] - vertices[0]).norm(),
+                           (vertices[4] - vertices[3]).norm(),
+                           (vertices[5] - vertices[4]).norm(),
+                           (vertices[5] - vertices[3]).norm()});
+
+        case ReferenceCell::Type::Hex:
+          // Return the longest of the four diagonals of the hexahedron
+          return std::max({(vertices[7] - vertices[0]).norm(),
+                           (vertices[6] - vertices[1]).norm(),
+                           (vertices[2] - vertices[5]).norm(),
+                           (vertices[3] - vertices[4]).norm()});
+        default:
+          Assert(false, ExcNotImplemented());
+          return -1e10;
+      }
+  }
+} // namespace internal
+
+
 /*--------------------- Functions: TriaAccessorBase -------------------------*/
 
 template <int structdim, int dim, int spacedim>
@@ -1885,62 +1958,26 @@ template <int structdim, int dim, int spacedim>
 double
 TriaAccessor<structdim, dim, spacedim>::diameter() const
 {
-  switch (this->reference_cell_type())
-    {
-      case ReferenceCell::Type::Line:
-        // Return the distance between the two vertices
-        return (this->vertex(1) - this->vertex(0)).norm();
+  boost::container::small_vector<Point<spacedim>,
+                                 GeometryInfo<structdim>::vertices_per_cell>
+    vertices(this->n_vertices());
 
-      case ReferenceCell::Type::Tri:
-        // Return the longest of the three edges
-        return std::max({(this->vertex(1) - this->vertex(0)).norm(),
-                         (this->vertex(2) - this->vertex(1)).norm(),
-                         (this->vertex(2) - this->vertex(0)).norm()});
+  for (unsigned int v = 0; v < vertices.size(); ++v)
+    vertices[v] = this->vertex(v);
 
-      case ReferenceCell::Type::Quad:
-        // Return the longer one of the two diagonals of the quadrilateral
-        return std::max({(this->vertex(3) - this->vertex(0)).norm(),
-                         (this->vertex(2) - this->vertex(1)).norm()});
+  return internal::diameter<structdim, spacedim>(vertices);
+}
 
-      case ReferenceCell::Type::Tet:
-        // Return the longest of the six edges of the tetrahedron
-        return std::max({(this->vertex(1) - this->vertex(0)).norm(),
-                         (this->vertex(2) - this->vertex(0)).norm(),
-                         (this->vertex(2) - this->vertex(1)).norm(),
-                         (this->vertex(3) - this->vertex(0)).norm(),
-                         (this->vertex(3) - this->vertex(1)).norm(),
-                         (this->vertex(3) - this->vertex(2)).norm()});
 
-      case ReferenceCell::Type::Wedge:
-        // Return ...
-        return std::max({// the longest of the 2*3=6 diagonals of the three
-                         // quadrilateral sides of the wedge or ...
-                         (this->vertex(4) - this->vertex(0)).norm(),
-                         (this->vertex(3) - this->vertex(1)).norm(),
-                         (this->vertex(5) - this->vertex(1)).norm(),
-                         (this->vertex(4) - this->vertex(2)).norm(),
-                         (this->vertex(5) - this->vertex(0)).norm(),
-                         (this->vertex(3) - this->vertex(2)).norm(),
-                         // the longest of the 3*2=6 edges of the two triangular
-                         // faces of the wedge
-                         (this->vertex(1) - this->vertex(0)).norm(),
-                         (this->vertex(2) - this->vertex(1)).norm(),
-                         (this->vertex(2) - this->vertex(0)).norm(),
-                         (this->vertex(4) - this->vertex(3)).norm(),
-                         (this->vertex(5) - this->vertex(4)).norm(),
-                         (this->vertex(5) - this->vertex(3)).norm()});
 
-      case ReferenceCell::Type::Hex:
-        // Return the longest of the four diagonals of the hexahedron
-        return std::max({(this->vertex(7) - this->vertex(0)).norm(),
-                         (this->vertex(6) - this->vertex(1)).norm(),
-                         (this->vertex(2) - this->vertex(5)).norm(),
-                         (this->vertex(3) - this->vertex(4)).norm()});
-
-      default:
-        Assert(false, ExcNotImplemented());
-        return -1e10;
-    }
+template <int dim, int spacedim>
+double
+CellAccessor<dim, spacedim>::diameter(
+  const Mapping<dim, spacedim> &mapping) const
+{
+  return internal::diameter<dim, spacedim>(
+    mapping.get_vertices(typename Triangulation<dim, spacedim>::cell_iterator(
+      this->tria, this->level(), this->index())));
 }
 
 

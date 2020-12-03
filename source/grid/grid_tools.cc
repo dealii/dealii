@@ -3099,49 +3099,7 @@ namespace GridTools
     diameter(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
              const Mapping<dim, spacedim> &mapping)
     {
-      // see also TriaAccessor::diameter()
-
-      const auto vertices = mapping.get_vertices(cell);
-      switch (cell->reference_cell_type())
-        {
-          case ReferenceCell::Type::Line:
-            return (vertices[1] - vertices[0]).norm();
-          case ReferenceCell::Type::Tri:
-            return std::max({(vertices[1] - vertices[0]).norm(),
-                             (vertices[2] - vertices[1]).norm(),
-                             (vertices[2] - vertices[0]).norm()});
-          case ReferenceCell::Type::Quad:
-            return std::max({(vertices[3] - vertices[0]).norm(),
-                             (vertices[2] - vertices[1]).norm()});
-          case ReferenceCell::Type::Tet:
-            return std::max({(vertices[1] - vertices[0]).norm(),
-                             (vertices[2] - vertices[0]).norm(),
-                             (vertices[2] - vertices[1]).norm(),
-                             (vertices[3] - vertices[0]).norm(),
-                             (vertices[3] - vertices[1]).norm(),
-                             (vertices[3] - vertices[2]).norm()});
-          case ReferenceCell::Type::Wedge:
-            return std::max({(vertices[4] - vertices[0]).norm(),
-                             (vertices[3] - vertices[1]).norm(),
-                             (vertices[5] - vertices[1]).norm(),
-                             (vertices[4] - vertices[2]).norm(),
-                             (vertices[5] - vertices[0]).norm(),
-                             (vertices[3] - vertices[2]).norm(),
-                             (vertices[1] - vertices[0]).norm(),
-                             (vertices[2] - vertices[1]).norm(),
-                             (vertices[2] - vertices[0]).norm(),
-                             (vertices[4] - vertices[3]).norm(),
-                             (vertices[5] - vertices[4]).norm(),
-                             (vertices[5] - vertices[3]).norm()});
-          case ReferenceCell::Type::Hex:
-            return std::max({(vertices[7] - vertices[0]).norm(),
-                             (vertices[6] - vertices[1]).norm(),
-                             (vertices[2] - vertices[5]).norm(),
-                             (vertices[3] - vertices[4]).norm()});
-          default:
-            Assert(false, ExcNotImplemented());
-            return -1e10;
-        }
+      return cell->diameter(mapping);
     }
   } // namespace internal
 
