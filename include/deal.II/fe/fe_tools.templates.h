@@ -2470,7 +2470,7 @@ namespace FETools
             // Now, just the [...]
             // part should be left.
             if (name.size() == 0 || name[0] != '[')
-              throw(std::string("Invalid first character in ") + name);
+              throw std::string("Invalid first character in ") + name;
             do
               {
                 // Erase the
@@ -2524,7 +2524,7 @@ namespace FETools
             // we actually had a ']'
             // there
             if (name.size() == 0 || name[0] != ']')
-              throw(std::string("Invalid first character in ") + name);
+              throw std::string("Invalid first character in ") + name;
             name.erase(0, 1);
             // just one more sanity check
             Assert((base_fes.size() == base_multiplicities.size()) &&
@@ -2572,7 +2572,7 @@ namespace FETools
             // or (Quadrature<1>(degree+1))
             // part should be left.
             if (name.size() == 0 || name[0] != '(')
-              throw(std::string("Invalid first character in ") + name);
+              throw std::string("Invalid first character in ") + name;
             name.erase(0, 1);
             if (name[0] != 'Q')
               {
