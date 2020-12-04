@@ -1450,7 +1450,7 @@ namespace Euler_DG
   // compiler to SIMD parallelize this loop (which means in practice that we
   // ensure that there is no overlap, also called aliasing, between the index
   // ranges of the pointers we use inside the loops). It turns out that at the
-  // time of this writing, GCC 7.2 fails to compile an OPENMP pragma inside a
+  // time of this writing, GCC 7.2 fails to compile an OpenMP pragma inside a
   // lambda function, so we comment this pragma out below. If your compiler is
   // newer, you should be able to uncomment these lines again.
   //
