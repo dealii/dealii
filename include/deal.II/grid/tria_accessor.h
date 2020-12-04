@@ -61,6 +61,7 @@ namespace internal
   {
     class TriaObjects;
     struct Implementation;
+    struct ImplementationMixedMesh;
   } // namespace TriangulationImplementation
 
   namespace TriaAccessorImplementation
@@ -1810,6 +1811,8 @@ private:
   friend class Triangulation;
 
   friend struct dealii::internal::TriangulationImplementation::Implementation;
+  friend struct dealii::internal::TriangulationImplementation::
+    ImplementationMixedMesh;
   friend struct dealii::internal::TriaAccessorImplementation::Implementation;
 };
 
@@ -3807,6 +3810,8 @@ private:
   friend class parallel::TriangulationBase;
 
   friend struct dealii::internal::TriangulationImplementation::Implementation;
+  friend struct dealii::internal::TriangulationImplementation::
+    ImplementationMixedMesh;
 };
 
 
