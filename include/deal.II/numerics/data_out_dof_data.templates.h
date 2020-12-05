@@ -110,6 +110,7 @@ namespace internal
           bool needs_hypercube_setup = false;
           bool needs_simplex_setup   = false;
           bool needs_wedge_setup     = false;
+          bool needs_pyramid_setup   = false;
 
           for (const auto &fe : finite_elements)
             for (unsigned int i = 0; i < fe->size(); ++i)
@@ -128,6 +129,9 @@ namespace internal
                   case ReferenceCell::Type::Wedge:
                     needs_wedge_setup |= true;
                     break;
+                  case ReferenceCell::Type::Pyramid:
+                    needs_pyramid_setup |= true;
+                    break;
                   default:
                     Assert(false, ExcNotImplemented());
                 }
@@ -135,6 +139,7 @@ namespace internal
           std::unique_ptr<dealii::Quadrature<dim>> quadrature_simplex;
           std::unique_ptr<dealii::Quadrature<dim>> quadrature_hypercube;
           std::unique_ptr<dealii::Quadrature<dim>> quadrature_wedge;
+          std::unique_ptr<dealii::Quadrature<dim>> quadrature_pyramid;
 
           if (needs_simplex_setup)
             {
@@ -158,10 +163,27 @@ namespace internal
                   .get_unit_support_points());
             }
 
-          n_q_points = std::max(
-            {needs_wedge_setup ? quadrature_wedge->size() : 0,
-             needs_simplex_setup ? quadrature_simplex->size() : 0,
-             needs_hypercube_setup ? quadrature_hypercube->size() : 0});
+          if (needs_pyramid_setup)
+            {
+              Assert(1 <= n_subdivisions && n_subdivisions <= 2,
+                     ExcNotImplemented());
+
+              std::vector<Point<dim>> points;
+
+              points.emplace_back(-1.0, -1.0, 0.0);
+              points.emplace_back(+1.0, -1.0, 0.0);
+              points.emplace_back(+1.0, +1.0, 0.0);
+              points.emplace_back(-1.0, +1.0, 0.0);
+              points.emplace_back(+0.0, +0.0, 1.0);
+
+              quadrature_pyramid = std::make_unique<Quadrature<dim>>(points);
+            }
+
+          n_q_points =
+            std::max({needs_wedge_setup ? quadrature_wedge->size() : 0,
+                      needs_simplex_setup ? quadrature_simplex->size() : 0,
+                      needs_hypercube_setup ? quadrature_hypercube->size() : 0,
+                      needs_pyramid_setup ? quadrature_pyramid->size() : 0});
 
           x_fe_values.resize(finite_elements.size());
           for (unsigned int i = 0; i < finite_elements.size(); ++i)
@@ -194,6 +216,9 @@ namespace internal
                         case ReferenceCell::Type::Wedge:
                           quadrature.push_back(*quadrature_wedge);
                           break;
+                        case ReferenceCell::Type::Pyramid:
+                          quadrature.push_back(*quadrature_pyramid);
+                          break;
                         default:
                           Assert(false, ExcNotImplemented());
                       }
@@ -206,7 +231,8 @@ namespace internal
                       // certain reference-cell kinds take by default the
                       // curved code path in DataOut::build_one_patch, for
                       // which the quadrature points need to be enabled
-                      (needs_simplex_setup || needs_wedge_setup) ?
+                      (needs_simplex_setup || needs_wedge_setup ||
+                       needs_pyramid_setup) ?
                         (update_flags | update_quadrature_points) :
                         update_flags);
                 }
