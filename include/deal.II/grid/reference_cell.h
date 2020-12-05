@@ -834,19 +834,26 @@ namespace ReferenceCell
           const unsigned int  face,
           const unsigned char face_orientation) const override
         {
-          Assert(false, ExcNotImplemented());
+          if (face == 0) // QUAD
+            {
+              return GeometryInfo<3>::standard_to_real_face_line(
+                line,
+                get_bit(face_orientation, 0),
+                get_bit(face_orientation, 2),
+                get_bit(face_orientation, 1));
+            }
+          else // TRI
+            {
+              static const std::array<std::array<unsigned int, 3>, 6> table = {
+                {{{2, 1, 0}},
+                 {{0, 1, 2}},
+                 {{1, 2, 0}},
+                 {{0, 2, 1}},
+                 {{1, 0, 2}},
+                 {{2, 0, 1}}}};
 
-          (void)face;
-
-          static const std::array<std::array<unsigned int, 3>, 6> table = {
-            {{{2, 1, 0}},
-             {{0, 1, 2}},
-             {{1, 2, 0}},
-             {{0, 2, 1}},
-             {{1, 0, 2}},
-             {{2, 0, 1}}}};
-
-          return table[face_orientation][line];
+              return table[face_orientation][line];
+            }
         }
 
         bool
