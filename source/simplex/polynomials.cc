@@ -508,20 +508,26 @@ namespace Simplex
   ScalarWedgePolynomial<dim>::ScalarWedgePolynomial(const unsigned int degree)
     : ScalarPolynomialsBase<dim>(degree,
                                  compute_n_polynomials_wedge(dim, degree))
+    , poly_tri(degree)
+    , poly_line(degree)
   {}
 
 
   namespace
   {
     /**
-     * TODO
+     * Decompose the shape-function index of a linear wedge into an index
+     * to access the right shape function within the triangle and and within
+     * the line.
      */
     static const constexpr std::array<std::array<unsigned int, 2>, 6>
       wedge_table_1{
         {{{0, 0}}, {{1, 0}}, {{2, 0}}, {{0, 1}}, {{1, 1}}, {{2, 1}}}};
 
     /**
-     * TODO
+     * Decompose the shape-function index of a quadratic wedge into an index
+     * to access the right shape function within the triangle and and within
+     * the line.
      */
     static const constexpr std::array<std::array<unsigned int, 2>, 18>
       wedge_table_2{{{{0, 0}},
@@ -550,18 +556,13 @@ namespace Simplex
   ScalarWedgePolynomial<dim>::compute_value(const unsigned int i,
                                             const Point<dim> & p) const
   {
-    AssertDimension(dim, 3);
-    AssertIndexRange(this->degree(), 3);
-
     const auto pair = this->degree() == 1 ? wedge_table_1[i] : wedge_table_2[i];
 
-    const ScalarPolynomial<2> poly_tri(this->degree());
-    const Point<2>            p_tri(p[0], p[1]);
-    const auto                v_tri = poly_tri.compute_value(pair[0], p_tri);
+    const Point<2> p_tri(p[0], p[1]);
+    const auto     v_tri = poly_tri.compute_value(pair[0], p_tri);
 
-    const ScalarPolynomial<1> poly_line(this->degree());
-    const Point<1>            p_line(p[2]);
-    const auto                v_line = poly_line.compute_value(pair[1], p_line);
+    const Point<1> p_line(p[2]);
+    const auto     v_line = poly_line.compute_value(pair[1], p_line);
 
     return v_tri * v_line;
   }
@@ -573,20 +574,15 @@ namespace Simplex
   ScalarWedgePolynomial<dim>::compute_grad(const unsigned int i,
                                            const Point<dim> & p) const
   {
-    AssertDimension(dim, 3);
-    AssertIndexRange(this->degree(), 3);
-
     const auto pair = this->degree() == 1 ? wedge_table_1[i] : wedge_table_2[i];
 
-    const ScalarPolynomial<2> poly_tri(this->degree());
-    const Point<2>            p_tri(p[0], p[1]);
-    const auto                v_tri = poly_tri.compute_value(pair[0], p_tri);
-    const auto                g_tri = poly_tri.compute_grad(pair[0], p_tri);
+    const Point<2> p_tri(p[0], p[1]);
+    const auto     v_tri = poly_tri.compute_value(pair[0], p_tri);
+    const auto     g_tri = poly_tri.compute_grad(pair[0], p_tri);
 
-    const ScalarPolynomial<1> poly_line(this->degree());
-    const Point<1>            p_line(p[2]);
-    const auto                v_line = poly_line.compute_value(pair[1], p_line);
-    const auto                g_line = poly_line.compute_grad(pair[1], p_line);
+    const Point<1> p_line(p[2]);
+    const auto     v_line = poly_line.compute_value(pair[1], p_line);
+    const auto     g_line = poly_line.compute_grad(pair[1], p_line);
 
     Tensor<1, dim> grad;
     grad[0] = g_tri[0] * v_line;

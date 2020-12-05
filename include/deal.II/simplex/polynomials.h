@@ -262,6 +262,17 @@ namespace Simplex
      */
     virtual std::unique_ptr<ScalarPolynomialsBase<dim>>
     clone() const override;
+
+  private:
+    /**
+     * Scalar polynomial defined on a triangle.
+     */
+    const ScalarPolynomial<2> poly_tri;
+
+    /**
+     * Scalar polynomial defined on a line.
+     */
+    const ScalarPolynomial<1> poly_line;
   };
 
 
