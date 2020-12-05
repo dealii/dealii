@@ -644,7 +644,7 @@ namespace ReferenceCell
       /**
        * Tet.
        */
-      struct Tet : public TensorProductBase<3>
+      struct Tet : public Base
       {
         unsigned int
         n_vertices() const override
@@ -798,7 +798,7 @@ namespace ReferenceCell
       /**
        * Pyramid.
        */
-      struct Pyramid : public TensorProductBase<3>
+      struct Pyramid : public Base
       {
         unsigned int
         n_vertices() const override
@@ -960,7 +960,7 @@ namespace ReferenceCell
       /**
        * Wedge.
        */
-      struct Wedge : public TensorProductBase<3>
+      struct Wedge : public Base
       {
         unsigned int
         n_vertices() const override
