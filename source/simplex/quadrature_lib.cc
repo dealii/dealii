@@ -168,6 +168,50 @@ namespace Simplex
            ExcMessage("No valid quadrature points!"));
   }
 
+
+
+  template <int dim>
+  QGaussPyramid<dim>::QGaussPyramid(const unsigned int n_points_1D)
+    : Quadrature<dim>()
+  {
+    AssertDimension(dim, 3);
+
+    if (n_points_1D == 1)
+      {
+        const double Q14 = 1.0 / 4.0;
+        const double Q43 = 4.0 / 3.0;
+
+        this->quadrature_points.emplace_back(0, 0, Q14);
+        this->weights.emplace_back(Q43);
+      }
+    else if (n_points_1D == 2)
+      {
+        // clang-format off
+        this->quadrature_points.emplace_back(-0.26318405556971, -0.26318405556971, 0.54415184401122);
+        this->quadrature_points.emplace_back(-0.50661630334979, -0.50661630334979, 0.12251482265544);
+        this->quadrature_points.emplace_back(-0.26318405556971, +0.26318405556971, 0.54415184401122);
+        this->quadrature_points.emplace_back(-0.50661630334979, +0.50661630334979, 0.12251482265544);
+        this->quadrature_points.emplace_back(+0.26318405556971, -0.26318405556971, 0.54415184401122);
+        this->quadrature_points.emplace_back(+0.50661630334979, -0.50661630334979, 0.12251482265544);
+        this->quadrature_points.emplace_back(+0.26318405556971, +0.26318405556971, 0.54415184401122);
+        this->quadrature_points.emplace_back(+0.50661630334979, +0.50661630334979, 0.12251482265544);
+        // clang-format on
+
+        this->weights.emplace_back(0.10078588207983);
+        this->weights.emplace_back(0.23254745125351);
+        this->weights.emplace_back(0.10078588207983);
+        this->weights.emplace_back(0.23254745125351);
+        this->weights.emplace_back(0.10078588207983);
+        this->weights.emplace_back(0.23254745125351);
+        this->weights.emplace_back(0.10078588207983);
+        this->weights.emplace_back(0.23254745125351);
+      }
+
+    AssertDimension(this->quadrature_points.size(), this->weights.size());
+    Assert(this->quadrature_points.size() > 0,
+           ExcMessage("No valid quadrature points!"));
+  }
+
 } // namespace Simplex
 
 
@@ -177,5 +221,8 @@ template class Simplex::QGauss<3>;
 template class Simplex::QGaussWedge<1>;
 template class Simplex::QGaussWedge<2>;
 template class Simplex::QGaussWedge<3>;
+template class Simplex::QGaussPyramid<1>;
+template class Simplex::QGaussPyramid<2>;
+template class Simplex::QGaussPyramid<3>;
 
 DEAL_II_NAMESPACE_CLOSE
