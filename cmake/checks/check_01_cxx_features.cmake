@@ -44,12 +44,10 @@
 # tests. Create a small macro to easily set CMAKE_REQUIRED_FLAGS
 #
 MACRO(_set_up_cmake_required)
-  # Let's put the user supplied `DEAL_II_CXX_FLAGS_SAVED` last so that we
-  # never override a user supplied -std=c++XY flag in our tests.
   RESET_CMAKE_REQUIRED()
   SET(CMAKE_REQUIRED_FLAGS "")
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS}")
   ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS_SAVED}")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS}")
 ENDMACRO()
 
 
@@ -306,10 +304,17 @@ _set_up_cmake_required()
 _test_cxx14_support()
 
 IF(NOT DEAL_II_HAVE_CXX14)
-  MESSAGE(STATUS "C++14 support not available. Try to set -std=c++14 explicitly")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-std=c++14")
-  _set_up_cmake_required()
-  _test_cxx14_support()
+  #
+  # We failed to detect C++14 support. Let's make an attempt to set the
+  # -std= compiler flag. (But in order to minimize confusion let's not
+  # override any manually specified -std= variable set by the user.)
+  #
+  IF(NOT "${DEAL_II_CXX_FLAGS_SAVED}" MATCHES "-std=")
+    MESSAGE(STATUS "C++14 support not available. Try to set -std=c++14 explicitly")
+    ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_SAVED "-std=c++14")
+    _set_up_cmake_required()
+    _test_cxx14_support()
+  ENDIF()
 ENDIF()
 
 IF(NOT DEAL_II_HAVE_CXX14)
