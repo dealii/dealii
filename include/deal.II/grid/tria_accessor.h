@@ -53,6 +53,9 @@ namespace parallel
 
 template <int dim, int spacedim>
 class Manifold;
+
+template <int dim, int spacedim>
+class Mapping;
 #endif
 
 namespace internal
@@ -125,7 +128,6 @@ namespace internal
     {
       using type = int;
     };
-
   } // namespace TriaAccessorImplementation
 } // namespace internal
 template <int structdim, int dim, int spacedim>
@@ -3719,6 +3721,14 @@ public:
    */
   CellId
   id() const;
+
+  using TriaAccessor<dim, dim, spacedim>::diameter;
+
+  /**
+   * The same as TriaAccessor::diameter() but also taking a Mapping class.
+   */
+  double
+  diameter(const Mapping<dim, spacedim> &mapping) const;
 
   /**
    * @}
