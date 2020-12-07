@@ -1442,13 +1442,19 @@ namespace Euler_DG
   // and a second `std::function` to be called after the loop last touches
   // an entry. The callback is in form of a range over the given vector (in
   // terms of the local index numbering in the MPI universe) that can be
-  // addressed by `local_element()` functions. For this second callback, we
-  // create a lambda that works on a range and write the respective update on
-  // this range. We add the `DEAL_II_OPENMP_SIMD_PRAGMA` before the local loop
-  // to suggest to the compiler to SIMD parallelize this loop (which means in
-  // practice that we ensure that there is no overlap, also called
-  // aliasing, between the index ranges of the pointers we use inside the
-  // loops). Note that we select a different code path for the last
+  // addressed by `local_element()` functions.
+  //
+  // For this second callback, we create a lambda that works on a range and
+  // write the respective update on this range. Ideally, we would add the
+  // `DEAL_II_OPENMP_SIMD_PRAGMA` before the local loop to suggest to the
+  // compiler to SIMD parallelize this loop (which means in practice that we
+  // ensure that there is no overlap, also called aliasing, between the index
+  // ranges of the pointers we use inside the loops). It turns out that at the
+  // time of this writing, GCC 7.2 fails to compile an OpenMP pragma inside a
+  // lambda function, so we comment this pragma out below. If your compiler is
+  // newer, you should be able to uncomment these lines again.
+  //
+  // Note that we select a different code path for the last
   // Runge--Kutta stage when we do not need to update the `next_ri`
   // vector. This strategy gives a considerable speedup. Whereas the inverse
   // mass matrix and vector updates take more than 60% of the computational
@@ -1498,7 +1504,7 @@ namespace Euler_DG
           const Number bi = factor_solution;
           if (ai == Number())
             {
-              DEAL_II_OPENMP_SIMD_PRAGMA
+              /* DEAL_II_OPENMP_SIMD_PRAGMA */
               for (unsigned int i = start_range; i < end_range; ++i)
                 {
                   const Number k_i          = next_ri.local_element(i);
@@ -1508,7 +1514,7 @@ namespace Euler_DG
             }
           else
             {
-              DEAL_II_OPENMP_SIMD_PRAGMA
+              /* DEAL_II_OPENMP_SIMD_PRAGMA */
               for (unsigned int i = start_range; i < end_range; ++i)
                 {
                   const Number k_i          = next_ri.local_element(i);
