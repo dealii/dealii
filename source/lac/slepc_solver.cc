@@ -184,9 +184,16 @@ namespace SLEPcWrappers
     ierr = EPSSolve(eps);
     AssertThrow(ierr == 0, ExcSLEPcError(ierr));
 
-    // get number of converged eigenstates
-    ierr = EPSGetConverged(eps, reinterpret_cast<PetscInt *>(n_converged));
-    AssertThrow(ierr == 0, ExcSLEPcError(ierr));
+    // Get number of converged eigenstates. We need to go around with a
+    // temporary variable once because the function wants to have a
+    // PetscInt as second argument whereas the `n_converged` argument
+    // to this function is just an unsigned int.
+    {
+      PetscInt petsc_n_converged = *n_converged;
+      ierr                       = EPSGetConverged(eps, &petsc_n_converged);
+      AssertThrow(ierr == 0, ExcSLEPcError(ierr));
+      *n_converged = petsc_n_converged;
+    }
 
     PetscInt  n_iterations  = 0;
     PetscReal residual_norm = 0;
