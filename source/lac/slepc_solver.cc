@@ -57,6 +57,8 @@ namespace SLEPcWrappers
     // randomly.
   }
 
+
+
   SolverBase::~SolverBase()
   {
     if (eps != nullptr)
@@ -69,6 +71,8 @@ namespace SLEPcWrappers
       }
   }
 
+
+
   void
   SolverBase::set_matrices(const PETScWrappers::MatrixBase &A)
   {
@@ -76,6 +80,8 @@ namespace SLEPcWrappers
     const PetscErrorCode ierr = EPSSetOperators(eps, A, nullptr);
     AssertThrow(ierr == 0, ExcSLEPcError(ierr));
   }
+
+
 
   void
   SolverBase::set_matrices(const PETScWrappers::MatrixBase &A,
@@ -85,6 +91,8 @@ namespace SLEPcWrappers
     const PetscErrorCode ierr = EPSSetOperators(eps, A, B);
     AssertThrow(ierr == 0, ExcSLEPcError(ierr));
   }
+
+
 
   void
   SolverBase::set_transformation(
@@ -98,10 +106,10 @@ namespace SLEPcWrappers
 #  if DEAL_II_SLEPC_VERSION_GTE(3, 8, 0)
     // see
     // https://lists.mcs.anl.gov/mailman/htdig/petsc-users/2017-October/033649.html
-    // From 3.8.0 SLEPc insists that when looking for smallest eigenvalues with
-    // shift-and-invert users should (a) set target (b) use EPS_TARGET_MAGNITUDE
-    // The former, however, needs to be applied to eps object and not spectral
-    // transformation.
+    // From 3.8.0 onward, SLEPc insists that when looking for smallest
+    // eigenvalues with shift-and-invert, users should (a) set target,
+    // (b) use EPS_TARGET_MAGNITUDE. The former, however, needs to be
+    // applied to the 'eps' object and not the spectral transformation.
     if (SLEPcWrappers::TransformationShiftInvert *sinv =
           dynamic_cast<SLEPcWrappers::TransformationShiftInvert *>(
             &transformation))
@@ -111,6 +119,8 @@ namespace SLEPcWrappers
       }
 #  endif
   }
+
+
 
   void
   SolverBase::set_target_eigenvalue(const PetscScalar &this_target)
@@ -122,6 +132,8 @@ namespace SLEPcWrappers
     AssertThrow(ierr == 0, ExcSLEPcError(ierr));
   }
 
+
+
   void
   SolverBase::set_which_eigenpairs(const EPSWhich eps_which)
   {
@@ -130,12 +142,16 @@ namespace SLEPcWrappers
     AssertThrow(ierr == 0, ExcSLEPcError(ierr));
   }
 
+
+
   void
   SolverBase::set_problem_type(const EPSProblemType eps_problem)
   {
     const PetscErrorCode ierr = EPSSetProblemType(eps, eps_problem);
     AssertThrow(ierr == 0, ExcSLEPcError(ierr));
   }
+
+
 
   void
   SolverBase::solve(const unsigned int n_eigenpairs, unsigned int *n_converged)
@@ -231,6 +247,8 @@ namespace SLEPcWrappers
     }
   }
 
+
+
   void
   SolverBase::get_eigenpair(const unsigned int         index,
                             PetscScalar &              eigenvalues,
@@ -241,6 +259,7 @@ namespace SLEPcWrappers
       EPSGetEigenpair(eps, index, &eigenvalues, nullptr, eigenvectors, nullptr);
     AssertThrow(ierr == 0, ExcSLEPcError(ierr));
   }
+
 
 
   void
@@ -275,6 +294,8 @@ namespace SLEPcWrappers
 #  endif
   }
 
+
+
   void
   SolverBase::get_solver_state(const SolverControl::State state)
   {
@@ -300,12 +321,16 @@ namespace SLEPcWrappers
       }
   }
 
+
+
   /* ---------------------- SolverControls ----------------------- */
   SolverControl &
   SolverBase::control() const
   {
     return solver_control;
   }
+
+
 
   int
   SolverBase::convergence_test(
@@ -324,6 +349,8 @@ namespace SLEPcWrappers
     return 0;
   }
 
+
+
   /* ---------------------- SolverKrylovSchur ------------------------ */
   SolverKrylovSchur::SolverKrylovSchur(SolverControl &       cn,
                                        const MPI_Comm &      mpi_communicator,
@@ -336,11 +363,15 @@ namespace SLEPcWrappers
     AssertThrow(ierr == 0, ExcSLEPcError(ierr));
   }
 
+
+
   /* ---------------------- SolverArnoldi ------------------------ */
   SolverArnoldi::AdditionalData::AdditionalData(
     const bool delayed_reorthogonalization)
     : delayed_reorthogonalization(delayed_reorthogonalization)
   {}
+
+
 
   SolverArnoldi::SolverArnoldi(SolverControl &       cn,
                                const MPI_Comm &      mpi_communicator,
@@ -361,10 +392,13 @@ namespace SLEPcWrappers
   }
 
 
+
   /* ---------------------- Lanczos ------------------------ */
   SolverLanczos::AdditionalData::AdditionalData(const EPSLanczosReorthogType r)
     : reorthog(r)
   {}
+
+
 
   SolverLanczos::SolverLanczos(SolverControl &       cn,
                                const MPI_Comm &      mpi_communicator,
@@ -379,6 +413,8 @@ namespace SLEPcWrappers
     AssertThrow(ierr == 0, ExcSLEPcError(ierr));
   }
 
+
+
   /* ----------------------- Power ------------------------- */
   SolverPower::SolverPower(SolverControl &       cn,
                            const MPI_Comm &      mpi_communicator,
@@ -390,11 +426,15 @@ namespace SLEPcWrappers
     AssertThrow(ierr == 0, ExcSLEPcError(ierr));
   }
 
+
+
   /* ---------------- Generalized Davidson ----------------- */
   SolverGeneralizedDavidson::AdditionalData::AdditionalData(
     bool double_expansion)
     : double_expansion(double_expansion)
   {}
+
+
 
   SolverGeneralizedDavidson::SolverGeneralizedDavidson(
     SolverControl &       cn,
@@ -413,6 +453,8 @@ namespace SLEPcWrappers
       }
   }
 
+
+
   /* ------------------ Jacobi Davidson -------------------- */
   SolverJacobiDavidson::SolverJacobiDavidson(SolverControl & cn,
                                              const MPI_Comm &mpi_communicator,
@@ -423,6 +465,8 @@ namespace SLEPcWrappers
     const PetscErrorCode ierr = EPSSetType(eps, const_cast<char *>(EPSJD));
     AssertThrow(ierr == 0, ExcSLEPcError(ierr));
   }
+
+
 
   /* ---------------------- LAPACK ------------------------- */
   SolverLAPACK::SolverLAPACK(SolverControl &       cn,
