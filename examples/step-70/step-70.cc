@@ -1492,7 +1492,7 @@ namespace Step70
         // the particle itself. We can then assemble the additional
         // terms in the system matrix and the right hand side as we would
         // normally.
-        const auto &cell = particle->get_surrounding_cell(fluid_tria);
+        const auto &cell = particle->get_surrounding_cell();
         const auto &dh_cell =
           typename DoFHandler<spacedim>::cell_iterator(*cell, &fluid_dh);
         dh_cell->get_dof_indices(fluid_dof_indices);

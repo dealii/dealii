@@ -46,13 +46,13 @@ namespace Particles
 
     /**
      * Constructor of the iterator. Takes a reference to the particle
-     * container, and an iterator to the cell-particle pair.
+     * container, an iterator to the cell, and the particle index within that
+     * cell.
      */
     ParticleIterator(
-      const std::multimap<internal::LevelInd, Particle<dim, spacedim>> &map,
-      const typename std::multimap<internal::LevelInd,
-                                   Particle<dim, spacedim>>::iterator
-        &particle);
+      const std::vector<std::vector<Particle<dim, spacedim>>> &   particles,
+      const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+      const unsigned int particle_index_within_cell);
 
     /**
      * Dereferencing operator, returns a reference to an accessor. Usage is thus
@@ -123,6 +123,12 @@ namespace Particles
     operator--(int);
 
     /**
+     * Return the state of the iterator.
+     */
+    IteratorState::IteratorStates
+    state() const;
+
+    /**
      * Mark the class as bidirectional iterator and declare some alias which
      * are standard for iterators and are used by algorithms to enquire about
      * the specifics of the iterators they work on.
@@ -146,10 +152,10 @@ namespace Particles
 
   template <int dim, int spacedim>
   inline ParticleIterator<dim, spacedim>::ParticleIterator(
-    const std::multimap<internal::LevelInd, Particle<dim, spacedim>> &map,
-    const typename std::multimap<internal::LevelInd,
-                                 Particle<dim, spacedim>>::iterator & particle)
-    : accessor(map, particle)
+    const std::vector<std::vector<Particle<dim, spacedim>>> &   particles,
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const unsigned int particle_index_within_cell)
+    : accessor(particles, cell, particle_index_within_cell)
   {}
 
 
@@ -252,6 +258,14 @@ namespace Particles
     return tmp;
   }
 
+
+
+  template <int dim, int spacedim>
+  inline IteratorState::IteratorStates
+  ParticleIterator<dim, spacedim>::state() const
+  {
+    return accessor.state();
+  }
 
 } // namespace Particles
 

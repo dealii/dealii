@@ -39,8 +39,8 @@ test()
     tr.refine_global(2);
     MappingQ<dim, spacedim> mapping(1);
 
-    // both processes create a particle handler, but only the first creates
-    // particles
+    // both processes create a particle handler with a particle in a
+    // position that is in a ghost cell to the other process
     Particles::ParticleHandler<dim, spacedim> particle_handler(tr, mapping);
 
     Point<spacedim> position;
@@ -57,6 +57,9 @@ test()
       position,
       reference_position,
       Utilities::MPI::this_mpi_process(tr.get_communicator()));
+
+    // We give a random cell hint to check that sorting and
+    // transferring ghost particles works.
     typename Triangulation<dim, spacedim>::active_cell_iterator cell =
       tr.begin_active();
     particle_handler.insert_particle(particle, cell);

@@ -39,8 +39,7 @@ namespace Particles
       if (particle_handler.n_locally_owned_particles() == 0)
         return; // nothing to do here
 
-      const auto &tria = space_dh.get_triangulation();
-      const auto &fe   = space_dh.get_fe();
+      const auto &fe = space_dh.get_fe();
       const auto  max_particles_per_cell =
         particle_handler.n_global_max_particles_per_cell();
 
@@ -80,7 +79,7 @@ namespace Particles
       auto particle = particle_handler.begin();
       while (particle != particle_handler.end())
         {
-          const auto &cell = particle->get_surrounding_cell(tria);
+          const auto &cell = particle->get_surrounding_cell();
           const auto  dh_cell =
             typename DoFHandler<dim, spacedim>::cell_iterator(*cell, &space_dh);
           dh_cell->get_dof_indices(dof_indices);
@@ -127,8 +126,7 @@ namespace Particles
 
       AssertDimension(matrix.n(), space_dh.n_dofs());
 
-      const auto &tria = space_dh.get_triangulation();
-      const auto &fe   = space_dh.get_fe();
+      const auto &fe = space_dh.get_fe();
       const auto  max_particles_per_cell =
         particle_handler.n_global_max_particles_per_cell();
 
@@ -174,7 +172,7 @@ namespace Particles
       auto particle = particle_handler.begin();
       while (particle != particle_handler.end())
         {
-          const auto &cell = particle->get_surrounding_cell(tria);
+          const auto &cell = particle->get_surrounding_cell();
           const auto &dh_cell =
             typename DoFHandler<dim, spacedim>::cell_iterator(*cell, &space_dh);
           dh_cell->get_dof_indices(dof_indices);

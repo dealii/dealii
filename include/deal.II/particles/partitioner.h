@@ -94,9 +94,7 @@ namespace Particles
        * without clearing the multimap of ghost particles, thus greatly
        * reducing the cost of exchanging the ghost particles information.
        */
-      std::vector<typename std::multimap<internal::LevelInd,
-                                         Particle<dim, spacedim>>::iterator>
-        ghost_particles_iterators;
+      std::vector<particle_iterator> ghost_particles_iterators;
 
       /**
        * Temporary storage that holds the data of the particles to be sent

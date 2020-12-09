@@ -70,8 +70,11 @@ test()
                                                                       2,
                                                                       0);
 
-    auto particle_it = particle_handler.insert_particle(particle1, cell1);
-    particle_it->set_properties(properties);
+    if (Utilities::MPI::this_mpi_process(tr.get_communicator()) == 0)
+      {
+        auto particle_it = particle_handler.insert_particle(particle1, cell1);
+        particle_it->set_properties(properties);
+      }
 
     std::vector<std::string> data_names;
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
@@ -101,7 +104,7 @@ main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  initlog();
+  MPILogInitAll all;
   deallog.push("2d/2d");
   test<2, 2>();
   deallog.pop();

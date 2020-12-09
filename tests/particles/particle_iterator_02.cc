@@ -15,8 +15,7 @@
 
 
 
-// Like particle_handler_serial_01, but tests the creation and use of a
-// particle iterator from the created particle.
+// Like particle_iterator_01, but tests state of the iterator.
 
 #include <deal.II/base/array_view.h>
 
@@ -70,25 +69,53 @@ test()
 
     particle_container[0].push_back(particle);
 
-    particle.get_properties()[0] = 0.05;
-    particle_container[0].push_back(particle);
-
-    Particles::ParticleIterator<dim> particle_it(particle_container,
-                                                 tr.begin(),
-                                                 0);
+    Particles::ParticleIterator<dim> particle_begin(particle_container,
+                                                    tr.begin(),
+                                                    0);
     Particles::ParticleIterator<dim> particle_end(particle_container,
                                                   tr.end(),
                                                   0);
+    Particles::ParticleIterator<dim> particle_nonexistent1(particle_container,
+                                                           tr.begin(),
+                                                           1);
+    Particles::ParticleIterator<dim> particle_nonexistent2(particle_container,
+                                                           tr.end(),
+                                                           1);
+    Particles::ParticleIterator<dim> particle_invalid;
 
-    for (; particle_it != particle_end; ++particle_it)
+    Assert(particle_begin->state() == IteratorState::valid, ExcInternalError());
+    Assert(particle_end->state() == IteratorState::past_the_end,
+           ExcInternalError());
+    Assert(particle_nonexistent1->state() == IteratorState::invalid,
+           ExcInternalError());
+    Assert(particle_nonexistent2->state() == IteratorState::invalid,
+           ExcInternalError());
+    Assert(particle_invalid->state() == IteratorState::invalid,
+           ExcInternalError());
+
+    Particles::ParticleIterator<dim> particle_iterator = particle_begin;
+    ++particle_iterator;
+
+    Assert(particle_iterator->state() == IteratorState::past_the_end,
+           ExcInternalError());
+
+    particle_iterator = particle_begin;
+    --particle_iterator;
+
+    Assert(particle_iterator->state() == IteratorState::past_the_end,
+           ExcInternalError());
+
+    for (particle_iterator = particle_begin; particle_iterator != particle_end;
+         ++particle_iterator)
       {
-        deallog << "Particle position: " << (*particle_it).get_location()
-                << std::endl
-                << "Particle properties: "
-                << std::vector<double>(particle_it->get_properties().begin(),
-                                       particle_it->get_properties().end())
+        deallog << "Particle position: " << particle_iterator->get_location()
+                << ". Iterator valid: "
+                << (particle_iterator->state() == IteratorState::valid)
                 << std::endl;
       }
+
+    Assert(particle_iterator->state() == IteratorState::past_the_end,
+           ExcInternalError());
   }
 
   deallog << "OK" << std::endl;
@@ -101,4 +128,5 @@ main()
 {
   initlog();
   test<2>();
+  test<3>();
 }
