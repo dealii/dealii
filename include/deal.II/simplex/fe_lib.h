@@ -40,8 +40,9 @@ namespace Simplex
     /**
      * Constructor.
      */
-    FE_Poly(const unsigned int               degree,
-            const std::vector<unsigned int> &dpo_vector);
+    FE_Poly(const unsigned int                                degree,
+            const std::vector<unsigned int> &                 dpo_vector,
+            const typename FiniteElementData<dim>::Conformity conformity);
 
   private:
     /**
