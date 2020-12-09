@@ -120,8 +120,10 @@ namespace Simplex
 
 
   template <int dim, int spacedim>
-  FE_Poly<dim, spacedim>::FE_Poly(const unsigned int               degree,
-                                  const std::vector<unsigned int> &dpo_vector)
+  FE_Poly<dim, spacedim>::FE_Poly(
+    const unsigned int                                degree,
+    const std::vector<unsigned int> &                 dpo_vector,
+    const typename FiniteElementData<dim>::Conformity conformity)
     : dealii::FE_Poly<dim, spacedim>(
         Simplex::ScalarPolynomial<dim>(degree),
         FiniteElementData<dim>(dpo_vector,
@@ -129,7 +131,7 @@ namespace Simplex
                                           ReferenceCell::Type::Tet,
                                1,
                                degree,
-                               FiniteElementData<dim>::L2),
+                               conformity),
         std::vector<bool>(FiniteElementData<dim>(dpo_vector,
                                                  dim == 2 ?
                                                    ReferenceCell::Type::Tri :
@@ -252,7 +254,9 @@ namespace Simplex
 
   template <int dim, int spacedim>
   FE_P<dim, spacedim>::FE_P(const unsigned int degree)
-    : FE_Poly<dim, spacedim>(degree, get_dpo_vector_fe_p(dim, degree))
+    : FE_Poly<dim, spacedim>(degree,
+                             get_dpo_vector_fe_p(dim, degree),
+                             FiniteElementData<dim>::H1)
   {}
 
 
@@ -338,7 +342,9 @@ namespace Simplex
 
   template <int dim, int spacedim>
   FE_DGP<dim, spacedim>::FE_DGP(const unsigned int degree)
-    : FE_Poly<dim, spacedim>(degree, get_dpo_vector_fe_dgp(dim, degree))
+    : FE_Poly<dim, spacedim>(degree,
+                             get_dpo_vector_fe_dgp(dim, degree),
+                             FiniteElementData<dim>::L2)
   {}
 
 
@@ -414,7 +420,7 @@ namespace Simplex
                                ReferenceCell::Type::Wedge,
                                1,
                                degree,
-                               FiniteElementData<dim>::L2),
+                               FiniteElementData<dim>::H1),
         std::vector<bool>(FiniteElementData<dim>(get_dpo_vector_fe_wedge(
                                                    degree),
                                                  ReferenceCell::Type::Wedge,
