@@ -2757,7 +2757,14 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::get_fe() const
            "associated with active cells. Consequently, you can not ask "
            "for the active finite element on cells with children."));
 
-  return this->dof_handler->get_fe(active_fe_index());
+  const auto &fe = this->dof_handler->get_fe(active_fe_index());
+
+  Assert(
+    this->reference_cell_type() == fe.reference_cell_type(),
+    ExcMessage(
+      "The reference-cell type of the cell does not match the one of the finite element!"));
+
+  return fe;
 }
 
 
