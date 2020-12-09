@@ -80,6 +80,19 @@ namespace internal
                              (vertices[3] - vertices[1]).norm(),
                              (vertices[3] - vertices[2]).norm()});
 
+          case ReferenceCell::Type::Pyramid:
+            // Return ...
+            return std::max({// the longest diagonal of the quadrilateral base
+                             // of the pyramid or ...
+                             (vertices[3] - vertices[0]).norm(),
+                             (vertices[2] - vertices[1]).norm(),
+                             // the longest edge connected with the apex of the
+                             // pyramid
+                             (vertices[4] - vertices[0]).norm(),
+                             (vertices[4] - vertices[1]).norm(),
+                             (vertices[4] - vertices[2]).norm(),
+                             (vertices[4] - vertices[3]).norm()});
+
           case ReferenceCell::Type::Wedge:
             // Return ...
             return std::max({// the longest of the 2*3=6 diagonals of the three
