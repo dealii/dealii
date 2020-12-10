@@ -257,6 +257,18 @@ namespace Simplex
 
 
   template <int dim, int spacedim>
+  std::pair<Table<2, bool>, std::vector<unsigned int>>
+  FE_Poly<dim, spacedim>::get_constant_modes() const
+  {
+    Table<2, bool> constant_modes(1, this->n_dofs_per_cell());
+    constant_modes.fill(true);
+    return std::pair<Table<2, bool>, std::vector<unsigned int>>(
+      constant_modes, std::vector<unsigned int>(1, 0));
+  }
+
+
+
+  template <int dim, int spacedim>
   void
   FE_Poly<dim, spacedim>::
     convert_generalized_support_point_values_to_dof_values(

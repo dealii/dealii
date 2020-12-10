@@ -44,6 +44,13 @@ namespace Simplex
             const std::vector<unsigned int> &                 dpo_vector,
             const typename FiniteElementData<dim>::Conformity conformity);
 
+    /**
+     * Return a list of constant modes of the element. For this element, the
+     * list consists of true arguments for all components.
+     */
+    std::pair<Table<2, bool>, std::vector<unsigned int>>
+    get_constant_modes() const override;
+
   private:
     /**
      * @copydoc dealii::FiniteElement::convert_generalized_support_point_values_to_dof_values()
