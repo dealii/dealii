@@ -239,6 +239,15 @@ private:
    */
   Table<3, double> interior_weights_abf;
 
+  /**
+   * Initialize the permutation pattern and the pattern of sign change.
+   *
+   * @note This function is not fully filled with the correct implementation
+   * yet. It needs to be consistently implemented in a future release to work
+   * on meshes that contain cells with flipped faces.
+   */
+  void
+  initialize_quad_dof_index_permutation_and_sign_change();
 
   // Allow access from other dimensions.
   template <int dim1>

@@ -138,6 +138,12 @@ private:
    */
   void
   initialize_support_points(const unsigned int rt_degree);
+
+  /**
+   * Initialize the permutation pattern and the pattern of sign change.
+   */
+  void
+  initialize_quad_dof_index_permutation_and_sign_change();
 };
 
 
