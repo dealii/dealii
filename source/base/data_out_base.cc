@@ -634,6 +634,12 @@ namespace
         vtk_cell_id[0] = 24;
         vtk_cell_id[1] = 1;
       }
+    else if (patch.reference_cell_type == ReferenceCell::Type::Wedge &&
+             patch.data.n_cols() == 6)
+      {
+        vtk_cell_id[0] = 13;
+        vtk_cell_id[1] = 1;
+      }
     else if (patch.reference_cell_type == ReferenceCell::get_hypercube(dim))
       {
         vtk_cell_id[0] = vtk_cell_type[dim];
