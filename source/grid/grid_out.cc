@@ -3217,11 +3217,30 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
         out << cell->n_vertices();
         for (const unsigned int i : cell->vertex_indices())
           {
-            out << ' '
-                << cell->vertex_index(GeometryInfo<dim>::vertices_per_cell ==
-                                          cell->n_vertices() ?
-                                        GeometryInfo<dim>::ucd_to_deal[i] :
-                                        i);
+            out << ' ';
+            switch (cell->reference_cell_type())
+              {
+                case ReferenceCell::Type::Vertex:
+                case ReferenceCell::Type::Line:
+                case ReferenceCell::Type::Quad:
+                case ReferenceCell::Type::Hex:
+                  out << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[i]);
+                  break;
+                case ReferenceCell::Type::Tri:
+                case ReferenceCell::Type::Tet:
+                case ReferenceCell::Type::Wedge:
+                  out << cell->vertex_index(i);
+                  break;
+                case ReferenceCell::Type::Pyramid:
+                  {
+                    static const std::array<unsigned int, 5> permutation_table{
+                      {0, 1, 3, 2, 4}};
+                    out << cell->vertex_index(permutation_table[i]);
+                    break;
+                  }
+                default:
+                  Assert(false, ExcNotImplemented());
+              }
           }
         out << '\n';
       }
