@@ -108,6 +108,11 @@ public:
    * Return the numbering of the underlying polynomial space compared to
    * lexicographic ordering of the basis functions. Returns
    * PolynomialType::get_numbering().
+   *
+   * @note Some implementations of this class do not support this function,
+   *   since no lexicographic ordering of the basis functions is possible
+   *   for them. Examples are: Simplex::FE_P, Simplex::FE_WedgeP, and
+   *   Simplex::FE_PyramidP.
    */
   std::vector<unsigned int>
   get_poly_space_numbering() const;
@@ -115,6 +120,8 @@ public:
   /**
    * Return the inverse numbering of the underlying polynomial space. Returns
    * PolynomialType::get_numbering_inverse().
+   *
+   * @note See note of get_poly_space_numbering().
    */
   std::vector<unsigned int>
   get_poly_space_numbering_inverse() const;
