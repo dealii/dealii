@@ -112,6 +112,17 @@ public:
       deallog << diagonal_global.l2_norm() << std::endl;
     }
 
+    {
+      VectorType diagonal_global;
+      MatrixFreeTools::compute_diagonal(matrix_free,
+                                        diagonal_global,
+                                        &Test::cell_function,
+                                        this);
+
+      diagonal_global.print(deallog.get_file_stream());
+      deallog << diagonal_global.l2_norm() << std::endl;
+    }
+
     if (test_matrix)
       {
         MatrixFreeTools::compute_matrix<dim,
