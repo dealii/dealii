@@ -39,6 +39,11 @@ namespace TimeStepping
    *   - RK_THIRD_ORDER (third order Runge-Kutta)
    *   - SSP_THIRD_ORDER (third order SSP Runge-Kutta)
    *   - RK_CLASSIC_FOURTH_ORDER (classical fourth order Runge-Kutta)
+   * - Low-storage (explicit) Runge-Kutta methods
+   *   - LOW_STORAGE_RK_STAGE3_ORDER3 (Three stages and third order)
+   *   - LOW_STORAGE_RK_STAGE5_ORDER4 (Five stages and fourth order)
+   *   - LOW_STORAGE_RK_STAGE7_ORDER4 (Seven stages and fourth order)
+   *   - LOW_STORAGE_RK_STAGE9_ORDER5 (Nine stages and fifth order)
    * - Implicit methods (see ImplicitRungeKutta::initialize):
    *   - BACKWARD_EULER (first order)
    *   - IMPLICIT_MIDPOINT (second order)
@@ -72,6 +77,28 @@ namespace TimeStepping
      * Classical fourth order Runge-Kutta method.
      */
     RK_CLASSIC_FOURTH_ORDER,
+    /**
+     * Three-stage scheme of order three by Kennedy et al.
+     * @cite KennedyCarpenterLewis2000. Its stability region is
+     * significantly smaller than the higher order schemes, but due to three
+     * stages only, it is very competitive in terms of the work per stage.
+     */
+    LOW_STORAGE_RK_STAGE3_ORDER3,
+    /**
+     * Five-stage scheme of order four,
+     * defined in the paper by Kennedy et al. @cite KennedyCarpenterLewis2000.
+     */
+    LOW_STORAGE_RK_STAGE5_ORDER4,
+    /**
+     * Seven-stage scheme of order four defined in the paper by Tselios and
+     * Simos @cite TseliosSimos2007.
+     */
+    LOW_STORAGE_RK_STAGE7_ORDER4,
+    /**
+     * Nine-stage scheme of order five
+     * defined in the paper by Kennedy et al. @cite KennedyCarpenterLewis2000.
+     */
+    LOW_STORAGE_RK_STAGE9_ORDER5,
     /**
      * Backward Euler method, first order.
      */
@@ -364,6 +391,126 @@ namespace TimeStepping
       const double             delta_t,
       const VectorType &       y,
       std::vector<VectorType> &f_stages) const;
+
+    /**
+     * Status structure of the object.
+     */
+    Status status;
+  };
+
+
+
+  /**
+   * The LowStorageRungeKutta class is derived from RungeKutta and implements a
+   * specific class of explicit methods. The main advantages of low-storage
+   * methods are the reduced memory consumption and the reduced memory access.
+   */
+  template <typename VectorType>
+  class LowStorageRungeKutta : public RungeKutta<VectorType>
+  {
+  public:
+    using RungeKutta<VectorType>::evolve_one_time_step;
+
+    /**
+     * Default constructor. This constructor creates an object for which
+     * you will want to call <code>initialize(runge_kutta_method)</code>
+     * before it can be used.
+     */
+    LowStorageRungeKutta() = default;
+
+    /**
+     * Constructor. This function calls initialize(runge_kutta_method).
+     */
+    LowStorageRungeKutta(const runge_kutta_method method);
+
+    /**
+     * Initialize the explicit Runge-Kutta method.
+     */
+    void
+    initialize(const runge_kutta_method method) override;
+
+    /**
+     * This function is used to advance from time @p t to t+ @p delta_t. @p f
+     * is the function $ f(t,y) $ that should be integrated, the input
+     * parameters are the time t and the vector y and the output is value of f
+     * at this point. @p id_minus_tau_J_inverse is a function that computes $
+     * inv(I-\tau J)$ where $ I $ is the identity matrix, $ \tau $ is given,
+     * and $ J $ is the Jacobian $ \frac{\partial J}{\partial y} $. The input
+     * parameters are the time, $ \tau $, and a vector. The output is the value
+     * of function at this point. evolve_one_time_step returns the time at the
+     * end of the time step.
+     */
+    double
+    evolve_one_time_step(
+      const std::function<VectorType(const double, const VectorType &)> &f,
+      const std::function<
+        VectorType(const double, const double, const VectorType &)>
+        &         id_minus_tau_J_inverse,
+      double      t,
+      double      delta_t,
+      VectorType &y) override;
+
+    /**
+     * This function is used to advance from time @p t to t+ @p delta_t. This
+     * function is similar to the one derived from RungeKutta, but does not
+     * required id_minus_tau_J_inverse because it is not used for explicit
+     * methods. evolve_one_time_step returns the time at the end of the time
+     * step. Note that vec_ki holds the evaluation of the differential operator,
+     * and vec_ri holds the right-hand side for the differential operator
+     * application.
+     */
+    double
+    evolve_one_time_step(
+      const std::function<VectorType(const double, const VectorType &)> &f,
+      double                                                             t,
+      double      delta_t,
+      VectorType &solution,
+      VectorType &vec_ri,
+      VectorType &vec_ki);
+
+    /**
+     * Get the coefficients of the scheme.
+     * Note that here vector @p a is not the conventional definition in terms of a
+     * Butcher tableau but merely one of the sub-diagonals. More details can be
+     * found in step-67 and the references therein.
+     */
+    void
+    get_coefficients(std::vector<double> &a,
+                     std::vector<double> &b,
+                     std::vector<double> &c) const;
+
+    /**
+     * This structure stores the name of the method used.
+     */
+    struct Status : public TimeStepping<VectorType>::Status
+    {
+      Status()
+        : method(invalid)
+      {}
+
+      runge_kutta_method method;
+    };
+
+    /**
+     * Return the status of the current object.
+     */
+    const Status &
+    get_status() const override;
+
+  private:
+    /**
+     * Compute  one stage of low storage rk.
+     */
+    void
+    compute_one_stage(
+      const std::function<VectorType(const double, const VectorType &)> &f,
+      const double                                                       t,
+      const double      factor_solution,
+      const double      factor_ai,
+      const VectorType &corrent_ri,
+      VectorType &      vec_ki,
+      VectorType &      solution,
+      VectorType &      next_ri) const;
 
     /**
      * Status structure of the object.

@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 // test Runge-Kutta methods in TimeStepping with a) a polynomial with expected
-// error 0 and b) convergence order for y=exp(t^2)
+// error 0 and b) convergence order for y=0.1*exp(t^2)
 #include <deal.II/base/time_stepping.h>
 
 #include <deal.II/lac/vector.h>
@@ -145,7 +145,7 @@ my5(double const t)
 double
 my_exact_solution(double const t)
 {
-  return std::exp(t * t);
+  return 0.1 * std::exp(t * t);
 }
 
 void
@@ -238,7 +238,7 @@ test_convergence(
     }
 
   deallog << "convergence rate" << std::endl;
-  for (unsigned int cycle = 0; cycle < 10; ++cycle)
+  for (unsigned int cycle = 0; cycle < 8; ++cycle)
     {
       unsigned int n_time_steps = std::pow(2., static_cast<double>(cycle));
       double       time_step =
@@ -255,7 +255,7 @@ test_convergence(
       error.sadd(1.0, -1.0, solution);
       double error_norm = error.l2_norm();
       errors.push_back(error_norm);
-      if (cycle > 0)
+      if (cycle > 1)
         deallog << std::log(std::fabs(errors[cycle - 1] / errors[cycle])) /
                      std::log(2.)
                 << std::endl;
@@ -266,6 +266,7 @@ int
 main()
 {
   initlog();
+  // deallog.precision(4);
   {
     deallog << "Forward Euler" << std::endl;
     TimeStepping::ExplicitRungeKutta<Vector<double>> fe(
@@ -287,6 +288,26 @@ main()
     TimeStepping::ExplicitRungeKutta<Vector<double>> rk4(
       TimeStepping::RK_CLASSIC_FOURTH_ORDER);
     test(rk4, f4, id_minus_tau_J_inv4, my4);
+
+    deallog << "Low-storage Runge-Kutta stage 3 order 3" << std::endl;
+    TimeStepping::LowStorageRungeKutta<Vector<double>> lsrk33(
+      TimeStepping::LOW_STORAGE_RK_STAGE3_ORDER3);
+    test(lsrk33, f3, id_minus_tau_J_inv3, my3);
+
+    deallog << "Low-storage Runge-Kutta stage 5 order 4" << std::endl;
+    TimeStepping::LowStorageRungeKutta<Vector<double>> lsrk54(
+      TimeStepping::LOW_STORAGE_RK_STAGE5_ORDER4);
+    test(lsrk54, f4, id_minus_tau_J_inv4, my4);
+
+    deallog << "Low-storage Runge-Kutta stage 7 order 4" << std::endl;
+    TimeStepping::LowStorageRungeKutta<Vector<double>> lsrk74(
+      TimeStepping::LOW_STORAGE_RK_STAGE7_ORDER4);
+    test(lsrk74, f4, id_minus_tau_J_inv4, my4);
+
+    deallog << "Low-storage Runge-Kutta stage 9 order 5" << std::endl;
+    TimeStepping::LowStorageRungeKutta<Vector<double>> lsrk95(
+      TimeStepping::LOW_STORAGE_RK_STAGE9_ORDER5);
+    test(lsrk95, f5, id_minus_tau_J_inv5, my5);
 
     deallog << "Backward Euler" << std::endl;
     TimeStepping::ImplicitRungeKutta<Vector<double>> be(
@@ -368,6 +389,38 @@ main()
     test_convergence(rk4,
                      my_rhs_function,
                      id_minus_tau_J_inv4,
+                     my_exact_solution);
+
+    deallog << "Low-storage Runge-Kutta stage 3 order 3" << std::endl;
+    TimeStepping::LowStorageRungeKutta<Vector<double>> lsrk33(
+      TimeStepping::LOW_STORAGE_RK_STAGE3_ORDER3);
+    test_convergence(lsrk33,
+                     my_rhs_function,
+                     id_minus_tau_J_inv3,
+                     my_exact_solution);
+
+    deallog << "Low-storage Runge-Kutta stage 5 order 4" << std::endl;
+    TimeStepping::LowStorageRungeKutta<Vector<double>> lsrk54(
+      TimeStepping::LOW_STORAGE_RK_STAGE5_ORDER4);
+    test_convergence(lsrk54,
+                     my_rhs_function,
+                     id_minus_tau_J_inv4,
+                     my_exact_solution);
+
+    deallog << "Low-storage Runge-Kutta stage 7 order 4" << std::endl;
+    TimeStepping::LowStorageRungeKutta<Vector<double>> lsrk74(
+      TimeStepping::LOW_STORAGE_RK_STAGE7_ORDER4);
+    test_convergence(lsrk74,
+                     my_rhs_function,
+                     id_minus_tau_J_inv4,
+                     my_exact_solution);
+
+    deallog << "Low-storage Runge-Kutta stage 9 order 5" << std::endl;
+    TimeStepping::LowStorageRungeKutta<Vector<double>> lsrk95(
+      TimeStepping::LOW_STORAGE_RK_STAGE9_ORDER5);
+    test_convergence(lsrk95,
+                     my_rhs_function,
+                     id_minus_tau_J_inv5,
                      my_exact_solution);
 
     deallog << "Backward Euler first order" << std::endl;
