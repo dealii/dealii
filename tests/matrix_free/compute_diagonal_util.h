@@ -208,7 +208,7 @@ public:
                  n_components,
                  Number,
                  VectorizedArrayType>
-      phi(data);
+      phi(data, pair);
     for (auto cell = pair.first; cell < pair.second; cell++)
       {
         phi.reinit(cell);

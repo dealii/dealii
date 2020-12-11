@@ -287,7 +287,7 @@ namespace MatrixFreeTools
                      n_components,
                      Number,
                      VectorizedArrayType>
-          phi(matrix_free, dof_no, quad_no, first_selected_component);
+          phi(matrix_free, range, dof_no, quad_no, first_selected_component);
 
         const unsigned int n_lanes = VectorizedArrayType::size();
 
