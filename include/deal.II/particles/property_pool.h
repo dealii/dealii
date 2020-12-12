@@ -44,6 +44,7 @@ namespace Particles
    * memory with varying sizes per particle (this memory would not be managed by
    * this class).
    */
+  template <int dim, int spacedim = dim>
   class PropertyPool
   {
   public:
@@ -142,10 +143,13 @@ namespace Particles
     std::vector<Handle> currently_available_handles;
   };
 
+
+
   /* ---------------------- inline and template functions ------------------ */
 
+  template <int dim, int spacedim>
   inline ArrayView<double>
-  PropertyPool::get_properties(const Handle handle)
+  PropertyPool<dim, spacedim>::get_properties(const Handle handle)
   {
     const std::vector<double>::size_type data_index =
       (handle != invalid_handle) ? handle * n_properties : 0;

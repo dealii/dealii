@@ -127,7 +127,7 @@ namespace Particles
      * function is after particle transfer to a new process.
      */
     void
-    set_property_pool(PropertyPool &property_pool);
+    set_property_pool(PropertyPool<dim, spacedim> &property_pool);
 
     /**
      * Return whether this particle has a valid property pool and a valid
@@ -384,7 +384,7 @@ namespace Particles
   template <int dim, int spacedim>
   inline void
   ParticleAccessor<dim, spacedim>::set_property_pool(
-    PropertyPool &new_property_pool)
+    PropertyPool<dim, spacedim> &new_property_pool)
   {
     Assert(particle != map->end(), ExcInternalError());
 
