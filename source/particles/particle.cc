@@ -51,12 +51,11 @@ namespace Particles
     , reference_location(particle.get_reference_location())
     , id(particle.get_id())
     , property_pool(particle.property_pool)
-    , properties((particle.has_properties()) ?
-                   property_pool->allocate_properties_array() :
-                   PropertyPool::invalid_handle)
+    , properties(PropertyPool::invalid_handle)
   {
     if (particle.has_properties())
       {
+        properties = property_pool->allocate_properties_array();
         const ArrayView<double> my_properties =
           property_pool->get_properties(properties);
         const ArrayView<const double> their_properties =

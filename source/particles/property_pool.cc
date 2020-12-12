@@ -20,7 +20,8 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Particles
 {
-  const PropertyPool::Handle PropertyPool::invalid_handle = nullptr;
+  const PropertyPool::Handle PropertyPool::invalid_handle =
+    static_cast<Handle>(-1);
 
 
   PropertyPool::PropertyPool(const unsigned int n_properties_per_slot)
@@ -30,12 +31,34 @@ namespace Particles
 
   PropertyPool::~PropertyPool()
   {
-    Assert(currently_open_handles.size() == 0,
-           ExcMessage("This property pool currently still holds " +
-                      std::to_string(currently_open_handles.size()) +
-                      " open handles to memory that was allocated "
-                      "via allocate_properties_array() but that has "
-                      "not been returned via deallocate_properties_array()."));
+    clear();
+  }
+
+
+
+  void
+  PropertyPool::clear()
+  {
+    if (n_properties > 0)
+      {
+        const unsigned int n_open_handles =
+          properties.size() / n_properties - currently_available_handles.size();
+        (void)n_open_handles;
+        AssertThrow(n_open_handles == 0,
+                    ExcMessage("This property pool currently still holds " +
+                               std::to_string(n_open_handles) +
+                               " open handles to memory that was allocated "
+                               "via allocate_properties_array() but that has "
+                               "not been returned via "
+                               "deallocate_properties_array()."));
+      }
+
+    // Clear vectors and ensure deallocation of memory
+    properties.clear();
+    properties.shrink_to_fit();
+
+    currently_available_handles.clear();
+    currently_available_handles.shrink_to_fit();
   }
 
 
@@ -43,11 +66,19 @@ namespace Particles
   PropertyPool::Handle
   PropertyPool::allocate_properties_array()
   {
-    PropertyPool::Handle handle = PropertyPool::invalid_handle;
+    Handle handle = invalid_handle;
     if (n_properties > 0)
       {
-        handle = new double[n_properties];
-        currently_open_handles.insert(handle);
+        if (currently_available_handles.size() > 0)
+          {
+            handle = currently_available_handles.back();
+            currently_available_handles.pop_back();
+          }
+        else
+          {
+            handle = properties.size() / n_properties;
+            properties.resize(properties.size() + n_properties, 0.0);
+          }
       }
 
     return handle;
@@ -56,19 +87,24 @@ namespace Particles
 
 
   void
-  PropertyPool::deallocate_properties_array(Handle handle)
+  PropertyPool::deallocate_properties_array(Handle &handle)
   {
-    Assert(currently_open_handles.count(handle) == 1, ExcInternalError());
-    currently_open_handles.erase(handle);
-    delete[] handle;
-  }
+    Assert(
+      handle != invalid_handle,
+      ExcMessage(
+        "This handle is invalid and cannot be deallocated. This can happen if the "
+        "handle was deallocated already before calling this function."));
+    currently_available_handles.push_back(handle);
+    handle = invalid_handle;
 
-
-
-  ArrayView<double>
-  PropertyPool::get_properties(const Handle handle)
-  {
-    return ArrayView<double>(handle, n_properties);
+    // If this was the last handle, resize containers to 0.
+    // This guarantees that all future properties
+    // are allocated in a sorted way without requiring reallocation.
+    if (currently_available_handles.size() * n_properties == properties.size())
+      {
+        currently_available_handles.clear();
+        properties.clear();
+      }
   }
 
 
@@ -76,7 +112,7 @@ namespace Particles
   void
   PropertyPool::reserve(const std::size_t size)
   {
-    (void)size;
+    properties.reserve(size * n_properties);
   }
 
 
