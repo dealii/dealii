@@ -14,6 +14,8 @@
 // ---------------------------------------------------------------------
 
 
+#include <deal.II/base/signaling_nan.h>
+
 #include <deal.II/particles/property_pool.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -61,6 +63,12 @@ namespace Particles
       }
 
     // Clear vectors and ensure deallocation of memory
+    locations.clear();
+    locations.shrink_to_fit();
+
+    reference_locations.clear();
+    reference_locations.shrink_to_fit();
+
     properties.clear();
     properties.shrink_to_fit();
 
@@ -84,7 +92,16 @@ namespace Particles
           }
         else
           {
-            handle = properties.size() / n_properties;
+            handle = locations.size();
+
+            // Append new slots to the end of the arrays. Initialize with
+            // invalid points.
+            locations.resize(locations.size() + 1,
+                             numbers::signaling_nan<Point<spacedim>>());
+            reference_locations.resize(reference_locations.size() + 1,
+                                       numbers::signaling_nan<Point<dim>>());
+
+            // In contrast, initialize properties by zero.
             properties.resize(properties.size() + n_properties, 0.0);
           }
       }
@@ -122,6 +139,8 @@ namespace Particles
   void
   PropertyPool<dim, spacedim>::reserve(const std::size_t size)
   {
+    locations.reserve(size);
+    reference_locations.reserve(size);
     properties.reserve(size * n_properties);
   }
 
