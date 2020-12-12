@@ -72,7 +72,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   typename PropertyPool<dim, spacedim>::Handle
-  PropertyPool<dim, spacedim>::allocate_properties_array()
+  PropertyPool<dim, spacedim>::register_particle()
   {
     Handle handle = invalid_handle;
     if (n_properties > 0)
@@ -96,7 +96,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   void
-  PropertyPool<dim, spacedim>::deallocate_properties_array(Handle &handle)
+  PropertyPool<dim, spacedim>::deregister_particle(Handle &handle)
   {
     Assert(
       handle != invalid_handle,

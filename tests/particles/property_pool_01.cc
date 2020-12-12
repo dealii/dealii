@@ -35,14 +35,14 @@ test()
     Particles::PropertyPool<dim, spacedim> pool(1);
 
     typename Particles::PropertyPool<dim, spacedim>::Handle handle =
-      pool.allocate_properties_array();
+      pool.register_particle();
 
     pool.get_properties(handle)[0] = 2.5;
 
     deallog << "Pool properties: " << pool.get_properties(handle)[0]
             << std::endl;
 
-    pool.deallocate_properties_array(handle);
+    pool.deregister_particle(handle);
   }
 
   deallog << "OK" << std::endl;

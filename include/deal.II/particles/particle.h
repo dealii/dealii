@@ -602,7 +602,7 @@ namespace Particles
     if (property_pool != nullptr &&
         properties != PropertyPool<dim, spacedim>::invalid_handle)
       {
-        new_handle = new_property_pool.allocate_properties_array();
+        new_handle = new_property_pool.register_particle();
 
         ArrayView<double> old_properties = this->get_properties();
         ArrayView<double> new_properties =
@@ -616,7 +616,7 @@ namespace Particles
     // release those.
     if (property_pool != nullptr &&
         properties != PropertyPool<dim, spacedim>::invalid_handle)
-      property_pool->deallocate_properties_array(properties);
+      property_pool->deregister_particle(properties);
 
 
     // Then set the pointer to the property pool we want to use. Also set the

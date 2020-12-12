@@ -55,7 +55,7 @@ namespace Particles
   {
     if (particle.has_properties())
       {
-        properties = property_pool->allocate_properties_array();
+        properties = property_pool->register_particle();
         const ArrayView<double> my_properties =
           property_pool->get_properties(properties);
         const ArrayView<const double> their_properties =
@@ -87,7 +87,7 @@ namespace Particles
 
     property_pool = new_property_pool;
     if (property_pool != nullptr)
-      properties = property_pool->allocate_properties_array();
+      properties = property_pool->register_particle();
     else
       properties = PropertyPool<dim, spacedim>::invalid_handle;
 
@@ -132,7 +132,7 @@ namespace Particles
 
         if (particle.has_properties())
           {
-            properties = property_pool->allocate_properties_array();
+            properties = property_pool->register_particle();
             const ArrayView<const double> their_properties =
               particle.get_properties();
             const ArrayView<double> my_properties =
@@ -178,7 +178,7 @@ namespace Particles
   {
     if (property_pool != nullptr &&
         properties != PropertyPool<dim, spacedim>::invalid_handle)
-      property_pool->deallocate_properties_array(properties);
+      property_pool->deregister_particle(properties);
   }
 
   template <int dim, int spacedim>
@@ -187,7 +187,7 @@ namespace Particles
   {
     if (property_pool != nullptr &&
         properties != PropertyPool<dim, spacedim>::invalid_handle)
-      property_pool->deallocate_properties_array(properties);
+      property_pool->deregister_particle(properties);
   }
 
 
@@ -278,7 +278,7 @@ namespace Particles
 
     // If we haven't allocated memory yet, do so now
     if (properties == PropertyPool<dim, spacedim>::invalid_handle)
-      properties = property_pool->allocate_properties_array();
+      properties = property_pool->register_particle();
 
     const ArrayView<double> property_values =
       property_pool->get_properties(properties);
@@ -309,7 +309,7 @@ namespace Particles
     // If this particle has no properties yet, allocate and initialize them.
     if (properties == PropertyPool<dim, spacedim>::invalid_handle)
       {
-        properties = property_pool->allocate_properties_array();
+        properties = property_pool->register_particle();
 
         ArrayView<double> my_properties =
           property_pool->get_properties(properties);
