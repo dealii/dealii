@@ -25,13 +25,13 @@ DEAL::   with 134 CG iterations needed to obtain convergence
 DEAL::
 DEAL::Solve problem on WEDGE mesh:
 DEAL::   on parallel::fullydistributed::Triangulation
-DEAL:cg::Starting value 0.0132550
-DEAL:cg::Convergence step 186 value 8.72414e-13
-DEAL::   with 186 CG iterations needed to obtain convergence
+DEAL:cg::Starting value 0.0561953
+DEAL:cg::Convergence step 197 value 8.60684e-13
+DEAL::   with 197 CG iterations needed to obtain convergence
 DEAL::
 DEAL::Solve problem on PYRAMID mesh:
 DEAL::   on parallel::fullydistributed::Triangulation
-DEAL:cg::Starting value 0.0230669
-DEAL:cg::Convergence step 79 value 7.71392e-13
-DEAL::   with 79 CG iterations needed to obtain convergence
+DEAL:cg::Starting value 0.101163
+DEAL:cg::Convergence step 83 value 9.01991e-13
+DEAL::   with 83 CG iterations needed to obtain convergence
 DEAL::

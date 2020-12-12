@@ -246,6 +246,160 @@ MappingFE<dim, spacedim>::InternalData::initialize_face(
           for (unsigned int i = 0; i < n_original_q_points; i++)
             unit_tangentials[7].emplace_back(t1);
         }
+      else if (this->fe.reference_cell_type() == ReferenceCell::Type::Wedge)
+        {
+          Tensor<1, dim> t1;
+          constexpr int  d0 = 0;
+          constexpr int  d1 = 1 % dim;
+          constexpr int  d2 = 2 % dim;
+
+          // face 0
+          t1[d0] = 0;
+          t1[d1] = 1;
+          t1[d2] = 0;
+          for (unsigned int i = 0; i < n_original_q_points; i++)
+            unit_tangentials[0].emplace_back(t1);
+
+          // face 0
+          t1[d0] = 1;
+          t1[d1] = 0;
+          t1[d2] = 0;
+          for (unsigned int i = 0; i < n_original_q_points; i++)
+            unit_tangentials[5].emplace_back(t1);
+
+          // face 1
+          t1[d0] = 1;
+          t1[d1] = 0;
+          t1[d2] = 0;
+          for (unsigned int i = 0; i < n_original_q_points; i++)
+            unit_tangentials[1].emplace_back(t1);
+
+          // face 1
+          t1[d0] = 0;
+          t1[d1] = 1;
+          t1[d2] = 0;
+          for (unsigned int i = 0; i < n_original_q_points; i++)
+            unit_tangentials[6].emplace_back(t1);
+
+          // face 2
+          t1[d0] = -1 / std::sqrt(2.0);
+          t1[d1] = +1 / std::sqrt(2.0);
+          t1[d2] = 0;
+          for (unsigned int i = 0; i < n_original_q_points; i++)
+            unit_tangentials[2].emplace_back(t1);
+
+          // face 2
+          t1[d0] = 0;
+          t1[d1] = 0;
+          t1[d2] = 1;
+          for (unsigned int i = 0; i < n_original_q_points; i++)
+            unit_tangentials[7].emplace_back(t1);
+
+          // face 3
+          t1[d0] = +0;
+          t1[d1] = +0;
+          t1[d2] = +1;
+          for (unsigned int i = 0; i < n_original_q_points; i++)
+            unit_tangentials[3].emplace_back(t1);
+
+          // face 3
+          t1[d0] = +0;
+          t1[d1] = +1;
+          t1[d2] = +0;
+          for (unsigned int i = 0; i < n_original_q_points; i++)
+            unit_tangentials[8].emplace_back(t1);
+
+          // face 4
+          t1[d0] = 1;
+          t1[d1] = 0;
+          t1[d2] = 0;
+          for (unsigned int i = 0; i < n_original_q_points; i++)
+            unit_tangentials[4].emplace_back(t1);
+
+          // face 4
+          t1[d0] = 0;
+          t1[d1] = 0;
+          t1[d2] = 1;
+          for (unsigned int i = 0; i < n_original_q_points; i++)
+            unit_tangentials[9].emplace_back(t1);
+        }
+      else if (this->fe.reference_cell_type() == ReferenceCell::Type::Pyramid)
+        {
+          Tensor<1, dim> t1;
+          constexpr int  d0 = 0;
+          constexpr int  d1 = 1 % dim;
+          constexpr int  d2 = 2 % dim;
+
+          // face 0
+          t1[d0] = 0;
+          t1[d1] = 1;
+          t1[d2] = 0;
+          for (unsigned int i = 0; i < n_original_q_points; i++)
+            unit_tangentials[0].emplace_back(t1);
+
+          // face 0
+          t1[d0] = 1;
+          t1[d1] = 0;
+          t1[d2] = 0;
+          for (unsigned int i = 0; i < n_original_q_points; i++)
+            unit_tangentials[5].emplace_back(t1);
+
+          // face 1
+          t1[d0] = 1.0 / sqrt(2.0);
+          t1[d1] = 0;
+          t1[d2] = 1.0 / sqrt(2.0);
+          for (unsigned int i = 0; i < n_original_q_points; i++)
+            unit_tangentials[1].emplace_back(t1);
+
+          // face 1
+          t1[d0] = 0;
+          t1[d1] = 1;
+          t1[d2] = 0;
+          for (unsigned int i = 0; i < n_original_q_points; i++)
+            unit_tangentials[6].emplace_back(t1);
+
+          // face 2
+          t1[d0] = 1.0 / sqrt(2.0);
+          t1[d1] = 0;
+          t1[d2] = -1.0 / sqrt(2.0);
+          for (unsigned int i = 0; i < n_original_q_points; i++)
+            unit_tangentials[2].emplace_back(t1);
+
+          // face 2
+          t1[d0] = 0;
+          t1[d1] = 1;
+          t1[d2] = 0;
+          for (unsigned int i = 0; i < n_original_q_points; i++)
+            unit_tangentials[7].emplace_back(t1);
+
+          // face 3
+          t1[d0] = 1;
+          t1[d1] = 0;
+          t1[d2] = 0;
+          for (unsigned int i = 0; i < n_original_q_points; i++)
+            unit_tangentials[3].emplace_back(t1);
+
+          // face 3
+          t1[d0] = 0;
+          t1[d1] = 1.0 / sqrt(2.0);
+          t1[d2] = 1.0 / sqrt(2.0);
+          for (unsigned int i = 0; i < n_original_q_points; i++)
+            unit_tangentials[8].emplace_back(t1);
+
+          // face 4
+          t1[d0] = 1;
+          t1[d1] = 0;
+          t1[d2] = 0;
+          for (unsigned int i = 0; i < n_original_q_points; i++)
+            unit_tangentials[4].emplace_back(t1);
+
+          // face 4
+          t1[d0] = 0;
+          t1[d1] = +1.0 / sqrt(2.0);
+          t1[d2] = -1.0 / sqrt(2.0);
+          for (unsigned int i = 0; i < n_original_q_points; i++)
+            unit_tangentials[9].emplace_back(t1);
+        }
       else
         {
           Assert(false, ExcNotImplemented());
