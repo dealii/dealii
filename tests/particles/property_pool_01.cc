@@ -29,9 +29,12 @@ void
 test()
 {
   {
-    Particles::PropertyPool pool(1);
+    const int dim      = 2;
+    const int spacedim = 2;
 
-    typename Particles::PropertyPool::Handle handle =
+    Particles::PropertyPool<dim, spacedim> pool(1);
+
+    typename Particles::PropertyPool<dim, spacedim>::Handle handle =
       pool.allocate_properties_array();
 
     pool.get_properties(handle)[0] = 2.5;

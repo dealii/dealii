@@ -29,10 +29,13 @@ void
 test()
 {
   {
-    const unsigned int      n_properties = 3;
-    Particles::PropertyPool pool(n_properties);
+    const int dim      = 2;
+    const int spacedim = 2;
 
-    typename Particles::PropertyPool::Handle handle =
+    const unsigned int                     n_properties = 3;
+    Particles::PropertyPool<dim, spacedim> pool(n_properties);
+
+    typename Particles::PropertyPool<dim, spacedim>::Handle handle =
       pool.allocate_properties_array();
 
     pool.get_properties(handle)[0] = 1.2;

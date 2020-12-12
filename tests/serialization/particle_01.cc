@@ -34,10 +34,10 @@ test()
     Point<spacedim> location;
     Point<dim>      reference_location;
 
-    location[spacedim - 1]      = 0.3;
-    reference_location[dim - 1] = 0.5;
-    const unsigned int      id  = 6;
-    Particles::PropertyPool property_pool(2);
+    location[spacedim - 1]                    = 0.3;
+    reference_location[dim - 1]               = 0.5;
+    const unsigned int                     id = 6;
+    Particles::PropertyPool<dim, spacedim> property_pool(2);
 
     Particles::Particle<dim, spacedim> particle(location,
                                                 reference_location,
@@ -65,7 +65,7 @@ test()
     std::istringstream            iss(oss.str());
     boost::archive::text_iarchive ia(iss, boost::archive::no_header);
 
-    Particles::PropertyPool property_pool(2);
+    Particles::PropertyPool<dim, spacedim> property_pool(2);
 
     Particles::Particle<dim, spacedim> particle;
     particle.set_property_pool(property_pool);
