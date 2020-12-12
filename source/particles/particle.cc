@@ -27,7 +27,7 @@ namespace Particles
     , reference_location(numbers::signaling_nan<Point<dim>>())
     , id(0)
     , property_pool(nullptr)
-    , properties(PropertyPool::invalid_handle)
+    , properties(PropertyPool<dim, spacedim>::invalid_handle)
   {}
 
 
@@ -40,7 +40,7 @@ namespace Particles
     , reference_location(reference_location)
     , id(id)
     , property_pool(nullptr)
-    , properties(PropertyPool::invalid_handle)
+    , properties(PropertyPool<dim, spacedim>::invalid_handle)
   {}
 
 
@@ -51,7 +51,7 @@ namespace Particles
     , reference_location(particle.get_reference_location())
     , id(particle.get_id())
     , property_pool(particle.property_pool)
-    , properties(PropertyPool::invalid_handle)
+    , properties(PropertyPool<dim, spacedim>::invalid_handle)
   {
     if (particle.has_properties())
       {
@@ -70,8 +70,9 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  Particle<dim, spacedim>::Particle(const void *&       data,
-                                    PropertyPool *const new_property_pool)
+  Particle<dim, spacedim>::Particle(
+    const void *&                      data,
+    PropertyPool<dim, spacedim> *const new_property_pool)
   {
     const types::particle_index *id_data =
       static_cast<const types::particle_index *>(data);
@@ -88,7 +89,7 @@ namespace Particles
     if (property_pool != nullptr)
       properties = property_pool->allocate_properties_array();
     else
-      properties = PropertyPool::invalid_handle;
+      properties = PropertyPool<dim, spacedim>::invalid_handle;
 
     // See if there are properties to load
     if (has_properties())
@@ -113,7 +114,7 @@ namespace Particles
     , property_pool(std::move(particle.property_pool))
     , properties(std::move(particle.properties))
   {
-    particle.properties = PropertyPool::invalid_handle;
+    particle.properties = PropertyPool<dim, spacedim>::invalid_handle;
   }
 
 
@@ -142,7 +143,7 @@ namespace Particles
                       my_properties.begin());
           }
         else
-          properties = PropertyPool::invalid_handle;
+          properties = PropertyPool<dim, spacedim>::invalid_handle;
       }
     return *this;
   }
@@ -165,7 +166,7 @@ namespace Particles
         // We stole the rhs's properties, so we need to invalidate
         // the handle the rhs holds lest it releases the memory that
         // we still reference here.
-        particle.properties = PropertyPool::invalid_handle;
+        particle.properties = PropertyPool<dim, spacedim>::invalid_handle;
       }
     return *this;
   }
@@ -175,7 +176,8 @@ namespace Particles
   template <int dim, int spacedim>
   Particle<dim, spacedim>::~Particle()
   {
-    if (property_pool != nullptr && properties != PropertyPool::invalid_handle)
+    if (property_pool != nullptr &&
+        properties != PropertyPool<dim, spacedim>::invalid_handle)
       property_pool->deallocate_properties_array(properties);
   }
 
@@ -183,7 +185,8 @@ namespace Particles
   void
   Particle<dim, spacedim>::free_properties()
   {
-    if (property_pool != nullptr && properties != PropertyPool::invalid_handle)
+    if (property_pool != nullptr &&
+        properties != PropertyPool<dim, spacedim>::invalid_handle)
       property_pool->deallocate_properties_array(properties);
   }
 
@@ -274,7 +277,7 @@ namespace Particles
     Assert(property_pool != nullptr, ExcInternalError());
 
     // If we haven't allocated memory yet, do so now
-    if (properties == PropertyPool::invalid_handle)
+    if (properties == PropertyPool<dim, spacedim>::invalid_handle)
       properties = property_pool->allocate_properties_array();
 
     const ArrayView<double> property_values =
@@ -304,7 +307,7 @@ namespace Particles
     Assert(property_pool != nullptr, ExcInternalError());
 
     // If this particle has no properties yet, allocate and initialize them.
-    if (properties == PropertyPool::invalid_handle)
+    if (properties == PropertyPool<dim, spacedim>::invalid_handle)
       {
         properties = property_pool->allocate_properties_array();
 

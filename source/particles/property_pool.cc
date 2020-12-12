@@ -20,24 +20,31 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Particles
 {
-  const PropertyPool::Handle PropertyPool::invalid_handle =
-    static_cast<Handle>(-1);
+  template <int dim, int spacedim>
+  const typename PropertyPool<dim, spacedim>::Handle
+    PropertyPool<dim, spacedim>::invalid_handle = static_cast<Handle>(-1);
 
 
-  PropertyPool::PropertyPool(const unsigned int n_properties_per_slot)
+
+  template <int dim, int spacedim>
+  PropertyPool<dim, spacedim>::PropertyPool(
+    const unsigned int n_properties_per_slot)
     : n_properties(n_properties_per_slot)
   {}
 
 
-  PropertyPool::~PropertyPool()
+
+  template <int dim, int spacedim>
+  PropertyPool<dim, spacedim>::~PropertyPool()
   {
     clear();
   }
 
 
 
+  template <int dim, int spacedim>
   void
-  PropertyPool::clear()
+  PropertyPool<dim, spacedim>::clear()
   {
     if (n_properties > 0)
       {
@@ -63,8 +70,9 @@ namespace Particles
 
 
 
-  PropertyPool::Handle
-  PropertyPool::allocate_properties_array()
+  template <int dim, int spacedim>
+  typename PropertyPool<dim, spacedim>::Handle
+  PropertyPool<dim, spacedim>::allocate_properties_array()
   {
     Handle handle = invalid_handle;
     if (n_properties > 0)
@@ -86,8 +94,9 @@ namespace Particles
 
 
 
+  template <int dim, int spacedim>
   void
-  PropertyPool::deallocate_properties_array(Handle &handle)
+  PropertyPool<dim, spacedim>::deallocate_properties_array(Handle &handle)
   {
     Assert(
       handle != invalid_handle,
@@ -109,18 +118,29 @@ namespace Particles
 
 
 
+  template <int dim, int spacedim>
   void
-  PropertyPool::reserve(const std::size_t size)
+  PropertyPool<dim, spacedim>::reserve(const std::size_t size)
   {
     properties.reserve(size * n_properties);
   }
 
 
 
+  template <int dim, int spacedim>
   unsigned int
-  PropertyPool::n_properties_per_slot() const
+  PropertyPool<dim, spacedim>::n_properties_per_slot() const
   {
     return n_properties;
   }
+
+
+  // Instantiate the class for all reasonable template arguments
+  template class PropertyPool<1, 1>;
+  template class PropertyPool<1, 2>;
+  template class PropertyPool<1, 3>;
+  template class PropertyPool<2, 2>;
+  template class PropertyPool<2, 3>;
+  template class PropertyPool<3, 3>;
 } // namespace Particles
 DEAL_II_NAMESPACE_CLOSE

@@ -190,8 +190,8 @@ namespace Particles
      * contains serialized data of the same length and type that is allocated
      * by @p property_pool.
      */
-    Particle(const void *&       begin_data,
-             PropertyPool *const property_pool = nullptr);
+    Particle(const void *&                      begin_data,
+             PropertyPool<dim, spacedim> *const property_pool = nullptr);
 
     /**
      * Move constructor for Particle, creates a particle from an existing
@@ -360,7 +360,7 @@ namespace Particles
      * allocated in the new property pool.
      */
     void
-    set_property_pool(PropertyPool &property_pool);
+    set_property_pool(PropertyPool<dim, spacedim> &property_pool);
 
     /**
      * Return whether this particle has a valid property pool and a valid
@@ -478,12 +478,12 @@ namespace Particles
      * A pointer to the property pool. Necessary to translate from the
      * handle to the actual memory locations.
      */
-    PropertyPool *property_pool;
+    PropertyPool<dim, spacedim> *property_pool;
 
     /**
      * A handle to all particle properties
      */
-    PropertyPool::Handle properties;
+    typename PropertyPool<dim, spacedim>::Handle properties;
   };
 
   /* ---------------------- inline and template functions ------------------ */
@@ -523,7 +523,7 @@ namespace Particles
   {
     unsigned int n_properties = 0;
     if ((property_pool != nullptr) &&
-        (properties != PropertyPool::invalid_handle))
+        (properties != PropertyPool<dim, spacedim>::invalid_handle))
       n_properties = get_properties().size();
 
     ar &location &reference_location &id &n_properties;
@@ -591,13 +591,16 @@ namespace Particles
 
   template <int dim, int spacedim>
   inline void
-  Particle<dim, spacedim>::set_property_pool(PropertyPool &new_property_pool)
+  Particle<dim, spacedim>::set_property_pool(
+    PropertyPool<dim, spacedim> &new_property_pool)
   {
     // First, we do want to save any properties that may
     // have previously been set, and copy them over to the memory allocated
     // on the new pool
-    PropertyPool::Handle new_handle = PropertyPool::invalid_handle;
-    if (property_pool != nullptr && properties != PropertyPool::invalid_handle)
+    typename PropertyPool<dim, spacedim>::Handle new_handle =
+      PropertyPool<dim, spacedim>::invalid_handle;
+    if (property_pool != nullptr &&
+        properties != PropertyPool<dim, spacedim>::invalid_handle)
       {
         new_handle = new_property_pool.allocate_properties_array();
 
@@ -611,7 +614,8 @@ namespace Particles
 
     // If the particle currently has a reference to properties, then
     // release those.
-    if (property_pool != nullptr && properties != PropertyPool::invalid_handle)
+    if (property_pool != nullptr &&
+        properties != PropertyPool<dim, spacedim>::invalid_handle)
       property_pool->deallocate_properties_array(properties);
 
 
@@ -639,7 +643,7 @@ namespace Particles
   Particle<dim, spacedim>::has_properties() const
   {
     return (property_pool != nullptr) &&
-           (properties != PropertyPool::invalid_handle);
+           (properties != PropertyPool<dim, spacedim>::invalid_handle);
   }
 
 } // namespace Particles

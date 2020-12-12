@@ -52,8 +52,8 @@ namespace Particles
     std::vector<Particle<dim, spacedim>>
     unpack_particles(
       const boost::iterator_range<std::vector<char>::const_iterator>
-        &           data_range,
-      PropertyPool &property_pool)
+        &                          data_range,
+      PropertyPool<dim, spacedim> &property_pool)
     {
       std::vector<Particle<dim, spacedim>> particles;
 
@@ -88,7 +88,7 @@ namespace Particles
   ParticleHandler<dim, spacedim>::ParticleHandler()
     : triangulation()
     , mapping()
-    , property_pool(std::make_unique<PropertyPool>(0))
+    , property_pool(std::make_unique<PropertyPool<dim, spacedim>>(0))
     , particles()
     , ghost_particles()
     , global_number_of_particles(0)
@@ -109,7 +109,7 @@ namespace Particles
     const unsigned int                  n_properties)
     : triangulation(&triangulation, typeid(*this).name())
     , mapping(&mapping, typeid(*this).name())
-    , property_pool(std::make_unique<PropertyPool>(n_properties))
+    , property_pool(std::make_unique<PropertyPool<dim, spacedim>>(n_properties))
     , particles()
     , ghost_particles()
     , global_number_of_particles(0)
@@ -137,7 +137,7 @@ namespace Particles
     mapping       = &new_mapping;
 
     // Create the memory pool that will store all particle properties
-    property_pool = std::make_unique<PropertyPool>(n_properties);
+    property_pool = std::make_unique<PropertyPool<dim, spacedim>>(n_properties);
 
     // Create the grid cache to cache the information about the triangulation
     // that is used to locate the particles into subdomains and cells
@@ -879,7 +879,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  PropertyPool &
+  PropertyPool<dim, spacedim> &
   ParticleHandler<dim, spacedim>::get_property_pool() const
   {
     return *property_pool;
