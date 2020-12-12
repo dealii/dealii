@@ -483,7 +483,7 @@ namespace Particles
     /**
      * A handle to all particle properties
      */
-    typename PropertyPool<dim, spacedim>::Handle properties;
+    typename PropertyPool<dim, spacedim>::Handle property_pool_handle;
   };
 
   /* ---------------------- inline and template functions ------------------ */
@@ -523,7 +523,7 @@ namespace Particles
   {
     unsigned int n_properties = 0;
     if ((property_pool != nullptr) &&
-        (properties != PropertyPool<dim, spacedim>::invalid_handle))
+        (property_pool_handle != PropertyPool<dim, spacedim>::invalid_handle))
       n_properties = get_properties().size();
 
     ar &location &reference_location &id &n_properties;
@@ -600,7 +600,7 @@ namespace Particles
     typename PropertyPool<dim, spacedim>::Handle new_handle =
       PropertyPool<dim, spacedim>::invalid_handle;
     if (property_pool != nullptr &&
-        properties != PropertyPool<dim, spacedim>::invalid_handle)
+        property_pool_handle != PropertyPool<dim, spacedim>::invalid_handle)
       {
         new_handle = new_property_pool.register_particle();
 
@@ -615,14 +615,14 @@ namespace Particles
     // If the particle currently has a reference to properties, then
     // release those.
     if (property_pool != nullptr &&
-        properties != PropertyPool<dim, spacedim>::invalid_handle)
-      property_pool->deregister_particle(properties);
+        property_pool_handle != PropertyPool<dim, spacedim>::invalid_handle)
+      property_pool->deregister_particle(property_pool_handle);
 
 
     // Then set the pointer to the property pool we want to use. Also set the
     // handle to any properties, if we have copied any above.
-    property_pool = &new_property_pool;
-    properties    = new_handle;
+    property_pool        = &new_property_pool;
+    property_pool_handle = new_handle;
   }
 
 
@@ -633,7 +633,7 @@ namespace Particles
   {
     Assert(has_properties(), ExcInternalError());
 
-    return property_pool->get_properties(properties);
+    return property_pool->get_properties(property_pool_handle);
   }
 
 
@@ -643,7 +643,8 @@ namespace Particles
   Particle<dim, spacedim>::has_properties() const
   {
     return (property_pool != nullptr) &&
-           (properties != PropertyPool<dim, spacedim>::invalid_handle);
+           (property_pool_handle !=
+            PropertyPool<dim, spacedim>::invalid_handle);
   }
 
 } // namespace Particles
