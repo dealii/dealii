@@ -131,6 +131,127 @@ namespace dealii
 
     template <int dim, int spacedim>
     void
+    subdivided_hyper_rectangle_with_pyramids(
+      Triangulation<dim, spacedim> &   tria,
+      const std::vector<unsigned int> &repetitions,
+      const Point<dim> &               p1,
+      const Point<dim> &               p2,
+      const bool                       colorize = false)
+    {
+      AssertDimension(dim, spacedim);
+
+      AssertThrow(colorize == false, ExcNotImplemented());
+
+      std::vector<Point<spacedim>> vertices;
+      std::vector<CellData<dim>>   cells;
+
+      if (dim == 3)
+        {
+          // determine cell sizes
+          const Point<dim> dx((p2[0] - p1[0]) / repetitions[0],
+                              (p2[1] - p1[1]) / repetitions[1],
+                              (p2[2] - p1[2]) / repetitions[2]);
+
+          // create vertices
+          for (unsigned int k = 0; k <= repetitions[2]; ++k)
+            for (unsigned int j = 0; j <= repetitions[1]; ++j)
+              for (unsigned int i = 0; i <= repetitions[0]; ++i)
+                vertices.push_back(Point<spacedim>(p1[0] + dx[0] * i,
+                                                   p1[1] + dx[1] * j,
+                                                   p1[2] + dx[2] * k));
+          for (unsigned int k = 0; k < repetitions[2]; ++k)
+            for (unsigned int j = 0; j < repetitions[1]; ++j)
+              for (unsigned int i = 0; i < repetitions[0]; ++i)
+                vertices.push_back(Point<spacedim>(p1[0] + dx[0] * (i + 0.5),
+                                                   p1[1] + dx[1] * (j + 0.5),
+                                                   p1[2] + dx[2] * (k + 0.5)));
+
+          // create cells
+          for (unsigned int k = 0; k < repetitions[2]; ++k)
+            for (unsigned int j = 0; j < repetitions[1]; ++j)
+              for (unsigned int i = 0; i < repetitions[0]; ++i)
+                {
+                  // create reference HEX cell
+                  std::array<unsigned int, 9> quad{
+                    {(k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                       (j + 0) * (repetitions[0] + 1) + i + 0,
+                     (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                       (j + 0) * (repetitions[0] + 1) + i + 1,
+                     (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                       (j + 1) * (repetitions[0] + 1) + i + 0,
+                     (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                       (j + 1) * (repetitions[0] + 1) + i + 1,
+                     (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                       (j + 0) * (repetitions[0] + 1) + i + 0,
+                     (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                       (j + 0) * (repetitions[0] + 1) + i + 1,
+                     (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                       (j + 1) * (repetitions[0] + 1) + i + 0,
+                     (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                       (j + 1) * (repetitions[0] + 1) + i + 1,
+                     (repetitions[2] + 1) * (repetitions[1] + 1) *
+                         (repetitions[0] + 1) +
+                       (repetitions[1] * repetitions[0] * k +
+                        repetitions[0] * j + i)}};
+
+
+                  // TRI cell 0
+                  {
+                    CellData<dim> tri;
+                    tri.vertices = {
+                      quad[0], quad[2], quad[4], quad[6], quad[8]};
+                    cells.push_back(tri);
+                  }
+                  // TRI cell 1
+                  {
+                    CellData<dim> tri;
+                    tri.vertices = {
+                      quad[2], quad[3], quad[6], quad[7], quad[8]};
+                    cells.push_back(tri);
+                  }
+                  // TRI cell 2
+                  {
+                    CellData<dim> tri;
+                    tri.vertices = {
+                      quad[6], quad[7], quad[4], quad[5], quad[8]};
+                    cells.push_back(tri);
+                  }
+                  // TRI cell 3
+                  {
+                    CellData<dim> tri;
+                    tri.vertices = {
+                      quad[1], quad[5], quad[3], quad[7], quad[8]};
+                    cells.push_back(tri);
+                  }
+                  // TRI cell 4
+                  {
+                    CellData<dim> tri;
+                    tri.vertices = {
+                      quad[0], quad[1], quad[2], quad[3], quad[8]};
+                    cells.push_back(tri);
+                  }
+                  // TRI cell 5
+                  {
+                    CellData<dim> tri;
+                    tri.vertices = {
+                      quad[0], quad[4], quad[1], quad[5], quad[8]};
+                    cells.push_back(tri);
+                  }
+                }
+        }
+      else
+        {
+          AssertThrow(colorize == false, ExcNotImplemented());
+        }
+
+      // actually create triangulation
+      tria.create_triangulation(vertices, cells, SubCellData());
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
     subdivided_hyper_rectangle_with_simplices_mix(
       Triangulation<dim, spacedim> &   tria,
       const std::vector<unsigned int> &repetitions,
