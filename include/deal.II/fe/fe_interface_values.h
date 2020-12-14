@@ -21,6 +21,8 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
 
+#include <deal.II/hp/q_collection.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
@@ -65,6 +67,16 @@ public:
   FEInterfaceValues(const Mapping<dim, spacedim> &      mapping,
                     const FiniteElement<dim, spacedim> &fe,
                     const Quadrature<dim - 1> &         quadrature,
+                    const UpdateFlags                   update_flags);
+
+  /**
+   * The same as above but taking a collection of quadrature rules
+   * so that different quadrature rules can be assigned to different
+   * faces.
+   */
+  FEInterfaceValues(const Mapping<dim, spacedim> &      mapping,
+                    const FiniteElement<dim, spacedim> &fe,
+                    const hp::QCollection<dim - 1> &    quadrature,
                     const UpdateFlags                   update_flags);
 
   /**
@@ -487,6 +499,24 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
   , fe_face_values_neighbor(nullptr)
 {}
 
+template <int dim, int spacedim>
+FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
+  const Mapping<dim, spacedim> &      mapping,
+  const FiniteElement<dim, spacedim> &fe,
+  const hp::QCollection<dim - 1> &    quadrature,
+  const UpdateFlags                   update_flags)
+  : n_quadrature_points(quadrature.max_n_quadrature_points())
+  , internal_fe_face_values(mapping, fe, quadrature, update_flags)
+  , internal_fe_subface_values(mapping, fe, quadrature, update_flags)
+  , internal_fe_face_values_neighbor(mapping, fe, quadrature[0], update_flags)
+  , internal_fe_subface_values_neighbor(mapping,
+                                        fe,
+                                        quadrature[0],
+                                        update_flags)
+  , fe_face_values(nullptr)
+  , fe_face_values_neighbor(nullptr)
+{}
+
 
 
 template <int dim, int spacedim>
@@ -550,6 +580,12 @@ FEInterfaceValues<dim, spacedim>::reinit(
                                                  sub_face_no_neighbor);
       fe_face_values_neighbor = &internal_fe_subface_values_neighbor;
     }
+
+  AssertDimension(fe_face_values->n_quadrature_points,
+                  fe_face_values_neighbor->n_quadrature_points);
+
+  const_cast<unsigned int &>(this->n_quadrature_points) =
+    fe_face_values->n_quadrature_points;
 
   // Set up dof mapping and remove duplicates (for continuous elements).
   {
