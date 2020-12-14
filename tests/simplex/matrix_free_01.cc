@@ -148,6 +148,14 @@ test(const unsigned int v, const unsigned int degree, const bool do_helmholtz)
       quad       = std::make_shared<Simplex::QGaussWedge<dim>>(degree + 1);
       fe_mapping = std::make_shared<Simplex::FE_WedgeP<dim>>(1);
     }
+  else if (v == 2)
+    {
+      GridGenerator::subdivided_hyper_cube_with_pyramids(tria,
+                                                         dim == 2 ? 16 : 8);
+      fe         = std::make_shared<Simplex::FE_PyramidP<dim>>(degree);
+      quad       = std::make_shared<Simplex::QGaussPyramid<dim>>(degree + 1);
+      fe_mapping = std::make_shared<Simplex::FE_PyramidP<dim>>(1);
+    }
   else
     Assert(false, ExcNotImplemented());
 
@@ -304,16 +312,18 @@ main(int argc, char **argv)
 
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
 
-  for (unsigned int i = 0; i < 2; ++i)
+  for (unsigned int i = 0; i <= 2; ++i)
     {
       if (i == 0)
         deallog.push("SIMPLEX");
       else if (i == 1)
         deallog.push("WEDGE  ");
+      else if (i == 2)
+        deallog.push("PYRAMID");
       else
         Assert(false, ExcNotImplemented());
 
-      if (i == 0)
+      if (i == 0) // 2D makes only sense for simplex
         {
           test<2>(i, /*degree=*/1, /*do_helmholtz*/ false);
           test<2>(i, /*degree=*/1, /*do_helmholtz*/ true);
@@ -323,8 +333,13 @@ main(int argc, char **argv)
 
       test<3>(i, /*degree=*/1, /*do_helmholtz*/ false);
       test<3>(i, /*degree=*/1, /*do_helmholtz*/ true);
-      test<3>(i, /*degree=*/2, /*do_helmholtz*/ false);
-      test<3>(i, /*degree=*/2, /*do_helmholtz*/ true);
+
+      if (i !=
+          2) // for pyramids no quadratic elements have been implemented yet
+        {
+          test<3>(i, /*degree=*/2, /*do_helmholtz*/ false);
+          test<3>(i, /*degree=*/2, /*do_helmholtz*/ true);
+        }
 
       deallog.pop();
     }
