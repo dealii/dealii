@@ -252,6 +252,31 @@ namespace dealii
 
     template <int dim, int spacedim>
     void
+    subdivided_hyper_cube_with_pyramids(Triangulation<dim, spacedim> &tria,
+                                        const unsigned int repetitions,
+                                        const double       p1       = 0.0,
+                                        const double       p2       = 1.0,
+                                        const bool         colorize = false)
+    {
+      if (dim == 3)
+        {
+          subdivided_hyper_rectangle_with_pyramids(
+            tria,
+            {{repetitions, repetitions, repetitions}},
+            {p1, p1, p1},
+            {p2, p2, p2},
+            colorize);
+        }
+      else
+        {
+          AssertThrow(false, ExcNotImplemented())
+        }
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
     subdivided_hyper_rectangle_with_simplices_mix(
       Triangulation<dim, spacedim> &   tria,
       const std::vector<unsigned int> &repetitions,

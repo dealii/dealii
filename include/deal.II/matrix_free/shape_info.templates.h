@@ -93,7 +93,8 @@ namespace internal
 
       if (dynamic_cast<const Simplex::FE_P<dim, dim> *>(&fe) != nullptr ||
           dynamic_cast<const Simplex::FE_DGP<dim, dim> *>(&fe) != nullptr ||
-          dynamic_cast<const Simplex::FE_WedgeP<dim, dim> *>(&fe) != nullptr)
+          dynamic_cast<const Simplex::FE_WedgeP<dim, dim> *>(&fe) != nullptr ||
+          dynamic_cast<const Simplex::FE_PyramidP<dim, dim> *>(&fe) != nullptr)
         {
           scalar_lexicographic.resize(fe.n_dofs_per_cell());
           for (unsigned int i = 0; i < scalar_lexicographic.size(); ++i)
@@ -206,7 +207,8 @@ namespace internal
               // indicative of their support
               if (dynamic_cast<const Simplex::FE_P<dim> *>(fe_poly_ptr) ||
                   dynamic_cast<const Simplex::FE_DGP<dim> *>(fe_poly_ptr) ||
-                  dynamic_cast<const Simplex::FE_WedgeP<dim> *>(fe_poly_ptr))
+                  dynamic_cast<const Simplex::FE_WedgeP<dim> *>(fe_poly_ptr) ||
+                  dynamic_cast<const Simplex::FE_PyramidP<dim> *>(fe_poly_ptr))
                 return true;
 #endif
 
@@ -247,6 +249,8 @@ namespace internal
           dynamic_cast<const Simplex::FE_DGP<dim> *>(
             &fe_in.base_element(base_element_number)) ||
           dynamic_cast<const Simplex::FE_WedgeP<dim> *>(
+            &fe_in.base_element(base_element_number)) ||
+          dynamic_cast<const Simplex::FE_PyramidP<dim> *>(
             &fe_in.base_element(base_element_number)))
         {
           // specialization for arbitrary finite elements and quadrature rules
