@@ -118,6 +118,71 @@ namespace ReferenceCell
     return table[dim][n_vertices];
   }
 
+
+  /**
+   * Compute the value of the $i$-th linear shape function at location $\xi$ for
+   * a given reference-cell type.
+   */
+  template <int dim>
+  inline double
+  d_linear_shape_function(const Type &       reference_cell,
+                          const Point<dim> & xi,
+                          const unsigned int i)
+  {
+    if (reference_cell == get_hypercube(dim))
+      return GeometryInfo<dim>::d_linear_shape_function(xi, i);
+
+    if (reference_cell ==
+        Type::Tri) // see also Simplex::ScalarPolynomial::compute_value
+      {
+        switch (i)
+          {
+            case 0:
+              return 1.0 - xi[0] - xi[1];
+            case 1:
+              return xi[0];
+            case 2:
+              return xi[1];
+          }
+      }
+
+    Assert(false, ExcNotImplemented());
+
+    return 0.0;
+  }
+
+  /**
+   * Compute the gradient of the $i$-th linear shape function at location $\xi$
+   * for a given reference-cell type.
+   */
+  template <int dim>
+  inline Tensor<1, dim>
+  d_linear_shape_function_gradient(const Type &       reference_cell,
+                                   const Point<dim> & xi,
+                                   const unsigned int i)
+  {
+    if (reference_cell == get_hypercube(dim))
+      return GeometryInfo<dim>::d_linear_shape_function_gradient(xi, i);
+
+    if (reference_cell ==
+        Type::Tri) // see also Simplex::ScalarPolynomial::compute_grad
+      {
+        switch (i)
+          {
+            case 0:
+              return Point<dim>(-1.0, -1.0);
+            case 1:
+              return Point<dim>(+1.0, +0.0);
+            case 2:
+              return Point<dim>(+0.0, +1.0);
+          }
+      }
+
+    Assert(false, ExcNotImplemented());
+
+    return Point<dim>(+0.0, +0.0, +0.0);
+  }
+
   namespace internal
   {
     /**
