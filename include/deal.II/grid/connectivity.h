@@ -636,7 +636,7 @@ namespace internal
 
 
     /**
-     * Implementation for hexahedrons.
+     * Implementation for hexahedra.
      */
     struct CellTypeHex : public CellTypeBase
     {

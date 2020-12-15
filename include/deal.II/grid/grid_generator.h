@@ -1909,7 +1909,7 @@ namespace GridGenerator
 
   /**
    * Convert a triangulation consisting only of hypercube cells
-   * (quadrilaterals, hexahedrons) to a triangulation only consisting of
+   * (quadrilaterals, hexahedra) to a triangulation only consisting of
    * simplices (triangles, tetrahedra).
    *
    * As an example, the following image shows how a set of three hexahedra
