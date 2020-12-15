@@ -1916,12 +1916,13 @@ namespace GridGenerator
    * meshing one eighths of a sphere are subdivided into tetrahedra, and how
    * the curved surface is taken into account. Colors indicate how boundary
    * indicators are inherited:
+   * @image html "convert_hypercube_to_simplex_mesh_visualization_octant.png"
+   *
+   * In general, each quadrilateral in 2d is subdivided into eight triangles,
+   * and each hexahedron in 3d into 24 tetrahedra as shown here:
    * @image html "convert_hypercube_to_simplex_mesh_visualization.png"
    *
-   * Thereby, in 2D a quadrilateral cell is converted into 8 triangle cells,
-   * whereas in 3D a hexahedron cell is converted into 24 tetrahedra cells.
-   *
-   * Material ID and boundary IDs will be inherited after conversion.
+   * Material ID and boundary IDs are inherited upon conversion.
    *
    * @param in_tria The triangulation containing hex elements.
    * @param out_tria The converted triangulation containing tet elements.
