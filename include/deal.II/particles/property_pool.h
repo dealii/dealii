@@ -82,24 +82,19 @@ namespace Particles
     clear();
 
     /**
-     * Return a new handle that allows accessing the reserved particle
-     * properties. If the number of properties is zero this will return an
-     * invalid handle. Handles can be copied, but after deallocating one
-     * of the copied handles using any of the other copies will cause
-     * undefined behavior.
+     * Return a new handle that allows a particle to store information such as
+     * properties and locations. This also allocated memory in this PropertyPool
+     * variable.
      */
     Handle
-    allocate_properties_array();
+    register_particle();
 
     /**
-     * Mark the properties corresponding to the handle @p handle as
-     * deleted and invalidate the @p handle. Calling this function
-     * more than once for the same handle (e.g. by calling it again
-     * with a copy of the previously invalidated handle) causes
-     * undefined behavior.
+     * Return a handle obtained by register_particle() and mark the memory
+     * allocated for storing the particle's data as free for re-use.
      */
     void
-    deallocate_properties_array(Handle &handle);
+    deregister_particle(Handle &handle);
 
     /**
      * Return an ArrayView to the properties that correspond to the given
