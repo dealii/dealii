@@ -140,6 +140,20 @@ namespace VectorTools
     const ComponentMask &component_mask = ComponentMask());
 
   /**
+   * Like the previous function, but take a mapping collection to go with
+   * DoFHandler objects with hp-capabilities.
+   */
+  template <int dim, int spacedim, typename number>
+  void
+  interpolate_boundary_values(
+    const hp::MappingCollection<dim, spacedim> &mapping,
+    const DoFHandler<dim, spacedim> &           dof,
+    const types::boundary_id                    boundary_component,
+    const Function<spacedim, number> &          boundary_function,
+    std::map<types::global_dof_index, number> & boundary_values,
+    const ComponentMask &component_mask = ComponentMask());
+
+  /**
    * Call the other interpolate_boundary_values() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>. The same comments
    * apply as for the previous function, in particular about the use of the
@@ -246,6 +260,20 @@ namespace VectorTools
     const ComponentMask &      component_mask = ComponentMask());
 
   /**
+   * Like the previous function, but take a mapping collection to go with
+   * DoFHandler objects with hp-capabilities.
+   */
+  template <int dim, int spacedim, typename number>
+  void
+  interpolate_boundary_values(
+    const hp::MappingCollection<dim, spacedim> &mapping,
+    const DoFHandler<dim, spacedim> &           dof,
+    const std::map<types::boundary_id, const Function<spacedim, number> *>
+      &                        function_map,
+    AffineConstraints<number> &constraints,
+    const ComponentMask &      component_mask = ComponentMask());
+
+  /**
    * Same function as above, but taking only one pair of boundary indicator
    * and corresponding boundary function. The same comments apply as for the
    * previous function, in particular about the use of the component mask and
@@ -265,6 +293,20 @@ namespace VectorTools
     const Function<spacedim, number> &boundary_function,
     AffineConstraints<number> &       constraints,
     const ComponentMask &             component_mask = ComponentMask());
+
+  /**
+   * Like the previous function, but take a mapping collection to go with
+   * DoFHandler objects with hp-capabilities.
+   */
+  template <int dim, int spacedim, typename number>
+  void
+  interpolate_boundary_values(
+    const hp::MappingCollection<dim, spacedim> &mapping,
+    const DoFHandler<dim, spacedim> &           dof,
+    const types::boundary_id                    boundary_component,
+    const Function<spacedim, number> &          boundary_function,
+    AffineConstraints<number> &                 constraints,
+    const ComponentMask &component_mask = ComponentMask());
 
   /**
    * Call the other interpolate_boundary_values() function, see above, with
