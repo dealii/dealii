@@ -1,0 +1,10 @@
+
+DEAL::Creation successful.
+DEAL::  Number of CellId objects: 256
+DEAL::Serialization with boost binary archives successful.
+DEAL::  Buffer size in bytes: 11875
+DEAL::Serialization with Utilities successful.
+DEAL::  Buffer size in bytes: 10264
+DEAL::Serialization with binary representation successful.
+DEAL::  Buffer size in bytes: 4120
+DEAL::OK
