@@ -3369,7 +3369,7 @@ public:
 
   /**
    * Indicate if the triangulation only consists of hypercube-like cells, i.e.,
-   * lines, quadrilaterals, or hexahedrons.
+   * lines, quadrilaterals, or hexahedra.
    */
   bool
   all_reference_cell_types_are_hyper_cube() const;

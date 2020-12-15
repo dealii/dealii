@@ -43,7 +43,7 @@
  *   </div>
  * </div>
  *
- * In 3D, tetrahedrons, pyramids, wedges, and hexahedrons are available:
+ * In 3D, tetrahedra, pyramids, wedges, and hexahedra are available:
  *
  *   <div class="parent">
  *     <div class="img" align="center">
