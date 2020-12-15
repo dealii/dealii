@@ -417,8 +417,7 @@ namespace VectorTools
     const ComponentMask &                      component_mask)
   {
     std::map<types::boundary_id, const Function<spacedim, number> *>
-      function_map;
-    function_map[boundary_component] = &boundary_function;
+      function_map = {{boundary_component, &boundary_function}};
     interpolate_boundary_values(
       mapping, dof, function_map, boundary_values, component_mask);
   }
@@ -451,8 +450,7 @@ namespace VectorTools
     const ComponentMask &                       component_mask)
   {
     std::map<types::boundary_id, const Function<spacedim, number> *>
-      function_map;
-    function_map[boundary_component] = &boundary_function;
+      function_map = {{boundary_component, &boundary_function}};
     interpolate_boundary_values(
       mapping, dof, function_map, boundary_values, component_mask);
   }
@@ -514,16 +512,14 @@ namespace VectorTools
     std::map<types::global_dof_index, number> boundary_values;
     interpolate_boundary_values(
       mapping, dof, function_map, boundary_values, component_mask_);
-    typename std::map<types::global_dof_index, number>::const_iterator
-      boundary_value = boundary_values.begin();
-    for (; boundary_value != boundary_values.end(); ++boundary_value)
+    for (const auto &boundary_value : boundary_values)
       {
-        if (constraints.can_store_line(boundary_value->first) &&
-            !constraints.is_constrained(boundary_value->first))
+        if (constraints.can_store_line(boundary_value.first) &&
+            !constraints.is_constrained(boundary_value.first))
           {
-            constraints.add_line(boundary_value->first);
-            constraints.set_inhomogeneity(boundary_value->first,
-                                          boundary_value->second);
+            constraints.add_line(boundary_value.first);
+            constraints.set_inhomogeneity(boundary_value.first,
+                                          boundary_value.second);
           }
       }
   }
@@ -541,8 +537,7 @@ namespace VectorTools
     const ComponentMask &             component_mask)
   {
     std::map<types::boundary_id, const Function<spacedim, number> *>
-      function_map;
-    function_map[boundary_component] = &boundary_function;
+      function_map = {{boundary_component, &boundary_function}};
     interpolate_boundary_values(
       mapping, dof, function_map, constraints, component_mask);
   }
@@ -562,16 +557,14 @@ namespace VectorTools
     std::map<types::global_dof_index, number> boundary_values;
     interpolate_boundary_values(
       mapping, dof, function_map, boundary_values, component_mask_);
-    typename std::map<types::global_dof_index, number>::const_iterator
-      boundary_value = boundary_values.begin();
-    for (; boundary_value != boundary_values.end(); ++boundary_value)
+    for (const auto &boundary_value : boundary_values)
       {
-        if (constraints.can_store_line(boundary_value->first) &&
-            !constraints.is_constrained(boundary_value->first))
+        if (constraints.can_store_line(boundary_value.first) &&
+            !constraints.is_constrained(boundary_value.first))
           {
-            constraints.add_line(boundary_value->first);
-            constraints.set_inhomogeneity(boundary_value->first,
-                                          boundary_value->second);
+            constraints.add_line(boundary_value.first);
+            constraints.set_inhomogeneity(boundary_value.first,
+                                          boundary_value.second);
           }
       }
   }
@@ -589,8 +582,7 @@ namespace VectorTools
     const ComponentMask &                       component_mask)
   {
     std::map<types::boundary_id, const Function<spacedim, number> *>
-      function_map;
-    function_map[boundary_component] = &boundary_function;
+      function_map = {{boundary_component, &boundary_function}};
     interpolate_boundary_values(
       mapping, dof, function_map, constraints, component_mask);
   }
