@@ -114,8 +114,11 @@ namespace Functions
     vector_laplacian_list(const std::vector<Point<dim>> &points,
                           std::vector<Vector<double>> &  values) const override;
 
-    std::size_t
-    memory_consumption() const;
+    /**
+     * Return an estimate for the memory consumption, in bytes, of this object.
+     */
+    virtual std::size_t
+    memory_consumption() const override;
 
   protected:
     /**
