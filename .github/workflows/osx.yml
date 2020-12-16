@@ -30,6 +30,20 @@ jobs:
       run: |
         make -j 2
         make -j 2 test # quicktests
+    - name: archive error 1
+      uses: actions/upload-artifact@v1
+      if: always()
+      continue-on-error: true
+      with:
+        name: osx-serial-CMakeOutput.log
+        path: CMakeFiles/CMakeOutput.log
+    - name: archive error 2
+      uses: actions/upload-artifact@v1
+      if: always()
+      continue-on-error: true
+      with:
+        name: osx-serial-CMakeError.log
+        path: CMakeFiles/CMakeError.log
 
   osx-parallel64:
     # MPI build using apple clang and 64 bit indices
@@ -64,4 +78,18 @@ jobs:
       run: |
         make -j 2
         make -j 2 test #quicktests
+    - name: archive error 1
+      uses: actions/upload-artifact@v1
+      if: always()
+      continue-on-error: true
+      with:
+        name: osx-parallel64-CMakeOutput.log
+        path: CMakeFiles/CMakeOutput.log
+    - name: archive error 2
+      uses: actions/upload-artifact@v1
+      if: always()
+      continue-on-error: true
+      with:
+        name: osx-parallel64-CMakeError.log
+        path: CMakeFiles/CMakeError.log
 
