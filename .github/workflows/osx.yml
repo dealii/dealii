@@ -14,9 +14,6 @@ jobs:
     - name: setup
       run: |
         ./contrib/utilities/download_clang_format
-        # force cmake version:
-        pip install cmake==3.18.4
-        echo "/Library/Frameworks/Python.framework/Versions/2.7/bin" >> $GITHUB_PATH
     - name: info
       run: |
         g++ -v
@@ -44,9 +41,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: setup
       run: |
-        # force cmake version:
-        pip install cmake==3.18.4
-        echo "/Library/Frameworks/Python.framework/Versions/2.7/bin" >> $GITHUB_PATH
         brew install openmpi
         cmake --version
         # uncomment these for a gcc based build
