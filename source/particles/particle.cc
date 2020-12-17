@@ -79,11 +79,15 @@ namespace Particles
     id                  = *id_data++;
     const double *pdata = reinterpret_cast<const double *>(id_data);
 
+    Point<spacedim> location;
     for (unsigned int i = 0; i < spacedim; ++i)
       location(i) = *pdata++;
+    set_location(location);
 
+    Point<dim> reference_location;
     for (unsigned int i = 0; i < dim; ++i)
       reference_location(i) = *pdata++;
+    set_reference_location(reference_location);
 
     property_pool = new_property_pool;
     if (property_pool != nullptr)
@@ -206,11 +210,11 @@ namespace Particles
 
     // Write location data
     for (unsigned int i = 0; i < spacedim; ++i, ++pdata)
-      *pdata = location(i);
+      *pdata = get_location()[i];
 
     // Write reference location data
     for (unsigned int i = 0; i < dim; ++i, ++pdata)
-      *pdata = reference_location(i);
+      *pdata = get_reference_location()[i];
 
     // Write property data
     if (has_properties())
@@ -225,6 +229,7 @@ namespace Particles
   }
 
 
+
   template <int dim, int spacedim>
   void
   Particle<dim, spacedim>::update_particle_data(const void *&data)
@@ -234,11 +239,15 @@ namespace Particles
     id                  = *id_data++;
     const double *pdata = reinterpret_cast<const double *>(id_data);
 
+    Point<spacedim> location;
     for (unsigned int i = 0; i < spacedim; ++i)
       location(i) = *pdata++;
+    set_location(location);
 
+    Point<dim> reference_location;
     for (unsigned int i = 0; i < dim; ++i)
       reference_location(i) = *pdata++;
+    set_reference_location(reference_location);
 
     // See if there are properties to load
     if (has_properties())
@@ -252,6 +261,7 @@ namespace Particles
 
     data = static_cast<const void *>(pdata);
   }
+
 
 
   template <int dim, int spacedim>

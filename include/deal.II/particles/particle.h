@@ -486,6 +486,8 @@ namespace Particles
     typename PropertyPool<dim, spacedim>::Handle property_pool_handle;
   };
 
+
+
   /* ---------------------- inline and template functions ------------------ */
 
   template <int dim, int spacedim>
@@ -495,7 +497,12 @@ namespace Particles
   {
     unsigned int n_properties = 0;
 
+    Point<spacedim> location;
+    Point<dim>      reference_location;
     ar &location &reference_location &id &n_properties;
+
+    set_location(location);
+    set_reference_location(reference_location);
 
     if (n_properties > 0)
       {
@@ -525,6 +532,9 @@ namespace Particles
     if ((property_pool != nullptr) &&
         (property_pool_handle != PropertyPool<dim, spacedim>::invalid_handle))
       n_properties = get_properties().size();
+
+    Point<spacedim> location           = get_location();
+    Point<dim>      reference_location = get_reference_location();
 
     ar &location &reference_location &id &n_properties;
 
