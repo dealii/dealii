@@ -45,6 +45,30 @@ namespace internal
       return Quadrature<dim - 1>();
     }
 
+    template <int dim>
+    inline std::vector<Quadrature<dim - 1>>
+    get_unique_face_quadratures(const Quadrature<dim> &quad)
+    {
+      if (dim == 2 || dim == 3)
+        for (unsigned int i = 1; i <= 3; ++i)
+          if (quad == Simplex::QGauss<dim>(i))
+            return {{Simplex::QGauss<dim - 1>(i)}};
+
+      if (dim == 3)
+        for (unsigned int i = 1; i <= 3; ++i)
+          if (quad == Simplex::QGaussWedge<dim>(i))
+            return {{QGauss<dim - 1>(i), Simplex::QGauss<dim - 1>(i)}};
+
+      if (dim == 3)
+        for (unsigned int i = 1; i <= 2; ++i)
+          if (quad == Simplex::QGaussPyramid<dim>(i))
+            return {{QGauss<dim - 1>(i), Simplex::QGauss<dim - 1>(i)}};
+
+      AssertThrow(false, ExcNotImplemented());
+
+      return {{QGauss<dim - 1>(1)}};
+    }
+
   } // end of namespace MatrixFreeFunctions
 } // end of namespace internal
 

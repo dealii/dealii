@@ -392,7 +392,7 @@ namespace internal
                   quad[my_q][q].get_tensor_basis()[0], update_default);
             }
 
-          face_data[my_q].descriptor.resize(n_hp_quads);
+          face_data[my_q].descriptor.reserve(n_hp_quads * 2);
           for (unsigned int hpq = 0; hpq < n_hp_quads; ++hpq)
             {
               bool flag = quad[my_q][hpq].is_tensor_product();
@@ -405,28 +405,29 @@ namespace internal
               if (flag == false)
                 {
 #ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
-                  try
+                  for (const auto &quad_face :
+                       get_unique_face_quadratures(quad[my_q][hpq]))
                     {
-                      const auto quad_face =
-                        get_face_quadrature(quad[my_q][hpq]);
-                      face_data[my_q].descriptor[hpq].initialize(
+                      face_data[my_q].descriptor.resize(
+                        face_data[my_q].descriptor.size() + 1);
+                      face_data[my_q].descriptor.back().initialize(
                         quad_face, update_default);
-                    }
-                  catch (...)
-                    {
-                      // TODO: nothing to do for now for wedges and pyramids.
                     }
 #else
                   Assert(false, ExcNotImplemented());
 #endif
                 }
               else
-                face_data[my_q].descriptor[hpq].initialize(
-                  quad[my_q][hpq].get_tensor_basis()[0],
-                  update_flags_boundary_faces);
+                {
+                  face_data[my_q].descriptor.resize(
+                    face_data[my_q].descriptor.size() + 1);
+                  face_data[my_q].descriptor.back().initialize(
+                    quad[my_q][hpq].get_tensor_basis()[0],
+                    update_flags_boundary_faces);
+                }
             }
 
-          face_data_by_cells[my_q].descriptor.resize(n_hp_quads);
+          face_data_by_cells[my_q].descriptor.reserve(n_hp_quads * 2);
           for (unsigned int hpq = 0; hpq < n_hp_quads; ++hpq)
             {
               bool flag = quad[my_q][hpq].is_tensor_product();
@@ -439,24 +440,25 @@ namespace internal
               if (flag == false)
                 {
 #ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
-                  try
+                  for (const auto &quad_face :
+                       get_unique_face_quadratures(quad[my_q][hpq]))
                     {
-                      const auto quad_face =
-                        get_face_quadrature(quad[my_q][hpq]);
-                      face_data_by_cells[my_q].descriptor[hpq].initialize(
+                      face_data_by_cells[my_q].descriptor.resize(
+                        face_data_by_cells[my_q].descriptor.size() + 1);
+                      face_data_by_cells[my_q].descriptor.back().initialize(
                         quad_face, update_default);
-                    }
-                  catch (...)
-                    {
-                      // TODO: nothing to do for now for wedges and pyramids.
                     }
 #else
                   Assert(false, ExcNotImplemented());
 #endif
                 }
               else
-                face_data_by_cells[my_q].descriptor[hpq].initialize(
-                  quad[my_q][hpq].get_tensor_basis()[0], update_default);
+                {
+                  face_data_by_cells[my_q].descriptor.resize(
+                    face_data_by_cells[my_q].descriptor.size() + 1);
+                  face_data_by_cells[my_q].descriptor.back().initialize(
+                    quad[my_q][hpq].get_tensor_basis()[0], update_default);
+                }
             }
         }
 
