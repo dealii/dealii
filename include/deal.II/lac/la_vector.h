@@ -400,14 +400,6 @@ namespace LinearAlgebra
     memory_consumption() const override;
 
     /**
-     * Attempt to perform an operation between two incompatible vector types.
-     *
-     * @ingroup Exceptions
-     */
-    DeclException0(ExcVectorTypeNotCompatible);
-
-  private:
-    /**
      * Write and read the data of this object from a stream for the purpose
      * of serialization using the [BOOST serialization
      * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
@@ -416,8 +408,14 @@ namespace LinearAlgebra
     void
     serialize(Archive &ar, const unsigned int version);
 
-    friend class boost::serialization::access;
+    /**
+     * Attempt to perform an operation between two incompatible vector types.
+     *
+     * @ingroup Exceptions
+     */
+    DeclException0(ExcVectorTypeNotCompatible);
 
+  private:
     // Make all other ReadWriteVector types friends.
     template <typename Number2>
     friend class Vector;
