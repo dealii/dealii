@@ -3072,7 +3072,8 @@ namespace GridTools
 
     /**
      * Write the data of this object to a stream for the purpose of
-     * serialization.
+     * serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html)
      *
      * @pre The user is responsible to keep the size of @p data
      * equal to the size as @p cell_ids .
@@ -3083,7 +3084,9 @@ namespace GridTools
 
     /**
      * Read the data of this object from a stream for the purpose of
-     * serialization. Throw away the previous content.
+     * serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+     * Throw away the previous content.
      */
     template <class Archive>
     void
@@ -3091,8 +3094,9 @@ namespace GridTools
 
 #  ifdef DOXYGEN
     /**
-     * Write and read the data of this object from a stream for the purpose
-     * of serialization.
+     * Read or write the data of this object to or from a stream for the
+     * purpose of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
      */
     template <class Archive>
     void

@@ -1497,7 +1497,8 @@ namespace Differentiation
 
       /**
        * Write the data of this object from a stream for the purpose
-       * of serialization.
+       * of serialization using the [BOOST serialization
+       * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
        *
        * This effectively saves the value stored into the @p archive with the
        * given @p version number into this object.
@@ -1508,7 +1509,8 @@ namespace Differentiation
 
       /**
        * Read the data of this object from a stream for the purpose
-       * of serialization.
+       * of serialization using the [BOOST serialization
+       * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
        *
        * This effectively loads the value stored out of the
        * @p archive with the given @p version number into this object.
@@ -1525,7 +1527,8 @@ namespace Differentiation
 #  ifdef DOXYGEN
       /**
        * Write and read the data of this object from a stream for the purpose
-       * of serialization.
+       * of serialization using the [BOOST serialization
+       * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
        *
        * This effectively saves or loads the value stored into/out of the
        * @p archive with the given @p version number into this object.

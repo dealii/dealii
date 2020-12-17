@@ -1384,7 +1384,7 @@ namespace boost
   namespace serialization
   {
     // Provides boost and c++11 with a way to serialize tuples and pairs
-    // automatically
+    // automatically.
     template <int N>
     struct Serialize
     {

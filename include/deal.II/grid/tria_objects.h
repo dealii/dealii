@@ -154,7 +154,8 @@ namespace internal
 
         /**
          * Read or write the data of this object to or from a stream for the
-         * purpose of serialization
+         * purpose of serialization using the [BOOST serialization
+         * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
          */
         template <class Archive>
         void
@@ -274,7 +275,8 @@ namespace internal
 
       /**
        * Read or write the data of this object to or from a stream for the
-       * purpose of serialization
+       * purpose of serialization using the [BOOST serialization
+       * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
        */
       template <class Archive>
       void
@@ -329,7 +331,8 @@ namespace internal
 
         /**
          * Write the data of this object to a stream for the purpose of
-         * serialization.
+         * serialization using the [BOOST serialization
+         * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
          */
         template <class Archive>
         void

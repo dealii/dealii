@@ -131,7 +131,9 @@ struct CellData
   operator==(const CellData<structdim> &other) const;
 
   /**
-   * Boost serialization function
+   * Read or write the data of this object to or from a stream for the
+   * purpose of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -279,7 +281,9 @@ namespace TriangulationDescription
   struct CellData
   {
     /**
-     * Boost serialization function
+     * Read or write the data of this object to or from a stream for the
+     * purpose of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
      */
     template <class Archive>
     void
@@ -342,7 +346,9 @@ namespace TriangulationDescription
   struct Description
   {
     /**
-     * Boost serialization function
+     * Read or write the data of this object to or from a stream for the
+     * purpose of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
      */
     template <class Archive>
     void

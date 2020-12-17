@@ -422,7 +422,8 @@ namespace Particles
 
     /**
      * Write the data of this object to a stream for the purpose of
-     * serialization.
+     * serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
      */
     template <class Archive>
     void
@@ -430,10 +431,12 @@ namespace Particles
 
     /**
      * Read the data of this object from a stream for the purpose of
-     * serialization. Note that in order to store the properties
-     * correctly, the property pool of this particle has to
-     * be known at the time of reading, i.e. set_property_pool()
-     * has to have been called, before this function is called.
+     * serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+     * Note that in order to store the properties correctly, the property pool
+     * of this particle has to be known at the time of reading, i.e.
+     * set_property_pool() has to have been called, before this function is
+     * called.
      */
     template <class Archive>
     void
@@ -448,7 +451,8 @@ namespace Particles
 #ifdef DOXYGEN
     /**
      * Write and read the data of this object from a stream for the purpose
-     * of serialization.
+     * of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
      */
     template <class Archive>
     void
