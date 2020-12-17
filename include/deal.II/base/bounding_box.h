@@ -26,6 +26,9 @@
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/geometry/algorithms/envelope.hpp>
 #include <boost/geometry/geometries/multi_point.hpp>
+#if DEAL_II_BOOST_VERSION_GTE(1, 75, 0)
+#  include <boost/geometry/strategies/envelope/cartesian.hpp>
+#endif
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
