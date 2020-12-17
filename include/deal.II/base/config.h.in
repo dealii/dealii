@@ -238,6 +238,13 @@
 #define DEAL_II_BOOST_VERSION_MINOR @Boost_MINOR_VERSION@
 #define DEAL_II_BOOST_VERSION_SUBMINOR @Boost_SUBMINOR_VERSION@
 
+#define DEAL_II_BOOST_VERSION_GTE(major,minor,subminor) \
+ ((DEAL_II_BOOST_VERSION_MAJOR * 100000 + \
+    DEAL_II_BOOST_VERSION_MINOR * 100 + \
+     DEAL_II_BOOST_VERSION_SUBMINOR) \
+    >= \
+    (major)*100000 + (minor)*100 + (subminor))
+
 /*
  * Gmsh:
  */
