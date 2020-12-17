@@ -23,16 +23,17 @@
 #
 
 MACRO(ENABLE_IF_LINKS _variable _flag)
-  STRING(STRIP "${_flag}" _flag_stripped)
+  # keep on top to avoid cluttering the _flag and _flag_stripped variables
+  ENABLE_IF_SUPPORTED(CMAKE_REQUIRED_FLAGS "-Werror")
 
+  STRING(STRIP "${_flag}" _flag_stripped)
   IF(NOT "${_flag_stripped}" STREQUAL "")
     STRING(REGEX REPLACE "^-" "" _flag_name "${_flag_stripped}")
     STRING(REGEX REPLACE "\[-+,\]" "_" _flag_name "${_flag_name}")
 
-    SET(_backup ${CMAKE_REQUIRED_LIBRARIES})
     LIST(APPEND CMAKE_REQUIRED_LIBRARIES "${_flag_stripped}")
     CHECK_CXX_SOURCE_COMPILES("int main(){}" DEAL_II_HAVE_LINKER_FLAG_${_flag_name})
-    SET(CMAKE_REQUIRED_LIBRARIES ${_backup})
+    RESET_CMAKE_REQUIRED()
 
     IF(DEAL_II_HAVE_LINKER_FLAG_${_flag_name})
       SET(${_variable} "${${_variable}} ${_flag_stripped}")
