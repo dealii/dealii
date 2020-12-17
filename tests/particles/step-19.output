@@ -1,0 +1,127 @@
+
+DEAL::Timestep 1
+DEAL::  Field degrees of freedom:                 2145
+DEAL::  Total number of particles in simulation:  8
+DEAL::  Number of particles lost this time step:  0
+DEAL::
+DEAL::  Now at t=7.65145e-07, dt=7.65145e-07.
+DEAL::
+DEAL::Timestep 2
+DEAL::  Field degrees of freedom:                 2145
+DEAL::  Total number of particles in simulation:  16
+DEAL::  Number of particles lost this time step:  0
+DEAL::
+DEAL::  Now at t=1.50732e-06, dt=7.42173e-07.
+DEAL::
+DEAL::Timestep 3
+DEAL::  Field degrees of freedom:                 2145
+DEAL::  Total number of particles in simulation:  24
+DEAL::  Number of particles lost this time step:  0
+DEAL::
+DEAL::  Now at t=1.89319e-06, dt=3.85876e-07.
+DEAL::
+DEAL::Timestep 4
+DEAL::  Field degrees of freedom:                 2145
+DEAL::  Total number of particles in simulation:  30
+DEAL::  Number of particles lost this time step:  0
+DEAL::
+DEAL::  Now at t=2.19932e-06, dt=3.06122e-07.
+DEAL::
+DEAL::Timestep 5
+DEAL::  Field degrees of freedom:                 2145
+DEAL::  Total number of particles in simulation:  36
+DEAL::  Number of particles lost this time step:  0
+DEAL::
+DEAL::  Now at t=2.46319e-06, dt=2.63877e-07.
+DEAL::
+DEAL::Timestep 6
+DEAL::  Field degrees of freedom:                 2145
+DEAL::  Total number of particles in simulation:  42
+DEAL::  Number of particles lost this time step:  0
+DEAL::
+DEAL::  Now at t=2.69998e-06, dt=2.36785e-07.
+DEAL::
+DEAL::0 0.318384 0.544690 0.506161 0.357517
+DEAL::0 properties: 22720.5 -10459.1 
+DEAL::8 0.300334 0.553160 0.262681 0.425280
+DEAL::8 properties: 15608.2 -7472.95 
+DEAL::16 0.288175 0.559066 0.0959559 0.472531
+DEAL::16 properties: 9102.09 -4482.66 
+DEAL::1 0.397796 0.661830 0.799670 0.294642
+DEAL::1 properties: 33369.8 -15049.9 
+DEAL::9 0.371456 0.674010 0.415706 0.392080
+DEAL::9 properties: 22812.4 -10806.6 
+DEAL::17 0.353806 0.682526 0.152330 0.460205
+DEAL::17 properties: 13269.7 -6506.68 
+DEAL::24 0.348502 0.685136 0.0722046 0.481087
+DEAL::24 properties: 8747.05 -4336.67 
+DEAL::30 0.345759 0.686497 0.0305811 0.491977
+DEAL::30 properties: 5324.92 -2655.15 
+DEAL::36 0.344337 0.687206 0.00894506 0.497651
+DEAL::36 properties: 2479.68 -1239.84 
+DEAL::10 0.444901 0.793909 0.636055 0.351273
+DEAL::10 properties: 32083.3 -14840.6 
+DEAL::18 0.420392 0.805542 0.236038 0.444339
+DEAL::18 properties: 18793.1 -9128.81 
+DEAL::25 0.413002 0.809149 0.113228 0.473192
+DEAL::25 properties: 12490.7 -6167.28 
+DEAL::31 0.409137 0.811060 0.0485375 0.488482
+DEAL::31 properties: 7668.71 -3818.74 
+DEAL::37 0.407102 0.812074 0.0143377 0.496594
+DEAL::37 properties: 3596.54 -1798.27 
+DEAL::2 0.481672 0.777464 0.216355 0.219714
+DEAL::2 properties: 46890.1 -20200.0 
+DEAL::19 0.489626 0.927650 0.384969 0.421200
+DEAL::19 properties: 27818.2 -12548.5 
+DEAL::26 0.478806 0.932612 0.187367 0.460899
+DEAL::26 properties: 18586.4 -8855.35 
+DEAL::32 0.473047 0.935373 0.0805624 0.482985
+DEAL::32 properties: 11411.7 -5614.09 
+DEAL::38 0.470018 0.936866 0.0238510 0.494929
+DEAL::38 properties: 5354.40 -2677.20 
+DEAL::3 0.578159 0.892404 0.906212 0.139233
+DEAL::3 properties: 67932.5 -23737.2 
+DEAL::11 0.525104 0.912390 0.0137312 0.299123
+DEAL::11 properties: 47472.6 -19001.9 
+DEAL::20 0.489626 1.07235 0.384969 0.578800
+DEAL::20 properties: 27818.2 12548.5 
+DEAL::27 0.478806 1.06739 0.187367 0.539101
+DEAL::27 properties: 18586.4 8855.35 
+DEAL::33 0.473047 1.06463 0.0805624 0.517015
+DEAL::33 properties: 11411.7 5614.09 
+DEAL::39 0.470018 1.06313 0.0238510 0.505071
+DEAL::39 properties: 5354.40 2677.20 
+DEAL::4 0.578159 1.10760 0.906212 0.860767
+DEAL::4 properties: 67932.5 23737.2 
+DEAL::12 0.525104 1.08761 0.0137312 0.700877
+DEAL::12 properties: 47472.6 19001.9 
+DEAL::13 0.444901 1.20609 0.636055 0.648727
+DEAL::13 properties: 32083.3 14840.6 
+DEAL::21 0.420392 1.19446 0.236038 0.555661
+DEAL::21 properties: 18793.1 9128.81 
+DEAL::28 0.413002 1.19085 0.113228 0.526808
+DEAL::28 properties: 12490.7 6167.28 
+DEAL::34 0.409137 1.18894 0.0485375 0.511518
+DEAL::34 properties: 7668.71 3818.74 
+DEAL::40 0.407102 1.18793 0.0143377 0.503406
+DEAL::40 properties: 3596.54 1798.27 
+DEAL::5 0.481672 1.22254 0.216355 0.780286
+DEAL::5 properties: 46890.1 20200.0 
+DEAL::6 0.397796 1.33817 0.799670 0.705358
+DEAL::6 properties: 33369.8 15049.9 
+DEAL::14 0.371456 1.32599 0.415706 0.607920
+DEAL::14 properties: 22812.4 10806.6 
+DEAL::22 0.353806 1.31747 0.152330 0.539795
+DEAL::22 properties: 13269.7 6506.68 
+DEAL::29 0.348502 1.31486 0.0722046 0.518913
+DEAL::29 properties: 8747.05 4336.67 
+DEAL::35 0.345759 1.31350 0.0305811 0.508023
+DEAL::35 properties: 5324.92 2655.15 
+DEAL::41 0.344337 1.31279 0.00894506 0.502349
+DEAL::41 properties: 2479.68 1239.84 
+DEAL::7 0.318384 1.45531 0.506161 0.642483
+DEAL::7 properties: 22720.5 10459.1 
+DEAL::15 0.300334 1.44684 0.262681 0.574720
+DEAL::15 properties: 15608.2 7472.95 
+DEAL::23 0.288175 1.44093 0.0959559 0.527469
+DEAL::23 properties: 9102.09 4482.66 
