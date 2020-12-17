@@ -279,7 +279,7 @@ namespace Particles
      *
      * @return The location of this particle.
      */
-    const Point<spacedim> &
+    Point<spacedim>
     get_location() const;
 
     /**
@@ -305,7 +305,7 @@ namespace Particles
     /**
      * Return the reference location of this particle in its current cell.
      */
-    const Point<dim> &
+    Point<dim>
     get_reference_location() const;
 
     /**
@@ -545,7 +545,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  inline const Point<spacedim> &
+  inline Point<spacedim>
   Particle<dim, spacedim>::get_location() const
   {
     return location;
@@ -563,7 +563,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  inline const Point<dim> &
+  inline Point<dim>
   Particle<dim, spacedim>::get_reference_location() const
   {
     return reference_location;
