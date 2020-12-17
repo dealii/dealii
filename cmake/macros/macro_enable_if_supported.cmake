@@ -22,22 +22,6 @@
 #
 
 MACRO(ENABLE_IF_SUPPORTED _variable _flag)
-  #
-  # For CMake prior to 3.19:
-  #
-  # Old clang versions are too conservative when reporting unsupported
-  # compiler flags. Therefore, we promote all warnings for an unsupported
-  # compiler flag to actual errors with the -Werror switch:
-  #
-  # Note: For cmake-3.19 onwards the supplied compiler flag must be a
-  # single flag. See https://github.com/dealii/dealii/issues/11272
-  #
-  IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_VERSION VERSION_LESS 3.19)
-    SET(_werror_string "-Werror ")
-  ELSE()
-    SET(_werror_string "")
-  ENDIF()
-
   STRING(STRIP "${_flag}" _flag_stripped)
 
   #
