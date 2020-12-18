@@ -297,7 +297,7 @@ namespace FETools
       cell = dof1.begin_active(),
       endc = dof1.end();
 
-    // map from possible fe objects in
+    // map from possible FE objects in
     // dof1 to the back_interpolation
     // matrices
     std::map<const FiniteElement<dim> *, std::unique_ptr<FullMatrix<double>>>

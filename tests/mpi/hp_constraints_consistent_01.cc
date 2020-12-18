@@ -84,7 +84,7 @@ test(const unsigned int degree_center,
   for (const auto &cell : dh.active_cell_iterators())
     if (cell->is_locally_owned() && cell->id().to_string() == "1_0:")
       {
-        // set different fe on center cell
+        // set different FE on center cell
         cell->set_active_fe_index(1);
 
 #ifdef DEBUG

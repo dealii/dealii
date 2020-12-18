@@ -15,7 +15,7 @@
 
 
 
-// check if future fe indices will be set correctly
+// check if future FE indices will be set correctly
 
 
 #include <deal.II/dofs/dof_handler.h>

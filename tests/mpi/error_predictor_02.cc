@@ -66,7 +66,7 @@ test()
   DoFHandler<dim> dh(tria);
   for (const auto &cell : dh.active_cell_iterators())
     {
-      // set active fe index
+      // set active FE index
       if (cell->is_locally_owned())
         cell->set_active_fe_index(1);
     }

@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 // A test that checks make_flux_sparsity_pattern
-// with vector-valued hp objects and coupling masks
+// with vector-valued hp-objects and coupling masks
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>

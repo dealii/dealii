@@ -798,7 +798,7 @@ namespace internal
       // a. Only cells belonging to the same category (or next higher if the
       // cell_vectorization_categories_strict is false) can be grouped into
       // the same SIMD batch
-      // b. hp adaptive computations must form contiguous ranges for the same
+      // b. hp-adaptive computations must form contiguous ranges for the same
       // degree (category) in cell_partition_data
       // c. We want to group the cells with the same parent in the same SIMD
       // lane if possible
@@ -954,7 +954,7 @@ namespace internal
 
       // Step 5: Sort the batches of cells by their last cell index to get
       // good locality, assuming that the initial cell order is of good
-      // locality. In case we have hp calculations with categories, we need to
+      // locality. In case we have hp-calculations with categories, we need to
       // sort also by the category.
       std::vector<std::array<unsigned int, 3>> batch_order;
       std::vector<std::array<unsigned int, 3>> batch_order_comm;

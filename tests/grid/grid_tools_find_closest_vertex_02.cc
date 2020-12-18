@@ -40,7 +40,7 @@ test(const Point<spacedim> &p, double displacement)
   GridGenerator::hyper_cube(tria);
   tria.refine_global();
 
-  // Vector fe
+  // Vector FE
   FESystem<dim, spacedim>   fe{FE_Q<dim, spacedim>(1), spacedim};
   DoFHandler<dim, spacedim> dh(tria);
   dh.distribute_dofs(fe);

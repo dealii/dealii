@@ -15,7 +15,7 @@
 
 
 
-// interpolate() can not deal with FE_Nothing in an hp setting
+// interpolate() can not deal with FE_Nothing in an hp-setting
 
 
 #include <deal.II/base/function.h>

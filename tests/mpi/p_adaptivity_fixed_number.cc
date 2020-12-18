@@ -66,7 +66,7 @@ setup(Triangulation<dim> &tria, const DoFHandler<dim> &dh)
   GridGenerator::subdivided_hyper_cube(tria, 4);
   Assert(tria.n_cells(0) == tria.n_global_active_cells(), ExcInternalError());
 
-  // Set all active fe indices to 1.
+  // Set all active FE indices to 1.
   // Flag first half of cells for refinement, and the other half for coarsening.
   for (const auto &cell : dh.active_cell_iterators())
     if (!cell->is_artificial() && cell->is_locally_owned())
@@ -104,8 +104,8 @@ test()
 
 
   // We flag the first half of all cells to be refined and the last half of all
-  // cells to be coarsened for p adapativity. Ultimately, the first quarter of
-  // all cells will be flagged for p refinement, and the last quarter for p
+  // cells to be coarsened for p-adapativity. Ultimately, the first quarter of
+  // all cells will be flagged for p-refinement, and the last quarter for p-
   // coarsening.
 
   Vector<double> indicators(tria.n_active_cells());

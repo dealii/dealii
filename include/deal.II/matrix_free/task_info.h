@@ -151,7 +151,7 @@ namespace internal
        * interleaving cell and face integrals.
        *
        * @param categories_are_hp Defines whether
-       * `cell_vectorization_categories` is originating from a hp adaptive
+       * `cell_vectorization_categories` is originating from a hp-adaptive
        * computation with variable polynomial degree or a user-defined
        * variant.
        *
@@ -246,7 +246,7 @@ namespace internal
        * some SIMD lanes in VectorizedArray would not be filled for a given
        * cell batch index.
        *
-       * @param hp_bool Defines whether we are in hp mode or not
+       * @param hp_bool Defines whether we are in hp-mode or not
        */
       void
       make_thread_graph_partition_color(
@@ -285,7 +285,7 @@ namespace internal
        * some SIMD lanes in VectorizedArray would not be filled for a given
        * cell batch index.
        *
-       * @param hp_bool Defines whether we are in hp mode or not
+       * @param hp_bool Defines whether we are in hp-mode or not
        */
       void
       make_thread_graph_partition_partition(
@@ -316,7 +316,7 @@ namespace internal
        * some SIMD lanes in VectorizedArray would not be filled for a given
        * cell batch index.
        *
-       * @param hp_bool Defines whether we are in hp mode or not
+       * @param hp_bool Defines whether we are in hp-mode or not
        */
       void
       make_thread_graph(const std::vector<unsigned int> &cell_active_fe_index,

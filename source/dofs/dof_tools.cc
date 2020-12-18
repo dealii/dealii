@@ -701,7 +701,7 @@ namespace DoFTools
                     // non-primitive, but use usual convention (see docs)
                     {
                       // first get at the cell-global number of a face dof,
-                      // to ask the fe certain questions
+                      // to ask the FE certain questions
                       const unsigned int cell_index =
                         (dim == 1 ?
                            i :
@@ -2201,7 +2201,7 @@ namespace DoFTools
         for (unsigned int fe_index = 0; fe_index < fe_collection.size();
              ++fe_index)
           {
-            // check whether every fe in the collection has support points
+            // check whether every FE in the collection has support points
             Assert(fe_collection[fe_index].has_support_points(),
                    typename FiniteElement<dim>::ExcFEHasNoSupportPoints());
             q_coll_dummy.push_back(Quadrature<dim>(

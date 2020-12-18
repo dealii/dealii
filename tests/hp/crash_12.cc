@@ -15,12 +15,12 @@
 
 
 
-// check the complex case described in the hp paper by playing through all
+// check the complex case described in the hp-paper by playing through all
 // sorts of arrangements of finite elements on one coarse and one refined cell
 //
 // this code in particular tests some compensating code in
 // dof_tools.cc, where we have to make sure that we select a suitable
-// set of primary dofs. this is mostly trivial in 2d and for most fe
+// set of primary dofs. this is mostly trivial in 2d and for most FE
 // combinations in 3d as well. the exceptions are that it doesn't work
 // as easily in 3d for the combinations Q4/Q3, Q5/Q3, and
 // Q5/Q4. Higher order finite elements in 3d will probably only
@@ -91,7 +91,7 @@ test()
         deallog << "Testing " << fe[i].get_name() << " vs. " << fe[j].get_name()
                 << std::endl;
 
-        // set fe on coarse cell to 'i', on
+        // set FE on coarse cell to 'i', on
         // all fine cells to 'j'
         typename DoFHandler<dim>::active_cell_iterator cell =
           dof_handler.begin_active();

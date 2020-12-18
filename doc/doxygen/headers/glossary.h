@@ -1136,12 +1136,12 @@
  * </dd>
  *
  *
- * <dt class="glossary">@anchor hp_paper <b>%hp paper</b></dt>
- * <dd>The "hp paper" is a paper by W. Bangerth and O. Kayser-Herold, titled
+ * <dt class="glossary">@anchor hp_paper <b>%hp-paper</b></dt>
+ * <dd>The "hp-paper" is a paper by W. Bangerth and O. Kayser-Herold, titled
  * "Data Structures and Requirements for hp Finite Element Software", that
  * describes many of the algorithms and data structures used in the implementation
- * of the hp framework of deal.II. In particular, it summarizes many of the
- * tricky points that have to be considered for %hp finite elements using continuous
+ * of the hp-framework of deal.II. In particular, it summarizes many of the
+ * tricky points that have to be considered for %hp-finite elements using continuous
  * elements.
  *
  * The full reference for this paper is as follows:

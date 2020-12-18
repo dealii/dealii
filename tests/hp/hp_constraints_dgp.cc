@@ -15,7 +15,7 @@
 
 
 
-// check that computation of hp constraints works for DGP elements correctly
+// check that computation of hp-constraints works for DGP elements correctly
 
 char logname[] = "output";
 

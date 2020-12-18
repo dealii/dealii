@@ -460,7 +460,7 @@ namespace internal
             }
         }
 
-      // In case we have no hp adaptivity (active_fe_index is empty), we have
+      // In case we have no hp-adaptivity (active_fe_index is empty), we have
       // cells, and the mapping is MappingQGeneric or a derived class, we can
       // use the fast method.
       if (active_fe_index.empty() && !cells.empty() && mapping->size() == 1 &&
@@ -904,7 +904,7 @@ namespace internal
         GeometryType cell_t_prev = general;
 
         // fe_values object that is used to compute the mapping data. for
-        // the hp case there might be more than one finite element. since we
+        // the hp-case there might be more than one finite element. since we
         // manually select the active FE index and not via a
         // DoFHandler<dim>::active_cell_iterator, we need to manually
         // select the correct finite element, so just hold a vector of
@@ -961,7 +961,7 @@ namespace internal
               dealii::FEValues<dim> &fe_val = *fe_values[my_q][fe_index];
               cell_data.resize(n_q_points);
 
-              // if the fe index has changed from the previous cell, set the
+              // if the FE index has changed from the previous cell, set the
               // old cell type to invalid (otherwise, we might detect
               // similarity due to some cells further ahead)
               if (my_q > 0)
@@ -1840,15 +1840,15 @@ namespace internal
                ++my_q)
             {
 #ifndef DEAL_II_WITH_SIMPLEX_SUPPORT
-              // currently only non-hp case...
+              // currently only non-hp-case...
               AssertDimension(mapping_in.size(), 1);
               AssertDimension(mapping_info.face_data[my_q].descriptor.size(),
                               1);
 #endif
 
-              // We assume that we have the faces sorted by the active fe
-              // indices so that the active fe index of the interior side of the
-              // face batch is the same as the fe index of the interior side of
+              // We assume that we have the faces sorted by the active FE
+              // indices so that the active FE index of the interior side of the
+              // face batch is the same as the FE index of the interior side of
               // its first entry.
               const unsigned int fe_index =
                 active_fe_index.size() > 0 ?
@@ -2026,9 +2026,9 @@ namespace internal
                           GeometryInfo<dim>::max_children_per_cell)
                         {
                           // We assume that we have the faces sorted by the
-                          // active fe indices so that the active fe index of
+                          // active FE indices so that the active FE index of
                           // the exterior side of the face batch is the same as
-                          // the fe index of the exterior side of its first
+                          // the FE index of the exterior side of its first
                           // entry.
                           const unsigned int fe_index =
                             active_fe_index.size() > 0 ?

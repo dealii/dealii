@@ -248,7 +248,7 @@ the two elements are just variations of each other in that they have the same
 number of vector components but have different polynomial degrees &mdash; this
 smells very much like what one would do in $hp$ finite element methods, and it
 is exactly what we are going to do here: we are going to (ab)use the classes
-and facilities of the hp namespace to assign different elements to different
+and facilities of the hp-namespace to assign different elements to different
 cells. In other words, we will use collect the two finite elements in an
 hp::FECollection, will integrate with an appropriate hp::QCollection using an
 hp::FEValues object, and our DoFHandler will be in <i>hp</i>-mode. You
@@ -256,7 +256,7 @@ may wish to take a look at step-27 for an overview of all of these concepts.
 
 Before going on describing the testcase, let us clarify a bit <i>why</i> this
 approach of extending the functions by zero to the entire domain and then
-mapping the problem on to the hp framework makes sense:
+mapping the problem on to the hp-framework makes sense:
 
 - It makes things uniform: On all cells, the number of vector components is
   the same (here, <code>2*dim+1</code>). This makes all sorts of
@@ -583,7 +583,7 @@ cell is on.
 Secondly, we use an object of type DoFHandler operating in <i>hp</i>-mode. This
 class needs to know which cells will use the Stokes and which the elasticity
 finite element. At the beginning of each refinement cycle we will therefore
-have to walk over all cells and set the (in hp parlance) active FE index to
+have to walk over all cells and set the (in hp-parlance) active FE index to
 whatever is appropriate in the current situation. While we can use symbolic
 names for the material id, the active FE index is in fact a number that will
 frequently be used to index into collections of objects (e.g. of type

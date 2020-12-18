@@ -219,7 +219,7 @@ namespace FETools
       // given FEs
       unsigned int n_shape_functions = 0;
       for (unsigned int i = 0; i < fes.size(); ++i)
-        if (multiplicities[i] > 0) // check needed as fe might be nullptr
+        if (multiplicities[i] > 0) // check needed as FE might be nullptr
           n_shape_functions += fes[i]->n_dofs_per_cell() * multiplicities[i];
 
       // generate the array that will hold the output
@@ -386,27 +386,27 @@ namespace FETools
       // given FEs
       unsigned int n_shape_functions = 0;
       for (unsigned int i = 0; i < fes.size(); ++i)
-        if (multiplicities[i] > 0) // needed because fe might be nullptr
+        if (multiplicities[i] > 0) // needed because FE might be nullptr
           n_shape_functions += fes[i]->n_dofs_per_cell() * multiplicities[i];
 
       unsigned int n_components = 0;
       if (do_tensor_product)
         {
           for (unsigned int i = 0; i < fes.size(); ++i)
-            if (multiplicities[i] > 0) // needed because fe might be nullptr
+            if (multiplicities[i] > 0) // needed because FE might be nullptr
               n_components += fes[i]->n_components() * multiplicities[i];
         }
       else
         {
           for (unsigned int i = 0; i < fes.size(); ++i)
-            if (multiplicities[i] > 0) // needed because fe might be nullptr
+            if (multiplicities[i] > 0) // needed because FE might be nullptr
               {
                 n_components = fes[i]->n_components();
                 break;
               }
           // Now check that all FEs have the same number of components:
           for (unsigned int i = 0; i < fes.size(); ++i)
-            if (multiplicities[i] > 0) // needed because fe might be nullptr
+            if (multiplicities[i] > 0) // needed because FE might be nullptr
               Assert(n_components == fes[i]->n_components(),
                      ExcDimensionMismatch(n_components,
                                           fes[i]->n_components()));

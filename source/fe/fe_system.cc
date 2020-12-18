@@ -1625,7 +1625,7 @@ FESystem<dim, spacedim>::initialize(
   Assert(count_nonzeros(multiplicities) > 0,
          ExcMessage("You only passed FiniteElements with multiplicity 0."));
 
-  // Note that we need to skip every fe with multiplicity 0 in the following
+  // Note that we need to skip every FE with multiplicity 0 in the following
   // block of code
 
   this->base_to_block_indices.reinit(0, 0);

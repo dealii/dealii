@@ -77,7 +77,7 @@ test2cellsFESystem(const unsigned int p_feq = 2, const unsigned int p_feen = 1)
     FESystem<dim>(FE_Q<dim>(p_feq), 1, FE_Nothing<dim>(), 1));
   fe_collection.push_back(FESystem<dim>(FE_Q<dim>(p_feen), 1, FE_Q<dim>(1), 1));
 
-  // push back to be able to resolve hp constrains:
+  // push back to be able to resolve hp-constrains:
   fe_collection.push_back(
     FESystem<dim>(FE_Q<dim>(p_feen), 1, FE_Nothing<dim>(), 1));
 

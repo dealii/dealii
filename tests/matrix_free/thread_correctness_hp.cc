@@ -16,7 +16,7 @@
 
 
 // this function tests the correctness of the implementation of parallel
-// matrix free matrix-vector products for hp elements by comparing to the
+// matrix free matrix-vector products for hp-elements by comparing to the
 // serial version
 
 #include <deal.II/base/function.h>

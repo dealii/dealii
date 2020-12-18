@@ -2500,7 +2500,7 @@ FE_Nedelec<dim>::get_face_interpolation_matrix(
   // satisfied. But the matrices
   // produced in that case might
   // lead to problems in the
-  // hp procedures, which use this
+  // hp-procedures, which use this
   // method.
   Assert(this->n_dofs_per_face(face_no) <= source_fe.n_dofs_per_face(face_no),
          (typename FiniteElement<dim>::ExcInterpolationNotImplemented()));
@@ -2607,7 +2607,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
   // satisfied. But the matrices
   // produced in that case might
   // lead to problems in the
-  // hp procedures, which use this
+  // hp-procedures, which use this
   // method.
   Assert(this->n_dofs_per_face(face_no) <= source_fe.n_dofs_per_face(face_no),
          (typename FiniteElement<dim>::ExcInterpolationNotImplemented()));

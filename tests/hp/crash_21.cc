@@ -17,7 +17,7 @@
 
 // a problem uncovered by Baerbel Janssen in that
 // DoFTools::make_flux_sparsity_pattern aborted in 1d with adaptively refined
-// meshes and hp DoFHandlers. this actually uncovered all sorts of other
+// meshes and hp-DoFHandlers. this actually uncovered all sorts of other
 // problems that led to a long sequence of assertions triggered every time one
 // of them was fixed. this test cumulatively makes sure everything is ok
 

@@ -17,7 +17,7 @@
 
 // this function tests the correctness of the implementation of
 // inhomogeneous constraints. The program is a modification of the step-27
-// tutorial program with hp elements and the constraints arising in that
+// tutorial program with hp-elements and the constraints arising in that
 // situation. the idea of the test is to set up a matrix with standard tools
 // (i.e., constraints and the boundary value list), and compare that with
 // the new function.

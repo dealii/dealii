@@ -278,7 +278,7 @@ PointValueHistory<dim>::add_point(const Point<dim> &location)
   // the requested point for all finite
   // element components lie in the same cell.
   // this could possibly be violated if
-  // components use different fe orders,
+  // components use different FE orders,
   // requested points are on the edge or
   // vertex of a cell and we are unlucky with
   // floating point rounding. Worst case

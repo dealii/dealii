@@ -15,7 +15,7 @@
 
 
 
-// like deal.II/vectors_rhs, but for hp objects. here, each hp object has only a
+// like deal.II/vectors_rhs, but for hp-objects. here, each hp-object has only a
 // single component, so we expect exactly the same output as for the old test.
 // vectors_rhs_hp tests for different finite elements
 

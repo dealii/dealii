@@ -84,9 +84,9 @@ namespace internal
        *
        * The third argument, @p fe_index, must equal zero. It is otherwise
        * unused, but we retain the argument so that we can use the same
-       * interface for non-hp and hp finite element methods, in effect making
-       * it possible to share the DoFAccessor class hierarchy between hp and
-       * non-hp classes.
+       * interface for non-hp- and hp-finite element methods, in effect making
+       * it possible to share the DoFAccessor class hierarchy between hp- and
+       * non-hp-classes.
        */
       template <int dh_dim, int spacedim>
       void
@@ -104,9 +104,9 @@ namespace internal
        *
        * The third argument, @p fe_index, must equal zero. It is otherwise
        * unused, but we retain the argument so that we can use the same
-       * interface for non-hp and hp finite element methods, in effect making
-       * it possible to share the DoFAccessor class hierarchy between hp and
-       * non-hp classes.
+       * interface for non-hp- and hp-finite element methods, in effect making
+       * it possible to share the DoFAccessor class hierarchy between hp- and
+       * non-hp-classes.
        */
       template <int dh_dim, int spacedim>
       types::global_dof_index
@@ -187,7 +187,7 @@ namespace internal
       Assert((fe_index ==
               dealii::DoFHandler<dh_dim, spacedim>::default_fe_index),
              ExcMessage("Only zero fe_index values are allowed for "
-                        "non-hp DoFHandlers."));
+                        "non-hp-DoFHandlers."));
       return true;
     }
 
@@ -206,7 +206,7 @@ namespace internal
       Assert(
         (fe_index == dealii::DoFHandler<dh_dim, spacedim>::default_fe_index),
         ExcMessage(
-          "Only the default FE index is allowed for non-hp DoFHandler objects"));
+          "Only the default FE index is allowed for non-hp-DoFHandler objects"));
       Assert(
         local_index < dof_handler.get_fe().template n_dofs_per_object<dim>(),
         ExcIndexRange(local_index,

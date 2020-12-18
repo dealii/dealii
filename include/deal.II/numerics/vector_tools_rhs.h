@@ -82,7 +82,7 @@ namespace VectorTools
       AffineConstraints<typename VectorType::value_type>());
 
   /**
-   * Like the previous set of functions, but for hp objects.
+   * Like the previous set of functions, but for hp-objects.
    */
   template <int dim, int spacedim, typename VectorType>
   void
@@ -96,7 +96,7 @@ namespace VectorTools
       AffineConstraints<typename VectorType::value_type>());
 
   /**
-   * Like the previous set of functions, but for hp objects.
+   * Like the previous set of functions, but for hp-objects.
    */
   template <int dim, int spacedim, typename VectorType>
   void
@@ -146,7 +146,7 @@ namespace VectorTools
       std::set<types::boundary_id>());
 
   /**
-   * Same as the set of functions above, but for hp objects.
+   * Same as the set of functions above, but for hp-objects.
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
@@ -165,7 +165,7 @@ namespace VectorTools
   /**
    * Call the create_boundary_right_hand_side() function, see above, with a
    * single Q1 mapping as collection. This function therefore will only work
-   * if the only active fe index in use is zero.
+   * if the only active FE index in use is zero.
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"

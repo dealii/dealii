@@ -16,7 +16,7 @@
 
 
 // a test where a degree of freedom was constrained multiple times,
-// but with different weights. see the hp paper for more on this
+// but with different weights. see the hp-paper for more on this
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -98,7 +98,7 @@ main()
   // out the numbers of the dofs that
   // belong to the shared edge
   // (that's the one that has four
-  // different fe indices associated
+  // different FE indices associated
   // with it). note that there is
   // only one such line so we can
   // quit the loop once we find it

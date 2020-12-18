@@ -38,7 +38,7 @@ namespace internal
 
 
 /**
- * Class for transfer between two multigrid levels for p or global coarsening.
+ * Class for transfer between two multigrid levels for p- or global coarsening.
  */
 template <int dim, typename VectorType>
 class MGTwoLevelTransfer
@@ -60,7 +60,7 @@ public:
 
 
 /**
- * Class for transfer between two multigrid levels for p or global coarsening.
+ * Class for transfer between two multigrid levels for p- or global coarsening.
  * Specialization for LinearAlgebra::distributed::Vector.
  */
 template <int dim, typename Number>

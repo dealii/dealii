@@ -28,7 +28,7 @@
 // check
 //   DoFTools::
 //   count_dofs_per_component (...);
-// for the hp case
+// for the hp-case
 
 
 using namespace std;

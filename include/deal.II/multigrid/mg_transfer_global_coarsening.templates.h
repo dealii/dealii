@@ -948,7 +948,7 @@ namespace internal
         dof_handler_coarse.get_fe(0).dofs_per_cell *
         GeometryInfo<dim>::max_children_per_cell;
 
-      // degree of fe on coarse and fine cell
+      // degree of FE on coarse and fine cell
       transfer.schemes[0].degree_coarse   = transfer.schemes[0].degree_fine =
         transfer.schemes[1].degree_coarse = dof_handler_coarse.get_fe(0).degree;
       transfer.schemes[1].degree_fine =

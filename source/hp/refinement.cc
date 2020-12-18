@@ -37,7 +37,7 @@ namespace hp
   namespace Refinement
   {
     /**
-     * Setting p adaptivity flags
+     * Setting p-adaptivity flags
      */
     template <int dim, int spacedim>
     void
@@ -631,7 +631,7 @@ namespace hp
 
 
     /**
-     * Decide between h and p adaptivity
+     * Decide between h- and p-adaptivity
      */
     template <int dim, int spacedim>
     void
@@ -695,9 +695,9 @@ namespace hp
             cell->clear_refine_flag();
 
             // A cell will only be coarsened into its parent if all of its
-            // siblings are flagged for h coarsening as well. We must take this
-            // into account for our decision whether we would like to impose h
-            // or p adaptivity.
+            // siblings are flagged for h-coarsening as well. We must take this
+            // into account for our decision whether we would like to impose h-
+            // or p-adaptivity.
             if (cell->coarsen_flag_set())
               {
                 const auto &       parent     = cell->parent();
@@ -737,8 +737,8 @@ namespace hp
                 if (h_flagged_children == n_children &&
                     p_flagged_children != n_children)
                   {
-                    // Perform pure h coarsening and
-                    // drop all p adaptation flags.
+                    // Perform pure h-coarsening and
+                    // drop all p-adaptation flags.
                     for (const auto &child : parent->child_iterators())
                       {
                         // h_flagged_children == n_children implies
@@ -750,8 +750,8 @@ namespace hp
                   }
                 else
                   {
-                    // Perform p adaptation on all children and
-                    // drop all h coarsening flags.
+                    // Perform p-adaptation on all children and
+                    // drop all h-coarsening flags.
                     for (const auto &child : parent->child_iterators())
                       {
                         if (child->is_active() && child->is_locally_owned())

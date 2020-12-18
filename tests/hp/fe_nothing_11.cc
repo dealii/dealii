@@ -16,7 +16,7 @@
 
 
 // test that FE_Nothing can be called with interpolate_boundary_values
-// with vector elements in the hp context with each element active
+// with vector elements in the hp-context with each element active
 // only in a subdomain
 
 

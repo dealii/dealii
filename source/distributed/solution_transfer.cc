@@ -308,7 +308,7 @@ namespace parallel
                 dim,
                 DoFHandlerType::space_dimension>::CELL_COARSEN:
                 {
-                  // In case of coarsening, we need to find a suitable fe index
+                  // In case of coarsening, we need to find a suitable FE index
                   // for the parent cell. We choose the 'least dominant fe'
                   // on all children from the associated FECollection.
 #  ifdef DEBUG
@@ -383,10 +383,10 @@ namespace parallel
                 DoFHandlerType::space_dimension>::CELL_REFINE:
                 {
                   // After refinement, this particular cell is no longer active,
-                  // and its children have inherited its fe index. However, to
-                  // unpack the data on the old cell, we need to recover its fe
+                  // and its children have inherited its FE index. However, to
+                  // unpack the data on the old cell, we need to recover its FE
                   // index from one of the children. Just to be sure, we also
-                  // check if all children have the same fe index.
+                  // check if all children have the same FE index.
                   fe_index = cell->child(0)->active_fe_index();
                   for (unsigned int child_index = 1;
                        child_index < cell->n_children();

@@ -31,7 +31,7 @@ template <int dim>
 void
 check_this(const DoFHandler<dim> &dof_handler)
 {
-  // don't check if fe has no support
+  // don't check if FE has no support
   // points
   if (dof_handler.get_fe().get_unit_support_points().size() == 0)
     return;

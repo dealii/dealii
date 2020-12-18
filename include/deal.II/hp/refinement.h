@@ -620,7 +620,7 @@ namespace hp
      *
      * @note The function Triangulation::prepare_coarsening_and_refinement()
      *   will clean up all h-coarsening flags if they are not shared among
-     *   all siblings. In the hp case, we need to bring forward this decision:
+     *   all siblings. In the hp-case, we need to bring forward this decision:
      *   If the cell will not be coarsened, but qualifies for p-adaptivity,
      *   we have to set all flags accordingly. So this function anticipates
      *   the decision that Triangulation::prepare_coarsening_and_refinement()

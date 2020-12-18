@@ -15,7 +15,7 @@
 
 
 
-// active fe indices serialization with a different number of cpus
+// active FE indices serialization with a different number of cpus
 
 
 #include <deal.II/distributed/tria.h>
@@ -63,7 +63,7 @@ test()
       for (auto &cell : dh.active_cell_iterators())
         if (cell->is_locally_owned())
           {
-            // set active fe index
+            // set active FE index
             if (i >= fe_collection.size())
               i = 0;
             cell->set_active_fe_index(i++);

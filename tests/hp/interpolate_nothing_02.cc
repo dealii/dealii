@@ -166,7 +166,7 @@ diffusionMechanics<dim>::cell_is_in_omega2_domain(
   return (cell->material_id() == omega2_domain_id);
 }
 
-// Set active fe indices in each sub-domain
+// Set active FE indices in each sub-domain
 template <int dim>
 void
 diffusionMechanics<dim>::set_active_fe_indices()

@@ -197,7 +197,7 @@ namespace Step4
     DoFTools::make_zero_boundary_constraints(dof_handler, constraints);
 
 #ifdef DEBUG
-    // We did not think about hp constraints on ghost cells yet.
+    // We did not think about hp-constraints on ghost cells yet.
     // Thus, we are content with verifying their consistency for now.
     IndexSet locally_active_dofs;
     DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);

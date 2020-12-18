@@ -72,7 +72,7 @@ test(const bool apply_constrains, const unsigned int hp)
   AffineConstraints<double> constraints; // for boundary conditions
 
 
-  // populate fe system:
+  // populate FE system:
   fe.push_back(FE_Q_Hierarchical<dim>(2));
   fe.push_back(FE_Q_Hierarchical<dim>(4));
 
@@ -82,7 +82,7 @@ test(const bool apply_constrains, const unsigned int hp)
   cell->set_active_fe_index(1);
 
   // need to distribute dofs before refinement,
-  // otherwise active fe index will not transfer to child cells
+  // otherwise active FE index will not transfer to child cells
   dof_handler.distribute_dofs(fe);
 
   // refine first cell (simple case)

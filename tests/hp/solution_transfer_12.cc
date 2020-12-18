@@ -222,7 +222,7 @@ transfer(std::ostream &out)
               std::fabs(func.value(fe_val.quadrature_point(q), 0) - vals[q]);
           }
       }
-    deallog << "Error in interpolating hp FE_Q_Hierarchical: " << error
+    deallog << "Error in interpolating hp-FE_Q_Hierarchical: " << error
             << std::endl;
   }
 }

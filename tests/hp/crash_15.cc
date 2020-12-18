@@ -22,7 +22,7 @@
 // apparently, what is happening is that we don't unify more than 2 finite
 // elements on an edge in 3d, according to a comment at the top of
 // hp::DoFHandler::compute_line_dof_identities at the time of this writing
-// (and referring to a comment in the hp paper). there is now code that deals
+// (and referring to a comment in the hp-paper). there is now code that deals
 // with the more narrow special case we have here
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -102,9 +102,9 @@ test()
             }
 
 
-          // if there are multiple active fe
+          // if there are multiple active FE
           // indices, make sure that all their
-          // fe indices were unified
+          // FE indices were unified
           for (unsigned int i = 0; i < cell->line(line)->n_active_fe_indices();
                ++i)
             for (unsigned int j = i + 1;

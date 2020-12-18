@@ -15,7 +15,7 @@
 
 
 
-// active fe indices transfer on repartitioning
+// active FE indices transfer on repartitioning
 
 
 #include <deal.II/distributed/cell_weights.h>
@@ -54,7 +54,7 @@ test()
   for (auto &cell : dh.active_cell_iterators())
     if (cell->is_locally_owned())
       {
-        // set active fe index
+        // set active FE index
         if (!(cell->is_artificial()))
           cell->set_active_fe_index(myid);
 

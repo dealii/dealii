@@ -752,7 +752,7 @@ namespace DerivativeApproximation
       // create collection objects from
       // single quadratures, mappings,
       // and finite elements. if we have
-      // an hp DoFHandler,
+      // an hp-DoFHandler,
       // dof_handler.get_fe() returns a
       // collection of which we do a
       // shallow copy instead
@@ -787,7 +787,7 @@ namespace DerivativeApproximation
       // derivatives
       typename DerivativeDescription::Derivative projected_derivative;
 
-      // reinit fe values object...
+      // reinit FE values object...
       x_fe_midpoint_value.reinit(cell);
       const FEValues<dim> &fe_midpoint_value =
         x_fe_midpoint_value.get_present_fe_values();
@@ -825,7 +825,7 @@ namespace DerivativeApproximation
         {
           const auto neighbor = *neighbor_ptr;
 
-          // reinit fe values object...
+          // reinit FE values object...
           x_fe_midpoint_value.reinit(neighbor);
           const FEValues<dim> &neighbor_fe_midpoint_value =
             x_fe_midpoint_value.get_present_fe_values();

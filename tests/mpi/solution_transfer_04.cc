@@ -61,7 +61,7 @@ test()
     {
       if (cell->is_locally_owned())
         {
-          // set active fe index
+          // set active FE index
           if (!(cell->is_artificial()))
             {
               if (i >= fe_collection.size())

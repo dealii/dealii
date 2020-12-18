@@ -15,11 +15,11 @@
 
 
 
-// have a 2x1 coarse mesh (or 2x1x1) and verify DoF indices in the hp
+// have a 2x1 coarse mesh (or 2x1x1) and verify DoF indices in the hp-
 // case with an FECollection that contains multiple copies of the same
-// FE_Q(2) element. in the sequential case, the hp code will unify DoF
+// FE_Q(2) element. in the sequential case, the hp-code will unify DoF
 // indices on boundaries between locally owned subdomains; in early
-// versions of the parallel hp support, we don't do that, but the
+// versions of the parallel hp-support, we don't do that, but the
 // final version now does
 //
 // this test gives a different perspective on this issue. in the _01

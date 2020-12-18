@@ -16,7 +16,7 @@
 
 // This test provides a hp::DoFHandler with two FE_Q(2) elements
 // assigned on a p::d::Triangulation consisting of 64x64 cells, on which
-// active fe indices are mostly randomly distributed. This DoF
+// active FE indices are mostly randomly distributed. This DoF
 // distribution test repeats for an increasing amount of processors.
 //
 // At some point, this test failed to provide a consistent number of

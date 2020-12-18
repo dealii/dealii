@@ -152,9 +152,9 @@ namespace VectorTools
    * Call the create_point_source_vector() function, see above, with
    * an implied default $Q_1$ mapping object.
    *
-   * Note that if your DoFHandler uses any active fe index other than zero, then
+   * Note that if your DoFHandler uses any active FE index other than zero, then
    * you need to call the function above that provides a mapping object for each
-   * active fe index.
+   * active FE index.
    */
   template <int dim, int spacedim>
   void
@@ -204,9 +204,9 @@ namespace VectorTools
    * Call the create_point_source_vector() function for vector-valued finite
    * elements, see above, with an implied default $Q_1$ mapping object.
    *
-   * Note that if your DoFHandler uses any active fe index other than zero, then
+   * Note that if your DoFHandler uses any active FE index other than zero, then
    * you need to call the function above that provides a mapping object for each
-   * active fe index.
+   * active FE index.
    */
   template <int dim, int spacedim>
   void

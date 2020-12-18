@@ -73,7 +73,7 @@ namespace VectorTools
     const ComponentMask &component_mask = ComponentMask());
 
   /**
-   * Same as above but in an hp context.
+   * Same as above but in an hp-context.
    */
   template <int dim, int spacedim, typename VectorType>
   void

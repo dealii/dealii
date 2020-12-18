@@ -188,7 +188,7 @@ namespace VectorTools
               for (unsigned int m = 0; m < multiplicity; ++m)
                 {
                   // recursively call apply_transform to make sure to
-                  // correctly handle nested fe systems.
+                  // correctly handle nested FE systems.
                   current_offset = apply_transform(base_fe,
                                                    current_offset,
                                                    fe_values_jacobians,
@@ -276,7 +276,7 @@ namespace VectorTools
       std::vector<types::global_dof_index> dofs_on_cell(fe.max_dofs_per_cell());
 
       // Temporary storage for cell-wise interpolation operation. We store a
-      // variant for every fe we encounter to speed up resizing operations.
+      // variant for every FE we encounter to speed up resizing operations.
       // The first vector is used for local function evaluation. The vector
       // dof_values is used to store intermediate cell-wise interpolation
       // results (see the detailed explanation in the for loop further down

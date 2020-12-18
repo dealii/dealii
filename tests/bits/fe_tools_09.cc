@@ -29,8 +29,8 @@ template <int dim>
 void
 check_this(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
 {
-  // check that the name of the fe
-  // and the name of the fe that we
+  // check that the name of the FE
+  // and the name of the FE that we
   // re-create from this name are
   // identitical. this is also a
   // pretty good indication that the

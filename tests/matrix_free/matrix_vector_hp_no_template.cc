@@ -17,7 +17,7 @@
 
 // this function tests the correctness of the implementation of matrix free
 // matrix-vector products by comparing with the result of deal.II sparse
-// matrix for hp DoFHandler on a hyperball mesh with hanging nodes and finite
+// matrix for hp-DoFHandler on a hyperball mesh with hanging nodes and finite
 // elements orders distributed randomly.
 
 #include <deal.II/base/function.h>

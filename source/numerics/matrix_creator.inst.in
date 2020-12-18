@@ -21,7 +21,7 @@ for (scalar : REAL_SCALARS; deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
-    // non-hp version of create_mass_matrix
+    // non-hp-version of create_mass_matrix
     template void MatrixCreator::
       create_mass_matrix<deal_II_dimension, deal_II_space_dimension, scalar>(
         const Mapping<deal_II_dimension, deal_II_space_dimension> &   mapping,
@@ -38,7 +38,7 @@ for (scalar : REAL_SCALARS; deal_II_dimension : DIMENSIONS;
         const Function<deal_II_space_dimension, scalar> *const coefficient,
         const AffineConstraints<scalar> &                      constraints);
 
-    // hp versions of functions
+    // hp-versions of functions
     template void MatrixCreator::
       create_mass_matrix<deal_II_dimension, deal_II_space_dimension, scalar>(
         const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
@@ -66,7 +66,7 @@ for (scalar : REAL_AND_COMPLEX_SCALARS; deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
-    // non-hp version of create_mass_matrix
+    // non-hp-version of create_mass_matrix
     template void MatrixCreator::
       create_mass_matrix<deal_II_dimension, deal_II_space_dimension, scalar>(
         const Mapping<deal_II_dimension, deal_II_space_dimension> &   mapping,
@@ -87,7 +87,7 @@ for (scalar : REAL_AND_COMPLEX_SCALARS; deal_II_dimension : DIMENSIONS;
         const Function<deal_II_space_dimension, scalar> *const coefficient,
         const AffineConstraints<scalar> &                      constraints);
 
-    // hp version
+    // hp-version
     template void MatrixCreator::
       create_mass_matrix<deal_II_dimension, deal_II_space_dimension, scalar>(
         const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
@@ -183,7 +183,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension == deal_II_space_dimension
 
-    // non-hp versions of create_laplace_matrix
+    // non-hp-versions of create_laplace_matrix
     template void MatrixCreator::create_laplace_matrix<deal_II_dimension>(
       const DoFHandler<deal_II_dimension> &    dof,
       const Quadrature<deal_II_dimension> &    q,
@@ -215,7 +215,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       const Function<deal_II_dimension> *const coefficient,
       const AffineConstraints<double> &        constraints);
 
-    // hp versions of create_laplace_matrix
+    // hp-versions of create_laplace_matrix
     template void MatrixCreator::create_laplace_matrix<deal_II_dimension>(
       const DoFHandler<deal_II_dimension> &     dof,
       const hp::QCollection<deal_II_dimension> &q,
@@ -253,7 +253,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension < deal_II_space_dimension
-    // non-hp version of create_laplace_matrix
+    // non-hp-version of create_laplace_matrix
     template void MatrixCreator::create_laplace_matrix<deal_II_dimension,
                                                        deal_II_space_dimension>(
       const Mapping<deal_II_dimension, deal_II_space_dimension> &   mapping,

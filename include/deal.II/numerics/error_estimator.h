@@ -429,7 +429,7 @@ public:
 
   /**
    * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp finite element dof handlers.
+   * quadrature collection for hp-finite element dof handlers.
    */
   template <typename InputVector>
   static void
@@ -452,7 +452,7 @@ public:
 
   /**
    * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp finite element dof handlers.
+   * quadrature collection for hp-finite element dof handlers.
    */
   template <typename InputVector>
   static void
@@ -474,7 +474,7 @@ public:
 
   /**
    * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp finite element dof handlers.
+   * quadrature collection for hp-finite element dof handlers.
    */
   template <typename InputVector>
   static void
@@ -497,7 +497,7 @@ public:
 
   /**
    * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp finite element dof handlers.
+   * quadrature collection for hp-finite element dof handlers.
    */
   template <typename InputVector>
   static void
@@ -715,7 +715,7 @@ public:
 
   /**
    * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp finite element dof handlers.
+   * quadrature collection for hp-finite element dof handlers.
    */
   template <typename InputVector>
   static void
@@ -738,7 +738,7 @@ public:
 
   /**
    * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp finite element dof handlers.
+   * quadrature collection for hp-finite element dof handlers.
    */
   template <typename InputVector>
   static void
@@ -760,7 +760,7 @@ public:
 
   /**
    * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp finite element dof handlers.
+   * quadrature collection for hp-finite element dof handlers.
    */
   template <typename InputVector>
   static void
@@ -783,7 +783,7 @@ public:
 
   /**
    * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp finite element dof handlers.
+   * quadrature collection for hp-finite element dof handlers.
    */
   template <typename InputVector>
   static void

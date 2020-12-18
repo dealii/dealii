@@ -15,9 +15,9 @@
 
 
 
-// have a 2x2 coarse mesh (or 2x2x1) and verify DoF indices in the hp
+// have a 2x2 coarse mesh (or 2x2x1) and verify DoF indices in the hp-
 // case with an FECollection that contains multiple copies of the same
-// FESystem object, consisting of two FE_Q(2) elements. the hp code will
+// FESystem object, consisting of two FE_Q(2) elements. the hp-code will
 // unify DoF indices on boundaries between all subdomains.
 //
 // in this testcase, three FESystem objects are distributed on four
