@@ -371,6 +371,17 @@ protected:
   const unsigned int active_quad_index;
 
   /**
+   * A pointer to the underlying quadrature formula specified at construction.
+   * Also contained in matrix_info, but it simplifies code if we store a
+   * reference to it.
+   */
+  const typename internal::MatrixFreeFunctions::MappingInfoStorage<
+    (is_face ? dim - 1 : dim),
+    dim,
+    Number,
+    VectorizedArrayType>::QuadratureDescriptor *descriptor;
+
+  /**
    * The number of quadrature points in the current evaluation context.
    */
   const unsigned int n_quadrature_points;
@@ -3337,7 +3348,8 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
            active_quad_index_in :
            std::min<unsigned int>(active_fe_index,
                                   mapping_data->descriptor.size() - 1)))
-  , n_quadrature_points(mapping_data->descriptor[active_quad_index].n_q_points)
+  , descriptor(&mapping_data->descriptor[active_quad_index])
+  , n_quadrature_points(descriptor->n_q_points)
   , data(&data_in.get_shape_info(
       dof_no,
       quad_no_in,
@@ -3348,8 +3360,7 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   , J_value(nullptr)
   , normal_vectors(nullptr)
   , normal_x_jacobian(nullptr)
-  , quadrature_weights(
-      mapping_data->descriptor[active_quad_index].quadrature_weights.begin())
+  , quadrature_weights(descriptor->quadrature_weights.begin())
   , cell(numbers::invalid_unsigned_int)
   , is_interior_face(is_interior_face)
   , dof_access_index(
@@ -3365,8 +3376,7 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
                   VectorizedArrayType::size());
   AssertDimension((is_face ? data->n_q_points_face : data->n_q_points),
                   n_quadrature_points);
-  AssertDimension(n_quadrature_points,
-                  mapping_data->descriptor[active_quad_index].n_q_points);
+  AssertDimension(n_quadrature_points, descriptor->n_q_points);
 }
 
 
@@ -3385,6 +3395,7 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   , quad_no(numbers::invalid_unsigned_int)
   , active_fe_index(numbers::invalid_unsigned_int)
   , active_quad_index(numbers::invalid_unsigned_int)
+  , descriptor(nullptr)
   , n_quadrature_points(
       Utilities::fixed_power < is_face ? dim - 1 : dim > (quadrature.size()))
   , matrix_info(nullptr)
@@ -3436,6 +3447,7 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   , quad_no(other.quad_no)
   , active_fe_index(other.active_fe_index)
   , active_quad_index(other.active_quad_index)
+  , descriptor(other.descriptor == nullptr ? nullptr : other.descriptor)
   , n_quadrature_points(other.n_quadrature_points)
   , matrix_info(other.matrix_info)
   , dof_info(other.dof_info)
@@ -3448,10 +3460,9 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   , J_value(nullptr)
   , normal_vectors(nullptr)
   , normal_x_jacobian(nullptr)
-  , quadrature_weights(
-      other.matrix_info == nullptr ?
-        nullptr :
-        mapping_data->descriptor[active_quad_index].quadrature_weights.begin())
+  , quadrature_weights(other.descriptor == nullptr ?
+                         nullptr :
+                         descriptor->quadrature_weights.begin())
   , cell(numbers::invalid_unsigned_int)
   , cell_type(internal::MatrixFreeFunctions::general)
   , is_interior_face(other.is_interior_face)
@@ -3498,6 +3509,7 @@ FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::operator=(
 
   matrix_info  = other.matrix_info;
   dof_info     = other.dof_info;
+  descriptor   = other.descriptor;
   mapping_data = other.mapping_data;
   if (other.matrix_info == nullptr)
     {
@@ -3512,9 +3524,7 @@ FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::operator=(
     }
 
   quadrature_weights =
-    (mapping_data != nullptr ?
-       mapping_data->descriptor[active_quad_index].quadrature_weights.begin() :
-       nullptr);
+    (descriptor != nullptr ? descriptor->quadrature_weights.begin() : nullptr);
   cell             = numbers::invalid_unsigned_int;
   cell_type        = internal::MatrixFreeFunctions::general;
   is_interior_face = other.is_interior_face;
@@ -7697,17 +7707,13 @@ FEEvaluation<dim,
       const Tensor<2, dim, VectorizedArrayType> &jac = this->jacobian[1];
       if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
         for (unsigned int d = 0; d < dim; ++d)
-          point[d] += jac[d][d] *
-                      static_cast<Number>(
-                        this->mapping_data->descriptor[this->active_quad_index]
-                          .quadrature.point(q)[d]);
+          point[d] += jac[d][d] * static_cast<Number>(
+                                    this->descriptor->quadrature.point(q)[d]);
       else
         for (unsigned int d = 0; d < dim; ++d)
           for (unsigned int e = 0; e < dim; ++e)
             point[d] += jac[d][e] * static_cast<Number>(
-                                      this->mapping_data
-                                        ->descriptor[this->active_quad_index]
-                                        .quadrature.point(q)[e]);
+                                      this->descriptor->quadrature.point(q)[e]);
       return point;
     }
   else
@@ -8641,8 +8647,7 @@ FEFaceEvaluation<dim,
         this->face_no,
         this->subface_index,
         this->face_orientation,
-        this->mapping_data->descriptor[this->active_fe_index]
-          .face_orientations);
+        this->descriptor->face_orientations);
   else
     internal::FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::
       evaluate(n_components,
@@ -8656,8 +8661,7 @@ FEFaceEvaluation<dim,
                this->face_no,
                this->subface_index,
                this->face_orientation,
-               this->mapping_data->descriptor[this->active_fe_index]
-                 .face_orientations);
+               this->descriptor->face_orientations);
 
 #  ifdef DEBUG
   if (evaluation_flag & EvaluationFlags::values)
@@ -8784,8 +8788,7 @@ FEFaceEvaluation<dim,
         this->face_no,
         this->subface_index,
         this->face_orientation,
-        this->mapping_data->descriptor[this->active_fe_index]
-          .face_orientations);
+        this->descriptor->face_orientations);
   else
     internal::FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::
       integrate(n_components,
@@ -8799,8 +8802,7 @@ FEFaceEvaluation<dim,
                 this->face_no,
                 this->subface_index,
                 this->face_orientation,
-                this->mapping_data->descriptor[this->active_fe_index]
-                  .face_orientations);
+                this->descriptor->face_orientations);
 }
 
 
@@ -8895,8 +8897,7 @@ FEFaceEvaluation<dim,
           this->subface_index,
           this->dof_access_index,
           face_orientations,
-          this->mapping_data->descriptor[this->active_fe_index]
-            .face_orientations);
+          this->descriptor->face_orientations);
       }
     else
       {
@@ -8936,8 +8937,7 @@ FEFaceEvaluation<dim,
               this->subface_index,
               this->dof_access_index,
               face_orientation_,
-              this->mapping_data->descriptor[this->active_fe_index]
-                .face_orientations);
+              this->descriptor->face_orientations);
           }
         else
           return internal::
@@ -8960,9 +8960,7 @@ FEFaceEvaluation<dim,
                               this->subface_index,
                               this->dof_access_index,
                               face_orientation_,
-                              this->mapping_data
-                                ->descriptor[this->active_fe_index]
-                                .face_orientations);
+                              this->descriptor->face_orientations);
       }
   };
 
@@ -9075,8 +9073,7 @@ FEFaceEvaluation<dim,
             this->subface_index,
             this->dof_access_index,
             face_orientation_,
-            this->mapping_data->descriptor[this->active_fe_index]
-              .face_orientations))
+            this->descriptor->face_orientations))
         {
           // if we arrive here, writing into the destination vector did not
           // succeed because some of the assumptions in integrate_scatter were
@@ -9107,9 +9104,7 @@ FEFaceEvaluation<dim,
                               this->subface_index,
                               this->dof_access_index,
                               face_orientation_,
-                              this->mapping_data
-                                ->descriptor[this->active_fe_index]
-                                .face_orientations))
+                              this->descriptor->face_orientations))
         {
           this->distribute_local_to_global(destination);
         }
