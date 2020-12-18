@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/exceptions.h>
 
 #include <array>
@@ -196,6 +197,17 @@ public:
    */
   types::coarse_cell_id
   get_coarse_cell_id() const;
+
+  /**
+   * Return a read-only container of integers that denotes which child to pick
+   * from one refinement level to the next, starting with the coarse cell, until
+   * we get to the cell represented by the current object.
+   *
+   * The number of elements in this container corresponds to (level-1) of the
+   * current cell.
+   */
+  ArrayView<const std::uint8_t>
+  get_child_indices() const;
 
 private:
   /**
@@ -381,10 +393,19 @@ CellId::is_ancestor_of(const CellId &other) const
 }
 
 
+
 inline types::coarse_cell_id
 CellId::get_coarse_cell_id() const
 {
   return coarse_cell_id;
+}
+
+
+
+inline ArrayView<const std::uint8_t>
+CellId::get_child_indices() const
+{
+  return {child_indices.data(), n_child_indices};
 }
 
 
