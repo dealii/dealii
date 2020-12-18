@@ -398,8 +398,7 @@ namespace Utilities
     std::stringstream origin(input);
 
     bio::filtering_streambuf<bio::input> out;
-    out.push(bio::gzip_compressor(
-      bio::gzip_params(boost::iostreams::gzip::default_compression)));
+    out.push(bio::gzip_compressor());
     out.push(origin);
     bio::copy(out, compressed);
 
