@@ -336,22 +336,6 @@ protected:
   const unsigned int quad_no;
 
   /**
-   * The active fe index for this class for efficient indexing in the hp case.
-   */
-  const unsigned int active_fe_index;
-
-  /**
-   * The active quadrature index for this class for efficient indexing in the
-   * hp case.
-   */
-  const unsigned int active_quad_index;
-
-  /**
-   * The number of quadrature points in the current evaluation context.
-   */
-  const unsigned int n_quadrature_points;
-
-  /**
    * A pointer to the underlying data.
    */
   const MatrixFree<dim, Number, VectorizedArrayType> *matrix_info;
@@ -374,6 +358,22 @@ protected:
     dim,
     Number,
     VectorizedArrayType> *mapping_data;
+
+  /**
+   * The active fe index for this class for efficient indexing in the hp case.
+   */
+  const unsigned int active_fe_index;
+
+  /**
+   * The active quadrature index for this class for efficient indexing in the
+   * hp case.
+   */
+  const unsigned int active_quad_index;
+
+  /**
+   * The number of quadrature points in the current evaluation context.
+   */
+  const unsigned int n_quadrature_points;
 
   /**
    * A pointer to the unit cell shape data, i.e., values, gradients and
@@ -3316,6 +3316,13 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
     const unsigned int active_quad_index_in)
   : scratch_data_array(data_in.acquire_scratch_data())
   , quad_no(quad_no_in)
+  , matrix_info(&data_in)
+  , dof_info(&data_in.get_dof_info(dof_no))
+  , mapping_data(
+      internal::MatrixFreeFunctions::
+        MappingInfoCellsOrFaces<dim, Number, is_face, VectorizedArrayType>::get(
+          data_in.get_mapping_info(),
+          quad_no))
   , active_fe_index(fe_degree != numbers::invalid_unsigned_int ?
                       data_in.get_dof_info(dof_no).fe_index_from_degree(
                         first_selected_component,
@@ -3325,50 +3332,12 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
                          0))
   , active_quad_index(
       fe_degree != numbers::invalid_unsigned_int ?
-        (is_face ? data_in.get_mapping_info()
-                     .face_data[quad_no_in]
-                     .quad_index_from_n_q_points(n_q_points) :
-                   data_in.get_mapping_info()
-                     .cell_data[quad_no_in]
-                     .quad_index_from_n_q_points(n_q_points)) :
+        (mapping_data->quad_index_from_n_q_points(n_q_points)) :
         (active_quad_index_in != numbers::invalid_unsigned_int ?
            active_quad_index_in :
            std::min<unsigned int>(active_fe_index,
-                                  (is_face ? data_in.get_mapping_info()
-                                               .face_data[quad_no_in]
-                                               .descriptor.size() :
-                                             data_in.get_mapping_info()
-                                               .cell_data[quad_no_in]
-                                               .descriptor.size()) -
-                                    1)))
-  , n_quadrature_points(
-      fe_degree != numbers::invalid_unsigned_int ?
-        n_q_points :
-        (is_face ? data_in
-                     .get_shape_info(
-                       dof_no,
-                       quad_no_in,
-                       data_in.get_dof_info(dof_no)
-                         .component_to_base_index[first_selected_component],
-                       active_fe_index,
-                       active_quad_index)
-                     .n_q_points_face :
-                   data_in
-                     .get_shape_info(
-                       dof_no,
-                       quad_no_in,
-                       data_in.get_dof_info(dof_no)
-                         .component_to_base_index[first_selected_component],
-                       active_fe_index,
-                       active_quad_index)
-                     .n_q_points))
-  , matrix_info(&data_in)
-  , dof_info(&data_in.get_dof_info(dof_no))
-  , mapping_data(
-      internal::MatrixFreeFunctions::
-        MappingInfoCellsOrFaces<dim, Number, is_face, VectorizedArrayType>::get(
-          data_in.get_mapping_info(),
-          quad_no))
+                                  mapping_data->descriptor.size() - 1)))
+  , n_quadrature_points(mapping_data->descriptor[active_quad_index].n_q_points)
   , data(&data_in.get_shape_info(
       dof_no,
       quad_no_in,
