@@ -66,9 +66,6 @@ test()
 
     const Particles::Particle<2> moved_particle(std::move(particle));
 
-    deallog << "Old particle has properties after move: "
-            << particle.has_properties() << std::endl;
-
     deallog << "Moved particle properties: "
             << std::vector<double>(moved_particle.get_properties().begin(),
                                    moved_particle.get_properties().end())
