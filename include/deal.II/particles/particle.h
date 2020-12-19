@@ -182,7 +182,8 @@ namespace Particles
      * @param[in,out] begin_data A pointer to a memory location from which
      * to read the information that completely describes a particle. This
      * class then de-serializes its data from this memory location and
-     * advance the pointer accordingly.
+     * advances the pointer beyond the data that has been read to initialize
+     * the particle information.
      *
      * @param[in,out] property_pool An optional pointer to a property pool
      * that is used to manage the property data used by this particle. Note that
