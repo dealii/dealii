@@ -647,8 +647,8 @@ namespace Functions
      * calculating the memory usage of trees (e.g., <tt>std::map</tt>) is
      * difficult.
      */
-    std::size_t
-    memory_consumption() const;
+    virtual std::size_t
+    memory_consumption() const override;
 
   protected:
     /**
@@ -1435,6 +1435,12 @@ namespace Functions
     gradient(const Point<dim> & p,
              const unsigned int component = 0) const override;
 
+    /**
+     * Return an estimate for the memory consumption, in bytes, of this object.
+     */
+    virtual std::size_t
+    memory_consumption() const override;
+
   protected:
     /**
      * Find the index in the table of the rectangle containing an input point
@@ -1540,6 +1546,12 @@ namespace Functions
     gradient(const Point<dim> & p,
              const unsigned int component = 0) const override;
 
+    /**
+     * Return an estimate for the memory consumption, in bytes, of this object.
+     */
+    virtual std::size_t
+    memory_consumption() const override;
+
   private:
     /**
      * The set of interval endpoints in each of the coordinate directions.
@@ -1607,6 +1619,12 @@ namespace Functions
     virtual Tensor<1, dim>
     gradient(const Point<dim> & p,
              const unsigned int component = 0) const override;
+
+    /**
+     * Return an estimate for the memory consumption, in bytes, of this object.
+     */
+    virtual std::size_t
+    memory_consumption() const override;
 
   private:
     /**

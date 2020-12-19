@@ -390,10 +390,10 @@ public:
 
   /**
    * Return an estimate for the memory consumption, in bytes, of this object.
-   * This is not exact (but will usually be close) because calculating the
-   * memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
+   *
+   * This function is virtual and can be overloaded by derived classes.
    */
-  std::size_t
+  virtual std::size_t
   memory_consumption() const;
 };
 
@@ -483,8 +483,8 @@ namespace Functions
     laplacian(const Point<dim> & point,
               const unsigned int component = 0) const override;
 
-    std::size_t
-    memory_consumption() const;
+    virtual std::size_t
+    memory_consumption() const override;
 
   protected:
     /**
@@ -602,11 +602,9 @@ public:
 
   /**
    * Return an estimate for the memory consumption, in bytes, of this object.
-   * This is not exact (but will usually be close) because calculating the
-   * memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
    */
-  std::size_t
-  memory_consumption() const;
+  virtual std::size_t
+  memory_consumption() const override;
 
 protected:
   /**

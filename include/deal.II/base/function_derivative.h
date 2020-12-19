@@ -102,8 +102,8 @@ public:
    * This is not exact (but will usually be close) because calculating the
    * memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
    */
-  std::size_t
-  memory_consumption() const;
+  virtual std::size_t
+  memory_consumption() const override;
 
 private:
   /**
