@@ -1188,18 +1188,10 @@ namespace Utilities
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
-    //
-    // we have to work around the fact that GCC 4.8.x claims to be C++
-    // conforming, but is not actually as it does not implement
-    // std::is_trivially_copyable.
-#if __GNUG__ && __GNUC__ < 5
-    if (__has_trivial_copy(T) && sizeof(T) < 256)
-#else
-#  ifdef DEAL_II_HAVE_CXX17
+#ifdef DEAL_II_HAVE_CXX17
     if constexpr (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#  else
+#else
     if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#  endif
 #endif
       {
         const std::size_t previous_size = dest_buffer.size();
@@ -1257,18 +1249,10 @@ namespace Utilities
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
-    //
-    // we have to work around the fact that GCC 4.8.x claims to be C++
-    // conforming, but is not actually as it does not implement
-    // std::is_trivially_copyable.
-#if __GNUG__ && __GNUC__ < 5
-    if (__has_trivial_copy(T) && sizeof(T) < 256)
-#else
-#  ifdef DEAL_II_HAVE_CXX17
+#ifdef DEAL_II_HAVE_CXX17
     if constexpr (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#  else
+#else
     if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#  endif
 #endif
       {
         Assert(std::distance(cbegin, cend) == sizeof(T), ExcInternalError());
@@ -1312,17 +1296,7 @@ namespace Utilities
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
-    //
-    // we have to work around the fact that GCC 4.8.x claims to be C++
-    // conforming, but is not actually as it does not implement
-    // std::is_trivially_copyable.
-    if (
-#if __GNUG__ && __GNUC__ < 5
-      __has_trivial_copy(T)
-#else
-      std::is_trivially_copyable<T>()
-#endif
-      && sizeof(T) * N < 256)
+    if (std::is_trivially_copyable<T>() && sizeof(T) * N < 256)
       {
         Assert(std::distance(cbegin, cend) == sizeof(T) * N,
                ExcInternalError());
