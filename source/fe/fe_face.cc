@@ -712,7 +712,7 @@ void
 FE_FaceQ<1, spacedim>::fill_fe_face_values(
   const typename Triangulation<1, spacedim>::cell_iterator &,
   const unsigned int face,
-  const Quadrature<0> &,
+  const hp::QCollection<0> &,
   const Mapping<1, spacedim> &,
   const typename Mapping<1, spacedim>::InternalDataBase &,
   const dealii::internal::FEValuesImplementation::MappingRelatedData<1,

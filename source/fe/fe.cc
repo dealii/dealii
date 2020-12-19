@@ -1281,6 +1281,26 @@ FiniteElement<dim, spacedim>::compute_n_nonzero_components(
 
 /*------------------------------- FiniteElement ----------------------*/
 
+#ifndef DOXYGEN
+template <int dim, int spacedim>
+std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
+FiniteElement<dim, spacedim>::get_face_data(
+  const UpdateFlags               flags,
+  const Mapping<dim, spacedim> &  mapping,
+  const hp::QCollection<dim - 1> &quadrature,
+  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
+                                                                     spacedim>
+    &output_data) const
+{
+  return get_data(flags,
+                  mapping,
+                  QProjector<dim>::project_to_all_faces(
+                    this->reference_cell_type(), quadrature),
+                  output_data);
+}
+
+
+
 template <int dim, int spacedim>
 std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
 FiniteElement<dim, spacedim>::get_face_data(
@@ -1297,6 +1317,68 @@ FiniteElement<dim, spacedim>::get_face_data(
                     this->reference_cell_type(), quadrature),
                   output_data);
 }
+
+
+
+template <int dim, int spacedim>
+inline void
+FiniteElement<dim, spacedim>::fill_fe_face_values(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const unsigned int                                          face_no,
+  const hp::QCollection<dim - 1> &                            quadrature,
+  const Mapping<dim, spacedim> &                              mapping,
+  const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
+                                                                     spacedim>
+    &                                                            mapping_data,
+  const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
+  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
+                                                                     spacedim>
+    &output_data) const
+{
+  // base class version, implement overriden function in derived classes
+  AssertDimension(quadrature.size(), 1);
+  fill_fe_face_values(cell,
+                      face_no,
+                      quadrature[0],
+                      mapping,
+                      mapping_internal,
+                      mapping_data,
+                      fe_internal,
+                      output_data);
+}
+
+
+
+template <int dim, int spacedim>
+inline void
+FiniteElement<dim, spacedim>::fill_fe_face_values(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const unsigned int                                          face_no,
+  const Quadrature<dim - 1> &                                 quadrature,
+  const Mapping<dim, spacedim> &                              mapping,
+  const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
+                                                                     spacedim>
+    &                                                            mapping_data,
+  const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
+  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
+                                                                     spacedim>
+    &output_data) const
+{
+  Assert(false,
+         ExcMessage("Use of a deprecated interface, please implement "
+                    "fill_fe_face_values taking a hp::QCollection argument"));
+  (void)cell;
+  (void)face_no;
+  (void)quadrature;
+  (void)mapping;
+  (void)mapping_internal;
+  (void)mapping_data;
+  (void)fe_internal;
+  (void)output_data;
+}
+#endif
 
 
 

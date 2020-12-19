@@ -111,13 +111,15 @@ MappingCartesian<dim, spacedim>::get_data(const UpdateFlags      update_flags,
 template <int dim, int spacedim>
 std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
 MappingCartesian<dim, spacedim>::get_face_data(
-  const UpdateFlags          update_flags,
-  const Quadrature<dim - 1> &quadrature) const
+  const UpdateFlags               update_flags,
+  const hp::QCollection<dim - 1> &quadrature) const
 {
+  AssertDimension(quadrature.size(), 1);
+
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
     std::make_unique<InternalData>(
       QProjector<dim>::project_to_all_faces(ReferenceCell::get_hypercube(dim),
-                                            quadrature));
+                                            quadrature[0]));
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
 
   // verify that we have computed the transitive hull of the required
@@ -437,11 +439,13 @@ void
 MappingCartesian<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const Quadrature<dim - 1> &                                 quadrature,
+  const hp::QCollection<dim - 1> &                            quadrature,
   const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
+  AssertDimension(quadrature.size(), 1);
+
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
@@ -468,7 +472,7 @@ MappingCartesian<dim, spacedim>::fill_fe_face_values(
 
   if (data.update_each & update_JxW_values)
     for (unsigned int i = 0; i < output_data.JxW_values.size(); ++i)
-      output_data.JxW_values[i] = J * quadrature.weight(i);
+      output_data.JxW_values[i] = J * quadrature[0].weight(i);
 
   if (data.update_each & update_boundary_forms)
     for (unsigned int i = 0; i < output_data.boundary_forms.size(); ++i)

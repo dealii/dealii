@@ -945,7 +945,7 @@ void
 FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const Quadrature<dim - 1> &                                 quadrature,
+  const hp::QCollection<dim - 1> &                            quadrature,
   const Mapping<dim, spacedim> &                              mapping,
   const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
   const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
@@ -956,6 +956,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                                                                      spacedim>
     &output_data) const
 {
+  AssertDimension(quadrature.size(), 1);
+
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
@@ -964,7 +966,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
          ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &>(fe_internal);
 
-  const unsigned int n_q_points = quadrature.size();
+  const unsigned int n_q_points = quadrature[0].size();
   // offset determines which data set
   // to take (all data sets for all
   // faces are stored contiguously)
