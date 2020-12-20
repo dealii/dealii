@@ -4861,6 +4861,8 @@ template <int dim, int spacedim>
 void
 FEFaceValues<dim, spacedim>::do_reinit(const unsigned int face_no)
 {
+  this->present_face_no = face_no;
+
   // first of all, set the present_face_index (if available)
   const typename Triangulation<dim, spacedim>::cell_iterator cell =
     *this->present_cell;
@@ -5122,6 +5124,8 @@ void
 FESubfaceValues<dim, spacedim>::do_reinit(const unsigned int face_no,
                                           const unsigned int subface_no)
 {
+  this->present_face_no = face_no;
+
   // first of all, set the present_face_index (if available)
   const typename Triangulation<dim, spacedim>::cell_iterator cell =
     *this->present_cell;
