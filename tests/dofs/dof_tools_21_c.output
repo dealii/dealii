@@ -33,6 +33,40 @@ DEAL::Reverse Matching:
     5 1:  0.5000
     5 0:  0.5000
     8 0:  1.000
+DEAL::Test for 2D in 3D, Q1:
+DEAL::
+DEAL::Triangulation:0
+DEAL::DoFs of face_1:
+DEAL:: component 0: (2 - -1.000 3.000 0.000) (3 - 1.000 3.000 0.000)
+DEAL::DoFs of face_2:
+DEAL:: component 0: (4 - -1.000 -3.000 0.000) (8 - 1.000 -3.000 0.000)
+DEAL::Orientation: 100
+DEAL::Matching:
+    4 2:  1.000
+    5 2:  0.5000
+    5 3:  0.5000
+    8 3:  1.000
+DEAL::Reverse Matching:
+    4 2:  1.000
+    5 2:  0.5000
+    5 3:  0.5000
+    8 3:  1.000
+DEAL::Triangulation:1
+DEAL::DoFs of face_1:
+DEAL:: component 0: (0 - 1.000 3.000 0.000) (1 - -1.000 3.000 0.000)
+DEAL::DoFs of face_2:
+DEAL:: component 0: (4 - -1.000 -3.000 0.000) (8 - 1.000 -3.000 0.000)
+DEAL::Orientation: 110
+DEAL::Matching:
+    4 1:  1.000
+    5 1:  0.5000
+    5 0:  0.5000
+    8 0:  1.000
+DEAL::Reverse Matching:
+    4 1:  1.000
+    5 1:  0.5000
+    5 0:  0.5000
+    8 0:  1.000
 DEAL::Test for 3D, Q1:
 DEAL::
 DEAL::Triangulation:0
