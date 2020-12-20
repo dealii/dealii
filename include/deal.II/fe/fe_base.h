@@ -673,6 +673,18 @@ public:
   get_first_face_quad_index(const unsigned int face_no = 0) const;
 };
 
+namespace internal
+{
+  /**
+   * Utility function to convert "dofs per object" information
+   * of a @p dim dimensional reference cell @p cell_type.
+   */
+  internal::GenericDoFsPerObject
+  expand(const unsigned int               dim,
+         const std::vector<unsigned int> &dofs_per_object,
+         const ReferenceCell::Type        cell_type);
+} // namespace internal
+
 
 
 // --------- inline and template functions ---------------
