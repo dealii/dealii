@@ -22,10 +22,12 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim>
-FE_Nothing<dim, spacedim>::FE_Nothing(const unsigned int n_components,
-                                      const bool         dominate)
+FE_Nothing<dim, spacedim>::FE_Nothing(const ReferenceCell::Type &type,
+                                      const unsigned int         n_components,
+                                      const bool                 dominate)
   : FiniteElement<dim, spacedim>(
       FiniteElementData<dim>(std::vector<unsigned>(dim + 1, 0),
+                             type,
                              n_components,
                              0,
                              FiniteElementData<dim>::unknown),
@@ -39,6 +41,17 @@ FE_Nothing<dim, spacedim>::FE_Nothing(const unsigned int n_components,
   // empty since their proper size is in fact zero given that the
   // element here has no degrees of freedom
 }
+
+
+
+template <int dim, int spacedim>
+FE_Nothing<dim, spacedim>::FE_Nothing(const unsigned int n_components,
+                                      const bool         dominate)
+  : FE_Nothing<dim, spacedim>(ReferenceCell::get_hypercube(dim),
+                              n_components,
+                              dominate)
+{}
+
 
 
 template <int dim, int spacedim>
@@ -194,10 +207,11 @@ operator==(const FiniteElement<dim, spacedim> &f) const
   // Then make sure the other object is really of type FE_Nothing,
   // and compare the data that has been passed to both objects'
   // constructors.
-  if (const FE_Nothing<dim, spacedim> *f_nothing =
+  if (const FE_Nothing<dim, spacedim> *fe_nothing =
         dynamic_cast<const FE_Nothing<dim, spacedim> *>(&f))
-    return ((dominate == f_nothing->dominate) &&
-            (this->components == f_nothing->components));
+    return ((dominate == fe_nothing->dominate) &&
+            (this->components == fe_nothing->components) &&
+            (this->reference_cell_type() == fe_nothing->reference_cell_type()));
   else
     return false;
 }
