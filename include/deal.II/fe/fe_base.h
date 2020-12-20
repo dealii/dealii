@@ -142,28 +142,32 @@ namespace internal
    *
    * As an example, the data is shown for a quadratic wedge. Which consists of
    * 6 vertices, 9 lines, and 5 faces (two triangles and three quadrilaterals).
-   *
+   * @code
    *              vertices                  lines                  faces cell
    * dpo_excl  1  1  1  1  1  1 | 1  1  1  1  1  1  1  1  1 |  0  0  1  1  1 |  0
    * dpo_incl  1  1  1  1  1  1 | 3  3  3  3  3  3  3  3  3 |  6  6  9  9  9 | 18
    * obj_index 0  1  2  3  4  5 | 6  7  8  9 10 11 12 13 14 | 15 15 15 16 17 | 18
+   * @endcode
    *
    * Since the above table looks as follows for:
    *
    * - a triangle:
-   *
+   * @code
    * dpo_excl  1  1  1 | 1  1  1 |  0
    * obj_index 0  1  2 | 3  4  5 |  6
+   * @endcode
    *
    * - quadrilateral:
-   *
+   * @code
    * dpo_excl  1  1  1  1 | 1  1  1  1 |  1
    * obj_index 0  1  2  3 | 4  5  6  7 |  8
+   * @endcode
    *
    * The index of the first d-dimensional object within each face results as:
-   *
+   * @code
    *                         vertices      lines       face
    * first_obj_index_on_face 0 0 0 0 0 | 3 3 4 4 4 | 6 6 8 8 8
+   * @endcode
    *
    */
   struct GenericDoFsPerObject
