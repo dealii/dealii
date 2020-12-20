@@ -15,7 +15,7 @@
 
 
 
-// check that computation of hp constraints works for DGQ elements correctly
+// check that computation of hp-constraints works for DGQ elements correctly
 
 char logname[] = "output";
 

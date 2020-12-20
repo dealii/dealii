@@ -153,9 +153,9 @@ namespace parallel
      * @endcode
      *
      *
-     * <h3>Note on usage with DoFHandler with hp capabilities</h3>
+     * <h3>Note on usage with DoFHandler with hp-capabilities</h3>
      *
-     * Since data on DoFHandler objects with hp capabilities is associated with
+     * Since data on DoFHandler objects with hp-capabilities is associated with
      * many different FiniteElement objects, each cell's data has to be
      * processed with its corresponding `future_fe_index`. Further, if
      * refinement is involved, data will be packed on the parent cell with its
@@ -166,11 +166,11 @@ namespace parallel
      * hp::FECollection::find_dominated_fe_extended() for more information).
      *
      * Transferring a solution across refinement works exactly like in the
-     * non-hp case. However, when considering serialization, we also have to
-     * store the active_fe_indices in an additional step. A code snippet
+     * non-hp-case. However, when considering serialization, we also have to
+     * store the active FE indices in an additional step. A code snippet
      * demonstrating serialization with the
      * parallel::distributed::SolutionTransfer class with DoFHandler objects
-     * with hp capabilities is provided in the following. Here VectorType is
+     * with hp-capabilities is provided in the following. Here VectorType is
      * your favorite vector type, e.g. PETScWrappers::MPI::Vector,
      * TrilinosWrappers::MPI::Vector, or corresponding block vectors.
      *
@@ -197,7 +197,7 @@ namespace parallel
      *
      * DoFHandler<dim,spacedim> hp_dof_handler(triangulation);
      * // We need to introduce our dof_handler to the fe_collection
-     * // before setting all active_fe_indices.
+     * // before setting all active FE indices.
      * hp_dof_handler.deserialize_active_fe_indices();
      * hp_dof_handler.distribute_dofs(fe_collection);
      *
@@ -372,11 +372,29 @@ namespace parallel
       void
       register_data_attach();
     };
-
-
   } // namespace distributed
 } // namespace parallel
 
+namespace Legacy
+{
+  namespace parallel
+  {
+    namespace distributed
+    {
+      /**
+       * The template arguments of the original
+       * dealii::parallel::distributed::SolutionTransfer class will change in a
+       * future release. If for some reason, you need a code that is compatible
+       * with deal.II 9.3 and the subsequent release, use this alias instead.
+       */
+      template <int dim,
+                typename VectorType,
+                typename DoFHandlerType = DoFHandler<dim>>
+      using SolutionTransfer = dealii::parallel::distributed::
+        SolutionTransfer<dim, VectorType, DoFHandlerType>;
+    } // namespace distributed
+  }   // namespace parallel
+} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -108,6 +108,11 @@ public:
    * Return the numbering of the underlying polynomial space compared to
    * lexicographic ordering of the basis functions. Returns
    * PolynomialType::get_numbering().
+   *
+   * @note Some implementations of this class do not support this function,
+   *   since no lexicographic ordering of the basis functions is possible
+   *   for them. Examples are: Simplex::FE_P, Simplex::FE_WedgeP, and
+   *   Simplex::FE_PyramidP.
    */
   std::vector<unsigned int>
   get_poly_space_numbering() const;
@@ -115,6 +120,8 @@ public:
   /**
    * Return the inverse numbering of the underlying polynomial space. Returns
    * PolynomialType::get_numbering_inverse().
+   *
+   * @note See note of get_poly_space_numbering().
    */
   std::vector<unsigned int>
   get_poly_space_numbering_inverse() const;
@@ -380,11 +387,13 @@ protected:
                                                                        spacedim>
       &output_data) const override;
 
+  using FiniteElement<dim, spacedim>::fill_fe_face_values;
+
   virtual void
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const Quadrature<dim - 1> &                                 quadrature,
+    const hp::QCollection<dim - 1> &                            quadrature,
     const Mapping<dim, spacedim> &                              mapping,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,

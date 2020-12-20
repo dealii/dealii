@@ -118,6 +118,71 @@ namespace ReferenceCell
     return table[dim][n_vertices];
   }
 
+
+  /**
+   * Compute the value of the $i$-th linear shape function at location $\xi$ for
+   * a given reference-cell type.
+   */
+  template <int dim>
+  inline double
+  d_linear_shape_function(const Type &       reference_cell,
+                          const Point<dim> & xi,
+                          const unsigned int i)
+  {
+    if (reference_cell == get_hypercube(dim))
+      return GeometryInfo<dim>::d_linear_shape_function(xi, i);
+
+    if (reference_cell ==
+        Type::Tri) // see also Simplex::ScalarPolynomial::compute_value
+      {
+        switch (i)
+          {
+            case 0:
+              return 1.0 - xi[0] - xi[1];
+            case 1:
+              return xi[0];
+            case 2:
+              return xi[1];
+          }
+      }
+
+    Assert(false, ExcNotImplemented());
+
+    return 0.0;
+  }
+
+  /**
+   * Compute the gradient of the $i$-th linear shape function at location $\xi$
+   * for a given reference-cell type.
+   */
+  template <int dim>
+  inline Tensor<1, dim>
+  d_linear_shape_function_gradient(const Type &       reference_cell,
+                                   const Point<dim> & xi,
+                                   const unsigned int i)
+  {
+    if (reference_cell == get_hypercube(dim))
+      return GeometryInfo<dim>::d_linear_shape_function_gradient(xi, i);
+
+    if (reference_cell ==
+        Type::Tri) // see also Simplex::ScalarPolynomial::compute_grad
+      {
+        switch (i)
+          {
+            case 0:
+              return Point<dim>(-1.0, -1.0);
+            case 1:
+              return Point<dim>(+1.0, +0.0);
+            case 2:
+              return Point<dim>(+0.0, +1.0);
+          }
+      }
+
+    Assert(false, ExcNotImplemented());
+
+    return Point<dim>(+0.0, +0.0, +0.0);
+  }
+
   namespace internal
   {
     /**
@@ -644,7 +709,7 @@ namespace ReferenceCell
       /**
        * Tet.
        */
-      struct Tet : public TensorProductBase<3>
+      struct Tet : public Base
       {
         unsigned int
         n_vertices() const override
@@ -798,7 +863,7 @@ namespace ReferenceCell
       /**
        * Pyramid.
        */
-      struct Pyramid : public TensorProductBase<3>
+      struct Pyramid : public Base
       {
         unsigned int
         n_vertices() const override
@@ -822,8 +887,6 @@ namespace ReferenceCell
         standard_line_to_face_and_line_index(
           const unsigned int line) const override
         {
-          Assert(false, ExcNotImplemented());
-
           static const std::array<unsigned int, 2> table[6] = {
             {{0, 0}}, {{0, 1}}, {{0, 2}}, {{1, 1}}, {{1, 2}}, {{2, 1}}};
 
@@ -836,19 +899,26 @@ namespace ReferenceCell
           const unsigned int  face,
           const unsigned char face_orientation) const override
         {
-          Assert(false, ExcNotImplemented());
+          if (face == 0) // QUAD
+            {
+              return GeometryInfo<3>::standard_to_real_face_line(
+                line,
+                get_bit(face_orientation, 0),
+                get_bit(face_orientation, 2),
+                get_bit(face_orientation, 1));
+            }
+          else // TRI
+            {
+              static const std::array<std::array<unsigned int, 3>, 6> table = {
+                {{{2, 1, 0}},
+                 {{0, 1, 2}},
+                 {{1, 2, 0}},
+                 {{0, 2, 1}},
+                 {{1, 0, 2}},
+                 {{2, 0, 1}}}};
 
-          (void)face;
-
-          static const std::array<std::array<unsigned int, 3>, 6> table = {
-            {{{2, 1, 0}},
-             {{0, 1, 2}},
-             {{1, 2, 0}},
-             {{0, 2, 1}},
-             {{1, 0, 2}},
-             {{2, 0, 1}}}};
-
-          return table[face_orientation][line];
+              return table[face_orientation][line];
+            }
         }
 
         bool
@@ -962,7 +1032,7 @@ namespace ReferenceCell
       /**
        * Wedge.
        */
-      struct Wedge : public TensorProductBase<3>
+      struct Wedge : public Base
       {
         unsigned int
         n_vertices() const override
@@ -986,10 +1056,15 @@ namespace ReferenceCell
         standard_line_to_face_and_line_index(
           const unsigned int line) const override
         {
-          Assert(false, ExcNotImplemented());
-
-          static const std::array<unsigned int, 2> table[6] = {
-            {{0, 0}}, {{0, 1}}, {{0, 2}}, {{1, 1}}, {{1, 2}}, {{2, 1}}};
+          static const std::array<unsigned int, 2> table[9] = {{{0, 0}},
+                                                               {{0, 2}},
+                                                               {{0, 1}},
+                                                               {{1, 0}},
+                                                               {{1, 1}},
+                                                               {{1, 2}},
+                                                               {{2, 0}},
+                                                               {{2, 1}},
+                                                               {{3, 1}}};
 
           return table[line];
         }
@@ -1000,19 +1075,26 @@ namespace ReferenceCell
           const unsigned int  face,
           const unsigned char face_orientation) const override
         {
-          Assert(false, ExcNotImplemented());
+          if (face > 1) // QUAD
+            {
+              return GeometryInfo<3>::standard_to_real_face_line(
+                line,
+                get_bit(face_orientation, 0),
+                get_bit(face_orientation, 2),
+                get_bit(face_orientation, 1));
+            }
+          else // TRI
+            {
+              static const std::array<std::array<unsigned int, 3>, 6> table = {
+                {{{2, 1, 0}},
+                 {{0, 1, 2}},
+                 {{1, 2, 0}},
+                 {{0, 2, 1}},
+                 {{1, 0, 2}},
+                 {{2, 0, 1}}}};
 
-          (void)face;
-
-          static const std::array<std::array<unsigned int, 3>, 6> table = {
-            {{{2, 1, 0}},
-             {{0, 1, 2}},
-             {{1, 2, 0}},
-             {{0, 2, 1}},
-             {{1, 0, 2}},
-             {{2, 0, 1}}}};
-
-          return table[face_orientation][line];
+              return table[face_orientation][line];
+            }
         }
 
         bool

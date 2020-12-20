@@ -15,9 +15,9 @@
 
 
 
-// have a 2x1 coarse mesh (or 2x1x1) and verify DoF indices in the hp
+// have a 2x1 coarse mesh (or 2x1x1) and verify DoF indices in the hp-
 // case with an FECollection that contains multiple copies of the same
-// FE_Q(2) element. the hp code will unify DoF indices on boundaries
+// FE_Q(2) element. the hp-code will unify DoF indices on boundaries
 // between all subdomains.
 
 
@@ -26,6 +26,8 @@
 
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
@@ -33,7 +35,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <numeric>
@@ -64,7 +65,7 @@ test()
   fe.push_back(FE_Q<dim>(2));
   fe.push_back(FE_Q<dim>(2));
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
   if (dof_handler.begin_active()->is_locally_owned())
     dof_handler.begin_active()->set_active_fe_index(0);
   if ((++dof_handler.begin_active())->is_locally_owned())

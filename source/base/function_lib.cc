@@ -2539,6 +2539,19 @@ namespace Functions
 
 
   template <int dim>
+  std::size_t
+  InterpolatedTensorProductGridData<dim>::memory_consumption() const
+  {
+    return sizeof(*this) +
+           MemoryConsumption::memory_consumption(coordinate_values) -
+           sizeof(coordinate_values) +
+           MemoryConsumption::memory_consumption(data_values) -
+           sizeof(data_values);
+  }
+
+
+
+  template <int dim>
   double
   InterpolatedTensorProductGridData<dim>::value(
     const Point<dim> & p,
@@ -2722,6 +2735,16 @@ namespace Functions
 
 
 
+  template <int dim>
+  std::size_t
+  InterpolatedUniformGridData<dim>::memory_consumption() const
+  {
+    return sizeof(*this) + data_values.memory_consumption() -
+           sizeof(data_values);
+  }
+
+
+
   /* ---------------------- Polynomial ----------------------- */
 
 
@@ -2827,6 +2850,18 @@ namespace Functions
       }
     return r;
   }
+
+
+
+  template <int dim>
+  std::size_t
+  Polynomial<dim>::memory_consumption() const
+  {
+    return sizeof(*this) + exponents.memory_consumption() - sizeof(exponents) +
+           MemoryConsumption::memory_consumption(coefficients) -
+           sizeof(coefficients);
+  }
+
 
 
   // explicit instantiations

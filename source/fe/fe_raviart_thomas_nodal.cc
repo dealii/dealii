@@ -378,7 +378,7 @@ FE_RaviartThomasNodal<dim>::
 // TODO: There are tests that check that the following few functions don't
 // produce assertion failures, but none that actually check whether they do the
 // right thing. one example for such a test would be to project a function onto
-// an hp space and make sure that the convergence order is correct with regard
+// an hp-space and make sure that the convergence order is correct with regard
 // to the lowest used polynomial degree
 
 template <int dim>
@@ -625,7 +625,7 @@ FE_RaviartThomasNodal<dim>::get_face_interpolation_matrix(
   // satisfied. But the matrices
   // produced in that case might
   // lead to problems in the
-  // hp procedures, which use this
+  // hp-procedures, which use this
   // method.
   Assert(this->n_dofs_per_face(face_no) <= source_fe.n_dofs_per_face(face_no),
          typename FiniteElement<dim>::ExcInterpolationNotImplemented());
@@ -733,7 +733,7 @@ FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix(
   // satisfied. But the matrices
   // produced in that case might
   // lead to problems in the
-  // hp procedures, which use this
+  // hp-procedures, which use this
   // method.
   Assert(this->n_dofs_per_face(face_no) <= source_fe.n_dofs_per_face(face_no),
          typename FiniteElement<dim>::ExcInterpolationNotImplemented());

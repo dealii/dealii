@@ -1496,7 +1496,7 @@ TriaAccessor<structdim, dim, spacedim>::set_bounding_object_indices(
   const ArrayView<int> bounding_object_index_ref =
     this->objects().get_bounding_object_indices(this->present_index);
 
-  AssertDimension(bounding_object_index_ref.size(), new_indices.size());
+  AssertIndexRange(new_indices.size(), bounding_object_index_ref.size() + 1);
 
   unsigned int i = 0;
   for (const auto &new_index : new_indices)
@@ -1516,7 +1516,7 @@ TriaAccessor<structdim, dim, spacedim>::set_bounding_object_indices(
   const ArrayView<int> bounding_object_index_ref =
     this->objects().get_bounding_object_indices(this->present_index);
 
-  AssertDimension(bounding_object_index_ref.size(), new_indices.size());
+  AssertIndexRange(new_indices.size(), bounding_object_index_ref.size() + 1);
 
   unsigned int i = 0;
   for (const auto &new_index : new_indices)

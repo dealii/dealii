@@ -20,8 +20,6 @@
 
 #include <deal.II/base/array_view.h>
 
-#include <set>
-
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -46,6 +44,7 @@ namespace Particles
    * memory with varying sizes per particle (this memory would not be managed by
    * this class).
    */
+  template <int dim, int spacedim = dim>
   class PropertyPool
   {
   public:
@@ -54,7 +53,7 @@ namespace Particles
      * uniquely identifies the slot of memory that is reserved for this
      * particle.
      */
-    using Handle = double *;
+    using Handle = unsigned int;
 
     /**
      * Define a default (invalid) value for handles.
@@ -74,20 +73,28 @@ namespace Particles
     ~PropertyPool();
 
     /**
-     * Return a new handle that allows accessing the reserved block
-     * of memory. If the number of properties is zero this will return an
-     * invalid handle.
-     */
-    Handle
-    allocate_properties_array();
-
-    /**
-     * Mark the properties corresponding to the handle @p handle as
-     * deleted. Calling this function more than once for the same
-     * handle causes undefined behavior.
+     * Clear the dynamic memory allocated by this class. This function
+     * ensures that all memory that had previously been allocated using
+     * allocate_properties_array() has also been returned via
+     * deallocate_properties_array().
      */
     void
-    deallocate_properties_array(const Handle handle);
+    clear();
+
+    /**
+     * Return a new handle that allows a particle to store information such as
+     * properties and locations. This also allocated memory in this PropertyPool
+     * variable.
+     */
+    Handle
+    register_particle();
+
+    /**
+     * Return a handle obtained by register_particle() and mark the memory
+     * allocated for storing the particle's data as free for re-use.
+     */
+    void
+    deregister_particle(Handle &handle);
 
     /**
      * Return an ArrayView to the properties that correspond to the given
@@ -116,12 +123,45 @@ namespace Particles
     const unsigned int n_properties;
 
     /**
-     * A collection of handles that have been created by
-     * allocate_properties_array() and have not been destroyed by
-     * deallocate_properties_array().
+     * The currently allocated properties (whether assigned to
+     * a particle or available for assignment).
      */
-    std::set<Handle> currently_open_handles;
+    std::vector<double> properties;
+
+    /**
+     * A collection of handles that have been created by
+     * allocate_properties_array() and have been destroyed by
+     * deallocate_properties_array(). Since the memory is still
+     * allocated these handles can be reused for new particles
+     * to avoid memory allocation.
+     */
+    std::vector<Handle> currently_available_handles;
   };
+
+
+
+  /* ---------------------- inline and template functions ------------------ */
+
+  template <int dim, int spacedim>
+  inline ArrayView<double>
+  PropertyPool<dim, spacedim>::get_properties(const Handle handle)
+  {
+    const std::vector<double>::size_type data_index =
+      (handle != invalid_handle) ? handle * n_properties : 0;
+
+    // Ideally we would need to assert that 'handle' has not been deallocated
+    // by searching through 'currently_available_handles'. However, this
+    // is expensive and this function is performance critical, so instead
+    // just check against the properties range, and rely on the fact
+    // that handles are invalidated when handed over to
+    // deallocate_properties_array().
+    Assert(data_index <= properties.size() - n_properties,
+           ExcMessage("Invalid property handle. This can happen if the "
+                      "handle was duplicated and then one copy was deallocated "
+                      "before trying to access the properties."));
+
+    return ArrayView<double>(properties.data() + data_index, n_properties);
+  }
 
 
 } // namespace Particles

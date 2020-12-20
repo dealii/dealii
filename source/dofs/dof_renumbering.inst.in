@@ -21,7 +21,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
     \{
       namespace boost
       \{
-        // TODO[WB]: also implement the following boost for hp DoFHandlers etc.
+        // TODO[WB]: also implement the following boost for hp-DoFHandlers etc.
       \}
 
 
@@ -78,7 +78,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
     \{
       namespace boost
       \{
-        // TODO[WB]: also implement the following boost for hp DoFHandlers etc.
+        // TODO[WB]: also implement the following boost for hp-DoFHandlers etc.
         template void
         Cuthill_McKee(DoFHandler<deal_II_dimension> &, bool, bool);
 

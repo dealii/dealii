@@ -318,7 +318,7 @@ namespace MatrixCreator
     const AffineConstraints<number> &constraints = AffineConstraints<number>());
 
   /**
-   * Same function as above, but for hp objects.
+   * Same function as above, but for hp-objects.
    */
   template <int dim, int spacedim, typename number>
   void
@@ -331,7 +331,7 @@ namespace MatrixCreator
     const AffineConstraints<number> &constraints = AffineConstraints<number>());
 
   /**
-   * Same function as above, but for hp objects.
+   * Same function as above, but for hp-objects.
    */
   template <int dim, int spacedim, typename number>
   void
@@ -343,7 +343,7 @@ namespace MatrixCreator
     const AffineConstraints<number> &constraints = AffineConstraints<number>());
 
   /**
-   * Same function as above, but for hp objects.
+   * Same function as above, but for hp-objects.
    */
   template <int dim, int spacedim, typename number>
   void
@@ -358,7 +358,7 @@ namespace MatrixCreator
     const AffineConstraints<number> &constraints = AffineConstraints<number>());
 
   /**
-   * Same function as above, but for hp objects.
+   * Same function as above, but for hp-objects.
    */
   template <int dim, int spacedim, typename number>
   void
@@ -430,7 +430,7 @@ namespace MatrixCreator
     std::vector<unsigned int>               component_mapping = {});
 
   /**
-   * Same function as above, but for hp objects.
+   * Same function as above, but for hp-objects.
    */
   template <int dim, int spacedim, typename number>
   void
@@ -447,7 +447,7 @@ namespace MatrixCreator
     std::vector<unsigned int>               component_mapping = {});
 
   /**
-   * Same function as above, but for hp objects.
+   * Same function as above, but for hp-objects.
    */
   template <int dim, int spacedim, typename number>
   void
@@ -550,8 +550,7 @@ namespace MatrixCreator
     const AffineConstraints<double> &constraints = AffineConstraints<double>());
 
   /**
-   * Like the functions above, but for hp dof handlers, mappings, and
-   * quadrature collections.
+   * Like the functions above, but for hp-objects.
    */
   template <int dim, int spacedim>
   void
@@ -564,8 +563,7 @@ namespace MatrixCreator
     const AffineConstraints<double> &constraints = AffineConstraints<double>());
 
   /**
-   * Like the functions above, but for hp dof handlers, mappings, and
-   * quadrature collections.
+   * Like the functions above, but for hp-objects.
    */
   template <int dim, int spacedim>
   void
@@ -577,8 +575,7 @@ namespace MatrixCreator
     const AffineConstraints<double> &constraints = AffineConstraints<double>());
 
   /**
-   * Like the functions above, but for hp dof handlers, mappings, and
-   * quadrature collections.
+   * Like the functions above, but for hp-objects.
    */
   template <int dim, int spacedim>
   void
@@ -593,8 +590,7 @@ namespace MatrixCreator
     const AffineConstraints<double> &constraints = AffineConstraints<double>());
 
   /**
-   * Like the functions above, but for hp dof handlers, mappings, and
-   * quadrature collections.
+   * Like the functions above, but for hp-objects.
    */
   template <int dim, int spacedim>
   void

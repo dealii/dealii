@@ -26,6 +26,8 @@
 
 #include <deal.II/distributed/shared_tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
@@ -34,8 +36,6 @@
 #include <deal.II/grid/intergrid_map.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <numeric>
 
@@ -55,7 +55,7 @@ test()
   hp::FECollection<dim> fe;
   fe.push_back(FESystem<dim>(FE_Q<dim>(3), 2, FE_DGQ<dim>(1), 1));
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(2);

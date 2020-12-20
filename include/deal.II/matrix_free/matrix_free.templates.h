@@ -85,12 +85,17 @@ std::pair<unsigned int, unsigned int>
 MatrixFree<dim, Number, VectorizedArrayType>::create_cell_subrange_hp_by_index(
   const std::pair<unsigned int, unsigned int> &range,
   const unsigned int                           fe_index,
-  const unsigned int                           vector_component) const
+  const unsigned int                           dof_handler_index) const
 {
-  AssertIndexRange(fe_index, dof_info[vector_component].max_fe_index);
+  if (dof_info[dof_handler_index].max_fe_index == 0)
+    return range;
+
+  AssertIndexRange(fe_index, dof_info[dof_handler_index].max_fe_index);
   const std::vector<unsigned int> &fe_indices =
-    dof_info[vector_component].cell_active_fe_index;
-  if (fe_indices.empty() == true)
+    dof_info[dof_handler_index].cell_active_fe_index;
+
+  if (fe_indices.empty() == true ||
+      dof_handlers[dof_handler_index]->get_fe_collection().size() == 1)
     return range;
   else
     {
@@ -101,7 +106,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::create_cell_subrange_hp_by_index(
         Assert(
           fe_indices[i] >= fe_indices[i - 1],
           ExcMessage(
-            "Cell range must be over sorted range of fe indices in hp case!"));
+            "Cell range must be over sorted range of FE indices in hp-case!"));
       AssertIndexRange(range.first, fe_indices.size() + 1);
       AssertIndexRange(range.second, fe_indices.size() + 1);
 #endif
@@ -124,14 +129,145 @@ MatrixFree<dim, Number, VectorizedArrayType>::create_cell_subrange_hp_by_index(
 
 
 
+namespace
+{
+  class FaceRangeCompartor
+  {
+  public:
+    FaceRangeCompartor(const std::vector<unsigned int> &fe_indices,
+                       const bool                       include)
+      : fe_indices(fe_indices)
+      , include(include)
+    {}
+
+    template <int vectorization_width>
+    bool
+    operator()(const internal::MatrixFreeFunctions::FaceToCellTopology<
+                 vectorization_width> &face,
+               const unsigned int &    fe_index)
+    {
+      const unsigned int fe_index_face =
+        fe_indices[face.cells_interior[0] / vectorization_width];
+
+      return fe_index_face < fe_index ||
+             (include ? (fe_index_face == fe_index) : false);
+    }
+
+    template <int vectorization_width>
+    bool
+    operator()(const internal::MatrixFreeFunctions::FaceToCellTopology<
+                 vectorization_width> &                     face,
+               const std::pair<unsigned int, unsigned int> &fe_index)
+    {
+      const std::pair<unsigned int, unsigned int> fe_index_face = {
+        fe_indices[face.cells_interior[0] / vectorization_width],
+        fe_indices[face.cells_exterior[0] / vectorization_width]};
+
+      return include ? (fe_index_face <= fe_index) : (fe_index_face < fe_index);
+    }
+
+  private:
+    const std::vector<unsigned int> &fe_indices;
+    const bool                       include;
+  };
+} // namespace
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+std::pair<unsigned int, unsigned int>
+MatrixFree<dim, Number, VectorizedArrayType>::
+  create_inner_face_subrange_hp_by_index(
+    const std::pair<unsigned int, unsigned int> &range,
+    const unsigned int                           fe_index_interior,
+    const unsigned int                           fe_index_exterior,
+    const unsigned int                           dof_handler_index) const
+{
+  if (dof_info[dof_handler_index].max_fe_index == 0 ||
+      dof_handlers[dof_handler_index]->get_fe_collection().size() == 1)
+    return range;
+
+  AssertIndexRange(fe_index_interior, dof_info[dof_handler_index].max_fe_index);
+  AssertIndexRange(fe_index_exterior, dof_info[dof_handler_index].max_fe_index);
+  const std::vector<unsigned int> &fe_indices =
+    dof_info[dof_handler_index].cell_active_fe_index;
+  if (fe_indices.empty() == true)
+    return range;
+  else
+    {
+      std::pair<unsigned int, unsigned int> return_range;
+      return_range.first =
+        std::lower_bound(face_info.faces.begin() + range.first,
+                         face_info.faces.begin() + range.second,
+                         std::pair<unsigned int, unsigned int>{
+                           fe_index_interior, fe_index_exterior},
+                         FaceRangeCompartor(fe_indices, false)) -
+        face_info.faces.begin();
+      return_range.second =
+        std::lower_bound(face_info.faces.begin() + return_range.first,
+                         face_info.faces.begin() + range.second,
+                         std::pair<unsigned int, unsigned int>{
+                           fe_index_interior, fe_index_exterior},
+                         FaceRangeCompartor(fe_indices, true)) -
+        face_info.faces.begin();
+      Assert(return_range.first >= range.first &&
+               return_range.second <= range.second,
+             ExcInternalError());
+      return return_range;
+    }
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+std::pair<unsigned int, unsigned int>
+MatrixFree<dim, Number, VectorizedArrayType>::
+  create_boundary_face_subrange_hp_by_index(
+    const std::pair<unsigned int, unsigned int> &range,
+    const unsigned int                           fe_index,
+    const unsigned int                           dof_handler_index) const
+{
+  if (dof_info[dof_handler_index].max_fe_index == 0 ||
+      dof_handlers[dof_handler_index]->get_fe_collection().size() == 1)
+    return range;
+
+  AssertIndexRange(fe_index, dof_info[dof_handler_index].max_fe_index);
+  const std::vector<unsigned int> &fe_indices =
+    dof_info[dof_handler_index].cell_active_fe_index;
+  if (fe_indices.empty() == true)
+    return range;
+  else
+    {
+      std::pair<unsigned int, unsigned int> return_range;
+      return_range.first =
+        std::lower_bound(face_info.faces.begin() + range.first,
+                         face_info.faces.begin() + range.second,
+                         fe_index,
+                         FaceRangeCompartor(fe_indices, false)) -
+        face_info.faces.begin();
+      return_range.second =
+        std::lower_bound(face_info.faces.begin() + return_range.first,
+                         face_info.faces.begin() + range.second,
+                         fe_index,
+                         FaceRangeCompartor(fe_indices, true)) -
+        face_info.faces.begin();
+      Assert(return_range.first >= range.first &&
+               return_range.second <= range.second,
+             ExcInternalError());
+      return return_range;
+    }
+}
+
+
+
 template <int dim, typename Number, typename VectorizedArrayType>
 void
 MatrixFree<dim, Number, VectorizedArrayType>::renumber_dofs(
   std::vector<types::global_dof_index> &renumbering,
-  const unsigned int                    vector_component)
+  const unsigned int                    dof_handler_index)
 {
-  AssertIndexRange(vector_component, dof_info.size());
-  dof_info[vector_component].compute_dof_renumbering(renumbering);
+  AssertIndexRange(dof_handler_index, dof_info.size());
+  dof_info[dof_handler_index].compute_dof_renumbering(renumbering);
 }
 
 
@@ -353,9 +489,6 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
           task_info.n_procs =
             Utilities::MPI::n_mpi_processes(task_info.communicator);
 
-          Assert(additional_data.communicator_sm == MPI_COMM_SELF,
-                 ExcNotImplemented());
-
           task_info.communicator_sm = additional_data.communicator_sm;
         }
       else
@@ -446,7 +579,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
     {
       if (dof_handler.size() > 1)
         {
-          // check if all DoHandlers are in the same hp mode; and if hp
+          // check if all DoHandlers are in the same hp-mode; and if hp-
           // capabilities are enabled: check if active_fe_indices of all
           // DoFHandler are the same.
           for (unsigned int i = 1; i < dof_handler.size(); ++i)
@@ -1546,7 +1679,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
 #ifdef DEAL_II_WITH_MPI
   {
     // non-buffering mode is only supported if the indices of all cells are
-    // contiguous for all dof_info objects and hp is not enabled.
+    // contiguous for all dof_info objects.
     bool is_non_buffering_sm_supported = true;
     for (const auto &di : dof_info)
       {

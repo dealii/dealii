@@ -971,9 +971,9 @@ FESystem<dim, spacedim>::get_data(
 template <int dim, int spacedim>
 std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
 FESystem<dim, spacedim>::get_face_data(
-  const UpdateFlags             flags,
-  const Mapping<dim, spacedim> &mapping,
-  const Quadrature<dim - 1> &   quadrature,
+  const UpdateFlags               flags,
+  const Mapping<dim, spacedim> &  mapping,
+  const hp::QCollection<dim - 1> &quadrature,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                      spacedim>
     & /*output_data*/) const
@@ -1007,7 +1007,7 @@ FESystem<dim, spacedim>::get_face_data(
       internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
         &base_fe_output_object = data.get_fe_output_object(base_no);
       base_fe_output_object.initialize(
-        quadrature.size(),
+        quadrature.max_n_quadrature_points(),
         base_element(base_no),
         flags | base_element(base_no).requires_update_flags(flags));
 
@@ -1112,7 +1112,7 @@ FESystem<dim, spacedim>::fill_fe_values(
                cell,
                invalid_face_number,
                invalid_face_number,
-               quadrature,
+               hp::QCollection<dim>(quadrature),
                cell_similarity,
                mapping_internal,
                fe_internal,
@@ -1127,7 +1127,7 @@ void
 FESystem<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const Quadrature<dim - 1> &                                 quadrature,
+  const hp::QCollection<dim - 1> &                            quadrature,
   const Mapping<dim, spacedim> &                              mapping,
   const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
   const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
@@ -1173,7 +1173,7 @@ FESystem<dim, spacedim>::fill_fe_subface_values(
                cell,
                face_no,
                sub_no,
-               quadrature,
+               hp::QCollection<dim - 1>(quadrature),
                CellSimilarity::none,
                mapping_internal,
                fe_internal,
@@ -1191,7 +1191,7 @@ FESystem<dim, spacedim>::compute_fill(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
   const unsigned int                                          sub_no,
-  const Quadrature<dim_1> &                                   quadrature,
+  const hp::QCollection<dim_1> &                              quadrature,
   const CellSimilarity::Similarity                            cell_similarity,
   const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
   const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
@@ -1238,16 +1238,19 @@ FESystem<dim, spacedim>::compute_fill(
 
         // fill_fe_face_values needs argument Quadrature<dim-1> for both cases
         // dim_1==dim-1 and dim_1=dim. Hence the following workaround
-        const Quadrature<dim> *    cell_quadrature = nullptr;
-        const Quadrature<dim - 1> *face_quadrature = nullptr;
-        const unsigned int         n_q_points      = quadrature.size();
+        const Quadrature<dim> *         cell_quadrature     = nullptr;
+        const hp::QCollection<dim - 1> *face_quadrature     = nullptr;
+        const Quadrature<dim - 1> *     sub_face_quadrature = nullptr;
+        const unsigned int              n_q_points = quadrature.size() == 1 ?
+                                          quadrature[0].size() :
+                                          quadrature[face_no].size();
 
         // static cast to the common base class of quadrature being either
         // Quadrature<dim> or Quadrature<dim-1>:
-        const Subscriptor *quadrature_base_pointer = &quadrature;
 
         if (face_no == invalid_face_number)
           {
+            const Subscriptor *quadrature_base_pointer = &quadrature[0];
             Assert(dim_1 == dim, ExcDimensionMismatch(dim_1, dim));
             Assert(dynamic_cast<const Quadrature<dim> *>(
                      quadrature_base_pointer) != nullptr,
@@ -1256,14 +1259,26 @@ FESystem<dim, spacedim>::compute_fill(
             cell_quadrature =
               static_cast<const Quadrature<dim> *>(quadrature_base_pointer);
           }
+        else if (sub_no == invalid_face_number)
+          {
+            const Subscriptor *quadrature_base_pointer = &quadrature;
+            Assert(dim_1 == dim - 1, ExcDimensionMismatch(dim_1, dim - 1));
+            Assert(dynamic_cast<const hp::QCollection<dim - 1> *>(
+                     quadrature_base_pointer) != nullptr,
+                   ExcInternalError());
+
+            face_quadrature = static_cast<const hp::QCollection<dim - 1> *>(
+              quadrature_base_pointer);
+          }
         else
           {
+            const Subscriptor *quadrature_base_pointer = &quadrature[0];
             Assert(dim_1 == dim - 1, ExcDimensionMismatch(dim_1, dim - 1));
             Assert(dynamic_cast<const Quadrature<dim - 1> *>(
                      quadrature_base_pointer) != nullptr,
                    ExcInternalError());
 
-            face_quadrature =
+            sub_face_quadrature =
               static_cast<const Quadrature<dim - 1> *>(quadrature_base_pointer);
           }
 
@@ -1297,7 +1312,7 @@ FESystem<dim, spacedim>::compute_fill(
           base_fe.fill_fe_subface_values(cell,
                                          face_no,
                                          sub_no,
-                                         *face_quadrature,
+                                         *sub_face_quadrature,
                                          mapping,
                                          mapping_internal,
                                          mapping_data,
@@ -1625,7 +1640,7 @@ FESystem<dim, spacedim>::initialize(
   Assert(count_nonzeros(multiplicities) > 0,
          ExcMessage("You only passed FiniteElements with multiplicity 0."));
 
-  // Note that we need to skip every fe with multiplicity 0 in the following
+  // Note that we need to skip every FE with multiplicity 0 in the following
   // block of code
 
   this->base_to_block_indices.reinit(0, 0);

@@ -122,7 +122,7 @@ namespace internal
        * and so on.
        *
        * In neighbors, <tt>neighbors[i].first</tt> is the level, while
-       * <tt>neighbors[i].first</tt> is the index of the neighbor.
+       * <tt>neighbors[i].second</tt> is the index of the neighbor.
        *
        * If a neighbor does not exist (cell is at the boundary),
        * <tt>level=index=-1</tt> is set.

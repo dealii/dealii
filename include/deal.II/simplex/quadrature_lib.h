@@ -50,6 +50,37 @@ namespace Simplex
      */
     explicit QGauss(const unsigned int n_points_1D);
   };
+
+  /**
+   * Integration rule for wedge entities.
+   */
+  template <int dim>
+  class QGaussWedge : public Quadrature<dim>
+  {
+  public:
+    /**
+     * Users specify a number `n_points_1D` as an indication of what polynomial
+     * degree to be integrated exactly. For details, see the comments of
+     * Simplex::QGauss.
+     */
+    explicit QGaussWedge(const unsigned int n_points_1D);
+  };
+
+  /**
+   * Integration rule for pyramid entities.
+   */
+  template <int dim>
+  class QGaussPyramid : public Quadrature<dim>
+  {
+  public:
+    /**
+     * Users specify a number `n_points_1D` as an indication of what polynomial
+     * degree to be integrated exactly. For details, see the comments of
+     * Simplex::QGauss.
+     */
+    explicit QGaussPyramid(const unsigned int n_points_1D);
+  };
+
 } // namespace Simplex
 
 DEAL_II_NAMESPACE_CLOSE

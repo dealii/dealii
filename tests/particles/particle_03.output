@@ -2,6 +2,5 @@
 DEAL::Particle properties: 0.150000 0.450000 0.750000
 DEAL::Copy particle properties: 0.150000 0.450000 0.750000
 DEAL::Old particle has properties before move: 1
-DEAL::Old particle has properties after move: 0
 DEAL::Moved particle properties: 0.150000 0.450000 0.750000
 DEAL::OK

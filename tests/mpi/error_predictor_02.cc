@@ -22,13 +22,12 @@
 #include <deal.II/distributed/error_predictor.h>
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/lac/vector.h>
 
@@ -64,11 +63,10 @@ test()
   for (unsigned int d = 1; d <= 3; ++d)
     fes.push_back(FE_Q<dim>(d));
 
-  hp::DoFHandler<dim> dh(tria);
-  dh.set_fe(fes);
+  DoFHandler<dim> dh(tria);
   for (const auto &cell : dh.active_cell_iterators())
     {
-      // set active fe index
+      // set active FE index
       if (cell->is_locally_owned())
         cell->set_active_fe_index(1);
     }
@@ -114,6 +112,7 @@ test()
             }
         }
     }
+  dh.distribute_dofs(fes);
 
   // ----- prepare error indicators -----
   Vector<float> error_indicators(tria.n_active_cells());

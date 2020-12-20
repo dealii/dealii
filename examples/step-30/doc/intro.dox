@@ -428,7 +428,7 @@ steps:
   requested refinement, using the requested isotropic and anisotropic flags.
 </ol>
 This approach is similar to the one we have used in step-27
-for hp refinement and
+for hp-refinement and
 has the great advantage of flexibility: Any error indicator can be
 used in the anisotropic process, i.e. if you have quite involved a posteriori
 goal-oriented error indicators available you can use them as easily as a simple

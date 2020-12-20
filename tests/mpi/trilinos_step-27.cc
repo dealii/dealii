@@ -36,6 +36,7 @@ namespace LA
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -45,7 +46,6 @@ namespace LA
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
 #include <deal.II/hp/refinement.h>
@@ -102,7 +102,7 @@ namespace Step27
 
     parallel::distributed::Triangulation<dim> triangulation;
 
-    hp::DoFHandler<dim>      dof_handler;
+    DoFHandler<dim>          dof_handler;
     hp::FECollection<dim>    fe_collection;
     hp::QCollection<dim>     quadrature_collection;
     hp::QCollection<dim - 1> face_quadrature_collection;
@@ -226,7 +226,7 @@ namespace Step27
                                              Functions::ZeroFunction<dim>(),
                                              constraints);
 #ifdef DEBUG
-    // We did not think about hp constraints on ghost cells yet.
+    // We did not think about hp-constraints on ghost cells yet.
     // Thus, we are content with verifying their consistency for now.
     IndexSet locally_active_dofs;
     DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);

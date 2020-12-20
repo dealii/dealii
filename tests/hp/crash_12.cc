@@ -15,12 +15,12 @@
 
 
 
-// check the complex case described in the hp paper by playing through all
+// check the complex case described in the hp-paper by playing through all
 // sorts of arrangements of finite elements on one coarse and one refined cell
 //
 // this code in particular tests some compensating code in
 // dof_tools.cc, where we have to make sure that we select a suitable
-// set of primary dofs. this is mostly trivial in 2d and for most fe
+// set of primary dofs. this is mostly trivial in 2d and for most FE
 // combinations in 3d as well. the exceptions are that it doesn't work
 // as easily in 3d for the combinations Q4/Q3, Q5/Q3, and
 // Q5/Q4. Higher order finite elements in 3d will probably only
@@ -33,6 +33,7 @@ char logname[] = "output";
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -43,8 +44,6 @@ char logname[] = "output";
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
@@ -84,7 +83,7 @@ test()
   fe.push_back(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), 4)));
   fe.push_back(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), 5)));
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   for (unsigned int i = 0; i < fe.size(); ++i)
     for (unsigned int j = 0; j < fe.size(); ++j)
@@ -92,9 +91,9 @@ test()
         deallog << "Testing " << fe[i].get_name() << " vs. " << fe[j].get_name()
                 << std::endl;
 
-        // set fe on coarse cell to 'i', on
+        // set FE on coarse cell to 'i', on
         // all fine cells to 'j'
-        typename hp::DoFHandler<dim>::active_cell_iterator cell =
+        typename DoFHandler<dim>::active_cell_iterator cell =
           dof_handler.begin_active();
         cell->set_active_fe_index(i);
         ++cell;

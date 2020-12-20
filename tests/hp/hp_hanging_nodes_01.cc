@@ -30,7 +30,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -49,7 +48,7 @@
 #include "../tests.h"
 
 
-// This a test for the hp capable version of the make_hanging_node_constraints
+// This a test for the hp-capable version of the make_hanging_node_constraints
 // method. It uses a triangulation with one refined element beside an
 // unrefined element to create the constraints for this configuration.
 
@@ -96,8 +95,8 @@ test_constraints(hp::FECollection<dim, spacedim> &fe_coll)
   // Now assign increasing
   // active_fe_indices to
   // the different cells.
-  hp::DoFHandler<dim, spacedim> dof_handler(tria);
-  typename hp::DoFHandler<dim, spacedim>::active_cell_iterator
+  DoFHandler<dim, spacedim> dof_handler(tria);
+  typename DoFHandler<dim, spacedim>::active_cell_iterator
     cell               = dof_handler.begin_active(),
     endc               = dof_handler.end();
   unsigned int fe_indx = 0;

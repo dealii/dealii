@@ -20,6 +20,8 @@
 #include <deal.II/base/function_lib.h>
 #include <deal.II/base/quadrature_lib.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q1.h>
 
@@ -28,7 +30,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/mapping_collection.h>
 
@@ -159,11 +160,11 @@ check()
   hp::MappingCollection<dim> mapping_2;
   mapping_2.push_back(MappingQGeneric<dim>(1));
 
-  hp::DoFHandler<dim> dof_handler(tria);
+  DoFHandler<dim> dof_handler(tria);
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
       cell->set_active_fe_index(Testing::rand() % fe.size());

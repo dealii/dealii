@@ -174,8 +174,7 @@ test(unsigned int n_ref)
 
   FE_Q<dim>               fe_q(fe_degree);
   FESystem<dim, dim>      fe_system(fe_q, dim);
-  dealii::DoFHandler<dim> dofh;
-  dofh.initialize(tria, fe_system);
+  dealii::DoFHandler<dim> dofh(tria);
   dofh.distribute_dofs(fe_system);
 
   const ComponentMask mask(dim, true);
@@ -183,9 +182,7 @@ test(unsigned int n_ref)
   nodes.reinit(dofh.n_dofs());
 
   VectorTools::get_position_vector(dofh, nodes, mask);
-  MappingFEField<dim, dim, Vector<double>, DoFHandler<dim>> mapping(dofh,
-                                                                    nodes,
-                                                                    mask);
+  MappingFEField<dim, dim, Vector<double>> mapping(dofh, nodes, mask);
 
   deallog << "Test with MappingQGeneric in " << dim << "D on "
           << tria.n_active_cells() << " cells:" << std::endl;

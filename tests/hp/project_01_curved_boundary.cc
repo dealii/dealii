@@ -31,7 +31,6 @@
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -83,7 +82,7 @@ test()
 
   hp::FECollection<dim> fe;
   fe.push_back(FE_Q<dim>(1));
-  hp::DoFHandler<dim> dh(tria);
+  DoFHandler<dim> dh(tria);
   dh.distribute_dofs(fe);
 
   Vector<double> v(dh.n_dofs());
@@ -159,7 +158,7 @@ test()
                          true);
     deallog << v.l2_norm() << std::endl;
     Assert(v.l2_norm() != 0, ExcInternalError());
-    for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+    for (typename DoFHandler<dim>::active_cell_iterator cell =
            dh.begin_active();
          cell != dh.end();
          ++cell)
@@ -185,7 +184,7 @@ test()
                          true);
     deallog << v.l2_norm() << std::endl;
     Assert(v.l2_norm() != 0, ExcInternalError());
-    for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+    for (typename DoFHandler<dim>::active_cell_iterator cell =
            dh.begin_active();
          cell != dh.end();
          ++cell)

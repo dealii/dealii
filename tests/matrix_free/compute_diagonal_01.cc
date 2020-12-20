@@ -65,6 +65,7 @@ test()
 
   Test<dim, fe_degree, n_points, n_components, Number, VectorizedArrayType>
     test(matrix_free,
+         constraint,
          [](FEEvaluation<dim,
                          fe_degree,
                          n_points,

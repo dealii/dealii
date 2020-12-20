@@ -588,6 +588,25 @@ classes, we will be able to use them interchangeably using the same syntax in
 all places.
 
 
+<h4> Is this how one should solve the Stokes equations? </h4>
+
+The discussions above showed *one* way in which the linear system that
+results from the Stokes equations can be solved, and because the
+tutorial programs are teaching tools that makes sense. But is this the
+way this system of equations *should* be solved?
+
+The answer to this is no. The primary bottleneck with the approach,
+already identified above, is that we have to repeatedly solve linear
+systems with $A$ inside the Schur complement, and because we don't
+have a good preconditioner for the Schur complement, these solves just
+have to happen too often. A better approach is to use a block
+decomposition, which is based on an observation of Silvester and
+Wathen @cite SW94 and explained in much greater detail in
+@cite elman2005 . An implementation of this alternative approach is
+discussed below, in the section on a <a href="#block-schur">block Schur
+complementation preconditioner</a> in the results section of this program.
+
+
 <h4> A note on the structure of the linear system </h4>
 
 Above, we have claimed that the linear system has the form

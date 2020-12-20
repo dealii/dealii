@@ -1072,7 +1072,7 @@ namespace internal
       operator()(const FaceToCellTopology<length> &face1,
                  const FaceToCellTopology<length> &face2) const
       {
-        // check if active fe indices match
+        // check if active FE indices match
         if (active_fe_indices.size() > 0)
           {
             // ... for interior faces

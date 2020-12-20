@@ -15,14 +15,12 @@
 
 
 
+#include <deal.II/base/std_cxx17/cmath.h>
 #include <deal.II/base/thread_management.h>
 
 #include <deal.II/fe/fe_series.h>
 
 #include <iostream>
-#ifdef DEAL_II_WITH_GSL
-#  include <gsl/gsl_sf_legendre.h>
-#endif
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -42,26 +40,15 @@ namespace
   double
   Lh(const Point<dim> &x_q, const TableIndices<dim> &indices)
   {
-#ifdef DEAL_II_WITH_GSL
     double res = 1.0;
     for (unsigned int d = 0; d < dim; d++)
       {
         const double x = 2.0 * (x_q[d] - 0.5);
         Assert((x_q[d] <= 1.0) && (x_q[d] >= 0.), ExcLegendre(d, x_q[d]));
-        const int ind = indices[d];
-        res *= std::sqrt(2.0) * gsl_sf_legendre_Pl(ind, x);
+        const unsigned int ind = indices[d];
+        res *= std::sqrt(2.0) * std_cxx17::legendre(ind, x);
       }
     return res;
-
-#else
-
-    (void)x_q;
-    (void)indices;
-    AssertThrow(false,
-                ExcMessage("deal.II has to be configured with GSL "
-                           "in order to use Legendre transformation."));
-    return 0;
-#endif
   }
 
 

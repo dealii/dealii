@@ -219,7 +219,7 @@ namespace FETools
       // given FEs
       unsigned int n_shape_functions = 0;
       for (unsigned int i = 0; i < fes.size(); ++i)
-        if (multiplicities[i] > 0) // check needed as fe might be nullptr
+        if (multiplicities[i] > 0) // check needed as FE might be nullptr
           n_shape_functions += fes[i]->n_dofs_per_cell() * multiplicities[i];
 
       // generate the array that will hold the output
@@ -386,27 +386,27 @@ namespace FETools
       // given FEs
       unsigned int n_shape_functions = 0;
       for (unsigned int i = 0; i < fes.size(); ++i)
-        if (multiplicities[i] > 0) // needed because fe might be nullptr
+        if (multiplicities[i] > 0) // needed because FE might be nullptr
           n_shape_functions += fes[i]->n_dofs_per_cell() * multiplicities[i];
 
       unsigned int n_components = 0;
       if (do_tensor_product)
         {
           for (unsigned int i = 0; i < fes.size(); ++i)
-            if (multiplicities[i] > 0) // needed because fe might be nullptr
+            if (multiplicities[i] > 0) // needed because FE might be nullptr
               n_components += fes[i]->n_components() * multiplicities[i];
         }
       else
         {
           for (unsigned int i = 0; i < fes.size(); ++i)
-            if (multiplicities[i] > 0) // needed because fe might be nullptr
+            if (multiplicities[i] > 0) // needed because FE might be nullptr
               {
                 n_components = fes[i]->n_components();
                 break;
               }
           // Now check that all FEs have the same number of components:
           for (unsigned int i = 0; i < fes.size(); ++i)
-            if (multiplicities[i] > 0) // needed because fe might be nullptr
+            if (multiplicities[i] > 0) // needed because FE might be nullptr
               Assert(n_components == fes[i]->n_components(),
                      ExcDimensionMismatch(n_components,
                                           fes[i]->n_components()));
@@ -2470,7 +2470,7 @@ namespace FETools
             // Now, just the [...]
             // part should be left.
             if (name.size() == 0 || name[0] != '[')
-              throw(std::string("Invalid first character in ") + name);
+              throw std::string("Invalid first character in ") + name;
             do
               {
                 // Erase the
@@ -2524,7 +2524,7 @@ namespace FETools
             // we actually had a ']'
             // there
             if (name.size() == 0 || name[0] != ']')
-              throw(std::string("Invalid first character in ") + name);
+              throw std::string("Invalid first character in ") + name;
             name.erase(0, 1);
             // just one more sanity check
             Assert((base_fes.size() == base_multiplicities.size()) &&
@@ -2572,7 +2572,7 @@ namespace FETools
             // or (Quadrature<1>(degree+1))
             // part should be left.
             if (name.size() == 0 || name[0] != '(')
-              throw(std::string("Invalid first character in ") + name);
+              throw std::string("Invalid first character in ") + name;
             name.erase(0, 1);
             if (name[0] != 'Q')
               {

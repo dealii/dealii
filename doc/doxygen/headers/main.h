@@ -201,7 +201,7 @@
  *
  *   The DoFHandler class and its associates are described in the @ref
  *   dofs module. In addition, there are specialized versions that can
- *   handle multilevel and hp discretizations. These are described in
+ *   handle multilevel and hp-discretizations. These are described in
  *   the @ref mg and @ref hp modules. Finite element methods frequently
  *   imply constraints on degrees of freedom, such as for hanging nodes
  *   or nodes at which boundary conditions apply; dealing with such

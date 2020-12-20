@@ -135,7 +135,7 @@ void
 FE_Nothing<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &,
   const unsigned int,
-  const Quadrature<dim - 1> &,
+  const hp::QCollection<dim - 1> &,
   const Mapping<dim, spacedim> &,
   const typename Mapping<dim, spacedim>::InternalDataBase &,
   const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
@@ -220,7 +220,7 @@ FE_Nothing<dim, spacedim>::compare_for_domination(
     // if it does and the other is FE_Nothing, either can dominate
     return FiniteElementDomination::either_element_can_dominate;
   else
-    // otherwise we dominate whatever fe is provided
+    // otherwise we dominate whatever FE is provided
     return FiniteElementDomination::this_element_dominates;
 }
 

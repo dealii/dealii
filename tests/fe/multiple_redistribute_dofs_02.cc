@@ -48,10 +48,10 @@ test()
   GridGenerator::hyper_cube(tria);
   hp::FECollection<dim, spacedim> fe_collection(FE_Q<dim, spacedim>(1));
 
-  hp::DoFHandler<dim, spacedim> dh(tria);
+  DoFHandler<dim, spacedim> dh(tria);
   dh.distribute_dofs(fe_collection);
 
-  // This stores a pointer to the fe in dh.
+  // This stores a pointer to the FE in dh.
   hp::FEValues<dim, spacedim> fe_v(dh.get_fe_collection(),
                                    hp::QCollection<dim>(QGauss<dim>(1)),
                                    update_values);

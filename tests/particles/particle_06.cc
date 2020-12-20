@@ -29,8 +29,8 @@ void
 test()
 {
   {
-    const unsigned int      n_properties_per_particle = 3;
-    Particles::PropertyPool pool(n_properties_per_particle);
+    const unsigned int                     n_properties_per_particle = 3;
+    Particles::PropertyPool<dim, spacedim> pool(n_properties_per_particle);
 
     Point<spacedim> position;
 

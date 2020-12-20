@@ -1907,6 +1907,38 @@ namespace GridGenerator
   flatten_triangulation(const Triangulation<dim, spacedim1> &in_tria,
                         Triangulation<dim, spacedim2> &      out_tria);
 
+  /**
+   * Convert a triangulation consisting only of hypercube cells
+   * (quadrilaterals, hexahedra) to a triangulation only consisting of
+   * simplices (triangles, tetrahedra).
+   *
+   * As an example, the following image shows how a set of three hexahedra
+   * meshing one eighths of a sphere are subdivided into tetrahedra, and how
+   * the curved surface is taken into account. Colors indicate how boundary
+   * indicators are inherited:
+   * @image html "convert_hypercube_to_simplex_mesh_visualization.png"
+   *
+   * Thereby, in 2D a quadrilateral cell is converted into 8 triangle cells,
+   * whereas in 3D a hexahedron cell is converted into 24 tetrahedra cells.
+   *
+   * Material ID and boundary IDs will be inherited after conversion.
+   *
+   * @param in_tria The triangulation containing hex elements.
+   * @param out_tria The converted triangulation containing tet elements.
+   */
+  template <int dim, int spacedim>
+  void
+  convert_hypercube_to_simplex_mesh(const Triangulation<dim, spacedim> &in_tria,
+                                    Triangulation<dim, spacedim> &out_tria);
+
+  /**
+   * Specialization of the above function for 1D: simply copy triangulation.
+   */
+  template <int spacedim>
+  void
+  convert_hypercube_to_simplex_mesh(const Triangulation<1, spacedim> &in_tria,
+                                    Triangulation<1, spacedim> &      out_tria);
+
 
   /**
    * Namespace Airfoil contains classes and functions in order to create a

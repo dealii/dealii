@@ -3092,48 +3092,6 @@ namespace GridTools
 
 
 
-  namespace internal
-  {
-    template <int dim, int spacedim>
-    double
-    diameter(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-             const Mapping<dim, spacedim> &mapping)
-    {
-      // see also TriaAccessor::diameter()
-
-      const auto vertices = mapping.get_vertices(cell);
-      switch (cell->reference_cell_type())
-        {
-          case ReferenceCell::Type::Line:
-            return (vertices[1] - vertices[0]).norm();
-          case ReferenceCell::Type::Tri:
-            return std::max(std::max((vertices[1] - vertices[0]).norm(),
-                                     (vertices[2] - vertices[1]).norm()),
-                            (vertices[2] - vertices[0]).norm());
-          case ReferenceCell::Type::Quad:
-            return std::max((vertices[3] - vertices[0]).norm(),
-                            (vertices[2] - vertices[1]).norm());
-          case ReferenceCell::Type::Tet:
-            return std::max(
-              std::max(std::max((vertices[1] - vertices[0]).norm(),
-                                (vertices[2] - vertices[0]).norm()),
-                       std::max((vertices[2] - vertices[1]).norm(),
-                                (vertices[3] - vertices[0]).norm())),
-              std::max((vertices[3] - vertices[1]).norm(),
-                       (vertices[3] - vertices[2]).norm()));
-          case ReferenceCell::Type::Hex:
-            return std::max(std::max((vertices[7] - vertices[0]).norm(),
-                                     (vertices[6] - vertices[1]).norm()),
-                            std::max((vertices[2] - vertices[5]).norm(),
-                                     (vertices[3] - vertices[4]).norm()));
-          default:
-            Assert(false, ExcNotImplemented());
-            return -1e10;
-        }
-    }
-  } // namespace internal
-
-
   template <int dim, int spacedim>
   double
   minimal_cell_diameter(const Triangulation<dim, spacedim> &triangulation,
@@ -3142,9 +3100,7 @@ namespace GridTools
     double min_diameter = std::numeric_limits<double>::max();
     for (const auto &cell : triangulation.active_cell_iterators())
       if (!cell->is_artificial())
-        min_diameter =
-          std::min(min_diameter,
-                   internal::diameter<dim, spacedim>(cell, mapping));
+        min_diameter = std::min(min_diameter, cell->diameter(mapping));
 
     double global_min_diameter = 0;
 
@@ -3171,8 +3127,7 @@ namespace GridTools
     double max_diameter = 0.;
     for (const auto &cell : triangulation.active_cell_iterators())
       if (!cell->is_artificial())
-        max_diameter =
-          std::max(max_diameter, internal::diameter(cell, mapping));
+        max_diameter = std::max(max_diameter, cell->diameter(mapping));
 
     double global_max_diameter = 0;
 

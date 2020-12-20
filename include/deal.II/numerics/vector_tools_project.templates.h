@@ -173,11 +173,25 @@ namespace VectorTools
       (void)project_to_boundary_first;
       (void)q_boundary;
 
+      AssertDimension(dof.get_fe_collection().size(), 1);
+
       Assert(dof.get_fe(0).n_components() == function.n_components,
              ExcDimensionMismatch(dof.get_fe(0).n_components(),
                                   function.n_components));
       Assert(dof.get_fe(0).n_components() == components,
              ExcDimensionMismatch(components, dof.get_fe(0).n_components()));
+
+      Quadrature<dim> quadrature_mf;
+
+      if (dof.get_fe(0).reference_cell_type() ==
+          ReferenceCell::get_hypercube(dim))
+        quadrature_mf = QGauss<dim>(dof.get_fe().degree + 2);
+      else
+        // TODO: since we have currently only implemented a handful quadrature
+        // rules for non-hypercube objects, we do not construct a new
+        // quadrature rule with degree + 2 here but  use the user-provided
+        // quadrature rule (which is guaranteed to be tabulated).
+        quadrature_mf = quadrature;
 
       // set up mass matrix and right hand side
       typename MatrixFree<dim, Number>::AdditionalData additional_data;
@@ -187,11 +201,8 @@ namespace VectorTools
         (update_values | update_JxW_values);
       std::shared_ptr<MatrixFree<dim, Number>> matrix_free(
         new MatrixFree<dim, Number>());
-      matrix_free->reinit(mapping,
-                          dof,
-                          constraints,
-                          QGauss<1>(dof.get_fe().degree + 2),
-                          additional_data);
+      matrix_free->reinit(
+        mapping, dof, constraints, quadrature_mf, additional_data);
       using MatrixType = MatrixFreeOperators::MassOperator<
         dim,
         -1,

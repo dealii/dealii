@@ -113,7 +113,7 @@ class FESystem;
  * particular feature is implemented. An example is whether an element
  * implements the information necessary to use it in the $hp$ finite element
  * context (see
- * @ref hp "hp finite element support").
+ * @ref hp "hp-finite element support").
  *
  *
  * <h3>Nomenclature</h3>
@@ -339,7 +339,7 @@ class FESystem;
  * neighboring (but differently refined) cells. The case that the finite
  * element spaces on different sides of a face are different, i.e., the $hp$
  * case (see
- * @ref hp "hp finite element support")
+ * @ref hp "hp-finite element support")
  * is handled by separate functions. See the
  * FiniteElement::get_face_interpolation_matrix() and
  * FiniteElement::get_subface_interpolation_matrix() functions.
@@ -820,7 +820,7 @@ public:
   /**
    * This operator returns a reference to the present object if the argument
    * given equals to zero. While this does not seem particularly useful, it is
-   * helpful in writing code that works with both ::DoFHandler and the hp
+   * helpful in writing code that works with both ::DoFHandler and the hp-
    * version hp::DoFHandler, since one can then write code like this:
    * @code
    * dofs_per_cell =
@@ -833,7 +833,7 @@ public:
    * doesn't offer a <code>dofs_per_cell</code> member variable: one first has
    * to select which finite element to work on, which is done using the
    * operator[]. Fortunately, <code>cell-@>active_fe_index()</code> also works
-   * for non-hp classes and simply returns zero in that case. The present
+   * for non-hp-classes and simply returns zero in that case. The present
    * operator[] accepts this zero argument, by returning the finite element
    * with index zero within its collection (that, of course, consists only of
    * the present finite element anyway).
@@ -1230,7 +1230,7 @@ public:
 
   /**
    * Return whether this element implements its hanging node constraints in
-   * the new way, which has to be used to make elements "hp compatible".  That
+   * the new way, which has to be used to make elements "hp-compatible".  That
    * means, the element properly implements the get_face_interpolation_matrix
    * and get_subface_interpolation_matrix methods. Therefore the return value
    * also indicates whether a call to the get_face_interpolation_matrix()
@@ -1239,14 +1239,14 @@ public:
    *
    * Currently the main purpose of this function is to allow the
    * make_hanging_node_constraints method to decide whether the new
-   * procedures, which are supposed to work in the hp framework can be used,
-   * or if the old well verified but not hp capable functions should be used.
+   * procedures, which are supposed to work in the hp-framework can be used,
+   * or if the old well verified but not hp-capable functions should be used.
    * Once the transition to the new scheme for computing the interface
    * constraints is complete, this function will be superfluous and will
    * probably go away.
    *
    * Derived classes should implement this function accordingly. The default
-   * assumption is that a finite element does not provide hp capable face
+   * assumption is that a finite element does not provide hp-capable face
    * interpolation, and the default implementation therefore returns @p false.
    */
   virtual bool
@@ -1312,12 +1312,12 @@ public:
 
 
   /**
-   * @name Functions to support hp
+   * @name Functions to support hp-
    * @{
    */
 
   /**
-   * If, on a vertex, several finite elements are active, the hp code first
+   * If, on a vertex, several finite elements are active, the hp-code first
    * assigns the degrees of freedom of each of these FEs different global
    * indices. It then calls this function to find out which of them should get
    * identical values, and consequently can receive the same global DoF index.
@@ -1362,7 +1362,7 @@ public:
    *
    * For a definition of domination, see FiniteElementDomination::Domination
    * and in particular the
-   * @ref hp_paper "hp paper".
+   * @ref hp_paper "hp-paper".
    */
   virtual FiniteElementDomination::Domination
   compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
@@ -2767,11 +2767,22 @@ protected:
    * it is no longer necessary.
    */
   virtual std::unique_ptr<InternalDataBase>
-  get_face_data(const UpdateFlags             update_flags,
-                const Mapping<dim, spacedim> &mapping,
-                const Quadrature<dim - 1> &   quadrature,
+  get_face_data(const UpdateFlags               update_flags,
+                const Mapping<dim, spacedim> &  mapping,
+                const hp::QCollection<dim - 1> &quadrature,
                 dealii::internal::FEValuesImplementation::
                   FiniteElementRelatedData<dim, spacedim> &output_data) const;
+
+  /**
+   * @deprecated Use the version taking a hp::QCollection argument.
+   */
+  virtual std::unique_ptr<InternalDataBase>
+  get_face_data(
+    const UpdateFlags             update_flags,
+    const Mapping<dim, spacedim> &mapping,
+    const Quadrature<dim - 1> &   quadrature,
+    internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
+      &output_data) const;
 
   /**
    * Like get_data(), but return an object that will later be used for
@@ -2964,7 +2975,7 @@ protected:
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const Quadrature<dim - 1> &                                 quadrature,
+    const hp::QCollection<dim - 1> &                            quadrature,
     const Mapping<dim, spacedim> &                              mapping,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
@@ -2973,7 +2984,23 @@ protected:
     const InternalDataBase &fe_internal,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
-      &output_data) const = 0;
+      &output_data) const;
+
+  /**
+   * @deprecated Use the version taking a hp::QCollection argument.
+   */
+  virtual void
+  fill_fe_face_values(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const unsigned int                                          face_no,
+    const Quadrature<dim - 1> &                                 quadrature,
+    const Mapping<dim, spacedim> &                              mapping,
+    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
+    const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      &                     mapping_data,
+    const InternalDataBase &fe_internal,
+    internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
+      &output_data) const;
 
   /**
    * This function is the equivalent to FiniteElement::fill_fe_values(), but

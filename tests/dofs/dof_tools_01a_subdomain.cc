@@ -19,7 +19,6 @@
 #include "../tests.h"
 
 #include "dof_tools_common.h"
-#include "dof_tools_common_fake_hp.h"
 
 // check
 //   DoFTools::
@@ -29,9 +28,9 @@
 
 
 
-template <typename DoFHandlerType>
+template <int dim>
 void
-check_this(const DoFHandlerType &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
   // create sparsity pattern
   SparsityPattern sp(dof_handler.n_dofs(),

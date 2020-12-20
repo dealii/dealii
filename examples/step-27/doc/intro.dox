@@ -60,7 +60,7 @@ deal.II, and that we will only have to provide the logic of what the
 program should do, not exactly how all this is going to happen.
 
 In deal.II, the $hp$ functionality is largely packaged into
-the hp namespace. This namespace provides classes that handle
+the hp-namespace. This namespace provides classes that handle
 $hp$ discretizations, assembling matrices and vectors, and other
 tasks. We will get to know many of them further down below. In
 addition, most of the functions in the DoFTools, and VectorTools
@@ -71,7 +71,7 @@ module and the links found there.
 It may be worth giving a slightly larger perspective at the end of
 this first part of the introduction. $hp$ functionality has been
 implemented in a number of different finite element packages (see, for
-example, the list of references cited in the @ref hp_paper "hp paper").
+example, the list of references cited in the @ref hp_paper "hp-paper").
 However, by and large, most of these packages have implemented it only
 for the (i) the 2d case, and/or (ii) the discontinuous Galerkin
 method. The latter is a significant simplification because
@@ -85,7 +85,7 @@ the resulting complexity. In particular, it handles computing the
 constraints (similar to hanging node constraints) of elements of
 different degree meeting at a face or edge. The many algorithmic and
 data structure techniques necessary for this are described in the
-@ref hp_paper "hp paper" for those interested in such detail.
+@ref hp_paper "hp-paper" for those interested in such detail.
 
 We hope that providing such a general implementation will help explore
 the potential of $hp$ methods further.
@@ -177,7 +177,7 @@ the same time.
 
 
 
-<h3>Assembling matrices and vectors with hp objects</h3>
+<h3>Assembling matrices and vectors with hp-objects</h3>
 
 Following this, we have to set up matrices and vectors for the linear system
 of the correct size and assemble them. Setting them up works in exactly the
@@ -250,7 +250,7 @@ usual fashion to assemble local contributions.
 
 
 
-<h3>A simple indicator for hp refinement and estimating smoothness</h3>
+<h3>A simple indicator for hp-refinement and estimating smoothness</h3>
 
 One of the central pieces of the adaptive finite element method is that we
 inspect the computed solution (a posteriori) with an indicator that tells us
@@ -261,7 +261,7 @@ complicated strategies in some programs, most importantly in step-14.
 
 In any case, as long as the decision is only "refine this cell" or "do not
 refine this cell", the actual refinement step is not particularly
-challenging. However, here we have a code that is capable of hp refinement,
+challenging. However, here we have a code that is capable of hp-refinement,
 i.e. we suddenly have two choices whenever we detect that the error on a
 certain cell is too large for our liking: we can refine the cell by splitting
 it into several smaller ones, or we can increase the polynomial degree of the
@@ -611,7 +611,7 @@ estimated smoothness exponent will be the same in either case.
 
 
 
-<h3>Complications with linear systems for hp discretizations</h3>
+<h3>Complications with linear systems for hp-discretizations</h3>
 
 <h4>Creating the sparsity pattern</h4>
 
@@ -643,7 +643,7 @@ The early tutorial programs use first or second degree finite elements, so
 removing entries in the sparsity pattern corresponding to constrained degrees of
 freedom does not have a large impact on the overall number of zeros explicitly
 stored by the matrix. However, since as many as a third of the degrees of
-freedom may be constrained in an hp discretization (and, with higher degree
+freedom may be constrained in an hp-discretization (and, with higher degree
 elements, these constraints can couple one DoF to as many as ten or twenty other
 DoFs), it is worthwhile to take these constraints into consideration since the
 resulting matrix will be much sparser (and, therefore, matrix-vector products or

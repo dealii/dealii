@@ -40,8 +40,16 @@ namespace Simplex
     /**
      * Constructor.
      */
-    FE_Poly(const unsigned int               degree,
-            const std::vector<unsigned int> &dpo_vector);
+    FE_Poly(const unsigned int                                degree,
+            const std::vector<unsigned int> &                 dpo_vector,
+            const typename FiniteElementData<dim>::Conformity conformity);
+
+    /**
+     * Return a list of constant modes of the element. For this element, the
+     * list consists of true arguments for all components.
+     */
+    std::pair<Table<2, bool>, std::vector<unsigned int>>
+    get_constant_modes() const override;
 
   private:
     /**
@@ -160,6 +168,127 @@ namespace Simplex
     hp_line_dof_identities(
       const FiniteElement<dim, spacedim> &fe_other) const override;
   };
+
+
+  /**
+   * Implementation of a scalar Lagrange finite element on a wedge that yields
+   * the finite element space of continuous, piecewise polynomials of
+   * degree p.
+   *
+   * @ingroup simplex
+   */
+  template <int dim, int spacedim = dim>
+  class FE_WedgeP : public dealii::FE_Poly<dim, spacedim>
+  {
+  public:
+    /**
+     * Constructor.
+     */
+    FE_WedgeP(const unsigned int degree);
+
+    /**
+     * @copydoc dealii::FiniteElement::clone()
+     */
+    std::unique_ptr<FiniteElement<dim, spacedim>>
+    clone() const override;
+
+    /**
+     * Return a string that uniquely identifies a finite element. This class
+     * returns <tt>Simplex::FE_WedgeP<dim>(degree)</tt>, with @p dim and @p degree
+     * replaced by appropriate values.
+     */
+    std::string
+    get_name() const override;
+
+    /**
+     * @copydoc dealii::FiniteElement::compare_for_domination()
+     */
+    FiniteElementDomination::Domination
+    compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
+                           const unsigned int codim) const override;
+
+    /**
+     * @copydoc dealii::FiniteElement::hp_vertex_dof_identities()
+     */
+    std::vector<std::pair<unsigned int, unsigned int>>
+    hp_vertex_dof_identities(
+      const FiniteElement<dim, spacedim> &fe_other) const override;
+
+    /**
+     * @copydoc dealii::FiniteElement::hp_line_dof_identities()
+     */
+    std::vector<std::pair<unsigned int, unsigned int>>
+    hp_line_dof_identities(
+      const FiniteElement<dim, spacedim> &fe_other) const override;
+
+    /**
+     * @copydoc dealii::FiniteElement::hp_quad_dof_identities()
+     */
+    std::vector<std::pair<unsigned int, unsigned int>>
+    hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other,
+                           const unsigned int face_no = 0) const override;
+  };
+
+
+  /**
+   * Implementation of a scalar Lagrange finite element on a pyramid that yields
+   * the finite element space of continuous, piecewise polynomials of
+   * degree p.
+   *
+   * @ingroup simplex
+   */
+  template <int dim, int spacedim = dim>
+  class FE_PyramidP : public dealii::FE_Poly<dim, spacedim>
+  {
+  public:
+    /**
+     * Constructor.
+     */
+    FE_PyramidP(const unsigned int degree);
+
+    /**
+     * @copydoc dealii::FiniteElement::clone()
+     */
+    std::unique_ptr<FiniteElement<dim, spacedim>>
+    clone() const override;
+
+    /**
+     * Return a string that uniquely identifies a finite element. This class
+     * returns <tt>Simplex::FE_PyramidP<dim>(degree)</tt>, with @p dim and @p degree
+     * replaced by appropriate values.
+     */
+    std::string
+    get_name() const override;
+
+    /**
+     * @copydoc dealii::FiniteElement::compare_for_domination()
+     */
+    FiniteElementDomination::Domination
+    compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
+                           const unsigned int codim) const override;
+
+    /**
+     * @copydoc dealii::FiniteElement::hp_vertex_dof_identities()
+     */
+    std::vector<std::pair<unsigned int, unsigned int>>
+    hp_vertex_dof_identities(
+      const FiniteElement<dim, spacedim> &fe_other) const override;
+
+    /**
+     * @copydoc dealii::FiniteElement::hp_line_dof_identities()
+     */
+    std::vector<std::pair<unsigned int, unsigned int>>
+    hp_line_dof_identities(
+      const FiniteElement<dim, spacedim> &fe_other) const override;
+
+    /**
+     * @copydoc dealii::FiniteElement::hp_quad_dof_identities()
+     */
+    std::vector<std::pair<unsigned int, unsigned int>>
+    hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other,
+                           const unsigned int face_no = 0) const override;
+  };
+
 
 } // namespace Simplex
 

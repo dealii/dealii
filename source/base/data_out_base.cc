@@ -598,11 +598,17 @@ namespace
   {
     std::array<unsigned int, 3> vtk_cell_id{};
 
-    if (write_higher_order_cells &&
-        patch.reference_cell_type == ReferenceCell::get_hypercube(dim))
+    if (write_higher_order_cells)
       {
-        vtk_cell_id[0] = vtk_lagrange_cell_type[dim];
-        vtk_cell_id[1] = 1;
+        if (patch.reference_cell_type == ReferenceCell::get_hypercube(dim))
+          {
+            vtk_cell_id[0] = vtk_lagrange_cell_type[dim];
+            vtk_cell_id[1] = 1;
+          }
+        else
+          {
+            Assert(false, ExcNotImplemented());
+          }
       }
     else if (patch.reference_cell_type == ReferenceCell::Type::Tri &&
              patch.data.n_cols() == 3)
@@ -626,6 +632,18 @@ namespace
              patch.data.n_cols() == 10)
       {
         vtk_cell_id[0] = 24;
+        vtk_cell_id[1] = 1;
+      }
+    else if (patch.reference_cell_type == ReferenceCell::Type::Wedge &&
+             patch.data.n_cols() == 6)
+      {
+        vtk_cell_id[0] = 13;
+        vtk_cell_id[1] = 1;
+      }
+    else if (patch.reference_cell_type == ReferenceCell::Type::Pyramid &&
+             patch.data.n_cols() == 5)
+      {
+        vtk_cell_id[0] = 14;
         vtk_cell_id[1] = 1;
       }
     else if (patch.reference_cell_type == ReferenceCell::get_hypercube(dim))

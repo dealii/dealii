@@ -1252,7 +1252,7 @@ namespace GridTools
   /**
    * Another version where we use that mapping on a given
    * cell that corresponds to the active finite element index of that cell.
-   * This is obviously only useful for hp problems, since the active finite
+   * This is obviously only useful for hp-problems, since the active finite
    * element index for all other DoF handlers is always zero.
    */
   template <int dim, int spacedim>

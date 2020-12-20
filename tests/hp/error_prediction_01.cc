@@ -16,15 +16,16 @@
 
 
 // validate combination of error prediction and cell data transfer algorithms
-// for hp adaptive methods
+// for hp-adaptive methods
 
+
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/refinement.h>
 
@@ -62,8 +63,7 @@ test()
   for (unsigned int d = 1; d <= 3; ++d)
     fes.push_back(FE_Q<dim>(d));
 
-  hp::DoFHandler<dim> dh(tria);
-  dh.set_fe(fes);
+  DoFHandler<dim> dh(tria);
   for (auto cell = dh.begin(0); cell != dh.end(0); ++cell)
     {
       if (cell->id().to_string() == "0_0:")
@@ -83,6 +83,7 @@ test()
           cell->set_future_fe_index(2);
         }
     }
+  dh.distribute_dofs(fes);
 
   // ----- predict -----
   Vector<float> error_indicators, predicted_error_indicators;

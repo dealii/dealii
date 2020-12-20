@@ -291,13 +291,13 @@ DEAL_II_NAMESPACE_OPEN
  * necessary to call AffineConstraints::distribute().
  *
  *
- * <h3>Implementation in the context of hp finite elements</h3>
+ * <h3>Implementation in the context of hp-finite elements</h3>
  *
  * In the case of DoFHandlers with hp-capabilities, nothing defines which of the
  * finite elements that are part of the hp::FECollection associated with the
  * DoFHandler, should be considered on cells that are not active (i.e., that
  * have children). This is because degrees of freedom are only allocated for
- * active cells and, in fact, it is not allowed to set an active_fe_index on
+ * active cells and, in fact, it is not allowed to set an active FE index on
  * non- active cells using DoFAccessor::set_active_fe_index().
  *
  * It is, thus, not entirely natural what should happen if, for example, a few
@@ -320,10 +320,10 @@ DEAL_II_NAMESPACE_OPEN
  *   cell. After refinement, this Q3 function on the mother cell is then
  *   interpolated into the space the user has selected for this cell (which may
  *   be different from Q3, in this example, if the user has set the
- *   active_fe_index for a different space post-refinement and before calling
+ *   active FE index for a different space post-refinement and before calling
  *   DoFHandler::distribute_dofs()).
  *
- * @note In the context of hp refinement, if cells are coarsened or the
+ * @note In the context of hp-refinement, if cells are coarsened or the
  * polynomial degree is lowered on some cells, then the old finite element
  * space is not a subspace of the new space and you may run into the same
  * situation as discussed above with hanging nodes. You may want to consider
@@ -573,6 +573,21 @@ private:
   std::vector<std::vector<Vector<typename VectorType::value_type>>>
     dof_values_on_cell;
 };
+
+namespace Legacy
+{
+  /**
+   * The template arguments of the original dealii::SolutionTransfer class will
+   * change in a future release. If for some reason, you need a code that is
+   * compatible with deal.II 9.3 and the subsequent release, use this alias
+   * instead.
+   */
+  template <int dim,
+            typename VectorType     = Vector<double>,
+            typename DoFHandlerType = DoFHandler<dim>>
+  using SolutionTransfer =
+    dealii::SolutionTransfer<dim, VectorType, DoFHandlerType>;
+} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE

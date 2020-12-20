@@ -932,7 +932,7 @@ public:
 
   /**
    * Return whether this element implements its hanging node constraints in
-   * the new way, which has to be used to make elements "hp compatible".
+   * the new way, which has to be used to make elements "hp-compatible".
    *
    * This function returns @p true if and only if all its base elements return
    * @p true for this function.
@@ -978,7 +978,7 @@ public:
     const unsigned int                  face_no = 0) const override;
 
   /**
-   * If, on a vertex, several finite elements are active, the hp code first
+   * If, on a vertex, several finite elements are active, the hp-code first
    * assigns the degrees of freedom of each of these FEs different global
    * indices. It then calls this function to find out which of them should get
    * identical values, and consequently can receive the same global DoF index.
@@ -1062,12 +1062,14 @@ protected:
                                                                        spacedim>
       &output_data) const override;
 
+  using FiniteElement<dim, spacedim>::get_face_data;
+
   virtual std::unique_ptr<
     typename FiniteElement<dim, spacedim>::InternalDataBase>
   get_face_data(
-    const UpdateFlags             update_flags,
-    const Mapping<dim, spacedim> &mapping,
-    const Quadrature<dim - 1> &   quadrature,
+    const UpdateFlags               update_flags,
+    const Mapping<dim, spacedim> &  mapping,
+    const hp::QCollection<dim - 1> &quadrature,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
       &output_data) const override;
@@ -1097,11 +1099,13 @@ protected:
                                                                        spacedim>
       &output_data) const override;
 
+  using FiniteElement<dim, spacedim>::fill_fe_face_values;
+
   virtual void
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const Quadrature<dim - 1> &                                 quadrature,
+    const hp::QCollection<dim - 1> &                            quadrature,
     const Mapping<dim, spacedim> &                              mapping,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
@@ -1145,7 +1149,7 @@ protected:
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
     const unsigned int                                          sub_no,
-    const Quadrature<dim_1> &                                   quadrature,
+    const hp::QCollection<dim_1> &                              quadrature,
     const CellSimilarity::Similarity                            cell_similarity,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_data,

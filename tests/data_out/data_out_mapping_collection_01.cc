@@ -19,6 +19,7 @@
 
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_nothing.h>
@@ -34,7 +35,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 
@@ -72,7 +72,7 @@ test()
   hp::MappingCollection<dim> mapping_collection(mapping_1, mapping_2);
 
   // create dof-handler and assign cells to different fes/manifolds
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     cell->set_active_fe_index(std::min(cell->active_cell_index(), 1u));

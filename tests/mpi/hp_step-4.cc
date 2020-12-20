@@ -41,8 +41,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
-
 #include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/lac/trilinos_precondition.h>
 #include <deal.II/lac/trilinos_solver.h>
@@ -83,7 +81,7 @@ namespace Step4
 
     parallel::distributed::Triangulation<dim> triangulation;
     hp::FECollection<dim>                     fe;
-    hp::DoFHandler<dim>                       dof_handler;
+    DoFHandler<dim>                           dof_handler;
     hp::QCollection<dim>                      q_collection;
 
     IndexSet locally_owned_dofs;
@@ -199,7 +197,7 @@ namespace Step4
     DoFTools::make_zero_boundary_constraints(dof_handler, constraints);
 
 #ifdef DEBUG
-    // We did not think about hp constraints on ghost cells yet.
+    // We did not think about hp-constraints on ghost cells yet.
     // Thus, we are content with verifying their consistency for now.
     IndexSet locally_active_dofs;
     DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);

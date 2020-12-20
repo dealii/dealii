@@ -16,7 +16,7 @@
 
 // This test provides a hp::DoFHandler with two FE_Q(2) elements
 // assigned on a p::d::Triangulation consisting of 64x64 cells, on which
-// active fe indices are mostly randomly distributed. This DoF
+// active FE indices are mostly randomly distributed. This DoF
 // distribution test repeats for an increasing amount of processors.
 //
 // At some point, this test failed to provide a consistent number of
@@ -28,6 +28,7 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
 
@@ -35,7 +36,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <iostream>
@@ -56,7 +56,7 @@ test(MPI_Comm mpi_communicator)
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(4);
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   // set active_fe_index mostly randomly
   for (const auto &cell : dof_handler.active_cell_iterators())

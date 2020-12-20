@@ -53,6 +53,9 @@ namespace parallel
 
 template <int dim, int spacedim>
 class Manifold;
+
+template <int dim, int spacedim>
+class Mapping;
 #endif
 
 namespace internal
@@ -61,6 +64,7 @@ namespace internal
   {
     class TriaObjects;
     struct Implementation;
+    struct ImplementationMixedMesh;
   } // namespace TriangulationImplementation
 
   namespace TriaAccessorImplementation
@@ -124,7 +128,6 @@ namespace internal
     {
       using type = int;
     };
-
   } // namespace TriaAccessorImplementation
 } // namespace internal
 template <int structdim, int dim, int spacedim>
@@ -1402,9 +1405,25 @@ public:
   /**
    * Diameter of the object.
    *
-   * The diameter of an object is computed to be the largest diagonal. This is
-   * not necessarily the true diameter for objects that may use higher order
-   * mappings, but completely sufficient for most computations.
+   * The diameter of an object is computed to be the largest diagonal of the
+   * current object. If this object is a quadrilateral, then there are two
+   * such diagonal, and if it is a hexahedron, then there are four diagonals
+   * that connect "opposite" points. For triangles and tetrahedra, the function
+   * simply returns the length of the longest edge.
+   *
+   * The situation is more difficult for wedges and pyramids: For wedges, we
+   * return the length of the longest diagonal of the three quadrilateral faces
+   * or the longest edge length of the two triangular faces. For pyramids,
+   * the same principle is applied.
+   *
+   * In all of these cases, this definition of "diameter" is
+   * not necessarily the true diameter in the sense of the largest distance
+   * between points inside the object. Indeed, one can often construct objects
+   * for which it is not, though these are generally quite deformed compared to
+   * the reference shape. Furthermore, for objects that may use higher order
+   * mappings, one may have bulging faces that also create trouble for
+   * computing an exact representation of the diameter of the object. That said,
+   * the definition used above is completely sufficient for most computations.
    */
   double
   diameter() const;
@@ -1794,6 +1813,8 @@ private:
   friend class Triangulation;
 
   friend struct dealii::internal::TriangulationImplementation::Implementation;
+  friend struct dealii::internal::TriangulationImplementation::
+    ImplementationMixedMesh;
   friend struct dealii::internal::TriaAccessorImplementation::Implementation;
 };
 
@@ -3701,6 +3722,14 @@ public:
   CellId
   id() const;
 
+  using TriaAccessor<dim, dim, spacedim>::diameter;
+
+  /**
+   * The same as TriaAccessor::diameter() but also taking a Mapping class.
+   */
+  double
+  diameter(const Mapping<dim, spacedim> &mapping) const;
+
   /**
    * @}
    */
@@ -3791,6 +3820,8 @@ private:
   friend class parallel::TriangulationBase;
 
   friend struct dealii::internal::TriangulationImplementation::Implementation;
+  friend struct dealii::internal::TriangulationImplementation::
+    ImplementationMixedMesh;
 };
 
 

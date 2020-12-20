@@ -1,7 +1,7 @@
 
 DEAL::   1D solution transfer
-DEAL::Error in interpolating hp FE_Q_Hierarchical: 0
+DEAL::Error in interpolating hp-FE_Q_Hierarchical: 0
 DEAL::   2D solution transfer
-DEAL::Error in interpolating hp FE_Q_Hierarchical: 0
+DEAL::Error in interpolating hp-FE_Q_Hierarchical: 0
 DEAL::   3D solution transfer
-DEAL::Error in interpolating hp FE_Q_Hierarchical: 0
+DEAL::Error in interpolating hp-FE_Q_Hierarchical: 0

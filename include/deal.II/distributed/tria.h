@@ -487,7 +487,7 @@ namespace parallel
        * assembly and solving. In practice, determining this cost is of course
        * not trivial since we don't solve on isolated cells, but on the entire
        * mesh. In such cases, one could, for example, choose the weight equal
-       * to the number of unknowns per cell (in the context of hp finite
+       * to the number of unknowns per cell (in the context of hp-finite
        * element methods), or using a heuristic that estimates the cost on
        * each cell depending on whether, for example, one has to run some
        * expensive algorithm on some cells but not others (such as forming

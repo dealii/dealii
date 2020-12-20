@@ -84,7 +84,7 @@ namespace internal
    * needs not allocate memory itself, or synchronize with other threads.
    *
    * The sizes of the arrays are initialized with the maximal number of
-   * entries necessary for the hp case. Within the loop over individual
+   * entries necessary for the hp-case. Within the loop over individual
    * cells, we then resize the arrays as necessary. Since for std::vector
    * resizing to a smaller size doesn't imply memory allocation, this is
    * fast.
@@ -195,7 +195,7 @@ namespace internal
 
     /**
      * Resize the arrays so that they fit the number of quadrature points
-     * associated with the given finite element index into the hp
+     * associated with the given finite element index into the hp-
      * collections.
      */
     void
@@ -700,7 +700,7 @@ namespace internal
                ExcInternalError());
 
         // get restriction of finite element function of @p{neighbor} to the
-        // common face. in the hp case, use the quadrature formula that
+        // common face. in the hp-case, use the quadrature formula that
         // matches the one we would use for the present cell
         fe_face_values_neighbor.reinit(neighbor,
                                        neighbor_neighbor,

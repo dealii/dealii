@@ -64,8 +64,8 @@ test()
   deallog << "dim = " << dim << std::endl;
 
   // Construct grid
-  Triangulation<dim>  triangulation;
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  Triangulation<dim> triangulation;
+  DoFHandler<dim>    dof_handler(triangulation);
   GridGenerator::hyper_cube(triangulation, -20, 20);
   triangulation.refine_global(4);
 

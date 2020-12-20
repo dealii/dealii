@@ -365,19 +365,21 @@ FE_Enriched<dim, spacedim>::setup_data(
 template <int dim, int spacedim>
 std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
 FE_Enriched<dim, spacedim>::get_face_data(
-  const UpdateFlags             update_flags,
-  const Mapping<dim, spacedim> &mapping,
-  const Quadrature<dim - 1> &   quadrature,
+  const UpdateFlags               update_flags,
+  const Mapping<dim, spacedim> &  mapping,
+  const hp::QCollection<dim - 1> &quadrature,
   internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
     &output_data) const
 {
+  AssertDimension(quadrature.size(), 1);
+
   auto data =
     fe_system->get_face_data(update_flags, mapping, quadrature, output_data);
   return setup_data(Utilities::dynamic_unique_cast<
                       typename FESystem<dim, spacedim>::InternalData>(
                       std::move(data)),
                     update_flags,
-                    quadrature);
+                    quadrature[0]);
 }
 
 
@@ -428,7 +430,7 @@ FE_Enriched<dim, spacedim>::initialize(
   Assert(fes.size() == multiplicities.size(),
          ExcDimensionMismatch(fes.size(), multiplicities.size()));
 
-  // Note that we need to skip every fe with multiplicity 0 in the following
+  // Note that we need to skip every FE with multiplicity 0 in the following
   // block of code
   this->base_to_block_indices.reinit(0, 0);
 
@@ -475,7 +477,7 @@ FE_Enriched<dim, spacedim>::initialize(
   // However, functions like interpolate_boundary_values() need all FEs inside
   // FECollection to be able to provide support points irrespectively whether
   // this FE sits on the boundary or not. Thus for moment just copy support
-  // points from fe system:
+  // points from FE system:
   {
     this->unit_support_points      = fe_system->unit_support_points;
     this->unit_face_support_points = fe_system->unit_face_support_points;
@@ -558,7 +560,7 @@ void
 FE_Enriched<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const Quadrature<dim - 1> &                                 quadrature,
+  const hp::QCollection<dim - 1> &                            quadrature,
   const Mapping<dim, spacedim> &                              mapping,
   const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
   const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
@@ -572,6 +574,8 @@ FE_Enriched<dim, spacedim>::fill_fe_face_values(
          ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &>(fe_internal);
 
+  AssertDimension(quadrature.size(), 1);
+
   // call FESystem's method to fill everything without enrichment function
   fe_system->fill_fe_face_values(cell,
                                  face_no,
@@ -584,7 +588,7 @@ FE_Enriched<dim, spacedim>::fill_fe_face_values(
 
   if (is_enriched)
     multiply_by_enrichment(
-      quadrature, fe_data, mapping_data, cell, output_data);
+      quadrature[0], fe_data, mapping_data, cell, output_data);
 }
 
 
@@ -1296,8 +1300,8 @@ namespace ColorEnriched
        * on adjacent cells, an enriched FE [0 0 1] should exist and is
        * found as the least dominating finite element for the two cells by
        * DoFTools::make_hanging_node_constraints, using the above mentioned
-       * hp::FECollection functions. Denoting the fe set in adjacent cells as
-       * {1,3} and {2,3}, this implies that an fe set {3} needs to be added!
+       * hp::FECollection functions. Denoting the FE set in adjacent cells as
+       * {1,3} and {2,3}, this implies that an FE set {3} needs to be added!
        * Based on the predicate configuration, this may not be automatically
        * done without the following special treatment.
        */
@@ -1319,10 +1323,10 @@ namespace ColorEnriched
                   const auto nbr_fe_index =
                     cell->neighbor(face)->active_fe_index();
 
-                  // find corresponding fe set
+                  // find corresponding FE set
                   const auto nbr_fe_set = fe_sets.at(nbr_fe_index);
 
-                  // find intersection of the fe sets: fe_set and nbr_fe_set
+                  // find intersection of the FE sets: fe_set and nbr_fe_set
                   std::set<unsigned int> intersection_set;
                   std::set_intersection(
                     fe_set.begin(),

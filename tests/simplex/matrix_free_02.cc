@@ -55,7 +55,8 @@ template <int dim>
 class PoissonOperator
 {
 public:
-  using VectorType = LinearAlgebra::distributed::Vector<double>;
+  using VectorType       = LinearAlgebra::distributed::Vector<double>;
+  using FECellIntegrator = FEEvaluation<dim, -1, 0, 1, double>;
 
   PoissonOperator(const MatrixFree<dim, double> &matrix_free,
                   const bool                     do_helmholtz)
@@ -75,24 +76,16 @@ public:
     const int dummy = 0;
 
     matrix_free.template cell_loop<VectorType, int>(
-      [&](const auto &data, auto &dst, const auto &, const auto cell_range) {
-        for (unsigned int i = 0; i < 2; ++i)
+      [&](const auto &data, auto &dst, const auto &, const auto range) {
+        FECellIntegrator phi(matrix_free, range);
+
+        for (unsigned int cell = range.first; cell < range.second; ++cell)
           {
-            const auto cell_subrange =
-              data.create_cell_subrange_hp_by_index(cell_range, i);
+            phi.reinit(cell);
+            for (unsigned int q = 0; q < phi.n_q_points; ++q)
+              phi.submit_value(1.0, q);
 
-            FEEvaluation<dim, -1, 0, 1, double> phi(matrix_free, 0, 0, 0, i, i);
-
-            for (unsigned int cell = cell_subrange.first;
-                 cell < cell_subrange.second;
-                 ++cell)
-              {
-                phi.reinit(cell);
-                for (unsigned int q = 0; q < phi.n_q_points; ++q)
-                  phi.submit_value(1.0, q);
-
-                phi.integrate_scatter(true, false, dst);
-              }
+            phi.integrate_scatter(true, false, dst);
           }
       },
       vec,
@@ -105,30 +98,23 @@ public:
   vmult(VectorType &dst, const VectorType &src) const
   {
     matrix_free.template cell_loop<VectorType, VectorType>(
-      [&](const auto &data, auto &dst, const auto &src, const auto cell_range) {
-        for (unsigned int i = 0; i < 2; ++i)
+      [&](const auto &data, auto &dst, const auto &src, const auto range) {
+        FECellIntegrator phi(matrix_free, range);
+
+        for (unsigned int cell = range.first; cell < range.second; ++cell)
           {
-            const auto cell_subrange =
-              data.create_cell_subrange_hp_by_index(cell_range, i);
+            phi.reinit(cell);
+            phi.gather_evaluate(src, do_helmholtz, true);
 
-            FEEvaluation<dim, -1, 0, 1, double> phi(matrix_free, 0, 0, 0, i, i);
-            for (unsigned int cell = cell_subrange.first;
-                 cell < cell_subrange.second;
-                 ++cell)
+            for (unsigned int q = 0; q < phi.n_q_points; ++q)
               {
-                phi.reinit(cell);
-                phi.gather_evaluate(src, do_helmholtz, true);
+                if (do_helmholtz)
+                  phi.submit_value(phi.get_value(q), q);
 
-                for (unsigned int q = 0; q < phi.n_q_points; ++q)
-                  {
-                    if (do_helmholtz)
-                      phi.submit_value(phi.get_value(q), q);
-
-                    phi.submit_gradient(phi.get_gradient(q), q);
-                  }
-
-                phi.integrate_scatter(do_helmholtz, true, dst);
+                phi.submit_gradient(phi.get_gradient(q), q);
               }
+
+            phi.integrate_scatter(do_helmholtz, true, dst);
           }
       },
       dst,

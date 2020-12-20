@@ -15,7 +15,7 @@
 
 
 
-// check that computation of hp constraints works for Q elements correctly
+// check that computation of hp-constraints works for Q elements correctly
 
 char logname[] = "output";
 

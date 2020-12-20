@@ -214,7 +214,7 @@ namespace parallel
                   (**estimated_error_it)[cell->active_cell_index()] *
                   (gamma_h * std::pow(.5, future_fe_degree));
 
-                // If the future fe index differs from the active one, also take
+                // If the future FE index differs from the active one, also take
                 // into account p-adaptation.
                 if (cell->future_fe_index_set())
                   *predicted_error_it *=

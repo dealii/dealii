@@ -45,7 +45,7 @@ check_this(const FiniteElement<dim> &fe, const FiniteElement<dim> & /*fe2*/)
   if (fe.n_components() != 1)
     return;
 
-  // ignore this check if this fe has already
+  // ignore this check if this FE has already
   // been treated
   static std::set<std::string> already_checked;
   if (already_checked.find(fe.get_name()) != already_checked.end())

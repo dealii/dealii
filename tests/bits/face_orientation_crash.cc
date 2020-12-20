@@ -73,7 +73,7 @@ check()
 
       // then build hanging node
       // constraints. this should trip the
-      // new code using the hp constraints,
+      // new code using the hp-constraints,
       // added in late July 2006
       AffineConstraints<double> constraints;
       DoFTools::make_hanging_node_constraints(dof, constraints);

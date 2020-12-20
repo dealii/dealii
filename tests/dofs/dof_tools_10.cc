@@ -19,7 +19,6 @@
 #include "../tests.h"
 
 #include "dof_tools_common.h"
-#include "dof_tools_common_fake_hp.h"
 
 // check
 //   DoFTools::map_dofs_to_support_points (const Mapping<dim> &,
@@ -28,17 +27,17 @@
 
 
 
-template <typename DoFHandlerType>
+template <int dim>
 void
-check_this(const DoFHandlerType &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
-  // don't check if fe has no support
+  // don't check if FE has no support
   // points
   if (dof_handler.get_fe().get_unit_support_points().size() == 0)
     return;
 
-  std::vector<Point<DoFHandlerType::dimension>> map(dof_handler.n_dofs());
-  MappingQ<DoFHandlerType::dimension>           mapping(2);
+  std::vector<Point<dim>> map(dof_handler.n_dofs());
+  MappingQ<dim>           mapping(2);
 
   DoFTools::map_dofs_to_support_points(mapping, dof_handler, map);
 

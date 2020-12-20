@@ -2337,7 +2337,7 @@ namespace DoFTools
                              const ComponentMask &mask = ComponentMask());
 
   /**
-   * Same as the previous function but for the hp case.
+   * Same as the previous function but for the hp-case.
    */
   template <int dim, int spacedim>
   void
@@ -2386,7 +2386,7 @@ namespace DoFTools
     const ComponentMask &                               mask = ComponentMask());
 
   /**
-   * Same as the previous function but for the hp case.
+   * Same as the previous function but for the hp-case.
    */
   template <int dim, int spacedim>
   void

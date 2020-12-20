@@ -765,7 +765,7 @@ namespace DoFTools
     namespace
     {
       // implementation of the same function in namespace DoFTools for
-      // non-hp DoFHandlers
+      // non-hp-DoFHandlers
       template <int dim,
                 int spacedim,
                 typename SparsityPatternType,
@@ -1103,7 +1103,7 @@ namespace DoFTools
           {
             // while the implementation above is quite optimized and caches a
             // lot of data (see e.g. the int/flux_dof_mask tables), this is no
-            // longer practical for the hp version since we would have to have
+            // longer practical for the hp-version since we would have to have
             // it for all combinations of elements in the hp::FECollection.
             // consequently, the implementation here is simpler and probably
             // less efficient but at least readable...
@@ -1189,7 +1189,7 @@ namespace DoFTools
                           if (!face_has_flux_coupling(cell, face))
                             continue;
 
-                          // Like the non-hp case: If the cells are on the same
+                          // Like the non-hp-case: If the cells are on the same
                           // level (and both are active, locally-owned cells)
                           // then only add to the sparsity pattern if the
                           // current cell is 'greater' in the total ordering.
@@ -1198,7 +1198,7 @@ namespace DoFTools
                               neighbor->is_active() &&
                               neighbor->is_locally_owned())
                             continue;
-                          // Again, like the non-hp case: If we are more refined
+                          // Again, like the non-hp-case: If we are more refined
                           // then the neighbor, then we will automatically find
                           // the active neighbor cell when we call 'neighbor
                           // (face)' above. The opposite is not true; if the

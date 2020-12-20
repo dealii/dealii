@@ -680,7 +680,7 @@ namespace Particles
      * Return a reference to the property pool that owns all particle
      * properties, and organizes them physically.
      */
-    PropertyPool &
+    PropertyPool<dim, spacedim> &
     get_property_pool() const;
 
     /**
@@ -805,7 +805,7 @@ namespace Particles
      * precedes the declaration of the `particles` and `ghost_particles`
      * members.
      */
-    std::unique_ptr<PropertyPool> property_pool;
+    std::unique_ptr<PropertyPool<dim, spacedim>> property_pool;
 
     /**
      * Set of particles currently living in the local domain, organized by

@@ -87,7 +87,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -229,22 +228,22 @@ get_h_area_sub<3>(double &h, double &a, const double L)
 // output for inspection
 template <int dim>
 void
-output(const std::string          name,
-       const Triangulation<dim> & triangulation,
-       const hp::DoFHandler<dim> &dof_handler,
-       const Vector<double> &     values,
-       const Vector<float> &      error)
+output(const std::string         name,
+       const Triangulation<dim> &triangulation,
+       const DoFHandler<dim> &   dof_handler,
+       const Vector<double> &    values,
+       const Vector<float> &     error)
 {
   dealii::Vector<double> fe_degrees(triangulation.n_active_cells());
   {
-    typename dealii::hp::DoFHandler<dim>::active_cell_iterator
+    typename dealii::DoFHandler<dim>::active_cell_iterator
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
     for (unsigned int index = 0; cell != endc; ++cell, ++index)
-      fe_degrees(index) = dof_handler.get_fe()[cell->active_fe_index()].degree;
+      fe_degrees(index) = dof_handler.get_fe(cell->active_fe_index()).degree;
   }
 
-  dealii::DataOut<dim, dealii::hp::DoFHandler<dim>> data_out;
+  dealii::DataOut<dim, dealii::DoFHandler<dim>> data_out;
   data_out.attach_dof_handler(dof_handler);
   data_out.add_data_vector(values, std::string("function_interpolation"));
   data_out.add_data_vector(fe_degrees, std::string("fe_degree"));
@@ -263,7 +262,7 @@ test_neumann(const NeumanBC<dim> &func)
   deallog << "NeumanBC case:" << std::endl;
   deallog << "--------------" << std::endl;
   Triangulation<dim>        triangulation;
-  hp::DoFHandler<dim>       dof_handler(triangulation);
+  DoFHandler<dim>           dof_handler(triangulation);
   hp::FECollection<dim>     fe_collection;
   hp::QCollection<dim>      quadrature_formula;
   hp::QCollection<dim - 1>  face_quadrature_formula;
@@ -348,7 +347,7 @@ test_regular(const MyFunction<dim> &func)
   deallog << "Regular face:" << std::endl;
   deallog << "-------------" << std::endl;
   Triangulation<dim>        triangulation;
-  hp::DoFHandler<dim>       dof_handler(triangulation);
+  DoFHandler<dim>           dof_handler(triangulation);
   hp::FECollection<dim>     fe_collection;
   hp::QCollection<dim>      quadrature_formula;
   hp::QCollection<dim - 1>  face_quadrature_formula;
@@ -388,7 +387,7 @@ test_regular(const MyFunction<dim> &func)
                                               p2,
                                               /*colorize*/ false);
 
-    typename dealii::hp::DoFHandler<dim>::active_cell_iterator
+    typename dealii::DoFHandler<dim>::active_cell_iterator
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
     for (; cell != endc; cell++)
@@ -463,7 +462,7 @@ test_irregular(const MyFunction<dim> &func)
   deallog << "Irregular face:" << std::endl;
   deallog << "---------------" << std::endl;
   Triangulation<dim>        triangulation;
-  hp::DoFHandler<dim>       dof_handler(triangulation);
+  DoFHandler<dim>           dof_handler(triangulation);
   hp::FECollection<dim>     fe_collection;
   hp::QCollection<dim>      quadrature_formula;
   hp::QCollection<dim - 1>  face_quadrature_formula;
@@ -506,13 +505,13 @@ test_irregular(const MyFunction<dim> &func)
                                               /*colorize*/ false);
     // refine left side
     {
-      typename dealii::hp::DoFHandler<dim>::active_cell_iterator cell =
+      typename dealii::DoFHandler<dim>::active_cell_iterator cell =
         dof_handler.begin_active();
       cell->set_refine_flag();
       triangulation.execute_coarsening_and_refinement();
     }
 
-    typename dealii::hp::DoFHandler<dim>::active_cell_iterator
+    typename dealii::DoFHandler<dim>::active_cell_iterator
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
     for (; cell != endc; cell++)
@@ -645,7 +644,7 @@ test(const MySecondFunction<dim> &func)
   deallog << "----------------------" << std::endl;
 
   dealii::Triangulation<dim>        triangulation;
-  dealii::hp::DoFHandler<dim>       dof_handler(triangulation);
+  dealii::DoFHandler<dim>           dof_handler(triangulation);
   dealii::hp::FECollection<dim>     fe_collection;
   dealii::hp::QCollection<dim>      quadrature_formula;
   dealii::hp::QCollection<dim - 1>  face_quadrature_formula;
@@ -667,7 +666,7 @@ test(const MySecondFunction<dim> &func)
     // will not carry to the child cells.
     dof_handler.distribute_dofs(fe_collection);
 
-    typename dealii::hp::DoFHandler<dim>::active_cell_iterator
+    typename dealii::DoFHandler<dim>::active_cell_iterator
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
     for (; cell != endc; cell++)

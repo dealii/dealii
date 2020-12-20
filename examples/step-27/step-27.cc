@@ -257,7 +257,7 @@ namespace Step27
   // This function is again a verbatim copy of what we already did in
   // step-6. Despite function calls with exactly the same names and arguments,
   // the algorithms used internally are different in some aspect since the
-  // dof_handler variable here is an hp object.
+  // dof_handler variable here is an hp-object.
   template <int dim>
   void LaplaceProblem<dim>::setup_system()
   {

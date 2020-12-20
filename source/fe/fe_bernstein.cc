@@ -131,7 +131,7 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
       // Make sure that the element for which the DoFs should be constrained
       // is the one with the higher polynomial degree.  Actually the procedure
       // will work also if this assertion is not satisfied. But the matrices
-      // produced in that case might lead to problems in the hp procedures,
+      // produced in that case might lead to problems in the hp-procedures,
       // which use this method.
       Assert(
         this->n_dofs_per_face(face_no) <= source_fe->n_dofs_per_face(face_no),
@@ -260,7 +260,7 @@ std::vector<std::pair<unsigned int, unsigned int>>
 FE_Bernstein<dim, spacedim>::hp_line_dof_identities(
   const FiniteElement<dim, spacedim> &) const
 {
-  // Since this fe is not interpolatory but on the vertices, we can
+  // Since this FE is not interpolatory but on the vertices, we can
   // not identify dofs on lines and on quads even if there are dofs
   // on lines and on quads.
   //
@@ -276,7 +276,7 @@ FE_Bernstein<dim, spacedim>::hp_quad_dof_identities(
   const FiniteElement<dim, spacedim> &,
   const unsigned int) const
 {
-  // Since this fe is not interpolatory but on the vertices, we can
+  // Since this FE is not interpolatory but on the vertices, we can
   // not identify dofs on lines and on quads even if there are dofs
   // on lines and on quads.
   //

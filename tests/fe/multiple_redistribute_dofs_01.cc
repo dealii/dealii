@@ -50,7 +50,7 @@ test()
   DoFHandler<dim, spacedim> dh(tria);
   dh.distribute_dofs(fe);
 
-  // This stores a pointer to the fe in dh.
+  // This stores a pointer to the FE in dh.
   FEValues<dim, spacedim> fe_v(dh.get_fe(), QGauss<dim>(1), update_values);
 
   tria.refine_global(1);

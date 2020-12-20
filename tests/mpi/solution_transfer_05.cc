@@ -28,13 +28,13 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_dgq.h>
 
 #include <deal.II/grid/grid_generator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/lac/la_parallel_vector.h>
@@ -58,9 +58,9 @@ test()
   for (unsigned int deg = 1; deg <= max_degree; ++deg)
     fe_dgq.push_back(FE_DGQ<dim>(deg));
 
-  hp::DoFHandler<dim> dgq_dof_handler(tria);
+  DoFHandler<dim> dgq_dof_handler(tria);
 
-  // randomly assign fes
+  // randomly assign FEs
   for (const auto &cell : dgq_dof_handler.active_cell_iterators())
     if (cell->is_locally_owned())
       cell->set_active_fe_index(Testing::rand() % max_degree);
@@ -85,7 +85,7 @@ test()
   parallel::distributed::SolutionTransfer<
     dim,
     LinearAlgebra::distributed::Vector<double>,
-    hp::DoFHandler<dim>>
+    DoFHandler<dim>>
     dgq_soltrans(dgq_dof_handler);
   dgq_soltrans.prepare_for_coarsening_and_refinement(dgq_solution);
 

@@ -251,6 +251,31 @@ namespace internal
       }
 
       /**
+       * Do that part of reserving space that pertains to releasing
+       * the previously used memory.
+       */
+      template <int dim, int spacedim>
+      static void
+      reset_to_empty_objects(DoFHandler<dim, spacedim> &dof_handler)
+      {
+        dof_handler.object_dof_indices.clear();
+        dof_handler.object_dof_indices.resize(dof_handler.tria->n_levels());
+        dof_handler.object_dof_indices.shrink_to_fit();
+
+        dof_handler.object_dof_ptr.clear();
+        dof_handler.object_dof_ptr.resize(dof_handler.tria->n_levels());
+        dof_handler.object_dof_ptr.shrink_to_fit();
+
+        dof_handler.cell_dof_cache_indices.clear();
+        dof_handler.cell_dof_cache_indices.resize(dof_handler.tria->n_levels());
+        dof_handler.cell_dof_cache_indices.shrink_to_fit();
+
+        dof_handler.cell_dof_cache_ptr.clear();
+        dof_handler.cell_dof_cache_ptr.resize(dof_handler.tria->n_levels());
+        dof_handler.cell_dof_cache_ptr.shrink_to_fit();
+      }
+
+      /**
        * Reserve enough space in the <tt>levels[]</tt> objects to store the
        * numbers of the degrees of freedom needed for the given element. The
        * given element is that one which was selected when calling
@@ -259,6 +284,8 @@ namespace internal
       template <int spacedim>
       static void reserve_space(DoFHandler<1, spacedim> &dof_handler)
       {
+        reset_to_empty_objects(dof_handler);
+
         dof_handler.object_dof_indices[0][0].resize(
           dof_handler.tria->n_vertices() *
             dof_handler.get_fe().n_dofs_per_vertex(),
@@ -300,6 +327,8 @@ namespace internal
       template <int spacedim>
       static void reserve_space(DoFHandler<2, spacedim> &dof_handler)
       {
+        reset_to_empty_objects(dof_handler);
+
         dof_handler.object_dof_indices[0][0].resize(
           dof_handler.tria->n_vertices() *
             dof_handler.get_fe().n_dofs_per_vertex(),
@@ -360,6 +389,8 @@ namespace internal
       static void reserve_space(DoFHandler<3, spacedim> &dof_handler)
       {
         const unsigned int dim = 3;
+
+        reset_to_empty_objects(dof_handler);
 
         dof_handler.object_dof_indices[0][0].resize(
           dof_handler.tria->n_vertices() *
@@ -979,7 +1010,7 @@ namespace internal
       struct Implementation
       {
         /**
-         * No future_fe_indices should have been assigned when partitioning a
+         * No future FE indices should have been assigned when partitioning a
          * triangulation, since they are only available locally and will not be
          * communicated.
          */
@@ -995,59 +1026,6 @@ namespace internal
                 !cell->future_fe_index_set(),
                 ExcMessage(
                   "There shouldn't be any cells flagged for p-adaptation when partitioning."));
-        }
-
-
-
-        /**
-         * Do that part of reserving space that pertains to releasing
-         * the previously used memory.
-         */
-        template <int dim, int spacedim>
-        static void
-        reserve_space_release_space(DoFHandler<dim, spacedim> &dof_handler)
-        {
-          // Release all space except the fields for active_fe_indices and
-          // refinement flags which we have to back up before
-          {
-            std::vector<std::vector<
-              typename DoFHandler<dim, spacedim>::active_fe_index_type>>
-              active_fe_backup(dof_handler.hp_cell_active_fe_indices.size()),
-              future_fe_backup(dof_handler.hp_cell_future_fe_indices.size());
-            for (unsigned int level = 0;
-                 level < dof_handler.hp_cell_future_fe_indices.size();
-                 ++level)
-              {
-                active_fe_backup[level] =
-                  std::move(dof_handler.hp_cell_active_fe_indices[level]);
-                future_fe_backup[level] =
-                  std::move(dof_handler.hp_cell_future_fe_indices[level]);
-              }
-
-            // delete all levels and set them up newly, since vectors
-            // are troublesome if you want to change their size
-            dof_handler.clear_space();
-
-            dof_handler.object_dof_indices.resize(dof_handler.tria->n_levels());
-            dof_handler.object_dof_ptr.resize(dof_handler.tria->n_levels());
-            dof_handler.cell_dof_cache_indices.resize(
-              dof_handler.tria->n_levels());
-            dof_handler.cell_dof_cache_ptr.resize(dof_handler.tria->n_levels());
-            dof_handler.hp_cell_active_fe_indices.resize(
-              dof_handler.tria->n_levels());
-            dof_handler.hp_cell_future_fe_indices.resize(
-              dof_handler.tria->n_levels());
-
-            for (unsigned int level = 0; level < dof_handler.tria->n_levels();
-                 ++level)
-              {
-                // recover backups
-                dof_handler.hp_cell_active_fe_indices[level] =
-                  std::move(active_fe_backup[level]);
-                dof_handler.hp_cell_future_fe_indices[level] =
-                  std::move(future_fe_backup[level]);
-              }
-          }
         }
 
 
@@ -1090,7 +1068,7 @@ namespace internal
                                      [cell->vertex_index(v)] = true;
 
                 // in debug mode, make sure that each vertex is associated
-                // with at least one fe (note that except for unused
+                // with at least one FE (note that except for unused
                 // vertices, all vertices are actually active). this is of
                 // course only true for vertices that are part of either
                 // ghost or locally owned cells
@@ -1259,7 +1237,7 @@ namespace internal
           // description in hp::DoFLevel) with the indices we will
           // need. Note that our task is more complicated than for the
           // cell case above since two adjacent cells may have different
-          // active_fe_indices, in which case we need to allocate
+          // active FE indices, in which case we need to allocate
           // *two* sets of face dofs for the same face. But they don't
           // *have* to be different, and so we need to prepare for this
           // as well.
@@ -1533,7 +1511,8 @@ namespace internal
                    dof_handler.hp_cell_future_fe_indices.size(),
                  ExcInternalError());
 
-          reserve_space_release_space(dof_handler);
+          internal::DoFHandlerImplementation::Implementation::
+            reset_to_empty_objects(dof_handler);
 
           Threads::TaskGroup<> tasks;
           tasks +=
@@ -1556,7 +1535,8 @@ namespace internal
                    dof_handler.hp_cell_future_fe_indices.size(),
                  ExcInternalError());
 
-          reserve_space_release_space(dof_handler);
+          internal::DoFHandlerImplementation::Implementation::
+            reset_to_empty_objects(dof_handler);
 
           Threads::TaskGroup<> tasks;
           tasks +=
@@ -1581,7 +1561,8 @@ namespace internal
                    dof_handler.hp_cell_future_fe_indices.size(),
                  ExcInternalError());
 
-          reserve_space_release_space(dof_handler);
+          internal::DoFHandlerImplementation::Implementation::
+            reset_to_empty_objects(dof_handler);
 
           Threads::TaskGroup<> tasks;
           tasks +=
@@ -1717,7 +1698,7 @@ namespace internal
 
         /**
          * Given a DoFHandler object in hp-mode, make sure that the
-         * active_fe_indices that a user has set for locally owned cells are
+         * active FE indices that a user has set for locally owned cells are
          * communicated to all other relevant cells as well.
          *
          * For parallel::shared::Triangulation objects,
@@ -1741,9 +1722,9 @@ namespace internal
             {
               // we have a shared triangulation. in this case, every processor
               // knows about all cells, but every processor only has knowledge
-              // about the active_fe_index on the cells it owns.
+              // about the active FE index on the cells it owns.
               //
-              // we can create a complete set of active_fe_indices by letting
+              // we can create a complete set of active FE indices by letting
               // every processor create a vector of indices for all cells,
               // filling only those on the cells it owns and setting the indices
               // on the other cells to zero. then we add all of these vectors
@@ -1760,7 +1741,7 @@ namespace internal
                                   tr->get_communicator(),
                                   active_fe_indices);
 
-              // now go back and fill the active_fe_index on all other
+              // now go back and fill the active FE index on all other
               // cells. we would like to call cell->set_active_fe_index(),
               // but that function does not allow setting these indices on
               // non-locally_owned cells. so we have to work around the
@@ -1828,7 +1809,7 @@ namespace internal
          * future refinement and coarsening. Further, prepare those indices to
          * be distributed on on the updated triangulation later.
          *
-         * On cells to be refined, the active_fe_index will be inherited to
+         * On cells to be refined, the active FE index will be inherited to
          * their children and thus will be stored as such.
          *
          * On cells to be coarsened, we choose the finite element on the parent
@@ -1840,7 +1821,7 @@ namespace internal
          * information.
          *
          * On cells intended for p-refinement or p-coarsening, those
-         * active_fe_indices will be determined by the corresponding flags that
+         * active FE indices will be determined by the corresponding flags that
          * have been set on the relevant cells.
          */
         template <int dim, int spacedim>
@@ -1855,7 +1836,7 @@ namespace internal
               {
                 if (cell->refine_flag_set())
                   {
-                    // Store the active_fe_index of each cell that will be
+                    // Store the active FE index of each cell that will be
                     // refined to and distribute it later on its children.
                     // Pick their future index if flagged for p-refinement.
                     fe_transfer->refined_cells_fe_index.insert(
@@ -1864,18 +1845,18 @@ namespace internal
                 else if (cell->coarsen_flag_set())
                   {
                     // From all cells that will be coarsened, determine their
-                    // parent and calculate its proper active_fe_index, so that
+                    // parent and calculate its proper active FE index, so that
                     // it can be set after refinement. But first, check if that
                     // particular cell has a parent at all.
                     Assert(cell->level() > 0, ExcInternalError());
                     const auto &parent = cell->parent();
 
-                    // Check if the active_fe_index for the current cell has
+                    // Check if the active FE index for the current cell has
                     // been determined already.
                     if (fe_transfer->coarsened_cells_fe_index.find(parent) ==
                         fe_transfer->coarsened_cells_fe_index.end())
                       {
-                        // Find a suitable active_fe_index for the parent cell
+                        // Find a suitable active FE index for the parent cell
                         // based on the 'least dominant finite element' of its
                         // children. Consider the childrens' hypothetical future
                         // index when they have been flagged for p-refinement.
@@ -1898,7 +1879,7 @@ namespace internal
                   {
                     // No h-refinement is scheduled for this cell.
                     // However, it may have p-refinement indicators, so we
-                    // choose a new active_fe_index based on its flags.
+                    // choose a new active FE index based on its flags.
                     if (cell->future_fe_index_set() == true)
                       fe_transfer->persisting_cells_fe_index.insert(
                         {cell, cell->future_fe_index()});
@@ -1919,7 +1900,7 @@ namespace internal
         {
           const auto &fe_transfer = dof_handler.active_fe_index_transfer;
 
-          // Set active_fe_indices on persisting cells.
+          // Set active FE indices on persisting cells.
           for (const auto &persist : fe_transfer->persisting_cells_fe_index)
             {
               const auto &cell = persist.first;
@@ -1931,7 +1912,7 @@ namespace internal
                 }
             }
 
-          // Distribute active_fe_indices from all refined cells on their
+          // Distribute active FE indices from all refined cells on their
           // respective children.
           for (const auto &refine : fe_transfer->refined_cells_fe_index)
             {
@@ -1945,7 +1926,7 @@ namespace internal
                 }
             }
 
-          // Set active_fe_indices on coarsened cells that have been determined
+          // Set active FE indices on coarsened cells that have been determined
           // before the actual coarsening happened.
           for (const auto &coarsen : fe_transfer->coarsened_cells_fe_index)
             {
@@ -1959,7 +1940,7 @@ namespace internal
 
         /**
          * Coarsening strategy for the CellDataTransfer object responsible for
-         * transferring the active_fe_index of each cell on
+         * transferring the active FE index of each cell on
          * parallel::distributed::Triangulation objects that have been refined.
          *
          * A finite element index needs to be determined for the (not yet
@@ -2459,24 +2440,24 @@ DoFHandler<dim, spacedim>::set_fe(const hp::FECollection<dim, spacedim> &ff)
           this->hp_cell_future_fe_indices.shrink_to_fit();
         }
 
-      // re-enabling hp-mode is not permitted since the active and future fe
+      // re-enabling hp-mode is not permitted since the active and future FE
       // tables are no longer available
       AssertThrow(
         hp_capability_enabled || !contains_multiple_fes,
         ExcMessage(
-          "You cannot re-enable hp capabilities after you registered a single "
+          "You cannot re-enable hp-capabilities after you registered a single "
           "finite element. Please create a new DoFHandler object instead."));
     }
 
   if (hp_capability_enabled)
     {
-      // make sure every processor knows the active_fe_indices
+      // make sure every processor knows the active FE indices
       // on both its own cells and all ghost cells
       dealii::internal::hp::DoFHandlerImplementation::Implementation::
         communicate_active_fe_indices(*this);
 
-      // make sure that the fe collection is large enough to
-      // cover all fe indices presently in use on the mesh
+      // make sure that the FE collection is large enough to
+      // cover all FE indices presently in use on the mesh
       for (const auto &cell : this->active_cell_iterators())
         if (!cell->is_artificial())
           Assert(cell->active_fe_index() < this->fe_collection.size(),
@@ -2511,7 +2492,9 @@ DoFHandler<dim, spacedim>::distribute_dofs(
          ExcMessage("The Triangulation you are using is empty!"));
   Assert(ff.size() > 0, ExcMessage("The hp::FECollection given is empty!"));
 
+  //
   // register the new finite element collection
+  //
   // don't create a new object if the one we have is identical
   if (this->fe_collection != ff)
     {
@@ -2536,27 +2519,29 @@ DoFHandler<dim, spacedim>::distribute_dofs(
           this->hp_cell_future_fe_indices.shrink_to_fit();
         }
 
-      // re-enabling hp-mode is not permitted since the active and future fe
+      // re-enabling hp-mode is not permitted since the active and future FE
       // tables are no longer available
       AssertThrow(
         hp_capability_enabled || !contains_multiple_fes,
         ExcMessage(
-          "You cannot re-enable hp capabilities after you registered a single "
+          "You cannot re-enable hp-capabilities after you registered a single "
           "finite element. Please call reinit() or create a new DoFHandler "
           "object instead."));
     }
 
+  //
   // enumerate all degrees of freedom
+  //
   if (hp_capability_enabled)
     {
-      // make sure every processor knows the active_fe_indices
+      // make sure every processor knows the active FE indices
       // on both its own cells and all ghost cells
-      dealii::internal::hp::DoFHandlerImplementation::Implementation::
+      internal::hp::DoFHandlerImplementation::Implementation::
         communicate_active_fe_indices(*this);
 
 #ifdef DEBUG
-      // make sure that the fe collection is large enough to
-      // cover all fe indices presently in use on the mesh
+      // make sure that the FE collection is large enough to
+      // cover all FE indices presently in use on the mesh
       for (const auto &cell : this->active_cell_iterators())
         {
           if (!cell->is_artificial())
@@ -2569,104 +2554,72 @@ DoFHandler<dim, spacedim>::distribute_dofs(
                                      this->fe_collection.size()));
         }
 #endif
-
-      object_dof_indices.resize(this->tria->n_levels());
-      object_dof_ptr.resize(this->tria->n_levels());
-      cell_dof_cache_indices.resize(this->tria->n_levels());
-      cell_dof_cache_ptr.resize(this->tria->n_levels());
-
-      // If an underlying shared::Tria allows artificial cells,
-      // then save the current set of subdomain ids, and set
-      // subdomain ids to the "true" owner of each cell. we later
-      // restore these flags
-      std::vector<types::subdomain_id>                      saved_subdomain_ids;
-      const parallel::shared::Triangulation<dim, spacedim> *shared_tria =
-        (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
-          &this->get_triangulation()));
-      if (shared_tria != nullptr && shared_tria->with_artificial_cells())
-        {
-          saved_subdomain_ids.resize(shared_tria->n_active_cells());
-
-          const std::vector<types::subdomain_id> &true_subdomain_ids =
-            shared_tria->get_true_subdomain_ids_of_cells();
-
-          for (const auto &cell : shared_tria->active_cell_iterators())
-            {
-              const unsigned int index   = cell->active_cell_index();
-              saved_subdomain_ids[index] = cell->subdomain_id();
-              cell->set_subdomain_id(true_subdomain_ids[index]);
-            }
-        }
-
-      // then allocate space for all the other tables
-      dealii::internal::hp::DoFHandlerImplementation::Implementation::
-        reserve_space(*this);
-
-      // now undo the subdomain modification
-      if (shared_tria != nullptr && shared_tria->with_artificial_cells())
-        for (const auto &cell : shared_tria->active_cell_iterators())
-          cell->set_subdomain_id(
-            saved_subdomain_ids[cell->active_cell_index()]);
-
-
-      // Clear user flags because we will need them. But first we save
-      // them and make sure that we restore them later such that at the
-      // end of this function the Triangulation will be in the same
-      // state as it was at the beginning of this function.
-      std::vector<bool> user_flags;
-      this->tria->save_user_flags(user_flags);
-      const_cast<Triangulation<dim, spacedim> &>(*this->tria)
-        .clear_user_flags();
-
-
-      /////////////////////////////////
-
-      // Now for the real work:
-      this->number_cache = this->policy->distribute_dofs();
-
-      /////////////////////////////////
-
-      // do some housekeeping: compress indices
-      //{
-      //  Threads::TaskGroup<> tg;
-      //  for (int level = this->levels_hp.size() - 1; level >= 0; --level)
-      //    tg += Threads::new_task(
-      //      &dealii::internal::hp::DoFLevel::compress_data<dim, spacedim>,
-      //      *this->levels_hp[level],
-      //      this->fe_collection);
-      //  tg.join_all();
-      //}
-
-      // finally restore the user flags
-      const_cast<Triangulation<dim, spacedim> &>(*this->tria)
-        .load_user_flags(user_flags);
     }
-  else
+
+  // We would like to enumerate all dofs for shared::Triangulations. If an
+  // underlying shared::Tria allows artificial cells, we need to restore the
+  // true cell owners temporarily. We save the current set of subdomain ids, set
+  // subdomain ids to the "true" owner of each cell, and later restore these
+  // flags.
+  std::vector<types::subdomain_id>                      saved_subdomain_ids;
+  const parallel::shared::Triangulation<dim, spacedim> *shared_tria =
+    (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
+      &this->get_triangulation()));
+  if (shared_tria != nullptr && shared_tria->with_artificial_cells())
     {
-      // delete all levels and set them up newly. note that we still have to
-      // allocate space for all degrees of freedom on this mesh (including ghost
-      // and cells that are entirely stored on different processors), though we
-      // may not assign numbers to some of them (i.e. they will remain at
-      // invalid_dof_index). We need to allocate the space because we will want
-      // to be able to query the dof_indices on each cell, and simply be told
-      // that we don't know them on some cell (i.e. get back invalid_dof_index)
-      this->clear_space();
-      object_dof_indices.resize(this->tria->n_levels());
-      object_dof_ptr.resize(this->tria->n_levels());
-      cell_dof_cache_indices.resize(this->tria->n_levels());
-      cell_dof_cache_ptr.resize(this->tria->n_levels());
-      internal::DoFHandlerImplementation::Implementation::reserve_space(*this);
+      saved_subdomain_ids.resize(shared_tria->n_active_cells());
 
-      // hand things off to the policy
-      this->number_cache = this->policy->distribute_dofs();
+      const std::vector<types::subdomain_id> &true_subdomain_ids =
+        shared_tria->get_true_subdomain_ids_of_cells();
 
-      // initialize the block info object only if this is a sequential
-      // triangulation. it doesn't work correctly yet if it is parallel
-      if (dynamic_cast<
-            const parallel::DistributedTriangulationBase<dim, spacedim> *>(
-            &*this->tria) == nullptr)
-        this->block_info_object.initialize(*this, false, true);
+      for (const auto &cell : shared_tria->active_cell_iterators())
+        {
+          const unsigned int index   = cell->active_cell_index();
+          saved_subdomain_ids[index] = cell->subdomain_id();
+          cell->set_subdomain_id(true_subdomain_ids[index]);
+        }
     }
+
+  // Adjust size of levels to the triangulation. Note that we still have to
+  // allocate space for all degrees of freedom on this mesh (including ghost
+  // and cells that are entirely stored on different processors), though we
+  // may not assign numbers to some of them (i.e. they will remain at
+  // invalid_dof_index). We need to allocate the space because we will want
+  // to be able to query the dof_indices on each cell, and simply be told
+  // that we don't know them on some cell (i.e. get back invalid_dof_index)
+  if (hp_capability_enabled)
+    internal::hp::DoFHandlerImplementation::Implementation::reserve_space(
+      *this);
+  else
+    internal::DoFHandlerImplementation::Implementation::reserve_space(*this);
+
+  // undo the subdomain modification
+  if (shared_tria != nullptr && shared_tria->with_artificial_cells())
+    for (const auto &cell : shared_tria->active_cell_iterators())
+      cell->set_subdomain_id(saved_subdomain_ids[cell->active_cell_index()]);
+
+  // hand the actual work over to the policy
+  this->number_cache = this->policy->distribute_dofs();
+
+  // do some housekeeping: compress indices
+  // if(hp_capability_enabled)
+  //   {
+  //     Threads::TaskGroup<> tg;
+  //     for (int level = this->levels_hp.size() - 1; level >= 0; --level)
+  //       tg += Threads::new_task(
+  //         &dealii::internal::hp::DoFLevel::compress_data<dim, spacedim>,
+  //         *this->levels_hp[level],
+  //         this->fe_collection);
+  //     tg.join_all();
+  //   }
+
+  // Initialize the block info object only if this is a sequential
+  // triangulation. It doesn't work correctly yet if it is parallel and has not
+  // yet been implemented for hp-mode.
+  if (!hp_capability_enabled &&
+      dynamic_cast<const parallel::DistributedTriangulationBase<dim, spacedim>
+                     *>(&*this->tria) == nullptr)
+    this->block_info_object.initialize(*this, false, true);
 }
 
 
@@ -3090,7 +3043,7 @@ DoFHandler<dim, spacedim>::connect_to_triangulation_signals()
     [this]() { this->create_active_fe_table(); }));
 
   // attach corresponding callback functions dealing with the transfer of
-  // active_fe_indices depending on the type of triangulation
+  // active FE indices depending on the type of triangulation
   if (dynamic_cast<
         const dealii::parallel::DistributedTriangulationBase<dim, spacedim> *>(
         &this->get_triangulation()))
@@ -3166,14 +3119,11 @@ DoFHandler<dim, spacedim>::create_active_fe_table()
   //  while (this->levels_hp.size() < this->tria->n_levels())
   //    this->levels_hp.emplace_back(new dealii::internal::hp::DoFLevel);
 
-  while (this->hp_cell_active_fe_indices.size() < this->tria->n_levels())
-    this->hp_cell_active_fe_indices.push_back({});
-
-  while (this->hp_cell_future_fe_indices.size() < this->tria->n_levels())
-    this->hp_cell_future_fe_indices.push_back({});
+  this->hp_cell_active_fe_indices.resize(this->tria->n_levels());
+  this->hp_cell_future_fe_indices.resize(this->tria->n_levels());
 
   // then make sure that on each level we have the appropriate size
-  // of active_fe_indices; preset them to zero, i.e. the default FE
+  // of active FE indices; preset them to zero, i.e. the default FE
   for (unsigned int level = 0; level < this->hp_cell_future_fe_indices.size();
        ++level)
     {
@@ -3187,7 +3137,7 @@ DoFHandler<dim, spacedim>::create_active_fe_table()
         }
       else
         {
-          // Either the active_fe_indices have size zero because
+          // Either the active FE indices have size zero because
           // they were just created, or the correct size. Other
           // sizes indicate that something went wrong.
           Assert(this->hp_cell_active_fe_indices[level].size() ==
@@ -3198,7 +3148,7 @@ DoFHandler<dim, spacedim>::create_active_fe_table()
         }
 
       // it may be that the previous table was compressed; in that
-      // case, restore the correct active_fe_index. the fact that
+      // case, restore the correct active FE index. the fact that
       // this no longer matches the indices in the table is of no
       // importance because the current function is called at a
       // point where we have to recreate the dof_indices tables in
@@ -3225,31 +3175,21 @@ DoFHandler<dim, spacedim>::update_active_fe_table()
   //      this->levels_hp.pop_back();
   //    }
 
-  while (this->hp_cell_active_fe_indices.size() < this->tria->n_levels())
-    this->hp_cell_active_fe_indices.push_back({});
+  this->hp_cell_active_fe_indices.resize(this->tria->n_levels());
+  this->hp_cell_active_fe_indices.shrink_to_fit();
 
-  while (this->hp_cell_active_fe_indices.size() > this->tria->n_levels())
-    this->hp_cell_active_fe_indices.pop_back();
+  this->hp_cell_future_fe_indices.resize(this->tria->n_levels());
+  this->hp_cell_future_fe_indices.shrink_to_fit();
 
-  while (this->hp_cell_future_fe_indices.size() < this->tria->n_levels())
-    this->hp_cell_future_fe_indices.push_back({});
-
-  while (this->hp_cell_future_fe_indices.size() > this->tria->n_levels())
-    this->hp_cell_future_fe_indices.pop_back();
-
-
-
-  Assert(this->hp_cell_future_fe_indices.size() == this->tria->n_levels(),
-         ExcInternalError());
   for (unsigned int i = 0; i < this->hp_cell_future_fe_indices.size(); ++i)
     {
-      // Resize active_fe_indices vectors. Use zero indicator to extend.
+      // Resize active FE indices vectors. Use zero indicator to extend.
       this->hp_cell_active_fe_indices[i].resize(this->tria->n_raw_cells(i), 0);
 
-      // Resize future_fe_indices vectors. Make sure that all
-      // future_fe_indices have been cleared after refinement happened.
+      // Resize future FE indices vectors. Make sure that all
+      // future FE indices have been cleared after refinement happened.
       //
-      // We have used future_fe_indices to update all active_fe_indices
+      // We have used future FE indices to update all active FE indices
       // before refinement happened, thus we are safe to clear them now.
       this->hp_cell_future_fe_indices[i].assign(this->tria->n_raw_cells(i),
                                                 invalid_active_fe_index);
@@ -3293,12 +3233,12 @@ DoFHandler<dim, spacedim>::pre_distributed_transfer_action()
   active_fe_index_transfer = std::make_unique<ActiveFEIndexTransfer>();
 
   // If we work on a p::d::Triangulation, we have to transfer all
-  // active_fe_indices since ownership of cells may change. We will
+  // active FE indices since ownership of cells may change. We will
   // use our p::d::CellDataTransfer member to achieve this. Further,
   // we prepare the values in such a way that they will correspond to
-  // the active_fe_indices on the new mesh.
+  // the active FE indices on the new mesh.
 
-  // Gather all current future_fe_indices.
+  // Gather all current future FE indices.
   active_fe_index_transfer->active_fe_indices.resize(
     get_triangulation().n_active_cells(), numbers::invalid_unsigned_int);
 
@@ -3349,7 +3289,7 @@ DoFHandler<dim, spacedim>::post_transfer_action()
   dealii::internal::hp::DoFHandlerImplementation::Implementation::
     distribute_fe_indices_on_refined_cells(*this);
 
-  // We have to distribute the information about active_fe_indices
+  // We have to distribute the information about active FE indices
   // of all cells (including the artificial ones) on all processors,
   // if a parallel::shared::Triangulation has been used.
   dealii::internal::hp::DoFHandlerImplementation::Implementation::
@@ -3372,17 +3312,17 @@ DoFHandler<dim, spacedim>::post_distributed_transfer_action()
 
   Assert(this->active_fe_index_transfer != nullptr, ExcInternalError());
 
-  // Unpack active_fe_indices.
+  // Unpack active FE indices.
   this->active_fe_index_transfer->active_fe_indices.resize(
     this->get_triangulation().n_active_cells(), numbers::invalid_unsigned_int);
   this->active_fe_index_transfer->cell_data_transfer->unpack(
     this->active_fe_index_transfer->active_fe_indices);
 
-  // Update all locally owned active_fe_indices.
+  // Update all locally owned active FE indices.
   this->set_active_fe_indices(
     this->active_fe_index_transfer->active_fe_indices);
 
-  // Update active_fe_indices on ghost cells.
+  // Update active FE indices on ghost cells.
   dealii::internal::hp::DoFHandlerImplementation::Implementation::
     communicate_active_fe_indices(*this);
 
@@ -3438,9 +3378,9 @@ DoFHandler<dim, spacedim>::prepare_for_serialization_of_active_fe_indices()
     });
 
   // If we work on a p::d::Triangulation, we have to transfer all
-  // active fe indices since ownership of cells may change.
+  // active FE indices since ownership of cells may change.
 
-  // Gather all current active_fe_indices
+  // Gather all current active FE indices
   get_active_fe_indices(active_fe_index_transfer->active_fe_indices);
 
   // Attach to transfer object
@@ -3495,16 +3435,16 @@ DoFHandler<dim, spacedim>::deserialize_active_fe_indices()
                                                   fe_collection);
     });
 
-  // Unpack active_fe_indices.
+  // Unpack active FE indices.
   active_fe_index_transfer->active_fe_indices.resize(
     get_triangulation().n_active_cells(), numbers::invalid_unsigned_int);
   active_fe_index_transfer->cell_data_transfer->deserialize(
     active_fe_index_transfer->active_fe_indices);
 
-  // Update all locally owned active_fe_indices.
+  // Update all locally owned active FE indices.
   set_active_fe_indices(active_fe_index_transfer->active_fe_indices);
 
-  // Update active_fe_indices on ghost cells.
+  // Update active FE indices on ghost cells.
   dealii::internal::hp::DoFHandlerImplementation::Implementation::
     communicate_active_fe_indices(*this);
 

@@ -174,8 +174,8 @@ public:
    * (which defaults to one, i.e. a scalar function), and the time variable,
    * which defaults to zero.
    */
-  Function(const unsigned int n_components = 1,
-           const time_type    initial_time = 0.0);
+  explicit Function(const unsigned int n_components = 1,
+                    const time_type    initial_time = 0.0);
 
   /**
    * Copy constructor.
@@ -390,10 +390,10 @@ public:
 
   /**
    * Return an estimate for the memory consumption, in bytes, of this object.
-   * This is not exact (but will usually be close) because calculating the
-   * memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
+   *
+   * This function is virtual and can be overloaded by derived classes.
    */
-  std::size_t
+  virtual std::size_t
   memory_consumption() const;
 };
 
@@ -414,22 +414,22 @@ namespace Functions
      * Constructor; set values of all components to the provided one. The
      * default number of components is one.
      */
-    ConstantFunction(const RangeNumberType value,
-                     const unsigned int    n_components = 1);
+    explicit ConstantFunction(const RangeNumberType value,
+                              const unsigned int    n_components = 1);
 
     /**
      * Constructor; takes an <tt>std::vector<RangeNumberType></tt> object as an
      * argument. The number of components is determined by
      * <tt>values.size()</tt>.
      */
-    ConstantFunction(const std::vector<RangeNumberType> &values);
+    explicit ConstantFunction(const std::vector<RangeNumberType> &values);
 
     /**
      * Constructor; takes an <tt>Vector<RangeNumberType></tt> object as an
      * argument. The number of components is determined by
      * <tt>values.size()</tt>.
      */
-    ConstantFunction(const Vector<RangeNumberType> &values);
+    explicit ConstantFunction(const Vector<RangeNumberType> &values);
 
     /**
      * Constructor; uses whatever stores in [begin_ptr, begin_ptr+n_components)
@@ -483,8 +483,8 @@ namespace Functions
     laplacian(const Point<dim> & point,
               const unsigned int component = 0) const override;
 
-    std::size_t
-    memory_consumption() const;
+    virtual std::size_t
+    memory_consumption() const override;
 
   protected:
     /**
@@ -513,7 +513,7 @@ namespace Functions
     /**
      * Constructor. The number of components is preset to one.
      */
-    ZeroFunction(const unsigned int n_components = 1);
+    explicit ZeroFunction(const unsigned int n_components = 1);
   };
 
 } // namespace Functions
@@ -602,11 +602,9 @@ public:
 
   /**
    * Return an estimate for the memory consumption, in bytes, of this object.
-   * This is not exact (but will usually be close) because calculating the
-   * memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
    */
-  std::size_t
-  memory_consumption() const;
+  virtual std::size_t
+  memory_consumption() const override;
 
 protected:
   /**
@@ -709,7 +707,7 @@ public:
    * value, convert this into an object that matches the Function<dim,
    * RangeNumberType> interface.
    */
-  ScalarFunctionFromFunctionObject(
+  explicit ScalarFunctionFromFunctionObject(
     const std::function<RangeNumberType(const Point<dim> &)> &function_object);
 
   /**
@@ -878,7 +876,7 @@ public:
    * method will trigger an exception, unless you first call the
    * set_function_gradients() method.
    */
-  FunctionFromFunctionObjects(
+  explicit FunctionFromFunctionObjects(
     const std::vector<std::function<RangeNumberType(const Point<dim> &)>>
       &          values,
     const double initial_time = 0.0);
@@ -1011,7 +1009,7 @@ public:
    * the first argument.  This should be such that the entire tensor_function
    * fits inside the <tt>n_component</tt> length return vector.
    */
-  VectorFunctionFromTensorFunction(
+  explicit VectorFunctionFromTensorFunction(
     const TensorFunction<1, dim, RangeNumberType> &tensor_function,
     const unsigned int                             selected_component = 0,
     const unsigned int                             n_components       = dim);

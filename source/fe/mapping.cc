@@ -141,6 +141,76 @@ Mapping<dim, spacedim>::project_real_point_to_unit_point_on_face(
   return {};
 }
 
+
+
+#ifndef DOXYGEN
+template <int dim, int spacedim>
+void
+Mapping<dim, spacedim>::fill_fe_face_values(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const unsigned int                                          face_no,
+  const hp::QCollection<dim - 1> &                            quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    &output_data) const
+{
+  // base class version, implement overriden function in derived classes
+  AssertDimension(quadrature.size(), 1);
+  fill_fe_face_values(cell, face_no, quadrature[0], internal_data, output_data);
+}
+
+
+
+template <int dim, int spacedim>
+void
+Mapping<dim, spacedim>::fill_fe_face_values(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const unsigned int                                          face_no,
+  const Quadrature<dim - 1> &                                 quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    &output_data) const
+{
+  Assert(false,
+         ExcMessage("Use of a deprecated interface, please implement "
+                    "fill_fe_face_values taking a hp::QCollection argument"));
+  (void)cell;
+  (void)face_no;
+  (void)quadrature;
+  (void)internal_data;
+  (void)output_data;
+}
+
+
+
+template <int dim, int spacedim>
+std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
+Mapping<dim, spacedim>::get_face_data(
+  const UpdateFlags               update_flags,
+  const hp::QCollection<dim - 1> &quadrature) const
+{
+  // base class version, implement overriden function in derived classes
+  return get_face_data(update_flags, quadrature[0]);
+}
+
+
+
+template <int dim, int spacedim>
+std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
+Mapping<dim, spacedim>::get_face_data(
+  const UpdateFlags          update_flags,
+  const Quadrature<dim - 1> &quadrature) const
+{
+  Assert(false,
+         ExcMessage("Use of a deprecated interface, please implement "
+                    "fill_fe_face_values taking a hp::QCollection argument"));
+  (void)update_flags;
+  (void)quadrature;
+
+  return std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>();
+}
+#endif
+
 /* ---------------------------- InternalDataBase --------------------------- */
 
 

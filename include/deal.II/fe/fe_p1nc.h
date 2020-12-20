@@ -311,11 +311,13 @@ private:
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2, 2>
       &output_data) const override;
 
+  using FiniteElement<2, 2>::get_face_data;
+
   virtual std::unique_ptr<FiniteElement<2, 2>::InternalDataBase>
   get_face_data(
     const UpdateFlags update_flags,
     const Mapping<2, 2> &,
-    const Quadrature<1> &quadrature,
+    const hp::QCollection<1> &quadrature,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2, 2>
       &output_data) const override;
 
@@ -343,6 +345,8 @@ private:
     internal::FEValuesImplementation::FiniteElementRelatedData<2, 2>
       &output_data) const override;
 
+  using FiniteElement<2, 2>::fill_fe_face_values;
+
   /**
    * Compute the data on the face of the current cell.
    */
@@ -350,7 +354,7 @@ private:
   fill_fe_face_values(
     const Triangulation<2, 2>::cell_iterator &cell,
     const unsigned int                        face_no,
-    const Quadrature<1> &                     quadrature,
+    const hp::QCollection<1> &                quadrature,
     const Mapping<2, 2> &                     mapping,
     const Mapping<2, 2>::InternalDataBase &   mapping_internal,
     const dealii::internal::FEValuesImplementation::MappingRelatedData<2, 2>

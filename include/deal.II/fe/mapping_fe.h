@@ -401,10 +401,12 @@ public:
   virtual std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
   get_data(const UpdateFlags, const Quadrature<dim> &quadrature) const override;
 
+  using Mapping<dim, spacedim>::get_face_data;
+
   // documentation can be found in Mapping::get_face_data()
   virtual std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
-  get_face_data(const UpdateFlags          flags,
-                const Quadrature<dim - 1> &quadrature) const override;
+  get_face_data(const UpdateFlags               flags,
+                const hp::QCollection<dim - 1> &quadrature) const override;
 
   // documentation can be found in Mapping::get_subface_data()
   virtual std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
@@ -421,12 +423,14 @@ public:
     dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
 
+  using Mapping<dim, spacedim>::fill_fe_face_values;
+
   // documentation can be found in Mapping::fill_fe_face_values()
   virtual void
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const Quadrature<dim - 1> &                                 quadrature,
+    const hp::QCollection<dim - 1> &                            quadrature,
     const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
     dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;

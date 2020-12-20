@@ -52,7 +52,7 @@ namespace hp
   {
   public:
     /**
-     * Whenever p adaptivity is considered in an hp finite element program,
+     * Whenever p-adaptivity is considered in an hp-finite element program,
      * a hierarchy of finite elements needs to be established to determine
      * succeeding finite elements for refinement and preceding ones for
      * coarsening.
@@ -283,10 +283,10 @@ namespace hp
     /**
      * Return whether all elements in this collection implement the hanging
      * node constraints in the new way, which has to be used to make elements
-     * "hp compatible". If this is not the case, the function returns false,
+     * "hp-compatible". If this is not the case, the function returns false,
      * which implies, that at least one element in the FECollection does not
      * support the new face interface constraints. On the other hand, if this
-     * method does return true, this does not imply that the hp method will
+     * method does return true, this does not imply that the hp-method will
      * work!
      *
      * This behavior is related to the fact, that FiniteElement classes,

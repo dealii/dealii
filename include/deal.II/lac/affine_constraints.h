@@ -443,7 +443,7 @@ class AffineConstraints;
  *
  * The algorithms used in the implementation of this class are described in
  * some detail in the
- * @ref hp_paper "hp paper".
+ * @ref hp_paper "hp-paper".
  * There is also a significant amount of documentation on how to use this
  * class in the
  * @ref constraints
@@ -1442,7 +1442,7 @@ public:
    * sparsity pattern entries.
    *
    * As explained in the
-   * @ref hp_paper "hp paper"
+   * @ref hp_paper "hp-paper"
    * and in step-27, first allocating a sparsity pattern and later coming back
    * and allocating additional entries for those matrix entries that will be
    * written to due to the elimination of constrained degrees of freedom
@@ -2280,110 +2280,116 @@ class BlockSparsityPatternBase;
 template <typename number>
 class BlockSparseMatrixEZ;
 
-/**
- * A "traits" class that can be used to determine whether a given type is a
- * block matrix type or not. For example,
- * @code
- *   IsBlockMatrix<SparseMatrix<number> >::value
- * @endcode
- * has the value `false`, whereas
- * @code
- *   IsBlockMatrix<BlockSparseMatrix<number> >::value
- * @endcode
- * is true. This is sometimes useful in template contexts where we may want to
- * do things differently depending on whether a template type denotes a
- * regular or a block matrix type.
- *
- * @see
- * @ref GlossBlockLA "Block (linear algebra)"
- */
-template <typename MatrixType>
-struct IsBlockMatrix
+namespace internal
 {
-private:
-  /**
-   * Overload returning true if the class is derived from BlockMatrixBase,
-   * which is what block matrices do (with the exception of
-   * BlockSparseMatrixEZ).
-   */
-  template <typename T>
-  static std::true_type
-  check(const BlockMatrixBase<T> *);
+  namespace AffineConstraints
+  {
+    /**
+     * A "traits" class that can be used to determine whether a given type is a
+     * block matrix type or not. For example,
+     * @code
+     *   IsBlockMatrix<SparseMatrix<number> >::value
+     * @endcode
+     * has the value `false`, whereas
+     * @code
+     *   IsBlockMatrix<BlockSparseMatrix<number> >::value
+     * @endcode
+     * is true. This is sometimes useful in template contexts where we may want
+     * to do things differently depending on whether a template type denotes a
+     * regular or a block matrix type.
+     *
+     * @see
+     * @ref GlossBlockLA "Block (linear algebra)"
+     */
+    template <typename MatrixType>
+    struct IsBlockMatrix
+    {
+    private:
+      /**
+       * Overload returning true if the class is derived from BlockMatrixBase,
+       * which is what block matrices do (with the exception of
+       * BlockSparseMatrixEZ).
+       */
+      template <typename T>
+      static std::true_type
+      check(const BlockMatrixBase<T> *);
 
-  /**
-   * Overload for BlockSparseMatrixEZ, which is the only block matrix not
-   * derived from BlockMatrixBase at the time of writing this class.
-   */
-  template <typename T>
-  static std::true_type
-  check(const BlockSparseMatrixEZ<T> *);
+      /**
+       * Overload for BlockSparseMatrixEZ, which is the only block matrix not
+       * derived from BlockMatrixBase at the time of writing this class.
+       */
+      template <typename T>
+      static std::true_type
+      check(const BlockSparseMatrixEZ<T> *);
 
-  /**
-   * Catch all for all other potential types that are then apparently not block
-   * matrices.
-   */
-  static std::false_type
-  check(...);
+      /**
+       * Catch all for all other potential types that are then apparently not
+       * block matrices.
+       */
+      static std::false_type
+      check(...);
 
-public:
-  /**
-   * A statically computable value that indicates whether the template
-   * argument to this class is a block matrix (in fact whether the type is
-   * derived from BlockMatrixBase<T> or is one of the other block matrix
-   * types).
-   */
-  static const bool value =
-    std::is_same<decltype(check(std::declval<MatrixType *>())),
-                 std::true_type>::value;
-};
+    public:
+      /**
+       * A statically computable value that indicates whether the template
+       * argument to this class is a block matrix (in fact whether the type is
+       * derived from BlockMatrixBase<T> or is one of the other block matrix
+       * types).
+       */
+      static const bool value =
+        std::is_same<decltype(check(std::declval<MatrixType *>())),
+                     std::true_type>::value;
+    };
 
-// instantiation of the static member
-template <typename MatrixType>
-const bool IsBlockMatrix<MatrixType>::value;
+    // instantiation of the static member
+    template <typename MatrixType>
+    const bool IsBlockMatrix<MatrixType>::value;
 
 
-/**
- * A class that can be used to determine whether a given type is a block
- * sparsity pattern type or not. In this, it matches the IsBlockMatrix
- * class.
- *
- * @see
- * @ref GlossBlockLA "Block (linear algebra)"
- */
-template <typename MatrixType>
-struct IsBlockSparsityPattern
-{
-private:
-  /**
-   * Overload returning true if the class is derived from
-   * BlockSparsityPatternBase, which is what block sparsity patterns do.
-   */
-  template <typename T>
-  static std::true_type
-  check(const BlockSparsityPatternBase<T> *);
+    /**
+     * A class that can be used to determine whether a given type is a block
+     * sparsity pattern type or not. In this, it matches the IsBlockMatrix
+     * class.
+     *
+     * @see
+     * @ref GlossBlockLA "Block (linear algebra)"
+     */
+    template <typename MatrixType>
+    struct IsBlockSparsityPattern
+    {
+    private:
+      /**
+       * Overload returning true if the class is derived from
+       * BlockSparsityPatternBase, which is what block sparsity patterns do.
+       */
+      template <typename T>
+      static std::true_type
+      check(const BlockSparsityPatternBase<T> *);
 
-  /**
-   * Catch all for all other potential types that are then apparently not block
-   * sparsity patterns.
-   */
-  static std::false_type
-  check(...);
+      /**
+       * Catch all for all other potential types that are then apparently not
+       * block sparsity patterns.
+       */
+      static std::false_type
+      check(...);
 
-public:
-  /**
-   * A statically computable value that indicates whether the template
-   * argument to this class is a block sparsity pattern (in fact whether the
-   * type is derived from BlockSparsityPatternBase<T>).
-   */
-  static const bool value =
-    std::is_same<decltype(check(std::declval<MatrixType *>())),
-                 std::true_type>::value;
-};
+    public:
+      /**
+       * A statically computable value that indicates whether the template
+       * argument to this class is a block sparsity pattern (in fact whether the
+       * type is derived from BlockSparsityPatternBase<T>).
+       */
+      static const bool value =
+        std::is_same<decltype(check(std::declval<MatrixType *>())),
+                     std::true_type>::value;
+    };
 
-// instantiation of the static member
-template <typename MatrixType>
-const bool IsBlockSparsityPattern<MatrixType>::value;
+    // instantiation of the static member
+    template <typename MatrixType>
+    const bool IsBlockSparsityPattern<MatrixType>::value;
 
+  } // namespace AffineConstraints
+} // namespace internal
 
 
 template <typename number>
@@ -2404,7 +2410,9 @@ AffineConstraints<number>::distribute_local_to_global(
     global_matrix,
     dummy,
     false,
-    std::integral_constant<bool, IsBlockMatrix<MatrixType>::value>());
+    std::integral_constant<
+      bool,
+      internal::AffineConstraints::IsBlockMatrix<MatrixType>::value>());
 }
 
 
@@ -2429,7 +2437,9 @@ AffineConstraints<number>::distribute_local_to_global(
     global_matrix,
     global_vector,
     use_inhomogeneities_for_rhs,
-    std::integral_constant<bool, IsBlockMatrix<MatrixType>::value>());
+    std::integral_constant<
+      bool,
+      internal::AffineConstraints::IsBlockMatrix<MatrixType>::value>());
 }
 
 
@@ -2450,9 +2460,9 @@ AffineConstraints<number>::add_entries_local_to_global(
     sparsity_pattern,
     keep_constrained_entries,
     dof_mask,
-    std::integral_constant<
-      bool,
-      IsBlockSparsityPattern<SparsityPatternType>::value>());
+    std::integral_constant<bool,
+                           internal::AffineConstraints::IsBlockSparsityPattern<
+                             SparsityPatternType>::value>());
 }
 
 DEAL_II_NAMESPACE_CLOSE

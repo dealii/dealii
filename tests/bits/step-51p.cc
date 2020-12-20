@@ -30,6 +30,7 @@ std::ofstream logfile("output");
 #include <deal.II/base/work_stream.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_dgp.h>
@@ -43,8 +44,6 @@ std::ofstream logfile("output");
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>

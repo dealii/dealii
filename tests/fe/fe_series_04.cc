@@ -36,13 +36,14 @@ bfloat(C(3)), nouns;
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_series.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/lac/vector.h>
@@ -86,7 +87,7 @@ void
 test(const LegendreFunction<dim> &func, const unsigned int poly_degree)
 {
   Triangulation<dim>    triangulation;
-  hp::DoFHandler<dim>   dof_handler(triangulation);
+  DoFHandler<dim>       dof_handler(triangulation);
   hp::FECollection<dim> fe_collection;
   hp::QCollection<dim>  quadrature_formula;
 
@@ -115,7 +116,7 @@ test(const LegendreFunction<dim> &func, const unsigned int poly_degree)
   Table<1, double> coeff_out(N);
   Vector<double>   local_dof_values;
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  typename DoFHandler<dim>::active_cell_iterator cell =
     dof_handler.begin_active();
   {
     const unsigned int cell_n_dofs          = cell->get_fe().dofs_per_cell;

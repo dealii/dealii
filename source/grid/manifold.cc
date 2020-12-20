@@ -892,8 +892,19 @@ FlatManifold<dim, spacedim>::normal_vector(
   const unsigned int facedim = dim - 1;
 
   Point<facedim> xi;
-  for (unsigned int i = 0; i < facedim; ++i)
-    xi[i] = 1. / 2;
+
+  const auto face_reference_cell_type = face->reference_cell_type();
+
+  if (face_reference_cell_type == ReferenceCell::get_hypercube(facedim))
+    {
+      for (unsigned int i = 0; i < facedim; ++i)
+        xi[i] = 1. / 2;
+    }
+  else
+    {
+      for (unsigned int i = 0; i < facedim; ++i)
+        xi[i] = 1. / 3;
+    }
 
   const double        eps = 1e-12;
   Tensor<1, spacedim> grad_F[facedim];
@@ -901,17 +912,17 @@ FlatManifold<dim, spacedim>::normal_vector(
   while (true)
     {
       Point<spacedim> F;
-      for (const unsigned int v : GeometryInfo<facedim>::vertex_indices())
-        F += face->vertex(v) *
-             GeometryInfo<facedim>::d_linear_shape_function(xi, v);
+      for (const unsigned int v : face->vertex_indices())
+        F += face->vertex(v) * ReferenceCell::d_linear_shape_function(
+                                 face_reference_cell_type, xi, v);
 
       for (unsigned int i = 0; i < facedim; ++i)
         {
           grad_F[i] = 0;
-          for (const unsigned int v : GeometryInfo<facedim>::vertex_indices())
+          for (const unsigned int v : face->vertex_indices())
             grad_F[i] +=
-              face->vertex(v) *
-              GeometryInfo<facedim>::d_linear_shape_function_gradient(xi, v)[i];
+              face->vertex(v) * ReferenceCell::d_linear_shape_function_gradient(
+                                  face_reference_cell_type, xi, v)[i];
         }
 
       Tensor<1, facedim> J;

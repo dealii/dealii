@@ -54,9 +54,8 @@ test()
   // Create a Mapping
   Vector<double> map_vector(dh.n_dofs());
   VectorTools::get_position_vector(dh, map_vector);
-  MappingFEField<dim, spacedim, Vector<double>, DoFHandler<dim>> mapping(
-    dh, map_vector);
-  MappingQGeneric<dim> mapping_ref(fe.degree);
+  MappingFEField<dim, spacedim, Vector<double>> mapping(dh, map_vector);
+  MappingQGeneric<dim>                          mapping_ref(fe.degree);
 
   QGauss<dim>   quad(1);
   FEValues<dim> fe_values_ref(mapping_ref, fe, quad, update_quadrature_points);
