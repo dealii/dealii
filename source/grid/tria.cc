@@ -11987,6 +11987,31 @@ Triangulation<dim, spacedim>::last_active() const
 
 template <int dim, int spacedim>
 typename Triangulation<dim, spacedim>::cell_iterator
+Triangulation<dim, spacedim>::create_cell_iterator(const CellId &cell_id) const
+{
+  cell_iterator cell(
+    this, 0, coarse_cell_id_to_coarse_cell_index(cell_id.get_coarse_cell_id()));
+
+  for (const auto &child_index : cell_id.get_child_indices())
+    {
+      Assert(
+        cell->has_children(),
+        ExcMessage(
+          "CellId is invalid for this triangulation.\n"
+          "Either the provided CellId does not correspond to a cell in this "
+          "triangulation object, or, in case you are using a parallel "
+          "triangulation, may correspond to an artificial cell that is less "
+          "refined on this processor."));
+      cell = cell->child(static_cast<unsigned int>(child_index));
+    }
+
+  return cell;
+}
+
+
+
+template <int dim, int spacedim>
+typename Triangulation<dim, spacedim>::cell_iterator
 Triangulation<dim, spacedim>::end() const
 {
   return cell_iterator(const_cast<Triangulation<dim, spacedim> *>(this),

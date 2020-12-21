@@ -25,6 +25,7 @@
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/subscriptor.h>
 
+#include <deal.II/grid/cell_id.h>
 #include <deal.II/grid/tria_description.h>
 #include <deal.II/grid/tria_iterator_selector.h>
 #include <deal.II/grid/tria_levels.h>
@@ -2744,6 +2745,21 @@ public:
   last_active() const;
 
   /**
+   * Return an iterator to a cell of this Triangulation object constructed from
+   * an independent CellId object.
+   *
+   * If the given argument corresponds to a valid cell in this triangulation,
+   * this operation will always succeed for sequential triangulations where the
+   * current processor stores all cells that are part of the triangulation. On
+   * the other hand, if this is a parallel triangulation, then the current
+   * processor may not actually know about this cell. In this case, this
+   * operation will succeed for locally relevant cells, but may not for
+   * artificial cells that are less refined on the current processor.
+   */
+  cell_iterator
+  create_cell_iterator(const CellId &cell_id) const;
+
+  /**
    * @name Cell iterator functions returning ranges of iterators
    */
 
@@ -4028,8 +4044,6 @@ private:
     ImplementationMixedMesh;
 
   friend class dealii::internal::TriangulationImplementation::TriaObjects;
-
-  friend class CellId;
 
   // explicitly check for sensible template arguments, but not on windows
   // because MSVC creates bogus warnings during normal compilation

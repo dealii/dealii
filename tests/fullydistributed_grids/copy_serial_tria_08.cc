@@ -65,7 +65,7 @@ test(int n_refinements, MPI_Comm comm)
   for (auto &cell : tria_pft.active_cell_iterators())
     {
       CellId id        = cell->id();
-      auto   cell_base = id.to_cell(basetria);
+      auto   cell_base = basetria.create_cell_iterator(id);
       // Assert(cell->center() == cell_base->center(),
       //       ExcMessage("Cells do not match"));
       for (unsigned int d = 0; d < dim; d++)
