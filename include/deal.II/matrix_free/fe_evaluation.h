@@ -3374,8 +3374,6 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   Assert(matrix_info->mapping_initialized() == true, ExcNotInitialized());
   AssertDimension(matrix_info->get_task_info().vectorization_length,
                   VectorizedArrayType::size());
-  AssertDimension((is_face ? data->n_q_points_face : data->n_q_points),
-                  n_quadrature_points);
   AssertDimension(n_quadrature_points, descriptor->n_q_points);
 }
 
@@ -4152,8 +4150,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     Utilities::fixed_power<dim>(this->data->data.front().fe_degree + 1);
   const unsigned int dofs_per_component =
     this->data->dofs_per_component_on_cell;
-  const unsigned int n_quadrature_points =
-    is_face ? this->data->n_q_points_face : this->data->n_q_points;
+  const unsigned int n_quadrature_points = this->n_quadrature_points;
 
   const unsigned int shift =
     std::max(tensor_dofs_per_component + 1, dofs_per_component) *
@@ -8353,7 +8350,7 @@ inline FEFaceEvaluation<dim,
               active_quad_index)
   , dofs_per_component(this->data->dofs_per_component_on_cell)
   , dofs_per_cell(this->data->dofs_per_component_on_cell * n_components_)
-  , n_q_points(this->data->n_q_points_face)
+  , n_q_points(this->n_quadrature_points)
 {}
 
 
