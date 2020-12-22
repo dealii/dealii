@@ -1194,6 +1194,7 @@ namespace Utilities
     if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
 #endif
       {
+        (void)allow_compression;
         const std::size_t previous_size = dest_buffer.size();
         dest_buffer.resize(previous_size + sizeof(T));
 
@@ -1255,6 +1256,7 @@ namespace Utilities
     if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
 #endif
       {
+        (void)allow_compression;
         Assert(std::distance(cbegin, cend) == sizeof(T), ExcInternalError());
         std::memcpy(&object, &*cbegin, sizeof(T));
       }
