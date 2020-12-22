@@ -3963,6 +3963,12 @@ public:
 
 protected:
   /**
+   * Number of the face selected the last time the reinit() function was
+   * called.
+   */
+  unsigned int present_face_no;
+
+  /**
    * Index of the face selected the last time the reinit() function was
    * called.
    */
@@ -5901,7 +5907,7 @@ template <int dim, int spacedim>
 inline const Quadrature<dim - 1> &
 FEFaceValuesBase<dim, spacedim>::get_quadrature() const
 {
-  return quadrature[0];
+  return quadrature[quadrature.size() == 1 ? 0 : present_face_no];
 }
 
 
