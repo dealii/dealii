@@ -418,7 +418,7 @@ public:
    * Constructor. Initialize the array with the given dimensions in each index
    * component.
    */
-  TableBase(const TableIndices<N> &sizes);
+  explicit TableBase(const TableIndices<N> &sizes);
 
   /**
    * Constructor. Initialize the array with the given dimensions in each index
@@ -716,7 +716,7 @@ public:
   /**
    * Constructor. Pass down the given dimension to the base class.
    */
-  Table(const size_type size);
+  explicit Table(const size_type size);
 
   /**
    * Constructor. Create a table with a given size and initialize it from a

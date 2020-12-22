@@ -85,7 +85,7 @@ public:
    *
    * @dealiiOperationIsMultithreaded
    */
-  AlignedVector(const size_type size, const T &init = T());
+  explicit AlignedVector(const size_type size, const T &init = T());
 
   /**
    * Destructor.
