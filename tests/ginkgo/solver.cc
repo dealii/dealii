@@ -101,8 +101,8 @@ main(int argc, char **argv)
     u = 0.;
     check_solver_within_range(gmres_solver.solve(A, u, f),
                               control.last_step(),
-                              20,
-                              49);
+                              23,
+                              29);
     u = 0.;
     check_solver_within_range(ir_solver_cg.solve(A, u, f),
                               control.last_step(),
