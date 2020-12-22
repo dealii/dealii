@@ -79,15 +79,26 @@ class FE_Nothing : public FiniteElement<dim, spacedim>
 {
 public:
   /**
-   * Constructor. First argument denotes the number of components to give this
+   * Constructor.
+   *
+   * The first argument specifies the reference-cell type.
+   *
+   * The second argument denotes the number of components to give this
    * finite element (default = 1).
    *
-   * Second argument decides whether FE_Nothing will dominate any other FE in
+   * The third argument decides whether FE_Nothing will dominate any other FE in
    * compare_for_domination() (default = false). Therefore at interfaces where,
    * for example, a Q1 meets an FE_Nothing, we will force the traces of the two
    * functions to be the same. Because the FE_Nothing encodes a space that is
    * zero everywhere, this means that the Q1 field will be forced to become zero
    * at this interface.
+   */
+  FE_Nothing(const ReferenceCell::Type &type,
+             const unsigned int         n_components = 1,
+             const bool                 dominate     = false);
+
+  /**
+   * Same as above but for a hypercube reference-cell type.
    */
   FE_Nothing(const unsigned int n_components = 1, const bool dominate = false);
 
