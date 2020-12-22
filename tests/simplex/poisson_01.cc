@@ -38,6 +38,8 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 
+#include <deal.II/hp/q_collection.h>
+
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
@@ -96,7 +98,7 @@ void
 test(const Triangulation<dim, spacedim> &tria,
      const FiniteElement<dim, spacedim> &fe,
      const Quadrature<dim> &             quad,
-     const Quadrature<dim - 1> &         face_quad,
+     const hp::QCollection<dim - 1> &    face_quad,
      const Mapping<dim, spacedim> &      mapping,
      const double                        r_boundary,
      const bool                          do_use_fe_face_values = true)
@@ -230,7 +232,7 @@ test(const Triangulation<dim, spacedim> &tria,
           if (face->at_boundary() && (face->boundary_id() == 1))
             {
               fe_face_values->reinit(cell, face);
-              for (unsigned int q = 0; q < face_quad.size(); ++q)
+              for (const auto q : fe_face_values->quadrature_point_indices())
                 for (unsigned int i = 0; i < dofs_per_cell; ++i)
                   cell_rhs(i) +=
                     (1.0 *                               // 1.0
@@ -289,7 +291,9 @@ test(const Triangulation<dim, spacedim> &tria,
 
       data_out.build_patches(mapping);
 
-      std::ofstream output("result.vtk");
+      static unsigned int counter = 0;
+
+      std::ofstream output("result" + std::to_string(counter++) + ".vtk");
       data_out.write_vtk(output);
     }
 }
@@ -372,7 +376,8 @@ test_tet(const MPI_Comm &comm, const Parameters<dim> &params)
 
   Simplex::QGauss<dim> quad(params.degree + 1);
 
-  Simplex::QGauss<dim - 1> face_quad(params.degree + 1);
+  hp::QCollection<dim - 1> face_quad{
+    Simplex::QGauss<dim - 1>(params.degree + 1)};
 
   Simplex::FE_P<dim> fe_mapping(1);
   MappingFE<dim>     mapping(fe_mapping);
@@ -415,12 +420,12 @@ test_hex(const MPI_Comm &comm, const Parameters<dim> &params)
 
   QGauss<dim> quad(params.degree + 1);
 
-  QGauss<dim - 1> quad_face(params.degree + 1);
+  hp::QCollection<dim - 1> face_quad{QGauss<dim - 1>(params.degree + 1)};
 
   MappingQ<dim, spacedim> mapping(1);
 
   // 4) Perform test (independent of mesh type)
-  test(tria, fe, quad, quad_face, mapping, params.p2[0]);
+  test(tria, fe, quad, face_quad, mapping, params.p2[0]);
 }
 
 template <int dim, int spacedim = dim>
@@ -501,13 +506,18 @@ test_wedge(const MPI_Comm &comm, const Parameters<dim> &params)
 
   Simplex::QGaussWedge<dim> quad(params.degree + 1);
 
-  Quadrature<dim - 1> face_quad; // not needed
+  hp::QCollection<dim - 1> face_quad{
+    Simplex::QGauss<dim - 1>(params.degree + 1),
+    Simplex::QGauss<dim - 1>(params.degree + 1),
+    QGauss<dim - 1>(params.degree + 1),
+    QGauss<dim - 1>(params.degree + 1),
+    QGauss<dim - 1>(params.degree + 1)};
 
   Simplex::FE_WedgeP<dim> fe_mapping(1);
   MappingFE<dim>          mapping(fe_mapping);
 
   // 4) Perform test (independent of mesh type)
-  test(*tria, fe, quad, face_quad, mapping, params.p2[0], false);
+  test(*tria, fe, quad, face_quad, mapping, params.p2[0], true);
 }
 
 template <int dim, int spacedim = dim>
@@ -588,13 +598,18 @@ test_pyramid(const MPI_Comm &comm, const Parameters<dim> &params)
 
   Simplex::QGaussPyramid<dim> quad(params.degree + 1);
 
-  Quadrature<dim - 1> face_quad; // not needed
+  hp::QCollection<dim - 1> face_quad{
+    QGauss<dim - 1>(params.degree + 1),
+    Simplex::QGauss<dim - 1>(params.degree + 1),
+    Simplex::QGauss<dim - 1>(params.degree + 1),
+    Simplex::QGauss<dim - 1>(params.degree + 1),
+    Simplex::QGauss<dim - 1>(params.degree + 1)};
 
   Simplex::FE_PyramidP<dim> fe_mapping(1);
   MappingFE<dim>            mapping(fe_mapping);
 
   // 4) Perform test (independent of mesh type)
-  test(*tria, fe, quad, face_quad, mapping, params.p2[0], false);
+  test(*tria, fe, quad, face_quad, mapping, params.p2[0], true);
 }
 
 int
