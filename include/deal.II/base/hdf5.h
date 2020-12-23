@@ -326,38 +326,6 @@ DEAL_II_NAMESPACE_OPEN
  * thread-safe HDF5 version serializes the API but does not provide any level of
  * concurrency. To achieve high parallel performance with HDF5, we advice to use
  * HDF5 with MPI.
- *
- * # Exceptions and parallel HDF5
- * In certain corner cases, exceptions combined with parallel HDF5 can freeze
- * deal.II. If one MPI process throws an exception and not the other ones, then
- * deal.II freezes. The reason is that the following happens:
- * 1. On the processor that calls the exception we try to close the parallel
- *   MPI file (H5F_try_close) which ultimately results in a barrier
- *   (MPI_barrier). This is triggered by the destructor of an HDF5Object.
- * 2. On the processor that does not call the exception we call
- *   H5VL_dataset_write() and end up in MPI_Allreduce().
- *
- * This could happen if an error is found in all the processes except one. For
- * example, the following code could potentially freeze deal.II:
- * @code
- * HDF5::File data_file(filename,
- *                            HDF5::File::FileAccessMode::create,
- *                            mpi_communicator);
- * {
- *  auto  dataset_a =
- *        data_file.create_dataset<double>(dataset_name_a, dataset_dimensions_a);
- *  dataset_a.write_selection(data_a, coordinates_a);
- * }
- *
- * AssertThrow(Utilities::MPI::this_mpi_process(mpi_communicator) == 0,
- *                   ExcInternalError());
- *
- * {
- *  auto  dataset_b =
- *        data_file.create_dataset<double>(dataset_name_b, dataset_dimensions_b);
- *  dataset_b.write_selection(data_b, coordinates_b);
- * }
- * @endcode
  */
 // clang-format on
 namespace HDF5
