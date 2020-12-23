@@ -29,11 +29,24 @@ test(const FiniteElement<dim, spacedim> &fe)
 {
   deallog << fe.get_name() << ": " << std::endl;
 
+  const auto &reference_cell =
+    ReferenceCell::internal::Info::get_cell(fe.reference_cell_type());
+
   deallog << "  n_dofs_per_vertex(): " << fe.n_dofs_per_vertex() << std::endl;
   deallog << "  n_dofs_per_line():   " << fe.n_dofs_per_line() << std::endl;
-  deallog << "  n_dofs_per_quad():   " << fe.n_dofs_per_quad() << std::endl;
+
+  deallog << "  n_dofs_per_quad():   ";
+  for (unsigned int i = 0; i < (dim == 2 ? 1 : reference_cell.n_faces()); ++i)
+    deallog << fe.n_dofs_per_quad(i) << " ";
+  deallog << std::endl;
+
   deallog << "  n_dofs_per_hex():    " << fe.n_dofs_per_hex() << std::endl;
-  deallog << "  n_dofs_per_face():   " << fe.n_dofs_per_face() << std::endl;
+
+  deallog << "  n_dofs_per_face():   ";
+  for (unsigned int i = 0; i < reference_cell.n_faces(); ++i)
+    deallog << fe.n_dofs_per_face(i) << " ";
+  deallog << std::endl;
+
   deallog << "  n_dofs_per_cell():   " << fe.n_dofs_per_cell() << std::endl;
   deallog << "  tensor_degree():     " << fe.tensor_degree() << std::endl;
 
@@ -49,8 +62,19 @@ main()
   test(Simplex::FE_P<2>(2));
   test(Simplex::FE_P<3>(1));
   test(Simplex::FE_P<3>(2));
+
   test(Simplex::FE_DGP<2>(1));
   test(Simplex::FE_DGP<2>(2));
   test(Simplex::FE_DGP<3>(1));
   test(Simplex::FE_DGP<3>(2));
+
+  test(Simplex::FE_WedgeP<3>(1));
+  test(Simplex::FE_WedgeP<3>(2));
+
+  test(Simplex::FE_WedgeDGP<3>(1));
+  test(Simplex::FE_WedgeDGP<3>(2));
+
+  test(Simplex::FE_PyramidP<3>(1));
+
+  test(Simplex::FE_PyramidDGP<3>(1));
 }

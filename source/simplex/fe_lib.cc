@@ -85,11 +85,10 @@ namespace Simplex
      * Helper function to set up the dpo vector of FE_WedgeP for a given @p degree.
      */
     internal::GenericDoFsPerObject
-    get_dpo_vector_fe_wedge(const unsigned int degree)
+    get_dpo_vector_fe_wedge_p(const unsigned int degree)
     {
       internal::GenericDoFsPerObject dpo;
 
-      // all dofs are internal
       if (degree == 1)
         {
           dpo.dofs_per_object_exclusive  = {{1}, {0}, {0, 0, 0, 0, 0}, {0}};
@@ -117,14 +116,33 @@ namespace Simplex
     }
 
     /**
-     * Helper function to set up the dpo vector of FE_WedgeP for a given @p degree.
+     * Helper function to set up the dpo vector of FE_WedgeDGP for a given @p degree.
      */
     internal::GenericDoFsPerObject
-    get_dpo_vector_fe_pyramid(const unsigned int degree)
+    get_dpo_vector_fe_wedge_dgp(const unsigned int degree)
+    {
+      unsigned int n_dofs = 0;
+
+      if (degree == 1)
+        n_dofs = 6;
+      else if (degree == 2)
+        n_dofs = 18;
+      else
+        Assert(false, ExcNotImplemented());
+
+      return internal::expand(3,
+                              {{0, 0, 0, n_dofs}},
+                              ReferenceCell::Type::Wedge);
+    }
+
+    /**
+     * Helper function to set up the dpo vector of FE_PyramidP for a given @p degree.
+     */
+    internal::GenericDoFsPerObject
+    get_dpo_vector_fe_pyramid_p(const unsigned int degree)
     {
       internal::GenericDoFsPerObject dpo;
 
-      // all dofs are internal
       if (degree == 1)
         {
           dpo.dofs_per_object_exclusive  = {{1}, {0}, {0, 0, 0, 0, 0}, {0}};
@@ -140,6 +158,24 @@ namespace Simplex
         }
 
       return dpo;
+    }
+
+    /**
+     * Helper function to set up the dpo vector of FE_PyramidDGP for a given @p degree.
+     */
+    internal::GenericDoFsPerObject
+    get_dpo_vector_fe_pyramid_dgp(const unsigned int degree)
+    {
+      unsigned int n_dofs = 0;
+
+      if (degree == 1)
+        n_dofs = 5;
+      else
+        Assert(false, ExcNotImplemented());
+
+      return internal::expand(3,
+                              {{0, 0, 0, n_dofs}},
+                              ReferenceCell::Type::Pyramid);
     }
   } // namespace
 
@@ -451,31 +487,27 @@ namespace Simplex
 
 
   template <int dim, int spacedim>
-  FE_WedgeP<dim, spacedim>::FE_WedgeP(const unsigned int degree)
+  FE_Wedge<dim, spacedim>::FE_Wedge(
+    const unsigned int                                degree,
+    const internal::GenericDoFsPerObject &            dpos,
+    const typename FiniteElementData<dim>::Conformity conformity)
     : dealii::FE_Poly<dim, spacedim>(
         Simplex::ScalarWedgePolynomial<dim>(degree),
-        FiniteElementData<dim>(get_dpo_vector_fe_wedge(degree),
+        FiniteElementData<dim>(dpos,
                                ReferenceCell::Type::Wedge,
                                1,
                                degree,
-                               FiniteElementData<dim>::H1),
-        std::vector<bool>(FiniteElementData<dim>(get_dpo_vector_fe_wedge(
-                                                   degree),
-                                                 ReferenceCell::Type::Wedge,
-                                                 1,
-                                                 degree)
-                            .dofs_per_cell,
-                          true),
+                               conformity),
+        std::vector<bool>(
+          FiniteElementData<dim>(dpos, ReferenceCell::Type::Wedge, 1, degree)
+            .dofs_per_cell,
+          true),
         std::vector<ComponentMask>(
-          FiniteElementData<dim>(get_dpo_vector_fe_wedge(degree),
-                                 ReferenceCell::Type::Wedge,
-                                 1,
-                                 degree)
+          FiniteElementData<dim>(dpos, ReferenceCell::Type::Wedge, 1, degree)
             .dofs_per_cell,
           std::vector<bool>(1, true)))
   {
     AssertDimension(dim, 3);
-
 
     if (degree == 1)
       {
@@ -485,13 +517,17 @@ namespace Simplex
         this->unit_support_points.emplace_back(1.0, 0.0, 1.0);
         this->unit_support_points.emplace_back(0.0, 1.0, 1.0);
         this->unit_support_points.emplace_back(0.0, 0.0, 1.0);
-
-        // TODO
-        this->unit_face_support_points[0].emplace_back(1.0, 0.0);
-        this->unit_face_support_points[0].emplace_back(0.0, 1.0);
-        this->unit_face_support_points[0].emplace_back(0.0, 0.0);
       }
   }
+
+
+
+  template <int dim, int spacedim>
+  FE_WedgeP<dim, spacedim>::FE_WedgeP(const unsigned int degree)
+    : FE_Wedge<dim, spacedim>(degree,
+                              get_dpo_vector_fe_wedge_p(degree),
+                              FiniteElementData<dim>::H1)
+  {}
 
 
 
@@ -579,7 +615,6 @@ namespace Simplex
   {
     (void)fe_other;
 
-
     AssertIndexRange(face_no, 5);
 
     if (face_no < 2)
@@ -604,26 +639,53 @@ namespace Simplex
 
 
   template <int dim, int spacedim>
-  FE_PyramidP<dim, spacedim>::FE_PyramidP(const unsigned int degree)
+  FE_WedgeDGP<dim, spacedim>::FE_WedgeDGP(const unsigned int degree)
+    : FE_Wedge<dim, spacedim>(degree,
+                              get_dpo_vector_fe_wedge_dgp(degree),
+                              FiniteElementData<dim>::L2)
+  {}
+
+
+
+  template <int dim, int spacedim>
+  std::unique_ptr<FiniteElement<dim, spacedim>>
+  FE_WedgeDGP<dim, spacedim>::clone() const
+  {
+    return std::make_unique<FE_WedgeDGP<dim, spacedim>>(*this);
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::string
+  FE_WedgeDGP<dim, spacedim>::get_name() const
+  {
+    std::ostringstream namebuf;
+    namebuf << "FE_WedgeDGP<" << dim << ">(" << this->degree << ")";
+
+    return namebuf.str();
+  }
+
+
+
+  template <int dim, int spacedim>
+  FE_Pyramid<dim, spacedim>::FE_Pyramid(
+    const unsigned int                                degree,
+    const internal::GenericDoFsPerObject &            dpos,
+    const typename FiniteElementData<dim>::Conformity conformity)
     : dealii::FE_Poly<dim, spacedim>(
         Simplex::ScalarPyramidPolynomial<dim>(degree),
-        FiniteElementData<dim>(get_dpo_vector_fe_pyramid(degree),
+        FiniteElementData<dim>(dpos,
                                ReferenceCell::Type::Pyramid,
                                1,
                                degree,
-                               FiniteElementData<dim>::H1),
-        std::vector<bool>(FiniteElementData<dim>(get_dpo_vector_fe_pyramid(
-                                                   degree),
-                                                 ReferenceCell::Type::Pyramid,
-                                                 1,
-                                                 degree)
-                            .dofs_per_cell,
-                          true),
+                               conformity),
+        std::vector<bool>(
+          FiniteElementData<dim>(dpos, ReferenceCell::Type::Pyramid, 1, degree)
+            .dofs_per_cell,
+          true),
         std::vector<ComponentMask>(
-          FiniteElementData<dim>(get_dpo_vector_fe_pyramid(degree),
-                                 ReferenceCell::Type::Pyramid,
-                                 1,
-                                 degree)
+          FiniteElementData<dim>(dpos, ReferenceCell::Type::Pyramid, 1, degree)
             .dofs_per_cell,
           std::vector<bool>(1, true)))
   {
@@ -639,6 +701,15 @@ namespace Simplex
         this->unit_support_points.emplace_back(+0.0, +0.0, 1.0);
       }
   }
+
+
+
+  template <int dim, int spacedim>
+  FE_PyramidP<dim, spacedim>::FE_PyramidP(const unsigned int degree)
+    : FE_Pyramid<dim, spacedim>(degree,
+                                get_dpo_vector_fe_pyramid_p(degree),
+                                FiniteElementData<dim>::H1)
+  {}
 
 
 
@@ -746,6 +817,36 @@ namespace Simplex
       result.emplace_back(i, i);
 
     return result;
+  }
+
+
+
+  template <int dim, int spacedim>
+  FE_PyramidDGP<dim, spacedim>::FE_PyramidDGP(const unsigned int degree)
+    : FE_Pyramid<dim, spacedim>(degree,
+                                get_dpo_vector_fe_pyramid_dgp(degree),
+                                FiniteElementData<dim>::L2)
+  {}
+
+
+
+  template <int dim, int spacedim>
+  std::unique_ptr<FiniteElement<dim, spacedim>>
+  FE_PyramidDGP<dim, spacedim>::clone() const
+  {
+    return std::make_unique<FE_PyramidDGP<dim, spacedim>>(*this);
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::string
+  FE_PyramidDGP<dim, spacedim>::get_name() const
+  {
+    std::ostringstream namebuf;
+    namebuf << "FE_PyramidDGP<" << dim << ">(" << this->degree << ")";
+
+    return namebuf.str();
   }
 
 
