@@ -25,17 +25,31 @@
 SET(GINKGO_DIR "" CACHE PATH "An optional hint to a GINKGO installation")
 SET_IF_EMPTY(GINKGO_DIR "$ENV{GINKGO_DIR}")
 
-find_package(Ginkgo
+#
+# Save and restore the ${CMAKE_MODULE_PATH} variable. The Ginkgo project
+# configuration unfortunately overrides the variable which causes
+# subsequent configuration to fail.
+#
+SET(_cmake_module_path ${CMAKE_MODULE_PATH})
+FIND_PACKAGE(Ginkgo
   HINTS ${GINKGO_DIR} ${Ginkgo_DIR} $ENV{Ginkgo_DIR}
   )
+SET(CMAKE_MODULE_PATH ${_cmake_module_path})
+
+#
+# Cosmetic clean up: Let's remove all variables beginning with "GINKGO_"
+# that are actually not used during configuration but show up in
+# detailed.log
+#
+unset(GINKGO_CXX_COMPILER)
 
 DEAL_II_PACKAGE_HANDLE(GINKGO
   LIBRARIES
-    REQUIRED GINKGO_INTERFACE_LINK_FLAGS
+    REQUIRED GINKGO_INTERFACE_LINK_LIBRARIES
   INCLUDE_DIRS
     REQUIRED GINKGO_INSTALL_INCLUDE_DIR
   USER_INCLUDE_DIRS
     REQUIRED GINKGO_INSTALL_INCLUDE_DIR
   CLEAR
-    GINKGO_INSTALL_INCLUDE_DIR GINKGO_INTERFACE_LINK_FLAGS
+    Ginkgo_DIR
   )
