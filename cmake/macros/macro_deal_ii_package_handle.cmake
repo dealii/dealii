@@ -67,6 +67,8 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature _var)
   SET(_fill_clear FALSE)
   SET(_clear "")
 
+  CLEAR_FEATURE(${_feature})
+
   FOREACH(_arg ${ARGN})
     IF(_arg MATCHES "^LIBRARIES(|_DEBUG|_RELEASE)$"
        OR _arg MATCHES "^(|BUNDLED_|USER_)INCLUDE_DIRS$"
