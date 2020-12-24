@@ -72,16 +72,25 @@ std::string
 FE_Nothing<dim, spacedim>::get_name() const
 {
   std::ostringstream namebuf;
-  namebuf << "FE_Nothing<" << dim << ">(";
+  namebuf << "FE_Nothing<" << Utilities::dim_string(dim, spacedim) << ">(";
+
+  std::vector<std::string> name_components;
+  if (this->reference_cell_type() != ReferenceCell::get_hypercube(dim))
+    name_components.push_back(
+      ReferenceCell::to_string(this->reference_cell_type()));
   if (this->n_components() > 1)
+    name_components.push_back(std::to_string(this->n_components()));
+  if (dominate)
+    name_components.emplace_back("dominating");
+
+  for (const std::string &comp : name_components)
     {
-      namebuf << this->n_components();
-      if (dominate)
-        namebuf << ", dominating";
+      namebuf << comp;
+      if (comp != name_components.back())
+        namebuf << ", ";
     }
-  else if (dominate)
-    namebuf << "dominating";
   namebuf << ")";
+
   return namebuf.str();
 }
 
@@ -195,29 +204,6 @@ bool
 FE_Nothing<dim, spacedim>::is_dominating() const
 {
   return dominate;
-}
-
-
-
-template <int dim, int spacedim>
-bool
-FE_Nothing<dim, spacedim>::
-operator==(const FiniteElement<dim, spacedim> &f) const
-{
-  // Compare fields stored in the base class
-  if (!(this->FiniteElement<dim, spacedim>::operator==(f)))
-    return false;
-
-  // Then make sure the other object is really of type FE_Nothing,
-  // and compare the data that has been passed to both objects'
-  // constructors.
-  if (const FE_Nothing<dim, spacedim> *fe_nothing =
-        dynamic_cast<const FE_Nothing<dim, spacedim> *>(&f))
-    return ((dominate == fe_nothing->dominate) &&
-            (this->components == fe_nothing->components) &&
-            (this->reference_cell_type() == fe_nothing->reference_cell_type()));
-  else
-    return false;
 }
 
 

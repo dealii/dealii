@@ -71,6 +71,39 @@ namespace ReferenceCell
   }
 
   /**
+   * Convert the given reference cell type to a string.
+   */
+  inline std::string
+  to_string(const Type &type)
+  {
+    switch (type)
+      {
+        case Type::Vertex:
+          return "Vertex";
+        case Type::Line:
+          return "Line";
+        case Type::Tri:
+          return "Tri";
+        case Type::Quad:
+          return "Quad";
+        case Type::Tet:
+          return "Tet";
+        case Type::Pyramid:
+          return "Pyramid";
+        case Type::Wedge:
+          return "Wedge";
+        case Type::Hex:
+          return "Hex";
+        case Type::Invalid:
+          return "Invalid";
+        default:
+          Assert(false, ExcNotImplemented());
+      }
+
+    return "Invalid";
+  }
+
+  /**
    * Return the correct simplex reference cell type for the given dimension
    * @p dim.
    */
