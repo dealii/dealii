@@ -11,9 +11,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: setup
-      run: |
-        ./contrib/utilities/download_clang_format
     - name: info
       run: |
         g++ -v
@@ -56,12 +53,10 @@ jobs:
     - name: setup
       run: |
         brew install openmpi
-        cmake --version
         # uncomment these for a gcc based build
         #export OMPI_CXX=g++
         #export OMPI_CC=gcc
         #export OMPI_FC=gfortran
-        ./contrib/utilities/download_clang_format
     - name: info
       run: |
         mpicxx -v
