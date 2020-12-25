@@ -282,8 +282,8 @@ MappingFE<dim, spacedim>::InternalData::initialize_face(
             unit_tangentials[6].emplace_back(t1);
 
           // face 2
-          t1[d0] = -1 / std::sqrt(2.0);
-          t1[d1] = +1 / std::sqrt(2.0);
+          t1[d0] = 1;
+          t1[d1] = 0;
           t1[d2] = 0;
           for (unsigned int i = 0; i < n_original_q_points; i++)
             unit_tangentials[2].emplace_back(t1);
@@ -296,30 +296,30 @@ MappingFE<dim, spacedim>::InternalData::initialize_face(
             unit_tangentials[7].emplace_back(t1);
 
           // face 3
-          t1[d0] = +0;
-          t1[d1] = +0;
-          t1[d2] = +1;
+          t1[d0] = -1 / std::sqrt(2.0);
+          t1[d1] = +1 / std::sqrt(2.0);
+          t1[d2] = 0;
           for (unsigned int i = 0; i < n_original_q_points; i++)
             unit_tangentials[3].emplace_back(t1);
 
           // face 3
-          t1[d0] = +0;
-          t1[d1] = +1;
-          t1[d2] = +0;
+          t1[d0] = 0;
+          t1[d1] = 0;
+          t1[d2] = 1;
           for (unsigned int i = 0; i < n_original_q_points; i++)
             unit_tangentials[8].emplace_back(t1);
 
           // face 4
-          t1[d0] = 1;
-          t1[d1] = 0;
-          t1[d2] = 0;
+          t1[d0] = +0;
+          t1[d1] = +0;
+          t1[d2] = +1;
           for (unsigned int i = 0; i < n_original_q_points; i++)
             unit_tangentials[4].emplace_back(t1);
 
           // face 4
-          t1[d0] = 0;
-          t1[d1] = 0;
-          t1[d2] = 1;
+          t1[d0] = +0;
+          t1[d1] = +1;
+          t1[d2] = +0;
           for (unsigned int i = 0; i < n_original_q_points; i++)
             unit_tangentials[9].emplace_back(t1);
         }
