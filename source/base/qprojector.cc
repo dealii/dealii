@@ -22,6 +22,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+//#define USE_ALTERNATIVE_PROJECTION_FOR_HYPERCUBE_CELLS
 
 template <int dim>
 Quadrature<2>
@@ -519,74 +520,104 @@ QProjector<2>::project_to_all_faces(
   const ReferenceCell::Type reference_cell_type,
   const hp::QCollection<1> &quadrature)
 {
+  const auto process = [&](const auto &faces) {
+    // linear polynomial to map the reference quadrature points correctly
+    // on faces
+    const Simplex::ScalarPolynomial<1> poly(1);
+
+    // new (projected) quadrature points and weights
+    std::vector<Point<2>> points;
+    std::vector<double>   weights;
+
+    // loop over all faces (lines) ...
+    for (unsigned int face_no = 0; face_no < faces.size(); ++face_no)
+      // ... and over all possible orientations
+      for (unsigned int orientation = 0; orientation < 2; ++orientation)
+        {
+          const auto &face = faces[face_no];
+
+          std::array<Point<2>, 2> support_points;
+
+          // determine support point of the current line with the correct
+          // orientation
+          switch (orientation)
+            {
+              case 0:
+                support_points = {{face.first[1], face.first[0]}};
+                break;
+              case 1:
+                support_points = {{face.first[0], face.first[1]}};
+                break;
+              default:
+                Assert(false, ExcNotImplemented());
+            }
+
+          // the quadrature rule to be projected ...
+          const auto &sub_quadrature_points =
+            quadrature[quadrature.size() == 1 ? 0 : face_no].get_points();
+          const auto &sub_quadrature_weights =
+            quadrature[quadrature.size() == 1 ? 0 : face_no].get_weights();
+
+          // loop over all quadrature points
+          for (unsigned int j = 0; j < sub_quadrature_points.size(); ++j)
+            {
+              Point<2> mapped_point;
+
+              // map reference quadrature point
+              for (unsigned int i = 0; i < 2; ++i)
+                mapped_point += support_points[i] *
+                                poly.compute_value(i, sub_quadrature_points[j]);
+
+              points.emplace_back(mapped_point);
+
+              // scale weight by arc length
+              weights.emplace_back(sub_quadrature_weights[j] * face.second);
+            }
+        }
+
+    // construct new quadrature rule
+    return Quadrature<2>(points, weights);
+  };
+
   if (reference_cell_type == ReferenceCell::Type::Tri)
     {
+      static const std::array<Point<2>, 3> points = {
+        {Point<2>(0.0, 0.0), Point<2>(1.0, 0.0), Point<2>(0.0, 1.0)}};
+
       // reference faces (defined by its support points and arc length)
       const std::array<std::pair<std::array<Point<2>, 2>, double>, 3> faces = {
-        {{{{Point<2>(0.0, 0.0), Point<2>(1.0, 0.0)}}, 1.0},
-         {{{Point<2>(1.0, 0.0), Point<2>(0.0, 1.0)}}, std::sqrt(2.0)},
-         {{{Point<2>(0.0, 1.0), Point<2>(0.0, 0.0)}}, 1.0}}};
+        {{{{points[0], points[1]}}, 1.0},
+         {{{points[1], points[2]}}, std::sqrt(2.0)},
+         {{{points[2], points[0]}}, 1.0}}};
 
-      // linear polynomial to map the reference quadrature points correctly
-      // on faces
-      const Simplex::ScalarPolynomial<1> poly(1);
+      return process(faces);
+    }
+  else if (reference_cell_type == ReferenceCell::Type::Quad
+#ifndef USE_ALTERNATIVE_PROJECTION_FOR_HYPERCUBE_CELLS
+           && false
+#endif
+  )
+    {
+      static const std::array<Point<2>, 4> points = {{Point<2>(0.0, 0.0),
+                                                      Point<2>(1.0, 0.0),
+                                                      Point<2>(0.0, 1.0),
+                                                      Point<2>(1.0, 1.0)}};
 
-      // new (projected) quadrature points and weights
-      std::vector<Point<2>> points;
-      std::vector<double>   weights;
+      // reference faces (defined by its support points and arc length)
+      const std::array<std::pair<std::array<Point<2>, 2>, double>, 4> faces = {
+        {{{{points[0], points[2]}}, 1.0},
+         {{{points[1], points[3]}}, 1.0},
+         {{{points[0], points[1]}}, 1.0},
+         {{{points[2], points[3]}}, 1.0}}};
 
-      // loop over all faces (lines) ...
-      for (unsigned int face_no = 0; face_no < faces.size(); ++face_no)
-        // ... and over all possible orientations
-        for (unsigned int orientation = 0; orientation < 2; ++orientation)
-          {
-            const auto &face = faces[face_no];
-
-            std::array<Point<2>, 2> support_points;
-
-            // determine support point of the current line with the correct
-            // orientation
-            switch (orientation)
-              {
-                case 0:
-                  support_points = {{face.first[1], face.first[0]}};
-                  break;
-                case 1:
-                  support_points = {{face.first[0], face.first[1]}};
-                  break;
-                default:
-                  Assert(false, ExcNotImplemented());
-              }
-
-            // the quadrature rule to be projected ...
-            const auto &sub_quadrature_points =
-              quadrature[quadrature.size() == 1 ? 0 : face_no].get_points();
-            const auto &sub_quadrature_weights =
-              quadrature[quadrature.size() == 1 ? 0 : face_no].get_weights();
-
-            // loop over all quadrature points
-            for (unsigned int j = 0; j < sub_quadrature_points.size(); ++j)
-              {
-                Point<2> mapped_point;
-
-                // map reference quadrature point
-                for (unsigned int i = 0; i < 2; ++i)
-                  mapped_point +=
-                    support_points[i] *
-                    poly.compute_value(i, sub_quadrature_points[j]);
-
-                points.emplace_back(mapped_point);
-
-                // scale weight by arc length
-                weights.emplace_back(sub_quadrature_weights[j] * face.second);
-              }
-          }
-
-      // construct new quadrature rule
-      return {points, weights};
+      return process(faces);
     }
 
+#ifdef USE_ALTERNATIVE_PROJECTION_FOR_HYPERCUBE_CELLS
+  Assert(false, ExcNotImplemented());
+#else
   Assert(reference_cell_type == ReferenceCell::Type::Quad, ExcNotImplemented());
+#endif
 
   const unsigned int dim = 2;
 
@@ -878,9 +909,37 @@ QProjector<3>::project_to_all_faces(
 
       return process(faces);
     }
+  else if (reference_cell_type == ReferenceCell::Type::Hex
+#ifndef USE_ALTERNATIVE_PROJECTION_FOR_HYPERCUBE_CELLS
+           && false
+#endif
+  )
+    {
+      static const std::array<Point<3>, 8> points = {{Point<3>(0.0, 0.0, 0.0),
+                                                      Point<3>(1.0, 0.0, 0.0),
+                                                      Point<3>(0.0, 1.0, 0.0),
+                                                      Point<3>(1.0, 1.0, 0.0),
+                                                      Point<3>(0.0, 0.0, 1.0),
+                                                      Point<3>(1.0, 0.0, 1.0),
+                                                      Point<3>(0.0, 1.0, 1.0),
+                                                      Point<3>(1.0, 1.0, 1.0)}};
 
+      const std::vector<std::pair<std::vector<Point<3>>, double>> faces = {
+        {{{{points[0], points[2], points[4], points[6]}}, 1.0},
+         {{{points[1], points[3], points[5], points[7]}}, 1.0},
+         {{{points[0], points[4], points[1], points[5]}}, 1.0},
+         {{{points[2], points[6], points[3], points[7]}}, 1.0},
+         {{{points[0], points[1], points[2], points[3]}}, 1.0},
+         {{{points[4], points[5], points[6], points[7]}}, 1.0}}};
 
+      return process(faces);
+    }
+
+#ifdef USE_ALTERNATIVE_PROJECTION_FOR_HYPERCUBE_CELLS
+  Assert(false, ExcNotImplemented());
+#else
   Assert(reference_cell_type == ReferenceCell::Type::Hex, ExcNotImplemented());
+#endif
 
   const unsigned int dim = 3;
 
@@ -1334,21 +1393,37 @@ QProjector<dim>::DataSetDescriptor::face(
   const bool                face_rotation,
   const unsigned int        n_quadrature_points)
 {
-  if (reference_cell_type == ReferenceCell::Type::Tri ||
-      reference_cell_type == ReferenceCell::Type::Tet)
+  if (
+#ifdef USE_ALTERNATIVE_PROJECTION_FOR_HYPERCUBE_CELLS
+    reference_cell_type == ReferenceCell::Type::Line ||
+    reference_cell_type == ReferenceCell::Type::Quad ||
+    reference_cell_type == ReferenceCell::Type::Hex ||
+#endif
+    reference_cell_type == ReferenceCell::Type::Tri ||
+    reference_cell_type == ReferenceCell::Type::Tet)
     {
-      if (dim == 2)
+      if (reference_cell_type == ReferenceCell::Type::Line)
+        return numbers::invalid_unsigned_int;
+
+      if (dim == 2) // Tri, Quad
         return {(2 * face_no + face_orientation) * n_quadrature_points};
-      else if (dim == 3)
+      else if (dim == 3) // Tet, Hex
         {
           const unsigned int orientation =
             (face_flip * 2 + face_rotation) * 2 + face_orientation;
-          return {(6 * face_no + orientation) * n_quadrature_points};
+          return {((reference_cell_type == ReferenceCell::Type::Hex ? 8 : 6) *
+                     face_no +
+                   orientation) *
+                  n_quadrature_points};
         }
     }
 
+#ifdef USE_ALTERNATIVE_PROJECTION_FOR_HYPERCUBE_CELLS
+  Assert(false, ExcNotImplemented());
+#else
   Assert(reference_cell_type == ReferenceCell::get_hypercube(dim),
          ExcNotImplemented());
+#endif
 
   Assert(face_no < GeometryInfo<dim>::faces_per_cell, ExcInternalError());
 
@@ -1422,19 +1497,32 @@ QProjector<dim>::DataSetDescriptor::face(
   const bool                      face_rotation,
   const hp::QCollection<dim - 1> &quadrature)
 {
-  if (reference_cell_type == ReferenceCell::Type::Tri ||
-      reference_cell_type == ReferenceCell::Type::Tet ||
-      reference_cell_type == ReferenceCell::Type::Wedge ||
-      reference_cell_type == ReferenceCell::Type::Pyramid)
+  if (
+#ifdef USE_ALTERNATIVE_PROJECTION_FOR_HYPERCUBE_CELLS
+    reference_cell_type == ReferenceCell::Type::Line ||
+    reference_cell_type == ReferenceCell::Type::Quad ||
+    reference_cell_type == ReferenceCell::Type::Hex ||
+#endif
+    reference_cell_type == ReferenceCell::Type::Tri ||
+    reference_cell_type == ReferenceCell::Type::Tet ||
+    reference_cell_type == ReferenceCell::Type::Wedge ||
+    reference_cell_type == ReferenceCell::Type::Pyramid)
     {
+      if (reference_cell_type == ReferenceCell::Type::Line)
+        return numbers::invalid_unsigned_int;
+
       unsigned int offset = 0;
 
       static const unsigned int X = numbers::invalid_unsigned_int;
-      static const std::array<unsigned int, 5> scale_tri   = {{2, 2, 2, X, X}};
-      static const std::array<unsigned int, 5> scale_tet   = {{6, 6, 6, 6, X}};
-      static const std::array<unsigned int, 5> scale_wedge = {{6, 6, 8, 8, 8}};
-      static const std::array<unsigned int, 5> scale_pyramid = {
-        {8, 6, 6, 6, 6}};
+      static const std::array<unsigned int, 6> scale_tri = {{2, 2, 2, X, X, X}};
+      static const std::array<unsigned int, 6> scale_quad = {
+        {2, 2, 2, 2, X, X}};
+      static const std::array<unsigned int, 6> scale_tet = {{6, 6, 6, 6, X, X}};
+      static const std::array<unsigned int, 6> scale_wedge = {
+        {6, 6, 8, 8, 8, X}};
+      static const std::array<unsigned int, 6> scale_pyramid = {
+        {8, 6, 6, 6, 6, X}};
+      static const std::array<unsigned int, 6> scale_hex = {{8, 8, 8, 8, 8, 8}};
 
       const auto &scale =
         (reference_cell_type == ReferenceCell::Type::Tri) ?
@@ -1443,7 +1531,11 @@ QProjector<dim>::DataSetDescriptor::face(
              scale_tet :
              ((reference_cell_type == ReferenceCell::Type::Wedge) ?
                 scale_wedge :
-                scale_pyramid));
+                ((reference_cell_type == ReferenceCell::Type::Pyramid) ?
+                   scale_pyramid :
+                   ((reference_cell_type == ReferenceCell::Type::Hex) ?
+                      scale_hex :
+                      scale_quad))));
 
       if (quadrature.size() == 1)
         offset = scale[0] * quadrature[0].size() * face_no;
@@ -1451,11 +1543,11 @@ QProjector<dim>::DataSetDescriptor::face(
         for (unsigned int i = 0; i < face_no; ++i)
           offset += scale[i] * quadrature[i].size();
 
-      if (dim == 2)
+      if (dim == 2) // Tri, Quad
         return {offset +
                 face_orientation *
                   quadrature[quadrature.size() == 1 ? 0 : face_no].size()};
-      else if (dim == 3)
+      else if (dim == 3) // Tet, Wedge, Pyramid, Hex
         {
           const unsigned int orientation =
             (face_flip * 2 + face_rotation) * 2 + face_orientation;
@@ -1466,8 +1558,12 @@ QProjector<dim>::DataSetDescriptor::face(
         }
     }
 
+#ifdef USE_ALTERNATIVE_PROJECTION_FOR_HYPERCUBE_CELLS
+  Assert(false, ExcNotImplemented());
+#else
   Assert(reference_cell_type == ReferenceCell::get_hypercube(dim),
          ExcNotImplemented());
+#endif
 
   Assert(face_no < GeometryInfo<dim>::faces_per_cell, ExcInternalError());
 
