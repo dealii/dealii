@@ -166,14 +166,14 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
         SET(_source_file "${_test_name}.cc")
 
-        SET(_target ${_test_name}.${_build_lowercase}) # target name
+        SET(_target ${_category}.${_test_name}.${_build_lowercase}) # target name
         SET(_run_args "$<TARGET_FILE:${_target}>") # the command to issue
 
       ELSEIF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.cu")
 
         SET(_source_file "${_test_name}.cu")
 
-        SET(_target ${_test_name}.${_build_lowercase}) # target name
+        SET(_target ${_category}.${_test_name}.${_build_lowercase}) # target name
         SET(_run_args "$<TARGET_FILE:${_target}>") # the command to issue
 
       ELSEIF( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm" OR
