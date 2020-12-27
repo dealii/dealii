@@ -23,6 +23,7 @@ SET(_unity_include_src
   manifold.cc
   manifold_lib.cc
   persistent_tria.cc
+  reference_cell.cc
   tria_accessor.cc
   tria_description.cc
   tria_faces.cc
@@ -64,6 +65,7 @@ SET(_inst
   intergrid_map.inst.in
   manifold.inst.in
   manifold_lib.inst.in
+  reference_cell.inst.in
   tria_accessor.inst.in
   tria_description.inst.in
   tria.inst.in

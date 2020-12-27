@@ -23,6 +23,15 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
+template <int dim, int spacedim>
+class Triangulation;
+template <int dim, int spacedim>
+class Mapping;
+template <int dim>
+class Quadrature;
+#endif
 
 /**
  * A namespace for reference cells.
@@ -478,6 +487,34 @@ namespace ReferenceCell
 
     return {};
   }
+
+  /*
+   * Create a (coarse) grid with a single cell of the shape of the provided
+   * reference cell.
+   */
+  template <int dim, int spacedim>
+  void
+  make_triangulation(const Type &                  reference_cell,
+                     Triangulation<dim, spacedim> &tria);
+
+  /**
+   * Return a default linear mapping matching the given reference cell
+   * (MappingQ1 for hypercube cells and MappingFE else).
+   */
+  template <int dim, int spacedim>
+  const Mapping<dim, spacedim> &
+  get_default_linear_mapping(const Type &reference_cell);
+
+  /**
+   * Return a Gauss-type quadrature matching the given reference cell(QGauss,
+   * Simplex::QGauss, Simplex::QGaussPyramid, Simplex::QGaussWedge) and
+   * @p n_points_1D the number of quadrature points in each direction (QGuass)
+   * or the indication of what polynomial degree to be integrated exactly.
+   */
+  template <int dim>
+  Quadrature<dim>
+  get_gauss_type_quadrature(const Type &   reference_cell,
+                            const unsigned n_points_1D);
 
   namespace internal
   {
