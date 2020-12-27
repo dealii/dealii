@@ -105,8 +105,9 @@ benchmark(const unsigned int n_global_refinements)
     AssertThrow(cell_ids == deserialized,
                 ExcMessage("Serialization with boost binary archives failed."));
     deallog << "Serialization with boost binary archives successful."
-            << std::endl
-            << "  Buffer size in bytes: " << size_in_bytes(buffer) << std::endl;
+            << std::endl;
+    std::cout << "  Buffer size in bytes: " << size_in_bytes(buffer)
+              << std::endl;
   }
 
 
@@ -142,8 +143,9 @@ benchmark(const unsigned int n_global_refinements)
     }
     AssertThrow(cell_ids == deserialized,
                 ExcMessage("Serialization with Utilities failed."));
-    deallog << "Serialization with Utilities successful." << std::endl
-            << "  Buffer size in bytes: " << size_in_bytes(buffer) << std::endl;
+    deallog << "Serialization with Utilities successful." << std::endl;
+    std::cout << "  Buffer size in bytes: " << size_in_bytes(buffer)
+              << std::endl;
   }
 
 
@@ -170,8 +172,9 @@ benchmark(const unsigned int n_global_refinements)
     AssertThrow(cell_ids == deserialized,
                 ExcMessage("Serialization with binary representation failed."));
     deallog << "Serialization with binary representation successful."
-            << std::endl
-            << "  Buffer size in bytes: " << size_in_bytes(buffer) << std::endl;
+            << std::endl;
+    std::cout << "  Buffer size in bytes: " << size_in_bytes(buffer)
+              << std::endl;
   }
 
   deallog << "OK" << std::endl;
