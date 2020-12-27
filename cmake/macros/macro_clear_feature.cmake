@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2018 - 2019 by the deal.II authors
+## Copyright (C) 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -14,7 +14,21 @@
 ## ---------------------------------------------------------------------
 
 #
-# Configuration for the Ginkgo library:
+# This macro is used for the feature configuration in deal.II. It clears
+# all individual FEATURE_* configuration variables for a given feature.
+#
+# Usage:
+#     CLEAR_FEATURE(feature)
+#
+# and all other suffixes defined in DEAL_II_LIST_SUFFIXES and
+# DEAL_II_STRING_SUFFIXES to the corresponding DEAL_II_* variables
 #
 
-CONFIGURE_FEATURE(GINKGO)
+MACRO(CLEAR_FEATURE _feature)
+  FOREACH(_var ${DEAL_II_LIST_SUFFIXES})
+    unset(${_feature}_${_var})
+  ENDFOREACH()
+  FOREACH(_var ${DEAL_II_STRING_SUFFIXES})
+    unset(${_feature}_${_var})
+  ENDFOREACH()
+ENDMACRO()

@@ -19,54 +19,53 @@
 # This module exports
 #
 #   GINKGO_INCLUDE_DIRS
+#   GINKGO_INTERFACE_LINK_FLAGS
 #
 
 SET(GINKGO_DIR "" CACHE PATH "An optional hint to a GINKGO installation")
 SET_IF_EMPTY(GINKGO_DIR "$ENV{GINKGO_DIR}")
 
-DEAL_II_FIND_LIBRARY(GINKGO_LIBRARY
-  NAMES ginkgo
-  HINTS ${GINKGO_DIR}
-  PATH_SUFFIXES
-    lib${LIB_SUFFIX} lib64 lib
-    # This is a hint, isn't it?
-    build/${CMAKE_CXX_PLATFORM_ID}-${CMAKE_SYSTEM_PROCESSOR}/libginkgo
+#
+# Save and restore the ${CMAKE_MODULE_PATH} variable. The Ginkgo project
+# configuration unfortunately overrides the variable which causes
+# subsequent configuration to fail.
+#
+SET(_cmake_module_path ${CMAKE_MODULE_PATH})
+FIND_PACKAGE(Ginkgo
+  HINTS ${GINKGO_DIR} ${Ginkgo_DIR} $ENV{Ginkgo_DIR}
   )
-DEAL_II_FIND_LIBRARY(GINKGO_REFERENCE_LIBRARY
-  NAMES ginkgo_reference
-  HINTS ${GINKGO_DIR}
-  PATH_SUFFIXES
-    lib${LIB_SUFFIX} lib64 lib
-    # This is a hint, isn't it?
-    build/${CMAKE_CXX_PLATFORM_ID}-${CMAKE_SYSTEM_PROCESSOR}/libginkgo_reference
-  )
-DEAL_II_FIND_LIBRARY(GINKGO_OMP_LIBRARY
-  NAMES ginkgo_omp
-  HINTS ${GINKGO_DIR}
-  PATH_SUFFIXES
-    lib${LIB_SUFFIX} lib64 lib
-    # This is a hint, isn't it?
-    build/${CMAKE_CXX_PLATFORM_ID}-${CMAKE_SYSTEM_PROCESSOR}/libginkgo_omp
-  )
-DEAL_II_FIND_LIBRARY(GINKGO_CUDA_LIBRARY
-  NAMES ginkgo_cuda
-  HINTS ${GINKGO_DIR}
-  PATH_SUFFIXES
-    lib${LIB_SUFFIX} lib64 lib
-    # This is a hint, isn't it?
-    build/${CMAKE_CXX_PLATFORM_ID}-${CMAKE_SYSTEM_PROCESSOR}/libginkgo_cuda
-  )
+SET(CMAKE_MODULE_PATH ${_cmake_module_path})
 
-DEAL_II_FIND_PATH(GINKGO_INCLUDE_DIR ginkgo/ginkgo.hpp
-  HINTS ${GINKGO_DIR}
-  PATH_SUFFIXES include
-  )
+#
+# Cosmetic clean up: Let's remove all variables beginning with "GINKGO_"
+# that are actually not used during configuration but show up in
+# detailed.log
+#
+unset(GINKGO_CXX_COMPILER)
+
+#
+# We'd like to have the full library names but the Ginkgo package only
+# exports a list with short names. So check again for every lib and store
+# the full path:
+#
+SET(_libraries "")
+FOREACH(_library ${GINKGO_INTERFACE_LINK_LIBRARIES})
+  LIST(APPEND _libraries GINKGO_LIBRARY_${_library})
+  DEAL_II_FIND_LIBRARY(GINKGO_LIBRARY_${_library}
+    NAMES ${_library}
+    HINTS ${GINKGO_INSTALL_LIBRARY_DIR}
+    NO_DEFAULT_PATH
+    NO_CMAKE_ENVIRONMENT_PATH
+    NO_CMAKE_PATH
+    NO_SYSTEM_ENVIRONMENT_PATH
+    NO_CMAKE_SYSTEM_PATH
+    NO_CMAKE_FIND_ROOT_PATH
+    )
+ENDFOREACH()
 
 DEAL_II_PACKAGE_HANDLE(GINKGO
-  LIBRARIES
-    REQUIRED GINKGO_LIBRARY GINKGO_REFERENCE_LIBRARY GINKGO_OMP_LIBRARY GINKGO_CUDA_LIBRARY
-  INCLUDE_DIRS REQUIRED GINKGO_INCLUDE_DIR
-  USER_INCLUDE_DIRS REQUIRED GINKGO_INCLUDE_DIR
-  CLEAR
-    GINKGO_LIBRARY GINKGO_REFERENCE_LIBRARY GINKGO_OMP_LIBRARY GINKGO_CUDA_LIBRARY GINKGO_INCLUDE_DIR
+  LIBRARIES REQUIRED ${_libraries}
+  INCLUDE_DIRS REQUIRED GINKGO_INSTALL_INCLUDE_DIR
+  USER_INCLUDE_DIRS REQUIRED GINKGO_INSTALL_INCLUDE_DIR
+  CLEAR Ginkgo_DIR ${_libraries}
   )
