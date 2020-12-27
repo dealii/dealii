@@ -183,6 +183,199 @@ namespace ReferenceCell
     return Point<dim>(+0.0, +0.0, +0.0);
   }
 
+  /**
+   * Determine the orientation of an entity of @p type described by its
+   * vertices @p var_1 relative to an entity described by @p var_0.
+   */
+  template <typename T, std::size_t N>
+  inline unsigned char
+  compute_orientation(const ReferenceCell::Type entity_type,
+                      const std::array<T, N> &  vertices_0,
+                      const std::array<T, N> &  vertices_1)
+  {
+    if (entity_type == ReferenceCell::Type::Line)
+      {
+        const std::array<T, 2> i{{vertices_0[0], vertices_0[1]}};
+        const std::array<T, 2> j{{vertices_1[0], vertices_1[1]}};
+
+        // line_orientation=true
+        if (i == std::array<T, 2>{{j[0], j[1]}})
+          return 1;
+
+        // line_orientation=false
+        if (i == std::array<T, 2>{{j[1], j[0]}})
+          return 0;
+      }
+    else if (entity_type == ReferenceCell::Type::Tri)
+      {
+        const std::array<T, 3> i{{vertices_0[0], vertices_0[1], vertices_0[2]}};
+        const std::array<T, 3> j{{vertices_1[0], vertices_1[1], vertices_1[2]}};
+
+        // face_orientation=true, face_rotation=false, face_flip=false
+        if (i == std::array<T, 3>{{j[0], j[1], j[2]}})
+          return 1;
+
+        // face_orientation=true, face_rotation=true, face_flip=false
+        if (i == std::array<T, 3>{{j[1], j[0], j[2]}})
+          return 3;
+
+        // face_orientation=true, face_rotation=false, face_flip=true
+        if (i == std::array<T, 3>{{j[2], j[0], j[1]}})
+          return 5;
+
+        // face_orientation=false, face_rotation=false, face_flip=false
+        if (i == std::array<T, 3>{{j[0], j[2], j[1]}})
+          return 0;
+
+        // face_orientation=false, face_rotation=true, face_flip=false
+        if (i == std::array<T, 3>{{j[1], j[2], j[0]}})
+          return 2;
+
+        // face_orientation=false, face_rotation=false, face_flip=true
+        if (i == std::array<T, 3>{{j[2], j[1], j[0]}})
+          return 4;
+      }
+    else if (entity_type == ReferenceCell::Type::Quad)
+      {
+        const std::array<T, 4> i{
+          {vertices_0[0], vertices_0[1], vertices_0[2], vertices_0[3]}};
+        const std::array<T, 4> j{
+          {vertices_1[0], vertices_1[1], vertices_1[2], vertices_1[3]}};
+
+        // face_orientation=true, face_rotation=false, face_flip=false
+        if (i == std::array<T, 4>{{j[0], j[1], j[2], j[3]}})
+          return 1;
+
+        // face_orientation=true, face_rotation=true, face_flip=false
+        if (i == std::array<T, 4>{{j[1], j[3], j[0], j[2]}})
+          return 3;
+
+        // face_orientation=true, face_rotation=false, face_flip=true
+        if (i == std::array<T, 4>{{j[3], j[2], j[1], j[0]}})
+          return 5;
+
+        // face_orientation=true, face_rotation=true, face_flip=true
+        if (i == std::array<T, 4>{{j[2], j[0], j[3], j[1]}})
+          return 7;
+
+        // face_orientation=false, face_rotation=false, face_flip=false
+        if (i == std::array<T, 4>{{j[0], j[2], j[1], j[3]}})
+          return 0;
+
+        // face_orientation=false, face_rotation=true, face_flip=false
+        if (i == std::array<T, 4>{{j[2], j[3], j[0], j[1]}})
+          return 2;
+
+        // face_orientation=false, face_rotation=false, face_flip=true
+        if (i == std::array<T, 4>{{j[3], j[1], j[2], j[0]}})
+          return 4;
+
+        // face_orientation=false, face_rotation=true, face_flip=true
+        if (i == std::array<T, 4>{{j[1], j[0], j[3], j[2]}})
+          return 6;
+      }
+
+    AssertThrow(false, dealii::StandardExceptions::ExcNotImplemented());
+
+    return -1;
+  }
+
+  /**
+   * Inverse function of compute_orientation().
+   */
+  template <typename T, std::size_t N>
+  inline std::array<T, N>
+  permute_according_orientation(const ReferenceCell::Type entity_type,
+                                const std::array<T, N> &  vertices,
+                                const unsigned int        orientation)
+  {
+    std::array<T, 4> temp;
+
+    if (entity_type == ReferenceCell::Type::Line)
+      {
+        switch (orientation)
+          {
+            case 1:
+              temp = {{vertices[0], vertices[1]}};
+              break;
+            case 0:
+              temp = {{vertices[1], vertices[0]}};
+              break;
+            default:
+              Assert(false, ExcNotImplemented());
+          }
+      }
+    else if (entity_type == ReferenceCell::Type::Tri)
+      {
+        switch (orientation)
+          {
+            case 1:
+              temp = {{vertices[0], vertices[1], vertices[2]}};
+              break;
+            case 3:
+              temp = {{vertices[1], vertices[0], vertices[2]}};
+              break;
+            case 5:
+              temp = {{vertices[2], vertices[0], vertices[1]}};
+              break;
+            case 0:
+              temp = {{vertices[0], vertices[2], vertices[1]}};
+              break;
+            case 2:
+              temp = {{vertices[1], vertices[2], vertices[0]}};
+              break;
+            case 4:
+              temp = {{vertices[2], vertices[1], vertices[0]}};
+              break;
+            default:
+              Assert(false, ExcNotImplemented());
+          }
+      }
+    else if (entity_type == ReferenceCell::Type::Quad)
+      {
+        switch (orientation)
+          {
+            case 1:
+              temp = {{vertices[0], vertices[1], vertices[2], vertices[3]}};
+              break;
+            case 3:
+              temp = {{vertices[1], vertices[3], vertices[0], vertices[2]}};
+              break;
+            case 5:
+              temp = {{vertices[3], vertices[2], vertices[1], vertices[0]}};
+              break;
+            case 7:
+              temp = {{vertices[2], vertices[0], vertices[3], vertices[1]}};
+              break;
+            case 0:
+              temp = {{vertices[0], vertices[2], vertices[1], vertices[3]}};
+              break;
+            case 2:
+              temp = {{vertices[2], vertices[3], vertices[0], vertices[1]}};
+              break;
+            case 4:
+              temp = {{vertices[3], vertices[1], vertices[2], vertices[0]}};
+              break;
+            case 6:
+              temp = {{vertices[1], vertices[0], vertices[3], vertices[2]}};
+              break;
+            default:
+              Assert(false, ExcNotImplemented());
+          }
+      }
+    else
+      {
+        AssertThrow(false, ExcNotImplemented());
+      }
+
+    std::array<T, N> temp_;
+    std::copy_n(temp.begin(), N, temp_.begin());
+
+    return temp_;
+  }
+
+
+
   namespace internal
   {
     /**

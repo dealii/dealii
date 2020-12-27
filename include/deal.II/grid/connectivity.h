@@ -987,107 +987,6 @@ namespace internal
 
 
     /**
-     * Determine the orientation of an entity of @p type described by its
-     * vertices @p var_1 relative to an entity described by @p var_0.
-     */
-    template <typename T, std::size_t N>
-    inline unsigned char
-    compute_orientation(const ReferenceCell::Type entity_type,
-                        const std::array<T, N> &  vertices_0,
-                        const std::array<T, N> &  vertices_1)
-    {
-      if (entity_type == ReferenceCell::Type::Line)
-        {
-          const std::array<T, 2> i{{vertices_0[0], vertices_0[1]}};
-          const std::array<T, 3> j{{vertices_1[0], vertices_1[1]}};
-
-          // line_orientation=true
-          if (i == std::array<T, 2>{{j[0], j[1]}})
-            return 1;
-
-          // line_orientation=false
-          if (i == std::array<T, 2>{{j[1], j[0]}})
-            return 0;
-        }
-      else if (entity_type == ReferenceCell::Type::Tri)
-        {
-          const std::array<T, 3> i{
-            {vertices_0[0], vertices_0[1], vertices_0[2]}};
-          const std::array<T, 3> j{
-            {vertices_1[0], vertices_1[1], vertices_1[2]}};
-
-          // face_orientation=true, face_rotation=false, face_flip=false
-          if (i == std::array<T, 3>{{j[0], j[1], j[2]}})
-            return 1;
-
-          // face_orientation=true, face_rotation=true, face_flip=false
-          if (i == std::array<T, 3>{{j[1], j[0], j[2]}})
-            return 3;
-
-          // face_orientation=true, face_rotation=false, face_flip=true
-          if (i == std::array<T, 3>{{j[2], j[0], j[1]}})
-            return 5;
-
-          // face_orientation=false, face_rotation=false, face_flip=false
-          if (i == std::array<T, 3>{{j[0], j[2], j[1]}})
-            return 0;
-
-          // face_orientation=false, face_rotation=true, face_flip=false
-          if (i == std::array<T, 3>{{j[1], j[2], j[0]}})
-            return 2;
-
-          // face_orientation=false, face_rotation=false, face_flip=true
-          if (i == std::array<T, 3>{{j[2], j[1], j[0]}})
-            return 4;
-        }
-      else if (entity_type == ReferenceCell::Type::Quad)
-        {
-          const std::array<T, 4> i{
-            {vertices_0[0], vertices_0[1], vertices_0[2], vertices_0[3]}};
-          const std::array<T, 4> j{
-            {vertices_1[0], vertices_1[1], vertices_1[2], vertices_1[3]}};
-
-          // face_orientation=true, face_rotation=false, face_flip=false
-          if (i == std::array<T, 4>{{j[0], j[1], j[2], j[3]}})
-            return 1;
-
-          // face_orientation=true, face_rotation=true, face_flip=false
-          if (i == std::array<T, 4>{{j[1], j[3], j[0], j[2]}})
-            return 3;
-
-          // face_orientation=true, face_rotation=false, face_flip=true
-          if (i == std::array<T, 4>{{j[3], j[2], j[1], j[0]}})
-            return 5;
-
-          // face_orientation=true, face_rotation=true, face_flip=true
-          if (i == std::array<T, 4>{{j[2], j[0], j[3], j[1]}})
-            return 7;
-
-          // face_orientation=false, face_rotation=false, face_flip=false
-          if (i == std::array<T, 4>{{j[0], j[2], j[1], j[3]}})
-            return 0;
-
-          // face_orientation=false, face_rotation=true, face_flip=false
-          if (i == std::array<T, 4>{{j[2], j[3], j[0], j[1]}})
-            return 2;
-
-          // face_orientation=false, face_rotation=false, face_flip=true
-          if (i == std::array<T, 4>{{j[3], j[1], j[2], j[0]}})
-            return 4;
-
-          // face_orientation=false, face_rotation=true, face_flip=true
-          if (i == std::array<T, 4>{{j[1], j[0], j[3], j[2]}})
-            return 6;
-        }
-
-      AssertThrow(false, dealii::StandardExceptions::ExcNotImplemented());
-
-      return -1;
-    }
-
-
-
-    /**
      * Build entities of dimension d (with 0<d<dim). Entities are described by
      * a set of vertices.
      *
@@ -1263,11 +1162,11 @@ namespace internal
             }
           else
             {
-              col_d[offset_i] = counter;
-              orientations[offset_i] =
-                compute_orientation(ad_entity_types[offset_i],
-                                    ref_indices,
-                                    ad_entity_vertices[offset_i]);
+              col_d[offset_i]        = counter;
+              orientations[offset_i] = ReferenceCell::compute_orientation(
+                ad_entity_types[offset_i],
+                ref_indices,
+                ad_entity_vertices[offset_i]);
             }
         }
       ptr_0.push_back(col_0.size());
