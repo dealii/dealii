@@ -35,6 +35,10 @@ FE_Nothing<dim, spacedim>::FE_Nothing(const ReferenceCell::Type &type,
       std::vector<ComponentMask>())
   , dominate(dominate)
 {
+  Assert(n_components >= 1,
+         ExcMessage("A finite element needs to have at least one "
+                    "vector component."));
+
   // in most other elements we have to set up all sorts of stuff
   // here. there isn't much that we have to do here; in particular,
   // we can simply leave the restriction and prolongation matrices
@@ -237,6 +241,7 @@ FE_Nothing<dim, spacedim>::compare_for_domination(
     // otherwise we dominate whatever FE is provided
     return FiniteElementDomination::this_element_dominates;
 }
+
 
 
 template <int dim, int spacedim>

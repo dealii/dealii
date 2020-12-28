@@ -41,6 +41,57 @@ DEAL_II_NAMESPACE_OPEN
  * use cases for this element. An interesting application for this element is
  * also presented in the paper @cite Cangiani2012.
  *
+ *
+ * <h3>FE_Nothing as seen as a function space</h3>
+ *
+ * Finite elements are often best interpreted as forming a
+ * [function space](https://en.wikipedia.org/wiki/Function_space), i.e., a
+ * set of functions that form a
+ * [vector space](https://en.wikipedia.org/wiki/Vector_space). One can indeed
+ * interpret FE_Nothing in this light: It corresponds to the function space
+ * $V_h=\{0\}$, i.e., the set of functions that are zero everywhere.
+ * (The constructor can take an argument that, if greater than one, extends
+ * the space to one of vector-valued functions with more than one component,
+ * with all components equal to zero everywhere.) Indeed, this is a vector
+ * space since every linear combination of elements in the vector space is
+ * also an element in the vector space, as is every multiple of the single
+ * element zero. It is obvious that the function space has no degrees of
+ * freedom, thus the name of the class.
+ *
+ *
+ * <h3>FE_Nothing in combination with other elements</h3>
+ *
+ * In situations such as those of step-46, one uses FE_Nothing on cells
+ * where one is not interested in a solution variable. For example, in fluid
+ * structure interaction problems, the fluid velocity is only defined on
+ * cells inside the fluid part of the domain. One then uses FE_Nothing
+ * on cells in the solid part of the domain to describe the finite element
+ * space for the velocity. In other words, the velocity lives everywhere
+ * conceptually, but it is identically zero in those parts of the domain
+ * where it is not of interest and doesn't use up any degrees of freedom
+ * there.
+ *
+ * The question is what happens at the interface between areas where one
+ * is interested in the solution (and uses a "normal" finite element) and
+ * where one is not interested (and uses FE_Nothing): Should the solution
+ * at that interface be zero -- i.e., we consider a "continuous" finite
+ * element field that happens to be zero in that area where FE_Nothing
+ * is used -- or is there no requirement for continuity at the interface.
+ * In the deal.II language, this is encoded by what the function
+ * FiniteElement::compare_for_domination() returns: If the FE_Nothing
+ * "dominates", then the solution must be zero at the interface; if it
+ * does not, then there is no requirement and one can think of FE_Nothing
+ * as a function space that is in general discontinuous (i.e., there is
+ * no requirement for any kind of continuity at cell interfaces) but on
+ * every cell equal to zero.
+ *
+ * A constructor argument denotes whether the element should be considered
+ * dominating or not. The default is for it not to dominate, i.e.,
+ * FE_Nothing is treated as a discontinuous element.
+ *
+ *
+ * <h3>FE_Nothing in the context of hanging nodes</h3>
+ *
  * Note that some care must be taken that the resulting mesh topology
  * continues to make sense when FE_Nothing elements are introduced. This is
  * particularly true when dealing with hanging node constraints, because the
@@ -81,17 +132,18 @@ public:
   /**
    * Constructor.
    *
-   * The first argument specifies the reference-cell type.
+   * @param[in] type Specifies the reference-cell type.
    *
-   * The second argument denotes the number of components to give this
-   * finite element (default = 1).
+   * @param[in] n_components Denotes the number of
+   * vector components to give this finite element. The default is one.
    *
-   * The third argument decides whether FE_Nothing will dominate any other FE in
-   * compare_for_domination() (default = false). Therefore at interfaces where,
-   * for example, a Q1 meets an FE_Nothing, we will force the traces of the two
-   * functions to be the same. Because the FE_Nothing encodes a space that is
-   * zero everywhere, this means that the Q1 field will be forced to become zero
-   * at this interface.
+   * @param[in] dominate Decides whether FE_Nothing will dominate
+   * any other FE in compare_for_domination() (with the default being `false`).
+   * Therefore at interfaces where, for example, a $Q_1$ meets an FE_Nothing, we
+   * will force the traces of the two functions to be the same. Because the
+   * FE_Nothing encodes a space that is zero everywhere, this means that the
+   * $Q_1$ field will be forced to become zero at this interface. See also the
+   * discussion in the general documentation of this class.
    */
   FE_Nothing(const ReferenceCell::Type &type,
              const unsigned int         n_components = 1,
@@ -200,6 +252,8 @@ public:
    * argument in the constructor @p dominate is true. When this argument is
    * false and @p fe_other is also of type FE_Nothing(), either element can
    * dominate. Otherwise there are no_requirements.
+   *
+   * See also the discussion in the general documentation of this class.
    */
   virtual FiniteElementDomination::Domination
   compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
