@@ -110,6 +110,60 @@ void generate_grid(Triangulation<2> &triangulation, int orientation)
   triangulation.refine_global(0);
 }
 
+/* The 2D in 3D case */
+void generate_grid(Triangulation<2, 3> &triangulation, int orientation)
+{
+  Point<3> vertices_1[] = {
+    Point<3>(-1., -3., 0.),
+    Point<3>(+1., -3., 0.),
+    Point<3>(-1., -1., 0.),
+    Point<3>(+1., -1., 0.),
+    Point<3>(-1., +1., 0.),
+    Point<3>(+1., +1., 0.),
+    Point<3>(-1., +3., 0.),
+    Point<3>(+1., +3., 0.),
+  };
+  std::vector<Point<3>> vertices(&vertices_1[0], &vertices_1[8]);
+
+  std::vector<CellData<2>> cells(2, CellData<2>());
+
+  /* cell 0 */
+  int cell_vertices_0[GeometryInfo<2>::vertices_per_cell] = {0, 1, 2, 3};
+
+  /* cell 1 */
+  int cell_vertices_1[2][GeometryInfo<2>::vertices_per_cell] = {
+    {4, 5, 6, 7},
+    {7, 6, 5, 4},
+  };
+
+  for (const unsigned int j : GeometryInfo<2>::vertex_indices())
+    {
+      cells[0].vertices[j] = cell_vertices_0[j];
+      cells[1].vertices[j] = cell_vertices_1[orientation][j];
+    }
+  cells[0].material_id = 0;
+  cells[1].material_id = 0;
+
+  triangulation.create_triangulation(vertices, cells, SubCellData());
+
+  Triangulation<2, 3>::cell_iterator cell_1 = triangulation.begin();
+  Triangulation<2, 3>::cell_iterator cell_2 = cell_1++;
+  Triangulation<2, 3>::face_iterator face_1;
+  Triangulation<2, 3>::face_iterator face_2;
+
+  // Look for the two outermost faces:
+  for (const unsigned int j : GeometryInfo<2>::face_indices())
+    {
+      if (cell_1->face(j)->center()(1) > 2.9)
+        face_1 = cell_1->face(j);
+      if (cell_2->face(j)->center()(1) < -2.9)
+        face_2 = cell_2->face(j);
+    }
+  face_1->set_boundary_id(42);
+  face_2->set_boundary_id(43);
+
+  triangulation.refine_global(0);
+}
 
 /* The 3D case */
 void generate_grid(Triangulation<3> &triangulation, int orientation)
@@ -185,20 +239,20 @@ void generate_grid(Triangulation<3> &triangulation, int orientation)
  * Print out all face DoFs and support points as well as the actual
  * matching via make_periodicity_constraints
  */
-template <int dim>
+template <int dim, int spacedim = dim>
 void
-print_matching(DoFHandler<dim> &dof_handler,
-               bool             constrain_only_velocity = false)
+print_matching(DoFHandler<dim, spacedim> &dof_handler,
+               bool                       constrain_only_velocity = false)
 {
-  const FiniteElement<dim> &fe = dof_handler.get_fe();
-  MappingQ<dim>             mapping(1);
+  const FiniteElement<dim, spacedim> &fe = dof_handler.get_fe();
+  MappingQ<dim, spacedim>             mapping(1);
 
-  AffineConstraints<double> constraint_matrix;
-  AffineConstraints<double> constraint_matrix_reverse;
-  std::vector<Point<dim>>   support_points(dof_handler.n_dofs());
-  DoFTools::map_dofs_to_support_points<dim>(mapping,
-                                            dof_handler,
-                                            support_points);
+  AffineConstraints<double>    constraint_matrix;
+  AffineConstraints<double>    constraint_matrix_reverse;
+  std::vector<Point<spacedim>> support_points(dof_handler.n_dofs());
+  DoFTools::map_dofs_to_support_points<dim, spacedim>(mapping,
+                                                      dof_handler,
+                                                      support_points);
 
   FEValuesExtractors::Vector v(0);
   FEValuesExtractors::Scalar v_1(0);
@@ -211,9 +265,10 @@ print_matching(DoFHandler<dim> &dof_handler,
     velocity_mask = fe.component_mask(v);
 
   // Look for the two outermost faces:
-  typename DoFHandler<dim>::face_iterator face_1;
-  typename DoFHandler<dim>::face_iterator face_2;
-  for (typename DoFHandler<dim>::cell_iterator cell = dof_handler.begin(0);
+  typename DoFHandler<dim, spacedim>::face_iterator face_1;
+  typename DoFHandler<dim, spacedim>::face_iterator face_2;
+  for (typename DoFHandler<dim, spacedim>::cell_iterator cell =
+         dof_handler.begin(0);
        cell != dof_handler.end(0);
        ++cell)
     {
@@ -267,7 +322,7 @@ print_matching(DoFHandler<dim> &dof_handler,
                                          face_1,
                                          face_2,
                                          dim == 2 ? 1 : 2,
-                                         dealii::Tensor<1, dim>()))
+                                         dealii::Tensor<1, spacedim>()))
     std::cerr << " not match! oh noze!! " << std::endl;
   deallog << "Orientation: " << orientation[0] << orientation[1]
           << orientation[2] << std::endl;
@@ -315,6 +370,22 @@ main()
       Triangulation<2> triangulation;
       FE_Q<2>          fe(1);
       DoFHandler<2>    dof_handler(triangulation);
+
+      deallog << "Triangulation:" << i << std::endl;
+
+      generate_grid(triangulation, i);
+      dof_handler.distribute_dofs(fe);
+      print_matching(dof_handler);
+    }
+
+  deallog << "Test for 2D in 3D, Q1:" << std::endl << std::endl;
+
+  for (int i = 0; i < 2; ++i)
+    {
+      // Generate a triangulation and match:
+      Triangulation<2, 3> triangulation;
+      FE_Q<2, 3>          fe(1);
+      DoFHandler<2, 3>    dof_handler(triangulation);
 
       deallog << "Triangulation:" << i << std::endl;
 
