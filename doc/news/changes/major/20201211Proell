@@ -1,0 +1,3 @@
+Improved: Update SUNDIALS ARKODE interface to support versions > 4.0.0 and add preconditioner support
+<br>
+(Sebastian Proell, 2020/12/11)

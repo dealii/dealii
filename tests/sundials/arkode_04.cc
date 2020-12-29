@@ -23,7 +23,7 @@
 #include "../tests.h"
 
 
-// Test implicit-explicit time stepper. Both setup and solve_jacobian_system.
+// Test implicit-explicit time stepper. Only solve_jacobian_system.
 // Brusselator benchmark
 
 /**
@@ -49,7 +49,7 @@
 int
 main(int argc, char **argv)
 {
-  std::ofstream out("output");
+  initlog();
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, numbers::invalid_unsigned_int);
@@ -62,12 +62,12 @@ main(int argc, char **argv)
 
   if (false)
     {
-      std::ofstream ofile(SOURCE_DIR "/harmonic_oscillator_06.prm");
+      std::ofstream ofile(SOURCE_DIR "/arkode_04.prm");
       prm.print_parameters(ofile, ParameterHandler::ShortText);
       ofile.close();
     }
 
-  std::ifstream ifile(SOURCE_DIR "/harmonic_oscillator_06.prm");
+  std::ifstream ifile(SOURCE_DIR "/arkode_04.prm");
   prm.parse_input(ifile);
 
   SUNDIALS::ARKode<VectorType> ode(data);
@@ -99,28 +99,17 @@ main(int argc, char **argv)
     return 0;
   };
 
-
-  ode.setup_jacobian = [&](const int,
-                           const double,
-                           const double gamma,
-                           const VectorType &,
-                           const VectorType &,
-                           bool &j_is_current) -> int {
-    J       = 0;
-    J(0, 0) = 1;
-    J(1, 1) = 1;
-    J(2, 2) = 1 + gamma / eps;
-    J.gauss_jordan();
-    j_is_current = true;
-    return 0;
-  };
-
   ode.solve_jacobian_system = [&](const double t,
                                   const double gamma,
                                   const VectorType &,
                                   const VectorType &,
                                   const VectorType &src,
                                   VectorType &      dst) -> int {
+    J       = 0;
+    J(0, 0) = 1;
+    J(1, 1) = 1;
+    J(2, 2) = 1 + gamma / eps;
+    J.gauss_jordan();
     J.vmult(dst, src);
     return 0;
   };
@@ -128,7 +117,8 @@ main(int argc, char **argv)
   ode.output_step = [&](const double       t,
                         const VectorType & sol,
                         const unsigned int step_number) -> int {
-    out << t << " " << sol[0] << " " << sol[1] << " " << sol[2] << std::endl;
+    deallog << t << " " << sol[0] << " " << sol[1] << " " << sol[2]
+            << std::endl;
     return 0;
   };
 

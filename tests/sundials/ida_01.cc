@@ -145,11 +145,11 @@ main(int argc, char **argv)
   ParameterHandler                              prm;
   data.add_parameters(prm);
 
-  // std::ofstream ofile(SOURCE_DIR "/harmonic_oscillator_01.prm");
+  // std::ofstream ofile(SOURCE_DIR "/ida_01.prm");
   // prm.print_parameters(ofile, ParameterHandler::ShortText);
   // ofile.close();
 
-  std::ifstream ifile(SOURCE_DIR "/harmonic_oscillator_01.prm");
+  std::ifstream ifile(SOURCE_DIR "/ida_01.prm");
   prm.parse_input(ifile);
 
 
