@@ -49,7 +49,7 @@ unset(GINKGO_CXX_COMPILER)
 # the full path:
 #
 SET(_libraries "")
-FOREACH(_library ${GINKGO_INTERFACE_LINK_LIBRARIES})
+FOREACH(_library ginkgo ${GINKGO_INTERFACE_LINK_LIBRARIES})
   LIST(APPEND _libraries GINKGO_LIBRARY_${_library})
   DEAL_II_FIND_LIBRARY(GINKGO_LIBRARY_${_library}
     NAMES ${_library}
