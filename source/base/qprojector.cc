@@ -645,52 +645,26 @@ QProjector<3>::project_to_all_faces(
 {
   const auto support_points_tri =
     [](const auto &face, const auto &orientation) -> std::vector<Point<3>> {
-    // determine support point of the current line with the correct
-    // orientation
-    switch (orientation)
-      {
-        case 1:
-          return {{face.first[0], face.first[1], face.first[2]}};
-        case 3:
-          return {{face.first[1], face.first[0], face.first[2]}};
-        case 5:
-          return {{face.first[2], face.first[0], face.first[1]}};
-        case 0:
-          return {{face.first[0], face.first[2], face.first[1]}};
-        case 2:
-          return {{face.first[1], face.first[2], face.first[0]}};
-        case 4:
-          return {{face.first[2], face.first[1], face.first[0]}};
-        default:
-          Assert(false, ExcNotImplemented());
-          return {{}};
-      }
+    std::array<Point<3>, 3> vertices;
+    std::copy_n(face.first.begin(), face.first.size(), vertices.begin());
+    const auto temp =
+      ReferenceCell::permute_according_orientation(ReferenceCell::Type::Tri,
+                                                   vertices,
+                                                   orientation);
+    return std::vector<Point<3>>(temp.begin(),
+                                 temp.begin() + face.first.size());
   };
 
   const auto support_points_quad =
     [](const auto &face, const auto &orientation) -> std::vector<Point<3>> {
-    switch (orientation)
-      {
-        case 1:
-          return {{face.first[0], face.first[1], face.first[2], face.first[3]}};
-        case 3:
-          return {{face.first[1], face.first[3], face.first[0], face.first[2]}};
-        case 5:
-          return {{face.first[3], face.first[2], face.first[1], face.first[0]}};
-        case 7:
-          return {{face.first[2], face.first[0], face.first[3], face.first[1]}};
-        case 0:
-          return {{face.first[0], face.first[2], face.first[1], face.first[3]}};
-        case 2:
-          return {{face.first[2], face.first[3], face.first[0], face.first[1]}};
-        case 4:
-          return {{face.first[3], face.first[1], face.first[2], face.first[0]}};
-        case 6:
-          return {{face.first[1], face.first[0], face.first[3], face.first[2]}};
-        default:
-          Assert(false, ExcNotImplemented());
-          return {{}};
-      }
+    std::array<Point<3>, 4> vertices;
+    std::copy_n(face.first.begin(), face.first.size(), vertices.begin());
+    const auto temp =
+      ReferenceCell::permute_according_orientation(ReferenceCell::Type::Quad,
+                                                   vertices,
+                                                   orientation);
+    return std::vector<Point<3>>(temp.begin(),
+                                 temp.begin() + face.first.size());
   };
 
   const auto process = [&](const auto &faces) {
