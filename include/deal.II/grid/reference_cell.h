@@ -887,8 +887,14 @@ namespace ReferenceCell
         standard_line_to_face_and_line_index(
           const unsigned int line) const override
         {
-          static const std::array<unsigned int, 2> table[6] = {
-            {{0, 0}}, {{0, 1}}, {{0, 2}}, {{1, 1}}, {{1, 2}}, {{2, 1}}};
+          static const std::array<unsigned int, 2> table[8] = {{{0, 0}},
+                                                               {{0, 1}},
+                                                               {{0, 2}},
+                                                               {{0, 3}},
+                                                               {{1, 2}},
+                                                               {{2, 1}},
+                                                               {{1, 1}},
+                                                               {{2, 2}}};
 
           return table[line];
         }

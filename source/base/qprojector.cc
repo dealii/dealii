@@ -693,7 +693,7 @@ QProjector<3>::project_to_all_faces(
       }
   };
 
-  const auto process = [&](const auto faces) {
+  const auto process = [&](const auto &faces) {
     // new (projected) quadrature points and weights
     std::vector<Point<3>> points;
     std::vector<double>   weights;
@@ -825,14 +825,19 @@ QProjector<3>::project_to_all_faces(
   else if (reference_cell_type == ReferenceCell::Type::Wedge)
     {
       const std::vector<std::pair<std::vector<Point<3>>, double>> faces = {
-        {{{{Point<3>(0.0, 1.0, 0.0),
+        {{{{Point<3>(1.0, 0.0, 0.0),
+            Point<3>(0.0, 0.0, 0.0),
+            Point<3>(0.0, 1.0, 0.0)}},
+          0.5},
+         {{{Point<3>(0.0, 0.0, 1.0),
+            Point<3>(1.0, 0.0, 1.0),
+            Point<3>(0.0, 1.0, 1.0)}},
+          0.5},
+         {{{Point<3>(0.0, 0.0, 0.0),
             Point<3>(1.0, 0.0, 0.0),
-            Point<3>(0.0, 0.0, 0.0)}},
-          0.5},
-         {{{Point<3>(1.0, 0.0, 1.0),
-            Point<3>(0.0, 1.0, 1.0),
-            Point<3>(0.0, 0.0, 1.0)}},
-          0.5},
+            Point<3>(0.0, 0.0, 1.0),
+            Point<3>(1.0, 0.0, 1.0)}},
+          1.0},
          {{{Point<3>(1.0, 0.0, 0.0),
             Point<3>(0.0, 1.0, 0.0),
             Point<3>(1.0, 0.0, 1.0),
@@ -842,11 +847,6 @@ QProjector<3>::project_to_all_faces(
             Point<3>(0.0, 0.0, 0.0),
             Point<3>(0.0, 1.0, 1.0),
             Point<3>(0.0, 0.0, 1.0)}},
-          1.0},
-         {{{Point<3>(0.0, 0.0, 0.0),
-            Point<3>(1.0, 0.0, 0.0),
-            Point<3>(0.0, 0.0, 1.0),
-            Point<3>(1.0, 0.0, 1.0)}},
           1.0}}};
 
       return process(faces);
