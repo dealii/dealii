@@ -91,7 +91,7 @@ namespace MatrixFreeTools
                                                n_components,
                                                Number,
                                                VectorizedArrayType> &) const,
-    CLASS *            owning_class,
+    const CLASS *      owning_class,
     const unsigned int dof_no                   = 0,
     const unsigned int quad_no                  = 0,
     const unsigned int first_selected_component = 0);
@@ -609,7 +609,7 @@ namespace MatrixFreeTools
                                                n_components,
                                                Number,
                                                VectorizedArrayType> &) const,
-    CLASS *            owning_class,
+    const CLASS *      owning_class,
     const unsigned int dof_no,
     const unsigned int quad_no,
     const unsigned int first_selected_component)
