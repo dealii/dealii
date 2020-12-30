@@ -20,6 +20,8 @@
 
 #include <deal.II/grid/tria.h>
 
+#include <boost/geometry.hpp>
+
 DEAL_II_NAMESPACE_OPEN
 
 
