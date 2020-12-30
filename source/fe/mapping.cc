@@ -20,7 +20,9 @@
 
 #include <deal.II/grid/tria.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/geometry.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
