@@ -46,6 +46,31 @@ namespace ReferenceCell
   };
 
   /**
+   * Return the dimension of the given reference-cell type @p type.
+   */
+  inline unsigned int
+  get_dimension(const Type &type)
+  {
+    switch (type)
+      {
+        case Type::Vertex:
+          return 0;
+        case Type::Line:
+          return 1;
+        case Type::Tri:
+        case Type::Quad:
+          return 2;
+        case Type::Tet:
+        case Type::Pyramid:
+        case Type::Wedge:
+        case Type::Hex:
+          return 3;
+        default:
+          return numbers::invalid_unsigned_int;
+      }
+  }
+
+  /**
    * Return the correct simplex reference cell type for the given dimension
    * @p dim.
    */
@@ -374,7 +399,85 @@ namespace ReferenceCell
     return temp_;
   }
 
+  /*
+   * Return i-th unit tangential vector of a face of the reference cell.
+   * The vectors are arranged such that the
+   * cross product between the two vectors returns the unit normal vector.
+   */
+  template <int dim>
+  inline Tensor<1, dim>
+  unit_tangential_vectors(const Type &       reference_cell,
+                          const unsigned int face_no,
+                          const unsigned int i)
+  {
+    AssertDimension(dim, get_dimension(reference_cell));
+    AssertIndexRange(i, dim - 1);
 
+    if (reference_cell == get_hypercube(dim))
+      {
+        AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
+        return GeometryInfo<dim>::unit_tangential_vectors[face_no][i];
+      }
+    else if (reference_cell == Type::Tri)
+      {
+        AssertIndexRange(face_no, 3);
+        static const std::array<Tensor<1, dim>, 3> table = {
+          {Point<dim>(1, 0),
+           Point<dim>(-std::sqrt(0.5), +std::sqrt(0.5)),
+           Point<dim>(0, -1)}};
+
+        return table[face_no];
+      }
+    else if (reference_cell == Type::Tet)
+      {
+        AssertIndexRange(face_no, 4);
+        static const std::array<std::array<Tensor<1, dim>, 2>, 4> table = {
+          {{{Point<dim>(0, 1, 0), Point<dim>(1, 0, 0)}},
+           {{Point<dim>(1, 0, 0), Point<dim>(0, 0, 1)}},
+           {{Point<dim>(0, 0, 1), Point<dim>(0, 1, 0)}},
+           {{Point<dim>(-std::pow(1.0 / 3.0, 1.0 / 4.0),
+                        +std::pow(1.0 / 3.0, 1.0 / 4.0),
+                        0),
+             Point<dim>(-std::pow(1.0 / 3.0, 1.0 / 4.0),
+                        0,
+                        +std::pow(1.0 / 3.0, 1.0 / 4.0))}}}};
+
+        return table[face_no][i];
+      }
+    else if (reference_cell == Type::Wedge)
+      {
+        AssertIndexRange(face_no, 5);
+        static const std::array<std::array<Tensor<1, dim>, 2>, 5> table = {
+          {{{Point<dim>(0, 1, 0), Point<dim>(1, 0, 0)}},
+           {{Point<dim>(1, 0, 0), Point<dim>(0, 0, 1)}},
+           {{Point<dim>(-1 / std::sqrt(2.0), +1 / std::sqrt(2.0), 0),
+             Point<dim>(0, 0, 1)}},
+           {{Point<dim>(0, 0, 1), Point<dim>(0, 1, 0)}},
+           {{Point<dim>(1, 0, 0), Point<dim>(0, 0, 1)}}}};
+
+        return table[face_no][i];
+      }
+    else if (reference_cell == Type::Pyramid)
+      {
+        AssertIndexRange(face_no, 5);
+        static const std::array<std::array<Tensor<1, dim>, 2>, 5> table = {
+          {{{Point<dim>(0, 1, 0), Point<dim>(1, 0, 0)}},
+           {{Point<dim>(+1.0 / sqrt(2.0), 0, +1.0 / sqrt(2.0)),
+             Point<dim>(0, 1, 0)}},
+           {{Point<dim>(+1.0 / sqrt(2.0), 0, -1.0 / sqrt(2.0)),
+             Point<dim>(0, 1, 0)}},
+           {{Point<dim>(1, 0, 0),
+             Point<dim>(0, +1.0 / sqrt(2.0), +1.0 / sqrt(2.0))}},
+           {{Point<dim>(1, 0, 0),
+             Point<dim>(0, +1.0 / sqrt(2.0), -1.0 / sqrt(2.0))}}}};
+
+        return table[face_no][i];
+      }
+
+    Assert(false, ExcNotImplemented());
+
+    return {};
+  }
 
   namespace internal
   {
