@@ -517,8 +517,7 @@ namespace Particles
             std::to_string(properties.size()) +
             " properties. Deserializing a particle only works for matching property sizes."));
 
-        ar &boost::serialization::make_array(get_properties().data(),
-                                             n_properties);
+        ar &boost::serialization::make_array(properties.data(), n_properties);
       }
   }
 
