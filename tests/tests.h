@@ -418,6 +418,7 @@ filter_out_small_numbers(const Number number, const double tolerance)
     return number;
 }
 
+
 // ---------------- Functions used in initializing subsystems -----------------
 
 
