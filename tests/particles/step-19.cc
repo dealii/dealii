@@ -487,6 +487,10 @@ namespace Step19
         if (particle_handler.n_particles_in_cell(cell) > 0)
           for (const auto &particle : particle_handler.particles_in_cell(cell))
             {
+              deallog << "Evaluating particle " << particle.get_id() << " at "
+                      << particle.get_location() << " with reference location "
+                      << particle.get_reference_location() << std::endl;
+
               const Point<dim> reference_location =
                 particle.get_reference_location();
               for (const unsigned int i : fe_values.dof_indices())
@@ -641,9 +645,22 @@ namespace Step19
                     new_particle.set_reference_location(
                       mapping.transform_real_to_unit_cell(cell, location));
                     new_particle.set_id(next_unused_particle_id);
-                    particle_handler.insert_particle(new_particle, cell);
 
                     ++next_unused_particle_id;
+
+                    deallog << "Creating particle " << new_particle.get_id()
+                            << " at " << new_particle.get_location()
+                            << " with properties ";
+
+                    // for (const auto x : new_particle.get_properties())
+                    //   deallog << x << ' ';
+                    //                   deallog << std::endl;
+
+                    const auto x_p =
+                      particle_handler.insert_particle(new_particle, cell);
+                    for (const auto x : x_p->get_properties())
+                      deallog << x << ' ';
+                    deallog << std::endl;
                   }
               }
           }
@@ -708,6 +725,8 @@ namespace Step19
                  ++particle, ++particle_index)
               {
                 const Tensor<1, dim> E = field_gradients[particle_index];
+                deallog << "Evaluating E for particle " << particle->get_id()
+                        << ": " << E << std::endl;
 
                 // Having now obtained the electric field at the location of one
                 // of the particles, we use this to update first the velocity
@@ -725,6 +744,9 @@ namespace Step19
                 //          {\Delta t} &= {\mathbf v}_i^{(n)}.
                 // @f}
                 const Tensor<1, dim> old_velocity(particle->get_properties());
+                deallog << "Getting old velocity of particle "
+                        << particle->get_id() << ": " << old_velocity
+                        << std::endl;
 
                 const Tensor<1, dim> acceleration =
                   Constants::electron_charge / Constants::electron_mass * E;
@@ -732,12 +754,17 @@ namespace Step19
                 const Tensor<1, dim> new_velocity =
                   old_velocity + acceleration * dt;
 
+                deallog << "Setting new velocity of particle "
+                        << particle->get_id() << ": " << new_velocity
+                        << std::endl;
                 particle->set_properties(make_array_view(new_velocity));
 
                 // With the new velocity, we can then also update the location
                 // of the particle and tell the particle about it.
                 const Point<dim> new_location =
                   particle->get_location() + dt * new_velocity;
+                deallog << "Setting location of particle " << particle->get_id()
+                        << ": " << new_location << std::endl;
                 particle->set_location(new_location);
               }
           }
@@ -1025,6 +1052,16 @@ namespace Step19
         deallog << "Timestep " << time.get_step_number() + 1 << std::endl;
         deallog << "  Field degrees of freedom:                 "
                 << dof_handler.n_dofs() << std::endl;
+
+        for (const auto &particle : particle_handler)
+          {
+            deallog << "Particle " << particle.get_id() << ", at "
+                    << particle.get_location() << "/"
+                    << particle.get_reference_location() << " with properties ";
+            for (const auto x : particle.get_properties())
+              deallog << x << ' ';
+            deallog << std::endl;
+          }
 
         assemble_system();
         solve_field();
