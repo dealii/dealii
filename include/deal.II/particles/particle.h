@@ -480,16 +480,6 @@ namespace Particles
     static PropertyPool<dim, spacedim> global_property_pool;
 
     /**
-     * Current particle location.
-     */
-    Point<spacedim> location;
-
-    /**
-     * Current particle location in the reference cell.
-     */
-    Point<dim> reference_location;
-
-    /**
      * Globally unique ID of particle.
      */
     types::particle_index id;
@@ -568,7 +558,7 @@ namespace Particles
   inline void
   Particle<dim, spacedim>::set_location(const Point<spacedim> &new_loc)
   {
-    location = new_loc;
+    property_pool->set_location(property_pool_handle, new_loc);
   }
 
 
@@ -577,7 +567,7 @@ namespace Particles
   inline const Point<spacedim> &
   Particle<dim, spacedim>::get_location() const
   {
-    return location;
+    return property_pool->get_location(property_pool_handle);
   }
 
 
@@ -586,7 +576,7 @@ namespace Particles
   inline void
   Particle<dim, spacedim>::set_reference_location(const Point<dim> &new_loc)
   {
-    reference_location = new_loc;
+    property_pool->set_reference_location(property_pool_handle, new_loc);
   }
 
 
@@ -595,7 +585,7 @@ namespace Particles
   inline const Point<dim> &
   Particle<dim, spacedim>::get_reference_location() const
   {
-    return reference_location;
+    return property_pool->get_reference_location(property_pool_handle);
   }
 
 
@@ -637,6 +627,9 @@ namespace Particles
     const typename PropertyPool<dim, spacedim>::Handle new_handle =
       new_property_pool.register_particle();
 
+    const Point<spacedim> location           = get_location();
+    const Point<dim>      reference_location = get_reference_location();
+
     if (/* old pool */ has_properties())
       {
         ArrayView<const double> old_properties = this->get_properties();
@@ -652,9 +645,13 @@ namespace Particles
 
 
     // Then set the pointer to the property pool we want to use. Also set the
-    // handle to any properties, if we have copied any above.
+    // handle to any properties.
     property_pool        = &new_property_pool;
     property_pool_handle = new_handle;
+
+    // Now also store the saved locations
+    set_location(location);
+    set_reference_location(reference_location);
   }
 
 
