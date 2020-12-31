@@ -158,8 +158,17 @@ public:
   clone() const override;
 
   /**
-   * Return a string that uniquely identifies a finite element. In this case
-   * it is <code>FE_Nothing@<dim@></code>.
+   * Return a string that uniquely identifies a finite element. The name is
+   * <tt>FE_Nothing@<dim,spacedim@>(type, n_components, dominating)</tt> where
+   * <tt>dim</tt>, <tt>spacedim</tt>, <tt>type</tt>, and <tt>n_components</tt>
+   * are all specified by the constructor or type signature with the following
+   * exceptions:
+   * <ol>
+   *   <li>If <tt>spacedim == dim</tt> then that field is not printed.</li>
+   *   <li>If <tt>type</tt> is a hypercube then that field is not printed.</li>
+   *   <li>If <tt>n_components == 1</tt> then that field is not printed.</li>
+   *   <li>If <tt>dominate == false</tt> then that field is not printed.</li>
+   * </ol>
    */
   virtual std::string
   get_name() const override;
@@ -322,16 +331,6 @@ public:
    */
   bool
   is_dominating() const;
-
-  /**
-   * Comparison operator. In addition to the fields already checked by
-   * FiniteElement::operator==(), this operator also checks for equality
-   * of the arguments passed to the constructors of the current object
-   * as well as the object against which the comparison is done (which
-   * for this purpose obviously also needs to be of type FE_Nothing).
-   */
-  virtual bool
-  operator==(const FiniteElement<dim, spacedim> &fe) const override;
 
 private:
   /**
