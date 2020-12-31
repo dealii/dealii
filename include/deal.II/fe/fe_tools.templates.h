@@ -1598,23 +1598,34 @@ namespace FETools
     const unsigned int n1 = fe1.n_dofs_per_cell();
     const unsigned int n2 = fe2.n_dofs_per_cell();
 
+    const auto reference_cell_type = fe1.reference_cell_type();
+
+    Assert(fe1.reference_cell_type() == fe2.reference_cell_type(),
+           ExcNotImplemented());
+
     // First, create a local mass matrix for the unit cell
     Triangulation<dim, spacedim> tr;
-    GridGenerator::hyper_cube(tr);
+    ReferenceCell::make_triangulation(reference_cell_type, tr);
+
+    const auto &mapping =
+      ReferenceCell::get_default_linear_mapping<dim, spacedim>(
+        reference_cell_type);
 
     // Choose a Gauss quadrature rule that is exact up to degree 2n-1
     const unsigned int degree =
       std::max(fe1.tensor_degree(), fe2.tensor_degree());
     Assert(degree != numbers::invalid_unsigned_int, ExcNotImplemented());
-    const QGauss<dim> quadrature(degree + 1);
+    const auto quadrature =
+      ReferenceCell::get_gauss_type_quadrature<dim>(reference_cell_type,
+                                                    degree + 1);
 
     // Set up FEValues.
     const UpdateFlags flags =
       update_values | update_quadrature_points | update_JxW_values;
-    FEValues<dim> val1(fe1, quadrature, update_values);
+    FEValues<dim> val1(mapping, fe1, quadrature, update_values);
     val1.reinit(tr.begin_active());
 
-    FEValues<dim> val2(fe2, quadrature, flags);
+    FEValues<dim> val2(mapping, fe2, quadrature, flags);
     val2.reinit(tr.begin_active());
 
     // Integrate and invert mass matrix. This happens in the target space
