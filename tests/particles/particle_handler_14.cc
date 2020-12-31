@@ -23,32 +23,21 @@
 
 #include <deal.II/fe/mapping_q.h>
 
-#include <deal.II/grid/grid_generator.h>
-
 #include <deal.II/particles/particle_handler.h>
 
 #include "../tests.h"
+
+#include "../test_grids.h"
+
 
 template <int dim, int spacedim>
 void
 test()
 {
   parallel::distributed::Triangulation<dim, spacedim> tr(MPI_COMM_WORLD);
+  TestGrids::hyper_line(tr, 2);
 
   MappingQ<dim, spacedim> mapping(1);
-
-  // setup triangulation
-  const unsigned int n_cells = 2;
-
-  std::vector<unsigned int> rep(dim, 1);
-  rep[0] = n_cells;
-  Point<dim> p1, p2;
-  for (unsigned int d = 0; d < dim; ++d)
-    {
-      p1[d] = 0;
-      p2[d] = (d == 0) ? n_cells : 1;
-    }
-  GridGenerator::subdivided_hyper_rectangle(tr, rep, p1, p2);
 
   // setup one particle in first cell
   Particles::ParticleHandler<dim, spacedim> particle_handler(tr, mapping);

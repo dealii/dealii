@@ -27,11 +27,11 @@
 
 #include <deal.II/fe/fe_q.h>
 
-#include <deal.II/grid/grid_generator.h>
-
 #include <deal.II/lac/vector.h>
 
 #include "../tests.h"
+
+#include "../test_grids.h"
 
 
 template <int dim>
@@ -40,19 +40,9 @@ test()
 {
   const unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
-  const unsigned int n_cells = 4;
-
   // ------ setup ------
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
-  std::vector<unsigned int>                 rep(dim, 1);
-  rep[0] = n_cells;
-  Point<dim> p1, p2;
-  for (unsigned int d = 0; d < dim; ++d)
-    {
-      p1[d] = 0;
-      p2[d] = (d == 0) ? n_cells : 1;
-    }
-  GridGenerator::subdivided_hyper_rectangle(tria, rep, p1, p2);
+  TestGrids::hyper_line(tria, 4);
 
   {
     auto first = tria.begin(0);

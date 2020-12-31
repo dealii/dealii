@@ -23,7 +23,6 @@
 
 #include <deal.II/fe/fe_q.h>
 
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/hp/fe_collection.h>
@@ -36,25 +35,16 @@
 
 #include "../tests.h"
 
+#include "../test_grids.h"
 
 
 template <int dim>
 void
 test()
 {
-  const unsigned int n_cells = 4;
-
   // ----- setup -----
-  Triangulation<dim>        tria;
-  std::vector<unsigned int> rep(dim, 1);
-  rep[0] = n_cells;
-  Point<dim> p1, p2;
-  for (unsigned int d = 0; d < dim; ++d)
-    {
-      p1[d] = 0;
-      p2[d] = (d == 0) ? n_cells : 1;
-    }
-  GridGenerator::subdivided_hyper_rectangle(tria, rep, p1, p2);
+  Triangulation<dim> tria;
+  TestGrids::hyper_line(tria, 4);
 
   tria.begin_active()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
