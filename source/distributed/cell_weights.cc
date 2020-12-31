@@ -171,9 +171,10 @@ namespace parallel
   {
     // Check if we are still working with the correct combination of
     // Triangulation and DoFHandler.
-    AssertThrow(&triangulation == &(dof_handler.get_triangulation()),
-                ExcMessage(
-                  "Triangulation associated with the DoFHandler has changed!"));
+    Assert(&triangulation == &(dof_handler.get_triangulation()),
+           ExcMessage(
+             "Triangulation associated with the DoFHandler has changed!"));
+    (void)triangulation;
 
     // Convert cell type from Triangulation to DoFHandler to be able
     // to access the information about the degrees of freedom.

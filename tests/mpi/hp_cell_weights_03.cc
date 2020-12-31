@@ -116,12 +116,14 @@ test()
     {
       tria.execute_coarsening_and_refinement();
     }
-  catch (ExcMessage &)
+  catch (const ExceptionBase &e)
     {
-      deallog << "Triangulation changed" << std::endl;
+      deallog << e.get_exc_name() << std::endl;
     }
 #else
-  deallog << "Triangulation changed" << std::endl;
+  deallog
+    << "ExcMessage(\"Triangulation associated with the DoFHandler has changed!\")"
+    << std::endl;
 #endif
 
   // make sure no processor is hanging
@@ -136,6 +138,8 @@ main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    log;
+
+  deal_II_exceptions::disable_abort_on_exception();
 
   deallog.push("2d");
   test<2>();
