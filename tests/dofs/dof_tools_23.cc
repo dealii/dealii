@@ -46,7 +46,7 @@
 
 
 
-template <int dim, int spacedim = dim>
+template <int dim, int spacedim>
 void
 check_this(const DoFHandler<dim, spacedim> &dof_handler)
 {
