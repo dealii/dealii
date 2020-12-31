@@ -245,7 +245,7 @@ void generate_grid(Triangulation<3> &triangulation, int orientation)
  * Print out all face DoFs and support points as well as the actual
  * matching via make_periodicity_constraints
  */
-template <int dim, int spacedim = dim>
+template <int dim, int spacedim>
 void
 print_matching(DoFHandler<dim, spacedim> &dof_handler,
                bool                       constrain_only_velocity = false)
