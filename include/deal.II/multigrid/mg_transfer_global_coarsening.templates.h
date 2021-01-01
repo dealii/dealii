@@ -93,10 +93,12 @@ namespace
   class CellProlongator
   {
   public:
-    CellProlongator(const AlignedVector<Number> &prolongation_matrix_1d,
+    CellProlongator(const AlignedVector<Number> &prolongation_matrix,
+                    const AlignedVector<Number> &prolongation_matrix_1d,
                     const Number *               evaluation_data_coarse,
                     Number *                     evaluation_data_fine)
-      : prolongation_matrix_1d(prolongation_matrix_1d)
+      : prolongation_matrix(prolongation_matrix)
+      , prolongation_matrix_1d(prolongation_matrix_1d)
       , evaluation_data_coarse(evaluation_data_coarse)
       , evaluation_data_fine(evaluation_data_fine)
     {}
@@ -106,6 +108,8 @@ namespace
     run(const unsigned int degree_fine_   = numbers::invalid_unsigned_int,
         const unsigned int degree_coarse_ = numbers::invalid_unsigned_int)
     {
+      Assert(prolongation_matrix_1d.size() > 0, ExcNotImplemented());
+
       internal::FEEvaluationImplBasisChange<
         internal::evaluate_general,
         internal::EvaluatorQuantity::value,
@@ -121,7 +125,28 @@ namespace
                             degree_fine_ + 1);
     }
 
+    void
+    run_full(const unsigned int n_dofs_fine, const unsigned int n_dofs_coarse)
+    {
+      AssertDimension(prolongation_matrix.size(), n_dofs_coarse * n_dofs_fine);
+
+      internal::FEEvaluationImplBasisChange<
+        internal::evaluate_general,
+        internal::EvaluatorQuantity::value,
+        1,
+        0,
+        0,
+        Number,
+        Number>::do_forward(1,
+                            prolongation_matrix,
+                            evaluation_data_coarse,
+                            evaluation_data_fine,
+                            n_dofs_coarse,
+                            n_dofs_fine);
+    }
+
   private:
+    const AlignedVector<Number> &prolongation_matrix;
     const AlignedVector<Number> &prolongation_matrix_1d;
     const Number *               evaluation_data_coarse;
     Number *                     evaluation_data_fine;
@@ -134,10 +159,12 @@ namespace
   class CellRestrictor
   {
   public:
-    CellRestrictor(const AlignedVector<Number> &prolongation_matrix_1d,
+    CellRestrictor(const AlignedVector<Number> &prolongation_matrix,
+                   const AlignedVector<Number> &prolongation_matrix_1d,
                    Number *                     evaluation_data_fine,
                    Number *                     evaluation_data_coarse)
-      : prolongation_matrix_1d(prolongation_matrix_1d)
+      : prolongation_matrix(prolongation_matrix)
+      , prolongation_matrix_1d(prolongation_matrix_1d)
       , evaluation_data_fine(evaluation_data_fine)
       , evaluation_data_coarse(evaluation_data_coarse)
     {}
@@ -147,6 +174,8 @@ namespace
     run(const unsigned int degree_fine_   = numbers::invalid_unsigned_int,
         const unsigned int degree_coarse_ = numbers::invalid_unsigned_int)
     {
+      Assert(prolongation_matrix_1d.size() > 0, ExcNotImplemented());
+
       internal::FEEvaluationImplBasisChange<
         internal::evaluate_general,
         internal::EvaluatorQuantity::value,
@@ -163,7 +192,29 @@ namespace
                              degree_fine_ + 1);
     }
 
+    void
+    run_full(const unsigned int n_dofs_fine, const unsigned int n_dofs_coarse)
+    {
+      AssertDimension(prolongation_matrix.size(), n_dofs_coarse * n_dofs_fine);
+
+      internal::FEEvaluationImplBasisChange<
+        internal::evaluate_general,
+        internal::EvaluatorQuantity::value,
+        1,
+        0,
+        0,
+        Number,
+        Number>::do_backward(1,
+                             prolongation_matrix,
+                             false,
+                             evaluation_data_fine,
+                             evaluation_data_coarse,
+                             n_dofs_coarse,
+                             n_dofs_fine);
+    }
+
   private:
+    const AlignedVector<Number> &prolongation_matrix;
     const AlignedVector<Number> &prolongation_matrix_1d;
     Number *                     evaluation_data_fine;
     Number *                     evaluation_data_coarse;
@@ -258,14 +309,27 @@ namespace internal
       std::vector<std::vector<unsigned int>> cell_local_chilren_indices(
         GeometryInfo<dim>::max_children_per_cell,
         std::vector<unsigned int>(dofs_per_cell_coarse));
-      {
-        for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
-             c++)
-          get_child_offset<dim>(c,
-                                fe_shift_1d,
-                                fe_degree,
-                                cell_local_chilren_indices[c]);
-      }
+      for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
+           c++)
+        get_child_offset<dim>(c,
+                              fe_shift_1d,
+                              fe_degree,
+                              cell_local_chilren_indices[c]);
+      return cell_local_chilren_indices;
+    }
+
+    template <int dim>
+    std::vector<std::vector<unsigned int>>
+    get_child_offsets_general(const unsigned int dofs_per_cell_coarse)
+    {
+      std::vector<std::vector<unsigned int>> cell_local_chilren_indices(
+        GeometryInfo<dim>::max_children_per_cell,
+        std::vector<unsigned int>(dofs_per_cell_coarse));
+      for (unsigned int c = 0, k = 0;
+           c < GeometryInfo<dim>::max_children_per_cell;
+           c++)
+        for (unsigned int d = 0; d < dofs_per_cell_coarse; ++d, ++k)
+          cell_local_chilren_indices[c][d] = k;
       return cell_local_chilren_indices;
     }
 
@@ -313,6 +377,21 @@ namespace internal
           level_coarse_cell_id * GeometryInfo<dim>::max_children_per_cell + i;
 
       return level_coarse_cell_id;
+    }
+
+    template <int dim, int spacedim>
+    std::unique_ptr<FiniteElement<1>>
+    create_1D_fe(const FiniteElement<dim, spacedim> &fe)
+    {
+      std::string fe_name = fe.get_name();
+      {
+        const std::size_t template_starts = fe_name.find_first_of('<');
+        Assert(fe_name[template_starts + 1] ==
+                 (dim == 1 ? '1' : (dim == 2 ? '2' : '3')),
+               ExcInternalError());
+        fe_name[template_starts + 1] = '1';
+      }
+      return FETools::get_fe_by_name<1, 1>(fe_name);
     }
 
   } // namespace
@@ -917,6 +996,9 @@ namespace internal
 
       transfer.n_components = fe_fine.n_components();
 
+      const auto reference_cell_type =
+        dof_handler_fine.get_fe(0).reference_cell();
+
       // create partitioners and vectors for internal purposes
       {
         // ... for fine mesh
@@ -1015,9 +1097,12 @@ namespace internal
 
 
       const auto cell_local_chilren_indices =
-        get_child_offsets<dim>(transfer.schemes[0].dofs_per_cell_coarse,
-                               fe_fine.degree + 1,
-                               fe_fine.degree);
+        (reference_cell_type == ReferenceCells::get_hypercube<dim>()) ?
+          get_child_offsets<dim>(transfer.schemes[0].dofs_per_cell_coarse,
+                                 fe_fine.degree + 1,
+                                 fe_fine.degree) :
+          get_child_offsets_general<dim>(
+            transfer.schemes[0].dofs_per_cell_coarse);
 
 
       // indices
@@ -1041,13 +1126,22 @@ namespace internal
 
         // ---------------------- lexicographic_numbering ----------------------
         std::vector<unsigned int> lexicographic_numbering;
-        {
-          const Quadrature<1> dummy_quadrature(
-            std::vector<Point<1>>(1, Point<1>()));
-          internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
-          shape_info.reinit(dummy_quadrature, fe_fine, 0);
-          lexicographic_numbering = shape_info.lexicographic_numbering;
-        }
+        if (reference_cell_type == ReferenceCells::get_hypercube<dim>())
+          {
+            const Quadrature<1> dummy_quadrature(
+              std::vector<Point<1>>(1, Point<1>()));
+            internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
+            shape_info.reinit(dummy_quadrature, fe_fine, 0);
+            lexicographic_numbering = shape_info.lexicographic_numbering;
+          }
+        else
+          {
+            const auto dummy_quadrature =
+              reference_cell_type.template get_gauss_type_quadrature<dim>(1);
+            internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
+            shape_info.reinit(dummy_quadrature, fe_fine, 0);
+            lexicographic_numbering = shape_info.lexicographic_numbering;
+          }
 
         // ------------------------------ indices ------------------------------
         unsigned int *level_dof_indices_coarse_0 =
@@ -1130,65 +1224,89 @@ namespace internal
       // ------------- prolongation matrix (0) -> identity matrix --------------
       {
         AssertDimension(fe_fine.n_base_elements(), 1);
-        std::string fe_name = fe_fine.base_element(0).get_name();
-        {
-          const std::size_t template_starts = fe_name.find_first_of('<');
-          Assert(fe_name[template_starts + 1] ==
-                   (dim == 1 ? '1' : (dim == 2 ? '2' : '3')),
-                 ExcInternalError());
-          fe_name[template_starts + 1] = '1';
-        }
-        const std::unique_ptr<FiniteElement<1>> fe(
-          FETools::get_fe_by_name<1, 1>(fe_name));
+        if (reference_cell_type == ReferenceCells::get_hypercube<dim>())
+          {
+            const auto fe = create_1D_fe(fe_fine.base_element(0));
 
-        transfer.schemes[0].prolongation_matrix_1d.resize(fe->dofs_per_cell *
-                                                          fe->dofs_per_cell);
+            transfer.schemes[0].prolongation_matrix_1d.resize(
+              fe->dofs_per_cell * fe->dofs_per_cell);
 
-        for (unsigned int i = 0; i < fe->dofs_per_cell; i++)
-          transfer.schemes[0]
-            .prolongation_matrix_1d[i + i * fe->dofs_per_cell] = Number(1.0);
+            for (unsigned int i = 0; i < fe->dofs_per_cell; i++)
+              transfer.schemes[0]
+                .prolongation_matrix_1d[i + i * fe->dofs_per_cell] =
+                Number(1.0);
+          }
+        else
+          {
+            const unsigned int n_dofs_per_cell =
+              fe_fine.base_element(0).n_dofs_per_cell();
+
+            transfer.schemes[0].prolongation_matrix.resize(n_dofs_per_cell *
+                                                           n_dofs_per_cell);
+
+            for (unsigned int i = 0; i < n_dofs_per_cell; i++)
+              transfer.schemes[0].prolongation_matrix[i + i * n_dofs_per_cell] =
+                Number(1.0);
+          }
       }
 
       // ----------------------- prolongation matrix (1) -----------------------
       {
         AssertDimension(fe_fine.n_base_elements(), 1);
-        std::string fe_name = fe_fine.base_element(0).get_name();
-        {
-          const std::size_t template_starts = fe_name.find_first_of('<');
-          Assert(fe_name[template_starts + 1] ==
-                   (dim == 1 ? '1' : (dim == 2 ? '2' : '3')),
-                 ExcInternalError());
-          fe_name[template_starts + 1] = '1';
-        }
-        const std::unique_ptr<FiniteElement<1>> fe(
-          FETools::get_fe_by_name<1, 1>(fe_name));
+        if (reference_cell_type == ReferenceCells::get_hypercube<dim>())
+          {
+            const auto fe = create_1D_fe(fe_fine.base_element(0));
 
-        std::vector<unsigned int> renumbering(fe->dofs_per_cell);
-        {
-          AssertIndexRange(fe->dofs_per_vertex, 2);
-          renumbering[0] = 0;
-          for (unsigned int i = 0; i < fe->dofs_per_line; ++i)
-            renumbering[i + fe->dofs_per_vertex] =
-              GeometryInfo<1>::vertices_per_cell * fe->dofs_per_vertex + i;
-          if (fe->dofs_per_vertex > 0)
-            renumbering[fe->dofs_per_cell - fe->dofs_per_vertex] =
-              fe->dofs_per_vertex;
-        }
+            std::vector<unsigned int> renumbering(fe->dofs_per_cell);
+            {
+              AssertIndexRange(fe->dofs_per_vertex, 2);
+              renumbering[0] = 0;
+              for (unsigned int i = 0; i < fe->dofs_per_line; ++i)
+                renumbering[i + fe->dofs_per_vertex] =
+                  GeometryInfo<1>::vertices_per_cell * fe->dofs_per_vertex + i;
+              if (fe->dofs_per_vertex > 0)
+                renumbering[fe->dofs_per_cell - fe->dofs_per_vertex] =
+                  fe->dofs_per_vertex;
+            }
 
-        // TODO: data structures are saved in form of DG data structures here
-        const unsigned int shift           = fe->dofs_per_cell;
-        const unsigned int n_child_dofs_1d = fe->dofs_per_cell * 2;
+            // TODO: data structures are saved in form of DG data structures
+            // here
+            const unsigned int shift           = fe->dofs_per_cell;
+            const unsigned int n_child_dofs_1d = fe->dofs_per_cell * 2;
 
-        transfer.schemes[1].prolongation_matrix_1d.resize(fe->dofs_per_cell *
-                                                          n_child_dofs_1d);
+            transfer.schemes[1].prolongation_matrix_1d.resize(
+              fe->dofs_per_cell * n_child_dofs_1d);
 
-        for (unsigned int c = 0; c < GeometryInfo<1>::max_children_per_cell;
-             ++c)
-          for (unsigned int i = 0; i < fe->dofs_per_cell; ++i)
-            for (unsigned int j = 0; j < fe->dofs_per_cell; ++j)
-              transfer.schemes[1]
-                .prolongation_matrix_1d[i * n_child_dofs_1d + j + c * shift] =
-                fe->get_prolongation_matrix(c)(renumbering[j], renumbering[i]);
+            for (unsigned int c = 0; c < GeometryInfo<1>::max_children_per_cell;
+                 ++c)
+              for (unsigned int i = 0; i < fe->dofs_per_cell; ++i)
+                for (unsigned int j = 0; j < fe->dofs_per_cell; ++j)
+                  transfer.schemes[1]
+                    .prolongation_matrix_1d[i * n_child_dofs_1d + j +
+                                            c * shift] =
+                    fe->get_prolongation_matrix(c)(renumbering[j],
+                                                   renumbering[i]);
+          }
+        else
+          {
+            const auto &       fe              = fe_fine.base_element(0);
+            const unsigned int n_dofs_per_cell = fe.n_dofs_per_cell();
+
+            transfer.schemes[1].prolongation_matrix.resize(
+              n_dofs_per_cell * n_dofs_per_cell *
+              GeometryInfo<dim>::max_children_per_cell);
+
+            for (unsigned int c = 0;
+                 c < GeometryInfo<dim>::max_children_per_cell;
+                 ++c)
+              for (unsigned int i = 0; i < n_dofs_per_cell; ++i)
+                for (unsigned int j = 0; j < n_dofs_per_cell; ++j)
+                  transfer.schemes[1].prolongation_matrix
+                    [i * n_dofs_per_cell *
+                       GeometryInfo<dim>::max_children_per_cell +
+                     j + c * n_dofs_per_cell] =
+                    fe.get_prolongation_matrix(c)(j, i);
+          }
       }
 
 
@@ -1418,26 +1536,56 @@ namespace internal
                 transfer.schemes[fe_index_pair.second].dofs_per_cell_coarse *
                 transfer.schemes[fe_index_pair.second].n_coarse_cells);
 
+            const auto reference_cell_type =
+              dof_handler_fine.get_fe(fe_index_pair.first.second)
+                .reference_cell();
+
+            Assert(reference_cell_type ==
+                     dof_handler_coarse.get_fe(fe_index_pair.first.second)
+                       .reference_cell(),
+                   ExcNotImplemented());
 
             // ------------------- lexicographic_numbering  --------------------
-            {
-              const Quadrature<1> dummy_quadrature(
-                std::vector<Point<1>>(1, Point<1>()));
-              internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
-              shape_info.reinit(dummy_quadrature,
-                                dof_handler_fine.get_fe(
-                                  fe_index_pair.first.second),
-                                0);
-              lexicographic_numbering_fine[fe_index_pair.second] =
-                shape_info.lexicographic_numbering;
+            if (reference_cell_type == ReferenceCells::get_hypercube<dim>())
+              {
+                const Quadrature<1> dummy_quadrature(
+                  std::vector<Point<1>>(1, Point<1>()));
+                internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
+                shape_info.reinit(dummy_quadrature,
+                                  dof_handler_fine.get_fe(
+                                    fe_index_pair.first.second),
+                                  0);
+                lexicographic_numbering_fine[fe_index_pair.second] =
+                  shape_info.lexicographic_numbering;
 
-              shape_info.reinit(dummy_quadrature,
-                                dof_handler_coarse.get_fe(
-                                  fe_index_pair.first.first),
-                                0);
-              lexicographic_numbering_coarse[fe_index_pair.second] =
-                shape_info.lexicographic_numbering;
-            }
+                shape_info.reinit(dummy_quadrature,
+                                  dof_handler_coarse.get_fe(
+                                    fe_index_pair.first.first),
+                                  0);
+                lexicographic_numbering_coarse[fe_index_pair.second] =
+                  shape_info.lexicographic_numbering;
+              }
+            else
+              {
+                const auto dummy_quadrature =
+                  reference_cell_type.template get_gauss_type_quadrature<dim>(
+                    1);
+
+                internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
+                shape_info.reinit(dummy_quadrature,
+                                  dof_handler_fine.get_fe(
+                                    fe_index_pair.first.second),
+                                  0);
+                lexicographic_numbering_fine[fe_index_pair.second] =
+                  shape_info.lexicographic_numbering;
+
+                shape_info.reinit(dummy_quadrature,
+                                  dof_handler_coarse.get_fe(
+                                    fe_index_pair.first.first),
+                                  0);
+                lexicographic_numbering_coarse[fe_index_pair.second] =
+                  shape_info.lexicographic_numbering;
+              }
           }
 
         // ------------------------------ indices  -----------------------------
@@ -1494,82 +1642,89 @@ namespace internal
 
           AssertDimension(
             dof_handler_fine.get_fe(fe_index_pair.second).n_base_elements(), 1);
-          std::string fe_name_fine =
-            dof_handler_fine.get_fe(fe_index_pair.second)
-              .base_element(0)
-              .get_name();
-          {
-            const std::size_t template_starts = fe_name_fine.find_first_of('<');
-            Assert(fe_name_fine[template_starts + 1] ==
-                     (dim == 1 ? '1' : (dim == 2 ? '2' : '3')),
-                   ExcInternalError());
-            fe_name_fine[template_starts + 1] = '1';
-          }
-          const std::unique_ptr<FiniteElement<1>> fe_fine(
-            FETools::get_fe_by_name<1, 1>(fe_name_fine));
-
-          std::vector<unsigned int> renumbering_fine(fe_fine->dofs_per_cell);
-          {
-            AssertIndexRange(fe_fine->dofs_per_vertex, 2);
-            renumbering_fine[0] = 0;
-            for (unsigned int i = 0; i < fe_fine->dofs_per_line; ++i)
-              renumbering_fine[i + fe_fine->dofs_per_vertex] =
-                GeometryInfo<1>::vertices_per_cell * fe_fine->dofs_per_vertex +
-                i;
-            if (fe_fine->dofs_per_vertex > 0)
-              renumbering_fine[fe_fine->dofs_per_cell -
-                               fe_fine->dofs_per_vertex] =
-                fe_fine->dofs_per_vertex;
-          }
-
-
-
           AssertDimension(
             dof_handler_coarse.get_fe(fe_index_pair.first).n_base_elements(),
             1);
-          std::string fe_name_coarse =
-            dof_handler_coarse.get_fe(fe_index_pair.first)
-              .base_element(0)
-              .get_name();
-          {
-            const std::size_t template_starts =
-              fe_name_coarse.find_first_of('<');
-            Assert(fe_name_coarse[template_starts + 1] ==
-                     (dim == 1 ? '1' : (dim == 2 ? '2' : '3')),
-                   ExcInternalError());
-            fe_name_coarse[template_starts + 1] = '1';
-          }
-          const std::unique_ptr<FiniteElement<1>> fe_coarse(
-            FETools::get_fe_by_name<1, 1>(fe_name_coarse));
 
-          std::vector<unsigned int> renumbering_coarse(
-            fe_coarse->dofs_per_cell);
-          {
-            AssertIndexRange(fe_coarse->dofs_per_vertex, 2);
-            renumbering_coarse[0] = 0;
-            for (unsigned int i = 0; i < fe_coarse->dofs_per_line; ++i)
-              renumbering_coarse[i + fe_coarse->dofs_per_vertex] =
-                GeometryInfo<1>::vertices_per_cell *
-                  fe_coarse->dofs_per_vertex +
-                i;
-            if (fe_coarse->dofs_per_vertex > 0)
-              renumbering_coarse[fe_coarse->dofs_per_cell -
-                                 fe_coarse->dofs_per_vertex] =
-                fe_coarse->dofs_per_vertex;
-          }
+          const auto reference_cell_type =
+            dof_handler_fine.get_fe(fe_index_pair_.first.second)
+              .reference_cell();
 
+          Assert(reference_cell_type ==
+                   dof_handler_coarse.get_fe(fe_index_pair_.first.second)
+                     .reference_cell(),
+                 ExcNotImplemented());
 
+          if (reference_cell_type == ReferenceCells::get_hypercube<dim>())
+            {
+              const auto fe_fine = create_1D_fe(
+                dof_handler_fine.get_fe(fe_index_pair.second).base_element(0));
 
-          FullMatrix<double> matrix(fe_fine->dofs_per_cell,
-                                    fe_coarse->dofs_per_cell);
-          FETools::get_projection_matrix(*fe_coarse, *fe_fine, matrix);
-          transfer.schemes[fe_index_no].prolongation_matrix_1d.resize(
-            fe_fine->dofs_per_cell * fe_coarse->dofs_per_cell);
+              std::vector<unsigned int> renumbering_fine(
+                fe_fine->dofs_per_cell);
+              {
+                AssertIndexRange(fe_fine->dofs_per_vertex, 2);
+                renumbering_fine[0] = 0;
+                for (unsigned int i = 0; i < fe_fine->dofs_per_line; ++i)
+                  renumbering_fine[i + fe_fine->dofs_per_vertex] =
+                    GeometryInfo<1>::vertices_per_cell *
+                      fe_fine->dofs_per_vertex +
+                    i;
+                if (fe_fine->dofs_per_vertex > 0)
+                  renumbering_fine[fe_fine->dofs_per_cell -
+                                   fe_fine->dofs_per_vertex] =
+                    fe_fine->dofs_per_vertex;
+              }
 
-          for (unsigned int i = 0, k = 0; i < fe_coarse->dofs_per_cell; ++i)
-            for (unsigned int j = 0; j < fe_fine->dofs_per_cell; ++j, ++k)
-              transfer.schemes[fe_index_no].prolongation_matrix_1d[k] =
-                matrix(renumbering_fine[j], renumbering_coarse[i]);
+              const auto fe_coarse = create_1D_fe(
+                dof_handler_coarse.get_fe(fe_index_pair.first).base_element(0));
+
+              std::vector<unsigned int> renumbering_coarse(
+                fe_coarse->dofs_per_cell);
+              {
+                AssertIndexRange(fe_coarse->dofs_per_vertex, 2);
+                renumbering_coarse[0] = 0;
+                for (unsigned int i = 0; i < fe_coarse->dofs_per_line; ++i)
+                  renumbering_coarse[i + fe_coarse->dofs_per_vertex] =
+                    GeometryInfo<1>::vertices_per_cell *
+                      fe_coarse->dofs_per_vertex +
+                    i;
+                if (fe_coarse->dofs_per_vertex > 0)
+                  renumbering_coarse[fe_coarse->dofs_per_cell -
+                                     fe_coarse->dofs_per_vertex] =
+                    fe_coarse->dofs_per_vertex;
+              }
+
+              FullMatrix<double> matrix(fe_fine->dofs_per_cell,
+                                        fe_coarse->dofs_per_cell);
+              FETools::get_projection_matrix(*fe_coarse, *fe_fine, matrix);
+              transfer.schemes[fe_index_no].prolongation_matrix_1d.resize(
+                fe_fine->dofs_per_cell * fe_coarse->dofs_per_cell);
+
+              for (unsigned int i = 0, k = 0; i < fe_coarse->dofs_per_cell; ++i)
+                for (unsigned int j = 0; j < fe_fine->dofs_per_cell; ++j, ++k)
+                  transfer.schemes[fe_index_no].prolongation_matrix_1d[k] =
+                    matrix(renumbering_fine[j], renumbering_coarse[i]);
+            }
+          else
+            {
+              const auto &fe_fine =
+                dof_handler_fine.get_fe(fe_index_pair.second).base_element(0);
+
+              const auto &fe_coarse =
+                dof_handler_coarse.get_fe(fe_index_pair.first).base_element(0);
+
+              FullMatrix<double> matrix(fe_fine.dofs_per_cell,
+                                        fe_coarse.dofs_per_cell);
+              FETools::get_projection_matrix(fe_coarse, fe_fine, matrix);
+              transfer.schemes[fe_index_no].prolongation_matrix.resize(
+                fe_fine.dofs_per_cell * fe_coarse.dofs_per_cell);
+
+              for (unsigned int i = 0, k = 0; i < fe_coarse.dofs_per_cell; ++i)
+                for (unsigned int j = 0; j < fe_fine.dofs_per_cell; ++j, ++k)
+                  transfer.schemes[fe_index_no].prolongation_matrix[k] =
+                    matrix(j, i);
+            }
         }
 
       // ------------------------------- weights -------------------------------
@@ -1850,9 +2005,9 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
                                         scheme.degree_coarse);
 
       const unsigned int n_scalar_dofs_fine =
-        Utilities::pow(scheme.degree_fine + 1, dim);
+        scheme.dofs_per_cell_fine / n_components;
       const unsigned int n_scalar_dofs_coarse =
-        Utilities::pow(scheme.degree_coarse + 1, dim);
+        scheme.dofs_per_cell_coarse / n_components;
 
       for (unsigned int cell = 0; cell < scheme.n_coarse_cells; cell += n_lanes)
         {
@@ -1879,11 +2034,16 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
           for (int c = n_components - 1; c >= 0; --c)
             {
               CellProlongator<dim, VectorizedArrayType> cell_prolongator(
+                scheme.prolongation_matrix,
                 scheme.prolongation_matrix_1d,
                 evaluation_data_coarse.begin() + c * n_scalar_dofs_coarse,
                 evaluation_data_fine.begin() + c * n_scalar_dofs_fine);
 
-              cell_transfer.run(cell_prolongator);
+              if (scheme.prolongation_matrix_1d.size() > 0)
+                cell_transfer.run(cell_prolongator);
+              else
+                cell_prolongator.run_full(n_scalar_dofs_fine,
+                                          n_scalar_dofs_coarse);
             }
           // ------------------------------ fine -----------------------------
 
@@ -1982,9 +2142,9 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
                                         scheme.degree_coarse);
 
       const unsigned int n_scalar_dofs_fine =
-        Utilities::pow(scheme.degree_fine + 1, dim);
+        scheme.dofs_per_cell_fine / n_components;
       const unsigned int n_scalar_dofs_coarse =
-        Utilities::pow(scheme.degree_coarse + 1, dim);
+        scheme.dofs_per_cell_coarse / n_components;
 
       for (unsigned int cell = 0; cell < scheme.n_coarse_cells; cell += n_lanes)
         {
@@ -2020,11 +2180,16 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
           for (int c = n_components - 1; c >= 0; --c)
             {
               CellRestrictor<dim, VectorizedArrayType> cell_restrictor(
+                scheme.prolongation_matrix,
                 scheme.prolongation_matrix_1d,
                 evaluation_data_fine.begin() + c * n_scalar_dofs_fine,
                 evaluation_data_coarse.begin() + c * n_scalar_dofs_coarse);
 
-              cell_transfer.run(cell_restrictor);
+              if (scheme.prolongation_matrix_1d.size() > 0)
+                cell_transfer.run(cell_restrictor);
+              else
+                cell_restrictor.run_full(n_scalar_dofs_fine,
+                                         n_scalar_dofs_coarse);
             }
           // ----------------------------- coarse ----------------------------
 

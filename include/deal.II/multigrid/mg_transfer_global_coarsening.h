@@ -239,7 +239,12 @@ private:
     std::vector<Number> weights;
 
     /**
-     * 1D prolongation matrix.
+     * Prolongation matrix for non-tensor-product elements.
+     */
+    AlignedVector<VectorizedArray<Number>> prolongation_matrix;
+
+    /**
+     * 1D prolongation matrix for tensor-product elements.
      */
     AlignedVector<VectorizedArray<Number>> prolongation_matrix_1d;
 
