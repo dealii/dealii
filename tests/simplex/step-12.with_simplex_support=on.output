@@ -1,15 +1,24 @@
-
-DEAL::Cycle 0
-DEAL::  Number of active cells:       2048
-DEAL::  Number of degrees of freedom: 12288
-DEAL:Richardson::Starting value 0.0883883
-DEAL:Richardson::Convergence step 16 value 9.71637e-17
-DEAL::  Solver converged in 16 iterations.
-DEAL::  L-infinity norm: 2.33280
-DEAL::Cycle 0
-DEAL::  Number of active cells:       2560
-DEAL::  Number of degrees of freedom: 25600
-DEAL:Richardson::Starting value 0.0360844
-DEAL:Richardson::Convergence step 13 value 2.52800e-14
-DEAL::  Solver converged in 13 iterations.
-DEAL::  L-infinity norm: 13.9260
+Cycle 0
+  Number of active cells:       8
+  Number of degrees of freedom: 24
+  Solver converged in 7 iterations.
+  Writing solution to <solution-0.vtk>
+  L-infinity norm: 1.00799
+Cycle 1
+  Number of active cells:       32
+  Number of degrees of freedom: 96
+  Solver converged in 8 iterations.
+  Writing solution to <solution-1.vtk>
+  L-infinity norm: 1.14371
+Cycle 2
+  Number of active cells:       128
+  Number of degrees of freedom: 384
+  Solver converged in 11 iterations.
+  Writing solution to <solution-2.vtk>
+  L-infinity norm: 1.09928
+Cycle 3
+  Number of active cells:       512
+  Number of degrees of freedom: 1536
+  Solver converged in 21 iterations.
+  Writing solution to <solution-3.vtk>
+  L-infinity norm: 1.11521
