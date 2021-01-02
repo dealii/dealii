@@ -245,7 +245,6 @@ public:
       , cell_vectorization_categories_strict(
           cell_vectorization_categories_strict)
       , communicator_sm(MPI_COMM_SELF)
-      , use_vector_data_exchanger_full(false)
     {}
 
     /**
@@ -272,7 +271,6 @@ public:
       , cell_vectorization_categories_strict(
           other.cell_vectorization_categories_strict)
       , communicator_sm(other.communicator_sm)
-      , use_vector_data_exchanger_full(other.use_vector_data_exchanger_full)
     {}
 
     // remove with level_mg_handler
@@ -302,8 +300,7 @@ public:
       cell_vectorization_category   = other.cell_vectorization_category;
       cell_vectorization_categories_strict =
         other.cell_vectorization_categories_strict;
-      communicator_sm                = other.communicator_sm;
-      use_vector_data_exchanger_full = other.use_vector_data_exchanger_full;
+      communicator_sm = other.communicator_sm;
 
       return *this;
     }
@@ -541,13 +538,6 @@ public:
      * Shared-memory MPI communicator. Default: MPI_COMM_SELF.
      */
     MPI_Comm communicator_sm;
-
-    /**
-     * Experimental: flag to switch between
-     * internal::MatrixFreeFunctions::VectorDataExchange::PartitionerWrapper and
-     * internal::MatrixFreeFunctions::VectorDataExchange::Full.
-     */
-    bool use_vector_data_exchanger_full;
   };
 
   /**
