@@ -698,187 +698,6 @@ namespace
   }
 
 
-
-  /**
-   * For a given triangulation: set up the
-   * neighbor information on all cells.
-   */
-  template <int spacedim>
-  void update_neighbors(Triangulation<1, spacedim> &)
-  {}
-
-
-  template <int dim, int spacedim>
-  void
-  update_neighbors(Triangulation<dim, spacedim> &triangulation)
-  {
-    // each face can be neighbored on two sides
-    // by cells. according to the face's
-    // intrinsic normal we define the left
-    // neighbor as the one for which the face
-    // normal points outward, and store that
-    // one first; the second one is then
-    // the right neighbor for which the
-    // face normal points inward. This
-    // information depends on the type of cell
-    // and local number of face for the
-    // 'standard ordering and orientation' of
-    // faces and then on the face_orientation
-    // information for the real mesh. Set up a
-    // table to have fast access to those
-    // offsets (0 for left and 1 for
-    // right). Some of the values are invalid
-    // as they reference too large face
-    // numbers, but we just leave them at a
-    // zero value.
-    //
-    // Note, that in 2d for lines as faces the
-    // normal direction given in the
-    // GeometryInfo class is not consistent. We
-    // thus define here that the normal for a
-    // line points to the right if the line
-    // points upwards.
-    //
-    // There is one more point to
-    // consider, however: if we have
-    // dim<spacedim, then we may have
-    // cases where cells are
-    // inverted. In effect, both
-    // cells think they are the left
-    // neighbor of an edge, for
-    // example, which leads us to
-    // forget neighborship
-    // information (a case that shows
-    // this is
-    // codim_one/hanging_nodes_02). We
-    // store whether a cell is
-    // inverted using the
-    // direction_flag, so if a cell
-    // has a false direction_flag,
-    // then we need to invert our
-    // selection whether we are a
-    // left or right neighbor in all
-    // following computations.
-    //
-    // first index:  dimension (minus 2)
-    // second index: local face index
-    // third index:  face_orientation (false and true)
-    static const unsigned int left_right_offset[2][6][2] = {
-      // quadrilateral
-      {{0, 1},  // face 0, face_orientation = false and true
-       {1, 0},  // face 1, face_orientation = false and true
-       {1, 0},  // face 2, face_orientation = false and true
-       {0, 1},  // face 3, face_orientation = false and true
-       {0, 0},  // face 4, invalid face
-       {0, 0}}, // face 5, invalid face
-                // hexahedron
-      {{0, 1}, {1, 0}, {0, 1}, {1, 0}, {0, 1}, {1, 0}}};
-
-    // now create a vector of the two active
-    // neighbors (left and right) for each face
-    // and fill it by looping over all cells. For
-    // cases with anisotropic refinement and more
-    // then one cell neighboring at a given side
-    // of the face we will automatically get the
-    // active one on the highest level as we loop
-    // over cells from lower levels first.
-    const typename Triangulation<dim, spacedim>::cell_iterator dummy;
-    std::vector<typename Triangulation<dim, spacedim>::cell_iterator>
-      adjacent_cells(2 * triangulation.n_raw_faces(), dummy);
-
-    for (const auto &cell : triangulation.cell_iterators())
-      for (auto f : cell->face_indices())
-        {
-          const typename Triangulation<dim, spacedim>::face_iterator face =
-            cell->face(f);
-
-          const unsigned int offset =
-            (cell->direction_flag() ?
-               left_right_offset[dim - 2][f][cell->face_orientation(f)] :
-               1 - left_right_offset[dim - 2][f][cell->face_orientation(f)]);
-
-          adjacent_cells[2 * face->index() + offset] = cell;
-
-          // if this cell is not refined, but the
-          // face is, then we'll have to set our
-          // cell as neighbor for the child faces
-          // as well. Fortunately the normal
-          // orientation of children will be just
-          // the same.
-          if (dim == 2)
-            {
-              if (cell->is_active() && face->has_children())
-                {
-                  adjacent_cells[2 * face->child(0)->index() + offset] = cell;
-                  adjacent_cells[2 * face->child(1)->index() + offset] = cell;
-                }
-            }
-          else // -> dim == 3
-            {
-              // We need the same as in 2d
-              // here. Furthermore, if the face is
-              // refined with cut_x or cut_y then
-              // those children again in the other
-              // direction, and if this cell is
-              // refined isotropically (along the
-              // face) then the neighbor will
-              // (probably) be refined as cut_x or
-              // cut_y along the face. For those
-              // neighboring children cells, their
-              // neighbor will be the current,
-              // inactive cell, as our children are
-              // too fine to be neighbors. Catch that
-              // case by also acting on inactive
-              // cells with isotropic refinement
-              // along the face. If the situation
-              // described is not present, the data
-              // will be overwritten later on when we
-              // visit cells on finer levels, so no
-              // harm will be done.
-              if (face->has_children() &&
-                  (cell->is_active() ||
-                   GeometryInfo<dim>::face_refinement_case(
-                     cell->refinement_case(), f) ==
-                     RefinementCase<dim - 1>::isotropic_refinement))
-                {
-                  for (unsigned int c = 0; c < face->n_children(); ++c)
-                    adjacent_cells[2 * face->child(c)->index() + offset] = cell;
-                  if (face->child(0)->has_children())
-                    {
-                      adjacent_cells[2 * face->child(0)->child(0)->index() +
-                                     offset] = cell;
-                      adjacent_cells[2 * face->child(0)->child(1)->index() +
-                                     offset] = cell;
-                    }
-                  if (face->child(1)->has_children())
-                    {
-                      adjacent_cells[2 * face->child(1)->child(0)->index() +
-                                     offset] = cell;
-                      adjacent_cells[2 * face->child(1)->child(1)->index() +
-                                     offset] = cell;
-                    }
-                } // if cell active and face refined
-            }     // else -> dim==3
-        }         // for all faces of all cells
-
-    // now loop again over all cells and set the
-    // corresponding neighbor cell. Note, that we
-    // have to use the opposite of the
-    // left_right_offset in this case as we want
-    // the offset of the neighbor, not our own.
-    for (const auto &cell : triangulation.cell_iterators())
-      for (auto f : cell->face_indices())
-        {
-          const unsigned int offset =
-            (cell->direction_flag() ?
-               left_right_offset[dim - 2][f][cell->face_orientation(f)] :
-               1 - left_right_offset[dim - 2][f][cell->face_orientation(f)]);
-          cell->set_neighbor(
-            f, adjacent_cells[2 * cell->face(f)->index() + 1 - offset]);
-        }
-  }
-
-
   template <int dim, int spacedim>
   void
   update_periodic_face_map_recursively(
@@ -1811,6 +1630,12 @@ namespace internal
       virtual ~Policy() = default;
 
       /**
+       * Update neighbors.
+       */
+      virtual void
+      update_neighbors(Triangulation<dim, spacedim> &tria) = 0;
+
+      /**
        * Delete children of given cell.
        */
       virtual void
@@ -1869,6 +1694,12 @@ namespace internal
     class PolicyWrapper : public Policy<dim, spacedim>
     {
     public:
+      void
+      update_neighbors(Triangulation<dim, spacedim> &tria) override
+      {
+        T::update_neighbors(tria);
+      }
+
       void
       delete_children(
         Triangulation<dim, spacedim> &                        tria,
@@ -2309,6 +2140,188 @@ namespace internal
 
         // wait for the background computation for quads
         update_quads_and_lines.join();
+      }
+
+
+
+      template <int spacedim>
+      static void update_neighbors(Triangulation<1, spacedim> &)
+      {}
+
+
+      template <int dim, int spacedim>
+      static void
+      update_neighbors(Triangulation<dim, spacedim> &triangulation)
+      {
+        // each face can be neighbored on two sides
+        // by cells. according to the face's
+        // intrinsic normal we define the left
+        // neighbor as the one for which the face
+        // normal points outward, and store that
+        // one first; the second one is then
+        // the right neighbor for which the
+        // face normal points inward. This
+        // information depends on the type of cell
+        // and local number of face for the
+        // 'standard ordering and orientation' of
+        // faces and then on the face_orientation
+        // information for the real mesh. Set up a
+        // table to have fast access to those
+        // offsets (0 for left and 1 for
+        // right). Some of the values are invalid
+        // as they reference too large face
+        // numbers, but we just leave them at a
+        // zero value.
+        //
+        // Note, that in 2d for lines as faces the
+        // normal direction given in the
+        // GeometryInfo class is not consistent. We
+        // thus define here that the normal for a
+        // line points to the right if the line
+        // points upwards.
+        //
+        // There is one more point to
+        // consider, however: if we have
+        // dim<spacedim, then we may have
+        // cases where cells are
+        // inverted. In effect, both
+        // cells think they are the left
+        // neighbor of an edge, for
+        // example, which leads us to
+        // forget neighborship
+        // information (a case that shows
+        // this is
+        // codim_one/hanging_nodes_02). We
+        // store whether a cell is
+        // inverted using the
+        // direction_flag, so if a cell
+        // has a false direction_flag,
+        // then we need to invert our
+        // selection whether we are a
+        // left or right neighbor in all
+        // following computations.
+        //
+        // first index:  dimension (minus 2)
+        // second index: local face index
+        // third index:  face_orientation (false and true)
+        static const unsigned int left_right_offset[2][6][2] = {
+          // quadrilateral
+          {{0, 1},  // face 0, face_orientation = false and true
+           {1, 0},  // face 1, face_orientation = false and true
+           {1, 0},  // face 2, face_orientation = false and true
+           {0, 1},  // face 3, face_orientation = false and true
+           {0, 0},  // face 4, invalid face
+           {0, 0}}, // face 5, invalid face
+                    // hexahedron
+          {{0, 1}, {1, 0}, {0, 1}, {1, 0}, {0, 1}, {1, 0}}};
+
+        // now create a vector of the two active
+        // neighbors (left and right) for each face
+        // and fill it by looping over all cells. For
+        // cases with anisotropic refinement and more
+        // then one cell neighboring at a given side
+        // of the face we will automatically get the
+        // active one on the highest level as we loop
+        // over cells from lower levels first.
+        const typename Triangulation<dim, spacedim>::cell_iterator dummy;
+        std::vector<typename Triangulation<dim, spacedim>::cell_iterator>
+          adjacent_cells(2 * triangulation.n_raw_faces(), dummy);
+
+        for (const auto &cell : triangulation.cell_iterators())
+          for (auto f : cell->face_indices())
+            {
+              const typename Triangulation<dim, spacedim>::face_iterator face =
+                cell->face(f);
+
+              const unsigned int offset =
+                (cell->direction_flag() ?
+                   left_right_offset[dim - 2][f][cell->face_orientation(f)] :
+                   1 -
+                     left_right_offset[dim - 2][f][cell->face_orientation(f)]);
+
+              adjacent_cells[2 * face->index() + offset] = cell;
+
+              // if this cell is not refined, but the
+              // face is, then we'll have to set our
+              // cell as neighbor for the child faces
+              // as well. Fortunately the normal
+              // orientation of children will be just
+              // the same.
+              if (dim == 2)
+                {
+                  if (cell->is_active() && face->has_children())
+                    {
+                      adjacent_cells[2 * face->child(0)->index() + offset] =
+                        cell;
+                      adjacent_cells[2 * face->child(1)->index() + offset] =
+                        cell;
+                    }
+                }
+              else // -> dim == 3
+                {
+                  // We need the same as in 2d
+                  // here. Furthermore, if the face is
+                  // refined with cut_x or cut_y then
+                  // those children again in the other
+                  // direction, and if this cell is
+                  // refined isotropically (along the
+                  // face) then the neighbor will
+                  // (probably) be refined as cut_x or
+                  // cut_y along the face. For those
+                  // neighboring children cells, their
+                  // neighbor will be the current,
+                  // inactive cell, as our children are
+                  // too fine to be neighbors. Catch that
+                  // case by also acting on inactive
+                  // cells with isotropic refinement
+                  // along the face. If the situation
+                  // described is not present, the data
+                  // will be overwritten later on when we
+                  // visit cells on finer levels, so no
+                  // harm will be done.
+                  if (face->has_children() &&
+                      (cell->is_active() ||
+                       GeometryInfo<dim>::face_refinement_case(
+                         cell->refinement_case(), f) ==
+                         RefinementCase<dim - 1>::isotropic_refinement))
+                    {
+                      for (unsigned int c = 0; c < face->n_children(); ++c)
+                        adjacent_cells[2 * face->child(c)->index() + offset] =
+                          cell;
+                      if (face->child(0)->has_children())
+                        {
+                          adjacent_cells[2 * face->child(0)->child(0)->index() +
+                                         offset] = cell;
+                          adjacent_cells[2 * face->child(0)->child(1)->index() +
+                                         offset] = cell;
+                        }
+                      if (face->child(1)->has_children())
+                        {
+                          adjacent_cells[2 * face->child(1)->child(0)->index() +
+                                         offset] = cell;
+                          adjacent_cells[2 * face->child(1)->child(1)->index() +
+                                         offset] = cell;
+                        }
+                    } // if cell active and face refined
+                }     // else -> dim==3
+            }         // for all faces of all cells
+
+        // now loop again over all cells and set the
+        // corresponding neighbor cell. Note, that we
+        // have to use the opposite of the
+        // left_right_offset in this case as we want
+        // the offset of the neighbor, not our own.
+        for (const auto &cell : triangulation.cell_iterators())
+          for (auto f : cell->face_indices())
+            {
+              const unsigned int offset =
+                (cell->direction_flag() ?
+                   left_right_offset[dim - 2][f][cell->face_orientation(f)] :
+                   1 -
+                     left_right_offset[dim - 2][f][cell->face_orientation(f)]);
+              cell->set_neighbor(
+                f, adjacent_cells[2 * cell->face(f)->index() + 1 - offset]);
+            }
       }
 
 
@@ -9913,6 +9926,75 @@ namespace internal
      */
     struct ImplementationMixedMesh
     {
+      template <int spacedim>
+      static void update_neighbors(Triangulation<1, spacedim> &)
+      {}
+
+      template <int dim, int spacedim>
+      void static update_neighbors(Triangulation<dim, spacedim> &triangulation)
+      {
+        std::vector<std::pair<unsigned int, unsigned int>> adjacent_cells(
+          2 * triangulation.n_raw_faces(),
+          {numbers::invalid_unsigned_int, numbers::invalid_unsigned_int});
+
+        const auto set_entry = [&](const auto &face_index, const auto &cell) {
+          const std::pair<unsigned int, unsigned int> cell_pair = {
+            cell->level(), cell->index()};
+          unsigned int index;
+
+          if (adjacent_cells[2 * face_index].first ==
+                numbers::invalid_unsigned_int &&
+              adjacent_cells[2 * face_index].second ==
+                numbers::invalid_unsigned_int)
+            {
+              index = 2 * face_index + 0;
+            }
+          else
+            {
+              Assert(((adjacent_cells[2 * face_index + 1].first ==
+                       numbers::invalid_unsigned_int) &&
+                      (adjacent_cells[2 * face_index + 1].second ==
+                       numbers::invalid_unsigned_int)),
+                     ExcNotImplemented());
+              index = 2 * face_index + 1;
+            }
+
+          adjacent_cells[index] = cell_pair;
+        };
+
+        const auto get_entry =
+          [&](const auto &face_index,
+              const auto &cell) -> TriaIterator<CellAccessor<dim, spacedim>> {
+          auto test = adjacent_cells[2 * face_index];
+
+          if (test == std::pair<unsigned int, unsigned int>(cell->level(),
+                                                            cell->index()))
+            test = adjacent_cells[2 * face_index + 1];
+
+          if ((test.first != numbers::invalid_unsigned_int) &&
+              (test.second != numbers::invalid_unsigned_int))
+            return TriaIterator<CellAccessor<dim, spacedim>>(&triangulation,
+                                                             test.first,
+                                                             test.second);
+          else
+            return typename Triangulation<dim, spacedim>::cell_iterator();
+        };
+
+        for (const auto &cell : triangulation.cell_iterators())
+          for (const auto &face : cell->face_iterators())
+            {
+              set_entry(face->index(), cell);
+
+              if (cell->is_active() && face->has_children())
+                for (unsigned int c = 0; c < face->n_children(); ++c)
+                  set_entry(face->child(c)->index(), cell);
+            }
+
+        for (const auto &cell : triangulation.cell_iterators())
+          for (auto f : cell->face_indices())
+            cell->set_neighbor(f, get_entry(cell->face(f)->index(), cell));
+      }
+
       template <int dim, int spacedim>
       static void
       delete_children(
@@ -13300,7 +13382,7 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
 
   // finally build up neighbor connectivity information, and set
   // active cell indices
-  update_neighbors(*this);
+  this->policy->update_neighbors(*this);
   reset_active_cell_indices();
 
   reset_global_cell_indices(); // TODO: better place?
