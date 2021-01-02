@@ -7026,7 +7026,8 @@ namespace GridGenerator
 
     for (unsigned int id = 0; cell != endc; ++cell, ++id)
       {
-        for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+        cells[id].vertices.resize(cell->n_vertices());
+        for (const auto i : cell->vertex_indices())
           cells[id].vertices[i] = cell->vertex_index(i);
         cells[id].material_id = cell->material_id();
         cells[id].manifold_id = cell->manifold_id();
@@ -7048,9 +7049,9 @@ namespace GridGenerator
                 for (; face != endf; ++face)
                   if (face->at_boundary())
                     {
-                      for (unsigned int i = 0;
-                           i < GeometryInfo<dim>::vertices_per_face;
-                           ++i)
+                      subcelldata.boundary_lines[f].vertices.resize(
+                        face->n_vertices());
+                      for (const auto i : face->vertex_indices())
                         subcelldata.boundary_lines[f].vertices[i] =
                           face->vertex_index(i);
                       subcelldata.boundary_lines[f].boundary_id =
@@ -7068,9 +7069,9 @@ namespace GridGenerator
                 for (; face != endf; ++face)
                   if (face->at_boundary())
                     {
-                      for (unsigned int i = 0;
-                           i < GeometryInfo<dim>::vertices_per_face;
-                           ++i)
+                      subcelldata.boundary_quads[f].vertices.resize(
+                        face->n_vertices());
+                      for (const auto i : face->vertex_indices())
                         subcelldata.boundary_quads[f].vertices[i] =
                           face->vertex_index(i);
                       subcelldata.boundary_quads[f].boundary_id =
