@@ -73,8 +73,8 @@ The discretization using the SIPG is given by the following weak formula
 @f}
 
 <h3>The penalty parameter</h3>
-The parameter is defined as $\sigma = \gamma/h_f$, where $h_f$ a local length scale associated
-with the cell face; here we choose the length of the cell in the direction normal to the face,
+The penalty parameter is defined as $\sigma = \gamma/h_f$, where $h_f$ a local length scale associated
+with the cell face; here we choose the approximation of the length of the cell in the direction normal to the face,
 and $\gamma$ is the penalization constant.
 To ensure the discrete coercivity, the penalization constant has to be large enough @cite ainsworth2007posteriori.
 People do not really have consensus on which precise formula to choose, among what was proposed in the literature.

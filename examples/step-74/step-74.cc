@@ -202,7 +202,7 @@ namespace Step74
                          const double       cell_extend_left,
                          const double       cell_extend_right)
   {
-    const double degree = std::max(1., static_cast<double>(fe_degree));
+    const double degree = std::max<double>(1, fe_degree);
     return degree * (degree + 1.) * 0.5 *
            (1. / cell_extend_left + 1. / cell_extend_right);
   }
@@ -242,7 +242,7 @@ namespace Step74
   // @sect3{The SIPGLaplace class}
   // After this preparations, we proceed with the main class of this program
   // called SIPGLaplace. Major differences will only come up in the
-  // implementation of the assemble functions, since use FEInterfaceValues to
+  // implementation of the assemble functions, since we use FEInterfaceValues to
   // assemble face terms.
   template <int dim>
   class SIPGLaplace
@@ -262,16 +262,18 @@ namespace Step74
     void   compute_error_estimate();
     double compute_energy_norm();
 
-    Triangulation<dim>   triangulation;
-    const unsigned       degree;
-    QGauss<dim>          quadrature;
-    QGauss<dim - 1>      face_quadrature;
-    const MappingQ1<dim> mapping;
+    Triangulation<dim>    triangulation;
+    const unsigned        degree;
+    const QGauss<dim>     quadrature;
+    const QGauss<dim - 1> face_quadrature;
+    const QGauss<dim>     quadrature_overintegration;
+    const QGauss<dim - 1> face_quadrature_overintegration;
+    const MappingQ1<dim>  mapping;
 
     using ScratchData = MeshWorker::ScratchData<dim>;
 
-    FE_DGQ<dim>     fe;
-    DoFHandler<dim> dof_handler;
+    const FE_DGQ<dim> fe;
+    DoFHandler<dim>   dof_handler;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -303,6 +305,8 @@ namespace Step74
     : degree(3)
     , quadrature(degree + 1)
     , face_quadrature(degree + 1)
+    , quadrature_overintegration(degree + 2)
+    , face_quadrature_overintegration(degree + 2)
     , mapping()
     , fe(degree)
     , dof_handler(triangulation)
@@ -616,8 +620,7 @@ namespace Step74
       std::vector<double> sol_u(n_q_points);
       fe_fv.get_function_values(solution, sol_u);
 
-      const double extent1 = cell->extent_in_direction(
-        GeometryInfo<dim>::unit_normal_direction[face_no]);
+      const double extent1 = cell->measure() / cell->face(face_no)->measure();
       const double penalty = compute_penalty(degree, extent1, extent1);
 
       double difference_norm_square = 0.;
@@ -663,10 +666,8 @@ namespace Step74
 
       const double h = cell->face(f)->diameter();
 
-      const double extent1 =
-        cell->extent_in_direction(GeometryInfo<dim>::unit_normal_direction[f]);
-      const double extent2 = ncell->extent_in_direction(
-        GeometryInfo<dim>::unit_normal_direction[nf]);
+      const double extent1 = cell->measure() / cell->face(f)->measure();
+      const double extent2 = ncell->measure() / ncell->face(nf)->measure();
       const double penalty = compute_penalty(degree, extent1, extent2);
 
       double flux_jump_square = 0;
@@ -764,8 +765,7 @@ namespace Step74
       std::vector<double> sol_u(n_q_points);
       fe_fv.get_function_values(solution, sol_u);
 
-      const double extent1 = cell->extent_in_direction(
-        GeometryInfo<dim>::unit_normal_direction[face_no]);
+      const double extent1 = cell->measure() / cell->face(face_no)->measure();
       const double penalty = compute_penalty(degree, extent1, extent1);
 
       double difference_norm_square = 0.;
@@ -802,10 +802,8 @@ namespace Step74
       std::vector<double> jump(n_q_points);
       get_function_jump(fe_iv, solution, jump);
 
-      const double extent1 =
-        cell->extent_in_direction(GeometryInfo<dim>::unit_normal_direction[f]);
-      const double extent2 = ncell->extent_in_direction(
-        GeometryInfo<dim>::unit_normal_direction[nf]);
+      const double extent1 = cell->measure() / cell->face(f)->measure();
+      const double extent2 = ncell->measure() / ncell->face(nf)->measure();
       const double penalty = compute_penalty(degree, extent1, extent2);
 
       double u_jump_square = 0;
@@ -832,9 +830,9 @@ namespace Step74
 
     ScratchData scratch_data(mapping,
                              fe,
-                             QGauss<dim>(fe.degree + 2),
+                             quadrature_overintegration,
                              cell_flags,
-                             QGauss<dim - 1>(fe.degree + 2),
+                             face_quadrature_overintegration,
                              face_flags);
 
     CopyData cd;
@@ -879,7 +877,7 @@ namespace Step74
                                         solution,
                                         *(exact_solution.get()),
                                         difference_per_cell,
-                                        QGauss<dim>(fe.degree + 2),
+                                        quadrature_overintegration,
                                         VectorTools::L2_norm);
 
       L2_error = VectorTools::compute_global_error(triangulation,
@@ -894,7 +892,7 @@ namespace Step74
                                         solution,
                                         *(exact_solution.get()),
                                         difference_per_cell,
-                                        QGauss<dim>(fe.degree + 2),
+                                        quadrature_overintegration,
                                         VectorTools::H1_seminorm);
 
       H1_error = VectorTools::compute_global_error(triangulation,
