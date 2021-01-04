@@ -24,7 +24,8 @@ $\gamma = 1$, $2$, are too small; on the other hand, a value
 $p(p+1)$ would be reasonable,
 where $p$ is the degree of polynomials. The last of these choices is
 the one one would expect to work by comparing
-to the discontinuous Galerkin formulations for the Laplace equation,
+to the discontinuous Galerkin formulations for the Laplace equation
+(see, for example, the discussions in step-39 and step-74),
 and it will turn out to also work here.
 But we should check what value of $\gamma$ is right, and we will do so
 below; changing $\gamma$ is easy in the two `face_worker` and
