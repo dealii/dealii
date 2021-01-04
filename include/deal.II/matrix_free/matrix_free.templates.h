@@ -1508,7 +1508,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
     dof_info,
     face_setup,
     constraint_values,
-    additional_data.use_vector_data_exchanger_full);
+    additional_data.communicator_sm != MPI_COMM_SELF);
 
   // set constraint pool from the std::map and reorder the indices
   std::vector<const std::vector<double> *> constraints(
@@ -1670,7 +1670,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
           face_setup.inner_ghost_faces,
           is_fe_dg[count++] && additional_data.hold_all_faces_to_owned_cells,
           task_info.communicator_sm,
-          additional_data.use_vector_data_exchanger_full);
+          task_info.communicator_sm != MPI_COMM_SELF);
     }
 
   for (auto &di : dof_info)
