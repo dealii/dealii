@@ -348,9 +348,23 @@ namespace LinearAlgebra
        * After calling this method, read access to ghost elements of the
        * vector is forbidden and an exception is thrown. Only write access to
        * ghost elements is allowed in this state.
+       *
+       * @deprecated Use zero_out_ghost_values() instead.
+       */
+      DEAL_II_DEPRECATED_EARLY void
+      zero_out_ghosts() const;
+
+
+      /**
+       * This method zeros the entries on ghost dofs, but does not touch
+       * locally owned DoFs.
+       *
+       * After calling this method, read access to ghost elements of the
+       * vector is forbidden and an exception is thrown. Only write access to
+       * ghost elements is allowed in this state.
        */
       void
-      zero_out_ghosts() const;
+      zero_out_ghost_values() const;
 
       /**
        * Return if this Vector contains ghost elements.

@@ -3797,7 +3797,7 @@ namespace internal
       if (ghosts_were_set == true)
         return;
 
-      vec.zero_out_ghosts();
+      vec.zero_out_ghost_values();
     }
 
 

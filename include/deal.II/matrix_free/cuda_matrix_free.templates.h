@@ -1218,7 +1218,7 @@ namespace CUDAWrappers
                 }
             dst.compress(VectorOperation::add);
           }
-        src.zero_out_ghosts();
+        src.zero_out_ghost_values();
       }
     else
       {

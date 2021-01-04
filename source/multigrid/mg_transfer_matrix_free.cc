@@ -253,7 +253,7 @@ MGTransferMatrixFree<dim, Number>::prolongate(
     dst.copy_locally_owned_data_from(this->ghosted_level_vector[to_level]);
 
   if (src_inplace == true)
-    src.zero_out_ghosts();
+    src.zero_out_ghost_values();
 }
 
 
@@ -330,7 +330,7 @@ MGTransferMatrixFree<dim, Number>::restrict_and_add(
     dst += dst_vec;
 
   if (src_inplace == true)
-    src.zero_out_ghosts();
+    src.zero_out_ghost_values();
 }
 
 

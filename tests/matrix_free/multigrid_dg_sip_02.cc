@@ -135,7 +135,7 @@ public:
         dst_copy = dst;
         dst.swap(dst_copy);
       }
-    dst.zero_out_ghosts();
+    dst.zero_out_ghost_values();
     data.loop(&LaplaceOperator::local_apply,
               &LaplaceOperator::local_apply_face,
               &LaplaceOperator::local_apply_boundary,

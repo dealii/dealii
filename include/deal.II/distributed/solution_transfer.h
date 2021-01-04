@@ -120,7 +120,7 @@ namespace parallel
      * LinearAlgebra::distributed::Vector allows writing into ghost elements.
      * For a ghosted vector the interpolation step can be accomplished via
      * @code
-     * interpolated_solution.zero_out_ghosts();
+     * interpolated_solution.zero_out_ghost_values();
      * soltrans.interpolate(interpolated_solution);
      * interpolated_solution.update_ghost_values();
      * @endcode

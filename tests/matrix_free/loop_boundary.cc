@@ -133,7 +133,7 @@ do_test(const unsigned int n_refine, const bool overlap_communication)
                                matrix_free.n_inner_face_batches() +
                                  matrix_free.n_boundary_face_batches()));
   ref.compress(VectorOperation::add);
-  in.zero_out_ghosts();
+  in.zero_out_ghost_values();
 
   std::function<void(const MatrixFree<dim> &,
                      LinearAlgebra::distributed::Vector<double> &,
@@ -209,7 +209,7 @@ do_test(const unsigned int n_refine, const bool overlap_communication)
             in,
             std::make_pair(0U, matrix_free.n_cell_batches()));
   ref.compress(VectorOperation::add);
-  in.zero_out_ghosts();
+  in.zero_out_ghost_values();
 
   matrix_free.cell_loop(cell_func, test, in, true);
   test -= ref;

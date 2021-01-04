@@ -502,7 +502,7 @@ namespace Step68
   template <int dim>
   void ParticleTracking<dim>::interpolate_function_to_field()
   {
-    velocity_field.zero_out_ghosts();
+    velocity_field.zero_out_ghost_values();
     VectorTools::interpolate(mapping, fluid_dh, velocity, velocity_field);
     velocity_field.update_ghost_values();
   }

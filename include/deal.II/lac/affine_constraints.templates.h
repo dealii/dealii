@@ -1885,7 +1885,7 @@ namespace internal
           if (vec.in_local_range(idx))
             vec(idx) = 0.;
         }
-      vec.zero_out_ghosts();
+      vec.zero_out_ghost_values();
     }
 
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
@@ -1930,7 +1930,7 @@ namespace internal
 
       Utilities::CUDA::free(constrained_local_dofs_device);
 
-      vec.zero_out_ghosts();
+      vec.zero_out_ghost_values();
     }
 #endif
 
@@ -2174,7 +2174,7 @@ namespace internal
     // TODO: the in vector might already have all elements. need to find a
     // way to efficiently avoid the copy then
     const_cast<LinearAlgebra::distributed::Vector<number> &>(vec)
-      .zero_out_ghosts();
+      .zero_out_ghost_values();
     output.reinit(locally_owned_elements,
                   needed_elements,
                   vec.get_mpi_communicator());
