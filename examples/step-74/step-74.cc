@@ -199,12 +199,12 @@ namespace Step74
 
   // This function computes the penalty $\sigma$.
   double compute_penalty(const unsigned int fe_degree,
-                         const double       cell_extend_left,
-                         const double       cell_extend_right)
+                         const double       cell_extent_left,
+                         const double       cell_extent_right)
   {
     const unsigned int degree = std::max(1U, fe_degree);
     return degree * (degree + 1.) * 0.5 *
-           (1. / cell_extend_left + 1. / cell_extend_right);
+           (1. / cell_extent_left + 1. / cell_extent_right);
   }
 
 
