@@ -166,10 +166,10 @@ namespace Step74
                          const Vector<double> &        solution,
                          std::vector<double> &         jump)
   {
-    const unsigned                     n_q = fe_iv.n_quadrature_points;
+    const unsigned int                 n_q = fe_iv.n_quadrature_points;
     std::array<std::vector<double>, 2> face_values;
     jump.resize(n_q);
-    for (unsigned i = 0; i < 2; ++i)
+    for (unsigned int i = 0; i < 2; ++i)
       {
         face_values[i].resize(n_q);
         fe_iv.get_fe_face_values(i).get_function_values(solution,
@@ -184,10 +184,10 @@ namespace Step74
                                   const Vector<double> &        solution,
                                   std::vector<Tensor<1, dim>> & gradient_jump)
   {
-    const unsigned              n_q = fe_iv.n_quadrature_points;
+    const unsigned int          n_q = fe_iv.n_quadrature_points;
     std::vector<Tensor<1, dim>> face_gradients[2];
     gradient_jump.resize(n_q);
-    for (unsigned i = 0; i < 2; ++i)
+    for (unsigned int i = 0; i < 2; ++i)
       {
         face_gradients[i].resize(n_q);
         fe_iv.get_fe_face_values(i).get_function_gradients(solution,
@@ -202,7 +202,7 @@ namespace Step74
                          const double       cell_extend_left,
                          const double       cell_extend_right)
   {
-    const double degree = std::max<double>(1, fe_degree);
+    const unsigned int degree = std::max(1U, fe_degree);
     return degree * (degree + 1.) * 0.5 *
            (1. / cell_extend_left + 1. / cell_extend_right);
   }
@@ -263,7 +263,7 @@ namespace Step74
     double compute_energy_norm();
 
     Triangulation<dim>    triangulation;
-    const unsigned        degree;
+    const unsigned int    degree;
     const QGauss<dim>     quadrature;
     const QGauss<dim - 1> face_quadrature;
     const QGauss<dim>     quadrature_overintegration;
