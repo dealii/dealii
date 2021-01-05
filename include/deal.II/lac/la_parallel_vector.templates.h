@@ -653,7 +653,7 @@ namespace LinearAlgebra
 
       // set vector size and allocate memory
       const size_type new_allocated_size =
-        partitioner->locally_onwed_size() + partitioner->n_ghost_indices();
+        partitioner->locally_owned_size() + partitioner->n_ghost_indices();
       resize_val(new_allocated_size, comm_sm);
 
       // initialize to zero

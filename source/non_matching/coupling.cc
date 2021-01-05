@@ -54,7 +54,7 @@ namespace NonMatching
      * Mapping and quadrature are those of this second triangulation.
      *
      * If the triangulation inside @p cache is parallel, only points lying over
-     * locally onwed cells are returned. This is why a vector of unsigned int
+     * locally owned cells are returned. This is why a vector of unsigned int
      * is returned: it describes the indices of cells from the immersed
      * triangulation which have been used (relative to a loop over al cells). If
      * embedding triangulation is not parallel, all cells shall be used.

@@ -3664,10 +3664,12 @@ namespace internal
 
           part.import_from_ghosted_array_start(
             dealii::VectorOperation::add,
-            component_in_block_vector + channel_shift,
-            ArrayView<Number>(vec.begin() +
-                                vec.get_partitioner()->locally_owned_size(),
-                              vec.get_partitioner()->n_ghost_indices()),
+            component_in_block_vector * 2 + channel_shift,
+            ArrayView<Number>(vec.begin(), part.locally_owned_size()),
+            vec.shared_vector_data(),
+            ArrayView<Number>(vec.begin() + part.locally_owned_size(),
+                              matrix_free.get_dof_info(mf_component)
+                                .vector_partitioner->n_ghost_indices()),
             ArrayView<Number>(tmp_data[component_in_block_vector]->begin(),
                               part.n_import_indices()),
             this->requests[component_in_block_vector]);
@@ -3828,19 +3830,12 @@ namespace internal
 
           if (part.n_ghost_indices() > 0)
             {
-              for (std::vector<std::pair<unsigned int, unsigned int>>::
-                     const_iterator my_ghosts =
-                       part.ghost_indices_within_larger_ghost_set().begin();
-                   my_ghosts !=
-                   part.ghost_indices_within_larger_ghost_set().end();
-                   ++my_ghosts)
-                for (unsigned int j = my_ghosts->first; j < my_ghosts->second;
-                     j++)
-                  {
-                    const_cast<LinearAlgebra::distributed::Vector<Number> &>(
-                      vec)
-                      .local_element(j + part.locally_owned_size()) = 0.;
-                  }
+              part.reset_ghost_values(ArrayView<Number>(
+                const_cast<LinearAlgebra::distributed::Vector<Number> &>(vec)
+                    .begin() +
+                  part.locally_owned_size(),
+                matrix_free.get_dof_info(mf_component)
+                  .vector_partitioner->n_ghost_indices()));
             }
 
 #  endif
