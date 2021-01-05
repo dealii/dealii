@@ -129,14 +129,18 @@ Cycle 2
 @endcode
 
 The following figure provides a log-log plot of the errors versus
-the number of degrees of freedom. Let $n$ be the number of degrees of
+the number of degrees of freedom for this test case on the L-shaped
+domain. In order to interpret it, let $n$ be the number of degrees of
 freedom, then on uniformly refined meshes, $h$ is of order
 $1/\sqrt{n}$ in 2D. Combining the theoretical results in the previous case,
 we see that if the solution is sufficiently smooth,
 we can expect the error in the $L_2$ norm to be of order $O(n^{-\frac{p+1}{2}})$
-and in $H^1$ seminorm to be $O(n^{-\frac{p}{2}})$. From the figure, we see
-that the SIPG with adaptive mesh refinement produces desirable results
-that match theoretical ones:
+and in $H^1$ seminorm to be $O(n^{-\frac{p}{2}})$. It is not a priori
+clear that one would get the same kind of behavior as a function of
+$n$ on adaptively refined meshes like the ones we use for this second
+test case, but one can certainly hope. Indeed, from the figure, we see
+that the SIPG with adaptive mesh refinement produces asymptotically
+the kinds of hoped-for results:
 
 <img width="600px" src="https://www.dealii.org/images/steps/developer/step-74.log-log-plot.png" alt="">
 
