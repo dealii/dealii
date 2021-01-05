@@ -57,7 +57,7 @@ DEAL_II_NAMESPACE_OPEN
  * </ol>
  *
  * A detailed discussion of this class can also be found in the step-7 and
- * step-13 example programs.
+ * step-13 example programs. It is also used in step-74.
  *
  * @ingroup textoutput
  */
