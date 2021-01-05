@@ -360,7 +360,7 @@ namespace PETScWrappers
      *
      * @deprecated use locally_owned_size() instead.
      */
-    DEAL_II_DEPRECATED
+    DEAL_II_DEPRECATED_EARLY
     size_type
     local_size() const;
 

@@ -289,7 +289,7 @@ namespace Utilities
        * @deprecated Use the more clearly named function locally_owned_size()
        * instead.
        */
-      DEAL_II_DEPRECATED
+      DEAL_II_DEPRECATED_EARLY
       unsigned int
       local_size() const;
 
