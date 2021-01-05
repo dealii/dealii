@@ -205,9 +205,7 @@ namespace Step26
   HeatEquation<dim>::HeatEquation()
     : fe(1)
     , dof_handler(triangulation)
-    , time(0.0)
     , time_step(1. / 500)
-    , timestep_number(0)
     , theta(0.5)
   {}
 
@@ -456,6 +454,9 @@ namespace Step26
     Vector<double> forcing_terms;
 
   start_time_iteration:
+
+    time            = 0.0;
+    timestep_number = 0;
 
     tmp.reinit(solution.size());
     forcing_terms.reinit(solution.size());
