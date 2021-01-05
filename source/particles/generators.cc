@@ -402,6 +402,8 @@ namespace Particles
       }
     }
 
+
+
     template <int dim, int spacedim>
     void
     dof_support_points(const DoFHandler<dim, spacedim> &dof_handler,
