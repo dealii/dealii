@@ -44,7 +44,7 @@ namespace internal
         virtual ~Base() = default;
 
         virtual unsigned int
-        local_size() const = 0;
+        locally_owned_size() const = 0;
 
         virtual unsigned int
         n_ghost_indices() const = 0;
@@ -149,7 +149,7 @@ namespace internal
         virtual ~PartitionerWrapper() = default;
 
         unsigned int
-        local_size() const override;
+        locally_owned_size() const override;
 
         unsigned int
         n_ghost_indices() const override;
@@ -262,7 +262,7 @@ namespace internal
           const MPI_Comm &communicator_sm);
 
         unsigned int
-        local_size() const override;
+        locally_owned_size() const override;
 
         unsigned int
         n_ghost_indices() const override;
