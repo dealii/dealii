@@ -573,10 +573,15 @@ namespace SmoothnessEstimator
     default_fe_series(const hp::FECollection<dim, spacedim> &fe_collection)
     {
       // Default number of coefficients per direction.
+      //
+      // Since we omit the zero-th mode in the Fourier decay strategy, make sure
+      // that we have at least two modes to work with per finite element. With a
+      // number of modes equal to the polynomial degree plus two for each finite
+      // element, the smoothness estimation algorithm tends to produce stable
+      // results.
       std::vector<unsigned int> n_coefficients_per_direction;
       for (unsigned int i = 0; i < fe_collection.size(); ++i)
-        n_coefficients_per_direction.push_back(
-          std::max<unsigned int>(3, fe_collection[i].degree + 1));
+        n_coefficients_per_direction.push_back(fe_collection[i].degree + 2);
 
       // Default quadrature collection.
       //
@@ -588,11 +593,11 @@ namespace SmoothnessEstimator
       // elements we deal with, i.e. the matrices F_k,j. We have to do that for
       // each of the finite elements in use. To that end we need a quadrature
       // rule. As a default, we use the same quadrature formula for each finite
-      // element, namely one that is obtained by iterating a 4-point Gauss
+      // element, namely one that is obtained by iterating a 5-point Gauss
       // formula as many times as the maximal exponent we use for the term
       // exp(ikx). Since the first mode corresponds to k = 0, the maximal wave
       // number is k = n_modes - 1.
-      const QGauss<1>      base_quadrature(4);
+      const QGauss<1>      base_quadrature(5);
       hp::QCollection<dim> q_collection;
       for (unsigned int i = 0; i < fe_collection.size(); ++i)
         {
