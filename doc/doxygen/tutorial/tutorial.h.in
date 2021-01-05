@@ -595,6 +595,12 @@
  *       through a ParticleHandler object.
  *       </td></tr>
  *
+ *   <tr valign="top">
+ *       <td>step-74</td>
+ *       <td> The Symmetric interior penalty Galerkin (SIPG) method for Poisson's equation.
+ *       <br/> Keywords: MeshWorker::mesh_loop(), FEInterfaceValues, ConvergenceTable
+ *       </td></tr>
+ *
  * </table>
  *
  *
@@ -803,7 +809,8 @@
  *       step-9,
  *       step-14,
  *       step-39,
- *       step-50
+ *       step-50,
+ *       step-74
  *     </td>
  *   </tr>
  *
@@ -835,7 +842,8 @@
  *       step-51,
  *       step-59,
  *       step-61,
- *       step-67
+ *       step-67,
+ *       step-74
  *     </td>
  *   </tr>
  *
