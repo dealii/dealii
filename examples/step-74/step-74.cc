@@ -57,13 +57,15 @@ namespace Step74
   // @sect3{Equation data}
   // Here we define two test cases: convergence_rate for a smooth function
   // and l_singularity for the Functions::LSingularityFunction.
-  enum class Test_Case
+  enum class TestCase
   {
     convergence_rate,
     l_singularity
   };
 
-  // A smooth solution for the convergence test.
+
+
+  // A smooth solution for the convergence test:
   template <int dim>
   class SmoothSolution : public Function<dim>
   {
@@ -71,13 +73,17 @@ namespace Step74
     SmoothSolution()
       : Function<dim>()
     {}
+
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<double> &          values,
                             const unsigned int component = 0) const override;
+
     virtual Tensor<1, dim>
     gradient(const Point<dim> & point,
              const unsigned int component = 0) const override;
   };
+
+
 
   template <int dim>
   void SmoothSolution<dim>::value_list(const std::vector<Point<dim>> &points,
@@ -89,6 +95,8 @@ namespace Step74
       values[i] =
         std::sin(2. * PI * points[i][0]) * std::sin(2. * PI * points[i][1]);
   }
+
+
 
   template <int dim>
   Tensor<1, dim>
@@ -104,7 +112,9 @@ namespace Step74
     return return_value;
   }
 
-  // The corresponding right-hand side of the smooth function.
+
+
+  // The corresponding right-hand side of the smooth function:
   template <int dim>
   class SmoothRightHandSide : public Function<dim>
   {
@@ -112,10 +122,13 @@ namespace Step74
     SmoothRightHandSide()
       : Function<dim>()
     {}
+
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<double> &          values,
                             const unsigned int /*component*/) const override;
   };
+
+
 
   template <int dim>
   void
@@ -129,8 +142,11 @@ namespace Step74
                   std::sin(2. * PI * points[i][1]);
   }
 
-  // The right-hand side corresponds to the function
-  // Functions::LSingularityFunction.
+
+
+  // The right-hand side that corresponds to the function
+  // Functions::LSingularityFunction, where we
+  // assume that the diffusion coefficient $\nu = 1$:
   template <int dim>
   class SingularRightHandSide : public Function<dim>
   {
@@ -138,13 +154,16 @@ namespace Step74
     SingularRightHandSide()
       : Function<dim>()
     {}
+
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<double> &          values,
                             const unsigned int /*component*/) const override;
 
   private:
-    Functions::LSingularityFunction ref;
+    const Functions::LSingularityFunction ref;
   };
+
+
 
   template <int dim>
   void
@@ -153,14 +172,15 @@ namespace Step74
                                          const unsigned int /*component*/) const
   {
     for (unsigned int i = 0; i < values.size(); ++i)
-      // We assume that the diffusion coefficient $\nu$ = 1.
       values[i] = -ref.laplacian(points[i]);
   }
 
+
+
   // @sect3{Auxiliary functions}
   // The following two auxiliary functions are used to compute
-  // jump terms for $u_h$ and $\nabla u_h$ on the
-  // interface, respectively.
+  // jump terms for $u_h$ and $\nabla u_h$ on a face,
+  // respectively.
   template <int dim>
   void get_function_jump(const FEInterfaceValues<dim> &fe_iv,
                          const Vector<double> &        solution,
@@ -178,6 +198,8 @@ namespace Step74
     for (unsigned int q = 0; q < n_q; ++q)
       jump[q] = face_values[0][q] - face_values[1][q];
   }
+
+
 
   template <int dim>
   void get_function_gradient_jump(const FEInterfaceValues<dim> &fe_iv,
@@ -198,9 +220,9 @@ namespace Step74
   }
 
   // This function computes the penalty $\sigma$.
-  double compute_penalty(const unsigned int fe_degree,
-                         const double       cell_extent_left,
-                         const double       cell_extent_right)
+  double get_penalty_factor(const unsigned int fe_degree,
+                            const double       cell_extent_left,
+                            const double       cell_extent_right)
   {
     const unsigned int degree = std::max(1U, fe_degree);
     return degree * (degree + 1.) * 0.5 *
@@ -209,10 +231,11 @@ namespace Step74
 
 
   // @sect3{The CopyData}
-  // Here we define Copy objects for the MeshWorker::mesh_loop(),
+  // In the following, we define "Copy" objects for the MeshWorker::mesh_loop(),
   // which is essentially the same as step-12. Note that the
-  // Scratch object is not defined here because we use
-  // MeshWorker::ScratchData<dim> instead.
+  // "Scratch" object is not defined here because we use
+  // MeshWorker::ScratchData<dim> instead. (The use of "Copy" and "Scratch"
+  // objects is extensively explained in the WorkStream namespace documentation.
   struct CopyDataFace
   {
     FullMatrix<double>                   cell_matrix;
@@ -220,6 +243,8 @@ namespace Step74
     std::array<double, 2>                values;
     std::array<unsigned int, 2>          cell_indices;
   };
+
+
 
   struct CopyData
   {
@@ -229,8 +254,10 @@ namespace Step74
     std::vector<CopyDataFace>            face_data;
     double                               value;
     unsigned int                         cell_index;
+
+
     template <class Iterator>
-    void reinit(const Iterator &cell, unsigned int dofs_per_cell)
+    void reinit(const Iterator &cell, const unsigned int dofs_per_cell)
     {
       cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
       cell_rhs.reinit(dofs_per_cell);
@@ -239,16 +266,19 @@ namespace Step74
     }
   };
 
+
+
   // @sect3{The SIPGLaplace class}
-  // After this preparations, we proceed with the main class of this program
-  // called SIPGLaplace. Major differences will only come up in the
+  // After these preparations, we proceed with the main class of this program,
+  // called `SIPGLaplace`. The overall structure of the class is as in many
+  // of the other tutorial programs. Major differences will only come up in the
   // implementation of the assemble functions, since we use FEInterfaceValues to
   // assemble face terms.
   template <int dim>
   class SIPGLaplace
   {
   public:
-    SIPGLaplace(const Test_Case &test_case);
+    SIPGLaplace(const TestCase &test_case);
     void run();
 
   private:
@@ -260,7 +290,7 @@ namespace Step74
 
     void   compute_errors();
     void   compute_error_estimate();
-    double compute_energy_norm();
+    double compute_energy_norm_error();
 
     Triangulation<dim>    triangulation;
     const unsigned int    degree;
@@ -280,28 +310,29 @@ namespace Step74
     Vector<double>       solution;
     Vector<double>       system_rhs;
 
-    // Vectors to store error estimator square and energy norm square per cell.
+    // The remainder of the class's members are used for the following:
+    // - Vectors to store error estimator square and energy norm square per
+    // cell.
+    // - Print convergence rate and errors on the screen.
+    // - The fiffusion coefficient $\nu$ is set to 1.
+    // - Members that store information about the test case to be computed.
     Vector<double> estimated_error_square_per_cell;
     Vector<double> energy_norm_square_per_cell;
 
-    // Print convergence rate and errors on the screen.
     ConvergenceTable convergence_table;
 
-    // Diffusion coefficient $\nu$ is set to 1.
     const double diffusion_coefficient = 1.;
 
-    const Test_Case test_case;
-
-    // Pointers that point to the correct classes of solution and right-hand
-    // side according to test_case.
-    std::unique_ptr<Function<dim>> exact_solution;
-    std::unique_ptr<Function<dim>> rhs_function;
+    const TestCase                       test_case;
+    std::unique_ptr<const Function<dim>> exact_solution;
+    std::unique_ptr<const Function<dim>> rhs_function;
   };
 
-  // The constructor here reads the test case as an input and then determines
-  // the correct solution and right-hand side classes.
+  // The constructor here takes the test case as input and then
+  // determines the correct solution and right-hand side classes. The
+  // remaining member variables are initialized in the obvious way.
   template <int dim>
-  SIPGLaplace<dim>::SIPGLaplace(const Test_Case &test_case)
+  SIPGLaplace<dim>::SIPGLaplace(const TestCase &test_case)
     : degree(3)
     , quadrature(degree + 1)
     , face_quadrature(degree + 1)
@@ -312,20 +343,23 @@ namespace Step74
     , dof_handler(triangulation)
     , test_case(test_case)
   {
-    if (test_case == Test_Case::convergence_rate)
+    if (test_case == TestCase::convergence_rate)
       {
-        exact_solution = std::make_unique<SmoothSolution<dim>>();
-        rhs_function   = std::make_unique<SmoothRightHandSide<dim>>();
+        exact_solution = std::make_unique<const SmoothSolution<dim>>();
+        rhs_function   = std::make_unique<const SmoothRightHandSide<dim>>();
       }
 
-    else if (test_case == Test_Case::l_singularity)
+    else if (test_case == TestCase::l_singularity)
       {
-        exact_solution = std::make_unique<Functions::LSingularityFunction>();
-        rhs_function   = std::make_unique<SingularRightHandSide<dim>>();
+        exact_solution =
+          std::make_unique<const Functions::LSingularityFunction>();
+        rhs_function = std::make_unique<const SingularRightHandSide<dim>>();
       }
     else
       AssertThrow(false, ExcNotImplemented());
   }
+
+
 
   template <int dim>
   void SIPGLaplace<dim>::setup_system()
@@ -340,16 +374,20 @@ namespace Step74
     system_rhs.reinit(dof_handler.n_dofs());
   }
 
+
+
   // @sect3{The assemble_system function}
-  // The assemble function here is similar to that in step-12.
+  // The assemble function here is similar to that in step-12 and step-47.
   // Different from assembling by hand, we just need to focus
   // on assembling on each cell, each boundary face, and each
   // interior face. The loops over cells and faces are handled
   // automatically by MeshWorker::mesh_loop().
+  //
+  // The function starts by defining a local (lambda) function that is
+  // used to integrate the cell terms:
   template <int dim>
   void SIPGLaplace<dim>::assemble_system()
   {
-    // This function assembles the cell integrals.
     const auto cell_worker =
       [&](const auto &cell, auto &scratch_data, auto &copy_data) {
         const FEValues<dim> &fe_v          = scratch_data.reinit(cell);
@@ -379,7 +417,7 @@ namespace Step74
             }
       };
 
-    // This function assembles face integrals on the boundary.
+    // Next, we need a function that assembles face integrals on the boundary:
     const auto boundary_worker = [&](const auto &        cell,
                                      const unsigned int &face_no,
                                      auto &              scratch_data,
@@ -398,7 +436,7 @@ namespace Step74
       exact_solution->value_list(q_points, g);
 
       const double extent1 = cell->measure() / cell->face(face_no)->measure();
-      const double penalty = compute_penalty(degree, extent1, extent1);
+      const double penalty = get_penalty_factor(degree, extent1, extent1);
 
       for (unsigned int point = 0; point < n_q_points; ++point)
         {
@@ -438,10 +476,10 @@ namespace Step74
         }
     };
 
-    // This function assembles face integrals on interior faces.
-    // To reinitialize FEInterfaceValues, we need to pass cells,
-    // face and subface indices (for adaptive refinement)
-    // to the reinit() function of FEInterfaceValues.
+    // Finally, a function that assembles face integrals on interior
+    // faces. To reinitialize FEInterfaceValues, we need to pass
+    // cells, face and subface indices (for adaptive refinement) to
+    // the reinit() function of FEInterfaceValues:
     const auto face_worker = [&](const auto &        cell,
                                  const unsigned int &f,
                                  const unsigned int &sf,
@@ -467,7 +505,7 @@ namespace Step74
 
       const double extent1 = cell->measure() / cell->face(f)->measure();
       const double extent2 = ncell->measure() / ncell->face(nf)->measure();
-      const double penalty = compute_penalty(degree, extent1, extent2);
+      const double penalty = get_penalty_factor(degree, extent1, extent2);
 
       for (unsigned int point = 0; point < n_q_points; ++point)
         {
@@ -493,11 +531,11 @@ namespace Step74
         }
     };
 
-    // The following lambda function will copy data to
-    // the global matrix and right-hand side.
-    // Though there are no hanging node constraints in DG discretization,
-    // we define an empty AffineConstraints oject that
-    // allows us to use distribute_local_to_global functionality.
+    // The following lambda function will then copy data into the
+    // global matrix and right-hand side.  Though there are no hanging
+    // node constraints in DG discretization, we define an empty
+    // AffineConstraints oject that allows us to use the
+    // AffineConstraints::distribute_local_to_global() functionality.
     AffineConstraints<double> constraints;
     constraints.close();
     const auto copier = [&](const auto &c) {
@@ -516,26 +554,28 @@ namespace Step74
         }
     };
 
-    // Here we define ScratchData and CopyData objects,
-    // and pass them together with the lambda functions
-    // above to MeshWorker::mesh_loop. In addition, we
-    // need to specify that we want to assemble interior faces once.
 
-    UpdateFlags cell_flags = update_values | update_gradients |
-                             update_quadrature_points | update_JxW_values;
-    UpdateFlags face_flags = update_values | update_gradients |
-                             update_quadrature_points | update_normal_vectors |
-                             update_JxW_values;
+    // With the assembly functions defined, we can now create
+    // ScratchData and CopyData objects, and pass them together with
+    // the lambda functions above to MeshWorker::mesh_loop(). In
+    // addition, we need to specify that we want to assemble on
+    // interior faces exactly once.
+    const UpdateFlags cell_flags = update_values | update_gradients |
+                                   update_quadrature_points | update_JxW_values;
+    const UpdateFlags face_flags = update_values | update_gradients |
+                                   update_quadrature_points |
+                                   update_normal_vectors | update_JxW_values;
 
     ScratchData scratch_data(
       mapping, fe, quadrature, cell_flags, face_quadrature, face_flags);
-    CopyData cd;
+    CopyData copy_data;
+
     MeshWorker::mesh_loop(dof_handler.begin_active(),
                           dof_handler.end(),
                           cell_worker,
                           copier,
                           scratch_data,
-                          cd,
+                          copy_data,
                           MeshWorker::assemble_own_cells |
                             MeshWorker::assemble_boundary_faces |
                             MeshWorker::assemble_own_interior_faces_once,
@@ -543,6 +583,10 @@ namespace Step74
                           face_worker);
   }
 
+
+
+  // @sect3{The solve() and output_results() function}
+  // The following two functions are entirely standard and without difficulty.
   template <int dim>
   void SIPGLaplace<dim>::solve()
   {
@@ -551,11 +595,14 @@ namespace Step74
     A_direct.vmult(solution, system_rhs);
   }
 
+
+
   template <int dim>
   void SIPGLaplace<dim>::output_results(const unsigned int cycle) const
   {
-    std::string filename = "sol_Q" + Utilities::int_to_string(degree, 1) + "-" +
-                           Utilities::int_to_string(cycle, 2) + ".vtu";
+    const std::string filename = "sol_Q" + Utilities::int_to_string(degree, 1) +
+                                 "-" + Utilities::int_to_string(cycle, 2) +
+                                 ".vtu";
     std::ofstream output(filename);
 
     DataOut<dim> data_out;
@@ -565,14 +612,17 @@ namespace Step74
     data_out.write_vtu(output);
   }
 
+
+  // @sect3{The compute_error_estimate() function}
   // The assembly of the error estimator here is quite similar to
-  // that of the global matrix and right-had side.
+  // that of the global matrix and right-had side and can be handled
+  // by the MeshWorker::mesh_loop() framework. To understand what
+  // each of the local (lambda) functions is doing, recall first that
+  // the local cell residual is defined as
+  // $h_K^2 \left\| f + \nu \Delta u_h \right\|_K^2$:
   template <int dim>
   void SIPGLaplace<dim>::compute_error_estimate()
   {
-    estimated_error_square_per_cell.reinit(triangulation.n_active_cells());
-
-    // Assemble cell residual $h_K^2 \left\| f + \nu \Delta u_h \right\|_K^2$.
     const auto cell_worker =
       [&](const auto &cell, auto &scratch_data, auto &copy_data) {
         const FEValues<dim> &fe_v = scratch_data.reinit(cell);
@@ -601,8 +651,8 @@ namespace Step74
         copy_data.value = hk * hk * residual_norm_square;
       };
 
-    // Assemble boundary terms $\sum_{f\in \partial K \cap \partial \Omega}
-    // \sigma \left\| [  u_h-g_D ]  \right\|_f^2  $.
+    // Next compute boundary terms $\sum_{f\in \partial K \cap \partial \Omega}
+    // \sigma \left\| [  u_h-g_D ]  \right\|_f^2  $:
     const auto boundary_worker = [&](const auto &        cell,
                                      const unsigned int &face_no,
                                      auto &              scratch_data,
@@ -621,7 +671,7 @@ namespace Step74
       fe_fv.get_function_values(solution, sol_u);
 
       const double extent1 = cell->measure() / cell->face(face_no)->measure();
-      const double penalty = compute_penalty(degree, extent1, extent1);
+      const double penalty = get_penalty_factor(degree, extent1, extent1);
 
       double difference_norm_square = 0.;
       for (unsigned int point = 0; point < q_points.size(); ++point)
@@ -632,9 +682,9 @@ namespace Step74
       copy_data.value += penalty * difference_norm_square;
     };
 
-    // Assemble interior face terms $\sum_{f\in \partial K}\lbrace \sigma
+    // And finally interior face terms $\sum_{f\in \partial K}\lbrace \sigma
     // \left\| [u_h]  \right\|_f^2   +  h_f \left\|  [\nu \nabla u_h \cdot
-    // \mathbf n ] \right\|_f^2 \rbrace$.
+    // \mathbf n ] \right\|_f^2 \rbrace$:
     const auto face_worker = [&](const auto &        cell,
                                  const unsigned int &f,
                                  const unsigned int &sf,
@@ -668,7 +718,7 @@ namespace Step74
 
       const double extent1 = cell->measure() / cell->face(f)->measure();
       const double extent2 = ncell->measure() / ncell->face(nf)->measure();
-      const double penalty = compute_penalty(degree, extent1, extent2);
+      const double penalty = get_penalty_factor(degree, extent1, extent2);
 
       double flux_jump_square = 0;
       double u_jump_square    = 0;
@@ -684,6 +734,9 @@ namespace Step74
       copy_data_face.values[1] = copy_data_face.values[0];
     };
 
+    // Having computed local contributions for each cell, we still
+    // need a way to copy these into the global vector that will hold
+    // the error estimators for all cells:
     const auto copier = [&](const auto &copy_data) {
       if (copy_data.cell_index != numbers::invalid_unsigned_int)
         estimated_error_square_per_cell[copy_data.cell_index] +=
@@ -693,22 +746,28 @@ namespace Step74
           estimated_error_square_per_cell[cdf.cell_indices[j]] += cdf.values[j];
     };
 
-    UpdateFlags cell_flags =
+    // After all of this set-up, let's do the actual work: We resize
+    // the vector into which the results will be written, and then
+    // drive the whole process using the MeshWorker::mesh_loop()
+    // function.
+    estimated_error_square_per_cell.reinit(triangulation.n_active_cells());
+
+    const UpdateFlags cell_flags =
       update_hessians | update_quadrature_points | update_JxW_values;
-    UpdateFlags face_flags = update_values | update_gradients |
-                             update_quadrature_points | update_JxW_values |
-                             update_normal_vectors;
+    const UpdateFlags face_flags = update_values | update_gradients |
+                                   update_quadrature_points |
+                                   update_JxW_values | update_normal_vectors;
 
     ScratchData scratch_data(
       mapping, fe, quadrature, cell_flags, face_quadrature, face_flags);
 
-    CopyData cd;
+    CopyData copy_data;
     MeshWorker::mesh_loop(dof_handler.begin_active(),
                           dof_handler.end(),
                           cell_worker,
                           copier,
                           scratch_data,
-                          cd,
+                          copy_data,
                           MeshWorker::assemble_own_cells |
                             MeshWorker::assemble_own_interior_faces_once |
                             MeshWorker::assemble_boundary_faces,
@@ -716,10 +775,12 @@ namespace Step74
                           face_worker);
   }
 
-  // Here we compute the error in the energy norm, which
-  // is similar to the assembling of the error estimator.
+
+  // @sect3{The compute_energy_norm_error() function}
+  // Next, we compute the error in the energy norm, which
+  // is similar to the assembling of the error estimator above.
   template <int dim>
-  double SIPGLaplace<dim>::compute_energy_norm()
+  double SIPGLaplace<dim>::compute_energy_norm_error()
   {
     energy_norm_square_per_cell.reinit(triangulation.n_active_cells());
 
@@ -766,7 +827,7 @@ namespace Step74
       fe_fv.get_function_values(solution, sol_u);
 
       const double extent1 = cell->measure() / cell->face(face_no)->measure();
-      const double penalty = compute_penalty(degree, extent1, extent1);
+      const double penalty = get_penalty_factor(degree, extent1, extent1);
 
       double difference_norm_square = 0.;
       for (unsigned int point = 0; point < q_points.size(); ++point)
@@ -804,7 +865,7 @@ namespace Step74
 
       const double extent1 = cell->measure() / cell->face(f)->measure();
       const double extent2 = ncell->measure() / ncell->face(nf)->measure();
-      const double penalty = compute_penalty(degree, extent1, extent2);
+      const double penalty = get_penalty_factor(degree, extent1, extent2);
 
       double u_jump_square = 0;
       for (unsigned int point = 0; point < n_q_points; ++point)
@@ -823,25 +884,25 @@ namespace Step74
           energy_norm_square_per_cell[cdf.cell_indices[j]] += cdf.values[j];
     };
 
-    UpdateFlags cell_flags =
+    const UpdateFlags cell_flags =
       update_gradients | update_quadrature_points | update_JxW_values;
     UpdateFlags face_flags =
       update_values | update_quadrature_points | update_JxW_values;
 
-    ScratchData scratch_data(mapping,
-                             fe,
-                             quadrature_overintegration,
-                             cell_flags,
-                             face_quadrature_overintegration,
-                             face_flags);
+    const ScratchData scratch_data(mapping,
+                                   fe,
+                                   quadrature_overintegration,
+                                   cell_flags,
+                                   face_quadrature_overintegration,
+                                   face_flags);
 
-    CopyData cd;
+    CopyData copy_data;
     MeshWorker::mesh_loop(dof_handler.begin_active(),
                           dof_handler.end(),
                           cell_worker,
                           copier,
                           scratch_data,
-                          cd,
+                          copy_data,
                           MeshWorker::assemble_own_cells |
                             MeshWorker::assemble_own_interior_faces_once |
                             MeshWorker::assemble_boundary_faces,
@@ -852,6 +913,9 @@ namespace Step74
     return energy_error;
   }
 
+
+
+  // @sect3{The refine_grid() function}
   template <int dim>
   void SIPGLaplace<dim>::refine_grid()
   {
@@ -863,12 +927,18 @@ namespace Step74
     triangulation.execute_coarsening_and_refinement();
   }
 
-  // We compute three errors in $L_2$ norm, $H_1$ seminorm, and the energy norm,
-  // respectively.
+
+
+  // @sect3{The compute_errors() function}
+  // We compute three errors in the $L_2$ norm, $H_1$ seminorm, and
+  // the energy norm, respectively. These are then printed to screen,
+  // but also stored in a table that records how these errors decay
+  // with mesh refinement and which can be output in one step at the
+  // end of the program.
   template <int dim>
   void SIPGLaplace<dim>::compute_errors()
   {
-    double L2_error, H1_error;
+    double L2_error, H1_error, energy_error;
 
     {
       Vector<float> difference_per_cell(triangulation.n_active_cells());
@@ -883,6 +953,7 @@ namespace Step74
       L2_error = VectorTools::compute_global_error(triangulation,
                                                    difference_per_cell,
                                                    VectorTools::L2_norm);
+      convergence_table.add_value("L2", L2_error);
     }
 
     {
@@ -898,12 +969,13 @@ namespace Step74
       H1_error = VectorTools::compute_global_error(triangulation,
                                                    difference_per_cell,
                                                    VectorTools::H1_seminorm);
+      convergence_table.add_value("H1", H1_error);
     }
 
-    convergence_table.add_value("L2", L2_error);
-    convergence_table.add_value("H1", H1_error);
-    const double energy_error = compute_energy_norm();
-    convergence_table.add_value("Energy", energy_error);
+    {
+      energy_error = compute_energy_norm_error();
+      convergence_table.add_value("Energy", energy_error);
+    }
 
     std::cout << "  Error in the L2 norm         : " << L2_error << std::endl
               << "  Error in the H1 seminorm     : " << H1_error << std::endl
@@ -911,17 +983,21 @@ namespace Step74
               << std::endl;
   }
 
+
+
+  // @sect3{The run() function}
   template <int dim>
   void SIPGLaplace<dim>::run()
   {
-    unsigned int max_cycle = test_case == Test_Case::convergence_rate ? 6 : 20;
+    const unsigned int max_cycle =
+      (test_case == TestCase::convergence_rate ? 6 : 20);
     for (unsigned int cycle = 0; cycle < max_cycle; ++cycle)
       {
         std::cout << "Cycle " << cycle << std::endl;
 
         switch (test_case)
           {
-            case Test_Case::convergence_rate:
+            case TestCase::convergence_rate:
               {
                 if (cycle == 0)
                   {
@@ -935,7 +1011,8 @@ namespace Step74
                   }
                 break;
               }
-            case Test_Case::l_singularity:
+
+            case TestCase::l_singularity:
               {
                 if (cycle == 0)
                   {
@@ -948,11 +1025,13 @@ namespace Step74
                   }
                 break;
               }
+
             default:
               {
                 Assert(false, ExcNotImplemented());
               }
           }
+
         std::cout << "  Number of active cells       : "
                   << triangulation.n_active_cells() << std::endl;
         setup_system();
@@ -970,7 +1049,7 @@ namespace Step74
         }
         compute_errors();
 
-        if (test_case == Test_Case::l_singularity)
+        if (test_case == TestCase::l_singularity)
           {
             compute_error_estimate();
             std::cout << "  Estimated error              : "
@@ -983,35 +1062,39 @@ namespace Step74
           }
         std::cout << std::endl;
       }
-    {
-      convergence_table.set_precision("L2", 3);
-      convergence_table.set_precision("H1", 3);
-      convergence_table.set_precision("Energy", 3);
 
-      convergence_table.set_scientific("L2", true);
-      convergence_table.set_scientific("H1", true);
-      convergence_table.set_scientific("Energy", true);
+    // Having run all of our computations, let us tell the convergence
+    // table how to format its data and output it to screen:
+    convergence_table.set_precision("L2", 3);
+    convergence_table.set_precision("H1", 3);
+    convergence_table.set_precision("Energy", 3);
 
-      if (test_case == Test_Case::l_singularity)
-        {
-          convergence_table.set_precision("Estimator", 3);
-          convergence_table.set_scientific("Estimator", true);
-        }
-      if (test_case == Test_Case::convergence_rate)
-        {
-          convergence_table.evaluate_convergence_rates(
-            "L2", ConvergenceTable::reduction_rate_log2);
-          convergence_table.evaluate_convergence_rates(
-            "H1", ConvergenceTable::reduction_rate_log2);
-        }
-      std::cout << "degree = " << degree << std::endl;
-      convergence_table.write_text(
-        std::cout, TableHandler::TextOutputFormat::org_mode_table);
-    }
+    convergence_table.set_scientific("L2", true);
+    convergence_table.set_scientific("H1", true);
+    convergence_table.set_scientific("Energy", true);
+
+    if (test_case == TestCase::convergence_rate)
+      {
+        convergence_table.evaluate_convergence_rates(
+          "L2", ConvergenceTable::reduction_rate_log2);
+        convergence_table.evaluate_convergence_rates(
+          "H1", ConvergenceTable::reduction_rate_log2);
+      }
+    if (test_case == TestCase::l_singularity)
+      {
+        convergence_table.set_precision("Estimator", 3);
+        convergence_table.set_scientific("Estimator", true);
+      }
+
+    std::cout << "degree = " << degree << std::endl;
+    convergence_table.write_text(
+      std::cout, TableHandler::TextOutputFormat::org_mode_table);
   }
 } // namespace Step74
 
 
+
+// @sect3{The main() function}
 // The following <code>main</code> function is similar to previous examples as
 // well, and need not be commented on.
 int main()
@@ -1020,7 +1103,9 @@ int main()
     {
       using namespace dealii;
       using namespace Step74;
-      Test_Case      test_case = Test_Case::l_singularity;
+
+      const TestCase test_case = TestCase::l_singularity;
+
       SIPGLaplace<2> problem(test_case);
       problem.run();
     }

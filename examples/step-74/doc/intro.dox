@@ -16,7 +16,8 @@ EAR-0949446 and EAR-1550901 and The University of California -- Davis.
 <h3>Overview</h3>
 In this tutorial, we display the usage of the FEInterfaceValues class,
 which is designed for assembling face terms arising from discontinuous Galerkin (DG) methods.
-The FEInterfaceValues class provides an easy way to obtain the jump and the average of the solution across cell faces.
+The FEInterfaceValues class provides an easy way to obtain the jump
+and the average of shape functions and of the solution across cell faces.
 This tutorial includes the following topics.
 <ol>
   <li> The SIPG method for Poisson's equation, which has already been used in step-39 and step-59.
@@ -41,12 +42,12 @@ on cell faces.
 We denote the mesh by ${\mathbb T}_h$, and $K\in{\mathbb T}_h$ is a mesh cell.
 The sets of interior and boundary faces are denoted by ${\mathbb F}^i_h$ and ${\mathbb F}^b_h$
 respectively. Let $K^0$ and $K^1$ be the two cells sharing a face $f\in F_h^i$,
-and $\mathbf n$ be the outer normal vector of $K^0$. Then the jump and average
-operators are given by
+and $\mathbf n$ be the outer normal vector of $K^0$. Then the jump
+operator is given by the "here minus there" formula,
 @f[
 \jump{v} = v^0 - v^1
 @f]
-and
+and the averaging operator as
 @f[
 \average{v} = \frac{v^0 + v^1}{2}
 @f]
@@ -72,58 +73,63 @@ The discretization using the SIPG is given by the following weak formula
   \right\}.
 @f}
 
+
 <h3>The penalty parameter</h3>
 The penalty parameter is defined as $\sigma = \gamma/h_f$, where $h_f$ a local length scale associated
-with the cell face; here we choose the approximation of the length of the cell in the direction normal to the face,
-and $\gamma$ is the penalization constant.
+with the cell face; here we choose an approximation of the length of the cell in the direction normal to the face:
+$\frac 1{h_f} = \frac 12 \left(\frac 1{h_K} + \frac 1{h_{K'}}\right)$,
+where $K,K'$ are the two cells adjacent to the face $f$ and we we
+compute $h_K = \frac{|K|}{|f|}$.
+
+In the formula above, $\gamma$ is the penalization constant.
 To ensure the discrete coercivity, the penalization constant has to be large enough @cite ainsworth2007posteriori.
-People do not really have consensus on which precise formula to choose, among what was proposed in the literature.
+People do not really have consensus on which of the formulas proposed
+in the literature should be used. (This is similar to the situation
+discussed in the "Results" section of step-47.)
 One can just pick a large constant, while other options could be the multiples of $(p+1)^2$ or $p(p+1)$. In this code,
 we follow step-39 and use $\gamma = p(p+1)$.
 
+
 <h3>A posteriori error estimator</h3>
-In this example, we use the error estimator by Karakashian and Pascal @cite karakashian2003posteriori with a slight modification
+In this example, with a slight modification, we use the error estimator by Karakashian and Pascal @cite karakashian2003posteriori
 @f[
 \eta^2 = \sum_{K \in {\mathbb T}_h} \eta^2_{K} +  \sum_{f_i \in {\mathbb F}^i_h}  \eta^2_{f_i} + \sum_{f_b \in F^i_b}\eta^2_{f_b}
 @f]
 where
-@f[
-\eta^2_{K} = h_K^2 \left\| f + \nu \Delta u_h \right\|_K^2
-@f]
-@f[
-\eta^2_{f_i} = \sigma \left\| \jump{u_h}  \right\|_f^2   +  h_f \left\|  \jump{\nu \nabla u_h} \cdot \mathbf n   \right\|_f^2
-@f]
-@f[
-\eta_{f_b}^2 =  \sigma \left\| u_h-g_D \right\|_f^2
-@f]
+@f{align*}{
+\eta^2_{K} &= h_K^2 \left\| f + \nu \Delta u_h \right\|_K^2,
+\\
+\eta^2_{f_i} &= \sigma \left\| \jump{u_h}  \right\|_f^2   +  h_f \left\|  \jump{\nu \nabla u_h} \cdot \mathbf n   \right\|_f^2,
+\\
+\eta_{f_b}^2 &=  \sigma \left\| u_h-g_D \right\|_f^2.
+@f}
 Here we use $\sigma = \gamma/h_f$ instead of $\gamma^2/h_f$ for the jump terms of $u_h$ (the first term in $\eta^2_{f_i}$ and $\eta_{f_b}^2$).
 
-In each cell $K$, we compute
-@f[
-\eta_{c}^2 = h_K^2 \left\| f + \nu \Delta u_h \right\|_K^2,
+In order to compute this estimator, in each cell $K$ we compute
+@f{align*}{
+\eta_{c}^2 &= h_K^2 \left\| f + \nu \Delta u_h \right\|_K^2,
+\\
+\eta_{f}^2 &= \sum_{f\in \partial K}\lbrace \sigma \left\| \jump{u_h}  \right\|_f^2   +  h_f \left\|  \jump{\nu \nabla u_h} \cdot \mathbf n  \right\|_f^2 \rbrace,
+\\
+\eta_{b}^2 &= \sum_{f\in \partial K \cap \partial \Omega}  \sigma \left\| (u_h -g_D)  \right\|_f^2.
 @f]
+Then the square of the error estimate per cell is
 @f[
-\eta_{f}^2 = \sum_{f\in \partial K}\lbrace \sigma \left\| \jump{u_h}  \right\|_f^2   +  h_f \left\|  \jump{\nu \nabla u_h} \cdot \mathbf n  \right\|_f^2 \rbrace,
+\eta_\text{local}^2 =\eta_{c}^2+0.5\eta_{f}^2+\eta_{b}^2.
 @f]
-@f[
-\eta_{b}^2 = \sum_{f\in \partial K \cap \partial \Omega}  \sigma \left\| (u_h -g_D)  \right\|_f^2.
-@f]
-Then the error estimate square per cell is
-@f[
-\eta_{local}^2 =\eta_{c}^2+0.5\eta_{f}^2+\eta_{b}^2.
-@f]
-Note that we compute $\eta_{local}^2$ instead of $\eta_{local}$ to simplify the implementation.
-The error estimate square per cell is stored in a global vector, whose $L_1$ norm is equal to $\eta^2$.
+The factor of $0.5$ results from the fact that the overall error
+estimator includes each interior face only once, and so the estimators per cell
+count it with a factor of one half for each of the two adjacent cells.
+Note that we compute $\eta_\text{local}^2$ instead of $\eta_\text{local}$ to simplify the implementation.
+The error estimate square per cell is then stored in a global vector, whose $l_1$ norm is equal to $\eta^2$.
 
 <h3>The test case</h3>
 In the first test problem, we run a convergence test using a smooth manufactured solution with $\nu =1$ in 2D
-@f[
-u=\sin(2\pi x)\sin(2\pi y), (x,y)\in (0,1)\times (0,1),
-@f]
-correspondingly,
-@f[
-u=0, \qquad \mbox{on } \partial \Omega.
-@f]
+@f{align*}
+u&=\sin(2\pi x)\sin(2\pi y), &\qquad\qquad &(x,y)\in\Omega=(0,1)\times (0,1),
+\\
+u&=0,                        &\qquad\qquad &\text{on } \partial \Omega,
+@f}
 and $f= 8\pi^2 u$. We compute errors against the manufactured solution and evaluate the convergence rate.
 
 In the second test, we choose Functions::LSingularityFunction on a L-shaped domain (GridGenerator::hyper_L) in 2D.

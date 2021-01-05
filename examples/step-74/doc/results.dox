@@ -24,7 +24,9 @@ Cycle 2
 .
 .
 @endcode
-Convergence rate for the smooth case with polynomial degree 3:
+
+When using the smooth case with polynomial degree 3, the convergence
+table will look like this:
 <table align="center" class="doxtable">
   <tr>
     <th>cycle</th>
@@ -99,7 +101,7 @@ Convergence rate for the smooth case with polynomial degree 3:
 </table>
 
 Theoretically, for polynomial degree $p$, the order of convergence in $L_2$
-norm and $H_1$ seminorm should be $p+1$ and $p$, respectively. Our numerical
+norm and $H^1$ seminorm should be $p+1$ and $p$, respectively. Our numerical
 results are in good agreement with theory.
 
 In the second test case, when you run the program, the screen output should look like the following:
@@ -128,19 +130,20 @@ Cycle 2
 
 The following figure provides a log-log plot of the errors versus
 the number of degrees of freedom. Let $n$ be the number of degrees of
-freedom, then $h$ is of order $1/\sqrt{n}$ in 2D. Combining the theoretical
-results in the previous case,
-we see that the error in $L_2$ norm is of order $O(n^{-\frac{p+1}{2}})$
-and in $H_1$ seminorm is $O(n^{-\frac{p}{2}})$. From the figure, we see
+freedom, then on uniformly refined meshes, $h$ is of order
+$1/\sqrt{n}$ in 2D. Combining the theoretical results in the previous case,
+we see that if the solution is sufficiently smooth,
+we can expect the error in the $L_2$ norm to be of order $O(n^{-\frac{p+1}{2}})$
+and in $H^1$ seminorm to be $O(n^{-\frac{p}{2}})$. From the figure, we see
 that the SIPG with adaptive mesh refinement produces desirable results
-that match theoretical ones.
+that match theoretical ones:
+
+<img width="600px" src="https://www.dealii.org/images/steps/developer/step-74.log-log-plot.png" alt="">
 
 In addition, we observe that the error estimator decreases
-in almost the same rate as the errors in the energy norm and $H_1$ seminorm,
-and one order lower than $L_2$ error, which illustrates
+at almost the same rate as the errors in the energy norm and $H^1$ seminorm,
+and one order lower than the $L_2$ error. This suggests
 its ability to predict regions with large errors.
-
-<img width="600px" src="https://www.dealii.org/images/steps/developer/step-74-log-log-plot.png" alt="">
 
 While this tutorial is focused on the implementation, the step-59 tutorial program achieves an efficient
 large-scale solver in terms of computing time with matrix-free solution techniques.
