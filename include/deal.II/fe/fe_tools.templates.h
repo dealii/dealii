@@ -1799,6 +1799,9 @@ namespace FETools
         const unsigned int n = fe.n_dofs_per_cell();
         const unsigned int nc =
           GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+
+        AssertDimension(matrices.size(), nc);
+
         for (unsigned int i = 0; i < nc; ++i)
           {
             Assert(matrices[i].n() == n,
@@ -1807,18 +1810,27 @@ namespace FETools
                    ExcDimensionMismatch(matrices[i].m(), n));
           }
 
+        const auto reference_cell_type = fe.reference_cell_type();
+
         // Set up meshes, one with a single
         // reference cell and refine it once
         Triangulation<dim, spacedim> tria;
-        GridGenerator::hyper_cube(tria, 0, 1);
+        ReferenceCell::make_triangulation(reference_cell_type, tria);
         tria.begin_active()->set_refine_flag(RefinementCase<dim>(ref_case));
         tria.execute_coarsening_and_refinement();
 
         const unsigned int degree = fe.degree;
-        QGauss<dim>        q_fine(degree + 1);
+
+        const auto &mapping =
+          ReferenceCell::get_default_linear_mapping<dim, spacedim>(
+            reference_cell_type);
+        const auto &q_fine =
+          ReferenceCell::get_gauss_type_quadrature<dim>(reference_cell_type,
+                                                        degree + 1);
         const unsigned int nq = q_fine.size();
 
-        FEValues<dim, spacedim> fine(fe,
+        FEValues<dim, spacedim> fine(mapping,
+                                     fe,
                                      q_fine,
                                      update_quadrature_points |
                                        update_JxW_values | update_values);
@@ -1865,7 +1877,10 @@ namespace FETools
                 q_points_coarse[i](j) = q_points_fine[i](j);
             const Quadrature<dim>   q_coarse(q_points_coarse,
                                            fine.get_JxW_values());
-            FEValues<dim, spacedim> coarse(fe, q_coarse, update_values);
+            FEValues<dim, spacedim> coarse(mapping,
+                                           fe,
+                                           q_coarse,
+                                           update_values);
 
             coarse.reinit(tria.begin(0));
 
@@ -1921,12 +1936,11 @@ namespace FETools
 
   template <int dim, typename number, int spacedim>
   void
-  compute_embedding_matrices(const FiniteElement<dim, spacedim> &fe,
-                             std::vector<std::vector<FullMatrix<number>>
-
-                                         > &                     matrices,
-                             const bool                          isotropic_only,
-                             const double                        threshold)
+  compute_embedding_matrices(
+    const FiniteElement<dim, spacedim> &          fe,
+    std::vector<std::vector<FullMatrix<number>>> &matrices,
+    const bool                                    isotropic_only,
+    const double                                  threshold)
   {
     Threads::TaskGroup<void> task_group;
 
