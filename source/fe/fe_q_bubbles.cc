@@ -422,7 +422,7 @@ template <int dim, int spacedim>
 std::vector<bool>
 FE_Q_Bubbles<dim, spacedim>::get_riaf_vector(const unsigned int q_deg)
 {
-  unsigned int       n_cont_dofs = Utilities::fixed_power<dim>(q_deg + 1);
+  const unsigned int n_cont_dofs = Utilities::fixed_power<dim>(q_deg + 1);
   const unsigned int n_bubbles   = (q_deg <= 1 ? 1 : dim);
   return std::vector<bool>(n_cont_dofs + n_bubbles, true);
 }
@@ -437,8 +437,9 @@ FE_Q_Bubbles<dim, spacedim>::get_dpo_vector(const unsigned int q_deg)
   for (unsigned int i = 1; i < dpo.size(); ++i)
     dpo[i] = dpo[i - 1] * (q_deg - 1);
 
-  dpo[dim] +=
-    (q_deg <= 1 ? 1 : dim); // all the bubble functions are discontinuous
+  // Then add the bubble functions; they are all associated with the
+  // cell interior
+  dpo[dim] += (q_deg <= 1 ? 1 : dim);
   return dpo;
 }
 

@@ -36,10 +36,18 @@ DEAL_II_NAMESPACE_OPEN
  */
 
 /**
- * Tensor product of given polynomials and bubble functions of form
- * $(2*x_j-1)^{degree-1}\prod_{i=0}^{dim-1}(x_i(1-x_i))$. This class inherits
+ * A class that represents a space of tensor product polynomials, augmented
+ * by $dim$ (non-normalized) bubble functions of form
+ * $\varphi_j(\mathbf x)
+ * = 2^{\text{degree}-1}\left(x_j-frac 12\right)^{\text{degree}-1}
+ * \left[\prod_{i=0}^{dim-1}(x_i(1-x_i))\right]$
+ * for $j=0,\ldots,dim-1$. If `degree` is one, then the first factor
+ * disappears and one receives the usual bubble function centered
+ * at the mid-point of the cell.
+ *
+ * This class inherits
  * most of its functionality from TensorProductPolynomials. The bubble
- * enrichments are added for the last indices. index.
+ * enrichments are added for the last index.
  */
 template <int dim>
 class TensorProductPolynomialsBubbles : public ScalarPolynomialsBase<dim>
