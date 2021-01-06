@@ -1,6 +1,5 @@
 
 DEAL::Creation successful.
-DEAL::  Number of CellId objects: 256
 DEAL::Serialization with boost binary archives successful.
 DEAL::Serialization with Utilities successful.
 DEAL::Serialization with binary representation successful.
