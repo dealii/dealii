@@ -1742,10 +1742,11 @@ namespace internal
       std::unique_ptr<Policy<dim, spacedim>>
       clone() override
       {
-        return std::unique_ptr<Policy<dim, spacedim>>(
-          new PolicyWrapper<dim, spacedim, T>());
+        return std::make_unique<PolicyWrapper<dim, spacedim, T>>();
       }
     };
+
+
 
     /**
      * A class into which we put many of the functions that implement
