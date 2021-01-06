@@ -14,13 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Step-02 on a simplex mesh. Following incompatible modifications had to be
-// made:
-//  - The function GridGenerator::hyper_cube() is only working for hypercube
-//    meshes. Use this function to create a temporary mesh and convert it to
-//    simplex mesh.
-//  - Local refinement is replaced by global refinement.
-
+// Step-12 with tetrahedron mesh.
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -32,7 +26,6 @@
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_interface_values.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_fe.h>
 #include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/grid/grid_generator.h>
@@ -48,11 +41,19 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
-#include <deal.II/meshworker/mesh_loop.h>
-
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/derivative_approximation.h>
 #include <deal.II/numerics/vector_tools.h>
+
+#include "../tests.h"
+
+// Finally, the new include file for using the mesh_loop from the MeshWorker
+// framework
+#include <deal.II/fe/mapping_fe.h>
+
+#include <deal.II/lac/precondition.h>
+
+#include <deal.II/meshworker/mesh_loop.h>
 
 #include <deal.II/simplex/fe_lib.h>
 #include <deal.II/simplex/grid_generator.h>
@@ -60,6 +61,8 @@
 
 #include <fstream>
 #include <iostream>
+
+//#define HEX
 
 namespace Step12
 {
@@ -107,12 +110,11 @@ namespace Step12
     wind_field(0) = -p(1);
     wind_field(1) = p(0);
 
-    if (wind_field.norm() > 1e-10)
+    if (wind_field.norm() > 1e-6)
       wind_field /= wind_field.norm();
 
     return wind_field;
   }
-
 
 
   template <int dim>
@@ -120,8 +122,8 @@ namespace Step12
   {
     ScratchData(const Mapping<dim> &       mapping,
                 const FiniteElement<dim> & fe,
-                const Quadrature<dim> &    quadrature,
-                const Quadrature<dim - 1> &quadrature_face,
+                const Quadrature<dim> &    quad,
+                const Quadrature<dim - 1> &quad_face,
                 const UpdateFlags          update_flags = update_values |
                                                  update_gradients |
                                                  update_quadrature_points |
@@ -129,11 +131,8 @@ namespace Step12
                 const UpdateFlags interface_update_flags =
                   update_values | update_gradients | update_quadrature_points |
                   update_JxW_values | update_normal_vectors)
-      : fe_values(mapping, fe, quadrature, update_flags)
-      , fe_interface_values(mapping,
-                            fe,
-                            quadrature_face,
-                            interface_update_flags)
+      : fe_values(mapping, fe, quad, update_flags)
+      , fe_interface_values(mapping, fe, quad_face, interface_update_flags)
     {}
 
 
@@ -142,10 +141,12 @@ namespace Step12
                   scratch_data.fe_values.get_fe(),
                   scratch_data.fe_values.get_quadrature(),
                   scratch_data.fe_values.get_update_flags())
-      , fe_interface_values(scratch_data.fe_interface_values.get_mapping(),
-                            scratch_data.fe_interface_values.get_fe(),
-                            scratch_data.fe_interface_values.get_quadrature(),
-                            scratch_data.fe_interface_values.get_update_flags())
+      , fe_interface_values(
+          scratch_data.fe_values
+            .get_mapping(), // TODO: implement for fe_interface_values
+          scratch_data.fe_values.get_fe(),
+          scratch_data.fe_interface_values.get_quadrature(),
+          scratch_data.fe_interface_values.get_update_flags())
     {}
 
     FEValues<dim>          fe_values;
@@ -202,14 +203,21 @@ namespace Step12
     void
     output_results(const unsigned int cycle) const;
 
-    Triangulation<dim>   triangulation;
+    Triangulation<dim> triangulation;
+#ifdef HEX
+    const MappingQ1<dim> mapping;
+#else
+    Simplex::FE_P<dim>   fe_mapping;
     const MappingFE<dim> mapping;
+#endif
 
-    const Simplex::FE_DGP<dim> fe;
-    DoFHandler<dim>            dof_handler;
-
-    const Simplex::QGauss<dim>     quadrature;
-    const Simplex::QGauss<dim - 1> quadrature_face;
+    // Furthermore we want to use DG elements.
+#ifdef HEX
+    FE_DGQ<dim> fe;
+#else
+    Simplex::FE_DGP<dim> fe;
+#endif
+    DoFHandler<dim> dof_handler;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -221,11 +229,15 @@ namespace Step12
 
   template <int dim>
   AdvectionProblem<dim>::AdvectionProblem()
-    : mapping(Simplex::FE_P<dim>(1))
-    , fe(1)
+#ifdef HEX
+    : mapping()
+    , fe(2)
+#else
+    : fe_mapping(1)
+    , mapping(fe_mapping)
+    , fe(2)
+#endif
     , dof_handler(triangulation)
-    , quadrature(fe.tensor_degree() + 1)
-    , quadrature_face(fe.tensor_degree() + 1)
   {}
 
 
@@ -251,11 +263,10 @@ namespace Step12
     using Iterator = typename DoFHandler<dim>::active_cell_iterator;
     const BoundaryValues<dim> boundary_function;
 
-    const auto cell_worker = [&](const Iterator &  cell,
-                                 ScratchData<dim> &scratch_data,
-                                 CopyData &        copy_data) {
-      const unsigned int n_dofs =
-        scratch_data.fe_values.get_fe().n_dofs_per_cell();
+    auto cell_worker = [&](const Iterator &  cell,
+                           ScratchData<dim> &scratch_data,
+                           CopyData &        copy_data) {
+      const unsigned int n_dofs = scratch_data.fe_values.get_fe().dofs_per_cell;
       copy_data.reinit(cell, n_dofs);
       scratch_data.fe_values.reinit(cell);
 
@@ -279,10 +290,10 @@ namespace Step12
         }
     };
 
-    const auto boundary_worker = [&](const Iterator &    cell,
-                                     const unsigned int &face_no,
-                                     ScratchData<dim> &  scratch_data,
-                                     CopyData &          copy_data) {
+    auto boundary_worker = [&](const Iterator &    cell,
+                               const unsigned int &face_no,
+                               ScratchData<dim> &  scratch_data,
+                               CopyData &          copy_data) {
       scratch_data.fe_interface_values.reinit(cell, face_no);
       const FEFaceValuesBase<dim> &fe_face =
         scratch_data.fe_interface_values.get_fe_face_values(0);
@@ -319,14 +330,14 @@ namespace Step12
         }
     };
 
-    const auto face_worker = [&](const Iterator &    cell,
-                                 const unsigned int &f,
-                                 const unsigned int &sf,
-                                 const Iterator &    ncell,
-                                 const unsigned int &nf,
-                                 const unsigned int &nsf,
-                                 ScratchData<dim> &  scratch_data,
-                                 CopyData &          copy_data) {
+    auto face_worker = [&](const Iterator &    cell,
+                           const unsigned int &f,
+                           const unsigned int &sf,
+                           const Iterator &    ncell,
+                           const unsigned int &nf,
+                           const unsigned int &nsf,
+                           ScratchData<dim> &  scratch_data,
+                           CopyData &          copy_data) {
       FEInterfaceValues<dim> &fe_iv = scratch_data.fe_interface_values;
       fe_iv.reinit(cell, f, sf, ncell, nf, nsf);
       const auto &q_points = fe_iv.get_quadrature_points();
@@ -356,9 +367,9 @@ namespace Step12
         }
     };
 
-    const AffineConstraints<double> constraints;
+    AffineConstraints<double> constraints;
 
-    const auto copier = [&](const CopyData &c) {
+    auto copier = [&](const CopyData &c) {
       constraints.distribute_local_to_global(c.cell_matrix,
                                              c.cell_rhs,
                                              c.local_dof_indices,
@@ -373,7 +384,19 @@ namespace Step12
         }
     };
 
-    ScratchData<dim> scratch_data(mapping, fe, quadrature, quadrature_face);
+    const unsigned int degree = dof_handler.get_fe().degree;
+
+#ifdef HEX
+    QGauss<dim> quad(degree + 1);
+
+    QGauss<dim - 1> face_quad(degree + 1);
+#else
+    Simplex::QGauss<dim> quad(degree + 1);
+
+    Simplex::QGauss<dim - 1> face_quad(degree + 1);
+#endif
+
+    ScratchData<dim> scratch_data(mapping, fe, quad, face_quad);
     CopyData         copy_data;
 
     MeshWorker::mesh_loop(dof_handler.begin_active(),
@@ -398,12 +421,12 @@ namespace Step12
 
     PreconditionBlockSSOR<SparseMatrix<double>> preconditioner;
 
-    preconditioner.initialize(system_matrix, fe.n_dofs_per_cell());
+    preconditioner.initialize(system_matrix, fe.dofs_per_cell);
 
     solver.solve(system_matrix, solution, right_hand_side, preconditioner);
 
-    std::cout << "  Solver converged in " << solver_control.last_step()
-              << " iterations." << std::endl;
+    deallog << "  Solver converged in " << solver_control.last_step()
+            << " iterations." << std::endl;
   }
 
 
@@ -411,7 +434,24 @@ namespace Step12
   void
   AdvectionProblem<dim>::refine_grid()
   {
-    triangulation.refine_global();
+    Vector<float> gradient_indicator(triangulation.n_active_cells());
+
+    DerivativeApproximation::approximate_gradient(mapping,
+                                                  dof_handler,
+                                                  solution,
+                                                  gradient_indicator);
+
+    unsigned int cell_no = 0;
+    for (const auto &cell : dof_handler.active_cell_iterators())
+      gradient_indicator(cell_no++) *=
+        std::pow(cell->diameter(), 1 + 1.0 * dim / 2);
+
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    gradient_indicator,
+                                                    0.3,
+                                                    0.1);
+
+    triangulation.execute_coarsening_and_refinement();
   }
 
 
@@ -419,17 +459,27 @@ namespace Step12
   void
   AdvectionProblem<dim>::output_results(const unsigned int cycle) const
   {
-    const std::string filename = "solution-" + std::to_string(cycle) + ".vtk";
-    std::cout << "  Writing solution to <" << filename << ">" << std::endl;
+#if false
+#  ifdef HEX
+    const std::string filename =
+      dim == 2 ? ("step12-quad-" + std::to_string(cycle) + ".vtk") :
+                 ("step12-hex-" + std::to_string(cycle) + ".vtk");
+#  else
+    const std::string filename =
+      dim == 2 ? ("step12-tri-" + std::to_string(cycle) + ".vtk") :
+                 ("step12-tet-" + std::to_string(cycle) + ".vtk");
+#  endif
+    deallog << "  Writing solution to <" << filename << ">" << std::endl;
     std::ofstream output(filename);
 
     DataOut<dim> data_out;
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(solution, "u", DataOut<dim>::type_dof_data);
 
-    data_out.build_patches(mapping);
+    data_out.build_patches(mapping, 2);
 
     data_out.write_vtk(output);
+#endif
 
     {
       Vector<float> values(triangulation.n_active_cells());
@@ -438,13 +488,13 @@ namespace Step12
                                         solution,
                                         Functions::ZeroFunction<dim>(),
                                         values,
-                                        quadrature,
+                                        QGauss<dim>(fe.degree + 1),
                                         VectorTools::Linfty_norm);
       const double l_infty =
         VectorTools::compute_global_error(triangulation,
                                           values,
                                           VectorTools::Linfty_norm);
-      std::cout << "  L-infinity norm: " << l_infty << std::endl;
+      deallog << "  L-infinity norm: " << l_infty << std::endl;
     }
   }
 
@@ -453,27 +503,36 @@ namespace Step12
   void
   AdvectionProblem<dim>::run()
   {
-    for (unsigned int cycle = 0; cycle < 4; ++cycle)
+    //#ifdef HEX
+    //    for (unsigned int cycle = 0; cycle < 6; ++cycle)
+    //#else
+    for (unsigned int cycle = 0; cycle < 1; ++cycle)
+      //#endif
       {
-        std::cout << "Cycle " << cycle << std::endl;
+        deallog << "Cycle " << cycle << std::endl;
 
         if (cycle == 0)
           {
-            Triangulation<dim> temp;
-            GridGenerator::hyper_cube(temp);
-            GridGenerator::convert_hypercube_to_simplex_mesh(temp,
-                                                             triangulation);
+#ifdef HEX
+            // GridGenerator::hyper_cube(triangulation);
+            // triangulation.refine_global(3);
+            GridGenerator::subdivided_hyper_cube(triangulation, 16);
+#else
+            GridGenerator::subdivided_hyper_cube_with_simplices(triangulation,
+                                                                dim == 2 ? 32 :
+                                                                           8);
+#endif
           }
         else
           refine_grid();
 
-        std::cout << "  Number of active cells:       "
-                  << triangulation.n_active_cells() << std::endl;
+        deallog << "  Number of active cells:       "
+                << triangulation.n_active_cells() << std::endl;
 
         setup_system();
 
-        std::cout << "  Number of degrees of freedom: " << dof_handler.n_dofs()
-                  << std::endl;
+        deallog << "  Number of degrees of freedom: " << dof_handler.n_dofs()
+                << std::endl;
 
         assemble_system();
         solve();
@@ -487,36 +546,16 @@ namespace Step12
 int
 main()
 {
-  try
-    {
-      Step12::AdvectionProblem<2> dgmethod;
-      dgmethod.run();
-    }
-  catch (std::exception &exc)
-    {
-      std::cerr << std::endl
-                << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      std::cerr << "Exception on processing: " << std::endl
-                << exc.what() << std::endl
-                << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      return 1;
-    }
-  catch (...)
-    {
-      std::cerr << std::endl
-                << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      std::cerr << "Unknown exception!" << std::endl
-                << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      return 1;
-    }
+  initlog();
+
+  {
+    Step12::AdvectionProblem<2> dgmethod;
+    dgmethod.run();
+  }
+  {
+    Step12::AdvectionProblem<3> dgmethod;
+    dgmethod.run();
+  }
 
   return 0;
 }
