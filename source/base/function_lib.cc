@@ -2552,6 +2552,15 @@ namespace Functions
 
 
   template <int dim>
+  const Table<dim, double> &
+  InterpolatedTensorProductGridData<dim>::get_data() const
+  {
+    return data_values;
+  }
+
+
+
+  template <int dim>
   double
   InterpolatedTensorProductGridData<dim>::value(
     const Point<dim> & p,
@@ -2741,6 +2750,15 @@ namespace Functions
   {
     return sizeof(*this) + data_values.memory_consumption() -
            sizeof(data_values);
+  }
+
+
+
+  template <int dim>
+  const Table<dim, double> &
+  InterpolatedUniformGridData<dim>::get_data() const
+  {
+    return data_values;
   }
 
 

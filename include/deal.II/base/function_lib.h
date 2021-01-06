@@ -1441,6 +1441,12 @@ namespace Functions
     virtual std::size_t
     memory_consumption() const override;
 
+    /**
+     * Return a reference to the internally stored data.
+     */
+    const Table<dim, double> &
+    get_data() const;
+
   protected:
     /**
      * Find the index in the table of the rectangle containing an input point
@@ -1551,6 +1557,12 @@ namespace Functions
      */
     virtual std::size_t
     memory_consumption() const override;
+
+    /**
+     * Return a reference to the internally stored data.
+     */
+    const Table<dim, double> &
+    get_data() const;
 
   private:
     /**
