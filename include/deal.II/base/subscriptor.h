@@ -186,7 +186,8 @@ public:
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
-   * of serialization.
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    *
    * This function does not actually serialize any of the member variables of
    * this class. The reason is that what this class stores is only who

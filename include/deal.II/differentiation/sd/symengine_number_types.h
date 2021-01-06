@@ -438,7 +438,8 @@ namespace Differentiation
       save(std::ostream &stream) const;
 
       /**
-       * Load the value stored in the @p stream into this object.
+       * Load the value stored in the @p stream into this object using the [BOOST serialization
+       * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
        *
        * It is expected that each expression appears on its own on single
        * line of @p stream.
@@ -452,7 +453,8 @@ namespace Differentiation
 
       /**
        * Write the data of this object to a stream for the purpose
-       * of serialization.
+       * of serialization using the [BOOST serialization
+       * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
        *
        * This effectively saves the value stored in this object to the
        * @p archive with the given @p version number.
@@ -480,7 +482,8 @@ namespace Differentiation
 #  ifdef DOXYGEN
       /**
        * Write and read the data of this object from a stream for the purpose
-       * of serialization.
+       * of serialization using the [BOOST serialization
+       * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
        *
        * This effectively saves or loads the value stored into/out of the
        * @p archive with the given @p version number into this object.

@@ -211,7 +211,8 @@ namespace Particles
       const Triangulation<dim, spacedim> &triangulation) const;
 
     /**
-     * Serialize the contents of this class.
+     * Serialize the contents of this class using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
      */
     template <class Archive>
     void

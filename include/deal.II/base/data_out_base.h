@@ -3316,7 +3316,9 @@ public:
   add_attribute(const std::string &attr_name, const unsigned int dimension);
 
   /**
-   * Read or write the data of this object for serialization
+   * Read or write the data of this object for serialization using the
+   * [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void

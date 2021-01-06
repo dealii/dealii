@@ -408,9 +408,9 @@ namespace LinearAlgebra
 
   private:
     /**
-     * Serialize the data of this object using boost. This function is
-     * necessary to use boost::archive::text_iarchive and
-     * boost::archive::text_oarchive.
+     * Write and read the data of this object from a stream for the purpose
+     * of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
      */
     template <typename Archive>
     void
