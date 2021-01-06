@@ -775,15 +775,27 @@ namespace Step74
                           face_worker);
   }
 
-
   // @sect3{The compute_energy_norm_error() function}
-  // Next, we compute the error in the energy norm, which
-  // is similar to the assembling of the error estimator above.
+  // Next, we evaluate the accuracy in terms of the energy norm.
+  // This function is similar to the assembling of the error estimator above.
+  // Here we compute the square of the energy norm defined by
+  // @f[
+  //   \|u \|_{1,h}^2 = \sum_{K \in \Gamma_h} \nu\|\nabla u \|_K^2 +
+  //   \sum_{f \in F_i} \sigma \| [ u ] \|_f^2 +
+  //   \sum_{f \in F_b} \sigma  \|u\|_f^2.
+  // @f]
+  // Therefore the corresponding error is
+  // @f[
+  //   \|u -u_h \|_{1,h}^2 = \sum_{K \in \Gamma_h} \nu\|\nabla (u_h - u)  \|_K^2
+  //   + \sum_{f \in F_i} \sigma  \|[ u_h ] \|_f^2 + \sum_{f \in F_b}\sigma
+  //   \|u_h-g_D\|_f^2.
+  // @f]
   template <int dim>
   double SIPGLaplace<dim>::compute_energy_norm_error()
   {
     energy_norm_square_per_cell.reinit(triangulation.n_active_cells());
 
+    // Assemble $\sum_{K \in \Gamma_h} \nu\|\nabla (u_h - u)  \|_K^2 $.
     const auto cell_worker =
       [&](const auto &cell, auto &scratch_data, auto &copy_data) {
         const FEValues<dim> &fe_v = scratch_data.reinit(cell);
@@ -806,9 +818,10 @@ namespace Step74
             norm_square +=
               (grad_u[point] - grad_exact[point]).norm_square() * JxW[point];
           }
-        copy_data.value = norm_square;
+        copy_data.value = diffusion_coefficient * norm_square;
       };
 
+    // Assemble $\sum_{f \in F_b}\sigma  \|u_h-g_D\|_f^2$.
     const auto boundary_worker = [&](const auto &        cell,
                                      const unsigned int &face_no,
                                      auto &              scratch_data,
@@ -838,6 +851,7 @@ namespace Step74
       copy_data.value += penalty * difference_norm_square;
     };
 
+    // Assemble $\sum_{f \in F_i} \sigma  \| [ u_h ] \|_f^2$.
     const auto face_worker = [&](const auto &        cell,
                                  const unsigned int &f,
                                  const unsigned int &sf,
