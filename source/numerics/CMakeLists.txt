@@ -26,6 +26,7 @@ SET(_unity_include_src
   matrix_tools_once.cc
   matrix_tools.cc
   time_dependent.cc
+  vector_repartitioner.cc
   vector_tools_boundary.cc
   vector_tools_constraints.cc
   vector_tools_mean_value.cc
@@ -91,6 +92,7 @@ SET(_inst
   smoothness_estimator.inst.in
   solution_transfer.inst.in
   time_dependent.inst.in
+  vector_repartitioner.inst.in
   vector_tools_boundary.inst.in
   vector_tools_constraints.inst.in
   vector_tools_integrate_difference.inst.in
