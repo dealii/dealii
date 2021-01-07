@@ -425,15 +425,16 @@ namespace Step27
       // collection, we will assign a future FE index that corresponds to a
       // polynomial with degree one higher than it currently is. The following
       // function is capable of doing exactly this. Absent any better
-      // strategies, we will set the threshold as the mean value between minimal
-      // and maximal smoothness indicators on cells flagged for refinement. This
-      // is achieved by setting the corresponding fraction parameter to a value
-      // of 0.5. In the same way, we deal with cells that are going to be
-      // coarsened and decrease their polynomial degree when their smoothness
-      // indicator is below the corresponding threshold determined on cells to
-      // be coarsened.
+      // strategies, we will set the threshold via interpolation between the
+      // minimal and maximal smoothness indicators on cells flagged for
+      // refinement. Since the corner singularities are strongly localized, we
+      // will favor $p$- over $h$-refinement quantitatively. We achieve this
+      // with a low threshold by setting a small interpolation factor of 0.2. In
+      // the same way, we deal with cells that are going to be coarsened and
+      // decrease their polynomial degree when their smoothness indicator is
+      // below the corresponding threshold determined on cells to be coarsened.
       hp::Refinement::p_adaptivity_from_relative_threshold(
-        dof_handler, smoothness_indicators, 0.5, 0.5);
+        dof_handler, smoothness_indicators, 0.2, 0.2);
 
       // The above function only determines whether the polynomial degree will
       // change via future FE indices, but does not manipulate the
