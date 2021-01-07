@@ -2056,6 +2056,9 @@ DoFHandler<dim, spacedim>::reinit(const Triangulation<dim, spacedim> &tria)
   DoFHandler<dim, spacedim>::clear();
   this->policy.reset();
 
+  // reset the finite element collection
+  this->fe_collection = hp::FECollection<dim, spacedim>();
+
   //
   // call constructor
   //
