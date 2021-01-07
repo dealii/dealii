@@ -1172,17 +1172,18 @@ namespace Functions
   double
   LSingularityFunction::value(const Point<2> &p, const unsigned int) const
   {
-    double x = p(0);
-    double y = p(1);
+    const double x = p(0);
+    const double y = p(1);
 
     if ((x >= 0) && (y >= 0))
       return 0.;
 
-    double phi = std::atan2(y, -x) + numbers::PI;
-    double r2  = x * x + y * y;
+    const double phi       = std::atan2(y, -x) + numbers::PI;
+    const double r_squared = x * x + y * y;
 
-    return std::pow(r2, 1. / 3.) * std::sin(2. / 3. * phi);
+    return std::pow(r_squared, 1. / 3.) * std::sin(2. / 3. * phi);
   }
+
 
 
   void
@@ -1195,20 +1196,21 @@ namespace Functions
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        double x = points[i](0);
-        double y = points[i](1);
+        const double x = points[i](0);
+        const double y = points[i](1);
 
         if ((x >= 0) && (y >= 0))
           values[i] = 0.;
         else
           {
-            double phi = std::atan2(y, -x) + numbers::PI;
-            double r2  = x * x + y * y;
+            const double phi       = std::atan2(y, -x) + numbers::PI;
+            const double r_squared = x * x + y * y;
 
-            values[i] = std::pow(r2, 1. / 3.) * std::sin(2. / 3. * phi);
+            values[i] = std::pow(r_squared, 1. / 3.) * std::sin(2. / 3. * phi);
           }
       }
   }
+
 
 
   void
@@ -1223,27 +1225,31 @@ namespace Functions
       {
         Assert(values[i].size() == 1,
                ExcDimensionMismatch(values[i].size(), 1));
-        double x = points[i](0);
-        double y = points[i](1);
+        const double x = points[i](0);
+        const double y = points[i](1);
 
         if ((x >= 0) && (y >= 0))
           values[i](0) = 0.;
         else
           {
-            double phi = std::atan2(y, -x) + numbers::PI;
-            double r2  = x * x + y * y;
+            const double phi       = std::atan2(y, -x) + numbers::PI;
+            const double r_squared = x * x + y * y;
 
-            values[i](0) = std::pow(r2, 1. / 3.) * std::sin(2. / 3. * phi);
+            values[i](0) =
+              std::pow(r_squared, 1. / 3.) * std::sin(2. / 3. * phi);
           }
       }
   }
 
 
+
   double
   LSingularityFunction::laplacian(const Point<2> &, const unsigned int) const
   {
+    // Not a bug but exactly how the function is defined:
     return 0.;
   }
+
 
 
   void
@@ -1259,13 +1265,14 @@ namespace Functions
   }
 
 
+
   Tensor<1, 2>
   LSingularityFunction::gradient(const Point<2> &p, const unsigned int) const
   {
-    double x   = p(0);
-    double y   = p(1);
-    double phi = std::atan2(y, -x) + numbers::PI;
-    double r43 = std::pow(x * x + y * y, 2. / 3.);
+    const double x   = p(0);
+    const double y   = p(1);
+    const double phi = std::atan2(y, -x) + numbers::PI;
+    const double r43 = std::pow(x * x + y * y, 2. / 3.);
 
     Tensor<1, 2> result;
     result[0] = 2. / 3. *
@@ -1276,6 +1283,7 @@ namespace Functions
                 r43;
     return result;
   }
+
 
 
   void
@@ -1289,10 +1297,10 @@ namespace Functions
     for (unsigned int i = 0; i < points.size(); ++i)
       {
         const Point<2> &p   = points[i];
-        double          x   = p(0);
-        double          y   = p(1);
-        double          phi = std::atan2(y, -x) + numbers::PI;
-        double          r43 = std::pow(x * x + y * y, 2. / 3.);
+        const double    x   = p(0);
+        const double    y   = p(1);
+        const double    phi = std::atan2(y, -x) + numbers::PI;
+        const double    r43 = std::pow(x * x + y * y, 2. / 3.);
 
         gradients[i][0] =
           2. / 3. *
@@ -1302,6 +1310,7 @@ namespace Functions
           (std::sin(2. / 3. * phi) * y - std::cos(2. / 3. * phi) * x) / r43;
       }
   }
+
 
 
   void
@@ -1317,10 +1326,10 @@ namespace Functions
         Assert(gradients[i].size() == 1,
                ExcDimensionMismatch(gradients[i].size(), 1));
         const Point<2> &p   = points[i];
-        double          x   = p(0);
-        double          y   = p(1);
-        double          phi = std::atan2(y, -x) + numbers::PI;
-        double          r43 = std::pow(x * x + y * y, 2. / 3.);
+        const double    x   = p(0);
+        const double    y   = p(1);
+        const double    phi = std::atan2(y, -x) + numbers::PI;
+        const double    r43 = std::pow(x * x + y * y, 2. / 3.);
 
         gradients[i][0][0] =
           2. / 3. *
@@ -1336,6 +1345,7 @@ namespace Functions
   LSingularityGradFunction::LSingularityGradFunction()
     : Function<2>(2)
   {}
+
 
 
   double
@@ -1464,13 +1474,13 @@ namespace Functions
   SlitSingularityFunction<dim>::value(const Point<dim> &p,
                                       const unsigned int) const
   {
-    double x = p(0);
-    double y = p(1);
+    const double x = p(0);
+    const double y = p(1);
 
-    double phi = std::atan2(x, y) + numbers::PI;
-    double r2  = x * x + y * y;
+    const double phi       = std::atan2(x, y) + numbers::PI;
+    const double r_squared = x * x + y * y;
 
-    return std::pow(r2, .25) * std::sin(.5 * phi);
+    return std::pow(r_squared, .25) * std::sin(.5 * phi);
   }
 
 
@@ -1486,13 +1496,13 @@ namespace Functions
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        double x = points[i](0);
-        double y = points[i](1);
+        const double x = points[i](0);
+        const double y = points[i](1);
 
-        double phi = std::atan2(x, y) + numbers::PI;
-        double r2  = x * x + y * y;
+        const double phi       = std::atan2(x, y) + numbers::PI;
+        const double r_squared = x * x + y * y;
 
-        values[i] = std::pow(r2, .25) * std::sin(.5 * phi);
+        values[i] = std::pow(r_squared, .25) * std::sin(.5 * phi);
       }
   }
 
@@ -1511,13 +1521,13 @@ namespace Functions
         Assert(values[i].size() == 1,
                ExcDimensionMismatch(values[i].size(), 1));
 
-        double x = points[i](0);
-        double y = points[i](1);
+        const double x = points[i](0);
+        const double y = points[i](1);
 
-        double phi = std::atan2(x, y) + numbers::PI;
-        double r2  = x * x + y * y;
+        const double phi       = std::atan2(x, y) + numbers::PI;
+        const double r_squared = x * x + y * y;
 
-        values[i](0) = std::pow(r2, .25) * std::sin(.5 * phi);
+        values[i](0) = std::pow(r_squared, .25) * std::sin(.5 * phi);
       }
   }
 
@@ -1551,10 +1561,10 @@ namespace Functions
   SlitSingularityFunction<dim>::gradient(const Point<dim> &p,
                                          const unsigned int) const
   {
-    double x   = p(0);
-    double y   = p(1);
-    double phi = std::atan2(x, y) + numbers::PI;
-    double r64 = std::pow(x * x + y * y, 3. / 4.);
+    const double x   = p(0);
+    const double y   = p(1);
+    const double phi = std::atan2(x, y) + numbers::PI;
+    const double r64 = std::pow(x * x + y * y, 3. / 4.);
 
     Tensor<1, dim> result;
     result[0] = 1. / 2. *
@@ -1580,10 +1590,10 @@ namespace Functions
     for (unsigned int i = 0; i < points.size(); ++i)
       {
         const Point<dim> &p   = points[i];
-        double            x   = p(0);
-        double            y   = p(1);
-        double            phi = std::atan2(x, y) + numbers::PI;
-        double            r64 = std::pow(x * x + y * y, 3. / 4.);
+        const double      x   = p(0);
+        const double      y   = p(1);
+        const double      phi = std::atan2(x, y) + numbers::PI;
+        const double      r64 = std::pow(x * x + y * y, 3. / 4.);
 
         gradients[i][0] =
           1. / 2. *
@@ -1611,10 +1621,10 @@ namespace Functions
                ExcDimensionMismatch(gradients[i].size(), 1));
 
         const Point<dim> &p   = points[i];
-        double            x   = p(0);
-        double            y   = p(1);
-        double            phi = std::atan2(x, y) + numbers::PI;
-        double            r64 = std::pow(x * x + y * y, 3. / 4.);
+        const double      x   = p(0);
+        const double      y   = p(1);
+        const double      phi = std::atan2(x, y) + numbers::PI;
+        const double      r64 = std::pow(x * x + y * y, 3. / 4.);
 
         gradients[i][0][0] =
           1. / 2. *
@@ -1634,13 +1644,13 @@ namespace Functions
   SlitHyperSingularityFunction::value(const Point<2> &p,
                                       const unsigned int) const
   {
-    double x = p(0);
-    double y = p(1);
+    const double x = p(0);
+    const double y = p(1);
 
-    double phi = std::atan2(x, y) + numbers::PI;
-    double r2  = x * x + y * y;
+    const double phi       = std::atan2(x, y) + numbers::PI;
+    const double r_squared = x * x + y * y;
 
-    return std::pow(r2, .125) * std::sin(.25 * phi);
+    return std::pow(r_squared, .125) * std::sin(.25 * phi);
   }
 
 
@@ -1654,13 +1664,13 @@ namespace Functions
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        double x = points[i](0);
-        double y = points[i](1);
+        const double x = points[i](0);
+        const double y = points[i](1);
 
-        double phi = std::atan2(x, y) + numbers::PI;
-        double r2  = x * x + y * y;
+        const double phi       = std::atan2(x, y) + numbers::PI;
+        const double r_squared = x * x + y * y;
 
-        values[i] = std::pow(r2, .125) * std::sin(.25 * phi);
+        values[i] = std::pow(r_squared, .125) * std::sin(.25 * phi);
       }
   }
 
@@ -1678,13 +1688,13 @@ namespace Functions
         Assert(values[i].size() == 1,
                ExcDimensionMismatch(values[i].size(), 1));
 
-        double x = points[i](0);
-        double y = points[i](1);
+        const double x = points[i](0);
+        const double y = points[i](1);
 
-        double phi = std::atan2(x, y) + numbers::PI;
-        double r2  = x * x + y * y;
+        const double phi       = std::atan2(x, y) + numbers::PI;
+        const double r_squared = x * x + y * y;
 
-        values[i](0) = std::pow(r2, .125) * std::sin(.25 * phi);
+        values[i](0) = std::pow(r_squared, .125) * std::sin(.25 * phi);
       }
   }
 
@@ -1715,10 +1725,10 @@ namespace Functions
   SlitHyperSingularityFunction::gradient(const Point<2> &p,
                                          const unsigned int) const
   {
-    double x   = p(0);
-    double y   = p(1);
-    double phi = std::atan2(x, y) + numbers::PI;
-    double r78 = std::pow(x * x + y * y, 7. / 8.);
+    const double x   = p(0);
+    const double y   = p(1);
+    const double phi = std::atan2(x, y) + numbers::PI;
+    const double r78 = std::pow(x * x + y * y, 7. / 8.);
 
 
     Tensor<1, 2> result;
@@ -1744,10 +1754,10 @@ namespace Functions
     for (unsigned int i = 0; i < points.size(); ++i)
       {
         const Point<2> &p   = points[i];
-        double          x   = p(0);
-        double          y   = p(1);
-        double          phi = std::atan2(x, y) + numbers::PI;
-        double          r78 = std::pow(x * x + y * y, 7. / 8.);
+        const double    x   = p(0);
+        const double    y   = p(1);
+        const double    phi = std::atan2(x, y) + numbers::PI;
+        const double    r78 = std::pow(x * x + y * y, 7. / 8.);
 
         gradients[i][0] =
           1. / 4. *
@@ -1773,10 +1783,10 @@ namespace Functions
                ExcDimensionMismatch(gradients[i].size(), 1));
 
         const Point<2> &p   = points[i];
-        double          x   = p(0);
-        double          y   = p(1);
-        double          phi = std::atan2(x, y) + numbers::PI;
-        double          r78 = std::pow(x * x + y * y, 7. / 8.);
+        const double    x   = p(0);
+        const double    y   = p(1);
+        const double    phi = std::atan2(x, y) + numbers::PI;
+        const double    r78 = std::pow(x * x + y * y, 7. / 8.);
 
         gradients[i][0][0] =
           1. / 4. *
@@ -1816,7 +1826,7 @@ namespace Functions
   double
   JumpFunction<dim>::value(const Point<dim> &p, const unsigned int) const
   {
-    double x = steepness * (-cosine * p(0) + sine * p(1));
+    const double x = steepness * (-cosine * p(0) + sine * p(1));
     return -std::atan(x);
   }
 
@@ -1833,8 +1843,8 @@ namespace Functions
 
     for (unsigned int i = 0; i < p.size(); ++i)
       {
-        double x  = steepness * (-cosine * p[i](0) + sine * p[i](1));
-        values[i] = -std::atan(x);
+        const double x = steepness * (-cosine * p[i](0) + sine * p[i](1));
+        values[i]      = -std::atan(x);
       }
   }
 
@@ -1843,8 +1853,8 @@ namespace Functions
   double
   JumpFunction<dim>::laplacian(const Point<dim> &p, const unsigned int) const
   {
-    double x = steepness * (-cosine * p(0) + sine * p(1));
-    double r = 1 + x * x;
+    const double x = steepness * (-cosine * p(0) + sine * p(1));
+    const double r = 1 + x * x;
     return 2 * steepness * steepness * x / (r * r);
   }
 
@@ -1862,9 +1872,9 @@ namespace Functions
 
     for (unsigned int i = 0; i < p.size(); ++i)
       {
-        double x  = steepness * (-cosine * p[i](0) + sine * p[i](1));
-        double r  = 1 + x * x;
-        values[i] = f * x / (r * r);
+        const double x = steepness * (-cosine * p[i](0) + sine * p[i](1));
+        const double r = 1 + x * x;
+        values[i]      = f * x / (r * r);
       }
   }
 
@@ -1874,8 +1884,8 @@ namespace Functions
   Tensor<1, dim>
   JumpFunction<dim>::gradient(const Point<dim> &p, const unsigned int) const
   {
-    double         x = steepness * (-cosine * p(0) + sine * p(1));
-    double         r = -steepness * (1 + x * x);
+    const double   x = steepness * (-cosine * p(0) + sine * p(1));
+    const double   r = -steepness * (1 + x * x);
     Tensor<1, dim> erg;
     erg[0] = cosine * r;
     erg[1] = sine * r;
@@ -1895,8 +1905,8 @@ namespace Functions
 
     for (unsigned int i = 0; i < p.size(); ++i)
       {
-        double x        = steepness * (cosine * p[i](0) + sine * p[i](1));
-        double r        = -steepness * (1 + x * x);
+        const double x  = steepness * (cosine * p[i](0) + sine * p[i](1));
+        const double r  = -steepness * (1 + x * x);
         gradients[i][0] = cosine * r;
         gradients[i][1] = sine * r;
       }
