@@ -29,6 +29,8 @@
 #include <deal.II/grid/tria_iterator_base.h>
 #include <deal.II/grid/tria_iterator_selector.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <utility>
 
 

@@ -67,6 +67,16 @@ test_bounding_box()
             << " is inside: " << b.point_inside(test_points[i]) << std::endl;
 
   deallog << std::endl;
+
+  // Verify that we get the same box when we use all those points together
+  {
+    test_points.push_back(boundaries.first);
+    test_points.push_back(boundaries.second);
+
+    BoundingBox<spacedim> b2(test_points);
+    deallog << "Boxes should be equal : " << (b2 == b) << std::endl;
+  }
+
   test_points.clear();
 
   // To create outside points we take a non-convex combination
@@ -86,6 +96,13 @@ test_bounding_box()
   for (unsigned int i = 0; i < test_points.size(); ++i)
     deallog << test_points[i]
             << " is inside: " << b.point_inside(test_points[i]) << std::endl;
+
+  // Similarly, verify that we get different boxes since some points are
+  // outside:
+  {
+    BoundingBox<spacedim> b2(test_points);
+    deallog << "Boxes should not be equal : " << (b2 != b) << std::endl;
+  }
   deallog << std::endl;
 }
 
