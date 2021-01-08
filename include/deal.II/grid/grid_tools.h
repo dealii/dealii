@@ -4103,7 +4103,7 @@ namespace GridTools
           for (unsigned int c = 0; c < static_cast<unsigned int>(n_cells); ++c)
             {
               const auto cell =
-                CellId(cell_data_to_send[idx][c]).to_cell(*tria);
+                tria->create_cell_iterator(CellId(cell_data_to_send[idx][c]));
 
               MeshCellIteratorType                mesh_it(tria,
                                            cell->level(),
@@ -4176,7 +4176,7 @@ namespace GridTools
           for (unsigned int c = 0; c < cellinfo.cell_ids.size(); ++c, ++data)
             {
               const typename Triangulation<dim, spacedim>::cell_iterator
-                tria_cell = cellinfo.cell_ids[c].to_cell(*tria);
+                tria_cell = tria->create_cell_iterator(cellinfo.cell_ids[c]);
 
               MeshCellIteratorType cell(tria,
                                         tria_cell->level(),

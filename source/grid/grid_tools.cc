@@ -5222,7 +5222,8 @@ namespace GridTools
         std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator>
           cell_iter(n_cells);
         for (unsigned int c = 0; c < n_cells; ++c)
-          cell_iter[c] = cell_ids[c].to_cell(cache.get_triangulation());
+          cell_iter[c] =
+            cache.get_triangulation().create_cell_iterator(cell_ids[c]);
 
         internal::DistributedComputePointLocations::merge_into_point_locations(
           cell_iter,
