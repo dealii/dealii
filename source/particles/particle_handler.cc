@@ -1533,7 +1533,7 @@ namespace Particles
         recv_data_it = static_cast<const char *>(recv_data_it) + cellid_size;
 
         const typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-          id.to_cell(*triangulation);
+          triangulation->create_cell_iterator(id);
 
         typename std::multimap<internal::LevelInd,
                                Particle<dim, spacedim>>::iterator
