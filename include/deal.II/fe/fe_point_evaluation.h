@@ -470,7 +470,7 @@ FEPointEvaluation<n_components, dim, spacedim>::evaluate(
   else if (values.size() > 0 || gradients.size() > 0)
     {
       // slow path with FEValues
-      UpdateFlags flags =
+      const UpdateFlags flags =
         (values.size() > 0 ? update_values : update_default) |
         (gradients.size() > 0 ? update_gradients : update_default);
       FEValues<dim, spacedim> fe_values(
@@ -480,6 +480,7 @@ FEPointEvaluation<n_components, dim, spacedim>::evaluate(
           std::vector<Point<dim>>(unit_points.begin(), unit_points.end())),
         flags);
       fe_values.reinit(cell);
+
       if (values.size() > 0)
         {
           AssertDimension(unit_points.size(), values.size());
@@ -503,6 +504,7 @@ FEPointEvaluation<n_components, dim, spacedim>::evaluate(
                       fe_values.shape_value_component(i, q, d) * value;
             }
         }
+
       if (gradients.size() > 0)
         {
           AssertDimension(unit_points.size(), gradients.size());
