@@ -407,6 +407,15 @@
             </p>
         </dd>
 
+        <dt><a name="ArborX"/>
+            <a href="https://github.com/arborx/ArborX" target="_top">ArborX</a></dt>
+        <dd>
+            <p>
+                <a href="https://github.com/arborx/ArborX" target="_top">ArborX</a> is an open-source library designed to provide performance portable algorithms for geometric search, similarly to nanoflann and Boost Geometry.
+                To use a self compiled version, pass <code>-DARBORX_DIR=/path/to/arborx</code> to the deal.II CMake call. To use <a href="https://github.com/arborx/ArborX" target="_top">ArborX</a>, deal.II needs to be configured with <a href="https://github.com/kokkos/kokkos" target="_top">Kokkos</a>support.
+            </p>
+        </dd>
+
         <dt><a name="ARPACK"/>
 	<a href="http://www.caam.rice.edu/software/ARPACK/" target="_top">ARPACK</a></dt>
         <dd>
@@ -501,6 +510,15 @@
                     The <a href="http://www.hdfgroup.org/HDF5/">HDF5 library</a> provides graphical output capabilities in <code>HDF5/XDMF</code> format.
                     <a href="http://www.hdfgroup.org/HDF5/">HDF5</a> should be readily packaged by most Linux distributions. To use a self compiled version, pass
                     <code>-DHDF5_DIR=/path/to/hdf5</code> to the deal.II CMake call.
+                </p>
+            </dd>
+
+            <dt><a name="Kokkos"/>
+                <a href="https://github.com/kokkos/kokkos" target="_top">Kokkos</a></dt>
+            <dd>
+                <p>
+                    <a href="https://github.com/kokkos/kokkos" target="_top">Kokkos</a> implements a programming model in C++ for writing performance portable applications targeting all major HPC platforms.
+                    To use a self compiled version, pass <code>-DKOKKOS_DIR=/path/to/kokkos</code> to the deal.II CMake call.
                 </p>
             </dd>
 
