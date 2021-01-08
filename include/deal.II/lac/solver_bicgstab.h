@@ -140,10 +140,13 @@ public:
      * Constructor.
      *
      * The default is to perform an exact residual computation and breakdown
-     * parameter 1e-10.
+     * parameter is the minimum finite value representable by the value_type of
+     * VectorType.
      */
-    explicit AdditionalData(const bool   exact_residual = true,
-                            const double breakdown      = 1.e-10)
+    explicit AdditionalData(
+      const bool   exact_residual = true,
+      const double breakdown =
+        std::numeric_limits<typename VectorType::value_type>::min())
       : exact_residual(exact_residual)
       , breakdown(breakdown)
     {}
@@ -257,13 +260,6 @@ protected:
 
 private:
   /**
-   * Everything before the iteration loop.
-   */
-  template <typename MatrixType>
-  SolverControl::State
-  start(const MatrixType &A);
-
-  /**
    * A structure returned by the iterate() function representing what it found
    * is happening during the iteration.
    */
@@ -349,20 +345,6 @@ SolverBicgstab<VectorType>::criterion(const MatrixType &A,
 
 
 template <typename VectorType>
-template <typename MatrixType>
-SolverControl::State
-SolverBicgstab<VectorType>::start(const MatrixType &A)
-{
-  A.vmult(*Vr, *Vx);
-  Vr->sadd(-1., 1., *Vb);
-  res = Vr->l2_norm();
-
-  return this->iteration_status(step, res, *Vx);
-}
-
-
-
-template <typename VectorType>
 void
 SolverBicgstab<VectorType>::print_vectors(const unsigned int,
                                           const VectorType &,
@@ -378,9 +360,14 @@ typename SolverBicgstab<VectorType>::IterationResult
 SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
                                     const PreconditionerType &preconditioner)
 {
-  // TODO:[GK] Implement "use the length of the computed orthogonal residual" in
-  // the BiCGStab method.
-  SolverControl::State state = SolverControl::iterate;
+  A.vmult(*Vr, *Vx);
+  Vr->sadd(-1., 1., *Vb);
+  res = Vr->l2_norm();
+
+  SolverControl::State state = this->iteration_status(step, res, *Vx);
+  if (state == SolverControl::State::success)
+    return IterationResult(false, state, step, res);
+
   alpha = omega = rho = 1.;
 
   VectorType &r    = *Vr;
@@ -399,8 +386,12 @@ SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
       ++step;
 
       rhobar = r * rbar;
-      beta   = rhobar * alpha / (rho * omega);
-      rho    = rhobar;
+      if (std::fabs(rhobar) < additional_data.breakdown)
+        {
+          return IterationResult(true, state, step, res);
+        }
+      beta = rhobar * alpha / (rho * omega);
+      rho  = rhobar;
       if (startup == true)
         {
           p       = r;
@@ -415,13 +406,12 @@ SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
       preconditioner.vmult(y, p);
       A.vmult(v, y);
       rhobar = rbar * v;
+      if (std::fabs(rhobar) < additional_data.breakdown)
+        {
+          return IterationResult(true, state, step, res);
+        }
 
       alpha = rho / rhobar;
-
-      // TODO:[?] Find better breakdown criterion
-
-      if (std::fabs(alpha) > 1.e10)
-        return IterationResult(true, state, step, res);
 
       res = std::sqrt(r.add_and_dot(-alpha, v, r));
 
@@ -440,8 +430,13 @@ SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
 
       preconditioner.vmult(z, r);
       A.vmult(t, z);
-      rhobar = t * r;
-      omega  = rhobar / (t * t);
+      rhobar         = t * r;
+      auto t_squared = t * t;
+      if (t_squared < additional_data.breakdown)
+        {
+          return IterationResult(true, state, step, res);
+        }
+      omega = rhobar / (t * t);
       Vx->add(alpha, y, omega, z);
 
       if (additional_data.exact_residual)
@@ -495,22 +490,12 @@ SolverBicgstab<VectorType>::solve(const MatrixType &        A,
   step = 0;
 
   IterationResult state(false, SolverControl::failure, 0, 0);
-
-  // Iterate while the inner iteration returns a breakdown, i.e., try and try
-  // until we succeed.
   do
     {
-      if (step != 0)
-        deallog << "Restart step " << step << std::endl;
-      if (start(A) == SolverControl::success)
-        {
-          state.state = SolverControl::success;
-          break;
-        }
       state = iterate(A, preconditioner);
-      ++step;
     }
-  while (state.breakdown == true);
+  while (state.state == SolverControl::iterate);
+
 
   // Release the temporary memory again.
   Vr.reset();
