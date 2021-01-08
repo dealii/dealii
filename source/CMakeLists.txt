@@ -73,6 +73,7 @@ ADD_SUBDIRECTORY(optimization/rol)
 ADD_SUBDIRECTORY(non_matching)
 ADD_SUBDIRECTORY(simplex)
 ADD_SUBDIRECTORY(sundials)
+ADD_SUBDIRECTORY(arborx)
 
 FOREACH(build ${DEAL_II_BUILD_TYPES})
   STRING(TOLOWER ${build} build_lowercase)
