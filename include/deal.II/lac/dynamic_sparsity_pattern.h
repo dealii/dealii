@@ -304,13 +304,13 @@ namespace DynamicSparsityPatternIterators
  *
  * <h3>Usage</h3>
  *
- * Use this class as follows:
+ * Usage of this class is explained in step-2 (without constraints) and step-6
+ * (with AffineConstraints) and typically looks as follows:
  * @code
  * DynamicSparsityPattern dynamic_pattern (dof_handler.n_dofs());
  * DoFTools::make_sparsity_pattern (dof_handler,
- *                                  dynamic_pattern);
- * constraints.condense (dynamic_pattern);
- *
+ *                                  dynamic_pattern,
+ *                                  constraints);
  * SparsityPattern sp;
  * sp.copy_from (dynamic_pattern);
  * @endcode
