@@ -290,9 +290,13 @@ namespace SmoothnessEstimator
     default_fe_series(const hp::FECollection<dim, spacedim> &fe_collection)
     {
       // Default number of coefficients per direction.
+      //
+      // With a number of modes equal to the polynomial degree plus two for each
+      // finite element, the smoothness estimation algorithm tends to produce
+      // stable results.
       std::vector<unsigned int> n_coefficients_per_direction;
       for (unsigned int i = 0; i < fe_collection.size(); ++i)
-        n_coefficients_per_direction.push_back(fe_collection[i].degree + 1);
+        n_coefficients_per_direction.push_back(fe_collection[i].degree + 2);
 
       // Default quadrature collection.
       //
