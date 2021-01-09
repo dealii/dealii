@@ -9644,7 +9644,7 @@ namespace internal
        * At present, this function does nothing in 1d and 2D, but
        * makes sure no two cells with a level difference greater than
        * one share one line in 3D. This is a requirement needed for
-       * the interpolation of hanging nodes, since otherwise to steps
+       * the interpolation of hanging nodes, since otherwise two steps
        * of interpolation would be necessary. This would make the
        * processes implemented in the @p AffineConstraints class much
        * more complex, since these two steps of interpolation do not
