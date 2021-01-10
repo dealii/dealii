@@ -529,17 +529,12 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
       Assert(subcelldata.check_consistency(dim), ExcInternalError());
 
 
-      // make sure that only either simplex or hypercube cells are available
-      //
       // TODO: the functions below (GridTools::delete_unused_vertices(),
       // GridTools::invert_all_cells_of_negative_grid(),
-      // GridReordering::reorder_cells(),
-      // Triangulation::create_triangulation_compatibility()) need to be
-      // revisited for simplex meshes
-      AssertThrow(dim == 1 || (is_tria_or_tet_mesh ^ is_quad_or_hex_mesh),
-                  ExcNotImplemented());
+      // GridReordering::reorder_cells()) need to be
+      // revisited for simplex/mixed meshes
 
-      if (dim == 1 || is_quad_or_hex_mesh)
+      if (dim == 1 || (is_quad_or_hex_mesh && !is_tria_or_tet_mesh))
         {
           GridTools::delete_unused_vertices(vertices, cells, subcelldata);
 
@@ -556,7 +551,10 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
         }
       else
         {
-          tria->create_triangulation(vertices, cells, subcelldata);
+          // simplex or mixed mesh
+          tria->create_triangulation_compatibility(vertices,
+                                                   cells,
+                                                   subcelldata);
         }
     }
   else
@@ -2150,17 +2148,12 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   // check that we actually read some cells.
   AssertThrow(cells.size() > 0, ExcGmshNoCellInformation());
 
-  // make sure that only either simplex or hypercube cells are available
-  //
   // TODO: the functions below (GridTools::delete_unused_vertices(),
   // GridTools::invert_all_cells_of_negative_grid(),
-  // GridReordering::reorder_cells(),
-  // Triangulation::create_triangulation_compatibility()) need to be revisited
-  // for simplex meshes
-  AssertThrow(dim == 1 || (is_tria_or_tet_mesh ^ is_quad_or_hex_mesh),
-              ExcNotImplemented());
+  // GridReordering::reorder_cells()) need to be revisited
+  // for simplex/mixed meshes
 
-  if (dim == 1 || is_quad_or_hex_mesh)
+  if (dim == 1 || (is_quad_or_hex_mesh && !is_tria_or_tet_mesh))
     {
       // do some clean-up on vertices...
       GridTools::delete_unused_vertices(vertices, cells, subcelldata);
@@ -2173,7 +2166,8 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
     }
   else
     {
-      tria->create_triangulation(vertices, cells, subcelldata);
+      // simplex or mixed mesh
+      tria->create_triangulation_compatibility(vertices, cells, subcelldata);
     }
 
   // in 1d, we also have to attach boundary ids to vertices, which does not
