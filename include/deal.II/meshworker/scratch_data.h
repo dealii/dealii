@@ -753,6 +753,35 @@ namespace MeshWorker
 
     /**
      * For the solution vector identified by @p global_vector_name, compute
+     * the Laplacians of the function at the quadrature points, and return a
+     * vector with the correct type deduced by the Extractor you passed as the
+     * @p variable argument.
+     *
+     * Before you can call this method, you need to call the
+     * extract_local_dof_values() method at least once, passing the same
+     * @p global_vector_name string, and the same type for the variable @p dummy.
+     *
+     * If you have not previously called the extract_local_dof_values() method,
+     * this function will throw an exception.
+     *
+     * For this function to work properly, the underlying FEValues,
+     * FEFaceValues, or FESubfaceValues object for which you called one of the
+     * reinit() functions, must have computed the information you are
+     * requesting. To do so, the update_hessians flag must be an element of the
+     * list of UpdateFlags that you passed to the constructor of this object.
+     * See "The interplay of UpdateFlags, Mapping, and FiniteElement" in
+     * the documentation of the FEValues class for more information.
+     */
+    template <typename Extractor, typename Number = double>
+    const std::vector<
+      typename internal::OutputType<dim, spacedim, Number, Extractor>::
+        laplacian_type> &
+    get_laplacians(const std::string &global_vector_name,
+                   const Extractor &  variable,
+                   const Number       dummy = Number(0));
+
+    /**
+     * For the solution vector identified by @p global_vector_name, compute
      * the third_derivatives of the function at the quadrature points, and
      * return a vector with the correct type deduced by the Extractor you passed
      * as the @p variable argument.
@@ -1124,6 +1153,45 @@ namespace MeshWorker
     AssertDimension(ret.size(), n_q_points);
 
     fev[variable].get_function_hessians_from_local_dof_values(
+      independent_local_dofs, ret);
+    return ret;
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <typename Extractor, typename Number>
+  const std::vector<
+    typename internal::OutputType<dim, spacedim, Number, Extractor>::
+      laplacian_type> &
+  ScratchData<dim, spacedim>::get_laplacians(
+    const std::string &global_vector_name,
+    const Extractor &  variable,
+    const Number       dummy)
+  {
+    const std::vector<Number> &independent_local_dofs =
+      get_local_dof_values(global_vector_name, dummy);
+
+    const FEValuesBase<dim, spacedim> &fev = get_current_fe_values();
+
+    const unsigned int n_q_points = fev.n_quadrature_points;
+
+    const std::string name = get_unique_name(
+      global_vector_name, variable, "_laplacians_q", n_q_points, dummy);
+
+    // Now build the return type
+    using RetType = std::vector<
+      typename internal::OutputType<dim, spacedim, Number, Extractor>::
+        laplacian_type>;
+
+    RetType &ret =
+      internal_data_storage.template get_or_add_object_with_name<RetType>(
+        name, n_q_points);
+
+
+    AssertDimension(ret.size(), n_q_points);
+
+    fev[variable].get_function_laplacians_from_local_dof_values(
       independent_local_dofs, ret);
     return ret;
   }
