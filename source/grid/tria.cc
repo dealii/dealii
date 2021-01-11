@@ -481,7 +481,8 @@ namespace
                              const SubCellData &)
   {
     for (auto &cell : cells)
-      std::swap(cell.vertices[2], cell.vertices[3]);
+      if (cell.vertices.size() == GeometryInfo<2>::vertices_per_cell)
+        std::swap(cell.vertices[2], cell.vertices[3]);
   }
 
 
@@ -490,21 +491,18 @@ namespace
   {
     unsigned int tmp[GeometryInfo<3>::vertices_per_cell];
     for (auto &cell : cells)
-      {
-        for (const unsigned int i : GeometryInfo<3>::vertex_indices())
-          tmp[i] = cell.vertices[i];
-        for (const unsigned int i : GeometryInfo<3>::vertex_indices())
-          cell.vertices[GeometryInfo<3>::ucd_to_deal[i]] = tmp[i];
-      }
+      if (cell.vertices.size() == GeometryInfo<3>::vertices_per_cell)
+        {
+          for (const unsigned int i : GeometryInfo<3>::vertex_indices())
+            tmp[i] = cell.vertices[i];
+          for (const unsigned int i : GeometryInfo<3>::vertex_indices())
+            cell.vertices[GeometryInfo<3>::ucd_to_deal[i]] = tmp[i];
+        }
 
     // now points in boundary quads
-    std::vector<CellData<2>>::iterator boundary_quad =
-      subcelldata.boundary_quads.begin();
-    std::vector<CellData<2>>::iterator end_quad =
-      subcelldata.boundary_quads.end();
-    for (unsigned int quad_no = 0; boundary_quad != end_quad;
-         ++boundary_quad, ++quad_no)
-      std::swap(boundary_quad->vertices[2], boundary_quad->vertices[3]);
+    for (auto &boundary_quad : subcelldata.boundary_quads)
+      if (boundary_quad.vertices.size() == GeometryInfo<2>::vertices_per_cell)
+        std::swap(boundary_quad.vertices[2], boundary_quad.vertices[3]);
   }
 
 
