@@ -2179,6 +2179,12 @@ namespace parallel
           Assert(false, ExcInternalError());
         }
 
+      Assert(
+        this->all_reference_cell_types_are_hyper_cube(),
+        ExcMessage(
+          "The class parallel::distributed::Triangulation only supports meshes "
+          "consisting only of hypercube-like cells."));
+
       // note that now we have some content in the p4est objects and call the
       // functions that do the actual work (which are dimension dependent, so
       // separate)
