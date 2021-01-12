@@ -1,0 +1,4 @@
+Fixed: Hanging node constraints for FE_System containing FE_Nothing
+elements have been fixed. This also affects FE_Enriched elements.
+<br>
+(Marc Fehling, 2021/01/12)

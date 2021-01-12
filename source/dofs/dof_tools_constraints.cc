@@ -533,6 +533,12 @@ namespace DoFTools
                   for (unsigned int i = 0; i < n_primary_dofs; ++i)
                     abs_sum += std::abs(face_constraints(row, i));
 
+                  // if all entries of the row are zero, the corresponding dof
+                  // is not supposed to be constrained to any other dof. we can
+                  // thus skip this row
+                  if (abs_sum == 0)
+                    continue;
+
                   // then enter those constraints that are larger than
                   // 1e-14*abs_sum. everything else probably originated from
                   // inexact inversion of matrices and similar effects. having
