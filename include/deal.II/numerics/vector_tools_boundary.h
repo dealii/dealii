@@ -131,7 +131,9 @@ namespace VectorTools
    *   that computing the projection is far more expensive than computing
    *   the interpolation because the latter can be done one face at a time
    *   whereas the projection requires the solution of a problem on the entire
-   *   boundary.
+   *   boundary. On the other hand, interpolation is only possible for
+   *   "nodal" finite element spaces (such as FE_Q, but not
+   *   FE_Q_Hierarchical), whereas the projection is always possible.
    */
   template <int dim, int spacedim, typename number>
   void
@@ -415,13 +417,17 @@ namespace VectorTools
    * component number in @p boundary_functions that should be used for this
    * component in @p dof. By default, no remapping is applied.
    *
-   * @note Using the *projection* rather than the *interpolation* of boundary
-   *   values makes relatively little difference in practice. That said,
-   *   it is far more computationally expensive to compute projections because
-   *   the require the solution of a problem that couples all unknowns on the
-   *   boundary, whereas interpolation works on one face at a time. For
-   *   some more theoretical considerations, see the documentation of the first
-   *   interpolate_boundary_values() function above.
+   * @note Using the *projection* rather than the *interpolation* of
+   *   boundary values makes relatively little difference in
+   *   practice. That said, it is far more computationally expensive
+   *   to compute projections because the require the solution of a
+   *   problem that couples all unknowns on the boundary, whereas
+   *   interpolation works on one face at a time. On the other hand,
+   *   interpolation is only possible for "nodal" finite element
+   *   spaces (such as FE_Q, but not FE_Q_Hierarchical), whereas the
+   *   projection is always possible. (For some more theoretical
+   *   considerations, see the documentation of the first
+   *   interpolate_boundary_values() function above.)
    */
   template <int dim, int spacedim, typename number>
   void
