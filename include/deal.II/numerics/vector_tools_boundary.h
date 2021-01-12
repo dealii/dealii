@@ -47,7 +47,8 @@ namespace VectorTools
   //@{
 
   /**
-   * Compute Dirichlet boundary conditions.  This function makes up a map of
+   * Compute constraints on the solution that corresponds to the imposition
+   * of Dirichlet boundary conditions.  This function creates a map of
    * degrees of freedom subject to Dirichlet boundary conditions and the
    * corresponding values to be assigned to them, by interpolation around the
    * boundary. For each degree of freedom at the boundary, if its index
@@ -95,6 +96,44 @@ namespace VectorTools
    * of these non-primitive shape functions must be @p false.
    *
    * See the general documentation of this namespace for more information.
+   *
+   * @note When solving a partial differential equation with boundary
+   *   conditions $u|_{\partial\Omega}=g$ (or on *parts* of the boundary),
+   *   then this boundary condition is in general not satisfiable exactly
+   *   using finite elements in the form $u_h|_{\partial\Omega}=g$. That is
+   *   because the function $g$ is generally not a polynomial, whereas
+   *   $u_h|_{\partial\Omega}$ *is* a polynomial on each face of the
+   *   mesh that is located at the boundary. In other words, it is in
+   *   general not possible to *impose* such boundary condition; what one
+   *   *can* do, however, is to impose
+   *     @f[ u_h|_{\partial\Omega}=I_h^{\partial\Omega} g, @f]
+   *   where $I_h^{\partial\Omega} g$ is a function that equals $g$ at each node
+   *   of the finite element space located on the boundary, and is piecewise
+   *   polynomial in between. In other words, $I_h^{\partial\Omega}$ is an
+   *   *interpolation operator* and $I_h^{\partial\Omega} g$ are the
+   *   interpolated boundary values -- thus the name. The use of
+   *   $I_h^{\partial\Omega} g$ instead of $g$ as boundary values imposes
+   *   an additional error (in the same spirit as using quadrature introduces
+   *   an additional error compared to being able to compute the integrals of
+   *   the weak form exactly). In most cases, this additional error is of the
+   *   same order as the other error terms in the finite element method,
+   *   though there are some subtle differences when measuring the error in
+   *   the $L^2$ norm. For some details, see @cite Bartels2004 .
+   *
+   * @note An alternative to using the interpolant,
+   *     @f[ u_h|_{\partial\Omega}=I_h^{\partial\Omega} g @f]
+   *   is to use the *projection* of the boundary values $g$ onto the
+   *   finite element space on the boundary:
+   *     @f[ u_h|_{\partial\Omega}=\Pi_h^{\partial\Omega} g. @f]
+   *   The projection is available using the project_boundary_values()
+   *   function. Using the projection may have some theoretical advantages
+   *   (see again @cite Bartels2004) but has the practical disadvantage
+   *   that computing the projection is far more expensive than computing
+   *   the interpolation because the latter can be done one face at a time
+   *   whereas the projection requires the solution of a problem on the entire
+   *   boundary. On the other hand, interpolation is only possible for
+   *   "nodal" finite element spaces (such as FE_Q, but not
+   *   FE_Q_Hierarchical), whereas the projection is always possible.
    */
   template <int dim, int spacedim, typename number>
   void
@@ -210,42 +249,9 @@ namespace VectorTools
    * the module on
    * @ref constraints.
    *
-   * The parameter @p boundary_component corresponds to the number @p
-   * boundary_id of the face.
-   *
-   * The flags in the last parameter, @p component_mask denote which
-   * components of the finite element space shall be interpolated. If it is
-   * left as specified by the default value (i.e. an empty array), all
-   * components are interpolated. If it is different from the default value,
-   * it is assumed that the number of entries equals the number of components
-   * in the boundary functions and the finite element, and those components in
-   * the given boundary function will be used for which the respective flag
-   * was set in the component mask. See also
-   * @ref GlossComponentMask.
-   * As an example, assume that you are solving the Stokes equations in 2d,
-   * with variables $(u,v,p)$ and that you only want to interpolate boundary
-   * values for the pressure, then the component mask should correspond to
-   * <code>(true,true,false)</code>.
-   *
-   * @note Whether a component mask has been specified or not, the number of
-   * components of the functions in @p function_map must match that of the
-   * finite element used by @p dof. In other words, for the example above, you
-   * need to provide a Function object that has 3 components (the two
-   * velocities and the pressure), even though you are only interested in the
-   * first two of them. interpolate_boundary_values() will then call this
-   * function to obtain a vector of 3 values at each interpolation point but
-   * only take the first two and discard the third. In other words, you are
-   * free to return whatever you like in the third component of the vector
-   * returned by Function::vector_value, but the Function object must state
-   * that it has 3 components.
-   *
-   * If the finite element used has shape functions that are non-zero in more
-   * than one component (in deal.II speak: they are non-primitive), then these
-   * components can presently not be used for interpolating boundary values.
-   * Thus, the elements in the component mask corresponding to the components
-   * of these non-primitive shape functions must be @p false.
-   *
-   * See the general documentation of this namespace for more information.
+   * This function is fundamentally equivalent to the ones above except that it
+   * puts its results into an AffineConstraint object rather than a `std::map`.
+   * See the functions above for more comments.
    *
    * @ingroup constraints
    */
@@ -410,6 +416,18 @@ namespace VectorTools
    * vector component of the finite element used in @p dof. This entry is the
    * component number in @p boundary_functions that should be used for this
    * component in @p dof. By default, no remapping is applied.
+   *
+   * @note Using the *projection* rather than the *interpolation* of
+   *   boundary values makes relatively little difference in
+   *   practice. That said, it is far more computationally expensive
+   *   to compute projections because the require the solution of a
+   *   problem that couples all unknowns on the boundary, whereas
+   *   interpolation works on one face at a time. On the other hand,
+   *   interpolation is only possible for "nodal" finite element
+   *   spaces (such as FE_Q, but not FE_Q_Hierarchical), whereas the
+   *   projection is always possible. (For some more theoretical
+   *   considerations, see the documentation of the first
+   *   interpolate_boundary_values() function above.)
    */
   template <int dim, int spacedim, typename number>
   void
