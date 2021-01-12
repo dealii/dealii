@@ -44,7 +44,7 @@ namespace SUNDIALS
      * field in the SUNDIALS N_Vector module. In addition, this class has a
      * flag to store whether the stored vector should be treated as const. When
      * get() is called on a non-const object of this class the flag is checked
-     * and an exception is thrown if the vector is actually const. Thus we
+     * and an exception is thrown if the vector is actually const. Thus, we
      * retain a kind of "runtime const correctness" although the static const
      * correctness is lost because SUNDIALS N_Vector does not support constness.
      */
@@ -54,14 +54,14 @@ namespace SUNDIALS
     public:
       /**
        * Create a non-owning content with an existing @p vector.
-       * @param vector
+       * @param vector The underlying vector to wrap in thi object.
        */
       NVectorContent(VectorType *vector);
 
       /**
        * Create a non-owning content with an existing const @p vector. If this
        * constructor is used, access is only allowed via the get() const method.
-       * @param vector
+       * @param vector The underlying vector to wrap in thi object.
        */
       NVectorContent(const VectorType *vector);
 
@@ -69,7 +69,7 @@ namespace SUNDIALS
        * Allocate a new (non-const) vector wrapped in a new content object. The
        * vector will be deallocated automatically when this object is destroyed.
        *
-       * This constructor is called by the N_VClone call of SUNDIALS.
+       * @note This constructor is intended for the N_VClone() call of SUNDIALS.
        */
       NVectorContent();
 
@@ -281,12 +281,11 @@ SUNDIALS::internal::NVectorContent<VectorType>::get()
 {
   AssertThrow(
     !is_const,
-    ExcMessage(
-      "Tried to access a constant vector content as non-const."
-      " This most likely happened because a vector that is passed to an"
-      " create_nvector() call should not be const.\n"
-      "Alternatively, if you tried to access the vector, use"
-      " unwrap_nvector_const() for this vector."));
+    ExcMessage("Tried to access a constant vector content as non-const."
+               " This most likely happened because a vector that is passed to a"
+               " NVectorView() call should not be const.\n"
+               "Alternatively, if you tried to access the vector, use"
+               " unwrap_nvector_const() for this vector."));
   return vector.get();
 }
 
@@ -297,6 +296,15 @@ const VectorType *
 SUNDIALS::internal::NVectorContent<VectorType>::get() const
 {
   return vector.get();
+}
+
+
+
+template <typename VectorType>
+SUNDIALS::internal::NVectorView<VectorType>
+SUNDIALS::internal::make_nvector_view(VectorType &vector)
+{
+  return NVectorView<VectorType>(vector);
 }
 
 
@@ -328,17 +336,11 @@ SUNDIALS::internal::unwrap_nvector_const(N_Vector v)
 
 template <typename VectorType>
 SUNDIALS::internal::NVectorView<VectorType>::NVectorView(VectorType &vector)
-  : vector_ptr(create_nvector(new NVectorContent<VectorType>(&vector)),
-               [](N_Vector v) { N_VDestroy(v); })
-{}
-
-
-
-template <typename VectorType>
-SUNDIALS::internal::NVectorView<VectorType>::NVectorView(
-  const VectorType &vector)
-  : vector_ptr(create_nvector(new NVectorContent<VectorType>(&vector)),
-               [](N_Vector v) { N_VDestroy(v); })
+  : vector_ptr(
+      create_nvector(
+        new NVectorContent<typename std::remove_const<VectorType>::type>(
+          &vector)),
+      [](N_Vector v) { N_VDestroy(v); })
 {}
 
 
@@ -367,7 +369,6 @@ SUNDIALS::internal::create_nvector(NVectorContent<VectorType> *content)
   N_Vector v = create_empty_nvector<VectorType>();
   Assert(v != nullptr, ExcInternalError());
 
-  // Create a non-owning vector content using a pointer and attach to N_Vector
   v->content = content;
   Assert(v->content != nullptr, ExcInternalError());
   return (v);
@@ -387,17 +388,13 @@ SUNDIALS::internal::NVectorOperations::clone_empty(N_Vector w)
 {
   Assert(w != nullptr, ExcInternalError());
   N_Vector v = N_VNewEmpty();
-  if (v == nullptr)
-    return (nullptr);
+  Assert(v != nullptr, ExcInternalError());
 
-  // Copy operations
-  if (N_VCopyOps(w, v))
-    {
-      N_VDestroy(v);
-      return (nullptr);
-    }
+  int status = N_VCopyOps(w, v);
+  Assert(status == 0, ExcInternalError());
+  (void)status;
 
-  return (v);
+  return v;
 }
 
 
@@ -411,16 +408,12 @@ SUNDIALS::internal::NVectorOperations::clone(N_Vector w)
   // the corresponding delete is called in destroy()
   auto  cloned   = new NVectorContent<VectorType>();
   auto *w_dealii = unwrap_nvector_const<VectorType>(w);
+
+  // reinit the cloned vector based on the layout of the source vector
   cloned->get()->reinit(*w_dealii);
-
   v->content = cloned;
-  if (v->content == nullptr)
-    {
-      N_VDestroy(v);
-      return nullptr;
-    }
 
-  return (v);
+  return v;
 }
 
 
@@ -429,6 +422,7 @@ template <typename VectorType>
 void
 SUNDIALS::internal::NVectorOperations::destroy(N_Vector v)
 {
+  // support destroying a nullptr because SUNDIALS vectors also do it
   if (v == nullptr)
     return;
 
@@ -754,8 +748,7 @@ N_Vector
 SUNDIALS::internal::create_empty_nvector()
 {
   N_Vector v = N_VNewEmpty();
-  if (v == nullptr)
-    return (nullptr);
+  Assert(v != nullptr, ExcInternalError());
 
   /* constructors, destructors, and utility operations */
   v->ops->nvgetvectorid = NVectorOperations::get_vector_id;

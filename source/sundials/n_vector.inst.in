@@ -16,7 +16,10 @@
 // serial Vector and BlockVector
 for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
   {
-    template class SUNDIALS::internal::NVectorView<V<S>>;
+    template SUNDIALS::internal::NVectorView<V<S>>
+    SUNDIALS::internal::make_nvector_view<>(V<S> &);
+    template SUNDIALS::internal::NVectorView<const V<S>>
+                         SUNDIALS::internal::make_nvector_view<>(const V<S> &);
     template V<S> *      SUNDIALS::internal::unwrap_nvector<V<S>>(N_Vector);
     template const V<S> *SUNDIALS::internal::unwrap_nvector_const<V<S>>(
       N_Vector);
@@ -25,8 +28,12 @@ for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
 // parallel Vector and BlockVector
 for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
   {
-    template class SUNDIALS::internal::NVectorView<
-      LinearAlgebra::distributed::V<S>>;
+    template SUNDIALS::internal::NVectorView<LinearAlgebra::distributed::V<S>>
+    SUNDIALS::internal::make_nvector_view<>(LinearAlgebra::distributed::V<S> &);
+    template SUNDIALS::internal::NVectorView<
+      const LinearAlgebra::distributed::V<S>>
+    SUNDIALS::internal::make_nvector_view<>(
+      const LinearAlgebra::distributed::V<S> &);
     template LinearAlgebra::distributed::V<S>
       *SUNDIALS::internal::unwrap_nvector<LinearAlgebra::distributed::V<S>>(
         N_Vector);
@@ -37,7 +44,10 @@ for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
 // TrilinosWrappers Vector and BlockVector
 for (V : DEAL_II_VEC_TEMPLATES)
   {
-    template class SUNDIALS::internal::NVectorView<TrilinosWrappers::MPI::V>;
+    template SUNDIALS::internal::NVectorView<TrilinosWrappers::MPI::V>
+    SUNDIALS::internal::make_nvector_view<>(TrilinosWrappers::MPI::V &);
+    template SUNDIALS::internal::NVectorView<const TrilinosWrappers::MPI::V>
+    SUNDIALS::internal::make_nvector_view<>(const TrilinosWrappers::MPI::V &);
     template TrilinosWrappers::MPI::V
       *SUNDIALS::internal::unwrap_nvector<TrilinosWrappers::MPI::V>(N_Vector);
     template const TrilinosWrappers::MPI::V

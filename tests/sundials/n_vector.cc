@@ -13,6 +13,9 @@
 //
 //-----------------------------------------------------------
 
+// Test SUNDIALS' vector operations on N_Vector implementation. The N_Vectors
+// are created by calling NVectorView on one of the internal vector types.
+
 #include "../../include/deal.II/sundials/n_vector.h"
 
 #include <deal.II/base/logstream.h>
@@ -23,6 +26,7 @@
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 
+#include "../../include/deal.II/sundials/n_vector.templates.h"
 #include <deal.II/sundials/n_vector.h>
 
 #include "../tests.h"
@@ -154,10 +158,10 @@ template <typename VectorType>
 void
 test_nvector_view_unwrap()
 {
-  auto                    vector       = create_test_vector<VectorType>();
-  const auto              const_vector = create_test_vector<VectorType>();
-  NVectorView<VectorType> n_vector(vector);
-  NVectorView<VectorType> const_n_vector(const_vector);
+  auto       vector         = create_test_vector<VectorType>();
+  const auto const_vector   = create_test_vector<VectorType>();
+  auto       n_vector       = make_nvector_view(vector);
+  auto       const_n_vector = make_nvector_view(const_vector);
 
   Assert(n_vector != nullptr, NVectorTestError());
   Assert((n_vector)->content != nullptr, NVectorTestError());
@@ -165,8 +169,8 @@ test_nvector_view_unwrap()
   Assert(const_n_vector != nullptr, NVectorTestError());
   Assert((const_n_vector)->content != nullptr, NVectorTestError());
 
+  // unwrap non-const as non-const
   auto *vector_unwrapped = unwrap_nvector<VectorType>(n_vector);
-  // here we  check for pointer equality
   Assert(vector_unwrapped == &vector, NVectorTestError());
 
   // unwrap non-const as const
@@ -202,9 +206,9 @@ template <typename VectorType>
 void
 test_get_vector_id()
 {
-  auto                    vector = create_test_vector<VectorType>();
-  NVectorView<VectorType> n_vector(vector);
-  auto                    id = N_VGetVectorID(n_vector);
+  auto vector   = create_test_vector<VectorType>();
+  auto n_vector = make_nvector_view(vector);
+  auto id       = N_VGetVectorID(n_vector);
   Assert(id == SUNDIALS_NVEC_CUSTOM, NVectorTestError());
   deallog << "test_get_vector_id OK" << std::endl;
 }
@@ -215,9 +219,9 @@ template <typename VectorType>
 void
 test_clone()
 {
-  auto                    vector = create_test_vector<VectorType>();
-  NVectorView<VectorType> n_vector(vector);
-  auto                    cloned = N_VClone(n_vector);
+  auto vector   = create_test_vector<VectorType>();
+  auto n_vector = make_nvector_view(vector);
+  auto cloned   = N_VClone(n_vector);
 
   Assert(cloned != nullptr, NVectorTestError());
   AssertDimension(unwrap_nvector<VectorType>(cloned)->size(), vector.size());
@@ -234,7 +238,7 @@ test_destroy()
 {
   GrowingVectorMemory<VectorType>                   mem;
   typename GrowingVectorMemory<VectorType>::Pointer vector(mem);
-  NVectorView<VectorType>                           n_vector(*vector);
+  auto n_vector = make_nvector_view(*vector);
 
   Assert(n_vector != nullptr, NVectorTestError());
   auto cloned = N_VClone(n_vector);
@@ -248,8 +252,12 @@ test_destroy()
   N_VDestroy(cloned);
 
   // NOTE: destroying a view vector is not possible and would lead to a double
-  // delete
+  // delete at the end of scope when the destructor of NVectorView calls destroy
+  // again
   // N_VDestroy(n_vector);
+
+  // destroying a nullptr does nothing but is possible
+  N_VDestroy(nullptr);
 
   // the destructor of NVectorView will do a destroy, so this is also
   // checked here
@@ -263,8 +271,8 @@ template <typename VectorType,
 void
 test_get_communicator()
 {
-  auto                    vector = create_test_vector<VectorType>();
-  NVectorView<VectorType> n_vector(vector);
+  auto vector   = create_test_vector<VectorType>();
+  auto n_vector = make_nvector_view(vector);
   Assert(N_VGetCommunicator(n_vector) == nullptr, NVectorTestError());
 
   deallog << "test_get_communicator OK" << std::endl;
@@ -277,8 +285,8 @@ template <typename VectorType,
 void
 test_get_communicator()
 {
-  auto                    vector = create_test_vector<VectorType>();
-  NVectorView<VectorType> n_vector(vector);
+  auto vector   = create_test_vector<VectorType>();
+  auto n_vector = make_nvector_view(vector);
   Assert(N_VGetCommunicator(n_vector) == MPI_COMM_WORLD, NVectorTestError());
 
   deallog << "test_get_communicator OK" << std::endl;
@@ -290,8 +298,8 @@ template <typename VectorType>
 void
 test_length()
 {
-  auto                    vector = create_test_vector<VectorType>();
-  NVectorView<VectorType> n_vector(vector);
+  auto vector   = create_test_vector<VectorType>();
+  auto n_vector = make_nvector_view(vector);
   Assert(N_VGetLength(n_vector) == static_cast<int>(vector.size()),
          NVectorTestError());
 
@@ -309,9 +317,9 @@ test_linear_sum()
   auto vc       = create_test_vector<VectorType>();
   auto expected = create_test_vector<VectorType>();
 
-  NVectorView<VectorType> nv_a(va);
-  NVectorView<VectorType> nv_b(vb);
-  NVectorView<VectorType> nv_c(vc);
+  auto nv_a = make_nvector_view(va);
+  auto nv_b = make_nvector_view(vb);
+  auto nv_c = make_nvector_view(vc);
 
   va = 1.0;
   vb = 2.0;
@@ -346,8 +354,8 @@ test_dot_product()
   const auto vb   = create_test_vector<VectorType>(3.0);
   const auto size = va.size();
 
-  NVectorView<VectorType> nv_a(va);
-  NVectorView<VectorType> nv_b(vb);
+  auto nv_a = make_nvector_view(va);
+  auto nv_b = make_nvector_view(vb);
 
   auto result   = N_VDotProd(nv_a, nv_b);
   auto expected = 6.0 * size;
@@ -371,7 +379,7 @@ test_set_constant()
   auto expected = create_test_vector<VectorType>();
   expected      = 1.0;
 
-  NVectorView<VectorType> n_vector(vector);
+  auto n_vector = make_nvector_view(vector);
 
   N_VConst(1.0, n_vector);
   Assert(vector_equal(vector, expected), NVectorTestError());
@@ -393,8 +401,8 @@ test_add_constant()
   auto       result   = create_test_vector<VectorType>(-1.0);
   auto       expected = create_test_vector<VectorType>(3.0);
 
-  NVectorView<VectorType> nv_a(vector_a);
-  NVectorView<VectorType> nv_result(result);
+  auto nv_a      = make_nvector_view(vector_a);
+  auto nv_result = make_nvector_view(result);
 
   N_VAddConst(nv_a, 1.0, nv_result);
   Assert(vector_equal(result, expected), NVectorTestError());
@@ -418,9 +426,9 @@ test_elementwise_product()
   auto       vector_result = create_test_vector<VectorType>();
   auto       expected      = create_test_vector<VectorType>(6.0);
 
-  NVectorView<VectorType> nv_a(vector_a);
-  NVectorView<VectorType> nv_b(vector_b);
-  NVectorView<VectorType> nv_result(vector_result);
+  auto nv_a      = make_nvector_view(vector_a);
+  auto nv_b      = make_nvector_view(vector_b);
+  auto nv_result = make_nvector_view(vector_result);
 
   // result = a.*b
   N_VProd(nv_a, nv_b, nv_result);
@@ -428,7 +436,7 @@ test_elementwise_product()
 
   auto vector_c = create_test_vector<VectorType>(2.0);
 
-  NVectorView<VectorType> nv_c(vector_c);
+  auto nv_c = make_nvector_view(vector_c);
 
   // c .*= b
   N_VProd(nv_c, nv_b, nv_c);
@@ -457,9 +465,9 @@ test_elementwise_div()
   auto       vector_result = create_test_vector<VectorType>();
   auto       expected      = create_test_vector<VectorType>(2.0);
 
-  NVectorView<VectorType> nv_a(vector_a);
-  NVectorView<VectorType> nv_b(vector_b);
-  NVectorView<VectorType> nv_result(vector_result);
+  auto nv_a      = make_nvector_view(vector_a);
+  auto nv_b      = make_nvector_view(vector_b);
+  auto nv_result = make_nvector_view(vector_result);
 
   N_VDiv(nv_a, nv_b, nv_result);
   Assert(vector_equal(vector_result, expected), NVectorTestError());
@@ -477,8 +485,8 @@ test_elementwise_inv()
   auto       vector_result = create_test_vector<VectorType>();
   auto       expected      = create_test_vector<VectorType>(1.0 / 6.0);
 
-  NVectorView<VectorType> nv_a(vector_a);
-  NVectorView<VectorType> nv_result(vector_result);
+  auto nv_a      = make_nvector_view(vector_a);
+  auto nv_result = make_nvector_view(vector_result);
 
   N_VInv(nv_a, nv_result);
   Assert(vector_equal(vector_result, expected), NVectorTestError());
@@ -501,8 +509,8 @@ test_elementwise_abs()
   auto       vector_result = create_test_vector<VectorType>();
   auto       expected      = create_test_vector<VectorType>(2.0);
 
-  NVectorView<VectorType> nv_a(vector_a);
-  NVectorView<VectorType> nv_result(vector_result);
+  auto nv_a      = make_nvector_view(vector_a);
+  auto nv_result = make_nvector_view(vector_result);
 
   N_VAbs(nv_a, nv_result);
   Assert(vector_equal(vector_result, expected), NVectorTestError());
@@ -524,8 +532,8 @@ test_weighted_rms_norm()
   const auto vector_a = create_test_vector<VectorType>(2.0);
   const auto vector_b = create_test_vector<VectorType>(3.0);
 
-  NVectorView<VectorType> nv_a(vector_a);
-  NVectorView<VectorType> nv_b(vector_b);
+  auto nv_a = make_nvector_view(vector_a);
+  auto nv_b = make_nvector_view(vector_b);
 
   const auto result = N_VWrmsNorm(nv_a, nv_b);
   Assert(std::fabs(result - 6.0) < 1e-12, NVectorTestError());
@@ -542,8 +550,8 @@ test_max_norm()
   const auto vector_a = create_test_vector<VectorType>(2.0);
   const auto vector_b = create_test_vector<VectorType>(-3.0);
 
-  NVectorView<VectorType> nv_a(vector_a);
-  NVectorView<VectorType> nv_b(vector_b);
+  auto nv_a = make_nvector_view(vector_a);
+  auto nv_b = make_nvector_view(vector_b);
 
   auto result = N_VMaxNorm(nv_a);
   Assert(std::fabs(result - 2.0) < 1e-12, NVectorTestError());
@@ -564,8 +572,8 @@ test_scale()
   auto       vector_b = create_test_vector<VectorType>(2.0);
   const auto expected = create_test_vector<VectorType>(4.0);
 
-  NVectorView<VectorType> nv_a(vector_a);
-  NVectorView<VectorType> nv_b(vector_b);
+  auto nv_a = make_nvector_view(vector_a);
+  auto nv_b = make_nvector_view(vector_b);
 
   // b *= 2
   N_VScale(2.0, nv_b, nv_b);
