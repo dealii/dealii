@@ -39,10 +39,13 @@ ParameterAcceptor::ParameterAcceptor(const std::string &name)
 }
 
 
+
 ParameterAcceptor::~ParameterAcceptor()
 {
   class_list[acceptor_id] = nullptr;
 }
+
+
 
 std::string
 ParameterAcceptor::get_section_name() const
@@ -50,6 +53,7 @@ ParameterAcceptor::get_section_name() const
   return (!section_name.empty() ? section_name :
                                   boost::core::demangle(typeid(*this).name()));
 }
+
 
 
 void
@@ -96,6 +100,8 @@ ParameterAcceptor::initialize(std::istream &input_stream, ParameterHandler &prm)
   parse_all_parameters(prm);
 }
 
+
+
 void
 ParameterAcceptor::clear()
 {
@@ -130,6 +136,8 @@ ParameterAcceptor::parse_all_parameters(ParameterHandler &prm)
       }
 }
 
+
+
 void
 ParameterAcceptor::declare_all_parameters(ParameterHandler &prm)
 {
@@ -142,6 +150,7 @@ ParameterAcceptor::declare_all_parameters(ParameterHandler &prm)
         instance->leave_my_subsection(prm);
       }
 }
+
 
 
 std::vector<std::string>
@@ -182,8 +191,36 @@ ParameterAcceptor::get_section_path() const
             break;
           }
     }
+  // Finally, insert the remaining subsections
+  sections.insert(sections.end(), subsections.begin(), subsections.end());
   return sections;
 }
+
+
+
+void
+ParameterAcceptor::enter_subsection(const std::string &subsection)
+{
+  AssertThrow(subsection.find(sep) == std::string::npos,
+              ExcMessage(
+                "A subsection name cannot contain the special character '/'"));
+  // First the easy case.
+  if (subsection == "")
+    return;
+  subsections.push_back(subsection);
+}
+
+
+
+void
+ParameterAcceptor::leave_subsection()
+{
+  AssertThrow(subsections.size() > 0,
+              ExcMessage("There is no subsection to leave here."));
+  subsections.pop_back();
+}
+
+
 
 void
 ParameterAcceptor::enter_my_subsection(
@@ -196,6 +233,8 @@ ParameterAcceptor::enter_my_subsection(
     }
 }
 
+
+
 void
 ParameterAcceptor::leave_my_subsection(
   ParameterHandler &prm = ParameterAcceptor::prm)
@@ -206,7 +245,5 @@ ParameterAcceptor::leave_my_subsection(
       prm.leave_subsection();
     }
 }
-
-
 
 DEAL_II_NAMESPACE_CLOSE
