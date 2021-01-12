@@ -105,6 +105,7 @@ namespace Simplex
   } // namespace
 
 
+
   template <int dim>
   double
   ScalarWedgePolynomial<dim>::compute_value(const unsigned int i,
@@ -507,7 +508,6 @@ namespace Simplex
   template class ScalarPyramidPolynomial<1>;
   template class ScalarPyramidPolynomial<2>;
   template class ScalarPyramidPolynomial<3>;
-
 } // namespace Simplex
 
 DEAL_II_NAMESPACE_CLOSE
