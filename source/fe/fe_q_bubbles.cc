@@ -122,7 +122,7 @@ namespace internal
             dh.distribute_dofs(fe);
 
             dealii::FEValues<dim, spacedim> fine(
-              StaticMappingQ1<dim, spacedim>::mapping,
+              ReferenceCell::get_default_linear_mapping(tr),
               fe,
               *q_fine,
               update_quadrature_points | update_JxW_values | update_values);

@@ -25,6 +25,7 @@
 
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/hp/fe_collection.h>
@@ -1099,12 +1100,14 @@ namespace DerivativeApproximation
     const unsigned int  component)
   {
     // just call the respective function with Q1 mapping
-    approximate_derivative_tensor(StaticMappingQ1<dim, spacedim>::mapping,
-                                  dof,
-                                  solution,
-                                  cell,
-                                  derivative,
-                                  component);
+    approximate_derivative_tensor(
+      ReferenceCell::get_default_linear_mapping<dim, spacedim>(
+        cell->reference_cell_type()),
+      dof,
+      solution,
+      cell,
+      derivative,
+      component);
   }
 
 

@@ -419,7 +419,8 @@ namespace GridTools
                                 const double                   tolerance)
   {
     return find_active_cell_around_point<dim, MeshType, spacedim>(
-             StaticMappingQ1<dim, spacedim>::mapping,
+             ReferenceCell::get_default_linear_mapping(
+               mesh.get_triangulation()),
              mesh,
              p,
              marked_vertices,
@@ -2379,6 +2380,7 @@ namespace GridTools
   {
     using MATCH_T =
       std::array<unsigned int, GeometryInfo<3>::vertices_per_face>;
+
     static inline std::bitset<3>
     lookup(const MATCH_T &matching)
     {

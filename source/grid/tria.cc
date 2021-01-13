@@ -9607,9 +9607,11 @@ namespace internal
                         // one.
                         const Point<spacedim> new_bound = face->center(true);
                         // to check it, transform to the unit cell
-                        // with Q1Mapping
+                        // with a linear mapping
                         const Point<dim> new_unit =
-                          StaticMappingQ1<dim, spacedim>::mapping
+                          ReferenceCell::get_default_linear_mapping<dim,
+                                                                    spacedim>(
+                            cell->reference_cell_type())
                             .transform_real_to_unit_cell(cell, new_bound);
 
                         // Now, we have to calculate the distance from

@@ -2084,8 +2084,8 @@ MappingFEField<dim, spacedim, VectorType, void>::transform_real_to_unit_cell(
   try
     {
       initial_p_unit =
-        StaticMappingQ1<dim, spacedim>::mapping.transform_real_to_unit_cell(
-          cell, p);
+        ReferenceCell::get_default_linear_mapping(cell->get_triangulation())
+          .transform_real_to_unit_cell(cell, p);
     }
   catch (const typename Mapping<dim, spacedim>::ExcTransformationFailed &)
     {
