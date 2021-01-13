@@ -1,0 +1,4 @@
+Moved: The StaticMappingQ1 class has been moved from the file
+`deal.II/fe/mapping_q1.h` to `deal.II/fe/mapping_linear.h`.
+<br>
+(Wolfgang Bangerth, 2021/01/13)
