@@ -909,12 +909,84 @@ MappingFE<dim, spacedim>::transform_real_to_unit_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const Point<spacedim> &                                     p) const
 {
-  Assert(false, StandardExceptions::ExcNotImplemented());
+  const std::vector<Point<spacedim>> support_points =
+    this->compute_mapping_support_points(cell);
 
-  (void)cell;
-  (void)p;
+  const double       eps        = 1.e-12 * cell->diameter();
+  const unsigned int loop_limit = 10;
 
-  return {};
+  Point<dim> p_unit;
+
+  Tensor<1, dim> grad_FT_residual;
+
+  unsigned int loop = 0;
+
+  // This loop solves the following problem:
+  // grad_F^T residual + (grad_F^T grad_F + grad_F^T hesss_F dp) dp = 0
+  // where the term
+  // (grad_F^T hess_F dp) is approximated by (hess_F * residual)
+  // This is basically a second order approximation of Newton method, where the
+  // Jacobian is corrected with a higher order term coming from the hessian.
+  do
+    {
+      Point<spacedim> mapped_point;
+
+      // Transpose of the gradient map
+      DerivativeForm<1, spacedim, dim> grad_FT;
+      Tensor<2, dim>                   corrected_metric_tensor;
+
+      // [TODO]
+      // When 2nd derivatives are implemented, we'll uncomment this
+      // DerivativeForm<2, spacedim, dim> hess_FT;
+      for (unsigned int i = 0; i < this->fe->n_dofs_per_cell(); ++i)
+        {
+          mapped_point += support_points[i] * this->fe->shape_value(i, p_unit);
+          const auto grad_F_i = this->fe->shape_grad(i, p_unit);
+          // [TODO]
+          // When 2nd derivatives are implemented, we'll uncomment this
+          // auto hessian_k = this->fe->shape_grad_grad(i, p_unit);
+          for (unsigned int j = 0; j < dim; ++j)
+            {
+              grad_FT[j] += grad_F_i[j] * support_points[i];
+              // [TODO]
+              // When 2nd derivatives are implemented, we'll uncomment this
+              // hess_FT[j] += hessian_k[j] * support_points[i];
+            }
+        }
+
+      // Residual
+      auto residual = p - mapped_point;
+      // Project the residual on the reference coordinate system
+      // to compute the error, and to filter components orthogonal to the
+      // manifold, and compute a 2nd order correction of the metric tensor
+      grad_FT_residual = apply_transformation(grad_FT, residual);
+
+      // Do not invert nor compute the metric if not necessary.
+      if (grad_FT_residual.norm() <= eps)
+        break;
+
+      // Now compute the (corrected) metric tensor
+      corrected_metric_tensor = -apply_transformation(grad_FT, grad_FT);
+
+      // [TODO]
+      // When 2nd derivatives are implemented, we'll uncomment this
+      // corrected_metric_tensor += apply_transformation(hess_FT, residual);
+
+      auto g_inverse = invert(corrected_metric_tensor);
+      p_unit -= Point<dim>(g_inverse * grad_FT_residual);
+
+      ++loop;
+    }
+  while (loop < loop_limit);
+
+  // Here we check that in the last execution of while the first
+  // condition was already wrong, meaning the residual was below
+  // eps. Only if the first condition failed, loop will have been
+  // increased and tested, and thus have reached the limit.
+  AssertThrow(loop < loop_limit,
+              (typename Mapping<dim, spacedim>::ExcTransformationFailed()));
+
+  return p_unit;
 }
 
 
@@ -1250,11 +1322,12 @@ namespace internal
     namespace
     {
       /**
-       * Depending on what information is called for in the update flags of the
+       * Depending on what information is called for in the update flags of
+       * the
        * @p data object, compute the various pieces of information that is
        * required by the fill_fe_face_values() and fill_fe_subface_values()
-       * functions. This function simply unifies the work that would be done by
-       * those two functions.
+       * functions. This function simply unifies the work that would be done
+       * by those two functions.
        *
        * The resulting data is put into the @p output_data argument.
        */
@@ -1292,9 +1365,9 @@ namespace internal
             // first compute some common data that is used for evaluating
             // all of the flags below
 
-            // map the unit tangentials to the real cell. checking for d!=dim-1
-            // eliminates compiler warnings regarding unsigned int expressions <
-            // 0.
+            // map the unit tangentials to the real cell. checking for
+            // d!=dim-1 eliminates compiler warnings regarding unsigned int
+            // expressions < 0.
             for (unsigned int d = 0; d != dim - 1; ++d)
               {
                 Assert(face_no + cell->n_faces() * d <
@@ -1315,8 +1388,9 @@ namespace internal
 
             if (update_flags & update_boundary_forms)
               {
-                // if dim==spacedim, we can use the unit tangentials to compute
-                // the boundary form by simply taking the cross product
+                // if dim==spacedim, we can use the unit tangentials to
+                // compute the boundary form by simply taking the cross
+                // product
                 if (dim == spacedim)
                   {
                     for (unsigned int i = 0; i < n_q_points; ++i)
@@ -1326,8 +1400,8 @@ namespace internal
                             // in 1d, we don't have access to any of the
                             // data.aux fields (because it has only dim-1
                             // components), but we can still compute the
-                            // boundary form by simply looking at the number of
-                            // the face
+                            // boundary form by simply looking at the number
+                            // of the face
                             output_data.boundary_forms[i][0] =
                               (face_no == 0 ? -1 : +1);
                             break;
@@ -1345,9 +1419,9 @@ namespace internal
                   }
                 else //(dim < spacedim)
                   {
-                    // in the codim-one case, the boundary form results from the
-                    // cross product of all the face tangential vectors and the
-                    // cell normal vector
+                    // in the codim-one case, the boundary form results from
+                    // the cross product of all the face tangential vectors
+                    // and the cell normal vector
                     //
                     // to compute the cell normal, use the same method used in
                     // fill_fe_values for cells above
@@ -1519,8 +1593,8 @@ MappingFE<dim, spacedim>::fill_fe_face_values(
 
   // if necessary, recompute the support points of the transformation of this
   // cell (note that we need to first check the triangulation pointer, since
-  // otherwise the second test might trigger an exception if the triangulations
-  // are not the same)
+  // otherwise the second test might trigger an exception if the
+  // triangulations are not the same)
   if ((data.mapping_support_points.size() == 0) ||
       (&cell->get_triangulation() !=
        &data.cell_of_current_support_points->get_triangulation()) ||
@@ -1566,8 +1640,8 @@ MappingFE<dim, spacedim>::fill_fe_subface_values(
 
   // if necessary, recompute the support points of the transformation of this
   // cell (note that we need to first check the triangulation pointer, since
-  // otherwise the second test might trigger an exception if the triangulations
-  // are not the same)
+  // otherwise the second test might trigger an exception if the
+  // triangulations are not the same)
   if ((data.mapping_support_points.size() == 0) ||
       (&cell->get_triangulation() !=
        &data.cell_of_current_support_points->get_triangulation()) ||
