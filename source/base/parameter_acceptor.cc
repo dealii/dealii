@@ -204,9 +204,10 @@ ParameterAcceptor::enter_subsection(const std::string &subsection)
   AssertThrow(subsection.find(sep) == std::string::npos,
               ExcMessage(
                 "A subsection name cannot contain the special character '/'"));
-  // First the easy case.
-  if (subsection == "")
-    return;
+
+  AssertThrow(subsection != "",
+              ExcMessage("Cannot create an empty subsection."));
+
   subsections.push_back(subsection);
 }
 

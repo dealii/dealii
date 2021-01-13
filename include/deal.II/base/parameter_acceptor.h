@@ -519,11 +519,11 @@ public:
   /**
    * Add the given @p subsection to the global path stored in this class.
    *
-   * This function changes the behaviour of enter_my_subsection(), by
+   * This function changes the behavior of enter_my_subsection(), by
    * appending a new subsection to the path stored in this class.
    *
    * This method can be used to split the parameters of this class into
-   * subsections, while still maintaining the general behaviour of this
+   * subsections, while still maintaining the general behavior of this
    * class.
    *
    * An example usage is given by the following snippet:
