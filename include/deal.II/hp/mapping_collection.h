@@ -21,7 +21,7 @@
 #include <deal.II/base/subscriptor.h>
 
 #include <deal.II/fe/fe.h>
-#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping_linear.h>
 
 #include <memory>
 #include <vector>

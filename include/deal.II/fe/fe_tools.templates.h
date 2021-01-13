@@ -54,7 +54,7 @@
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_cartesian.h>
-#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping_linear.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>

@@ -18,6 +18,7 @@
 
 
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_linear.h>
 
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>

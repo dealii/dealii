@@ -56,15 +56,6 @@ MappingQ1<dim, spacedim>::clone() const
   return std::make_unique<MappingQ1<dim, spacedim>>(*this);
 }
 
-//---------------------------------------------------------------------------
-
-
-template <int dim, int spacedim>
-MappingQGeneric<dim, spacedim>
-  StaticMappingQ1<dim, spacedim>::mapping = MappingQGeneric<dim, spacedim>(1);
-
-
-
 //--------------------------- Explicit instantiations -----------------------
 #include "mapping_q1.inst"
 

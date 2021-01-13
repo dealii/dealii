@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,9 +14,20 @@
 // ---------------------------------------------------------------------
 
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
-  {
-#if deal_II_dimension <= deal_II_space_dimension
-    template class MappingQ1<deal_II_dimension, deal_II_space_dimension>;
-#endif
-  }
+#include <deal.II/fe/mapping_linear.h>
+
+
+DEAL_II_NAMESPACE_OPEN
+
+
+template <int dim, int spacedim>
+MappingQGeneric<dim, spacedim>
+  StaticMappingQ1<dim, spacedim>::mapping = MappingQGeneric<dim, spacedim>(1);
+
+
+
+//--------------------------- Explicit instantiations -----------------------
+#include "mapping_linear.inst"
+
+
+DEAL_II_NAMESPACE_CLOSE

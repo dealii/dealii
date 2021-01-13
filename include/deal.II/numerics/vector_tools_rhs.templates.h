@@ -17,6 +17,8 @@
 #define dealii_vector_tools_rhs_templates_h
 
 
+#include <deal.II/fe/mapping_linear.h>
+
 #include <deal.II/hp/fe_values.h>
 
 #include <deal.II/lac/block_vector.h>

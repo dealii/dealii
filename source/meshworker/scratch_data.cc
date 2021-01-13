@@ -13,6 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/fe/mapping_linear.h>
+
 #include <deal.II/meshworker/scratch_data.h>
 
 #include <memory>

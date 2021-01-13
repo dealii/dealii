@@ -65,33 +65,6 @@ public:
 };
 
 
-
-/**
- * Many places in the library by default use (bi-,tri-)linear mappings unless
- * users explicitly provide a different mapping to use. In these cases, the
- * called function has to create a $Q_1$ mapping object, i.e., an object of
- * kind MappingQGeneric(1). This is costly. It would also be costly to create
- * such objects as static objects in the affected functions, because static
- * objects are never destroyed throughout the lifetime of a program, even
- * though they only have to be created once the first time code runs through a
- * particular function.
- *
- * In order to avoid creation of (static or dynamic) $Q_1$ mapping objects in
- * these contexts throughout the library, this class defines a static $Q_1$
- * mapping object. This object can then be used in all of those places where
- * such an object is needed.
- */
-template <int dim, int spacedim = dim>
-struct StaticMappingQ1
-{
-  /**
-   * The static $Q_1$ mapping object discussed in the documentation of this
-   * class.
-   */
-  static MappingQGeneric<dim, spacedim> mapping;
-};
-
-
 /*@}*/
 
 

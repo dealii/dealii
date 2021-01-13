@@ -27,7 +27,7 @@
 
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping_linear.h>
 
 #include <deal.II/matrix_free/mapping_info.h>
 #include <deal.II/matrix_free/shape_info.h>
