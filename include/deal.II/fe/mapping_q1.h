@@ -80,6 +80,10 @@ public:
  * these contexts throughout the library, this class defines a static $Q_1$
  * mapping object. This object can then be used in all of those places where
  * such an object is needed.
+ *
+ * @note The use of this object should be avoided since it is only applicable
+ *   in cases where a mesh consists exclusively of quadrilaterals or hexahedra.
+ *   Use ReferenceCell::get_default_linear_mapping() instead.
  */
 template <int dim, int spacedim = dim>
 struct StaticMappingQ1
