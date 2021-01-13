@@ -536,6 +536,8 @@ namespace DoFTools
                   // if all entries of the row are zero, the corresponding dof
                   // is not supposed to be constrained to any other dof. we can
                   // thus skip this row
+                  // this happens for example whenever FE_System elements with
+                  // FE_Nothing elements are constrained
                   if (abs_sum == 0)
                     continue;
 
