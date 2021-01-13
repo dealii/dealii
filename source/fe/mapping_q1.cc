@@ -14,28 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-#include <deal.II/base/derivative_form.h>
-#include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/quadrature.h>
-#include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/tensor_product_polynomials.h>
-
-#include <deal.II/dofs/dof_accessor.h>
-
-#include <deal.II/fe/fe.h>
-#include <deal.II/fe/fe_tools.h>
-#include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
-
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/lac/full_matrix.h>
-
-#include <algorithm>
-#include <array>
-#include <cmath>
-#include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN

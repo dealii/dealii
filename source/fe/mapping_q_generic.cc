@@ -30,12 +30,9 @@
 #include <deal.II/fe/mapping_q_generic.h>
 #include <deal.II/fe/mapping_q_internal.h>
 
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/lac/full_matrix.h>
 
 #include <boost/container/small_vector.hpp>
 
