@@ -140,6 +140,26 @@ namespace ReferenceCell
 
 
 
+  template <int dim, int spacedim>
+  const Mapping<dim, spacedim> &
+  get_default_linear_mapping(const Triangulation<dim, spacedim> &triangulation)
+  {
+    const auto &reference_cell_types = triangulation.get_reference_cell_types();
+    Assert(reference_cell_types.size() == 1,
+           ExcMessage(
+             "This function can only work for triangulations that "
+             "use only a single cell type -- for example, only triangles "
+             "or only quadrilaterals. For mixed meshes, there is no "
+             "single linear mapping object that can be used for all "
+             "cells of the triangulation. The triangulation you are "
+             "passing to this function uses multiple cell types."));
+
+    return get_default_linear_mapping<dim, spacedim>(
+      reference_cell_types.front());
+  }
+
+
+
   template <int dim>
   Quadrature<dim>
   get_gauss_type_quadrature(const Type &   reference_cell,
