@@ -17,11 +17,3 @@ DEAL:0::n_blocks:4
 DEAL:0::n_comp:1
 DEAL:0::n_dofs:13
 DEAL:0::Face dominating set for 1 and 2: 3
-    9 = 0
-    10 = 0
-    12 = 0
-    14 = 0
-    15 = 0
-    17 = 0
-    23 = 0
-    27 = 0
