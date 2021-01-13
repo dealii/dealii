@@ -925,9 +925,9 @@ namespace ReferenceCell
           static const std::array<std::array<unsigned int, 3>, 6> table = {
             {{{2, 1, 0}},
              {{0, 1, 2}},
+             {{1, 0, 2}},
              {{1, 2, 0}},
              {{0, 2, 1}},
-             {{1, 0, 2}},
              {{2, 0, 1}}}};
 
           return table[face_orientation][line];
@@ -971,9 +971,9 @@ namespace ReferenceCell
           static const std::array<std::array<unsigned int, 3>, 6> table = {
             {{{0, 2, 1}},
              {{0, 1, 2}},
+             {{2, 1, 0}},
              {{1, 2, 0}},
              {{1, 0, 2}},
-             {{2, 1, 0}},
              {{2, 0, 1}}}};
 
           return table[face_orientation][vertex];
@@ -1093,9 +1093,9 @@ namespace ReferenceCell
               static const std::array<std::array<unsigned int, 3>, 6> table = {
                 {{{2, 1, 0}},
                  {{0, 1, 2}},
+                 {{1, 0, 2}},
                  {{1, 2, 0}},
                  {{0, 2, 1}},
-                 {{1, 0, 2}},
                  {{2, 0, 1}}}};
 
               return table[face_orientation][line];
@@ -1143,9 +1143,9 @@ namespace ReferenceCell
               static const std::array<std::array<unsigned int, 3>, 6> table = {
                 {{{0, 2, 1}},
                  {{0, 1, 2}},
+                 {{2, 1, 0}},
                  {{1, 2, 0}},
                  {{1, 0, 2}},
-                 {{2, 1, 0}},
                  {{2, 0, 1}}}};
 
               return table[face_orientation][vertex];
@@ -1269,9 +1269,9 @@ namespace ReferenceCell
               static const std::array<std::array<unsigned int, 3>, 6> table = {
                 {{{2, 1, 0}},
                  {{0, 1, 2}},
+                 {{1, 0, 2}},
                  {{1, 2, 0}},
                  {{0, 2, 1}},
-                 {{1, 0, 2}},
                  {{2, 0, 1}}}};
 
               return table[face_orientation][line];
@@ -1319,9 +1319,9 @@ namespace ReferenceCell
               static const std::array<std::array<unsigned int, 3>, 6> table = {
                 {{{0, 2, 1}},
                  {{0, 1, 2}},
+                 {{2, 1, 0}},
                  {{1, 2, 0}},
                  {{1, 0, 2}},
-                 {{2, 1, 0}},
                  {{2, 0, 1}}}};
 
               return table[face_orientation][vertex];
@@ -1634,7 +1634,7 @@ namespace ReferenceCell
           return 1;
 
         // face_orientation=true, face_rotation=true, face_flip=false
-        if (i == std::array<T, 3>{{j[1], j[0], j[2]}})
+        if (i == std::array<T, 3>{{j[1], j[2], j[0]}})
           return 3;
 
         // face_orientation=true, face_rotation=false, face_flip=true
@@ -1646,11 +1646,11 @@ namespace ReferenceCell
           return 0;
 
         // face_orientation=false, face_rotation=true, face_flip=false
-        if (i == std::array<T, 3>{{j[1], j[2], j[0]}})
+        if (i == std::array<T, 3>{{j[2], j[1], j[0]}})
           return 2;
 
         // face_orientation=false, face_rotation=false, face_flip=true
-        if (i == std::array<T, 3>{{j[2], j[1], j[0]}})
+        if (i == std::array<T, 3>{{j[1], j[0], j[2]}})
           return 4;
       }
     else if (entity_type == ReferenceCell::Type::Quad)
@@ -1665,7 +1665,7 @@ namespace ReferenceCell
           return 1;
 
         // face_orientation=true, face_rotation=true, face_flip=false
-        if (i == std::array<T, 4>{{j[1], j[3], j[0], j[2]}})
+        if (i == std::array<T, 4>{{j[2], j[0], j[3], j[1]}})
           return 3;
 
         // face_orientation=true, face_rotation=false, face_flip=true
@@ -1673,7 +1673,7 @@ namespace ReferenceCell
           return 5;
 
         // face_orientation=true, face_rotation=true, face_flip=true
-        if (i == std::array<T, 4>{{j[2], j[0], j[3], j[1]}})
+        if (i == std::array<T, 4>{{j[1], j[3], j[0], j[2]}})
           return 7;
 
         // face_orientation=false, face_rotation=false, face_flip=false
@@ -1733,7 +1733,7 @@ namespace ReferenceCell
               temp = {{vertices[0], vertices[1], vertices[2]}};
               break;
             case 3:
-              temp = {{vertices[1], vertices[0], vertices[2]}};
+              temp = {{vertices[1], vertices[2], vertices[0]}};
               break;
             case 5:
               temp = {{vertices[2], vertices[0], vertices[1]}};
@@ -1742,10 +1742,10 @@ namespace ReferenceCell
               temp = {{vertices[0], vertices[2], vertices[1]}};
               break;
             case 2:
-              temp = {{vertices[1], vertices[2], vertices[0]}};
+              temp = {{vertices[2], vertices[1], vertices[0]}};
               break;
             case 4:
-              temp = {{vertices[2], vertices[1], vertices[0]}};
+              temp = {{vertices[1], vertices[0], vertices[2]}};
               break;
             default:
               Assert(false, ExcNotImplemented());
@@ -1759,13 +1759,13 @@ namespace ReferenceCell
               temp = {{vertices[0], vertices[1], vertices[2], vertices[3]}};
               break;
             case 3:
-              temp = {{vertices[1], vertices[3], vertices[0], vertices[2]}};
+              temp = {{vertices[2], vertices[0], vertices[3], vertices[1]}};
               break;
             case 5:
               temp = {{vertices[3], vertices[2], vertices[1], vertices[0]}};
               break;
             case 7:
-              temp = {{vertices[2], vertices[0], vertices[3], vertices[1]}};
+              temp = {{vertices[1], vertices[3], vertices[0], vertices[2]}};
               break;
             case 0:
               temp = {{vertices[0], vertices[2], vertices[1], vertices[3]}};
