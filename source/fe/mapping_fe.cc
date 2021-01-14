@@ -175,6 +175,7 @@ MappingFE<dim, spacedim>::InternalData::initialize_face(
 }
 
 
+
 template <int dim, int spacedim>
 void
 MappingFE<dim, spacedim>::InternalData::compute_shape_function_values(
@@ -931,8 +932,6 @@ MappingFE<dim, spacedim>::transform_real_to_unit_cell(
 
       // Transpose of the gradient map
       DerivativeForm<1, spacedim, dim> grad_FT;
-      Tensor<1, dim>                   grad_FT_residual;
-      Tensor<2, dim>                   corrected_metric_tensor;
       DerivativeForm<2, spacedim, dim> hess_FT;
 
       for (unsigned int i = 0; i < this->fe->n_dofs_per_cell(); ++i)
@@ -949,24 +948,25 @@ MappingFE<dim, spacedim>::transform_real_to_unit_cell(
         }
 
       // Residual
-      auto residual = p - mapped_point;
+      const auto residual = p - mapped_point;
       // Project the residual on the reference coordinate system
       // to compute the error, and to filter components orthogonal to the
       // manifold, and compute a 2nd order correction of the metric tensor
-      grad_FT_residual = apply_transformation(grad_FT, residual);
+      const auto grad_FT_residual = apply_transformation(grad_FT, residual);
 
       // Do not invert nor compute the metric if not necessary.
       if (grad_FT_residual.norm() <= eps)
         break;
 
       // Now compute the (corrected) metric tensor
+      Tensor<2, dim> corrected_metric_tensor;
       for (unsigned int j = 0; j < dim; ++j)
         for (unsigned int l = 0; l < dim; ++l)
           corrected_metric_tensor[j][l] =
             -grad_FT[j] * grad_FT[l] + hess_FT[j][l] * residual;
 
       // And compute the update
-      auto g_inverse = invert(corrected_metric_tensor);
+      const auto g_inverse = invert(corrected_metric_tensor);
       p_unit -= Point<dim>(g_inverse * grad_FT_residual);
 
       ++loop;
