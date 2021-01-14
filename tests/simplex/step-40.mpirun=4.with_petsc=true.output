@@ -1,0 +1,4 @@
+Running with PETSc on 4 MPI rank(s)...
+   Number of active cells:       512
+   Number of degrees of freedom: 1089
+   Solved in 7 iterations.
