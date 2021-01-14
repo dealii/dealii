@@ -1209,17 +1209,26 @@ namespace LinearAlgebra
       /**
        * Exception
        */
-      DeclException4(ExcAccessToNonLocalElement,
-                     size_type,
-                     size_type,
-                     size_type,
-                     size_type,
-                     << "You tried to access element " << arg1
-                     << " of a distributed vector, but this element is not "
-                     << "stored on the current processor. Note: The range of "
-                     << "locally owned elements is " << arg2 << " to " << arg3
-                     << ", and there are " << arg4 << " ghost elements "
-                     << "that this vector can access.");
+      DeclException4(
+        ExcAccessToNonLocalElement,
+        size_type,
+        size_type,
+        size_type,
+        size_type,
+        << "You tried to access element " << arg1
+        << " of a distributed vector, but this element is not "
+        << "stored on the current processor. Note: The range of "
+        << "locally owned elements is " << arg2 << " to " << arg3
+        << ", and there are " << arg4 << " ghost elements "
+        << "that this vector can access."
+        << "\n\n"
+        << "A common source for this kind of problem is that you "
+        << "are passing a 'fully distributed' vector into a function "
+        << "that needs read access to vector elements that correspond "
+        << "to degrees of freedom on ghost cells (or at least to "
+        << "'locally active' degrees of freedom that are not also "
+        << "'locally owned'). You need to pass a vector that has these "
+        << "elements as ghost entries.");
 
     private:
       /**
