@@ -40,7 +40,7 @@ Manifold<dim, spacedim>::project_to_manifold(
   const Point<spacedim> &) const
 {
   Assert(false, ExcPureFunctionCalled());
-  return Point<spacedim>();
+  return {};
 }
 
 
@@ -354,7 +354,7 @@ Manifold<dim, spacedim>::get_new_point_on_face(
         return get_new_point_on_quad(face);
     }
 
-  return Point<spacedim>();
+  return {};
 }
 
 
@@ -374,7 +374,7 @@ Manifold<dim, spacedim>::get_new_point_on_cell(
         return get_new_point_on_hex(cell);
     }
 
-  return Point<spacedim>();
+  return {};
 }
 
 
@@ -451,7 +451,7 @@ Manifold<dim, spacedim>::get_new_point_on_hex(
   const typename Triangulation<dim, spacedim>::hex_iterator & /*hex*/) const
 {
   Assert(false, ExcImpossibleInDim(dim));
-  return Point<spacedim>();
+  return {};
 }
 
 

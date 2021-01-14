@@ -2936,7 +2936,7 @@ GeometryInfo<dim>::unit_cell_vertex(const unsigned int)
 {
   Assert(false, ExcNotImplemented());
 
-  return Point<dim>();
+  return {};
 }
 
 
@@ -3122,7 +3122,7 @@ GeometryInfo<dim>::cell_to_child_coordinates(
 
 {
   Assert(false, ExcNotImplemented());
-  return Point<dim>();
+  return {};
 }
 
 
@@ -3258,7 +3258,7 @@ GeometryInfo<dim>::child_to_cell_coordinates(
   const RefinementCase<dim> /*refine_case*/)
 {
   Assert(false, ExcNotImplemented());
-  return Point<dim>();
+  return {};
 }
 
 

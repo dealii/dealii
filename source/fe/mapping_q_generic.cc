@@ -465,7 +465,7 @@ MappingQGeneric<dim, spacedim>::transform_real_to_unit_cell_internal(
 {
   // default implementation (should never be called)
   Assert(false, ExcInternalError());
-  return Point<dim>();
+  return {};
 }
 
 

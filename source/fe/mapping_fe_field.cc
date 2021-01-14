@@ -2227,7 +2227,7 @@ failure:
               (typename Mapping<dim, spacedim>::ExcTransformationFailed()));
   // ...the compiler wants us to return something, though we can
   // of course never get here...
-  return Point<dim>();
+  return {};
 }
 
 
