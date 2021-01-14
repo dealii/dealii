@@ -29,6 +29,8 @@
 #include <deal.II/fe/fe_q_base.h>
 #include <deal.II/fe/fe_tools.h>
 
+#include <deal.II/simplex/fe_lib.h>
+
 #include <memory>
 #include <sstream>
 #include <vector>
@@ -734,21 +736,25 @@ std::vector<std::pair<unsigned int, unsigned int>>
 FE_Q_Base<PolynomialType, dim, spacedim>::hp_vertex_dof_identities(
   const FiniteElement<dim, spacedim> &fe_other) const
 {
-  // we can presently only compute these identities if both FEs are FE_Qs or
-  // if the other one is an FE_Nothing. in the first case, there should be
-  // exactly one single DoF of each FE at a vertex, and they should have
-  // identical value
   if (dynamic_cast<const FE_Q_Base<PolynomialType, dim, spacedim> *>(
         &fe_other) != nullptr)
     {
-      return std::vector<std::pair<unsigned int, unsigned int>>(
-        1, std::make_pair(0U, 0U));
+      // there should be exactly one single DoF of each FE at a vertex, and they
+      // should have identical value
+      return {{0U, 0U}};
+    }
+  else if (dynamic_cast<const Simplex::FE_P<dim, spacedim> *>(&fe_other) !=
+           nullptr)
+    {
+      // there should be exactly one single DoF of each FE at a vertex, and they
+      // should have identical value
+      return {{0U, 0U}};
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&fe_other) != nullptr)
     {
       // the FE_Nothing has no degrees of freedom, so there are no
       // equivalencies to be recorded
-      return std::vector<std::pair<unsigned int, unsigned int>>();
+      return {};
     }
   else if (fe_other.n_unique_faces() == 1 && fe_other.n_dofs_per_face(0) == 0)
     {
@@ -759,12 +765,12 @@ FE_Q_Base<PolynomialType, dim, spacedim>::hp_vertex_dof_identities(
       // that it is discontinuous because it has no DoFs on
       // its faces. in that case, just state that we have no
       // constraints to declare
-      return std::vector<std::pair<unsigned int, unsigned int>>();
+      return {};
     }
   else
     {
       Assert(false, ExcNotImplemented());
-      return std::vector<std::pair<unsigned int, unsigned int>>();
+      return {};
     }
 }
 
