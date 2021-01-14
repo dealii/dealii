@@ -1162,11 +1162,11 @@ namespace internal
             }
           else
             {
-              col_d[offset_i]        = counter;
-              orientations[offset_i] = ReferenceCell::compute_orientation(
-                ad_entity_types[offset_i],
-                ref_indices,
-                ad_entity_vertices[offset_i]);
+              col_d[offset_i] = counter;
+              orientations[offset_i] =
+                ReferenceCell::compute_orientation(ad_entity_types[offset_i],
+                                                   ad_entity_vertices[offset_i],
+                                                   ref_indices);
             }
         }
       ptr_0.push_back(col_0.size());
