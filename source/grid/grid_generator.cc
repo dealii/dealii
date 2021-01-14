@@ -1308,12 +1308,9 @@ namespace GridGenerator
                 Assert(false, ExcInternalError());
             }
 
-      for (typename Triangulation<dim, spacedim>::cell_iterator cell =
-             tria.begin();
-           cell != tria.end();
-           ++cell)
+      for (const auto &cell : tria.cell_iterators())
         {
-          char id = 0;
+          types::material_id id = 0;
           for (unsigned int d = 0; d < dim; ++d)
             if (cell->center()(d) > 0)
               id += (1 << d);
