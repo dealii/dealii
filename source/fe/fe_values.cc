@@ -4388,10 +4388,8 @@ FEValues<dim, spacedim>::FEValues(const FiniteElement<dim, spacedim> &fe,
       q.size(),
       fe.n_dofs_per_cell(),
       update_default,
-      // TODO: We should query the default mapping for the kind of cell
-      // represented by 'fe' and 'q':
       ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-        ReferenceCell::get_hypercube(dim)),
+        fe.reference_cell_type()),
       fe)
   , quadrature(q)
 {
@@ -4716,10 +4714,8 @@ FEFaceValues<dim, spacedim>::FEFaceValues(
   : FEFaceValuesBase<dim, spacedim>(
       fe.n_dofs_per_cell(),
       update_flags,
-      // TODO: We should query the default mapping for the kind of cell
-      // represented by 'fe' and 'q':
       ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-        ReferenceCell::get_hypercube(dim)),
+        fe.reference_cell_type()),
       fe,
       quadrature)
 {
@@ -4950,10 +4946,8 @@ FESubfaceValues<dim, spacedim>::FESubfaceValues(
   : FEFaceValuesBase<dim, spacedim>(
       fe.n_dofs_per_cell(),
       update_flags,
-      // TODO: We should query the default mapping for the kind of cell
-      // represented by 'fe' and 'q':
       ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-        ReferenceCell::get_hypercube(dim)),
+        fe.reference_cell_type()),
       fe,
       quadrature)
 {
