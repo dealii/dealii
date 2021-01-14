@@ -447,8 +447,8 @@ namespace Utilities
     /**
      * Given the number of locally owned elements @p locally_owned_size,
      * create a 1:1 partitioning of the of elements across the MPI
-     * communicator @p comm. The total size of elements is the sum of @p
-     * locally_owned_size across the MPI communicator.  Each process will
+     * communicator @p comm. The total size of elements is the sum of
+     * @p locally_owned_size across the MPI communicator.  Each process will
      * store contiguous subset of indices, and the index set on process p+1
      * starts at the index one larger than the last one stored on process p.
      */
