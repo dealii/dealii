@@ -517,6 +517,67 @@ public:
   static ParameterHandler prm;
 
   /**
+   * Add the given @p subsection to the global path stored in this class.
+   *
+   * This function changes the behavior of enter_my_subsection(), by
+   * appending a new subsection to the path stored in this class.
+   *
+   * This method can be used to split the parameters of this class into
+   * subsections, while still maintaining the general behavior of this
+   * class.
+   *
+   * An example usage is given by the following snippet:
+   * @code
+   * class MyClass : public ParameterAcceptor
+   * {
+   *   MyClass()
+   *     : ParameterAcceptor("Main section")
+   *   {
+   *     add_parameter("A param", member_var);
+   *     enter_subsection("New section");
+   *     add_parameter("Another param", another_member_var);
+   *     leave_subsection();
+   *   }
+   *
+   * private:
+   *   std::vector<unsigned int> member_var = {1,2};
+   *   std::map<types::boundary_id, std::string> another_member_var;
+   *   ...
+   * };
+   *
+   * int main()
+   * {
+   *   // ParameterAcceptor::initialize()
+   *   MyClass class;
+   *
+   *   // With this call, all derived classes will have their
+   *   // parameters initialized
+   *   ParameterAcceptor::initialize("file.prm");
+   * }
+   * @endcode
+   *
+   * which will produce a parameter file organized as
+   *
+   * @code
+   * subsection Main section
+   *   set A param = 1, 2
+   *   subsection New section
+   *     set Another param =
+   *   end
+   * end
+   * @endcode
+   */
+  void
+  enter_subsection(const std::string &subsection);
+
+  /**
+   * Leave the subsection that was entered by calling the enter_subsection()
+   * function.
+   */
+  void
+  leave_subsection();
+
+  /**
    * Make sure we enter the right subsection of the given parameter.
    */
   void
@@ -547,6 +608,9 @@ private:
 protected:
   /** The subsection name for this class. */
   const std::string section_name;
+
+  /** The subsubsections that are currently active. */
+  std::vector<std::string> subsections;
 };
 
 

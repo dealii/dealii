@@ -57,6 +57,107 @@ namespace Simplex
     }
 
     /**
+     * Set up a vector that contains the unit (reference) cell support points
+     * for FE_Poly and sufficiently similar elements.
+     */
+    template <int dim>
+    std::vector<Point<dim>>
+    unit_support_points_fe_poly(const unsigned int degree)
+    {
+      std::vector<Point<dim>> unit_points;
+      if (dim == 1)
+        {
+          // We don't really have dim = 1 support for simplex elements yet, but
+          // its convenient for populating the face array
+          if (degree >= 1)
+            {
+              unit_points.emplace_back(0.0);
+              unit_points.emplace_back(1.0);
+            }
+          if (degree == 2)
+            {
+              unit_points.emplace_back(0.5);
+            }
+          if (degree > 2)
+            {
+              Assert(false, ExcNotImplemented());
+            }
+        }
+      else if (dim == 2)
+        {
+          if (degree >= 1)
+            {
+              unit_points.emplace_back(0.0, 0.0);
+              unit_points.emplace_back(1.0, 0.0);
+              unit_points.emplace_back(0.0, 1.0);
+            }
+          if (degree == 2)
+            {
+              unit_points.emplace_back(0.5, 0.0);
+              unit_points.emplace_back(0.5, 0.5);
+              unit_points.emplace_back(0.0, 0.5);
+            }
+          if (degree > 3)
+            {
+              Assert(false, ExcNotImplemented());
+            }
+        }
+      else if (dim == 3)
+        {
+          if (degree >= 1)
+            {
+              unit_points.emplace_back(0.0, 0.0, 0.0);
+              unit_points.emplace_back(1.0, 0.0, 0.0);
+              unit_points.emplace_back(0.0, 1.0, 0.0);
+              unit_points.emplace_back(0.0, 0.0, 1.0);
+            }
+          if (degree == 2)
+            {
+              unit_points.emplace_back(0.5, 0.0, 0.0);
+              unit_points.emplace_back(0.5, 0.5, 0.0);
+              unit_points.emplace_back(0.0, 0.5, 0.0);
+              unit_points.emplace_back(0.0, 0.0, 0.5);
+              unit_points.emplace_back(0.5, 0.0, 0.5);
+              unit_points.emplace_back(0.0, 0.5, 0.5);
+            }
+          if (degree == 3)
+            {
+              Assert(false, ExcNotImplemented());
+            }
+        }
+      else
+        {
+          Assert(false, ExcNotImplemented());
+        }
+
+      return unit_points;
+    }
+
+    /**
+     * Set up a vector that contains the unit (reference) cell's faces support
+     * points for FE_Poly and sufficiently similar elements.
+     */
+    template <int dim>
+    std::vector<std::vector<Point<dim - 1>>>
+    unit_face_support_points_fe_poly(const unsigned int degree)
+    {
+      Assert(dim == 2 || dim == 3, ExcNotImplemented());
+      const auto &info = ReferenceCell::internal::Info::get_cell(
+        dim == 2 ? ReferenceCell::Type::Tri : ReferenceCell::Type::Tet);
+      std::vector<std::vector<Point<dim - 1>>> unit_face_points;
+
+      // all faces have the same support points
+      for (auto face_n : info.face_indices())
+        {
+          (void)face_n;
+          unit_face_points.emplace_back(
+            unit_support_points_fe_poly<dim - 1>(degree));
+        }
+
+      return unit_face_points;
+    }
+
+    /**
      * Helper function to set up the dpo vector of FE_DGP for a given @p dim and
      * @p degree.
      */
@@ -212,83 +313,11 @@ namespace Simplex
             .dofs_per_cell,
           std::vector<bool>(1, true)))
   {
-    this->unit_support_points.clear();
-
-    if (dim == 2)
-      {
-        if (degree == 1)
-          {
-            this->unit_support_points.emplace_back(0.0, 0.0);
-            this->unit_support_points.emplace_back(1.0, 0.0);
-            this->unit_support_points.emplace_back(0.0, 1.0);
-
-            // TODO
-            this->unit_face_support_points[0].emplace_back(0.0);
-            this->unit_face_support_points[0].emplace_back(1.0);
-          }
-        else if (degree == 2)
-          {
-            this->unit_support_points.emplace_back(0.0, 0.0);
-            this->unit_support_points.emplace_back(1.0, 0.0);
-            this->unit_support_points.emplace_back(0.0, 1.0);
-            this->unit_support_points.emplace_back(0.5, 0.0);
-            this->unit_support_points.emplace_back(0.5, 0.5);
-            this->unit_support_points.emplace_back(0.0, 0.5);
-
-            // TODO
-            this->unit_face_support_points[0].emplace_back(0.0);
-            this->unit_face_support_points[0].emplace_back(1.0);
-            this->unit_face_support_points[0].emplace_back(0.5);
-          }
-        else
-          {
-            Assert(false, ExcNotImplemented());
-          }
-      }
-    else if (dim == 3)
-      {
-        if (degree == 1)
-          {
-            this->unit_support_points.emplace_back(0.0, 0.0, 0.0);
-            this->unit_support_points.emplace_back(1.0, 0.0, 0.0);
-            this->unit_support_points.emplace_back(0.0, 1.0, 0.0);
-            this->unit_support_points.emplace_back(0.0, 0.0, 1.0);
-
-            // TODO
-            this->unit_face_support_points[0].emplace_back(1.0, 0.0);
-            this->unit_face_support_points[0].emplace_back(0.0, 1.0);
-            this->unit_face_support_points[0].emplace_back(0.0, 0.0);
-          }
-        else if (degree == 2)
-          {
-            this->unit_support_points.emplace_back(0.0, 0.0, 0.0);
-            this->unit_support_points.emplace_back(1.0, 0.0, 0.0);
-            this->unit_support_points.emplace_back(0.0, 1.0, 0.0);
-            this->unit_support_points.emplace_back(0.0, 0.0, 1.0);
-            this->unit_support_points.emplace_back(0.5, 0.0, 0.0);
-            this->unit_support_points.emplace_back(0.5, 0.5, 0.0);
-            this->unit_support_points.emplace_back(0.0, 0.5, 0.0);
-            this->unit_support_points.emplace_back(0.0, 0.0, 0.5);
-            this->unit_support_points.emplace_back(0.5, 0.0, 0.5);
-            this->unit_support_points.emplace_back(0.0, 0.5, 0.5);
-
-            // TODO
-            this->unit_face_support_points[0].emplace_back(1.0, 0.0);
-            this->unit_face_support_points[0].emplace_back(0.0, 1.0);
-            this->unit_face_support_points[0].emplace_back(0.0, 0.0);
-            this->unit_face_support_points[0].emplace_back(0.5, 0.5);
-            this->unit_face_support_points[0].emplace_back(0.0, 0.5);
-            this->unit_face_support_points[0].emplace_back(0.5, 0.0);
-          }
-        else
-          {
-            Assert(false, ExcNotImplemented());
-          }
-      }
-    else
-      {
-        Assert(false, ExcNotImplemented());
-      }
+    this->unit_support_points = unit_support_points_fe_poly<dim>(degree);
+    // Discontinuous elements don't have face support points
+    if (conformity == FiniteElementData<dim>::Conformity::H1)
+      this->unit_face_support_points =
+        unit_face_support_points_fe_poly<dim>(degree);
   }
 
 

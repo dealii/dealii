@@ -2188,11 +2188,10 @@ namespace FETools
 
   template <int dim, typename number, int spacedim>
   void
-  compute_projection_matrices(const FiniteElement<dim, spacedim> &fe,
-                              std::vector<std::vector<FullMatrix<number>>
-
-                                          > &                     matrices,
-                              const bool isotropic_only)
+  compute_projection_matrices(
+    const FiniteElement<dim, spacedim> &          fe,
+    std::vector<std::vector<FullMatrix<number>>> &matrices,
+    const bool                                    isotropic_only)
   {
     const unsigned int n      = fe.n_dofs_per_cell();
     const unsigned int nd     = fe.n_components();

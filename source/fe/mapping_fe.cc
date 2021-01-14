@@ -914,7 +914,7 @@ MappingFE<dim, spacedim>::transform_real_to_unit_cell(
   (void)cell;
   (void)p;
 
-  return Point<dim>();
+  return {};
 }
 
 

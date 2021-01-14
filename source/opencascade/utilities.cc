@@ -841,7 +841,7 @@ namespace OpenCASCADE
         default:
           Assert(false, ExcUnsupportedShape());
       }
-    return Point<dim>();
+    return {};
   }
 
   std::tuple<Point<3>, Tensor<1, 3>, double, double>

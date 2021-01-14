@@ -317,10 +317,11 @@ namespace VectorTools
                              Vector<double> &                 rhs_vector)
   {
     if (dof_handler.has_hp_capabilities())
-      create_point_source_vector(hp::StaticMappingQ1<dim>::mapping_collection,
-                                 dof_handler,
-                                 p,
-                                 rhs_vector);
+      create_point_source_vector(
+        hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
+        dof_handler,
+        p,
+        rhs_vector);
     else
       create_point_source_vector(StaticMappingQ1<dim, spacedim>::mapping,
                                  dof_handler,
@@ -421,11 +422,12 @@ namespace VectorTools
                              Vector<double> &                 rhs_vector)
   {
     if (dof_handler.has_hp_capabilities())
-      create_point_source_vector(hp::StaticMappingQ1<dim>::mapping_collection,
-                                 dof_handler,
-                                 p,
-                                 orientation,
-                                 rhs_vector);
+      create_point_source_vector(
+        hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
+        dof_handler,
+        p,
+        orientation,
+        rhs_vector);
     else
       create_point_source_vector(StaticMappingQ1<dim, spacedim>::mapping,
                                  dof_handler,
