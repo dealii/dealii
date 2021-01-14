@@ -85,6 +85,11 @@ jobs:
         make -j 2
     - name: test
       run: |
+        # Remove warning: "A high-performance Open MPI point-to-point
+        # messaging module was unable to find any relevant network
+        # interfaces."
+        export OMPI_MCA_btl_base_warn_component_unused='0'
+        
         cd build
         make -j 2 setup_tests_simplex
         ctest --output-on-failure -j 2
