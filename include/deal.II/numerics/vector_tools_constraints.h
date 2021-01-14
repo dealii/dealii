@@ -303,7 +303,7 @@ namespace VectorTools
     const std::set<types::boundary_id> &boundary_ids,
     AffineConstraints<double> &         constraints,
     const Mapping<dim, spacedim> &      mapping =
-      ReferenceCell::get_default_linear_mapping<dim,spacedim>(
+      ReferenceCell::get_default_linear_mapping<dim, spacedim>(
         ReferenceCell::get_hypercube(dim)));
 
   /**
@@ -332,7 +332,7 @@ namespace VectorTools
       &                           function_map,
     AffineConstraints<double> &   constraints,
     const Mapping<dim, spacedim> &mapping =
-      ReferenceCell::get_default_linear_mapping<dim,spacedim>(
+      ReferenceCell::get_default_linear_mapping<dim, spacedim>(
         ReferenceCell::get_hypercube(dim)));
 
   /**
@@ -351,7 +351,7 @@ namespace VectorTools
     const std::set<types::boundary_id> &boundary_ids,
     AffineConstraints<double> &         constraints,
     const Mapping<dim, spacedim> &      mapping =
-      ReferenceCell::get_default_linear_mapping<dim,spacedim>(
+      ReferenceCell::get_default_linear_mapping<dim, spacedim>(
         ReferenceCell::get_hypercube(dim)));
 
   //@}
