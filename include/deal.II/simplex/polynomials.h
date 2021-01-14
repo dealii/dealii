@@ -57,7 +57,8 @@ namespace Simplex
     /**
      * @copydoc ScalarPolynomialsBase::evaluate()
      *
-     * @note Currently, only the vectors @p values and @p grads are filled.
+     * @note Currently, only the vectors @p values, @p grads, and @p grad_grads
+     *   are filled.
      */
     void
     evaluate(const Point<dim> &           unit_point,
@@ -76,7 +77,7 @@ namespace Simplex
     /**
      * @copydoc ScalarPolynomialsBase::compute_derivative()
      *
-     * @note Currently, only implemented for first derivative.
+     * @note Currently, only implemented for first and second derivative.
      */
     template <int order>
     Tensor<order, dim>
@@ -91,8 +92,6 @@ namespace Simplex
 
     /**
      * @copydoc ScalarPolynomialsBase::compute_2nd_derivative()
-     *
-     * @note Not implemented yet.
      */
     Tensor<2, dim>
     compute_2nd_derivative(const unsigned int i,
@@ -334,8 +333,6 @@ namespace Simplex
 
     /**
      * @copydoc ScalarPolynomialsBase::compute_2nd_derivative()
-     *
-     * @note Not implemented yet.
      */
     Tensor<2, dim>
     compute_2nd_derivative(const unsigned int i,
@@ -397,15 +394,34 @@ namespace Simplex
   ScalarPolynomial<dim>::compute_derivative(const unsigned int i,
                                             const Point<dim> & p) const
   {
-    Tensor<order, dim> der;
+    Tensor<order, dim> derivative;
 
-    AssertDimension(order, 1);
-    const auto grad = compute_grad(i, p);
+    if (order == 1)
+      {
+        Tensor<1, dim> &derivative_1 =
+          *reinterpret_cast<Tensor<1, dim> *>(&derivative);
 
-    for (unsigned int i = 0; i < dim; i++)
-      der[i] = grad[i];
+        const auto grad = compute_grad(i, p);
+        for (unsigned int i = 0; i < dim; ++i)
+          derivative_1[i] = grad[i];
+      }
+    else if (order == 2)
+      {
+        Tensor<2, dim> &derivative_2 =
+          *reinterpret_cast<Tensor<2, dim> *>(&derivative);
 
-    return der;
+        const auto grad_grad = compute_grad_grad(i, p);
+
+        for (unsigned int i = 0; i < dim; ++i)
+          for (unsigned int j = 0; j < dim; ++j)
+            derivative_2[i][j] = grad_grad[i][j];
+      }
+    else
+      {
+        Assert(false, ExcNotImplemented());
+      }
+
+    return derivative;
   }
 
 
