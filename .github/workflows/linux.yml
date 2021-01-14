@@ -20,7 +20,7 @@ jobs:
         cmake --version
     - name: configure
       run: |
-        cmake -D CMAKE_BUILD_TYPE=Release -D DEAL_II_CXX_FLAGS='-Werror' .
+        cmake -D CMAKE_BUILD_TYPE=Release -D DEAL_II_CXX_FLAGS='-Werror' -D DEAL_II_EARLY_DEPRECATIONS=ON .
     - name: archive
       uses: actions/upload-artifact@v1
       with:
@@ -58,6 +58,7 @@ jobs:
       run: |
         cmake -D CMAKE_BUILD_TYPE=Debug \
               -D DEAL_II_CXX_FLAGS='-Werror' \
+              -D DEAL_II_EARLY_DEPRECATIONS=ON \
               -D DEAL_II_WITH_MPI="ON" \
               -D DEAL_II_WITH_SIMPLEX_SUPPORT="ON" \
               -D DEAL_II_WITH_TRILINOS="ON" \
@@ -115,6 +116,7 @@ jobs:
         cmake -D CMAKE_BUILD_TYPE=Debug \
               -D DEAL_II_CUDA_FLAGS='-arch=sm_70' \
               -D DEAL_II_CXX_FLAGS='-Werror -Wno-non-template-friend' \
+              -D DEAL_II_EARLY_DEPRECATIONS=ON \
               -D DEAL_II_WITH_CUDA="ON" \
               -D DEAL_II_WITH_MPI="ON" \
               -D DEAL_II_WITH_P4EST="ON" \
