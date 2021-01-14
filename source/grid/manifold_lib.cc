@@ -855,7 +855,7 @@ namespace
                    const Point<spacedim> & /*candidate_point*/)
   {
     Assert(false, ExcNotImplemented());
-    return Point<spacedim>();
+    return {};
   }
 
   template <>
@@ -990,7 +990,7 @@ SphericalManifold<dim, spacedim>::get_new_point(
   const Point<spacedim> &) const
 {
   Assert(false, ExcNotImplemented());
-  return Point<spacedim>();
+  return {};
 }
 
 
@@ -1260,7 +1260,7 @@ Point<spacedim>
 EllipticalManifold<dim, spacedim>::push_forward(const Point<spacedim> &) const
 {
   Assert(false, ExcNotImplemented());
-  return Point<spacedim>();
+  return {};
 }
 
 
@@ -1288,7 +1288,7 @@ Point<spacedim>
 EllipticalManifold<dim, spacedim>::pull_back(const Point<spacedim> &) const
 {
   Assert(false, ExcNotImplemented());
-  return Point<spacedim>();
+  return {};
 }
 
 
@@ -2374,7 +2374,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
           Assert(false, ExcInternalError());
       }
 
-    return Point<dim>();
+    return {};
   };
 
   // Function that can guess the location of a chart point by assuming that

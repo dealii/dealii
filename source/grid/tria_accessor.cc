@@ -1245,7 +1245,7 @@ namespace
     // this function catches all the cases not
     // explicitly handled above
     Assert(false, ExcNotImplemented());
-    return Point<spacedim>();
+    return {};
   }
 
 

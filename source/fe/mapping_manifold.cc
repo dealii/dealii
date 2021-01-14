@@ -163,7 +163,7 @@ MappingManifold<dim, spacedim>::transform_real_to_unit_cell(
   const Point<spacedim> &) const
 {
   Assert(false, ExcNotImplemented());
-  return Point<dim>();
+  return {};
 }
 
 
