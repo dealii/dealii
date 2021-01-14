@@ -917,14 +917,12 @@ MappingFE<dim, spacedim>::transform_real_to_unit_cell(
 
   Point<dim> p_unit;
 
-  Tensor<1, dim> grad_FT_residual;
-
   unsigned int loop = 0;
 
   // This loop solves the following problem:
-  // grad_F^T residual + (grad_F^T grad_F + grad_F^T hesss_F dp) dp = 0
+  // grad_F^T residual + (grad_F^T grad_F + grad_F^T hess_F^T dp) dp = 0
   // where the term
-  // (grad_F^T hess_F dp) is approximated by (hess_F * residual)
+  // (grad_F^T hess_F dp) is approximated by (-hess_F * residual)
   // This is basically a second order approximation of Newton method, where the
   // Jacobian is corrected with a higher order term coming from the hessian.
   do
@@ -933,24 +931,20 @@ MappingFE<dim, spacedim>::transform_real_to_unit_cell(
 
       // Transpose of the gradient map
       DerivativeForm<1, spacedim, dim> grad_FT;
+      Tensor<1, dim>                   grad_FT_residual;
       Tensor<2, dim>                   corrected_metric_tensor;
+      DerivativeForm<2, spacedim, dim> hess_FT;
 
-      // [TODO]
-      // When 2nd derivatives are implemented, we'll uncomment this
-      // DerivativeForm<2, spacedim, dim> hess_FT;
       for (unsigned int i = 0; i < this->fe->n_dofs_per_cell(); ++i)
         {
           mapped_point += support_points[i] * this->fe->shape_value(i, p_unit);
-          const auto grad_F_i = this->fe->shape_grad(i, p_unit);
-          // [TODO]
-          // When 2nd derivatives are implemented, we'll uncomment this
-          // auto hessian_k = this->fe->shape_grad_grad(i, p_unit);
+          const auto grad_F_i    = this->fe->shape_grad(i, p_unit);
+          const auto hessian_F_i = this->fe->shape_grad_grad(i, p_unit);
           for (unsigned int j = 0; j < dim; ++j)
             {
               grad_FT[j] += grad_F_i[j] * support_points[i];
-              // [TODO]
-              // When 2nd derivatives are implemented, we'll uncomment this
-              // hess_FT[j] += hessian_k[j] * support_points[i];
+              for (unsigned int l = 0; l < dim; ++l)
+                hess_FT[j][l] += hessian_F_i[j][l] * support_points[i];
             }
         }
 
@@ -966,12 +960,12 @@ MappingFE<dim, spacedim>::transform_real_to_unit_cell(
         break;
 
       // Now compute the (corrected) metric tensor
-      corrected_metric_tensor = -apply_transformation(grad_FT, grad_FT);
+      for (unsigned int j = 0; j < dim; ++j)
+        for (unsigned int l = 0; l < dim; ++l)
+          corrected_metric_tensor[j][l] =
+            -grad_FT[j] * grad_FT[l] + hess_FT[j][l] * residual;
 
-      // [TODO]
-      // When 2nd derivatives are implemented, we'll uncomment this
-      // corrected_metric_tensor += apply_transformation(hess_FT, residual);
-
+      // And compute the update
       auto g_inverse = invert(corrected_metric_tensor);
       p_unit -= Point<dim>(g_inverse * grad_FT_residual);
 
