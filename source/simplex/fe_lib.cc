@@ -16,6 +16,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_tools.h>
 
@@ -423,14 +424,42 @@ namespace Simplex
   FE_P<dim, spacedim>::hp_vertex_dof_identities(
     const FiniteElement<dim, spacedim> &fe_other) const
   {
-    (void)fe_other;
-
-    Assert((dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
-           ExcNotImplemented());
     AssertDimension(dim, 2);
-    AssertDimension(this->degree, fe_other.tensor_degree());
 
-    return {{0, 0}};
+    if (dynamic_cast<const FE_P<dim, spacedim> *>(&fe_other) != nullptr)
+      {
+        // there should be exactly one single DoF of each FE at a vertex, and
+        // they should have identical value
+        return {{0U, 0U}};
+      }
+    else if (dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other) != nullptr)
+      {
+        // there should be exactly one single DoF of each FE at a vertex, and
+        // they should have identical value
+        return {{0U, 0U}};
+      }
+    else if (dynamic_cast<const FE_Nothing<dim> *>(&fe_other) != nullptr)
+      {
+        // the FE_Nothing has no degrees of freedom, so there are no
+        // equivalencies to be recorded
+        return {};
+      }
+    else if (fe_other.n_unique_faces() == 1 && fe_other.n_dofs_per_face(0) == 0)
+      {
+        // if the other element has no elements on faces at all,
+        // then it would be impossible to enforce any kind of
+        // continuity even if we knew exactly what kind of element
+        // we have -- simply because the other element declares
+        // that it is discontinuous because it has no DoFs on
+        // its faces. in that case, just state that we have no
+        // constraints to declare
+        return {};
+      }
+    else
+      {
+        Assert(false, ExcNotImplemented());
+        return {};
+      }
   }
 
 
