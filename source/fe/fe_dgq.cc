@@ -30,6 +30,8 @@
 
 #include <deal.II/lac/vector.h>
 
+#include <deal.II/simplex/fe_lib.h>
+
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -690,6 +692,16 @@ FE_DGQ<dim, spacedim>::compare_for_domination(
       if (this->degree < fe_hierarchical_other->degree)
         return FiniteElementDomination::this_element_dominates;
       else if (this->degree == fe_hierarchical_other->degree)
+        return FiniteElementDomination::either_element_can_dominate;
+      else
+        return FiniteElementDomination::other_element_dominates;
+    }
+  else if (const Simplex::FE_DGP<dim, spacedim> *fe_dgp_other =
+             dynamic_cast<const Simplex::FE_DGP<dim, spacedim> *>(&fe_other))
+    {
+      if (this->degree < fe_dgp_other->degree)
+        return FiniteElementDomination::this_element_dominates;
+      else if (this->degree == fe_dgp_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;

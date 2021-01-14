@@ -16,6 +16,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_tools.h>
 
@@ -434,15 +435,55 @@ namespace Simplex
     const FiniteElement<dim, spacedim> &fe_other,
     const unsigned int                  codim) const
   {
-    (void)fe_other;
-    (void)codim;
+    Assert(codim <= dim, ExcImpossibleInDim(dim));
 
-    Assert((dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
-           ExcNotImplemented());
-    AssertDimension(dim, 2);
-    AssertDimension(this->degree, fe_other.tensor_degree());
+    // vertex/line/face domination
+    // (if fe_other is derived from FE_DGP)
+    // ------------------------------------
+    if (codim > 0)
+      if (dynamic_cast<const FE_DGP<dim, spacedim> *>(&fe_other) != nullptr)
+        // there are no requirements between continuous and discontinuous
+        // elements
+        return FiniteElementDomination::no_requirements;
 
-    return FiniteElementDomination::either_element_can_dominate;
+    // vertex/line/face domination
+    // (if fe_other is not derived from FE_DGP)
+    // & cell domination
+    // ----------------------------------------
+    if (const FE_P<dim, spacedim> *fe_p_other =
+          dynamic_cast<const FE_P<dim, spacedim> *>(&fe_other))
+      {
+        if (this->degree < fe_p_other->degree)
+          return FiniteElementDomination::this_element_dominates;
+        else if (this->degree == fe_p_other->degree)
+          return FiniteElementDomination::either_element_can_dominate;
+        else
+          return FiniteElementDomination::other_element_dominates;
+      }
+    else if (const FE_Q<dim, spacedim> *fe_q_other =
+               dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other))
+      {
+        if (this->degree < fe_q_other->degree)
+          return FiniteElementDomination::this_element_dominates;
+        else if (this->degree == fe_q_other->degree)
+          return FiniteElementDomination::either_element_can_dominate;
+        else
+          return FiniteElementDomination::other_element_dominates;
+      }
+    else if (const FE_Nothing<dim, spacedim> *fe_nothing =
+               dynamic_cast<const FE_Nothing<dim, spacedim> *>(&fe_other))
+      {
+        if (fe_nothing->is_dominating())
+          return FiniteElementDomination::other_element_dominates;
+        else
+          // the FE_Nothing has no degrees of freedom and it is typically used
+          // in a context where we don't require any continuity along the
+          // interface
+          return FiniteElementDomination::no_requirements;
+      }
+
+    Assert(false, ExcNotImplemented());
+    return FiniteElementDomination::neither_element_dominates;
   }
 
 
@@ -521,15 +562,52 @@ namespace Simplex
     const FiniteElement<dim, spacedim> &fe_other,
     const unsigned int                  codim) const
   {
-    (void)fe_other;
-    (void)codim;
+    Assert(codim <= dim, ExcImpossibleInDim(dim));
 
-    Assert((dynamic_cast<const FE_DGQ<dim, spacedim> *>(&fe_other)),
-           ExcNotImplemented());
-    AssertDimension(dim, 2);
-    AssertDimension(this->degree, fe_other.tensor_degree());
+    // vertex/line/face domination
+    // ---------------------------
+    if (codim > 0)
+      // this is a discontinuous element, so by definition there will
+      // be no constraints wherever this element comes together with
+      // any other kind of element
+      return FiniteElementDomination::no_requirements;
 
-    return FiniteElementDomination::either_element_can_dominate;
+    // cell domination
+    // ---------------
+    if (const FE_DGP<dim, spacedim> *fe_dgp_other =
+          dynamic_cast<const FE_DGP<dim, spacedim> *>(&fe_other))
+      {
+        if (this->degree < fe_dgp_other->degree)
+          return FiniteElementDomination::this_element_dominates;
+        else if (this->degree == fe_dgp_other->degree)
+          return FiniteElementDomination::either_element_can_dominate;
+        else
+          return FiniteElementDomination::other_element_dominates;
+      }
+    else if (const FE_DGQ<dim, spacedim> *fe_dgq_other =
+               dynamic_cast<const FE_DGQ<dim, spacedim> *>(&fe_other))
+      {
+        if (this->degree < fe_dgq_other->degree)
+          return FiniteElementDomination::this_element_dominates;
+        else if (this->degree == fe_dgq_other->degree)
+          return FiniteElementDomination::either_element_can_dominate;
+        else
+          return FiniteElementDomination::other_element_dominates;
+      }
+    else if (const FE_Nothing<dim, spacedim> *fe_nothing =
+               dynamic_cast<const FE_Nothing<dim, spacedim> *>(&fe_other))
+      {
+        if (fe_nothing->is_dominating())
+          return FiniteElementDomination::other_element_dominates;
+        else
+          // the FE_Nothing has no degrees of freedom and it is typically used
+          // in a context where we don't require any continuity along the
+          // interface
+          return FiniteElementDomination::no_requirements;
+      }
+
+    Assert(false, ExcNotImplemented());
+    return FiniteElementDomination::neither_element_dominates;
   }
 
 
@@ -630,14 +708,66 @@ namespace Simplex
     const FiniteElement<dim, spacedim> &fe_other,
     const unsigned int                  codim) const
   {
-    (void)fe_other;
-    (void)codim;
+    Assert(codim <= dim, ExcImpossibleInDim(dim));
 
-    Assert((dynamic_cast<const Simplex::FE_P<dim, spacedim> *>(&fe_other)) ||
-             (dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
-           ExcNotImplemented());
+    // vertex/line/face domination
+    // (if fe_other is derived from FE_DGP)
+    // ------------------------------------
+    if (codim > 0)
+      if (dynamic_cast<const FE_DGP<dim, spacedim> *>(&fe_other) != nullptr)
+        // there are no requirements between continuous and discontinuous
+        // elements
+        return FiniteElementDomination::no_requirements;
 
-    return FiniteElementDomination::this_element_dominates;
+
+    // vertex/line/face domination
+    // (if fe_other is not derived from FE_DGP)
+    // & cell domination
+    // ----------------------------------------
+    if (const FE_WedgeP<dim, spacedim> *fe_wp_other =
+          dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other))
+      {
+        if (this->degree < fe_wp_other->degree)
+          return FiniteElementDomination::this_element_dominates;
+        else if (this->degree == fe_wp_other->degree)
+          return FiniteElementDomination::either_element_can_dominate;
+        else
+          return FiniteElementDomination::other_element_dominates;
+      }
+    else if (const FE_P<dim, spacedim> *fe_p_other =
+               dynamic_cast<const FE_P<dim, spacedim> *>(&fe_other))
+      {
+        if (this->degree < fe_p_other->degree)
+          return FiniteElementDomination::this_element_dominates;
+        else if (this->degree == fe_p_other->degree)
+          return FiniteElementDomination::either_element_can_dominate;
+        else
+          return FiniteElementDomination::other_element_dominates;
+      }
+    else if (const FE_Q<dim, spacedim> *fe_q_other =
+               dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other))
+      {
+        if (this->degree < fe_q_other->degree)
+          return FiniteElementDomination::this_element_dominates;
+        else if (this->degree == fe_q_other->degree)
+          return FiniteElementDomination::either_element_can_dominate;
+        else
+          return FiniteElementDomination::other_element_dominates;
+      }
+    else if (const FE_Nothing<dim> *fe_nothing =
+               dynamic_cast<const FE_Nothing<dim> *>(&fe_other))
+      {
+        if (fe_nothing->is_dominating())
+          return FiniteElementDomination::other_element_dominates;
+        else
+          // the FE_Nothing has no degrees of freedom and it is typically used
+          // in a context where we don't require any continuity along the
+          // interface
+          return FiniteElementDomination::no_requirements;
+      }
+
+    Assert(false, ExcNotImplemented());
+    return FiniteElementDomination::neither_element_dominates;
   }
 
 
@@ -812,14 +942,65 @@ namespace Simplex
     const FiniteElement<dim, spacedim> &fe_other,
     const unsigned int                  codim) const
   {
-    (void)fe_other;
-    (void)codim;
+    Assert(codim <= dim, ExcImpossibleInDim(dim));
 
-    Assert((dynamic_cast<const Simplex::FE_P<dim, spacedim> *>(&fe_other)) ||
-             (dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
-           ExcNotImplemented());
+    // vertex/line/face domination
+    // (if fe_other is derived from FE_DGP)
+    // ------------------------------------
+    if (codim > 0)
+      if (dynamic_cast<const FE_DGP<dim, spacedim> *>(&fe_other) != nullptr)
+        // there are no requirements between continuous and discontinuous
+        // elements
+        return FiniteElementDomination::no_requirements;
 
-    return FiniteElementDomination::this_element_dominates;
+    // vertex/line/face domination
+    // (if fe_other is not derived from FE_DGP)
+    // & cell domination
+    // ----------------------------------------
+    if (const FE_PyramidP<dim, spacedim> *fe_pp_other =
+          dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other))
+      {
+        if (this->degree < fe_pp_other->degree)
+          return FiniteElementDomination::this_element_dominates;
+        else if (this->degree == fe_pp_other->degree)
+          return FiniteElementDomination::either_element_can_dominate;
+        else
+          return FiniteElementDomination::other_element_dominates;
+      }
+    else if (const FE_P<dim, spacedim> *fe_p_other =
+               dynamic_cast<const FE_P<dim, spacedim> *>(&fe_other))
+      {
+        if (this->degree < fe_p_other->degree)
+          return FiniteElementDomination::this_element_dominates;
+        else if (this->degree == fe_p_other->degree)
+          return FiniteElementDomination::either_element_can_dominate;
+        else
+          return FiniteElementDomination::other_element_dominates;
+      }
+    else if (const FE_Q<dim, spacedim> *fe_q_other =
+               dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other))
+      {
+        if (this->degree < fe_q_other->degree)
+          return FiniteElementDomination::this_element_dominates;
+        else if (this->degree == fe_q_other->degree)
+          return FiniteElementDomination::either_element_can_dominate;
+        else
+          return FiniteElementDomination::other_element_dominates;
+      }
+    else if (const FE_Nothing<dim, spacedim> *fe_nothing =
+               dynamic_cast<const FE_Nothing<dim, spacedim> *>(&fe_other))
+      {
+        if (fe_nothing->is_dominating())
+          return FiniteElementDomination::other_element_dominates;
+        else
+          // the FE_Nothing has no degrees of freedom and it is typically used
+          // in a context where we don't require any continuity along the
+          // interface
+          return FiniteElementDomination::no_requirements;
+      }
+
+    Assert(false, ExcNotImplemented());
+    return FiniteElementDomination::neither_element_dominates;
   }
 
 
