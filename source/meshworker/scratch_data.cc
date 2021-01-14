@@ -74,12 +74,16 @@ namespace MeshWorker
     const UpdateFlags &                 update_flags,
     const Quadrature<dim - 1> &         face_quadrature,
     const UpdateFlags &                 face_update_flags)
-    : ScratchData(StaticMappingQ1<dim, spacedim>::mapping,
-                  fe,
-                  quadrature,
-                  update_flags,
-                  face_quadrature,
-                  face_update_flags)
+    : ScratchData(
+        // TODO: We should query the default mapping for the kind of cell
+        // represented by 'fe' and 'q':
+        ReferenceCell::get_default_linear_mapping<dim, spacedim>(
+          ReferenceCell::get_hypercube(dim)),
+        fe,
+        quadrature,
+        update_flags,
+        face_quadrature,
+        face_update_flags)
   {}
 
 
@@ -93,14 +97,18 @@ namespace MeshWorker
     const Quadrature<dim - 1> &         face_quadrature,
     const UpdateFlags &                 face_update_flags,
     const UpdateFlags &                 neighbor_face_update_flags)
-    : ScratchData(StaticMappingQ1<dim, spacedim>::mapping,
-                  fe,
-                  quadrature,
-                  update_flags,
-                  neighbor_update_flags,
-                  face_quadrature,
-                  face_update_flags,
-                  neighbor_face_update_flags)
+    : ScratchData(
+        // TODO: We should query the default mapping for the kind of cell
+        // represented by 'fe' and 'q':
+        ReferenceCell::get_default_linear_mapping<dim, spacedim>(
+          ReferenceCell::get_hypercube(dim)),
+        fe,
+        quadrature,
+        update_flags,
+        neighbor_update_flags,
+        face_quadrature,
+        face_update_flags,
+        neighbor_face_update_flags)
   {}
 
 

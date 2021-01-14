@@ -340,12 +340,30 @@ namespace ReferenceCell
                      Triangulation<dim, spacedim> &tria);
 
   /**
-   * Return a default linear mapping matching the given reference cell
-   * (MappingQ1 for hypercube cells and MappingFE else).
+   * Return a default linear mapping matching the given reference cell.
+   * If this reference cell is a hypercube, then the returned mapping
+   * is a MappingQ1; otherwise, it is an object of type MappingFE
+   * initialized with Simplex::FE_P (if the reference cell is a triangle and
+   * tetrahedron), with Simplex::FE_PyramidP (if the reference cell is a
+   * pyramid), or with Simplex::FE_WedgeP (if the reference cell is a wedge). In
+   * other words, the term "linear" in the name of the function has to be
+   * understood as $d$-linear (i.e., bilinear or trilinear) for some of the
+   * coordinate directions.
    */
   template <int dim, int spacedim>
   const Mapping<dim, spacedim> &
   get_default_linear_mapping(const Type &reference_cell);
+
+  /**
+   * Return a default linear mapping that works for the given triangulation.
+   * Internally, this function calls the function above for the reference
+   * cell used by the given triangulation, assuming that the triangulation
+   * uses only a single cell type. If the triangulation uses mixed cell
+   * types, then this function will trigger an exception.
+   */
+  template <int dim, int spacedim>
+  const Mapping<dim, spacedim> &
+  get_default_linear_mapping(const Triangulation<dim, spacedim> &triangulation);
 
   /**
    * Return a Gauss-type quadrature matching the given reference cell(QGauss,
