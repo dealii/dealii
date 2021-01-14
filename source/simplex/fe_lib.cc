@@ -69,60 +69,52 @@ namespace Simplex
         {
           // We don't really have dim = 1 support for simplex elements yet, but
           // its convenient for populating the face array
+          Assert(degree <= 2, ExcNotImplemented());
           if (degree >= 1)
             {
               unit_points.emplace_back(0.0);
               unit_points.emplace_back(1.0);
-            }
-          if (degree == 2)
-            {
-              unit_points.emplace_back(0.5);
-            }
-          if (degree > 2)
-            {
-              Assert(false, ExcNotImplemented());
+
+              if (degree == 2)
+                unit_points.emplace_back(0.5);
             }
         }
       else if (dim == 2)
         {
+          Assert(degree <= 2, ExcNotImplemented());
           if (degree >= 1)
             {
               unit_points.emplace_back(0.0, 0.0);
               unit_points.emplace_back(1.0, 0.0);
               unit_points.emplace_back(0.0, 1.0);
-            }
-          if (degree == 2)
-            {
-              unit_points.emplace_back(0.5, 0.0);
-              unit_points.emplace_back(0.5, 0.5);
-              unit_points.emplace_back(0.0, 0.5);
-            }
-          if (degree > 3)
-            {
-              Assert(false, ExcNotImplemented());
+
+              if (degree == 2)
+                {
+                  unit_points.emplace_back(0.5, 0.0);
+                  unit_points.emplace_back(0.5, 0.5);
+                  unit_points.emplace_back(0.0, 0.5);
+                }
             }
         }
       else if (dim == 3)
         {
+          Assert(degree <= 2, ExcNotImplemented());
           if (degree >= 1)
             {
               unit_points.emplace_back(0.0, 0.0, 0.0);
               unit_points.emplace_back(1.0, 0.0, 0.0);
               unit_points.emplace_back(0.0, 1.0, 0.0);
               unit_points.emplace_back(0.0, 0.0, 1.0);
-            }
-          if (degree == 2)
-            {
-              unit_points.emplace_back(0.5, 0.0, 0.0);
-              unit_points.emplace_back(0.5, 0.5, 0.0);
-              unit_points.emplace_back(0.0, 0.5, 0.0);
-              unit_points.emplace_back(0.0, 0.0, 0.5);
-              unit_points.emplace_back(0.5, 0.0, 0.5);
-              unit_points.emplace_back(0.0, 0.5, 0.5);
-            }
-          if (degree == 3)
-            {
-              Assert(false, ExcNotImplemented());
+
+              if (degree == 2)
+                {
+                  unit_points.emplace_back(0.5, 0.0, 0.0);
+                  unit_points.emplace_back(0.5, 0.5, 0.0);
+                  unit_points.emplace_back(0.0, 0.5, 0.0);
+                  unit_points.emplace_back(0.0, 0.0, 0.5);
+                  unit_points.emplace_back(0.5, 0.0, 0.5);
+                  unit_points.emplace_back(0.0, 0.5, 0.5);
+                }
             }
         }
       else
