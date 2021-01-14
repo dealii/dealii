@@ -512,20 +512,39 @@ namespace DoFTools
         for (unsigned int row = 0; row != n_dependent_dofs; ++row)
           if (constraints.is_constrained(dependent_dofs[row]) == false)
             {
-              bool constraint_already_satisfied = false;
+              // Check if we have an identity constraint, i.e.,
+              // something of the form
+              //   U(dependent_dof[row])==U(primary_dof[row]),
+              // where
+              //   dependent_dof[row] == primary_dof[row].
+              // This can happen in the hp context where we have previously
+              // unified DoF indices, for example, the middle node on the
+              // face of a Q4 element will have gotten the same index
+              // as the middle node of the Q2 element on the neighbor
+              // cell. But because the other Q4 nodes will still have to be
+              // constrained, so the middle node shows up again here.
+              //
+              // If we find such a constraint, then it is trivially
+              // satisfied, and we can move on to the next dependent
+              // DoF (row). The only thing we should make sure is that the
+              // row of the matrix really just contains this one entry.
+              bool is_trivial_constraint = false;
 
-              // Check if we have an identity constraint, which is already
-              // satisfied by unification of the corresponding global dof
-              // indices
               for (unsigned int i = 0; i < n_primary_dofs; ++i)
                 if (face_constraints(row, i) == 1.0)
-                  if (primary_dofs[i] == dependent_dofs[row])
+                  if (dependent_dofs[row] == primary_dofs[i])
                     {
-                      constraint_already_satisfied = true;
+                      is_trivial_constraint = true;
+
+                      for (unsigned int ii = 0; ii < n_primary_dofs; ++ii)
+                        if (ii != i)
+                          Assert(face_constraints(row, ii) == 0.0,
+                                 ExcInternalError());
+
                       break;
                     }
 
-              if (constraint_already_satisfied == false)
+              if (is_trivial_constraint == false)
                 {
                   // add up the absolute values of all constraints in this line
                   // to get a measure of their absolute size
