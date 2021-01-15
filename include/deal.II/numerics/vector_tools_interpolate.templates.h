@@ -531,7 +531,8 @@ namespace VectorTools
     VectorType &                                               vec,
     const ComponentMask &                                      component_mask)
   {
-    interpolate(StaticMappingQ1<dim, spacedim>::mapping,
+    interpolate(ReferenceCell::get_default_linear_mapping(
+                  dof.get_triangulation()),
                 dof,
                 function,
                 vec,

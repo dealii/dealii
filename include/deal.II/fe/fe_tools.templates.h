@@ -2292,7 +2292,8 @@ namespace FETools
                 q_points_coarse[q](j) = q_points_fine[q](j);
             Quadrature<dim> q_coarse(q_points_coarse, fine.get_JxW_values());
             FEValues<dim, spacedim> coarse(
-              StaticMappingQ1<dim, spacedim>::mapping,
+              ReferenceCell::get_default_linear_mapping<dim, spacedim>(
+                coarse_cell->reference_cell_type()),
               fe,
               q_coarse,
               update_values);

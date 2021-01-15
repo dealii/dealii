@@ -1055,7 +1055,8 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   const types::material_id  material_id,
   const Strategy            strategy)
 {
-  estimate(StaticMappingQ1<dim, spacedim>::mapping,
+  estimate(ReferenceCell::get_default_linear_mapping<dim, spacedim>(
+             dof_handler.get_triangulation()),
            dof_handler,
            quadrature,
            neumann_bc,
@@ -1125,7 +1126,8 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   const types::material_id  material_id,
   const Strategy            strategy)
 {
-  estimate(StaticMappingQ1<dim, spacedim>::mapping,
+  estimate(ReferenceCell::get_default_linear_mapping<dim, spacedim>(
+             dof_handler.get_triangulation()),
            dof_handler,
            quadrature,
            neumann_bc,
@@ -1370,7 +1372,8 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   const types::material_id                material_id,
   const Strategy                          strategy)
 {
-  estimate(StaticMappingQ1<dim, spacedim>::mapping,
+  estimate(ReferenceCell::get_default_linear_mapping<dim, spacedim>(
+             dof_handler.get_triangulation()),
            dof_handler,
            quadrature,
            neumann_bc,
@@ -1404,7 +1407,8 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   const types::material_id                material_id,
   const Strategy                          strategy)
 {
-  estimate(StaticMappingQ1<dim, spacedim>::mapping,
+  estimate(ReferenceCell::get_default_linear_mapping<dim, spacedim>(
+             dof_handler.get_triangulation()),
            dof_handler,
            quadrature,
            neumann_bc,

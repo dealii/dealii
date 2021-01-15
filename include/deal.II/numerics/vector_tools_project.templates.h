@@ -887,7 +887,7 @@ namespace VectorTools
            ExcMessage("Please specify the mapping explicitly "
                       "when building with MSVC!"));
 #else
-    project(StaticMappingQ1<dim, spacedim>::mapping,
+    project(ReferenceCell::get_default_linear_mapping(dof.get_triangulation()),
             dof,
             constraints,
             quadrature,
