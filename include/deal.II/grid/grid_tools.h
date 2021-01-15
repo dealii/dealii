@@ -2939,7 +2939,7 @@ namespace GridTools
                              const DataType &)> &        unpack,
     const std::function<bool(const typename MeshType::active_cell_iterator &)>
       &cell_filter =
-        [](const typename MeshType::active_cell_iterator &) { return true; });
+        always_return<typename MeshType::active_cell_iterator, bool>{true});
 
   /**
    * Exchange arbitrary data of type @p DataType provided by the function
@@ -2959,9 +2959,9 @@ namespace GridTools
       const typename MeshType::level_cell_iterator &)> &pack,
     const std::function<void(const typename MeshType::level_cell_iterator &,
                              const DataType &)> &       unpack,
-    const std::function<bool(const typename MeshType::level_cell_iterator &)>
-      &cell_filter =
-        [](const typename MeshType::level_cell_iterator &) { return true; });
+    const std::function<bool(const typename MeshType::level_cell_iterator &)> &
+      cell_filter = always_return<typename MeshType::level_cell_iterator, bool>{
+        true});
 
   /* Exchange with all processors of the MPI communicator @p mpi_communicator the vector of bounding
    * boxes @p local_bboxes.
@@ -3980,7 +3980,7 @@ namespace GridTools
     template <typename DataType,
               typename MeshType,
               typename MeshCellIteratorType>
-    void
+    inline void
     exchange_cell_data(
       const MeshType &mesh,
       const std::function<
@@ -4218,7 +4218,7 @@ namespace GridTools
   } // namespace internal
 
   template <typename DataType, typename MeshType>
-  void
+  inline void
   exchange_cell_data_to_ghosts(
     const MeshType &                                     mesh,
     const std::function<std_cxx17::optional<DataType>(
@@ -4256,7 +4256,7 @@ namespace GridTools
 
 
   template <typename DataType, typename MeshType>
-  void
+  inline void
   exchange_cell_data_to_level_ghosts(
     const MeshType &                                    mesh,
     const std::function<std_cxx17::optional<DataType>(

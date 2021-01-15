@@ -184,6 +184,24 @@ struct identity
 
 
 /**
+ * A class that always returns a given value.
+ * This is needed as a workaround for lambdas used as default parameters
+ * some compilers struggle to deal with.
+ */
+template <typename ArgType, typename ValueType>
+struct always_return
+{
+  ValueType value;
+  ValueType
+  operator()(const ArgType &)
+  {
+    return value;
+  }
+};
+
+
+
+/**
  * A class to perform comparisons of arbitrary pointers for equality. In some
  * circumstances, one would like to make sure that two arguments to a function
  * are not the same object. One would, in this case, make sure that their

@@ -529,6 +529,56 @@ namespace parallel
 
 
   template <int dim, int spacedim>
+  void
+  TriangulationBase<dim, spacedim>::communicate_locally_moved_vertices(
+    const std::vector<bool> &vertex_locally_moved)
+  {
+    AssertDimension(vertex_locally_moved.size(), this->n_vertices());
+#ifdef DEBUG
+    {
+      const std::vector<bool> locally_owned_vertices =
+        dealii::GridTools::get_locally_owned_vertices(*this);
+      for (unsigned int i = 0; i < locally_owned_vertices.size(); ++i)
+        Assert((vertex_locally_moved[i] == false) ||
+                 (locally_owned_vertices[i] == true),
+               ExcMessage("The vertex_locally_moved argument must not "
+                          "contain vertices that are not locally owned"));
+    }
+#endif
+
+    Point<spacedim> invalid_point;
+    for (int d = 0; d < spacedim; ++d)
+      invalid_point[d] = std::numeric_limits<double>::quiet_NaN();
+
+    const auto pack = [&](const auto &cell) {
+      std::vector<Point<spacedim>> vertices(cell->n_vertices());
+
+      for (const auto v : cell->vertex_indices())
+        if (vertex_locally_moved[cell->vertex_index(v)])
+          vertices[v] = cell->vertex(v);
+        else
+          vertices[v] = invalid_point;
+
+      return vertices;
+    };
+
+    const auto unpack = [&](const auto &cell, const auto &vertices) {
+      for (const auto v : cell->vertex_indices())
+        if (std::isnan(vertices[v][0]) == false)
+          cell->vertex(v) = vertices[v];
+    };
+
+    if (this->is_multilevel_hierarchy_constructed())
+      GridTools::exchange_cell_data_to_level_ghosts<
+        std::vector<Point<spacedim>>>(*this, pack, unpack);
+    else
+      GridTools::exchange_cell_data_to_ghosts<std::vector<Point<spacedim>>>(
+        *this, pack, unpack);
+  }
+
+
+
+  template <int dim, int spacedim>
   const Utilities::MPI::Partitioner &
   TriangulationBase<dim, spacedim>::global_active_cell_index_partitioner() const
   {
