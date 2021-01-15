@@ -13,7 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/polynomial.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/tensor_product_polynomials.h>
 
 #include <deal.II/fe/mapping_fe.h>
 #include <deal.II/fe/mapping_q1.h>
@@ -23,6 +25,7 @@
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/simplex/fe_lib.h>
+#include <deal.II/simplex/polynomials.h>
 #include <deal.II/simplex/quadrature_lib.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -100,6 +103,7 @@ namespace ReferenceCell
         Assert(false, ExcNotImplemented());
       }
   }
+
 
 
   template <int dim, int spacedim>
