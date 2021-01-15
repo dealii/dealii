@@ -77,9 +77,9 @@ namespace Simplex
 
 
   /**
-   * Implementation of a scalar Lagrange finite element Pp that yields
+   * Implementation of a scalar Lagrange finite element $P_k$ that yields
    * the finite element space of continuous, piecewise polynomials of
-   * degree p.
+   * degree k.
    *
    * @ingroup simplex
    */
