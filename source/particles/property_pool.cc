@@ -14,6 +14,8 @@
 // ---------------------------------------------------------------------
 
 
+#include <deal.II/base/signaling_nan.h>
+
 #include <deal.II/particles/property_pool.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -61,6 +63,12 @@ namespace Particles
       }
 
     // Clear vectors and ensure deallocation of memory
+    locations.clear();
+    locations.shrink_to_fit();
+
+    reference_locations.clear();
+    reference_locations.shrink_to_fit();
+
     properties.clear();
     properties.shrink_to_fit();
 
@@ -75,19 +83,26 @@ namespace Particles
   PropertyPool<dim, spacedim>::register_particle()
   {
     Handle handle = invalid_handle;
-    if (n_properties > 0)
+    if (currently_available_handles.size() > 0)
       {
-        if (currently_available_handles.size() > 0)
-          {
-            handle = currently_available_handles.back();
-            currently_available_handles.pop_back();
-          }
-        else
-          {
-            handle = properties.size() / n_properties;
-            properties.resize(properties.size() + n_properties, 0.0);
-          }
+        handle = currently_available_handles.back();
+        currently_available_handles.pop_back();
       }
+    else
+      {
+        handle = locations.size();
+
+        locations.resize(locations.size() + 1);
+        reference_locations.resize(reference_locations.size() + 1);
+        properties.resize(properties.size() + n_properties);
+      }
+
+    // Then initialize whatever slot we have taken with invalid locations,
+    // but initialize properties with zero.
+    set_location(handle, numbers::signaling_nan<Point<spacedim>>());
+    set_reference_location(handle, numbers::signaling_nan<Point<dim>>());
+    for (double &x : get_properties(handle))
+      x = 0;
 
     return handle;
   }
@@ -122,6 +137,8 @@ namespace Particles
   void
   PropertyPool<dim, spacedim>::reserve(const std::size_t size)
   {
+    locations.reserve(size);
+    reference_locations.reserve(size);
     properties.reserve(size * n_properties);
   }
 
