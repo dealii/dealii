@@ -158,17 +158,17 @@ MappingFE<dim, spacedim>::InternalData::initialize_face(
       for (unsigned int i = 0; i < n_faces; ++i)
         {
           unit_tangentials[i].resize(n_original_q_points);
-          std::fill(unit_tangentials[i].begin(),
-                    unit_tangentials[i].end(),
-                    ReferenceCell::unit_tangential_vectors<dim>(
-                      reference_cell_type, i, 0));
+          std::fill(
+            unit_tangentials[i].begin(),
+            unit_tangentials[i].end(),
+            reference_cell_type.template unit_tangential_vectors<dim>(i, 0));
           if (dim > 2)
             {
               unit_tangentials[n_faces + i].resize(n_original_q_points);
               std::fill(unit_tangentials[n_faces + i].begin(),
                         unit_tangentials[n_faces + i].end(),
-                        ReferenceCell::unit_tangential_vectors<dim>(
-                          reference_cell_type, i, 1));
+                        reference_cell_type
+                          .template unit_tangential_vectors<dim>(i, 1));
             }
         }
     }
@@ -871,9 +871,8 @@ MappingFE<dim, spacedim>::MappingFE(const FiniteElement<dim, spacedim> &fe)
   for (unsigned int point = 0; point < n_points; ++point)
     for (unsigned int i = 0; i < n_shape_functions; ++i)
       mapping_support_point_weights(point, i) =
-        ReferenceCell::d_linear_shape_function(reference_cell_type,
-                                               mapping_support_points[point],
-                                               i);
+        reference_cell_type.d_linear_shape_function(
+          mapping_support_points[point], i);
 }
 
 

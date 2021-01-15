@@ -37,7 +37,7 @@ namespace ReferenceCell
   make_triangulation(const Type &                  reference_cell,
                      Triangulation<dim, spacedim> &tria)
   {
-    AssertDimension(dim, get_dimension(reference_cell));
+    AssertDimension(dim, reference_cell.get_dimension());
 
     if (reference_cell == get_hypercube(dim))
       {
@@ -110,7 +110,7 @@ namespace ReferenceCell
   std::unique_ptr<Mapping<dim, spacedim>>
   get_default_mapping(const Type &reference_cell, const unsigned int degree)
   {
-    AssertDimension(dim, get_dimension(reference_cell));
+    AssertDimension(dim, reference_cell.get_dimension());
 
     if (reference_cell == get_hypercube(dim))
       return std::make_unique<MappingQGeneric<dim, spacedim>>(degree);
@@ -136,7 +136,7 @@ namespace ReferenceCell
   const Mapping<dim, spacedim> &
   get_default_linear_mapping(const Type &reference_cell)
   {
-    AssertDimension(dim, get_dimension(reference_cell));
+    AssertDimension(dim, reference_cell.get_dimension());
 
     if (reference_cell == get_hypercube(dim))
       {
@@ -195,7 +195,7 @@ namespace ReferenceCell
   get_gauss_type_quadrature(const Type &   reference_cell,
                             const unsigned n_points_1D)
   {
-    AssertDimension(dim, get_dimension(reference_cell));
+    AssertDimension(dim, reference_cell.get_dimension());
 
     if (reference_cell == get_hypercube(dim))
       return QGauss<dim>(n_points_1D);
@@ -215,7 +215,7 @@ namespace ReferenceCell
   Quadrature<dim> &
   get_nodal_type_quadrature(const Type &reference_cell)
   {
-    AssertDimension(dim, get_dimension(reference_cell));
+    AssertDimension(dim, reference_cell.get_dimension());
 
     const auto create_quadrature = [](const Type &reference_cell) {
       Triangulation<dim> tria;
