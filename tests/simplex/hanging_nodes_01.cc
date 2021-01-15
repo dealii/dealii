@@ -16,9 +16,22 @@
 
 
 // verify hanging node constraints on locally h-refined simplex mesh
+//
+// dofs will be enumerated as follows
+//  scenario 1:
+//   1-------0
+//   |\      |
+//   |  \    |
+//   5---6   |
+//   |\  |\  |
+//   |  \|  \|
+//   3---4---2
+
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
+
+#include <deal.II/fe/mapping_fe.h>
 
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria.h>
@@ -30,6 +43,75 @@
 
 #include "../tests.h"
 
+
+// ----- diagnostics -----
+
+template <int dim>
+void
+print_dof_indices_on_faces(const DoFHandler<dim> &dofh)
+{
+  std::vector<types::global_dof_index> dof_indices;
+
+  for (const auto &cell : dofh.active_cell_iterators())
+    for (unsigned int f = 0; f < cell->n_faces(); ++f)
+      {
+        const auto &face = cell->face(f);
+
+        if (face->has_children())
+          {
+            for (unsigned int sf = 0; sf < face->n_children(); ++sf)
+              {
+                const auto &subface = face->child(sf);
+                Assert(subface->n_active_fe_indices() == 1, ExcInternalError());
+                const unsigned int subface_fe_index =
+                  subface->nth_active_fe_index(0);
+                const auto &subface_fe = dofh.get_fe(subface_fe_index);
+
+                dof_indices.resize(subface_fe.n_dofs_per_face(f));
+                subface->get_dof_indices(dof_indices, subface_fe_index);
+
+                deallog << "cell:" << cell->active_cell_index() << " face:" << f
+                        << " subface:" << sf << " dofs:";
+                for (const auto &i : dof_indices)
+                  deallog << i << " ";
+                deallog << std::endl;
+              }
+          }
+        else
+          {
+            Assert(face->n_active_fe_indices() == 1, ExcInternalError());
+            const unsigned int face_fe_index = face->nth_active_fe_index(0);
+            const auto &       face_fe       = dofh.get_fe(face_fe_index);
+
+            dof_indices.resize(face_fe.n_dofs_per_face(f));
+            face->get_dof_indices(dof_indices, face_fe_index);
+
+            deallog << "cell:" << cell->active_cell_index() << " face:" << f
+                    << " dofs:";
+            for (const auto &i : dof_indices)
+              deallog << i << " ";
+            deallog << std::endl;
+          }
+      }
+}
+
+
+template <int dim>
+void
+print_dof_points(const DoFHandler<dim> &dofh)
+{
+  std::vector<Point<dim>> points(dofh.n_dofs());
+  DoFTools::map_dofs_to_support_points(MappingFE<dim>(dofh.get_fe()),
+                                       dofh,
+                                       points);
+
+  for (unsigned int i = 0; i < dofh.n_dofs(); ++i)
+    deallog << "dof:" << i << " point:" << points[i] << std::endl;
+}
+
+
+
+// ----- test -----
 
 template <int dim>
 void
@@ -51,9 +133,14 @@ test()
   dofh.distribute_dofs(Simplex::FE_P<dim>(1));
   deallog << "ndofs: " << dofh.n_dofs() << std::endl;
 
+#if false
+  print_dof_points(dofh);
+  print_dof_indices_on_faces(dofh);
+#endif
+
   // hanging node constraints
   AffineConstraints<double> constraints;
-  // DoFTools::make_hanging_node_constraints(dofh, constraints);
+  DoFTools::make_hanging_node_constraints(dofh, constraints);
   constraints.print(deallog.get_file_stream());
 
   deallog << "OK" << std::endl;

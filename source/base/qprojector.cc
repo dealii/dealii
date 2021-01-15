@@ -128,32 +128,57 @@ QProjector<2>::project_to_face(const ReferenceCell::Type reference_cell_type,
                                const unsigned int        face_no,
                                std::vector<Point<2>> &   q_points)
 {
-  Assert(reference_cell_type == ReferenceCell::Type::Quad, ExcNotImplemented());
-  (void)reference_cell_type;
-
   const unsigned int dim = 2;
   AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
   Assert(q_points.size() == quadrature.size(),
          ExcDimensionMismatch(q_points.size(), quadrature.size()));
 
-  for (unsigned int p = 0; p < quadrature.size(); ++p)
-    switch (face_no)
-      {
-        case 0:
-          q_points[p] = Point<dim>(0, quadrature.point(p)(0));
-          break;
-        case 1:
-          q_points[p] = Point<dim>(1, quadrature.point(p)(0));
-          break;
-        case 2:
-          q_points[p] = Point<dim>(quadrature.point(p)(0), 0);
-          break;
-        case 3:
-          q_points[p] = Point<dim>(quadrature.point(p)(0), 1);
-          break;
-        default:
-          Assert(false, ExcInternalError());
-      }
+  if (reference_cell_type == ReferenceCell::Type::Tri)
+    {
+      // use linear polynomial to map the reference quadrature points correctly
+      // on faces, i.e., Simplex::ScalarPolynomial<1>(1)
+      for (unsigned int p = 0; p < quadrature.size(); ++p)
+        switch (face_no)
+          {
+            case 0:
+              q_points[p] = Point<dim>(quadrature.point(p)(0), 0);
+              break;
+            case 1:
+              q_points[p] =
+                Point<dim>(1 - quadrature.point(p)(0), quadrature.point(p)(0));
+              break;
+            case 2:
+              q_points[p] = Point<dim>(0, 1 - quadrature.point(p)(0));
+              break;
+            default:
+              Assert(false, ExcInternalError());
+          }
+    }
+  else if (reference_cell_type == ReferenceCell::Type::Quad)
+    {
+      for (unsigned int p = 0; p < quadrature.size(); ++p)
+        switch (face_no)
+          {
+            case 0:
+              q_points[p] = Point<dim>(0, quadrature.point(p)(0));
+              break;
+            case 1:
+              q_points[p] = Point<dim>(1, quadrature.point(p)(0));
+              break;
+            case 2:
+              q_points[p] = Point<dim>(quadrature.point(p)(0), 0);
+              break;
+            case 3:
+              q_points[p] = Point<dim>(quadrature.point(p)(0), 1);
+              break;
+            default:
+              Assert(false, ExcInternalError());
+          }
+    }
+  else
+    {
+      Assert(false, ExcInternalError());
+    }
 }
 
 
@@ -285,9 +310,6 @@ QProjector<2>::project_to_subface(const ReferenceCell::Type reference_cell_type,
                                   std::vector<Point<2>> &   q_points,
                                   const RefinementCase<1> &)
 {
-  Assert(reference_cell_type == ReferenceCell::Type::Quad, ExcNotImplemented());
-  (void)reference_cell_type;
-
   const unsigned int dim = 2;
   AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
   AssertIndexRange(subface_no, GeometryInfo<dim>::max_children_per_face);
@@ -295,65 +317,130 @@ QProjector<2>::project_to_subface(const ReferenceCell::Type reference_cell_type,
   Assert(q_points.size() == quadrature.size(),
          ExcDimensionMismatch(q_points.size(), quadrature.size()));
 
-  for (unsigned int p = 0; p < quadrature.size(); ++p)
-    switch (face_no)
-      {
-        case 0:
-          switch (subface_no)
-            {
-              case 0:
-                q_points[p] = Point<dim>(0, quadrature.point(p)(0) / 2);
-                break;
-              case 1:
-                q_points[p] = Point<dim>(0, quadrature.point(p)(0) / 2 + 0.5);
-                break;
-              default:
-                Assert(false, ExcInternalError());
-            }
-          break;
-        case 1:
-          switch (subface_no)
-            {
-              case 0:
-                q_points[p] = Point<dim>(1, quadrature.point(p)(0) / 2);
-                break;
-              case 1:
-                q_points[p] = Point<dim>(1, quadrature.point(p)(0) / 2 + 0.5);
-                break;
-              default:
-                Assert(false, ExcInternalError());
-            }
-          break;
-        case 2:
-          switch (subface_no)
-            {
-              case 0:
-                q_points[p] = Point<dim>(quadrature.point(p)(0) / 2, 0);
-                break;
-              case 1:
-                q_points[p] = Point<dim>(quadrature.point(p)(0) / 2 + 0.5, 0);
-                break;
-              default:
-                Assert(false, ExcInternalError());
-            }
-          break;
-        case 3:
-          switch (subface_no)
-            {
-              case 0:
-                q_points[p] = Point<dim>(quadrature.point(p)(0) / 2, 1);
-                break;
-              case 1:
-                q_points[p] = Point<dim>(quadrature.point(p)(0) / 2 + 0.5, 1);
-                break;
-              default:
-                Assert(false, ExcInternalError());
-            }
-          break;
+  if (reference_cell_type == ReferenceCell::Type::Tri)
+    {
+      // use linear polynomial to map the reference quadrature points correctly
+      // on faces, i.e., Simplex::ScalarPolynomial<1>(1)
+      for (unsigned int p = 0; p < quadrature.size(); ++p)
+        switch (face_no)
+          {
+            case 0:
+              switch (subface_no)
+                {
+                  case 0:
+                    q_points[p] = Point<dim>(quadrature.point(p)(0) / 2, 0);
+                    break;
+                  case 1:
+                    q_points[p] =
+                      Point<dim>(0.5 + quadrature.point(p)(0) / 2, 0);
+                    break;
+                  default:
+                    Assert(false, ExcInternalError());
+                }
+              break;
+            case 1:
+              switch (subface_no)
+                {
+                  case 0:
+                    q_points[p] = Point<dim>(1 - quadrature.point(p)(0) / 2,
+                                             quadrature.point(p)(0) / 2);
+                    break;
+                  case 1:
+                    q_points[p] = Point<dim>(0.5 - quadrature.point(p)(0) / 2,
+                                             0.5 + quadrature.point(p)(0) / 2);
+                    break;
+                  default:
+                    Assert(false, ExcInternalError());
+                }
+              break;
+            case 2:
+              switch (subface_no)
+                {
+                  case 0:
+                    q_points[p] = Point<dim>(0, 1 - quadrature.point(p)(0) / 2);
+                    break;
+                  case 1:
+                    q_points[p] =
+                      Point<dim>(0, 0.5 - quadrature.point(p)(0) / 2);
+                    break;
+                  default:
+                    Assert(false, ExcInternalError());
+                }
+              break;
+            default:
+              Assert(false, ExcInternalError());
+          }
+    }
+  else if (reference_cell_type == ReferenceCell::Type::Quad)
+    {
+      for (unsigned int p = 0; p < quadrature.size(); ++p)
+        switch (face_no)
+          {
+            case 0:
+              switch (subface_no)
+                {
+                  case 0:
+                    q_points[p] = Point<dim>(0, quadrature.point(p)(0) / 2);
+                    break;
+                  case 1:
+                    q_points[p] =
+                      Point<dim>(0, quadrature.point(p)(0) / 2 + 0.5);
+                    break;
+                  default:
+                    Assert(false, ExcInternalError());
+                }
+              break;
+            case 1:
+              switch (subface_no)
+                {
+                  case 0:
+                    q_points[p] = Point<dim>(1, quadrature.point(p)(0) / 2);
+                    break;
+                  case 1:
+                    q_points[p] =
+                      Point<dim>(1, quadrature.point(p)(0) / 2 + 0.5);
+                    break;
+                  default:
+                    Assert(false, ExcInternalError());
+                }
+              break;
+            case 2:
+              switch (subface_no)
+                {
+                  case 0:
+                    q_points[p] = Point<dim>(quadrature.point(p)(0) / 2, 0);
+                    break;
+                  case 1:
+                    q_points[p] =
+                      Point<dim>(quadrature.point(p)(0) / 2 + 0.5, 0);
+                    break;
+                  default:
+                    Assert(false, ExcInternalError());
+                }
+              break;
+            case 3:
+              switch (subface_no)
+                {
+                  case 0:
+                    q_points[p] = Point<dim>(quadrature.point(p)(0) / 2, 1);
+                    break;
+                  case 1:
+                    q_points[p] =
+                      Point<dim>(quadrature.point(p)(0) / 2 + 0.5, 1);
+                    break;
+                  default:
+                    Assert(false, ExcInternalError());
+                }
+              break;
 
-        default:
-          Assert(false, ExcInternalError());
-      }
+            default:
+              Assert(false, ExcInternalError());
+          }
+    }
+  else
+    {
+      Assert(false, ExcInternalError());
+    }
 }
 
 
@@ -521,6 +608,17 @@ QProjector<2>::project_to_all_faces(
 {
   if (reference_cell_type == ReferenceCell::Type::Tri)
     {
+      const auto support_points_line =
+        [](const auto &face, const auto &orientation) -> std::vector<Point<2>> {
+        std::array<Point<2>, 2> vertices;
+        std::copy_n(face.first.begin(), face.first.size(), vertices.begin());
+        const auto temp =
+          ReferenceCell::Type(ReferenceCell::Type::Line)
+            .permute_according_orientation(vertices, orientation);
+        return std::vector<Point<2>>(temp.begin(),
+                                     temp.begin() + face.first.size());
+      };
+
       // reference faces (defined by its support points and arc length)
       const std::array<std::pair<std::array<Point<2>, 2>, double>, 3> faces = {
         {{{{Point<2>(0.0, 0.0), Point<2>(1.0, 0.0)}}, 1.0},
@@ -542,21 +640,10 @@ QProjector<2>::project_to_all_faces(
           {
             const auto &face = faces[face_no];
 
-            std::array<Point<2>, 2> support_points;
-
             // determine support point of the current line with the correct
             // orientation
-            switch (orientation)
-              {
-                case 0:
-                  support_points = {{face.first[1], face.first[0]}};
-                  break;
-                case 1:
-                  support_points = {{face.first[0], face.first[1]}};
-                  break;
-                default:
-                  Assert(false, ExcNotImplemented());
-              }
+            std::vector<Point<2>> support_points =
+              support_points_line(face, orientation);
 
             // the quadrature rule to be projected ...
             const auto &sub_quadrature_points =
