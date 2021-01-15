@@ -309,7 +309,8 @@ namespace parallel
     // transform back and store result
     this->reference_cell_types.clear();
     for (const auto &i : reference_cell_types_ui)
-      this->reference_cell_types.push_back(static_cast<ReferenceCell::Type>(i));
+      this->reference_cell_types.emplace_back(
+        static_cast<ReferenceCell::Type::CellKinds>(i));
   }
 
 

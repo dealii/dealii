@@ -39,20 +39,148 @@ class Quadrature;
 namespace ReferenceCell
 {
   /**
-   * Supported reference cell types.
+   * A type that describes the kinds of reference cells that can be used.
+   * This includes quadrilaterals and hexahedra (i.e., "hypercubes"),
+   * triangles and tetrahedra (simplices), and the pyramids and wedges
+   * necessary when using mixed 3d meshes.
    */
-  enum class Type : std::uint8_t
+  class Type
   {
-    Vertex  = 0,
-    Line    = 1,
-    Tri     = 2,
-    Quad    = 3,
-    Tet     = 4,
-    Pyramid = 5,
-    Wedge   = 6,
-    Hex     = 7,
-    Invalid = static_cast<std::uint8_t>(-1)
+  public:
+    enum CellKinds : std::uint8_t
+    {
+      Vertex  = 0,
+      Line    = 1,
+      Tri     = 2,
+      Quad    = 3,
+      Tet     = 4,
+      Pyramid = 5,
+      Wedge   = 6,
+      Hex     = 7,
+      Invalid = static_cast<std::uint8_t>(-1)
+    };
+
+    /**
+     * Default constructor. Initialize this object as an invalid object.
+     */
+    Type();
+
+    /**
+     * Constructor.
+     */
+    Type(const CellKinds kind);
+
+    /**
+     * Conversion operator to an integer.
+     */
+    operator std::uint8_t() const;
+
+    /**
+     * Operator for equality comparison.
+     */
+    bool
+    operator==(const Type &type) const;
+
+    /**
+     * Operator for inequality comparison.
+     */
+    bool
+    operator!=(const Type &type) const;
+
+    /**
+     * Operator for equality comparison.
+     */
+    bool
+    operator==(const CellKinds &type) const;
+
+    /**
+     * Operator for inequality comparison.
+     */
+    bool
+    operator!=(const CellKinds &type) const;
+
+    /**
+     * Write and read the data of this object from a stream for the purpose
+     * of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+     */
+    template <class Archive>
+    void
+    serialize(Archive &archive, const unsigned int /*version*/);
+
+  private:
+    /**
+     * The variable that stores what this object actually corresponds to.
+     */
+    CellKinds kind;
   };
+
+
+
+  inline Type::Type()
+    : Type(Invalid)
+  {}
+
+
+
+  inline Type::Type(const CellKinds kind)
+    : kind(kind)
+  {}
+
+
+
+  inline Type::operator std::uint8_t() const
+  {
+    return kind;
+  }
+
+
+
+  inline bool
+  Type::operator==(const Type &type) const
+  {
+    return kind == type.kind;
+  }
+
+
+
+  inline bool
+  Type::operator!=(const Type &type) const
+  {
+    return kind != type.kind;
+  }
+
+
+
+  inline bool
+  Type::operator==(const CellKinds &type) const
+  {
+    return kind == type;
+  }
+
+
+
+  inline bool
+  Type::operator!=(const CellKinds &type) const
+  {
+    return kind != type;
+  }
+
+
+
+  template <class Archive>
+  inline void
+  Type::serialize(Archive &archive, const unsigned int /*version*/)
+  {
+    // Serialize the state as an 8-bit int. When saving the state, the
+    // last of the following 3 lines is a no-op. When loading, the first
+    // of these lines is a no-op.
+    std::uint8_t kind_as_int = static_cast<std::uint8_t>(kind);
+    archive &    kind_as_int;
+    kind = static_cast<CellKinds>(kind_as_int);
+  }
+
+
 
   /**
    * Return the dimension of the given reference-cell type @p type.
@@ -169,15 +297,17 @@ namespace ReferenceCell
     AssertIndexRange(n_vertices, 9);
     const auto X = Type::Invalid;
 
-    static constexpr std::array<std::array<ReferenceCell::Type, 9>, 4> table = {
-      {// dim 0
-       {{X, Type::Vertex, X, X, X, X, X, X, X}},
-       // dim 1
-       {{X, X, Type::Line, X, X, X, X, X, X}},
-       // dim 2
-       {{X, X, X, Type::Tri, Type::Quad, X, X, X, X}},
-       // dim 3
-       {{X, X, X, X, Type::Tet, Type::Pyramid, Type::Wedge, X, Type::Hex}}}};
+    static constexpr std::array<std::array<ReferenceCell::Type::CellKinds, 9>,
+                                4>
+      table = {
+        {// dim 0
+         {{X, Type::Vertex, X, X, X, X, X, X, X}},
+         // dim 1
+         {{X, X, Type::Line, X, X, X, X, X, X}},
+         // dim 2
+         {{X, X, X, Type::Tri, Type::Quad, X, X, X, X}},
+         // dim 3
+         {{X, X, X, X, Type::Tet, Type::Pyramid, Type::Wedge, X, Type::Hex}}}};
     Assert(table[dim][n_vertices] != Type::Invalid,
            ExcMessage("The combination of dim = " + std::to_string(dim) +
                       " and n_vertices = " + std::to_string(n_vertices) +
