@@ -41,7 +41,7 @@ SET(_inst
 )
 
 FILE(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/tet/*.h
+  ${CMAKE_SOURCE_DIR}/include/deal.II/simplex/*.h
   )
 
 DEAL_II_ADD_LIBRARY(obj_simplex OBJECT ${_src} ${_header} ${_inst})
