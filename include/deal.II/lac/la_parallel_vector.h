@@ -1218,8 +1218,8 @@ namespace LinearAlgebra
         << "You tried to access element " << arg1
         << " of a distributed vector, but this element is not "
         << "stored on the current processor. Note: The range of "
-        << "locally owned elements is " << arg2 << " to " << arg3
-        << ", and there are " << arg4 << " ghost elements "
+        << "locally owned elements is [" << arg2 << "," << arg3
+        << "], and there are " << arg4 << " ghost elements "
         << "that this vector can access."
         << "\n\n"
         << "A common source for this kind of problem is that you "
@@ -1589,7 +1589,7 @@ namespace LinearAlgebra
           partitioner->ghost_indices().is_element(global_index),
         ExcAccessToNonLocalElement(global_index,
                                    partitioner->local_range().first,
-                                   partitioner->local_range().second,
+                                   partitioner->local_range().second - 1,
                                    partitioner->ghost_indices().n_elements()));
       // do not allow reading a vector which is not in ghost mode
       Assert(partitioner->in_local_range(global_index) ||
@@ -1613,7 +1613,7 @@ namespace LinearAlgebra
           partitioner->ghost_indices().is_element(global_index),
         ExcAccessToNonLocalElement(global_index,
                                    partitioner->local_range().first,
-                                   partitioner->local_range().second,
+                                   partitioner->local_range().second - 1,
                                    partitioner->ghost_indices().n_elements()));
       // we would like to prevent reading ghosts from a vector that does not
       // have them imported, but this is not possible because we might be in a
