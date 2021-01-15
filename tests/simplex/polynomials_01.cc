@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// Test Simplex::ScalarPolynomial on an the points of an arbitrary quadrature
-// rule.
+// Test Simplex::BarycentricPolynomials on an the points of an arbitrary
+// quadrature rule.
 
 
 #include <deal.II/base/quadrature_lib.h>
@@ -30,8 +30,9 @@ template <int dim>
 void
 test(const unsigned int degree)
 {
-  Simplex::ScalarPolynomial<dim> poly(degree);
-  QSimplex<dim>                  quad(QGauss<dim>(degree + 1));
+  const auto poly =
+    Simplex::BarycentricPolynomials<dim>::get_fe_p_basis(degree);
+  QSimplex<dim> quad(QGauss<dim>(degree + 1));
 
   std::vector<double>         values(poly.n());
   std::vector<Tensor<1, dim>> grads(poly.n());

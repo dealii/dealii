@@ -18,7 +18,7 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
-#include <deal.II/simplex/polynomials.h>
+#include <deal.II/simplex/barycentric_polynomials.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -529,7 +529,7 @@ QProjector<2>::project_to_all_faces(
 
       // linear polynomial to map the reference quadrature points correctly
       // on faces
-      const Simplex::ScalarPolynomial<1> poly(1);
+      const auto poly = Simplex::BarycentricPolynomials<1>::get_fe_p_basis(1);
 
       // new (projected) quadrature points and weights
       std::vector<Point<2>> points;
@@ -668,8 +668,8 @@ QProjector<3>::project_to_all_faces(
     std::vector<Point<3>> points;
     std::vector<double>   weights;
 
-    const Simplex::ScalarPolynomial<2> poly_tri(1);
-    const TensorProductPolynomials<2>  poly_quad(
+    const auto poly_tri = Simplex::BarycentricPolynomials<2>::get_fe_p_basis(1);
+    const TensorProductPolynomials<2> poly_quad(
       Polynomials::generate_complete_Lagrange_basis(
         {Point<1>(0.0), Point<1>(1.0)}));
 

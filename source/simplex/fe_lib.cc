@@ -283,7 +283,7 @@ namespace Simplex
     const std::vector<unsigned int> &                 dpo_vector,
     const typename FiniteElementData<dim>::Conformity conformity)
     : dealii::FE_Poly<dim, spacedim>(
-        Simplex::ScalarPolynomial<dim>(degree),
+        BarycentricPolynomials<dim>::get_fe_p_basis(degree),
         FiniteElementData<dim>(dpo_vector,
                                dim == 2 ? ReferenceCell::Type::Tri :
                                           ReferenceCell::Type::Tet,

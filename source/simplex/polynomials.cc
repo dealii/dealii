@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 
+#include <deal.II/simplex/barycentric_polynomials.h>
 #include <deal.II/simplex/polynomials.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -636,8 +637,8 @@ namespace Simplex
   ScalarWedgePolynomial<dim>::ScalarWedgePolynomial(const unsigned int degree)
     : ScalarPolynomialsBase<dim>(degree,
                                  compute_n_polynomials_wedge(dim, degree))
-    , poly_tri(degree)
-    , poly_line(degree)
+    , poly_tri(BarycentricPolynomials<2>::get_fe_p_basis(degree))
+    , poly_line(BarycentricPolynomials<1>::get_fe_p_basis(degree))
   {}
 
 
