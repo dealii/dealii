@@ -528,46 +528,46 @@ namespace DoFTools
               // satisfied, and we can move on to the next dependent
               // DoF (row). The only thing we should make sure is that the
               // row of the matrix really just contains this one entry.
-              bool is_trivial_constraint = false;
+              {
+                bool is_trivial_constraint = false;
 
+                for (unsigned int i = 0; i < n_primary_dofs; ++i)
+                  if (face_constraints(row, i) == 1.0)
+                    if (dependent_dofs[row] == primary_dofs[i])
+                      {
+                        is_trivial_constraint = true;
+
+                        for (unsigned int ii = 0; ii < n_primary_dofs; ++ii)
+                          if (ii != i)
+                            Assert(face_constraints(row, ii) == 0.0,
+                                   ExcInternalError());
+
+                        break;
+                      }
+
+                if (is_trivial_constraint == true)
+                  continue;
+              }
+              // add up the absolute values of all constraints in this line
+              // to get a measure of their absolute size
+              number1 abs_sum = 0;
               for (unsigned int i = 0; i < n_primary_dofs; ++i)
-                if (face_constraints(row, i) == 1.0)
-                  if (dependent_dofs[row] == primary_dofs[i])
-                    {
-                      is_trivial_constraint = true;
+                abs_sum += std::abs(face_constraints(row, i));
 
-                      for (unsigned int ii = 0; ii < n_primary_dofs; ++ii)
-                        if (ii != i)
-                          Assert(face_constraints(row, ii) == 0.0,
-                                 ExcInternalError());
-
-                      break;
-                    }
-
-              if (is_trivial_constraint == false)
-                {
-                  // add up the absolute values of all constraints in this line
-                  // to get a measure of their absolute size
-                  number1 abs_sum = 0;
-                  for (unsigned int i = 0; i < n_primary_dofs; ++i)
-                    abs_sum += std::abs(face_constraints(row, i));
-
-                  // then enter those constraints that are larger than
-                  // 1e-14*abs_sum. everything else probably originated from
-                  // inexact inversion of matrices and similar effects. having
-                  // those constraints in here will only lead to problems
-                  // because it makes sparsity patterns fuller than necessary
-                  // without producing any significant effect
-                  constraints.add_line(dependent_dofs[row]);
-                  for (unsigned int i = 0; i < n_primary_dofs; ++i)
-                    if ((face_constraints(row, i) != 0) &&
-                        (std::fabs(face_constraints(row, i)) >=
-                         1e-14 * abs_sum))
-                      constraints.add_entry(dependent_dofs[row],
-                                            primary_dofs[i],
-                                            face_constraints(row, i));
-                  constraints.set_inhomogeneity(dependent_dofs[row], 0.);
-                }
+              // then enter those constraints that are larger than
+              // 1e-14*abs_sum. everything else probably originated from
+              // inexact inversion of matrices and similar effects. having
+              // those constraints in here will only lead to problems
+              // because it makes sparsity patterns fuller than necessary
+              // without producing any significant effect
+              constraints.add_line(dependent_dofs[row]);
+              for (unsigned int i = 0; i < n_primary_dofs; ++i)
+                if ((face_constraints(row, i) != 0) &&
+                    (std::fabs(face_constraints(row, i)) >= 1e-14 * abs_sum))
+                  constraints.add_entry(dependent_dofs[row],
+                                        primary_dofs[i],
+                                        face_constraints(row, i));
+              constraints.set_inhomogeneity(dependent_dofs[row], 0.);
             }
       }
 
