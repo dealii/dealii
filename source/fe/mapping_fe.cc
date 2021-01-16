@@ -2157,6 +2157,16 @@ MappingFE<dim, spacedim>::compute_mapping_support_points(
 
 
 
+template <int dim, int spacedim>
+BoundingBox<spacedim>
+MappingFE<dim, spacedim>::get_bounding_box(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
+{
+  return BoundingBox<spacedim>(this->compute_mapping_support_points(cell));
+}
+
+
+
 //--------------------------- Explicit instantiations -----------------------
 #include "mapping_fe.inst"
 
