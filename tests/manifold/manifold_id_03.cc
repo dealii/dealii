@@ -44,6 +44,7 @@ test(unsigned int ref = 1)
 
 
   tria.begin_active()->set_manifold_id(1);
+  tria.set_manifold(1, FlatManifold<dim, spacedim>());
 
   tria.refine_global(1);
 

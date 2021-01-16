@@ -72,6 +72,7 @@ ladutenko_circle(Triangulation<dim> &triangulation,
   GridGenerator::hyper_ball(triangulation, center, radius);
   triangulation.set_all_manifold_ids(circular_manifold_id);
   triangulation.set_manifold(circular_manifold_id, *boundary);
+  triangulation.set_manifold(straight_manifold_id, FlatManifold<dim>());
 
   const double core_radius  = 1.0 / 4.8 * radius;
   const double inner_radius = 1.0 / 2.4 * radius;

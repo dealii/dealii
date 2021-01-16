@@ -20,6 +20,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
@@ -53,6 +54,10 @@ test()
             cell->face(f)->set_manifold_id(cell->face(f)->boundary_id());
         }
 
+  for (const auto bid : triangulation.get_manifold_ids())
+    if (bid != numbers::flat_manifold_id)
+      triangulation.set_manifold(bid, FlatManifold<3>());
+
   static const CylindricalManifold<dim> outer_cylinder(0);
   triangulation.set_manifold(0, outer_cylinder);
 
@@ -62,6 +67,10 @@ test()
 
   // now extract the surface mesh
   Triangulation<dim - 1, dim> triangulation_surface;
+
+  for (const auto bid : triangulation.get_manifold_ids())
+    if (bid != numbers::flat_manifold_id)
+      triangulation_surface.set_manifold(bid, FlatManifold<2, 3>());
 
   static const CylindricalManifold<dim - 1, dim> surface_cyl(0);
   triangulation_surface.set_manifold(0, surface_cyl);
