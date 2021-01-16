@@ -380,7 +380,7 @@ namespace ReferenceCell
     return Point<dim>(+0.0, +0.0, +0.0);
   }
 
-  /*
+  /**
    * Return i-th unit tangential vector of a face of the reference cell.
    * The vectors are arranged such that the
    * cross product between the two vectors returns the unit normal vector.
@@ -453,6 +453,44 @@ namespace ReferenceCell
              Point<dim>(0, +1.0 / sqrt(2.0), -1.0 / sqrt(2.0))}}}};
 
         return table[face_no][i];
+      }
+
+    Assert(false, ExcNotImplemented());
+
+    return {};
+  }
+
+  /**
+   * Return the unit normal vector of a face of the reference cell.
+   */
+  template <int dim>
+  inline Tensor<1, dim>
+  unit_normal_vectors(const Type &reference_cell, const unsigned int face_no)
+  {
+    AssertDimension(dim, get_dimension(reference_cell));
+
+    if (reference_cell == get_hypercube(dim))
+      {
+        AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
+        return GeometryInfo<dim>::unit_normal_vector[face_no];
+      }
+    else if (dim == 2)
+      {
+        const auto tangential =
+          unit_tangential_vectors<dim>(reference_cell, face_no, 0);
+
+        Tensor<1, dim> result;
+
+        result[0] = tangential[1];
+        result[1] = -tangential[0];
+
+        return result;
+      }
+    else if (dim == 3)
+      {
+        return cross_product_3d(
+          unit_tangential_vectors<dim>(reference_cell, face_no, 0),
+          unit_tangential_vectors<dim>(reference_cell, face_no, 1));
       }
 
     Assert(false, ExcNotImplemented());
