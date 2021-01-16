@@ -1830,9 +1830,9 @@ namespace TrilinosWrappers
                    size_type,
                    << "You tried to access element (" << arg1 << "/" << arg2
                    << ")"
-                   << " of a distributed matrix, but only rows " << arg3
-                   << " through " << arg4
-                   << " are stored locally and can be accessed.");
+                   << " of a distributed matrix, but only rows in range ["
+                   << arg3 << "," << arg4
+                   << "] are stored locally and can be accessed.");
 
     /**
      * Exception
