@@ -103,6 +103,32 @@ namespace ReferenceCell
 
 
   template <int dim, int spacedim>
+  std::unique_ptr<Mapping<dim, spacedim>>
+  get_default_mapping(const Type &reference_cell, const unsigned int degree)
+  {
+    AssertDimension(dim, get_dimension(reference_cell));
+
+    if (reference_cell == get_hypercube(dim))
+      return std::make_unique<MappingQGeneric<dim, spacedim>>(degree);
+    else if (reference_cell == Type::Tri || reference_cell == Type::Tet)
+      return std::make_unique<MappingFE<dim, spacedim>>(
+        Simplex::FE_P<dim, spacedim>(degree));
+    else if (reference_cell == Type::Pyramid)
+      return std::make_unique<MappingFE<dim, spacedim>>(
+        Simplex::FE_PyramidP<dim, spacedim>(degree));
+    else if (reference_cell == Type::Wedge)
+      return std::make_unique<MappingFE<dim, spacedim>>(
+        Simplex::FE_WedgeP<dim, spacedim>(degree));
+    else
+      {
+        Assert(false, ExcNotImplemented());
+      }
+
+    return std::make_unique<MappingQGeneric<dim, spacedim>>(degree);
+  }
+
+
+  template <int dim, int spacedim>
   const Mapping<dim, spacedim> &
   get_default_linear_mapping(const Type &reference_cell)
   {

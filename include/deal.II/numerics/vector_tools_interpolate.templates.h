@@ -653,8 +653,12 @@ namespace VectorTools
       {
         const Quadrature<dim> quad(fe.get_unit_support_points());
 
-        MappingQGeneric<dim, spacedim> map_q(fe.degree);
-        FEValues<dim, spacedim> fe_v(map_q, fe, quad, update_quadrature_points);
+        const auto map_q = ReferenceCell::get_default_mapping<dim, spacedim>(
+          fe.reference_cell_type(), fe.degree);
+        FEValues<dim, spacedim>              fe_v(*map_q,
+                                     fe,
+                                     quad,
+                                     update_quadrature_points);
         std::vector<types::global_dof_index> dofs(fe.n_dofs_per_cell());
 
         AssertDimension(fe.n_dofs_per_cell(),
