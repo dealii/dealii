@@ -234,6 +234,7 @@ namespace Step68
     GridGenerator::convert_hypercube_to_simplex_mesh(
       temporary_quad_particle_triangulation,
       temporary_tri_particle_triangulation);
+    temporary_tri_particle_triangulation.set_manifold(0, FlatManifold<dim>());
 
 
     // extract relevant information from distributed triangulation
@@ -246,6 +247,7 @@ namespace Step68
     parallel::fullydistributed::Triangulation<dim> particle_triangulation(
       mpi_communicator);
     particle_triangulation.create_triangulation(particle_construction_data);
+    particle_triangulation.set_manifold(0, FlatManifold<dim>());
 
     // We generate the necessary bounding boxes for the particles generator.
     // These bounding boxes are required to quickly identify in which

@@ -42,6 +42,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
@@ -204,6 +205,9 @@ run()
 
   sixty_deg_hyper_shell(triangulation, Point<dim>(), 0.5, 1.0);
   GridTools::copy_boundary_to_manifold_id(triangulation);
+
+  for (unsigned int d = 0; d < 2 * dim; ++d)
+    triangulation.set_manifold(d, FlatManifold<dim>());
 
   static SphericalManifold<dim> boundary((Point<dim>()));
   triangulation.set_manifold(0, boundary);

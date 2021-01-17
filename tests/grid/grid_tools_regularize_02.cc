@@ -42,6 +42,9 @@ main()
 
   GridTools::copy_boundary_to_manifold_id(tria);
 
+  for (const auto bid : tria.get_boundary_ids())
+    tria.set_manifold(bid, FlatManifold<2>());
+
   tria.set_manifold(0, m0);
   tria.set_manifold(1, m1);
 

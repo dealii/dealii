@@ -155,6 +155,9 @@ test()
   GridGenerator::subdivided_hyper_rectangle(tr, subdivisions, p1, p2);
   GridTools::copy_boundary_to_manifold_id(tr);
 
+  for (const auto bid : tr.get_boundary_ids())
+    tr.set_manifold(bid, FlatManifold<dim>());
+
   static const SphericalManifold<dim> boundary(tr.begin_active()->center());
   tr.set_manifold(1, boundary);
 

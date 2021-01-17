@@ -56,6 +56,9 @@ void make_grid(Triangulation<2> &triangulation)
 
   GridGenerator::convert_hypercube_to_simplex_mesh(triangulation_temp,
                                                    triangulation);
+  for (const auto i : triangulation_temp.get_manifold_ids())
+    if (i != numbers::flat_manifold_id)
+      triangulation.set_manifold(i, triangulation_temp.get_manifold(i));
 
   triangulation.refine_global(); // WARNING: no local refinement is performed
 }

@@ -19,6 +19,7 @@
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/manifold.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
@@ -47,6 +48,8 @@ test()
   Triangulation<3> triangulation_3;
   GridGenerator::extrude_triangulation(
     triangulation_2, 3, 1.0, triangulation_3, true);
+  triangulation_3.set_manifold(0, FlatManifold<3>());
+  triangulation_3.set_manifold(1, FlatManifold<3>());
   TransfiniteInterpolationManifold<3> tfi_manifold;
   tfi_manifold.initialize(triangulation_3);
   CylindricalManifold<3> cylinder_manifold(2);

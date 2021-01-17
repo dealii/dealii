@@ -95,6 +95,7 @@ main()
     GridGenerator::extract_boundary_mesh(volume_mesh,
                                          boundary_mesh,
                                          boundary_ids);
+    boundary_mesh.set_manifold(1, FlatManifold<dim - 1, dim>());
     deallog << volume_mesh.n_active_cells() << std::endl;
     deallog << boundary_mesh.n_active_cells() << std::endl;
 

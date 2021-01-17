@@ -68,6 +68,7 @@ main()
   // This is here to ignore the points created in the interior of the
   // face.
   tria.begin()->set_manifold_id(1);
+  tria.set_manifold(1, FlatManifold<2, 3>());
 
   // We refine twice, and expect the outer points to end up on a
   // smooth curve interpolating the square vertices.

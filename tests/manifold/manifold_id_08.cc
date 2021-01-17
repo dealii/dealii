@@ -16,6 +16,7 @@
 // Make sure that Triangulation::get_manifold_ids() work correctly
 
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
 #include "../tests.h"
@@ -36,6 +37,10 @@ test(unsigned int ref = 1)
     tria.begin_active()->face(f)->set_manifold_id(2);
 
   tria.begin_active()->line(0)->set_manifold_id(3);
+
+  tria.set_manifold(1, FlatManifold<dim>());
+  tria.set_manifold(2, FlatManifold<dim>());
+  tria.set_manifold(3, FlatManifold<dim>());
 
   tria.refine_global(ref);
 

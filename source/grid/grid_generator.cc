@@ -2125,6 +2125,8 @@ namespace GridGenerator
     tria.set_manifold(2,
                       CylindricalManifold<3>(Tensor<1, 3>({0., 1., 0.}),
                                              Point<3>()));
+
+    tria.set_manifold(0, FlatManifold<3>());
     TransfiniteInterpolationManifold<3> transfinite;
     transfinite.initialize(tria);
     tria.set_manifold(0, transfinite);
@@ -3509,6 +3511,7 @@ namespace GridGenerator
 
     PolarManifold<2> polar_manifold(new_center);
     tria.set_manifold(polar_manifold_id, polar_manifold);
+    tria.set_manifold(tfi_manifold_id, FlatManifold<2>());
     TransfiniteInterpolationManifold<2> inner_manifold;
     inner_manifold.initialize(tria);
     tria.set_manifold(tfi_manifold_id, inner_manifold);
@@ -3557,8 +3560,11 @@ namespace GridGenerator
     const CylindricalManifold<3> cylindrical_manifold(
       direction,
       /*axial_point*/ new_center);
+    tria.set_manifold(polar_manifold_id, FlatManifold<3>());
+    tria.set_manifold(tfi_manifold_id, FlatManifold<3>());
     TransfiniteInterpolationManifold<3> inner_manifold;
     inner_manifold.initialize(tria);
+
     tria.set_manifold(polar_manifold_id, cylindrical_manifold);
     tria.set_manifold(tfi_manifold_id, inner_manifold);
   }
@@ -3763,6 +3769,8 @@ namespace GridGenerator
     // attach manifolds
     PolarManifold<2> polar_manifold(Point<2>(0.2, 0.2));
     tria.set_manifold(polar_manifold_id, polar_manifold);
+
+    tria.set_manifold(tfi_manifold_id, FlatManifold<2>());
     TransfiniteInterpolationManifold<2> inner_manifold;
     inner_manifold.initialize(tria);
     tria.set_manifold(tfi_manifold_id, inner_manifold);
@@ -3816,6 +3824,8 @@ namespace GridGenerator
     const Point<3>     axial_point(m_ptr->center[0], m_ptr->center[1], 0.0);
     const Tensor<1, 3> direction{{0.0, 0.0, 1.0}};
 
+    tria.set_manifold(cylindrical_manifold_id, FlatManifold<3>());
+    tria.set_manifold(tfi_manifold_id, FlatManifold<3>());
     const CylindricalManifold<3> cylindrical_manifold(direction, axial_point);
     TransfiniteInterpolationManifold<3> inner_manifold;
     inner_manifold.initialize(tria);
@@ -4314,6 +4324,8 @@ namespace GridGenerator
     tria.set_manifold(0, SphericalManifold<2>(p));
     if (internal_manifolds)
       tria.set_manifold(1, SphericalManifold<2>(p));
+    else
+      tria.set_manifold(1, FlatManifold<2>());
   }
 
 
@@ -4429,6 +4441,9 @@ namespace GridGenerator
     SphericalManifold<dim> inner_manifold(inner_center);
     SphericalManifold<dim> outer_manifold(outer_center);
 
+    tria.set_manifold(0, FlatManifold<dim>());
+    tria.set_manifold(1, FlatManifold<dim>());
+    tria.set_manifold(2, FlatManifold<dim>());
     TransfiniteInterpolationManifold<dim> transfinite;
     transfinite.initialize(tria);
 
@@ -5068,6 +5083,8 @@ namespace GridGenerator
     tria.set_manifold(0, SphericalManifold<3>(p));
     if (internal_manifold)
       tria.set_manifold(1, SphericalManifold<3>(p));
+    else
+      tria.set_manifold(1, FlatManifold<3>());
   }
 
 
@@ -5849,6 +5866,8 @@ namespace GridGenerator
         cell->set_manifold_id(1);
       else
         cell->set_all_manifold_ids(numbers::flat_manifold_id);
+
+    tria.set_manifold(1, FlatManifold<dim>());
 
     tria.set_all_manifold_ids_on_boundary(0);
     tria.set_manifold(0, SphericalManifold<dim>(p));
@@ -8216,6 +8235,17 @@ namespace GridGenerator
     for (unsigned int i = 0; i < temporary_map_boundary_cell_face.size(); i++)
       surface_to_volume_mapping[temporary_map_boundary_cell_face[i].first] =
         temporary_map_boundary_cell_face[i].second.first;
+
+    // TODO: we attach flat manifolds here; one should attach submanifolds here
+    const auto attached_mids =
+      surface_mesh.get_triangulation().get_manifold_ids();
+    for (const auto i : volume_mesh.get_triangulation().get_manifold_ids())
+      if (i != numbers::flat_manifold_id &&
+          std::find(attached_mids.begin(), attached_mids.end(), i) ==
+            attached_mids.end())
+        const_cast<Triangulation<dim - 1, spacedim> &>(
+          surface_mesh.get_triangulation())
+          .set_manifold(i, FlatManifold<dim - 1, spacedim>());
 
     return surface_to_volume_mapping;
   }

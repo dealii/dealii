@@ -29,6 +29,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
@@ -117,6 +118,10 @@ main()
     volume_mesh.refine_global(1);
 
     Triangulation<dim - 1, dim> boundary_mesh;
+
+    for (const auto bid : volume_mesh.get_manifold_ids())
+      if (bid != numbers::flat_manifold_id)
+        boundary_mesh.set_manifold(bid, FlatManifold<2, 3>());
 
     surface_to_volume_mapping =
       GridGenerator::extract_boundary_mesh(volume_mesh, boundary_mesh);
