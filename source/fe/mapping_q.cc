@@ -544,6 +544,21 @@ MappingQ<dim, spacedim>::clone() const
 
 
 
+template <int dim, int spacedim>
+BoundingBox<spacedim>
+MappingQ<dim, spacedim>::get_bounding_box(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
+{
+  if (cell->has_boundary_lines() || use_mapping_q_on_all_cells ||
+      (dim != spacedim))
+    return BoundingBox<spacedim>(
+      qp_mapping->compute_mapping_support_points(cell));
+  else
+    return BoundingBox<spacedim>(q1_mapping->get_vertices(cell));
+}
+
+
+
 // explicit instantiations
 #include "mapping_q.inst"
 

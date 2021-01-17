@@ -140,6 +140,11 @@ public:
   virtual bool
   preserves_vertex_locations() const override;
 
+  // for documentation, see the Mapping base class
+  virtual BoundingBox<spacedim>
+  get_bounding_box(const typename Triangulation<dim, spacedim>::cell_iterator
+                     &cell) const override;
+
   /**
    * Exception which is thrown when the mapping is being evaluated at
    * non-active cell.

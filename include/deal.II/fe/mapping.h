@@ -375,11 +375,11 @@ public:
    * displacements or choose completely different locations, e.g.,
    * MappingQEulerian, MappingQ1Eulerian, or MappingFEField.
    *
-   * This function returns the bounding box containing all the vertices of the
-   * cell, as returned by the get_vertices() method. Beware of the fact that
-   * for higher order mappings this bounding box is only an approximation of the
-   * true bounding box, since it does not take into account curved faces, and it
-   * may be smaller than the true bounding box.
+   * For linear mappings, this function returns the bounding box containing all
+   * the vertices of the cell, as returned by the get_vertices() method. For
+   * higher order mappings defined through support points, the bounding box is
+   * only guaranteed to contain all the support points, and it is, in general,
+   * only an approximation of the true bounding box, which may be larger.
    *
    * @param[in] cell The cell for which you want to compute the bounding box
    */
