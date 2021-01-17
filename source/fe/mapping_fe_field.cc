@@ -192,28 +192,6 @@ MappingFEField<dim, spacedim, VectorType, void>::InternalData::
 
 
 
-namespace
-{
-  // Construct a quadrature formula containing the vertices of the reference
-  // cell in dimension dim (with invalid weights)
-  template <int dim>
-  Quadrature<dim> &
-  get_vertex_quadrature()
-  {
-    static Quadrature<dim> quad;
-    if (quad.size() == 0)
-      {
-        std::vector<Point<dim>> points(GeometryInfo<dim>::vertices_per_cell);
-        for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
-          points[i] = GeometryInfo<dim>::unit_cell_vertex(i);
-        quad = Quadrature<dim>(points);
-      }
-    return quad;
-  }
-} // namespace
-
-
-
 template <int dim, int spacedim, typename VectorType>
 MappingFEField<dim, spacedim, VectorType, void>::MappingFEField(
   const DoFHandler<dim, spacedim> &euler_dof_handler,
@@ -229,7 +207,8 @@ MappingFEField<dim, spacedim, VectorType, void>::MappingFEField(
                 true))
   , fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int)
   , fe_values(this->euler_dof_handler->get_fe(),
-              get_vertex_quadrature<dim>(),
+              ReferenceCell::get_nodal_type_quadrature<dim>(
+                this->euler_dof_handler->get_fe().reference_cell_type()),
               update_values)
 {
   unsigned int size = 0;
@@ -257,7 +236,8 @@ MappingFEField<dim, spacedim, VectorType, void>::MappingFEField(
                 true))
   , fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int)
   , fe_values(this->euler_dof_handler->get_fe(),
-              get_vertex_quadrature<dim>(),
+              ReferenceCell::get_nodal_type_quadrature<dim>(
+                this->euler_dof_handler->get_fe().reference_cell_type()),
               update_values)
 {
   unsigned int size = 0;
@@ -296,7 +276,8 @@ MappingFEField<dim, spacedim, VectorType, void>::MappingFEField(
                 true))
   , fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int)
   , fe_values(this->euler_dof_handler->get_fe(),
-              get_vertex_quadrature<dim>(),
+              ReferenceCell::get_nodal_type_quadrature<dim>(
+                this->euler_dof_handler->get_fe().reference_cell_type()),
               update_values)
 {
   unsigned int size = 0;
@@ -332,7 +313,8 @@ MappingFEField<dim, spacedim, VectorType, void>::MappingFEField(
   , fe_mask(mapping.fe_mask)
   , fe_to_real(mapping.fe_to_real)
   , fe_values(mapping.euler_dof_handler->get_fe(),
-              get_vertex_quadrature<dim>(),
+              ReferenceCell::get_nodal_type_quadrature<dim>(
+                this->euler_dof_handler->get_fe().reference_cell_type()),
               update_values)
 {}
 
@@ -372,8 +354,7 @@ MappingFEField<dim, spacedim, VectorType, void>::get_vertices(
     *cell, euler_dof_handler);
 
   Assert(uses_level_dofs || dof_cell->is_active() == true, ExcInactiveCell());
-  AssertDimension(GeometryInfo<dim>::vertices_per_cell,
-                  fe_values.n_quadrature_points);
+  AssertDimension(cell->n_vertices(), fe_values.n_quadrature_points);
   AssertDimension(fe_to_real.size(),
                   euler_dof_handler->get_fe().n_components());
   if (uses_level_dofs)
@@ -402,7 +383,7 @@ MappingFEField<dim, spacedim, VectorType, void>::get_vertices(
 
   boost::container::small_vector<Point<spacedim>,
                                  GeometryInfo<dim>::vertices_per_cell>
-    vertices(GeometryInfo<dim>::vertices_per_cell);
+    vertices(cell->n_vertices());
   for (unsigned int i = 0; i < dofs_per_cell; ++i)
     {
       const unsigned int comp = fe_to_real
@@ -412,7 +393,7 @@ MappingFEField<dim, spacedim, VectorType, void>::get_vertices(
           typename VectorType::value_type value =
             internal::ElementAccess<VectorType>::get(vector, dof_indices[i]);
           if (euler_dof_handler->get_fe().is_primitive(i))
-            for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+            for (const unsigned int v : cell->vertex_indices())
               vertices[v][comp] += fe_values.shape_value(i, v) * value;
           else
             Assert(false, ExcNotImplemented());
@@ -585,23 +566,30 @@ MappingFEField<dim, spacedim, VectorType, void>::compute_face_data(
           data.aux.resize(
             dim - 1, std::vector<Tensor<1, spacedim>>(n_original_q_points));
 
+
+          // TODO: only a single reference cell type possible...
+          const auto reference_cell_type =
+            this->euler_dof_handler->get_fe().reference_cell_type();
+          const auto n_faces =
+            ReferenceCell::internal::Info::get_cell(reference_cell_type)
+              .n_faces();
+
           // Compute tangentials to the unit cell.
-          for (const unsigned int i : GeometryInfo<dim>::face_indices())
+          for (unsigned int i = 0; i < n_faces; ++i)
             {
               data.unit_tangentials[i].resize(n_original_q_points);
               std::fill(data.unit_tangentials[i].begin(),
                         data.unit_tangentials[i].end(),
-                        GeometryInfo<dim>::unit_tangential_vectors[i][0]);
+                        ReferenceCell::unit_tangential_vectors<dim>(
+                          reference_cell_type, i, 0));
               if (dim > 2)
                 {
-                  data.unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
-                    .resize(n_original_q_points);
-                  std::fill(
-                    data.unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
-                      .begin(),
-                    data.unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
-                      .end(),
-                    GeometryInfo<dim>::unit_tangential_vectors[i][1]);
+                  data.unit_tangentials[n_faces + i].resize(
+                    n_original_q_points);
+                  std::fill(data.unit_tangentials[n_faces + i].begin(),
+                            data.unit_tangentials[n_faces + i].end(),
+                            ReferenceCell::unit_tangential_vectors<dim>(
+                              reference_cell_type, i, 1));
                 }
             }
         }
@@ -1273,22 +1261,17 @@ namespace internal
             // 0.
             for (unsigned int d = 0; d != dim - 1; ++d)
               {
-                Assert(face_no + GeometryInfo<dim>::faces_per_cell * d <
+                Assert(face_no + cell->n_faces() * d <
                          data.unit_tangentials.size(),
                        ExcInternalError());
                 Assert(
                   data.aux[d].size() <=
-                    data
-                      .unit_tangentials[face_no +
-                                        GeometryInfo<dim>::faces_per_cell * d]
-                      .size(),
+                    data.unit_tangentials[face_no + cell->n_faces() * d].size(),
                   ExcInternalError());
 
                 mapping.transform(
                   make_array_view(
-                    data
-                      .unit_tangentials[face_no +
-                                        GeometryInfo<dim>::faces_per_cell * d]),
+                    data.unit_tangentials[face_no + cell->n_faces() * d]),
                   mapping_contravariant,
                   data,
                   make_array_view(data.aux[d]));
@@ -1371,6 +1354,7 @@ namespace internal
 
                       if (subface_no != numbers::invalid_unsigned_int)
                         {
+                          // TODO
                           const double area_ratio =
                             GeometryInfo<dim>::subface_ratio(
                               cell->subface_case(face_no), subface_no);
@@ -2096,6 +2080,7 @@ MappingFEField<dim, spacedim, VectorType, void>::transform_real_to_unit_cell(
         initial_p_unit[d] = 0.5;
     }
 
+  // TODO
   initial_p_unit = GeometryInfo<dim>::project_to_unit_cell(initial_p_unit);
 
   // for (unsigned int d=0; d<dim; ++d)

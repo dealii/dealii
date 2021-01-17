@@ -544,6 +544,16 @@ namespace ReferenceCell
   get_gauss_type_quadrature(const Type &   reference_cell,
                             const unsigned n_points_1D);
 
+  /**
+   * Return a quadrature rule with the support points of the given reference
+   * cell.
+   *
+   * @note The weights are not filled.
+   */
+  template <int dim>
+  Quadrature<dim> &
+  get_nodal_type_quadrature(const Type &reference_cell);
+
   namespace internal
   {
     /**
