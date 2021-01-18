@@ -54,15 +54,8 @@
  *
  * @subsection simplex_reference_example_simplex Example: simplex mesh
  *
- * The following code shows how to work with simplex meshes:
- *
- * @include step_3_simplex.cc
- *
- * @subsection simplex_reference_example_mixed Example: mixed mesh
- *
- * The following code shows how to work with mixed meshes:
- *
- * @include step_3_mixed.cc
+ * The step-3simplex shows how to work with simplex meshes and
+ * step-3mixed shows how to work with mixed meshes.
  *
  * @section simplex_reference_cells Reference cells
  *
