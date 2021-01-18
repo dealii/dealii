@@ -868,15 +868,52 @@ namespace internal
       // copy constrain matrix; TODO: why only for the coarse level?
       transfer.constraint_coarse.copy_from(constraint_coarse);
 
-      // make sure that no hp is used
-      AssertDimension(dof_handler_coarse.get_fe_collection().size(), 1);
-      AssertDimension(dof_handler_fine.get_fe_collection().size(), 1);
+      // gather ranges for active FE indices on both fine and coarse dofhandlers
+      std::array<unsigned int, 2> min_active_fe_indices = {
+        {std::numeric_limits<unsigned int>::max(),
+         std::numeric_limits<unsigned int>::max()}};
+      std::array<unsigned int, 2> max_active_fe_indices = {{0, 0}};
+
+      for (const auto &cell : dof_handler_fine.active_cell_iterators())
+        if (cell->is_locally_owned())
+          {
+            min_active_fe_indices[0] =
+              std::min(min_active_fe_indices[0], cell->active_fe_index());
+            max_active_fe_indices[0] =
+              std::max(max_active_fe_indices[0], cell->active_fe_index());
+          }
+
+      for (const auto &cell : dof_handler_coarse.active_cell_iterators())
+        if (cell->is_locally_owned())
+          {
+            min_active_fe_indices[1] =
+              std::min(min_active_fe_indices[1], cell->active_fe_index());
+            max_active_fe_indices[1] =
+              std::max(max_active_fe_indices[1], cell->active_fe_index());
+          }
+
+      const auto comm = get_mpi_comm(dof_handler_fine);
+
+      Assert(comm == get_mpi_comm(dof_handler_coarse), ExcNotImplemented());
+
+      ArrayView<unsigned int> temp_min(min_active_fe_indices);
+      ArrayView<unsigned int> temp_max(max_active_fe_indices);
+      Utilities::MPI::min(temp_min, comm, temp_min);
+      Utilities::MPI::max(temp_max, comm, temp_max);
+
+      // make sure that hp is used neither on the coarse nor on the fine
+      // dofhandler
+      AssertDimension(min_active_fe_indices[0], max_active_fe_indices[0]);
+      AssertDimension(min_active_fe_indices[1], max_active_fe_indices[1]);
+
+      const auto &fe_fine = dof_handler_fine.get_fe(min_active_fe_indices[0]);
+      const auto &fe_coarse =
+        dof_handler_coarse.get_fe(min_active_fe_indices[1]);
 
       // extract number of components
-      AssertDimension(dof_handler_fine.get_fe().n_components(),
-                      dof_handler_coarse.get_fe().n_components());
+      AssertDimension(fe_fine.n_components(), fe_coarse.n_components());
 
-      transfer.n_components = dof_handler_fine.get_fe().n_components();
+      transfer.n_components = fe_fine.n_components();
 
       // create partitioners and vectors for internal purposes
       {
@@ -939,28 +976,24 @@ namespace internal
       transfer.schemes.resize(2);
 
       // check if FE is the same; TODO: better way?
-      AssertDimension(dof_handler_coarse.get_fe(0).dofs_per_cell,
-                      dof_handler_fine.get_fe(0).dofs_per_cell);
+      AssertDimension(fe_coarse.dofs_per_cell, fe_fine.dofs_per_cell);
 
       // number of dofs on coarse and fine cells
       transfer.schemes[0].dofs_per_cell_coarse =
         transfer.schemes[0].dofs_per_cell_fine =
-          transfer.schemes[1].dofs_per_cell_coarse =
-            dof_handler_coarse.get_fe(0).dofs_per_cell;
+          transfer.schemes[1].dofs_per_cell_coarse = fe_coarse.dofs_per_cell;
       transfer.schemes[1].dofs_per_cell_fine =
-        dof_handler_coarse.get_fe(0).dofs_per_cell *
-        GeometryInfo<dim>::max_children_per_cell;
+        fe_coarse.dofs_per_cell * GeometryInfo<dim>::max_children_per_cell;
 
       // degree of FE on coarse and fine cell
       transfer.schemes[0].degree_coarse   = transfer.schemes[0].degree_fine =
-        transfer.schemes[1].degree_coarse = dof_handler_coarse.get_fe(0).degree;
-      transfer.schemes[1].degree_fine =
-        dof_handler_coarse.get_fe(0).degree * 2 + 1;
+        transfer.schemes[1].degree_coarse = fe_coarse.degree;
+      transfer.schemes[1].degree_fine     = fe_coarse.degree * 2 + 1;
 
       // continuous or discontinuous
       transfer.schemes[0].fine_element_is_continuous =
         transfer.schemes[1].fine_element_is_continuous =
-          dof_handler_fine.get_fe(0).dofs_per_vertex > 0;
+          fe_fine.dofs_per_vertex > 0;
 
       // count coarse cells for each scheme (0, 1)
       {
@@ -981,8 +1014,8 @@ namespace internal
 
       const auto cell_local_chilren_indices =
         get_child_offsets<dim>(transfer.schemes[0].dofs_per_cell_coarse,
-                               dof_handler_fine.get_fe(0).degree + 1,
-                               dof_handler_fine.get_fe(0).degree);
+                               fe_fine.degree + 1,
+                               fe_fine.degree);
 
 
       // indices
@@ -1010,7 +1043,7 @@ namespace internal
           const Quadrature<1> dummy_quadrature(
             std::vector<Point<1>>(1, Point<1>()));
           internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
-          shape_info.reinit(dummy_quadrature, dof_handler_fine.get_fe(0), 0);
+          shape_info.reinit(dummy_quadrature, fe_fine, 0);
           lexicographic_numbering = shape_info.lexicographic_numbering;
         }
 
@@ -1094,9 +1127,8 @@ namespace internal
 
       // ------------- prolongation matrix (0) -> identity matrix --------------
       {
-        AssertDimension(dof_handler_fine.get_fe(0).n_base_elements(), 1);
-        std::string fe_name =
-          dof_handler_fine.get_fe(0).base_element(0).get_name();
+        AssertDimension(fe_fine.n_base_elements(), 1);
+        std::string fe_name = fe_fine.base_element(0).get_name();
         {
           const std::size_t template_starts = fe_name.find_first_of('<');
           Assert(fe_name[template_starts + 1] ==
@@ -1117,9 +1149,8 @@ namespace internal
 
       // ----------------------- prolongation matrix (1) -----------------------
       {
-        AssertDimension(dof_handler_fine.get_fe(0).n_base_elements(), 1);
-        std::string fe_name =
-          dof_handler_fine.get_fe(0).base_element(0).get_name();
+        AssertDimension(fe_fine.n_base_elements(), 1);
+        std::string fe_name = fe_fine.base_element(0).get_name();
         {
           const std::size_t template_starts = fe_name.find_first_of('<');
           Assert(fe_name[template_starts + 1] ==
