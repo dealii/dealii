@@ -379,6 +379,26 @@ namespace parallel
       is_multilevel_hierarchy_constructed() const override;
 
       /**
+       * Transfer data across forests.
+       *
+       * Besides the actual @p parallel_forest, which has been already refined
+       * and repartitioned, this function also needs information about its
+       * previous state, i.e. the locally owned intervals in p4est's
+       * sc_array of each processor. This information needs to be memcopyied
+       * out of the old p4est object and has to be provided via the parameter
+       * @p previous_global_first_quadrant.
+       *
+       * Data has to be previously packed with
+       * DistributedTriangulationBase::DataTransfer::pack_data().
+       */
+      void
+      execute_transfer(
+        const typename dealii::internal::p4est::types<dim>::forest
+          *parallel_forest,
+        const typename dealii::internal::p4est::types<dim>::gloidx
+          *previous_global_first_quadrant);
+
+      /**
        * Implementation of the same function as in the base class.
        *
        * @note This function cannot copy a triangulation that has been refined.
@@ -610,10 +630,11 @@ namespace parallel
        * file. This file needs to be reachable from all nodes in the
        * computation on a shared network file system. See the SolutionTransfer
        * class on how to store solution vectors into this file. Additional
-       * cell-based data can be saved using register_data_attach().
+       * cell-based data can be saved using
+       * DistributedTriangulationBase::DataTransfer::register_data_attach().
        */
-      void
-      save(const std::string &filename) const;
+      virtual void
+      save(const std::string &filename) const override;
 
       /**
        * Load the refinement information saved with save() back in. The mesh
@@ -624,7 +645,9 @@ namespace parallel
        * you saved with. Rather, if a mesh is loaded with a different number
        * of MPI processes than used at the time of saving, the mesh is
        * repartitioned appropriately. Cell-based data that was saved with
-       * register_data_attach() can be read in with notify_ready_to_unpack()
+       * DistributedTriangulationBase::DataTransfer::register_data_attach() can
+       * be read in with
+       * DistributedTriangulationBase::DataTransfer::notify_ready_to_unpack()
        * after calling load().
        *
        * If you use p4est version > 0.3.4.2 the @p autopartition flag tells
@@ -633,179 +656,9 @@ namespace parallel
        * set to false, the triangulation is only repartitioned if needed (i.e.
        * if a different number of MPI processes is encountered).
        */
-      void
-      load(const std::string &filename, const bool autopartition = true);
-
-      /**
-       * Register a function that can be used to attach data of fixed size
-       * to cells. This is useful for two purposes: (i) Upon refinement and
-       * coarsening of a triangulation (in
-       * parallel::distributed::Triangulation::execute_coarsening_and_refinement()),
-       * one needs to be able to store one or more data vectors per cell that
-       * characterizes the solution values on the cell so that this data can
-       * then be transferred to the new owning processor of the cell (or
-       * its parent/children) when the mesh is re-partitioned; (ii) when
-       * serializing a computation to a file, it is necessary to attach
-       * data to cells so that it can be saved (in
-       * parallel::distributed::Triangulation::save()) along with the cell's
-       * other information and, if necessary, later be reloaded from disk
-       * with a different subdivision of cells among the processors.
-       *
-       * The way this function works is that it allows any number of interest
-       * parties to register their intent to attach data to cells. One example
-       * of classes that do this is parallel::distributed::SolutionTransfer
-       * where each parallel::distributed::SolutionTransfer object that works
-       * on the current Triangulation object then needs to register its intent.
-       * Each of these parties registers a callback function (the first
-       * argument here, @p pack_callback) that will be called whenever the
-       * triangulation's execute_coarsening_and_refinement() or save()
-       * functions are called.
-       *
-       * The current function then returns an integer handle that corresponds
-       * to the number of data set that the callback provided here will attach.
-       * While this number could be given a precise meaning, this is
-       * not important: You will never actually have to do anything with
-       * this number except return it to the notify_ready_to_unpack() function.
-       * In other words, each interested party (i.e., the caller of the current
-       * function) needs to store their respective returned handle for later use
-       * when unpacking data in the callback provided to
-       * notify_ready_to_unpack().
-       *
-       * Whenever @p pack_callback is then called by
-       * execute_coarsening_and_refinement() or load() on a given cell, it
-       * receives a number of arguments. In particular, the first
-       * argument passed to the callback indicates the cell for which
-       * it is supposed to attach data. This is always an active cell.
-       *
-       * The second, CellStatus, argument provided to the callback function
-       * will tell you if the given cell will be coarsened, refined, or will
-       * persist as is. (This status may be different than the refinement
-       * or coarsening flags set on that cell, to accommodate things such as
-       * the "one hanging node per edge" rule.). These flags need to be
-       * read in context with the p4est quadrant they belong to, as their
-       * relations are gathered in local_quadrant_cell_relations.
-       *
-       * Specifically, the values for this argument mean the following:
-       *
-       * - `CELL_PERSIST`: The cell won't be refined/coarsened, but might be
-       * moved to a different processor. If this is the case, the callback
-       * will want to pack up the data on this cell into an array and store
-       * it at the provided address for later unpacking wherever this cell
-       * may land.
-       * - `CELL_REFINE`: This cell will be refined into 4 or 8 cells (in 2d
-       * and 3d, respectively). However, because these children don't exist
-       * yet, you cannot access them at the time when the callback is
-       * called. Thus, in local_quadrant_cell_relations, the corresponding
-       * p4est quadrants of the children cells are linked to the deal.II
-       * cell which is going to be refined. To be specific, only the very
-       * first child is marked with `CELL_REFINE`, whereas the others will be
-       * marked with `CELL_INVALID`, which indicates that these cells will be
-       * ignored by default during the packing or unpacking process. This
-       * ensures that data is only transferred once onto or from the parent
-       * cell. If the callback is called with `CELL_REFINE`, the callback
-       * will want to pack up the data on this cell into an array and store
-       * it at the provided address for later unpacking in a way so that
-       * it can then be transferred to the children of the cell that will
-       * then be available. In other words, if the data the callback
-       * will want to pack up corresponds to a finite element field, then
-       * the prolongation from parent to (new) children will have to happen
-       * during unpacking.
-       * - `CELL_COARSEN`: The children of this cell will be coarsened into the
-       * given cell. These children still exist, so if this is the value
-       * given to the callback as second argument, the callback will want
-       * to transfer data from the children to the current parent cell and
-       * pack it up so that it can later be unpacked again on a cell that
-       * then no longer has any children (and may also be located on a
-       * different processor). In other words, if the data the callback
-       * will want to pack up corresponds to a finite element field, then
-       * it will need to do the restriction from children to parent at
-       * this point.
-       * - `CELL_INVALID`: See `CELL_REFINE`.
-       *
-       * @note If this function is used for serialization of data
-       *   using save() and load(), then the cell status argument with which
-       *   the callback is called will always be `CELL_PERSIST`.
-       *
-       * The callback function is expected to return a memory chunk of the
-       * format `std::vector<char>`, representing the packed data on a
-       * certain cell.
-       *
-       * The second parameter @p returns_variable_size_data indicates whether
-       * the returned size of the memory region from the callback function
-       * varies by cell (<tt>=true</tt>) or stays constant on each one
-       * throughout the whole domain (<tt>=false</tt>).
-       *
-       * @note The purpose of this function is to register intent to
-       *   attach data for a single, subsequent call to
-       *   execute_coarsening_and_refinement() and notify_ready_to_unpack(),
-       *   save(), load(). Consequently, notify_ready_to_unpack(), save(),
-       *   and load() all forget the registered callbacks once these
-       *   callbacks have been called, and you will have to re-register
-       *   them with a triangulation if you want them to be active for
-       *   another call to these functions.
-       */
-      unsigned int
-      register_data_attach(
-        const std::function<std::vector<char>(const cell_iterator &,
-                                              const CellStatus)> &pack_callback,
-        const bool returns_variable_size_data);
-
-      /**
-       * This function is the opposite of register_data_attach(). It is called
-       * <i>after</i> the execute_coarsening_and_refinement() or save()/load()
-       * functions are done when classes and functions that have previously
-       * attached data to a triangulation for either transfer to other
-       * processors, across mesh refinement, or serialization of data to
-       * a file are ready to receive that data back. The important part about
-       * this process is that the triangulation cannot do this right away from
-       * the end of execute_coarsening_and_refinement() or load() via a
-       * previously attached callback function (as the register_data_attach()
-       * function does) because the classes that eventually want the data
-       * back may need to do some setup between the point in time where the
-       * mesh has been recreated and when the data can actually be received.
-       * An example is the parallel::distributed::SolutionTransfer class
-       * that can really only receive the data once not only the mesh is
-       * completely available again on the current processor, but only
-       * after a DoFHandler has been reinitialized and distributed
-       * degrees of freedom. In other words, there is typically a significant
-       * amount of set up that needs to happen in user space before the classes
-       * that can receive data attached to cell are ready to actually do so.
-       * When they are, they use the current function to tell the triangulation
-       * object that now is the time when they are ready by calling the
-       * current function.
-       *
-       * The supplied callback function is then called for each newly locally
-       * owned cell. The first argument to the callback is an iterator that
-       * designates the cell; the second argument indicates the status of the
-       * cell in question; and the third argument localizes a memory area by
-       * two iterators that contains the data that was previously saved from
-       * the callback provided to register_data_attach().
-       *
-       * The CellStatus will indicate if the cell was refined, coarsened, or
-       * persisted unchanged. The @p cell_iterator argument to the callback
-       * will then either be an active,
-       * locally owned cell (if the cell was not refined), or the immediate
-       * parent if it was refined during execute_coarsening_and_refinement().
-       * Therefore, contrary to during register_data_attach(), you can now
-       * access the children if the status is `CELL_REFINE` but no longer for
-       * callbacks with status `CELL_COARSEN`.
-       *
-       * The first argument to this function, `handle`, corresponds to
-       * the return value of register_data_attach(). (The precise
-       * meaning of what the numeric value of this handle is supposed
-       * to represent is neither important, nor should you try to use
-       * it for anything other than transmit information between a
-       * call to register_data_attach() to the corresponding call to
-       * notify_ready_to_unpack().)
-       */
-      void
-      notify_ready_to_unpack(
-        const unsigned int handle,
-        const std::function<void(
-          const cell_iterator &,
-          const CellStatus,
-          const boost::iterator_range<std::vector<char>::const_iterator> &)>
-          &unpack_callback);
+      virtual void
+      load(const std::string &filename,
+           const bool         autopartition = true) override;
 
       /**
        * Return a permutation vector for the order the coarse cells are handed
@@ -890,246 +743,16 @@ namespace parallel
       typename dealii::internal::p4est::types<dim>::ghost *parallel_ghost;
 
       /**
-       * A structure that stores information about the data that has been, or
-       * will be, attached to cells via the register_data_attach() function
-       * and later retrieved via notify_ready_to_unpack().
-       */
-      struct CellAttachedData
-      {
-        /**
-         * number of functions that get attached to the Triangulation through
-         * register_data_attach() for example SolutionTransfer.
-         */
-        unsigned int n_attached_data_sets;
-
-        /**
-         * number of functions that need to unpack their data after a call from
-         * load()
-         */
-        unsigned int n_attached_deserialize;
-
-        using pack_callback_t = std::function<std::vector<char>(
-          typename Triangulation<dim, spacedim>::cell_iterator,
-          CellStatus)>;
-
-        /**
-         * These callback functions will be stored in the order in which they
-         * have been registered with the register_data_attach() function.
-         */
-        std::vector<pack_callback_t> pack_callbacks_fixed;
-        std::vector<pack_callback_t> pack_callbacks_variable;
-      };
-
-      CellAttachedData cell_attached_data;
-
-      /**
-       * This auxiliary data structure stores the relation between a p4est
-       * quadrant, a deal.II cell and its current CellStatus. For an extensive
-       * description of the latter, see the documentation for the member
-       * function register_data_attach().
-       */
-      using quadrant_cell_relation_t = typename std::tuple<
-        typename dealii::internal::p4est::types<dim>::quadrant *,
-        CellStatus,
-        cell_iterator>;
-
-      /**
-       * Vector of tuples, which each contain a p4est quadrant, a deal.II cell
-       * and their relation after refinement. To update its contents, use the
-       * compute_quadrant_cell_relations member function.
-       *
-       * The size of this vector is assumed to be equal to the number of locally
-       * owned quadrants in the parallel_forest object.
-       */
-      std::vector<quadrant_cell_relation_t> local_quadrant_cell_relations;
-
-      /**
-       * Go through all p4est trees and store the relations between locally
-       * owned quadrants and cells in the private member
-       * local_quadrant_cell_relations.
+       * Go through all p4est trees and store the relations between the status
+       * of locally owned quadrants and cells in the private member
+       * local_cell_relations.
        *
        * The stored vector will be ordered by the occurrence of quadrants in
        * the corresponding local sc_array of the parallel_forest. p4est requires
        * this specific ordering for its transfer functions.
        */
-      void
-      update_quadrant_cell_relations();
-
-      /**
-       * This class in the private scope of parallel::distributed::Triangulation
-       * is dedicated to the data transfer across repartitioned meshes
-       * and to the file system.
-       *
-       * It is designed to store all data buffers intended for transfer
-       * separated from the parallel_forest and to interface with p4est
-       * where it is absolutely necessary.
-       */
-      class DataTransfer
-      {
-      public:
-        DataTransfer(const MPI_Comm &mpi_communicator);
-
-        /**
-         * Prepare data transfer by calling the pack callback functions on each
-         * cell
-         * in @p quad_cell_relations.
-         *
-         * All registered callback functions in @p pack_callbacks_fixed will write
-         * into the fixed size buffer, whereas each entry of @p pack_callbacks_variable
-         * will write its data into the variable size buffer.
-         */
-        void
-        pack_data(
-          const std::vector<quadrant_cell_relation_t> &quad_cell_relations,
-          const std::vector<typename CellAttachedData::pack_callback_t>
-            &pack_callbacks_fixed,
-          const std::vector<typename CellAttachedData::pack_callback_t>
-            &pack_callbacks_variable);
-
-        /**
-         * Transfer data across forests.
-         *
-         * Besides the actual @p parallel_forest, which has been already refined
-         * and repartitioned, this function also needs information about its
-         * previous state, i.e. the locally owned intervals in p4est's
-         * sc_array of each processor. This information needs to be memcopyied
-         * out of the old p4est object and has to be provided via the parameter
-         * @p previous_global_first_quadrant.
-         *
-         * Data has to be previously packed with pack_data().
-         */
-        void
-        execute_transfer(
-          const typename dealii::internal::p4est::types<dim>::forest
-            *parallel_forest,
-          const typename dealii::internal::p4est::types<dim>::gloidx
-            *previous_global_first_quadrant);
-
-        /**
-         * Unpack the CellStatus information on each entry of
-         * @p quad_cell_relations.
-         *
-         * Data has to be previously transferred with execute_transfer()
-         * or read from the file system via load().
-         */
-        void
-        unpack_cell_status(
-          std::vector<quadrant_cell_relation_t> &quad_cell_relations) const;
-
-        /**
-         * Unpack previously transferred data on each cell registered in
-         * @p quad_cell_relations with the provided @p unpack_callback function.
-         *
-         * The parameter @p handle corresponds to the position where the
-         * @p unpack_callback function is allowed to read from the memory. Its
-         * value needs to be in accordance with the corresponding pack_callback
-         * function that has been registered previously.
-         *
-         * Data has to be previously transferred with execute_transfer()
-         * or read from the file system via load().
-         */
-        void
-        unpack_data(
-          const std::vector<quadrant_cell_relation_t> &quad_cell_relations,
-          const unsigned int                           handle,
-          const std::function<void(
-            const typename dealii::Triangulation<dim, spacedim>::cell_iterator
-              &,
-            const typename dealii::Triangulation<dim, spacedim>::CellStatus &,
-            const boost::iterator_range<std::vector<char>::const_iterator> &)>
-            &unpack_callback) const;
-
-        /**
-         * Transfer data to file system.
-         *
-         * The data will be written in a separate file, whose name
-         * consists of the stem @p filename and an attached identifier
-         * <tt>-fixed.data</tt> for fixed size data and <tt>-variable.data</tt>
-         * for variable size data.
-         *
-         * All processors write into these files simultaneously via MPIIO.
-         * Each processor's position to write to will be determined
-         * from the provided @p parallel_forest.
-         *
-         * Data has to be previously packed with pack_data().
-         */
-        void
-        save(const typename dealii::internal::p4est::types<dim>::forest
-               *                parallel_forest,
-             const std::string &filename) const;
-
-        /**
-         * Transfer data from file system.
-         *
-         * The data will be read from separate file, whose name
-         * consists of the stem @p filename and an attached identifier
-         * <tt>-fixed.data</tt> for fixed size data and <tt>-variable.data</tt>
-         * for variable size data.
-         * The @p n_attached_deserialize_fixed and @p n_attached_deserialize_variable
-         * parameters are required to gather the memory offsets for each
-         * callback.
-         *
-         * All processors read from these files simultaneously via MPIIO.
-         * Each processor's position to read from will be determined
-         * from the provided @p parallel_forest.
-         *
-         * After loading, unpack_data() needs to be called to finally
-         * distribute data across the associated triangulation.
-         */
-        void
-        load(const typename dealii::internal::p4est::types<dim>::forest
-               *                parallel_forest,
-             const std::string &filename,
-             const unsigned int n_attached_deserialize_fixed,
-             const unsigned int n_attached_deserialize_variable);
-
-        /**
-         * Clears all containers and associated data, and resets member
-         * values to their default state.
-         *
-         * Frees memory completely.
-         */
-        void
-        clear();
-
-      private:
-        MPI_Comm mpi_communicator;
-
-        /**
-         * Flag that denotes if variable size data has been packed.
-         */
-        bool variable_size_data_stored;
-
-        /**
-         * Cumulative size in bytes that those functions that have called
-         * register_data_attach() want to attach to each cell. This number
-         * only pertains to fixed-sized buffers where the data attached to
-         * each cell has exactly the same size.
-         *
-         * The last entry of this container corresponds to the data size
-         * packed per cell in the fixed size buffer (which can be accessed
-         * calling <tt>sizes_fixed_cumulative.back()</tt>).
-         */
-        std::vector<unsigned int> sizes_fixed_cumulative;
-
-        /**
-         * Consecutive buffers designed for the fixed size transfer
-         * functions of p4est.
-         */
-        std::vector<char> src_data_fixed;
-        std::vector<char> dest_data_fixed;
-
-        /**
-         * Consecutive buffers designed for the variable size transfer
-         * functions of p4est.
-         */
-        std::vector<int>  src_sizes_variable;
-        std::vector<int>  dest_sizes_variable;
-        std::vector<char> src_data_variable;
-        std::vector<char> dest_data_variable;
-      };
-
-      DataTransfer data_transfer;
+      virtual void
+      update_cell_relations() override;
 
       /**
        * Two arrays that store which p4est tree corresponds to which coarse
@@ -1307,43 +930,30 @@ namespace parallel
        * This function is not implemented, but needs to be present for the
        * compiler.
        */
-      void
-      load(const std::string &filename, const bool autopartition = true);
+      virtual void
+      load(const std::string &filename,
+           const bool         autopartition = true) override;
 
       /**
        * This function is not implemented, but needs to be present for the
        * compiler.
        */
-      void
-      save(const std::string &filename) const;
+      virtual void
+      save(const std::string &filename) const override;
 
-      bool
+      /**
+       * This function is not implemented, but needs to be present for the
+       * compiler.
+       */
+      virtual bool
       is_multilevel_hierarchy_constructed() const override;
 
       /**
        * This function is not implemented, but needs to be present for the
        * compiler.
        */
-      unsigned int
-      register_data_attach(
-        const std::function<std::vector<char>(
-          const typename dealii::Triangulation<1, spacedim>::cell_iterator &,
-          const typename dealii::Triangulation<1, spacedim>::CellStatus)>
-          &        pack_callback,
-        const bool returns_variable_size_data);
-
-      /**
-       * This function is not implemented, but needs to be present for the
-       * compiler.
-       */
-      void
-      notify_ready_to_unpack(
-        const unsigned int handle,
-        const std::function<void(
-          const typename dealii::Triangulation<1, spacedim>::cell_iterator &,
-          const typename dealii::Triangulation<1, spacedim>::CellStatus,
-          const boost::iterator_range<std::vector<char>::const_iterator> &)>
-          &unpack_callback);
+      virtual void
+      update_cell_relations() override;
 
       /**
        * Dummy arrays. This class isn't usable but the compiler wants to see

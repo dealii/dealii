@@ -231,6 +231,29 @@ namespace parallel
       virtual bool
       is_multilevel_hierarchy_constructed() const override;
 
+      /**
+       * Save the triangulation into the given file. This file needs to be
+       * reachable from all nodes in the computation on a shared network file
+       * system. See the SolutionTransfer class on how to store solution vectors
+       * into this file. Additional cell-based data can be saved using
+       * register_data_attach().
+       */
+      virtual void
+      save(const std::string &filename) const override;
+
+      /**
+       * Load the triangulation saved with save() back in. The mesh
+       * must be empty before calling this function.
+       *
+       * You need to load with the same number of MPI processes that
+       * you saved with. Cell-based data that was saved with
+       * register_data_attach() can be read in with notify_ready_to_unpack()
+       * after calling load().
+       */
+      virtual void
+      load(const std::string &filename,
+           const bool         autopartition = true) override;
+
     private:
       virtual unsigned int
       coarse_cell_id_to_coarse_cell_index(
@@ -239,6 +262,15 @@ namespace parallel
       virtual types::coarse_cell_id
       coarse_cell_index_to_coarse_cell_id(
         const unsigned int coarse_cell_index) const override;
+
+      /**
+       * Go through all locally owned cells and store the relations between
+       * cells and their status in the private member local_cell_relations.
+       *
+       * The stored vector will be ordered by the occurrence of cells.
+       */
+      virtual void
+      update_cell_relations() override;
 
       /**
        * store the Settings.
