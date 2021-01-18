@@ -1427,7 +1427,7 @@ namespace parallel
       Assert(
         this->cell_attached_data.n_attached_deserialize == 0,
         ExcMessage(
-          "not all SolutionTransfer's got deserialized after the last load()"));
+          "Not all SolutionTransfer objects have been deserialized after the last call to load()."));
       Assert(this->n_cells() > 0,
              ExcMessage("Can not save() an empty Triangulation."));
 

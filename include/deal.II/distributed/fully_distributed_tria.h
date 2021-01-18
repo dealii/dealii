@@ -246,13 +246,14 @@ namespace parallel
        * must be empty before calling this function.
        *
        * You need to load with the same number of MPI processes that
-       * you saved with. Cell-based data that was saved with
-       * register_data_attach() can be read in with notify_ready_to_unpack()
-       * after calling load().
+       * you saved with, hence autopartition is disabled.
+       *
+       * Cell-based data that was saved with register_data_attach() can be read
+       * in with notify_ready_to_unpack() after calling load().
        */
       virtual void
       load(const std::string &filename,
-           const bool         autopartition = true) override;
+           const bool         autopartition = false) override;
 
     private:
       virtual unsigned int
