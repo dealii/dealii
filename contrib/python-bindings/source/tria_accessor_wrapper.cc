@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2020 by the deal.II authors
+// Copyright (C) 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -417,8 +417,18 @@ namespace python
       return internal::tria_accessor_cast<1, 2, 2>(tria_accessor)->n_vertices();
     else if ((dim == 2) && (spacedim == 3) && (structdim == 1))
       return internal::tria_accessor_cast<1, 2, 3>(tria_accessor)->n_vertices();
-    else
+    else if ((dim == 3) && (spacedim == 3) && (structdim == 1))
+      return internal::tria_accessor_cast<1, 3, 3>(tria_accessor)->n_vertices();
+    else if ((dim == 3) && (spacedim == 3) && (structdim == 2))
       return internal::tria_accessor_cast<2, 3, 3>(tria_accessor)->n_vertices();
+    else if ((dim == 3) && (spacedim == 3) && (structdim == 3))
+      return internal::tria_accessor_cast<3, 3, 3>(tria_accessor)->n_vertices();
+    else
+      {
+        AssertThrow(false,
+                    ExcMessage("Wrong structdim-dim-spacedim combination."));
+        return -1;
+      }
   }
 
 
@@ -430,8 +440,18 @@ namespace python
       return internal::tria_accessor_cast<1, 2, 2>(tria_accessor)->n_lines();
     else if ((dim == 2) && (spacedim == 3) && (structdim == 1))
       return internal::tria_accessor_cast<1, 2, 3>(tria_accessor)->n_lines();
-    else
+    else if ((dim == 3) && (spacedim == 3) && (structdim == 1))
+      return internal::tria_accessor_cast<1, 3, 3>(tria_accessor)->n_lines();
+    else if ((dim == 3) && (spacedim == 3) && (structdim == 2))
       return internal::tria_accessor_cast<2, 3, 3>(tria_accessor)->n_lines();
+    else if ((dim == 3) && (spacedim == 3) && (structdim == 3))
+      return internal::tria_accessor_cast<3, 3, 3>(tria_accessor)->n_lines();
+    else
+      {
+        AssertThrow(false,
+                    ExcMessage("Wrong structdim-dim-spacedim combination."));
+        return -1;
+      }
   }
 
 
@@ -441,10 +461,16 @@ namespace python
   {
     if ((dim == 2) && (spacedim == 2) && (structdim == 1))
       return internal::tria_accessor_cast<1, 2, 2>(tria_accessor)->n_faces();
-    else if ((dim == 2) && (spacedim == 3) && (structdim == 1))
-      return internal::tria_accessor_cast<1, 2, 3>(tria_accessor)->n_faces();
-    else
+    else if ((dim == 3) && (spacedim == 3) && (structdim == 2))
       return internal::tria_accessor_cast<2, 3, 3>(tria_accessor)->n_faces();
+    else if ((dim == 3) && (spacedim == 3) && (structdim == 3))
+      return internal::tria_accessor_cast<3, 3, 3>(tria_accessor)->n_faces();
+    else
+      {
+        AssertThrow(false,
+                    ExcMessage("Wrong structdim-dim-spacedim combination."));
+        return -1;
+      }
   }
 
 } // namespace python

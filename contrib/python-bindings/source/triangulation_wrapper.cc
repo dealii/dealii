@@ -1549,6 +1549,7 @@ namespace python
   }
 
 
+
   void
   TriangulationWrapper::convert_hypercube_to_simplex_mesh(
     TriangulationWrapper &tria_out)
@@ -1567,6 +1568,7 @@ namespace python
       internal::convert_hypercube_to_simplex_mesh<3, 3>(triangulation,
                                                         tria_out);
   }
+
 
 
   void

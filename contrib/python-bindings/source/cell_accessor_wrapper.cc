@@ -796,6 +796,8 @@ namespace python
       return internal::cell_cast<3, 3>(cell_accessor)->n_faces();
   }
 
+
+
   CellTypeWrapper
   CellAccessorWrapper::reference_cell_type() const
   {
