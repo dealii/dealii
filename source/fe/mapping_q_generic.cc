@@ -30,12 +30,9 @@
 #include <deal.II/fe/mapping_q_generic.h>
 #include <deal.II/fe/mapping_q_internal.h>
 
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/lac/full_matrix.h>
 
 #include <boost/container/small_vector.hpp>
 
@@ -1639,6 +1636,16 @@ MappingQGeneric<dim, spacedim>::compute_mapping_support_points(
     }
 
   return a;
+}
+
+
+
+template <int dim, int spacedim>
+BoundingBox<spacedim>
+MappingQGeneric<dim, spacedim>::get_bounding_box(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
+{
+  return BoundingBox<spacedim>(this->compute_mapping_support_points(cell));
 }
 
 

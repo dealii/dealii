@@ -4384,11 +4384,13 @@ template <int dim, int spacedim>
 FEValues<dim, spacedim>::FEValues(const FiniteElement<dim, spacedim> &fe,
                                   const Quadrature<dim> &             q,
                                   const UpdateFlags update_flags)
-  : FEValuesBase<dim, spacedim>(q.size(),
-                                fe.n_dofs_per_cell(),
-                                update_default,
-                                StaticMappingQ1<dim, spacedim>::mapping,
-                                fe)
+  : FEValuesBase<dim, spacedim>(
+      q.size(),
+      fe.n_dofs_per_cell(),
+      update_default,
+      ReferenceCell::get_default_linear_mapping<dim, spacedim>(
+        fe.reference_cell_type()),
+      fe)
   , quadrature(q)
 {
   initialize(update_flags);
@@ -4709,11 +4711,13 @@ FEFaceValues<dim, spacedim>::FEFaceValues(
   const FiniteElement<dim, spacedim> &fe,
   const hp::QCollection<dim - 1> &    quadrature,
   const UpdateFlags                   update_flags)
-  : FEFaceValuesBase<dim, spacedim>(fe.n_dofs_per_cell(),
-                                    update_flags,
-                                    StaticMappingQ1<dim, spacedim>::mapping,
-                                    fe,
-                                    quadrature)
+  : FEFaceValuesBase<dim, spacedim>(
+      fe.n_dofs_per_cell(),
+      update_flags,
+      ReferenceCell::get_default_linear_mapping<dim, spacedim>(
+        fe.reference_cell_type()),
+      fe,
+      quadrature)
 {
   initialize(update_flags);
 }
@@ -4939,11 +4943,13 @@ FESubfaceValues<dim, spacedim>::FESubfaceValues(
   const FiniteElement<dim, spacedim> &fe,
   const Quadrature<dim - 1> &         quadrature,
   const UpdateFlags                   update_flags)
-  : FEFaceValuesBase<dim, spacedim>(fe.n_dofs_per_cell(),
-                                    update_flags,
-                                    StaticMappingQ1<dim, spacedim>::mapping,
-                                    fe,
-                                    quadrature)
+  : FEFaceValuesBase<dim, spacedim>(
+      fe.n_dofs_per_cell(),
+      update_flags,
+      ReferenceCell::get_default_linear_mapping<dim, spacedim>(
+        fe.reference_cell_type()),
+      fe,
+      quadrature)
 {
   initialize(update_flags);
 }

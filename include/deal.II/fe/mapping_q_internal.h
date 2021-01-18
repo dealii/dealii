@@ -531,7 +531,7 @@ namespace internal
       //    p(x) - p = p(x) - p(x*)
       //             = -grad p(x) * (x*-x) + higher order terms
       // This suggest to measure with a norm that corresponds to
-      //    A = {[grad p(x]^T [grad p(x)]}^{-1}
+      //    A = {[grad p(x)]^T [grad p(x)]}^{-1}
       // because then
       //    \| p(x) - p \|_A  \approx  \| x - x* \|
       // Consequently, we will try to enforce that

@@ -77,9 +77,9 @@ namespace Simplex
 
 
   /**
-   * Implementation of a scalar Lagrange finite element Pp that yields
+   * Implementation of a scalar Lagrange finite element $P_k$ that yields
    * the finite element space of continuous, piecewise polynomials of
-   * degree p.
+   * degree $k$.
    *
    * @ingroup simplex
    */
@@ -131,9 +131,10 @@ namespace Simplex
 
 
   /**
-   * Implementation of a scalar Lagrange finite element Pp that yields
-   * the finite element space of discontinuous, piecewise polynomials of
-   * degree p.
+   * Implementation of a scalar discontinuous Lagrange finite element
+   * $P_k$, sometimes denoted as $P_{-k}$, that yields the finite
+   * element space of discontinuous, piecewise polynomials of degree
+   * $k$.
    *
    * @ingroup simplex
    */
@@ -204,7 +205,7 @@ namespace Simplex
   /**
    * Implementation of a scalar Lagrange finite element on a wedge that yields
    * the finite element space of continuous, piecewise polynomials of
-   * degree p.
+   * degree $k$.
    *
    * @ingroup simplex
    */
@@ -263,7 +264,7 @@ namespace Simplex
   /**
    * Implementation of a scalar Lagrange finite element on a wedge that yields
    * the finite element space of discontinuous, piecewise polynomials of
-   * degree p.
+   * degree $k$.
    *
    * @ingroup simplex
    */
@@ -313,7 +314,7 @@ namespace Simplex
   /**
    * Implementation of a scalar Lagrange finite element on a pyramid that yields
    * the finite element space of continuous, piecewise polynomials of
-   * degree p.
+   * degree $k$.
    *
    * @ingroup simplex
    */
@@ -372,7 +373,7 @@ namespace Simplex
   /**
    * Implementation of a scalar Lagrange finite element on a pyramid that yields
    * the finite element space of discontinuous, piecewise polynomials of
-   * degree p.
+   * degree $k$.
    *
    * @ingroup simplex
    */

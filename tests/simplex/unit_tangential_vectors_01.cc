@@ -14,7 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// Test ReferenceCell::unit_tangential_vectors() for all reference-cell types.
+// Test ReferenceCell::unit_tangential_vectors() and ::unit_normal_vectors()
+// for all reference-cell types.
 
 
 #include <deal.II/grid/reference_cell.h>
@@ -31,11 +32,17 @@ test(const ReferenceCell::Type &reference_cell)
 {
   for (const auto face_no :
        ReferenceCell::internal::Info::get_cell(reference_cell).face_indices())
-    for (unsigned int i = 0; i < dim - 1; ++i)
-      deallog << ReferenceCell::unit_tangential_vectors<dim>(reference_cell,
-                                                             face_no,
-                                                             i)
+    {
+      deallog << ReferenceCell::unit_normal_vectors<dim>(reference_cell,
+                                                         face_no)
               << std::endl;
+
+      for (unsigned int i = 0; i < dim - 1; ++i)
+        deallog << ReferenceCell::unit_tangential_vectors<dim>(reference_cell,
+                                                               face_no,
+                                                               i)
+                << std::endl;
+    }
   deallog << std::endl;
 }
 

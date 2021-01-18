@@ -411,11 +411,125 @@ namespace Simplex
   ScalarPolynomial<dim>::compute_grad_grad(const unsigned int i,
                                            const Point<dim> & p) const
   {
-    (void)i;
     (void)p;
 
-    Assert(false, ExcNotImplemented());
-    return Tensor<2, dim>();
+    Tensor<2, dim> result;
+
+    if (this->degree() < 2)
+      return result;
+
+    if (dim == 1)
+      {
+        if (i == 0)
+          {
+            result[0][0] = 4.0;
+          }
+        else if (i == 1)
+          {
+            result[0][0] = 4.0;
+          }
+        else if (i == 2)
+          {
+            result[0][0] = -8.0;
+          }
+        else
+          {
+            Assert(false, ExcNotImplemented());
+          }
+      }
+    else if (dim == 2)
+      {
+        if (i == 0)
+          {
+            for (unsigned j = 0; j < dim; ++j)
+              for (unsigned k = 0; k < dim; ++k)
+                result[j][k] = 4.0;
+          }
+        else if (i == 1)
+          {
+            result[0][0] = 4.0;
+          }
+        else if (i == 2)
+          {
+            result[1][1] = 4.0;
+          }
+        else if (i == 3)
+          {
+            result[0][0] = -8.0;
+            result[0][1] = result[1][0] = -4.0;
+          }
+        else if (i == 4)
+          {
+            result[0][1] = result[1][0] = 4.0;
+          }
+        else if (i == 5)
+          {
+            result[1][1] = -8.0;
+            result[0][1] = result[1][0] = -4.0;
+          }
+        else
+          {
+            Assert(false, ExcNotImplemented());
+          }
+      }
+    else if (dim == 3)
+      {
+        if (i == 0)
+          {
+            for (unsigned j = 0; j < dim; ++j)
+              for (unsigned k = 0; k < dim; ++k)
+                result[j][k] = 4.0;
+          }
+        else if (i == 1)
+          {
+            result[0][0] = 4.0;
+          }
+        else if (i == 2)
+          {
+            result[1][1] = 4.0;
+          }
+        else if (i == 3)
+          {
+            result[2][2] = 4.0;
+          }
+        else if (i == 4)
+          {
+            result[0][0] = -8.0;
+            result[0][1] = result[0][2] = result[1][0] = result[2][0] = -4.0;
+          }
+        else if (i == 5)
+          {
+            result[0][1] = result[1][0] = 4.0;
+          }
+        else if (i == 6)
+          {
+            result[1][1] = -8.0;
+            result[0][1] = result[1][0] = result[1][2] = result[2][1] = -4.0;
+          }
+        else if (i == 7)
+          {
+            result[2][2] = -8.0;
+            result[2][0] = result[2][1] = result[0][2] = result[1][2] = -4.0;
+          }
+        else if (i == 8)
+          {
+            result[0][2] = result[2][0] = 4.0;
+          }
+        else if (i == 9)
+          {
+            result[1][2] = result[2][1] = 4.0;
+          }
+        else
+          {
+            Assert(false, ExcNotImplemented());
+          }
+      }
+    else
+      {
+        Assert(false, ExcNotImplemented());
+      }
+
+    return result;
   }
 
 
@@ -442,6 +556,10 @@ namespace Simplex
     if (grads.size() == this->n())
       for (unsigned int i = 0; i < this->n(); i++)
         grads[i] = compute_grad(i, unit_point);
+
+    if (grad_grads.size() == this->n())
+      for (unsigned int i = 0; i < this->n(); i++)
+        grad_grads[i] = compute_grad_grad(i, unit_point);
   }
 
 
@@ -461,12 +579,7 @@ namespace Simplex
   ScalarPolynomial<dim>::compute_2nd_derivative(const unsigned int i,
                                                 const Point<dim> & p) const
   {
-    (void)i;
-    (void)p;
-
-    Assert(false, ExcNotImplemented());
-
-    return {};
+    return compute_grad_grad(i, p);
   }
 
 

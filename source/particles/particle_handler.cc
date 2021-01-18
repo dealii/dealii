@@ -490,7 +490,7 @@ namespace Particles
       AssertDimension(ids.size(), positions.size());
 
     const auto tria =
-      dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
+      dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
         &(*triangulation));
     const auto comm =
       (tria != nullptr ? tria->get_communicator() : MPI_COMM_WORLD);
@@ -1799,8 +1799,8 @@ namespace Particles
 
     switch (status)
       {
-        case parallel::distributed::Triangulation<dim, spacedim>::CELL_PERSIST:
-        case parallel::distributed::Triangulation<dim, spacedim>::CELL_REFINE:
+        case parallel::TriangulationBase<dim, spacedim>::CELL_PERSIST:
+        case parallel::TriangulationBase<dim, spacedim>::CELL_REFINE:
           // If the cell persist or is refined store all particles of the
           // current cell.
           {
@@ -1828,7 +1828,7 @@ namespace Particles
           }
           break;
 
-        case parallel::distributed::Triangulation<dim, spacedim>::CELL_COARSEN:
+        case parallel::TriangulationBase<dim, spacedim>::CELL_COARSEN:
           // If this cell is the parent of children that will be coarsened,
           // collect the particles of all children.
           {
@@ -1892,7 +1892,7 @@ namespace Particles
 
     switch (status)
       {
-        case parallel::distributed::Triangulation<dim, spacedim>::CELL_PERSIST:
+        case parallel::TriangulationBase<dim, spacedim>::CELL_PERSIST:
           {
             auto position_hint = particles.end();
             for (const auto &particle : loaded_particles_on_cell)
@@ -1912,7 +1912,7 @@ namespace Particles
           }
           break;
 
-        case parallel::distributed::Triangulation<dim, spacedim>::CELL_COARSEN:
+        case parallel::TriangulationBase<dim, spacedim>::CELL_COARSEN:
           {
             typename std::multimap<internal::LevelInd,
                                    Particle<dim, spacedim>>::iterator
@@ -1938,7 +1938,7 @@ namespace Particles
           }
           break;
 
-        case parallel::distributed::Triangulation<dim, spacedim>::CELL_REFINE:
+        case parallel::TriangulationBase<dim, spacedim>::CELL_REFINE:
           {
             std::vector<
               typename std::multimap<internal::LevelInd,

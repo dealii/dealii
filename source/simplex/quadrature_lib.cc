@@ -140,7 +140,11 @@ namespace Simplex
 
     AssertDimension(this->quadrature_points.size(), this->weights.size());
     Assert(this->quadrature_points.size() > 0,
-           ExcMessage("No valid quadrature points!"));
+           ExcNotImplemented(
+             "Simplex::QGauss is currently only implemented for "
+             "n_points_1D = 1, 2, and 3, while you are asking for "
+             "n_points_1D = " +
+             Utilities::to_string(n_points_1D)));
   }
 
 

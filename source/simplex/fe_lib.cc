@@ -16,6 +16,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_tools.h>
 
@@ -69,60 +70,52 @@ namespace Simplex
         {
           // We don't really have dim = 1 support for simplex elements yet, but
           // its convenient for populating the face array
+          Assert(degree <= 2, ExcNotImplemented());
           if (degree >= 1)
             {
               unit_points.emplace_back(0.0);
               unit_points.emplace_back(1.0);
-            }
-          if (degree == 2)
-            {
-              unit_points.emplace_back(0.5);
-            }
-          if (degree > 2)
-            {
-              Assert(false, ExcNotImplemented());
+
+              if (degree == 2)
+                unit_points.emplace_back(0.5);
             }
         }
       else if (dim == 2)
         {
+          Assert(degree <= 2, ExcNotImplemented());
           if (degree >= 1)
             {
               unit_points.emplace_back(0.0, 0.0);
               unit_points.emplace_back(1.0, 0.0);
               unit_points.emplace_back(0.0, 1.0);
-            }
-          if (degree == 2)
-            {
-              unit_points.emplace_back(0.5, 0.0);
-              unit_points.emplace_back(0.5, 0.5);
-              unit_points.emplace_back(0.0, 0.5);
-            }
-          if (degree > 3)
-            {
-              Assert(false, ExcNotImplemented());
+
+              if (degree == 2)
+                {
+                  unit_points.emplace_back(0.5, 0.0);
+                  unit_points.emplace_back(0.5, 0.5);
+                  unit_points.emplace_back(0.0, 0.5);
+                }
             }
         }
       else if (dim == 3)
         {
+          Assert(degree <= 2, ExcNotImplemented());
           if (degree >= 1)
             {
               unit_points.emplace_back(0.0, 0.0, 0.0);
               unit_points.emplace_back(1.0, 0.0, 0.0);
               unit_points.emplace_back(0.0, 1.0, 0.0);
               unit_points.emplace_back(0.0, 0.0, 1.0);
-            }
-          if (degree == 2)
-            {
-              unit_points.emplace_back(0.5, 0.0, 0.0);
-              unit_points.emplace_back(0.5, 0.5, 0.0);
-              unit_points.emplace_back(0.0, 0.5, 0.0);
-              unit_points.emplace_back(0.0, 0.0, 0.5);
-              unit_points.emplace_back(0.5, 0.0, 0.5);
-              unit_points.emplace_back(0.0, 0.5, 0.5);
-            }
-          if (degree == 3)
-            {
-              Assert(false, ExcNotImplemented());
+
+              if (degree == 2)
+                {
+                  unit_points.emplace_back(0.5, 0.0, 0.0);
+                  unit_points.emplace_back(0.5, 0.5, 0.0);
+                  unit_points.emplace_back(0.0, 0.5, 0.0);
+                  unit_points.emplace_back(0.0, 0.0, 0.5);
+                  unit_points.emplace_back(0.5, 0.0, 0.5);
+                  unit_points.emplace_back(0.0, 0.5, 0.5);
+                }
             }
         }
       else
@@ -434,15 +427,55 @@ namespace Simplex
     const FiniteElement<dim, spacedim> &fe_other,
     const unsigned int                  codim) const
   {
-    (void)fe_other;
-    (void)codim;
+    Assert(codim <= dim, ExcImpossibleInDim(dim));
 
-    Assert((dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
-           ExcNotImplemented());
-    AssertDimension(dim, 2);
-    AssertDimension(this->degree, fe_other.tensor_degree());
+    // vertex/line/face domination
+    // (if fe_other is derived from FE_DGP)
+    // ------------------------------------
+    if (codim > 0)
+      if (dynamic_cast<const FE_DGP<dim, spacedim> *>(&fe_other) != nullptr)
+        // there are no requirements between continuous and discontinuous
+        // elements
+        return FiniteElementDomination::no_requirements;
 
-    return FiniteElementDomination::either_element_can_dominate;
+    // vertex/line/face domination
+    // (if fe_other is not derived from FE_DGP)
+    // & cell domination
+    // ----------------------------------------
+    if (const FE_P<dim, spacedim> *fe_p_other =
+          dynamic_cast<const FE_P<dim, spacedim> *>(&fe_other))
+      {
+        if (this->degree < fe_p_other->degree)
+          return FiniteElementDomination::this_element_dominates;
+        else if (this->degree == fe_p_other->degree)
+          return FiniteElementDomination::either_element_can_dominate;
+        else
+          return FiniteElementDomination::other_element_dominates;
+      }
+    else if (const FE_Q<dim, spacedim> *fe_q_other =
+               dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other))
+      {
+        if (this->degree < fe_q_other->degree)
+          return FiniteElementDomination::this_element_dominates;
+        else if (this->degree == fe_q_other->degree)
+          return FiniteElementDomination::either_element_can_dominate;
+        else
+          return FiniteElementDomination::other_element_dominates;
+      }
+    else if (const FE_Nothing<dim, spacedim> *fe_nothing =
+               dynamic_cast<const FE_Nothing<dim, spacedim> *>(&fe_other))
+      {
+        if (fe_nothing->is_dominating())
+          return FiniteElementDomination::other_element_dominates;
+        else
+          // the FE_Nothing has no degrees of freedom and it is typically used
+          // in a context where we don't require any continuity along the
+          // interface
+          return FiniteElementDomination::no_requirements;
+      }
+
+    Assert(false, ExcNotImplemented());
+    return FiniteElementDomination::neither_element_dominates;
   }
 
 
@@ -452,14 +485,42 @@ namespace Simplex
   FE_P<dim, spacedim>::hp_vertex_dof_identities(
     const FiniteElement<dim, spacedim> &fe_other) const
   {
-    (void)fe_other;
-
-    Assert((dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
-           ExcNotImplemented());
     AssertDimension(dim, 2);
-    AssertDimension(this->degree, fe_other.tensor_degree());
 
-    return {{0, 0}};
+    if (dynamic_cast<const FE_P<dim, spacedim> *>(&fe_other) != nullptr)
+      {
+        // there should be exactly one single DoF of each FE at a vertex, and
+        // they should have identical value
+        return {{0U, 0U}};
+      }
+    else if (dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other) != nullptr)
+      {
+        // there should be exactly one single DoF of each FE at a vertex, and
+        // they should have identical value
+        return {{0U, 0U}};
+      }
+    else if (dynamic_cast<const FE_Nothing<dim> *>(&fe_other) != nullptr)
+      {
+        // the FE_Nothing has no degrees of freedom, so there are no
+        // equivalencies to be recorded
+        return {};
+      }
+    else if (fe_other.n_unique_faces() == 1 && fe_other.n_dofs_per_face(0) == 0)
+      {
+        // if the other element has no elements on faces at all,
+        // then it would be impossible to enforce any kind of
+        // continuity even if we knew exactly what kind of element
+        // we have -- simply because the other element declares
+        // that it is discontinuous because it has no DoFs on
+        // its faces. in that case, just state that we have no
+        // constraints to declare
+        return {};
+      }
+    else
+      {
+        Assert(false, ExcNotImplemented());
+        return {};
+      }
   }
 
 
@@ -469,19 +530,82 @@ namespace Simplex
   FE_P<dim, spacedim>::hp_line_dof_identities(
     const FiniteElement<dim, spacedim> &fe_other) const
   {
-    (void)fe_other;
-
-    Assert((dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
-           ExcNotImplemented());
     AssertDimension(dim, 2);
-    AssertDimension(this->degree, fe_other.tensor_degree());
+    Assert(this->degree <= 2, ExcNotImplemented());
 
-    std::vector<std::pair<unsigned int, unsigned int>> result;
+    if (const FE_P<dim, spacedim> *fe_p_other =
+          dynamic_cast<const FE_P<dim, spacedim> *>(&fe_other))
+      {
+        // dofs are located along lines, so two dofs are identical if they are
+        // located at identical positions.
+        // Therefore, read the points in unit_support_points for the
+        // first coordinate direction. For FE_P, they are currently hard-coded
+        // and we iterate over points on the first line which begin after the 3
+        // vertex points in the complete list of unit support points
 
-    for (unsigned int i = 0; i < this->degree - 1; ++i)
-      result.emplace_back(i, i);
+        Assert(fe_p_other->degree <= 2, ExcNotImplemented());
 
-    return result;
+        std::vector<std::pair<unsigned int, unsigned int>> identities;
+
+        for (unsigned int i = 0; i < this->degree - 1; ++i)
+          for (unsigned int j = 0; j < fe_p_other->degree - 1; ++j)
+            if (std::fabs(this->unit_support_points[i + 3][0] -
+                          fe_p_other->unit_support_points[i + 3][0]) < 1e-14)
+              identities.emplace_back(i, j);
+
+        return identities;
+      }
+    else if (const FE_Q<dim, spacedim> *fe_q_other =
+               dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other))
+      {
+        // dofs are located along lines, so two dofs are identical if they are
+        // located at identical positions. if we had only equidistant points, we
+        // could simply check for similarity like (i+1)*q == (j+1)*p, but we
+        // might have other support points (e.g. Gauss-Lobatto
+        // points). Therefore, read the points in unit_support_points for the
+        // first coordinate direction. For FE_Q, we take the lexicographic
+        // ordering of the line support points in the first direction (i.e.,
+        // x-direction), which we access between index 1 and p-1 (index 0 and p
+        // are vertex dofs). For FE_P, they are currently hard-coded and we
+        // iterate over points on the first line which begin after the 3 vertex
+        // points in the complete list of unit support points
+
+        const std::vector<unsigned int> &index_map_inverse_q_other =
+          fe_q_other->get_poly_space_numbering_inverse();
+
+        std::vector<std::pair<unsigned int, unsigned int>> identities;
+
+        for (unsigned int i = 0; i < this->degree - 1; ++i)
+          for (unsigned int j = 0; j < fe_q_other->degree - 1; ++j)
+            if (std::fabs(this->unit_support_points[i + 3][0] -
+                          fe_q_other->get_unit_support_points()
+                            [index_map_inverse_q_other[j + 1]][0]) < 1e-14)
+              identities.emplace_back(i, j);
+
+        return identities;
+      }
+    else if (dynamic_cast<const FE_Nothing<dim> *>(&fe_other) != nullptr)
+      {
+        // the FE_Nothing has no degrees of freedom, so there are no
+        // equivalencies to be recorded
+        return {};
+      }
+    else if (fe_other.n_unique_faces() == 1 && fe_other.n_dofs_per_face(0) == 0)
+      {
+        // if the other element has no elements on faces at all,
+        // then it would be impossible to enforce any kind of
+        // continuity even if we knew exactly what kind of element
+        // we have -- simply because the other element declares
+        // that it is discontinuous because it has no DoFs on
+        // its faces. in that case, just state that we have no
+        // constraints to declare
+        return {};
+      }
+    else
+      {
+        Assert(false, ExcNotImplemented());
+        return {};
+      }
   }
 
 
@@ -521,15 +645,52 @@ namespace Simplex
     const FiniteElement<dim, spacedim> &fe_other,
     const unsigned int                  codim) const
   {
-    (void)fe_other;
-    (void)codim;
+    Assert(codim <= dim, ExcImpossibleInDim(dim));
 
-    Assert((dynamic_cast<const FE_DGQ<dim, spacedim> *>(&fe_other)),
-           ExcNotImplemented());
-    AssertDimension(dim, 2);
-    AssertDimension(this->degree, fe_other.tensor_degree());
+    // vertex/line/face domination
+    // ---------------------------
+    if (codim > 0)
+      // this is a discontinuous element, so by definition there will
+      // be no constraints wherever this element comes together with
+      // any other kind of element
+      return FiniteElementDomination::no_requirements;
 
-    return FiniteElementDomination::either_element_can_dominate;
+    // cell domination
+    // ---------------
+    if (const FE_DGP<dim, spacedim> *fe_dgp_other =
+          dynamic_cast<const FE_DGP<dim, spacedim> *>(&fe_other))
+      {
+        if (this->degree < fe_dgp_other->degree)
+          return FiniteElementDomination::this_element_dominates;
+        else if (this->degree == fe_dgp_other->degree)
+          return FiniteElementDomination::either_element_can_dominate;
+        else
+          return FiniteElementDomination::other_element_dominates;
+      }
+    else if (const FE_DGQ<dim, spacedim> *fe_dgq_other =
+               dynamic_cast<const FE_DGQ<dim, spacedim> *>(&fe_other))
+      {
+        if (this->degree < fe_dgq_other->degree)
+          return FiniteElementDomination::this_element_dominates;
+        else if (this->degree == fe_dgq_other->degree)
+          return FiniteElementDomination::either_element_can_dominate;
+        else
+          return FiniteElementDomination::other_element_dominates;
+      }
+    else if (const FE_Nothing<dim, spacedim> *fe_nothing =
+               dynamic_cast<const FE_Nothing<dim, spacedim> *>(&fe_other))
+      {
+        if (fe_nothing->is_dominating())
+          return FiniteElementDomination::other_element_dominates;
+        else
+          // the FE_Nothing has no degrees of freedom and it is typically used
+          // in a context where we don't require any continuity along the
+          // interface
+          return FiniteElementDomination::no_requirements;
+      }
+
+    Assert(false, ExcNotImplemented());
+    return FiniteElementDomination::neither_element_dominates;
   }
 
 
@@ -630,14 +791,66 @@ namespace Simplex
     const FiniteElement<dim, spacedim> &fe_other,
     const unsigned int                  codim) const
   {
-    (void)fe_other;
-    (void)codim;
+    Assert(codim <= dim, ExcImpossibleInDim(dim));
 
-    Assert((dynamic_cast<const Simplex::FE_P<dim, spacedim> *>(&fe_other)) ||
-             (dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
-           ExcNotImplemented());
+    // vertex/line/face domination
+    // (if fe_other is derived from FE_DGP)
+    // ------------------------------------
+    if (codim > 0)
+      if (dynamic_cast<const FE_DGP<dim, spacedim> *>(&fe_other) != nullptr)
+        // there are no requirements between continuous and discontinuous
+        // elements
+        return FiniteElementDomination::no_requirements;
 
-    return FiniteElementDomination::this_element_dominates;
+
+    // vertex/line/face domination
+    // (if fe_other is not derived from FE_DGP)
+    // & cell domination
+    // ----------------------------------------
+    if (const FE_WedgeP<dim, spacedim> *fe_wp_other =
+          dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other))
+      {
+        if (this->degree < fe_wp_other->degree)
+          return FiniteElementDomination::this_element_dominates;
+        else if (this->degree == fe_wp_other->degree)
+          return FiniteElementDomination::either_element_can_dominate;
+        else
+          return FiniteElementDomination::other_element_dominates;
+      }
+    else if (const FE_P<dim, spacedim> *fe_p_other =
+               dynamic_cast<const FE_P<dim, spacedim> *>(&fe_other))
+      {
+        if (this->degree < fe_p_other->degree)
+          return FiniteElementDomination::this_element_dominates;
+        else if (this->degree == fe_p_other->degree)
+          return FiniteElementDomination::either_element_can_dominate;
+        else
+          return FiniteElementDomination::other_element_dominates;
+      }
+    else if (const FE_Q<dim, spacedim> *fe_q_other =
+               dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other))
+      {
+        if (this->degree < fe_q_other->degree)
+          return FiniteElementDomination::this_element_dominates;
+        else if (this->degree == fe_q_other->degree)
+          return FiniteElementDomination::either_element_can_dominate;
+        else
+          return FiniteElementDomination::other_element_dominates;
+      }
+    else if (const FE_Nothing<dim> *fe_nothing =
+               dynamic_cast<const FE_Nothing<dim> *>(&fe_other))
+      {
+        if (fe_nothing->is_dominating())
+          return FiniteElementDomination::other_element_dominates;
+        else
+          // the FE_Nothing has no degrees of freedom and it is typically used
+          // in a context where we don't require any continuity along the
+          // interface
+          return FiniteElementDomination::no_requirements;
+      }
+
+    Assert(false, ExcNotImplemented());
+    return FiniteElementDomination::neither_element_dominates;
   }
 
 
@@ -812,14 +1025,65 @@ namespace Simplex
     const FiniteElement<dim, spacedim> &fe_other,
     const unsigned int                  codim) const
   {
-    (void)fe_other;
-    (void)codim;
+    Assert(codim <= dim, ExcImpossibleInDim(dim));
 
-    Assert((dynamic_cast<const Simplex::FE_P<dim, spacedim> *>(&fe_other)) ||
-             (dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
-           ExcNotImplemented());
+    // vertex/line/face domination
+    // (if fe_other is derived from FE_DGP)
+    // ------------------------------------
+    if (codim > 0)
+      if (dynamic_cast<const FE_DGP<dim, spacedim> *>(&fe_other) != nullptr)
+        // there are no requirements between continuous and discontinuous
+        // elements
+        return FiniteElementDomination::no_requirements;
 
-    return FiniteElementDomination::this_element_dominates;
+    // vertex/line/face domination
+    // (if fe_other is not derived from FE_DGP)
+    // & cell domination
+    // ----------------------------------------
+    if (const FE_PyramidP<dim, spacedim> *fe_pp_other =
+          dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other))
+      {
+        if (this->degree < fe_pp_other->degree)
+          return FiniteElementDomination::this_element_dominates;
+        else if (this->degree == fe_pp_other->degree)
+          return FiniteElementDomination::either_element_can_dominate;
+        else
+          return FiniteElementDomination::other_element_dominates;
+      }
+    else if (const FE_P<dim, spacedim> *fe_p_other =
+               dynamic_cast<const FE_P<dim, spacedim> *>(&fe_other))
+      {
+        if (this->degree < fe_p_other->degree)
+          return FiniteElementDomination::this_element_dominates;
+        else if (this->degree == fe_p_other->degree)
+          return FiniteElementDomination::either_element_can_dominate;
+        else
+          return FiniteElementDomination::other_element_dominates;
+      }
+    else if (const FE_Q<dim, spacedim> *fe_q_other =
+               dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other))
+      {
+        if (this->degree < fe_q_other->degree)
+          return FiniteElementDomination::this_element_dominates;
+        else if (this->degree == fe_q_other->degree)
+          return FiniteElementDomination::either_element_can_dominate;
+        else
+          return FiniteElementDomination::other_element_dominates;
+      }
+    else if (const FE_Nothing<dim, spacedim> *fe_nothing =
+               dynamic_cast<const FE_Nothing<dim, spacedim> *>(&fe_other))
+      {
+        if (fe_nothing->is_dominating())
+          return FiniteElementDomination::other_element_dominates;
+        else
+          // the FE_Nothing has no degrees of freedom and it is typically used
+          // in a context where we don't require any continuity along the
+          // interface
+          return FiniteElementDomination::no_requirements;
+      }
+
+    Assert(false, ExcNotImplemented());
+    return FiniteElementDomination::neither_element_dominates;
   }
 
 

@@ -1184,7 +1184,7 @@ namespace TrilinosWrappers
       {
         Assert(false,
                ExcAccessToNonLocalElement(
-                 i, j, local_range().first, local_range().second));
+                 i, j, local_range().first, local_range().second - 1));
       }
     else
       {

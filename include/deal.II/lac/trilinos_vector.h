@@ -1274,15 +1274,22 @@ namespace TrilinosWrappers
         size_type,
         size_type,
         size_type,
-        << "You tried to access element " << arg1
+        << "You are trying to access element " << arg1
         << " of a distributed vector, but this element is not stored "
         << "on the current processor. Note: There are " << arg2
         << " elements stored "
-        << "on the current processor from within the range " << arg3
-        << " through " << arg4
-        << " but Trilinos vectors need not store contiguous "
+        << "on the current processor from within the range [" << arg3 << ","
+        << arg4 << "] but Trilinos vectors need not store contiguous "
         << "ranges on each processor, and not every element in "
-        << "this range may in fact be stored locally.");
+        << "this range may in fact be stored locally."
+        << "\n\n"
+        << "A common source for this kind of problem is that you "
+        << "are passing a 'fully distributed' vector into a function "
+        << "that needs read access to vector elements that correspond "
+        << "to degrees of freedom on ghost cells (or at least to "
+        << "'locally active' degrees of freedom that are not also "
+        << "'locally owned'). You need to pass a vector that has these "
+        << "elements as ghost entries.");
 
     private:
       /**

@@ -1959,8 +1959,8 @@ TriaAccessor<structdim, dim, spacedim>::set_all_manifold_ids(
         break;
 
       case 2:
-        // for quads also set manifold_id of bounding lines
-        for (unsigned int i = 0; i < 4; ++i)
+        // for quads/simplices also set manifold_id of bounding lines
+        for (unsigned int i = 0; i < this->n_lines(); ++i)
           this->line(i)->set_manifold_id(manifold_ind);
         break;
       default:

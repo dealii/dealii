@@ -271,6 +271,18 @@ MappingQEulerian<dim, VectorType, spacedim>::fill_fe_values(
 
 
 
+template <int dim, class VectorType, int spacedim>
+BoundingBox<spacedim>
+MappingQEulerian<dim, VectorType, spacedim>::get_bounding_box(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
+{
+  return BoundingBox<spacedim>(
+    dynamic_cast<const MappingQEulerianGeneric &>(*this->qp_mapping)
+      .compute_mapping_support_points(cell));
+}
+
+
+
 // explicit instantiations
 #include "mapping_q_eulerian.inst"
 

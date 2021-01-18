@@ -39,20 +39,148 @@ class Quadrature;
 namespace ReferenceCell
 {
   /**
-   * Supported reference cell types.
+   * A type that describes the kinds of reference cells that can be used.
+   * This includes quadrilaterals and hexahedra (i.e., "hypercubes"),
+   * triangles and tetrahedra (simplices), and the pyramids and wedges
+   * necessary when using mixed 3d meshes.
    */
-  enum class Type : std::uint8_t
+  class Type
   {
-    Vertex  = 0,
-    Line    = 1,
-    Tri     = 2,
-    Quad    = 3,
-    Tet     = 4,
-    Pyramid = 5,
-    Wedge   = 6,
-    Hex     = 7,
-    Invalid = static_cast<std::uint8_t>(-1)
+  public:
+    enum CellKinds : std::uint8_t
+    {
+      Vertex  = 0,
+      Line    = 1,
+      Tri     = 2,
+      Quad    = 3,
+      Tet     = 4,
+      Pyramid = 5,
+      Wedge   = 6,
+      Hex     = 7,
+      Invalid = static_cast<std::uint8_t>(-1)
+    };
+
+    /**
+     * Default constructor. Initialize this object as an invalid object.
+     */
+    Type();
+
+    /**
+     * Constructor.
+     */
+    Type(const CellKinds kind);
+
+    /**
+     * Conversion operator to an integer.
+     */
+    operator std::uint8_t() const;
+
+    /**
+     * Operator for equality comparison.
+     */
+    bool
+    operator==(const Type &type) const;
+
+    /**
+     * Operator for inequality comparison.
+     */
+    bool
+    operator!=(const Type &type) const;
+
+    /**
+     * Operator for equality comparison.
+     */
+    bool
+    operator==(const CellKinds &type) const;
+
+    /**
+     * Operator for inequality comparison.
+     */
+    bool
+    operator!=(const CellKinds &type) const;
+
+    /**
+     * Write and read the data of this object from a stream for the purpose
+     * of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+     */
+    template <class Archive>
+    void
+    serialize(Archive &archive, const unsigned int /*version*/);
+
+  private:
+    /**
+     * The variable that stores what this object actually corresponds to.
+     */
+    CellKinds kind;
   };
+
+
+
+  inline Type::Type()
+    : Type(Invalid)
+  {}
+
+
+
+  inline Type::Type(const CellKinds kind)
+    : kind(kind)
+  {}
+
+
+
+  inline Type::operator std::uint8_t() const
+  {
+    return kind;
+  }
+
+
+
+  inline bool
+  Type::operator==(const Type &type) const
+  {
+    return kind == type.kind;
+  }
+
+
+
+  inline bool
+  Type::operator!=(const Type &type) const
+  {
+    return kind != type.kind;
+  }
+
+
+
+  inline bool
+  Type::operator==(const CellKinds &type) const
+  {
+    return kind == type;
+  }
+
+
+
+  inline bool
+  Type::operator!=(const CellKinds &type) const
+  {
+    return kind != type;
+  }
+
+
+
+  template <class Archive>
+  inline void
+  Type::serialize(Archive &archive, const unsigned int /*version*/)
+  {
+    // Serialize the state as an 8-bit int. When saving the state, the
+    // last of the following 3 lines is a no-op. When loading, the first
+    // of these lines is a no-op.
+    std::uint8_t kind_as_int = static_cast<std::uint8_t>(kind);
+    archive &    kind_as_int;
+    kind = static_cast<CellKinds>(kind_as_int);
+  }
+
+
 
   /**
    * Return the dimension of the given reference-cell type @p type.
@@ -169,15 +297,17 @@ namespace ReferenceCell
     AssertIndexRange(n_vertices, 9);
     const auto X = Type::Invalid;
 
-    static constexpr std::array<std::array<ReferenceCell::Type, 9>, 4> table = {
-      {// dim 0
-       {{X, Type::Vertex, X, X, X, X, X, X, X}},
-       // dim 1
-       {{X, X, Type::Line, X, X, X, X, X, X}},
-       // dim 2
-       {{X, X, X, Type::Tri, Type::Quad, X, X, X, X}},
-       // dim 3
-       {{X, X, X, X, Type::Tet, Type::Pyramid, Type::Wedge, X, Type::Hex}}}};
+    static constexpr std::array<std::array<ReferenceCell::Type::CellKinds, 9>,
+                                4>
+      table = {
+        {// dim 0
+         {{X, Type::Vertex, X, X, X, X, X, X, X}},
+         // dim 1
+         {{X, X, Type::Line, X, X, X, X, X, X}},
+         // dim 2
+         {{X, X, X, Type::Tri, Type::Quad, X, X, X, X}},
+         // dim 3
+         {{X, X, X, X, Type::Tet, Type::Pyramid, Type::Wedge, X, Type::Hex}}}};
     Assert(table[dim][n_vertices] != Type::Invalid,
            ExcMessage("The combination of dim = " + std::to_string(dim) +
                       " and n_vertices = " + std::to_string(n_vertices) +
@@ -250,7 +380,7 @@ namespace ReferenceCell
     return Point<dim>(+0.0, +0.0, +0.0);
   }
 
-  /*
+  /**
    * Return i-th unit tangential vector of a face of the reference cell.
    * The vectors are arranged such that the
    * cross product between the two vectors returns the unit normal vector.
@@ -330,6 +460,44 @@ namespace ReferenceCell
     return {};
   }
 
+  /**
+   * Return the unit normal vector of a face of the reference cell.
+   */
+  template <int dim>
+  inline Tensor<1, dim>
+  unit_normal_vectors(const Type &reference_cell, const unsigned int face_no)
+  {
+    AssertDimension(dim, get_dimension(reference_cell));
+
+    if (reference_cell == get_hypercube(dim))
+      {
+        AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
+        return GeometryInfo<dim>::unit_normal_vector[face_no];
+      }
+    else if (dim == 2)
+      {
+        const auto tangential =
+          unit_tangential_vectors<dim>(reference_cell, face_no, 0);
+
+        Tensor<1, dim> result;
+
+        result[0] = tangential[1];
+        result[1] = -tangential[0];
+
+        return result;
+      }
+    else if (dim == 3)
+      {
+        return cross_product_3d(
+          unit_tangential_vectors<dim>(reference_cell, face_no, 0),
+          unit_tangential_vectors<dim>(reference_cell, face_no, 1));
+      }
+
+    Assert(false, ExcNotImplemented());
+
+    return {};
+  }
+
   /*
    * Create a (coarse) grid with a single cell of the shape of the provided
    * reference cell.
@@ -340,12 +508,30 @@ namespace ReferenceCell
                      Triangulation<dim, spacedim> &tria);
 
   /**
-   * Return a default linear mapping matching the given reference cell
-   * (MappingQ1 for hypercube cells and MappingFE else).
+   * Return a default linear mapping matching the given reference cell.
+   * If this reference cell is a hypercube, then the returned mapping
+   * is a MappingQ1; otherwise, it is an object of type MappingFE
+   * initialized with Simplex::FE_P (if the reference cell is a triangle and
+   * tetrahedron), with Simplex::FE_PyramidP (if the reference cell is a
+   * pyramid), or with Simplex::FE_WedgeP (if the reference cell is a wedge). In
+   * other words, the term "linear" in the name of the function has to be
+   * understood as $d$-linear (i.e., bilinear or trilinear) for some of the
+   * coordinate directions.
    */
   template <int dim, int spacedim>
   const Mapping<dim, spacedim> &
   get_default_linear_mapping(const Type &reference_cell);
+
+  /**
+   * Return a default linear mapping that works for the given triangulation.
+   * Internally, this function calls the function above for the reference
+   * cell used by the given triangulation, assuming that the triangulation
+   * uses only a single cell type. If the triangulation uses mixed cell
+   * types, then this function will trigger an exception.
+   */
+  template <int dim, int spacedim>
+  const Mapping<dim, spacedim> &
+  get_default_linear_mapping(const Triangulation<dim, spacedim> &triangulation);
 
   /**
    * Return a Gauss-type quadrature matching the given reference cell(QGauss,
@@ -357,6 +543,16 @@ namespace ReferenceCell
   Quadrature<dim>
   get_gauss_type_quadrature(const Type &   reference_cell,
                             const unsigned n_points_1D);
+
+  /**
+   * Return a quadrature rule with the support points of the given reference
+   * cell.
+   *
+   * @note The weights are not filled.
+   */
+  template <int dim>
+  Quadrature<dim> &
+  get_nodal_type_quadrature(const Type &reference_cell);
 
   namespace internal
   {
@@ -925,9 +1121,9 @@ namespace ReferenceCell
           static const std::array<std::array<unsigned int, 3>, 6> table = {
             {{{2, 1, 0}},
              {{0, 1, 2}},
+             {{1, 0, 2}},
              {{1, 2, 0}},
              {{0, 2, 1}},
-             {{1, 0, 2}},
              {{2, 0, 1}}}};
 
           return table[face_orientation][line];
@@ -971,9 +1167,9 @@ namespace ReferenceCell
           static const std::array<std::array<unsigned int, 3>, 6> table = {
             {{{0, 2, 1}},
              {{0, 1, 2}},
+             {{2, 1, 0}},
              {{1, 2, 0}},
              {{1, 0, 2}},
-             {{2, 1, 0}},
              {{2, 0, 1}}}};
 
           return table[face_orientation][vertex];
@@ -1093,9 +1289,9 @@ namespace ReferenceCell
               static const std::array<std::array<unsigned int, 3>, 6> table = {
                 {{{2, 1, 0}},
                  {{0, 1, 2}},
+                 {{1, 0, 2}},
                  {{1, 2, 0}},
                  {{0, 2, 1}},
-                 {{1, 0, 2}},
                  {{2, 0, 1}}}};
 
               return table[face_orientation][line];
@@ -1143,9 +1339,9 @@ namespace ReferenceCell
               static const std::array<std::array<unsigned int, 3>, 6> table = {
                 {{{0, 2, 1}},
                  {{0, 1, 2}},
+                 {{2, 1, 0}},
                  {{1, 2, 0}},
                  {{1, 0, 2}},
-                 {{2, 1, 0}},
                  {{2, 0, 1}}}};
 
               return table[face_orientation][vertex];
@@ -1269,9 +1465,9 @@ namespace ReferenceCell
               static const std::array<std::array<unsigned int, 3>, 6> table = {
                 {{{2, 1, 0}},
                  {{0, 1, 2}},
+                 {{1, 0, 2}},
                  {{1, 2, 0}},
                  {{0, 2, 1}},
-                 {{1, 0, 2}},
                  {{2, 0, 1}}}};
 
               return table[face_orientation][line];
@@ -1319,9 +1515,9 @@ namespace ReferenceCell
               static const std::array<std::array<unsigned int, 3>, 6> table = {
                 {{{0, 2, 1}},
                  {{0, 1, 2}},
+                 {{2, 1, 0}},
                  {{1, 2, 0}},
                  {{1, 0, 2}},
-                 {{2, 1, 0}},
                  {{2, 0, 1}}}};
 
               return table[face_orientation][vertex];
@@ -1634,7 +1830,7 @@ namespace ReferenceCell
           return 1;
 
         // face_orientation=true, face_rotation=true, face_flip=false
-        if (i == std::array<T, 3>{{j[1], j[0], j[2]}})
+        if (i == std::array<T, 3>{{j[1], j[2], j[0]}})
           return 3;
 
         // face_orientation=true, face_rotation=false, face_flip=true
@@ -1646,11 +1842,11 @@ namespace ReferenceCell
           return 0;
 
         // face_orientation=false, face_rotation=true, face_flip=false
-        if (i == std::array<T, 3>{{j[1], j[2], j[0]}})
+        if (i == std::array<T, 3>{{j[2], j[1], j[0]}})
           return 2;
 
         // face_orientation=false, face_rotation=false, face_flip=true
-        if (i == std::array<T, 3>{{j[2], j[1], j[0]}})
+        if (i == std::array<T, 3>{{j[1], j[0], j[2]}})
           return 4;
       }
     else if (entity_type == ReferenceCell::Type::Quad)
@@ -1665,7 +1861,7 @@ namespace ReferenceCell
           return 1;
 
         // face_orientation=true, face_rotation=true, face_flip=false
-        if (i == std::array<T, 4>{{j[1], j[3], j[0], j[2]}})
+        if (i == std::array<T, 4>{{j[2], j[0], j[3], j[1]}})
           return 3;
 
         // face_orientation=true, face_rotation=false, face_flip=true
@@ -1673,7 +1869,7 @@ namespace ReferenceCell
           return 5;
 
         // face_orientation=true, face_rotation=true, face_flip=true
-        if (i == std::array<T, 4>{{j[2], j[0], j[3], j[1]}})
+        if (i == std::array<T, 4>{{j[1], j[3], j[0], j[2]}})
           return 7;
 
         // face_orientation=false, face_rotation=false, face_flip=false
@@ -1733,7 +1929,7 @@ namespace ReferenceCell
               temp = {{vertices[0], vertices[1], vertices[2]}};
               break;
             case 3:
-              temp = {{vertices[1], vertices[0], vertices[2]}};
+              temp = {{vertices[1], vertices[2], vertices[0]}};
               break;
             case 5:
               temp = {{vertices[2], vertices[0], vertices[1]}};
@@ -1742,10 +1938,10 @@ namespace ReferenceCell
               temp = {{vertices[0], vertices[2], vertices[1]}};
               break;
             case 2:
-              temp = {{vertices[1], vertices[2], vertices[0]}};
+              temp = {{vertices[2], vertices[1], vertices[0]}};
               break;
             case 4:
-              temp = {{vertices[2], vertices[1], vertices[0]}};
+              temp = {{vertices[1], vertices[0], vertices[2]}};
               break;
             default:
               Assert(false, ExcNotImplemented());
@@ -1759,13 +1955,13 @@ namespace ReferenceCell
               temp = {{vertices[0], vertices[1], vertices[2], vertices[3]}};
               break;
             case 3:
-              temp = {{vertices[1], vertices[3], vertices[0], vertices[2]}};
+              temp = {{vertices[2], vertices[0], vertices[3], vertices[1]}};
               break;
             case 5:
               temp = {{vertices[3], vertices[2], vertices[1], vertices[0]}};
               break;
             case 7:
-              temp = {{vertices[2], vertices[0], vertices[3], vertices[1]}};
+              temp = {{vertices[1], vertices[3], vertices[0], vertices[2]}};
               break;
             case 0:
               temp = {{vertices[0], vertices[2], vertices[1], vertices[3]}};
