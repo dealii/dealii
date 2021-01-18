@@ -32,6 +32,8 @@ template <int dim, int spacedim>
 class Mapping;
 template <int dim>
 class Quadrature;
+template <int dim>
+class ScalarPolynomialsBase;
 #endif
 
 /**
@@ -410,12 +412,73 @@ namespace ReferenceCell
         switch (i)
           {
             case 0:
-              return 1.0 - xi[0] - xi[1];
+              return 1.0 - xi[std::min(0, dim - 1)] - xi[std::min(1, dim - 1)];
             case 1:
-              return xi[0];
+              return xi[std::min(0, dim - 1)];
             case 2:
-              return xi[1];
+              return xi[std::min(1, dim - 1)];
           }
+      }
+
+    if (reference_cell ==
+        Type::Tet) // see also Simplex::ScalarPolynomial::compute_value
+      {
+        switch (i)
+          {
+            case 0:
+              return 1.0 - xi[std::min(0, dim - 1)] - xi[std::min(1, dim - 1)] -
+                     xi[std::min(2, dim - 1)];
+            case 1:
+              return xi[std::min(0, dim - 1)];
+            case 2:
+              return xi[std::min(1, dim - 1)];
+            case 3:
+              return xi[std::min(2, dim - 1)];
+          }
+      }
+
+    if (reference_cell ==
+        Type::Wedge) // see also Simplex::ScalarWedgePolynomial::compute_value
+      {
+        return d_linear_shape_function<2>(Type::Tri,
+                                          Point<2>(xi[std::min(0, dim - 1)],
+                                                   xi[std::min(1, dim - 1)]),
+                                          i % 3) *
+               d_linear_shape_function<1>(Type::Line,
+                                          Point<1>(xi[std::min(2, dim - 1)]),
+                                          i / 3);
+      }
+
+    if (reference_cell ==
+        Type::Pyramid) // see also
+                       // Simplex::ScalarPyramidPolynomial::compute_value
+      {
+        const double Q14 = 0.25;
+        double       ration;
+
+        const double r = xi[std::min(0, dim - 1)];
+        const double s = xi[std::min(1, dim - 1)];
+        const double t = xi[std::min(2, dim - 1)];
+
+        if (fabs(t - 1.0) > 1.0e-14)
+          {
+            ration = (r * s * t) / (1.0 - t);
+          }
+        else
+          {
+            ration = 0.0;
+          }
+
+        if (i == 0)
+          return Q14 * ((1.0 - r) * (1.0 - s) - t + ration);
+        if (i == 1)
+          return Q14 * ((1.0 + r) * (1.0 - s) - t - ration);
+        if (i == 2)
+          return Q14 * ((1.0 - r) * (1.0 + s) - t - ration);
+        if (i == 3)
+          return Q14 * ((1.0 + r) * (1.0 + s) - t + ration);
+        else
+          return t;
       }
 
     Assert(false, ExcNotImplemented());

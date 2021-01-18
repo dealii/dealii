@@ -467,6 +467,9 @@ protected:
   virtual std::vector<Point<spacedim>>
   compute_mapping_support_points(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell) const;
+
+private:
+  Table<2, double> mapping_support_point_weights;
 };
 
 
