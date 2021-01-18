@@ -166,6 +166,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
         SET(_source_file "${_test_name}.cc")
 
+        SET(_target_short ${_test_name}.${_build_lowercase}) # target name
         SET(_target ${_category}.${_test_name}.${_build_lowercase}) # target name
         SET(_run_args "$<TARGET_FILE:${_target}>") # the command to issue
 
@@ -173,6 +174,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
         SET(_source_file "${_test_name}.cu")
 
+        SET(_target_short ${_test_name}.${_build_lowercase}) # target name
         SET(_target ${_category}.${_test_name}.${_build_lowercase}) # target name
         SET(_run_args "$<TARGET_FILE:${_target}>") # the command to issue
 
@@ -202,6 +204,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
             "\" is defined.\n\n"
             )
         ENDIF()
+        SET(_target_short ${_target})
         SET(_run_args
           "$<TARGET_FILE:${_target}>"
           "${_prm_file}"
@@ -221,6 +224,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
             "\" is defined.\n\n"
             )
         ENDIF()
+        SET(_target_short ${_target})
         SET(_run_args
           "$<TARGET_FILE:${_target}>"
           "${_json_file}"
@@ -273,16 +277,18 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         # interruption.
         #
         ADD_CUSTOM_COMMAND(
-          OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}/interrupt_guard.cc
-          COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/${_target}/interrupt_guard.cc
+          OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target_short}/interrupt_guard.cc
+          COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/${_target_short}/interrupt_guard.cc
           )
 
 
         ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL
           ${_generated_files}
           ${_source_file}
-          ${CMAKE_CURRENT_BINARY_DIR}/${_target}/interrupt_guard.cc
+          ${CMAKE_CURRENT_BINARY_DIR}/${_target_short}/interrupt_guard.cc
           )
+
+        SET_TARGET_PROPERTIES(${_target} PROPERTIES OUTPUT_NAME ${_target_short})
 
         DEAL_II_SETUP_TARGET(${_target} ${_build})
         TARGET_LINK_LIBRARIES(${_target}
@@ -293,7 +299,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           COMPILE_DEFINITIONS SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
           )
         SET_PROPERTY(TARGET ${_target} PROPERTY
-          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${_target}"
+          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${_target_short}"
           )
 
       ENDIF()
