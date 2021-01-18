@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/geometry_info.h>
 
 
@@ -108,6 +109,12 @@ namespace ReferenceCell
     void
     serialize(Archive &archive, const unsigned int /*version*/);
 
+    /**
+     * Return a vector of faces a @p vertex belongs to.
+     */
+    ArrayView<const unsigned int>
+    faces_for_given_vertex(const unsigned int vertex) const;
+
   private:
     /**
      * The variable that stores what this object actually corresponds to.
@@ -178,6 +185,74 @@ namespace ReferenceCell
     std::uint8_t kind_as_int = static_cast<std::uint8_t>(kind);
     archive &    kind_as_int;
     kind = static_cast<CellKinds>(kind_as_int);
+  }
+
+
+
+  inline ArrayView<const unsigned int>
+  Type::faces_for_given_vertex(const unsigned int vertex) const
+  {
+    if (kind == Type::Line)
+      {
+        AssertIndexRange(vertex, GeometryInfo<1>::vertices_per_cell);
+        return {&GeometryInfo<2>::vertex_to_face[vertex][0], 1};
+      }
+    else if (kind == Type::Quad)
+      {
+        AssertIndexRange(vertex, GeometryInfo<2>::vertices_per_cell);
+        return {&GeometryInfo<2>::vertex_to_face[vertex][0], 2};
+      }
+    else if (kind == Type::Hex)
+      {
+        AssertIndexRange(vertex, GeometryInfo<3>::vertices_per_cell);
+        return {&GeometryInfo<3>::vertex_to_face[vertex][0], 3};
+      }
+    else if (kind == Type::Tri)
+      {
+        AssertIndexRange(vertex, 3);
+        static const std::array<std::array<unsigned int, 2>, 3> table = {
+          {{{0, 2}}, {{0, 1}}, {{1, 2}}}};
+
+        return table[vertex];
+      }
+    else if (kind == Type::Tet)
+      {
+        AssertIndexRange(vertex, 4);
+        static const std::array<std::array<unsigned int, 3>, 4> table = {
+          {{{0, 1, 2}}, {{0, 1, 3}}, {{0, 2, 3}}, {{1, 2, 3}}}};
+
+        return table[vertex];
+      }
+    else if (kind == Type::Wedge)
+      {
+        AssertIndexRange(vertex, 6);
+        static const std::array<std::array<unsigned int, 3>, 6> table = {
+          {{{0, 2, 4}},
+           {{0, 2, 3}},
+           {{0, 3, 4}},
+           {{1, 2, 4}},
+           {{1, 2, 3}},
+           {{1, 3, 4}}}};
+
+        return table[vertex];
+      }
+    else if (kind == Type::Pyramid)
+      {
+        AssertIndexRange(vertex, 5);
+        static const unsigned int X = numbers::invalid_unsigned_int;
+        static const std::array<std::array<unsigned int, 4>, 5> table = {
+          {{{0, 1, 3, X}},
+           {{0, 2, 3, X}},
+           {{0, 1, 4, X}},
+           {{0, 2, 4, X}},
+           {{1, 2, 3, 4}}}};
+
+        return {&table[vertex][0], vertex == 4 ? 4u : 3u};
+      }
+
+    Assert(false, ExcNotImplemented());
+
+    return {};
   }
 
 
