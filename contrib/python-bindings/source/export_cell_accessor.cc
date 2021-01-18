@@ -16,6 +16,7 @@
 #include <boost/python.hpp>
 
 #include <cell_accessor_wrapper.h>
+#include <reference_cell_wrapper.h>
 #include <triangulation_wrapper.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -151,6 +152,11 @@ namespace python
 
 
 
+  const char reference_cell_type_docstring[] =
+    " Reference cell type of the current cell).                          \n";
+
+
+
   const char n_vertices_docstring[] =
     " Number of vertices.                                                \n";
 
@@ -254,6 +260,10 @@ namespace python
            &CellAccessorWrapper::vertex_index,
            vertex_index_docstring,
            boost::python::args("self", "vertex"))
+      .def("reference_cell_type",
+           &CellAccessorWrapper::reference_cell_type,
+           reference_cell_type_docstring,
+           boost::python::args("self"))
       .def("n_vertices",
            &CellAccessorWrapper::n_vertices,
            n_vertices_docstring,
