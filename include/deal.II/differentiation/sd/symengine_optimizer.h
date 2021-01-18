@@ -1124,6 +1124,11 @@ namespace Differentiation
        * @tparam TensorType The type of tensor to be evaluated and returned
        *         (i.e. Tensor or SymmetricTensor).
        * @param[in] symbol_tensor The symbolic tensor that is to be evaluated.
+       * @param[in] cached_evaluation A vector that stores the numerical
+       *            values of all dependent variables referenced by the
+       *            @p optimizer. This vector is, most typically, first attained
+       *            by a call to the BatchOptimizer::evaluate() variant that
+       *            takes no arguments.
        * @param[in] optimizer The optimizer that can evaluate the input
        *       @p symbol_tensor.
        * @return TensorType<rank, dim, NumberType> The numeric result that the
@@ -1136,6 +1141,7 @@ namespace Differentiation
       TensorType<rank, dim, NumberType>
       tensor_evaluate_optimized(
         const TensorType<rank, dim, Expression> &symbol_tensor,
+        const std::vector<NumberType> &          cached_evaluation,
         const BatchOptimizer<NumberType> &       optimizer)
       {
         TensorType<rank, dim, NumberType> out;
@@ -1143,7 +1149,8 @@ namespace Differentiation
           {
             const TableIndices<rank> indices(
               out.unrolled_to_component_indices(i));
-            out[indices] = optimizer.evaluate(symbol_tensor[indices]);
+            out[indices] =
+              optimizer.extract(symbol_tensor[indices], cached_evaluation);
           }
         return out;
       }
@@ -1161,6 +1168,11 @@ namespace Differentiation
        * @tparam TensorType The type of tensor to be evaluated and returned
        *         (i.e. Tensor or SymmetricTensor).
        * @param[in] symbol_tensor The symbolic tensor that is to be evaluated.
+       * @param[in] cached_evaluation A vector that stores the numerical
+       *            values of all dependent variables referenced by the
+       *            @p optimizer. This vector is, most typically, first attained
+       *            by a call to the BatchOptimizer::evaluate() variant that
+       *            takes no arguments.
        * @param[in] optimizer The optimizer that can evaluate the input
        *       @p symbol_tensor.
        * @return TensorType<rank, dim, NumberType> The numeric result that the
@@ -1170,6 +1182,7 @@ namespace Differentiation
       SymmetricTensor<4, dim, NumberType>
       tensor_evaluate_optimized(
         const SymmetricTensor<4, dim, Expression> &symbol_tensor,
+        const std::vector<NumberType> &            cached_evaluation,
         const BatchOptimizer<NumberType> &         optimizer)
       {
         SymmetricTensor<4, dim, NumberType> out;
@@ -1182,7 +1195,8 @@ namespace Differentiation
             {
               const TableIndices<4> indices =
                 make_rank_4_tensor_indices<dim>(i, j);
-              out[indices] = optimizer.evaluate(symbol_tensor[indices]);
+              out[indices] =
+                optimizer.extract(symbol_tensor[indices], cached_evaluation);
             }
         return out;
       }
@@ -1855,7 +1869,9 @@ namespace Differentiation
       /**
        * Returns the result of a value substitution into the optimized
        * counterpart of all dependent functions. This function fetches all of
-       * those cached values.
+       * those cached values. If these results are stored elsewhere, and you
+       * want to use this optimizer to extract components of the cached results
+       * then you can make use of the extract() functions listed below.
        *
        * These values were computed by substituting a @p substitution_values map
        * during substitute() call.
@@ -1920,6 +1936,56 @@ namespace Differentiation
       template <int rank, int dim>
       SymmetricTensor<rank, dim, ReturnType>
       evaluate(const SymmetricTensor<rank, dim, Expression> &funcs) const;
+
+
+      /**
+       * Returns the result of a value substitution into the optimized
+       * counterpart of @p func. This function fetches that one value
+       * stored in the @p cached_evaluation vector. This vector is, most
+       * typically, first attained by a call to the evaluate() variant that
+       * takes no arguments.
+       */
+      ReturnType
+      extract(const Expression &             func,
+              const std::vector<ReturnType> &cached_evaluation) const;
+
+
+      /**
+       * Returns the result of a value substitution into the optimized
+       * counterpart of @p funcs. This function fetches that subset of
+       * values stored in the @p cached_evaluation vector. This vector is, most
+       * typically, first attained by a call to the evaluate() variant that
+       * takes no arguments.
+       */
+      std::vector<ReturnType>
+      extract(const std::vector<Expression> &funcs,
+              const std::vector<ReturnType> &cached_evaluation) const;
+
+
+      /**
+       * Returns the result of a tensor value substitution into the optimized
+       * counterpart of @p funcs. This function fetches those tensor components
+       * stored in the @p cached_evaluation vector. This vector is, most
+       * typically, first attained by a call to the evaluate() variant that
+       * takes no arguments.
+       */
+      template <int rank, int dim>
+      Tensor<rank, dim, ReturnType>
+      extract(const Tensor<rank, dim, Expression> &funcs,
+              const std::vector<ReturnType> &      cached_evaluation) const;
+
+
+      /**
+       * Returns the result of a tensor value substitution into the optimized
+       * counterpart of @p funcs. This function fetches those symmetric
+       * tensor components stored in the @p cached_evaluation vector. This vector
+       * is, most typically, first attained by a call to the evaluate() variant
+       * that takes no arguments.
+       */
+      template <int rank, int dim>
+      SymmetricTensor<rank, dim, ReturnType>
+      extract(const SymmetricTensor<rank, dim, Expression> &funcs,
+              const std::vector<ReturnType> &cached_evaluation) const;
 
       //@}
 
@@ -2445,8 +2511,9 @@ namespace Differentiation
     template <typename ReturnType>
     template <int rank, int dim>
     Tensor<rank, dim, ReturnType>
-    BatchOptimizer<ReturnType>::evaluate(
-      const Tensor<rank, dim, Expression> &funcs) const
+    BatchOptimizer<ReturnType>::extract(
+      const Tensor<rank, dim, Expression> &funcs,
+      const std::vector<ReturnType> &      cached_evaluation) const
     {
       Assert(
         values_substituted() == true,
@@ -2454,7 +2521,40 @@ namespace Differentiation
           "The optimizer is not configured to perform evaluation. "
           "This action can only performed after substitute() has been called."));
 
-      return internal::tensor_evaluate_optimized(funcs, *this);
+      return internal::tensor_evaluate_optimized(funcs,
+                                                 cached_evaluation,
+                                                 *this);
+    }
+
+
+
+    template <typename ReturnType>
+    template <int rank, int dim>
+    Tensor<rank, dim, ReturnType>
+    BatchOptimizer<ReturnType>::evaluate(
+      const Tensor<rank, dim, Expression> &funcs) const
+    {
+      return extract(funcs, dependent_variables_output);
+    }
+
+
+
+    template <typename ReturnType>
+    template <int rank, int dim>
+    SymmetricTensor<rank, dim, ReturnType>
+    BatchOptimizer<ReturnType>::extract(
+      const SymmetricTensor<rank, dim, Expression> &funcs,
+      const std::vector<ReturnType> &               cached_evaluation) const
+    {
+      Assert(
+        values_substituted() == true,
+        ExcMessage(
+          "The optimizer is not configured to perform evaluation. "
+          "This action can only performed after substitute() has been called."));
+
+      return internal::tensor_evaluate_optimized(funcs,
+                                                 cached_evaluation,
+                                                 *this);
     }
 
 
@@ -2465,13 +2565,7 @@ namespace Differentiation
     BatchOptimizer<ReturnType>::evaluate(
       const SymmetricTensor<rank, dim, Expression> &funcs) const
     {
-      Assert(
-        values_substituted() == true,
-        ExcMessage(
-          "The optimizer is not configured to perform evaluation. "
-          "This action can only performed after substitute() has been called."));
-
-      return internal::tensor_evaluate_optimized(funcs, *this);
+      return extract(funcs, dependent_variables_output);
     }
 
 #  endif // DOXYGEN

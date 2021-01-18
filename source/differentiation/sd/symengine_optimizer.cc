@@ -523,7 +523,9 @@ namespace Differentiation
 
     template <typename ReturnType>
     ReturnType
-    BatchOptimizer<ReturnType>::evaluate(const Expression &func) const
+    BatchOptimizer<ReturnType>::extract(
+      const Expression &             func,
+      const std::vector<ReturnType> &cached_evaluation) const
     {
       Assert(
         values_substituted() == true,
@@ -613,7 +615,33 @@ namespace Differentiation
              ExcMessage("Function has not been registered."));
       Assert(it->second < n_dependent_variables(), ExcInternalError());
 
-      return dependent_variables_output[it->second];
+      return cached_evaluation[it->second];
+    }
+
+
+
+    template <typename ReturnType>
+    ReturnType
+    BatchOptimizer<ReturnType>::evaluate(const Expression &func) const
+    {
+      return extract(func, dependent_variables_output);
+    }
+
+
+
+    template <typename ReturnType>
+    std::vector<ReturnType>
+    BatchOptimizer<ReturnType>::extract(
+      const std::vector<Expression> &funcs,
+      const std::vector<ReturnType> &cached_evaluation) const
+    {
+      std::vector<ReturnType> out;
+      out.reserve(funcs.size());
+
+      for (const auto &func : funcs)
+        out.emplace_back(extract(func, cached_evaluation));
+
+      return out;
     }
 
 
@@ -623,13 +651,7 @@ namespace Differentiation
     BatchOptimizer<ReturnType>::evaluate(
       const std::vector<Expression> &funcs) const
     {
-      std::vector<ReturnType> out;
-      out.reserve(funcs.size());
-
-      for (const auto &func : funcs)
-        out.emplace_back(evaluate(func));
-
-      return out;
+      return extract(funcs, dependent_variables_output);
     }
 
 
