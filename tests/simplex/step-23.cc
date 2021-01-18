@@ -14,7 +14,12 @@
 // ---------------------------------------------------------------------
 
 
-// Step-23 with tetrahedron mesh.
+// Step-23 with tetrahedron mesh. Following incompatible modifications had to be
+// made:
+// - Change FE_Q and QGauss to Simplex::FE_P and Simplex::QGauss.
+// - Explicit use of MappingFE instead of the default mapping.
+// - Grid generation by subdivided_hyper_cube_with_simplices instead of
+// hyper_cube, because global refinement is not allowed.
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
