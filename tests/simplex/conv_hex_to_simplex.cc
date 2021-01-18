@@ -80,6 +80,13 @@ check_file() // for dim = spaceim
 
   GridGenerator::convert_hypercube_to_simplex_mesh(in_tria, out_tria);
 
+  // copy manifolds to test global refining
+  for (const auto i : in_tria.get_manifold_ids())
+    if (i != numbers::flat_manifold_id)
+      out_tria.set_manifold(i, in_tria.get_manifold(i));
+
+  // out_tria.refine_global(2);
+
   // write 2 outputs (total mesh and only surface mesh)
   const auto grid_out = [](const auto &tria,
                            const bool  surface_mesh_only = false) {

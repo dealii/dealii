@@ -181,6 +181,47 @@ namespace ReferenceCell
     return Quadrature<dim>(); // never reached
   }
 
+  template <int dim>
+  Quadrature<dim> &
+  get_nodal_type_quadrature(const Type &reference_cell)
+  {
+    AssertDimension(dim, get_dimension(reference_cell));
+
+    const auto create_quadrature = [](const Type &reference_cell) {
+      Triangulation<dim> tria;
+      make_triangulation(reference_cell, tria);
+
+      return Quadrature<dim>(tria.get_vertices());
+    };
+
+    if (reference_cell == get_hypercube(dim))
+      {
+        static Quadrature<dim> quadrature = create_quadrature(reference_cell);
+        return quadrature;
+      }
+    else if (reference_cell == Type::Tri || reference_cell == Type::Tet)
+      {
+        static Quadrature<dim> quadrature = create_quadrature(reference_cell);
+        return quadrature;
+      }
+    else if (reference_cell == Type::Pyramid)
+      {
+        static Quadrature<dim> quadrature = create_quadrature(reference_cell);
+        return quadrature;
+      }
+    else if (reference_cell == Type::Wedge)
+      {
+        static Quadrature<dim> quadrature = create_quadrature(reference_cell);
+        return quadrature;
+      }
+    else
+      Assert(false, ExcNotImplemented());
+
+    static Quadrature<dim> dummy;
+
+    return dummy; // never reached
+  }
+
 #include "reference_cell.inst"
 
 } // namespace ReferenceCell

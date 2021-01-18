@@ -815,11 +815,42 @@ FE_Q_Base<PolynomialType, dim, spacedim>::hp_line_dof_identities(
 
       return identities;
     }
+  else if (const Simplex::FE_P<dim, spacedim> *fe_p_other =
+             dynamic_cast<const Simplex::FE_P<dim, spacedim> *>(&fe_other))
+    {
+      // DoFs are located along lines, so two dofs are identical if they are
+      // located at identical positions. If we had only equidistant points, we
+      // could simply check for similarity like (i+1)*q == (j+1)*p, but we
+      // might have other support points (e.g. Gauss-Lobatto
+      // points). Therefore, read the points in unit_support_points for the
+      // first coordinate direction. For FE_Q, we take the lexicographic
+      // ordering of the line support points in the first direction (i.e.,
+      // x-direction), which we access between index 1 and p-1 (index 0 and p
+      // are vertex dofs). For FE_P, they are currently hard-coded and we
+      // iterate over points on the first line which begin after the 3 vertex
+      // points in the complete list of unit support points
+
+      Assert(fe_p_other->degree <= 2, ExcNotImplemented());
+
+      const std::vector<unsigned int> &index_map_inverse_q =
+        this->get_poly_space_numbering_inverse();
+
+      std::vector<std::pair<unsigned int, unsigned int>> identities;
+
+      for (unsigned int i = 0; i < this->degree - 1; ++i)
+        for (unsigned int j = 0; j < fe_p_other->degree - 1; ++j)
+          if (std::fabs(
+                this->unit_support_points[index_map_inverse_q[i + 1]][0] -
+                fe_p_other->get_unit_support_points()[j + 3][0]) < 1e-14)
+            identities.emplace_back(i, j);
+
+      return identities;
+    }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&fe_other) != nullptr)
     {
       // the FE_Nothing has no degrees of freedom, so there are no
       // equivalencies to be recorded
-      return std::vector<std::pair<unsigned int, unsigned int>>();
+      return {};
     }
   else if (fe_other.n_unique_faces() == 1 && fe_other.n_dofs_per_face(0) == 0)
     {
@@ -830,12 +861,12 @@ FE_Q_Base<PolynomialType, dim, spacedim>::hp_line_dof_identities(
       // that it is discontinuous because it has no DoFs on
       // its faces. in that case, just state that we have no
       // constraints to declare
-      return std::vector<std::pair<unsigned int, unsigned int>>();
+      return {};
     }
   else
     {
       Assert(false, ExcNotImplemented());
-      return std::vector<std::pair<unsigned int, unsigned int>>();
+      return {};
     }
 }
 

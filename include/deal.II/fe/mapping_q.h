@@ -119,6 +119,11 @@ public:
   virtual bool
   preserves_vertex_locations() const override;
 
+  // for documentation, see the Mapping base class
+  virtual BoundingBox<spacedim>
+  get_bounding_box(const typename Triangulation<dim, spacedim>::cell_iterator
+                     &cell) const override;
+
   /**
    * Transform the point @p p on the unit cell to the point @p p_real on the
    * real cell @p cell and returns @p p_real.

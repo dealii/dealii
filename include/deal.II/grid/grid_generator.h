@@ -1927,6 +1927,15 @@ namespace GridGenerator
    *
    * @param in_tria The triangulation containing hex elements.
    * @param out_tria The converted triangulation containing tet elements.
+   *
+   * @note No manifold objects are copied by this function: you must
+   *   copy existing manifold objects from @p in_tria to @p out_tria, e.g.,
+   *   with the following code:
+   * @code
+   * for (const auto i : in_tria.get_manifold_ids())
+   *   if (i != numbers::flat_manifold_id)
+   *     out_tria.set_manifold(i, in_tria.get_manifold(i));
+   * @endcode
    */
   template <int dim, int spacedim>
   void

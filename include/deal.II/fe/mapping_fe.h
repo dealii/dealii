@@ -79,6 +79,12 @@ public:
   unsigned int
   get_degree() const;
 
+  // for documentation, see the Mapping base class
+  virtual BoundingBox<spacedim>
+  get_bounding_box(const typename Triangulation<dim, spacedim>::cell_iterator
+                     &cell) const override;
+
+
   /**
    * Always returns @p true because the default implementation of functions in
    * this class preserves vertex locations.
@@ -97,11 +103,7 @@ public:
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const Point<dim> &p) const override;
 
-  /**
-   * for documentation, see the Mapping base class
-   *
-   * note: not implemented yet
-   */
+  // for documentation, see the Mapping base class
   virtual Point<dim>
   transform_real_to_unit_cell(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,

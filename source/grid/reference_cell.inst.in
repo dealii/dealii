@@ -34,4 +34,6 @@ for (deal_II_dimension : DIMENSIONS)
   {
     template Quadrature<deal_II_dimension> get_gauss_type_quadrature(
       const Type &reference_cell, const unsigned n_points_1D);
+    template Quadrature<deal_II_dimension> &get_nodal_type_quadrature(
+      const Type &reference_cell);
   }

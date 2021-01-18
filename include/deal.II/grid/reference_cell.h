@@ -39,20 +39,148 @@ class Quadrature;
 namespace ReferenceCell
 {
   /**
-   * Supported reference cell types.
+   * A type that describes the kinds of reference cells that can be used.
+   * This includes quadrilaterals and hexahedra (i.e., "hypercubes"),
+   * triangles and tetrahedra (simplices), and the pyramids and wedges
+   * necessary when using mixed 3d meshes.
    */
-  enum class Type : std::uint8_t
+  class Type
   {
-    Vertex  = 0,
-    Line    = 1,
-    Tri     = 2,
-    Quad    = 3,
-    Tet     = 4,
-    Pyramid = 5,
-    Wedge   = 6,
-    Hex     = 7,
-    Invalid = static_cast<std::uint8_t>(-1)
+  public:
+    enum CellKinds : std::uint8_t
+    {
+      Vertex  = 0,
+      Line    = 1,
+      Tri     = 2,
+      Quad    = 3,
+      Tet     = 4,
+      Pyramid = 5,
+      Wedge   = 6,
+      Hex     = 7,
+      Invalid = static_cast<std::uint8_t>(-1)
+    };
+
+    /**
+     * Default constructor. Initialize this object as an invalid object.
+     */
+    Type();
+
+    /**
+     * Constructor.
+     */
+    Type(const CellKinds kind);
+
+    /**
+     * Conversion operator to an integer.
+     */
+    operator std::uint8_t() const;
+
+    /**
+     * Operator for equality comparison.
+     */
+    bool
+    operator==(const Type &type) const;
+
+    /**
+     * Operator for inequality comparison.
+     */
+    bool
+    operator!=(const Type &type) const;
+
+    /**
+     * Operator for equality comparison.
+     */
+    bool
+    operator==(const CellKinds &type) const;
+
+    /**
+     * Operator for inequality comparison.
+     */
+    bool
+    operator!=(const CellKinds &type) const;
+
+    /**
+     * Write and read the data of this object from a stream for the purpose
+     * of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+     */
+    template <class Archive>
+    void
+    serialize(Archive &archive, const unsigned int /*version*/);
+
+  private:
+    /**
+     * The variable that stores what this object actually corresponds to.
+     */
+    CellKinds kind;
   };
+
+
+
+  inline Type::Type()
+    : Type(Invalid)
+  {}
+
+
+
+  inline Type::Type(const CellKinds kind)
+    : kind(kind)
+  {}
+
+
+
+  inline Type::operator std::uint8_t() const
+  {
+    return kind;
+  }
+
+
+
+  inline bool
+  Type::operator==(const Type &type) const
+  {
+    return kind == type.kind;
+  }
+
+
+
+  inline bool
+  Type::operator!=(const Type &type) const
+  {
+    return kind != type.kind;
+  }
+
+
+
+  inline bool
+  Type::operator==(const CellKinds &type) const
+  {
+    return kind == type;
+  }
+
+
+
+  inline bool
+  Type::operator!=(const CellKinds &type) const
+  {
+    return kind != type;
+  }
+
+
+
+  template <class Archive>
+  inline void
+  Type::serialize(Archive &archive, const unsigned int /*version*/)
+  {
+    // Serialize the state as an 8-bit int. When saving the state, the
+    // last of the following 3 lines is a no-op. When loading, the first
+    // of these lines is a no-op.
+    std::uint8_t kind_as_int = static_cast<std::uint8_t>(kind);
+    archive &    kind_as_int;
+    kind = static_cast<CellKinds>(kind_as_int);
+  }
+
+
 
   /**
    * Return the dimension of the given reference-cell type @p type.
@@ -169,15 +297,17 @@ namespace ReferenceCell
     AssertIndexRange(n_vertices, 9);
     const auto X = Type::Invalid;
 
-    static constexpr std::array<std::array<ReferenceCell::Type, 9>, 4> table = {
-      {// dim 0
-       {{X, Type::Vertex, X, X, X, X, X, X, X}},
-       // dim 1
-       {{X, X, Type::Line, X, X, X, X, X, X}},
-       // dim 2
-       {{X, X, X, Type::Tri, Type::Quad, X, X, X, X}},
-       // dim 3
-       {{X, X, X, X, Type::Tet, Type::Pyramid, Type::Wedge, X, Type::Hex}}}};
+    static constexpr std::array<std::array<ReferenceCell::Type::CellKinds, 9>,
+                                4>
+      table = {
+        {// dim 0
+         {{X, Type::Vertex, X, X, X, X, X, X, X}},
+         // dim 1
+         {{X, X, Type::Line, X, X, X, X, X, X}},
+         // dim 2
+         {{X, X, X, Type::Tri, Type::Quad, X, X, X, X}},
+         // dim 3
+         {{X, X, X, X, Type::Tet, Type::Pyramid, Type::Wedge, X, Type::Hex}}}};
     Assert(table[dim][n_vertices] != Type::Invalid,
            ExcMessage("The combination of dim = " + std::to_string(dim) +
                       " and n_vertices = " + std::to_string(n_vertices) +
@@ -250,7 +380,7 @@ namespace ReferenceCell
     return Point<dim>(+0.0, +0.0, +0.0);
   }
 
-  /*
+  /**
    * Return i-th unit tangential vector of a face of the reference cell.
    * The vectors are arranged such that the
    * cross product between the two vectors returns the unit normal vector.
@@ -330,6 +460,44 @@ namespace ReferenceCell
     return {};
   }
 
+  /**
+   * Return the unit normal vector of a face of the reference cell.
+   */
+  template <int dim>
+  inline Tensor<1, dim>
+  unit_normal_vectors(const Type &reference_cell, const unsigned int face_no)
+  {
+    AssertDimension(dim, get_dimension(reference_cell));
+
+    if (reference_cell == get_hypercube(dim))
+      {
+        AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
+        return GeometryInfo<dim>::unit_normal_vector[face_no];
+      }
+    else if (dim == 2)
+      {
+        const auto tangential =
+          unit_tangential_vectors<dim>(reference_cell, face_no, 0);
+
+        Tensor<1, dim> result;
+
+        result[0] = tangential[1];
+        result[1] = -tangential[0];
+
+        return result;
+      }
+    else if (dim == 3)
+      {
+        return cross_product_3d(
+          unit_tangential_vectors<dim>(reference_cell, face_no, 0),
+          unit_tangential_vectors<dim>(reference_cell, face_no, 1));
+      }
+
+    Assert(false, ExcNotImplemented());
+
+    return {};
+  }
+
   /*
    * Create a (coarse) grid with a single cell of the shape of the provided
    * reference cell.
@@ -375,6 +543,16 @@ namespace ReferenceCell
   Quadrature<dim>
   get_gauss_type_quadrature(const Type &   reference_cell,
                             const unsigned n_points_1D);
+
+  /**
+   * Return a quadrature rule with the support points of the given reference
+   * cell.
+   *
+   * @note The weights are not filled.
+   */
+  template <int dim>
+  Quadrature<dim> &
+  get_nodal_type_quadrature(const Type &reference_cell);
 
   namespace internal
   {

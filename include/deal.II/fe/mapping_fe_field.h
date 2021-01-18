@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii_mapping_fe_h
-#define dealii_mapping_fe_h
+#ifndef dealii_mapping_fe_field_h
+#define dealii_mapping_fe_field_h
 
 
 #include <deal.II/base/config.h>

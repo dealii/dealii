@@ -1278,9 +1278,8 @@ namespace TrilinosWrappers
         << " of a distributed vector, but this element is not stored "
         << "on the current processor. Note: There are " << arg2
         << " elements stored "
-        << "on the current processor from within the range " << arg3
-        << " through " << arg4
-        << " but Trilinos vectors need not store contiguous "
+        << "on the current processor from within the range [" << arg3 << ","
+        << arg4 << "] but Trilinos vectors need not store contiguous "
         << "ranges on each processor, and not every element in "
         << "this range may in fact be stored locally."
         << "\n\n"
