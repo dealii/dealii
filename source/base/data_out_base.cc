@@ -567,25 +567,41 @@ namespace
   const unsigned int tecplot_binary_cell_type[4] = {0, 0, 1, 3};
 #endif
 
-  // NOTE: The dimension of the array is chosen to 5 to allow the choice
-  // DataOutBase<deal_II_dimension,deal_II_dimension+1> in general Wolfgang
-  // supposed that we don't need it in general, but however this choice avoids a
-  // -Warray-bounds check warning
-  const unsigned int vtk_cell_type[5] = {1,  // VTK_VERTEX
-                                         3,  // VTK_LINE
-                                         9,  // VTK_QUAD
-                                         12, // VTK_HEXAHEDRON
-                                         static_cast<unsigned int>(-1)};
+  // Define cell id using VTK nomenclature for linear, quadratic and
+  // high-order Lagrange cells
+  enum vtk_linear_cell_type
+  {
+    VTK_VERTEX     = 1,
+    VTK_LINE       = 3,
+    VTK_TRIANGLE   = 5,
+    VTK_QUAD       = 9,
+    VTK_TETRA      = 10,
+    VTK_HEXAHEDRON = 12,
+    VTK_WEDGE      = 13,
+    VTK_PYRAMID    = 14
+  };
 
-  // VTK cell ids defined in vtk_cell_type are used for linear cells,
-  // the ones defined below are used when Lagrange cells are written.
-  const unsigned int vtk_lagrange_cell_type[5] = {
-    1,  // VTK_VERTEX
-    68, // VTK_LAGRANGE_CURVE
-    70, // VTK_LAGRANGE_QUADRILATERAL
-    72, // VTK_LAGRANGE_HEXAHEDRON
-    static_cast<unsigned int>(-1)};
+  enum vtk_quadratic_cell_type
+  {
+    VTK_QUADRATIC_EDGE       = 21,
+    VTK_QUADRATIC_TRIANGLE   = 22,
+    VTK_QUADRATIC_QUAD       = 23,
+    VTK_QUADRATIC_TETRA      = 24,
+    VTK_QUADRATIC_HEXAHEDRON = 25,
+    VTK_QUADRATIC_WEDGE      = 26,
+    VTK_QUADRATIC_PYRAMID    = 27
+  };
 
+  enum vtk_lagrange_cell_type
+  {
+    VTK_LAGRANGE_CURVE         = 68,
+    VTK_LAGRANGE_TRIANGLE      = 69,
+    VTK_LAGRANGE_QUADRILATERAL = 70,
+    VTK_LAGRANGE_TETRAHEDRON   = 71,
+    VTK_LAGRANGE_HEXAHEDRON    = 72,
+    VTK_LAGRANGE_WEDGE         = 73,
+    VTK_LAGRANGE_PYRAMID       = 74
+  };
 
   /**
    * Return the tuple (vtk cell type, number of cells, number of vertices)
@@ -602,7 +618,12 @@ namespace
       {
         if (patch.reference_cell_type == ReferenceCell::get_hypercube(dim))
           {
-            vtk_cell_id[0] = vtk_lagrange_cell_type[dim];
+            const std::array<unsigned int, 4> cell_type_by_dim{
+              {VTK_VERTEX,
+               VTK_LAGRANGE_CURVE,
+               VTK_LAGRANGE_QUADRILATERAL,
+               VTK_LAGRANGE_HEXAHEDRON}};
+            vtk_cell_id[0] = cell_type_by_dim[dim];
             vtk_cell_id[1] = 1;
           }
         else
@@ -613,42 +634,44 @@ namespace
     else if (patch.reference_cell_type == ReferenceCell::Type::Tri &&
              patch.data.n_cols() == 3)
       {
-        vtk_cell_id[0] = 5;
+        vtk_cell_id[0] = VTK_TRIANGLE;
         vtk_cell_id[1] = 1;
       }
     else if (patch.reference_cell_type == ReferenceCell::Type::Tri &&
              patch.data.n_cols() == 6)
       {
-        vtk_cell_id[0] = 22;
+        vtk_cell_id[0] = VTK_QUADRATIC_TRIANGLE;
         vtk_cell_id[1] = 1;
       }
     else if (patch.reference_cell_type == ReferenceCell::Type::Tet &&
              patch.data.n_cols() == 4)
       {
-        vtk_cell_id[0] = 10;
+        vtk_cell_id[0] = VTK_TETRA;
         vtk_cell_id[1] = 1;
       }
     else if (patch.reference_cell_type == ReferenceCell::Type::Tet &&
              patch.data.n_cols() == 10)
       {
-        vtk_cell_id[0] = 24;
+        vtk_cell_id[0] = VTK_QUADRATIC_TETRA;
         vtk_cell_id[1] = 1;
       }
     else if (patch.reference_cell_type == ReferenceCell::Type::Wedge &&
              patch.data.n_cols() == 6)
       {
-        vtk_cell_id[0] = 13;
+        vtk_cell_id[0] = VTK_WEDGE;
         vtk_cell_id[1] = 1;
       }
     else if (patch.reference_cell_type == ReferenceCell::Type::Pyramid &&
              patch.data.n_cols() == 5)
       {
-        vtk_cell_id[0] = 14;
+        vtk_cell_id[0] = VTK_PYRAMID;
         vtk_cell_id[1] = 1;
       }
     else if (patch.reference_cell_type == ReferenceCell::get_hypercube(dim))
       {
-        vtk_cell_id[0] = vtk_cell_type[dim];
+        const std::array<unsigned int, 4> cell_type_by_dim{
+          {VTK_VERTEX, VTK_LINE, VTK_QUAD, VTK_HEXAHEDRON}};
+        vtk_cell_id[0] = cell_type_by_dim[dim];
         vtk_cell_id[1] = Utilities::pow(patch.n_subdivisions, dim);
       }
     else
