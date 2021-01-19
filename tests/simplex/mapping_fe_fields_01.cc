@@ -14,7 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// Test MappingFEField for simplex meshes.
+// Test MappingFEField and VectorTools::get_position_vector() for simplex
+// meshes.
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -36,21 +37,6 @@
 
 using namespace dealii;
 
-template <int dim>
-class Solution : public Function<dim>
-{
-public:
-  Solution()
-    : Function<dim>(dim)
-  {}
-
-  double
-  value(const Point<dim> &point, const unsigned int compontent) const
-  {
-    return point[compontent];
-  }
-};
-
 void
 test()
 {
@@ -59,7 +45,7 @@ test()
   Triangulation<dim> tria;
   GridGenerator::subdivided_hyper_cube_with_simplices(tria, 1);
 
-  Simplex::FE_P<dim> fe(2);
+  Simplex::FE_P<dim> fe(1);
   FESystem<dim>      euler_fe(fe, dim);
 
   DoFHandler<dim> dof_handler(tria);
@@ -70,14 +56,7 @@ test()
 
   Vector<double> euler_vector(euler_dof_handler.n_dofs());
 
-  // TODO: not working (missing mapping)
-  // VectorTools::get_position_vector(euler_dof_handler, euler_vector);
-
-  MappingFE<dim> mapping_interpolation(Simplex::FE_P<dim>(1));
-  VectorTools::interpolate(mapping_interpolation,
-                           euler_dof_handler,
-                           Solution<dim>(),
-                           euler_vector);
+  VectorTools::get_position_vector(euler_dof_handler, euler_vector);
 
   MappingFEField<dim> mapping(euler_dof_handler, euler_vector);
 

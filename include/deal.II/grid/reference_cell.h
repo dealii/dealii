@@ -646,6 +646,18 @@ namespace ReferenceCell
                      Triangulation<dim, spacedim> &tria);
 
   /**
+   * Return a default mapping of degree @ degree matching the given reference
+   * cell. If this reference cell is a hypercube, then the returned mapping is a
+   * MappingQGeneric; otherwise, it is an object of type MappingFE initialized
+   * with Simplex::FE_P (if the reference cell is a triangle and tetrahedron),
+   * with Simplex::FE_PyramidP (if the reference cell is a pyramid), or with
+   * Simplex::FE_WedgeP (if the reference cell is a wedge).
+   */
+  template <int dim, int spacedim>
+  std::unique_ptr<Mapping<dim, spacedim>>
+  get_default_mapping(const Type &reference_cell, const unsigned int degree);
+
+  /**
    * Return a default linear mapping matching the given reference cell.
    * If this reference cell is a hypercube, then the returned mapping
    * is a MappingQ1; otherwise, it is an object of type MappingFE
