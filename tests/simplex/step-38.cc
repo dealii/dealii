@@ -63,7 +63,7 @@ namespace Step38
   class LaplaceBeltramiProblem
   {
   public:
-    LaplaceBeltramiProblem(const unsigned degree = 1);
+    LaplaceBeltramiProblem(const unsigned degree = 2);
     void
     run();
 
@@ -274,7 +274,7 @@ namespace Step38
     system_matrix = 0;
     system_rhs    = 0;
 #ifdef USE_SIMPLEX
-    const Simplex::QGauss<dim> quadrature_formula(2 * fe.degree);
+    const Simplex::QGauss<dim> quadrature_formula(fe.degree + 1);
 #else
     const QGauss<dim> quadrature_formula(2 * fe.degree);
 #endif
@@ -379,7 +379,7 @@ namespace Step38
                                       Solution<spacedim>(),
                                       difference_per_cell,
 #ifdef USE_SIMPLEX
-                                      Simplex::QGauss<dim>(2 * fe.degree + 1),
+                                      Simplex::QGauss<dim>(fe.degree + 1),
 #else
                                       QGauss<dim>(2 * fe.degree +
                                                   1), // This also works on
@@ -412,7 +412,7 @@ main()
     {
       using namespace Step38;
 
-      LaplaceBeltramiProblem<3> laplace_beltrami(1);
+      LaplaceBeltramiProblem<3> laplace_beltrami;
       laplace_beltrami.run();
     }
   catch (std::exception &exc)
