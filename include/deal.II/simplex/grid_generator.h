@@ -27,8 +27,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
-
 namespace GridGenerator
 {
   /**
@@ -76,8 +74,6 @@ namespace GridGenerator
                                        const bool         colorize = false);
 
 } // namespace GridGenerator
-
-#endif
 
 DEAL_II_NAMESPACE_CLOSE
 
