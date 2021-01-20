@@ -38,9 +38,8 @@ test(const ReferenceCell::Type &reference_cell)
               << std::endl;
 
       for (unsigned int i = 0; i < dim - 1; ++i)
-        deallog << ReferenceCell::unit_tangential_vectors<dim>(reference_cell,
-                                                               face_no,
-                                                               i)
+        deallog << reference_cell.template unit_tangential_vectors<dim>(face_no,
+                                                                        i)
                 << std::endl;
     }
   deallog << std::endl;

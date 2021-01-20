@@ -580,16 +580,16 @@ MappingFEField<dim, spacedim, VectorType, void>::compute_face_data(
               data.unit_tangentials[i].resize(n_original_q_points);
               std::fill(data.unit_tangentials[i].begin(),
                         data.unit_tangentials[i].end(),
-                        ReferenceCell::unit_tangential_vectors<dim>(
-                          reference_cell_type, i, 0));
+                        reference_cell_type
+                          .template unit_tangential_vectors<dim>(i, 0));
               if (dim > 2)
                 {
                   data.unit_tangentials[n_faces + i].resize(
                     n_original_q_points);
                   std::fill(data.unit_tangentials[n_faces + i].begin(),
                             data.unit_tangentials[n_faces + i].end(),
-                            ReferenceCell::unit_tangential_vectors<dim>(
-                              reference_cell_type, i, 1));
+                            reference_cell_type
+                              .template unit_tangential_vectors<dim>(i, 1));
                 }
             }
         }

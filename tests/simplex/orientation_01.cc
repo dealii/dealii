@@ -33,10 +33,9 @@ test(const ReferenceCell::Type type, const unsigned int n_orientations)
       for (unsigned int i = 0; i < n_points; ++i)
         origin[i] = i;
 
-      const auto permuted =
-        ReferenceCell::permute_according_orientation(type, origin, o);
+      const auto permuted = type.permute_according_orientation(origin, o);
       const unsigned int origin_back =
-        ReferenceCell::compute_orientation(type, permuted, origin);
+        type.compute_orientation(permuted, origin);
 
       AssertDimension(o, origin_back);
     }
