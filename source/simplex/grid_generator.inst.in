@@ -15,8 +15,6 @@
 
 
 
-#ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
-
 for (deal_II_dimension : DIMENSIONS)
   {
     template void GridGenerator::subdivided_hyper_rectangle_with_simplices(
@@ -33,5 +31,3 @@ for (deal_II_dimension : DIMENSIONS)
       const double       p2,
       const bool         colorize);
   }
-
-#endif
