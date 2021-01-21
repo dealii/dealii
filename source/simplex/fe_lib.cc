@@ -20,6 +20,7 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_tools.h>
 
+#include <deal.II/simplex/barycentric_polynomials.h>
 #include <deal.II/simplex/fe_lib.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -282,7 +283,7 @@ namespace Simplex
     const std::vector<unsigned int> &                 dpo_vector,
     const typename FiniteElementData<dim>::Conformity conformity)
     : dealii::FE_Poly<dim, spacedim>(
-        Simplex::ScalarPolynomial<dim>(degree),
+        BarycentricPolynomials<dim>::get_fe_p_basis(degree),
         FiniteElementData<dim>(dpo_vector,
                                dim == 2 ? ReferenceCell::Type::Tri :
                                           ReferenceCell::Type::Tet,
