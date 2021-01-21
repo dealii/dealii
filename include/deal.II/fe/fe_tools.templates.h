@@ -2265,8 +2265,7 @@ namespace FETools
         tr.begin_active()->set_refine_flag(RefinementCase<dim>(ref_case));
         tr.execute_coarsening_and_refinement();
 
-        FEValues<dim, spacedim> fine(StaticMappingQ1<dim, spacedim>::mapping,
-                                     fe,
+        FEValues<dim, spacedim> fine(fe,
                                      q_fine,
                                      update_quadrature_points |
                                        update_JxW_values | update_values);

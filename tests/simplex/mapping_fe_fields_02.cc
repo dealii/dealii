@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// Test MappingFEField and VectorTools::get_position_vector() for simplex
-// meshes.
+// Like mapping_fe_fields_01 but for deformed meshes tested for linear and
+// quadratic mapping.
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -37,15 +37,30 @@
 
 using namespace dealii;
 
+template <int dim>
+class Solution : public Function<dim>
+{
+public:
+  Solution()
+    : Function<dim>(dim)
+  {}
+
+  double
+  value(const Point<dim> &point, const unsigned int compontent) const
+  {
+    return std::sin(point[compontent] * 0.5 * numbers::PI);
+  }
+};
+
 void
-test()
+test(const unsigned int mapping_degree)
 {
   const int dim = 2;
 
   Triangulation<dim> tria;
-  GridGenerator::subdivided_hyper_cube_with_simplices(tria, 1);
+  GridGenerator::subdivided_hyper_cube_with_simplices(tria, 4);
 
-  Simplex::FE_P<dim> fe(1);
+  Simplex::FE_P<dim> fe(mapping_degree);
   FESystem<dim>      euler_fe(fe, dim);
 
   DoFHandler<dim> dof_handler(tria);
@@ -56,21 +71,16 @@ test()
 
   Vector<double> euler_vector(euler_dof_handler.n_dofs());
 
-  VectorTools::get_position_vector(euler_dof_handler, euler_vector);
+  // TODO: not working (missing mapping)
+  // VectorTools::get_position_vector(euler_dof_handler, euler_vector);
+
+  MappingFE<dim> mapping_interpolation(Simplex::FE_P<dim>(1));
+  VectorTools::interpolate(mapping_interpolation,
+                           euler_dof_handler,
+                           Solution<dim>(),
+                           euler_vector);
 
   MappingFEField<dim> mapping(euler_dof_handler, euler_vector);
-
-  Simplex::QGauss<dim> quadrature_formula(1);
-
-  FEValues<dim> fe_values(mapping,
-                          fe,
-                          quadrature_formula,
-                          update_values | update_gradients);
-
-  for (const auto &cell : dof_handler.active_cell_iterators())
-    {
-      fe_values.reinit(cell);
-    }
 
   {
     DataOut<dim> data_out;
@@ -83,7 +93,7 @@ test()
     data_out.build_patches(mapping, 2);
 
 #if false
-    std::ofstream output("test.vtk");
+    std::ofstream output("test." + std::to_string(mapping_degree) +  ".vtk");
     data_out.write_vtk(output);
 #else
     data_out.write_vtk(deallog.get_file_stream());
@@ -96,5 +106,6 @@ main()
 {
   initlog();
 
-  test();
+  test(1); // linear mapping
+  test(2); // quadratic mapping
 }

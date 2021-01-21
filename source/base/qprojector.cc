@@ -647,10 +647,8 @@ QProjector<3>::project_to_all_faces(
     [](const auto &face, const auto &orientation) -> std::vector<Point<3>> {
     std::array<Point<3>, 3> vertices;
     std::copy_n(face.first.begin(), face.first.size(), vertices.begin());
-    const auto temp =
-      ReferenceCell::permute_according_orientation(ReferenceCell::Type::Tri,
-                                                   vertices,
-                                                   orientation);
+    const auto temp = ReferenceCell::Type(ReferenceCell::Type::Tri)
+                        .permute_according_orientation(vertices, orientation);
     return std::vector<Point<3>>(temp.begin(),
                                  temp.begin() + face.first.size());
   };
@@ -659,10 +657,8 @@ QProjector<3>::project_to_all_faces(
     [](const auto &face, const auto &orientation) -> std::vector<Point<3>> {
     std::array<Point<3>, 4> vertices;
     std::copy_n(face.first.begin(), face.first.size(), vertices.begin());
-    const auto temp =
-      ReferenceCell::permute_according_orientation(ReferenceCell::Type::Quad,
-                                                   vertices,
-                                                   orientation);
+    const auto temp = ReferenceCell::Type(ReferenceCell::Type::Quad)
+                        .permute_according_orientation(vertices, orientation);
     return std::vector<Point<3>>(temp.begin(),
                                  temp.begin() + face.first.size());
   };

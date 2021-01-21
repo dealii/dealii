@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,8 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Test ReferenceCell::unit_tangential_vectors() and ::unit_normal_vectors()
-// for all reference-cell types.
+// Test ReferenceCell::Kind::faces_for_given_vertex().
 
 
 #include <deal.II/grid/reference_cell.h>
@@ -30,17 +29,15 @@ template <int dim>
 void
 test(const ReferenceCell::Type &reference_cell)
 {
-  for (const auto face_no :
-       ReferenceCell::internal::Info::get_cell(reference_cell).face_indices())
-    {
-      deallog << ReferenceCell::unit_normal_vectors<dim>(reference_cell,
-                                                         face_no)
-              << std::endl;
+  const auto  kind = ReferenceCell::Type(reference_cell);
+  const auto &info = ReferenceCell::internal::Info::get_cell(reference_cell);
 
-      for (unsigned int i = 0; i < dim - 1; ++i)
-        deallog << reference_cell.template unit_tangential_vectors<dim>(face_no,
-                                                                        i)
-                << std::endl;
+  for (const auto v : info.vertex_indices())
+    {
+      deallog << v << ": ";
+      for (const auto i : kind.faces_for_given_vertex(v))
+        deallog << i << " ";
+      deallog << std::endl;
     }
   deallog << std::endl;
 }
@@ -52,6 +49,7 @@ main()
 {
   initlog();
 
+  test<2>(ReferenceCell::Type::Line);
   test<2>(ReferenceCell::Type::Tri);
   test<2>(ReferenceCell::Type::Quad);
   test<3>(ReferenceCell::Type::Tet);

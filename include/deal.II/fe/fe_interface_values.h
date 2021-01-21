@@ -525,22 +525,30 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
   const Quadrature<dim - 1> &         quadrature,
   const UpdateFlags                   update_flags)
   : n_quadrature_points(quadrature.size())
-  , internal_fe_face_values(StaticMappingQ1<dim, spacedim>::mapping,
-                            fe,
-                            quadrature,
-                            update_flags)
-  , internal_fe_subface_values(StaticMappingQ1<dim, spacedim>::mapping,
-                               fe,
-                               quadrature,
-                               update_flags)
-  , internal_fe_face_values_neighbor(StaticMappingQ1<dim, spacedim>::mapping,
-                                     fe,
-                                     quadrature,
-                                     update_flags)
-  , internal_fe_subface_values_neighbor(StaticMappingQ1<dim, spacedim>::mapping,
-                                        fe,
-                                        quadrature,
-                                        update_flags)
+  , internal_fe_face_values(
+      ReferenceCell::get_default_linear_mapping<dim, spacedim>(
+        fe.reference_cell_type()),
+      fe,
+      quadrature,
+      update_flags)
+  , internal_fe_subface_values(
+      ReferenceCell::get_default_linear_mapping<dim, spacedim>(
+        fe.reference_cell_type()),
+      fe,
+      quadrature,
+      update_flags)
+  , internal_fe_face_values_neighbor(
+      ReferenceCell::get_default_linear_mapping<dim, spacedim>(
+        fe.reference_cell_type()),
+      fe,
+      quadrature,
+      update_flags)
+  , internal_fe_subface_values_neighbor(
+      ReferenceCell::get_default_linear_mapping<dim, spacedim>(
+        fe.reference_cell_type()),
+      fe,
+      quadrature,
+      update_flags)
   , fe_face_values(nullptr)
   , fe_face_values_neighbor(nullptr)
 {}

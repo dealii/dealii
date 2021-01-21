@@ -43,12 +43,14 @@ test(const unsigned int orientation)
   }
 
   {
-    const auto &face     = dummy.begin()->face(face_no);
-    const auto  permuted = ReferenceCell::permute_according_orientation(
-      ReferenceCell::Type::Tri,
-      std::array<unsigned int, 3>{
-        {face->vertex_index(0), face->vertex_index(1), face->vertex_index(2)}},
-      orientation);
+    const auto &face = dummy.begin()->face(face_no);
+    const auto  permuted =
+      ReferenceCell::Type(ReferenceCell::Type::Tri)
+        .permute_according_orientation(
+          std::array<unsigned int, 3>{{face->vertex_index(0),
+                                       face->vertex_index(1),
+                                       face->vertex_index(2)}},
+          orientation);
 
     auto direction =
       cross_product_3d(vertices[permuted[1]] - vertices[permuted[0]],

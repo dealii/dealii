@@ -14,23 +14,19 @@
 // ---------------------------------------------------------------------
 
 
-// Test MappingFEField and VectorTools::get_position_vector() for simplex
-// meshes.
+// Distribute Simplex::FE_Wedge on a DoFHandler.
 
 #include <deal.II/dofs/dof_handler.h>
 
-#include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_fe.h>
-#include <deal.II/fe/mapping_fe_field.h>
 
+#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/numerics/data_out.h>
-#include <deal.II/numerics/vector_tools.h>
 
 #include <deal.II/simplex/fe_lib.h>
-#include <deal.II/simplex/grid_generator.h>
 #include <deal.II/simplex/quadrature_lib.h>
 
 #include "../tests.h"
@@ -38,39 +34,23 @@
 using namespace dealii;
 
 void
-test()
+test(const unsigned int mapping_degree)
 {
   const int dim = 2;
 
-  Triangulation<dim> tria;
-  GridGenerator::subdivided_hyper_cube_with_simplices(tria, 1);
+  Triangulation<dim> tria, tria_temp;
+  GridGenerator::hyper_shell(tria_temp, Point<dim>(), 1.0, 2.0);
+  GridGenerator::convert_hypercube_to_simplex_mesh(tria_temp, tria);
+  for (const auto i : tria_temp.get_manifold_ids())
+    if (i != numbers::flat_manifold_id)
+      tria.set_manifold(i, tria_temp.get_manifold(i));
 
-  Simplex::FE_P<dim> fe(1);
-  FESystem<dim>      euler_fe(fe, dim);
+  Simplex::FE_P<dim> fe(2);
 
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
 
-  DoFHandler<dim> euler_dof_handler(tria);
-  euler_dof_handler.distribute_dofs(euler_fe);
-
-  Vector<double> euler_vector(euler_dof_handler.n_dofs());
-
-  VectorTools::get_position_vector(euler_dof_handler, euler_vector);
-
-  MappingFEField<dim> mapping(euler_dof_handler, euler_vector);
-
-  Simplex::QGauss<dim> quadrature_formula(1);
-
-  FEValues<dim> fe_values(mapping,
-                          fe,
-                          quadrature_formula,
-                          update_values | update_gradients);
-
-  for (const auto &cell : dof_handler.active_cell_iterators())
-    {
-      fe_values.reinit(cell);
-    }
+  MappingFE<dim> mapping(Simplex::FE_P<dim>{mapping_degree});
 
   {
     DataOut<dim> data_out;
@@ -83,7 +63,7 @@ test()
     data_out.build_patches(mapping, 2);
 
 #if false
-    std::ofstream output("test.vtk");
+    std::ofstream output("test." + std::to_string(mapping_degree) +  ".vtk");
     data_out.write_vtk(output);
 #else
     data_out.write_vtk(deallog.get_file_stream());
@@ -96,5 +76,6 @@ main()
 {
   initlog();
 
-  test();
+  test(1);
+  test(2);
 }

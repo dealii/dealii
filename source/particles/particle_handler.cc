@@ -1208,7 +1208,7 @@ namespace Particles
         if (cell->is_locally_owned())
           {
             std::set<unsigned int> cell_to_neighbor_subdomain;
-            for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+            for (const unsigned int v : cell->vertex_indices())
               {
                 cell_to_neighbor_subdomain.insert(
                   vertex_to_neighbor_subdomain[cell->vertex_index(v)].begin(),

@@ -19,8 +19,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
-
 namespace GridGenerator
 {
   template <int dim, int spacedim>
@@ -32,6 +30,9 @@ namespace GridGenerator
     const Point<dim> &               p2,
     const bool                       colorize)
   {
+#ifndef DEAL_II_WITH_SIMPLEX_SUPPORT
+    Assert(false, ExcNeedsSimplexSupport());
+#endif
     AssertDimension(dim, spacedim);
 
     AssertThrow(colorize == false, ExcNotImplemented());
@@ -206,8 +207,6 @@ namespace GridGenerator
       }
   }
 } // namespace GridGenerator
-
-#endif
 
 // explicit instantiations
 #include "grid_generator.inst"

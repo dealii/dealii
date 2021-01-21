@@ -21,6 +21,7 @@
 
 #include <deal.II/grid/grid_tools.h>
 
+#include <fstream>
 #include <memory>
 
 DEAL_II_NAMESPACE_OPEN
@@ -206,6 +207,7 @@ namespace parallel
         }
 
       this->update_number_cache();
+      // this->update_cell_relations();
     }
 
 
@@ -400,6 +402,35 @@ namespace parallel
       return coarse_cell_id;
     }
 
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::update_cell_relations()
+    {
+      AssertThrow(false, ExcNotImplemented());
+    }
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::save(const std::string &filename) const
+    {
+      (void)filename;
+
+      AssertThrow(false, ExcNotImplemented());
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::load(const std::string &filename,
+                                       const bool         autopartition)
+    {
+      (void)filename;
+      (void)autopartition;
+
+      AssertThrow(false, ExcNotImplemented());
+    }
 
 
   } // namespace fullydistributed

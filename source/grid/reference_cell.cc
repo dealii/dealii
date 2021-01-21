@@ -13,7 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/polynomial.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/tensor_product_polynomials.h>
 
 #include <deal.II/fe/mapping_fe.h>
 #include <deal.II/fe/mapping_q1.h>
@@ -23,6 +25,7 @@
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/simplex/fe_lib.h>
+#include <deal.II/simplex/polynomials.h>
 #include <deal.II/simplex/quadrature_lib.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -34,7 +37,7 @@ namespace ReferenceCell
   make_triangulation(const Type &                  reference_cell,
                      Triangulation<dim, spacedim> &tria)
   {
-    AssertDimension(dim, get_dimension(reference_cell));
+    AssertDimension(dim, reference_cell.get_dimension());
 
     if (reference_cell == get_hypercube(dim))
       {
@@ -102,11 +105,38 @@ namespace ReferenceCell
   }
 
 
+
+  template <int dim, int spacedim>
+  std::unique_ptr<Mapping<dim, spacedim>>
+  get_default_mapping(const Type &reference_cell, const unsigned int degree)
+  {
+    AssertDimension(dim, reference_cell.get_dimension());
+
+    if (reference_cell == get_hypercube(dim))
+      return std::make_unique<MappingQGeneric<dim, spacedim>>(degree);
+    else if (reference_cell == Type::Tri || reference_cell == Type::Tet)
+      return std::make_unique<MappingFE<dim, spacedim>>(
+        Simplex::FE_P<dim, spacedim>(degree));
+    else if (reference_cell == Type::Pyramid)
+      return std::make_unique<MappingFE<dim, spacedim>>(
+        Simplex::FE_PyramidP<dim, spacedim>(degree));
+    else if (reference_cell == Type::Wedge)
+      return std::make_unique<MappingFE<dim, spacedim>>(
+        Simplex::FE_WedgeP<dim, spacedim>(degree));
+    else
+      {
+        Assert(false, ExcNotImplemented());
+      }
+
+    return std::make_unique<MappingQGeneric<dim, spacedim>>(degree);
+  }
+
+
   template <int dim, int spacedim>
   const Mapping<dim, spacedim> &
   get_default_linear_mapping(const Type &reference_cell)
   {
-    AssertDimension(dim, get_dimension(reference_cell));
+    AssertDimension(dim, reference_cell.get_dimension());
 
     if (reference_cell == get_hypercube(dim))
       {
@@ -165,7 +195,7 @@ namespace ReferenceCell
   get_gauss_type_quadrature(const Type &   reference_cell,
                             const unsigned n_points_1D)
   {
-    AssertDimension(dim, get_dimension(reference_cell));
+    AssertDimension(dim, reference_cell.get_dimension());
 
     if (reference_cell == get_hypercube(dim))
       return QGauss<dim>(n_points_1D);
@@ -185,7 +215,7 @@ namespace ReferenceCell
   Quadrature<dim> &
   get_nodal_type_quadrature(const Type &reference_cell)
   {
-    AssertDimension(dim, get_dimension(reference_cell));
+    AssertDimension(dim, reference_cell.get_dimension());
 
     const auto create_quadrature = [](const Type &reference_cell) {
       Triangulation<dim> tria;

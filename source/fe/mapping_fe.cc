@@ -158,17 +158,17 @@ MappingFE<dim, spacedim>::InternalData::initialize_face(
       for (unsigned int i = 0; i < n_faces; ++i)
         {
           unit_tangentials[i].resize(n_original_q_points);
-          std::fill(unit_tangentials[i].begin(),
-                    unit_tangentials[i].end(),
-                    ReferenceCell::unit_tangential_vectors<dim>(
-                      reference_cell_type, i, 0));
+          std::fill(
+            unit_tangentials[i].begin(),
+            unit_tangentials[i].end(),
+            reference_cell_type.template unit_tangential_vectors<dim>(i, 0));
           if (dim > 2)
             {
               unit_tangentials[n_faces + i].resize(n_original_q_points);
               std::fill(unit_tangentials[n_faces + i].begin(),
                         unit_tangentials[n_faces + i].end(),
-                        ReferenceCell::unit_tangential_vectors<dim>(
-                          reference_cell_type, i, 1));
+                        reference_cell_type
+                          .template unit_tangential_vectors<dim>(i, 1));
             }
         }
     }
@@ -853,8 +853,26 @@ MappingFE<dim, spacedim>::MappingFE(const FiniteElement<dim, spacedim> &fe)
   Assert(polynomial_degree >= 1,
          ExcMessage("It only makes sense to create polynomial mappings "
                     "with a polynomial degree greater or equal to one."));
-  Assert(fe.tensor_degree() == 1, ExcNotImplemented());
   Assert(fe.n_components() == 1, ExcNotImplemented());
+
+  Assert(fe.has_support_points(), ExcNotImplemented());
+
+  const auto &mapping_support_points = fe.get_unit_support_points();
+
+  const auto reference_cell_type = fe.reference_cell_type();
+
+  const unsigned int n_points = mapping_support_points.size();
+  const unsigned int n_shape_functions =
+    ReferenceCell::internal::Info::get_cell(reference_cell_type).n_vertices();
+
+  this->mapping_support_point_weights =
+    Table<2, double>(n_points, n_shape_functions);
+
+  for (unsigned int point = 0; point < n_points; ++point)
+    for (unsigned int i = 0; i < n_shape_functions; ++i)
+      mapping_support_point_weights(point, i) =
+        reference_cell_type.d_linear_shape_function(
+          mapping_support_points[point], i);
 }
 
 
@@ -863,6 +881,7 @@ template <int dim, int spacedim>
 MappingFE<dim, spacedim>::MappingFE(const MappingFE<dim, spacedim> &mapping)
   : fe(mapping.fe->clone())
   , polynomial_degree(mapping.polynomial_degree)
+  , mapping_support_point_weights(mapping.mapping_support_point_weights)
 {}
 
 
@@ -2204,23 +2223,78 @@ MappingFE<dim, spacedim>::transform(
 
 
 
+namespace
+{
+  template <int spacedim>
+  bool
+  check_all_manifold_ids_identical(
+    const TriaIterator<CellAccessor<1, spacedim>> &)
+  {
+    return true;
+  }
+
+
+
+  template <int spacedim>
+  bool
+  check_all_manifold_ids_identical(
+    const TriaIterator<CellAccessor<2, spacedim>> &cell)
+  {
+    const auto b_id = cell->manifold_id();
+
+    for (const auto f : cell->face_indices())
+      if (b_id != cell->face(f)->manifold_id())
+        return false;
+
+    return true;
+  }
+
+
+
+  template <int spacedim>
+  bool
+  check_all_manifold_ids_identical(
+    const TriaIterator<CellAccessor<3, spacedim>> &cell)
+  {
+    const auto b_id = cell->manifold_id();
+
+    for (const auto f : cell->face_indices())
+      if (b_id != cell->face(f)->manifold_id())
+        return false;
+
+    for (const auto l : cell->line_indices())
+      if (b_id != cell->line(l)->manifold_id())
+        return false;
+
+    return true;
+  }
+} // namespace
+
+
+
 template <int dim, int spacedim>
 std::vector<Point<spacedim>>
 MappingFE<dim, spacedim>::compute_mapping_support_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
-  // get the vertices first
-  std::vector<Point<spacedim>> a(cell->n_vertices());
+  Assert(
+    check_all_manifold_ids_identical(cell),
+    ExcMessage(
+      "All entities of a cell need to have the same boundary id as the cell has."));
+
+  std::vector<Point<spacedim>> vertices(cell->n_vertices());
 
   for (const unsigned int i : cell->vertex_indices())
-    a[i] = cell->vertex(i);
+    vertices[i] = cell->vertex(i);
 
-  if (this->polynomial_degree > 1)
-    {
-      Assert(false, ExcNotImplemented());
-    }
+  std::vector<Point<spacedim>> mapping_support_points(
+    fe->get_unit_support_points().size());
 
-  return a;
+  cell->get_manifold().get_new_points(vertices,
+                                      mapping_support_point_weights,
+                                      mapping_support_points);
+
+  return mapping_support_points;
 }
 
 

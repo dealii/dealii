@@ -266,27 +266,23 @@ namespace GridTools
               // (possibly) coarser neighbor. if this is the case,
               // then we need to also add this neighbor
               if (dim >= 2)
-                for (unsigned int vface = 0; vface < dim; vface++)
-                  {
-                    const unsigned int face =
-                      GeometryInfo<dim>::vertex_to_face[v][vface];
-
-                    if (!cell->at_boundary(face) &&
-                        cell->neighbor(face)->is_active())
-                      {
-                        // there is a (possibly) coarser cell behind a
-                        // face to which the vertex belongs. the
-                        // vertex we are looking at is then either a
-                        // vertex of that coarser neighbor, or it is a
-                        // hanging node on one of the faces of that
-                        // cell. in either case, it is adjacent to the
-                        // vertex, so add it to the list as well (if
-                        // the cell was already in the list then the
-                        // std::set makes sure that we get it only
-                        // once)
-                        adjacent_cells.insert(cell->neighbor(face));
-                      }
-                  }
+                for (const auto face :
+                     cell->reference_cell_type().faces_for_given_vertex(v))
+                  if (!cell->at_boundary(face) &&
+                      cell->neighbor(face)->is_active())
+                    {
+                      // there is a (possibly) coarser cell behind a
+                      // face to which the vertex belongs. the
+                      // vertex we are looking at is then either a
+                      // vertex of that coarser neighbor, or it is a
+                      // hanging node on one of the faces of that
+                      // cell. in either case, it is adjacent to the
+                      // vertex, so add it to the list as well (if
+                      // the cell was already in the list then the
+                      // std::set makes sure that we get it only
+                      // once)
+                      adjacent_cells.insert(cell->neighbor(face));
+                    }
 
               // in any case, we have found a cell, so go to the next cell
               goto next_cell;
