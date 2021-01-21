@@ -54,74 +54,68 @@ namespace internal
                                            GeometryInfo<dim>::vertices_per_cell>
         vertices)
     {
-      switch (ReferenceCell::n_vertices_to_type(dim, vertices.size()))
-        {
-          case ReferenceCell::Type::Line:
-            // Return the distance between the two vertices
-            return (vertices[1] - vertices[0]).norm();
+      const ReferenceCell::Type reference_cell_type =
+        ReferenceCell::n_vertices_to_type(dim, vertices.size());
 
-          case ReferenceCell::Type::Tri:
-            // Return the longest of the three edges
-            return std::max({(vertices[1] - vertices[0]).norm(),
-                             (vertices[2] - vertices[1]).norm(),
-                             (vertices[2] - vertices[0]).norm()});
+      if (reference_cell_type == ReferenceCell::Type::Line)
+        // Return the distance between the two vertices
+        return (vertices[1] - vertices[0]).norm();
+      else if (reference_cell_type == ReferenceCell::Type::Tri)
+        // Return the longest of the three edges
+        return std::max({(vertices[1] - vertices[0]).norm(),
+                         (vertices[2] - vertices[1]).norm(),
+                         (vertices[2] - vertices[0]).norm()});
+      else if (reference_cell_type == ReferenceCell::Type::Quad)
+        // Return the longer one of the two diagonals of the quadrilateral
+        return std::max({(vertices[3] - vertices[0]).norm(),
+                         (vertices[2] - vertices[1]).norm()});
+      else if (reference_cell_type == ReferenceCell::Type::Tet)
+        // Return the longest of the six edges of the tetrahedron
+        return std::max({(vertices[1] - vertices[0]).norm(),
+                         (vertices[2] - vertices[0]).norm(),
+                         (vertices[2] - vertices[1]).norm(),
+                         (vertices[3] - vertices[0]).norm(),
+                         (vertices[3] - vertices[1]).norm(),
+                         (vertices[3] - vertices[2]).norm()});
+      else if (reference_cell_type == ReferenceCell::Type::Pyramid)
+        // Return ...
+        return std::max({// the longest diagonal of the quadrilateral base
+                         // of the pyramid or ...
+                         (vertices[3] - vertices[0]).norm(),
+                         (vertices[2] - vertices[1]).norm(),
+                         // the longest edge connected with the apex of the
+                         // pyramid
+                         (vertices[4] - vertices[0]).norm(),
+                         (vertices[4] - vertices[1]).norm(),
+                         (vertices[4] - vertices[2]).norm(),
+                         (vertices[4] - vertices[3]).norm()});
+      else if (reference_cell_type == ReferenceCell::Type::Wedge)
+        // Return ...
+        return std::max({// the longest of the 2*3=6 diagonals of the three
+                         // quadrilateral sides of the wedge or ...
+                         (vertices[4] - vertices[0]).norm(),
+                         (vertices[3] - vertices[1]).norm(),
+                         (vertices[5] - vertices[1]).norm(),
+                         (vertices[4] - vertices[2]).norm(),
+                         (vertices[5] - vertices[0]).norm(),
+                         (vertices[3] - vertices[2]).norm(),
+                         // the longest of the 3*2=6 edges of the two
+                         // triangular faces of the wedge
+                         (vertices[1] - vertices[0]).norm(),
+                         (vertices[2] - vertices[1]).norm(),
+                         (vertices[2] - vertices[0]).norm(),
+                         (vertices[4] - vertices[3]).norm(),
+                         (vertices[5] - vertices[4]).norm(),
+                         (vertices[5] - vertices[3]).norm()});
+      else if (reference_cell_type == ReferenceCell::Type::Hex)
+        // Return the longest of the four diagonals of the hexahedron
+        return std::max({(vertices[7] - vertices[0]).norm(),
+                         (vertices[6] - vertices[1]).norm(),
+                         (vertices[2] - vertices[5]).norm(),
+                         (vertices[3] - vertices[4]).norm()});
 
-          case ReferenceCell::Type::Quad:
-            // Return the longer one of the two diagonals of the quadrilateral
-            return std::max({(vertices[3] - vertices[0]).norm(),
-                             (vertices[2] - vertices[1]).norm()});
-
-          case ReferenceCell::Type::Tet:
-            // Return the longest of the six edges of the tetrahedron
-            return std::max({(vertices[1] - vertices[0]).norm(),
-                             (vertices[2] - vertices[0]).norm(),
-                             (vertices[2] - vertices[1]).norm(),
-                             (vertices[3] - vertices[0]).norm(),
-                             (vertices[3] - vertices[1]).norm(),
-                             (vertices[3] - vertices[2]).norm()});
-
-          case ReferenceCell::Type::Pyramid:
-            // Return ...
-            return std::max({// the longest diagonal of the quadrilateral base
-                             // of the pyramid or ...
-                             (vertices[3] - vertices[0]).norm(),
-                             (vertices[2] - vertices[1]).norm(),
-                             // the longest edge connected with the apex of the
-                             // pyramid
-                             (vertices[4] - vertices[0]).norm(),
-                             (vertices[4] - vertices[1]).norm(),
-                             (vertices[4] - vertices[2]).norm(),
-                             (vertices[4] - vertices[3]).norm()});
-
-          case ReferenceCell::Type::Wedge:
-            // Return ...
-            return std::max({// the longest of the 2*3=6 diagonals of the three
-                             // quadrilateral sides of the wedge or ...
-                             (vertices[4] - vertices[0]).norm(),
-                             (vertices[3] - vertices[1]).norm(),
-                             (vertices[5] - vertices[1]).norm(),
-                             (vertices[4] - vertices[2]).norm(),
-                             (vertices[5] - vertices[0]).norm(),
-                             (vertices[3] - vertices[2]).norm(),
-                             // the longest of the 3*2=6 edges of the two
-                             // triangular faces of the wedge
-                             (vertices[1] - vertices[0]).norm(),
-                             (vertices[2] - vertices[1]).norm(),
-                             (vertices[2] - vertices[0]).norm(),
-                             (vertices[4] - vertices[3]).norm(),
-                             (vertices[5] - vertices[4]).norm(),
-                             (vertices[5] - vertices[3]).norm()});
-
-          case ReferenceCell::Type::Hex:
-            // Return the longest of the four diagonals of the hexahedron
-            return std::max({(vertices[7] - vertices[0]).norm(),
-                             (vertices[6] - vertices[1]).norm(),
-                             (vertices[2] - vertices[5]).norm(),
-                             (vertices[3] - vertices[4]).norm()});
-          default:
-            Assert(false, ExcNotImplemented());
-            return -1e10;
-        }
+      Assert(false, ExcNotImplemented());
+      return -1e10;
     }
   } // namespace TriaAccessorImplementation
 } // namespace internal

@@ -32,6 +32,17 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace ReferenceCell
 {
+  const Type Type::Vertex  = Type(0);
+  const Type Type::Line    = Type(1);
+  const Type Type::Tri     = Type(2);
+  const Type Type::Quad    = Type(3);
+  const Type Type::Tet     = Type(4);
+  const Type Type::Pyramid = Type(5);
+  const Type Type::Wedge   = Type(6);
+  const Type Type::Hex     = Type(7);
+  const Type Type::Invalid = Type(static_cast<std::uint8_t>(-1));
+
+
   template <int dim, int spacedim>
   void
   make_triangulation(const Type &                  reference_cell,
