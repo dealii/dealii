@@ -1,0 +1,22 @@
+
+DEAL:1d::constraints:
+DEAL:1d::dof values:
+DEAL:1d:: cell 0: 1 1
+DEAL:1d:: cell 1: 1 1
+DEAL:1d::OK
+DEAL:2d::constraints:
+    1 = 0
+    3 = 0
+DEAL:2d::dof values:
+DEAL:2d:: cell 0: 1.5 0 1.5 0
+DEAL:2d:: cell 1: 1 1 1 1
+DEAL:2d::OK
+DEAL:3d::constraints:
+    1 = 0
+    3 = 0
+    5 = 0
+    7 = 0
+DEAL:3d::dof values:
+DEAL:3d:: cell 0: 1.5 0 1.5 0 1.5 0 1.5 0
+DEAL:3d:: cell 1: 1 1 1 1 1 1 1 1
+DEAL:3d::OK
