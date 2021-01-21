@@ -70,7 +70,7 @@ namespace Particles
       ParticleHandler<dim, spacedim> &    particle_handler,
       const Mapping<dim, spacedim> &      mapping =
         ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-          ReferenceCell::get_hypercube<dim>()));
+          ReferenceCell::Type::get_hypercube<dim>()));
 
     /**
      * A function that generates one particle at a random location in cell @p cell and with
@@ -109,7 +109,7 @@ namespace Particles
       std::mt19937 &                random_number_generator,
       const Mapping<dim, spacedim> &mapping =
         ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-          ReferenceCell::get_hypercube<dim>()));
+          ReferenceCell::Type::get_hypercube<dim>()));
 
     /**
      * A function that generates particles randomly in the domain with a
@@ -165,7 +165,7 @@ namespace Particles
       ParticleHandler<dim, spacedim> &    particle_handler,
       const Mapping<dim, spacedim> &      mapping =
         ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-          ReferenceCell::get_hypercube<dim>()),
+          ReferenceCell::Type::get_hypercube<dim>()),
       const unsigned int random_number_seed = 5432);
 
 
@@ -212,7 +212,7 @@ namespace Particles
       ParticleHandler<dim, spacedim> &particle_handler,
       const Mapping<dim, spacedim> &  mapping =
         ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-          ReferenceCell::get_hypercube<dim>()),
+          ReferenceCell::Type::get_hypercube<dim>()),
       const ComponentMask &                   components = ComponentMask(),
       const std::vector<std::vector<double>> &properties = {});
 
@@ -257,7 +257,7 @@ namespace Particles
       ParticleHandler<dim, spacedim> &particle_handler,
       const Mapping<dim, spacedim> &  mapping =
         ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-          ReferenceCell::get_hypercube<dim>()),
+          ReferenceCell::Type::get_hypercube<dim>()),
       const std::vector<std::vector<double>> &properties = {});
   } // namespace Generators
 } // namespace Particles

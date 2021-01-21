@@ -165,7 +165,8 @@ namespace MGTools
         // TODO: This assumes that the dofs per face on all faces coincide!
         const unsigned int face_no = 0;
 
-        Assert(fe.reference_cell_type() == ReferenceCell::get_hypercube<dim>(),
+        Assert(fe.reference_cell_type() ==
+                 ReferenceCell::Type::get_hypercube<dim>(),
                ExcNotImplemented());
 
         unsigned int increment =
@@ -345,7 +346,8 @@ namespace MGTools
 
         // TODO: This assumes that the dofs per face on all faces coincide!
         const unsigned int face_no = 0;
-        Assert(fe.reference_cell_type() == ReferenceCell::get_hypercube<dim>(),
+        Assert(fe.reference_cell_type() ==
+                 ReferenceCell::Type::get_hypercube<dim>(),
                ExcNotImplemented());
 
         Assert(couplings.n_rows() == fe.n_components(),

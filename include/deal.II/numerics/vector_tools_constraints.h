@@ -281,7 +281,7 @@ namespace VectorTools
     AffineConstraints<double> &   constraints,
     const Mapping<dim, spacedim> &mapping =
       ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-        ReferenceCell::get_hypercube<dim>()));
+        ReferenceCell::Type::get_hypercube<dim>()));
 
   /**
    * This function does the same as the
@@ -304,7 +304,7 @@ namespace VectorTools
     AffineConstraints<double> &         constraints,
     const Mapping<dim, spacedim> &      mapping =
       ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-        ReferenceCell::get_hypercube<dim>()));
+        ReferenceCell::Type::get_hypercube<dim>()));
 
   /**
    * Compute the constraints that correspond to boundary conditions of the
@@ -333,7 +333,7 @@ namespace VectorTools
     AffineConstraints<double> &   constraints,
     const Mapping<dim, spacedim> &mapping =
       ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-        ReferenceCell::get_hypercube<dim>()));
+        ReferenceCell::Type::get_hypercube<dim>()));
 
   /**
    * Same as above for homogeneous tangential-flux constraints.
@@ -352,7 +352,7 @@ namespace VectorTools
     AffineConstraints<double> &         constraints,
     const Mapping<dim, spacedim> &      mapping =
       ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-        ReferenceCell::get_hypercube<dim>()));
+        ReferenceCell::Type::get_hypercube<dim>()));
 
   //@}
 } // namespace VectorTools

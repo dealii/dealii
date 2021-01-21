@@ -602,7 +602,8 @@ template <int dim>
 Quadrature<dim> inline QProjector<dim>::project_to_all_faces(
   const Quadrature<dim - 1> &quadrature)
 {
-  return project_to_all_faces(ReferenceCell::get_hypercube<dim>(), quadrature);
+  return project_to_all_faces(ReferenceCell::Type::get_hypercube<dim>(),
+                              quadrature);
 }
 
 

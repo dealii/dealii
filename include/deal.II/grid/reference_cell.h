@@ -62,6 +62,25 @@ namespace ReferenceCell
     static const Type Invalid;
 
     /**
+     * Return the correct simplex reference cell type for the given dimension
+     * `dim`. Depending on the template argument `dim`, this function returns a
+     * reference to either Vertex, Tri, or Tet.
+     */
+    template <int dim>
+    static constexpr const Type &
+    get_simplex();
+
+
+    /**
+     * Return the correct hypercube reference cell type for the given dimension
+     * `dim`. Depending on the template argument `dim`, this function returns a
+     * reference to either Vertex, Quad, or Hex.
+     */
+    template <int dim>
+    static constexpr const Type &
+    get_hypercube();
+
+    /**
      * Default constructor. Initialize this object as an invalid object.
      */
     constexpr Type();
@@ -362,13 +381,11 @@ namespace ReferenceCell
     return "Invalid";
   }
 
-  /**
-   * Return the correct simplex reference cell type for the given dimension
-   * @p dim.
-   */
+
+
   template <int dim>
-  inline const Type &
-  get_simplex()
+  inline constexpr const Type &
+  Type::get_simplex()
   {
     switch (dim)
       {
@@ -386,13 +403,11 @@ namespace ReferenceCell
       }
   }
 
-  /**
-   * Return the correct hypercube reference cell type for the given dimension
-   * @p dim.
-   */
+
+
   template <int dim>
-  inline const Type &
-  get_hypercube()
+  inline constexpr const Type &
+  Type::get_hypercube()
   {
     switch (dim)
       {
@@ -640,7 +655,7 @@ namespace ReferenceCell
   {
     AssertDimension(dim, reference_cell.get_dimension());
 
-    if (reference_cell == get_hypercube<dim>())
+    if (reference_cell == Type::get_hypercube<dim>())
       {
         AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
         return GeometryInfo<dim>::unit_normal_vector[face_no];
