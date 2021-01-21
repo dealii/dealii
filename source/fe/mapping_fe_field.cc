@@ -625,7 +625,7 @@ MappingFEField<dim, spacedim, VectorType, void>::get_face_data(
     std::make_unique<InternalData>(euler_dof_handler->get_fe(), fe_mask);
   auto &                data = dynamic_cast<InternalData &>(*data_ptr);
   const Quadrature<dim> q(
-    QProjector<dim>::project_to_all_faces(ReferenceCell::get_hypercube(dim),
+    QProjector<dim>::project_to_all_faces(ReferenceCell::get_hypercube<dim>(),
                                           quadrature[0]));
   this->compute_face_data(update_flags, q, quadrature[0].size(), data);
 
@@ -642,9 +642,8 @@ MappingFEField<dim, spacedim, VectorType, void>::get_subface_data(
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
     std::make_unique<InternalData>(euler_dof_handler->get_fe(), fe_mask);
   auto &                data = dynamic_cast<InternalData &>(*data_ptr);
-  const Quadrature<dim> q(
-    QProjector<dim>::project_to_all_subfaces(ReferenceCell::get_hypercube(dim),
-                                             quadrature));
+  const Quadrature<dim> q(QProjector<dim>::project_to_all_subfaces(
+    ReferenceCell::get_hypercube<dim>(), quadrature));
   this->compute_face_data(update_flags, q, quadrature.size(), data);
 
   return data_ptr;
@@ -1695,25 +1694,25 @@ MappingFEField<dim, spacedim, VectorType, void>::fill_fe_face_values(
 
   update_internal_dofs(cell, data);
 
-  internal::MappingFEFieldImplementation::do_fill_fe_face_values<dim,
-                                                                 spacedim,
-                                                                 VectorType>(
-    *this,
-    cell,
-    face_no,
-    numbers::invalid_unsigned_int,
-    QProjector<dim>::DataSetDescriptor::face(ReferenceCell::get_hypercube(dim),
-                                             face_no,
-                                             cell->face_orientation(face_no),
-                                             cell->face_flip(face_no),
-                                             cell->face_rotation(face_no),
-                                             quadrature[0].size()),
-    quadrature[0],
-    data,
-    euler_dof_handler->get_fe(),
-    fe_mask,
-    fe_to_real,
-    output_data);
+  internal::MappingFEFieldImplementation::
+    do_fill_fe_face_values<dim, spacedim, VectorType>(
+      *this,
+      cell,
+      face_no,
+      numbers::invalid_unsigned_int,
+      QProjector<dim>::DataSetDescriptor::face(
+        ReferenceCell::get_hypercube<dim>(),
+        face_no,
+        cell->face_orientation(face_no),
+        cell->face_flip(face_no),
+        cell->face_rotation(face_no),
+        quadrature[0].size()),
+      quadrature[0],
+      data,
+      euler_dof_handler->get_fe(),
+      fe_mask,
+      fe_to_real,
+      output_data);
 }
 
 
@@ -1736,28 +1735,27 @@ MappingFEField<dim, spacedim, VectorType, void>::fill_fe_subface_values(
 
   update_internal_dofs(cell, data);
 
-  internal::MappingFEFieldImplementation::do_fill_fe_face_values<dim,
-                                                                 spacedim,
-                                                                 VectorType>(
-    *this,
-    cell,
-    face_no,
-    numbers::invalid_unsigned_int,
-    QProjector<dim>::DataSetDescriptor::subface(ReferenceCell::get_hypercube(
-                                                  dim),
-                                                face_no,
-                                                subface_no,
-                                                cell->face_orientation(face_no),
-                                                cell->face_flip(face_no),
-                                                cell->face_rotation(face_no),
-                                                quadrature.size(),
-                                                cell->subface_case(face_no)),
-    quadrature,
-    data,
-    euler_dof_handler->get_fe(),
-    fe_mask,
-    fe_to_real,
-    output_data);
+  internal::MappingFEFieldImplementation::
+    do_fill_fe_face_values<dim, spacedim, VectorType>(
+      *this,
+      cell,
+      face_no,
+      numbers::invalid_unsigned_int,
+      QProjector<dim>::DataSetDescriptor::subface(
+        ReferenceCell::get_hypercube<dim>(),
+        face_no,
+        subface_no,
+        cell->face_orientation(face_no),
+        cell->face_flip(face_no),
+        cell->face_rotation(face_no),
+        quadrature.size(),
+        cell->subface_case(face_no)),
+      quadrature,
+      data,
+      euler_dof_handler->get_fe(),
+      fe_mask,
+      fe_to_real,
+      output_data);
 }
 
 

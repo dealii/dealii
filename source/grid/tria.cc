@@ -13535,7 +13535,7 @@ Triangulation<dim, spacedim>::all_reference_cell_types_are_hyper_cube() const
 {
   return (this->reference_cell_types.size() == 0) ||
          (this->reference_cell_types.size() == 1 &&
-          this->reference_cell_types[0] == ReferenceCell::get_hypercube(dim));
+          this->reference_cell_types[0] == ReferenceCell::get_hypercube<dim>());
 }
 
 

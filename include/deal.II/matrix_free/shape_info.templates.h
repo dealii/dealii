@@ -316,7 +316,8 @@ namespace internal
 
           try
             {
-              const auto reference_cell_type = ReferenceCell::get_simplex(dim);
+              const auto reference_cell_type =
+                ReferenceCell::get_simplex<dim>();
 
               const auto quad_face  = get_face_quadrature(quad);
               this->n_q_points_face = quad_face.size();

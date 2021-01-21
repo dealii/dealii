@@ -1756,7 +1756,8 @@ namespace internal
         Assert(index < dim, ExcInternalError());
 
         if ((reference_cell_type == ReferenceCell::Type::Invalid ||
-             reference_cell_type == ReferenceCell::get_hypercube(dim)) == false)
+             reference_cell_type == ReferenceCell::get_hypercube<dim>()) ==
+            false)
           {
 #ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
             return index;

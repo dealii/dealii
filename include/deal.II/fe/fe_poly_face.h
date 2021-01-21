@@ -178,7 +178,7 @@ protected:
       update_flags,
       mapping,
       hp::QCollection<dim - 1>(QProjector<dim - 1>::project_to_all_children(
-        ReferenceCell::get_hypercube(dim - 1), quadrature)),
+        ReferenceCell::get_hypercube<dim - 1>(), quadrature)),
       output_data);
   }
 

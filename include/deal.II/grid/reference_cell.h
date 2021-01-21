@@ -366,8 +366,9 @@ namespace ReferenceCell
    * Return the correct simplex reference cell type for the given dimension
    * @p dim.
    */
-  inline Type
-  get_simplex(const unsigned int dim)
+  template <int dim>
+  inline const Type &
+  get_simplex()
   {
     switch (dim)
       {
@@ -389,8 +390,9 @@ namespace ReferenceCell
    * Return the correct hypercube reference cell type for the given dimension
    * @p dim.
    */
-  inline Type
-  get_hypercube(const unsigned int dim)
+  template <int dim>
+  inline const Type &
+  get_hypercube()
   {
     switch (dim)
       {
@@ -445,7 +447,7 @@ namespace ReferenceCell
                                 const unsigned int i) const
   {
     AssertDimension(dim, get_dimension());
-    if (*this == get_hypercube(dim))
+    if (*this == get_hypercube<dim>())
       return GeometryInfo<dim>::d_linear_shape_function(xi, i);
 
     if (*this == Type::Tri) // see also Simplex::ScalarPolynomial::compute_value
@@ -533,7 +535,7 @@ namespace ReferenceCell
                                          const unsigned int i) const
   {
     AssertDimension(dim, get_dimension());
-    if (*this == get_hypercube(dim))
+    if (*this == get_hypercube<dim>())
       return GeometryInfo<dim>::d_linear_shape_function_gradient(xi, i);
 
     if (*this == Type::Tri) // see also Simplex::ScalarPolynomial::compute_grad
@@ -563,7 +565,7 @@ namespace ReferenceCell
     AssertDimension(dim, get_dimension());
     AssertIndexRange(i, dim - 1);
 
-    if (*this == get_hypercube(dim))
+    if (*this == get_hypercube<dim>())
       {
         AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
         return GeometryInfo<dim>::unit_tangential_vectors[face_no][i];
@@ -638,7 +640,7 @@ namespace ReferenceCell
   {
     AssertDimension(dim, reference_cell.get_dimension());
 
-    if (reference_cell == get_hypercube(dim))
+    if (reference_cell == get_hypercube<dim>())
       {
         AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
         return GeometryInfo<dim>::unit_normal_vector[face_no];

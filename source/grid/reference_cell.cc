@@ -50,7 +50,7 @@ namespace ReferenceCell
   {
     AssertDimension(dim, reference_cell.get_dimension());
 
-    if (reference_cell == get_hypercube(dim))
+    if (reference_cell == get_hypercube<dim>())
       {
         GridGenerator::hyper_cube(tria, 0, 1);
       }
@@ -123,7 +123,7 @@ namespace ReferenceCell
   {
     AssertDimension(dim, reference_cell.get_dimension());
 
-    if (reference_cell == get_hypercube(dim))
+    if (reference_cell == get_hypercube<dim>())
       return std::make_unique<MappingQGeneric<dim, spacedim>>(degree);
     else if (reference_cell == Type::Tri || reference_cell == Type::Tet)
       return std::make_unique<MappingFE<dim, spacedim>>(
@@ -149,7 +149,7 @@ namespace ReferenceCell
   {
     AssertDimension(dim, reference_cell.get_dimension());
 
-    if (reference_cell == get_hypercube(dim))
+    if (reference_cell == get_hypercube<dim>())
       {
         return StaticMappingQ1<dim, spacedim>::mapping;
       }
@@ -208,7 +208,7 @@ namespace ReferenceCell
   {
     AssertDimension(dim, reference_cell.get_dimension());
 
-    if (reference_cell == get_hypercube(dim))
+    if (reference_cell == get_hypercube<dim>())
       return QGauss<dim>(n_points_1D);
     else if (reference_cell == Type::Tri || reference_cell == Type::Tet)
       return Simplex::QGauss<dim>(n_points_1D);
@@ -235,7 +235,7 @@ namespace ReferenceCell
       return Quadrature<dim>(tria.get_vertices());
     };
 
-    if (reference_cell == get_hypercube(dim))
+    if (reference_cell == get_hypercube<dim>())
       {
         static Quadrature<dim> quadrature = create_quadrature(reference_cell);
         return quadrature;

@@ -77,7 +77,7 @@ namespace GridTools
     Cache(const Triangulation<dim, spacedim> &tria,
           const Mapping<dim, spacedim> &      mapping =
             ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-              ReferenceCell::get_hypercube(dim)));
+              ReferenceCell::get_hypercube<dim>()));
 
     /**
      * Destructor.
