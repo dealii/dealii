@@ -71,6 +71,13 @@ namespace ReferenceCell
      */
     Type(const std::uint8_t kind);
 
+
+    /**
+     * Return true if the object is a Vertex, Line, Quad, or Hex.
+     */
+    bool
+    is_hyper_cube() const;
+
     /**
      * Return the dimension of the reference cell represented by the current
      * object.
@@ -308,6 +315,14 @@ namespace ReferenceCell
     Assert(false, ExcNotImplemented());
 
     return {};
+  }
+
+
+
+  inline bool
+  Type::is_hyper_cube() const
+  {
+    return (*this == Vertex || *this == Line || *this == Quad || *this == Hex);
   }
 
 
