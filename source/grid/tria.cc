@@ -4452,7 +4452,8 @@ namespace internal
                   ++next_unused_cell;
             }
 
-          if (cell->reference_cell_type() == ReferenceCell::Type::Tri)
+          if ((dim == 2) &&
+              (cell->reference_cell_type() == ReferenceCell::Type::Tri))
             {
               subcells[0]->set_bounding_object_indices({new_lines[0]->index(),
                                                         new_lines[8]->index(),
@@ -4502,7 +4503,8 @@ namespace internal
               // triangulation.levels[subcells[2]->level()]->face_orientations[subcells[2]->index()
               // * GeometryInfo<2>::faces_per_cell + 0] = 0;
             }
-          else if (cell->reference_cell_type() == ReferenceCell::Type::Quad)
+          else if ((dim == 2) &&
+                   (cell->reference_cell_type() == ReferenceCell::Type::Quad))
             {
               subcells[0]->set_bounding_object_indices(
                 {new_lines[0]->index(),
