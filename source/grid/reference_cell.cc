@@ -38,6 +38,11 @@ namespace ReferenceCell
     dealii::ReferenceCell::Type
     make_reference_cell_from_int(const std::uint8_t kind)
     {
+      // Make sure these are the only indices from which objects can be
+      // created.
+      Assert((kind == static_cast<std::uint8_t>(-1)) || (kind < 8),
+             ExcInternalError());
+
       // Call the private constructor, which we can from here because this
       // function is a 'friend'.
       return dealii::ReferenceCell::Type(kind);
