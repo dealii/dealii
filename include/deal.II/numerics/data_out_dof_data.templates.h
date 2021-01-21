@@ -114,27 +114,24 @@ namespace internal
 
           for (const auto &fe : finite_elements)
             for (unsigned int i = 0; i < fe->size(); ++i)
-              switch ((*fe)[i].reference_cell_type())
-                {
-                  case ReferenceCell::Type::Vertex:
-                  case ReferenceCell::Type::Line:
-                  case ReferenceCell::Type::Quad:
-                  case ReferenceCell::Type::Hex:
-                    needs_hypercube_setup |= true;
-                    break;
-                  case ReferenceCell::Type::Tri:
-                  case ReferenceCell::Type::Tet:
-                    needs_simplex_setup |= true;
-                    break;
-                  case ReferenceCell::Type::Wedge:
-                    needs_wedge_setup |= true;
-                    break;
-                  case ReferenceCell::Type::Pyramid:
-                    needs_pyramid_setup |= true;
-                    break;
-                  default:
-                    Assert(false, ExcNotImplemented());
-                }
+              {
+                const auto reference_cell_type = (*fe)[i].reference_cell_type();
+
+                if ((reference_cell_type == ReferenceCell::Type::Vertex) ||
+                    (reference_cell_type == ReferenceCell::Type::Line) ||
+                    (reference_cell_type == ReferenceCell::Type::Quad) ||
+                    (reference_cell_type == ReferenceCell::Type::Hex))
+                  needs_hypercube_setup |= true;
+                else if ((reference_cell_type == ReferenceCell::Type::Tri) ||
+                         (reference_cell_type == ReferenceCell::Type::Tet))
+                  needs_simplex_setup |= true;
+                else if (reference_cell_type == ReferenceCell::Type::Wedge)
+                  needs_wedge_setup |= true;
+                else if (reference_cell_type == ReferenceCell::Type::Pyramid)
+                  needs_pyramid_setup |= true;
+                else
+                  Assert(false, ExcNotImplemented());
+              }
 
           std::unique_ptr<dealii::Quadrature<dim>> quadrature_simplex;
           std::unique_ptr<dealii::Quadrature<dim>> quadrature_hypercube;
@@ -201,27 +198,30 @@ namespace internal
                   dealii::hp::QCollection<dim> quadrature;
 
                   for (unsigned int j = 0; j < finite_elements[i]->size(); ++j)
-                    switch ((*finite_elements[i])[j].reference_cell_type())
-                      {
-                        case ReferenceCell::Type::Vertex:
-                        case ReferenceCell::Type::Line:
-                        case ReferenceCell::Type::Quad:
-                        case ReferenceCell::Type::Hex:
-                          quadrature.push_back(*quadrature_hypercube);
-                          break;
-                        case ReferenceCell::Type::Tri:
-                        case ReferenceCell::Type::Tet:
-                          quadrature.push_back(*quadrature_simplex);
-                          break;
-                        case ReferenceCell::Type::Wedge:
-                          quadrature.push_back(*quadrature_wedge);
-                          break;
-                        case ReferenceCell::Type::Pyramid:
-                          quadrature.push_back(*quadrature_pyramid);
-                          break;
-                        default:
-                          Assert(false, ExcNotImplemented());
-                      }
+                    {
+                      const auto reference_cell_type =
+                        (*finite_elements[i])[j].reference_cell_type();
+
+                      if ((reference_cell_type ==
+                           ReferenceCell::Type::Vertex) ||
+                          (reference_cell_type == ReferenceCell::Type::Line) ||
+                          (reference_cell_type == ReferenceCell::Type::Quad) ||
+                          (reference_cell_type == ReferenceCell::Type::Hex))
+                        quadrature.push_back(*quadrature_hypercube);
+                      else if ((reference_cell_type ==
+                                ReferenceCell::Type::Tri) ||
+                               (reference_cell_type ==
+                                ReferenceCell::Type::Tet))
+                        quadrature.push_back(*quadrature_simplex);
+                      else if (reference_cell_type ==
+                               ReferenceCell::Type::Wedge)
+                        quadrature.push_back(*quadrature_wedge);
+                      else if (reference_cell_type ==
+                               ReferenceCell::Type::Pyramid)
+                        quadrature.push_back(*quadrature_pyramid);
+                      else
+                        Assert(false, ExcNotImplemented());
+                    }
 
                   x_fe_values[i] =
                     std::make_shared<dealii::hp::FEValues<dim, spacedim>>(

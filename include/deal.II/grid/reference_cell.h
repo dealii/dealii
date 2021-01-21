@@ -51,18 +51,15 @@ namespace ReferenceCell
   class Type
   {
   public:
-    enum CellKinds : std::uint8_t
-    {
-      Vertex  = 0,
-      Line    = 1,
-      Tri     = 2,
-      Quad    = 3,
-      Tet     = 4,
-      Pyramid = 5,
-      Wedge   = 6,
-      Hex     = 7,
-      Invalid = static_cast<std::uint8_t>(-1)
-    };
+    static const Type Vertex;
+    static const Type Line;
+    static const Type Tri;
+    static const Type Quad;
+    static const Type Tet;
+    static const Type Pyramid;
+    static const Type Wedge;
+    static const Type Hex;
+    static const Type Invalid;
 
     /**
      * Default constructor. Initialize this object as an invalid object.
@@ -72,7 +69,7 @@ namespace ReferenceCell
     /**
      * Constructor.
      */
-    Type(const CellKinds kind);
+    Type(const std::uint8_t kind);
 
     /**
      * Return the dimension of the reference cell represented by the current
@@ -155,13 +152,13 @@ namespace ReferenceCell
      * Operator for equality comparison.
      */
     bool
-    operator==(const CellKinds &type) const;
+    operator==(const std::uint8_t &type) const;
 
     /**
      * Operator for inequality comparison.
      */
     bool
-    operator!=(const CellKinds &type) const;
+    operator!=(const std::uint8_t &type) const;
 
     /**
      * Write and read the data of this object from a stream for the purpose
@@ -182,7 +179,7 @@ namespace ReferenceCell
     /**
      * The variable that stores what this object actually corresponds to.
      */
-    CellKinds kind;
+    std::uint8_t kind;
   };
 
 
@@ -193,7 +190,7 @@ namespace ReferenceCell
 
 
 
-  inline Type::Type(const CellKinds kind)
+  inline Type::Type(const std::uint8_t kind)
     : kind(kind)
   {}
 
@@ -223,7 +220,7 @@ namespace ReferenceCell
 
 
   inline bool
-  Type::operator==(const CellKinds &type) const
+  Type::operator==(const std::uint8_t &type) const
   {
     return kind == type;
   }
@@ -231,7 +228,7 @@ namespace ReferenceCell
 
 
   inline bool
-  Type::operator!=(const CellKinds &type) const
+  Type::operator!=(const std::uint8_t &type) const
   {
     return kind != type;
   }
@@ -242,12 +239,7 @@ namespace ReferenceCell
   inline void
   Type::serialize(Archive &archive, const unsigned int /*version*/)
   {
-    // Serialize the state as an 8-bit int. When saving the state, the
-    // last of the following 3 lines is a no-op. When loading, the first
-    // of these lines is a no-op.
-    std::uint8_t kind_as_int = static_cast<std::uint8_t>(kind);
-    archive &    kind_as_int;
-    kind = static_cast<CellKinds>(kind_as_int);
+    archive &kind;
   }
 
 
@@ -323,23 +315,18 @@ namespace ReferenceCell
   inline unsigned int
   Type::get_dimension() const
   {
-    switch (kind)
-      {
-        case Type::Vertex:
-          return 0;
-        case Type::Line:
-          return 1;
-        case Type::Tri:
-        case Type::Quad:
-          return 2;
-        case Type::Tet:
-        case Type::Pyramid:
-        case Type::Wedge:
-        case Type::Hex:
-          return 3;
-        default:
-          return numbers::invalid_unsigned_int;
-      }
+    if (*this == Vertex)
+      return 0;
+    else if (*this == Line)
+      return 1;
+    else if ((*this == Tri) || (*this == Quad))
+      return 2;
+    else if ((*this == Tet) || (*this == Pyramid) || (*this == Wedge) ||
+             (*this == Hex))
+      return 3;
+
+    Assert(false, ExcNotImplemented());
+    return numbers::invalid_unsigned_int;
   }
 
 
@@ -350,29 +337,26 @@ namespace ReferenceCell
   inline std::string
   Type::to_string() const
   {
-    switch (kind)
-      {
-        case Type::Vertex:
-          return "Vertex";
-        case Type::Line:
-          return "Line";
-        case Type::Tri:
-          return "Tri";
-        case Type::Quad:
-          return "Quad";
-        case Type::Tet:
-          return "Tet";
-        case Type::Pyramid:
-          return "Pyramid";
-        case Type::Wedge:
-          return "Wedge";
-        case Type::Hex:
-          return "Hex";
-        case Type::Invalid:
-          return "Invalid";
-        default:
-          Assert(false, ExcNotImplemented());
-      }
+    if (*this == Vertex)
+      return "Vertex";
+    else if (*this == Line)
+      return "Line";
+    else if (*this == Tri)
+      return "Tri";
+    else if (*this == Quad)
+      return "Quad";
+    else if (*this == Tet)
+      return "Tet";
+    else if (*this == Pyramid)
+      return "Pyramid";
+    else if (*this == Wedge)
+      return "Wedge";
+    else if (*this == Hex)
+      return "Hex";
+    else if (*this == Invalid)
+      return "Invalid";
+
+    Assert(false, ExcNotImplemented());
 
     return "Invalid";
   }
@@ -434,8 +418,8 @@ namespace ReferenceCell
     AssertIndexRange(n_vertices, 9);
     const auto X = Type::Invalid;
 
-    static constexpr std::array<std::array<ReferenceCell::Type::CellKinds, 9>,
-                                4>
+    static const std::array<std::array<ReferenceCell::Type, 9>,
+                            4>
       table = {
         {// dim 0
          {{X, Type::Vertex, X, X, X, X, X, X, X}},

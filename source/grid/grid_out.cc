@@ -3218,29 +3218,25 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
         for (const unsigned int i : cell->vertex_indices())
           {
             out << ' ';
-            switch (cell->reference_cell_type())
+            const auto reference_cell_type = cell->reference_cell_type();
+
+            if ((reference_cell_type == ReferenceCell::Type::Vertex) ||
+                (reference_cell_type == ReferenceCell::Type::Line) ||
+                (reference_cell_type == ReferenceCell::Type::Quad) ||
+                (reference_cell_type == ReferenceCell::Type::Hex))
+              out << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[i]);
+            else if ((reference_cell_type == ReferenceCell::Type::Tri) ||
+                     (reference_cell_type == ReferenceCell::Type::Tet) ||
+                     (reference_cell_type == ReferenceCell::Type::Wedge))
+              out << cell->vertex_index(i);
+            else if (reference_cell_type == ReferenceCell::Type::Pyramid)
               {
-                case ReferenceCell::Type::Vertex:
-                case ReferenceCell::Type::Line:
-                case ReferenceCell::Type::Quad:
-                case ReferenceCell::Type::Hex:
-                  out << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[i]);
-                  break;
-                case ReferenceCell::Type::Tri:
-                case ReferenceCell::Type::Tet:
-                case ReferenceCell::Type::Wedge:
-                  out << cell->vertex_index(i);
-                  break;
-                case ReferenceCell::Type::Pyramid:
-                  {
-                    static const std::array<unsigned int, 5> permutation_table{
-                      {0, 1, 3, 2, 4}};
-                    out << cell->vertex_index(permutation_table[i]);
-                    break;
-                  }
-                default:
-                  Assert(false, ExcNotImplemented());
+                static const std::array<unsigned int, 5> permutation_table{
+                  {0, 1, 3, 2, 4}};
+                out << cell->vertex_index(permutation_table[i]);
               }
+            else
+              Assert(false, ExcNotImplemented());
           }
         out << '\n';
       }
