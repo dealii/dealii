@@ -149,18 +149,6 @@ namespace ReferenceCell
     operator!=(const Type &type) const;
 
     /**
-     * Operator for equality comparison.
-     */
-    bool
-    operator==(const std::uint8_t &type) const;
-
-    /**
-     * Operator for inequality comparison.
-     */
-    bool
-    operator!=(const std::uint8_t &type) const;
-
-    /**
      * Write and read the data of this object from a stream for the purpose
      * of serialization using the [BOOST serialization
      * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
@@ -215,22 +203,6 @@ namespace ReferenceCell
   Type::operator!=(const Type &type) const
   {
     return kind != type.kind;
-  }
-
-
-
-  inline bool
-  Type::operator==(const std::uint8_t &type) const
-  {
-    return kind == type;
-  }
-
-
-
-  inline bool
-  Type::operator!=(const std::uint8_t &type) const
-  {
-    return kind != type;
   }
 
 
