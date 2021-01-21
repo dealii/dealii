@@ -64,12 +64,12 @@ namespace ReferenceCell
     /**
      * Default constructor. Initialize this object as an invalid object.
      */
-    Type();
+    constexpr Type();
 
     /**
      * Constructor.
      */
-    Type(const std::uint8_t kind);
+    constexpr Type(const std::uint8_t kind);
 
     /**
      * Return the dimension of the reference cell represented by the current
@@ -134,18 +134,18 @@ namespace ReferenceCell
     /**
      * Conversion operator to an integer.
      */
-    operator std::uint8_t() const;
+    constexpr operator std::uint8_t() const;
 
     /**
      * Operator for equality comparison.
      */
-    bool
+    constexpr bool
     operator==(const Type &type) const;
 
     /**
      * Operator for inequality comparison.
      */
-    bool
+    constexpr bool
     operator!=(const Type &type) const;
 
     /**
@@ -172,26 +172,26 @@ namespace ReferenceCell
 
 
 
-  inline Type::Type()
-    : Type(Invalid)
+  inline constexpr Type::Type()
+    : Type(static_cast<std::uint8_t>(-1))
   {}
 
 
 
-  inline Type::Type(const std::uint8_t kind)
+  inline constexpr Type::Type(const std::uint8_t kind)
     : kind(kind)
   {}
 
 
 
-  inline Type::operator std::uint8_t() const
+  inline constexpr Type::operator std::uint8_t() const
   {
     return kind;
   }
 
 
 
-  inline bool
+  inline constexpr bool
   Type::operator==(const Type &type) const
   {
     return kind == type.kind;
@@ -199,7 +199,7 @@ namespace ReferenceCell
 
 
 
-  inline bool
+  inline constexpr bool
   Type::operator!=(const Type &type) const
   {
     return kind != type.kind;
