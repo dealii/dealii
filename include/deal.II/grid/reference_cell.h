@@ -79,6 +79,12 @@ namespace ReferenceCell
     is_hyper_cube() const;
 
     /**
+     * Return true if the object is a Vertex, Line, Tri, or Tet.
+     */
+    bool
+    is_simplex() const;
+
+    /**
      * Return the dimension of the reference cell represented by the current
      * object.
      */
@@ -323,6 +329,14 @@ namespace ReferenceCell
   Type::is_hyper_cube() const
   {
     return (*this == Vertex || *this == Line || *this == Quad || *this == Hex);
+  }
+
+
+
+  inline bool
+  Type::is_simplex() const
+  {
+    return (*this == Vertex || *this == Line || *this == Tri || *this == Tet);
   }
 
 
