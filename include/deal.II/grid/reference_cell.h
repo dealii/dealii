@@ -42,6 +42,29 @@ class ScalarPolynomialsBase;
  */
 namespace ReferenceCell
 {
+  class Type;
+
+  namespace internal
+  {
+    /**
+     * A helper function to create a ReferenceCell::Type object from an
+     * integer. ReferenceCell::Type objects are "singletons" (actually,
+     * "multitons" -- there are multiple, but they are only a handful and
+     * these are all that can be used). What is then necessary is to
+     * have a way to create these with their internal id to distinguish
+     * the few possible ones in existence. We could do this via a public
+     * constructor of ReferenceCell::Type, but that would allow users to
+     * create ones outside the range we envision, and we don't want to do
+     * that. Rather, the constructor that takes an integer is made `private`
+     * but we have this one function in an internal namespace that is a friend
+     * of the class and can be used to create the objects.
+     */
+    Type
+    make_reference_cell_from_int(const std::uint8_t kind);
+  } // namespace internal
+
+
+
   /**
    * A type that describes the kinds of reference cells that can be used.
    * This includes quadrilaterals and hexahedra (i.e., "hypercubes"),
@@ -65,12 +88,6 @@ namespace ReferenceCell
      * Default constructor. Initialize this object as an invalid object.
      */
     constexpr Type();
-
-    /**
-     * Constructor.
-     */
-    constexpr Type(const std::uint8_t kind);
-
 
     /**
      * Return true if the object is a Vertex, Line, Quad, or Hex.
@@ -181,6 +198,21 @@ namespace ReferenceCell
      * The variable that stores what this object actually corresponds to.
      */
     std::uint8_t kind;
+
+    /**
+     * Constructor. This is the constructor used to create the different
+     * `static` member variables of this class. It is `private` but can
+     * be called by a function in an internal namespace that is a `friend`
+     * of this class.
+     */
+    constexpr Type(const std::uint8_t kind);
+
+    /**
+     * A kind of constructor -- not quite private because it can be
+     * called by anyone, but at least hidden in an internal namespace.
+     */
+    friend Type
+    internal::make_reference_cell_from_int(const std::uint8_t);
   };
 
 

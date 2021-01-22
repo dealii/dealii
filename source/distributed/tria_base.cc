@@ -309,7 +309,8 @@ namespace parallel
     // transform back and store result
     this->reference_cell_types.clear();
     for (const auto &i : reference_cell_types_ui)
-      this->reference_cell_types.emplace_back(static_cast<std::uint8_t>(i));
+      this->reference_cell_types.emplace_back(
+        ReferenceCell::internal::make_reference_cell_from_int(i));
   }
 
 

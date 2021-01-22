@@ -30,17 +30,36 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+
 namespace ReferenceCell
 {
-  const Type Type::Vertex  = Type(0);
-  const Type Type::Line    = Type(1);
-  const Type Type::Tri     = Type(2);
-  const Type Type::Quad    = Type(3);
-  const Type Type::Tet     = Type(4);
-  const Type Type::Pyramid = Type(5);
-  const Type Type::Wedge   = Type(6);
-  const Type Type::Hex     = Type(7);
-  const Type Type::Invalid = Type(static_cast<std::uint8_t>(-1));
+  namespace internal
+  {
+    dealii::ReferenceCell::Type
+    make_reference_cell_from_int(const std::uint8_t kind)
+    {
+      // Make sure these are the only indices from which objects can be
+      // created.
+      Assert((kind == static_cast<std::uint8_t>(-1)) || (kind < 8),
+             ExcInternalError());
+
+      // Call the private constructor, which we can from here because this
+      // function is a 'friend'.
+      return {kind};
+    }
+  } // namespace internal
+
+
+  const Type Type::Vertex  = internal::make_reference_cell_from_int(0);
+  const Type Type::Line    = internal::make_reference_cell_from_int(1);
+  const Type Type::Tri     = internal::make_reference_cell_from_int(2);
+  const Type Type::Quad    = internal::make_reference_cell_from_int(3);
+  const Type Type::Tet     = internal::make_reference_cell_from_int(4);
+  const Type Type::Pyramid = internal::make_reference_cell_from_int(5);
+  const Type Type::Wedge   = internal::make_reference_cell_from_int(6);
+  const Type Type::Hex     = internal::make_reference_cell_from_int(7);
+  const Type Type::Invalid =
+    internal::make_reference_cell_from_int(static_cast<std::uint8_t>(-1));
 
 
   template <int dim, int spacedim>
