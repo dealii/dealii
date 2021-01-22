@@ -96,6 +96,8 @@ namespace ReferenceCell
   void
   Type::make_triangulation(Triangulation<dim, spacedim> &tria) const
   {
+    AssertDimension(dim, this->get_dimension());
+
     if (this->is_hyper_cube())
       {
         GridGenerator::hyper_cube(tria, 0, 1);
@@ -172,9 +174,9 @@ namespace ReferenceCell
   {
     AssertDimension(dim, get_dimension());
 
-    if (*this == Type::get_hypercube<dim>())
+    if (is_hyper_cube())
       return std::make_unique<MappingQGeneric<dim, spacedim>>(degree);
-    else if (*this == Type::Tri || *this == Type::Tet)
+    else if (is_simplex())
       return std::make_unique<MappingFE<dim, spacedim>>(
         Simplex::FE_P<dim, spacedim>(degree));
     else if (*this == Type::Pyramid)
@@ -199,11 +201,11 @@ namespace ReferenceCell
   {
     AssertDimension(dim, get_dimension());
 
-    if (*this == Type::get_hypercube<dim>())
+    if (is_hyper_cube())
       {
         return StaticMappingQ1<dim, spacedim>::mapping;
       }
-    else if (*this == Type::Tri || *this == Type::Tet)
+    else if (is_simplex())
       {
         static const MappingFE<dim, spacedim> mapping(
           Simplex::FE_P<dim, spacedim>(1));
