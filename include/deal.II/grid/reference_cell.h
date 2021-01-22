@@ -283,22 +283,22 @@ namespace ReferenceCell
   inline ArrayView<const unsigned int>
   Type::faces_for_given_vertex(const unsigned int vertex) const
   {
-    if (kind == Type::Line)
+    if (*this == Type::Line)
       {
         AssertIndexRange(vertex, GeometryInfo<1>::vertices_per_cell);
         return {&GeometryInfo<2>::vertex_to_face[vertex][0], 1};
       }
-    else if (kind == Type::Quad)
+    else if (*this == Type::Quad)
       {
         AssertIndexRange(vertex, GeometryInfo<2>::vertices_per_cell);
         return {&GeometryInfo<2>::vertex_to_face[vertex][0], 2};
       }
-    else if (kind == Type::Hex)
+    else if (*this == Type::Hex)
       {
         AssertIndexRange(vertex, GeometryInfo<3>::vertices_per_cell);
         return {&GeometryInfo<3>::vertex_to_face[vertex][0], 3};
       }
-    else if (kind == Type::Tri)
+    else if (*this == Type::Tri)
       {
         AssertIndexRange(vertex, 3);
         static const std::array<std::array<unsigned int, 2>, 3> table = {
@@ -306,7 +306,7 @@ namespace ReferenceCell
 
         return table[vertex];
       }
-    else if (kind == Type::Tet)
+    else if (*this == Type::Tet)
       {
         AssertIndexRange(vertex, 4);
         static const std::array<std::array<unsigned int, 3>, 4> table = {
@@ -314,7 +314,7 @@ namespace ReferenceCell
 
         return table[vertex];
       }
-    else if (kind == Type::Wedge)
+    else if (*this == Type::Wedge)
       {
         AssertIndexRange(vertex, 6);
         static const std::array<std::array<unsigned int, 3>, 6> table = {
@@ -327,7 +327,7 @@ namespace ReferenceCell
 
         return table[vertex];
       }
-    else if (kind == Type::Pyramid)
+    else if (*this == Type::Pyramid)
       {
         AssertIndexRange(vertex, 5);
         static const unsigned int X = numbers::invalid_unsigned_int;
