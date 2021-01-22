@@ -438,6 +438,18 @@ class TestTriangulationWrapper(unittest.TestCase):
                 self.assertTrue(cell.center().distance(cell_ret.center()) < 1e-8)
 
 
+    def test_simplex(self):
+        for dim in self.dim:
+            triangulation_hex = self.build_hyper_cube_triangulation(dim)
+            triangulation_simplex = Triangulation(dim[0], dim[1])
+            triangulation_hex.convert_hypercube_to_simplex_mesh(triangulation_simplex)
+
+            if dim[0] == '3D':
+                self.assertTrue(triangulation_simplex.n_active_cells() == 24)
+            else:
+                self.assertTrue(triangulation_simplex.n_active_cells() == 8)
+
+
     def test_save_load(self):
         for dim in self.dim:
             triangulation_1 = self.build_hyper_cube_triangulation(dim)

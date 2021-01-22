@@ -274,6 +274,11 @@ namespace python
     void
     transform(boost::python::object &transformation);
 
+    /*! @copydoc GridGenerator::convert_hypercube_to_simplex_mesh
+     */
+    void
+    convert_hypercube_to_simplex_mesh(TriangulationWrapper &tria_out);
+
     /*! @copydoc GridTools::find_active_cell_around_point
      */
     CellAccessorWrapper

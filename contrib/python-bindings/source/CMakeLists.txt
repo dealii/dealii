@@ -38,6 +38,7 @@ SET(_src
   export_mapping.cc
   export_manifold.cc
   export_quadrature.cc
+  export_reference_cell.cc
   cell_accessor_wrapper.cc
   tria_accessor_wrapper.cc
   point_wrapper.cc
@@ -45,6 +46,7 @@ SET(_src
   mapping_wrapper.cc
   manifold_wrapper.cc
   quadrature_wrapper.cc
+  reference_cell_wrapper.cc
   )
 
 FOREACH(_build ${DEAL_II_BUILD_TYPES})

@@ -479,6 +479,13 @@ namespace python
     "Return the diameter of the largest active cell of a triangulation.    \n";
 
 
+
+  const char convert_hypercube_to_simplex_mesh_docstring[] =
+    "Convert a triangulation consisting only of hypercube cells            \n"
+    "(quadrilaterals, hexahedra) to a triangulation only consisting of     \n"
+    "simplices (triangles, tetrahedra).                                    \n";
+
+
   void
   export_triangulation()
   {
@@ -665,6 +672,10 @@ namespace python
            &TriangulationWrapper::transform,
            transform_docstring,
            boost::python::args("self", "transformation"))
+      .def("convert_hypercube_to_simplex_mesh",
+           &TriangulationWrapper::convert_hypercube_to_simplex_mesh,
+           convert_hypercube_to_simplex_mesh_docstring,
+           boost::python::args("self", "tria_out"))
       .def("find_active_cell_around_point",
            &TriangulationWrapper::find_active_cell_around_point,
            find_active_cell_around_point_overloads(

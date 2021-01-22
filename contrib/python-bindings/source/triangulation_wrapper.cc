@@ -557,6 +557,21 @@ namespace python
 
     template <int dim, int spacedim>
     void
+    convert_hypercube_to_simplex_mesh(void *                triangulation,
+                                      TriangulationWrapper &tria_out)
+    {
+      Triangulation<dim, spacedim> *tria =
+        static_cast<Triangulation<dim, spacedim> *>(triangulation);
+      Triangulation<dim, spacedim> *tria_2 =
+        static_cast<Triangulation<dim, spacedim> *>(
+          tria_out.get_triangulation());
+      GridGenerator::convert_hypercube_to_simplex_mesh(*tria, *tria_2);
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
     replicate_triangulation(TriangulationWrapper &     tria_in,
                             const boost::python::list &extents,
                             void *                     tria_out)
@@ -1536,6 +1551,27 @@ namespace python
 
 
   void
+  TriangulationWrapper::convert_hypercube_to_simplex_mesh(
+    TriangulationWrapper &tria_out)
+  {
+    AssertThrow(
+      (tria_out.get_dim() == dim) && (tria_out.get_spacedim() == spacedim),
+      ExcMessage("The output Triangulation must be of the same dimension"));
+
+    if ((dim == 2) && (spacedim == 2))
+      internal::convert_hypercube_to_simplex_mesh<2, 2>(triangulation,
+                                                        tria_out);
+    else if ((dim == 2) && (spacedim == 3))
+      internal::convert_hypercube_to_simplex_mesh<2, 3>(triangulation,
+                                                        tria_out);
+    else
+      internal::convert_hypercube_to_simplex_mesh<3, 3>(triangulation,
+                                                        tria_out);
+  }
+
+
+
+  void
   TriangulationWrapper::extrude_triangulation(
     const unsigned int    n_slices,
     const double          height,
@@ -1978,6 +2014,7 @@ namespace python
     else
       AssertThrow(false, ExcMessage("Dimension needs to be 2D or 3D."));
   }
+
 } // namespace python
 
 DEAL_II_NAMESPACE_CLOSE

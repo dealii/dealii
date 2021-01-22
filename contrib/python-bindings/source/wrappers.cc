@@ -37,6 +37,8 @@ namespace python
   export_manifold();
   void
   export_quadrature();
+  void
+  export_reference_cell();
 } // namespace python
 
 DEAL_II_NAMESPACE_CLOSE
@@ -65,6 +67,7 @@ BOOST_PYTHON_MODULE(Debug)
   // message is printed.
   dealii::deal_II_exceptions::disable_abort_on_exception();
 
+  dealii::python::export_reference_cell();
   dealii::python::export_tria_accessor();
   dealii::python::export_cell_accessor();
   dealii::python::export_point();
@@ -85,6 +88,7 @@ BOOST_PYTHON_MODULE(Release)
   doc_options.enable_py_signatures();
   doc_options.disable_cpp_signatures();
 
+  dealii::python::export_reference_cell();
   dealii::python::export_tria_accessor();
   dealii::python::export_cell_accessor();
   dealii::python::export_point();
