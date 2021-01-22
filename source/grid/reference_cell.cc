@@ -45,7 +45,7 @@ namespace ReferenceCell
 
       // Call the private constructor, which we can from here because this
       // function is a 'friend'.
-      return dealii::ReferenceCell::Type(kind);
+      return {kind};
     }
   } // namespace internal
 
