@@ -62,6 +62,39 @@ namespace ReferenceCell
     internal::make_reference_cell_from_int(static_cast<std::uint8_t>(-1));
 
 
+
+  /**
+   * Convert the given reference cell type to a string.
+   */
+  std::string
+  Type::to_string() const
+  {
+    if (*this == Vertex)
+      return "Vertex";
+    else if (*this == Line)
+      return "Line";
+    else if (*this == Tri)
+      return "Tri";
+    else if (*this == Quad)
+      return "Quad";
+    else if (*this == Tet)
+      return "Tet";
+    else if (*this == Pyramid)
+      return "Pyramid";
+    else if (*this == Wedge)
+      return "Wedge";
+    else if (*this == Hex)
+      return "Hex";
+    else if (*this == Invalid)
+      return "Invalid";
+
+    Assert(false, ExcNotImplemented());
+
+    return "Invalid";
+  }
+
+
+
   template <int dim, int spacedim>
   void
   make_triangulation(const Type &                  reference_cell,
