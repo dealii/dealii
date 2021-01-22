@@ -147,6 +147,33 @@ test(const unsigned int degree)
                      .norm()
                 << std::endl;
       deallog << std::endl;
+
+      for (unsigned int i = 0; i < unit_points.size(); ++i)
+        {
+          evaluator.submit_value(evaluator.get_value(i), i);
+          evaluator.submit_gradient(evaluator.get_gradient(i), i);
+          evaluator_scalar.submit_value(evaluator_scalar.get_value(i), i);
+          evaluator_scalar.submit_gradient(evaluator_scalar.get_gradient(i), i);
+        }
+
+      evaluator.integrate(cell,
+                          unit_points,
+                          solution_values,
+                          EvaluationFlags::values | EvaluationFlags::gradients);
+
+      for (const auto i : solution_values)
+        deallog << i << " ";
+      deallog << std::endl;
+
+      evaluator_scalar.integrate(cell,
+                                 unit_points,
+                                 solution_values,
+                                 EvaluationFlags::values |
+                                   EvaluationFlags::gradients);
+
+      for (const auto i : solution_values)
+        deallog << i << " ";
+      deallog << std::endl;
     }
 }
 

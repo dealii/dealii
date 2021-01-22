@@ -48,12 +48,21 @@ namespace internal
       using gradient_type = Tensor<1, n_components, Tensor<1, dim>>;
 
       static void
-      read_value(const double       vector_entry,
+      read_value(const double &     vector_entry,
                  const unsigned int component,
                  value_type &       result)
       {
         AssertIndexRange(component, n_components);
         result[component] = vector_entry;
+      }
+
+      static void
+      write_value(double &           vector_entry,
+                  const unsigned int component,
+                  const value_type & result)
+      {
+        AssertIndexRange(component, n_components);
+        vector_entry = result[component];
       }
 
       static void
@@ -68,6 +77,16 @@ namespace internal
             result[i][d] = value[d][i][vector_lane];
       }
 
+      static void get_gradient(
+        Tensor<1, dim, Tensor<1, n_components, VectorizedArray<double>>> &value,
+        const unsigned int   vector_lane,
+        const gradient_type &result)
+      {
+        for (unsigned int i = 0; i < n_components; ++i)
+          for (unsigned int d = 0; d < dim; ++d)
+            value[d][i][vector_lane] = result[i][d];
+      }
+
       static void
       set_value(const Tensor<1, n_components, VectorizedArray<double>> &value,
                 const unsigned int vector_lane,
@@ -77,9 +96,26 @@ namespace internal
           result[i] = value[i][vector_lane];
       }
 
+      static void
+        get_value(Tensor<1, n_components, VectorizedArray<double>> &value,
+                  const unsigned int                                vector_lane,
+                  const value_type &                                result)
+      {
+        for (unsigned int i = 0; i < n_components; ++i)
+          value[i][vector_lane] = result[i];
+      }
+
       template <typename Number>
       static Number &access(Tensor<1, n_components, Number> &value,
                             const unsigned int               component)
+      {
+        return value[component];
+      }
+
+      template <typename Number>
+      static const Number &
+      access(const Tensor<1, n_components, Number> &value,
+             const unsigned int                     component)
       {
         return value[component];
       }
@@ -92,11 +128,19 @@ namespace internal
       using gradient_type = Tensor<1, dim>;
 
       static void
-      read_value(const double vector_entry,
+      read_value(const double &vector_entry,
                  const unsigned int,
                  value_type &result)
       {
         result = vector_entry;
+      }
+
+      static void
+      write_value(double &vector_entry,
+                  const unsigned int,
+                  const value_type &result)
+      {
+        vector_entry = result;
       }
 
       static void
@@ -108,6 +152,14 @@ namespace internal
           result[d] = value[d][vector_lane];
       }
 
+      static void get_gradient(Tensor<1, dim, VectorizedArray<double>> &value,
+                               const unsigned int   vector_lane,
+                               const gradient_type &result)
+      {
+        for (unsigned int d = 0; d < dim; ++d)
+          value[d][vector_lane] = result[d];
+      }
+
       static void
       set_value(const VectorizedArray<double> &value,
                 const unsigned int             vector_lane,
@@ -116,9 +168,24 @@ namespace internal
         result = value[vector_lane];
       }
 
+      static void
+      get_value(VectorizedArray<double> &value,
+                const unsigned int       vector_lane,
+                const value_type &       result)
+      {
+        value[vector_lane] = result;
+      }
+
       template <typename Number>
       static Number &
       access(Number &value, const unsigned int)
+      {
+        return value;
+      }
+
+      template <typename Number>
+      static const Number &
+      access(const Number &value, const unsigned int)
       {
         return value;
       }
@@ -131,11 +198,19 @@ namespace internal
       using gradient_type = Tensor<2, dim>;
 
       static void
-      read_value(const double       vector_entry,
+      read_value(const double &     vector_entry,
                  const unsigned int component,
                  value_type &       result)
       {
         result[component] = vector_entry;
+      }
+
+      static void
+      write_value(double &           vector_entry,
+                  const unsigned int component,
+                  const value_type & result)
+      {
+        vector_entry = result[component];
       }
 
       static void
@@ -149,6 +224,16 @@ namespace internal
             result[i][d] = value[d][i][vector_lane];
       }
 
+      static void get_gradient(
+        Tensor<1, dim, Tensor<1, dim, VectorizedArray<double>>> &value,
+        const unsigned int                                       vector_lane,
+        const gradient_type &                                    result)
+      {
+        for (unsigned int i = 0; i < dim; ++i)
+          for (unsigned int d = 0; d < dim; ++d)
+            value[d][i][vector_lane] = result[i][d];
+      }
+
       static void
       set_value(const Tensor<1, dim, VectorizedArray<double>> &value,
                 const unsigned int                             vector_lane,
@@ -158,14 +243,34 @@ namespace internal
           result[i] = value[i][vector_lane];
       }
 
+      static void get_value(Tensor<1, dim, VectorizedArray<double>> &value,
+                            const unsigned int vector_lane,
+                            const value_type & result)
+      {
+        for (unsigned int i = 0; i < dim; ++i)
+          value[i][vector_lane] = result[i];
+      }
+
       static double &
       access(value_type &value, const unsigned int component)
       {
         return value[component];
       }
 
+      static const double &
+      access(const value_type &value, const unsigned int component)
+      {
+        return value[component];
+      }
+
       static Tensor<1, dim> &
       access(gradient_type &value, const unsigned int component)
+      {
+        return value[component];
+      }
+
+      static const Tensor<1, dim> &
+      access(const gradient_type &value, const unsigned int component)
       {
         return value[component];
       }
@@ -178,11 +283,19 @@ namespace internal
       using gradient_type = Tensor<1, 1>;
 
       static void
-      read_value(const double vector_entry,
+      read_value(const double &vector_entry,
                  const unsigned int,
                  value_type &result)
       {
         result = vector_entry;
+      }
+
+      static void
+      write_value(double &vector_entry,
+                  const unsigned int,
+                  const value_type &result)
+      {
+        vector_entry = result;
       }
 
       static void
@@ -193,6 +306,13 @@ namespace internal
         result[0] = value[0][vector_lane];
       }
 
+      static void get_gradient(Tensor<1, 1, VectorizedArray<double>> &value,
+                               const unsigned int   vector_lane,
+                               const gradient_type &result)
+      {
+        value[0][vector_lane] = result[0];
+      }
+
       static void
       set_value(const VectorizedArray<double> &value,
                 const unsigned int             vector_lane,
@@ -201,9 +321,24 @@ namespace internal
         result = value[vector_lane];
       }
 
+      static void
+      get_value(VectorizedArray<double> &value,
+                const unsigned int       vector_lane,
+                const value_type &       result)
+      {
+        value[vector_lane] = result;
+      }
+
       template <typename Number>
       static Number &
       access(Number &value, const unsigned int)
+      {
+        return value;
+      }
+
+      template <typename Number>
+      static const Number &
+      access(const Number &value, const unsigned int)
       {
         return value;
       }
@@ -272,14 +407,36 @@ public:
    * values on the element as returned by `cell->get_dof_values(global_vector,
    * solution_values)`.
    *
-   * @param[in] flags Flags specifying which quantities should be evaluated
-   * at the points.
+   * @param[in] evaluation_flags Flags specifying which quantities should be
+   * evaluated at the points.
    */
   void
   evaluate(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
            const ArrayView<const Point<dim>> &     unit_points,
            const ArrayView<const double> &         solution_values,
-           const EvaluationFlags::EvaluationFlags &flags);
+           const EvaluationFlags::EvaluationFlags &evaluation_flags);
+
+  /**
+   * This is one of the main functions in this class and the one that does the
+   * heavy lifting.
+   *
+   * @param[in] cell An iterator to the current cell in question
+   *
+   * @param[in] unit_points List of points in the reference locations of the
+   * current cell where the FiniteElement object should be evaluated
+   *
+   * @param[out] solution_values This array is filled and can be used to
+   * during `cell->set_dof_values(global_vector, solution_values)`.
+   *
+   * @param[in] integration_flags Flags specifying which quantities should be
+   * integrated at the points.
+   *
+   */
+  void
+  integrate(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+            const ArrayView<const Point<dim>> &     unit_points,
+            const ArrayView<double> &               solution_values,
+            const EvaluationFlags::EvaluationFlags &integration_flags);
 
   /**
    * Return the value at quadrature point number @p q_point after a call to
@@ -293,6 +450,17 @@ public:
   get_value(const unsigned int q_point) const;
 
   /**
+   * Write a value to the field containing the values on points
+   * with component q_point. Access to the same field as through get_value().
+   * If applied before the function FEPointEvaluation::integrate()
+   * with EvaluationFlags::values set is called, this specifies the value
+   * which is tested by all basis function on the current cell and
+   * integrated over.
+   */
+  void
+  submit_value(const value_type &value, const unsigned int q_point);
+
+  /**
    * Return the gradient at quadrature point number @p q_point after a call to
    * FEPointEvaluation::evaluate() with EvaluationFlags::gradient set, or
    * the gradient that has been stored there with a call to
@@ -302,6 +470,17 @@ public:
    */
   const gradient_type &
   get_gradient(const unsigned int q_point) const;
+
+  /**
+   * Write a contribution that is tested by the gradient to the field
+   * containing the values on points with component q_point. Access to the same
+   * field as through get_gradient(). If applied before the function
+   * FEPointEvaluation::integrate(EvaluationFlags::gradients) is called,
+   * this specifies what is tested by all basis function gradients on the
+   * current cell and integrated over.
+   */
+  void
+  submit_gradient(const gradient_type &, const unsigned int q_point);
 
 private:
   /**
@@ -402,7 +581,7 @@ FEPointEvaluation<n_components, dim, spacedim>::FEPointEvaluation(
       poly               = Polynomials::generate_complete_Lagrange_basis(
         QGaussLobatto<1>(shape_info.data[0].fe_degree + 1).get_points());
     }
-  else
+  if (true /*TODO: as long as the fast path of integrate() is not working*/)
     {
       nonzero_shape_function_component.resize(fe.n_dofs_per_cell());
       for (unsigned int d = 0; d < n_components; ++d)
@@ -561,6 +740,164 @@ FEPointEvaluation<n_components, dim, spacedim>::evaluate(
 
 
 template <int n_components, int dim, int spacedim>
+void
+FEPointEvaluation<n_components, dim, spacedim>::integrate(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const ArrayView<const Point<dim>> &                         unit_points,
+  const ArrayView<double> &                                   solution_values,
+  const EvaluationFlags::EvaluationFlags &                    integration_flags)
+{
+  AssertDimension(solution_values.size(), fe->dofs_per_cell);
+  if (false /*TODO*/ && (((integration_flags & EvaluationFlags::values) ||
+                          (integration_flags & EvaluationFlags::gradients)) &&
+                         !poly.empty()))
+    {
+      Assert(false, ExcNotImplemented());
+      // fast path with tensor product integration
+
+      if (solution_renumbered.size() != dofs_per_component)
+        solution_renumbered.resize(dofs_per_component);
+
+      // let mapping compute the transformation
+      if (integration_flags & EvaluationFlags::gradients)
+        {
+          Assert(mapping_q_generic != nullptr, ExcInternalError());
+
+          mapping_q_generic->transform_variable(
+            cell,
+            mapping_covariant,
+            unit_points,
+            ArrayView<const gradient_type>(gradients.data(), gradients.size()),
+            ArrayView<gradient_type>(gradients.data(), gradients.size()));
+        }
+
+      if (integration_flags & EvaluationFlags::values)
+        AssertIndexRange(unit_points.size(), values.size() + 1);
+      if (integration_flags & EvaluationFlags::gradients)
+        AssertIndexRange(unit_points.size(), gradients.size() + 1);
+
+      const std::size_t n_points = unit_points.size();
+      const std::size_t n_lanes  = VectorizedArray<double>::size();
+      for (unsigned int i = 0; i < n_points; i += n_lanes)
+        {
+          // convert to vectorized format
+          Point<dim, VectorizedArray<double>> vectorized_points;
+          for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
+            for (unsigned int d = 0; d < dim; ++d)
+              vectorized_points[d][j] = unit_points[i + j][d];
+
+          typename internal::ProductTypeNoPoint<value_type,
+                                                VectorizedArray<double>>::type
+            value;
+          Tensor<1,
+                 dim,
+                 typename internal::ProductTypeNoPoint<
+                   value_type,
+                   VectorizedArray<double>>::type>
+            gradient;
+
+          // convert back to standard format
+          if (integration_flags & EvaluationFlags::values)
+            for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
+              internal::FEPointEvaluation::EvaluatorTypeTraits<
+                dim,
+                n_components>::get_value(value, j, values[i + j]);
+          if (integration_flags & EvaluationFlags::gradients)
+            for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
+              internal::FEPointEvaluation::EvaluatorTypeTraits<
+                dim,
+                n_components>::get_gradient(gradient, j, gradients[i + j]);
+
+          // compute
+          internal::integrate_tensor_product_value_and_gradient(
+            poly,
+            solution_renumbered,
+            value,
+            gradient,
+            vectorized_points,
+            poly.size() == 2);
+        }
+
+      for (unsigned int comp = 0; comp < n_components; ++comp)
+        for (unsigned int i = 0; i < dofs_per_component; ++i)
+          internal::FEPointEvaluation::EvaluatorTypeTraits<dim, n_components>::
+            write_value(
+              solution_values[renumber[comp * dofs_per_component + i]],
+              comp,
+              solution_renumbered[i]);
+    }
+  else if ((integration_flags & EvaluationFlags::values) ||
+           (integration_flags & EvaluationFlags::gradients))
+    {
+      // slow path with FEValues
+      const UpdateFlags flags =
+        ((integration_flags & EvaluationFlags::values) ? update_values :
+                                                         update_default) |
+        ((integration_flags & EvaluationFlags::gradients) ? update_gradients :
+                                                            update_default);
+      FEValues<dim, spacedim> fe_values(
+        *mapping,
+        *fe,
+        Quadrature<dim>(
+          std::vector<Point<dim>>(unit_points.begin(), unit_points.end())),
+        flags);
+      fe_values.reinit(cell);
+
+      std::fill(solution_values.begin(), solution_values.end(), 0.0);
+
+      if (integration_flags & EvaluationFlags::values)
+        {
+          AssertIndexRange(unit_points.size(), values.size() + 1);
+          for (unsigned int i = 0; i < fe->n_dofs_per_cell(); ++i)
+            {
+              for (unsigned int d = 0; d < n_components; ++d)
+                if (nonzero_shape_function_component[i][d] &&
+                    (fe->is_primitive(i) || fe->is_primitive()))
+                  for (unsigned int q = 0; q < unit_points.size(); ++q)
+                    solution_values[i] +=
+                      fe_values.shape_value(i, q) *
+                      internal::FEPointEvaluation::EvaluatorTypeTraits<
+                        dim,
+                        n_components>::access(values[q], d);
+                else if (nonzero_shape_function_component[i][d])
+                  for (unsigned int q = 0; q < unit_points.size(); ++q)
+                    solution_values[i] +=
+                      fe_values.shape_value_component(i, q, d) *
+                      internal::FEPointEvaluation::EvaluatorTypeTraits<
+                        dim,
+                        n_components>::access(values[q], d);
+            }
+        }
+
+      if (integration_flags & EvaluationFlags::gradients)
+        {
+          AssertIndexRange(unit_points.size(), gradients.size() + 1);
+          for (unsigned int i = 0; i < fe->n_dofs_per_cell(); ++i)
+            {
+              for (unsigned int d = 0; d < n_components; ++d)
+                if (nonzero_shape_function_component[i][d] &&
+                    (fe->is_primitive(i) || fe->is_primitive()))
+                  for (unsigned int q = 0; q < unit_points.size(); ++q)
+                    solution_values[i] +=
+                      fe_values.shape_grad(i, q) *
+                      internal::FEPointEvaluation::EvaluatorTypeTraits<
+                        dim,
+                        n_components>::access(gradients[q], d);
+                else if (nonzero_shape_function_component[i][d])
+                  for (unsigned int q = 0; q < unit_points.size(); ++q)
+                    solution_values[i] +=
+                      fe_values.shape_grad_component(i, q, d) *
+                      internal::FEPointEvaluation::EvaluatorTypeTraits<
+                        dim,
+                        n_components>::access(gradients[q], d);
+            }
+        }
+    }
+}
+
+
+
+template <int n_components, int dim, int spacedim>
 inline const typename FEPointEvaluation<n_components, dim, spacedim>::value_type
   &
   FEPointEvaluation<n_components, dim, spacedim>::get_value(
@@ -580,6 +917,34 @@ inline const typename FEPointEvaluation<n_components, dim, spacedim>::
 {
   AssertIndexRange(q_point, gradients.size());
   return gradients[q_point];
+}
+
+
+
+template <int n_components, int dim, int spacedim>
+inline void
+FEPointEvaluation<n_components, dim, spacedim>::submit_value(
+  const value_type & value,
+  const unsigned int q_point)
+{
+  if (values.size() <= q_point)
+    values.resize(values.size() + 1);
+
+  values[q_point] = value;
+}
+
+
+
+template <int n_components, int dim, int spacedim>
+inline void
+FEPointEvaluation<n_components, dim, spacedim>::submit_gradient(
+  const gradient_type &gradient,
+  const unsigned int   q_point)
+{
+  if (gradients.size() <= q_point)
+    gradients.resize(gradients.size() + 1);
+
+  gradients[q_point] = gradient;
 }
 
 DEAL_II_NAMESPACE_CLOSE
