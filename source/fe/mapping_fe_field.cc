@@ -343,6 +343,19 @@ MappingFEField<dim, spacedim, VectorType, void>::preserves_vertex_locations()
 
 
 template <int dim, int spacedim, typename VectorType>
+bool
+MappingFEField<dim, spacedim, VectorType, void>::is_compatible_with(
+  const ReferenceCell::Type &cell_type) const
+{
+  if (cell_type.get_dimension() != dim)
+    return false; // TODO: or is this an error?
+
+  return true;
+}
+
+
+
+template <int dim, int spacedim, typename VectorType>
 boost::container::small_vector<Point<spacedim>,
                                GeometryInfo<dim>::vertices_per_cell>
 MappingFEField<dim, spacedim, VectorType, void>::get_vertices(
@@ -2219,6 +2232,7 @@ MappingFEField<dim, spacedim, VectorType, void>::get_degree() const
 {
   return euler_dof_handler->get_fe().degree;
 }
+
 
 
 template <int dim, int spacedim, typename VectorType>

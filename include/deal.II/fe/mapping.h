@@ -402,6 +402,14 @@ public:
   preserves_vertex_locations() const = 0;
 
   /**
+   * Returns is this instance of Mapping is compatible with the type of cell
+   * in @p cell_type.
+   *
+   */
+  virtual bool
+  is_compatible_with(const ReferenceCell::Type &cell_type) const = 0;
+
+  /**
    * @name Mapping points between reference and real cells
    * @{
    */

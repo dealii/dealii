@@ -170,6 +170,9 @@ public:
   get_bounding_box(const typename Triangulation<dim, spacedim>::cell_iterator
                      &cell) const override;
 
+  virtual bool
+  is_compatible_with(const ReferenceCell::Type &cell_type) const override;
+
   /**
    * @name Mapping points between reference and real cells
    * @{

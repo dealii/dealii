@@ -124,6 +124,9 @@ public:
   get_bounding_box(const typename Triangulation<dim, spacedim>::cell_iterator
                      &cell) const override;
 
+  virtual bool
+  is_compatible_with(const ReferenceCell::Type &cell_type) const override;
+
   /**
    * Transform the point @p p on the unit cell to the point @p p_real on the
    * real cell @p cell and returns @p p_real.

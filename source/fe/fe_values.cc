@@ -4499,6 +4499,13 @@ void
 FEValues<dim, spacedim>::reinit(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell)
 {
+  // Check that mapping and reference cell type are compatible:
+  Assert(this->get_mapping().is_compatible_with(cell->reference_cell_type()),
+         ExcMessage(
+           "You are trying to call FEValues::reinit() with a cell of type " +
+           cell->reference_cell_type().to_string() +
+           " with a Mapping that is not compatible with it."));
+
   // no FE in this cell, so no assertion
   // necessary here
   this->maybe_invalidate_previous_present_cell(cell);
@@ -4527,6 +4534,13 @@ FEValues<dim, spacedim>::reinit(
   Assert(static_cast<const FiniteElementData<dim> &>(*this->fe) ==
            static_cast<const FiniteElementData<dim> &>(cell->get_fe()),
          (typename FEValuesBase<dim, spacedim>::ExcFEDontMatch()));
+
+  // Check that mapping and reference cell type are compatible:
+  Assert(this->get_mapping().is_compatible_with(cell->reference_cell_type()),
+         ExcMessage(
+           "You are trying to call FEValues::reinit() with a cell of type " +
+           cell->reference_cell_type().to_string() +
+           " with a Mapping that is not compatible with it."));
 
   this->maybe_invalidate_previous_present_cell(cell);
   this->check_cell_similarity(cell);

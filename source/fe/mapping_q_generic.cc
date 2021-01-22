@@ -1652,6 +1652,22 @@ MappingQGeneric<dim, spacedim>::get_bounding_box(
 
 
 
+template <int dim, int spacedim>
+bool
+MappingQGeneric<dim, spacedim>::is_compatible_with(
+  const ReferenceCell::Type &cell_type) const
+{
+  if (cell_type.get_dimension() != dim)
+    return false; // TODO: or is this an error?
+
+  if (cell_type.is_hyper_cube())
+    return true;
+
+  return false;
+}
+
+
+
 //--------------------------- Explicit instantiations -----------------------
 #include "mapping_q_generic.inst"
 
