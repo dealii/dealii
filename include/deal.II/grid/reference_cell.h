@@ -781,7 +781,7 @@ namespace ReferenceCell
    * @note The weights are not filled.
    */
   template <int dim>
-  Quadrature<dim> &
+  const Quadrature<dim> &
   get_nodal_type_quadrature(const Type &reference_cell);
 
   namespace internal

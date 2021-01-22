@@ -244,7 +244,7 @@ namespace ReferenceCell
 
 
   template <int dim>
-  Quadrature<dim> &
+  const Quadrature<dim> &
   get_nodal_type_quadrature(const Type &reference_cell)
   {
     AssertDimension(dim, reference_cell.get_dimension());
@@ -258,22 +258,26 @@ namespace ReferenceCell
 
     if (reference_cell == Type::get_hypercube<dim>())
       {
-        static Quadrature<dim> quadrature = create_quadrature(reference_cell);
+        static const Quadrature<dim> quadrature =
+          create_quadrature(reference_cell);
         return quadrature;
       }
     else if (reference_cell == Type::Tri || reference_cell == Type::Tet)
       {
-        static Quadrature<dim> quadrature = create_quadrature(reference_cell);
+        static const Quadrature<dim> quadrature =
+          create_quadrature(reference_cell);
         return quadrature;
       }
     else if (reference_cell == Type::Pyramid)
       {
-        static Quadrature<dim> quadrature = create_quadrature(reference_cell);
+        static const Quadrature<dim> quadrature =
+          create_quadrature(reference_cell);
         return quadrature;
       }
     else if (reference_cell == Type::Wedge)
       {
-        static Quadrature<dim> quadrature = create_quadrature(reference_cell);
+        static const Quadrature<dim> quadrature =
+          create_quadrature(reference_cell);
         return quadrature;
       }
     else
