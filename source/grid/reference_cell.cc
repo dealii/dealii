@@ -179,19 +179,19 @@ namespace ReferenceCell
 
   template <int dim, int spacedim>
   std::unique_ptr<Mapping<dim, spacedim>>
-  get_default_mapping(const Type &reference_cell, const unsigned int degree)
+  Type::get_default_mapping(const unsigned int degree) const
   {
-    AssertDimension(dim, reference_cell.get_dimension());
+    AssertDimension(dim, get_dimension());
 
-    if (reference_cell == Type::get_hypercube<dim>())
+    if (*this == Type::get_hypercube<dim>())
       return std::make_unique<MappingQGeneric<dim, spacedim>>(degree);
-    else if (reference_cell == Type::Tri || reference_cell == Type::Tet)
+    else if (*this == Type::Tri || *this == Type::Tet)
       return std::make_unique<MappingFE<dim, spacedim>>(
         Simplex::FE_P<dim, spacedim>(degree));
-    else if (reference_cell == Type::Pyramid)
+    else if (*this == Type::Pyramid)
       return std::make_unique<MappingFE<dim, spacedim>>(
         Simplex::FE_PyramidP<dim, spacedim>(degree));
-    else if (reference_cell == Type::Wedge)
+    else if (*this == Type::Wedge)
       return std::make_unique<MappingFE<dim, spacedim>>(
         Simplex::FE_WedgeP<dim, spacedim>(degree));
     else
@@ -203,29 +203,30 @@ namespace ReferenceCell
   }
 
 
+
   template <int dim, int spacedim>
   const Mapping<dim, spacedim> &
-  get_default_linear_mapping(const Type &reference_cell)
+  Type::get_default_linear_mapping() const
   {
-    AssertDimension(dim, reference_cell.get_dimension());
+    AssertDimension(dim, get_dimension());
 
-    if (reference_cell == Type::get_hypercube<dim>())
+    if (*this == Type::get_hypercube<dim>())
       {
         return StaticMappingQ1<dim, spacedim>::mapping;
       }
-    else if (reference_cell == Type::Tri || reference_cell == Type::Tet)
+    else if (*this == Type::Tri || *this == Type::Tet)
       {
         static const MappingFE<dim, spacedim> mapping(
           Simplex::FE_P<dim, spacedim>(1));
         return mapping;
       }
-    else if (reference_cell == Type::Pyramid)
+    else if (*this == Type::Pyramid)
       {
         static const MappingFE<dim, spacedim> mapping(
           Simplex::FE_PyramidP<dim, spacedim>(1));
         return mapping;
       }
-    else if (reference_cell == Type::Wedge)
+    else if (*this == Type::Wedge)
       {
         static const MappingFE<dim, spacedim> mapping(
           Simplex::FE_WedgeP<dim, spacedim>(1));
@@ -255,8 +256,8 @@ namespace ReferenceCell
              "cells of the triangulation. The triangulation you are "
              "passing to this function uses multiple cell types."));
 
-    return get_default_linear_mapping<dim, spacedim>(
-      reference_cell_types.front());
+    return reference_cell_types.front()
+      .template get_default_linear_mapping<dim, spacedim>();
   }
 
 

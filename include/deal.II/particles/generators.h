@@ -69,8 +69,8 @@ namespace Particles
       const std::vector<Point<dim>> &     particle_reference_locations,
       ParticleHandler<dim, spacedim> &    particle_handler,
       const Mapping<dim, spacedim> &      mapping =
-        ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-          ReferenceCell::Type::get_hypercube<dim>()));
+        ReferenceCell::Type::get_hypercube<dim>()
+          .template get_default_linear_mapping<dim, spacedim>());
 
     /**
      * A function that generates one particle at a random location in cell @p cell and with
@@ -108,8 +108,8 @@ namespace Particles
       const types::particle_index                                        id,
       std::mt19937 &                random_number_generator,
       const Mapping<dim, spacedim> &mapping =
-        ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-          ReferenceCell::Type::get_hypercube<dim>()));
+        ReferenceCell::Type::get_hypercube<dim>()
+          .template get_default_linear_mapping<dim, spacedim>());
 
     /**
      * A function that generates particles randomly in the domain with a
@@ -164,8 +164,8 @@ namespace Particles
       const types::particle_index         n_particles_to_create,
       ParticleHandler<dim, spacedim> &    particle_handler,
       const Mapping<dim, spacedim> &      mapping =
-        ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-          ReferenceCell::Type::get_hypercube<dim>()),
+        ReferenceCell::Type::get_hypercube<dim>()
+          .template get_default_linear_mapping<dim, spacedim>(),
       const unsigned int random_number_seed = 5432);
 
 
@@ -211,8 +211,8 @@ namespace Particles
         &                             global_bounding_boxes,
       ParticleHandler<dim, spacedim> &particle_handler,
       const Mapping<dim, spacedim> &  mapping =
-        ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-          ReferenceCell::Type::get_hypercube<dim>()),
+        ReferenceCell::Type::get_hypercube<dim>()
+          .template get_default_linear_mapping<dim, spacedim>(),
       const ComponentMask &                   components = ComponentMask(),
       const std::vector<std::vector<double>> &properties = {});
 
@@ -249,16 +249,15 @@ namespace Particles
      */
     template <int dim, int spacedim = dim>
     void
-    quadrature_points(
-      const Triangulation<dim, spacedim> &triangulation,
-      const Quadrature<dim> &             quadrature,
-      const std::vector<std::vector<BoundingBox<spacedim>>>
-        &                             global_bounding_boxes,
-      ParticleHandler<dim, spacedim> &particle_handler,
-      const Mapping<dim, spacedim> &  mapping =
-        ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-          ReferenceCell::Type::get_hypercube<dim>()),
-      const std::vector<std::vector<double>> &properties = {});
+    quadrature_points(const Triangulation<dim, spacedim> &triangulation,
+                      const Quadrature<dim> &             quadrature,
+                      const std::vector<std::vector<BoundingBox<spacedim>>>
+                        &                             global_bounding_boxes,
+                      ParticleHandler<dim, spacedim> &particle_handler,
+                      const Mapping<dim, spacedim> &  mapping =
+                        ReferenceCell::Type::get_hypercube<dim>()
+                          .template get_default_linear_mapping<dim, spacedim>(),
+                      const std::vector<std::vector<double>> &properties = {});
   } // namespace Generators
 } // namespace Particles
 

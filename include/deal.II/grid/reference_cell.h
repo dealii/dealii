@@ -174,6 +174,34 @@ namespace ReferenceCell
                                   const unsigned int      orientation) const;
 
     /**
+     * Return a default mapping of degree @p degree matching the current
+     * reference cell. If this reference cell is a hypercube, then the returned
+     * mapping is a MappingQGeneric; otherwise, it is an object of type
+     * MappingFE initialized with Simplex::FE_P (if the reference cell is a
+     * triangle or tetrahedron), with Simplex::FE_PyramidP (if the reference
+     * cell is a pyramid), or with Simplex::FE_WedgeP (if the reference cell is
+     * a wedge).
+     */
+    template <int dim, int spacedim>
+    std::unique_ptr<Mapping<dim, spacedim>>
+    get_default_mapping(const unsigned int degree) const;
+
+    /**
+     * Return a default linear mapping matching the current reference cell.
+     * If this reference cell is a hypercube, then the returned mapping
+     * is a MappingQ1; otherwise, it is an object of type MappingFE
+     * initialized with Simplex::FE_P (if the reference cell is a triangle or
+     * tetrahedron), with Simplex::FE_PyramidP (if the reference cell is a
+     * pyramid), or with Simplex::FE_WedgeP (if the reference cell is a wedge).
+     * In other words, the term "linear" in the name of the function has to be
+     * understood as $d$-linear (i.e., bilinear or trilinear) for some of the
+     * coordinate directions.
+     */
+    template <int dim, int spacedim>
+    const Mapping<dim, spacedim> &
+    get_default_linear_mapping() const;
+
+    /**
      * Return a text representation of the reference cell represented by the
      * current object.
      */
@@ -692,33 +720,6 @@ namespace ReferenceCell
   void
   make_triangulation(const Type &                  reference_cell,
                      Triangulation<dim, spacedim> &tria);
-
-  /**
-   * Return a default mapping of degree @ degree matching the given reference
-   * cell. If this reference cell is a hypercube, then the returned mapping is a
-   * MappingQGeneric; otherwise, it is an object of type MappingFE initialized
-   * with Simplex::FE_P (if the reference cell is a triangle and tetrahedron),
-   * with Simplex::FE_PyramidP (if the reference cell is a pyramid), or with
-   * Simplex::FE_WedgeP (if the reference cell is a wedge).
-   */
-  template <int dim, int spacedim>
-  std::unique_ptr<Mapping<dim, spacedim>>
-  get_default_mapping(const Type &reference_cell, const unsigned int degree);
-
-  /**
-   * Return a default linear mapping matching the given reference cell.
-   * If this reference cell is a hypercube, then the returned mapping
-   * is a MappingQ1; otherwise, it is an object of type MappingFE
-   * initialized with Simplex::FE_P (if the reference cell is a triangle and
-   * tetrahedron), with Simplex::FE_PyramidP (if the reference cell is a
-   * pyramid), or with Simplex::FE_WedgeP (if the reference cell is a wedge). In
-   * other words, the term "linear" in the name of the function has to be
-   * understood as $d$-linear (i.e., bilinear or trilinear) for some of the
-   * coordinate directions.
-   */
-  template <int dim, int spacedim>
-  const Mapping<dim, spacedim> &
-  get_default_linear_mapping(const Type &reference_cell);
 
   /**
    * Return a default linear mapping that works for the given triangulation.
