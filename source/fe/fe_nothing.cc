@@ -51,7 +51,7 @@ FE_Nothing<dim, spacedim>::FE_Nothing(const ReferenceCell::Type &type,
 template <int dim, int spacedim>
 FE_Nothing<dim, spacedim>::FE_Nothing(const unsigned int n_components,
                                       const bool         dominate)
-  : FE_Nothing<dim, spacedim>(ReferenceCell::get_hypercube(dim),
+  : FE_Nothing<dim, spacedim>(ReferenceCell::Type::get_hypercube<dim>(),
                               n_components,
                               dominate)
 {}
@@ -75,7 +75,7 @@ FE_Nothing<dim, spacedim>::get_name() const
   namebuf << "FE_Nothing<" << Utilities::dim_string(dim, spacedim) << ">(";
 
   std::vector<std::string> name_components;
-  if (this->reference_cell_type() != ReferenceCell::get_hypercube(dim))
+  if (this->reference_cell_type() != ReferenceCell::Type::get_hypercube<dim>())
     name_components.push_back(this->reference_cell_type().to_string());
   if (this->n_components() > 1)
     name_components.push_back(std::to_string(this->n_components()));

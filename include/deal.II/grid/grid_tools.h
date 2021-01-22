@@ -177,7 +177,7 @@ namespace GridTools
   volume(const Triangulation<dim, spacedim> &tria,
          const Mapping<dim, spacedim> &      mapping =
            ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-             ReferenceCell::get_hypercube(dim)));
+             ReferenceCell::Type::get_hypercube<dim>()));
 
   /**
    * Return an approximation of the diameter of the smallest active cell of a
@@ -195,7 +195,7 @@ namespace GridTools
     const Triangulation<dim, spacedim> &triangulation,
     const Mapping<dim, spacedim> &      mapping =
       ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-        ReferenceCell::get_hypercube(dim)));
+        ReferenceCell::Type::get_hypercube<dim>()));
 
   /**
    * Return an approximation of the diameter of the largest active cell of a
@@ -213,7 +213,7 @@ namespace GridTools
     const Triangulation<dim, spacedim> &triangulation,
     const Mapping<dim, spacedim> &      mapping =
       ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-        ReferenceCell::get_hypercube(dim)));
+        ReferenceCell::Type::get_hypercube<dim>()));
 
   /**
    * Given a list of vertices (typically obtained using
@@ -1045,7 +1045,7 @@ namespace GridTools
     const Triangulation<dim, spacedim> &container,
     const Mapping<dim, spacedim> &      mapping =
       ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-        ReferenceCell::get_hypercube(dim)));
+        ReferenceCell::Type::get_hypercube<dim>()));
 
   /**
    * Find and return the index of the closest vertex to a given point in the
@@ -1873,7 +1873,7 @@ namespace GridTools
     const Point<spacedim> &                                            position,
     const Mapping<dim, spacedim> &                                     mapping =
       ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-        ReferenceCell::get_hypercube(dim)));
+        ReferenceCell::Type::get_hypercube<dim>()));
 
   /**
    * Compute a globally unique index for each vertex and hanging node
@@ -3261,7 +3261,7 @@ namespace GridTools
                 !cell->face(face)->at_boundary())
               {
                 Assert(cell->reference_cell_type() ==
-                         ReferenceCell::get_hypercube(dim),
+                         ReferenceCell::Type::get_hypercube<dim>(),
                        ExcNotImplemented());
 
                 // this line has children
@@ -3281,7 +3281,7 @@ namespace GridTools
                 !cell->face(face)->at_boundary())
               {
                 Assert(cell->reference_cell_type() ==
-                         ReferenceCell::get_hypercube(dim),
+                         ReferenceCell::Type::get_hypercube<dim>(),
                        ExcNotImplemented());
 
                 // this face has hanging nodes

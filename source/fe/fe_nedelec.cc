@@ -380,9 +380,8 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
   const QGauss<1>            reference_edge_quadrature(order + 1);
   const unsigned int         n_edge_points = reference_edge_quadrature.size();
   const Quadrature<dim - 1> &edge_quadrature =
-    QProjector<dim - 1>::project_to_all_faces(ReferenceCell::get_hypercube(dim -
-                                                                           1),
-                                              reference_edge_quadrature);
+    QProjector<dim - 1>::project_to_all_faces(
+      ReferenceCell::Type::get_hypercube<dim - 1>(), reference_edge_quadrature);
 
   if (order > 0)
     {
@@ -415,7 +414,7 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
                                                          q_point] =
               edge_quadrature.point(
                 QProjector<dim - 1>::DataSetDescriptor::face(
-                  ReferenceCell::get_hypercube(dim - 1),
+                  ReferenceCell::Type::get_hypercube<dim - 1>(),
                   line,
                   true,
                   false,
@@ -516,7 +515,7 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
                                                          q_point] =
               edge_quadrature.point(
                 QProjector<dim - 1>::DataSetDescriptor::face(
-                  ReferenceCell::get_hypercube(dim - 1),
+                  ReferenceCell::Type::get_hypercube<dim - 1>(),
                   line,
                   true,
                   false,

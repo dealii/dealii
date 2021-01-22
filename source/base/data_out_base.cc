@@ -294,7 +294,7 @@ namespace DataOutBase
                                         n_data_sets,
                                       patch.data.n_rows()));
           Assert(patch.reference_cell_type !=
-                     ReferenceCell::get_hypercube(dim) ||
+                     ReferenceCell::Type::get_hypercube<dim>() ||
                    (n_data_sets == 0) ||
                    (patch.data.n_cols() ==
                     Utilities::fixed_power<dim>(n_subdivisions + 1)),
@@ -616,7 +616,8 @@ namespace
 
     if (write_higher_order_cells)
       {
-        if (patch.reference_cell_type == ReferenceCell::get_hypercube(dim))
+        if (patch.reference_cell_type ==
+            ReferenceCell::Type::get_hypercube<dim>())
           {
             const std::array<unsigned int, 4> cell_type_by_dim{
               {VTK_VERTEX,
@@ -667,7 +668,8 @@ namespace
         vtk_cell_id[0] = VTK_PYRAMID;
         vtk_cell_id[1] = 1;
       }
-    else if (patch.reference_cell_type == ReferenceCell::get_hypercube(dim))
+    else if (patch.reference_cell_type ==
+             ReferenceCell::Type::get_hypercube<dim>())
       {
         const std::array<unsigned int, 4> cell_type_by_dim{
           {VTK_VERTEX, VTK_LINE, VTK_QUAD, VTK_HEXAHEDRON}};
@@ -679,7 +681,8 @@ namespace
         Assert(false, ExcNotImplemented());
       }
 
-    if (patch.reference_cell_type != ReferenceCell::get_hypercube(dim) ||
+    if (patch.reference_cell_type !=
+          ReferenceCell::Type::get_hypercube<dim>() ||
         write_higher_order_cells)
       vtk_cell_id[2] = patch.data.n_cols();
     else
@@ -915,7 +918,8 @@ namespace
     for (const auto &patch : patches)
       {
         // The following formula doesn't hold for non-tensor products.
-        if (patch.reference_cell_type == ReferenceCell::get_hypercube(dim))
+        if (patch.reference_cell_type ==
+            ReferenceCell::Type::get_hypercube<dim>())
           {
             n_nodes += Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
             n_cells += Utilities::fixed_power<dim>(patch.n_subdivisions);
@@ -946,7 +950,8 @@ namespace
     for (const auto &patch : patches)
       {
         // The following formulas don't hold for non-tensor products.
-        if (patch.reference_cell_type == ReferenceCell::get_hypercube(dim))
+        if (patch.reference_cell_type ==
+            ReferenceCell::Type::get_hypercube<dim>())
           {
             n_nodes += Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
 
@@ -1862,7 +1867,7 @@ namespace DataOutBase
     : patch_index(no_neighbor)
     , n_subdivisions(1)
     , points_are_available(false)
-    , reference_cell_type(ReferenceCell::get_hypercube(dim))
+    , reference_cell_type(ReferenceCell::Type::get_hypercube<dim>())
   // all the other data has a constructor of its own, except for the "neighbors"
   // field, which we set to invalid values.
   {
@@ -1964,7 +1969,7 @@ namespace DataOutBase
   Patch<0, spacedim>::Patch()
     : patch_index(no_neighbor)
     , points_are_available(false)
-    , reference_cell_type(ReferenceCell::get_hypercube(0))
+    , reference_cell_type(ReferenceCell::Type::get_hypercube<0>())
   {
     Assert(spacedim <= 3, ExcNotImplemented());
   }
@@ -2627,7 +2632,8 @@ namespace DataOutBase
         // special treatment of simplices since they are not subdivided, such
         // that no new nodes have to be created, but the precomputed ones can be
         // used
-        if (patch.reference_cell_type != ReferenceCell::get_hypercube(dim))
+        if (patch.reference_cell_type !=
+            ReferenceCell::Type::get_hypercube<dim>())
           {
             Point<spacedim> node;
 
@@ -2671,7 +2677,8 @@ namespace DataOutBase
     for (const auto &patch : patches)
       {
         // special treatment of simplices since they are not subdivided
-        if (patch.reference_cell_type != ReferenceCell::get_hypercube(dim))
+        if (patch.reference_cell_type !=
+            ReferenceCell::Type::get_hypercube<dim>())
           {
             out.write_cell_single(count++,
                                   first_vertex_of_patch,
@@ -8643,8 +8650,25 @@ namespace
 std::string
 XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
 {
-  return get_xdmf_content(indent_level,
-                          ReferenceCell::get_hypercube(dimension));
+  switch (dimension)
+    {
+      case 0:
+        return get_xdmf_content(indent_level,
+                                ReferenceCell::Type::get_hypercube<0>());
+      case 1:
+        return get_xdmf_content(indent_level,
+                                ReferenceCell::Type::get_hypercube<1>());
+      case 2:
+        return get_xdmf_content(indent_level,
+                                ReferenceCell::Type::get_hypercube<2>());
+      case 3:
+        return get_xdmf_content(indent_level,
+                                ReferenceCell::Type::get_hypercube<3>());
+      default:
+        Assert(false, ExcNotImplemented());
+    }
+
+  return "";
 }
 
 
