@@ -7094,8 +7094,12 @@ namespace GridGenerator
   convert_hypercube_to_simplex_mesh(const Triangulation<dim, spacedim> &in_tria,
                                     Triangulation<dim, spacedim> &out_tria)
   {
-    Assert(in_tria.n_global_levels() == 1,
-           ExcMessage("Number of global levels has to be 1."));
+    const int n_levels = in_tria.n_levels();
+    for (int level_n = 0; level_n < n_levels - 1; ++level_n)
+    {
+      Assert(in_tria.n_active_cells(level_n) == 0,
+             ExcMessage("The input triangulation must only have active cells on its finest level."));
+    }
 
     Assert(dim > 1, ExcNotImplemented());
 
@@ -7291,50 +7295,50 @@ namespace GridGenerator
     // (ii) create new midpoint vertex locations for each face (and record their
     // new indices in the 'face_to_new_vertex_indices' vector),
     // (iii) create new midpoint vertex locations for each cell (dim = 2 only)
-    for (const auto &cell : in_tria)
+    for (const auto &cell : in_tria.active_cell_iterators())
       {
         // temporary array storing the global indices of each cell entity in the
         // sequence: vertices, edges/faces, cell
         std::array<unsigned int, dim == 2 ? 9 : 14> local_vertex_indices;
 
         // (i) copy the existing vertex locations
-        for (const auto v : cell.vertex_indices())
+        for (const auto v : cell->vertex_indices())
           {
-            const auto v_global = cell.vertex_index(v);
+            const auto v_global = cell->vertex_index(v);
 
             if (old_to_new_vertex_indices[v_global] ==
                 numbers::invalid_unsigned_int)
               {
                 old_to_new_vertex_indices[v_global] = vertices.size();
-                vertices.push_back(cell.vertex(v));
+                vertices.push_back(cell->vertex(v));
               }
 
             local_vertex_indices[v] = old_to_new_vertex_indices[v_global];
           }
 
         // (ii) create new midpoint vertex locations for each face
-        for (const auto f : cell.face_indices())
+        for (const auto f : cell->face_indices())
           {
-            const auto f_global = cell.face_index(f);
+            const auto f_global = cell->face_index(f);
 
             if (face_to_new_vertex_indices[f_global] ==
                 numbers::invalid_unsigned_int)
               {
                 face_to_new_vertex_indices[f_global] = vertices.size();
                 vertices.push_back(
-                  cell.face(f)->center(/*respect_manifold*/ true));
+                  cell->face(f)->center(/*respect_manifold*/ true));
               }
 
-            local_vertex_indices[cell.n_vertices() + f] =
+            local_vertex_indices[cell->n_vertices() + f] =
               face_to_new_vertex_indices[f_global];
           }
 
         // (iii) create new midpoint vertex locations for each cell
         if (dim == 2)
           {
-            local_vertex_indices[cell.n_vertices() + cell.n_faces()] =
+            local_vertex_indices[cell->n_vertices() + cell->n_faces()] =
               vertices.size();
-            vertices.push_back(cell.center(/*respect_manifold*/ true));
+            vertices.push_back(cell->center(/*respect_manifold*/ true));
           }
 
         // helper function for creating cells and subcells
@@ -7416,13 +7420,13 @@ namespace GridGenerator
             }
         };
 
-        const auto material_id_cell = cell.material_id();
+        const auto material_id_cell = cell->material_id();
 
         // create cells one by one
         if (dim == 2)
           {
             // get cell-manifold id from current quad cell
-            const auto manifold_id_cell = cell.manifold_id();
+            const auto manifold_id_cell = cell->manifold_id();
             // inherit cell manifold
             for (const auto &cell_vertices : table_2D_cell)
               add_cell(dim, cell_vertices, material_id_cell, manifold_id_cell);
@@ -7440,7 +7444,7 @@ namespace GridGenerator
         else if (dim == 3)
           {
             // get cell-manifold id from current quad cell
-            const auto manifold_id_cell = cell.manifold_id();
+            const auto manifold_id_cell = cell->manifold_id();
             // inherit cell manifold
             for (const auto &cell_vertices : vertex_ids_for_cells_3d)
               add_cell(dim, cell_vertices, material_id_cell, manifold_id_cell);
@@ -7465,10 +7469,10 @@ namespace GridGenerator
           Assert(false, ExcNotImplemented());
 
         // Set up sub-cell data.
-        for (const auto f : cell.face_indices())
+        for (const auto f : cell->face_indices())
           {
-            const auto bid = cell.face(f)->boundary_id();
-            const auto mid = cell.face(f)->manifold_id();
+            const auto bid = cell->face(f)->boundary_id();
+            const auto mid = cell->face(f)->manifold_id();
 
             // process boundary-faces: set boundary and manifold ids
             if (dim == 2) // 2D boundary-faces
