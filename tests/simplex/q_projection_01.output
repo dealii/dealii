@@ -72,76 +72,76 @@ DEAL:2d-3::0.00000 0.500000 0.444444
 DEAL:2d-3::0.00000 0.887298 0.277778 
 DEAL:2d-3::
 DEAL:3d-1::face_no=0 face_orientation=true face_flip=false face_rotation=false:
-DEAL:3d-1::0.333333 0.333333 0.00000 1.00000 
+DEAL:3d-1::0.333333 0.333333 0.00000 0.500000 
 DEAL:3d-1::
 DEAL:3d-1::face_no=0 face_orientation=true face_flip=true face_rotation=false:
-DEAL:3d-1::0.333333 0.333333 0.00000 1.00000 
+DEAL:3d-1::0.333333 0.333333 0.00000 0.500000 
 DEAL:3d-1::
 DEAL:3d-1::face_no=0 face_orientation=true face_flip=false face_rotation=true:
-DEAL:3d-1::0.333333 0.333333 0.00000 1.00000 
+DEAL:3d-1::0.333333 0.333333 0.00000 0.500000 
 DEAL:3d-1::
 DEAL:3d-1::face_no=0 face_orientation=false face_flip=false face_rotation=false:
-DEAL:3d-1::0.333333 0.333333 0.00000 1.00000 
+DEAL:3d-1::0.333333 0.333333 0.00000 0.500000 
 DEAL:3d-1::
 DEAL:3d-1::face_no=0 face_orientation=false face_flip=true face_rotation=false:
-DEAL:3d-1::0.333333 0.333333 0.00000 1.00000 
+DEAL:3d-1::0.333333 0.333333 0.00000 0.500000 
 DEAL:3d-1::
 DEAL:3d-1::face_no=0 face_orientation=false face_flip=false face_rotation=true:
-DEAL:3d-1::0.333333 0.333333 0.00000 1.00000 
+DEAL:3d-1::0.333333 0.333333 0.00000 0.500000 
 DEAL:3d-1::
 DEAL:3d-1::face_no=1 face_orientation=true face_flip=false face_rotation=false:
-DEAL:3d-1::0.333333 0.00000 0.333333 1.00000 
+DEAL:3d-1::0.333333 0.00000 0.333333 0.500000 
 DEAL:3d-1::
 DEAL:3d-1::face_no=1 face_orientation=true face_flip=true face_rotation=false:
-DEAL:3d-1::0.333333 0.00000 0.333333 1.00000 
+DEAL:3d-1::0.333333 0.00000 0.333333 0.500000 
 DEAL:3d-1::
 DEAL:3d-1::face_no=1 face_orientation=true face_flip=false face_rotation=true:
-DEAL:3d-1::0.333333 0.00000 0.333333 1.00000 
+DEAL:3d-1::0.333333 0.00000 0.333333 0.500000 
 DEAL:3d-1::
 DEAL:3d-1::face_no=1 face_orientation=false face_flip=false face_rotation=false:
-DEAL:3d-1::0.333333 0.00000 0.333333 1.00000 
+DEAL:3d-1::0.333333 0.00000 0.333333 0.500000 
 DEAL:3d-1::
 DEAL:3d-1::face_no=1 face_orientation=false face_flip=true face_rotation=false:
-DEAL:3d-1::0.333333 0.00000 0.333333 1.00000 
+DEAL:3d-1::0.333333 0.00000 0.333333 0.500000 
 DEAL:3d-1::
 DEAL:3d-1::face_no=1 face_orientation=false face_flip=false face_rotation=true:
-DEAL:3d-1::0.333333 0.00000 0.333333 1.00000 
+DEAL:3d-1::0.333333 0.00000 0.333333 0.500000 
 DEAL:3d-1::
 DEAL:3d-1::face_no=2 face_orientation=true face_flip=false face_rotation=false:
-DEAL:3d-1::0.00000 0.333333 0.333333 1.00000 
+DEAL:3d-1::0.00000 0.333333 0.333333 0.500000 
 DEAL:3d-1::
 DEAL:3d-1::face_no=2 face_orientation=true face_flip=true face_rotation=false:
-DEAL:3d-1::0.00000 0.333333 0.333333 1.00000 
+DEAL:3d-1::0.00000 0.333333 0.333333 0.500000 
 DEAL:3d-1::
 DEAL:3d-1::face_no=2 face_orientation=true face_flip=false face_rotation=true:
-DEAL:3d-1::0.00000 0.333333 0.333333 1.00000 
+DEAL:3d-1::0.00000 0.333333 0.333333 0.500000 
 DEAL:3d-1::
 DEAL:3d-1::face_no=2 face_orientation=false face_flip=false face_rotation=false:
-DEAL:3d-1::0.00000 0.333333 0.333333 1.00000 
+DEAL:3d-1::0.00000 0.333333 0.333333 0.500000 
 DEAL:3d-1::
 DEAL:3d-1::face_no=2 face_orientation=false face_flip=true face_rotation=false:
-DEAL:3d-1::0.00000 0.333333 0.333333 1.00000 
+DEAL:3d-1::0.00000 0.333333 0.333333 0.500000 
 DEAL:3d-1::
 DEAL:3d-1::face_no=2 face_orientation=false face_flip=false face_rotation=true:
-DEAL:3d-1::0.00000 0.333333 0.333333 1.00000 
+DEAL:3d-1::0.00000 0.333333 0.333333 0.500000 
 DEAL:3d-1::
 DEAL:3d-1::face_no=3 face_orientation=true face_flip=false face_rotation=false:
-DEAL:3d-1::0.333333 0.333333 0.333333 1.73205 
+DEAL:3d-1::0.333333 0.333333 0.333333 0.866025 
 DEAL:3d-1::
 DEAL:3d-1::face_no=3 face_orientation=true face_flip=true face_rotation=false:
-DEAL:3d-1::0.333333 0.333333 0.333333 1.73205 
+DEAL:3d-1::0.333333 0.333333 0.333333 0.866025 
 DEAL:3d-1::
 DEAL:3d-1::face_no=3 face_orientation=true face_flip=false face_rotation=true:
-DEAL:3d-1::0.333333 0.333333 0.333333 1.73205 
+DEAL:3d-1::0.333333 0.333333 0.333333 0.866025 
 DEAL:3d-1::
 DEAL:3d-1::face_no=3 face_orientation=false face_flip=false face_rotation=false:
-DEAL:3d-1::0.333333 0.333333 0.333333 1.73205 
+DEAL:3d-1::0.333333 0.333333 0.333333 0.866025 
 DEAL:3d-1::
 DEAL:3d-1::face_no=3 face_orientation=false face_flip=true face_rotation=false:
-DEAL:3d-1::0.333333 0.333333 0.333333 1.73205 
+DEAL:3d-1::0.333333 0.333333 0.333333 0.866025 
 DEAL:3d-1::
 DEAL:3d-1::face_no=3 face_orientation=false face_flip=false face_rotation=true:
-DEAL:3d-1::0.333333 0.333333 0.333333 1.73205 
+DEAL:3d-1::0.333333 0.333333 0.333333 0.866025 
 DEAL:3d-1::
 DEAL:3d-4::face_no=0 face_orientation=true face_flip=false face_rotation=false:
 DEAL:3d-4::0.666667 0.166667 0.00000 0.166667 

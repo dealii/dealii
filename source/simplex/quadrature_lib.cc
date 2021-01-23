@@ -46,7 +46,7 @@ namespace Simplex
           {
             const double p = 1.0 / 3.0;
             this->quadrature_points.emplace_back(p, p);
-            this->weights.emplace_back(1.0);
+            this->weights.emplace_back(0.5);
           }
         else if (n_points_1D == 2)
           {
