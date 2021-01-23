@@ -20,6 +20,7 @@
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/std_cxx17/cmath.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -36,8 +37,6 @@
 
 #include <deal.II/numerics/smoothness_estimator.h>
 #include <deal.II/numerics/vector_tools.h>
-
-#include <gsl/gsl_sf_legendre.h>
 
 #include <iostream>
 
@@ -82,8 +81,8 @@ Lh(const Point<dim> &x_q, const TableIndices<dim> &indices)
       const double x = 2.0 * (x_q[d] - 0.5);
       Assert((x_q[d] <= 1.0) && (x_q[d] >= 0.),
              ExcMessage("x_q is not in [0,1]" + Utilities::to_string(x_q[d])));
-      const int ind = indices[d];
-      res *= sqrt(2.0) * gsl_sf_legendre_Pl(ind, x);
+      const unsigned int ind = indices[d];
+      res *= sqrt(2.0) * std_cxx17::legendre(ind, x);
     }
   return res;
 }
