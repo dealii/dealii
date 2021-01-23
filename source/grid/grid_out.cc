@@ -1512,7 +1512,17 @@ void
 GridOut::write_svg(const Triangulation<dim, spacedim> &,
                    std::ostream & /*out*/) const
 {
-  Assert(false, ExcNotImplemented());
+  Assert(false,
+         ExcMessage("Mesh output in SVG format is not implemented for anything "
+                    "other than two-dimensional meshes in two-dimensional "
+                    "space. That's because three-dimensional meshes are best "
+                    "viewed in programs that allow changing the viewpoint, "
+                    "but SVG format does not allow this: It is an inherently "
+                    "2d format, and for three-dimensional meshes would "
+                    "require choosing one, fixed viewpoint."
+                    "\n\n"
+                    "You probably want to output your mesh in a format such "
+                    "as VTK, VTU, or gnuplot."));
 }
 
 
@@ -2787,6 +2797,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
 }
 
 
+
 template <>
 void
 GridOut::write_mathgl(const Triangulation<1> &, std::ostream &) const
@@ -2794,6 +2805,7 @@ GridOut::write_mathgl(const Triangulation<1> &, std::ostream &) const
   // 1d specialization not done yet
   Assert(false, ExcNotImplemented());
 }
+
 
 
 template <int dim, int spacedim>
