@@ -63,9 +63,6 @@ namespace ReferenceCell
 
 
 
-  /**
-   * Convert the given reference cell type to a string.
-   */
   std::string
   Type::to_string() const
   {
