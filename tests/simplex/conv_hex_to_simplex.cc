@@ -40,7 +40,8 @@ template <int dim, int spacedim>
 void
 create_triangulation(Triangulation<dim, spacedim> &triangulation)
 {
-  GridGenerator::subdivided_hyper_cube(triangulation, 4);
+  GridGenerator::hyper_cube(triangulation);
+  triangulation.refine_global(2);
 }
 
 template <int dim>
@@ -59,20 +60,23 @@ check_file() // for dim = spaceim
 
   // make each cell a different material id
   unsigned int m_id = 0;
-  for (const auto &cell : in_tria)
+  for (const auto &cell : in_tria.active_cell_iterators())
     {
-      cell.set_material_id(m_id++);
+      cell->set_material_id(m_id++);
     }
+
+  //  TODO - there is some horrible bug here where m_id = 21 at this point but
+  //  it should be just 16.
 
   // set different boundary ids and output
   unsigned int b_id = 0;
-  for (const auto &cell : in_tria)
+  for (const auto &cell : in_tria.active_cell_iterators())
     {
       for (const auto f : cell.face_indices())
         {
-          if (cell.face(f)->at_boundary())
+          if (cell->face(f)->at_boundary())
             {
-              cell.face(f)->set_boundary_id(b_id);
+              cell->face(f)->set_boundary_id(b_id);
               b_id++;
             }
         }
