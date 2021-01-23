@@ -1670,11 +1670,9 @@ TriaAccessor<3, 3, 3>::set_all_manifold_ids(
   // for hexes also set manifold_id
   // of bounding quads and lines
 
-  // Six bonding quads
-  for (unsigned int i = 0; i < 6; ++i)
+  for (unsigned int i : this->face_indices())
     this->quad(i)->set_manifold_id(manifold_ind);
-  // Twelve bounding lines
-  for (unsigned int i = 0; i < 12; ++i)
+  for (unsigned int i : this->line_indices())
     this->line(i)->set_manifold_id(manifold_ind);
 }
 

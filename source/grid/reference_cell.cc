@@ -75,8 +75,19 @@ namespace ReferenceCell
       }
     else if (reference_cell == Type::Tri)
       {
-        static const std::vector<Point<spacedim>> vertices = {
-          {{0.0, 0.0}, {1.0, 0.0}, {0.0, 1.0}}};
+        std::vector<Point<spacedim>> vertices;
+        if (spacedim == 2)
+          {
+            vertices.emplace_back(0.0, 0.0);
+            vertices.emplace_back(1.0, 0.0);
+            vertices.emplace_back(0.0, 1.0);
+          }
+        else if (spacedim == 3)
+          {
+            vertices.emplace_back(0.0, 0.0, 0.0);
+            vertices.emplace_back(1.0, 0.0, 0.0);
+            vertices.emplace_back(0.0, 1.0, 0.0);
+          }
 
         std::vector<CellData<dim>> cells(1);
         cells[0].vertices = {0, 1, 2};

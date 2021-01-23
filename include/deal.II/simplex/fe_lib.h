@@ -48,7 +48,7 @@ namespace Simplex
      * Return a list of constant modes of the element. For this element, the
      * list consists of true arguments for all components.
      */
-    std::pair<Table<2, bool>, std::vector<unsigned int>>
+    virtual std::pair<Table<2, bool>, std::vector<unsigned int>>
     get_constant_modes() const override;
 
     /**
@@ -56,17 +56,16 @@ namespace Simplex
      *
      * @note Only implemented for RefinementCase::isotropic_refinement.
      */
-    const FullMatrix<double> &
+    virtual const FullMatrix<double> &
     get_prolongation_matrix(
       const unsigned int         child,
       const RefinementCase<dim> &refinement_case =
         RefinementCase<dim>::isotropic_refinement) const override;
 
-  private:
     /**
      * @copydoc dealii::FiniteElement::convert_generalized_support_point_values_to_dof_values()
      */
-    void
+    virtual void
     convert_generalized_support_point_values_to_dof_values(
       const std::vector<Vector<double>> &support_point_values,
       std::vector<double> &              nodal_values) const override;
