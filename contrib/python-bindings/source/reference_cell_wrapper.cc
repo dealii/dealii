@@ -33,7 +33,7 @@ namespace python
 
 
 
-  CellTypeWrapper::CellTypeWrapper(const ReferenceCell::Type::CellKinds &kind)
+  CellTypeWrapper::CellTypeWrapper(const std::uint8_t &kind)
   {
     cell_type = kind;
   }
@@ -52,11 +52,10 @@ namespace python
 
 
 
-  ReferenceCell::Type::CellKinds
+  std::uint8_t
   CellTypeWrapper::cell_kind() const
   {
-    std::uint8_t kind = (std::uint8_t)cell_type;
-    return static_cast<ReferenceCell::Type::CellKinds>(kind);
+    return cell_type;
   }
 
 } // namespace python

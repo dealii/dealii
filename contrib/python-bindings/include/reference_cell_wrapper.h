@@ -35,12 +35,12 @@ namespace python
     CellTypeWrapper(const CellTypeWrapper &other);
 
     /**
-     * Constructor. Takes a CellKinds enum field and creates a Type class.
+     * Constructor. Takes a cell kind id field and creates a Type class.
      */
-    CellTypeWrapper(const ReferenceCell::Type::CellKinds &kind);
+    CellTypeWrapper(const std::uint8_t &kind);
 
     /**
-     * Constructor. Takes a CellKinds enum field and creates a Type class.
+     * Constructor. Takes a ReferenceCell::Type object and creates a Type class.
      */
     CellTypeWrapper(const ReferenceCell::Type &cell_type_in);
 
@@ -54,7 +54,7 @@ namespace python
      */
     ~CellTypeWrapper();
 
-    ReferenceCell::Type::CellKinds
+    std::uint8_t
     cell_kind() const;
 
   private:
