@@ -321,10 +321,25 @@ ExceptionBase::generate_message() const
                 << "--------------------------------------------------------"
                 << std::endl;
 
-      // print out general data
+      // Print out general data
       print_exc_data(converter);
-      // print out exception specific data
-      print_info(converter);
+
+      // Print out exception specific data. Put this into another stringstream
+      // object for now so that we can break long lines and print them in a
+      // more easily read way
+      {
+        std::ostringstream message;
+        print_info(message);
+
+        const auto message_in_lines =
+          Utilities::break_text_into_lines(message.str(), 70);
+
+        // Put the message into the stream that will be output.
+        for (const auto &line : message_in_lines)
+          converter << "    " << line << '\n';
+      }
+
+
       print_stack_trace(converter);
 
       if (!deal_II_exceptions::internals::get_additional_assert_output()
