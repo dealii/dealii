@@ -8,14 +8,18 @@ jobs:
   build-master-docker:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout code
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.7.0
+        with:
+          access_token: ${{ github.token }}
+          
+      - name: Checkout code
         uses: actions/checkout@v2
-      -
-        name: Set up Docker Buildx
+
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-      -
-        name: Login to DockerHub
+
+      - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -25,8 +29,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./contrib/docker/
-          cache_froms: type=registry,ref=dealii/dependencies:focal
-          repository: dealii/dealii
+          cache-from: type=registry,ref=dealii/dependencies:focal
           cache-to: type=inline
-          add_git_labels: true
-          tags: master-focal
+          push: true
+          tags: dealii/dealii:master-focal
