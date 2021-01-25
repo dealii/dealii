@@ -75,13 +75,14 @@ bool
 MappingCartesian<dim, spacedim>::is_compatible_with(
   const ReferenceCell::Type &cell_type) const
 {
-  if (cell_type.get_dimension() != dim)
-    return false; // TODO: or is this an error?
+  Assert(dim == cell_type.get_dimension(),
+         ExcMessage("The dimension of your mapping (" +
+                    Utilities::to_string(dim) +
+                    ") and the reference cell cell_type (" +
+                    Utilities::to_string(cell_type.get_dimension()) +
+                    " ) do not agree."));
 
-  if (cell_type.is_hyper_cube())
-    return true;
-
-  return false;
+  return cell_type.is_hyper_cube();
 }
 
 

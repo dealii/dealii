@@ -2309,6 +2309,25 @@ MappingFE<dim, spacedim>::get_bounding_box(
 
 
 
+template <int dim, int spacedim>
+bool
+MappingFE<dim, spacedim>::is_compatible_with(
+  const ReferenceCell::Type &cell_type) const
+{
+  Assert(dim == cell_type.get_dimension(),
+         ExcMessage("The dimension of your mapping (" +
+                    Utilities::to_string(dim) +
+                    ") and the reference cell cell_type (" +
+                    Utilities::to_string(cell_type.get_dimension()) +
+                    " ) do not agree."));
+
+  // TODO: query fe->reference_cell() to compare once is exists.
+
+  return true;
+}
+
+
+
 //--------------------------- Explicit instantiations -----------------------
 #include "mapping_fe.inst"
 

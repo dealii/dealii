@@ -608,16 +608,6 @@ MappingFE<dim, spacedim>::preserves_vertex_locations() const
 }
 
 
-template <int dim, int spacedim>
-bool
-MappingFE<dim, spacedim>::is_compatible_with(
-  const ReferenceCell::Type &cell_type) const
-{
-  if (cell_type.get_dimension() != dim)
-    return false; // TODO: or is this an error?
-
-  return true;
-}
 
 #endif // DOXYGEN
 
