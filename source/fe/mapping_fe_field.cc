@@ -354,11 +354,7 @@ MappingFEField<dim, spacedim, VectorType, void>::is_compatible_with(
                     Utilities::to_string(cell_type.get_dimension()) +
                     " ) do not agree."));
 
-
-  // TODO: check euler_dof_handler->get_fe()
-
-
-  return true;
+  return euler_dof_handler->get_fe().reference_cell_type() == cell_type;
 }
 
 

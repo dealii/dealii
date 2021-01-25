@@ -2321,9 +2321,7 @@ MappingFE<dim, spacedim>::is_compatible_with(
                     Utilities::to_string(cell_type.get_dimension()) +
                     " ) do not agree."));
 
-  // TODO: query fe->reference_cell() to compare once is exists.
-
-  return true;
+  return fe->reference_cell_type() == cell_type;
 }
 
 
