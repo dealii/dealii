@@ -73,7 +73,7 @@ namespace ReferenceCell
       {
         GridGenerator::hyper_cube(tria, 0, 1);
       }
-    else if (reference_cell == Type::Tri)
+    else if ((dim == 2) && (reference_cell == Type::Tri))
       {
         const std::vector<Point<spacedim>> vertices = {
           Point<spacedim>(),               // the origin
@@ -86,7 +86,7 @@ namespace ReferenceCell
 
         tria.create_triangulation(vertices, cells, {});
       }
-    else if (reference_cell == Type::Tet)
+    else if ((dim == 3) && (reference_cell == Type::Tet))
       {
         AssertDimension(spacedim, 3);
 
@@ -98,7 +98,7 @@ namespace ReferenceCell
 
         tria.create_triangulation(vertices, cells, {});
       }
-    else if (reference_cell == Type::Pyramid)
+    else if ((dim == 3) && (reference_cell == Type::Pyramid))
       {
         AssertDimension(spacedim, 3);
 
@@ -114,7 +114,7 @@ namespace ReferenceCell
 
         tria.create_triangulation(vertices, cells, {});
       }
-    else if (reference_cell == Type::Wedge)
+    else if ((dim == 3) && (reference_cell == Type::Wedge))
       {
         AssertDimension(spacedim, 3);
 
