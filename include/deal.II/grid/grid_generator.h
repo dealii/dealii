@@ -1522,6 +1522,7 @@ namespace GridGenerator
    * Given the two triangulations specified as the first two arguments, create
    * the triangulation that contains the cells of both triangulation and store
    * it in the third parameter. Previous content of @p result will be deleted.
+   * One of the two input triangulations can also be the @p result triangulation.
    *
    * This function is most often used to compose meshes for more complicated
    * geometries if the geometry can be composed of simpler parts for which
