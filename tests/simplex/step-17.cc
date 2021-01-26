@@ -189,7 +189,7 @@ namespace Step17
   void
   ElasticProblem<dim>::setup_system()
   {
-    GridTools::partition_triangulation(n_mpi_processes, triangulation);
+    GridTools::partition_triangulation_zorder(n_mpi_processes, triangulation);
 
     dof_handler.distribute_dofs(fe);
     DoFRenumbering::subdomain_wise(dof_handler);
