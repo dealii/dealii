@@ -23,6 +23,8 @@
 
 #    include <sundials/sundials_nvector.h>
 
+#    include <memory>
+
 DEAL_II_NAMESPACE_OPEN
 
 #    ifndef DOXYGEN
