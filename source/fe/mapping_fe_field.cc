@@ -1571,9 +1571,15 @@ MappingFEField<dim, spacedim, VectorType, void>::fill_fe_values(
                   if (dim == 1)
                     output_data.normal_vectors[point] =
                       cross_product_2d(-DX_t[0]);
-                  else // dim == 2
-                    output_data.normal_vectors[point] =
-                      cross_product_3d(DX_t[0], DX_t[1]);
+                  else
+                    {
+                      Assert(dim == 2, ExcInternalError());
+
+                      // dim-1==1 for the second argument, but this
+                      // avoids a compiler warning about array bounds:
+                      output_data.normal_vectors[point] =
+                        cross_product_3d(DX_t[0], DX_t[dim - 1]);
+                    }
 
                   output_data.normal_vectors[point] /=
                     output_data.normal_vectors[point].norm();
