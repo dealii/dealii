@@ -18,9 +18,12 @@ jobs:
       run: |
         g++ -v
         cmake --version
+    - name: modules
+      run: |
+        sudo apt-get install libboost-all-dev
     - name: configure
       run: |
-        cmake -D CMAKE_BUILD_TYPE=Release -D DEAL_II_CXX_FLAGS='-Werror' -D DEAL_II_EARLY_DEPRECATIONS=ON .
+        cmake -D CMAKE_BUILD_TYPE=Release -D DEAL_II_CXX_FLAGS='-Werror' -D DEAL_II_EARLY_DEPRECATIONS=ON -DDEAL_II_COMPONENT_PYTHON_BINDINGS=ON .
     - name: archive
       uses: actions/upload-artifact@v1
       with:
