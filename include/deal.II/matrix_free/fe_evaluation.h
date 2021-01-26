@@ -748,7 +748,7 @@ public:
   /**
    * Return the value of a finite element function at quadrature point number
    * @p q_point after a call to FEEvaluation::evaluate() with
-   * EvaluationFlags::value set, or the value that has been stored there with
+   * EvaluationFlags::values set, or the value that has been stored there with
    * a call to FEEvaluationBase::submit_value(). If the object is
    * vector-valued, a vector-valued return argument is given. Note that when
    * vectorization is enabled, values from several cells are grouped together.
