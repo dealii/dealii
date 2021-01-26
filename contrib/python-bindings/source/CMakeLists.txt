@@ -38,7 +38,6 @@ SET(_src
   export_mapping.cc
   export_manifold.cc
   export_quadrature.cc
-  export_reference_cell.cc
   cell_accessor_wrapper.cc
   tria_accessor_wrapper.cc
   point_wrapper.cc
