@@ -99,10 +99,7 @@ test(const unsigned int degree)
   std::vector<Tensor<1, dim>> function_values(unit_points.size());
   std::vector<Tensor<2, dim>> function_gradients(unit_points.size());
 
-  std::vector<types::global_dof_index> dof_indices(fe.dofs_per_cell);
-  std::vector<Tensor<1, dim>>          function_values_1(unit_points.size());
-  std::vector<Tensor<2, dim>>          function_gradients_1(unit_points.size());
-  FEValuesExtractors::Vector           extractor(0);
+  FEValuesExtractors::Vector extractor(0);
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
@@ -117,16 +114,15 @@ test(const unsigned int degree)
       evaluator.evaluate(cell,
                          unit_points,
                          solution_values,
-                         function_values_1,
-                         function_gradients_1);
+                         EvaluationFlags::values | EvaluationFlags::gradients);
 
       deallog << "Cell with center " << cell->center(true) << std::endl;
-      for (unsigned int i = 0; i < function_values_1.size(); ++i)
+      for (unsigned int i = 0; i < function_values.size(); ++i)
         deallog << mapping.transform_unit_to_real_cell(cell, unit_points[i])
-                << ": " << function_values_1[i] << " error value "
-                << (function_values[i] - function_values_1[i]).norm()
+                << ": " << evaluator.get_value(i) << " error value "
+                << (function_values[i] - evaluator.get_value(i)).norm()
                 << " error grad "
-                << (function_gradients_1[i] - function_gradients[i]).norm()
+                << (evaluator.get_gradient(i) - function_gradients[i]).norm()
                 << std::endl;
       deallog << std::endl;
     }

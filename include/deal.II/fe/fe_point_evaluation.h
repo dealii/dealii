@@ -27,6 +27,7 @@
 
 #include <deal.II/fe/mapping_q_generic.h>
 
+#include <deal.II/matrix_free/evaluation_flags.h>
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/tensor_product_kernels.h>
 
@@ -271,23 +272,36 @@ public:
    * values on the element as returned by `cell->get_dof_values(global_vector,
    * solution_values)`.
    *
-   * @param[out] values Array where the values of the evaluation of the
-   * solution interpolated to the given points is stored. The array must have
-   * the same size as the `unit_points` argument if values should be
-   * computed. If empty, values will not be computed.
-   *
-   * @param[out] gradients Array where the gradients of the evaluation of the
-   * solution interpolated to the given points is stored. The gradients are
-   * expressed in real space via the Mapping defined in the constructor. The
-   * array must have the same size as the `unit_points` argument if gradients
-   * should be computed. If empty, gradients will not be computed.
+   * @param[in] flags Flags specifying which quantities should be evaluated
+   * at the points.
    */
   void
   evaluate(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-           const ArrayView<const Point<dim>> &unit_points,
-           const ArrayView<const double> &    solution_values,
-           const ArrayView<value_type> &      values,
-           const ArrayView<gradient_type> &   gradients = {});
+           const ArrayView<const Point<dim>> &     unit_points,
+           const ArrayView<const double> &         solution_values,
+           const EvaluationFlags::EvaluationFlags &flags);
+
+  /**
+   * Return the value at quadrature point number @p q_point after a call to
+   * FEPointEvaluation::evaluate() with EvaluationFlags::value set, or
+   * the value that has been stored there with a call to
+   * FEPointEvaluation::submit_value(). If the object is vector-valued, a
+   * vector-valued return argument is given. Note that when
+   * vectorization is enabled, values from several points are grouped together.
+   */
+  const value_type &
+  get_value(const unsigned int q_point) const;
+
+  /**
+   * Return the gradient at quadrature point number @p q_point after a call to
+   * FEPointEvaluation::evaluate() with EvaluationFlags::gradient set, or
+   * the gradient that has been stored there with a call to
+   * FEPointEvaluation::submit_gradient(). If the object is vector-valued, a
+   * vector-valued return argument is given. Note that when
+   * vectorization is enabled, values from several points are grouped together.
+   */
+  const gradient_type &
+  get_gradient(const unsigned int q_point) const;
 
 private:
   /**
@@ -325,6 +339,16 @@ private:
    * collect the unknowns for a particular basis function.
    */
   std::vector<value_type> solution_renumbered;
+
+  /**
+   * Temporary array to store the values at the points.
+   */
+  std::vector<value_type> values;
+
+  /**
+   * Temporary array to store the gradients at the points.
+   */
+  std::vector<gradient_type> gradients;
 
   /**
    * Number of unknowns per component, i.e., number of unique basis functions,
@@ -406,11 +430,12 @@ FEPointEvaluation<n_components, dim, spacedim>::evaluate(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const ArrayView<const Point<dim>> &                         unit_points,
   const ArrayView<const double> &                             solution_values,
-  const ArrayView<value_type> &                               values,
-  const ArrayView<gradient_type> &                            gradients)
+  const EvaluationFlags::EvaluationFlags &                    evaluation_flag)
 {
   AssertDimension(solution_values.size(), fe->dofs_per_cell);
-  if ((values.size() > 0 || gradients.size() > 0) && !poly.empty())
+  if (((evaluation_flag & EvaluationFlags::values) ||
+       (evaluation_flag & EvaluationFlags::gradients)) &&
+      !poly.empty())
     {
       // fast path with tensor product evaluation
       if (solution_renumbered.size() != dofs_per_component)
@@ -422,10 +447,10 @@ FEPointEvaluation<n_components, dim, spacedim>::evaluate(
                        comp,
                        solution_renumbered[i]);
 
-      if (values.size() > 0)
-        AssertDimension(unit_points.size(), values.size());
-      if (gradients.size() > 0)
-        AssertDimension(unit_points.size(), gradients.size());
+      if (evaluation_flag & EvaluationFlags::values)
+        values.resize(unit_points.size());
+      if (evaluation_flag & EvaluationFlags::gradients)
+        gradients.resize(unit_points.size());
 
       const std::size_t n_points = unit_points.size();
       const std::size_t n_lanes  = VectorizedArray<double>::size();
@@ -443,12 +468,12 @@ FEPointEvaluation<n_components, dim, spacedim>::evaluate(
               poly, solution_renumbered, vectorized_points, poly.size() == 2);
 
           // convert back to standard format
-          if (values.size() > 0)
+          if (evaluation_flag & EvaluationFlags::values)
             for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
               internal::FEPointEvaluation::EvaluatorTypeTraits<
                 dim,
                 n_components>::set_value(val_and_grad.first, j, values[i + j]);
-          if (gradients.size() > 0)
+          if (evaluation_flag & EvaluationFlags::gradients)
             for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
               internal::FEPointEvaluation::
                 EvaluatorTypeTraits<dim, n_components>::set_gradient(
@@ -456,23 +481,26 @@ FEPointEvaluation<n_components, dim, spacedim>::evaluate(
         }
 
       // let mapping compute the transformation
-      if (gradients.size() > 0)
+      if (evaluation_flag & EvaluationFlags::gradients)
         {
           Assert(mapping_q_generic != nullptr, ExcInternalError());
           mapping_q_generic->transform_variable(
             cell,
             mapping_covariant,
             unit_points,
-            ArrayView<const gradient_type>(gradients.begin(), gradients.size()),
-            gradients);
+            ArrayView<const gradient_type>(gradients.data(), gradients.size()),
+            ArrayView<gradient_type>(gradients.data(), gradients.size()));
         }
     }
-  else if (values.size() > 0 || gradients.size() > 0)
+  else if ((evaluation_flag & EvaluationFlags::values) ||
+           (evaluation_flag & EvaluationFlags::gradients))
     {
       // slow path with FEValues
       const UpdateFlags flags =
-        (values.size() > 0 ? update_values : update_default) |
-        (gradients.size() > 0 ? update_gradients : update_default);
+        ((evaluation_flag & EvaluationFlags::values) ? update_values :
+                                                       update_default) |
+        ((evaluation_flag & EvaluationFlags::gradients) ? update_gradients :
+                                                          update_default);
       FEValues<dim, spacedim> fe_values(
         *mapping,
         *fe,
@@ -481,9 +509,9 @@ FEPointEvaluation<n_components, dim, spacedim>::evaluate(
         flags);
       fe_values.reinit(cell);
 
-      if (values.size() > 0)
+      if (evaluation_flag & EvaluationFlags::values)
         {
-          AssertDimension(unit_points.size(), values.size());
+          values.resize(unit_points.size());
           std::fill(values.begin(), values.end(), value_type());
           for (unsigned int i = 0; i < fe->n_dofs_per_cell(); ++i)
             {
@@ -505,9 +533,9 @@ FEPointEvaluation<n_components, dim, spacedim>::evaluate(
             }
         }
 
-      if (gradients.size() > 0)
+      if (evaluation_flag & EvaluationFlags::gradients)
         {
-          AssertDimension(unit_points.size(), gradients.size());
+          gradients.resize(unit_points.size());
           std::fill(gradients.begin(), gradients.end(), gradient_type());
           for (unsigned int i = 0; i < fe->n_dofs_per_cell(); ++i)
             {
@@ -528,6 +556,30 @@ FEPointEvaluation<n_components, dim, spacedim>::evaluate(
             }
         }
     }
+}
+
+
+
+template <int n_components, int dim, int spacedim>
+inline const typename FEPointEvaluation<n_components, dim, spacedim>::value_type
+  &
+  FEPointEvaluation<n_components, dim, spacedim>::get_value(
+    const unsigned int q_point) const
+{
+  AssertIndexRange(q_point, values.size());
+  return values[q_point];
+}
+
+
+
+template <int n_components, int dim, int spacedim>
+inline const typename FEPointEvaluation<n_components, dim, spacedim>::
+  gradient_type &
+  FEPointEvaluation<n_components, dim, spacedim>::get_gradient(
+    const unsigned int q_point) const
+{
+  AssertIndexRange(q_point, gradients.size());
+  return gradients[q_point];
 }
 
 DEAL_II_NAMESPACE_CLOSE
