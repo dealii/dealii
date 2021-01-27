@@ -1009,6 +1009,21 @@ namespace ReferenceCell
 
           return 0;
         }
+
+        /**
+         * Indices of child cells that are adjacent to a certain face of the
+         * mother cell.
+         */
+        virtual unsigned int
+        child_cell_on_face(const unsigned int face_n,
+                           const unsigned int subface_n) const
+        {
+          Assert(false, ExcNotImplemented());
+          (void)face_n;
+          (void)subface_n;
+
+          return numbers::invalid_unsigned_int;
+        }
       };
 
 
@@ -1218,6 +1233,17 @@ namespace ReferenceCell
         {
           AssertIndexRange(face_n, n_faces());
           return face_n;
+        }
+
+        virtual unsigned int
+        child_cell_on_face(const unsigned int face_n,
+                           const unsigned int subface_n) const override
+        {
+          static constexpr unsigned int subcells[3][2] = {{0, 1},
+                                                          {1, 2},
+                                                          {2, 0}};
+
+          return subcells[face_n][subface_n];
         }
       };
 
