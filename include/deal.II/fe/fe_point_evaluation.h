@@ -519,13 +519,13 @@ FEPointEvaluation<n_components, dim, spacedim>::evaluate(
               for (unsigned int d = 0; d < n_components; ++d)
                 if (nonzero_shape_function_component[i][d] &&
                     (fe->is_primitive(i) || fe->is_primitive()))
-                  for (unsigned int q = 0; q < values.size(); ++q)
+                  for (unsigned int q = 0; q < unit_points.size(); ++q)
                     internal::FEPointEvaluation::
                       EvaluatorTypeTraits<dim, n_components>::access(values[q],
                                                                      d) +=
                       fe_values.shape_value(i, q) * value;
                 else if (nonzero_shape_function_component[i][d])
-                  for (unsigned int q = 0; q < values.size(); ++q)
+                  for (unsigned int q = 0; q < unit_points.size(); ++q)
                     internal::FEPointEvaluation::
                       EvaluatorTypeTraits<dim, n_components>::access(values[q],
                                                                      d) +=
@@ -543,12 +543,12 @@ FEPointEvaluation<n_components, dim, spacedim>::evaluate(
               for (unsigned int d = 0; d < n_components; ++d)
                 if (nonzero_shape_function_component[i][d] &&
                     (fe->is_primitive(i) || fe->is_primitive()))
-                  for (unsigned int q = 0; q < values.size(); ++q)
+                  for (unsigned int q = 0; q < unit_points.size(); ++q)
                     internal::FEPointEvaluation::
                       EvaluatorTypeTraits<dim, n_components>::access(
                         gradients[q], d) += fe_values.shape_grad(i, q) * value;
                 else if (nonzero_shape_function_component[i][d])
-                  for (unsigned int q = 0; q < values.size(); ++q)
+                  for (unsigned int q = 0; q < unit_points.size(); ++q)
                     internal::FEPointEvaluation::EvaluatorTypeTraits<
                       dim,
                       n_components>::access(gradients[q], d) +=
