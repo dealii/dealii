@@ -240,14 +240,6 @@ namespace ReferenceCell
     ArrayView<const unsigned int>
     faces_for_given_vertex(const unsigned int vertex) const;
 
-    /*
-     * Create a (coarse) grid with a single cell of the shape of this
-     * reference cell.
-     */
-    template <int dim, int spacedim>
-    void
-    make_triangulation(Triangulation<dim, spacedim> &tria) const;
-
   private:
     /**
      * The variable that stores what this object actually corresponds to.
@@ -719,6 +711,15 @@ namespace ReferenceCell
 
     return {};
   }
+
+  /*
+   * Create a (coarse) grid with a single cell of the shape of the provided
+   * reference cell.
+   */
+  template <int dim, int spacedim>
+  void
+  make_triangulation(const Type &                  reference_cell,
+                     Triangulation<dim, spacedim> &tria);
 
   /**
    * Return a default linear mapping that works for the given triangulation.

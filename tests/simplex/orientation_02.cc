@@ -29,7 +29,7 @@ test(const unsigned int orientation)
 
 
   Triangulation<3> dummy, tria;
-  ReferenceCell::Type::Tet.make_triangulation(dummy);
+  ReferenceCell::make_triangulation(ReferenceCell::Type::Tet, dummy);
 
   auto vertices = dummy.get_vertices();
 

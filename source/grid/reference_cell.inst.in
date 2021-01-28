@@ -16,8 +16,9 @@
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
-    template void Type::make_triangulation(
-      Triangulation<deal_II_dimension, deal_II_space_dimension> & tria) const;
+    template void make_triangulation(
+      const Type &                                               reference_cell,
+      Triangulation<deal_II_dimension, deal_II_space_dimension> &tria);
 
     template std::unique_ptr<
       Mapping<deal_II_dimension, deal_II_space_dimension>>
