@@ -521,6 +521,65 @@ public:
   void
   read_msh(std::istream &in);
 
+#ifdef DEAL_II_GMSH_WITH_API
+  /**
+   * Read grid data using Gmsh API. Any file supported by Gmsh can be passed as
+   * argument. The format is deduced from the filename extension.
+   *
+   * This function interprets non-named physical ids (gmsh format < 4.0) as
+   * material or boundary ids (similarly to what happens with the other
+   * read_msh() function). If you want to specify non default manifold or
+   * boundary ids, you must group all entities that require a non default
+   * boundary or manifold id into named physical groups, where the name is
+   * interpreted using the function Patterns::Tools::to_value() applied to a
+   * `std::map<std::string, int>`. The keys can be either `MaterialID` (if the
+   * physical group refers to object of dimension `dim`), `BoundaryID` (if the
+   * group refers to objects of dimension < `dim`), or `ManifoldID`.
+   *
+   * From the Gmsh documentation, the formats of the physical tags follows the
+   * following conventions:
+   * @code
+   * $PhysicalNames // same as MSH version 2
+   *   numPhysicalNames(ASCII int)
+   *   dimension(ASCII int) physicalTag(ASCII int) "name"(127 characters max)
+   *   ...
+   * $EndPhysicalNames
+   * @endcode
+   *
+   * For example, the following snippet of mesh file
+   * @code
+   * MeshFormat
+   * 4.1 0 8
+   * $EndMeshFormat
+   * $PhysicalNames
+   * 4
+   * 1 1 "ManifoldID:0"
+   * 1 2 "BoundaryID: -1, ManifoldID: 1"
+   * 2 3 "ManifoldID: 1"
+   * 2 4 "MaterialID: 2, ManifoldID: 1"
+   * $EndPhysicalNames
+   * $Entities
+   * ...
+   * @endcode
+   *
+   * refers to a two dimensional grid where:
+   * - a portion of the boundary of dimension 1 has physical tag 1, and manifold
+   *   id 0
+   * - some internal faces (lines of dimension 1) have manifold id 1
+   * - some elements have manifold id 1 (and material id equal to the default
+   *   value, i.e., zero)
+   * - some elements have manifold id 1 and material id equal to 2
+   *
+   * If the physical groups are not named, then the behaviour is the same as
+   * the other read_msh() function, i.e., the physical tag itself is interpreted
+   * as a boundary or material id.
+   *
+   * @ingroup simplex
+   */
+  void
+  read_msh(const std::string &filename);
+#endif
+
   /**
    * Read grid data from a file containing tecplot ASCII data. This also works
    * in the absence of any tecplot installation.
