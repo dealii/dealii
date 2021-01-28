@@ -210,6 +210,9 @@ public:
   virtual bool
   preserves_vertex_locations() const override;
 
+  virtual bool
+  is_compatible_with(const ReferenceCell::Type &cell_type) const override;
+
   /**
    * Return the mapped vertices of a cell.
    *

@@ -85,6 +85,9 @@ public:
                      &cell) const override;
 
 
+  virtual bool
+  is_compatible_with(const ReferenceCell::Type &cell_type) const override;
+
   /**
    * Always returns @p true because the default implementation of functions in
    * this class preserves vertex locations.
@@ -603,6 +606,8 @@ MappingFE<dim, spacedim>::preserves_vertex_locations() const
 {
   return true;
 }
+
+
 
 #endif // DOXYGEN
 
