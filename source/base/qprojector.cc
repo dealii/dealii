@@ -27,52 +27,55 @@ namespace internal
 {
   namespace QProjector
   {
-    Quadrature<2>
-    reflect(const Quadrature<2> &q)
+    namespace
     {
-      // Take the points and reflect them by the diagonal
-      std::vector<Point<2>> q_points(q.get_points());
-      for (Point<2> &p : q_points)
-        std::swap(p[0], p[1]);
+      Quadrature<2>
+      reflect(const Quadrature<2> &q)
+      {
+        // Take the points and reflect them by the diagonal
+        std::vector<Point<2>> q_points(q.get_points());
+        for (Point<2> &p : q_points)
+          std::swap(p[0], p[1]);
 
-      return Quadrature<2>(q_points, q.get_weights());
-    }
+        return Quadrature<2>(q_points, q.get_weights());
+      }
 
 
-    Quadrature<2>
-    rotate(const Quadrature<2> &q, const unsigned int n_times)
-    {
-      std::vector<Point<2>> q_points(q.size());
-      for (unsigned int i = 0; i < q.size(); ++i)
-        {
-          switch (n_times % 4)
-            {
-              case 0:
-                // 0 degree. the point remains as it is.
-                q_points[i] = q.point(i);
-                break;
+      Quadrature<2>
+      rotate(const Quadrature<2> &q, const unsigned int n_times)
+      {
+        std::vector<Point<2>> q_points(q.size());
+        for (unsigned int i = 0; i < q.size(); ++i)
+          {
+            switch (n_times % 4)
+              {
+                case 0:
+                  // 0 degree. the point remains as it is.
+                  q_points[i] = q.point(i);
+                  break;
 
-              case 1:
-                // 90 degree counterclockwise
-                q_points[i][0] = 1.0 - q.point(i)[1];
-                q_points[i][1] = q.point(i)[0];
-                break;
-              case 2:
-                // 180 degree counterclockwise
-                q_points[i][0] = 1.0 - q.point(i)[0];
-                q_points[i][1] = 1.0 - q.point(i)[1];
-                break;
-              case 3:
-                // 270 degree counterclockwise
-                q_points[i][0] = q.point(i)[1];
-                q_points[i][1] = 1.0 - q.point(i)[0];
-                break;
-            }
-        }
+                case 1:
+                  // 90 degree counterclockwise
+                  q_points[i][0] = 1.0 - q.point(i)[1];
+                  q_points[i][1] = q.point(i)[0];
+                  break;
+                case 2:
+                  // 180 degree counterclockwise
+                  q_points[i][0] = 1.0 - q.point(i)[0];
+                  q_points[i][1] = 1.0 - q.point(i)[1];
+                  break;
+                case 3:
+                  // 270 degree counterclockwise
+                  q_points[i][0] = q.point(i)[1];
+                  q_points[i][1] = 1.0 - q.point(i)[0];
+                  break;
+              }
+          }
 
-      return Quadrature<2>(q_points, q.get_weights());
-    }
-  } // namespace QProjector
+        return Quadrature<2>(q_points, q.get_weights());
+      }
+    } // namespace
+  }   // namespace QProjector
 } // namespace internal
 
 
