@@ -2109,6 +2109,18 @@ namespace GridTools
   partition_multigrid_levels(Triangulation<dim, spacedim> &triangulation);
 
   /**
+   * This function allows to ask for the owning subdomain of cells identified by
+   * CellId objects that do not have to exist on the current process.
+   *
+   * @note This function has not been implemented yet for
+   *   parallel::fullydistributed::Triangulation.
+   */
+  template <int dim, int spacedim>
+  std::vector<types::subdomain_id>
+  get_subdomain_association(const Triangulation<dim, spacedim> &triangulation,
+                            const std::vector<CellId> &         cell_ids);
+
+  /**
    * For each active cell, return in the output array to which subdomain (as
    * given by the <tt>cell->subdomain_id()</tt> function) it belongs. The
    * output array is supposed to have the right size already when calling this
@@ -2142,7 +2154,6 @@ namespace GridTools
   count_cells_with_subdomain_association(
     const Triangulation<dim, spacedim> &triangulation,
     const types::subdomain_id           subdomain);
-
 
   /**
    * For a triangulation, return a mask that represents which of its vertices

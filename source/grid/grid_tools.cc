@@ -18,6 +18,8 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/thread_management.h>
 
+#include <deal.II/distributed/fully_distributed_tria.h>
+#include <deal.II/distributed/p4est_wrappers.h>
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
 
@@ -3023,6 +3025,101 @@ namespace GridTools
           }
       }
   }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<types::subdomain_id>
+  get_subdomain_association(const Triangulation<dim, spacedim> &triangulation,
+                            const std::vector<CellId> &         cell_ids)
+  {
+    std::vector<types::subdomain_id> subdomain_ids;
+    subdomain_ids.reserve(cell_ids.size());
+
+    if (dynamic_cast<
+          const parallel::fullydistributed::Triangulation<dim, spacedim> *>(
+          &triangulation) != nullptr)
+      {
+        Assert(false, ExcNotImplemented());
+      }
+    else if (const parallel::distributed::Triangulation<dim, spacedim>
+               *parallel_tria = dynamic_cast<
+                 const parallel::distributed::Triangulation<dim, spacedim> *>(
+                 &triangulation))
+      {
+#ifndef DEAL_II_WITH_P4EST
+        Assert(
+          false,
+          ExcMessage(
+            "You are attempting to use a functionality that is only available "
+            "if deal.II was configured to use p4est, but cmake did not find a "
+            "valid p4est library."));
+#else
+        // for parallel distributed triangulations, we will ask the p4est oracle
+        // about the global partitioning of active cells since this information
+        // is stored on every process
+        for (const auto &cell_id : cell_ids)
+          {
+            // find descendent from coarse quadrant
+            typename dealii::internal::p4est::types<dim>::quadrant p4est_cell,
+              p4est_children[GeometryInfo<dim>::max_children_per_cell];
+
+            dealii::internal::p4est::init_coarse_quadrant<dim>(p4est_cell);
+            for (const auto &child_index : cell_id.get_child_indices())
+              {
+                dealii::internal::p4est::init_quadrant_children<dim>(
+                  p4est_cell, p4est_children);
+                p4est_cell =
+                  p4est_children[static_cast<unsigned int>(child_index)];
+              }
+
+            // find owning process, i.e., the subdomain id
+            const int owner =
+              dealii::internal::p4est::functions<dim>::comm_find_owner(
+                const_cast<typename dealii::internal::p4est::types<dim>::forest
+                             *>(parallel_tria->get_p4est()),
+                cell_id.get_coarse_cell_id(),
+                &p4est_cell,
+                Utilities::MPI::this_mpi_process(
+                  parallel_tria->get_communicator()));
+
+            Assert(owner >= 0, ExcMessage("p4est should know the owner."));
+
+            subdomain_ids.push_back(owner);
+          }
+#endif
+      }
+    else if (const parallel::shared::Triangulation<dim, spacedim> *shared_tria =
+               dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>
+                              *>(&triangulation))
+      {
+        // for parallel shared triangulations, we need to access true subdomain
+        // ids which are also valid for artificial cells
+        const std::vector<types::subdomain_id> &true_subdomain_ids_of_cells =
+          shared_tria->get_true_subdomain_ids_of_cells();
+
+        for (const auto &cell_id : cell_ids)
+          {
+            const unsigned int active_cell_index =
+              shared_tria->create_cell_iterator(cell_id)->active_cell_index();
+            subdomain_ids.push_back(
+              true_subdomain_ids_of_cells[active_cell_index]);
+          }
+      }
+    else
+      {
+        // the most general type of triangulation is the serial one. here, all
+        // subdomain information is directly available
+        for (const auto &cell_id : cell_ids)
+          {
+            subdomain_ids.push_back(
+              triangulation.create_cell_iterator(cell_id)->subdomain_id());
+          }
+      }
+
+    return subdomain_ids;
+  }
+
 
 
   template <int dim, int spacedim>
