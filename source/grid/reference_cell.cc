@@ -94,16 +94,13 @@ namespace ReferenceCell
 
   template <int dim, int spacedim>
   void
-  make_triangulation(const Type &                  reference_cell,
-                     Triangulation<dim, spacedim> &tria)
+  Type::make_triangulation(Triangulation<dim, spacedim> &tria) const
   {
-    AssertDimension(dim, reference_cell.get_dimension());
-
-    if (reference_cell == Type::get_hypercube<dim>())
+    if (this->is_hyper_cube())
       {
         GridGenerator::hyper_cube(tria, 0, 1);
       }
-    else if ((dim == 2) && (reference_cell == Type::Tri))
+    else if ((dim == 2) && (*this == Tri))
       {
         const std::vector<Point<spacedim>> vertices = {
           Point<spacedim>(),               // the origin
@@ -116,7 +113,7 @@ namespace ReferenceCell
 
         tria.create_triangulation(vertices, cells, {});
       }
-    else if ((dim == 3) && (reference_cell == Type::Tet))
+    else if ((dim == 3) && (*this == Tet))
       {
         AssertDimension(spacedim, 3);
 
@@ -128,7 +125,7 @@ namespace ReferenceCell
 
         tria.create_triangulation(vertices, cells, {});
       }
-    else if ((dim == 3) && (reference_cell == Type::Pyramid))
+    else if ((dim == 3) && (*this == Pyramid))
       {
         AssertDimension(spacedim, 3);
 
@@ -144,7 +141,7 @@ namespace ReferenceCell
 
         tria.create_triangulation(vertices, cells, {});
       }
-    else if ((dim == 3) && (reference_cell == Type::Wedge))
+    else if ((dim == 3) && (*this == Wedge))
       {
         AssertDimension(spacedim, 3);
 
@@ -285,7 +282,7 @@ namespace ReferenceCell
 
     const auto create_quadrature = [](const Type &reference_cell) {
       Triangulation<dim> tria;
-      make_triangulation(reference_cell, tria);
+      reference_cell.make_triangulation(tria);
 
       return Quadrature<dim>(tria.get_vertices());
     };
