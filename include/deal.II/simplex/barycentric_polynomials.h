@@ -227,11 +227,16 @@ namespace Simplex
     static BarycentricPolynomials<dim>
     get_fe_p_basis(const unsigned int degree);
 
-    /*
+    /**
      * Constructor taking the polynomial @p degree as input.
      */
     BarycentricPolynomials(
       const std::vector<BarycentricPolynomial<dim>> &polynomials);
+
+    /**
+     * Access operator.
+     */
+    const BarycentricPolynomial<dim> &operator[](const std::size_t i) const;
 
     /**
      * @copydoc ScalarPolynomialsBase::evaluate()
@@ -695,6 +700,14 @@ namespace Simplex
         temp %= slice_size;
       }
     return result;
+  }
+
+  template <int dim>
+  const BarycentricPolynomial<dim> &BarycentricPolynomials<dim>::
+                                    operator[](const std::size_t i) const
+  {
+    AssertIndexRange(i, polys.size());
+    return polys[i];
   }
 } // namespace Simplex
 
