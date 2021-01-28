@@ -653,8 +653,9 @@ namespace VectorTools
       {
         const Quadrature<dim> quad(fe.get_unit_support_points());
 
-        const auto map_q = ReferenceCell::get_default_mapping<dim, spacedim>(
-          fe.reference_cell_type(), fe.degree);
+        const auto map_q =
+          fe.reference_cell_type().template get_default_mapping<dim, spacedim>(
+            fe.degree);
         FEValues<dim, spacedim>              fe_v(*map_q,
                                      fe,
                                      quad,

@@ -1608,8 +1608,7 @@ namespace FETools
     ReferenceCell::make_triangulation(reference_cell_type, tr);
 
     const auto &mapping =
-      ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-        reference_cell_type);
+      reference_cell_type.template get_default_linear_mapping<dim, spacedim>();
 
     // Choose a Gauss quadrature rule that is exact up to degree 2n-1
     const unsigned int degree =
@@ -1822,8 +1821,8 @@ namespace FETools
         const unsigned int degree = fe.degree;
 
         const auto &mapping =
-          ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-            reference_cell_type);
+          reference_cell_type
+            .template get_default_linear_mapping<dim, spacedim>();
         const auto &q_fine =
           ReferenceCell::get_gauss_type_quadrature<dim>(reference_cell_type,
                                                         degree + 1);
@@ -2291,8 +2290,8 @@ namespace FETools
                 q_points_coarse[q](j) = q_points_fine[q](j);
             Quadrature<dim> q_coarse(q_points_coarse, fine.get_JxW_values());
             FEValues<dim, spacedim> coarse(
-              ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-                coarse_cell->reference_cell_type()),
+              coarse_cell->reference_cell_type()
+                .template get_default_linear_mapping<dim, spacedim>(),
               fe,
               q_coarse,
               update_values);

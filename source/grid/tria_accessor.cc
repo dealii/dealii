@@ -1857,8 +1857,8 @@ CellAccessor<3>::point_inside(const Point<3> &p) const
     {
       const TriaRawIterator<CellAccessor<dim, spacedim>> cell_iterator(*this);
       return (GeometryInfo<dim>::is_inside_unit_cell(
-        ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-          reference_cell_type())
+        reference_cell_type()
+          .template get_default_linear_mapping<dim, spacedim>()
           .transform_real_to_unit_cell(cell_iterator, p)));
     }
   catch (const Mapping<dim, spacedim>::ExcTransformationFailed &)

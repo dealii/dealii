@@ -176,8 +176,8 @@ namespace GridTools
   double
   volume(const Triangulation<dim, spacedim> &tria,
          const Mapping<dim, spacedim> &      mapping =
-           ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-             ReferenceCell::Type::get_hypercube<dim>()));
+           (ReferenceCell::Type::get_hypercube<dim>()
+              .template get_default_linear_mapping<dim, spacedim>()));
 
   /**
    * Return an approximation of the diameter of the smallest active cell of a
@@ -194,8 +194,8 @@ namespace GridTools
   minimal_cell_diameter(
     const Triangulation<dim, spacedim> &triangulation,
     const Mapping<dim, spacedim> &      mapping =
-      ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-        ReferenceCell::Type::get_hypercube<dim>()));
+      (ReferenceCell::Type::get_hypercube<dim>()
+         .template get_default_linear_mapping<dim, spacedim>()));
 
   /**
    * Return an approximation of the diameter of the largest active cell of a
@@ -212,8 +212,8 @@ namespace GridTools
   maximal_cell_diameter(
     const Triangulation<dim, spacedim> &triangulation,
     const Mapping<dim, spacedim> &      mapping =
-      ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-        ReferenceCell::Type::get_hypercube<dim>()));
+      (ReferenceCell::Type::get_hypercube<dim>()
+         .template get_default_linear_mapping<dim, spacedim>()));
 
   /**
    * Given a list of vertices (typically obtained using
@@ -1044,8 +1044,8 @@ namespace GridTools
   extract_used_vertices(
     const Triangulation<dim, spacedim> &container,
     const Mapping<dim, spacedim> &      mapping =
-      ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-        ReferenceCell::Type::get_hypercube<dim>()));
+      (ReferenceCell::Type::get_hypercube<dim>()
+         .template get_default_linear_mapping<dim, spacedim>()));
 
   /**
    * Find and return the index of the closest vertex to a given point in the
@@ -1872,8 +1872,8 @@ namespace GridTools
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
     const Point<spacedim> &                                            position,
     const Mapping<dim, spacedim> &                                     mapping =
-      ReferenceCell::get_default_linear_mapping<dim, spacedim>(
-        ReferenceCell::Type::get_hypercube<dim>()));
+      (ReferenceCell::Type::get_hypercube<dim>()
+         .template get_default_linear_mapping<dim, spacedim>()));
 
   /**
    * Compute a globally unique index for each vertex and hanging node

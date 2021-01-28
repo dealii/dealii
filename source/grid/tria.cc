@@ -9611,9 +9611,9 @@ namespace internal
                         // to check it, transform to the unit cell
                         // with a linear mapping
                         const Point<dim> new_unit =
-                          ReferenceCell::get_default_linear_mapping<dim,
-                                                                    spacedim>(
-                            cell->reference_cell_type())
+                          cell->reference_cell_type()
+                            .template get_default_linear_mapping<dim,
+                                                                 spacedim>()
                             .transform_real_to_unit_cell(cell, new_bound);
 
                         // Now, we have to calculate the distance from
