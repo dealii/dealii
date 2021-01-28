@@ -7,7 +7,8 @@ An error occurred in file <parameter_handler.cc> in function
 The violated condition was: 
     subsection_path.size() != 0
 Additional information: 
-    You can't leave a subsection if you are already at the top level of the subsection hierarchy.
+    You can't leave a subsection if you are already at the top level of
+    the subsection hierarchy.
 --------------------------------------------------------
 
 DEAL::
@@ -22,7 +23,8 @@ An error occurred in file <parameter_handler.cc> in function
 The violated condition was: 
     subsection_path.size() != 0
 Additional information: 
-    You can't leave a subsection if you are already at the top level of the subsection hierarchy.
+    You can't leave a subsection if you are already at the top level of
+    the subsection hierarchy.
 --------------------------------------------------------
 
 DEAL::
