@@ -7,12 +7,7 @@ on:
 jobs:
   build-master-docker:
     runs-on: ubuntu-latest
-    steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.7.0
-        with:
-          access_token: ${{ github.token }}
-          
+    steps:          
       - name: Checkout code
         uses: actions/checkout@v2
 
