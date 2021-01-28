@@ -1098,6 +1098,53 @@ public:
   void
   write_msh(const Triangulation<dim, spacedim> &tria, std::ostream &out) const;
 
+#ifdef DEAL_II_GMSH_WITH_API
+  /**
+   * Write the triangulation in any format supported by gmsh API.
+   *
+   * Gmsh API allows writing its output in several formats through their C++
+   * API. This function translates a Triangulation object into a gmsh collection
+   * of entities and calls the gmsh::write() method with the filename passed as
+   * argument. This method generates a different entity for each unique pair of
+   * non default manifold id and boundary id, and writes a gmsh physical group
+   * for each unique combination, allowing you to read back the triangulation
+   * using the GridIn::read_msh() method that takes a string as argument.
+   *
+   * In particular, all cell objects with non default boundary id or non
+   * default manifold id are grouped in a unique physical tag, whose name
+   * contains the boundary and manifold indicators. The names are constructed
+   * using Patterns::Tools::to_value() applied to a `std::map<std::string, int>`
+   * where the keys are either `MaterialID`, `BoundaryID`, or `ManifoldID`,
+   * i.e., a cell with material id 1, and manifold id 3 would be grouped in a
+   * physical tag (whose numbering is not specified), named
+   * `MaterialID:1, ManifoldID:3`.
+   *
+   * For example, calling the method with a hyper ball grid refined once,
+   * would results in the following physical tags defined in the output file:
+   * @code
+   * MeshFormat
+   * 4.1 0 8
+   * $EndMeshFormat
+   * $PhysicalNames
+   * 3
+   * 1 1 "ManifoldID:0"
+   * 1 2 "BoundaryID:-1, ManifoldID:1"
+   * 2 3 "ManifoldID:1"
+   * $EndPhysicalNames
+   * $Entities
+   * ...
+   * @endcode
+   *
+   * The special boundary id `-1` is used to indicate internal boundaries. The
+   * internal boundaries must be specified whenever it is necessary to specify
+   * a non-flat manifold id.
+   */
+  template <int dim, int spacedim>
+  void
+  write_msh(const Triangulation<dim, spacedim> &tria,
+            const std::string &                 filename) const;
+#endif
+
   /**
    * Write the triangulation in the ucd format.
    *
