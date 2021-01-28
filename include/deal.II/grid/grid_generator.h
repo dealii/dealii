@@ -769,6 +769,58 @@ namespace GridGenerator
                       const double        radius = 1.);
 
   /**
+   * Generate a 2D mesh consisting of the unit square joined with a copy shifted
+   * by $s = (1,0)$. Depending on the flags passed either the right or the left
+   * square is rotated by $\pi/2$. This way one can generate a mesh in which one
+   * square possibly contains an edge that has the opposite tangential (and
+   * hence also opposite normal) orientation of the neighboring edge of the
+   * other square.
+   *
+   * This mesh is not overly useful from a practical point of view. For
+   * debugging purposes it can be used to check for orientation issues for
+   * vector- or tensor-valued finite elements.
+   *
+   * @note If <code>rotate_left_square==rotate_right_square</code> the mesh is consistently oriented.
+   *
+   * @param[out] tria The input triangulation.
+   * @param[in] rotate_left_square <code>true</code> if the left square is
+   * rotated by $\pi/2$.
+   * @param[in] rotate_right_square <code>true</code> if the right square is
+   * rotated by $\pi/2$.
+   */
+  void non_standard_orientation_mesh(Triangulation<2> &tria,
+                                     const bool        rotate_left_square,
+                                     const bool        rotate_right_square);
+
+  /**
+   * Generate a 3D mesh consisting of the unit cube joined with a copy shifted
+   * by $s = (1,0,0)$. Depending on the flags passed either the right or the
+   * left cube (when looking at the positively oriented (x,z)-plane) contains a
+   * face that is either not in standard orientation and/or is rotated by either
+   * $\pi/2$, $\pi$ or $3/2\pi$.
+   *
+   * This mesh is not overly useful from a practical point of view. For
+   * debugging purposes it can be used to check for orientation issues for
+   * vector- or tensor-valued finite elements.
+   *
+   * @param[out] tria The input triangulation.
+   * @param[in] face_orientation <code>true</code> if the face is the not in
+   * standard orientation.
+   * @param[in] face_flip <code>true</code> if the face is rotated by +180
+   * degrees
+   * @param[in] face_rotation <code>true</code> if the face is rotated
+   * (additionally) by +90 degrees
+   * @param[in] manipulate_left_cube <code>true</code> if the left cube is
+   * to be re-ordered. If `false`, it is the right cube.
+   */
+  void non_standard_orientation_mesh(Triangulation<3> &tria,
+                                     const bool        face_orientation,
+                                     const bool        face_flip,
+                                     const bool        face_rotation,
+                                     const bool        manipulate_left_cube);
+
+
+  /**
    * Creates a hyper sphere, i.e., a surface of a ball in @p spacedim
    * dimensions. This function only exists for dim+1=spacedim in 2 and 3 space
    * dimensions. (To create a mesh of a ball, use GridGenerator::hyper_ball().)
