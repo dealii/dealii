@@ -1580,6 +1580,7 @@ namespace GridGenerator
   }
 
 
+
   template <int dim, int spacedim>
   void
   hyper_cube(Triangulation<dim, spacedim> &tria,
@@ -1598,6 +1599,8 @@ namespace GridGenerator
       }
     hyper_rectangle(tria, p1, p2, colorize);
   }
+
+
 
   template <int dim>
   void
@@ -1710,6 +1713,82 @@ namespace GridGenerator
     tria.create_triangulation(points, cells, SubCellData());
   }
 
+
+
+  template <int dim, int spacedim>
+  void
+  reference_cell(const ReferenceCell::Type &   reference_cell,
+                 Triangulation<dim, spacedim> &tria)
+  {
+    AssertDimension(dim, reference_cell.get_dimension());
+
+    if (reference_cell == ReferenceCell::Type::get_hypercube<dim>())
+      {
+        GridGenerator::hyper_cube(tria, 0, 1);
+      }
+    else if ((dim == 2) && (reference_cell == ReferenceCell::Type::Tri))
+      {
+        const std::vector<Point<spacedim>> vertices = {
+          Point<spacedim>(),               // the origin
+          Point<spacedim>::unit_vector(0), // unit point along x-axis
+          Point<spacedim>::unit_vector(1)  // unit point along y-axis
+        };
+
+        std::vector<CellData<dim>> cells(1);
+        cells[0].vertices = {0, 1, 2};
+
+        tria.create_triangulation(vertices, cells, {});
+      }
+    else if ((dim == 3) && (reference_cell == ReferenceCell::Type::Tet))
+      {
+        AssertDimension(spacedim, 3);
+
+        static const std::vector<Point<spacedim>> vertices = {
+          {{0.0, 0.0, 0.0}, {1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}}};
+
+        std::vector<CellData<dim>> cells(1);
+        cells[0].vertices = {0, 1, 2, 3};
+
+        tria.create_triangulation(vertices, cells, {});
+      }
+    else if ((dim == 3) && (reference_cell == ReferenceCell::Type::Pyramid))
+      {
+        AssertDimension(spacedim, 3);
+
+        static const std::vector<Point<spacedim>> vertices = {
+          {{-1.0, -1.0, 0.0},
+           {+1.0, -1.0, 0.0},
+           {-1.0, +1.0, 0.0},
+           {+1.0, +1.0, 0.0},
+           {+0.0, +0.0, 1.0}}};
+
+        std::vector<CellData<dim>> cells(1);
+        cells[0].vertices = {0, 1, 2, 3, 4};
+
+        tria.create_triangulation(vertices, cells, {});
+      }
+    else if ((dim == 3) && (reference_cell == ReferenceCell::Type::Wedge))
+      {
+        AssertDimension(spacedim, 3);
+
+        static const std::vector<Point<spacedim>> vertices = {
+          {{1.0, 0.0, 0.0},
+           {0.0, 1.0, 0.0},
+           {0.0, 0.0, 0.0},
+           {1.0, 0.0, 1.0},
+           {0.0, 1.0, 1.0},
+           {0.0, 0.0, 1.0}}};
+
+        std::vector<CellData<dim>> cells(1);
+        cells[0].vertices = {0, 1, 2, 3, 4, 5};
+
+        tria.create_triangulation(vertices, cells, {});
+      }
+    else
+      {
+        Assert(false, ExcNotImplemented());
+      }
+  }
 
   void moebius(Triangulation<3> & tria,
                const unsigned int n_cells,

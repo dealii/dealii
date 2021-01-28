@@ -712,15 +712,6 @@ namespace ReferenceCell
     return {};
   }
 
-  /*
-   * Create a (coarse) grid with a single cell of the shape of the provided
-   * reference cell.
-   */
-  template <int dim, int spacedim>
-  void
-  make_triangulation(const Type &                  reference_cell,
-                     Triangulation<dim, spacedim> &tria);
-
   /**
    * Return a default linear mapping that works for the given triangulation.
    * Internally, this function calls the function above for the reference
