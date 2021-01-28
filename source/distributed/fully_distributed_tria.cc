@@ -407,16 +407,156 @@ namespace parallel
     void
     Triangulation<dim, spacedim>::update_cell_relations()
     {
-      AssertThrow(false, ExcNotImplemented());
+      // Reorganize memory for local_cell_relations.
+      this->local_cell_relations.resize(this->n_locally_owned_active_cells());
+      this->local_cell_relations.shrink_to_fit();
+
+      unsigned int cell_id = 0;
+
+      for (auto cell = this->begin_active(); cell != this->end(); ++cell)
+        {
+          if (!cell->is_locally_owned())
+            continue;
+
+          this->local_cell_relations[cell_id] =
+            std::make_tuple(Triangulation<dim, spacedim>::CELL_PERSIST, cell);
+          ++cell_id;
+        }
     }
+
+
 
     template <int dim, int spacedim>
     void
     Triangulation<dim, spacedim>::save(const std::string &filename) const
     {
+#ifdef DEAL_II_WITH_MPI
+      AssertThrow(this->cell_attached_data.pack_callbacks_variable.size() == 0,
+                  ExcNotImplemented());
+
+      Assert(
+        this->cell_attached_data.n_attached_deserialize == 0,
+        ExcMessage(
+          "Not all SolutionTransfer objects have been deserialized after the last call to load()."));
+      Assert(this->n_cells() > 0,
+             ExcMessage("Can not save() an empty Triangulation."));
+
+      const int myrank =
+        Utilities::MPI::this_mpi_process(this->mpi_communicator);
+      const int mpisize =
+        Utilities::MPI::n_mpi_processes(this->mpi_communicator);
+
+      // Compute global offset for each rank.
+      unsigned int n_locally_owned_cells = this->n_locally_owned_active_cells();
+
+      unsigned int global_first_cell = 0;
+
+      int ierr = MPI_Exscan(&n_locally_owned_cells,
+                            &global_first_cell,
+                            1,
+                            MPI_UNSIGNED,
+                            MPI_SUM,
+                            this->mpi_communicator);
+      AssertThrowMPI(ierr);
+
+      global_first_cell *= sizeof(unsigned int);
+
+
+      if (myrank == 0)
+        {
+          std::string   fname = std::string(filename) + ".info";
+          std::ofstream f(fname.c_str());
+          f << "version nproc n_attached_fixed_size_objs n_attached_variable_size_objs n_global_active_cells"
+            << std::endl
+            << 4 << " "
+            << Utilities::MPI::n_mpi_processes(this->mpi_communicator) << " "
+            << this->cell_attached_data.pack_callbacks_fixed.size() << " "
+            << this->cell_attached_data.pack_callbacks_variable.size() << " "
+            << this->n_global_active_cells() << std::endl;
+        }
+
+      // Save cell attached data.
+      this->save_attached_data(global_first_cell,
+                               this->n_global_active_cells(),
+                               filename);
+
+      // Save triangulation description.
+      {
+        MPI_Info info;
+        int      ierr = MPI_Info_create(&info);
+        AssertThrowMPI(ierr);
+
+        const std::string fname_tria = filename + "_triangulation.data";
+
+        // Open file.
+        MPI_File fh;
+        ierr = MPI_File_open(this->mpi_communicator,
+                             DEAL_II_MPI_CONST_CAST(fname_tria.c_str()),
+                             MPI_MODE_CREATE | MPI_MODE_WRONLY,
+                             info,
+                             &fh);
+        AssertThrowMPI(ierr);
+
+        ierr = MPI_File_set_size(fh, 0); // delete the file contents
+        AssertThrowMPI(ierr);
+        // this barrier is necessary, because otherwise others might already
+        // write while one core is still setting the size to zero.
+        ierr = MPI_Barrier(this->mpi_communicator);
+        AssertThrowMPI(ierr);
+        ierr = MPI_Info_free(&info);
+        AssertThrowMPI(ierr);
+        // ------------------
+
+        // Create construction data.
+        const auto construction_data = TriangulationDescription::Utilities::
+          create_description_from_triangulation(*this,
+                                                this->mpi_communicator,
+                                                this->settings);
+
+        // Pack.
+        std::vector<char> buffer;
+        dealii::Utilities::pack(construction_data, buffer, false);
+
+        // Write offsets to file.
+        unsigned int buffer_size = buffer.size();
+
+        unsigned int offset = 0;
+
+        ierr = MPI_Exscan(&buffer_size,
+                          &offset,
+                          1,
+                          MPI_UNSIGNED,
+                          MPI_SUM,
+                          this->mpi_communicator);
+        AssertThrowMPI(ierr);
+
+        // Write offsets to file.
+        ierr = MPI_File_write_at(fh,
+                                 myrank * sizeof(unsigned int),
+                                 DEAL_II_MPI_CONST_CAST(&buffer_size),
+                                 1,
+                                 MPI_UNSIGNED,
+                                 MPI_STATUS_IGNORE);
+        AssertThrowMPI(ierr);
+
+        // Write buffers to file.
+        ierr = MPI_File_write_at(fh,
+                                 mpisize * sizeof(unsigned int) +
+                                   offset, // global position in file
+                                 DEAL_II_MPI_CONST_CAST(buffer.data()),
+                                 buffer.size(), // local buffer
+                                 MPI_CHAR,
+                                 MPI_STATUS_IGNORE);
+        AssertThrowMPI(ierr);
+
+        ierr = MPI_File_close(&fh);
+        AssertThrowMPI(ierr);
+      }
+#else
       (void)filename;
 
-      AssertThrow(false, ExcNotImplemented());
+      AssertThrow(false, ExcNeedsMPI());
+#endif
     }
 
 
@@ -426,10 +566,143 @@ namespace parallel
     Triangulation<dim, spacedim>::load(const std::string &filename,
                                        const bool         autopartition)
     {
+#ifdef DEAL_II_WITH_MPI
+      AssertThrow(
+        autopartition == false,
+        ExcMessage(
+          "load() only works if run with the same number of MPI processes used for saving the triangulation, hence autopartition is disabled."));
+
+      Assert(this->n_cells() == 0,
+             ExcMessage("load() only works if the Triangulation is empty!"));
+
+      // Compute global offset for each rank.
+      unsigned int n_locally_owned_cells = this->n_locally_owned_active_cells();
+
+      unsigned int global_first_cell = 0;
+
+      int ierr = MPI_Exscan(&n_locally_owned_cells,
+                            &global_first_cell,
+                            1,
+                            MPI_UNSIGNED,
+                            MPI_SUM,
+                            this->mpi_communicator);
+      AssertThrowMPI(ierr);
+
+      global_first_cell *= sizeof(unsigned int);
+
+
+      unsigned int version, numcpus, attached_count_fixed,
+        attached_count_variable, n_global_active_cells;
+      {
+        std::string   fname = std::string(filename) + ".info";
+        std::ifstream f(fname.c_str());
+        AssertThrow(f, ExcIO());
+        std::string firstline;
+        getline(f, firstline); // skip first line
+        f >> version >> numcpus >> attached_count_fixed >>
+          attached_count_variable >> n_global_active_cells;
+      }
+
+      AssertThrow(version == 4,
+                  ExcMessage("Incompatible version found in .info file."));
+      Assert(this->n_global_active_cells() == n_global_active_cells,
+             ExcMessage("Number of global active cells differ!"));
+
+      // Load description and construct the triangulation.
+      {
+        const int myrank =
+          Utilities::MPI::this_mpi_process(this->mpi_communicator);
+        const int mpisize =
+          Utilities::MPI::n_mpi_processes(this->mpi_communicator);
+
+        AssertDimension(numcpus, mpisize);
+
+        // Open file.
+        MPI_Info info;
+        int      ierr = MPI_Info_create(&info);
+        AssertThrowMPI(ierr);
+
+        const std::string fname_tria = filename + "_triangulation.data";
+
+        MPI_File fh;
+        ierr = MPI_File_open(this->mpi_communicator,
+                             DEAL_II_MPI_CONST_CAST(fname_tria.c_str()),
+                             MPI_MODE_RDONLY,
+                             info,
+                             &fh);
+        AssertThrowMPI(ierr);
+
+        ierr = MPI_Info_free(&info);
+        AssertThrowMPI(ierr);
+
+        // Read offsets from file.
+        unsigned int buffer_size;
+
+        ierr = MPI_File_read_at(fh,
+                                myrank * sizeof(unsigned int),
+                                DEAL_II_MPI_CONST_CAST(&buffer_size),
+                                1,
+                                MPI_UNSIGNED,
+                                MPI_STATUS_IGNORE);
+        AssertThrowMPI(ierr);
+
+        unsigned int offset = 0;
+
+        ierr = MPI_Exscan(&buffer_size,
+                          &offset,
+                          1,
+                          MPI_UNSIGNED,
+                          MPI_SUM,
+                          this->mpi_communicator);
+        AssertThrowMPI(ierr);
+
+        // Read buffers from file.
+        std::vector<char> buffer(buffer_size);
+        ierr = MPI_File_read_at(fh,
+                                mpisize * sizeof(unsigned int) +
+                                  offset, // global position in file
+                                DEAL_II_MPI_CONST_CAST(buffer.data()),
+                                buffer.size(), // local buffer
+                                MPI_CHAR,
+                                MPI_STATUS_IGNORE);
+        AssertThrowMPI(ierr);
+
+        ierr = MPI_File_close(&fh);
+        AssertThrowMPI(ierr);
+
+        auto construction_data = dealii::Utilities::template unpack<
+          TriangulationDescription::Description<dim, spacedim>>(buffer, false);
+
+        // WARNING: serialization cannot handle the MPI communicator
+        // which is the reason why we have to set it here explicitly
+        construction_data.comm = this->mpi_communicator;
+
+        this->create_triangulation(construction_data);
+      }
+
+      // clear all of the callback data, as explained in the documentation of
+      // register_data_attach()
+      this->cell_attached_data.n_attached_data_sets = 0;
+      this->cell_attached_data.n_attached_deserialize =
+        attached_count_fixed + attached_count_variable;
+
+      // Load attached cell data, if any was stored.
+      this->load_attached_data(global_first_cell,
+                               this->n_global_active_cells(),
+                               this->n_locally_owned_active_cells(),
+                               filename,
+                               attached_count_fixed,
+                               attached_count_variable);
+
+      this->update_cell_relations();
+      this->update_periodic_face_map();
+      this->update_number_cache();
+#else
       (void)filename;
       (void)autopartition;
 
-      AssertThrow(false, ExcNotImplemented());
+      AssertThrow(false, ExcNeedsMPI());
+#endif
     }
 
 
