@@ -168,6 +168,72 @@ namespace Simplex
     }
 
     /**
+     * Specify the constraints which the dofs on the two sides of a cell
+     * interface underlie if the line connects two cells of which one is refined
+     * once.
+     */
+    template <int dim>
+    FullMatrix<double>
+    constraints_fe_poly(const unsigned int /*degree*/)
+    {
+      // no constraints in 1d
+      // constraints in 3d not implemented yet
+      return FullMatrix<double>();
+    }
+
+    template <>
+    FullMatrix<double>
+    constraints_fe_poly<2>(const unsigned int degree)
+    {
+      const unsigned int dim = 2;
+
+      Assert(degree <= 2, ExcNotImplemented());
+
+      // the following implements the 2d case
+      // (the 3d case is not implemented yet)
+      //
+      // consult FE_Q_Base::Implementation::initialize_constraints()
+      // for more information
+
+      std::vector<Point<dim - 1>> constraint_points;
+      // midpoint
+      constraint_points.emplace_back(0.5);
+      if (degree == 2)
+        {
+          // midpoint on subface 0
+          constraint_points.emplace_back(0.25);
+          // midpoint on subface 1
+          constraint_points.emplace_back(0.75);
+        }
+
+      // Now construct relation between destination (child) and source (mother)
+      // dofs.
+
+      const unsigned int n_dofs_constrained = constraint_points.size();
+      unsigned int       n_dofs_per_face    = degree + 1;
+      FullMatrix<double> interface_constraints(n_dofs_constrained,
+                                               n_dofs_per_face);
+
+      const auto poly =
+        Simplex::BarycentricPolynomials<dim - 1>::get_fe_p_basis(degree);
+
+      for (unsigned int i = 0; i < n_dofs_constrained; ++i)
+        for (unsigned int j = 0; j < n_dofs_per_face; ++j)
+          {
+            interface_constraints(i, j) =
+              poly.compute_value(j, constraint_points[i]);
+
+            // if the value is small up to round-off, then simply set it to zero
+            // to avoid unwanted fill-in of the constraint matrices (which would
+            // then increase the number of other DoFs a constrained DoF would
+            // couple to)
+            if (std::fabs(interface_constraints(i, j)) < 1e-13)
+              interface_constraints(i, j) = 0;
+          }
+      return interface_constraints;
+    }
+
+    /**
      * Helper function to set up the dpo vector of FE_DGP for a given @p dim and
      * @p degree.
      */
@@ -328,6 +394,7 @@ namespace Simplex
     if (conformity == FiniteElementData<dim>::Conformity::H1)
       this->unit_face_support_points =
         unit_face_support_points_fe_poly<dim>(degree);
+    this->interface_constraints = constraints_fe_poly<dim>(degree);
   }
 
 

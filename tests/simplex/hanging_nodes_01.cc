@@ -53,7 +53,7 @@ test()
 
   // hanging node constraints
   AffineConstraints<double> constraints;
-  // DoFTools::make_hanging_node_constraints(dofh, constraints);
+  DoFTools::make_hanging_node_constraints(dofh, constraints);
   constraints.print(deallog.get_file_stream());
 
   deallog << "OK" << std::endl;
