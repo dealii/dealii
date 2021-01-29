@@ -1013,7 +1013,7 @@ namespace Step70
     // levels of the tree:
     std::vector<BoundingBox<spacedim>> all_boxes;
     all_boxes.reserve(fluid_tria.n_locally_owned_active_cells());
-    for (const auto cell : fluid_tria.active_cell_iterators())
+    for (const auto &cell : fluid_tria.active_cell_iterators())
       if (cell->is_locally_owned())
         all_boxes.emplace_back(cell->bounding_box());
 

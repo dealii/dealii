@@ -2195,7 +2195,7 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
 
   // Vertex renumbering, by dealii type
   const std::vector<std::vector<unsigned int>> gmsh_to_dealii = {
-    {{{0}},
+    {{0},
      {{0, 1}},
      {{0, 1, 2}},
      {{0, 1, 3, 2}},
