@@ -17,4 +17,3 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           sourceRunId: ${{ github.event.workflow_run.id }}
           notifyPRCancel: true
-          skipEventTypes: '["push", "schedule"]'
