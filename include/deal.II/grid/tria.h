@@ -1830,7 +1830,9 @@ public:
    * @note This function is used in step-14 and step-19.
    *
    * @note This function triggers the "create" signal after doing its work. See
-   * the section on signals in the general documentation of this class.
+   * the section on signals in the general documentation of this class. For
+   * example as a consequence of this, all DoFHandler objects connected to
+   * this triangulation will be reinitialized via DoFHandler::reinit().
    *
    * @note The check for distorted cells is only done if dim==spacedim, as
    * otherwise cells can legitimately be twisted if the manifold they describe
