@@ -566,6 +566,29 @@ test_max_norm()
 
 template <typename VectorType>
 void
+test_min_element()
+{
+  const auto vector_a = create_test_vector<VectorType>(2.0);
+  const auto vector_b = create_test_vector<VectorType>(-3.0);
+
+  auto nv_a = make_nvector_view(vector_a);
+  auto nv_b = make_nvector_view(vector_b);
+
+  auto result = N_VMin(nv_a);
+  std::cout << "result: " << result << std::endl;
+  vector_a.print(std::cout);
+  Assert(std::fabs(result - 2.0) < 1e-12, NVectorTestError());
+
+  result = N_VMin(nv_b);
+  Assert(std::fabs(result - (-3.0)) < 1e-12, NVectorTestError());
+
+  deallog << "test_min_element OK" << std::endl;
+}
+
+
+
+template <typename VectorType>
+void
 test_scale()
 {
   const auto vector_a = create_test_vector<VectorType>(2.0);
@@ -612,6 +635,7 @@ run_all_tests(const std::string &prefix)
   test_elementwise_abs<VectorType>();
   test_weighted_rms_norm<VectorType>();
   test_max_norm<VectorType>();
+  test_min_element<VectorType>();
   test_scale<VectorType>();
 }
 
