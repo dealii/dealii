@@ -48,7 +48,7 @@ namespace internal
       using gradient_type = Tensor<1, n_components, Tensor<1, dim>>;
 
       static void
-      read_value(const double &     vector_entry,
+      read_value(const double       vector_entry,
                  const unsigned int component,
                  value_type &       result)
       {
@@ -128,7 +128,7 @@ namespace internal
       using gradient_type = Tensor<1, dim>;
 
       static void
-      read_value(const double &vector_entry,
+      read_value(const double vector_entry,
                  const unsigned int,
                  value_type &result)
       {
@@ -198,7 +198,7 @@ namespace internal
       using gradient_type = Tensor<2, dim>;
 
       static void
-      read_value(const double &     vector_entry,
+      read_value(const double       vector_entry,
                  const unsigned int component,
                  value_type &       result)
       {
@@ -283,7 +283,7 @@ namespace internal
       using gradient_type = Tensor<1, 1>;
 
       static void
-      read_value(const double &vector_entry,
+      read_value(const double vector_entry,
                  const unsigned int,
                  value_type &result)
       {
