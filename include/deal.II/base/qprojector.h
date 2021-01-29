@@ -535,29 +535,6 @@ public:
      */
     DataSetDescriptor(const unsigned int dataset_offset);
   };
-
-private:
-  /**
-   * Given a quadrature object in 2d, reflect all quadrature points at the
-   * main diagonal and return them with their original weights.
-   *
-   * This function is necessary for projecting a 2d quadrature rule onto the
-   * faces of a 3d cube, since there we need both orientations.
-   */
-  static Quadrature<2>
-  reflect(const Quadrature<2> &q);
-
-  /**
-   * Given a quadrature object in 2d, rotate all quadrature points by @p
-   * n_times * 90 degrees counterclockwise and return them with their original
-   * weights.
-   *
-   * This function is necessary for projecting a 2d quadrature rule onto the
-   * faces of a 3d cube, since there we need all rotations to account for
-   * face_flip and face_rotation of non-standard faces.
-   */
-  static Quadrature<2>
-  rotate(const Quadrature<2> &q, const unsigned int n_times);
 };
 
 /*@}*/
