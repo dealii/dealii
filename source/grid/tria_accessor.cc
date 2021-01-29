@@ -2845,368 +2845,433 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
     {
       case 2:
         {
-          const unsigned int neighbor_neighbor =
-            this->neighbor_of_neighbor(face);
-          const unsigned int neighbor_child_index =
-            GeometryInfo<dim>::child_cell_on_face(
-              this->neighbor(face)->refinement_case(),
-              neighbor_neighbor,
-              subface);
-
-          TriaIterator<CellAccessor<dim, spacedim>> sub_neighbor =
-            this->neighbor(face)->child(neighbor_child_index);
-          // the neighbors child can have children,
-          // which are not further refined along the
-          // face under consideration. as we are
-          // normally interested in one of this
-          // child's child, search for the right one.
-          while (sub_neighbor->has_children())
+          if (this->reference_cell_type() == ReferenceCell::Type::Tri)
             {
-              Assert((GeometryInfo<dim>::face_refinement_case(
-                        sub_neighbor->refinement_case(), neighbor_neighbor) ==
-                      RefinementCase<dim>::no_refinement),
-                     ExcInternalError());
-              sub_neighbor =
-                sub_neighbor->child(GeometryInfo<dim>::child_cell_on_face(
-                  sub_neighbor->refinement_case(), neighbor_neighbor, 0));
+              const auto neighbor_cell = this->neighbor(face);
+
+              // only for isotropic refinement at the moment
+              Assert(neighbor_cell->refinement_case() ==
+                       RefinementCase<2>::isotropic_refinement,
+                     ExcNotImplemented());
+
+              // determine indices for this cell's subface from the perspective
+              // of the neighboring cell
+              const unsigned int neighbor_face =
+                this->neighbor_of_neighbor(face);
+              // two neighboring cells have an opposed orientation on their
+              // shared face if both of them follow the same orientation type
+              // (i.e., standard or non-standard).
+              // we verify this with a XOR operation.
+              const unsigned int neighbor_subface =
+                (!(this->line_orientation(face)) !=
+                 !(neighbor_cell->line_orientation(neighbor_face))) ?
+                  (1 - subface) :
+                  subface;
+
+              const auto &info = ReferenceCell::internal::Info::get_cell(
+                ReferenceCell::Type::Tri);
+              const unsigned int neighbor_child_index =
+                info.child_cell_on_face(neighbor_face, neighbor_subface);
+              TriaIterator<CellAccessor<dim, spacedim>> sub_neighbor =
+                neighbor_cell->child(neighbor_child_index);
+
+              // neighbor's child is not allowed to be further refined for the
+              // moment
+              Assert(sub_neighbor->refinement_case() ==
+                       RefinementCase<dim>::no_refinement,
+                     ExcNotImplemented());
+
+              return sub_neighbor;
+            }
+          else if (this->reference_cell_type() == ReferenceCell::Type::Quad)
+            {
+              const unsigned int neighbor_neighbor =
+                this->neighbor_of_neighbor(face);
+              const unsigned int neighbor_child_index =
+                GeometryInfo<dim>::child_cell_on_face(
+                  this->neighbor(face)->refinement_case(),
+                  neighbor_neighbor,
+                  subface);
+
+              TriaIterator<CellAccessor<dim, spacedim>> sub_neighbor =
+                this->neighbor(face)->child(neighbor_child_index);
+              // the neighbors child can have children,
+              // which are not further refined along the
+              // face under consideration. as we are
+              // normally interested in one of this
+              // child's child, search for the right one.
+              while (sub_neighbor->has_children())
+                {
+                  Assert((GeometryInfo<dim>::face_refinement_case(
+                            sub_neighbor->refinement_case(),
+                            neighbor_neighbor) ==
+                          RefinementCase<dim>::no_refinement),
+                         ExcInternalError());
+                  sub_neighbor =
+                    sub_neighbor->child(GeometryInfo<dim>::child_cell_on_face(
+                      sub_neighbor->refinement_case(), neighbor_neighbor, 0));
+                }
+
+              return sub_neighbor;
             }
 
-          return sub_neighbor;
+          // if no reference cell type matches
+          Assert(false, ExcNotImplemented());
+          return TriaIterator<CellAccessor<dim, spacedim>>();
         }
 
 
       case 3:
         {
-          // this function returns the neighbor's
-          // child on a given face and
-          // subface.
-
-          // we have to consider one other aspect here:
-          // The face might be refined
-          // anisotropically. In this case, the subface
-          // number refers to the following, where we
-          // look at the face from the current cell,
-          // thus the subfaces are in standard
-          // orientation concerning the cell
-          //
-          // for isotropic refinement
-          //
-          // *---*---*
-          // | 2 | 3 |
-          // *---*---*
-          // | 0 | 1 |
-          // *---*---*
-          //
-          // for 2*anisotropic refinement
-          // (first cut_y, then cut_x)
-          //
-          // *---*---*
-          // | 2 | 3 |
-          // *---*---*
-          // | 0 | 1 |
-          // *---*---*
-          //
-          // for 2*anisotropic refinement
-          // (first cut_x, then cut_y)
-          //
-          // *---*---*
-          // | 1 | 3 |
-          // *---*---*
-          // | 0 | 2 |
-          // *---*---*
-          //
-          // for purely anisotropic refinement:
-          //
-          // *---*---*      *-------*
-          // |   |   |        |   1   |
-          // | 0 | 1 |  or  *-------*
-          // |   |   |        |   0   |
-          // *---*---*        *-------*
-          //
-          // for "mixed" refinement:
-          //
-          // *---*---*      *---*---*      *---*---*      *-------*
-          // |   | 2 |      | 1 |   |      | 1 | 2 |      |   2   |
-          // | 0 *---*  or  *---* 2 |  or  *---*---*  or  *---*---*
-          // |   | 1 |      | 0 |   |      |   0   |      | 0 | 1 |
-          // *---*---*      *---*---*      *-------*      *---*---*
-
-          const typename Triangulation<dim, spacedim>::face_iterator
-                             mother_face    = this->face(face);
-          const unsigned int total_children = mother_face->number_of_children();
-          AssertIndexRange(subface, total_children);
-          Assert(total_children <= GeometryInfo<3>::max_children_per_face,
-                 ExcInternalError());
-
-          unsigned int                                    neighbor_neighbor;
-          TriaIterator<CellAccessor<dim, spacedim>>       neighbor_child;
-          const TriaIterator<CellAccessor<dim, spacedim>> neighbor =
-            this->neighbor(face);
-
-
-          const RefinementCase<dim - 1> mother_face_ref_case =
-            mother_face->refinement_case();
-          if (mother_face_ref_case ==
-              static_cast<RefinementCase<dim - 1>>(
-                RefinementCase<2>::cut_xy)) // total_children==4
+          if (this->reference_cell_type() == ReferenceCell::Type::Hex)
             {
-              // this case is quite easy. we are sure,
-              // that the neighbor is not coarser.
+              // this function returns the neighbor's
+              // child on a given face and
+              // subface.
 
-              // get the neighbor's number for the given
-              // face and the neighbor
-              neighbor_neighbor = this->neighbor_of_neighbor(face);
+              // we have to consider one other aspect here:
+              // The face might be refined
+              // anisotropically. In this case, the subface
+              // number refers to the following, where we
+              // look at the face from the current cell,
+              // thus the subfaces are in standard
+              // orientation concerning the cell
+              //
+              // for isotropic refinement
+              //
+              // *---*---*
+              // | 2 | 3 |
+              // *---*---*
+              // | 0 | 1 |
+              // *---*---*
+              //
+              // for 2*anisotropic refinement
+              // (first cut_y, then cut_x)
+              //
+              // *---*---*
+              // | 2 | 3 |
+              // *---*---*
+              // | 0 | 1 |
+              // *---*---*
+              //
+              // for 2*anisotropic refinement
+              // (first cut_x, then cut_y)
+              //
+              // *---*---*
+              // | 1 | 3 |
+              // *---*---*
+              // | 0 | 2 |
+              // *---*---*
+              //
+              // for purely anisotropic refinement:
+              //
+              // *---*---*      *-------*
+              // |   |   |        |   1   |
+              // | 0 | 1 |  or  *-------*
+              // |   |   |        |   0   |
+              // *---*---*        *-------*
+              //
+              // for "mixed" refinement:
+              //
+              // *---*---*      *---*---*      *---*---*      *-------*
+              // |   | 2 |      | 1 |   |      | 1 | 2 |      |   2   |
+              // | 0 *---*  or  *---* 2 |  or  *---*---*  or  *---*---*
+              // |   | 1 |      | 0 |   |      |   0   |      | 0 | 1 |
+              // *---*---*      *---*---*      *-------*      *---*---*
 
-              // now use the info provided by GeometryInfo
-              // to extract the neighbors child number
-              const unsigned int neighbor_child_index =
-                GeometryInfo<dim>::child_cell_on_face(
-                  neighbor->refinement_case(),
-                  neighbor_neighbor,
-                  subface,
-                  neighbor->face_orientation(neighbor_neighbor),
-                  neighbor->face_flip(neighbor_neighbor),
-                  neighbor->face_rotation(neighbor_neighbor));
-              neighbor_child = neighbor->child(neighbor_child_index);
-
-              // make sure that the neighbor child cell we
-              // have found shares the desired subface.
-              Assert((this->face(face)->child(subface) ==
-                      neighbor_child->face(neighbor_neighbor)),
+              const typename Triangulation<dim, spacedim>::face_iterator
+                                 mother_face = this->face(face);
+              const unsigned int total_children =
+                mother_face->number_of_children();
+              AssertIndexRange(subface, total_children);
+              Assert(total_children <= GeometryInfo<3>::max_children_per_face,
                      ExcInternalError());
-            }
-          else //-> the face is refined anisotropically
-            {
-              // first of all, we have to find the
-              // neighbor at one of the anisotropic
-              // children of the
-              // mother_face. determine, which of
-              // these we need.
-              unsigned int first_child_to_find;
-              unsigned int neighbor_child_index;
-              if (total_children == 2)
-                first_child_to_find = subface;
-              else
+
+              unsigned int                                    neighbor_neighbor;
+              TriaIterator<CellAccessor<dim, spacedim>>       neighbor_child;
+              const TriaIterator<CellAccessor<dim, spacedim>> neighbor =
+                this->neighbor(face);
+
+
+              const RefinementCase<dim - 1> mother_face_ref_case =
+                mother_face->refinement_case();
+              if (mother_face_ref_case ==
+                  static_cast<RefinementCase<dim - 1>>(
+                    RefinementCase<2>::cut_xy)) // total_children==4
                 {
-                  first_child_to_find = subface / 2;
-                  if (total_children == 3 && subface == 1 &&
-                      !mother_face->child(0)->has_children())
-                    first_child_to_find = 1;
+                  // this case is quite easy. we are sure,
+                  // that the neighbor is not coarser.
+
+                  // get the neighbor's number for the given
+                  // face and the neighbor
+                  neighbor_neighbor = this->neighbor_of_neighbor(face);
+
+                  // now use the info provided by GeometryInfo
+                  // to extract the neighbors child number
+                  const unsigned int neighbor_child_index =
+                    GeometryInfo<dim>::child_cell_on_face(
+                      neighbor->refinement_case(),
+                      neighbor_neighbor,
+                      subface,
+                      neighbor->face_orientation(neighbor_neighbor),
+                      neighbor->face_flip(neighbor_neighbor),
+                      neighbor->face_rotation(neighbor_neighbor));
+                  neighbor_child = neighbor->child(neighbor_child_index);
+
+                  // make sure that the neighbor child cell we
+                  // have found shares the desired subface.
+                  Assert((this->face(face)->child(subface) ==
+                          neighbor_child->face(neighbor_neighbor)),
+                         ExcInternalError());
                 }
-              if (neighbor_is_coarser(face))
+              else //-> the face is refined anisotropically
                 {
-                  std::pair<unsigned int, unsigned int> indices =
-                    neighbor_of_coarser_neighbor(face);
-                  neighbor_neighbor = indices.first;
-
-
-                  // we have to translate our
-                  // subface_index according to the
-                  // RefineCase and subface index of
-                  // the coarser face (our face is an
-                  // anisotropic child of the coarser
-                  // face), 'a' denotes our
-                  // subface_index 0 and 'b' denotes
-                  // our subface_index 1, whereas 0...3
-                  // denote isotropic subfaces of the
-                  // coarser face
-                  //
-                  // cut_x and coarser_subface_index=0
-                  //
-                  // *---*---*
-                  // |b=2|   |
-                  // |   |   |
-                  // |a=0|   |
-                  // *---*---*
-                  //
-                  // cut_x and coarser_subface_index=1
-                  //
-                  // *---*---*
-                  // |   |b=3|
-                  // |   |   |
-                  // |   |a=1|
-                  // *---*---*
-                  //
-                  // cut_y and coarser_subface_index=0
-                  //
-                  // *-------*
-                  // |       |
-                  // *-------*
-                  // |a=0 b=1|
-                  // *-------*
-                  //
-                  // cut_y and coarser_subface_index=1
-                  //
-                  // *-------*
-                  // |a=2 b=3|
-                  // *-------*
-                  // |       |
-                  // *-------*
-                  unsigned int iso_subface;
-                  if (neighbor->face(neighbor_neighbor)->refinement_case() ==
-                      RefinementCase<2>::cut_x)
-                    iso_subface = 2 * first_child_to_find + indices.second;
+                  // first of all, we have to find the
+                  // neighbor at one of the anisotropic
+                  // children of the
+                  // mother_face. determine, which of
+                  // these we need.
+                  unsigned int first_child_to_find;
+                  unsigned int neighbor_child_index;
+                  if (total_children == 2)
+                    first_child_to_find = subface;
                   else
                     {
-                      Assert(
-                        neighbor->face(neighbor_neighbor)->refinement_case() ==
-                          RefinementCase<2>::cut_y,
-                        ExcInternalError());
-                      iso_subface = first_child_to_find + 2 * indices.second;
+                      first_child_to_find = subface / 2;
+                      if (total_children == 3 && subface == 1 &&
+                          !mother_face->child(0)->has_children())
+                        first_child_to_find = 1;
                     }
-                  neighbor_child_index = GeometryInfo<dim>::child_cell_on_face(
-                    neighbor->refinement_case(),
-                    neighbor_neighbor,
-                    iso_subface,
-                    neighbor->face_orientation(neighbor_neighbor),
-                    neighbor->face_flip(neighbor_neighbor),
-                    neighbor->face_rotation(neighbor_neighbor));
-                }
-              else // neighbor is not coarser
-                {
-                  neighbor_neighbor    = neighbor_of_neighbor(face);
-                  neighbor_child_index = GeometryInfo<dim>::child_cell_on_face(
-                    neighbor->refinement_case(),
-                    neighbor_neighbor,
-                    first_child_to_find,
-                    neighbor->face_orientation(neighbor_neighbor),
-                    neighbor->face_flip(neighbor_neighbor),
-                    neighbor->face_rotation(neighbor_neighbor),
-                    mother_face_ref_case);
+                  if (neighbor_is_coarser(face))
+                    {
+                      std::pair<unsigned int, unsigned int> indices =
+                        neighbor_of_coarser_neighbor(face);
+                      neighbor_neighbor = indices.first;
+
+
+                      // we have to translate our
+                      // subface_index according to the
+                      // RefineCase and subface index of
+                      // the coarser face (our face is an
+                      // anisotropic child of the coarser
+                      // face), 'a' denotes our
+                      // subface_index 0 and 'b' denotes
+                      // our subface_index 1, whereas 0...3
+                      // denote isotropic subfaces of the
+                      // coarser face
+                      //
+                      // cut_x and coarser_subface_index=0
+                      //
+                      // *---*---*
+                      // |b=2|   |
+                      // |   |   |
+                      // |a=0|   |
+                      // *---*---*
+                      //
+                      // cut_x and coarser_subface_index=1
+                      //
+                      // *---*---*
+                      // |   |b=3|
+                      // |   |   |
+                      // |   |a=1|
+                      // *---*---*
+                      //
+                      // cut_y and coarser_subface_index=0
+                      //
+                      // *-------*
+                      // |       |
+                      // *-------*
+                      // |a=0 b=1|
+                      // *-------*
+                      //
+                      // cut_y and coarser_subface_index=1
+                      //
+                      // *-------*
+                      // |a=2 b=3|
+                      // *-------*
+                      // |       |
+                      // *-------*
+                      unsigned int iso_subface;
+                      if (neighbor->face(neighbor_neighbor)
+                            ->refinement_case() == RefinementCase<2>::cut_x)
+                        iso_subface = 2 * first_child_to_find + indices.second;
+                      else
+                        {
+                          Assert(neighbor->face(neighbor_neighbor)
+                                     ->refinement_case() ==
+                                   RefinementCase<2>::cut_y,
+                                 ExcInternalError());
+                          iso_subface =
+                            first_child_to_find + 2 * indices.second;
+                        }
+                      neighbor_child_index =
+                        GeometryInfo<dim>::child_cell_on_face(
+                          neighbor->refinement_case(),
+                          neighbor_neighbor,
+                          iso_subface,
+                          neighbor->face_orientation(neighbor_neighbor),
+                          neighbor->face_flip(neighbor_neighbor),
+                          neighbor->face_rotation(neighbor_neighbor));
+                    }
+                  else // neighbor is not coarser
+                    {
+                      neighbor_neighbor = neighbor_of_neighbor(face);
+                      neighbor_child_index =
+                        GeometryInfo<dim>::child_cell_on_face(
+                          neighbor->refinement_case(),
+                          neighbor_neighbor,
+                          first_child_to_find,
+                          neighbor->face_orientation(neighbor_neighbor),
+                          neighbor->face_flip(neighbor_neighbor),
+                          neighbor->face_rotation(neighbor_neighbor),
+                          mother_face_ref_case);
+                    }
+
+                  neighbor_child = neighbor->child(neighbor_child_index);
+                  // it might be, that the neighbor_child
+                  // has children, which are not refined
+                  // along the given subface. go down that
+                  // list and deliver the last of those.
+                  while (
+                    neighbor_child->has_children() &&
+                    GeometryInfo<dim>::face_refinement_case(
+                      neighbor_child->refinement_case(), neighbor_neighbor) ==
+                      RefinementCase<2>::no_refinement)
+                    neighbor_child = neighbor_child->child(
+                      GeometryInfo<dim>::child_cell_on_face(
+                        neighbor_child->refinement_case(),
+                        neighbor_neighbor,
+                        0));
+
+                  // if there are two total subfaces, we
+                  // are finished. if there are four we
+                  // have to get a child of our current
+                  // neighbor_child. If there are three,
+                  // we have to check which of the two
+                  // possibilities applies.
+                  if (total_children == 3)
+                    {
+                      if (mother_face->child(0)->has_children())
+                        {
+                          if (subface < 2)
+                            neighbor_child = neighbor_child->child(
+                              GeometryInfo<dim>::child_cell_on_face(
+                                neighbor_child->refinement_case(),
+                                neighbor_neighbor,
+                                subface,
+                                neighbor_child->face_orientation(
+                                  neighbor_neighbor),
+                                neighbor_child->face_flip(neighbor_neighbor),
+                                neighbor_child->face_rotation(
+                                  neighbor_neighbor),
+                                mother_face->child(0)->refinement_case()));
+                        }
+                      else
+                        {
+                          Assert(mother_face->child(1)->has_children(),
+                                 ExcInternalError());
+                          if (subface > 0)
+                            neighbor_child = neighbor_child->child(
+                              GeometryInfo<dim>::child_cell_on_face(
+                                neighbor_child->refinement_case(),
+                                neighbor_neighbor,
+                                subface - 1,
+                                neighbor_child->face_orientation(
+                                  neighbor_neighbor),
+                                neighbor_child->face_flip(neighbor_neighbor),
+                                neighbor_child->face_rotation(
+                                  neighbor_neighbor),
+                                mother_face->child(1)->refinement_case()));
+                        }
+                    }
+                  else if (total_children == 4)
+                    {
+                      neighbor_child = neighbor_child->child(
+                        GeometryInfo<dim>::child_cell_on_face(
+                          neighbor_child->refinement_case(),
+                          neighbor_neighbor,
+                          subface % 2,
+                          neighbor_child->face_orientation(neighbor_neighbor),
+                          neighbor_child->face_flip(neighbor_neighbor),
+                          neighbor_child->face_rotation(neighbor_neighbor),
+                          mother_face->child(subface / 2)->refinement_case()));
+                    }
                 }
 
-              neighbor_child = neighbor->child(neighbor_child_index);
-              // it might be, that the neighbor_child
-              // has children, which are not refined
-              // along the given subface. go down that
-              // list and deliver the last of those.
-              while (neighbor_child->has_children() &&
-                     GeometryInfo<dim>::face_refinement_case(
-                       neighbor_child->refinement_case(), neighbor_neighbor) ==
-                       RefinementCase<2>::no_refinement)
+              // it might be, that the neighbor_child has
+              // children, which are not refined along the
+              // given subface. go down that list and
+              // deliver the last of those.
+              while (neighbor_child->has_children())
                 neighbor_child =
                   neighbor_child->child(GeometryInfo<dim>::child_cell_on_face(
                     neighbor_child->refinement_case(), neighbor_neighbor, 0));
 
-              // if there are two total subfaces, we
-              // are finished. if there are four we
-              // have to get a child of our current
-              // neighbor_child. If there are three,
-              // we have to check which of the two
-              // possibilities applies.
-              if (total_children == 3)
-                {
-                  if (mother_face->child(0)->has_children())
-                    {
-                      if (subface < 2)
-                        neighbor_child = neighbor_child->child(
-                          GeometryInfo<dim>::child_cell_on_face(
-                            neighbor_child->refinement_case(),
-                            neighbor_neighbor,
-                            subface,
-                            neighbor_child->face_orientation(neighbor_neighbor),
-                            neighbor_child->face_flip(neighbor_neighbor),
-                            neighbor_child->face_rotation(neighbor_neighbor),
-                            mother_face->child(0)->refinement_case()));
-                    }
-                  else
-                    {
-                      Assert(mother_face->child(1)->has_children(),
-                             ExcInternalError());
-                      if (subface > 0)
-                        neighbor_child = neighbor_child->child(
-                          GeometryInfo<dim>::child_cell_on_face(
-                            neighbor_child->refinement_case(),
-                            neighbor_neighbor,
-                            subface - 1,
-                            neighbor_child->face_orientation(neighbor_neighbor),
-                            neighbor_child->face_flip(neighbor_neighbor),
-                            neighbor_child->face_rotation(neighbor_neighbor),
-                            mother_face->child(1)->refinement_case()));
-                    }
-                }
-              else if (total_children == 4)
-                {
-                  neighbor_child =
-                    neighbor_child->child(GeometryInfo<dim>::child_cell_on_face(
-                      neighbor_child->refinement_case(),
-                      neighbor_neighbor,
-                      subface % 2,
-                      neighbor_child->face_orientation(neighbor_neighbor),
-                      neighbor_child->face_flip(neighbor_neighbor),
-                      neighbor_child->face_rotation(neighbor_neighbor),
-                      mother_face->child(subface / 2)->refinement_case()));
-                }
-            }
-
-          // it might be, that the neighbor_child has
-          // children, which are not refined along the
-          // given subface. go down that list and
-          // deliver the last of those.
-          while (neighbor_child->has_children())
-            neighbor_child =
-              neighbor_child->child(GeometryInfo<dim>::child_cell_on_face(
-                neighbor_child->refinement_case(), neighbor_neighbor, 0));
-
 #ifdef DEBUG
-          // check, whether the face neighbor_child matches the requested
-          // subface.
-          typename Triangulation<dim, spacedim>::face_iterator requested;
-          switch (this->subface_case(face))
-            {
-              case internal::SubfaceCase<3>::case_x:
-              case internal::SubfaceCase<3>::case_y:
-              case internal::SubfaceCase<3>::case_xy:
-                requested = mother_face->child(subface);
-                break;
-              case internal::SubfaceCase<3>::case_x1y2y:
-              case internal::SubfaceCase<3>::case_y1x2x:
-                requested = mother_face->child(subface / 2)->child(subface % 2);
-                break;
+              // check, whether the face neighbor_child matches the requested
+              // subface.
+              typename Triangulation<dim, spacedim>::face_iterator requested;
+              switch (this->subface_case(face))
+                {
+                  case internal::SubfaceCase<3>::case_x:
+                  case internal::SubfaceCase<3>::case_y:
+                  case internal::SubfaceCase<3>::case_xy:
+                    requested = mother_face->child(subface);
+                    break;
+                  case internal::SubfaceCase<3>::case_x1y2y:
+                  case internal::SubfaceCase<3>::case_y1x2x:
+                    requested =
+                      mother_face->child(subface / 2)->child(subface % 2);
+                    break;
 
-              case internal::SubfaceCase<3>::case_x1y:
-              case internal::SubfaceCase<3>::case_y1x:
-                switch (subface)
-                  {
-                    case 0:
-                    case 1:
-                      requested = mother_face->child(0)->child(subface);
-                      break;
-                    case 2:
-                      requested = mother_face->child(1);
-                      break;
-                    default:
-                      Assert(false, ExcInternalError());
-                  }
-                break;
-              case internal::SubfaceCase<3>::case_x2y:
-              case internal::SubfaceCase<3>::case_y2x:
-                switch (subface)
-                  {
-                    case 0:
-                      requested = mother_face->child(0);
-                      break;
-                    case 1:
-                    case 2:
-                      requested = mother_face->child(1)->child(subface - 1);
-                      break;
-                    default:
-                      Assert(false, ExcInternalError());
-                  }
-                break;
-              default:
-                Assert(false, ExcInternalError());
-                break;
-            }
-          Assert(requested == neighbor_child->face(neighbor_neighbor),
-                 ExcInternalError());
+                  case internal::SubfaceCase<3>::case_x1y:
+                  case internal::SubfaceCase<3>::case_y1x:
+                    switch (subface)
+                      {
+                        case 0:
+                        case 1:
+                          requested = mother_face->child(0)->child(subface);
+                          break;
+                        case 2:
+                          requested = mother_face->child(1);
+                          break;
+                        default:
+                          Assert(false, ExcInternalError());
+                      }
+                    break;
+                  case internal::SubfaceCase<3>::case_x2y:
+                  case internal::SubfaceCase<3>::case_y2x:
+                    switch (subface)
+                      {
+                        case 0:
+                          requested = mother_face->child(0);
+                          break;
+                        case 1:
+                        case 2:
+                          requested = mother_face->child(1)->child(subface - 1);
+                          break;
+                        default:
+                          Assert(false, ExcInternalError());
+                      }
+                    break;
+                  default:
+                    Assert(false, ExcInternalError());
+                    break;
+                }
+              Assert(requested == neighbor_child->face(neighbor_neighbor),
+                     ExcInternalError());
 #endif
 
-          return neighbor_child;
+              return neighbor_child;
+            }
+
+          // if no reference cell type matches
+          Assert(false, ExcNotImplemented());
+          return TriaIterator<CellAccessor<dim, spacedim>>();
         }
 
       default:
-        // 1d or more than 3d
+        // if 1d or more than 3d
         Assert(false, ExcNotImplemented());
         return TriaIterator<CellAccessor<dim, spacedim>>();
     }
