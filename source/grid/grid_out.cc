@@ -1484,8 +1484,8 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
   const std::array<int, 8> dealii_to_gmsh_type = {{15, 1, 2, 3, 4, 7, 6, 5}};
 
   // Vertex renumbering, by dealii type
-  const std::vector<std::vector<unsigned int>> dealii_to_gmsh = {
-    {{{0}},
+  const std::array<std::vector<unsigned int>, 8> dealii_to_gmsh = {
+    {{0},
      {{0, 1}},
      {{0, 1, 2}},
      {{0, 1, 3, 2}},
@@ -1531,7 +1531,7 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
                f->boundary_id() != numbers::internal_face_boundary_id))
             set_of_pairs.insert({f->boundary_id(), f->manifold_id()});
         if (dim > 2)
-          for (const auto &l : cell->line_indices())
+          for (const auto l : cell->line_indices())
             {
               const auto &f = cell->line(l);
               if (f->manifold_id() != numbers::flat_manifold_id ||
@@ -1564,7 +1564,7 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
     Assert(entity_tag > 0, ExcInternalError());
     // Add all vertex ids. Make sure we renumber to gmsh, and we add 1 to the
     // global index.
-    for (const auto &v : element->vertex_indices())
+    for (const auto v : element->vertex_indices())
       element_nodes[entity_tag - 1][type].emplace_back(
         element->vertex_index(dealii_to_gmsh[type][v]) + 1);
 
@@ -1608,7 +1608,7 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
       for (const auto &face : cell->face_iterators())
         maybe_add_element(face, face->boundary_id());
       if (dim > 2)
-        for (const auto &l : cell->line_indices())
+        for (const auto l : cell->line_indices())
           maybe_add_element(cell->line(l), cell->line(l)->boundary_id());
     }
 
@@ -1616,7 +1616,7 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
   gmsh::initialize();
   gmsh::option::setNumber("General.Verbosity", 0);
   gmsh::model::add("Grid generated in deal.II");
-  for (const auto p : dim_entity_tag)
+  for (const auto &p : dim_entity_tag)
     {
       gmsh::model::addDiscreteEntity(p.first, p.second);
       gmsh::model::mesh::addNodes(p.first, p.second, nodes, coords);
