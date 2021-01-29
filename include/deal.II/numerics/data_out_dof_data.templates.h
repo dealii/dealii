@@ -84,6 +84,121 @@ namespace internal
 
 
     /**
+     * Generate evalution points on a simplex with arbitrary number of
+     * subdivisions.
+     */
+    template <int dim>
+    inline std::vector<Point<dim>>
+    generate_simplex_evaluation_points(const unsigned int n_subdivisions)
+    {
+      (void)n_subdivisions;
+
+      Assert(false, ExcNotImplemented());
+
+      return {};
+    }
+
+
+
+    /**
+     * Helper function to create evaluation points recursively with
+     * subdivisions=0,1,2 being the base case:
+     *                                        +
+     *                                        |\
+     *                            +           +-+
+     *                            |\          |\|\
+     *                  +         +-+         +-+-+
+     *                  |\        |\|\        |\|\|\
+     *          +       +-+       +-+-+       +-+-+-+
+     *          |\      |\|\      |\|\|\      |\|\|\|\
+     *    +     +-+     +-+-+     +-+-+-+     +-+-+-+-+
+     *
+     *    0      1        2          3            4
+     *    ^      ^                   |            |
+     *    |      |                   |            |
+     *    +--------------------------+            |
+     *           |                                |
+     *           +--------------------------------+
+     */
+    inline void
+    generate_simplex_evaluation_points_recursively(
+      const std::vector<Point<2>> &bounding_vertices,
+      const unsigned int           n_subdivisions,
+      std::vector<Point<2>> &      evaluation_points)
+    {
+      if (n_subdivisions == 0)
+        {
+          evaluation_points.push_back(bounding_vertices[0]);
+          return;
+        }
+
+      for (const auto &p : bounding_vertices)
+        evaluation_points.push_back(p);
+
+      if (n_subdivisions == 1)
+        return;
+
+      // Helper functions to create intermediate points between p0 and p1 with
+      // n_subdivisions. This function appends these new points to the vector
+      // evaluation_points but also returns the points as a vector to be able
+      // to easily access specific points on the line.
+      const auto generate_inbetween_points = [&](const Point<2> &p0,
+                                                 const Point<2> &p1) {
+        std::vector<Point<2>> line_points;
+
+        for (unsigned int i = 1; i < n_subdivisions; ++i)
+          line_points.push_back(p0 + (p1 - p0) / n_subdivisions * i);
+
+        evaluation_points.insert(evaluation_points.end(),
+                                 line_points.begin(),
+                                 line_points.end());
+
+        return line_points;
+      };
+
+      const auto line_points_0 =
+        generate_inbetween_points(bounding_vertices[0], bounding_vertices[1]);
+      const auto line_points_1 =
+        generate_inbetween_points(bounding_vertices[1], bounding_vertices[2]);
+      const auto line_points_2 =
+        generate_inbetween_points(bounding_vertices[2], bounding_vertices[0]);
+
+      if (n_subdivisions == 2)
+        return;
+
+      generate_simplex_evaluation_points_recursively(
+        // create new inner triangle (see ASCII art above)
+        {{Point<2>(line_points_0[line_points_0.size() - 2][0],
+                   line_points_1[0][1]),
+          Point<2>(line_points_0[0][0],
+                   line_points_1[line_points_1.size() - 2][1]),
+          Point<2>(line_points_0[0][0], line_points_1[0][1])}},
+        n_subdivisions - 3,
+        evaluation_points);
+    }
+
+
+
+    /**
+     * Specialization for triangles.
+     */
+    template <>
+    inline std::vector<Point<2>>
+    generate_simplex_evaluation_points(const unsigned int n_subdivisions)
+    {
+      std::vector<Point<2>> evalution_points;
+
+      generate_simplex_evaluation_points_recursively(
+        {{Point<2>(0.0, 0.0), Point<2>(1.0, 0.0), Point<2>(0.0, 1.0)}},
+        n_subdivisions,
+        evalution_points);
+
+      return evalution_points;
+    }
+
+
+
+    /**
      * Set up vectors of FEValues and FEFaceValues needed inside of
      * ParallelDataBase and return the maximum number of quadrature points
      * needed to allocate enough memory for the scratch data.
@@ -140,9 +255,13 @@ namespace internal
 
           if (needs_simplex_setup)
             {
-              quadrature_simplex = std::make_unique<Quadrature<dim>>(
-                Simplex::FE_P<dim, spacedim>(n_subdivisions)
-                  .get_unit_support_points());
+              if (dim == 2)
+                quadrature_simplex = std::make_unique<Quadrature<dim>>(
+                  generate_simplex_evaluation_points<dim>(n_subdivisions));
+              else
+                quadrature_simplex = std::make_unique<Quadrature<dim>>(
+                  Simplex::FE_P<dim, spacedim>(n_subdivisions)
+                    .get_unit_support_points());
             }
 
           if (needs_hypercube_setup)

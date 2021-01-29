@@ -19,6 +19,7 @@
 
 #include <deal.II/dofs/dof_handler.h>
 
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_fe.h>
 
@@ -34,6 +35,8 @@
 #include <deal.II/simplex/quadrature_lib.h>
 
 #include "../tests.h"
+
+#include "./simplex_grids.h"
 
 using namespace dealii;
 
@@ -54,20 +57,44 @@ public:
 
 template <int dim, int spacedim = dim>
 void
-test(const FiniteElement<dim, spacedim> &fe,
+test(const FiniteElement<dim, spacedim> &fe_0,
+     const FiniteElement<dim, spacedim> &fe_1,
      const unsigned int                  n_components,
      const bool                          do_high_order)
 {
+  const unsigned int degree = fe_0.tensor_degree();
+
+  hp::FECollection<dim, spacedim> fe(fe_0, fe_1);
+
+  hp::QCollection<dim> quadrature(Simplex::QGauss<dim>(degree + 1),
+                                  QGauss<dim>(degree + 1));
+
+  hp::MappingCollection<dim, spacedim> mapping(
+    MappingFE<dim, spacedim>(Simplex::FE_P<dim, spacedim>(1)),
+    MappingQGeneric<dim, spacedim>(1));
+
   Triangulation<dim, spacedim> tria;
-  GridGenerator::subdivided_hyper_cube_with_simplices(tria, dim == 2 ? 4 : 2);
+  GridGenerator::subdivided_hyper_cube_with_simplices_mix(tria,
+                                                          dim == 2 ? 4 : 2);
 
   DoFHandler<dim> dof_handler(tria);
+
+  for (const auto &cell : dof_handler.active_cell_iterators())
+    {
+      if (cell->is_locally_owned() == false)
+        continue;
+
+      if (cell->reference_cell_type() == ReferenceCell::Type::Tri)
+        cell->set_active_fe_index(0);
+      else if (cell->reference_cell_type() == ReferenceCell::Type::Quad)
+        cell->set_active_fe_index(1);
+      else
+        Assert(false, ExcNotImplemented());
+    }
 
   dof_handler.distribute_dofs(fe);
 
   Vector<double> solution(dof_handler.n_dofs());
-
-  MappingFE<dim> mapping(Simplex::FE_P<dim>(1));
 
   AffineConstraints<double> dummy;
   dummy.close();
@@ -75,14 +102,14 @@ test(const FiniteElement<dim, spacedim> &fe,
   VectorTools::project(mapping,
                        dof_handler,
                        dummy,
-                       Simplex::QGauss<dim>(fe.tensor_degree() + 1),
+                       quadrature,
                        RightHandSideFunction<dim>(n_components),
                        solution);
 
   static unsigned int counter = 0;
 
   for (unsigned int n_subdivisions = 1;
-       n_subdivisions <= (do_high_order ? 3 : 2);
+       n_subdivisions <= (do_high_order ? 4 : 2);
        ++n_subdivisions)
     {
       DataOutBase::VtkFlags flags;
@@ -116,35 +143,22 @@ main()
     {
       const bool do_high_order = (i == 1);
 
-      if (do_high_order)
+      if (true)
         {
           const unsigned int dim = 2;
-          test<dim>(Simplex::FE_P<dim>(2) /*=degree*/, 1, do_high_order);
-          test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2 /*=degree*/), dim),
-                    dim,
-                    do_high_order);
-          test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2 /*=degree*/),
-                                  dim,
-                                  Simplex::FE_P<dim>(1 /*=degree*/),
-                                  1),
-                    dim + 1,
-                    do_high_order);
-        }
+          test<dim>(Simplex::FE_P<dim>(2), FE_Q<dim>(2), 1, do_high_order);
 
-      if (do_high_order ==
-          false /*TODO: higher-order output not working for 3D*/)
-        {
-          const unsigned int dim = 3;
-          test<dim>(Simplex::FE_P<dim>(2) /*=degree*/, 1, do_high_order);
-          test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2 /*=degree*/), dim),
+          continue; // TODO
+
+          test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2), dim),
+                    FESystem<dim>(FE_Q<dim>(2), dim),
                     dim,
                     do_high_order);
-          test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2 /*=degree*/),
-                                  dim,
-                                  Simplex::FE_P<dim>(1 /*=degree*/),
-                                  1),
-                    dim + 1,
-                    do_high_order);
+          test<dim>(
+            FESystem<dim>(Simplex::FE_P<dim>(2), dim, Simplex::FE_P<dim>(1), 1),
+            FESystem<dim>(FE_Q<dim>(2), dim, FE_Q<dim>(1), 1),
+            dim + 1,
+            do_high_order);
         }
     }
 }

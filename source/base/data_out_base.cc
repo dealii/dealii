@@ -627,6 +627,11 @@ namespace
             vtk_cell_id[0] = cell_type_by_dim[dim];
             vtk_cell_id[1] = 1;
           }
+        else if (patch.reference_cell_type == ReferenceCell::Type::Tri)
+          {
+            vtk_cell_id[0] = VTK_LAGRANGE_TRIANGLE;
+            vtk_cell_id[1] = 1;
+          }
         else
           {
             Assert(false, ExcNotImplemented());
@@ -2730,36 +2735,54 @@ namespace DataOutBase
 
     for (const auto &patch : patches)
       {
-        const unsigned int n_subdivisions = patch.n_subdivisions;
-        const unsigned int n              = n_subdivisions + 1;
+        if (patch.reference_cell_type !=
+            ReferenceCell::Type::get_hypercube<dim>())
+          {
+            connectivity.resize(patch.data.n_cols());
 
-        cell_order.fill(n_subdivisions);
-        connectivity.resize(Utilities::fixed_power<dim>(n));
+            for (unsigned int i = 0; i < patch.data.n_cols(); ++i)
+              connectivity[i] = i;
 
-        // Length of loops in all dimensons
-        const unsigned int n1 = (dim > 0) ? n_subdivisions : 0;
-        const unsigned int n2 = (dim > 1) ? n_subdivisions : 0;
-        const unsigned int n3 = (dim > 2) ? n_subdivisions : 0;
-        // Offsets of outer loops
-        const unsigned int d1 = 1;
-        const unsigned int d2 = n;
-        const unsigned int d3 = n * n;
-        for (unsigned int i3 = 0; i3 <= n3; ++i3)
-          for (unsigned int i2 = 0; i2 <= n2; ++i2)
-            for (unsigned int i1 = 0; i1 <= n1; ++i1)
-              {
-                const unsigned int local_index = i3 * d3 + i2 * d2 + i1 * d1;
-                const unsigned int connectivity_index =
-                  vtk_point_index_from_ijk(i1, i2, i3, cell_order);
-                connectivity[connectivity_index] = local_index;
-              }
+            out.template write_high_order_cell<dim>(count++,
+                                                    first_vertex_of_patch,
+                                                    connectivity);
 
-        out.template write_high_order_cell<dim>(count++,
-                                                first_vertex_of_patch,
-                                                connectivity);
+            first_vertex_of_patch += patch.data.n_cols();
+          }
+        else
+          {
+            const unsigned int n_subdivisions = patch.n_subdivisions;
+            const unsigned int n              = n_subdivisions + 1;
 
-        // finally update the number of the first vertex of this patch
-        first_vertex_of_patch += Utilities::fixed_power<dim>(n);
+            cell_order.fill(n_subdivisions);
+            connectivity.resize(Utilities::fixed_power<dim>(n));
+
+            // Length of loops in all dimensons
+            const unsigned int n1 = (dim > 0) ? n_subdivisions : 0;
+            const unsigned int n2 = (dim > 1) ? n_subdivisions : 0;
+            const unsigned int n3 = (dim > 2) ? n_subdivisions : 0;
+            // Offsets of outer loops
+            const unsigned int d1 = 1;
+            const unsigned int d2 = n;
+            const unsigned int d3 = n * n;
+            for (unsigned int i3 = 0; i3 <= n3; ++i3)
+              for (unsigned int i2 = 0; i2 <= n2; ++i2)
+                for (unsigned int i1 = 0; i1 <= n1; ++i1)
+                  {
+                    const unsigned int local_index =
+                      i3 * d3 + i2 * d2 + i1 * d1;
+                    const unsigned int connectivity_index =
+                      vtk_point_index_from_ijk(i1, i2, i3, cell_order);
+                    connectivity[connectivity_index] = local_index;
+                  }
+
+            out.template write_high_order_cell<dim>(count++,
+                                                    first_vertex_of_patch,
+                                                    connectivity);
+
+            // finally update the number of the first vertex of this patch
+            first_vertex_of_patch += Utilities::fixed_power<dim>(n);
+          }
       }
 
     out.flush_cells();
