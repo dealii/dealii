@@ -32,6 +32,10 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 
+#ifdef DEAL_II_GMSH_WITH_API
+#  include <gmsh.h>
+#endif
+
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -1467,6 +1471,211 @@ GridOut::write_xfig(const Triangulation<2> &tria,
 
   AssertThrow(out, ExcIO());
 }
+
+
+
+#ifdef DEAL_II_GMSH_WITH_API
+template <int dim, int spacedim>
+void
+GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
+                   const std::string &                 filename) const
+{
+  // mesh Type renumbering
+  const std::array<int, 8> dealii_to_gmsh_type = {{15, 1, 2, 3, 4, 7, 6, 5}};
+
+  // Vertex renumbering, by dealii type
+  const std::vector<std::vector<unsigned int>> dealii_to_gmsh = {
+    {{{0}},
+     {{0, 1}},
+     {{0, 1, 2}},
+     {{0, 1, 3, 2}},
+     {{0, 1, 2, 3}},
+     {{0, 1, 3, 2, 4}},
+     {{0, 1, 2, 3, 4, 5}},
+     {{0, 1, 3, 2, 4, 5, 7, 6}}}};
+
+  // Extract all vertices (nodes in gmsh terminology), and store their three
+  // dimensional coordinates (regardless of dim).
+  const auto &             vertices = tria.get_vertices();
+  std::vector<double>      coords(3 * vertices.size());
+  std::vector<std::size_t> nodes(vertices.size());
+
+  // Each node has a strictly positive tag. We assign simply its index+1.
+  std::size_t i = 0;
+  for (const auto &p : vertices)
+    {
+      for (unsigned int d = 0; d < spacedim; ++d)
+        coords[i * 3 + d] = p[d];
+      nodes[i] = i + 1;
+      ++i;
+    }
+
+  // Construct one entity tag per boundary and manifold id pair.
+  // We need to be smart here, in order to save some disk space. All cells need
+  // to be written, but only faces and lines that have non default boundary ids
+  // and/or manifold ids. We collect them into pairs, and for each unique pair,
+  // we create a gmsh entity where we store the elements. Pre-count all the
+  // entities, and make sure we know which pair refers to what entity and
+  // vice-versa.
+  using IdPair = std::pair<types::material_id, types::manifold_id>;
+  std::map<IdPair, int> id_pair_to_entity_tag;
+  std::vector<IdPair>   all_pairs;
+  {
+    std::set<IdPair> set_of_pairs;
+    for (const auto &cell : tria.active_cell_iterators())
+      {
+        set_of_pairs.insert({cell->material_id(), cell->manifold_id()});
+        for (const auto &f : cell->face_iterators())
+          if (f->manifold_id() != numbers::flat_manifold_id ||
+              (f->boundary_id() != 0 &&
+               f->boundary_id() != numbers::internal_face_boundary_id))
+            set_of_pairs.insert({f->boundary_id(), f->manifold_id()});
+        if (dim > 2)
+          for (const auto &l : cell->line_indices())
+            {
+              const auto &f = cell->line(l);
+              if (f->manifold_id() != numbers::flat_manifold_id ||
+                  (f->boundary_id() != 0 &&
+                   f->boundary_id() != numbers::internal_face_boundary_id))
+                set_of_pairs.insert({f->boundary_id(), f->manifold_id()});
+            }
+      }
+    all_pairs = {set_of_pairs.begin(), set_of_pairs.end()};
+
+    int entity = 1;
+    for (const auto &p : set_of_pairs)
+      id_pair_to_entity_tag[p] = entity++;
+  }
+
+  const auto n_entity_tags = id_pair_to_entity_tag.size();
+
+  // All elements in the mesh, by entity tag, and by dealii type.
+  std::vector<std::vector<std::vector<std::size_t>>> element_ids(
+    n_entity_tags, std::vector<std::vector<std::size_t>>(8));
+  std::vector<std::vector<std::vector<std::size_t>>> element_nodes(
+    n_entity_tags, std::vector<std::vector<std::size_t>>(8));
+
+  // One elment id counter for all dimensions.
+  std::size_t element_id = 1;
+
+  const auto add_element = [&](const auto &element, const int &entity_tag) {
+    const auto type = element->reference_cell_type();
+
+    Assert(entity_tag > 0, ExcInternalError());
+    // Add all vertex ids. Make sure we renumber to gmsh, and we add 1 to the
+    // global index.
+    for (const auto &v : element->vertex_indices())
+      element_nodes[entity_tag - 1][type].emplace_back(
+        element->vertex_index(dealii_to_gmsh[type][v]) + 1);
+
+    // Save the element id.
+    element_ids[entity_tag - 1][type].emplace_back(element_id);
+    ++element_id;
+  };
+
+  // Will create a separate gmsh entity, only  if it's a cell, or if the
+  // boundary and/or the manifold ids are not the default ones.
+  // In the meanwhile, also store each pair of dimension and entity tag that was
+  // requested.
+  std::set<std::pair<int, int>> dim_entity_tag;
+
+  auto maybe_add_element =
+    [&](const auto &              element,
+        const types::boundary_id &boundary_or_material_id) {
+      const auto struct_dim  = element->structure_dimension;
+      const auto manifold_id = element->manifold_id();
+
+      // Exclude default boundary/manifold id or invalid/flag
+      const bool non_default_boundary_or_material_id =
+        (boundary_or_material_id != 0 &&
+         boundary_or_material_id != numbers::internal_face_boundary_id);
+      const bool non_default_manifold =
+        manifold_id != numbers::flat_manifold_id;
+      if (struct_dim == dim || non_default_boundary_or_material_id ||
+          non_default_manifold)
+        {
+          const auto entity_tag =
+            id_pair_to_entity_tag[{boundary_or_material_id, manifold_id}];
+          add_element(element, entity_tag);
+          dim_entity_tag.insert({struct_dim, entity_tag});
+        }
+    };
+
+  // Loop recursively over all cells, faces, and possibly lines.
+  for (const auto &cell : tria.active_cell_iterators())
+    {
+      maybe_add_element(cell, cell->material_id());
+      for (const auto &face : cell->face_iterators())
+        maybe_add_element(face, face->boundary_id());
+      if (dim > 2)
+        for (const auto &l : cell->line_indices())
+          maybe_add_element(cell->line(l), cell->line(l)->boundary_id());
+    }
+
+  // Now that we collected everything, plug them into gmsh
+  gmsh::initialize();
+  gmsh::option::setNumber("General.Verbosity", 0);
+  gmsh::model::add("Grid generated in deal.II");
+  for (const auto p : dim_entity_tag)
+    {
+      gmsh::model::addDiscreteEntity(p.first, p.second);
+      gmsh::model::mesh::addNodes(p.first, p.second, nodes, coords);
+    }
+
+  for (unsigned int entity_tag = 0; entity_tag < n_entity_tags; ++entity_tag)
+    for (unsigned int t = 1; t < 8; ++t)
+      {
+        const auto all_element_ids   = element_ids[entity_tag][t];
+        const auto all_element_nodes = element_nodes[entity_tag][t];
+        const auto gmsh_t            = dealii_to_gmsh_type[t];
+        if (all_element_ids.size() > 0)
+          gmsh::model::mesh::addElementsByType(entity_tag + 1,
+                                               gmsh_t,
+                                               all_element_ids,
+                                               all_element_nodes);
+      }
+
+  // Make sure nodes belong to the right entities.
+  gmsh::model::mesh::reclassifyNodes();
+  gmsh::model::mesh::removeDuplicateNodes();
+
+  // Now for each individual pair of dim and entry, add a physical group, if
+  // necessary
+  for (const auto &it : dim_entity_tag)
+    {
+      const auto &d           = it.first;
+      const auto &entity_tag  = it.second;
+      const auto &boundary_id = all_pairs[entity_tag - 1].first;
+      const auto &manifold_id = all_pairs[entity_tag - 1].second;
+
+      std::string physical_name;
+      if (d == dim && boundary_id != 0)
+        physical_name += "MaterialID:" + Utilities::int_to_string(
+                                           static_cast<int>(boundary_id));
+      else if (d < dim && boundary_id != 0)
+        physical_name +=
+          "BoundaryID:" +
+          (boundary_id == numbers::internal_face_boundary_id ?
+             "-1" :
+             Utilities::int_to_string(static_cast<int>(boundary_id)));
+
+      std::string sep = physical_name != "" ? ", " : "";
+      if (manifold_id != numbers::flat_manifold_id)
+        physical_name +=
+          sep + "ManifoldID:" +
+          Utilities::int_to_string(static_cast<int>(manifold_id));
+      const auto physical_tag =
+        gmsh::model::addPhysicalGroup(d, {entity_tag}, -1);
+      if (physical_name != "")
+        gmsh::model::setPhysicalName(d, physical_tag, physical_name);
+    }
+
+
+  gmsh::write(filename);
+  gmsh::clear();
+  gmsh::finalize();
+}
+#endif
 
 
 
