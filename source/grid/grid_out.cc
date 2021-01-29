@@ -1484,7 +1484,7 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
   const std::array<int, 8> dealii_to_gmsh_type = {{15, 1, 2, 3, 4, 7, 6, 5}};
 
   // Vertex renumbering, by dealii type
-  const std::vector<std::vector<unsigned int>> dealii_to_gmsh = {
+  const std::array<std::vector<unsigned int>, 8> dealii_to_gmsh = {
     {{0},
      {{0, 1}},
      {{0, 1, 2}},
