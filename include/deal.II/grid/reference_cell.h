@@ -1988,7 +1988,7 @@ namespace ReferenceCell
               out << ",";
           }
 
-        out << "] is no permutation of [";
+        out << "] is not a permutation of [";
 
         for (unsigned int i = 0; i < n_vertices; ++i)
           {
