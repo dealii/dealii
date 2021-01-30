@@ -41,6 +41,8 @@
 #  ifdef DEAL_II_WITH_MPI
 #    include <nvector/nvector_parallel.h>
 #  endif
+#  include <deal.II/sundials/n_vector.h>
+
 #  include <boost/signals2.hpp>
 
 #  include <sundials/sundials_linearsolver.h>
@@ -610,26 +612,7 @@ namespace SUNDIALS
      * @param[in,out] y   The new initial solution
      */
     void
-    reset(const double t, const double h, const VectorType &y);
-
-    /*!
-     * Create a new SUNDIALS vector from a given template.
-     *
-     * @note Vectors created this way should be freed with free_vector().
-     *
-     * @param template_vector The vector to use as a template for the layout of
-     *   a new vector.
-     */
-    N_Vector
-    create_vector(const VectorType &template_vector) const;
-
-    /**
-     * Free a SUNDIALS vector created with create_vector().
-     *
-     * @param vector The vector to free
-     */
-    void
-    free_vector(N_Vector vector) const;
+    reset(const double t, const double h, VectorType &y);
 
     /**
      * Provides user access to the internally used ARKODE memory.
@@ -1299,7 +1282,7 @@ namespace SUNDIALS
     /**
      * Set up the (non)linear solver and preconditioners in the ARKODE memory
      * object based on the user-specified functions.
-     * @param solution The solution vector whihc is used as a template to create
+     * @param solution The solution vector which is used as a template to create
      *   new vectors.
      */
     void
@@ -1335,12 +1318,12 @@ namespace SUNDIALS
     /**
      * ARKode solution vector.
      */
-    N_Vector yy;
+    internal::NVectorView<VectorType> yy;
 
     /**
      * ARKode absolute tolerances vector.
      */
-    N_Vector abs_tolls;
+    internal::NVectorView<VectorType> abs_tolls;
 
     /**
      * MPI communicator. SUNDIALS solver runs happily in
