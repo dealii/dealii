@@ -20,13 +20,11 @@
 #include <deal.II/sundials/n_vector.templates.h>
 
 #ifdef DEAL_II_WITH_SUNDIALS
-#  if DEAL_II_SUNDIALS_VERSION_GTE(5, 0, 0)
 
 DEAL_II_NAMESPACE_OPEN
 
-#    include "n_vector.inst"
+#  include "n_vector.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 
-#  endif
 #endif
