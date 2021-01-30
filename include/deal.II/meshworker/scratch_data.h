@@ -524,6 +524,14 @@ namespace MeshWorker
     get_general_data_storage();
 
     /**
+     * Return a GeneralDataStorage object that can be used to store any amount
+     * of data, of any type, which is then made accessible by an identifier
+     * string.
+     */
+    const GeneralDataStorage &
+    get_general_data_storage() const;
+
+    /**
      * @name Evaluation of finite element fields and their derivatives on the current cell
      */
     /** @{ */ // CurrentCellEvaluation
