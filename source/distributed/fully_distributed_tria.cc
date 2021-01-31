@@ -207,7 +207,7 @@ namespace parallel
         }
 
       this->update_number_cache();
-      // this->update_cell_relations();
+      this->update_cell_relations();
     }
 
 
