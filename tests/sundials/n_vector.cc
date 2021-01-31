@@ -132,6 +132,47 @@ namespace
     return vector;
   }
 
+  template <>
+  TrilinosWrappers::MPI::BlockVector
+  create_test_vector(double value)
+  {
+    const unsigned n_processes =
+      Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+    const unsigned block_size =
+      ((n_processes - 1) * (n_processes)) / 2 + n_processes;
+    const auto partitioning =
+      create_parallel_index_set().split_by_block({block_size, block_size});
+    TrilinosWrappers::MPI::BlockVector vector(partitioning, MPI_COMM_WORLD);
+    vector = value;
+    return vector;
+  }
+
+  template <>
+  PETScWrappers::MPI::Vector
+  create_test_vector(double value)
+  {
+    IndexSet local_dofs = create_parallel_index_set();
+
+    PETScWrappers::MPI::Vector vector(local_dofs, MPI_COMM_WORLD);
+    vector = value;
+    return vector;
+  }
+
+  template <>
+  PETScWrappers::MPI::BlockVector
+  create_test_vector(double value)
+  {
+    const unsigned n_processes =
+      Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+    const unsigned block_size =
+      ((n_processes - 1) * (n_processes)) / 2 + n_processes;
+    const auto partitioning =
+      create_parallel_index_set().split_by_block({block_size, block_size});
+    PETScWrappers::MPI::BlockVector vector(partitioning, MPI_COMM_WORLD);
+    vector = value;
+    return vector;
+  }
+
   template <typename VectorType>
   bool
   vector_equal(const VectorType &a, const VectorType &b)
@@ -575,8 +616,6 @@ test_min_element()
   auto nv_b = make_nvector_view(vector_b);
 
   auto result = N_VMin(nv_a);
-  std::cout << "result: " << result << std::endl;
-  vector_a.print(std::cout);
   Assert(std::fabs(result - 2.0) < 1e-12, NVectorTestError());
 
   result = N_VMin(nv_b);
@@ -654,4 +693,15 @@ main(int argc, char **argv)
   run_all_tests<LinearAlgebra::distributed::BlockVector<double>>(
     "LinearAlgebra::distributed::BlockVector<double>");
   run_all_tests<TrilinosWrappers::MPI::Vector>("TrilinosWrappers::MPI::Vector");
+  run_all_tests<TrilinosWrappers::MPI::BlockVector>(
+    "TrilinosWrappers::MPI::BlockVector");
+  run_all_tests<PETScWrappers::MPI::Vector>("PETScWrappers::MPI::Vector");
+  run_all_tests<PETScWrappers::MPI::BlockVector>(
+    "PETScWrappers::MPI::BlockVector");
+
+  // although the memory would be cleared in ~MPI_InitFinalize it needs to be
+  // done manually to satisfy the PETSc memory check inside ~MPILogInitAll,
+  // which is invoked first
+  GrowingVectorMemory<PETScWrappers::MPI::Vector>::release_unused_memory();
+  GrowingVectorMemory<PETScWrappers::MPI::BlockVector>::release_unused_memory();
 }

@@ -28,6 +28,8 @@
 #  include <deal.II/lac/la_parallel_block_vector.h>
 #  include <deal.II/lac/la_parallel_vector.h>
 #  include <deal.II/lac/la_vector.h>
+#  include <deal.II/lac/petsc_block_vector.h>
+#  include <deal.II/lac/petsc_vector.h>
 #  include <deal.II/lac/trilinos_parallel_block_vector.h>
 #  include <deal.II/lac/trilinos_vector.h>
 #  include <deal.II/lac/vector_memory.h>
@@ -651,9 +653,21 @@ template <typename VectorType,
 realtype
 SUNDIALS::internal::NVectorOperations::min_element(N_Vector x)
 {
-  auto *     vector    = unwrap_nvector_const<VectorType>(x);
-  const auto local_min = *std::min_element(vector->begin(), vector->end());
-  return Utilities::MPI::min(local_min, get_communicator<VectorType>(x));
+  auto *vector = unwrap_nvector_const<VectorType>(x);
+
+
+  const auto indexed_less_than = [&](const IndexSet::size_type idxa,
+                                     const IndexSet::size_type idxb) {
+    return (*vector)[idxa] < (*vector)[idxb];
+  };
+
+  auto local_elements = vector->locally_owned_elements();
+
+  const auto local_min = *std::min_element(local_elements.begin(),
+                                           local_elements.end(),
+                                           indexed_less_than);
+  return Utilities::MPI::min((*vector)[local_min],
+                             get_communicator<VectorType>(x));
 }
 
 
@@ -673,12 +687,22 @@ SUNDIALS::internal::NVectorOperations::min_element(N_Vector x)
 
   for (unsigned i = 0; i < vector->n_blocks(); ++i)
     {
+      const auto indexed_less_than = [&](const IndexSet::size_type idxa,
+                                         const IndexSet::size_type idxb) {
+        return vector->block(i)[idxa] < vector->block(i)[idxb];
+      };
+
+      auto local_elements = vector->block(i).locally_owned_elements();
+
       const auto block_local_min_element =
-        std::min_element(vector->block(i).begin(), vector->block(i).end());
+        std::min_element(local_elements.begin(),
+                         local_elements.end(),
+                         indexed_less_than);
 
       // guard against empty blocks on this processor
-      if (block_local_min_element != vector->block(i).end())
-        proc_local_min = std::min(proc_local_min, *block_local_min_element);
+      if (block_local_min_element != local_elements.end())
+        proc_local_min =
+          std::min(proc_local_min, vector->block(i)[*block_local_min_element]);
     }
 
   return Utilities::MPI::min(proc_local_min, get_communicator<VectorType>(x));
@@ -715,11 +739,12 @@ SUNDIALS::internal::NVectorOperations::elementwise_div(N_Vector x,
   AssertDimension(x_dealii->size(), z_dealii->size());
   AssertDimension(x_dealii->size(), y_dealii->size());
 
-  std::transform(x_dealii->begin(),
-                 x_dealii->end(),
-                 y_dealii->begin(),
-                 z_dealii->begin(),
-                 std::divides<>{});
+  auto x_ele = x_dealii->locally_owned_elements();
+  for (const auto idx : x_ele)
+    {
+      (*z_dealii)[idx] = (*x_dealii)[idx] / (*y_dealii)[idx];
+    }
+  z_dealii->compress(VectorOperation::insert);
 }
 
 
@@ -741,11 +766,15 @@ SUNDIALS::internal::NVectorOperations::elementwise_div(N_Vector x,
   AssertDimension(x_dealii->n_blocks(), y_dealii->n_blocks());
 
   for (unsigned i = 0; i < x_dealii->n_blocks(); ++i)
-    std::transform(x_dealii->block(i).begin(),
-                   x_dealii->block(i).end(),
-                   y_dealii->block(i).begin(),
-                   z_dealii->block(i).begin(),
-                   std::divides<>{});
+    {
+      auto x_ele = x_dealii->block(i).locally_owned_elements();
+      for (const auto idx : x_ele)
+        {
+          z_dealii->block(i)[idx] =
+            x_dealii->block(i)[idx] / y_dealii->block(i)[idx];
+        }
+    }
+  z_dealii->compress(VectorOperation::insert);
 }
 
 
@@ -760,10 +789,12 @@ SUNDIALS::internal::NVectorOperations::elementwise_inv(N_Vector x, N_Vector z)
 
   AssertDimension(x_dealii->size(), z_dealii->size());
 
-  std::transform(x_dealii->begin(),
-                 x_dealii->end(),
-                 z_dealii->begin(),
-                 [](typename VectorType::value_type v) { return 1.0 / v; });
+  auto x_ele = x_dealii->locally_owned_elements();
+  for (const auto idx : x_ele)
+    {
+      (*z_dealii)[idx] = 1.0 / (*x_dealii)[idx];
+    }
+  z_dealii->compress(VectorOperation::insert);
 }
 
 
@@ -780,10 +811,15 @@ SUNDIALS::internal::NVectorOperations::elementwise_inv(N_Vector x, N_Vector z)
   AssertDimension(x_dealii->n_blocks(), z_dealii->n_blocks());
 
   for (unsigned i = 0; i < x_dealii->n_blocks(); ++i)
-    std::transform(x_dealii->block(i).begin(),
-                   x_dealii->block(i).end(),
-                   z_dealii->block(i).begin(),
-                   [](typename VectorType::value_type v) { return 1.0 / v; });
+    {
+      auto x_ele = x_dealii->block(i).locally_owned_elements();
+      for (const auto idx : x_ele)
+        {
+          z_dealii->block(i)[idx] = 1.0 / x_dealii->block(i)[idx];
+        }
+    }
+
+  z_dealii->compress(VectorOperation::insert);
 }
 
 
@@ -798,12 +834,13 @@ SUNDIALS::internal::NVectorOperations::elementwise_abs(N_Vector x, N_Vector z)
 
   AssertDimension(x_dealii->size(), z_dealii->size());
 
-  std::transform(x_dealii->begin(),
-                 x_dealii->end(),
-                 z_dealii->begin(),
-                 [](typename VectorType::value_type v) {
-                   return std::fabs(v);
-                 });
+  auto x_ele = x_dealii->locally_owned_elements();
+  for (const auto idx : x_ele)
+    {
+      (*z_dealii)[idx] = std::fabs((*x_dealii)[idx]);
+    }
+
+  z_dealii->compress(VectorOperation::insert);
 }
 
 
@@ -820,12 +857,15 @@ SUNDIALS::internal::NVectorOperations::elementwise_abs(N_Vector x, N_Vector z)
   AssertDimension(x_dealii->n_blocks(), z_dealii->n_blocks());
 
   for (unsigned i = 0; i < x_dealii->n_blocks(); ++i)
-    std::transform(x_dealii->block(i).begin(),
-                   x_dealii->block(i).end(),
-                   z_dealii->block(i).begin(),
-                   [](typename VectorType::value_type v) {
-                     return std::fabs(v);
-                   });
+    {
+      auto x_ele = x_dealii->block(i).locally_owned_elements();
+      for (const auto idx : x_ele)
+        {
+          z_dealii->block(i)[idx] = std::fabs(x_dealii->block(i)[idx]);
+        }
+    }
+
+  z_dealii->compress(VectorOperation::insert);
 }
 
 
