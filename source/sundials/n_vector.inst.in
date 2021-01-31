@@ -68,3 +68,21 @@ for (V : DEAL_II_VEC_TEMPLATES)
       const TrilinosWrappers::MPI::V>;
   }
 #endif
+
+#ifdef DEAL_II_WITH_PETSC
+// PETScWrappers Vector and BlockVector
+for (V : DEAL_II_VEC_TEMPLATES)
+  {
+    template SUNDIALS::internal::NVectorView<PETScWrappers::MPI::V>
+    SUNDIALS::internal::make_nvector_view<>(PETScWrappers::MPI::V &);
+    template SUNDIALS::internal::NVectorView<const PETScWrappers::MPI::V>
+    SUNDIALS::internal::make_nvector_view<>(const PETScWrappers::MPI::V &);
+    template PETScWrappers::MPI::V
+      *SUNDIALS::internal::unwrap_nvector<PETScWrappers::MPI::V>(N_Vector);
+    template const PETScWrappers::MPI::V *
+      SUNDIALS::internal::unwrap_nvector_const<PETScWrappers::MPI::V>(N_Vector);
+
+    template class SUNDIALS::internal::NVectorView<PETScWrappers::MPI::V>;
+    template class SUNDIALS::internal::NVectorView<const PETScWrappers::MPI::V>;
+  }
+#endif
