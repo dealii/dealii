@@ -15,17 +15,17 @@
 
 
 
-// verify hanging node constraints on locally p-refined simplex mesh
+// verify hanging node constraints on locally hp-refined simplex mesh
 //
 // dofs will be enumerated as follows
-//  scenario 1:    scenario 2:
-//   6-------4      2---4---3
-//   |\      |      |\      |
-//   |  \    |      |  \    |
-//   3   2   |      |   5   6
-//   |    \  |      |    \  |
-//   |      \|      |      \|
-//   0---1---5      0-------1
+//  scenario 1:
+//   9---1---0
+//   |\      |
+//   |  \    |
+//   6--2,8  3
+//   |\  |\  |
+//   |  \|  \|
+//   4---5---7
 
 
 #include <deal.II/dofs/dof_handler.h>
@@ -61,15 +61,15 @@ main()
         GridGenerator::subdivided_hyper_cube_with_simplices(tria, 1);
       };
 
-    test<dim>({0, 0},
-              {0, 1},
-              hp::FECollection<dim>(Simplex::FE_P<dim>(2),
-                                    Simplex::FE_P<dim>(1)),
-              subdivided_hyper_cube_with_simplices);
-    test<dim>({0, 0},
+    test<dim>({1, 0},
               {0, 1},
               hp::FECollection<dim>(Simplex::FE_P<dim>(1),
                                     Simplex::FE_P<dim>(2)),
+              subdivided_hyper_cube_with_simplices);
+    test<dim>({1, 0},
+              {0, 1},
+              hp::FECollection<dim>(Simplex::FE_P<dim>(2),
+                                    Simplex::FE_P<dim>(1)),
               subdivided_hyper_cube_with_simplices);
   }
   deallog.pop();

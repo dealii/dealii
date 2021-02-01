@@ -376,5 +376,60 @@ namespace dealii
           AssertThrow(false, ExcNotImplemented())
         }
     }
+
+
+
+    /**
+     * Adds a simplex cell to face @p face_no of a hyper_cube cell.
+     */
+    template <int dim, int spacedim>
+    void
+    cube_and_pyramid(Triangulation<dim, spacedim> &tria,
+                     const unsigned int            face_no = 1)
+    {
+      Assert(face_no % 2 == 1,
+             ExcMessage("Only works for odd face numbers. "
+                        "GridReordering::reorder_cells() is not prepared for "
+                        "simplices yet (uses GeometryInfo)."));
+
+      // create cube
+      Triangulation<dim, spacedim> tria_cube;
+      GridGenerator::hyper_cube(tria_cube);
+      const auto cube = tria_cube.begin_active();
+      AssertIndexRange(face_no, cube->n_faces());
+
+      // extract vertices from specified face, store their midpoint
+      std::vector<Point<spacedim>> vertices;
+      Point<spacedim>              midpoint;
+      const auto                   shared_face = cube->face(face_no);
+      for (unsigned int v = 0; v < shared_face->n_vertices(); ++v)
+        {
+          const auto &vertex = shared_face->vertex(v);
+          vertices.push_back(vertex);
+          midpoint += vertex;
+        }
+      midpoint /= vertices.size();
+
+      // add simplex cell in coordinate direction
+      const unsigned int coordinate = face_no / 2;
+#ifdef DEBUG
+      // all vertices should be in a plane
+      for (const auto &vertex : vertices)
+        Assert(midpoint(coordinate) == vertex(coordinate), ExcInternalError());
+#endif
+
+      // add another vertex as tip of triangle/pyramid
+      Point<spacedim> tip = midpoint;
+      tip(coordinate) += (face_no % 2 == 1) ? 1. : -1.;
+      vertices.push_back(tip);
+
+      CellData<dim> simplex(vertices.size());
+      std::iota(simplex.vertices.begin(), simplex.vertices.end(), 0);
+
+      Triangulation<dim, spacedim> tria_simplex;
+      tria_simplex.create_triangulation(vertices, {simplex}, SubCellData());
+
+      GridGenerator::merge_triangulations(tria_cube, tria_simplex, tria);
+    }
   } // namespace GridGenerator
 } // namespace dealii
