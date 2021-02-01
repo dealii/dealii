@@ -531,8 +531,6 @@ namespace internal
                       patch_values_system.solution_gradients.size());
       AssertDimension(patch_values_system.solution_values.size(),
                       patch_values_system.solution_hessians.size());
-      if (patch_values_system.solution_values[0].size() == n_components)
-        return;
       for (unsigned int k = 0; k < patch_values_system.solution_values.size();
            ++k)
         {

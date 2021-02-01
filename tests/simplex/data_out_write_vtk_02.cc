@@ -148,12 +148,11 @@ main()
           const unsigned int dim = 2;
           test<dim>(Simplex::FE_P<dim>(2), FE_Q<dim>(2), 1, do_high_order);
 
-          continue; // TODO
-
           test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2), dim),
                     FESystem<dim>(FE_Q<dim>(2), dim),
                     dim,
                     do_high_order);
+
           test<dim>(
             FESystem<dim>(Simplex::FE_P<dim>(2), dim, Simplex::FE_P<dim>(1), 1),
             FESystem<dim>(FE_Q<dim>(2), dim, FE_Q<dim>(1), 1),
