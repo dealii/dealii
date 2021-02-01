@@ -1,0 +1,4 @@
+New: MGConstrainedDoFs::initialize() now permits to specify if one wants to 
+impose zero Dirichlet conditions between refinement edges.
+<br>
+(Luca Heltai, 2021/02/01)

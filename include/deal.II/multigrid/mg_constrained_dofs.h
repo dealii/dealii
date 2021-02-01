@@ -52,9 +52,9 @@ public:
    * from the dof handler object. Works with natural boundary conditions only.
    * There exists a sister function setting up boundary constraints as well.
    *
-   * This function ensures that on every level, degrees of freedom at interior
-   * edges of a refinement level are treated corrected but leaves degrees of
-   * freedom at the boundary of the domain untouched assuming that no
+   * This function allows to control if degrees of freedom at
+   * interior edges of a refinement level are set to zero, but leaves degrees
+   * of freedom at the boundary of the domain untouched assuming that no
    * Dirichlet boundary conditions for them exist.
    *
    * Furthermore, this call sets up an AffineConstraints object on each
@@ -76,7 +76,8 @@ public:
   void
   initialize(const DoFHandler<dim, spacedim> &dof,
              const MGLevelObject<IndexSet> &  level_relevant_dofs =
-               MGLevelObject<IndexSet>());
+               MGLevelObject<IndexSet>(),
+             const bool &set_zero_constraints_at_refinement_edge = true);
 
   /**
    * Fill the internal data structures with information
@@ -235,7 +236,8 @@ template <int dim, int spacedim>
 inline void
 MGConstrainedDoFs::initialize(
   const DoFHandler<dim, spacedim> &dof,
-  const MGLevelObject<IndexSet> &  level_relevant_dofs)
+  const MGLevelObject<IndexSet> &  level_relevant_dofs,
+  const bool &                     set_zero_constraints_at_refinement_edge)
 {
   boundary_indices.clear();
   refinement_edge_indices.clear();
@@ -328,8 +330,8 @@ MGConstrainedDoFs::initialize(
       // Initialize with empty IndexSet of correct size
       refinement_edge_indices[l] = IndexSet(dof.n_dofs(l));
     }
-
-  MGTools::extract_inner_interface_dofs(dof, refinement_edge_indices);
+  if (set_zero_constraints_at_refinement_edge)
+    MGTools::extract_inner_interface_dofs(dof, refinement_edge_indices);
 }
 
 
