@@ -24,6 +24,8 @@
 #  include <deal.II/base/utilities.h>
 
 #  include <deal.II/lac/block_vector.h>
+#  include <deal.II/lac/la_parallel_block_vector.h>
+#  include <deal.II/lac/la_parallel_vector.h>
 #  ifdef DEAL_II_WITH_TRILINOS
 #    include <deal.II/lac/trilinos_parallel_block_vector.h>
 #    include <deal.II/lac/trilinos_vector.h>
@@ -1016,12 +1018,22 @@ namespace SUNDIALS
   template class ARKode<Vector<double>>;
   template class ARKode<BlockVector<double>>;
 
+  template class ARKode<LinearAlgebra::distributed::Vector<double>>;
+  template class ARKode<LinearAlgebra::distributed::BlockVector<double>>;
+
 #  if DEAL_II_SUNDIALS_VERSION_GTE(4, 0, 0)
   template struct SundialsOperator<Vector<double>>;
   template struct SundialsOperator<BlockVector<double>>;
+  template struct SundialsOperator<LinearAlgebra::distributed::Vector<double>>;
+  template struct SundialsOperator<
+    LinearAlgebra::distributed::BlockVector<double>>;
 
   template struct SundialsPreconditioner<Vector<double>>;
   template struct SundialsPreconditioner<BlockVector<double>>;
+  template struct SundialsPreconditioner<
+    LinearAlgebra::distributed::Vector<double>>;
+  template struct SundialsPreconditioner<
+    LinearAlgebra::distributed::BlockVector<double>>;
 #  endif
 
 #  ifdef DEAL_II_WITH_MPI
@@ -1045,11 +1057,11 @@ namespace SUNDIALS
   template class ARKode<PETScWrappers::MPI::BlockVector>;
 
 #        if DEAL_II_SUNDIALS_VERSION_GTE(4, 0, 0)
-  template class SundialsOperator<PETScWrappers::MPI::Vector>;
-  template class SundialsOperator<PETScWrappers::MPI::BlockVector>;
+  template struct SundialsOperator<PETScWrappers::MPI::Vector>;
+  template struct SundialsOperator<PETScWrappers::MPI::BlockVector>;
 
-  template class SundialsPreconditioner<PETScWrappers::MPI::Vector>;
-  template class SundialsPreconditioner<PETScWrappers::MPI::BlockVector>;
+  template struct SundialsPreconditioner<PETScWrappers::MPI::Vector>;
+  template struct SundialsPreconditioner<PETScWrappers::MPI::BlockVector>;
 #        endif
 #      endif // PETSC_USE_COMPLEX
 #    endif   // DEAL_II_WITH_PETSC
