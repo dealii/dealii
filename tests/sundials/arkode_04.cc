@@ -72,11 +72,6 @@ main(int argc, char **argv)
 
   SUNDIALS::ARKode<VectorType> ode(data);
 
-  ode.reinit_vector = [&](VectorType &v) {
-    // Three independent variables
-    v.reinit(3);
-  };
-
   // Parameters
   double u0 = 3.9, v0 = 1.1, w0 = 2.8, a = 1.2, b = 2.5, eps = 1e-5;
   // Explicit jacobian.

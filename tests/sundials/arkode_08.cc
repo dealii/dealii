@@ -69,8 +69,6 @@ main(int argc, char **argv)
 
   SUNDIALS::ARKode<VectorType> ode(data);
 
-  ode.reinit_vector = [&](VectorType &v) { v.reinit(2); };
-
   // Explicit jacobian = stiffness matrix
   FullMatrix<double> K(2, 2);
   K(0, 0) = K(1, 1) = 0.5;

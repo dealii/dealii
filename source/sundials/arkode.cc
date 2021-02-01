@@ -384,11 +384,8 @@ namespace SUNDIALS
 
       LinearSolveFunction<VectorType> lsolve;
 
-      //! solver reference to forward all solver related calls to user-specified
-      //! functions
-      ARKode<VectorType> *solver;
-      void *              P_data;
-      void *              A_data;
+      void *P_data;
+      void *A_data;
     };
 
 
@@ -422,18 +419,15 @@ namespace SUNDIALS
                         N_Vector b,
                         realtype tol)
     {
-      auto                content = access_content<VectorType>(LS);
-      ARKode<VectorType> &solver  = *(content->solver);
+      auto content = access_content<VectorType>(LS);
 
       auto *src_b = internal::unwrap_nvector_const<VectorType>(b);
       auto *dst_x = internal::unwrap_nvector<VectorType>(x);
 
-      SundialsOperator<VectorType> op(solver,
-                                      content->A_data,
-                                      content->a_times_fn);
+      SundialsOperator<VectorType> op(content->A_data, content->a_times_fn);
 
       SundialsPreconditioner<VectorType> preconditioner(
-        solver, content->P_data, content->preconditioner_solve, tol);
+        content->P_data, content->preconditioner_solve, tol);
 
       return content->lsolve(op, preconditioner, *dst_x, *src_b, tol);
     }
@@ -503,8 +497,7 @@ namespace SUNDIALS
   class SundialsLinearSolverWrapper
   {
   public:
-    SundialsLinearSolverWrapper(ARKode<VectorType> &            solver,
-                                LinearSolveFunction<VectorType> lsolve)
+    SundialsLinearSolverWrapper(LinearSolveFunction<VectorType> lsolve)
     {
       sun_linear_solver                  = SUNLinSolNewEmpty();
       sun_linear_solver->ops->gettype    = arkode_linsol_get_type;
@@ -515,7 +508,6 @@ namespace SUNDIALS
       sun_linear_solver->ops->setpreconditioner =
         arkode_linsol_set_preconditioner<VectorType>;
 
-      content.solver             = &solver;
       content.lsolve             = lsolve;
       sun_linear_solver->content = &content;
     }
@@ -811,7 +803,7 @@ namespace SUNDIALS
           {
             linear_solver =
               std::make_unique<SundialsLinearSolverWrapper<VectorType>>(
-                *this, solve_linearized_system);
+                solve_linearized_system);
             sun_linear_solver = linear_solver->get_wrapped_solver();
           }
         else
@@ -882,7 +874,7 @@ namespace SUNDIALS
           {
             mass_solver =
               std::make_unique<SundialsLinearSolverWrapper<VectorType>>(
-                *this, solve_mass);
+                solve_mass);
             sun_mass_linear_solver = mass_solver->get_wrapped_solver();
           }
         else
@@ -949,11 +941,9 @@ namespace SUNDIALS
 #  if DEAL_II_SUNDIALS_VERSION_GTE(4, 0, 0)
 
   template <typename VectorType>
-  SundialsOperator<VectorType>::SundialsOperator(ARKode<VectorType> &solver,
-                                                 void *              A_data,
-                                                 ATimesFn            a_times_fn)
-    : solver(solver)
-    , A_data(A_data)
+  SundialsOperator<VectorType>::SundialsOperator(void *   A_data,
+                                                 ATimesFn a_times_fn)
+    : A_data(A_data)
     , a_times_fn(a_times_fn)
 
   {
@@ -978,12 +968,10 @@ namespace SUNDIALS
 
   template <typename VectorType>
   SundialsPreconditioner<VectorType>::SundialsPreconditioner(
-    ARKode<VectorType> &solver,
-    void *              P_data,
-    PSolveFn            p_solve_fn,
-    double              tol)
-    : solver(solver)
-    , P_data(P_data)
+    void *   P_data,
+    PSolveFn p_solve_fn,
+    double   tol)
+    : P_data(P_data)
     , p_solve_fn(p_solve_fn)
     , tol(tol)
   {}

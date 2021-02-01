@@ -76,8 +76,6 @@ main(int argc, char **argv)
 
   SUNDIALS::ARKode<VectorType> ode(data);
 
-  ode.reinit_vector = [&](VectorType &v) { v.reinit(2); };
-
   double kappa = 1.0;
 
   ode.explicit_function =
