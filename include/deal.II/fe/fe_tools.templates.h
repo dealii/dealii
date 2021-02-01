@@ -1605,7 +1605,7 @@ namespace FETools
 
     // First, create a local mass matrix for the unit cell
     Triangulation<dim, spacedim> tr;
-    reference_cell_type.make_triangulation(tr);
+    GridGenerator::reference_cell(reference_cell_type, tr);
 
     const auto &mapping =
       reference_cell_type.template get_default_linear_mapping<dim, spacedim>();
@@ -1814,7 +1814,7 @@ namespace FETools
         // Set up meshes, one with a single
         // reference cell and refine it once
         Triangulation<dim, spacedim> tria;
-        reference_cell_type.make_triangulation(tria);
+        GridGenerator::reference_cell(reference_cell_type, tria);
         tria.begin_active()->set_refine_flag(RefinementCase<dim>(ref_case));
         tria.execute_coarsening_and_refinement();
 

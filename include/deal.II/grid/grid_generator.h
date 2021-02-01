@@ -25,6 +25,7 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/table.h>
 
+#include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria.h>
 
 #include <array>
@@ -127,6 +128,17 @@ namespace GridGenerator
   void
   simplex(Triangulation<dim, dim> &      tria,
           const std::vector<Point<dim>> &vertices);
+
+  /*
+   * Create a (coarse) grid with a single cell of the shape of the provided
+   * reference cell. This is a generalization of the hyper_cube() and simplex()
+   * functions above.
+   */
+  template <int dim, int spacedim>
+  void
+  reference_cell(const ReferenceCell::Type &   reference_cell,
+                 Triangulation<dim, spacedim> &tria);
+
 
   /**
    * Same as hyper_cube(), but with the difference that not only one cell is

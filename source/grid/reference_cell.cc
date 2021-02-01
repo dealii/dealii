@@ -93,82 +93,6 @@ namespace ReferenceCell
 
 
   template <int dim, int spacedim>
-  void
-  Type::make_triangulation(Triangulation<dim, spacedim> &tria) const
-  {
-    AssertDimension(dim, this->get_dimension());
-
-    if (this->is_hyper_cube())
-      {
-        GridGenerator::hyper_cube(tria, 0, 1);
-      }
-    else if ((dim == 2) && (*this == Tri))
-      {
-        const std::vector<Point<spacedim>> vertices = {
-          Point<spacedim>(),               // the origin
-          Point<spacedim>::unit_vector(0), // unit point along x-axis
-          Point<spacedim>::unit_vector(1)  // unit point along y-axis
-        };
-
-        std::vector<CellData<dim>> cells(1);
-        cells[0].vertices = {0, 1, 2};
-
-        tria.create_triangulation(vertices, cells, {});
-      }
-    else if ((dim == 3) && (*this == Tet))
-      {
-        AssertDimension(spacedim, 3);
-
-        static const std::vector<Point<spacedim>> vertices = {
-          {{0.0, 0.0, 0.0}, {1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}}};
-
-        std::vector<CellData<dim>> cells(1);
-        cells[0].vertices = {0, 1, 2, 3};
-
-        tria.create_triangulation(vertices, cells, {});
-      }
-    else if ((dim == 3) && (*this == Pyramid))
-      {
-        AssertDimension(spacedim, 3);
-
-        static const std::vector<Point<spacedim>> vertices = {
-          {{-1.0, -1.0, 0.0},
-           {+1.0, -1.0, 0.0},
-           {-1.0, +1.0, 0.0},
-           {+1.0, +1.0, 0.0},
-           {+0.0, +0.0, 1.0}}};
-
-        std::vector<CellData<dim>> cells(1);
-        cells[0].vertices = {0, 1, 2, 3, 4};
-
-        tria.create_triangulation(vertices, cells, {});
-      }
-    else if ((dim == 3) && (*this == Wedge))
-      {
-        AssertDimension(spacedim, 3);
-
-        static const std::vector<Point<spacedim>> vertices = {
-          {{1.0, 0.0, 0.0},
-           {0.0, 1.0, 0.0},
-           {0.0, 0.0, 0.0},
-           {1.0, 0.0, 1.0},
-           {0.0, 1.0, 1.0},
-           {0.0, 0.0, 1.0}}};
-
-        std::vector<CellData<dim>> cells(1);
-        cells[0].vertices = {0, 1, 2, 3, 4, 5};
-
-        tria.create_triangulation(vertices, cells, {});
-      }
-    else
-      {
-        Assert(false, ExcNotImplemented());
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
   std::unique_ptr<Mapping<dim, spacedim>>
   Type::get_default_mapping(const unsigned int degree) const
   {
@@ -284,7 +208,7 @@ namespace ReferenceCell
 
     const auto create_quadrature = [](const Type &reference_cell) {
       Triangulation<dim> tria;
-      reference_cell.make_triangulation(tria);
+      GridGenerator::reference_cell(reference_cell, tria);
 
       return Quadrature<dim>(tria.get_vertices());
     };

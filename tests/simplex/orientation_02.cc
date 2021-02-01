@@ -17,6 +17,7 @@
 
 // Test a mesh with two tetrahedra for all possible orientations.
 
+#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria.h>
 
@@ -29,7 +30,7 @@ test(const unsigned int orientation)
 
 
   Triangulation<3> dummy, tria;
-  ReferenceCell::Type::Tet.make_triangulation(dummy);
+  GridGenerator::reference_cell(ReferenceCell::Type::Tet, dummy);
 
   auto vertices = dummy.get_vertices();
 
