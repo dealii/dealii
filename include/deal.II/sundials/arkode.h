@@ -280,10 +280,8 @@ namespace SUNDIALS
    * $z_j$ where $j < i$). Additional information on the specific predictor
    * algorithms implemented in ARKode is provided in ARKode documentation.
    *
-   * The user has to provide the implementation of the following
-   *`std::function`s:
-   *  - reinit_vector()
-   * and either one or both of
+   * The user has to provide the implementation of at least one (or both) of the
+   * following `std::function`s:
    *  - implicit_function()
    *  - explicit_function()
    *
@@ -363,12 +361,7 @@ namespace SUNDIALS
    *
    * SUNDIALS::ARKode<VectorType> ode;
    *
-   * ode.reinit_vector = [] (VectorType&v)
-   * {
-   *   v.reinit(2);
-   * };
-   *
-   * double kappa = 1.0;
+   * const double kappa = 1.0;
    *
    * ode.explicit_function = [kappa] (double,
    *                                  const VectorType &y,
@@ -634,9 +627,14 @@ namespace SUNDIALS
     get_arkode_memory() const;
 
     /**
-     * A function object that users need to supply and that is intended to
-     * reinit the given vector.
+     * A function object that was used to `reinit` the given vector. Setting
+     * this field does no longer have any effect and all auxiliary vectors are
+     * reinit-ed automatically based on the user-supplied vector in solve_ode().
+     *
+     * @deprecated This function is no longer used and can be safely removed in
+     *   user code.
      */
+    DEAL_II_DEPRECATED
     std::function<void(VectorType &)> reinit_vector;
 
     /**
@@ -1373,19 +1371,12 @@ namespace SUNDIALS
     /**
      * Constructor.
      *
-     * @param solver The ARKode solver that uses this operator
      * @param A_data Data required by @p a_times_fn
      * @param a_times_fn A function pointer to the function that computes A*v
      */
-    SundialsOperator(ARKode<VectorType> &solver,
-                     void *              A_data,
-                     ATimesFn            a_times_fn);
+    SundialsOperator(void *A_data, ATimesFn a_times_fn);
 
   private:
-    /**
-     * Reference to the ARKode object that uses this SundialsOperator.
-     */
-    ARKode<VectorType> &solver;
     /**
      * Data necessary to evaluate a_times_fn.
      */
@@ -1421,23 +1412,14 @@ namespace SUNDIALS
     /**
      * Constructor.
      *
-     * @param solver The ARKode solver that uses this operator
      * @param P_data Data required by @p p_solve_fn
      * @param p_solve_fn A function pointer to the function that computes A*v
      * @param tol Tolerance, that an iterative solver should use to judge
      *   convergence
      */
-    SundialsPreconditioner(ARKode<VectorType> &solver,
-                           void *              P_data,
-                           PSolveFn            p_solve_fn,
-                           double              tol);
+    SundialsPreconditioner(void *P_data, PSolveFn p_solve_fn, double tol);
 
   private:
-    /**
-     * Reference to the ARKode object that uses this SundialsPreconditioner.
-     */
-    ARKode<VectorType> &solver;
-
     /**
      * Data necessary to calls p_solve_fn
      */
