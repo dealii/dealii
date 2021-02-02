@@ -16,14 +16,14 @@
 #include <deal.II/base/parameter_handler.h>
 
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 
 #include <deal.II/sundials/arkode.h>
 
 #include "../tests.h"
 
 
-// Test implicit-explicit time stepper, no jacobian.
+// Test implicit-explicit time stepper, no jacobian. Use L:d:V (in serial)
 // Brusselator benchmark
 
 /**
@@ -54,7 +54,7 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, numbers::invalid_unsigned_int);
 
-  typedef Vector<double> VectorType;
+  using VectorType = LinearAlgebra::distributed::Vector<double>;
 
   ParameterHandler                             prm;
   SUNDIALS::ARKode<VectorType>::AdditionalData data;
@@ -108,7 +108,7 @@ main(int argc, char **argv)
     return 0;
   };
 
-  Vector<double> y(3);
+  VectorType y(3);
   y[0] = u0;
   y[1] = v0;
   y[2] = w0;
