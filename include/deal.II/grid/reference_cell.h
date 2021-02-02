@@ -157,6 +157,13 @@ namespace ReferenceCell
                             const unsigned int i) const;
 
     /**
+     * Return the unit normal vector of a face of the reference cell.
+     */
+    template <int dim>
+    Tensor<1, dim>
+    unit_normal_vectors(const unsigned int face_no) const;
+
+    /**
      * Determine the orientation of the current entity described by its
      * vertices @p var_1 relative to an entity described by @p var_0.
      */
@@ -674,27 +681,26 @@ namespace ReferenceCell
     return {};
   }
 
-  /**
-   * Return the unit normal vector of a face of the reference cell.
-   */
+
+
   template <int dim>
   inline Tensor<1, dim>
-  unit_normal_vectors(const Type &reference_cell, const unsigned int face_no)
+  Type::unit_normal_vectors(const unsigned int face_no) const
   {
-    AssertDimension(dim, reference_cell.get_dimension());
+    AssertDimension(dim, this->get_dimension());
 
-    if (reference_cell == Type::get_hypercube<dim>())
+    if (is_hyper_cube())
       {
         AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
         return GeometryInfo<dim>::unit_normal_vector[face_no];
       }
     else if (dim == 2)
       {
-        const auto tangential =
-          reference_cell.unit_tangential_vectors<dim>(face_no, 0);
+        Assert(*this == Tri, ExcInternalError());
+
+        const auto tangential = unit_tangential_vectors<dim>(face_no, 0);
 
         Tensor<1, dim> result;
-
         result[0] = tangential[1];
         result[1] = -tangential[0];
 
@@ -702,9 +708,8 @@ namespace ReferenceCell
       }
     else if (dim == 3)
       {
-        return cross_product_3d(
-          reference_cell.unit_tangential_vectors<dim>(face_no, 0),
-          reference_cell.unit_tangential_vectors<dim>(face_no, 1));
+        return cross_product_3d(unit_tangential_vectors<dim>(face_no, 0),
+                                unit_tangential_vectors<dim>(face_no, 1));
       }
 
     Assert(false, ExcNotImplemented());

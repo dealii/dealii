@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/template_constraints.h>
+#include <deal.II/base/types.h>
 #include <deal.II/base/work_stream.h>
 
 #include <deal.II/grid/filtered_iterator.h>

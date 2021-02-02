@@ -33,8 +33,7 @@ test(const ReferenceCell::Type &reference_cell)
   for (const auto face_no :
        ReferenceCell::internal::Info::get_cell(reference_cell).face_indices())
     {
-      deallog << ReferenceCell::unit_normal_vectors<dim>(reference_cell,
-                                                         face_no)
+      deallog << reference_cell.template unit_normal_vectors<dim>(face_no)
               << std::endl;
 
       for (unsigned int i = 0; i < dim - 1; ++i)
