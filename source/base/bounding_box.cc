@@ -12,6 +12,7 @@
 // the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
+
 #include <deal.II/base/bounding_box.h>
 #include <deal.II/base/geometry_info.h>
 
@@ -140,24 +141,6 @@ BoundingBox<spacedim, Number>::get_neighbor_type(
       // Degenerate and mergeable cases have been found, it remains:
       return NeighborType::attached_neighbors;
     }
-}
-
-
-
-template <int spacedim, typename Number>
-std::pair<Point<spacedim, Number>, Point<spacedim, Number>> &
-BoundingBox<spacedim, Number>::get_boundary_points()
-{
-  return this->boundary_points;
-}
-
-
-
-template <int spacedim, typename Number>
-const std::pair<Point<spacedim, Number>, Point<spacedim, Number>> &
-BoundingBox<spacedim, Number>::get_boundary_points() const
-{
-  return this->boundary_points;
 }
 
 
