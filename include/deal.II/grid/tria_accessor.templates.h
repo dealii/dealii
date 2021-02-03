@@ -689,7 +689,7 @@ namespace internal
       face_orientation(const TriaAccessor<3, 3, 3> &accessor,
                        const unsigned int           face)
       {
-        return internal::get_bit(
+        return Utilities::get_bit(
           accessor.tria->levels[accessor.present_level]->face_orientations
             [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
           0 /*=orientation_bit*/);
@@ -739,7 +739,7 @@ namespace internal
                    ->face_orientations.size(),
                ExcInternalError());
 
-        return internal::get_bit(
+        return Utilities::get_bit(
           accessor.tria->levels[accessor.present_level]->face_orientations
             [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
           2 /*=flip_bit*/);
@@ -775,7 +775,7 @@ namespace internal
                    ->face_orientations.size(),
                ExcInternalError());
 
-        return internal::get_bit(
+        return Utilities::get_bit(
           accessor.tria->levels[accessor.present_level]->face_orientations
             [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
           1 /*=rotation_bit*/);
@@ -873,7 +873,7 @@ namespace internal
                  accessor.tria->levels[accessor.present_level]
                    ->face_orientations.size(),
                ExcInternalError());
-        internal::set_bit(
+        Utilities::set_bit(
           accessor.tria->levels[accessor.present_level]->face_orientations
             [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
           0 /*=orientation_bit*/,
@@ -906,7 +906,7 @@ namespace internal
                    ->face_orientations.size(),
                ExcInternalError());
 
-        internal::set_bit(
+        Utilities::set_bit(
           accessor.tria->levels[accessor.present_level]->face_orientations
             [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
           2 /*=flip_bit*/,
@@ -939,7 +939,7 @@ namespace internal
                    ->face_orientations.size(),
                ExcInternalError());
 
-        internal::set_bit(
+        Utilities::set_bit(
           accessor.tria->levels[accessor.present_level]->face_orientations
             [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
           1 /*=rotation_bit*/,

@@ -21,6 +21,7 @@
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/utilities.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -767,36 +768,6 @@ get_default_linear_mapping(const Triangulation<dim, spacedim> &triangulation);
 namespace internal
 {
   /**
-   * Check if the bit at position @p n in @p number is set.
-   */
-  inline static bool
-  get_bit(const unsigned char number, const unsigned int n)
-  {
-    AssertIndexRange(n, 8);
-
-    // source:
-    // https://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit
-    // "Checking a bit"
-    return (number >> n) & 1U;
-  }
-
-
-
-  /**
-   * Set the bit at position @p n in @p number to value @p x.
-   */
-  inline static void
-  set_bit(unsigned char &number, const unsigned int n, const bool x)
-  {
-    AssertIndexRange(n, 8);
-
-    // source:
-    // https://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit
-    // "Changing the nth bit to x"
-    number ^= (-static_cast<unsigned char>(x) ^ number) & (1U << n);
-  }
-
-  /**
    * A namespace for geometric information on reference cells.
    */
   namespace Info
@@ -1070,9 +1041,9 @@ namespace internal
         return GeometryInfo<dim>::face_to_cell_lines(
           face,
           line,
-          get_bit(face_orientation, 0),
-          get_bit(face_orientation, 2),
-          get_bit(face_orientation, 1));
+          Utilities::get_bit(face_orientation, 0),
+          Utilities::get_bit(face_orientation, 2),
+          Utilities::get_bit(face_orientation, 1));
       }
 
       unsigned int
@@ -1083,9 +1054,9 @@ namespace internal
         return GeometryInfo<dim>::face_to_cell_vertices(
           face,
           vertex,
-          get_bit(face_orientation, 0),
-          get_bit(face_orientation, 2),
-          get_bit(face_orientation, 1));
+          Utilities::get_bit(face_orientation, 0),
+          Utilities::get_bit(face_orientation, 2),
+          Utilities::get_bit(face_orientation, 1));
       }
     };
 
@@ -1506,9 +1477,9 @@ namespace internal
           {
             return GeometryInfo<3>::standard_to_real_face_line(
               line,
-              get_bit(face_orientation, 0),
-              get_bit(face_orientation, 2),
-              get_bit(face_orientation, 1));
+              Utilities::get_bit(face_orientation, 0),
+              Utilities::get_bit(face_orientation, 2),
+              Utilities::get_bit(face_orientation, 1));
           }
         else // TRI
           {
@@ -1556,9 +1527,9 @@ namespace internal
           {
             return GeometryInfo<3>::standard_to_real_face_vertex(
               vertex,
-              get_bit(face_orientation, 0),
-              get_bit(face_orientation, 2),
-              get_bit(face_orientation, 1));
+              Utilities::get_bit(face_orientation, 0),
+              Utilities::get_bit(face_orientation, 2),
+              Utilities::get_bit(face_orientation, 1));
           }
         else // Tri
           {
@@ -1680,9 +1651,9 @@ namespace internal
           {
             return GeometryInfo<3>::standard_to_real_face_line(
               line,
-              get_bit(face_orientation, 0),
-              get_bit(face_orientation, 2),
-              get_bit(face_orientation, 1));
+              Utilities::get_bit(face_orientation, 0),
+              Utilities::get_bit(face_orientation, 2),
+              Utilities::get_bit(face_orientation, 1));
           }
         else // TRI
           {
@@ -1730,9 +1701,9 @@ namespace internal
           {
             return GeometryInfo<3>::standard_to_real_face_vertex(
               vertex,
-              get_bit(face_orientation, 0),
-              get_bit(face_orientation, 2),
-              get_bit(face_orientation, 1));
+              Utilities::get_bit(face_orientation, 0),
+              Utilities::get_bit(face_orientation, 2),
+              Utilities::get_bit(face_orientation, 1));
           }
         else // TRI
           {
@@ -1827,9 +1798,9 @@ namespace internal
 
         return GeometryInfo<3>::standard_to_real_face_line(
           line,
-          get_bit(face_orientation, 0),
-          get_bit(face_orientation, 2),
-          get_bit(face_orientation, 1));
+          Utilities::get_bit(face_orientation, 0),
+          Utilities::get_bit(face_orientation, 2),
+          Utilities::get_bit(face_orientation, 1));
       }
 
       bool
@@ -1852,9 +1823,10 @@ namespace internal
             {false, false}},
            {{true, false}, {false, true}}}};
 
-        const bool face_orientation = get_bit(face_orientation_raw, 0);
-        const bool face_flip        = get_bit(face_orientation_raw, 2);
-        const bool face_rotation    = get_bit(face_orientation_raw, 1);
+        const bool face_orientation =
+          Utilities::get_bit(face_orientation_raw, 0);
+        const bool face_flip     = Utilities::get_bit(face_orientation_raw, 2);
+        const bool face_rotation = Utilities::get_bit(face_orientation_raw, 1);
 
         return (
           static_cast<bool>(line_orientation) ==
@@ -1879,9 +1851,9 @@ namespace internal
 
         return GeometryInfo<3>::standard_to_real_face_vertex(
           vertex,
-          get_bit(face_orientation, 0),
-          get_bit(face_orientation, 2),
-          get_bit(face_orientation, 1));
+          Utilities::get_bit(face_orientation, 0),
+          Utilities::get_bit(face_orientation, 2),
+          Utilities::get_bit(face_orientation, 1));
       }
 
       dealii::ReferenceCell
