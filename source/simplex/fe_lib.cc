@@ -15,6 +15,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/qprojector.h>
+
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q.h>
@@ -449,6 +451,155 @@ namespace Simplex
 
     // finally return the matrix
     return this->prolongation[refinement_case - 1][child];
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  FE_Poly<dim, spacedim>::get_face_interpolation_matrix(
+    const FiniteElement<dim, spacedim> &x_source_fe,
+    FullMatrix<double> &                interpolation_matrix,
+    const unsigned int                  face_no) const
+  {
+    Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(face_no),
+           ExcDimensionMismatch(interpolation_matrix.m(),
+                                x_source_fe.n_dofs_per_face(face_no)));
+
+    if (const FE_Poly<dim, spacedim> *source_fe =
+          dynamic_cast<const FE_Poly<dim, spacedim> *>(&x_source_fe))
+      {
+        const Quadrature<dim - 1> quad_face_support(
+          source_fe->get_unit_face_support_points(face_no));
+
+        const double eps = 2e-13 * this->degree * (dim - 1);
+
+        std::vector<Point<dim>> face_quadrature_points(
+          quad_face_support.size());
+        QProjector<dim>::project_to_face(this->reference_cell_type(),
+                                         quad_face_support,
+                                         face_no,
+                                         face_quadrature_points);
+
+        for (unsigned int i = 0; i < source_fe->n_dofs_per_face(face_no); ++i)
+          for (unsigned int j = 0; j < this->n_dofs_per_face(face_no); ++j)
+            {
+              double matrix_entry =
+                this->shape_value(this->face_to_cell_index(j, 0),
+                                  face_quadrature_points[i]);
+
+              // Correct the interpolated value. I.e. if it is close to 1 or
+              // 0, make it exactly 1 or 0. Unfortunately, this is required to
+              // avoid problems with higher order elements.
+              if (std::fabs(matrix_entry - 1.0) < eps)
+                matrix_entry = 1.0;
+              if (std::fabs(matrix_entry) < eps)
+                matrix_entry = 0.0;
+
+              interpolation_matrix(i, j) = matrix_entry;
+            }
+
+#ifdef DEBUG
+        for (unsigned int j = 0; j < source_fe->n_dofs_per_face(face_no); ++j)
+          {
+            double sum = 0.;
+
+            for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
+              sum += interpolation_matrix(j, i);
+
+            Assert(std::fabs(sum - 1) < eps, ExcInternalError());
+          }
+#endif
+      }
+    else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe) != nullptr)
+      {
+        // nothing to do here, the FE_Nothing has no degrees of freedom anyway
+      }
+    else
+      AssertThrow(
+        false,
+        (typename FiniteElement<dim,
+                                spacedim>::ExcInterpolationNotImplemented()));
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  FE_Poly<dim, spacedim>::get_subface_interpolation_matrix(
+    const FiniteElement<dim, spacedim> &x_source_fe,
+    const unsigned int                  subface,
+    FullMatrix<double> &                interpolation_matrix,
+    const unsigned int                  face_no) const
+  {
+    Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(face_no),
+           ExcDimensionMismatch(interpolation_matrix.m(),
+                                x_source_fe.n_dofs_per_face(face_no)));
+
+    if (const FE_Poly<dim, spacedim> *source_fe =
+          dynamic_cast<const FE_Poly<dim, spacedim> *>(&x_source_fe))
+      {
+        const Quadrature<dim - 1> quad_face_support(
+          source_fe->get_unit_face_support_points(face_no));
+
+        const double eps = 2e-13 * this->degree * (dim - 1);
+
+        std::vector<Point<dim>> subface_quadrature_points(
+          quad_face_support.size());
+        QProjector<dim>::project_to_subface(this->reference_cell_type(),
+                                            quad_face_support,
+                                            face_no,
+                                            subface,
+                                            subface_quadrature_points);
+
+        for (unsigned int i = 0; i < source_fe->n_dofs_per_face(face_no); ++i)
+          for (unsigned int j = 0; j < this->n_dofs_per_face(face_no); ++j)
+            {
+              double matrix_entry =
+                this->shape_value(this->face_to_cell_index(j, 0),
+                                  subface_quadrature_points[i]);
+
+              // Correct the interpolated value. I.e. if it is close to 1 or
+              // 0, make it exactly 1 or 0. Unfortunately, this is required to
+              // avoid problems with higher order elements.
+              if (std::fabs(matrix_entry - 1.0) < eps)
+                matrix_entry = 1.0;
+              if (std::fabs(matrix_entry) < eps)
+                matrix_entry = 0.0;
+
+              interpolation_matrix(i, j) = matrix_entry;
+            }
+
+#ifdef DEBUG
+        for (unsigned int j = 0; j < source_fe->n_dofs_per_face(face_no); ++j)
+          {
+            double sum = 0.;
+
+            for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
+              sum += interpolation_matrix(j, i);
+
+            Assert(std::fabs(sum - 1) < eps, ExcInternalError());
+          }
+#endif
+      }
+    else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe) != nullptr)
+      {
+        // nothing to do here, the FE_Nothing has no degrees of freedom anyway
+      }
+    else
+      AssertThrow(
+        false,
+        (typename FiniteElement<dim,
+                                spacedim>::ExcInterpolationNotImplemented()));
+  }
+
+
+
+  template <int dim, int spacedim>
+  bool
+  FE_Poly<dim, spacedim>::hp_constraints_are_implemented() const
+  {
+    return true;
   }
 
 
