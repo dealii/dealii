@@ -15,7 +15,6 @@ DEAL::XML format:
 DEAL::========================================
 <?xml version="1.0" encoding="utf-8"?>
 <ParameterHandler><Testing><A_20bool><value>true</value><default_value>true</default_value><documentation/><pattern>1</pattern><pattern_description>[Bool]</pattern_description><actions>1</actions></A_20bool><A_20double><value>1</value><default_value>1</default_value><documentation/><pattern>0</pattern><pattern_description>[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]</pattern_description><actions>0</actions></A_20double><A_20string><value>Ciao</value><default_value>Ciao</default_value><documentation/><pattern>2</pattern><pattern_description>[Anything]</pattern_description><actions>2</actions></A_20string></Testing></ParameterHandler>
-
 DEAL::JSON format: 
 DEAL::========================================
 {

@@ -10,7 +10,6 @@ DEAL::ShortXML format:
 DEAL::========================================
 <?xml version="1.0" encoding="utf-8"?>
 <ParameterHandler><A_20double>1</A_20double><Section_20two><Another_20double>2</Another_20double></Section_20two></ParameterHandler>
-
 DEAL::ShortJSON format: 
 DEAL::========================================
 {

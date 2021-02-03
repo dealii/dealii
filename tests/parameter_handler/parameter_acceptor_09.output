@@ -11,7 +11,6 @@ end
 DEAL::Generate and read input.xml
 <?xml version="1.0" encoding="utf-8"?>
 <ParameterHandler><Test><A_20point><value>0, 0, 0</value><default_value>0, 0, 0</default_value><documentation/><pattern>1</pattern><pattern_description>[List of &lt;[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]&gt; of length 3...3 (inclusive)]</pattern_description><actions>0,1</actions></A_20point></Test></ParameterHandler>
-
 DEAL::Generate and read input.json
 {
     "Test":
