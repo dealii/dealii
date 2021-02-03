@@ -1490,19 +1490,20 @@ namespace internal
       // loop over cells and create CRS
       for (const auto &cell : cells)
         {
-          const ReferenceCell::Type cell_type =
-            ReferenceCell::n_vertices_to_type(dim, cell.vertices.size());
+          const ReferenceCell::Type reference_cell_type =
+            ReferenceCell::Type::n_vertices_to_type(dim, cell.vertices.size());
 
-          Assert(cell_type != ReferenceCell::Type::Invalid,
+          Assert(reference_cell_type != ReferenceCell::Type::Invalid,
                  ExcNotImplemented());
-          AssertIndexRange(static_cast<types::geometric_entity_type>(cell_type),
+          AssertIndexRange(static_cast<types::geometric_entity_type>(
+                             reference_cell_type),
                            cell_types_impl.size());
           Assert(cell_types_impl[static_cast<types::geometric_entity_type>(
-                                   cell_type)]
+                                   reference_cell_type)]
                      .get() != nullptr,
                  ExcNotImplemented());
 
-          cell_types_indices.push_back(cell_type);
+          cell_types_indices.push_back(reference_cell_type);
 
           // create CRS of vertices (to remove template argument dim)
           for (const auto &vertex : cell.vertices)
