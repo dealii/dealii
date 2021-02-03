@@ -927,7 +927,8 @@ namespace
         else
           {
             Assert(patch.n_subdivisions == 1, ExcNotImplemented());
-            const auto &info = internal::Info::get_cell(patch.reference_cell);
+            const auto &info =
+              internal::ReferenceCell::get_cell(patch.reference_cell);
             n_nodes += info.n_vertices();
             n_cells += 1;
           }
@@ -7738,7 +7739,8 @@ DataOutBase::write_hdf5_parallel(
   // patches
   Assert(patches.size() > 0, ExcNoPatches());
 
-  const auto &cell_info = internal::Info::get_cell(patches[0].reference_cell);
+  const auto &cell_info =
+    internal::ReferenceCell::get_cell(patches[0].reference_cell);
 
   hid_t h5_mesh_file_id = -1, h5_solution_file_id, file_plist_id, plist_id;
   hid_t node_dataspace, node_dataset, node_file_dataspace,

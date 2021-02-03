@@ -2868,7 +2868,8 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
                   (1 - subface) :
                   subface;
 
-              const auto &info = internal::Info::get_cell(ReferenceCell::Tri);
+              const auto &info =
+                internal::ReferenceCell::get_cell(ReferenceCell::Tri);
               const unsigned int neighbor_child_index =
                 info.child_cell_on_face(neighbor_face, neighbor_subface);
               TriaIterator<CellAccessor<dim, spacedim>> sub_neighbor =

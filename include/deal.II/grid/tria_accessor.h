@@ -1693,7 +1693,7 @@ protected:
    * Return additional information related to the current geometric entity
    * type.
    */
-  inline const internal::Info::Base &
+  inline const internal::ReferenceCell::Base &
   reference_cell_info() const;
 
 private:

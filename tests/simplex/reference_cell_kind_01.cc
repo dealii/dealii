@@ -30,7 +30,7 @@ void
 test(const ReferenceCell &reference_cell)
 {
   const auto  kind = ReferenceCell(reference_cell);
-  const auto &info = internal::Info::get_cell(reference_cell);
+  const auto &info = internal::ReferenceCell::get_cell(reference_cell);
 
   for (const auto v : info.vertex_indices())
     {
