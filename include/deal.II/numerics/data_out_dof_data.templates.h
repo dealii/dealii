@@ -232,17 +232,17 @@ namespace internal
               {
                 const auto reference_cell_type = (*fe)[i].reference_cell_type();
 
-                if ((reference_cell_type == ReferenceCell::Type::Vertex) ||
-                    (reference_cell_type == ReferenceCell::Type::Line) ||
-                    (reference_cell_type == ReferenceCell::Type::Quad) ||
-                    (reference_cell_type == ReferenceCell::Type::Hex))
+                if ((reference_cell_type == dealii::ReferenceCell::Vertex) ||
+                    (reference_cell_type == dealii::ReferenceCell::Line) ||
+                    (reference_cell_type == dealii::ReferenceCell::Quad) ||
+                    (reference_cell_type == dealii::ReferenceCell::Hex))
                   needs_hypercube_setup |= true;
-                else if ((reference_cell_type == ReferenceCell::Type::Tri) ||
-                         (reference_cell_type == ReferenceCell::Type::Tet))
+                else if ((reference_cell_type == dealii::ReferenceCell::Tri) ||
+                         (reference_cell_type == dealii::ReferenceCell::Tet))
                   needs_simplex_setup |= true;
-                else if (reference_cell_type == ReferenceCell::Type::Wedge)
+                else if (reference_cell_type == dealii::ReferenceCell::Wedge)
                   needs_wedge_setup |= true;
-                else if (reference_cell_type == ReferenceCell::Type::Pyramid)
+                else if (reference_cell_type == dealii::ReferenceCell::Pyramid)
                   needs_pyramid_setup |= true;
                 else
                   Assert(false, ExcNotImplemented());
@@ -322,21 +322,23 @@ namespace internal
                         (*finite_elements[i])[j].reference_cell_type();
 
                       if ((reference_cell_type ==
-                           ReferenceCell::Type::Vertex) ||
-                          (reference_cell_type == ReferenceCell::Type::Line) ||
-                          (reference_cell_type == ReferenceCell::Type::Quad) ||
-                          (reference_cell_type == ReferenceCell::Type::Hex))
+                           dealii::ReferenceCell::Vertex) ||
+                          (reference_cell_type ==
+                           dealii::ReferenceCell::Line) ||
+                          (reference_cell_type ==
+                           dealii::ReferenceCell::Quad) ||
+                          (reference_cell_type == dealii::ReferenceCell::Hex))
                         quadrature.push_back(*quadrature_hypercube);
                       else if ((reference_cell_type ==
-                                ReferenceCell::Type::Tri) ||
+                                dealii::ReferenceCell::Tri) ||
                                (reference_cell_type ==
-                                ReferenceCell::Type::Tet))
+                                dealii::ReferenceCell::Tet))
                         quadrature.push_back(*quadrature_simplex);
                       else if (reference_cell_type ==
-                               ReferenceCell::Type::Wedge)
+                               dealii::ReferenceCell::Wedge)
                         quadrature.push_back(*quadrature_wedge);
                       else if (reference_cell_type ==
-                               ReferenceCell::Type::Pyramid)
+                               dealii::ReferenceCell::Pyramid)
                         quadrature.push_back(*quadrature_pyramid);
                       else
                         Assert(false, ExcNotImplemented());

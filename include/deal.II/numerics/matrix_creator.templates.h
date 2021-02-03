@@ -689,8 +689,7 @@ namespace MatrixCreator
                      const Function<spacedim, number> *const coefficient,
                      const AffineConstraints<number> &       constraints)
   {
-    create_mass_matrix(ReferenceCell::get_default_linear_mapping(
-                         dof.get_triangulation()),
+    create_mass_matrix(get_default_linear_mapping(dof.get_triangulation()),
                        dof,
                        q,
                        matrix,
@@ -767,8 +766,7 @@ namespace MatrixCreator
                      const Function<spacedim, number> *const coefficient,
                      const AffineConstraints<number> &       constraints)
   {
-    create_mass_matrix(ReferenceCell::get_default_linear_mapping(
-                         dof.get_triangulation()),
+    create_mass_matrix(get_default_linear_mapping(dof.get_triangulation()),
                        dof,
                        q,
                        matrix,
@@ -1730,7 +1728,7 @@ namespace MatrixCreator
     const Function<spacedim, number> *const a,
     std::vector<unsigned int>               component_mapping)
   {
-    create_boundary_mass_matrix(ReferenceCell::get_default_linear_mapping(
+    create_boundary_mass_matrix(get_default_linear_mapping(
                                   dof.get_triangulation()),
                                 dof,
                                 q,
@@ -1920,8 +1918,7 @@ namespace MatrixCreator
                         const Function<spacedim> *const  coefficient,
                         const AffineConstraints<double> &constraints)
   {
-    create_laplace_matrix(ReferenceCell::get_default_linear_mapping(
-                            dof.get_triangulation()),
+    create_laplace_matrix(get_default_linear_mapping(dof.get_triangulation()),
                           dof,
                           q,
                           matrix,
@@ -1997,8 +1994,7 @@ namespace MatrixCreator
                         const Function<spacedim> *const  coefficient,
                         const AffineConstraints<double> &constraints)
   {
-    create_laplace_matrix(ReferenceCell::get_default_linear_mapping(
-                            dof.get_triangulation()),
+    create_laplace_matrix(get_default_linear_mapping(dof.get_triangulation()),
                           dof,
                           q,
                           matrix,

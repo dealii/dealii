@@ -470,7 +470,7 @@ namespace VectorTools
     VectorType &                                               rhs_vector,
     const AffineConstraints<typename VectorType::value_type> & constraints)
   {
-    create_right_hand_side(ReferenceCell::get_default_linear_mapping(
+    create_right_hand_side(get_default_linear_mapping(
                              dof_handler.get_triangulation()),
                            dof_handler,
                            quadrature,

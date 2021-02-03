@@ -154,8 +154,8 @@ namespace Simplex
       if (dim == 1)
         return {};
 
-      const auto &info = ReferenceCell::internal::Info::get_cell(
-        dim == 2 ? ReferenceCell::Type::Tri : ReferenceCell::Type::Tet);
+      const auto &info = internal::Info::get_cell(
+        dim == 2 ? ReferenceCell::Tri : ReferenceCell::Tet);
       std::vector<std::vector<Point<dim - 1>>> unit_face_points;
 
       // all faces have the same support points
@@ -310,9 +310,7 @@ namespace Simplex
       else
         Assert(false, ExcNotImplemented());
 
-      return internal::expand(3,
-                              {{0, 0, 0, n_dofs}},
-                              ReferenceCell::Type::Wedge);
+      return internal::expand(3, {{0, 0, 0, n_dofs}}, ReferenceCell::Wedge);
     }
 
     /**
@@ -353,9 +351,7 @@ namespace Simplex
       else
         Assert(false, ExcNotImplemented());
 
-      return internal::expand(3,
-                              {{0, 0, 0, n_dofs}},
-                              ReferenceCell::Type::Pyramid);
+      return internal::expand(3, {{0, 0, 0, n_dofs}}, ReferenceCell::Pyramid);
     }
   } // namespace
 
@@ -369,27 +365,26 @@ namespace Simplex
     : dealii::FE_Poly<dim, spacedim>(
         BarycentricPolynomials<dim>::get_fe_p_basis(degree),
         FiniteElementData<dim>(dpo_vector,
-                               dim == 2 ? ReferenceCell::Type::Tri :
-                                          ReferenceCell::Type::Tet,
+                               dim == 2 ? ReferenceCell::Tri :
+                                          ReferenceCell::Tet,
                                1,
                                degree,
                                conformity),
         std::vector<bool>(FiniteElementData<dim>(dpo_vector,
-                                                 dim == 2 ?
-                                                   ReferenceCell::Type::Tri :
-                                                   ReferenceCell::Type::Tet,
+                                                 dim == 2 ? ReferenceCell::Tri :
+                                                            ReferenceCell::Tet,
                                                  1,
                                                  degree)
                             .dofs_per_cell,
                           true),
-        std::vector<ComponentMask>(
-          FiniteElementData<dim>(dpo_vector,
-                                 dim == 2 ? ReferenceCell::Type::Tri :
-                                            ReferenceCell::Type::Tet,
-                                 1,
-                                 degree)
-            .dofs_per_cell,
-          std::vector<bool>(1, true)))
+        std::vector<ComponentMask>(FiniteElementData<dim>(dpo_vector,
+                                                          dim == 2 ?
+                                                            ReferenceCell::Tri :
+                                                            ReferenceCell::Tet,
+                                                          1,
+                                                          degree)
+                                     .dofs_per_cell,
+                                   std::vector<bool>(1, true)))
   {
     this->unit_support_points = unit_support_points_fe_poly<dim>(degree);
     // Discontinuous elements don't have face support points
@@ -962,16 +957,16 @@ namespace Simplex
     : dealii::FE_Poly<dim, spacedim>(
         Simplex::ScalarWedgePolynomial<dim>(degree),
         FiniteElementData<dim>(dpos,
-                               ReferenceCell::Type::Wedge,
+                               ReferenceCell::Wedge,
                                1,
                                degree,
                                conformity),
         std::vector<bool>(
-          FiniteElementData<dim>(dpos, ReferenceCell::Type::Wedge, 1, degree)
+          FiniteElementData<dim>(dpos, ReferenceCell::Wedge, 1, degree)
             .dofs_per_cell,
           true),
         std::vector<ComponentMask>(
-          FiniteElementData<dim>(dpos, ReferenceCell::Type::Wedge, 1, degree)
+          FiniteElementData<dim>(dpos, ReferenceCell::Wedge, 1, degree)
             .dofs_per_cell,
           std::vector<bool>(1, true)))
   {
@@ -1196,16 +1191,16 @@ namespace Simplex
     : dealii::FE_Poly<dim, spacedim>(
         Simplex::ScalarPyramidPolynomial<dim>(degree),
         FiniteElementData<dim>(dpos,
-                               ReferenceCell::Type::Pyramid,
+                               ReferenceCell::Pyramid,
                                1,
                                degree,
                                conformity),
         std::vector<bool>(
-          FiniteElementData<dim>(dpos, ReferenceCell::Type::Pyramid, 1, degree)
+          FiniteElementData<dim>(dpos, ReferenceCell::Pyramid, 1, degree)
             .dofs_per_cell,
           true),
         std::vector<ComponentMask>(
-          FiniteElementData<dim>(dpos, ReferenceCell::Type::Pyramid, 1, degree)
+          FiniteElementData<dim>(dpos, ReferenceCell::Pyramid, 1, degree)
             .dofs_per_cell,
           std::vector<bool>(1, true)))
   {
@@ -1619,7 +1614,7 @@ namespace Simplex
       // basis.
       const auto polys = get_basis<dim>(degree);
       return FiniteElementData<dim>(get_dpo_vector<dim>(degree),
-                                    ReferenceCell::Type::get_simplex<dim>(),
+                                    ReferenceCell::get_simplex<dim>(),
                                     1, // n_components
                                     polys.degree(),
                                     FiniteElementData<dim>::H1);

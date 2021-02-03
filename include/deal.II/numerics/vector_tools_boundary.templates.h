@@ -466,7 +466,7 @@ namespace VectorTools
     std::map<types::global_dof_index, number> &boundary_values,
     const ComponentMask &                      component_mask)
   {
-    interpolate_boundary_values(ReferenceCell::get_default_linear_mapping(
+    interpolate_boundary_values(get_default_linear_mapping(
                                   dof.get_triangulation()),
                                 dof,
                                 boundary_component,
@@ -486,7 +486,7 @@ namespace VectorTools
     std::map<types::global_dof_index, number> &boundary_values,
     const ComponentMask &                      component_mask)
   {
-    interpolate_boundary_values(ReferenceCell::get_default_linear_mapping(
+    interpolate_boundary_values(get_default_linear_mapping(
                                   dof.get_triangulation()),
                                 dof,
                                 function_map,
@@ -600,7 +600,7 @@ namespace VectorTools
     AffineConstraints<number> &       constraints,
     const ComponentMask &             component_mask)
   {
-    interpolate_boundary_values(ReferenceCell::get_default_linear_mapping(
+    interpolate_boundary_values(get_default_linear_mapping(
                                   dof.get_triangulation()),
                                 dof,
                                 boundary_component,
@@ -620,7 +620,7 @@ namespace VectorTools
     AffineConstraints<number> &constraints,
     const ComponentMask &      component_mask)
   {
-    interpolate_boundary_values(ReferenceCell::get_default_linear_mapping(
+    interpolate_boundary_values(get_default_linear_mapping(
                                   dof.get_triangulation()),
                                 dof,
                                 function_map,
@@ -887,8 +887,7 @@ namespace VectorTools
     std::map<types::global_dof_index, number> &boundary_values,
     std::vector<unsigned int>                  component_mapping)
   {
-    project_boundary_values(ReferenceCell::get_default_linear_mapping(
-                              dof.get_triangulation()),
+    project_boundary_values(get_default_linear_mapping(dof.get_triangulation()),
                             dof,
                             boundary_functions,
                             q,
@@ -978,8 +977,7 @@ namespace VectorTools
     AffineConstraints<number> &constraints,
     std::vector<unsigned int>  component_mapping)
   {
-    project_boundary_values(ReferenceCell::get_default_linear_mapping(
-                              dof.get_triangulation()),
+    project_boundary_values(get_default_linear_mapping(dof.get_triangulation()),
                             dof,
                             boundary_functions,
                             q,

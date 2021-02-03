@@ -30,7 +30,7 @@ test(const unsigned int orientation)
 
 
   Triangulation<3> dummy, tria;
-  GridGenerator::reference_cell(ReferenceCell::Type::Tet, dummy);
+  GridGenerator::reference_cell(ReferenceCell::Tet, dummy);
 
   auto vertices = dummy.get_vertices();
 
@@ -46,7 +46,7 @@ test(const unsigned int orientation)
   {
     const auto &face = dummy.begin()->face(face_no);
     const auto  permuted =
-      ReferenceCell::Type(ReferenceCell::Type::Tri)
+      ReferenceCell(ReferenceCell::Tri)
         .permute_according_orientation(
           std::array<unsigned int, 3>{{face->vertex_index(0),
                                        face->vertex_index(1),
@@ -97,8 +97,9 @@ test(const unsigned int orientation)
   for (const auto l : face->line_indices())
     {
       const unsigned int l_ =
-        ReferenceCell::internal::Info::Tet().standard_to_real_face_line(
-          l, face_no, orientation);
+        internal::Info::Tet().standard_to_real_face_line(l,
+                                                         face_no,
+                                                         orientation);
 
       std::array<unsigned int, 2> a = {
         {face->line(l_)->vertex_index(0), face->line(l_)->vertex_index(1)}};

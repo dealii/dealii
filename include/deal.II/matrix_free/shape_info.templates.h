@@ -316,16 +316,15 @@ namespace internal
 
           try
             {
-              const auto reference_cell_type =
-                ReferenceCell::Type::get_simplex<dim>();
+              const dealii::ReferenceCell reference_cell_type =
+                dealii::ReferenceCell::get_simplex<dim>();
 
               const auto quad_face  = get_face_quadrature(quad);
               this->n_q_points_face = quad_face.size();
 
               const unsigned int n_face_orientations = dim == 2 ? 2 : 6;
               const unsigned int n_faces =
-                ReferenceCell::internal::Info::get_cell(reference_cell_type)
-                  .n_faces();
+                dealii::internal::Info::get_cell(reference_cell_type).n_faces();
 
               const auto projected_quad_face =
                 QProjector<dim>::project_to_all_faces(reference_cell_type,

@@ -294,7 +294,7 @@ namespace DataOutBase
                                         n_data_sets,
                                       patch.data.n_rows()));
           Assert(patch.reference_cell_type !=
-                     ReferenceCell::Type::get_hypercube<dim>() ||
+                     ReferenceCell::get_hypercube<dim>() ||
                    (n_data_sets == 0) ||
                    (patch.data.n_cols() ==
                     Utilities::fixed_power<dim>(n_subdivisions + 1)),
@@ -616,8 +616,7 @@ namespace
 
     if (write_higher_order_cells)
       {
-        if (patch.reference_cell_type ==
-            ReferenceCell::Type::get_hypercube<dim>())
+        if (patch.reference_cell_type == ReferenceCell::get_hypercube<dim>())
           {
             const std::array<unsigned int, 4> cell_type_by_dim{
               {VTK_VERTEX,
@@ -627,7 +626,7 @@ namespace
             vtk_cell_id[0] = cell_type_by_dim[dim];
             vtk_cell_id[1] = 1;
           }
-        else if (patch.reference_cell_type == ReferenceCell::Type::Tri)
+        else if (patch.reference_cell_type == ReferenceCell::Tri)
           {
             vtk_cell_id[0] = VTK_LAGRANGE_TRIANGLE;
             vtk_cell_id[1] = 1;
@@ -637,44 +636,43 @@ namespace
             Assert(false, ExcNotImplemented());
           }
       }
-    else if (patch.reference_cell_type == ReferenceCell::Type::Tri &&
+    else if (patch.reference_cell_type == ReferenceCell::Tri &&
              patch.data.n_cols() == 3)
       {
         vtk_cell_id[0] = VTK_TRIANGLE;
         vtk_cell_id[1] = 1;
       }
-    else if (patch.reference_cell_type == ReferenceCell::Type::Tri &&
+    else if (patch.reference_cell_type == ReferenceCell::Tri &&
              patch.data.n_cols() == 6)
       {
         vtk_cell_id[0] = VTK_QUADRATIC_TRIANGLE;
         vtk_cell_id[1] = 1;
       }
-    else if (patch.reference_cell_type == ReferenceCell::Type::Tet &&
+    else if (patch.reference_cell_type == ReferenceCell::Tet &&
              patch.data.n_cols() == 4)
       {
         vtk_cell_id[0] = VTK_TETRA;
         vtk_cell_id[1] = 1;
       }
-    else if (patch.reference_cell_type == ReferenceCell::Type::Tet &&
+    else if (patch.reference_cell_type == ReferenceCell::Tet &&
              patch.data.n_cols() == 10)
       {
         vtk_cell_id[0] = VTK_QUADRATIC_TETRA;
         vtk_cell_id[1] = 1;
       }
-    else if (patch.reference_cell_type == ReferenceCell::Type::Wedge &&
+    else if (patch.reference_cell_type == ReferenceCell::Wedge &&
              patch.data.n_cols() == 6)
       {
         vtk_cell_id[0] = VTK_WEDGE;
         vtk_cell_id[1] = 1;
       }
-    else if (patch.reference_cell_type == ReferenceCell::Type::Pyramid &&
+    else if (patch.reference_cell_type == ReferenceCell::Pyramid &&
              patch.data.n_cols() == 5)
       {
         vtk_cell_id[0] = VTK_PYRAMID;
         vtk_cell_id[1] = 1;
       }
-    else if (patch.reference_cell_type ==
-             ReferenceCell::Type::get_hypercube<dim>())
+    else if (patch.reference_cell_type == ReferenceCell::get_hypercube<dim>())
       {
         const std::array<unsigned int, 4> cell_type_by_dim{
           {VTK_VERTEX, VTK_LINE, VTK_QUAD, VTK_HEXAHEDRON}};
@@ -686,8 +684,7 @@ namespace
         Assert(false, ExcNotImplemented());
       }
 
-    if (patch.reference_cell_type !=
-          ReferenceCell::Type::get_hypercube<dim>() ||
+    if (patch.reference_cell_type != ReferenceCell::get_hypercube<dim>() ||
         write_higher_order_cells)
       vtk_cell_id[2] = patch.data.n_cols();
     else
@@ -923,8 +920,7 @@ namespace
     for (const auto &patch : patches)
       {
         // The following formula doesn't hold for non-tensor products.
-        if (patch.reference_cell_type ==
-            ReferenceCell::Type::get_hypercube<dim>())
+        if (patch.reference_cell_type == ReferenceCell::get_hypercube<dim>())
           {
             n_nodes += Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
             n_cells += Utilities::fixed_power<dim>(patch.n_subdivisions);
@@ -932,8 +928,8 @@ namespace
         else
           {
             Assert(patch.n_subdivisions == 1, ExcNotImplemented());
-            const auto &info = ReferenceCell::internal::Info::get_cell(
-              patch.reference_cell_type);
+            const auto &info =
+              internal::Info::get_cell(patch.reference_cell_type);
             n_nodes += info.n_vertices();
             n_cells += 1;
           }
@@ -955,8 +951,7 @@ namespace
     for (const auto &patch : patches)
       {
         // The following formulas don't hold for non-tensor products.
-        if (patch.reference_cell_type ==
-            ReferenceCell::Type::get_hypercube<dim>())
+        if (patch.reference_cell_type == ReferenceCell::get_hypercube<dim>())
           {
             n_nodes += Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
 
@@ -1872,7 +1867,7 @@ namespace DataOutBase
     : patch_index(no_neighbor)
     , n_subdivisions(1)
     , points_are_available(false)
-    , reference_cell_type(ReferenceCell::Type::get_hypercube<dim>())
+    , reference_cell_type(ReferenceCell::get_hypercube<dim>())
   // all the other data has a constructor of its own, except for the "neighbors"
   // field, which we set to invalid values.
   {
@@ -1974,7 +1969,7 @@ namespace DataOutBase
   Patch<0, spacedim>::Patch()
     : patch_index(no_neighbor)
     , points_are_available(false)
-    , reference_cell_type(ReferenceCell::Type::get_hypercube<0>())
+    , reference_cell_type(ReferenceCell::get_hypercube<0>())
   {
     Assert(spacedim <= 3, ExcNotImplemented());
   }
@@ -2637,8 +2632,7 @@ namespace DataOutBase
         // special treatment of simplices since they are not subdivided, such
         // that no new nodes have to be created, but the precomputed ones can be
         // used
-        if (patch.reference_cell_type !=
-            ReferenceCell::Type::get_hypercube<dim>())
+        if (patch.reference_cell_type != ReferenceCell::get_hypercube<dim>())
           {
             Point<spacedim> node;
 
@@ -2682,8 +2676,7 @@ namespace DataOutBase
     for (const auto &patch : patches)
       {
         // special treatment of simplices since they are not subdivided
-        if (patch.reference_cell_type !=
-            ReferenceCell::Type::get_hypercube<dim>())
+        if (patch.reference_cell_type != ReferenceCell::get_hypercube<dim>())
           {
             out.write_cell_single(count++,
                                   first_vertex_of_patch,
@@ -2735,8 +2728,7 @@ namespace DataOutBase
 
     for (const auto &patch : patches)
       {
-        if (patch.reference_cell_type !=
-            ReferenceCell::Type::get_hypercube<dim>())
+        if (patch.reference_cell_type != ReferenceCell::get_hypercube<dim>())
           {
             connectivity.resize(patch.data.n_cols());
 
@@ -7749,7 +7741,7 @@ DataOutBase::write_hdf5_parallel(
   Assert(patches.size() > 0, ExcNoPatches());
 
   const auto &cell_info =
-    ReferenceCell::internal::Info::get_cell(patches[0].reference_cell_type);
+    internal::Info::get_cell(patches[0].reference_cell_type);
 
   hid_t h5_mesh_file_id = -1, h5_solution_file_id, file_plist_id, plist_id;
   hid_t node_dataspace, node_dataset, node_file_dataspace,
@@ -8677,16 +8669,16 @@ XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
     {
       case 0:
         return get_xdmf_content(indent_level,
-                                ReferenceCell::Type::get_hypercube<0>());
+                                ReferenceCell::get_hypercube<0>());
       case 1:
         return get_xdmf_content(indent_level,
-                                ReferenceCell::Type::get_hypercube<1>());
+                                ReferenceCell::get_hypercube<1>());
       case 2:
         return get_xdmf_content(indent_level,
-                                ReferenceCell::Type::get_hypercube<2>());
+                                ReferenceCell::get_hypercube<2>());
       case 3:
         return get_xdmf_content(indent_level,
-                                ReferenceCell::Type::get_hypercube<3>());
+                                ReferenceCell::get_hypercube<3>());
       default:
         Assert(false, ExcNotImplemented());
     }
@@ -8697,9 +8689,8 @@ XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
 
 
 std::string
-XDMFEntry::get_xdmf_content(
-  const unsigned int         indent_level,
-  const ReferenceCell::Type &reference_cell_type) const
+XDMFEntry::get_xdmf_content(const unsigned int   indent_level,
+                            const ReferenceCell &reference_cell_type) const
 {
   if (!valid)
     return "";
@@ -8731,19 +8722,19 @@ XDMFEntry::get_xdmf_content(
            << "\" NodesPerElement=\"2\">\n";
       else if (dimension == 2)
         {
-          Assert(reference_cell_type == ReferenceCell::Type::Quad ||
-                   reference_cell_type == ReferenceCell::Type::Tri,
+          Assert(reference_cell_type == ReferenceCell::Quad ||
+                   reference_cell_type == ReferenceCell::Tri,
                  ExcNotImplemented());
 
           ss << indent(indent_level + 1) << "<Topology TopologyType=\"";
-          if (reference_cell_type == ReferenceCell::Type::Quad)
+          if (reference_cell_type == ReferenceCell::Quad)
             {
               ss << "Quadrilateral"
                  << "\" NumberOfElements=\"" << num_cells << "\">\n"
                  << indent(indent_level + 2) << "<DataItem Dimensions=\""
                  << num_cells << " " << (1 << dimension);
             }
-          else // if (reference_cell_type == ReferenceCell::Type::Tri)
+          else // if (reference_cell_type == ReferenceCell::Tri)
             {
               ss << "Triangle"
                  << "\" NumberOfElements=\"" << num_cells << "\">\n"
@@ -8753,19 +8744,19 @@ XDMFEntry::get_xdmf_content(
         }
       else if (dimension == 3)
         {
-          Assert(reference_cell_type == ReferenceCell::Type::Hex ||
-                   reference_cell_type == ReferenceCell::Type::Tet,
+          Assert(reference_cell_type == ReferenceCell::Hex ||
+                   reference_cell_type == ReferenceCell::Tet,
                  ExcNotImplemented());
 
           ss << indent(indent_level + 1) << "<Topology TopologyType=\"";
-          if (reference_cell_type == ReferenceCell::Type::Hex)
+          if (reference_cell_type == ReferenceCell::Hex)
             {
               ss << "Hexahedron"
                  << "\" NumberOfElements=\"" << num_cells << "\">\n"
                  << indent(indent_level + 2) << "<DataItem Dimensions=\""
                  << num_cells << " " << (1 << dimension);
             }
-          else // if (reference_cell_type == ReferenceCell::Type::Tet)
+          else // if (reference_cell_type == ReferenceCell::Tet)
             {
               ss << "Tetrahedron"
                  << "\" NumberOfElements=\"" << num_cells << "\">\n"

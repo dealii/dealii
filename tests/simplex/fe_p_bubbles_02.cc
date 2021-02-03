@@ -44,14 +44,14 @@ compute_nodal_quadrature(const FiniteElement<dim, spacedim> &fe)
   Assert(fe.n_blocks() == 1, ExcNotImplemented());
   Assert(fe.n_components() == 1, ExcNotImplemented());
 
-  const ReferenceCell::Type type = fe.reference_cell_type();
+  const ReferenceCell type = fe.reference_cell_type();
 
   const Quadrature<dim> q_gauss =
     type.get_gauss_type_quadrature<dim>(fe.tensor_degree() + 1);
   Triangulation<dim, spacedim> tria;
   GridGenerator::reference_cell(type, tria);
   const Mapping<dim, spacedim> &mapping =
-    ReferenceCell::get_default_linear_mapping<dim, spacedim>(type);
+    get_default_linear_mapping<dim, spacedim>(type);
 
   auto                    cell = tria.begin_active();
   FEValues<dim, spacedim> fe_values(mapping,
@@ -110,13 +110,13 @@ test_interpolate()
 
           Simplex::FE_P_Bubbles<dim, spacedim> fe(degree);
 
-          const ReferenceCell::Type type = fe.reference_cell_type();
+          const ReferenceCell       type = fe.reference_cell_type();
           DoFHandler<dim, spacedim> dh(tria);
           dh.distribute_dofs(fe);
           deallog << "number of dofs = " << dh.n_dofs() << std::endl;
 
           const Mapping<dim, spacedim> &map =
-            ReferenceCell::get_default_linear_mapping<dim, spacedim>(type);
+            get_default_linear_mapping<dim, spacedim>(type);
 
           Vector<double> solution(dh.n_dofs());
           VectorTools::interpolate(map, dh, func, solution);
@@ -175,7 +175,7 @@ test_lumped_project()
 
           Simplex::FE_P_Bubbles<dim, spacedim> fe(degree);
 
-          const ReferenceCell::Type type = fe.reference_cell_type();
+          const ReferenceCell       type = fe.reference_cell_type();
           DoFHandler<dim, spacedim> dh(tria);
           dh.distribute_dofs(fe);
           deallog << "number of dofs = " << dh.n_dofs() << std::endl;
@@ -187,7 +187,7 @@ test_lumped_project()
           Vector<double> consistent_rhs(dh.n_dofs());
 
           const Mapping<dim, spacedim> &map =
-            ReferenceCell::get_default_linear_mapping<dim, spacedim>(type);
+            get_default_linear_mapping<dim, spacedim>(type);
 
           FEValues<dim> lumped_fev(map,
                                    fe,

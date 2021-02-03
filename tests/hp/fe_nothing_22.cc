@@ -39,25 +39,25 @@ test()
           << std::endl;
   if (dim == 2)
     {
-      deallog << (FE_Nothing<dim>(ReferenceCell::Type::Quad, 2, true) ==
+      deallog << (FE_Nothing<dim>(ReferenceCell::Quad, 2, true) ==
                   FE_Nothing<dim>(2, true))
               << std::endl;
-      deallog << (FE_Nothing<dim>(ReferenceCell::Type::Tri, 2, true) ==
+      deallog << (FE_Nothing<dim>(ReferenceCell::Tri, 2, true) ==
                   FE_Nothing<dim>(2, true))
               << std::endl;
     }
   if (dim == 3)
     {
-      deallog << (FE_Nothing<dim>(ReferenceCell::Type::Hex, 2, true) ==
+      deallog << (FE_Nothing<dim>(ReferenceCell::Hex, 2, true) ==
                   FE_Nothing<dim>(2, true))
               << std::endl;
-      deallog << (FE_Nothing<dim>(ReferenceCell::Type::Tet, 2, true) ==
+      deallog << (FE_Nothing<dim>(ReferenceCell::Tet, 2, true) ==
                   FE_Nothing<dim>(2, true))
               << std::endl;
-      deallog << (FE_Nothing<dim>(ReferenceCell::Type::Wedge, 1, false) ==
-                  FE_Nothing<dim>(ReferenceCell::Type::Pyramid, 1, false))
+      deallog << (FE_Nothing<dim>(ReferenceCell::Wedge, 1, false) ==
+                  FE_Nothing<dim>(ReferenceCell::Pyramid, 1, false))
               << std::endl;
-      deallog << (FE_Nothing<dim>(ReferenceCell::Type::Wedge, 3) ==
+      deallog << (FE_Nothing<dim>(ReferenceCell::Wedge, 3) ==
                   FE_Nothing<dim>(3))
               << std::endl;
     }

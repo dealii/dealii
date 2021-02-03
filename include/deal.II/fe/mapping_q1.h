@@ -84,7 +84,7 @@ public:
  * @note The use of this object should be avoided since it is only applicable
  *   in cases where a mesh consists exclusively of quadrilaterals or hexahedra.
  *   Use
- * `ReferenceCell::Type::get_hypercube<dim>().get_default_linear_mapping()`
+ * `ReferenceCell::get_hypercube<dim>().get_default_linear_mapping()`
  *   instead.
  */
 template <int dim, int spacedim = dim>

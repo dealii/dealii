@@ -1748,16 +1748,16 @@ namespace internal
       template <int dim>
       unsigned int
       reorder_face_derivative_indices(
-        const unsigned int        face_no,
-        const unsigned int        index,
-        const ReferenceCell::Type reference_cell_type =
-          ReferenceCell::Type::Invalid)
+        const unsigned int          face_no,
+        const unsigned int          index,
+        const dealii::ReferenceCell reference_cell_type =
+          dealii::ReferenceCell::Invalid)
       {
         Assert(index < dim, ExcInternalError());
 
-        if ((reference_cell_type == ReferenceCell::Type::Invalid ||
+        if ((reference_cell_type == dealii::ReferenceCell::Invalid ||
              reference_cell_type ==
-               ReferenceCell::Type::get_hypercube<dim>()) == false)
+               dealii::ReferenceCell::get_hypercube<dim>()) == false)
           {
 #ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
             return index;

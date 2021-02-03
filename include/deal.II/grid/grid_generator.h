@@ -136,7 +136,7 @@ namespace GridGenerator
    */
   template <int dim, int spacedim>
   void
-  reference_cell(const ReferenceCell::Type &   reference_cell,
+  reference_cell(const ReferenceCell &         reference_cell,
                  Triangulation<dim, spacedim> &tria);
 
 

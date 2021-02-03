@@ -294,7 +294,7 @@ namespace parallel
     // run algorithm for locally-owned cells
     dealii::Triangulation<dim, spacedim>::update_reference_cell_types();
 
-    // translate ReferenceCell::Type to unsigned int (needed by
+    // translate ReferenceCell to unsigned int (needed by
     // Utilities::MPI::compute_set_union)
     std::vector<unsigned int> reference_cell_types_ui;
 
@@ -310,7 +310,7 @@ namespace parallel
     this->reference_cell_types.clear();
     for (const auto &i : reference_cell_types_ui)
       this->reference_cell_types.emplace_back(
-        ReferenceCell::internal::make_reference_cell_from_int(i));
+        dealii::internal::ReferenceCell::make_reference_cell_from_int(i));
   }
 
 

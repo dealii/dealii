@@ -3388,7 +3388,7 @@ public:
    * Return vector filled with the used reference-cell types of this
    * triangulation.
    */
-  const std::vector<ReferenceCell::Type> &
+  const std::vector<ReferenceCell> &
   get_reference_cell_types() const;
 
   /**
@@ -3511,7 +3511,7 @@ protected:
    * Vector caching all reference-cell types of the given triangulation
    * (also in the distributed case).
    */
-  std::vector<ReferenceCell::Type> reference_cell_types;
+  std::vector<ReferenceCell> reference_cell_types;
 
   /**
    * Write a bool vector to the given stream, writing a pre- and a postfix

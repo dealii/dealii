@@ -324,7 +324,7 @@ namespace DataOutBase
     /**
      * Reference-cell type of the underlying cell of this patch.
      */
-    ReferenceCell::Type reference_cell_type;
+    ReferenceCell reference_cell_type;
 
     /**
      * Default constructor. Sets #n_subdivisions to one, #points_are_available
@@ -474,7 +474,7 @@ namespace DataOutBase
     /**
      * Reference-cell type of the underlying cell of this patch.
      */
-    ReferenceCell::Type reference_cell_type;
+    ReferenceCell reference_cell_type;
 
     /**
      * Default constructor. Sets #points_are_available
@@ -3333,7 +3333,7 @@ public:
    * If the entry is not valid, this returns an empty string.
    *
    * @deprecated Use the overload taking an `unsigned int` and a
-   * `const ReferenceCell::Type &` instead.
+   * `const ReferenceCell &` instead.
    */
   DEAL_II_DEPRECATED
   std::string
@@ -3344,8 +3344,8 @@ public:
    * If the entry is not valid, this returns an empty string.
    */
   std::string
-  get_xdmf_content(const unsigned int         indent_level,
-                   const ReferenceCell::Type &reference_cell_type) const;
+  get_xdmf_content(const unsigned int   indent_level,
+                   const ReferenceCell &reference_cell_type) const;
 
 private:
   /**

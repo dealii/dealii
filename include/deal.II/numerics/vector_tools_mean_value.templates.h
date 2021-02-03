@@ -197,7 +197,7 @@ namespace VectorTools
                      const VectorType &               v,
                      const unsigned int               component)
   {
-    return compute_mean_value(ReferenceCell::get_default_linear_mapping(
+    return compute_mean_value(get_default_linear_mapping(
                                 dof.get_triangulation()),
                               dof,
                               quadrature,

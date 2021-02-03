@@ -3042,7 +3042,7 @@ namespace
 {
   // Convert ExodusII strings to cell types. Use the number of nodes per element
   // to disambiguate some cases.
-  ReferenceCell::Type
+  ReferenceCell
   exodusii_name_to_type(const std::string &type_name,
                         const int          n_nodes_per_element)
   {
@@ -3063,28 +3063,28 @@ namespace
                       type_name_2.end());
 
     if (type_name_2 == "TRI" || type_name_2 == "TRIANGLE")
-      return ReferenceCell::Type::Tri;
+      return ReferenceCell::Tri;
     else if (type_name_2 == "QUAD" || type_name_2 == "QUADRILATERAL")
-      return ReferenceCell::Type::Quad;
+      return ReferenceCell::Quad;
     else if (type_name_2 == "SHELL")
       {
         if (n_nodes_per_element == 3)
-          return ReferenceCell::Type::Tri;
+          return ReferenceCell::Tri;
         else
-          return ReferenceCell::Type::Quad;
+          return ReferenceCell::Quad;
       }
     else if (type_name_2 == "TET" || type_name_2 == "TETRA" ||
              type_name_2 == "TETRAHEDRON")
-      return ReferenceCell::Type::Tet;
+      return ReferenceCell::Tet;
     else if (type_name_2 == "PYRA" || type_name_2 == "PYRAMID")
-      return ReferenceCell::Type::Pyramid;
+      return ReferenceCell::Pyramid;
     else if (type_name_2 == "WEDGE")
-      return ReferenceCell::Type::Wedge;
+      return ReferenceCell::Wedge;
     else if (type_name_2 == "HEX" || type_name_2 == "HEXAHEDRON")
-      return ReferenceCell::Type::Hex;
+      return ReferenceCell::Hex;
 
     Assert(false, ExcNotImplemented());
-    return ReferenceCell::Type::Invalid;
+    return ReferenceCell::Invalid;
   }
 
   // Associate deal.II boundary ids with sidesets (a face can be in multiple
@@ -3192,11 +3192,10 @@ namespace
             // Record the b_or_m_id of the current face.
             const unsigned int   local_face_n = face_id % max_faces_per_cell;
             const CellData<dim> &cell = cells[face_id / max_faces_per_cell];
-            const ReferenceCell::Type cell_type =
-              ReferenceCell::Type::n_vertices_to_type(dim,
-                                                      cell.vertices.size());
+            const ReferenceCell  cell_type =
+              ReferenceCell::n_vertices_to_type(dim, cell.vertices.size());
             const ReferenceCell::internal::Info::Base &info =
-              ReferenceCell::internal::Info::get_cell(cell_type);
+              internal::Info::get_cell(cell_type);
             const unsigned int deal_face_n =
               info.exodusii_face_to_deal_face(local_face_n);
             const ReferenceCell::internal::Info::Base &face_info =
@@ -3345,10 +3344,10 @@ GridIn<dim, spacedim>::read_exodusii(
                           &n_faces_per_element,
                           &n_attributes_per_element);
       AssertThrowExodusII(ierr);
-      const ReferenceCell::Type type =
+      const ReferenceCell type =
         exodusii_name_to_type(string_temp.data(), n_nodes_per_element);
       const ReferenceCell::internal::Info::Base &info =
-        ReferenceCell::internal::Info::get_cell(type);
+        internal::Info::get_cell(type);
       // The number of nodes per element may be larger than what we want to
       // read - for example, if the Exodus file contains a QUAD9 element, we
       // only want to read the first four values and ignore the rest.

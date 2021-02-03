@@ -41,7 +41,7 @@ test<2>(const unsigned int n_points)
   Simplex::QGauss<dim - 1> quad_ref(n_points);
 
   const auto quad =
-    QProjector<dim>::project_to_all_faces(ReferenceCell::Type::Tri, quad_ref);
+    QProjector<dim>::project_to_all_faces(ReferenceCell::Tri, quad_ref);
 
   const auto print = [&](const unsigned int face_no,
                          const bool         face_orientation) {
@@ -50,13 +50,12 @@ test<2>(const unsigned int n_points)
             << ":" << std::endl;
     for (unsigned int
            q = 0,
-           i =
-             QProjector<dim>::DataSetDescriptor::face(ReferenceCell::Type::Tri,
-                                                      face_no,
-                                                      face_orientation,
-                                                      false,
-                                                      false,
-                                                      quad_ref.size());
+           i = QProjector<dim>::DataSetDescriptor::face(ReferenceCell::Tri,
+                                                        face_no,
+                                                        face_orientation,
+                                                        false,
+                                                        false,
+                                                        quad_ref.size());
          q < quad_ref.size();
          ++q, ++i)
       {
@@ -83,7 +82,7 @@ test<3>(const unsigned int n_points)
   Simplex::QGauss<dim - 1> quad_ref(n_points);
 
   const auto quad =
-    QProjector<dim>::project_to_all_faces(ReferenceCell::Type::Tet, quad_ref);
+    QProjector<dim>::project_to_all_faces(ReferenceCell::Tet, quad_ref);
 
   const auto print = [&](const unsigned int face_no,
                          const bool         face_orientation,
@@ -96,13 +95,12 @@ test<3>(const unsigned int n_points)
             << std::endl;
     for (unsigned int
            q = 0,
-           i =
-             QProjector<dim>::DataSetDescriptor::face(ReferenceCell::Type::Tet,
-                                                      face_no,
-                                                      face_orientation,
-                                                      face_flip,
-                                                      face_rotation,
-                                                      quad_ref.size());
+           i = QProjector<dim>::DataSetDescriptor::face(ReferenceCell::Tet,
+                                                        face_no,
+                                                        face_orientation,
+                                                        face_flip,
+                                                        face_rotation,
+                                                        quad_ref.size());
          q < quad_ref.size();
          ++q, ++i)
       {

@@ -415,8 +415,7 @@ namespace GridTools
                                 const double                   tolerance)
   {
     return find_active_cell_around_point<dim, MeshType, spacedim>(
-             ReferenceCell::get_default_linear_mapping(
-               mesh.get_triangulation()),
+             get_default_linear_mapping(mesh.get_triangulation()),
              mesh,
              p,
              marked_vertices,
