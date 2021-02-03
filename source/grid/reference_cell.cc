@@ -179,18 +179,17 @@ namespace ReferenceCell
 
   template <int dim>
   Quadrature<dim>
-  get_gauss_type_quadrature(const Type &   reference_cell,
-                            const unsigned n_points_1D)
+  Type::get_gauss_type_quadrature(const unsigned n_points_1D) const
   {
-    AssertDimension(dim, reference_cell.get_dimension());
+    AssertDimension(dim, get_dimension());
 
-    if (reference_cell == Type::get_hypercube<dim>())
+    if (is_hyper_cube())
       return QGauss<dim>(n_points_1D);
-    else if (reference_cell == Type::Tri || reference_cell == Type::Tet)
+    else if (is_simplex())
       return Simplex::QGauss<dim>(n_points_1D);
-    else if (reference_cell == Type::Pyramid)
+    else if (*this == Type::Pyramid)
       return Simplex::QGaussPyramid<dim>(n_points_1D);
-    else if (reference_cell == Type::Wedge)
+    else if (*this == Type::Wedge)
       return Simplex::QGaussWedge<dim>(n_points_1D);
     else
       Assert(false, ExcNotImplemented());
@@ -202,10 +201,13 @@ namespace ReferenceCell
 
   template <int dim>
   const Quadrature<dim> &
-  get_nodal_type_quadrature(const Type &reference_cell)
+  Type::get_nodal_type_quadrature() const
   {
-    AssertDimension(dim, reference_cell.get_dimension());
+    AssertDimension(dim, get_dimension());
 
+    // A function that is used to fill a quadrature object of the
+    // desired type the first time we encounter a particular
+    // reference cell
     const auto create_quadrature = [](const Type &reference_cell) {
       Triangulation<dim> tria;
       GridGenerator::reference_cell(reference_cell, tria);
@@ -213,35 +215,30 @@ namespace ReferenceCell
       return Quadrature<dim>(tria.get_vertices());
     };
 
-    if (reference_cell == Type::get_hypercube<dim>())
+    if (is_hyper_cube())
       {
-        static const Quadrature<dim> quadrature =
-          create_quadrature(reference_cell);
+        static const Quadrature<dim> quadrature = create_quadrature(*this);
         return quadrature;
       }
-    else if (reference_cell == Type::Tri || reference_cell == Type::Tet)
+    else if (is_simplex())
       {
-        static const Quadrature<dim> quadrature =
-          create_quadrature(reference_cell);
+        static const Quadrature<dim> quadrature = create_quadrature(*this);
         return quadrature;
       }
-    else if (reference_cell == Type::Pyramid)
+    else if (*this == Type::Pyramid)
       {
-        static const Quadrature<dim> quadrature =
-          create_quadrature(reference_cell);
+        static const Quadrature<dim> quadrature = create_quadrature(*this);
         return quadrature;
       }
-    else if (reference_cell == Type::Wedge)
+    else if (*this == Type::Wedge)
       {
-        static const Quadrature<dim> quadrature =
-          create_quadrature(reference_cell);
+        static const Quadrature<dim> quadrature = create_quadrature(*this);
         return quadrature;
       }
     else
       Assert(false, ExcNotImplemented());
 
-    static Quadrature<dim> dummy;
-
+    static const Quadrature<dim> dummy;
     return dummy; // never reached
   }
 
