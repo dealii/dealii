@@ -10379,14 +10379,13 @@ Triangulation<dim, spacedim>::get_manifold_ids() const
     if (cell->is_locally_owned())
       {
         m_ids.insert(cell->manifold_id());
-        if (dim > 1)
-          for (const unsigned int face : GeometryInfo<dim>::face_indices())
-            if (cell->at_boundary(face))
-              m_ids.insert(cell->face(face)->manifold_id());
+        for (const auto &face : cell->face_iterators())
+          m_ids.insert(face->manifold_id());
+        if (dim == 3)
+          for (const unsigned int l : cell->line_indices())
+            m_ids.insert(cell->line(l)->manifold_id());
       }
-  std::vector<types::manifold_id> manifold_indicators(m_ids.begin(),
-                                                      m_ids.end());
-  return manifold_indicators;
+  return {m_ids.begin(), m_ids.end()};
 }
 
 /*-----------------------------------------------------------------*/
