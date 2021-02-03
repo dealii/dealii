@@ -3193,7 +3193,8 @@ namespace
             const unsigned int   local_face_n = face_id % max_faces_per_cell;
             const CellData<dim> &cell = cells[face_id / max_faces_per_cell];
             const ReferenceCell::Type cell_type =
-              ReferenceCell::n_vertices_to_type(dim, cell.vertices.size());
+              ReferenceCell::Type::n_vertices_to_type(dim,
+                                                      cell.vertices.size());
             const ReferenceCell::internal::Info::Base &info =
               ReferenceCell::internal::Info::get_cell(cell_type);
             const unsigned int deal_face_n =

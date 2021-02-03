@@ -93,7 +93,6 @@ namespace ReferenceCell
     static constexpr const Type &
     get_simplex();
 
-
     /**
      * Return the correct hypercube reference cell type for the given dimension
      * `dim`. Depending on the template argument `dim`, this function returns a
@@ -102,6 +101,15 @@ namespace ReferenceCell
     template <int dim>
     static constexpr const Type &
     get_hypercube();
+
+    /**
+     * Return the correct ReferenceCell::Type for a given structural dimension
+     * and number of vertices. For example, if `dim==2` and `n_vertices==4`,
+     * this function will return `Quad`. But if `dim==3` and `n_vertices==4`, it
+     * will return `Tri`.
+     */
+    static Type
+    n_vertices_to_type(const int dim, const unsigned int n_vertices);
 
     /**
      * Default constructor. Initialize this object as an invalid object.
@@ -482,17 +490,15 @@ namespace ReferenceCell
       }
   }
 
-  /**
-   * Retrieve the correct ReferenceCell::Type for a given structural dimension
-   * and number of vertices.
-   */
+
+
   inline Type
-  n_vertices_to_type(const int dim, const unsigned int n_vertices)
+  Type::n_vertices_to_type(const int dim, const unsigned int n_vertices)
   {
     AssertIndexRange(dim, 4);
     AssertIndexRange(n_vertices, 9);
-    const auto X = Type::Invalid;
 
+    const auto X = Type::Invalid;
     static const std::array<std::array<ReferenceCell::Type, 9>,
                             4>
       table = {
