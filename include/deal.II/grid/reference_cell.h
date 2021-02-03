@@ -209,6 +209,28 @@ namespace ReferenceCell
     get_default_linear_mapping() const;
 
     /**
+     * Return a Gauss-type quadrature matching the given reference cell (QGauss,
+     * Simplex::QGauss, Simplex::QGaussPyramid, Simplex::QGaussWedge).
+     *
+     * @param[in] n_points_1D The number of quadrature points in each direction
+     * (QGauss) or an indication of what polynomial degree needs to be
+     * integrated exactly for the other types.
+     */
+    template <int dim>
+    Quadrature<dim>
+    get_gauss_type_quadrature(const unsigned n_points_1D) const;
+
+    /**
+     * Return a quadrature rule with the support points of the given reference
+     * cell.
+     *
+     * @note The weights of the quadrature object are left unfilled.
+     */
+    template <int dim>
+    const Quadrature<dim> &
+    get_nodal_type_quadrature() const;
+
+    /**
      * Return a text representation of the reference cell represented by the
      * current object.
      */
@@ -722,27 +744,6 @@ namespace ReferenceCell
   template <int dim, int spacedim>
   const Mapping<dim, spacedim> &
   get_default_linear_mapping(const Triangulation<dim, spacedim> &triangulation);
-
-  /**
-   * Return a Gauss-type quadrature matching the given reference cell(QGauss,
-   * Simplex::QGauss, Simplex::QGaussPyramid, Simplex::QGaussWedge) and
-   * @p n_points_1D the number of quadrature points in each direction (QGuass)
-   * or the indication of what polynomial degree to be integrated exactly.
-   */
-  template <int dim>
-  Quadrature<dim>
-  get_gauss_type_quadrature(const Type &   reference_cell,
-                            const unsigned n_points_1D);
-
-  /**
-   * Return a quadrature rule with the support points of the given reference
-   * cell.
-   *
-   * @note The weights are not filled.
-   */
-  template <int dim>
-  const Quadrature<dim> &
-  get_nodal_type_quadrature(const Type &reference_cell);
 
   namespace internal
   {

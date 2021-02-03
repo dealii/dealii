@@ -207,8 +207,9 @@ MappingFEField<dim, spacedim, VectorType, void>::MappingFEField(
                 true))
   , fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int)
   , fe_values(this->euler_dof_handler->get_fe(),
-              ReferenceCell::get_nodal_type_quadrature<dim>(
-                this->euler_dof_handler->get_fe().reference_cell_type()),
+              this->euler_dof_handler->get_fe()
+                .reference_cell_type()
+                .template get_nodal_type_quadrature<dim>(),
               update_values)
 {
   unsigned int size = 0;
@@ -236,8 +237,9 @@ MappingFEField<dim, spacedim, VectorType, void>::MappingFEField(
                 true))
   , fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int)
   , fe_values(this->euler_dof_handler->get_fe(),
-              ReferenceCell::get_nodal_type_quadrature<dim>(
-                this->euler_dof_handler->get_fe().reference_cell_type()),
+              this->euler_dof_handler->get_fe()
+                .reference_cell_type()
+                .template get_nodal_type_quadrature<dim>(),
               update_values)
 {
   unsigned int size = 0;
@@ -276,8 +278,9 @@ MappingFEField<dim, spacedim, VectorType, void>::MappingFEField(
                 true))
   , fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int)
   , fe_values(this->euler_dof_handler->get_fe(),
-              ReferenceCell::get_nodal_type_quadrature<dim>(
-                this->euler_dof_handler->get_fe().reference_cell_type()),
+              this->euler_dof_handler->get_fe()
+                .reference_cell_type()
+                .template get_nodal_type_quadrature<dim>(),
               update_values)
 {
   unsigned int size = 0;
@@ -313,8 +316,9 @@ MappingFEField<dim, spacedim, VectorType, void>::MappingFEField(
   , fe_mask(mapping.fe_mask)
   , fe_to_real(mapping.fe_to_real)
   , fe_values(mapping.euler_dof_handler->get_fe(),
-              ReferenceCell::get_nodal_type_quadrature<dim>(
-                this->euler_dof_handler->get_fe().reference_cell_type()),
+              this->euler_dof_handler->get_fe()
+                .reference_cell_type()
+                .template get_nodal_type_quadrature<dim>(),
               update_values)
 {}
 

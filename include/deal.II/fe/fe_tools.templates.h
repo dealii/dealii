@@ -1598,7 +1598,7 @@ namespace FETools
     const unsigned int n1 = fe1.n_dofs_per_cell();
     const unsigned int n2 = fe2.n_dofs_per_cell();
 
-    const auto reference_cell_type = fe1.reference_cell_type();
+    const ReferenceCell::Type reference_cell_type = fe1.reference_cell_type();
 
     Assert(fe1.reference_cell_type() == fe2.reference_cell_type(),
            ExcNotImplemented());
@@ -1615,8 +1615,7 @@ namespace FETools
       std::max(fe1.tensor_degree(), fe2.tensor_degree());
     Assert(degree != numbers::invalid_unsigned_int, ExcNotImplemented());
     const auto quadrature =
-      ReferenceCell::get_gauss_type_quadrature<dim>(reference_cell_type,
-                                                    degree + 1);
+      reference_cell_type.get_gauss_type_quadrature<dim>(degree + 1);
 
     // Set up FEValues.
     const UpdateFlags flags =
@@ -1809,7 +1808,8 @@ namespace FETools
                    ExcDimensionMismatch(matrices[i].m(), n));
           }
 
-        const auto reference_cell_type = fe.reference_cell_type();
+        const ReferenceCell::Type reference_cell_type =
+          fe.reference_cell_type();
 
         // Set up meshes, one with a single
         // reference cell and refine it once
@@ -1824,8 +1824,7 @@ namespace FETools
           reference_cell_type
             .template get_default_linear_mapping<dim, spacedim>();
         const auto &q_fine =
-          ReferenceCell::get_gauss_type_quadrature<dim>(reference_cell_type,
-                                                        degree + 1);
+          reference_cell_type.get_gauss_type_quadrature<dim>(degree + 1);
         const unsigned int nq = q_fine.size();
 
         FEValues<dim, spacedim> fine(mapping,
