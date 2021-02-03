@@ -53,18 +53,18 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionerBase
+  class PreconditionBase
   {
   public:
     /**
      * Constructor.
      */
-    PreconditionerBase();
+    PreconditionBase();
 
     /**
      * Destructor.
      */
-    virtual ~PreconditionerBase();
+    virtual ~PreconditionBase();
 
     /**
      * Destroys the preconditioner, leaving an object like just after having
@@ -129,12 +129,12 @@ namespace PETScWrappers
    * preconditioner.
    *
    * See the comment in the base class
-   * @ref PreconditionerBase
+   * @ref PreconditionBase
    * for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionJacobi : public PreconditionerBase
+  class PreconditionJacobi : public PreconditionBase
   {
   public:
     /**
@@ -212,12 +212,12 @@ namespace PETScWrappers
    * the relevant section of the PETSc manual, but is not implemented here.
    *
    * See the comment in the base class
-   * @ref PreconditionerBase
+   * @ref PreconditionBase
    * for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionBlockJacobi : public PreconditionerBase
+  class PreconditionBlockJacobi : public PreconditionBase
   {
   public:
     /**
@@ -285,7 +285,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionSOR : public PreconditionerBase
+  class PreconditionSOR : public PreconditionBase
   {
   public:
     /**
@@ -345,7 +345,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionSSOR : public PreconditionerBase
+  class PreconditionSSOR : public PreconditionBase
   {
   public:
     /**
@@ -403,12 +403,12 @@ namespace PETScWrappers
    * each processor.
    *
    * See the comment in the base class
-   * @ref PreconditionerBase
+   * @ref PreconditionBase
    * for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionEisenstat : public PreconditionerBase
+  class PreconditionEisenstat : public PreconditionBase
   {
   public:
     /**
@@ -469,7 +469,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionICC : public PreconditionerBase
+  class PreconditionICC : public PreconditionBase
   {
   public:
     /**
@@ -529,7 +529,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionILU : public PreconditionerBase
+  class PreconditionILU : public PreconditionBase
   {
   public:
     /**
@@ -587,14 +587,14 @@ namespace PETScWrappers
    * (depending on the settings) performs an exact factorization of the
    * matrix, so it is not necessary to wrap it in an iterative solver. This
    * class is typically used with SolverPreOnly to get a direct
-   * solver. Alternatively, you can use PreconditionerBase::vmult() directly.
+   * solver. Alternatively, you can use PreconditionBase::vmult() directly.
    *
    * @note This is not a parallel preconditioner so it only works in serial
    * computations with a single processor.
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionLU : public PreconditionerBase
+  class PreconditionLU : public PreconditionBase
   {
   public:
     /**
@@ -673,7 +673,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionBoomerAMG : public PreconditionerBase
+  class PreconditionBoomerAMG : public PreconditionBase
   {
   public:
     /**
@@ -803,7 +803,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionParaSails : public PreconditionerBase
+  class PreconditionParaSails : public PreconditionBase
   {
   public:
     /**
@@ -913,7 +913,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionNone : public PreconditionerBase
+  class PreconditionNone : public PreconditionBase
   {
   public:
     /**
@@ -954,6 +954,12 @@ namespace PETScWrappers
      */
     AdditionalData additional_data;
   };
+
+  /**
+   * Alias for backwards-compatibility.
+   * @deprecated Use PETScWrappers::PreconditionBase instead.
+   */
+  using PreconditionerBase DEAL_II_DEPRECATED_EARLY = PreconditionBase;
 } // namespace PETScWrappers
 
 

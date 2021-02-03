@@ -1,0 +1,4 @@
+Update: class PETScWrappers::PreconditionerBase renamed to
+PETScWrappers::PreconditionBase for consistency.
+<br>
+(Pasquale Claudio Africa, 2021/02/03)

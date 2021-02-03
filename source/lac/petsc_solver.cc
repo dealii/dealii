@@ -50,10 +50,10 @@ namespace PETScWrappers
 
 
   void
-  SolverBase::solve(const MatrixBase &        A,
-                    VectorBase &              x,
-                    const VectorBase &        b,
-                    const PreconditionerBase &preconditioner)
+  SolverBase::solve(const MatrixBase &      A,
+                    VectorBase &            x,
+                    const VectorBase &      b,
+                    const PreconditionBase &preconditioner)
   {
     /*
       TODO: PETSc duplicates communicators, so this does not work (you put
@@ -210,7 +210,7 @@ namespace PETScWrappers
   }
 
   void
-  SolverBase::initialize(const PreconditionerBase &preconditioner)
+  SolverBase::initialize(const PreconditionBase &preconditioner)
   {
     PetscErrorCode ierr;
 

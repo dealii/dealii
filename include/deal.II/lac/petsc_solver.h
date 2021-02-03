@@ -51,7 +51,7 @@ namespace PETScWrappers
 #    ifndef DOXYGEN
   class MatrixBase;
   class VectorBase;
-  class PreconditionerBase;
+  class PreconditionBase;
 #    endif
 
 
@@ -136,10 +136,10 @@ namespace PETScWrappers
      * performance reasons. See class Documentation.
      */
     void
-    solve(const MatrixBase &        A,
-          VectorBase &              x,
-          const VectorBase &        b,
-          const PreconditionerBase &preconditioner);
+    solve(const MatrixBase &      A,
+          VectorBase &            x,
+          const VectorBase &      b,
+          const PreconditionBase &preconditioner);
 
 
     /**
@@ -169,7 +169,7 @@ namespace PETScWrappers
      * intended for use with SLEPc spectral transformation class.
      */
     void
-    initialize(const PreconditionerBase &preconditioner);
+    initialize(const PreconditionBase &preconditioner);
 
   protected:
     /**

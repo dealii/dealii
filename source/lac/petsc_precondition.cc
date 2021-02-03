@@ -33,12 +33,12 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
 {
-  PreconditionerBase::PreconditionerBase()
+  PreconditionBase::PreconditionBase()
     : pc(nullptr)
     , matrix(nullptr)
   {}
 
-  PreconditionerBase::~PreconditionerBase()
+  PreconditionBase::~PreconditionBase()
   {
     try
       {
@@ -49,7 +49,7 @@ namespace PETScWrappers
   }
 
   void
-  PreconditionerBase::clear()
+  PreconditionBase::clear()
   {
     matrix = nullptr;
 
@@ -63,7 +63,7 @@ namespace PETScWrappers
 
 
   void
-  PreconditionerBase::vmult(VectorBase &dst, const VectorBase &src) const
+  PreconditionBase::vmult(VectorBase &dst, const VectorBase &src) const
   {
     AssertThrow(pc != nullptr, StandardExceptions::ExcInvalidState());
 
@@ -73,7 +73,7 @@ namespace PETScWrappers
 
 
   void
-  PreconditionerBase::Tvmult(VectorBase &dst, const VectorBase &src) const
+  PreconditionBase::Tvmult(VectorBase &dst, const VectorBase &src) const
   {
     AssertThrow(pc != nullptr, StandardExceptions::ExcInvalidState());
 
@@ -83,7 +83,7 @@ namespace PETScWrappers
 
 
   void
-  PreconditionerBase::create_pc()
+  PreconditionBase::create_pc()
   {
     // only allow the creation of the
     // preconditioner once
@@ -110,13 +110,13 @@ namespace PETScWrappers
 
 
   const PC &
-  PreconditionerBase::get_pc() const
+  PreconditionBase::get_pc() const
   {
     return pc;
   }
 
 
-  PreconditionerBase::operator Mat() const
+  PreconditionBase::operator Mat() const
   {
     return matrix;
   }
