@@ -3213,6 +3213,11 @@ namespace parallel
     Triangulation<dim, spacedim>::copy_triangulation(
       const dealii::Triangulation<dim, spacedim> &other_tria)
     {
+      Assert(other_tria.n_levels() == 1,
+             ExcMessage(
+               "Parallel distributed triangulations can only be copied, "
+               "if they are not refined!"));
+
       try
         {
           dealii::parallel::TriangulationBase<dim, spacedim>::
@@ -3231,11 +3236,6 @@ namespace parallel
       // functions that do the actual work (which are dimension dependent, so
       // separate)
       triangulation_has_content = true;
-
-      Assert(other_tria.n_levels() == 1,
-             ExcMessage(
-               "Parallel distributed triangulations can only be copied, "
-               "if they are not refined!"));
 
       if (const dealii::parallel::distributed::Triangulation<dim, spacedim>
             *other_tria_x =
