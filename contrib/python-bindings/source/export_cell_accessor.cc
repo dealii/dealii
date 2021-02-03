@@ -152,8 +152,8 @@ namespace python
 
 
 
-  const char reference_cell_type_docstring[] =
-    " Reference cell type of the current cell).                          \n";
+  const char reference_cell_docstring[] =
+    " Reference cell of the current cell).                               \n";
 
 
 
@@ -260,9 +260,9 @@ namespace python
            &CellAccessorWrapper::vertex_index,
            vertex_index_docstring,
            boost::python::args("self", "vertex"))
-      .def("reference_cell_type",
-           &CellAccessorWrapper::reference_cell_type,
-           reference_cell_type_docstring,
+      .def("reference_cell",
+           &CellAccessorWrapper::reference_cell,
+           reference_cell_docstring,
            boost::python::args("self"))
       .def("n_vertices",
            &CellAccessorWrapper::n_vertices,

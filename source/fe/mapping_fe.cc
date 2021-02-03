@@ -153,24 +153,22 @@ MappingFE<dim, spacedim>::InternalData::initialize_face(
                  std::vector<Tensor<1, spacedim>>(n_original_q_points));
 
       // Compute tangentials to the unit cell.
-      const auto reference_cell_type = this->fe.reference_cell_type();
-      const auto n_faces =
-        internal::Info::get_cell(reference_cell_type).n_faces();
+      const auto reference_cell = this->fe.reference_cell();
+      const auto n_faces = internal::Info::get_cell(reference_cell).n_faces();
 
       for (unsigned int i = 0; i < n_faces; ++i)
         {
           unit_tangentials[i].resize(n_original_q_points);
-          std::fill(
-            unit_tangentials[i].begin(),
-            unit_tangentials[i].end(),
-            reference_cell_type.template unit_tangential_vectors<dim>(i, 0));
+          std::fill(unit_tangentials[i].begin(),
+                    unit_tangentials[i].end(),
+                    reference_cell.template unit_tangential_vectors<dim>(i, 0));
           if (dim > 2)
             {
               unit_tangentials[n_faces + i].resize(n_original_q_points);
-              std::fill(unit_tangentials[n_faces + i].begin(),
-                        unit_tangentials[n_faces + i].end(),
-                        reference_cell_type
-                          .template unit_tangential_vectors<dim>(i, 1));
+              std::fill(
+                unit_tangentials[n_faces + i].begin(),
+                unit_tangentials[n_faces + i].end(),
+                reference_cell.template unit_tangential_vectors<dim>(i, 1));
             }
         }
     }
@@ -861,11 +859,11 @@ MappingFE<dim, spacedim>::MappingFE(const FiniteElement<dim, spacedim> &fe)
 
   const auto &mapping_support_points = fe.get_unit_support_points();
 
-  const auto reference_cell_type = fe.reference_cell_type();
+  const auto reference_cell = fe.reference_cell();
 
   const unsigned int n_points = mapping_support_points.size();
   const unsigned int n_shape_functions =
-    internal::Info::get_cell(reference_cell_type).n_vertices();
+    internal::Info::get_cell(reference_cell).n_vertices();
 
   this->mapping_support_point_weights =
     Table<2, double>(n_points, n_shape_functions);
@@ -873,8 +871,8 @@ MappingFE<dim, spacedim>::MappingFE(const FiniteElement<dim, spacedim> &fe)
   for (unsigned int point = 0; point < n_points; ++point)
     for (unsigned int i = 0; i < n_shape_functions; ++i)
       mapping_support_point_weights(point, i) =
-        reference_cell_type.d_linear_shape_function(
-          mapping_support_points[point], i);
+        reference_cell.d_linear_shape_function(mapping_support_points[point],
+                                               i);
 }
 
 
@@ -1088,7 +1086,7 @@ MappingFE<dim, spacedim>::get_face_data(
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
   data.initialize_face(this->requires_update_flags(update_flags),
                        QProjector<dim>::project_to_all_faces(
-                         this->fe->reference_cell_type(), quadrature),
+                         this->fe->reference_cell(), quadrature),
                        quadrature.max_n_quadrature_points());
 
   return data_ptr;
@@ -1107,7 +1105,7 @@ MappingFE<dim, spacedim>::get_subface_data(
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
   data.initialize_face(this->requires_update_flags(update_flags),
                        QProjector<dim>::project_to_all_subfaces(
-                         this->fe->reference_cell_type(), quadrature),
+                         this->fe->reference_cell(), quadrature),
                        quadrature.size());
 
   return data_ptr;
@@ -1624,7 +1622,7 @@ MappingFE<dim, spacedim>::fill_fe_face_values(
     cell,
     face_no,
     numbers::invalid_unsigned_int,
-    QProjector<dim>::DataSetDescriptor::face(this->fe->reference_cell_type(),
+    QProjector<dim>::DataSetDescriptor::face(this->fe->reference_cell(),
                                              face_no,
                                              cell->face_orientation(face_no),
                                              cell->face_flip(face_no),
@@ -1671,7 +1669,7 @@ MappingFE<dim, spacedim>::fill_fe_subface_values(
     cell,
     face_no,
     subface_no,
-    QProjector<dim>::DataSetDescriptor::subface(this->fe->reference_cell_type(),
+    QProjector<dim>::DataSetDescriptor::subface(this->fe->reference_cell(),
                                                 face_no,
                                                 subface_no,
                                                 cell->face_orientation(face_no),
@@ -2323,7 +2321,7 @@ MappingFE<dim, spacedim>::is_compatible_with(
                     Utilities::to_string(cell_type.get_dimension()) +
                     " ) do not agree."));
 
-  return fe->reference_cell_type() == cell_type;
+  return fe->reference_cell() == cell_type;
 }
 
 

@@ -185,10 +185,10 @@ namespace python
     unsigned int
     vertex_index(const unsigned int i) const;
 
-    /*! @copydoc TriaAccessor::reference_cell_type
+    /*! @copydoc TriaAccessor::reference_cell
      */
     CellTypeWrapper
-    reference_cell_type() const;
+    reference_cell() const;
 
     /*! @copydoc TriaAccessor::n_vertices
      */

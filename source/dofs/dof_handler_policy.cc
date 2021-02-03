@@ -837,7 +837,7 @@ namespace internal
                                 dof_handler.get_fe(other_fe_index),
                                 quad_dof_identities
                                   [most_dominating_fe_index][other_fe_index]
-                                  [cell->quad(q)->reference_cell_type() ==
+                                  [cell->quad(q)->reference_cell() ==
                                    dealii::ReferenceCell::Quad],
                                 most_dominating_fe_index_face_no);
 
@@ -1594,7 +1594,7 @@ namespace internal
                                 dof_handler.get_fe(other_fe_index),
                                 quad_dof_identities
                                   [most_dominating_fe_index][other_fe_index]
-                                  [cell->quad(q)->reference_cell_type() ==
+                                  [cell->quad(q)->reference_cell() ==
                                    dealii::ReferenceCell::Quad],
                                 most_dominating_fe_index_face_no);
 

@@ -1639,7 +1639,7 @@ public:
    * Reference cell type of the current object.
    */
   ReferenceCell
-  reference_cell_type() const;
+  reference_cell() const;
 
   /**
    * Number of vertices.
@@ -2720,7 +2720,7 @@ public:
    * Reference cell type of the current object.
    */
   ReferenceCell
-  reference_cell_type() const;
+  reference_cell() const;
 
   /**
    * Number of vertices.

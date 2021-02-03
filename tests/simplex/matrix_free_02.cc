@@ -157,8 +157,8 @@ test(const unsigned version, const unsigned int degree, const bool do_helmholtz)
   DoFHandler<dim> dof_handler(tria);
 
   for (const auto &cell : dof_handler.active_cell_iterators())
-    if (cell->reference_cell_type() == ReferenceCell::Tri ||
-        cell->reference_cell_type() == ReferenceCell::Tet)
+    if (cell->reference_cell() == ReferenceCell::Tri ||
+        cell->reference_cell() == ReferenceCell::Tet)
       cell->set_active_fe_index(0);
     else
       cell->set_active_fe_index(1);

@@ -1559,7 +1559,7 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
   std::size_t element_id = 1;
 
   const auto add_element = [&](const auto &element, const int &entity_tag) {
-    const auto type = element->reference_cell_type();
+    const auto type = element->reference_cell();
 
     Assert(entity_tag > 0, ExcInternalError());
     // Add all vertex ids. Make sure we renumber to gmsh, and we add 1 to the
@@ -3175,8 +3175,8 @@ namespace
     for (; cell != end; ++cell)
       {
         DataOutBase::Patch<dim, spacedim> patch;
-        patch.reference_cell_type = cell->reference_cell_type();
-        patch.n_subdivisions      = 1;
+        patch.reference_cell = cell->reference_cell();
+        patch.n_subdivisions = 1;
         patch.data.reinit(5, cell->n_vertices());
 
         for (const unsigned int v : cell->vertex_indices())
@@ -3439,18 +3439,18 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
         for (const unsigned int i : cell->vertex_indices())
           {
             out << ' ';
-            const auto reference_cell_type = cell->reference_cell_type();
+            const auto reference_cell = cell->reference_cell();
 
-            if ((reference_cell_type == ReferenceCell::Vertex) ||
-                (reference_cell_type == ReferenceCell::Line) ||
-                (reference_cell_type == ReferenceCell::Quad) ||
-                (reference_cell_type == ReferenceCell::Hex))
+            if ((reference_cell == ReferenceCell::Vertex) ||
+                (reference_cell == ReferenceCell::Line) ||
+                (reference_cell == ReferenceCell::Quad) ||
+                (reference_cell == ReferenceCell::Hex))
               out << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[i]);
-            else if ((reference_cell_type == ReferenceCell::Tri) ||
-                     (reference_cell_type == ReferenceCell::Tet) ||
-                     (reference_cell_type == ReferenceCell::Wedge))
+            else if ((reference_cell == ReferenceCell::Tri) ||
+                     (reference_cell == ReferenceCell::Tet) ||
+                     (reference_cell == ReferenceCell::Wedge))
               out << cell->vertex_index(i);
-            else if (reference_cell_type == ReferenceCell::Pyramid)
+            else if (reference_cell == ReferenceCell::Pyramid)
               {
                 static const std::array<unsigned int, 5> permutation_table{
                   {0, 1, 3, 2, 4}};
@@ -3490,19 +3490,19 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
   if (vtk_flags.output_cells)
     {
       for (const auto &cell : tria.active_cell_iterators())
-        out << table[static_cast<int>(cell->reference_cell_type())] << ' ';
+        out << table[static_cast<int>(cell->reference_cell())] << ' ';
       out << '\n';
     }
   if (vtk_flags.output_faces)
     {
       for (const auto &face : faces)
-        out << table[static_cast<int>(face->reference_cell_type())] << ' ';
+        out << table[static_cast<int>(face->reference_cell())] << ' ';
       out << '\n';
     }
   if (vtk_flags.output_edges)
     {
       for (const auto &edge : edges)
-        out << table[static_cast<int>(edge->reference_cell_type())] << ' ';
+        out << table[static_cast<int>(edge->reference_cell())] << ' ';
     }
   out << "\n\nCELL_DATA " << n_cells << '\n'
       << "SCALARS MaterialID int 1\n"

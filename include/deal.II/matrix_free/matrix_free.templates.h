@@ -1480,7 +1480,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
              fe_no < dof_handlers[no]->get_fe_collection().size();
              ++fe_no)
           shape_info_dummy(c, fe_no).reinit(
-            dof_handlers[no]->get_fe(fe_no).reference_cell_type() ==
+            dof_handlers[no]->get_fe(fe_no).reference_cell() ==
                 ReferenceCell::get_hypercube<dim>() ?
               quad :
               quad_simplex,

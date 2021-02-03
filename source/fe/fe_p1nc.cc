@@ -266,7 +266,7 @@ FE_P1NC::fill_fe_face_values(
 
   // compute on the face
   const Quadrature<2> quadrature_on_face =
-    QProjector<2>::project_to_face(this->reference_cell_type(),
+    QProjector<2>::project_to_face(this->reference_cell(),
                                    quadrature[0],
                                    face_no);
 
@@ -313,7 +313,7 @@ FE_P1NC::fill_fe_subface_values(
 
   // compute on the subface
   const Quadrature<2> quadrature_on_subface = QProjector<2>::project_to_subface(
-    this->reference_cell_type(), quadrature, face_no, sub_no);
+    this->reference_cell(), quadrature, face_no, sub_no);
 
   if (flags & update_values)
     for (unsigned int i = 0; i < quadrature_on_subface.size(); ++i)

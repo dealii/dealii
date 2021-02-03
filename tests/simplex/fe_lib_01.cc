@@ -29,8 +29,7 @@ test(const FiniteElement<dim, spacedim> &fe)
 {
   deallog << fe.get_name() << ": " << std::endl;
 
-  const auto &reference_cell =
-    internal::Info::get_cell(fe.reference_cell_type());
+  const auto &reference_cell = internal::Info::get_cell(fe.reference_cell());
 
   deallog << "  n_dofs_per_vertex(): " << fe.n_dofs_per_vertex() << std::endl;
   deallog << "  n_dofs_per_line():   " << fe.n_dofs_per_line() << std::endl;

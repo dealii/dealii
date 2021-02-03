@@ -471,7 +471,7 @@ namespace Simplex
 
         std::vector<Point<dim>> face_quadrature_points(
           quad_face_support.size());
-        QProjector<dim>::project_to_face(this->reference_cell_type(),
+        QProjector<dim>::project_to_face(this->reference_cell(),
                                          quad_face_support,
                                          face_no,
                                          face_quadrature_points);
@@ -541,7 +541,7 @@ namespace Simplex
 
         std::vector<Point<dim>> subface_quadrature_points(
           quad_face_support.size());
-        QProjector<dim>::project_to_subface(this->reference_cell_type(),
+        QProjector<dim>::project_to_subface(this->reference_cell(),
                                             quad_face_support,
                                             face_no,
                                             subface,

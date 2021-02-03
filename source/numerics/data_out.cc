@@ -97,8 +97,8 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
   ::dealii::DataOutBase::Patch<DoFHandlerType::dimension,
                                DoFHandlerType::space_dimension>
     patch;
-  patch.n_subdivisions      = n_subdivisions;
-  patch.reference_cell_type = cell_and_index->first->reference_cell_type();
+  patch.n_subdivisions = n_subdivisions;
+  patch.reference_cell = cell_and_index->first->reference_cell();
 
   // initialize FEValues
   scratch_data.reinit_all_fe_values(this->dof_data, cell_and_index->first);
@@ -147,7 +147,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
       (curved_cell_region == curved_boundary &&
        (cell_and_index->first->at_boundary() ||
         (DoFHandlerType::dimension != DoFHandlerType::space_dimension))) ||
-      (cell_and_index->first->reference_cell_type() !=
+      (cell_and_index->first->reference_cell() !=
        ReferenceCell::get_hypercube<dim>()))
     {
       Assert(patch.space_dim == DoFHandlerType::space_dimension,

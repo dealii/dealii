@@ -1490,21 +1490,21 @@ namespace internal
       // loop over cells and create CRS
       for (const auto &cell : cells)
         {
-          const dealii::ReferenceCell reference_cell_type =
+          const dealii::ReferenceCell reference_cell =
             dealii::ReferenceCell::n_vertices_to_type(dim,
                                                       cell.vertices.size());
 
-          Assert(reference_cell_type != dealii::ReferenceCell::Invalid,
+          Assert(reference_cell != dealii::ReferenceCell::Invalid,
                  ExcNotImplemented());
           AssertIndexRange(static_cast<types::geometric_entity_type>(
-                             reference_cell_type),
+                             reference_cell),
                            cell_types_impl.size());
           Assert(cell_types_impl[static_cast<types::geometric_entity_type>(
-                                   reference_cell_type)]
+                                   reference_cell)]
                      .get() != nullptr,
                  ExcNotImplemented());
 
-          cell_types_indices.push_back(reference_cell_type);
+          cell_types_indices.push_back(reference_cell);
 
           // create CRS of vertices (to remove template argument dim)
           for (const auto &vertex : cell.vertices)

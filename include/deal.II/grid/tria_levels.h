@@ -222,7 +222,7 @@ namespace internal
        *
        * @note Used only for dim=2 and dim=3.
        */
-      std::vector<dealii::ReferenceCell> reference_cell_type;
+      std::vector<dealii::ReferenceCell> reference_cell;
 
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
@@ -265,7 +265,7 @@ namespace internal
         ar &face_orientations;
 
       if (dim == 2 || dim == 3)
-        ar &reference_cell_type;
+        ar &reference_cell;
     }
 
   } // namespace TriangulationImplementation

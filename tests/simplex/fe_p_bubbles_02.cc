@@ -44,7 +44,7 @@ compute_nodal_quadrature(const FiniteElement<dim, spacedim> &fe)
   Assert(fe.n_blocks() == 1, ExcNotImplemented());
   Assert(fe.n_components() == 1, ExcNotImplemented());
 
-  const ReferenceCell type = fe.reference_cell_type();
+  const ReferenceCell type = fe.reference_cell();
 
   const Quadrature<dim> q_gauss =
     type.get_gauss_type_quadrature<dim>(fe.tensor_degree() + 1);
@@ -110,7 +110,7 @@ test_interpolate()
 
           Simplex::FE_P_Bubbles<dim, spacedim> fe(degree);
 
-          const ReferenceCell       type = fe.reference_cell_type();
+          const ReferenceCell       type = fe.reference_cell();
           DoFHandler<dim, spacedim> dh(tria);
           dh.distribute_dofs(fe);
           deallog << "number of dofs = " << dh.n_dofs() << std::endl;
@@ -175,7 +175,7 @@ test_lumped_project()
 
           Simplex::FE_P_Bubbles<dim, spacedim> fe(degree);
 
-          const ReferenceCell       type = fe.reference_cell_type();
+          const ReferenceCell       type = fe.reference_cell();
           DoFHandler<dim, spacedim> dh(tria);
           dh.distribute_dofs(fe);
           deallog << "number of dofs = " << dh.n_dofs() << std::endl;

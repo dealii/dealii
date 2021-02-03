@@ -375,10 +375,10 @@ namespace parallel
     update_number_cache();
 
     /**
-     * @copydoc dealii::Triangulation::update_reference_cell_types()
+     * @copydoc dealii::Triangulation::update_reference_cells()
      */
     void
-    update_reference_cell_types() override;
+    update_reference_cells() override;
 
     /**
      * Reset global active cell indices and global level cell indices.

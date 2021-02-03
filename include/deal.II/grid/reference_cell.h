@@ -957,7 +957,7 @@ namespace internal
        * Return reference-cell type of face @p face_no.
        */
       virtual dealii::ReferenceCell
-      face_reference_cell_type(const unsigned int face_no) const
+      face_reference_cell(const unsigned int face_no) const
       {
         Assert(false, ExcNotImplemented());
         (void)face_no;
@@ -1097,7 +1097,7 @@ namespace internal
     struct Vertex : public TensorProductBase<0>
     {
       dealii::ReferenceCell
-      face_reference_cell_type(const unsigned int face_no) const override
+      face_reference_cell(const unsigned int face_no) const override
       {
         (void)face_no;
         return dealii::ReferenceCell::Invalid;
@@ -1121,7 +1121,7 @@ namespace internal
     struct Line : public TensorProductBase<1>
     {
       dealii::ReferenceCell
-      face_reference_cell_type(const unsigned int face_no) const override
+      face_reference_cell(const unsigned int face_no) const override
       {
         (void)face_no;
         return dealii::ReferenceCell::Vertex;
@@ -1194,7 +1194,7 @@ namespace internal
       }
 
       dealii::ReferenceCell
-      face_reference_cell_type(const unsigned int face_no) const override
+      face_reference_cell(const unsigned int face_no) const override
       {
         (void)face_no;
 
@@ -1280,7 +1280,7 @@ namespace internal
       }
 
       dealii::ReferenceCell
-      face_reference_cell_type(const unsigned int face_no) const override
+      face_reference_cell(const unsigned int face_no) const override
       {
         (void)face_no;
         return dealii::ReferenceCell::Line;
@@ -1404,7 +1404,7 @@ namespace internal
       }
 
       dealii::ReferenceCell
-      face_reference_cell_type(const unsigned int face_no) const override
+      face_reference_cell(const unsigned int face_no) const override
       {
         (void)face_no;
 
@@ -1575,7 +1575,7 @@ namespace internal
       }
 
       dealii::ReferenceCell
-      face_reference_cell_type(const unsigned int face_no) const override
+      face_reference_cell(const unsigned int face_no) const override
       {
         AssertIndexRange(face_no, n_faces());
 
@@ -1749,7 +1749,7 @@ namespace internal
       }
 
       dealii::ReferenceCell
-      face_reference_cell_type(const unsigned int face_no) const override
+      face_reference_cell(const unsigned int face_no) const override
       {
         AssertIndexRange(face_no, n_faces());
 
@@ -1885,7 +1885,7 @@ namespace internal
       }
 
       dealii::ReferenceCell
-      face_reference_cell_type(const unsigned int face_no) const override
+      face_reference_cell(const unsigned int face_no) const override
       {
         (void)face_no;
         return dealii::ReferenceCell::Quad;
@@ -1936,7 +1936,7 @@ namespace internal
     inline const internal::Info::Base &
     get_face(const dealii::ReferenceCell &type, const unsigned int face_no)
     {
-      return get_cell(get_cell(type).face_reference_cell_type(face_no));
+      return get_cell(get_cell(type).face_reference_cell(face_no));
     }
 
   } // namespace Info

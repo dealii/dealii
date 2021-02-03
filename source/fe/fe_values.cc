@@ -4390,8 +4390,7 @@ FEValues<dim, spacedim>::FEValues(const FiniteElement<dim, spacedim> &fe,
       q.size(),
       fe.n_dofs_per_cell(),
       update_default,
-      fe.reference_cell_type()
-        .template get_default_linear_mapping<dim, spacedim>(),
+      fe.reference_cell().template get_default_linear_mapping<dim, spacedim>(),
       fe)
   , quadrature(q)
 {
@@ -4502,10 +4501,10 @@ FEValues<dim, spacedim>::reinit(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell)
 {
   // Check that mapping and reference cell type are compatible:
-  Assert(this->get_mapping().is_compatible_with(cell->reference_cell_type()),
+  Assert(this->get_mapping().is_compatible_with(cell->reference_cell()),
          ExcMessage(
            "You are trying to call FEValues::reinit() with a cell of type " +
-           cell->reference_cell_type().to_string() +
+           cell->reference_cell().to_string() +
            " with a Mapping that is not compatible with it."));
 
   // no FE in this cell, so no assertion
@@ -4538,10 +4537,10 @@ FEValues<dim, spacedim>::reinit(
          (typename FEValuesBase<dim, spacedim>::ExcFEDontMatch()));
 
   // Check that mapping and reference cell type are compatible:
-  Assert(this->get_mapping().is_compatible_with(cell->reference_cell_type()),
+  Assert(this->get_mapping().is_compatible_with(cell->reference_cell()),
          ExcMessage(
            "You are trying to call FEValues::reinit() with a cell of type " +
-           cell->reference_cell_type().to_string() +
+           cell->reference_cell().to_string() +
            " with a Mapping that is not compatible with it."));
 
   this->maybe_invalidate_previous_present_cell(cell);
@@ -4639,7 +4638,7 @@ FEFaceValuesBase<dim, spacedim>::FEFaceValuesBase(
 {
   Assert(quadrature.size() == 1 ||
            quadrature.size() ==
-             internal::Info::get_cell(fe.reference_cell_type()).n_faces(),
+             internal::Info::get_cell(fe.reference_cell()).n_faces(),
          ExcInternalError());
 }
 
@@ -4729,8 +4728,7 @@ FEFaceValues<dim, spacedim>::FEFaceValues(
   : FEFaceValuesBase<dim, spacedim>(
       fe.n_dofs_per_cell(),
       update_flags,
-      fe.reference_cell_type()
-        .template get_default_linear_mapping<dim, spacedim>(),
+      fe.reference_cell().template get_default_linear_mapping<dim, spacedim>(),
       fe,
       quadrature)
 {
@@ -4961,8 +4959,7 @@ FESubfaceValues<dim, spacedim>::FESubfaceValues(
   : FEFaceValuesBase<dim, spacedim>(
       fe.n_dofs_per_cell(),
       update_flags,
-      fe.reference_cell_type()
-        .template get_default_linear_mapping<dim, spacedim>(),
+      fe.reference_cell().template get_default_linear_mapping<dim, spacedim>(),
       fe,
       quadrature)
 {

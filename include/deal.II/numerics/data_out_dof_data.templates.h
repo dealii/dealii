@@ -230,19 +230,19 @@ namespace internal
           for (const auto &fe : finite_elements)
             for (unsigned int i = 0; i < fe->size(); ++i)
               {
-                const auto reference_cell_type = (*fe)[i].reference_cell_type();
+                const auto reference_cell = (*fe)[i].reference_cell();
 
-                if ((reference_cell_type == dealii::ReferenceCell::Vertex) ||
-                    (reference_cell_type == dealii::ReferenceCell::Line) ||
-                    (reference_cell_type == dealii::ReferenceCell::Quad) ||
-                    (reference_cell_type == dealii::ReferenceCell::Hex))
+                if ((reference_cell == dealii::ReferenceCell::Vertex) ||
+                    (reference_cell == dealii::ReferenceCell::Line) ||
+                    (reference_cell == dealii::ReferenceCell::Quad) ||
+                    (reference_cell == dealii::ReferenceCell::Hex))
                   needs_hypercube_setup |= true;
-                else if ((reference_cell_type == dealii::ReferenceCell::Tri) ||
-                         (reference_cell_type == dealii::ReferenceCell::Tet))
+                else if ((reference_cell == dealii::ReferenceCell::Tri) ||
+                         (reference_cell == dealii::ReferenceCell::Tet))
                   needs_simplex_setup |= true;
-                else if (reference_cell_type == dealii::ReferenceCell::Wedge)
+                else if (reference_cell == dealii::ReferenceCell::Wedge)
                   needs_wedge_setup |= true;
-                else if (reference_cell_type == dealii::ReferenceCell::Pyramid)
+                else if (reference_cell == dealii::ReferenceCell::Pyramid)
                   needs_pyramid_setup |= true;
                 else
                   Assert(false, ExcNotImplemented());
@@ -318,27 +318,20 @@ namespace internal
 
                   for (unsigned int j = 0; j < finite_elements[i]->size(); ++j)
                     {
-                      const auto reference_cell_type =
-                        (*finite_elements[i])[j].reference_cell_type();
+                      const auto reference_cell =
+                        (*finite_elements[i])[j].reference_cell();
 
-                      if ((reference_cell_type ==
-                           dealii::ReferenceCell::Vertex) ||
-                          (reference_cell_type ==
-                           dealii::ReferenceCell::Line) ||
-                          (reference_cell_type ==
-                           dealii::ReferenceCell::Quad) ||
-                          (reference_cell_type == dealii::ReferenceCell::Hex))
+                      if ((reference_cell == dealii::ReferenceCell::Vertex) ||
+                          (reference_cell == dealii::ReferenceCell::Line) ||
+                          (reference_cell == dealii::ReferenceCell::Quad) ||
+                          (reference_cell == dealii::ReferenceCell::Hex))
                         quadrature.push_back(*quadrature_hypercube);
-                      else if ((reference_cell_type ==
-                                dealii::ReferenceCell::Tri) ||
-                               (reference_cell_type ==
-                                dealii::ReferenceCell::Tet))
+                      else if ((reference_cell == dealii::ReferenceCell::Tri) ||
+                               (reference_cell == dealii::ReferenceCell::Tet))
                         quadrature.push_back(*quadrature_simplex);
-                      else if (reference_cell_type ==
-                               dealii::ReferenceCell::Wedge)
+                      else if (reference_cell == dealii::ReferenceCell::Wedge)
                         quadrature.push_back(*quadrature_wedge);
-                      else if (reference_cell_type ==
-                               dealii::ReferenceCell::Pyramid)
+                      else if (reference_cell == dealii::ReferenceCell::Pyramid)
                         quadrature.push_back(*quadrature_pyramid);
                       else
                         Assert(false, ExcNotImplemented());

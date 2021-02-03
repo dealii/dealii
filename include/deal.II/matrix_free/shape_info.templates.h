@@ -316,7 +316,7 @@ namespace internal
 
           try
             {
-              const dealii::ReferenceCell reference_cell_type =
+              const dealii::ReferenceCell reference_cell =
                 dealii::ReferenceCell::get_simplex<dim>();
 
               const auto quad_face  = get_face_quadrature(quad);
@@ -324,10 +324,10 @@ namespace internal
 
               const unsigned int n_face_orientations = dim == 2 ? 2 : 6;
               const unsigned int n_faces =
-                dealii::internal::Info::get_cell(reference_cell_type).n_faces();
+                dealii::internal::Info::get_cell(reference_cell).n_faces();
 
               const auto projected_quad_face =
-                QProjector<dim>::project_to_all_faces(reference_cell_type,
+                QProjector<dim>::project_to_all_faces(reference_cell,
                                                       quad_face);
 
               shape_values_face.reinit(
@@ -341,7 +341,7 @@ namespace internal
                   {
                     const auto offset =
                       QProjector<dim>::DataSetDescriptor::face(
-                        reference_cell_type,
+                        reference_cell,
                         f,
                         (o ^ 1) & 1,  // face_orientation
                         (o >> 1) & 1, // face_flip

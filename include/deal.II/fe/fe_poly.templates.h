@@ -363,7 +363,7 @@ FE_Poly<dim, spacedim>::fill_fe_face_values(
   // faces are stored contiguously)
 
   const auto offset =
-    QProjector<dim>::DataSetDescriptor::face(this->reference_cell_type(),
+    QProjector<dim>::DataSetDescriptor::face(this->reference_cell(),
                                              face_no,
                                              cell->face_orientation(face_no),
                                              cell->face_flip(face_no),
@@ -453,7 +453,7 @@ FE_Poly<dim, spacedim>::fill_fe_subface_values(
   // sub-faces are stored contiguously)
 
   const auto offset =
-    QProjector<dim>::DataSetDescriptor::subface(this->reference_cell_type(),
+    QProjector<dim>::DataSetDescriptor::subface(this->reference_cell(),
                                                 face_no,
                                                 sub_no,
                                                 cell->face_orientation(face_no),

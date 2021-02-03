@@ -799,14 +799,14 @@ namespace python
 
 
   CellTypeWrapper
-  CellAccessorWrapper::reference_cell_type() const
+  CellAccessorWrapper::reference_cell() const
   {
     if ((dim == 2) && (spacedim == 2))
-      return internal::cell_cast<2, 2>(cell_accessor)->reference_cell_type();
+      return internal::cell_cast<2, 2>(cell_accessor)->reference_cell();
     else if ((dim == 2) && (spacedim == 3))
-      return internal::cell_cast<2, 3>(cell_accessor)->reference_cell_type();
+      return internal::cell_cast<2, 3>(cell_accessor)->reference_cell();
     else
-      return internal::cell_cast<3, 3>(cell_accessor)->reference_cell_type();
+      return internal::cell_cast<3, 3>(cell_accessor)->reference_cell();
   }
 
 } // namespace python
