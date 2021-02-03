@@ -698,13 +698,8 @@ namespace ReferenceCell
       {
         Assert(*this == Tri, ExcInternalError());
 
-        const auto tangential = unit_tangential_vectors<dim>(face_no, 0);
-
-        Tensor<1, dim> result;
-        result[0] = tangential[1];
-        result[1] = -tangential[0];
-
-        return result;
+        // Return the rotated vector
+        return cross_product_2d(unit_tangential_vectors<dim>(face_no, 0));
       }
     else if (dim == 3)
       {
