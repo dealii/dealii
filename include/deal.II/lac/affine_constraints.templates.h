@@ -63,18 +63,6 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <typename number>
-void
-AffineConstraints<number>::copy_from(const AffineConstraints<number> &other)
-{
-  lines       = other.lines;
-  lines_cache = other.lines_cache;
-  local_lines = other.local_lines;
-  sorted      = other.sorted;
-}
-
-
-
-template <typename number>
 bool
 AffineConstraints<number>::ConstraintLine::
 operator<(const ConstraintLine &a) const

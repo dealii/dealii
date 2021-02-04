@@ -594,8 +594,9 @@ public:
    * This function exists because @p operator=() is explicitly
    * disabled.
    */
+  template <typename other_number>
   void
-  copy_from(const AffineConstraints &other);
+  copy_from(const AffineConstraints<other_number> &other);
 
   /**
    * clear() the AffineConstraints object and supply an IndexSet with lines
@@ -1598,6 +1599,26 @@ public:
     number inhomogeneity;
 
     /**
+     * Default constructor.
+     */
+    ConstraintLine(const size_type &index         = numbers::invalid_dof_index,
+                   const Entries &  entries       = {},
+                   const number &   inhomogeneity = 0.0);
+
+    /**
+     * Copy constructor.
+     */
+    template <typename ConstraintLineType>
+    ConstraintLine(const ConstraintLineType &other);
+
+    /**
+     * Copy assignment.
+     */
+    template <typename ConstraintLineType>
+    ConstraintLine &
+    operator=(const ConstraintLineType &other);
+
+    /**
      * This operator is a bit weird and unintuitive: it compares the line
      * numbers of two lines. We need this to sort the lines; in fact we could
      * do this using a comparison predicate.  However, this way, it is easier,
@@ -1796,6 +1817,9 @@ public:
                  << "with the appropriate locally_relevant set so "
                  << "that every processor who owns a DoF that constrains "
                  << "another DoF also knows about this constraint?");
+
+  template <typename>
+  friend class AffineConstraints;
 
 private:
   /**
@@ -2394,6 +2418,22 @@ namespace internal
 } // namespace internal
 
 
+
+template <typename number>
+template <typename other_number>
+inline void
+AffineConstraints<number>::copy_from(
+  const AffineConstraints<other_number> &other)
+{
+  lines.clear();
+  lines.insert(lines.begin(), other.lines.begin(), other.lines.end());
+  lines_cache = other.lines_cache;
+  local_lines = other.local_lines;
+  sorted      = other.sorted;
+}
+
+
+
 template <typename number>
 template <typename MatrixType>
 inline void
@@ -2465,6 +2505,51 @@ AffineConstraints<number>::add_entries_local_to_global(
     std::integral_constant<bool,
                            internal::AffineConstraints::IsBlockSparsityPattern<
                              SparsityPatternType>::value>());
+}
+
+
+
+template <typename number>
+inline AffineConstraints<number>::ConstraintLine::ConstraintLine(
+  const size_type &                                                  index,
+  const typename AffineConstraints<number>::ConstraintLine::Entries &entries,
+  const number &inhomogeneity)
+  : index(index)
+  , entries(entries)
+  , inhomogeneity(inhomogeneity)
+{}
+
+
+
+template <typename number>
+template <typename ConstraintLineType>
+inline AffineConstraints<number>::ConstraintLine::ConstraintLine(
+  const ConstraintLineType &other)
+{
+  this->index = other.index;
+
+  entries.clear();
+  entries.insert(entries.begin(), other.entries.begin(), other.entries.end());
+
+  this->inhomogeneity = other.inhomogeneity;
+}
+
+
+
+template <typename number>
+template <typename ConstraintLineType>
+inline typename AffineConstraints<number>::ConstraintLine &
+AffineConstraints<number>::ConstraintLine::
+operator=(const ConstraintLineType &other)
+{
+  this->index = other.index;
+
+  entries.clear();
+  entries.insert(entries.begin(), other.entries.begin(), other.entries.end());
+
+  this->inhomogeneity = other.inhomogeneity;
+
+  return *this;
 }
 
 DEAL_II_NAMESPACE_CLOSE
