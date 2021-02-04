@@ -235,8 +235,7 @@ DEAL_II_NAMESPACE_OPEN
  * </ul>
  */
 template <int dim, int spacedim = dim>
-class FE_Q_DG0
-  : public FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>
+class FE_Q_DG0 : public FE_Q_Base<dim, spacedim>
 {
 public:
   /**

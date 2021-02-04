@@ -60,8 +60,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 
 template <int dim, int spacedim = dim>
-class FE_Bernstein
-  : public FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim>
+class FE_Bernstein : public FE_Q_Base<dim, spacedim>
 {
 public:
   /**

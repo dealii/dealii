@@ -545,7 +545,7 @@ DEAL_II_NAMESPACE_OPEN
  * <td align="center"> </td> </tr> </table>
  */
 template <int dim, int spacedim = dim>
-class FE_Q : public FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim>
+class FE_Q : public FE_Q_Base<dim, spacedim>
 {
 public:
   /**

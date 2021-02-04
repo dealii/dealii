@@ -36,13 +36,13 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 FE_Bernstein<dim, spacedim>::FE_Bernstein(const unsigned int degree)
-  : FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim>(
-      this->renumber_bases(degree),
-      FiniteElementData<dim>(this->get_dpo_vector(degree),
-                             1,
-                             degree,
-                             FiniteElementData<dim>::H1),
-      std::vector<bool>(1, false))
+  : FE_Q_Base<dim, spacedim>(this->renumber_bases(degree),
+                             FiniteElementData<dim>(this->get_dpo_vector(
+                                                      degree),
+                                                    1,
+                                                    degree,
+                                                    FiniteElementData<dim>::H1),
+                             std::vector<bool>(1, false))
 {}
 
 

@@ -108,11 +108,7 @@ DEAL_II_NAMESPACE_OPEN
  * FE_Q_iso_Q1 with more than one subdivision does have less coupling.
  */
 template <int dim, int spacedim = dim>
-class FE_Q_iso_Q1
-  : public FE_Q_Base<
-      TensorProductPolynomials<dim, Polynomials::PiecewisePolynomial<double>>,
-      dim,
-      spacedim>
+class FE_Q_iso_Q1 : public FE_Q_Base<dim, spacedim>
 {
 public:
   /**
