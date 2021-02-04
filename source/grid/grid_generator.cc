@@ -2149,10 +2149,11 @@ namespace GridGenerator
 
     // Check that the order of the vertices makes sense, i.e., the volume of the
     // cell is positive.
-    Assert(GridTools::volume(tria) > 0.,
-           ExcMessage(
-             "The volume of the cell is not greater than zero. "
-             "This could be due to the wrong ordering of the vertices."));
+    Assert(
+      GridTools::volume(tria, ReferenceCell::get_default_linear_mapping(tria)) >
+        0.,
+      ExcMessage("The volume of the cell is not greater than zero. "
+                 "This could be due to the wrong ordering of the vertices."));
   }
 
 
