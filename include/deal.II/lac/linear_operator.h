@@ -113,6 +113,8 @@ identity_operator(const LinearOperator<Range, Domain, Payload> &);
  * one can write:
  *
  * @code
+ * #include <deal.II/lac/linear_operator_tools.h>
+ *
  * dealii::SparseMatrix<double> A, B, C;
  * const double k = ...;
  *
@@ -153,6 +155,15 @@ identity_operator(const LinearOperator<Range, Domain, Payload> &);
  * operator overloading). In this instance, it is again necessary to provide
  * an interface that produces the result of this composite operation that is
  * compatible with Trilinos operator used by Trilinos solvers.
+ *
+ * @note Many use cases of LinearOperator lead to intermediate expressions
+ * requiring a PackagedOperation. In order to include all necessary header
+ * files in one go consider using
+ * @code
+ * #include <deal.II/lac/linear_operator_tools.h>
+ * @endcode
+ *
+ * In order to use the full LinearOperator and PackagedOperation
  *
  * @note To ensure that the correct payload is provided, wrapper functions
  * for linear operators have been provided within the respective
