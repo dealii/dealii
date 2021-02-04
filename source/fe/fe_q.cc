@@ -44,7 +44,7 @@ namespace internal
           return QGaussLobatto<1>(degree + 1).get_points();
         else
           {
-            using FEQ = dealii::FE_Q_Base<TensorProductPolynomials<1>, 1, 1>;
+            using FEQ = dealii::FE_Q_Base<1, 1>;
             AssertThrow(false, FEQ::ExcFEQCannotHaveDegree0());
           }
         return std::vector<Point<1>>();
@@ -57,7 +57,7 @@ namespace internal
 
 template <int dim, int spacedim>
 FE_Q<dim, spacedim>::FE_Q(const unsigned int degree)
-  : FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim>(
+  : FE_Q_Base<dim, spacedim>(
       TensorProductPolynomials<dim>(
         Polynomials::generate_complete_Lagrange_basis(
           internal::FE_Q::get_QGaussLobatto_points(degree))),
@@ -74,7 +74,7 @@ FE_Q<dim, spacedim>::FE_Q(const unsigned int degree)
 
 template <int dim, int spacedim>
 FE_Q<dim, spacedim>::FE_Q(const Quadrature<1> &points)
-  : FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim>(
+  : FE_Q_Base<dim, spacedim>(
       TensorProductPolynomials<dim>(
         Polynomials::generate_complete_Lagrange_basis(points.get_points())),
       FiniteElementData<dim>(this->get_dpo_vector(points.size() - 1),

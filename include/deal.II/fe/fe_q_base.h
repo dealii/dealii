@@ -34,18 +34,16 @@ DEAL_II_NAMESPACE_OPEN
  * functional as a stand-alone. The completion of definitions is left to the
  * derived classes.
  */
-template <class PolynomialType,
-          int dim      = PolynomialType::dimension,
-          int spacedim = dim>
+template <int dim, int spacedim = dim>
 class FE_Q_Base : public FE_Poly<dim, spacedim>
 {
 public:
   /**
    * Constructor.
    */
-  FE_Q_Base(const PolynomialType &        poly_space,
-            const FiniteElementData<dim> &fe_data,
-            const std::vector<bool> &     restriction_is_additive_flags);
+  FE_Q_Base(const ScalarPolynomialsBase<dim> &poly_space,
+            const FiniteElementData<dim> &    fe_data,
+            const std::vector<bool> &         restriction_is_additive_flags);
 
   /**
    * Return the matrix interpolating from the given finite element to the
@@ -330,7 +328,7 @@ protected:
   struct Implementation;
 
   // Declare implementation friend.
-  friend struct FE_Q_Base<PolynomialType, dim, spacedim>::Implementation;
+  friend struct FE_Q_Base<dim, spacedim>::Implementation;
 
 private:
   /**

@@ -88,8 +88,7 @@ DEAL_II_NAMESPACE_OPEN
  * the bubble enrichments in the middle of the cell.
  */
 template <int dim, int spacedim = dim>
-class FE_Q_Bubbles
-  : public FE_Q_Base<TensorProductPolynomialsBubbles<dim>, dim, spacedim>
+class FE_Q_Bubbles : public FE_Q_Base<dim, spacedim>
 {
 public:
   /**

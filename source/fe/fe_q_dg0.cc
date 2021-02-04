@@ -33,15 +33,14 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const unsigned int degree)
-  : FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>(
-      TensorProductPolynomialsConst<dim>(
-        Polynomials::generate_complete_Lagrange_basis(
-          QGaussLobatto<1>(degree + 1).get_points())),
-      FiniteElementData<dim>(get_dpo_vector(degree),
-                             1,
-                             degree,
-                             FiniteElementData<dim>::L2),
-      get_riaf_vector(degree))
+  : FE_Q_Base<dim, spacedim>(TensorProductPolynomialsConst<dim>(
+                               Polynomials::generate_complete_Lagrange_basis(
+                                 QGaussLobatto<1>(degree + 1).get_points())),
+                             FiniteElementData<dim>(get_dpo_vector(degree),
+                                                    1,
+                                                    degree,
+                                                    FiniteElementData<dim>::L2),
+                             get_riaf_vector(degree))
 {
   Assert(degree > 0,
          ExcMessage("This element can only be used for polynomial degrees "
@@ -61,7 +60,7 @@ FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const unsigned int degree)
 
 template <int dim, int spacedim>
 FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const Quadrature<1> &points)
-  : FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>(
+  : FE_Q_Base<dim, spacedim>(
       TensorProductPolynomialsConst<dim>(
         Polynomials::generate_complete_Lagrange_basis(points.get_points())),
       FiniteElementData<dim>(get_dpo_vector(points.size() - 1),
@@ -226,8 +225,8 @@ FE_Q_DG0<dim, spacedim>::get_interpolation_matrix(
          ExcDimensionMismatch(interpolation_matrix.m(),
                               x_source_fe.n_dofs_per_cell()));
 
-  this->FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>::
-    get_interpolation_matrix(x_source_fe, interpolation_matrix);
+  this->FE_Q_Base<dim, spacedim>::get_interpolation_matrix(
+    x_source_fe, interpolation_matrix);
 }
 
 
@@ -267,8 +266,8 @@ FE_Q_DG0<dim, spacedim>::has_support_on_face(
   if (shape_index == this->n_dofs_per_cell() - 1)
     return true;
   else
-    return FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>::
-      has_support_on_face(shape_index, face_index);
+    return FE_Q_Base<dim, spacedim>::has_support_on_face(shape_index,
+                                                         face_index);
 }
 
 
