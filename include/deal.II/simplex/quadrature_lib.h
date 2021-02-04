@@ -52,6 +52,36 @@ namespace Simplex
   };
 
   /**
+   * Witherden-Vincent rules for simplex entities.
+   *
+   * Like QGauss, users should specify a number `n_points_1D` as an indication
+   * of what polynomial degree to be integrated exactly (e.g., for $n$ points,
+   * the rule can integrate polynomials of degree $2 n - 1$ exactly). The given
+   * value for n_points_1D = 1, 2, 3, 4, 5 results in the following number of
+   * quadrature points in 2D and 3D:
+   * - 2D: 1, 6, 7, 15, 19
+   * - 3D: 1, 8, 14, 35, 59
+   *
+   * For 1D, the quadrature rule degenerates to a `QGauss<1>(n_points_1D)`.
+   *
+   * These rules match the ones listed for Witherden-Vincent in the quadpy
+   * @cite quadpy library and were first described in
+   * @cite witherden2015identification.
+   *
+   * @ingroup simplex
+   */
+  template <int dim>
+  class QWitherdenVincent : public QSimplex<dim>
+  {
+  public:
+    /**
+     * Constructor taking the number of quadrature points in 1D direction
+     * @p n_points_1D.
+     */
+    explicit QWitherdenVincent(const unsigned int n_points_1D);
+  };
+
+  /**
    * Integration rule for wedge entities.
    */
   template <int dim>
