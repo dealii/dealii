@@ -691,6 +691,20 @@ namespace Utilities
          const bool allow_compression = true);
 
   /**
+   * Check if the bit at position @p n in @p number is set.
+   */
+  bool
+  get_bit(const unsigned char number, const unsigned int n);
+
+
+  /**
+   * Set the bit at position @p n in @p number to value @p x.
+   */
+  void
+  set_bit(unsigned char &number, const unsigned int n, const bool x);
+
+
+  /**
    * Convert an object of type `std::unique_ptr<From>` to an object of
    * type `std::unique_ptr<To>`, where it is assumed that we can cast
    * the pointer to `From` to a pointer to `To` using a `dynamic_cast`
@@ -1332,6 +1346,32 @@ namespace Utilities
                  buffer.cend(),
                  unpacked_object,
                  allow_compression);
+  }
+
+
+
+  inline bool
+  get_bit(const unsigned char number, const unsigned int n)
+  {
+    AssertIndexRange(n, 8);
+
+    // source:
+    // https://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit
+    // "Checking a bit"
+    return (number >> n) & 1U;
+  }
+
+
+
+  inline void
+  set_bit(unsigned char &number, const unsigned int n, const bool x)
+  {
+    AssertIndexRange(n, 8);
+
+    // source:
+    // https://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit
+    // "Changing the nth bit to x"
+    number ^= (-static_cast<unsigned char>(x) ^ number) & (1U << n);
   }
 
 
