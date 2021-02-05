@@ -23,7 +23,9 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/container/small_vector.hpp>
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 
 #include <cmath>
 #include <memory>
