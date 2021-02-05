@@ -1717,16 +1717,16 @@ namespace GridGenerator
 
   template <int dim, int spacedim>
   void
-  reference_cell(const ReferenceCell::Type &   reference_cell,
+  reference_cell(const ReferenceCell &         reference_cell,
                  Triangulation<dim, spacedim> &tria)
   {
     AssertDimension(dim, reference_cell.get_dimension());
 
-    if (reference_cell == ReferenceCell::Type::get_hypercube<dim>())
+    if (reference_cell == ReferenceCell::get_hypercube<dim>())
       {
         GridGenerator::hyper_cube(tria, 0, 1);
       }
-    else if ((dim == 2) && (reference_cell == ReferenceCell::Type::Tri))
+    else if ((dim == 2) && (reference_cell == ReferenceCell::Tri))
       {
         const std::vector<Point<spacedim>> vertices = {
           Point<spacedim>(),               // the origin
@@ -1739,7 +1739,7 @@ namespace GridGenerator
 
         tria.create_triangulation(vertices, cells, {});
       }
-    else if ((dim == 3) && (reference_cell == ReferenceCell::Type::Tet))
+    else if ((dim == 3) && (reference_cell == ReferenceCell::Tet))
       {
         AssertDimension(spacedim, 3);
 
@@ -1751,7 +1751,7 @@ namespace GridGenerator
 
         tria.create_triangulation(vertices, cells, {});
       }
-    else if ((dim == 3) && (reference_cell == ReferenceCell::Type::Pyramid))
+    else if ((dim == 3) && (reference_cell == ReferenceCell::Pyramid))
       {
         AssertDimension(spacedim, 3);
 
@@ -1767,7 +1767,7 @@ namespace GridGenerator
 
         tria.create_triangulation(vertices, cells, {});
       }
-    else if ((dim == 3) && (reference_cell == ReferenceCell::Type::Wedge))
+    else if ((dim == 3) && (reference_cell == ReferenceCell::Wedge))
       {
         AssertDimension(spacedim, 3);
 
@@ -2149,11 +2149,10 @@ namespace GridGenerator
 
     // Check that the order of the vertices makes sense, i.e., the volume of the
     // cell is positive.
-    Assert(
-      GridTools::volume(tria, ReferenceCell::get_default_linear_mapping(tria)) >
-        0.,
-      ExcMessage("The volume of the cell is not greater than zero. "
-                 "This could be due to the wrong ordering of the vertices."));
+    Assert(GridTools::volume(tria, get_default_linear_mapping(tria)) > 0.,
+           ExcMessage(
+             "The volume of the cell is not greater than zero. "
+             "This could be due to the wrong ordering of the vertices."));
   }
 
 

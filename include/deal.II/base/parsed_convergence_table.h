@@ -527,8 +527,7 @@ ParsedConvergenceTable::error_from_exact(const DoFHandler<dim, spacedim> &dh,
                                          const Function<spacedim> &exact,
                                          const Function<spacedim> *weight)
 {
-  error_from_exact(ReferenceCell::get_default_linear_mapping(
-                     dh.get_triangulation()),
+  error_from_exact(get_default_linear_mapping(dh.get_triangulation()),
                    dh,
                    solution,
                    exact,

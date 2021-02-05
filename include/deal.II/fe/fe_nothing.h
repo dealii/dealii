@@ -145,9 +145,9 @@ public:
    * $Q_1$ field will be forced to become zero at this interface. See also the
    * discussion in the general documentation of this class.
    */
-  FE_Nothing(const ReferenceCell::Type &type,
-             const unsigned int         n_components = 1,
-             const bool                 dominate     = false);
+  FE_Nothing(const ReferenceCell &type,
+             const unsigned int   n_components = 1,
+             const bool           dominate     = false);
 
   /**
    * Same as above but for a hypercube reference-cell type.

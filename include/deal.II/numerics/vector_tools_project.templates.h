@@ -184,7 +184,7 @@ namespace VectorTools
       Quadrature<dim> quadrature_mf;
 
       if (dof.get_fe(0).reference_cell_type() ==
-          ReferenceCell::Type::get_hypercube<dim>())
+          ReferenceCell::get_hypercube<dim>())
         quadrature_mf = QGauss<dim>(dof.get_fe().degree + 2);
       else
         // TODO: since we have currently only implemented a handful quadrature
@@ -887,7 +887,7 @@ namespace VectorTools
            ExcMessage("Please specify the mapping explicitly "
                       "when building with MSVC!"));
 #else
-    project(ReferenceCell::get_default_linear_mapping(dof.get_triangulation()),
+    project(get_default_linear_mapping(dof.get_triangulation()),
             dof,
             constraints,
             quadrature,

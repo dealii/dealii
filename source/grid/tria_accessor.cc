@@ -2845,7 +2845,7 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
     {
       case 2:
         {
-          if (this->reference_cell_type() == ReferenceCell::Type::Tri)
+          if (this->reference_cell_type() == ReferenceCell::Tri)
             {
               const auto neighbor_cell = this->neighbor(face);
 
@@ -2868,8 +2868,7 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
                   (1 - subface) :
                   subface;
 
-              const auto &info = ReferenceCell::internal::Info::get_cell(
-                ReferenceCell::Type::Tri);
+              const auto &info = internal::Info::get_cell(ReferenceCell::Tri);
               const unsigned int neighbor_child_index =
                 info.child_cell_on_face(neighbor_face, neighbor_subface);
               TriaIterator<CellAccessor<dim, spacedim>> sub_neighbor =
@@ -2883,7 +2882,7 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
 
               return sub_neighbor;
             }
-          else if (this->reference_cell_type() == ReferenceCell::Type::Quad)
+          else if (this->reference_cell_type() == ReferenceCell::Quad)
             {
               const unsigned int neighbor_neighbor =
                 this->neighbor_of_neighbor(face);
@@ -2923,7 +2922,7 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
 
       case 3:
         {
-          if (this->reference_cell_type() == ReferenceCell::Type::Hex)
+          if (this->reference_cell_type() == ReferenceCell::Hex)
             {
               // this function returns the neighbor's
               // child on a given face and

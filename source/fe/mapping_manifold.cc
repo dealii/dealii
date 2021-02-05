@@ -292,8 +292,7 @@ MappingManifold<dim, spacedim>::get_face_data(
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
   data.initialize_face(this->requires_update_flags(update_flags),
                        QProjector<dim>::project_to_all_faces(
-                         ReferenceCell::Type::get_hypercube<dim>(),
-                         quadrature[0]),
+                         ReferenceCell::get_hypercube<dim>(), quadrature[0]),
                        quadrature[0].size());
 
   return data_ptr;
@@ -312,7 +311,7 @@ MappingManifold<dim, spacedim>::get_subface_data(
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
   data.initialize_face(this->requires_update_flags(update_flags),
                        QProjector<dim>::project_to_all_subfaces(
-                         ReferenceCell::Type::get_hypercube<dim>(), quadrature),
+                         ReferenceCell::get_hypercube<dim>(), quadrature),
                        quadrature.size());
 
   return data_ptr;
@@ -1229,7 +1228,7 @@ MappingManifold<dim, spacedim>::fill_fe_face_values(
     face_no,
     numbers::invalid_unsigned_int,
     QProjector<dim>::DataSetDescriptor::face(
-      ReferenceCell::Type::get_hypercube<dim>(),
+      ReferenceCell::get_hypercube<dim>(),
       face_no,
       cell->face_orientation(face_no),
       cell->face_flip(face_no),
@@ -1264,7 +1263,7 @@ MappingManifold<dim, spacedim>::fill_fe_subface_values(
     face_no,
     subface_no,
     QProjector<dim>::DataSetDescriptor::subface(
-      ReferenceCell::Type::get_hypercube<dim>(),
+      ReferenceCell::get_hypercube<dim>(),
       face_no,
       subface_no,
       cell->face_orientation(face_no),

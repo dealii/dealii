@@ -121,11 +121,12 @@ namespace internal
             dealii::DoFHandler<dim, spacedim> dh(tr);
             dh.distribute_dofs(fe);
 
-            dealii::FEValues<dim, spacedim> fine(
-              ReferenceCell::get_default_linear_mapping(tr),
-              fe,
-              *q_fine,
-              update_quadrature_points | update_JxW_values | update_values);
+            dealii::FEValues<dim, spacedim> fine(get_default_linear_mapping(tr),
+                                                 fe,
+                                                 *q_fine,
+                                                 update_quadrature_points |
+                                                   update_JxW_values |
+                                                   update_values);
 
             const unsigned int n_dofs = dh.n_dofs();
 

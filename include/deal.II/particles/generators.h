@@ -69,7 +69,7 @@ namespace Particles
       const std::vector<Point<dim>> &     particle_reference_locations,
       ParticleHandler<dim, spacedim> &    particle_handler,
       const Mapping<dim, spacedim> &      mapping =
-        (ReferenceCell::Type::get_hypercube<dim>()
+        (ReferenceCell::get_hypercube<dim>()
            .template get_default_linear_mapping<dim, spacedim>()));
 
     /**
@@ -108,7 +108,7 @@ namespace Particles
       const types::particle_index                                        id,
       std::mt19937 &                random_number_generator,
       const Mapping<dim, spacedim> &mapping =
-        (ReferenceCell::Type::get_hypercube<dim>()
+        (ReferenceCell::get_hypercube<dim>()
            .template get_default_linear_mapping<dim, spacedim>()));
 
     /**
@@ -164,7 +164,7 @@ namespace Particles
       const types::particle_index         n_particles_to_create,
       ParticleHandler<dim, spacedim> &    particle_handler,
       const Mapping<dim, spacedim> &      mapping =
-        (ReferenceCell::Type::get_hypercube<dim>()
+        (ReferenceCell::get_hypercube<dim>()
            .template get_default_linear_mapping<dim, spacedim>()),
       const unsigned int random_number_seed = 5432);
 
@@ -211,7 +211,7 @@ namespace Particles
         &                             global_bounding_boxes,
       ParticleHandler<dim, spacedim> &particle_handler,
       const Mapping<dim, spacedim> &  mapping =
-        (ReferenceCell::Type::get_hypercube<dim>()
+        (ReferenceCell::get_hypercube<dim>()
            .template get_default_linear_mapping<dim, spacedim>()),
       const ComponentMask &                   components = ComponentMask(),
       const std::vector<std::vector<double>> &properties = {});
@@ -256,7 +256,7 @@ namespace Particles
         &                             global_bounding_boxes,
       ParticleHandler<dim, spacedim> &particle_handler,
       const Mapping<dim, spacedim> &  mapping =
-        (ReferenceCell::Type::get_hypercube<dim>()
+        (ReferenceCell::get_hypercube<dim>()
            .template get_default_linear_mapping<dim, spacedim>()),
       const std::vector<std::vector<double>> &properties = {});
   } // namespace Generators

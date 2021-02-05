@@ -125,7 +125,7 @@ public:
                      &cell) const override;
 
   virtual bool
-  is_compatible_with(const ReferenceCell::Type &cell_type) const override;
+  is_compatible_with(const ReferenceCell &cell_type) const override;
 
   /**
    * Transform the point @p p on the unit cell to the point @p p_real on the

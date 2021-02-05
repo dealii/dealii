@@ -35,12 +35,12 @@ namespace python
 
   CellTypeWrapper::CellTypeWrapper(const std::uint8_t &kind)
   {
-    cell_type = ReferenceCell::internal::make_reference_cell_from_int(kind);
+    cell_type = internal::ReferenceCell::make_reference_cell_from_int(kind);
   }
 
 
 
-  CellTypeWrapper::CellTypeWrapper(const ReferenceCell::Type &cell_type_in)
+  CellTypeWrapper::CellTypeWrapper(const ReferenceCell &cell_type_in)
   {
     cell_type = cell_type_in;
   }

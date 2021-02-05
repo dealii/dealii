@@ -288,7 +288,7 @@ private:
   /**
    * Reference cell type.
    */
-  const ReferenceCell::Type cell_type;
+  const ReferenceCell cell_type;
 
   /**
    * Number of unique quads. If all quads have the same type, the value is
@@ -495,7 +495,7 @@ public:
    * underlying geometric entity can be specified.
    */
   FiniteElementData(const std::vector<unsigned int> &dofs_per_object,
-                    const ReferenceCell::Type        cell_type,
+                    const ReferenceCell              cell_type,
                     const unsigned int               n_components,
                     const unsigned int               degree,
                     const Conformity                 conformity = unknown,
@@ -508,7 +508,7 @@ public:
    * is particular useful for cells with triangles and quadrilaterals as faces.
    */
   FiniteElementData(const internal::GenericDoFsPerObject &data,
-                    const ReferenceCell::Type             cell_type,
+                    const ReferenceCell                   cell_type,
                     const unsigned int                    n_components,
                     const unsigned int                    degree,
                     const Conformity                      conformity = unknown,
@@ -519,7 +519,7 @@ public:
    * example, whether the element's reference cell is a square or
    * triangle, or similar choices in higher dimensions.
    */
-  ReferenceCell::Type
+  ReferenceCell
   reference_cell_type() const;
 
   /**
@@ -686,7 +686,7 @@ namespace internal
   internal::GenericDoFsPerObject
   expand(const unsigned int               dim,
          const std::vector<unsigned int> &dofs_per_object,
-         const ReferenceCell::Type        cell_type);
+         const dealii::ReferenceCell      cell_type);
 } // namespace internal
 
 
@@ -745,7 +745,7 @@ namespace FiniteElementDomination
 
 
 template <int dim>
-inline ReferenceCell::Type
+inline ReferenceCell
 FiniteElementData<dim>::reference_cell_type() const
 {
   return cell_type;

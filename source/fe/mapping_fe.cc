@@ -153,7 +153,7 @@ MappingFE<dim, spacedim>::InternalData::initialize_face(
       // Compute tangentials to the unit cell.
       const auto reference_cell_type = this->fe.reference_cell_type();
       const auto n_faces =
-        ReferenceCell::internal::Info::get_cell(reference_cell_type).n_faces();
+        internal::Info::get_cell(reference_cell_type).n_faces();
 
       for (unsigned int i = 0; i < n_faces; ++i)
         {
@@ -863,7 +863,7 @@ MappingFE<dim, spacedim>::MappingFE(const FiniteElement<dim, spacedim> &fe)
 
   const unsigned int n_points = mapping_support_points.size();
   const unsigned int n_shape_functions =
-    ReferenceCell::internal::Info::get_cell(reference_cell_type).n_vertices();
+    internal::Info::get_cell(reference_cell_type).n_vertices();
 
   this->mapping_support_point_weights =
     Table<2, double>(n_points, n_shape_functions);
@@ -2312,7 +2312,7 @@ MappingFE<dim, spacedim>::get_bounding_box(
 template <int dim, int spacedim>
 bool
 MappingFE<dim, spacedim>::is_compatible_with(
-  const ReferenceCell::Type &cell_type) const
+  const ReferenceCell &cell_type) const
 {
   Assert(dim == cell_type.get_dimension(),
          ExcMessage("The dimension of your mapping (" +

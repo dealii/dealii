@@ -28,10 +28,10 @@ using namespace dealii;
 
 template <int dim>
 void
-test(const ReferenceCell::Type &reference_cell)
+test(const ReferenceCell &reference_cell)
 {
   for (const auto face_no :
-       ReferenceCell::internal::Info::get_cell(reference_cell).face_indices())
+       internal::Info::get_cell(reference_cell).face_indices())
     {
       deallog << reference_cell.template unit_normal_vectors<dim>(face_no)
               << std::endl;
@@ -51,10 +51,10 @@ main()
 {
   initlog();
 
-  test<2>(ReferenceCell::Type::Tri);
-  test<2>(ReferenceCell::Type::Quad);
-  test<3>(ReferenceCell::Type::Tet);
-  test<3>(ReferenceCell::Type::Pyramid);
-  test<3>(ReferenceCell::Type::Wedge);
-  test<3>(ReferenceCell::Type::Hex);
+  test<2>(ReferenceCell::Tri);
+  test<2>(ReferenceCell::Quad);
+  test<3>(ReferenceCell::Tet);
+  test<3>(ReferenceCell::Pyramid);
+  test<3>(ReferenceCell::Wedge);
+  test<3>(ReferenceCell::Hex);
 }

@@ -77,7 +77,7 @@ namespace internal
        *
        * @note Used only for dim=3.
        */
-      std::vector<ReferenceCell::Type> quad_reference_cell_type;
+      std::vector<dealii::ReferenceCell> quad_reference_cell_type;
 
       /**
        * The TriaObject containing the data of lines.

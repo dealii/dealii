@@ -54,22 +54,22 @@ namespace internal
                                            GeometryInfo<dim>::vertices_per_cell>
         vertices)
     {
-      const ReferenceCell::Type reference_cell_type =
-        ReferenceCell::Type::n_vertices_to_type(dim, vertices.size());
+      const dealii::ReferenceCell reference_cell_type =
+        dealii::ReferenceCell::n_vertices_to_type(dim, vertices.size());
 
-      if (reference_cell_type == ReferenceCell::Type::Line)
+      if (reference_cell_type == dealii::ReferenceCell::Line)
         // Return the distance between the two vertices
         return (vertices[1] - vertices[0]).norm();
-      else if (reference_cell_type == ReferenceCell::Type::Tri)
+      else if (reference_cell_type == dealii::ReferenceCell::Tri)
         // Return the longest of the three edges
         return std::max({(vertices[1] - vertices[0]).norm(),
                          (vertices[2] - vertices[1]).norm(),
                          (vertices[2] - vertices[0]).norm()});
-      else if (reference_cell_type == ReferenceCell::Type::Quad)
+      else if (reference_cell_type == dealii::ReferenceCell::Quad)
         // Return the longer one of the two diagonals of the quadrilateral
         return std::max({(vertices[3] - vertices[0]).norm(),
                          (vertices[2] - vertices[1]).norm()});
-      else if (reference_cell_type == ReferenceCell::Type::Tet)
+      else if (reference_cell_type == dealii::ReferenceCell::Tet)
         // Return the longest of the six edges of the tetrahedron
         return std::max({(vertices[1] - vertices[0]).norm(),
                          (vertices[2] - vertices[0]).norm(),
@@ -77,7 +77,7 @@ namespace internal
                          (vertices[3] - vertices[0]).norm(),
                          (vertices[3] - vertices[1]).norm(),
                          (vertices[3] - vertices[2]).norm()});
-      else if (reference_cell_type == ReferenceCell::Type::Pyramid)
+      else if (reference_cell_type == dealii::ReferenceCell::Pyramid)
         // Return ...
         return std::max({// the longest diagonal of the quadrilateral base
                          // of the pyramid or ...
@@ -89,7 +89,7 @@ namespace internal
                          (vertices[4] - vertices[1]).norm(),
                          (vertices[4] - vertices[2]).norm(),
                          (vertices[4] - vertices[3]).norm()});
-      else if (reference_cell_type == ReferenceCell::Type::Wedge)
+      else if (reference_cell_type == dealii::ReferenceCell::Wedge)
         // Return ...
         return std::max({// the longest of the 2*3=6 diagonals of the three
                          // quadrilateral sides of the wedge or ...
@@ -107,7 +107,7 @@ namespace internal
                          (vertices[4] - vertices[3]).norm(),
                          (vertices[5] - vertices[4]).norm(),
                          (vertices[5] - vertices[3]).norm()});
-      else if (reference_cell_type == ReferenceCell::Type::Hex)
+      else if (reference_cell_type == dealii::ReferenceCell::Hex)
         // Return the longest of the four diagonals of the hexahedron
         return std::max({(vertices[7] - vertices[0]).norm(),
                          (vertices[6] - vertices[1]).norm(),
@@ -689,7 +689,7 @@ namespace internal
       face_orientation(const TriaAccessor<3, 3, 3> &accessor,
                        const unsigned int           face)
       {
-        return ReferenceCell::internal::get_bit(
+        return internal::get_bit(
           accessor.tria->levels[accessor.present_level]->face_orientations
             [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
           0 /*=orientation_bit*/);
@@ -739,7 +739,7 @@ namespace internal
                    ->face_orientations.size(),
                ExcInternalError());
 
-        return ReferenceCell::internal::get_bit(
+        return internal::get_bit(
           accessor.tria->levels[accessor.present_level]->face_orientations
             [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
           2 /*=flip_bit*/);
@@ -775,7 +775,7 @@ namespace internal
                    ->face_orientations.size(),
                ExcInternalError());
 
-        return ReferenceCell::internal::get_bit(
+        return internal::get_bit(
           accessor.tria->levels[accessor.present_level]->face_orientations
             [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
           1 /*=rotation_bit*/);
@@ -873,7 +873,7 @@ namespace internal
                  accessor.tria->levels[accessor.present_level]
                    ->face_orientations.size(),
                ExcInternalError());
-        ReferenceCell::internal::set_bit(
+        internal::set_bit(
           accessor.tria->levels[accessor.present_level]->face_orientations
             [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
           0 /*=orientation_bit*/,
@@ -906,7 +906,7 @@ namespace internal
                    ->face_orientations.size(),
                ExcInternalError());
 
-        ReferenceCell::internal::set_bit(
+        internal::set_bit(
           accessor.tria->levels[accessor.present_level]->face_orientations
             [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
           2 /*=flip_bit*/,
@@ -939,7 +939,7 @@ namespace internal
                    ->face_orientations.size(),
                ExcInternalError());
 
-        ReferenceCell::internal::set_bit(
+        internal::set_bit(
           accessor.tria->levels[accessor.present_level]->face_orientations
             [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
           1 /*=rotation_bit*/,
@@ -1086,13 +1086,13 @@ TriaAccessor<structdim, dim, spacedim>::vertex_iterator(
 
 
 template <int structdim, int dim, int spacedim>
-inline ReferenceCell::Type
+inline ReferenceCell
 TriaAccessor<structdim, dim, spacedim>::reference_cell_type() const
 {
   if (structdim == 0)
-    return ReferenceCell::Type::Vertex;
+    return ReferenceCell::Vertex;
   else if (structdim == 1)
-    return ReferenceCell::Type::Line;
+    return ReferenceCell::Line;
   else if (structdim == dim)
     return this->tria->levels[this->present_level]
       ->reference_cell_type[this->present_index];
@@ -2248,15 +2248,15 @@ TriaAccessor<structdim, dim, spacedim>::face_indices() const
 
 
 template <int structdim, int dim, int spacedim>
-inline const ReferenceCell::internal::Info::Base &
+inline const internal::Info::Base &
 TriaAccessor<structdim, dim, spacedim>::reference_cell_info() const
 {
   if (structdim == 0)
-    return ReferenceCell::internal::Info::get_cell(ReferenceCell::Type::Vertex);
+    return internal::Info::get_cell(ReferenceCell::Vertex);
   else if (structdim == 1)
-    return ReferenceCell::internal::Info::get_cell(ReferenceCell::Type::Line);
+    return internal::Info::get_cell(ReferenceCell::Line);
   else
-    return ReferenceCell::internal::Info::get_cell(this->reference_cell_type());
+    return internal::Info::get_cell(this->reference_cell_type());
 }
 
 
@@ -3110,10 +3110,10 @@ TriaAccessor<0, 1, spacedim>::used() const
 
 
 template <int spacedim>
-inline ReferenceCell::Type
+inline ReferenceCell
 TriaAccessor<0, 1, spacedim>::reference_cell_type() const
 {
-  return ReferenceCell::Type::Vertex;
+  return ReferenceCell::Vertex;
 }
 
 

@@ -47,9 +47,9 @@ process(const std::vector<Point<spacedim>> &vertices,
 
   AssertDimension(reference_cell_types.size(), 1);
 
-  if (reference_cell_types[0] == ReferenceCell::Type::get_simplex<dim>())
+  if (reference_cell_types[0] == ReferenceCell::get_simplex<dim>())
     mapping = std::make_shared<MappingFE<dim>>(Simplex::FE_P<dim>(1));
-  else if (reference_cell_types[0] == ReferenceCell::Type::Wedge)
+  else if (reference_cell_types[0] == ReferenceCell::Wedge)
     mapping = std::make_shared<MappingFE<dim>>(Simplex::FE_WedgeP<dim>(1));
   else
     AssertThrow(false, ExcNotImplemented());

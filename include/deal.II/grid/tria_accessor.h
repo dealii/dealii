@@ -1636,7 +1636,7 @@ public:
   /**
    * Reference cell type of the current object.
    */
-  ReferenceCell::Type
+  ReferenceCell
   reference_cell_type() const;
 
   /**
@@ -1691,7 +1691,7 @@ protected:
    * Return additional information related to the current geometric entity
    * type.
    */
-  inline const ReferenceCell::internal::Info::Base &
+  inline const internal::Info::Base &
   reference_cell_info() const;
 
 private:
@@ -2717,7 +2717,7 @@ public:
   /**
    * Reference cell type of the current object.
    */
-  ReferenceCell::Type
+  ReferenceCell
   reference_cell_type() const;
 
   /**

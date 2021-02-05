@@ -24,7 +24,7 @@ namespace internal
   internal::GenericDoFsPerObject
   expand(const unsigned int               dim,
          const std::vector<unsigned int> &dofs_per_object,
-         const ReferenceCell::Type        cell_type)
+         const dealii::ReferenceCell      cell_type)
   {
     internal::GenericDoFsPerObject result;
 
@@ -54,15 +54,13 @@ namespace internal
 
     // first_line_index
     const unsigned int first_line_index =
-      (ReferenceCell::internal::Info::get_cell(cell_type).n_vertices() *
-       dofs_per_vertex);
+      (internal::Info::get_cell(cell_type).n_vertices() * dofs_per_vertex);
     result.object_index[1][0] = first_line_index;
 
     // first_quad_index
     const unsigned int first_quad_index =
       (first_line_index +
-       ReferenceCell::internal::Info::get_cell(cell_type).n_lines() *
-         dofs_per_line);
+       internal::Info::get_cell(cell_type).n_lines() * dofs_per_line);
     result.object_index[2][0] = first_quad_index;
 
     // first_hex_index
@@ -70,49 +68,37 @@ namespace internal
       (first_quad_index +
        (dim == 2 ?
           1 :
-          (dim == 3 ?
-             ReferenceCell::internal::Info::get_cell(cell_type).n_faces() :
-             0)) *
+          (dim == 3 ? internal::Info::get_cell(cell_type).n_faces() : 0)) *
          dofs_per_quad);
 
     // first_face_line_index
     result.first_object_index_on_face[1][0] =
-      (ReferenceCell::internal::Info::get_face(cell_type, face_no)
-         .n_vertices() *
+      (internal::Info::get_face(cell_type, face_no).n_vertices() *
        dofs_per_vertex);
 
     // first_face_quad_index
     result.first_object_index_on_face[2][0] =
       ((dim == 3 ?
-          ReferenceCell::internal::Info::get_face(cell_type, face_no)
-              .n_vertices() *
+          internal::Info::get_face(cell_type, face_no).n_vertices() *
             dofs_per_vertex :
-          ReferenceCell::internal::Info::get_cell(cell_type).n_vertices() *
-            dofs_per_vertex) +
-       ReferenceCell::internal::Info::get_face(cell_type, face_no).n_lines() *
-         dofs_per_line);
+          internal::Info::get_cell(cell_type).n_vertices() * dofs_per_vertex) +
+       internal::Info::get_face(cell_type, face_no).n_lines() * dofs_per_line);
 
     // dofs_per_face
     result.dofs_per_object_inclusive[dim - 1][0] =
-      (ReferenceCell::internal::Info::get_face(cell_type, face_no)
-           .n_vertices() *
+      (internal::Info::get_face(cell_type, face_no).n_vertices() *
          dofs_per_vertex +
-       ReferenceCell::internal::Info::get_face(cell_type, face_no).n_lines() *
-         dofs_per_line +
+       internal::Info::get_face(cell_type, face_no).n_lines() * dofs_per_line +
        (dim == 3 ? 1 : 0) * dofs_per_quad);
 
 
     // dofs_per_cell
     result.dofs_per_object_inclusive[dim][0] =
-      (ReferenceCell::internal::Info::get_cell(cell_type).n_vertices() *
-         dofs_per_vertex +
-       ReferenceCell::internal::Info::get_cell(cell_type).n_lines() *
-         dofs_per_line +
+      (internal::Info::get_cell(cell_type).n_vertices() * dofs_per_vertex +
+       internal::Info::get_cell(cell_type).n_lines() * dofs_per_line +
        (dim == 2 ?
           1 :
-          (dim == 3 ?
-             ReferenceCell::internal::Info::get_cell(cell_type).n_faces() :
-             0)) *
+          (dim == 3 ? internal::Info::get_cell(cell_type).n_faces() : 0)) *
          dofs_per_quad +
        (dim == 3 ? 1 : 0) * dofs_per_hex);
 
@@ -128,11 +114,10 @@ FiniteElementData<dim>::FiniteElementData(
   const Conformity                 conformity,
   const BlockIndices &             block_indices)
   : FiniteElementData(dofs_per_object,
-                      dim == 0 ?
-                        ReferenceCell::Type::Vertex :
-                        (dim == 1 ? ReferenceCell::Type::Line :
-                                    (dim == 2 ? ReferenceCell::Type::Quad :
-                                                ReferenceCell::Type::Hex)),
+                      dim == 0 ? ReferenceCell::Vertex :
+                                 (dim == 1 ? ReferenceCell::Line :
+                                             (dim == 2 ? ReferenceCell::Quad :
+                                                         ReferenceCell::Hex)),
                       n_components,
                       degree,
                       conformity,
@@ -142,7 +127,7 @@ FiniteElementData<dim>::FiniteElementData(
 template <int dim>
 FiniteElementData<dim>::FiniteElementData(
   const std::vector<unsigned int> &dofs_per_object,
-  const ReferenceCell::Type        cell_type,
+  const ReferenceCell              cell_type,
   const unsigned int               n_components,
   const unsigned int               degree,
   const Conformity                 conformity,
@@ -158,7 +143,7 @@ FiniteElementData<dim>::FiniteElementData(
 template <int dim>
 FiniteElementData<dim>::FiniteElementData(
   const internal::GenericDoFsPerObject &data,
-  const ReferenceCell::Type             cell_type,
+  const ReferenceCell                   cell_type,
   const unsigned int                    n_components,
   const unsigned int                    degree,
   const Conformity                      conformity,

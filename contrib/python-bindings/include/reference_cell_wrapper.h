@@ -40,9 +40,9 @@ namespace python
     CellTypeWrapper(const std::uint8_t &kind);
 
     /**
-     * Constructor. Takes a ReferenceCell::Type object and creates a Type class.
+     * Constructor. Takes a ReferenceCell object and creates a Type class.
      */
-    CellTypeWrapper(const ReferenceCell::Type &cell_type_in);
+    CellTypeWrapper(const ReferenceCell &cell_type_in);
 
     /**
      * Constructor for an empty object.
@@ -58,7 +58,7 @@ namespace python
     cell_kind() const;
 
   private:
-    ReferenceCell::Type cell_type;
+    ReferenceCell cell_type;
   };
 
 } // namespace python

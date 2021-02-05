@@ -48,8 +48,7 @@ namespace VectorTools
               Vector<typename VectorType::value_type> &value)
   {
     if (dof.has_hp_capabilities() == false)
-      point_value(ReferenceCell::get_default_linear_mapping(
-                    dof.get_triangulation()),
+      point_value(get_default_linear_mapping(dof.get_triangulation()),
                   dof,
                   fe_function,
                   point,
@@ -70,8 +69,7 @@ namespace VectorTools
               const Point<spacedim> &          point)
   {
     if (dof.has_hp_capabilities() == false)
-      return point_value(ReferenceCell::get_default_linear_mapping(
-                           dof.get_triangulation()),
+      return point_value(get_default_linear_mapping(dof.get_triangulation()),
                          dof,
                          fe_function,
                          point);
@@ -325,7 +323,7 @@ namespace VectorTools
         p,
         rhs_vector);
     else
-      create_point_source_vector(ReferenceCell::get_default_linear_mapping(
+      create_point_source_vector(get_default_linear_mapping(
                                    dof_handler.get_triangulation()),
                                  dof_handler,
                                  p,
@@ -432,7 +430,7 @@ namespace VectorTools
         orientation,
         rhs_vector);
     else
-      create_point_source_vector(ReferenceCell::get_default_linear_mapping(
+      create_point_source_vector(get_default_linear_mapping(
                                    dof_handler.get_triangulation()),
                                  dof_handler,
                                  p,

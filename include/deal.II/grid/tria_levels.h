@@ -222,7 +222,7 @@ namespace internal
        *
        * @note Used only for dim=2 and dim=3.
        */
-      std::vector<ReferenceCell::Type> reference_cell_type;
+      std::vector<dealii::ReferenceCell> reference_cell_type;
 
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
