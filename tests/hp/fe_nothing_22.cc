@@ -39,19 +39,19 @@ test()
           << std::endl;
   if (dim == 2)
     {
-      deallog << (FE_Nothing<dim>(ReferenceCell::Quad, 2, true) ==
+      deallog << (FE_Nothing<dim>(ReferenceCell::Quadrilateral, 2, true) ==
                   FE_Nothing<dim>(2, true))
               << std::endl;
-      deallog << (FE_Nothing<dim>(ReferenceCell::Tri, 2, true) ==
+      deallog << (FE_Nothing<dim>(ReferenceCell::Triangle, 2, true) ==
                   FE_Nothing<dim>(2, true))
               << std::endl;
     }
   if (dim == 3)
     {
-      deallog << (FE_Nothing<dim>(ReferenceCell::Hex, 2, true) ==
+      deallog << (FE_Nothing<dim>(ReferenceCell::Hexahedron, 2, true) ==
                   FE_Nothing<dim>(2, true))
               << std::endl;
-      deallog << (FE_Nothing<dim>(ReferenceCell::Tet, 2, true) ==
+      deallog << (FE_Nothing<dim>(ReferenceCell::Tetrahedron, 2, true) ==
                   FE_Nothing<dim>(2, true))
               << std::endl;
       deallog << (FE_Nothing<dim>(ReferenceCell::Wedge, 1, false) ==

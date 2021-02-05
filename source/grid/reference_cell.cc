@@ -19,6 +19,7 @@
 
 #include <deal.II/fe/mapping_fe.h>
 #include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping_q_generic.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/reference_cell.h>
@@ -28,6 +29,8 @@
 #include <deal.II/simplex/polynomials.h>
 #include <deal.II/simplex/quadrature_lib.h>
 
+#include <memory>
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -36,17 +39,17 @@ const ReferenceCell ReferenceCell::Vertex =
   internal::ReferenceCell::make_reference_cell_from_int(0);
 const ReferenceCell ReferenceCell::Line =
   internal::ReferenceCell::make_reference_cell_from_int(1);
-const ReferenceCell ReferenceCell::Tri =
+const ReferenceCell ReferenceCell::Triangle =
   internal::ReferenceCell::make_reference_cell_from_int(2);
-const ReferenceCell ReferenceCell::Quad =
+const ReferenceCell ReferenceCell::Quadrilateral =
   internal::ReferenceCell::make_reference_cell_from_int(3);
-const ReferenceCell ReferenceCell::Tet =
+const ReferenceCell ReferenceCell::Tetrahedron =
   internal::ReferenceCell::make_reference_cell_from_int(4);
 const ReferenceCell ReferenceCell::Pyramid =
   internal::ReferenceCell::make_reference_cell_from_int(5);
 const ReferenceCell ReferenceCell::Wedge =
   internal::ReferenceCell::make_reference_cell_from_int(6);
-const ReferenceCell ReferenceCell::Hex =
+const ReferenceCell ReferenceCell::Hexahedron =
   internal::ReferenceCell::make_reference_cell_from_int(7);
 const ReferenceCell ReferenceCell::Invalid =
   internal::ReferenceCell::make_reference_cell_from_int(
@@ -61,17 +64,17 @@ ReferenceCell::to_string() const
     return "Vertex";
   else if (*this == Line)
     return "Line";
-  else if (*this == Tri)
+  else if (*this == Triangle)
     return "Tri";
-  else if (*this == Quad)
+  else if (*this == Quadrilateral)
     return "Quad";
-  else if (*this == Tet)
+  else if (*this == Tetrahedron)
     return "Tet";
   else if (*this == Pyramid)
     return "Pyramid";
   else if (*this == Wedge)
     return "Wedge";
-  else if (*this == Hex)
+  else if (*this == Hexahedron)
     return "Hex";
   else if (*this == Invalid)
     return "Invalid";

@@ -3063,25 +3063,25 @@ namespace
                       type_name_2.end());
 
     if (type_name_2 == "TRI" || type_name_2 == "TRIANGLE")
-      return ReferenceCell::Tri;
+      return ReferenceCell::Triangle;
     else if (type_name_2 == "QUAD" || type_name_2 == "QUADRILATERAL")
-      return ReferenceCell::Quad;
+      return ReferenceCell::Quadrilateral;
     else if (type_name_2 == "SHELL")
       {
         if (n_nodes_per_element == 3)
-          return ReferenceCell::Tri;
+          return ReferenceCell::Triangle;
         else
-          return ReferenceCell::Quad;
+          return ReferenceCell::Quadrilateral;
       }
     else if (type_name_2 == "TET" || type_name_2 == "TETRA" ||
              type_name_2 == "TETRAHEDRON")
-      return ReferenceCell::Tet;
+      return ReferenceCell::Tetrahedron;
     else if (type_name_2 == "PYRA" || type_name_2 == "PYRAMID")
       return ReferenceCell::Pyramid;
     else if (type_name_2 == "WEDGE")
       return ReferenceCell::Wedge;
     else if (type_name_2 == "HEX" || type_name_2 == "HEXAHEDRON")
-      return ReferenceCell::Hex;
+      return ReferenceCell::Hexahedron;
 
     Assert(false, ExcNotImplemented());
     return ReferenceCell::Invalid;

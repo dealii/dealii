@@ -50,10 +50,10 @@ main()
   initlog();
 
   test<2>(ReferenceCell::Line);
-  test<2>(ReferenceCell::Tri);
-  test<2>(ReferenceCell::Quad);
-  test<3>(ReferenceCell::Tet);
+  test<2>(ReferenceCell::Triangle);
+  test<2>(ReferenceCell::Quadrilateral);
+  test<3>(ReferenceCell::Tetrahedron);
   test<3>(ReferenceCell::Pyramid);
   test<3>(ReferenceCell::Wedge);
-  test<3>(ReferenceCell::Hex);
+  test<3>(ReferenceCell::Hexahedron);
 }

@@ -234,11 +234,11 @@ namespace internal
 
                 if ((reference_cell == dealii::ReferenceCell::Vertex) ||
                     (reference_cell == dealii::ReferenceCell::Line) ||
-                    (reference_cell == dealii::ReferenceCell::Quad) ||
-                    (reference_cell == dealii::ReferenceCell::Hex))
+                    (reference_cell == dealii::ReferenceCell::Quadrilateral) ||
+                    (reference_cell == dealii::ReferenceCell::Hexahedron))
                   needs_hypercube_setup |= true;
-                else if ((reference_cell == dealii::ReferenceCell::Tri) ||
-                         (reference_cell == dealii::ReferenceCell::Tet))
+                else if ((reference_cell == dealii::ReferenceCell::Triangle) ||
+                         (reference_cell == dealii::ReferenceCell::Tetrahedron))
                   needs_simplex_setup |= true;
                 else if (reference_cell == dealii::ReferenceCell::Wedge)
                   needs_wedge_setup |= true;
@@ -323,11 +323,14 @@ namespace internal
 
                       if ((reference_cell == dealii::ReferenceCell::Vertex) ||
                           (reference_cell == dealii::ReferenceCell::Line) ||
-                          (reference_cell == dealii::ReferenceCell::Quad) ||
-                          (reference_cell == dealii::ReferenceCell::Hex))
+                          (reference_cell ==
+                           dealii::ReferenceCell::Quadrilateral) ||
+                          (reference_cell == dealii::ReferenceCell::Hexahedron))
                         quadrature.push_back(*quadrature_hypercube);
-                      else if ((reference_cell == dealii::ReferenceCell::Tri) ||
-                               (reference_cell == dealii::ReferenceCell::Tet))
+                      else if ((reference_cell ==
+                                dealii::ReferenceCell::Triangle) ||
+                               (reference_cell ==
+                                dealii::ReferenceCell::Tetrahedron))
                         quadrature.push_back(*quadrature_simplex);
                       else if (reference_cell == dealii::ReferenceCell::Wedge)
                         quadrature.push_back(*quadrature_wedge);

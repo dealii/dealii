@@ -156,13 +156,12 @@ FiniteElement<dim, spacedim>::FiniteElement(
 
       for (unsigned int f = 0; f < this->n_unique_quads(); ++f)
         {
-          adjust_quad_dof_index_for_face_orientation_table[f] =
-            Table<2, int>(this->n_dofs_per_quad(f),
-                          internal::ReferenceCell::get_cell(
-                            this->reference_cell())
-                                .face_reference_cell(f) == ReferenceCell::Quad ?
-                            8 :
-                            6);
+          adjust_quad_dof_index_for_face_orientation_table[f] = Table<2, int>(
+            this->n_dofs_per_quad(f),
+            internal::ReferenceCell::get_cell(this->reference_cell())
+                  .face_reference_cell(f) == ReferenceCell::Quadrilateral ?
+              8 :
+              6);
           adjust_quad_dof_index_for_face_orientation_table[f].fill(0);
         }
     }
@@ -687,7 +686,7 @@ FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
              [this->n_unique_quads() == 1 ? 0 : face]
                .n_elements() ==
            (internal::ReferenceCell::get_cell(this->reference_cell())
-                  .face_reference_cell(face) == ReferenceCell::Quad ?
+                  .face_reference_cell(face) == ReferenceCell::Quadrilateral ?
               8 :
               6) *
              this->n_dofs_per_quad(face),

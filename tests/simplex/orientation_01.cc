@@ -47,8 +47,8 @@ main()
   initlog();
 
   test<2>(ReferenceCell::Line, 2);
-  test<3>(ReferenceCell::Tri, 3);
-  test<4>(ReferenceCell::Quad, 4);
+  test<3>(ReferenceCell::Triangle, 3);
+  test<4>(ReferenceCell::Quadrilateral, 4);
 
   deallog << "OK!" << std::endl;
 }

@@ -210,7 +210,7 @@ namespace internal
         (void)e;
 
         if (d == 2)
-          return dealii::ReferenceCell::Tri;
+          return dealii::ReferenceCell::Triangle;
 
         if (d == 1)
           return dealii::ReferenceCell::Line;
@@ -267,7 +267,7 @@ namespace internal
         (void)e;
 
         if (d == 2)
-          return dealii::ReferenceCell::Quad;
+          return dealii::ReferenceCell::Quadrilateral;
 
         if (d == 1)
           return dealii::ReferenceCell::Line;
@@ -332,10 +332,10 @@ namespace internal
         (void)e;
 
         if (d == 3)
-          return dealii::ReferenceCell::Tet;
+          return dealii::ReferenceCell::Tetrahedron;
 
         if (d == 2)
-          return dealii::ReferenceCell::Tri;
+          return dealii::ReferenceCell::Triangle;
 
         if (d == 1)
           return dealii::ReferenceCell::Line;
@@ -446,9 +446,9 @@ namespace internal
           return dealii::ReferenceCell::Pyramid;
 
         if (d == 2 && e == 0)
-          return dealii::ReferenceCell::Quad;
+          return dealii::ReferenceCell::Quadrilateral;
         else if (d == 2)
-          return dealii::ReferenceCell::Tri;
+          return dealii::ReferenceCell::Triangle;
 
         if (d == 1)
           return dealii::ReferenceCell::Line;
@@ -572,9 +572,9 @@ namespace internal
           return dealii::ReferenceCell::Wedge;
 
         if (d == 2 && e > 1)
-          return dealii::ReferenceCell::Quad;
+          return dealii::ReferenceCell::Quadrilateral;
         else if (d == 2)
-          return dealii::ReferenceCell::Tri;
+          return dealii::ReferenceCell::Triangle;
 
         if (d == 1)
           return dealii::ReferenceCell::Line;
@@ -697,10 +697,10 @@ namespace internal
         (void)e;
 
         if (d == 3)
-          return dealii::ReferenceCell::Hex;
+          return dealii::ReferenceCell::Hexahedron;
 
         if (d == 2)
-          return dealii::ReferenceCell::Quad;
+          return dealii::ReferenceCell::Quadrilateral;
 
         if (d == 1)
           return dealii::ReferenceCell::Line;
@@ -1452,13 +1452,13 @@ namespace internal
                         dealii::ReferenceCell::Line)]
         .reset(new CellTypeLine());
       cell_types_impl[static_cast<types::geometric_entity_type>(
-                        dealii::ReferenceCell::Tri)]
+                        dealii::ReferenceCell::Triangle)]
         .reset(new CellTypeTri());
       cell_types_impl[static_cast<types::geometric_entity_type>(
-                        dealii::ReferenceCell::Quad)]
+                        dealii::ReferenceCell::Quadrilateral)]
         .reset(new CellTypeQuad());
       cell_types_impl[static_cast<types::geometric_entity_type>(
-                        dealii::ReferenceCell::Tet)]
+                        dealii::ReferenceCell::Tetrahedron)]
         .reset(new CellTypeTet());
       cell_types_impl[static_cast<types::geometric_entity_type>(
                         dealii::ReferenceCell::Pyramid)]
@@ -1467,7 +1467,7 @@ namespace internal
                         dealii::ReferenceCell::Wedge)]
         .reset(new CellTypeWedge());
       cell_types_impl[static_cast<types::geometric_entity_type>(
-                        dealii::ReferenceCell::Hex)]
+                        dealii::ReferenceCell::Hexahedron)]
         .reset(new CellTypeHex());
 
       // determine cell types and process vertices
