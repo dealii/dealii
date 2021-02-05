@@ -365,14 +365,13 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
   this->generalized_support_points.resize(npoints);
 
   Quadrature<dim> faces =
-    QProjector<dim>::project_to_all_faces(this->reference_cell_type(),
-                                          face_points);
+    QProjector<dim>::project_to_all_faces(this->reference_cell(), face_points);
   for (unsigned int k = 0;
        k < face_points.size() * GeometryInfo<dim>::faces_per_cell;
        ++k)
     this->generalized_support_points[k] = faces.point(
       k +
-      QProjector<dim>::DataSetDescriptor::face(this->reference_cell_type(),
+      QProjector<dim>::DataSetDescriptor::face(this->reference_cell(),
                                                0,
                                                true,
                                                false,

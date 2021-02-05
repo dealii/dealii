@@ -1857,7 +1857,7 @@ CellAccessor<3>::point_inside(const Point<3> &p) const
     {
       const TriaRawIterator<CellAccessor<dim, spacedim>> cell_iterator(*this);
       return (GeometryInfo<dim>::is_inside_unit_cell(
-        reference_cell_type()
+        reference_cell()
           .template get_default_linear_mapping<dim, spacedim>()
           .transform_real_to_unit_cell(cell_iterator, p)));
     }
@@ -2845,7 +2845,7 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
     {
       case 2:
         {
-          if (this->reference_cell_type() == ReferenceCell::Tri)
+          if (this->reference_cell() == ReferenceCell::Tri)
             {
               const auto neighbor_cell = this->neighbor(face);
 
@@ -2882,7 +2882,7 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
 
               return sub_neighbor;
             }
-          else if (this->reference_cell_type() == ReferenceCell::Quad)
+          else if (this->reference_cell() == ReferenceCell::Quad)
             {
               const unsigned int neighbor_neighbor =
                 this->neighbor_of_neighbor(face);
@@ -2922,7 +2922,7 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
 
       case 3:
         {
-          if (this->reference_cell_type() == ReferenceCell::Hex)
+          if (this->reference_cell() == ReferenceCell::Hex)
             {
               // this function returns the neighbor's
               // child on a given face and

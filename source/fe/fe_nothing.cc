@@ -75,8 +75,8 @@ FE_Nothing<dim, spacedim>::get_name() const
   namebuf << "FE_Nothing<" << Utilities::dim_string(dim, spacedim) << ">(";
 
   std::vector<std::string> name_components;
-  if (this->reference_cell_type() != ReferenceCell::get_hypercube<dim>())
-    name_components.push_back(this->reference_cell_type().to_string());
+  if (this->reference_cell() != ReferenceCell::get_hypercube<dim>())
+    name_components.push_back(this->reference_cell().to_string());
   if (this->n_components() > 1)
     name_components.push_back(std::to_string(this->n_components()));
   if (dominate)

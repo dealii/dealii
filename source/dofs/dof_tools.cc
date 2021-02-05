@@ -687,12 +687,12 @@ namespace DoFTools
               {
                 const FiniteElement<dim, spacedim> &fe = cell->get_fe();
 
-                const auto reference_cell_type = cell->reference_cell_type();
+                const auto reference_cell = cell->reference_cell();
 
                 const auto &cell_rc =
-                  dealii::internal::Info::get_cell(reference_cell_type);
+                  dealii::internal::Info::get_cell(reference_cell);
                 const auto &face_rc =
-                  dealii::internal::Info::get_face(reference_cell_type, face);
+                  dealii::internal::Info::get_face(reference_cell, face);
 
                 const unsigned int n_vertices_per_cell = cell_rc.n_vertices();
                 const unsigned int n_lines_per_cell    = cell_rc.n_lines();

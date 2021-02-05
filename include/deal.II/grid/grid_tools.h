@@ -3271,7 +3271,7 @@ namespace GridTools
             if (cell->face(face)->has_children() &&
                 !cell->face(face)->at_boundary())
               {
-                Assert(cell->reference_cell_type() ==
+                Assert(cell->reference_cell() ==
                          ReferenceCell::get_hypercube<dim>(),
                        ExcNotImplemented());
 
@@ -3291,7 +3291,7 @@ namespace GridTools
             if (cell->face(face)->has_children() &&
                 !cell->face(face)->at_boundary())
               {
-                Assert(cell->reference_cell_type() ==
+                Assert(cell->reference_cell() ==
                          ReferenceCell::get_hypercube<dim>(),
                        ExcNotImplemented());
 

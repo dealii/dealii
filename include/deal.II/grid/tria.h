@@ -3389,14 +3389,14 @@ public:
    * triangulation.
    */
   const std::vector<ReferenceCell> &
-  get_reference_cell_types() const;
+  get_reference_cells() const;
 
   /**
    * Indicate if the triangulation only consists of hypercube-like cells, i.e.,
    * lines, quadrilaterals, or hexahedra.
    */
   bool
-  all_reference_cell_types_are_hyper_cube() const;
+  all_reference_cells_are_hyper_cube() const;
 
 #ifdef DOXYGEN
   /**
@@ -3511,7 +3511,7 @@ protected:
    * Vector caching all reference-cell types of the given triangulation
    * (also in the distributed case).
    */
-  std::vector<ReferenceCell> reference_cell_types;
+  std::vector<ReferenceCell> reference_cells;
 
   /**
    * Write a bool vector to the given stream, writing a pre- and a postfix
@@ -3550,10 +3550,10 @@ protected:
   update_periodic_face_map();
 
   /**
-   * Update the internal reference_cell_types vector.
+   * Update the internal reference_cells vector.
    */
   virtual void
-  update_reference_cell_types();
+  update_reference_cells();
 
 
 private:

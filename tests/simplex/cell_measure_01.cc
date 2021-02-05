@@ -43,13 +43,13 @@ process(const std::vector<Point<spacedim>> &vertices,
 
   std::shared_ptr<MappingFE<dim>> mapping;
 
-  const auto reference_cell_types = tria.get_reference_cell_types();
+  const auto reference_cells = tria.get_reference_cells();
 
-  AssertDimension(reference_cell_types.size(), 1);
+  AssertDimension(reference_cells.size(), 1);
 
-  if (reference_cell_types[0] == ReferenceCell::get_simplex<dim>())
+  if (reference_cells[0] == ReferenceCell::get_simplex<dim>())
     mapping = std::make_shared<MappingFE<dim>>(Simplex::FE_P<dim>(1));
-  else if (reference_cell_types[0] == ReferenceCell::Wedge)
+  else if (reference_cells[0] == ReferenceCell::Wedge)
     mapping = std::make_shared<MappingFE<dim>>(Simplex::FE_WedgeP<dim>(1));
   else
     AssertThrow(false, ExcNotImplemented());

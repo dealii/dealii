@@ -1178,10 +1178,10 @@ namespace internal
               tria_faces.quads_line_orientations.size(),
             true);
 
-          tria_faces.quad_reference_cell_type.reserve(new_size);
-          tria_faces.quad_reference_cell_type.insert(
-            tria_faces.quad_reference_cell_type.end(),
-            new_size - tria_faces.quad_reference_cell_type.size(),
+          tria_faces.quad_reference_cell.reserve(new_size);
+          tria_faces.quad_reference_cell.insert(
+            tria_faces.quad_reference_cell.end(),
+            new_size - tria_faces.quad_reference_cell.size(),
             dealii::ReferenceCell::Quad);
         }
     }
@@ -1304,10 +1304,10 @@ namespace internal
 
           if (tria_level.dim == 2 || tria_level.dim == 3)
             {
-              tria_level.reference_cell_type.reserve(total_cells);
-              tria_level.reference_cell_type.insert(
-                tria_level.reference_cell_type.end(),
-                total_cells - tria_level.reference_cell_type.size(),
+              tria_level.reference_cell.reserve(total_cells);
+              tria_level.reference_cell.insert(
+                tria_level.reference_cell.end(),
+                total_cells - tria_level.reference_cell.size(),
                 tria_level.dim == 2 ? dealii::ReferenceCell::Quad :
                                       dealii::ReferenceCell::Hex);
             }
@@ -2414,8 +2414,7 @@ namespace internal
             for (unsigned int q = 0, k = 0; q < n_quads; ++q)
               {
                 // set entity type of quads
-                faces.quad_reference_cell_type[q] =
-                  connectivity.entity_types(2)[q];
+                faces.quad_reference_cell[q] = connectivity.entity_types(2)[q];
 
                 // loop over all its lines
                 for (unsigned int i = crs.ptr[q], j = 0; i < crs.ptr[q + 1];
@@ -2466,8 +2465,7 @@ namespace internal
               cells_0.manifold_id[cell] = cells[cell].manifold_id;
 
               // set entity types
-              level.reference_cell_type[cell] =
-                connectivity.entity_types(dim)[cell];
+              level.reference_cell[cell] = connectivity.entity_types(dim)[cell];
 
               // loop over faces
               for (unsigned int i = crs.ptr[cell], j = 0; i < crs.ptr[cell + 1];
@@ -2668,8 +2666,8 @@ namespace internal
         if (dim == 3 && structdim == 2)
           {
             // quad entity types
-            faces.quad_reference_cell_type.assign(
-              size, dealii::ReferenceCell::Invalid);
+            faces.quad_reference_cell.assign(size,
+                                             dealii::ReferenceCell::Invalid);
 
             // quad line orientations
             faces.quads_line_orientations.assign(size * faces_per_cell, -1);
@@ -2705,7 +2703,7 @@ namespace internal
 
         level.neighbors.assign(size * faces_per_cell, {-1, -1});
 
-        level.reference_cell_type.assign(size, dealii::ReferenceCell::Invalid);
+        level.reference_cell.assign(size, dealii::ReferenceCell::Invalid);
 
         if (orientation_needed)
           level.face_orientations.assign(size * faces_per_cell, -1);
@@ -4110,13 +4108,13 @@ namespace internal
                  triangulation.active_cell_iterators_on_level(level))
               if (cell->refine_flag_set())
                 {
-                  if (cell->reference_cell_type() == dealii::ReferenceCell::Tri)
+                  if (cell->reference_cell() == dealii::ReferenceCell::Tri)
                     {
                       needed_cells += 4;
                       needed_vertices += 0;
                       n_single_lines += 3;
                     }
-                  else if (cell->reference_cell_type() ==
+                  else if (cell->reference_cell() ==
                            dealii::ReferenceCell::Quad)
                     {
                       needed_cells += 4;
@@ -4270,9 +4268,9 @@ namespace internal
 
           unsigned int n_new_vertices = 0;
 
-          if (cell->reference_cell_type() == dealii::ReferenceCell::Tri)
+          if (cell->reference_cell() == dealii::ReferenceCell::Tri)
             n_new_vertices = 6;
-          else if (cell->reference_cell_type() == dealii::ReferenceCell::Quad)
+          else if (cell->reference_cell() == dealii::ReferenceCell::Quad)
             n_new_vertices = 9;
           else
             AssertThrow(false, ExcNotImplemented());
@@ -4286,7 +4284,7 @@ namespace internal
               new_vertices[cell->n_vertices() + line_no] =
                 cell->line(line_no)->child(0)->vertex_index(1);
 
-          if (cell->reference_cell_type() == dealii::ReferenceCell::Quad)
+          if (cell->reference_cell() == dealii::ReferenceCell::Quad)
             {
               while (triangulation.vertices_used[next_unused_vertex] == true)
                 ++next_unused_vertex;
@@ -4325,12 +4323,12 @@ namespace internal
           unsigned int lmin = 0;
           unsigned int lmax = 0;
 
-          if (cell->reference_cell_type() == dealii::ReferenceCell::Tri)
+          if (cell->reference_cell() == dealii::ReferenceCell::Tri)
             {
               lmin = 6;
               lmax = 9;
             }
-          else if (cell->reference_cell_type() == dealii::ReferenceCell::Quad)
+          else if (cell->reference_cell() == dealii::ReferenceCell::Quad)
             {
               lmin = 8;
               lmax = 12;
@@ -4355,7 +4353,7 @@ namespace internal
 
           if (true)
             {
-              if (cell->reference_cell_type() == dealii::ReferenceCell::Tri)
+              if (cell->reference_cell() == dealii::ReferenceCell::Tri)
                 {
                   // add lines in the right order [TODO: clean up]
                   const auto ref = [&](const unsigned int face_no,
@@ -4390,8 +4388,7 @@ namespace internal
                   new_lines[8]->set_bounding_object_indices(
                     {new_vertices[5], new_vertices[3]});
                 }
-              else if (cell->reference_cell_type() ==
-                       dealii::ReferenceCell::Quad)
+              else if (cell->reference_cell() == dealii::ReferenceCell::Quad)
                 {
                   unsigned int l = 0;
                   for (const unsigned int face_no : cell->face_indices())
@@ -4433,9 +4430,9 @@ namespace internal
 
           unsigned int n_children = 0;
 
-          if (cell->reference_cell_type() == dealii::ReferenceCell::Tri)
+          if (cell->reference_cell() == dealii::ReferenceCell::Tri)
             n_children = 4;
-          else if (cell->reference_cell_type() == dealii::ReferenceCell::Quad)
+          else if (cell->reference_cell() == dealii::ReferenceCell::Quad)
             n_children = 4;
           else
             AssertThrow(false, ExcNotImplemented());
@@ -4454,7 +4451,7 @@ namespace internal
             }
 
           if ((dim == 2) &&
-              (cell->reference_cell_type() == dealii::ReferenceCell::Tri))
+              (cell->reference_cell() == dealii::ReferenceCell::Tri))
             {
               subcells[0]->set_bounding_object_indices({new_lines[0]->index(),
                                                         new_lines[8]->index(),
@@ -4505,7 +4502,7 @@ namespace internal
               // * GeometryInfo<2>::faces_per_cell + 0] = 0;
             }
           else if ((dim == 2) &&
-                   (cell->reference_cell_type() == dealii::ReferenceCell::Quad))
+                   (cell->reference_cell() == dealii::ReferenceCell::Quad))
             {
               subcells[0]->set_bounding_object_indices(
                 {new_lines[0]->index(),
@@ -4549,8 +4546,7 @@ namespace internal
               // TODO: here we assume that all children have the same reference
               // cell type as the parent! This is justified for 2D.
               triangulation.levels[subcells[i]->level()]
-                ->reference_cell_type[subcells[i]->index()] =
-                cell->reference_cell_type();
+                ->reference_cell[subcells[i]->index()] = cell->reference_cell();
 
               if (i % 2 == 0)
                 subcells[i]->set_parent(cell->index());
@@ -4586,8 +4582,7 @@ namespace internal
                                   next_unused_cell,
                                   cell);
 
-                  if (cell->reference_cell_type() ==
-                        dealii::ReferenceCell::Quad &&
+                  if (cell->reference_cell() == dealii::ReferenceCell::Quad &&
                       check_for_distorted_cells &&
                       has_distorted_children<dim, spacedim>(cell))
                     cells_with_distorted_children.distorted_cells.push_back(
@@ -9612,7 +9607,7 @@ namespace internal
                         // to check it, transform to the unit cell
                         // with a linear mapping
                         const Point<dim> new_unit =
-                          cell->reference_cell_type()
+                          cell->reference_cell()
                             .template get_default_linear_mapping<dim,
                                                                  spacedim>()
                             .transform_real_to_unit_cell(cell, new_bound);
@@ -10100,7 +10095,7 @@ Triangulation<dim, spacedim>::Triangulation(
   Triangulation<dim, spacedim> &&tria) noexcept
   : Subscriptor(std::move(tria))
   , smooth_grid(tria.smooth_grid)
-  , reference_cell_types(std::move(tria.reference_cell_types))
+  , reference_cells(std::move(tria.reference_cells))
   , periodic_face_pairs_level_0(std::move(tria.periodic_face_pairs_level_0))
   , periodic_face_map(std::move(tria.periodic_face_map))
   , levels(std::move(tria.levels))
@@ -10126,7 +10121,7 @@ operator=(Triangulation<dim, spacedim> &&tria) noexcept
   Subscriptor::operator=(std::move(tria));
 
   smooth_grid                  = tria.smooth_grid;
-  reference_cell_types         = std::move(tria.reference_cell_types);
+  reference_cells              = std::move(tria.reference_cells);
   periodic_face_pairs_level_0  = std::move(tria.periodic_face_pairs_level_0);
   periodic_face_map            = std::move(tria.periodic_face_map);
   levels                       = std::move(tria.levels);
@@ -10185,7 +10180,7 @@ Triangulation<dim, spacedim>::clear()
   clear_despite_subscriptions();
   periodic_face_pairs_level_0.clear();
   periodic_face_map.clear();
-  reference_cell_types.clear();
+  reference_cells.clear();
 }
 
 
@@ -10414,7 +10409,7 @@ Triangulation<dim, spacedim>::copy_triangulation(
   vertices_used          = other_tria.vertices_used;
   anisotropic_refinement = other_tria.anisotropic_refinement;
   smooth_grid            = other_tria.smooth_grid;
-  reference_cell_types   = other_tria.reference_cell_types;
+  reference_cells        = other_tria.reference_cells;
 
   if (dim > 1)
     faces = std::make_unique<internal::TriangulationImplementation::TriaFaces>(
@@ -10500,7 +10495,7 @@ Triangulation<dim, spacedim>::create_triangulation(
       internal::TriangulationImplementation::Implementation::
         create_triangulation(v, cells, subcelldata, *this);
 
-      this->update_reference_cell_types();
+      this->update_reference_cells();
     }
   catch (...)
     {
@@ -10508,7 +10503,7 @@ Triangulation<dim, spacedim>::create_triangulation(
       throw;
     }
 
-  if (this->all_reference_cell_types_are_hyper_cube())
+  if (this->all_reference_cells_are_hyper_cube())
     {
       this->policy =
         std::make_unique<internal::TriangulationImplementation::PolicyWrapper<
@@ -13505,37 +13500,37 @@ Triangulation<dim, spacedim>::update_periodic_face_map()
 
 template <int dim, int spacedim>
 void
-Triangulation<dim, spacedim>::update_reference_cell_types()
+Triangulation<dim, spacedim>::update_reference_cells()
 {
-  std::set<ReferenceCell> reference_cell_types_set;
+  std::set<ReferenceCell> reference_cells_set;
   for (auto cell : active_cell_iterators())
     if (cell->is_locally_owned())
-      reference_cell_types_set.insert(cell->reference_cell_type());
+      reference_cells_set.insert(cell->reference_cell());
 
-  std::vector<ReferenceCell> reference_cell_types(
-    reference_cell_types_set.begin(), reference_cell_types_set.end());
+  std::vector<ReferenceCell> reference_cells(reference_cells_set.begin(),
+                                             reference_cells_set.end());
 
-  this->reference_cell_types = reference_cell_types;
+  this->reference_cells = reference_cells;
 }
 
 
 
 template <int dim, int spacedim>
 const std::vector<ReferenceCell> &
-Triangulation<dim, spacedim>::get_reference_cell_types() const
+Triangulation<dim, spacedim>::get_reference_cells() const
 {
-  return this->reference_cell_types;
+  return this->reference_cells;
 }
 
 
 
 template <int dim, int spacedim>
 bool
-Triangulation<dim, spacedim>::all_reference_cell_types_are_hyper_cube() const
+Triangulation<dim, spacedim>::all_reference_cells_are_hyper_cube() const
 {
-  return (this->reference_cell_types.size() == 0) ||
-         (this->reference_cell_types.size() == 1 &&
-          this->reference_cell_types[0] == ReferenceCell::get_hypercube<dim>());
+  return (this->reference_cells.size() == 0) ||
+         (this->reference_cells.size() == 1 &&
+          this->reference_cells[0] == ReferenceCell::get_hypercube<dim>());
 }
 
 

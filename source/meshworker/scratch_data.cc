@@ -74,7 +74,7 @@ namespace MeshWorker
     const UpdateFlags &                 update_flags,
     const Quadrature<dim - 1> &         face_quadrature,
     const UpdateFlags &                 face_update_flags)
-    : ScratchData(fe.reference_cell_type()
+    : ScratchData(fe.reference_cell()
                     .template get_default_linear_mapping<dim, spacedim>(),
                   fe,
                   quadrature,
@@ -94,7 +94,7 @@ namespace MeshWorker
     const Quadrature<dim - 1> &         face_quadrature,
     const UpdateFlags &                 face_update_flags,
     const UpdateFlags &                 neighbor_face_update_flags)
-    : ScratchData(fe.reference_cell_type()
+    : ScratchData(fe.reference_cell()
                     .template get_default_linear_mapping<dim, spacedim>(),
                   fe,
                   quadrature,

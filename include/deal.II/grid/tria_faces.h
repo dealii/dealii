@@ -77,7 +77,7 @@ namespace internal
        *
        * @note Used only for dim=3.
        */
-      std::vector<dealii::ReferenceCell> quad_reference_cell_type;
+      std::vector<dealii::ReferenceCell> quad_reference_cell;
 
       /**
        * The TriaObject containing the data of lines.
@@ -115,7 +115,7 @@ namespace internal
         ar &lines;
 
       if (dim == 3)
-        ar &quads &lines &quads_line_orientations &quad_reference_cell_type;
+        ar &quads &lines &quads_line_orientations &quad_reference_cell;
     }
   } // namespace TriangulationImplementation
 } // namespace internal

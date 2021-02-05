@@ -220,7 +220,7 @@ FE_ABF<dim>::initialize_support_points(const unsigned int deg)
         }
 
       Quadrature<dim> faces =
-        QProjector<dim>::project_to_all_faces(this->reference_cell_type(),
+        QProjector<dim>::project_to_all_faces(this->reference_cell(),
                                               face_points);
       for (; current < GeometryInfo<dim>::faces_per_cell * n_face_points;
            ++current)
@@ -348,9 +348,7 @@ FE_ABF<dim>::initialize_restriction()
       // in the quadrature points
       // of a full face.
       Quadrature<dim> q_face =
-        QProjector<dim>::project_to_face(this->reference_cell_type(),
-                                         q_base,
-                                         face);
+        QProjector<dim>::project_to_face(this->reference_cell(), q_base, face);
       // Store shape values, since the
       // evaluation suffers if not
       // ordered by point
@@ -369,7 +367,7 @@ FE_ABF<dim>::initialize_restriction()
           // evaluated on the subface
           // only.
           Quadrature<dim> q_sub = QProjector<dim>::project_to_subface(
-            this->reference_cell_type(), q_base, face, sub);
+            this->reference_cell(), q_base, face, sub);
           const unsigned int child = GeometryInfo<dim>::child_cell_on_face(
             RefinementCase<dim>::isotropic_refinement, face, sub);
 
@@ -451,7 +449,7 @@ FE_ABF<dim>::initialize_restriction()
        ++child)
     {
       Quadrature<dim> q_sub =
-        QProjector<dim>::project_to_child(this->reference_cell_type(),
+        QProjector<dim>::project_to_child(this->reference_cell(),
                                           q_cell,
                                           child);
 
@@ -613,12 +611,7 @@ FE_ABF<dim>::convert_generalized_support_point_values_to_dof_values(
           // TODO: Check what the face_orientation, face_flip and face_rotation
           // have to be in 3D
           unsigned int k = QProjector<dim>::DataSetDescriptor::face(
-            this->reference_cell_type(),
-            face,
-            false,
-            false,
-            false,
-            n_face_points);
+            this->reference_cell(), face, false, false, false, n_face_points);
           for (unsigned int i = 0; i < boundary_weights_abf.size(1); ++i)
             nodal_values[start_abf_dofs + i] +=
               n_orient * boundary_weights_abf(k + fp, i) *

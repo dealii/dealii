@@ -1750,14 +1750,14 @@ namespace internal
       reorder_face_derivative_indices(
         const unsigned int          face_no,
         const unsigned int          index,
-        const dealii::ReferenceCell reference_cell_type =
+        const dealii::ReferenceCell reference_cell =
           dealii::ReferenceCell::Invalid)
       {
         Assert(index < dim, ExcInternalError());
 
-        if ((reference_cell_type == dealii::ReferenceCell::Invalid ||
-             reference_cell_type ==
-               dealii::ReferenceCell::get_hypercube<dim>()) == false)
+        if ((reference_cell == dealii::ReferenceCell::Invalid ||
+             reference_cell == dealii::ReferenceCell::get_hypercube<dim>()) ==
+            false)
           {
 #ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
             return index;
@@ -1954,7 +1954,7 @@ namespace internal
                                   reorder_face_derivative_indices<dim>(
                                     faces[face].interior_face_no,
                                     e,
-                                    cell_it->reference_cell_type());
+                                    cell_it->reference_cell());
                                 face_data.general_jac[q][d][e][v] =
                                   inv_jac[d][ee];
                               }
@@ -2102,7 +2102,7 @@ namespace internal
                                   reorder_face_derivative_indices<dim>(
                                     faces[face].exterior_face_no,
                                     e,
-                                    cell_it->reference_cell_type());
+                                    cell_it->reference_cell());
                                 face_data.general_jac[n_q_points + q][d][e][v] =
                                   inv_jac[d][ee];
                               }

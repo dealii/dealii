@@ -1179,7 +1179,7 @@ namespace parallel
         }
 
       Assert(
-        this->all_reference_cell_types_are_hyper_cube(),
+        this->all_reference_cells_are_hyper_cube(),
         ExcMessage(
           "The class parallel::distributed::Triangulation only supports meshes "
           "consisting only of hypercube-like cells."));

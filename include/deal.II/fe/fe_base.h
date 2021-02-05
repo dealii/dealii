@@ -520,7 +520,7 @@ public:
    * triangle, or similar choices in higher dimensions.
    */
   ReferenceCell
-  reference_cell_type() const;
+  reference_cell() const;
 
   /**
    * Number of unique quads. If all quads have the same type, the value is
@@ -746,7 +746,7 @@ namespace FiniteElementDomination
 
 template <int dim>
 inline ReferenceCell
-FiniteElementData<dim>::reference_cell_type() const
+FiniteElementData<dim>::reference_cell() const
 {
   return cell_type;
 }

@@ -1101,7 +1101,7 @@ namespace DerivativeApproximation
   {
     // just call the respective function with Q1 mapping
     approximate_derivative_tensor(
-      cell->reference_cell_type()
+      cell->reference_cell()
         .template get_default_linear_mapping<dim, spacedim>(),
       dof,
       solution,

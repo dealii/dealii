@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Test TriaAccessor::reference_cell_type() on a 1D/2D/3D HEX mesh.
+// Test TriaAccessor::reference_cell() on a 1D/2D/3D HEX mesh.
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
@@ -31,17 +31,17 @@ test()
   GridGenerator::subdivided_hyper_cube(tria, 3);
 
   for (const auto &cell : tria.active_cell_iterators())
-    deallog << static_cast<int>(cell->reference_cell_type()) << " ";
+    deallog << static_cast<int>(cell->reference_cell()) << " ";
   deallog << std::endl;
 
   if (dim != 1)
     for (const auto &face : tria.active_face_iterators())
-      deallog << static_cast<int>(face->reference_cell_type()) << " ";
+      deallog << static_cast<int>(face->reference_cell()) << " ";
   deallog << std::endl;
 
   for (const auto &cell : tria.active_cell_iterators())
     for (const auto &face : cell->face_iterators())
-      deallog << static_cast<int>(face->reference_cell_type()) << " ";
+      deallog << static_cast<int>(face->reference_cell()) << " ";
   deallog << std::endl;
 }
 

@@ -1542,7 +1542,7 @@ namespace GridTools
               // then we need to also add this neighbor
               if (dim >= 2)
                 for (const auto face :
-                     cell->reference_cell_type().faces_for_given_vertex(v))
+                     cell->reference_cell().faces_for_given_vertex(v))
                   if (!cell->at_boundary(face) &&
                       cell->neighbor(face)->is_active())
                     {

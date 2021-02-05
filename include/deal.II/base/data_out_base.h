@@ -324,7 +324,7 @@ namespace DataOutBase
     /**
      * Reference-cell type of the underlying cell of this patch.
      */
-    ReferenceCell reference_cell_type;
+    ReferenceCell reference_cell;
 
     /**
      * Default constructor. Sets #n_subdivisions to one, #points_are_available
@@ -474,7 +474,7 @@ namespace DataOutBase
     /**
      * Reference-cell type of the underlying cell of this patch.
      */
-    ReferenceCell reference_cell_type;
+    ReferenceCell reference_cell;
 
     /**
      * Default constructor. Sets #points_are_available
@@ -3345,7 +3345,7 @@ public:
    */
   std::string
   get_xdmf_content(const unsigned int   indent_level,
-                   const ReferenceCell &reference_cell_type) const;
+                   const ReferenceCell &reference_cell) const;
 
 private:
   /**

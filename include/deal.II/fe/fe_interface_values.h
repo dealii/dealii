@@ -526,26 +526,22 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
   const UpdateFlags                   update_flags)
   : n_quadrature_points(quadrature.size())
   , internal_fe_face_values(
-      fe.reference_cell_type()
-        .template get_default_linear_mapping<dim, spacedim>(),
+      fe.reference_cell().template get_default_linear_mapping<dim, spacedim>(),
       fe,
       quadrature,
       update_flags)
   , internal_fe_subface_values(
-      fe.reference_cell_type()
-        .template get_default_linear_mapping<dim, spacedim>(),
+      fe.reference_cell().template get_default_linear_mapping<dim, spacedim>(),
       fe,
       quadrature,
       update_flags)
   , internal_fe_face_values_neighbor(
-      fe.reference_cell_type()
-        .template get_default_linear_mapping<dim, spacedim>(),
+      fe.reference_cell().template get_default_linear_mapping<dim, spacedim>(),
       fe,
       quadrature,
       update_flags)
   , internal_fe_subface_values_neighbor(
-      fe.reference_cell_type()
-        .template get_default_linear_mapping<dim, spacedim>(),
+      fe.reference_cell().template get_default_linear_mapping<dim, spacedim>(),
       fe,
       quadrature,
       update_flags)

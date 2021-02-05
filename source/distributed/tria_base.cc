@@ -289,27 +289,27 @@ namespace parallel
 
   template <int dim, int spacedim>
   void
-  TriangulationBase<dim, spacedim>::update_reference_cell_types()
+  TriangulationBase<dim, spacedim>::update_reference_cells()
   {
     // run algorithm for locally-owned cells
-    dealii::Triangulation<dim, spacedim>::update_reference_cell_types();
+    dealii::Triangulation<dim, spacedim>::update_reference_cells();
 
     // translate ReferenceCell to unsigned int (needed by
     // Utilities::MPI::compute_set_union)
-    std::vector<unsigned int> reference_cell_types_ui;
+    std::vector<unsigned int> reference_cells_ui;
 
-    for (const auto &i : this->reference_cell_types)
-      reference_cell_types_ui.push_back(static_cast<unsigned int>(i));
+    for (const auto &i : this->reference_cells)
+      reference_cells_ui.push_back(static_cast<unsigned int>(i));
 
     // create union
-    reference_cell_types_ui =
-      Utilities::MPI::compute_set_union(reference_cell_types_ui,
+    reference_cells_ui =
+      Utilities::MPI::compute_set_union(reference_cells_ui,
                                         this->mpi_communicator);
 
     // transform back and store result
-    this->reference_cell_types.clear();
-    for (const auto &i : reference_cell_types_ui)
-      this->reference_cell_types.emplace_back(
+    this->reference_cells.clear();
+    for (const auto &i : reference_cells_ui)
+      this->reference_cells.emplace_back(
         dealii::internal::ReferenceCell::make_reference_cell_from_int(i));
   }
 

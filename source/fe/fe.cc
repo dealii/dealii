@@ -158,9 +158,8 @@ FiniteElement<dim, spacedim>::FiniteElement(
         {
           adjust_quad_dof_index_for_face_orientation_table[f] =
             Table<2, int>(this->n_dofs_per_quad(f),
-                          internal::Info::get_cell(this->reference_cell_type())
-                                .face_reference_cell_type(f) ==
-                              ReferenceCell::Quad ?
+                          internal::Info::get_cell(this->reference_cell())
+                                .face_reference_cell(f) == ReferenceCell::Quad ?
                             8 :
                             6);
           adjust_quad_dof_index_for_face_orientation_table[f].fill(0);
@@ -572,8 +571,7 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
                                                  const bool face_flip,
                                                  const bool face_rotation) const
 {
-  const auto &refence_cell =
-    internal::Info::get_cell(this->reference_cell_type());
+  const auto &refence_cell = internal::Info::get_cell(this->reference_cell());
 
   AssertIndexRange(face_index, this->n_dofs_per_face(face));
   AssertIndexRange(face, refence_cell.n_faces());
@@ -686,8 +684,8 @@ FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
   Assert(adjust_quad_dof_index_for_face_orientation_table
              [this->n_unique_quads() == 1 ? 0 : face]
                .n_elements() ==
-           (internal::Info::get_cell(this->reference_cell_type())
-                  .face_reference_cell_type(face) == ReferenceCell::Quad ?
+           (internal::Info::get_cell(this->reference_cell())
+                  .face_reference_cell(face) == ReferenceCell::Quad ?
               8 :
               6) *
              this->n_dofs_per_quad(face),
@@ -1295,8 +1293,8 @@ FiniteElement<dim, spacedim>::get_face_data(
 {
   return get_data(flags,
                   mapping,
-                  QProjector<dim>::project_to_all_faces(
-                    this->reference_cell_type(), quadrature),
+                  QProjector<dim>::project_to_all_faces(this->reference_cell(),
+                                                        quadrature),
                   output_data);
 }
 
@@ -1314,8 +1312,8 @@ FiniteElement<dim, spacedim>::get_face_data(
 {
   return get_data(flags,
                   mapping,
-                  QProjector<dim>::project_to_all_faces(
-                    this->reference_cell_type(), quadrature),
+                  QProjector<dim>::project_to_all_faces(this->reference_cell(),
+                                                        quadrature),
                   output_data);
 }
 
@@ -1396,7 +1394,7 @@ FiniteElement<dim, spacedim>::get_subface_data(
   return get_data(flags,
                   mapping,
                   QProjector<dim>::project_to_all_subfaces(
-                    this->reference_cell_type(), quadrature),
+                    this->reference_cell(), quadrature),
                   output_data);
 }
 

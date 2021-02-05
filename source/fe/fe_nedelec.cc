@@ -284,7 +284,7 @@ FE_Nedelec<2>::initialize_support_points(const unsigned int order)
   const unsigned int    n_boundary_points =
     GeometryInfo<dim>::lines_per_cell * n_edge_points;
   const Quadrature<dim> edge_quadrature =
-    QProjector<dim>::project_to_all_faces(this->reference_cell_type(),
+    QProjector<dim>::project_to_all_faces(this->reference_cell(),
                                           reference_edge_quadrature);
 
   this->generalized_face_support_points[face_no].resize(n_edge_points);
@@ -311,14 +311,14 @@ FE_Nedelec<2>::initialize_support_points(const unsigned int order)
           for (unsigned int line = 0; line < GeometryInfo<dim>::lines_per_cell;
                ++line)
             this->generalized_support_points[line * n_edge_points + q_point] =
-              edge_quadrature.point(QProjector<dim>::DataSetDescriptor::face(
-                                      this->reference_cell_type(),
-                                      line,
-                                      true,
-                                      false,
-                                      false,
-                                      n_edge_points) +
-                                    q_point);
+              edge_quadrature.point(
+                QProjector<dim>::DataSetDescriptor::face(this->reference_cell(),
+                                                         line,
+                                                         true,
+                                                         false,
+                                                         false,
+                                                         n_edge_points) +
+                q_point);
 
           for (unsigned int i = 0; i < order; ++i)
             boundary_weights(q_point, i) =
@@ -342,14 +342,14 @@ FE_Nedelec<2>::initialize_support_points(const unsigned int order)
            ++line)
         for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point)
           this->generalized_support_points[line * n_edge_points + q_point] =
-            edge_quadrature.point(QProjector<dim>::DataSetDescriptor::face(
-                                    this->reference_cell_type(),
-                                    line,
-                                    true,
-                                    false,
-                                    false,
-                                    n_edge_points) +
-                                  q_point);
+            edge_quadrature.point(
+              QProjector<dim>::DataSetDescriptor::face(this->reference_cell(),
+                                                       line,
+                                                       true,
+                                                       false,
+                                                       false,
+                                                       n_edge_points) +
+              q_point);
     }
 }
 
@@ -474,7 +474,7 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
         }
 
       const Quadrature<dim> &face_quadrature =
-        QProjector<dim>::project_to_all_faces(this->reference_cell_type(),
+        QProjector<dim>::project_to_all_faces(this->reference_cell(),
                                               reference_face_quadrature);
 
       for (const unsigned int face : GeometryInfo<dim>::face_indices())
@@ -483,14 +483,14 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
             this->generalized_support_points[face * n_face_points + q_point +
                                              GeometryInfo<dim>::lines_per_cell *
                                                n_edge_points] =
-              face_quadrature.point(QProjector<dim>::DataSetDescriptor::face(
-                                      this->reference_cell_type(),
-                                      face,
-                                      true,
-                                      false,
-                                      false,
-                                      n_face_points) +
-                                    q_point);
+              face_quadrature.point(
+                QProjector<dim>::DataSetDescriptor::face(this->reference_cell(),
+                                                         face,
+                                                         true,
+                                                         false,
+                                                         false,
+                                                         n_face_points) +
+                q_point);
           }
 
       // Create support points in the interior.
