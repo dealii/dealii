@@ -492,7 +492,7 @@ template <typename VectorType,
           std::enable_if_t<is_serial_vector<VectorType>::value, int>>
 MPI_Comm SUNDIALS::internal::NVectorOperations::get_communicator(N_Vector)
 {
-  return {};
+  return MPI_COMM_SELF;
 }
 
 
