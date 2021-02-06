@@ -34,13 +34,9 @@ template <int dim, int spacedim>
 class Mapping;
 template <int dim>
 class Quadrature;
-template <int dim>
-class ScalarPolynomialsBase;
 #endif
 
-/**
- * A namespace for reference cells.
- */
+
 class ReferenceCell;
 
 namespace internal
