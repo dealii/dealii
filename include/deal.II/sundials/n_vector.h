@@ -21,6 +21,7 @@
 #ifdef DEAL_II_WITH_SUNDIALS
 #  include <sundials/sundials_nvector.h>
 
+#  include <functional>
 #  include <memory>
 
 DEAL_II_NAMESPACE_OPEN
