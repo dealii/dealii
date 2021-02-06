@@ -704,6 +704,9 @@ namespace Step68
   {
     if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
       deallog << "Particles location" << std::endl;
+
+    MPI_Barrier(mpi_communicator);
+
     for (unsigned int proc = 0;
          proc < Utilities::MPI::n_mpi_processes(mpi_communicator);
          ++proc)
@@ -737,7 +740,7 @@ main(int argc, char *argv[])
   using namespace dealii;
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  initlog();
+  MPILogInitAll all;
   deallog.depth_console(1);
 
   try
