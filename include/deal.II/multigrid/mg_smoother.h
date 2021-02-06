@@ -482,6 +482,14 @@ public:
              const MGLevelObject<DATA> &       additional_data);
 
   /**
+   * Same as above but taking a std::unique_ptr.
+   */
+  template <typename MatrixType2, class DATA>
+  void
+  initialize(const MGLevelObject<std::unique_ptr<MatrixType2>> &matrices,
+             const MGLevelObject<DATA> &additional_data);
+
+  /**
    * Initialize for single blocks of matrices. Of this block matrix, the block
    * indicated by @p block_row and @p block_col is selected on each level.
    * This function stores pointers to the level matrices and initializes the
@@ -1064,6 +1072,32 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize(
       matrices[i] =
         linear_operator<VectorType>(LinearOperator<VectorType>(), m[i]);
       smoothers[i].initialize(m[i], data[i]);
+    }
+}
+
+
+
+template <typename MatrixType, typename PreconditionerType, typename VectorType>
+template <typename MatrixType2, class DATA>
+inline void
+MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize(
+  const MGLevelObject<std::unique_ptr<MatrixType2>> &m,
+  const MGLevelObject<DATA> &                        data)
+{
+  const unsigned int min = m.min_level();
+  const unsigned int max = m.max_level();
+
+  Assert(data.min_level() == min, ExcDimensionMismatch(data.min_level(), min));
+  Assert(data.max_level() == max, ExcDimensionMismatch(data.max_level(), max));
+
+  matrices.resize(min, max);
+  smoothers.resize(min, max);
+
+  for (unsigned int i = min; i <= max; ++i)
+    {
+      matrices[i] =
+        linear_operator<VectorType>(LinearOperator<VectorType>(), *m[i]);
+      smoothers[i].initialize(*m[i], data[i]);
     }
 }
 
