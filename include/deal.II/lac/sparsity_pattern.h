@@ -1138,6 +1138,13 @@ public:
    *
    * Previous content of this object is lost, and the sparsity pattern is in
    * compressed mode afterwards.
+   *
+   * Once you have built a sparsity pattern with this function, you
+   * probably want to attach a SparseMatrix object to it. The original
+   * `matrix` object can then be copied into this SparseMatrix object
+   * using the version of SparseMatrix::copy_from() that takes a
+   * FullMatrix object as argument. Through this procedure, you can
+   * convert a FullMatrix into a SparseMatrix.
    */
   template <typename number>
   void
