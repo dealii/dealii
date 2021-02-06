@@ -56,8 +56,8 @@ namespace internal
      * but we have this one function in an internal namespace that is a friend
      * of the class and can be used to create the objects.
      */
-    dealii::ReferenceCell
-    make_reference_cell_from_int(const std::uint8_t kind);
+    DEAL_II_CONSTEXPR dealii::ReferenceCell
+                      make_reference_cell_from_int(const std::uint8_t kind);
   } // namespace ReferenceCell
 } // namespace internal
 
@@ -293,8 +293,8 @@ private:
    * A kind of constructor -- not quite private because it can be
    * called by anyone, but at least hidden in an internal namespace.
    */
-  friend ReferenceCell
-  internal::ReferenceCell::make_reference_cell_from_int(const std::uint8_t);
+  friend DEAL_II_CONSTEXPR ReferenceCell
+                           internal::ReferenceCell::make_reference_cell_from_int(const std::uint8_t);
 };
 
 
@@ -331,6 +331,27 @@ ReferenceCell::operator!=(const ReferenceCell &type) const
 {
   return kind != type.kind;
 }
+
+
+
+namespace internal
+{
+  namespace ReferenceCell
+  {
+    inline DEAL_II_CONSTEXPR dealii::ReferenceCell
+                             make_reference_cell_from_int(const std::uint8_t kind)
+    {
+      // Make sure these are the only indices from which objects can be
+      // created.
+      Assert((kind == static_cast<std::uint8_t>(-1)) || (kind < 8),
+             ExcInternalError());
+
+      // Call the private constructor, which we can from here because this
+      // function is a 'friend'.
+      return {kind};
+    }
+  } // namespace ReferenceCell
+} // namespace internal
 
 
 

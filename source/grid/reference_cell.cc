@@ -31,25 +31,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace internal
-{
-  namespace ReferenceCell
-  {
-    dealii::ReferenceCell
-    make_reference_cell_from_int(const std::uint8_t kind)
-    {
-      // Make sure these are the only indices from which objects can be
-      // created.
-      Assert((kind == static_cast<std::uint8_t>(-1)) || (kind < 8),
-             ExcInternalError());
-
-      // Call the private constructor, which we can from here because this
-      // function is a 'friend'.
-      return {kind};
-    }
-  } // namespace ReferenceCell
-} // namespace internal
-
 
 const ReferenceCell ReferenceCell::Vertex =
   internal::ReferenceCell::make_reference_cell_from_int(0);
