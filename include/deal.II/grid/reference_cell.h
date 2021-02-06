@@ -29,9 +29,8 @@ DEAL_II_NAMESPACE_OPEN
 // Forward declarations
 #ifndef DOXYGEN
 template <int dim, int spacedim>
-class Triangulation;
-template <int dim, int spacedim>
 class Mapping;
+
 template <int dim>
 class Quadrature;
 #endif
@@ -750,16 +749,6 @@ ReferenceCell::unit_normal_vectors(const unsigned int face_no) const
   return {};
 }
 
-/**
- * Return a default linear mapping that works for the given triangulation.
- * Internally, this function calls the function above for the reference
- * cell used by the given triangulation, assuming that the triangulation
- * uses only a single cell type. If the triangulation uses mixed cell
- * types, then this function will trigger an exception.
- */
-template <int dim, int spacedim>
-const Mapping<dim, spacedim> &
-get_default_linear_mapping(const Triangulation<dim, spacedim> &triangulation);
 
 namespace internal
 {
