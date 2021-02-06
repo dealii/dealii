@@ -60,8 +60,8 @@ namespace internal
      * but we have this one function in an internal namespace that is a friend
      * of the class and can be used to create the objects.
      */
-    constexpr dealii::ReferenceCell
-    make_reference_cell_from_int(const std::uint8_t kind);
+    DEAL_II_CONSTEXPR dealii::ReferenceCell
+                      make_reference_cell_from_int(const std::uint8_t kind);
   } // namespace ReferenceCell
 } // namespace internal
 
@@ -297,8 +297,8 @@ private:
    * A kind of constructor -- not quite private because it can be
    * called by anyone, but at least hidden in an internal namespace.
    */
-  friend constexpr ReferenceCell
-  internal::ReferenceCell::make_reference_cell_from_int(const std::uint8_t);
+  friend DEAL_II_CONSTEXPR ReferenceCell
+                           internal::ReferenceCell::make_reference_cell_from_int(const std::uint8_t);
 };
 
 
@@ -342,8 +342,8 @@ namespace internal
 {
   namespace ReferenceCell
   {
-    constexpr dealii::ReferenceCell
-    make_reference_cell_from_int(const std::uint8_t kind)
+    DEAL_II_CONSTEXPR dealii::ReferenceCell
+                      make_reference_cell_from_int(const std::uint8_t kind)
     {
       // Make sure these are the only indices from which objects can be
       // created.
@@ -356,6 +356,9 @@ namespace internal
     }
   } // namespace ReferenceCell
 } // namespace internal
+
+
+
 template <class Archive>
 inline void
 ReferenceCell::serialize(Archive &archive, const unsigned int /*version*/)
