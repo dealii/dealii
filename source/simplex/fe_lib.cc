@@ -154,7 +154,7 @@ namespace Simplex
       if (dim == 1)
         return {};
 
-      const auto &info = internal::Info::get_cell(
+      const auto &info = internal::ReferenceCell::get_cell(
         dim == 2 ? ReferenceCell::Tri : ReferenceCell::Tet);
       std::vector<std::vector<Point<dim - 1>>> unit_face_points;
 

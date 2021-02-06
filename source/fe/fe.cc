@@ -158,7 +158,8 @@ FiniteElement<dim, spacedim>::FiniteElement(
         {
           adjust_quad_dof_index_for_face_orientation_table[f] =
             Table<2, int>(this->n_dofs_per_quad(f),
-                          internal::Info::get_cell(this->reference_cell())
+                          internal::ReferenceCell::get_cell(
+                            this->reference_cell())
                                 .face_reference_cell(f) == ReferenceCell::Quad ?
                             8 :
                             6);
@@ -571,7 +572,8 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
                                                  const bool face_flip,
                                                  const bool face_rotation) const
 {
-  const auto &refence_cell = internal::Info::get_cell(this->reference_cell());
+  const auto &refence_cell =
+    internal::ReferenceCell::get_cell(this->reference_cell());
 
   AssertIndexRange(face_index, this->n_dofs_per_face(face));
   AssertIndexRange(face, refence_cell.n_faces());
@@ -684,7 +686,7 @@ FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
   Assert(adjust_quad_dof_index_for_face_orientation_table
              [this->n_unique_quads() == 1 ? 0 : face]
                .n_elements() ==
-           (internal::Info::get_cell(this->reference_cell())
+           (internal::ReferenceCell::get_cell(this->reference_cell())
                   .face_reference_cell(face) == ReferenceCell::Quad ?
               8 :
               6) *

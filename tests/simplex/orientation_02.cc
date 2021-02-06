@@ -97,9 +97,9 @@ test(const unsigned int orientation)
   for (const auto l : face->line_indices())
     {
       const unsigned int l_ =
-        internal::Info::Tet().standard_to_real_face_line(l,
-                                                         face_no,
-                                                         orientation);
+        internal::ReferenceCell::Tet().standard_to_real_face_line(l,
+                                                                  face_no,
+                                                                  orientation);
 
       std::array<unsigned int, 2> a = {
         {face->line(l_)->vertex_index(0), face->line(l_)->vertex_index(1)}};

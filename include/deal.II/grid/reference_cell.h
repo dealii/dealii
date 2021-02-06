@@ -770,7 +770,7 @@ namespace internal
   /**
    * A namespace for geometric information on reference cells.
    */
-  namespace Info
+  namespace ReferenceCell
   {
     /**
      * Interface to be used in TriaAccessor/TriaCellAccessor to access
@@ -1885,18 +1885,18 @@ namespace internal
     /**
      * Return for a given reference-cell type the right Info.
      */
-    inline const internal::Info::Base &
+    inline const internal::ReferenceCell::Base &
     get_cell(const dealii::ReferenceCell &type)
     {
-      static const std::array<std::unique_ptr<internal::Info::Base>, 8> gei{
-        {std::make_unique<internal::Info::Vertex>(),
-         std::make_unique<internal::Info::Line>(),
-         std::make_unique<internal::Info::Tri>(),
-         std::make_unique<internal::Info::Quad>(),
-         std::make_unique<internal::Info::Tet>(),
-         std::make_unique<internal::Info::Pyramid>(),
-         std::make_unique<internal::Info::Wedge>(),
-         std::make_unique<internal::Info::Hex>()}};
+      static const std::array<std::unique_ptr<internal::ReferenceCell::Base>, 8>
+        gei{{std::make_unique<internal::ReferenceCell::Vertex>(),
+             std::make_unique<internal::ReferenceCell::Line>(),
+             std::make_unique<internal::ReferenceCell::Tri>(),
+             std::make_unique<internal::ReferenceCell::Quad>(),
+             std::make_unique<internal::ReferenceCell::Tet>(),
+             std::make_unique<internal::ReferenceCell::Pyramid>(),
+             std::make_unique<internal::ReferenceCell::Wedge>(),
+             std::make_unique<internal::ReferenceCell::Hex>()}};
       AssertIndexRange(static_cast<std::uint8_t>(type), 8);
       return *gei[static_cast<std::uint8_t>(type)];
     }
@@ -1905,13 +1905,13 @@ namespace internal
      * Return for a given reference-cell type @p and face number @p face_no the
      * right Info of the @p face_no-th face.
      */
-    inline const internal::Info::Base &
+    inline const internal::ReferenceCell::Base &
     get_face(const dealii::ReferenceCell &type, const unsigned int face_no)
     {
       return get_cell(get_cell(type).face_reference_cell(face_no));
     }
 
-  } // namespace Info
+  } // namespace ReferenceCell
 } // namespace internal
 
 
@@ -1947,7 +1947,7 @@ namespace internal
       out << "[";
 
       const unsigned int n_vertices =
-        internal::Info::get_cell(entity_type).n_vertices();
+        internal::ReferenceCell::get_cell(entity_type).n_vertices();
 
       for (unsigned int i = 0; i < n_vertices; ++i)
         {
@@ -1992,7 +1992,8 @@ inline unsigned char
 ReferenceCell::compute_orientation(const std::array<T, N> &vertices_0,
                                    const std::array<T, N> &vertices_1) const
 {
-  AssertIndexRange(internal::Info::get_cell(*this).n_vertices(), N + 1);
+  AssertIndexRange(internal::ReferenceCell::get_cell(*this).n_vertices(),
+                   N + 1);
   if (*this == ReferenceCell::Line)
     {
       const std::array<T, 2> i{{vertices_0[0], vertices_0[1]}};

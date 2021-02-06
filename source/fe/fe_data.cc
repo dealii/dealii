@@ -54,13 +54,14 @@ namespace internal
 
     // first_line_index
     const unsigned int first_line_index =
-      (internal::Info::get_cell(cell_type).n_vertices() * dofs_per_vertex);
+      (internal::ReferenceCell::get_cell(cell_type).n_vertices() *
+       dofs_per_vertex);
     result.object_index[1][0] = first_line_index;
 
     // first_quad_index
     const unsigned int first_quad_index =
       (first_line_index +
-       internal::Info::get_cell(cell_type).n_lines() * dofs_per_line);
+       internal::ReferenceCell::get_cell(cell_type).n_lines() * dofs_per_line);
     result.object_index[2][0] = first_quad_index;
 
     // first_hex_index
@@ -68,37 +69,43 @@ namespace internal
       (first_quad_index +
        (dim == 2 ?
           1 :
-          (dim == 3 ? internal::Info::get_cell(cell_type).n_faces() : 0)) *
+          (dim == 3 ? internal::ReferenceCell::get_cell(cell_type).n_faces() :
+                      0)) *
          dofs_per_quad);
 
     // first_face_line_index
     result.first_object_index_on_face[1][0] =
-      (internal::Info::get_face(cell_type, face_no).n_vertices() *
+      (internal::ReferenceCell::get_face(cell_type, face_no).n_vertices() *
        dofs_per_vertex);
 
     // first_face_quad_index
     result.first_object_index_on_face[2][0] =
       ((dim == 3 ?
-          internal::Info::get_face(cell_type, face_no).n_vertices() *
+          internal::ReferenceCell::get_face(cell_type, face_no).n_vertices() *
             dofs_per_vertex :
-          internal::Info::get_cell(cell_type).n_vertices() * dofs_per_vertex) +
-       internal::Info::get_face(cell_type, face_no).n_lines() * dofs_per_line);
+          internal::ReferenceCell::get_cell(cell_type).n_vertices() *
+            dofs_per_vertex) +
+       internal::ReferenceCell::get_face(cell_type, face_no).n_lines() *
+         dofs_per_line);
 
     // dofs_per_face
     result.dofs_per_object_inclusive[dim - 1][0] =
-      (internal::Info::get_face(cell_type, face_no).n_vertices() *
+      (internal::ReferenceCell::get_face(cell_type, face_no).n_vertices() *
          dofs_per_vertex +
-       internal::Info::get_face(cell_type, face_no).n_lines() * dofs_per_line +
+       internal::ReferenceCell::get_face(cell_type, face_no).n_lines() *
+         dofs_per_line +
        (dim == 3 ? 1 : 0) * dofs_per_quad);
 
 
     // dofs_per_cell
     result.dofs_per_object_inclusive[dim][0] =
-      (internal::Info::get_cell(cell_type).n_vertices() * dofs_per_vertex +
-       internal::Info::get_cell(cell_type).n_lines() * dofs_per_line +
+      (internal::ReferenceCell::get_cell(cell_type).n_vertices() *
+         dofs_per_vertex +
+       internal::ReferenceCell::get_cell(cell_type).n_lines() * dofs_per_line +
        (dim == 2 ?
           1 :
-          (dim == 3 ? internal::Info::get_cell(cell_type).n_faces() : 0)) *
+          (dim == 3 ? internal::ReferenceCell::get_cell(cell_type).n_faces() :
+                      0)) *
          dofs_per_quad +
        (dim == 3 ? 1 : 0) * dofs_per_hex);
 

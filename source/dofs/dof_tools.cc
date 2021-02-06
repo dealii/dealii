@@ -690,9 +690,10 @@ namespace DoFTools
                 const auto reference_cell = cell->reference_cell();
 
                 const auto &cell_rc =
-                  dealii::internal::Info::get_cell(reference_cell);
+                  dealii::internal::ReferenceCell::get_cell(reference_cell);
                 const auto &face_rc =
-                  dealii::internal::Info::get_face(reference_cell, face);
+                  dealii::internal::ReferenceCell::get_face(reference_cell,
+                                                            face);
 
                 const unsigned int n_vertices_per_cell = cell_rc.n_vertices();
                 const unsigned int n_lines_per_cell    = cell_rc.n_lines();

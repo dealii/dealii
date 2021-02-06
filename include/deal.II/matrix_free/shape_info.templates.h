@@ -324,7 +324,8 @@ namespace internal
 
               const unsigned int n_face_orientations = dim == 2 ? 2 : 6;
               const unsigned int n_faces =
-                dealii::internal::Info::get_cell(reference_cell).n_faces();
+                dealii::internal::ReferenceCell::get_cell(reference_cell)
+                  .n_faces();
 
               const auto projected_quad_face =
                 QProjector<dim>::project_to_all_faces(reference_cell,
