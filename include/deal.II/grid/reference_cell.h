@@ -342,8 +342,8 @@ namespace internal
 {
   namespace ReferenceCell
   {
-    DEAL_II_CONSTEXPR dealii::ReferenceCell
-                      make_reference_cell_from_int(const std::uint8_t kind)
+    inline DEAL_II_CONSTEXPR dealii::ReferenceCell
+                             make_reference_cell_from_int(const std::uint8_t kind)
     {
       // Make sure these are the only indices from which objects can be
       // created.
