@@ -1751,11 +1751,11 @@ namespace internal
         const unsigned int          face_no,
         const unsigned int          index,
         const dealii::ReferenceCell reference_cell =
-          dealii::ReferenceCell::Invalid)
+          dealii::ReferenceCells::Invalid)
       {
         Assert(index < dim, ExcInternalError());
 
-        if ((reference_cell == dealii::ReferenceCell::Invalid ||
+        if ((reference_cell == dealii::ReferenceCells::Invalid ||
              reference_cell == dealii::ReferenceCell::get_hypercube<dim>()) ==
             false)
           {

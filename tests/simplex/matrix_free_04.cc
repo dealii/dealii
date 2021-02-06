@@ -260,8 +260,8 @@ test(const unsigned version, const unsigned int degree)
   DoFHandler<dim> dof_handler(tria);
 
   for (const auto &cell : dof_handler.active_cell_iterators())
-    if (cell->reference_cell() == ReferenceCell::Triangle ||
-        cell->reference_cell() == ReferenceCell::Tetrahedron)
+    if (cell->reference_cell() == ReferenceCells::Triangle ||
+        cell->reference_cell() == ReferenceCells::Tetrahedron)
       cell->set_active_fe_index(0);
     else
       cell->set_active_fe_index(1);

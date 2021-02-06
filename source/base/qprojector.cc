@@ -86,7 +86,7 @@ QProjector<1>::project_to_face(const Quadrature<0> &  quadrature,
                                const unsigned int     face_no,
                                std::vector<Point<1>> &q_points)
 {
-  project_to_face(ReferenceCell::Line, quadrature, face_no, q_points);
+  project_to_face(ReferenceCells::Line, quadrature, face_no, q_points);
 }
 
 
@@ -98,7 +98,7 @@ QProjector<1>::project_to_face(const ReferenceCell reference_cell,
                                const unsigned int     face_no,
                                std::vector<Point<1>> &q_points)
 {
-  Assert(reference_cell == ReferenceCell::Line, ExcNotImplemented());
+  Assert(reference_cell == ReferenceCells::Line, ExcNotImplemented());
   (void)reference_cell;
 
   const unsigned int dim = 1;
@@ -116,7 +116,7 @@ QProjector<2>::project_to_face(const Quadrature<1> &  quadrature,
                                const unsigned int     face_no,
                                std::vector<Point<2>> &q_points)
 {
-  project_to_face(ReferenceCell::Quadrilateral, quadrature, face_no, q_points);
+  project_to_face(ReferenceCells::Quadrilateral, quadrature, face_no, q_points);
 }
 
 
@@ -133,7 +133,7 @@ QProjector<2>::project_to_face(const ReferenceCell    reference_cell,
   Assert(q_points.size() == quadrature.size(),
          ExcDimensionMismatch(q_points.size(), quadrature.size()));
 
-  if (reference_cell == ReferenceCell::Triangle)
+  if (reference_cell == ReferenceCells::Triangle)
     {
       // use linear polynomial to map the reference quadrature points correctly
       // on faces, i.e., Simplex::ScalarPolynomial<1>(1)
@@ -154,7 +154,7 @@ QProjector<2>::project_to_face(const ReferenceCell    reference_cell,
               Assert(false, ExcInternalError());
           }
     }
-  else if (reference_cell == ReferenceCell::Quadrilateral)
+  else if (reference_cell == ReferenceCells::Quadrilateral)
     {
       for (unsigned int p = 0; p < quadrature.size(); ++p)
         switch (face_no)
@@ -189,7 +189,7 @@ QProjector<3>::project_to_face(const Quadrature<2> &  quadrature,
                                const unsigned int     face_no,
                                std::vector<Point<3>> &q_points)
 {
-  project_to_face(ReferenceCell::Hexahedron, quadrature, face_no, q_points);
+  project_to_face(ReferenceCells::Hexahedron, quadrature, face_no, q_points);
 }
 
 
@@ -201,7 +201,7 @@ QProjector<3>::project_to_face(const ReferenceCell    reference_cell,
                                const unsigned int     face_no,
                                std::vector<Point<3>> &q_points)
 {
-  Assert(reference_cell == ReferenceCell::Hexahedron, ExcNotImplemented());
+  Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
   (void)reference_cell;
 
   const unsigned int dim = 3;
@@ -253,7 +253,7 @@ QProjector<1>::project_to_subface(const Quadrature<0> &    quadrature,
                                   const RefinementCase<0> &ref_case)
 {
   project_to_subface(
-    ReferenceCell::Line, quadrature, face_no, subface_no, q_points, ref_case);
+    ReferenceCells::Line, quadrature, face_no, subface_no, q_points, ref_case);
 }
 
 
@@ -267,7 +267,7 @@ QProjector<1>::project_to_subface(const ReferenceCell reference_cell,
                                   std::vector<Point<1>> &q_points,
                                   const RefinementCase<0> &)
 {
-  Assert(reference_cell == ReferenceCell::Line, ExcNotImplemented());
+  Assert(reference_cell == ReferenceCells::Line, ExcNotImplemented());
   (void)reference_cell;
 
   const unsigned int dim = 1;
@@ -287,7 +287,7 @@ QProjector<2>::project_to_subface(const Quadrature<1> &    quadrature,
                                   std::vector<Point<2>> &  q_points,
                                   const RefinementCase<1> &ref_case)
 {
-  project_to_subface(ReferenceCell::Quadrilateral,
+  project_to_subface(ReferenceCells::Quadrilateral,
                      quadrature,
                      face_no,
                      subface_no,
@@ -313,7 +313,7 @@ QProjector<2>::project_to_subface(const ReferenceCell    reference_cell,
   Assert(q_points.size() == quadrature.size(),
          ExcDimensionMismatch(q_points.size(), quadrature.size()));
 
-  if (reference_cell == ReferenceCell::Triangle)
+  if (reference_cell == ReferenceCells::Triangle)
     {
       // use linear polynomial to map the reference quadrature points correctly
       // on faces, i.e., Simplex::ScalarPolynomial<1>(1)
@@ -367,7 +367,7 @@ QProjector<2>::project_to_subface(const ReferenceCell    reference_cell,
               Assert(false, ExcInternalError());
           }
     }
-  else if (reference_cell == ReferenceCell::Quadrilateral)
+  else if (reference_cell == ReferenceCells::Quadrilateral)
     {
       for (unsigned int p = 0; p < quadrature.size(); ++p)
         switch (face_no)
@@ -449,7 +449,7 @@ QProjector<3>::project_to_subface(const Quadrature<2> &    quadrature,
                                   std::vector<Point<3>> &  q_points,
                                   const RefinementCase<2> &ref_case)
 {
-  project_to_subface(ReferenceCell::Hexahedron,
+  project_to_subface(ReferenceCells::Hexahedron,
                      quadrature,
                      face_no,
                      subface_no,
@@ -468,7 +468,7 @@ QProjector<3>::project_to_subface(const ReferenceCell      reference_cell,
                                   std::vector<Point<3>> &  q_points,
                                   const RefinementCase<2> &ref_case)
 {
-  Assert(reference_cell == ReferenceCell::Hexahedron, ExcNotImplemented());
+  Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
   (void)reference_cell;
 
   const unsigned int dim = 3;
@@ -555,7 +555,7 @@ QProjector<1>::project_to_all_faces(const ReferenceCell       reference_cell,
                                     const hp::QCollection<0> &quadrature)
 {
   AssertDimension(quadrature.size(), 1);
-  Assert(reference_cell == ReferenceCell::Line, ExcNotImplemented());
+  Assert(reference_cell == ReferenceCells::Line, ExcNotImplemented());
   (void)reference_cell;
 
   const unsigned int dim = 1;
@@ -600,15 +600,15 @@ Quadrature<2>
 QProjector<2>::project_to_all_faces(const ReferenceCell       reference_cell,
                                     const hp::QCollection<1> &quadrature)
 {
-  if (reference_cell == ReferenceCell::Triangle)
+  if (reference_cell == ReferenceCells::Triangle)
     {
       const auto support_points_line =
         [](const auto &face, const auto &orientation) -> std::vector<Point<2>> {
         std::array<Point<2>, 2> vertices;
         std::copy_n(face.first.begin(), face.first.size(), vertices.begin());
         const auto temp =
-          ReferenceCell::Line.permute_according_orientation(vertices,
-                                                            orientation);
+          ReferenceCells::Line.permute_according_orientation(vertices,
+                                                             orientation);
         return std::vector<Point<2>>(temp.begin(),
                                      temp.begin() + face.first.size());
       };
@@ -667,7 +667,7 @@ QProjector<2>::project_to_all_faces(const ReferenceCell       reference_cell,
       return {points, weights};
     }
 
-  Assert(reference_cell == ReferenceCell::Quadrilateral, ExcNotImplemented());
+  Assert(reference_cell == ReferenceCells::Quadrilateral, ExcNotImplemented());
 
   const unsigned int dim = 2;
 
@@ -728,8 +728,8 @@ QProjector<3>::project_to_all_faces(const ReferenceCell       reference_cell,
     std::array<Point<3>, 3> vertices;
     std::copy_n(face.first.begin(), face.first.size(), vertices.begin());
     const auto temp =
-      ReferenceCell::Triangle.permute_according_orientation(vertices,
-                                                            orientation);
+      ReferenceCells::Triangle.permute_according_orientation(vertices,
+                                                             orientation);
     return std::vector<Point<3>>(temp.begin(),
                                  temp.begin() + face.first.size());
   };
@@ -739,8 +739,8 @@ QProjector<3>::project_to_all_faces(const ReferenceCell       reference_cell,
     std::array<Point<3>, 4> vertices;
     std::copy_n(face.first.begin(), face.first.size(), vertices.begin());
     const auto temp =
-      ReferenceCell::Quadrilateral.permute_according_orientation(vertices,
-                                                                 orientation);
+      ReferenceCells::Quadrilateral.permute_according_orientation(vertices,
+                                                                  orientation);
     return std::vector<Point<3>>(temp.begin(),
                                  temp.begin() + face.first.size());
   };
@@ -850,7 +850,7 @@ QProjector<3>::project_to_all_faces(const ReferenceCell       reference_cell,
     return Quadrature<3>(points, weights);
   };
 
-  if (reference_cell == ReferenceCell::Tetrahedron)
+  if (reference_cell == ReferenceCells::Tetrahedron)
     {
       // reference faces (defined by its support points and its area)
       // note: the area is later not used as a scaling factor but recomputed
@@ -874,7 +874,7 @@ QProjector<3>::project_to_all_faces(const ReferenceCell       reference_cell,
 
       return process(faces);
     }
-  else if (reference_cell == ReferenceCell::Wedge)
+  else if (reference_cell == ReferenceCells::Wedge)
     {
       const std::vector<std::pair<std::vector<Point<3>>, double>> faces = {
         {{{{Point<3>(1.0, 0.0, 0.0),
@@ -903,7 +903,7 @@ QProjector<3>::project_to_all_faces(const ReferenceCell       reference_cell,
 
       return process(faces);
     }
-  else if (reference_cell == ReferenceCell::Pyramid)
+  else if (reference_cell == ReferenceCells::Pyramid)
     {
       const std::vector<std::pair<std::vector<Point<3>>, double>> faces = {
         {{{{Point<3>(-1.0, -1.0, 0.0),
@@ -932,7 +932,7 @@ QProjector<3>::project_to_all_faces(const ReferenceCell       reference_cell,
     }
 
 
-  Assert(reference_cell == ReferenceCell::Hexahedron, ExcNotImplemented());
+  Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
 
   const unsigned int dim = 3;
 
@@ -1029,7 +1029,7 @@ template <>
 Quadrature<1>
 QProjector<1>::project_to_all_subfaces(const Quadrature<0> &quadrature)
 {
-  return project_to_all_subfaces(ReferenceCell::Line, quadrature);
+  return project_to_all_subfaces(ReferenceCells::Line, quadrature);
 }
 
 
@@ -1039,7 +1039,7 @@ Quadrature<1>
 QProjector<1>::project_to_all_subfaces(const ReferenceCell  reference_cell,
                                        const Quadrature<0> &quadrature)
 {
-  Assert(reference_cell == ReferenceCell::Line, ExcNotImplemented());
+  Assert(reference_cell == ReferenceCells::Line, ExcNotImplemented());
   (void)reference_cell;
 
   const unsigned int dim = 1;
@@ -1086,11 +1086,11 @@ Quadrature<2>
 QProjector<2>::project_to_all_subfaces(const ReferenceCell  reference_cell,
                                        const SubQuadrature &quadrature)
 {
-  if (reference_cell == ReferenceCell::Triangle ||
-      reference_cell == ReferenceCell::Tetrahedron)
+  if (reference_cell == ReferenceCells::Triangle ||
+      reference_cell == ReferenceCells::Tetrahedron)
     return Quadrature<2>(); // nothing to do
 
-  Assert(reference_cell == ReferenceCell::Quadrilateral, ExcNotImplemented());
+  Assert(reference_cell == ReferenceCells::Quadrilateral, ExcNotImplemented());
 
   const unsigned int dim = 2;
 
@@ -1136,7 +1136,7 @@ template <>
 Quadrature<2>
 QProjector<2>::project_to_all_subfaces(const SubQuadrature &quadrature)
 {
-  return project_to_all_subfaces(ReferenceCell::Quadrilateral, quadrature);
+  return project_to_all_subfaces(ReferenceCells::Quadrilateral, quadrature);
 }
 
 
@@ -1146,11 +1146,11 @@ Quadrature<3>
 QProjector<3>::project_to_all_subfaces(const ReferenceCell  reference_cell,
                                        const SubQuadrature &quadrature)
 {
-  if (reference_cell == ReferenceCell::Triangle ||
-      reference_cell == ReferenceCell::Tetrahedron)
+  if (reference_cell == ReferenceCells::Triangle ||
+      reference_cell == ReferenceCells::Tetrahedron)
     return Quadrature<3>(); // nothing to do
 
-  Assert(reference_cell == ReferenceCell::Hexahedron, ExcNotImplemented());
+  Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
 
   const unsigned int dim         = 3;
   SubQuadrature      q_reflected = internal::QProjector::reflect(quadrature);
@@ -1228,7 +1228,7 @@ template <>
 Quadrature<3>
 QProjector<3>::project_to_all_subfaces(const SubQuadrature &quadrature)
 {
-  return project_to_all_subfaces(ReferenceCell::Hexahedron, quadrature);
+  return project_to_all_subfaces(ReferenceCells::Hexahedron, quadrature);
 }
 
 
@@ -1388,8 +1388,8 @@ QProjector<dim>::DataSetDescriptor::face(const ReferenceCell reference_cell,
                                          const bool          face_rotation,
                                          const unsigned int n_quadrature_points)
 {
-  if (reference_cell == ReferenceCell::Triangle ||
-      reference_cell == ReferenceCell::Tetrahedron)
+  if (reference_cell == ReferenceCells::Triangle ||
+      reference_cell == ReferenceCells::Tetrahedron)
     {
       if (dim == 2)
         return {(2 * face_no + face_orientation) * n_quadrature_points};
@@ -1476,10 +1476,10 @@ QProjector<dim>::DataSetDescriptor::face(
   const bool                      face_rotation,
   const hp::QCollection<dim - 1> &quadrature)
 {
-  if (reference_cell == ReferenceCell::Triangle ||
-      reference_cell == ReferenceCell::Tetrahedron ||
-      reference_cell == ReferenceCell::Wedge ||
-      reference_cell == ReferenceCell::Pyramid)
+  if (reference_cell == ReferenceCells::Triangle ||
+      reference_cell == ReferenceCells::Tetrahedron ||
+      reference_cell == ReferenceCells::Wedge ||
+      reference_cell == ReferenceCells::Pyramid)
     {
       unsigned int offset = 0;
 
@@ -1491,12 +1491,12 @@ QProjector<dim>::DataSetDescriptor::face(
         {8, 6, 6, 6, 6}};
 
       const auto &scale =
-        (reference_cell == ReferenceCell::Triangle) ?
+        (reference_cell == ReferenceCells::Triangle) ?
           scale_tri :
-          ((reference_cell == ReferenceCell::Tetrahedron) ?
+          ((reference_cell == ReferenceCells::Tetrahedron) ?
              scale_tet :
-             ((reference_cell == ReferenceCell::Wedge) ? scale_wedge :
-                                                         scale_pyramid));
+             ((reference_cell == ReferenceCells::Wedge) ? scale_wedge :
+                                                          scale_pyramid));
 
       if (quadrature.size() == 1)
         offset = scale[0] * quadrature[0].size() * face_no;
@@ -1614,7 +1614,7 @@ QProjector<1>::DataSetDescriptor::subface(
   const unsigned int n_quadrature_points,
   const internal::SubfaceCase<1>)
 {
-  Assert(reference_cell == ReferenceCell::Line, ExcNotImplemented());
+  Assert(reference_cell == ReferenceCells::Line, ExcNotImplemented());
   (void)reference_cell;
 
   Assert(face_no < GeometryInfo<1>::faces_per_cell, ExcInternalError());
@@ -1638,7 +1638,7 @@ QProjector<1>::DataSetDescriptor::subface(
   const unsigned int             n_quadrature_points,
   const internal::SubfaceCase<1> ref_case)
 {
-  return subface(ReferenceCell::Line,
+  return subface(ReferenceCells::Line,
                  face_no,
                  subface_no,
                  face_orientation,
@@ -1662,7 +1662,7 @@ QProjector<2>::DataSetDescriptor::subface(
   const unsigned int n_quadrature_points,
   const internal::SubfaceCase<2>)
 {
-  Assert(reference_cell == ReferenceCell::Quadrilateral, ExcNotImplemented());
+  Assert(reference_cell == ReferenceCells::Quadrilateral, ExcNotImplemented());
   (void)reference_cell;
 
   Assert(face_no < GeometryInfo<2>::faces_per_cell, ExcInternalError());
@@ -1686,7 +1686,7 @@ QProjector<2>::DataSetDescriptor::subface(
   const unsigned int             n_quadrature_points,
   const internal::SubfaceCase<2> ref_case)
 {
-  return subface(ReferenceCell::Quadrilateral,
+  return subface(ReferenceCells::Quadrilateral,
                  face_no,
                  subface_no,
                  face_orientation,
@@ -1711,7 +1711,7 @@ QProjector<3>::DataSetDescriptor::subface(
 {
   const unsigned int dim = 3;
 
-  Assert(reference_cell == ReferenceCell::Hexahedron, ExcNotImplemented());
+  Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
   (void)reference_cell;
 
   Assert(face_no < GeometryInfo<dim>::faces_per_cell, ExcInternalError());
@@ -1965,7 +1965,7 @@ QProjector<3>::DataSetDescriptor::subface(
   const unsigned int             n_quadrature_points,
   const internal::SubfaceCase<3> ref_case)
 {
-  return subface(ReferenceCell::Hexahedron,
+  return subface(ReferenceCells::Hexahedron,
                  face_no,
                  subface_no,
                  face_orientation,

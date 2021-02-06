@@ -3441,16 +3441,16 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
             out << ' ';
             const auto reference_cell = cell->reference_cell();
 
-            if ((reference_cell == ReferenceCell::Vertex) ||
-                (reference_cell == ReferenceCell::Line) ||
-                (reference_cell == ReferenceCell::Quadrilateral) ||
-                (reference_cell == ReferenceCell::Hexahedron))
+            if ((reference_cell == ReferenceCells::Vertex) ||
+                (reference_cell == ReferenceCells::Line) ||
+                (reference_cell == ReferenceCells::Quadrilateral) ||
+                (reference_cell == ReferenceCells::Hexahedron))
               out << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[i]);
-            else if ((reference_cell == ReferenceCell::Triangle) ||
-                     (reference_cell == ReferenceCell::Tetrahedron) ||
-                     (reference_cell == ReferenceCell::Wedge))
+            else if ((reference_cell == ReferenceCells::Triangle) ||
+                     (reference_cell == ReferenceCells::Tetrahedron) ||
+                     (reference_cell == ReferenceCells::Wedge))
               out << cell->vertex_index(i);
-            else if (reference_cell == ReferenceCell::Pyramid)
+            else if (reference_cell == ReferenceCells::Pyramid)
               {
                 static const std::array<unsigned int, 5> permutation_table{
                   {0, 1, 3, 2, 4}};
@@ -4274,7 +4274,7 @@ namespace internal
           Quadrature<dim - 1> quadrature(boundary_points, dummy_weights);
 
           q_projector = QProjector<dim>::project_to_all_faces(
-            dealii::ReferenceCell::Quadrilateral, quadrature);
+            dealii::ReferenceCells::Quadrilateral, quadrature);
         }
 
       for (const auto &cell : tria.active_cell_iterators())

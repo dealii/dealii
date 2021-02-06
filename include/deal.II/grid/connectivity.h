@@ -77,7 +77,7 @@ namespace internal
         (void)d;
         (void)e;
 
-        return dealii::ReferenceCell::Vertex;
+        return dealii::ReferenceCells::Vertex;
       }
 
       /**
@@ -156,11 +156,11 @@ namespace internal
         (void)e;
 
         if (d == 1)
-          return dealii::ReferenceCell::Line;
+          return dealii::ReferenceCells::Line;
 
         Assert(false, ExcNotImplemented());
 
-        return dealii::ReferenceCell::Vertex;
+        return dealii::ReferenceCells::Vertex;
       }
 
       unsigned int
@@ -210,14 +210,14 @@ namespace internal
         (void)e;
 
         if (d == 2)
-          return dealii::ReferenceCell::Triangle;
+          return dealii::ReferenceCells::Triangle;
 
         if (d == 1)
-          return dealii::ReferenceCell::Line;
+          return dealii::ReferenceCells::Line;
 
         Assert(false, ExcNotImplemented());
 
-        return dealii::ReferenceCell::Vertex;
+        return dealii::ReferenceCells::Vertex;
       }
 
       unsigned int
@@ -267,14 +267,14 @@ namespace internal
         (void)e;
 
         if (d == 2)
-          return dealii::ReferenceCell::Quadrilateral;
+          return dealii::ReferenceCells::Quadrilateral;
 
         if (d == 1)
-          return dealii::ReferenceCell::Line;
+          return dealii::ReferenceCells::Line;
 
         Assert(false, ExcNotImplemented());
 
-        return dealii::ReferenceCell::Vertex;
+        return dealii::ReferenceCells::Vertex;
       }
 
       unsigned int
@@ -332,17 +332,17 @@ namespace internal
         (void)e;
 
         if (d == 3)
-          return dealii::ReferenceCell::Tetrahedron;
+          return dealii::ReferenceCells::Tetrahedron;
 
         if (d == 2)
-          return dealii::ReferenceCell::Triangle;
+          return dealii::ReferenceCells::Triangle;
 
         if (d == 1)
-          return dealii::ReferenceCell::Line;
+          return dealii::ReferenceCells::Line;
 
         Assert(false, ExcNotImplemented());
 
-        return dealii::ReferenceCell::Vertex;
+        return dealii::ReferenceCells::Vertex;
       }
 
       unsigned int
@@ -443,19 +443,19 @@ namespace internal
         (void)e;
 
         if (d == 3)
-          return dealii::ReferenceCell::Pyramid;
+          return dealii::ReferenceCells::Pyramid;
 
         if (d == 2 && e == 0)
-          return dealii::ReferenceCell::Quadrilateral;
+          return dealii::ReferenceCells::Quadrilateral;
         else if (d == 2)
-          return dealii::ReferenceCell::Triangle;
+          return dealii::ReferenceCells::Triangle;
 
         if (d == 1)
-          return dealii::ReferenceCell::Line;
+          return dealii::ReferenceCells::Line;
 
         Assert(false, ExcNotImplemented());
 
-        return dealii::ReferenceCell::Vertex;
+        return dealii::ReferenceCells::Vertex;
       }
 
       unsigned int
@@ -569,19 +569,19 @@ namespace internal
         (void)e;
 
         if (d == 3)
-          return dealii::ReferenceCell::Wedge;
+          return dealii::ReferenceCells::Wedge;
 
         if (d == 2 && e > 1)
-          return dealii::ReferenceCell::Quadrilateral;
+          return dealii::ReferenceCells::Quadrilateral;
         else if (d == 2)
-          return dealii::ReferenceCell::Triangle;
+          return dealii::ReferenceCells::Triangle;
 
         if (d == 1)
-          return dealii::ReferenceCell::Line;
+          return dealii::ReferenceCells::Line;
 
         Assert(false, ExcNotImplemented());
 
-        return dealii::ReferenceCell::Vertex;
+        return dealii::ReferenceCells::Vertex;
       }
 
       unsigned int
@@ -697,17 +697,17 @@ namespace internal
         (void)e;
 
         if (d == 3)
-          return dealii::ReferenceCell::Hexahedron;
+          return dealii::ReferenceCells::Hexahedron;
 
         if (d == 2)
-          return dealii::ReferenceCell::Quadrilateral;
+          return dealii::ReferenceCells::Quadrilateral;
 
         if (d == 1)
-          return dealii::ReferenceCell::Line;
+          return dealii::ReferenceCells::Line;
 
         Assert(false, ExcNotImplemented());
 
-        return dealii::ReferenceCell::Vertex;
+        return dealii::ReferenceCells::Vertex;
       }
 
       unsigned int
@@ -1449,25 +1449,25 @@ namespace internal
       std::vector<std::shared_ptr<CellTypeBase>> cell_types_impl(8);
 
       cell_types_impl[static_cast<types::geometric_entity_type>(
-                        dealii::ReferenceCell::Line)]
+                        dealii::ReferenceCells::Line)]
         .reset(new CellTypeLine());
       cell_types_impl[static_cast<types::geometric_entity_type>(
-                        dealii::ReferenceCell::Triangle)]
+                        dealii::ReferenceCells::Triangle)]
         .reset(new CellTypeTri());
       cell_types_impl[static_cast<types::geometric_entity_type>(
-                        dealii::ReferenceCell::Quadrilateral)]
+                        dealii::ReferenceCells::Quadrilateral)]
         .reset(new CellTypeQuad());
       cell_types_impl[static_cast<types::geometric_entity_type>(
-                        dealii::ReferenceCell::Tetrahedron)]
+                        dealii::ReferenceCells::Tetrahedron)]
         .reset(new CellTypeTet());
       cell_types_impl[static_cast<types::geometric_entity_type>(
-                        dealii::ReferenceCell::Pyramid)]
+                        dealii::ReferenceCells::Pyramid)]
         .reset(new CellTypePyramid());
       cell_types_impl[static_cast<types::geometric_entity_type>(
-                        dealii::ReferenceCell::Wedge)]
+                        dealii::ReferenceCells::Wedge)]
         .reset(new CellTypeWedge());
       cell_types_impl[static_cast<types::geometric_entity_type>(
-                        dealii::ReferenceCell::Hexahedron)]
+                        dealii::ReferenceCells::Hexahedron)]
         .reset(new CellTypeHex());
 
       // determine cell types and process vertices
@@ -1494,7 +1494,7 @@ namespace internal
             dealii::ReferenceCell::n_vertices_to_type(dim,
                                                       cell.vertices.size());
 
-          Assert(reference_cell != dealii::ReferenceCell::Invalid,
+          Assert(reference_cell != dealii::ReferenceCells::Invalid,
                  ExcNotImplemented());
           AssertIndexRange(static_cast<types::geometric_entity_type>(
                              reference_cell),

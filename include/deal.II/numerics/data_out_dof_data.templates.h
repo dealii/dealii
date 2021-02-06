@@ -232,17 +232,18 @@ namespace internal
               {
                 const auto reference_cell = (*fe)[i].reference_cell();
 
-                if ((reference_cell == dealii::ReferenceCell::Vertex) ||
-                    (reference_cell == dealii::ReferenceCell::Line) ||
-                    (reference_cell == dealii::ReferenceCell::Quadrilateral) ||
-                    (reference_cell == dealii::ReferenceCell::Hexahedron))
+                if ((reference_cell == dealii::ReferenceCells::Vertex) ||
+                    (reference_cell == dealii::ReferenceCells::Line) ||
+                    (reference_cell == dealii::ReferenceCells::Quadrilateral) ||
+                    (reference_cell == dealii::ReferenceCells::Hexahedron))
                   needs_hypercube_setup |= true;
-                else if ((reference_cell == dealii::ReferenceCell::Triangle) ||
-                         (reference_cell == dealii::ReferenceCell::Tetrahedron))
+                else if ((reference_cell == dealii::ReferenceCells::Triangle) ||
+                         (reference_cell ==
+                          dealii::ReferenceCells::Tetrahedron))
                   needs_simplex_setup |= true;
-                else if (reference_cell == dealii::ReferenceCell::Wedge)
+                else if (reference_cell == dealii::ReferenceCells::Wedge)
                   needs_wedge_setup |= true;
-                else if (reference_cell == dealii::ReferenceCell::Pyramid)
+                else if (reference_cell == dealii::ReferenceCells::Pyramid)
                   needs_pyramid_setup |= true;
                 else
                   Assert(false, ExcNotImplemented());
@@ -321,20 +322,22 @@ namespace internal
                       const auto reference_cell =
                         (*finite_elements[i])[j].reference_cell();
 
-                      if ((reference_cell == dealii::ReferenceCell::Vertex) ||
-                          (reference_cell == dealii::ReferenceCell::Line) ||
+                      if ((reference_cell == dealii::ReferenceCells::Vertex) ||
+                          (reference_cell == dealii::ReferenceCells::Line) ||
                           (reference_cell ==
-                           dealii::ReferenceCell::Quadrilateral) ||
-                          (reference_cell == dealii::ReferenceCell::Hexahedron))
+                           dealii::ReferenceCells::Quadrilateral) ||
+                          (reference_cell ==
+                           dealii::ReferenceCells::Hexahedron))
                         quadrature.push_back(*quadrature_hypercube);
                       else if ((reference_cell ==
-                                dealii::ReferenceCell::Triangle) ||
+                                dealii::ReferenceCells::Triangle) ||
                                (reference_cell ==
-                                dealii::ReferenceCell::Tetrahedron))
+                                dealii::ReferenceCells::Tetrahedron))
                         quadrature.push_back(*quadrature_simplex);
-                      else if (reference_cell == dealii::ReferenceCell::Wedge)
+                      else if (reference_cell == dealii::ReferenceCells::Wedge)
                         quadrature.push_back(*quadrature_wedge);
-                      else if (reference_cell == dealii::ReferenceCell::Pyramid)
+                      else if (reference_cell ==
+                               dealii::ReferenceCells::Pyramid)
                         quadrature.push_back(*quadrature_pyramid);
                       else
                         Assert(false, ExcNotImplemented());
