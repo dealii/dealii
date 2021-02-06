@@ -21,7 +21,9 @@
 #ifdef DEAL_II_WITH_SYMENGINE
 
 
+#  include <deal.II/base/symmetric_tensor.h>
 #  include <deal.II/base/template_constraints.h>
+#  include <deal.II/base/tensor.h>
 
 #  include <deal.II/differentiation/sd/symengine_number_types.h>
 
@@ -79,6 +81,26 @@ namespace internal
         std::is_arithmetic<typename T::value_type>::value>::type>
     {
       using type = Differentiation::SD::Expression;
+    };
+
+    template <int rank, int dim, typename T>
+    struct GeneralProductTypeImpl<Tensor<rank, dim, T>,
+                                  Differentiation::SD::Expression>
+    {
+      using type =
+        Tensor<rank,
+               dim,
+               typename ProductType<T, Differentiation::SD::Expression>::type>;
+    };
+
+    template <int rank, int dim, typename T>
+    struct GeneralProductTypeImpl<SymmetricTensor<rank, dim, T>,
+                                  Differentiation::SD::Expression>
+    {
+      using type = SymmetricTensor<
+        rank,
+        dim,
+        typename ProductType<T, Differentiation::SD::Expression>::type>;
     };
 
   } // namespace SD
