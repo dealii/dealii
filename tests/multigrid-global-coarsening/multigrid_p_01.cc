@@ -36,9 +36,11 @@ test(const unsigned int n_refinements,
     GridGenerator::subdivided_hyper_cube(tria, 2);
   tria.refine_global(n_refinements);
 
-  const auto level_degrees = MGTransferGlobalCoarseningTools::create_p_sequence(
-    fe_degree_fine,
-    MGTransferGlobalCoarseningTools::PolynomialSequenceType::bisect);
+  const auto level_degrees =
+    MGTransferGlobalCoarseningTools::create_polynomial_coarsening_sequence(
+      fe_degree_fine,
+      MGTransferGlobalCoarseningTools::PolynomialCoarseningSequenceType::
+        bisect);
 
   const unsigned int min_level = 0;
   const unsigned int max_level = level_degrees.size() - 1;
