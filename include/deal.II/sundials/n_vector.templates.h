@@ -279,7 +279,12 @@ namespace SUNDIALS
       inline void *
       get_communicator_as_void_ptr(N_Vector v)
       {
+#  ifndef DEAL_II_WITH_MPI
+        (void)v;
+        return nullptr;
+#  else
         return get_communicator<VectorType>(v);
+#  endif
       }
 
     } // namespace NVectorOperations
@@ -487,7 +492,7 @@ template <typename VectorType,
           std::enable_if_t<is_serial_vector<VectorType>::value, int>>
 MPI_Comm SUNDIALS::internal::NVectorOperations::get_communicator(N_Vector)
 {
-  return nullptr;
+  return {};
 }
 
 
