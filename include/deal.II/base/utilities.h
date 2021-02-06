@@ -763,20 +763,42 @@ namespace Utilities
    */
   template <typename To, typename From>
   std::unique_ptr<To>
-  dynamic_unique_cast(std::unique_ptr<From> &&p)
-  {
-    // Let's see if we can cast from 'From' to 'To'. If so, do the cast,
-    // and then release the pointer from the old
-    // owner
-    if (To *cast = dynamic_cast<To *>(p.get()))
-      {
-        std::unique_ptr<To> result(cast);
-        p.release();
-        return result;
-      }
-    else
-      throw std::bad_cast();
-  }
+  dynamic_unique_cast(std::unique_ptr<From> &&p);
+
+  /**
+   * Return underlying value. Default: return input.
+   */
+  template <typename T>
+  T &
+  get_underlying_value(T &p);
+
+  /**
+   * Return underlying value. Specialization for std::shared_ptr<T>.
+   */
+  template <typename T>
+  T &
+  get_underlying_value(std::shared_ptr<T> &p);
+
+  /**
+   * Return underlying value. Specialization for const std::shared_ptr<T>.
+   */
+  template <typename T>
+  T &
+  get_underlying_value(const std::shared_ptr<T> &p);
+
+  /**
+   * Return underlying value. Specialization for std::unique_ptr<T>.
+   */
+  template <typename T>
+  T &
+  get_underlying_value(std::unique_ptr<T> &p);
+
+  /**
+   * Return underlying value. Specialization for const std::unique_ptr<T>.
+   */
+  template <typename T>
+  T &
+  get_underlying_value(const std::unique_ptr<T> &p);
 
   /**
    * A namespace for utility functions that probe system properties.
@@ -1372,6 +1394,70 @@ namespace Utilities
     // https://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit
     // "Changing the nth bit to x"
     number ^= (-static_cast<unsigned char>(x) ^ number) & (1U << n);
+  }
+
+
+
+  template <typename To, typename From>
+  inline std::unique_ptr<To>
+  dynamic_unique_cast(std::unique_ptr<From> &&p)
+  {
+    // Let's see if we can cast from 'From' to 'To'. If so, do the cast,
+    // and then release the pointer from the old
+    // owner
+    if (To *cast = dynamic_cast<To *>(p.get()))
+      {
+        std::unique_ptr<To> result(cast);
+        p.release();
+        return result;
+      }
+    else
+      throw std::bad_cast();
+  }
+
+
+
+  template <typename T>
+  inline T &
+  get_underlying_value(T &p)
+  {
+    return p;
+  }
+
+
+
+  template <typename T>
+  inline T &
+  get_underlying_value(std::shared_ptr<T> &p)
+  {
+    return *p;
+  }
+
+
+
+  template <typename T>
+  inline T &
+  get_underlying_value(const std::shared_ptr<T> &p)
+  {
+    return *p;
+  }
+
+
+
+  template <typename T>
+  inline T &
+  get_underlying_value(std::unique_ptr<T> &p)
+  {
+    return *p;
+  }
+
+
+
+  template <typename T>
+  inline T &
+  get_underlying_value(const std::unique_ptr<T> &p)
+  {
+    return *p;
   }
 
 
