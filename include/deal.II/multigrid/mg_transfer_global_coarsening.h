@@ -87,6 +87,19 @@ namespace MGTransferGlobalCoarseningTools
     const unsigned int                      max_degree,
     const PolynomialCoarseningSequenceType &p_sequence);
 
+  /**
+   * For a given triangulation @p tria, determine the geometric coarsening
+   * sequence by repeated global coarsening of the provided triangulation.
+   *
+   * @note For convenience, a reference to the input triangulation is stored in
+   *   the last entry of the return vector.
+   * @note Currently, only implemented for parallel::distributed::Triangulation.
+   */
+  template <int dim, int spacedim>
+  std::vector<std::shared_ptr<Triangulation<dim, spacedim>>>
+  create_geometric_coarsening_sequence(
+    const Triangulation<dim, spacedim> &tria);
+
 } // namespace MGTransferGlobalCoarseningTools
 
 
