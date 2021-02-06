@@ -22,11 +22,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 
     template const Mapping<deal_II_dimension, deal_II_space_dimension>
       &ReferenceCell::get_default_linear_mapping() const;
-
-    template const Mapping<deal_II_dimension, deal_II_space_dimension>
-      &get_default_linear_mapping(
-        const Triangulation<deal_II_dimension, deal_II_space_dimension>
-          &triangulation);
 #endif
   }
 
