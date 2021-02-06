@@ -33,10 +33,10 @@ class Mapping;
 
 template <int dim>
 class Quadrature;
-#endif
-
 
 class ReferenceCell;
+#endif
+
 
 namespace internal
 {
