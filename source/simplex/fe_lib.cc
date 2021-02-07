@@ -155,7 +155,7 @@ namespace Simplex
         return {};
 
       const auto &info = internal::ReferenceCell::get_cell(
-        dim == 2 ? ReferenceCell::Tri : ReferenceCell::Tet);
+        dim == 2 ? ReferenceCell::Triangle : ReferenceCell::Tetrahedron);
       std::vector<std::vector<Point<dim - 1>>> unit_face_points;
 
       // all faces have the same support points
@@ -365,26 +365,27 @@ namespace Simplex
     : dealii::FE_Poly<dim, spacedim>(
         BarycentricPolynomials<dim>::get_fe_p_basis(degree),
         FiniteElementData<dim>(dpo_vector,
-                               dim == 2 ? ReferenceCell::Tri :
-                                          ReferenceCell::Tet,
+                               dim == 2 ? ReferenceCell::Triangle :
+                                          ReferenceCell::Tetrahedron,
                                1,
                                degree,
                                conformity),
         std::vector<bool>(FiniteElementData<dim>(dpo_vector,
-                                                 dim == 2 ? ReferenceCell::Tri :
-                                                            ReferenceCell::Tet,
+                                                 dim == 2 ?
+                                                   ReferenceCell::Triangle :
+                                                   ReferenceCell::Tetrahedron,
                                                  1,
                                                  degree)
                             .dofs_per_cell,
                           true),
-        std::vector<ComponentMask>(FiniteElementData<dim>(dpo_vector,
-                                                          dim == 2 ?
-                                                            ReferenceCell::Tri :
-                                                            ReferenceCell::Tet,
-                                                          1,
-                                                          degree)
-                                     .dofs_per_cell,
-                                   std::vector<bool>(1, true)))
+        std::vector<ComponentMask>(
+          FiniteElementData<dim>(dpo_vector,
+                                 dim == 2 ? ReferenceCell::Triangle :
+                                            ReferenceCell::Tetrahedron,
+                                 1,
+                                 degree)
+            .dofs_per_cell,
+          std::vector<bool>(1, true)))
   {
     this->unit_support_points = unit_support_points_fe_poly<dim>(degree);
     // Discontinuous elements don't have face support points

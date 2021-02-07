@@ -121,10 +121,11 @@ FiniteElementData<dim>::FiniteElementData(
   const Conformity                 conformity,
   const BlockIndices &             block_indices)
   : FiniteElementData(dofs_per_object,
-                      dim == 0 ? ReferenceCell::Vertex :
-                                 (dim == 1 ? ReferenceCell::Line :
-                                             (dim == 2 ? ReferenceCell::Quad :
-                                                         ReferenceCell::Hex)),
+                      dim == 0 ?
+                        ReferenceCell::Vertex :
+                        (dim == 1 ? ReferenceCell::Line :
+                                    (dim == 2 ? ReferenceCell::Quadrilateral :
+                                                ReferenceCell::Hexahedron)),
                       n_components,
                       degree,
                       conformity,

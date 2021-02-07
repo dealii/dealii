@@ -84,9 +84,9 @@ test(const FiniteElement<dim, spacedim> &fe_0,
       if (cell->is_locally_owned() == false)
         continue;
 
-      if (cell->reference_cell() == ReferenceCell::Tri)
+      if (cell->reference_cell() == ReferenceCell::Triangle)
         cell->set_active_fe_index(0);
-      else if (cell->reference_cell() == ReferenceCell::Quad)
+      else if (cell->reference_cell() == ReferenceCell::Quadrilateral)
         cell->set_active_fe_index(1);
       else
         Assert(false, ExcNotImplemented());

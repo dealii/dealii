@@ -1726,7 +1726,7 @@ namespace GridGenerator
       {
         GridGenerator::hyper_cube(tria, 0, 1);
       }
-    else if ((dim == 2) && (reference_cell == ReferenceCell::Tri))
+    else if ((dim == 2) && (reference_cell == ReferenceCell::Triangle))
       {
         const std::vector<Point<spacedim>> vertices = {
           Point<spacedim>(),               // the origin
@@ -1739,7 +1739,7 @@ namespace GridGenerator
 
         tria.create_triangulation(vertices, cells, {});
       }
-    else if ((dim == 3) && (reference_cell == ReferenceCell::Tet))
+    else if ((dim == 3) && (reference_cell == ReferenceCell::Tetrahedron))
       {
         AssertDimension(spacedim, 3);
 

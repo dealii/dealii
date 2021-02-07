@@ -625,7 +625,7 @@ namespace
             vtk_cell_id[0] = cell_type_by_dim[dim];
             vtk_cell_id[1] = 1;
           }
-        else if (patch.reference_cell == ReferenceCell::Tri)
+        else if (patch.reference_cell == ReferenceCell::Triangle)
           {
             vtk_cell_id[0] = VTK_LAGRANGE_TRIANGLE;
             vtk_cell_id[1] = 1;
@@ -635,25 +635,25 @@ namespace
             Assert(false, ExcNotImplemented());
           }
       }
-    else if (patch.reference_cell == ReferenceCell::Tri &&
+    else if (patch.reference_cell == ReferenceCell::Triangle &&
              patch.data.n_cols() == 3)
       {
         vtk_cell_id[0] = VTK_TRIANGLE;
         vtk_cell_id[1] = 1;
       }
-    else if (patch.reference_cell == ReferenceCell::Tri &&
+    else if (patch.reference_cell == ReferenceCell::Triangle &&
              patch.data.n_cols() == 6)
       {
         vtk_cell_id[0] = VTK_QUADRATIC_TRIANGLE;
         vtk_cell_id[1] = 1;
       }
-    else if (patch.reference_cell == ReferenceCell::Tet &&
+    else if (patch.reference_cell == ReferenceCell::Tetrahedron &&
              patch.data.n_cols() == 4)
       {
         vtk_cell_id[0] = VTK_TETRA;
         vtk_cell_id[1] = 1;
       }
-    else if (patch.reference_cell == ReferenceCell::Tet &&
+    else if (patch.reference_cell == ReferenceCell::Tetrahedron &&
              patch.data.n_cols() == 10)
       {
         vtk_cell_id[0] = VTK_QUADRATIC_TETRA;
@@ -8721,19 +8721,19 @@ XDMFEntry::get_xdmf_content(const unsigned int   indent_level,
            << "\" NodesPerElement=\"2\">\n";
       else if (dimension == 2)
         {
-          Assert(reference_cell == ReferenceCell::Quad ||
-                   reference_cell == ReferenceCell::Tri,
+          Assert(reference_cell == ReferenceCell::Quadrilateral ||
+                   reference_cell == ReferenceCell::Triangle,
                  ExcNotImplemented());
 
           ss << indent(indent_level + 1) << "<Topology TopologyType=\"";
-          if (reference_cell == ReferenceCell::Quad)
+          if (reference_cell == ReferenceCell::Quadrilateral)
             {
               ss << "Quadrilateral"
                  << "\" NumberOfElements=\"" << num_cells << "\">\n"
                  << indent(indent_level + 2) << "<DataItem Dimensions=\""
                  << num_cells << " " << (1 << dimension);
             }
-          else // if (reference_cell == ReferenceCell::Tri)
+          else // if (reference_cell == ReferenceCell::Triangle)
             {
               ss << "Triangle"
                  << "\" NumberOfElements=\"" << num_cells << "\">\n"
@@ -8743,19 +8743,19 @@ XDMFEntry::get_xdmf_content(const unsigned int   indent_level,
         }
       else if (dimension == 3)
         {
-          Assert(reference_cell == ReferenceCell::Hex ||
-                   reference_cell == ReferenceCell::Tet,
+          Assert(reference_cell == ReferenceCell::Hexahedron ||
+                   reference_cell == ReferenceCell::Tetrahedron,
                  ExcNotImplemented());
 
           ss << indent(indent_level + 1) << "<Topology TopologyType=\"";
-          if (reference_cell == ReferenceCell::Hex)
+          if (reference_cell == ReferenceCell::Hexahedron)
             {
               ss << "Hexahedron"
                  << "\" NumberOfElements=\"" << num_cells << "\">\n"
                  << indent(indent_level + 2) << "<DataItem Dimensions=\""
                  << num_cells << " " << (1 << dimension);
             }
-          else // if (reference_cell == ReferenceCell::Tet)
+          else // if (reference_cell == ReferenceCell::Tetrahedron)
             {
               ss << "Tetrahedron"
                  << "\" NumberOfElements=\"" << num_cells << "\">\n"

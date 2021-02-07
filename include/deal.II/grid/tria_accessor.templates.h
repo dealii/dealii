@@ -60,16 +60,16 @@ namespace internal
       if (reference_cell == dealii::ReferenceCell::Line)
         // Return the distance between the two vertices
         return (vertices[1] - vertices[0]).norm();
-      else if (reference_cell == dealii::ReferenceCell::Tri)
+      else if (reference_cell == dealii::ReferenceCell::Triangle)
         // Return the longest of the three edges
         return std::max({(vertices[1] - vertices[0]).norm(),
                          (vertices[2] - vertices[1]).norm(),
                          (vertices[2] - vertices[0]).norm()});
-      else if (reference_cell == dealii::ReferenceCell::Quad)
+      else if (reference_cell == dealii::ReferenceCell::Quadrilateral)
         // Return the longer one of the two diagonals of the quadrilateral
         return std::max({(vertices[3] - vertices[0]).norm(),
                          (vertices[2] - vertices[1]).norm()});
-      else if (reference_cell == dealii::ReferenceCell::Tet)
+      else if (reference_cell == dealii::ReferenceCell::Tetrahedron)
         // Return the longest of the six edges of the tetrahedron
         return std::max({(vertices[1] - vertices[0]).norm(),
                          (vertices[2] - vertices[0]).norm(),
@@ -107,7 +107,7 @@ namespace internal
                          (vertices[4] - vertices[3]).norm(),
                          (vertices[5] - vertices[4]).norm(),
                          (vertices[5] - vertices[3]).norm()});
-      else if (reference_cell == dealii::ReferenceCell::Hex)
+      else if (reference_cell == dealii::ReferenceCell::Hexahedron)
         // Return the longest of the four diagonals of the hexahedron
         return std::max({(vertices[7] - vertices[0]).norm(),
                          (vertices[6] - vertices[1]).norm(),

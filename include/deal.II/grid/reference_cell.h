@@ -73,18 +73,18 @@ class ReferenceCell
 public:
   static const ReferenceCell Vertex;
   static const ReferenceCell Line;
-  static const ReferenceCell Tri;
-  static const ReferenceCell Quad;
-  static const ReferenceCell Tet;
+  static const ReferenceCell Triangle;
+  static const ReferenceCell Quadrilateral;
+  static const ReferenceCell Tetrahedron;
   static const ReferenceCell Pyramid;
   static const ReferenceCell Wedge;
-  static const ReferenceCell Hex;
+  static const ReferenceCell Hexahedron;
   static const ReferenceCell Invalid;
 
   /**
    * Return the correct simplex reference cell type for the given dimension
    * `dim`. Depending on the template argument `dim`, this function returns a
-   * reference to either Vertex, Tri, or Tet.
+   * reference to either Vertex, Triangle, or Tetrahedron.
    */
   template <int dim>
   static constexpr const ReferenceCell &
@@ -93,7 +93,7 @@ public:
   /**
    * Return the correct hypercube reference cell type for the given dimension
    * `dim`. Depending on the template argument `dim`, this function returns a
-   * reference to either Vertex, Quad, or Hex.
+   * reference to either Vertex, Quadrilateral, or Hexahedron.
    */
   template <int dim>
   static constexpr const ReferenceCell &
@@ -102,8 +102,8 @@ public:
   /**
    * Return the correct ReferenceCell for a given structural
    * dimension and number of vertices. For example, if `dim==2` and
-   * `n_vertices==4`, this function will return `Quad`. But if `dim==3` and
-   * `n_vertices==4`, it will return `Tri`.
+   * `n_vertices==4`, this function will return `Quadrilateral`. But if `dim==3`
+   * and `n_vertices==4`, it will return `Tetrahedron`.
    */
   static ReferenceCell
   n_vertices_to_type(const int dim, const unsigned int n_vertices);
@@ -114,13 +114,13 @@ public:
   constexpr ReferenceCell();
 
   /**
-   * Return true if the object is a Vertex, Line, Quad, or Hex.
+   * Return true if the object is a Vertex, Line, Quadrilateral, or Hexahedron.
    */
   bool
   is_hyper_cube() const;
 
   /**
-   * Return true if the object is a Vertex, Line, Tri, or Tet.
+   * Return true if the object is a Vertex, Line, Triangle, or Tetrahedron.
    */
   bool
   is_simplex() const;
@@ -371,17 +371,17 @@ ReferenceCell::faces_for_given_vertex(const unsigned int vertex) const
       AssertIndexRange(vertex, GeometryInfo<1>::vertices_per_cell);
       return {&GeometryInfo<2>::vertex_to_face[vertex][0], 1};
     }
-  else if (*this == ReferenceCell::Quad)
+  else if (*this == ReferenceCell::Quadrilateral)
     {
       AssertIndexRange(vertex, GeometryInfo<2>::vertices_per_cell);
       return {&GeometryInfo<2>::vertex_to_face[vertex][0], 2};
     }
-  else if (*this == ReferenceCell::Hex)
+  else if (*this == ReferenceCell::Hexahedron)
     {
       AssertIndexRange(vertex, GeometryInfo<3>::vertices_per_cell);
       return {&GeometryInfo<3>::vertex_to_face[vertex][0], 3};
     }
-  else if (*this == ReferenceCell::Tri)
+  else if (*this == ReferenceCell::Triangle)
     {
       AssertIndexRange(vertex, 3);
       static const std::array<std::array<unsigned int, 2>, 3> table = {
@@ -389,7 +389,7 @@ ReferenceCell::faces_for_given_vertex(const unsigned int vertex) const
 
       return table[vertex];
     }
-  else if (*this == ReferenceCell::Tet)
+  else if (*this == ReferenceCell::Tetrahedron)
     {
       AssertIndexRange(vertex, 4);
       static const std::array<std::array<unsigned int, 3>, 4> table = {
@@ -434,7 +434,8 @@ ReferenceCell::faces_for_given_vertex(const unsigned int vertex) const
 inline bool
 ReferenceCell::is_hyper_cube() const
 {
-  return (*this == Vertex || *this == Line || *this == Quad || *this == Hex);
+  return (*this == Vertex || *this == Line || *this == Quadrilateral ||
+          *this == Hexahedron);
 }
 
 
@@ -442,7 +443,8 @@ ReferenceCell::is_hyper_cube() const
 inline bool
 ReferenceCell::is_simplex() const
 {
-  return (*this == Vertex || *this == Line || *this == Tri || *this == Tet);
+  return (*this == Vertex || *this == Line || *this == Triangle ||
+          *this == Tetrahedron);
 }
 
 
@@ -454,10 +456,10 @@ ReferenceCell::get_dimension() const
     return 0;
   else if (*this == Line)
     return 1;
-  else if ((*this == Tri) || (*this == Quad))
+  else if ((*this == Triangle) || (*this == Quadrilateral))
     return 2;
-  else if ((*this == Tet) || (*this == Pyramid) || (*this == Wedge) ||
-           (*this == Hex))
+  else if ((*this == Tetrahedron) || (*this == Pyramid) || (*this == Wedge) ||
+           (*this == Hexahedron))
     return 3;
 
   Assert(false, ExcNotImplemented());
@@ -477,9 +479,9 @@ ReferenceCell::get_simplex()
       case 1:
         return ReferenceCell::Line;
       case 2:
-        return ReferenceCell::Tri;
+        return ReferenceCell::Triangle;
       case 3:
-        return ReferenceCell::Tet;
+        return ReferenceCell::Tetrahedron;
       default:
         Assert(false, ExcNotImplemented());
         return ReferenceCell::Invalid;
@@ -499,9 +501,9 @@ ReferenceCell::get_hypercube()
       case 1:
         return ReferenceCell::Line;
       case 2:
-        return ReferenceCell::Quad;
+        return ReferenceCell::Quadrilateral;
       case 3:
-        return ReferenceCell::Hex;
+        return ReferenceCell::Hexahedron;
       default:
         Assert(false, ExcNotImplemented());
         return ReferenceCell::Invalid;
@@ -524,17 +526,25 @@ ReferenceCell::n_vertices_to_type(const int dim, const unsigned int n_vertices)
               // dim 1
               {{X, X, ReferenceCell::Line, X, X, X, X, X, X}},
               // dim 2
-              {{X, X, X, ReferenceCell::Tri, ReferenceCell::Quad, X, X, X, X}},
+              {{X,
+                X,
+                X,
+                ReferenceCell::Triangle,
+                ReferenceCell::Quadrilateral,
+                X,
+                X,
+                X,
+                X}},
               // dim 3
               {{X,
                 X,
                 X,
                 X,
-                ReferenceCell::Tet,
+                ReferenceCell::Tetrahedron,
                 ReferenceCell::Pyramid,
                 ReferenceCell::Wedge,
                 X,
-                ReferenceCell::Hex}}}};
+                ReferenceCell::Hexahedron}}}};
   Assert(table[dim][n_vertices] != ReferenceCell::Invalid,
          ExcMessage("The combination of dim = " + std::to_string(dim) +
                     " and n_vertices = " + std::to_string(n_vertices) +
@@ -554,7 +564,8 @@ ReferenceCell::d_linear_shape_function(const Point<dim> & xi,
     return GeometryInfo<dim>::d_linear_shape_function(xi, i);
 
   if (*this ==
-      ReferenceCell::Tri) // see also Simplex::ScalarPolynomial::compute_value
+      ReferenceCell::Triangle) // see also
+                               // Simplex::ScalarPolynomial::compute_value
     {
       switch (i)
         {
@@ -568,7 +579,8 @@ ReferenceCell::d_linear_shape_function(const Point<dim> & xi,
     }
 
   if (*this ==
-      ReferenceCell::Tet) // see also Simplex::ScalarPolynomial::compute_value
+      ReferenceCell::Tetrahedron) // see also
+                                  // Simplex::ScalarPolynomial::compute_value
     {
       switch (i)
         {
@@ -588,7 +600,7 @@ ReferenceCell::d_linear_shape_function(const Point<dim> & xi,
       ReferenceCell::Wedge) // see also
                             // Simplex::ScalarWedgePolynomial::compute_value
     {
-      return ReferenceCell(ReferenceCell::Tri)
+      return ReferenceCell(ReferenceCell::Triangle)
                .d_linear_shape_function<2>(Point<2>(xi[std::min(0, dim - 1)],
                                                     xi[std::min(1, dim - 1)]),
                                            i % 3) *
@@ -646,7 +658,8 @@ ReferenceCell::d_linear_shape_function_gradient(const Point<dim> & xi,
     return GeometryInfo<dim>::d_linear_shape_function_gradient(xi, i);
 
   if (*this ==
-      ReferenceCell::Tri) // see also Simplex::ScalarPolynomial::compute_grad
+      ReferenceCell::Triangle) // see also
+                               // Simplex::ScalarPolynomial::compute_grad
     {
       switch (i)
         {
@@ -678,7 +691,7 @@ ReferenceCell::unit_tangential_vectors(const unsigned int face_no,
       AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
       return GeometryInfo<dim>::unit_tangential_vectors[face_no][i];
     }
-  else if (*this == ReferenceCell::Tri)
+  else if (*this == ReferenceCell::Triangle)
     {
       AssertIndexRange(face_no, 3);
       static const std::array<Tensor<1, dim>, 3> table = {
@@ -688,7 +701,7 @@ ReferenceCell::unit_tangential_vectors(const unsigned int face_no,
 
       return table[face_no];
     }
-  else if (*this == ReferenceCell::Tet)
+  else if (*this == ReferenceCell::Tetrahedron)
     {
       AssertIndexRange(face_no, 4);
       static const std::array<std::array<Tensor<1, dim>, 2>, 4> table = {
@@ -754,7 +767,7 @@ ReferenceCell::unit_normal_vectors(const unsigned int face_no) const
     }
   else if (dim == 2)
     {
-      Assert(*this == Tri, ExcInternalError());
+      Assert(*this == Triangle, ExcInternalError());
 
       // Return the rotated vector
       return cross_product_2d(unit_tangential_vectors<dim>(face_no, 0));
@@ -1124,7 +1137,7 @@ namespace internal
     /**
      * Triangle.
      */
-    struct Tri : public Base
+    struct Triangle : public Base
     {
       unsigned int
       n_vertices() const override
@@ -1232,9 +1245,9 @@ namespace internal
 
 
     /**
-     * Quad.
+     * Quadrilateral
      */
-    struct Quad : public TensorProductBase<2>
+    struct Quadrilateral : public TensorProductBase<2>
     {
       std::array<unsigned int, 2>
       standard_vertex_to_face_and_vertex_index(
@@ -1283,9 +1296,9 @@ namespace internal
 
 
     /**
-     * Tet.
+     * Tetrahedron
      */
-    struct Tet : public Base
+    struct Tetrahedron : public Base
     {
       unsigned int
       n_vertices() const override
@@ -1387,7 +1400,7 @@ namespace internal
 
         AssertIndexRange(face_no, n_faces());
 
-        return dealii::ReferenceCell::Tri;
+        return dealii::ReferenceCell::Triangle;
       }
 
       unsigned int
@@ -1557,9 +1570,9 @@ namespace internal
         AssertIndexRange(face_no, n_faces());
 
         if (face_no == 0)
-          return dealii::ReferenceCell::Quad;
+          return dealii::ReferenceCell::Quadrilateral;
         else
-          return dealii::ReferenceCell::Tri;
+          return dealii::ReferenceCell::Triangle;
       }
 
       unsigned int
@@ -1731,9 +1744,9 @@ namespace internal
         AssertIndexRange(face_no, n_faces());
 
         if (face_no > 1)
-          return dealii::ReferenceCell::Quad;
+          return dealii::ReferenceCell::Quadrilateral;
         else
-          return dealii::ReferenceCell::Tri;
+          return dealii::ReferenceCell::Triangle;
       }
 
       unsigned int
@@ -1785,7 +1798,7 @@ namespace internal
     /**
      * Hex.
      */
-    struct Hex : public TensorProductBase<3>
+    struct Hexahedron : public TensorProductBase<3>
     {
       std::array<unsigned int, 2>
       standard_line_to_face_and_line_index(
@@ -1866,7 +1879,7 @@ namespace internal
       face_reference_cell(const unsigned int face_no) const override
       {
         (void)face_no;
-        return dealii::ReferenceCell::Quad;
+        return dealii::ReferenceCell::Quadrilateral;
       }
 
       virtual unsigned int
@@ -1897,12 +1910,12 @@ namespace internal
       static const std::array<std::unique_ptr<internal::ReferenceCell::Base>, 8>
         gei{{std::make_unique<internal::ReferenceCell::Vertex>(),
              std::make_unique<internal::ReferenceCell::Line>(),
-             std::make_unique<internal::ReferenceCell::Tri>(),
-             std::make_unique<internal::ReferenceCell::Quad>(),
-             std::make_unique<internal::ReferenceCell::Tet>(),
+             std::make_unique<internal::ReferenceCell::Triangle>(),
+             std::make_unique<internal::ReferenceCell::Quadrilateral>(),
+             std::make_unique<internal::ReferenceCell::Tetrahedron>(),
              std::make_unique<internal::ReferenceCell::Pyramid>(),
              std::make_unique<internal::ReferenceCell::Wedge>(),
-             std::make_unique<internal::ReferenceCell::Hex>()}};
+             std::make_unique<internal::ReferenceCell::Hexahedron>()}};
       AssertIndexRange(static_cast<std::uint8_t>(type), 8);
       return *gei[static_cast<std::uint8_t>(type)];
     }
@@ -2013,7 +2026,7 @@ ReferenceCell::compute_orientation(const std::array<T, N> &vertices_0,
       if (i == std::array<T, 2>{{j[1], j[0]}})
         return 0;
     }
-  else if (*this == ReferenceCell::Tri)
+  else if (*this == ReferenceCell::Triangle)
     {
       const std::array<T, 3> i{{vertices_0[0], vertices_0[1], vertices_0[2]}};
       const std::array<T, 3> j{{vertices_1[0], vertices_1[1], vertices_1[2]}};
@@ -2042,7 +2055,7 @@ ReferenceCell::compute_orientation(const std::array<T, N> &vertices_0,
       if (i == std::array<T, 3>{{j[1], j[0], j[2]}})
         return 4;
     }
-  else if (*this == ReferenceCell::Quad)
+  else if (*this == ReferenceCell::Quadrilateral)
     {
       const std::array<T, 4> i{
         {vertices_0[0], vertices_0[1], vertices_0[2], vertices_0[3]}};
@@ -2111,7 +2124,7 @@ ReferenceCell::permute_according_orientation(
             Assert(false, ExcNotImplemented());
         }
     }
-  else if (*this == ReferenceCell::Tri)
+  else if (*this == ReferenceCell::Triangle)
     {
       switch (orientation)
         {
@@ -2137,7 +2150,7 @@ ReferenceCell::permute_according_orientation(
             Assert(false, ExcNotImplemented());
         }
     }
-  else if (*this == ReferenceCell::Quad)
+  else if (*this == ReferenceCell::Quadrilateral)
     {
       switch (orientation)
         {
