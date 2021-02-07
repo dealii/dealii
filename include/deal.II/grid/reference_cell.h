@@ -346,23 +346,23 @@ namespace internal
 
 namespace ReferenceCells
 {
-  constexpr ReferenceCell Vertex =
+  DEAL_II_CONSTEXPR const ReferenceCell Vertex =
     internal::ReferenceCell::make_reference_cell_from_int(0);
-  constexpr ReferenceCell Line =
+  DEAL_II_CONSTEXPR const ReferenceCell Line =
     internal::ReferenceCell::make_reference_cell_from_int(1);
-  constexpr ReferenceCell Triangle =
+  DEAL_II_CONSTEXPR const ReferenceCell Triangle =
     internal::ReferenceCell::make_reference_cell_from_int(2);
-  constexpr ReferenceCell Quadrilateral =
+  DEAL_II_CONSTEXPR const ReferenceCell Quadrilateral =
     internal::ReferenceCell::make_reference_cell_from_int(3);
-  constexpr ReferenceCell Tetrahedron =
+  DEAL_II_CONSTEXPR const ReferenceCell Tetrahedron =
     internal::ReferenceCell::make_reference_cell_from_int(4);
-  constexpr ReferenceCell Pyramid =
+  DEAL_II_CONSTEXPR const ReferenceCell Pyramid =
     internal::ReferenceCell::make_reference_cell_from_int(5);
-  constexpr ReferenceCell Wedge =
+  DEAL_II_CONSTEXPR const ReferenceCell Wedge =
     internal::ReferenceCell::make_reference_cell_from_int(6);
-  constexpr ReferenceCell Hexahedron =
+  DEAL_II_CONSTEXPR const ReferenceCell Hexahedron =
     internal::ReferenceCell::make_reference_cell_from_int(7);
-  constexpr ReferenceCell Invalid =
+  DEAL_II_CONSTEXPR const ReferenceCell Invalid =
     internal::ReferenceCell::make_reference_cell_from_int(
       static_cast<std::uint8_t>(-1));
 } // namespace ReferenceCells
