@@ -13533,8 +13533,11 @@ template <int dim, int spacedim>
 bool
 Triangulation<dim, spacedim>::all_reference_cells_are_hyper_cube() const
 {
-  return (this->reference_cells.size() == 0) ||
-         (this->reference_cells.size() == 1 &&
+  Assert(this->reference_cells.size() > 0,
+         ExcMessage("You can't ask about the kinds of reference "
+                    "cells used by this triangulation if the "
+                    "triangulation doesn't yet have any cells in it."));
+  return (this->reference_cells.size() == 1 &&
           this->reference_cells[0] == ReferenceCell::get_hypercube<dim>());
 }
 
