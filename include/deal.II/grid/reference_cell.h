@@ -67,6 +67,15 @@ namespace internal
  * This includes quadrilaterals and hexahedra (i.e., "hypercubes"),
  * triangles and tetrahedra (simplices), and the pyramids and wedges
  * necessary when using mixed 3d meshes.
+ *
+ * Objects of this type should not be created in user code, and as a
+ * consequence the class does not have a user-accessible constructor
+ * other than the default constructor (which creates an invalid object).
+ * Rather, there is a finite number of specific reference cell objects
+ * defined in the ReferenceCells namespace that completely enumerate
+ * all of the possible values. User codes should therefore rely
+ * exclusively on assigning ReferenceCell objects from these special
+ * objects, and comparing against those special objects.
  */
 class ReferenceCell
 {
@@ -344,6 +353,13 @@ namespace internal
 
 
 
+/**
+ * A namespace in which we define objects that correspond to specific
+ * reference cells. The objects defined here are a complete enumeration
+ * of all possible reference cells that can be used in deal.II.
+ *
+ * @relates ReferenceCell
+ */
 namespace ReferenceCells
 {
   DEAL_II_CONSTEXPR const ReferenceCell Vertex =
