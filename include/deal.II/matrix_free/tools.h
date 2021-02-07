@@ -628,6 +628,55 @@ namespace MatrixFreeTools
       first_selected_component);
   }
 
+  namespace internal
+  {
+    /**
+     * If value type of matrix and constrains equals, return a reference
+     * to the given AffineConstraint instance.
+     */
+    template <typename MatrixType,
+              typename Number,
+              typename std::enable_if<std::is_same<
+                typename std::remove_const<typename std::remove_reference<
+                  typename MatrixType::value_type>::type>::type,
+                typename std::remove_const<typename std::remove_reference<
+                  Number>::type>::type>::value>::type * = nullptr>
+    const AffineConstraints<typename MatrixType::value_type> &
+    create_new_affine_constraints_if_needed(
+      const MatrixType &,
+      const AffineConstraints<Number> &constraints,
+      std::unique_ptr<AffineConstraints<typename MatrixType::value_type>> &)
+    {
+      return constraints;
+    }
+
+    /**
+     * If value type of matrix and constrains do not equal, a new
+     * AffineConstraint instance with the value type of the matrix is
+     * created and a reference to it is returned.
+     */
+    template <typename MatrixType,
+              typename Number,
+              typename std::enable_if<!std::is_same<
+                typename std::remove_const<typename std::remove_reference<
+                  typename MatrixType::value_type>::type>::type,
+                typename std::remove_const<typename std::remove_reference<
+                  Number>::type>::type>::value>::type * = nullptr>
+    const AffineConstraints<typename MatrixType::value_type> &
+    create_new_affine_constraints_if_needed(
+      const MatrixType &,
+      const AffineConstraints<Number> &constraints,
+      std::unique_ptr<AffineConstraints<typename MatrixType::value_type>>
+        &new_constraints)
+    {
+      new_constraints =
+        std::make_unique<AffineConstraints<typename MatrixType::value_type>>();
+      new_constraints->copy_from(constraints);
+
+      return *new_constraints;
+    }
+  } // namespace internal
+
   template <int dim,
             int fe_degree,
             int n_q_points_1d,
@@ -637,9 +686,9 @@ namespace MatrixFreeTools
             typename MatrixType>
   void
   compute_matrix(
-    const MatrixFree<dim, Number, VectorizedArrayType> &            matrix_free,
-    const AffineConstraints<Number> &                               constraints,
-    MatrixType &                                                    matrix,
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+    const AffineConstraints<Number> &                   constraints_in,
+    MatrixType &                                        matrix,
     const std::function<void(FEEvaluation<dim,
                                           fe_degree,
                                           n_q_points_1d,
@@ -650,6 +699,13 @@ namespace MatrixFreeTools
     const unsigned int                                              quad_no,
     const unsigned int first_selected_component)
   {
+    std::unique_ptr<AffineConstraints<typename MatrixType::value_type>>
+                                                              constraints_for_matrix;
+    const AffineConstraints<typename MatrixType::value_type> &constraints =
+      internal::create_new_affine_constraints_if_needed(matrix,
+                                                        constraints_in,
+                                                        constraints_for_matrix);
+
     matrix_free.template cell_loop<MatrixType, MatrixType>(
       [&](const auto &, auto &dst, const auto &, const auto range) {
         FEEvaluation<dim,
