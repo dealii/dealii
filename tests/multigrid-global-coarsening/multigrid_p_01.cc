@@ -101,8 +101,9 @@ test(const unsigned int n_refinements,
                                                 constraints[l + 1],
                                                 constraints[l]);
 
-  MGTransferGlobalCoarsening<Operator<dim, Number>, VectorType> transfer(
-    operators, transfers);
+  MGTransferGlobalCoarsening<dim, VectorType> transfer(
+    transfers,
+    [&](const auto l, auto &vec) { operators[l].initialize_dof_vector(vec); });
 
   GMGParameters mg_data; // TODO
 
