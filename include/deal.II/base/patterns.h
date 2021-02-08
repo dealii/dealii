@@ -2292,7 +2292,7 @@ namespace Patterns
       {
         std::array<std::string, std::tuple_size<T>::value> a = {
           {Convert<typename std::tuple_element<U, T>::type>::to_string(
-            std::get<U>(t), *pattern.get_pattern(U).clone())...}};
+            std::get<U>(t), pattern.get_pattern(U))...}};
         return a;
       }
 
@@ -2311,7 +2311,7 @@ namespace Patterns
       {
         return std::make_tuple(
           Convert<typename std::tuple_element<U, T>::type>::to_value(
-            s[U], *pattern.get_pattern(U).clone())...);
+            s[U], pattern.get_pattern(U))...);
       }
 
       static T
