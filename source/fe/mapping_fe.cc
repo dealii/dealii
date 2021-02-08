@@ -154,8 +154,7 @@ MappingFE<dim, spacedim>::InternalData::initialize_face(
 
       // Compute tangentials to the unit cell.
       const auto reference_cell = this->fe.reference_cell();
-      const auto n_faces =
-        internal::ReferenceCell::get_cell(reference_cell).n_faces();
+      const auto n_faces        = reference_cell.n_faces();
 
       for (unsigned int i = 0; i < n_faces; ++i)
         {
@@ -862,9 +861,8 @@ MappingFE<dim, spacedim>::MappingFE(const FiniteElement<dim, spacedim> &fe)
 
   const auto reference_cell = fe.reference_cell();
 
-  const unsigned int n_points = mapping_support_points.size();
-  const unsigned int n_shape_functions =
-    internal::ReferenceCell::get_cell(reference_cell).n_vertices();
+  const unsigned int n_points          = mapping_support_points.size();
+  const unsigned int n_shape_functions = reference_cell.n_vertices();
 
   this->mapping_support_point_weights =
     Table<2, double>(n_points, n_shape_functions);

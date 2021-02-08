@@ -2195,7 +2195,7 @@ template <int structdim, int dim, int spacedim>
 unsigned int
 TriaAccessor<structdim, dim, spacedim>::n_vertices() const
 {
-  return this->reference_cell_info().n_vertices();
+  return this->reference_cell().n_vertices();
 }
 
 
@@ -2204,7 +2204,7 @@ template <int structdim, int dim, int spacedim>
 unsigned int
 TriaAccessor<structdim, dim, spacedim>::n_lines() const
 {
-  return this->reference_cell_info().n_lines();
+  return this->reference_cell().n_lines();
 }
 
 
@@ -2215,7 +2215,7 @@ TriaAccessor<structdim, dim, spacedim>::n_faces() const
 {
   AssertDimension(structdim, dim);
 
-  return this->reference_cell_info().n_faces();
+  return this->reference_cell().n_faces();
 }
 
 

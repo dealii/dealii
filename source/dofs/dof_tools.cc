@@ -689,16 +689,13 @@ namespace DoFTools
 
                 const auto reference_cell = cell->reference_cell();
 
-                const auto &cell_rc =
-                  dealii::internal::ReferenceCell::get_cell(reference_cell);
-                const auto &face_rc =
-                  dealii::internal::ReferenceCell::get_face(reference_cell,
-                                                            face);
-
-                const unsigned int n_vertices_per_cell = cell_rc.n_vertices();
-                const unsigned int n_lines_per_cell    = cell_rc.n_lines();
-                const unsigned int n_vertices_per_face = face_rc.n_vertices();
-                const unsigned int n_lines_per_face    = face_rc.n_lines();
+                const unsigned int n_vertices_per_cell =
+                  reference_cell.n_vertices();
+                const unsigned int n_lines_per_cell = reference_cell.n_lines();
+                const unsigned int n_vertices_per_face =
+                  reference_cell.face_reference_cell(face).n_vertices();
+                const unsigned int n_lines_per_face =
+                  reference_cell.face_reference_cell(face).n_lines();
 
                 const unsigned int dofs_per_face = fe.n_dofs_per_face(face);
                 face_dof_indices.resize(dofs_per_face);

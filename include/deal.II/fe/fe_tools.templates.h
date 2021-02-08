@@ -282,11 +282,9 @@ namespace FETools
       // 3. Quads
       for (unsigned int quad_number = 0;
            quad_number <
-           (dim == 2 ? 1 :
-                       (dim == 3 ? dealii::internal::ReferenceCell::get_cell(
-                                     fes.front()->reference_cell())
-                                     .n_faces() :
-                                   0));
+           (dim == 2 ?
+              1 :
+              (dim == 3 ? fes.front()->reference_cell().n_faces() : 0));
            ++quad_number)
         {
           for (unsigned int base = 0; base < fes.size(); ++base)
@@ -499,11 +497,9 @@ namespace FETools
       // 3. Quads
       for (unsigned int quad_number = 0;
            quad_number <
-           (dim == 2 ? 1 :
-                       (dim == 3 ? dealii::internal::ReferenceCell::get_cell(
-                                     fes.front()->reference_cell())
-                                     .n_faces() :
-                                   0));
+           (dim == 2 ?
+              1 :
+              (dim == 3 ? fes.front()->reference_cell().n_faces() : 0));
            ++quad_number)
         {
           unsigned int comp_start = 0;
@@ -761,11 +757,7 @@ namespace FETools
       // 3. Quads
       for (unsigned int quad_number = 0;
            quad_number <
-           (dim == 2 ? 1 :
-                       (dim == 3 ? dealii::internal::ReferenceCell::get_cell(
-                                     fe.reference_cell())
-                                     .n_faces() :
-                                   0));
+           (dim == 2 ? 1 : (dim == 3 ? fe.reference_cell().n_faces() : 0));
            ++quad_number)
         {
           unsigned int comp_start = 0;
@@ -872,9 +864,7 @@ namespace FETools
       unsigned int total_index = 0;
       for (unsigned int vertex_number = 0;
            vertex_number <
-           dealii::internal::ReferenceCell::get_face(fe.reference_cell(),
-                                                     face_no)
-             .n_vertices();
+           fe.reference_cell().face_reference_cell(face_no).n_vertices();
            ++vertex_number)
         {
           unsigned int comp_start = 0;
@@ -932,9 +922,7 @@ namespace FETools
       // 2. Lines
       for (unsigned int line_number = 0;
            line_number <
-           dealii::internal::ReferenceCell::get_face(fe.reference_cell(),
-                                                     face_no)
-             .n_lines();
+           fe.reference_cell().face_reference_cell(face_no).n_lines();
            ++line_number)
         {
           unsigned int comp_start = 0;
@@ -1995,9 +1983,7 @@ namespace FETools
     {
       unsigned int face_dof = 0;
       for (unsigned int i = 0;
-           i < dealii::internal::ReferenceCell::get_face(fe.reference_cell(),
-                                                         face_no)
-                 .n_vertices();
+           i < fe.reference_cell().face_reference_cell(face_no).n_vertices();
            ++i)
         {
           const unsigned int offset_c =
@@ -2015,9 +2001,7 @@ namespace FETools
         }
 
       for (unsigned int i = 1;
-           i <= dealii::internal::ReferenceCell::get_face(fe.reference_cell(),
-                                                          face_no)
-                  .n_lines();
+           i <= fe.reference_cell().face_reference_cell(face_no).n_lines();
            ++i)
         {
           const unsigned int offset_c =

@@ -591,8 +591,7 @@ MappingFEField<dim, spacedim, VectorType, void>::compute_face_data(
           // TODO: only a single reference cell type possible...
           const auto reference_cell =
             this->euler_dof_handler->get_fe().reference_cell();
-          const auto n_faces =
-            internal::ReferenceCell::get_cell(reference_cell).n_faces();
+          const auto n_faces = reference_cell.n_faces();
 
           // Compute tangentials to the unit cell.
           for (unsigned int i = 0; i < n_faces; ++i)
