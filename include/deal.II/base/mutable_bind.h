@@ -145,9 +145,9 @@ namespace Utilities
      * the conversion
      */
     void
-    parse_arguments(const std::string &                           value_string,
-                    const std::unique_ptr<Patterns::PatternBase> &pattern =
-                      Patterns::Tools::Convert<TupleType>::to_pattern());
+    parse_arguments(const std::string &          value_string,
+                    const Patterns::PatternBase &pattern =
+                      *Patterns::Tools::Convert<TupleType>::to_pattern());
 
   private:
     /**
@@ -280,8 +280,8 @@ namespace Utilities
   template <typename ReturnType, class... FunctionArgs>
   void
   MutableBind<ReturnType, FunctionArgs...>::parse_arguments(
-    const std::string &                           value_string,
-    const std::unique_ptr<Patterns::PatternBase> &pattern)
+    const std::string &          value_string,
+    const Patterns::PatternBase &pattern)
   {
     arguments =
       Patterns::Tools::Convert<TupleType>::to_value(value_string, pattern);
