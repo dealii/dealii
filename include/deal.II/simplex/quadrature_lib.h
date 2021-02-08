@@ -31,10 +31,10 @@ namespace Simplex
    * Users specify a number `n_points_1D` as an indication of what polynomial
    * degree to be integrated exactly, similarly to the number of points in a
    * QGauss quadrature object, even though the present quadrature formula is not
-   * a tensor product. The given value is translated for n_points_1D=1,2,3 to
+   * a tensor product. The given value is translated for n_points_1D=1,2,3,4 to
    * following number of quadrature points for 2D and 3D:
-   *   - 2D: 1, 3, 7
-   *   - 3D: 1, 4, 10
+   *   - 2D: 1, 3, 7, 15
+   *   - 3D: 1, 4, 10, 35
    *
    * For 1D, the quadrature rule degenerates to a `QGauss<1>(n_points_1D)`.
    *
