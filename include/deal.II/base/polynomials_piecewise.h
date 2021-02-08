@@ -48,6 +48,8 @@ namespace Polynomials
    * allow constructing FE_Q_iso_Q1 elements that put additional degrees of
    * freedom into an equivalent of a refined mesh instead of higher order
    * polynomials, which is useful when using mixed finite elements.
+   *
+   * @ingroup Polynomials
    */
   template <typename number>
   class PiecewisePolynomial : public Subscriptor
