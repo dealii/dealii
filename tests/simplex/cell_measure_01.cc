@@ -49,7 +49,7 @@ process(const std::vector<Point<spacedim>> &vertices,
 
   if (reference_cells[0] == ReferenceCell::get_simplex<dim>())
     mapping = std::make_shared<MappingFE<dim>>(Simplex::FE_P<dim>(1));
-  else if (reference_cells[0] == ReferenceCell::Wedge)
+  else if (reference_cells[0] == ReferenceCells::Wedge)
     mapping = std::make_shared<MappingFE<dim>>(Simplex::FE_WedgeP<dim>(1));
   else
     AssertThrow(false, ExcNotImplemented());

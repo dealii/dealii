@@ -155,7 +155,7 @@ namespace Simplex
         return {};
 
       const auto &info = internal::ReferenceCell::get_cell(
-        dim == 2 ? ReferenceCell::Triangle : ReferenceCell::Tetrahedron);
+        dim == 2 ? ReferenceCells::Triangle : ReferenceCells::Tetrahedron);
       std::vector<std::vector<Point<dim - 1>>> unit_face_points;
 
       // all faces have the same support points
@@ -310,7 +310,7 @@ namespace Simplex
       else
         Assert(false, ExcNotImplemented());
 
-      return internal::expand(3, {{0, 0, 0, n_dofs}}, ReferenceCell::Wedge);
+      return internal::expand(3, {{0, 0, 0, n_dofs}}, ReferenceCells::Wedge);
     }
 
     /**
@@ -351,7 +351,7 @@ namespace Simplex
       else
         Assert(false, ExcNotImplemented());
 
-      return internal::expand(3, {{0, 0, 0, n_dofs}}, ReferenceCell::Pyramid);
+      return internal::expand(3, {{0, 0, 0, n_dofs}}, ReferenceCells::Pyramid);
     }
   } // namespace
 
@@ -365,23 +365,23 @@ namespace Simplex
     : dealii::FE_Poly<dim, spacedim>(
         BarycentricPolynomials<dim>::get_fe_p_basis(degree),
         FiniteElementData<dim>(dpo_vector,
-                               dim == 2 ? ReferenceCell::Triangle :
-                                          ReferenceCell::Tetrahedron,
+                               dim == 2 ? ReferenceCells::Triangle :
+                                          ReferenceCells::Tetrahedron,
                                1,
                                degree,
                                conformity),
         std::vector<bool>(FiniteElementData<dim>(dpo_vector,
                                                  dim == 2 ?
-                                                   ReferenceCell::Triangle :
-                                                   ReferenceCell::Tetrahedron,
+                                                   ReferenceCells::Triangle :
+                                                   ReferenceCells::Tetrahedron,
                                                  1,
                                                  degree)
                             .dofs_per_cell,
                           true),
         std::vector<ComponentMask>(
           FiniteElementData<dim>(dpo_vector,
-                                 dim == 2 ? ReferenceCell::Triangle :
-                                            ReferenceCell::Tetrahedron,
+                                 dim == 2 ? ReferenceCells::Triangle :
+                                            ReferenceCells::Tetrahedron,
                                  1,
                                  degree)
             .dofs_per_cell,
@@ -958,16 +958,16 @@ namespace Simplex
     : dealii::FE_Poly<dim, spacedim>(
         Simplex::ScalarWedgePolynomial<dim>(degree),
         FiniteElementData<dim>(dpos,
-                               ReferenceCell::Wedge,
+                               ReferenceCells::Wedge,
                                1,
                                degree,
                                conformity),
         std::vector<bool>(
-          FiniteElementData<dim>(dpos, ReferenceCell::Wedge, 1, degree)
+          FiniteElementData<dim>(dpos, ReferenceCells::Wedge, 1, degree)
             .dofs_per_cell,
           true),
         std::vector<ComponentMask>(
-          FiniteElementData<dim>(dpos, ReferenceCell::Wedge, 1, degree)
+          FiniteElementData<dim>(dpos, ReferenceCells::Wedge, 1, degree)
             .dofs_per_cell,
           std::vector<bool>(1, true)))
   {
@@ -1192,16 +1192,16 @@ namespace Simplex
     : dealii::FE_Poly<dim, spacedim>(
         Simplex::ScalarPyramidPolynomial<dim>(degree),
         FiniteElementData<dim>(dpos,
-                               ReferenceCell::Pyramid,
+                               ReferenceCells::Pyramid,
                                1,
                                degree,
                                conformity),
         std::vector<bool>(
-          FiniteElementData<dim>(dpos, ReferenceCell::Pyramid, 1, degree)
+          FiniteElementData<dim>(dpos, ReferenceCells::Pyramid, 1, degree)
             .dofs_per_cell,
           true),
         std::vector<ComponentMask>(
-          FiniteElementData<dim>(dpos, ReferenceCell::Pyramid, 1, degree)
+          FiniteElementData<dim>(dpos, ReferenceCells::Pyramid, 1, degree)
             .dofs_per_cell,
           std::vector<bool>(1, true)))
   {

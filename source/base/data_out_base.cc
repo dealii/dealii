@@ -625,7 +625,7 @@ namespace
             vtk_cell_id[0] = cell_type_by_dim[dim];
             vtk_cell_id[1] = 1;
           }
-        else if (patch.reference_cell == ReferenceCell::Triangle)
+        else if (patch.reference_cell == ReferenceCells::Triangle)
           {
             vtk_cell_id[0] = VTK_LAGRANGE_TRIANGLE;
             vtk_cell_id[1] = 1;
@@ -635,37 +635,37 @@ namespace
             Assert(false, ExcNotImplemented());
           }
       }
-    else if (patch.reference_cell == ReferenceCell::Triangle &&
+    else if (patch.reference_cell == ReferenceCells::Triangle &&
              patch.data.n_cols() == 3)
       {
         vtk_cell_id[0] = VTK_TRIANGLE;
         vtk_cell_id[1] = 1;
       }
-    else if (patch.reference_cell == ReferenceCell::Triangle &&
+    else if (patch.reference_cell == ReferenceCells::Triangle &&
              patch.data.n_cols() == 6)
       {
         vtk_cell_id[0] = VTK_QUADRATIC_TRIANGLE;
         vtk_cell_id[1] = 1;
       }
-    else if (patch.reference_cell == ReferenceCell::Tetrahedron &&
+    else if (patch.reference_cell == ReferenceCells::Tetrahedron &&
              patch.data.n_cols() == 4)
       {
         vtk_cell_id[0] = VTK_TETRA;
         vtk_cell_id[1] = 1;
       }
-    else if (patch.reference_cell == ReferenceCell::Tetrahedron &&
+    else if (patch.reference_cell == ReferenceCells::Tetrahedron &&
              patch.data.n_cols() == 10)
       {
         vtk_cell_id[0] = VTK_QUADRATIC_TETRA;
         vtk_cell_id[1] = 1;
       }
-    else if (patch.reference_cell == ReferenceCell::Wedge &&
+    else if (patch.reference_cell == ReferenceCells::Wedge &&
              patch.data.n_cols() == 6)
       {
         vtk_cell_id[0] = VTK_WEDGE;
         vtk_cell_id[1] = 1;
       }
-    else if (patch.reference_cell == ReferenceCell::Pyramid &&
+    else if (patch.reference_cell == ReferenceCells::Pyramid &&
              patch.data.n_cols() == 5)
       {
         vtk_cell_id[0] = VTK_PYRAMID;
@@ -8721,19 +8721,19 @@ XDMFEntry::get_xdmf_content(const unsigned int   indent_level,
            << "\" NodesPerElement=\"2\">\n";
       else if (dimension == 2)
         {
-          Assert(reference_cell == ReferenceCell::Quadrilateral ||
-                   reference_cell == ReferenceCell::Triangle,
+          Assert(reference_cell == ReferenceCells::Quadrilateral ||
+                   reference_cell == ReferenceCells::Triangle,
                  ExcNotImplemented());
 
           ss << indent(indent_level + 1) << "<Topology TopologyType=\"";
-          if (reference_cell == ReferenceCell::Quadrilateral)
+          if (reference_cell == ReferenceCells::Quadrilateral)
             {
               ss << "Quadrilateral"
                  << "\" NumberOfElements=\"" << num_cells << "\">\n"
                  << indent(indent_level + 2) << "<DataItem Dimensions=\""
                  << num_cells << " " << (1 << dimension);
             }
-          else // if (reference_cell == ReferenceCell::Triangle)
+          else // if (reference_cell == ReferenceCells::Triangle)
             {
               ss << "Triangle"
                  << "\" NumberOfElements=\"" << num_cells << "\">\n"
@@ -8743,19 +8743,19 @@ XDMFEntry::get_xdmf_content(const unsigned int   indent_level,
         }
       else if (dimension == 3)
         {
-          Assert(reference_cell == ReferenceCell::Hexahedron ||
-                   reference_cell == ReferenceCell::Tetrahedron,
+          Assert(reference_cell == ReferenceCells::Hexahedron ||
+                   reference_cell == ReferenceCells::Tetrahedron,
                  ExcNotImplemented());
 
           ss << indent(indent_level + 1) << "<Topology TopologyType=\"";
-          if (reference_cell == ReferenceCell::Hexahedron)
+          if (reference_cell == ReferenceCells::Hexahedron)
             {
               ss << "Hexahedron"
                  << "\" NumberOfElements=\"" << num_cells << "\">\n"
                  << indent(indent_level + 2) << "<DataItem Dimensions=\""
                  << num_cells << " " << (1 << dimension);
             }
-          else // if (reference_cell == ReferenceCell::Tetrahedron)
+          else // if (reference_cell == ReferenceCells::Tetrahedron)
             {
               ss << "Tetrahedron"
                  << "\" NumberOfElements=\"" << num_cells << "\">\n"

@@ -75,14 +75,14 @@ test<2>()
                                             QGauss<dim - 1>(4));
 
     const auto quad =
-      QProjector<dim>::project_to_all_faces(ReferenceCell::Quadrilateral,
+      QProjector<dim>::project_to_all_faces(ReferenceCells::Quadrilateral,
                                             quad_ref);
 
     const auto print = [&](const unsigned int face_no) {
       deallog << "face_no=" << face_no << ":" << std::endl;
       for (unsigned int q = 0,
                         i = QProjector<dim>::DataSetDescriptor::face(
-                          ReferenceCell::Quadrilateral,
+                          ReferenceCells::Quadrilateral,
                           face_no,
                           false,
                           false,

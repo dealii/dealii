@@ -34,49 +34,26 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-
-const ReferenceCell ReferenceCell::Vertex =
-  internal::ReferenceCell::make_reference_cell_from_int(0);
-const ReferenceCell ReferenceCell::Line =
-  internal::ReferenceCell::make_reference_cell_from_int(1);
-const ReferenceCell ReferenceCell::Triangle =
-  internal::ReferenceCell::make_reference_cell_from_int(2);
-const ReferenceCell ReferenceCell::Quadrilateral =
-  internal::ReferenceCell::make_reference_cell_from_int(3);
-const ReferenceCell ReferenceCell::Tetrahedron =
-  internal::ReferenceCell::make_reference_cell_from_int(4);
-const ReferenceCell ReferenceCell::Pyramid =
-  internal::ReferenceCell::make_reference_cell_from_int(5);
-const ReferenceCell ReferenceCell::Wedge =
-  internal::ReferenceCell::make_reference_cell_from_int(6);
-const ReferenceCell ReferenceCell::Hexahedron =
-  internal::ReferenceCell::make_reference_cell_from_int(7);
-const ReferenceCell ReferenceCell::Invalid =
-  internal::ReferenceCell::make_reference_cell_from_int(
-    static_cast<std::uint8_t>(-1));
-
-
-
 std::string
 ReferenceCell::to_string() const
 {
-  if (*this == Vertex)
+  if (*this == ReferenceCells::Vertex)
     return "Vertex";
-  else if (*this == Line)
+  else if (*this == ReferenceCells::Line)
     return "Line";
-  else if (*this == Triangle)
+  else if (*this == ReferenceCells::Triangle)
     return "Tri";
-  else if (*this == Quadrilateral)
+  else if (*this == ReferenceCells::Quadrilateral)
     return "Quad";
-  else if (*this == Tetrahedron)
+  else if (*this == ReferenceCells::Tetrahedron)
     return "Tet";
-  else if (*this == Pyramid)
+  else if (*this == ReferenceCells::Pyramid)
     return "Pyramid";
-  else if (*this == Wedge)
+  else if (*this == ReferenceCells::Wedge)
     return "Wedge";
-  else if (*this == Hexahedron)
+  else if (*this == ReferenceCells::Hexahedron)
     return "Hex";
-  else if (*this == Invalid)
+  else if (*this == ReferenceCells::Invalid)
     return "Invalid";
 
   Assert(false, ExcNotImplemented());
@@ -97,10 +74,10 @@ ReferenceCell::get_default_mapping(const unsigned int degree) const
   else if (is_simplex())
     return std::make_unique<MappingFE<dim, spacedim>>(
       Simplex::FE_P<dim, spacedim>(degree));
-  else if (*this == ReferenceCell::Pyramid)
+  else if (*this == ReferenceCells::Pyramid)
     return std::make_unique<MappingFE<dim, spacedim>>(
       Simplex::FE_PyramidP<dim, spacedim>(degree));
-  else if (*this == ReferenceCell::Wedge)
+  else if (*this == ReferenceCells::Wedge)
     return std::make_unique<MappingFE<dim, spacedim>>(
       Simplex::FE_WedgeP<dim, spacedim>(degree));
   else
@@ -129,13 +106,13 @@ ReferenceCell::get_default_linear_mapping() const
         Simplex::FE_P<dim, spacedim>(1));
       return mapping;
     }
-  else if (*this == ReferenceCell::Pyramid)
+  else if (*this == ReferenceCells::Pyramid)
     {
       static const MappingFE<dim, spacedim> mapping(
         Simplex::FE_PyramidP<dim, spacedim>(1));
       return mapping;
     }
-  else if (*this == ReferenceCell::Wedge)
+  else if (*this == ReferenceCells::Wedge)
     {
       static const MappingFE<dim, spacedim> mapping(
         Simplex::FE_WedgeP<dim, spacedim>(1));
@@ -161,9 +138,9 @@ ReferenceCell::get_gauss_type_quadrature(const unsigned n_points_1D) const
     return QGauss<dim>(n_points_1D);
   else if (is_simplex())
     return Simplex::QGauss<dim>(n_points_1D);
-  else if (*this == ReferenceCell::Pyramid)
+  else if (*this == ReferenceCells::Pyramid)
     return Simplex::QGaussPyramid<dim>(n_points_1D);
-  else if (*this == ReferenceCell::Wedge)
+  else if (*this == ReferenceCells::Wedge)
     return Simplex::QGaussWedge<dim>(n_points_1D);
   else
     Assert(false, ExcNotImplemented());
@@ -199,12 +176,12 @@ ReferenceCell::get_nodal_type_quadrature() const
       static const Quadrature<dim> quadrature = create_quadrature(*this);
       return quadrature;
     }
-  else if (*this == ReferenceCell::Pyramid)
+  else if (*this == ReferenceCells::Pyramid)
     {
       static const Quadrature<dim> quadrature = create_quadrature(*this);
       return quadrature;
     }
-  else if (*this == ReferenceCell::Wedge)
+  else if (*this == ReferenceCells::Wedge)
     {
       static const Quadrature<dim> quadrature = create_quadrature(*this);
       return quadrature;

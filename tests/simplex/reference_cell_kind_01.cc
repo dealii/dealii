@@ -49,11 +49,11 @@ main()
 {
   initlog();
 
-  test<2>(ReferenceCell::Line);
-  test<2>(ReferenceCell::Triangle);
-  test<2>(ReferenceCell::Quadrilateral);
-  test<3>(ReferenceCell::Tetrahedron);
-  test<3>(ReferenceCell::Pyramid);
-  test<3>(ReferenceCell::Wedge);
-  test<3>(ReferenceCell::Hexahedron);
+  test<2>(ReferenceCells::Line);
+  test<2>(ReferenceCells::Triangle);
+  test<2>(ReferenceCells::Quadrilateral);
+  test<3>(ReferenceCells::Tetrahedron);
+  test<3>(ReferenceCells::Pyramid);
+  test<3>(ReferenceCells::Wedge);
+  test<3>(ReferenceCells::Hexahedron);
 }

@@ -57,19 +57,19 @@ namespace internal
       const dealii::ReferenceCell reference_cell =
         dealii::ReferenceCell::n_vertices_to_type(dim, vertices.size());
 
-      if (reference_cell == dealii::ReferenceCell::Line)
+      if (reference_cell == dealii::ReferenceCells::Line)
         // Return the distance between the two vertices
         return (vertices[1] - vertices[0]).norm();
-      else if (reference_cell == dealii::ReferenceCell::Triangle)
+      else if (reference_cell == dealii::ReferenceCells::Triangle)
         // Return the longest of the three edges
         return std::max({(vertices[1] - vertices[0]).norm(),
                          (vertices[2] - vertices[1]).norm(),
                          (vertices[2] - vertices[0]).norm()});
-      else if (reference_cell == dealii::ReferenceCell::Quadrilateral)
+      else if (reference_cell == dealii::ReferenceCells::Quadrilateral)
         // Return the longer one of the two diagonals of the quadrilateral
         return std::max({(vertices[3] - vertices[0]).norm(),
                          (vertices[2] - vertices[1]).norm()});
-      else if (reference_cell == dealii::ReferenceCell::Tetrahedron)
+      else if (reference_cell == dealii::ReferenceCells::Tetrahedron)
         // Return the longest of the six edges of the tetrahedron
         return std::max({(vertices[1] - vertices[0]).norm(),
                          (vertices[2] - vertices[0]).norm(),
@@ -77,7 +77,7 @@ namespace internal
                          (vertices[3] - vertices[0]).norm(),
                          (vertices[3] - vertices[1]).norm(),
                          (vertices[3] - vertices[2]).norm()});
-      else if (reference_cell == dealii::ReferenceCell::Pyramid)
+      else if (reference_cell == dealii::ReferenceCells::Pyramid)
         // Return ...
         return std::max({// the longest diagonal of the quadrilateral base
                          // of the pyramid or ...
@@ -89,7 +89,7 @@ namespace internal
                          (vertices[4] - vertices[1]).norm(),
                          (vertices[4] - vertices[2]).norm(),
                          (vertices[4] - vertices[3]).norm()});
-      else if (reference_cell == dealii::ReferenceCell::Wedge)
+      else if (reference_cell == dealii::ReferenceCells::Wedge)
         // Return ...
         return std::max({// the longest of the 2*3=6 diagonals of the three
                          // quadrilateral sides of the wedge or ...
@@ -107,7 +107,7 @@ namespace internal
                          (vertices[4] - vertices[3]).norm(),
                          (vertices[5] - vertices[4]).norm(),
                          (vertices[5] - vertices[3]).norm()});
-      else if (reference_cell == dealii::ReferenceCell::Hexahedron)
+      else if (reference_cell == dealii::ReferenceCells::Hexahedron)
         // Return the longest of the four diagonals of the hexahedron
         return std::max({(vertices[7] - vertices[0]).norm(),
                          (vertices[6] - vertices[1]).norm(),
@@ -1090,9 +1090,9 @@ inline ReferenceCell
 TriaAccessor<structdim, dim, spacedim>::reference_cell() const
 {
   if (structdim == 0)
-    return ReferenceCell::Vertex;
+    return ReferenceCells::Vertex;
   else if (structdim == 1)
-    return ReferenceCell::Line;
+    return ReferenceCells::Line;
   else if (structdim == dim)
     return this->tria->levels[this->present_level]
       ->reference_cell[this->present_index];
@@ -2252,9 +2252,9 @@ inline const internal::ReferenceCell::Base &
 TriaAccessor<structdim, dim, spacedim>::reference_cell_info() const
 {
   if (structdim == 0)
-    return internal::ReferenceCell::get_cell(ReferenceCell::Vertex);
+    return internal::ReferenceCell::get_cell(ReferenceCells::Vertex);
   else if (structdim == 1)
-    return internal::ReferenceCell::get_cell(ReferenceCell::Line);
+    return internal::ReferenceCell::get_cell(ReferenceCells::Line);
   else
     return internal::ReferenceCell::get_cell(this->reference_cell());
 }
@@ -3113,7 +3113,7 @@ template <int spacedim>
 inline ReferenceCell
 TriaAccessor<0, 1, spacedim>::reference_cell() const
 {
-  return ReferenceCell::Vertex;
+  return ReferenceCells::Vertex;
 }
 
 

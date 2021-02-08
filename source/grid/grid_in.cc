@@ -3063,28 +3063,28 @@ namespace
                       type_name_2.end());
 
     if (type_name_2 == "TRI" || type_name_2 == "TRIANGLE")
-      return ReferenceCell::Triangle;
+      return ReferenceCells::Triangle;
     else if (type_name_2 == "QUAD" || type_name_2 == "QUADRILATERAL")
-      return ReferenceCell::Quadrilateral;
+      return ReferenceCells::Quadrilateral;
     else if (type_name_2 == "SHELL")
       {
         if (n_nodes_per_element == 3)
-          return ReferenceCell::Triangle;
+          return ReferenceCells::Triangle;
         else
-          return ReferenceCell::Quadrilateral;
+          return ReferenceCells::Quadrilateral;
       }
     else if (type_name_2 == "TET" || type_name_2 == "TETRA" ||
              type_name_2 == "TETRAHEDRON")
-      return ReferenceCell::Tetrahedron;
+      return ReferenceCells::Tetrahedron;
     else if (type_name_2 == "PYRA" || type_name_2 == "PYRAMID")
-      return ReferenceCell::Pyramid;
+      return ReferenceCells::Pyramid;
     else if (type_name_2 == "WEDGE")
-      return ReferenceCell::Wedge;
+      return ReferenceCells::Wedge;
     else if (type_name_2 == "HEX" || type_name_2 == "HEXAHEDRON")
-      return ReferenceCell::Hexahedron;
+      return ReferenceCells::Hexahedron;
 
     Assert(false, ExcNotImplemented());
-    return ReferenceCell::Invalid;
+    return ReferenceCells::Invalid;
   }
 
   // Associate deal.II boundary ids with sidesets (a face can be in multiple
