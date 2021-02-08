@@ -1615,7 +1615,7 @@ namespace Simplex
       // basis.
       const auto polys = get_basis<dim>(degree);
       return FiniteElementData<dim>(get_dpo_vector<dim>(degree),
-                                    ReferenceCell::get_simplex<dim>(),
+                                    ReferenceCells::get_simplex<dim>(),
                                     1, // n_components
                                     polys.degree(),
                                     FiniteElementData<dim>::H1);

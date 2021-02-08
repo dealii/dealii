@@ -1756,7 +1756,7 @@ namespace internal
         Assert(index < dim, ExcInternalError());
 
         if ((reference_cell == dealii::ReferenceCells::Invalid ||
-             reference_cell == dealii::ReferenceCell::get_hypercube<dim>()) ==
+             reference_cell == dealii::ReferenceCells::get_hypercube<dim>()) ==
             false)
           {
 #ifdef DEAL_II_WITH_SIMPLEX_SUPPORT

@@ -1239,7 +1239,7 @@ Quadrature<dim>
 QProjector<dim>::project_to_child(const Quadrature<dim> &quadrature,
                                   const unsigned int     child_no)
 {
-  return project_to_child(ReferenceCell::get_hypercube<dim>(),
+  return project_to_child(ReferenceCells::get_hypercube<dim>(),
                           quadrature,
                           child_no);
 }
@@ -1252,7 +1252,7 @@ QProjector<dim>::project_to_child(const ReferenceCell    reference_cell,
                                   const Quadrature<dim> &quadrature,
                                   const unsigned int     child_no)
 {
-  Assert(reference_cell == ReferenceCell::get_hypercube<dim>(),
+  Assert(reference_cell == ReferenceCells::get_hypercube<dim>(),
          ExcNotImplemented());
   (void)reference_cell;
 
@@ -1282,7 +1282,7 @@ template <int dim>
 Quadrature<dim>
 QProjector<dim>::project_to_all_children(const Quadrature<dim> &quadrature)
 {
-  return project_to_all_children(ReferenceCell::get_hypercube<dim>(),
+  return project_to_all_children(ReferenceCells::get_hypercube<dim>(),
                                  quadrature);
 }
 
@@ -1293,7 +1293,7 @@ Quadrature<dim>
 QProjector<dim>::project_to_all_children(const ReferenceCell    reference_cell,
                                          const Quadrature<dim> &quadrature)
 {
-  Assert(reference_cell == ReferenceCell::get_hypercube<dim>(),
+  Assert(reference_cell == ReferenceCells::get_hypercube<dim>(),
          ExcNotImplemented());
   (void)reference_cell;
 
@@ -1325,7 +1325,7 @@ QProjector<dim>::project_to_line(const Quadrature<1> &quadrature,
                                  const Point<dim> &   p1,
                                  const Point<dim> &   p2)
 {
-  return project_to_line(ReferenceCell::get_hypercube<dim>(),
+  return project_to_line(ReferenceCells::get_hypercube<dim>(),
                          quadrature,
                          p1,
                          p2);
@@ -1340,7 +1340,7 @@ QProjector<dim>::project_to_line(const ReferenceCell  reference_cell,
                                  const Point<dim> &   p1,
                                  const Point<dim> &   p2)
 {
-  Assert(reference_cell == ReferenceCell::get_hypercube<dim>(),
+  Assert(reference_cell == ReferenceCells::get_hypercube<dim>(),
          ExcNotImplemented());
   (void)reference_cell;
 
@@ -1369,7 +1369,7 @@ QProjector<dim>::DataSetDescriptor::face(const unsigned int face_no,
                                          const bool         face_rotation,
                                          const unsigned int n_quadrature_points)
 {
-  return face(ReferenceCell::get_hypercube<dim>(),
+  return face(ReferenceCells::get_hypercube<dim>(),
               face_no,
               face_orientation,
               face_flip,
@@ -1401,7 +1401,7 @@ QProjector<dim>::DataSetDescriptor::face(const ReferenceCell reference_cell,
         }
     }
 
-  Assert(reference_cell == ReferenceCell::get_hypercube<dim>(),
+  Assert(reference_cell == ReferenceCells::get_hypercube<dim>(),
          ExcNotImplemented());
 
   Assert(face_no < GeometryInfo<dim>::faces_per_cell, ExcInternalError());
@@ -1519,7 +1519,7 @@ QProjector<dim>::DataSetDescriptor::face(
         }
     }
 
-  Assert(reference_cell == ReferenceCell::get_hypercube<dim>(),
+  Assert(reference_cell == ReferenceCells::get_hypercube<dim>(),
          ExcNotImplemented());
 
   Assert(face_no < GeometryInfo<dim>::faces_per_cell, ExcInternalError());
@@ -1982,7 +1982,7 @@ Quadrature<dim>
 QProjector<dim>::project_to_face(const SubQuadrature &quadrature,
                                  const unsigned int   face_no)
 {
-  return project_to_face(ReferenceCell::get_hypercube<dim>(),
+  return project_to_face(ReferenceCells::get_hypercube<dim>(),
                          quadrature,
                          face_no);
 }
@@ -1995,7 +1995,7 @@ QProjector<dim>::project_to_face(const ReferenceCell  reference_cell,
                                  const SubQuadrature &quadrature,
                                  const unsigned int   face_no)
 {
-  Assert(reference_cell == ReferenceCell::get_hypercube<dim>(),
+  Assert(reference_cell == ReferenceCells::get_hypercube<dim>(),
          ExcNotImplemented());
   (void)reference_cell;
 
@@ -2013,7 +2013,7 @@ QProjector<dim>::project_to_subface(const SubQuadrature &          quadrature,
                                     const unsigned int             subface_no,
                                     const RefinementCase<dim - 1> &ref_case)
 {
-  return project_to_subface(ReferenceCell::get_hypercube<dim>(),
+  return project_to_subface(ReferenceCells::get_hypercube<dim>(),
                             quadrature,
                             face_no,
                             subface_no,
@@ -2030,7 +2030,7 @@ QProjector<dim>::project_to_subface(const ReferenceCell  reference_cell,
                                     const unsigned int   subface_no,
                                     const RefinementCase<dim - 1> &ref_case)
 {
-  Assert(reference_cell == ReferenceCell::get_hypercube<dim>(),
+  Assert(reference_cell == ReferenceCells::get_hypercube<dim>(),
          ExcNotImplemented());
   (void)reference_cell;
 

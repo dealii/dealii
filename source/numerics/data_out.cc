@@ -148,7 +148,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
        (cell_and_index->first->at_boundary() ||
         (DoFHandlerType::dimension != DoFHandlerType::space_dimension))) ||
       (cell_and_index->first->reference_cell() !=
-       ReferenceCell::get_hypercube<dim>()))
+       ReferenceCells::get_hypercube<dim>()))
     {
       Assert(patch.space_dim == DoFHandlerType::space_dimension,
              ExcInternalError());

@@ -1722,7 +1722,7 @@ namespace GridGenerator
   {
     AssertDimension(dim, reference_cell.get_dimension());
 
-    if (reference_cell == ReferenceCell::get_hypercube<dim>())
+    if (reference_cell == ReferenceCells::get_hypercube<dim>())
       {
         GridGenerator::hyper_cube(tria, 0, 1);
       }
