@@ -83,20 +83,33 @@ public:
   /**
    * Return the correct ReferenceCell for a given structural
    * dimension and number of vertices. For example, if `dim==2` and
-   * `n_vertices==4`, this function will return `Quadrilateral`. But if `dim==3`
-   * and `n_vertices==4`, it will return `Tetrahedron`.
+   * `n_vertices==4`, this function will return ReferenceCells::Quadrilateral.
+   * But if `dim==3` and `n_vertices==4`, it will return
+   * ReferenceCells::Tetrahedron.
    */
   static ReferenceCell
   n_vertices_to_type(const int dim, const unsigned int n_vertices);
 
   /**
-   * Default constructor. Initialize this object as an invalid object.
+   * Default constructor. Initialize this object as an invalid object. The
+   * end result is that the current object equals ReferenceCells::Invalid.
+   *
+   * Generally, ReferenceCell objects are created by assignment from
+   * the special objects in namespace ReferenceCells, which is the only
+   * way to obtain a valid object.
    */
   DEAL_II_CONSTEXPR
   ReferenceCell();
 
   /**
-   * Return true if the object is a Vertex, Line, Quadrilateral, or Hexahedron.
+   * @name Querying information about the kind of reference cells
+   * @{
+   */
+
+  /**
+   * Return `true` if the object is a ReferenceCells::Vertex,
+   * ReferenceCells::Line, ReferenceCells::Quadrilateral, or
+   * ReferenceCells::Hexahedron.
    */
   bool
   is_hyper_cube() const;
@@ -115,6 +128,15 @@ public:
   get_dimension() const;
 
   /**
+   * @}
+   */
+
+  /**
+   * @name Shape functions, mappings, quadratures defined on a reference cell
+   * @{
+   */
+
+  /**
    * Compute the value of the $i$-th linear shape function at location $\xi$
    * for the current reference-cell type.
    */
@@ -130,42 +152,6 @@ public:
   Tensor<1, dim>
   d_linear_shape_function_gradient(const Point<dim> & xi,
                                    const unsigned int i) const;
-
-  /*
-   * Return $i$-th unit tangential vector of a face of the reference cell.
-   * The vectors are arranged such that the
-   * cross product between the two vectors returns the unit normal vector.
-   *
-   * @pre $i$ must be between zero and `dim-1`.
-   */
-  template <int dim>
-  Tensor<1, dim>
-  unit_tangential_vectors(const unsigned int face_no,
-                          const unsigned int i) const;
-
-  /**
-   * Return the unit normal vector of a face of the reference cell.
-   */
-  template <int dim>
-  Tensor<1, dim>
-  unit_normal_vectors(const unsigned int face_no) const;
-
-  /**
-   * Determine the orientation of the current entity described by its
-   * vertices @p var_1 relative to an entity described by @p var_0.
-   */
-  template <typename T, std::size_t N>
-  unsigned char
-  compute_orientation(const std::array<T, N> &vertices_0,
-                      const std::array<T, N> &vertices_1) const;
-
-  /**
-   * Inverse function of compute_orientation().
-   */
-  template <typename T, std::size_t N>
-  std::array<T, N>
-  permute_according_orientation(const std::array<T, N> &vertices,
-                                const unsigned int      orientation) const;
 
   /**
    * Return a default mapping of degree @p degree matching the current
@@ -218,6 +204,66 @@ public:
   get_nodal_type_quadrature() const;
 
   /**
+   * @}
+   */
+
+  /**
+   * @name Geometric properties of reference cells
+   * @{
+   */
+
+  /*
+   * Return $i$-th unit tangential vector of a face of the reference cell.
+   * The vectors are arranged such that the
+   * cross product between the two vectors returns the unit normal vector.
+   *
+   * @pre $i$ must be between zero and `dim-1`.
+   */
+  template <int dim>
+  Tensor<1, dim>
+  unit_tangential_vectors(const unsigned int face_no,
+                          const unsigned int i) const;
+
+  /**
+   * Return the unit normal vector of a face of the reference cell.
+   */
+  template <int dim>
+  Tensor<1, dim>
+  unit_normal_vectors(const unsigned int face_no) const;
+
+  /**
+   * Determine the orientation of the current entity described by its
+   * vertices @p var_1 relative to an entity described by @p var_0.
+   */
+  template <typename T, std::size_t N>
+  unsigned char
+  compute_orientation(const std::array<T, N> &vertices_0,
+                      const std::array<T, N> &vertices_1) const;
+
+  /**
+   * Inverse function of compute_orientation().
+   */
+  template <typename T, std::size_t N>
+  std::array<T, N>
+  permute_according_orientation(const std::array<T, N> &vertices,
+                                const unsigned int      orientation) const;
+
+  /**
+   * Return a vector of faces a given @p vertex_index belongs to.
+   */
+  ArrayView<const unsigned int>
+  faces_for_given_vertex(const unsigned int vertex_index) const;
+
+  /**
+   * @}
+   */
+
+  /**
+   * @name Other functions
+   * @{
+   */
+
+  /**
    * Return a text representation of the reference cell represented by the
    * current object.
    */
@@ -251,10 +297,8 @@ public:
   serialize(Archive &archive, const unsigned int /*version*/);
 
   /**
-   * Return a vector of faces a @p vertex belongs to.
+   * @}
    */
-  ArrayView<const unsigned int>
-  faces_for_given_vertex(const unsigned int vertex) const;
 
 private:
   /**
