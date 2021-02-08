@@ -92,7 +92,8 @@ public:
   /**
    * Default constructor. Initialize this object as an invalid object.
    */
-  constexpr ReferenceCell();
+  DEAL_II_CONSTEXPR
+  ReferenceCell();
 
   /**
    * Return true if the object is a Vertex, Line, Quadrilateral, or Hexahedron.
@@ -379,7 +380,8 @@ namespace ReferenceCells
 
 
 
-inline constexpr ReferenceCell::ReferenceCell()
+inline DEAL_II_CONSTEXPR
+ReferenceCell::ReferenceCell()
   : ReferenceCell(ReferenceCells::Invalid)
 {}
 
