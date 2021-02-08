@@ -124,10 +124,12 @@ namespace Particles
     // If this was the last handle, resize containers to 0.
     // This guarantees that all future properties
     // are allocated in a sorted way without requiring reallocation.
-    if (currently_available_handles.size() * n_properties == properties.size())
+    if (currently_available_handles.size() == locations.size())
       {
         currently_available_handles.clear();
         properties.clear();
+        locations.clear();
+        reference_locations.clear();
       }
   }
 
