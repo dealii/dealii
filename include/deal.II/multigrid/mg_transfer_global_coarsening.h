@@ -38,6 +38,60 @@ namespace internal
 
 
 /**
+ * Global coarsening utility functions.
+ */
+namespace MGTransferGlobalCoarseningTools
+{
+  /**
+   * Common polynomial coarsening sequences.
+   *
+   * @note These polynomial coarsening sequences up to a degree of 9 are
+   *   precompiled in MGTwoLevelTransfer. See also:
+   *   MGTwoLevelTransfer::fast_polynomial_transfer_supported()
+   */
+  enum class PolynomialCoarseningSequenceType
+  {
+    /**
+     * Half polynomial degree by integer division. For example, for degree=7
+     * the following sequence would be obtained:: 7 -> 3 -> 1
+     */
+    bisect,
+    /**
+     * Decrease the polynomial degree by one. E.g., for degree=7 following
+     * sequence would result: 7 -> 6 -> 5 -> 4 -> 3 -> 2 -> 1
+     */
+    decrease_by_one,
+    /**
+     * Decrease the polynomial degree to one. E.g., for degree=7 following
+     * sequence would result: 7 -> 1
+     */
+    go_to_one
+  };
+
+  /**
+   * For a given @p degree and polynomial coarsening sequence @p p_sequence,
+   * determine the next coarser degree.
+   */
+  unsigned int
+  create_next_polynomial_coarsening_degree(
+    const unsigned int                      degree,
+    const PolynomialCoarseningSequenceType &p_sequence);
+
+  /**
+   * For a given @p max_degree and polynomial coarsening sequence @p p_sequence,
+   * determine the full sequence of polynomial degrees, sorted in ascending
+   * order.
+   */
+  std::vector<unsigned int>
+  create_polynomial_coarsening_sequence(
+    const unsigned int                      max_degree,
+    const PolynomialCoarseningSequenceType &p_sequence);
+
+} // namespace MGTransferGlobalCoarseningTools
+
+
+
+/**
  * Class for transfer between two multigrid levels for p- or global coarsening.
  */
 template <int dim, typename VectorType>
