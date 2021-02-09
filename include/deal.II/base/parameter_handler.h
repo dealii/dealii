@@ -2345,7 +2345,7 @@ ParameterHandler::add_parameter(const std::string &          entry,
 
   auto action = [&, pattern_index](const std::string &val) {
     parameter = Patterns::Tools::Convert<ParameterType>::to_value(
-      val, patterns[pattern_index]);
+      val, *patterns[pattern_index]);
   };
   add_action(entry, action);
 }
