@@ -176,7 +176,7 @@ namespace GridTools
   double
   volume(const Triangulation<dim, spacedim> &tria,
          const Mapping<dim, spacedim> &      mapping =
-           (ReferenceCell::get_hypercube<dim>()
+           (ReferenceCells::get_hypercube<dim>()
               .template get_default_linear_mapping<dim, spacedim>()));
 
   /**
@@ -194,7 +194,7 @@ namespace GridTools
   minimal_cell_diameter(
     const Triangulation<dim, spacedim> &triangulation,
     const Mapping<dim, spacedim> &      mapping =
-      (ReferenceCell::get_hypercube<dim>()
+      (ReferenceCells::get_hypercube<dim>()
          .template get_default_linear_mapping<dim, spacedim>()));
 
   /**
@@ -212,7 +212,7 @@ namespace GridTools
   maximal_cell_diameter(
     const Triangulation<dim, spacedim> &triangulation,
     const Mapping<dim, spacedim> &      mapping =
-      (ReferenceCell::get_hypercube<dim>()
+      (ReferenceCells::get_hypercube<dim>()
          .template get_default_linear_mapping<dim, spacedim>()));
 
   /**
@@ -1044,7 +1044,7 @@ namespace GridTools
   extract_used_vertices(
     const Triangulation<dim, spacedim> &container,
     const Mapping<dim, spacedim> &      mapping =
-      (ReferenceCell::get_hypercube<dim>()
+      (ReferenceCells::get_hypercube<dim>()
          .template get_default_linear_mapping<dim, spacedim>()));
 
   /**
@@ -1872,7 +1872,7 @@ namespace GridTools
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
     const Point<spacedim> &                                            position,
     const Mapping<dim, spacedim> &                                     mapping =
-      (ReferenceCell::get_hypercube<dim>()
+      (ReferenceCells::get_hypercube<dim>()
          .template get_default_linear_mapping<dim, spacedim>()));
 
   /**
@@ -3272,7 +3272,7 @@ namespace GridTools
                 !cell->face(face)->at_boundary())
               {
                 Assert(cell->reference_cell() ==
-                         ReferenceCell::get_hypercube<dim>(),
+                         ReferenceCells::get_hypercube<dim>(),
                        ExcNotImplemented());
 
                 // this line has children
@@ -3292,7 +3292,7 @@ namespace GridTools
                 !cell->face(face)->at_boundary())
               {
                 Assert(cell->reference_cell() ==
-                         ReferenceCell::get_hypercube<dim>(),
+                         ReferenceCells::get_hypercube<dim>(),
                        ExcNotImplemented());
 
                 // this face has hanging nodes

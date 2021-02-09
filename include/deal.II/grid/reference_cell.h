@@ -81,24 +81,6 @@ class ReferenceCell
 {
 public:
   /**
-   * Return the correct simplex reference cell type for the given dimension
-   * `dim`. Depending on the template argument `dim`, this function returns a
-   * reference to either Vertex, Triangle, or Tetrahedron.
-   */
-  template <int dim>
-  static constexpr const ReferenceCell &
-  get_simplex();
-
-  /**
-   * Return the correct hypercube reference cell type for the given dimension
-   * `dim`. Depending on the template argument `dim`, this function returns a
-   * reference to either Vertex, Quadrilateral, or Hexahedron.
-   */
-  template <int dim>
-  static constexpr const ReferenceCell &
-  get_hypercube();
-
-  /**
    * Return the correct ReferenceCell for a given structural
    * dimension and number of vertices. For example, if `dim==2` and
    * `n_vertices==4`, this function will return `Quadrilateral`. But if `dim==3`
@@ -110,7 +92,8 @@ public:
   /**
    * Default constructor. Initialize this object as an invalid object.
    */
-  constexpr ReferenceCell();
+  DEAL_II_CONSTEXPR
+  ReferenceCell();
 
   /**
    * Return true if the object is a Vertex, Line, Quadrilateral, or Hexahedron.
@@ -297,12 +280,6 @@ private:
 
 
 
-inline constexpr ReferenceCell::ReferenceCell()
-  : ReferenceCell(static_cast<std::uint8_t>(-1))
-{}
-
-
-
 inline constexpr ReferenceCell::ReferenceCell(const std::uint8_t kind)
   : kind(kind)
 {}
@@ -381,7 +358,32 @@ namespace ReferenceCells
   DEAL_II_CONSTEXPR const ReferenceCell Invalid =
     internal::ReferenceCell::make_reference_cell_from_int(
       static_cast<std::uint8_t>(-1));
+
+  /**
+   * Return the correct simplex reference cell type for the given dimension
+   * `dim`. Depending on the template argument `dim`, this function returns a
+   * reference to either Vertex, Triangle, or Tetrahedron.
+   */
+  template <int dim>
+  constexpr const ReferenceCell &
+  get_simplex();
+
+  /**
+   * Return the correct hypercube reference cell type for the given dimension
+   * `dim`. Depending on the template argument `dim`, this function returns a
+   * reference to either Vertex, Quadrilateral, or Hexahedron.
+   */
+  template <int dim>
+  constexpr const ReferenceCell &
+  get_hypercube();
 } // namespace ReferenceCells
+
+
+
+inline DEAL_II_CONSTEXPR
+ReferenceCell::ReferenceCell()
+  : ReferenceCell(ReferenceCells::Invalid)
+{}
 
 
 
@@ -504,48 +506,50 @@ ReferenceCell::get_dimension() const
 
 
 
-template <int dim>
-inline constexpr const ReferenceCell &
-ReferenceCell::get_simplex()
+namespace ReferenceCells
 {
-  switch (dim)
-    {
-      case 0:
-        return ReferenceCells::Vertex;
-      case 1:
-        return ReferenceCells::Line;
-      case 2:
-        return ReferenceCells::Triangle;
-      case 3:
-        return ReferenceCells::Tetrahedron;
-      default:
-        Assert(false, ExcNotImplemented());
-        return ReferenceCells::Invalid;
-    }
-}
+  template <int dim>
+  inline constexpr const ReferenceCell &
+  get_simplex()
+  {
+    switch (dim)
+      {
+        case 0:
+          return ReferenceCells::Vertex;
+        case 1:
+          return ReferenceCells::Line;
+        case 2:
+          return ReferenceCells::Triangle;
+        case 3:
+          return ReferenceCells::Tetrahedron;
+        default:
+          Assert(false, ExcNotImplemented());
+          return ReferenceCells::Invalid;
+      }
+  }
 
 
 
-template <int dim>
-inline constexpr const ReferenceCell &
-ReferenceCell::get_hypercube()
-{
-  switch (dim)
-    {
-      case 0:
-        return ReferenceCells::Vertex;
-      case 1:
-        return ReferenceCells::Line;
-      case 2:
-        return ReferenceCells::Quadrilateral;
-      case 3:
-        return ReferenceCells::Hexahedron;
-      default:
-        Assert(false, ExcNotImplemented());
-        return ReferenceCells::Invalid;
-    }
-}
-
+  template <int dim>
+  inline constexpr const ReferenceCell &
+  get_hypercube()
+  {
+    switch (dim)
+      {
+        case 0:
+          return ReferenceCells::Vertex;
+        case 1:
+          return ReferenceCells::Line;
+        case 2:
+          return ReferenceCells::Quadrilateral;
+        case 3:
+          return ReferenceCells::Hexahedron;
+        default:
+          Assert(false, ExcNotImplemented());
+          return ReferenceCells::Invalid;
+      }
+  }
+} // namespace ReferenceCells
 
 
 inline ReferenceCell
@@ -596,7 +600,7 @@ ReferenceCell::d_linear_shape_function(const Point<dim> & xi,
                                        const unsigned int i) const
 {
   AssertDimension(dim, get_dimension());
-  if (*this == get_hypercube<dim>())
+  if (*this == ReferenceCells::get_hypercube<dim>())
     return GeometryInfo<dim>::d_linear_shape_function(xi, i);
 
   if (*this ==
@@ -690,7 +694,7 @@ ReferenceCell::d_linear_shape_function_gradient(const Point<dim> & xi,
                                                 const unsigned int i) const
 {
   AssertDimension(dim, get_dimension());
-  if (*this == get_hypercube<dim>())
+  if (*this == ReferenceCells::get_hypercube<dim>())
     return GeometryInfo<dim>::d_linear_shape_function_gradient(xi, i);
 
   if (*this ==
@@ -722,7 +726,7 @@ ReferenceCell::unit_tangential_vectors(const unsigned int face_no,
   AssertDimension(dim, get_dimension());
   AssertIndexRange(i, dim - 1);
 
-  if (*this == get_hypercube<dim>())
+  if (*this == ReferenceCells::get_hypercube<dim>())
     {
       AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
       return GeometryInfo<dim>::unit_tangential_vectors[face_no][i];

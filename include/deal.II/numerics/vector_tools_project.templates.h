@@ -183,7 +183,8 @@ namespace VectorTools
 
       Quadrature<dim> quadrature_mf;
 
-      if (dof.get_fe(0).reference_cell() == ReferenceCell::get_hypercube<dim>())
+      if (dof.get_fe(0).reference_cell() ==
+          ReferenceCells::get_hypercube<dim>())
         quadrature_mf = QGauss<dim>(dof.get_fe().degree + 2);
       else
         // TODO: since we have currently only implemented a handful quadrature

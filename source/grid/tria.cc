@@ -13539,7 +13539,7 @@ Triangulation<dim, spacedim>::all_reference_cells_are_hyper_cube() const
                     "cells used by this triangulation if the "
                     "triangulation doesn't yet have any cells in it."));
   return (this->reference_cells.size() == 1 &&
-          this->reference_cells[0] == ReferenceCell::get_hypercube<dim>());
+          this->reference_cells[0] == ReferenceCells::get_hypercube<dim>());
 }
 
 

@@ -897,7 +897,7 @@ FlatManifold<dim, spacedim>::normal_vector(
 
   const auto face_reference_cell = face->reference_cell();
 
-  if (face_reference_cell == ReferenceCell::get_hypercube<facedim>())
+  if (face_reference_cell == ReferenceCells::get_hypercube<facedim>())
     {
       for (unsigned int i = 0; i < facedim; ++i)
         xi[i] = 1. / 2;

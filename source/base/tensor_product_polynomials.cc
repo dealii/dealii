@@ -382,7 +382,7 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
       else
         for (indices[0] = 0; indices[0] < n_polynomials; ++indices[0], ++ind)
           {
-            unsigned int i = index_map_inverse[ind];
+            const unsigned int i = index_map_inverse[ind];
 
             if (update_values)
               {

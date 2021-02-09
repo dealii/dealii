@@ -317,7 +317,7 @@ namespace internal
           try
             {
               const dealii::ReferenceCell reference_cell =
-                dealii::ReferenceCell::get_simplex<dim>();
+                dealii::ReferenceCells::get_simplex<dim>();
 
               const auto quad_face  = get_face_quadrature(quad);
               this->n_q_points_face = quad_face.size();
