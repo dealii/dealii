@@ -1608,6 +1608,49 @@ namespace parallel
     }
 
 
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::load(
+      const typename dealii::internal::p4est::types<dim>::forest *forest)
+    {
+      if (parallel_ghost != nullptr)
+        {
+          dealii::internal::p4est::functions<dim>::ghost_destroy(
+            parallel_ghost);
+          parallel_ghost = nullptr;
+        }
+      dealii::internal::p4est::functions<dim>::destroy(parallel_forest);
+      parallel_forest = nullptr;
+
+      // note: we can keep the connectivity, since the coarse grid does not
+      // change
+
+      // create deep copy
+      typename dealii::internal::p4est::types<dim>::forest *temp =
+        const_cast<typename dealii::internal::p4est::types<dim>::forest *>(
+          forest);
+      parallel_forest =
+        dealii::internal::p4est::functions<dim>::copy_forest(temp, false);
+      parallel_forest->user_pointer = this;
+
+      try
+        {
+          copy_local_forest_to_triangulation();
+        }
+      catch (const typename Triangulation<dim>::DistortedCellList &)
+        {
+          // the underlying
+          // triangulation should not
+          // be checking for
+          // distorted cells
+          Assert(false, ExcInternalError());
+        }
+
+      this->update_periodic_face_map();
+      this->update_number_cache();
+    }
+
+
 
     template <int dim, int spacedim>
     unsigned int

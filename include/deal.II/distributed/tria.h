@@ -605,6 +605,14 @@ namespace parallel
            const bool         autopartition = true) override;
 
       /**
+       * Load the refinement information from a given parallel forest. This
+       * forest might be obtained from the function call to
+       * parallel::distributed::Triangulation::get_p4est();
+       */
+      void
+      load(const typename dealii::internal::p4est::types<dim>::forest *forest);
+
+      /**
        * Return a permutation vector for the order the coarse cells are handed
        * off to p4est. For example the value of the $i$th element in this
        * vector is the index of the deal.II coarse cell (counting from
