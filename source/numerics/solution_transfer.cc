@@ -15,6 +15,7 @@
 
 #include <deal.II/base/memory_consumption.h>
 
+#include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -92,6 +93,32 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::prepare_for_pure_refinement()
 
   clear();
 
+  // We need to access dof indices on the entire domain. For
+  // shared::Triangulations, ownership of cells might change. If they allow the
+  // use of artificial cells, we need to restore the true cell owners
+  // temporarily. We save the current set of subdomain ids, set subdomain ids to
+  // the "true" owner of each cell, and later restore these flags.
+  std::vector<types::subdomain_id> saved_subdomain_ids;
+  const parallel::shared::Triangulation<dim, DoFHandlerType::space_dimension>
+    *shared_tria =
+      (dynamic_cast<const parallel::shared::
+                      Triangulation<dim, DoFHandlerType::space_dimension> *>(
+        &dof_handler->get_triangulation()));
+  if (shared_tria != nullptr && shared_tria->with_artificial_cells())
+    {
+      saved_subdomain_ids.resize(shared_tria->n_active_cells());
+
+      const std::vector<types::subdomain_id> &true_subdomain_ids =
+        shared_tria->get_true_subdomain_ids_of_cells();
+
+      for (const auto &cell : shared_tria->active_cell_iterators())
+        {
+          const unsigned int index   = cell->active_cell_index();
+          saved_subdomain_ids[index] = cell->subdomain_id();
+          cell->set_subdomain_id(true_subdomain_ids[index]);
+        }
+    }
+
   const unsigned int n_active_cells =
     dof_handler->get_triangulation().n_active_cells();
   n_dofs_old = dof_handler->n_dofs();
@@ -115,6 +142,11 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::prepare_for_pure_refinement()
         Pointerstruct(&indices_on_cell[i], cell->active_fe_index());
     }
   prepared_for = pure_refinement;
+
+  // Undo the subdomain modification.
+  if (shared_tria != nullptr && shared_tria->with_artificial_cells())
+    for (const auto &cell : shared_tria->active_cell_iterators())
+      cell->set_subdomain_id(saved_subdomain_ids[cell->active_cell_index()]);
 }
 
 
@@ -132,6 +164,32 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::refine_interpolate(
   Assert(&in != &out,
          ExcMessage("Vectors cannot be used as input and output"
                     " at the same time!"));
+
+  // We need to access dof indices on the entire domain. For
+  // shared::Triangulations, ownership of cells might change. If they allow the
+  // use of artificial cells, we need to restore the true cell owners
+  // temporarily. We save the current set of subdomain ids, set subdomain ids to
+  // the "true" owner of each cell, and later restore these flags.
+  std::vector<types::subdomain_id> saved_subdomain_ids;
+  const parallel::shared::Triangulation<dim, DoFHandlerType::space_dimension>
+    *shared_tria =
+      (dynamic_cast<const parallel::shared::
+                      Triangulation<dim, DoFHandlerType::space_dimension> *>(
+        &dof_handler->get_triangulation()));
+  if (shared_tria != nullptr && shared_tria->with_artificial_cells())
+    {
+      saved_subdomain_ids.resize(shared_tria->n_active_cells());
+
+      const std::vector<types::subdomain_id> &true_subdomain_ids =
+        shared_tria->get_true_subdomain_ids_of_cells();
+
+      for (const auto &cell : shared_tria->active_cell_iterators())
+        {
+          const unsigned int index   = cell->active_cell_index();
+          saved_subdomain_ids[index] = cell->subdomain_id();
+          cell->set_subdomain_id(true_subdomain_ids[index]);
+        }
+    }
 
   Vector<typename VectorType::value_type> local_values(0);
 
@@ -171,6 +229,11 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::refine_interpolate(
                                                 this_fe_index);
         }
     }
+
+  // Undo the subdomain modification.
+  if (shared_tria != nullptr && shared_tria->with_artificial_cells())
+    for (const auto &cell : shared_tria->active_cell_iterators())
+      cell->set_subdomain_id(saved_subdomain_ids[cell->active_cell_index()]);
 }
 
 
@@ -273,6 +336,32 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
              ExcDimensionMismatch(all_in[i].size(), n_dofs_old));
     }
 #endif
+
+  // We need to access dof indices on the entire domain. For
+  // shared::Triangulations, ownership of cells might change. If they allow the
+  // use of artificial cells, we need to restore the true cell owners
+  // temporarily. We save the current set of subdomain ids, set subdomain ids to
+  // the "true" owner of each cell, and later restore these flags.
+  std::vector<types::subdomain_id> saved_subdomain_ids;
+  const parallel::shared::Triangulation<dim, DoFHandlerType::space_dimension>
+    *shared_tria =
+      (dynamic_cast<const parallel::shared::
+                      Triangulation<dim, DoFHandlerType::space_dimension> *>(
+        &dof_handler->get_triangulation()));
+  if (shared_tria != nullptr && shared_tria->with_artificial_cells())
+    {
+      saved_subdomain_ids.resize(shared_tria->n_active_cells());
+
+      const std::vector<types::subdomain_id> &true_subdomain_ids =
+        shared_tria->get_true_subdomain_ids_of_cells();
+
+      for (const auto &cell : shared_tria->active_cell_iterators())
+        {
+          const unsigned int index   = cell->active_cell_index();
+          saved_subdomain_ids[index] = cell->subdomain_id();
+          cell->set_subdomain_id(true_subdomain_ids[index]);
+        }
+    }
 
   // first count the number
   // of cells that will be coarsened
@@ -391,6 +480,11 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
   Assert(n_cf == n_coarsen_fathers, ExcInternalError());
 
   prepared_for = coarsening_and_refinement;
+
+  // Undo the subdomain modification.
+  if (shared_tria != nullptr && shared_tria->with_artificial_cells())
+    for (const auto &cell : shared_tria->active_cell_iterators())
+      cell->set_subdomain_id(saved_subdomain_ids[cell->active_cell_index()]);
 }
 
 
@@ -428,6 +522,32 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
              ExcMessage("Vectors cannot be used as input and output"
                         " at the same time!"));
 #endif
+
+  // We need to access dof indices on the entire domain. For
+  // shared::Triangulations, ownership of cells might change. If they allow the
+  // use of artificial cells, we need to restore the true cell owners
+  // temporarily. We save the current set of subdomain ids, set subdomain ids to
+  // the "true" owner of each cell, and later restore these flags.
+  std::vector<types::subdomain_id> saved_subdomain_ids;
+  const parallel::shared::Triangulation<dim, DoFHandlerType::space_dimension>
+    *shared_tria =
+      (dynamic_cast<const parallel::shared::
+                      Triangulation<dim, DoFHandlerType::space_dimension> *>(
+        &dof_handler->get_triangulation()));
+  if (shared_tria != nullptr && shared_tria->with_artificial_cells())
+    {
+      saved_subdomain_ids.resize(shared_tria->n_active_cells());
+
+      const std::vector<types::subdomain_id> &true_subdomain_ids =
+        shared_tria->get_true_subdomain_ids_of_cells();
+
+      for (const auto &cell : shared_tria->active_cell_iterators())
+        {
+          const unsigned int index   = cell->active_cell_index();
+          saved_subdomain_ids[index] = cell->subdomain_id();
+          cell->set_subdomain_id(true_subdomain_ids[index]);
+        }
+    }
 
   Vector<typename VectorType::value_type> local_values;
   std::vector<types::global_dof_index>    dofs;
@@ -534,6 +654,11 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
             Assert(false, ExcInternalError());
         }
     }
+
+  // Undo the subdomain modification.
+  if (shared_tria != nullptr && shared_tria->with_artificial_cells())
+    for (const auto &cell : shared_tria->active_cell_iterators())
+      cell->set_subdomain_id(saved_subdomain_ids[cell->active_cell_index()]);
 }
 
 
