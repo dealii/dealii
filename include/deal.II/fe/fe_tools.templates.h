@@ -235,9 +235,7 @@ namespace FETools
       // one, taking into account multiplicities, and other complications
       unsigned int total_index = 0;
       for (const unsigned int vertex_number :
-           dealii::internal::ReferenceCell::get_cell(
-             fes.front()->reference_cell())
-             .vertex_indices())
+           fes.front()->reference_cell().vertex_indices())
         {
           for (unsigned int base = 0; base < fes.size(); ++base)
             for (unsigned int m = 0; m < multiplicities[base]; ++m)
@@ -258,9 +256,7 @@ namespace FETools
 
       // 2. Lines
       for (const unsigned int line_number :
-           dealii::internal::ReferenceCell::get_cell(
-             fes.front()->reference_cell())
-             .line_indices())
+           fes.front()->reference_cell().line_indices())
         {
           for (unsigned int base = 0; base < fes.size(); ++base)
             for (unsigned int m = 0; m < multiplicities[base]; ++m)
@@ -426,9 +422,7 @@ namespace FETools
       // base elements, and other complications
       unsigned int total_index = 0;
       for (const unsigned int vertex_number :
-           dealii::internal::ReferenceCell::get_cell(
-             fes.front()->reference_cell())
-             .vertex_indices())
+           fes.front()->reference_cell().vertex_indices())
         {
           unsigned int comp_start = 0;
           for (unsigned int base = 0; base < fes.size(); ++base)
@@ -461,9 +455,7 @@ namespace FETools
 
       // 2. Lines
       for (const unsigned int line_number :
-           dealii::internal::ReferenceCell::get_cell(
-             fes.front()->reference_cell())
-             .line_indices())
+           fes.front()->reference_cell().line_indices())
         {
           unsigned int comp_start = 0;
           for (unsigned int base = 0; base < fes.size(); ++base)
@@ -669,8 +661,7 @@ namespace FETools
       // vertex, etc
       total_index = 0;
       for (const unsigned int vertex_number :
-           dealii::internal::ReferenceCell::get_cell(fe.reference_cell())
-             .vertex_indices())
+           fe.reference_cell().vertex_indices())
         {
           unsigned int comp_start = 0;
           for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
@@ -711,9 +702,7 @@ namespace FETools
         }
 
       // 2. Lines
-      for (const unsigned int line_number :
-           dealii::internal::ReferenceCell::get_cell(fe.reference_cell())
-             .line_indices())
+      for (const unsigned int line_number : fe.reference_cell().line_indices())
         {
           unsigned int comp_start = 0;
           for (unsigned int base = 0; base < fe.n_base_elements(); ++base)

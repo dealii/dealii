@@ -221,6 +221,13 @@ public:
   n_vertices() const;
 
   /**
+   * Return an object that can be thought of as an array containing all
+   * indices from zero to n_vertices().
+   */
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  vertex_indices() const;
+
+  /**
    * Return the number of lines that make up the reference
    * cell in question. A line is an "edge" (a one-dimensional
    * object) of the reference cell.
@@ -229,12 +236,26 @@ public:
   n_lines() const;
 
   /**
+   * Return an object that can be thought of as an array containing all
+   * indices from zero to n_lines().
+   */
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  line_indices() const;
+
+  /**
    * Return the number of faces that make up the reference
    * cell in question. A face is a `(dim-1)`-dimensional
    * object bounding the reference cell.
    */
   unsigned int
   n_faces() const;
+
+  /**
+   * Return an object that can be thought of as an array containing all
+   * indices from zero to n_faces().
+   */
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  face_indices() const;
 
   /**
    * Return the reference-cell type of face @p face_no of the current
@@ -676,6 +697,30 @@ ReferenceCell::n_faces() const
 
 
 
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+ReferenceCell::vertex_indices() const
+{
+  return {0U, n_vertices()};
+}
+
+
+
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+ReferenceCell::line_indices() const
+{
+  return {0U, n_lines()};
+}
+
+
+
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+ReferenceCell::face_indices() const
+{
+  return {0U, n_faces()};
+}
+
+
+
 inline ReferenceCell
 ReferenceCell::face_reference_cell(const unsigned int face_no) const
 {
@@ -1083,7 +1128,6 @@ namespace internal
         return 0;
       }
 
-    public:
       /**
        * Return an object that can be thought of as an array containing all
        * indices from zero to n_vertices().
@@ -1114,6 +1158,7 @@ namespace internal
         return {0U, n_faces()};
       }
 
+    public:
       /**
        * Standard decomposition of vertex index into face and face-vertex
        * index.
