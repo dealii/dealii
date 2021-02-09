@@ -537,7 +537,7 @@ namespace LinearAlgebra
       if (omit_zeroing_entries == false)
         this->operator=(Number());
       else
-        zero_out_ghosts();
+        zero_out_ghost_values();
     }
 
 
@@ -598,7 +598,7 @@ namespace LinearAlgebra
       if (omit_zeroing_entries == false)
         this->operator=(Number());
       else
-        zero_out_ghosts();
+        zero_out_ghost_values();
 
       // do not reallocate import_data directly, but only upon request. It
       // is only used as temporary storage for compress() and
@@ -846,7 +846,7 @@ namespace LinearAlgebra
       if (must_update_ghost_values)
         update_ghost_values();
       else
-        zero_out_ghosts();
+        zero_out_ghost_values();
       return *this;
     }
 
@@ -916,6 +916,15 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     void
     Vector<Number, MemorySpaceType>::zero_out_ghosts() const
+    {
+      this->zero_out_ghost_values();
+    }
+
+
+
+    template <typename Number, typename MemorySpaceType>
+    void
+    Vector<Number, MemorySpaceType>::zero_out_ghost_values() const
     {
       if (data.values != nullptr)
         std::fill_n(data.values.get() + partitioner->local_size(),
@@ -1420,7 +1429,7 @@ namespace LinearAlgebra
       // if we call Vector::operator=0, we want to zero out all the entries
       // plus ghosts.
       if (s == Number())
-        zero_out_ghosts();
+        zero_out_ghost_values();
 
       return *this;
     }

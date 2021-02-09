@@ -508,7 +508,7 @@ namespace Step48
     data_out.write_vtu_with_pvtu_record(
       "./", "solution", timestep_number, MPI_COMM_WORLD, 3);
 
-    solution.zero_out_ghosts();
+    solution.zero_out_ghost_values();
   }
 
 

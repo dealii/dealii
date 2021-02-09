@@ -134,7 +134,7 @@ namespace LinearAlgebra
      * This vector can take two different states with respect to ghost
      * elements:
      * <ul>
-     * <li> After creation and whenever zero_out_ghosts() is called (or
+     * <li> After creation and whenever zero_out_ghost_values() is called (or
      * <code>operator= (0.)</code>), the vector does only allow writing into
      * ghost elements but not reading from ghost elements.
      * <li> After a call to update_ghost_values(), the vector does not allow
@@ -515,7 +515,7 @@ namespace LinearAlgebra
        * operation. However, global reduction operations like norms or the
        * inner product will always ignore ghost elements in order to avoid
        * counting the ghost data more than once. To allow writing to ghost
-       * elements again, call zero_out_ghosts().
+       * elements again, call zero_out_ghost_values().
        *
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
@@ -605,9 +605,22 @@ namespace LinearAlgebra
        * After calling this method, read access to ghost elements of the
        * vector is forbidden and an exception is thrown. Only write access to
        * ghost elements is allowed in this state.
+       *
+       * @deprecated Use zero_out_ghost_values() instead.
+       */
+      DEAL_II_DEPRECATED_EARLY void
+      zero_out_ghosts() const;
+
+      /**
+       * This method zeros the entries on ghost dofs, but does not touch
+       * locally owned DoFs.
+       *
+       * After calling this method, read access to ghost elements of the
+       * vector is forbidden and an exception is thrown. Only write access to
+       * ghost elements is allowed in this state.
        */
       void
-      zero_out_ghosts() const;
+      zero_out_ghost_values() const;
 
       /**
        * Return whether the vector currently is in a state where ghost values

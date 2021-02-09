@@ -1892,8 +1892,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
         }
     }
 
-  this->vec_coarse.zero_out_ghosts(); // clear ghost values; else compress in
-                                      // do_restrict_add does not work
+  this->vec_coarse.zero_out_ghost_values(); // clear ghost values; else compress
+                                            // in do_restrict_add does not work
 
   if (schemes.size() > 0 && schemes.front().fine_element_is_continuous)
     this->vec_fine.compress(VectorOperation::add);

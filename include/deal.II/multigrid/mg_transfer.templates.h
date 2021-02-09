@@ -531,7 +531,7 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_from_mg(
       // In this case, we can simply copy the local range. To avoid having
       // stray data in ghost entries of the destination, make sure to clear
       // them here.
-      dst.zero_out_ghosts();
+      dst.zero_out_ghost_values();
       AssertDimension(src[src.max_level()].local_size(), dst.local_size());
       dst.copy_locally_owned_data_from(src[src.max_level()]);
       return;
@@ -544,7 +544,7 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_from_mg(
       Assert(copy_indices_global_mine.back().empty(), ExcInternalError());
       const LinearAlgebra::distributed::Vector<Number> &src_level =
         src[src.max_level()];
-      dst.zero_out_ghosts();
+      dst.zero_out_ghost_values();
       for (unsigned int i = 0; i < copy_indices.back().n_cols(); ++i)
         dst.local_element(i) =
           src_level.local_element(copy_indices.back()(1, i));
@@ -602,7 +602,7 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
   // attention, since they belong to the coarse level, but have fine level
   // basis functions
 
-  dst.zero_out_ghosts();
+  dst.zero_out_ghost_values();
   for (unsigned int level = src.min_level(); level <= src.max_level(); ++level)
     {
       // the ghosted vector should already have the correct local size (but
