@@ -401,6 +401,9 @@ namespace internal
       p4est_init_t            init_fn,
       void *                  user_pointer) = p4est_new_ext;
 
+    types<2>::forest *(&functions<2>::copy_forest)(types<2>::forest *input,
+                                                   int copy_data) = p4est_copy;
+
     void (&functions<2>::destroy)(types<2>::forest *p4est) = p4est_destroy;
 
     void (&functions<2>::refine)(types<2>::forest *p4est,
@@ -587,6 +590,9 @@ namespace internal
       std::size_t             data_size,
       p8est_init_t            init_fn,
       void *                  user_pointer) = p8est_new_ext;
+
+    types<3>::forest *(&functions<3>::copy_forest)(types<3>::forest *input,
+                                                   int copy_data) = p8est_copy;
 
     void (&functions<3>::destroy)(types<3>::forest *p8est) = p8est_destroy;
 
