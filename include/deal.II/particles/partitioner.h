@@ -99,14 +99,18 @@ namespace Particles
         ghost_particles_iterators;
 
       /**
-       * Vector of char that is used to organize the particle information to be
-       * sent to other processors
+       * Temporary storage that holds the data of the particles to be sent
+       * to other processors to update the ghost particles information
+       * in update_ghost_particles()
+       * send_recv_particles_properties_and_location()
        */
       std::vector<char> send_data;
 
       /**
-       * Vector of char that is used to organize the particle information to
-       * received from other processors
+       * Temporary storage that holds the data of the particles to receive
+       * the ghost particles information from other processors in
+       * in update_ghost_particles()
+       * send_recv_particles_properties_and_location()
        */
       std::vector<char> recv_data;
     };
