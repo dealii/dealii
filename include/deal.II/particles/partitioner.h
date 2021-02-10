@@ -97,6 +97,22 @@ namespace Particles
       std::vector<typename std::multimap<internal::LevelInd,
                                          Particle<dim, spacedim>>::iterator>
         ghost_particles_iterators;
+
+      /**
+       * Temporary storage that holds the data of the particles to be sent
+       * to other processors to update the ghost particles information
+       * in update_ghost_particles()
+       * send_recv_particles_properties_and_location()
+       */
+      std::vector<char> send_data;
+
+      /**
+       * Temporary storage that holds the data of the particles to receive
+       * the ghost particles information from other processors in
+       * in update_ghost_particles()
+       * send_recv_particles_properties_and_location()
+       */
+      std::vector<char> recv_data;
     };
   } // namespace internal
 
