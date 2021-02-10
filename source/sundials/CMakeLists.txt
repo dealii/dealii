@@ -21,6 +21,7 @@ SET(_src
   copy.cc
   kinsol.cc
   n_vector.cc
+  sunlinsol_wrapper.cc
   )
 
 SET(_inst
