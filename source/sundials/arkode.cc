@@ -36,6 +36,7 @@
 #  endif
 
 #  include <deal.II/sundials/n_vector.h>
+#  include <deal.II/sundials/sunlinsol_wrapper.h>
 
 #  if DEAL_II_SUNDIALS_VERSION_LT(4, 0, 0)
 #    include <arkode/arkode_impl.h>
@@ -371,166 +372,10 @@ namespace SUNDIALS
 
       return solver.mass_preconditioner_setup(t);
     }
-
-
-
-    /**
-     * storage for internal content of the linear solver wrapper
-     */
-    template <typename VectorType>
-    struct LinearSolverContent
-    {
-      ATimesFn a_times_fn;
-      PSetupFn preconditioner_setup;
-      PSolveFn preconditioner_solve;
-
-      LinearSolveFunction<VectorType> lsolve;
-
-      void *P_data;
-      void *A_data;
-    };
-
-
-
-    /**
-     * Access our LinearSolverContent from the generic content of the
-     * SUNLinearSolver @p ls.
-     */
-    template <typename VectorType>
-    LinearSolverContent<VectorType> *
-    access_content(SUNLinearSolver ls)
-    {
-      Assert(ls->content != nullptr, ExcInternalError());
-      return static_cast<LinearSolverContent<VectorType> *>(ls->content);
-    }
-
-
-
-    SUNLinearSolver_Type arkode_linsol_get_type(SUNLinearSolver)
-    {
-      return SUNLINEARSOLVER_ITERATIVE;
-    }
-
-
-
-    template <typename VectorType>
-    int
-    arkode_linsol_solve(SUNLinearSolver LS,
-                        SUNMatrix,
-                        N_Vector x,
-                        N_Vector b,
-                        realtype tol)
-    {
-      auto content = access_content<VectorType>(LS);
-
-      auto *src_b = internal::unwrap_nvector_const<VectorType>(b);
-      auto *dst_x = internal::unwrap_nvector<VectorType>(x);
-
-      SundialsOperator<VectorType> op(content->A_data, content->a_times_fn);
-
-      SundialsPreconditioner<VectorType> preconditioner(
-        content->P_data, content->preconditioner_solve, tol);
-
-      return content->lsolve(op, preconditioner, *dst_x, *src_b, tol);
-    }
-
-
-
-    template <typename VectorType>
-    int
-    arkode_linsol_setup(SUNLinearSolver LS, SUNMatrix)
-    {
-      auto content = access_content<VectorType>(LS);
-      if (content->preconditioner_setup)
-        return content->preconditioner_setup(content->P_data);
-      return 0;
-    }
-
-
-
-    template <typename VectorType>
-    int arkode_linsol_initialize(SUNLinearSolver)
-    {
-      // this method is currently only provided because SUNDIALS 4.0.0 requires
-      // it - no user-set action is implemented so far
-      return 0;
-    }
-
-
-
-    template <typename VectorType>
-    int
-    arkode_linsol_set_a_times(SUNLinearSolver LS, void *A_data, ATimesFn ATimes)
-    {
-      auto content        = access_content<VectorType>(LS);
-      content->A_data     = A_data;
-      content->a_times_fn = ATimes;
-      return 0;
-    }
-
-
-
-    template <typename VectorType>
-    int
-    arkode_linsol_set_preconditioner(SUNLinearSolver LS,
-                                     void *          P_data,
-                                     PSetupFn        p_setup,
-                                     PSolveFn        p_solve)
-    {
-      auto content                  = access_content<VectorType>(LS);
-      content->P_data               = P_data;
-      content->preconditioner_setup = p_setup;
-      content->preconditioner_solve = p_solve;
-      return 0;
-    }
 #  endif
 
   } // namespace
 
-#  if DEAL_II_SUNDIALS_VERSION_GTE(4, 0, 0)
-
-  /*!
-   * Attach wrapper functions to SUNDIALS' linear solver interface. We pretend
-   * that the user-supplied linear solver is matrix-free, even though it can
-   * be matrix-based. This way SUNDIALS does not need to understand our matrix
-   * types.
-   */
-  template <typename VectorType>
-  class SundialsLinearSolverWrapper
-  {
-  public:
-    SundialsLinearSolverWrapper(LinearSolveFunction<VectorType> lsolve)
-    {
-      sun_linear_solver                  = SUNLinSolNewEmpty();
-      sun_linear_solver->ops->gettype    = arkode_linsol_get_type;
-      sun_linear_solver->ops->solve      = arkode_linsol_solve<VectorType>;
-      sun_linear_solver->ops->setup      = arkode_linsol_setup<VectorType>;
-      sun_linear_solver->ops->initialize = arkode_linsol_initialize<VectorType>;
-      sun_linear_solver->ops->setatimes = arkode_linsol_set_a_times<VectorType>;
-      sun_linear_solver->ops->setpreconditioner =
-        arkode_linsol_set_preconditioner<VectorType>;
-
-      content.lsolve             = lsolve;
-      sun_linear_solver->content = &content;
-    }
-
-    ~SundialsLinearSolverWrapper()
-    {
-      SUNLinSolFreeEmpty(sun_linear_solver);
-    }
-
-    SUNLinearSolver
-    get_wrapped_solver()
-    {
-      return sun_linear_solver;
-    }
-
-  private:
-    SUNLinearSolver                 sun_linear_solver;
-    LinearSolverContent<VectorType> content;
-  };
-
-#  endif
 
   template <typename VectorType>
   ARKode<VectorType>::ARKode(const AdditionalData &data,
@@ -804,9 +649,9 @@ namespace SUNDIALS
         if (solve_linearized_system)
           {
             linear_solver =
-              std::make_unique<SundialsLinearSolverWrapper<VectorType>>(
+              std::make_unique<internal::LinearSolverWrapper<VectorType>>(
                 solve_linearized_system);
-            sun_linear_solver = linear_solver->get_wrapped_solver();
+            sun_linear_solver = *linear_solver;
           }
         else
           {
@@ -875,9 +720,9 @@ namespace SUNDIALS
         if (solve_mass)
           {
             mass_solver =
-              std::make_unique<SundialsLinearSolverWrapper<VectorType>>(
+              std::make_unique<internal::LinearSolverWrapper<VectorType>>(
                 solve_mass);
-            sun_mass_linear_solver = mass_solver->get_wrapped_solver();
+            sun_mass_linear_solver = *mass_solver;
           }
         else
           {
@@ -940,89 +785,11 @@ namespace SUNDIALS
     return arkode_mem;
   }
 
-#  if DEAL_II_SUNDIALS_VERSION_GTE(4, 0, 0)
-
-  template <typename VectorType>
-  SundialsOperator<VectorType>::SundialsOperator(void *   A_data,
-                                                 ATimesFn a_times_fn)
-    : A_data(A_data)
-    , a_times_fn(a_times_fn)
-
-  {
-    Assert(a_times_fn != nullptr, ExcInternalError());
-  }
-
-
-
-  template <typename VectorType>
-  void
-  SundialsOperator<VectorType>::vmult(VectorType &      dst,
-                                      const VectorType &src) const
-  {
-    auto sun_dst = internal::make_nvector_view(dst);
-    auto sun_src = internal::make_nvector_view(src);
-    int  status  = a_times_fn(A_data, sun_src, sun_dst);
-    (void)status;
-    AssertARKode(status);
-  }
-
-
-
-  template <typename VectorType>
-  SundialsPreconditioner<VectorType>::SundialsPreconditioner(
-    void *   P_data,
-    PSolveFn p_solve_fn,
-    double   tol)
-    : P_data(P_data)
-    , p_solve_fn(p_solve_fn)
-    , tol(tol)
-  {}
-
-
-
-  template <typename VectorType>
-  void
-  SundialsPreconditioner<VectorType>::vmult(VectorType &      dst,
-                                            const VectorType &src) const
-  {
-    // apply identity preconditioner if nothing else specified
-    if (!p_solve_fn)
-      {
-        dst = src;
-        return;
-      }
-
-    auto sun_dst = internal::make_nvector_view(dst);
-    auto sun_src = internal::make_nvector_view(src);
-    // for custom preconditioners no distinction between left and right
-    // preconditioning is made
-    int status =
-      p_solve_fn(P_data, sun_src, sun_dst, tol, 0 /*precondition_type*/);
-    (void)status;
-    AssertARKode(status);
-  }
-#  endif
-
   template class ARKode<Vector<double>>;
   template class ARKode<BlockVector<double>>;
 
   template class ARKode<LinearAlgebra::distributed::Vector<double>>;
   template class ARKode<LinearAlgebra::distributed::BlockVector<double>>;
-
-#  if DEAL_II_SUNDIALS_VERSION_GTE(4, 0, 0)
-  template struct SundialsOperator<Vector<double>>;
-  template struct SundialsOperator<BlockVector<double>>;
-  template struct SundialsOperator<LinearAlgebra::distributed::Vector<double>>;
-  template struct SundialsOperator<
-    LinearAlgebra::distributed::BlockVector<double>>;
-
-  template struct SundialsPreconditioner<Vector<double>>;
-  template struct SundialsPreconditioner<BlockVector<double>>;
-  template struct SundialsPreconditioner<
-    LinearAlgebra::distributed::Vector<double>>;
-  template struct SundialsPreconditioner<
-    LinearAlgebra::distributed::BlockVector<double>>;
-#  endif
 
 #  ifdef DEAL_II_WITH_MPI
 
@@ -1030,27 +797,12 @@ namespace SUNDIALS
   template class ARKode<TrilinosWrappers::MPI::Vector>;
   template class ARKode<TrilinosWrappers::MPI::BlockVector>;
 
-#      if DEAL_II_SUNDIALS_VERSION_GTE(4, 0, 0)
-  template struct SundialsOperator<TrilinosWrappers::MPI::Vector>;
-  template struct SundialsOperator<TrilinosWrappers::MPI::BlockVector>;
-
-  template struct SundialsPreconditioner<TrilinosWrappers::MPI::Vector>;
-  template struct SundialsPreconditioner<TrilinosWrappers::MPI::BlockVector>;
-#      endif
 #    endif // DEAL_II_WITH_TRILINOS
 
 #    ifdef DEAL_II_WITH_PETSC
 #      ifndef PETSC_USE_COMPLEX
   template class ARKode<PETScWrappers::MPI::Vector>;
   template class ARKode<PETScWrappers::MPI::BlockVector>;
-
-#        if DEAL_II_SUNDIALS_VERSION_GTE(4, 0, 0)
-  template struct SundialsOperator<PETScWrappers::MPI::Vector>;
-  template struct SundialsOperator<PETScWrappers::MPI::BlockVector>;
-
-  template struct SundialsPreconditioner<PETScWrappers::MPI::Vector>;
-  template struct SundialsPreconditioner<PETScWrappers::MPI::BlockVector>;
-#        endif
 #      endif // PETSC_USE_COMPLEX
 #    endif   // DEAL_II_WITH_PETSC
 
