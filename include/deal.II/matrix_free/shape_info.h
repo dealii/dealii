@@ -421,6 +421,12 @@ namespace internal
       unsigned int n_q_points_face;
 
       /**
+       * Stores the number of quadrature points of a face in @p dim dimensions
+       * for simplex, wedge and pyramid reference cells.
+       */
+      std::vector<unsigned int> n_q_points_faces;
+
+      /**
        * Stores the number of DoFs per face in @p dim dimensions.
        */
       unsigned int dofs_per_component_on_face;

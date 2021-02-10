@@ -314,64 +314,97 @@ namespace internal
                                   q] = grad[d];
               }
 
-          try
-            {
-              const dealii::ReferenceCell reference_cell =
-                dealii::ReferenceCells::get_simplex<dim>();
+          {
+            const auto reference_cell_type = fe.reference_cell();
 
-              const auto quad_face  = get_face_quadrature(quad);
-              this->n_q_points_face = quad_face.size();
+            const auto  temp      = get_face_quadrature_collection(quad, false);
+            const auto &quad_face = temp.second;
 
-              const unsigned int n_face_orientations = dim == 2 ? 2 : 6;
-              const unsigned int n_faces =
-                dealii::internal::ReferenceCell::get_cell(reference_cell)
-                  .n_faces();
+            if (reference_cell_type != temp.first)
+              {
+                // TODO: this might happen if the quadrature rule and the
+                // the FE do not match
+                this->n_q_points_face = 0;
+              }
+            else
+              {
+                this->n_q_points_face = quad_face[0].size();
 
-              const auto projected_quad_face =
-                QProjector<dim>::project_to_all_faces(reference_cell,
-                                                      quad_face);
+                n_q_points_faces.resize(quad_face.size());
+                for (unsigned int i = 0; i < quad_face.size(); ++i)
+                  n_q_points_faces[i] = quad_face[i].size();
 
-              shape_values_face.reinit(
-                {n_faces, n_face_orientations, n_dofs * n_q_points_face});
+                unsigned int n_q_points_face_max = 0;
 
-              shape_gradients_face.reinit(
-                {n_faces, n_face_orientations, dim, n_dofs * n_q_points_face});
+                for (unsigned int i = 0; i < quad_face.size(); ++i)
+                  n_q_points_face_max =
+                    std::max(n_q_points_face_max, quad_face[i].size());
 
-              for (unsigned int f = 0; f < n_faces; ++f)
-                for (unsigned int o = 0; o < n_face_orientations; ++o)
+                unsigned int n_max_vertices = 0;
+
+                for (unsigned int face_no = 0; face_no < quad_face.size();
+                     ++face_no)
+                  n_max_vertices = std::max(n_max_vertices,
+                                            internal::ReferenceCell::get_face(
+                                              reference_cell_type, face_no)
+                                              .n_vertices());
+
+                const auto projected_quad_face =
+                  QProjector<dim>::project_to_all_faces(reference_cell_type,
+                                                        quad_face);
+
+                const unsigned int n_max_face_orientations =
+                  dim == 2 ? 2 : (2 * n_max_vertices);
+
+                shape_values_face.reinit({quad_face.size(),
+                                          n_max_face_orientations,
+                                          n_dofs * n_q_points_face_max});
+
+                shape_gradients_face.reinit({quad_face.size(),
+                                             n_max_face_orientations,
+                                             dim,
+                                             n_dofs * n_q_points_face_max});
+
+                for (unsigned int f = 0; f < quad_face.size(); ++f)
                   {
-                    const auto offset =
-                      QProjector<dim>::DataSetDescriptor::face(
-                        reference_cell,
-                        f,
-                        (o ^ 1) & 1,  // face_orientation
-                        (o >> 1) & 1, // face_flip
-                        (o >> 2) & 1, // face_rotation
-                        n_q_points_face);
+                    const unsigned int n_face_orientations =
+                      dim == 2 ? 2 :
+                                 (2 * internal::ReferenceCell::get_face(
+                                        reference_cell_type, f)
+                                        .n_vertices());
 
-                    for (unsigned int i = 0; i < n_dofs; ++i)
-                      for (unsigned int q = 0; q < n_q_points_face; ++q)
-                        {
-                          const auto point =
-                            projected_quad_face.point(q + offset);
+                    const unsigned int n_q_points_face = quad_face[f].size();
 
-                          shape_values_face(f, o, i * n_q_points_face + q) =
-                            fe.shape_value(i, point);
+                    for (unsigned int o = 0; o < n_face_orientations; ++o)
+                      {
+                        const auto offset =
+                          QProjector<dim>::DataSetDescriptor::face(
+                            reference_cell_type,
+                            f,
+                            (o ^ 1) & 1,  // face_orientation
+                            (o >> 1) & 1, // face_flip
+                            (o >> 2) & 1, // face_rotation
+                            quad_face);
 
-                          const auto grad = fe.shape_grad(i, point);
+                        for (unsigned int i = 0; i < n_dofs; ++i)
+                          for (unsigned int q = 0; q < n_q_points_face; ++q)
+                            {
+                              const auto point =
+                                projected_quad_face.point(q + offset);
 
-                          for (int d = 0; d < dim; ++d)
-                            shape_gradients_face(
-                              f, o, d, i * n_q_points_face + q) = grad[d];
-                        }
+                              shape_values_face(f, o, i * n_q_points_face + q) =
+                                fe.shape_value(i, point);
+
+                              const auto grad = fe.shape_grad(i, point);
+
+                              for (int d = 0; d < dim; ++d)
+                                shape_gradients_face(
+                                  f, o, d, i * n_q_points_face + q) = grad[d];
+                            }
+                      }
                   }
-            }
-          catch (...)
-            {
-              // TODO: this might happen if the quadrature rule and the
-              // the FE do not match
-              this->n_q_points_face = 0;
-            }
+              }
+          }
 
           // TODO: also fill shape_hessians, inverse_shape_values,
           //   shape_data_on_face, quadrature_data_on_face,
