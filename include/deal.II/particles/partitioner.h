@@ -97,6 +97,18 @@ namespace Particles
       std::vector<typename std::multimap<internal::LevelInd,
                                          Particle<dim, spacedim>>::iterator>
         ghost_particles_iterators;
+
+      /**
+       * Vector of char that is used to organize the particle information to be
+       * sent to other processors
+       */
+      std::vector<char> send_data;
+
+      /**
+       * Vector of char that is used to organize the particle information to
+       * received from other processors
+       */
+      std::vector<char> recv_data;
     };
   } // namespace internal
 

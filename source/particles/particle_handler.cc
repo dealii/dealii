@@ -1521,6 +1521,11 @@ namespace Particles
             n_recv_data[i] * individual_particle_data_size;
 
         ghost_particles_cache.neighbors = neighbors;
+
+        ghost_particles_cache.send_data.resize(
+          ghost_particles_cache.send_pointers.back());
+        ghost_particles_cache.recv_data.resize(
+          ghost_particles_cache.recv_pointers.back());
       }
 
     while (reinterpret_cast<std::size_t>(recv_data_it) -
@@ -1580,13 +1585,11 @@ namespace Particles
       ExcMessage(
         "This function is only implemented for parallel::TriangulationBase objects."));
 
-    std::vector<char> send_data;
+    std::vector<char> &send_data = ghost_particles_cache.send_data;
 
     // Fill data to send
     if (send_pointers.back() > 0)
       {
-        // Allocate space for sending particle data
-        send_data.resize(send_pointers.back());
         void *data = static_cast<void *>(&send_data.front());
 
         // Serialize the data sorted by receiving process
@@ -1599,8 +1602,7 @@ namespace Particles
             }
       }
 
-    // Set up the space for the received particle data
-    std::vector<char> recv_data(recv_pointers.back());
+    std::vector<char> &recv_data = ghost_particles_cache.recv_data;
 
     // Exchange the particle data between domains
     {
