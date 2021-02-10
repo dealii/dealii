@@ -314,32 +314,26 @@ private:
  * one of these element, as well as, systems with different elements or other
  * elements are currently not implemented.
  */
-template <typename MatrixType, typename VectorType>
+template <int dim, typename VectorType>
 class MGTransferGlobalCoarsening : public dealii::MGTransferBase<VectorType>
 {
 public:
-  static_assert(std::is_same<typename MatrixType::value_type,
-                             typename VectorType::value_type>::value,
-                "Types do not match.");
-
-  /**
-   * Dimension.
-   */
-  static const int dim = MatrixType::dim;
-
   /**
    * Value type.
    */
-  using Number = typename MatrixType::value_type;
+  using Number = typename VectorType::value_type;
 
   /**
-   * Constructor taking an operator for each level (minimum requirement is
-   * that the operator provides the function initialize_dof_vector()) and
-   * transfer operators (with the coarsest level kept empty in @p transfer).
+   * Constructor taking a collection of transfer operators (with the coarsest
+   * level kept
+   * empty in @p transfer) and an optional function that initializes the
+   * internal level vectors within the function call copy_to_mg() if used in the
+   * context of PreconditionMG.
    */
   MGTransferGlobalCoarsening(
-    const MGLevelObject<MatrixType> &                         matrices,
-    const MGLevelObject<MGTwoLevelTransfer<dim, VectorType>> &transfer);
+    const MGLevelObject<MGTwoLevelTransfer<dim, VectorType>> &transfer,
+    const std::function<void(const unsigned int, VectorType &)>
+      &initialize_dof_vector = {});
 
   /**
    * Perform prolongation.
@@ -382,8 +376,16 @@ public:
                const MGLevelObject<VectorType> &src) const;
 
 private:
-  const MGLevelObject<MatrixType> &                         matrices;
+  /**
+   * Collection of the two-level transfer operators.
+   */
   const MGLevelObject<MGTwoLevelTransfer<dim, VectorType>> &transfer;
+
+  /**
+   * Function to initialize internal level vectors.
+   */
+  const std::function<void(const unsigned int, VectorType &)>
+    initialize_dof_vector;
 };
 
 
@@ -435,22 +437,20 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <typename MatrixType, typename VectorType>
-MGTransferGlobalCoarsening<MatrixType, VectorType>::MGTransferGlobalCoarsening(
-  const MGLevelObject<MatrixType> &                         matrices,
-  const MGLevelObject<MGTwoLevelTransfer<dim, VectorType>> &transfer)
-  : matrices(matrices)
-  , transfer(transfer)
-{
-  AssertDimension(matrices.max_level() - matrices.min_level(),
-                  transfer.max_level() - transfer.min_level());
-}
+template <int dim, typename VectorType>
+MGTransferGlobalCoarsening<dim, VectorType>::MGTransferGlobalCoarsening(
+  const MGLevelObject<MGTwoLevelTransfer<dim, VectorType>> &transfer,
+  const std::function<void(const unsigned int, VectorType &)>
+    &initialize_dof_vector)
+  : transfer(transfer)
+  , initialize_dof_vector(initialize_dof_vector)
+{}
 
 
 
-template <typename MatrixType, typename VectorType>
+template <int dim, typename VectorType>
 void
-MGTransferGlobalCoarsening<MatrixType, VectorType>::prolongate(
+MGTransferGlobalCoarsening<dim, VectorType>::prolongate(
   const unsigned int to_level,
   VectorType &       dst,
   const VectorType & src) const
@@ -460,9 +460,9 @@ MGTransferGlobalCoarsening<MatrixType, VectorType>::prolongate(
 
 
 
-template <typename MatrixType, typename VectorType>
+template <int dim, typename VectorType>
 void
-MGTransferGlobalCoarsening<MatrixType, VectorType>::restrict_and_add(
+MGTransferGlobalCoarsening<dim, VectorType>::restrict_and_add(
   const unsigned int from_level,
   VectorType &       dst,
   const VectorType & src) const
@@ -472,10 +472,10 @@ MGTransferGlobalCoarsening<MatrixType, VectorType>::restrict_and_add(
 
 
 
-template <typename MatrixType, typename VectorType>
+template <int dim, typename VectorType>
 template <class InVector, int spacedim>
 void
-MGTransferGlobalCoarsening<MatrixType, VectorType>::copy_to_mg(
+MGTransferGlobalCoarsening<dim, VectorType>::copy_to_mg(
   const DoFHandler<dim, spacedim> &dof_handler,
   MGLevelObject<VectorType> &      dst,
   const InVector &                 src) const
@@ -483,17 +483,17 @@ MGTransferGlobalCoarsening<MatrixType, VectorType>::copy_to_mg(
   (void)dof_handler;
 
   for (unsigned int level = dst.min_level(); level <= dst.max_level(); ++level)
-    matrices[level].initialize_dof_vector(dst[level]);
+    initialize_dof_vector(level, dst[level]);
 
   dst[dst.max_level()].copy_locally_owned_data_from(src);
 }
 
 
 
-template <typename MatrixType, typename VectorType>
+template <int dim, typename VectorType>
 template <class OutVector, int spacedim>
 void
-MGTransferGlobalCoarsening<MatrixType, VectorType>::copy_from_mg(
+MGTransferGlobalCoarsening<dim, VectorType>::copy_from_mg(
   const DoFHandler<dim, spacedim> &dof_handler,
   OutVector &                      dst,
   const MGLevelObject<VectorType> &src) const
