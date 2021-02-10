@@ -132,7 +132,8 @@ public:
                             MemorySpaceType> &view);
 
   /**
-   * A constructor that automatically creates a view from a value_type object.
+   * A constructor that automatically creates a view from a single value_type
+   * object. The view so created then has length one.
    */
   explicit ArrayView(value_type &element);
 
@@ -168,6 +169,23 @@ public:
    *   such as <code>ArrayView@<double@></code>.
    */
   ArrayView(std::vector<typename std::remove_cv<value_type>::type> &vector);
+
+  /**
+   * A constructor that automatically creates a view for a given C-style array.
+   * This constructor can be used as follows:
+   * @code
+   *   ArrayView<int>
+   *   get_data_table ()
+   *   {
+   *     const int my_data[7] = { 1, 1, 2, 3, 5, 8, 13 };
+   *     return {my_data};
+   *   }
+   * @endcode
+   * The object so returned is then a view of the array, with the size 7
+   * correctly deduced.
+   */
+  template <std::size_t N>
+  ArrayView(value_type (&array)[N]);
 
   /**
    * A constructor that automatically creates a view from a std::array object.
@@ -469,6 +487,15 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
                 "only create an ArrayView to const values from a const "
                 "std::array.");
 }
+
+
+
+template <typename ElementType, typename MemorySpaceType>
+template <std::size_t N>
+inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
+  ElementType (&array)[N])
+  : ArrayView(&array[0], N)
+{}
 
 
 
