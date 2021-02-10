@@ -624,7 +624,7 @@ namespace internal
           accessor.reference_cell().standard_line_to_face_and_line_index(i);
         const auto quad_index = pair[0];
         const auto line_index =
-          accessor.reference_cell_info().standard_to_real_face_line(
+          accessor.reference_cell().standard_to_real_face_line(
             pair[1], pair[0], face_orientation_raw(accessor, quad_index));
 
         return accessor.quad(quad_index)->line_index(line_index);
@@ -836,7 +836,7 @@ namespace internal
           accessor.reference_cell().standard_line_to_face_and_line_index(line);
         const auto quad_index = pair[0];
         const auto line_index =
-          accessor.reference_cell_info().standard_to_real_face_line(
+          accessor.reference_cell().standard_to_real_face_line(
             pair[1], pair[0], face_orientation_raw(accessor, quad_index));
 
         return accessor.reference_cell_info().combine_face_and_line_orientation(
@@ -1022,7 +1022,7 @@ namespace internal
             corner);
         const auto line_index = pair[0];
         const auto vertex_index =
-          accessor.reference_cell_info().standard_to_real_face_vertex(
+          accessor.reference_cell().standard_to_real_face_vertex(
             pair[1], pair[0], accessor.line_orientation(line_index));
 
         return accessor.line(line_index)->vertex_index(vertex_index);
@@ -1039,7 +1039,7 @@ namespace internal
             corner);
         const auto face_index = pair[0];
         const auto vertex_index =
-          accessor.reference_cell_info().standard_to_real_face_vertex(
+          accessor.reference_cell().standard_to_real_face_vertex(
             pair[1], pair[0], face_orientation_raw(accessor, face_index));
 
         return accessor.quad(face_index)->vertex_index(vertex_index);
