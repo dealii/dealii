@@ -454,19 +454,20 @@ namespace Simplex
   template <int dim, int spacedim>
   void
   FE_Poly<dim, spacedim>::get_face_interpolation_matrix(
-    const FiniteElement<dim, spacedim> &x_source_fe,
+    const FiniteElement<dim, spacedim> &source_fe,
     FullMatrix<double> &                interpolation_matrix,
     const unsigned int                  face_no) const
   {
-    Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(face_no),
+    Assert(interpolation_matrix.m() == source_fe.n_dofs_per_face(face_no),
            ExcDimensionMismatch(interpolation_matrix.m(),
-                                x_source_fe.n_dofs_per_face(face_no)));
+                                source_fe.n_dofs_per_face(face_no)));
 
-    if (const FE_Poly<dim, spacedim> *source_fe =
-          dynamic_cast<const FE_Poly<dim, spacedim> *>(&x_source_fe))
+    // see if source is a P or Q element
+    if ((dynamic_cast<const FE_Poly<dim, spacedim> *>(&source_fe) != nullptr) ||
+        (dynamic_cast<const FE_Q_Base<dim, spacedim> *>(&source_fe) != nullptr))
       {
         const Quadrature<dim - 1> quad_face_support(
-          source_fe->get_unit_face_support_points(face_no));
+          source_fe.get_unit_face_support_points(face_no));
 
         const double eps = 2e-13 * this->degree * (dim - 1);
 
@@ -477,7 +478,7 @@ namespace Simplex
                                          face_no,
                                          face_quadrature_points);
 
-        for (unsigned int i = 0; i < source_fe->n_dofs_per_face(face_no); ++i)
+        for (unsigned int i = 0; i < source_fe.n_dofs_per_face(face_no); ++i)
           for (unsigned int j = 0; j < this->n_dofs_per_face(face_no); ++j)
             {
               double matrix_entry =
@@ -496,7 +497,7 @@ namespace Simplex
             }
 
 #ifdef DEBUG
-        for (unsigned int j = 0; j < source_fe->n_dofs_per_face(face_no); ++j)
+        for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
           {
             double sum = 0.;
 
@@ -507,7 +508,7 @@ namespace Simplex
           }
 #endif
       }
-    else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe) != nullptr)
+    else if (dynamic_cast<const FE_Nothing<dim> *>(&source_fe) != nullptr)
       {
         // nothing to do here, the FE_Nothing has no degrees of freedom anyway
       }
@@ -523,20 +524,21 @@ namespace Simplex
   template <int dim, int spacedim>
   void
   FE_Poly<dim, spacedim>::get_subface_interpolation_matrix(
-    const FiniteElement<dim, spacedim> &x_source_fe,
+    const FiniteElement<dim, spacedim> &source_fe,
     const unsigned int                  subface,
     FullMatrix<double> &                interpolation_matrix,
     const unsigned int                  face_no) const
   {
-    Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(face_no),
+    Assert(interpolation_matrix.m() == source_fe.n_dofs_per_face(face_no),
            ExcDimensionMismatch(interpolation_matrix.m(),
-                                x_source_fe.n_dofs_per_face(face_no)));
+                                source_fe.n_dofs_per_face(face_no)));
 
-    if (const FE_Poly<dim, spacedim> *source_fe =
-          dynamic_cast<const FE_Poly<dim, spacedim> *>(&x_source_fe))
+    // see if source is a P or Q element
+    if ((dynamic_cast<const FE_Poly<dim, spacedim> *>(&source_fe) != nullptr) ||
+        (dynamic_cast<const FE_Q_Base<dim, spacedim> *>(&source_fe) != nullptr))
       {
         const Quadrature<dim - 1> quad_face_support(
-          source_fe->get_unit_face_support_points(face_no));
+          source_fe.get_unit_face_support_points(face_no));
 
         const double eps = 2e-13 * this->degree * (dim - 1);
 
@@ -548,7 +550,7 @@ namespace Simplex
                                             subface,
                                             subface_quadrature_points);
 
-        for (unsigned int i = 0; i < source_fe->n_dofs_per_face(face_no); ++i)
+        for (unsigned int i = 0; i < source_fe.n_dofs_per_face(face_no); ++i)
           for (unsigned int j = 0; j < this->n_dofs_per_face(face_no); ++j)
             {
               double matrix_entry =
@@ -567,7 +569,7 @@ namespace Simplex
             }
 
 #ifdef DEBUG
-        for (unsigned int j = 0; j < source_fe->n_dofs_per_face(face_no); ++j)
+        for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
           {
             double sum = 0.;
 
@@ -578,7 +580,7 @@ namespace Simplex
           }
 #endif
       }
-    else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe) != nullptr)
+    else if (dynamic_cast<const FE_Nothing<dim> *>(&source_fe) != nullptr)
       {
         // nothing to do here, the FE_Nothing has no degrees of freedom anyway
       }

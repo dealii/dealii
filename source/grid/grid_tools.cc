@@ -552,7 +552,7 @@ namespace GridTools
     for (const auto &cell : tria.cell_iterators_on_level(0))
       {
         // Save cell data
-        CellData<dim> cell_data;
+        CellData<dim> cell_data(cell->n_vertices());
         for (const unsigned int cell_vertex_n : cell->vertex_indices())
           {
             Assert(cell->vertex_index(cell_vertex_n) < vertices.size(),

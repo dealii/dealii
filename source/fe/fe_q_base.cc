@@ -621,18 +621,19 @@ FE_Q_Base<dim, spacedim>::get_face_interpolation_matrix(
 template <int dim, int spacedim>
 void
 FE_Q_Base<dim, spacedim>::get_subface_interpolation_matrix(
-  const FiniteElement<dim, spacedim> &x_source_fe,
+  const FiniteElement<dim, spacedim> &source_fe,
   const unsigned int                  subface,
   FullMatrix<double> &                interpolation_matrix,
   const unsigned int                  face_no) const
 {
-  Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(face_no),
+  Assert(interpolation_matrix.m() == source_fe.n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.m(),
-                              x_source_fe.n_dofs_per_face(face_no)));
+                              source_fe.n_dofs_per_face(face_no)));
 
-  // see if source is a Q element
-  if (const FE_Q_Base<dim, spacedim> *source_fe =
-        dynamic_cast<const FE_Q_Base<dim, spacedim> *>(&x_source_fe))
+  // see if source is a Q or P element
+  if ((dynamic_cast<const FE_Q_Base<dim, spacedim> *>(&source_fe) != nullptr) ||
+      (dynamic_cast<const Simplex::FE_Poly<dim, spacedim> *>(&source_fe) !=
+       nullptr))
     {
       // have this test in here since a table of size 2x0 reports its size as
       // 0x0
@@ -646,18 +647,18 @@ FE_Q_Base<dim, spacedim>::get_subface_interpolation_matrix(
       // produced in that case might lead to problems in the hp-procedures,
       // which use this method.
       Assert(
-        this->n_dofs_per_face(face_no) <= source_fe->n_dofs_per_face(face_no),
+        this->n_dofs_per_face(face_no) <= source_fe.n_dofs_per_face(face_no),
         (typename FiniteElement<dim,
                                 spacedim>::ExcInterpolationNotImplemented()));
 
       // generate a point on this cell and evaluate the shape functions there
       const Quadrature<dim - 1> quad_face_support(
-        source_fe->get_unit_face_support_points(face_no));
+        source_fe.get_unit_face_support_points(face_no));
 
       // Rule of thumb for FP accuracy, that can be expected for a given
       // polynomial degree.  This value is used to cut off values close to
       // zero.
-      double eps = 2e-13 * q_degree * (dim - 1);
+      double eps = 2e-13 * this->q_degree * (dim - 1);
 
       // compute the interpolation matrix by simply taking the value at the
       // support points.
@@ -673,7 +674,7 @@ FE_Q_Base<dim, spacedim>::get_subface_interpolation_matrix(
                                               quad_face_support,
                                               0,
                                               subface);
-      for (unsigned int i = 0; i < source_fe->n_dofs_per_face(face_no); ++i)
+      for (unsigned int i = 0; i < source_fe.n_dofs_per_face(face_no); ++i)
         {
           const Point<dim> &p = subface_quadrature.point(i);
 
@@ -697,7 +698,7 @@ FE_Q_Base<dim, spacedim>::get_subface_interpolation_matrix(
 #ifdef DEBUG
       // make sure that the row sum of each of the matrices is 1 at this
       // point. this must be so since the shape functions sum up to 1
-      for (unsigned int j = 0; j < source_fe->n_dofs_per_face(face_no); ++j)
+      for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
         {
           double sum = 0.;
 
@@ -708,7 +709,7 @@ FE_Q_Base<dim, spacedim>::get_subface_interpolation_matrix(
         }
 #endif
     }
-  else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe) != nullptr)
+  else if (dynamic_cast<const FE_Nothing<dim> *>(&source_fe) != nullptr)
     {
       // nothing to do here, the FE_Nothing has no degrees of freedom anyway
     }
