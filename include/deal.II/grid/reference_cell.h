@@ -564,42 +564,34 @@ ReferenceCell::faces_for_given_vertex(const unsigned int vertex) const
   else if (*this == ReferenceCells::Triangle)
     {
       AssertIndexRange(vertex, 3);
-      static const std::array<std::array<unsigned int, 2>, 3> table = {
-        {{{0, 2}}, {{0, 1}}, {{1, 2}}}};
+      static const unsigned int table[3][2] = {{0, 2}, {0, 1}, {1, 2}};
 
       return table[vertex];
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
       AssertIndexRange(vertex, 4);
-      static const std::array<std::array<unsigned int, 3>, 4> table = {
-        {{{0, 1, 2}}, {{0, 1, 3}}, {{0, 2, 3}}, {{1, 2, 3}}}};
+      static const unsigned int table[4][3] = {{0, 1, 2},
+                                               {0, 1, 3},
+                                               {0, 2, 3},
+                                               {1, 2, 3}};
 
       return table[vertex];
     }
   else if (*this == ReferenceCells::Wedge)
     {
       AssertIndexRange(vertex, 6);
-      static const std::array<std::array<unsigned int, 3>, 6> table = {
-        {{{0, 2, 4}},
-         {{0, 2, 3}},
-         {{0, 3, 4}},
-         {{1, 2, 4}},
-         {{1, 2, 3}},
-         {{1, 3, 4}}}};
+      static const unsigned int table[6][3] = {
+        {0, 2, 4}, {0, 2, 3}, {0, 3, 4}, {1, 2, 4}, {1, 2, 3}, {1, 3, 4}};
 
       return table[vertex];
     }
   else if (*this == ReferenceCells::Pyramid)
     {
       AssertIndexRange(vertex, 5);
-      static const unsigned int X = numbers::invalid_unsigned_int;
-      static const std::array<std::array<unsigned int, 4>, 5> table = {
-        {{{0, 1, 3, X}},
-         {{0, 2, 3, X}},
-         {{0, 1, 4, X}},
-         {{0, 2, 4, X}},
-         {{1, 2, 3, 4}}}};
+      static const unsigned int X           = numbers::invalid_unsigned_int;
+      static const unsigned int table[5][4] = {
+        {0, 1, 3, X}, {0, 2, 3, X}, {0, 1, 4, X}, {0, 2, 4, X}, {1, 2, 3, 4}};
 
       return {&table[vertex][0], vertex == 4 ? 4u : 3u};
     }
@@ -972,32 +964,32 @@ ReferenceCell::n_vertices_to_type(const int dim, const unsigned int n_vertices)
   AssertIndexRange(n_vertices, 9);
 
   const auto X = ReferenceCells::Invalid;
-  static const std::array<std::array<ReferenceCell, 9>,
-                          4>
-    table = {{// dim 0
-              {{X, ReferenceCells::Vertex, X, X, X, X, X, X, X}},
-              // dim 1
-              {{X, X, ReferenceCells::Line, X, X, X, X, X, X}},
-              // dim 2
-              {{X,
-                X,
-                X,
-                ReferenceCells::Triangle,
-                ReferenceCells::Quadrilateral,
-                X,
-                X,
-                X,
-                X}},
-              // dim 3
-              {{X,
-                X,
-                X,
-                X,
-                ReferenceCells::Tetrahedron,
-                ReferenceCells::Pyramid,
-                ReferenceCells::Wedge,
-                X,
-                ReferenceCells::Hexahedron}}}};
+
+  static const ReferenceCell table[4][9] = {
+    // dim 0
+    {X, ReferenceCells::Vertex, X, X, X, X, X, X, X},
+    // dim 1
+    {X, X, ReferenceCells::Line, X, X, X, X, X, X},
+    // dim 2
+    {X,
+     X,
+     X,
+     ReferenceCells::Triangle,
+     ReferenceCells::Quadrilateral,
+     X,
+     X,
+     X,
+     X},
+    // dim 3
+    {X,
+     X,
+     X,
+     X,
+     ReferenceCells::Tetrahedron,
+     ReferenceCells::Pyramid,
+     ReferenceCells::Wedge,
+     X,
+     ReferenceCells::Hexahedron}};
   Assert(table[dim][n_vertices] != ReferenceCells::Invalid,
          ExcMessage("The combination of dim = " + std::to_string(dim) +
                     " and n_vertices = " + std::to_string(n_vertices) +
@@ -1147,55 +1139,55 @@ ReferenceCell::unit_tangential_vectors(const unsigned int face_no,
   else if (*this == ReferenceCells::Triangle)
     {
       AssertIndexRange(face_no, 3);
-      static const std::array<Tensor<1, dim>, 3> table = {
-        {Point<dim>(1, 0),
-         Point<dim>(-std::sqrt(0.5), +std::sqrt(0.5)),
-         Point<dim>(0, -1)}};
+      static const Tensor<1, dim> table[3] = {Point<dim>(1, 0),
+                                              Point<dim>(-std::sqrt(0.5),
+                                                         +std::sqrt(0.5)),
+                                              Point<dim>(0, -1)};
 
       return table[face_no];
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
       AssertIndexRange(face_no, 4);
-      static const std::array<std::array<Tensor<1, dim>, 2>, 4> table = {
-        {{{Point<dim>(0, 1, 0), Point<dim>(1, 0, 0)}},
-         {{Point<dim>(1, 0, 0), Point<dim>(0, 0, 1)}},
-         {{Point<dim>(0, 0, 1), Point<dim>(0, 1, 0)}},
-         {{Point<dim>(-std::pow(1.0 / 3.0, 1.0 / 4.0),
-                      +std::pow(1.0 / 3.0, 1.0 / 4.0),
-                      0),
-           Point<dim>(-std::pow(1.0 / 3.0, 1.0 / 4.0),
-                      0,
-                      +std::pow(1.0 / 3.0, 1.0 / 4.0))}}}};
+      static const Tensor<1, dim> table[4][2] = {
+        {Point<dim>(0, 1, 0), Point<dim>(1, 0, 0)},
+        {Point<dim>(1, 0, 0), Point<dim>(0, 0, 1)},
+        {Point<dim>(0, 0, 1), Point<dim>(0, 1, 0)},
+        {Point<dim>(-std::pow(1.0 / 3.0, 1.0 / 4.0),
+                    +std::pow(1.0 / 3.0, 1.0 / 4.0),
+                    0),
+         Point<dim>(-std::pow(1.0 / 3.0, 1.0 / 4.0),
+                    0,
+                    +std::pow(1.0 / 3.0, 1.0 / 4.0))}};
 
       return table[face_no][i];
     }
   else if (*this == ReferenceCells::Wedge)
     {
       AssertIndexRange(face_no, 5);
-      static const std::array<std::array<Tensor<1, dim>, 2>, 5> table = {
-        {{{Point<dim>(0, 1, 0), Point<dim>(1, 0, 0)}},
-         {{Point<dim>(1, 0, 0), Point<dim>(0, 0, 1)}},
-         {{Point<dim>(-1 / std::sqrt(2.0), +1 / std::sqrt(2.0), 0),
-           Point<dim>(0, 0, 1)}},
-         {{Point<dim>(0, 0, 1), Point<dim>(0, 1, 0)}},
-         {{Point<dim>(1, 0, 0), Point<dim>(0, 0, 1)}}}};
+      static const Tensor<1, dim> table[5][2] = {
+        {Point<dim>(0, 1, 0), Point<dim>(1, 0, 0)},
+        {Point<dim>(1, 0, 0), Point<dim>(0, 0, 1)},
+        {Point<dim>(-1 / std::sqrt(2.0), +1 / std::sqrt(2.0), 0),
+         Point<dim>(0, 0, 1)},
+        {Point<dim>(0, 0, 1), Point<dim>(0, 1, 0)},
+        {Point<dim>(1, 0, 0), Point<dim>(0, 0, 1)}};
 
       return table[face_no][i];
     }
   else if (*this == ReferenceCells::Pyramid)
     {
       AssertIndexRange(face_no, 5);
-      static const std::array<std::array<Tensor<1, dim>, 2>, 5> table = {
-        {{{Point<dim>(0, 1, 0), Point<dim>(1, 0, 0)}},
-         {{Point<dim>(+1.0 / sqrt(2.0), 0, +1.0 / sqrt(2.0)),
-           Point<dim>(0, 1, 0)}},
-         {{Point<dim>(+1.0 / sqrt(2.0), 0, -1.0 / sqrt(2.0)),
-           Point<dim>(0, 1, 0)}},
-         {{Point<dim>(1, 0, 0),
-           Point<dim>(0, +1.0 / sqrt(2.0), +1.0 / sqrt(2.0))}},
-         {{Point<dim>(1, 0, 0),
-           Point<dim>(0, +1.0 / sqrt(2.0), -1.0 / sqrt(2.0))}}}};
+      static const Tensor<1, dim> table[5][2] = {
+        {Point<dim>(0, 1, 0), Point<dim>(1, 0, 0)},
+        {Point<dim>(+1.0 / sqrt(2.0), 0, +1.0 / sqrt(2.0)),
+         Point<dim>(0, 1, 0)},
+        {Point<dim>(+1.0 / sqrt(2.0), 0, -1.0 / sqrt(2.0)),
+         Point<dim>(0, 1, 0)},
+        {Point<dim>(1, 0, 0),
+         Point<dim>(0, +1.0 / sqrt(2.0), +1.0 / sqrt(2.0))},
+        {Point<dim>(1, 0, 0),
+         Point<dim>(0, +1.0 / sqrt(2.0), -1.0 / sqrt(2.0))}};
 
       return table[face_no][i];
     }
@@ -1634,8 +1626,7 @@ namespace internal
       {
         (void)face;
 
-        static const std::array<std::array<unsigned int, 2>, 2> table = {
-          {{{1, 0}}, {{0, 1}}}};
+        static const unsigned int table[2][2] = {{1, 0}, {0, 1}};
 
         return table[line_orientation][vertex];
       }
@@ -1669,8 +1660,7 @@ namespace internal
                             const unsigned int  vertex,
                             const unsigned char face_orientation) const override
       {
-        static const std::array<std::array<unsigned int, 2>, 3> table = {
-          {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
+        static const unsigned int table[3][2] = {{0, 1}, {1, 2}, {2, 0}};
 
         return table[face][face_orientation ? vertex : (1 - vertex)];
       }
@@ -1737,7 +1727,7 @@ namespace internal
       exodusii_vertex_to_deal_vertex(const unsigned int vertex_n) const override
       {
         AssertIndexRange(vertex_n, n_vertices());
-        constexpr std::array<unsigned int, 4> exodus_to_deal{{0, 1, 3, 2}};
+        constexpr unsigned int exodus_to_deal[4] = {0, 1, 3, 2};
         return exodus_to_deal[vertex_n];
       }
 
@@ -1745,7 +1735,7 @@ namespace internal
       exodusii_face_to_deal_face(const unsigned int face_n) const override
       {
         AssertIndexRange(face_n, n_faces());
-        constexpr std::array<unsigned int, 4> exodus_to_deal{{2, 1, 3, 0}};
+        constexpr unsigned int exodus_to_deal[4] = {2, 1, 3, 0};
         return exodus_to_deal[face_n];
       }
     };
@@ -1793,13 +1783,8 @@ namespace internal
       {
         (void)face;
 
-        static const std::array<std::array<unsigned int, 3>, 6> table = {
-          {{{2, 1, 0}},
-           {{0, 1, 2}},
-           {{1, 0, 2}},
-           {{1, 2, 0}},
-           {{0, 2, 1}},
-           {{2, 0, 1}}}};
+        static const unsigned int table[6][3] = {
+          {2, 1, 0}, {0, 1, 2}, {1, 0, 2}, {1, 2, 0}, {0, 2, 1}, {2, 0, 1}};
 
         return table[face_orientation][line];
       }
@@ -1839,13 +1824,8 @@ namespace internal
         AssertIndexRange(face_orientation, 6);
         (void)face;
 
-        static const std::array<std::array<unsigned int, 3>, 6> table = {
-          {{{0, 2, 1}},
-           {{0, 1, 2}},
-           {{2, 1, 0}},
-           {{1, 2, 0}},
-           {{1, 0, 2}},
-           {{2, 0, 1}}}};
+        static const unsigned int table[6][3] = {
+          {0, 2, 1}, {0, 1, 2}, {2, 1, 0}, {1, 2, 0}, {1, 0, 2}, {2, 0, 1}};
 
         return table[face_orientation][vertex];
       }
@@ -1867,8 +1847,10 @@ namespace internal
       {
         AssertIndexRange(face, n_faces());
 
-        const static std::array<std::array<unsigned int, 3>, 4> table = {
-          {{{0, 1, 2}}, {{0, 3, 4}}, {{2, 5, 3}}, {{1, 4, 5}}}};
+        const static unsigned int table[4][3] = {{0, 1, 2},
+                                                 {0, 3, 4},
+                                                 {2, 5, 3},
+                                                 {1, 4, 5}};
 
         return table[face]
                     [standard_to_real_face_line(line, face, face_orientation)];
@@ -1879,8 +1861,10 @@ namespace internal
                             const unsigned int  vertex,
                             const unsigned char face_orientation) const override
       {
-        static const std::array<std::array<unsigned int, 3>, 4> table = {
-          {{{0, 1, 2}}, {{1, 0, 3}}, {{0, 2, 3}}, {{2, 1, 3}}}};
+        static const unsigned int table[4][3] = {{0, 1, 2},
+                                                 {1, 0, 3},
+                                                 {0, 2, 3},
+                                                 {2, 1, 3}};
 
         return table[face][standard_to_real_face_vertex(
           vertex, face, face_orientation)];
@@ -1897,7 +1881,7 @@ namespace internal
       exodusii_face_to_deal_face(const unsigned int face_n) const override
       {
         AssertIndexRange(face_n, n_faces());
-        constexpr std::array<unsigned int, 4> exodus_to_deal{{1, 3, 2, 0}};
+        static const unsigned int exodus_to_deal[4] = {1, 3, 2, 0};
         return exodus_to_deal[face_n];
       }
     };
@@ -1959,13 +1943,8 @@ namespace internal
           }
         else // TRI
           {
-            static const std::array<std::array<unsigned int, 3>, 6> table = {
-              {{{2, 1, 0}},
-               {{0, 1, 2}},
-               {{1, 0, 2}},
-               {{1, 2, 0}},
-               {{0, 2, 1}},
-               {{2, 0, 1}}}};
+            static const unsigned int table[6][3] = {
+              {2, 1, 0}, {0, 1, 2}, {1, 0, 2}, {1, 2, 0}, {0, 2, 1}, {2, 0, 1}};
 
             return table[face_orientation][line];
           }
@@ -2009,13 +1988,8 @@ namespace internal
           }
         else // Tri
           {
-            static const std::array<std::array<unsigned int, 3>, 6> table = {
-              {{{0, 2, 1}},
-               {{0, 1, 2}},
-               {{2, 1, 0}},
-               {{1, 2, 0}},
-               {{1, 0, 2}},
-               {{2, 0, 1}}}};
+            static const unsigned int table[6][3] = {
+              {0, 2, 1}, {0, 1, 2}, {2, 1, 0}, {1, 2, 0}, {1, 0, 2}, {2, 0, 1}};
 
             return table[face_orientation][vertex];
           }
@@ -2046,13 +2020,9 @@ namespace internal
           {
             AssertIndexRange(vertex, 3);
           }
-        constexpr auto X = numbers::invalid_unsigned_int;
-        static const std::array<std::array<unsigned int, 4>, 5> table = {
-          {{{0, 1, 2, 3}},
-           {{0, 2, 4, X}},
-           {{3, 1, 4, X}},
-           {{1, 0, 4, X}},
-           {{2, 3, 4, X}}}};
+        constexpr auto            X           = numbers::invalid_unsigned_int;
+        static const unsigned int table[5][4] = {
+          {0, 1, 2, 3}, {0, 2, 4, X}, {3, 1, 4, X}, {1, 0, 4, X}, {2, 3, 4, X}};
 
         return table[face][standard_to_real_face_vertex(
           vertex, face, face_orientation)];
@@ -2062,7 +2032,7 @@ namespace internal
       exodusii_vertex_to_deal_vertex(const unsigned int vertex_n) const override
       {
         AssertIndexRange(vertex_n, n_vertices());
-        constexpr std::array<unsigned int, 5> exodus_to_deal{{0, 1, 3, 2, 4}};
+        static const unsigned int exodus_to_deal[5] = {0, 1, 3, 2, 4};
         return exodus_to_deal[vertex_n];
       }
 
@@ -2070,7 +2040,7 @@ namespace internal
       exodusii_face_to_deal_face(const unsigned int face_n) const override
       {
         AssertIndexRange(face_n, n_faces());
-        constexpr std::array<unsigned int, 5> exodus_to_deal{{3, 2, 4, 1, 0}};
+        static const unsigned int exodus_to_deal[5] = {3, 2, 4, 1, 0};
         return exodus_to_deal[face_n];
       }
     };
@@ -2133,13 +2103,8 @@ namespace internal
           }
         else // TRI
           {
-            static const std::array<std::array<unsigned int, 3>, 6> table = {
-              {{{2, 1, 0}},
-               {{0, 1, 2}},
-               {{1, 0, 2}},
-               {{1, 2, 0}},
-               {{0, 2, 1}},
-               {{2, 0, 1}}}};
+            static const unsigned int table[6][3] = {
+              {2, 1, 0}, {0, 1, 2}, {1, 0, 2}, {1, 2, 0}, {0, 2, 1}, {2, 0, 1}};
 
             return table[face_orientation][line];
           }
@@ -2183,13 +2148,8 @@ namespace internal
           }
         else // TRI
           {
-            static const std::array<std::array<unsigned int, 3>, 6> table = {
-              {{{0, 2, 1}},
-               {{0, 1, 2}},
-               {{2, 1, 0}},
-               {{1, 2, 0}},
-               {{1, 0, 2}},
-               {{2, 0, 1}}}};
+            static const unsigned int table[6][3] = {
+              {0, 2, 1}, {0, 1, 2}, {2, 1, 0}, {1, 2, 0}, {1, 0, 2}, {2, 0, 1}};
 
             return table[face_orientation][vertex];
           }
@@ -2220,13 +2180,10 @@ namespace internal
           {
             AssertIndexRange(vertex, 4);
           }
-        constexpr auto X = numbers::invalid_unsigned_int;
-        static const std::array<std::array<unsigned int, 4>, 6> table = {
-          {{{1, 0, 2, X}},
-           {{3, 4, 5, X}},
-           {{0, 1, 3, 4}},
-           {{1, 2, 4, 5}},
-           {{2, 0, 5, 3}}}};
+
+        constexpr auto            X           = numbers::invalid_unsigned_int;
+        static const unsigned int table[6][4] = {
+          {1, 0, 2, X}, {3, 4, 5, X}, {0, 1, 3, 4}, {1, 2, 4, 5}, {2, 0, 5, 3}};
 
         return table[face][standard_to_real_face_vertex(
           vertex, face, face_orientation)];
@@ -2236,8 +2193,7 @@ namespace internal
       exodusii_vertex_to_deal_vertex(const unsigned int vertex_n) const override
       {
         AssertIndexRange(vertex_n, n_vertices());
-        constexpr std::array<unsigned int, 6> exodus_to_deal{
-          {2, 1, 0, 5, 4, 3}};
+        static const unsigned int exodus_to_deal[6] = {2, 1, 0, 5, 4, 3};
         return exodus_to_deal[vertex_n];
       }
 
@@ -2245,7 +2201,7 @@ namespace internal
       exodusii_face_to_deal_face(const unsigned int face_n) const override
       {
         AssertIndexRange(face_n, n_faces());
-        constexpr std::array<unsigned int, 6> exodus_to_deal{{3, 4, 2, 0, 1}};
+        static const unsigned int exodus_to_deal[6] = {3, 4, 2, 0, 1};
         return exodus_to_deal[face_n];
       }
     };
@@ -2343,8 +2299,7 @@ namespace internal
       exodusii_vertex_to_deal_vertex(const unsigned int vertex_n) const override
       {
         AssertIndexRange(vertex_n, n_vertices());
-        constexpr std::array<unsigned int, 8> exodus_to_deal{
-          {0, 1, 3, 2, 4, 5, 7, 6}};
+        static const unsigned int exodus_to_deal[8] = {0, 1, 3, 2, 4, 5, 7, 6};
         return exodus_to_deal[vertex_n];
       }
 
@@ -2352,8 +2307,7 @@ namespace internal
       exodusii_face_to_deal_face(const unsigned int face_n) const override
       {
         AssertIndexRange(face_n, n_faces());
-        constexpr std::array<unsigned int, 6> exodus_to_deal{
-          {2, 1, 3, 0, 4, 5}};
+        static const unsigned int exodus_to_deal[6] = {2, 1, 3, 0, 4, 5};
         return exodus_to_deal[face_n];
       }
     };
@@ -2364,15 +2318,15 @@ namespace internal
     inline const internal::ReferenceCell::Base &
     get_cell(const dealii::ReferenceCell &type)
     {
-      static const std::array<std::unique_ptr<internal::ReferenceCell::Base>, 8>
-        gei{{std::make_unique<internal::ReferenceCell::Vertex>(),
-             std::make_unique<internal::ReferenceCell::Line>(),
-             std::make_unique<internal::ReferenceCell::Triangle>(),
-             std::make_unique<internal::ReferenceCell::Quadrilateral>(),
-             std::make_unique<internal::ReferenceCell::Tetrahedron>(),
-             std::make_unique<internal::ReferenceCell::Pyramid>(),
-             std::make_unique<internal::ReferenceCell::Wedge>(),
-             std::make_unique<internal::ReferenceCell::Hexahedron>()}};
+      static const std::unique_ptr<internal::ReferenceCell::Base> gei[8] = {
+        std::make_unique<internal::ReferenceCell::Vertex>(),
+        std::make_unique<internal::ReferenceCell::Line>(),
+        std::make_unique<internal::ReferenceCell::Triangle>(),
+        std::make_unique<internal::ReferenceCell::Quadrilateral>(),
+        std::make_unique<internal::ReferenceCell::Tetrahedron>(),
+        std::make_unique<internal::ReferenceCell::Pyramid>(),
+        std::make_unique<internal::ReferenceCell::Wedge>(),
+        std::make_unique<internal::ReferenceCell::Hexahedron>()};
       AssertIndexRange(static_cast<std::uint8_t>(type), 8);
       return *gei[static_cast<std::uint8_t>(type)];
     }
