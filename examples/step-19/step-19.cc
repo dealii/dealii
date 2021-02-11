@@ -460,7 +460,7 @@ namespace Step19
         // @note It is worth pointing out that calling the
         //   Particles::ParticleHandler::particles_in_cell() and
         //   Particles::ParticleHandler::n_particles_in_cell() functions is not
-        //   very effective on problems with a large number of particles. But it
+        //   very efficient on problems with a large number of particles. But it
         //   illustrates the easiest way to write this algorithm, and so we are
         //   willing to incur this cost for the moment for expository purposes.
         //   We discuss the issue in more detail in the

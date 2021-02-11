@@ -55,6 +55,9 @@ namespace Polynomials
    * form, the constructor with the roots in form of a Lagrange polynomial
    * must be used. In case a manipulation is done that changes the roots, the
    * representation is switched to the coefficient form.
+   *
+   * This class is a typical example of a possible template argument for the
+   * TensorProductPolynomials class.
    */
   template <typename number>
   class Polynomial : public Subscriptor
