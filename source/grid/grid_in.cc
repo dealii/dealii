@@ -3198,8 +3198,7 @@ namespace
               internal::ReferenceCell::get_cell(cell_type);
             const unsigned int deal_face_n =
               info.exodusii_face_to_deal_face(local_face_n);
-            const internal::ReferenceCell::Base &face_info =
-              internal::ReferenceCell::get_face(cell_type, deal_face_n);
+            const auto &face_info = cell_type.face_reference_cell(deal_face_n);
 
             // The orientation we pick doesn't matter here since when we create
             // the Triangulation we will sort the vertices for each CellData
@@ -3367,7 +3366,7 @@ GridIn<dim, spacedim>::read_exodusii(
           CellData<dim> cell(type.n_vertices());
           for (unsigned int i : type.vertex_indices())
             {
-              cell.vertices[internal::ReferenceCell::get_cell(info)
+              cell.vertices[internal::ReferenceCell::get_cell(type)
                               .exodusii_vertex_to_deal_vertex(i)] =
                 connection[elem_n + i] - 1;
             }
