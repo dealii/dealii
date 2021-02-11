@@ -935,17 +935,15 @@ ReferenceCell::standard_vertex_to_face_and_vertex_index(
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
-      static const std::array<unsigned int, 2> table[4] = {{{0, 0}},
-                                                           {{0, 1}},
-                                                           {{0, 2}},
-                                                           {{1, 2}}};
+      static const std::array<std::array<unsigned int, 2>, 4> table = {
+        {{{0, 0}}, {{0, 1}}, {{0, 2}}, {{1, 2}}}};
 
       return table[vertex];
     }
   else if (*this == ReferenceCells::Pyramid)
     {
-      static const std::array<unsigned int, 2> table[5] = {
-        {{0, 0}}, {{0, 1}}, {{0, 2}}, {{0, 3}}, {{1, 2}}};
+      static const std::array<std::array<unsigned int, 2>, 5> table = {
+        {{{0, 0}}, {{0, 1}}, {{0, 2}}, {{0, 3}}, {{1, 2}}}};
 
       return table[vertex];
     }
