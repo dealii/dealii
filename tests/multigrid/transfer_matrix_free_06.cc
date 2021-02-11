@@ -43,7 +43,7 @@ check(const unsigned int fe_degree)
   deallog << "FE: " << fe.get_name() << std::endl;
 
   // run a few different sizes...
-  unsigned int sizes[] = {1, 3};
+  unsigned int sizes[] = {1, 2};
   for (unsigned int cycle = 0; cycle < sizeof(sizes) / sizeof(unsigned int);
        ++cycle)
     {
@@ -56,7 +56,7 @@ check(const unsigned int fe_degree)
             n_subdiv /= 2;
           }
       n_refinements += 6 - 2 * dim;
-      if (fe_degree < 3)
+      if (fe_degree == 1)
         n_refinements += 1;
 
       parallel::distributed::Triangulation<dim> tr(
