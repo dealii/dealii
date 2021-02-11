@@ -1608,11 +1608,22 @@ namespace parallel
     }
 
 
+
     template <int dim, int spacedim>
     void
     Triangulation<dim, spacedim>::load(
       const typename dealii::internal::p4est::types<dim>::forest *forest)
     {
+      Assert(this->n_cells() > 0,
+             ExcMessage(
+               "load() only works if the Triangulation already contains "
+               "a coarse mesh!"));
+      Assert(this->n_cells() == forest->trees->elem_count,
+             ExcMessage(
+               "Coarse mesh of the Triangulation does not match the one "
+               "of the provided forest!"));
+
+      // clear the old forest
       if (parallel_ghost != nullptr)
         {
           dealii::internal::p4est::functions<dim>::ghost_destroy(
@@ -1625,7 +1636,7 @@ namespace parallel
       // note: we can keep the connectivity, since the coarse grid does not
       // change
 
-      // create deep copy
+      // create deep copy of the new forest
       typename dealii::internal::p4est::types<dim>::forest *temp =
         const_cast<typename dealii::internal::p4est::types<dim>::forest *>(
           forest);

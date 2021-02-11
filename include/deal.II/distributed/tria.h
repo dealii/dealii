@@ -607,7 +607,7 @@ namespace parallel
       /**
        * Load the refinement information from a given parallel forest. This
        * forest might be obtained from the function call to
-       * parallel::distributed::Triangulation::get_p4est();
+       * parallel::distributed::Triangulation::get_p4est().
        */
       void
       load(const typename dealii::internal::p4est::types<dim>::forest *forest);
