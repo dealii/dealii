@@ -927,9 +927,7 @@ namespace
         else
           {
             Assert(patch.n_subdivisions == 1, ExcNotImplemented());
-            const auto &info =
-              internal::ReferenceCell::get_cell(patch.reference_cell);
-            n_nodes += info.n_vertices();
+            n_nodes += patch.reference_cell.n_vertices();
             n_cells += 1;
           }
       }
@@ -7739,9 +7737,6 @@ DataOutBase::write_hdf5_parallel(
   // patches
   Assert(patches.size() > 0, ExcNoPatches());
 
-  const auto &cell_info =
-    internal::ReferenceCell::get_cell(patches[0].reference_cell);
-
   hid_t h5_mesh_file_id = -1, h5_solution_file_id, file_plist_id, plist_id;
   hid_t node_dataspace, node_dataset, node_file_dataspace,
     node_memory_dataspace;
@@ -7835,7 +7830,7 @@ DataOutBase::write_hdf5_parallel(
       AssertThrow(node_dataspace >= 0, ExcIO());
 
       cell_ds_dim[0] = global_node_cell_count[1];
-      cell_ds_dim[1] = cell_info.n_vertices();
+      cell_ds_dim[1] = patches[0].reference_cell.n_vertices();
       cell_dataspace = H5Screate_simple(2, cell_ds_dim, nullptr);
       AssertThrow(cell_dataspace >= 0, ExcIO());
 
@@ -7896,7 +7891,7 @@ DataOutBase::write_hdf5_parallel(
 
       // And repeat for cells
       count[0] = local_node_cell_count[1];
-      count[1] = cell_info.n_vertices();
+      count[1] = patches[0].reference_cell.n_vertices();
       offset[0] = global_node_cell_offsets[1];
       offset[1] = 0;
       cell_memory_dataspace = H5Screate_simple(2, count, nullptr);

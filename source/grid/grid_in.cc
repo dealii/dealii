@@ -3346,13 +3346,11 @@ GridIn<dim, spacedim>::read_exodusii(
       AssertThrowExodusII(ierr);
       const ReferenceCell type =
         exodusii_name_to_type(string_temp.data(), n_nodes_per_element);
-      const internal::ReferenceCell::Base &info =
-        internal::ReferenceCell::get_cell(type);
 
       // The number of nodes per element may be larger than what we want to
       // read - for example, if the Exodus file contains a QUAD9 element, we
       // only want to read the first four values and ignore the rest.
-      Assert(int(info.n_vertices()) <= n_nodes_per_element, ExcInternalError());
+      Assert(int(type.n_vertices()) <= n_nodes_per_element, ExcInternalError());
 
       std::vector<int> connection(n_nodes_per_element * n_block_elements);
       ierr = ex_get_conn(ex_id,
@@ -3366,10 +3364,11 @@ GridIn<dim, spacedim>::read_exodusii(
       for (unsigned int elem_n = 0; elem_n < connection.size();
            elem_n += n_nodes_per_element)
         {
-          CellData<dim> cell(info.n_vertices());
-          for (unsigned int i : info.vertex_indices())
+          CellData<dim> cell(type.n_vertices());
+          for (unsigned int i : type.vertex_indices())
             {
-              cell.vertices[info.exodusii_vertex_to_deal_vertex(i)] =
+              cell.vertices[internal::ReferenceCell::get_cell(info)
+                              .exodusii_vertex_to_deal_vertex(i)] =
                 connection[elem_n + i] - 1;
             }
           cell.material_id = element_block_id;

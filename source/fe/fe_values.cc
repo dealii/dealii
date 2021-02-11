@@ -4637,8 +4637,7 @@ FEFaceValuesBase<dim, spacedim>::FEFaceValuesBase(
   , quadrature(quadrature)
 {
   Assert(quadrature.size() == 1 ||
-           quadrature.size() ==
-             internal::ReferenceCell::get_cell(fe.reference_cell()).n_faces(),
+           quadrature.size() == fe.reference_cell().n_faces(),
          ExcInternalError());
 }
 

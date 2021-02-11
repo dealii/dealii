@@ -344,10 +344,10 @@ namespace internal
 
                 for (unsigned int face_no = 0; face_no < quad_face.size();
                      ++face_no)
-                  n_max_vertices = std::max(n_max_vertices,
-                                            internal::ReferenceCell::get_face(
-                                              reference_cell_type, face_no)
-                                              .n_vertices());
+                  n_max_vertices =
+                    std::max(n_max_vertices,
+                             reference_cell_type.face_reference_cell(face_no)
+                               .n_vertices());
 
                 const auto projected_quad_face =
                   QProjector<dim>::project_to_all_faces(reference_cell_type,
@@ -369,8 +369,7 @@ namespace internal
                   {
                     const unsigned int n_face_orientations =
                       dim == 2 ? 2 :
-                                 (2 * internal::ReferenceCell::get_face(
-                                        reference_cell_type, f)
+                                 (2 * reference_cell_type.face_reference_cell(f)
                                         .n_vertices());
 
                     const unsigned int n_q_points_face = quad_face[f].size();

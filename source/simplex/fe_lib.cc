@@ -154,12 +154,12 @@ namespace Simplex
       if (dim == 1)
         return {};
 
-      const auto &info = internal::ReferenceCell::get_cell(
-        dim == 2 ? ReferenceCells::Triangle : ReferenceCells::Tetrahedron);
       std::vector<std::vector<Point<dim - 1>>> unit_face_points;
 
       // all faces have the same support points
-      for (auto face_n : info.face_indices())
+      for (auto face_n :
+           (dim == 2 ? ReferenceCells::Triangle : ReferenceCells::Tetrahedron)
+             .face_indices())
         {
           (void)face_n;
           unit_face_points.emplace_back(

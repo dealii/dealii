@@ -208,7 +208,110 @@ public:
    */
 
   /**
+   * @name Querying the number of building blocks of a reference cell
+   * @{
+   */
+
+  /**
+   * Return the number of vertices that make up the reference
+   * cell in question. A vertex is a "corner" (a zero-dimensional
+   * object) of the reference cell.
+   */
+  unsigned int
+  n_vertices() const;
+
+  /**
+   * Return an object that can be thought of as an array containing all
+   * indices from zero to n_vertices().
+   */
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  vertex_indices() const;
+
+  /**
+   * Return the number of lines that make up the reference
+   * cell in question. A line is an "edge" (a one-dimensional
+   * object) of the reference cell.
+   */
+  unsigned int
+  n_lines() const;
+
+  /**
+   * Return an object that can be thought of as an array containing all
+   * indices from zero to n_lines().
+   */
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  line_indices() const;
+
+  /**
+   * Return the number of faces that make up the reference
+   * cell in question. A face is a `(dim-1)`-dimensional
+   * object bounding the reference cell.
+   */
+  unsigned int
+  n_faces() const;
+
+  /**
+   * Return an object that can be thought of as an array containing all
+   * indices from zero to n_faces().
+   */
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  face_indices() const;
+
+  /**
+   * Return the reference-cell type of face @p face_no of the current
+   * object. For example, if the current object is
+   * ReferenceCells::Tetrahedron, then `face_no` must be between
+   * in the interval $[0,4)$ and the function will always return
+   * ReferenceCells::Triangle. If the current object is
+   * ReferenceCells::Hexahedron, then `face_no` must be between
+   * in the interval $[0,6)$ and the function will always return
+   * ReferenceCells::Quadrilateral. For wedges and pyramids, the
+   * returned object may be either ReferenceCells::Triangle or
+   * ReferenceCells::Quadrilateral, depending on the given index.
+   */
+  ReferenceCell
+  face_reference_cell(const unsigned int face_no) const;
+
+  /**
+   * @}
+   */
+
+  /**
+   * @name Relationships between objects in the cell and on faces
+   * @{
+   */
+
+  /**
+   * For a given vertex in a cell, return a pair of a face index and a
+   * vertex index within this face.
+   *
+   * @note In practice, a vertex is of course generally part of more than one
+   *   face, and one could return different faces and the corresponding
+   *   index within. Which face this function chooses is often not of
+   *   importance (and not exposed by this function on purpose).
+   */
+  std::array<unsigned int, 2>
+  standard_vertex_to_face_and_vertex_index(const unsigned int vertex) const;
+
+  /**
+   * For a given line in a cell, return a pair of a face index and a
+   * line index within this face.
+   *
+   * @note In practice, a line is of course generally part of more than one
+   *   face, and one could return different faces and the corresponding
+   *   index within. Which face this function chooses is often not of
+   *   importance (and not exposed by this function on purpose).
+   */
+  std::array<unsigned int, 2>
+  standard_line_to_face_and_line_index(const unsigned int line) const;
+
+  /**
+   * @}
+   */
+
+  /**
    * @name Geometric properties of reference cells
+   * @name Querying the number of building blocks of a reference cell
    * @{
    */
 
@@ -550,6 +653,272 @@ ReferenceCell::get_dimension() const
 
 
 
+inline unsigned int
+ReferenceCell::n_vertices() const
+{
+  if (*this == ReferenceCells::Vertex)
+    return 1;
+  else if (*this == ReferenceCells::Line)
+    return 2;
+  else if (*this == ReferenceCells::Triangle)
+    return 3;
+  else if (*this == ReferenceCells::Quadrilateral)
+    return 4;
+  else if (*this == ReferenceCells::Tetrahedron)
+    return 4;
+  else if (*this == ReferenceCells::Pyramid)
+    return 5;
+  else if (*this == ReferenceCells::Wedge)
+    return 6;
+  else if (*this == ReferenceCells::Hexahedron)
+    return 8;
+
+  Assert(false, ExcNotImplemented());
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+inline unsigned int
+ReferenceCell::n_lines() const
+{
+  if (*this == ReferenceCells::Vertex)
+    return 0;
+  else if (*this == ReferenceCells::Line)
+    return 1;
+  else if (*this == ReferenceCells::Triangle)
+    return 3;
+  else if (*this == ReferenceCells::Quadrilateral)
+    return 4;
+  else if (*this == ReferenceCells::Tetrahedron)
+    return 6;
+  else if (*this == ReferenceCells::Pyramid)
+    return 7;
+  else if (*this == ReferenceCells::Wedge)
+    return 9;
+  else if (*this == ReferenceCells::Hexahedron)
+    return 12;
+
+  Assert(false, ExcNotImplemented());
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+inline unsigned int
+ReferenceCell::n_faces() const
+{
+  if (*this == ReferenceCells::Vertex)
+    return 0;
+  else if (*this == ReferenceCells::Line)
+    return 2;
+  else if (*this == ReferenceCells::Triangle)
+    return 3;
+  else if (*this == ReferenceCells::Quadrilateral)
+    return 4;
+  else if (*this == ReferenceCells::Tetrahedron)
+    return 4;
+  else if (*this == ReferenceCells::Pyramid)
+    return 5;
+  else if (*this == ReferenceCells::Wedge)
+    return 5;
+  else if (*this == ReferenceCells::Hexahedron)
+    return 6;
+
+  Assert(false, ExcNotImplemented());
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+ReferenceCell::vertex_indices() const
+{
+  return {0U, n_vertices()};
+}
+
+
+
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+ReferenceCell::line_indices() const
+{
+  return {0U, n_lines()};
+}
+
+
+
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+ReferenceCell::face_indices() const
+{
+  return {0U, n_faces()};
+}
+
+
+
+inline ReferenceCell
+ReferenceCell::face_reference_cell(const unsigned int face_no) const
+{
+  AssertIndexRange(face_no, n_faces());
+
+  if (*this == ReferenceCells::Vertex)
+    return ReferenceCells::Invalid;
+  else if (*this == ReferenceCells::Line)
+    return ReferenceCells::Vertex;
+  else if (*this == ReferenceCells::Triangle)
+    return ReferenceCells::Line;
+  else if (*this == ReferenceCells::Quadrilateral)
+    return ReferenceCells::Line;
+  else if (*this == ReferenceCells::Tetrahedron)
+    return ReferenceCells::Triangle;
+  else if (*this == ReferenceCells::Pyramid)
+    {
+      if (face_no == 0)
+        return ReferenceCells::Quadrilateral;
+      else
+        return ReferenceCells::Triangle;
+    }
+  else if (*this == ReferenceCells::Wedge)
+    {
+      if (face_no > 1)
+        return ReferenceCells::Quadrilateral;
+      else
+        return ReferenceCells::Triangle;
+    }
+  else if (*this == ReferenceCells::Hexahedron)
+    return ReferenceCells::Quadrilateral;
+
+  Assert(false, ExcNotImplemented());
+  return ReferenceCells::Invalid;
+}
+
+
+
+inline std::array<unsigned int, 2>
+ReferenceCell::standard_vertex_to_face_and_vertex_index(
+  const unsigned int vertex) const
+{
+  AssertIndexRange(vertex, n_vertices());
+
+  if (*this == ReferenceCells::Vertex)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Line)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Triangle)
+    {
+      static const std::array<std::array<unsigned int, 2>, 3> table = {
+        {{{0, 0}}, {{0, 1}}, {{1, 1}}}};
+
+      return table[vertex];
+    }
+  else if (*this == ReferenceCells::Quadrilateral)
+    {
+      return GeometryInfo<2>::standard_quad_vertex_to_line_vertex_index(vertex);
+    }
+  else if (*this == ReferenceCells::Tetrahedron)
+    {
+      static const std::array<unsigned int, 2> table[4] = {{{0, 0}},
+                                                           {{0, 1}},
+                                                           {{0, 2}},
+                                                           {{1, 2}}};
+
+      return table[vertex];
+    }
+  else if (*this == ReferenceCells::Pyramid)
+    {
+      static const std::array<unsigned int, 2> table[5] = {
+        {{0, 0}}, {{0, 1}}, {{0, 2}}, {{0, 3}}, {{1, 2}}};
+
+      return table[vertex];
+    }
+  else if (*this == ReferenceCells::Wedge)
+    {
+      static const std::array<std::array<unsigned int, 2>, 6> table = {
+        {{{0, 1}}, {{0, 0}}, {{0, 2}}, {{1, 0}}, {{1, 1}}, {{1, 2}}}};
+
+      return table[vertex];
+    }
+  else if (*this == ReferenceCells::Hexahedron)
+    {
+      return GeometryInfo<3>::standard_hex_vertex_to_quad_vertex_index(vertex);
+    }
+
+  Assert(false, ExcNotImplemented());
+  return {};
+}
+
+
+
+inline std::array<unsigned int, 2>
+ReferenceCell::standard_line_to_face_and_line_index(
+  const unsigned int line) const
+{
+  AssertIndexRange(line, n_lines());
+
+  if (*this == ReferenceCells::Vertex)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Line)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Triangle)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Quadrilateral)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Tetrahedron)
+    {
+      static const std::array<unsigned int, 2> table[6] = {
+        {{0, 0}}, {{0, 1}}, {{0, 2}}, {{1, 1}}, {{1, 2}}, {{2, 1}}};
+
+      return table[line];
+    }
+  else if (*this == ReferenceCells::Pyramid)
+    {
+      static const std::array<unsigned int, 2> table[8] = {{{0, 0}},
+                                                           {{0, 1}},
+                                                           {{0, 2}},
+                                                           {{0, 3}},
+                                                           {{1, 2}},
+                                                           {{2, 1}},
+                                                           {{1, 1}},
+                                                           {{2, 2}}};
+
+      return table[line];
+    }
+  else if (*this == ReferenceCells::Wedge)
+    {
+      static const std::array<unsigned int, 2> table[9] = {{{0, 0}},
+                                                           {{0, 2}},
+                                                           {{0, 1}},
+                                                           {{1, 0}},
+                                                           {{1, 1}},
+                                                           {{1, 2}},
+                                                           {{2, 0}},
+                                                           {{2, 1}},
+                                                           {{3, 1}}};
+
+      return table[line];
+    }
+  else if (*this == ReferenceCells::Hexahedron)
+    {
+      return GeometryInfo<3>::standard_hex_line_to_quad_line_index(line);
+    }
+
+  Assert(false, ExcNotImplemented());
+  return {};
+}
+
+
+
 namespace ReferenceCells
 {
   template <int dim>
@@ -887,6 +1256,7 @@ namespace internal
        */
       virtual ~Base() = default;
 
+    private:
       /**
        * Number of vertices.
        */
@@ -975,6 +1345,7 @@ namespace internal
         return {{0, 0}};
       }
 
+    public:
       /**
        * Correct vertex index depending on face orientation.
        */
@@ -1027,6 +1398,7 @@ namespace internal
         return true;
       }
 
+    private:
       /**
        * Return reference-cell type of face @p face_no.
        */
@@ -1039,6 +1411,7 @@ namespace internal
         return ReferenceCells::Invalid;
       }
 
+    public:
       /**
        * Map face line number to cell line number.
        */
@@ -2011,7 +2384,7 @@ namespace internal
     inline const internal::ReferenceCell::Base &
     get_face(const dealii::ReferenceCell &type, const unsigned int face_no)
     {
-      return get_cell(get_cell(type).face_reference_cell(face_no));
+      return get_cell(type.face_reference_cell(face_no));
     }
 
   } // namespace ReferenceCell
@@ -2049,8 +2422,7 @@ namespace internal
     {
       out << "[";
 
-      const unsigned int n_vertices =
-        internal::ReferenceCell::get_cell(entity_type).n_vertices();
+      const unsigned int n_vertices = entity_type.n_vertices();
 
       for (unsigned int i = 0; i < n_vertices; ++i)
         {
@@ -2095,8 +2467,7 @@ inline unsigned char
 ReferenceCell::compute_orientation(const std::array<T, N> &vertices_0,
                                    const std::array<T, N> &vertices_1) const
 {
-  AssertIndexRange(internal::ReferenceCell::get_cell(*this).n_vertices(),
-                   N + 1);
+  AssertIndexRange(n_vertices(), N + 1);
   if (*this == ReferenceCells::Line)
     {
       const std::array<T, 2> i{{vertices_0[0], vertices_0[1]}};

@@ -621,8 +621,7 @@ namespace internal
       line_index(const TriaAccessor<3, 3, 3> &accessor, const unsigned int i)
       {
         const auto pair =
-          accessor.reference_cell_info().standard_line_to_face_and_line_index(
-            i);
+          accessor.reference_cell().standard_line_to_face_and_line_index(i);
         const auto quad_index = pair[0];
         const auto line_index =
           accessor.reference_cell_info().standard_to_real_face_line(
@@ -834,8 +833,7 @@ namespace internal
         AssertIndexRange(line, accessor.n_lines());
 
         const auto pair =
-          accessor.reference_cell_info().standard_line_to_face_and_line_index(
-            line);
+          accessor.reference_cell().standard_line_to_face_and_line_index(line);
         const auto quad_index = pair[0];
         const auto line_index =
           accessor.reference_cell_info().standard_to_real_face_line(
@@ -1019,8 +1017,9 @@ namespace internal
       vertex_index(const TriaAccessor<2, dim, spacedim> &accessor,
                    const unsigned int                    corner)
       {
-        const auto pair = accessor.reference_cell_info()
-                            .standard_vertex_to_face_and_vertex_index(corner);
+        const auto pair =
+          accessor.reference_cell().standard_vertex_to_face_and_vertex_index(
+            corner);
         const auto line_index = pair[0];
         const auto vertex_index =
           accessor.reference_cell_info().standard_to_real_face_vertex(
@@ -1035,8 +1034,9 @@ namespace internal
       vertex_index(const TriaAccessor<3, 3, 3> &accessor,
                    const unsigned int           corner)
       {
-        const auto pair = accessor.reference_cell_info()
-                            .standard_vertex_to_face_and_vertex_index(corner);
+        const auto pair =
+          accessor.reference_cell().standard_vertex_to_face_and_vertex_index(
+            corner);
         const auto face_index = pair[0];
         const auto vertex_index =
           accessor.reference_cell_info().standard_to_real_face_vertex(
@@ -2195,7 +2195,7 @@ template <int structdim, int dim, int spacedim>
 unsigned int
 TriaAccessor<structdim, dim, spacedim>::n_vertices() const
 {
-  return this->reference_cell_info().n_vertices();
+  return this->reference_cell().n_vertices();
 }
 
 
@@ -2204,7 +2204,7 @@ template <int structdim, int dim, int spacedim>
 unsigned int
 TriaAccessor<structdim, dim, spacedim>::n_lines() const
 {
-  return this->reference_cell_info().n_lines();
+  return this->reference_cell().n_lines();
 }
 
 
@@ -2215,7 +2215,7 @@ TriaAccessor<structdim, dim, spacedim>::n_faces() const
 {
   AssertDimension(structdim, dim);
 
-  return this->reference_cell_info().n_faces();
+  return this->reference_cell().n_faces();
 }
 
 
