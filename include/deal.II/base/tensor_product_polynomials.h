@@ -66,6 +66,10 @@ class TensorProductPolynomialsConst;
  * indices i,j,k of the one-dimensional polynomials in x,y and z direction.
  * The ordering of the dim-dimensional polynomials can be changed by using the
  * set_numbering() function.
+ *
+ * @tparam PolynomialType A class that satisfies the required interface for computing
+ *   tensor products. Typical choices for this template argument are
+ *   Polynomials::Polynomial and Polynomials::PiecewisePolynomial.
  */
 template <int dim, typename PolynomialType = Polynomials::Polynomial<double>>
 class TensorProductPolynomials : public ScalarPolynomialsBase<dim>

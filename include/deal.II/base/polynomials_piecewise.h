@@ -44,10 +44,19 @@ namespace Polynomials
    * Definition of piecewise 1D polynomials for the unit interval. This space
    * allows the description of interpolating polynomials on parts of the unit
    * interval, similarly to the definition of finite element basis functions
-   * on the subdivided elements. This primary purpose of this class is to
-   * allow constructing FE_Q_iso_Q1 elements that put additional degrees of
-   * freedom into an equivalent of a refined mesh instead of higher order
-   * polynomials, which is useful when using mixed finite elements.
+   * on subdivided elements. The primary purpose of this class is to
+   * allow constructing the shape functions of the FE_Q_iso_Q1 class that has
+   * a number of interpolation points in each coordinate direction, but instead
+   * of using them for higher-order polynomials just chooses piecewise linear
+   * shape functions -- in effect, it is a $Q_1$ element defined on a
+   * subdivision of the reference cell, and replicated on each of these
+   * sub-cells.
+   *
+   * This class is not derived from the ScalarPolynomialsBase base class
+   * because it is not actually a polynomial -- it is a piecewise polynomial.
+   * However, it is interface-compatible with the Polynomials::Polynomial
+   * class, and consequently can be used as template argument for
+   * TensorProductPolynomials.
    *
    * @ingroup Polynomials
    */
