@@ -566,7 +566,7 @@ ReferenceCell::faces_for_given_vertex(const unsigned int vertex) const
       AssertIndexRange(vertex, 3);
       static const unsigned int table[3][2] = {{0, 2}, {0, 1}, {1, 2}};
 
-      return table[vertex];
+      return {&table[vertex][0], 2};
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
@@ -576,7 +576,7 @@ ReferenceCell::faces_for_given_vertex(const unsigned int vertex) const
                                                {0, 2, 3},
                                                {1, 2, 3}};
 
-      return table[vertex];
+      return {&table[vertex][0], 3};
     }
   else if (*this == ReferenceCells::Wedge)
     {
@@ -584,7 +584,7 @@ ReferenceCell::faces_for_given_vertex(const unsigned int vertex) const
       static const unsigned int table[6][3] = {
         {0, 2, 4}, {0, 2, 3}, {0, 3, 4}, {1, 2, 4}, {1, 2, 3}, {1, 3, 4}};
 
-      return table[vertex];
+      return {&table[vertex][0], 3};
     }
   else if (*this == ReferenceCells::Pyramid)
     {
