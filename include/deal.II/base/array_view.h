@@ -174,10 +174,10 @@ public:
    * A constructor that automatically creates a view for a given C-style array.
    * This constructor can be used as follows:
    * @code
-   *   ArrayView<int>
+   *   ArrayView<const int>
    *   get_data_table ()
    *   {
-   *     const int my_data[7] = { 1, 1, 2, 3, 5, 8, 13 };
+   *     static const int my_data[7] = { 1, 1, 2, 3, 5, 8, 13 };
    *     return {my_data};
    *   }
    * @endcode
