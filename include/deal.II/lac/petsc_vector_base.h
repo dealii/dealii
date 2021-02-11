@@ -356,7 +356,7 @@ namespace PETScWrappers
      * is the same as size(), but for parallel vectors it may be smaller.
      *
      * To figure out which elements exactly are stored locally, use
-     * local_range().
+     * local_range() or locally_owned_elements().
      *
      * @deprecated use locally_owned_size() instead.
      */
@@ -370,7 +370,7 @@ namespace PETScWrappers
      * is the same as size(), but for parallel vectors it may be smaller.
      *
      * To figure out which elements exactly are stored locally, use
-     * local_range().
+     * local_range() or locally_owned_elements().
      */
     size_type
     locally_owned_size() const;

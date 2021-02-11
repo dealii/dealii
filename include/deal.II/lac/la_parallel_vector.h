@@ -925,7 +925,7 @@ namespace LinearAlgebra
        * Return the local size of the vector, i.e., the number of indices
        * owned locally.
        *
-       * @deprecated use locally_owned_size() instead.
+       * @deprecated Use locally_owned_size() instead.
        */
       DEAL_II_DEPRECATED_EARLY
       size_type

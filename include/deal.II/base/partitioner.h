@@ -285,6 +285,8 @@ namespace Utilities
       /**
        * Return the number of locally owned indices,
        * i.e., local_range().second minus local_range().first.
+       * The returned numbers need to add up to the total number of indices when
+       * summed over all processes
        *
        * @deprecated Use the more clearly named function locally_owned_size()
        * instead.
@@ -296,6 +298,8 @@ namespace Utilities
       /**
        * Return the number of locally owned indices,
        * i.e., local_range().second minus local_range().first.
+       * The returned numbers need to add up to the total number of indices when
+       * summed over all processes
        */
       unsigned int
       locally_owned_size() const;
