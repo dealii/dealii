@@ -23,6 +23,9 @@
 
 #    include <sundials/sundials_linearsolver.h>
 
+#    include <functional>
+#    include <memory>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace SUNDIALS
