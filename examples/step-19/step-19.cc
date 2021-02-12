@@ -37,8 +37,9 @@
 #include <deal.II/grid/grid_refinement.h>
 
 #include <deal.II/fe/mapping_q.h>
-#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/fe_point_evaluation.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_values.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -643,13 +644,15 @@ namespace Step19
   // The approach used here is conceptually the same used in the
   // `assemble_system()` function: We loop over all cells, find the particles
   // located there (with the same caveat about the inefficiency of the algorithm
-  // used here to find these particles), and create an FEValues object with
-  // these positions:
+  // used here to find these particles), and use FEPointEvaluation object to
+  // evaluate the gradient at these positions:
   template <int dim>
   void CathodeRaySimulator<dim>::move_particles()
   {
     const double dt = time.get_next_step_size();
 
+    Vector<double>            solution_values(fe.n_dofs_per_cell());
+    FEPointEvaluation<1, dim> evaluator(mapping, fe);
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (particle_handler.n_particles_in_cell(cell) > 0)
@@ -662,21 +665,15 @@ namespace Step19
           for (const auto &particle : particles_in_cell)
             particle_positions.push_back(particle.get_reference_location());
 
-          const Quadrature<dim> quadrature_formula(particle_positions);
-          FEValues<dim>         particle_position_fe_values(mapping,
-                                                    fe,
-                                                    quadrature_formula,
-                                                    update_gradients);
+          cell->get_dof_values(solution, solution_values);
 
-          particle_position_fe_values.reinit(cell);
-
-          // Then we can ask the FEValues object for the gradients of the
-          // solution (i.e., the electric field $\mathbf E$) at these locations
-          // and loop over the individual particles:
-          std::vector<Tensor<1, dim>> field_gradients(
-            quadrature_formula.size());
-          particle_position_fe_values.get_function_gradients(solution,
-                                                             field_gradients);
+          // Then we can ask the FEPointEvaluation object for the gradients of
+          // the solution (i.e., the electric field $\mathbf E$) at these
+          // locations and loop over the individual particles:
+          evaluator.evaluate(cell,
+                             particle_positions,
+                             make_array_view(solution_values),
+                             EvaluationFlags::gradients);
 
           {
             typename Particles::ParticleHandler<dim>::particle_iterator
@@ -685,7 +682,7 @@ namespace Step19
                  particle != particles_in_cell.end();
                  ++particle, ++particle_index)
               {
-                const Tensor<1, dim> E = field_gradients[particle_index];
+                const Tensor<1, dim> E = evaluator.get_gradient(particle_index);
 
                 // Having now obtained the electric field at the location of one
                 // of the particles, we use this to update first the velocity
