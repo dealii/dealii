@@ -1217,7 +1217,7 @@ ReferenceCell::standard_to_real_face_vertex(
     }
   else if (*this == ReferenceCells::Pyramid)
     {
-      if (face == 0) // Quad
+      if (face == 0) // The quadrilateral face
         {
           return GeometryInfo<3>::standard_to_real_face_vertex(
             vertex,
@@ -1225,7 +1225,7 @@ ReferenceCell::standard_to_real_face_vertex(
             Utilities::get_bit(face_orientation, 2),
             Utilities::get_bit(face_orientation, 1));
         }
-      else // Tri
+      else // One of the triangular faces
         {
           static const unsigned int table[6][3] = {
             {0, 2, 1}, {0, 1, 2}, {2, 1, 0}, {1, 2, 0}, {1, 0, 2}, {2, 0, 1}};
@@ -1235,7 +1235,7 @@ ReferenceCell::standard_to_real_face_vertex(
     }
   else if (*this == ReferenceCells::Wedge)
     {
-      if (face > 1) // QUAD
+      if (face > 1) // One of the quadrilateral faces
         {
           return GeometryInfo<3>::standard_to_real_face_vertex(
             vertex,
@@ -1243,7 +1243,7 @@ ReferenceCell::standard_to_real_face_vertex(
             Utilities::get_bit(face_orientation, 2),
             Utilities::get_bit(face_orientation, 1));
         }
-      else // TRI
+      else // One of the triangular faces
         {
           static const unsigned int table[6][3] = {
             {0, 2, 1}, {0, 1, 2}, {2, 1, 0}, {1, 2, 0}, {1, 0, 2}, {2, 0, 1}};
@@ -1300,7 +1300,7 @@ ReferenceCell::standard_to_real_face_line(
     }
   else if (*this == ReferenceCells::Pyramid)
     {
-      if (face == 0) // QUAD
+      if (face == 0) // The quadrilateral face
         {
           return GeometryInfo<3>::standard_to_real_face_line(
             line,
@@ -1308,7 +1308,7 @@ ReferenceCell::standard_to_real_face_line(
             Utilities::get_bit(face_orientation, 2),
             Utilities::get_bit(face_orientation, 1));
         }
-      else // TRI
+      else // One of the triangular faces
         {
           static const unsigned int table[6][3] = {
             {2, 1, 0}, {0, 1, 2}, {1, 0, 2}, {1, 2, 0}, {0, 2, 1}, {2, 0, 1}};
@@ -1318,7 +1318,7 @@ ReferenceCell::standard_to_real_face_line(
     }
   else if (*this == ReferenceCells::Wedge)
     {
-      if (face > 1) // QUAD
+      if (face > 1) // One of the quadrilateral faces
         {
           return GeometryInfo<3>::standard_to_real_face_line(
             line,
@@ -1326,7 +1326,7 @@ ReferenceCell::standard_to_real_face_line(
             Utilities::get_bit(face_orientation, 2),
             Utilities::get_bit(face_orientation, 1));
         }
-      else // TRI
+      else // One of the triangular faces
         {
           static const unsigned int table[6][3] = {
             {2, 1, 0}, {0, 1, 2}, {1, 0, 2}, {1, 2, 0}, {0, 2, 1}, {2, 0, 1}};
@@ -2380,7 +2380,7 @@ namespace internal
         const unsigned int  face,
         const unsigned char face_orientation) const override
       {
-        if (face == 0) // QUAD
+        if (face == 0) // The quadrilateral face
           {
             return GeometryInfo<3>::standard_to_real_face_line(
               line,
@@ -2388,7 +2388,7 @@ namespace internal
               Utilities::get_bit(face_orientation, 2),
               Utilities::get_bit(face_orientation, 1));
           }
-        else // TRI
+        else // One of the triangular faces
           {
             static const std::array<std::array<unsigned int, 3>, 6> table = {
               {{{2, 1, 0}},
@@ -2430,7 +2430,7 @@ namespace internal
         const unsigned int  face,
         const unsigned char face_orientation) const override
       {
-        if (face == 0) // Quad
+        if (face == 0) // The one quadrilateral face
           {
             return GeometryInfo<3>::standard_to_real_face_vertex(
               vertex,
@@ -2438,7 +2438,7 @@ namespace internal
               Utilities::get_bit(face_orientation, 2),
               Utilities::get_bit(face_orientation, 1));
           }
-        else // Tri
+        else // One of the triangular faces
           {
             static const std::array<std::array<unsigned int, 3>, 6> table = {
               {{{0, 2, 1}},
@@ -2554,7 +2554,7 @@ namespace internal
         const unsigned int  face,
         const unsigned char face_orientation) const override
       {
-        if (face > 1) // QUAD
+        if (face > 1) // One of the quadrilateral faces
           {
             return GeometryInfo<3>::standard_to_real_face_line(
               line,
@@ -2562,7 +2562,7 @@ namespace internal
               Utilities::get_bit(face_orientation, 2),
               Utilities::get_bit(face_orientation, 1));
           }
-        else // TRI
+        else // One of the triangular faces
           {
             static const std::array<std::array<unsigned int, 3>, 6> table = {
               {{{2, 1, 0}},
@@ -2604,7 +2604,7 @@ namespace internal
         const unsigned int  face,
         const unsigned char face_orientation) const override
       {
-        if (face > 1) // QUAD
+        if (face > 1) // One of the quadrilateral faces
           {
             return GeometryInfo<3>::standard_to_real_face_vertex(
               vertex,
@@ -2612,7 +2612,7 @@ namespace internal
               Utilities::get_bit(face_orientation, 2),
               Utilities::get_bit(face_orientation, 1));
           }
-        else // TRI
+        else // One of the triangular faces
           {
             static const std::array<std::array<unsigned int, 3>, 6> table = {
               {{{0, 2, 1}},
