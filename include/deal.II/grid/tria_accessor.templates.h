@@ -2851,8 +2851,7 @@ inline typename dealii::internal::TriangulationImplementation::
   Iterators<1, spacedim>::line_iterator
   TriaAccessor<0, 1, spacedim>::line(const unsigned int)
 {
-  return typename dealii::internal::TriangulationImplementation::
-    Iterators<1, spacedim>::line_iterator();
+  return {};
 }
 
 
@@ -2870,8 +2869,7 @@ inline typename dealii::internal::TriangulationImplementation::
   Iterators<1, spacedim>::quad_iterator
   TriaAccessor<0, 1, spacedim>::quad(const unsigned int)
 {
-  return typename dealii::internal::TriangulationImplementation::
-    Iterators<1, spacedim>::quad_iterator();
+  return {};
 }
 
 
