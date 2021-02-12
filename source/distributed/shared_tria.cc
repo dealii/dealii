@@ -468,6 +468,59 @@ namespace parallel
 #endif
 
 
+
+namespace internal
+{
+  namespace parallel
+  {
+    namespace shared
+    {
+      template <int dim, int spacedim>
+      TemporarilyRestoreSubdomainIds<dim, spacedim>::
+        TemporarilyRestoreSubdomainIds(const Triangulation<dim, spacedim> &tria)
+        : shared_tria(
+            dynamic_cast<
+              const dealii::parallel::shared::Triangulation<dim, spacedim> *>(
+              &tria))
+      {
+        if (shared_tria && shared_tria->with_artificial_cells())
+          {
+            // Save the current set of subdomain IDs, and set subdomain IDs
+            // to the "true" owner of each cell.
+            const std::vector<types::subdomain_id> &true_subdomain_ids =
+              shared_tria->get_true_subdomain_ids_of_cells();
+
+            saved_subdomain_ids.resize(shared_tria->n_active_cells());
+            for (const auto &cell : shared_tria->active_cell_iterators())
+              {
+                const unsigned int index   = cell->active_cell_index();
+                saved_subdomain_ids[index] = cell->subdomain_id();
+                cell->set_subdomain_id(true_subdomain_ids[index]);
+              }
+          }
+      }
+
+
+
+      template <int dim, int spacedim>
+      TemporarilyRestoreSubdomainIds<dim, spacedim>::
+        ~TemporarilyRestoreSubdomainIds()
+      {
+        if (shared_tria && shared_tria->with_artificial_cells())
+          {
+            // Undo the subdomain modification.
+            for (const auto &cell : shared_tria->active_cell_iterators())
+              {
+                const unsigned int index = cell->active_cell_index();
+                cell->set_subdomain_id(saved_subdomain_ids[index]);
+              }
+          }
+      }
+    } // namespace shared
+  }   // namespace parallel
+} // namespace internal
+
+
 /*-------------- Explicit Instantiations -------------------------------*/
 #include "shared_tria.inst"
 
