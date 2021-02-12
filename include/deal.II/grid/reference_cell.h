@@ -877,7 +877,8 @@ ReferenceCell::child_cell_on_face(const unsigned int face,
     }
   else if (*this == ReferenceCells::Triangle)
     {
-      static constexpr unsigned int subcells[3][2] = {{0, 1}, {1, 2}, {2, 0}};
+      static const std::array<std::array<unsigned int, 2>, 3> subcells = {
+        {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
 
       return subcells[face][subface];
     }
@@ -1068,10 +1069,8 @@ ReferenceCell::face_to_cell_lines(const unsigned int  face,
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
-      const static unsigned int table[4][3] = {{0, 1, 2},
-                                               {0, 3, 4},
-                                               {2, 5, 3},
-                                               {1, 4, 5}};
+      const static std::array<std::array<unsigned int, 3>, 4> table = {
+        {{{0, 1, 2}}, {{0, 3, 4}}, {{2, 5, 3}}, {{1, 4, 5}}}};
 
       return table[face]
                   [standard_to_real_face_line(line, face, face_orientation)];
@@ -1123,7 +1122,8 @@ ReferenceCell::face_to_cell_vertices(const unsigned int  face,
     }
   else if (*this == ReferenceCells::Triangle)
     {
-      static const unsigned int table[3][2] = {{0, 1}, {1, 2}, {2, 0}};
+      static const std::array<std::array<unsigned int, 2>, 3> table = {
+        {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
 
       return table[face][face_orientation ? vertex : (1 - vertex)];
     }
@@ -1138,28 +1138,34 @@ ReferenceCell::face_to_cell_vertices(const unsigned int  face,
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
-      static const unsigned int table[4][3] = {{0, 1, 2},
-                                               {1, 0, 3},
-                                               {0, 2, 3},
-                                               {2, 1, 3}};
+      static const std::array<std::array<unsigned int, 3>, 4> table = {
+        {{{0, 1, 2}}, {{1, 0, 3}}, {{0, 2, 3}}, {{2, 1, 3}}}};
 
       return table[face][standard_to_real_face_vertex(
         vertex, face, face_orientation)];
     }
   else if (*this == ReferenceCells::Pyramid)
     {
-      constexpr auto            X           = numbers::invalid_unsigned_int;
-      static const unsigned int table[5][4] = {
-        {0, 1, 2, 3}, {0, 2, 4, X}, {3, 1, 4, X}, {1, 0, 4, X}, {2, 3, 4, X}};
+      constexpr auto X = numbers::invalid_unsigned_int;
+      static const std::array<std::array<unsigned int, 4>, 5> table = {
+        {{{0, 1, 2, 3}},
+         {{0, 2, 4, X}},
+         {{3, 1, 4, X}},
+         {{1, 0, 4, X}},
+         {{2, 3, 4, X}}}};
 
       return table[face][standard_to_real_face_vertex(
         vertex, face, face_orientation)];
     }
   else if (*this == ReferenceCells::Wedge)
     {
-      constexpr auto            X           = numbers::invalid_unsigned_int;
-      static const unsigned int table[6][4] = {
-        {1, 0, 2, X}, {3, 4, 5, X}, {0, 1, 3, 4}, {1, 2, 4, 5}, {2, 0, 5, 3}};
+      constexpr auto X = numbers::invalid_unsigned_int;
+      static const std::array<std::array<unsigned int, 4>, 6> table = {
+        {{{1, 0, 2, X}},
+         {{3, 4, 5, X}},
+         {{0, 1, 3, 4}},
+         {{1, 2, 4, 5}},
+         {{2, 0, 5, 3}}}};
 
       return table[face][standard_to_real_face_vertex(
         vertex, face, face_orientation)];
@@ -1199,7 +1205,8 @@ ReferenceCell::standard_to_real_face_vertex(
     }
   else if (*this == ReferenceCells::Triangle)
     {
-      static const unsigned int table[2][2] = {{1, 0}, {0, 1}};
+      static const std::array<std::array<unsigned int, 2>, 2> table = {
+        {{{1, 0}}, {{0, 1}}}};
 
       return table[face_orientation][vertex];
     }
@@ -1210,8 +1217,13 @@ ReferenceCell::standard_to_real_face_vertex(
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
-      static const unsigned int table[6][3] = {
-        {0, 2, 1}, {0, 1, 2}, {2, 1, 0}, {1, 2, 0}, {1, 0, 2}, {2, 0, 1}};
+      static const std::array<std::array<unsigned int, 3>, 6> table = {
+        {{{0, 2, 1}},
+         {{0, 1, 2}},
+         {{2, 1, 0}},
+         {{1, 2, 0}},
+         {{1, 0, 2}},
+         {{2, 0, 1}}}};
 
       return table[face_orientation][vertex];
     }
@@ -1227,8 +1239,13 @@ ReferenceCell::standard_to_real_face_vertex(
         }
       else // One of the triangular faces
         {
-          static const unsigned int table[6][3] = {
-            {0, 2, 1}, {0, 1, 2}, {2, 1, 0}, {1, 2, 0}, {1, 0, 2}, {2, 0, 1}};
+          static const std::array<std::array<unsigned int, 3>, 6> table = {
+            {{{0, 2, 1}},
+             {{0, 1, 2}},
+             {{2, 1, 0}},
+             {{1, 2, 0}},
+             {{1, 0, 2}},
+             {{2, 0, 1}}}};
 
           return table[face_orientation][vertex];
         }
@@ -1245,8 +1262,13 @@ ReferenceCell::standard_to_real_face_vertex(
         }
       else // One of the triangular faces
         {
-          static const unsigned int table[6][3] = {
-            {0, 2, 1}, {0, 1, 2}, {2, 1, 0}, {1, 2, 0}, {1, 0, 2}, {2, 0, 1}};
+          static const std::array<std::array<unsigned int, 3>, 6> table = {
+            {{{0, 2, 1}},
+             {{0, 1, 2}},
+             {{2, 1, 0}},
+             {{1, 2, 0}},
+             {{1, 0, 2}},
+             {{2, 0, 1}}}};
 
           return table[face_orientation][vertex];
         }
@@ -1293,8 +1315,13 @@ ReferenceCell::standard_to_real_face_line(
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
-      static const unsigned int table[6][3] = {
-        {2, 1, 0}, {0, 1, 2}, {1, 0, 2}, {1, 2, 0}, {0, 2, 1}, {2, 0, 1}};
+      static const std::array<std::array<unsigned int, 3>, 6> table = {
+        {{{2, 1, 0}},
+         {{0, 1, 2}},
+         {{1, 0, 2}},
+         {{1, 2, 0}},
+         {{0, 2, 1}},
+         {{2, 0, 1}}}};
 
       return table[face_orientation][line];
     }
@@ -1310,8 +1337,13 @@ ReferenceCell::standard_to_real_face_line(
         }
       else // One of the triangular faces
         {
-          static const unsigned int table[6][3] = {
-            {2, 1, 0}, {0, 1, 2}, {1, 0, 2}, {1, 2, 0}, {0, 2, 1}, {2, 0, 1}};
+          static const std::array<std::array<unsigned int, 3>, 6> table = {
+            {{{2, 1, 0}},
+             {{0, 1, 2}},
+             {{1, 0, 2}},
+             {{1, 2, 0}},
+             {{0, 2, 1}},
+             {{2, 0, 1}}}};
 
           return table[face_orientation][line];
         }
@@ -1328,8 +1360,13 @@ ReferenceCell::standard_to_real_face_line(
         }
       else // One of the triangular faces
         {
-          static const unsigned int table[6][3] = {
-            {2, 1, 0}, {0, 1, 2}, {1, 0, 2}, {1, 2, 0}, {0, 2, 1}, {2, 0, 1}};
+          static const std::array<std::array<unsigned int, 3>, 6> table = {
+            {{{2, 1, 0}},
+             {{0, 1, 2}},
+             {{1, 0, 2}},
+             {{1, 2, 0}},
+             {{0, 2, 1}},
+             {{2, 0, 1}}}};
 
           return table[face_orientation][line];
         }
