@@ -252,22 +252,13 @@ namespace SUNDIALS
 
       template <
         typename VectorType,
-        typename std::enable_if_t<is_serial_vector<VectorType>::value, int> = 0>
-      MPI_Comm get_communicator(N_Vector);
-
-      template <
-        typename VectorType,
-        typename std::enable_if_t<!is_serial_vector<VectorType>::value &&
-                                    !IsBlockVector<VectorType>::value,
-                                  int> = 0>
+        typename std::enable_if_t<!IsBlockVector<VectorType>::value, int> = 0>
       MPI_Comm
       get_communicator(N_Vector v);
 
       template <
         typename VectorType,
-        typename std::enable_if_t<!is_serial_vector<VectorType>::value &&
-                                    IsBlockVector<VectorType>::value,
-                                  int> = 0>
+        typename std::enable_if_t<IsBlockVector<VectorType>::value, int> = 0>
       MPI_Comm
       get_communicator(N_Vector v);
 
@@ -275,17 +266,17 @@ namespace SUNDIALS
        * Sundials likes a void* but we want to use the above functions
        * internally with a safe type.
        */
-      template <typename VectorType>
+      template <
+        typename VectorType,
+        typename std::enable_if_t<is_serial_vector<VectorType>::value, int> = 0>
       inline void *
-      get_communicator_as_void_ptr(N_Vector v)
-      {
-#  ifndef DEAL_II_WITH_MPI
-        (void)v;
-        return nullptr;
-#  else
-        return get_communicator<VectorType>(v);
-#  endif
-      }
+      get_communicator_as_void_ptr(N_Vector v);
+
+      template <typename VectorType,
+                typename std::enable_if_t<!is_serial_vector<VectorType>::value,
+                                          int> = 0>
+      inline void *
+      get_communicator_as_void_ptr(N_Vector v);
 
     } // namespace NVectorOperations
   }   // namespace internal
@@ -489,18 +480,7 @@ SUNDIALS::internal::NVectorOperations::destroy(N_Vector v)
 
 
 template <typename VectorType,
-          std::enable_if_t<is_serial_vector<VectorType>::value, int>>
-MPI_Comm SUNDIALS::internal::NVectorOperations::get_communicator(N_Vector)
-{
-  return MPI_COMM_SELF;
-}
-
-
-
-template <typename VectorType,
-          std::enable_if_t<!is_serial_vector<VectorType>::value &&
-                             IsBlockVector<VectorType>::value,
-                           int>>
+          std::enable_if_t<IsBlockVector<VectorType>::value, int>>
 MPI_Comm
 SUNDIALS::internal::NVectorOperations::get_communicator(N_Vector v)
 {
@@ -510,13 +490,37 @@ SUNDIALS::internal::NVectorOperations::get_communicator(N_Vector v)
 
 
 template <typename VectorType,
-          std::enable_if_t<!is_serial_vector<VectorType>::value &&
-                             !IsBlockVector<VectorType>::value,
-                           int>>
+          std::enable_if_t<!IsBlockVector<VectorType>::value, int>>
 MPI_Comm
 SUNDIALS::internal::NVectorOperations::get_communicator(N_Vector v)
 {
   return unwrap_nvector_const<VectorType>(v)->get_mpi_communicator();
+}
+
+
+
+template <typename VectorType,
+          typename std::enable_if_t<is_serial_vector<VectorType>::value, int>>
+void *
+  SUNDIALS::internal::NVectorOperations::get_communicator_as_void_ptr(N_Vector)
+{
+  // required by SUNDIALS: MPI-unaware vectors should return the nullptr as comm
+  return nullptr;
+}
+
+
+
+template <typename VectorType,
+          typename std::enable_if_t<!is_serial_vector<VectorType>::value, int>>
+void *
+SUNDIALS::internal::NVectorOperations::get_communicator_as_void_ptr(N_Vector v)
+{
+#  ifndef DEAL_II_WITH_MPI
+  (void)v;
+  return nullptr;
+#  else
+  return get_communicator<VectorType>(v);
+#  endif
 }
 
 

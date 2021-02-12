@@ -314,6 +314,7 @@ test_get_communicator()
 {
   auto vector   = create_test_vector<VectorType>();
   auto n_vector = make_nvector_view(vector);
+  // required by SUNDIALS: MPI-unaware vectors should return the nullptr
   Assert(N_VGetCommunicator(n_vector) == nullptr, NVectorTestError());
 
   deallog << "test_get_communicator OK" << std::endl;
