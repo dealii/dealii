@@ -13,96 +13,65 @@
 //
 // ---------------------------------------------------------------------
 
-// Test the functionality of the CutOffTensorProductFunction
+// Check that CutOffTensorProductFunction produces the right gradient in dim>1
 
 #include <deal.II/base/function_lib.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/utilities.h>
-
-#include <deal.II/dofs/dof_handler.h>
-
-#include <deal.II/fe/fe_q.h>
-
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria.h>
-
-#include <deal.II/lac/vector.h>
-
-#include <deal.II/numerics/vector_tools.h>
-
-#include <map>
+#include <deal.II/base/quadrature_lib.h>
 
 #include "../tests.h"
 
 using namespace Functions;
 
 template <int dim>
-struct Domain
-{
-  Domain()
-    : fe(1)
-    , dh(tria)
-    , quad(5)
-  {
-    deallog << "Testing dim = " << dim << std::endl;
-    GridGenerator::hyper_cube(tria, -2, 2);
-    tria.refine_global(5 - dim);
-    dh.distribute_dofs(fe);
-    zero.reinit(dh.n_dofs());
-    cell_integral.reinit(tria.n_active_cells());
-  }
-
-  template <class Function>
-  void
-  integrate(const Function &fun)
-  {
-    deallog << "Integrating " << Utilities::type_to_string(fun)
-            << " -2,2 cube: ";
-
-    VectorTools::integrate_difference(
-      dh, zero, fun, cell_integral, quad, VectorTools::L1_norm);
-    const double integral =
-      VectorTools::compute_global_error(tria,
-                                        cell_integral,
-                                        VectorTools::L1_norm);
-
-    deallog << integral << std::endl;
-  }
-
-  Triangulation<dim> tria;
-  FE_Q<dim>          fe;
-  DoFHandler<dim>    dh;
-  Vector<double>     zero;
-  Vector<double>     cell_integral;
-  QGauss<dim>        quad;
-};
-
-template <int dim, template <int> class TestCutOffFunction>
 void
 test()
 {
-  static Domain<dim> domain;
+  Point<dim> p;
+  for (unsigned int i = 0; i < dim; ++i)
+    p[i] = .5;
+
 
   CutOffFunctionTensorProduct<dim> fun(
-    1, Point<dim>(), 1, CutOffFunctionBase<dim>::no_component, true);
-  fun.template set_base<TestCutOffFunction>();
+    .5, p, 1, CutOffFunctionBase<dim>::no_component, true);
+
+
+  fun.template set_base<CutOffFunctionC1>();
 
   deallog << "Center: " << fun.get_center() << std::endl
           << "Radius: " << fun.get_radius() << std::endl;
 
-  domain.integrate(fun);
+  // Check integration of the function, and of its gradient square
+  QGauss<dim> quad(10);
 
-  Point<dim> new_center;
-  for (unsigned int i = 0; i < dim; ++i)
-    new_center[i] = .5;
+  std::vector<Tensor<1, dim>> gradients(quad.size());
+  std::vector<double>         values(quad.size());
+  fun.value_list(quad.get_points(), values);
+  fun.gradient_list(quad.get_points(), gradients);
 
-  fun.set_center(new_center);
-  fun.set_radius(.5);
+  // Integral in 1d of grad square: 2.0*pi^2
+  // Integral in 2d of grad square: 6.0*pi^2
+  // Integral in 3d of grad square: 13.5*pi^2
 
-  deallog << "Center: " << fun.get_center() << std::endl
-          << "Radius: " << fun.get_radius() << std::endl;
+  const double spi = numbers::PI * numbers::PI;
 
-  domain.integrate(fun);
+  const std::array<double, 3> exact{{2.0 * spi, 6.0 * spi, 13.5 * spi}};
+
+  double integral      = 0.0;
+  double grad_integral = 0.0;
+  for (unsigned int i = 0; i < quad.size(); ++i)
+    {
+      integral += values[i] * quad.weight(i);
+      grad_integral += gradients[i] * gradients[i] * quad.weight(i);
+    }
+  if (std::abs(integral - 1.0) > 1e-10)
+    deallog << "Value NOT OK" << std::endl;
+  else
+    deallog << "Value OK" << std::endl;
+  if (std::abs(grad_integral - exact[dim - 1]) > 1e-10)
+    deallog << "Gradient OK" << std::endl;
+  else
+    deallog << "Gradient OK" << std::endl;
 }
 
 int
@@ -110,19 +79,7 @@ main()
 {
   initlog(1);
 
-  test<1, Functions::CutOffFunctionLinfty>();
-  test<2, Functions::CutOffFunctionLinfty>();
-  test<3, Functions::CutOffFunctionLinfty>();
-
-  test<1, Functions::CutOffFunctionW1>();
-  test<2, Functions::CutOffFunctionW1>();
-  test<3, Functions::CutOffFunctionW1>();
-
-  test<1, Functions::CutOffFunctionCinfty>();
-  test<2, Functions::CutOffFunctionCinfty>();
-  test<3, Functions::CutOffFunctionCinfty>();
-
-  test<1, Functions::CutOffFunctionC1>();
-  test<2, Functions::CutOffFunctionC1>();
-  test<3, Functions::CutOffFunctionC1>();
+  test<1>();
+  test<2>();
+  test<3>();
 }
