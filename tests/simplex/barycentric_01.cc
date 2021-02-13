@@ -16,11 +16,13 @@
 // Test Simplex::BarycentricPolynomial and Simplex::BarycentricPolynomials.
 
 #include <deal.II/base/point.h>
+#include <deal.II/base/polynomials_barycentric.h>
 #include <deal.II/base/table.h>
 
-#include <deal.II/simplex/barycentric_polynomials.h>
-#include <deal.II/simplex/fe_lib.h>
-#include <deal.II/simplex/polynomials.h>
+#include <deal.II/fe/fe_pyramid_p.h>
+#include <deal.II/fe/fe_simplex_p.h>
+#include <deal.II/fe/fe_simplex_p_bubbles.h>
+#include <deal.II/fe/fe_wedge_p.h>
 
 #include "../tests.h"
 

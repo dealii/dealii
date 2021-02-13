@@ -18,11 +18,13 @@
 // verify hanging node constraints on locally hp-refined hybrid meshes
 
 
+#include <deal.II/fe/fe_pyramid_p.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_simplex_p.h>
+#include <deal.II/fe/fe_simplex_p_bubbles.h>
+#include <deal.II/fe/fe_wedge_p.h>
 
 #include <deal.II/hp/fe_collection.h>
-
-#include <deal.II/simplex/fe_lib.h>
 
 #include <vector>
 

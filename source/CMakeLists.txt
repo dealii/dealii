@@ -71,7 +71,6 @@ ADD_SUBDIRECTORY(differentiation)
 ADD_SUBDIRECTORY(physics)
 ADD_SUBDIRECTORY(optimization/rol)
 ADD_SUBDIRECTORY(non_matching)
-ADD_SUBDIRECTORY(simplex)
 ADD_SUBDIRECTORY(sundials)
 
 FOREACH(build ${DEAL_II_BUILD_TYPES})

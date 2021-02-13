@@ -29,7 +29,11 @@
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_poly.h>
+#include <deal.II/fe/fe_pyramid_p.h>
 #include <deal.II/fe/fe_q_dg0.h>
+#include <deal.II/fe/fe_simplex_p.h>
+#include <deal.II/fe/fe_simplex_p_bubbles.h>
+#include <deal.II/fe/fe_wedge_p.h>
 
 #include <deal.II/grid/reference_cell.h>
 
@@ -37,8 +41,6 @@
 
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/util.h>
-
-#include <deal.II/simplex/fe_lib.h>
 
 
 DEAL_II_NAMESPACE_OPEN

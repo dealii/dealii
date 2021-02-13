@@ -18,9 +18,8 @@
 // quadrature rule.
 
 
+#include <deal.II/base/polynomials_barycentric.h>
 #include <deal.II/base/quadrature_lib.h>
-
-#include <deal.II/simplex/polynomials.h>
 
 #include "../tests.h"
 

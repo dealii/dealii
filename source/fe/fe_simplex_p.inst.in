@@ -15,19 +15,11 @@
 
 
 
-for (deal_II_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
   {
-    template void GridGenerator::subdivided_hyper_rectangle_with_simplices(
-      Triangulation<deal_II_dimension> & tria,
-      const std::vector<unsigned int> &repetitions,
-      const Point<deal_II_dimension> & p1,
-      const Point<deal_II_dimension> & p2,
-      const bool                       colorize);
-
-    template void GridGenerator::subdivided_hyper_cube_with_simplices(
-      Triangulation<deal_II_dimension> & tria,
-      const unsigned int repetitions,
-      const double       p1,
-      const double       p2,
-      const bool         colorize);
+#if deal_II_dimension <= deal_II_space_dimension
+    template class Simplex::FE_Poly<deal_II_dimension, deal_II_space_dimension>;
+    template class Simplex::FE_P<deal_II_dimension, deal_II_space_dimension>;
+    template class Simplex::FE_DGP<deal_II_dimension, deal_II_space_dimension>;
+#endif
   }

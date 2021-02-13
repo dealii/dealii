@@ -18,22 +18,11 @@
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
-    template class Simplex::FE_Poly<deal_II_dimension, deal_II_space_dimension>;
-    template class Simplex::FE_P<deal_II_dimension, deal_II_space_dimension>;
-    template class Simplex::FE_DGP<deal_II_dimension, deal_II_space_dimension>;
     template class Simplex::FE_Wedge<deal_II_dimension,
                                      deal_II_space_dimension>;
     template class Simplex::FE_WedgeP<deal_II_dimension,
                                       deal_II_space_dimension>;
     template class Simplex::FE_WedgeDGP<deal_II_dimension,
                                         deal_II_space_dimension>;
-    template class Simplex::FE_Pyramid<deal_II_dimension,
-                                       deal_II_space_dimension>;
-    template class Simplex::FE_PyramidP<deal_II_dimension,
-                                        deal_II_space_dimension>;
-    template class Simplex::FE_PyramidDGP<deal_II_dimension,
-                                          deal_II_space_dimension>;
-    template class Simplex::FE_P_Bubbles<deal_II_dimension,
-                                         deal_II_space_dimension>;
 #endif
   }

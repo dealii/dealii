@@ -27,8 +27,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/simplex/grid_generator.h>
-
 #include <fstream>
 #include <iostream>
 
