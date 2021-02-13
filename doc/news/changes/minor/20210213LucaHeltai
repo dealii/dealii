@@ -1,0 +1,3 @@
+Fixed: CutOffFunctionTensorProduct::gradient() was computing the wrong gradient. This is now fixed.
+<br>
+(Luca Heltai, 2021/02/13)
