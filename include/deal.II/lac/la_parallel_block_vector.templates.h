@@ -836,9 +836,10 @@ namespace LinearAlgebra
 
     template <typename Number>
     inline void
-    BlockVector<Number>::import(const LinearAlgebra::ReadWriteVector<Number> &,
-                                VectorOperation::values,
-                                std::shared_ptr<const CommunicationPatternBase>)
+    BlockVector<Number>::import(
+      const LinearAlgebra::ReadWriteVector<Number> &,
+      VectorOperation::values,
+      std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>)
     {
       AssertThrow(false, ExcNotImplemented());
     }

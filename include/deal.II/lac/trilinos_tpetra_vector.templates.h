@@ -165,9 +165,10 @@ namespace LinearAlgebra
     template <typename Number>
     void
     Vector<Number>::import(
-      const ReadWriteVector<Number> &                 V,
-      VectorOperation::values                         operation,
-      std::shared_ptr<const CommunicationPatternBase> communication_pattern)
+      const ReadWriteVector<Number> &V,
+      VectorOperation::values        operation,
+      std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+        communication_pattern)
     {
       // If no communication pattern is given, create one. Otherwise, use the
       // one given.

@@ -220,11 +220,10 @@ namespace LinearAlgebra
      * This function is not implemented and will throw an exception.
      */
     virtual void
-    import(
-      const ReadWriteVector<Number> &                 V,
-      VectorOperation::values                         operation,
-      std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-        std::shared_ptr<const CommunicationPatternBase>()) override;
+    import(const ReadWriteVector<Number> &V,
+           VectorOperation::values        operation,
+           std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+             communication_pattern = {}) override;
 
     /**
      * Add @p a to all components. Note that @p a is a scalar not a vector.

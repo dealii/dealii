@@ -23,7 +23,7 @@
 
 #  ifdef DEAL_II_WITH_MPI
 
-#    include <deal.II/lac/communication_pattern_base.h>
+#    include <deal.II/base/communication_pattern_base.h>
 
 #    include <Epetra_Import.h>
 
@@ -37,9 +37,10 @@ namespace LinearAlgebra
   {
     /**
      * This class implements a wrapper to a Trilinos Epetra_Import object,
-     * for use in places where a CommunicationPatternBase object is required.
+     * for use in places where a Utilities::MPI::CommunicationPatternBase object
+     * is required.
      */
-    class CommunicationPattern : public CommunicationPatternBase
+    class CommunicationPattern : public Utilities::MPI::CommunicationPatternBase
     {
     public:
       /**
