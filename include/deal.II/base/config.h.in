@@ -149,7 +149,18 @@
 #cmakedefine DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
 #cmakedefine DEAL_II_CXX14_CONSTEXPR_BUG
 
+/**
+ * Macro indicating that the current feature will be removed in a future
+ * release.
+ */
 #cmakedefine DEAL_II_DEPRECATED @DEAL_II_DEPRECATED@
+
+/**
+ * Same as above, but for things that have been deprecated during the current
+ * development cycle. By default, no warnings are printed for a feature
+ * deprecated prior to a release until <em>after</em> that release has been
+ * finalized - see DEAL_II_EARLY_DEPRECATIONS for more information.
+ */
 #cmakedefine DEAL_II_DEPRECATED_EARLY @DEAL_II_DEPRECATED_EARLY@
 #cmakedefine DEAL_II_FALLTHROUGH @DEAL_II_FALLTHROUGH@
 #cmakedefine DEAL_II_CONSTEXPR @DEAL_II_CONSTEXPR@
