@@ -44,6 +44,30 @@ namespace Utilities
        * Return the corresponding MPI data type id for the argument given.
        */
       inline MPI_Datatype
+      mpi_type_id(const char *)
+      {
+        return MPI_CHAR;
+      }
+
+
+
+      inline MPI_Datatype
+      mpi_type_id(const signed char *)
+      {
+        return MPI_SIGNED_CHAR;
+      }
+
+
+
+      inline MPI_Datatype
+      mpi_type_id(const short *)
+      {
+        return MPI_SHORT;
+      }
+
+
+
+      inline MPI_Datatype
       mpi_type_id(const int *)
       {
         return MPI_INT;
@@ -55,6 +79,22 @@ namespace Utilities
       mpi_type_id(const long int *)
       {
         return MPI_LONG;
+      }
+
+
+
+      inline MPI_Datatype
+      mpi_type_id(const unsigned char *)
+      {
+        return MPI_UNSIGNED_CHAR;
+      }
+
+
+
+      inline MPI_Datatype
+      mpi_type_id(const unsigned short *)
+      {
+        return MPI_UNSIGNED_SHORT;
       }
 
 
