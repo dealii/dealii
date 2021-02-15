@@ -321,15 +321,13 @@ namespace Utilities
           AssertThrowMPI(ierr);
         }
 
-      auto src_iterator = src.begin();
-
       // post send
       for (types::global_dof_index i = 0, k = 0; i < send_ranks.size(); i++)
         {
           // collect data to be send
           for (types::global_dof_index j = send_ptr[i]; j < send_ptr[i + 1];
                j++)
-            buffers[j] = src_iterator[send_indices[k++]];
+            buffers[j] = src[send_indices[k++]];
 
           // send data
           const auto ierr =
@@ -360,8 +358,6 @@ namespace Utilities
       (void)requests;
       Assert(false, ExcNeedsMPI());
 #else
-      auto dst_iterator = dst.begin();
-
       // receive all data packages and copy data from buffers
       for (types::global_dof_index proc = 0; proc < recv_ranks.size(); proc++)
         {
@@ -376,7 +372,7 @@ namespace Utilities
           for (types::global_dof_index j = recv_ptr[i], c = 0;
                j < recv_ptr[i + 1];
                j++)
-            dst_iterator[recv_indices[j]] = buffers[recv_ptr[i] + c++];
+            dst[recv_indices[j]] = buffers[recv_ptr[i] + c++];
         }
 
       // wait that all data packages have been sent
