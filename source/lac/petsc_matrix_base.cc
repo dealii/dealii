@@ -426,6 +426,7 @@ namespace PETScWrappers
   }
 
 
+
   MatrixBase &
   MatrixBase::add(const PetscScalar factor, const MatrixBase &other)
   {
@@ -436,13 +437,6 @@ namespace PETScWrappers
     return *this;
   }
 
-
-
-  MatrixBase &
-  MatrixBase::add(const MatrixBase &other, const PetscScalar factor)
-  {
-    return add(factor, other);
-  }
 
 
   void

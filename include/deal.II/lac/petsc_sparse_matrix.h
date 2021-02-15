@@ -400,72 +400,6 @@ namespace PETScWrappers
       ~SparseMatrix() override;
 
       /**
-       * Create a sparse matrix of dimensions @p m times @p n, with an initial
-       * guess of @p n_nonzero_per_row and @p n_offdiag_nonzero_per_row
-       * nonzero elements per row (see documentation of the MatCreateAIJ PETSc
-       * function for more information about these parameters). PETSc is able
-       * to cope with the situation that more than this number of elements are
-       * later allocated for a row, but this involves copying data, and is
-       * thus expensive.
-       *
-       * For the meaning of the @p local_row and @p local_columns parameters,
-       * see the class documentation.
-       *
-       * The @p is_symmetric flag determines whether we should tell PETSc that
-       * the matrix is going to be symmetric (as indicated by the call
-       * <tt>MatSetOption(mat, MAT_SYMMETRIC)</tt>. Note that the PETSc
-       * documentation states that one cannot form an ILU decomposition of a
-       * matrix for which this flag has been set to @p true, only an ICC. The
-       * default value of this flag is @p false.
-       *
-       * @deprecated This constructor is deprecated: please use the
-       * constructor with a sparsity pattern argument instead.
-       */
-      DEAL_II_DEPRECATED
-      SparseMatrix(const MPI_Comm &communicator,
-                   const size_type m,
-                   const size_type n,
-                   const size_type local_rows,
-                   const size_type local_columns,
-                   const size_type n_nonzero_per_row,
-                   const bool      is_symmetric              = false,
-                   const size_type n_offdiag_nonzero_per_row = 0);
-
-      /**
-       * Initialize a rectangular matrix with @p m rows and @p n columns. The
-       * maximal number of nonzero entries for diagonal and off- diagonal
-       * blocks of each row is given by the @p row_lengths and @p
-       * offdiag_row_lengths arrays.
-       *
-       * For the meaning of the @p local_row and @p local_columns parameters,
-       * see the class documentation.
-       *
-       * Just as for the other constructors: PETSc is able to cope with the
-       * situation that more than this number of elements are later allocated
-       * for a row, but this involves copying data, and is thus expensive.
-       *
-       * The @p is_symmetric flag determines whether we should tell PETSc that
-       * the matrix is going to be symmetric (as indicated by the call
-       * <tt>MatSetOption(mat, MAT_SYMMETRIC)</tt>. Note that the PETSc
-       * documentation states that one cannot form an ILU decomposition of a
-       * matrix for which this flag has been set to @p true, only an ICC. The
-       * default value of this flag is @p false.
-       *
-       * @deprecated This constructor is deprecated: please use the
-       * constructor with a sparsity pattern argument instead.
-       */
-      DEAL_II_DEPRECATED
-      SparseMatrix(const MPI_Comm &              communicator,
-                   const size_type               m,
-                   const size_type               n,
-                   const size_type               local_rows,
-                   const size_type               local_columns,
-                   const std::vector<size_type> &row_lengths,
-                   const bool                    is_symmetric = false,
-                   const std::vector<size_type> &offdiag_row_lengths =
-                     std::vector<size_type>());
-
-      /**
        * Initialize using the given sparsity pattern with communication
        * happening over the provided @p communicator.
        *
@@ -514,45 +448,6 @@ namespace PETScWrappers
        */
       void
       copy_from(const SparseMatrix &other);
-
-      /**
-       * Throw away the present matrix and generate one that has the same
-       * properties as if it were created by the constructor of this class
-       * with the same argument list as the present function.
-       *
-       * @deprecated This overload of <code>reinit</code> is deprecated:
-       * please use the overload with a sparsity pattern argument instead.
-       */
-      DEAL_II_DEPRECATED
-      void
-      reinit(const MPI_Comm &communicator,
-             const size_type m,
-             const size_type n,
-             const size_type local_rows,
-             const size_type local_columns,
-             const size_type n_nonzero_per_row,
-             const bool      is_symmetric              = false,
-             const size_type n_offdiag_nonzero_per_row = 0);
-
-      /**
-       * Throw away the present matrix and generate one that has the same
-       * properties as if it were created by the constructor of this class
-       * with the same argument list as the present function.
-       *
-       * @deprecated This overload of <code>reinit</code> is deprecated:
-       * please use the overload with a sparsity pattern argument instead.
-       */
-      DEAL_II_DEPRECATED
-      void
-      reinit(const MPI_Comm &              communicator,
-             const size_type               m,
-             const size_type               n,
-             const size_type               local_rows,
-             const size_type               local_columns,
-             const std::vector<size_type> &row_lengths,
-             const bool                    is_symmetric = false,
-             const std::vector<size_type> &offdiag_row_lengths =
-               std::vector<size_type>());
 
       /**
        * Initialize using the given sparsity pattern with communication
@@ -697,41 +592,6 @@ namespace PETScWrappers
        * Copy of the communicator object to be used for this parallel vector.
        */
       MPI_Comm communicator;
-
-      /**
-       * Do the actual work for the respective reinit() function and the
-       * matching constructor, i.e. create a matrix. Getting rid of the
-       * previous matrix is left to the caller.
-       *
-       * @deprecated This overload of <code>do_reinit</code> is deprecated:
-       * please use the overload with a sparsity pattern argument instead.
-       */
-      DEAL_II_DEPRECATED
-      void
-      do_reinit(const size_type m,
-                const size_type n,
-                const size_type local_rows,
-                const size_type local_columns,
-                const size_type n_nonzero_per_row,
-                const bool      is_symmetric              = false,
-                const size_type n_offdiag_nonzero_per_row = 0);
-
-      /**
-       * Same as previous function.
-       *
-       * @deprecated This overload of <code>do_reinit</code> is deprecated:
-       * please use the overload with a sparsity pattern argument instead.
-       */
-      DEAL_II_DEPRECATED
-      void
-      do_reinit(const size_type               m,
-                const size_type               n,
-                const size_type               local_rows,
-                const size_type               local_columns,
-                const std::vector<size_type> &row_lengths,
-                const bool                    is_symmetric = false,
-                const std::vector<size_type> &offdiag_row_lengths =
-                  std::vector<size_type>());
 
       /**
        * Same as previous functions.
