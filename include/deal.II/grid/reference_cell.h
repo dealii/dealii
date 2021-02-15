@@ -282,6 +282,42 @@ public:
    */
 
   /**
+   * Return which child cells are adjacent to a certain face of the
+   * mother cell.
+   *
+   * For example, in 2D the layout of a quadrilateral cell is as follows:
+   * @verbatim
+   * .      3
+   * .   2-->--3
+   * .   |     |
+   * . 0 ^     ^ 1
+   * .   |     |
+   * .   0-->--1
+   * .      2
+   * @endverbatim
+   * Vertices and faces are indicated with their numbers, faces also with
+   * their directions.
+   *
+   * Now, when refined, the layout is like this:
+   * @verbatim
+   * *--*--*
+   * | 2|3 |
+   * *--*--*
+   * | 0|1 |
+   * *--*--*
+   * @endverbatim
+   *
+   * Thus, the child cells on face 0 are (ordered in the direction of the
+   * face) 0 and 2, on face 3 they are 2 and 3, etc.
+   *
+   * For three spatial dimensions, the exact order of the children is laid
+   * down in the general documentation of this class.
+   */
+  unsigned int
+  child_cell_on_face(const unsigned int face_n,
+                     const unsigned int subface_n) const;
+
+  /**
    * For a given vertex in a cell, return a pair of a face index and a
    * vertex index within this face.
    *
@@ -304,6 +340,38 @@ public:
    */
   std::array<unsigned int, 2>
   standard_line_to_face_and_line_index(const unsigned int line) const;
+
+  /**
+   * Map face line number to cell line number.
+   */
+  unsigned int
+  face_to_cell_lines(const unsigned int  face,
+                     const unsigned int  line,
+                     const unsigned char face_orientation) const;
+
+  /**
+   * Map face vertex number to cell vertex number.
+   */
+  unsigned int
+  face_to_cell_vertices(const unsigned int  face,
+                        const unsigned int  vertex,
+                        const unsigned char face_orientation) const;
+
+  /**
+   * Correct vertex index depending on face orientation.
+   */
+  unsigned int
+  standard_to_real_face_vertex(const unsigned int  vertex,
+                               const unsigned int  face,
+                               const unsigned char face_orientation) const;
+
+  /**
+   * Correct line index depending on face orientation.
+   */
+  unsigned int
+  standard_to_real_face_line(const unsigned int  line,
+                             const unsigned int  face,
+                             const unsigned char face_orientation) const;
 
   /**
    * @}
@@ -793,6 +861,54 @@ ReferenceCell::face_reference_cell(const unsigned int face_no) const
 
 
 
+inline unsigned int
+ReferenceCell::child_cell_on_face(const unsigned int face,
+                                  const unsigned int subface) const
+{
+  AssertIndexRange(face, n_faces());
+
+  if (*this == ReferenceCells::Vertex)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Line)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Triangle)
+    {
+      static const std::array<std::array<unsigned int, 2>, 3> subcells = {
+        {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
+
+      return subcells[face][subface];
+    }
+  else if (*this == ReferenceCells::Quadrilateral)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Tetrahedron)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Pyramid)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Wedge)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Hexahedron)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+
+  Assert(false, ExcNotImplemented());
+  return {};
+}
+
+
+
 inline std::array<unsigned int, 2>
 ReferenceCell::standard_vertex_to_face_and_vertex_index(
   const unsigned int vertex) const
@@ -820,17 +936,15 @@ ReferenceCell::standard_vertex_to_face_and_vertex_index(
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
-      static const std::array<unsigned int, 2> table[4] = {{{0, 0}},
-                                                           {{0, 1}},
-                                                           {{0, 2}},
-                                                           {{1, 2}}};
+      static const std::array<std::array<unsigned int, 2>, 4> table = {
+        {{{0, 0}}, {{0, 1}}, {{0, 2}}, {{1, 2}}}};
 
       return table[vertex];
     }
   else if (*this == ReferenceCells::Pyramid)
     {
-      static const std::array<unsigned int, 2> table[5] = {
-        {{0, 0}}, {{0, 1}}, {{0, 2}}, {{0, 3}}, {{1, 2}}};
+      static const std::array<std::array<unsigned int, 2>, 5> table = {
+        {{{0, 0}}, {{0, 1}}, {{0, 2}}, {{0, 3}}, {{1, 2}}}};
 
       return table[vertex];
     }
@@ -915,6 +1029,359 @@ ReferenceCell::standard_line_to_face_and_line_index(
 
   Assert(false, ExcNotImplemented());
   return {};
+}
+
+
+
+inline unsigned int
+ReferenceCell::face_to_cell_lines(const unsigned int  face,
+                                  const unsigned int  line,
+                                  const unsigned char face_orientation) const
+{
+  AssertIndexRange(face, n_faces());
+  AssertIndexRange(line, face_reference_cell(face).n_lines());
+
+  if (*this == ReferenceCells::Vertex)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Line)
+    {
+      return GeometryInfo<1>::face_to_cell_lines(
+        face,
+        line,
+        Utilities::get_bit(face_orientation, 0),
+        Utilities::get_bit(face_orientation, 2),
+        Utilities::get_bit(face_orientation, 1));
+    }
+  else if (*this == ReferenceCells::Triangle)
+    {
+      return face;
+    }
+  else if (*this == ReferenceCells::Quadrilateral)
+    {
+      return GeometryInfo<2>::face_to_cell_lines(
+        face,
+        line,
+        Utilities::get_bit(face_orientation, 0),
+        Utilities::get_bit(face_orientation, 2),
+        Utilities::get_bit(face_orientation, 1));
+    }
+  else if (*this == ReferenceCells::Tetrahedron)
+    {
+      const static std::array<std::array<unsigned int, 3>, 4> table = {
+        {{{0, 1, 2}}, {{0, 3, 4}}, {{2, 5, 3}}, {{1, 4, 5}}}};
+
+      return table[face]
+                  [standard_to_real_face_line(line, face, face_orientation)];
+    }
+  else if (*this == ReferenceCells::Pyramid)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Wedge)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Hexahedron)
+    {
+      return GeometryInfo<3>::face_to_cell_lines(
+        face,
+        line,
+        Utilities::get_bit(face_orientation, 0),
+        Utilities::get_bit(face_orientation, 2),
+        Utilities::get_bit(face_orientation, 1));
+    }
+
+  Assert(false, ExcNotImplemented());
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+inline unsigned int
+ReferenceCell::face_to_cell_vertices(const unsigned int  face,
+                                     const unsigned int  vertex,
+                                     const unsigned char face_orientation) const
+{
+  AssertIndexRange(face, n_faces());
+  AssertIndexRange(vertex, face_reference_cell(face).n_vertices());
+
+  if (*this == ReferenceCells::Vertex)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Line)
+    {
+      return GeometryInfo<1>::face_to_cell_vertices(
+        face,
+        vertex,
+        Utilities::get_bit(face_orientation, 0),
+        Utilities::get_bit(face_orientation, 2),
+        Utilities::get_bit(face_orientation, 1));
+    }
+  else if (*this == ReferenceCells::Triangle)
+    {
+      static const std::array<std::array<unsigned int, 2>, 3> table = {
+        {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
+
+      return table[face][face_orientation ? vertex : (1 - vertex)];
+    }
+  else if (*this == ReferenceCells::Quadrilateral)
+    {
+      return GeometryInfo<2>::face_to_cell_vertices(
+        face,
+        vertex,
+        Utilities::get_bit(face_orientation, 0),
+        Utilities::get_bit(face_orientation, 2),
+        Utilities::get_bit(face_orientation, 1));
+    }
+  else if (*this == ReferenceCells::Tetrahedron)
+    {
+      static const std::array<std::array<unsigned int, 3>, 4> table = {
+        {{{0, 1, 2}}, {{1, 0, 3}}, {{0, 2, 3}}, {{2, 1, 3}}}};
+
+      return table[face][standard_to_real_face_vertex(
+        vertex, face, face_orientation)];
+    }
+  else if (*this == ReferenceCells::Pyramid)
+    {
+      constexpr auto X = numbers::invalid_unsigned_int;
+      static const std::array<std::array<unsigned int, 4>, 5> table = {
+        {{{0, 1, 2, 3}},
+         {{0, 2, 4, X}},
+         {{3, 1, 4, X}},
+         {{1, 0, 4, X}},
+         {{2, 3, 4, X}}}};
+
+      return table[face][standard_to_real_face_vertex(
+        vertex, face, face_orientation)];
+    }
+  else if (*this == ReferenceCells::Wedge)
+    {
+      constexpr auto X = numbers::invalid_unsigned_int;
+      static const std::array<std::array<unsigned int, 4>, 6> table = {
+        {{{1, 0, 2, X}},
+         {{3, 4, 5, X}},
+         {{0, 1, 3, 4}},
+         {{1, 2, 4, 5}},
+         {{2, 0, 5, 3}}}};
+
+      return table[face][standard_to_real_face_vertex(
+        vertex, face, face_orientation)];
+    }
+  else if (*this == ReferenceCells::Hexahedron)
+    {
+      return GeometryInfo<3>::face_to_cell_vertices(
+        face,
+        vertex,
+        Utilities::get_bit(face_orientation, 0),
+        Utilities::get_bit(face_orientation, 2),
+        Utilities::get_bit(face_orientation, 1));
+    }
+
+  Assert(false, ExcNotImplemented());
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+inline unsigned int
+ReferenceCell::standard_to_real_face_vertex(
+  const unsigned int  vertex,
+  const unsigned int  face,
+  const unsigned char face_orientation) const
+{
+  AssertIndexRange(face, n_faces());
+  AssertIndexRange(vertex, face_reference_cell(face).n_vertices());
+
+  if (*this == ReferenceCells::Vertex)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Line)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Triangle)
+    {
+      static const std::array<std::array<unsigned int, 2>, 2> table = {
+        {{{1, 0}}, {{0, 1}}}};
+
+      return table[face_orientation][vertex];
+    }
+  else if (*this == ReferenceCells::Quadrilateral)
+    {
+      return GeometryInfo<2>::standard_to_real_line_vertex(vertex,
+                                                           face_orientation);
+    }
+  else if (*this == ReferenceCells::Tetrahedron)
+    {
+      static const std::array<std::array<unsigned int, 3>, 6> table = {
+        {{{0, 2, 1}},
+         {{0, 1, 2}},
+         {{2, 1, 0}},
+         {{1, 2, 0}},
+         {{1, 0, 2}},
+         {{2, 0, 1}}}};
+
+      return table[face_orientation][vertex];
+    }
+  else if (*this == ReferenceCells::Pyramid)
+    {
+      if (face == 0) // The quadrilateral face
+        {
+          return GeometryInfo<3>::standard_to_real_face_vertex(
+            vertex,
+            Utilities::get_bit(face_orientation, 0),
+            Utilities::get_bit(face_orientation, 2),
+            Utilities::get_bit(face_orientation, 1));
+        }
+      else // One of the triangular faces
+        {
+          static const std::array<std::array<unsigned int, 3>, 6> table = {
+            {{{0, 2, 1}},
+             {{0, 1, 2}},
+             {{2, 1, 0}},
+             {{1, 2, 0}},
+             {{1, 0, 2}},
+             {{2, 0, 1}}}};
+
+          return table[face_orientation][vertex];
+        }
+    }
+  else if (*this == ReferenceCells::Wedge)
+    {
+      if (face > 1) // One of the quadrilateral faces
+        {
+          return GeometryInfo<3>::standard_to_real_face_vertex(
+            vertex,
+            Utilities::get_bit(face_orientation, 0),
+            Utilities::get_bit(face_orientation, 2),
+            Utilities::get_bit(face_orientation, 1));
+        }
+      else // One of the triangular faces
+        {
+          static const std::array<std::array<unsigned int, 3>, 6> table = {
+            {{{0, 2, 1}},
+             {{0, 1, 2}},
+             {{2, 1, 0}},
+             {{1, 2, 0}},
+             {{1, 0, 2}},
+             {{2, 0, 1}}}};
+
+          return table[face_orientation][vertex];
+        }
+    }
+  else if (*this == ReferenceCells::Hexahedron)
+    {
+      return GeometryInfo<3>::standard_to_real_face_vertex(
+        vertex,
+        Utilities::get_bit(face_orientation, 0),
+        Utilities::get_bit(face_orientation, 2),
+        Utilities::get_bit(face_orientation, 1));
+    }
+
+  Assert(false, ExcNotImplemented());
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+inline unsigned int
+ReferenceCell::standard_to_real_face_line(
+  const unsigned int  line,
+  const unsigned int  face,
+  const unsigned char face_orientation) const
+{
+  AssertIndexRange(face, n_faces());
+  AssertIndexRange(line, face_reference_cell(face).n_lines());
+
+  if (*this == ReferenceCells::Vertex)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Line)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Triangle)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Quadrilateral)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Tetrahedron)
+    {
+      static const std::array<std::array<unsigned int, 3>, 6> table = {
+        {{{2, 1, 0}},
+         {{0, 1, 2}},
+         {{1, 0, 2}},
+         {{1, 2, 0}},
+         {{0, 2, 1}},
+         {{2, 0, 1}}}};
+
+      return table[face_orientation][line];
+    }
+  else if (*this == ReferenceCells::Pyramid)
+    {
+      if (face == 0) // The quadrilateral face
+        {
+          return GeometryInfo<3>::standard_to_real_face_line(
+            line,
+            Utilities::get_bit(face_orientation, 0),
+            Utilities::get_bit(face_orientation, 2),
+            Utilities::get_bit(face_orientation, 1));
+        }
+      else // One of the triangular faces
+        {
+          static const std::array<std::array<unsigned int, 3>, 6> table = {
+            {{{2, 1, 0}},
+             {{0, 1, 2}},
+             {{1, 0, 2}},
+             {{1, 2, 0}},
+             {{0, 2, 1}},
+             {{2, 0, 1}}}};
+
+          return table[face_orientation][line];
+        }
+    }
+  else if (*this == ReferenceCells::Wedge)
+    {
+      if (face > 1) // One of the quadrilateral faces
+        {
+          return GeometryInfo<3>::standard_to_real_face_line(
+            line,
+            Utilities::get_bit(face_orientation, 0),
+            Utilities::get_bit(face_orientation, 2),
+            Utilities::get_bit(face_orientation, 1));
+        }
+      else // One of the triangular faces
+        {
+          static const std::array<std::array<unsigned int, 3>, 6> table = {
+            {{{2, 1, 0}},
+             {{0, 1, 2}},
+             {{1, 0, 2}},
+             {{1, 2, 0}},
+             {{0, 2, 1}},
+             {{2, 0, 1}}}};
+
+          return table[face_orientation][line];
+        }
+    }
+  else if (*this == ReferenceCells::Hexahedron)
+    {
+      return GeometryInfo<3>::standard_to_real_face_line(
+        line,
+        Utilities::get_bit(face_orientation, 0),
+        Utilities::get_bit(face_orientation, 2),
+        Utilities::get_bit(face_orientation, 1));
+    }
+
+  Assert(false, ExcNotImplemented());
+  return numbers::invalid_unsigned_int;
 }
 
 
@@ -1345,7 +1812,6 @@ namespace internal
         return {{0, 0}};
       }
 
-    public:
       /**
        * Correct vertex index depending on face orientation.
        */
@@ -1380,6 +1846,7 @@ namespace internal
         return 0;
       }
 
+    public:
       /**
        * Combine face and line orientation.
        */
@@ -1411,7 +1878,6 @@ namespace internal
         return ReferenceCells::Invalid;
       }
 
-    public:
       /**
        * Map face line number to cell line number.
        */
@@ -1444,6 +1910,7 @@ namespace internal
         return 0;
       }
 
+    public:
       /**
        * Map an ExodusII vertex number to a deal.II vertex number.
        */
@@ -1468,6 +1935,7 @@ namespace internal
         return 0;
       }
 
+    private:
       /**
        * Indices of child cells that are adjacent to a certain face of the
        * mother cell.
@@ -1949,7 +2417,7 @@ namespace internal
         const unsigned int  face,
         const unsigned char face_orientation) const override
       {
-        if (face == 0) // QUAD
+        if (face == 0) // The quadrilateral face
           {
             return GeometryInfo<3>::standard_to_real_face_line(
               line,
@@ -1957,7 +2425,7 @@ namespace internal
               Utilities::get_bit(face_orientation, 2),
               Utilities::get_bit(face_orientation, 1));
           }
-        else // TRI
+        else // One of the triangular faces
           {
             static const std::array<std::array<unsigned int, 3>, 6> table = {
               {{{2, 1, 0}},
@@ -1999,7 +2467,7 @@ namespace internal
         const unsigned int  face,
         const unsigned char face_orientation) const override
       {
-        if (face == 0) // Quad
+        if (face == 0) // The one quadrilateral face
           {
             return GeometryInfo<3>::standard_to_real_face_vertex(
               vertex,
@@ -2007,7 +2475,7 @@ namespace internal
               Utilities::get_bit(face_orientation, 2),
               Utilities::get_bit(face_orientation, 1));
           }
-        else // Tri
+        else // One of the triangular faces
           {
             static const std::array<std::array<unsigned int, 3>, 6> table = {
               {{{0, 2, 1}},
@@ -2123,7 +2591,7 @@ namespace internal
         const unsigned int  face,
         const unsigned char face_orientation) const override
       {
-        if (face > 1) // QUAD
+        if (face > 1) // One of the quadrilateral faces
           {
             return GeometryInfo<3>::standard_to_real_face_line(
               line,
@@ -2131,7 +2599,7 @@ namespace internal
               Utilities::get_bit(face_orientation, 2),
               Utilities::get_bit(face_orientation, 1));
           }
-        else // TRI
+        else // One of the triangular faces
           {
             static const std::array<std::array<unsigned int, 3>, 6> table = {
               {{{2, 1, 0}},
@@ -2173,7 +2641,7 @@ namespace internal
         const unsigned int  face,
         const unsigned char face_orientation) const override
       {
-        if (face > 1) // QUAD
+        if (face > 1) // One of the quadrilateral faces
           {
             return GeometryInfo<3>::standard_to_real_face_vertex(
               vertex,
@@ -2181,7 +2649,7 @@ namespace internal
               Utilities::get_bit(face_orientation, 2),
               Utilities::get_bit(face_orientation, 1));
           }
-        else // TRI
+        else // One of the triangular faces
           {
             static const std::array<std::array<unsigned int, 3>, 6> table = {
               {{{0, 2, 1}},
