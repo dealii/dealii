@@ -417,8 +417,8 @@ namespace parallel
       });
 
     // 5) set up new partitioner
-    IndexSet is_local(this->n_global_active_cells());
-    IndexSet is_ghost(this->n_global_active_cells());
+    std::vector<types::global_dof_index> is_local_vector;
+    std::vector<types::global_dof_index> is_ghost_vector;
 
     for (const auto &cell : this->active_cell_iterators())
       if (!cell->is_artificial())
@@ -429,10 +429,18 @@ namespace parallel
             continue;
 
           if (cell->is_locally_owned())
-            is_local.add_index(index);
+            is_local_vector.push_back(index);
           else
-            is_ghost.add_index(index);
+            is_ghost_vector.push_back(index);
         }
+
+    std::sort(is_local_vector.begin(), is_local_vector.end());
+    IndexSet is_local(this->n_global_active_cells());
+    is_local.add_indices(is_local_vector.begin(), is_local_vector.end());
+
+    std::sort(is_ghost_vector.begin(), is_ghost_vector.end());
+    IndexSet is_ghost(this->n_global_active_cells());
+    is_ghost.add_indices(is_ghost_vector.begin(), is_ghost_vector.end());
 
     number_cache.active_cell_index_partitioner =
       Utilities::MPI::Partitioner(is_local, is_ghost, this->mpi_communicator);
@@ -497,8 +505,8 @@ namespace parallel
         // 6) set up cell partitioners for each level
         for (unsigned int l = 0; l < this->n_global_levels(); ++l)
           {
-            IndexSet is_local(n_cells_level[l]);
-            IndexSet is_ghost(n_cells_level[l]);
+            std::vector<types::global_dof_index> is_local_vector;
+            std::vector<types::global_dof_index> is_ghost_vector;
 
             for (const auto &cell : this->cell_iterators_on_level(l))
               if (cell->level_subdomain_id() !=
@@ -511,10 +519,21 @@ namespace parallel
 
                   if (cell->level_subdomain_id() ==
                       this->locally_owned_subdomain())
-                    is_local.add_index(index);
+                    is_local_vector.push_back(index);
                   else
-                    is_ghost.add_index(index);
+                    is_ghost_vector.push_back(index);
+                  ;
                 }
+
+            IndexSet is_local(n_cells_level[l]);
+            std::sort(is_local_vector.begin(), is_local_vector.end());
+            is_local.add_indices(is_local_vector.begin(),
+                                 is_local_vector.end());
+
+            IndexSet is_ghost(n_cells_level[l]);
+            std::sort(is_ghost_vector.begin(), is_ghost_vector.end());
+            is_ghost.add_indices(is_ghost_vector.begin(),
+                                 is_ghost_vector.end());
 
             number_cache.level_cell_index_partitioners[l] =
               Utilities::MPI::Partitioner(is_local,
