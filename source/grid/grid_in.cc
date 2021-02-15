@@ -3212,8 +3212,8 @@ namespace
                   boundary_line.boundary_id = current_b_or_m_id;
                 for (unsigned int j = 0; j < face_info.n_vertices(); ++j)
                   boundary_line.vertices[j] =
-                    cell
-                      .vertices[info.face_to_cell_vertices(deal_face_n, j, 0)];
+                    cell.vertices[cell_type.face_to_cell_vertices(
+                      deal_face_n, j, 0)];
 
                 subcelldata.boundary_lines.push_back(std::move(boundary_line));
               }
@@ -3226,8 +3226,8 @@ namespace
                   boundary_quad.boundary_id = current_b_or_m_id;
                 for (unsigned int j = 0; j < face_info.n_vertices(); ++j)
                   boundary_quad.vertices[j] =
-                    cell
-                      .vertices[info.face_to_cell_vertices(deal_face_n, j, 0)];
+                    cell.vertices[cell_type.face_to_cell_vertices(
+                      deal_face_n, j, 0)];
 
                 subcelldata.boundary_quads.push_back(std::move(boundary_quad));
               }
