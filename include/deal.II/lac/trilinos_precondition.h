@@ -544,9 +544,7 @@ namespace TrilinosWrappers
      * elements are zero. In a default application this would mean that we
      * divide by zero, so by setting the parameter <tt>min_diagonal</tt> to a
      * small nonzero value the SOR will work on a matrix that is not too far
-     * away from the one we want to treat. Finally, <tt>overlap</tt> governs
-     * the overlap of the partitions when the preconditioner runs in parallel,
-     * forming a so-called additive Schwarz preconditioner.
+     * away from the one we want to treat.
      */
     struct AdditionalData
     {
