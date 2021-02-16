@@ -2009,7 +2009,7 @@ namespace internal
                                 solution_old.begin(),
                                 temp_vector1.begin(),
                                 solution.begin());
-      VectorUpdatesRange<Number>(upd, rhs.local_size());
+      VectorUpdatesRange<Number>(upd, rhs.locally_owned_size());
 
       // swap vectors x^{n+1}->x^{n}, given the updates in the function above
       if (iteration_index == 0)
@@ -2102,7 +2102,7 @@ namespace internal
       types::global_dof_index first_local_range = 0;
       if (!vector.locally_owned_elements().is_empty())
         first_local_range = vector.locally_owned_elements().nth_index_in_set(0);
-      for (unsigned int i = 0; i < vector.local_size(); ++i)
+      for (unsigned int i = 0; i < vector.locally_owned_size(); ++i)
         vector.local_element(i) = (i + first_local_range) % 11;
 
       const Number mean_value = vector.mean_value();
@@ -2123,12 +2123,12 @@ namespace internal
     template <typename Number>
     __global__ void
     set_initial_guess_kernel(const types::global_dof_index offset,
-                             const unsigned int            local_size,
+                             const unsigned int            locally_owned_size,
                              Number *                      values)
 
     {
       const unsigned int index = threadIdx.x + blockDim.x * blockIdx.x;
-      if (index < local_size)
+      if (index < locally_owned_size)
         values[index] = (index + offset) % 11;
     }
 
@@ -2148,7 +2148,7 @@ namespace internal
       if (!vector.locally_owned_elements().is_empty())
         first_local_range = vector.locally_owned_elements().nth_index_in_set(0);
 
-      const auto n_local_elements = vector.local_size();
+      const auto n_local_elements = vector.locally_owned_size();
       const int  n_blocks =
         1 + (n_local_elements - 1) / CUDAWrappers::block_size;
       set_initial_guess_kernel<<<n_blocks, CUDAWrappers::block_size>>>(

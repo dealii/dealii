@@ -545,6 +545,14 @@ public:
   size() const;
 
   /**
+   * Return local dimension of the vector. This is the sum of the local
+   * dimensions (i.e., values stored on the current processor) of all
+   * components.
+   */
+  std::size_t
+  locally_owned_size() const;
+
+  /**
    * Return an index set that describes which elements of this vector are
    * owned by the current processor. Note that this index set does not include
    * elements this vector may store locally as ghost elements but that are in
@@ -1426,6 +1434,18 @@ inline std::size_t
 BlockVectorBase<VectorType>::size() const
 {
   return block_indices.total_size();
+}
+
+
+
+template <class VectorType>
+inline std::size_t
+BlockVectorBase<VectorType>::locally_owned_size() const
+{
+  std::size_t local_size = 0;
+  for (unsigned int b = 0; b < n_blocks(); ++b)
+    local_size += block(b).locally_owned_size();
+  return local_size;
 }
 
 

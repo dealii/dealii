@@ -46,9 +46,9 @@ namespace internal
 
 
       unsigned int
-      PartitionerWrapper::local_size() const
+      PartitionerWrapper::locally_owned_size() const
       {
-        return partitioner->local_size();
+        return partitioner->locally_owned_size();
       }
 
 
@@ -1275,7 +1275,7 @@ namespace internal
 
 
       unsigned int
-      Full::local_size() const
+      Full::locally_owned_size() const
       {
         return n_local_elements;
       }

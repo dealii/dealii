@@ -260,11 +260,11 @@ namespace Utilities
 
     std::vector<IndexSet>
     create_ascending_partitioning(const MPI_Comm &          comm,
-                                  const IndexSet::size_type local_size)
+                                  const IndexSet::size_type locally_owned_size)
     {
       const unsigned int                     n_proc = n_mpi_processes(comm);
       const std::vector<IndexSet::size_type> sizes =
-        all_gather(comm, local_size);
+        all_gather(comm, locally_owned_size);
       const auto total_size =
         std::accumulate(sizes.begin(), sizes.end(), IndexSet::size_type(0));
 
@@ -716,9 +716,9 @@ namespace Utilities
 
     std::vector<IndexSet>
     create_ascending_partitioning(const MPI_Comm & /*comm*/,
-                                  const IndexSet::size_type local_size)
+                                  const IndexSet::size_type locally_owned_size)
     {
-      return std::vector<IndexSet>(1, complete_index_set(local_size));
+      return std::vector<IndexSet>(1, complete_index_set(locally_owned_size));
     }
 
     IndexSet

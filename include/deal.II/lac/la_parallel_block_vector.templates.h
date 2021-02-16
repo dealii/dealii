@@ -269,7 +269,7 @@ namespace LinearAlgebra
                         &start_ptr);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-          const size_type vec_size = this->block(i).local_size();
+          const size_type vec_size = this->block(i).locally_owned_size();
           petsc_helpers::copy_petsc_vector(start_ptr,
                                            start_ptr + vec_size,
                                            this->block(i).begin());
@@ -674,9 +674,9 @@ namespace LinearAlgebra
 
       Number local_result = Number();
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
-        local_result +=
-          this->block(i).mean_value_local() *
-          static_cast<real_type>(this->block(i).partitioner->local_size());
+        local_result += this->block(i).mean_value_local() *
+                        static_cast<real_type>(
+                          this->block(i).partitioner->locally_owned_size());
 
       if (this->block(0).partitioner->n_mpi_processes() > 1)
         return Utilities::MPI::sum(

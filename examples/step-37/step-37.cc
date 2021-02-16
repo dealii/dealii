@@ -549,7 +549,7 @@ namespace Step37
 
     this->set_constrained_entries_to_one(inverse_diagonal);
 
-    for (unsigned int i = 0; i < inverse_diagonal.local_size(); ++i)
+    for (unsigned int i = 0; i < inverse_diagonal.locally_owned_size(); ++i)
       {
         Assert(inverse_diagonal.local_element(i) > 0.,
                ExcMessage("No diagonal entry in a positive definite operator "

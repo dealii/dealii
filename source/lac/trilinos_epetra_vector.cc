@@ -540,6 +540,14 @@ namespace LinearAlgebra
 
 
 
+    Vector::size_type
+    Vector::locally_owned_size() const
+    {
+      return vector->MyLength();
+    }
+
+
+
     MPI_Comm
     Vector::get_mpi_communicator() const
     {

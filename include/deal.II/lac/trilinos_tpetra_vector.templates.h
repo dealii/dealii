@@ -549,6 +549,15 @@ namespace LinearAlgebra
 
 
     template <typename Number>
+    typename Vector<Number>::size_type
+    Vector<Number>::locally_owned_size() const
+    {
+      return vector->getLocalLength();
+    }
+
+
+
+    template <typename Number>
     MPI_Comm
     Vector<Number>::get_mpi_communicator() const
     {

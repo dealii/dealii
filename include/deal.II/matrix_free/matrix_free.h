@@ -3466,10 +3466,10 @@ namespace internal
 
           part.export_to_ghosted_array_start(
             component_in_block_vector * 2 + channel_shift,
-            ArrayView<const Number>(vec.begin(), part.local_size()),
+            ArrayView<const Number>(vec.begin(), part.locally_owned_size()),
             vec.shared_vector_data(),
             ArrayView<Number>(const_cast<Number *>(vec.begin()) +
-                                part.local_size(),
+                                part.locally_owned_size(),
                               matrix_free.get_dof_info(mf_component)
                                 .vector_partitioner->n_ghost_indices()),
             ArrayView<Number>(tmp_data[component_in_block_vector]->begin(),
@@ -3550,10 +3550,10 @@ namespace internal
               part.n_import_sm_procs() != 0)
             {
               part.export_to_ghosted_array_finish(
-                ArrayView<const Number>(vec.begin(), part.local_size()),
+                ArrayView<const Number>(vec.begin(), part.locally_owned_size()),
                 vec.shared_vector_data(),
                 ArrayView<Number>(const_cast<Number *>(vec.begin()) +
-                                    part.local_size(),
+                                    part.locally_owned_size(),
                                   matrix_free.get_dof_info(mf_component)
                                     .vector_partitioner->n_ghost_indices()),
                 this->requests[component_in_block_vector]);
@@ -3665,9 +3665,9 @@ namespace internal
           part.import_from_ghosted_array_start(
             dealii::VectorOperation::add,
             component_in_block_vector * 2 + channel_shift,
-            ArrayView<Number>(vec.begin(), part.local_size()),
+            ArrayView<Number>(vec.begin(), part.locally_owned_size()),
             vec.shared_vector_data(),
-            ArrayView<Number>(vec.begin() + part.local_size(),
+            ArrayView<Number>(vec.begin() + part.locally_owned_size(),
                               matrix_free.get_dof_info(mf_component)
                                 .vector_partitioner->n_ghost_indices()),
             ArrayView<Number>(tmp_data[component_in_block_vector]->begin(),
@@ -3747,9 +3747,9 @@ namespace internal
             {
               part.import_from_ghosted_array_finish(
                 VectorOperation::add,
-                ArrayView<Number>(vec.begin(), part.local_size()),
+                ArrayView<Number>(vec.begin(), part.locally_owned_size()),
                 vec.shared_vector_data(),
-                ArrayView<Number>(vec.begin() + part.local_size(),
+                ArrayView<Number>(vec.begin() + part.locally_owned_size(),
                                   matrix_free.get_dof_info(mf_component)
                                     .vector_partitioner->n_ghost_indices()),
                 ArrayView<const Number>(
@@ -3833,7 +3833,7 @@ namespace internal
               part.reset_ghost_values(ArrayView<Number>(
                 const_cast<LinearAlgebra::distributed::Vector<Number> &>(vec)
                     .begin() +
-                  part.local_size(),
+                  part.locally_owned_size(),
                 matrix_free.get_dof_info(mf_component)
                   .vector_partitioner->n_ghost_indices()));
             }
@@ -4742,7 +4742,7 @@ namespace internal
               // Case with threaded loop -> currently no overlap implemented
               dealii::parallel::apply_to_subranges(
                 0U,
-                dof_info.vector_partitioner->local_size(),
+                dof_info.vector_partitioner->locally_owned_size(),
                 operation_before_loop,
                 internal::VectorImplementation::minimum_parallel_grain_size);
             }
@@ -4772,7 +4772,7 @@ namespace internal
               // Case with threaded loop -> currently no overlap implemented
               dealii::parallel::apply_to_subranges(
                 0U,
-                dof_info.vector_partitioner->local_size(),
+                dof_info.vector_partitioner->locally_owned_size(),
                 operation_after_loop,
                 internal::VectorImplementation::minimum_parallel_grain_size);
             }

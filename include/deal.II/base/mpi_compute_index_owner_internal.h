@@ -196,7 +196,7 @@ namespace Utilities
            * the possible end of the index space. Equivalent to
            * `local_range.second - local_range.first`.
            */
-          types::global_dof_index local_size;
+          types::global_dof_index locally_owned_size;
 
           /**
            * The global size of the index space.
@@ -337,7 +337,7 @@ namespace Utilities
                   }
 
                 // 4) receive messages until all dofs in dict are processed
-                while (this->local_size != dic_local_received)
+                while (this->locally_owned_size != dic_local_received)
                   {
                     // wait for an incoming message
                     MPI_Status status;
@@ -515,10 +515,10 @@ namespace Utilities
             local_range.first  = get_index_offset(my_rank);
             local_range.second = get_index_offset(my_rank + 1);
 
-            local_size = local_range.second - local_range.first;
+            locally_owned_size = local_range.second - local_range.first;
 
             actually_owning_ranks = {};
-            actually_owning_ranks.resize(local_size,
+            actually_owning_ranks.resize(locally_owned_size,
                                          numbers::invalid_unsigned_int);
 #else
             (void)owned_indices;
