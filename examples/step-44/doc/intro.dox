@@ -692,5 +692,3 @@ That is, the response would be overly stiff.
 The initial and final configurations are shown in the image above.
 Using symmetry, we solve for only one quarter of the geometry (i.e. a cube with dimension $0.001$).
 The inner-quarter of the upper surface of the domain is subject to a load of $p_0$.
-
-

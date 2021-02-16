@@ -79,3 +79,11 @@ process "tests include source examples cmake/scripts contrib/python-bindings" \
 
 process "tests include source examples cmake/scripts contrib/python-bindings doc" \
   ".*\.(cc|h|cu|cuh|html|dox|txt)" remove_trailing_whitespace
+
+#
+# Ensure only a single newline at end of files
+#
+
+process "tests include source examples cmake/scripts contrib/python-bindings doc" \
+  ".*\.(cc|h|cu|cuh|html|dox|txt)" ensure_single_trailing_newline
+

@@ -189,4 +189,3 @@ ELSE()
   ADD_DEPENDENCIES(code-gallery build_code-gallery_h)
 
 ENDIF()
-

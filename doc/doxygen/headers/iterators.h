@@ -390,5 +390,3 @@ levels, and accessors for objects of lower dimensionality do not have a
  * @defgroup Accessors Accessor classes of the mesh iterators
  * @ingroup Iterators
  */
-
-

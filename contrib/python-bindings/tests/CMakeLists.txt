@@ -28,4 +28,3 @@ FOREACH(_test_path ${_tests})
    "PYTHONPATH=${CMAKE_BINARY_DIR}/${DEAL_II_PYTHON_RELDIR}/../:$ENV{PYTHONPATH};DEAL_II_PYTHON_TESTPATH=${_test_directory}"
    )
 ENDFOREACH()
-
