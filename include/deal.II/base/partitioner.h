@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/array_view.h>
+#include <deal.II/base/communication_pattern_base.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/memory_space.h>
@@ -26,7 +27,6 @@
 #include <deal.II/base/types.h>
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/lac/communication_pattern_base.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_operation.h>
 
@@ -191,7 +191,7 @@ namespace Utilities
      * detect this case and only send the selected indices, taken from the
      * full array of ghost entries.
      */
-    class Partitioner : public ::dealii::LinearAlgebra::CommunicationPatternBase
+    class Partitioner : public Utilities::MPI::CommunicationPatternBase
     {
     public:
       /**

@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/communication_pattern_base.h>
 #include <deal.II/base/numbers.h>
 
 #include <deal.II/lac/vector_operation.h>
@@ -32,7 +33,6 @@ DEAL_II_NAMESPACE_OPEN
 class IndexSet;
 namespace LinearAlgebra
 {
-  class CommunicationPatternBase;
   template <typename Number>
   class ReadWriteVector;
 } // namespace LinearAlgebra
@@ -107,11 +107,10 @@ namespace LinearAlgebra
      * performance.
      */
     virtual void
-    import(
-      const ReadWriteVector<Number> &                 V,
-      VectorOperation::values                         operation,
-      std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-        std::shared_ptr<const CommunicationPatternBase>()) = 0;
+    import(const ReadWriteVector<Number> &V,
+           VectorOperation::values        operation,
+           std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+             communication_pattern = {}) = 0;
 
     /**
      * Return the scalar product of two vectors.

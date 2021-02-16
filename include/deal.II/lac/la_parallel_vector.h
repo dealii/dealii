@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/communication_pattern_base.h>
 #include <deal.II/base/memory_space.h>
 #include <deal.II/base/memory_space_data.h>
 #include <deal.II/base/mpi.h>
@@ -721,11 +722,10 @@ namespace LinearAlgebra
        * be moved to the device.
        */
       virtual void
-      import(
-        const LinearAlgebra::ReadWriteVector<Number> &  V,
-        VectorOperation::values                         operation,
-        std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-          std::shared_ptr<const CommunicationPatternBase>()) override;
+      import(const LinearAlgebra::ReadWriteVector<Number> &V,
+             VectorOperation::values                       operation,
+             std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+               communication_pattern = {}) override;
 
       /**
        * Return the scalar product of two vectors.

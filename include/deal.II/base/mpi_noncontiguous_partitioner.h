@@ -18,11 +18,11 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/communication_pattern_base.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi_compute_index_owner_internal.h>
 #include <deal.II/base/mpi_tags.h>
 
-#include <deal.II/lac/communication_pattern_base.h>
 #include <deal.II/lac/vector_space_vector.h>
 
 
@@ -37,7 +37,7 @@ namespace Utilities
      * regarding the order of the underlying index sets.
      */
     class NoncontiguousPartitioner
-      : public dealii::LinearAlgebra::CommunicationPatternBase
+      : public Utilities::MPI::CommunicationPatternBase
     {
     public:
       /**
