@@ -457,80 +457,98 @@ namespace Utilities
 
 
     template <typename T>
+    T
+    all_reduce(const T &                                     vec,
+               const MPI_Comm &                              comm,
+               const std::function<T(const T &, const T &)> &combiner)
+    {
+#ifdef DEAL_II_WITH_MPI
+      if (job_supports_mpi())
+        {
+          // 1) perform custom reduction
+          T result = vec;
+
+          const unsigned int rank  = this_mpi_process(comm);
+          const unsigned int nproc = n_mpi_processes(comm);
+
+          for (unsigned int stride = 1; stride < nproc; stride *= 2)
+            {
+              const unsigned int rank_recv =
+                (2 * stride) * (rank / (2 * stride));
+              const unsigned int rank_send = rank_recv + stride;
+
+              if (rank_send >= nproc) // nothing to do
+                continue;
+
+              if (rank_recv == rank) // process receives data
+                {
+                  MPI_Status status;
+                  const auto ierr_1 = MPI_Probe(rank_send,
+                                                internal::Tags::compute_union,
+                                                comm,
+                                                &status);
+                  AssertThrowMPI(ierr_1);
+
+                  int        amount;
+                  const auto ierr_2 = MPI_Get_count(&status, MPI_CHAR, &amount);
+                  AssertThrowMPI(ierr_2);
+
+                  std::vector<char> temp(amount);
+
+                  const auto ierr_3 = MPI_Recv(temp.data(),
+                                               amount,
+                                               MPI_CHAR,
+                                               status.MPI_SOURCE,
+                                               status.MPI_TAG,
+                                               comm,
+                                               MPI_STATUS_IGNORE);
+                  AssertThrowMPI(ierr_3);
+
+                  result = combiner(result, Utilities::unpack<T>(temp, false));
+                }
+              else if (rank_send == rank) // process sends data
+                {
+                  const std::vector<char> temp = Utilities::pack(result, false);
+
+                  const auto ierr = MPI_Send(temp.data(),
+                                             temp.size(),
+                                             MPI_CHAR,
+                                             rank_recv,
+                                             internal::Tags::compute_union,
+                                             comm);
+                  AssertThrowMPI(ierr);
+                }
+            }
+
+          // 2) broadcast result
+          std::vector<char> temp = Utilities::pack(result, false);
+          unsigned int      size = temp.size();
+          MPI_Bcast(&size, 1, MPI_UNSIGNED, 0, comm);
+          temp.resize(size);
+          MPI_Bcast(temp.data(), size, MPI_CHAR, 0, comm);
+
+          return Utilities::unpack<T>(temp, false);
+        }
+#endif
+      (void)comm;
+      (void)combiner;
+      return vec;
+    }
+
+
+    template <typename T>
     std::vector<T>
     compute_set_union(const std::vector<T> &vec, const MPI_Comm &comm)
     {
-#ifdef DEAL_II_WITH_MPI
-      // 1) collect vector entries and create union
-      std::vector<T> result = vec;
-
-      const unsigned int rank  = this_mpi_process(comm);
-      const unsigned int nproc = n_mpi_processes(comm);
-
-      for (unsigned int stride = 1; stride < nproc; stride *= 2)
-        {
-          const unsigned int rank_recv = (2 * stride) * (rank / (2 * stride));
-          const unsigned int rank_send = rank_recv + stride;
-
-          if (rank_send >= nproc) // nothing to do
-            continue;
-
-          if (rank_recv == rank) // process receives data
-            {
-              MPI_Status status;
-              const auto ierr_1 = MPI_Probe(rank_send,
-                                            internal::Tags::compute_union,
-                                            comm,
-                                            &status);
-              AssertThrowMPI(ierr_1);
-
-              int        amount;
-              const auto ierr_2 =
-                MPI_Get_count(&status,
-                              internal::mpi_type_id(result.data()),
-                              &amount);
-              AssertThrowMPI(ierr_2);
-
-              const unsigned int old_size = result.size();
-              result.resize(old_size + amount);
-
-              const auto ierr_3 = MPI_Recv(result.data() + old_size,
-                                           amount,
-                                           internal::mpi_type_id(result.data()),
-                                           status.MPI_SOURCE,
-                                           status.MPI_TAG,
-                                           comm,
-                                           MPI_STATUS_IGNORE);
-              AssertThrowMPI(ierr_3);
-
-              std::sort(result.begin(), result.end());
-              result.erase(std::unique(result.begin(), result.end()),
-                           result.end());
-            }
-          else if (rank_send == rank) // process sends data
-            {
-              const auto ierr = MPI_Send(result.data(),
-                                         result.size(),
-                                         internal::mpi_type_id(result.data()),
-                                         rank_recv,
-                                         internal::Tags::compute_union,
-                                         comm);
-              AssertThrowMPI(ierr);
-            }
-        }
-
-      // 2) broadcast result
-      int size = result.size();
-      MPI_Bcast(&size, 1, MPI_INT, 0, comm);
-      result.resize(size);
-      MPI_Bcast(
-        result.data(), size, internal::mpi_type_id(vec.data()), 0, comm);
-
-      return result;
-#else
-      (void)comm;
-      return vec;
-#endif
+      return Utilities::MPI::all_reduce<std::vector<T>>(
+        vec, comm, [](const auto &set_1, const auto &set_2) {
+          // merge vectors, sort, and eliminate duplicates -> mimic std::set<T>
+          auto result = set_1;
+          result.insert(result.end(), set_2.begin(), set_2.end());
+          std::sort(result.begin(), result.end());
+          result.erase(std::unique(result.begin(), result.end()), result.end());
+          return result;
+        });
     }
 
 
