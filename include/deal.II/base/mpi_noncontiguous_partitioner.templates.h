@@ -54,9 +54,17 @@ namespace Utilities
 
 
     std::pair<unsigned int, unsigned int>
-    NoncontiguousPartitioner::n_targets()
+    NoncontiguousPartitioner::n_targets() const
     {
       return {send_ranks.size(), recv_ranks.size()};
+    }
+
+
+
+    unsigned int
+    NoncontiguousPartitioner::temporary_storage_size() const
+    {
+      return send_ptr.back();
     }
 
 
@@ -252,7 +260,7 @@ namespace Utilities
         requests.resize(send_ranks.size() + recv_ranks.size());
 
       if (this->buffers.size() != send_ptr.back() * sizeof(Number))
-        this->buffers.resize(send_ptr.back() * sizeof(Number), 0);
+        this->buffers.resize(this->temporary_storage_size() * sizeof(Number));
 
       // perform actual exchange
       this->template export_to_ghosted_array<Number>(
