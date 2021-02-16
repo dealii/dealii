@@ -302,12 +302,14 @@ namespace Utilities
       Assert(false, ExcNeedsMPI());
 #else
       AssertIndexRange(communication_channel, 10);
+      AssertDimension(requests.size(), recv_ranks.size() + send_ranks.size());
 
       const auto tag =
         communication_channel +
         internal::Tags::noncontiguous_partitioner_update_ghost_values;
 
       // post recv
+      AssertIndexRange(recv_ranks.size(), recv_ptr.size());
       for (types::global_dof_index i = 0; i < recv_ranks.size(); i++)
         {
           const auto ierr =
@@ -322,14 +324,23 @@ namespace Utilities
         }
 
       // post send
+      AssertIndexRange(send_ranks.size(), send_ptr.size());
       for (types::global_dof_index i = 0, k = 0; i < send_ranks.size(); i++)
         {
           // collect data to be send
           for (types::global_dof_index j = send_ptr[i]; j < send_ptr[i + 1];
                j++)
-            buffers[j] = src[send_indices[k++]];
+            {
+              AssertIndexRange(k, send_indices.size());
+              buffers[j] = src[send_indices[k]];
+              ++k;
+            }
 
           // send data
+          Assert((send_ptr[i] < buffers.size()) ||
+                   (send_ptr[i] == buffers.size() &&
+                    send_ptr[i + 1] == send_ptr[i]),
+                 ExcMessage("The input buffer doesn't contain enough entries"));
           const auto ierr =
             MPI_Isend(buffers.data() + send_ptr[i],
                       send_ptr[i + 1] - send_ptr[i],
@@ -369,6 +380,7 @@ namespace Utilities
                                         &status);
           AssertThrowMPI(ierr);
 
+          AssertIndexRange(i + 1, recv_ptr.size());
           for (types::global_dof_index j = recv_ptr[i], c = 0;
                j < recv_ptr[i + 1];
                j++)
