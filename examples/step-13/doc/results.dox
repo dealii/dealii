@@ -179,4 +179,3 @@ executing refinement would improve the results (exercise: what does
 the code do?), making them consistently better than global
 refinement. Behavior is still irregular, though, so no results about
 an order of convergence are possible.)
-

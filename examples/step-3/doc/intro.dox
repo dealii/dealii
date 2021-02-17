@@ -405,4 +405,3 @@ data types but, as explained above, they are used throughout the library so that
 becomes possible to change the actual type to a larger one if necessary without
 having to go through the entire library and figure out whether a particular use
 of <code>unsigned int</code> corresponds to, say, a material indicator.
-

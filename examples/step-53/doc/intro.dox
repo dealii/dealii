@@ -374,4 +374,3 @@ in a number of static member functions.
 
 Having discussed the general outline of how we want to implement things, let us go
 to the program and show how it is done in practice.
-
