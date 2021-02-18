@@ -28,8 +28,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   Particle<dim, spacedim>::Particle()
-    : id(0)
-    , property_pool(&global_property_pool)
+    : property_pool(&global_property_pool)
     , property_pool_handle(property_pool->register_particle())
   {}
 
@@ -39,24 +38,24 @@ namespace Particles
   Particle<dim, spacedim>::Particle(const Point<spacedim> &location,
                                     const Point<dim> &     reference_location,
                                     const types::particle_index id)
-    : id(id)
-    , property_pool(&global_property_pool)
+    : property_pool(&global_property_pool)
     , property_pool_handle(property_pool->register_particle())
   {
     set_location(location);
     set_reference_location(reference_location);
+    set_id(id);
   }
 
 
 
   template <int dim, int spacedim>
   Particle<dim, spacedim>::Particle(const Particle<dim, spacedim> &particle)
-    : id(particle.get_id())
-    , property_pool(particle.property_pool)
+    : property_pool(particle.property_pool)
     , property_pool_handle(property_pool->register_particle())
   {
     set_location(particle.get_location());
     set_reference_location(particle.get_reference_location());
+    set_id(particle.get_id());
 
     if (particle.has_properties())
       {
@@ -77,14 +76,13 @@ namespace Particles
   Particle<dim, spacedim>::Particle(
     const void *&                      data,
     PropertyPool<dim, spacedim> *const new_property_pool)
-    : id(0)
-    , property_pool(new_property_pool != nullptr ? new_property_pool :
+    : property_pool(new_property_pool != nullptr ? new_property_pool :
                                                    &global_property_pool)
     , property_pool_handle(property_pool->register_particle())
   {
     const types::particle_index *id_data =
       static_cast<const types::particle_index *>(data);
-    id                  = *id_data++;
+    set_id(*id_data++);
     const double *pdata = reinterpret_cast<const double *>(id_data);
 
     Point<spacedim> location;
@@ -113,11 +111,10 @@ namespace Particles
 
   template <int dim, int spacedim>
   Particle<dim, spacedim>::Particle(Particle<dim, spacedim> &&particle) noexcept
-    : id(std::move(particle.id))
-    , property_pool(std::move(particle.property_pool))
+    : property_pool(std::move(particle.property_pool))
     , property_pool_handle(std::move(particle.property_pool_handle))
   {
-    // There is no need to copy locations and properties -- we simply
+    // There is no need to copy locations, properties, and id -- we simply
     // inherit them from the object we move from.
 
     // We stole the rhs's properties, so we need to invalidate
@@ -134,14 +131,13 @@ namespace Particles
   {
     if (this != &particle)
       {
-        id = particle.id;
-
         Assert(this->property_pool->n_properties_per_slot() ==
                  particle.property_pool->n_properties_per_slot(),
                ExcInternalError());
 
         set_location(particle.get_location());
         set_reference_location(particle.get_reference_location());
+        set_id(particle.get_id());
 
         if (particle.has_properties())
           {
@@ -174,11 +170,10 @@ namespace Particles
         if (property_pool_handle != PropertyPool<dim, spacedim>::invalid_handle)
           property_pool->deregister_particle(property_pool_handle);
 
-        id                   = std::move(particle.id);
         property_pool        = std::move(particle.property_pool);
         property_pool_handle = std::move(particle.property_pool_handle);
 
-        // No need to copy locations and properties -- we just get them
+        // No need to copy locations, properties, and id -- we just get them
         // by taking over the property pool handle.
 
         // We stole the rhs's properties, so we need to invalidate
@@ -224,7 +219,7 @@ namespace Particles
   Particle<dim, spacedim>::write_data(void *&data) const
   {
     types::particle_index *id_data = static_cast<types::particle_index *>(data);
-    *id_data                       = id;
+    *id_data                       = get_id();
     ++id_data;
     double *pdata = reinterpret_cast<double *>(id_data);
 
@@ -256,7 +251,7 @@ namespace Particles
   {
     const types::particle_index *id_data =
       static_cast<const types::particle_index *>(data);
-    id                  = *id_data++;
+    set_id(*id_data++);
     const double *pdata = reinterpret_cast<const double *>(id_data);
 
     Point<spacedim> location;
