@@ -2247,19 +2247,6 @@ TriaAccessor<structdim, dim, spacedim>::face_indices() const
 
 
 
-template <int structdim, int dim, int spacedim>
-inline const internal::ReferenceCell::Base &
-TriaAccessor<structdim, dim, spacedim>::reference_cell_info() const
-{
-  if (structdim == 0)
-    return internal::ReferenceCell::get_cell(ReferenceCells::Vertex);
-  else if (structdim == 1)
-    return internal::ReferenceCell::get_cell(ReferenceCells::Line);
-  else
-    return internal::ReferenceCell::get_cell(this->reference_cell());
-}
-
-
 /*----------------- Functions: TriaAccessor<0,dim,spacedim> -----------------*/
 
 template <int dim, int spacedim>
