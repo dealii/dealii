@@ -193,6 +193,104 @@ ReferenceCell::get_nodal_type_quadrature() const
   return dummy; // never reached
 }
 
+
+
+unsigned int
+ReferenceCell::exodusii_vertex_to_deal_vertex(const unsigned int vertex_n) const
+{
+  AssertIndexRange(vertex_n, n_vertices());
+
+  if (*this == ReferenceCells::Line)
+    {
+      return vertex_n;
+    }
+  else if (*this == ReferenceCells::Triangle)
+    {
+      return vertex_n;
+    }
+  else if (*this == ReferenceCells::Quadrilateral)
+    {
+      constexpr std::array<unsigned int, 4> exodus_to_deal{{0, 1, 3, 2}};
+      return exodus_to_deal[vertex_n];
+    }
+  else if (*this == ReferenceCells::Tetrahedron)
+    {
+      return vertex_n;
+    }
+  else if (*this == ReferenceCells::Hexahedron)
+    {
+      constexpr std::array<unsigned int, 8> exodus_to_deal{
+        {0, 1, 3, 2, 4, 5, 7, 6}};
+      return exodus_to_deal[vertex_n];
+    }
+  else if (*this == ReferenceCells::Wedge)
+    {
+      constexpr std::array<unsigned int, 6> exodus_to_deal{{2, 1, 0, 5, 4, 3}};
+      return exodus_to_deal[vertex_n];
+    }
+  else if (*this == ReferenceCells::Pyramid)
+    {
+      constexpr std::array<unsigned int, 5> exodus_to_deal{{0, 1, 3, 2, 4}};
+      return exodus_to_deal[vertex_n];
+    }
+
+  Assert(false, ExcNotImplemented());
+
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+unsigned int
+ReferenceCell::exodusii_face_to_deal_face(const unsigned int face_n) const
+{
+  AssertIndexRange(face_n, n_faces());
+
+  if (*this == ReferenceCells::Vertex)
+    {
+      return 0;
+    }
+  if (*this == ReferenceCells::Line)
+    {
+      return face_n;
+    }
+  else if (*this == ReferenceCells::Triangle)
+    {
+      return face_n;
+    }
+  else if (*this == ReferenceCells::Quadrilateral)
+    {
+      constexpr std::array<unsigned int, 4> exodus_to_deal{{2, 1, 3, 0}};
+      return exodus_to_deal[face_n];
+    }
+  else if (*this == ReferenceCells::Tetrahedron)
+    {
+      constexpr std::array<unsigned int, 4> exodus_to_deal{{1, 3, 2, 0}};
+      return exodus_to_deal[face_n];
+    }
+  else if (*this == ReferenceCells::Hexahedron)
+    {
+      constexpr std::array<unsigned int, 6> exodus_to_deal{{2, 1, 3, 0, 4, 5}};
+      return exodus_to_deal[face_n];
+    }
+  else if (*this == ReferenceCells::Wedge)
+    {
+      constexpr std::array<unsigned int, 6> exodus_to_deal{{3, 4, 2, 0, 1}};
+      return exodus_to_deal[face_n];
+    }
+  else if (*this == ReferenceCells::Pyramid)
+    {
+      constexpr std::array<unsigned int, 5> exodus_to_deal{{3, 2, 4, 1, 0}};
+      return exodus_to_deal[face_n];
+    }
+
+  Assert(false, ExcNotImplemented());
+
+  return numbers::invalid_unsigned_int;
+}
+
+
+
 #include "reference_cell.inst"
 
 DEAL_II_NAMESPACE_CLOSE
