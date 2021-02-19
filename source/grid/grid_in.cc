@@ -251,6 +251,16 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                        j++) // loop to feed data
                     in >> cells.back().vertices[j];
 
+                  // Hexahedra need a permutation to go from VTK numbering
+                  // to deal numbering
+                  if (cell_types[count] == 12)
+                    {
+                      std::swap(cells.back().vertices[2],
+                                cells.back().vertices[3]);
+                      std::swap(cells.back().vertices[6],
+                                cells.back().vertices[7]);
+                    }
+
                   cells.back().material_id = 0;
                 }
               // VTK_TRIANGLE is 5, VTK_QUAD is 9
@@ -318,6 +328,16 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                   for (unsigned int j = 0; j < n_vertices;
                        j++) // loop to feed data
                     in >> cells.back().vertices[j];
+
+                  // Quadrilaterals need a permutation to go from VTK numbering
+                  // to deal numbering
+                  if (cell_types[count] == 9)
+                    {
+                      // Like Hexahedra - the last two vertices need to be
+                      // flipped
+                      std::swap(cells.back().vertices[2],
+                                cells.back().vertices[3]);
+                    }
 
                   cells.back().material_id = 0;
                 }
@@ -550,12 +570,10 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
           if (dim == spacedim)
             GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(
-              vertices, cells);
+              vertices, cells, true);
 
-          GridReordering<dim, spacedim>::reorder_cells(cells);
-          tria->create_triangulation_compatibility(vertices,
-                                                   cells,
-                                                   subcelldata);
+          GridReordering<dim, spacedim>::reorder_cells(cells, true);
+          tria->create_triangulation(vertices, cells, subcelldata);
 
           return;
         }
