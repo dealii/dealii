@@ -3429,7 +3429,8 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
    *
    * see also: https://vtk.org/wp-content/uploads/2015/04/file-formats.pdf
    */
-  static const std::array<int, 8> table = {{1, 3, 5, 9, 10, 14, 13, 12}};
+  static const std::array<int, 8> deal_to_vtk_cell_type =
+    {{1, 3, 5, 9, 10, 14, 13, 12}};
 
   // write cells.
   if (vtk_flags.output_cells)
@@ -3490,19 +3491,22 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
   if (vtk_flags.output_cells)
     {
       for (const auto &cell : tria.active_cell_iterators())
-        out << table[static_cast<int>(cell->reference_cell())] << ' ';
+        out << deal_to_vtk_cell_type[static_cast<int>(cell->reference_cell())]
+            << ' ';
       out << '\n';
     }
   if (vtk_flags.output_faces)
     {
       for (const auto &face : faces)
-        out << table[static_cast<int>(face->reference_cell())] << ' ';
+        out << deal_to_vtk_cell_type[static_cast<int>(face->reference_cell())]
+            << ' ';
       out << '\n';
     }
   if (vtk_flags.output_edges)
     {
       for (const auto &edge : edges)
-        out << table[static_cast<int>(edge->reference_cell())] << ' ';
+        out << deal_to_vtk_cell_type[static_cast<int>(edge->reference_cell())]
+            << ' ';
     }
   out << "\n\nCELL_DATA " << n_cells << '\n'
       << "SCALARS MaterialID int 1\n"
