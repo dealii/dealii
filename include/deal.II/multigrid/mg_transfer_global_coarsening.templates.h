@@ -996,8 +996,7 @@ namespace internal
 
       transfer.n_components = fe_fine.n_components();
 
-      const auto reference_cell_type =
-        dof_handler_fine.get_fe(0).reference_cell();
+      const auto reference_cell = dof_handler_fine.get_fe(0).reference_cell();
 
       // create partitioners and vectors for internal purposes
       {
@@ -1097,7 +1096,7 @@ namespace internal
 
 
       const auto cell_local_chilren_indices =
-        (reference_cell_type == ReferenceCells::get_hypercube<dim>()) ?
+        (reference_cell == ReferenceCells::get_hypercube<dim>()) ?
           get_child_offsets<dim>(transfer.schemes[0].dofs_per_cell_coarse,
                                  fe_fine.degree + 1,
                                  fe_fine.degree) :
@@ -1126,7 +1125,7 @@ namespace internal
 
         // ---------------------- lexicographic_numbering ----------------------
         std::vector<unsigned int> lexicographic_numbering;
-        if (reference_cell_type == ReferenceCells::get_hypercube<dim>())
+        if (reference_cell == ReferenceCells::get_hypercube<dim>())
           {
             const Quadrature<1> dummy_quadrature(
               std::vector<Point<1>>(1, Point<1>()));
@@ -1137,7 +1136,7 @@ namespace internal
         else
           {
             const auto dummy_quadrature =
-              reference_cell_type.template get_gauss_type_quadrature<dim>(1);
+              reference_cell.template get_gauss_type_quadrature<dim>(1);
             internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
             shape_info.reinit(dummy_quadrature, fe_fine, 0);
             lexicographic_numbering = shape_info.lexicographic_numbering;
@@ -1224,7 +1223,7 @@ namespace internal
       // ------------- prolongation matrix (0) -> identity matrix --------------
       {
         AssertDimension(fe_fine.n_base_elements(), 1);
-        if (reference_cell_type == ReferenceCells::get_hypercube<dim>())
+        if (reference_cell == ReferenceCells::get_hypercube<dim>())
           {
             const auto fe = create_1D_fe(fe_fine.base_element(0));
 
@@ -1253,7 +1252,7 @@ namespace internal
       // ----------------------- prolongation matrix (1) -----------------------
       {
         AssertDimension(fe_fine.n_base_elements(), 1);
-        if (reference_cell_type == ReferenceCells::get_hypercube<dim>())
+        if (reference_cell == ReferenceCells::get_hypercube<dim>())
           {
             const auto fe = create_1D_fe(fe_fine.base_element(0));
 
@@ -1536,17 +1535,17 @@ namespace internal
                 transfer.schemes[fe_index_pair.second].dofs_per_cell_coarse *
                 transfer.schemes[fe_index_pair.second].n_coarse_cells);
 
-            const auto reference_cell_type =
+            const auto reference_cell =
               dof_handler_fine.get_fe(fe_index_pair.first.second)
                 .reference_cell();
 
-            Assert(reference_cell_type ==
+            Assert(reference_cell ==
                      dof_handler_coarse.get_fe(fe_index_pair.first.second)
                        .reference_cell(),
                    ExcNotImplemented());
 
             // ------------------- lexicographic_numbering  --------------------
-            if (reference_cell_type == ReferenceCells::get_hypercube<dim>())
+            if (reference_cell == ReferenceCells::get_hypercube<dim>())
               {
                 const Quadrature<1> dummy_quadrature(
                   std::vector<Point<1>>(1, Point<1>()));
@@ -1568,8 +1567,7 @@ namespace internal
             else
               {
                 const auto dummy_quadrature =
-                  reference_cell_type.template get_gauss_type_quadrature<dim>(
-                    1);
+                  reference_cell.template get_gauss_type_quadrature<dim>(1);
 
                 internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
                 shape_info.reinit(dummy_quadrature,
@@ -1646,16 +1644,16 @@ namespace internal
             dof_handler_coarse.get_fe(fe_index_pair.first).n_base_elements(),
             1);
 
-          const auto reference_cell_type =
+          const auto reference_cell =
             dof_handler_fine.get_fe(fe_index_pair_.first.second)
               .reference_cell();
 
-          Assert(reference_cell_type ==
+          Assert(reference_cell ==
                    dof_handler_coarse.get_fe(fe_index_pair_.first.second)
                      .reference_cell(),
                  ExcNotImplemented());
 
-          if (reference_cell_type == ReferenceCells::get_hypercube<dim>())
+          if (reference_cell == ReferenceCells::get_hypercube<dim>())
             {
               const auto fe_fine = create_1D_fe(
                 dof_handler_fine.get_fe(fe_index_pair.second).base_element(0));

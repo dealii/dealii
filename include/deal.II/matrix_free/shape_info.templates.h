@@ -315,12 +315,12 @@ namespace internal
               }
 
           {
-            const auto reference_cell_type = fe.reference_cell();
+            const auto reference_cell = fe.reference_cell();
 
             const auto  temp      = get_face_quadrature_collection(quad, false);
             const auto &quad_face = temp.second;
 
-            if (reference_cell_type != temp.first)
+            if (reference_cell != temp.first)
               {
                 // TODO: this might happen if the quadrature rule and the
                 // the FE do not match
@@ -344,13 +344,12 @@ namespace internal
 
                 for (unsigned int face_no = 0; face_no < quad_face.size();
                      ++face_no)
-                  n_max_vertices =
-                    std::max(n_max_vertices,
-                             reference_cell_type.face_reference_cell(face_no)
-                               .n_vertices());
+                  n_max_vertices = std::max(
+                    n_max_vertices,
+                    reference_cell.face_reference_cell(face_no).n_vertices());
 
                 const auto projected_quad_face =
-                  QProjector<dim>::project_to_all_faces(reference_cell_type,
+                  QProjector<dim>::project_to_all_faces(reference_cell,
                                                         quad_face);
 
                 const unsigned int n_max_face_orientations =
@@ -368,9 +367,10 @@ namespace internal
                 for (unsigned int f = 0; f < quad_face.size(); ++f)
                   {
                     const unsigned int n_face_orientations =
-                      dim == 2 ? 2 :
-                                 (2 * reference_cell_type.face_reference_cell(f)
-                                        .n_vertices());
+                      dim == 2 ?
+                        2 :
+                        (2 *
+                         reference_cell.face_reference_cell(f).n_vertices());
 
                     const unsigned int n_q_points_face = quad_face[f].size();
 
@@ -378,7 +378,7 @@ namespace internal
                       {
                         const auto offset =
                           QProjector<dim>::DataSetDescriptor::face(
-                            reference_cell_type,
+                            reference_cell,
                             f,
                             (o ^ 1) & 1,  // face_orientation
                             (o >> 1) & 1, // face_flip
