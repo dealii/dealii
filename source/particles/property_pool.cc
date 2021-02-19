@@ -69,6 +69,9 @@ namespace Particles
     reference_locations.clear();
     reference_locations.shrink_to_fit();
 
+    ids.clear();
+    ids.shrink_to_fit();
+
     properties.clear();
     properties.shrink_to_fit();
 
@@ -94,6 +97,7 @@ namespace Particles
 
         locations.resize(locations.size() + 1);
         reference_locations.resize(reference_locations.size() + 1);
+        ids.resize(ids.size() + 1);
         properties.resize(properties.size() + n_properties);
       }
 
@@ -101,6 +105,7 @@ namespace Particles
     // but initialize properties with zero.
     set_location(handle, numbers::signaling_nan<Point<spacedim>>());
     set_reference_location(handle, numbers::signaling_nan<Point<dim>>());
+    set_id(handle, numbers::invalid_unsigned_int);
     for (double &x : get_properties(handle))
       x = 0;
 
@@ -130,6 +135,7 @@ namespace Particles
         properties.clear();
         locations.clear();
         reference_locations.clear();
+        ids.clear();
       }
   }
 
@@ -142,6 +148,7 @@ namespace Particles
     locations.reserve(size);
     reference_locations.reserve(size);
     properties.reserve(size * n_properties);
+    ids.reserve(size);
   }
 
 

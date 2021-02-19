@@ -24,6 +24,56 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+namespace types
+{
+  /* Type definitions */
+
+#ifdef DEAL_II_WITH_64BIT_INDICES
+  /**
+   * The type used for indices of particles. While in
+   * sequential computations the 4 billion indices of 32-bit unsigned integers
+   * is plenty, parallel computations using hundreds of processes can overflow
+   * this number and we need a bigger index space. We here utilize the same
+   * build variable that controls the dof indices because the number
+   * of degrees of freedom and the number of particles are typically on the same
+   * order of magnitude.
+   *
+   * The data type always indicates an unsigned integer type.
+   */
+  using particle_index = uint64_t;
+
+#  ifdef DEAL_II_WITH_MPI
+  /**
+   * An identifier that denotes the MPI type associated with
+   * types::global_dof_index.
+   */
+#    define DEAL_II_PARTICLE_INDEX_MPI_TYPE MPI_UINT64_T
+#  endif
+
+#else
+  /**
+   * The type used for indices of particles. While in
+   * sequential computations the 4 billion indices of 32-bit unsigned integers
+   * is plenty, parallel computations using hundreds of processes can overflow
+   * this number and we need a bigger index space. We here utilize the same
+   * build variable that controls the dof indices because the number
+   * of degrees of freedom and the number of particles are typically on the same
+   * order of magnitude.
+   *
+   * The data type always indicates an unsigned integer type.
+   */
+  using particle_index = unsigned int;
+
+#  ifdef DEAL_II_WITH_MPI
+  /**
+   * An identifier that denotes the MPI type associated with
+   * types::global_dof_index.
+   */
+#    define DEAL_II_PARTICLE_INDEX_MPI_TYPE MPI_UNSIGNED
+#  endif
+#endif
+} // namespace types
+
 namespace Particles
 {
   /**
@@ -128,6 +178,20 @@ namespace Particles
                            const Point<dim> &new_reference_location);
 
     /**
+     * Return the ID number of this particle identified by the given
+     * `handle`.
+     */
+    types::particle_index
+    get_id(const Handle handle) const;
+
+    /**
+     * Set the ID number of this particle identified by the given
+     * `handle`.
+     */
+    void
+    set_id(const Handle handle, const types::particle_index &new_id);
+
+    /**
      * Return an ArrayView to the properties that correspond to the given
      * handle @p handle.
      */
@@ -166,6 +230,13 @@ namespace Particles
      * handles.
      */
     std::vector<Point<dim>> reference_locations;
+
+    /**
+     * A vector that stores the unique identifiers of particles. It is indexed
+     * in the same way as the `locations` and `properties` arrays, i.e., via
+     * handles.
+     */
+    std::vector<types::particle_index> ids;
 
     /**
      * The currently allocated properties (whether assigned to
@@ -273,12 +344,59 @@ namespace Particles
     // just check against the array range, and rely on the fact
     // that handles are invalidated when handed over to
     // deallocate_properties_array().
-    Assert(data_index <= locations.size() - 1,
+    Assert(data_index <= reference_locations.size() - 1,
            ExcMessage("Invalid location handle. This can happen if the "
                       "handle was duplicated and then one copy was deallocated "
                       "before trying to access the properties."));
 
     reference_locations[data_index] = new_reference_location;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline types::particle_index
+  PropertyPool<dim, spacedim>::get_id(const Handle handle) const
+  {
+    const std::vector<double>::size_type data_index =
+      (handle != invalid_handle) ? handle : 0;
+
+    // Ideally we would need to assert that 'handle' has not been deallocated
+    // by searching through 'currently_available_handles'. However, this
+    // is expensive and this function is performance critical, so instead
+    // just check against the array range, and rely on the fact
+    // that handles are invalidated when handed over to
+    // deallocate_properties_array().
+    Assert(data_index <= ids.size() - 1,
+           ExcMessage("Invalid location handle. This can happen if the "
+                      "handle was duplicated and then one copy was deallocated "
+                      "before trying to access the properties."));
+
+    return ids[data_index];
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline void
+  PropertyPool<dim, spacedim>::set_id(const Handle                 handle,
+                                      const types::particle_index &new_id)
+  {
+    const std::vector<double>::size_type data_index =
+      (handle != invalid_handle) ? handle : 0;
+
+    // Ideally we would need to assert that 'handle' has not been deallocated
+    // by searching through 'currently_available_handles'. However, this
+    // is expensive and this function is performance critical, so instead
+    // just check against the array range, and rely on the fact
+    // that handles are invalidated when handed over to
+    // deallocate_properties_array().
+    Assert(data_index <= ids.size() - 1,
+           ExcMessage("Invalid location handle. This can happen if the "
+                      "handle was duplicated and then one copy was deallocated "
+                      "before trying to access the properties."));
+
+    ids[data_index] = new_id;
   }
 
 
