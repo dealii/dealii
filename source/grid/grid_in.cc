@@ -3196,19 +3196,21 @@ namespace
               ReferenceCell::n_vertices_to_type(dim, cell.vertices.size());
             const unsigned int deal_face_n =
               cell_type.exodusii_face_to_deal_face(local_face_n);
-            const auto &face_info = cell_type.face_reference_cell(deal_face_n);
+            const ReferenceCell face_reference_cell =
+              cell_type.face_reference_cell(deal_face_n);
 
             // The orientation we pick doesn't matter here since when we create
             // the Triangulation we will sort the vertices for each CellData
             // object created here.
             if (dim == 2)
               {
-                CellData<1> boundary_line(face_info.n_vertices());
+                CellData<1> boundary_line(face_reference_cell.n_vertices());
                 if (apply_all_indicators_to_manifolds)
                   boundary_line.manifold_id = current_b_or_m_id;
                 else
                   boundary_line.boundary_id = current_b_or_m_id;
-                for (unsigned int j = 0; j < face_info.n_vertices(); ++j)
+                for (unsigned int j = 0; j < face_reference_cell.n_vertices();
+                     ++j)
                   boundary_line.vertices[j] =
                     cell.vertices[cell_type.face_to_cell_vertices(
                       deal_face_n, j, 0)];
@@ -3217,12 +3219,13 @@ namespace
               }
             else if (dim == 3)
               {
-                CellData<2> boundary_quad(face_info.n_vertices());
+                CellData<2> boundary_quad(face_reference_cell.n_vertices());
                 if (apply_all_indicators_to_manifolds)
                   boundary_quad.manifold_id = current_b_or_m_id;
                 else
                   boundary_quad.boundary_id = current_b_or_m_id;
-                for (unsigned int j = 0; j < face_info.n_vertices(); ++j)
+                for (unsigned int j = 0; j < face_reference_cell.n_vertices();
+                     ++j)
                   boundary_quad.vertices[j] =
                     cell.vertices[cell_type.face_to_cell_vertices(
                       deal_face_n, j, 0)];
