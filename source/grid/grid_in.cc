@@ -3194,10 +3194,8 @@ namespace
             const CellData<dim> &cell = cells[face_id / max_faces_per_cell];
             const ReferenceCell  cell_type =
               ReferenceCell::n_vertices_to_type(dim, cell.vertices.size());
-            const internal::ReferenceCell::Base &info =
-              internal::ReferenceCell::get_cell(cell_type);
             const unsigned int deal_face_n =
-              info.exodusii_face_to_deal_face(local_face_n);
+              cell_type.exodusii_face_to_deal_face(local_face_n);
             const auto &face_info = cell_type.face_reference_cell(deal_face_n);
 
             // The orientation we pick doesn't matter here since when we create
@@ -3366,8 +3364,7 @@ GridIn<dim, spacedim>::read_exodusii(
           CellData<dim> cell(type.n_vertices());
           for (unsigned int i : type.vertex_indices())
             {
-              cell.vertices[internal::ReferenceCell::get_cell(type)
-                              .exodusii_vertex_to_deal_vertex(i)] =
+              cell.vertices[type.exodusii_vertex_to_deal_vertex(i)] =
                 connection[elem_n + i] - 1;
             }
           cell.material_id = element_block_id;

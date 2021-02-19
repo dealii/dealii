@@ -430,6 +430,27 @@ public:
    */
 
   /**
+   * @name Translating between deal.II indexing and formats used by other programs
+   * @{
+   */
+
+  /**
+   * Map an ExodusII vertex number to a deal.II vertex number.
+   */
+  unsigned int
+  exodusii_vertex_to_deal_vertex(const unsigned int vertex_n) const;
+
+  /**
+   * Map an ExodusII face number to a deal.II face number.
+   */
+  unsigned int
+  exodusii_face_to_deal_face(const unsigned int face_n) const;
+
+  /**
+   * @}
+   */
+
+  /**
    * @name Other functions
    * @{
    */
@@ -1910,7 +1931,6 @@ namespace internal
         return 0;
       }
 
-    public:
       /**
        * Map an ExodusII vertex number to a deal.II vertex number.
        */
@@ -1935,7 +1955,6 @@ namespace internal
         return 0;
       }
 
-    private:
       /**
        * Indices of child cells that are adjacent to a certain face of the
        * mother cell.
