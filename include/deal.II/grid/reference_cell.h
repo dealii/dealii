@@ -374,6 +374,14 @@ public:
                              const unsigned char face_orientation) const;
 
   /**
+   * Combine face and line orientation.
+   */
+  bool
+  combine_face_and_line_orientation(const unsigned int  line,
+                                    const unsigned char face_orientation,
+                                    const unsigned char line_orientation) const;
+
+  /**
    * @}
    */
 
@@ -1725,6 +1733,43 @@ ReferenceCell::unit_normal_vectors(const unsigned int face_no) const
 }
 
 
+
+inline bool
+ReferenceCell::combine_face_and_line_orientation(
+  const unsigned int  line,
+  const unsigned char face_orientation_raw,
+  const unsigned char line_orientation) const
+{
+  if (*this == ReferenceCells::Hexahedron)
+    {
+      static const bool bool_table[2][2][2][2] = {
+        {{{true, false},    // lines 0/1, face_orientation=false,
+                            // face_flip=false, face_rotation=false and true
+          {false, true}},   // lines 0/1, face_orientation=false,
+                            // face_flip=true, face_rotation=false and true
+         {{true, true},     // lines 0/1, face_orientation=true,
+                            // face_flip=false, face_rotation=false and true
+          {false, false}}}, // lines 0/1, face_orientation=true,
+                            // face_flip=true, face_rotation=false and true
+
+        {{{true, true}, // lines 2/3 ...
+          {false, false}},
+         {{true, false}, {false, true}}}};
+
+      const bool face_orientation = Utilities::get_bit(face_orientation_raw, 0);
+      const bool face_flip        = Utilities::get_bit(face_orientation_raw, 2);
+      const bool face_rotation    = Utilities::get_bit(face_orientation_raw, 1);
+
+      return (static_cast<bool>(line_orientation) ==
+              bool_table[line / 2][face_orientation][face_flip][face_rotation]);
+    }
+  else
+    // TODO: This might actually be wrong for some of the other
+    // kinds of objects. We should check this
+    return true;
+}
+
+
 namespace internal
 {
   /**
@@ -1867,7 +1912,6 @@ namespace internal
         return 0;
       }
 
-    public:
       /**
        * Combine face and line orientation.
        */
@@ -1886,7 +1930,6 @@ namespace internal
         return true;
       }
 
-    private:
       /**
        * Return reference-cell type of face @p face_no.
        */

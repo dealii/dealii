@@ -839,7 +839,7 @@ namespace internal
           accessor.reference_cell().standard_to_real_face_line(
             pair[1], pair[0], face_orientation_raw(accessor, quad_index));
 
-        return accessor.reference_cell_info().combine_face_and_line_orientation(
+        return accessor.reference_cell().combine_face_and_line_orientation(
           pair[1],
           face_orientation_raw(accessor, quad_index),
           accessor.quad(quad_index)->line_orientation(line_index));
