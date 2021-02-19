@@ -42,11 +42,13 @@ namespace Particles
 
       for (const auto &particle : particles)
         {
-          particle.write_data(current_data);
+          current_data = particle.write_particle_data_to_memory(current_data);
         }
 
       return buffer;
     }
+
+
 
     template <int dim, int spacedim>
     std::vector<Particle<dim, spacedim>>
@@ -1392,7 +1394,8 @@ namespace Particles
                 memcpy(data, &cellid, cellid_size);
                 data = static_cast<char *>(data) + cellid_size;
 
-                particles_to_send.at(neighbors[i])[j]->write_data(data);
+                data = particles_to_send.at(neighbors[i])[j]
+                         ->write_particle_data_to_memory(data);
                 if (store_callback)
                   data =
                     store_callback(particles_to_send.at(neighbors[i])[j], data);
@@ -1596,7 +1599,7 @@ namespace Particles
         for (const auto i : neighbors)
           for (const auto &p : particles_to_send.at(i))
             {
-              p->write_data(data);
+              data = p->write_particle_data_to_memory(data);
               if (store_callback)
                 data = store_callback(p, data);
             }
@@ -1659,7 +1662,8 @@ namespace Particles
       {
         // Update particle data using previously allocated memory space
         // for efficiency reasons
-        recv_particle->second.update_particle_data(recv_data_it);
+        recv_data_it =
+          recv_particle->second.read_particle_data_from_memory(recv_data_it);
 
         if (load_callback)
           recv_data_it =
@@ -1873,6 +1877,8 @@ namespace Particles
 
     return pack_particles(stored_particles_on_cell);
   }
+
+
 
   template <int dim, int spacedim>
   void
