@@ -241,7 +241,21 @@ namespace CUDAWrappers
      * degrees of freedom, the DoFHandler and the mapping describe the
      * transformation from unit to real cell, and the finite element
      * underlying the DoFHandler together with the quadrature formula
-     * describe the local operations.
+     * describe the local operations. This function takes an IteratorFilters
+     * object (predicate) to loop over a subset of the active cells. When using
+     * MPI, the predicate should filter out non locally owned cells.
+     */
+    template <typename IteratorFiltersType>
+    void
+    reinit(const Mapping<dim> &             mapping,
+           const DoFHandler<dim> &          dof_handler,
+           const AffineConstraints<Number> &constraints,
+           const Quadrature<1> &            quad,
+           const IteratorFiltersType &      iterator_filter,
+           const AdditionalData &           additional_data = AdditionalData());
+
+    /**
+     * Same as above using Iterators::LocallyOwnedCell() as predicate.
      */
     void
     reinit(const Mapping<dim> &             mapping,
@@ -384,11 +398,13 @@ namespace CUDAWrappers
     /**
      * Initializes the data structures.
      */
+    template <typename IteratorFiltersType>
     void
     internal_reinit(const Mapping<dim> &             mapping,
                     const DoFHandler<dim> &          dof_handler,
                     const AffineConstraints<Number> &constraints,
                     const Quadrature<1> &            quad,
+                    const IteratorFiltersType &      iterator_filter,
                     std::shared_ptr<const MPI_Comm>  comm,
                     const AdditionalData             additional_data);
 
