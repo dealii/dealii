@@ -41,7 +41,7 @@ namespace SUNDIALS
      * Create a new SUNLinearSolver structure without any content and
      * operations set to `nullptr`.
      */
-    SUNLinearSolver
+    inline SUNLinearSolver
     SUNLinSolNewEmpty()
     {
       /* create linear solver object */
@@ -80,7 +80,7 @@ namespace SUNDIALS
      *
      * @param solver The solver memory to free
      */
-    void
+    inline void
     SUNLinSolFreeEmpty(SUNLinearSolver solver)
     {
       if (solver == nullptr)
