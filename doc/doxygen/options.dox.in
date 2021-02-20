@@ -198,6 +198,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_COMPILER_CUDA_AWARE=1 \
                          DEAL_II_WITH_GINKGO=1 \
                          DEAL_II_WITH_GMSH=1 \
+                         DEAL_II_GMSH_WITH_API=1 \
                          DEAL_II_WITH_GSL=1 \
                          DEAL_II_WITH_HDF5=1 \
                          DEAL_II_WITH_LAPACK=1 \
