@@ -132,7 +132,9 @@ namespace Utilities
           partitioner_export_end = partitioner_export_start + 200,
 
           /// NoncontiguousPartitioner::update_values
-          noncontiguous_partitioner_update_ghost_values,
+          noncontiguous_partitioner_update_ghost_values_start,
+          noncontiguous_partitioner_update_ghost_values_end =
+            noncontiguous_partitioner_update_ghost_values_start + 10,
 
           // Utilities::MPI::compute_union
           compute_union,
