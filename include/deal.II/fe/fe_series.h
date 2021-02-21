@@ -55,9 +55,10 @@ DEAL_II_NAMESPACE_OPEN
 namespace FESeries
 {
   /**
-   * A class to calculate expansion of a scalar FE field into Fourier series
-   * on a reference element. The exponential form of the Fourier series is
-   * based on completeness and Hermitian orthogonality of the set of exponential
+   * A class to calculate expansion of a scalar FE (or a single component
+   * of vector-valued FE) field into Fourier series on a reference element.
+   * The exponential form of the Fourier series is  based on completeness
+   * and Hermitian orthogonality of the set of exponential
    * functions $ \phi_{\bf k}({\bf x}) = \exp(2 \pi i\, {\bf k} \cdot {\bf x})$.
    * For example in 1D the L2-orthogonality condition reads
    * @f[
@@ -96,10 +97,21 @@ namespace FESeries
      * each direction, @p fe_collection is the hp::FECollection for which
      * expansion will be used and @p q_collection is the hp::QCollection used to
      * integrate the expansion for each FiniteElement in @p fe_collection.
+     *
+     * As the Fourier expansion can only be performed on scalar fields, this
+     * class does not operate on vector-valued finite elements and will
+     * therefore throw an assertion. However, each component of a finite element
+     * field can be treated as a scalar field, respectively, on which Fourier
+     * expansions are again possible. For this purpose, the optional parameter
+     * @p component defines which component of each FiniteElement will be used.
+     * The default value of @p component only applies to scalar FEs, in which
+     * case it indicates that the sole component is to be decomposed. For
+     * vector-valued FEs, a non-default value must be explicitly provided.
      */
     Fourier(const std::vector<unsigned int> &      n_coefficients_per_direction,
             const hp::FECollection<dim, spacedim> &fe_collection,
-            const hp::QCollection<dim> &           q_collection);
+            const hp::QCollection<dim> &           q_collection,
+            const unsigned int component = numbers::invalid_unsigned_int);
 
     /**
      * A non-default constructor. The @p n_coefficients_per_direction defines the
@@ -204,13 +216,20 @@ namespace FESeries
      * Auxiliary vector to store unrolled coefficients.
      */
     std::vector<CoefficientType> unrolled_coefficients;
+
+    /**
+     * Which component of FiniteElement should be used to calculate the
+     * expansion.
+     */
+    const unsigned int component;
   };
 
 
 
   /**
-   * A class to calculate expansion of a scalar FE field into series of Legendre
-   * functions on a reference element.
+   * A class to calculate expansion of a scalar FE (or a single component
+   * of vector-valued FE) field into series of Legendre functions on a
+   * reference element.
    *
    * Legendre functions are solutions to Legendre's differential equation
    * @f[
@@ -262,10 +281,21 @@ namespace FESeries
      * each direction, @p fe_collection is the hp::FECollection for which
      * expansion will be used and @p q_collection is the hp::QCollection used to
      * integrate the expansion for each FiniteElement in @p fe_collection.
+     *
+     * As the Legendre expansion can only be performed on scalar fields, this
+     * class does not operate on vector-valued finite elements and will
+     * therefore throw an assertion. However, each component of a finite element
+     * field can be treated as a scalar field, respectively, on which Legendre
+     * expansions are again possible. For this purpose, the optional parameter
+     * @p component defines which component of each FiniteElement will be used.
+     * The default value of @p component only applies to scalar FEs, in which
+     * case it indicates that the sole component is to be decomposed. For
+     * vector-valued FEs, a non-default value must be explicitly provided.
      */
     Legendre(const std::vector<unsigned int> &n_coefficients_per_direction,
              const hp::FECollection<dim, spacedim> &fe_collection,
-             const hp::QCollection<dim> &           q_collection);
+             const hp::QCollection<dim> &           q_collection,
+             const unsigned int component = numbers::invalid_unsigned_int);
 
     /**
      * A non-default constructor. The @p size_in_each_direction defines the number
@@ -364,6 +394,12 @@ namespace FESeries
      * Auxiliary vector to store unrolled coefficients.
      */
     std::vector<CoefficientType> unrolled_coefficients;
+
+    /**
+     * Which component of FiniteElement should be used to calculate the
+     * expansion.
+     */
+    const unsigned int component;
   };
 
 
