@@ -1688,14 +1688,6 @@ public:
    * @}
    */
 
-protected:
-  /**
-   * Return additional information related to the current geometric entity
-   * type.
-   */
-  inline const internal::ReferenceCell::Base &
-  reference_cell_info() const;
-
 private:
   /**
    * Like set_boundary_id but without checking for internal faces or invalid
