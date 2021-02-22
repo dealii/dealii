@@ -101,6 +101,9 @@ namespace Utilities
        * @pre The size of the @p temporary_storage vector has to be at least
        *   temporary_storage_size. The reason for this is that this vector is
        *   used as buffer for both sending and receiving data.
+       *
+       * @note Any value less than 10 is a valid value of
+       *   @p communication_channel.
        */
       template <typename Number>
       void
@@ -123,6 +126,9 @@ namespace Utilities
        *
        * @pre The required size of the vectors are the same as in the functions
        *   above.
+       *
+       * @note Any value less than 10 is a valid value of
+       *   @p communication_channel.
        */
       template <typename Number>
       void

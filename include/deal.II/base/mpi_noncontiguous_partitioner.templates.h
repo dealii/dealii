@@ -308,12 +308,15 @@ namespace Utilities
       (void)requests;
       Assert(false, ExcNeedsMPI());
 #else
-      AssertIndexRange(communication_channel, 10);
       AssertDimension(requests.size(), recv_ranks.size() + send_ranks.size());
 
       const auto tag =
         communication_channel +
-        internal::Tags::noncontiguous_partitioner_update_ghost_values;
+        internal::Tags::noncontiguous_partitioner_update_ghost_values_start;
+
+      AssertIndexRange(
+        tag,
+        internal::Tags::noncontiguous_partitioner_update_ghost_values_end + 1);
 
       // post recv
       AssertIndexRange(recv_ranks.size(), recv_ptr.size());
