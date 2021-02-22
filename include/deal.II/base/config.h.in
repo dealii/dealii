@@ -452,6 +452,15 @@ _Pragma("GCC diagnostic pop")
 #endif
 
 /***********************************************************************
+ * Define macros for picking the correct C linkage name for a Fortran function.
+ * See cmake/configure/configure_fortran_mangling.cmake for more information.
+ */
+
+#define DEAL_II_FORTRAN_MANGLE(name, NAME) @DEAL_II_FORTRAN_MANGLE@
+
+#define DEAL_II_FORTRAN_MANGLE_UNDERSCORE(name, NAME) @DEAL_II_FORTRAN_MANGLE_UNDERSCORE@
+
+/***********************************************************************
  * Define a portable preprocessor macro that generates custom warnings
  * reporting the line and the file where the warning appears. Taken from:
  * http://goodliffe.blogspot.com/2009/07/c-how-to-say-warning-to-visual-studio-c.html
