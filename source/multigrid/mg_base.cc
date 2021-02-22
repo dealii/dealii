@@ -41,6 +41,22 @@ MGSmootherBase<VectorType>::apply(const unsigned int level,
 }
 
 
+
+template <typename VectorType>
+void
+MGTransferBase<VectorType>::prolongate_and_add(const unsigned int to_level,
+                                               VectorType &       dst,
+                                               const VectorType & src) const
+{
+  VectorType temp;
+  temp.reinit(dst, true);
+
+  this->prolongate(to_level, temp, src);
+
+  dst += temp;
+}
+
+
 // Explicit instantiations
 
 #include "mg_base.inst"
