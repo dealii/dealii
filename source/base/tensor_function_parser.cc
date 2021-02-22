@@ -63,12 +63,12 @@ TensorFunctionParser<rank, dim, Number>::TensorFunctionParser(
 {
   auto constants_map = Patterns::Tools::Convert<ConstMap>::to_value(
     constants,
-    std::make_unique<Patterns::Map>(Patterns::Anything(),
-                                    Patterns::Double(),
-                                    0,
-                                    Patterns::Map::max_int_value,
-                                    ",",
-                                    "="));
+    Patterns::Map(Patterns::Anything(),
+                  Patterns::Double(),
+                  0,
+                  Patterns::Map::max_int_value,
+                  ",",
+                  "="));
   initialize(variable_names,
              expression,
              constants_map,

@@ -2333,8 +2333,8 @@ ParameterHandler::add_parameter(const std::string &          entry,
                 "that is const. Use a non-const type.");
 
   declare_entry(entry,
-                Patterns::Tools::Convert<ParameterType>::to_string(
-                  parameter, pattern.clone()),
+                Patterns::Tools::Convert<ParameterType>::to_string(parameter,
+                                                                   pattern),
                 pattern,
                 documentation,
                 has_to_be_set);
@@ -2345,7 +2345,7 @@ ParameterHandler::add_parameter(const std::string &          entry,
 
   auto action = [&, pattern_index](const std::string &val) {
     parameter = Patterns::Tools::Convert<ParameterType>::to_value(
-      val, patterns[pattern_index]->clone());
+      val, *patterns[pattern_index]);
   };
   add_action(entry, action);
 }

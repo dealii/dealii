@@ -309,9 +309,9 @@ namespace Patterns
        * Convert a NormType to a string.
        */
       static std::string
-      to_string(const VectorTools::NormType &                 s,
-                const std::unique_ptr<Patterns::PatternBase> &p =
-                  Convert<VectorTools::NormType>::to_pattern())
+      to_string(const VectorTools::NormType &s,
+                const Patterns::PatternBase &p =
+                  *Convert<VectorTools::NormType>::to_pattern())
       {
         std::string str;
         if (s == VectorTools::mean)
@@ -342,7 +342,7 @@ namespace Patterns
           {
             AssertThrow(false, ExcMessage("Didn't recognize a norm type."));
           }
-        AssertThrow(p->match(str), ExcInternalError());
+        AssertThrow(p.match(str), ExcInternalError());
         return str;
       }
 
@@ -351,12 +351,12 @@ namespace Patterns
        * Convert a string to a NormType.
        */
       static VectorTools::NormType
-      to_value(const std::string &                           str,
-               const std::unique_ptr<Patterns::PatternBase> &p =
-                 Convert<VectorTools::NormType>::to_pattern())
+      to_value(const std::string &          str,
+               const Patterns::PatternBase &p =
+                 *Convert<VectorTools::NormType>::to_pattern())
       {
         VectorTools::NormType norm = VectorTools::mean;
-        AssertThrow(p->match(str),
+        AssertThrow(p.match(str),
                     ExcMessage(
                       "String " + str +
                       " cannot be converted to VectorTools::NormType"));
