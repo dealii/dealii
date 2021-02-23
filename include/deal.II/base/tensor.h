@@ -747,7 +747,6 @@ private:
   // Allow an arbitrary Tensor to access the underlying values.
   template <int, int, typename>
   friend class Tensor;
-
 };
 
 
