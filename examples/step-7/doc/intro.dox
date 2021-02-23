@@ -85,11 +85,11 @@ formulation. The equation that we want to solve here is the Helmholtz equation
 @f[
   -\Delta u + \alpha u = f,
 @f]
-on the square $[-1,1]^2$ with $\alpha=1$, augmented by boundary conditions
+on the square $[-1,1]^2$ with $\alpha=1$, augmented by Dirichlet boundary conditions
 @f[
   u = g_1
 @f]
-on some part $\Gamma_1$ of the boundary $\Gamma$, and
+on some part $\Gamma_1$ of the boundary $\Gamma$, and Neumann conditions
 @f[
   {\mathbf n}\cdot \nabla u = g_2
 @f]
@@ -130,18 +130,18 @@ particular way, we have manufactured ourselves a problem to which we
 know the solution. This allows us then to compute the error of our
 numerical solution. In the code below, we represent $\bar u$ by the
 <code>Solution</code> class, and other classes will be used to
-denote $\bar u|_{\Gamma_1}$ and ${\mathbf n}\cdot \nabla\bar u|_{\Gamma_2}$.
+denote $\bar u|_{\Gamma_1}=g_1$ and ${\mathbf n}\cdot \nabla\bar u|_{\Gamma_2}=g_2$.
 
 Using the above definitions, we can state the weak formulation of the
 equation, which reads: find $u\in H^1_g=\{v\in H^1: v|_{\Gamma_1}=g_1\}$ such
 that
 @f[
-  {(\nabla u, \nabla v)}_\Omega + {(u,v)}_\Omega
+  {(\nabla v, \nabla u)}_\Omega + {(v,u)}_\Omega
   =
-  {(f,v)}_\Omega + {(g_2,v)}_{\Gamma_2}
+  {(v,f)}_\Omega + {(v,g_2)}_{\Gamma_2}
 @f]
 for all test functions $v\in H^1_0=\{v\in H^1: v|_{\Gamma_1}=0\}$. The
-boundary term ${(g_2,v)}_{\Gamma_2}$ has appeared by integration by parts and
+boundary term ${(v,g_2)}_{\Gamma_2}$ has appeared by integration by parts and
 using $\partial_n u=g_2$ on $\Gamma_2$ and $v=0$ on $\Gamma_1$. The cell
 matrices and vectors which we use to build the global matrices and right hand
 side vectors in the discrete formulation therefore look like this:
@@ -149,8 +149,8 @@ side vectors in the discrete formulation therefore look like this:
   A_{ij}^K &=& \left(\nabla \varphi_i, \nabla \varphi_j\right)_K
               +\left(\varphi_i, \varphi_j\right)_K,
   \\
-  f_i^K &=& \left(f,\varphi_i\right)_K
-           +\left(g_2, \varphi_i\right)_{\partial K\cap \Gamma_2}.
+  F_i^K &=& \left(\varphi_i, f\right)_K
+           +\left(\varphi_i, g_2\right)_{\partial K\cap \Gamma_2}.
 @f}
 Since the generation of the domain integrals has been shown in previous
 examples several times, only the generation of the contour integral is of
@@ -195,7 +195,7 @@ to this program (with the exception of <code>main()</code>, which must be in
 the global namespace) into it, and only close it at the bottom of the file. In
 other words, the structure of the program is of the kind
 @code
-  ... #includes
+  #includes ...
 
   namespace Step7
   {
