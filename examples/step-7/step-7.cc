@@ -660,8 +660,8 @@ namespace Step7
 
                   for (unsigned int i = 0; i < dofs_per_cell; ++i)
                     cell_rhs(i) +=
-                      (neumann_value *                          // g(x_q)
-                       fe_face_values.shape_value(i, q_point) * // phi_i(x_q)
+                      (fe_face_values.shape_value(i, q_point) * // phi_i(x_q)
+                       neumann_value *                          // g(x_q)
                        fe_face_values.JxW(q_point));            // dx
                 }
             }
