@@ -1387,7 +1387,7 @@ public:
    * Exception used when a certain feature doesn't make sense when
    * DoFHandler does not hp-capabilities.
    */
-  DeclExceptionMsg(ExcNotAvailableWithoutHP,
+  DeclExceptionMsg(ExcOnlyAvailableWithHP,
                    "The current function doesn't make sense when used with a "
                    "DoFHandler without hp-capabilities.");
 

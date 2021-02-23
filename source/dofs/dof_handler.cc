@@ -1713,7 +1713,7 @@ namespace internal
         {
           Assert(
             dof_handler.hp_capability_enabled == true,
-            (typename DoFHandler<dim, spacedim>::ExcNotAvailableWithoutHP()));
+            (typename DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
           if (const dealii::parallel::shared::Triangulation<dim, spacedim> *tr =
                 dynamic_cast<
@@ -3115,7 +3115,7 @@ template <int dim, int spacedim>
 void
 DoFHandler<dim, spacedim>::create_active_fe_table()
 {
-  AssertThrow(hp_capability_enabled == true, ExcNotAvailableWithoutHP());
+  AssertThrow(hp_capability_enabled == true, ExcOnlyAvailableWithHP());
 
 
   // Create sufficiently many hp::DoFLevels.
