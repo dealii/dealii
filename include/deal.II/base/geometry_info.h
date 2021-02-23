@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/ndarray.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/std_cxx20/iota_view.h>
 
@@ -67,7 +68,7 @@ namespace internal
         return {{Tensor<1, 1>{{-1}}, Tensor<1, 1>{{1}}}};
       }
 
-      static constexpr std::array<std::array<Tensor<1, 1>, 0>, 2>
+      static constexpr dealii::ndarray<Tensor<1, 1>, 2, 0>
       unit_tangential_vectors()
       {
         return {{{{}}, {{}}}};
@@ -85,7 +86,7 @@ namespace internal
         return {{0, 1}};
       }
 
-      static constexpr std::array<std::array<unsigned int, 1>, 2>
+      static constexpr dealii::ndarray<unsigned int, 2, 1>
       vertex_to_face()
       {
         return {{{{0}}, {{1}}}};
@@ -122,7 +123,7 @@ namespace internal
                  Tensor<1, 2>{{0., 1.}}}};
       }
 
-      static constexpr std::array<std::array<Tensor<1, 2>, 1>, 4>
+      static constexpr dealii::ndarray<Tensor<1, 2>, 4, 1>
       unit_tangential_vectors()
       {
         return {{{{Tensor<1, 2>{{0, -1}}}},
@@ -143,7 +144,7 @@ namespace internal
         return {{0, 2, 1, 3}};
       }
 
-      static constexpr std::array<std::array<unsigned int, 2>, 4>
+      static constexpr dealii::ndarray<unsigned int, 4, 2>
       vertex_to_face()
       {
         return {{{{0, 2}}, {{1, 2}}, {{0, 3}}, {{1, 3}}}};
@@ -182,7 +183,7 @@ namespace internal
                  Tensor<1, 3>{{0, 0, 1}}}};
       }
 
-      static constexpr std::array<std::array<Tensor<1, 3>, 2>, 6>
+      static constexpr dealii::ndarray<Tensor<1, 3>, 6, 2>
       unit_tangential_vectors()
       {
         return {{{{Tensor<1, 3>{{0, -1, 0}}, Tensor<1, 3>{{0, 0, 1}}}},
@@ -205,7 +206,7 @@ namespace internal
         return {{0, 4, 2, 6, 1, 5, 3, 7}};
       }
 
-      static constexpr std::array<std::array<unsigned int, 3>, 8>
+      static constexpr dealii::ndarray<unsigned int, 8, 3>
       vertex_to_face()
       {
         return {{{{0, 2, 4}},
@@ -268,7 +269,7 @@ namespace internal
                  Tensor<1, 4>{{0, 0, 0, 1}}}};
       }
 
-      static constexpr std::array<std::array<Tensor<1, 4>, 3>, 8>
+      static constexpr dealii::ndarray<Tensor<1, 4>, 8, 3>
       unit_tangential_vectors()
       {
         return {{{{Tensor<1, 4>{{0, -1, 0, 0}},
@@ -324,7 +325,7 @@ namespace internal
                  numbers::invalid_unsigned_int}};
       }
 
-      static constexpr std::array<std::array<unsigned int, 4>, 16>
+      static constexpr dealii::ndarray<unsigned int, 16, 4>
       vertex_to_face()
       {
         return {{{{numbers::invalid_unsigned_int,
@@ -2116,7 +2117,7 @@ struct GeometryInfo
    * bounds the reference cell in <i>x</i> direction, the second in <i>y</i>
    * direction, and so on.
    */
-  static constexpr std::array<std::array<unsigned int, dim>, vertices_per_cell>
+  static constexpr ndarray<unsigned int, vertices_per_cell, dim>
     vertex_to_face =
       internal::GeometryInfoHelper::Initializers<dim>::vertex_to_face();
 
@@ -2618,8 +2619,7 @@ struct GeometryInfo
    * @ref GlossFaceOrientation "glossary"
    * entry on face orientation.
    */
-  static constexpr std::array<std::array<Tensor<1, dim>, dim - 1>,
-                              faces_per_cell>
+  static constexpr ndarray<Tensor<1, dim>, faces_per_cell, dim - 1>
     unit_tangential_vectors = internal::GeometryInfoHelper::Initializers<
       dim>::unit_tangential_vectors();
 

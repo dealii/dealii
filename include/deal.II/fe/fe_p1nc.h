@@ -292,7 +292,7 @@ private:
    * x + b y + c$ on given cell. For each local shape function, the array
    * consists of three coefficients is in order of a,b and c.
    */
-  static std::array<std::array<double, 3>, 4>
+  static ndarray<double, 4, 3>
   get_linear_shape_coefficients(const Triangulation<2, 2>::cell_iterator &cell);
 
   /**

@@ -14,6 +14,8 @@
 // ---------------------------------------------------------------------
 
 
+#include <deal.II/base/ndarray.h>
+
 #include <deal.II/simplex/barycentric_polynomials.h>
 #include <deal.II/simplex/polynomials.h>
 
@@ -74,34 +76,33 @@ namespace Simplex
      * to access the right shape function within the triangle and and within
      * the line.
      */
-    static const constexpr std::array<std::array<unsigned int, 2>, 6>
-      wedge_table_1{
-        {{{0, 0}}, {{1, 0}}, {{2, 0}}, {{0, 1}}, {{1, 1}}, {{2, 1}}}};
+    static const constexpr ndarray<unsigned int, 6, 2> wedge_table_1{
+      {{{0, 0}}, {{1, 0}}, {{2, 0}}, {{0, 1}}, {{1, 1}}, {{2, 1}}}};
 
     /**
      * Decompose the shape-function index of a quadratic wedge into an index
      * to access the right shape function within the triangle and and within
      * the line.
      */
-    static const constexpr std::array<std::array<unsigned int, 2>, 18>
-      wedge_table_2{{{{0, 0}},
-                     {{1, 0}},
-                     {{2, 0}},
-                     {{0, 1}},
-                     {{1, 1}},
-                     {{2, 1}},
-                     {{3, 0}},
-                     {{4, 0}},
-                     {{5, 0}},
-                     {{3, 1}},
-                     {{4, 1}},
-                     {{5, 1}},
-                     {{0, 2}},
-                     {{1, 2}},
-                     {{2, 2}},
-                     {{3, 2}},
-                     {{4, 2}},
-                     {{5, 2}}}};
+    static const constexpr ndarray<unsigned int, 18, 2> wedge_table_2{
+      {{{0, 0}},
+       {{1, 0}},
+       {{2, 0}},
+       {{0, 1}},
+       {{1, 1}},
+       {{2, 1}},
+       {{3, 0}},
+       {{4, 0}},
+       {{5, 0}},
+       {{3, 1}},
+       {{4, 1}},
+       {{5, 1}},
+       {{0, 2}},
+       {{1, 2}},
+       {{2, 2}},
+       {{3, 2}},
+       {{4, 2}},
+       {{5, 2}}}};
   } // namespace
 
 
