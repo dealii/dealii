@@ -85,7 +85,7 @@ FE_P1NC::get_dpo_vector()
 
 
 
-std::array<std::array<double, 3>, 4>
+ndarray<double, 4, 3>
 FE_P1NC::get_linear_shape_coefficients(
   const Triangulation<2, 2>::cell_iterator &cell)
 {
@@ -102,7 +102,7 @@ FE_P1NC::get_linear_shape_coefficients(
   const double det = (mpt[0](0) - mpt[1](0)) * (mpt[2](1) - mpt[3](1)) -
                      (mpt[2](0) - mpt[3](0)) * (mpt[0](1) - mpt[1](1));
 
-  std::array<std::array<double, 3>, 4> coeffs;
+  ndarray<double, 4, 3> coeffs;
   coeffs[0][0] =
     ((mpt[2](1) - mpt[3](1)) * (0.5) - (mpt[0](1) - mpt[1](1)) * (0.5)) / det;
   coeffs[1][0] =
@@ -224,8 +224,7 @@ FE_P1NC::fill_fe_values(
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
 
   // linear shape functions
-  std::array<std::array<double, 3>, 4> coeffs =
-    get_linear_shape_coefficients(cell);
+  ndarray<double, 4, 3> coeffs = get_linear_shape_coefficients(cell);
 
   // compute on the cell
   if (flags & update_values)
@@ -261,8 +260,7 @@ FE_P1NC::fill_fe_face_values(
   const UpdateFlags flags(fe_internal.update_each);
 
   // linear shape functions
-  const std::array<std::array<double, 3>, 4> coeffs =
-    get_linear_shape_coefficients(cell);
+  const ndarray<double, 4, 3> coeffs = get_linear_shape_coefficients(cell);
 
   // compute on the face
   const Quadrature<2> quadrature_on_face =
@@ -308,8 +306,7 @@ FE_P1NC::fill_fe_subface_values(
   const UpdateFlags flags(fe_internal.update_each);
 
   // linear shape functions
-  const std::array<std::array<double, 3>, 4> coeffs =
-    get_linear_shape_coefficients(cell);
+  const ndarray<double, 4, 3> coeffs = get_linear_shape_coefficients(cell);
 
   // compute on the subface
   const Quadrature<2> quadrature_on_subface = QProjector<2>::project_to_subface(

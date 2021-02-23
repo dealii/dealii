@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/ndarray.h>
 #include <deal.II/base/types.h>
 
 #include <deal.II/lac/full_matrix.h>
@@ -59,8 +60,8 @@ namespace MeshWorker
      * For every object, specify the size they should have.
      */
     explicit CopyData(
-      const std::array<std::array<unsigned int, 2>, n_matrices> &matrix_sizes,
-      const std::array<unsigned int, n_vectors> &                vector_sizes,
+      const ndarray<unsigned int, n_matrices, 2> &   matrix_sizes,
+      const std::array<unsigned int, n_vectors> &    vector_sizes,
       const std::array<unsigned int, n_dof_indices> &dof_indices_sizes);
 
     /**
@@ -107,8 +108,8 @@ namespace MeshWorker
 
   template <int n_matrices, int n_vectors, int n_dof_indices>
   CopyData<n_matrices, n_vectors, n_dof_indices>::CopyData(
-    const std::array<std::array<unsigned int, 2>, n_matrices> &matrix_sizes,
-    const std::array<unsigned int, n_vectors> &                vector_sizes,
+    const ndarray<unsigned int, n_matrices, 2> &   matrix_sizes,
+    const std::array<unsigned int, n_vectors> &    vector_sizes,
     const std::array<unsigned int, n_dof_indices> &dof_indices_sizes)
   {
     for (unsigned int i = 0; i < n_matrices; ++i)

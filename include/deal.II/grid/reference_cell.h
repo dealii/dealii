@@ -20,6 +20,7 @@
 
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/ndarray.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>
 
@@ -661,7 +662,7 @@ ReferenceCell::faces_for_given_vertex(const unsigned int vertex) const
   else if (*this == ReferenceCells::Triangle)
     {
       AssertIndexRange(vertex, 3);
-      static const std::array<std::array<unsigned int, 2>, 3> table = {
+      static const ndarray<unsigned int, 3, 2> table = {
         {{{0, 2}}, {{0, 1}}, {{1, 2}}}};
 
       return table[vertex];
@@ -669,7 +670,7 @@ ReferenceCell::faces_for_given_vertex(const unsigned int vertex) const
   else if (*this == ReferenceCells::Tetrahedron)
     {
       AssertIndexRange(vertex, 4);
-      static const std::array<std::array<unsigned int, 3>, 4> table = {
+      static const ndarray<unsigned int, 4, 3> table = {
         {{{0, 1, 2}}, {{0, 1, 3}}, {{0, 2, 3}}, {{1, 2, 3}}}};
 
       return table[vertex];
@@ -677,13 +678,12 @@ ReferenceCell::faces_for_given_vertex(const unsigned int vertex) const
   else if (*this == ReferenceCells::Wedge)
     {
       AssertIndexRange(vertex, 6);
-      static const std::array<std::array<unsigned int, 3>, 6> table = {
-        {{{0, 2, 4}},
-         {{0, 2, 3}},
-         {{0, 3, 4}},
-         {{1, 2, 4}},
-         {{1, 2, 3}},
-         {{1, 3, 4}}}};
+      static const ndarray<unsigned int, 6, 3> table = {{{{0, 2, 4}},
+                                                         {{0, 2, 3}},
+                                                         {{0, 3, 4}},
+                                                         {{1, 2, 4}},
+                                                         {{1, 2, 3}},
+                                                         {{1, 3, 4}}}};
 
       return table[vertex];
     }
@@ -691,12 +691,11 @@ ReferenceCell::faces_for_given_vertex(const unsigned int vertex) const
     {
       AssertIndexRange(vertex, 5);
       static const unsigned int X = numbers::invalid_unsigned_int;
-      static const std::array<std::array<unsigned int, 4>, 5> table = {
-        {{{0, 1, 3, X}},
-         {{0, 2, 3, X}},
-         {{0, 1, 4, X}},
-         {{0, 2, 4, X}},
-         {{1, 2, 3, 4}}}};
+      static const ndarray<unsigned int, 5, 4> table = {{{{0, 1, 3, X}},
+                                                         {{0, 2, 3, X}},
+                                                         {{0, 1, 4, X}},
+                                                         {{0, 2, 4, X}},
+                                                         {{1, 2, 3, 4}}}};
 
       return {&table[vertex][0], vertex == 4 ? 4u : 3u};
     }
@@ -906,7 +905,7 @@ ReferenceCell::child_cell_on_face(const unsigned int face,
     }
   else if (*this == ReferenceCells::Triangle)
     {
-      static const std::array<std::array<unsigned int, 2>, 3> subcells = {
+      static const ndarray<unsigned int, 3, 2> subcells = {
         {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
 
       return subcells[face][subface];
@@ -954,7 +953,7 @@ ReferenceCell::standard_vertex_to_face_and_vertex_index(
     }
   else if (*this == ReferenceCells::Triangle)
     {
-      static const std::array<std::array<unsigned int, 2>, 3> table = {
+      static const ndarray<unsigned int, 3, 2> table = {
         {{{0, 0}}, {{0, 1}}, {{1, 1}}}};
 
       return table[vertex];
@@ -965,21 +964,21 @@ ReferenceCell::standard_vertex_to_face_and_vertex_index(
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
-      static const std::array<std::array<unsigned int, 2>, 4> table = {
+      static const ndarray<unsigned int, 4, 2> table = {
         {{{0, 0}}, {{0, 1}}, {{0, 2}}, {{1, 2}}}};
 
       return table[vertex];
     }
   else if (*this == ReferenceCells::Pyramid)
     {
-      static const std::array<std::array<unsigned int, 2>, 5> table = {
+      static const ndarray<unsigned int, 5, 2> table = {
         {{{0, 0}}, {{0, 1}}, {{0, 2}}, {{0, 3}}, {{1, 2}}}};
 
       return table[vertex];
     }
   else if (*this == ReferenceCells::Wedge)
     {
-      static const std::array<std::array<unsigned int, 2>, 6> table = {
+      static const ndarray<unsigned int, 6, 2> table = {
         {{{0, 1}}, {{0, 0}}, {{0, 2}}, {{1, 0}}, {{1, 1}}, {{1, 2}}}};
 
       return table[vertex];
@@ -1098,7 +1097,7 @@ ReferenceCell::face_to_cell_lines(const unsigned int  face,
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
-      const static std::array<std::array<unsigned int, 3>, 4> table = {
+      const static ndarray<unsigned int, 4, 3> table = {
         {{{0, 1, 2}}, {{0, 3, 4}}, {{2, 5, 3}}, {{1, 4, 5}}}};
 
       return table[face]
@@ -1151,7 +1150,7 @@ ReferenceCell::face_to_cell_vertices(const unsigned int  face,
     }
   else if (*this == ReferenceCells::Triangle)
     {
-      static const std::array<std::array<unsigned int, 2>, 3> table = {
+      static const ndarray<unsigned int, 3, 2> table = {
         {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
 
       return table[face][face_orientation ? vertex : (1 - vertex)];
@@ -1167,7 +1166,7 @@ ReferenceCell::face_to_cell_vertices(const unsigned int  face,
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
-      static const std::array<std::array<unsigned int, 3>, 4> table = {
+      static const ndarray<unsigned int, 4, 3> table = {
         {{{0, 1, 2}}, {{1, 0, 3}}, {{0, 2, 3}}, {{2, 1, 3}}}};
 
       return table[face][standard_to_real_face_vertex(
@@ -1176,12 +1175,11 @@ ReferenceCell::face_to_cell_vertices(const unsigned int  face,
   else if (*this == ReferenceCells::Pyramid)
     {
       constexpr auto X = numbers::invalid_unsigned_int;
-      static const std::array<std::array<unsigned int, 4>, 5> table = {
-        {{{0, 1, 2, 3}},
-         {{0, 2, 4, X}},
-         {{3, 1, 4, X}},
-         {{1, 0, 4, X}},
-         {{2, 3, 4, X}}}};
+      static const ndarray<unsigned int, 5, 4> table = {{{{0, 1, 2, 3}},
+                                                         {{0, 2, 4, X}},
+                                                         {{3, 1, 4, X}},
+                                                         {{1, 0, 4, X}},
+                                                         {{2, 3, 4, X}}}};
 
       return table[face][standard_to_real_face_vertex(
         vertex, face, face_orientation)];
@@ -1189,12 +1187,11 @@ ReferenceCell::face_to_cell_vertices(const unsigned int  face,
   else if (*this == ReferenceCells::Wedge)
     {
       constexpr auto X = numbers::invalid_unsigned_int;
-      static const std::array<std::array<unsigned int, 4>, 6> table = {
-        {{{1, 0, 2, X}},
-         {{3, 4, 5, X}},
-         {{0, 1, 3, 4}},
-         {{1, 2, 4, 5}},
-         {{2, 0, 5, 3}}}};
+      static const ndarray<unsigned int, 6, 4> table = {{{{1, 0, 2, X}},
+                                                         {{3, 4, 5, X}},
+                                                         {{0, 1, 3, 4}},
+                                                         {{1, 2, 4, 5}},
+                                                         {{2, 0, 5, 3}}}};
 
       return table[face][standard_to_real_face_vertex(
         vertex, face, face_orientation)];
@@ -1234,8 +1231,7 @@ ReferenceCell::standard_to_real_face_vertex(
     }
   else if (*this == ReferenceCells::Triangle)
     {
-      static const std::array<std::array<unsigned int, 2>, 2> table = {
-        {{{1, 0}}, {{0, 1}}}};
+      static const ndarray<unsigned int, 2, 2> table = {{{{1, 0}}, {{0, 1}}}};
 
       return table[face_orientation][vertex];
     }
@@ -1246,13 +1242,12 @@ ReferenceCell::standard_to_real_face_vertex(
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
-      static const std::array<std::array<unsigned int, 3>, 6> table = {
-        {{{0, 2, 1}},
-         {{0, 1, 2}},
-         {{2, 1, 0}},
-         {{1, 2, 0}},
-         {{1, 0, 2}},
-         {{2, 0, 1}}}};
+      static const ndarray<unsigned int, 6, 3> table = {{{{0, 2, 1}},
+                                                         {{0, 1, 2}},
+                                                         {{2, 1, 0}},
+                                                         {{1, 2, 0}},
+                                                         {{1, 0, 2}},
+                                                         {{2, 0, 1}}}};
 
       return table[face_orientation][vertex];
     }
@@ -1268,13 +1263,12 @@ ReferenceCell::standard_to_real_face_vertex(
         }
       else // One of the triangular faces
         {
-          static const std::array<std::array<unsigned int, 3>, 6> table = {
-            {{{0, 2, 1}},
-             {{0, 1, 2}},
-             {{2, 1, 0}},
-             {{1, 2, 0}},
-             {{1, 0, 2}},
-             {{2, 0, 1}}}};
+          static const ndarray<unsigned int, 6, 3> table = {{{{0, 2, 1}},
+                                                             {{0, 1, 2}},
+                                                             {{2, 1, 0}},
+                                                             {{1, 2, 0}},
+                                                             {{1, 0, 2}},
+                                                             {{2, 0, 1}}}};
 
           return table[face_orientation][vertex];
         }
@@ -1291,13 +1285,12 @@ ReferenceCell::standard_to_real_face_vertex(
         }
       else // One of the triangular faces
         {
-          static const std::array<std::array<unsigned int, 3>, 6> table = {
-            {{{0, 2, 1}},
-             {{0, 1, 2}},
-             {{2, 1, 0}},
-             {{1, 2, 0}},
-             {{1, 0, 2}},
-             {{2, 0, 1}}}};
+          static const ndarray<unsigned int, 6, 3> table = {{{{0, 2, 1}},
+                                                             {{0, 1, 2}},
+                                                             {{2, 1, 0}},
+                                                             {{1, 2, 0}},
+                                                             {{1, 0, 2}},
+                                                             {{2, 0, 1}}}};
 
           return table[face_orientation][vertex];
         }
@@ -1344,13 +1337,12 @@ ReferenceCell::standard_to_real_face_line(
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
-      static const std::array<std::array<unsigned int, 3>, 6> table = {
-        {{{2, 1, 0}},
-         {{0, 1, 2}},
-         {{1, 0, 2}},
-         {{1, 2, 0}},
-         {{0, 2, 1}},
-         {{2, 0, 1}}}};
+      static const ndarray<unsigned int, 6, 3> table = {{{{2, 1, 0}},
+                                                         {{0, 1, 2}},
+                                                         {{1, 0, 2}},
+                                                         {{1, 2, 0}},
+                                                         {{0, 2, 1}},
+                                                         {{2, 0, 1}}}};
 
       return table[face_orientation][line];
     }
@@ -1366,13 +1358,12 @@ ReferenceCell::standard_to_real_face_line(
         }
       else // One of the triangular faces
         {
-          static const std::array<std::array<unsigned int, 3>, 6> table = {
-            {{{2, 1, 0}},
-             {{0, 1, 2}},
-             {{1, 0, 2}},
-             {{1, 2, 0}},
-             {{0, 2, 1}},
-             {{2, 0, 1}}}};
+          static const ndarray<unsigned int, 6, 3> table = {{{{2, 1, 0}},
+                                                             {{0, 1, 2}},
+                                                             {{1, 0, 2}},
+                                                             {{1, 2, 0}},
+                                                             {{0, 2, 1}},
+                                                             {{2, 0, 1}}}};
 
           return table[face_orientation][line];
         }
@@ -1389,13 +1380,12 @@ ReferenceCell::standard_to_real_face_line(
         }
       else // One of the triangular faces
         {
-          static const std::array<std::array<unsigned int, 3>, 6> table = {
-            {{{2, 1, 0}},
-             {{0, 1, 2}},
-             {{1, 0, 2}},
-             {{1, 2, 0}},
-             {{0, 2, 1}},
-             {{2, 0, 1}}}};
+          static const ndarray<unsigned int, 6, 3> table = {{{{2, 1, 0}},
+                                                             {{0, 1, 2}},
+                                                             {{1, 0, 2}},
+                                                             {{1, 2, 0}},
+                                                             {{0, 2, 1}},
+                                                             {{2, 0, 1}}}};
 
           return table[face_orientation][line];
         }
@@ -1467,33 +1457,32 @@ ReferenceCell::n_vertices_to_type(const int dim, const unsigned int n_vertices)
   AssertIndexRange(dim, 4);
   AssertIndexRange(n_vertices, 9);
 
-  const auto X = ReferenceCells::Invalid;
-  static const std::array<std::array<ReferenceCell, 9>,
-                          4>
-    table = {{// dim 0
-              {{X, ReferenceCells::Vertex, X, X, X, X, X, X, X}},
-              // dim 1
-              {{X, X, ReferenceCells::Line, X, X, X, X, X, X}},
-              // dim 2
-              {{X,
-                X,
-                X,
-                ReferenceCells::Triangle,
-                ReferenceCells::Quadrilateral,
-                X,
-                X,
-                X,
-                X}},
-              // dim 3
-              {{X,
-                X,
-                X,
-                X,
-                ReferenceCells::Tetrahedron,
-                ReferenceCells::Pyramid,
-                ReferenceCells::Wedge,
-                X,
-                ReferenceCells::Hexahedron}}}};
+  const auto                                X     = ReferenceCells::Invalid;
+  static const ndarray<ReferenceCell, 4, 9> table = {
+    {// dim 0
+     {{X, ReferenceCells::Vertex, X, X, X, X, X, X, X}},
+     // dim 1
+     {{X, X, ReferenceCells::Line, X, X, X, X, X, X}},
+     // dim 2
+     {{X,
+       X,
+       X,
+       ReferenceCells::Triangle,
+       ReferenceCells::Quadrilateral,
+       X,
+       X,
+       X,
+       X}},
+     // dim 3
+     {{X,
+       X,
+       X,
+       X,
+       ReferenceCells::Tetrahedron,
+       ReferenceCells::Pyramid,
+       ReferenceCells::Wedge,
+       X,
+       ReferenceCells::Hexahedron}}}};
   Assert(table[dim][n_vertices] != ReferenceCells::Invalid,
          ExcMessage("The combination of dim = " + std::to_string(dim) +
                     " and n_vertices = " + std::to_string(n_vertices) +
@@ -1653,7 +1642,7 @@ ReferenceCell::unit_tangential_vectors(const unsigned int face_no,
   else if (*this == ReferenceCells::Tetrahedron)
     {
       AssertIndexRange(face_no, 4);
-      static const std::array<std::array<Tensor<1, dim>, 2>, 4> table = {
+      static const ndarray<Tensor<1, dim>, 4, 2> table = {
         {{{Point<dim>(0, 1, 0), Point<dim>(1, 0, 0)}},
          {{Point<dim>(1, 0, 0), Point<dim>(0, 0, 1)}},
          {{Point<dim>(0, 0, 1), Point<dim>(0, 1, 0)}},
@@ -1669,7 +1658,7 @@ ReferenceCell::unit_tangential_vectors(const unsigned int face_no,
   else if (*this == ReferenceCells::Wedge)
     {
       AssertIndexRange(face_no, 5);
-      static const std::array<std::array<Tensor<1, dim>, 2>, 5> table = {
+      static const ndarray<Tensor<1, dim>, 5, 2> table = {
         {{{Point<dim>(0, 1, 0), Point<dim>(1, 0, 0)}},
          {{Point<dim>(1, 0, 0), Point<dim>(0, 0, 1)}},
          {{Point<dim>(-1 / std::sqrt(2.0), +1 / std::sqrt(2.0), 0),
@@ -1682,7 +1671,7 @@ ReferenceCell::unit_tangential_vectors(const unsigned int face_no,
   else if (*this == ReferenceCells::Pyramid)
     {
       AssertIndexRange(face_no, 5);
-      static const std::array<std::array<Tensor<1, dim>, 2>, 5> table = {
+      static const ndarray<Tensor<1, dim>, 5, 2> table = {
         {{{Point<dim>(0, 1, 0), Point<dim>(1, 0, 0)}},
          {{Point<dim>(+1.0 / sqrt(2.0), 0, +1.0 / sqrt(2.0)),
            Point<dim>(0, 1, 0)}},

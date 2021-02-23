@@ -207,10 +207,10 @@ namespace Step33
     // the function with different input vector data types, so we templatize
     // on it as well:
     template <typename InputVector>
-    static void compute_flux_matrix(
-      const InputVector &                            W,
-      std::array<std::array<typename InputVector::value_type, dim>,
-                 EulerEquations<dim>::n_components> &flux)
+    static void compute_flux_matrix(const InputVector &W,
+                                    ndarray<typename InputVector::value_type,
+                                            EulerEquations<dim>::n_components,
+                                            dim> &     flux)
     {
       // First compute the pressure that appears in the flux matrix, and then
       // compute the first <code>dim</code> columns of the matrix that
@@ -253,8 +253,9 @@ namespace Step33
       const double                                                alpha,
       std::array<typename InputVector::value_type, n_components> &normal_flux)
     {
-      std::array<std::array<typename InputVector::value_type, dim>,
-                 EulerEquations<dim>::n_components>
+      ndarray<typename InputVector::value_type,
+              EulerEquations<dim>::n_components,
+              dim>
         iflux, oflux;
 
       compute_flux_matrix(Wplus, iflux);
@@ -1776,12 +1777,12 @@ namespace Step33
     // terms of autodifferentiation variables, so that the Jacobian
     // contributions can later easily be computed from it:
 
-    std::vector<std::array<std::array<Sacado::Fad::DFad<double>, dim>,
-                           EulerEquations<dim>::n_components>>
+    std::vector<ndarray<Sacado::Fad::DFad<double>,
+                        EulerEquations<dim>::n_components,
+                        dim>>
       flux(n_q_points);
 
-    std::vector<
-      std::array<std::array<double, dim>, EulerEquations<dim>::n_components>>
+    std::vector<ndarray<double, EulerEquations<dim>::n_components, dim>>
       flux_old(n_q_points);
 
     std::vector<

@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/array_view.h>
+#include <deal.II/base/ndarray.h>
 
 #include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria_description.h>
@@ -193,7 +194,7 @@ namespace internal
 
         if (d == 1)
           {
-            static const std::array<std::array<unsigned int, 2>, 3> table = {
+            static const dealii::ndarray<unsigned int, 3, 2> table = {
               {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
 
             return {table[e]};
@@ -250,7 +251,7 @@ namespace internal
 
         if (d == 1)
           {
-            static const std::array<std::array<unsigned int, 2>, 4> table = {
+            static const dealii::ndarray<unsigned int, 4, 2> table = {
               {{{0, 2}}, {{1, 3}}, {{0, 1}}, {{2, 3}}}};
 
             return {table[e]};
@@ -307,7 +308,7 @@ namespace internal
 
         if (d == 2)
           {
-            static const std::array<std::array<unsigned int, 3>, 4> table = {
+            static const dealii::ndarray<unsigned int, 4, 3> table = {
               {{{0, 1, 2}}, {{1, 0, 3}}, {{0, 2, 3}}, {{2, 1, 3}}}};
 
             return {table[e]};
@@ -315,7 +316,7 @@ namespace internal
 
         if (d == 1)
           {
-            static const std::array<std::array<unsigned int, 2>, 6> table = {
+            static const dealii::ndarray<unsigned int, 6, 2> table = {
               {{{0, 1}}, {{1, 2}}, {{2, 0}}, {{0, 3}}, {{1, 3}}, {{2, 3}}}};
 
             return {table[e]};
@@ -363,7 +364,7 @@ namespace internal
       nth_line_of_surface(const unsigned int line,
                           const unsigned int face) const override
       {
-        const static std::array<std::array<unsigned int, 3>, 4> table = {
+        const static dealii::ndarray<unsigned int, 4, 3> table = {
           {{{0, 1, 2}}, {{0, 3, 4}}, {{2, 5, 3}}, {{1, 4, 5}}}};
 
         return table[face][line];
@@ -373,11 +374,11 @@ namespace internal
       vertices_of_nth_line_of_surface(const unsigned int line,
                                       const unsigned int face) const override
       {
-        const static std::array<std::array<std::array<unsigned int, 2>, 3>, 4>
-          table = {{{{{{0, 1}}, {{1, 2}}, {{2, 0}}}},
-                    {{{{1, 0}}, {{0, 3}}, {{3, 1}}}},
-                    {{{{0, 2}}, {{2, 3}}, {{3, 0}}}},
-                    {{{{2, 1}}, {{1, 3}}, {{3, 2}}}}}};
+        const static dealii::ndarray<unsigned int, 4, 3, 2> table = {
+          {{{{{0, 1}}, {{1, 2}}, {{2, 0}}}},
+           {{{{1, 0}}, {{0, 3}}, {{3, 1}}}},
+           {{{{0, 2}}, {{2, 3}}, {{3, 0}}}},
+           {{{{2, 1}}, {{1, 3}}, {{3, 2}}}}}};
 
         return table[face][line];
       }
@@ -411,7 +412,7 @@ namespace internal
                 return {table};
               }
 
-            static const std::array<std::array<unsigned int, 3>, 4> table = {
+            static const dealii::ndarray<unsigned int, 4, 3> table = {
               {{{0, 2, 4}}, {{3, 1, 4}}, {{1, 0, 4}}, {{2, 3, 4}}}};
 
             return {table[e - 1]};
@@ -419,7 +420,7 @@ namespace internal
 
         if (d == 1)
           {
-            static const std::array<std::array<unsigned int, 2>, 8> table = {
+            static const dealii::ndarray<unsigned int, 8, 2> table = {
               {{{0, 2}},
                {{1, 3}},
                {{0, 1}},
@@ -478,7 +479,7 @@ namespace internal
       nth_line_of_surface(const unsigned int line,
                           const unsigned int face) const override
       {
-        const static std::array<std::array<unsigned int, 4>, 5> table = {
+        const static dealii::ndarray<unsigned int, 5, 4> table = {
           {{{0, 1, 2, 3}},
            {{0, 6, 4, numbers::invalid_unsigned_int}},
            {{1, 5, 7, numbers::invalid_unsigned_int}},
@@ -494,12 +495,12 @@ namespace internal
       {
         static const unsigned int X = static_cast<unsigned int>(-1);
 
-        const static std::array<std::array<std::array<unsigned int, 2>, 4>, 5>
-          table = {{{{{{0, 2}}, {{1, 3}}, {{0, 1}}, {{2, 3}}}},
-                    {{{{0, 2}}, {{2, 4}}, {{4, 0}}, {{X, X}}}},
-                    {{{{3, 1}}, {{1, 4}}, {{4, 3}}, {{X, X}}}},
-                    {{{{1, 0}}, {{0, 4}}, {{4, 1}}, {{X, X}}}},
-                    {{{{2, 3}}, {{3, 4}}, {{4, 2}}, {{X, X}}}}}};
+        const static dealii::ndarray<unsigned int, 5, 4, 2> table = {
+          {{{{{0, 2}}, {{1, 3}}, {{0, 1}}, {{2, 3}}}},
+           {{{{0, 2}}, {{2, 4}}, {{4, 0}}, {{X, X}}}},
+           {{{{3, 1}}, {{1, 4}}, {{4, 3}}, {{X, X}}}},
+           {{{{1, 0}}, {{0, 4}}, {{4, 1}}, {{X, X}}}},
+           {{{{2, 3}}, {{3, 4}}, {{4, 2}}, {{X, X}}}}}};
 
         return table[face][line];
       }
@@ -530,13 +531,13 @@ namespace internal
           {
             if (e == 0 || e == 1)
               {
-                static const std::array<std::array<unsigned int, 3>, 2> table =
-                  {{{{1, 0, 2}}, {{3, 4, 5}}}};
+                static const dealii::ndarray<unsigned int, 2, 3> table = {
+                  {{{1, 0, 2}}, {{3, 4, 5}}}};
 
                 return {table[e]};
               }
 
-            static const std::array<std::array<unsigned int, 4>, 3> table = {
+            static const dealii::ndarray<unsigned int, 3, 4> table = {
               {{{0, 1, 3, 4}}, {{1, 2, 4, 5}}, {{2, 0, 5, 3}}}};
 
             return {table[e - 2]};
@@ -544,7 +545,7 @@ namespace internal
 
         if (d == 1)
           {
-            static const std::array<std::array<unsigned int, 2>, 9> table = {
+            static const dealii::ndarray<unsigned int, 9, 2> table = {
               {{{0, 1}},
                {{1, 2}},
                {{2, 0}},
@@ -606,7 +607,7 @@ namespace internal
       {
         static const unsigned int X = static_cast<unsigned int>(-1);
 
-        const static std::array<std::array<unsigned int, 4>, 5> table = {
+        const static dealii::ndarray<unsigned int, 5, 4> table = {
           {{{0, 2, 1, X}},
            {{3, 4, 5, X}},
            {{6, 7, 0, 3}},
@@ -622,12 +623,12 @@ namespace internal
       {
         static const unsigned int X = static_cast<unsigned int>(-1);
 
-        const static std::array<std::array<std::array<unsigned int, 2>, 4>, 5>
-          table = {{{{{{1, 0}}, {{0, 2}}, {{2, 1}}, {{X, X}}}},
-                    {{{{3, 4}}, {{4, 5}}, {{5, 3}}, {{X, X}}}},
-                    {{{{0, 3}}, {{1, 4}}, {{0, 1}}, {{3, 4}}}},
-                    {{{{1, 4}}, {{2, 5}}, {{1, 2}}, {{4, 5}}}},
-                    {{{{2, 5}}, {{0, 3}}, {{2, 0}}, {{5, 3}}}}}};
+        const static dealii::ndarray<unsigned int, 5, 4, 2> table = {
+          {{{{{1, 0}}, {{0, 2}}, {{2, 1}}, {{X, X}}}},
+           {{{{3, 4}}, {{4, 5}}, {{5, 3}}, {{X, X}}}},
+           {{{{0, 3}}, {{1, 4}}, {{0, 1}}, {{3, 4}}}},
+           {{{{1, 4}}, {{2, 5}}, {{1, 2}}, {{4, 5}}}},
+           {{{{2, 5}}, {{0, 3}}, {{2, 0}}, {{5, 3}}}}}};
 
         return table[face][line];
       }
@@ -656,7 +657,7 @@ namespace internal
 
         if (d == 2)
           {
-            static const std::array<std::array<unsigned int, 4>, 6> table = {
+            static const dealii::ndarray<unsigned int, 6, 4> table = {
               {{{0, 2, 4, 6}},
                {{1, 3, 5, 7}},
                {{0, 4, 1, 5}},
@@ -669,7 +670,7 @@ namespace internal
 
         if (d == 1)
           {
-            static const std::array<std::array<unsigned int, 2>, 12> table = {
+            static const dealii::ndarray<unsigned int, 12, 2> table = {
               {{{0, 2}},
                {{1, 3}},
                {{0, 1}},
@@ -728,7 +729,7 @@ namespace internal
       nth_line_of_surface(const unsigned int line,
                           const unsigned int face) const override
       {
-        const static std::array<std::array<unsigned int, 4>, 6> table = {
+        const static dealii::ndarray<unsigned int, 6, 4> table = {
           {{{8, 10, 0, 4}},
            {{9, 11, 1, 5}},
            {{2, 6, 8, 9}},
@@ -743,13 +744,13 @@ namespace internal
       vertices_of_nth_line_of_surface(const unsigned int line,
                                       const unsigned int face) const override
       {
-        const static std::array<std::array<std::array<unsigned int, 2>, 4>, 6>
-          table = {{{{{{0, 4}}, {{2, 6}}, {{0, 2}}, {{4, 6}}}},
-                    {{{{1, 5}}, {{3, 7}}, {{1, 3}}, {{5, 7}}}},
-                    {{{{0, 1}}, {{4, 5}}, {{0, 4}}, {{1, 5}}}},
-                    {{{{2, 3}}, {{6, 7}}, {{2, 6}}, {{3, 7}}}},
-                    {{{{0, 2}}, {{1, 3}}, {{0, 1}}, {{2, 3}}}},
-                    {{{{4, 6}}, {{5, 7}}, {{4, 5}}, {{6, 7}}}}}};
+        const static dealii::ndarray<unsigned int, 6, 4, 2> table = {
+          {{{{{0, 4}}, {{2, 6}}, {{0, 2}}, {{4, 6}}}},
+           {{{{1, 5}}, {{3, 7}}, {{1, 3}}, {{5, 7}}}},
+           {{{{0, 1}}, {{4, 5}}, {{0, 4}}, {{1, 5}}}},
+           {{{{2, 3}}, {{6, 7}}, {{2, 6}}, {{3, 7}}}},
+           {{{{0, 2}}, {{1, 3}}, {{0, 1}}, {{2, 3}}}},
+           {{{{4, 6}}, {{5, 7}}, {{4, 5}}, {{6, 7}}}}}};
 
         return table[face][line];
       }

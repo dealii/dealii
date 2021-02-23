@@ -45,8 +45,7 @@ constexpr std::array<int, GeometryInfo<dim>::faces_per_cell>
   GeometryInfo<dim>::unit_normal_orientation;
 
 template <int dim>
-constexpr std::array<std::array<unsigned int, dim>,
-                     GeometryInfo<dim>::vertices_per_cell>
+constexpr ndarray<unsigned int, GeometryInfo<dim>::vertices_per_cell, dim>
   GeometryInfo<dim>::vertex_to_face;
 
 template <int dim>
@@ -58,8 +57,8 @@ constexpr std::array<Tensor<1, dim>, GeometryInfo<dim>::faces_per_cell>
   GeometryInfo<dim>::unit_normal_vector;
 
 template <int dim>
-constexpr std::array<std::array<Tensor<1, dim>, dim - 1>,
-                     GeometryInfo<dim>::faces_per_cell>
+constexpr ndarray<Tensor<1, dim>, GeometryInfo<dim>::faces_per_cell, dim - 1>
+
   GeometryInfo<dim>::unit_tangential_vectors;
 
 template <int dim>
