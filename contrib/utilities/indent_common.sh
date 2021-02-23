@@ -171,7 +171,11 @@ remove_trailing_whitespace()
   file="${1}"
   tmpfile="$(mktemp "${TMPDIR}/$(basename "$1").tmp.XXXXXXXX")"
 
-  sed 's/\s\+$//g' "${file}" > "${tmpfile}"
+  #
+  # Mac OS uses BSD sed (other than GNU sed in Linux),
+  # so it doesn't recognize \s as 'spaces' or + as 'one or more'.
+  #
+  sed 's/[[:space:]]\{1,\}$//g' "${file}" > "${tmpfile}"
   if ! diff -q "${file}" "${tmpfile}" >/dev/null; then
     mv "${tmpfile}" "${file}"
   fi
