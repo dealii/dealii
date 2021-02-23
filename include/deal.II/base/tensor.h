@@ -717,7 +717,7 @@ public:
    */
   using tensor_type = Tensor<rank_, dim, Number>;
 
-private:
+protected:
   /**
    * Array of tensors holding the subelements.
    */
@@ -725,6 +725,7 @@ private:
   // ... avoid a compiler warning in case of dim == 0 and ensure that the
   // array always has positive size.
 
+private:
   /**
    * Internal helper function for unroll.
    */
@@ -747,9 +748,6 @@ private:
   template <int, int, typename>
   friend class Tensor;
 
-  // Point is allowed access to the coordinates. This is supposed to improve
-  // speed.
-  friend class Point<dim, Number>;
 };
 
 
