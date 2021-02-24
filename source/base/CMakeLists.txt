@@ -48,6 +48,7 @@ SET(_unity_include_src
   mpi.cc
   mpi_consensus_algorithms.cc
   mpi_noncontiguous_partitioner.cc
+  mpi_remote_point_evaluation.cc
   mu_parser_internal.cc
   multithread_info.cc
   named_selection.cc
@@ -132,6 +133,7 @@ SET(_inst
   geometric_utilities.inst.in
   mpi.inst.in
   mpi_noncontiguous_partitioner.inst.in
+  mpi_remote_point_evaluation.inst.in
   partitioner.inst.in
   partitioner.cuda.inst.in
   polynomials_rannacher_turek.inst.in
