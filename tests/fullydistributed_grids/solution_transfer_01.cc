@@ -89,6 +89,7 @@ test(TriangulationType &triangulation)
 
   {
     triangulation.load(filename);
+    dof_handler.distribute_dofs(FE_Q<dim>(2));
 
     parallel::distributed::SolutionTransfer<dim, VectorType> solution_transfer(
       dof_handler);

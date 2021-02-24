@@ -137,6 +137,10 @@ namespace parallel
       prepare_for_coarsening_and_refinement(
         const std::vector<const VectorType *> &all_in)
     {
+      for (unsigned int i = 0; i < all_in.size(); ++i)
+        Assert(all_in[i]->size() == dof_handler->n_dofs(),
+               ExcDimensionMismatch(all_in[i]->size(), dof_handler->n_dofs()));
+
       input_vectors = all_in;
       register_data_attach();
     }
@@ -230,6 +234,9 @@ namespace parallel
     {
       Assert(input_vectors.size() == all_out.size(),
              ExcDimensionMismatch(input_vectors.size(), all_out.size()));
+      for (unsigned int i = 0; i < all_out.size(); ++i)
+        Assert(all_out[i]->size() == dof_handler->n_dofs(),
+               ExcDimensionMismatch(all_out[i]->size(), dof_handler->n_dofs()));
 
       // TODO: casting away constness is bad
       auto *tria = (dynamic_cast<parallel::DistributedTriangulationBase<
