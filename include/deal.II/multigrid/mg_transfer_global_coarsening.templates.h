@@ -1873,15 +1873,23 @@ namespace MGTransferGlobalCoarseningTools
   } // namespace internal
 
   template <int dim, int spacedim>
-  std::vector<std::shared_ptr<Triangulation<dim, spacedim>>>
+  std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
   create_geometric_coarsening_sequence(
     const Triangulation<dim, spacedim> &fine_triangulation_in)
   {
-    std::vector<std::shared_ptr<Triangulation<dim, spacedim>>>
-      coarse_grid_triangulations;
+    std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
+      coarse_grid_triangulations(fine_triangulation_in.n_global_levels());
+
+    coarse_grid_triangulations.back().reset(&fine_triangulation_in, [](auto &) {
+      // empty deleter, since fine_triangulation_in is an external field
+      // and its destructor is called somewhere else
+    });
+
+    // for a single level nothing has to be done
+    if (fine_triangulation_in.n_global_levels() == 1)
+      return coarse_grid_triangulations;
 
 #ifndef DEAL_II_WITH_P4EST
-    (void)fine_triangulation_in;
     Assert(false, ExcNotImplemented());
 #else
     const auto fine_triangulation =
@@ -1894,15 +1902,6 @@ namespace MGTransferGlobalCoarseningTools
 
     const auto coarse_mesh_description =
       GridTools::get_coarse_mesh_description(*fine_triangulation);
-
-    coarse_grid_triangulations.resize(fine_triangulation->n_global_levels());
-
-    coarse_grid_triangulations[max_level].reset(
-      const_cast<Triangulation<dim, spacedim> *>(&fine_triangulation_in),
-      [](auto &) {
-        // empty deleter, since fine_triangulation_in is an external field
-        // and its destructor is called somewhere else
-      });
 
     // create coarse meshes
     for (unsigned int l = max_level; l > 0; --l)
