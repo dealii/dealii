@@ -34,7 +34,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 class InterpolationFunction : public Function<dim>
@@ -51,58 +50,80 @@ public:
   }
 };
 
-template <int dim, typename TriangulationType>
-void
-test(TriangulationType &triangulation)
+
+using VectorType = LinearAlgebra::distributed::Vector<double>;
+
+
+template <int dim>
+VectorType
+transfer(const std::string &mode)
 {
+  AssertThrow(mode == "save" || mode == "load", ExcInternalError());
+
+  const std::string filename =
+    "solution_transfer_" + std::to_string(dim) + "d_out";
+
+  parallel::fullydistributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
+  if (mode == "save")
+    {
+      parallel::distributed::Triangulation<dim> tria_base(MPI_COMM_WORLD);
+      GridGenerator::hyper_cube(tria_base);
+      tria_base.refine_global(3);
+
+      const auto description = TriangulationDescription::Utilities::
+        create_description_from_triangulation(tria_base, MPI_COMM_WORLD);
+
+      triangulation.create_triangulation(description);
+    }
+  else if (mode == "load")
+    {
+      triangulation.load(filename);
+    }
+
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(FE_Q<dim>(2));
 
   IndexSet locally_relevant_dofs;
   DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
-
-  using VectorType = LinearAlgebra::distributed::Vector<double>;
-
   std::shared_ptr<Utilities::MPI::Partitioner> partitioner =
     std::make_shared<Utilities::MPI::Partitioner>(
       dof_handler.locally_owned_dofs(), locally_relevant_dofs, MPI_COMM_WORLD);
 
+  parallel::distributed::SolutionTransfer<dim, VectorType> solution_transfer(
+    dof_handler);
   VectorType vector(partitioner);
+  if (mode == "save")
+    {
+      VectorTools::interpolate(dof_handler,
+                               InterpolationFunction<dim>(),
+                               vector);
+      vector.update_ghost_values();
 
-  VectorTools::interpolate(dof_handler, InterpolationFunction<dim>(), vector);
-  vector.update_ghost_values();
+      solution_transfer.prepare_for_serialization(vector);
 
-  VectorType vector_loaded(partitioner);
+      triangulation.save(filename);
+    }
+  else if (mode == "load")
+    {
+      solution_transfer.deserialize(vector);
 
-  const std::string filename =
-    "solution_transfer_" + std::to_string(dim) + "d_out";
+      vector.update_ghost_values();
+    }
 
-  {
-    parallel::distributed::SolutionTransfer<dim, VectorType> solution_transfer(
-      dof_handler);
-    solution_transfer.prepare_for_serialization(vector);
+  return vector;
+}
 
-    triangulation.save(filename);
-  }
 
-  triangulation.clear();
+template <int dim>
+void
+test()
+{
+  VectorType vector        = transfer<dim>("save");
+  VectorType vector_loaded = transfer<dim>("load");
 
-  {
-    triangulation.load(filename);
-    dof_handler.distribute_dofs(FE_Q<dim>(2));
-
-    parallel::distributed::SolutionTransfer<dim, VectorType> solution_transfer(
-      dof_handler);
-    solution_transfer.deserialize(vector_loaded);
-
-    vector_loaded.update_ghost_values();
-  }
-
-  // Verify that error is 0.
-  VectorType error(vector);
-  error.add(-1, vector_loaded);
-
-  deallog << (error.linfty_norm() < 1e-16 ? "PASSED" : "FAILED") << std::endl;
+  // Verify that both vectors are the same.
+  vector.add(-1, vector_loaded);
+  deallog << (vector.linfty_norm() < 1e-16 ? "PASSED" : "FAILED") << std::endl;
 }
 
 
@@ -114,40 +135,10 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   deallog.push("2d");
-  {
-    constexpr int dim = 2;
-
-    parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
-    GridGenerator::hyper_cube(triangulation);
-    triangulation.refine_global(3);
-
-    const auto description = TriangulationDescription::Utilities::
-      create_description_from_triangulation(triangulation, MPI_COMM_WORLD);
-
-    parallel::fullydistributed::Triangulation<dim> triangulation_pft(
-      MPI_COMM_WORLD);
-    triangulation_pft.create_triangulation(description);
-
-    test<dim>(triangulation_pft);
-  }
+  test<2>();
   deallog.pop();
 
   deallog.push("3d");
-  {
-    constexpr int dim = 3;
-
-    parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
-    GridGenerator::hyper_cube(triangulation);
-    triangulation.refine_global(3);
-
-    const auto description = TriangulationDescription::Utilities::
-      create_description_from_triangulation(triangulation, MPI_COMM_WORLD);
-
-    parallel::fullydistributed::Triangulation<dim> triangulation_pft(
-      MPI_COMM_WORLD);
-    triangulation_pft.create_triangulation(description);
-
-    test<dim>(triangulation_pft);
-  }
+  test<3>();
   deallog.pop();
 }
