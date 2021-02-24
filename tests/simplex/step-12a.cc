@@ -49,15 +49,19 @@
 
 // Finally, the new include file for using the mesh_loop from the MeshWorker
 // framework
+#include <deal.II/base/quadrature_lib.h>
+
+#include <deal.II/fe/fe_pyramid_p.h>
+#include <deal.II/fe/fe_simplex_p.h>
+#include <deal.II/fe/fe_simplex_p_bubbles.h>
+#include <deal.II/fe/fe_wedge_p.h>
 #include <deal.II/fe/mapping_fe.h>
+
+#include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/lac/precondition.h>
 
 #include <deal.II/meshworker/mesh_loop.h>
-
-#include <deal.II/simplex/fe_lib.h>
-#include <deal.II/simplex/grid_generator.h>
-#include <deal.II/simplex/quadrature_lib.h>
 
 #include <fstream>
 #include <iostream>

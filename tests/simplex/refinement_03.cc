@@ -18,9 +18,8 @@
 // Verify CellAccessor::neighbor_child_on_subface for a triangle mesh.
 
 
+#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
-
-#include <deal.II/simplex/grid_generator.h>
 
 #include "../tests.h"
 

@@ -17,12 +17,14 @@
 
 // Test TriaAccessor::measure() and TriaAccessor::diameter().
 
+#include <deal.II/fe/fe_pyramid_p.h>
+#include <deal.II/fe/fe_simplex_p.h>
+#include <deal.II/fe/fe_simplex_p_bubbles.h>
+#include <deal.II/fe/fe_wedge_p.h>
 #include <deal.II/fe/mapping_fe.h>
 
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
-
-#include <deal.II/simplex/fe_lib.h>
 
 #include "../tests.h"
 

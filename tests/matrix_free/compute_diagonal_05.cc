@@ -17,11 +17,12 @@
 // Test MatrixFreeTools::compute_diagonal() for a Laplace operator on a simplex
 // mesh.
 
+#include <deal.II/base/quadrature_lib.h>
+
+#include <deal.II/fe/fe_p.h>
 #include <deal.II/fe/mapping_fe.h>
 
-#include <deal.II/simplex/fe_lib.h>
-#include <deal.II/simplex/grid_generator.h>
-#include <deal.II/simplex/quadrature_lib.h>
+#include <deal.II/grid/grid_generator.h>
 
 #include "compute_diagonal_util.h"
 

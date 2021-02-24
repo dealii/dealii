@@ -2146,8 +2146,6 @@ namespace GridGenerator
       add_parameters(ParameterHandler &prm);
     };
 
-
-
     /**
      * Initialize the given triangulation with a flow field around an airfoil,
      * i.e., a mesh of C-Type approximating Joukowski or NACA (4 digit)
@@ -2206,6 +2204,50 @@ namespace GridGenerator
       const AdditionalData &additional_data = AdditionalData());
 
   } // namespace Airfoil
+
+  /**
+   * Create a coordinate-parallel brick from the two diagonally opposite
+   * corner points @p p1 and @p p2. The number of vertices in coordinate
+   * direction @p i is given by <tt>repetitions[i]+1</tt>.
+   *
+   * @note This function connects internally 4/8 vertices to
+   *   quadrilateral/hexahedral cells and subdivides these into 2/5
+   * triangular/tetrahedral cells.
+   *
+   * @note Currently, this function only works for `dim==spacedim`.
+   *
+   * @ingroup simplex
+   */
+  template <int dim, int spacedim>
+  void
+  subdivided_hyper_rectangle_with_simplices(
+    Triangulation<dim, spacedim> &   tria,
+    const std::vector<unsigned int> &repetitions,
+    const Point<dim> &               p1,
+    const Point<dim> &               p2,
+    const bool                       colorize = false);
+
+  /**
+   * Initialize the given triangulation with a hypercube (square in 2D and
+   * cube in 3D) consisting of @p repetitions cells in each direction.
+   * The hypercube volume is the tensor product interval
+   * $[left,right]^{\text{dim}}$ in the present number of dimensions, where
+   * the limits are given as arguments. They default to zero and unity, then
+   * producing the unit hypercube.
+   *
+   * @note This function connects internally 4/8 vertices to
+   * quadrilateral/hexahedral cells and subdivides these into 2/5
+   * triangular/tetrahedral cells.
+   *
+   * @ingroup simplex
+   */
+  template <int dim, int spacedim>
+  void
+  subdivided_hyper_cube_with_simplices(Triangulation<dim, spacedim> &tria,
+                                       const unsigned int repetitions,
+                                       const double       p1       = 0.0,
+                                       const double       p2       = 1.0,
+                                       const bool         colorize = false);
 
   ///@}
 

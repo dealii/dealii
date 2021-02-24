@@ -17,7 +17,7 @@
 // Test Simplex::QGauss: output its quadrature points and weights.
 
 
-#include <deal.II/simplex/quadrature_lib.h>
+#include <deal.II/base/quadrature_lib.h>
 
 #include "../tests.h"
 

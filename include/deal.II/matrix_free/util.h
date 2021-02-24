@@ -21,12 +21,11 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/quadrature.h>
+#include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/grid/reference_cell.h>
 
 #include <deal.II/hp/q_collection.h>
-
-#include <deal.II/simplex/quadrature_lib.h>
 
 DEAL_II_NAMESPACE_OPEN
 

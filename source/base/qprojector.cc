@@ -15,10 +15,9 @@
 
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/polynomials_barycentric.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/tensor_product_polynomials.h>
-
-#include <deal.II/simplex/barycentric_polynomials.h>
 
 DEAL_II_NAMESPACE_OPEN
 

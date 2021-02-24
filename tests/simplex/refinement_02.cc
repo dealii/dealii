@@ -17,10 +17,9 @@
 
 // Test the correct setup of neighbors during refinement of simplex mesh.
 
+#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria.h>
-
-#include <deal.II/simplex/grid_generator.h>
 
 #include "../tests.h"
 

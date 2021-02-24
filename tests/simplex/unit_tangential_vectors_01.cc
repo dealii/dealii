@@ -18,9 +18,9 @@
 // for all reference-cell types.
 
 
-#include <deal.II/grid/reference_cell.h>
+#include <deal.II/base/quadrature_lib.h>
 
-#include <deal.II/simplex/quadrature_lib.h>
+#include <deal.II/grid/reference_cell.h>
 
 #include "../tests.h"
 

@@ -23,6 +23,7 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi_consensus_algorithms.h>
 #include <deal.II/base/polynomials_piecewise.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/utilities.h>
 
@@ -40,8 +41,6 @@
 #include <deal.II/matrix_free/face_info.h>
 #include <deal.II/matrix_free/face_setup_internal.h>
 #include <deal.II/matrix_free/matrix_free.h>
-
-#include <deal.II/simplex/quadrature_lib.h>
 
 #ifdef DEAL_II_WITH_TBB
 #  include <deal.II/base/parallel.h>

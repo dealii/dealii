@@ -17,9 +17,9 @@
 // Test ReferenceCell::Kind::faces_for_given_vertex().
 
 
-#include <deal.II/grid/reference_cell.h>
+#include <deal.II/base/quadrature_lib.h>
 
-#include <deal.II/simplex/quadrature_lib.h>
+#include <deal.II/grid/reference_cell.h>
 
 #include "../tests.h"
 
