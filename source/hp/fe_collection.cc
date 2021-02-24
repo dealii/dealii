@@ -315,6 +315,52 @@ namespace hp
 
 
   template <int dim, int spacedim>
+  std::vector<unsigned int>
+  FECollection<dim, spacedim>::get_hierarchy_sequence(
+    const unsigned int fe_index) const
+  {
+    AssertIndexRange(fe_index, size());
+
+    std::deque<unsigned int> sequence = {fe_index};
+
+    // get predecessors
+    {
+      unsigned int front = sequence.front();
+      unsigned int previous;
+      while ((previous = previous_in_hierarchy(front)) != front)
+        {
+          sequence.push_front(previous);
+          front = previous;
+
+          Assert(sequence.size() <= finite_elements.size(),
+                 ExcMessage(
+                   "The registered hierarchy is not terminated: "
+                   "previous_in_hierarchy() does not stop at a final index."));
+        }
+    }
+
+    // get successors
+    {
+      unsigned int back = sequence.back();
+      unsigned int next;
+      while ((next = next_in_hierarchy(back)) != back)
+        {
+          sequence.push_back(next);
+          back = next;
+
+          Assert(sequence.size() <= finite_elements.size(),
+                 ExcMessage(
+                   "The registered hierarchy is not terminated: "
+                   "next_in_hierarchy() does not stop at a final index."));
+        }
+    }
+
+    return {sequence.begin(), sequence.end()};
+  }
+
+
+
+  template <int dim, int spacedim>
   unsigned int
   FECollection<dim, spacedim>::next_in_hierarchy(
     const unsigned int fe_index) const
