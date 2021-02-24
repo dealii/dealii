@@ -216,7 +216,7 @@ namespace internal
         {
           Assert(
             dof_handler.hp_capability_enabled == true,
-            (typename DoFHandler<dim, spacedim>::ExcNotAvailableWithoutHP()));
+            (typename DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
           std::map<types::global_dof_index, types::global_dof_index>
             dof_identities;
@@ -374,9 +374,8 @@ namespace internal
         compute_line_dof_identities(const DoFHandler<1, spacedim> &dof_handler)
         {
           (void)dof_handler;
-          Assert(
-            dof_handler.hp_capability_enabled == true,
-            (typename DoFHandler<1, spacedim>::ExcNotAvailableWithoutHP()));
+          Assert(dof_handler.hp_capability_enabled == true,
+                 (typename DoFHandler<1, spacedim>::ExcOnlyAvailableWithHP()));
 
           return std::map<types::global_dof_index, types::global_dof_index>();
         }
@@ -389,7 +388,7 @@ namespace internal
         {
           Assert(
             dof_handler.hp_capability_enabled == true,
-            (typename DoFHandler<dim, spacedim>::ExcNotAvailableWithoutHP()));
+            (typename DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
           std::map<types::global_dof_index, types::global_dof_index>
             dof_identities;
@@ -743,7 +742,7 @@ namespace internal
           (void)dof_handler;
           Assert(
             dof_handler.hp_capability_enabled == true,
-            (typename DoFHandler<dim, spacedim>::ExcNotAvailableWithoutHP()));
+            (typename DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
           // this function should only be called for dim<3 where there are
           // no quad dof identies. for dim==3, the specialization below should
@@ -758,9 +757,8 @@ namespace internal
         static std::map<types::global_dof_index, types::global_dof_index>
         compute_quad_dof_identities(const DoFHandler<3, spacedim> &dof_handler)
         {
-          Assert(
-            dof_handler.hp_capability_enabled == true,
-            (typename DoFHandler<3, spacedim>::ExcNotAvailableWithoutHP()));
+          Assert(dof_handler.hp_capability_enabled == true,
+                 (typename DoFHandler<3, spacedim>::ExcOnlyAvailableWithHP()));
 
           const int dim = 3;
 
@@ -1066,7 +1064,7 @@ namespace internal
         {
           Assert(
             dof_handler.hp_capability_enabled == true,
-            (typename DoFHandler<dim, spacedim>::ExcNotAvailableWithoutHP()));
+            (typename DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
           // Note: we may wish to have something here similar to what
           // we do for lines and quads, namely that we only identify
@@ -1223,9 +1221,8 @@ namespace internal
           DoFHandler<1, spacedim> &dof_handler)
         {
           (void)dof_handler;
-          Assert(
-            dof_handler.hp_capability_enabled == true,
-            (typename DoFHandler<1, spacedim>::ExcNotAvailableWithoutHP()));
+          Assert(dof_handler.hp_capability_enabled == true,
+                 (typename DoFHandler<1, spacedim>::ExcOnlyAvailableWithHP()));
         }
 
 
@@ -1236,7 +1233,7 @@ namespace internal
         {
           Assert(
             dof_handler.hp_capability_enabled == true,
-            (typename DoFHandler<dim, spacedim>::ExcNotAvailableWithoutHP()));
+            (typename DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
           // we will mark lines that we have already treated, so first save and
           // clear the user flags on lines and later restore them
@@ -1499,7 +1496,7 @@ namespace internal
           (void)dof_handler;
           Assert(
             dof_handler.hp_capability_enabled == true,
-            (typename DoFHandler<dim, spacedim>::ExcNotAvailableWithoutHP()));
+            (typename DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
           // this function should only be called for dim<3 where there are
           // no quad dof identies. for dim>=3, the specialization below should
@@ -1512,9 +1509,8 @@ namespace internal
         static void merge_invalid_quad_dofs_on_ghost_interfaces(
           DoFHandler<3, spacedim> &dof_handler)
         {
-          Assert(
-            dof_handler.hp_capability_enabled == true,
-            (typename DoFHandler<3, spacedim>::ExcNotAvailableWithoutHP()));
+          Assert(dof_handler.hp_capability_enabled == true,
+                 (typename DoFHandler<3, spacedim>::ExcOnlyAvailableWithHP()));
 
           const int dim = 3;
 
