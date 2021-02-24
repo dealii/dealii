@@ -3044,6 +3044,8 @@ DoFHandler<dim, spacedim>::connect_to_triangulation_signals()
   // connect functions to signals of the underlying triangulation
   this->tria_listeners.push_back(this->tria->signals.create.connect(
     [this]() { this->reinit(*(this->tria)); }));
+  this->tria_listeners.push_back(
+    this->tria->signals.clear.connect([this]() { this->clear(); }));
 
   // attach corresponding callback functions dealing with the transfer of
   // active FE indices depending on the type of triangulation
