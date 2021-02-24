@@ -1249,7 +1249,15 @@ namespace HDF5
     std::shared_ptr<hid_t>
     get_hdf5_datatype()
     {
-      std::shared_ptr<hid_t> t_type;
+      static_assert(std::is_same<number, float>::value ||
+                      std::is_same<number, double>::value ||
+                      std::is_same<number, int>::value ||
+                      std::is_same<number, unsigned int>::value ||
+                      std::is_same<number, std::complex<float>>::value ||
+                      std::is_same<number, std::complex<double>>::value,
+                    "The data type you are trying to get the HDF5 tag for "
+                    "is not supported by this function.");
+
       if (std::is_same<number, float>::value)
         {
           return std::make_shared<hid_t>(H5T_NATIVE_FLOAT);
@@ -1268,13 +1276,15 @@ namespace HDF5
         }
       else if (std::is_same<number, std::complex<float>>::value)
         {
-          t_type  = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
-            // Release the HDF5 resource
-            const herr_t ret = H5Tclose(*pointer);
-            AssertNothrow(ret >= 0, ExcInternalError());
-            (void)ret;
-            delete pointer;
-          });
+          std::shared_ptr<hid_t> t_type =
+            std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
+              // Release the HDF5 resource
+              const herr_t ret = H5Tclose(*pointer);
+              AssertNothrow(ret >= 0, ExcInternalError());
+              (void)ret;
+              delete pointer;
+            });
+
           *t_type = H5Tcreate(H5T_COMPOUND, sizeof(std::complex<float>));
           //  The C++ standards committee agreed to mandate that the storage
           //  format used for the std::complex type be binary-compatible with
@@ -1289,13 +1299,14 @@ namespace HDF5
         }
       else if (std::is_same<number, std::complex<double>>::value)
         {
-          t_type  = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
-            // Release the HDF5 resource
-            const herr_t ret = H5Tclose(*pointer);
-            AssertNothrow(ret >= 0, ExcInternalError());
-            (void)ret;
-            delete pointer;
-          });
+          std::shared_ptr<hid_t> t_type =
+            std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
+              // Release the HDF5 resource
+              const herr_t ret = H5Tclose(*pointer);
+              AssertNothrow(ret >= 0, ExcInternalError());
+              (void)ret;
+              delete pointer;
+            });
           *t_type = H5Tcreate(H5T_COMPOUND, sizeof(std::complex<double>));
           //  The C++ standards committee agreed to mandate that the storage
           //  format used for the std::complex type be binary-compatible with
@@ -1311,7 +1322,7 @@ namespace HDF5
 
       // The function should not reach this point
       Assert(false, ExcInternalError());
-      return t_type;
+      return {};
     }
 
 
