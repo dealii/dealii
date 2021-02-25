@@ -1215,6 +1215,9 @@ struct GeometryInfo;
 
 
 /**
+ * This class provides a description of zero-dimensional cells. It has been
+ * superseded by the ReferenceCell class -- see there for more information.
+ *
  * Topological description of zero dimensional cells, i.e. points. This class
  * might not look too useful but often is if in a certain dimension we would
  * like to enquire information about objects with dimension one lower than the
@@ -1434,6 +1437,9 @@ struct GeometryInfo<0>
  * This class provides dimension independent information to all topological
  * structures that make up the unit, or
  * @ref GlossReferenceCell "reference cell".
+ * This class has been
+ * superseded by the ReferenceCell class -- see there for more information.
+ *
  *
  * It is the one central point in the library where information about the
  * numbering of vertices, lines, or faces of the reference cell is collected.
