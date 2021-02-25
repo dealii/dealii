@@ -139,6 +139,12 @@ public:
   get_shape_info() const;
 
   /**
+   * Return a reference to the DoFInfo object currently in use.
+   */
+  const internal::MatrixFreeFunctions::DoFInfo &
+  get_dof_info() const;
+
+  /**
    * Return the determinant of the Jacobian from the unit to the real cell
    * times the quadrature weight.
    */
@@ -269,6 +275,12 @@ public:
    */
   unsigned int
   get_active_quadrature_index() const;
+
+  /**
+   * Return the underlying MatrixFree object.
+   */
+  const MatrixFree<dim, Number, VectorizedArrayType> &
+  get_matrix_free() const;
 
 protected:
   /**
@@ -1106,6 +1118,12 @@ public:
   begin_hessians();
 
   //@}
+
+  /**
+   * Return the first selected component.
+   */
+  unsigned int
+  get_first_selected_component() const;
 
 protected:
   /**
@@ -3611,6 +3629,19 @@ FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
 
 
 template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline const internal::MatrixFreeFunctions::DoFInfo &
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::get_dof_info()
+  const
+{
+  Assert(dof_info != nullptr,
+         ExcMessage(
+           "FEEvaluation was not initialized with a MatrixFree object!"));
+  return *dof_info;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
 inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, VectorizedArrayType>
                              FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   get_normal_vector(const unsigned int q_point) const
@@ -3952,6 +3983,19 @@ FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   get_active_quadrature_index() const
 {
   return active_quad_index;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline const MatrixFree<dim, Number, VectorizedArrayType> &
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  get_matrix_free() const
+{
+  Assert(matrix_info != nullptr,
+         ExcMessage(
+           "FEEvaluation was not initialized with a MatrixFree object!"));
+  return *matrix_info;
 }
 
 
@@ -5413,6 +5457,20 @@ FEEvaluationBase<dim, n_components, Number, is_face, VectorizedArrayType>::
   hessians_quad_initialized = true;
 #  endif
   return hessians_quad;
+}
+
+
+
+template <int dim,
+          int n_components,
+          typename Number,
+          bool is_face,
+          typename VectorizedArrayType>
+inline unsigned int
+FEEvaluationBase<dim, n_components, Number, is_face, VectorizedArrayType>::
+  get_first_selected_component() const
+{
+  return first_selected_component;
 }
 
 
