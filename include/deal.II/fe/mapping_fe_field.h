@@ -211,7 +211,7 @@ public:
   preserves_vertex_locations() const override;
 
   virtual bool
-  is_compatible_with(const ReferenceCell &cell_type) const override;
+  is_compatible_with(const ReferenceCell &reference_cell) const override;
 
   /**
    * Return the mapped vertices of a cell.
