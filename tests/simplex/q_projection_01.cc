@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Test QProjection for Simplex::QGauss.
+// Test QProjection for QGaussSimplex.
 
 
 #include <deal.II/base/qprojector.h>
@@ -37,7 +37,7 @@ test<2>(const unsigned int n_points)
 {
   const int dim = 2;
 
-  Simplex::QGauss<dim - 1> quad_ref(n_points);
+  QGaussSimplex<dim - 1> quad_ref(n_points);
 
   const auto quad =
     QProjector<dim>::project_to_all_faces(ReferenceCells::Triangle, quad_ref);
@@ -79,7 +79,7 @@ test<3>(const unsigned int n_points)
 {
   const int dim = 3;
 
-  Simplex::QGauss<dim - 1> quad_ref(n_points);
+  QGaussSimplex<dim - 1> quad_ref(n_points);
 
   const auto quad =
     QProjector<dim>::project_to_all_faces(ReferenceCells::Tetrahedron,

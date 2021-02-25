@@ -211,7 +211,7 @@ namespace Step12
 #ifdef HEX
     const MappingQ1<dim> mapping;
 #else
-    Simplex::FE_P<dim>   fe_mapping;
+    FE_SimplexP<dim>     fe_mapping;
     const MappingFE<dim> mapping;
 #endif
 
@@ -219,7 +219,7 @@ namespace Step12
 #ifdef HEX
     FE_DGQ<dim> fe;
 #else
-    Simplex::FE_DGP<dim> fe;
+    FE_SimplexDGP<dim>   fe;
 #endif
     DoFHandler<dim> dof_handler;
 
@@ -395,9 +395,9 @@ namespace Step12
 
     QGauss<dim - 1> face_quad(degree + 1);
 #else
-    Simplex::QGauss<dim> quad(degree + 1);
+    QGaussSimplex<dim> quad(degree + 1);
 
-    Simplex::QGauss<dim - 1> face_quad(degree + 1);
+    QGaussSimplex<dim - 1> face_quad(degree + 1);
 #endif
 
     ScratchData<dim> scratch_data(mapping, fe, quad, face_quad);

@@ -301,10 +301,10 @@ test(const unsigned int degree)
 
   GridGenerator::subdivided_hyper_cube_with_simplices(tria, n_subdivisions);
 
-  Simplex::FE_DGP<dim>     fe(degree);
-  Simplex::QGauss<dim>     quadrature(degree + 1);
-  Simplex::QGauss<dim - 1> face_quadrature(degree + 1);
-  MappingFE<dim>           mapping(Simplex::FE_P<dim>(1));
+  FE_SimplexDGP<dim>     fe(degree);
+  QGaussSimplex<dim>     quadrature(degree + 1);
+  QGaussSimplex<dim - 1> face_quadrature(degree + 1);
+  MappingFE<dim>         mapping(FE_SimplexP<dim>(1));
 #else
   GridGenerator::subdivided_hyper_cube(tria, dim == 2 ? 16 : 8);
 

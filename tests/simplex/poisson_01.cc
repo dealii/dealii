@@ -336,7 +336,7 @@ test_tet(const MPI_Comm &comm, const Parameters<dim> &params)
   // ... create triangulation
   if (params.use_grid_generator)
     {
-      // ...via Simplex::GridGenerator
+      // ...via GridGenerator
       GridGenerator::subdivided_hyper_rectangle_with_simplices(
         *tria, params.repetitions, params.p1, params.p2, false);
     }
@@ -373,15 +373,14 @@ test_tet(const MPI_Comm &comm, const Parameters<dim> &params)
   grid_out.write_vtk(*tria, out);
 
   // 3) Select components
-  Simplex::FE_P<dim> fe(params.degree);
+  FE_SimplexP<dim> fe(params.degree);
 
-  Simplex::QGauss<dim> quad(params.degree + 1);
+  QGaussSimplex<dim> quad(params.degree + 1);
 
-  hp::QCollection<dim - 1> face_quad{
-    Simplex::QGauss<dim - 1>(params.degree + 1)};
+  hp::QCollection<dim - 1> face_quad{QGaussSimplex<dim - 1>(params.degree + 1)};
 
-  Simplex::FE_P<dim> fe_mapping(1);
-  MappingFE<dim>     mapping(fe_mapping);
+  FE_SimplexP<dim> fe_mapping(1);
+  MappingFE<dim>   mapping(fe_mapping);
 
   // 4) Perform test (independent of mesh type)
   test(*tria, fe, quad, face_quad, mapping, params.p2[0]);
@@ -466,7 +465,7 @@ test_wedge(const MPI_Comm &comm, const Parameters<dim> &params)
   // ... create triangulation
   if (params.use_grid_generator)
     {
-      // ...via Simplex::GridGenerator
+      // ...via GridGenerator
       GridGenerator::subdivided_hyper_rectangle_with_wedges(
         *tria, params.repetitions, params.p1, params.p2, false);
     }
@@ -503,19 +502,18 @@ test_wedge(const MPI_Comm &comm, const Parameters<dim> &params)
   grid_out.write_vtk(*tria, out);
 
   // 3) Select components
-  Simplex::FE_WedgeP<dim> fe(params.degree);
+  FE_WedgeP<dim> fe(params.degree);
 
-  Simplex::QGaussWedge<dim> quad(params.degree + 1);
+  QGaussWedge<dim> quad(params.degree + 1);
 
-  hp::QCollection<dim - 1> face_quad{
-    Simplex::QGauss<dim - 1>(params.degree + 1),
-    Simplex::QGauss<dim - 1>(params.degree + 1),
-    QGauss<dim - 1>(params.degree + 1),
-    QGauss<dim - 1>(params.degree + 1),
-    QGauss<dim - 1>(params.degree + 1)};
+  hp::QCollection<dim - 1> face_quad{QGaussSimplex<dim - 1>(params.degree + 1),
+                                     QGaussSimplex<dim - 1>(params.degree + 1),
+                                     QGauss<dim - 1>(params.degree + 1),
+                                     QGauss<dim - 1>(params.degree + 1),
+                                     QGauss<dim - 1>(params.degree + 1)};
 
-  Simplex::FE_WedgeP<dim> fe_mapping(1);
-  MappingFE<dim>          mapping(fe_mapping);
+  FE_WedgeP<dim> fe_mapping(1);
+  MappingFE<dim> mapping(fe_mapping);
 
   // 4) Perform test (independent of mesh type)
   test(*tria, fe, quad, face_quad, mapping, params.p2[0], true);
@@ -558,7 +556,7 @@ test_pyramid(const MPI_Comm &comm, const Parameters<dim> &params)
   // ... create triangulation
   if (params.use_grid_generator)
     {
-      // ...via Simplex::GridGenerator
+      // ...via GridGenerator
       GridGenerator::subdivided_hyper_rectangle_with_pyramids(
         *tria, params.repetitions, params.p1, params.p2, false);
     }
@@ -595,19 +593,18 @@ test_pyramid(const MPI_Comm &comm, const Parameters<dim> &params)
   grid_out.write_vtk(*tria, out);
 
   // 3) Select components
-  Simplex::FE_PyramidP<dim> fe(params.degree);
+  FE_PyramidP<dim> fe(params.degree);
 
-  Simplex::QGaussPyramid<dim> quad(params.degree + 1);
+  QGaussPyramid<dim> quad(params.degree + 1);
 
-  hp::QCollection<dim - 1> face_quad{
-    QGauss<dim - 1>(params.degree + 1),
-    Simplex::QGauss<dim - 1>(params.degree + 1),
-    Simplex::QGauss<dim - 1>(params.degree + 1),
-    Simplex::QGauss<dim - 1>(params.degree + 1),
-    Simplex::QGauss<dim - 1>(params.degree + 1)};
+  hp::QCollection<dim - 1> face_quad{QGauss<dim - 1>(params.degree + 1),
+                                     QGaussSimplex<dim - 1>(params.degree + 1),
+                                     QGaussSimplex<dim - 1>(params.degree + 1),
+                                     QGaussSimplex<dim - 1>(params.degree + 1),
+                                     QGaussSimplex<dim - 1>(params.degree + 1)};
 
-  Simplex::FE_PyramidP<dim> fe_mapping(1);
-  MappingFE<dim>            mapping(fe_mapping);
+  FE_PyramidP<dim> fe_mapping(1);
+  MappingFE<dim>   mapping(fe_mapping);
 
   // 4) Perform test (independent of mesh type)
   test(*tria, fe, quad, face_quad, mapping, params.p2[0], true);

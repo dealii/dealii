@@ -55,9 +55,9 @@ test(const unsigned int n_refinements,
 
       if (do_simplex_mesh)
         {
-          fe      = std::make_unique<Simplex::FE_P<dim>>(fe_degree_fine);
-          quad    = std::make_unique<Simplex::QGauss<dim>>(fe_degree_fine + 1);
-          mapping = std::make_unique<MappingFE<dim>>(Simplex::FE_P<dim>(1));
+          fe      = std::make_unique<FE_SimplexP<dim>>(fe_degree_fine);
+          quad    = std::make_unique<QGaussSimplex<dim>>(fe_degree_fine + 1);
+          mapping = std::make_unique<MappingFE<dim>>(FE_SimplexP<dim>(1));
         }
       else
         {

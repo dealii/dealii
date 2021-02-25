@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Evaluate Simplex::FE_P_Bubbles.
+// Evaluate FE_SimplexP_Bubbles.
 
 
 #include <deal.II/base/quadrature_lib.h>
@@ -61,7 +61,7 @@ test_unit_support_points()
   for (unsigned int degree = 0; degree < 3; ++degree)
     {
       deallog << "approximation degree = " << degree << std::endl;
-      Simplex::FE_P_Bubbles<dim, spacedim> fe(degree);
+      FE_SimplexP_Bubbles<dim, spacedim> fe(degree);
       deallog << "element tensor degree = " << fe.tensor_degree() << std::endl;
       Quadrature<dim> quad(fe.get_unit_support_points());
       test(fe, quad);

@@ -16,8 +16,8 @@
 
 // Step-08 on a simplex mesh. Following incompatible modifications had to be
 // made:
-//  - Change the FE_Q to Simplex::FE_P.
-//  - Change QGauss to Simplex::QGauss.
+//  - Change the FE_Q to FE_SimplexP.
+//  - Change QGauss to QGaussSimplex.
 //  - Use MappingFE (Do not use default mapping).
 //  - Convert triangulation to a triangulation based on simplices.
 //  - Use refine_global() instead of execute_coarsening_and_refinement().
@@ -135,8 +135,8 @@ namespace Step8
   template <int dim>
   ElasticProblem<dim>::ElasticProblem()
     : dof_handler(triangulation)
-    , mapping(Simplex::FE_P<dim>(1))
-    , fe(Simplex::FE_P<dim>(1), dim)
+    , mapping(FE_SimplexP<dim>(1))
+    , fe(FE_SimplexP<dim>(1), dim)
   {}
 
   template <int dim>
@@ -164,8 +164,8 @@ namespace Step8
   void
   ElasticProblem<dim>::assemble_system()
   {
-    Simplex::QGauss<dim> quadrature_formula(fe.degree + 1);
-    FEValues<dim>        fe_values(mapping,
+    QGaussSimplex<dim> quadrature_formula(fe.degree + 1);
+    FEValues<dim>      fe_values(mapping,
                             fe,
                             quadrature_formula,
                             update_values | update_gradients |
@@ -267,7 +267,7 @@ namespace Step8
   {
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-    Simplex::QGauss<dim - 1> quadrature(fe.degree + 1);
+    QGaussSimplex<dim - 1> quadrature(fe.degree + 1);
     KellyErrorEstimator<dim>::estimate(
       mapping, dof_handler, quadrature, {}, solution, estimated_error_per_cell);
 

@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Test n_dofs_per-methods of Simplex::FE_P  and Simplex::FE_DGP.
+// Test n_dofs_per-methods of FE_SimplexP  and FE_SimplexDGP.
 
 
 #include <deal.II/fe/fe_pyramid_p.h>
@@ -59,23 +59,23 @@ main()
 {
   initlog();
 
-  test(Simplex::FE_P<2>(1));
-  test(Simplex::FE_P<2>(2));
-  test(Simplex::FE_P<3>(1));
-  test(Simplex::FE_P<3>(2));
+  test(FE_SimplexP<2>(1));
+  test(FE_SimplexP<2>(2));
+  test(FE_SimplexP<3>(1));
+  test(FE_SimplexP<3>(2));
 
-  test(Simplex::FE_DGP<2>(1));
-  test(Simplex::FE_DGP<2>(2));
-  test(Simplex::FE_DGP<3>(1));
-  test(Simplex::FE_DGP<3>(2));
+  test(FE_SimplexDGP<2>(1));
+  test(FE_SimplexDGP<2>(2));
+  test(FE_SimplexDGP<3>(1));
+  test(FE_SimplexDGP<3>(2));
 
-  test(Simplex::FE_WedgeP<3>(1));
-  test(Simplex::FE_WedgeP<3>(2));
+  test(FE_WedgeP<3>(1));
+  test(FE_WedgeP<3>(2));
 
-  test(Simplex::FE_WedgeDGP<3>(1));
-  test(Simplex::FE_WedgeDGP<3>(2));
+  test(FE_WedgeDGP<3>(1));
+  test(FE_WedgeDGP<3>(2));
 
-  test(Simplex::FE_PyramidP<3>(1));
+  test(FE_PyramidP<3>(1));
 
-  test(Simplex::FE_PyramidDGP<3>(1));
+  test(FE_PyramidDGP<3>(1));
 }

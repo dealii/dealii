@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Test Simplex::FE_Poly::get_prolongation_matrix()
+// Test FE_SimplexPoly::get_prolongation_matrix()
 // (and indirectly FETools::compute_embedding_matrices() for simplices).
 
 
@@ -65,8 +65,8 @@ main()
   const int dim      = 2;
   const int spacedim = 2;
 
-  Simplex::FE_P<dim, spacedim> fe(2);
-  MappingFE<dim>               mapping(Simplex::FE_P<dim>(1));
+  FE_SimplexP<dim, spacedim> fe(2);
+  MappingFE<dim>             mapping(FE_SimplexP<dim>(1));
 
   const unsigned int n_refinements = 2;
 

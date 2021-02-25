@@ -74,13 +74,13 @@ ReferenceCell::get_default_mapping(const unsigned int degree) const
     return std::make_unique<MappingQGeneric<dim, spacedim>>(degree);
   else if (is_simplex())
     return std::make_unique<MappingFE<dim, spacedim>>(
-      Simplex::FE_P<dim, spacedim>(degree));
+      FE_SimplexP<dim, spacedim>(degree));
   else if (*this == ReferenceCells::Pyramid)
     return std::make_unique<MappingFE<dim, spacedim>>(
-      Simplex::FE_PyramidP<dim, spacedim>(degree));
+      FE_PyramidP<dim, spacedim>(degree));
   else if (*this == ReferenceCells::Wedge)
     return std::make_unique<MappingFE<dim, spacedim>>(
-      Simplex::FE_WedgeP<dim, spacedim>(degree));
+      FE_WedgeP<dim, spacedim>(degree));
   else
     {
       Assert(false, ExcNotImplemented());
@@ -104,19 +104,19 @@ ReferenceCell::get_default_linear_mapping() const
   else if (is_simplex())
     {
       static const MappingFE<dim, spacedim> mapping(
-        Simplex::FE_P<dim, spacedim>(1));
+        FE_SimplexP<dim, spacedim>(1));
       return mapping;
     }
   else if (*this == ReferenceCells::Pyramid)
     {
       static const MappingFE<dim, spacedim> mapping(
-        Simplex::FE_PyramidP<dim, spacedim>(1));
+        FE_PyramidP<dim, spacedim>(1));
       return mapping;
     }
   else if (*this == ReferenceCells::Wedge)
     {
       static const MappingFE<dim, spacedim> mapping(
-        Simplex::FE_WedgeP<dim, spacedim>(1));
+        FE_WedgeP<dim, spacedim>(1));
       return mapping;
     }
   else
@@ -138,11 +138,11 @@ ReferenceCell::get_gauss_type_quadrature(const unsigned n_points_1D) const
   if (is_hyper_cube())
     return QGauss<dim>(n_points_1D);
   else if (is_simplex())
-    return Simplex::QGauss<dim>(n_points_1D);
+    return QGaussSimplex<dim>(n_points_1D);
   else if (*this == ReferenceCells::Pyramid)
-    return Simplex::QGaussPyramid<dim>(n_points_1D);
+    return QGaussPyramid<dim>(n_points_1D);
   else if (*this == ReferenceCells::Wedge)
-    return Simplex::QGaussWedge<dim>(n_points_1D);
+    return QGaussWedge<dim>(n_points_1D);
   else
     Assert(false, ExcNotImplemented());
 

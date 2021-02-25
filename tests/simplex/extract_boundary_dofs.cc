@@ -45,8 +45,8 @@ test()
 
   GridGenerator::subdivided_hyper_cube_with_simplices(tr, 4);
 
-  const Simplex::FE_P<dim> fe(2);
-  DoFHandler<dim>          dofh(tr);
+  const FE_SimplexP<dim> fe(2);
+  DoFHandler<dim>        dofh(tr);
   dofh.distribute_dofs(fe);
 
   IndexSet relevant_set, boundary_dofs;

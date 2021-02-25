@@ -421,10 +421,10 @@ namespace Step18
   template <int dim>
   TopLevel<dim>::TopLevel()
     : triangulation()
-    , fe(Simplex::FE_P<dim>(degree), dim)
+    , fe(FE_SimplexP<dim>(degree), dim)
     , dof_handler(triangulation)
-    , quadrature_formula(Simplex::QGauss<dim>(fe.degree + 1))
-    , mapping(Simplex::FE_P<dim>(1))
+    , quadrature_formula(QGaussSimplex<dim>(fe.degree + 1))
+    , mapping(FE_SimplexP<dim>(1))
     , present_time(0.0)
     , present_timestep(1.0)
     , end_time(10.0)

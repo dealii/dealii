@@ -634,7 +634,7 @@ FE_Q_Base<dim, spacedim>::get_subface_interpolation_matrix(
 
   // see if source is a Q or P element
   if ((dynamic_cast<const FE_Q_Base<dim, spacedim> *>(&source_fe) != nullptr) ||
-      (dynamic_cast<const Simplex::FE_Poly<dim, spacedim> *>(&source_fe) !=
+      (dynamic_cast<const FE_SimplexPoly<dim, spacedim> *>(&source_fe) !=
        nullptr))
     {
       // have this test in here since a table of size 2x0 reports its size as
@@ -744,7 +744,7 @@ FE_Q_Base<dim, spacedim>::hp_vertex_dof_identities(
       // should have identical value
       return {{0U, 0U}};
     }
-  else if (dynamic_cast<const Simplex::FE_P<dim, spacedim> *>(&fe_other) !=
+  else if (dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other) !=
            nullptr)
     {
       // there should be exactly one single DoF of each FE at a vertex, and they
@@ -815,8 +815,8 @@ FE_Q_Base<dim, spacedim>::hp_line_dof_identities(
 
       return identities;
     }
-  else if (const Simplex::FE_P<dim, spacedim> *fe_p_other =
-             dynamic_cast<const Simplex::FE_P<dim, spacedim> *>(&fe_other))
+  else if (const FE_SimplexP<dim, spacedim> *fe_p_other =
+             dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other))
     {
       // DoFs are located along lines, so two dofs are identical if they are
       // located at identical positions. If we had only equidistant points, we
@@ -826,7 +826,7 @@ FE_Q_Base<dim, spacedim>::hp_line_dof_identities(
       // first coordinate direction. For FE_Q, we take the lexicographic
       // ordering of the line support points in the first direction (i.e.,
       // x-direction), which we access between index 1 and p-1 (index 0 and p
-      // are vertex dofs). For FE_P, they are currently hard-coded and we
+      // are vertex dofs). For FE_SimplexP, they are currently hard-coded and we
       // iterate over points on the first line which begin after the 3 vertex
       // points in the complete list of unit support points
 

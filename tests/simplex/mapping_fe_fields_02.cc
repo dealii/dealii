@@ -63,8 +63,8 @@ test(const unsigned int mapping_degree)
   Triangulation<dim> tria;
   GridGenerator::subdivided_hyper_cube_with_simplices(tria, 4);
 
-  Simplex::FE_P<dim> fe(mapping_degree);
-  FESystem<dim>      euler_fe(fe, dim);
+  FE_SimplexP<dim> fe(mapping_degree);
+  FESystem<dim>    euler_fe(fe, dim);
 
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
@@ -77,7 +77,7 @@ test(const unsigned int mapping_degree)
   // TODO: not working (missing mapping)
   // VectorTools::get_position_vector(euler_dof_handler, euler_vector);
 
-  MappingFE<dim> mapping_interpolation(Simplex::FE_P<dim>(1));
+  MappingFE<dim> mapping_interpolation(FE_SimplexP<dim>(1));
   VectorTools::interpolate(mapping_interpolation,
                            euler_dof_handler,
                            Solution<dim>(),

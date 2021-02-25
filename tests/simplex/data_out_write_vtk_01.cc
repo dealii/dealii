@@ -70,7 +70,7 @@ test(const FiniteElement<dim, spacedim> &fe,
 
   Vector<double> solution(dof_handler.n_dofs());
 
-  MappingFE<dim> mapping(Simplex::FE_P<dim>(1));
+  MappingFE<dim> mapping(FE_SimplexP<dim>(1));
 
   AffineConstraints<double> dummy;
   dummy.close();
@@ -78,7 +78,7 @@ test(const FiniteElement<dim, spacedim> &fe,
   VectorTools::project(mapping,
                        dof_handler,
                        dummy,
-                       Simplex::QGauss<dim>(fe.tensor_degree() + 1),
+                       QGaussSimplex<dim>(fe.tensor_degree() + 1),
                        RightHandSideFunction<dim>(n_components),
                        solution);
 
@@ -122,13 +122,13 @@ main()
       if (do_high_order)
         {
           const unsigned int dim = 2;
-          test<dim>(Simplex::FE_P<dim>(2) /*=degree*/, 1, do_high_order);
-          test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2 /*=degree*/), dim),
+          test<dim>(FE_SimplexP<dim>(2) /*=degree*/, 1, do_high_order);
+          test<dim>(FESystem<dim>(FE_SimplexP<dim>(2 /*=degree*/), dim),
                     dim,
                     do_high_order);
-          test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2 /*=degree*/),
+          test<dim>(FESystem<dim>(FE_SimplexP<dim>(2 /*=degree*/),
                                   dim,
-                                  Simplex::FE_P<dim>(1 /*=degree*/),
+                                  FE_SimplexP<dim>(1 /*=degree*/),
                                   1),
                     dim + 1,
                     do_high_order);
@@ -138,13 +138,13 @@ main()
           false /*TODO: higher-order output not working for 3D*/)
         {
           const unsigned int dim = 3;
-          test<dim>(Simplex::FE_P<dim>(2) /*=degree*/, 1, do_high_order);
-          test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2 /*=degree*/), dim),
+          test<dim>(FE_SimplexP<dim>(2) /*=degree*/, 1, do_high_order);
+          test<dim>(FESystem<dim>(FE_SimplexP<dim>(2 /*=degree*/), dim),
                     dim,
                     do_high_order);
-          test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2 /*=degree*/),
+          test<dim>(FESystem<dim>(FE_SimplexP<dim>(2 /*=degree*/),
                                   dim,
-                                  Simplex::FE_P<dim>(1 /*=degree*/),
+                                  FE_SimplexP<dim>(1 /*=degree*/),
                                   1),
                     dim + 1,
                     do_high_order);

@@ -18,8 +18,8 @@
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
-    template class Simplex::FE_Poly<deal_II_dimension, deal_II_space_dimension>;
-    template class Simplex::FE_P<deal_II_dimension, deal_II_space_dimension>;
-    template class Simplex::FE_DGP<deal_II_dimension, deal_II_space_dimension>;
+    template class FE_SimplexPoly<deal_II_dimension, deal_II_space_dimension>;
+    template class FE_SimplexP<deal_II_dimension, deal_II_space_dimension>;
+    template class FE_SimplexDGP<deal_II_dimension, deal_II_space_dimension>;
 #endif
   }

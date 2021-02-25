@@ -20,10 +20,10 @@
 
 // Step-04 on a simplex mesh. Following incompatible modifications had to be
 // made:
-//  - Change the FE_Q to Simplex::FE_P
+//  - Change the FE_Q to FE_SimplexP
 //  - Put the MappingFE as a class member and use as an argument instead of
 //  default mapping
-//  - Change QGauss to Simplex::QGauss
+//  - Change QGauss to QGaussSimplex
 //  - Convert triangulation to a triangulation based on simplices
 
 
@@ -88,7 +88,7 @@ private:
   output_results() const;
 
   Triangulation<dim> triangulation;
-  Simplex::FE_P<dim> fe;
+  FE_SimplexP<dim>   fe;
   DoFHandler<dim>    dof_handler;
 
   MappingFE<dim> mapping;
@@ -190,7 +190,7 @@ template <int dim>
 void
 Step4<dim>::assemble_system()
 {
-  Simplex::QGauss<dim> quadrature_formula(fe.degree + 1);
+  QGaussSimplex<dim> quadrature_formula(fe.degree + 1);
 
   RightHandSide<dim> right_hand_side;
 

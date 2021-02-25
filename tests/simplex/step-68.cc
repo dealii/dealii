@@ -171,8 +171,8 @@ namespace Step68
     : mpi_communicator(MPI_COMM_WORLD)
     , background_triangulation(mpi_communicator)
     , fluid_dh(background_triangulation)
-    , fluid_fe(Simplex::FE_P<dim>(velocity_degree), dim)
-    , mapping(Simplex::FE_P<dim>(velocity_degree))
+    , fluid_fe(FE_SimplexP<dim>(velocity_degree), dim)
+    , mapping(FE_SimplexP<dim>(velocity_degree))
   {}
 
   // @sect4{Particles generation}
@@ -272,7 +272,7 @@ namespace Step68
     // We generate the particles at the position of a single
     // point quadrature. Consequently, one particle will be generated
     // at the centroid of each cell.
-    Simplex::QGauss<dim> quadrature_formula(1);
+    QGaussSimplex<dim> quadrature_formula(1);
 
     Particles::Generators::quadrature_points(particle_triangulation,
                                              quadrature_formula,

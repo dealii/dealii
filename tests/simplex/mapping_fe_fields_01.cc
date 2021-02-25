@@ -48,8 +48,8 @@ test()
   Triangulation<dim> tria;
   GridGenerator::subdivided_hyper_cube_with_simplices(tria, 1);
 
-  Simplex::FE_P<dim> fe(1);
-  FESystem<dim>      euler_fe(fe, dim);
+  FE_SimplexP<dim> fe(1);
+  FESystem<dim>    euler_fe(fe, dim);
 
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
@@ -63,7 +63,7 @@ test()
 
   MappingFEField<dim> mapping(euler_dof_handler, euler_vector);
 
-  Simplex::QGauss<dim> quadrature_formula(1);
+  QGaussSimplex<dim> quadrature_formula(1);
 
   FEValues<dim> fe_values(mapping,
                           fe,

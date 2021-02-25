@@ -24,188 +24,185 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace Simplex
+/**
+ * Base class of FE_SimplexP and FE_SimplexDGP.
+ *
+ * @note Only implemented for 2D and 3D.
+ *
+ * @ingroup simplex
+ */
+template <int dim, int spacedim = dim>
+class FE_SimplexPoly : public dealii::FE_Poly<dim, spacedim>
 {
+public:
   /**
-   * Base class of FE_P and FE_DGP.
-   *
-   * @note Only implemented for 2D and 3D.
-   *
-   * @ingroup simplex
+   * Constructor.
    */
-  template <int dim, int spacedim = dim>
-  class FE_Poly : public dealii::FE_Poly<dim, spacedim>
-  {
-  public:
-    /**
-     * Constructor.
-     */
-    FE_Poly(const unsigned int                                degree,
-            const std::vector<unsigned int> &                 dpo_vector,
-            const typename FiniteElementData<dim>::Conformity conformity);
-
-    /**
-     * Return a list of constant modes of the element. For this element, the
-     * list consists of true arguments for all components.
-     */
-    virtual std::pair<Table<2, bool>, std::vector<unsigned int>>
-    get_constant_modes() const override;
-
-    /**
-     * @copydoc dealii::FiniteElement::get_prolongation_matrix()
-     *
-     * @note Only implemented for RefinementCase::isotropic_refinement.
-     */
-    virtual const FullMatrix<double> &
-    get_prolongation_matrix(
-      const unsigned int         child,
-      const RefinementCase<dim> &refinement_case =
-        RefinementCase<dim>::isotropic_refinement) const override;
-
-    /**
-     * @copydoc dealii::FiniteElement::get_face_interpolation_matrix()
-     */
-    void
-    get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source_fe,
-                                  FullMatrix<double> &interpolation_matrix,
-                                  const unsigned int  face_no) const override;
-
-    /**
-     * @copydoc dealii::FiniteElement::get_subface_interpolation_matrix()
-     */
-    void
-    get_subface_interpolation_matrix(
-      const FiniteElement<dim, spacedim> &x_source_fe,
-      const unsigned int                  subface,
-      FullMatrix<double> &                interpolation_matrix,
-      const unsigned int                  face_no) const override;
-
-    /**
-     * @copydoc dealii::FiniteElement::hp_constraints_are_implemented()
-     */
-    bool
-    hp_constraints_are_implemented() const override;
-
-    /**
-     * @copydoc dealii::FiniteElement::convert_generalized_support_point_values_to_dof_values()
-     */
-    virtual void
-    convert_generalized_support_point_values_to_dof_values(
-      const std::vector<Vector<double>> &support_point_values,
-      std::vector<double> &              nodal_values) const override;
-
-    mutable Threads::Mutex mutex;
-  };
-
-
+  FE_SimplexPoly(const unsigned int                                degree,
+                 const std::vector<unsigned int> &                 dpo_vector,
+                 const typename FiniteElementData<dim>::Conformity conformity);
 
   /**
-   * Implementation of a scalar Lagrange finite element $P_k$ that yields
-   * the finite element space of continuous, piecewise polynomials of
-   * degree $k$.
-   *
-   * @ingroup simplex
+   * Return a list of constant modes of the element. For this element, the
+   * list consists of true arguments for all components.
    */
-  template <int dim, int spacedim = dim>
-  class FE_P : public FE_Poly<dim, spacedim>
-  {
-  public:
-    /**
-     * Constructor.
-     */
-    FE_P(const unsigned int degree);
-
-    /**
-     * @copydoc dealii::FiniteElement::clone()
-     */
-    std::unique_ptr<FiniteElement<dim, spacedim>>
-    clone() const override;
-
-    /**
-     * Return a string that uniquely identifies a finite element. This class
-     * returns <tt>Simplex::FE_P<dim>(degree)</tt>, with @p dim and @p degree
-     * replaced by appropriate values.
-     */
-    std::string
-    get_name() const override;
-
-    /**
-     * @copydoc dealii::FiniteElement::compare_for_domination()
-     */
-    FiniteElementDomination::Domination
-    compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
-                           const unsigned int codim) const override;
-
-    /**
-     * @copydoc dealii::FiniteElement::hp_vertex_dof_identities()
-     */
-    std::vector<std::pair<unsigned int, unsigned int>>
-    hp_vertex_dof_identities(
-      const FiniteElement<dim, spacedim> &fe_other) const override;
-
-    /**
-     * @copydoc dealii::FiniteElement::hp_line_dof_identities()
-     */
-    std::vector<std::pair<unsigned int, unsigned int>>
-    hp_line_dof_identities(
-      const FiniteElement<dim, spacedim> &fe_other) const override;
-  };
-
-
+  virtual std::pair<Table<2, bool>, std::vector<unsigned int>>
+  get_constant_modes() const override;
 
   /**
-   * Implementation of a scalar discontinuous Lagrange finite element
-   * $P_k$, sometimes denoted as $P_{-k}$, that yields the finite
-   * element space of discontinuous, piecewise polynomials of degree
-   * $k$.
+   * @copydoc dealii::FiniteElement::get_prolongation_matrix()
    *
-   * @ingroup simplex
+   * @note Only implemented for RefinementCase::isotropic_refinement.
    */
-  template <int dim, int spacedim = dim>
-  class FE_DGP : public FE_Poly<dim, spacedim>
-  {
-  public:
-    /**
-     * Constructor.
-     */
-    FE_DGP(const unsigned int degree);
+  virtual const FullMatrix<double> &
+  get_prolongation_matrix(
+    const unsigned int         child,
+    const RefinementCase<dim> &refinement_case =
+      RefinementCase<dim>::isotropic_refinement) const override;
 
-    /**
-     * @copydoc dealii::FiniteElement::clone()
-     */
-    std::unique_ptr<FiniteElement<dim, spacedim>>
-    clone() const override;
+  /**
+   * @copydoc dealii::FiniteElement::get_face_interpolation_matrix()
+   */
+  void
+  get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source_fe,
+                                FullMatrix<double> &interpolation_matrix,
+                                const unsigned int  face_no) const override;
 
-    /**
-     * Return a string that uniquely identifies a finite element. This class
-     * returns <tt>Simplex::FE_DGP<dim>(degree)</tt>, with @p dim and @p degree
-     * replaced by appropriate values.
-     */
-    std::string
-    get_name() const override;
+  /**
+   * @copydoc dealii::FiniteElement::get_subface_interpolation_matrix()
+   */
+  void
+  get_subface_interpolation_matrix(
+    const FiniteElement<dim, spacedim> &x_source_fe,
+    const unsigned int                  subface,
+    FullMatrix<double> &                interpolation_matrix,
+    const unsigned int                  face_no) const override;
 
-    /**
-     * @copydoc dealii::FiniteElement::compare_for_domination()
-     */
-    FiniteElementDomination::Domination
-    compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
-                           const unsigned int codim) const override;
+  /**
+   * @copydoc dealii::FiniteElement::hp_constraints_are_implemented()
+   */
+  bool
+  hp_constraints_are_implemented() const override;
 
-    /**
-     * @copydoc dealii::FiniteElement::hp_vertex_dof_identities()
-     */
-    std::vector<std::pair<unsigned int, unsigned int>>
-    hp_vertex_dof_identities(
-      const FiniteElement<dim, spacedim> &fe_other) const override;
+  /**
+   * @copydoc dealii::FiniteElement::convert_generalized_support_point_values_to_dof_values()
+   */
+  virtual void
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>> &support_point_values,
+    std::vector<double> &              nodal_values) const override;
 
-    /**
-     * @copydoc dealii::FiniteElement::hp_line_dof_identities()
-     */
-    std::vector<std::pair<unsigned int, unsigned int>>
-    hp_line_dof_identities(
-      const FiniteElement<dim, spacedim> &fe_other) const override;
-  };
-} // namespace Simplex
+  mutable Threads::Mutex mutex;
+};
+
+
+
+/**
+ * Implementation of a scalar Lagrange finite element $P_k$ that yields
+ * the finite element space of continuous, piecewise polynomials of
+ * degree $k$.
+ *
+ * @ingroup simplex
+ */
+template <int dim, int spacedim = dim>
+class FE_SimplexP : public FE_SimplexPoly<dim, spacedim>
+{
+public:
+  /**
+   * Constructor.
+   */
+  FE_SimplexP(const unsigned int degree);
+
+  /**
+   * @copydoc dealii::FiniteElement::clone()
+   */
+  std::unique_ptr<FiniteElement<dim, spacedim>>
+  clone() const override;
+
+  /**
+   * Return a string that uniquely identifies a finite element. This class
+   * returns <tt>FE_SimplexP<dim>(degree)</tt>, with @p dim and @p degree
+   * replaced by appropriate values.
+   */
+  std::string
+  get_name() const override;
+
+  /**
+   * @copydoc dealii::FiniteElement::compare_for_domination()
+   */
+  FiniteElementDomination::Domination
+  compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
+                         const unsigned int codim) const override;
+
+  /**
+   * @copydoc dealii::FiniteElement::hp_vertex_dof_identities()
+   */
+  std::vector<std::pair<unsigned int, unsigned int>>
+  hp_vertex_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const override;
+
+  /**
+   * @copydoc dealii::FiniteElement::hp_line_dof_identities()
+   */
+  std::vector<std::pair<unsigned int, unsigned int>>
+  hp_line_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const override;
+};
+
+
+
+/**
+ * Implementation of a scalar discontinuous Lagrange finite element
+ * $P_k$, sometimes denoted as $P_{-k}$, that yields the finite
+ * element space of discontinuous, piecewise polynomials of degree
+ * $k$.
+ *
+ * @ingroup simplex
+ */
+template <int dim, int spacedim = dim>
+class FE_SimplexDGP : public FE_SimplexPoly<dim, spacedim>
+{
+public:
+  /**
+   * Constructor.
+   */
+  FE_SimplexDGP(const unsigned int degree);
+
+  /**
+   * @copydoc dealii::FiniteElement::clone()
+   */
+  std::unique_ptr<FiniteElement<dim, spacedim>>
+  clone() const override;
+
+  /**
+   * Return a string that uniquely identifies a finite element. This class
+   * returns <tt>FE_SimplexDGP<dim>(degree)</tt>, with @p dim and @p degree
+   * replaced by appropriate values.
+   */
+  std::string
+  get_name() const override;
+
+  /**
+   * @copydoc dealii::FiniteElement::compare_for_domination()
+   */
+  FiniteElementDomination::Domination
+  compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
+                         const unsigned int codim) const override;
+
+  /**
+   * @copydoc dealii::FiniteElement::hp_vertex_dof_identities()
+   */
+  std::vector<std::pair<unsigned int, unsigned int>>
+  hp_vertex_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const override;
+
+  /**
+   * @copydoc dealii::FiniteElement::hp_line_dof_identities()
+   */
+  std::vector<std::pair<unsigned int, unsigned int>>
+  hp_line_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const override;
+};
 
 DEAL_II_NAMESPACE_CLOSE
 

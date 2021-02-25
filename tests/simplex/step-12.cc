@@ -205,11 +205,11 @@ namespace Step12
     Triangulation<dim>   triangulation;
     const MappingFE<dim> mapping;
 
-    const Simplex::FE_DGP<dim> fe;
-    DoFHandler<dim>            dof_handler;
+    const FE_SimplexDGP<dim> fe;
+    DoFHandler<dim>          dof_handler;
 
-    const Simplex::QGauss<dim>     quadrature;
-    const Simplex::QGauss<dim - 1> quadrature_face;
+    const QGaussSimplex<dim>     quadrature;
+    const QGaussSimplex<dim - 1> quadrature_face;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -221,7 +221,7 @@ namespace Step12
 
   template <int dim>
   AdvectionProblem<dim>::AdvectionProblem()
-    : mapping(Simplex::FE_P<dim>(1))
+    : mapping(FE_SimplexP<dim>(1))
     , fe(1)
     , dof_handler(triangulation)
     , quadrature(fe.tensor_degree() + 1)

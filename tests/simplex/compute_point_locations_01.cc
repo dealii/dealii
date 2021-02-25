@@ -39,7 +39,7 @@ test_in_unit_cube(const std::vector<Point<dim>> &points)
   Triangulation<dim> tria;
   GridGenerator::subdivided_hyper_cube_with_simplices(tria, 1);
 
-  MappingFE<dim> mapping(Simplex::FE_P<dim>(1));
+  MappingFE<dim> mapping(FE_SimplexP<dim>(1));
 
   const auto tria_cache =
     std::make_unique<GridTools::Cache<dim>>(tria, mapping);

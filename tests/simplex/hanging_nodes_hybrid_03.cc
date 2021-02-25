@@ -56,19 +56,19 @@ main(int argc, char *argv[])
           deallog << "q_degree: " << q << ", p_degree: " << p << std::endl;
           test<dim>({0, 1},
                     {0, 1},
-                    hp::FECollection<dim>(FE_Q<dim>(q), Simplex::FE_P<dim>(p)),
+                    hp::FECollection<dim>(FE_Q<dim>(q), FE_SimplexP<dim>(p)),
                     cube_and_pyramid);
           test<dim>({1, 0},
                     {0, 1},
-                    hp::FECollection<dim>(FE_Q<dim>(q), Simplex::FE_P<dim>(p)),
+                    hp::FECollection<dim>(FE_Q<dim>(q), FE_SimplexP<dim>(p)),
                     cube_and_pyramid);
           test<dim>({0, 1},
                     {1, 0},
-                    hp::FECollection<dim>(Simplex::FE_P<dim>(p), FE_Q<dim>(q)),
+                    hp::FECollection<dim>(FE_SimplexP<dim>(p), FE_Q<dim>(q)),
                     cube_and_pyramid);
           test<dim>({1, 0},
                     {1, 0},
-                    hp::FECollection<dim>(Simplex::FE_P<dim>(p), FE_Q<dim>(q)),
+                    hp::FECollection<dim>(FE_SimplexP<dim>(p), FE_Q<dim>(q)),
                     cube_and_pyramid);
         }
   }

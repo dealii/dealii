@@ -111,8 +111,7 @@ public:
    *
    * @note Some implementations of this class do not support this function,
    *   since no lexicographic ordering of the basis functions is possible
-   *   for them. Examples are: Simplex::FE_P, Simplex::FE_WedgeP, and
-   *   Simplex::FE_PyramidP.
+   *   for them. Examples are: FE_SimplexP, FE_WedgeP, and FE_PyramidP.
    */
   std::vector<unsigned int>
   get_poly_space_numbering() const;

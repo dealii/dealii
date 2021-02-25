@@ -66,7 +66,7 @@ test(const FiniteElement<dim, spacedim> &fe, const unsigned int n_components)
 
   Vector<double> solution(dof_handler.n_dofs());
 
-  MappingFE<dim> mapping(Simplex::FE_P<dim>(1));
+  MappingFE<dim> mapping(FE_SimplexP<dim>(1));
 
   VectorTools::interpolate(mapping,
                            dof_handler,
@@ -102,21 +102,21 @@ main()
 
   {
     const unsigned int dim = 2;
-    test<dim>(Simplex::FE_P<dim>(2) /*=degree*/, 1);
-    test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2 /*=degree*/), dim), dim);
-    test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2 /*=degree*/),
+    test<dim>(FE_SimplexP<dim>(2) /*=degree*/, 1);
+    test<dim>(FESystem<dim>(FE_SimplexP<dim>(2 /*=degree*/), dim), dim);
+    test<dim>(FESystem<dim>(FE_SimplexP<dim>(2 /*=degree*/),
                             dim,
-                            Simplex::FE_P<dim>(1 /*=degree*/),
+                            FE_SimplexP<dim>(1 /*=degree*/),
                             1),
               dim + 1);
   }
   {
     const unsigned int dim = 3;
-    test<dim>(Simplex::FE_P<dim>(2) /*=degree*/, 1);
-    test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2 /*=degree*/), dim), dim);
-    test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2 /*=degree*/),
+    test<dim>(FE_SimplexP<dim>(2) /*=degree*/, 1);
+    test<dim>(FESystem<dim>(FE_SimplexP<dim>(2 /*=degree*/), dim), dim);
+    test<dim>(FESystem<dim>(FE_SimplexP<dim>(2 /*=degree*/),
                             dim,
-                            Simplex::FE_P<dim>(1 /*=degree*/),
+                            FE_SimplexP<dim>(1 /*=degree*/),
                             1),
               dim + 1);
   }

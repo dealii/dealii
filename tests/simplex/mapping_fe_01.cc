@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Distribute Simplex::FE_Wedge on a DoFHandler.
+// Distribute FE_WedgeP on a DoFHandler.
 
 #include <deal.II/base/quadrature_lib.h>
 
@@ -48,12 +48,12 @@ test(const unsigned int mapping_degree)
     if (i != numbers::flat_manifold_id)
       tria.set_manifold(i, tria_temp.get_manifold(i));
 
-  Simplex::FE_P<dim> fe(2);
+  FE_SimplexP<dim> fe(2);
 
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
 
-  MappingFE<dim> mapping(Simplex::FE_P<dim>{mapping_degree});
+  MappingFE<dim> mapping(FE_SimplexP<dim>{mapping_degree});
 
   {
     DataOut<dim> data_out;

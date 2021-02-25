@@ -158,9 +158,9 @@ public:
    * Return a default mapping of degree @p degree matching the current
    * reference cell. If this reference cell is a hypercube, then the returned
    * mapping is a MappingQGeneric; otherwise, it is an object of type
-   * MappingFE initialized with Simplex::FE_P (if the reference cell is a
-   * triangle or tetrahedron), with Simplex::FE_PyramidP (if the reference
-   * cell is a pyramid), or with Simplex::FE_WedgeP (if the reference cell is
+   * MappingFE initialized with FE_SimplexP (if the reference cell is a
+   * triangle or tetrahedron), with FE_PyramidP (if the reference
+   * cell is a pyramid), or with FE_WedgeP (if the reference cell is
    * a wedge).
    */
   template <int dim, int spacedim>
@@ -171,9 +171,9 @@ public:
    * Return a default linear mapping matching the current reference cell.
    * If this reference cell is a hypercube, then the returned mapping
    * is a MappingQ1; otherwise, it is an object of type MappingFE
-   * initialized with Simplex::FE_P (if the reference cell is a triangle or
-   * tetrahedron), with Simplex::FE_PyramidP (if the reference cell is a
-   * pyramid), or with Simplex::FE_WedgeP (if the reference cell is a wedge).
+   * initialized with FE_SimplexP (if the reference cell is a triangle or
+   * tetrahedron), with FE_PyramidP (if the reference cell is a
+   * pyramid), or with FE_WedgeP (if the reference cell is a wedge).
    * In other words, the term "linear" in the name of the function has to be
    * understood as $d$-linear (i.e., bilinear or trilinear) for some of the
    * coordinate directions.
@@ -184,7 +184,7 @@ public:
 
   /**
    * Return a Gauss-type quadrature matching the given reference cell (QGauss,
-   * Simplex::QGauss, Simplex::QGaussPyramid, Simplex::QGaussWedge).
+   * QGaussSimplex, QGaussPyramid, QGaussWedge).
    *
    * @param[in] n_points_1D The number of quadrature points in each direction
    * (QGauss) or an indication of what polynomial degree needs to be
@@ -1503,7 +1503,7 @@ ReferenceCell::d_linear_shape_function(const Point<dim> & xi,
 
   if (*this ==
       ReferenceCells::Triangle) // see also
-                                // Simplex::ScalarPolynomial::compute_value
+                                // BarycentricPolynomials<2>::compute_value
     {
       switch (i)
         {
@@ -1518,7 +1518,7 @@ ReferenceCell::d_linear_shape_function(const Point<dim> & xi,
 
   if (*this ==
       ReferenceCells::Tetrahedron) // see also
-                                   // Simplex::ScalarPolynomial::compute_value
+                                   // BarycentricPolynomials<3>::compute_value
     {
       switch (i)
         {
@@ -1534,9 +1534,8 @@ ReferenceCell::d_linear_shape_function(const Point<dim> & xi,
         }
     }
 
-  if (*this ==
-      ReferenceCells::Wedge) // see also
-                             // Simplex::ScalarWedgePolynomial::compute_value
+  if (*this == ReferenceCells::Wedge) // see also
+                                      // ScalarWedgePolynomial::compute_value
     {
       return ReferenceCell(ReferenceCells::Triangle)
                .d_linear_shape_function<2>(Point<2>(xi[std::min(0, dim - 1)],
@@ -1547,9 +1546,9 @@ ReferenceCell::d_linear_shape_function(const Point<dim> & xi,
                                            i / 3);
     }
 
-  if (*this == ReferenceCells::
-                 Pyramid) // see also
-                          // Simplex::ScalarPyramidPolynomial::compute_value
+  if (*this ==
+      ReferenceCells::Pyramid) // see also
+                               // ScalarPyramidPolynomial::compute_value
     {
       const double Q14 = 0.25;
       double       ration;
@@ -1597,7 +1596,7 @@ ReferenceCell::d_linear_shape_function_gradient(const Point<dim> & xi,
 
   if (*this ==
       ReferenceCells::Triangle) // see also
-                                // Simplex::ScalarPolynomial::compute_grad
+                                // BarycentricPolynomials<2>::compute_grad
     {
       switch (i)
         {

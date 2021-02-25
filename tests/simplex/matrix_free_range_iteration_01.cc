@@ -15,7 +15,7 @@
 
 
 
-// Test ShapeData for Simplex::FE_P and Simplex::QGauss
+// Test ShapeData for FE_SimplexP and QGaussSimplex
 
 #include <deal.II/dofs/dof_handler.h>
 

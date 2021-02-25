@@ -247,15 +247,15 @@ test(const unsigned version, const unsigned int degree)
   else if (version == 2)
     GridGenerator::subdivided_hyper_cube_with_simplices_mix(tria, subdivisions);
 
-  Simplex::FE_DGP<dim>  fe1(degree);
+  FE_SimplexDGP<dim>    fe1(degree);
   FE_DGQ<dim>           fe2(degree);
   hp::FECollection<dim> fes(fe1, fe2);
 
-  Simplex::QGauss<dim> quad1(degree + 1);
+  QGaussSimplex<dim>   quad1(degree + 1);
   QGauss<dim>          quad2(degree + 1);
   hp::QCollection<dim> quads(quad1, quad2);
 
-  MappingFE<dim>             mapping1(Simplex::FE_P<dim>(1));
+  MappingFE<dim>             mapping1(FE_SimplexP<dim>(1));
   MappingQ<dim>              mapping2(1);
   hp::MappingCollection<dim> mappings(mapping1, mapping2);
 
