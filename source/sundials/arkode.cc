@@ -226,7 +226,6 @@ namespace SUNDIALS
       Assert(user_data != nullptr, ExcInternalError());
       ARKode<VectorType> &solver =
         *static_cast<ARKode<VectorType> *>(user_data);
-      GrowingVectorMemory<VectorType> mem;
 
       auto *src_v  = internal::unwrap_nvector_const<VectorType>(v);
       auto *src_y  = internal::unwrap_nvector_const<VectorType>(y);
@@ -385,6 +384,7 @@ namespace SUNDIALS
     , communicator(is_serial_vector<VectorType>::value ?
                      MPI_COMM_SELF :
                      Utilities::MPI::duplicate_communicator(mpi_comm))
+    , last_end_time(data.initial_time)
   {
     set_functions_to_trigger_an_assert();
   }
@@ -418,21 +418,64 @@ namespace SUNDIALS
     DiscreteTime time(data.initial_time,
                       data.final_time,
                       data.initial_step_size);
-    reset(time.get_current_time(), time.get_next_step_size(), solution);
 
-    if (output_step)
-      output_step(time.get_current_time(), solution, time.get_step_number());
+    return do_evolve_time(solution, time, /* force_solver_restart = */ true);
+  }
 
-    while (time.is_at_end() == false)
+
+
+  template <typename VectorType>
+  unsigned int
+  ARKode<VectorType>::solve_ode_incrementally(VectorType & solution,
+                                              const double intermediate_time,
+                                              const bool   reset_solver)
+  {
+    AssertThrow(
+      intermediate_time > last_end_time,
+      dealii::ExcMessage(
+        "The requested intermediate time is smaller than the last requested "
+        "intermediate time."));
+
+    const bool   do_reset = reset_solver || arkode_mem == nullptr;
+    DiscreteTime time(last_end_time, intermediate_time, data.initial_step_size);
+    return do_evolve_time(solution, time, do_reset);
+  }
+
+
+
+  template <typename VectorType>
+  int
+  ARKode<VectorType>::do_evolve_time(VectorType &  solution,
+                                     DiscreteTime &time,
+                                     const bool    do_reset)
+  {
+    if (do_reset)
+      {
+        reset(time.get_current_time(), time.get_next_step_size(), solution);
+        if (output_step)
+          output_step(time.get_current_time(),
+                      solution,
+                      time.get_step_number());
+      }
+
+    auto solution_nvector = internal::make_nvector_view(solution);
+
+    while (!time.is_at_end())
       {
         time.set_desired_next_step_size(data.output_period);
         double actual_next_time;
 #  if DEAL_II_SUNDIALS_VERSION_LT(4, 0, 0)
-        const auto status = SundialsARKode(
-          arkode_mem, time.get_next_time(), yy, &actual_next_time, ARK_NORMAL);
+        const auto status = SundialsARKode(arkode_mem,
+                                           time.get_next_time(),
+                                           solution_nvector,
+                                           &actual_next_time,
+                                           ARK_NORMAL);
 #  else
-        const auto status = ARKStepEvolve(
-          arkode_mem, time.get_next_time(), yy, &actual_next_time, ARK_NORMAL);
+        const auto status = ARKStepEvolve(arkode_mem,
+                                          time.get_next_time(),
+                                          solution_nvector,
+                                          &actual_next_time,
+                                          ARK_NORMAL);
 #  endif
         (void)status;
         AssertARKode(status);
@@ -450,17 +493,20 @@ namespace SUNDIALS
                       solution,
                       time.get_step_number());
       }
-
+    last_end_time = time.get_current_time();
     return time.get_step_number();
   }
+
+
 
 #  if DEAL_II_SUNDIALS_VERSION_LT(4, 0, 0)
   template <typename VectorType>
   void
-  ARKode<VectorType>::reset(const double current_time,
-                            const double current_time_step,
-                            VectorType & solution)
+  ARKode<VectorType>::reset(const double      current_time,
+                            const double      current_time_step,
+                            const VectorType &solution)
   {
+    last_end_time = current_time;
     if (arkode_mem)
       ARKodeFree(&arkode_mem);
 
@@ -474,21 +520,21 @@ namespace SUNDIALS
 
     // just a view on the memory in solution, all write operations on yy by
     // ARKODE will automatically be mirrored to solution
-    yy = internal::make_nvector_view(solution);
+    auto initial_condition_nvector = internal::make_nvector_view(solution);
 
     status = ARKodeInit(
       arkode_mem,
       explicit_function ? &t_arkode_explicit_function<VectorType> : nullptr,
       implicit_function ? &t_arkode_implicit_function<VectorType> : nullptr,
       current_time,
-      yy);
+      initial_condition_nvector);
     AssertARKode(status);
 
     if (get_local_tolerances)
       {
-        abs_tolls = make_nvector_view(get_local_tolerances());
+        const auto abs_tols = make_nvector_view(get_local_tolerances());
         status =
-          ARKodeSVtolerances(arkode_mem, data.relative_tolerance, abs_tolls);
+          ARKodeSVtolerances(arkode_mem, data.relative_tolerance, abs_tols);
         AssertARKode(status);
       }
     else
@@ -570,8 +616,9 @@ namespace SUNDIALS
   void
   ARKode<VectorType>::reset(const double current_time,
                             const double current_time_step,
-                            VectorType &solution)
+                            const VectorType &solution)
   {
+    last_end_time = current_time;
     if (arkode_mem)
       ARKStepFree(&arkode_mem);
 
@@ -580,7 +627,7 @@ namespace SUNDIALS
 
     // just a view on the memory in solution, all write operations on yy by
     // ARKODE will automatically be mirrored to solution
-    yy = internal::make_nvector_view(solution);
+    auto initial_condition_nvector = internal::make_nvector_view(solution);
 
     Assert(explicit_function || implicit_function,
            ExcFunctionNotProvided("explicit_function || implicit_function"));
@@ -589,15 +636,16 @@ namespace SUNDIALS
       explicit_function ? &t_arkode_explicit_function<VectorType> : nullptr,
       implicit_function ? &t_arkode_implicit_function<VectorType> : nullptr,
       current_time,
-      yy);
+      initial_condition_nvector);
 
     Assert(arkode_mem != nullptr, ExcInternalError());
 
     if (get_local_tolerances)
       {
-        abs_tolls = internal::make_nvector_view(get_local_tolerances());
+        const auto abs_tols =
+          internal::make_nvector_view(get_local_tolerances());
         status =
-          ARKStepSVtolerances(arkode_mem, data.relative_tolerance, abs_tolls);
+          ARKStepSVtolerances(arkode_mem, data.relative_tolerance, abs_tols);
         AssertARKode(status);
       }
     else
@@ -614,7 +662,7 @@ namespace SUNDIALS
 
     setup_system_solver(solution);
 
-    setup_mass_solver();
+    setup_mass_solver(solution);
 
     status = ARKStepSetInitStep(arkode_mem, current_time_step);
     AssertARKode(status);
@@ -657,8 +705,9 @@ namespace SUNDIALS
           {
             // use default solver from SUNDIALS
             // TODO give user options
+            auto y_template = internal::make_nvector_view(solution);
             sun_linear_solver =
-              SUNLinSol_SPGMR(yy,
+              SUNLinSol_SPGMR(y_template,
                               PREC_NONE,
                               0 /*krylov subvectors, 0 uses default*/);
           }
@@ -709,7 +758,7 @@ namespace SUNDIALS
 
   template <typename VectorType>
   void
-  ARKode<VectorType>::setup_mass_solver()
+  ARKode<VectorType>::setup_mass_solver(const VectorType &solution)
   {
     int status;
     (void)status;
@@ -726,8 +775,9 @@ namespace SUNDIALS
           }
         else
           {
+            auto y_template = internal::make_nvector_view(solution);
             sun_mass_linear_solver =
-              SUNLinSol_SPGMR(yy,
+              SUNLinSol_SPGMR(y_template,
                               PREC_NONE,
                               0 /*krylov subvectors, 0 uses default*/);
           }
