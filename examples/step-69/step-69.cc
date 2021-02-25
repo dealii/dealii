@@ -592,7 +592,7 @@ namespace Step69
 
     triangulation.clear();
 
-    Triangulation<dim> tria1, tria2, tria3, tria4;
+    Triangulation<dim> tria1, tria2, tria3, tria4, tria5, tria6;
 
     GridGenerator::hyper_cube_with_cylindrical_hole(
       tria1, disk_diameter / 2., disk_diameter, 0.5, 1, false);
@@ -611,14 +611,27 @@ namespace Step69
 
     GridGenerator::subdivided_hyper_rectangle(
       tria4,
-      {6, 4},
-      Point<2>(disk_diameter, -height / 2.),
+      {6, 2},
+      Point<2>(disk_diameter, -disk_diameter),
+      Point<2>(length - disk_position, disk_diameter));
+
+    GridGenerator::subdivided_hyper_rectangle(
+      tria5,
+      {6, 1},
+      Point<2>(disk_diameter, disk_diameter),
       Point<2>(length - disk_position, height / 2.));
 
-    GridGenerator::merge_triangulations({&tria1, &tria2, &tria3, &tria4},
-                                        triangulation,
-                                        1.e-12,
-                                        true);
+    GridGenerator::subdivided_hyper_rectangle(
+      tria6,
+      {6, 1},
+      Point<2>(disk_diameter, -height / 2.),
+      Point<2>(length - disk_position, -disk_diameter));
+
+    GridGenerator::merge_triangulations(
+      {&tria1, &tria2, &tria3, &tria4, &tria5, &tria6},
+      triangulation,
+      1.e-12,
+      true);
 
     triangulation.set_manifold(0, PolarManifold<2>(Point<2>()));
 
