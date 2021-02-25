@@ -562,15 +562,16 @@ MappingQ<dim, spacedim>::get_bounding_box(
 template <int dim, int spacedim>
 bool
 MappingQ<dim, spacedim>::is_compatible_with(
-  const ReferenceCell &cell_type) const
+  const ReferenceCell &reference_cell) const
 {
-  if (cell_type.get_dimension() != dim)
-    return false; // TODO: or is this an error?
+  Assert(dim == reference_cell.get_dimension(),
+         ExcMessage("The dimension of your mapping (" +
+                    Utilities::to_string(dim) +
+                    ") and the reference cell cell_type (" +
+                    Utilities::to_string(reference_cell.get_dimension()) +
+                    " ) do not agree."));
 
-  if (cell_type.is_hyper_cube())
-    return true;
-
-  return false;
+  return reference_cell.is_hyper_cube();
 }
 
 

@@ -136,12 +136,12 @@ FiniteElementData<dim>::FiniteElementData(
 template <int dim>
 FiniteElementData<dim>::FiniteElementData(
   const internal::GenericDoFsPerObject &data,
-  const ReferenceCell                   cell_type,
+  const ReferenceCell                   reference_cell,
   const unsigned int                    n_components,
   const unsigned int                    degree,
   const Conformity                      conformity,
   const BlockIndices &                  block_indices)
-  : cell_type(cell_type)
+  : reference_cell_kind(reference_cell)
   , number_unique_quads(data.dofs_per_object_inclusive[2].size())
   , number_unique_faces(data.dofs_per_object_inclusive[dim - 1].size())
   , dofs_per_vertex(data.dofs_per_object_exclusive[0][0])

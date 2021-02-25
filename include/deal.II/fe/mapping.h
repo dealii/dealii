@@ -403,10 +403,10 @@ public:
 
   /**
    * Returns if this instance of Mapping is compatible with the type of cell
-   * in @p cell_type.
+   * in @p reference_cell.
    */
   virtual bool
-  is_compatible_with(const ReferenceCell &cell_type) const = 0;
+  is_compatible_with(const ReferenceCell &reference_cell) const = 0;
 
   /**
    * @name Mapping points between reference and real cells

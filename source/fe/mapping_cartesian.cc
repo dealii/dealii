@@ -73,16 +73,16 @@ MappingCartesian<dim, spacedim>::preserves_vertex_locations() const
 template <int dim, int spacedim>
 bool
 MappingCartesian<dim, spacedim>::is_compatible_with(
-  const ReferenceCell &cell_type) const
+  const ReferenceCell &reference_cell) const
 {
-  Assert(dim == cell_type.get_dimension(),
+  Assert(dim == reference_cell.get_dimension(),
          ExcMessage("The dimension of your mapping (" +
                     Utilities::to_string(dim) +
                     ") and the reference cell cell_type (" +
-                    Utilities::to_string(cell_type.get_dimension()) +
+                    Utilities::to_string(reference_cell.get_dimension()) +
                     " ) do not agree."));
 
-  return cell_type.is_hyper_cube();
+  return reference_cell.is_hyper_cube();
 }
 
 

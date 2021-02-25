@@ -86,7 +86,7 @@ public:
 
 
   virtual bool
-  is_compatible_with(const ReferenceCell &cell_type) const override;
+  is_compatible_with(const ReferenceCell &reference_cell) const override;
 
   /**
    * Always returns @p true because the default implementation of functions in
