@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Distribute Simplex::FE_Wedge on a DoFHandler.
+// Distribute FE_WedgeP on a DoFHandler.
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -81,7 +81,7 @@ test_3()
   std::ofstream out("mesh.vtk");
   grid_out.write_vtk(tria, out);
 
-  Simplex::FE_WedgeP<dim, spacedim> fe(2);
+  FE_WedgeP<dim, spacedim> fe(2);
 
   DoFHandler<dim, spacedim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);

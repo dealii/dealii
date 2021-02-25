@@ -62,7 +62,7 @@ void make_grid(Triangulation<2> &triangulation)
 
 void distribute_dofs(DoFHandler<2> &dof_handler)
 {
-  const Simplex::FE_P<2> finite_element(1);
+  const FE_SimplexP<2> finite_element(1);
   dof_handler.distribute_dofs(finite_element);
 
   DynamicSparsityPattern dynamic_sparsity_pattern(dof_handler.n_dofs(),

@@ -368,12 +368,12 @@ namespace Step55
                       Triangulation<dim>::smoothing_on_refinement |
                       Triangulation<dim>::smoothing_on_coarsening))
 #else
-    , fe(Simplex::FE_P<dim>(velocity_degree),
+    , fe(FE_SimplexP<dim>(velocity_degree),
          dim,
-         Simplex::FE_P<dim>(velocity_degree - 1),
+         FE_SimplexP<dim>(velocity_degree - 1),
          1)
     , triangulation(mpi_communicator)
-    , mapping(Simplex::FE_P<dim>(1))
+    , mapping(FE_SimplexP<dim>(1))
 #endif
     , dof_handler(triangulation)
     , pcout(std::cout,
@@ -571,7 +571,7 @@ namespace Step55
 #ifdef HEX
     const QGauss<dim> quadrature_formula(velocity_degree + 1);
 #else
-    const Simplex::QGauss<dim> quadrature_formula(velocity_degree + 1);
+    const QGaussSimplex<dim> quadrature_formula(velocity_degree + 1);
 #endif
 
     FEValues<dim> fe_values(mapping,
@@ -734,8 +734,8 @@ namespace Step55
 #ifdef HEX
                                       QGauss<dim>(velocity_degree + 2),
 #else
-                                      Simplex::QGauss<dim>(velocity_degree +
-                                                           1),    // TODO: +2
+                                      QGaussSimplex<dim>(velocity_degree +
+                                                         1),    // TODO: +2
 #endif
                                       locally_relevant_solution,
                                       dim);
@@ -774,7 +774,7 @@ namespace Step55
 #ifdef HEX
       const QGauss<dim> quadrature(velocity_degree + 2);
 #else
-      const Simplex::QGauss<dim> quadrature(velocity_degree + 1); // TODO: +2
+      const QGaussSimplex<dim> quadrature(velocity_degree + 1); // TODO: +2
 #endif
 
       VectorTools::integrate_difference(mapping,

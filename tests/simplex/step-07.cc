@@ -262,8 +262,8 @@ namespace Step7
   HelmholtzProblem<dim>::assemble_system()
   {
 #ifdef USE_SIMPLEX
-    Simplex::QGauss<dim>     quadrature_formula(fe->degree + 1);
-    Simplex::QGauss<dim - 1> face_quadrature_formula(fe->degree + 1);
+    QGaussSimplex<dim>     quadrature_formula(fe->degree + 1);
+    QGaussSimplex<dim - 1> face_quadrature_formula(fe->degree + 1);
 #else
     QGauss<dim>     quadrature_formula(fe->degree + 1);
     QGauss<dim - 1> face_quadrature_formula(fe->degree + 1);
@@ -280,7 +280,7 @@ namespace Step7
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
 #ifdef USE_SIMPLEX
-    MappingFE<dim> mapping(Simplex::FE_P<dim>(1));
+    MappingFE<dim> mapping(FE_SimplexP<dim>(1));
 #else
     MappingFE<dim>  mapping(FE_Q<dim>(1));
 #endif
@@ -440,7 +440,7 @@ namespace Step7
     Vector<float> difference_per_cell(triangulation.n_active_cells());
 
 #ifdef USE_SIMPLEX
-    MappingFE<dim> mapping(Simplex::FE_P<dim>(1));
+    MappingFE<dim> mapping(FE_SimplexP<dim>(1));
 #else
     MappingFE<dim>  mapping(FE_Q<dim>(1));
 #endif
@@ -574,7 +574,7 @@ namespace Step7
     data_out.add_data_vector(solution, "solution");
 
 #ifdef USE_SIMPLEX
-    MappingFE<dim> mapping(Simplex::FE_P<dim>(1));
+    MappingFE<dim> mapping(FE_SimplexP<dim>(1));
 #else
     MappingFE<dim> mapping(FE_Q<dim>(1));
 #endif
@@ -705,7 +705,7 @@ main()
                 << std::endl;
 
 #ifdef USE_SIMPLEX
-        Simplex::FE_P<dim> fe(1);
+        FE_SimplexP<dim> fe(1);
 #else
         FE_Q<dim> fe(1);
 #endif
@@ -726,7 +726,7 @@ main()
                 << std::endl;
 
 #ifdef USE_SIMPLEX
-        Simplex::FE_P<dim> fe(1);
+        FE_SimplexP<dim> fe(1);
 #else
         FE_Q<dim> fe(1);
 #endif
@@ -744,7 +744,7 @@ main()
                 << std::endl;
 
 #ifdef USE_SIMPLEX
-        Simplex::FE_P<dim> fe(2);
+        FE_SimplexP<dim> fe(2);
 #else
         FE_Q<dim> fe(2);
 #endif
@@ -761,7 +761,7 @@ main()
                 << std::endl;
 
 #ifdef USE_SIMPLEX
-        Simplex::FE_P<dim> fe(2);
+        FE_SimplexP<dim> fe(2);
 #else
         FE_Q<dim> fe(2);
 #endif

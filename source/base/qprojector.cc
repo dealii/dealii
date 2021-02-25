@@ -135,7 +135,7 @@ QProjector<2>::project_to_face(const ReferenceCell    reference_cell,
   if (reference_cell == ReferenceCells::Triangle)
     {
       // use linear polynomial to map the reference quadrature points correctly
-      // on faces, i.e., Simplex::ScalarPolynomial<1>(1)
+      // on faces, i.e., BarycentricPolynomials<1>(1)
       for (unsigned int p = 0; p < quadrature.size(); ++p)
         switch (face_no)
           {
@@ -315,7 +315,7 @@ QProjector<2>::project_to_subface(const ReferenceCell    reference_cell,
   if (reference_cell == ReferenceCells::Triangle)
     {
       // use linear polynomial to map the reference quadrature points correctly
-      // on faces, i.e., Simplex::ScalarPolynomial<1>(1)
+      // on faces, i.e., BarycentricPolynomials<1>(1)
       for (unsigned int p = 0; p < quadrature.size(); ++p)
         switch (face_no)
           {
@@ -620,7 +620,7 @@ QProjector<2>::project_to_all_faces(const ReferenceCell       reference_cell,
 
       // linear polynomial to map the reference quadrature points correctly
       // on faces
-      const auto poly = Simplex::BarycentricPolynomials<1>::get_fe_p_basis(1);
+      const auto poly = BarycentricPolynomials<1>::get_fe_p_basis(1);
 
       // new (projected) quadrature points and weights
       std::vector<Point<2>> points;
@@ -749,7 +749,7 @@ QProjector<3>::project_to_all_faces(const ReferenceCell       reference_cell,
     std::vector<Point<3>> points;
     std::vector<double>   weights;
 
-    const auto poly_tri = Simplex::BarycentricPolynomials<2>::get_fe_p_basis(1);
+    const auto poly_tri = BarycentricPolynomials<2>::get_fe_p_basis(1);
     const TensorProductPolynomials<2> poly_quad(
       Polynomials::generate_complete_Lagrange_basis(
         {Point<1>(0.0), Point<1>(1.0)}));

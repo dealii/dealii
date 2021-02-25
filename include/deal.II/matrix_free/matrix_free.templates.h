@@ -1470,7 +1470,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
     shape_info.size(0), shape_info.size(2));
   {
     Quadrature<dim> quad(QGauss<dim>(1));
-    Quadrature<dim> quad_simplex(Simplex::QGauss<dim>(1));
+    Quadrature<dim> quad_simplex(QGaussSimplex<dim>(1));
     for (unsigned int no = 0, c = 0; no < dof_handlers.size(); no++)
       for (unsigned int b = 0;
            b < dof_handlers[no]->get_fe(0).n_base_elements();

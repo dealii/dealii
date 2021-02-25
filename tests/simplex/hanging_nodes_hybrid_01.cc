@@ -65,19 +65,19 @@ main(int argc, char *argv[])
         deallog << "degree: " << d << std::endl;
         test<dim>({0, 1},
                   {0, 1},
-                  hp::FECollection<dim>(FE_Q<dim>(d), Simplex::FE_P<dim>(d)),
+                  hp::FECollection<dim>(FE_Q<dim>(d), FE_SimplexP<dim>(d)),
                   cube_and_pyramid);
         test<dim>({1, 0},
                   {0, 1},
-                  hp::FECollection<dim>(FE_Q<dim>(d), Simplex::FE_P<dim>(d)),
+                  hp::FECollection<dim>(FE_Q<dim>(d), FE_SimplexP<dim>(d)),
                   cube_and_pyramid);
         test<dim>({0, 1},
                   {1, 0},
-                  hp::FECollection<dim>(Simplex::FE_P<dim>(d), FE_Q<dim>(d)),
+                  hp::FECollection<dim>(FE_SimplexP<dim>(d), FE_Q<dim>(d)),
                   cube_and_pyramid);
         test<dim>({1, 0},
                   {1, 0},
-                  hp::FECollection<dim>(Simplex::FE_P<dim>(d), FE_Q<dim>(d)),
+                  hp::FECollection<dim>(FE_SimplexP<dim>(d), FE_Q<dim>(d)),
                   cube_and_pyramid);
       }
   }

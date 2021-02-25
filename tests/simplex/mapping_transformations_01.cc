@@ -56,7 +56,7 @@ main()
   Triangulation<2> triangulation;
   make_grid(triangulation);
 
-  MappingFE<2> mapping(Simplex::FE_P<2>(1));
+  MappingFE<2> mapping(FE_SimplexP<2>(1));
 
   unsigned int n_points = 1;
 

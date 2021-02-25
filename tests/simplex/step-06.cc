@@ -101,7 +101,7 @@ private:
   output_results(const unsigned int cycle) const;
 
 #ifdef USE_SIMPLEX
-  Simplex::FE_P<dim> fe;
+  FE_SimplexP<dim> fe;
 #else
   FE_Q<dim>         fe;
 #endif
@@ -173,7 +173,7 @@ void
 Step6<dim>::assemble_system()
 {
 #ifdef USE_SIMPLEX
-  const Simplex::QGauss<dim> quadrature_formula(fe.degree + 1);
+  const QGaussSimplex<dim> quadrature_formula(fe.degree + 1);
 #else
   const QGauss<dim> quadrature_formula(fe.degree + 1);
 #endif
@@ -252,7 +252,7 @@ Step6<dim>::refine_grid()
 #  ifdef USE_SIMPLEX
   KellyErrorEstimator<dim>::estimate(MappingFE<dim>(fe),
                                      dof_handler,
-                                     Simplex::QGauss<dim - 1>(fe.degree + 1),
+                                     QGaussSimplex<dim - 1>(fe.degree + 1),
                                      {},
                                      solution,
                                      estimated_error_per_cell);

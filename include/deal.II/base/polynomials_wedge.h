@@ -25,149 +25,139 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * A namespace for functions and classes that provide support for simplex
- * reference cell entities, i.e., triangles and tetrahedrons.
+ * Polynomials defined on wedge entities. This class is basis of
+ * FE_WedgeP.
  *
- *  @ingroup simplex
+ * The polynomials are created via a tensor product of a
+ * BarycentricPolynomials<2>::get_fe_p_basis(degree) and a
+ * BarycentricPolynomials<1>::get_fe_p_basis(degree), however, are
+ * re-numerated to better match the definition of FiniteElement.
  */
-namespace Simplex
+template <int dim>
+class ScalarWedgePolynomial : public ScalarPolynomialsBase<dim>
 {
+public:
   /**
-   * Polynomials defined on wedge entities. This class is basis of
-   * Simplex::FE_WedgeP.
-   *
-   * The polynomials are created via a tensor product of a
-   * Simplex::BarycentricPolynomials<2>::get_fe_p_basis(degree) and a
-   * Simplex::BarycentricPolynomials<1>::get_fe_p_basis(degree), however, are
-   * re-numerated to better match the definition of FiniteElement.
+   * Make the dimension available to the outside.
    */
-  template <int dim>
-  class ScalarWedgePolynomial : public ScalarPolynomialsBase<dim>
-  {
-  public:
-    /**
-     * Make the dimension available to the outside.
-     */
-    static const unsigned int dimension = dim;
+  static const unsigned int dimension = dim;
 
-    /*
-     * Constructor taking the polynomial @p degree as input.
-     *
-     * @note Currently, only linear (degree=1) and quadratic polynomials
-     *   (degree=2) are implemented.
-     */
-    ScalarWedgePolynomial(const unsigned int degree);
+  /*
+   * Constructor taking the polynomial @p degree as input.
+   *
+   * @note Currently, only linear (degree=1) and quadratic polynomials
+   *   (degree=2) are implemented.
+   */
+  ScalarWedgePolynomial(const unsigned int degree);
 
-    /**
-     * @copydoc ScalarPolynomialsBase::evaluate()
-     *
-     * @note Currently, only the vectors @p values and @p grads are filled.
-     */
-    void
-    evaluate(const Point<dim> &           unit_point,
-             std::vector<double> &        values,
-             std::vector<Tensor<1, dim>> &grads,
-             std::vector<Tensor<2, dim>> &grad_grads,
-             std::vector<Tensor<3, dim>> &third_derivatives,
-             std::vector<Tensor<4, dim>> &fourth_derivatives) const override;
+  /**
+   * @copydoc ScalarPolynomialsBase::evaluate()
+   *
+   * @note Currently, only the vectors @p values and @p grads are filled.
+   */
+  void
+  evaluate(const Point<dim> &           unit_point,
+           std::vector<double> &        values,
+           std::vector<Tensor<1, dim>> &grads,
+           std::vector<Tensor<2, dim>> &grad_grads,
+           std::vector<Tensor<3, dim>> &third_derivatives,
+           std::vector<Tensor<4, dim>> &fourth_derivatives) const override;
 
-    double
-    compute_value(const unsigned int i, const Point<dim> &p) const override;
+  double
+  compute_value(const unsigned int i, const Point<dim> &p) const override;
 
-    /**
-     * @copydoc ScalarPolynomialsBase::compute_derivative()
-     *
-     * @note Currently, only implemented for first derivative.
-     */
-    template <int order>
-    Tensor<order, dim>
-    compute_derivative(const unsigned int i, const Point<dim> &p) const;
-
-    Tensor<1, dim>
-    compute_1st_derivative(const unsigned int i,
-                           const Point<dim> & p) const override;
-
-    /**
-     * @copydoc ScalarPolynomialsBase::compute_2nd_derivative()
-     *
-     * @note Not implemented yet.
-     */
-    Tensor<2, dim>
-    compute_2nd_derivative(const unsigned int i,
-                           const Point<dim> & p) const override;
-
-    /**
-     * @copydoc ScalarPolynomialsBase::compute_3rd_derivative()
-     *
-     * @note Not implemented yet.
-     */
-    Tensor<3, dim>
-    compute_3rd_derivative(const unsigned int i,
-                           const Point<dim> & p) const override;
-
-    /**
-     * @copydoc ScalarPolynomialsBase::compute_4th_derivative()
-     *
-     * @note Not implemented yet.
-     */
-    Tensor<4, dim>
-    compute_4th_derivative(const unsigned int i,
-                           const Point<dim> & p) const override;
-
-    /**
-     * @copydoc ScalarPolynomialsBase::compute_grad()
-     *
-     * @note Not implemented yet.
-     */
-    Tensor<1, dim>
-    compute_grad(const unsigned int i, const Point<dim> &p) const override;
-
-    /**
-     * @copydoc ScalarPolynomialsBase::compute_grad_grad()
-     *
-     * @note Not implemented yet.
-     */
-    Tensor<2, dim>
-    compute_grad_grad(const unsigned int i, const Point<dim> &p) const override;
-
-    std::string
-    name() const override;
-
-    virtual std::unique_ptr<ScalarPolynomialsBase<dim>>
-    clone() const override;
-
-  private:
-    /**
-     * Scalar polynomials defined on a triangle.
-     */
-    const BarycentricPolynomials<2> poly_tri;
-
-    /**
-     * Scalar polynomials defined on a line.
-     */
-    const BarycentricPolynomials<1> poly_line;
-  };
-
-
-
-  template <int dim>
+  /**
+   * @copydoc ScalarPolynomialsBase::compute_derivative()
+   *
+   * @note Currently, only implemented for first derivative.
+   */
   template <int order>
   Tensor<order, dim>
-  ScalarWedgePolynomial<dim>::compute_derivative(const unsigned int i,
-                                                 const Point<dim> & p) const
-  {
-    Tensor<order, dim> der;
+  compute_derivative(const unsigned int i, const Point<dim> &p) const;
 
-    AssertDimension(order, 1);
-    const auto grad = compute_grad(i, p);
+  Tensor<1, dim>
+  compute_1st_derivative(const unsigned int i,
+                         const Point<dim> & p) const override;
 
-    for (unsigned int i = 0; i < dim; i++)
-      der[i] = grad[i];
+  /**
+   * @copydoc ScalarPolynomialsBase::compute_2nd_derivative()
+   *
+   * @note Not implemented yet.
+   */
+  Tensor<2, dim>
+  compute_2nd_derivative(const unsigned int i,
+                         const Point<dim> & p) const override;
 
-    return der;
-  }
+  /**
+   * @copydoc ScalarPolynomialsBase::compute_3rd_derivative()
+   *
+   * @note Not implemented yet.
+   */
+  Tensor<3, dim>
+  compute_3rd_derivative(const unsigned int i,
+                         const Point<dim> & p) const override;
 
-} // namespace Simplex
+  /**
+   * @copydoc ScalarPolynomialsBase::compute_4th_derivative()
+   *
+   * @note Not implemented yet.
+   */
+  Tensor<4, dim>
+  compute_4th_derivative(const unsigned int i,
+                         const Point<dim> & p) const override;
+
+  /**
+   * @copydoc ScalarPolynomialsBase::compute_grad()
+   *
+   * @note Not implemented yet.
+   */
+  Tensor<1, dim>
+  compute_grad(const unsigned int i, const Point<dim> &p) const override;
+
+  /**
+   * @copydoc ScalarPolynomialsBase::compute_grad_grad()
+   *
+   * @note Not implemented yet.
+   */
+  Tensor<2, dim>
+  compute_grad_grad(const unsigned int i, const Point<dim> &p) const override;
+
+  std::string
+  name() const override;
+
+  virtual std::unique_ptr<ScalarPolynomialsBase<dim>>
+  clone() const override;
+
+private:
+  /**
+   * Scalar polynomials defined on a triangle.
+   */
+  const BarycentricPolynomials<2> poly_tri;
+
+  /**
+   * Scalar polynomials defined on a line.
+   */
+  const BarycentricPolynomials<1> poly_line;
+};
+
+
+
+template <int dim>
+template <int order>
+Tensor<order, dim>
+ScalarWedgePolynomial<dim>::compute_derivative(const unsigned int i,
+                                               const Point<dim> & p) const
+{
+  Tensor<order, dim> der;
+
+  AssertDimension(order, 1);
+  const auto grad = compute_grad(i, p);
+
+  for (unsigned int i = 0; i < dim; i++)
+    der[i] = grad[i];
+
+  return der;
+}
 
 DEAL_II_NAMESPACE_CLOSE
 

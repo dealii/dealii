@@ -139,24 +139,24 @@ test(const unsigned int v, const unsigned int degree, const bool do_helmholtz)
     {
       GridGenerator::subdivided_hyper_cube_with_simplices(tria,
                                                           dim == 2 ? 16 : 8);
-      fe         = std::make_shared<Simplex::FE_P<dim>>(degree);
-      quad       = std::make_shared<Simplex::QGauss<dim>>(degree + 1);
-      fe_mapping = std::make_shared<Simplex::FE_P<dim>>(1);
+      fe         = std::make_shared<FE_SimplexP<dim>>(degree);
+      quad       = std::make_shared<QGaussSimplex<dim>>(degree + 1);
+      fe_mapping = std::make_shared<FE_SimplexP<dim>>(1);
     }
   else if (v == 1)
     {
       GridGenerator::subdivided_hyper_cube_with_wedges(tria, dim == 2 ? 16 : 8);
-      fe         = std::make_shared<Simplex::FE_WedgeP<dim>>(degree);
-      quad       = std::make_shared<Simplex::QGaussWedge<dim>>(degree + 1);
-      fe_mapping = std::make_shared<Simplex::FE_WedgeP<dim>>(1);
+      fe         = std::make_shared<FE_WedgeP<dim>>(degree);
+      quad       = std::make_shared<QGaussWedge<dim>>(degree + 1);
+      fe_mapping = std::make_shared<FE_WedgeP<dim>>(1);
     }
   else if (v == 2)
     {
       GridGenerator::subdivided_hyper_cube_with_pyramids(tria,
                                                          dim == 2 ? 16 : 8);
-      fe         = std::make_shared<Simplex::FE_PyramidP<dim>>(degree);
-      quad       = std::make_shared<Simplex::QGaussPyramid<dim>>(degree + 1);
-      fe_mapping = std::make_shared<Simplex::FE_PyramidP<dim>>(1);
+      fe         = std::make_shared<FE_PyramidP<dim>>(degree);
+      quad       = std::make_shared<QGaussPyramid<dim>>(degree + 1);
+      fe_mapping = std::make_shared<FE_PyramidP<dim>>(1);
     }
   else
     Assert(false, ExcNotImplemented());

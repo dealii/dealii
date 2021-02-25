@@ -91,7 +91,7 @@ test(const FiniteElement<dim, spacedim> &fe, const unsigned int n_components)
 
   solution.reinit(owned_dofs, locally_relevant_dofs, comm);
 
-  MappingFE<dim> mapping(Simplex::FE_P<dim>(1));
+  MappingFE<dim> mapping(FE_SimplexP<dim>(1));
 
   VectorTools::interpolate(mapping,
                            dof_handler,
@@ -149,18 +149,16 @@ main(int argc, char **argv)
 
   {
     const unsigned int dim = 2;
-    test<dim>(Simplex::FE_P<dim>(2), 1);
-    test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2), dim), dim);
-    test<dim>(
-      FESystem<dim>(Simplex::FE_P<dim>(2), dim, Simplex::FE_P<dim>(1), 1),
-      dim + 1);
+    test<dim>(FE_SimplexP<dim>(2), 1);
+    test<dim>(FESystem<dim>(FE_SimplexP<dim>(2), dim), dim);
+    test<dim>(FESystem<dim>(FE_SimplexP<dim>(2), dim, FE_SimplexP<dim>(1), 1),
+              dim + 1);
   }
   {
     const unsigned int dim = 3;
-    test<dim>(Simplex::FE_P<dim>(2), 1);
-    test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2), dim), dim);
-    test<dim>(
-      FESystem<dim>(Simplex::FE_P<dim>(2), dim, Simplex::FE_P<dim>(1), 1),
-      dim + 1);
+    test<dim>(FE_SimplexP<dim>(2), 1);
+    test<dim>(FESystem<dim>(FE_SimplexP<dim>(2), dim), dim);
+    test<dim>(FESystem<dim>(FE_SimplexP<dim>(2), dim, FE_SimplexP<dim>(1), 1),
+              dim + 1);
   }
 }

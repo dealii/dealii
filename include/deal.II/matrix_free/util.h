@@ -40,8 +40,8 @@ namespace internal
     {
       if (dim == 2 || dim == 3)
         for (unsigned int i = 1; i <= 3; ++i)
-          if (quad == Simplex::QGauss<dim>(i))
-            return Simplex::QGauss<dim - 1>(i);
+          if (quad == QGaussSimplex<dim>(i))
+            return QGaussSimplex<dim - 1>(i);
 
       AssertThrow(false, ExcNotImplemented());
 
@@ -56,9 +56,9 @@ namespace internal
       if (dim == 2 || dim == 3)
         {
           for (unsigned int i = 1; i <= 4; ++i)
-            if (quad == Simplex::QGauss<dim>(i))
+            if (quad == QGaussSimplex<dim>(i))
               {
-                Simplex::QGauss<dim - 1> tri(i);
+                QGaussSimplex<dim - 1> tri(i);
 
                 if (dim == 2)
                   return {ReferenceCells::Triangle,
@@ -69,9 +69,9 @@ namespace internal
               }
 
           for (unsigned int i = 1; i <= 5; ++i)
-            if (quad == Simplex::QWitherdenVincent<dim>(i))
+            if (quad == QWitherdenVincent<dim>(i))
               {
-                Simplex::QWitherdenVincent<dim - 1> tri(i);
+                QWitherdenVincent<dim - 1> tri(i);
 
                 if (dim == 2)
                   return {ReferenceCells::Triangle,
@@ -84,10 +84,10 @@ namespace internal
 
       if (dim == 3)
         for (unsigned int i = 1; i <= 3; ++i)
-          if (quad == Simplex::QGaussWedge<dim>(i))
+          if (quad == QGaussWedge<dim>(i))
             {
-              QGauss<dim - 1>          quad(i);
-              Simplex::QGauss<dim - 1> tri(i);
+              QGauss<dim - 1>        quad(i);
+              QGaussSimplex<dim - 1> tri(i);
 
               return {
                 ReferenceCells::Wedge,
@@ -96,10 +96,10 @@ namespace internal
 
       if (dim == 3)
         for (unsigned int i = 1; i <= 2; ++i)
-          if (quad == Simplex::QGaussPyramid<dim>(i))
+          if (quad == QGaussPyramid<dim>(i))
             {
-              QGauss<dim - 1>          quad(i);
-              Simplex::QGauss<dim - 1> tri(i);
+              QGauss<dim - 1>        quad(i);
+              QGaussSimplex<dim - 1> tri(i);
 
               return {
                 ReferenceCells::Pyramid,

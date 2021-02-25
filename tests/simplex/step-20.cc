@@ -16,11 +16,11 @@
 
 // Step-20 on a simplex mesh. Following modifications had to be made:
 //  - Create a hypercube with simplices
-//  - Change the FE_RT elements to Simplex::FE_P (2nd degree) and FE_DGQ to
-//  Simplex::FE_DGP (1st degree)
+//  - Change the FE_RT elements to FE_SimplexP (2nd degree) and FE_DGQ to
+//  FE_SimplexDGP (1st degree)
 //    These spaces are an alternative to solve the mixed Laplacian
 //    (https://link.springer.com/article/10.1007/s10092-009-0009-6)
-//  - Change QGauss to Simplex::QGauss and use MappingFE instead of default
+//  - Change QGauss to QGaussSimplex and use MappingFE instead of default
 //  mapping.
 
 
@@ -215,9 +215,9 @@ namespace Step20
   template <int dim>
   MixedLaplaceProblem<dim>::MixedLaplaceProblem(const unsigned int degree)
     : degree(degree)
-    , fe(FESystem<dim>(Simplex::FE_P<dim>(degree), dim),
+    , fe(FESystem<dim>(FE_SimplexP<dim>(degree), dim),
          1,
-         Simplex::FE_DGP<dim>(degree - 1),
+         FE_SimplexDGP<dim>(degree - 1),
          1)
     , dof_handler(triangulation)
   {}
@@ -273,9 +273,9 @@ namespace Step20
   void
   MixedLaplaceProblem<dim>::assemble_system()
   {
-    Simplex::QGauss<dim>     quadrature_formula(degree + 1);
-    Simplex::QGauss<dim - 1> face_quadrature_formula(degree + 1);
-    MappingFE<dim>           mapping(Simplex::FE_DGP<dim>(1));
+    QGaussSimplex<dim>     quadrature_formula(degree + 1);
+    QGaussSimplex<dim - 1> face_quadrature_formula(degree + 1);
+    MappingFE<dim>         mapping(FE_SimplexDGP<dim>(1));
 
     FEValues<dim>     fe_values(mapping,
                             fe,
@@ -436,7 +436,7 @@ namespace Step20
 
     QTrapezoid<1>  q_trapez;
     QIterated<dim> quadrature(q_trapez, degree + 2);
-    MappingFE<dim> mapping(Simplex::FE_DGP<dim>(1));
+    MappingFE<dim> mapping(FE_SimplexDGP<dim>(1));
 
     VectorTools::integrate_difference(mapping,
                                       dof_handler,
@@ -472,7 +472,7 @@ namespace Step20
   void
   MixedLaplaceProblem<dim>::output_results() const
   {
-    MappingFE<dim>           mapping(Simplex::FE_DGP<dim>(1));
+    MappingFE<dim>           mapping(FE_SimplexDGP<dim>(1));
     std::vector<std::string> solution_names(dim, "u");
     solution_names.emplace_back("p");
     std::vector<DataComponentInterpretation::DataComponentInterpretation>

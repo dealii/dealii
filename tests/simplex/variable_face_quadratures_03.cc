@@ -72,12 +72,12 @@ test<2>()
 
   // test FEFaceValues for FE_System(FE_P)
   {
-    const hp::QCollection<dim - 1> quad_ref(Simplex::QGauss<dim - 1>(1),
-                                            Simplex::QGauss<dim - 1>(2),
-                                            Simplex::QGauss<dim - 1>(3));
+    const hp::QCollection<dim - 1> quad_ref(QGaussSimplex<dim - 1>(1),
+                                            QGaussSimplex<dim - 1>(2),
+                                            QGaussSimplex<dim - 1>(3));
 
-    MappingFE<dim> mapping(Simplex::FE_P<dim>(1));
-    FESystem<dim>  fe(Simplex::FE_P<dim>{2}, dim);
+    MappingFE<dim> mapping(FE_SimplexP<dim>(1));
+    FESystem<dim>  fe(FE_SimplexP<dim>{2}, dim);
 
     const UpdateFlags flags = mapping.requires_update_flags(
       update_values | update_quadrature_points | update_JxW_values);
@@ -125,13 +125,13 @@ test<3>()
 
   // test FEFaceValues for FE_System(FE_P)
   {
-    const hp::QCollection<dim - 1> quad_ref(Simplex::QGauss<dim - 1>(1),
-                                            Simplex::QGauss<dim - 1>(2),
-                                            Simplex::QGauss<dim - 1>(3),
-                                            Simplex::QGauss<dim - 1>(1));
+    const hp::QCollection<dim - 1> quad_ref(QGaussSimplex<dim - 1>(1),
+                                            QGaussSimplex<dim - 1>(2),
+                                            QGaussSimplex<dim - 1>(3),
+                                            QGaussSimplex<dim - 1>(1));
 
-    MappingFE<dim> mapping(Simplex::FE_P<dim>(1));
-    FESystem<dim>  fe(Simplex::FE_P<dim>{2}, dim);
+    MappingFE<dim> mapping(FE_SimplexP<dim>(1));
+    FESystem<dim>  fe(FE_SimplexP<dim>{2}, dim);
 
     const UpdateFlags flags = mapping.requires_update_flags(
       update_values | update_quadrature_points | update_JxW_values);

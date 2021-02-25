@@ -65,13 +65,11 @@ main()
 
     test<dim>({0, 0},
               {0, 1},
-              hp::FECollection<dim>(Simplex::FE_P<dim>(2),
-                                    Simplex::FE_P<dim>(1)),
+              hp::FECollection<dim>(FE_SimplexP<dim>(2), FE_SimplexP<dim>(1)),
               subdivided_hyper_cube_with_simplices);
     test<dim>({0, 0},
               {0, 1},
-              hp::FECollection<dim>(Simplex::FE_P<dim>(1),
-                                    Simplex::FE_P<dim>(2)),
+              hp::FECollection<dim>(FE_SimplexP<dim>(1), FE_SimplexP<dim>(2)),
               subdivided_hyper_cube_with_simplices);
   }
   deallog.pop();

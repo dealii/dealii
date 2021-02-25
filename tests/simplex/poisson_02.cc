@@ -185,14 +185,14 @@ public:
       unsigned int initial_refinement,
       unsigned int number_refinement)
   {
-    return std::make_unique<DGHeat<dim>>(
-      false,
-      new Simplex::FE_DGP<dim>(degree),
-      new MappingFE<dim>(Simplex::FE_P<dim>(1)),
-      new Simplex::QGauss<dim>(degree + 1),
-      new Simplex::QGauss<dim - 1>(degree + 1),
-      initial_refinement,
-      number_refinement);
+    return std::make_unique<DGHeat<dim>>(false,
+                                         new FE_SimplexDGP<dim>(degree),
+                                         new MappingFE<dim>(
+                                           FE_SimplexP<dim>(1)),
+                                         new QGaussSimplex<dim>(degree + 1),
+                                         new QGaussSimplex<dim - 1>(degree + 1),
+                                         initial_refinement,
+                                         number_refinement);
   }
 
 

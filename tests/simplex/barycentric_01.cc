@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Test Simplex::BarycentricPolynomial and Simplex::BarycentricPolynomials.
+// Test BarycentricPolynomial and BarycentricPolynomials.
 
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomials_barycentric.h>
@@ -33,14 +33,14 @@ main()
 {
   initlog();
 
-  Simplex::BarycentricPolynomial<2> bp2({1, 0, 0}, 1.0);
+  BarycentricPolynomial<2> bp2({1, 0, 0}, 1.0);
   deallog << bp2 << std::endl;
 
   // test some basic algebra with barycentric polynomials
   {
     deallog << "1D:" << std::endl;
-    const auto bp1_0 = Simplex::BarycentricPolynomial<1>::monomial(0);
-    const auto bp1_1 = Simplex::BarycentricPolynomial<1>::monomial(1);
+    const auto bp1_0 = BarycentricPolynomial<1>::monomial(0);
+    const auto bp1_1 = BarycentricPolynomial<1>::monomial(1);
 
     deallog << "bp1_0 = " << bp1_0 << std::endl;
     deallog << "bp1_1 = " << bp1_1 << std::endl;
@@ -50,13 +50,13 @@ main()
 
   {
     deallog << std::endl << "2D:" << std::endl;
-    const auto bp2_0 = Simplex::BarycentricPolynomial<2>::monomial(0) * 2;
+    const auto bp2_0 = BarycentricPolynomial<2>::monomial(0) * 2;
     deallog << "bp2_0 = " << bp2_0 << std::endl;
 
-    const auto bp2_1 = 3.0 * Simplex::BarycentricPolynomial<2>::monomial(1);
+    const auto bp2_1 = 3.0 * BarycentricPolynomial<2>::monomial(1);
     deallog << "bp2_1 = " << bp2_1 << std::endl;
 
-    const auto bp2_2 = Simplex::BarycentricPolynomial<2>::monomial(2);
+    const auto bp2_2 = BarycentricPolynomial<2>::monomial(2);
     deallog << "bp2_2 = " << bp2_2 << std::endl;
 
     const auto prod1 = bp2_0 + bp2_1;
@@ -81,11 +81,11 @@ main()
   {
     deallog << std::endl << "Test with TRI6" << std::endl;
 
-    const auto t1 = Simplex::BarycentricPolynomial<2>::monomial(0);
-    const auto t2 = Simplex::BarycentricPolynomial<2>::monomial(1);
-    const auto t3 = Simplex::BarycentricPolynomial<2>::monomial(2);
+    const auto t1 = BarycentricPolynomial<2>::monomial(0);
+    const auto t2 = BarycentricPolynomial<2>::monomial(1);
+    const auto t3 = BarycentricPolynomial<2>::monomial(2);
 
-    std::vector<Simplex::BarycentricPolynomial<2>> p2;
+    std::vector<BarycentricPolynomial<2>> p2;
     p2.push_back(t1 * (2 * t1 - 1));
     p2.push_back(t2 * (2 * t2 - 1));
     p2.push_back(t3 * (2 * t3 - 1));
@@ -93,7 +93,7 @@ main()
     p2.push_back(4 * t2 * t3);
     p2.push_back(4 * t3 * t1);
 
-    Simplex::FE_P<2> fe(2);
+    FE_SimplexP<2> fe(2);
     for (unsigned int i = 0; i < 6; ++i)
       {
         deallog << "p = " << p2[i] << std::endl;
@@ -111,10 +111,10 @@ main()
 
   {
     deallog << std::endl << "Test with TET4" << std::endl;
-    const auto tet4 = Simplex::BarycentricPolynomials<3>::get_fe_p_basis(1);
+    const auto tet4 = BarycentricPolynomials<3>::get_fe_p_basis(1);
 
-    Simplex::FE_P<3> fe(1);
-    const auto &     points = fe.get_unit_support_points();
+    FE_SimplexP<3> fe(1);
+    const auto &   points = fe.get_unit_support_points();
     for (unsigned int i = 0; i < 4; ++i)
       {
         Assert(points.size() == 4, ExcInternalError());
@@ -142,10 +142,10 @@ main()
 
   {
     deallog << "Test with TET10" << std::endl;
-    const auto tet10 = Simplex::BarycentricPolynomials<3>::get_fe_p_basis(2);
+    const auto tet10 = BarycentricPolynomials<3>::get_fe_p_basis(2);
 
-    Simplex::FE_P<3> fe(2);
-    const auto &     points = fe.get_unit_support_points();
+    FE_SimplexP<3> fe(2);
+    const auto &   points = fe.get_unit_support_points();
     for (unsigned int i = 0; i < 10; ++i)
       {
         Assert(points.size() == 10, ExcInternalError());

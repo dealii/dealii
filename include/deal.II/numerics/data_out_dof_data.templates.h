@@ -261,7 +261,7 @@ namespace internal
                   generate_simplex_evaluation_points<dim>(n_subdivisions));
               else
                 quadrature_simplex = std::make_unique<Quadrature<dim>>(
-                  Simplex::FE_P<dim, spacedim>(n_subdivisions)
+                  FE_SimplexP<dim, spacedim>(n_subdivisions)
                     .get_unit_support_points());
             }
 
@@ -275,7 +275,7 @@ namespace internal
           if (needs_wedge_setup)
             {
               quadrature_wedge = std::make_unique<Quadrature<dim>>(
-                Simplex::FE_WedgeP<dim, spacedim>(
+                FE_WedgeP<dim, spacedim>(
                   1 /*note: vtk only supports linear wedges*/)
                   .get_unit_support_points());
             }

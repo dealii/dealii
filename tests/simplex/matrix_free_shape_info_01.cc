@@ -15,7 +15,7 @@
 
 
 
-// Test ShapeData for Simplex::FE_P and Simplex::QGauss
+// Test ShapeData for FE_SimplexP and QGaussSimplex
 
 #include <deal.II/base/quadrature_lib.h>
 
@@ -124,9 +124,9 @@ test(const FiniteElement<dim, spacedim> &fe)
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
 
-  MappingFE<dim> mapping(Simplex::FE_P<dim>(1));
+  MappingFE<dim> mapping(FE_SimplexP<dim>(1));
 
-  Simplex::QGauss<dim> quadrature(1);
+  QGaussSimplex<dim> quadrature(1);
 
   internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info(quadrature, fe);
 
@@ -193,5 +193,5 @@ main()
 {
   initlog();
 
-  test<2>(Simplex::FE_P<2>(2));
+  test<2>(FE_SimplexP<2>(2));
 }

@@ -60,9 +60,9 @@ template <int dim, int spacedim = dim>
 void
 test()
 {
-  Simplex::FE_P<dim, spacedim> fe_coarse(1);
-  Simplex::FE_P<dim, spacedim> fe_fine(2);
-  MappingFE<dim>               mapping(Simplex::FE_P<dim>(1));
+  FE_SimplexP<dim, spacedim> fe_coarse(1);
+  FE_SimplexP<dim, spacedim> fe_fine(2);
+  MappingFE<dim>             mapping(FE_SimplexP<dim>(1));
 
   FullMatrix<double> matrix(fe_fine.n_dofs_per_cell(),
                             fe_coarse.n_dofs_per_cell());

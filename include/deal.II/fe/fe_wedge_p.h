@@ -24,117 +24,114 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace Simplex
+/**
+ * Base class of FE_WedgeP and FE_WedgeDGP.
+ *
+ * @note Only implemented for 3D.
+ *
+ * @ingroup simplex
+ */
+template <int dim, int spacedim = dim>
+class FE_Wedge : public dealii::FE_Poly<dim, spacedim>
 {
+public:
   /**
-   * Base class of FE_WedgeP and FE_WedgeDGP.
-   *
-   * @note Only implemented for 3D.
-   *
-   * @ingroup simplex
+   * Constructor.
    */
-  template <int dim, int spacedim = dim>
-  class FE_Wedge : public dealii::FE_Poly<dim, spacedim>
-  {
-  public:
-    /**
-     * Constructor.
-     */
-    FE_Wedge(const unsigned int                                degree,
-             const internal::GenericDoFsPerObject &            dpos,
-             const typename FiniteElementData<dim>::Conformity conformity);
-  };
+  FE_Wedge(const unsigned int                                degree,
+           const internal::GenericDoFsPerObject &            dpos,
+           const typename FiniteElementData<dim>::Conformity conformity);
+};
 
+/**
+ * Implementation of a scalar Lagrange finite element on a wedge that yields
+ * the finite element space of continuous, piecewise polynomials of
+ * degree $k$.
+ *
+ * @ingroup simplex
+ */
+template <int dim, int spacedim = dim>
+class FE_WedgeP : public FE_Wedge<dim, spacedim>
+{
+public:
   /**
-   * Implementation of a scalar Lagrange finite element on a wedge that yields
-   * the finite element space of continuous, piecewise polynomials of
-   * degree $k$.
-   *
-   * @ingroup simplex
+   * Constructor.
    */
-  template <int dim, int spacedim = dim>
-  class FE_WedgeP : public FE_Wedge<dim, spacedim>
-  {
-  public:
-    /**
-     * Constructor.
-     */
-    FE_WedgeP(const unsigned int degree);
-
-    /**
-     * @copydoc dealii::FiniteElement::clone()
-     */
-    std::unique_ptr<FiniteElement<dim, spacedim>>
-    clone() const override;
-
-    /**
-     * Return a string that uniquely identifies a finite element. This class
-     * returns <tt>Simplex::FE_WedgeP<dim>(degree)</tt>, with @p dim and @p degree
-     * replaced by appropriate values.
-     */
-    std::string
-    get_name() const override;
-
-    /**
-     * @copydoc dealii::FiniteElement::compare_for_domination()
-     */
-    FiniteElementDomination::Domination
-    compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
-                           const unsigned int codim) const override;
-
-    /**
-     * @copydoc dealii::FiniteElement::hp_vertex_dof_identities()
-     */
-    std::vector<std::pair<unsigned int, unsigned int>>
-    hp_vertex_dof_identities(
-      const FiniteElement<dim, spacedim> &fe_other) const override;
-
-    /**
-     * @copydoc dealii::FiniteElement::hp_line_dof_identities()
-     */
-    std::vector<std::pair<unsigned int, unsigned int>>
-    hp_line_dof_identities(
-      const FiniteElement<dim, spacedim> &fe_other) const override;
-
-    /**
-     * @copydoc dealii::FiniteElement::hp_quad_dof_identities()
-     */
-    std::vector<std::pair<unsigned int, unsigned int>>
-    hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other,
-                           const unsigned int face_no = 0) const override;
-  };
+  FE_WedgeP(const unsigned int degree);
 
   /**
-   * Implementation of a scalar Lagrange finite element on a wedge that yields
-   * the finite element space of discontinuous, piecewise polynomials of
-   * degree $k$.
-   *
-   * @ingroup simplex
+   * @copydoc dealii::FiniteElement::clone()
    */
-  template <int dim, int spacedim = dim>
-  class FE_WedgeDGP : public FE_Wedge<dim, spacedim>
-  {
-  public:
-    /**
-     * Constructor.
-     */
-    FE_WedgeDGP(const unsigned int degree);
+  std::unique_ptr<FiniteElement<dim, spacedim>>
+  clone() const override;
 
-    /**
-     * @copydoc dealii::FiniteElement::clone()
-     */
-    std::unique_ptr<FiniteElement<dim, spacedim>>
-    clone() const override;
+  /**
+   * Return a string that uniquely identifies a finite element. This class
+   * returns <tt>FE_WedgeP<dim>(degree)</tt>, with @p dim and @p degree
+   * replaced by appropriate values.
+   */
+  std::string
+  get_name() const override;
 
-    /**
-     * Return a string that uniquely identifies a finite element. This class
-     * returns <tt>Simplex::FE_WedgeDGP<dim>(degree)</tt>, with @p dim and @p degree
-     * replaced by appropriate values.
-     */
-    std::string
-    get_name() const override;
-  };
-} // namespace Simplex
+  /**
+   * @copydoc dealii::FiniteElement::compare_for_domination()
+   */
+  FiniteElementDomination::Domination
+  compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
+                         const unsigned int codim) const override;
+
+  /**
+   * @copydoc dealii::FiniteElement::hp_vertex_dof_identities()
+   */
+  std::vector<std::pair<unsigned int, unsigned int>>
+  hp_vertex_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const override;
+
+  /**
+   * @copydoc dealii::FiniteElement::hp_line_dof_identities()
+   */
+  std::vector<std::pair<unsigned int, unsigned int>>
+  hp_line_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const override;
+
+  /**
+   * @copydoc dealii::FiniteElement::hp_quad_dof_identities()
+   */
+  std::vector<std::pair<unsigned int, unsigned int>>
+  hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other,
+                         const unsigned int face_no = 0) const override;
+};
+
+/**
+ * Implementation of a scalar Lagrange finite element on a wedge that yields
+ * the finite element space of discontinuous, piecewise polynomials of
+ * degree $k$.
+ *
+ * @ingroup simplex
+ */
+template <int dim, int spacedim = dim>
+class FE_WedgeDGP : public FE_Wedge<dim, spacedim>
+{
+public:
+  /**
+   * Constructor.
+   */
+  FE_WedgeDGP(const unsigned int degree);
+
+  /**
+   * @copydoc dealii::FiniteElement::clone()
+   */
+  std::unique_ptr<FiniteElement<dim, spacedim>>
+  clone() const override;
+
+  /**
+   * Return a string that uniquely identifies a finite element. This class
+   * returns <tt>FE_WedgeDGP<dim>(degree)</tt>, with @p dim and @p degree
+   * replaced by appropriate values.
+   */
+  std::string
+  get_name() const override;
+};
 
 DEAL_II_NAMESPACE_CLOSE
 

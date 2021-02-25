@@ -24,117 +24,114 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace Simplex
+/**
+ * Base class of FE_PyramidP and FE_PyramidDGP.
+ *
+ * @note Only implemented for 3D.
+ *
+ * @ingroup simplex
+ */
+template <int dim, int spacedim = dim>
+class FE_Pyramid : public dealii::FE_Poly<dim, spacedim>
 {
+public:
   /**
-   * Base class of FE_PyramidP and FE_PyramidDGP.
-   *
-   * @note Only implemented for 3D.
-   *
-   * @ingroup simplex
+   * Constructor.
    */
-  template <int dim, int spacedim = dim>
-  class FE_Pyramid : public dealii::FE_Poly<dim, spacedim>
-  {
-  public:
-    /**
-     * Constructor.
-     */
-    FE_Pyramid(const unsigned int                                degree,
-               const internal::GenericDoFsPerObject &            dpos,
-               const typename FiniteElementData<dim>::Conformity conformity);
-  };
+  FE_Pyramid(const unsigned int                                degree,
+             const internal::GenericDoFsPerObject &            dpos,
+             const typename FiniteElementData<dim>::Conformity conformity);
+};
 
+/**
+ * Implementation of a scalar Lagrange finite element on a pyramid that yields
+ * the finite element space of continuous, piecewise polynomials of
+ * degree $k$.
+ *
+ * @ingroup simplex
+ */
+template <int dim, int spacedim = dim>
+class FE_PyramidP : public FE_Pyramid<dim, spacedim>
+{
+public:
   /**
-   * Implementation of a scalar Lagrange finite element on a pyramid that yields
-   * the finite element space of continuous, piecewise polynomials of
-   * degree $k$.
-   *
-   * @ingroup simplex
+   * Constructor.
    */
-  template <int dim, int spacedim = dim>
-  class FE_PyramidP : public FE_Pyramid<dim, spacedim>
-  {
-  public:
-    /**
-     * Constructor.
-     */
-    FE_PyramidP(const unsigned int degree);
-
-    /**
-     * @copydoc dealii::FiniteElement::clone()
-     */
-    std::unique_ptr<FiniteElement<dim, spacedim>>
-    clone() const override;
-
-    /**
-     * Return a string that uniquely identifies a finite element. This class
-     * returns <tt>Simplex::FE_PyramidP<dim>(degree)</tt>, with @p dim and @p degree
-     * replaced by appropriate values.
-     */
-    std::string
-    get_name() const override;
-
-    /**
-     * @copydoc dealii::FiniteElement::compare_for_domination()
-     */
-    FiniteElementDomination::Domination
-    compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
-                           const unsigned int codim) const override;
-
-    /**
-     * @copydoc dealii::FiniteElement::hp_vertex_dof_identities()
-     */
-    std::vector<std::pair<unsigned int, unsigned int>>
-    hp_vertex_dof_identities(
-      const FiniteElement<dim, spacedim> &fe_other) const override;
-
-    /**
-     * @copydoc dealii::FiniteElement::hp_line_dof_identities()
-     */
-    std::vector<std::pair<unsigned int, unsigned int>>
-    hp_line_dof_identities(
-      const FiniteElement<dim, spacedim> &fe_other) const override;
-
-    /**
-     * @copydoc dealii::FiniteElement::hp_quad_dof_identities()
-     */
-    std::vector<std::pair<unsigned int, unsigned int>>
-    hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other,
-                           const unsigned int face_no = 0) const override;
-  };
+  FE_PyramidP(const unsigned int degree);
 
   /**
-   * Implementation of a scalar Lagrange finite element on a pyramid that yields
-   * the finite element space of discontinuous, piecewise polynomials of
-   * degree $k$.
-   *
-   * @ingroup simplex
+   * @copydoc dealii::FiniteElement::clone()
    */
-  template <int dim, int spacedim = dim>
-  class FE_PyramidDGP : public FE_Pyramid<dim, spacedim>
-  {
-  public:
-    /**
-     * Constructor.
-     */
-    FE_PyramidDGP(const unsigned int degree);
+  std::unique_ptr<FiniteElement<dim, spacedim>>
+  clone() const override;
 
-    /**
-     * @copydoc dealii::FiniteElement::clone()
-     */
-    std::unique_ptr<FiniteElement<dim, spacedim>>
-    clone() const override;
+  /**
+   * Return a string that uniquely identifies a finite element. This class
+   * returns <tt>FE_PyramidP<dim>(degree)</tt>, with @p dim and @p degree
+   * replaced by appropriate values.
+   */
+  std::string
+  get_name() const override;
 
-    /**
-     * Return a string that uniquely identifies a finite element. This class
-     * returns <tt>Simplex::FE_PyramidDGP<dim>(degree)</tt>, with @p dim and @p degree
-     * replaced by appropriate values.
-     */
-    std::string
-    get_name() const override;
-  };
-} // namespace Simplex
+  /**
+   * @copydoc dealii::FiniteElement::compare_for_domination()
+   */
+  FiniteElementDomination::Domination
+  compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
+                         const unsigned int codim) const override;
+
+  /**
+   * @copydoc dealii::FiniteElement::hp_vertex_dof_identities()
+   */
+  std::vector<std::pair<unsigned int, unsigned int>>
+  hp_vertex_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const override;
+
+  /**
+   * @copydoc dealii::FiniteElement::hp_line_dof_identities()
+   */
+  std::vector<std::pair<unsigned int, unsigned int>>
+  hp_line_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const override;
+
+  /**
+   * @copydoc dealii::FiniteElement::hp_quad_dof_identities()
+   */
+  std::vector<std::pair<unsigned int, unsigned int>>
+  hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other,
+                         const unsigned int face_no = 0) const override;
+};
+
+/**
+ * Implementation of a scalar Lagrange finite element on a pyramid that yields
+ * the finite element space of discontinuous, piecewise polynomials of
+ * degree $k$.
+ *
+ * @ingroup simplex
+ */
+template <int dim, int spacedim = dim>
+class FE_PyramidDGP : public FE_Pyramid<dim, spacedim>
+{
+public:
+  /**
+   * Constructor.
+   */
+  FE_PyramidDGP(const unsigned int degree);
+
+  /**
+   * @copydoc dealii::FiniteElement::clone()
+   */
+  std::unique_ptr<FiniteElement<dim, spacedim>>
+  clone() const override;
+
+  /**
+   * Return a string that uniquely identifies a finite element. This class
+   * returns <tt>FE_PyramidDGP<dim>(degree)</tt>, with @p dim and @p degree
+   * replaced by appropriate values.
+   */
+  std::string
+  get_name() const override;
+};
 
 DEAL_II_NAMESPACE_CLOSE
 
