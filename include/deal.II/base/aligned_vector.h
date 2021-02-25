@@ -387,7 +387,7 @@ namespace internal
    * @relatesalso AlignedVector
    */
   template <typename T>
-  class AlignedVectorCopy : private parallel::ParallelForInteger
+  class AlignedVectorCopy : private dealii::parallel::ParallelForInteger
   {
     static const std::size_t minimum_parallel_grain_size =
       160000 / sizeof(T) + 1;
@@ -454,7 +454,7 @@ namespace internal
    * @relatesalso AlignedVector
    */
   template <typename T>
-  class AlignedVectorMove : private parallel::ParallelForInteger
+  class AlignedVectorMove : private dealii::parallel::ParallelForInteger
   {
     static const std::size_t minimum_parallel_grain_size =
       160000 / sizeof(T) + 1;
@@ -532,7 +532,7 @@ namespace internal
    * @relatesalso AlignedVector
    */
   template <typename T, bool initialize_memory>
-  class AlignedVectorSet : private parallel::ParallelForInteger
+  class AlignedVectorSet : private dealii::parallel::ParallelForInteger
   {
     static const std::size_t minimum_parallel_grain_size =
       160000 / sizeof(T) + 1;
@@ -634,7 +634,8 @@ namespace internal
    * @relatesalso AlignedVector
    */
   template <typename T, bool initialize_memory>
-  class AlignedVectorDefaultInitialize : private parallel::ParallelForInteger
+  class AlignedVectorDefaultInitialize
+    : private dealii::parallel::ParallelForInteger
   {
     static const std::size_t minimum_parallel_grain_size =
       160000 / sizeof(T) + 1;

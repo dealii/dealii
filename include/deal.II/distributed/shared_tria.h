@@ -460,6 +460,73 @@ namespace parallel
 #endif
 } // namespace parallel
 
+
+namespace internal
+{
+  namespace parallel
+  {
+    namespace shared
+    {
+      /**
+       * This class temporarily modifies the subdomain ID of all active cells to
+       * their respective "true" owner.
+       *
+       * The modification only happens on parallel::shared::Triangulation
+       * objects with artificial cells, and persists for the lifetime of an
+       * instantiation of this class.
+       *
+       * The TemporarilyRestoreSubdomainIds class should only be used for
+       * temporary read-only purposes. For example, whenever your implementation
+       * requires to treat artificial cells temporarily as locally relevant to
+       * access their dof indices.
+       *
+       * This class has effect only if artificial cells are allowed. Without
+       * artificial cells, the current subdomain IDs already correspond to the
+       * true subdomain IDs. See the @ref GlossArtificialCell "glossary"
+       * for more information about artificial cells.
+       */
+      template <int dim, int spacedim>
+      class TemporarilyRestoreSubdomainIds : public Subscriptor
+      {
+      public:
+        /**
+         * Constructor.
+         *
+         * Stores the subdomain ID of all active cells if the provided
+         * Triangulation is of type parallel::shared::Triangulation.
+         *
+         * Replaces them by their true subdomain ID equivalent.
+         */
+        TemporarilyRestoreSubdomainIds(
+          const Triangulation<dim, spacedim> &tria);
+
+        /**
+         * Destructor.
+         *
+         * Returns the subdomain ID of all active cells on the
+         * parallel::shared::Triangulation into their previous state.
+         */
+        ~TemporarilyRestoreSubdomainIds();
+
+      private:
+        /**
+         * The modified parallel::shared::Triangulation.
+         */
+        SmartPointer<
+          const dealii::parallel::shared::Triangulation<dim, spacedim>>
+          shared_tria;
+
+        /**
+         * A vector that temporarily stores the subdomain IDs on all active
+         * cells before they have been modified on the
+         * parallel::shared::Triangulation.
+         */
+        std::vector<unsigned int> saved_subdomain_ids;
+      };
+    } // namespace shared
+  }   // namespace parallel
+} // namespace internal
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
