@@ -1406,7 +1406,8 @@ QGaussSimplex<dim>::QGaussSimplex(const unsigned int n_points_1D)
         }
       else if (n_points_1D == 4)
         {
-          Quadrature<dim>::operator=(QWitherdenVincent<dim>(n_points_1D));
+          Quadrature<dim>::operator=(
+            QWitherdenVincentSimplex<dim>(n_points_1D));
         }
     }
   else if (dim == 3)
@@ -1464,7 +1465,8 @@ QGaussSimplex<dim>::QGaussSimplex(const unsigned int n_points_1D)
         }
       else if (n_points_1D == 4)
         {
-          Quadrature<dim>::operator=(QWitherdenVincent<dim>(n_points_1D));
+          Quadrature<dim>::operator=(
+            QWitherdenVincentSimplex<dim>(n_points_1D));
         }
     }
 
@@ -1503,7 +1505,8 @@ namespace
 
 
 template <int dim>
-QWitherdenVincent<dim>::QWitherdenVincent(const unsigned int n_points_1D)
+QWitherdenVincentSimplex<dim>::QWitherdenVincentSimplex(
+  const unsigned int n_points_1D)
   : QSimplex<dim>(Quadrature<dim>())
 {
   Assert(1 <= dim && dim <= 3, ExcNotImplemented());
@@ -1845,8 +1848,8 @@ template class QGaussPyramid<1>;
 template class QGaussPyramid<2>;
 template class QGaussPyramid<3>;
 
-template class QWitherdenVincent<1>;
-template class QWitherdenVincent<2>;
-template class QWitherdenVincent<3>;
+template class QWitherdenVincentSimplex<1>;
+template class QWitherdenVincentSimplex<2>;
+template class QWitherdenVincentSimplex<3>;
 
 DEAL_II_NAMESPACE_CLOSE

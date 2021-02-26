@@ -69,9 +69,9 @@ namespace internal
               }
 
           for (unsigned int i = 1; i <= 5; ++i)
-            if (quad == QWitherdenVincent<dim>(i))
+            if (quad == QWitherdenVincentSimplex<dim>(i))
               {
-                QWitherdenVincent<dim - 1> tri(i);
+                QWitherdenVincentSimplex<dim - 1> tri(i);
 
                 if (dim == 2)
                   return {ReferenceCells::Triangle,

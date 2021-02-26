@@ -34,7 +34,7 @@ DEAL_II_NAMESPACE_OPEN
  * re-numerated to better match the definition of FiniteElement.
  */
 template <int dim>
-class ScalarWedgePolynomial : public ScalarPolynomialsBase<dim>
+class ScalarLagrangePolynomialWedge : public ScalarPolynomialsBase<dim>
 {
 public:
   /**
@@ -48,7 +48,7 @@ public:
    * @note Currently, only linear (degree=1) and quadratic polynomials
    *   (degree=2) are implemented.
    */
-  ScalarWedgePolynomial(const unsigned int degree);
+  ScalarLagrangePolynomialWedge(const unsigned int degree);
 
   /**
    * @copydoc ScalarPolynomialsBase::evaluate()
@@ -145,8 +145,9 @@ private:
 template <int dim>
 template <int order>
 Tensor<order, dim>
-ScalarWedgePolynomial<dim>::compute_derivative(const unsigned int i,
-                                               const Point<dim> & p) const
+ScalarLagrangePolynomialWedge<dim>::compute_derivative(
+  const unsigned int i,
+  const Point<dim> & p) const
 {
   Tensor<order, dim> der;
 

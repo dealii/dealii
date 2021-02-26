@@ -42,7 +42,8 @@ namespace
 
 
 template <int dim>
-ScalarWedgePolynomial<dim>::ScalarWedgePolynomial(const unsigned int degree)
+ScalarLagrangePolynomialWedge<dim>::ScalarLagrangePolynomialWedge(
+  const unsigned int degree)
   : ScalarPolynomialsBase<dim>(degree, compute_n_polynomials_wedge(dim, degree))
   , poly_tri(BarycentricPolynomials<2>::get_fe_p_basis(degree))
   , poly_line(BarycentricPolynomials<1>::get_fe_p_basis(degree))
@@ -88,8 +89,8 @@ namespace
 
 template <int dim>
 double
-ScalarWedgePolynomial<dim>::compute_value(const unsigned int i,
-                                          const Point<dim> & p) const
+ScalarLagrangePolynomialWedge<dim>::compute_value(const unsigned int i,
+                                                  const Point<dim> & p) const
 {
   const auto pair = this->degree() == 1 ? wedge_table_1[i] : wedge_table_2[i];
 
@@ -106,8 +107,8 @@ ScalarWedgePolynomial<dim>::compute_value(const unsigned int i,
 
 template <int dim>
 Tensor<1, dim>
-ScalarWedgePolynomial<dim>::compute_grad(const unsigned int i,
-                                         const Point<dim> & p) const
+ScalarLagrangePolynomialWedge<dim>::compute_grad(const unsigned int i,
+                                                 const Point<dim> & p) const
 {
   const auto pair = this->degree() == 1 ? wedge_table_1[i] : wedge_table_2[i];
 
@@ -131,8 +132,8 @@ ScalarWedgePolynomial<dim>::compute_grad(const unsigned int i,
 
 template <int dim>
 Tensor<2, dim>
-ScalarWedgePolynomial<dim>::compute_grad_grad(const unsigned int i,
-                                              const Point<dim> & p) const
+ScalarLagrangePolynomialWedge<dim>::compute_grad_grad(const unsigned int i,
+                                                      const Point<dim> &p) const
 {
   (void)i;
   (void)p;
@@ -145,7 +146,7 @@ ScalarWedgePolynomial<dim>::compute_grad_grad(const unsigned int i,
 
 template <int dim>
 void
-ScalarWedgePolynomial<dim>::evaluate(
+ScalarLagrangePolynomialWedge<dim>::evaluate(
   const Point<dim> &           unit_point,
   std::vector<double> &        values,
   std::vector<Tensor<1, dim>> &grads,
@@ -171,8 +172,9 @@ ScalarWedgePolynomial<dim>::evaluate(
 
 template <int dim>
 Tensor<1, dim>
-ScalarWedgePolynomial<dim>::compute_1st_derivative(const unsigned int i,
-                                                   const Point<dim> & p) const
+ScalarLagrangePolynomialWedge<dim>::compute_1st_derivative(
+  const unsigned int i,
+  const Point<dim> & p) const
 {
   return compute_grad(i, p);
 }
@@ -181,8 +183,9 @@ ScalarWedgePolynomial<dim>::compute_1st_derivative(const unsigned int i,
 
 template <int dim>
 Tensor<2, dim>
-ScalarWedgePolynomial<dim>::compute_2nd_derivative(const unsigned int i,
-                                                   const Point<dim> & p) const
+ScalarLagrangePolynomialWedge<dim>::compute_2nd_derivative(
+  const unsigned int i,
+  const Point<dim> & p) const
 {
   (void)i;
   (void)p;
@@ -196,8 +199,9 @@ ScalarWedgePolynomial<dim>::compute_2nd_derivative(const unsigned int i,
 
 template <int dim>
 Tensor<3, dim>
-ScalarWedgePolynomial<dim>::compute_3rd_derivative(const unsigned int i,
-                                                   const Point<dim> & p) const
+ScalarLagrangePolynomialWedge<dim>::compute_3rd_derivative(
+  const unsigned int i,
+  const Point<dim> & p) const
 {
   (void)i;
   (void)p;
@@ -211,8 +215,9 @@ ScalarWedgePolynomial<dim>::compute_3rd_derivative(const unsigned int i,
 
 template <int dim>
 Tensor<4, dim>
-ScalarWedgePolynomial<dim>::compute_4th_derivative(const unsigned int i,
-                                                   const Point<dim> & p) const
+ScalarLagrangePolynomialWedge<dim>::compute_4th_derivative(
+  const unsigned int i,
+  const Point<dim> & p) const
 {
   (void)i;
   (void)p;
@@ -226,24 +231,24 @@ ScalarWedgePolynomial<dim>::compute_4th_derivative(const unsigned int i,
 
 template <int dim>
 std::string
-ScalarWedgePolynomial<dim>::name() const
+ScalarLagrangePolynomialWedge<dim>::name() const
 {
-  return "ScalarWedgePolynomial";
+  return "ScalarLagrangePolynomialWedge";
 }
 
 
 
 template <int dim>
 std::unique_ptr<ScalarPolynomialsBase<dim>>
-ScalarWedgePolynomial<dim>::clone() const
+ScalarLagrangePolynomialWedge<dim>::clone() const
 {
-  return std::make_unique<ScalarWedgePolynomial<dim>>(*this);
+  return std::make_unique<ScalarLagrangePolynomialWedge<dim>>(*this);
 }
 
 
 
-template class ScalarWedgePolynomial<1>;
-template class ScalarWedgePolynomial<2>;
-template class ScalarWedgePolynomial<3>;
+template class ScalarLagrangePolynomialWedge<1>;
+template class ScalarLagrangePolynomialWedge<2>;
+template class ScalarLagrangePolynomialWedge<3>;
 
 DEAL_II_NAMESPACE_CLOSE

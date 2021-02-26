@@ -1539,8 +1539,9 @@ ReferenceCell::d_linear_shape_function(const Point<dim> & xi,
         }
     }
 
-  if (*this == ReferenceCells::Wedge) // see also
-                                      // ScalarWedgePolynomial::compute_value
+  if (*this ==
+      ReferenceCells::Wedge) // see also
+                             // ScalarLagrangePolynomialWedge::compute_value
     {
       return ReferenceCell(ReferenceCells::Triangle)
                .d_linear_shape_function<2>(Point<2>(xi[std::min(0, dim - 1)],
@@ -1553,7 +1554,7 @@ ReferenceCell::d_linear_shape_function(const Point<dim> & xi,
 
   if (*this ==
       ReferenceCells::Pyramid) // see also
-                               // ScalarPyramidPolynomial::compute_value
+                               // ScalarLagrangePolynomialPyramid::compute_value
     {
       const double Q14 = 0.25;
       double       ration;
