@@ -96,7 +96,7 @@ namespace MGTransferGlobalCoarseningTools
    * @note Currently, only implemented for parallel::distributed::Triangulation.
    */
   template <int dim, int spacedim>
-  std::vector<std::shared_ptr<Triangulation<dim, spacedim>>>
+  std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
   create_geometric_coarsening_sequence(
     const Triangulation<dim, spacedim> &tria);
 
