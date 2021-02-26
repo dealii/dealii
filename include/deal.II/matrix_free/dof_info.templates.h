@@ -1310,13 +1310,17 @@ namespace internal
           const std::function<void(
             const std::function<void(
               const unsigned int, const unsigned int, const bool)> &)> &loop) {
-          bool all_nodal = true;
+          bool all_nodal_and_tensorial = true;
           for (unsigned int c = 0; c < n_base_elements; ++c)
-            if (!shape_info(global_base_element_offset + c, 0)
-                   .data.front()
-                   .nodal_at_cell_boundaries)
-              all_nodal = false;
-          if (all_nodal == false)
+            {
+              const auto &si =
+                shape_info(global_base_element_offset + c, 0).data.front();
+              if (!si.nodal_at_cell_boundaries ||
+                  (si.element_type ==
+                   internal::MatrixFreeFunctions::ElementType::tensor_none))
+                all_nodal_and_tensorial = false;
+            }
+          if (all_nodal_and_tensorial == false)
             vector_partitioner_values = vector_partitioner;
           else
             {
