@@ -156,8 +156,10 @@ public:
     const LinearAlgebra::distributed::Vector<Number> &src) const override;
 
   /**
-   * Restrict fine-mesh field @p src to each multigrid level in @p dof_handler and
-   * store the result in @p dst.
+   * Interpolate fine-mesh field @p src to each multigrid level in
+   * @p dof_handler and store the result in @p dst. This function is different
+   * from restriction, where a weighted residual is
+   * transferred to a coarser level (transposition of prolongation matrix).
    *
    * The argument @p dst has to be initialized with the correct size according
    * to the number of levels of the triangulation.

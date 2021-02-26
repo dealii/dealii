@@ -122,6 +122,15 @@ public:
    */
   void
   restrict_and_add(VectorType &dst, const VectorType &src) const;
+
+  /**
+   * Perform interpolation of a solution vector from the fine level to the
+   * coarse level. This function is different from restriction, where a
+   * weighted residual is transferred to a coarser level (transposition of
+   * prolongation matrix).
+   */
+  void
+  interpolate(VectorType &dst, const VectorType &src) const;
 };
 
 
@@ -184,6 +193,16 @@ public:
   restrict_and_add(LinearAlgebra::distributed::Vector<Number> &      dst,
                    const LinearAlgebra::distributed::Vector<Number> &src) const;
 
+  /**
+   * Perform interpolation of a solution vector from the fine level to the
+   * coarse level. This function is different from restriction, where a
+   * weighted residual is transferred to a coarser level (transposition of
+   * prolongation matrix).
+   */
+  void
+  interpolate(LinearAlgebra::distributed::Vector<Number> &      dst,
+              const LinearAlgebra::distributed::Vector<Number> &src) const;
+
 private:
   /**
    * A multigrid transfer scheme. A multrigrid transfer class can have different
@@ -240,6 +259,16 @@ private:
      * 1D prolongation matrix for tensor-product elements.
      */
     AlignedVector<VectorizedArray<Number>> prolongation_matrix_1d;
+
+    /**
+     * Restriction matrix for non-tensor-product elements.
+     */
+    AlignedVector<VectorizedArray<Number>> restriction_matrix;
+
+    /**
+     * 1D restriction matrix for tensor-product elements.
+     */
+    AlignedVector<VectorizedArray<Number>> restriction_matrix_1d;
 
     /**
      * DoF indices of the coarse cells, expressed in indices local to the MPI
@@ -366,6 +395,26 @@ public:
                OutVector &                      dst,
                const MGLevelObject<VectorType> &src) const;
 
+  /**
+   * Interpolate fine-mesh field @p src to each multigrid level in
+   * @p dof_handler and store the result in @p dst. This function is different
+   * from restriction, where a weighted residual is
+   * transferred to a coarser level (transposition of prolongation matrix).
+   *
+   * The argument @p dst has to be initialized with the correct size according
+   * to the number of levels of the triangulation.
+   *
+   * If an inner vector of @p dst is empty or has incorrect locally owned size,
+   * it will be resized to locally relevant degrees of freedom on each level.
+   *
+   * @note DoFHandler is not needed here, but is required by the interface.
+   */
+  template <class InVector, int spacedim>
+  void
+  interpolate_to_mg(const DoFHandler<dim, spacedim> &dof_handler,
+                    MGLevelObject<VectorType> &      dst,
+                    const InVector &                 src) const;
+
 private:
   /**
    * Collection of the two-level transfer operators.
@@ -451,6 +500,33 @@ MGTransferGlobalCoarsening<dim, VectorType>::copy_from_mg(
   (void)dof_handler;
 
   dst.copy_locally_owned_data_from(src[src.max_level()]);
+}
+
+
+
+template <int dim, typename VectorType>
+template <class InVector, int spacedim>
+void
+MGTransferGlobalCoarsening<dim, VectorType>::interpolate_to_mg(
+  const DoFHandler<dim, spacedim> &dof_handler,
+  MGLevelObject<VectorType> &      dst,
+  const InVector &                 src) const
+{
+  (void)dof_handler;
+
+  const unsigned int min_level = transfer.min_level();
+  const unsigned int max_level = transfer.max_level();
+
+  AssertDimension(min_level, dst.min_level());
+  AssertDimension(max_level, dst.max_level());
+
+  for (unsigned int level = min_level; level <= max_level; ++level)
+    initialize_dof_vector(level, dst[level]);
+
+  dst[transfer.max_level()].copy_locally_owned_data_from(src);
+
+  for (unsigned int l = max_level; l > min_level; --l)
+    this->transfer[l].interpolate(dst[l - 1], dst[l]);
 }
 
 #endif
