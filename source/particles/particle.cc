@@ -215,23 +215,25 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  void
-  Particle<dim, spacedim>::write_data(void *&data) const
+  void *
+  Particle<dim, spacedim>::write_particle_data_to_memory(
+    void *data_pointer) const
   {
-    types::particle_index *id_data = static_cast<types::particle_index *>(data);
-    *id_data                       = get_id();
+    types::particle_index *id_data =
+      static_cast<types::particle_index *>(data_pointer);
+    *id_data = get_id();
     ++id_data;
     double *pdata = reinterpret_cast<double *>(id_data);
 
-    // Write location data
+    // Write location
     for (unsigned int i = 0; i < spacedim; ++i, ++pdata)
       *pdata = get_location()[i];
 
-    // Write reference location data
+    // Write reference location
     for (unsigned int i = 0; i < dim; ++i, ++pdata)
       *pdata = get_reference_location()[i];
 
-    // Write property data
+    // Write properties
     if (has_properties())
       {
         const ArrayView<double> particle_properties =
@@ -240,17 +242,18 @@ namespace Particles
           *pdata = particle_properties[i];
       }
 
-    data = static_cast<void *>(pdata);
+    return static_cast<void *>(pdata);
   }
 
 
 
   template <int dim, int spacedim>
-  void
-  Particle<dim, spacedim>::update_particle_data(const void *&data)
+  const void *
+  Particle<dim, spacedim>::read_particle_data_from_memory(
+    const void *data_pointer)
   {
     const types::particle_index *id_data =
-      static_cast<const types::particle_index *>(data);
+      static_cast<const types::particle_index *>(data_pointer);
     set_id(*id_data++);
     const double *pdata = reinterpret_cast<const double *>(id_data);
 
@@ -274,7 +277,7 @@ namespace Particles
           particle_properties[i] = *pdata++;
       }
 
-    data = static_cast<const void *>(pdata);
+    return static_cast<const void *>(pdata);
   }
 
 

@@ -187,17 +187,18 @@ namespace Particles
      * and later de-serializing the properties by calling the appropriate
      * constructor Particle(void *&data, PropertyPool *property_pool = nullptr);
      *
-     * @param [in,out] data The memory location to write particle data
-     * into. This pointer points to the begin of the memory, in which the
-     * data will be written and it will be advanced by the serialized size
-     * of this particle.
+     * @param [in] data The memory location to write particle data
+     *   into.
+     *
+     * @return A pointer to the next byte after the array to which data has
+     *   been written.
      */
-    void
-    write_data(void *&data) const;
+    void *
+    write_particle_data_to_memory(void *data) const;
 
 
     /**
-     * Update all of the data associated with a particle : id,
+     * Update all of the data associated with a particle: id,
      * location, reference location and, if any, properties by using a
      * data array. The array is expected to be large enough to take the data,
      * and the void pointer should point to the first entry of the array to
@@ -206,13 +207,15 @@ namespace Particles
      * class be built. This is used in the ParticleHandler to update the
      * ghost particles without de-allocating and re-allocating memory.
      *
-     * @param[in,out] data A pointer to a memory location from which
+     * @param[in] data A pointer to a memory location from which
      * to read the information that completely describes a particle. This
-     * class then de-serializes its data from this memory location and
-     * advance the pointer accordingly.
+     * class then de-serializes its data from this memory location.
+     *
+     * @return A pointer to the next byte after the array from which data has
+     *   been read.
      */
-    void
-    update_particle_data(const void *&data);
+    const void *
+    read_particle_data_from_memory(const void *data);
 
     /**
      * Set the location of this particle. Note that this does not check
