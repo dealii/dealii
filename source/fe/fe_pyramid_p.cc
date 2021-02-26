@@ -78,7 +78,7 @@ FE_Pyramid<dim, spacedim>::FE_Pyramid(
   const internal::GenericDoFsPerObject &            dpos,
   const typename FiniteElementData<dim>::Conformity conformity)
   : dealii::FE_Poly<dim, spacedim>(
-      ScalarPyramidPolynomial<dim>(degree),
+      ScalarLagrangePolynomialPyramid<dim>(degree),
       FiniteElementData<dim>(dpos,
                              ReferenceCells::Pyramid,
                              1,

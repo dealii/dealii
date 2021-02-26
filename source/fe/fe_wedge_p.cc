@@ -86,7 +86,7 @@ FE_Wedge<dim, spacedim>::FE_Wedge(
   const internal::GenericDoFsPerObject &            dpos,
   const typename FiniteElementData<dim>::Conformity conformity)
   : dealii::FE_Poly<dim, spacedim>(
-      ScalarWedgePolynomial<dim>(degree),
+      ScalarLagrangePolynomialWedge<dim>(degree),
       FiniteElementData<dim>(dpos,
                              ReferenceCells::Wedge,
                              1,

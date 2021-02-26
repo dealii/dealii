@@ -23,7 +23,7 @@ void
 print(const unsigned int n_points_1D)
 {
   deallog << "n_points_1D = " << n_points_1D << std::endl;
-  const QWitherdenVincent<dim> quad(n_points_1D);
+  const QWitherdenVincentSimplex<dim> quad(n_points_1D);
 
   deallog << "quad size = " << quad.size() << std::endl;
   for (unsigned int q = 0; q < quad.size(); ++q)
@@ -52,8 +52,8 @@ check_accuracy_1D(const unsigned int n_points_1D)
   // component
   monomial_powers[dim - 1] += accuracy - sum;
 
-  const Functions::Monomial<dim> func(monomial_powers);
-  const QWitherdenVincent<dim>   quad(n_points_1D);
+  const Functions::Monomial<dim>      func(monomial_powers);
+  const QWitherdenVincentSimplex<dim> quad(n_points_1D);
 
   deallog << "Monomial powers = " << monomial_powers << std::endl;
   double integrand = 0.0;

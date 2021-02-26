@@ -840,14 +840,14 @@ public:
  * @ingroup simplex
  */
 template <int dim>
-class QWitherdenVincent : public QSimplex<dim>
+class QWitherdenVincentSimplex : public QSimplex<dim>
 {
 public:
   /**
    * Constructor taking the number of quadrature points in 1D direction
    * @p n_points_1D.
    */
-  explicit QWitherdenVincent(const unsigned int n_points_1D);
+  explicit QWitherdenVincentSimplex(const unsigned int n_points_1D);
 };
 
 /**

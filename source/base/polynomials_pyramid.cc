@@ -40,7 +40,8 @@ namespace
 
 
 template <int dim>
-ScalarPyramidPolynomial<dim>::ScalarPyramidPolynomial(const unsigned int degree)
+ScalarLagrangePolynomialPyramid<dim>::ScalarLagrangePolynomialPyramid(
+  const unsigned int degree)
   : ScalarPolynomialsBase<dim>(degree,
                                compute_n_polynomials_pyramid(dim, degree))
 {}
@@ -48,8 +49,8 @@ ScalarPyramidPolynomial<dim>::ScalarPyramidPolynomial(const unsigned int degree)
 
 template <int dim>
 double
-ScalarPyramidPolynomial<dim>::compute_value(const unsigned int i,
-                                            const Point<dim> & p) const
+ScalarLagrangePolynomialPyramid<dim>::compute_value(const unsigned int i,
+                                                    const Point<dim> & p) const
 {
   AssertDimension(dim, 3);
   AssertIndexRange(this->degree(), 2);
@@ -86,8 +87,8 @@ ScalarPyramidPolynomial<dim>::compute_value(const unsigned int i,
 
 template <int dim>
 Tensor<1, dim>
-ScalarPyramidPolynomial<dim>::compute_grad(const unsigned int i,
-                                           const Point<dim> & p) const
+ScalarLagrangePolynomialPyramid<dim>::compute_grad(const unsigned int i,
+                                                   const Point<dim> & p) const
 {
   AssertDimension(dim, 3);
   AssertIndexRange(this->degree(), 4);
@@ -163,8 +164,9 @@ ScalarPyramidPolynomial<dim>::compute_grad(const unsigned int i,
 
 template <int dim>
 Tensor<2, dim>
-ScalarPyramidPolynomial<dim>::compute_grad_grad(const unsigned int i,
-                                                const Point<dim> & p) const
+ScalarLagrangePolynomialPyramid<dim>::compute_grad_grad(
+  const unsigned int i,
+  const Point<dim> & p) const
 {
   (void)i;
   (void)p;
@@ -177,7 +179,7 @@ ScalarPyramidPolynomial<dim>::compute_grad_grad(const unsigned int i,
 
 template <int dim>
 void
-ScalarPyramidPolynomial<dim>::evaluate(
+ScalarLagrangePolynomialPyramid<dim>::evaluate(
   const Point<dim> &           unit_point,
   std::vector<double> &        values,
   std::vector<Tensor<1, dim>> &grads,
@@ -203,8 +205,9 @@ ScalarPyramidPolynomial<dim>::evaluate(
 
 template <int dim>
 Tensor<1, dim>
-ScalarPyramidPolynomial<dim>::compute_1st_derivative(const unsigned int i,
-                                                     const Point<dim> & p) const
+ScalarLagrangePolynomialPyramid<dim>::compute_1st_derivative(
+  const unsigned int i,
+  const Point<dim> & p) const
 {
   return compute_grad(i, p);
 }
@@ -213,8 +216,9 @@ ScalarPyramidPolynomial<dim>::compute_1st_derivative(const unsigned int i,
 
 template <int dim>
 Tensor<2, dim>
-ScalarPyramidPolynomial<dim>::compute_2nd_derivative(const unsigned int i,
-                                                     const Point<dim> & p) const
+ScalarLagrangePolynomialPyramid<dim>::compute_2nd_derivative(
+  const unsigned int i,
+  const Point<dim> & p) const
 {
   (void)i;
   (void)p;
@@ -228,8 +232,9 @@ ScalarPyramidPolynomial<dim>::compute_2nd_derivative(const unsigned int i,
 
 template <int dim>
 Tensor<3, dim>
-ScalarPyramidPolynomial<dim>::compute_3rd_derivative(const unsigned int i,
-                                                     const Point<dim> & p) const
+ScalarLagrangePolynomialPyramid<dim>::compute_3rd_derivative(
+  const unsigned int i,
+  const Point<dim> & p) const
 {
   (void)i;
   (void)p;
@@ -243,8 +248,9 @@ ScalarPyramidPolynomial<dim>::compute_3rd_derivative(const unsigned int i,
 
 template <int dim>
 Tensor<4, dim>
-ScalarPyramidPolynomial<dim>::compute_4th_derivative(const unsigned int i,
-                                                     const Point<dim> & p) const
+ScalarLagrangePolynomialPyramid<dim>::compute_4th_derivative(
+  const unsigned int i,
+  const Point<dim> & p) const
 {
   (void)i;
   (void)p;
@@ -258,24 +264,24 @@ ScalarPyramidPolynomial<dim>::compute_4th_derivative(const unsigned int i,
 
 template <int dim>
 std::string
-ScalarPyramidPolynomial<dim>::name() const
+ScalarLagrangePolynomialPyramid<dim>::name() const
 {
-  return "ScalarPyramidPolynomial";
+  return "ScalarLagrangePolynomialPyramid";
 }
 
 
 
 template <int dim>
 std::unique_ptr<ScalarPolynomialsBase<dim>>
-ScalarPyramidPolynomial<dim>::clone() const
+ScalarLagrangePolynomialPyramid<dim>::clone() const
 {
-  return std::make_unique<ScalarPyramidPolynomial<dim>>(*this);
+  return std::make_unique<ScalarLagrangePolynomialPyramid<dim>>(*this);
 }
 
 
 
-template class ScalarPyramidPolynomial<1>;
-template class ScalarPyramidPolynomial<2>;
-template class ScalarPyramidPolynomial<3>;
+template class ScalarLagrangePolynomialPyramid<1>;
+template class ScalarLagrangePolynomialPyramid<2>;
+template class ScalarLagrangePolynomialPyramid<3>;
 
 DEAL_II_NAMESPACE_CLOSE

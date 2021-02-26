@@ -34,7 +34,7 @@ DEAL_II_NAMESPACE_OPEN
  * FE_PyramidP.
  */
 template <int dim>
-class ScalarPyramidPolynomial : public ScalarPolynomialsBase<dim>
+class ScalarLagrangePolynomialPyramid : public ScalarPolynomialsBase<dim>
 {
 public:
   /**
@@ -47,7 +47,7 @@ public:
    *
    * @note Currently, only linear polynomials (degree=1) are implemented.
    */
-  ScalarPyramidPolynomial(const unsigned int degree);
+  ScalarLagrangePolynomialPyramid(const unsigned int degree);
 
   /**
    * @copydoc ScalarPolynomialsBase::evaluate()
@@ -128,8 +128,9 @@ public:
 template <int dim>
 template <int order>
 Tensor<order, dim>
-ScalarPyramidPolynomial<dim>::compute_derivative(const unsigned int i,
-                                                 const Point<dim> & p) const
+ScalarLagrangePolynomialPyramid<dim>::compute_derivative(
+  const unsigned int i,
+  const Point<dim> & p) const
 {
   Tensor<order, dim> der;
 
