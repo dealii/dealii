@@ -924,6 +924,8 @@ public:
    *
    * This function is really only for internal use in the library unless you
    * absolutely know what this is all about.
+   *
+   * This function queries ReferenceCell::standard_vs_true_line_orientation().
    */
   bool
   line_orientation(const unsigned int line) const;

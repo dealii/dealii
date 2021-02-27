@@ -832,17 +832,20 @@ namespace internal
         Assert(accessor.used(), TriaAccessorExceptions::ExcCellNotUsed());
         AssertIndexRange(line, accessor.n_lines());
 
+        // First pick a face on which this line is a part of, and the
+        // index of the line within.
         const auto pair =
           accessor.reference_cell().standard_line_to_face_and_line_index(line);
         const auto quad_index = pair[0];
-        const auto line_index =
+        const auto line_within_face_index =
           accessor.reference_cell().standard_to_real_face_line(
             pair[1], pair[0], face_orientation_raw(accessor, quad_index));
 
-        return accessor.reference_cell().combine_face_and_line_orientation(
+        // Then query how that line is oriented within that face:
+        return accessor.reference_cell().standard_vs_true_line_orientation(
           pair[1],
           face_orientation_raw(accessor, quad_index),
-          accessor.quad(quad_index)->line_orientation(line_index));
+          accessor.quad(quad_index)->line_orientation(line_within_face_index));
       }
 
 
