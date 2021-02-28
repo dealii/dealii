@@ -1009,6 +1009,21 @@ namespace Utilities
            const unsigned int root_process = 0);
 
     /**
+     * A function that combines values @p local_value from all processes
+     * via a user-specified binary operation @p combiner and distributes the
+     * result back to all processes. As such this function is similar to
+     * MPI_Allreduce (if it were implemented by a global reduction followed
+     * by a broadcast step) but due to the user-specified binary operation also
+     * general object types, including ones that store variable amounts of data,
+     * can be handled.
+     */
+    template <typename T>
+    T
+    all_reduce(const T &                                     local_value,
+               const MPI_Comm &                              comm,
+               const std::function<T(const T &, const T &)> &combiner);
+
+    /**
      * Given a partitioned index set space, compute the owning MPI process rank
      * of each element of a second index set according to the partitioned index
      * set. A natural usage of this function is to compute for each ghosted
