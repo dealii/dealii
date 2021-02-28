@@ -238,19 +238,6 @@ namespace internal
 {
   namespace
   {
-    template <typename MeshType>
-    MPI_Comm
-    get_mpi_comm(const MeshType &mesh)
-    {
-      const auto *tria_parallel = dynamic_cast<
-        const dealii::parallel::TriangulationBase<MeshType::dimension,
-                                                  MeshType::space_dimension> *>(
-        &(mesh.get_triangulation()));
-
-      return tria_parallel != nullptr ? tria_parallel->get_communicator() :
-                                        MPI_COMM_SELF;
-    }
-
     template <int dim>
     unsigned int
     compute_shift_within_children(const unsigned int child,
@@ -516,7 +503,8 @@ namespace internal
     FineDoFHandlerView(const MeshType &mesh_fine, const MeshType &mesh_coarse)
       : mesh_fine(mesh_fine)
       , mesh_coarse(mesh_coarse)
-      , communicator(get_mpi_comm(mesh_fine) /*TODO: fix for different comms*/)
+      , communicator(
+          mesh_fine.get_communicator() /*TODO: fix for different comms*/)
       , cell_id_translator(n_coarse_cells(mesh_fine),
                            n_global_levels(mesh_fine))
     {
@@ -873,7 +861,7 @@ namespace internal
           n_coarse_cells =
             std::max(n_coarse_cells, cell->id().get_coarse_cell_id());
 
-      return Utilities::MPI::max(n_coarse_cells, get_mpi_comm(mesh)) + 1;
+      return Utilities::MPI::max(n_coarse_cells, mesh.get_communicator()) + 1;
     }
 
     static unsigned int
@@ -973,9 +961,10 @@ namespace internal
               std::max(max_active_fe_indices[1], cell->active_fe_index());
           }
 
-      const auto comm = get_mpi_comm(dof_handler_fine);
+      const auto comm = dof_handler_fine.get_communicator();
 
-      Assert(comm == get_mpi_comm(dof_handler_coarse), ExcNotImplemented());
+      Assert(comm == dof_handler_coarse.get_communicator(),
+             ExcNotImplemented());
 
       ArrayView<unsigned int> temp_min(min_active_fe_indices);
       ArrayView<unsigned int> temp_max(max_active_fe_indices);
@@ -1002,10 +991,10 @@ namespace internal
       {
         // ... for fine mesh
         {
-          transfer.partitioner_fine.reset(
-            new Utilities::MPI::Partitioner(view.locally_owned_dofs(),
-                                            view.locally_relevant_dofs(),
-                                            get_mpi_comm(dof_handler_fine)));
+          transfer.partitioner_fine.reset(new Utilities::MPI::Partitioner(
+            view.locally_owned_dofs(),
+            view.locally_relevant_dofs(),
+            dof_handler_fine.get_communicator()));
           transfer.vec_fine.reinit(transfer.partitioner_fine);
         }
 
@@ -1018,7 +1007,7 @@ namespace internal
           transfer.partitioner_coarse.reset(new Utilities::MPI::Partitioner(
             dof_handler_coarse.locally_owned_dofs(),
             locally_relevant_dofs,
-            get_mpi_comm(dof_handler_coarse)));
+            dof_handler_coarse.get_communicator()));
           transfer.vec_coarse.reinit(transfer.partitioner_coarse);
         }
       }
@@ -1324,7 +1313,7 @@ namespace internal
             std::make_shared<Utilities::MPI::Partitioner>(
               dof_handler_fine.locally_owned_dofs(),
               locally_relevant_dofs,
-              get_mpi_comm(dof_handler_fine));
+              dof_handler_fine.get_communicator());
           transfer.vec_fine.reinit(transfer.partitioner_fine);
 
           touch_count_.reinit(partitioner_fine_);
@@ -1487,7 +1476,7 @@ namespace internal
 
       transfer.constraint_coarse.copy_from(constraint_coarse);
 
-      const auto comm = get_mpi_comm(dof_handler_coarse);
+      const auto comm = dof_handler_coarse.get_communicator();
       {
         IndexSet locally_relevant_dofs;
         DoFTools::extract_locally_relevant_dofs(dof_handler_fine,

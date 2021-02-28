@@ -90,7 +90,7 @@ namespace parallel
   {
     std::size_t mem =
       this->dealii::Triangulation<dim, spacedim>::memory_consumption() +
-      MemoryConsumption::memory_consumption(mpi_communicator) +
+      MemoryConsumption::memory_consumption(this->mpi_communicator) +
       MemoryConsumption::memory_consumption(my_subdomain) +
       MemoryConsumption::memory_consumption(
         number_cache.n_global_active_cells) +
@@ -135,7 +135,7 @@ namespace parallel
   }
 
   template <int dim, int spacedim>
-  const MPI_Comm &
+  MPI_Comm
   TriangulationBase<dim, spacedim>::get_communicator() const
   {
     return mpi_communicator;
@@ -170,7 +170,7 @@ namespace parallel
           number_cache.ghost_owners.insert(cell->subdomain_id());
 
       Assert(number_cache.ghost_owners.size() <
-               Utilities::MPI::n_mpi_processes(mpi_communicator),
+               Utilities::MPI::n_mpi_processes(this->mpi_communicator),
              ExcInternalError());
     }
 

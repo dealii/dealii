@@ -96,8 +96,8 @@ namespace parallel
     /**
      * Return MPI communicator used by this triangulation.
      */
-    virtual const MPI_Comm &
-    get_communicator() const;
+    virtual MPI_Comm
+    get_communicator() const override;
 
     /**
      * Return if multilevel hierarchy is supported and has been constructed.
@@ -308,7 +308,7 @@ namespace parallel
      * communicator for this class, which is a duplicate of the one passed to
      * the constructor.
      */
-    MPI_Comm mpi_communicator;
+    const MPI_Comm mpi_communicator;
 
     /**
      * The subdomain id to be used for the current processor. This is the MPI

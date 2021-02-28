@@ -10190,6 +10190,14 @@ Triangulation<dim, spacedim>::clear()
 }
 
 
+template <int dim, int spacedim>
+MPI_Comm
+Triangulation<dim, spacedim>::get_communicator() const
+{
+  return MPI_COMM_SELF;
+}
+
+
 
 template <int dim, int spacedim>
 void
