@@ -1,0 +1,5 @@
+New: A new class GridTools::MarchingCubeAlgorithm has been added. It
+helps to create a surface mesh on the iso line/contour of a scalar field.
+<br>
+(Peter Munch, Magdalena Schreter, Martin Kronbichler, 2021/02/28)
+

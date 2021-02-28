@@ -493,3 +493,11 @@ for (deal_II_dimension : DIMENSIONS)
         unsigned int);
 #endif
   }
+
+for (deal_II_vec : REAL_NONBLOCK_VECTORS; deal_II_dimension : DIMENSIONS)
+  {
+#if deal_II_dimension > 1
+    template class GridTools::MarchingCubeAlgorithm<deal_II_dimension,
+                                                    deal_II_vec>;
+#endif
+  }

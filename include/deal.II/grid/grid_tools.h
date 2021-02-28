@@ -29,6 +29,7 @@
 
 #  include <deal.II/dofs/dof_handler.h>
 
+#  include <deal.II/fe/fe_values.h>
 #  include <deal.II/fe/mapping.h>
 #  include <deal.II/fe/mapping_q1.h>
 
@@ -39,7 +40,11 @@
 
 #  include <deal.II/hp/dof_handler.h>
 
+#  include <deal.II/lac/la_parallel_vector.h>
+#  include <deal.II/lac/la_vector.h>
+#  include <deal.II/lac/petsc_vector.h>
 #  include <deal.II/lac/sparsity_tools.h>
+#  include <deal.II/lac/trilinos_vector.h>
 
 #  include <deal.II/numerics/rtree.h>
 
@@ -3265,6 +3270,130 @@ namespace GridTools
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 #  endif
   };
+
+
+
+  /**
+   * An implementation of the marching-square (2D) and marching-cube algorithm
+   * for creating data structures (vectors of Point and CellData) to
+   * create a linear/bilinear surface mesh on the iso line/contour of a
+   * scalar field.
+   *
+   * To improve the approximation of the iso line/contour and the resulting
+   * linear surface mesh, one increases the number of subdivision so that the
+   * algorithm is not run on a cell but on subcells with vertex values having
+   * been interpolated from the cell values.
+   *
+   * @note The resulting mesh will contain lines in 2D and triangles in 3D.
+   *
+   * @note The resulting mesh will not be of high quality, since it might
+   *   contain cells with very small diameters if the mesh is cut close to a
+   *   vertex.
+   */
+  template <int dim, typename VectorType>
+  class MarchingCubeAlgorithm
+  {
+  public:
+    /**
+     * Value type of vector.
+     */
+    using value_type = typename VectorType::value_type;
+
+    /**
+     * Constructor.
+     */
+    MarchingCubeAlgorithm(const Mapping<dim, dim> &      mapping,
+                          const FiniteElement<dim, dim> &fe,
+                          const unsigned int             n_subdivisions = 1,
+                          const double                   tolerance = 1e-10);
+
+    /**
+     * Process all locally-owned cells and fill @p vertices and @p cells for all
+     * cells that are cut.
+     */
+    void
+    process(const DoFHandler<dim> &         background_dof_handler,
+            const VectorType &              ls_vector,
+            const double                    iso_level,
+            std::vector<Point<dim>> &       vertices,
+            std::vector<CellData<dim - 1>> &cells) const;
+
+    /**
+     * Process the provided cell and fill @p vertices and @p cells for all cells
+     * that are cut.
+     *
+     * @note The resulting vectors are empty if the cell is not cut.
+     */
+    void
+    process_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
+                 const VectorType &              ls_vector,
+                 const double                    iso_level,
+                 std::vector<Point<dim>> &       vertices,
+                 std::vector<CellData<dim - 1>> &cells) const;
+
+  private:
+    /**
+     * Internal function to create a quadrature rule with n_subdivisions+1
+     * equally-positioned quadrature points.
+     */
+    static Quadrature<dim>
+    create_quadrature_rule(const unsigned int n_subdivisions);
+
+    /**
+     * Process a cell.
+     */
+    void
+    process_cell(std::vector<value_type> &       ls_values,
+                 const std::vector<Point<dim>> & points,
+                 const double                    iso_level,
+                 std::vector<Point<dim>> &       vertices,
+                 std::vector<CellData<dim - 1>> &cells) const;
+
+    /**
+     * Process a sub-cell (2D).
+     *
+     * @note Subcells with saddle points are ignored. Please increase the number
+     *   of subdivisions in this case.
+     */
+    void
+    process_sub_cell(const std::vector<value_type> & ls_values,
+                     const std::vector<Point<2>> &   points,
+                     const std::vector<unsigned int> mask,
+                     const double                    iso_level,
+                     std::vector<Point<2>> &         vertices,
+                     std::vector<CellData<1>> &      cells) const;
+
+    /**
+     * Process a sub-cell (3D).
+     */
+    void
+    process_sub_cell(const std::vector<value_type> & ls_values,
+                     const std::vector<Point<3>> &   points,
+                     const std::vector<unsigned int> mask,
+                     const double                    iso_level,
+                     std::vector<Point<3>> &         vertices,
+                     std::vector<CellData<2>> &      cells) const;
+
+    /**
+     * Number of subdivisions each cell is subdivided into in each direction to
+     * improve the approximation.
+     */
+    const unsigned int n_subdivisions;
+
+    /**
+     * Absolute tolerance specifying the minimum distance between a vertex and
+     * the cut point so that a line is considered cut.
+     */
+    const double tolerance;
+
+    /**
+     * FEValues used internally and set up with a quadrature rule with the
+     * correct number of subdivisions.
+     */
+    mutable FEValues<dim> fe_values;
+  };
+
+
 
   /**
    * @name Exceptions
