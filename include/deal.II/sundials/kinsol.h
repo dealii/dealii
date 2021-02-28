@@ -53,7 +53,11 @@ namespace SUNDIALS
    * Interface to SUNDIALS non linear solver (KINSOL).
    *
    * KINSOL is a solver for nonlinear algebraic systems in residual form $F(u)
-   * = 0$ or fixed point form $G(u) = u$. It includes a Newton-Krylov solver
+   * = 0$ or fixed point form $G(u) = u$, where $u$ is a vector which we will
+   * assume to be in ${\mathbb R}^n$ or ${\mathbb C}^n$, but that may also have
+   * a block structure and may be distributed in parallel computations; the
+   * functions $F$ and $G$ satisfy $F,G:{\mathbb R}^N \to{\mathbb R}^N$ or
+   * $F,G:{\mathbb C}^N \to{\mathbb C}^N$. It includes a Newton-Krylov solver
    * as well as Picard and fixed point solvers, both of which can be
    * accelerated with Anderson acceleration. KINSOL is based on the previous
    * Fortran package NKSOL of Brown and Saad.
@@ -474,14 +478,18 @@ namespace SUNDIALS
 
     /**
      * A function object that users need to supply and that is intended to
-     * reinit the given vector.
+     * reinitize the given vector to its correct size, block structure (if
+     * block vectors are used), and MPI communicator (if the vector is
+     * distributed across multiple processors using MPI), along with any
+     * other properties necessary.
      */
     std::function<void(VectorType &)> reinit_vector;
 
     /**
      * A function object that users should supply and that is intended to
-     * compute the residual dst = F(src). This function is only used if the
-     * SolutionStrategy::newton or SolutionStrategy::linesearch are specified.
+     * compute the residual `dst = F(src)`. This function is only used if the
+     * SolutionStrategy::newton or SolutionStrategy::linesearch strategies
+     * were selected.
      *
      * This function should return:
      * - 0: Success
@@ -494,9 +502,10 @@ namespace SUNDIALS
 
     /**
      * A function object that users should supply and that is intended to
-     * compute the iteration function G(u) for the fixed point and Picard
+     * compute the iteration function $G(u)$ for the fixed point and Picard
      * iteration. This function is only used if the
-     * SolutionStrategy::fixed_point or SolutionStrategy::picard are specified.
+     * SolutionStrategy::fixed_point or SolutionStrategy::picard strategies
+     * were selected.
      *
      * This function should return:
      * - 0: Success
@@ -507,7 +516,6 @@ namespace SUNDIALS
      */
     std::function<int(const VectorType &src, VectorType &dst)>
       iteration_function;
-
 
     /**
      * A function object that users may supply and that is intended to
@@ -520,27 +528,32 @@ namespace SUNDIALS
      * SolutionStrategy that has been selected.
      *
      * In the cases strategy = SolutionStrategy::newton or
-     * SolutionStrategy::linesearch, A is the Jacobian $J = \partial F/\partial
-     * u$. If strategy = SolutionStrategy::picard, A is the approximate
-     * Jacobian matrix $L$. If strategy = SolutionStrategy::fixed_point, then
-     * linear systems do not arise, and this function is never called.
+     * SolutionStrategy::linesearch, $A$ is the Jacobian $J = \partial
+     * F/\partial u$. If strategy = SolutionStrategy::picard, $A$ is the
+     * approximate Jacobian matrix $L$. If strategy =
+     * SolutionStrategy::fixed_point, then linear systems do not arise, and this
+     * function is never called.
      *
      * The setup_jacobian() function may call a user-supplied function, or a
      * function within the linear solver module, to compute Jacobian-related
      * data that is required by the linear solver. It may also preprocess that
      * data as needed for solve_jacobian_system(), which may involve calling a
-     * generic function (such as for LU factorization). This data may be
-     * intended either for direct use (in a direct linear solver) or for use in
-     * a preconditioner (in a preconditioned iterative linear solver).
+     * generic function (such as for LU factorization) or, more generally,
+     * build preconditioners from the assembled Jacobian. In any case, the
+     * data so generated may then be used whenever a linear system is solved.
      *
-     * The setup_jacobian() function is not called at every Newton iteration,
+     * The point of this function is that
+     * setup_jacobian() function is not called at every Newton iteration,
      * but only as frequently as the solver determines that it is appropriate
      * to perform the setup task. In this way, Jacobian-related data generated
      * by setup_jacobian() is expected to be used over a number of Newton
-     * iterations.
+     * iterations. KINSOL determines itself when it is beneficial to regenerate
+     * the Jacobian and associated information (such as preconditioners
+     * computed for the Jacobian), thereby saving the effort to regenerate
+     * the Jacobian matrix and a preconditioner for it whenever possible.
      *
-     * @param current_u Current value of u
-     * @param current_f Current value of F(u) or G(u)
+     * @param current_u Current value of $u$
+     * @param current_f Current value of $F(u)$ or $G(u)$
      *
      * This function should return:
      * - 0: Success
@@ -557,10 +570,10 @@ namespace SUNDIALS
      * the Jacobian linear system. This function will be called by KINSOL
      * (possibly several times) after setup_jacobian() has been called at least
      * once. KINSOL tries to do its best to call setup_jacobian() the minimum
-     * amount of times. If convergence can be achieved without updating the
+     * number of times. If convergence can be achieved without updating the
      * Jacobian, then KINSOL does not call setup_jacobian() again. If, on the
      * contrary, internal KINSOL convergence tests fail, then KINSOL calls
-     * again setup_jacobian() with updated vectors and coefficients so that
+     * setup_jacobian() again with updated vectors and coefficients so that
      * successive calls to solve_jacobian_systems() lead to better convergence
      * in the Newton process.
      *
@@ -569,16 +582,17 @@ namespace SUNDIALS
      * converge, or may converge very slowly.
      *
      * A call to this function should store in `dst` the result of $J^{-1}$
-     * applied to `src`, i.e., `J*dst = src`. It is the users responsibility
+     * applied to `rhs`, i.e., `J*dst = rhs`. It is the user's responsibility
      * to set up proper solvers and preconditioners inside this function.
      *
      *
-     * Arguments to the function are
+     * Arguments to the function are:
      *
      * @param[in] ycur  is the current $y$ vector for the current KINSOL
-     * internal step
+     * internal step. In the documentation above, this $y$ vector is generally
+     * denoted by $u$.
      * @param[in] fcur  is the current value of the implicit right-hand side at
-     * ycur, $f_I (t_n, ypred)$.
+     * `ycur`, $f_I (t_n, ypred)$.
      * @param[in] rhs  the system right hand side to solve for
      * @param[out] dst the solution of $A^{-1} * src$
      *
