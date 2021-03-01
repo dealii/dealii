@@ -539,26 +539,26 @@ public:
    * From the Gmsh documentation, the formats of the physical tags follows the
    * following conventions:
    * @code
-   * $PhysicalNames // same as MSH version 2
+   * \$PhysicalNames // same as MSH version 2
    *   numPhysicalNames(ASCII int)
    *   dimension(ASCII int) physicalTag(ASCII int) "name"(127 characters max)
    *   ...
-   * $EndPhysicalNames
+   * \$EndPhysicalNames
    * @endcode
    *
    * For example, the following snippet of mesh file
    * @code
    * MeshFormat
    * 4.1 0 8
-   * $EndMeshFormat
-   * $PhysicalNames
+   * \$EndMeshFormat
+   * \$PhysicalNames
    * 4
    * 1 1 "ManifoldID:0"
    * 1 2 "BoundaryID: -1, ManifoldID: 1"
    * 2 3 "ManifoldID: 1"
    * 2 4 "MaterialID: 2, ManifoldID: 1"
-   * $EndPhysicalNames
-   * $Entities
+   * \$EndPhysicalNames
+   * \$Entities
    * ...
    * @endcode
    *
