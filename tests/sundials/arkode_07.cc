@@ -118,17 +118,9 @@ main(int argc, char **argv)
     return 0;
   };
 
-  ode.solve_linearized_system =
-    [&](SUNDIALS::SundialsOperator<VectorType> &      op,
-        SUNDIALS::SundialsPreconditioner<VectorType> &prec,
-        VectorType &                                  x,
-        const VectorType &                            b,
-        double                                        tol) -> int {
-    ReductionControl     control;
-    SolverCG<VectorType> solver_cg(control);
-    solver_cg.solve(op, x, b, prec);
-    return 0;
-  };
+  ReductionControl     control;
+  SolverCG<VectorType> solver_cg(control);
+  ode.set_linear_solver(solver_cg, control);
 
   ode.jacobian_preconditioner_setup = [&](double            t,
                                           const VectorType &y,

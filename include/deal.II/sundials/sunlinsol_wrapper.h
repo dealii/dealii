@@ -21,6 +21,8 @@
 #ifdef DEAL_II_WITH_SUNDIALS
 #  if DEAL_II_SUNDIALS_VERSION_GTE(4, 0, 0)
 
+#    include <deal.II/lac/solver.h>
+
 #    include <sundials/sundials_linearsolver.h>
 
 #    include <functional>
@@ -167,6 +169,39 @@ namespace SUNDIALS
     {
     public:
       explicit LinearSolverWrapper(LinearSolveFunction<VectorType> lsolve);
+
+      /**
+       * Wrap the given @p solver.
+       */
+      template <typename SolverType>
+      LinearSolverWrapper(SolverType &solver)
+        : LinearSolverWrapper([&](SundialsOperator<VectorType> &      op,
+                                  SundialsPreconditioner<VectorType> &prec,
+                                  VectorType &                        x,
+                                  const VectorType &                  b,
+                                  double                              tol) {
+          (void)tol;
+          solver.solve(op, x, b, prec);
+          return 0;
+        })
+      {}
+
+      /**
+       * Wrap the given @p solver which has a SolverControl @p control. The @p
+       * control will receive updated tolerances directly from SUNDIALS.
+       */
+      template <typename SolverType>
+      LinearSolverWrapper(SolverType &solver, SolverControl &control)
+        : LinearSolverWrapper([&](SundialsOperator<VectorType> &      op,
+                                  SundialsPreconditioner<VectorType> &prec,
+                                  VectorType &                        x,
+                                  const VectorType &                  b,
+                                  double                              tol) {
+          control.set_tolerance(tol);
+          solver.solve(op, x, b, prec);
+          return 0;
+        })
+      {}
 
       ~LinearSolverWrapper();
 

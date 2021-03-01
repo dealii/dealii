@@ -653,6 +653,11 @@ namespace SUNDIALS
                 solve_linearized_system);
             sun_linear_solver = *linear_solver;
           }
+        else if (linear_solver)
+          {
+            // user called set_linear_solver() which already created the wrapper
+            sun_linear_solver = *linear_solver;
+          }
         else
           {
             // use default solver from SUNDIALS

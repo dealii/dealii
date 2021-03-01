@@ -975,6 +975,27 @@ namespace SUNDIALS
      */
     LinearSolveFunction<VectorType> solve_linearized_system;
 
+
+    /**
+     * Set the given @p solver for the solution of the linearized system.
+     *
+     * @note Alternative to setting solve_linearized_system directly.
+     */
+    template <typename SolverType>
+    void
+    set_linear_solver(SolverType &solver);
+
+    /**
+     * Set the given @p solver with SolverControl @p control for the solution of
+     * the linearized system. The @p control will receive tolerances directly
+     * from SUNDIALS.
+     *
+     * @note Alternative to setting solve_linearized_system directly.
+     */
+    template <typename SolverType>
+    void
+    set_linear_solver(SolverType &solver, SolverControl &control);
+
     /**
      * A LinearSolveFunction object that users may supply and that is intended
      * to solve the mass system $Mx=b$. The matrix-vector product $Mx$ is
@@ -1314,6 +1335,33 @@ namespace SUNDIALS
                  << ". Please consult SUNDIALS manual.");
 
 } // namespace SUNDIALS
+
+/*-------------------------------- Inline functions ------------------------*/
+
+#  ifndef DOXYGEN
+
+template <typename VectorType>
+template <typename SolverType>
+void
+SUNDIALS::ARKode<VectorType>::set_linear_solver(SolverType &solver)
+{
+  linear_solver =
+    std::make_unique<internal::LinearSolverWrapper<VectorType>>(solver);
+}
+
+
+
+template <typename VectorType>
+template <typename SolverType>
+void
+SUNDIALS::ARKode<VectorType>::set_linear_solver(SolverType &   solver,
+                                                SolverControl &control)
+{
+  linear_solver =
+    std::make_unique<internal::LinearSolverWrapper<VectorType>>(solver,
+                                                                control);
+}
+#  endif
 
 DEAL_II_NAMESPACE_CLOSE
 #endif
