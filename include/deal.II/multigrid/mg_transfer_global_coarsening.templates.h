@@ -1221,33 +1221,9 @@ namespace internal
       }
 
       // ------------- prolongation matrix (0) -> identity matrix --------------
-      {
-        AssertDimension(fe_fine.n_base_elements(), 1);
-        if (reference_cell == ReferenceCells::get_hypercube<dim>())
-          {
-            const auto fe = create_1D_fe(fe_fine.base_element(0));
 
-            transfer.schemes[0].prolongation_matrix_1d.resize(
-              fe->dofs_per_cell * fe->dofs_per_cell);
-
-            for (unsigned int i = 0; i < fe->dofs_per_cell; i++)
-              transfer.schemes[0]
-                .prolongation_matrix_1d[i + i * fe->dofs_per_cell] =
-                Number(1.0);
-          }
-        else
-          {
-            const unsigned int n_dofs_per_cell =
-              fe_fine.base_element(0).n_dofs_per_cell();
-
-            transfer.schemes[0].prolongation_matrix.resize(n_dofs_per_cell *
-                                                           n_dofs_per_cell);
-
-            for (unsigned int i = 0; i < n_dofs_per_cell; i++)
-              transfer.schemes[0].prolongation_matrix[i + i * n_dofs_per_cell] =
-                Number(1.0);
-          }
-      }
+      // nothing to do since for identity prolongation matrices a short-cut
+      // code path is used during prolongation/restriction
 
       // ----------------------- prolongation matrix (1) -----------------------
       {
