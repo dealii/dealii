@@ -1124,14 +1124,14 @@ public:
    * @code
    * MeshFormat
    * 4.1 0 8
-   * $EndMeshFormat
-   * $PhysicalNames
+   * \$EndMeshFormat
+   * \$PhysicalNames
    * 3
    * 1 1 "ManifoldID:0"
    * 1 2 "BoundaryID:-1, ManifoldID:1"
    * 2 3 "ManifoldID:1"
-   * $EndPhysicalNames
-   * $Entities
+   * \$EndPhysicalNames
+   * \$Entities
    * ...
    * @endcode
    *
