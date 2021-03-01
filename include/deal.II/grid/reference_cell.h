@@ -380,10 +380,17 @@ public:
                              const unsigned char face_orientation) const;
 
   /**
-   * Combine face and line orientation.
+   * Return whether the line with index @p line is oriented in
+   * standard direction within a cell, given the @p face_orientation of
+   * the face within the current cell, and @p line_orientation flag
+   * for the line within that face. @p true indicates that the line is
+   * oriented from vertex 0 to vertex 1, whereas it is the other way
+   * around otherwise. In 1d and 2d, this is always @p true, but in 3d
+   * it may be different, see the respective discussion in the
+   * documentation of the GeometryInfo class.
    */
   bool
-  combine_face_and_line_orientation(const unsigned int  line,
+  standard_vs_true_line_orientation(const unsigned int  line,
                                     const unsigned char face_orientation,
                                     const unsigned char line_orientation) const;
 
@@ -1729,7 +1736,7 @@ ReferenceCell::unit_normal_vectors(const unsigned int face_no) const
 
 
 inline bool
-ReferenceCell::combine_face_and_line_orientation(
+ReferenceCell::standard_vs_true_line_orientation(
   const unsigned int  line,
   const unsigned char face_orientation_raw,
   const unsigned char line_orientation) const
