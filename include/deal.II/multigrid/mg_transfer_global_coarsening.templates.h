@@ -2209,8 +2209,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
         }
     }
 
-  if (schemes.size() && schemes.front().fine_element_is_continuous)
-    this->vec_coarse.compress(VectorOperation::add);
+  this->vec_coarse.compress(VectorOperation::add);
 
   dst.copy_locally_owned_data_from(this->vec_coarse);
 }
