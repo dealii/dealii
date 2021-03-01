@@ -50,14 +50,6 @@ print(const LinearAlgebra::distributed::Vector<Number> &vec)
 }
 
 
-template <int dim, typename Number>
-void
-print(const MGTwoLevelTransfer<dim, Number> &transfer)
-{
-  transfer.print_internal(deallog);
-}
-
-
 template <int dim, typename Number, typename MeshType>
 void
 test_transfer_operator(
@@ -69,9 +61,6 @@ test_transfer_operator(
   AffineConstraints<Number> constraint_fine;
   DoFTools::make_hanging_node_constraints(dof_handler_fine, constraint_fine);
   constraint_fine.close();
-
-  // print internal information of transfer operator
-  print(transfer);
 
   // perform prolongation
   LinearAlgebra::distributed::Vector<Number> src, dst;

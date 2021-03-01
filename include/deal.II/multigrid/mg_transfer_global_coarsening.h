@@ -184,13 +184,6 @@ public:
   restrict_and_add(LinearAlgebra::distributed::Vector<Number> &      dst,
                    const LinearAlgebra::distributed::Vector<Number> &src) const;
 
-  /**
-   * Print internal data structures to stream @p out.
-   */
-  template <typename Stream>
-  void
-  print_internal(Stream &out) const;
-
 private:
   /**
    * A multigrid transfer scheme. A multrigrid transfer class can have different
@@ -259,13 +252,6 @@ private:
      * rank.
      */
     std::vector<unsigned int> level_dof_indices_fine;
-
-    /**
-     * Print internal data structures to stream @p out.
-     */
-    template <typename Stream>
-    void
-    print(Stream &out) const;
   };
 
   /**
@@ -398,47 +384,6 @@ private:
 #ifndef DOXYGEN
 
 /* ----------------------- Inline functions --------------------------------- */
-
-
-
-template <int dim, typename Number>
-template <typename Stream>
-void
-MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
-  MGTransferScheme::print(Stream &out) const
-{
-  out << "weights:" << std::endl;
-  for (const auto w : weights)
-    out << w << " ";
-  out << std::endl;
-
-  out << "level_dof_indices_fine:" << std::endl;
-  for (const auto w : level_dof_indices_fine)
-    out << w << " ";
-  out << std::endl;
-
-  out << "level_dof_indices_coarse:" << std::endl;
-  for (const auto w : level_dof_indices_coarse)
-    out << w << " ";
-  out << std::endl;
-
-  out << "prolongation_matrix_1d:" << std::endl;
-  for (const auto w : prolongation_matrix_1d)
-    out << w[0] << " ";
-  out << std::endl;
-}
-
-
-
-template <int dim, typename Number>
-template <typename Stream>
-void
-MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
-  print_internal(Stream &out) const
-{
-  for (const auto &scheme : schemes)
-    scheme.print(out);
-}
 
 
 
