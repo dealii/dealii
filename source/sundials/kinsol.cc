@@ -36,14 +36,12 @@
 
 #    include <deal.II/sundials/copy.h>
 
+// Make sure we #include the SUNDIALS config file...
 #    include <sundials/sundials_config.h>
-#    if DEAL_II_SUNDIALS_VERSION_GTE(3, 0, 0)
-#      include <kinsol/kinsol_direct.h>
-#      include <sunlinsol/sunlinsol_dense.h>
-#      include <sunmatrix/sunmatrix_dense.h>
-#    else
-#      include <kinsol/kinsol_dense.h>
-#    endif
+// ...before the rest of the SUNDIALS files:
+#    include <kinsol/kinsol_direct.h>
+#    include <sunlinsol/sunlinsol_dense.h>
+#    include <sunmatrix/sunmatrix_dense.h>
 
 #    include <iomanip>
 #    include <iostream>
@@ -269,32 +267,21 @@ namespace SUNDIALS
     status = KINSetRelErrFunc(kinsol_mem, data.dq_relative_error);
     AssertKINSOL(status);
 
-#    if DEAL_II_SUNDIALS_VERSION_GTE(3, 0, 0)
     SUNMatrix       J  = nullptr;
     SUNLinearSolver LS = nullptr;
-#    endif
 
     if (solve_jacobian_system)
       {
         auto KIN_mem        = static_cast<KINMem>(kinsol_mem);
         KIN_mem->kin_lsolve = t_kinsol_solve_jacobian<VectorType>;
         if (setup_jacobian)
-          {
-            KIN_mem->kin_lsetup = t_kinsol_setup_jacobian<VectorType>;
-#    if DEAL_II_SUNDIALS_VERSION_LT(3, 0, 0)
-            KIN_mem->kin_setupNonNull = true;
-#    endif
-          }
+          KIN_mem->kin_lsetup = t_kinsol_setup_jacobian<VectorType>;
       }
     else
       {
-#    if DEAL_II_SUNDIALS_VERSION_GTE(3, 0, 0)
         J      = SUNDenseMatrix(system_size, system_size);
         LS     = SUNDenseLinearSolver(u_scale, J);
         status = KINDlsSetLinearSolver(kinsol_mem, LS, J);
-#    else
-        status = KINDense(kinsol_mem, system_size);
-#    endif
         AssertKINSOL(status);
       }
 
@@ -332,10 +319,8 @@ namespace SUNDIALS
     status = KINGetNumNonlinSolvIters(kinsol_mem, &nniters);
     AssertKINSOL(status);
 
-#    if DEAL_II_SUNDIALS_VERSION_GTE(3, 0, 0)
     SUNMatDestroy(J);
     SUNLinSolFree(LS);
-#    endif
     KINFree(&kinsol_mem);
 
     return static_cast<unsigned int>(nniters);
