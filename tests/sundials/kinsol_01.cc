@@ -43,13 +43,6 @@ main(int argc, char **argv)
   ParameterHandler                             prm;
   data.add_parameters(prm);
 
-  if (false)
-    {
-      std::ofstream ofile(SOURCE_DIR "/kinsol_01.prm");
-      prm.print_parameters(ofile, ParameterHandler::ShortText);
-      ofile.close();
-    }
-
   std::ifstream ifile(SOURCE_DIR "/kinsol_01.prm");
   prm.parse_input(ifile);
 
