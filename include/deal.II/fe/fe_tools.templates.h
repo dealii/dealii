@@ -2164,9 +2164,15 @@ namespace FETools
     const unsigned int nd     = fe.n_components();
     const unsigned int degree = fe.degree;
 
+    const ReferenceCell reference_cell = fe.reference_cell();
+
+    const auto &mapping =
+      reference_cell.template get_default_linear_mapping<dim, spacedim>();
+    const auto &q_fine =
+      reference_cell.get_gauss_type_quadrature<dim>(degree + 1);
+
     // prepare FEValues, quadrature etc on
     // coarse cell
-    QGauss<dim>        q_fine(degree + 1);
     const unsigned int nq = q_fine.size();
 
     // create mass matrix on coarse cell.
@@ -2174,9 +2180,10 @@ namespace FETools
     {
       // set up a triangulation for coarse cell
       Triangulation<dim, spacedim> tr;
-      GridGenerator::hyper_cube(tr, 0, 1);
+      GridGenerator::reference_cell(reference_cell, tr);
 
-      FEValues<dim, spacedim> coarse(fe,
+      FEValues<dim, spacedim> coarse(mapping,
+                                     fe,
                                      q_fine,
                                      update_JxW_values | update_values);
 
@@ -2212,9 +2219,10 @@ namespace FETools
 
 
     const auto compute_one_case =
-      [&fe, &q_fine, n, nd, nq](const unsigned int        ref_case,
-                                const FullMatrix<double> &inverse_mass_matrix,
-                                std::vector<FullMatrix<double>> &matrices) {
+      [&reference_cell, &mapping, &fe, &q_fine, n, nd, nq](
+        const unsigned int               ref_case,
+        const FullMatrix<double> &       inverse_mass_matrix,
+        std::vector<FullMatrix<double>> &matrices) {
         const unsigned int nc =
           GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
 
@@ -2228,11 +2236,12 @@ namespace FETools
 
         // create a respective refinement on the triangulation
         Triangulation<dim, spacedim> tr;
-        GridGenerator::hyper_cube(tr, 0, 1);
+        GridGenerator::reference_cell(reference_cell, tr);
         tr.begin_active()->set_refine_flag(RefinementCase<dim>(ref_case));
         tr.execute_coarsening_and_refinement();
 
-        FEValues<dim, spacedim> fine(fe,
+        FEValues<dim, spacedim> fine(mapping,
+                                     fe,
                                      q_fine,
                                      update_quadrature_points |
                                        update_JxW_values | update_values);

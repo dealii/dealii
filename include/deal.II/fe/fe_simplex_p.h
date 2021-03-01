@@ -61,6 +61,17 @@ public:
       RefinementCase<dim>::isotropic_refinement) const override;
 
   /**
+   * @copydoc dealii::FiniteElement::get_restriction_matrix()
+   *
+   * @note Only implemented for RefinementCase::isotropic_refinement.
+   */
+  virtual const FullMatrix<double> &
+  get_restriction_matrix(
+    const unsigned int         child,
+    const RefinementCase<dim> &refinement_case =
+      RefinementCase<dim>::isotropic_refinement) const override;
+
+  /**
    * @copydoc dealii::FiniteElement::get_face_interpolation_matrix()
    */
   void

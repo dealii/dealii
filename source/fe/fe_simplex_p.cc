@@ -355,6 +355,48 @@ FE_SimplexPoly<dim, spacedim>::get_prolongation_matrix(
 
 
 template <int dim, int spacedim>
+const FullMatrix<double> &
+FE_SimplexPoly<dim, spacedim>::get_restriction_matrix(
+  const unsigned int         child,
+  const RefinementCase<dim> &refinement_case) const
+{
+  Assert(refinement_case == RefinementCase<dim>::isotropic_refinement,
+         ExcNotImplemented());
+  AssertDimension(dim, spacedim);
+
+  // initialization upon first request
+  if (this->restriction[refinement_case - 1][child].n() == 0)
+    {
+      std::lock_guard<std::mutex> lock(this->mutex);
+
+      // if matrix got updated while waiting for the lock
+      if (this->restriction[refinement_case - 1][child].n() ==
+          this->n_dofs_per_cell())
+        return this->restriction[refinement_case - 1][child];
+
+      // now do the work. need to get a non-const version of data in order to
+      // be able to modify them inside a const function
+      auto &this_nonconst = const_cast<FE_SimplexPoly<dim, spacedim> &>(*this);
+
+      std::vector<std::vector<FullMatrix<double>>> isotropic_matrices(
+        RefinementCase<dim>::isotropic_refinement);
+      isotropic_matrices.back().resize(
+        GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+        FullMatrix<double>(this->n_dofs_per_cell(), this->n_dofs_per_cell()));
+
+      FETools::compute_projection_matrices(*this, isotropic_matrices, true);
+
+      this_nonconst.restriction[refinement_case - 1].swap(
+        isotropic_matrices.back());
+    }
+
+  // finally return the matrix
+  return this->restriction[refinement_case - 1][child];
+}
+
+
+
+template <int dim, int spacedim>
 void
 FE_SimplexPoly<dim, spacedim>::get_face_interpolation_matrix(
   const FiniteElement<dim, spacedim> &source_fe,
