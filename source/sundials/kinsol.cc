@@ -36,8 +36,10 @@
 
 #    include <deal.II/sundials/copy.h>
 
-#    include <kinsol/kinsol_direct.h>
+// Make sure we #include the SUNDIALS config file...
 #    include <sundials/sundials_config.h>
+// ...before the rest of the SUNDIALS files:
+#    include <kinsol/kinsol_direct.h>
 #    include <sunlinsol/sunlinsol_dense.h>
 #    include <sunmatrix/sunmatrix_dense.h>
 
