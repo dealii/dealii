@@ -1615,6 +1615,13 @@ public:
   clear();
 
   /**
+   * Return MPI communicator used by this triangulation. In the case of
+   * a serial Triangulation object, MPI_COMM_SELF is returned.
+   */
+  virtual MPI_Comm
+  get_communicator() const;
+
+  /**
    * Set the mesh smoothing to @p mesh_smoothing. This overrides the
    * MeshSmoothing given to the constructor. It is allowed to call this
    * function only if the triangulation is empty.

@@ -1268,6 +1268,12 @@ public:
   get_triangulation() const;
 
   /**
+   * Return MPI communicator used by the underlying triangulation.
+   */
+  MPI_Comm
+  get_communicator() const;
+
+  /**
    * Whenever serialization with a parallel::distributed::Triangulation as the
    * underlying triangulation is considered, we also need to consider storing
    * the active FE indices on all active cells as well.
@@ -2015,6 +2021,18 @@ DoFHandler<dim, spacedim>::get_triangulation() const
          ExcMessage("This DoFHandler object has not been associated "
                     "with a triangulation."));
   return *tria;
+}
+
+
+
+template <int dim, int spacedim>
+inline MPI_Comm
+DoFHandler<dim, spacedim>::get_communicator() const
+{
+  Assert(tria != nullptr,
+         ExcMessage("This DoFHandler object has not been associated "
+                    "with a triangulation."));
+  return tria->get_communicator();
 }
 
 
