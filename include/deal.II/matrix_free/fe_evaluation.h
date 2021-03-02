@@ -4740,10 +4740,14 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   // Simple case: We have contiguous storage, so we can simply copy out the
   // data
-  if (this->dof_info->index_storage_variants[ind][this->cell] ==
-        internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
-          interleaved_contiguous &&
-      n_lanes == VectorizedArrayType::size())
+  if ((this->dof_info->index_storage_variants[ind][this->cell] ==
+         internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+           interleaved_contiguous &&
+       n_lanes == VectorizedArrayType::size()) &&
+      !(is_face &&
+        this->dof_access_index ==
+          internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
+        this->is_interior_face == false))
     {
       const unsigned int dof_index =
         dof_indices_cont[this->cell * VectorizedArrayType::size()] +
@@ -4768,23 +4772,18 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       return;
     }
 
+  std::array<unsigned int, VectorizedArrayType::size()> cells =
+    this->get_cell_or_face_ids();
+
   // More general case: Must go through the components one by one and apply
   // some transformations
   const unsigned int n_filled_lanes =
     this->dof_info->n_vectorization_lanes_filled[ind][this->cell];
 
-  unsigned int dof_indices[VectorizedArrayType::size()];
-  for (unsigned int v = 0; v < n_filled_lanes; ++v)
-    dof_indices[v] =
-      dof_indices_cont[this->cell * VectorizedArrayType::size() + v] +
-      this->dof_info
-          ->component_dof_indices_offset[this->active_fe_index]
-                                        [this->first_selected_component] *
-        this->dof_info->dof_indices_interleave_strides
-          [ind][this->cell * VectorizedArrayType::size() + v];
-
-  for (unsigned int v = n_filled_lanes; v < VectorizedArrayType::size(); ++v)
-    dof_indices[v] = numbers::invalid_unsigned_int;
+  const bool is_ecl =
+    this->dof_access_index ==
+      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
+    this->is_interior_face == false;
 
   if (vectors_sm[0] != nullptr)
     {
@@ -4795,19 +4794,20 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
         for (unsigned int v = 0; v < n_filled_lanes; ++v)
           {
+            Assert(cells[v] != numbers::invalid_unsigned_int,
+                   ExcNotImplemented());
             Assert(ind < this->dof_info->dof_indices_contiguous_sm.size(),
                    ExcIndexRange(
                      ind, 0, this->dof_info->dof_indices_contiguous_sm.size()));
-            Assert(this->cell * VectorizedArrayType::size() + v <
+            Assert(cells[v] <
                      this->dof_info->dof_indices_contiguous_sm[ind].size(),
                    ExcIndexRange(
-                     this->cell * VectorizedArrayType::size() + v,
+                     cells[v],
                      0,
                      this->dof_info->dof_indices_contiguous_sm[ind].size()));
 
             const auto &temp =
-              this->dof_info->dof_indices_contiguous_sm
-                [ind][this->cell * VectorizedArrayType::size() + v];
+              this->dof_info->dof_indices_contiguous_sm[ind][cells[v]];
 
             if (temp.first != numbers::invalid_unsigned_int)
               vector_ptrs[v] = const_cast<typename VectorType::value_type *>(
@@ -4825,7 +4825,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       };
 
       if (n_filled_lanes == VectorizedArrayType::size() &&
-          n_lanes == VectorizedArrayType::size())
+          n_lanes == VectorizedArrayType::size() && !is_ecl)
         {
           if (n_components == 1 || n_fe_components == 1)
             {
@@ -4886,10 +4886,26 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       return;
     }
 
+  unsigned int dof_indices[VectorizedArrayType::size()];
+
+  for (unsigned int v = 0; v < n_filled_lanes; ++v)
+    {
+      Assert(cells[v] != numbers::invalid_unsigned_int, ExcNotImplemented());
+      dof_indices[v] =
+        dof_indices_cont[cells[v]] +
+        this->dof_info
+            ->component_dof_indices_offset[this->active_fe_index]
+                                          [this->first_selected_component] *
+          this->dof_info->dof_indices_interleave_strides[ind][cells[v]];
+    }
+
+  for (unsigned int v = n_filled_lanes; v < VectorizedArrayType::size(); ++v)
+    dof_indices[v] = numbers::invalid_unsigned_int;
+
   // In the case with contiguous cell indices, we know that there are no
   // constraints and that the indices within each element are contiguous
   if (n_filled_lanes == VectorizedArrayType::size() &&
-      n_lanes == VectorizedArrayType::size())
+      n_lanes == VectorizedArrayType::size() && !is_ecl)
     {
       if (this->dof_info->index_storage_variants[ind][this->cell] ==
           internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
@@ -8688,35 +8704,73 @@ FEFaceEvaluation<dim,
       !(evaluation_flag & EvaluationFlags::gradients))
     return;
 
-  if (fe_degree > -1)
-    internal::FEFaceEvaluationImplEvaluateSelector<dim, VectorizedArrayType>::
-      template run<fe_degree, n_q_points_1d>(
-        n_components,
-        *this->data,
-        values_array,
-        this->begin_values(),
-        this->begin_gradients(),
-        this->scratch_data,
-        evaluation_flag & EvaluationFlags::values,
-        evaluation_flag & EvaluationFlags::gradients,
-        this->face_no,
-        this->subface_index,
-        this->face_orientation,
-        this->descriptor->face_orientations);
+  if (this->dof_access_index ==
+        internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
+      this->is_interior_face == false)
+    {
+      const auto face_nos          = this->compute_face_no_data();
+      const auto face_orientations = this->compute_face_orientations();
+
+#  ifdef DEBUG
+      // currently on structured meshes are supported -> face numers and
+      // orientations have to be the same for all filled lanes
+      for (unsigned int v = 1; v < VectorizedArrayType::size(); ++v)
+        {
+          if (face_nos[v] != numbers::invalid_unsigned_int)
+            AssertDimension(face_nos[0], face_nos[v]);
+          if (face_orientations[v] != numbers::invalid_unsigned_int)
+            AssertDimension(face_orientations[0], face_orientations[v]);
+        }
+#  endif
+
+      internal::FEFaceEvaluationImplEvaluateSelector<dim, VectorizedArrayType>::
+        template run<fe_degree, n_q_points_1d>(
+          n_components,
+          *this->data,
+          values_array,
+          this->begin_values(),
+          this->begin_gradients(),
+          this->scratch_data,
+          evaluation_flag & EvaluationFlags::values,
+          evaluation_flag & EvaluationFlags::gradients,
+          face_nos[0],
+          this->subface_index,
+          face_orientations[0],
+          this->descriptor->face_orientations);
+    }
   else
-    internal::FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::
-      evaluate(n_components,
-               *this->data,
-               values_array,
-               this->begin_values(),
-               this->begin_gradients(),
-               this->scratch_data,
-               evaluation_flag & EvaluationFlags::values,
-               evaluation_flag & EvaluationFlags::gradients,
-               this->face_no,
-               this->subface_index,
-               this->face_orientation,
-               this->descriptor->face_orientations);
+    {
+      if (fe_degree > -1)
+        internal::FEFaceEvaluationImplEvaluateSelector<dim,
+                                                       VectorizedArrayType>::
+          template run<fe_degree, n_q_points_1d>(
+            n_components,
+            *this->data,
+            values_array,
+            this->begin_values(),
+            this->begin_gradients(),
+            this->scratch_data,
+            evaluation_flag & EvaluationFlags::values,
+            evaluation_flag & EvaluationFlags::gradients,
+            this->face_no,
+            this->subface_index,
+            this->face_orientation,
+            this->descriptor->face_orientations);
+      else
+        internal::FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::
+          evaluate(n_components,
+                   *this->data,
+                   values_array,
+                   this->begin_values(),
+                   this->begin_gradients(),
+                   this->scratch_data,
+                   evaluation_flag & EvaluationFlags::values,
+                   evaluation_flag & EvaluationFlags::gradients,
+                   this->face_no,
+                   this->subface_index,
+                   this->face_orientation,
+                   this->descriptor->face_orientations);
+    }
 
 #  ifdef DEBUG
   if (evaluation_flag & EvaluationFlags::values)
@@ -9316,7 +9370,9 @@ FEFaceEvaluation<dim,
     }
   else
     {
-      std::fill(face_no_data.begin(), face_no_data.end(), 0);
+      std::fill(face_no_data.begin(),
+                face_no_data.end(),
+                numbers::invalid_unsigned_int);
 
       if (dim == 3)
         {
@@ -9365,6 +9421,16 @@ FEFaceEvaluation<dim,
               // compare the IDs with the given cell ID
               face_no_data[i] = face_orientation;
             }
+        }
+      else
+        {
+          std::fill(
+            face_no_data.begin(),
+            face_no_data.begin() +
+              this->dof_info->n_vectorization_lanes_filled
+                [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
+                [this->cell],
+            0);
         }
     }
 

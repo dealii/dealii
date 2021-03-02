@@ -121,7 +121,7 @@ test(const unsigned int n_refinements = 1)
                 deallog << static_cast<int>(phi_m.begin_dof_values()[i][0])
                         << " ";
               deallog << std::endl;
-              phi_m.gather_evaluate(src, true, false);
+              phi_m.gather_evaluate(src, EvaluationFlags::values);
               for (unsigned int i = 0; i < phi_m.static_n_q_points; i++)
                 deallog << static_cast<int>(phi_m.begin_values()[i][0]) << " ";
               deallog << std::endl;
@@ -132,7 +132,7 @@ test(const unsigned int n_refinements = 1)
                         << " ";
               deallog << std::endl;
 
-              phi_p.gather_evaluate(src, true, false);
+              phi_p.gather_evaluate(src, EvaluationFlags::values);
               for (unsigned int i = 0; i < phi_p.static_n_q_points; i++)
                 deallog << static_cast<int>(phi_p.begin_values()[i][0]) << " ";
               deallog << std::endl << std::endl;
