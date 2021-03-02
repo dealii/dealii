@@ -1999,11 +1999,14 @@ DoFHandler<dim, spacedim>::DoFHandler(const Triangulation<dim, spacedim> &tria)
 template <int dim, int spacedim>
 DoFHandler<dim, spacedim>::~DoFHandler()
 {
-  // unsubscribe all attachments to refinement signals of the underlying
-  // triangulation
+  // unsubscribe all attachments to signals of the underlying triangulation
   for (auto &connection : this->tria_listeners)
     connection.disconnect();
   this->tria_listeners.clear();
+
+  for (auto &connection : this->tria_listeners_for_transfer)
+    connection.disconnect();
+  this->tria_listeners_for_transfer.clear();
 
   // release allocated memory
   // virtual functions called in constructors and destructors never use the
@@ -2051,6 +2054,10 @@ DoFHandler<dim, spacedim>::reinit(const Triangulation<dim, spacedim> &tria)
   for (auto &connection : this->tria_listeners)
     connection.disconnect();
   this->tria_listeners.clear();
+
+  for (auto &connection : this->tria_listeners_for_transfer)
+    connection.disconnect();
+  this->tria_listeners_for_transfer.clear();
 
   // release allocated memory and policy
   DoFHandler<dim, spacedim>::clear();
@@ -2431,10 +2438,11 @@ DoFHandler<dim, spacedim>::set_fe(const hp::FECollection<dim, spacedim> &ff)
         {
           hp_capability_enabled = false;
 
-          // unsubscribe connections to signals
-          for (auto &connection : this->tria_listeners)
+          // unsubscribe connections to signals that are only relevant for
+          // hp-mode, since we only have a single element here
+          for (auto &connection : this->tria_listeners_for_transfer)
             connection.disconnect();
-          this->tria_listeners.clear();
+          this->tria_listeners_for_transfer.clear();
 
           // release active and future finite element tables
           this->hp_cell_active_fe_indices.clear();
@@ -2510,10 +2518,11 @@ DoFHandler<dim, spacedim>::distribute_dofs(
         {
           hp_capability_enabled = false;
 
-          // unsubscribe connections to signals
-          for (auto &connection : this->tria_listeners)
+          // unsubscribe connections to signals that are only relevant for
+          // hp-mode, since we only have a single element here
+          for (auto &connection : this->tria_listeners_for_transfer)
             connection.disconnect();
-          this->tria_listeners.clear();
+          this->tria_listeners_for_transfer.clear();
 
           // release active and future finite element tables
           this->hp_cell_active_fe_indices.clear();
@@ -3025,6 +3034,9 @@ template <int dim, int spacedim>
 void
 DoFHandler<dim, spacedim>::connect_to_triangulation_signals()
 {
+  // make sure this is called during initialization in hp-mode
+  Assert(hp_capability_enabled, ExcOnlyAvailableWithHP());
+
   // connect functions to signals of the underlying triangulation
   this->tria_listeners.push_back(this->tria->signals.create.connect(
     [this]() { this->reinit(*(this->tria)); }));
@@ -3038,31 +3050,31 @@ DoFHandler<dim, spacedim>::connect_to_triangulation_signals()
         &this->get_triangulation()))
     {
       // repartitioning signals
-      this->tria_listeners.push_back(
+      this->tria_listeners_for_transfer.push_back(
         this->tria->signals.pre_distributed_repartition.connect([this]() {
           internal::hp::DoFHandlerImplementation::Implementation::
             ensure_absence_of_future_fe_indices<dim, spacedim>(*this);
         }));
-      this->tria_listeners.push_back(
+      this->tria_listeners_for_transfer.push_back(
         this->tria->signals.pre_distributed_repartition.connect(
           [this]() { this->pre_distributed_transfer_action(); }));
-      this->tria_listeners.push_back(
+      this->tria_listeners_for_transfer.push_back(
         this->tria->signals.post_distributed_repartition.connect(
           [this] { this->post_distributed_transfer_action(); }));
 
       // refinement signals
-      this->tria_listeners.push_back(
+      this->tria_listeners_for_transfer.push_back(
         this->tria->signals.pre_distributed_refinement.connect(
           [this]() { this->pre_distributed_transfer_action(); }));
-      this->tria_listeners.push_back(
+      this->tria_listeners_for_transfer.push_back(
         this->tria->signals.post_distributed_refinement.connect(
           [this]() { this->post_distributed_transfer_action(); }));
 
       // serialization signals
-      this->tria_listeners.push_back(
+      this->tria_listeners_for_transfer.push_back(
         this->tria->signals.post_distributed_save.connect(
           [this]() { this->active_fe_index_transfer.reset(); }));
-      this->tria_listeners.push_back(
+      this->tria_listeners_for_transfer.push_back(
         this->tria->signals.post_distributed_load.connect(
           [this]() { this->update_active_fe_table(); }));
     }
@@ -3071,25 +3083,27 @@ DoFHandler<dim, spacedim>::connect_to_triangulation_signals()
              &this->get_triangulation()) != nullptr)
     {
       // partitioning signals
-      this->tria_listeners.push_back(
+      this->tria_listeners_for_transfer.push_back(
         this->tria->signals.pre_partition.connect([this]() {
           internal::hp::DoFHandlerImplementation::Implementation::
             ensure_absence_of_future_fe_indices(*this);
         }));
 
       // refinement signals
-      this->tria_listeners.push_back(this->tria->signals.pre_refinement.connect(
-        [this] { this->pre_transfer_action(); }));
-      this->tria_listeners.push_back(
+      this->tria_listeners_for_transfer.push_back(
+        this->tria->signals.pre_refinement.connect(
+          [this] { this->pre_transfer_action(); }));
+      this->tria_listeners_for_transfer.push_back(
         this->tria->signals.post_refinement.connect(
           [this] { this->post_transfer_action(); }));
     }
   else
     {
       // refinement signals
-      this->tria_listeners.push_back(this->tria->signals.pre_refinement.connect(
-        [this] { this->pre_transfer_action(); }));
-      this->tria_listeners.push_back(
+      this->tria_listeners_for_transfer.push_back(
+        this->tria->signals.pre_refinement.connect(
+          [this] { this->pre_transfer_action(); }));
+      this->tria_listeners_for_transfer.push_back(
         this->tria->signals.post_refinement.connect(
           [this] { this->post_transfer_action(); }));
     }

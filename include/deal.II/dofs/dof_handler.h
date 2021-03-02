@@ -1667,6 +1667,13 @@ private:
   std::vector<boost::signals2::connection> tria_listeners;
 
   /**
+   * A list of connections with which this object connects to the
+   * triangulation. They get triggered specifially when data needs to be
+   * transferred due to refinement or repartitioning. Only active in hp-mode.
+   */
+  std::vector<boost::signals2::connection> tria_listeners_for_transfer;
+
+  /**
    * Free all memory used for non-multigrid data structures.
    */
   void
@@ -1700,14 +1707,13 @@ private:
                 const types::global_dof_index global_index) const;
 
   /**
-   * Setup DoFHandler policy.
+   * Set up DoFHandler policy.
    */
   void
   setup_policy();
 
   /**
-   * Setup connections to refinement signals of the underlying triangulation.
-   * Necessary for the hp-mode.
+   * Set up connections to signals of the underlying triangulation.
    */
   void
   connect_to_triangulation_signals();
