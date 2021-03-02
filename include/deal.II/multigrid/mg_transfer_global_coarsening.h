@@ -373,7 +373,7 @@ private:
   const MGLevelObject<MGTwoLevelTransfer<dim, VectorType>> &transfer;
 
   /**
-   * Function to initialize internal level vectors.
+   * %Function to initialize internal level vectors.
    */
   const std::function<void(const unsigned int, VectorType &)>
     initialize_dof_vector;

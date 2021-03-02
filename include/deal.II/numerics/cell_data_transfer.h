@@ -119,9 +119,9 @@ public:
    * @param[in] triangulation The triangulation on which all operations will
    *   happen. At the time when this constructor is called, the refinement
    *   in question has not happened yet.
-   * @param[in] refinement_strategy Function deciding how data will be stored on
-   *   refined cells from its parent cell.
-   * @param[in] coarsening_strategy Function deciding which data to store on
+   * @param[in] refinement_strategy %Function deciding how data will be stored
+   *   on refined cells from its parent cell.
+   * @param[in] coarsening_strategy %Function deciding which data to store on
    *   a cell whose children will get coarsened into.
    */
   CellDataTransfer(
@@ -165,7 +165,7 @@ private:
     triangulation;
 
   /**
-   * Function deciding how data will be stored on refined cells from its parent
+   * %Function deciding how data will be stored on refined cells from its parent
    * cell.
    */
   const std::function<std::vector<value_type>(
@@ -174,7 +174,7 @@ private:
     refinement_strategy;
 
   /**
-   * Function deciding on how to process data from children to be stored on the
+   * %Function deciding on how to process data from children to be stored on the
    * parent cell.
    */
   const std::function<value_type(

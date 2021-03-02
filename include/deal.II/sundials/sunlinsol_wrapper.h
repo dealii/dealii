@@ -66,7 +66,7 @@ namespace SUNDIALS
     void *A_data;
 
     /**
-     * Function pointer declared by SUNDIALS to evaluate the matrix vector
+     * %Function pointer declared by SUNDIALS to evaluate the matrix vector
      * product.
      */
     ATimesFn a_times_fn;
@@ -109,7 +109,7 @@ namespace SUNDIALS
     void *P_data;
 
     /**
-     * Function pointer to a function that computes the preconditioner
+     * %Function pointer to a function that computes the preconditioner
      * application.
      */
     PSolveFn p_solve_fn;

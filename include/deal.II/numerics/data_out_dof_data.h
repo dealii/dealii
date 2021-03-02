@@ -1000,7 +1000,7 @@ protected:
   std::vector<Patch> patches;
 
   /**
-   * Function by which the base class's functions get to know what patches
+   * %Function by which the base class's functions get to know what patches
    * they shall write to a file.
    */
   virtual const std::vector<Patch> &

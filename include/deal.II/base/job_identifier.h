@@ -67,7 +67,7 @@ public:
   operator()() const;
 
   /**
-   * Function to identify the presently running program.
+   * %Function to identify the presently running program.
    */
   static const JobIdentifier &
   get_dealjobid();
