@@ -1472,32 +1472,7 @@ public:
     const unsigned int                           dof_handler_index = 0) const;
 
   /**
-   * In the hp-adaptive case, a subrange of internal faces as computed during
-   * loop() might contain internal faces with elements of different active
-   * FE indices. Use this function to compute what the subrange for a given pair
-   * of active FE indices is.
-   */
-  std::pair<unsigned int, unsigned int>
-  create_inner_face_subrange_hp_by_index(
-    const std::pair<unsigned int, unsigned int> &range,
-    const unsigned int                           fe_index_interior,
-    const unsigned int                           fe_index_exterior,
-    const unsigned int                           dof_handler_index = 0) const;
-
-  /**
-   * In the hp-adaptive case, a subrange of boundary faces as computed during
-   * loop() might contain boundary faces with elements of different active
-   * FE indices. Use this function to compute what the subrange for a given
-   * active FE indices is.
-   */
-  std::pair<unsigned int, unsigned int>
-  create_boundary_face_subrange_hp_by_index(
-    const std::pair<unsigned int, unsigned int> &range,
-    const unsigned int                           fe_index,
-    const unsigned int                           dof_handler_index = 0) const;
-
-  /**
-   * In the hp-adaptive case, return number of active_fe_indices.
+   * In the hp adaptive case, return number of active_fe_indices.
    */
   unsigned int
   n_active_fe_indices() const;
@@ -4642,49 +4617,51 @@ namespace internal
           }
     }
 
-    // Runs the assembler on interior faces. If no function is given, nothing
-    // is done
     virtual void
-    face(const std::pair<unsigned int, unsigned int> &face_range) override
+    cell(const unsigned int range_index) override
     {
-      if (face_function != nullptr && face_range.second > face_range.first)
-        for (unsigned int i = 0; i < matrix_free.n_active_fe_indices(); ++i)
-          for (unsigned int j = 0; j < matrix_free.n_active_fe_indices(); ++j)
-            {
-              const auto face_subrange =
-                matrix_free.create_inner_face_subrange_hp_by_index(face_range,
-                                                                   i,
-                                                                   j);
-
-              if (face_subrange.second <= face_subrange.first)
-                continue;
-              (container.*
-               face_function)(matrix_free, this->dst, this->src, face_subrange);
-            }
+      process_range(cell_function,
+                    matrix_free.get_task_info().cell_partition_data_hp_ptr,
+                    matrix_free.get_task_info().cell_partition_data_hp,
+                    range_index);
     }
 
-    // Runs the assembler on boundary faces. If no function is given, nothing
-    // is done
     virtual void
-    boundary(const std::pair<unsigned int, unsigned int> &face_range) override
+    face(const unsigned int range_index) override
     {
-      if (boundary_function != nullptr && face_range.second > face_range.first)
-        for (unsigned int i = 0; i < matrix_free.n_active_fe_indices(); ++i)
-          {
-            const auto face_subrange =
-              matrix_free.create_boundary_face_subrange_hp_by_index(face_range,
-                                                                    i);
-
-            if (face_subrange.second <= face_subrange.first)
-              continue;
-
-            (container.*boundary_function)(matrix_free,
-                                           this->dst,
-                                           this->src,
-                                           face_subrange);
-          }
+      process_range(face_function,
+                    matrix_free.get_task_info().face_partition_data_hp_ptr,
+                    matrix_free.get_task_info().face_partition_data_hp,
+                    range_index);
     }
 
+    virtual void
+    boundary(const unsigned int range_index) override
+    {
+      process_range(boundary_function,
+                    matrix_free.get_task_info().boundary_partition_data_hp_ptr,
+                    matrix_free.get_task_info().boundary_partition_data_hp,
+                    range_index);
+    }
+
+  private:
+    void
+    process_range(const function_type &            fu,
+                  const std::vector<unsigned int> &ptr,
+                  const std::vector<unsigned int> &data,
+                  const unsigned int               range_index)
+    {
+      if (fu == nullptr)
+        return;
+
+      for (unsigned int i = ptr[range_index]; i < ptr[range_index + 1]; ++i)
+        (container.*fu)(matrix_free,
+                        this->dst,
+                        this->src,
+                        std::make_pair(data[2 * i], data[2 * i + 1]));
+    }
+
+  public:
     // Starts the communication for the update ghost values operation. We
     // cannot call this update if ghost and destination are the same because
     // that would introduce spurious entries in the destination (there is also
