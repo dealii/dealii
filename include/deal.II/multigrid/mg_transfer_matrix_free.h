@@ -125,6 +125,12 @@ public:
     LinearAlgebra::distributed::Vector<Number> &      dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const override;
 
+  virtual void
+  prolongate_and_add(
+    const unsigned int                                to_level,
+    LinearAlgebra::distributed::Vector<Number> &      dst,
+    const LinearAlgebra::distributed::Vector<Number> &src) const override;
+
   /**
    * Restrict a vector from level <tt>from_level</tt> to level
    * <tt>from_level-1</tt> using the transpose operation of the prolongate()
@@ -378,6 +384,12 @@ public:
    */
   virtual void
   prolongate(
+    const unsigned int                                     to_level,
+    LinearAlgebra::distributed::BlockVector<Number> &      dst,
+    const LinearAlgebra::distributed::BlockVector<Number> &src) const override;
+
+  virtual void
+  prolongate_and_add(
     const unsigned int                                     to_level,
     LinearAlgebra::distributed::BlockVector<Number> &      dst,
     const LinearAlgebra::distributed::BlockVector<Number> &src) const override;
