@@ -345,7 +345,7 @@ public:
    *
    *
    * @param column_name Name of the column to add;
-   * @param custom_function Function that will be called to fill the given
+   * @param custom_function %Function that will be called to fill the given
    * entry. You need to make sure that the scope of this function is valid
    * up to the call to error_from_exact() or difference();
    * @param compute_rate If set to true, then this column will be included in

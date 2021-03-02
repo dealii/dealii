@@ -128,7 +128,7 @@ namespace Functions
      *
      *  @endcode
      *
-     * Function constants is a collection of pairs in the form name=value,
+     * %Function constants is a collection of pairs in the form name=value,
      * separated by commas, for example:
      *
      *  @code

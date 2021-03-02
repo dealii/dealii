@@ -475,7 +475,7 @@ namespace MatrixFreeOperators
     bool have_interface_matrices;
 
     /**
-     * Function which implements vmult_add (@p transpose = false) and
+     * %Function which implements vmult_add (@p transpose = false) and
      * Tvmult_add (@p transpose = true).
      */
     void

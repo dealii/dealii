@@ -241,7 +241,7 @@ namespace SUNDIALS
        * @param strategy Solution strategy
        * @param maximum_non_linear_iterations Maximum number of nonlinear
        * iterations
-       * @param function_tolerance Function norm stopping tolerance
+       * @param function_tolerance %Function norm stopping tolerance
        * @param step_tolerance Scaled step stopping tolerance
        *
        * Newton parameters:

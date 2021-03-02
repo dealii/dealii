@@ -214,10 +214,10 @@ namespace parallel
        *   container stores values that differ in size. A varying amount of data
        *   may be packed per cell, if for example the underlying ValueType of
        *   the VectorType container is a container itself.
-       * @param[in] refinement_strategy Function deciding how data will be
-       * stored on refined cells from its parent cell.
-       * @param[in] coarsening_strategy Function deciding which data to store on
-       *   a cell whose children will get coarsened into.
+       * @param[in] refinement_strategy %Function deciding how data will be
+       *   stored on refined cells from its parent cell.
+       * @param[in] coarsening_strategy %Function deciding which data to store
+       *   on a cell whose children will get coarsened into.
        */
       CellDataTransfer(
         const parallel::distributed::Triangulation<dim, spacedim>
@@ -246,8 +246,8 @@ namespace parallel
        *   container stores values that differ in size. A varying amount of data
        *   may be packed per cell, if for example the underlying ValueType of
        *   the VectorType container is a container itself.
-       * @param[in] coarsening_strategy Function deciding which data to store on
-       *   a cell whose children will get coarsened into.
+       * @param[in] coarsening_strategy %Function deciding which data to store
+       *   on a cell whose children will get coarsened into.
        *
        * @deprecated Use the above constructor instead.
        */
@@ -341,7 +341,7 @@ namespace parallel
       const bool transfer_variable_size_data;
 
       /**
-       * Function deciding how data will be stored on refined cells from its
+       * %Function deciding how data will be stored on refined cells from its
        * parent cell.
        */
       const std::function<std::vector<value_type>(
@@ -350,7 +350,7 @@ namespace parallel
         refinement_strategy;
 
       /**
-       * Function deciding on how to process data from children to be stored on
+       * %Function deciding on how to process data from children to be stored on
        * the parent cell.
        */
       const std::function<value_type(

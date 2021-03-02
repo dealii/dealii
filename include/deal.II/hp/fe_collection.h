@@ -528,7 +528,7 @@ namespace hp
     get_hierarchy_sequence(const unsigned int fe_index = 0) const;
 
     /**
-     * Function returning the index of the finite element following the given
+     * %Function returning the index of the finite element following the given
      * @p fe_index in hierarchy.
      *
      * By default, the index succeeding @p fe_index will be returned. If @p fe_index
@@ -540,7 +540,7 @@ namespace hp
     next_in_hierarchy(const unsigned int fe_index) const;
 
     /**
-     * Function returning the index of the finite element preceding the given
+     * %Function returning the index of the finite element preceding the given
      * @p fe_index in hierarchy.
      *
      * By default, the index preceding @p fe_index will be returned. If @p fe_index
@@ -768,7 +768,7 @@ namespace hp
       finite_elements;
 
     /**
-     * Function returning the index of the finite element following the given
+     * %Function returning the index of the finite element following the given
      * one in hierarchy.
      */
     std::function<unsigned int(const typename hp::FECollection<dim, spacedim> &,
@@ -776,7 +776,7 @@ namespace hp
       hierarchy_next;
 
     /**
-     * Function returning the index of the finite element preceding the given
+     * %Function returning the index of the finite element preceding the given
      * one in hierarchy.
      */
     std::function<unsigned int(const typename hp::FECollection<dim, spacedim> &,

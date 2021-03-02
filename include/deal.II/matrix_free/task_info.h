@@ -336,7 +336,7 @@ namespace internal
         DynamicSparsityPattern &          connectivity_blocks) const;
 
       /**
-       * Function to create coloring on the second layer within each
+       * %Function to create coloring on the second layer within each
        * partition.
        */
       void
@@ -349,7 +349,7 @@ namespace internal
         std::vector<unsigned int> &      partition_color_list);
 
       /**
-       * Function to create partitioning on the second layer within each
+       * %Function to create partitioning on the second layer within each
        * partition.
        */
       void
