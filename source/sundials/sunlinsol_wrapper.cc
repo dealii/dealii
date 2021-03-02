@@ -103,7 +103,7 @@ namespace SUNDIALS
     template <typename VectorType>
     int
     arkode_linsol_solve(SUNLinearSolver LS,
-                        SUNMatrix,
+                        SUNMatrix /*ignored*/,
                         N_Vector x,
                         N_Vector b,
                         realtype tol)
@@ -125,7 +125,7 @@ namespace SUNDIALS
 
     template <typename VectorType>
     int
-    arkode_linsol_setup(SUNLinearSolver LS, SUNMatrix)
+    arkode_linsol_setup(SUNLinearSolver LS, SUNMatrix /*ignored*/)
     {
       auto content = access_content<VectorType>(LS);
       if (content->preconditioner_setup)
@@ -171,6 +171,8 @@ namespace SUNDIALS
       return 0;
     }
   } // namespace
+
+
 
   template <typename VectorType>
   internal::LinearSolverWrapper<VectorType>::LinearSolverWrapper(
