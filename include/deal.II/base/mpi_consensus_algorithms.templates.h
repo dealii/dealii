@@ -593,11 +593,11 @@ namespace Utilities
         // implementations. We reduce the threshold for debug mode to be
         // able to test also the non-blocking implementation. This feature
         // is tested by:
-        // tests/multigrid/transfer_matrix_free_06.with_mpi=true.with_p4est=true.with_trilinos=true.mpirun=15.output
+        // tests/multigrid/transfer_matrix_free_06.with_mpi=true.with_p4est=true.with_trilinos=true.mpirun=10.output
 #ifdef DEAL_II_WITH_MPI
 #  if DEAL_II_MPI_VERSION_GTE(3, 0)
 #    ifdef DEBUG
-        if (this->n_procs > 14)
+        if (this->n_procs > 10)
 #    else
         if (this->n_procs > 99)
 #    endif
