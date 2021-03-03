@@ -66,6 +66,15 @@ namespace Utilities
       template class Selector<types::global_dof_index, unsigned int>;
 #endif
 
+      template class Process<char, char>;
+
+      template class NBX<char, char>;
+
+      template class PEX<char, char>;
+
+      template class Serial<char, char>;
+
+      template class Selector<char, char>;
 
     } // namespace ConsensusAlgorithms
   }   // end of namespace MPI
