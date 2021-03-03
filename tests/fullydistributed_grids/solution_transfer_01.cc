@@ -64,19 +64,20 @@ transfer(const std::string &mode)
     "solution_transfer_" + std::to_string(dim) + "d_out";
 
   parallel::fullydistributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
-  if (mode == "save")
-    {
-      parallel::distributed::Triangulation<dim> tria_base(MPI_COMM_WORLD);
-      GridGenerator::hyper_cube(tria_base);
-      tria_base.refine_global(3);
+  {
+    parallel::distributed::Triangulation<dim> tria_base(MPI_COMM_WORLD);
+    GridGenerator::hyper_cube(tria_base);
+    tria_base.refine_global(3);
 
-      const auto description = TriangulationDescription::Utilities::
-        create_description_from_triangulation(tria_base, MPI_COMM_WORLD);
+    const auto description = TriangulationDescription::Utilities::
+      create_description_from_triangulation(tria_base, MPI_COMM_WORLD);
 
-      triangulation.create_triangulation(description);
-    }
-  else if (mode == "load")
+    triangulation.create_triangulation(description);
+  }
+
+  if (mode == "load")
     {
+      triangulation.clear();
       triangulation.load(filename);
     }
 
