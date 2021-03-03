@@ -2653,6 +2653,119 @@ DoFHandler<dim, spacedim>::distribute_mg_dofs()
 
 
 template <int dim, int spacedim>
+bool
+DoFHandler<dim, spacedim>::prepare_coarsening_and_refinement(
+  const unsigned int max_difference,
+  const unsigned int contains_fe_index) const
+{
+  Assert(max_difference > 0,
+         ExcMessage(
+           "This function does not serve any purpose for max_difference = 0."));
+  AssertIndexRange(contains_fe_index, fe_collection.size());
+
+  if (!hp_capability_enabled)
+    // nothing to do
+    return false;
+
+  // communication of future fe indices on ghost cells necessary.
+  // thus, currently only implemented for serial triangulations.
+  Assert((dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+            &(*tria)) == nullptr),
+         ExcNotImplemented());
+
+  //
+  // establish hierarchy
+  //
+  // - create bimap between hierarchy levels and FE indices
+  // - classify cells based on their level
+
+  // map from FE index to level in hierarchy
+  // FE indices that are not covered in the hierarchy are not in the map
+  const std::vector<unsigned int> fe_index_for_hierarchy_level =
+    fe_collection.get_hierarchy_sequence(contains_fe_index);
+
+  // map from level in hierarchy to FE index
+  // FE indices that are not covered in the hierarchy are not in the map
+  std::map<unsigned int, unsigned int> hierarchy_level_for_fe_index;
+  for (unsigned int i = 0; i < fe_index_for_hierarchy_level.size(); ++i)
+    hierarchy_level_for_fe_index[fe_index_for_hierarchy_level[i]] = i;
+
+  // map from level in hierarchy to cells on that particular level
+  // cells that are not covered in the hierarchy are not in the map
+  std::vector<std::list<active_cell_iterator>> cells_on_hierarchy_level(
+    fe_index_for_hierarchy_level.size());
+  if (fe_index_for_hierarchy_level.size() == fe_collection.size())
+    {
+      // all FE indices are part of hierarchy
+      for (const auto &cell : active_cell_iterators())
+        cells_on_hierarchy_level
+          [hierarchy_level_for_fe_index[cell->future_fe_index()]]
+            .push_back(cell);
+    }
+  else
+    {
+      // only some FE indices are part of hierarchy
+      typename decltype(hierarchy_level_for_fe_index)::iterator iter;
+      for (const auto &cell : active_cell_iterators())
+        {
+          iter = hierarchy_level_for_fe_index.find(cell->future_fe_index());
+          if (iter != hierarchy_level_for_fe_index.end())
+            cells_on_hierarchy_level[iter->second].push_back(cell);
+        }
+    }
+
+  //
+  // limit level difference of neighboring cells
+  //
+  // - always raise levels to match criterion, never lower them
+  //   (hence iterating from highest to lowest level)
+  // - update future FE indices
+  // - move cells in level representation correspondigly
+
+  bool changed_fe_indices = false;
+  for (unsigned int level = fe_index_for_hierarchy_level.size() - 1;
+       level > max_difference;
+       --level)
+    for (const auto &cell : cells_on_hierarchy_level[level])
+      for (unsigned int f = 0; f < cell->n_faces(); ++f)
+        if (cell->face(f)->at_boundary() == false)
+          {
+            const auto neighbor = cell->neighbor(f);
+
+            const auto neighbor_fe_and_level =
+              hierarchy_level_for_fe_index.find(neighbor->future_fe_index());
+
+            // ignore neighbors that are not part of the hierarchy
+            if (neighbor_fe_and_level == hierarchy_level_for_fe_index.end())
+              continue;
+
+            const auto neighbor_level = neighbor_fe_and_level->second;
+
+            if ((level - max_difference) > neighbor_level)
+              {
+                // remove neighbor from old level representation
+                auto &     old_cells = cells_on_hierarchy_level[neighbor_level];
+                const auto iter =
+                  std::find(old_cells.begin(), old_cells.end(), neighbor);
+                old_cells.erase(iter);
+
+                // move neighbor to new level representation
+                const unsigned int new_level = level - max_difference;
+                cells_on_hierarchy_level[new_level].push_back(neighbor);
+
+                // update future FE index
+                neighbor->set_future_fe_index(
+                  fe_index_for_hierarchy_level[new_level]);
+                changed_fe_indices = true;
+              }
+          }
+
+  return changed_fe_indices;
+}
+
+
+
+template <int dim, int spacedim>
 void
 DoFHandler<dim, spacedim>::initialize_local_block_info()
 {
