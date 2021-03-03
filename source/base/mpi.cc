@@ -368,9 +368,6 @@ namespace Utilities
         {
           (void)destination;
           AssertIndexRange(destination, n_procs);
-          Assert(destination != myid,
-                 ExcMessage(
-                   "There is no point in communicating with ourselves."));
         }
 
 #  if DEAL_II_MPI_VERSION_GTE(3, 0)
