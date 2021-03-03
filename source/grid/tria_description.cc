@@ -211,7 +211,7 @@ namespace TriangulationDescription
           for (auto cell : tria.cell_iterators_on_level(level))
             if ((construct_multigrid &&
                  (cell->level_subdomain_id() == my_rank)) ||
-                (cell->active() && cell->subdomain_id() == my_rank))
+                (cell->is_active() && cell->subdomain_id() == my_rank))
               add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
                 cell, vertices_owned_by_locally_owned_cells_on_level);
 
@@ -298,7 +298,7 @@ namespace TriangulationDescription
       // on active level
       const auto is_locally_relevant_on_active_level =
         [&](TriaIterator<CellAccessor<dim, spacedim>> &cell) {
-          if (cell->active())
+          if (cell->is_active())
             for (const auto v : cell->vertex_indices())
               if (vertices_owned_by_locally_owned_active_cells
                     [cell->vertex_index(v)])
@@ -316,7 +316,7 @@ namespace TriangulationDescription
           for (auto cell : tria.cell_iterators_on_level(level))
             if ((construct_multigrid &&
                  (cell->level_subdomain_id() == my_rank)) ||
-                (cell->active() && cell->subdomain_id() == my_rank))
+                (cell->is_active() && cell->subdomain_id() == my_rank))
               add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
                 cell, vertices_owned_by_locally_owned_cells_on_level);
 
