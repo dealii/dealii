@@ -474,7 +474,7 @@ namespace internal
                   &fe) { return finite_elements[dataset].get() == fe.get(); });
           if (is_duplicate == false)
             {
-              if (cell->active())
+              if (cell->is_active())
                 {
                   typename DoFHandler<dim, spacedim>::active_cell_iterator
                     dh_cell(&cell->get_triangulation(),
