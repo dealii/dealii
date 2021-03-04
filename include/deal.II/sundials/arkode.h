@@ -41,6 +41,8 @@
 #  ifdef DEAL_II_WITH_MPI
 #    include <nvector/nvector_parallel.h>
 #  endif
+#  include <deal.II/base/discrete_time.h>
+
 #  include <deal.II/sundials/n_vector.h>
 #  include <deal.II/sundials/sunlinsol_wrapper.h>
 
@@ -535,9 +537,43 @@ namespace SUNDIALS
     /**
      * Integrate the initial value problem. This function returns the final
      * number of computed steps.
+     *
+     * @param solution On input, this vector contains the initial condition. On
+     *   output, it contains the solution at the final time.
      */
     unsigned int
     solve_ode(VectorType &solution);
+
+    /**
+     * Integrate the initial value problem. Compared to the function above, this
+     * function allows to specify an @p intermediate_time for the next solution.
+     * Repeated calls of this function must use monotonously increasing values
+     * for @p intermediate_time. The last solution state is saved internally
+     * along with the @p intermediate_time and will be reused as initial
+     * condition for the next call.
+     *
+     * Users may find this function useful when integrating ARKode into an outer
+     * time loop of their own, especially when output_step() is too restrictive.
+     *
+     * @note @p intermediate_time may be larger than AdditionalData::final_time,
+     *   which is ignored by this function.
+     *
+     * @param solution The final solution. If the solver restarts, either
+     *   because it is the first ever solve or the flag @p reset_solver is
+     *   set, the vector is also used as initial condition.
+     * @param intermediate_time The time for the incremental solution step. Must
+     *   be greater than the last time that was used in a previous call to this
+     *   function.
+     * @param reset_solver Optional flag to recreate all internal objects which
+     *   may be desirable for spatial adaptivity methods. If set to `true`,
+     *   reset() is called before solving the ODE, which sets @p solution as
+     *   initial condition. This will *not* reset the stored time from previous
+     *   calls to this function.
+     */
+    unsigned int
+    solve_ode_incrementally(VectorType & solution,
+                            const double intermediate_time,
+                            const bool   reset_solver = false);
 
     /**
      * Clear internal memory and start with clean objects. This function is
@@ -549,12 +585,12 @@ namespace SUNDIALS
      * a different function to solver_should_restart() that performs all mesh
      * changes, transfers the solution to the new mesh, and returns true.
      *
-     * @param[in] t  The new starting time
-     * @param[in] h  The new starting time step
-     * @param[in,out] y   The new initial solution
+     * @param t  The new starting time
+     * @param h  The new starting time step
+     * @param y  The new initial solution
      */
     void
-    reset(const double t, const double h, VectorType &y);
+    reset(const double t, const double h, const VectorType &y);
 
     /**
      * Provides user access to the internally used ARKODE memory.
@@ -1224,6 +1260,14 @@ namespace SUNDIALS
                    << "Please provide an implementation for the function \""
                    << arg1 << "\"");
 
+    /**
+     * Internal routine to call ARKode repeatedly.
+     */
+    int
+    do_evolve_time(VectorType &          solution,
+                   dealii::DiscreteTime &time,
+                   const bool            do_reset);
+
 #  if DEAL_II_SUNDIALS_VERSION_GTE(4, 0, 0)
 
     /**
@@ -1238,9 +1282,11 @@ namespace SUNDIALS
     /**
      * Set up the solver and preconditioner for a non-identity mass matrix in
      * the ARKODE memory object based on the user-specified functions.
+     * @param solution The solution vector which is used as a template to create
+     *   new vectors.
      */
     void
-    setup_mass_solver();
+    setup_mass_solver(const VectorType &solution);
 
 #  endif
 
@@ -1263,16 +1309,6 @@ namespace SUNDIALS
     void *arkode_mem;
 
     /**
-     * ARKode solution vector.
-     */
-    internal::NVectorView<VectorType> yy;
-
-    /**
-     * ARKode absolute tolerances vector.
-     */
-    internal::NVectorView<VectorType> abs_tolls;
-
-    /**
      * MPI communicator. SUNDIALS solver runs happily in
      * parallel. Note that if the library is compiled without MPI
      * support, MPI_Comm is aliased as int.
@@ -1280,9 +1316,9 @@ namespace SUNDIALS
     MPI_Comm communicator;
 
     /**
-     * Memory pool of vectors.
+     * The final time in the last call to solve_ode().
      */
-    GrowingVectorMemory<VectorType> mem;
+    double last_end_time;
 
 #  if DEAL_II_SUNDIALS_VERSION_GTE(4, 0, 0)
     std::unique_ptr<internal::LinearSolverWrapper<VectorType>> linear_solver;
