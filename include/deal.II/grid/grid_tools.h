@@ -946,6 +946,14 @@ namespace GridTools
    * obtained from GridTools::compute_mesh_predicate_bounding_box; then the
    * global one can be obtained using either
    * GridTools::exchange_local_bounding_boxes or Utilities::MPI::all_gather
+   * @param[in] tolerance Tolerance in terms of unit cell coordinates. Depending
+   *   on the problem, it might be necessary to adjust the tolerance in order
+   *   to be able to identify a cell. Floating
+   *   point arithmetic implies that a point will, in general, not lie exactly
+   *   on a vertex, edge, or face. In either case, it is not predictable which
+   *   of the cells adjacent to a vertex or an edge/face this function returns.
+   *   Consequently, algorithms that call this function need to take into
+   *   account that the returned cell will only contain the point approximately.
    * @return A tuple containing the quadrature information
    *
    * The elements of the output tuple are:
@@ -1001,7 +1009,99 @@ namespace GridTools
   distributed_compute_point_locations(
     const GridTools::Cache<dim, spacedim> &                cache,
     const std::vector<Point<spacedim>> &                   local_points,
-    const std::vector<std::vector<BoundingBox<spacedim>>> &global_bboxes);
+    const std::vector<std::vector<BoundingBox<spacedim>>> &global_bboxes,
+    const double                                           tolerance = 1e-10);
+
+  namespace internal
+  {
+    /**
+     * Data structure returned by
+     * GridTools::internal::distributed_compute_point_locations(). It provides
+     * information to perform GridTools::distributed_compute_point_locations()
+     * and to set up the communication pattern within
+     * Utilities::MPI::RemotePointEvaluation::reinit().
+     *
+     * @note The name of the fields are chosen with
+     *   Utilities::MPI::RemotePointEvaluation in mind. Here, quantities are
+     *   computed at specified arbitrary positioned points (and even on remote
+     *   processes in the MPI universe) cell by cell and these values are sent
+     *   to requesting processes, which receive the result and resort the
+     *   result according to the points.
+     */
+    template <int dim, int spacedim>
+    struct DistributedComputePointLocationsInternal
+    {
+      /**
+       * Information of each point on sending/evaluation side. The elements of
+       * the tuple are as follows: 0) cell level and index, 1) rank of the
+       * owning process, 2) local index of the owning process, 3) reference
+       * position, 4) real position, 5) permutation index within a send buffer.
+       */
+      std::vector<std::tuple<std::pair<int, int>,
+                             unsigned int,
+                             unsigned int,
+                             Point<dim>,
+                             Point<spacedim>,
+                             unsigned int>>
+        send_components;
+
+      /**
+       * Ranks to send to.
+       */
+      std::vector<unsigned int> send_ranks;
+
+      /**
+       * Pointers of ranges within a send buffer to be sent to the ranks
+       * specified by send_ranks. The size of the send buffer is given
+       * by send_ptrs.back().
+       */
+      std::vector<unsigned int> send_ptrs;
+
+      /**
+       * Information of each received data value. The elements of the tuple are
+       * as follows: 0) rank of sender, 1) local index, 2) enumeration index.
+       *
+       * @note The vector is sorted according to 1), 0), 2).
+       *
+       * @note To each point multiple data values might be associated to. This
+       *   might be the case if a point coincides with a geometric entity (e.g.,
+       *   vertex) that is shared by multiple cells.
+       */
+      std::vector<std::tuple<unsigned int, unsigned int, unsigned int>>
+        recv_components;
+
+      /**
+       * Ranks from where data is received.
+       */
+      std::vector<unsigned int> recv_ranks;
+
+      /**
+       * Pointers of ranges within a receive buffer that are filled by ranks
+       * specified by recv_ranks. The size of the receive buffer is given by
+       * recv_ptrs.back().
+       */
+      std::vector<unsigned int> recv_ptrs;
+    };
+
+    /**
+     * A function that fills DistributedComputePointLocationsInternal.
+     * If the input argument @p perform_handshake is set to false only
+     * the fields needed by
+     * GridTools::internal::distributed_compute_point_locations() are filled.
+     * If the input argument is set to true additional data structures are
+     * set up to be able to setup the communication pattern within
+     * Utilities::MPI::RemotePointEvaluation::reinit().
+     */
+    template <int dim, int spacedim>
+    DistributedComputePointLocationsInternal<dim, spacedim>
+    distributed_compute_point_locations(
+      const GridTools::Cache<dim, spacedim> &                cache,
+      const std::vector<Point<spacedim>> &                   points,
+      const std::vector<std::vector<BoundingBox<spacedim>>> &global_bboxes,
+      const double                                           tolerance,
+      const bool                                             perform_handshake);
+
+  } // namespace internal
 
   /**
    * Return a map `vertex index -> Point<spacedim>` containing the used
