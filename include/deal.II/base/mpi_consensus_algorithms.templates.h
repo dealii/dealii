@@ -575,11 +575,11 @@ namespace Utilities
         std::vector<T1> send_buffer;
         std::vector<T2> recv_buffer;
         std::vector<T2> request_buffer;
-        std::vector<T1> buffer_recv;
 
         this->process.create_request(0, send_buffer);
         this->process.prepare_buffer_for_answer(0, recv_buffer);
-        this->process.answer_request(0, buffer_recv, request_buffer);
+        this->process.answer_request(0, send_buffer, request_buffer);
+        recv_buffer = request_buffer;
         this->process.read_answer(0, recv_buffer);
       }
 
