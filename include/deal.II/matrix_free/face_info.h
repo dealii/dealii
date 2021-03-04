@@ -111,6 +111,12 @@ namespace internal
       unsigned char face_orientation;
 
       /**
+       * Reference-cell type of the given face: 0 for line or quadrilateral,
+       * 1 for triangle.
+       */
+      unsigned char face_type;
+
+      /**
        * Return the memory consumption of the present data structure.
        */
       std::size_t

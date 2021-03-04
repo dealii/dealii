@@ -1843,8 +1843,6 @@ namespace internal
 #ifndef DEAL_II_WITH_SIMPLEX_SUPPORT
               // currently only non-hp-case...
               AssertDimension(mapping_in.size(), 1);
-              AssertDimension(mapping_info.face_data[my_q].descriptor.size(),
-                              1);
 #endif
 
               // We assume that we have the faces sorted by the active FE
