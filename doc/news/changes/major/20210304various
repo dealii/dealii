@@ -1,0 +1,8 @@
+New: Experimental support for simplex meshes (i.e., meshes consisting
+of triangle or tetrahedron cells) and mixed meshes (i.e., meshes consisting
+of lines, triangles, quadrilateral, tetrahedron, pyramid, wedge, and/or 
+hexahedron cells) has been added. The new features are presented 
+in the test folder `tests/simplex` and in the 
+new "Simplex" module page.
+<br>
+(various, 2021/03/04)
