@@ -1672,11 +1672,11 @@ ReferenceCell::unit_tangential_vectors(const unsigned int face_no,
       AssertIndexRange(face_no, 5);
       static const ndarray<Tensor<1, dim>, 5, 2> table = {
         {{{Point<dim>(0, 1, 0), Point<dim>(1, 0, 0)}},
+         {{Point<dim>(1, 0, 0), Point<dim>(0, 1, 0)}},
          {{Point<dim>(1, 0, 0), Point<dim>(0, 0, 1)}},
          {{Point<dim>(-1 / std::sqrt(2.0), +1 / std::sqrt(2.0), 0),
            Point<dim>(0, 0, 1)}},
-         {{Point<dim>(0, 0, 1), Point<dim>(0, 1, 0)}},
-         {{Point<dim>(1, 0, 0), Point<dim>(0, 0, 1)}}}};
+         {{Point<dim>(0, 0, 1), Point<dim>(0, 1, 0)}}}};
 
       return table[face_no][i];
     }
