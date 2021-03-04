@@ -443,13 +443,8 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
           dst[level].reinit(ghosted_level_vector[level], false);
         else
           {
-            const dealii::parallel::TriangulationBase<dim, spacedim> *tria =
-              (dynamic_cast<
-                const dealii::parallel::TriangulationBase<dim, spacedim> *>(
-                &dof_handler.get_triangulation()));
             dst[level].reinit(dof_handler.locally_owned_mg_dofs(level),
-                              tria != nullptr ? tria->get_communicator() :
-                                                MPI_COMM_SELF);
+                              dof_handler.get_communicator());
           }
       }
     else if ((perform_plain_copy == false &&

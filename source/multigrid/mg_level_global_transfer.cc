@@ -284,11 +284,7 @@ void
 MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
   fill_and_communicate_copy_indices(const DoFHandler<dim, spacedim> &mg_dof)
 {
-  const parallel::TriangulationBase<dim, spacedim> *ptria =
-    dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-      &mg_dof.get_triangulation());
-  const MPI_Comm mpi_communicator =
-    ptria != nullptr ? ptria->get_communicator() : MPI_COMM_SELF;
+  const MPI_Comm mpi_communicator = mg_dof.get_communicator();
 
   fill_internal(mg_dof,
                 mg_constrained_dofs,

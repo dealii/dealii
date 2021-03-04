@@ -1260,13 +1260,7 @@ namespace VectorTools
     }
 #endif
 
-    MPI_Comm comm = MPI_COMM_SELF;
-#ifdef DEAL_II_WITH_MPI
-    if (const parallel::TriangulationBase<dim, spacedim> *ptria =
-          dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-            &tria))
-      comm = ptria->get_communicator();
-#endif
+    const MPI_Comm comm = tria.get_communicator();
 
     switch (norm)
       {

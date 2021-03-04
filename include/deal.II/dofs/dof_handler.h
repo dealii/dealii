@@ -1945,20 +1945,10 @@ DoFHandler<dim, spacedim>::n_locally_owned_dofs_per_processor() const
   if (number_cache.n_locally_owned_dofs_per_processor.empty() &&
       number_cache.n_global_dofs > 0)
     {
-      MPI_Comm comm;
-
-      const parallel::TriangulationBase<dim, spacedim> *tr =
-        (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-          &this->get_triangulation()));
-      if (tr != nullptr)
-        comm = tr->get_communicator();
-      else
-        comm = MPI_COMM_SELF;
-
       const_cast<dealii::internal::DoFHandlerImplementation::NumberCache &>(
         number_cache)
         .n_locally_owned_dofs_per_processor =
-        number_cache.get_n_locally_owned_dofs_per_processor(comm);
+        number_cache.get_n_locally_owned_dofs_per_processor(get_communicator());
     }
   return number_cache.n_locally_owned_dofs_per_processor;
 }
@@ -1972,20 +1962,10 @@ DoFHandler<dim, spacedim>::locally_owned_dofs_per_processor() const
   if (number_cache.locally_owned_dofs_per_processor.empty() &&
       number_cache.n_global_dofs > 0)
     {
-      MPI_Comm comm;
-
-      const parallel::TriangulationBase<dim, spacedim> *tr =
-        (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-          &this->get_triangulation()));
-      if (tr != nullptr)
-        comm = tr->get_communicator();
-      else
-        comm = MPI_COMM_SELF;
-
       const_cast<dealii::internal::DoFHandlerImplementation::NumberCache &>(
         number_cache)
         .locally_owned_dofs_per_processor =
-        number_cache.get_locally_owned_dofs_per_processor(comm);
+        number_cache.get_locally_owned_dofs_per_processor(get_communicator());
     }
   return number_cache.locally_owned_dofs_per_processor;
 }
@@ -2007,20 +1987,11 @@ DoFHandler<dim, spacedim>::locally_owned_mg_dofs_per_processor(
   if (mg_number_cache[level].locally_owned_dofs_per_processor.empty() &&
       mg_number_cache[level].n_global_dofs > 0)
     {
-      MPI_Comm comm;
-
-      const parallel::TriangulationBase<dim, spacedim> *tr =
-        (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-          &this->get_triangulation()));
-      if (tr != nullptr)
-        comm = tr->get_communicator();
-      else
-        comm = MPI_COMM_SELF;
-
       const_cast<dealii::internal::DoFHandlerImplementation::NumberCache &>(
         mg_number_cache[level])
         .locally_owned_dofs_per_processor =
-        mg_number_cache[level].get_locally_owned_dofs_per_processor(comm);
+        mg_number_cache[level].get_locally_owned_dofs_per_processor(
+          get_communicator());
     }
   return mg_number_cache[level].locally_owned_dofs_per_processor;
 }
