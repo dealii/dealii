@@ -169,8 +169,10 @@ public:
           }
       },
       [&](const auto &data, auto &dst, const auto &src, const auto face_range) {
-        FEFaceEvaluation<dim, -1, 0, 1, number> fe_eval(data, true);
-        FEFaceEvaluation<dim, -1, 0, 1, number> fe_eval_neighbor(data, false);
+        FEFaceEvaluation<dim, -1, 0, 1, number> fe_eval(data, face_range, true);
+        FEFaceEvaluation<dim, -1, 0, 1, number> fe_eval_neighbor(data,
+                                                                 face_range,
+                                                                 false);
 
         for (unsigned int face = face_range.first; face < face_range.second;
              face++)
@@ -214,7 +216,7 @@ public:
           }
       },
       [&](const auto &data, auto &dst, const auto &src, const auto face_range) {
-        FEFaceEvaluation<dim, -1, 0, 1, number> fe_eval(data, true);
+        FEFaceEvaluation<dim, -1, 0, 1, number> fe_eval(data, face_range, true);
         for (unsigned int face = face_range.first; face < face_range.second;
              face++)
           {
