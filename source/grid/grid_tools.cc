@@ -5110,7 +5110,22 @@ namespace GridTools
           }
       }
     } // namespace DistributedComputePointLocations
-  }   // namespace internal
+
+
+    template <typename T, typename U>
+    std::vector<T>
+    permute(const std::vector<T> &input, const std::vector<U> &indices)
+    {
+      std::vector<T> ouput;
+      ouput.reserve(input.size());
+
+      for (unsigned int i = 0; i < input.size(); ++i)
+        ouput.push_back(input[std::get<2>(indices[i])]);
+
+      return ouput;
+    }
+
+  } // namespace internal
 
 
 
@@ -5341,14 +5356,41 @@ namespace GridTools
     out_points.resize(size_output);
     out_ranks.resize(size_output);
 
-    unsigned int c = 0;
+    unsigned int                                    c = 0;
+    std::vector<std::tuple<int, int, unsigned int>> cells_sorted;
+    cells_sorted.reserve(found_points.size());
+    for (const auto &cell_and_data : found_points)
+      cells_sorted.emplace_back(cell_and_data.first->level(),
+                                cell_and_data.first->index(),
+                                c++);
+    std::sort(cells_sorted.begin(), cells_sorted.end());
+
+    c = 0;
     for (const auto &cell_and_data : found_points)
       {
-        out_cells[c]   = cell_and_data.first;
-        out_qpoints[c] = std::get<0>(cell_and_data.second);
-        out_maps[c]    = std::get<1>(cell_and_data.second);
-        out_points[c]  = std::get<2>(cell_and_data.second);
-        out_ranks[c]   = std::get<3>(cell_and_data.second);
+        const unsigned int index = std::get<2>(cells_sorted[c]);
+
+        std::vector<std::tuple<unsigned int, unsigned int, unsigned int>>
+          indices_sorted;
+
+        const unsigned int n_indices = std::get<0>(cell_and_data.second).size();
+        indices_sorted.reserve(n_indices);
+
+        for (unsigned int i = 0; i < n_indices; ++i)
+          indices_sorted.emplace_back(std::get<3>(cell_and_data.second)[i],
+                                      std::get<1>(cell_and_data.second)[i],
+                                      i);
+        std::sort(indices_sorted.begin(), indices_sorted.end());
+
+        out_cells[index] = cell_and_data.first;
+        out_qpoints[index] =
+          internal::permute(std::get<0>(cell_and_data.second), indices_sorted);
+        out_maps[index] =
+          internal::permute(std::get<1>(cell_and_data.second), indices_sorted);
+        out_points[index] =
+          internal::permute(std::get<2>(cell_and_data.second), indices_sorted);
+        out_ranks[index] =
+          internal::permute(std::get<3>(cell_and_data.second), indices_sorted);
         ++c;
       }
 
