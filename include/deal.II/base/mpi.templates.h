@@ -44,6 +44,18 @@ namespace Utilities
        * Return the corresponding MPI data type id for the argument given.
        */
       inline MPI_Datatype
+      mpi_type_id(const bool *)
+      {
+#  if DEAL_II_MPI_VERSION_GTE(2, 2)
+        return MPI_CXX_BOOL;
+#  else
+        return MPI_C_BOOL;
+#  endif
+      }
+
+
+
+      inline MPI_Datatype
       mpi_type_id(const char *)
       {
         return MPI_CHAR;
@@ -452,6 +464,66 @@ namespace Utilities
         const ArrayView<T> &      minima)
     {
       internal::all_reduce(MPI_MIN, values, mpi_communicator, minima);
+    }
+
+
+
+    template <typename T>
+    T
+    logical_or(const T &t, const MPI_Comm &mpi_communicator)
+    {
+      static_assert(std::is_integral<T>::value,
+                    "The MPI_LOR operation only allows integral data types.");
+
+      T return_value{};
+      internal::all_reduce(MPI_LOR,
+                           ArrayView<const T>(&t, 1),
+                           mpi_communicator,
+                           ArrayView<T>(&return_value, 1));
+      return return_value;
+    }
+
+
+
+    template <typename T, typename U>
+    void
+    logical_or(const T &values, const MPI_Comm &mpi_communicator, U &results)
+    {
+      static_assert(std::is_same<typename std::decay<T>::type,
+                                 typename std::decay<U>::type>::value,
+                    "Input and output arguments must have the same type!");
+
+      static_assert(std::is_integral<typename T::value_type>::value,
+                    "The MPI_LOR operation only allows integral data types.");
+
+      // Specializations of std containers for the data type bool do not
+      // necessarily store its elements as a contiguous array. Thus we will use
+      // the make_array_view() function with iterators here, which verifies
+      // this.
+      const auto array_view_values =
+        make_array_view(values.cbegin(), values.cend());
+      const auto array_view_results =
+        make_array_view(results.begin(), results.end());
+
+      using const_type =
+        ArrayView<const typename decltype(array_view_values)::value_type>;
+      logical_or(static_cast<const_type>(array_view_values),
+                 mpi_communicator,
+                 array_view_results);
+    }
+
+
+
+    template <typename T>
+    void
+    logical_or(const ArrayView<const T> &values,
+               const MPI_Comm &          mpi_communicator,
+               const ArrayView<T> &      results)
+    {
+      static_assert(std::is_integral<T>::value,
+                    "The MPI_LOR operation only allows integral data types.");
+
+      internal::all_reduce(MPI_LOR, values, mpi_communicator, results);
     }
 
 

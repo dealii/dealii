@@ -1188,6 +1188,16 @@ namespace Utilities
     }
 
 
+    template bool
+    logical_or<bool>(const bool &, const MPI_Comm &);
+
+
+    template void
+    logical_or<bool>(const ArrayView<const bool> &,
+                     const MPI_Comm &,
+                     const ArrayView<bool> &);
+
+
     template std::vector<unsigned int>
     compute_set_union(const std::vector<unsigned int> &vec,
                       const MPI_Comm &                 comm);

@@ -53,6 +53,9 @@ using MPI_Op       = int;
 #  ifndef MPI_SUM
 #    define MPI_SUM 0
 #  endif
+#  ifndef MPI_LOR
+#    define MPI_LOR 0
+#  endif
 #endif
 
 
@@ -679,6 +682,66 @@ namespace Utilities
         const ArrayView<T> &      minima);
 
     /**
+     * Performs a <i>logical or</i> operation over all processors of the value
+     * @p t. The <i>logical or</i> operator `||` returns the boolean value
+     * `true` if either or all operands are `true` and returns `false`
+     * otherwise. If the provided value @p t corresponds to `0` in its
+     * associated data type `T`, it will be interpreted as `false`, and `true`
+     * otherwise. Data type `T` must be of type `integral`, i.e., `bool`,
+     * `char`, `short`, `int`, `long`, or any of their variations.
+     *
+     * This function is collective over all processors given in the
+     * @ref GlossMPICommunicator "communicator".
+     * If deal.II is not configured for use of MPI, this function simply
+     * returns the value of @p value. This function corresponds to the
+     * <code>MPI_Allreduce</code> function, i.e., all processors receive the
+     * result of this operation.
+     *
+     * @note Sometimes, not all processors need a result and in that case one
+     * would call the <code>MPI_Reduce</code> function instead of the
+     * <code>MPI_Allreduce</code> function. The latter is at most twice as
+     * expensive, so if you are concerned about performance, it may be
+     * worthwhile investigating whether your algorithm indeed needs the result
+     * everywhere.
+     */
+    template <typename T>
+    T
+    logical_or(const T &t, const MPI_Comm &mpi_communicator);
+
+    /**
+     * Like the previous function, but performs the <i>logical or</i> operation
+     * on each element of an array. In other words, the i-th element of the
+     * results array is the result of the <i>logical or</i> operation applied on
+     * the i-th entries of the input arrays from each processor. T and U must
+     * decay to the same type, e.g., they just differ by one of them having a
+     * const type qualifier and the other not.
+     *
+     * Input and output arrays may be the same.
+     *
+     * @note Depending on your standard library, this function may not work with
+     *   specializations of `std::vector` for the data type `bool`. In that
+     *   case, use a different container or data type.
+     */
+    template <typename T, typename U>
+    void
+    logical_or(const T &values, const MPI_Comm &mpi_communicator, U &results);
+
+    /**
+     * Like the previous function, but performs the <i>logical or</i> operation
+     * on each element of an array as specified by the ArrayView arguments.
+     * In other words, the i-th element of the results array is the result of
+     * the <i>logical or</i> operation applied on the i-th entries of the input
+     * arrays from each processor.
+     *
+     * Input and output arrays may be the same.
+     */
+    template <typename T>
+    void
+    logical_or(const ArrayView<const T> &values,
+               const MPI_Comm &          mpi_communicator,
+               const ArrayView<T> &      results);
+
+    /**
      * A data structure to store the result of the min_max_avg() function.
      * The structure stores the minimum, maximum, and average of one
      * value contributed by each processor that participates in an
@@ -1129,6 +1192,21 @@ namespace Utilities
                            ArrayView<const T>(values, N),
                            mpi_communicator,
                            ArrayView<T>(minima, N));
+    }
+
+    template <typename T, unsigned int N>
+    void
+    logical_or(const T (&values)[N],
+               const MPI_Comm &mpi_communicator,
+               T (&results)[N])
+    {
+      static_assert(std::is_integral<T>::value,
+                    "The MPI_LOR operation only allows integral data types.");
+
+      internal::all_reduce(MPI_LOR,
+                           ArrayView<const T>(values, N),
+                           mpi_communicator,
+                           ArrayView<T>(results, N));
     }
 
     template <typename T>
