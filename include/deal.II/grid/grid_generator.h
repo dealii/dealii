@@ -2433,9 +2433,16 @@ namespace GridGenerator
      * Process a cell.
      */
     void
-    process_cell(std::vector<double> &           ls_values,
-                 std::vector<Point<dim>> &       vertices,
-                 std::vector<CellData<dim - 1>> &cells) const;
+    process_cell(std::vector<double> &        ls_values,
+                 const std::vector<Point<2>> &points,
+                 std::vector<Point<2>> &      vertices,
+                 std::vector<CellData<1>> &   cells) const;
+
+    void
+    process_cell(std::vector<double> &        ls_values,
+                 const std::vector<Point<3>> &points,
+                 std::vector<Point<3>> &      vertices,
+                 std::vector<CellData<2>> &   cells) const;
 
   private:
     static Quadrature<dim>
@@ -2443,10 +2450,17 @@ namespace GridGenerator
 
     static void
     process_sub_cell(const std::vector<double> &     ls_values,
-                     const std::vector<Point<dim>> & points,
+                     const std::vector<Point<2>> &   points,
                      const std::vector<unsigned int> mask,
-                     std::vector<Point<dim>> &       vertices,
-                     std::vector<CellData<dim - 1>> &cells);
+                     std::vector<Point<2>> &         vertices,
+                     std::vector<CellData<1>> &      cells);
+
+    static void
+    process_sub_cell(const std::vector<double> &     ls_values,
+                     const std::vector<Point<3>> &   points,
+                     const std::vector<unsigned int> mask,
+                     std::vector<Point<3>> &         vertices,
+                     std::vector<CellData<2>> &      cells);
 
     const unsigned int    n_subdivisions;
     mutable FEValues<dim> fe_values;

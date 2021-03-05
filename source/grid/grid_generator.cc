@@ -8467,15 +8467,28 @@ namespace GridGenerator
   {
     std::vector<Point<dim>> quadrature_points;
 
-    for (unsigned int j = 0; j <= n_subdivisions; ++j)
-      for (unsigned int i = 0; i <= n_subdivisions; ++i)
-        quadrature_points.emplace_back(1.0 / n_subdivisions * i,
-                                       1.0 / n_subdivisions * j);
+    if (dim == 2)
+      {
+        for (unsigned int j = 0; j <= n_subdivisions; ++j)
+          for (unsigned int i = 0; i <= n_subdivisions; ++i)
+            quadrature_points.emplace_back(1.0 / n_subdivisions * i,
+                                           1.0 / n_subdivisions * j);
 
-    for (unsigned int j = 0; j < n_subdivisions; ++j)
-      for (unsigned int i = 0; i < n_subdivisions; ++i)
-        quadrature_points.emplace_back(1.0 / n_subdivisions * (i + 0.5),
-                                       1.0 / n_subdivisions * (j + 0.5));
+        for (unsigned int j = 0; j < n_subdivisions; ++j)
+          for (unsigned int i = 0; i < n_subdivisions; ++i)
+            quadrature_points.emplace_back(1.0 / n_subdivisions * (i + 0.5),
+                                           1.0 / n_subdivisions * (j + 0.5));
+      }
+    else
+      {
+        for (unsigned int k = 0; k <= n_subdivisions; ++k)
+          for (unsigned int j = 0; j <= n_subdivisions; ++j)
+            for (unsigned int i = 0; i <= n_subdivisions; ++i)
+              quadrature_points.emplace_back(1.0 / n_subdivisions * i,
+                                             1.0 / n_subdivisions * j,
+                                             1.0 / n_subdivisions * k);
+      }
+
 
     return {quadrature_points};
   }
@@ -8498,7 +8511,10 @@ namespace GridGenerator
         fe_values.reinit(cell);
         ls_values.resize(cell->get_fe().n_dofs_per_cell());
         fe_values.get_function_values(ls_vector, ls_values);
-        process_cell(ls_values, vertices, cells);
+        process_cell(ls_values,
+                     fe_values.get_quadrature_points(),
+                     vertices,
+                     cells);
       }
   }
 
@@ -8507,9 +8523,10 @@ namespace GridGenerator
   template <int dim>
   void
   MarchingCubeAlgorithm<dim>::process_cell(
-    std::vector<double> &           ls_values,
-    std::vector<Point<dim>> &       vertices,
-    std::vector<CellData<dim - 1>> &cells) const
+    std::vector<double> &        ls_values,
+    const std::vector<Point<2>> &points,
+    std::vector<Point<2>> &      vertices,
+    std::vector<CellData<1>> &   cells) const
   {
     for (unsigned int j = 0; j < n_subdivisions; ++j)
       for (unsigned int i = 0; i < n_subdivisions; ++i)
@@ -8522,12 +8539,38 @@ namespace GridGenerator
             (n_subdivisions + 1) * (n_subdivisions + 1) +
               (n_subdivisions * j + i)};
 
-          process_sub_cell(ls_values,
-                           fe_values.get_quadrature_points(),
-                           mask,
-                           vertices,
-                           cells);
+          process_sub_cell(ls_values, points, mask, vertices, cells);
         }
+  }
+
+
+
+  template <int dim>
+  void
+  MarchingCubeAlgorithm<dim>::process_cell(
+    std::vector<double> &        ls_values,
+    const std::vector<Point<3>> &points,
+    std::vector<Point<3>> &      vertices,
+    std::vector<CellData<2>> &   cells) const
+  {
+    const unsigned p = n_subdivisions + 1;
+
+    for (unsigned int k = 0; k < n_subdivisions; ++k)
+      for (unsigned int j = 0; j < n_subdivisions; ++j)
+        for (unsigned int i = 0; i < n_subdivisions; ++i)
+          {
+            std::vector<unsigned int> mask{
+              p * p * (k + 0) + p * (j + 0) + (i + 0),
+              p * p * (k + 0) + p * (j + 0) + (i + 1),
+              p * p * (k + 0) + p * (j + 1) + (i + 1),
+              p * p * (k + 0) + p * (j + 1) + (i + 0),
+              p * p * (k + 1) + p * (j + 0) + (i + 0),
+              p * p * (k + 1) + p * (j + 0) + (i + 1),
+              p * p * (k + 1) + p * (j + 1) + (i + 1),
+              p * p * (k + 1) + p * (j + 1) + (i + 0)};
+
+            process_sub_cell(ls_values, points, mask, vertices, cells);
+          }
   }
 
 
@@ -8536,10 +8579,10 @@ namespace GridGenerator
   void
   MarchingCubeAlgorithm<dim>::process_sub_cell(
     const std::vector<double> &     ls_values,
-    const std::vector<Point<dim>> & points,
+    const std::vector<Point<2>> &   points,
     const std::vector<unsigned int> mask,
-    std::vector<Point<dim>> &       vertices,
-    std::vector<CellData<dim - 1>> &cells)
+    std::vector<Point<2>> &         vertices,
+    std::vector<CellData<1>> &      cells)
   {
     unsigned int c = 0;
 
@@ -8606,6 +8649,26 @@ namespace GridGenerator
 
     process_lines(table[c]);
   }
+
+
+
+  template <int dim>
+  void
+  MarchingCubeAlgorithm<dim>::process_sub_cell(
+    const std::vector<double> &     ls_values,
+    const std::vector<Point<3>> &   points,
+    const std::vector<unsigned int> mask,
+    std::vector<Point<3>> &         vertices,
+    std::vector<CellData<2>> &      cells)
+  {
+    (void)ls_values;
+    (void)points;
+    (void)mask;
+    (void)vertices;
+    (void)cells;
+  }
+
+
 
   template <int dim, typename VectorType>
   void
