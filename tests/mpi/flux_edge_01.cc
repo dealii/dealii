@@ -66,7 +66,7 @@ namespace Step39
   class InteriorPenaltyProblem
   {
   public:
-    typedef MeshWorker::IntegrationInfo<dim> CellInfo;
+    using CellInfo = MeshWorker::IntegrationInfo<dim>;
 
     InteriorPenaltyProblem(const FiniteElement<dim> &fe);
 

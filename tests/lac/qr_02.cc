@@ -101,8 +101,8 @@ template <typename number>
 void
 test()
 {
-  typedef Vector<number> VectorType;
-  QR<VectorType>         qr;
+  using VectorType = Vector<number>;
+  QR<VectorType> qr;
 
   auto print_givens = [](const unsigned int           i,
                          const unsigned int           j,

@@ -55,7 +55,7 @@
 
 namespace PhaseField
 {
-  typedef Vector<double> vectorType;
+  using vectorType = Vector<double>;
 
 
   ///////////////////////////////////////////////////////////////

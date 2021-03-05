@@ -51,10 +51,10 @@ test()
 
   std::set<std::string> input, output;
 
-  typedef typename DoFHandler<dim>::active_cell_iterator cell_iterator;
-  typedef short                                          DT;
-  std::map<CellId, DT>                                   map;
-  short                                                  counter = 0;
+  using cell_iterator = typename DoFHandler<dim>::active_cell_iterator;
+  using DT            = short;
+  std::map<CellId, DT> map;
+  short                counter = 0;
 
   std::map<unsigned int, std::set<dealii::types::subdomain_id>>
     vertices_with_ghost_neighbors =

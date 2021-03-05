@@ -36,8 +36,8 @@ check()
 int
 main()
 {
-  typedef Sacado::Fad::DFad<double>  Sdouble;
-  typedef Sacado::Fad::DFad<Sdouble> SSdouble;
+  using Sdouble  = Sacado::Fad::DFad<double>;
+  using SSdouble = Sacado::Fad::DFad<Sdouble>;
   initlog();
 
 

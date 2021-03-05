@@ -64,7 +64,7 @@ test()
   auto cell = dh.begin_active();
   auto endc = dh.end();
 
-  typedef decltype(cell) Iterator;
+  using Iterator = decltype(cell);
 
   auto measures = std::make_tuple(0.0, 0.0, 0.0);
 

@@ -117,7 +117,7 @@ test()
   if (fe_degree > 1)
     return;
 
-  typedef double                            number;
+  using number = double;
   const SphericalManifold<dim>              manifold;
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_ball(tria);

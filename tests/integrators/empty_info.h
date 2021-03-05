@@ -30,7 +30,7 @@ public:
 class EmptyInfoBox
 {
 public:
-  typedef EmptyInfo CellInfo;
+  using CellInfo = EmptyInfo;
   template <int dim, class DOFINFO>
   void
   post_cell(const MeshWorker::DoFInfoBox<dim, DOFINFO> &)

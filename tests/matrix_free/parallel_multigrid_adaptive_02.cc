@@ -201,12 +201,12 @@ do_test(const DoFHandler<dim> &dof)
   }
 
   // set up multigrid in analogy to step-37
-  typedef LaplaceOperator<dim,
-                          fe_degree,
-                          n_q_points_1d,
-                          1,
-                          LinearAlgebra::distributed::Vector<number>>
-    LevelMatrixType;
+  using LevelMatrixType =
+    LaplaceOperator<dim,
+                    fe_degree,
+                    n_q_points_1d,
+                    1,
+                    LinearAlgebra::distributed::Vector<number>>;
 
   MGLevelObject<LevelMatrixType>         mg_matrices;
   MGLevelObject<MatrixFree<dim, number>> mg_level_data;
@@ -256,9 +256,9 @@ do_test(const DoFHandler<dim> &dof)
   MGCoarseIterative<LevelMatrixType, number> mg_coarse;
   mg_coarse.initialize(mg_matrices[0]);
 
-  typedef PreconditionChebyshev<LevelMatrixType,
-                                LinearAlgebra::distributed::Vector<number>>
-    SMOOTHER;
+  using SMOOTHER =
+    PreconditionChebyshev<LevelMatrixType,
+                          LinearAlgebra::distributed::Vector<number>>;
   MGSmootherPrecondition<LevelMatrixType,
                          SMOOTHER,
                          LinearAlgebra::distributed::Vector<number>>

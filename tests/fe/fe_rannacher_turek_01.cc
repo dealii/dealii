@@ -124,8 +124,8 @@ test_interpolation()
   Quadrature<2> quadrature(fe.get_generalized_support_points());
   FEValues<2>   fev(fe, quadrature, update_values | update_JxW_values);
 
-  typedef DoFHandler<2>::cell_iterator cell_it;
-  cell_it                              cell = dofh.begin_active();
+  using cell_it = DoFHandler<2>::cell_iterator;
+  cell_it cell  = dofh.begin_active();
   for (; cell != dofh.end(); ++cell)
     {
       fev.reinit(cell);

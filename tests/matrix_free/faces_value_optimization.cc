@@ -208,7 +208,7 @@ test()
   AffineConstraints<double> constraints;
   constraints.close();
 
-  typedef double number;
+  using number = double;
 
   MatrixFree<dim, number> mf_data;
   {

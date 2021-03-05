@@ -50,9 +50,9 @@ test()
   tria[1].last_active()->set_refine_flag();
   tria[1].execute_coarsening_and_refinement();
 
-  typedef std::list<std::pair<typename Triangulation<dim>::cell_iterator,
-                              typename Triangulation<dim>::cell_iterator>>
-    CellList;
+  using CellList =
+    std::list<std::pair<typename Triangulation<dim>::cell_iterator,
+                        typename Triangulation<dim>::cell_iterator>>;
 
   const CellList cell_list =
     GridTools::get_finest_common_cells(tria[0], tria[1]);

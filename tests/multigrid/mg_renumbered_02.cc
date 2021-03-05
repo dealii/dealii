@@ -179,7 +179,7 @@ template <int dim>
 class LaplaceProblem
 {
 public:
-  typedef MeshWorker::IntegrationInfo<dim> CellInfo;
+  using CellInfo = MeshWorker::IntegrationInfo<dim>;
 
   LaplaceProblem(const unsigned int deg);
   void

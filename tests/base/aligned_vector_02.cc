@@ -21,8 +21,8 @@
 #include "../tests.h"
 
 
-typedef AlignedVector<unsigned int> VEC;
-typedef AlignedVector<VEC>          VECVEC;
+using VEC    = AlignedVector<unsigned int>;
+using VECVEC = AlignedVector<VEC>;
 void
 print_vec(VECVEC &v)
 {
@@ -39,8 +39,8 @@ print_vec(VECVEC &v)
 void
 test()
 {
-  typedef AlignedVector<unsigned int> VEC;
-  VEC                                 a(4);
+  using VEC = AlignedVector<unsigned int>;
+  VEC a(4);
   a[0] = 2;
   a[1] = 1;
   a[2] = 42;

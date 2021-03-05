@@ -68,7 +68,7 @@ public:
     , kappa(_kappa)
     , out("output")
   {
-    typedef Vector<double> VectorType;
+    using VectorType = Vector<double>;
 
     time_stepper.reinit_vector = [&](VectorType &v) { v.reinit(2); };
 

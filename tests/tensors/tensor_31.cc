@@ -27,19 +27,19 @@ test_symmetric()
 {
   constexpr int dim = 3;
 
-  typedef std::complex<double>                   rank0_complex;
+  using rank0_complex = std::complex<double>;
   dealii::Tensor<1, dim, rank0_complex>          curl_complex;
   dealii::SymmetricTensor<2, dim, rank0_complex> permeability_complex;
 
-  typedef std::complex<float>                 rank0_complex_float;
+  using rank0_complex_float = std::complex<float>;
   dealii::Tensor<1, dim, rank0_complex_float> curl_complex_float;
   dealii::Tensor<2, dim, rank0_complex_float> permeability_complex_float;
 
-  typedef double                rank0;
+  using rank0 = double;
   dealii::Tensor<1, dim, rank0> curl;
   dealii::Tensor<2, dim, rank0> permeability;
 
-  typedef double                      rank0_float;
+  using rank0_float = double;
   dealii::Tensor<1, dim, rank0_float> curl_float;
   dealii::Tensor<2, dim, rank0_float> permeability_float;
 
@@ -135,20 +135,20 @@ template <int dim>
 void
 test()
 {
-  typedef std::complex<double>                         rank0_complex;
+  using rank0_complex = std::complex<double>;
   dealii::Tensor<1, dim == 2 ? 1 : dim, rank0_complex> curl_complex;
   dealii::Tensor<dim == 2 ? 0 : 2, dim, rank0_complex> permeability_complex;
 
-  typedef std::complex<float> rank0_complex_float;
+  using rank0_complex_float = std::complex<float>;
   dealii::Tensor<1, dim == 2 ? 1 : dim, rank0_complex_float> curl_complex_float;
   dealii::Tensor<dim == 2 ? 0 : 2, dim, rank0_complex_float>
     permeability_complex_float;
 
-  typedef double                               rank0;
+  using rank0 = double;
   dealii::Tensor<1, dim == 2 ? 1 : dim, rank0> curl;
   dealii::Tensor<dim == 2 ? 0 : 2, dim, rank0> permeability;
 
-  typedef double                                     rank0_float;
+  using rank0_float = double;
   dealii::Tensor<1, dim == 2 ? 1 : dim, rank0_float> curl_float;
   dealii::Tensor<dim == 2 ? 0 : 2, dim, rank0_float> permeability_float;
 

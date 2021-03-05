@@ -25,7 +25,7 @@
 
 using namespace Polynomials;
 
-typedef std::vector<Polynomial<double>> PolVector;
+using PolVector = std::vector<Polynomial<double>>;
 
 
 void

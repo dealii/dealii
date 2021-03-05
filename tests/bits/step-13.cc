@@ -347,7 +347,7 @@ namespace LaplaceSolver
   void
   Solver<dim>::assemble_linear_system(LinearSystem &linear_system)
   {
-    typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
+    using active_cell_iterator = typename DoFHandler<dim>::active_cell_iterator;
 
     const unsigned int n_threads = MultithreadInfo::n_threads();
     std::vector<std::pair<active_cell_iterator, active_cell_iterator>>

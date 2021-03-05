@@ -37,7 +37,7 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, numbers::invalid_unsigned_int);
 
-  typedef Vector<double> VectorType;
+  using VectorType = Vector<double>;
 
   SUNDIALS::KINSOL<VectorType>::AdditionalData data;
   ParameterHandler                             prm;

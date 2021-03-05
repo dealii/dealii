@@ -59,7 +59,7 @@ template <int dim, typename number = double>
 class LaplaceOperator : public Subscriptor
 {
 public:
-  typedef number value_type;
+  using value_type = number;
 
   LaplaceOperator(){};
 
@@ -460,7 +460,7 @@ do_test(const DoFHandler<dim> &dof, const unsigned int n_q_points_1d)
   in = 1.;
 
   // set up multigrid in analogy to step-37
-  typedef LaplaceOperator<dim, number> LevelMatrixType;
+  using LevelMatrixType = LaplaceOperator<dim, number>;
 
   MGLevelObject<LevelMatrixType> mg_matrices;
   mg_matrices.resize(0, dof.get_triangulation().n_global_levels() - 1);
@@ -474,9 +474,9 @@ do_test(const DoFHandler<dim> &dof, const unsigned int n_q_points_1d)
   MGCoarseIterative<LevelMatrixType, number> mg_coarse;
   mg_coarse.initialize(mg_matrices[0]);
 
-  typedef PreconditionChebyshev<LevelMatrixType,
-                                LinearAlgebra::distributed::Vector<number>>
-    SMOOTHER;
+  using SMOOTHER =
+    PreconditionChebyshev<LevelMatrixType,
+                          LinearAlgebra::distributed::Vector<number>>;
   MGSmootherPrecondition<LevelMatrixType,
                          SMOOTHER,
                          LinearAlgebra::distributed::Vector<number>>

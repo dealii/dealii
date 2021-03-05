@@ -47,10 +47,9 @@ test()
   std::map<CellId, std::string> input;
   std::set<std::string>         output;
 
-  typedef
-    typename parallel::distributed::Triangulation<dim>::active_cell_iterator
-                        cell_iterator;
-  typedef double        DT;
+  using cell_iterator =
+    typename parallel::distributed::Triangulation<dim>::active_cell_iterator;
+  using DT = double;
   std::map<CellId, int> map;
   int                   counter = 0;
 

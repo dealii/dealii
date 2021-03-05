@@ -43,7 +43,7 @@ test()
   std::set<std::string> input, output;
 
 
-  typedef double       DT;
+  using DT = double;
   std::map<CellId, DT> map;
   DT                   counter = 0.0;
 
@@ -70,9 +70,8 @@ test()
           }
       }
 
-  typedef
-    typename parallel::distributed::Triangulation<dim>::active_cell_iterator
-      cell_iterator;
+  using cell_iterator =
+    typename parallel::distributed::Triangulation<dim>::active_cell_iterator;
   GridTools::
     exchange_cell_data_to_ghosts<DT, parallel::distributed::Triangulation<dim>>(
       tria,

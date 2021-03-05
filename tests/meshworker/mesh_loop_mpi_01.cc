@@ -67,7 +67,7 @@ test()
   auto cell = tria.begin_active();
   auto endc = tria.end();
 
-  typedef decltype(cell) Iterator;
+  using Iterator = decltype(cell);
 
   auto cell_worker = [](const Iterator &cell, ScratchData &s, CopyData &c) {
     deallog << "Cell worker on : " << cell << " ghost? " << cell->is_ghost()

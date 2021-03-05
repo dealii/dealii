@@ -39,7 +39,7 @@ template <typename number>
 void
 test()
 {
-  typedef Vector<number> VectorType;
+  using VectorType = Vector<number>;
 
   // size of the problem
   const unsigned int N = 10;

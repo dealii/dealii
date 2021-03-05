@@ -51,7 +51,7 @@ template <int dim, int fe_degree>
 void
 test()
 {
-  typedef double number;
+  using number = double;
 
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);

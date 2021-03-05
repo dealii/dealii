@@ -50,7 +50,7 @@ template <int dim,
 class MatrixFreeVariant
 {
 public:
-  typedef VectorizedArray<Number> vector_t;
+  using vector_t = VectorizedArray<Number>;
 
   MatrixFreeVariant(const MatrixFree<dim, Number> &data_in)
     : data(data_in)

@@ -72,8 +72,8 @@ template <int dim,
 class BlockLaplace : public Subscriptor
 {
 public:
-  typedef typename BlockVectorType::value_type value_type;
-  typedef typename BlockVectorType::size_type  size_type;
+  using value_type = typename BlockVectorType::value_type;
+  using size_type  = typename BlockVectorType::size_type;
 
   BlockLaplace()
     : Subscriptor()
@@ -322,12 +322,12 @@ do_test(const std::vector<const DoFHandler<dim> *> &dof)
     }
 
   // set up multigrid in analogy to step-37
-  typedef BlockLaplace<dim,
-                       fe_degree_1,
-                       fe_degree_2,
-                       n_q_points_1d,
-                       LinearAlgebra::distributed::BlockVector<number>>
-    LevelMatrixType;
+  using LevelMatrixType =
+    BlockLaplace<dim,
+                 fe_degree_1,
+                 fe_degree_2,
+                 n_q_points_1d,
+                 LinearAlgebra::distributed::BlockVector<number>>;
 
   MGLevelObject<LevelMatrixType>         mg_matrices;
   MGLevelObject<MatrixFree<dim, number>> mg_level_data;
@@ -383,7 +383,7 @@ do_test(const std::vector<const DoFHandler<dim> *> &dof)
   MGCoarseIterative<LevelMatrixType, number> mg_coarse;
   mg_coarse.initialize(mg_matrices[0]);
 
-  typedef PreconditionJacobi<LevelMatrixType> SMOOTHER;
+  using SMOOTHER = PreconditionJacobi<LevelMatrixType>;
   MGSmootherPrecondition<LevelMatrixType,
                          SMOOTHER,
                          LinearAlgebra::distributed::BlockVector<number>>

@@ -38,8 +38,8 @@ main()
   initlog();
   deallog << std::setprecision(3);
 
-  typedef Tensor<0, 1> T;
-  T                    t1(13.), t2(42);
+  using T = Tensor<0, 1>;
+  T t1(13.), t2(42);
 
   compare(T(), 0.);
   compare(T(13.), 13.);

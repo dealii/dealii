@@ -258,7 +258,7 @@ LaplaceProblem<dim>::solve()
   MGCoarseGridHouseholder<float, Vector<double>> mg_coarse;
   mg_coarse.initialize(coarse_matrix);
 
-  typedef PreconditionSOR<SparseMatrix<float>> RELAXATION;
+  using RELAXATION = PreconditionSOR<SparseMatrix<float>>;
   MGSmootherRelaxation<SparseMatrix<float>, RELAXATION, Vector<double>>
     mg_smoother;
 

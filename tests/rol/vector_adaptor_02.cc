@@ -72,7 +72,7 @@ public:
 void
 test(const double x, const double y)
 {
-  typedef double RealT;
+  using RealT = double;
 
   QuadraticObjective<RealT> quad_objective;
 

@@ -277,7 +277,7 @@ test()
                                             /*tolerance (global)*/ 0.0,
                                             /*reduce (w.r.t. initial)*/ 1.e-13);
 
-    typedef TrilinosWrappers::MPI::Vector  VectorType;
+    using VectorType = TrilinosWrappers::MPI::Vector;
     SolverCG<VectorType>                   solver_c(inner_control_c);
     TrilinosWrappers::PreconditionIdentity preconditioner;
 

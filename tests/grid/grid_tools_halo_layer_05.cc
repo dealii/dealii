@@ -85,7 +85,7 @@ test()
   tria.refine_global(2);
   DoFHandler<dim> dof_handler(tria);
 
-  typedef typename DoFHandler<dim>::active_cell_iterator cell_iterator;
+  using cell_iterator = typename DoFHandler<dim>::active_cell_iterator;
 
   // Mark a small block at the corner of the hypercube
   cell_iterator cell = dof_handler.begin_active(), endc = dof_handler.end();

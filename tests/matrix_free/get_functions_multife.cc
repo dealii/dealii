@@ -52,7 +52,7 @@ template <int dim,
 class MatrixFreeTest
 {
 public:
-  typedef std::vector<Vector<Number>> VectorType;
+  using VectorType = std::vector<Vector<Number>>;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
     : data(data_in)
@@ -206,7 +206,7 @@ template <int dim, int fe_degree>
 void
 test()
 {
-  typedef double     number;
+  using number = double;
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);

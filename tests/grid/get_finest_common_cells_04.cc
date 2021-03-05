@@ -79,9 +79,9 @@ test()
     }
 #endif
 
-  typedef std::list<std::pair<typename Triangulation<dim>::cell_iterator,
-                              typename Triangulation<dim>::cell_iterator>>
-    CellList;
+  using CellList =
+    std::list<std::pair<typename Triangulation<dim>::cell_iterator,
+                        typename Triangulation<dim>::cell_iterator>>;
 
   deallog << "number of locally owned cells in tria 0 and tria 1: "
           << tria_0.n_active_cells() << ' ' << tria_1.n_active_cells()

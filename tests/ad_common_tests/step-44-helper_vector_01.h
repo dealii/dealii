@@ -1193,8 +1193,8 @@ namespace Step44
     Assert(n_dependent_variables == n_independent_variables,
            ExcMessage("Expect square system."));
 
-    typedef AD::VectorFunction<dim, ad_type_code, number_t> ADHelper;
-    typedef typename ADHelper::ad_type                      ADNumberType;
+    using ADHelper     = AD::VectorFunction<dim, ad_type_code, number_t>;
+    using ADNumberType = typename ADHelper::ad_type;
     ADHelper ad_helper(n_independent_variables, n_dependent_variables);
     ad_helper.set_tape_buffer_sizes(); // Increase the buffer size from the
                                        // default values

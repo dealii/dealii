@@ -25,8 +25,8 @@
 void
 test()
 {
-  typedef AlignedVector<unsigned int> VEC;
-  VEC                                 a(4);
+  using VEC = AlignedVector<unsigned int>;
+  VEC a(4);
   deallog << "Constructor: ";
   for (unsigned int i = 0; i < a.size(); ++i)
     deallog << a[i] << " ";

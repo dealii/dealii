@@ -52,7 +52,7 @@ template <int dim, int fe_degree>
 void
 test()
 {
-  typedef double               number;
+  using number = double;
   const SphericalManifold<dim> manifold;
   Triangulation<dim>           tria;
   GridGenerator::hyper_ball(tria);

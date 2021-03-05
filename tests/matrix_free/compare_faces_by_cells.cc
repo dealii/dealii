@@ -51,7 +51,7 @@ template <int dim,
 class LaplaceOperator : public Subscriptor
 {
 public:
-  typedef number value_type;
+  using value_type = number;
 
   LaplaceOperator(){};
 

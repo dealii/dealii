@@ -102,7 +102,7 @@ test()
   deallog << "relevant: ";
   locally_relevant_dofs.print(deallog);
 
-  typedef typename LA::MPI::BlockSparseMatrix::value_type number;
+  using number = typename LA::MPI::BlockSparseMatrix::value_type;
 
   AffineConstraints<number> constraints(locally_relevant_dofs);
   constraints.close();
@@ -160,9 +160,9 @@ template <int dim>
 void
 test_alt()
 {
-  typedef LA_Trilinos LA;
-  unsigned int        myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-  unsigned int        numproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+  using LA             = LA_Trilinos;
+  unsigned int myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int numproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   if (myid == 0)
     deallog << "numproc=" << numproc << std::endl;

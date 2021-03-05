@@ -92,8 +92,8 @@ namespace Step50
     FE_Q<dim>                                 fe;
     DoFHandler<dim>                           mg_dof_handler;
 
-    typedef TrilinosWrappers::SparseMatrix matrix_t;
-    typedef TrilinosWrappers::MPI::Vector  vector_t;
+    using matrix_t = TrilinosWrappers::SparseMatrix;
+    using vector_t = TrilinosWrappers::MPI::Vector;
 
     matrix_t system_matrix;
 
@@ -416,7 +416,7 @@ namespace Step50
                                 PreconditionIdentity>
       coarse_grid_solver(coarse_solver, coarse_matrix, id);
 
-    typedef TrilinosWrappers::PreconditionJacobi         Smoother;
+    using Smoother = TrilinosWrappers::PreconditionJacobi;
     MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
     mg_smoother.initialize(mg_matrices);
     mg_smoother.set_steps(2);

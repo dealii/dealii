@@ -37,7 +37,7 @@ DeclException2(ExcNumberMismatch,
 
 
 
-typedef Triangulation<2>::active_cell_iterator active_cell_iterator;
+using active_cell_iterator = Triangulation<2>::active_cell_iterator;
 
 template <typename Iterator>
 bool
@@ -154,7 +154,7 @@ test()
   // check 4: and yet another possibility
   if (true)
     {
-      typedef FilteredIterator<active_cell_iterator> FI;
+      using FI = FilteredIterator<active_cell_iterator>;
 
       bool (*predicate)(const active_cell_iterator, const unsigned int) =
         &level_equal_to<active_cell_iterator>;
@@ -182,9 +182,9 @@ test()
   // id
   if (true)
     {
-      typedef FilteredIterator<active_cell_iterator> FI;
-      const IteratorFilters::SubdomainEqualTo        predicate(1);
-      FI                                             cell(predicate);
+      using FI = FilteredIterator<active_cell_iterator>;
+      const IteratorFilters::SubdomainEqualTo predicate(1);
+      FI                                      cell(predicate);
       cell.set_to_next_positive(tria.begin_active());
       active_cell_iterator endc(tria.end());
       active_cell_iterator cell1 = tria.begin_active();

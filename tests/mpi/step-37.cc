@@ -111,23 +111,21 @@ namespace Step37
 
     AffineConstraints<double> constraints;
     AffineConstraints<double> non_homogeneous_constraints;
-    typedef MatrixFreeOperators::LaplaceOperator<
+    using SystemMatrixType = MatrixFreeOperators::LaplaceOperator<
       dim,
       degree_finite_element,
       degree_finite_element + 1,
       1,
-      LinearAlgebra::distributed::Vector<double>>
-                     SystemMatrixType;
+      LinearAlgebra::distributed::Vector<double>>;
     SystemMatrixType system_matrix;
 
     MGConstrainedDoFs mg_constrained_dofs;
-    typedef MatrixFreeOperators::LaplaceOperator<
+    using LevelMatrixType = MatrixFreeOperators::LaplaceOperator<
       dim,
       degree_finite_element,
       degree_finite_element + 1,
       1,
-      LinearAlgebra::distributed::Vector<float>>
-                                   LevelMatrixType;
+      LinearAlgebra::distributed::Vector<float>>;
     MGLevelObject<LevelMatrixType> mg_matrices;
 
     LinearAlgebra::distributed::Vector<double> solution;
@@ -378,9 +376,9 @@ namespace Step37
     MGTransferMatrixFree<dim, float> mg_transfer(mg_constrained_dofs);
     mg_transfer.build(dof_handler);
 
-    typedef PreconditionChebyshev<LevelMatrixType,
-                                  LinearAlgebra::distributed::Vector<float>>
-      SmootherType;
+    using SmootherType =
+      PreconditionChebyshev<LevelMatrixType,
+                            LinearAlgebra::distributed::Vector<float>>;
     mg::SmootherRelaxation<SmootherType,
                            LinearAlgebra::distributed::Vector<float>>
                                                          mg_smoother;

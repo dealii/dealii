@@ -35,7 +35,7 @@ helmholtz_operator(const MatrixFree<dim, typename VectorType::value_type> &data,
                    const VectorType &                                      src,
                    const std::pair<unsigned int, unsigned int> &cell_range)
 {
-  typedef typename VectorType::value_type                Number;
+  using Number = typename VectorType::value_type;
   FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(data);
   const unsigned int n_q_points = fe_eval.n_q_points;
 
@@ -66,8 +66,8 @@ helmholtz_operator_no_template(
   const unsigned int                                      active_fe_index,
   const unsigned int                                      active_quad_index)
 {
-  typedef typename VectorType::value_type Number;
-  FEEvaluation<dim, -1, 0, 1, Number>     fe_eval(
+  using Number = typename VectorType::value_type;
+  FEEvaluation<dim, -1, 0, 1, Number> fe_eval(
     data, 0, 0, 0, active_fe_index, active_quad_index);
   const unsigned int n_q_points = fe_eval.n_q_points;
 
@@ -96,7 +96,7 @@ template <int dim,
 class MatrixFreeTest
 {
 public:
-  typedef VectorizedArray<Number> vector_t;
+  using vector_t = VectorizedArray<Number>;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
     : data(data_in)

@@ -43,7 +43,7 @@ template <int dim>
 class Local : public Subscriptor
 {
 public:
-  typedef MeshWorker::IntegrationInfo<dim> CellInfo;
+  using CellInfo = MeshWorker::IntegrationInfo<dim>;
 
   void
   cell(MeshWorker::DoFInfo<dim> &dinfo, CellInfo &info) const;

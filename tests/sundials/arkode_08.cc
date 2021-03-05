@@ -51,7 +51,7 @@ main(int argc, char **argv)
 {
   initlog();
 
-  typedef Vector<double> VectorType;
+  using VectorType = Vector<double>;
 
   ParameterHandler                             prm;
   SUNDIALS::ARKode<VectorType>::AdditionalData data;

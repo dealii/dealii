@@ -33,7 +33,7 @@
 
 
 #define N 3
-typedef Vector<double> VectorType;
+using VectorType = Vector<double>;
 
 class MGAll : public MGSmootherBase<VectorType>,
               public MGTransferBase<VectorType>,

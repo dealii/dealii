@@ -32,8 +32,8 @@ template <int dim,
 void
 test_serialization()
 {
-  namespace SD = Differentiation::SD;
-  typedef SD::Expression SD_number_t;
+  namespace SD      = Differentiation::SD;
+  using SD_number_t = SD::Expression;
 
   // Serialization
   // Note: We scope all symbolic variables to make sure that they are

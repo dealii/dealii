@@ -55,7 +55,7 @@ template <int dim>
 class TriaTest
 {
 private:
-  typedef typename parallel::distributed::Triangulation<dim> TypeTria;
+  using TypeTria = typename parallel::distributed::Triangulation<dim>;
 
 public:
   TriaTest(const typename dealii::Triangulation<dim>::MeshSmoothing
