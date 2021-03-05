@@ -674,8 +674,7 @@ MGTransferBlockMatrixFree<dim, Number>::copy_to_mg(
                 LinearAlgebra::distributed::Vector<Number> &v =
                   dst[level].block(b);
                 v.reinit(dof_handler[b]->locally_owned_mg_dofs(level),
-                         tria != nullptr ? tria->get_communicator() :
-                                           MPI_COMM_SELF);
+                         dof_handler[b]->get_communicator());
               }
             dst[level].collect_sizes();
           }

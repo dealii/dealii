@@ -491,11 +491,7 @@ namespace Particles
     if (!ids.empty())
       AssertDimension(ids.size(), positions.size());
 
-    const auto tria =
-      dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-        &(*triangulation));
-    const auto comm =
-      (tria != nullptr ? tria->get_communicator() : MPI_COMM_WORLD);
+    const auto comm = triangulation->get_communicator();
 
     const auto n_mpi_processes = Utilities::MPI::n_mpi_processes(comm);
 

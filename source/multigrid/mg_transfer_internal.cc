@@ -946,18 +946,12 @@ namespace internal
           // the base class for keeping ghosted transfer indices. To avoid
           // keeping two very similar vectors, we keep one single ghosted
           // vector that is augmented/filled here.
-          const dealii::parallel::TriangulationBase<dim, dim> *ptria =
-            (dynamic_cast<
-              const dealii::parallel::TriangulationBase<dim, dim> *>(&tria));
-          const MPI_Comm communicator =
-            ptria != nullptr ? ptria->get_communicator() : MPI_COMM_SELF;
-
           reinit_level_partitioner(dof_handler.locally_owned_mg_dofs(level),
                                    ghosted_level_dofs,
                                    external_partitioners.empty() ?
                                      nullptr :
                                      external_partitioners[level],
-                                   communicator,
+                                   tria.get_communicator(),
                                    target_partitioners[level],
                                    copy_indices_global_mine[level]);
 
@@ -976,7 +970,7 @@ namespace internal
                                        external_partitioners.empty() ?
                                          nullptr :
                                          external_partitioners[0],
-                                       communicator,
+                                       tria.get_communicator(),
                                        target_partitioners[0],
                                        copy_indices_global_mine[0]);
 
