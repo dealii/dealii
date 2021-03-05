@@ -442,7 +442,7 @@ namespace SUNDIALS
         // called do not actually receive the KINSOL object, just the LS
         // object, so we have to store a pointer to the current
         // object in the LS object
-        LS = SUNLinSolNewEmpty();
+        LS          = SUNLinSolNewEmpty();
         LS->content = this;
 
         LS->ops->gettype =
@@ -472,8 +472,8 @@ namespace SUNDIALS
         // if we don't set it, it won't call the functions that set up
         // the matrix object (i.e., the argument to the 'KINSetJacFn'
         // function below).
-        J             = SUNMatNewEmpty();
-        J->content    = this;
+        J          = SUNMatNewEmpty();
+        J->content = this;
 
         J->ops->getid = [](SUNMatrix /*ignored*/) -> SUNMatrix_ID {
           return SUNMATRIX_CUSTOM;
