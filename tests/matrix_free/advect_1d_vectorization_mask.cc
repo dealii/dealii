@@ -137,11 +137,11 @@ private:
       data, true, 0, 0, start_vector_component);
     FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number> phi_p(
       data, false, 0, 0, start_vector_component);
-    typedef typename FEFaceEvaluation<dim,
-                                      fe_degree,
-                                      n_q_points_1d,
-                                      n_components,
-                                      number>::value_type value_type;
+    using value_type = typename FEFaceEvaluation<dim,
+                                                 fe_degree,
+                                                 n_q_points_1d,
+                                                 n_components,
+                                                 number>::value_type;
 
     const unsigned int n_vect = VectorizedArray<number>::size();
 
@@ -193,12 +193,12 @@ private:
     const std::pair<unsigned int, unsigned int> &face_range) const
   {
     FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number>
-                                                          fe_eval(data, true, 0, 0, start_vector_component);
-    typedef typename FEFaceEvaluation<dim,
-                                      fe_degree,
-                                      n_q_points_1d,
-                                      n_components,
-                                      number>::value_type value_type;
+      fe_eval(data, true, 0, 0, start_vector_component);
+    using value_type = typename FEFaceEvaluation<dim,
+                                                 fe_degree,
+                                                 n_q_points_1d,
+                                                 n_components,
+                                                 number>::value_type;
 
     const unsigned int n_vect = VectorizedArray<number>::size();
 

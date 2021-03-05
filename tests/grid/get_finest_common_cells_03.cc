@@ -53,9 +53,9 @@ test()
   DoFHandler<dim> dh0(tria[0]);
   DoFHandler<dim> dh1(tria[1]);
 
-  typedef std::list<std::pair<typename DoFHandler<dim>::cell_iterator,
-                              typename DoFHandler<dim>::cell_iterator>>
-    CellList;
+  using CellList =
+    std::list<std::pair<typename DoFHandler<dim>::cell_iterator,
+                        typename DoFHandler<dim>::cell_iterator>>;
 
   const CellList cell_list = GridTools::get_finest_common_cells(dh0, dh1);
   for (typename CellList::const_iterator cell_pair = cell_list.begin();

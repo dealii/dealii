@@ -57,8 +57,8 @@ template <int dim, int degree, typename VectorType>
 class MatrixFreeTest
 {
 public:
-  typedef typename DoFHandler<dim>::active_cell_iterator CellIterator;
-  typedef double                                         Number;
+  using CellIterator = typename DoFHandler<dim>::active_cell_iterator;
+  using Number       = double;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
     : data(data_in){};
@@ -69,7 +69,7 @@ public:
               const VectorType &                           src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
-    typedef VectorizedArray<Number>                    vector_t;
+    using vector_t = VectorizedArray<Number>;
     FEEvaluation<dim, degree, degree + 1, dim, Number> phi(data);
     vector_t coeff = make_vectorized_array(global_coefficient);
 

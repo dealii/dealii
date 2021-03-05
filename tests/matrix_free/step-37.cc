@@ -376,9 +376,9 @@ namespace Step37
     void
     output_results(const unsigned int cycle) const;
 
-    typedef LaplaceOperator<dim, degree_finite_element, double>
-                                                               SystemMatrixType;
-    typedef LaplaceOperator<dim, degree_finite_element, float> LevelMatrixType;
+    using SystemMatrixType =
+      LaplaceOperator<dim, degree_finite_element, double>;
+    using LevelMatrixType = LaplaceOperator<dim, degree_finite_element, float>;
 
     Triangulation<dim>        triangulation;
     FE_Q<dim>                 fe;
@@ -578,7 +578,7 @@ namespace Step37
     MGCoarseGridHouseholder<float, Vector<double>> mg_coarse;
     mg_coarse.initialize(coarse_matrix);
 
-    typedef PreconditionChebyshev<LevelMatrixType, Vector<double>> SMOOTHER;
+    using SMOOTHER = PreconditionChebyshev<LevelMatrixType, Vector<double>>;
     MGSmootherPrecondition<LevelMatrixType, SMOOTHER, Vector<double>>
       mg_smoother;
 

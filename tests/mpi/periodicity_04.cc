@@ -258,8 +258,8 @@ check(const unsigned int orientation, bool reverse)
 
   triangulation.execute_coarsening_and_refinement();
 
-  typedef std::pair<typename Triangulation<dim>::cell_iterator, unsigned int>
-    CellFace;
+  using CellFace =
+    std::pair<typename Triangulation<dim>::cell_iterator, unsigned int>;
   const typename std::map<CellFace, std::pair<CellFace, std::bitset<3>>>
     &face_map = triangulation.get_periodic_face_map();
   typename std::map<CellFace,

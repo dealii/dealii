@@ -37,7 +37,7 @@ DeclException2(ExcNumberMismatch,
 
 
 
-typedef Triangulation<2>::active_cell_iterator active_cell_iterator;
+using active_cell_iterator = Triangulation<2>::active_cell_iterator;
 
 template <typename Iterator>
 bool

@@ -48,7 +48,7 @@ template <int dim, int fe_degree>
 void
 test()
 {
-  typedef double               number;
+  using number = double;
   const SphericalManifold<dim> manifold;
   Triangulation<dim>           tria;
   GridGenerator::hyper_ball(tria);
@@ -90,7 +90,7 @@ test()
                           mf_data.get_quadrature(),
                           update_quadrature_points);
 
-  typedef VectorizedArray<double> vector_t;
+  using vector_t = VectorizedArray<double>;
   for (unsigned int cell = 0; cell < n_cells; ++cell)
     {
       fe_eval.reinit(cell);

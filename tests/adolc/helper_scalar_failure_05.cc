@@ -40,8 +40,8 @@ template <int dim, typename number_t, enum AD::NumberTypes ad_type_code>
 bool
 test_register_multiple_dep_vars()
 {
-  typedef AD::ScalarFunction<dim, ad_type_code, number_t> ADHelper;
-  typedef typename ADHelper::ad_type                      ADNumberType;
+  using ADHelper     = AD::ScalarFunction<dim, ad_type_code, number_t>;
+  using ADNumberType = typename ADHelper::ad_type;
 
   std::cout << "*** Test variables: Scalar + Scalar (coupled), "
             << (AD::ADNumberTraits<ADNumberType>::is_taped == true ? "Taped" :

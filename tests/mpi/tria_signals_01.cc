@@ -109,7 +109,7 @@ test()
   signal_counter_clear                   = 0;
   signal_counter_any_change              = 0;
 
-  typedef parallel::distributed::Triangulation<dim, spacedim> TriaType;
+  using TriaType = parallel::distributed::Triangulation<dim, spacedim>;
 
   {
     const std::string prefix = Utilities::int_to_string(dim, 1) + "d-" +

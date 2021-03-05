@@ -395,7 +395,7 @@ namespace Step39
   class InteriorPenaltyProblem
   {
   public:
-    typedef MeshWorker::IntegrationInfo<dim> CellInfo;
+    using CellInfo = MeshWorker::IntegrationInfo<dim>;
 
     InteriorPenaltyProblem(const FiniteElement<dim> &fe);
 
@@ -641,10 +641,9 @@ namespace Step39
                                 PreconditionIdentity>
       coarse_grid_solver(coarse_solver, coarse_matrix, identity);
 
-    typedef RelaxationBlockJacobi<TrilinosWrappers::SparseMatrix,
-                                  double,
-                                  TrilinosWrappers::MPI::Vector>
-      Smoother;
+    using Smoother = RelaxationBlockJacobi<TrilinosWrappers::SparseMatrix,
+                                           double,
+                                           TrilinosWrappers::MPI::Vector>;
 
     MGLevelObject<typename Smoother::AdditionalData> smoother_data;
     smoother_data.resize(0, triangulation.n_levels() - 1);

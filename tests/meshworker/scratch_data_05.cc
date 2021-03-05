@@ -54,8 +54,8 @@
 
 using namespace MeshWorker;
 
-typedef Sacado::Fad::DFad<double>  Sdouble;
-typedef Sacado::Fad::DFad<Sdouble> SSdouble;
+using Sdouble  = Sacado::Fad::DFad<double>;
+using SSdouble = Sacado::Fad::DFad<Sdouble>;
 
 template <int dim, int spacedim>
 void
@@ -112,7 +112,7 @@ test()
   auto cell = dh.begin_active();
   auto endc = dh.end();
 
-  typedef decltype(cell) Iterator;
+  using Iterator = decltype(cell);
 
   FEValuesExtractors::Scalar scalar(0);
 

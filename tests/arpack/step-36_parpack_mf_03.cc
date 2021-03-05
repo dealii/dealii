@@ -137,7 +137,7 @@ test()
     // set up iterative inverse
     static ReductionControl inner_control_c(dof_handler.n_dofs(), 0.0, 1.e-14);
 
-    typedef LinearAlgebra::distributed::Vector<double> VectorType;
+    using VectorType = LinearAlgebra::distributed::Vector<double>;
     SolverCG<VectorType> solver_c(inner_control_c);
     PreconditionIdentity preconditioner;
     const auto invert = inverse_operator(linear_operator<VectorType>(mass),

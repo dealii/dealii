@@ -56,7 +56,7 @@ get_this_mpi_process()
 void
 test()
 {
-  typedef PETScWrappers::MPI::SparseMatrix::size_type size_type;
+  using size_type = PETScWrappers::MPI::SparseMatrix::size_type;
 
   // create a parallel matrix where the first
   // process has 10 rows, the second one 20,

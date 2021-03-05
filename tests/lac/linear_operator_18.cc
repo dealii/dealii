@@ -32,8 +32,8 @@ main(int argc, char *argv[])
   initlog();
   deallog << std::setprecision(10);
 
-  typedef LinearAlgebra::distributed::Vector<double> vector_t;
-  typedef TrilinosWrappers::SparseMatrix             matrix_t;
+  using vector_t = LinearAlgebra::distributed::Vector<double>;
+  using matrix_t = TrilinosWrappers::SparseMatrix;
 
   matrix_t a(5U, 4U, 3U);
   a.compress(VectorOperation::add);

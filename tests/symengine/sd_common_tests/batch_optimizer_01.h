@@ -513,10 +513,10 @@ test_functions()
   FullMatrix<number_t> D2psi_sd_sd(n_independent_variables,
                                    n_independent_variables);
   {
-    typedef SD::Expression SDNumberType;
+    using SDNumberType = SD::Expression;
 
     // Function and its derivatives
-    typedef FunctionStruct<SDNumberType> func_sd;
+    using func_sd = FunctionStruct<SDNumberType>;
 
     deallog.push("Symbolic computation: Function initialisation");
     const SDNumberType symb_s0("s1");

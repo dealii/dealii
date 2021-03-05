@@ -29,7 +29,7 @@ main()
 {
   initlog();
 
-  typedef std::tuple<std::string, Point<3>, unsigned int> T;
+  using T = std::tuple<std::string, Point<3>, unsigned int>;
 
   T a;
   a = Convert<T>::to_value("Ciao : 1.0, 2.0, 3.0 : 33");

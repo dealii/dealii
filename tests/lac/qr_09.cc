@@ -123,7 +123,7 @@ template <typename number>
 void
 test()
 {
-  typedef Vector<number> VectorType;
+  using VectorType = Vector<number>;
   QR<VectorType>         qr;
   ImplicitQR<VectorType> pqr;
 

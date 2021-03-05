@@ -1154,8 +1154,8 @@ namespace Step44
 
     const unsigned int n_independent_variables = data.local_dof_indices.size();
 
-    typedef AD::EnergyFunctional<ad_type_code, number_t> ADHelper;
-    typedef typename ADHelper::ad_type                   ADNumberType;
+    using ADHelper     = AD::EnergyFunctional<ad_type_code, number_t>;
+    using ADNumberType = typename ADHelper::ad_type;
     ADHelper ad_helper(n_independent_variables);
     ad_helper.set_tape_buffer_sizes(); // Increase the buffer size from the
                                        // default values

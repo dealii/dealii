@@ -36,8 +36,8 @@ template <int dim, typename number_t, enum AD::NumberTypes ad_type_code>
 void
 test_physics()
 {
-  typedef
-    typename AD::NumberTraits<number_t, ad_type_code>::ad_type ADNumberType;
+  using ADNumberType =
+    typename AD::NumberTraits<number_t, ad_type_code>::ad_type;
 
   std::cout << "*** Test physics functions: Kinematics, "
             << "dim = " << Utilities::to_string(dim) << ", "

@@ -187,9 +187,9 @@ main()
 
   generate_grid(triangulation2);
 
-  typedef Triangulation<2>::cell_iterator                         CellIterator2;
-  typedef std::vector<GridTools::PeriodicFacePair<CellIterator2>> FaceVector2;
-  FaceVector2                                                     test2;
+  using CellIterator2 = Triangulation<2>::cell_iterator;
+  using FaceVector2   = std::vector<GridTools::PeriodicFacePair<CellIterator2>>;
+  FaceVector2 test2;
   GridTools::collect_periodic_faces(
     triangulation2, 42, 1, test2, dealii::Tensor<1, 2>());
 
@@ -206,9 +206,9 @@ main()
 
   generate_grid(triangulation3);
 
-  typedef Triangulation<3>::cell_iterator                         CellIterator3;
-  typedef std::vector<GridTools::PeriodicFacePair<CellIterator3>> FaceVector3;
-  FaceVector3                                                     test3;
+  using CellIterator3 = Triangulation<3>::cell_iterator;
+  using FaceVector3   = std::vector<GridTools::PeriodicFacePair<CellIterator3>>;
+  FaceVector3 test3;
   GridTools::collect_periodic_faces(
     triangulation3, 42, 2, test3, dealii::Tensor<1, 3>());
 

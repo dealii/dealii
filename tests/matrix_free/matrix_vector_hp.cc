@@ -111,7 +111,7 @@ test()
   if (fe_degree > 1)
     return;
 
-  typedef double               number;
+  using number = double;
   const SphericalManifold<dim> manifold;
   Triangulation<dim>           tria;
   GridGenerator::hyper_ball(tria);

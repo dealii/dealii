@@ -154,7 +154,7 @@ void
 Step4<dim>::make_grid()
 {
   GridGenerator::hyper_cube(triangulation, -1, 1, true);
-  typedef typename dealii::Triangulation<dim>::cell_iterator CellIteratorTria;
+  using CellIteratorTria = typename dealii::Triangulation<dim>::cell_iterator;
   std::vector<dealii::GridTools::PeriodicFacePair<CellIteratorTria>>
                      periodic_faces;
   const unsigned int b_id1     = 2;

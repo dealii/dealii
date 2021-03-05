@@ -48,7 +48,7 @@ template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest
 {
 public:
-  typedef Vector<Number> VectorType;
+  using VectorType = Vector<Number>;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
     : data(data_in){};

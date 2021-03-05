@@ -34,7 +34,7 @@ template <int dim>
 class myIntegrator : public dealii::MeshWorker::LocalIntegrator<dim>
 {
 public:
-  typedef MeshWorker::IntegrationInfo<dim> CellInfo;
+  using CellInfo = MeshWorker::IntegrationInfo<dim>;
 
   void
   cell(MeshWorker::DoFInfo<dim> &dinfo, CellInfo &info) const;

@@ -365,8 +365,8 @@ template <int dim>
 void
 LaplaceProblem<dim>::solve()
 {
-  typedef SparseMatrix<double> matrix_t;
-  typedef Vector<double>       vector_t;
+  using matrix_t = SparseMatrix<double>;
+  using vector_t = Vector<double>;
 
   MGTransferPrebuilt<vector_t> mg_transfer(mg_constrained_dofs);
   mg_transfer.build(mg_dof_handler);
@@ -382,7 +382,7 @@ LaplaceProblem<dim>::solve()
                               PreconditionIdentity>
     coarse_grid_solver(coarse_solver, coarse_matrix, id);
 
-  typedef PreconditionJacobi<matrix_t>                 Smoother;
+  using Smoother = PreconditionJacobi<matrix_t>;
   MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
   mg_smoother.initialize(mg_matrices, Smoother::AdditionalData(0.5));
   mg_smoother.set_steps(2);
