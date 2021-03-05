@@ -780,6 +780,9 @@ namespace internal
                         info.cells_exterior[0] = numbers::invalid_unsigned_int;
                         info.interior_face_no  = f;
                         info.exterior_face_no  = dcell->face(f)->boundary_id();
+                        info.face_type =
+                          dcell->face(f)->reference_cell() !=
+                          dealii::ReferenceCells::get_hypercube<dim - 1>();
                         info.subface_index =
                           GeometryInfo<dim>::max_children_per_cell;
                         info.face_orientation = 0;
@@ -959,6 +962,9 @@ namespace internal
       else
         info.exterior_face_no = cell->neighbor_face_no(face_no);
 
+      info.face_type = cell->face(face_no)->reference_cell() !=
+                       dealii::ReferenceCells::get_hypercube<dim - 1>();
+
       info.subface_index = GeometryInfo<dim>::max_children_per_cell;
       Assert(neighbor->level() <= cell->level(), ExcInternalError());
       if (cell->level() > neighbor->level())
@@ -1037,6 +1043,8 @@ namespace internal
         return false;
       if (face1.face_orientation != face2.face_orientation)
         return false;
+      if (face1.face_type != face2.face_type)
+        return false;
 
       if (active_fe_indices.size() > 0)
         {
@@ -1072,6 +1080,12 @@ namespace internal
       operator()(const FaceToCellTopology<length> &face1,
                  const FaceToCellTopology<length> &face2) const
       {
+        // check if active FE indices match
+        if (face1.face_type < face2.face_type)
+          return true;
+        else if (face1.face_type > face2.face_type)
+          return false;
+
         // check if active FE indices match
         if (active_fe_indices.size() > 0)
           {
@@ -1187,6 +1201,7 @@ namespace internal
             new_faces(face_comparator);
           for (const auto &face_type : faces_type)
             {
+              macro_face.face_type = faces_in[face_type[0]].face_type;
               macro_face.interior_face_no =
                 faces_in[face_type[0]].interior_face_no;
               macro_face.exterior_face_no =

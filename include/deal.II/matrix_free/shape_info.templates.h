@@ -93,10 +93,9 @@ namespace internal
 
       const auto fe_poly = dynamic_cast<const FE_Poly<dim, dim> *>(&fe);
 
-      if (dynamic_cast<const FE_SimplexP<dim, dim> *>(&fe) != nullptr ||
-          dynamic_cast<const FE_SimplexDGP<dim, dim> *>(&fe) != nullptr ||
-          dynamic_cast<const FE_WedgeP<dim, dim> *>(&fe) != nullptr ||
-          dynamic_cast<const FE_PyramidP<dim, dim> *>(&fe) != nullptr)
+      if (dynamic_cast<const FE_SimplexPoly<dim, dim> *>(&fe) != nullptr ||
+          dynamic_cast<const FE_Wedge<dim, dim> *>(&fe) != nullptr ||
+          dynamic_cast<const FE_Pyramid<dim, dim> *>(&fe) != nullptr)
         {
           scalar_lexicographic.resize(fe.n_dofs_per_cell());
           for (unsigned int i = 0; i < scalar_lexicographic.size(); ++i)

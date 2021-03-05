@@ -2549,7 +2549,7 @@ namespace internal
       if (data.element_type == MatrixFreeFunctions::tensor_none)
         {
           const unsigned int n_dofs     = data.dofs_per_component_on_cell;
-          const unsigned int n_q_points = data.n_q_points_face;
+          const unsigned int n_q_points = data.n_q_points_faces[face_no];
           const auto         shape_info = data.data.front();
 
           using Eval = EvaluatorTensorProduct<evaluate_general,
@@ -2704,7 +2704,7 @@ namespace internal
       if (data.element_type == MatrixFreeFunctions::tensor_none)
         {
           const unsigned int n_dofs     = data.dofs_per_component_on_cell;
-          const unsigned int n_q_points = data.n_q_points_face;
+          const unsigned int n_q_points = data.n_q_points_faces[face_no];
           const auto         shape_info = data.data.front();
 
           using Eval = EvaluatorTensorProduct<evaluate_general,
