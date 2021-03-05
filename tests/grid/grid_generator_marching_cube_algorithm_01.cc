@@ -108,7 +108,7 @@ create_partitioner(const DoFHandler<dim, spacedim> &dof_handler)
 
 template <int dim>
 void
-test()
+test(const unsigned int n_subdivisions)
 {
   const unsigned int spacedim = dim + 1;
 
@@ -121,10 +121,17 @@ test()
 
   parallel::shared::Triangulation<spacedim> background_tria(
     MPI_COMM_WORLD, Triangulation<spacedim>::none, true);
-  GridGenerator::subdivided_hyper_rectangle(background_tria,
-                                            {20, 20},
-                                            {-1.0, -1.0},
-                                            {+1.0, +1.0});
+
+  if (spacedim == 2)
+    GridGenerator::subdivided_hyper_rectangle(background_tria,
+                                              {20, 20},
+                                              {-1.0, -1.0},
+                                              {+1.0, +1.0});
+  else
+    GridGenerator::subdivided_hyper_rectangle(background_tria,
+                                              {20, 20, 20},
+                                              {-1.0, -1.0, -1.0},
+                                              {+1.0, +1.0, +1.0});
 
   FE_Q<spacedim>       background_fe(background_fe_degree);
   DoFHandler<spacedim> background_dof_handler(background_tria);
@@ -141,8 +148,6 @@ test()
 
   ls_vector.update_ghost_values();
 
-  const unsigned int n_subdivisions = 3;
-
   GridGenerator::MarchingCubeAlgorithm<spacedim> mc(
     background_mapping, background_dof_handler.get_fe(), n_subdivisions);
 
@@ -155,7 +160,14 @@ test()
   // write computed vectors to Paraview
   if (true)
     {
+#if false
       GridOut().write_mesh_per_processor_as_vtu(tria, "grid_surface");
+#else
+      GridOut       grid_out;
+      std::ofstream out("grid_surface." + std::to_string(spacedim) + "." +
+                        std::to_string(n_subdivisions) + ".vtk");
+      grid_out.write_vtk(tria, out);
+#endif
     }
 
   if (true)
@@ -168,10 +180,8 @@ test()
       data_out.add_data_vector(background_dof_handler, ls_vector, "curvature");
 
       data_out.build_patches(background_mapping, background_fe_degree + 1);
-      data_out.write_vtu_with_pvtu_record("./",
-                                          "data_background",
-                                          0,
-                                          MPI_COMM_WORLD);
+      data_out.write_vtu_with_pvtu_record(
+        "./", "data_background." + std::to_string(spacedim), 0, MPI_COMM_WORLD);
     }
 }
 
@@ -183,5 +193,8 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
   MPILogInitAll                    all;
 
-  test<1>();
+  for (unsigned int i = 1; i <= 3; ++i)
+    test<1>(i);
+  for (unsigned int i = 1; i <= 3; ++i)
+    test<2>(i);
 }
