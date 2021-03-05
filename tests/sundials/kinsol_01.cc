@@ -22,7 +22,10 @@
 
 #include "../tests.h"
 
-// provide only residual function, use internal solver.
+// Solve a nonlinear system but provide only residual function. KINSOL
+// then uses its internal solvers which are based on a
+// finite-difference approximation to the Jacobian and a direct
+// solver.
 
 /**
  * Solve the non linear problem
