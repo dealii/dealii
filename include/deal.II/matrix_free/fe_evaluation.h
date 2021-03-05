@@ -8523,7 +8523,10 @@ FEFaceEvaluation<dim,
       face_index <
         this->matrix_info->get_task_info().boundary_partition_data.back())
     Assert(this->is_interior_face,
-           ExcMessage("Boundary faces do not have a neighbor"));
+           ExcMessage(
+             "Boundary faces do not have a neighbor. When looping over "
+             "boundary faces use FEFaceEvaluation with the parameter "
+             "is_interior_face set to true. "));
 
   this->face_no =
     (this->is_interior_face ? faces.interior_face_no : faces.exterior_face_no);
