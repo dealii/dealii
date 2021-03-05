@@ -2272,6 +2272,15 @@ DoFHandler<dim, spacedim>::MGVertexDoFs::set_index(
 }
 
 
+
+extern template class DoFHandler<1, 1>;
+extern template class DoFHandler<1, 2>;
+extern template class DoFHandler<1, 3>;
+extern template class DoFHandler<2, 2>;
+extern template class DoFHandler<2, 3>;
+extern template class DoFHandler<3, 3>;
+
+
 #endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE

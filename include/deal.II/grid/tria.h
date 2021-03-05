@@ -4399,6 +4399,13 @@ bool
 Triangulation<1, 3>::prepare_coarsening_and_refinement();
 
 
+extern template class Triangulation<1, 1>;
+extern template class Triangulation<1, 2>;
+extern template class Triangulation<1, 3>;
+extern template class Triangulation<2, 2>;
+extern template class Triangulation<2, 3>;
+extern template class Triangulation<3, 3>;
+
 #endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
