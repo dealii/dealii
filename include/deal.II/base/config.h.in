@@ -41,8 +41,8 @@
 #cmakedefine DEAL_II_WITH_COMPLEX_VALUES
 #cmakedefine DEAL_II_WITH_CUDA
 #cmakedefine DEAL_II_WITH_GINKGO
-#cmakedefine DEAL_II_WITH_GSL
 #cmakedefine DEAL_II_WITH_GMSH
+#cmakedefine DEAL_II_WITH_GSL
 #cmakedefine DEAL_II_WITH_HDF5
 #cmakedefine DEAL_II_WITH_LAPACK
 #cmakedefine LAPACK_WITH_64BIT_BLAS_INDICES
