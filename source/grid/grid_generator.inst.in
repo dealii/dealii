@@ -297,4 +297,21 @@ for (deal_II_dimension : DIMENSIONS)
       const double       p1,
       const double       p2,
       const bool         colorize);
+
+#if deal_II_dimension > 1
+    template class GridGenerator::MarchingCubeAlgorithm<deal_II_dimension>;
+
+    template void GridGenerator::MarchingCubeAlgorithm<deal_II_dimension>::
+      create_triangulation(
+        const DoFHandler<deal_II_dimension> &background_dof_handler,
+        const LinearAlgebra::Vector<double> &ls_vector,
+        Triangulation<deal_II_dimension - 1, deal_II_dimension> &tria);
+
+    template void GridGenerator::MarchingCubeAlgorithm<deal_II_dimension>::
+      create_triangulation(
+        const DoFHandler<deal_II_dimension> &background_dof_handler,
+        const LinearAlgebra::distributed::Vector<double> &       ls_vector,
+        Triangulation<deal_II_dimension - 1, deal_II_dimension> &tria);
+
+#endif
   }

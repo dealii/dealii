@@ -28,6 +28,9 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
+#include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/la_vector.h>
+
 #include <array>
 #include <cmath>
 #include <limits>
@@ -8437,6 +8440,172 @@ namespace GridGenerator
       {
         AssertThrow(false, ExcNotImplemented())
       }
+  }
+
+
+
+  template <int dim>
+  MarchingCubeAlgorithm<dim>::MarchingCubeAlgorithm(
+    const Mapping<dim, dim> &      mapping,
+    const FiniteElement<dim, dim> &fe,
+    const unsigned int             n_subdivisions)
+    : n_subdivisions(n_subdivisions)
+    , fe_values(mapping,
+                fe,
+                create_qudrature_rule(n_subdivisions),
+                update_values | update_quadrature_points)
+    , ls_values(fe_values.n_quadrature_points)
+  {
+    AssertDimension(dim, 2);
+  }
+
+
+
+  template <int dim>
+  Quadrature<dim>
+  MarchingCubeAlgorithm<dim>::create_qudrature_rule(
+    const unsigned int n_subdivisions)
+  {
+    std::vector<Point<dim>> quadrature_points;
+
+    for (unsigned int j = 0; j <= n_subdivisions; ++j)
+      for (unsigned int i = 0; i <= n_subdivisions; ++i)
+        quadrature_points.emplace_back(1.0 / n_subdivisions * i,
+                                       1.0 / n_subdivisions * j);
+
+    for (unsigned int j = 0; j < n_subdivisions; ++j)
+      for (unsigned int i = 0; i < n_subdivisions; ++i)
+        quadrature_points.emplace_back(1.0 / n_subdivisions * (i + 0.5),
+                                       1.0 / n_subdivisions * (j + 0.5));
+
+    return {quadrature_points};
+  }
+
+
+
+  template <int dim>
+  template <typename VectorType>
+  void
+  MarchingCubeAlgorithm<dim>::create_triangulation(
+    const DoFHandler<dim> &      background_dof_handler,
+    const VectorType &           ls_vector,
+    Triangulation<dim - 1, dim> &tria)
+  {
+    std::vector<Point<dim>>        vertices;
+    std::vector<CellData<dim - 1>> cells;
+
+    for (const auto &cell : background_dof_handler.active_cell_iterators())
+      {
+        fe_values.reinit(cell);
+        fe_values.get_function_values(ls_vector, ls_values);
+        process_cell(vertices, cells);
+      }
+
+    tria.create_triangulation(vertices, cells, {});
+  }
+
+
+
+  template <int dim>
+  void
+  MarchingCubeAlgorithm<dim>::process_cell(
+    std::vector<Point<dim>> &       vertices,
+    std::vector<CellData<dim - 1>> &cells)
+  {
+    for (unsigned int j = 0; j < n_subdivisions; ++j)
+      for (unsigned int i = 0; i < n_subdivisions; ++i)
+        {
+          std::vector<unsigned int> mask{
+            (n_subdivisions + 1) * (j + 0) + (i + 0),
+            (n_subdivisions + 1) * (j + 0) + (i + 1),
+            (n_subdivisions + 1) * (j + 1) + (i + 1),
+            (n_subdivisions + 1) * (j + 1) + (i + 0),
+            (n_subdivisions + 1) * (n_subdivisions + 1) +
+              (n_subdivisions * j + i)};
+
+          process_sub_cell(ls_values,
+                           fe_values.get_quadrature_points(),
+                           mask,
+                           vertices,
+                           cells);
+        }
+  }
+
+
+
+  template <int dim>
+  void
+  MarchingCubeAlgorithm<dim>::process_sub_cell(
+    const std::vector<double> &     ls_values,
+    const std::vector<Point<dim>> & points,
+    const std::vector<unsigned int> mask,
+    std::vector<Point<dim>> &       vertices,
+    std::vector<CellData<dim - 1>> &cells)
+  {
+    unsigned int c = 0;
+
+    for (unsigned int i = 0, scale = 1; i < 4; ++i, scale *= 2)
+      c += (ls_values[mask[i]] > 0) * scale;
+
+    if (c == 0 || c == 15)
+      return; // nothing to do since the level set function is constant within
+              // the sub_cell
+
+    const auto process_points = [&](const auto &lines) {
+      const double w0 = std::abs(ls_values[mask[lines[0]]]);
+      const double w1 = std::abs(ls_values[mask[lines[1]]]);
+
+      return points[mask[lines[0]]] * (w1 / (w0 + w1)) +
+             points[mask[lines[1]]] * (w0 / (w0 + w1));
+    };
+
+    const auto process_lines = [&](const auto &lines) {
+      std::array<std::array<unsigned int, 2>, 4> table{
+        {{{0, 3}}, {{1, 2}}, {{0, 1}}, {{3, 2}}}};
+
+      const auto p0 = process_points(table[lines[0]]);
+      const auto p1 = process_points(table[lines[1]]);
+
+      cells.resize(cells.size() + 1);
+      cells.back().vertices[0] = vertices.size();
+      cells.back().vertices[1] = vertices.size() + 1;
+
+      vertices.emplace_back(p0);
+      vertices.emplace_back(p1);
+    };
+
+    // Check if the isoline for level set values larger than zero is the
+    // element's diagonal and level set values on both sides from the diagonal
+    // are smaller than zero. In this case, the level set would be a
+    // "hat"-function which does not make sense.
+    if (c == 5 || c == 10)
+      {
+        Assert(false, ExcNotImplemented());
+        return;
+      }
+
+    static const unsigned int X = -1;
+
+    std::array<std::array<unsigned int, 2>, 16> table{{
+      {{X, X}},
+      {{0, 2}},
+      {{1, 2}},
+      {{0, 1}}, //  c=0-3
+      {{1, 3}},
+      {{X, X}},
+      {{2, 3}},
+      {{0, 3}}, //  c=4-7
+      {{0, 3}},
+      {{2, 3}},
+      {{X, X}},
+      {{1, 3}}, //  c=8-11
+      {{0, 1}},
+      {{2, 1}},
+      {{0, 2}},
+      {{X, X}} //   c=12-15
+    }};
+
+    process_lines(table[c]);
   }
 
 } // namespace GridGenerator
