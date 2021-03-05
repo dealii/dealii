@@ -132,7 +132,18 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       distributed_compute_point_locations(
         const Cache<deal_II_dimension, deal_II_space_dimension> &,
         const std::vector<Point<deal_II_space_dimension>> &,
-        const std::vector<std::vector<BoundingBox<deal_II_space_dimension>>> &);
+        const std::vector<std::vector<BoundingBox<deal_II_space_dimension>>> &,
+        const double tolerance);
+
+      template internal::DistributedComputePointLocationsInternal<
+        deal_II_dimension,
+        deal_II_space_dimension>
+      internal::distributed_compute_point_locations(
+        const Cache<deal_II_dimension, deal_II_space_dimension> &,
+        const std::vector<Point<deal_II_space_dimension>> &,
+        const std::vector<std::vector<BoundingBox<deal_II_space_dimension>>> &,
+        const double,
+        const bool);
     \}
 
 #endif

@@ -804,7 +804,7 @@ public:
     const Triangulation<Accessor::dimension, Accessor::space_dimension> *parent,
     const int                                                            level,
     const int                                                            index,
-    const typename Accessor::AccessorData *local_data = 0);
+    const typename Accessor::AccessorData *local_data = nullptr);
 
   /**
    * This is a conversion operator (constructor) which takes another iterator
