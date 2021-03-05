@@ -8454,7 +8454,6 @@ namespace GridGenerator
                 fe,
                 create_qudrature_rule(n_subdivisions),
                 update_values | update_quadrature_points)
-    , ls_values(fe_values.n_quadrature_points)
   {
     AssertDimension(dim, 2);
   }
@@ -8486,22 +8485,21 @@ namespace GridGenerator
   template <int dim>
   template <typename VectorType>
   void
-  MarchingCubeAlgorithm<dim>::create_triangulation(
-    const DoFHandler<dim> &      background_dof_handler,
-    const VectorType &           ls_vector,
-    Triangulation<dim - 1, dim> &tria)
+  MarchingCubeAlgorithm<dim>::process(
+    const DoFHandler<dim> &         background_dof_handler,
+    const VectorType &              ls_vector,
+    std::vector<Point<dim>> &       vertices,
+    std::vector<CellData<dim - 1>> &cells) const
   {
-    std::vector<Point<dim>>        vertices;
-    std::vector<CellData<dim - 1>> cells;
+    std::vector<double> ls_values;
 
     for (const auto &cell : background_dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
+        ls_values.resize(cell->get_fe().n_dofs_per_cell());
         fe_values.get_function_values(ls_vector, ls_values);
-        process_cell(vertices, cells);
+        process_cell(ls_values, vertices, cells);
       }
-
-    tria.create_triangulation(vertices, cells, {});
   }
 
 
@@ -8509,8 +8507,9 @@ namespace GridGenerator
   template <int dim>
   void
   MarchingCubeAlgorithm<dim>::process_cell(
+    std::vector<double> &           ls_values,
     std::vector<Point<dim>> &       vertices,
-    std::vector<CellData<dim - 1>> &cells)
+    std::vector<CellData<dim - 1>> &cells) const
   {
     for (unsigned int j = 0; j < n_subdivisions; ++j)
       for (unsigned int i = 0; i < n_subdivisions; ++i)
@@ -8606,6 +8605,28 @@ namespace GridGenerator
     }};
 
     process_lines(table[c]);
+  }
+
+  template <int dim, typename VectorType>
+  void
+  create_triangulation_with_marching_cube_algorithm(
+    const MarchingCubeAlgorithm<dim> &mc,
+    const DoFHandler<dim> &           background_dof_handler,
+    const VectorType &                ls_vector,
+    Triangulation<dim - 1, dim> &     tria)
+  {
+    std::vector<Point<dim>>        vertices;
+    std::vector<CellData<dim - 1>> cells;
+    SubCellData                    subcelldata;
+
+    mc.process(background_dof_handler, ls_vector, vertices, cells);
+
+    std::vector<unsigned int> considered_vertices;
+
+    // GridTools::delete_duplicated_vertices (vertices, cells, subcelldata,
+    // considered_vertices);
+
+    tria.create_triangulation(vertices, cells, subcelldata);
   }
 
 } // namespace GridGenerator

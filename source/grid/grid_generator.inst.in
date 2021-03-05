@@ -301,17 +301,19 @@ for (deal_II_dimension : DIMENSIONS)
 #if deal_II_dimension > 1
     template class GridGenerator::MarchingCubeAlgorithm<deal_II_dimension>;
 
-    template void GridGenerator::MarchingCubeAlgorithm<deal_II_dimension>::
-      create_triangulation(
-        const DoFHandler<deal_II_dimension> &background_dof_handler,
-        const LinearAlgebra::Vector<double> &ls_vector,
-        Triangulation<deal_II_dimension - 1, deal_II_dimension> &tria);
+    template void
+    GridGenerator::MarchingCubeAlgorithm<deal_II_dimension>::process(
+      const DoFHandler<deal_II_dimension> &             background_dof_handler,
+      const LinearAlgebra::distributed::Vector<double> &ls_vector,
+      std::vector<Point<deal_II_dimension>> &           vertices,
+      std::vector<CellData<deal_II_dimension - 1>> &    cells) const;
 
-    template void GridGenerator::MarchingCubeAlgorithm<deal_II_dimension>::
-      create_triangulation(
-        const DoFHandler<deal_II_dimension> &background_dof_handler,
-        const LinearAlgebra::distributed::Vector<double> &       ls_vector,
-        Triangulation<deal_II_dimension - 1, deal_II_dimension> &tria);
+    template void
+    GridGenerator::create_triangulation_with_marching_cube_algorithm(
+      const GridGenerator::MarchingCubeAlgorithm<deal_II_dimension> &,
+      const DoFHandler<deal_II_dimension> &             background_dof_handler,
+      const LinearAlgebra::distributed::Vector<double> &ls_vector,
+      Triangulation<deal_II_dimension - 1, deal_II_dimension> &tria);
 
 #endif
   }

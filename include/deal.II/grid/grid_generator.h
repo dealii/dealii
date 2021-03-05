@@ -2424,16 +2424,18 @@ namespace GridGenerator
 
     template <typename VectorType>
     void
-    create_triangulation(const DoFHandler<dim> &      background_dof_handler,
-                         const VectorType &           ls_vector,
-                         Triangulation<dim - 1, dim> &tria);
+    process(const DoFHandler<dim> &         background_dof_handler,
+            const VectorType &              ls_vector,
+            std::vector<Point<dim>> &       vertices,
+            std::vector<CellData<dim - 1>> &cells) const;
 
     /**
      * Process a cell.
      */
     void
-    process_cell(std::vector<Point<dim>> &       vertices,
-                 std::vector<CellData<dim - 1>> &cells);
+    process_cell(std::vector<double> &           ls_values,
+                 std::vector<Point<dim>> &       vertices,
+                 std::vector<CellData<dim - 1>> &cells) const;
 
   private:
     static Quadrature<dim>
@@ -2446,10 +2448,18 @@ namespace GridGenerator
                      std::vector<Point<dim>> &       vertices,
                      std::vector<CellData<dim - 1>> &cells);
 
-    const unsigned int  n_subdivisions;
-    FEValues<dim>       fe_values;
-    std::vector<double> ls_values;
+    const unsigned int    n_subdivisions;
+    mutable FEValues<dim> fe_values;
   };
+
+
+  template <int dim, typename VectorType>
+  void
+  create_triangulation_with_marching_cube_algorithm(
+    const MarchingCubeAlgorithm<dim> &mc,
+    const DoFHandler<dim> &           background_dof_handler,
+    const VectorType &                ls_vector,
+    Triangulation<dim - 1, dim> &     tria);
 
   ///@}
 

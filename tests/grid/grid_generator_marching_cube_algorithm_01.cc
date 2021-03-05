@@ -149,7 +149,8 @@ test()
   parallel::shared::Triangulation<dim, spacedim> tria(
     MPI_COMM_WORLD, Triangulation<dim, spacedim>::none, true);
 
-  mc.create_triangulation(background_dof_handler, ls_vector, tria);
+  GridGenerator::create_triangulation_with_marching_cube_algorithm(
+    mc, background_dof_handler, ls_vector, tria);
 
   // write computed vectors to Paraview
   if (true)
