@@ -17,6 +17,7 @@
 
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/mpi.templates.h>
 
 #include <deal.II/distributed/cell_data_transfer.templates.h>
 #include <deal.II/distributed/shared_tria.h>
@@ -1715,6 +1716,9 @@ namespace internal
             dof_handler.hp_capability_enabled == true,
             (typename DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
+          using active_fe_index_type =
+            typename dealii::DoFHandler<dim, spacedim>::active_fe_index_type;
+
           if (const dealii::parallel::shared::Triangulation<dim, spacedim> *tr =
                 dynamic_cast<
                   const dealii::parallel::shared::Triangulation<dim, spacedim>
@@ -1730,8 +1734,8 @@ namespace internal
               // on the other cells to zero. then we add all of these vectors
               // up, and because every vector entry has exactly one processor
               // that owns it, the sum is correct
-              std::vector<unsigned int> active_fe_indices(tr->n_active_cells(),
-                                                          0u);
+              std::vector<active_fe_index_type> active_fe_indices(
+                tr->n_active_cells(), 0u);
               for (const auto &cell : dof_handler.active_cell_iterators())
                 if (cell->is_locally_owned())
                   active_fe_indices[cell->active_cell_index()] =
@@ -1766,15 +1770,17 @@ namespace internal
               // to have functions that can pack and unpack the data we want to
               // transport -- namely, the single unsigned int active_fe_index
               // objects
-              auto pack = [](const typename dealii::DoFHandler<dim, spacedim>::
-                               active_cell_iterator &cell) -> unsigned int {
+              auto pack =
+                [](const typename dealii::DoFHandler<dim, spacedim>::
+                     active_cell_iterator &cell) -> active_fe_index_type {
                 return cell->active_fe_index();
               };
 
-              auto unpack = [&dof_handler](
-                              const typename dealii::DoFHandler<dim, spacedim>::
-                                active_cell_iterator &cell,
-                              const unsigned int      active_fe_index) -> void {
+              auto unpack =
+                [&dof_handler](
+                  const typename dealii::DoFHandler<dim, spacedim>::
+                    active_cell_iterator &   cell,
+                  const active_fe_index_type active_fe_index) -> void {
                 // we would like to say
                 //   cell->set_active_fe_index(active_fe_index);
                 // but this is not allowed on cells that are not
@@ -1785,11 +1791,8 @@ namespace internal
               };
 
               GridTools::exchange_cell_data_to_ghosts<
-                unsigned int,
-                dealii::DoFHandler<dim, spacedim>>(
-                static_cast<dealii::DoFHandler<dim, spacedim> &>(dof_handler),
-                pack,
-                unpack);
+                active_fe_index_type,
+                dealii::DoFHandler<dim, spacedim>>(dof_handler, pack, unpack);
             }
           else
             {
