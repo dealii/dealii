@@ -8574,6 +8574,90 @@ namespace GridGenerator
 
 
 
+  namespace internal
+  {
+    template <int          dim,
+              unsigned int n_vertices,
+              unsigned int n_configurations,
+              unsigned int n_lines,
+              typename value_type>
+    void
+    process_sub_cell(
+      const std::array<unsigned int, n_configurations> & edgeTable,
+      const ndarray<unsigned int, n_configurations, 16> &triTable,
+      const ndarray<unsigned int, n_lines, 2> &          line_to_vertex_table,
+      const std::vector<value_type> &                    ls_values,
+      const std::vector<Point<dim>> &                    points,
+      const std::vector<unsigned int>                    mask,
+      std::vector<Point<dim>> &                          vertices,
+      std::vector<CellData<dim - 1>> &                   cells)
+    {
+      Point<dim>   VertexList[n_lines];
+      Point<dim>   NewVertexList[n_lines];
+      unsigned int LocalRemap[n_lines];
+
+      // Determine the index into the edge table which
+      // tells us which vertices are inside of the surface
+      unsigned int CubeIndex = 0;
+
+      for (unsigned int v = 0; v < n_vertices; ++v)
+        if (ls_values[mask[v]] < 0.0f)
+          CubeIndex |= (1 << v);
+
+      // Cube is entirely in/out of the surface
+      if (edgeTable[CubeIndex] == 0)
+        return;
+
+      const auto VertexInterp = [&](const unsigned int i,
+                                    const unsigned int j) {
+        return Point<dim>(
+          points[mask[i]] +
+          (-ls_values[mask[i]] / (ls_values[mask[j]] - ls_values[mask[i]])) *
+            (points[mask[j]] - points[mask[i]]));
+      };
+
+      // Find the vertices where the surface intersects the cube
+      for (unsigned int l = 0; l < n_lines; ++l)
+        if (edgeTable[CubeIndex] & (1 << l))
+          VertexList[l] = VertexInterp(line_to_vertex_table[l][0],
+                                       line_to_vertex_table[l][1]);
+
+      static constexpr unsigned int X = static_cast<unsigned int>(-1);
+
+      unsigned int NewVertexCount = 0;
+      for (unsigned int i = 0; i < n_lines; i++)
+        LocalRemap[i] = X;
+
+      for (int i = 0; triTable[CubeIndex][i] != X; i++)
+        if (LocalRemap[triTable[CubeIndex][i]] == X)
+          {
+            NewVertexList[NewVertexCount] = VertexList[triTable[CubeIndex][i]];
+            LocalRemap[triTable[CubeIndex][i]] = NewVertexCount;
+            NewVertexCount++;
+          }
+
+      const unsigned int offset = vertices.size();
+
+      for (int i = 0; i < NewVertexCount; i++)
+        vertices.push_back(NewVertexList[i]);
+
+      for (int i = 0; triTable[CubeIndex][i] != X; i += 3)
+        {
+          cells.resize(cells.size() + 1);
+          cells.back().vertices.resize(3);
+
+          cells.back().vertices[0] =
+            LocalRemap[triTable[CubeIndex][i + 0]] + offset;
+          cells.back().vertices[1] =
+            LocalRemap[triTable[CubeIndex][i + 1]] + offset;
+          cells.back().vertices[2] =
+            LocalRemap[triTable[CubeIndex][i + 2]] + offset;
+        }
+    }
+  } // namespace internal
+
+
+
   template <int dim, typename VectorType>
   void
   MarchingCubeAlgorithm<dim, VectorType>::process_sub_cell(
@@ -8954,29 +9038,6 @@ namespace GridGenerator
        {{0, 3, 8, X, X, X, X, X, X, X, X, X, X, X, X, X}},
        {{X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, X}}}};
 
-    Point<3>     VertexList[n_lines];
-    Point<3>     NewVertexList[n_lines];
-    unsigned int LocalRemap[n_lines];
-
-    // Determine the index into the edge table which
-    // tells us which vertices are inside of the surface
-    int CubeIndex = 0;
-
-    for (unsigned int v = 0; v < n_vertices; ++v)
-      if (ls_values[mask[v]] < 0.0f)
-        CubeIndex |= (1 << v);
-
-    // Cube is entirely in/out of the surface
-    if (edgeTable[CubeIndex] == 0)
-      return;
-
-    const auto VertexInterp = [&](const unsigned int i, const unsigned int j) {
-      return Point<3>(
-        points[mask[i]] +
-        (-ls_values[mask[i]] / (ls_values[mask[j]] - ls_values[mask[i]])) *
-          (points[mask[j]] - points[mask[i]]));
-    };
-
     static constexpr ndarray<unsigned int, n_lines, 2> line_to_vertex_table = {
       {{{0, 1}},
        {{1, 2}},
@@ -8991,41 +9052,15 @@ namespace GridGenerator
        {{2, 6}},
        {{3, 7}}}};
 
-    // Find the vertices where the surface intersects the cube
-    for (unsigned int l = 0; l < n_lines; ++l)
-      if (edgeTable[CubeIndex] & (1 << l))
-        VertexList[l] =
-          VertexInterp(line_to_vertex_table[l][0], line_to_vertex_table[l][1]);
-
-    int NewVertexCount = 0;
-    for (unsigned int i = 0; i < n_lines; i++)
-      LocalRemap[i] = X;
-
-    for (int i = 0; triTable[CubeIndex][i] != X; i++)
-      if (LocalRemap[triTable[CubeIndex][i]] == X)
-        {
-          NewVertexList[NewVertexCount] = VertexList[triTable[CubeIndex][i]];
-          LocalRemap[triTable[CubeIndex][i]] = NewVertexCount;
-          NewVertexCount++;
-        }
-
-    const unsigned int offset = vertices.size();
-
-    for (int i = 0; i < NewVertexCount; i++)
-      vertices.push_back(NewVertexList[i]);
-
-    for (int i = 0; triTable[CubeIndex][i] != X; i += 3)
-      {
-        cells.resize(cells.size() + 1);
-        cells.back().vertices.resize(3);
-
-        cells.back().vertices[0] =
-          LocalRemap[triTable[CubeIndex][i + 0]] + offset;
-        cells.back().vertices[1] =
-          LocalRemap[triTable[CubeIndex][i + 1]] + offset;
-        cells.back().vertices[2] =
-          LocalRemap[triTable[CubeIndex][i + 2]] + offset;
-      }
+    internal::process_sub_cell<3, n_vertices, n_configurations, n_lines>(
+      edgeTable,
+      triTable,
+      line_to_vertex_table,
+      ls_values,
+      points,
+      mask,
+      vertices,
+      cells);
   }
 
 
