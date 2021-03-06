@@ -2407,22 +2407,39 @@ namespace GridGenerator
 
   /**
    * An implementation of the marching-square (2D) and marching-cube algorithm
-   * for creating a surface mesh on the iso line/contour of a scalar field.
+   * for creating a linear/bilinear surface mesh on the iso line/contour of a
+   * scalar field.
+   *
+   * To increase the approximation of the iso line/contour and the resulting
+   * linear surface mesh, one increase the number of subdivision so that the
+   * algorithm is not run on a cell but on subcells with vertex values having
+   * been interpolated from the cell values.
    *
    * @note The resulting mesh will contain lines in 2D and triangles in 3D.
+   *
+   * @note The resulting mesh will not be of high quality, since it might
+   *   contain cells with very small diameters if the mesh is cut close to a
+   *   vertex.
    */
-  template <int dim>
+  template <int dim, typename VectorType>
   class MarchingCubeAlgorithm
   {
   public:
+    /**
+     * Value type of vector.
+     */
+    using value_type = typename VectorType::value_type;
+
     /**
      * Constructor.
      */
     MarchingCubeAlgorithm(const Mapping<dim, dim> &      mapping,
                           const FiniteElement<dim, dim> &fe,
-                          const unsigned int             n_subdivisions);
+                          const unsigned int             n_subdivisions = 1);
 
-    template <typename VectorType>
+    /**
+     * Process all locally-owned cells.
+     */
     void
     process(const DoFHandler<dim> &         background_dof_handler,
             const VectorType &              ls_vector,
@@ -2430,50 +2447,75 @@ namespace GridGenerator
             std::vector<CellData<dim - 1>> &cells) const;
 
     /**
-     * Process a cell.
+     * Process a cell (2D).
      */
     void
-    process_cell(std::vector<double> &        ls_values,
+    process_cell(std::vector<value_type> &    ls_values,
                  const std::vector<Point<2>> &points,
                  std::vector<Point<2>> &      vertices,
                  std::vector<CellData<1>> &   cells) const;
 
+    /**
+     * Process a cell (3D).
+     */
     void
-    process_cell(std::vector<double> &        ls_values,
+    process_cell(std::vector<value_type> &    ls_values,
                  const std::vector<Point<3>> &points,
                  std::vector<Point<3>> &      vertices,
                  std::vector<CellData<2>> &   cells) const;
 
   private:
+    /**
+     * Internal function to create a quadrature rule with n_subdivisions+1
+     * equally-positioned quadrature points.
+     */
     static Quadrature<dim>
     create_qudrature_rule(const unsigned int n_subdivisions);
 
+    /**
+     * Process a sub-cell (2D).
+     */
     static void
-    process_sub_cell(const std::vector<double> &     ls_values,
+    process_sub_cell(const std::vector<value_type> & ls_values,
                      const std::vector<Point<2>> &   points,
                      const std::vector<unsigned int> mask,
                      std::vector<Point<2>> &         vertices,
                      std::vector<CellData<1>> &      cells);
 
+    /**
+     * Process a sub-cell (2D).
+     */
     static void
-    process_sub_cell(const std::vector<double> &     ls_values,
+    process_sub_cell(const std::vector<value_type> & ls_values,
                      const std::vector<Point<3>> &   points,
                      const std::vector<unsigned int> mask,
                      std::vector<Point<3>> &         vertices,
                      std::vector<CellData<2>> &      cells);
 
-    const unsigned int    n_subdivisions;
+    /**
+     * Number of subdivisions defined in the constructor.
+     */
+    const unsigned int n_subdivisions;
+
+    /**
+     * FEValues used internally and set up with a quadrature rule with the
+     * correct number of subdivisions.
+     */
     mutable FEValues<dim> fe_values;
   };
 
 
+  /**
+   * Create a codim-1 triangulation based on a iso-line/surface and the
+   * marching-cube algorithm (MarchingCubeAlgorithm).
+   */
   template <int dim, typename VectorType>
   void
   create_triangulation_with_marching_cube_algorithm(
-    const MarchingCubeAlgorithm<dim> &mc,
-    const DoFHandler<dim> &           background_dof_handler,
-    const VectorType &                ls_vector,
-    Triangulation<dim - 1, dim> &     tria);
+    const MarchingCubeAlgorithm<dim, VectorType> &mc,
+    const DoFHandler<dim> &                       background_dof_handler,
+    const VectorType &                            ls_vector,
+    Triangulation<dim - 1, dim> &                 tria);
 
   ///@}
 

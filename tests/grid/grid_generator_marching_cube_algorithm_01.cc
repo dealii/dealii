@@ -148,7 +148,7 @@ test(const unsigned int n_subdivisions)
 
   ls_vector.update_ghost_values();
 
-  GridGenerator::MarchingCubeAlgorithm<spacedim> mc(
+  GridGenerator::MarchingCubeAlgorithm<spacedim, VectorType> mc(
     background_mapping, background_dof_handler.get_fe(), n_subdivisions);
 
   parallel::shared::Triangulation<dim, spacedim> tria(
@@ -160,14 +160,22 @@ test(const unsigned int n_subdivisions)
   // write computed vectors to Paraview
   if (true)
     {
-#if false
-      GridOut().write_mesh_per_processor_as_vtu(tria, "grid_surface");
-#else
-      GridOut       grid_out;
-      std::ofstream out("grid_surface." + std::to_string(spacedim) + "." +
-                        std::to_string(n_subdivisions) + ".vtk");
-      grid_out.write_vtk(tria, out);
-#endif
+      if (false)
+        {
+          GridOut().write_mesh_per_processor_as_vtu(tria, "grid_surface");
+        }
+      else if (false)
+        {
+          GridOut       grid_out;
+          std::ofstream out("grid_surface." + std::to_string(spacedim) + "." +
+                            std::to_string(n_subdivisions) + ".vtk");
+          grid_out.write_vtk(tria, out);
+        }
+      else
+        {
+          GridOut grid_out;
+          grid_out.write_vtk(tria, deallog.get_file_stream());
+        }
     }
 
   if (true)
