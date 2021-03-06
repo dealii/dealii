@@ -2631,17 +2631,33 @@ namespace DataOutBase
         // used
         if (patch.reference_cell != ReferenceCells::get_hypercube<dim>())
           {
-            Point<spacedim> node;
+            const auto compute_node = [&](const unsigned int point_no) {
+              Point<spacedim> node;
+
+              if (patch.points_are_available)
+                {
+                  for (unsigned int d = 0; d < spacedim; ++d)
+                    node[d] =
+                      patch.data(patch.data.size(0) - spacedim + d, point_no);
+                  return node;
+                }
+              else
+                {
+                  AssertDimension(patch.n_subdivisions, 1);
+                  Assert(
+                    patch.reference_cell != ReferenceCells::Pyramid,
+                    ExcMessage(
+                      "Pyramids need different ordering of the vertices, which is not implemented yet here."));
+
+                  node = patch.vertices[point_no];
+                }
+
+              return node;
+            };
 
             for (unsigned int point_no = 0; point_no < patch.data.n_cols();
                  ++point_no)
-              {
-                for (unsigned int d = 0; d < spacedim; ++d)
-                  node[d] =
-                    patch.data(patch.data.size(0) - spacedim + d, point_no);
-
-                out.write_point(count++, node);
-              }
+              out.write_point(count++, compute_node(point_no));
           }
         else
           {

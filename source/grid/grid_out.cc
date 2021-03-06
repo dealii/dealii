@@ -3649,7 +3649,13 @@ GridOut::write_mesh_per_processor_as_vtu(
   data_names.emplace_back("level_subdomain");
   data_names.emplace_back("proc_writing");
 
-  const unsigned int n_q_points = GeometryInfo<dim>::vertices_per_cell;
+  const auto reference_cells = tria.get_reference_cells();
+
+  AssertDimension(reference_cells.size(), 1);
+
+  const auto &reference_cell = reference_cells[0];
+
+  const unsigned int n_q_points = reference_cell.n_vertices();
 
   for (const auto &cell : tria.cell_iterators())
     {
@@ -3676,6 +3682,7 @@ GridOut::write_mesh_per_processor_as_vtu(
       DataOutBase::Patch<dim, spacedim> patch;
       patch.data.reinit(n_datasets, n_q_points);
       patch.points_are_available = false;
+      patch.reference_cell       = reference_cell;
 
       for (unsigned int vertex = 0; vertex < n_q_points; ++vertex)
         {
@@ -3693,7 +3700,7 @@ GridOut::write_mesh_per_processor_as_vtu(
           patch.data(3, vertex) = tria.locally_owned_subdomain();
         }
 
-      for (auto f : GeometryInfo<dim>::face_indices())
+      for (auto f : reference_cell.face_indices())
         patch.neighbors[f] = numbers::invalid_unsigned_int;
       patches.push_back(patch);
     }
