@@ -19,6 +19,7 @@
 #include <deal.II/base/mpi.templates.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria_base.h>
 
 #include <deal.II/grid/grid_tools.h>
@@ -380,11 +381,45 @@ namespace parallel
 #ifndef DEAL_II_WITH_MPI
     Assert(false, ExcNeedsMPI());
 #else
+    if (const auto pst =
+          dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
+            this))
+      if (pst->with_artificial_cells() == false)
+        {
+          // Specialization for parallel::shared::Triangulation without
+          // artificial cells. The code below only works if a halo of a single
+          // ghost cells is needed.
 
-    // currently only implemented for distributed triangulations
-    if (dynamic_cast<const parallel::DistributedTriangulationBase<dim, spacedim>
-                       *>(this) == nullptr)
-      return;
+          std::vector<unsigned int> cell_counter(n_subdomains + 1);
+
+          // count number of cells of each process
+          for (const auto &cell : this->active_cell_iterators())
+            cell_counter[cell->subdomain_id() + 1]++;
+
+          // take prefix sum to obtain offset of each process
+          for (unsigned int i = 0; i < n_subdomains; ++i)
+            cell_counter[i + 1] += cell_counter[i];
+
+          // create partitioners
+          IndexSet is_local(cell_counter.back());
+          is_local.add_range(cell_counter[my_subdomain],
+                             cell_counter[my_subdomain + 1]);
+          IndexSet is_ghost(cell_counter.back());
+          number_cache.active_cell_index_partitioner =
+            Utilities::MPI::Partitioner(is_local,
+                                        is_ghost,
+                                        this->mpi_communicator);
+
+          // set global active cell indices and increment process-local counters
+          for (const auto &cell : this->active_cell_iterators())
+            cell->set_global_active_cell_index(
+              cell_counter[cell->subdomain_id()]++);
+
+          Assert(this->is_multilevel_hierarchy_constructed() == false,
+                 ExcNotImplemented());
+
+          return;
+        }
 
     // 1) determine number of active locally-owned cells
     const types::global_cell_index n_locally_owned_cells =

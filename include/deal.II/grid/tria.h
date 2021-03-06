@@ -4234,8 +4234,13 @@ Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
   // this here. don't forget to first resize the fields appropriately
   {
     for (auto &level : levels)
-      level->active_cell_indices.resize(level->refine_flags.size());
+      {
+        level->active_cell_indices.resize(level->refine_flags.size());
+        level->global_active_cell_indices.resize(level->refine_flags.size());
+        level->global_level_cell_indices.resize(level->refine_flags.size());
+      }
     reset_active_cell_indices();
+    reset_global_cell_indices();
   }
 
 
