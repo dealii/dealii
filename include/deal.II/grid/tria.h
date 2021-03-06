@@ -4297,13 +4297,35 @@ unsigned int
 Triangulation<2, 2>::n_raw_quads(const unsigned int level) const;
 template <>
 unsigned int
-Triangulation<1, 1>::n_raw_hexs(const unsigned int level) const;
+Triangulation<3, 3>::n_raw_quads(const unsigned int level) const;
+template <>
+unsigned int
+Triangulation<3, 3>::n_raw_quads() const;
 template <>
 unsigned int
 Triangulation<1, 1>::n_active_quads(const unsigned int level) const;
 template <>
 unsigned int
 Triangulation<1, 1>::n_active_quads() const;
+template <>
+unsigned int
+Triangulation<1, 1>::n_raw_hexs(const unsigned int level) const;
+template <>
+unsigned int
+Triangulation<3, 3>::n_raw_hexs(const unsigned int level) const;
+template <>
+unsigned int
+Triangulation<3, 3>::n_hexs() const;
+template <>
+unsigned int
+Triangulation<3, 3>::n_active_hexs() const;
+template <>
+unsigned int
+Triangulation<3, 3>::n_active_hexs(const unsigned int) const;
+template <>
+unsigned int
+Triangulation<3, 3>::n_hexs(const unsigned int level) const;
+
 template <>
 unsigned int
 Triangulation<1, 1>::max_adjacent_cells() const;
@@ -4341,7 +4363,6 @@ Triangulation<1, 2>::max_adjacent_cells() const;
 // -------------------------------------------------------------------
 // -- Explicit specializations for codimension two grids
 
-
 template <>
 unsigned int
 Triangulation<1, 3>::n_quads() const;
@@ -4366,6 +4387,16 @@ Triangulation<1, 3>::n_active_quads() const;
 template <>
 unsigned int
 Triangulation<1, 3>::max_adjacent_cells() const;
+
+template <>
+bool
+Triangulation<1, 1>::prepare_coarsening_and_refinement();
+template <>
+bool
+Triangulation<1, 2>::prepare_coarsening_and_refinement();
+template <>
+bool
+Triangulation<1, 3>::prepare_coarsening_and_refinement();
 
 
 #endif // DOXYGEN
