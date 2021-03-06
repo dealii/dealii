@@ -8660,7 +8660,11 @@ namespace GridGenerator
     std::vector<Point<3>> &         vertices,
     std::vector<CellData<2>> &      cells)
   {
-    static int edgeTable[256] = {
+    static constexpr unsigned int n_vertices       = 8;
+    static constexpr unsigned int n_lines          = 12;
+    static constexpr unsigned int n_configurations = std::pow(2, n_vertices);
+
+    static int edgeTable[n_configurations] = {
       0x0,   0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c, 0x80c, 0x905,
       0xa0f, 0xb06, 0xc0a, 0xd03, 0xe09, 0xf00, 0x190, 0x99,  0x393, 0x29a,
       0x596, 0x49f, 0x795, 0x69c, 0x99c, 0x895, 0xb9f, 0xa96, 0xd9a, 0xc93,
@@ -8688,7 +8692,7 @@ namespace GridGenerator
       0xf00, 0xe09, 0xd03, 0xc0a, 0xb06, 0xa0f, 0x905, 0x80c, 0x70c, 0x605,
       0x50f, 0x406, 0x30a, 0x203, 0x109, 0x0};
 
-    static char triTable[256][16] = {
+    static char triTable[n_configurations][16] = {
       {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
       {0, 8, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
       {0, 1, 9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
@@ -8946,31 +8950,17 @@ namespace GridGenerator
       {0, 3, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
       {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}};
 
-    int TriangleCount;
-
-    Point<3> VertexList[12];
-    Point<3> NewVertexList[12];
-    char     LocalRemap[12];
+    Point<3> VertexList[n_lines];
+    Point<3> NewVertexList[n_lines];
+    char     LocalRemap[n_lines];
 
     // Determine the index into the edge table which
     // tells us which vertices are inside of the surface
     int CubeIndex = 0;
-    if (ls_values[mask[0]] < 0.0f)
-      CubeIndex |= 1;
-    if (ls_values[mask[1]] < 0.0f)
-      CubeIndex |= 2;
-    if (ls_values[mask[2]] < 0.0f)
-      CubeIndex |= 4;
-    if (ls_values[mask[3]] < 0.0f)
-      CubeIndex |= 8;
-    if (ls_values[mask[4]] < 0.0f)
-      CubeIndex |= 16;
-    if (ls_values[mask[5]] < 0.0f)
-      CubeIndex |= 32;
-    if (ls_values[mask[6]] < 0.0f)
-      CubeIndex |= 64;
-    if (ls_values[mask[7]] < 0.0f)
-      CubeIndex |= 128;
+
+    for (unsigned int v = 0; v < n_vertices; ++v)
+      if (ls_values[mask[v]] < 0.0f)
+        CubeIndex |= (1 << v);
 
     // Cube is entirely in/out of the surface
     if (edgeTable[CubeIndex] == 0)
@@ -9010,27 +9000,22 @@ namespace GridGenerator
       VertexList[11] = VertexInterp(3, 7);
 
     int NewVertexCount = 0;
-    for (int i = 0; i < 12; i++)
+    for (unsigned int i = 0; i < n_lines; i++)
       LocalRemap[i] = -1;
 
     for (int i = 0; triTable[CubeIndex][i] != -1; i++)
-      {
-        if (LocalRemap[triTable[CubeIndex][i]] == -1)
-          {
-            NewVertexList[NewVertexCount] = VertexList[triTable[CubeIndex][i]];
-            LocalRemap[triTable[CubeIndex][i]] = NewVertexCount;
-            NewVertexCount++;
-          }
-      }
+      if (LocalRemap[triTable[CubeIndex][i]] == -1)
+        {
+          NewVertexList[NewVertexCount] = VertexList[triTable[CubeIndex][i]];
+          LocalRemap[triTable[CubeIndex][i]] = NewVertexCount;
+          NewVertexCount++;
+        }
 
     const unsigned int offset = vertices.size();
 
     for (int i = 0; i < NewVertexCount; i++)
-      {
-        vertices.push_back(NewVertexList[i]);
-      }
+      vertices.push_back(NewVertexList[i]);
 
-    TriangleCount = 0;
     for (int i = 0; triTable[CubeIndex][i] != -1; i += 3)
       {
         cells.resize(cells.size() + 1);
@@ -9042,7 +9027,6 @@ namespace GridGenerator
           LocalRemap[triTable[CubeIndex][i + 1]] + offset;
         cells.back().vertices[2] =
           LocalRemap[triTable[CubeIndex][i + 2]] + offset;
-        TriangleCount++;
       }
   }
 
