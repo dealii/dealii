@@ -8473,11 +8473,6 @@ namespace GridGenerator
           for (unsigned int i = 0; i <= n_subdivisions; ++i)
             quadrature_points.emplace_back(1.0 / n_subdivisions * i,
                                            1.0 / n_subdivisions * j);
-
-        for (unsigned int j = 0; j < n_subdivisions; ++j)
-          for (unsigned int i = 0; i < n_subdivisions; ++i)
-            quadrature_points.emplace_back(1.0 / n_subdivisions * (i + 0.5),
-                                           1.0 / n_subdivisions * (j + 0.5));
       }
     else
       {
@@ -8542,9 +8537,7 @@ namespace GridGenerator
             (n_subdivisions + 1) * (j + 0) + (i + 0),
             (n_subdivisions + 1) * (j + 0) + (i + 1),
             (n_subdivisions + 1) * (j + 1) + (i + 1),
-            (n_subdivisions + 1) * (j + 1) + (i + 0),
-            (n_subdivisions + 1) * (n_subdivisions + 1) +
-              (n_subdivisions * j + i)};
+            (n_subdivisions + 1) * (j + 1) + (i + 0)};
 
           process_sub_cell(ls_values, points, mask, vertices, cells);
         }
@@ -8593,8 +8586,8 @@ namespace GridGenerator
               typename value_type>
     void
     process_sub_cell(
-      const std::array<unsigned int, n_configurations> &     edgeTable,
-      const ndarray<unsigned int, n_configurations, n_cols> &triTable,
+      const std::array<unsigned int, n_configurations> &configuration_table,
+      const ndarray<unsigned int, n_configurations, n_cols> &edge_table,
       const ndarray<unsigned int, n_lines, 2> &line_to_vertex_table,
       const std::vector<value_type> &          ls_values,
       const std::vector<Point<dim>> &          points,
@@ -8602,63 +8595,65 @@ namespace GridGenerator
       std::vector<Point<dim>> &                vertices,
       std::vector<CellData<dim - 1>> &         cells)
     {
-      Point<dim>   VertexList[n_lines];
-      Point<dim>   NewVertexList[n_lines];
-      unsigned int LocalRemap[n_lines];
+      // inspired by https://graphics.stanford.edu/~mdfisher/MarchingCubes.html
 
-      // Determine the index into the edge table which
-      // tells us which vertices are inside of the surface
-      unsigned int CubeIndex = 0;
+      static constexpr unsigned int X = static_cast<unsigned int>(-1);
 
+      // determine configuration
+      unsigned int configuration = 0;
       for (unsigned int v = 0; v < n_vertices; ++v)
         if (ls_values[mask[v]] < 0.0f)
-          CubeIndex |= (1 << v);
+          configuration |= (1 << v);
 
-      // Cube is entirely in/out of the surface
-      if (edgeTable[CubeIndex] == 0)
+      // cell is not cut (nothing to do)
+      if (configuration_table[configuration] == 0)
         return;
 
-      const auto VertexInterp = [&](const unsigned int i,
-                                    const unsigned int j) {
+      // helper function to determine where an edge (between index i and j) is
+      // cut
+      const auto interpolate = [&](const unsigned int i, const unsigned int j) {
         return Point<dim>(
           points[mask[i]] +
           (-ls_values[mask[i]] / (ls_values[mask[j]] - ls_values[mask[i]])) *
             (points[mask[j]] - points[mask[i]]));
       };
 
-      // Find the vertices where the surface intersects the cube
+      // determine the position where edges are cut (if they are cut)
+      std::array<Point<dim>, n_lines> vertex_list_all;
       for (unsigned int l = 0; l < n_lines; ++l)
-        if (edgeTable[CubeIndex] & (1 << l))
-          VertexList[l] = VertexInterp(line_to_vertex_table[l][0],
-                                       line_to_vertex_table[l][1]);
+        if (configuration_table[configuration] & (1 << l))
+          vertex_list_all[l] =
+            interpolate(line_to_vertex_table[l][0], line_to_vertex_table[l][1]);
 
-      static constexpr unsigned int X = static_cast<unsigned int>(-1);
-
-      unsigned int NewVertexCount = 0;
-      for (unsigned int i = 0; i < n_lines; i++)
-        LocalRemap[i] = X;
-
-      for (int i = 0; triTable[CubeIndex][i] != X; i++)
-        if (LocalRemap[triTable[CubeIndex][i]] == X)
+      // merge duplicate vertices if possible
+      unsigned int                      local_vertex_count = 0;
+      std::array<Point<dim>, n_lines>   vertex_list_reduced;
+      std::array<unsigned int, n_lines> local_remap;
+      std::fill(local_remap.begin(), local_remap.end(), X);
+      for (int i = 0; edge_table[configuration][i] != X; i++)
+        if (local_remap[edge_table[configuration][i]] == X)
           {
-            NewVertexList[NewVertexCount] = VertexList[triTable[CubeIndex][i]];
-            LocalRemap[triTable[CubeIndex][i]] = NewVertexCount;
-            NewVertexCount++;
+            vertex_list_reduced[local_vertex_count] =
+              vertex_list_all[edge_table[configuration][i]];
+            local_remap[edge_table[configuration][i]] = local_vertex_count;
+            local_vertex_count++;
           }
 
-      const unsigned int offset = vertices.size();
+      // write back vertices
+      const unsigned int n_vertices_old = vertices.size();
+      for (unsigned int i = 0; i < local_vertex_count; i++)
+        vertices.push_back(vertex_list_reduced[i]);
 
-      for (unsigned int i = 0; i < NewVertexCount; i++)
-        vertices.push_back(NewVertexList[i]);
-
-      for (unsigned int i = 0; triTable[CubeIndex][i] != X; i += n_sub_vertices)
+      // write back cells
+      for (unsigned int i = 0; edge_table[configuration][i] != X;
+           i += n_sub_vertices)
         {
           cells.resize(cells.size() + 1);
           cells.back().vertices.resize(n_sub_vertices);
 
           for (unsigned int v = 0; v < n_sub_vertices; ++v)
             cells.back().vertices[v] =
-              LocalRemap[triTable[CubeIndex][i + v]] + offset;
+              local_remap[edge_table[configuration][i + v]] + n_vertices_old;
         }
     }
   } // namespace internal
@@ -8674,22 +8669,22 @@ namespace GridGenerator
     std::vector<Point<2>> &         vertices,
     std::vector<CellData<1>> &      cells)
   {
+    // set up dimension-dependent sizes and tables
     static constexpr unsigned int n_vertices       = 4;
     static constexpr unsigned int n_sub_vertices   = 2;
     static constexpr unsigned int n_lines          = 4;
     static constexpr unsigned int n_configurations = std::pow(2, n_vertices);
+    static constexpr unsigned int X = static_cast<unsigned int>(-1);
 
     // clang-format off
-    static constexpr std::array<unsigned int, n_configurations> edgeTable = {{
-      0b0000, 0b0101, 0b0110, 0b0011,   
-      0b1010, 0b0000, 0b1100, 0b1001,   
-      0b1001, 0b1100, 0b0000, 0b1010,   
+    static constexpr std::array<unsigned int, n_configurations> configuration_table = {{
+      0b0000, 0b0101, 0b0110, 0b0011,
+      0b1010, 0b0000, 0b1100, 0b1001,
+      0b1001, 0b1100, 0b0000, 0b1010,
       0b0011, 0b0110, 0b0101, 0b0000}};
     // clang-format on
 
-    static constexpr unsigned int X = static_cast<unsigned int>(-1);
-
-    static constexpr ndarray<unsigned int, n_configurations, 5> triTable = {
+    static constexpr ndarray<unsigned int, n_configurations, 5> edge_table = {
       {{{X, X, X, X, X}},
        {{0, 2, X, X, X}},
        {{1, 2, X, X, X}},
@@ -8710,13 +8705,14 @@ namespace GridGenerator
     static constexpr ndarray<unsigned int, n_lines, 2> line_to_vertex_table = {
       {{{0, 3}}, {{1, 2}}, {{0, 1}}, {{3, 2}}}};
 
+    // run dimension-independent code
     internal::process_sub_cell<2,
                                n_vertices,
                                n_sub_vertices,
                                n_configurations,
                                n_lines,
-                               5>(edgeTable,
-                                  triTable,
+                               5>(configuration_table,
+                                  edge_table,
                                   line_to_vertex_table,
                                   ls_values,
                                   points,
@@ -8736,10 +8732,12 @@ namespace GridGenerator
     std::vector<Point<3>> &         vertices,
     std::vector<CellData<2>> &      cells)
   {
+    // set up dimension-dependent sizes and tables
     static constexpr unsigned int n_vertices       = 8;
     static constexpr unsigned int n_sub_vertices   = 3;
     static constexpr unsigned int n_lines          = 12;
     static constexpr unsigned int n_configurations = std::pow(2, n_vertices);
+    static constexpr unsigned int X = static_cast<unsigned int>(-1);
 
     // clang-format off
     static constexpr std::array<unsigned int, n_configurations> edgeTable = {{
@@ -8770,8 +8768,6 @@ namespace GridGenerator
       0xf00, 0xe09, 0xd03, 0xc0a, 0xb06, 0xa0f, 0x905, 0x80c, 0x70c, 0x605,
       0x50f, 0x406, 0x30a, 0x203, 0x109, 0x0}};
     // clang-format on
-
-    static constexpr unsigned int X = static_cast<unsigned int>(-1);
 
     static constexpr ndarray<unsigned int, n_configurations, 16> triTable = {
       {{{X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, X}},
@@ -9045,6 +9041,7 @@ namespace GridGenerator
        {{2, 6}},
        {{3, 7}}}};
 
+    // run dimension-independent code
     internal::process_sub_cell<3,
                                n_vertices,
                                n_sub_vertices,
