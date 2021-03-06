@@ -8578,19 +8578,21 @@ namespace GridGenerator
   {
     template <int          dim,
               unsigned int n_vertices,
+              unsigned int n_sub_vertices,
               unsigned int n_configurations,
               unsigned int n_lines,
+              unsigned int n_cols,
               typename value_type>
     void
     process_sub_cell(
-      const std::array<unsigned int, n_configurations> & edgeTable,
-      const ndarray<unsigned int, n_configurations, 16> &triTable,
-      const ndarray<unsigned int, n_lines, 2> &          line_to_vertex_table,
-      const std::vector<value_type> &                    ls_values,
-      const std::vector<Point<dim>> &                    points,
-      const std::vector<unsigned int>                    mask,
-      std::vector<Point<dim>> &                          vertices,
-      std::vector<CellData<dim - 1>> &                   cells)
+      const std::array<unsigned int, n_configurations> &     edgeTable,
+      const ndarray<unsigned int, n_configurations, n_cols> &triTable,
+      const ndarray<unsigned int, n_lines, 2> &line_to_vertex_table,
+      const std::vector<value_type> &          ls_values,
+      const std::vector<Point<dim>> &          points,
+      const std::vector<unsigned int>          mask,
+      std::vector<Point<dim>> &                vertices,
+      std::vector<CellData<dim - 1>> &         cells)
     {
       Point<dim>   VertexList[n_lines];
       Point<dim>   NewVertexList[n_lines];
@@ -8638,20 +8640,17 @@ namespace GridGenerator
 
       const unsigned int offset = vertices.size();
 
-      for (int i = 0; i < NewVertexCount; i++)
+      for (unsigned int i = 0; i < NewVertexCount; i++)
         vertices.push_back(NewVertexList[i]);
 
-      for (int i = 0; triTable[CubeIndex][i] != X; i += 3)
+      for (unsigned int i = 0; triTable[CubeIndex][i] != X; i += n_sub_vertices)
         {
           cells.resize(cells.size() + 1);
-          cells.back().vertices.resize(3);
+          cells.back().vertices.resize(n_sub_vertices);
 
-          cells.back().vertices[0] =
-            LocalRemap[triTable[CubeIndex][i + 0]] + offset;
-          cells.back().vertices[1] =
-            LocalRemap[triTable[CubeIndex][i + 1]] + offset;
-          cells.back().vertices[2] =
-            LocalRemap[triTable[CubeIndex][i + 2]] + offset;
+          for (unsigned int v = 0; v < n_sub_vertices; ++v)
+            cells.back().vertices[v] =
+              LocalRemap[triTable[CubeIndex][i + v]] + offset;
         }
     }
   } // namespace internal
@@ -8745,6 +8744,7 @@ namespace GridGenerator
     std::vector<CellData<2>> &      cells)
   {
     static constexpr unsigned int n_vertices       = 8;
+    static constexpr unsigned int n_sub_vertices   = 3;
     static constexpr unsigned int n_lines          = 12;
     static constexpr unsigned int n_configurations = std::pow(2, n_vertices);
 
@@ -9052,15 +9052,19 @@ namespace GridGenerator
        {{2, 6}},
        {{3, 7}}}};
 
-    internal::process_sub_cell<3, n_vertices, n_configurations, n_lines>(
-      edgeTable,
-      triTable,
-      line_to_vertex_table,
-      ls_values,
-      points,
-      mask,
-      vertices,
-      cells);
+    internal::process_sub_cell<3,
+                               n_vertices,
+                               n_sub_vertices,
+                               n_configurations,
+                               n_lines,
+                               16>(edgeTable,
+                                   triTable,
+                                   line_to_vertex_table,
+                                   ls_values,
+                                   points,
+                                   mask,
+                                   vertices,
+                                   cells);
   }
 
 
