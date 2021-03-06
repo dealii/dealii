@@ -8670,19 +8670,30 @@ namespace GridGenerator
     std::vector<CellData<1>> &      cells)
   {
     // set up dimension-dependent sizes and tables
-    static constexpr unsigned int n_vertices       = 4;
-    static constexpr unsigned int n_sub_vertices   = 2;
-    static constexpr unsigned int n_lines          = 4;
-    static constexpr unsigned int n_configurations = std::pow(2, n_vertices);
+    static constexpr unsigned int n_vertices     = 4;
+    static constexpr unsigned int n_sub_vertices = 2;
+    static constexpr unsigned int n_lines        = 4;
+    static constexpr unsigned int n_configurations =
+      Utilities::pow(2, n_vertices);
     static constexpr unsigned int X = static_cast<unsigned int>(-1);
 
-    // clang-format off
-    static constexpr std::array<unsigned int, n_configurations> configuration_table = {{
-      0b0000, 0b0101, 0b0110, 0b0011,
-      0b1010, 0b0000, 0b1100, 0b1001,
-      0b1001, 0b1100, 0b0000, 0b1010,
-      0b0011, 0b0110, 0b0101, 0b0000}};
-    // clang-format on
+    static constexpr std::array<unsigned int, n_configurations>
+      configuration_table = {{0b0000,
+                              0b0101,
+                              0b0110,
+                              0b0011,
+                              0b1010,
+                              0b0000,
+                              0b1100,
+                              0b1001,
+                              0b1001,
+                              0b1100,
+                              0b0000,
+                              0b1010,
+                              0b0011,
+                              0b0110,
+                              0b0101,
+                              0b0000}};
 
     static constexpr ndarray<unsigned int, n_configurations, 5> edge_table = {
       {{{X, X, X, X, X}},
@@ -8733,10 +8744,11 @@ namespace GridGenerator
     std::vector<CellData<2>> &      cells)
   {
     // set up dimension-dependent sizes and tables
-    static constexpr unsigned int n_vertices       = 8;
-    static constexpr unsigned int n_sub_vertices   = 3;
-    static constexpr unsigned int n_lines          = 12;
-    static constexpr unsigned int n_configurations = std::pow(2, n_vertices);
+    static constexpr unsigned int n_vertices     = 8;
+    static constexpr unsigned int n_sub_vertices = 3;
+    static constexpr unsigned int n_lines        = 12;
+    static constexpr unsigned int n_configurations =
+      Utilities::pow(2, n_vertices);
     static constexpr unsigned int X = static_cast<unsigned int>(-1);
 
     // clang-format off
