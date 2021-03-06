@@ -8973,31 +8973,25 @@ namespace GridGenerator
           (points[mask[j]] - points[mask[i]]));
     };
 
+    static constexpr ndarray<unsigned int, n_lines, 2> line_to_vertex_table = {
+      {{{0, 1}},
+       {{1, 2}},
+       {{2, 3}},
+       {{3, 0}},
+       {{4, 5}},
+       {{5, 6}},
+       {{6, 7}},
+       {{7, 4}},
+       {{0, 4}},
+       {{1, 5}},
+       {{2, 6}},
+       {{3, 7}}}};
+
     // Find the vertices where the surface intersects the cube
-    if (edgeTable[CubeIndex] & 1)
-      VertexList[0] = VertexInterp(0, 1);
-    if (edgeTable[CubeIndex] & 2)
-      VertexList[1] = VertexInterp(1, 2);
-    if (edgeTable[CubeIndex] & 4)
-      VertexList[2] = VertexInterp(2, 3);
-    if (edgeTable[CubeIndex] & 8)
-      VertexList[3] = VertexInterp(3, 0);
-    if (edgeTable[CubeIndex] & 16)
-      VertexList[4] = VertexInterp(4, 5);
-    if (edgeTable[CubeIndex] & 32)
-      VertexList[5] = VertexInterp(5, 6);
-    if (edgeTable[CubeIndex] & 64)
-      VertexList[6] = VertexInterp(6, 7);
-    if (edgeTable[CubeIndex] & 128)
-      VertexList[7] = VertexInterp(7, 4);
-    if (edgeTable[CubeIndex] & 256)
-      VertexList[8] = VertexInterp(0, 4);
-    if (edgeTable[CubeIndex] & 512)
-      VertexList[9] = VertexInterp(1, 5);
-    if (edgeTable[CubeIndex] & 1024)
-      VertexList[10] = VertexInterp(2, 6);
-    if (edgeTable[CubeIndex] & 2048)
-      VertexList[11] = VertexInterp(3, 7);
+    for (unsigned int l = 0; l < n_lines; ++l)
+      if (edgeTable[CubeIndex] & (1 << l))
+        VertexList[l] =
+          VertexInterp(line_to_vertex_table[l][0], line_to_vertex_table[l][1]);
 
     int NewVertexCount = 0;
     for (unsigned int i = 0; i < n_lines; i++)
