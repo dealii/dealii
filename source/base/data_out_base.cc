@@ -697,14 +697,14 @@ namespace
   //----------------------------------------------------------------------//
   // For a given patch, compute the node interpolating the corner nodes linearly
   // at the point (xstep, ystep, zstep)*1./n_subdivisions. If the points are
-  // saved in the patch.data member, return the saved point instead
+  // saved in the patch.data member, return the saved point instead.
   template <int dim, int spacedim>
   inline Point<spacedim>
-  compute_node(const DataOutBase::Patch<dim, spacedim> &patch,
-               const unsigned int                       xstep,
-               const unsigned int                       ystep,
-               const unsigned int                       zstep,
-               const unsigned int                       n_subdivisions)
+  compute_hypercube_node(const DataOutBase::Patch<dim, spacedim> &patch,
+                         const unsigned int                       xstep,
+                         const unsigned int                       ystep,
+                         const unsigned int                       zstep,
+                         const unsigned int n_subdivisions)
   {
     Point<spacedim> node;
     if (patch.points_are_available)
@@ -768,6 +768,36 @@ namespace
               }
           }
       }
+    return node;
+  }
+
+  // For a given patch, compute the nodes for arbitrary (non-hypercube) cells.
+  // If the points are saved in the patch.data member, return the saved point
+  // instead.
+  template <int dim, int spacedim>
+  inline Point<spacedim>
+  compute_arbitrary_node(const DataOutBase::Patch<dim, spacedim> &patch,
+                         const unsigned int                       point_no)
+  {
+    Point<spacedim> node;
+
+    if (patch.points_are_available)
+      {
+        for (unsigned int d = 0; d < spacedim; ++d)
+          node[d] = patch.data(patch.data.size(0) - spacedim + d, point_no);
+        return node;
+      }
+    else
+      {
+        AssertDimension(patch.n_subdivisions, 1);
+        Assert(
+          patch.reference_cell != ReferenceCells::Pyramid,
+          ExcMessage(
+            "Pyramids need different ordering of the vertices, which is not implemented yet here."));
+
+        node = patch.vertices[point_no];
+      }
+
     return node;
   }
 
@@ -2626,22 +2656,12 @@ namespace DataOutBase
 
     for (const auto &patch : patches)
       {
-        // special treatment of simplices since they are not subdivided, such
-        // that no new nodes have to be created, but the precomputed ones can be
-        // used
+        // special treatment of non-hypercube cells
         if (patch.reference_cell != ReferenceCells::get_hypercube<dim>())
           {
-            Point<spacedim> node;
-
             for (unsigned int point_no = 0; point_no < patch.data.n_cols();
                  ++point_no)
-              {
-                for (unsigned int d = 0; d < spacedim; ++d)
-                  node[d] =
-                    patch.data(patch.data.size(0) - spacedim + d, point_no);
-
-                out.write_point(count++, node);
-              }
+              out.write_point(count++, compute_arbitrary_node(patch, point_no));
           }
         else
           {
@@ -2657,7 +2677,8 @@ namespace DataOutBase
               for (unsigned int i2 = 0; i2 < n2; ++i2)
                 for (unsigned int i1 = 0; i1 < n1; ++i1)
                   out.write_point(
-                    count++, compute_node(patch, i1, i2, i3, n_subdivisions));
+                    count++,
+                    compute_hypercube_node(patch, i1, i2, i3, n_subdivisions));
           }
       }
     out.flush_points();
@@ -3585,7 +3606,8 @@ namespace DataOutBase
                 for (unsigned int i1 = 0; i1 < n1; ++i1)
                   {
                     // compute coordinates for this patch point
-                    out << compute_node(patch, i1, i2, 0, n_subdivisions)
+                    out << compute_hypercube_node(
+                             patch, i1, i2, 0, n_subdivisions)
                         << ' ';
 
                     for (unsigned int data_set = 0; data_set < n_data_sets;
@@ -3612,7 +3634,7 @@ namespace DataOutBase
                   {
                     // compute coordinates for this patch point
                     this_point =
-                      compute_node(patch, i1, i2, i3, n_subdivisions);
+                      compute_hypercube_node(patch, i1, i2, i3, n_subdivisions);
                     // line into positive x-direction if possible
                     if (i1 < n_subdivisions)
                       {
@@ -3626,7 +3648,7 @@ namespace DataOutBase
                         out << '\n';
 
                         // write point there and its data
-                        out << compute_node(
+                        out << compute_hypercube_node(
                           patch, i1 + 1, i2, i3, n_subdivisions);
 
                         for (unsigned int data_set = 0; data_set < n_data_sets;
@@ -3653,7 +3675,7 @@ namespace DataOutBase
                         out << '\n';
 
                         // write point there and its data
-                        out << compute_node(
+                        out << compute_hypercube_node(
                           patch, i1, i2 + 1, i3, n_subdivisions);
 
                         for (unsigned int data_set = 0; data_set < n_data_sets;
@@ -3680,7 +3702,7 @@ namespace DataOutBase
                         out << '\n';
 
                         // write point there and its data
-                        out << compute_node(
+                        out << compute_hypercube_node(
                           patch, i1, i2, i3 + 1, n_subdivisions);
 
                         for (unsigned int data_set = 0; data_set < n_data_sets;
@@ -3866,7 +3888,7 @@ namespace DataOutBase
             {
               // compute coordinates for this patch point, storing in ver
               ver[i1 * d1 + i2 * d2] =
-                compute_node(patch, i1, i2, 0, n_subdivisions);
+                compute_hypercube_node(patch, i1, i2, 0, n_subdivisions);
             }
 
 
@@ -4108,11 +4130,14 @@ namespace DataOutBase
           for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
             {
               Point<spacedim> points[4];
-              points[0] = compute_node(patch, i1, i2, 0, n_subdivisions);
-              points[1] = compute_node(patch, i1 + 1, i2, 0, n_subdivisions);
-              points[2] = compute_node(patch, i1, i2 + 1, 0, n_subdivisions);
-              points[3] =
-                compute_node(patch, i1 + 1, i2 + 1, 0, n_subdivisions);
+              points[0] =
+                compute_hypercube_node(patch, i1, i2, 0, n_subdivisions);
+              points[1] =
+                compute_hypercube_node(patch, i1 + 1, i2, 0, n_subdivisions);
+              points[2] =
+                compute_hypercube_node(patch, i1, i2 + 1, 0, n_subdivisions);
+              points[3] = compute_hypercube_node(
+                patch, i1 + 1, i2 + 1, 0, n_subdivisions);
 
               switch (spacedim)
                 {
@@ -6058,7 +6083,8 @@ namespace DataOutBase
     Point<2>                projection_decomposition;
     std::array<Point<2>, 4> projection_decompositions;
 
-    projected_point = compute_node(first_patch, 0, 0, 0, n_subdivisions);
+    projected_point =
+      compute_hypercube_node(first_patch, 0, 0, 0, n_subdivisions);
 
     if (first_patch.data.n_rows() != 0)
       {
@@ -6085,13 +6111,13 @@ namespace DataOutBase
             for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
               {
                 projected_points[0] =
-                  compute_node(patch, i1, i2, 0, n_subdivisions);
+                  compute_hypercube_node(patch, i1, i2, 0, n_subdivisions);
                 projected_points[1] =
-                  compute_node(patch, i1 + 1, i2, 0, n_subdivisions);
+                  compute_hypercube_node(patch, i1 + 1, i2, 0, n_subdivisions);
                 projected_points[2] =
-                  compute_node(patch, i1, i2 + 1, 0, n_subdivisions);
-                projected_points[3] =
-                  compute_node(patch, i1 + 1, i2 + 1, 0, n_subdivisions);
+                  compute_hypercube_node(patch, i1, i2 + 1, 0, n_subdivisions);
+                projected_points[3] = compute_hypercube_node(
+                  patch, i1 + 1, i2 + 1, 0, n_subdivisions);
 
                 x_min = std::min(x_min, projected_points[0][0]);
                 x_min = std::min(x_min, projected_points[1][0]);
@@ -6266,7 +6292,8 @@ namespace DataOutBase
 
     Point<3> point;
 
-    projected_point = compute_node(first_patch, 0, 0, 0, n_subdivisions);
+    projected_point =
+      compute_hypercube_node(first_patch, 0, 0, 0, n_subdivisions);
 
     if (first_patch.data.n_rows() != 0)
       {
@@ -6299,10 +6326,11 @@ namespace DataOutBase
             for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
               {
                 const std::array<Point<spacedim>, 4> projected_vertices{
-                  {compute_node(patch, i1, i2, 0, n_subdivisions),
-                   compute_node(patch, i1 + 1, i2, 0, n_subdivisions),
-                   compute_node(patch, i1, i2 + 1, 0, n_subdivisions),
-                   compute_node(patch, i1 + 1, i2 + 1, 0, n_subdivisions)}};
+                  {compute_hypercube_node(patch, i1, i2, 0, n_subdivisions),
+                   compute_hypercube_node(patch, i1 + 1, i2, 0, n_subdivisions),
+                   compute_hypercube_node(patch, i1, i2 + 1, 0, n_subdivisions),
+                   compute_hypercube_node(
+                     patch, i1 + 1, i2 + 1, 0, n_subdivisions)}};
 
                 Assert((flags.height_vector < patch.data.n_rows()) ||
                          patch.data.n_rows() == 0,
@@ -6440,10 +6468,11 @@ namespace DataOutBase
             for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
               {
                 const std::array<Point<spacedim>, 4> projected_vertices = {
-                  {compute_node(patch, i1, i2, 0, n_subdivisions),
-                   compute_node(patch, i1 + 1, i2, 0, n_subdivisions),
-                   compute_node(patch, i1, i2 + 1, 0, n_subdivisions),
-                   compute_node(patch, i1 + 1, i2 + 1, 0, n_subdivisions)}};
+                  {compute_hypercube_node(patch, i1, i2, 0, n_subdivisions),
+                   compute_hypercube_node(patch, i1 + 1, i2, 0, n_subdivisions),
+                   compute_hypercube_node(patch, i1, i2 + 1, 0, n_subdivisions),
+                   compute_hypercube_node(
+                     patch, i1 + 1, i2 + 1, 0, n_subdivisions)}};
 
                 Assert((flags.height_vector < patch.data.n_rows()) ||
                          patch.data.n_rows() == 0,
