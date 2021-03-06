@@ -2467,6 +2467,17 @@ namespace GridGenerator
                  std::vector<Point<3>> &      vertices,
                  std::vector<CellData<2>> &   cells) const;
 
+    /**
+     * Process the cell @p cell. Calls the above functions but allows the users
+     * to perform their own cell loop and potentially perform some pre- and
+     * post-processing steps.
+     */
+    void
+    process_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
+                 const VectorType &              ls_vector,
+                 std::vector<Point<dim>> &       vertices,
+                 std::vector<CellData<dim - 1>> &cells) const;
+
   private:
     /**
      * Internal function to create a quadrature rule with n_subdivisions+1

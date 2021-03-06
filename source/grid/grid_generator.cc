@@ -8503,18 +8503,26 @@ namespace GridGenerator
     std::vector<Point<dim>> &       vertices,
     std::vector<CellData<dim - 1>> &cells) const
   {
+    for (const auto &cell : background_dof_handler.active_cell_iterators())
+      process_cell(cell, ls_vector, vertices, cells);
+  }
+
+
+
+  template <int dim, typename VectorType>
+  void
+  MarchingCubeAlgorithm<dim, VectorType>::process_cell(
+    const typename DoFHandler<dim>::active_cell_iterator &cell,
+    const VectorType &                                    ls_vector,
+    std::vector<Point<dim>> &                             vertices,
+    std::vector<CellData<dim - 1>> &                      cells) const
+  {
     std::vector<value_type> ls_values;
 
-    for (const auto &cell : background_dof_handler.active_cell_iterators())
-      {
-        fe_values.reinit(cell);
-        ls_values.resize(cell->get_fe().n_dofs_per_cell());
-        fe_values.get_function_values(ls_vector, ls_values);
-        process_cell(ls_values,
-                     fe_values.get_quadrature_points(),
-                     vertices,
-                     cells);
-      }
+    fe_values.reinit(cell);
+    ls_values.resize(cell->get_fe().n_dofs_per_cell());
+    fe_values.get_function_values(ls_vector, ls_values);
+    process_cell(ls_values, fe_values.get_quadrature_points(), vertices, cells);
   }
 
 
