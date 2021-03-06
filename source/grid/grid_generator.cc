@@ -8666,70 +8666,55 @@ namespace GridGenerator
     std::vector<Point<2>> &         vertices,
     std::vector<CellData<1>> &      cells)
   {
-    unsigned int c = 0;
+    static constexpr unsigned int n_vertices       = 4;
+    static constexpr unsigned int n_sub_vertices   = 2;
+    static constexpr unsigned int n_lines          = 4;
+    static constexpr unsigned int n_configurations = std::pow(2, n_vertices);
 
-    for (unsigned int i = 0, scale = 1; i < 4; ++i, scale *= 2)
-      c += (ls_values[mask[i]] > 0) * scale;
+    // clang-format off
+    static constexpr std::array<unsigned int, n_configurations> edgeTable = {{
+      0b0000, 0b0101, 0b0110, 0b0011,   
+      0b1010, 0b0000, 0b1100, 0b1001,   
+      0b1001, 0b1100, 0b0000, 0b1010,   
+      0b0011, 0b0110, 0b0101, 0b0000}};
+    // clang-format on
 
-    if (c == 0 || c == 15)
-      return; // nothing to do since the level set function is constant within
-              // the sub_cell
+    static constexpr unsigned int X = static_cast<unsigned int>(-1);
 
-    const auto process_points = [&](const auto &lines) {
-      const value_type w0 = std::abs(ls_values[mask[lines[0]]]);
-      const value_type w1 = std::abs(ls_values[mask[lines[1]]]);
+    static constexpr ndarray<unsigned int, n_configurations, 5> triTable = {
+      {{{X, X, X, X, X}},
+       {{0, 2, X, X, X}},
+       {{1, 2, X, X, X}},
+       {{0, 1, X, X, X}},
+       {{1, 3, X, X, X}},
+       {{X, X, X, X, X}},
+       {{2, 3, X, X, X}},
+       {{0, 3, X, X, X}},
+       {{0, 3, X, X, X}},
+       {{2, 3, X, X, X}},
+       {{X, X, X, X, X}},
+       {{1, 3, X, X, X}},
+       {{0, 1, X, X, X}},
+       {{2, 1, X, X, X}},
+       {{0, 2, X, X, X}},
+       {{X, X, X, X, X}}}};
 
-      return points[mask[lines[0]]] * (w1 / (w0 + w1)) +
-             points[mask[lines[1]]] * (w0 / (w0 + w1));
-    };
+    static constexpr ndarray<unsigned int, n_lines, 2> line_to_vertex_table = {
+      {{{0, 3}}, {{1, 2}}, {{0, 1}}, {{3, 2}}}};
 
-    const auto process_lines = [&](const auto &lines) {
-      std::array<std::array<unsigned int, 2>, 4> table{
-        {{{0, 3}}, {{1, 2}}, {{0, 1}}, {{3, 2}}}};
-
-      const auto p0 = process_points(table[lines[0]]);
-      const auto p1 = process_points(table[lines[1]]);
-
-      cells.resize(cells.size() + 1);
-      cells.back().vertices[0] = vertices.size();
-      cells.back().vertices[1] = vertices.size() + 1;
-
-      vertices.emplace_back(p0);
-      vertices.emplace_back(p1);
-    };
-
-    // Check if the isoline for level set values larger than zero is the
-    // element's diagonal and level set values on both sides from the diagonal
-    // are smaller than zero. In this case, the level set would be a
-    // "hat"-function which does not make sense.
-    if (c == 5 || c == 10)
-      {
-        Assert(false, ExcNotImplemented());
-        return;
-      }
-
-    static const unsigned int X = -1;
-
-    std::array<std::array<unsigned int, 2>, 16> table{{
-      {{X, X}},
-      {{0, 2}},
-      {{1, 2}},
-      {{0, 1}}, //  c=0-3
-      {{1, 3}},
-      {{X, X}},
-      {{2, 3}},
-      {{0, 3}}, //  c=4-7
-      {{0, 3}},
-      {{2, 3}},
-      {{X, X}},
-      {{1, 3}}, //  c=8-11
-      {{0, 1}},
-      {{2, 1}},
-      {{0, 2}},
-      {{X, X}} //   c=12-15
-    }};
-
-    process_lines(table[c]);
+    internal::process_sub_cell<2,
+                               n_vertices,
+                               n_sub_vertices,
+                               n_configurations,
+                               n_lines,
+                               5>(edgeTable,
+                                  triTable,
+                                  line_to_vertex_table,
+                                  ls_values,
+                                  points,
+                                  mask,
+                                  vertices,
+                                  cells);
   }
 
 
