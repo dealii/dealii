@@ -45,7 +45,8 @@ test(int n_refinements, MPI_Comm comm)
       deallog << cell->id() << " -> " << cell->subdomain_id() << " "
               << cell->global_active_cell_index() << std::endl;
 
-  const auto &part = tria.global_active_cell_index_partitioner();
+  const Utilities::MPI::Partitioner &part =
+    *tria.global_active_cell_index_partitioner().lock();
 
   part.locally_owned_range().print(deallog);
   part.ghost_indices().print(deallog);
