@@ -8591,7 +8591,7 @@ namespace GridGenerator
       const ndarray<unsigned int, n_lines, 2> &line_to_vertex_table,
       const std::vector<value_type> &          ls_values,
       const std::vector<Point<dim>> &          points,
-      const std::vector<unsigned int>          mask,
+      const std::vector<unsigned int> &        mask,
       std::vector<Point<dim>> &                vertices,
       std::vector<CellData<dim - 1>> &         cells)
     {
