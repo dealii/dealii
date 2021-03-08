@@ -38,7 +38,7 @@ checks() {
   fi
 
   # Add the location 'download_clang_format' or 'compile_clang_format'
-  # installs clang-format to to the local PATH.
+  # installs clang-format to the local PATH.
   CLANG_FORMAT_PATH="$(cd "$(dirname "$0")" && pwd)/programs/clang-6/bin"
   export PATH="${CLANG_FORMAT_PATH}:${PATH}"
 
