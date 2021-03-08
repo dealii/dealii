@@ -1879,7 +1879,7 @@ TriaAccessor<structdim, dim, spacedim>::set_all_boundary_ids(
       case 2:
         // for boundary quads also set
         // boundary_id of bounding lines
-        for (unsigned int i = 0; i < 4; ++i)
+        for (unsigned int i = 0; i < this->n_lines(); ++i)
           this->line(i)->set_boundary_id(boundary_ind);
         break;
 
