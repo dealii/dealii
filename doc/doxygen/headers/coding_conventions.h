@@ -56,6 +56,14 @@ pre-commit hook. One way to do so, is to copy
 <code>\${SOURCE_DIR}/contrib/git-hooks/pre-commit</code> to
 <code>\${SOURCE_DIR}/.git/hooks/pre-commit</code> and make sure it is
 executable.
+
+If the system you are working on has more than one version of
+<code>clang-format</code> installed (or if it is not in the path)
+you should replace the above <code>make indent</code> command with
+@code
+  make DEAL_II_CLANG_FORMAT=/path/to/clang-6.0/clang-format indent
+@endcode
+to point to the correct executable.
 </p>
 
 <h3>Style issues</h3>
