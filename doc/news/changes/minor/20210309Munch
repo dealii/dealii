@@ -1,0 +1,7 @@
+New: The class MGTransferMatrixFree::build() now also
+accepts an optional function for initializing the internal level vectors. 
+This is useful if one uses the the transfer operators in the context of 
+smoothers that are built around MatrixFree objects.
+<br>
+(Peter Munch, 2021/03/09)
+

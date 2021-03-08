@@ -438,14 +438,15 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
         // In case a ghosted level vector has been initialized, we can simply
         // use that as a template for the vector partitioning. If not, we
         // resort to the locally owned range of the dof handler.
-        if (level <= ghosted_level_vector.max_level() &&
-            ghosted_level_vector[level].size() == dof_handler.n_dofs(level))
+        if (initialize_dof_vector)
+          initialize_dof_vector(level, dst[level]);
+        else if (level <= ghosted_level_vector.max_level() &&
+                 ghosted_level_vector[level].size() ==
+                   dof_handler.n_dofs(level))
           dst[level].reinit(ghosted_level_vector[level], false);
         else
-          {
-            dst[level].reinit(dof_handler.locally_owned_mg_dofs(level),
-                              dof_handler.get_communicator());
-          }
+          dst[level].reinit(dof_handler.locally_owned_mg_dofs(level),
+                            dof_handler.get_communicator());
       }
     else if ((perform_plain_copy == false &&
               perform_renumbered_plain_copy == false) ||
@@ -561,20 +562,29 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_from_mg(
     {
       // the ghosted vector should already have the correct local size (but
       // different parallel layout)
-      AssertDimension(ghosted_level_vector[level].locally_owned_size(),
-                      src[level].locally_owned_size());
+      if (ghosted_level_vector[level].size() > 0)
+        AssertDimension(ghosted_level_vector[level].locally_owned_size(),
+                        src[level].locally_owned_size());
 
       // the first time around, we copy the source vector to the temporary
       // vector that we hold for the purpose of data exchange
       LinearAlgebra::distributed::Vector<Number> &ghosted_vector =
         ghosted_level_vector[level];
-      ghosted_vector = src[level];
-      ghosted_vector.update_ghost_values();
+
+      if (ghosted_level_vector[level].size() > 0)
+        ghosted_vector = src[level];
+
+      const auto ghosted_vector_ptr = (ghosted_level_vector[level].size() > 0) ?
+                                        &ghosted_vector :
+                                        &src[level];
+
+      ghosted_vector_ptr->update_ghost_values();
+
 
       auto copy_unknowns = [&](const Table<2, unsigned int> &indices) {
         for (unsigned int i = 0; i < indices.n_cols(); ++i)
           dst.local_element(indices(0, i)) =
-            ghosted_vector.local_element(indices(1, i));
+            ghosted_vector_ptr->local_element(indices(1, i));
       };
 
       // first copy local unknowns
