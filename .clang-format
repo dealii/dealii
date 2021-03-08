@@ -69,6 +69,8 @@ IncludeCategories:
     Priority: -1
 # deal.II folders in sorted order:
   - Regex:    "deal.II/algorithms/.*\\.h"
+    Priority: 100
+  - Regex:    "deal.II/arborx/.*\\.h"
     Priority: 110
   - Regex:    "deal.II/base/.*\\.h"
     Priority: 120
