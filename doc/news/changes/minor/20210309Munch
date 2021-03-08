@@ -1,0 +1,8 @@
+New: The classes MGLevelGlobalTransfer and MGTransferMatrixFree now
+accept in the constructor an optional function for initializing
+the internal level vectors. This is useful if one uses the the 
+transfer operators in the context of smoothers that are build
+around MatrixFree objects.
+<br>
+(Peter Munch, 2021/03/09)
+

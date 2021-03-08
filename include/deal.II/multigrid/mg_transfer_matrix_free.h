@@ -59,13 +59,20 @@ public:
    * Constructor without constraint matrices. Use this constructor only with
    * discontinuous finite elements or with no local refinement.
    */
-  MGTransferMatrixFree();
+  MGTransferMatrixFree(
+    const std::function<void(const unsigned int,
+                             LinearAlgebra::distributed::Vector<Number> &)>
+      &initialize_dof_vector = {});
 
   /**
    * Constructor with constraints. Equivalent to the default constructor
    * followed by initialize_constraints().
    */
-  MGTransferMatrixFree(const MGConstrainedDoFs &mg_constrained_dofs);
+  MGTransferMatrixFree(
+    const MGConstrainedDoFs &mg_constrained_dofs,
+    const std::function<void(const unsigned int,
+                             LinearAlgebra::distributed::Vector<Number> &)>
+      &initialize_dof_vector = {});
 
   /**
    * Destructor.
