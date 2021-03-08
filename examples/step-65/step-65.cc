@@ -633,7 +633,7 @@ namespace Step65
       MappingQCache<dim> mapping(fe.degree + 1);
       {
         TimerOutput::Scope scope(timer, "Initialize mapping cache");
-        mapping.initialize(triangulation, MappingQGeneric<dim>(fe.degree + 1));
+        mapping.initialize(MappingQGeneric<dim>(fe.degree + 1), triangulation);
       }
       std::cout << "   Memory consumption cache:     "
                 << 1e-6 * mapping.memory_consumption() << " MB" << std::endl;

@@ -1,0 +1,6 @@
+New: MappingQCache has a new initialize function that takes
+either a std::function or a dealii::Function for transforming
+individual points.
+<br>
+(Niklas Fehn, Martin Kronbichler, Peter Munch, 2021/03/10)
+
