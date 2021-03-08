@@ -25,6 +25,8 @@
 
 #  include <deal.II/boost_adaptors/bounding_box.h>
 
+#  include <deal.II/distributed/shared_tria.h>
+
 #  include <deal.II/dofs/dof_handler.h>
 
 #  include <deal.II/fe/mapping.h>
@@ -4114,8 +4116,7 @@ namespace GridTools
       (void)cell_filter;
       (void)process_cells;
       (void)compute_ghost_owners;
-      Assert(false,
-             ExcMessage("GridTools::exchange_cell_data() requires MPI."));
+      Assert(false, ExcNeedsMPI());
 #    else
       constexpr int dim      = MeshType::dimension;
       constexpr int spacedim = MeshType::space_dimension;
@@ -4126,6 +4127,21 @@ namespace GridTools
         tria != nullptr,
         ExcMessage(
           "The function exchange_cell_data_to_ghosts() only works with parallel triangulations."));
+
+      if (const auto tria = dynamic_cast<
+            const parallel::shared::Triangulation<dim, spacedim> *>(
+            &mesh.get_triangulation()))
+        {
+          Assert(
+            tria->with_artificial_cells(),
+            ExcMessage(
+              "The functions GridTools::exchange_cell_data_to_ghosts() and "
+              "GridTools::exchange_cell_data_to_level_ghosts() can only "
+              "operate on a single layer ghost cells. However, you have "
+              "given a Triangulation object of type "
+              "parallel::shared::Triangulation without artificial cells "
+              "resulting in arbitrary numbers of ghost layers."));
+        }
 
       // build list of cells to request for each neighbor
       std::set<dealii::types::subdomain_id> ghost_owners =
@@ -4344,9 +4360,7 @@ namespace GridTools
     (void)pack;
     (void)unpack;
     (void)cell_filter;
-    Assert(false,
-           ExcMessage(
-             "GridTools::exchange_cell_data_to_ghosts() requires MPI."));
+    Assert(false, ExcNeedsMPI());
 #    else
     internal::exchange_cell_data<DataType,
                                  MeshType,
@@ -4382,9 +4396,7 @@ namespace GridTools
     (void)pack;
     (void)unpack;
     (void)cell_filter;
-    Assert(false,
-           ExcMessage(
-             "GridTools::exchange_cell_data_to_level_ghosts() requires MPI."));
+    Assert(false, ExcNeedsMPI());
 #    else
     internal::exchange_cell_data<DataType,
                                  MeshType,
