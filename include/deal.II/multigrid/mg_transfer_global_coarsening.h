@@ -481,6 +481,13 @@ MGTransferGlobalCoarsening<dim, VectorType>::copy_to_mg(
 {
   (void)dof_handler;
 
+  Assert(
+    initialize_dof_vector,
+    ExcMessage(
+      "To be able to use this function, a function to initialize an internal "
+      "DoF vector has to be provided in the constructor of "
+      "MGTransferGlobalCoarsening."));
+
   for (unsigned int level = dst.min_level(); level <= dst.max_level(); ++level)
     initialize_dof_vector(level, dst[level]);
 
@@ -513,6 +520,13 @@ MGTransferGlobalCoarsening<dim, VectorType>::interpolate_to_mg(
   const InVector &                 src) const
 {
   (void)dof_handler;
+
+  Assert(
+    initialize_dof_vector,
+    ExcMessage(
+      "To be able to use this function, a function to initialize an internal "
+      "DoF vector has to be provided in the constructor of "
+      "MGTransferGlobalCoarsening."));
 
   const unsigned int min_level = transfer.min_level();
   const unsigned int max_level = transfer.max_level();
