@@ -35,20 +35,6 @@ namespace internal
   namespace MatrixFreeFunctions
   {
     template <int dim>
-    inline Quadrature<dim - 1>
-    get_face_quadrature(const Quadrature<dim> &quad)
-    {
-      if (dim == 2 || dim == 3)
-        for (unsigned int i = 1; i <= 3; ++i)
-          if (quad == QGaussSimplex<dim>(i))
-            return QGaussSimplex<dim - 1>(i);
-
-      AssertThrow(false, ExcNotImplemented());
-
-      return Quadrature<dim - 1>();
-    }
-
-    template <int dim>
     inline std::pair<dealii::ReferenceCell, dealii::hp::QCollection<dim - 1>>
     get_face_quadrature_collection(const Quadrature<dim> &quad,
                                    const bool             do_assert = true)
@@ -112,6 +98,36 @@ namespace internal
       return {ReferenceCells::Invalid, dealii::hp::QCollection<dim - 1>()};
     }
 
+
+
+    template <int dim>
+    inline std::pair<Quadrature<dim - 1>, Quadrature<dim - 1>>
+    get_unique_face_quadratures(const Quadrature<dim> &quad)
+    {
+      if (dim == 2 || dim == 3)
+        for (unsigned int i = 1; i <= 3; ++i)
+          if (quad == QGaussSimplex<dim>(i))
+            {
+              if (dim == 2)
+                return {QGaussSimplex<dim - 1>(i), Quadrature<dim - 1>()};
+              else
+                return {Quadrature<dim - 1>(), QGaussSimplex<dim - 1>(i)};
+            }
+
+      if (dim == 3)
+        for (unsigned int i = 1; i <= 3; ++i)
+          if (quad == QGaussWedge<dim>(i))
+            return {QGauss<dim - 1>(i), QGaussSimplex<dim - 1>(i)};
+
+      if (dim == 3)
+        for (unsigned int i = 1; i <= 2; ++i)
+          if (quad == QGaussPyramid<dim>(i))
+            return {QGauss<dim - 1>(i), QGaussSimplex<dim - 1>(i)};
+
+      AssertThrow(false, ExcNotImplemented());
+
+      return {QGauss<dim - 1>(1), QGauss<dim - 1>(1)};
+    }
   } // end of namespace MatrixFreeFunctions
 } // end of namespace internal
 

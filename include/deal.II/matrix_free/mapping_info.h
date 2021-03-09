@@ -27,6 +27,8 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/mapping.h>
 
+#include <deal.II/grid/reference_cell.h>
+
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/hp/q_collection.h>
 
@@ -193,6 +195,14 @@ namespace internal
        * orientation.
        */
       std::vector<QuadratureDescriptor> descriptor;
+
+      /**
+       * Collection of quadrature formulae applied on the given face.
+       *
+       * @note Only filled for faces, since faces might be quadrilateral or
+       *   triangle shaped.
+       */
+      std::vector<dealii::hp::QCollection<structdim>> q_collection;
 
       /**
        * Stores the index offset into the arrays @p jxw_values, @p jacobians,
@@ -453,6 +463,12 @@ namespace internal
        * The pointer to the first entry of mapping_collection.
        */
       SmartPointer<const Mapping<dim>> mapping;
+
+      /**
+       * Reference-cell type related to each quadrature and active quadrature
+       * index.
+       */
+      std::vector<std::vector<dealii::ReferenceCell>> reference_cell_types;
 
       /**
        * Internal function to compute the geometry for the case the mapping is
