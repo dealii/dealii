@@ -443,7 +443,8 @@ namespace parallel
     is_ghost.add_indices(is_ghost_vector.begin(), is_ghost_vector.end());
 
     number_cache.active_cell_index_partitioner =
-      Utilities::MPI::Partitioner(is_local, is_ghost, this->mpi_communicator);
+      std::make_shared<const Utilities::MPI::Partitioner>(
+        is_local, is_ghost, this->mpi_communicator);
 
     // 6) proceed with multigrid levels if requested
     if (this->is_multilevel_hierarchy_constructed() == true)
@@ -536,9 +537,8 @@ namespace parallel
                                  is_ghost_vector.end());
 
             number_cache.level_cell_index_partitioners[l] =
-              Utilities::MPI::Partitioner(is_local,
-                                          is_ghost,
-                                          this->mpi_communicator);
+              std::make_shared<const Utilities::MPI::Partitioner>(
+                is_local, is_ghost, this->mpi_communicator);
           }
       }
 
@@ -598,14 +598,14 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  const Utilities::MPI::Partitioner &
+  const std::weak_ptr<const Utilities::MPI::Partitioner>
   TriangulationBase<dim, spacedim>::global_active_cell_index_partitioner() const
   {
     return number_cache.active_cell_index_partitioner;
   }
 
   template <int dim, int spacedim>
-  const Utilities::MPI::Partitioner &
+  const std::weak_ptr<const Utilities::MPI::Partitioner>
   TriangulationBase<dim, spacedim>::global_level_cell_index_partitioner(
     const unsigned int level) const
   {
