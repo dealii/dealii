@@ -664,11 +664,20 @@ public:
    * exception is thrown, in case cells are not uniformly oriented.
    *
    * Note, that this function should be called before reorder_cells().
+   *
+   * @param all_vertices The vertices of the mesh.
+   * @param original_cells An object that contains the data that describes the
+   * mesh.
+   * @param use_new_style_ordering If true, then use the standard ordering of
+   * vertices within a cell. If false (the default), then use the "old-style"
+   * ordering of vertices within cells used by deal.II before version 5.2 and
+   * as explained in the documentation of this class.
    */
   static void
   invert_all_cells_of_negative_grid(
     const std::vector<Point<spacedim>> &all_vertices,
-    std::vector<CellData<dim>> &        original_cells);
+    std::vector<CellData<dim>> &        original_cells,
+    const bool                          use_new_style_ordering = false);
 };
 
 
@@ -677,19 +686,22 @@ template <>
 void
 GridReordering<2>::invert_all_cells_of_negative_grid(
   const std::vector<Point<2>> &all_vertices,
-  std::vector<CellData<2>> &   cells);
+  std::vector<CellData<2>> &   cells,
+  const bool                   use_new_style_ordering);
 
 template <>
 void
 GridReordering<2, 3>::invert_all_cells_of_negative_grid(
   const std::vector<Point<3>> &all_vertices,
-  std::vector<CellData<2>> &   cells);
+  std::vector<CellData<2>> &   cells,
+  const bool                   use_new_style_ordering);
 
 template <>
 void
 GridReordering<3>::invert_all_cells_of_negative_grid(
   const std::vector<Point<3>> &all_vertices,
-  std::vector<CellData<3>> &   cells);
+  std::vector<CellData<3>> &   cells,
+  const bool                   use_new_style_ordering);
 
 DEAL_II_NAMESPACE_CLOSE
 

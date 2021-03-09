@@ -228,9 +228,10 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
         {
           for (unsigned int count = 0; count < n_geometric_objects; count++)
             {
-              unsigned int type;
-              in >> type;
+              unsigned int n_vertices;
+              in >> n_vertices;
 
+              // VTK_TETRA is 10, VTK_HEXAHEDRON is 12
               if (cell_types[count] == 10 || cell_types[count] == 12)
                 {
                   if (cell_types[count] == 10)
@@ -244,14 +245,25 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                                 subcelldata.boundary_lines.size() == 0,
                               ExcNotImplemented());
 
-                  cells.emplace_back(type);
+                  cells.emplace_back(n_vertices);
 
-                  for (unsigned int j = 0; j < type; j++) // loop to feed data
+                  for (unsigned int j = 0; j < n_vertices;
+                       j++) // loop to feed data
                     in >> cells.back().vertices[j];
+
+                  // Hexahedra need a permutation to go from VTK numbering
+                  // to deal numbering
+                  if (cell_types[count] == 12)
+                    {
+                      std::swap(cells.back().vertices[2],
+                                cells.back().vertices[3]);
+                      std::swap(cells.back().vertices[6],
+                                cells.back().vertices[7]);
+                    }
 
                   cells.back().material_id = 0;
                 }
-
+              // VTK_TRIANGLE is 5, VTK_QUAD is 9
               else if (cell_types[count] == 5 || cell_types[count] == 9)
                 {
                   if (cell_types[count] == 5)
@@ -264,19 +276,20 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                   AssertThrow(subcelldata.boundary_lines.size() == 0,
                               ExcNotImplemented());
 
-                  subcelldata.boundary_quads.emplace_back(type);
+                  subcelldata.boundary_quads.emplace_back(n_vertices);
 
-                  for (unsigned int j = 0; j < type;
+                  for (unsigned int j = 0; j < n_vertices;
                        j++) // loop to feed the data to the boundary
                     in >> subcelldata.boundary_quads.back().vertices[j];
 
                   subcelldata.boundary_quads.back().material_id = 0;
                 }
+              // VTK_LINE is 3
               else if (cell_types[count] == 3)
                 {
-                  subcelldata.boundary_lines.emplace_back(type);
+                  subcelldata.boundary_lines.emplace_back(n_vertices);
 
-                  for (unsigned int j = 0; j < type;
+                  for (unsigned int j = 0; j < n_vertices;
                        j++) // loop to feed the data to the boundary
                     in >> subcelldata.boundary_lines.back().vertices[j];
 
@@ -287,16 +300,17 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 AssertThrow(
                   false,
                   ExcMessage(
-                    "While reading VTK file, unknown file type encountered"));
+                    "While reading VTK file, unknown cell type encountered"));
             }
         }
       else if (dim == 2)
         {
           for (unsigned int count = 0; count < n_geometric_objects; count++)
             {
-              unsigned int type;
-              in >> type;
+              unsigned int n_vertices;
+              in >> n_vertices;
 
+              // VTK_TRIANGLE is 5, VTK_QUAD is 9
               if (cell_types[count] == 5 || cell_types[count] == 9)
                 {
                   // we assume that the file contains first all cells,
@@ -309,21 +323,32 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                   if (cell_types[count] == 9)
                     is_quad_or_hex_mesh = true;
 
-                  cells.emplace_back(type);
+                  cells.emplace_back(n_vertices);
 
-                  for (unsigned int j = 0; j < type; j++) // loop to feed data
+                  for (unsigned int j = 0; j < n_vertices;
+                       j++) // loop to feed data
                     in >> cells.back().vertices[j];
+
+                  // Quadrilaterals need a permutation to go from VTK numbering
+                  // to deal numbering
+                  if (cell_types[count] == 9)
+                    {
+                      // Like Hexahedra - the last two vertices need to be
+                      // flipped
+                      std::swap(cells.back().vertices[2],
+                                cells.back().vertices[3]);
+                    }
 
                   cells.back().material_id = 0;
                 }
-
+              // VTK_LINE is 3
               else if (cell_types[count] == 3)
                 {
                   // If this is encountered, the pointer comes out of the loop
                   // and starts processing boundaries.
-                  subcelldata.boundary_lines.emplace_back(type);
+                  subcelldata.boundary_lines.emplace_back(n_vertices);
 
-                  for (unsigned int j = 0; j < type;
+                  for (unsigned int j = 0; j < n_vertices;
                        j++) // loop to feed the data to the boundary
                     {
                       in >> subcelldata.boundary_lines.back().vertices[j];
@@ -545,12 +570,10 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
           if (dim == spacedim)
             GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(
-              vertices, cells);
+              vertices, cells, true);
 
-          GridReordering<dim, spacedim>::reorder_cells(cells);
-          tria->create_triangulation_compatibility(vertices,
-                                                   cells,
-                                                   subcelldata);
+          GridReordering<dim, spacedim>::reorder_cells(cells, true);
+          tria->create_triangulation(vertices, cells, subcelldata);
 
           return;
         }

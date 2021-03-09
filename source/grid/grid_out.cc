@@ -3429,7 +3429,10 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
    *
    * see also: https://vtk.org/wp-content/uploads/2015/04/file-formats.pdf
    */
-  static const std::array<int, 8> table = {{1, 3, 5, 9, 10, 14, 13, 12}};
+  static const std::array<int, 8> deal_to_vtk_cell_type = {
+    {1, 3, 5, 9, 10, 14, 13, 12}};
+  static const std::array<unsigned int, 8> vtk_to_deal_hypercube = {
+    {0, 1, 3, 2, 4, 5, 7, 6}};
 
   // write cells.
   if (vtk_flags.output_cells)
@@ -3445,7 +3448,7 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
                 (reference_cell == ReferenceCells::Line) ||
                 (reference_cell == ReferenceCells::Quadrilateral) ||
                 (reference_cell == ReferenceCells::Hexahedron))
-              out << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[i]);
+              out << cell->vertex_index(vtk_to_deal_hypercube[i]);
             else if ((reference_cell == ReferenceCells::Triangle) ||
                      (reference_cell == ReferenceCells::Tetrahedron) ||
                      (reference_cell == ReferenceCells::Wedge))
@@ -3465,13 +3468,12 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
     for (const auto &face : faces)
       {
         out << face->n_vertices();
-        constexpr int face_dim = dim > 1 ? dim - 1 : 1;
         for (const unsigned int i : face->vertex_indices())
           {
             out << ' '
                 << face->vertex_index(GeometryInfo<dim>::vertices_per_face ==
                                           face->n_vertices() ?
-                                        GeometryInfo<face_dim>::ucd_to_deal[i] :
+                                        vtk_to_deal_hypercube[i] :
                                         i);
           }
         out << '\n';
@@ -3490,19 +3492,22 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
   if (vtk_flags.output_cells)
     {
       for (const auto &cell : tria.active_cell_iterators())
-        out << table[static_cast<int>(cell->reference_cell())] << ' ';
+        out << deal_to_vtk_cell_type[static_cast<int>(cell->reference_cell())]
+            << ' ';
       out << '\n';
     }
   if (vtk_flags.output_faces)
     {
       for (const auto &face : faces)
-        out << table[static_cast<int>(face->reference_cell())] << ' ';
+        out << deal_to_vtk_cell_type[static_cast<int>(face->reference_cell())]
+            << ' ';
       out << '\n';
     }
   if (vtk_flags.output_edges)
     {
       for (const auto &edge : edges)
-        out << table[static_cast<int>(edge->reference_cell())] << ' ';
+        out << deal_to_vtk_cell_type[static_cast<int>(edge->reference_cell())]
+            << ' ';
     }
   out << "\n\nCELL_DATA " << n_cells << '\n'
       << "SCALARS MaterialID int 1\n"
