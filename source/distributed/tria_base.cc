@@ -406,9 +406,8 @@ namespace parallel
                              cell_counter[my_subdomain + 1]);
           IndexSet is_ghost(cell_counter.back());
           number_cache.active_cell_index_partitioner =
-            Utilities::MPI::Partitioner(is_local,
-                                        is_ghost,
-                                        this->mpi_communicator);
+            std::make_shared<const Utilities::MPI::Partitioner>(
+              is_local, is_ghost, this->mpi_communicator);
 
           // set global active cell indices and increment process-local counters
           for (const auto &cell : this->active_cell_iterators())
