@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2020 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -725,8 +725,6 @@ public:
    * library (contrary to its Triangulation counterpart).
    *
    * Returns whether any future FE indices have been changed by this function.
-   *
-   * @note Only implemented for serial applications.
    */
   bool
   prepare_coarsening_and_refinement(
