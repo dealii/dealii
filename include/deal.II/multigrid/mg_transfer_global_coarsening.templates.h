@@ -1947,7 +1947,7 @@ namespace MGTransferGlobalCoarseningTools
     std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
       coarse_grid_triangulations(fine_triangulation_in.n_global_levels());
 
-    coarse_grid_triangulations.back().reset(&fine_triangulation_in, [](auto &) {
+    coarse_grid_triangulations.back().reset(&fine_triangulation_in, [](auto *) {
       // empty deleter, since fine_triangulation_in is an external field
       // and its destructor is called somewhere else
     });
