@@ -1697,7 +1697,13 @@ namespace internal
         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
         const ArrayView<Tensor<rank, spacedim>> &                output)
       {
-        AssertDimension(input.size(), output.size());
+        // In the case of wedges and pyramids, faces might have different
+        // numbers of quadrature points on each face with the result
+        // that input and output have different sizes, since input has
+        // the correct size but the size of output is the maximum of
+        // all possible sizes.
+        AssertIndexRange(input.size(), output.size() + 1);
+
         Assert(
           (dynamic_cast<
              const typename dealii::MappingFE<dim, spacedim>::InternalData *>(
@@ -1717,7 +1723,7 @@ namespace internal
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_contravariant_transformation"));
 
-                for (unsigned int i = 0; i < output.size(); ++i)
+                for (unsigned int i = 0; i < input.size(); ++i)
                   output[i] =
                     apply_transformation(data.contravariant[i], input[i]);
 
@@ -1738,7 +1744,7 @@ namespace internal
                 if (rank != 1)
                   return;
 
-                for (unsigned int i = 0; i < output.size(); ++i)
+                for (unsigned int i = 0; i < input.size(); ++i)
                   {
                     output[i] =
                       apply_transformation(data.contravariant[i], input[i]);
@@ -1756,7 +1762,7 @@ namespace internal
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_covariant_transformation"));
 
-                for (unsigned int i = 0; i < output.size(); ++i)
+                for (unsigned int i = 0; i < input.size(); ++i)
                   output[i] = apply_transformation(data.covariant[i], input[i]);
 
                 return;

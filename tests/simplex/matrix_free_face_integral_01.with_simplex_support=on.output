@@ -1,0 +1,8 @@
+
+DEAL:SIMPLEX:: dim=2 degree=1: OK
+DEAL:SIMPLEX:: dim=2 degree=2: OK
+DEAL:SIMPLEX:: dim=3 degree=1: OK
+DEAL:SIMPLEX:: dim=3 degree=2: OK
+DEAL:WEDGE  :: dim=3 degree=1: OK
+DEAL:WEDGE  :: dim=3 degree=2: OK
+DEAL:PYRAMID:: dim=3 degree=1: OK
