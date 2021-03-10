@@ -2701,7 +2701,8 @@ DoFHandler<dim, spacedim>::prepare_coarsening_and_refinement(
   using level_type                      = active_fe_index_type;
   static const level_type invalid_level = invalid_active_fe_index;
 
-  LinearAlgebra::distributed::Vector<level_type> future_levels;
+  // HOTFIX: dealii::Vector does not accept integral types
+  LinearAlgebra::distributed::Vector<float> future_levels;
   if (const auto parallel_tria =
         dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
           &(*tria)))
@@ -2751,8 +2752,8 @@ DoFHandler<dim, spacedim>::prepare_coarsening_and_refinement(
       for (const auto &cell : active_cell_iterators())
         if (!cell->is_artificial())
           {
-            const level_type cell_level =
-              future_levels[cell->global_active_cell_index()];
+            const level_type cell_level = static_cast<level_type>(
+              future_levels[cell->global_active_cell_index()]);
 
             // ignore cells that are not part of the hierarchy
             if (cell_level == invalid_level)
@@ -2773,8 +2774,8 @@ DoFHandler<dim, spacedim>::prepare_coarsening_and_refinement(
                   // owning process and communicated at the next loop iteration.
                   if (neighbor->is_locally_owned())
                     {
-                      const level_type neighbor_level =
-                        future_levels[neighbor->global_active_cell_index()];
+                      const level_type neighbor_level = static_cast<level_type>(
+                        future_levels[neighbor->global_active_cell_index()]);
 
                       // ignore neighbors that are not part of the hierarchy
                       if (neighbor_level == invalid_level)
@@ -2803,8 +2804,8 @@ DoFHandler<dim, spacedim>::prepare_coarsening_and_refinement(
   for (const auto &cell : active_cell_iterators())
     if (cell->is_locally_owned())
       {
-        const level_type cell_level =
-          future_levels[cell->global_active_cell_index()];
+        const level_type cell_level = static_cast<level_type>(
+          future_levels[cell->global_active_cell_index()]);
 
         if (cell_level != invalid_level)
           {
