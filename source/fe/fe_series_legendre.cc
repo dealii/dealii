@@ -74,14 +74,16 @@ namespace
   integrate(const FiniteElement<dim, spacedim> &fe,
             const Quadrature<dim> &             quadrature,
             const TableIndices<dim> &           indices,
-            const unsigned int                  dof)
+            const unsigned int                  dof,
+            const unsigned int                  component)
   {
     double sum = 0;
     for (unsigned int q = 0; q < quadrature.size(); ++q)
       {
         const Point<dim> &x_q = quadrature.point(q);
-        sum +=
-          Lh(x_q, indices) * fe.shape_value(dof, x_q) * quadrature.weight(q);
+        sum += Lh(x_q, indices) *
+               fe.shape_value_component(dof, x_q, component) *
+               quadrature.weight(q);
       }
     return sum * multiplier(indices);
   }
@@ -99,6 +101,7 @@ namespace
     const hp::FECollection<1, spacedim> &fe_collection,
     const hp::QCollection<1> &           q_collection,
     const unsigned int                   fe,
+    const unsigned int                   component,
     std::vector<FullMatrix<double>> &    legendre_transform_matrices)
   {
     AssertIndexRange(fe, fe_collection.size());
@@ -111,8 +114,12 @@ namespace
 
         for (unsigned int k = 0; k < n_coefficients_per_direction[fe]; ++k)
           for (unsigned int j = 0; j < fe_collection[fe].n_dofs_per_cell(); ++j)
-            legendre_transform_matrices[fe](k, j) = integrate(
-              fe_collection[fe], q_collection[fe], TableIndices<1>(k), j);
+            legendre_transform_matrices[fe](k, j) =
+              integrate(fe_collection[fe],
+                        q_collection[fe],
+                        TableIndices<1>(k),
+                        j,
+                        component);
       }
   }
 
@@ -123,6 +130,7 @@ namespace
     const hp::FECollection<2, spacedim> &fe_collection,
     const hp::QCollection<2> &           q_collection,
     const unsigned int                   fe,
+    const unsigned int                   component,
     std::vector<FullMatrix<double>> &    legendre_transform_matrices)
   {
     AssertIndexRange(fe, fe_collection.size());
@@ -143,7 +151,8 @@ namespace
                 integrate(fe_collection[fe],
                           q_collection[fe],
                           TableIndices<2>(k1, k2),
-                          j);
+                          j,
+                          component);
       }
   }
 
@@ -154,6 +163,7 @@ namespace
     const hp::FECollection<3, spacedim> &fe_collection,
     const hp::QCollection<3> &           q_collection,
     const unsigned int                   fe,
+    const unsigned int                   component,
     std::vector<FullMatrix<double>> &    legendre_transform_matrices)
   {
     AssertIndexRange(fe, fe_collection.size());
@@ -175,7 +185,8 @@ namespace
                   integrate(fe_collection[fe],
                             q_collection[fe],
                             TableIndices<3>(k1, k2, k3),
-                            j);
+                            j,
+                            component);
       }
   }
 } // namespace
@@ -188,15 +199,27 @@ namespace FESeries
   Legendre<dim, spacedim>::Legendre(
     const std::vector<unsigned int> &      n_coefficients_per_direction,
     const hp::FECollection<dim, spacedim> &fe_collection,
-    const hp::QCollection<dim> &           q_collection)
+    const hp::QCollection<dim> &           q_collection,
+    const unsigned int                     component_)
     : n_coefficients_per_direction(n_coefficients_per_direction)
     , fe_collection(&fe_collection)
     , q_collection(q_collection)
     , legendre_transform_matrices(fe_collection.size())
+    , component(component_ != numbers::invalid_unsigned_int ? component_ : 0)
   {
     Assert(n_coefficients_per_direction.size() == fe_collection.size() &&
              n_coefficients_per_direction.size() == q_collection.size(),
            ExcMessage("All parameters are supposed to have the same size."));
+
+    if (fe_collection[0].n_components() > 1)
+      Assert(
+        component_ != numbers::invalid_unsigned_int,
+        ExcMessage(
+          "For vector-valued problems, you need to explicitly specify for "
+          "which vector component you will want to do a Fourier decomposition "
+          "by setting the 'component' argument of this constructor."));
+
+    AssertIndexRange(component, fe_collection[0].n_components());
 
     // reserve sufficient memory
     const unsigned int max_n_coefficients_per_direction =
@@ -231,7 +254,8 @@ namespace FESeries
       (n_coefficients_per_direction == legendre.n_coefficients_per_direction) &&
       (*fe_collection == *(legendre.fe_collection)) &&
       (q_collection == legendre.q_collection) &&
-      (legendre_transform_matrices == legendre.legendre_transform_matrices));
+      (legendre_transform_matrices == legendre.legendre_transform_matrices) &&
+      (component == legendre.component));
   }
 
 
@@ -247,6 +271,7 @@ namespace FESeries
                          *fe_collection,
                          q_collection,
                          fe,
+                         component,
                          legendre_transform_matrices);
       });
 
@@ -281,6 +306,7 @@ namespace FESeries
                      *fe_collection,
                      q_collection,
                      cell_active_fe_index,
+                     component,
                      legendre_transform_matrices);
 
     const FullMatrix<CoefficientType> &matrix =

@@ -287,7 +287,8 @@ namespace SmoothnessEstimator
 
     template <int dim, int spacedim>
     FESeries::Legendre<dim, spacedim>
-    default_fe_series(const hp::FECollection<dim, spacedim> &fe_collection)
+    default_fe_series(const hp::FECollection<dim, spacedim> &fe_collection,
+                      const unsigned int                     component)
     {
       // Default number of coefficients per direction.
       //
@@ -323,7 +324,8 @@ namespace SmoothnessEstimator
 
       return FESeries::Legendre<dim, spacedim>(n_coefficients_per_direction,
                                                fe_collection,
-                                               q_collection);
+                                               q_collection,
+                                               component);
     }
   } // namespace Legendre
 
@@ -574,7 +576,8 @@ namespace SmoothnessEstimator
 
     template <int dim, int spacedim>
     FESeries::Fourier<dim, spacedim>
-    default_fe_series(const hp::FECollection<dim, spacedim> &fe_collection)
+    default_fe_series(const hp::FECollection<dim, spacedim> &fe_collection,
+                      const unsigned int                     component)
     {
       // Default number of coefficients per direction.
       //
@@ -613,7 +616,8 @@ namespace SmoothnessEstimator
 
       return FESeries::Fourier<dim, spacedim>(n_coefficients_per_direction,
                                               fe_collection,
-                                              q_collection);
+                                              q_collection,
+                                              component);
     }
   } // namespace Fourier
 } // namespace SmoothnessEstimator
