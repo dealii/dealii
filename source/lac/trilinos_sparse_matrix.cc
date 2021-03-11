@@ -2215,7 +2215,7 @@ namespace TrilinosWrappers
                                         const_cast<Epetra_CrsMatrix &>(
                                           tmp_result.trilinos_matrix()));
 #  else
-      Assert("false",
+      Assert(false,
              ExcMessage("This function requires that the Trilinos "
                         "installation found while running the deal.II "
                         "CMake scripts contains the optional Trilinos "
