@@ -2672,10 +2672,16 @@ DoFHandler<dim, spacedim>::prepare_coarsening_and_refinement(
     // nothing to do
     return false;
 
+
   //
   // establish hierarchy
   //
   // - create bimap between hierarchy levels and FE indices
+
+  // there can be as many levels in the hierarchy as active FE indices are
+  // possible
+  using level_type                      = active_fe_index_type;
+  static const level_type invalid_level = invalid_active_fe_index;
 
   // map from FE index to level in hierarchy
   // FE indices that are not covered in the hierarchy are not in the map
@@ -2683,10 +2689,13 @@ DoFHandler<dim, spacedim>::prepare_coarsening_and_refinement(
     fe_collection.get_hierarchy_sequence(contains_fe_index);
 
   // map from level in hierarchy to FE index
-  // FE indices that are not covered in the hierarchy are not in the map
-  std::map<unsigned int, unsigned int> hierarchy_level_for_fe_index;
-  for (unsigned int i = 0; i < fe_index_for_hierarchy_level.size(); ++i)
-    hierarchy_level_for_fe_index[fe_index_for_hierarchy_level[i]] = i;
+  // FE indices that are not covered in the hierarchy will be mapped to
+  // invalid_level
+  std::vector<unsigned int> hierarchy_level_for_fe_index(fe_collection.size(),
+                                                         invalid_level);
+  for (unsigned int l = 0; l < fe_index_for_hierarchy_level.size(); ++l)
+    hierarchy_level_for_fe_index[fe_index_for_hierarchy_level[l]] = l;
+
 
   //
   // parallelization
@@ -2695,11 +2704,6 @@ DoFHandler<dim, spacedim>::prepare_coarsening_and_refinement(
   // - update ghost values in each iteration (see later)
   // - no need to compress, since the owning processor will have the correct
   //   level index
-
-  // there can be as many levels in the hierarchy as active FE indices are
-  // possible
-  using level_type                      = active_fe_index_type;
-  static const level_type invalid_level = invalid_active_fe_index;
 
   // HOTFIX: dealii::Vector does not accept integral types
   LinearAlgebra::distributed::Vector<float> future_levels;
@@ -2720,16 +2724,8 @@ DoFHandler<dim, spacedim>::prepare_coarsening_and_refinement(
 
   for (const auto &cell : active_cell_iterators())
     if (cell->is_locally_owned())
-      {
-        // set level if FE is part of hierarchy
-        const auto cell_fe_and_level =
-          hierarchy_level_for_fe_index.find(cell->future_fe_index());
-
-        future_levels[cell->global_active_cell_index()] =
-          (cell_fe_and_level != hierarchy_level_for_fe_index.end()) ?
-            cell_fe_and_level->second :
-            invalid_level;
-      }
+      future_levels[cell->global_active_cell_index()] =
+        hierarchy_level_for_fe_index[cell->future_fe_index()];
 
 
   //
