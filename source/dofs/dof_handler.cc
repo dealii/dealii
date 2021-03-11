@@ -2741,35 +2741,6 @@ DoFHandler<dim, spacedim>::prepare_coarsening_and_refinement(
   // - always raise levels to match criterion, never lower them
   // - exchange level indices on ghost cells
 
-  // Function that updates the level of neighbor to fulfill difference
-  // criterion, and returns whether it was changed.
-  const auto update_neighbor_level =
-    [&future_levels, max_difference](const active_cell_iterator &neighbor,
-                                     const level_type cell_level) -> bool {
-    // We only care about locally owned neighbors. If neighbor is a ghost cell,
-    // its future FE index will be updated on the owning process and
-    // communicated at the next loop iteration.
-    if (neighbor->is_locally_owned())
-      {
-        const level_type neighbor_level = static_cast<level_type>(
-          future_levels[neighbor->global_active_cell_index()]);
-
-        // ignore neighbors that are not part of the hierarchy
-        if (neighbor_level == invalid_level)
-          return false;
-
-        if ((cell_level - max_difference) > neighbor_level)
-          {
-            future_levels[neighbor->global_active_cell_index()] =
-              cell_level - max_difference;
-
-            return true;
-          }
-      }
-
-    return false;
-  };
-
   bool levels_changed = false;
   bool levels_changed_in_cycle;
   do
@@ -2804,15 +2775,63 @@ DoFHandler<dim, spacedim>::prepare_coarsening_and_refinement(
                         {
                           const auto neighbor =
                             cell->neighbor_child_on_subface(f, sf);
-                          levels_changed_in_cycle |=
-                            update_neighbor_level(neighbor, cell_level);
+
+                          // We only care about locally owned neighbors. If
+                          // neighbor is a ghost cell, its future FE index will
+                          // be updated on the owning process and communicated
+                          // at the next loop iteration.
+                          if (neighbor->is_locally_owned())
+                            {
+                              const level_type neighbor_level =
+                                static_cast<level_type>(
+                                  future_levels
+                                    [neighbor->global_active_cell_index()]);
+
+                              // ignore neighbors that are not part of the
+                              // hierarchy
+                              if (neighbor_level == invalid_level)
+                                continue;
+
+                              if ((cell_level - max_difference) >
+                                  neighbor_level)
+                                {
+                                  future_levels
+                                    [neighbor->global_active_cell_index()] =
+                                      cell_level - max_difference;
+
+                                  levels_changed_in_cycle = true;
+                                }
+                            }
                         }
                     }
                   else
                     {
                       const auto neighbor = cell->neighbor(f);
-                      levels_changed_in_cycle |=
-                        update_neighbor_level(neighbor, cell_level);
+
+                      // We only care about locally owned neighbors. If neighbor
+                      // is a ghost cell, its future FE index will be updated on
+                      // the owning process and communicated at the next loop
+                      // iteration.
+                      if (neighbor->is_locally_owned())
+                        {
+                          const level_type neighbor_level =
+                            static_cast<level_type>(
+                              future_levels[neighbor
+                                              ->global_active_cell_index()]);
+
+                          // ignore neighbors that are not part of the hierarchy
+                          if (neighbor_level == invalid_level)
+                            continue;
+
+                          if ((cell_level - max_difference) > neighbor_level)
+                            {
+                              future_levels[neighbor
+                                              ->global_active_cell_index()] =
+                                cell_level - max_difference;
+
+                              levels_changed_in_cycle = true;
+                            }
+                        }
                     }
                 }
           }
