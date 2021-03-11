@@ -2690,22 +2690,14 @@ namespace parallel
       // has happened, we need to update the quadrant cell relations
       update_cell_relations();
 
-      // before repartitioning the mesh, store the current distribution
-      // of the p4est quadrants and let others attach mesh related info
-      // (such as SolutionTransfer data)
+      // before repartitioning the mesh, save a copy of the current positions of
+      // quadrants
+      // only if data needs to be transferred later
       std::vector<typename dealii::internal::p4est::types<dim>::gloidx>
         previous_global_first_quadrant;
 
-      // pack data only if anything has been attached
       if (this->cell_attached_data.n_attached_data_sets > 0)
         {
-          this->data_transfer.pack_data(
-            this->local_cell_relations,
-            this->cell_attached_data.pack_callbacks_fixed,
-            this->cell_attached_data.pack_callbacks_variable);
-
-          // before repartitioning the p4est object, save a copy of the
-          // positions of the global first quadrants for data transfer later
           previous_global_first_quadrant.resize(parallel_forest->mpisize + 1);
           std::memcpy(previous_global_first_quadrant.data(),
                       parallel_forest->global_first_quadrant,
@@ -2749,6 +2741,15 @@ namespace parallel
             }
         }
 
+      // pack data before triangulation gets updated
+      if (this->cell_attached_data.n_attached_data_sets > 0)
+        {
+          this->data_transfer.pack_data(
+            this->local_cell_relations,
+            this->cell_attached_data.pack_callbacks_fixed,
+            this->cell_attached_data.pack_callbacks_variable);
+        }
+
       // finally copy back from local part of tree to deal.II
       // triangulation. before doing so, make sure there are no refine or
       // coarsen flags pending
@@ -2769,11 +2770,9 @@ namespace parallel
           Assert(false, ExcInternalError());
         }
 
-      // transfer data
-      // only if anything has been attached
+      // transfer data after triangulation got updated
       if (this->cell_attached_data.n_attached_data_sets > 0)
         {
-          // execute transfer after triangulation got updated
           this->execute_transfer(parallel_forest,
                                  previous_global_first_quadrant.data());
 
@@ -2860,21 +2859,14 @@ namespace parallel
       // signal that repartitioning is going to happen
       this->signals.pre_distributed_repartition();
 
-      // before repartitioning the mesh let others attach mesh related info
-      // (such as SolutionTransfer data) to the p4est
+      // before repartitioning the mesh, save a copy of the current positions of
+      // quadrants
+      // only if data needs to be transferred later
       std::vector<typename dealii::internal::p4est::types<dim>::gloidx>
         previous_global_first_quadrant;
 
-      // pack data only if anything has been attached
       if (this->cell_attached_data.n_attached_data_sets > 0)
         {
-          this->data_transfer.pack_data(
-            this->local_cell_relations,
-            this->cell_attached_data.pack_callbacks_fixed,
-            this->cell_attached_data.pack_callbacks_variable);
-
-          // before repartitioning the p4est object, save a copy of the
-          // positions of quadrant for data transfer later
           previous_global_first_quadrant.resize(parallel_forest->mpisize + 1);
           std::memcpy(previous_global_first_quadrant.data(),
                       parallel_forest->global_first_quadrant,
@@ -2914,6 +2906,15 @@ namespace parallel
           parallel_forest->user_pointer = this;
         }
 
+      // pack data before triangulation gets updated
+      if (this->cell_attached_data.n_attached_data_sets > 0)
+        {
+          this->data_transfer.pack_data(
+            this->local_cell_relations,
+            this->cell_attached_data.pack_callbacks_fixed,
+            this->cell_attached_data.pack_callbacks_variable);
+        }
+
       try
         {
           copy_local_forest_to_triangulation();
@@ -2925,11 +2926,9 @@ namespace parallel
           Assert(false, ExcInternalError());
         }
 
-      // transfer data
-      // only if anything has been attached
+      // transfer data after triangulation got updated
       if (this->cell_attached_data.n_attached_data_sets > 0)
         {
-          // execute transfer after triangulation got updated
           this->execute_transfer(parallel_forest,
                                  previous_global_first_quadrant.data());
         }
