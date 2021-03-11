@@ -270,10 +270,11 @@ namespace VectorTools
    * vertices of the Triangulation.
    *
    * The optional ComponentMask argument can be used to specify what
-   * components of the FiniteElement to use to describe the geometry. If no
-   * mask is specified at construction time, then a default one is used, i.e.,
-   * the first spacedim components of the FiniteElement are assumed to
-   * represent the geometry of the problem.
+   * components of the FiniteElement to use to describe the
+   * geometry. If no mask is specified at construction time, then a
+   * default-constructed mask is used, which is then interpreted as
+   * saying that the first `spacedim` components of the FiniteElement
+   * are assumed to represent the geometry of the problem.
    *
    * This function is only implemented for FiniteElements where the specified
    * components are primitive.
