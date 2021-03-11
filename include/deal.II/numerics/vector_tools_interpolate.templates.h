@@ -618,9 +618,28 @@ namespace VectorTools
   }
 
 
+
   template <int dim, int spacedim, typename VectorType>
   void
   get_position_vector(const DoFHandler<dim, spacedim> &dh,
+                      VectorType &                     vector,
+                      const ComponentMask &            mask)
+  {
+    const FiniteElement<dim, spacedim> &fe = dh.get_fe();
+    get_position_vector(
+      *fe.reference_cell().template get_default_mapping<dim, spacedim>(
+        fe.degree),
+      dh,
+      vector,
+      mask);
+  }
+
+
+
+  template <int dim, int spacedim, typename VectorType>
+  void
+  get_position_vector(const Mapping<dim, spacedim> &   map_q,
+                      const DoFHandler<dim, spacedim> &dh,
                       VectorType &                     vector,
                       const ComponentMask &            mask)
   {
@@ -652,13 +671,7 @@ namespace VectorTools
       {
         const Quadrature<dim> quad(fe.get_unit_support_points());
 
-        const auto map_q =
-          fe.reference_cell().template get_default_mapping<dim, spacedim>(
-            fe.degree);
-        FEValues<dim, spacedim>              fe_v(*map_q,
-                                     fe,
-                                     quad,
-                                     update_quadrature_points);
+        FEValues<dim, spacedim> fe_v(map_q, fe, quad, update_quadrature_points);
         std::vector<types::global_dof_index> dofs(fe.n_dofs_per_cell());
 
         AssertDimension(fe.n_dofs_per_cell(),
@@ -719,7 +732,7 @@ namespace VectorTools
         dhq.distribute_dofs(feq);
         Vector<double>      eulerq(dhq.n_dofs());
         const ComponentMask maskq(spacedim, true);
-        get_position_vector(dhq, eulerq);
+        get_position_vector(map_q, dhq, eulerq);
 
         FullMatrix<double>             transfer(fe.n_dofs_per_cell(),
                                     feq.n_dofs_per_cell());
