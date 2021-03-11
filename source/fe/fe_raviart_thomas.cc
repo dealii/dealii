@@ -35,10 +35,6 @@
 #include <memory>
 #include <sstream>
 
-// TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
-// adjust_line_dof_index_for_line_orientation_table fields, and write tests
-// similar to bits/face_orientation_and_fe_q_*
-
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -113,6 +109,10 @@ FE_RaviartThomas<dim>::FE_RaviartThomas(const unsigned int deg)
           this->interface_constraints(target_row, j) = face_embeddings[d](i, j);
         ++target_row;
       }
+
+  // We need to initialize the dof permuation table and the one for the sign
+  // change.
+  initialize_quad_dof_index_permutation_and_sign_change();
 }
 
 
@@ -247,6 +247,165 @@ FE_RaviartThomas<dim>::initialize_support_points(const unsigned int deg)
          ExcInternalError());
 }
 
+
+template <int dim>
+void
+FE_RaviartThomas<dim>::initialize_quad_dof_index_permutation_and_sign_change()
+{
+  // For 1D do nothing.
+  //
+  // TODO: For 2D we simply keep the legacy behavior for now. This should be
+  // changed in the future and can be taken care of by similar means as the 3D
+  // case below. The legacy behavior can be found in fe_poly_tensor.cc in the
+  // function internal::FE_PolyTensor::get_dof_sign_change_h_div(...)
+  if (dim < 3)
+    return;
+
+  // TODO: the implementation makes the assumption that all faces have the
+  // same number of dofs
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 0;
+
+  Assert(this->adjust_quad_dof_index_for_face_orientation_table[0]
+             .n_elements() == 8 * this->n_dofs_per_quad(face_no),
+         ExcInternalError());
+
+  // The 3D RaviartThomas space has tensor_degree*tensor_degree face dofs
+  const unsigned int n = this->tensor_degree();
+  Assert(n * n == this->n_dofs_per_quad(face_no), ExcInternalError());
+
+  // The vector of tables adjust_quad_dof_index_for_face_orientation_table
+  // contains offsets for local face_dofs and is being filled with zeros in
+  // fe.cc. We need to fill it with the correct values in case of non-standard,
+  // flipped (rotated by +180 degrees) or rotated (rotated by +90 degrees) faces
+
+  // The dofs on a face are connected to a n x n matrix. for example, for
+  // tensor_degree==3 we have the following dofs on a quad:
+
+  //  ___________
+  // |           |
+  // |  6  7  8  |
+  // |           |
+  // |  3  4  5  |
+  // |           |
+  // |  0  1  2  |
+  // |___________|
+  //
+  // We have dof_index=i+n*j with index i in x-direction and index j in
+  // y-direction running from 0 to n-1.  to extract i and j we can use
+  // i=dof_index%n and j=dof_index/n. The indices i and j can then be used to
+  // compute the offset.
+
+  // Example: if the switches are (true | true | true) that means we rotate the
+  // face first by + 90 degree(counterclockwise) then by another +180
+  // degrees but we do not flip it since the face has standard
+  // orientation. The flip axis is the diagonal from the lower left to the upper
+  // right corner of the face. With these flags the configuration above becomes:
+  //  ___________
+  // |           |
+  // |  2  5  8  |
+  // |           |
+  // |  1  4  7  |
+  // |           |
+  // |  0  3  6  |
+  // |___________|
+  //
+  // This is exactly what is realized by the formulas implemented below. Note
+  // that the necessity of a permuattion depends on the three flags.
+
+  // There is also a pattern for the sign change of the mapped face_dofs
+  // depending on the switches. In the above example it would be
+  //  ___________
+  // |           |
+  // |  +  -  +  |
+  // |           |
+  // |  +  -  +  |
+  // |           |
+  // |  +  -  +  |
+  // |___________|
+  //
+
+  for (unsigned int local_face_dof = 0;
+       local_face_dof < this->n_dofs_per_quad(face_no);
+       ++local_face_dof)
+    {
+      // Row and column
+      unsigned int i = local_face_dof % n;
+      unsigned int j = local_face_dof / n;
+
+      // We have 8 cases that are all treated the same way. Note that the
+      // corresponding case to case_no is just its binary representation.
+      // The above example of (false | true | true) would be case_no=3
+      for (unsigned int case_no = 0; case_no < 8; ++case_no)
+        {
+          // Get the binary representation of the case
+          const bool face_orientation = Utilities::get_bit(case_no, 2);
+          const bool face_flip        = Utilities::get_bit(case_no, 1);
+          const bool face_rotation    = Utilities::get_bit(case_no, 0);
+
+          if (((!face_orientation) && (!face_rotation)) ||
+              ((face_orientation) && (face_rotation)))
+            {
+              // We flip across the diagonal
+              // This is the local face dof offset
+              this->adjust_quad_dof_index_for_face_orientation_table[face_no](
+                local_face_dof, case_no) = j + i * n - local_face_dof;
+            }
+          else
+            {
+              // Offset is zero
+              this->adjust_quad_dof_index_for_face_orientation_table[face_no](
+                local_face_dof, case_no) = 0;
+            } // if face needs dof permutation
+
+          // Get new local face_dof by adding offset
+          const unsigned int new_local_face_dof =
+            local_face_dof +
+            this->adjust_quad_dof_index_for_face_orientation_table[face_no](
+              local_face_dof, case_no);
+          // compute new row and column index
+          i = new_local_face_dof % n;
+          j = new_local_face_dof / n;
+
+          /*
+           * Now compute if a sign change is necessary. This is done for the
+           * case of face_orientation==true
+           */
+          // flip = false, rotation=true
+          if (!face_flip && face_rotation)
+            {
+              this->adjust_quad_dof_sign_for_face_orientation_table[face_no](
+                local_face_dof, case_no) = ((j % 2) == 1);
+            }
+          // flip = true, rotation=false
+          else if (face_flip && !face_rotation)
+            {
+              // This case is symmetric (although row and column may be
+              // switched)
+              this->adjust_quad_dof_sign_for_face_orientation_table[face_no](
+                local_face_dof, case_no) = ((j % 2) == 1) != ((i % 2) == 1);
+            }
+          // flip = true, rotation=true
+          else if (face_flip && face_rotation)
+            {
+              this->adjust_quad_dof_sign_for_face_orientation_table[face_no](
+                local_face_dof, case_no) = ((i % 2) == 1);
+            }
+          /*
+           * flip = false, rotation=false => nothing to do
+           */
+
+          /*
+           * If face_orientation==false the sign flip is exactly the opposite.
+           */
+          if (!face_orientation)
+            this->adjust_quad_dof_sign_for_face_orientation_table[face_no](
+              local_face_dof, case_no) =
+              !this->adjust_quad_dof_sign_for_face_orientation_table[face_no](
+                local_face_dof, case_no);
+        } // case_no
+    }     // local_face_dof
+}
 
 
 template <>

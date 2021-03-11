@@ -98,7 +98,6 @@ FE_DGVector<PolynomialType, dim, spacedim>::has_support_on_face(
 }
 
 
-
 template <class PolynomialType, int dim, int spacedim>
 std::size_t
 FE_DGVector<PolynomialType, dim, spacedim>::memory_consumption() const

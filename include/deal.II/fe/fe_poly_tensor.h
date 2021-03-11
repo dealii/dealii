@@ -225,6 +225,46 @@ protected:
   single_mapping_kind() const;
 
   /**
+   * For faces with non-standard face_orientation in 3D, the dofs on faces
+   * (quads) have to be permuted in order to be combined with the correct
+   * shape functions and additionally can change the sign. Given a local
+   * dof @p index on a quad, return the
+   * sign of the permuted shape function, if the face has non-standard
+   * face_orientation, face_flip or face_rotation. In 2D and 1D there is no need
+   * for permutation and consequently it does nothing in this case.
+   *
+   * The permutation itself is returned by
+   * adjust_quad_dof_index_for_face_orientation implemented in the interface
+   * class FiniteElement<dim>.
+   */
+  bool
+  adjust_quad_dof_sign_for_face_orientation(const unsigned int index,
+                                            const unsigned int face_no,
+                                            const bool         face_orientation,
+                                            const bool         face_flip,
+                                            const bool face_rotation) const;
+
+  /**
+   * For faces with non-standard face_orientation in 3D, the dofs on faces
+   * (quads) need not only to be permuted in order to be combined with the
+   * correct shape functions. Additionally they may change their sign.
+   *
+   * The constructor of this class fills this table with 'false' values, i.e.,
+   * no sign change at all. Derived finite element classes have to
+   * fill this Table with the correct values, see the documentation in
+   * GeometryInfo<dim> and
+   * this @ref GlossFaceOrientation "glossary entry on face orientation".
+   *
+   * The table must be filled in finite element classes derived
+   * from FE_PolyTensor in a meaningful way since the permutation
+   * pattern and the pattern of sign changes depends on how the finite element
+   * distributes the local dofs on the faces. An example is the function
+   * `initialize_quad_dof_index_permutation_and_sign_change()` in the
+   * FE_RaviartThomas class that fills this table.
+   */
+  std::vector<Table<2, bool>> adjust_quad_dof_sign_for_face_orientation_table;
+
+  /**
    * Returns MappingKind @p i for the finite element.
    */
   MappingKind
@@ -262,7 +302,7 @@ protected:
     std::vector<Tensor<5, dim>> fourth_derivatives(0);
 
     if (update_flags & (update_values | update_gradients | update_hessians))
-      data.sign_change.resize(this->n_dofs_per_cell());
+      data.dof_sign_change.resize(this->dofs_per_cell);
 
     // initialize fields only if really
     // necessary. otherwise, don't
@@ -460,7 +500,7 @@ protected:
     /**
      * Scratch arrays for intermediate computations
      */
-    mutable std::vector<double>              sign_change;
+    mutable std::vector<double>              dof_sign_change;
     mutable std::vector<Tensor<1, spacedim>> transformed_shape_values;
     // for shape_gradient computations
     mutable std::vector<Tensor<2, spacedim>> transformed_shape_grads;

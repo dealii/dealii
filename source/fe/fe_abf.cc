@@ -35,14 +35,11 @@
 #include <memory>
 #include <sstream>
 
+DEAL_II_NAMESPACE_OPEN
 
 // TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
 // adjust_line_dof_index_for_line_orientation_table fields, and write tests
 // similar to bits/face_orientation_and_fe_q_*
-
-
-DEAL_II_NAMESPACE_OPEN
-
 
 template <int dim>
 FE_ABF<dim>::FE_ABF(const unsigned int deg)
@@ -114,8 +111,24 @@ FE_ABF<dim>::FE_ABF(const unsigned int deg)
           this->interface_constraints(target_row, j) = face_embedding(i, j);
         ++target_row;
       }
+
+  // We need to initialize the dof permuation table and the one for the sign
+  // change.
+  initialize_quad_dof_index_permutation_and_sign_change();
 }
 
+
+template <int dim>
+void
+FE_ABF<dim>::initialize_quad_dof_index_permutation_and_sign_change()
+{
+  // for 1D and 2D, do nothing
+  if (dim < 3)
+    return;
+
+  // TODO: Implement this for this class
+  return;
+}
 
 
 template <int dim>

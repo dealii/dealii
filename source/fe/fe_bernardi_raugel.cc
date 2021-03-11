@@ -36,6 +36,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
+// adjust_line_dof_index_for_line_orientation_table fields, and write tests
+// similar to bits/face_orientation_and_fe_q_*
+
 template <int dim>
 FE_BernardiRaugel<dim>::FE_BernardiRaugel(const unsigned int p)
   : FE_PolyTensor<dim>(
@@ -62,6 +66,10 @@ FE_BernardiRaugel<dim>::FE_BernardiRaugel(const unsigned int p)
   // Set up the generalized support
   // points
   initialize_support_points();
+
+  // We need to initialize the dof permuation table and the one for the sign
+  // change.
+  initialize_quad_dof_index_permutation_and_sign_change();
 }
 
 
@@ -76,6 +84,18 @@ FE_BernardiRaugel<dim>::get_name() const
   return namebuf.str();
 }
 
+
+template <int dim>
+void
+FE_BernardiRaugel<dim>::initialize_quad_dof_index_permutation_and_sign_change()
+{
+  // for 1D and 2D, do nothing
+  if (dim < 3)
+    return;
+
+  // TODO: Implement this for this class
+  return;
+}
 
 
 template <int dim>

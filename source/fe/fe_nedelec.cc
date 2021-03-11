@@ -37,11 +37,6 @@
 #include <memory>
 #include <sstream>
 
-// TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
-// adjust_line_dof_index_for_line_orientation_table fields, and write tests
-// similar to bits/face_orientation_and_fe_q_*
-
-
 DEAL_II_NAMESPACE_OPEN
 
 //#define DEBUG_NEDELEC
@@ -66,6 +61,10 @@ namespace internal
   }   // namespace FE_Nedelec
 } // namespace internal
 
+
+// TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
+// adjust_line_dof_index_for_line_orientation_table fields, and write tests
+// similar to bits/face_orientation_and_fe_q_*
 
 template <int dim>
 FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
@@ -207,8 +206,24 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
       default:
         Assert(false, ExcNotImplemented());
     }
+
+  // We need to initialize the dof permuation table and the one for the sign
+  // change.
+  initialize_quad_dof_index_permutation_and_sign_change();
 }
 
+
+template <int dim>
+void
+FE_Nedelec<dim>::initialize_quad_dof_index_permutation_and_sign_change()
+{
+  // for 1D and 2D, do nothing
+  if (dim < 3)
+    return;
+
+  // TODO: Implement this for this class
+  return;
+}
 
 
 template <int dim>

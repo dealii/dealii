@@ -857,7 +857,6 @@ namespace GridGenerator
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
    */
-
   template <int spacedim>
   void hyper_sphere(Triangulation<spacedim - 1, spacedim> &tria,
                     const Point<spacedim> &center = Point<spacedim>(),
