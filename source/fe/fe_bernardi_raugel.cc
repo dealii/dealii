@@ -177,6 +177,73 @@ FE_BernardiRaugel<dim>::initialize_support_points()
     }
 }
 
+
+
+template <int dim>
+void
+FE_BernardiRaugel<dim>::fill_fe_values(
+  const typename Triangulation<dim, dim>::cell_iterator &cell,
+  const CellSimilarity::Similarity                       cell_similarity,
+  const Quadrature<dim> &                                quadrature,
+  const Mapping<dim, dim> &                              mapping,
+  const typename Mapping<dim, dim>::InternalDataBase &   mapping_internal,
+  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, dim>
+    &                                                       mapping_data,
+  const typename FiniteElement<dim, dim>::InternalDataBase &fe_internal,
+  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim>
+    &output_data) const
+{
+  // Call the base implementation then we'll touch up the data slightly
+  FE_PolyTensor<dim, dim>::fill_fe_values(
+     cell,
+     cell_similarity,
+     quadrature,
+     mapping,
+     mapping_internal,
+     mapping_data,
+     fe_internal,
+     output_data);
+  std::cout << "Length of mapping_data.normal_vectors: " << mapping_data.normal_vectors.size() << std::endl;
+
+  // Convert to the correct internal data class for this FE class.
+  //Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
+  //    ExcInternalError());
+  const typename FE_PolyTensor<dim>::InternalData &fe_data =
+    static_cast<const typename FE_PolyTensor<dim>::InternalData &>(fe_internal);
+
+  const unsigned int n_q_points = quadrature.size();
+
+  // convert the output data to use the outward normal from the physical cell
+  // i.e. if the original shape function is \hat{\psi} = \vec{\hat{n}}*phi,
+  // then we recover psi and compute
+  // \psi = \vec{n}*(\hat{\psi}_1^2 + \hat{\psi}_2^2 + \hat{\psi}_3^2)^(1/2)
+  std::cout << "FE_BR adjusting bubbles:" << std::endl;
+  for (unsigned int i = dim*GeometryInfo<dim>::vertices_per_cell; i < this->dofs_per_cell; ++i)
+  {
+    const unsigned int first =
+            output_data.shape_function_to_row_table[i * this->n_components() +
+                                                    this->get_nonzero_components(i)
+                                                      .first_selected_component()];
+
+    for (unsigned int k = 0; k < n_q_points; ++k)
+    {
+      const double psi = std::sqrt(fe_data.shape_values[i][k] * fe_data.shape_values[i][k]);
+
+      unsigned int f = i - dim*GeometryInfo<dim>::vertices_per_cell;
+      //Tensor<1,dim> normal = cell->face(f);
+
+      for (unsigned int d = 0; d < dim; ++d)
+      {
+//        output_data.shape_values(first + d, k) =
+//          normal[d]*psi;
+      }
+
+    }
+  }
+
+  std::cout << "Done!" << std::endl;
+}
+
 template class FE_BernardiRaugel<2>;
 template class FE_BernardiRaugel<3>;
 
