@@ -226,18 +226,21 @@ namespace LinearAlgebra
      * In Host mode, this class allows to use MPI-3 shared-memory features
      * by providing a separate MPI communicator that consists of processes on
      * the same shared-memory domain. By calling
-     * <code> vector.shared_vector_data();
-     * </code>
+     * `vector.shared_vector_data();`,
      * users have read-only access to both locally-owned and ghost values of
      * processes combined in the shared-memory communicator (@p comm_sm in
      * reinit()).
      *
-     * You can create a communicator consisting of all processes on
-     * the same shared-memory domain with:
-     * <code> MPI_Comm comm_sm;
-     * MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, rank, MPI_INFO_NULL,
-     * &comm_sm);
-     * </code>
+     * For this to work, you have to call the constructor or one of the reinit()
+     * functions of this class with a non-default value for the `comm_sm`
+     * argument, where the argument corresponds to a communicator consisting of
+     * all processes on the same shared-memory domain. This kind of communicator
+     * can be created using the following code snippet:
+     * @code
+     *   MPI_Comm comm_sm;
+     *   MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, rank, MPI_INFO_NULL,
+     *                       &comm_sm);
+     * @endcode
      *
      * @see CUDAWrappers
      */
@@ -382,7 +385,8 @@ namespace LinearAlgebra
        * The optional argument @p comm_sm, which consists of processes on
        * the same shared-memory domain, allows users have read-only access to
        * both locally-owned and ghost values of processes combined in the
-       * shared-memory communicator.
+       * shared-memory communicator. See the general documentation of this class
+       * for more information about this argument.
        */
       void
       reinit(
@@ -396,7 +400,8 @@ namespace LinearAlgebra
        * The optional argument @p comm_sm, which consists of processes on
        * the same shared-memory domain, allows users have read-only access to
        * both locally-owned and ghost values of processes combined in the
-       * shared-memory communicator.
+       * shared-memory communicator. See the general documentation of this class
+       * for more information about this argument.
        *
        * @note In the created underlying partitioner, the local index range is
        *   translated to global indices in an ascending and one-to-one fashion,
@@ -1384,7 +1389,9 @@ namespace LinearAlgebra
       mutable std::mutex mutex;
 
       /**
-       * Communicator to be used for the shared-memory domain.
+       * Communicator to be used for the shared-memory domain. See the general
+       * documentation of this class for more information about the purpose of
+       * `comm_sm`.
        */
       MPI_Comm comm_sm;
 
