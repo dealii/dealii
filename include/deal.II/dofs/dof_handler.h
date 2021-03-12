@@ -549,7 +549,7 @@ public:
   /**
    * Constructor. Take @p tria as the triangulation to work on.
    */
-  DoFHandler(const Triangulation<dim, spacedim> &tria);
+  explicit DoFHandler(const Triangulation<dim, spacedim> &tria);
 
   /**
    * Copy constructor. DoFHandler objects are large and expensive.
