@@ -1864,10 +1864,6 @@ public:
    * <code>fe.n_dofs_per_cell()</code>) but instead that the returned values are
    * the <i>global</i> indices of those degrees of freedom that are located
    * locally on the current cell.
-   *
-   * @deprecated Currently, this function can also be called for non-active
-   * cells, if all degrees of freedom of the FiniteElement are located in
-   * vertices. This functionality will vanish in a future release.
    */
   void
   get_dof_indices(std::vector<types::global_dof_index> &dof_indices) const;
