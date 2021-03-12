@@ -322,18 +322,6 @@ Function<dim, RangeNumberType>::memory_consumption() const
 namespace Functions
 {
   template <int dim, typename RangeNumberType>
-  ZeroFunction<dim, RangeNumberType>::ZeroFunction(
-    const unsigned int n_components)
-    : ConstantFunction<dim, RangeNumberType>(RangeNumberType(), n_components)
-  {}
-
-} // namespace Functions
-
-//---------------------------------------------------------------------------
-
-namespace Functions
-{
-  template <int dim, typename RangeNumberType>
   ConstantFunction<dim, RangeNumberType>::ConstantFunction(
     const RangeNumberType value,
     const unsigned int    n_components)
@@ -341,12 +329,15 @@ namespace Functions
     , function_value_vector(n_components, value)
   {}
 
+
+
   template <int dim, typename RangeNumberType>
   ConstantFunction<dim, RangeNumberType>::ConstantFunction(
     const std::vector<RangeNumberType> &values)
     : Function<dim, RangeNumberType>(values.size())
     , function_value_vector(values)
   {}
+
 
 
   template <int dim, typename RangeNumberType>
@@ -359,6 +350,7 @@ namespace Functions
            ExcDimensionMismatch(values.size(), function_value_vector.size()));
     std::copy(values.begin(), values.end(), function_value_vector.begin());
   }
+
 
 
   template <int dim, typename RangeNumberType>
@@ -465,6 +457,7 @@ namespace Functions
   }
 
 
+
   template <int dim, typename RangeNumberType>
   void
   ConstantFunction<dim, RangeNumberType>::vector_gradient(
@@ -477,6 +470,7 @@ namespace Functions
     for (unsigned int c = 0; c < this->n_components; ++c)
       gradients[c].clear();
   }
+
 
 
   template <int dim, typename RangeNumberType>
@@ -492,6 +486,7 @@ namespace Functions
     for (unsigned int i = 0; i < points.size(); ++i)
       gradients[i].clear();
   }
+
 
 
   template <int dim, typename RangeNumberType>
@@ -530,6 +525,14 @@ namespace Functions
   {
     return 0;
   }
+
+
+
+  template <int dim, typename RangeNumberType>
+  ZeroFunction<dim, RangeNumberType>::ZeroFunction(
+    const unsigned int n_components)
+    : ConstantFunction<dim, RangeNumberType>(RangeNumberType(), n_components)
+  {}
 } // namespace Functions
 
 //---------------------------------------------------------------------------
