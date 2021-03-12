@@ -112,7 +112,7 @@ In order to compute this estimator, in each cell $K$ we compute
 \eta_{f}^2 &= \sum_{f\in \partial K}\lbrace \sigma \left\| \jump{u_h}  \right\|_f^2   +  h_f \left\|  \jump{\nu \nabla u_h} \cdot \mathbf n  \right\|_f^2 \rbrace,
 \\
 \eta_{b}^2 &= \sum_{f\in \partial K \cap \partial \Omega}  \sigma \left\| (u_h -g_D)  \right\|_f^2.
-@f]
+@f}
 Then the square of the error estimate per cell is
 @f[
 \eta_\text{local}^2 =\eta_{c}^2+0.5\eta_{f}^2+\eta_{b}^2.
@@ -125,7 +125,7 @@ The error estimate square per cell is then stored in a global vector, whose $l_1
 
 <h3>The test case</h3>
 In the first test problem, we run a convergence test using a smooth manufactured solution with $\nu =1$ in 2D
-@f{align*}
+@f{align*}{
 u&=\sin(2\pi x)\sin(2\pi y), &\qquad\qquad &(x,y)\in\Omega=(0,1)\times (0,1),
 \\
 u&=0,                        &\qquad\qquad &\text{on } \partial \Omega,
