@@ -16,6 +16,10 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/work_stream.h>
 
+#include <deal.II/fe/fe_nothing.h>
+#include <deal.II/fe/fe_tools.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/mapping_q_cache.h>
 
 #include <functional>
@@ -73,15 +77,60 @@ MappingQCache<dim, spacedim>::preserves_vertex_locations() const
 template <int dim, int spacedim>
 void
 MappingQCache<dim, spacedim>::initialize(
+  const Mapping<dim, spacedim> &      mapping,
+  const Triangulation<dim, spacedim> &triangulation)
+{
+  // FE and FEValues in the case they are needed
+  FE_Nothing<dim, spacedim> fe;
+  Threads::ThreadLocalStorage<std::unique_ptr<FEValues<dim, spacedim>>>
+    fe_values_all;
+
+  this->initialize(
+    triangulation,
+    [&](const typename Triangulation<dim, spacedim>::cell_iterator &cell) {
+      const auto mapping_q_generic =
+        dynamic_cast<const MappingQGeneric<dim, spacedim> *>(&mapping);
+      if (mapping_q_generic != nullptr &&
+          this->get_degree() == mapping_q_generic->get_degree())
+        {
+          return mapping_q_generic->compute_mapping_support_points(cell);
+        }
+      else
+        {
+          // get FEValues (thread-safe); in the case that this thread has not
+          // created a an FEValues object yet, this helper-function also
+          // creates one with the right quadrature rule
+          auto &fe_values = fe_values_all.get();
+          if (fe_values.get() == nullptr)
+            {
+              QGaussLobatto<dim> quadrature_gl(this->polynomial_degree + 1);
+
+              std::vector<Point<dim>> quadrature_points;
+              for (const auto i :
+                   FETools::hierarchic_to_lexicographic_numbering<dim>(
+                     this->polynomial_degree))
+                quadrature_points.push_back(quadrature_gl.point(i));
+              Quadrature<dim> quadrature(quadrature_points);
+
+              fe_values = std::make_unique<FEValues<dim, spacedim>>(
+                mapping, fe, quadrature, update_quadrature_points);
+            }
+
+          fe_values->reinit(cell);
+          return fe_values->get_quadrature_points();
+        }
+    });
+}
+
+
+
+template <int dim, int spacedim>
+void
+MappingQCache<dim, spacedim>::initialize(
   const Triangulation<dim, spacedim> &  triangulation,
   const MappingQGeneric<dim, spacedim> &mapping)
 {
-  AssertDimension(this->get_degree(), mapping.get_degree());
-  initialize(triangulation,
-             [&mapping](const typename Triangulation<dim>::cell_iterator &cell)
-               -> std::vector<Point<spacedim>> {
-               return mapping.compute_mapping_support_points(cell);
-             });
+  this->initialize(mapping, triangulation);
 }
 
 
@@ -121,6 +170,96 @@ MappingQCache<dim, spacedim>::initialize(
     /* copy_data */ nullptr,
     2 * MultithreadInfo::n_threads(),
     /* chunk_size = */ 1);
+}
+
+
+
+template <int dim, int spacedim>
+void
+MappingQCache<dim, spacedim>::initialize(
+  const Mapping<dim, spacedim> &      mapping,
+  const Triangulation<dim, spacedim> &tria,
+  const std::function<Point<spacedim>(
+    const typename Triangulation<dim, spacedim>::cell_iterator &,
+    const Point<spacedim> &)> &       transformation_function,
+  const bool                          function_describes_relative_displacement)
+{
+  // FE and FEValues in the case they are needed
+  FE_Nothing<dim, spacedim> fe;
+  Threads::ThreadLocalStorage<std::unique_ptr<FEValues<dim, spacedim>>>
+    fe_values_all;
+
+  this->initialize(
+    tria,
+    [&](const typename Triangulation<dim, spacedim>::cell_iterator &cell) {
+      std::vector<Point<spacedim>> points;
+
+      const auto mapping_q_generic =
+        dynamic_cast<const MappingQGeneric<dim, spacedim> *>(&mapping);
+
+      if (mapping_q_generic != nullptr &&
+          this->get_degree() == mapping_q_generic->get_degree())
+        {
+          points = mapping_q_generic->compute_mapping_support_points(cell);
+        }
+      else
+        {
+          // get FEValues (thread-safe); in the case that this thread has not
+          // created a an FEValues object yet, this helper-function also
+          // creates one with the right quadrature rule
+          auto &fe_values = fe_values_all.get();
+          if (fe_values.get() == nullptr)
+            {
+              QGaussLobatto<dim> quadrature_gl(this->polynomial_degree + 1);
+
+              std::vector<Point<dim>> quadrature_points;
+              for (const auto i :
+                   FETools::hierarchic_to_lexicographic_numbering<dim>(
+                     this->polynomial_degree))
+                quadrature_points.push_back(quadrature_gl.point(i));
+              Quadrature<dim> quadrature(quadrature_points);
+
+              fe_values = std::make_unique<FEValues<dim, spacedim>>(
+                mapping, fe, quadrature, update_quadrature_points);
+            }
+
+          fe_values->reinit(cell);
+          points = fe_values->get_quadrature_points();
+        }
+
+      for (auto &p : points)
+        if (function_describes_relative_displacement)
+          p += transformation_function(cell, p);
+        else
+          p = transformation_function(cell, p);
+
+      return points;
+    });
+}
+
+
+
+template <int dim, int spacedim>
+void
+MappingQCache<dim, spacedim>::initialize(
+  const Mapping<dim, spacedim> &      mapping,
+  const Triangulation<dim, spacedim> &tria,
+  const Function<spacedim> &          transformation_function,
+  const bool                          function_describes_relative_displacement)
+{
+  AssertDimension(transformation_function.n_components, spacedim);
+
+  this->initialize(
+    mapping,
+    tria,
+    [&](const typename Triangulation<dim, spacedim>::cell_iterator &,
+        const Point<spacedim> &point) -> Point<spacedim> {
+      Point<spacedim> new_point;
+      for (int c = 0; c < spacedim; ++c)
+        new_point[c] = transformation_function.value(point, c);
+      return new_point;
+    },
+    function_describes_relative_displacement);
 }
 
 
