@@ -97,12 +97,7 @@ Step3::Step3()
 
 void Step3::make_grid()
 {
-  if (true)
-    GridIn<2>(triangulation).read("box_2D_mixed.msh");
-  else if (false)
-    GridIn<2>(triangulation).read("box_2D_tri.msh");
-  else
-    GridIn<2>(triangulation).read("box_2D_quad.msh");
+  GridIn<2>(triangulation).read("box_2D_mixed.msh");
 
   std::cout << "Number of active cells: " << triangulation.n_active_cells()
             << std::endl;
