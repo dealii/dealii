@@ -1,0 +1,5 @@
+New: GridTools::assign_boundary_ids() allows quick assignment of boundary_id
+values to a triangulation using a number of geometrical predicate functions
+that could be provided as lambdas.
+<br>
+(Reza Rastak, 2020/09/10)

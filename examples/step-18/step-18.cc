@@ -40,6 +40,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/manifold_lib.h>
@@ -753,28 +754,27 @@ namespace Step18
   // z-coordinates of either 0 (bottom face), an indicator of 1 for z=3 (top
   // face); finally, we use boundary indicator 2 for all faces on the inside
   // of the cylinder shell, and 3 for the outside.
+  //
+  // Even though we can use the set_boundary_id() method to manually assign
+  // boundary_id values to faces of the coarse mesh (as shown in step-7), here
+  // we use the convenient function GridTools::assign_boundary_ids() to
+  // specify the boundary ids for the whole triangulation in a single
+  // statement.
   template <int dim>
   void TopLevel<dim>::create_coarse_grid()
   {
     const double inner_radius = 0.8, outer_radius = 1;
     GridGenerator::cylinder_shell(triangulation, 3, inner_radius, outer_radius);
-    for (const auto &cell : triangulation.active_cell_iterators())
-      for (const auto &face : cell->face_iterators())
-        if (face->at_boundary())
-          {
-            const Point<dim> face_center = face->center();
 
-            if (face_center[2] == 0)
-              face->set_boundary_id(0);
-            else if (face_center[2] == 3)
-              face->set_boundary_id(1);
-            else if (std::sqrt(face_center[0] * face_center[0] +
-                               face_center[1] * face_center[1]) <
-                     (inner_radius + outer_radius) / 2)
-              face->set_boundary_id(2);
-            else
-              face->set_boundary_id(3);
-          }
+    GridTools::assign_boundary_ids(
+      triangulation,
+      {{/*id =*/0, [](const Point<dim> &p) { return p[2] == 0.; }},
+       {/*id =*/1, [](const Point<dim> &p) { return p[2] == 3.; }},
+       {/*id =*/2,
+        [=](const Point<dim> &p) {
+          return p[0] * p[0] + p[1] * p[1] < (inner_radius + outer_radius) / 2.;
+        }},
+       {/*id =*/3, [](const Point<dim> &) { return true; }}});
 
     // Once all this is done, we can refine the mesh once globally:
     triangulation.refine_global(1);
