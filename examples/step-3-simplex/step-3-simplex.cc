@@ -145,7 +145,8 @@ void Step3::setup_system()
 
 
 // @sect4{Step3::assemble_system}
-
+//
+// Nothing has changed here.
 void Step3::assemble_system()
 {
   FEValues<2> fe_values(mapping,
@@ -203,7 +204,8 @@ void Step3::assemble_system()
 
 
 // @sect4{Step3::solve}
-
+//
+// Nothing has changed here.
 void Step3::solve()
 {
   SolverControl            solver_control(1000, 1e-12);
@@ -213,7 +215,8 @@ void Step3::solve()
 
 
 // @sect4{Step3::output_results}
-
+//
+// Nothing has changed here.
 void Step3::output_results() const
 {
   DataOut<2> data_out;
@@ -231,7 +234,8 @@ void Step3::output_results() const
 
 
 // @sect4{Step3::run}
-
+//
+// Nothing has changed here.
 void Step3::run()
 {
   make_grid();
@@ -243,7 +247,8 @@ void Step3::run()
 
 
 // @sect3{The <code>main</code> function}
-
+//
+// Nothing has changed here.
 int main()
 {
   deallog.depth_console(2);

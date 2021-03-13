@@ -1,3 +1,41 @@
 <h1>Results</h1>
 
-TODO
+The following picture shows the mesh and the result obtained by executing this
+program:
+
+<table align="center" class="doxtable" style="width:65%">
+  <tr>
+    <td>
+        @image html step_3_mixed_0.png
+    </td>
+    <td>
+        @image html step_3_mixed_1.png
+    </td>
+  </tr>
+</table>
+
+Not surprisingly, the result looks as expected.
+
+
+<h3>Possibilities for extensions</h3>
+
+In this tutorial, we presented how to use the deal.II simplex infrastructure
+to solve a simple Poisson problem on a mixed mesh in 2D. In this scope, we
+could only present a small section of the capabilities. In the following, we
+point out further capabilities.
+
+
+<h4>3D meshes</h4>
+
+In 3D, meshes might also consist of wedges/prisms and pyramids. So that the
+above introduced collections might consist of four components.
+
+For these cell types, following finite-element and quadrature-rule classes are
+available:
+ - wedge: FE_WedgeP, FE_WedgeDGP, QGaussWedge, MappingFE
+ - pyramid: FE_PyramidP, FE_PyramidDGP, QGaussPyramid, MappingFE
+
+<h4>Parallelization, face integrals and discontinuous Galerkin methods, and matrix-free operator evaluation</h4>
+
+Regarding these aspects, the same comments are valid as described in
+step-3-simplex for pure simplex meshes.
