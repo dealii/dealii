@@ -2711,11 +2711,8 @@ DoFHandler<dim, spacedim>::prepare_coarsening_and_refinement(
         dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
           &(*tria)))
     {
-      const auto &partitioner =
-        *parallel_tria->global_active_cell_index_partitioner().lock();
-      future_levels.reinit(partitioner.locally_owned_range(),
-                           partitioner.ghost_indices(),
-                           partitioner.get_mpi_communicator());
+      future_levels.reinit(
+        parallel_tria->global_active_cell_index_partitioner().lock());
     }
   else
     {

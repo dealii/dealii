@@ -400,14 +400,17 @@ namespace parallel
           for (unsigned int i = 0; i < n_subdomains; ++i)
             cell_counter[i + 1] += cell_counter[i];
 
+          AssertDimension(cell_counter.back(), this->n_active_cells());
+
           // create partitioners
-          IndexSet is_local(cell_counter.back());
+          IndexSet is_local(this->n_active_cells());
           is_local.add_range(cell_counter[my_subdomain],
                              cell_counter[my_subdomain + 1]);
-          IndexSet is_ghost(cell_counter.back());
           number_cache.active_cell_index_partitioner =
             std::make_shared<const Utilities::MPI::Partitioner>(
-              is_local, is_ghost, this->mpi_communicator);
+              is_local,
+              complete_index_set(this->n_active_cells()),
+              this->mpi_communicator);
 
           // set global active cell indices and increment process-local counters
           for (const auto &cell : this->active_cell_iterators())
