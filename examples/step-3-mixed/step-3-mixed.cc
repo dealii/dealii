@@ -20,11 +20,13 @@
  */
 
 
-// @sect3{Many new include files}
+// @sect3{Include files}
 
+// Include files as used in step-3:
 #include <deal.II/base/function.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/lac/vector.h>
@@ -39,13 +41,15 @@
 #include <fstream>
 #include <iostream>
 
+// Include files as added int step-3-simplex:
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/mapping_fe.h>
-
 #include <deal.II/grid/grid_in.h>
 
-#include <deal.II/fe/fe_q.h>
+// Include files that we need in this tutorial to be able to deal with
+// collections of finite element, quadrature rules, mapping objects, and
+// FEValues.
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/mapping_collection.h>
@@ -54,6 +58,10 @@
 using namespace dealii;
 
 // @sect3{The <code>Step3</code> class}
+//
+// This is the main class of the tutorial. Since it is very similar to the
+// version from step-3 and step-3-simplex, we will only point out and explain
+// the relevant differences that allow to perform simulations on mixed meshes.
 
 class Step3
 {
@@ -69,11 +77,15 @@ private:
   void solve();
   void output_results() const;
 
-  Triangulation<2>               triangulation;
+  Triangulation<2> triangulation;
+
+  // As already explained, we are not working with mapping objects, finite
+  // elements, and quadrature rules directly but on collection of them.
   const hp::MappingCollection<2> mapping;
   const hp::FECollection<2>      fe;
   const hp::QCollection<2>       quadrature_formula;
-  DoFHandler<2>                  dof_handler;
+
+  DoFHandler<2> dof_handler;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;
@@ -84,7 +96,10 @@ private:
 
 
 // @sect4{Step3::Step3}
-
+//
+// In the constructor of the Step3 class, we fill the collections. Here we
+// position the objects related to triangles in the first place (index 0) and
+// the ones related to quadrilaterals in the second place (index 1).
 Step3::Step3()
   : mapping(MappingFE<2>(FE_SimplexP<2>(1)), MappingFE<2>(FE_Q<2>(1)))
   , fe(FE_SimplexP<2>(2), FE_Q<2>(2))
@@ -94,7 +109,8 @@ Step3::Step3()
 
 
 // @sect4{Step3::make_grid}
-
+//
+// Read the external mesh file "box_2D_mixed.msh" as in step-3-simplex.
 void Step3::make_grid()
 {
   GridIn<2>(triangulation).read("box_2D_mixed.msh");
@@ -105,7 +121,10 @@ void Step3::make_grid()
 
 
 // @sect4{Step3::setup_system}
-
+//
+// In contrast to step-3 and step-3-simplex, we need here a preprocessing step
+// that assigns to cells active_fe_indices consistently according to the
+// indices in the collections.
 void Step3::setup_system()
 {
   for (const auto &cell : dof_handler.active_cell_iterators())
@@ -133,7 +152,21 @@ void Step3::setup_system()
 
 
 // @sect4{Step3::assemble_system}
-
+//
+// The following function looks similar to the version in step-3 and
+// step-3-simplex with the following two differences:
+//  - We do not work with FEValues directly but with the collection class
+//    hp::FEValues. It gives us - after it has been initialized with the current
+//    cell - a reference to the right FEValues (constructed
+//    with the correct mapping object, finite element, and quadrature rule),
+//    which can be used as usual to compute the cell integrals.
+//  - The cell-local stiffness matrix and right-hand-side vector have different
+//    sizes depending on the cell type so that they might need to be resized
+//    for each cell.
+//
+// Apart from these two changes, the code has not changes. In particular, the
+// the cell integrals have not been changed depending if one operates on
+// hypercube, simplex, or mixed meshes.
 void Step3::assemble_system()
 {
   hp::FEValues<2> hp_fe_values(mapping,

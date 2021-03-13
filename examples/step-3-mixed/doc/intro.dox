@@ -83,8 +83,9 @@ For further details on hp-methods, see step-27.
 <h3>Mesh generation</h3>
 
 Just like in step-3-simplex, we read an externally generated mesh. For this
-tutorial, we have created the mesh (square with with and high of one) with Gmsh
-with the following journal file "box_2D_mixed.geo":
+tutorial, we have created the mesh (square with width and hight of one; squares
+on the left side and triangles on the right side) with Gmsh with the following
+journal file "box_2D_mixed.geo":
 
 @code
 Rectangle(1) = {0.0, 0, 0, 0.5, 1, 0};

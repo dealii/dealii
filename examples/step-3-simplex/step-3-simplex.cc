@@ -20,8 +20,9 @@
  */
 
 
-// @sect3{Many new include files}
+// @sect3{Include files}
 
+// Include files as used in step-3:
 #include <deal.II/base/function.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -39,15 +40,23 @@
 #include <fstream>
 #include <iostream>
 
+// Include files that contain appropriate quadrature rules, finite elements,
+// and mapping objects for simplex meshes.
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/mapping_fe.h>
 
+// The following class contains the class GridIn that allows us to read
+// external meshes.
 #include <deal.II/grid/grid_in.h>
 
 using namespace dealii;
 
 // @sect3{The <code>Step3</code> class}
+//
+// This is the main class of the tutorial. Since it is very similar to the
+// version from step-3, we will only point out and explain the relevant
+// differences that allow to perform simulations on simplex meshes.
 
 class Step3
 {
@@ -63,11 +72,15 @@ private:
   void solve();
   void output_results() const;
 
-  Triangulation<2>       triangulation;
+  Triangulation<2> triangulation;
+
+  // Here we select mapping object, finite elements, and quadrature rules
+  // that are compatible with simplex meshes.
   const MappingFE<2>     mapping;
   const FE_SimplexP<2>   fe;
   const QGaussSimplex<2> quadrature_formula;
-  DoFHandler<2>          dof_handler;
+
+  DoFHandler<2> dof_handler;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;
@@ -78,17 +91,22 @@ private:
 
 
 // @sect4{Step3::Step3}
-
+//
+// In the constructor we set the polynomial degree of the finite element and
+// the number of quadrature points. Furthermore, we initialize the MappingFE
+// object with a (linear) FE_SimplexP object so that it can work on simplex
+// meshes.
 Step3::Step3()
   : mapping(FE_SimplexP<2>(1))
   , fe(2)
-  , quadrature_formula(fe.degree + 1)
+  , quadrature_formula(3)
   , dof_handler(triangulation)
 {}
 
 
 // @sect4{Step3::make_grid}
-
+//
+// Read the external mesh file "box_2D_tri.msh" as in step-3-simplex.
 void Step3::make_grid()
 {
   GridIn<2>(triangulation).read("box_2D_tri.msh");
@@ -99,7 +117,17 @@ void Step3::make_grid()
 
 
 // @sect4{Step3::setup_system}
-
+//
+// From here on nothing has changed.  In particular, the
+// the cell integrals have not been changed depending if one operates on
+// hypercube or simplex meshes. This is astonishing and has been accomplished by
+// the follow two classes:
+//  - DoFHandler: this class stores degrees of freedom in a flexible way and
+//    allows simple access to them depending on the element type independent of
+//    the cell type.
+//  - FEValues: this class hides the details of finite element, quadrature rule,
+//    and mapping (even if the implementations might be inherently different)
+//    behind a unified interface.
 void Step3::setup_system()
 {
   dof_handler.distribute_dofs(fe);
