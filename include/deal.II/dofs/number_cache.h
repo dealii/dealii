@@ -20,6 +20,7 @@
 
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/mpi.h>
+#include <deal.II/base/partitioner.h>
 
 #include <vector>
 
@@ -178,6 +179,12 @@ namespace internal
        * works only on one MPI process.)
        */
       std::vector<IndexSet> locally_owned_dofs_per_processor;
+
+      /**
+       * Partitioner for the locally relevant degrees of freedom.
+       */
+      std::shared_ptr<const Utilities::MPI::Partitioner>
+        locally_relevant_dofs_partitioner;
 
       /**
        * Read or write the data of this object to or from a stream for the

@@ -2602,6 +2602,16 @@ DoFHandler<dim, spacedim>::distribute_dofs(
   // hand the actual work over to the policy
   this->number_cache = this->policy->distribute_dofs();
 
+  // cache locally-relevant degrees of freedom in the form of a partitioner
+  {
+    IndexSet locally_relevant_dofs;
+    DoFTools::extract_locally_relevant_dofs(*this, locally_relevant_dofs);
+    this->number_cache.locally_relevant_dofs_partitioner =
+      std::make_shared<const Utilities::MPI::Partitioner>(locally_owned_dofs(),
+                                                          locally_relevant_dofs,
+                                                          get_communicator());
+  }
+
   // do some housekeeping: compress indices
   // if(hp_capability_enabled)
   //   {
@@ -2647,6 +2657,23 @@ DoFHandler<dim, spacedim>::distribute_mg_dofs()
 
   internal::DoFHandlerImplementation::Implementation::reserve_space_mg(*this);
   this->mg_number_cache = this->policy->distribute_mg_dofs();
+
+  // cache locally-relevant degrees of freedom on the levels in the form of a
+  // partitioner
+  for (unsigned int level = 0;
+       level <= this->get_triangulation().n_global_levels();
+       ++level)
+    {
+      IndexSet locally_relevant_dofs;
+      DoFTools::extract_locally_relevant_level_dofs(*this,
+                                                    level,
+                                                    locally_relevant_dofs);
+      this->mg_number_cache[level].locally_relevant_dofs_partitioner =
+        std::make_shared<const Utilities::MPI::Partitioner>(
+          locally_owned_mg_dofs(level),
+          locally_relevant_dofs,
+          get_communicator());
+    }
 
   // initialize the block info object only if this is a sequential
   // triangulation. it doesn't work correctly yet if it is parallel

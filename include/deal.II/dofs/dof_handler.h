@@ -1275,6 +1275,32 @@ public:
                            locally_owned_mg_dofs_per_processor(const unsigned int level) const;
 
   /**
+   * Return partitioner for locally-relevant degrees of freedom.
+   *
+   * @note This function is equivalent to setting up the partitioner manually
+   *   with DoFHandler::locally_owned_dofs(),
+   *   DoFTools::extract_locally_relevant_dofs(), and
+   *   DoFHandler::get_communicator(). However, since the object is
+   * pre-computed, the potentially expensive setup can be skipped and the same
+   * partitioner can be shared by multiple vectors.
+   */
+  const std::weak_ptr<const Utilities::MPI::Partitioner>
+  locally_relevant_dofs_partitioner() const;
+
+  /**
+   * Return partitioner for locally-relevant level degrees of freedom.
+   *
+   * @note This function is equivalent to setting up the partitioner manually
+   *   with DoFHandler::locally_owned_mg_dofs(),
+   *   DoFTools::extract_locally_relevant_level_dofs(), and
+   *   DoFHandler::get_communicator(). However, since the object is
+   * pre-computed, the potentially expensive setup can be skipped and the same
+   * partitioner can be shared by multiple vectors.
+   */
+  const std::weak_ptr<const Utilities::MPI::Partitioner>
+  locally_relevant_level_dofs_partitioner(const unsigned int level) const;
+
+  /**
    * Return a constant reference to the selected finite element object.
    * Since there is only one FiniteElement @p index must be equal to zero
    * which is also the default value.
@@ -1992,6 +2018,38 @@ DoFHandler<dim, spacedim>::locally_owned_mg_dofs_per_processor(
           get_communicator());
     }
   return mg_number_cache[level].locally_owned_dofs_per_processor;
+}
+
+
+
+template <int dim, int spacedim>
+const std::weak_ptr<const Utilities::MPI::Partitioner>
+DoFHandler<dim, spacedim>::locally_relevant_dofs_partitioner() const
+{
+  Assert(
+    number_cache.locally_relevant_dofs_partitioner != nullptr,
+    ExcMessage(
+      "Distribute active DoFs using distribute_dofs() before calling this function."));
+
+  return number_cache.locally_relevant_dofs_partitioner;
+}
+
+
+
+template <int dim, int spacedim>
+const std::weak_ptr<const Utilities::MPI::Partitioner>
+DoFHandler<dim, spacedim>::locally_relevant_level_dofs_partitioner(
+  const unsigned int level) const
+{
+  Assert(level < this->get_triangulation().n_global_levels(),
+         ExcMessage("The given level index exceeds the number of levels "
+                    "present in the triangulation"));
+  Assert(
+    mg_number_cache[level].locally_relevant_dofs_partitioner != nullptr,
+    ExcMessage(
+      "Distribute level DoFs using distribute_mg_dofs() before calling this function."));
+
+  return mg_number_cache[level].locally_relevant_dofs_partitioner;
 }
 
 

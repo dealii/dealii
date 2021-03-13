@@ -1,0 +1,8 @@
+New: The class DoFHandler now stores Utilties::MPI::Partitioner objects
+with locally-relevant degrees of freedom both on the active level and
+the multigrid levels. They can be access via the functions
+DoFHandler::locally_relevant_dofs_partitioner() and
+DoFHadnler::locally_relevant_level_dofs_partitioner().
+<br>
+(Peter Munch, 2021/03/13)
+
