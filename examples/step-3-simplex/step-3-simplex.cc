@@ -120,14 +120,16 @@ void Step3::setup_system()
 
 void Step3::assemble_system()
 {
-  FEValues<2>        fe_values(mapping,
+  FEValues<2> fe_values(mapping,
                         fe,
                         quadrature_formula,
                         update_values | update_gradients | update_JxW_values);
+
   const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double>     cell_rhs(dofs_per_cell);
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
+
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
       fe_values.reinit(cell);

@@ -45,6 +45,12 @@
 
 #include <deal.II/grid/grid_in.h>
 
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/hp/fe_collection.h>
+#include <deal.II/hp/fe_values.h>
+#include <deal.II/hp/mapping_collection.h>
+#include <deal.II/hp/q_collection.h>
+
 using namespace dealii;
 
 // @sect3{The <code>Step3</code> class}
@@ -63,11 +69,11 @@ private:
   void solve();
   void output_results() const;
 
-  Triangulation<2>       triangulation;
-  const MappingFE<2>     mapping;
-  const FE_SimplexP<2>   fe;
-  const QGaussSimplex<2> quadrature_formula;
-  DoFHandler<2>          dof_handler;
+  Triangulation<2>               triangulation;
+  const hp::MappingCollection<2> mapping;
+  const hp::FECollection<2>      fe;
+  const hp::QCollection<2>       quadrature_formula;
+  DoFHandler<2>                  dof_handler;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;
@@ -80,9 +86,9 @@ private:
 // @sect4{Step3::Step3}
 
 Step3::Step3()
-  : mapping(FE_SimplexP<2>(1))
-  , fe(2)
-  , quadrature_formula(fe.degree + 1)
+  : mapping(MappingFE<2>(FE_SimplexP<2>(1)), MappingFE<2>(FE_Q<2>(1)))
+  , fe(FE_SimplexP<2>(2), FE_Q<2>(2))
+  , quadrature_formula(QGaussSimplex<2>(3), QGauss<2>(3))
   , dof_handler(triangulation)
 {}
 
@@ -91,7 +97,12 @@ Step3::Step3()
 
 void Step3::make_grid()
 {
-  GridIn<2>(triangulation).read("box_2D_tri.msh");
+  if (true)
+    GridIn<2>(triangulation).read("box_2D_mixed.msh");
+  else if (false)
+    GridIn<2>(triangulation).read("box_2D_tri.msh");
+  else
+    GridIn<2>(triangulation).read("box_2D_quad.msh");
 
   std::cout << "Number of active cells: " << triangulation.n_active_cells()
             << std::endl;
@@ -102,6 +113,16 @@ void Step3::make_grid()
 
 void Step3::setup_system()
 {
+  for (const auto &cell : dof_handler.active_cell_iterators())
+    {
+      if (cell->reference_cell() == ReferenceCells::Triangle)
+        cell->set_active_fe_index(0);
+      else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
+        cell->set_active_fe_index(1);
+      else
+        Assert(false, ExcNotImplemented());
+    }
+
   dof_handler.distribute_dofs(fe);
   std::cout << "Number of degrees of freedom: " << dof_handler.n_dofs()
             << std::endl;
@@ -120,17 +141,26 @@ void Step3::setup_system()
 
 void Step3::assemble_system()
 {
-  FEValues<2>        fe_values(mapping,
-                        fe,
-                        quadrature_formula,
-                        update_values | update_gradients | update_JxW_values);
-  const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
-  FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
-  Vector<double>     cell_rhs(dofs_per_cell);
-  std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
+  hp::FEValues<2> hp_fe_values(mapping,
+                               fe,
+                               quadrature_formula,
+                               update_values | update_gradients |
+                                 update_JxW_values);
+
+  FullMatrix<double>                   cell_matrix;
+  Vector<double>                       cell_rhs;
+  std::vector<types::global_dof_index> local_dof_indices;
+
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
-      fe_values.reinit(cell);
+      hp_fe_values.reinit(cell);
+
+      const auto &fe_values = hp_fe_values.get_present_fe_values();
+
+      const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
+      cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
+      cell_rhs.reinit(dofs_per_cell);
+      local_dof_indices.resize(dofs_per_cell);
 
       cell_matrix = 0;
       cell_rhs    = 0;
