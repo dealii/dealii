@@ -108,7 +108,7 @@ create_partitioner(const DoFHandler<dim, spacedim> &dof_handler)
 
 template <int dim>
 void
-test(const unsigned int n_subdivisions)
+test(const unsigned int n_subdivisions, const double iso_level)
 {
   const unsigned int spacedim = dim + 1;
 
@@ -155,7 +155,7 @@ test(const unsigned int n_subdivisions)
     MPI_COMM_WORLD, Triangulation<dim, spacedim>::none, true);
 
   GridGenerator::create_triangulation_with_marching_cube_algorithm(
-    mc, background_dof_handler, ls_vector, tria);
+    mc, background_dof_handler, ls_vector, iso_level, tria);
 
   // write computed vectors to Paraview
   if (true)
@@ -178,7 +178,7 @@ test(const unsigned int n_subdivisions)
         }
     }
 
-  if (true)
+  if (false)
     {
       DataOutBase::VtkFlags flags;
       flags.write_higher_order_cells = true;
@@ -202,7 +202,7 @@ main(int argc, char **argv)
   MPILogInitAll                    all;
 
   for (unsigned int i = 1; i <= 3; ++i)
-    test<1>(i);
+    test<1>(i, -0.1 + i * 0.05);
   for (unsigned int i = 1; i <= 3; ++i)
-    test<2>(i);
+    test<2>(i, -0.1 + i * 0.05);
 }

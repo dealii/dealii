@@ -2443,6 +2443,7 @@ namespace GridGenerator
     void
     process(const DoFHandler<dim> &         background_dof_handler,
             const VectorType &              ls_vector,
+            const double                    iso_level,
             std::vector<Point<dim>> &       vertices,
             std::vector<CellData<dim - 1>> &cells) const;
 
@@ -2455,6 +2456,7 @@ namespace GridGenerator
     void
     process_cell(std::vector<value_type> &    ls_values,
                  const std::vector<Point<2>> &points,
+                 const double                 iso_level,
                  std::vector<Point<2>> &      vertices,
                  std::vector<CellData<1>> &   cells) const;
 
@@ -2464,6 +2466,7 @@ namespace GridGenerator
     void
     process_cell(std::vector<value_type> &    ls_values,
                  const std::vector<Point<3>> &points,
+                 const double                 iso_level,
                  std::vector<Point<3>> &      vertices,
                  std::vector<CellData<2>> &   cells) const;
 
@@ -2475,6 +2478,7 @@ namespace GridGenerator
     void
     process_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
                  const VectorType &              ls_vector,
+                 const double                    iso_level,
                  std::vector<Point<dim>> &       vertices,
                  std::vector<CellData<dim - 1>> &cells) const;
 
@@ -2496,6 +2500,7 @@ namespace GridGenerator
     process_sub_cell(const std::vector<value_type> & ls_values,
                      const std::vector<Point<2>> &   points,
                      const std::vector<unsigned int> mask,
+                     const double                    iso_level,
                      std::vector<Point<2>> &         vertices,
                      std::vector<CellData<1>> &      cells);
 
@@ -2506,6 +2511,7 @@ namespace GridGenerator
     process_sub_cell(const std::vector<value_type> & ls_values,
                      const std::vector<Point<3>> &   points,
                      const std::vector<unsigned int> mask,
+                     const double                    iso_level,
                      std::vector<Point<3>> &         vertices,
                      std::vector<CellData<2>> &      cells);
 
@@ -2532,6 +2538,7 @@ namespace GridGenerator
     const MarchingCubeAlgorithm<dim, VectorType> &mc,
     const DoFHandler<dim> &                       background_dof_handler,
     const VectorType &                            ls_vector,
+    const double                                  iso_level,
     Triangulation<dim - 1, dim> &                 tria);
 
   ///@}

@@ -8495,11 +8495,12 @@ namespace GridGenerator
   MarchingCubeAlgorithm<dim, VectorType>::process(
     const DoFHandler<dim> &         background_dof_handler,
     const VectorType &              ls_vector,
+    const double                    iso_level,
     std::vector<Point<dim>> &       vertices,
     std::vector<CellData<dim - 1>> &cells) const
   {
     for (const auto &cell : background_dof_handler.active_cell_iterators())
-      process_cell(cell, ls_vector, vertices, cells);
+      process_cell(cell, ls_vector, iso_level, vertices, cells);
   }
 
 
@@ -8509,6 +8510,7 @@ namespace GridGenerator
   MarchingCubeAlgorithm<dim, VectorType>::process_cell(
     const typename DoFHandler<dim>::active_cell_iterator &cell,
     const VectorType &                                    ls_vector,
+    const double                                          iso_level,
     std::vector<Point<dim>> &                             vertices,
     std::vector<CellData<dim - 1>> &                      cells) const
   {
@@ -8517,7 +8519,8 @@ namespace GridGenerator
     fe_values.reinit(cell);
     ls_values.resize(cell->get_fe().n_dofs_per_cell());
     fe_values.get_function_values(ls_vector, ls_values);
-    process_cell(ls_values, fe_values.get_quadrature_points(), vertices, cells);
+    process_cell(
+      ls_values, fe_values.get_quadrature_points(), iso_level, vertices, cells);
   }
 
 
@@ -8527,6 +8530,7 @@ namespace GridGenerator
   MarchingCubeAlgorithm<dim, VectorType>::process_cell(
     std::vector<value_type> &    ls_values,
     const std::vector<Point<2>> &points,
+    const double                 iso_level,
     std::vector<Point<2>> &      vertices,
     std::vector<CellData<1>> &   cells) const
   {
@@ -8539,7 +8543,7 @@ namespace GridGenerator
             (n_subdivisions + 1) * (j + 1) + (i + 1),
             (n_subdivisions + 1) * (j + 1) + (i + 0)};
 
-          process_sub_cell(ls_values, points, mask, vertices, cells);
+          process_sub_cell(ls_values, points, mask, iso_level, vertices, cells);
         }
   }
 
@@ -8550,6 +8554,7 @@ namespace GridGenerator
   MarchingCubeAlgorithm<dim, VectorType>::process_cell(
     std::vector<value_type> &    ls_values,
     const std::vector<Point<3>> &points,
+    const double                 iso_level,
     std::vector<Point<3>> &      vertices,
     std::vector<CellData<2>> &   cells) const
   {
@@ -8569,7 +8574,8 @@ namespace GridGenerator
               p * p * (k + 1) + p * (j + 1) + (i + 1),
               p * p * (k + 1) + p * (j + 1) + (i + 0)};
 
-            process_sub_cell(ls_values, points, mask, vertices, cells);
+            process_sub_cell(
+              ls_values, points, mask, iso_level, vertices, cells);
           }
   }
 
@@ -8592,6 +8598,7 @@ namespace GridGenerator
       const std::vector<value_type> &          ls_values,
       const std::vector<Point<dim>> &          points,
       const std::vector<unsigned int> &        mask,
+      const double                             iso_level,
       std::vector<Point<dim>> &                vertices,
       std::vector<CellData<dim - 1>> &         cells)
     {
@@ -8602,7 +8609,7 @@ namespace GridGenerator
       // determine configuration
       unsigned int configuration = 0;
       for (unsigned int v = 0; v < n_vertices; ++v)
-        if (ls_values[mask[v]] < 0.0f)
+        if (ls_values[mask[v]] < iso_level)
           configuration |= (1 << v);
 
       // cell is not cut (nothing to do)
@@ -8610,12 +8617,22 @@ namespace GridGenerator
         return;
 
       // helper function to determine where an edge (between index i and j) is
-      // cut
+      // cut - see also: http://paulbourke.net/geometry/polygonise/
       const auto interpolate = [&](const unsigned int i, const unsigned int j) {
-        return Point<dim>(
-          points[mask[i]] +
-          (-ls_values[mask[i]] / (ls_values[mask[j]] - ls_values[mask[i]])) *
-            (points[mask[j]] - points[mask[i]]));
+        const double tolerance = 1e-10;
+
+        if (std::abs(iso_level - ls_values[mask[i]]) < tolerance)
+          return points[mask[i]];
+        if (std::abs(iso_level - ls_values[mask[j]]) < tolerance)
+          return points[mask[j]];
+        if (std::abs(ls_values[mask[i]] - ls_values[mask[j]]) < tolerance)
+          return points[mask[i]];
+
+        const double mu = (iso_level - ls_values[mask[i]]) /
+                          (ls_values[mask[j]] - ls_values[mask[i]]);
+
+        return Point<dim>(points[mask[i]] +
+                          mu * (points[mask[j]] - points[mask[i]]));
       };
 
       // determine the position where edges are cut (if they are cut)
@@ -8666,6 +8683,7 @@ namespace GridGenerator
     const std::vector<value_type> & ls_values,
     const std::vector<Point<2>> &   points,
     const std::vector<unsigned int> mask,
+    const double                    iso_level,
     std::vector<Point<2>> &         vertices,
     std::vector<CellData<1>> &      cells)
   {
@@ -8728,6 +8746,7 @@ namespace GridGenerator
                                   ls_values,
                                   points,
                                   mask,
+                                  iso_level,
                                   vertices,
                                   cells);
   }
@@ -8740,6 +8759,7 @@ namespace GridGenerator
     const std::vector<value_type> & ls_values,
     const std::vector<Point<3>> &   points,
     const std::vector<unsigned int> mask,
+    const double                    iso_level,
     std::vector<Point<3>> &         vertices,
     std::vector<CellData<2>> &      cells)
   {
@@ -9065,6 +9085,7 @@ namespace GridGenerator
                                    ls_values,
                                    points,
                                    mask,
+                                   iso_level,
                                    vertices,
                                    cells);
   }
@@ -9077,13 +9098,14 @@ namespace GridGenerator
     const MarchingCubeAlgorithm<dim, VectorType> &mc,
     const DoFHandler<dim> &                       background_dof_handler,
     const VectorType &                            ls_vector,
+    const double                                  iso_level,
     Triangulation<dim - 1, dim> &                 tria)
   {
     std::vector<Point<dim>>        vertices;
     std::vector<CellData<dim - 1>> cells;
     SubCellData                    subcelldata;
 
-    mc.process(background_dof_handler, ls_vector, vertices, cells);
+    mc.process(background_dof_handler, ls_vector, iso_level, vertices, cells);
 
     std::vector<unsigned int> considered_vertices;
 
