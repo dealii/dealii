@@ -41,7 +41,7 @@
 #include <fstream>
 #include <iostream>
 
-// Include files as added int step-3simplex:
+// Include files as added in step-3simplex:
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/mapping_fe.h>
@@ -231,7 +231,8 @@ void Step3::assemble_system()
 
 
 // @sect4{Step3::solve}
-
+//
+// Nothing has changed here.
 void Step3::solve()
 {
   SolverControl            solver_control(1000, 1e-12);
