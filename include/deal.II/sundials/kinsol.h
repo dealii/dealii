@@ -632,7 +632,7 @@ namespace SUNDIALS
     DeclException1(ExcKINSOLError,
                    int,
                    << "One of the SUNDIALS KINSOL internal functions "
-                   << " returned a negative error code: " << arg1
+                   << "returned a negative error code: " << arg1
                    << ". Please consult SUNDIALS manual.");
 
 
