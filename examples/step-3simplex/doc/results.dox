@@ -58,7 +58,7 @@ elements which is crucial to solve vector-valued problems as needed, e.g., to
 solve elasticity and fluid problems (see also step-17).
 
 
-<h4>Mesh generation</h4>
+<h4>Alternative mesh generation approaches</h4>
 
 In this tutorial, we have created the mesh externally and read it with the
 help of GridIn. Since we believe that the main motivation to work on simplex
