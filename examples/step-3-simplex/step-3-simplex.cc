@@ -92,7 +92,7 @@ private:
 
 // @sect4{Step3::Step3}
 //
-// In the constructor we set the polynomial degree of the finite element and
+// In the constructor, we set the polynomial degree of the finite element and
 // the number of quadrature points. Furthermore, we initialize the MappingFE
 // object with a (linear) FE_SimplexP object so that it can work on simplex
 // meshes.
@@ -120,8 +120,8 @@ void Step3::make_grid()
 //
 // From here on nothing has changed.  In particular, the
 // the cell integrals have not been changed depending if one operates on
-// hypercube or simplex meshes. This is astonishing and has been accomplished by
-// the follow two classes:
+// hypercube or simplex meshes. This is astonishing and is possible dut to the
+// design of the following two classes:
 //  - DoFHandler: this class stores degrees of freedom in a flexible way and
 //    allows simple access to them depending on the element type independent of
 //    the cell type.

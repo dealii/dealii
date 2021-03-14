@@ -48,7 +48,7 @@
 #include <deal.II/grid/grid_in.h>
 
 // Include files that we need in this tutorial to be able to deal with
-// collections of finite element, quadrature rules, mapping objects, and
+// collections of finite elements, quadrature rules, mapping objects, and
 // FEValues.
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
@@ -123,8 +123,8 @@ void Step3::make_grid()
 // @sect4{Step3::setup_system}
 //
 // In contrast to step-3 and step-3-simplex, we need here a preprocessing step
-// that assigns to cells active_fe_indices consistently according to the
-// indices in the collections.
+// that assigns to each cell an active_fe_index consistently according to the
+// indices in the collections and the cell type.
 void Step3::setup_system()
 {
   for (const auto &cell : dof_handler.active_cell_iterators())
@@ -157,12 +157,12 @@ void Step3::setup_system()
 // step-3-simplex with the following two differences:
 //  - We do not work with FEValues directly but with the collection class
 //    hp::FEValues. It gives us - after it has been initialized with the current
-//    cell - a reference to the right FEValues (constructed
+//    cell - a reference to the right FEValues object (constructed
 //    with the correct mapping object, finite element, and quadrature rule),
 //    which can be used as usual to compute the cell integrals.
 //  - The cell-local stiffness matrix and right-hand-side vector have different
-//    sizes depending on the cell type so that they might need to be resized
-//    for each cell.
+//    sizes depending on the cell type (6 DoFs vs. 9 DoFs) so that they might
+//    need to be resized for each cell.
 //
 // Apart from these two changes, the code has not changes. In particular, the
 // the cell integrals have not been changed depending if one operates on

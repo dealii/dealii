@@ -1,6 +1,6 @@
 <h1>Results</h1>
 
-The following picture shows the mesh and the result obtained by executing this
+The following figures show the mesh and the result obtained by executing this
 program:
 
 <table align="center" class="doxtable" style="width:65%">
@@ -29,7 +29,7 @@ point out further capabilities.
 
 An extension to 3D is quite straight forward. Both FE_SimplexP and QGaussSimplex
 are implemented in a dimensional-independent way. So that simply replacing
-everywhere dim=2 with 3 should work out of the box.
+everywhere dim=2 with dim=3 should work out of the box.
 
 Furthermore, embedding of a 2D mesh consisting of triangles in 3D space is
 possible.
@@ -47,15 +47,15 @@ and pyramids. We consider such meshes in the tutorial step-3-mixed.
 <h4>Alternative finite elements, quadrature rules, and mapping objects</h4>
 
 In this tutorial, we used the most basic finite-element, quadrature-rule, and
-mapping classes. However, more classes are compatible. The following list
-gives an overview of these classes:
+mapping classes. However, more classes are compatible for simplices. The
+following list gives an overview of these classes:
 - finite elements: FE_SimplexP, FE_SimplexDGP, FE_SimplexP_Bubbles
 - quadrature rules: QGaussSimplex, QWitherdenVincentSimplex, QDuffy
 - mapping objects: MappingFE, MappingFEField
 
-It should be also pointed out that FESystems can handle simplex finite elements
-which is crucial to solve vector-valued problems as needed, e.g., to elasticity
-problems (see also step-17).
+It should be also pointed out that FESystems can also handle simplex finite
+elements which is crucial to solve vector-valued problems as needed, e.g., to
+solve elasticity and fluid problems (see also step-17).
 
 
 <h4>Mesh generation</h4>
@@ -63,23 +63,22 @@ problems (see also step-17).
 In this tutorial, we have created the mesh externally and read it with the
 help of GridIn. Since we believe that the main motivation to work on simplex
 meshes is that one has a complex geometry given that can only be meshed with
-an external tool with simplices, we don't have too many function in the
-GridGenerator namespace targeted simplex meshes. However we would like to point
+an external tool with simplices, we don't have too many functions in the
+GridGenerator namespace targeting simplex meshes. However we would like to point
 out the following functions:
  - GridGenerator::subdivided_hyper_cube_with_simplices() and
    GridGenerator::subdivided_hyper_rectangle_with_simplices(), which fill a
    hypercube and hyperrectangle domain with simplices
  - GridGenerator::convert_hypercube_to_simplex_mesh(), which converts meshes
    consisting of hypercube element to simplex meshes by replacing one
-   quadrilateral with 4 triangles and by replacing one hexahedron with 24
-   tetrahdons
+   quadrilateral with 4 triangles and one hexahedron with 24 tetrahdons
 
 
 <h4>hp-adaptivity</h4>
 
 Here, we considered a mesh without refinements and with all cells assigned the
 same type of element and with the same polynomial degrees. However, one is not
-restricted to this.
+restricted to this. For further details on hp-methods, see step-27.
 
 
 <h4>Parallelization</h4>
@@ -98,6 +97,6 @@ meshes.
 
 <h4>Matrix-free operator evaluation</h4>
 
-Here we should a matrix-based approach. However, one could also rewrite the
-code using MatrixFree, FEEvaluation, and FEFaceEvaluation that are compatible
-with simplex meshes.
+Here we showd a matrix-based approach. However, one could also rewrite the
+code using MatrixFree, FEEvaluation, and FEFaceEvaluation that are also
+compatible with simplex meshes.

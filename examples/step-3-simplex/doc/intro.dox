@@ -4,7 +4,7 @@
 <i>
 This program was contributed by Peter Munch. This work and the required
 generalizations of the internal data structures of deal.II was partly supported
-by ...
+by ... [TODO: clarify my funding]
 </i>
 
 
@@ -17,8 +17,9 @@ Many freely available mesh-generation tools produce meshes consist of
 simplices (triangles in 2D; tetrahedra in 3D). The reason for this is that
 generating such kind of meshes for complex geometries is simpler that the
 generation of hex-only meshes. This tutorial shows how to work on such kind of
-meshes with experimental features in deal.II. For this purpose, we solve the
-Poisson problem from step-3 in 2D with a mesh only consisting of triangles.
+meshes with the experimental simplex features in deal.II. For this purpose, we
+solve the Poisson problem from step-3 in 2D with a mesh only consisting of
+triangles.
 
 
 <h3>Working with simplex meshes</h3>
@@ -28,7 +29,7 @@ elements, quadrature rules, and mapping objects. In step-3, we used FE_Q,
 QGauss, and (implicitly by not specifying a mapping) MappingQ1. The equivalent
 classes for the first two in the context of simplex are FE_SimplexP and
 QGaussSimplex, which we will use here. For mapping purposes, we use the class
-MappingFE that implements an isoparametric mapping. We initialize it with
+MappingFE, which implements an isoparametric mapping. We initialize it with
 a FE_SimplexP object so that it can be applied on simplex meshes.
 
 

@@ -1,6 +1,6 @@
 <h1>Results</h1>
 
-The following picture shows the mesh and the result obtained by executing this
+The following figures show the mesh and the result obtained by executing this
 program:
 
 <table align="center" class="doxtable" style="width:65%">
@@ -23,6 +23,14 @@ In this tutorial, we presented how to use the deal.II simplex infrastructure
 to solve a simple Poisson problem on a mixed mesh in 2D. In this scope, we
 could only present a small section of the capabilities. In the following, we
 point out further capabilities.
+
+
+<h4>Pure hypercube and simplex meshes</h4>
+
+In this tutorial, we worked on mesh consisting both of quadrilaterals and
+triangles. However, the program and the underlying concepts also work if the
+mesh only contains either quadrilaterals or triangles. Interested users can try
+this out: we have provided appropriate journal files and meshes for such cases.
 
 
 <h4>3D meshes</h4>
