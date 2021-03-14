@@ -131,7 +131,7 @@ namespace SUNDIALS
   {
     template <typename VectorType>
     int
-    t_kinsol_function(N_Vector yy, N_Vector FF, void *user_data)
+    residual_or_iteration_callback(N_Vector yy, N_Vector FF, void *user_data)
     {
       KINSOL<VectorType> &solver =
         *static_cast<KINSOL<VectorType> *>(user_data);
@@ -163,7 +163,7 @@ namespace SUNDIALS
 #  if DEAL_II_SUNDIALS_VERSION_LT(5, 0, 0)
     template <typename VectorType>
     int
-    t_kinsol_setup_jacobian(KINMem kinsol_mem)
+    setup_jacobian_callback(KINMem kinsol_mem)
     {
       KINSOL<VectorType> &solver =
         *static_cast<KINSOL<VectorType> *>(kinsol_mem->kin_user_data);
@@ -186,11 +186,11 @@ namespace SUNDIALS
 
     template <typename VectorType>
     int
-    t_kinsol_solve_jacobian(KINMem    kinsol_mem,
-                            N_Vector  x,
-                            N_Vector  b,
-                            realtype *sJpnorm,
-                            realtype *sFdotJp)
+    solve_with_jacobian_callback(KINMem    kinsol_mem,
+                                 N_Vector  x,
+                                 N_Vector  b,
+                                 realtype *sJpnorm,
+                                 realtype *sFdotJp)
     {
       KINSOL<VectorType> &solver =
         *static_cast<KINSOL<VectorType> *>(kinsol_mem->kin_user_data);
@@ -228,7 +228,7 @@ namespace SUNDIALS
 
     template <typename VectorType>
     int
-    t_kinsol_setup_jacobian(N_Vector u,
+    setup_jacobian_callback(N_Vector u,
                             N_Vector f,
                             SUNMatrix /* ignored */,
                             void *user_data,
@@ -262,11 +262,11 @@ namespace SUNDIALS
 
     template <typename VectorType>
     int
-    t_kinsol_solve_jacobian(SUNLinearSolver LS,
-                            SUNMatrix /*ignored*/,
-                            N_Vector x,
-                            N_Vector b,
-                            realtype /*tol*/)
+    solve_with_jacobian_callback(SUNLinearSolver LS,
+                                 SUNMatrix /*ignored*/,
+                                 N_Vector x,
+                                 N_Vector b,
+                                 realtype /*tol*/)
     {
       // Receive the object that describes the linear solver and
       // unpack the pointer to the KINSOL object from which we can then
@@ -390,7 +390,8 @@ namespace SUNDIALS
 
     kinsol_mem = KINCreate();
 
-    int status = KINInit(kinsol_mem, t_kinsol_function<VectorType>, solution);
+    int status =
+      KINInit(kinsol_mem, residual_or_iteration_callback<VectorType>, solution);
     (void)status;
     AssertKINSOL(status);
 
@@ -432,10 +433,10 @@ namespace SUNDIALS
       {
 #  if DEAL_II_SUNDIALS_VERSION_LT(5, 0, 0)
         auto KIN_mem        = static_cast<KINMem>(kinsol_mem);
-        KIN_mem->kin_lsolve = t_kinsol_solve_jacobian<VectorType>;
+        KIN_mem->kin_lsolve = solve_with_jacobian_callback<VectorType>;
         if (setup_jacobian) // user assigned a function object to the Jacobian
           // set-up slot
-          KIN_mem->kin_lsetup = t_kinsol_setup_jacobian<VectorType>;
+          KIN_mem->kin_lsetup = setup_jacobian_callback<VectorType>;
 #  else
         // Set the operations we care for in the sun_linear_solver object
         // and attach it to the KINSOL object. The functions that will get
@@ -465,7 +466,7 @@ namespace SUNDIALS
           return 0;
         };
 
-        LS->ops->solve = t_kinsol_solve_jacobian<VectorType>;
+        LS->ops->solve = solve_with_jacobian_callback<VectorType>;
 
         // Even though we don't use it, KINSOL still wants us to set some
         // kind of matrix object for the nonlinear solver. This is because
@@ -503,7 +504,7 @@ namespace SUNDIALS
         if (setup_jacobian)
           {
             status =
-              KINSetJacFn(kinsol_mem, &t_kinsol_setup_jacobian<VectorType>);
+              KINSetJacFn(kinsol_mem, &setup_jacobian_callback<VectorType>);
             AssertKINSOL(status);
           }
 #  endif
