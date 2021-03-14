@@ -2494,6 +2494,104 @@ DoFHandler<dim, spacedim>::distribute_dofs(
 
 
 
+namespace
+{
+  template <int dim, int spacedim>
+  std::shared_ptr<const Utilities::MPI::Partitioner>
+  extract_locally_relevant_dofs_partitioner(
+    const DoFHandler<dim, spacedim> &dof_handler)
+  {
+    IndexSet locally_relevant_dofs = dof_handler.locally_owned_dofs();
+
+    // now add the DoF on the adjacent ghost cells to the IndexSet
+
+    // Note: For certain meshes (in particular in 3D and with many
+    // processors), it is really necessary to cache intermediate data. After
+    // trying several objects such as std::set, a vector that is always kept
+    // sorted, and a vector that is initially unsorted and sorted once at the
+    // end, the latter has been identified to provide the best performance.
+    // Martin Kronbichler
+    std::vector<types::global_dof_index> dof_indices;
+    std::vector<types::global_dof_index> dofs_on_ghosts;
+
+    for (const auto &cell : dof_handler.active_cell_iterators())
+      if (cell->is_ghost())
+        {
+          dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+          cell->get_dof_indices(dof_indices);
+          for (const auto dof_index : dof_indices)
+            if (!locally_relevant_dofs.is_element(dof_index))
+              dofs_on_ghosts.push_back(dof_index);
+        }
+
+    // sort, compress out duplicates, fill into index set
+    std::sort(dofs_on_ghosts.begin(), dofs_on_ghosts.end());
+    locally_relevant_dofs.add_indices(dofs_on_ghosts.begin(),
+                                      std::unique(dofs_on_ghosts.begin(),
+                                                  dofs_on_ghosts.end()));
+    locally_relevant_dofs.compress();
+
+    return std::make_shared<const Utilities::MPI::Partitioner>(
+      dof_handler.locally_owned_dofs(),
+      locally_relevant_dofs,
+      dof_handler.get_communicator());
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::shared_ptr<const Utilities::MPI::Partitioner>
+  extract_locally_relevant_level_dofs_partitioner(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    const unsigned int               level)
+  {
+    // collect all the locally owned dofs
+    IndexSet locally_relevant_dofs = dof_handler.locally_owned_mg_dofs(level);
+
+    // add the DoF on the adjacent ghost cells to the IndexSet
+
+    // Note: For certain meshes (in particular in 3D and with many
+    // processors), it is really necessary to cache intermediate data. After
+    // trying several objects such as std::set, a vector that is always kept
+    // sorted, and a vector that is initially unsorted and sorted once at the
+    // end, the latter has been identified to provide the best performance.
+    // Martin Kronbichler
+    std::vector<types::global_dof_index> dof_indices;
+    std::vector<types::global_dof_index> dofs_on_ghosts;
+
+    for (const auto &cell : dof_handler.cell_iterators_on_level(level))
+      {
+        const types::subdomain_id id = cell->level_subdomain_id();
+
+        // skip artificial and own cells (only look at ghost cells)
+        if (id == dof_handler.get_triangulation().locally_owned_subdomain() ||
+            id == numbers::artificial_subdomain_id)
+          continue;
+
+        dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+        cell->get_mg_dof_indices(dof_indices);
+        for (const auto dof_index : dof_indices)
+          if (!locally_relevant_dofs.is_element(dof_index))
+            dofs_on_ghosts.push_back(dof_index);
+      }
+
+    // sort, compress out duplicates, fill into index set
+    std::sort(dofs_on_ghosts.begin(), dofs_on_ghosts.end());
+    locally_relevant_dofs.add_indices(dofs_on_ghosts.begin(),
+                                      std::unique(dofs_on_ghosts.begin(),
+                                                  dofs_on_ghosts.end()));
+
+    locally_relevant_dofs.compress();
+
+    return std::make_shared<const Utilities::MPI::Partitioner>(
+      dof_handler.locally_owned_mg_dofs(level),
+      locally_relevant_dofs,
+      dof_handler.get_communicator());
+  }
+} // namespace
+
+
+
 template <int dim, int spacedim>
 void
 DoFHandler<dim, spacedim>::distribute_dofs(
@@ -2603,14 +2701,8 @@ DoFHandler<dim, spacedim>::distribute_dofs(
   this->number_cache = this->policy->distribute_dofs();
 
   // cache locally-relevant degrees of freedom in the form of a partitioner
-  {
-    IndexSet locally_relevant_dofs;
-    DoFTools::extract_locally_relevant_dofs(*this, locally_relevant_dofs);
-    this->number_cache.locally_relevant_dofs_partitioner =
-      std::make_shared<const Utilities::MPI::Partitioner>(locally_owned_dofs(),
-                                                          locally_relevant_dofs,
-                                                          get_communicator());
-  }
+  this->number_cache.locally_relevant_dofs_partitioner =
+    extract_locally_relevant_dofs_partitioner(*this);
 
   // do some housekeeping: compress indices
   // if(hp_capability_enabled)
@@ -2661,19 +2753,10 @@ DoFHandler<dim, spacedim>::distribute_mg_dofs()
   // cache locally-relevant degrees of freedom on the levels in the form of a
   // partitioner
   for (unsigned int level = 0;
-       level <= this->get_triangulation().n_global_levels();
+       level < this->get_triangulation().n_global_levels();
        ++level)
-    {
-      IndexSet locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_level_dofs(*this,
-                                                    level,
-                                                    locally_relevant_dofs);
-      this->mg_number_cache[level].locally_relevant_dofs_partitioner =
-        std::make_shared<const Utilities::MPI::Partitioner>(
-          locally_owned_mg_dofs(level),
-          locally_relevant_dofs,
-          get_communicator());
-    }
+    this->mg_number_cache[level].locally_relevant_dofs_partitioner =
+      extract_locally_relevant_level_dofs_partitioner(*this, level);
 
   // initialize the block info object only if this is a sequential
   // triangulation. it doesn't work correctly yet if it is parallel
@@ -3019,6 +3102,8 @@ DoFHandler<dim, spacedim>::renumber_dofs(
 
       // do the renumbering
       this->number_cache = this->policy->renumber_dofs(new_numbers);
+      this->number_cache.locally_relevant_dofs_partitioner =
+        extract_locally_relevant_dofs_partitioner(*this);
 
       // now re-compress the dof indices
       //{
@@ -3077,6 +3162,8 @@ DoFHandler<dim, spacedim>::renumber_dofs(
 #endif
 
       this->number_cache = this->policy->renumber_dofs(new_numbers);
+      this->number_cache.locally_relevant_dofs_partitioner =
+        extract_locally_relevant_dofs_partitioner(*this);
     }
 }
 
@@ -3121,6 +3208,8 @@ DoFHandler<dim, spacedim>::renumber_dofs(
 
   this->mg_number_cache[level] =
     this->policy->renumber_mg_dofs(level, new_numbers);
+  this->mg_number_cache[level].locally_relevant_dofs_partitioner =
+    extract_locally_relevant_level_dofs_partitioner(*this, level);
 }
 
 

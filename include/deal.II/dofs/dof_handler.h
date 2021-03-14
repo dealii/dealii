@@ -2045,7 +2045,8 @@ DoFHandler<dim, spacedim>::locally_relevant_level_dofs_partitioner(
          ExcMessage("The given level index exceeds the number of levels "
                     "present in the triangulation"));
   Assert(
-    mg_number_cache[level].locally_relevant_dofs_partitioner != nullptr,
+    mg_number_cache.size() == this->get_triangulation().n_global_levels() &&
+      mg_number_cache[level].locally_relevant_dofs_partitioner != nullptr,
     ExcMessage(
       "Distribute level DoFs using distribute_mg_dofs() before calling this function."));
 

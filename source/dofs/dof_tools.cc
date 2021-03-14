@@ -1197,39 +1197,11 @@ namespace DoFTools
   extract_locally_relevant_dofs(const DoFHandler<dim, spacedim> &dof_handler,
                                 IndexSet &                       dof_set)
   {
-    // collect all the locally owned dofs
-    dof_set = dof_handler.locally_owned_dofs();
+    const auto &partitioner =
+      *dof_handler.locally_relevant_dofs_partitioner().lock();
 
-    // now add the DoF on the adjacent ghost cells to the IndexSet
-
-    // Note: For certain meshes (in particular in 3D and with many
-    // processors), it is really necessary to cache intermediate data. After
-    // trying several objects such as std::set, a vector that is always kept
-    // sorted, and a vector that is initially unsorted and sorted once at the
-    // end, the latter has been identified to provide the best performance.
-    // Martin Kronbichler
-    std::vector<types::global_dof_index> dof_indices;
-    std::vector<types::global_dof_index> dofs_on_ghosts;
-
-    typename DoFHandler<dim, spacedim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
-    for (; cell != endc; ++cell)
-      if (cell->is_ghost())
-        {
-          dof_indices.resize(cell->get_fe().n_dofs_per_cell());
-          cell->get_dof_indices(dof_indices);
-          for (const auto dof_index : dof_indices)
-            if (!dof_set.is_element(dof_index))
-              dofs_on_ghosts.push_back(dof_index);
-        }
-
-    // sort, compress out duplicates, fill into index set
-    std::sort(dofs_on_ghosts.begin(), dofs_on_ghosts.end());
-    dof_set.add_indices(dofs_on_ghosts.begin(),
-                        std::unique(dofs_on_ghosts.begin(),
-                                    dofs_on_ghosts.end()));
-    dof_set.compress();
+    dof_set = partitioner.locally_owned_range();
+    dof_set.add_indices(partitioner.ghost_indices());
   }
 
 
@@ -1241,47 +1213,11 @@ namespace DoFTools
     const unsigned int               level,
     IndexSet &                       dof_set)
   {
-    // collect all the locally owned dofs
-    dof_set = dof_handler.locally_owned_mg_dofs(level);
+    const auto &partitioner =
+      *dof_handler.locally_relevant_level_dofs_partitioner(level).lock();
 
-    // add the DoF on the adjacent ghost cells to the IndexSet
-
-    // Note: For certain meshes (in particular in 3D and with many
-    // processors), it is really necessary to cache intermediate data. After
-    // trying several objects such as std::set, a vector that is always kept
-    // sorted, and a vector that is initially unsorted and sorted once at the
-    // end, the latter has been identified to provide the best performance.
-    // Martin Kronbichler
-    std::vector<types::global_dof_index> dof_indices;
-    std::vector<types::global_dof_index> dofs_on_ghosts;
-
-    typename DoFHandler<dim, spacedim>::cell_iterator cell = dof_handler.begin(
-                                                        level),
-                                                      endc =
-                                                        dof_handler.end(level);
-    for (; cell != endc; ++cell)
-      {
-        const types::subdomain_id id = cell->level_subdomain_id();
-
-        // skip artificial and own cells (only look at ghost cells)
-        if (id == dof_handler.get_triangulation().locally_owned_subdomain() ||
-            id == numbers::artificial_subdomain_id)
-          continue;
-
-        dof_indices.resize(cell->get_fe().n_dofs_per_cell());
-        cell->get_mg_dof_indices(dof_indices);
-        for (const auto dof_index : dof_indices)
-          if (!dof_set.is_element(dof_index))
-            dofs_on_ghosts.push_back(dof_index);
-      }
-
-    // sort, compress out duplicates, fill into index set
-    std::sort(dofs_on_ghosts.begin(), dofs_on_ghosts.end());
-    dof_set.add_indices(dofs_on_ghosts.begin(),
-                        std::unique(dofs_on_ghosts.begin(),
-                                    dofs_on_ghosts.end()));
-
-    dof_set.compress();
+    dof_set = partitioner.locally_owned_range();
+    dof_set.add_indices(partitioner.ghost_indices());
   }
 
 
