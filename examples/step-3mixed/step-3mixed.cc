@@ -22,7 +22,7 @@
 
 // @sect3{Include files}
 
-// Include files as used in step-3:
+// Include files, as used in step-3:
 #include <deal.II/base/function.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -41,7 +41,7 @@
 #include <fstream>
 #include <iostream>
 
-// Include files as added in step-3simplex:
+// Include files, as added in step-3simplex:
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/mapping_fe.h>
@@ -80,7 +80,7 @@ private:
   Triangulation<2> triangulation;
 
   // As already explained, we are not working with mapping objects, finite
-  // elements, and quadrature rules directly but on collection of them.
+  // elements, and quadrature rules directly but with collections of them.
   const hp::MappingCollection<2> mapping;
   const hp::FECollection<2>      fe;
   const hp::QCollection<2>       quadrature_formula;
@@ -97,7 +97,7 @@ private:
 
 // @sect4{Step3::Step3}
 //
-// In the constructor of the Step3 class, we fill the collections. Here we
+// In the constructor of the Step3 class, we fill the collections. Here, we
 // position the objects related to triangles in the first place (index 0) and
 // the ones related to quadrilaterals in the second place (index 1).
 Step3::Step3()
@@ -123,7 +123,7 @@ void Step3::make_grid()
 // @sect4{Step3::setup_system}
 //
 // In contrast to step-3 and step-3simplex, we need here a preprocessing step
-// that assigns to each cell an active_fe_index consistently according to the
+// that assigns an active_fe_index to each cell consistently according to the
 // indices in the collections and the cell type.
 void Step3::setup_system()
 {
@@ -160,12 +160,12 @@ void Step3::setup_system()
 //    cell - a reference to the right FEValues object (constructed
 //    with the correct mapping object, finite element, and quadrature rule),
 //    which can be used as usual to compute the cell integrals.
-//  - The cell-local stiffness matrix and right-hand-side vector have different
-//    sizes depending on the cell type (6 DoFs vs. 9 DoFs) so that they might
-//    need to be resized for each cell.
+//  - The cell-local stiffness matrix and the right-hand-side vector have
+//    different sizes depending on the cell type (6 DoFs vs. 9 DoFs) so that
+//    they might need to be resized for each cell.
 //
-// Apart from these two changes, the code has not changes. In particular, the
-// the cell integrals have not been changed depending if one operates on
+// Apart from these two changes, the code has not changed. Not even, the
+// cell integrals have been changed depending on whether one operates on
 // hypercube, simplex, or mixed meshes.
 void Step3::assemble_system()
 {

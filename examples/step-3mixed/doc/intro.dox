@@ -3,7 +3,7 @@
 
 <i>
 This program was contributed by Peter Munch. This work and the required
-generalizations of the internal data structures of deal.II was partly supported
+generalizations of the internal data structures of deal.II were partly supported
 by ... [TODO: clarify my funding]
 </i>
 
@@ -13,76 +13,77 @@ by ... [TODO: clarify my funding]
 
 <h3>Motivation</h3>
 
-The motivation for using simplex meshes (as done in step-3simplex) is straight
-forward: many freely available mesh-generation tools are very good in creating
-good quality meshes in such a format while they struggle with hex-only meshes.
-Hex-only meshes on the other hand are characterized with better numerical
-properties (e.g., less degrees of freedom for the same degree of accuracy and
-possibly better performance since the tensor-product structure can be
-exploited) and are as a consequence the natural choice for rather simple
+The motivation for using simplex meshes (as done in step-3simplex) is
+straightforward: many freely available mesh-generation tools are very good in
+creating good-quality meshes in such a format, while they struggle with hex-only
+meshes. Hex-only meshes, on the other hand, are characterized with better
+numerical properties (e.g., less degrees of freedom for the same degree of
+accuracy and possibly better performance since the tensor-product structure can
+be exploited) and are, as a consequence, the natural choice for rather simple
 geometries and for meshes described by a coarse mesh with a few cells
-(like, a hyperball) and obtained in their final form through iterative local
+(like a hyperball) and obtained in their final form through iterative local
 refinement.
 
 Mixed meshes try to combine the best of both worlds by partitioning the geometry
 in parts that can be easily meshed by hypercube cells (quadrilaterals in 2D,
 hexahedrons in 3D) and in parts that can not be meshed easily, requiring
-simplices (triangles in 2D, tetrahedons in 3D). Since one assumes that the
+simplices (triangles in 2D, tetrahedrons in 3D). Since one assumes that the
 region requiring simplices is rather small compared to the rest of the domain
 where more efficient and accurate methods can be applied, one can expect that
 the overall efficiency is hardly impacted by such an approach.
 
-One should not that in 3D, one also needs a transition region between hypercube
+One should note that in 3D, one also needs a transition region between hypercube
 and simplex regions. Here, one can use wedges/prisms and/or pyramids.
 
 
 <h3>Working with mixed meshes</h3>
 
 <i>
-In the following, we concentrate for sake of simplicity on 2D meshes: they
-can only contain triangles and quadrilaterals. However as detailed in the
-outlook, an extension of the presented approach to the 3D case is straight
-forward.
+In the following, we concentrate, for the sake of simplicity, on 2D meshes: they
+can only contain triangles and quadrilaterals. However, as detailed in the
+outlook, an extension of the presented approach to the 3D case is
+straightforward.
 </i>
 
-The complexity of working with mixed meshes in 2D is that it contains of two
+The complexity of working with mixed meshes in 2D results from the fact
+that it contains of two
 types of geometrical objects: quadrilaterals and triangles. How to deal with
-quadrilaterals, we have discussed in step-3: we select an appropriate finite
-elements, quadrature rule, mapping object, e.g., FE_Q, QGauss, and MappingFE
+quadrilaterals, we have discussed in step-3: we selected an appropriate finite
+element, quadrature rule and mapping object, e.g., FE_Q, QGauss, and MappingFE
 (initialized with FE_Q). For simplex meshes, we selected in step-3simplex
 FE_SimplexP, QGaussSimplex, and MappingFE (intialized with FE_SimplexP).
 
 For mixed meshes, we need multiple finite elements, quadrature rules, and
 mapping objects (one set for triangles and one set for quadrilaterals) in the
-same program. To ease the work with the multitude of object (in particular in
-3D, we need at least four of each), you can collect the object and group them
+same program. To ease the work with the multitude of objects (in particular in
+3D, we need at least four of each), you can collect the objects and group them
 together in hp::FECollection, hp::QCollection, and hp::MappingCollection.
 
-Just like in the context of finite element, quadrature rule, and mapping object,
-we need multiple FEValues objects: the collection of FEValues is called
+Just like in the context of finite elements, quadrature rules, and mapping
+objects, we need multiple FEValues objects: the collection of FEValues is called
 hp::FEValues. It returns the FEValues object needed for the current cell via
 the method hp::FEValues::get_present_fe_values().
 
-For hp::FEValues to be able to select, the right finite element/quadrature rule/
-mapping object set, it queries during hp::FEValues::reinit() the active_fe_index
-of the given cell. The indices have to be set - as shown below -  before calling
-DoFHandler::distribute_dofs() by the user.
+For hp::FEValues, to be able to select the right finite element/quadrature rule/
+mapping object set, it queries the active_fe_index of the given cell during
+hp::FEValues::reinit(). The indices have to be set - as shown below -  before
+calling DoFHandler::distribute_dofs() by the user.
 
 <i>
 The namespace name of hp::FECollection, hp::QCollection, hp::MappingCollection,
-and hp::FEValues indicate that these classes have not been written for mixed
-meshes in the first place but for problems where each (hypercube) cell could
-have a different type of finite element assigned - in the simplest case all
-cells have the same element type but different polynomial degree p (the reason
-for the letter "p"). An extension of this infrastructure to work not only
-on different element types but also to work on different geometrical object
+and hp::FEValues indicates that these classes have not been written for mixed
+meshes in the first place, but for problems where each (hypercube) cell could
+have a different type of finite element assigned - in the simplest case, all
+cells have the same element type but different polynomial degrees p (the reason
+for the letter "p" in "hp"). An extension of this infrastructure to work not
+only on different element types but also on different geometrical objects
 was a natural choice. For further details on hp-methods, see step-27.
 </i>
 
 <h3>Mesh generation</h3>
 
 Just like in step-3simplex, we read an externally generated mesh. For this
-tutorial, we have created the mesh (square with width and hight of one;
+tutorial, we have created the mesh (square with width and height of one;
 quadrilaterals on the left half and triangles on the right half) with Gmsh with
 the following journal file "box_2D_mixed.geo":
 
@@ -97,11 +98,11 @@ Save "box_2D_mixed.msh";
 @endcode
 
 The journal file can be processed by Gmsh generating the actual mesh with the
-ending ".geo":
+ending ".msh":
 
 @code
 gmsh box_2D_mixed.geo
 @endcode
 
 We have included in the tutorial folder both the journal file and the mesh file
-in the case one does not have access to Gmsh.
+in the event that one does not have access to Gmsh.

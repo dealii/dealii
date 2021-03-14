@@ -22,7 +22,7 @@
 
 // @sect3{Include files}
 
-// Include files as used in step-3:
+// Include files, as used in step-3:
 #include <deal.II/base/function.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -46,7 +46,7 @@
 #include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/mapping_fe.h>
 
-// The following class contains the class GridIn that allows us to read
+// The following file contains the class GridIn, which allows us to read
 // external meshes.
 #include <deal.II/grid/grid_in.h>
 
@@ -74,7 +74,7 @@ private:
 
   Triangulation<2> triangulation;
 
-  // Here we select mapping object, finite elements, and quadrature rules
+  // Here, we select a mapping object, a finite element, and a quadrature rule
   // that are compatible with simplex meshes.
   const MappingFE<2>     mapping;
   const FE_SimplexP<2>   fe;
@@ -106,7 +106,7 @@ Step3::Step3()
 
 // @sect4{Step3::make_grid}
 //
-// Read the external mesh file "box_2D_tri.msh" as in step-3-simplex.
+// Read the external mesh file "box_2D_tri.msh" as in step-3.
 void Step3::make_grid()
 {
   GridIn<2>(triangulation).read("box_2D_tri.msh");
@@ -118,15 +118,15 @@ void Step3::make_grid()
 
 // @sect4{Step3::setup_system}
 //
-// From here on nothing has changed.  In particular, the
-// the cell integrals have not been changed depending if one operates on
-// hypercube or simplex meshes. This is astonishing and is possible dut to the
+// From here on, nothing has changed. Not even, the
+// cell integrals have been changed depending on whether one operates on
+// hypercube or simplex meshes. This is astonishing and is possible due to the
 // design of the following two classes:
 //  - DoFHandler: this class stores degrees of freedom in a flexible way and
 //    allows simple access to them depending on the element type independent of
 //    the cell type.
 //  - FEValues: this class hides the details of finite element, quadrature rule,
-//    and mapping (even if the implementations might be inherently different)
+//    and mapping (even if the implementations are inherently different)
 //    behind a unified interface.
 void Step3::setup_system()
 {
