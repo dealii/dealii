@@ -41,7 +41,7 @@
 #include <fstream>
 #include <iostream>
 
-// Include files as added int step-3-simplex:
+// Include files as added int step-3simplex:
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/mapping_fe.h>
@@ -60,7 +60,7 @@ using namespace dealii;
 // @sect3{The <code>Step3</code> class}
 //
 // This is the main class of the tutorial. Since it is very similar to the
-// version from step-3 and step-3-simplex, we will only point out and explain
+// version from step-3 and step-3simplex, we will only point out and explain
 // the relevant differences that allow to perform simulations on mixed meshes.
 
 class Step3
@@ -110,7 +110,7 @@ Step3::Step3()
 
 // @sect4{Step3::make_grid}
 //
-// Read the external mesh file "box_2D_mixed.msh" as in step-3-simplex.
+// Read the external mesh file "box_2D_mixed.msh" as in step-3simplex.
 void Step3::make_grid()
 {
   GridIn<2>(triangulation).read("box_2D_mixed.msh");
@@ -122,7 +122,7 @@ void Step3::make_grid()
 
 // @sect4{Step3::setup_system}
 //
-// In contrast to step-3 and step-3-simplex, we need here a preprocessing step
+// In contrast to step-3 and step-3simplex, we need here a preprocessing step
 // that assigns to each cell an active_fe_index consistently according to the
 // indices in the collections and the cell type.
 void Step3::setup_system()
@@ -154,7 +154,7 @@ void Step3::setup_system()
 // @sect4{Step3::assemble_system}
 //
 // The following function looks similar to the version in step-3 and
-// step-3-simplex with the following two differences:
+// step-3simplex with the following two differences:
 //  - We do not work with FEValues directly but with the collection class
 //    hp::FEValues. It gives us - after it has been initialized with the current
 //    cell - a reference to the right FEValues object (constructed

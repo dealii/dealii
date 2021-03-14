@@ -13,7 +13,7 @@ by ... [TODO: clarify my funding]
 
 <h3>Motivation</h3>
 
-The motivation for using simplex meshes (as done in step-3-simplex) is straight
+The motivation for using simplex meshes (as done in step-3simplex) is straight
 forward: many freely available mesh-generation tools are very good in creating
 good quality meshes in such a format while they struggle with hex-only meshes.
 Hex-only meshes on the other hand are characterized with better numerical
@@ -49,7 +49,7 @@ The complexity of working with mixed meshes in 2D is that it contains of two
 types of geometrical objects: quadrilaterals and triangles. How to deal with
 quadrilaterals, we have discussed in step-3: we select an appropriate finite
 elements, quadrature rule, mapping object, e.g., FE_Q, QGauss, and MappingFE
-(initialized with FE_Q). For simplex meshes, we selected in step-3-simplex
+(initialized with FE_Q). For simplex meshes, we selected in step-3simplex
 FE_SimplexP, QGaussSimplex, and MappingFE (intialized with FE_SimplexP).
 
 For mixed meshes, we need multiple finite elements, quadrature rules, and
@@ -81,7 +81,7 @@ was a natural choice. For further details on hp-methods, see step-27.
 
 <h3>Mesh generation</h3>
 
-Just like in step-3-simplex, we read an externally generated mesh. For this
+Just like in step-3simplex, we read an externally generated mesh. For this
 tutorial, we have created the mesh (square with width and hight of one;
 quadrilaterals on the left half and triangles on the right half) with Gmsh with
 the following journal file "box_2D_mixed.geo":

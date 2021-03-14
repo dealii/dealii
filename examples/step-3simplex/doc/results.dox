@@ -41,7 +41,7 @@ In step-3, we considered meshes only consisting of quadrilaterals. Here, we
 considered the case that the mesh only consists of triangles. However, in the
 general case (also known as mixed mesh) the mesh might consists of both cell
 types. In 3D, meshes might even consist of more cell types, like, wedges/prisms
-and pyramids. We consider such meshes in the tutorial step-3-mixed.
+and pyramids. We consider such meshes in the tutorial step-3mixed.
 
 
 <h4>Alternative finite elements, quadrature rules, and mapping objects</h4>
