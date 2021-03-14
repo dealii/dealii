@@ -41,9 +41,9 @@ IF(NOT DEAL_II_WITH_OPENCASCADE) # keep in one line
   MESSAGE(FATAL_ERROR "
 Error! This tutorial requires a deal.II library that was configured with the following options:
     DEAL_II_WITH_OPENCASCADE = ON
-However, the deal.II library found at ${DEAL_II_PATH} was configured with these options
+However, the deal.II library found at ${DEAL_II_PATH} was configured with these options:
     DEAL_II_WITH_OPENCASCADE = ${DEAL_II_WITH_OPENCASCADE}
-which conflict with the requirements."
+This conflicts with the requirements."
     )
 ENDIF()
 

@@ -43,11 +43,11 @@ Error! This tutorial requires a deal.II library that was configured with the fol
     DEAL_II_WITH_MPI = ON
     DEAL_II_WITH_P4EST = ON
     DEAL_II_WITH_CUDA = ON
-However, the deal.II library found at ${DEAL_II_PATH} was configured with these options
+However, the deal.II library found at ${DEAL_II_PATH} was configured with these options:
     DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}
     DEAL_II_WITH_P4EST = ${DEAL_II_WITH_P4EST}
     DEAL_II_WITH_CUDA = ${DEAL_II_WITH_CUDA}
-which conflict with the requirements."
+This conflicts with the requirements."
     )
 ENDIF()
 
