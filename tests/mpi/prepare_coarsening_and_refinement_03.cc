@@ -80,10 +80,9 @@ test(parallel::TriangulationBase<dim> &tria,
   for (unsigned int i = 0; i < n_refinements; ++i)
     {
       for (const auto &cell : tria.active_cell_iterators())
-        if (cell->is_locally_owned())
-          for (unsigned int v = 0; v < cell->n_vertices(); ++v)
-            if (cell->vertex(v)[0] == 0.)
-              cell->set_refine_flag();
+        for (unsigned int v = 0; v < cell->n_vertices(); ++v)
+          if (cell->vertex(v)[0] == 0.)
+            cell->set_refine_flag();
 
       tria.execute_coarsening_and_refinement();
     }
