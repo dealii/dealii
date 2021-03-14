@@ -23,6 +23,18 @@ DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
 DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
 DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
 DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   2_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   3_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   4_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
 DEAL::
 DEAL::*******   degree 0   *******   orientation case 1   *******
 DEAL::Element Info:  
@@ -45,7 +57,19 @@ DEAL::   n_base_elements      : 1
 DEAL::
 DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
 DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
 DEAL::Normal jumps (at quad points) in cell   1_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   2_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   3_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   4_0:   at face   2
 DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
 DEAL::
 DEAL::*******   degree 0   *******   orientation case 2   *******
@@ -67,9 +91,21 @@ DEAL::   n_components         : 2
 DEAL::   n_blocks             : 1
 DEAL::   n_base_elements      : 1
 DEAL::
-DEAL::Normal jumps (at quad points) in cell   0_0:   at face   2
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
 DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
 DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   2_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   3_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   4_0:   at face   2
 DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
 DEAL::
 DEAL::*******   degree 0   *******   orientation case 3   *******
@@ -91,9 +127,21 @@ DEAL::   n_components         : 2
 DEAL::   n_blocks             : 1
 DEAL::   n_base_elements      : 1
 DEAL::
-DEAL::Normal jumps (at quad points) in cell   0_0:   at face   2
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   2
 DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
 DEAL::Normal jumps (at quad points) in cell   1_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   2_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   3_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   4_0:   at face   2
 DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
 DEAL::
 DEAL::*******   degree 1   *******   orientation case 0   *******
@@ -119,6 +167,18 @@ DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
 DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
 DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
 DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   2_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   3_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   4_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
 DEAL::
 DEAL::*******   degree 1   *******   orientation case 1   *******
 DEAL::Element Info:  
@@ -141,7 +201,19 @@ DEAL::   n_base_elements      : 1
 DEAL::
 DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
 DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
 DEAL::Normal jumps (at quad points) in cell   1_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   2_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   3_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   4_0:   at face   2
 DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
 DEAL::
 DEAL::*******   degree 1   *******   orientation case 2   *******
@@ -163,9 +235,21 @@ DEAL::   n_components         : 2
 DEAL::   n_blocks             : 1
 DEAL::   n_base_elements      : 1
 DEAL::
-DEAL::Normal jumps (at quad points) in cell   0_0:   at face   2
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
 DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
 DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   2_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   3_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   4_0:   at face   2
 DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
 DEAL::
 DEAL::*******   degree 1   *******   orientation case 3   *******
@@ -187,7 +271,19 @@ DEAL::   n_components         : 2
 DEAL::   n_blocks             : 1
 DEAL::   n_base_elements      : 1
 DEAL::
-DEAL::Normal jumps (at quad points) in cell   0_0:   at face   2
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   2
 DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
 DEAL::Normal jumps (at quad points) in cell   1_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   2_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   3_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   4_0:   at face   2
 DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   

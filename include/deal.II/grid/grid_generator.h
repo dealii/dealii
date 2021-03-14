@@ -779,29 +779,26 @@ namespace GridGenerator
                       const double        radius = 1.);
 
   /**
-   * Generate a 2D mesh consisting of the unit square joined with a copy shifted
-   * by $s = (1,0)$. Depending on the flags passed either the right or the left
-   * square is rotated by $\pi/2$. This way one can generate a mesh in which one
-   * square possibly contains an edge that has the opposite tangential (and
-   * hence also opposite normal) orientation of the neighboring edge of the
-   * other square.
+   * Generate a 2D mesh consisting of five squares arranged in a plus-shape.
+   * Depending on the number <code>n_rotate_middle_square</code> passed the
+   * middle square is rotated by a degree of
+   * <code>n_rotate_middle_square</code>$\pi/2$. This way one can generate a
+   * mesh in which the middle square contains edges that have the opposite
+   * tangential and/or opposite normal orientation compared to the neighboring
+   * edges of the other squares.
    *
    * This mesh is not overly useful from a practical point of view. For
    * debugging purposes it can be used to check for orientation issues for
    * vector- or tensor-valued finite elements.
    *
-   * @note If <code>rotate_left_square==rotate_right_square</code> the mesh is consistently oriented.
-   *
    * @param[out] tria The input triangulation.
-   * @param[in] rotate_left_square <code>true</code> if the left square is
-   * rotated by $\pi/2$.
-   * @param[in] rotate_right_square <code>true</code> if the right square is
-   * rotated by $\pi/2$.
+   * @param[in] n_rotate_middle_square number of rotations in [0,4) of right
+   * square by
+   * $\pi/2$.
    */
   void
-  non_standard_orientation_mesh(Triangulation<2> &tria,
-                                const bool        rotate_left_square,
-                                const bool        rotate_right_square);
+  non_standard_orientation_mesh(Triangulation<2> & tria,
+                                const unsigned int n_rotate_middle_square);
 
   /**
    * Generate a 3D mesh consisting of the unit cube joined with a copy shifted
