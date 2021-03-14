@@ -29,7 +29,6 @@
 #include <deal.II/base/timer.h>
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 

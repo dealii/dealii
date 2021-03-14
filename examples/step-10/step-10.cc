@@ -23,13 +23,10 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/fe/fe_values.h>
 
 // This include file is new. Even if we are not solving a PDE in this tutorial,

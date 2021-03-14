@@ -21,8 +21,6 @@
 // The first few includes are just like in the previous program, so do not
 // require additional comments:
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 
 // However, the next file is new. We need this include file for the
