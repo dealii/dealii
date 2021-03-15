@@ -30,7 +30,6 @@
 #include <functional>
 #include <list>
 #include <set>
-#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -689,9 +688,10 @@ namespace parallel
                        const unsigned int n_attached_deserialize_variable);
 
     /**
-     * Go through all cells and store the relations between locally
-     * owned quadrants and cells in the private member
-     * local_cell_relations.
+     * Go through all cells and store the relations between a deal.II cell and
+     * its current CellStatus in the private member local_cell_relations.
+     * For an extensive description of CellStatus, see the documentation
+     * for the member function register_data_attach().
      *
      * The stored vector will be ordered by the occurrence of quadrants.
      */
@@ -704,12 +704,12 @@ namespace parallel
      * description of the latter, see the documentation for the member
      * function register_data_attach().
      */
-    using cell_relation_t = typename std::tuple<CellStatus, cell_iterator>;
+    using cell_relation_t = typename std::pair<cell_iterator, CellStatus>;
 
     /**
-     * Vector of tuples, which each contain a deal.II cell
+     * Vector of pair, each containing a deal.II cell iterator
      * and their relation after refinement. To update its contents, use the
-     * compute_cell_relations member function.
+     * update_cell_relations() member function.
      *
      * The size of this vector is assumed to be equal to the number of locally
      * owned quadrants in the parallel_forest object.

@@ -33,7 +33,6 @@
 #include <functional>
 #include <list>
 #include <set>
-#include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -695,8 +694,8 @@ namespace parallel
       typename dealii::internal::p4est::types<dim>::ghost *parallel_ghost;
 
       /**
-       * Go through all p4est trees and store the relations between the status
-       * of locally owned quadrants and cells in the private member
+       * Go through all p4est trees and store the relations between a deal.II
+       * cell and its current CellStatus in the private member
        * local_cell_relations.
        *
        * The stored vector will be ordered by the occurrence of quadrants in

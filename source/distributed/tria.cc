@@ -934,14 +934,14 @@ namespace
   }
 
   template <int dim, int spacedim>
-  using cell_relation_t = typename std::tuple<
-    typename dealii::Triangulation<dim, spacedim>::CellStatus,
-    typename dealii::Triangulation<dim, spacedim>::cell_iterator>;
+  using cell_relation_t = typename std::pair<
+    typename dealii::Triangulation<dim, spacedim>::cell_iterator,
+    typename dealii::Triangulation<dim, spacedim>::CellStatus>;
 
   /**
-   * Adds a tuple of a p4est quadrant, @p status and @p dealii_cell
+   * Adds a pair of a @p dealii_cell and its @p status
    * to the vector containing all relations @p cell_rel.
-   * The tuple will be inserted in the position corresponding to the one
+   * The pair will be inserted in the position corresponding to the one
    * of the p4est quadrant in the underlying p4est sc_array. The position
    * will be determined from @p idx, which is the position of the quadrant
    * in its corresponding @p tree. The p4est quadrant will be deduced from
@@ -962,7 +962,7 @@ namespace
     Assert(local_quadrant_index < cell_rel.size(), ExcInternalError());
 
     // store relation
-    cell_rel[local_quadrant_index] = std::make_tuple(status, dealii_cell);
+    cell_rel[local_quadrant_index] = std::make_pair(dealii_cell, status);
   }
 
 
@@ -1032,7 +1032,7 @@ namespace
     else if (!p4est_has_children && !dealii_cell->has_children())
       {
         // this active cell didn't change
-        // save tuple into corresponding position
+        // save pair into corresponding position
         add_single_cell_relation<dim, spacedim>(
           cell_rel,
           tree,
@@ -1455,7 +1455,7 @@ namespace parallel
         {
           (void)cell_rel;
           Assert(
-            (std::get<0>(cell_rel) == // cell_status
+            (cell_rel.second == // cell_status
              parallel::distributed::Triangulation<dim, spacedim>::CELL_PERSIST),
             ExcInternalError());
         }
@@ -3391,8 +3391,8 @@ namespace parallel
       // in the same order p4est will encounter them during repartitioning.
       for (const auto &cell_rel : this->local_cell_relations)
         {
-          const auto &cell_status = std::get<0>(cell_rel);
-          const auto &cell_it     = std::get<1>(cell_rel);
+          const auto &cell_it     = cell_rel.first;
+          const auto &cell_status = cell_rel.second;
 
           switch (cell_status)
             {

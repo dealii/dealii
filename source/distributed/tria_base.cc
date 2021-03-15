@@ -745,7 +745,7 @@ namespace parallel
           {
             (void)cell_rel;
             Assert(
-              (std::get<0>(cell_rel) == // cell_status
+              (cell_rel.second == // cell_status
                parallel::DistributedTriangulationBase<dim,
                                                       spacedim>::CELL_PERSIST),
               ExcInternalError());
@@ -819,7 +819,7 @@ namespace parallel
       {
         // reset all cell_status entries after coarsening/refinement
         for (auto &cell_rel : local_cell_relations)
-          std::get<0>(cell_rel) =
+          cell_rel.second =
             parallel::DistributedTriangulationBase<dim, spacedim>::CELL_PERSIST;
       }
   }
@@ -893,8 +893,8 @@ namespace parallel
       auto data_cell_variable_it = packed_variable_size_data.begin();
       for (; cell_rel_it != cell_relations.cend(); ++cell_rel_it)
         {
-          const auto &cell_status = std::get<0>(*cell_rel_it);
-          const auto &dealii_cell = std::get<1>(*cell_rel_it);
+          const auto &dealii_cell = cell_rel_it->first;
+          const auto &cell_status = cell_rel_it->second;
 
           // Assertions about the tree structure.
           switch (cell_status)
@@ -1197,7 +1197,7 @@ namespace parallel
     for (; cell_rel_it != cell_relations.end();
          ++cell_rel_it, dest_fixed_it += sizes_fixed_cumulative.back())
       {
-        std::get<0>(*cell_rel_it) = // cell_status
+        cell_rel_it->second = // cell_status
           Utilities::unpack<typename parallel::DistributedTriangulationBase<
             dim,
             spacedim>::CellStatus>(dest_fixed_it,
@@ -1298,8 +1298,8 @@ namespace parallel
     auto dest_sizes_it = dest_sizes_variable.cbegin();
     for (; cell_rel_it != cell_relations.end(); ++cell_rel_it)
       {
-        const auto &cell_status = std::get<0>(*cell_rel_it);
-        const auto &dealii_cell = std::get<1>(*cell_rel_it);
+        const auto &dealii_cell = cell_rel_it->first;
+        const auto &cell_status = cell_rel_it->second;
 
         if (callback_variable_transfer)
           {
