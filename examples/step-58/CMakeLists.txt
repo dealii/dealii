@@ -42,10 +42,10 @@ IF(NOT (DEAL_II_WITH_UMFPACK AND DEAL_II_WITH_COMPLEX_VALUES)) # keep in one lin
 Error! This tutorial requires a deal.II library that was configured with the following options:
     DEAL_II_WITH_UMFPACK        = ON
     DEAL_II_WITH_COMPLEX_VALUES = ON
-However, the deal.II library found at ${DEAL_II_PATH} was configured with these options
+However, the deal.II library found at ${DEAL_II_PATH} was configured with these options:
     DEAL_II_WITH_UMFPACK        = ${DEAL_II_WITH_UMFPACK}
     DEAL_II_WITH_COMPLEX_VALUES = ${DEAL_II_WITH_COMPLEX_VALUES}
-which conflict with the requirements."
+This conflicts with the requirements."
     )
 ENDIF()
 

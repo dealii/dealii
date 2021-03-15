@@ -41,9 +41,9 @@ IF(NOT DEAL_II_WITH_ZLIB) # keep in one line
   MESSAGE(FATAL_ERROR "
 Error! This tutorial requires a deal.II library that was configured with the following options:
   DEAL_II_WITH_ZLIB = ON
-However, the deal.II library found at ${DEAL_II_PATH} was configured with these options
+However, the deal.II library found at ${DEAL_II_PATH} was configured with these options:
   DEAL_II_WITH_ZLIB = ${DEAL_II_WITH_ZLIB}
-which conflict with the requirements."
+This conflicts with the requirements."
     )
 ENDIF()
 

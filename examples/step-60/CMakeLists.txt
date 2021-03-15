@@ -42,10 +42,10 @@ IF(NOT DEAL_II_WITH_UMFPACK OR NOT DEAL_II_WITH_MUPARSER) # keep in one line
 Error! This tutorial requires a deal.II library that was configured with the following options:
     DEAL_II_WITH_MUPARSER = ON
     DEAL_II_WITH_UMFPACK = ON
-However, the deal.II library found at ${DEAL_II_PATH} was configured with these options
+However, the deal.II library found at ${DEAL_II_PATH} was configured with these options:
     DEAL_II_WITH_MUPARSER = ${DEAL_II_WITH_MUPARSER}
     DEAL_II_WITH_UMFPACK = ${DEAL_II_WITH_UMFPACK}
-which conflict with the requirements."
+This conflicts with the requirements."
     )
 ENDIF()
 
