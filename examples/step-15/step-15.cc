@@ -673,13 +673,10 @@ namespace Step15
         data_out.add_data_vector(present_solution, "solution");
         data_out.add_data_vector(newton_update, "update");
         data_out.build_patches();
+
         const std::string filename =
           "solution-" + Utilities::int_to_string(refinement, 2) + ".vtk";
-        std::ofstream         output(filename);
-        DataOutBase::VtkFlags vtk_flags;
-        vtk_flags.compression_level =
-          DataOutBase::VtkFlags::ZlibCompressionLevel::best_speed;
-        data_out.set_flags(vtk_flags);
+        std::ofstream output(filename);
         data_out.write_vtu(output);
       }
   }
