@@ -18,6 +18,7 @@ jobs:
         ./contrib/utilities/download_clang_format
         sudo apt update && sudo apt install doxygen graphviz perl texlive-bibtex-extra
         doxygen --version
+
     - name: indent
       run: |
         ./contrib/utilities/check_indentation.sh
