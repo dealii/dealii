@@ -376,6 +376,15 @@ namespace MeshWorker
 
 
   template <int dim, int spacedim>
+  const GeneralDataStorage &
+  ScratchData<dim, spacedim>::get_general_data_storage() const
+  {
+    return user_data_storage;
+  }
+
+
+
+  template <int dim, int spacedim>
   const Mapping<dim, spacedim> &
   ScratchData<dim, spacedim>::get_mapping() const
   {
