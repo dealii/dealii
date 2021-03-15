@@ -16,7 +16,10 @@ jobs:
     - name: setup
       run: |
         ./contrib/utilities/download_clang_format
-        sudo apt update && sudo apt install doxygen graphviz perl texlive-bibtex-extra
+        sudo apt update && sudo apt install doxygen
+        sudo apt update && sudo apt install graphviz
+        sudo apt update && sudo apt install perl
+        sudo apt update && sudo apt install texlive-bibtex-extra
         doxygen --version
     - name: indent
       run: |
