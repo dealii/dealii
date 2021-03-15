@@ -32,6 +32,8 @@
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 
+#include <deal.II/numerics/vector_tools_evaluate.h>
+
 #include <functional>
 
 DEAL_II_NAMESPACE_OPEN
@@ -318,6 +320,25 @@ namespace
     (void)vector_ghosted;
   }
 #endif
+
+  template <int dim, typename Number>
+  Tensor<1, dim, Number>
+  add(const Tensor<1, dim, Number> a, const Tensor<1, dim, Number> b)
+  {
+    return a + b;
+  }
+
+  template <int dim, typename Number>
+  Tensor<1, dim, Number>
+  add(const Tensor<1, dim, Number> a, const Number b)
+  {
+    auto temp = a;
+
+    for (int i = 0; i < dim; ++i)
+      temp[i] += b;
+
+    return temp;
+  }
 } // namespace
 
 
@@ -365,11 +386,105 @@ MappingQCache<dim, spacedim>::initialize(
   const bool update_values_might_be_needed =
     ((is_fe_q || is_fe_dgq) && fe.degree == this->get_degree()) == false;
 
+  const auto mapping_q_generic =
+    dynamic_cast<const MappingQGeneric<dim, spacedim> *>(&mapping);
+
+  const bool do_setup_mg_levels = true; // TODO: make parameter
+
+  std::vector<Point<spacedim>> level_points;
+  std::vector<typename FEPointEvaluation<spacedim, dim>::value_type>
+                                         level_result;
+  std::vector<std::vector<unsigned int>> level_offsets;
+
+  if (do_setup_mg_levels)
+    {
+      level_offsets.resize(dof_handler.get_triangulation().n_levels());
+
+      for (unsigned int l = 0; l < level_offsets.size(); ++l)
+        level_offsets[l].resize(dof_handler.get_triangulation().n_cells(l));
+
+      QGaussLobatto<dim> quadrature_gl(this->polynomial_degree + 1);
+
+      std::vector<Point<dim>> quadrature_points;
+      for (const auto i : FETools::hierarchic_to_lexicographic_numbering<dim>(
+             this->polynomial_degree))
+        quadrature_points.push_back(quadrature_gl.point(i));
+      Quadrature<dim> quadrature(quadrature_points);
+
+      FEValues<dim, spacedim> fe_values(mapping,
+                                        fe_nothing,
+                                        quadrature,
+                                        update_quadrature_points);
+
+      // loop over all cell and ...
+      for (const auto &cell : dof_handler.cell_iterators())
+        {
+          if ((cell->level_subdomain_id() !=
+               numbers::artificial_subdomain_id) == false)
+            continue;
+
+          // ... compute local points
+          std::vector<Point<spacedim>> cell_points;
+
+          if (mapping_q_generic != nullptr &&
+              this->get_degree() == mapping_q_generic->get_degree())
+            cell_points =
+              mapping_q_generic->compute_mapping_support_points(cell);
+          else
+            {
+              fe_values.reinit(cell);
+              cell_points = fe_values.get_quadrature_points();
+            }
+
+          // store the points
+          level_offsets[cell->level()][cell->index()] = level_points.size();
+          level_points.insert(level_points.end(),
+                              cell_points.begin(),
+                              cell_points.end());
+        }
+
+      // evaluate solution at points
+      if constexpr (dim == spacedim) // TODO
+        {
+          Utilities::MPI::RemotePointEvaluation<dim, spacedim> evaluation_cache;
+          level_result =
+            VectorTools::evaluate_at_points<spacedim>(mapping,
+                                                      dof_handler,
+                                                      vector_ghosted,
+                                                      level_points,
+                                                      evaluation_cache);
+        }
+      else
+        {
+          Assert(false, ExcNotImplemented());
+        }
+    }
+
   // Step 2: loop over all cells
   this->initialize(
     dof_handler.get_triangulation(),
     [&](const typename Triangulation<dim, spacedim>::cell_iterator &cell_tria)
       -> std::vector<Point<spacedim>> {
+      // specialization for level cells
+      if (do_setup_mg_levels && cell_tria->is_active() == false &&
+          cell_tria->level_subdomain_id() != numbers::artificial_subdomain_id)
+        {
+          std::vector<Point<spacedim>> result(
+            Utilities::pow<unsigned int>(this->get_degree() + 1, dim));
+
+          const unsigned int offset =
+            level_offsets[cell_tria->level()][cell_tria->index()];
+
+          for (unsigned int i = 0, j = offset; i < result.size(); ++i, ++j)
+            if (vector_describes_relative_displacement)
+              result[i] =
+                Point<spacedim>(add(level_points[j], level_result[j]));
+            else
+              result[i] = Point<spacedim>(level_result[j]);
+
+          return result;
+        }
+
       const bool is_active_non_artificial_cell =
         (cell_tria->is_active() == true) &&
         (cell_tria->is_artificial() == false);
@@ -379,9 +494,6 @@ MappingQCache<dim, spacedim>::initialize(
         cell_tria->level(),
         cell_tria->index(),
         &dof_handler);
-
-      const auto mapping_q_generic =
-        dynamic_cast<const MappingQGeneric<dim, spacedim> *>(&mapping);
 
       // Step 2a) set up and reinit FEValues (if needed)
       if (((vector_describes_relative_displacement ||

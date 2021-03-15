@@ -124,7 +124,7 @@ do_test(const unsigned int degree,
     MappingQCache<dim>   mapping_cache(mapping_degree);
     mapping_cache.initialize(mapping,
                              dof_handler,
-                             vectors,
+                             vector,
                              is_displacement_function);
 
     const unsigned int rank = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);

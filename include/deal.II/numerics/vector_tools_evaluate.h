@@ -71,7 +71,7 @@ namespace VectorTools
   template <int n_components, int dim, int spacedim, typename VectorType>
   std::vector<typename FEPointEvaluation<n_components, dim>::value_type>
   evaluate_at_points(
-    const Mapping<dim> &                                  mapping,
+    const Mapping<dim, spacedim> &                        mapping,
     const DoFHandler<dim, spacedim> &                     dof_handler,
     const VectorType &                                    vector,
     const std::vector<Point<spacedim>> &                  evaluation_points,
@@ -103,7 +103,7 @@ namespace VectorTools
   template <int n_components, int dim, int spacedim, typename VectorType>
   inline std::vector<typename FEPointEvaluation<n_components, dim>::value_type>
   evaluate_at_points(
-    const Mapping<dim> &                                  mapping,
+    const Mapping<dim, spacedim> &                        mapping,
     const DoFHandler<dim, spacedim> &                     dof_handler,
     const VectorType &                                    vector,
     const std::vector<Point<spacedim>> &                  evaluation_points,
@@ -187,7 +187,7 @@ namespace VectorTools
     const EvaluationFlags::EvaluationFlags                      flags)
   {
     using value_type =
-      typename FEPointEvaluation<n_components, dim>::value_type;
+      typename FEPointEvaluation<n_components, dim, spacedim>::value_type;
 
     Assert(cache.is_ready(),
            ExcMessage(
@@ -208,15 +208,17 @@ namespace VectorTools
       // the results onto the points
       const auto fu = [&](auto &values, const auto &cell_data) {
         std::vector<typename VectorType::value_type> solution_values;
+        std::vector<double>                          solution_values_temp;
 
-        std::vector<std::unique_ptr<FEPointEvaluation<n_components, dim>>>
+        std::vector<
+          std::unique_ptr<FEPointEvaluation<n_components, dim, spacedim>>>
           evaluators(dof_handler.get_fe_collection().size());
 
         const auto get_evaluator = [&](const unsigned int active_fe_index)
-          -> FEPointEvaluation<n_components, dim> & {
+          -> FEPointEvaluation<n_components, dim, spacedim> & {
           if (evaluators[active_fe_index] == nullptr)
             evaluators[active_fe_index] =
-              std::make_unique<FEPointEvaluation<n_components, dim>>(
+              std::make_unique<FEPointEvaluation<n_components, dim, spacedim>>(
                 cache.get_mapping(), dof_handler.get_fe(active_fe_index));
 
           return *evaluators[active_fe_index];
@@ -224,7 +226,7 @@ namespace VectorTools
 
         for (unsigned int i = 0; i < cell_data.cells.size(); ++i)
           {
-            typename DoFHandler<dim>::active_cell_iterator cell = {
+            typename DoFHandler<dim, spacedim>::active_cell_iterator cell = {
               &cache.get_triangulation(),
               cell_data.cells[i].first,
               cell_data.cells[i].second,
@@ -242,11 +244,16 @@ namespace VectorTools
                                  solution_values.begin(),
                                  solution_values.end());
 
+            solution_values_temp.resize(solution_values.size());
+
+            for (unsigned int i = 0; i < solution_values_temp.size(); ++i)
+              solution_values_temp[i] = solution_values[i];
+
             auto &evaluator = get_evaluator(cell->active_fe_index());
 
             evaluator.evaluate(cell,
                                unit_points,
-                               solution_values,
+                               solution_values_temp,
                                dealii::EvaluationFlags::values);
 
             for (unsigned int q = 0; q < unit_points.size(); ++q)
