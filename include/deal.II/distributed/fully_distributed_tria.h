@@ -266,7 +266,7 @@ namespace parallel
 
       /**
        * Go through all locally owned cells and store the relations between
-       * cells and their status in the private member local_cell_relations.
+       * cells and their CellStatus in the private member local_cell_relations.
        *
        * The stored vector will be ordered by the occurrence of cells.
        */

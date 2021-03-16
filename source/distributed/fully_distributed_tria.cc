@@ -419,7 +419,7 @@ namespace parallel
             continue;
 
           this->local_cell_relations[cell_id] =
-            std::make_tuple(Triangulation<dim, spacedim>::CELL_PERSIST, cell);
+            std::make_pair(cell, Triangulation<dim, spacedim>::CELL_PERSIST);
           ++cell_id;
         }
     }
