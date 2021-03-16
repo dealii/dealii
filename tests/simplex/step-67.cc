@@ -13,11 +13,24 @@
  *
  * ---------------------------------------------------------------------
  *
- * Author: Martin Kronbichler, 2020
+ * step-67 on a simplex mesh (only testcase = 0 is tested). The major
+ * modifications are:
+ * - Since MatrixFreeOperators::CellwiseInverseMassMatrix cannot be used, the
+ *   following two places are changed:
+ *   - EulerOperator::project() is replaced by VectorTools::project().
+ *   - The linear system is solved globally by first using
+ * MatrixFreeOperators::MassOperator to generate the matrix and then using CG to
+ * solve it, instead of using EulerOperator::local_apply_inverse_mass_matrix()
+ *
+ * - The function GridGenerator::hyper_rectangle() is only working for hypercube
+ * meshes. Use it to create a temporary mesh and then convert it to a simplex
+ * mesh.
+ *
+ *
  */
 
-// The include files are similar to the previous matrix-free tutorial programs
-// step-37, step-48, and step-59
+
+
 //#define HEX
 
 #include <deal.II/base/conditional_ostream.h>
@@ -802,13 +815,6 @@ namespace Euler_DG
       const std::pair<unsigned int, unsigned int> &     cell_range) const;
 
     void
-    local_apply_vmult(
-      const MatrixFree<dim, Number> &                   data,
-      LinearAlgebra::distributed::Vector<Number> &      dst,
-      const LinearAlgebra::distributed::Vector<Number> &src,
-      const std::pair<unsigned int, unsigned int> &     cell_range) const;
-
-    void
     local_apply_face(
       const MatrixFree<dim, Number> &                   data,
       LinearAlgebra::distributed::Vector<Number> &      dst,
@@ -1120,33 +1126,6 @@ namespace Euler_DG
                                  EvaluationFlags::nothing) |
                                 EvaluationFlags::gradients,
                               dst);
-      }
-  }
-
-  template <int dim, int degree, int n_points_1d>
-  void
-  EulerOperator<dim, degree, n_points_1d>::local_apply_vmult(
-    const MatrixFree<dim, Number> &,
-    LinearAlgebra::distributed::Vector<Number> &      dst,
-    const LinearAlgebra::distributed::Vector<Number> &src,
-    const std::pair<unsigned int, unsigned int> &     cell_range) const
-  {
-#ifdef HEX
-    FEEvaluation<dim, degree, n_points_1d, dim + 2, Number> phi(data);
-#else
-    FEEvaluation<dim, -1, n_points_1d, dim + 2, Number>     phi(data);
-#endif
-
-    for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
-      {
-        phi.reinit(cell);
-        phi.gather_evaluate(src, EvaluationFlags::values);
-
-        for (unsigned int q = 0; q < phi.n_q_points; ++q)
-          {
-            phi.submit_value(phi.get_value(q), q);
-          }
-        phi.integrate_scatter(EvaluationFlags::values, dst);
       }
   }
 
@@ -1486,19 +1465,6 @@ namespace Euler_DG
     }
   }
 
-  template <int dim, int degree, int n_points_1d>
-  void
-  EulerOperator<dim, degree, n_points_1d>::vmult(
-    LinearAlgebra::distributed::Vector<Number> &      dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const
-  {
-    {
-      TimerOutput::Scope t(timer, "apply - vmult");
-
-      data.cell_loop(&EulerOperator::local_apply_vmult, this, dst, src, true);
-    }
-  }
-
   // Let us move to the function that does an entire stage of a Runge--Kutta
   // update. It calls EulerOperator::apply() followed by some updates
   // to the vectors, namely `next_ri = solution + factor_ai * k_i` and
@@ -1614,12 +1580,11 @@ namespace Euler_DG
       std::shared_ptr<MatrixFree<dim, Number>> matrix_free(
         new MatrixFree<dim, Number>(data));
       mass_matrix.initialize(matrix_free);
-      mass_matrix.compute_diagonal();
 
       ReductionControl control(6 * vec_ki.size(), 0., 1e-12, false, false);
       SolverCG<LinearAlgebra::distributed::Vector<Number>> cg(control);
 
-      cg.solve(*this, next_ri, vec_ki, PreconditionIdentity());
+      cg.solve(mass_matrix, next_ri, vec_ki, PreconditionIdentity());
 
       const Number ai = factor_ai;
       const Number bi = factor_solution;
