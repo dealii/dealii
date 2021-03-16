@@ -533,6 +533,59 @@ namespace Functions
     const unsigned int n_components)
     : ConstantFunction<dim, RangeNumberType>(RangeNumberType(), n_components)
   {}
+
+
+
+  template <int dim, typename RangeNumberType>
+  IdentityFunction<dim, RangeNumberType>::IdentityFunction()
+    : Function<dim, RangeNumberType>(dim)
+  {}
+
+
+
+  template <int dim, typename RangeNumberType>
+  RangeNumberType
+  IdentityFunction<dim, RangeNumberType>::value(
+    const Point<dim> & p,
+    const unsigned int component) const
+  {
+    AssertIndexRange(component, this->n_components);
+    return p[component];
+  }
+
+
+
+  template <int dim, typename RangeNumberType>
+  Tensor<1, dim, RangeNumberType>
+  IdentityFunction<dim, RangeNumberType>::gradient(
+    const Point<dim> &,
+    const unsigned int component) const
+  {
+    AssertIndexRange(component, this->n_components);
+    Tensor<1, dim, RangeNumberType> result;
+    result[component] = RangeNumberType(1);
+    return result;
+  }
+
+
+
+  template <int dim, typename RangeNumberType>
+  SymmetricTensor<2, dim, RangeNumberType>
+  IdentityFunction<dim, RangeNumberType>::hessian(const Point<dim> &,
+                                                  const unsigned int) const
+  {
+    return SymmetricTensor<2, dim, RangeNumberType>();
+  }
+
+
+
+  template <int dim, typename RangeNumberType>
+  RangeNumberType
+  IdentityFunction<dim, RangeNumberType>::laplacian(const Point<dim> &,
+                                                    const unsigned int) const
+  {
+    return 0;
+  }
 } // namespace Functions
 
 //---------------------------------------------------------------------------

@@ -516,6 +516,51 @@ namespace Functions
     explicit ZeroFunction(const unsigned int n_components = 1);
   };
 
+  /**
+   * A function whose output is also its input. One possible application of this
+   * function is interpolating or projecting a finite element field that
+   * represents spatial coordinates: e.g., one can set up a finite element field
+   * to interpolate the vertices of a Triangulation with this function, which is
+   * useful when doing calculations in a Lagrangian reference frame.
+   *
+   * @ingroup functions
+   */
+  template <int dim, typename RangeNumberType = double>
+  class IdentityFunction : public Function<dim, RangeNumberType>
+  {
+  public:
+    /**
+     * Constructor. The number of components is set to dim.
+     */
+    IdentityFunction();
+
+    /**
+     * @copydoc Function::value()
+     */
+    virtual RangeNumberType
+    value(const Point<dim> &p, const unsigned int component = 0) const override;
+
+    /**
+     * @copydoc Function::gradient()
+     */
+    virtual Tensor<1, dim, RangeNumberType>
+    gradient(const Point<dim> & p,
+             const unsigned int component = 0) const override;
+
+    /**
+     * @copydoc Function::laplacian()
+     */
+    virtual RangeNumberType
+    laplacian(const Point<dim> & p,
+              const unsigned int component = 0) const override;
+
+    /**
+     * @copydoc Function::hessian()
+     */
+    virtual SymmetricTensor<2, dim, RangeNumberType>
+    hessian(const Point<dim> & p,
+            const unsigned int component = 0) const override;
+  };
 } // namespace Functions
 
 
