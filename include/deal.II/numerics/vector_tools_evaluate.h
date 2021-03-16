@@ -208,7 +208,6 @@ namespace VectorTools
       // the results onto the points
       const auto fu = [&](auto &values, const auto &cell_data) {
         std::vector<typename VectorType::value_type> solution_values;
-        std::vector<double>                          solution_values_temp;
 
         std::vector<
           std::unique_ptr<FEPointEvaluation<n_components, dim, spacedim>>>
@@ -244,16 +243,13 @@ namespace VectorTools
                                  solution_values.begin(),
                                  solution_values.end());
 
-            solution_values_temp.resize(solution_values.size());
-
-            for (unsigned int i = 0; i < solution_values_temp.size(); ++i)
-              solution_values_temp[i] = solution_values[i];
-
             auto &evaluator = get_evaluator(cell->active_fe_index());
 
             evaluator.evaluate(cell,
                                unit_points,
-                               solution_values_temp,
+                               ArrayView<const typename VectorType::value_type>(
+                                 solution_values.data(),
+                                 solution_values.size()),
                                dealii::EvaluationFlags::values);
 
             for (unsigned int q = 0; q < unit_points.size(); ++q)

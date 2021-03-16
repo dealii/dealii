@@ -447,12 +447,13 @@ MappingQCache<dim, spacedim>::initialize(
       if constexpr (dim == spacedim) // TODO
         {
           Utilities::MPI::RemotePointEvaluation<dim, spacedim> evaluation_cache;
+          evaluation_cache.reinit(level_points,
+                                  dof_handler.get_triangulation(),
+                                  mapping);
           level_result =
-            VectorTools::evaluate_at_points<spacedim>(mapping,
+            VectorTools::evaluate_at_points<spacedim>(evaluation_cache,
                                                       dof_handler,
-                                                      vector_ghosted,
-                                                      level_points,
-                                                      evaluation_cache);
+                                                      vector_ghosted);
         }
       else
         {
