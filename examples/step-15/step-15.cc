@@ -595,52 +595,37 @@ namespace Step15
   // @sect4{MinimalSurfaceProblem::run}
 
   // In the run function, we build the first grid and then have the top-level
-  // logic for the Newton iteration. The function has two variables, one that
-  // indicates whether this is the first time we solve for a Newton update and
-  // one that indicates the refinement level of the mesh:
+  // logic for the Newton iteration.
+  //
+  // As described in the introduction, the domain is the unit disk around
+  // the origin, created in the same way as shown in step-6. The mesh is
+  // globally refined twice followed later on by several adaptive cycles.
+  //
+  // Before starting the Newton loop, we also need to do a bit of
+  // setup work: We need to create the basic data structures and
+  // ensure that the first Newton iterate already has the correct
+  // boundary values, as discussed in the introduction.
   template <int dim>
   void MinimalSurfaceProblem<dim>::run()
   {
-    unsigned int refinement = 0;
-    bool         first_step = true;
-
-    // As described in the introduction, the domain is the unit disk around
-    // the origin, created in the same way as shown in step-6. The mesh is
-    // globally refined twice followed later on by several adaptive cycles:
     GridGenerator::hyper_ball(triangulation);
     triangulation.refine_global(2);
+
+    setup_system(true);
+    set_boundary_values();
 
     // The Newton iteration starts next. During the first step we do not have
     // information about the residual prior to this step and so we continue
     // the Newton iteration until we have reached at least one iteration and
     // until residual is less than $10^{-3}$.
-    //
-    // At the beginning of the loop, we do a bit of setup work. In the first
-    // go around, we compute the solution on the twice globally refined mesh
-    // after setting up the basic data structures and ensuring that the first
-    // Newton iterate already has the correct boundary values. In all
-    // following mesh refinement loops, the mesh will be refined adaptively.
-    double previous_res = 0;
-    while (first_step || (previous_res > 1e-3))
+    double       previous_res     = 0;
+    unsigned int refinement_cycle = 0;
+    while ((refinement_cycle == 0) || (previous_res > 1e-3))
       {
-        if (first_step == true)
-          {
-            std::cout << "******** Initial mesh "
-                      << " ********" << std::endl;
+        std::cout << "Mesh refinement step " << refinement_cycle << std::endl;
 
-            setup_system(true);
-            set_boundary_values();
-
-            first_step = false;
-          }
-        else
-          {
-            ++refinement;
-            std::cout << "******** Refined mesh " << refinement << " ********"
-                      << std::endl;
-
-            refine_mesh();
-          }
+        if (refinement_cycle != 0)
+          refine_mesh();
 
         // On every mesh we do exactly five Newton steps. We print the initial
         // residual here and then start the iterations on this mesh.
@@ -664,9 +649,9 @@ namespace Step15
             std::cout << "  Residual: " << compute_residual(0) << std::endl;
           }
 
-        // Every fifth iteration, i.e., just before we refine the mesh again,
-        // we output the solution as well as the Newton update. This happens
-        // as in all programs before:
+        // Just before we refine the mesh again, we then output the
+        // solution as well as the Newton update, and increment the
+        // mesh refinement cycle counter by one:
         DataOut<dim> data_out;
 
         data_out.attach_dof_handler(dof_handler);
@@ -675,9 +660,12 @@ namespace Step15
         data_out.build_patches();
 
         const std::string filename =
-          "solution-" + Utilities::int_to_string(refinement, 2) + ".vtk";
+          "solution-" + Utilities::int_to_string(refinement_cycle, 2) + ".vtk";
         std::ofstream output(filename);
         data_out.write_vtu(output);
+
+        ++refinement_cycle;
+        std::cout << std::endl;
       }
   }
 } // namespace Step15
