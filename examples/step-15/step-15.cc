@@ -123,7 +123,7 @@ namespace Step15
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
 
-    Vector<double> present_solution;
+    Vector<double> current_solution;
     Vector<double> newton_update;
     Vector<double> system_rhs;
   };
@@ -188,7 +188,7 @@ namespace Step15
     if (initial_step)
       {
         dof_handler.distribute_dofs(fe);
-        present_solution.reinit(dof_handler.n_dofs());
+        current_solution.reinit(dof_handler.n_dofs());
 
         hanging_node_constraints.clear();
         DoFTools::make_hanging_node_constraints(dof_handler,
@@ -263,7 +263,7 @@ namespace Step15
         // cell with which the FEValues object has last been reinitialized.
         // The values of the gradients at all quadrature points are then written
         // into the second argument:
-        fe_values.get_function_gradients(present_solution,
+        fe_values.get_function_gradients(current_solution,
                                          old_solution_gradients);
 
         // With this, we can then do the integration loop over all quadrature
@@ -352,7 +352,7 @@ namespace Step15
     hanging_node_constraints.distribute(newton_update);
 
     const double alpha = determine_step_length();
-    present_solution.add(alpha, newton_update);
+    current_solution.add(alpha, newton_update);
   }
 
 
@@ -371,7 +371,7 @@ namespace Step15
       dof_handler,
       QGauss<dim - 1>(fe.degree + 1),
       std::map<types::boundary_id, const Function<dim> *>(),
-      present_solution,
+      current_solution,
       estimated_error_per_cell);
 
     GridRefinement::refine_and_coarsen_fixed_number(triangulation,
@@ -403,7 +403,7 @@ namespace Step15
     // by doing the actual refinement and distribution of degrees of freedom
     // on the new mesh
     SolutionTransfer<dim> solution_transfer(dof_handler);
-    solution_transfer.prepare_for_coarsening_and_refinement(present_solution);
+    solution_transfer.prepare_for_coarsening_and_refinement(current_solution);
 
     triangulation.execute_coarsening_and_refinement();
 
@@ -421,8 +421,8 @@ namespace Step15
     // solution before refinement had the correct boundary values, and so we
     // have to explicitly make sure that it now has:
     Vector<double> tmp(dof_handler.n_dofs());
-    solution_transfer.interpolate(present_solution, tmp);
-    present_solution = tmp;
+    solution_transfer.interpolate(current_solution, tmp);
+    current_solution = tmp;
 
     set_boundary_values();
 
@@ -438,7 +438,7 @@ namespace Step15
                                             hanging_node_constraints);
     hanging_node_constraints.close();
 
-    hanging_node_constraints.distribute(present_solution);
+    hanging_node_constraints.distribute(current_solution);
 
     // We end the function by updating all the remaining data structures,
     // indicating to <code>setup_dofs()</code> that this is not the first
@@ -467,7 +467,7 @@ namespace Step15
                                              BoundaryValues<dim>(),
                                              boundary_values);
     for (auto &boundary_value : boundary_values)
-      present_solution(boundary_value.first) = boundary_value.second;
+      current_solution(boundary_value.first) = boundary_value.second;
   }
 
 
@@ -494,7 +494,7 @@ namespace Step15
     Vector<double> residual(dof_handler.n_dofs());
 
     Vector<double> evaluation_point(dof_handler.n_dofs());
-    evaluation_point = present_solution;
+    evaluation_point = current_solution;
     evaluation_point.add(alpha, newton_update);
 
     const QGauss<dim> quadrature_formula(fe.degree + 1);
@@ -595,52 +595,37 @@ namespace Step15
   // @sect4{MinimalSurfaceProblem::run}
 
   // In the run function, we build the first grid and then have the top-level
-  // logic for the Newton iteration. The function has two variables, one that
-  // indicates whether this is the first time we solve for a Newton update and
-  // one that indicates the refinement level of the mesh:
+  // logic for the Newton iteration.
+  //
+  // As described in the introduction, the domain is the unit disk around
+  // the origin, created in the same way as shown in step-6. The mesh is
+  // globally refined twice followed later on by several adaptive cycles.
+  //
+  // Before starting the Newton loop, we also need to do a bit of
+  // setup work: We need to create the basic data structures and
+  // ensure that the first Newton iterate already has the correct
+  // boundary values, as discussed in the introduction.
   template <int dim>
   void MinimalSurfaceProblem<dim>::run()
   {
-    unsigned int refinement = 0;
-    bool         first_step = true;
-
-    // As described in the introduction, the domain is the unit disk around
-    // the origin, created in the same way as shown in step-6. The mesh is
-    // globally refined twice followed later on by several adaptive cycles:
     GridGenerator::hyper_ball(triangulation);
     triangulation.refine_global(2);
+
+    setup_system(true);
+    set_boundary_values();
 
     // The Newton iteration starts next. During the first step we do not have
     // information about the residual prior to this step and so we continue
     // the Newton iteration until we have reached at least one iteration and
     // until residual is less than $10^{-3}$.
-    //
-    // At the beginning of the loop, we do a bit of setup work. In the first
-    // go around, we compute the solution on the twice globally refined mesh
-    // after setting up the basic data structures and ensuring that the first
-    // Newton iterate already has the correct boundary values. In all
-    // following mesh refinement loops, the mesh will be refined adaptively.
-    double previous_res = 0;
-    while (first_step || (previous_res > 1e-3))
+    double       previous_res     = 0;
+    unsigned int refinement_cycle = 0;
+    while ((refinement_cycle == 0) || (previous_res > 1e-3))
       {
-        if (first_step == true)
-          {
-            std::cout << "******** Initial mesh "
-                      << " ********" << std::endl;
+        std::cout << "Mesh refinement step " << refinement_cycle << std::endl;
 
-            setup_system(true);
-            set_boundary_values();
-
-            first_step = false;
-          }
-        else
-          {
-            ++refinement;
-            std::cout << "******** Refined mesh " << refinement << " ********"
-                      << std::endl;
-
-            refine_mesh();
-          }
+        if (refinement_cycle != 0)
+          refine_mesh();
 
         // On every mesh we do exactly five Newton steps. We print the initial
         // residual here and then start the iterations on this mesh.
@@ -664,20 +649,23 @@ namespace Step15
             std::cout << "  Residual: " << compute_residual(0) << std::endl;
           }
 
-        // Every fifth iteration, i.e., just before we refine the mesh again,
-        // we output the solution as well as the Newton update. This happens
-        // as in all programs before:
+        // Just before we refine the mesh again, we then output the
+        // solution as well as the Newton update, and increment the
+        // mesh refinement cycle counter by one:
         DataOut<dim> data_out;
 
         data_out.attach_dof_handler(dof_handler);
-        data_out.add_data_vector(present_solution, "solution");
+        data_out.add_data_vector(current_solution, "solution");
         data_out.add_data_vector(newton_update, "update");
         data_out.build_patches();
 
         const std::string filename =
-          "solution-" + Utilities::int_to_string(refinement, 2) + ".vtk";
+          "solution-" + Utilities::int_to_string(refinement_cycle, 2) + ".vtk";
         std::ofstream output(filename);
         data_out.write_vtu(output);
+
+        ++refinement_cycle;
+        std::cout << std::endl;
       }
   }
 } // namespace Step15

@@ -3,25 +3,46 @@
 
 The output of the program looks as follows:
 @code
-* ******** Initial mesh  ********
+Mesh refinement step
   Initial residual: 1.53143
   Residual: 1.08746
   Residual: 0.966748
   Residual: 0.859602
   Residual: 0.766462
   Residual: 0.685475
-* ******** Refined mesh 1 ********
-  Initial residual: 0.865774
-  Residual: 0.759295
-  Residual: 0.675281
-  Residual: 0.603523
-  Residual: 0.540744
-  Residual: 0.485238
-* ******** Refined mesh 2 ********
-  Initial residual: 0.425581
-  Residual: 0.382042
-  Residual: 0.343307
-  Residual: 0.308718
+
+Mesh refinement step
+  Initial residual: 0.868959
+  Residual: 0.762125
+  Residual: 0.677792
+  Residual: 0.605762
+  Residual: 0.542748
+  Residual: 0.48704
+
+Mesh refinement step
+  Initial residual: 0.426445
+  Residual: 0.382731
+  Residual: 0.343865
+  Residual: 0.30918
+  Residual: 0.278147
+  Residual: 0.250327
+
+Mesh refinement step
+  Initial residual: 0.282026
+  Residual: 0.253146
+  Residual: 0.227414
+  Residual: 0.20441
+  Residual: 0.183803
+  Residual: 0.165319
+
+Mesh refinement step
+  Initial residual: 0.154404
+  Residual: 0.138723
+  Residual: 0.124694
+  Residual: 0.112124
+  Residual: 0.100847
+  Residual: 0.0907222
+
 ....
 @endcode
 
