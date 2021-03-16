@@ -1329,7 +1329,7 @@ namespace Step69
   ProblemDescription<dim>::momentum(const state_type &U)
   {
     Tensor<1, dim> result;
-    std::copy(&U[1], &U[1 + dim], &result[0]);
+    std::copy_n(&U[1], dim, &result[0]);
     return result;
   }
 
