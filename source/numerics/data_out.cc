@@ -1084,10 +1084,14 @@ template <int dim, typename DoFHandlerType>
 void
 DataOut<dim, DoFHandlerType>::build_patches(const unsigned int n_subdivisions)
 {
-  build_patches(StaticMappingQ1<DoFHandlerType::dimension,
-                                DoFHandlerType::space_dimension>::mapping,
-                n_subdivisions,
-                no_curved_cells);
+  AssertDimension(this->triangulation->get_reference_cells().size(), 1);
+
+  build_patches(
+    this->triangulation->get_reference_cells()[0]
+      .template get_default_linear_mapping<DoFHandlerType::dimension,
+                                           DoFHandlerType::space_dimension>(),
+    n_subdivisions,
+    no_curved_cells);
 }
 
 
