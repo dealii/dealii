@@ -77,17 +77,17 @@ namespace internal
 
       /**
        * Index of the face between 0 and GeometryInfo::faces_per_cell within
-       * the cells on the "interior" side of the faces.
-       */
-      unsigned char interior_face_no;
-
-      /**
-       * Index of the face between 0 and GeometryInfo::faces_per_cell within
        * the cells on the "exterior" side of the faces.
        *
        * For a boundary face, this data field stores the boundary id.
        */
-      unsigned char exterior_face_no;
+      types::boundary_id exterior_face_no;
+
+      /**
+       * Index of the face between 0 and GeometryInfo::faces_per_cell within
+       * the cells on the "interior" side of the faces.
+       */
+      unsigned char interior_face_no;
 
       /**
        * For adaptively refined meshes, the cell on the exterior side of the
