@@ -1249,13 +1249,13 @@ namespace internal
           tria_level.global_active_cell_indices.insert(
             tria_level.global_active_cell_indices.end(),
             total_cells - tria_level.global_active_cell_indices.size(),
-            numbers::invalid_unsigned_int);
+            numbers::invalid_dof_index);
 
           tria_level.global_level_cell_indices.reserve(total_cells);
           tria_level.global_level_cell_indices.insert(
             tria_level.global_level_cell_indices.end(),
             total_cells - tria_level.global_level_cell_indices.size(),
-            numbers::invalid_unsigned_int);
+            numbers::invalid_dof_index);
 
           if (dimension < space_dimension)
             {
