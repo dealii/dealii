@@ -30,6 +30,7 @@
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_pyramid_p.h>
 #include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/fe_wedge_p.h>
@@ -232,14 +233,9 @@ namespace internal
               {
                 const auto reference_cell = (*fe)[i].reference_cell();
 
-                if ((reference_cell == dealii::ReferenceCells::Vertex) ||
-                    (reference_cell == dealii::ReferenceCells::Line) ||
-                    (reference_cell == dealii::ReferenceCells::Quadrilateral) ||
-                    (reference_cell == dealii::ReferenceCells::Hexahedron))
+                if (reference_cell.is_hyper_cube())
                   needs_hypercube_setup |= true;
-                else if ((reference_cell == dealii::ReferenceCells::Triangle) ||
-                         (reference_cell ==
-                          dealii::ReferenceCells::Tetrahedron))
+                else if (reference_cell.is_simplex())
                   needs_simplex_setup |= true;
                 else if (reference_cell == dealii::ReferenceCells::Wedge)
                   needs_wedge_setup |= true;
@@ -322,17 +318,9 @@ namespace internal
                       const auto reference_cell =
                         (*finite_elements[i])[j].reference_cell();
 
-                      if ((reference_cell == dealii::ReferenceCells::Vertex) ||
-                          (reference_cell == dealii::ReferenceCells::Line) ||
-                          (reference_cell ==
-                           dealii::ReferenceCells::Quadrilateral) ||
-                          (reference_cell ==
-                           dealii::ReferenceCells::Hexahedron))
+                      if (reference_cell.is_hyper_cube())
                         quadrature.push_back(*quadrature_hypercube);
-                      else if ((reference_cell ==
-                                dealii::ReferenceCells::Triangle) ||
-                               (reference_cell ==
-                                dealii::ReferenceCells::Tetrahedron))
+                      else if (reference_cell.is_simplex())
                         quadrature.push_back(*quadrature_simplex);
                       else if (reference_cell == dealii::ReferenceCells::Wedge)
                         quadrature.push_back(*quadrature_wedge);
@@ -2213,10 +2201,35 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_fes() const
     }
   if (this->dof_data.empty())
     {
-      finite_elements.resize(1);
-      finite_elements[0] =
-        std::make_shared<dealii::hp::FECollection<dhdim, dhspacedim>>(
-          FE_DGQ<dhdim, dhspacedim>(0));
+      Assert(triangulation != nullptr, ExcNotImplemented());
+
+      const auto &reference_cells = triangulation->get_reference_cells();
+      finite_elements.reserve(reference_cells.size());
+
+      // TODO: below we select linear, discontinuous elements for simplex,
+      // wedge, and pyramid; we would like to select constant functions, but
+      // that is not implemented yet
+      for (const auto &reference_cell : reference_cells)
+        {
+          if (reference_cell.is_hyper_cube())
+            finite_elements.emplace_back(
+              std::make_shared<dealii::hp::FECollection<dhdim, dhspacedim>>(
+                FE_DGQ<dhdim, dhspacedim>(0)));
+          else if (reference_cell.is_simplex())
+            finite_elements.emplace_back(
+              std::make_shared<dealii::hp::FECollection<dhdim, dhspacedim>>(
+                FE_SimplexDGP<dhdim, dhspacedim>(1)));
+          else if (reference_cell == dealii::ReferenceCells::Wedge)
+            finite_elements.emplace_back(
+              std::make_shared<dealii::hp::FECollection<dhdim, dhspacedim>>(
+                FE_WedgeDGP<dhdim, dhspacedim>(1)));
+          else if (reference_cell == dealii::ReferenceCells::Pyramid)
+            finite_elements.emplace_back(
+              std::make_shared<dealii::hp::FECollection<dhdim, dhspacedim>>(
+                FE_PyramidDGP<dhdim, dhspacedim>(1)));
+          else
+            Assert(false, ExcNotImplemented());
+        }
     }
   return finite_elements;
 }
