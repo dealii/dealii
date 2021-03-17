@@ -1355,7 +1355,7 @@ QGaussSimplex<dim>::QGaussSimplex(const unsigned int n_points_1D)
   : QSimplex<dim>(Quadrature<dim>())
 {
   // fill quadrature points and quadrature weights
-  if (dim == 1)
+  if (dim == 0 || dim == 1)
     {
       const dealii::QGauss<dim> quad(n_points_1D);
 
@@ -1838,6 +1838,7 @@ template class QSplit<1>;
 template class QSplit<2>;
 template class QSplit<3>;
 
+template class QGaussSimplex<0>;
 template class QGaussSimplex<1>;
 template class QGaussSimplex<2>;
 template class QGaussSimplex<3>;
