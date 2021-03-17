@@ -181,6 +181,13 @@ namespace hp
     push_back(const FiniteElement<dim, spacedim> &new_fe);
 
     /**
+     * TODO
+     */
+    const FiniteElement<dim, spacedim> &
+    operator()(const unsigned int index,
+               const unsigned int reference_cell_index) const;
+
+    /**
      * Return the number of vector components of the finite elements in this
      * collection.  This number must be the same for all elements in the
      * collection.
@@ -826,6 +833,20 @@ namespace hp
   operator!=(const FECollection<dim, spacedim> &fe_collection) const
   {
     return !(*this == fe_collection);
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline const FiniteElement<dim, spacedim> &
+  FECollection<dim, spacedim>::
+  operator()(const unsigned int index,
+             const unsigned int reference_cell_index) const
+  {
+    (void)reference_cell_index;
+
+    AssertIndexRange(index, this->size());
+    return this->operator[](index);
   }
 
 

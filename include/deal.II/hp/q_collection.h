@@ -201,7 +201,7 @@ namespace hp
       return false;
 
     for (unsigned int i = 0; i < n_quadratures; ++i)
-      if ((this->operator[](i) == q_collection[i]) == false)
+      if (!(this->operator[](i) == q_collection[i]))
         return false;
 
     return true;
