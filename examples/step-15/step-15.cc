@@ -660,7 +660,7 @@ namespace Step15
         data_out.build_patches();
 
         const std::string filename =
-          "solution-" + Utilities::int_to_string(refinement_cycle, 2) + ".vtk";
+          "solution-" + Utilities::int_to_string(refinement_cycle, 2) + ".vtu";
         std::ofstream output(filename);
         data_out.write_vtu(output);
 
