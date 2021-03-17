@@ -2762,8 +2762,8 @@ DoFHandler<dim, spacedim>::prepare_coarsening_and_refinement(
                    (typename dealii::Triangulation<dim, spacedim>::
                       ExcInconsistentCoarseningFlags()));
 
-            const level_type child_level =
-              future_levels[child->global_active_cell_index()];
+            const level_type child_level = static_cast<level_type>(
+              future_levels[child->global_active_cell_index()]);
             Assert(child_level != invalid_level,
                    ExcMessage("The FiniteElement on one of the siblings of "
                               "a cell you are trying to coarsen is not part "
