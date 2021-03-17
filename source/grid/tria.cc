@@ -2709,9 +2709,9 @@ namespace internal
           level.face_orientations.assign(size * faces_per_cell, -1);
 
         level.global_active_cell_indices.assign(size,
-                                                numbers::invalid_unsigned_int);
+                                                numbers::invalid_dof_index);
         level.global_level_cell_indices.assign(size,
-                                               numbers::invalid_unsigned_int);
+                                               numbers::invalid_dof_index);
       }
 
 
