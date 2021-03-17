@@ -22,6 +22,8 @@
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/subscriptor.h>
 
+#include <deal.II/hp/collection.h>
+
 #include <memory>
 #include <vector>
 
@@ -41,7 +43,7 @@ namespace hp
    * @ingroup hp hpcollection
    */
   template <int dim>
-  class QCollection : public Subscriptor
+  class QCollection : public Collection<Quadrature<dim>>
   {
   public:
     /**
@@ -103,25 +105,11 @@ namespace hp
     push_back(const Quadrature<dim_in> &new_quadrature);
 
     /**
-     * Return a reference to the quadrature rule specified by the argument.
-     *
-     * @pre @p index must be between zero and the number of elements of the
-     * collection.
-     */
-    const Quadrature<dim> &operator[](const unsigned int index) const;
-
-    /**
      * Equality comparison operator. All stored Quadrature objects are compared
      * in order.
      */
     bool
     operator==(const QCollection<dim> &q_collection) const;
-
-    /**
-     * Return the number of quadrature pointers stored in this object.
-     */
-    unsigned int
-    size() const;
 
     /**
      * Return the maximum number of quadrature points over all the elements of
@@ -131,13 +119,6 @@ namespace hp
      */
     unsigned int
     max_n_quadrature_points() const;
-
-    /**
-     * Determine an estimate for the memory consumption (in bytes) of this
-     * object.
-     */
-    std::size_t
-    memory_consumption() const;
 
     /**
      * Exception
@@ -197,36 +178,16 @@ namespace hp
 
   template <int dim>
   inline unsigned int
-  QCollection<dim>::size() const
-  {
-    return quadratures.size();
-  }
-
-
-
-  template <int dim>
-  inline unsigned int
   QCollection<dim>::max_n_quadrature_points() const
   {
-    Assert(quadratures.size() > 0,
+    Assert(this->size() > 0,
            ExcMessage("You can't call this function for an empty collection"));
 
-    unsigned int m = 0;
-    for (unsigned int i = 0; i < quadratures.size(); ++i)
-      if (quadratures[i]->size() > m)
-        m = quadratures[i]->size();
+    unsigned int max = 0;
+    for (unsigned int i = 0; i < this->size(); ++i)
+      max = std::max(max, this->operator[](i).size());
 
-    return m;
-  }
-
-
-
-  template <int dim>
-  inline const Quadrature<dim> &QCollection<dim>::
-                                operator[](const unsigned int index) const
-  {
-    AssertIndexRange(index, quadratures.size());
-    return *quadratures[index];
+    return max;
   }
 
 
@@ -235,12 +196,12 @@ namespace hp
   inline bool
   QCollection<dim>::operator==(const QCollection<dim> &q_collection) const
   {
-    const unsigned int n_quadratures = size();
+    const unsigned int n_quadratures = this->size();
     if (n_quadratures != q_collection.size())
       return false;
 
     for (unsigned int i = 0; i < n_quadratures; ++i)
-      if (!(*quadratures[i] == q_collection[i]))
+      if ((this->operator[](i) == q_collection[i]) == false)
         return false;
 
     return true;
@@ -252,16 +213,7 @@ namespace hp
   template <int dim_in>
   inline QCollection<dim>::QCollection(const Quadrature<dim_in> &quadrature)
   {
-    quadratures.push_back(std::make_shared<const Quadrature<dim>>(quadrature));
-  }
-
-
-
-  template <int dim>
-  inline std::size_t
-  QCollection<dim>::memory_consumption() const
-  {
-    return (sizeof(*this) + MemoryConsumption::memory_consumption(quadratures));
+    this->push_back(quadrature);
   }
 
 
@@ -270,7 +222,7 @@ namespace hp
   inline void
   QCollection<dim>::push_back(const Quadrature<dim_in> &new_quadrature)
   {
-    quadratures.push_back(
+    Collection<Quadrature<dim>>::push_back(
       std::make_shared<const Quadrature<dim>>(new_quadrature));
   }
 
