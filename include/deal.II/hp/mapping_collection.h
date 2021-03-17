@@ -23,6 +23,8 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/mapping_q1.h>
 
+#include <deal.II/hp/collection.h>
+
 #include <memory>
 #include <vector>
 
@@ -51,7 +53,7 @@ namespace hp
    * @ingroup hp hpcollection
    */
   template <int dim, int spacedim = dim>
-  class MappingCollection : public Subscriptor
+  class MappingCollection : public Collection<Mapping<dim, spacedim>>
   {
   public:
     /**
@@ -97,35 +99,6 @@ namespace hp
      */
     void
     push_back(const Mapping<dim, spacedim> &new_mapping);
-
-    /**
-     * Return the mapping object which was specified by the user for the
-     * active FE index which is provided as a parameter to this method.
-     *
-     * @pre @p index must be between zero and the number of elements of the
-     * collection.
-     */
-    const Mapping<dim, spacedim> &operator[](const unsigned int index) const;
-
-    /**
-     * Return the number of mapping objects stored in this container.
-     */
-    unsigned int
-    size() const;
-
-    /**
-     * Determine an estimate for the memory consumption (in bytes) of this
-     * object.
-     */
-    std::size_t
-    memory_consumption() const;
-
-  private:
-    /**
-     * The real container, which stores pointers to the different Mapping
-     * objects.
-     */
-    std::vector<std::shared_ptr<const Mapping<dim, spacedim>>> mappings;
   };
 
 
@@ -175,23 +148,6 @@ namespace hp
       (static_cast<const Mapping<dim, spacedim> *>(&mappings))...};
     for (const auto p : mapping_pointers)
       push_back(*p);
-  }
-
-  template <int dim, int spacedim>
-  inline unsigned int
-  MappingCollection<dim, spacedim>::size() const
-  {
-    return mappings.size();
-  }
-
-
-
-  template <int dim, int spacedim>
-  inline const Mapping<dim, spacedim> &MappingCollection<dim, spacedim>::
-                                       operator[](const unsigned int index) const
-  {
-    AssertIndexRange(index, mappings.size());
-    return *mappings[index];
   }
 
 } // namespace hp
