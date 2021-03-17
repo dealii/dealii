@@ -2734,6 +2734,63 @@ DoFHandler<dim, spacedim>::prepare_coarsening_and_refinement(
   // - always raise levels to match criterion, never lower them
   // - exchange level indices on ghost cells
 
+  // For cells to be h-coarsened, we need to determine a future FE for the
+  // parent cell, which will be the dominated FE among all children
+  // However, if we want to enforce the max_difference criterion on all cells on
+  // the updated mesh, we will need to simulate the updated mesh on the current
+  // mesh.
+  //
+  // As we are working on p-levels, we will set all siblings that will be
+  // coarsened to the highest p-level among them. The parent cell will be
+  // assigned exactly this level in form of the corresponding FE index in the
+  // adaptation process in Triangulation::execute_coarsening_and_refinement().
+  //
+  // This function takes a cell and sets all its siblings to the highest p-level
+  // among them. Returns whether any future levels have been changed.
+  const auto prepare_level_for_parent =
+    [&](const active_cell_iterator &neighbor) -> bool {
+    Assert(neighbor->is_active() && neighbor->is_locally_owned(),
+           ExcInternalError());
+    if (neighbor->coarsen_flag_set())
+      {
+        const auto parent = neighbor->parent();
+
+        std::set<unsigned int> future_levels_children;
+        for (const auto &child : parent->child_iterators())
+          {
+            Assert(child->is_active() && child->coarsen_flag_set(),
+                   (typename dealii::Triangulation<dim, spacedim>::
+                      ExcInconsistentCoarseningFlags()));
+
+            const level_type child_level =
+              future_levels[child->global_active_cell_index()];
+            Assert(child_level != invalid_level,
+                   ExcMessage("The FiniteElement on one of the siblings of "
+                              "a cell you are trying to coarsen is not part "
+                              "of the registered p-adaptation hierarchy."));
+            future_levels_children.insert(child_level);
+          }
+        Assert(!future_levels_children.empty(), ExcInternalError());
+
+        const unsigned int max_level_children =
+          *future_levels_children.rbegin();
+
+        bool children_changed = false;
+        for (const auto &child : parent->child_iterators())
+          if (child->is_locally_owned() &&
+              future_levels[child->global_active_cell_index()] !=
+                max_level_children)
+            {
+              future_levels[child->global_active_cell_index()] =
+                max_level_children;
+              children_changed = true;
+            }
+        return children_changed;
+      }
+
+    return false;
+  };
+
   bool levels_changed = false;
   bool levels_changed_in_cycle;
   do
@@ -2794,6 +2851,15 @@ DoFHandler<dim, spacedim>::prepare_coarsening_and_refinement(
 
                                   levels_changed_in_cycle = true;
                                 }
+
+                              // Neighbors on subfaces have the same parent.
+                              // It is sufficient to update all siblings flagged
+                              // for h-coarsening only once in the very last
+                              // iteration.
+                              if (sf == cell->face(f)->n_children() - 1)
+                                levels_changed_in_cycle |=
+                                  prepare_level_for_parent(
+                                    cell->neighbor_child_on_subface(f, sf));
                             }
                         }
                     }
@@ -2824,6 +2890,9 @@ DoFHandler<dim, spacedim>::prepare_coarsening_and_refinement(
 
                               levels_changed_in_cycle = true;
                             }
+
+                          levels_changed_in_cycle |=
+                            prepare_level_for_parent(neighbor);
                         }
                     }
                 }
