@@ -520,8 +520,9 @@ namespace Functions
    * A function whose output is also its input. One possible application of this
    * function is interpolating or projecting a finite element field that
    * represents spatial coordinates: e.g., one can set up a finite element field
-   * to interpolate the vertices of a Triangulation with this function, which is
-   * useful when doing calculations in a Lagrangian reference frame.
+   * to interpolate the positions of a Triangulation's cells with this function
+   * (via VectorTools::interpolate()), which is useful when doing calculations
+   * in a Lagrangian reference frame.
    *
    * @ingroup functions
    */
