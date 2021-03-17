@@ -198,7 +198,8 @@ namespace hp
     FEValuesType &
     select_fe_values(const unsigned int fe_index,
                      const unsigned int mapping_index,
-                     const unsigned int q_index);
+                     const unsigned int q_index,
+                     const unsigned int r_index);
 
   protected:
     /**
@@ -243,13 +244,13 @@ namespace hp
      * Initially, all entries have zero pointers, and we will allocate them
      * lazily as needed in select_fe_values() or precalculate_fe_values().
      */
-    Table<3, std::unique_ptr<FEValuesType>> fe_values_table;
+    Table<4, std::unique_ptr<FEValuesType>> fe_values_table;
 
     /**
      * Set of indices pointing at the fe_values object selected last time
      * the select_fe_value() function was called.
      */
-    TableIndices<3> present_fe_values_index;
+    TableIndices<4> present_fe_values_index;
 
     /**
      * Values of the update flags as given to the constructor.

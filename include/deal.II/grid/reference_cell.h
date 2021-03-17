@@ -633,6 +633,59 @@ namespace ReferenceCells
   template <int dim>
   constexpr const ReferenceCell &
   get_hypercube();
+
+  /**
+   * TODO
+   */
+  template <int dim>
+  constexpr unsigned int
+  n_possible_reference_cells()
+  {
+    switch (dim)
+      {
+        case 0:
+          return 1;
+        case 1:
+          return 1;
+        case 2:
+          return 2;
+        case 3:
+          return 4;
+        default:
+          Assert(false, ExcNotImplemented());
+          return 0;
+      }
+  }
+
+  /**
+   * TODO
+   */
+  constexpr unsigned int
+  refrence_cell_to_index(const ReferenceCell &reference_cell)
+  {
+    switch (reference_cell)
+      {
+        case ReferenceCells::Vertex:
+          return 0;
+        case ReferenceCells::Line:
+          return 0;
+        case ReferenceCells::Triangle:
+          return 0;
+        case ReferenceCells::Quadrilateral:
+          return 1;
+        case ReferenceCells::Tetrahedron:
+          return 0;
+        case ReferenceCells::Pyramid:
+          return 1;
+        case ReferenceCells::Wedge:
+          return 2;
+        case ReferenceCells::Hexahedron:
+          return 3;
+        default:
+          Assert(false, ExcNotImplemented());
+          return numbers::invalid_unsigned_int;
+      }
+  }
 } // namespace ReferenceCells
 
 
