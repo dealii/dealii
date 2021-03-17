@@ -52,6 +52,83 @@ namespace SUNDIALS
 {
   using namespace internal;
 
+
+  template <typename VectorType>
+  KINSOL<VectorType>::AdditionalData::AdditionalData(
+    const SolutionStrategy &strategy,
+    const unsigned int      maximum_non_linear_iterations,
+    const double            function_tolerance,
+    const double            step_tolerance,
+    const bool              no_init_setup,
+    const unsigned int      maximum_setup_calls,
+    const double            maximum_newton_step,
+    const double            dq_relative_error,
+    const unsigned int      maximum_beta_failures,
+    const unsigned int      anderson_subspace_size)
+    : strategy(strategy)
+    , maximum_non_linear_iterations(maximum_non_linear_iterations)
+    , function_tolerance(function_tolerance)
+    , step_tolerance(step_tolerance)
+    , no_init_setup(no_init_setup)
+    , maximum_setup_calls(maximum_setup_calls)
+    , maximum_newton_step(maximum_newton_step)
+    , dq_relative_error(dq_relative_error)
+    , maximum_beta_failures(maximum_beta_failures)
+    , anderson_subspace_size(anderson_subspace_size)
+  {}
+
+
+
+  template <typename VectorType>
+  void
+  KINSOL<VectorType>::AdditionalData::add_parameters(ParameterHandler &prm)
+  {
+    static std::string strategy_str("newton");
+    prm.add_parameter("Solution strategy",
+                      strategy_str,
+                      "Choose among newton|linesearch|fixed_point|picard",
+                      Patterns::Selection(
+                        "newton|linesearch|fixed_point|picard"));
+    prm.add_action("Solution strategy", [&](const std::string &value) {
+      if (value == "newton")
+        strategy = newton;
+      else if (value == "linesearch")
+        strategy = linesearch;
+      else if (value == "fixed_point")
+        strategy = fixed_point;
+      else if (value == "picard")
+        strategy = picard;
+      else
+        Assert(false, ExcInternalError());
+    });
+    prm.add_parameter("Maximum number of nonlinear iterations",
+                      maximum_non_linear_iterations);
+    prm.add_parameter("Function norm stopping tolerance", function_tolerance);
+    prm.add_parameter("Scaled step stopping tolerance", step_tolerance);
+
+    prm.enter_subsection("Newton parameters");
+    prm.add_parameter("No initial matrix setup", no_init_setup);
+    prm.add_parameter("Maximum iterations without matrix setup",
+                      maximum_setup_calls);
+    prm.add_parameter("Maximum allowable scaled length of the Newton step",
+                      maximum_newton_step);
+    prm.add_parameter("Relative error for different quotient computation",
+                      dq_relative_error);
+    prm.leave_subsection();
+
+    prm.enter_subsection("Linesearch parameters");
+    prm.add_parameter("Maximum number of beta-condition failures",
+                      maximum_beta_failures);
+    prm.leave_subsection();
+
+
+    prm.enter_subsection("Fixed point and Picard parameters");
+    prm.add_parameter("Anderson acceleration subspace size",
+                      anderson_subspace_size);
+    prm.leave_subsection();
+  }
+
+
   namespace
   {
     template <typename VectorType>
