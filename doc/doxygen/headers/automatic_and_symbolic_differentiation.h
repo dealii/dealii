@@ -489,16 +489,17 @@
  * we support. To date, the helper classes have been developed for the following contexts:
  *
  * - Classes designed to operate at the quadrature point level (or any general continuum point):
- *   - ScalarFunction: Differentiation of a scalar-valued function. One typical use would be the
- *                     the development of constitutive laws directly from a strain energy function.
- *   - VectorFunction: Differentiation of a vector-valued function. This could be used to
- *                     linearize the kinematic variables of a constitutive law, or assist in solving
- *                     the evolution equations of local internal variables.
+ *   - Differentiation::AD::ScalarFunction: %Differentiation of a scalar-valued function.
+ *       One typical use would be the the development of constitutive laws directly from a strain
+ *       energy function.
+ *   - Differentiation::AD::VectorFunction: %Differentiation of a vector-valued function.
+ *       This could be used to linearize the kinematic variables of a constitutive law, or assist
+ *       in solving the evolution equations of local internal variables.
  * - Classes designed to operate at the cell level:
- *   - EnergyFunctional: Differentiation of a scalar-valued energy functional, such as might arise
- *                       from variational formulations.
- *   - ResidualLinearization: Differentiation of a vector-valued finite element residual, leading to
- *                            its consistent linearization.
+ *   - Differentiation::AD::EnergyFunctional: %Differentiation of a scalar-valued energy functional,
+ *       such as might arise from variational formulations.
+ *   - Differentiation::AD::ResidualLinearization: %Differentiation of a vector-valued finite element
+ *       residual, leading to its consistent linearization.
  *
  * Naturally, it is also possible for users to manage the initialization and derivative
  * computations themselves.
