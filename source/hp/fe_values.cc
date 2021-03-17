@@ -182,14 +182,11 @@ namespace hp
     AssertIndexRange(q_index, q_collections.size());
 
 
-    // set the triple of indices
-    // that we want to work with
-    present_fe_values_index = TableIndices<3>(fe_index, mapping_index, q_index);
+    // set the triple of indices that we want to work with
+    present_fe_values_index = {fe_index, mapping_index, q_index};
 
-    // first check whether we
-    // already have an object for
-    // this particular combination
-    // of indices
+    // first check whether we already have an object for this particular
+    // combination of indices
     if (fe_values_table(present_fe_values_index).get() == nullptr)
       fe_values_table(present_fe_values_index) =
         std::make_unique<FEValuesType>((*mapping_collection)[mapping_index],
@@ -226,7 +223,7 @@ namespace hp
 
         task_group +=
           Threads::new_task([&, fe_index, mapping_index, q_index]() {
-            fe_values_table(TableIndices<3>(fe_index, mapping_index, q_index)) =
+            fe_values_table[fe_index][mapping_index][q_index] =
               std::make_unique<FEValuesType>(
                 (*mapping_collection)[mapping_index],
                 (*fe_collection)[fe_index],
@@ -299,8 +296,7 @@ namespace hp
     const unsigned int                                       mapping_index,
     const unsigned int                                       fe_index)
   {
-    // determine which indices we
-    // should actually use
+    // determine which indices we should actually use
     unsigned int real_q_index = q_index, real_mapping_index = mapping_index,
                  real_fe_index = fe_index;
 
@@ -328,9 +324,7 @@ namespace hp
     AssertIndexRange(real_mapping_index, this->mapping_collection->size());
     AssertIndexRange(real_fe_index, this->fe_collection->size());
 
-    // now finally actually get the
-    // corresponding object and
-    // initialize it
+    // now finally actually get the corresponding object and initialize it
     this->select_fe_values(real_fe_index, real_mapping_index, real_q_index)
       .reinit(cell);
   }
@@ -345,8 +339,7 @@ namespace hp
     const unsigned int                                          mapping_index,
     const unsigned int                                          fe_index)
   {
-    // determine which indices we
-    // should actually use
+    // determine which indices we should actually use
     unsigned int real_q_index = q_index, real_mapping_index = mapping_index,
                  real_fe_index = fe_index;
 
@@ -364,9 +357,7 @@ namespace hp
     AssertIndexRange(real_mapping_index, this->mapping_collection->size());
     AssertIndexRange(real_fe_index, this->fe_collection->size());
 
-    // now finally actually get the
-    // corresponding object and
-    // initialize it
+    // now finally actually get the corresponding object and initialize it
     this->select_fe_values(real_fe_index, real_mapping_index, real_q_index)
       .reinit(cell);
   }
@@ -465,9 +456,7 @@ namespace hp
     AssertIndexRange(real_mapping_index, this->mapping_collection->size());
     AssertIndexRange(real_fe_index, this->fe_collection->size());
 
-    // now finally actually get the
-    // corresponding object and
-    // initialize it
+    // now finally actually get the corresponding object and initialize it
     this->select_fe_values(real_fe_index, real_mapping_index, real_q_index)
       .reinit(cell, face_no);
   }
@@ -518,9 +507,7 @@ namespace hp
     AssertIndexRange(real_mapping_index, this->mapping_collection->size());
     AssertIndexRange(real_fe_index, this->fe_collection->size());
 
-    // now finally actually get the
-    // corresponding object and
-    // initialize it
+    // now finally actually get the corresponding object and initialize it
     this->select_fe_values(real_fe_index, real_mapping_index, real_q_index)
       .reinit(cell, face_no);
   }
@@ -581,8 +568,7 @@ namespace hp
     const unsigned int                                       mapping_index,
     const unsigned int                                       fe_index)
   {
-    // determine which indices we
-    // should actually use
+    // determine which indices we should actually use
     unsigned int real_q_index = q_index, real_mapping_index = mapping_index,
                  real_fe_index = fe_index;
 
@@ -610,9 +596,7 @@ namespace hp
     AssertIndexRange(real_mapping_index, this->mapping_collection->size());
     AssertIndexRange(real_fe_index, this->fe_collection->size());
 
-    // now finally actually get the
-    // corresponding object and
-    // initialize it
+    // now finally actually get the corresponding object and initialize it
     this->select_fe_values(real_fe_index, real_mapping_index, real_q_index)
       .reinit(cell, face_no, subface_no);
   }
@@ -629,8 +613,7 @@ namespace hp
     const unsigned int                                          mapping_index,
     const unsigned int                                          fe_index)
   {
-    // determine which indices we
-    // should actually use
+    // determine which indices we should actually use
     unsigned int real_q_index = q_index, real_mapping_index = mapping_index,
                  real_fe_index = fe_index;
 
@@ -648,9 +631,7 @@ namespace hp
     AssertIndexRange(real_mapping_index, this->mapping_collection->size());
     AssertIndexRange(real_fe_index, this->fe_collection->size());
 
-    // now finally actually get the
-    // corresponding object and
-    // initialize it
+    // now finally actually get the corresponding object and initialize it
     this->select_fe_values(real_fe_index, real_mapping_index, real_q_index)
       .reinit(cell, face_no, subface_no);
   }
