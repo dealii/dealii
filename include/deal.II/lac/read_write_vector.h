@@ -47,6 +47,8 @@ DEAL_II_NAMESPACE_OPEN
 #ifndef DOXYGEN
 namespace LinearAlgebra
 {
+  template <typename>
+  class Vector;
   namespace distributed
   {
     template <typename, typename>
@@ -282,6 +284,36 @@ namespace LinearAlgebra
      */
     ReadWriteVector<Number> &
     operator=(const Number s);
+
+    /**
+     * Imports all the elements present in the vector's IndexSet from the
+     * input vector @p vec. VectorOperation::values @p operation
+     * is used to decide if the elements in @p V should be added to the
+     * current vector or replace the current elements.
+     *
+     * @note The parameter @p communication_pattern is ignored since we are
+     *   dealing with a serial vector here.
+     */
+    void
+    import(const dealii::Vector<Number> &vec,
+           VectorOperation::values       operation,
+           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+             &communication_pattern = {});
+
+    /**
+     * Imports all the elements present in the vector's IndexSet from the
+     * input vector @p vec. VectorOperation::values @p operation
+     * is used to decide if the elements in @p V should be added to the
+     * current vector or replace the current elements.
+     *
+     * @note The parameter @p communication_pattern is ignored since we are
+     *   dealing with a serial vector here.
+     */
+    void
+    import(const LinearAlgebra::Vector<Number> &vec,
+           VectorOperation::values              operation,
+           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+             &communication_pattern = {});
 
     /**
      * Imports all the elements present in the vector's IndexSet from the
