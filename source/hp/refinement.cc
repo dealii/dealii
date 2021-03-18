@@ -843,6 +843,99 @@ namespace hp
       // - always raise levels to match criterion, never lower them
       // - exchange level indices on ghost cells
 
+      // Function that updates the level of neighbor to fulfill difference
+      // criterion, and returns whether it was changed.
+      const auto update_neighbor_level =
+        [&future_levels, max_difference](const auto &     neighbor,
+                                         const level_type cell_level) -> bool {
+        Assert(neighbor->is_active(), ExcInternalError());
+        // We only care about locally owned neighbors. If neighbor is a ghost
+        // cell, its future FE index will be updated on the owning process and
+        // communicated at the next loop iteration.
+        if (neighbor->is_locally_owned())
+          {
+            const level_type neighbor_level = static_cast<level_type>(
+              future_levels[neighbor->global_active_cell_index()]);
+
+            // ignore neighbors that are not part of the hierarchy
+            if (neighbor_level == invalid_level)
+              return false;
+
+            if ((cell_level - max_difference) > neighbor_level)
+              {
+                future_levels[neighbor->global_active_cell_index()] =
+                  cell_level - max_difference;
+
+                return true;
+              }
+          }
+
+        return false;
+      };
+
+      // For cells to be h-coarsened, we need to determine a future FE for the
+      // parent cell, which will be the dominated FE among all children
+      // However, if we want to enforce the max_difference criterion on all
+      // cells on the updated mesh, we will need to simulate the updated mesh on
+      // the current mesh.
+      //
+      // As we are working on p-levels, we will set all siblings that will be
+      // coarsened to the highest p-level among them. The parent cell will be
+      // assigned exactly this level in form of the corresponding FE index in
+      // the adaptation process in
+      // Triangulation::execute_coarsening_and_refinement().
+      //
+      // This function takes a cell and sets all its siblings to the highest
+      // p-level among them. Returns whether any future levels have been
+      // changed.
+      const auto prepare_level_for_parent = [&](const auto &neighbor) -> bool {
+        Assert(neighbor->is_active(), ExcInternalError());
+        if (neighbor->coarsen_flag_set() && neighbor->is_locally_owned())
+          {
+            const auto parent = neighbor->parent();
+
+            std::vector<unsigned int> future_levels_children;
+            future_levels_children.reserve(parent->n_children());
+            for (const auto &child : parent->child_iterators())
+              {
+                Assert(child->is_active() && child->coarsen_flag_set(),
+                       (typename dealii::Triangulation<dim, spacedim>::
+                          ExcInconsistentCoarseningFlags()));
+
+                const level_type child_level = static_cast<level_type>(
+                  future_levels[child->global_active_cell_index()]);
+                Assert(child_level != invalid_level,
+                       ExcMessage(
+                         "The FiniteElement on one of the siblings of "
+                         "a cell you are trying to coarsen is not part "
+                         "of the registered p-adaptation hierarchy."));
+                future_levels_children.push_back(child_level);
+              }
+            Assert(!future_levels_children.empty(), ExcInternalError());
+
+            const unsigned int max_level_children =
+              *std::max_element(future_levels_children.begin(),
+                                future_levels_children.end());
+
+            bool children_changed = false;
+            for (const auto &child : parent->child_iterators())
+              // We only care about locally owned children. If child is a ghost
+              // cell, its future FE index will be updated on the owning process
+              // and communicated at the next loop iteration.
+              if (child->is_locally_owned() &&
+                  future_levels[child->global_active_cell_index()] !=
+                    max_level_children)
+                {
+                  future_levels[child->global_active_cell_index()] =
+                    max_level_children;
+                  children_changed = true;
+                }
+            return children_changed;
+          }
+
+        return false;
+      };
+
       bool levels_changed = false;
       bool levels_changed_in_cycle;
       do
@@ -878,64 +971,22 @@ namespace hp
                               const auto neighbor =
                                 cell->neighbor_child_on_subface(f, sf);
 
-                              // We only care about locally owned neighbors. If
-                              // neighbor is a ghost cell, its future FE index
-                              // will be updated on the owning process and
-                              // communicated at the next loop iteration.
-                              if (neighbor->is_locally_owned())
-                                {
-                                  const level_type neighbor_level =
-                                    static_cast<level_type>(
-                                      future_levels
-                                        [neighbor->global_active_cell_index()]);
+                              levels_changed_in_cycle |=
+                                update_neighbor_level(neighbor, cell_level);
 
-                                  // ignore neighbors that are not part of the
-                                  // hierarchy
-                                  if (neighbor_level == invalid_level)
-                                    continue;
-
-                                  if ((cell_level - max_difference) >
-                                      neighbor_level)
-                                    {
-                                      future_levels
-                                        [neighbor->global_active_cell_index()] =
-                                          cell_level - max_difference;
-
-                                      levels_changed_in_cycle = true;
-                                    }
-                                }
+                              levels_changed_in_cycle |=
+                                prepare_level_for_parent(neighbor);
                             }
                         }
                       else
                         {
                           const auto neighbor = cell->neighbor(f);
 
-                          // We only care about locally owned neighbors. If
-                          // neighbor is a ghost cell, its future FE index will
-                          // be updated on the owning process and communicated
-                          // at the next loop iteration.
-                          if (neighbor->is_locally_owned())
-                            {
-                              const level_type neighbor_level =
-                                static_cast<level_type>(
-                                  future_levels
-                                    [neighbor->global_active_cell_index()]);
+                          levels_changed_in_cycle |=
+                            update_neighbor_level(neighbor, cell_level);
 
-                              // ignore neighbors that are not part of the
-                              // hierarchy
-                              if (neighbor_level == invalid_level)
-                                continue;
-
-                              if ((cell_level - max_difference) >
-                                  neighbor_level)
-                                {
-                                  future_levels
-                                    [neighbor->global_active_cell_index()] =
-                                      cell_level - max_difference;
-
-                                  levels_changed_in_cycle = true;
-                                }
-                            }
+                          levels_changed_in_cycle |=
+                            prepare_level_for_parent(neighbor);
                         }
                     }
               }
