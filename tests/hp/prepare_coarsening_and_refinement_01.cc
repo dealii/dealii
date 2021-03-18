@@ -32,6 +32,7 @@
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/hp/fe_collection.h>
+#include <deal.II/hp/refinement.h>
 
 #include <vector>
 
@@ -74,7 +75,9 @@ test(const unsigned int fes_size, const unsigned int max_difference)
 
   center_cell->set_active_fe_index(sequence.back());
   const bool fe_indices_changed =
-    dofh.prepare_coarsening_and_refinement(max_difference, contains_fe_index);
+    hp::Refinement::limit_p_level_difference(dofh,
+                                             max_difference,
+                                             contains_fe_index);
   tria.execute_coarsening_and_refinement();
 
   (void)fe_indices_changed;

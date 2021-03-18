@@ -42,6 +42,13 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         choose_p_over_h<deal_II_dimension, deal_II_space_dimension>(
           const dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>
             &);
+
+        template bool
+        limit_p_level_difference<deal_II_dimension, deal_II_space_dimension>(
+          const dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>
+            &,
+          const unsigned int,
+          const unsigned int);
       \}
     \}
 #endif

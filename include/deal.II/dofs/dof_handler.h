@@ -702,36 +702,6 @@ public:
   distribute_mg_dofs();
 
   /**
-   * Prepare all cells for p-adaptation in hp-mode. Does nothing in non-hp-mode.
-   *
-   * Essentially does to future FE indices what
-   * Triangulation::prepare_coarsening_and_refinement() does to refinement
-   * flags.
-   *
-   * In detail, this function limits the level difference of neighboring cells
-   * and thus smoothes the overall function space. Future FE indices will be
-   * raised (and never lowered) so that the level difference to neighboring
-   * cells is never larger than @p max_difference.
-   *
-   * Multiple FE hierarchies might have been registered via
-   * hp::FECollection::set_hierarchy(). This function operates on only one
-   * hierarchy, namely the one that contains the FE index @p contains_fe_index.
-   * Cells with future FE indices that are not part of the corresponding
-   * hierarchy will be ignored.
-   *
-   * The function can optionally be called before performing adaptation with
-   * Triangulation::execute_coarsening_and_refinement(). It is not necessary to
-   * call this function, nor will it be automatically invoked in any part of the
-   * library (contrary to its Triangulation counterpart).
-   *
-   * Returns whether any future FE indices have been changed by this function.
-   */
-  bool
-  prepare_coarsening_and_refinement(
-    const unsigned int max_difference    = 1,
-    const unsigned int contains_fe_index = 0) const;
-
-  /**
    * Returns whether this DoFHandler has hp-capabilities.
    */
   bool
