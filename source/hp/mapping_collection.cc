@@ -47,7 +47,7 @@ namespace hp
   MappingCollection<dim, spacedim>::push_back(
     const Mapping<dim, spacedim> &new_mapping)
   {
-    Collection<Mapping<dim, spacedim>>::push_back(
+    Collection<Mapping<dim, spacedim>, 1>::push_back(
       std::shared_ptr<const Mapping<dim, spacedim>>(new_mapping.clone()));
   }
 

@@ -53,7 +53,7 @@ namespace hp
    * @ingroup hp hpcollection
    */
   template <int dim, int spacedim = dim>
-  class MappingCollection : public Collection<Mapping<dim, spacedim>>
+  class MappingCollection : public Collection<Mapping<dim, spacedim>, 1>
   {
   public:
     /**

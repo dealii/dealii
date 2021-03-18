@@ -43,7 +43,7 @@ namespace hp
    * @ingroup hp hpcollection
    */
   template <int dim>
-  class QCollection : public Collection<Quadrature<dim>>
+  class QCollection : public Collection<Quadrature<dim>, 1>
   {
   public:
     /**
@@ -222,7 +222,7 @@ namespace hp
   inline void
   QCollection<dim>::push_back(const Quadrature<dim_in> &new_quadrature)
   {
-    Collection<Quadrature<dim>>::push_back(
+    Collection<Quadrature<dim>, 1>::push_back(
       std::make_shared<const Quadrature<dim>>(new_quadrature));
   }
 

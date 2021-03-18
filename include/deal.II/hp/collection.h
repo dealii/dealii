@@ -37,14 +37,14 @@ namespace hp
    * @ingroup hp hpcollection
    */
   template <typename T, int N = 1>
-  class Collection : public Subscriptor
+  class CollectionBase : public Subscriptor
   {
   public:
     /**
      * Default constructor. Leads to an empty collection that can later be
      * filled using push_back().
      */
-    Collection() = default;
+    CollectionBase() = default;
 
     /**
      * Add a new object.
@@ -82,13 +82,27 @@ namespace hp
   };
 
 
+
+  template <typename T, int N>
+  class Collection;
+
+
+
+  template <typename T>
+  class Collection<T, 1> : public CollectionBase<T, 1>
+  {
+  public:
+    Collection() = default;
+  };
+
+
   /* --------------- inline functions ------------------- */
 
 
 
   template <typename T, int N>
   std::size_t
-  Collection<T, N>::memory_consumption() const
+  CollectionBase<T, N>::memory_consumption() const
   {
     return (sizeof(*this) + MemoryConsumption::memory_consumption(entries));
   }
@@ -97,7 +111,7 @@ namespace hp
 
   template <typename T, int N>
   void
-  Collection<T, N>::push_back(const std::shared_ptr<const T> &new_entry)
+  CollectionBase<T, N>::push_back(const std::shared_ptr<const T> &new_entry)
   {
     const auto         temp     = entries;
     const unsigned int old_size = this->size();
@@ -116,7 +130,7 @@ namespace hp
 
   template <typename T, int N>
   inline unsigned int
-  Collection<T, N>::size() const
+  CollectionBase<T, N>::size() const
   {
     return entries.size()[0];
   }
@@ -124,7 +138,8 @@ namespace hp
 
 
   template <typename T, int N>
-  inline const T &Collection<T, N>::operator[](const unsigned int index) const
+  inline const T &CollectionBase<T, N>::
+                  operator[](const unsigned int index) const
   {
     AssertIndexRange(index, this->size());
     return *entries[index];
