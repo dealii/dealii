@@ -1,0 +1,116 @@
+
+
+Timer: test 1 (basic)
+
+
+timings for level = 0:
+
+General          2.20e+04 s
+
+timings for level = 1:
+
+General          2.20e+04 s    100.00 %
+  Part 1         2.00e+03 s      9.09 %
+  Part 2         3.00e+03 s     13.64 %
+  Part 3         4.00e+03 s     18.18 %
+  Other          1.30e+04 s     59.09 %
+
+timings for level = 2:
+
+General        
+  Part 2         3.00e+03 s    100.00 %
+    Sub a        7.50e+02 s     25.00 %
+    Sub b        9.00e+02 s     30.00 %
+    Other        1.35e+03 s     45.00 %
+  Part 3         4.00e+03 s    100.00 %
+    Sub a        5.00e+02 s     12.50 %
+    Sub b        9.88e+02 s     24.69 %
+    Other        2.51e+03 s     62.81 %
+
+timings all:
+
+General          2.20e+04 s
+  Part 1         2.00e+03 s
+  Part 2         3.00e+03 s
+    Sub a        7.50e+02 s
+    Sub b        9.00e+02 s
+  Part 3         4.00e+03 s
+    Sub a        5.00e+02 s
+      sub-sub a  4.00e+01 s
+    Sub b        9.88e+02 s
+
+
+TimerTree: test 2 (modular coupling)
+
+
+timings for level = 0:
+
+FSI                   1.00e+02 s
+
+timings for level = 1:
+
+FSI                   1.00e+02 s    100.00 %
+  Fluid               7.00e+01 s     70.00 %
+  Structure           2.50e+01 s     25.00 %
+  Other               5.00e+00 s      5.00 %
+
+timings for level = 2:
+
+FSI                 
+  Fluid               7.00e+01 s    100.00 %
+    Pressure Poisson  4.00e+01 s     57.14 %
+    Postprocessing    1.00e+01 s     14.29 %
+    ALE update        1.50e+01 s     21.43 %
+    Other             5.00e+00 s      7.14 %
+  Structure           2.50e+01 s    100.00 %
+    Right-hand side   2.00e+00 s      8.00 %
+    Assemble          9.00e+00 s     36.00 %
+    Solve             1.40e+01 s     56.00 %
+    Other             0.00e+00 s      0.00 %
+
+timings all:
+
+FSI                   1.00e+02 s
+  Fluid               7.00e+01 s
+    Pressure Poisson  4.00e+01 s
+    Postprocessing    1.00e+01 s
+    ALE update        1.50e+01 s
+  Structure           2.50e+01 s
+    Right-hand side   2.00e+00 s
+    Assemble          9.00e+00 s
+    Solve             1.40e+01 s
+
+timings for level = 0:
+
+
+timings for level = 1:
+
+
+timings for level = 2:
+
+
+timings all:
+
+
+timings for level = 0:
+
+Structure          2.50e+01 s
+
+timings for level = 1:
+
+Structure          2.50e+01 s    100.00 %
+  Right-hand side  2.00e+00 s      8.00 %
+  Assemble         9.00e+00 s     36.00 %
+  Solve            1.40e+01 s     56.00 %
+  Other            0.00e+00 s      0.00 %
+
+timings for level = 2:
+
+Structure        
+
+timings all:
+
+Structure          2.50e+01 s
+  Right-hand side  2.00e+00 s
+  Assemble         9.00e+00 s
+  Solve            1.40e+01 s
