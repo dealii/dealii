@@ -24,7 +24,6 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * A class for wall-time measurements enabling a modular coupling of modules in
  * a minimally invasive way.
- *
  */
 class TimerTree
 {
@@ -49,9 +48,9 @@ public:
   }
 
   /**
-   * Inserts a measured wall_time into the tree, by
+   * Inserts a measured @p wall_time into the tree, by
    * either creating a new entry in the tree if this function is called
-   * the first time with this ID, or by adding the wall_time to an
+   * the first time with the ID @p ids, or by adding the @p wall_time to an
    * entry already existing in the tree.
    */
   void
@@ -129,10 +128,10 @@ public:
 
   /**
    * Inserts a whole sub_tree into an existing tree, where
-   * the parameter names specifies the place at which to insert the sub_tree.
+   * the parameter @p ids specifies the place at which to insert the @p sub_tree.
    * This function allows to combine different timer trees in a modular way.
-   * If a non empty string new_name is provided, the id of  sub_tree is
-   * replaced by new_name when inserted into the tree.
+   * If a non empty string @p new_name is provided, the id of @p sub_tree is
+   * replaced by @p new_name when inserted into the tree.
    */
   void
   insert(std::vector<std::string> const         ids,
@@ -203,8 +202,9 @@ public:
    * a wall time has been set for the parent of these children. In this
    * case, an additional item `other` is created in order to give insights
    * to which extent the code has been covered with timers and to which
-   * extend time is spent is other code paths that are currently not
-   * covered by timers.
+   * extend time is spent in other code paths that are currently not
+   * covered by timers. The parameter @p level specifies the level for which
+   * to print results, where a value of 0 corresponds to the high level module.
    */
   void
   print_level(ConditionalOStream const &pcout, unsigned int const level) const
