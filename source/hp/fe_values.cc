@@ -169,7 +169,7 @@ namespace hp
                 Threads::new_task([&, fe_index, m_index, q_index, r_index]() {
                   fe_values_table[fe_index][m_index][q_index][r_index] =
                     std::make_unique<FEValuesType>(
-                      (*mapping_collection)[m_index], // TODO
+                      (*mapping_collection)(m_index, r_index),
                       (*fe_collection)(fe_index, r_index),
                       q_collections[q_index], // TODO
                       update_flags);
@@ -199,11 +199,12 @@ namespace hp
     // first check whether we already have an object for this particular
     // combination of indices
     if (fe_values_table(present_fe_values_index).get() == nullptr)
-      fe_values_table(present_fe_values_index) = std::make_unique<FEValuesType>(
-        (*mapping_collection)[mapping_index], // TOOD
-        (*fe_collection)(fe_index, r_index),
-        q_collections[q_index], // TOOD
-        update_flags);
+      fe_values_table(present_fe_values_index) =
+        std::make_unique<FEValuesType>((*mapping_collection)(mapping_index,
+                                                             r_index),
+                                       (*fe_collection)(fe_index, r_index),
+                                       q_collections[q_index], // TOOD
+                                       update_flags);
 
     // now there definitely is one!
     return *fe_values_table(present_fe_values_index);
@@ -240,7 +241,7 @@ namespace hp
             Threads::new_task([&, fe_index, mapping_index, q_index, r_index]() {
               fe_values_table[fe_index][mapping_index][q_index][r_index] =
                 std::make_unique<FEValuesType>(
-                  (*mapping_collection)[mapping_index], // TOOD
+                  (*mapping_collection)(mapping_index, r_index),
                   (*fe_collection)(fe_index, r_index),
                   q_collections[q_index], // TOOD
                   update_flags);

@@ -62,6 +62,13 @@ namespace hp
     const T &operator[](const unsigned int index) const;
 
     /**
+     * TODO
+     */
+    const T &
+    operator()(const unsigned int index,
+               const unsigned int reference_cell_index) const;
+
+    /**
      * Return the number of objects stored in this container.
      */
     unsigned int
@@ -116,7 +123,20 @@ namespace hp
   template <typename T>
   inline const T &Collection<T>::operator[](const unsigned int index) const
   {
-    AssertIndexRange(index, entries.size());
+    AssertIndexRange(index, this->size());
+    return *entries[index];
+  }
+
+
+
+  template <typename T>
+  inline const T &
+  Collection<T>::operator()(const unsigned int index,
+                            const unsigned int reference_cell_index) const
+  {
+    (void)reference_cell_index;
+
+    AssertIndexRange(index, this->size());
     return *entries[index];
   }
 
