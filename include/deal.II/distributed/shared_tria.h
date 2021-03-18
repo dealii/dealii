@@ -232,11 +232,25 @@ namespace parallel
       /**
        * Constructor.
        *
-       * If @p allow_aritifical_cells is true, this class will behave similar
-       * to parallel::distributed::Triangulation in that there will be locally
-       * owned, ghost and artificial cells.
+       * The flag @p allow_artificial_cells can be used to enable artifical
+       * cells. If enabled, this class will behave similarly
+       * to parallel::distributed::Triangulation and
+       * parallel::fullydistributed::Triangulation in the sense that there will
+       * be locally owned cells, a single layer of ghost cells, and
+       * artificial cells. However, one should not forget that in contrast to
+       * those parallel triangulations all cells are duplicated on all
+       * processes, leading in most cases to significantly more artificial
+       * cells.
        *
-       * Otherwise all non-locally owned cells are considered ghost.
+       * If artificial cells are disabled, all non-locally owned cells are
+       * considered ghost cells. This might lead to very expensive ghost-value
+       * update steps. While in the case of artificial cells, ghost-value
+       * updates lead to communication only with the direct process neighbors in
+       * a point-to-point fashion, these degenerate to an operation in which
+       * every process communicates with every other process (an "all-to-all"
+       * communication) if no artifical cells are available. If such ghost-value
+       * updates are the bottleneck in your code, you may want to consider
+       * enabling artificial cells.
        */
       Triangulation(
         const MPI_Comm &mpi_communicator,
