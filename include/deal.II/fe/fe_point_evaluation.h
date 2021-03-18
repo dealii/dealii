@@ -47,8 +47,9 @@ namespace internal
       using value_type    = Tensor<1, n_components>;
       using gradient_type = Tensor<1, n_components, Tensor<1, dim>>;
 
+      template <typename Number>
       static void
-      read_value(const double       vector_entry,
+      read_value(const Number       vector_entry,
                  const unsigned int component,
                  value_type &       result)
       {
@@ -56,8 +57,9 @@ namespace internal
         result[component] = vector_entry;
       }
 
+      template <typename Number>
       static void
-      write_value(double &           vector_entry,
+      write_value(Number &           vector_entry,
                   const unsigned int component,
                   const value_type & result)
       {
@@ -127,16 +129,18 @@ namespace internal
       using value_type    = double;
       using gradient_type = Tensor<1, dim>;
 
+      template <typename Number>
       static void
-      read_value(const double vector_entry,
+      read_value(const Number vector_entry,
                  const unsigned int,
                  value_type &result)
       {
         result = vector_entry;
       }
 
+      template <typename Number>
       static void
-      write_value(double &vector_entry,
+      write_value(Number &vector_entry,
                   const unsigned int,
                   const value_type &result)
       {
@@ -197,16 +201,18 @@ namespace internal
       using value_type    = Tensor<1, dim>;
       using gradient_type = Tensor<2, dim>;
 
+      template <typename Number>
       static void
-      read_value(const double       vector_entry,
+      read_value(const Number       vector_entry,
                  const unsigned int component,
                  value_type &       result)
       {
         result[component] = vector_entry;
       }
 
+      template <typename Number>
       static void
-      write_value(double &           vector_entry,
+      write_value(Number &           vector_entry,
                   const unsigned int component,
                   const value_type & result)
       {
@@ -410,10 +416,11 @@ public:
    * @param[in] evaluation_flags Flags specifying which quantities should be
    * evaluated at the points.
    */
+  template <typename Number>
   void
   evaluate(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
            const ArrayView<const Point<dim>> &     unit_points,
-           const ArrayView<const double> &         solution_values,
+           const ArrayView<const Number> &         solution_values,
            const EvaluationFlags::EvaluationFlags &evaluation_flags);
 
   /**
@@ -432,10 +439,11 @@ public:
    * integrated at the points.
    *
    */
+  template <typename Number>
   void
   integrate(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
             const ArrayView<const Point<dim>> &     unit_points,
-            const ArrayView<double> &               solution_values,
+            const ArrayView<Number> &               solution_values,
             const EvaluationFlags::EvaluationFlags &integration_flags);
 
   /**
@@ -604,11 +612,12 @@ FEPointEvaluation<n_components, dim, spacedim>::FEPointEvaluation(
 
 
 template <int n_components, int dim, int spacedim>
+template <typename Number>
 void
 FEPointEvaluation<n_components, dim, spacedim>::evaluate(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const ArrayView<const Point<dim>> &                         unit_points,
-  const ArrayView<const double> &                             solution_values,
+  const ArrayView<const Number> &                             solution_values,
   const EvaluationFlags::EvaluationFlags &                    evaluation_flag)
 {
   AssertDimension(solution_values.size(), fe->dofs_per_cell);
@@ -740,11 +749,12 @@ FEPointEvaluation<n_components, dim, spacedim>::evaluate(
 
 
 template <int n_components, int dim, int spacedim>
+template <typename Number>
 void
 FEPointEvaluation<n_components, dim, spacedim>::integrate(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const ArrayView<const Point<dim>> &                         unit_points,
-  const ArrayView<double> &                                   solution_values,
+  const ArrayView<Number> &                                   solution_values,
   const EvaluationFlags::EvaluationFlags &                    integration_flags)
 {
   AssertDimension(solution_values.size(), fe->dofs_per_cell);

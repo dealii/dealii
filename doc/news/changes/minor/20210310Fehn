@@ -1,6 +1,8 @@
-New: MappingQCache has a new initialize function that takes
+New: MappingQCache has new initialize functions. One set of functions takes
 either a std::function or a dealii::Function for transforming
-individual points.
+individual points. Another set of functions take global vectors (and 
+MGLevelObjects of global vectors) and use these to initialize the position of
+the support points much like MappingFEField does.
 <br>
 (Niklas Fehn, Martin Kronbichler, Peter Munch, 2021/03/10)
 

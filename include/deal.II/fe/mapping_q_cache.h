@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/function.h>
+#include <deal.II/base/mg_level_object.h>
 
 #include <deal.II/fe/mapping_q_generic.h>
 
@@ -28,6 +29,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
+template <int, int>
+class DoFHandler;
+#endif
 
 
 /*!@addtogroup mapping */
@@ -160,6 +166,42 @@ public:
              const Triangulation<dim, spacedim> &tria,
              const Function<spacedim> &          transformation_function,
              const bool function_describes_relative_displacement);
+
+  /**
+   * Initialize the data cache of the active cells by a discrete field
+   * (specified
+   * by @p dof_handler and @p vector) that describes the absolute or
+   * relative position of each support point.
+   *
+   * @note By using this function for reinitialization, this class behaves like
+   *   MappingFEField (vector_describes_relative_displacement == false) or
+   *   MappingQEulerian (vector_describes_relative_displacement == true), but
+   *   with much more efficient operations internally.
+   */
+  template <typename VectorType>
+  void
+  initialize(const Mapping<dim, spacedim> &   mapping,
+             const DoFHandler<dim, spacedim> &dof_handler,
+             const VectorType &               vector,
+             const bool vector_describes_relative_displacement);
+
+  /**
+   * Initialize the data cache of all non-artificial cells by a solution
+   * (specified by @p dof_handler and a set of @p vectors on all levels of the
+   * triangulation) that describes the absolute or relative position of each
+   * support point.
+   *
+   * @note By using this function for reinitialization, this class behaves like
+   *   MappingFEField (vector_describes_relative_displacement == false) or
+   *   MappingQEulerian (vector_describes_relative_displacement == true), but
+   *   with much more efficient operations internally.
+   */
+  template <typename VectorType>
+  void
+  initialize(const Mapping<dim, spacedim> &   mapping,
+             const DoFHandler<dim, spacedim> &dof_handler,
+             const MGLevelObject<VectorType> &vectors,
+             const bool vector_describes_relative_displacement);
 
   /**
    * Return the memory consumption (in bytes) of the cache.

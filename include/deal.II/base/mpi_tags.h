@@ -139,6 +139,9 @@ namespace Utilities
           // Utilities::MPI::compute_union
           compute_union,
 
+          // Utilities::MPI::RemotePointEvaluation
+          remote_point_evaluation,
+
         };
       } // namespace Tags
     }   // namespace internal
