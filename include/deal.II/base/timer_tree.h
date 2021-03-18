@@ -135,9 +135,9 @@ public:
    * replaced by new_name when inserted into the tree.
    */
   void
-  insert(std::vector<std::string>   ids,
-         std::shared_ptr<TimerTree> sub_tree,
-         std::string const          new_name = "")
+  insert(std::vector<std::string> const         ids,
+         std::shared_ptr<TimerTree const> const sub_tree,
+         std::string const                      new_name = "")
   {
     AssertThrow(ids.size() > 0, ExcMessage("Empty ID specified."));
     AssertThrow(id == ids[0], ExcMessage("Invalid ID specified."));
@@ -221,7 +221,7 @@ private:
    * Copy function.
    */
   void
-  copy_from(std::shared_ptr<TimerTree> other)
+  copy_from(std::shared_ptr<TimerTree const> const other)
   {
     *this = *other;
   }
