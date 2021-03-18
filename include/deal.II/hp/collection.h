@@ -36,7 +36,7 @@ namespace hp
    *
    * @ingroup hp hpcollection
    */
-  template <typename T>
+  template <typename T, int N = 1>
   class Collection : public Subscriptor
   {
   public:
@@ -74,11 +74,11 @@ namespace hp
     std::size_t
     memory_consumption() const;
 
-  private:
+  protected:
     /**
      * The real container, which stores pointers to the different objects.
      */
-    std::vector<std::shared_ptr<const T>> entries;
+    Table<N, std::shared_ptr<const T>> entries;
   };
 
 
@@ -86,37 +86,47 @@ namespace hp
 
 
 
-  template <typename T>
+  template <typename T, int N>
   std::size_t
-  Collection<T>::memory_consumption() const
+  Collection<T, N>::memory_consumption() const
   {
     return (sizeof(*this) + MemoryConsumption::memory_consumption(entries));
   }
 
 
 
-  template <typename T>
+  template <typename T, int N>
   void
-  Collection<T>::push_back(const std::shared_ptr<const T> &new_entry)
+  Collection<T, N>::push_back(const std::shared_ptr<const T> &new_entry)
   {
-    entries.push_back(new_entry);
+    const auto         temp     = entries;
+    const unsigned int old_size = this->size();
+
+    AssertDimension(N, 1);
+
+    entries = Table<N, std::shared_ptr<const T>>(old_size + 1);
+
+    for (unsigned int i = 0; i < old_size; ++i)
+      entries[i] = temp[i];
+
+    entries[old_size] = new_entry;
   }
 
 
 
-  template <typename T>
+  template <typename T, int N>
   inline unsigned int
-  Collection<T>::size() const
+  Collection<T, N>::size() const
   {
-    return entries.size();
+    return entries.size()[0];
   }
 
 
 
-  template <typename T>
-  inline const T &Collection<T>::operator[](const unsigned int index) const
+  template <typename T, int N>
+  inline const T &Collection<T, N>::operator[](const unsigned int index) const
   {
-    AssertIndexRange(index, entries.size());
+    AssertIndexRange(index, this->size());
     return *entries[index];
   }
 
