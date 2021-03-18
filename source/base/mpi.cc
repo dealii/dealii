@@ -1188,6 +1188,8 @@ namespace Utilities
     }
 
 
+#ifndef DOXYGEN
+    // explicit instantiations
     template bool
     logical_or<bool>(const bool &, const MPI_Comm &);
 
@@ -1205,6 +1207,7 @@ namespace Utilities
 
     template std::set<unsigned int>
     compute_set_union(const std::set<unsigned int> &set, const MPI_Comm &comm);
+#endif
 
 #include "mpi.inst"
   } // end of namespace MPI
