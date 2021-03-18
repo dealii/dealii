@@ -23,6 +23,7 @@
 
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/vector_operations_internal.h>
 
@@ -405,6 +406,68 @@ namespace LinearAlgebra
       }
 
     return *this;
+  }
+
+
+
+  namespace internal
+  {
+    template <typename VectorType, typename Number>
+    void
+    import_serial_vector(const VectorType &       values,
+                         VectorOperation::values  operation,
+                         ReadWriteVector<Number> &rw_vector)
+    {
+      using size_type = types::global_dof_index;
+
+      const IndexSet &stored = rw_vector.get_stored_elements();
+      if (operation == VectorOperation::add)
+        for (size_type i = 0; i < stored.n_elements(); ++i)
+          rw_vector.local_element(i) += values(stored.nth_index_in_set(i));
+      else if (operation == VectorOperation::min)
+        for (size_type i = 0; i < stored.n_elements(); ++i)
+          rw_vector.local_element(i) =
+            get_min(values(stored.nth_index_in_set(i)),
+                    rw_vector.local_element(i));
+      else if (operation == VectorOperation::max)
+        for (size_type i = 0; i < stored.n_elements(); ++i)
+          rw_vector.local_element(i) =
+            get_max(values(stored.nth_index_in_set(i)),
+                    rw_vector.local_element(i));
+      else
+        for (size_type i = 0; i < stored.n_elements(); ++i)
+          rw_vector.local_element(i) = values(stored.nth_index_in_set(i));
+    }
+  } // namespace internal
+
+
+
+  template <typename Number>
+  void
+  ReadWriteVector<Number>::import(
+    const dealii::Vector<Number> &vec,
+    VectorOperation::values       operation,
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+      &communication_pattern)
+  {
+    (void)communication_pattern;
+
+    internal::import_serial_vector(vec, operation, *this);
+  }
+
+
+
+  template <typename Number>
+  void
+  ReadWriteVector<Number>::import(
+    const LinearAlgebra::Vector<Number> &vec,
+    VectorOperation::values              operation,
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+      &communication_pattern)
+  {
+    (void)communication_pattern;
+
+    internal::import_serial_vector(vec, operation, *this);
   }
 
 
