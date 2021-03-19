@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2020 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,12 +22,14 @@
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria_base.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/refinement.h>
 
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/vector.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -751,6 +753,219 @@ namespace hp
                   }
               }
           }
+    }
+
+
+
+    /**
+     * Optimize p-level distribution
+     */
+    template <int dim, int spacedim>
+    bool
+    limit_p_level_difference(
+      const dealii::DoFHandler<dim, spacedim> &dof_handler,
+      const unsigned int                       max_difference,
+      const unsigned int                       contains_fe_index)
+    {
+      Assert(
+        dof_handler.has_hp_capabilities(),
+        (typename dealii::DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
+      Assert(
+        max_difference > 0,
+        ExcMessage(
+          "This function does not serve any purpose for max_difference = 0."));
+      AssertIndexRange(contains_fe_index,
+                       dof_handler.get_fe_collection().size());
+
+      //
+      // establish hierarchy
+      //
+      // - create bimap between hierarchy levels and FE indices
+
+      // there can be as many levels in the hierarchy as active FE indices are
+      // possible
+      using level_type =
+        typename dealii::DoFHandler<dim, spacedim>::active_fe_index_type;
+      static const level_type invalid_level =
+        dealii::DoFHandler<dim, spacedim>::invalid_active_fe_index;
+
+      // map from FE index to level in hierarchy
+      // FE indices that are not covered in the hierarchy are not in the map
+      const std::vector<unsigned int> fe_index_for_hierarchy_level =
+        dof_handler.get_fe_collection().get_hierarchy_sequence(
+          contains_fe_index);
+
+      // map from level in hierarchy to FE index
+      // FE indices that are not covered in the hierarchy will be mapped to
+      // invalid_level
+      std::vector<unsigned int> hierarchy_level_for_fe_index(
+        dof_handler.get_fe_collection().size(), invalid_level);
+      for (unsigned int l = 0; l < fe_index_for_hierarchy_level.size(); ++l)
+        hierarchy_level_for_fe_index[fe_index_for_hierarchy_level[l]] = l;
+
+
+      //
+      // parallelization
+      //
+      // - create distributed vector of level indices
+      // - update ghost values in each iteration (see later)
+      // - no need to compress, since the owning processor will have the correct
+      //   level index
+
+      // HOTFIX: dealii::Vector does not accept integral types
+      LinearAlgebra::distributed::Vector<float> future_levels;
+      if (const auto parallel_tria =
+            dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+              &(dof_handler.get_triangulation())))
+        {
+          future_levels.reinit(
+            parallel_tria->global_active_cell_index_partitioner().lock());
+        }
+      else
+        {
+          future_levels.reinit(
+            dof_handler.get_triangulation().n_active_cells());
+        }
+
+      for (const auto &cell : dof_handler.active_cell_iterators())
+        if (cell->is_locally_owned())
+          future_levels[cell->global_active_cell_index()] =
+            hierarchy_level_for_fe_index[cell->future_fe_index()];
+
+
+      //
+      // limit level difference of neighboring cells
+      //
+      // - go over all locally relevant cells, and adjust the level indices of
+      //   locally owned neighbors to match the level difference (as a
+      //   consequence, indices on ghost cells will be updated only on the
+      //   owning processor)
+      // - always raise levels to match criterion, never lower them
+      // - exchange level indices on ghost cells
+
+      bool levels_changed = false;
+      bool levels_changed_in_cycle;
+      do
+        {
+          levels_changed_in_cycle = false;
+
+          future_levels.update_ghost_values();
+
+          for (const auto &cell : dof_handler.active_cell_iterators())
+            if (!cell->is_artificial())
+              {
+                const level_type cell_level = static_cast<level_type>(
+                  future_levels[cell->global_active_cell_index()]);
+
+                // ignore cells that are not part of the hierarchy
+                if (cell_level == invalid_level)
+                  continue;
+
+                // ignore lowest levels of the hierarchy that always fulfill the
+                // max_difference criterion
+                if (cell_level <= max_difference)
+                  continue;
+
+                for (unsigned int f = 0; f < cell->n_faces(); ++f)
+                  if (cell->face(f)->at_boundary() == false)
+                    {
+                      if (cell->face(f)->has_children())
+                        {
+                          for (unsigned int sf = 0;
+                               sf < cell->face(f)->n_children();
+                               ++sf)
+                            {
+                              const auto neighbor =
+                                cell->neighbor_child_on_subface(f, sf);
+
+                              // We only care about locally owned neighbors. If
+                              // neighbor is a ghost cell, its future FE index
+                              // will be updated on the owning process and
+                              // communicated at the next loop iteration.
+                              if (neighbor->is_locally_owned())
+                                {
+                                  const level_type neighbor_level =
+                                    static_cast<level_type>(
+                                      future_levels
+                                        [neighbor->global_active_cell_index()]);
+
+                                  // ignore neighbors that are not part of the
+                                  // hierarchy
+                                  if (neighbor_level == invalid_level)
+                                    continue;
+
+                                  if ((cell_level - max_difference) >
+                                      neighbor_level)
+                                    {
+                                      future_levels
+                                        [neighbor->global_active_cell_index()] =
+                                          cell_level - max_difference;
+
+                                      levels_changed_in_cycle = true;
+                                    }
+                                }
+                            }
+                        }
+                      else
+                        {
+                          const auto neighbor = cell->neighbor(f);
+
+                          // We only care about locally owned neighbors. If
+                          // neighbor is a ghost cell, its future FE index will
+                          // be updated on the owning process and communicated
+                          // at the next loop iteration.
+                          if (neighbor->is_locally_owned())
+                            {
+                              const level_type neighbor_level =
+                                static_cast<level_type>(
+                                  future_levels
+                                    [neighbor->global_active_cell_index()]);
+
+                              // ignore neighbors that are not part of the
+                              // hierarchy
+                              if (neighbor_level == invalid_level)
+                                continue;
+
+                              if ((cell_level - max_difference) >
+                                  neighbor_level)
+                                {
+                                  future_levels
+                                    [neighbor->global_active_cell_index()] =
+                                      cell_level - max_difference;
+
+                                  levels_changed_in_cycle = true;
+                                }
+                            }
+                        }
+                    }
+              }
+
+          levels_changed_in_cycle =
+            Utilities::MPI::logical_or(levels_changed_in_cycle,
+                                       dof_handler.get_communicator());
+          levels_changed |= levels_changed_in_cycle;
+        }
+      while (levels_changed_in_cycle);
+
+      // update future FE indices on locally owned cells
+      for (const auto &cell : dof_handler.active_cell_iterators())
+        if (cell->is_locally_owned())
+          {
+            const level_type cell_level = static_cast<level_type>(
+              future_levels[cell->global_active_cell_index()]);
+
+            if (cell_level != invalid_level)
+              {
+                const unsigned int fe_index =
+                  fe_index_for_hierarchy_level[cell_level];
+
+                // only update if necessary
+                if (fe_index != cell->active_fe_index())
+                  cell->set_future_fe_index(fe_index);
+              }
+          }
+
+      return levels_changed;
     }
   } // namespace Refinement
 } // namespace hp

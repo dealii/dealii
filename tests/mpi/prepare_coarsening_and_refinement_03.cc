@@ -30,6 +30,7 @@
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/hp/fe_collection.h>
+#include <deal.II/hp/refinement.h>
 
 #include "../tests.h"
 
@@ -94,7 +95,9 @@ test(parallel::TriangulationBase<dim> &tria,
   dofh.distribute_dofs(fes);
 
   const bool fe_indices_changed =
-    dofh.prepare_coarsening_and_refinement(max_difference, contains_fe_index);
+    hp::Refinement::limit_p_level_difference(dofh,
+                                             max_difference,
+                                             contains_fe_index);
   tria.execute_coarsening_and_refinement();
 
   (void)fe_indices_changed;
