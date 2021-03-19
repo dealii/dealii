@@ -2952,6 +2952,11 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
         ExcMessage(
           "You ask for information on children of this cell which is only "
           "available for active cells. One of its children is not active."));
+      Assert(child->is_locally_owned(),
+             ExcMessage(
+               "You ask for information on children of this cell which is only "
+               "available for locally owned cells. One of its children is not "
+               "locally owned."));
       future_fe_indices_children.insert(child->future_fe_index());
     }
   Assert(!future_fe_indices_children.empty(), ExcInternalError());

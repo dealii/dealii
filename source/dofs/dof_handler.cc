@@ -1955,8 +1955,8 @@ namespace internal
         static unsigned int
         determine_fe_from_children(
           const typename Triangulation<dim, spacedim>::cell_iterator &,
-          const std::vector<unsigned int> &        children_fe_indices,
-          dealii::hp::FECollection<dim, spacedim> &fe_collection)
+          const std::vector<unsigned int> &              children_fe_indices,
+          const dealii::hp::FECollection<dim, spacedim> &fe_collection)
         {
           Assert(!children_fe_indices.empty(), ExcInternalError());
 
