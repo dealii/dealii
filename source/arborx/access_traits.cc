@@ -21,9 +21,9 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace ArborXWrappers
 {
-  // ------------------- PointIntersect ------------------- //
+  // ------------------- PointPredicate ------------------- //
   template <int dim, typename Number>
-  PointIntersect::PointIntersect(
+  PointPredicate::PointPredicate(
     const std::vector<dealii::Point<dim, Number>> &dim_points)
   {
     static_assert(dim != 1, "dim equal to one is not supported.");
@@ -42,7 +42,7 @@ namespace ArborXWrappers
 
 
   std::size_t
-  PointIntersect::size() const
+  PointPredicate::size() const
   {
     return points.size();
   }
@@ -50,16 +50,40 @@ namespace ArborXWrappers
 
 
   const dealii::Point<3, float> &
-  PointIntersect::get(unsigned int i) const
+  PointPredicate::get(unsigned int i) const
   {
     return points[i];
   }
 
 
 
-  // ------------------- BoundingBoxIntersect ------------------- //
   template <int dim, typename Number>
-  BoundingBoxIntersect::BoundingBoxIntersect(
+  PointIntersectPredicate::PointIntersectPredicate(
+    const std::vector<dealii::Point<dim, Number>> &points)
+    : PointPredicate(points)
+  {}
+
+
+
+  template <int dim, typename Number>
+  PointNearestPredicate::PointNearestPredicate(
+    const std::vector<dealii::Point<dim, Number>> &points,
+    const unsigned int                             n_nearest_neighbors)
+    : PointPredicate(points)
+    , n_nearest_neighbors(n_nearest_neighbors)
+  {}
+
+
+
+  unsigned int
+  PointNearestPredicate::get_n_nearest_neighbors() const
+  {
+    return n_nearest_neighbors;
+  }
+
+  // ------------------- BoundingBoxPredicate ------------------- //
+  template <int dim, typename Number>
+  BoundingBoxPredicate::BoundingBoxPredicate(
     const std::vector<dealii::BoundingBox<dim, Number>> &bb)
   {
     const unsigned int size = bb.size();
@@ -84,7 +108,7 @@ namespace ArborXWrappers
 
 
   std::size_t
-  BoundingBoxIntersect::size() const
+  BoundingBoxPredicate::size() const
   {
     return bounding_boxes.size();
   }
@@ -92,9 +116,35 @@ namespace ArborXWrappers
 
 
   const dealii::BoundingBox<3, float> &
-  BoundingBoxIntersect::get(unsigned int i) const
+  BoundingBoxPredicate::get(unsigned int i) const
   {
     return bounding_boxes[i];
+  }
+
+
+
+  template <int dim, typename Number>
+  BoundingBoxIntersectPredicate::BoundingBoxIntersectPredicate(
+    const std::vector<dealii::BoundingBox<dim, Number>> &bounding_boxes)
+    : BoundingBoxPredicate(bounding_boxes)
+  {}
+
+
+
+  template <int dim, typename Number>
+  BoundingBoxNearestPredicate::BoundingBoxNearestPredicate(
+    const std::vector<dealii::BoundingBox<dim, Number>> &bounding_boxes,
+    const unsigned int                                   n_nearest_neighbors)
+    : BoundingBoxPredicate(bounding_boxes)
+    , n_nearest_neighbors(n_nearest_neighbors)
+  {}
+
+
+
+  unsigned int
+  BoundingBoxNearestPredicate::get_n_nearest_neighbors() const
+  {
+    return n_nearest_neighbors;
   }
 } // namespace ArborXWrappers
 
