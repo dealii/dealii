@@ -1642,6 +1642,7 @@ namespace parallel
           forest);
       parallel_forest =
         dealii::internal::p4est::functions<dim>::copy_forest(temp, false);
+      parallel_forest->connectivity = connectivity;
       parallel_forest->user_pointer = this;
 
       try
@@ -1650,10 +1651,8 @@ namespace parallel
         }
       catch (const typename Triangulation<dim>::DistortedCellList &)
         {
-          // the underlying
-          // triangulation should not
-          // be checking for
-          // distorted cells
+          // the underlying triangulation should not be checking for distorted
+          // cells
           Assert(false, ExcInternalError());
         }
 
