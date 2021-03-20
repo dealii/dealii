@@ -3266,10 +3266,14 @@ namespace parallel
     Triangulation<dim, spacedim>::copy_triangulation(
       const dealii::Triangulation<dim, spacedim> &other_tria)
     {
-      Assert(other_tria.n_levels() == 1,
-             ExcMessage(
-               "Parallel distributed triangulations can only be copied, "
-               "if they are not refined!"));
+      Assert(
+        (dynamic_cast<
+          const dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
+          &other_tria)) ||
+          (other_tria.n_global_levels() == 1),
+        ExcNotImplemented());
+
+      dealii::parallel::distributed::Triangulation<dim, spacedim>::clear();
 
       try
         {
@@ -3285,31 +3289,46 @@ namespace parallel
           Assert(false, ExcInternalError());
         }
 
-      // note that now we have some content in the p4est objects and call the
-      // functions that do the actual work (which are dimension dependent, so
-      // separate)
-      triangulation_has_content = true;
-
       if (const dealii::parallel::distributed::Triangulation<dim, spacedim>
-            *other_tria_x =
+            *other_distributed =
               dynamic_cast<const dealii::parallel::distributed::
                              Triangulation<dim, spacedim> *>(&other_tria))
         {
+          // copy parallel distributed specifics
+          settings = other_distributed->settings;
+          triangulation_has_content =
+            other_distributed->triangulation_has_content;
           coarse_cell_to_p4est_tree_permutation =
-            other_tria_x->coarse_cell_to_p4est_tree_permutation;
+            other_distributed->coarse_cell_to_p4est_tree_permutation;
           p4est_tree_to_coarse_cell_permutation =
-            other_tria_x->p4est_tree_to_coarse_cell_permutation;
-          this->cell_attached_data = other_tria_x->cell_attached_data;
-          this->data_transfer      = other_tria_x->data_transfer;
+            other_distributed->p4est_tree_to_coarse_cell_permutation;
+          this->cell_attached_data = other_distributed->cell_attached_data;
+          this->data_transfer      = other_distributed->data_transfer;
 
-          settings = other_tria_x->settings;
+          // create deep copy of connectivity graph
+          typename dealii::internal::p4est::types<dim>::connectivity
+            *temp_connectivity = const_cast<
+              typename dealii::internal::p4est::types<dim>::connectivity *>(
+              other_distributed->connectivity);
+          connectivity =
+            dealii::internal::p4est::copy_connectivity<dim>(temp_connectivity);
+
+          // create deep copy of parallel forest
+          typename dealii::internal::p4est::types<dim>::forest *temp_forest =
+            const_cast<typename dealii::internal::p4est::types<dim>::forest *>(
+              other_distributed->parallel_forest);
+          parallel_forest =
+            dealii::internal::p4est::functions<dim>::copy_forest(temp_forest,
+                                                                 false);
+          parallel_forest->connectivity = connectivity;
+          parallel_forest->user_pointer = this;
         }
       else
         {
+          triangulation_has_content = true;
           setup_coarse_cell_to_p4est_tree_permutation();
+          copy_new_triangulation_to_p4est(std::integral_constant<int, dim>());
         }
-
-      copy_new_triangulation_to_p4est(std::integral_constant<int, dim>());
 
       try
         {
