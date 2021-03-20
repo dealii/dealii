@@ -1650,10 +1650,8 @@ namespace parallel
         }
       catch (const typename Triangulation<dim>::DistortedCellList &)
         {
-          // the underlying
-          // triangulation should not
-          // be checking for
-          // distorted cells
+          // the underlying triangulation should not be checking for distorted
+          // cells
           Assert(false, ExcInternalError());
         }
 
@@ -3267,64 +3265,59 @@ namespace parallel
     Triangulation<dim, spacedim>::copy_triangulation(
       const dealii::Triangulation<dim, spacedim> &other_tria)
     {
-      Assert(other_tria.n_levels() == 1,
-             ExcMessage(
-               "Parallel distributed triangulations can only be copied, "
-               "if they are not refined!"));
+      Assert(
+        (dynamic_cast<
+          const dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
+          &other_tria)) ||
+          (other_tria.n_global_levels() == 1),
+        ExcNotImplemented());
 
-      try
-        {
-          dealii::parallel::TriangulationBase<dim, spacedim>::
-            copy_triangulation(other_tria);
-        }
-      catch (
-        const typename dealii::Triangulation<dim, spacedim>::DistortedCellList
-          &)
-        {
-          // the underlying triangulation should not be checking for distorted
-          // cells
-          Assert(false, ExcInternalError());
-        }
+      // copy coarse triangulation and its manifold description
+      {
+        const auto coarse_mesh_description =
+          GridTools::get_coarse_mesh_description(other_tria);
 
-      // note that now we have some content in the p4est objects and call the
-      // functions that do the actual work (which are dimension dependent, so
-      // separate)
-      triangulation_has_content = true;
+        try
+          {
+            create_triangulation(std::get<0>(coarse_mesh_description),
+                                 std::get<1>(coarse_mesh_description),
+                                 std::get<2>(coarse_mesh_description));
+          }
+        catch (const typename Triangulation<dim>::DistortedCellList &)
+          {
+            // the underlying triangulation should not be checking for distorted
+            // cells
+            Assert(false, ExcInternalError());
+          }
 
-      if (const dealii::parallel::distributed::Triangulation<dim, spacedim>
-            *other_tria_x =
-              dynamic_cast<const dealii::parallel::distributed::
-                             Triangulation<dim, spacedim> *>(&other_tria))
-        {
-          coarse_cell_to_p4est_tree_permutation =
-            other_tria_x->coarse_cell_to_p4est_tree_permutation;
-          p4est_tree_to_coarse_cell_permutation =
-            other_tria_x->p4est_tree_to_coarse_cell_permutation;
-          this->cell_attached_data = other_tria_x->cell_attached_data;
-          this->data_transfer      = other_tria_x->data_transfer;
+        for (const auto i : other_tria.get_manifold_ids())
+          if (i != numbers::flat_manifold_id)
+            this->set_manifold(i, other_tria.get_manifold(i));
+      }
 
-          settings = other_tria_x->settings;
-        }
-      else
+      // deal with parallel distributed specifics
+      if (const auto *other_distributed =
+            dynamic_cast<const dealii::parallel::distributed::
+                           Triangulation<dim, spacedim> *>(&other_tria))
         {
-          setup_coarse_cell_to_p4est_tree_permutation();
-        }
+          // copy attributes
+          this->cell_attached_data = other_distributed->cell_attached_data;
+          this->data_transfer      = other_distributed->data_transfer;
 
-      copy_new_triangulation_to_p4est(std::integral_constant<int, dim>());
+          settings = other_distributed->settings;
 
-      try
-        {
-          copy_local_forest_to_triangulation();
-        }
-      catch (const typename Triangulation<dim>::DistortedCellList &)
-        {
-          // the underlying triangulation should not be checking for distorted
-          // cells
-          Assert(false, ExcInternalError());
+          // recover refinement tree
+          load(other_distributed->get_p4est());
         }
 
-      this->update_periodic_face_map();
-      this->update_number_cache();
+      // release unused vector memory because we will have very different
+      // vectors now
+      if (dynamic_cast<const dealii::parallel::TriangulationBase<dim, spacedim>
+                         *>(&other_tria))
+        {
+          ::dealii::internal::GrowingVectorMemoryImplementation::
+            release_all_unused_memory();
+        }
     }
 
 
