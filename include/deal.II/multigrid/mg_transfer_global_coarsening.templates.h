@@ -1914,30 +1914,6 @@ namespace MGTransferGlobalCoarseningTools
   }
 
 
-  namespace internal
-  {
-    template <int dim, int spacedim>
-    void
-    load_forest(const parallel::distributed::Triangulation<dim, spacedim> &in,
-                parallel::distributed::Triangulation<dim, spacedim> &      out)
-    {
-#ifndef DEAL_II_WITH_P4EST
-      (void)in;
-      (void)out;
-#else
-      out.load(in.get_p4est());
-#endif
-    }
-
-    template <int spacedim>
-    void
-    load_forest(const parallel::distributed::Triangulation<1, spacedim> &in,
-                parallel::distributed::Triangulation<1, spacedim> &      out)
-    {
-      (void)in;
-      (void)out;
-    }
-  } // namespace internal
 
   template <int dim, int spacedim>
   std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
@@ -1967,33 +1943,16 @@ namespace MGTransferGlobalCoarseningTools
 
     const unsigned int max_level = fine_triangulation->n_global_levels() - 1;
 
-    const auto coarse_mesh_description =
-      GridTools::get_coarse_mesh_description(*fine_triangulation);
-
     // create coarse meshes
     for (unsigned int l = max_level; l > 0; --l)
       {
-        // create empty triangulation
+        // copy triangulation
         auto new_tria =
           std::make_shared<parallel::distributed::Triangulation<dim, spacedim>>(
             fine_triangulation->get_communicator(),
             fine_triangulation->get_mesh_smoothing());
 
-        // create coarse grid
-        new_tria->create_triangulation(std::get<0>(coarse_mesh_description),
-                                       std::get<1>(coarse_mesh_description),
-                                       std::get<2>(coarse_mesh_description));
-
-        for (const auto i : fine_triangulation->get_manifold_ids())
-          if (i != numbers::flat_manifold_id)
-            new_tria->set_manifold(i, fine_triangulation->get_manifold(i));
-
-        // create refinement hierarchy (by loading stored mesh)
-        internal::load_forest(
-          *dynamic_cast<
-            const parallel::distributed::Triangulation<dim, spacedim> *>(
-            coarse_grid_triangulations[l].get()),
-          *new_tria);
+        new_tria->copy_triangulation(*coarse_grid_triangulations[l]);
 
         // coarsen mesh
         new_tria->coarsen_global();
