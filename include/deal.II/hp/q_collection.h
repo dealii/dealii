@@ -60,6 +60,13 @@ namespace hp
     QCollection(const QCollection<dim_in, N> &other);
 
     /**
+     * Copy constructor.
+     */
+    QCollection(const Table<N, std::shared_ptr<const Quadrature<dim>>> entries)
+      : Collection<Quadrature<dim>, N, QCollection<dim, N - 1>>(entries)
+    {}
+
+    /**
      * Conversion constructor. This constructor creates a QCollection from a
      * single quadrature rule. More quadrature formulas can be added with
      * push_back(), if desired, though it would probably be clearer to add all
@@ -142,11 +149,8 @@ namespace hp
   template <int dim_in>
   QCollection<dim, N>::QCollection(const QCollection<dim_in, N> &other)
   {
-    Assert(false, ExcNotImplemented());
-    (void)other;
-
-    // for (unsigned int i = 0; i < other.size(); ++i)
-    //  push_back(other[i]);
+    for (unsigned int i = 0; i < other.size(); ++i)
+      push_back(other[i]);
   }
 
 

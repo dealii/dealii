@@ -35,13 +35,15 @@ namespace hp
     QCollection<q_dim, 2>
     translate(const QCollection<q_dim, 1> &q_collection)
     {
-      Assert(false, ExcNotImplemented());
-      (void)q_collection;
+      const Table<1, std::shared_ptr<const Quadrature<q_dim>>> &old_enties =
+        q_collection.get_entries();
+      Table<2, std::shared_ptr<const Quadrature<q_dim>>> new_enties(
+        old_enties.size()[0], 1);
 
-      // for (unsigned int q = 0; q < q_collection.size(); ++q)
-      //  q_collections.emplace_back(q_collection[q]);
+      for (unsigned int i = 0; i < old_enties.size()[0]; ++i)
+        new_enties[i][0] = old_enties[i];
 
-      return QCollection<q_dim, 2>();
+      return QCollection<q_dim, 2>(new_enties);
     }
 
     /**
@@ -52,13 +54,15 @@ namespace hp
     QCollection<q_dim, 1>
     translate(const QCollection<q_dim, 2> &q_collections)
     {
-      Assert(false, ExcNotImplemented());
-      (void)q_collections;
+      const Table<2, std::shared_ptr<const Quadrature<q_dim>>> &old_enties =
+        q_collections.get_entries();
+      Table<1, std::shared_ptr<const Quadrature<q_dim>>> new_enties(
+        old_enties.size()[0]);
 
-      // for (unsigned int q = 0; q < q_collections.size(); ++q)
-      //  result.push_back(q_collections[q][0]);
+      for (unsigned int i = 0; i < old_enties.size()[0]; ++i)
+        new_enties[i] = old_enties[i][0];
 
-      return QCollection<q_dim, 1>();
+      return QCollection<q_dim, 1>(new_enties);
     }
   } // namespace
 

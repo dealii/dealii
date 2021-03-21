@@ -60,6 +60,12 @@ namespace hp
     std::size_t
     memory_consumption() const;
 
+    const Table<N, std::shared_ptr<const T>> &
+    get_entries() const
+    {
+      return entries;
+    }
+
   protected:
     /**
      * The real container, which stores pointers to the different objects.
@@ -146,13 +152,24 @@ namespace hp
     /**
      * TODO
      */
-    const U operator[](const unsigned int index) const;
+    const U operator[](const unsigned int index) const
+    {
+      Table<1, std::shared_ptr<const T>> new_enties(this->entries.size()[1]);
+
+      for (unsigned int i = 0; i < this->entries.size()[1]; ++i)
+        new_enties[i] = this->entries[index][i];
+
+      return U(new_enties);
+    }
 
     /**
      * TODO
      */
     unsigned int
-    size() const;
+    size() const
+    {
+      return this->entries.size()[0];
+    }
   };
 
 
