@@ -49,9 +49,7 @@ namespace hp
     /**
      * TODO.
      */
-    CollectionBase(const Table<N, std::shared_ptr<const T>> &entries)
-      : entries(entries)
-    {}
+    CollectionBase(const Table<N, std::shared_ptr<const T>> &entries);
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
@@ -60,17 +58,17 @@ namespace hp
     std::size_t
     memory_consumption() const;
 
+    /**
+     * TODO
+     */
     Table<N, std::shared_ptr<const T>> &
-    get_entries()
-    {
-      return entries;
-    }
+    get_entries();
 
+    /**
+     * TODO
+     */
     const Table<N, std::shared_ptr<const T>> &
-    get_entries() const
-    {
-      return entries;
-    }
+    get_entries() const;
 
   protected:
     /**
@@ -111,9 +109,7 @@ namespace hp
     /**
      * TODO.
      */
-    Collection(const Table<1, std::shared_ptr<const T>> &entries)
-      : CollectionBase<T, 1>(entries)
-    {}
+    Collection(const Table<1, std::shared_ptr<const T>> &entries);
 
     /**
      * Add a new object.
@@ -151,35 +147,30 @@ namespace hp
     /**
      * TODO.
      */
-    Collection(const Table<2, std::shared_ptr<const T>> &entries)
-      : CollectionBase<T, 2>(entries)
-    {}
+    Collection(const Table<2, std::shared_ptr<const T>> &entries);
 
     /**
      * TODO
      */
-    const U operator[](const unsigned int index) const
-    {
-      Table<1, std::shared_ptr<const T>> new_enties(this->entries.size()[1]);
-
-      for (unsigned int i = 0; i < this->entries.size()[1]; ++i)
-        new_enties[i] = this->entries[index][i];
-
-      return U(new_enties);
-    }
+    const U operator[](const unsigned int index) const;
 
     /**
      * TODO
      */
     unsigned int
-    size() const
-    {
-      return this->entries.size()[0];
-    }
+    size() const;
   };
 
 
   /* --------------- inline functions ------------------- */
+
+
+
+  template <typename T, int N>
+  CollectionBase<T, N>::CollectionBase(
+    const Table<N, std::shared_ptr<const T>> &entries)
+    : entries(entries)
+  {}
 
 
 
@@ -189,6 +180,32 @@ namespace hp
   {
     return (sizeof(*this) + MemoryConsumption::memory_consumption(entries));
   }
+
+
+
+  template <typename T, int N>
+  Table<N, std::shared_ptr<const T>> &
+  CollectionBase<T, N>::get_entries()
+  {
+    return entries;
+  }
+
+
+
+  template <typename T, int N>
+  const Table<N, std::shared_ptr<const T>> &
+  CollectionBase<T, N>::get_entries() const
+  {
+    return entries;
+  }
+
+
+
+  template <typename T, typename U>
+  Collection<T, 1, U>::Collection(
+    const Table<1, std::shared_ptr<const T>> &entries)
+    : CollectionBase<T, 1>(entries)
+  {}
 
 
 
@@ -224,6 +241,36 @@ namespace hp
   {
     AssertIndexRange(index, this->size());
     return *this->entries[index];
+  }
+
+
+
+  template <typename T, typename U>
+  Collection<T, 2, U>::Collection(
+    const Table<2, std::shared_ptr<const T>> &entries)
+    : CollectionBase<T, 2>(entries)
+  {}
+
+
+
+  template <typename T, typename U>
+  const U Collection<T, 2, U>::operator[](const unsigned int index) const
+  {
+    Table<1, std::shared_ptr<const T>> new_enties(this->entries.size()[1]);
+
+    for (unsigned int i = 0; i < this->entries.size()[1]; ++i)
+      new_enties[i] = this->entries[index][i];
+
+    return U(new_enties);
+  }
+
+
+
+  template <typename T, typename U>
+  unsigned int
+  Collection<T, 2, U>::size() const
+  {
+    return this->entries.size()[0];
   }
 
 } // namespace hp
