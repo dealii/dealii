@@ -36,7 +36,7 @@ namespace hp
    *
    * @ingroup hp hpcollection
    */
-  template <typename T, int N = 1>
+  template <typename T, int N>
   class CollectionBase : public Subscriptor
   {
   public:
