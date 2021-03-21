@@ -126,6 +126,36 @@ namespace hp
   };
 
 
+
+  template <typename T, typename U>
+  class Collection<T, 2, U> : public CollectionBase<T, 2>
+  {
+  public:
+    /**
+     * TODO
+     */
+    Collection() = default;
+
+    /**
+     * TODO.
+     */
+    Collection(const Table<2, std::shared_ptr<const T>> &entries)
+      : CollectionBase<T, 2>(entries)
+    {}
+
+    /**
+     * TODO
+     */
+    const U operator[](const unsigned int index) const;
+
+    /**
+     * TODO
+     */
+    unsigned int
+    size() const;
+  };
+
+
   /* --------------- inline functions ------------------- */
 
 
