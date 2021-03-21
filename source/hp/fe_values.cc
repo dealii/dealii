@@ -32,15 +32,16 @@ namespace hp
      * with each containing one quadrature rule from the input collection.
      */
     template <int q_dim>
-    std::vector<QCollection<q_dim>>
-    translate(const QCollection<q_dim> &q_collection)
+    QCollection<q_dim, 2>
+    translate(const QCollection<q_dim, 1> &q_collection)
     {
-      std::vector<QCollection<q_dim>> q_collections;
+      Assert(false, ExcNotImplemented());
+      (void)q_collection;
 
-      for (unsigned int q = 0; q < q_collection.size(); ++q)
-        q_collections.emplace_back(q_collection[q]);
+      // for (unsigned int q = 0; q < q_collection.size(); ++q)
+      //  q_collections.emplace_back(q_collection[q]);
 
-      return q_collections;
+      return QCollection<q_dim, 2>();
     }
 
     /**
@@ -48,15 +49,16 @@ namespace hp
      * rule of each collection and construct with these a new collection.
      */
     template <int q_dim>
-    QCollection<q_dim>
-    translate(const std::vector<QCollection<q_dim>> &q_collections)
+    QCollection<q_dim, 1>
+    translate(const QCollection<q_dim, 2> &q_collections)
     {
-      QCollection<q_dim> result;
+      Assert(false, ExcNotImplemented());
+      (void)q_collections;
 
-      for (unsigned int q = 0; q < q_collections.size(); ++q)
-        result.push_back(q_collections[q][0]);
+      // for (unsigned int q = 0; q < q_collections.size(); ++q)
+      //  result.push_back(q_collections[q][0]);
 
-      return result;
+      return QCollection<q_dim, 1>();
     }
   } // namespace
 
@@ -87,7 +89,7 @@ namespace hp
     const MappingCollection<dim, FEValuesType::space_dimension>
       &                                                     mapping_collection,
     const FECollection<dim, FEValuesType::space_dimension> &fe_collection,
-    const std::vector<QCollection<q_dim>> &                 q_collections,
+    const QCollection<q_dim, 2> &                           q_collections,
     const UpdateFlags                                       update_flags)
     : fe_collection(&fe_collection)
     , mapping_collection(&mapping_collection)
@@ -120,7 +122,7 @@ namespace hp
   template <int dim, int q_dim, class FEValuesType>
   FEValuesBase<dim, q_dim, FEValuesType>::FEValuesBase(
     const FECollection<dim, FEValuesType::space_dimension> &fe_collection,
-    const std::vector<QCollection<q_dim>> &                 q_collection,
+    const QCollection<q_dim, 2> &                           q_collection,
     const UpdateFlags                                       update_flags)
     : FEValuesBase(
         dealii::hp::StaticMappingQ1<dim, FEValuesType::space_dimension>::
@@ -381,10 +383,10 @@ namespace hp
 
   template <int dim, int spacedim>
   FEFaceValues<dim, spacedim>::FEFaceValues(
-    const hp::MappingCollection<dim, spacedim> & mapping,
-    const hp::FECollection<dim, spacedim> &      fe_collection,
-    const std::vector<hp::QCollection<dim - 1>> &q_collection,
-    const UpdateFlags                            update_flags)
+    const hp::MappingCollection<dim, spacedim> &mapping,
+    const hp::FECollection<dim, spacedim> &     fe_collection,
+    const hp::QCollection<dim - 1, 2> &         q_collection,
+    const UpdateFlags                           update_flags)
     : hp::FEValuesBase<dim, dim - 1, dealii::FEFaceValues<dim, spacedim>>(
         mapping,
         fe_collection,
@@ -407,9 +409,9 @@ namespace hp
 
   template <int dim, int spacedim>
   FEFaceValues<dim, spacedim>::FEFaceValues(
-    const hp::FECollection<dim, spacedim> &      fe_collection,
-    const std::vector<hp::QCollection<dim - 1>> &q_collection,
-    const UpdateFlags                            update_flags)
+    const hp::FECollection<dim, spacedim> &fe_collection,
+    const hp::QCollection<dim - 1, 2> &    q_collection,
+    const UpdateFlags                      update_flags)
     : hp::FEValuesBase<dim, dim - 1, dealii::FEFaceValues<dim, spacedim>>(
         fe_collection,
         q_collection,

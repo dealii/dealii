@@ -57,7 +57,7 @@ namespace hp
      * Copy constructor.
      */
     template <int dim_in>
-    QCollection(const QCollection<dim_in> &other);
+    QCollection(const QCollection<dim_in, N> &other);
 
     /**
      * Conversion constructor. This constructor creates a QCollection from a
@@ -140,10 +140,13 @@ namespace hp
 
   template <int dim, int N>
   template <int dim_in>
-  QCollection<dim, N>::QCollection(const QCollection<dim_in> &other)
+  QCollection<dim, N>::QCollection(const QCollection<dim_in, N> &other)
   {
-    for (unsigned int i = 0; i < other.size(); ++i)
-      push_back(other[i]);
+    Assert(false, ExcNotImplemented());
+    (void)other;
+
+    // for (unsigned int i = 0; i < other.size(); ++i)
+    //  push_back(other[i]);
   }
 
 
