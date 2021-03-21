@@ -22,6 +22,8 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function.h>
 
+#include <deal.II/hp/q_collection.h>
+
 #include <deal.II/lac/affine_constraints.h>
 
 #include <map>
@@ -58,8 +60,6 @@ class DoFHandler;
 
 namespace hp
 {
-  template <int>
-  class QCollection;
   template <int, int>
   class MappingCollection;
   template <int, int>

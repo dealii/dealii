@@ -19,6 +19,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/hp/q_collection.h>
+
 #include <functional>
 #include <memory>
 
@@ -46,8 +48,6 @@ namespace hp
   class DoFHandler;
   template <int dim, int spacedim>
   class MappingCollection;
-  template <int dim>
-  class QCollection;
 } // namespace hp
 
 

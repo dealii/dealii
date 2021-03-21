@@ -42,8 +42,8 @@ namespace hp
    *
    * @ingroup hp hpcollection
    */
-  template <int dim>
-  class QCollection : public Collection<Quadrature<dim>, 1>
+  template <int dim, int N = 1>
+  class QCollection : public Collection<Quadrature<dim>, N>
   {
   public:
     /**
@@ -137,9 +137,9 @@ namespace hp
 
   /* --------------- inline functions ------------------- */
 
-  template <int dim>
+  template <int dim, int N>
   template <int dim_in>
-  QCollection<dim>::QCollection(const QCollection<dim_in> &other)
+  QCollection<dim, N>::QCollection(const QCollection<dim_in> &other)
   {
     for (unsigned int i = 0; i < other.size(); ++i)
       push_back(other[i]);
@@ -147,9 +147,9 @@ namespace hp
 
 
 
-  template <int dim>
+  template <int dim, int N>
   template <class... QTypes>
-  QCollection<dim>::QCollection(const QTypes &... quadrature_objects)
+  QCollection<dim, N>::QCollection(const QTypes &... quadrature_objects)
   {
     // loop over all of the given arguments and add the quadrature objects to
     // this collection. Inlining the definition of q_pointers causes internal
@@ -176,9 +176,9 @@ namespace hp
 
 
 
-  template <int dim>
+  template <int dim, int N>
   inline unsigned int
-  QCollection<dim>::max_n_quadrature_points() const
+  QCollection<dim, N>::max_n_quadrature_points() const
   {
     Assert(this->size() > 0,
            ExcMessage("You can't call this function for an empty collection"));
@@ -192,9 +192,9 @@ namespace hp
 
 
 
-  template <int dim>
+  template <int dim, int N>
   inline bool
-  QCollection<dim>::operator==(const QCollection<dim> &q_collection) const
+  QCollection<dim, N>::operator==(const QCollection<dim> &q_collection) const
   {
     const unsigned int n_quadratures = this->size();
     if (n_quadratures != q_collection.size())
@@ -209,20 +209,21 @@ namespace hp
 
 
 
-  template <int dim>
+  template <int dim, int N>
   template <int dim_in>
-  inline QCollection<dim>::QCollection(const Quadrature<dim_in> &quadrature)
+  inline QCollection<dim, N>::QCollection(const Quadrature<dim_in> &quadrature)
   {
     this->push_back(quadrature);
   }
 
 
-  template <int dim>
+
+  template <int dim, int N>
   template <int dim_in>
   inline void
-  QCollection<dim>::push_back(const Quadrature<dim_in> &new_quadrature)
+  QCollection<dim, N>::push_back(const Quadrature<dim_in> &new_quadrature)
   {
-    Collection<Quadrature<dim>, 1>::push_back(
+    Collection<Quadrature<dim>, N>::push_back(
       std::make_shared<const Quadrature<dim>>(new_quadrature));
   }
 

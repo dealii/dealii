@@ -24,6 +24,8 @@
 
 #include <deal.II/fe/component_mask.h>
 
+#include <deal.II/hp/q_collection.h>
+
 #include <map>
 
 DEAL_II_NAMESPACE_OPEN
@@ -37,11 +39,6 @@ class Mapping;
 template <int>
 class Quadrature;
 
-namespace hp
-{
-  template <int>
-  class QCollection;
-}
 #endif
 
 
