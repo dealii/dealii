@@ -47,27 +47,6 @@ namespace hp
     CollectionBase() = default;
 
     /**
-     * Add a new object.
-     */
-    void
-    push_back(const std::shared_ptr<const T> &new_entry);
-
-    /**
-     * Return the object which was specified by the user for the
-     * active FE index which is provided as a parameter to this method.
-     *
-     * @pre @p index must be between zero and the number of elements of the
-     * collection.
-     */
-    const T &operator[](const unsigned int index) const;
-
-    /**
-     * Return the number of objects stored in this container.
-     */
-    unsigned int
-    size() const;
-
-    /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
@@ -93,6 +72,27 @@ namespace hp
   {
   public:
     Collection() = default;
+
+    /**
+     * Add a new object.
+     */
+    void
+    push_back(const std::shared_ptr<const T> &new_entry);
+
+    /**
+     * Return the object which was specified by the user for the
+     * active FE index which is provided as a parameter to this method.
+     *
+     * @pre @p index must be between zero and the number of elements of the
+     * collection.
+     */
+    const T &operator[](const unsigned int index) const;
+
+    /**
+     * Return the number of objects stored in this container.
+     */
+    unsigned int
+    size() const;
   };
 
 
@@ -109,40 +109,37 @@ namespace hp
 
 
 
-  template <typename T, int N>
+  template <typename T>
   void
-  CollectionBase<T, N>::push_back(const std::shared_ptr<const T> &new_entry)
+  Collection<T, 1>::push_back(const std::shared_ptr<const T> &new_entry)
   {
-    const auto         temp     = entries;
+    const auto         temp     = this->entries;
     const unsigned int old_size = this->size();
 
-    AssertDimension(N, 1);
-
-    entries = Table<N, std::shared_ptr<const T>>(old_size + 1);
+    this->entries = Table<1, std::shared_ptr<const T>>(old_size + 1);
 
     for (unsigned int i = 0; i < old_size; ++i)
-      entries[i] = temp[i];
+      this->entries[i] = temp[i];
 
-    entries[old_size] = new_entry;
+    this->entries[old_size] = new_entry;
   }
 
 
 
-  template <typename T, int N>
+  template <typename T>
   inline unsigned int
-  CollectionBase<T, N>::size() const
+  Collection<T, 1>::size() const
   {
-    return entries.size()[0];
+    return this->entries.size()[0];
   }
 
 
 
-  template <typename T, int N>
-  inline const T &CollectionBase<T, N>::
-                  operator[](const unsigned int index) const
+  template <typename T>
+  inline const T &Collection<T, 1>::operator[](const unsigned int index) const
   {
     AssertIndexRange(index, this->size());
-    return *entries[index];
+    return *this->entries[index];
   }
 
 } // namespace hp
