@@ -69,13 +69,25 @@ namespace hp
 
 
 
-  template <typename T, int N>
+  template <typename T, int N, typename U = T>
   class Collection;
 
 
 
-  template <typename T>
-  class Collection<T, 1> : public CollectionBase<T, 1>
+  template <typename T, typename U>
+  class Collection<T, 0, U>
+  {
+  public:
+    /**
+     * TODO.
+     */
+    Collection() = default;
+  };
+
+
+
+  template <typename T, typename U>
+  class Collection<T, 1, U> : public CollectionBase<T, 1>
   {
   public:
     /**
@@ -127,9 +139,9 @@ namespace hp
 
 
 
-  template <typename T>
+  template <typename T, typename U>
   void
-  Collection<T, 1>::push_back(const std::shared_ptr<const T> &new_entry)
+  Collection<T, 1, U>::push_back(const std::shared_ptr<const T> &new_entry)
   {
     const auto         temp     = this->entries;
     const unsigned int old_size = this->size();
@@ -144,17 +156,18 @@ namespace hp
 
 
 
-  template <typename T>
+  template <typename T, typename U>
   inline unsigned int
-  Collection<T, 1>::size() const
+  Collection<T, 1, U>::size() const
   {
     return this->entries.size()[0];
   }
 
 
 
-  template <typename T>
-  inline const T &Collection<T, 1>::operator[](const unsigned int index) const
+  template <typename T, typename U>
+  inline const T &Collection<T, 1, U>::
+                  operator[](const unsigned int index) const
   {
     AssertIndexRange(index, this->size());
     return *this->entries[index];
