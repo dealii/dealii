@@ -60,6 +60,12 @@ namespace hp
     std::size_t
     memory_consumption() const;
 
+    Table<N, std::shared_ptr<const T>> &
+    get_entries()
+    {
+      return entries;
+    }
+
     const Table<N, std::shared_ptr<const T>> &
     get_entries() const
     {

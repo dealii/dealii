@@ -63,10 +63,10 @@
 template <int dim>
 struct ScratchData
 {
-  hp::MappingCollection<dim>            mapping;
-  hp::FECollection<dim>                 fe;
-  hp::QCollection<dim>                  quadrature;
-  std::vector<hp::QCollection<dim - 1>> face_quadrature;
+  hp::MappingCollection<dim>  mapping;
+  hp::FECollection<dim>       fe;
+  hp::QCollection<dim>        quadrature;
+  hp::QCollection<dim - 1, 2> face_quadrature;
 
   std::function<void(Triangulation<dim> &)> mesh_generator;
 };
@@ -447,9 +447,9 @@ private:
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;
 
-  const hp::QCollection<dim>                  quadrature;
-  const std::vector<hp::QCollection<dim - 1>> face_quadrature;
-  const hp::QCollection<dim - 1>              face_quadrature_dummy;
+  const hp::QCollection<dim>        quadrature;
+  const hp::QCollection<dim - 1, 2> face_quadrature;
+  const hp::QCollection<dim - 1>    face_quadrature_dummy;
 
   Vector<double> solution1;
   Vector<double> solution2;
@@ -998,8 +998,11 @@ main()
             hp::MappingCollection<2>(MappingFE<2>(FE_SimplexP<2>(1)));
           scratch_data.fe         = hp::FECollection<2>(FE_SimplexDGP<2>(i));
           scratch_data.quadrature = hp::QCollection<2>(QGaussSimplex<2>(i + 1));
-          scratch_data.face_quadrature = std::vector<hp::QCollection<1>>{
-            hp::QCollection<1>(QGaussSimplex<1>(i + 1))};
+
+          Table<2, std::shared_ptr<const Quadrature<1>>> entries(1, 1);
+          entries[0][0] = std::make_shared<QGaussSimplex<1>>(i + 1);
+
+          scratch_data.face_quadrature = hp::QCollection<1, 2>(entries);
           scratch_data.mesh_generator =
             [](Triangulation<2> &triangulation) -> void {
             GridGenerator::subdivided_hyper_cube_with_simplices(triangulation,
@@ -1017,10 +1020,13 @@ main()
 
           scratch_data.mapping =
             hp::MappingCollection<2>(MappingQGeneric<2>(1));
-          scratch_data.fe              = hp::FECollection<2>(FE_DGQ<2>(i));
-          scratch_data.quadrature      = hp::QCollection<2>(QGauss<2>(i + 1));
-          scratch_data.face_quadrature = std::vector<hp::QCollection<1>>{
-            hp::QCollection<1>(QGauss<1>(i + 1))};
+          scratch_data.fe         = hp::FECollection<2>(FE_DGQ<2>(i));
+          scratch_data.quadrature = hp::QCollection<2>(QGauss<2>(i + 1));
+
+          Table<2, std::shared_ptr<const Quadrature<1>>> entries(1, 1);
+          entries[0][0] = std::make_shared<QGauss<1>>(i + 1);
+
+          scratch_data.face_quadrature = hp::QCollection<1, 2>(entries);
           scratch_data.mesh_generator =
             [](Triangulation<2> &triangulation) -> void {
             GridGenerator::hyper_cube(triangulation);
@@ -1040,8 +1046,11 @@ main()
             hp::MappingCollection<3>(MappingFE<3>(FE_SimplexP<3>(1)));
           scratch_data.fe         = hp::FECollection<3>(FE_SimplexDGP<3>(i));
           scratch_data.quadrature = hp::QCollection<3>(QGaussSimplex<3>(i + 1));
-          scratch_data.face_quadrature = std::vector<hp::QCollection<2>>{
-            hp::QCollection<2>(QGaussSimplex<2>(i + 1))};
+
+          Table<2, std::shared_ptr<const Quadrature<2>>> entries(1, 1);
+          entries[0][0] = std::make_shared<QGaussSimplex<2>>(i + 1);
+
+          scratch_data.face_quadrature = hp::QCollection<2, 2>(entries);
           scratch_data.mesh_generator =
             [](Triangulation<3> &triangulation) -> void {
             GridGenerator::subdivided_hyper_cube_with_simplices(triangulation,
@@ -1061,12 +1070,15 @@ main()
             hp::MappingCollection<3>(MappingFE<3>(FE_PyramidP<3>(1)));
           scratch_data.fe         = hp::FECollection<3>(FE_PyramidDGP<3>(i));
           scratch_data.quadrature = hp::QCollection<3>(QGaussPyramid<3>(i + 1));
-          scratch_data.face_quadrature = std::vector<hp::QCollection<2>>{
-            hp::QCollection<2>(QGauss<2>(i + 1),
-                               QGaussSimplex<2>(i + 1),
-                               QGaussSimplex<2>(i + 1),
-                               QGaussSimplex<2>(i + 1),
-                               QGaussSimplex<2>(i + 1))};
+
+          Table<2, std::shared_ptr<const Quadrature<2>>> entries(1, 5);
+          entries[0][0] = std::make_shared<QGauss<2>>(i + 1);
+          entries[0][1] = std::make_shared<QGaussSimplex<2>>(i + 1);
+          entries[0][2] = std::make_shared<QGaussSimplex<2>>(i + 1);
+          entries[0][3] = std::make_shared<QGaussSimplex<2>>(i + 1);
+          entries[0][4] = std::make_shared<QGaussSimplex<2>>(i + 1);
+
+          scratch_data.face_quadrature = hp::QCollection<2, 2>(entries);
           scratch_data.mesh_generator =
             [](Triangulation<3> &triangulation) -> void {
             GridGenerator::subdivided_hyper_cube_with_pyramids(triangulation,
@@ -1086,12 +1098,15 @@ main()
             hp::MappingCollection<3>(MappingFE<3>(FE_WedgeP<3>(1)));
           scratch_data.fe         = hp::FECollection<3>(FE_WedgeDGP<3>(i));
           scratch_data.quadrature = hp::QCollection<3>(QGaussWedge<3>(i + 1));
-          scratch_data.face_quadrature = std::vector<hp::QCollection<2>>{
-            hp::QCollection<2>(QGaussSimplex<2>(i + 1),
-                               QGaussSimplex<2>(i + 1),
-                               QGauss<2>(i + 1),
-                               QGauss<2>(i + 1),
-                               QGauss<2>(i + 1))};
+
+          Table<2, std::shared_ptr<const Quadrature<2>>> entries(1, 5);
+          entries[0][0] = std::make_shared<QGaussSimplex<2>>(i + 1);
+          entries[0][1] = std::make_shared<QGaussSimplex<2>>(i + 1);
+          entries[0][2] = std::make_shared<QGauss<2>>(i + 1);
+          entries[0][3] = std::make_shared<QGauss<2>>(i + 1);
+          entries[0][4] = std::make_shared<QGauss<2>>(i + 1);
+
+          scratch_data.face_quadrature = hp::QCollection<2, 2>(entries);
           scratch_data.mesh_generator =
             [](Triangulation<3> &triangulation) -> void {
             GridGenerator::subdivided_hyper_cube_with_wedges(triangulation, 8);
@@ -1108,10 +1123,13 @@ main()
 
           scratch_data.mapping =
             hp::MappingCollection<3>(MappingQGeneric<3>(1));
-          scratch_data.fe              = hp::FECollection<3>(FE_DGQ<3>(i));
-          scratch_data.quadrature      = hp::QCollection<3>(QGauss<3>(i + 1));
-          scratch_data.face_quadrature = std::vector<hp::QCollection<2>>{
-            hp::QCollection<2>(QGauss<2>(i + 1))};
+          scratch_data.fe         = hp::FECollection<3>(FE_DGQ<3>(i));
+          scratch_data.quadrature = hp::QCollection<3>(QGauss<3>(i + 1));
+
+          Table<2, std::shared_ptr<const Quadrature<2>>> entries(1, 1);
+          entries[0][0] = std::make_shared<QGauss<2>>(i + 1);
+
+          scratch_data.face_quadrature = hp::QCollection<2, 2>(entries);
           scratch_data.mesh_generator =
             [](Triangulation<3> &triangulation) -> void {
             GridGenerator::subdivided_hyper_cube(triangulation, 8);

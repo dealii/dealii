@@ -145,12 +145,36 @@ namespace hp
 
   /* --------------- inline functions ------------------- */
 
+  namespace internal
+  {
+    template <int N, int dim, int dim_in>
+    void
+    copy(const QCollection<dim_in, N> &other, QCollection<dim, N> &result)
+    {
+      Assert(false, ExcNotImplemented());
+
+      (void)other;
+      (void)result;
+    }
+
+    template <int dim, int dim_in>
+    void
+    copy(const QCollection<dim_in, 1> &other, QCollection<dim, 1> &result)
+    {
+      result.entries().resize(other.size());
+
+      for (unsigned int i = 0; i < other.size(); ++i)
+        result.entries()[i] = other.entries()[i];
+    }
+  } // namespace internal
+
+
+
   template <int dim, int N>
   template <int dim_in>
   QCollection<dim, N>::QCollection(const QCollection<dim_in, N> &other)
   {
-    for (unsigned int i = 0; i < other.size(); ++i)
-      push_back(other[i]);
+    internal::copy(other, *this);
   }
 
 
