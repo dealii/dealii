@@ -47,6 +47,13 @@ namespace hp
     CollectionBase() = default;
 
     /**
+     * TODO.
+     */
+    CollectionBase(const Table<N, std::shared_ptr<const T>> &entries)
+      : entries(entries)
+    {}
+
+    /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
@@ -71,7 +78,18 @@ namespace hp
   class Collection<T, 1> : public CollectionBase<T, 1>
   {
   public:
+    /**
+     * Default constructor. Leads to an empty collection that can later be
+     * filled using push_back().
+     */
     Collection() = default;
+
+    /**
+     * TODO.
+     */
+    Collection(const Table<1, std::shared_ptr<const T>> &entries)
+      : CollectionBase<T, 1>(entries)
+    {}
 
     /**
      * Add a new object.
