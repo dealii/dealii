@@ -408,20 +408,13 @@ namespace parallel
     Triangulation<dim, spacedim>::update_cell_relations()
     {
       // Reorganize memory for local_cell_relations.
-      this->local_cell_relations.resize(this->n_locally_owned_active_cells());
-      this->local_cell_relations.shrink_to_fit();
+      this->local_cell_relations.clear();
+      this->local_cell_relations.reserve(this->n_locally_owned_active_cells());
 
-      unsigned int cell_id = 0;
-
-      for (auto cell = this->begin_active(); cell != this->end(); ++cell)
-        {
-          if (!cell->is_locally_owned())
-            continue;
-
-          this->local_cell_relations[cell_id] =
-            std::make_pair(cell, Triangulation<dim, spacedim>::CELL_PERSIST);
-          ++cell_id;
-        }
+      for (const auto &cell : this->active_cell_iterators())
+        if (cell->is_locally_owned())
+          this->local_cell_relations.emplace_back(
+            cell, Triangulation<dim, spacedim>::CELL_PERSIST);
     }
 
 

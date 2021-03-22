@@ -265,10 +265,15 @@ namespace parallel
         const unsigned int coarse_cell_index) const override;
 
       /**
-       * Go through all locally owned cells and store the relations between
-       * cells and their CellStatus in the private member local_cell_relations.
+       * Go through all active cells that are locally owned and record how they
+       * will change in the private member vector local_cell_relations.
        *
-       * The stored vector will be ordered by the occurrence of cells.
+       * As no adaptive mesh refinement is supported at the moment for this
+       * class, all cells will be flagged with the CellStatus CELL_PERSIST.
+       * These relations will currently only be used for serialization.
+       *
+       * The stored vector will have a size equal to the number of locally owned
+       * active cells and will be ordered by the occurrence of those cells.
        */
       virtual void
       update_cell_relations() override;

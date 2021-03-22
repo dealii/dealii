@@ -688,31 +688,29 @@ namespace parallel
                        const unsigned int n_attached_deserialize_variable);
 
     /**
-     * Go through all cells and store the relations between a deal.II cell and
-     * its current CellStatus in the private member local_cell_relations.
-     * For an extensive description of CellStatus, see the documentation
-     * for the member function register_data_attach().
+     * A function to record the CellStatus of currently active cells that
+     * are locally owned. This information is mandatory to transfer data
+     * between meshes during adaptation or serialization, e.g., using
+     * parallel::distributed::SolutionTransfer.
      *
-     * The stored vector will be ordered by the occurrence of quadrants.
+     * Relations will be stored in the private member local_cell_relations. For
+     * an extensive description of CellStatus, see the documentation for the
+     * member function register_data_attach().
      */
     virtual void
     update_cell_relations() = 0;
 
     /**
-     * This auxiliary data structure stores the relation between
-     * a deal.II cell and its current CellStatus. For an extensive
-     * description of the latter, see the documentation for the member
-     * function register_data_attach().
+     * Auxiliary data structure for assigning a CellStatus to a deal.II cell
+     * iterator. For an extensive description of the former, see the
+     * documentation for the member function register_data_attach().
      */
     using cell_relation_t = typename std::pair<cell_iterator, CellStatus>;
 
     /**
-     * Vector of pair, each containing a deal.II cell iterator
-     * and their relation after refinement. To update its contents, use the
+     * Vector of pairs, each containing a deal.II cell iterator and its
+     * respective CellStatus. To update its contents, use the
      * update_cell_relations() member function.
-     *
-     * The size of this vector is assumed to be equal to the number of locally
-     * owned quadrants in the parallel_forest object.
      */
     std::vector<cell_relation_t> local_cell_relations;
 

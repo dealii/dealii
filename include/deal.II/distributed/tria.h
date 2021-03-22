@@ -694,13 +694,25 @@ namespace parallel
       typename dealii::internal::p4est::types<dim>::ghost *parallel_ghost;
 
       /**
-       * Go through all p4est trees and store the relations between a deal.II
-       * cell and its current CellStatus in the private member
-       * local_cell_relations.
+       * Go through all p4est trees and record the relations between locally
+       * owned p4est quadrants and active deal.II cells in the private member
+       * vector local_cell_relations.
+       *
+       * The vector contains an active cell iterator for every locally owned
+       * p4est quadrant, as well as a CellStatus flag to describe their
+       * relation.
        *
        * The stored vector will be ordered by the occurrence of quadrants in
        * the corresponding local sc_array of the parallel_forest. p4est requires
-       * this specific ordering for its transfer functions.
+       * this specific ordering for its transfer functions. Therefore, the size
+       * of this vector will be equal to the number of locally owned quadrants
+       * in the parallel_forest object.
+       *
+       * These relations will be established for example in the mesh refinement
+       * process: after adapting the parallel_forest, but before applying these
+       * changes to this triangulation, we will record how cells will change in
+       * the refinement process. With this information, we can prepare all
+       * buffers for data transfer accordingly.
        */
       virtual void
       update_cell_relations() override;
