@@ -593,13 +593,7 @@ namespace Utilities
             }
 
           // 2) broadcast result
-          std::vector<char> temp = Utilities::pack(result, false);
-          unsigned int      size = temp.size();
-          MPI_Bcast(&size, 1, MPI_UNSIGNED, 0, comm);
-          temp.resize(size);
-          MPI_Bcast(temp.data(), size, MPI_CHAR, 0, comm);
-
-          return Utilities::unpack<T>(temp, false);
+          return Utilities::MPI::broadcast(comm, result);
         }
 #endif
       (void)comm;

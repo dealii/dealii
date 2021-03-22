@@ -1072,6 +1072,28 @@ namespace Utilities
            const unsigned int root_process = 0);
 
     /**
+     * Sends an object @p object_to_send from the process @p root_process
+     * to all other processes.
+     *
+     * A generalization of the classic `MPI_Bcast` function that accepts
+     * arbitrary data types `T`, as long as Utilities::pack() (which in turn
+     * uses `boost::serialize`, see in Utilities::pack() for details) accepts
+     * `T` as an argument.
+     *
+     * @param[in] comm MPI communicator.
+     * @param[in] object_to_send An object to send to all processes.
+     * @param[in] root_process The process that sends the object to all
+     * processes. By default the process with rank 0 is the root process.
+     *
+     * @return Every process receives the object sent by the @p root_process.
+     */
+    template <typename T>
+    T
+    broadcast(const MPI_Comm &   comm,
+              const T &          object_to_send,
+              const unsigned int root_process = 0);
+
+    /**
      * A function that combines values @p local_value from all processes
      * via a user-specified binary operation @p combiner and distributes the
      * result back to all processes. As such this function is similar to
@@ -1460,6 +1482,37 @@ namespace Utilities
             }
         }
       return received_objects;
+#  endif
+    }
+
+    template <typename T>
+    T
+    broadcast(const MPI_Comm &   comm,
+              const T &          object_to_send,
+              const unsigned int root_process)
+    {
+#  ifndef DEAL_II_WITH_MPI
+      (void)comm;
+      (void)root_process;
+      return object_to_send;
+#  else
+      const auto n_procs = dealii::Utilities::MPI::n_mpi_processes(comm);
+      AssertIndexRange(root_process, n_procs);
+      (void)n_procs;
+
+      std::vector<char> buffer      = Utilities::pack(object_to_send, false);
+      unsigned int      buffer_size = buffer.size();
+
+      // Exchanging the size of buffer
+      int ierr = MPI_Bcast(&buffer_size, 1, MPI_UNSIGNED, root_process, comm);
+      AssertThrowMPI(ierr);
+
+      buffer.resize(buffer_size);
+      ierr =
+        MPI_Bcast(buffer.data(), buffer_size, MPI_CHAR, root_process, comm);
+      AssertThrowMPI(ierr);
+
+      return Utilities::unpack<T>(buffer, false);
 #  endif
     }
 
