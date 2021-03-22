@@ -1484,69 +1484,82 @@ public:
   using BaseClass =
     FEEvaluationBase<dim, 1, Number, is_face, VectorizedArrayType>;
 
-  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_dof_value()
+  /**
+   * @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_dof_value()
    */
   value_type
   get_dof_value(const unsigned int dof) const;
 
-  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::submit_dof_value()
+  /**
+   * @copydoc FEEvaluationBase<dim,1,Number,is_face>::submit_dof_value()
    */
   void
   submit_dof_value(const value_type val_in, const unsigned int dof);
 
-  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_value()
+  /**
+   * @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_value()
    */
   value_type
   get_value(const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::submit_value()
+  /**
+   * @copydoc FEEvaluationBase<dim,1,Number,is_face>::submit_value()
    */
   void
   submit_value(const value_type val_in, const unsigned int q_point);
 
-  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::submit_value()
+  /**
+   * @copydoc FEEvaluationBase<dim,1,Number,is_face>::submit_value()
    */
   void
   submit_value(const Tensor<1, 1, VectorizedArrayType> val_in,
                const unsigned int                      q_point);
 
-  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_gradient()
+  /**
+   * @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_gradient()
    */
   gradient_type
   get_gradient(const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_normal_derivative()
+  /**
+   * @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_normal_derivative()
    */
   value_type
   get_normal_derivative(const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::submit_gradient()
+  /**
+   * @copydoc FEEvaluationBase<dim,1,Number,is_face>::submit_gradient()
    */
   void
   submit_gradient(const gradient_type grad_in, const unsigned int q_point);
 
-  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::submit_normal_derivative()
+  /**
+   * @copydoc FEEvaluationBase<dim,1,Number,is_face>::submit_normal_derivative()
    */
   void
   submit_normal_derivative(const value_type   grad_in,
                            const unsigned int q_point);
 
-  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_hessian()
+  /**
+   * @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_hessian()
    */
   Tensor<2, dim, VectorizedArrayType>
   get_hessian(unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_hessian_diagonal()
+  /**
+   * @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_hessian_diagonal()
    */
   gradient_type
   get_hessian_diagonal(const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_laplacian()
+  /**
+   * @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_laplacian()
    */
   value_type
   get_laplacian(const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::integrate_value()
+  /**
+   * @copydoc FEEvaluationBase<dim,1,Number,is_face>::integrate_value()
    */
   value_type
   integrate_value() const;
@@ -1624,7 +1637,8 @@ public:
   using BaseClass =
     FEEvaluationBase<dim, dim, Number, is_face, VectorizedArrayType>;
 
-  /** @copydoc FEEvaluationBase<dim,dim,Number,is_face>::get_gradient()
+  /**
+   * @copydoc FEEvaluationBase<dim,dim,Number,is_face>::get_gradient()
    */
   gradient_type
   get_gradient(const unsigned int q_point) const;
@@ -1652,17 +1666,20 @@ public:
   Tensor<1, (dim == 2 ? 1 : dim), VectorizedArrayType>
   get_curl(const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<dim,dim,Number,is_face>::get_hessian()
+  /**
+   * @copydoc FEEvaluationBase<dim,dim,Number,is_face>::get_hessian()
    */
   Tensor<3, dim, VectorizedArrayType>
   get_hessian(const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<dim,dim,Number,is_face>::get_hessian_diagonal()
+  /**
+   * @copydoc FEEvaluationBase<dim,dim,Number,is_face>::get_hessian_diagonal()
    */
   gradient_type
   get_hessian_diagonal(const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<dim,dim,Number,is_face>::submit_gradient()
+  /**
+   * @copydoc FEEvaluationBase<dim,dim,Number,is_face>::submit_gradient()
    */
   void
   submit_gradient(const gradient_type grad_in, const unsigned int q_point);
@@ -1783,79 +1800,107 @@ public:
   using BaseClass =
     FEEvaluationBase<1, 1, Number, is_face, VectorizedArrayType>;
 
-  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::get_dof_value()
+  /**
+   * @copydoc FEEvaluationBase<1,1,Number,is_face>::get_dof_value()
    */
   value_type
   get_dof_value(const unsigned int dof) const;
 
-  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_dof_value()
+  /**
+   * @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_dof_value()
    */
   void
   submit_dof_value(const value_type val_in, const unsigned int dof);
 
-  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::get_value()
+  /**
+   * @copydoc FEEvaluationBase<1,1,Number,is_face>::get_value()
    */
   value_type
   get_value(const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_value()
+  /**
+   * @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_value()
    */
   void
   submit_value(const value_type val_in, const unsigned int q_point);
 
-  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_value()
+  /**
+   * @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_value()
    */
   void
   submit_value(const gradient_type val_in, const unsigned int q_point);
 
-  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::get_gradient()
+  /**
+   * @copydoc FEEvaluationBase<1,1,Number,is_face>::get_gradient()
    */
   gradient_type
   get_gradient(const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_normal_derivative()
+  /**
+   * @copydoc FEEvaluationBase<1,1,Number,is_face>::get_divergence()
+   */
+  value_type
+  get_divergence(const unsigned int q_point) const;
+
+  /**
+   * @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_normal_derivative()
    */
   value_type
   get_normal_derivative(const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_gradient()
+  /**
+   * @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_gradient()
    */
   void
   submit_gradient(const gradient_type grad_in, const unsigned int q_point);
 
-  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_gradient()
+  /**
+   * @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_gradient()
    */
   void
   submit_gradient(const value_type grad_in, const unsigned int q_point);
 
-  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_normal_derivative()
+  /**
+   * @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_gradient()
+   */
+  void
+  submit_gradient(const Tensor<2, 1, VectorizedArrayType> grad_in,
+                  const unsigned int                      q_point);
+
+  /**
+   * @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_normal_derivative()
    */
   void
   submit_normal_derivative(const value_type   grad_in,
                            const unsigned int q_point);
 
-  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_normal_derivative()
+  /**
+   * @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_normal_derivative()
    */
   void
   submit_normal_derivative(const gradient_type grad_in,
                            const unsigned int  q_point);
 
-  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::get_hessian()
+  /**
+   * @copydoc FEEvaluationBase<1,1,Number,is_face>::get_hessian()
    */
   Tensor<2, 1, VectorizedArrayType>
   get_hessian(unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::get_hessian_diagonal()
+  /**
+   * @copydoc FEEvaluationBase<1,1,Number,is_face>::get_hessian_diagonal()
    */
   gradient_type
   get_hessian_diagonal(const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::get_laplacian()
+  /**
+   * @copydoc FEEvaluationBase<1,1,Number,is_face>::get_laplacian()
    */
   value_type
   get_laplacian(const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::integrate_value()
+  /**
+   * @copydoc FEEvaluationBase<1,1,Number,is_face>::integrate_value()
    */
   value_type
   integrate_value() const;
@@ -7122,6 +7167,16 @@ inline DEAL_II_ALWAYS_INLINE Tensor<1, 1, VectorizedArrayType>
 
 template <typename Number, bool is_face, typename VectorizedArrayType>
 inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
+                             FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::get_divergence(
+  const unsigned int q_point) const
+{
+  return get_gradient(q_point)[0];
+}
+
+
+
+template <typename Number, bool is_face, typename VectorizedArrayType>
+inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
                              FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::
   get_normal_derivative(const unsigned int q_point) const
 {
@@ -7245,6 +7300,17 @@ FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::submit_gradient(
       this->J_value[0] * this->quadrature_weights[q_point];
 
   this->gradients_quad[q_point] = jac[0][0] * grad_in * JxW;
+}
+
+
+
+template <typename Number, bool is_face, typename VectorizedArrayType>
+inline DEAL_II_ALWAYS_INLINE void
+FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::submit_gradient(
+  const Tensor<2, 1, VectorizedArrayType> grad_in,
+  const unsigned int                      q_point)
+{
+  submit_gradient(grad_in[0][0], q_point);
 }
 
 
