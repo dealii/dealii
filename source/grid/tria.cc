@@ -10429,9 +10429,8 @@ Triangulation<dim, spacedim>::copy_triangulation(
     faces = std::make_unique<internal::TriangulationImplementation::TriaFaces>(
       *other_tria.faces);
 
-  auto bdry_iterator = other_tria.manifold.begin();
-  for (; bdry_iterator != other_tria.manifold.end(); ++bdry_iterator)
-    manifold[bdry_iterator->first] = bdry_iterator->second->clone();
+  for (const auto &p : other_tria.manifold)
+    set_manifold(p.first, *p.second);
 
 
   levels.reserve(other_tria.levels.size());
