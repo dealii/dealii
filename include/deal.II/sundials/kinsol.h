@@ -19,33 +19,34 @@
 #include <deal.II/base/config.h>
 
 #ifdef DEAL_II_WITH_SUNDIALS
-#  if DEAL_II_SUNDIALS_VERSION_LT(4, 0, 0)
 
 
-#    include <deal.II/base/conditional_ostream.h>
-#    include <deal.II/base/exceptions.h>
-#    include <deal.II/base/logstream.h>
-#    include <deal.II/base/mpi.h>
-#    include <deal.II/base/parameter_handler.h>
+#  include <deal.II/base/conditional_ostream.h>
+#  include <deal.II/base/exceptions.h>
+#  include <deal.II/base/logstream.h>
+#  include <deal.II/base/mpi.h>
+#  include <deal.II/base/parameter_handler.h>
 
-#    include <deal.II/lac/vector.h>
-#    include <deal.II/lac/vector_memory.h>
+#  include <deal.II/lac/vector.h>
+#  include <deal.II/lac/vector_memory.h>
 
-#    include <boost/signals2.hpp>
+#  include <boost/signals2.hpp>
 
-#    include <kinsol/kinsol.h>
+#  include <kinsol/kinsol.h>
+#  if DEAL_II_SUNDIALS_VERSION_LT(5, 0, 0)
 #    include <kinsol/kinsol_impl.h>
-#    include <nvector/nvector_serial.h>
-#    include <sundials/sundials_math.h>
-#    include <sundials/sundials_types.h>
+#  endif
+#  include <nvector/nvector_serial.h>
+#  include <sundials/sundials_math.h>
+#  include <sundials/sundials_types.h>
 
-#    include <memory>
+#  include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
 
 // Shorthand notation for KINSOL error codes.
-#    define AssertKINSOL(code) Assert(code >= 0, ExcKINSOLError(code))
+#  define AssertKINSOL(code) Assert(code >= 0, ExcKINSOLError(code))
 
 namespace SUNDIALS
 {
@@ -357,7 +358,9 @@ namespace SUNDIALS
        * The maximum number of nonlinear iterations that can be
        * performed between calls to the setup_jacobian() function.
        *
-       * If set to zero, default values provided by KINSOL will be used.
+       * If set to zero, default values provided by KINSOL will be used,
+       * and in practice this often means that KINSOL will re-use a
+       * Jacobian matrix computed in one iteration for later iterations.
        */
       unsigned int maximum_setup_calls;
 
@@ -452,7 +455,7 @@ namespace SUNDIALS
      * - 0: Success
      * - >0: Recoverable error (KINSOL will try to change its internal
      * parameters and attempt a new solution step)
-     * - <0: Unrecoverable error the computation will be aborted and an
+     * - <0: Unrecoverable error; the computation will be aborted and an
      * assertion will be thrown.
      */
     std::function<int(const VectorType &src, VectorType &dst)>
@@ -529,13 +532,13 @@ namespace SUNDIALS
      *
      * Arguments to the function are:
      *
-     * @param[in] ycur  is the current $y$ vector for the current KINSOL
+     * @param[in] ycur The current $y$ vector for the current KINSOL
      * internal step. In the documentation above, this $y$ vector is generally
      * denoted by $u$.
-     * @param[in] fcur  is the current value of the implicit right-hand side at
+     * @param[in] fcur The current value of the implicit right-hand side at
      * `ycur`, $f_I (t_n, ypred)$.
-     * @param[in] rhs  the system right hand side to solve for
-     * @param[out] dst the solution of $A^{-1} * src$
+     * @param[in] rhs The system right hand side to solve for
+     * @param[out] dst The solution of $J^{-1} * src$
      *
      * This function should return:
      * - 0: Success
@@ -543,6 +546,20 @@ namespace SUNDIALS
      * parameters and attempt a new solution step)
      * - <0: Unrecoverable error the computation will be aborted and an
      * assertion will be thrown.
+     *
+     * @warning Starting with SUNDIALS 4.0, SUNDIALS no longer provides the
+     *   `ycur` and `fcur` variables -- only `rhs` is provided and `dst`
+     *   needs to be returned. The first two arguments will therefore be
+     *   empty vectors in that case. In practice, that means that one
+     *   can no longer compute a Jacobian matrix for the current iterate
+     *   within this function. Rather, this has to happen inside the
+     *   `setup_jacobian` function above that receives this information.
+     *   If it is important that the Jacobian corresponds to the *current*
+     *   iterate (rather than a re-used Jacobian matrix that had been
+     *   computed in a previous iteration and that therefore corresponds
+     *   to a *previous* iterate), then you will also have to set the
+     *   AdditionalData::maximum_newton_step variable to one, indicating
+     *   that the Jacobian should be re-computed in every iteration.
      */
     std::function<int(const VectorType &ycur,
                       const VectorType &fcur,
@@ -635,7 +652,7 @@ namespace SUNDIALS
 
 
 DEAL_II_NAMESPACE_CLOSE
-#  endif
+
 #endif
 
 #endif
