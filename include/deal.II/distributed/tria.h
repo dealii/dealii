@@ -400,8 +400,6 @@ namespace parallel
       /**
        * Implementation of the same function as in the base class.
        *
-       * @note This function cannot copy a triangulation that has been refined.
-       *
        * @note This function can be used to copy a serial Triangulation to a
        * parallel::distributed::Triangulation but only if the serial
        * Triangulation has never been refined.
