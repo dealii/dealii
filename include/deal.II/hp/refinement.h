@@ -677,6 +677,13 @@ namespace hp
      * to call this function, nor will it be automatically invoked in any part
      * of the library (contrary to its Triangulation counterpart).
      *
+     * On cells that will be h-coarsened, we enforce the difference criterion as
+     * if it is already a parent cell. That means, we set the level of all
+     * siblings to the highest one among them. In that case, all sibling cells
+     * need to have the h-coarsenening flags set terminally via
+     * Triangulation::prepare_coarsening_and_refinement() beforehand. Otherwise
+     * an assertion will be triggered.
+     *
      * Returns whether any future FE indices have been changed by this function.
      */
     template <int dim, int spacedim>
