@@ -271,7 +271,7 @@ but it should not be very hard to get the program to work!
 
 <h4> Convergence Comparison </h4>
 
-Is Q1 or Q2 better? What about adaptive versus global refinement? A (somewhat
+Is $Q_1$ or $Q_2$ better? What about adaptive versus global refinement? A (somewhat
 unfair but typical) metric to compare them, is to look at the error as a
 function of the number of unknowns.
 
@@ -288,10 +288,11 @@ work than if we used global refinement. This is not a particularly
 surprising conclusion, but it's worth checking these sorts of
 assumptions in practice.
 
-Of course, a fairer comparison would be to plot runtime (switch to release
-mode first!) instead of number of unknowns on the $x$ axis. If you
-plotted run time against the number of unknowns by timing each
-refinement step (e.g., using the Timer class), you will notice that
-the linear solver is not perfect -- its run time grows faster than
-proportional to the linear system size -- and picking a better
-linear solver might be appropriate for this kind of comparison.
+Of course, a fairer comparison would be to plot runtime (switch to
+release mode first!) instead of number of unknowns on the $x$ axis. If
+you plotted run time (check out the Timer class!) against the number
+of unknowns by timing each refinement step, you will notice that the
+linear system solver we use in this program is not perfect -- its run
+time grows faster than proportional to the linear system size -- and
+picking a better linear solver might be appropriate for this kind of
+comparison.
