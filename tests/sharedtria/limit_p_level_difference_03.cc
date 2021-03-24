@@ -21,7 +21,7 @@
 
 #include <deal.II/base/point.h>
 
-#include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/shared_tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -44,7 +44,9 @@ divide_and_ceil(unsigned int x, unsigned int y)
 
 template <int dim>
 void
-test(const unsigned int fes_size, const unsigned int max_difference)
+test(const unsigned int fes_size,
+     const unsigned int max_difference,
+     const bool         allow_artificial_cells)
 {
   Assert(max_difference > 0, ExcInternalError());
   Assert(fes_size > 1, ExcInternalError());
@@ -70,7 +72,9 @@ test(const unsigned int fes_size, const unsigned int max_difference)
   // after prepare_coarsening_and_refinement(), each p-level will correspond to
   // a unique column of cells and thus h-level
 
-  parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
+  parallel::shared::Triangulation<dim> tria(MPI_COMM_WORLD,
+                                            Triangulation<dim>::none,
+                                            allow_artificial_cells);
   TestGrids::hyper_line(tria, 2);
   const unsigned int n_refinements =
     divide_and_ceil(sequence.size() - 1, max_difference);
@@ -124,7 +128,12 @@ main(int argc, char *argv[])
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     initlog();
 
-  test<2>(5, 1);
-  test<2>(10, 2);
-  test<2>(15, 3);
+  deallog << std::boolalpha;
+  for (const bool allow_artificial_cells : {false, true})
+    {
+      deallog << "artificial cells: " << allow_artificial_cells << std::endl;
+      test<2>(5, 1, allow_artificial_cells);
+      test<2>(10, 2, allow_artificial_cells);
+      test<2>(15, 3, allow_artificial_cells);
+    }
 }

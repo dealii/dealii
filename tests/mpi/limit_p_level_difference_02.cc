@@ -24,9 +24,7 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
-#include <deal.II/distributed/tria_base.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -44,11 +42,8 @@
 
 template <int dim>
 void
-test(parallel::TriangulationBase<dim> &tria,
-     const unsigned int                fes_size,
-     const unsigned int                max_difference)
+test(const unsigned int fes_size, const unsigned int max_difference)
 {
-  Assert(tria.n_levels() == 0, ExcInternalError());
   Assert(fes_size > 0, ExcInternalError());
   Assert(max_difference > 0, ExcInternalError());
 
@@ -61,6 +56,7 @@ test(parallel::TriangulationBase<dim> &tria,
   const auto         sequence = fes.get_hierarchy_sequence(contains_fe_index);
 
   // setup cross-shaped mesh
+  parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   {
     std::vector<unsigned int> sizes(Utilities::pow(2, dim),
                                     static_cast<unsigned int>(
@@ -129,41 +125,7 @@ main(int argc, char *argv[])
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     initlog();
 
-  constexpr const unsigned int dim = 2;
-
-  deallog << "parallel::shared::Triangulation" << std::endl;
-  {
-    parallel::shared::Triangulation<dim> tria(MPI_COMM_WORLD);
-
-    test<dim>(tria, 4, 1);
-    tria.clear();
-    test<dim>(tria, 8, 2);
-    tria.clear();
-    test<dim>(tria, 12, 3);
-  }
-
-  deallog << "parallel::shared::Triangulation with artificial cells"
-          << std::endl;
-  {
-    parallel::shared::Triangulation<dim> tria(MPI_COMM_WORLD,
-                                              Triangulation<dim>::none,
-                                              /*allow_artificial_cells=*/true);
-
-    test<dim>(tria, 4, 1);
-    tria.clear();
-    test<dim>(tria, 8, 2);
-    tria.clear();
-    test<dim>(tria, 12, 3);
-  }
-
-  deallog << "parallel::distributed::Triangulation" << std::endl;
-  {
-    parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
-
-    test<dim>(tria, 4, 1);
-    tria.clear();
-    test<dim>(tria, 8, 2);
-    tria.clear();
-    test<dim>(tria, 12, 3);
-  }
+  test<2>(4, 1);
+  test<2>(8, 2);
+  test<2>(12, 3);
 }

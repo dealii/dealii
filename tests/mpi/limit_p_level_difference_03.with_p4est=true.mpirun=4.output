@@ -1,13 +1,4 @@
 
-DEAL::parallel::shared::Triangulation
-DEAL::OK
-DEAL::OK
-DEAL::OK
-DEAL::parallel::shared::Triangulation with artificial cells
-DEAL::OK
-DEAL::OK
-DEAL::OK
-DEAL::parallel::distributed::Triangulation
 DEAL::OK
 DEAL::OK
 DEAL::OK
