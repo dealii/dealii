@@ -104,14 +104,14 @@ public:
             std::vector<std::string> remaining_id = erase_first(ids);
 
             bool found = false;
-            for (auto it = sub_trees.begin(); it != sub_trees.end(); ++it)
+            for (const auto it : sub_trees)
               {
                 // find out where to insert item
-                if ((*it)->id == remaining_id[0])
+                if (it->id == remaining_id[0])
                   {
                     found = true;
 
-                    (*it)->insert(remaining_id, wall_time);
+                    it->insert(remaining_id, wall_time);
                   }
               }
 
@@ -165,11 +165,11 @@ public:
     bool found = false;
     if (remaining_id.size() > 0)
       {
-        for (auto it = sub_trees.begin(); it != sub_trees.end(); ++it)
+        for (const auto it : sub_trees)
           {
-            if ((*it)->id == remaining_id[0])
+            if (it->id == remaining_id[0])
               {
-                (*it)->insert(remaining_id, sub_tree, new_name);
+                it->insert(remaining_id, sub_tree, new_name);
                 found = true;
               }
           }
@@ -279,9 +279,9 @@ private:
   {
     unsigned int length = id.length();
 
-    for (auto it = sub_trees.begin(); it != sub_trees.end(); ++it)
+    for (const auto it : sub_trees)
       {
-        length = std::max(length, (*it)->get_length() + offset_per_level);
+        length = std::max(length, it->get_length() + offset_per_level);
       }
 
     return length;
@@ -303,9 +303,9 @@ private:
 
     print_id_and_data(pcout, offset, length);
 
-    for (auto it = sub_trees.begin(); it != sub_trees.end(); ++it)
+    for (const auto it : sub_trees)
       {
-        (*it)->do_print_plain(pcout, offset + offset_per_level, length);
+        it->do_print_plain(pcout, offset + offset_per_level, length);
       }
   }
 
@@ -349,12 +349,12 @@ private:
 
         // recursively print sub trees (decreasing the level and incrementing
         // the offset)
-        for (auto it = sub_trees.begin(); it != sub_trees.end(); ++it)
+        for (const auto it : sub_trees)
           {
-            (*it)->do_print_level(pcout,
-                                  level - 1,
-                                  offset + offset_per_level,
-                                  length);
+            it->do_print_level(pcout,
+                               level - 1,
+                               offset + offset_per_level,
+                               length);
           }
       }
   }
@@ -424,14 +424,14 @@ private:
         other.data->wall_time = ref_time;
       }
 
-    for (auto it = sub_trees.begin(); it != sub_trees.end(); ++it)
+    for (const auto it : sub_trees)
       {
-        if ((*it)->data.get())
+        if (it->data.get())
           {
-            (*it)->print_id_and_data(pcout, offset, length, relative, ref_time);
+            it->print_id_and_data(pcout, offset, length, relative, ref_time);
 
             if (relative)
-              other.data->wall_time -= (*it)->data->wall_time;
+              other.data->wall_time -= it->data->wall_time;
           }
       }
 
