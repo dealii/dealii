@@ -70,6 +70,18 @@ test(const unsigned int fes_size, const unsigned int max_difference)
   DoFHandler<dim> dofh(tria);
   dofh.distribute_dofs(fes);
 
+  bool fe_indices_changed;
+  tria.signals.post_p4est_refinement.connect(
+    [&]() {
+      const internal::parallel::distributed::TemporarilyMatchRefineFlags<dim>
+        refine_modifier(tria);
+      fe_indices_changed =
+        hp::Refinement::limit_p_level_difference(dofh,
+                                                 max_difference,
+                                                 contains_fe_index);
+    },
+    boost::signals2::at_front);
+
   // increase p-level in center subsequently
   for (unsigned int i = 0; i < sequence.size() - 1; ++i)
     {
@@ -79,13 +91,9 @@ test(const unsigned int fes_size, const unsigned int max_difference)
           cell->set_future_fe_index(
             fes.next_in_hierarchy(cell->active_fe_index()));
 
-      const bool fe_indices_changed =
-        hp::Refinement::limit_p_level_difference(dofh,
-                                                 max_difference,
-                                                 contains_fe_index);
+      fe_indices_changed = false;
       tria.execute_coarsening_and_refinement();
 
-      (void)fe_indices_changed;
       if (i >= max_difference)
         Assert(fe_indices_changed, ExcInternalError());
 
