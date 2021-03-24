@@ -411,6 +411,16 @@ namespace LinearAlgebra
 #endif
 
     /**
+     * Fall-back function for vectors that are not-supported by this class.
+     */
+    template <typename VectorType>
+    void
+    import(const VectorType &      vec,
+           VectorOperation::values operation,
+           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+             &communication_pattern = {});
+
+    /**
      * The value returned by this function denotes the dimension of the vector
      * spaces that are modeled by objects of this kind. However, objects of
      * the current class do not actually stores all elements of vectors of
@@ -1046,6 +1056,23 @@ namespace LinearAlgebra
             "The given value is not finite but either infinite or Not A Number (NaN)"));
         this->operator()(indices[i]) += values_to_add[i];
       }
+  }
+
+
+
+  template <typename Number>
+  template <typename VectorType>
+  inline void
+  ReadWriteVector<Number>::import(
+    const VectorType &      vec,
+    VectorOperation::values operation,
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+      &communication_pattern)
+  {
+    Assert(false, ExcNotImplemented());
+    (void)vec;
+    (void)operation;
+    (void)communication_pattern;
   }
 
 
