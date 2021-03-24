@@ -56,12 +56,17 @@ public:
   void
   insert(std::vector<std::string> const ids, double const wall_time)
   {
-    AssertThrow(ids.size() > 0, ExcMessage("empty name."));
+    Assert(
+      ids.size() > 0,
+      ExcMessage(
+        "You need to specify a not empty identifier 'ids' in order to insert a wall_time into the tree."));
 
     if (this->id == "") // the tree is currently empty
       {
-        AssertThrow(sub_trees.empty(),
-                    ExcMessage("invalid state found. aborting."));
+        Assert(
+          sub_trees.empty(),
+          ExcMessage(
+            "The tree is currently empty and does not have an 'id'. Sub trees must therefore also be empty."));
 
         this->id = ids[0];
 
@@ -120,9 +125,10 @@ public:
       }
     else // the provided name does not fit to this tree
       {
-        AssertThrow(false,
-                    ExcMessage("The name provided is " + ids[0] +
-                               ", but must be " + id + " instead."));
+        Assert(false,
+               ExcMessage("The name provided is ids[0] = <" + ids[0] +
+                          ">, but the tree has the id = <" + id +
+                          "> instead."));
       }
   }
 
@@ -130,16 +136,29 @@ public:
    * Inserts a whole sub_tree into an existing tree, where
    * the parameter @p ids specifies the place at which to insert the @p sub_tree.
    * This function allows to combine different timer trees in a modular way.
-   * If a non empty string @p new_name is provided, the id of @p sub_tree is
-   * replaced by @p new_name when inserted into the tree.
+   *
+   * @note If a sub-tree with the same id as @p sub_tree already exists in the tree,
+   * the existing sub-tree is replaced by @p sub_tree.
+   *
+   * @note If a non empty string @p new_name is provided, the id of @p sub_tree is
+   * replaced by @p new_name when inserted into the tree. This is necessary if a
+   * program uses the same module multiple times but for different purposes.
    */
   void
   insert(std::vector<std::string> const         ids,
          std::shared_ptr<TimerTree const> const sub_tree,
          std::string const                      new_name = "")
   {
-    AssertThrow(ids.size() > 0, ExcMessage("Empty ID specified."));
-    AssertThrow(id == ids[0], ExcMessage("Invalid ID specified."));
+    Assert(
+      ids.size() > 0,
+      ExcMessage(
+        "You need to specify a not empty identifier 'ids' in order to insert a sub_tree."));
+
+    Assert(id == ids[0],
+           ExcMessage(
+             "You want to insert a sub_tree with ids[0] = <" + ids[0] +
+             ">, but this identifier does not match the tree's id = <" + id +
+             ">."));
 
     std::vector<std::string> remaining_id = erase_first(ids);
 
@@ -158,26 +177,31 @@ public:
 
     if (found == false)
       {
-        AssertThrow(
+        Assert(
           remaining_id.size() == 0,
           ExcMessage(
-            "Subtree can not be inserted since the specified ID does not exist in this tree."));
+            "Subtree can not be inserted since the specified identifier <" +
+            remaining_id[0] + "> does not exist in this tree."));
 
         std::shared_ptr<TimerTree> new_tree(new TimerTree());
         new_tree->copy_from(sub_tree);
+
+        // The sub_tree's id can be replaced by a new name (if specified when
+        // calling this function)
         if (!new_name.empty())
           new_tree->id = new_name;
 
-        // Make sure that the new tree does not already exist
-        for (auto it = sub_trees.begin(); it != sub_trees.end(); ++it)
-          {
-            AssertThrow(
-              new_tree->id != (*it)->id,
-              ExcMessage(
-                "Subtree can not be inserted since the tree already contains a subtree with the same ID."));
-          }
+        // search whether the new tree already exists
+        auto it = sub_trees.begin();
+        for (; it != sub_trees.end(); it++)
+          if ((*it)->id == new_tree->id)
+            break;
 
-        sub_trees.push_back(new_tree);
+        // replace existing sub-tree if new sub-tree already exists
+        if (it != sub_trees.end())
+          *it = new_tree;
+        else // otherwise, add another sub-tree
+          sub_trees.push_back(new_tree);
       }
   }
 
@@ -232,7 +256,10 @@ private:
   std::vector<std::string>
   erase_first(std::vector<std::string> const &in) const
   {
-    AssertThrow(in.size() > 0, ExcMessage("empty name."));
+    Assert(
+      in.size() > 0,
+      ExcMessage(
+        "First entry of vector can not be erased since the provided vector is empty."));
 
     std::vector<std::string> out(in);
     out.erase(out.begin());
