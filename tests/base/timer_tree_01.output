@@ -94,11 +94,11 @@ timings all:
 
 timings for level = 0:
 
-Structure          2.50e+01 s
+Elasticity         2.50e+01 s
 
 timings for level = 1:
 
-Structure          2.50e+01 s    100.00 %
+Elasticity         2.50e+01 s    100.00 %
   Right-hand side  2.00e+00 s      8.00 %
   Assemble         9.00e+00 s     36.00 %
   Solve            1.40e+01 s     56.00 %
@@ -106,11 +106,11 @@ Structure          2.50e+01 s    100.00 %
 
 timings for level = 2:
 
-Structure        
+Elasticity       
 
 timings all:
 
-Structure          2.50e+01 s
+Elasticity         2.50e+01 s
   Right-hand side  2.00e+00 s
   Assemble         9.00e+00 s
   Solve            1.40e+01 s

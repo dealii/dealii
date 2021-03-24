@@ -100,6 +100,7 @@ test2()
 
   std::shared_ptr<TimerTree> tree_fluid;
   tree_fluid.reset(new TimerTree());
+  // overall time can be inserted first ...
   tree_fluid->insert({"Fluid"}, 70.);
   tree_fluid->insert({"Fluid", "Pressure Poisson"}, 40.);
   tree_fluid->insert({"Fluid", "Postprocessing"}, 10.);
@@ -108,12 +109,19 @@ test2()
 
   std::shared_ptr<TimerTree> tree_structure;
   tree_structure.reset(new TimerTree());
-  tree_structure->insert({"Structure", "Right-hand side"}, 2.);
-  tree_structure->insert({"Structure", "Assemble"}, 9.);
-  tree_structure->insert({"Structure", "Solve"}, 14.);
-  tree_structure->insert({"Structure"}, 25.);
+  tree_structure->insert({"Elasticity", "Right-hand side"}, 2.);
+  tree_structure->insert({"Elasticity", "Assemble"}, 9.);
+  tree_structure->insert({"Elasticity", "Solve"}, 14.);
+  // ... but can also be inserted last
+  tree_structure->insert({"Elasticity"}, 25.);
 
+  // Inserting sub-trees
+
+  // inserting a sub-tree multiple times does not change the results
   tree.insert({"FSI"}, tree_fluid);
+  tree.insert({"FSI"}, tree_fluid);
+
+  // a new name can be provided for a sub-tree
   tree.insert({"FSI"}, tree_structure, "Structure");
 
   pcout << std::endl << "timings for level = 0:" << std::endl;
