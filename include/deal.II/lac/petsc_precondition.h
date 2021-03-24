@@ -19,6 +19,8 @@
 
 #  include <deal.II/base/config.h>
 
+#  include <deal.II/base/subscriptor.h>
+
 #  ifdef DEAL_II_WITH_PETSC
 
 #    include <deal.II/lac/exceptions.h>
@@ -53,7 +55,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionBase
+  class PreconditionBase : public Subscriptor
   {
   public:
     /**
