@@ -31,7 +31,7 @@ public:
   /**
    * Constructor.
    */
-  TimerTree(MPI_Comm const &comm)
+  TimerTree(const MPI_Comm &comm)
     : id("")
     , comm(comm)
   {}
@@ -56,7 +56,7 @@ public:
    * entry already existing in the tree.
    */
   void
-  insert(std::vector<std::string> const ids, double const wall_time)
+  insert(const std::vector<std::string> &ids, const double wall_time)
   {
     Assert(
       ids.size() > 0,
@@ -145,9 +145,9 @@ public:
    * program uses the same module multiple times but for different purposes.
    */
   void
-  insert(std::vector<std::string> const         ids,
-         std::shared_ptr<TimerTree const> const sub_tree,
-         std::string const                      new_name = "")
+  insert(const std::vector<std::string> &       ids,
+         const std::shared_ptr<const TimerTree> sub_tree,
+         const std::string &                    new_name = "")
   {
     Assert(
       ids.size() > 0,
@@ -210,9 +210,9 @@ public:
    * the relative share of the children.
    */
   void
-  print_plain(ConditionalOStream const &pcout) const
+  print_plain(const ConditionalOStream &pcout) const
   {
-    unsigned int const length = get_length();
+    const unsigned int length = get_length();
 
     pcout << std::endl;
 
@@ -231,9 +231,9 @@ public:
    * to print results, where a value of 0 corresponds to the high level module.
    */
   void
-  print_level(ConditionalOStream const &pcout, unsigned int const level) const
+  print_level(const ConditionalOStream &pcout, const unsigned int level) const
   {
-    unsigned int const length = get_length();
+    const unsigned int length = get_length();
 
     pcout << std::endl;
 
@@ -245,7 +245,7 @@ private:
    * This function erases the first entry of the vector.
    */
   std::vector<std::string>
-  erase_first(std::vector<std::string> const &in) const
+  erase_first(const std::vector<std::string> &in) const
   {
     Assert(
       in.size() > 0,
@@ -262,7 +262,7 @@ private:
    * Returns average wall-time over all MPI processes for the root of this tree.
    */
   double
-  get_average_wall_time(double const wall_time) const
+  get_average_wall_time(const double wall_time) const
   {
     Utilities::MPI::MinMaxAvg time_data =
       Utilities::MPI::min_max_avg(wall_time, comm);
@@ -294,9 +294,9 @@ private:
    * call this function recursively and to produce formatted output.
    */
   void
-  do_print_plain(ConditionalOStream const &pcout,
-                 unsigned int const        offset,
-                 unsigned int const        length) const
+  do_print_plain(const ConditionalOStream &pcout,
+                 const unsigned int        offset,
+                 const unsigned int        length) const
   {
     if (id.empty())
       return;
@@ -315,10 +315,10 @@ private:
    * parameters @p offset and @p length to produce formatted output.
    */
   void
-  do_print_level(ConditionalOStream const &pcout,
-                 unsigned int const        level,
-                 unsigned int const        offset,
-                 unsigned int const        length) const
+  do_print_level(const ConditionalOStream &pcout,
+                 const unsigned int        level,
+                 const unsigned int        offset,
+                 const unsigned int        length) const
   {
     if (id.empty())
       return;
@@ -363,9 +363,9 @@ private:
    * Prints id of a tree. The parameters @p offset and @p length produce formatted output.
    */
   void
-  print_id(ConditionalOStream const &pcout,
-           unsigned int const        offset,
-           unsigned int const        length) const
+  print_id(const ConditionalOStream &pcout,
+           const unsigned int        offset,
+           const unsigned int        length) const
   {
     pcout << std::setw(offset) << "" << std::setw(length - offset) << std::left
           << id;
@@ -378,20 +378,20 @@ private:
    * If @p relative is true, the wall time is additionally printed in '%' of @p ref_time.
    */
   void
-  print_id_and_data(ConditionalOStream const &pcout,
-                    unsigned int const        offset,
-                    unsigned int const        length,
-                    bool const                relative = false,
-                    double const              ref_time = -1.0) const
+  print_id_and_data(const ConditionalOStream &pcout,
+                    const unsigned int        offset,
+                    const unsigned int        length,
+                    const bool                relative = false,
+                    const double              ref_time = -1.0) const
   {
     pcout << std::setw(offset) << "" << std::setw(length - offset) << std::left
           << id;
 
-    double const ref_time_avg = get_average_wall_time(ref_time);
+    const double ref_time_avg = get_average_wall_time(ref_time);
 
     if (data.get())
       {
-        double const time_avg = get_average_wall_time(data->wall_time);
+        const double time_avg = get_average_wall_time(data->wall_time);
 
         pcout << std::setprecision(precision) << std::scientific
               << std::setw(10) << std::right << time_avg << " s";
@@ -410,11 +410,11 @@ private:
    * in '%' of @p ref_time.
    */
   void
-  print_direct_children(ConditionalOStream const &pcout,
-                        unsigned int const        offset,
-                        unsigned int const        length,
-                        bool const                relative = false,
-                        double const              ref_time = -1.0) const
+  print_direct_children(const ConditionalOStream &pcout,
+                        const unsigned int        offset,
+                        const unsigned int        length,
+                        const bool                relative = false,
+                        const double              ref_time = -1.0) const
   {
     TimerTree other = TimerTree(comm);
     if (relative && sub_trees.size() > 0)
