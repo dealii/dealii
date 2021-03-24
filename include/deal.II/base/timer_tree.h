@@ -450,8 +450,14 @@ private:
       other.print_id_and_data(pcout, offset, length, relative, ref_time);
   }
 
+  /**
+   * Identifier of this tree.
+   */
   std::string id;
 
+  /**
+   * Struct describing the data of a tree.
+   */
   struct Data
   {
     Data()
@@ -461,12 +467,25 @@ private:
     double wall_time;
   };
 
+  /**
+   * Data of this tree.
+   */
   std::shared_ptr<Data> data;
 
+  /**
+   * A vector of sub-trees.
+   */
   std::vector<std::shared_ptr<TimerTree>> sub_trees;
 
+  /**
+   * Offset per level for formatted output specified in number of characters.
+   */
   static constexpr unsigned int offset_per_level = 2;
-  static constexpr unsigned int precision        = 2;
+
+  /**
+   * Value passed to std::setprecision() in print functions.
+   */
+  static constexpr unsigned int precision = 2;
 };
 
 
