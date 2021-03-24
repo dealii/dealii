@@ -37,18 +37,6 @@ public:
   {}
 
   /**
-   * Copy assignment operator.
-   */
-  TimerTree &
-  operator=(TimerTree const &other)
-  {
-    this->id        = other.id;
-    this->data      = other.data;
-    this->sub_trees = other.sub_trees;
-    this->comm      = other.comm;
-  }
-
-  /**
    * Clears the content of this tree. Sub trees inserted
    * into this tree via pointers to external trees are not touched.
    */
