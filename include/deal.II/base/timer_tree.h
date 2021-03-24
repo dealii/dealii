@@ -241,8 +241,8 @@ public:
   }
 
 private:
-  /*
-   * Copy function.
+  /**
+   * Copies a timer tree.
    */
   void
   copy_from(std::shared_ptr<TimerTree const> const other)
@@ -250,7 +250,7 @@ private:
     *this = *other;
   }
 
-  /*
+  /**
    * This function erases the first entry of the vector.
    */
   std::vector<std::string>
@@ -267,7 +267,7 @@ private:
     return out;
   }
 
-  /*
+  /**
    * Returns average wall-time over all MPI processes for the root of this tree.
    */
   double
@@ -278,8 +278,10 @@ private:
     return time_data.avg;
   }
 
-  /*
-   * print functions
+  /**
+   * Returns number of characters per line required by print functions to
+   * produce nicely formatted output. The function calls itself recursively for
+   * all its sub-trees.
    */
   unsigned int
   get_length() const
@@ -294,6 +296,12 @@ private:
     return length;
   }
 
+  /**
+   * Prints results in 'plain' format, i.e., for all levels of the hierarchical
+   * timer tree. This function does not print relative wall times in '%' of the
+   * overall wall time. The parameters @p offset and @p length are required to
+   * call this function recursively and to produce formatted output.
+   */
   void
   do_print_plain(ConditionalOStream const &pcout,
                  unsigned int const        offset,
@@ -302,7 +310,7 @@ private:
     if (id.empty())
       return;
 
-    print_own(pcout, offset, length);
+    print_id_and_data(pcout, offset, length);
 
     for (auto it = sub_trees.begin(); it != sub_trees.end(); ++it)
       {
@@ -310,6 +318,11 @@ private:
       }
   }
 
+  /**
+   * Private member function that prints results for a given @p level of the timer tree.
+   * In contrast to the public member function, this function has additional
+   * parameters @p offset and @p length to produce formatted output.
+   */
   void
   do_print_level(ConditionalOStream const &pcout,
                  unsigned int const        level,
@@ -322,13 +335,13 @@ private:
     if (level == 0)
       {
         if (data.get())
-          print_own(pcout, offset, length);
+          print_id_and_data(pcout, offset, length);
       }
     else if (level == 1)
       {
         if (sub_trees.size() > 0)
           {
-            print_own(pcout, offset, length, true, data->wall_time);
+            print_id_and_data(pcout, offset, length, true, data->wall_time);
 
             bool const relative = (data.get() != nullptr);
             print_direct_children(pcout,
@@ -341,7 +354,7 @@ private:
     else
       {
         // only print name
-        print_name(pcout, offset, length);
+        print_id(pcout, offset, length);
 
         // recursively print sub trees (decreasing the level and incrementing
         // the offset)
@@ -355,10 +368,13 @@ private:
       }
   }
 
+  /**
+   * Prints id of a tree. The parameters @p offset and @p length produce formatted output.
+   */
   void
-  print_name(ConditionalOStream const &pcout,
-             unsigned int const        offset,
-             unsigned int const        length) const
+  print_id(ConditionalOStream const &pcout,
+           unsigned int const        offset,
+           unsigned int const        length) const
   {
     pcout << std::setw(offset) << "" << std::setw(length - offset) << std::left
           << id;
@@ -366,12 +382,16 @@ private:
     pcout << std::endl;
   }
 
+  /**
+   * Prints data of a tree. The parameters @p offset and @p length produce formatted output.
+   * If @p relative is true, the wall time is additionally printed in '%' of @p ref_time.
+   */
   void
-  print_own(ConditionalOStream const &pcout,
-            unsigned int const        offset,
-            unsigned int const        length,
-            bool const                relative = false,
-            double const              ref_time = -1.0) const
+  print_id_and_data(ConditionalOStream const &pcout,
+                    unsigned int const        offset,
+                    unsigned int const        length,
+                    bool const                relative = false,
+                    double const              ref_time = -1.0) const
   {
     pcout << std::setw(offset) << "" << std::setw(length - offset) << std::left
           << id;
@@ -395,6 +415,11 @@ private:
     pcout << std::endl;
   }
 
+  /**
+   * Prints all direct children of a tree. The parameters @p offset and @p length produce
+   * formatted output. If @p relative is true, the wall time is additionally printed
+   * in '%' of @p ref_time.
+   */
   void
   print_direct_children(ConditionalOStream const &pcout,
                         unsigned int const        offset,
@@ -414,7 +439,7 @@ private:
       {
         if ((*it)->data.get())
           {
-            (*it)->print_own(pcout, offset, length, relative, ref_time);
+            (*it)->print_id_and_data(pcout, offset, length, relative, ref_time);
 
             if (relative)
               other.data->wall_time -= (*it)->data->wall_time;
@@ -422,7 +447,7 @@ private:
       }
 
     if (relative && sub_trees.size() > 0)
-      other.print_own(pcout, offset, length, relative, ref_time);
+      other.print_id_and_data(pcout, offset, length, relative, ref_time);
   }
 
   std::string id;
@@ -440,8 +465,8 @@ private:
 
   std::vector<std::shared_ptr<TimerTree>> sub_trees;
 
-  static unsigned int const offset_per_level = 2;
-  static unsigned int const precision        = 2;
+  static constexpr unsigned int offset_per_level = 2;
+  static constexpr unsigned int precision        = 2;
 };
 
 
