@@ -15,7 +15,9 @@
 
 // tests basic functionality of TimerTree
 
+#include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/mpi.h>
+#include <deal.II/base/timer.h>
 #include <deal.II/base/timer_tree.h>
 
 #include <fstream>

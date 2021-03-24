@@ -16,8 +16,7 @@
 #ifndef dealii_timer_tree_h
 #define dealii_timer_tree_h
 
-#include <deal.II/base/conditional_ostream.h>
-#include <deal.II/base/timer.h>
+#include <deal.II/base/exceptions.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -37,8 +36,8 @@ public:
   {}
 
   /**
-   * Clears the content of this tree. Sub trees inserted
-   * into this tree via pointers to external trees are not touched.
+   * Clears the content of this tree. The content of sub trees inserted
+   * into this tree via pointers to external trees is not touched.
    */
   void
   clear()
@@ -209,14 +208,15 @@ public:
    * Prints wall time of all items of a tree without an analysis of
    * the relative share of the children.
    */
+  template <typename OStreamType>
   void
-  print_plain(const ConditionalOStream &pcout) const
+  print_plain(const OStreamType &ostream) const
   {
     const unsigned int length = get_length();
 
-    pcout << std::endl;
+    ostream << std::endl;
 
-    do_print_plain(pcout, 0, length);
+    do_print_plain(ostream, 0, length);
   }
 
   /**
@@ -230,14 +230,15 @@ public:
    * covered by timers. The parameter @p level specifies the level for which
    * to print results, where a value of 0 corresponds to the high level module.
    */
+  template <typename OStreamType>
   void
-  print_level(const ConditionalOStream &pcout, const unsigned int level) const
+  print_level(const OStreamType &ostream, const unsigned int level) const
   {
     const unsigned int length = get_length();
 
-    pcout << std::endl;
+    ostream << std::endl;
 
-    do_print_level(pcout, level, 0, length);
+    do_print_level(ostream, level, 0, length);
   }
 
 private:
@@ -293,19 +294,20 @@ private:
    * overall wall time. The parameters @p offset and @p length are required to
    * call this function recursively and to produce formatted output.
    */
+  template <typename OStreamType>
   void
-  do_print_plain(const ConditionalOStream &pcout,
-                 const unsigned int        offset,
-                 const unsigned int        length) const
+  do_print_plain(const OStreamType &ostream,
+                 const unsigned int offset,
+                 const unsigned int length) const
   {
     if (id.empty())
       return;
 
-    print_id_and_data(pcout, offset, length);
+    print_id_and_data(ostream, offset, length);
 
     for (const auto it : sub_trees)
       {
-        it->do_print_plain(pcout, offset + offset_per_level, length);
+        it->do_print_plain(ostream, offset + offset_per_level, length);
       }
   }
 
@@ -314,11 +316,12 @@ private:
    * In contrast to the public member function, this function has additional
    * parameters @p offset and @p length to produce formatted output.
    */
+  template <typename OStreamType>
   void
-  do_print_level(const ConditionalOStream &pcout,
-                 const unsigned int        level,
-                 const unsigned int        offset,
-                 const unsigned int        length) const
+  do_print_level(const OStreamType &ostream,
+                 const unsigned int level,
+                 const unsigned int offset,
+                 const unsigned int length) const
   {
     if (id.empty())
       return;
@@ -326,16 +329,16 @@ private:
     if (level == 0)
       {
         if (data.get())
-          print_id_and_data(pcout, offset, length);
+          print_id_and_data(ostream, offset, length);
       }
     else if (level == 1)
       {
         if (sub_trees.size() > 0)
           {
-            print_id_and_data(pcout, offset, length, true, data->wall_time);
+            print_id_and_data(ostream, offset, length, true, data->wall_time);
 
             bool const relative = (data.get() != nullptr);
-            print_direct_children(pcout,
+            print_direct_children(ostream,
                                   offset + offset_per_level,
                                   length,
                                   relative,
@@ -345,13 +348,13 @@ private:
     else
       {
         // only print name
-        print_id(pcout, offset, length);
+        print_id(ostream, offset, length);
 
         // recursively print sub trees (decreasing the level and incrementing
         // the offset)
         for (const auto it : sub_trees)
           {
-            it->do_print_level(pcout,
+            it->do_print_level(ostream,
                                level - 1,
                                offset + offset_per_level,
                                length);
@@ -362,30 +365,32 @@ private:
   /**
    * Prints id of a tree. The parameters @p offset and @p length produce formatted output.
    */
+  template <typename OStreamType>
   void
-  print_id(const ConditionalOStream &pcout,
-           const unsigned int        offset,
-           const unsigned int        length) const
+  print_id(const OStreamType &ostream,
+           const unsigned int offset,
+           const unsigned int length) const
   {
-    pcout << std::setw(offset) << "" << std::setw(length - offset) << std::left
-          << id;
+    ostream << std::setw(offset) << "" << std::setw(length - offset)
+            << std::left << id;
 
-    pcout << std::endl;
+    ostream << std::endl;
   }
 
   /**
    * Prints data of a tree. The parameters @p offset and @p length produce formatted output.
    * If @p relative is true, the wall time is additionally printed in '%' of @p ref_time.
    */
+  template <typename OStreamType>
   void
-  print_id_and_data(const ConditionalOStream &pcout,
-                    const unsigned int        offset,
-                    const unsigned int        length,
-                    const bool                relative = false,
-                    const double              ref_time = -1.0) const
+  print_id_and_data(const OStreamType &ostream,
+                    const unsigned int offset,
+                    const unsigned int length,
+                    const bool         relative = false,
+                    const double       ref_time = -1.0) const
   {
-    pcout << std::setw(offset) << "" << std::setw(length - offset) << std::left
-          << id;
+    ostream << std::setw(offset) << "" << std::setw(length - offset)
+            << std::left << id;
 
     const double ref_time_avg = get_average_wall_time(ref_time);
 
@@ -393,15 +398,15 @@ private:
       {
         const double time_avg = get_average_wall_time(data->wall_time);
 
-        pcout << std::setprecision(precision) << std::scientific
-              << std::setw(10) << std::right << time_avg << " s";
+        ostream << std::setprecision(precision) << std::scientific
+                << std::setw(10) << std::right << time_avg << " s";
 
         if (relative)
-          pcout << std::setprecision(precision) << std::fixed << std::setw(10)
-                << std::right << time_avg / ref_time_avg * 100.0 << " %";
+          ostream << std::setprecision(precision) << std::fixed << std::setw(10)
+                  << std::right << time_avg / ref_time_avg * 100.0 << " %";
       }
 
-    pcout << std::endl;
+    ostream << std::endl;
   }
 
   /**
@@ -409,12 +414,13 @@ private:
    * formatted output. If @p relative is true, the wall time is additionally printed
    * in '%' of @p ref_time.
    */
+  template <typename OStreamType>
   void
-  print_direct_children(const ConditionalOStream &pcout,
-                        const unsigned int        offset,
-                        const unsigned int        length,
-                        const bool                relative = false,
-                        const double              ref_time = -1.0) const
+  print_direct_children(const OStreamType &ostream,
+                        const unsigned int offset,
+                        const unsigned int length,
+                        const bool         relative = false,
+                        const double       ref_time = -1.0) const
   {
     TimerTree other = TimerTree(comm);
     if (relative && sub_trees.size() > 0)
@@ -428,7 +434,7 @@ private:
       {
         if (it->data.get())
           {
-            it->print_id_and_data(pcout, offset, length, relative, ref_time);
+            it->print_id_and_data(ostream, offset, length, relative, ref_time);
 
             if (relative)
               other.data->wall_time -= it->data->wall_time;
@@ -436,7 +442,7 @@ private:
       }
 
     if (relative && sub_trees.size() > 0)
-      other.print_id_and_data(pcout, offset, length, relative, ref_time);
+      other.print_id_and_data(ostream, offset, length, relative, ref_time);
   }
 
   /**
