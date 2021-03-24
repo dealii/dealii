@@ -2689,6 +2689,10 @@ namespace parallel
       // has happened, we need to update the quadrant cell relations
       update_cell_relations();
 
+      // signals that parallel_forest has been refined and cell relations have
+      // been updated
+      this->signals.post_p4est_refinement();
+
       // before repartitioning the mesh, save a copy of the current positions of
       // quadrants
       // only if data needs to be transferred later
