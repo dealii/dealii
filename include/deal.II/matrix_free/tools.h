@@ -826,7 +826,8 @@ namespace MatrixFreeTools
 
             for (unsigned int v = 0; v < n_filled_lanes; ++v)
               {
-                const auto cell_v = matrix_free.get_cell_iterator(cell, v);
+                const auto cell_v =
+                  matrix_free.get_cell_iterator(cell, v, dof_no);
 
                 if (matrix_free.get_mg_level() != numbers::invalid_unsigned_int)
                   cell_v->get_mg_dof_indices(dof_indices);
@@ -838,7 +839,6 @@ namespace MatrixFreeTools
 
                 constraints.distribute_local_to_global(matrices[v],
                                                        dof_indices_mf,
-                                                       dof_indices_mf,
                                                        dst);
               }
           }
@@ -847,13 +847,6 @@ namespace MatrixFreeTools
       matrix);
 
     matrix.compress(VectorOperation::add);
-
-    for (auto &entry : matrix)
-      if (entry.row() == entry.column() && entry.value() == 0.0)
-        {
-          Assert(constraints.is_constrained(entry.row()), ExcNotImplemented());
-          entry.value() = 1.0;
-        }
   }
 
   template <typename CLASS,
