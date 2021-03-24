@@ -536,7 +536,7 @@ namespace parallel
      * or coarsening flags set on that cell, to accommodate things such as
      * the "one hanging node per edge" rule.). These flags need to be
      * read in context with the p4est quadrant they belong to, as their
-     * relations are gathered in local_quadrant_cell_relations.
+     * relations are gathered in local_cell_relations.
      *
      * Specifically, the values for this argument mean the following:
      *
@@ -548,7 +548,7 @@ namespace parallel
      * - `CELL_REFINE`: This cell will be refined into 4 or 8 cells (in 2d
      * and 3d, respectively). However, because these children don't exist
      * yet, you cannot access them at the time when the callback is
-     * called. Thus, in local_quadrant_cell_relations, the corresponding
+     * called. Thus, in local_cell_relations, the corresponding
      * p4est quadrants of the children cells are linked to the deal.II
      * cell which is going to be refined. To be specific, only the very
      * first child is marked with `CELL_REFINE`, whereas the others will be
