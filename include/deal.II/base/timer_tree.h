@@ -31,9 +31,22 @@ public:
   /**
    * Constructor.
    */
-  TimerTree()
+  TimerTree(MPI_Comm const &comm)
     : id("")
+    , comm(comm)
   {}
+
+  /**
+   * Copy assignment operator.
+   */
+  TimerTree &
+  operator=(TimerTree const &other)
+  {
+    this->id        = other.id;
+    this->data      = other.data;
+    this->sub_trees = other.sub_trees;
+    this->comm      = other.comm;
+  }
 
   /**
    * Clears the content of this tree. Sub trees inserted
@@ -42,9 +55,10 @@ public:
   void
   clear()
   {
-    this->id = "";
+    this->id = std::string();
     data     = nullptr;
     sub_trees.clear();
+    this->comm = MPI_Comm();
   }
 
   /**
@@ -81,8 +95,7 @@ public:
           {
             std::vector<std::string> remaining_id = erase_first(ids);
 
-            std::shared_ptr<TimerTree> new_tree;
-            new_tree.reset(new TimerTree());
+            std::shared_ptr<TimerTree> new_tree(new TimerTree(comm));
             new_tree->insert(remaining_id, wall_time);
             sub_trees.push_back(new_tree);
           }
@@ -116,8 +129,7 @@ public:
 
             if (found == false)
               {
-                std::shared_ptr<TimerTree> new_tree;
-                new_tree.reset(new TimerTree());
+                std::shared_ptr<TimerTree> new_tree(new TimerTree(comm));
                 new_tree->insert(remaining_id, wall_time);
                 sub_trees.push_back(new_tree);
               }
@@ -183,8 +195,8 @@ public:
             "Subtree can not be inserted since the specified identifier <" +
             remaining_id[0] + "> does not exist in this tree."));
 
-        std::shared_ptr<TimerTree> new_tree(new TimerTree());
-        new_tree->copy_from(sub_tree);
+        std::shared_ptr<TimerTree> new_tree(new TimerTree(comm));
+        *new_tree = *sub_tree;
 
         // The sub_tree's id can be replaced by a new name (if specified when
         // calling this function)
@@ -242,15 +254,6 @@ public:
 
 private:
   /**
-   * Copies a timer tree.
-   */
-  void
-  copy_from(std::shared_ptr<TimerTree const> const other)
-  {
-    *this = *other;
-  }
-
-  /**
    * This function erases the first entry of the vector.
    */
   std::vector<std::string>
@@ -271,10 +274,10 @@ private:
    * Returns average wall-time over all MPI processes for the root of this tree.
    */
   double
-  get_average_wall_time() const
+  get_average_wall_time(double const wall_time) const
   {
     Utilities::MPI::MinMaxAvg time_data =
-      Utilities::MPI::min_max_avg(data->wall_time, MPI_COMM_WORLD);
+      Utilities::MPI::min_max_avg(wall_time, comm);
     return time_data.avg;
   }
 
@@ -396,13 +399,11 @@ private:
     pcout << std::setw(offset) << "" << std::setw(length - offset) << std::left
           << id;
 
-    Utilities::MPI::MinMaxAvg ref_time_data =
-      Utilities::MPI::min_max_avg(ref_time, MPI_COMM_WORLD);
-    double const ref_time_avg = ref_time_data.avg;
+    double const ref_time_avg = get_average_wall_time(ref_time);
 
     if (data.get())
       {
-        double const time_avg = get_average_wall_time();
+        double const time_avg = get_average_wall_time(data->wall_time);
 
         pcout << std::setprecision(precision) << std::scientific
               << std::setw(10) << std::right << time_avg << " s";
@@ -427,7 +428,7 @@ private:
                         bool const                relative = false,
                         double const              ref_time = -1.0) const
   {
-    TimerTree other;
+    TimerTree other = TimerTree(comm);
     if (relative && sub_trees.size() > 0)
       {
         other.id = "Other";
@@ -476,6 +477,11 @@ private:
    * A vector of sub-trees.
    */
   std::vector<std::shared_ptr<TimerTree>> sub_trees;
+
+  /**
+   * MPI communicator.
+   */
+  MPI_Comm comm;
 
   /**
    * Offset per level for formatted output specified in number of characters.

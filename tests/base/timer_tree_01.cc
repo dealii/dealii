@@ -42,7 +42,7 @@ test1()
   Timer timer;
   timer.restart();
 
-  TimerTree tree;
+  TimerTree tree = TimerTree(MPI_COMM_WORLD);
 
   for (unsigned int i = 0; i < 1000; ++i)
     {
@@ -95,11 +95,11 @@ test2()
   Timer timer;
   timer.restart();
 
-  TimerTree tree;
+  TimerTree tree = TimerTree(MPI_COMM_WORLD);
   tree.insert({"FSI"}, 100.);
 
-  std::shared_ptr<TimerTree> tree_fluid;
-  tree_fluid.reset(new TimerTree());
+  std::shared_ptr<TimerTree> tree_fluid =
+    std::make_shared<TimerTree>(TimerTree(MPI_COMM_WORLD));
   // overall time can be inserted first ...
   tree_fluid->insert({"Fluid"}, 70.);
   tree_fluid->insert({"Fluid", "Pressure Poisson"}, 40.);
@@ -107,8 +107,8 @@ test2()
   tree_fluid->insert({"Fluid", "ALE update"}, 15.);
 
 
-  std::shared_ptr<TimerTree> tree_structure;
-  tree_structure.reset(new TimerTree());
+  std::shared_ptr<TimerTree> tree_structure =
+    std::make_shared<TimerTree>(TimerTree(MPI_COMM_WORLD));
   tree_structure->insert({"Elasticity", "Right-hand side"}, 2.);
   tree_structure->insert({"Elasticity", "Assemble"}, 9.);
   tree_structure->insert({"Elasticity", "Solve"}, 14.);
