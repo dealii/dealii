@@ -503,7 +503,7 @@ namespace internal
        * true subdomain IDs. See the @ref GlossArtificialCell "glossary"
        * for more information about artificial cells.
        */
-      template <int dim, int spacedim>
+      template <int dim, int spacedim = dim>
       class TemporarilyRestoreSubdomainIds : public Subscriptor
       {
       public:
@@ -530,7 +530,7 @@ namespace internal
         /**
          * The modified parallel::shared::Triangulation.
          */
-        SmartPointer<
+        const SmartPointer<
           const dealii::parallel::shared::Triangulation<dim, spacedim>>
           shared_tria;
 
