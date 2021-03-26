@@ -535,7 +535,7 @@ public:
 
   /**
    * Invalid active FE index which will be used as a default value to determine
-   *  whether a future FE index has been set or not.
+   * whether a future FE index has been set or not.
    */
   static const active_fe_index_type invalid_active_fe_index =
     static_cast<active_fe_index_type>(-1);
@@ -1245,18 +1245,15 @@ public:
                            locally_owned_mg_dofs_per_processor(const unsigned int level) const;
 
   /**
-   * Return a constant reference to the selected finite element object.
-   * Since there is only one FiniteElement @p index must be equal to zero
-   * which is also the default value.
+   * Return a constant reference to the indexth finite element object that is
+   * used by this object.
    */
   const FiniteElement<dim, spacedim> &
   get_fe(const unsigned int index = 0) const;
 
   /**
    * Return a constant reference to the set of finite element objects that
-   * are used by this @p DoFHandler. Since this object only contains one
-   * FiniteElement, only this one object is returned wrapped in a
-   * hp::FECollection.
+   * are used by this object.
    */
   const hp::FECollection<dim, spacedim> &
   get_fe_collection() const;
