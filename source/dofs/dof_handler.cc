@@ -1000,6 +1000,8 @@ namespace internal
     };
   } // namespace DoFHandlerImplementation
 
+
+
   namespace hp
   {
     namespace DoFHandlerImplementation
@@ -1872,7 +1874,9 @@ namespace internal
 #endif
 
                         const unsigned int fe_index =
-                          parent->dominated_future_fe_on_children();
+                          dealii::internal::hp::DoFHandlerImplementation::
+                            dominated_future_fe_on_children<dim, spacedim>(
+                              parent);
 
                         fe_transfer->coarsened_cells_fe_index.insert(
                           {parent, fe_index});
@@ -1969,12 +1973,74 @@ namespace internal
                                                      /*codim=*/0);
 
           Assert(dominated_fe_index != numbers::invalid_unsigned_int,
-                 (typename dealii::DoFCellAccessor<dim, spacedim, false>::
-                    ExcNoDominatedFiniteElementOnChildren()));
+                 ExcNoDominatedFiniteElementOnChildren());
 
           return dominated_fe_index;
         }
+
+
+        /**
+         * Return the index of the finite element from the entire
+         * hp::FECollection that is dominated by those assigned as future finite
+         * elements to the
+         * children of @p parent.
+         *
+         * See documentation in the header file for more information.
+         */
+        template <int dim, int spacedim>
+        static unsigned int
+        dominated_future_fe_on_children(
+          const typename DoFHandler<dim, spacedim>::cell_iterator &parent)
+        {
+          Assert(
+            !parent->is_active(),
+            ExcMessage(
+              "You ask for information on children of this cell which is only "
+              "available for active cells. This cell has no children."));
+
+          std::set<unsigned int> future_fe_indices_children;
+          for (const auto &child : parent->child_iterators())
+            {
+              Assert(
+                child->is_active(),
+                ExcMessage(
+                  "You ask for information on children of this cell which is only "
+                  "available for active cells. One of its children is not active."));
+              Assert(
+                child->is_locally_owned(),
+                ExcMessage(
+                  "You ask for information on children of this cell which is only "
+                  "available for locally owned cells. One of its children is not "
+                  "locally owned."));
+              future_fe_indices_children.insert(child->future_fe_index());
+            }
+          Assert(!future_fe_indices_children.empty(), ExcInternalError());
+
+          const unsigned int future_fe_index =
+            parent->get_dof_handler().fe_collection.find_dominated_fe_extended(
+              future_fe_indices_children,
+              /*codim=*/0);
+
+          Assert(future_fe_index != numbers::invalid_unsigned_int,
+                 ExcNoDominatedFiniteElementOnChildren());
+
+          return future_fe_index;
+        }
       };
+
+
+
+      /**
+       * Public wrapper for the above function.
+       */
+      template <int dim, int spacedim>
+      unsigned int
+      dominated_future_fe_on_children(
+        const typename DoFHandler<dim, spacedim>::cell_iterator &parent)
+      {
+        return Implementation::dominated_future_fe_on_children<dim, spacedim>(
+          parent);
+      }
     } // namespace DoFHandlerImplementation
   }   // namespace hp
 } // namespace internal

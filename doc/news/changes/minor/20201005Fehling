@@ -1,4 +1,0 @@
-New: Helper function DoFCellAccessor::dominated_future_fe_on_children()
-to clean up code for hp-coarsening.
-<br>
-(Marc Fehling, 2020/10/05)

@@ -240,7 +240,8 @@ namespace parallel
 #  endif
 
                 const unsigned int future_fe_index =
-                  cell->dominated_future_fe_on_children();
+                  dealii::internal::hp::DoFHandlerImplementation::
+                    dominated_future_fe_on_children<dim, spacedim>(cell);
 
                 const unsigned int future_fe_degree =
                   dof_handler->get_fe_collection()[future_fe_index].degree;

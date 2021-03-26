@@ -1817,6 +1817,46 @@ private:
 #endif
 };
 
+namespace internal
+{
+  namespace hp
+  {
+    namespace DoFHandlerImplementation
+    {
+      /**
+       * Return the index of the finite element from the entire hp::FECollection
+       * that is dominated by those assigned as future finite elements to the
+       * children of @p parent.
+       *
+       * We find the corresponding finite element among the future finite
+       * elements on the children of this cell. If none of them qualify, we
+       * extend our search on the whole hp::FECollection, which is the element
+       * that describes the smallest finite element space that includes all
+       * future finite elements assigned to the children. If the function is not
+       * able to find a finite element at all, an assertion will be triggered.
+       *
+       * In this way, we determine the finite element of the parent cell in case
+       * of h-coarsening in the hp-context.
+       *
+       * @note This function can only be called on direct parent cells, i.e.,
+       * non-active cells whose children are all active.
+       */
+      template <int dim, int spacedim = dim>
+      unsigned int
+      dominated_future_fe_on_children(
+        const typename DoFHandler<dim, spacedim>::cell_iterator &parent);
+
+      /**
+       * Exception
+       */
+      DeclExceptionMsg(
+        ExcNoDominatedFiniteElementOnChildren,
+        "No FiniteElement has been found in your FECollection that is "
+        "dominated by all children of a cell you are trying to coarsen!");
+    } // namespace DoFHandlerImplementation
+  }   // namespace hp
+} // namespace internal
+
 #ifndef DOXYGEN
 
 /* ----------------------- Inline functions ----------------------------------
