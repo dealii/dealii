@@ -948,6 +948,49 @@ namespace internal
 
   class MGTwoLevelTransferImplementation
   {
+    template <int dim, typename Number, typename MeshType>
+    static void
+    precompute_constraints(
+      const MeshType &                         dof_handler_coarse,
+      const dealii::AffineConstraints<Number> &constraint_coarse,
+      MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
+        &transfer)
+    {
+      transfer.constraint_coarse.copy_from(constraint_coarse);
+
+      std::vector<types::global_dof_index> dependencies;
+
+      const auto &locally_owned_dofs = dof_handler_coarse.locally_owned_dofs();
+
+      for (const auto i : locally_owned_dofs)
+        {
+          if (constraint_coarse.is_constrained(i) == false)
+            continue;
+
+          const auto constraints = constraint_coarse.get_constraint_entries(i);
+
+          if (constraints)
+            for (const auto &p : *constraints)
+              if (locally_owned_dofs.is_element(p.first) == false)
+                dependencies.push_back(p.first);
+        }
+
+      std::sort(dependencies.begin(), dependencies.end());
+      dependencies.erase(std::unique(dependencies.begin(), dependencies.end()),
+                         dependencies.end());
+
+      IndexSet locally_relevant_dofs(locally_owned_dofs.size());
+      locally_relevant_dofs.add_indices(dependencies.begin(),
+                                        dependencies.end());
+
+      const auto partitioner = std::make_shared<Utilities::MPI::Partitioner>(
+        locally_owned_dofs,
+        locally_relevant_dofs,
+        dof_handler_coarse.get_communicator());
+
+      transfer.vec_coarse_constraints.reinit(partitioner);
+    }
+
   public:
     template <int dim, typename Number, typename MeshType>
     static void
@@ -963,7 +1006,7 @@ namespace internal
         dof_handler_fine, dof_handler_coarse);
 
       // copy constrain matrix; TODO: why only for the coarse level?
-      transfer.constraint_coarse.copy_from(constraint_coarse);
+      precompute_constraints(dof_handler_coarse, constraint_coarse, transfer);
 
       // gather ranges for active FE indices on both fine and coarse dofhandlers
       std::array<unsigned int, 2> min_active_fe_indices = {
@@ -1518,7 +1561,7 @@ namespace internal
               .dofs_per_vertex > 0;
         }
 
-      transfer.constraint_coarse.copy_from(constraint_coarse);
+      precompute_constraints(dof_handler_coarse, constraint_coarse, transfer);
 
       const auto comm = dof_handler_coarse.get_communicator();
       {
@@ -1979,8 +2022,32 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
   const unsigned int n_lanes = VectorizedArrayType::size();
 
   this->vec_coarse.copy_locally_owned_data_from(src);
-  this->vec_coarse.update_ghost_values();
-  this->constraint_coarse.distribute(this->vec_coarse);
+
+  // the following code is equivalent to:
+  // this->constraint_coarse.distribute(this->vec_coarse);
+  {
+    this->vec_coarse_constraints.copy_locally_owned_data_from(src);
+    this->vec_coarse_constraints.update_ghost_values();
+
+    for (const auto i : partitioner_coarse->locally_owned_range())
+      {
+        if (constraint_coarse.is_constrained(i) == false)
+          continue;
+
+        Number temp = constraint_coarse.is_inhomogeneously_constrained(i) ?
+                        constraint_coarse.get_inhomogeneity(i) :
+                        0.0;
+
+        const auto constraints = constraint_coarse.get_constraint_entries(i);
+
+        if (constraints)
+          for (const auto &p : *constraints)
+            temp += vec_coarse_constraints[p.first] * p.second;
+
+        vec_coarse[i] = temp;
+      }
+  }
+
   this->vec_coarse
     .update_ghost_values(); // note: make sure that ghost values are set
 

@@ -315,6 +315,11 @@ private:
   AffineConstraints<Number> constraint_coarse;
 
   /**
+   * Internal vector that performs constraint_coarse.distribute().
+   */
+  mutable LinearAlgebra::distributed::Vector<Number> vec_coarse_constraints;
+
+  /**
    * Number of components.
    */
   unsigned int n_components;
