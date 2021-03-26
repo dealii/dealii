@@ -24,7 +24,7 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/shared_tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -42,7 +42,9 @@
 
 template <int dim>
 void
-test(const unsigned int fes_size, const unsigned int max_difference)
+test(const unsigned int fes_size,
+     const unsigned int max_difference,
+     const bool         allow_artificial_cells)
 {
   Assert(fes_size > 0, ExcInternalError());
   Assert(max_difference > 0, ExcInternalError());
@@ -56,7 +58,9 @@ test(const unsigned int fes_size, const unsigned int max_difference)
   const auto         sequence = fes.get_hierarchy_sequence(contains_fe_index);
 
   // setup cross-shaped mesh
-  parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
+  parallel::shared::Triangulation<dim> tria(MPI_COMM_WORLD,
+                                            Triangulation<dim>::none,
+                                            allow_artificial_cells);
   {
     std::vector<unsigned int> sizes(Utilities::pow(2, dim),
                                     static_cast<unsigned int>(
@@ -119,7 +123,12 @@ main(int argc, char *argv[])
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     initlog();
 
-  test<2>(4, 1);
-  test<2>(8, 2);
-  test<2>(12, 3);
+  deallog << std::boolalpha;
+  for (const bool allow_artificial_cells : {false, true})
+    {
+      deallog << "artificial cells: " << allow_artificial_cells << std::endl;
+      test<2>(4, 1, allow_artificial_cells);
+      test<2>(8, 2, allow_artificial_cells);
+      test<2>(12, 3, allow_artificial_cells);
+    }
 }

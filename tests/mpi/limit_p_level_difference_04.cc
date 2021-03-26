@@ -19,9 +19,7 @@
 // on h-coarsened grids
 
 
-#include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
-#include <deal.II/distributed/tria_base.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -37,9 +35,8 @@
 
 template <int dim>
 void
-test(parallel::TriangulationBase<dim> &tria, const unsigned int max_difference)
+test(const unsigned int max_difference)
 {
-  Assert(tria.n_levels() == 0, ExcInternalError());
   Assert(max_difference > 0, ExcInternalError());
 
   // setup FE collection
@@ -65,6 +62,7 @@ test(parallel::TriangulationBase<dim> &tria, const unsigned int max_difference)
   // after prepare_coarsening_and_refinement(), the p-levels should propagate
   // through the central cells as if they were already coarsened
 
+  parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   TestGrids::hyper_line(tria, 3);
 
   // refine the central cell
@@ -91,12 +89,6 @@ test(parallel::TriangulationBase<dim> &tria, const unsigned int max_difference)
   (void)fe_indices_changed;
   Assert(fe_indices_changed, ExcInternalError());
 
-  deallog << "future FE indices before adaptation:" << std::endl;
-  for (const auto &cell : dofh.active_cell_iterators())
-    if (cell->is_locally_owned())
-      deallog << " " << cell->id().to_string() << " " << cell->future_fe_index()
-              << std::endl;
-
   tria.execute_coarsening_and_refinement();
 
   deallog << "active FE indices after adaptation:" << std::endl;
@@ -115,45 +107,7 @@ main(int argc, char *argv[])
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    log;
 
-  constexpr const unsigned int dim = 2;
-
-  // Known bug:
-  //   Collecting FE indices for parent cells on children fails for p::s::T
-  //   at the moment whenever siblings belong to the different processors.
-  //
-  //  deallog << "parallel::shared::Triangulation" << std::endl;
-  //  {
-  //    parallel::shared::Triangulation<dim> tria(MPI_COMM_WORLD);
-  //
-  //    test<dim>(tria, 1);
-  //    tria.clear();
-  //    test<dim>(tria, 2);
-  //    tria.clear();
-  //    test<dim>(tria, 3);
-  //  }
-  //
-  //  deallog << "parallel::shared::Triangulation with artificial cells"
-  //          << std::endl;
-  //  {
-  //    parallel::shared::Triangulation<dim> tria(MPI_COMM_WORLD,
-  //                                              Triangulation<dim>::none,
-  //                                              /*allow_artificial_cells=*/true);
-  //
-  //    test<dim>(tria, 1);
-  //    tria.clear();
-  //    test<dim>(tria, 2);
-  //    tria.clear();
-  //    test<dim>(tria, 3);
-  //  }
-
-  deallog << "parallel::distributed::Triangulation" << std::endl;
-  {
-    parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
-
-    test<dim>(tria, 1);
-    tria.clear();
-    test<dim>(tria, 2);
-    tria.clear();
-    test<dim>(tria, 3);
-  }
+  test<2>(1);
+  test<2>(2);
+  test<2>(3);
 }

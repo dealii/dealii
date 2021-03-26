@@ -17,14 +17,14 @@
 // verify restrictions on level differences imposed by
 // DoFHandler::prepare_coarsening_and_refinement()
 //
-// set the center cell to the highest p-level in a hyper_cross geometry
-// and verify that all other cells comply to the level difference
+// sequentially increase the p-level of the center cell in a hyper_cross
+// geometry and verify that all other comply to the level difference
 
 
 #include <deal.II/base/point.h>
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/shared_tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -42,7 +42,9 @@
 
 template <int dim>
 void
-test(const unsigned int fes_size, const unsigned int max_difference)
+test(const unsigned int fes_size,
+     const unsigned int max_difference,
+     const bool         allow_artificial_cells)
 {
   Assert(fes_size > 0, ExcInternalError());
   Assert(max_difference > 0, ExcInternalError());
@@ -56,7 +58,9 @@ test(const unsigned int fes_size, const unsigned int max_difference)
   const auto         sequence = fes.get_hierarchy_sequence(contains_fe_index);
 
   // setup cross-shaped mesh
-  parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
+  parallel::shared::Triangulation<dim> tria(MPI_COMM_WORLD,
+                                            Triangulation<dim>::none,
+                                            allow_artificial_cells);
   {
     std::vector<unsigned int> sizes(Utilities::pow(2, dim),
                                     static_cast<unsigned int>(
@@ -70,27 +74,33 @@ test(const unsigned int fes_size, const unsigned int max_difference)
   DoFHandler<dim> dofh(tria);
   dofh.distribute_dofs(fes);
 
-  // set center cell to highest p-level
-  for (const auto &cell : dofh.active_cell_iterators())
-    if (cell->is_locally_owned() && cell->center() == Point<dim>())
-      cell->set_active_fe_index(sequence.back());
+  // increase p-level in center subsequently
+  for (unsigned int i = 0; i < sequence.size() - 1; ++i)
+    {
+      // find center cell
+      for (const auto &cell : dofh.active_cell_iterators())
+        if (cell->is_locally_owned() && cell->center() == Point<dim>())
+          cell->set_future_fe_index(
+            fes.next_in_hierarchy(cell->active_fe_index()));
 
-  const bool fe_indices_changed =
-    hp::Refinement::limit_p_level_difference(dofh,
-                                             max_difference,
-                                             contains_fe_index);
-  tria.execute_coarsening_and_refinement();
+      const bool fe_indices_changed =
+        hp::Refinement::limit_p_level_difference(dofh,
+                                                 max_difference,
+                                                 contains_fe_index);
+      tria.execute_coarsening_and_refinement();
 
-  (void)fe_indices_changed;
-  Assert(fe_indices_changed, ExcInternalError());
+      (void)fe_indices_changed;
+      if (i >= max_difference)
+        Assert(fe_indices_changed, ExcInternalError());
 
-  // display number of cells for each FE index
-  std::vector<unsigned int> count(fes.size(), 0);
-  for (const auto &cell : dofh.active_cell_iterators())
-    if (cell->is_locally_owned())
-      count[cell->active_fe_index()]++;
-  Utilities::MPI::sum(count, tria.get_communicator(), count);
-  deallog << "fe count:" << count << std::endl;
+      // display number of cells for each FE index
+      std::vector<unsigned int> count(fes.size(), 0);
+      for (const auto &cell : dofh.active_cell_iterators())
+        if (cell->is_locally_owned())
+          count[cell->active_fe_index()]++;
+      Utilities::MPI::sum(count, tria.get_communicator(), count);
+      deallog << "cycle:" << i << ", fe count:" << count << std::endl;
+    }
 
 #ifdef DEBUG
   // check each cell's active FE index by its distance from the center
@@ -119,7 +129,12 @@ main(int argc, char *argv[])
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     initlog();
 
-  test<2>(4, 1);
-  test<2>(8, 2);
-  test<2>(12, 3);
+  deallog << std::boolalpha;
+  for (const bool allow_artificial_cells : {false, true})
+    {
+      deallog << "artificial cells: " << allow_artificial_cells << std::endl;
+      test<2>(4, 1, allow_artificial_cells);
+      test<2>(8, 2, allow_artificial_cells);
+      test<2>(12, 3, allow_artificial_cells);
+    }
 }
