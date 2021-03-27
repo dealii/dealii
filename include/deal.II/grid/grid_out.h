@@ -1324,17 +1324,18 @@ public:
    *
    * Due to the way this function writes data to the output stream,
    * the resulting output files correspond to a faithful representation
-   * of the mesh in that all cells are visible for visualization. However,
+   * of the mesh in that all cells are visible for visualization. In general,
    * the data is not in a format that allows reading this file in again
    * through the GridIn class. This is because every vertex of the mesh is
    * duplicated as many times as there are adjacent cells. In other words,
    * every cell has its own, separate set of vertices that are at the
    * same location as the vertices of other cells, but are separately
-   * numbered. If such a file is read in through the GridIn class, then
-   * that will result in a mesh that has the correct cells and vertex
-   * locations, but because the vertices are logically separate (though at
-   * the same locations) all cells are unconnected and have no neighbors
-   * across faces.
+   * numbered.
+   *
+   * In order to create a file that can be read with the GridIn class,
+   * the flag GridOutFlags::Vtu::serialize_triangulation must be set to true. In
+   * this case, the generated vtu file will contain the triangulation in a xml
+   * section which is ignored by general vtu readers.
    */
   template <int dim, int spacedim>
   void
