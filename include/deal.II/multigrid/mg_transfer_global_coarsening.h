@@ -310,14 +310,48 @@ private:
   mutable LinearAlgebra::distributed::Vector<Number> vec_coarse;
 
   /**
-   * Constraint matrix on coarse level.
-   */
-  AffineConstraints<Number> constraint_coarse;
-
-  /**
-   * Internal vector that performs constraint_coarse.distribute().
+   * Internal vector for performing manual constraint_coarse.distribute(), which
+   * is needed for acceptable performance.
    */
   mutable LinearAlgebra::distributed::Vector<Number> vec_coarse_constraints;
+
+  /**
+   * Constraint-entry indices for manually performing
+   * constraint_coarse.distribute() in MPI-local indices (for performance
+   * reasons).
+   */
+  std::vector<unsigned int> constraint_coarse_distribute_indices;
+
+  /**
+   * Constraint-entry values for manually performing
+   * constraint_coarse.distribute() in MPI-local indices (for performance
+   * reasons).
+   */
+  std::vector<Number> constraint_coarse_distribute_values;
+
+  /**
+   * Pointers to the constraint entries for performing manual
+   * constraint_coarse.distribute().
+   */
+  std::vector<unsigned int> constraint_coarse_distribute_ptr;
+
+  /**
+   * Constraint-entry indices for performing manual
+   * constraint_coarse.distribute_local_to_global().
+   */
+  std::vector<unsigned int> distribute_local_to_global_indices;
+
+  /**
+   * Constraint-entry values for performing manual
+   * constraint_coarse.distribute_local_to_global().
+   */
+  std::vector<Number> distribute_local_to_global_values;
+
+  /**
+   * Pointers to the constraint entries for performing manual
+   * constraint_coarse.distribute_local_to_global().
+   */
+  std::vector<unsigned int> distribute_local_to_global_ptr;
 
   /**
    * Number of components.
