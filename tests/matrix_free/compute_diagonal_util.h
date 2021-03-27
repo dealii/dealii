@@ -188,6 +188,10 @@ public:
 
         for (; a1 != A1.end(); ++a1, ++a2, ++a_ref)
           {
+            if (a1->row() == a1->column() &&
+                constraints.is_constrained(a1->row()))
+              continue;
+
             Assert(std::abs(a1->value() - a_ref->value()) < 1e-6,
                    ExcNotImplemented());
             Assert(std::abs(a2->value() - a_ref->value()) < 1e-6,
