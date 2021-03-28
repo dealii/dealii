@@ -98,8 +98,6 @@ namespace Step15
   {
   public:
     MinimalSurfaceProblem();
-    ~MinimalSurfaceProblem();
-
     void run();
 
   private:
@@ -160,13 +158,6 @@ namespace Step15
     , fe(2)
   {}
 
-
-
-  template <int dim>
-  MinimalSurfaceProblem<dim>::~MinimalSurfaceProblem()
-  {
-    dof_handler.clear();
-  }
 
   // @sect4{MinimalSurfaceProblem::setup_system}
 
