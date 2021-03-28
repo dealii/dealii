@@ -422,7 +422,7 @@ public:
    * to true.
    *
    * When this flag is set to true, the generated vtu file contains the
-   * triangulation in a xml section which is ignored by vtu general vtu readers.
+   * triangulation in a xml section which is ignored by general vtu readers.
    * If this section is absent, an exception is thrown.
    */
   void
