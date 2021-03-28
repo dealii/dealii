@@ -524,7 +524,8 @@ namespace Step15
 
         for (unsigned int q = 0; q < n_q_points; ++q)
           {
-            const double coeff = 1 / std::sqrt(1 + gradients[q] * gradients[q]);
+            const double coeff =
+              1. / std::sqrt(1 + gradients[q] * gradients[q]);
 
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               cell_residual(i) -= (fe_values.shape_grad(i, q) // \nabla \phi_i
@@ -616,9 +617,9 @@ namespace Step15
     // information about the residual prior to this step and so we continue
     // the Newton iteration until we have reached at least one iteration and
     // until residual is less than $10^{-3}$.
-    double       previous_res     = 0;
-    unsigned int refinement_cycle = 0;
-    while ((refinement_cycle == 0) || (previous_res > 1e-3))
+    double       previous_residual = 0;
+    unsigned int refinement_cycle  = 0;
+    while ((refinement_cycle == 0) || (previous_residual > 1e-3))
       {
         std::cout << "Mesh refinement step " << refinement_cycle << std::endl;
 
@@ -640,7 +641,7 @@ namespace Step15
              ++inner_iteration)
           {
             assemble_system();
-            previous_res = system_rhs.l2_norm();
+            previous_residual = system_rhs.l2_norm();
 
             solve();
 
