@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Check ArborX wrapper: intersection of points with bounding boxes
+// Check ArborX wrapper: nearest points from bounding boxes and others points
 
 
 #include <deal.II/arborx/access_traits.h>
@@ -26,7 +26,7 @@
 
 
 void
-test_2d()
+test_bounding_box_2d()
 {
   std::vector<BoundingBox<2>> bounding_boxes;
   std::vector<Point<2>>       points;
@@ -58,11 +58,11 @@ test_2d()
   query_points.emplace_back(2.6, 2.6);
 
 
-  ArborXWrappers::BVH                     bvh(bounding_boxes);
-  ArborXWrappers::PointIntersectPredicate pt_intersect(query_points);
-  auto             indices_offset = bvh.query(pt_intersect);
-  std::vector<int> indices        = indices_offset.first;
-  std::vector<int> offset         = indices_offset.second;
+  ArborXWrappers::BVH                   bvh(bounding_boxes);
+  ArborXWrappers::PointNearestPredicate pt_nearest(query_points, 1);
+  auto                                  indices_offset = bvh.query(pt_nearest);
+  std::vector<int>                      indices        = indices_offset.first;
+  std::vector<int>                      offset         = indices_offset.second;
 
   std::vector<int> indices_ref = {0, 5, 10, 10};
   std::vector<int> offset_ref  = {0, 1, 2, 3, 4};
@@ -93,7 +93,63 @@ test_2d()
 }
 
 void
-test_3d()
+test_points_2d()
+{
+  std::vector<Point<2>> points;
+
+  unsigned int n_points_1d = 5;
+  for (unsigned int i = 0; i < n_points_1d; ++i)
+    {
+      for (unsigned int j = 0; j < n_points_1d; ++j)
+        {
+          points.emplace_back(j, i);
+        }
+    }
+
+
+  std::vector<Point<2>> query_points;
+  query_points.emplace_back(0.5, 0.5);
+  query_points.emplace_back(1.5, 1.5);
+  query_points.emplace_back(2.2, 2.2);
+  query_points.emplace_back(2.6, 2.6);
+
+
+  ArborXWrappers::BVH                   bvh(points);
+  ArborXWrappers::PointNearestPredicate pt_nearest(query_points, 1);
+  auto                                  indices_offset = bvh.query(pt_nearest);
+  std::vector<int>                      indices        = indices_offset.first;
+  std::vector<int>                      offset         = indices_offset.second;
+
+  std::vector<int> indices_ref = {0, 6, 12, 18};
+  std::vector<int> offset_ref  = {0, 1, 2, 3, 4};
+
+  AssertThrow(indices.size() == indices_ref.size(), ExcInternalError());
+  AssertThrow(offset.size() == offset_ref.size(), ExcInternalError());
+  for (unsigned int i = 0; i < offset.size() - 1; ++i)
+    {
+      for (unsigned int j = offset[i]; j < offset[i + 1]; ++j)
+        {
+          // The indices associated to each query are not ordered.
+          bool found = false;
+          for (unsigned int k = offset[i]; k < offset[i + 1]; ++k)
+            {
+              if (indices[j] == indices_ref[k])
+                {
+                  found = true;
+                  break;
+                }
+            }
+          AssertThrow(found, ExcInternalError());
+        }
+    }
+  for (unsigned int i = 0; i < offset.size(); ++i)
+    AssertThrow(offset[i] == offset_ref[i], ExcInternalError());
+
+  deallog << "OK" << std::endl;
+}
+
+void
+test_bounding_box_3d()
 {
   std::vector<BoundingBox<3>> bounding_boxes;
   std::vector<Point<3>>       points;
@@ -133,14 +189,71 @@ test_3d()
   query_points.emplace_back(2.6, 2.6, 2.6);
 
 
-  ArborXWrappers::BVH                     bvh(bounding_boxes);
-  ArborXWrappers::PointIntersectPredicate pt_intersect(query_points);
-  auto             indices_offset = bvh.query(pt_intersect);
-  std::vector<int> indices        = indices_offset.first;
-  std::vector<int> offset         = indices_offset.second;
+  ArborXWrappers::BVH                   bvh(bounding_boxes);
+  ArborXWrappers::PointNearestPredicate pt_nearest(query_points, 1);
+  auto                                  indices_offset = bvh.query(pt_nearest);
+  std::vector<int>                      indices        = indices_offset.first;
+  std::vector<int>                      offset         = indices_offset.second;
 
 
   std::vector<int> indices_ref = {0, 21, 42, 42};
+  std::vector<int> offset_ref  = {0, 1, 2, 3, 4};
+
+  AssertThrow(indices.size() == indices_ref.size(), ExcInternalError());
+  AssertThrow(offset.size() == offset_ref.size(), ExcInternalError());
+  for (unsigned int i = 0; i < offset.size() - 1; ++i)
+    {
+      for (unsigned int j = offset[i]; j < offset[i + 1]; ++j)
+        {
+          // The indices associated to each query are not ordered.
+          bool found = false;
+          for (unsigned int k = offset[i]; k < offset[i + 1]; ++k)
+            {
+              if (indices[j] == indices_ref[k])
+                {
+                  found = true;
+                  break;
+                }
+            }
+          AssertThrow(found, ExcInternalError());
+        }
+    }
+  for (unsigned int i = 0; i < offset.size(); ++i)
+    AssertThrow(offset[i] == offset_ref[i], ExcInternalError());
+  deallog << "OK" << std::endl;
+}
+
+void
+test_points_3d()
+{
+  std::vector<Point<3>> points;
+
+  unsigned int n_points_1d = 5;
+  for (unsigned int i = 0; i < n_points_1d; ++i)
+    {
+      for (unsigned int j = 0; j < n_points_1d; ++j)
+        {
+          for (unsigned int k = 0; k < n_points_1d; ++k)
+            {
+              points.emplace_back(k, j, i);
+            }
+        }
+    }
+
+  std::vector<Point<3>> query_points;
+  query_points.emplace_back(0.5, 0.5, 0.5);
+  query_points.emplace_back(1.5, 1.5, 1.5);
+  query_points.emplace_back(2.2, 2.2, 2.2);
+  query_points.emplace_back(2.6, 2.6, 2.6);
+
+
+  ArborXWrappers::BVH                   bvh(points);
+  ArborXWrappers::PointNearestPredicate pt_nearest(query_points, 1);
+  auto                                  indices_offset = bvh.query(pt_nearest);
+  std::vector<int>                      indices        = indices_offset.first;
+  std::vector<int>                      offset         = indices_offset.second;
+
+  std::vector<int> indices_ref = {0, 31, 62, 93};
   std::vector<int> offset_ref  = {0, 1, 2, 3, 4};
 
   AssertThrow(indices.size() == indices_ref.size(), ExcInternalError());
@@ -179,8 +292,10 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
 
   // tests
-  test_2d();
-  test_3d();
+  test_bounding_box_2d();
+  test_bounding_box_3d();
+  test_points_2d();
+  test_points_3d();
 
   Kokkos::finalize();
 }

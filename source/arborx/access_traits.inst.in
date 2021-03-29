@@ -20,10 +20,17 @@ for (DIM : DIMENSIONS; SCALAR : REAL_SCALARS)
     DEAL_II_NAMESPACE_OPEN
     namespace ArborXWrappers
     {
-      template PointIntersect::PointIntersect(
-        const std::vector<dealii::Point<DIM, SCALAR>> &dim_points);
-      template BoundingBoxIntersect::BoundingBoxIntersect(
+      template PointIntersectPredicate::PointIntersectPredicate(
+        const std::vector<dealii::Point<DIM, SCALAR>> &points);
+      template PointNearestPredicate::PointNearestPredicate(
+        const std::vector<dealii::Point<DIM, SCALAR>> &points,
+        const unsigned int                             n_nearest_neighbors);
+
+      template BoundingBoxIntersectPredicate::BoundingBoxIntersectPredicate(
         const std::vector<dealii::BoundingBox<DIM, SCALAR>> &bb);
+      template BoundingBoxNearestPredicate::BoundingBoxNearestPredicate(
+        const std::vector<dealii::BoundingBox<DIM, SCALAR>> &bb,
+        const unsigned int n_nearest_neighbors);
     \}
     DEAL_II_NAMESPACE_CLOSE
 

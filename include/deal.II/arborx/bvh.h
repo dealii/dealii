@@ -61,6 +61,12 @@ namespace ArborXWrappers
     BVH(const std::vector<BoundingBox<dim, Number>> &bounding_boxes);
 
     /**
+     * Constructor. Use a vector of @p points as primitives.
+     */
+    template <int dim, typename Number>
+    BVH(const std::vector<Point<dim, Number>> &points);
+
+    /**
      * Return the indices of those BoundingBox objects that satisfy the @p queries.
      * Because @p queries can contain multiple queries, the function returns a pair
      * of indices and offsets.
@@ -82,7 +88,8 @@ namespace ArborXWrappers
      *
      * @code
      * const std::vector<BoundingBox<dim>> query_bounding_boxes = ...
-     * ArborXWrappers::BoundingBoxIntersect bb_intersect(query_bounding_boxes);
+     * ArborXWrappers::BoundingBoxIntersectPredicate
+     * bb_intersect(query_bounding_boxes);
      *
      * const std::vector<BoundingBox<dim>> bvh_bounding_boxes = ...
      * ArborxWrappers::BVH bvh(bvh_bounding_boxes);
@@ -107,12 +114,25 @@ namespace ArborXWrappers
      *
      * @code
      * const std::vector<Point<dim>> query_points = ...
-     * ArborXWrappers::PointIntersect pt_intersect(query_points);
+     * ArborXWrappers::PointIntersectPredicate pt_intersect(query_points);
      *
      * const std::vector<BoundingBox<dim>> bvh_bounding_boxes = ...
      * ArborxWrappers::BVH bvh(bvh_bounding_boxes);
      *
      * auto [indices, offset] = bvh.query(pt_intersect);
+     * @endcode
+     *
+     * As a final example, we want to show how to find the five nearest points
+     * of a given set of points. This can done as follows:
+     *
+     * @code
+     * const std::vector<Point<dim>> query_points = ...
+     * ArborXWrappers::PointNearestPredicate pt_nearest(query_points, 5);
+     *
+     * const std::vector<Point<dim>> bvh_points = ...
+     * ArborxWrappers::BVH bvh(bvh_points);
+     *
+     * auto [indices, offset] = bvh.query(pt_nearest);
      * @endcode
      */
     template <typename QueryType>
@@ -131,6 +151,13 @@ namespace ArborXWrappers
   template <int dim, typename Number>
   BVH::BVH(const std::vector<BoundingBox<dim, Number>> &bounding_boxes)
     : bvh(Kokkos::DefaultHostExecutionSpace{}, bounding_boxes)
+  {}
+
+
+
+  template <int dim, typename Number>
+  BVH::BVH(const std::vector<Point<dim, Number>> &points)
+    : bvh(Kokkos::DefaultHostExecutionSpace{}, points)
   {}
 
 
