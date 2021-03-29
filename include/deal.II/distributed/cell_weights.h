@@ -20,7 +20,7 @@
 
 #include <deal.II/distributed/tria_base.h>
 
-#include <deal.II/hp/dof_handler.h>
+#include <deal.II/dofs/dof_handler.h>
 
 
 DEAL_II_NAMESPACE_OPEN

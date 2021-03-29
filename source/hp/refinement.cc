@@ -573,7 +573,8 @@ namespace hp
 #endif
 
                     parent_future_fe_index =
-                      parent->dominated_future_fe_on_children();
+                      dealii::internal::hp::DoFHandlerImplementation::
+                        dominated_future_fe_on_children<dim, spacedim>(parent);
 
                     future_fe_indices_on_coarsened_cells.insert(
                       {parent, parent_future_fe_index});

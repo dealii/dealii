@@ -397,10 +397,8 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
               fe_indices_children, /*codim=*/0);
 
           Assert(target_fe_index != numbers::invalid_unsigned_int,
-                 (typename dealii::DoFCellAccessor<
-                   dim,
-                   DoFHandlerType::space_dimension,
-                   false>::ExcNoDominatedFiniteElementOnChildren()));
+                 internal::hp::DoFHandlerImplementation::
+                   ExcNoDominatedFiniteElementOnChildren());
 
           const unsigned int dofs_per_cell =
             dof_handler->get_fe(target_fe_index).n_dofs_per_cell();

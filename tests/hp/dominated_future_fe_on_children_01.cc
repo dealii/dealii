@@ -16,7 +16,7 @@
 
 
 // Verify functionality of
-// DoFCellAccessor:dominated_future_fe_on_children()
+// internal::hp::DoFHandlerImplementation::dominated_future_fe_on_children()
 
 #include <deal.II/base/logstream.h>
 
@@ -52,7 +52,8 @@ test()
 
   const auto &       parent = dofh.begin(/*level=*/0);
   const unsigned int parent_future_fe =
-    parent->dominated_future_fe_on_children();
+    internal::hp::DoFHandlerImplementation::dominated_future_fe_on_children<
+      dim>(parent);
 
   deallog << parent_future_fe << std::endl;
 }

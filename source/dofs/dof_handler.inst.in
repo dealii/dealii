@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2020 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,12 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
     template std::string internal::policy_to_string(
       const dealii::internal::DoFHandlerImplementation::Policy::
         PolicyBase<deal_II_dimension, deal_II_space_dimension> &policy);
+
+    template unsigned int internal::hp::DoFHandlerImplementation::
+      dominated_future_fe_on_children<deal_II_dimension,
+                                      deal_II_space_dimension>(
+        const typename DoFHandler<deal_II_dimension,
+                                  deal_II_space_dimension>::cell_iterator &);
 #endif
   }
 

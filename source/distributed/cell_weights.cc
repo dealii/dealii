@@ -200,7 +200,8 @@ namespace parallel
                      dim>::ExcInconsistentCoarseningFlags());
 #endif
 
-          fe_index = cell->dominated_future_fe_on_children();
+          fe_index = dealii::internal::hp::DoFHandlerImplementation::
+            dominated_future_fe_on_children<dim, spacedim>(cell);
           break;
 
         default:
