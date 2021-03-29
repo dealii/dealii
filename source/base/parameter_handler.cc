@@ -761,7 +761,19 @@ ParameterHandler::parse_input_from_json(std::istream &in,
   boost::property_tree::ptree node_tree;
   // This boost function will raise an exception if this is not a valid JSON
   // file.
-  read_json(in, node_tree);
+  try
+    {
+      read_json(in, node_tree);
+    }
+  catch (const std::exception &e)
+    {
+      AssertThrow(
+        false,
+        ExcMessage(
+          "The provided JSON file is not valid. Boost aborted with the "
+          "following assert message: \n\n" +
+          std::string(e.what())));
+    }
 
   // The xml function is reused to read in the xml into the parameter file.
   // This means that only mangled files can be read.
