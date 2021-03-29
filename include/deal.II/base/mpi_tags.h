@@ -142,6 +142,10 @@ namespace Utilities
           // Utilities::MPI::RemotePointEvaluation
           remote_point_evaluation,
 
+          // internal::FineDoFHandlerView::FineDoFHandlerView::reinit() for mg
+          // global coarsening transfer
+          fine_dof_handler_view_reinit,
+
         };
       } // namespace Tags
     }   // namespace internal

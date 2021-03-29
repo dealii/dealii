@@ -643,7 +643,8 @@ namespace internal
         for (const auto &i : targets_with_indexset)
           {
             indices_to_be_sent[i.first] = {};
-            auto &buffer                = indices_to_be_sent[i.first];
+            std::vector<types::global_dof_index> &buffer =
+              indices_to_be_sent[i.first];
 
             for (auto cell_id : i.second)
               {
@@ -658,13 +659,15 @@ namespace internal
 
             requests.resize(requests.size() + 1);
 
-            MPI_Isend(buffer.data(),
-                      buffer.size(),
-                      Utilities::MPI::internal::mpi_type_id(buffer.data()),
-                      i.first,
-                      11,
-                      communicator,
-                      &requests.back());
+            const auto ierr_1 = MPI_Isend(
+              buffer.data(),
+              buffer.size(),
+              Utilities::MPI::internal::mpi_type_id(buffer.data()),
+              i.first,
+              Utilities::MPI::internal::Tags::fine_dof_handler_view_reinit,
+              communicator,
+              &requests.back());
+            AssertThrowMPI(ierr_1);
           }
       }
 
@@ -709,20 +712,34 @@ namespace internal
         for (unsigned int i = 0; i < ranks.size(); ++i)
           {
             MPI_Status status;
-            MPI_Probe(MPI_ANY_SOURCE, 11, communicator, &status);
+            const auto ierr_1 = MPI_Probe(
+              MPI_ANY_SOURCE,
+              Utilities::MPI::internal::Tags::fine_dof_handler_view_reinit,
+              communicator,
+              &status);
+            AssertThrowMPI(ierr_1);
 
-            int message_length;
-            MPI_Get_count(&status, MPI_UNSIGNED, &message_length);
+            std::vector<types::global_dof_index> buffer;
 
-            std::vector<types::global_dof_index> buffer(message_length);
+            int        message_length;
+            const auto ierr_2 =
+              MPI_Get_count(&status,
+                            Utilities::MPI::internal::mpi_type_id(
+                              buffer.data()),
+                            &message_length);
+            AssertThrowMPI(ierr_2);
 
-            MPI_Recv(buffer.data(),
-                     buffer.size(),
-                     Utilities::MPI::internal::mpi_type_id(buffer.data()),
-                     status.MPI_SOURCE,
-                     11,
-                     communicator,
-                     MPI_STATUS_IGNORE);
+            buffer.resize(message_length);
+
+            const auto ierr_3 = MPI_Recv(
+              buffer.data(),
+              buffer.size(),
+              Utilities::MPI::internal::mpi_type_id(buffer.data()),
+              status.MPI_SOURCE,
+              Utilities::MPI::internal::Tags::fine_dof_handler_view_reinit,
+              communicator,
+              MPI_STATUS_IGNORE);
+            AssertThrowMPI(ierr_3);
 
             ghost_indices.insert(ghost_indices.end(),
                                  buffer.begin(),
@@ -742,7 +759,9 @@ namespace internal
               }
           }
 
-        MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
+        const auto ierr_1 =
+          MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
+        AssertThrowMPI(ierr_1);
       }
 
       std::sort(ghost_indices.begin(), ghost_indices.end());
@@ -752,10 +771,10 @@ namespace internal
 
       this->is_extended_locally_owned = dof_handler_dst.locally_owned_dofs();
 
-      this->is_extendende_ghosts = IndexSet(dof_handler_dst.n_dofs());
-      this->is_extendende_ghosts.add_indices(ghost_indices.begin(),
-                                             ghost_indices.end());
-      this->is_extendende_ghosts.subtract_set(this->is_extended_locally_owned);
+      this->is_extended_ghosts = IndexSet(dof_handler_dst.n_dofs());
+      this->is_extended_ghosts.add_indices(ghost_indices.begin(),
+                                           ghost_indices.end());
+      this->is_extended_ghosts.subtract_set(this->is_extended_locally_owned);
 
 #endif
     }
@@ -857,7 +876,7 @@ namespace internal
     const IndexSet &
     locally_relevant_dofs() const
     {
-      return is_extendende_ghosts;
+      return is_extended_ghosts;
     }
 
   private:
@@ -875,7 +894,7 @@ namespace internal
 
 
     IndexSet is_extended_locally_owned;
-    IndexSet is_extendende_ghosts;
+    IndexSet is_extended_ghosts;
 
     std::map<unsigned int, std::vector<types::global_dof_index>> map;
 
