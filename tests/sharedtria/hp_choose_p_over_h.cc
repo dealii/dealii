@@ -69,11 +69,11 @@ test()
           for (unsigned int i = 0; i < cell->n_children(); ++i)
             {
               const auto &child = cell->child(i);
+
+              child->set_coarsen_flag();
+
               if (child->is_locally_owned())
-                {
-                  child->set_future_fe_index(1);
-                  child->set_coarsen_flag();
-                }
+                child->set_future_fe_index(1);
             }
         }
       else if (cell->id().to_string() == "1_0:")
@@ -84,12 +84,12 @@ test()
           for (unsigned int i = 0; i < cell->n_children(); ++i)
             {
               const auto &child = cell->child(i);
+
+              child->set_coarsen_flag();
+
               if (child->is_locally_owned())
-                {
-                  if (i == 0)
-                    child->set_future_fe_index(1);
-                  child->set_coarsen_flag();
-                }
+                if (i == 0)
+                  child->set_future_fe_index(1);
             }
         }
     }

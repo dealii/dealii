@@ -22,6 +22,7 @@
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria_base.h>
 
+#include <deal.II/dofs/dof_accessor.templates.h>
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/grid/grid_refinement.h>
@@ -655,33 +656,14 @@ namespace hp
         dof_handler.has_hp_capabilities(),
         (typename dealii::DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
-      // Siblings of cells to be coarsened may not be owned by the same
-      // processor. We will exchange coarsening flags on ghost cells and
-      // temporarily store them.
-      std::map<CellId, std::pair<bool, bool>> ghost_buffer;
-
-      if (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-            &dof_handler.get_triangulation()))
-        {
-          auto pack =
-            [](const typename dealii::DoFHandler<dim,
-                                                 spacedim>::active_cell_iterator
-                 &cell) -> std::pair<bool, bool> {
-            return {cell->coarsen_flag_set(), cell->future_fe_index_set()};
-          };
-
-          auto unpack =
-            [&ghost_buffer](const typename dealii::DoFHandler<dim, spacedim>::
-                              active_cell_iterator &    cell,
-                            const std::pair<bool, bool> pair) -> void {
-            ghost_buffer.emplace(cell->id(), pair);
-          };
-
-          GridTools::exchange_cell_data_to_ghosts<
-            std::pair<bool, bool>,
-            dealii::DoFHandler<dim, spacedim>>(dof_handler, pack, unpack);
-        }
-
+      // Ghost siblings might occur on parallel::shared::Triangulation objects.
+      // We need information about future FE indices on all locally relevant
+      // cells here, and thus communicate them.
+      if (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
+            &dof_handler.get_triangulation()) != nullptr)
+        dealii::internal::hp::DoFHandlerImplementation::
+          communicate_future_fe_indices(
+            const_cast<dealii::DoFHandler<dim, spacedim> &>(dof_handler));
 
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (cell->is_locally_owned() && cell->future_fe_index_set())
@@ -711,12 +693,27 @@ namespace hp
                           }
                         else if (child->is_ghost())
                           {
-                            const std::pair<bool, bool> &flags =
-                              ghost_buffer[child->id()];
+                            // The case of siblings being owned by different
+                            // processors can only occur for
+                            // parallel::shared::Triangulation objects.
+                            Assert(
+                              (dynamic_cast<const parallel::shared::
+                                              Triangulation<dim, spacedim> *>(
+                                 &dof_handler.get_triangulation()) != nullptr),
+                              ExcInternalError());
 
-                            if (flags.first)
+                            if (child->coarsen_flag_set())
                               ++h_flagged_children;
-                            if (flags.second)
+                            // The public interface does not allow to access
+                            // future FE indices on ghost cells. However, we
+                            // need this information here and thus call the
+                            // internal function that does not check for cell
+                            // ownership.
+                            if (dealii::internal::
+                                  DoFCellAccessorImplementation::
+                                    Implementation::
+                                      future_fe_index_set<dim, spacedim, false>(
+                                        *child))
                               ++p_flagged_children;
                           }
                         else
