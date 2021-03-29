@@ -129,12 +129,13 @@ namespace Particles
 
           // The local particle start index is the number of all particles
           // generated on lower MPI ranks.
-          MPI_Exscan(&n_particles_to_generate,
-                     &particle_index,
-                     1,
-                     DEAL_II_PARTICLE_INDEX_MPI_TYPE,
-                     MPI_SUM,
-                     tria->get_communicator());
+          const int ierr = MPI_Exscan(&n_particles_to_generate,
+                                      &particle_index,
+                                      1,
+                                      DEAL_II_PARTICLE_INDEX_MPI_TYPE,
+                                      MPI_SUM,
+                                      tria->get_communicator());
+          AssertThrowMPI(ierr);
         }
 #endif
 
@@ -295,12 +296,13 @@ namespace Particles
               dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
                 &triangulation))
           {
-            MPI_Exscan(&local_weight_integral,
-                       &local_start_weight,
-                       1,
-                       MPI_DOUBLE,
-                       MPI_SUM,
-                       tria->get_communicator());
+            const int ierr = MPI_Exscan(&local_weight_integral,
+                                        &local_start_weight,
+                                        1,
+                                        MPI_DOUBLE,
+                                        MPI_SUM,
+                                        tria->get_communicator());
+            AssertThrowMPI(ierr);
           }
 #endif
 

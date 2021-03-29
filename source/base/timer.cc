@@ -889,14 +889,15 @@ TimerOutput::print_wall_time_statistics(const MPI_Comm &mpi_comm,
         std::vector<double> receive_data(my_rank == 0 ? n_ranks : 0);
         std::vector<double> result(9);
 #ifdef DEAL_II_WITH_MPI
-        MPI_Gather(&given_time,
-                   1,
-                   MPI_DOUBLE,
-                   receive_data.data(),
-                   1,
-                   MPI_DOUBLE,
-                   0,
-                   mpi_comm);
+        int ierr = MPI_Gather(&given_time,
+                              1,
+                              MPI_DOUBLE,
+                              receive_data.data(),
+                              1,
+                              MPI_DOUBLE,
+                              0,
+                              mpi_comm);
+        AssertThrowMPI(ierr);
         if (my_rank == 0)
           {
             // fill the received data in a pair and sort; on the way, also
@@ -923,7 +924,8 @@ TimerOutput::print_wall_time_statistics(const MPI_Comm &mpi_comm,
             result[7] = data_rank[n_ranks - 1].first;
             result[8] = data_rank[n_ranks - 1].second;
           }
-        MPI_Bcast(result.data(), 9, MPI_DOUBLE, 0, mpi_comm);
+        ierr = MPI_Bcast(result.data(), 9, MPI_DOUBLE, 0, mpi_comm);
+        AssertThrowMPI(ierr);
 #endif
         out_stream << std::setw(10) << std::setprecision(4) << std::right;
         out_stream << result[0] << "s ";

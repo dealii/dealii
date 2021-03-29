@@ -4054,6 +4054,7 @@ namespace internal
                                triangulation->get_communicator()) -
                                1,
                              triangulation->get_communicator());
+            AssertThrowMPI(ierr);
 
             // shift indices
             for (types::global_dof_index &index : renumbering)

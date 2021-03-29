@@ -147,8 +147,9 @@ namespace Utilities
       const unsigned int size = Utilities::MPI::n_mpi_processes(comm_small);
 
       std::vector<unsigned int> ranks(size);
-      MPI_Allgather(
+      const int                 ierr = MPI_Allgather(
         &rank, 1, MPI_UNSIGNED, ranks.data(), 1, MPI_UNSIGNED, comm_small);
+      AssertThrowMPI(ierr);
 
       return ranks;
     }
@@ -531,21 +532,23 @@ namespace Utilities
       std::vector<unsigned int> buffer(dest_vector.size());
       unsigned int              n_recv_from = 0;
 
-      MPI_Reduce(dest_vector.data(),
-                 buffer.data(),
-                 dest_vector.size(),
-                 MPI_UNSIGNED,
-                 MPI_SUM,
-                 0,
-                 mpi_comm);
-      MPI_Scatter(buffer.data(),
-                  1,
-                  MPI_UNSIGNED,
-                  &n_recv_from,
-                  1,
-                  MPI_UNSIGNED,
-                  0,
-                  mpi_comm);
+      int ierr = MPI_Reduce(dest_vector.data(),
+                            buffer.data(),
+                            dest_vector.size(),
+                            MPI_UNSIGNED,
+                            MPI_SUM,
+                            0,
+                            mpi_comm);
+      AssertThrowMPI(ierr);
+      ierr = MPI_Scatter(buffer.data(),
+                         1,
+                         MPI_UNSIGNED,
+                         &n_recv_from,
+                         1,
+                         MPI_UNSIGNED,
+                         0,
+                         mpi_comm);
+      AssertThrowMPI(ierr);
 
       return n_recv_from;
 #  endif
