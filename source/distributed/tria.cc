@@ -2322,18 +2322,12 @@ namespace parallel
 
       // set all cells to artificial. we will later set it to the correct
       // subdomain in match_tree_recursively
-      for (typename Triangulation<dim, spacedim>::cell_iterator cell =
-             this->begin(0);
-           cell != this->end(0);
-           ++cell)
+      for (const auto &cell : this->cell_iterators_on_level(0))
         cell->recursively_set_subdomain_id(numbers::artificial_subdomain_id);
 
       do
         {
-          for (typename Triangulation<dim, spacedim>::cell_iterator cell =
-                 this->begin(0);
-               cell != this->end(0);
-               ++cell)
+          for (const auto &cell : this->cell_iterators_on_level(0))
             {
               // if this processor stores no part of the forest that comes out
               // of this coarse grid cell, then we need to delete all children
@@ -3355,10 +3349,7 @@ namespace parallel
       this->local_cell_relations.shrink_to_fit();
 
       // recurse over p4est
-      for (typename Triangulation<dim, spacedim>::cell_iterator cell =
-             this->begin(0);
-           cell != this->end(0);
-           ++cell)
+      for (const auto &cell : this->cell_iterators_on_level(0))
         {
           // skip coarse cells that are not ours
           if (tree_exists_locally<dim, spacedim>(
