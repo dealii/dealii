@@ -1821,6 +1821,21 @@ namespace internal
     namespace DoFHandlerImplementation
     {
       /**
+       * Given a DoFHandler object in hp-mode, make sure that the
+       * future FE indices that a user has set for locally owned cells are
+       * communicated to all other relevant cells as well.
+       *
+       * For parallel::shared::Triangulation objects,
+       * this information is distributed on both ghost and artificial cells.
+       *
+       * In case a parallel::distributed::Triangulation is used,
+       * indices are communicated only to ghost cells.
+       */
+      template <int dim, int spacedim>
+      void
+      communicate_future_fe_indices(DoFHandler<dim, spacedim> &dof_handler);
+
+      /**
        * Return the index of the finite element from the entire hp::FECollection
        * that is dominated by those assigned as future finite elements to the
        * children of @p parent.
@@ -1837,6 +1852,12 @@ namespace internal
        *
        * @note This function can only be called on direct parent cells, i.e.,
        * non-active cells whose children are all active.
+       *
+       * @note On parallel::shared::Triangulation objects where sibling cells
+       * can be ghost cells, make sure that future FE indices have been properly
+       * communicated with communicate_future_fe_indices() first. Otherwise,
+       * results might differ on different processors. There is no check for
+       * consistency of future FE indices.
        */
       template <int dim, int spacedim = dim>
       unsigned int
