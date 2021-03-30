@@ -76,12 +76,14 @@ namespace Utilities
       types::global_dof_index prefix_sum = 0;
 
 #ifdef DEAL_II_WITH_MPI
-      MPI_Exscan(&local_size,
-                 &prefix_sum,
-                 1,
-                 Utilities::MPI::internal::mpi_type_id(&prefix_sum),
-                 MPI_SUM,
-                 communicator);
+      const int ierr =
+        MPI_Exscan(&local_size,
+                   &prefix_sum,
+                   1,
+                   Utilities::MPI::internal::mpi_type_id(&prefix_sum),
+                   MPI_SUM,
+                   communicator);
+      AssertThrowMPI(ierr);
 #endif
 
       local_range_data = {prefix_sum, prefix_sum + local_size};
