@@ -2167,10 +2167,7 @@ namespace parallel
                 }
 
             // clear coarsen flag if not all children were marked
-            for (typename Triangulation<dim, spacedim>::cell_iterator cell =
-                   tria.begin();
-                 cell != tria.end();
-                 ++cell)
+            for (const auto &cell : tria.cell_iterators())
               {
                 // nothing to do if we are already on the finest level
                 if (cell->is_active())
@@ -2322,18 +2319,12 @@ namespace parallel
 
       // set all cells to artificial. we will later set it to the correct
       // subdomain in match_tree_recursively
-      for (typename Triangulation<dim, spacedim>::cell_iterator cell =
-             this->begin(0);
-           cell != this->end(0);
-           ++cell)
+      for (const auto &cell : this->cell_iterators_on_level(0))
         cell->recursively_set_subdomain_id(numbers::artificial_subdomain_id);
 
       do
         {
-          for (typename Triangulation<dim, spacedim>::cell_iterator cell =
-                 this->begin(0);
-               cell != this->end(0);
-               ++cell)
+          for (const auto &cell : this->cell_iterators_on_level(0))
             {
               // if this processor stores no part of the forest that comes out
               // of this coarse grid cell, then we need to delete all children
@@ -2459,9 +2450,7 @@ namespace parallel
           for (unsigned int lvl = this->n_levels(); lvl > 0;)
             {
               --lvl;
-              typename Triangulation<dim, spacedim>::cell_iterator cell,
-                endc = this->end(lvl);
-              for (cell = this->begin(lvl); cell != endc; ++cell)
+              for (const auto &cell : this->cell_iterators_on_level(lvl))
                 {
                   if ((cell->is_active() &&
                        cell->subdomain_id() ==
@@ -2486,10 +2475,7 @@ namespace parallel
           for (unsigned int lvl = 0; lvl < this->n_levels(); ++lvl)
             marked_vertices[lvl] = mark_locally_active_vertices_on_level(lvl);
 
-          for (typename Triangulation<dim, spacedim>::cell_iterator cell =
-                 this->begin(0);
-               cell != this->end(0);
-               ++cell)
+          for (const auto &cell : this->cell_iterators_on_level(0))
             {
               typename dealii::internal::p4est::types<dim>::quadrant
                                  p4est_coarse_cell;
@@ -2515,9 +2501,7 @@ namespace parallel
           for (unsigned int lvl = this->n_levels(); lvl > 0;)
             {
               --lvl;
-              typename Triangulation<dim, spacedim>::cell_iterator cell,
-                endc = this->end(lvl);
-              for (cell = this->begin(lvl); cell != endc; ++cell)
+              for (const auto &cell : this->cell_iterators_on_level(lvl))
                 {
                   if (cell->has_children())
                     for (unsigned int c = 0;
@@ -2971,8 +2955,7 @@ namespace parallel
       Assert(dim > 1, ExcNotImplemented());
 
       std::vector<bool> marked_vertices(this->n_vertices(), false);
-      cell_iterator     cell = this->begin(level), endc = this->end(level);
-      for (; cell != endc; ++cell)
+      for (const auto &cell : this->cell_iterators_on_level(level))
         if (cell->level_subdomain_id() == this->locally_owned_subdomain())
           for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
             marked_vertices[cell->vertex_index(v)] = true;
@@ -2982,10 +2965,6 @@ namespace parallel
        * as active (i.e., belonging to an owned level cell), also the other
        * one is active
        */
-      typename std::map<std::pair<cell_iterator, unsigned int>,
-                        std::pair<std::pair<cell_iterator, unsigned int>,
-                                  std::bitset<3>>>::const_iterator it;
-
       // When a connectivity in the code below is detected, the assignment
       // 'marked_vertices[v1] = marked_vertices[v2] = true' makes sure that
       // the information about the periodicity propagates back to vertices on
@@ -2997,15 +2976,13 @@ namespace parallel
       // the number of space dimensions) we can be sure that all connections
       // to vertices have been created.
       for (unsigned int repetition = 0; repetition < dim; ++repetition)
-        for (it = this->get_periodic_face_map().begin();
-             it != this->get_periodic_face_map().end();
-             ++it)
+        for (const auto &it : this->get_periodic_face_map())
           {
-            const cell_iterator & cell_1           = it->first.first;
-            const unsigned int    face_no_1        = it->first.second;
-            const cell_iterator & cell_2           = it->second.first.first;
-            const unsigned int    face_no_2        = it->second.first.second;
-            const std::bitset<3> &face_orientation = it->second.second;
+            const cell_iterator & cell_1           = it.first.first;
+            const unsigned int    face_no_1        = it.first.second;
+            const cell_iterator & cell_2           = it.second.first.first;
+            const unsigned int    face_no_2        = it.second.first.second;
+            const std::bitset<3> &face_orientation = it.second.second;
 
             if (cell_1->level() == level && cell_2->level() == level)
               {
@@ -3355,10 +3332,7 @@ namespace parallel
       this->local_cell_relations.shrink_to_fit();
 
       // recurse over p4est
-      for (typename Triangulation<dim, spacedim>::cell_iterator cell =
-             this->begin(0);
-           cell != this->end(0);
-           ++cell)
+      for (const auto &cell : this->cell_iterators_on_level(0))
         {
           // skip coarse cells that are not ours
           if (tree_exists_locally<dim, spacedim>(
