@@ -3876,6 +3876,12 @@ private:
   clear_despite_subscriptions();
 
   /**
+   * Reset triangulation policy.
+   */
+  void
+  reset_policy();
+
+  /**
    * For all cells, set the active cell indices so that active cells know the
    * how many-th active cell they are, and all other cells have an invalid
    * value. This function is called after mesh creation, refinement, and
@@ -4252,6 +4258,7 @@ Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
     reset_global_cell_indices();
   }
 
+  reset_policy();
 
   bool my_check_for_distorted_cells;
   ar & my_check_for_distorted_cells;

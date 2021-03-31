@@ -10486,35 +10486,11 @@ Triangulation<dim, spacedim>::create_triangulation_compatibility(
 }
 
 
-
 template <int dim, int spacedim>
 void
-Triangulation<dim, spacedim>::create_triangulation(
-  const std::vector<Point<spacedim>> &v,
-  const std::vector<CellData<dim>> &  cells,
-  const SubCellData &                 subcelldata)
+Triangulation<dim, spacedim>::reset_policy()
 {
-  Assert((vertices.size() == 0) && (levels.size() == 0) && (faces == nullptr),
-         ExcTriangulationNotEmpty(vertices.size(), levels.size()));
-  // check that no forbidden arrays
-  // are used
-  Assert(subcelldata.check_consistency(dim), ExcInternalError());
-
-  // try to create a triangulation; if this fails, we still want to
-  // throw an exception but if we just do so we'll get into trouble
-  // because sometimes other objects are already attached to it:
-  try
-    {
-      internal::TriangulationImplementation::Implementation::
-        create_triangulation(v, cells, subcelldata, *this);
-
-      this->update_reference_cells();
-    }
-  catch (...)
-    {
-      clear_despite_subscriptions();
-      throw;
-    }
+  this->update_reference_cells();
 
   if (this->all_reference_cells_are_hyper_cube())
     {
@@ -10536,6 +10512,38 @@ Triangulation<dim, spacedim>::create_triangulation(
           spacedim,
           internal::TriangulationImplementation::ImplementationMixedMesh>>();
     }
+}
+
+
+
+template <int dim, int spacedim>
+void
+Triangulation<dim, spacedim>::create_triangulation(
+  const std::vector<Point<spacedim>> &v,
+  const std::vector<CellData<dim>> &  cells,
+  const SubCellData &                 subcelldata)
+{
+  Assert((vertices.size() == 0) && (levels.size() == 0) && (faces == nullptr),
+         ExcTriangulationNotEmpty(vertices.size(), levels.size()));
+  // check that no forbidden arrays
+  // are used
+  Assert(subcelldata.check_consistency(dim), ExcInternalError());
+
+  // try to create a triangulation; if this fails, we still want to
+  // throw an exception but if we just do so we'll get into trouble
+  // because sometimes other objects are already attached to it:
+  try
+    {
+      internal::TriangulationImplementation::Implementation::
+        create_triangulation(v, cells, subcelldata, *this);
+    }
+  catch (...)
+    {
+      clear_despite_subscriptions();
+      throw;
+    }
+
+  reset_policy();
 
   // update our counts of the various elements of a triangulation, and set
   // active_cell_indices of all cells
