@@ -541,17 +541,15 @@ namespace Step15
     // thing on every cell and so we didn't not want to deal with the question
     // of whether a particular degree of freedom sits at the boundary in the
     // integration above. Rather, we will simply set to zero these entries
-    // after the fact. To this end, we first need to determine which degrees
+    // after the fact. To this end, we need to determine which degrees
     // of freedom do in fact belong to the boundary and then loop over all of
     // those and set the residual entry to zero. This happens in the following
-    // lines which we have already seen used in step-11:
+    // lines which we have already seen used in step-11, using the appropriate
+    // function from namespace DoFTools:
     hanging_node_constraints.condense(residual);
 
-    IndexSet boundary_dofs(dof_handler.n_dofs());
-    DoFTools::extract_boundary_dofs(dof_handler,
-                                    ComponentMask(),
-                                    boundary_dofs);
-    for (types::global_dof_index i : boundary_dofs)
+    for (types::global_dof_index i :
+         DoFTools::extract_boundary_dofs(dof_handler))
       residual(i) = 0;
 
     // At the end of the function, we return the norm of the residual:
