@@ -1485,9 +1485,11 @@ namespace DoFTools
    * live on which cell.
    * @param[in] component_mask A mask denoting the vector components of the
    * finite element that should be considered (see also
-   * @ref GlossComponentMask).
+   * @ref GlossComponentMask). If left at the default, the component mask
+   * indicates that all vector components of the finite element should be
+   * considered.
    * @param[in] boundary_ids If empty, this function extracts the indices of the
-   * degrees of freedom for all parts of the boundary. If it is a non- empty
+   * degrees of freedom for all parts of the boundary. If it is a non-empty
    * list, then the function only considers boundary faces with the boundary
    * indicators listed in this argument.
    * @return The IndexSet object that
@@ -1501,8 +1503,8 @@ namespace DoFTools
    */
   template <int dim, int spacedim>
   IndexSet
-  extract_boundary_dofs(const DoFHandler<dim, spacedim> &   dof_handler,
-                        const ComponentMask &               component_mask,
+  extract_boundary_dofs(const DoFHandler<dim, spacedim> &dof_handler,
+                        const ComponentMask &component_mask = ComponentMask(),
                         const std::set<types::boundary_id> &boundary_ids = {});
 
   /**
