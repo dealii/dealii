@@ -45,6 +45,10 @@ namespace hp
     void
     full_p_adaptivity(const dealii::DoFHandler<dim, spacedim> &dof_handler)
     {
+      if (dof_handler.get_fe_collection().size() == 0)
+        // nothing to do
+        return;
+
       Assert(
         dof_handler.has_hp_capabilities(),
         (typename dealii::DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
@@ -63,6 +67,10 @@ namespace hp
       const dealii::DoFHandler<dim, spacedim> &dof_handler,
       const std::vector<bool> &                p_flags)
     {
+      if (dof_handler.get_fe_collection().size() == 0)
+        // nothing to do
+        return;
+
       Assert(
         dof_handler.has_hp_capabilities(),
         (typename dealii::DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
@@ -108,6 +116,10 @@ namespace hp
       const ComparisonFunction<typename identity<Number>::type>
         &compare_coarsen)
     {
+      if (dof_handler.get_fe_collection().size() == 0)
+        // nothing to do
+        return;
+
       Assert(
         dof_handler.has_hp_capabilities(),
         (typename dealii::DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
@@ -143,6 +155,10 @@ namespace hp
       const ComparisonFunction<typename identity<Number>::type>
         &compare_coarsen)
     {
+      if (dof_handler.get_fe_collection().size() == 0)
+        // nothing to do
+        return;
+
       Assert(
         dof_handler.has_hp_capabilities(),
         (typename dealii::DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
@@ -236,6 +252,10 @@ namespace hp
       const ComparisonFunction<typename identity<Number>::type>
         &compare_coarsen)
     {
+      if (dof_handler.get_fe_collection().size() == 0)
+        // nothing to do
+        return;
+
       Assert(
         dof_handler.has_hp_capabilities(),
         (typename dealii::DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
@@ -428,6 +448,10 @@ namespace hp
       const dealii::DoFHandler<dim, spacedim> &dof_handler,
       const Vector<Number> &                   sobolev_indices)
     {
+      if (dof_handler.get_fe_collection().size() == 0)
+        // nothing to do
+        return;
+
       Assert(
         dof_handler.has_hp_capabilities(),
         (typename dealii::DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
@@ -486,6 +510,10 @@ namespace hp
       const ComparisonFunction<typename identity<Number>::type>
         &compare_coarsen)
     {
+      if (dof_handler.get_fe_collection().size() == 0)
+        // nothing to do
+        return;
+
       Assert(
         dof_handler.has_hp_capabilities(),
         (typename dealii::DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
@@ -524,6 +552,10 @@ namespace hp
                   const double                             gamma_h,
                   const double                             gamma_n)
     {
+      if (dof_handler.get_fe_collection().size() == 0)
+        // nothing to do
+        return;
+
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
                       error_indicators.size());
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
@@ -633,6 +665,10 @@ namespace hp
     void
     force_p_over_h(const dealii::DoFHandler<dim, spacedim> &dof_handler)
     {
+      if (dof_handler.get_fe_collection().size() == 0)
+        // nothing to do
+        return;
+
       Assert(
         dof_handler.has_hp_capabilities(),
         (typename dealii::DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
@@ -651,6 +687,10 @@ namespace hp
     void
     choose_p_over_h(const dealii::DoFHandler<dim, spacedim> &dof_handler)
     {
+      if (dof_handler.get_fe_collection().size() == 0)
+        // nothing to do
+        return;
+
       Assert(
         dof_handler.has_hp_capabilities(),
         (typename dealii::DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
@@ -768,6 +808,10 @@ namespace hp
       const unsigned int                       max_difference,
       const unsigned int                       contains_fe_index)
     {
+      if (dof_handler.get_fe_collection().size() == 0)
+        // nothing to do
+        return false;
+
       Assert(
         dof_handler.has_hp_capabilities(),
         (typename dealii::DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));

@@ -2019,9 +2019,6 @@ template <int dim, int spacedim>
 inline const hp::FECollection<dim, spacedim> &
 DoFHandler<dim, spacedim>::get_fe_collection() const
 {
-  Assert(fe_collection.size() > 0,
-         ExcMessage("No finite element collection is associated with "
-                    "this DoFHandler"));
   return fe_collection;
 }
 
