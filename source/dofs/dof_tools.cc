@@ -634,6 +634,7 @@ namespace DoFTools
   }
 
 
+
   template <int dim, int spacedim>
   void
   extract_boundary_dofs(const DoFHandler<dim, spacedim> &   dof_handler,
@@ -675,7 +676,6 @@ namespace DoFTools
     // boundary line is also part of a boundary face which we will be
     // visiting sooner or later
     for (const auto &cell : dof_handler.active_cell_iterators())
-
       // only work on cells that are either locally owned or at least ghost
       // cells
       if (cell->is_artificial() == false)
