@@ -1,0 +1,475 @@
+
+<br>
+
+<i>
+This program was contributed by Martin Kronbichler, Peter Munch, and David
+Schneider. Many of the features shown here have been added to deal.II during
+and for the development of the deal.II-based, efficient, matrix-free
+finite-element library for high-dimensional partial differential equations
+hyper.deal (see https://github.com/hyperdeal/hyperdeal). For more details and
+for applications of the presented features in slightly different contexts
+(high-dimensional advection equation and Vlasov-Poisson equations) see the release
+paper @cite munch2020hyperdeal.
+
+This work was partly supported by the German Research Foundation (DFG) through
+the project "High-order discontinuous Galerkin for the exa-scale" (ExaDG)
+within the priority program "Software for Exascale Computing" (SPPEXA) and
+by the Bavarian government through the project "High-order matrix-free finite
+element implementations with hybrid parallelization and improved data locality"
+within the KONWIHR program.
+</i>
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+This tutorial program solves the Euler equations of fluid dynamics, using an
+explicit time integrator with the matrix-free framework applied to a
+high-order discontinuous Galerkin discretization in space. The numerical
+approach used here is identical to that used in step-67, however, we utilize
+different advanced MatrixFree techniques to reach even a higher throughput.
+
+The two main features of this tutorial are:
+- the usage of shared-memory features from MPI-3.0 and
+- the usage of cell-centric loops, which allow to write to the global vector only
+  once and, therefore, are ideal for the usage of shared memory.
+
+Further topics we discuss in this tutorial are the usage and benefits of the
+template argument VectorizedArrayType (instead of simply using
+VectorizedArray<Number>) as well as the possibility to pass lambdas to
+MatrixFree loops.
+
+For details on the numerics, we refer to the documentation of step-67. We
+concentrate here only on the key differences.
+
+<h3>Shared-memory and hybrid parallelization with MPI-3.0</h3>
+
+<h4>Motivation</h4>
+
+There exist many shared-memory libraries that are based on threads like TBB,
+OpenMP, or TaskFlow. Integrating such libraries into existing MPI programs
+allows one to use shared memory. However, these libraries come with an overhead
+for the programmer, since all parallelizable code sections have to be found and
+transformed according to the library used, including the difficulty when some
+third-party numerical library, like an iterative solver package, only relies on
+MPI.
+
+Considering a purely MPI-parallelized FEM application, one can identify that
+the major time and memory benefit of using shared memory would come from
+accessing the part of the solution vector owned by the processes on the same
+compute node without the need to make explicit copies and buffering them.
+Fur this propose, MPI-3.0 provides shared-memory features based on so-called
+windows, where processes can directly access the data of the neighbors on the same
+shared-memory domain.
+
+<h4>Basic MPI-3.0 commands</h4>
+
+A few relevant MPI-3.0 commands are worth discussing in detail.
+A new MPI communicator <code>comm_sm</code>, which consists of processes from
+the communicator <code>comm</code> that have access to the same shared memory,
+can be created via:
+
+@code
+MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, rank, MPI_INFO_NULL, &comm_sm);
+@endcode
+
+The following code snippet shows the simplified allocation routines of
+shared memory for the value type <code>T</code> and the size
+<code>local_size</code>, as well as, how to query pointers to the data belonging
+to processes in the same shared-memory domain:
+
+@code
+MPI_Win          win;         // window
+T *              data_this;   // pointer to locally-owned data
+std::vector<T *> data_others; // pointers to shared data
+
+// configure shared memory
+MPI_Info info;
+MPI_Info_create(&info);
+MPI_Info_set(info, "alloc_shared_noncontig", "true");
+
+// allocate shared memory
+MPI_Win_allocate_shared(local_size * sizeof(T), sizeof(T), info, comm_sm, &data_this, &win);
+
+// get pointers to the shared data owned by the processes in the same sm domain
+data_others.resize(size_sm);
+int disp_unit = 0; // displacement size - an output parameter we don't need right now
+MPI_Aint ssize = 0; // window size - an output parameter we don't need right now
+for (int i = 0; i < size_sm; ++i)
+  MPI_Win_shared_query(win, i, &ssize, &disp_unit, &data_others[i]);
+
+Assert(data_this == data_others[rank_sm], ExcMessage("Something went wrong!"));
+@endcode
+
+Once the data is not needed anymore, the window has to be freed, which also
+frees the locally-owned data:
+
+@code
+MPI_Win_free(&win);
+@endcode
+
+<h4>MPI-3.0 and LinearAlgebra::distributed::Vector</h4>
+
+The commands mentioned in the last section are integrated into
+LinearAlgebra::distributed::Vector and are used to allocate shared memory if
+an optional (second) communicator is provided to the reinit()-functions.
+
+For example, a vector can be set up with a partitioner (containing the global
+communicator) and a sub-communicator (containing the processes on the same
+compute node):
+@code
+vec.reinit(partitioner, comm_sm);
+@endcode
+
+Locally owned values and ghost values can be processed as usual. However, now
+users also have read access to the values of the shared-memory neighbors via
+the function:
+@code
+const std::vector<ArrayView<const Number>> &
+LinearAlgebra::distributed::Vector::shared_vector_data() const;
+@endcode
+
+<h4>MPI-3.0 and MatrixFree</h4>
+
+While LinearAlgebra::distributed::Vector provides the option to allocate
+shared memory and to access the values of shared memory of neighboring processes
+in a coordinated way, it does not actually exploit the benefits of the
+usage of shared memory itself.
+
+The MatrixFree infrastructure, however, does:
+- On the one hand, within the matrix-free loops MatrixFree::loop(),
+  MatrixFree::cell_loop(), and MatrixFree::loop_cell_centric(), only ghost
+  values that need to be updated <em>are</em> updated. Ghost values from
+  shared-memory neighbors can be accessed directly, making buffering, i.e.,
+  copying of the values into the ghost region of a vector possibly redundant.
+  To deal with possible race conditions, necessary synchronizations are
+  performed within MatrixFree. In the case that values have to be buffered,
+  values are copied directly from the neighboring shared-memory process,
+  bypassing more expensive MPI operations based on <code>MPI_ISend</code> and
+  <code>MPI_IRecv</code>.
+- On the other hand, classes like FEEvaluation and FEFaceEvaluation can read
+  directly from the shared memory, so buffering the values is indeed
+  not necessary in certain cases.
+
+To be able to use the shared-memory capabilities of MatrixFree, MatrixFree
+has to be appropriately configured by providing the user-created sub-communicator:
+
+@code
+typename MatrixFree<dim, Number>::AdditionalData additional_data;
+
+// set flags as usual (not shown)
+
+additional_data.communicator_sm = comm_sm;
+
+data.reinit(mapping, dof_handler, constraint, quadrature, additional_data);
+@endcode
+
+
+<h3>Cell-centric loops</h3>
+
+<h4>Motivation: FCL vs. CCL</h4>
+
+"Face-centric loops" (short FCL) visit cells and faces (inner and boundary ones) in
+separate loops. As a consequence, each entity is visited only once and fluxes
+between cells are evaluated only once. How to perform face-centric loops
+with the help of MatrixFree::loop() by providing three functions (one for
+the cell integrals, one for the inner, and one for the boundary faces) has
+been presented in step-59 and step-67.
+
+"Cell-centric loops" (short CCL or ECL (for element-centric loops)
+in the hyper.deal release paper), in
+contrast, process a cell and in direct succession process all its
+faces (i.e., visit all faces twice). Their benefit has become clear for
+modern CPU processor architecture in the literature @cite KronbichlerKormann2019,
+although this kind of loop implies that fluxes have to be computed twice (for
+each side of an interior face). CCL has two primary advantages:
+- On the one hand, entries in the solution vector are written exactly once
+  back to main memory in the case of CCL, while in the case of FCL at least once
+  despite of cache-efficient scheduling of cell and face loops-due to cache
+  capacity misses.
+- On the other hand, since each entry of the solution vector is accessed exactly
+  once, no synchronization between threads is needed while accessing the solution
+  vector in the case of CCL. This absence of race conditions during writing into
+  the destination vector makes CCL particularly suitable for shared-memory
+  parallelization.
+
+One should also note that although fluxes are computed twice in the case of CCL,
+this does not automatically translate into doubling of the computation, since
+values already interpolated to the cell quadrature points can be interpolated
+to a face with a simple 1D interpolation.
+
+<h4>Cell-centric loops and MatrixFree</h4>
+
+For cell-centric loop implementations, the function MatrixFree::loop_cell_centric()
+can be used, to which the user can pass a function that should be performed on
+each cell.
+
+To derive an appropriate function, which can be passed in MatrixFree::loop_cell_centric(),
+one might, in principle, transform/merge the following three functions, which can
+be passed to a MatrixFree::loop():
+
+@code
+matrix_free.template loop<VectorType, VectorType>(
+  [&](const auto &data, auto &dst, const auto &src, const auto range) {
+    // operation performed on cells
+
+    FEEvaluation<dim, degree, degree + 1, 1, Number> phi(data);
+    for (unsigned int cell = range.first; cell < range.second; ++cell)
+      {
+        phi.reinit(cell);
+        phi.gather_evaluate(src, cell_evaluation_flags);
+
+        // some operations on the cell quadrature points
+
+        phi.integrate_scatter(cell_evaluation_flags, dst);
+      }
+  },
+  [&](const auto &data, auto &dst, const auto &src, const auto range) {
+    // operation performed inner faces
+
+    FEFaceEvaluation<dim, degree, degree + 1, 1, Number> phi_m(data, /*is_interior_face=*/true);
+    FEFaceEvaluation<dim, degree, degree + 1, 1, Number> phi_p(data, /*is_interior_face=*/false);
+
+    for (unsigned int face = range.first; face < range.second; ++face)
+      {
+        phi_m.reinit(face);
+        phi_m.gather_evaluate(src, face_evaluation_flags);
+        phi_p.reinit(face);
+        phi_p.gather_evaluate(src, face_evaluation_flags);
+
+        // some operations on the face quadrature points
+
+        phi_m.integrate_scatter(face_evaluation_flags, dst);
+        phi_p.integrate_scatter(face_evaluation_flags, dst);
+      }
+  },
+  [&](const auto &data, auto &dst, const auto &src, const auto range) {
+    // operation performed boundary faces
+
+    FEFaceEvaluation<dim, degree, degree + 1, 1, Number> phi_m(data, /*is_interior_face=*/true);
+
+    for (unsigned int face = range.first; face < range.second; ++face)
+      {
+        phi_m.reinit(face);
+        phi_m.gather_evaluate(src, face_evaluation_flags);
+
+        // some operations on the face quadrature points
+
+        phi_m.integrate_scatter(face_evaluation_flags, dst);
+      }
+  },
+  dst,
+  src);
+@endcode
+
+in the following way:
+
+@code
+matrix_free.template loop_cell_centric<VectorType, VectorType>(
+  [&](const auto &data, auto &dst, const auto &src, const auto range) {
+    FEEvaluation<dim, degree, degree + 1, 1, Number>     phi(data);
+    FEFaceEvaluation<dim, degree, degree + 1, 1, Number> phi_m(data, /*is_interior_face=*/true);
+    FEFaceEvaluation<dim, degree, degree + 1, 1, Number> phi_p(data, /*is_interior_face=*/false);
+
+    for (unsigned int cell = range.first; cell < range.second; ++cell)
+      {
+        phi.reinit(cell);
+        phi.gather_evaluate(src, cell_evaluation_flags);
+
+        // some operations on the cell quadrature points
+
+        phi.integrate_scatter(cell_evaluation_flags, dst);
+
+        // loop over all faces of cell
+        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+          {
+            if (data.get_faces_by_cells_boundary_id(cell, face)[0] ==
+                numbers::internal_face_boundary_id)
+              {
+                // internal face
+                phi_m.reinit(cell, face);
+                phi_m.gather_evaluate(src, face_evaluation_flags);
+                phi_p.reinit(cell, face);
+                phi_p.gather_evaluate(src, face_evaluation_flags);
+
+                // some operations on the face quadrature points
+
+                phi_m.integrate_scatter(face_evaluation_flags, dst);
+              }
+            else
+              {
+                // boundary face
+                phi_m.reinit(cell, face);
+                phi_m.gather_evaluate(src, face_evaluation_flags);
+
+                // some operations on the face quadrature points
+
+                phi_m.integrate_scatter(face_evaluation_flags, dst);
+              }
+          }
+      }
+  },
+  dst,
+  src);
+@endcode
+
+It should be noted that FEFaceEvaluation is initialized now with two numbers,
+the cell number and the local face number. The given example only
+highlights how to transform face-centric loops into cell-centric loops and
+is by no means efficient, since data is read and written multiple times
+from and to the global vector as well as computations are performed
+redundantly. Below, we will discuss advanced techniques that target these issues.
+
+To be able to use MatrixFree::loop_cell_centric(), following flags of MatrixFree::AdditionalData
+have to be enabled:
+
+@code
+typename MatrixFree<dim, Number>::AdditionalData additional_data;
+
+// set flags as usual (not shown)
+
+additional_data.hold_all_faces_to_owned_cells       = true;
+additional_data.mapping_update_flags_faces_by_cells =
+  additional_data.mapping_update_flags_inner_faces |
+  additional_data.mapping_update_flags_boundary_faces;
+
+data.reinit(mapping, dof_handler, constraint, quadrature, additional_data);
+@endcode
+
+In particular, these flags enable that the internal data structures are set up
+for all faces of the cells.
+
+Currently, cell-centric loops in deal.II only work for uniformly refined meshes
+and if no constraints are applied (which is the standard case DG is normally
+used).
+
+
+<h3>Providing lambdas to MatrixFree loops</h3>
+
+The examples given above have already used lambdas, which have been provided to
+matrix-free loops. The following short examples present how to transform functions between
+a version where a class and a pointer to one of its methods are used and a
+variant where lambdas are utilized.
+
+In the following code, a class and a pointer to one of its methods, which should
+be interpreted as cell integral, are passed to MatrixFree::loop():
+
+@code
+void
+local_apply_cell(const MatrixFree<dim, Number> &              data,
+                 VectorType &                                 dst,
+                 const VectorType &                           src,
+                 const std::pair<unsigned int, unsigned int> &range) const
+{
+  FEEvaluation<dim, degree, degree + 1, 1, Number> phi(data);
+  for (unsigned int cell = range.first; cell < range.second; ++cell)
+    {
+      phi.reinit(cell);
+      phi.gather_evaluate(src, cell_evaluation_flags);
+
+      // some operations on the quadrature points
+
+      phi.integrate_scatter(cell_evaluation_flags, dst);
+    }
+}
+@endcode
+
+@code
+matrix_free.cell_loop(&Operator::local_apply_cell, this, dst, src);
+@endcode
+
+However, it is also possible to pass an anonymous function via a lambda function
+with the same result:
+
+@code
+matrix_free.template cell_loop<VectorType, VectorType>(
+  [&](const auto &data, auto &dst, const auto &src, const auto range) {
+    FEEvaluation<dim, degree, degree + 1, 1, Number> phi(data);
+    for (unsigned int cell = range.first; cell < range.second; ++cell)
+      {
+        phi.reinit(cell);
+        phi.gather_evaluate(src, cell_evaluation_flags);
+
+        // some operations on the quadrature points
+
+        phi.integrate_scatter(cell_evaluation_flags, dst);
+      }
+  },
+  dst,
+  src);
+@endcode
+
+<h3>VectorizedArrayType</h3>
+
+The class VectorizedArray<Number> is a key component to achieve the high
+node-level performance of the matrix-free algorithms in deal.II.
+It is a wrapper class around a short vector of $n$ entries of type Number and
+maps arithmetic operations to appropriate single-instruction/multiple-data
+(SIMD) concepts by intrinsic functions. The length of the vector can be
+queried by VectorizedArray::size() and its underlying number type by
+VectorizedArray::value_type.
+
+In the default case (<code>VectorizedArray<Number></code>), the vector length is
+set at compile time of the library to
+match the highest value supported by the given processor architecture.
+However, also a second optional template argument can be
+specified as <code>VectorizedArray<Number, size></code>, where <code>size</code> explicitly
+controls the  vector length within the capabilities of a particular instruction
+set. A full list of supported vector lengths is presented in the following table:
+
+<table align="center" class="doxtable">
+  <tr>
+   <th>double</th>
+   <th>float</th>
+   <th>ISA</th>
+  </tr>
+  <tr>
+   <td><code>VectorizedArray<double, 1></code></td>
+   <td><code>VectorizedArray<float, 1></code></td>
+   <td>(auto-vectorization)</td>
+  </tr>
+  <tr>
+   <td><code>VectorizedArray<double, 2></code></td>
+   <td><code>VectorizedArray<float, 4></code></td>
+   <td>SSE2/AltiVec</td>
+  </tr>
+  <tr>
+   <td><code>VectorizedArray<double, 4></code></td>
+   <td><code>VectorizedArray<float, 8></code></td>
+   <td>AVX/AVX2</td>
+  </tr>
+  <tr>
+   <td><code>VectorizedArray<double, 8></code></td>
+   <td><code>VectorizedArray<float, 16></code></td>
+   <td>AVX-512</td>
+  </tr>
+</table>
+
+This allows users to select the vector length/ISA and, as a consequence, the
+number of cells to be processed at once in matrix-free operator evaluations,
+possibly reducing the pressure on the caches, an severe issue for very high
+degrees (and dimensions).
+
+A possible further reason to reduce the number of filled lanes
+is to simplify debugging: instead of having to look at, e.g., 8
+cells, one can concentrate on a single cell.
+
+The interface of VectorizedArray also enables the replacement by any type with
+a matching interface. Specifically, this prepares deal.II for the <code>std::simd</code>
+class that is planned to become part of the C++23 standard. The following table
+compares the deal.II-specific SIMD classes and the equivalent C++23 classes:
+
+
+<table align="center" class="doxtable">
+  <tr>
+   <th>VectorizedArray (deal.II)</th>
+   <th>std::simd (C++23)</th>
+  </tr>
+  <tr>
+   <td><code>VectorizedArray<Number></code></td>
+   <td><code>std::experimental::native_simd<Number></code></td>
+  </tr>
+  <tr>
+   <td><code>VectorizedArray<Number, size></code></td>
+   <td><code>std::experimental::fixed_size_simd<Number, size></code></td>
+  </tr>
+</table>
