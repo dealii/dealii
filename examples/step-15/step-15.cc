@@ -603,13 +603,15 @@ namespace Step15
     setup_system(/*first time=*/true);
     set_boundary_values();
 
-    // The Newton iteration starts next. During the first step we do not have
-    // information about the residual prior to this step and so we continue
-    // the Newton iteration until we have reached at least one iteration and
-    // until residual is less than $10^{-3}$.
-    double       previous_residual = 0;
-    unsigned int refinement_cycle  = 0;
-    while ((refinement_cycle == 0) || (previous_residual > 1e-3))
+    // The Newton iteration starts next. We iterate until the (norm of the)
+    // residual computed at the end of the previous iteration is less than
+    // $10^{-3}$, as checked at the end of the `do { ... } while` loop that
+    // starts here. Because we don't have a reasonable value to initialize
+    // the variable, we just use the largest value that can be represented
+    // as a `double`.
+    double       last_residual_norm = std::numeric_limits<double>::max();
+    unsigned int refinement_cycle   = 0;
+    do
       {
         std::cout << "Mesh refinement step " << refinement_cycle << std::endl;
 
@@ -631,7 +633,7 @@ namespace Step15
              ++inner_iteration)
           {
             assemble_system();
-            previous_residual = system_rhs.l2_norm();
+            last_residual_norm = system_rhs.l2_norm();
 
             solve();
 
@@ -656,6 +658,7 @@ namespace Step15
         ++refinement_cycle;
         std::cout << std::endl;
       }
+    while (last_residual_norm > 1e-3);
   }
 } // namespace Step15
 
