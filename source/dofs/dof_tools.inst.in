@@ -188,6 +188,12 @@ for (deal_II_dimension : DIMENSIONS)
       IndexSet &,
       const std::set<types::boundary_id> &);
 
+    template IndexSet
+    DoFTools::extract_boundary_dofs<deal_II_dimension, deal_II_dimension>(
+      const DoFHandler<deal_II_dimension> &,
+      const ComponentMask &,
+      const std::set<types::boundary_id> &);
+
     template void DoFTools::extract_dofs_with_support_on_boundary<
       deal_II_dimension,
       deal_II_dimension>(const DoFHandler<deal_II_dimension> &,

@@ -642,6 +642,19 @@ namespace DoFTools
                         IndexSet &                          selected_dofs,
                         const std::set<types::boundary_id> &boundary_ids)
   {
+    // Simply forward to the other function
+    selected_dofs =
+      extract_boundary_dofs(dof_handler, component_mask, boundary_ids);
+  }
+
+
+
+  template <int dim, int spacedim>
+  IndexSet
+  extract_boundary_dofs(const DoFHandler<dim, spacedim> &   dof_handler,
+                        const ComponentMask &               component_mask,
+                        const std::set<types::boundary_id> &boundary_ids)
+  {
     Assert(component_mask.represents_n_components(
              dof_handler.get_fe_collection().n_components()),
            ExcMessage("Component mask has invalid size."));
@@ -649,9 +662,7 @@ namespace DoFTools
              boundary_ids.end(),
            ExcInvalidBoundaryIndicator());
 
-    // first reset output argument
-    selected_dofs.clear();
-    selected_dofs.set_size(dof_handler.n_dofs());
+    IndexSet selected_dofs(dof_handler.n_dofs());
 
     // let's see whether we have to check for certain boundary indicators
     // or whether we can accept all
@@ -760,6 +771,8 @@ namespace DoFTools
                         }
                     }
               }
+
+    return selected_dofs;
   }
 
 

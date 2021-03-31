@@ -1486,21 +1486,33 @@ namespace DoFTools
    * @param[in] component_mask A mask denoting the vector components of the
    * finite element that should be considered (see also
    * @ref GlossComponentMask).
-   * @param[out] selected_dofs The IndexSet object that is returned and that
-   * will contain the indices of degrees of freedom that are located on the
-   * boundary (and correspond to the selected vector components and boundary
-   * indicators, depending on the values of the @p component_mask and @p
-   * boundary_ids arguments).
    * @param[in] boundary_ids If empty, this function extracts the indices of the
    * degrees of freedom for all parts of the boundary. If it is a non- empty
    * list, then the function only considers boundary faces with the boundary
    * indicators listed in this argument.
+   * @return The IndexSet object that
+   * will contain the indices of degrees of freedom that are located on the
+   * boundary (and correspond to the selected vector components and boundary
+   * indicators, depending on the values of the @p component_mask and @p
+   * boundary_ids arguments).
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, int spacedim>
-  void
+  IndexSet
+  extract_boundary_dofs(const DoFHandler<dim, spacedim> &   dof_handler,
+                        const ComponentMask &               component_mask,
+                        const std::set<types::boundary_id> &boundary_ids = {});
+
+  /**
+   * The same as the previous function, except that it returns its information
+   * via the third argument.
+   *
+   * @deprecated Use the previous function instead.
+   */
+  template <int dim, int spacedim>
+  DEAL_II_DEPRECATED_EARLY void
   extract_boundary_dofs(const DoFHandler<dim, spacedim> &   dof_handler,
                         const ComponentMask &               component_mask,
                         IndexSet &                          selected_dofs,
