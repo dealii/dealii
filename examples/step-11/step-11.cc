@@ -132,36 +132,22 @@ namespace Step11
     solution.reinit(dof_handler.n_dofs());
     system_rhs.reinit(dof_handler.n_dofs());
 
-    // Next task is to construct the object representing the constraint that
+    // The next task is to construct the object representing the constraint that
     // the mean value of the degrees of freedom on the boundary shall be
-    // zero. For this, we first want a list of those nodes which are actually
+    // zero. For this, we first want a list of those nodes that are actually
     // at the boundary. The <code>DoFTools</code> namespace has a function
-    // that returns an array of Boolean values where <code>true</code>
-    // indicates that the node is at the boundary. The second argument denotes
-    // a mask selecting which components of vector valued finite elements we
-    // want to be considered. This sort of information is encoded using the
-    // ComponentMask class (see also @ref GlossComponentMask). Since we have a
-    // scalar finite element anyway, this mask in reality should have only one
-    // entry with a <code>true</code> value. However, the ComponentMask class
-    // has semantics that allow it to represents a mask of indefinite size
-    // whose every element equals <code>true</code> when one just default
-    // constructs such an object, so this is what we'll do here.
-    std::vector<bool> boundary_dofs(dof_handler.n_dofs(), false);
-    DoFTools::extract_boundary_dofs(dof_handler,
-                                    ComponentMask(),
-                                    boundary_dofs);
+    // that returns an IndexSet object that contains the indices of all those
+    // degrees of freedom that are at the boundary.
+    //
+    // Once we have this index set, we wanted to know which is the first
+    // index corresponding to a degree of freedom on the boundary. We need
+    // this because we wanted to constrain one of the nodes on the boundary by
+    // the values of all other DoFs on the boundary. To get the index of this
+    // "first" degree of freedom is easy enough using the IndexSet class:
+    const IndexSet boundary_dofs = DoFTools::extract_boundary_dofs(dof_handler);
 
-    // Now first for the generation of the constraints: as mentioned in the
-    // introduction, we constrain one of the nodes on the boundary by the
-    // values of all other DoFs on the boundary. So, let us first pick out the
-    // first boundary node from this list. We do that by searching for the
-    // first <code>true</code> value in the array (note that
-    // <code>std::find</code> returns an iterator to this element), and
-    // computing its distance to the overall first element in the array to get
-    // its index:
-    const unsigned int first_boundary_dof = std::distance(
-      boundary_dofs.begin(),
-      std::find(boundary_dofs.begin(), boundary_dofs.end(), true));
+    const types::global_dof_index first_boundary_dof =
+      boundary_dofs.nth_index_in_set(0);
 
     // Then generate a constraints object with just this one constraint. First
     // clear all previous content (which might reside there from the previous
@@ -172,8 +158,8 @@ namespace Step11
     // of what is to come later:
     mean_value_constraints.clear();
     mean_value_constraints.add_line(first_boundary_dof);
-    for (unsigned int i = first_boundary_dof + 1; i < dof_handler.n_dofs(); ++i)
-      if (boundary_dofs[i] == true)
+    for (types::global_dof_index i : boundary_dofs)
+      if (i != first_boundary_dof)
         mean_value_constraints.add_entry(first_boundary_dof, i, -1);
     mean_value_constraints.close();
 
