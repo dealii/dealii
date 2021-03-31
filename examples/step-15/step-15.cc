@@ -108,6 +108,7 @@ namespace Step15
     void   set_boundary_values();
     double compute_residual(const double alpha) const;
     double determine_step_length() const;
+    void   output_results(const unsigned int refinement_cycle) const;
 
     Triangulation<dim> triangulation;
 
@@ -579,6 +580,29 @@ namespace Step15
 
 
 
+  // @sect4{MinimalSurfaceProblem::output_results}
+
+  // This last function to be called from `run()` outputs the current solution
+  // (and the Newton update) in graphical form as a VTU file. It is entirely the
+  // same as what has been used in previous tutorials.
+  template <int dim>
+  void MinimalSurfaceProblem<dim>::output_results(
+    const unsigned int refinement_cycle) const
+  {
+    DataOut<dim> data_out;
+
+    data_out.attach_dof_handler(dof_handler);
+    data_out.add_data_vector(current_solution, "solution");
+    data_out.add_data_vector(newton_update, "update");
+    data_out.build_patches();
+
+    const std::string filename =
+      "solution-" + Utilities::int_to_string(refinement_cycle, 2) + ".vtu";
+    std::ofstream output(filename);
+    data_out.write_vtu(output);
+  }
+
+
   // @sect4{MinimalSurfaceProblem::run}
 
   // In the run function, we build the first grid and then have the top-level
@@ -624,7 +648,11 @@ namespace Step15
         // hand side as the residual to check against when deciding whether to
         // stop the iterations. We then solve the linear system (the function
         // also updates $u^{n+1}=u^n+\alpha^n\;\delta u^n$) and output the
-        // residual at the end of this Newton step:
+        // norm of the residual at the end of this Newton step.
+        //
+        // After the end of this loop, we then also output the solution on the
+        // current mesh in graphical form and increment the counter for the
+        // mesh refinement cycle.
         std::cout << "  Initial residual: " << compute_residual(0) << std::endl;
 
         for (unsigned int inner_iteration = 0; inner_iteration < 5;
@@ -638,20 +666,7 @@ namespace Step15
             std::cout << "  Residual: " << compute_residual(0) << std::endl;
           }
 
-        // Just before we refine the mesh again, we then output the
-        // solution as well as the Newton update, and increment the
-        // mesh refinement cycle counter by one:
-        DataOut<dim> data_out;
-
-        data_out.attach_dof_handler(dof_handler);
-        data_out.add_data_vector(current_solution, "solution");
-        data_out.add_data_vector(newton_update, "update");
-        data_out.build_patches();
-
-        const std::string filename =
-          "solution-" + Utilities::int_to_string(refinement_cycle, 2) + ".vtu";
-        std::ofstream output(filename);
-        data_out.write_vtu(output);
+        output_results(refinement_cycle);
 
         ++refinement_cycle;
         std::cout << std::endl;
