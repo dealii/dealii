@@ -1505,7 +1505,7 @@ namespace DoFTools
    * @deprecated Use the previous function instead.
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
+  DEAL_II_DEPRECATED_EARLY void
   extract_boundary_dofs(const DoFHandler<dim, spacedim> &   dof_handler,
                         const ComponentMask &               component_mask,
                         IndexSet &                          selected_dofs,
