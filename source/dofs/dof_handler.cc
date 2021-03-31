@@ -20,6 +20,7 @@
 #include <deal.II/base/mpi.templates.h>
 
 #include <deal.II/distributed/cell_data_transfer.templates.h>
+#include <deal.II/distributed/fully_distributed_tria.h>
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
 
@@ -3228,8 +3229,14 @@ DoFHandler<dim, spacedim>::connect_to_triangulation_signals()
   // attach corresponding callback functions dealing with the transfer of
   // active FE indices depending on the type of triangulation
   if (dynamic_cast<
-        const dealii::parallel::DistributedTriangulationBase<dim, spacedim> *>(
-        &this->get_triangulation()))
+        const dealii::parallel::fullydistributed::Triangulation<dim, spacedim>
+          *>(&this->get_triangulation()))
+    {
+      // no transfer of active FE indices for this class
+    }
+  else if (dynamic_cast<
+             const dealii::parallel::distributed::Triangulation<dim, spacedim>
+               *>(&this->get_triangulation()))
     {
       // repartitioning signals
       this->tria_listeners_for_transfer.push_back(
@@ -3246,7 +3253,7 @@ DoFHandler<dim, spacedim>::connect_to_triangulation_signals()
 
       // refinement signals
       this->tria_listeners_for_transfer.push_back(
-        this->tria->signals.pre_distributed_refinement.connect(
+        this->tria->signals.post_p4est_refinement.connect(
           [this]() { this->pre_distributed_transfer_action(); }));
       this->tria_listeners_for_transfer.push_back(
         this->tria->signals.post_distributed_refinement.connect(

@@ -2220,6 +2220,15 @@ public:
     boost::signals2::signal<void()> pre_distributed_refinement;
 
     /**
+     * This signal is triggered during execution of the
+     * parallel::distributed::Triangulation::execute_coarsening_and_refinement()
+     * function. At the time this signal is triggered, the p4est oracle has been
+     * refined and the cell relations have been updated. The triangulation is
+     * unchanged otherwise, and the p4est oracle has not yet been repartitioned.
+     */
+    boost::signals2::signal<void()> post_p4est_refinement;
+
+    /**
      * This signal is triggered at the end of execution of the
      * parallel::distributed::Triangulation::execute_coarsening_and_refinement()
      * function when the triangulation has reached its final state. This signal
