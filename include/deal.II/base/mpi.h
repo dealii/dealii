@@ -1500,14 +1500,26 @@ namespace Utilities
       AssertIndexRange(root_process, n_procs);
       (void)n_procs;
 
-      std::vector<char> buffer      = Utilities::pack(object_to_send, false);
-      unsigned int      buffer_size = buffer.size();
+      std::vector<char> buffer;
+      unsigned int      buffer_size = numbers::invalid_unsigned_int;
 
-      // Exchanging the size of buffer
+      // On the root process, pack the data and determine what the
+      // buffer size needs to be.
+      if (this_mpi_process(comm) == root_process)
+        {
+          buffer      = Utilities::pack(object_to_send, false);
+          buffer_size = buffer.size();
+        }
+
+      // Exchange the size of buffer
       int ierr = MPI_Bcast(&buffer_size, 1, MPI_UNSIGNED, root_process, comm);
       AssertThrowMPI(ierr);
 
-      buffer.resize(buffer_size);
+      // If not on the root process, correctly size the buffer to
+      // receive the data, then do exactly that.
+      if (this_mpi_process(comm) != root_process)
+        buffer.resize(buffer_size);
+
       ierr =
         MPI_Bcast(buffer.data(), buffer_size, MPI_CHAR, root_process, comm);
       AssertThrowMPI(ierr);
