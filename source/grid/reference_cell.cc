@@ -34,6 +34,47 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+namespace
+{
+  namespace VTKCellType
+  {
+    // Define VTK constants for linear, quadratic and
+    // high-order Lagrange geometrices
+    enum
+    {
+      VTK_VERTEX = 1,
+      // Linear cells
+      VTK_LINE       = 3,
+      VTK_TRIANGLE   = 5,
+      VTK_QUAD       = 9,
+      VTK_TETRA      = 10,
+      VTK_HEXAHEDRON = 12,
+      VTK_WEDGE      = 13,
+      VTK_PYRAMID    = 14,
+      // Quadratic cells
+      VTK_QUADRATIC_EDGE       = 21,
+      VTK_QUADRATIC_TRIANGLE   = 22,
+      VTK_QUADRATIC_QUAD       = 23,
+      VTK_QUADRATIC_TETRA      = 24,
+      VTK_QUADRATIC_HEXAHEDRON = 25,
+      VTK_QUADRATIC_WEDGE      = 26,
+      VTK_QUADRATIC_PYRAMID    = 27,
+      // Lagrange cells
+      VTK_LAGRANGE_CURVE         = 68,
+      VTK_LAGRANGE_TRIANGLE      = 69,
+      VTK_LAGRANGE_QUADRILATERAL = 70,
+      VTK_LAGRANGE_TETRAHEDRON   = 71,
+      VTK_LAGRANGE_HEXAHEDRON    = 72,
+      VTK_LAGRANGE_WEDGE         = 73,
+      VTK_LAGRANGE_PYRAMID       = 74,
+      // Invalid code
+      VTK_INVALID = static_cast<unsigned int>(-1)
+    };
+
+  } // namespace VTKCellType
+
+} // namespace
+
 
 std::string
 ReferenceCell::to_string() const
@@ -291,6 +332,91 @@ ReferenceCell::exodusii_face_to_deal_face(const unsigned int face_n) const
 }
 
 
+
+unsigned int
+ReferenceCell::vtk_linear_type() const
+{
+  if (*this == ReferenceCells::Vertex)
+    return VTKCellType::VTK_VERTEX;
+  else if (*this == ReferenceCells::Line)
+    return VTKCellType::VTK_LINE;
+  else if (*this == ReferenceCells::Triangle)
+    return VTKCellType::VTK_TRIANGLE;
+  else if (*this == ReferenceCells::Quadrilateral)
+    return VTKCellType::VTK_QUAD;
+  else if (*this == ReferenceCells::Tetrahedron)
+    return VTKCellType::VTK_TETRA;
+  else if (*this == ReferenceCells::Pyramid)
+    return VTKCellType::VTK_PYRAMID;
+  else if (*this == ReferenceCells::Wedge)
+    return VTKCellType::VTK_WEDGE;
+  else if (*this == ReferenceCells::Hexahedron)
+    return VTKCellType::VTK_HEXAHEDRON;
+  else if (*this == ReferenceCells::Invalid)
+    return VTKCellType::VTK_INVALID;
+
+  Assert(false, ExcNotImplemented());
+
+  return VTKCellType::VTK_INVALID;
+}
+
+
+
+unsigned int
+ReferenceCell::vtk_quadratic_type() const
+{
+  if (*this == ReferenceCells::Vertex)
+    return VTKCellType::VTK_VERTEX;
+  else if (*this == ReferenceCells::Line)
+    return VTKCellType::VTK_QUADRATIC_EDGE;
+  else if (*this == ReferenceCells::Triangle)
+    return VTKCellType::VTK_QUADRATIC_TRIANGLE;
+  else if (*this == ReferenceCells::Quadrilateral)
+    return VTKCellType::VTK_QUADRATIC_QUAD;
+  else if (*this == ReferenceCells::Tetrahedron)
+    return VTKCellType::VTK_QUADRATIC_TETRA;
+  else if (*this == ReferenceCells::Pyramid)
+    return VTKCellType::VTK_QUADRATIC_PYRAMID;
+  else if (*this == ReferenceCells::Wedge)
+    return VTKCellType::VTK_QUADRATIC_WEDGE;
+  else if (*this == ReferenceCells::Hexahedron)
+    return VTKCellType::VTK_QUADRATIC_HEXAHEDRON;
+  else if (*this == ReferenceCells::Invalid)
+    return VTKCellType::VTK_INVALID;
+
+  Assert(false, ExcNotImplemented());
+
+  return VTKCellType::VTK_INVALID;
+}
+
+
+
+unsigned int
+ReferenceCell::vtk_lagrange_type() const
+{
+  if (*this == ReferenceCells::Vertex)
+    return VTKCellType::VTK_VERTEX;
+  else if (*this == ReferenceCells::Line)
+    return VTKCellType::VTK_LAGRANGE_CURVE;
+  else if (*this == ReferenceCells::Triangle)
+    return VTKCellType::VTK_LAGRANGE_TRIANGLE;
+  else if (*this == ReferenceCells::Quadrilateral)
+    return VTKCellType::VTK_LAGRANGE_QUADRILATERAL;
+  else if (*this == ReferenceCells::Tetrahedron)
+    return VTKCellType::VTK_LAGRANGE_TETRAHEDRON;
+  else if (*this == ReferenceCells::Pyramid)
+    return VTKCellType::VTK_LAGRANGE_PYRAMID;
+  else if (*this == ReferenceCells::Wedge)
+    return VTKCellType::VTK_LAGRANGE_WEDGE;
+  else if (*this == ReferenceCells::Hexahedron)
+    return VTKCellType::VTK_LAGRANGE_HEXAHEDRON;
+  else if (*this == ReferenceCells::Invalid)
+    return VTKCellType::VTK_INVALID;
+
+  Assert(false, ExcNotImplemented());
+
+  return VTKCellType::VTK_INVALID;
+}
 
 #include "reference_cell.inst"
 
