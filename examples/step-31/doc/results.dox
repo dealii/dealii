@@ -585,7 +585,7 @@ more accurate; the program therefore uses these higher order elements,
 despite the penalty we pay in terms of smaller time steps.
 
 
-<h3> Possible extensions </h3>
+<h3> Possibilities for extensions </h3>
 
 There are various ways to extend the current program. Of particular interest
 is, of course, to make it faster and/or increase the resolution of the

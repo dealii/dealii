@@ -278,7 +278,7 @@ is not a good choice in 3D - a full decomposition needs many new entries that
 
 
 
-<h3>Possible Extensions</h3>
+<h3>Possibilities for extensions</h3>
 
 <a name="improved-solver">
 <h4>Improved linear solver in 3D</h4>
