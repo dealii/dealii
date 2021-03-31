@@ -557,13 +557,12 @@ namespace Step15
     // lines which we have already seen used in step-11:
     hanging_node_constraints.condense(residual);
 
-    std::vector<bool> boundary_dofs(dof_handler.n_dofs());
+    IndexSet boundary_dofs(dof_handler.n_dofs());
     DoFTools::extract_boundary_dofs(dof_handler,
                                     ComponentMask(),
                                     boundary_dofs);
-    for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
-      if (boundary_dofs[i] == true)
-        residual(i) = 0;
+    for (types::global_dof_index i : boundary_dofs)
+      residual(i) = 0;
 
     // At the end of the function, we return the norm of the residual:
     return residual.l2_norm();
@@ -611,7 +610,7 @@ namespace Step15
     GridGenerator::hyper_ball(triangulation);
     triangulation.refine_global(2);
 
-    setup_system(true);
+    setup_system(/*first time=*/true);
     set_boundary_values();
 
     // The Newton iteration starts next. During the first step we do not have
