@@ -62,8 +62,9 @@ namespace ArborXWrappers
    * This class defines a predicate used by ArborXWrappers::BVH to determine
    * for given points which of the bounding boxes used to build the
    * ArborXWrappers::BVH intersect with them.
+   * @note The class is not supposed to be used in polymorphic context.
    */
-  class PointIntersectPredicate : public PointPredicate
+  class PointIntersectPredicate : private PointPredicate
   {
   public:
     /**
@@ -73,6 +74,10 @@ namespace ArborXWrappers
     template <int dim, typename Number>
     PointIntersectPredicate(
       const std::vector<dealii::Point<dim, Number>> &points);
+
+    // We need these since we inherit privately to avoid polymorphic use.
+    using PointPredicate::get;
+    using PointPredicate::size;
   };
 
 
@@ -81,8 +86,9 @@ namespace ArborXWrappers
    * This class defines a predicate used by ArborXWrappers::BVH to determine
    * for given points which are the nearest bounding boxes/points among the ones
    * used to build the ArborXWrappers::BVH.
+   * @note The class is not supposed to be used in polymorphic context.
    */
-  class PointNearestPredicate : public PointPredicate
+  class PointNearestPredicate : private PointPredicate
   {
   public:
     /**
@@ -99,6 +105,10 @@ namespace ArborXWrappers
      */
     unsigned int
     get_n_nearest_neighbors() const;
+
+    // We need these since we inherit privately to avoid polymorphic use.
+    using PointPredicate::get;
+    using PointPredicate::size;
 
   private:
     unsigned int n_nearest_neighbors;
@@ -142,8 +152,9 @@ namespace ArborXWrappers
    * This class is used by ArborXWrappers::BVH to determine for given bounding
    * boxes which of the bounding boxes used to build the ArborXWrappers::BVH
    * intersect with them.
+   * @note The class is not supposed to be used in polymorphic context.
    */
-  class BoundingBoxIntersectPredicate : public BoundingBoxPredicate
+  class BoundingBoxIntersectPredicate : private BoundingBoxPredicate
   {
   public:
     /**
@@ -153,6 +164,10 @@ namespace ArborXWrappers
     template <int dim, typename Number>
     BoundingBoxIntersectPredicate(
       const std::vector<dealii::BoundingBox<dim, Number>> &bounding_boxes);
+
+    // We need these since we inherit privately to avoid polymorphic use.
+    using BoundingBoxPredicate::get;
+    using BoundingBoxPredicate::size;
   };
 
 
@@ -160,8 +175,9 @@ namespace ArborXWrappers
    * This class is used by ArborXWrappers::BVH to determine for given bounding
    * boxes which are the nearest bounding boxes/points among the ones used to
    * build the ArborXWrappers::BVH.
+   * @note The class is not supposed to be used in polymorphic context.
    */
-  class BoundingBoxNearestPredicate : public BoundingBoxPredicate
+  class BoundingBoxNearestPredicate : private BoundingBoxPredicate
   {
   public:
     /**
@@ -179,6 +195,10 @@ namespace ArborXWrappers
      */
     unsigned int
     get_n_nearest_neighbors() const;
+
+    // We need these since we inherit privately to avoid polymorphic use.
+    using BoundingBoxPredicate::get;
+    using BoundingBoxPredicate::size;
 
   private:
     unsigned int n_nearest_neighbors;
