@@ -948,6 +948,46 @@ namespace GridGenerator
            const double        radius      = 1.,
            const double        half_length = 1.);
 
+
+  /**
+   * Create a @p dim dimensional cylinder where the $x$-axis serves as
+   * the axis of the cylinder. For the purposes of this function, a
+   * cylinder is defined as a (@p dim - 1) dimensional disk of given
+   * @p radius, extruded along the axis of the cylinder (which is the
+   * first coordinate direction). Consequently, in three dimensions,
+   * the cylinder extends from `x=-half_length` to `x=+half_length`
+   * and its projection into the @p yz-plane is a circle of radius @p
+   * radius. In two dimensions, the cylinder is a rectangle from
+   * `x=-half_length` to `x=+half_length` and from `y=-radius` to
+   * `y=radius`.
+   *
+   * The boundaries are colored according to the following scheme: 0 for the
+   * hull of the cylinder, 1 for the left hand face and 2 for the right hand
+   * face (see
+   * @ref GlossColorization "the glossary entry on colorization").
+   *
+   * The manifold id for the hull of the cylinder is set to zero, and a
+   * CylindricalManifold is attached to it.
+   *
+   * @pre The triangulation passed as argument needs to be empty when calling
+   * this function.
+   *
+   * @param x_subdivisions A positive integer denoting the number
+   * of cells to generate in the x direction. The default cylinder has
+   * x_repetitions=2.
+   *
+   * @param radius The radius of the circle in the yz-plane used to extrude the cylinder.
+   *
+   * @param half_length The half-length of the cylinder in the x direction.
+   */
+  template <int dim>
+  void
+  subdivided_cylinder(Triangulation<dim> &tria,
+                      const unsigned int  x_subdivisions,
+                      const double        radius      = 1.,
+                      const double        half_length = 1.);
+
+
   /**
    * Create a cut cone around the x-axis.  The cone extends from
    * <tt>x=-half_length</tt> to <tt>x=half_length</tt> and its projection into
