@@ -210,12 +210,17 @@ class FE_Enriched;
  *
  * @ingroup febase fe vector_valued
  *
- * Hartmann 2001.
  */
 template <int dim, int spacedim = dim>
 class FESystem : public FiniteElement<dim, spacedim>
 {
 public:
+  /**
+   * Delete default constructor so that `FESystem(FEPairs &&... fe_pairs)` is
+   * not accidentally picked if no FiniteElement is provided.
+   */
+  FESystem() = delete;
+
   /**
    * Constructor. Take a finite element and the number of elements you want to
    * group together using this class.
