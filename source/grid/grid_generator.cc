@@ -5457,15 +5457,6 @@ namespace GridGenerator
 
   // Implementation for 3D only
   template <>
-  void cylinder(Triangulation<3> &tria,
-                const double      radius,
-                const double      half_length)
-  {
-    subdivided_cylinder(tria, 2, radius, half_length);
-  }
-
-  // Implementation for 3D only
-  template <>
   void subdivided_cylinder(Triangulation<3> & tria,
                            const unsigned int x_subdivisions,
                            const double       radius,
@@ -5476,7 +5467,6 @@ namespace GridGenerator
     const double d = radius / std::sqrt(2.0);
     const double a = d / (1 + std::sqrt(2.0));
 
-    // const unsigned int    npts_per_plane = 8;
     std::vector<Point<3>> vertices;
     const double          initial_height   = -half_length;
     const double          height_increment = 2. * half_length / x_subdivisions;
@@ -5547,12 +5537,9 @@ namespace GridGenerator
     // interior if one of its vertices
     // is at coordinates '+-a' as set
     // above
-    Triangulation<3>::cell_iterator cell = tria.begin();
-    Triangulation<3>::cell_iterator end  = tria.end();
-
     tria.set_all_manifold_ids_on_boundary(0);
 
-    for (; cell != end; ++cell)
+    for (const auto &cell : tria.cell_iterators())
       for (unsigned int i : GeometryInfo<3>::face_indices())
         if (cell->at_boundary(i))
           {
@@ -5594,7 +5581,14 @@ namespace GridGenerator
     tria.set_manifold(0, CylindricalManifold<3>());
   }
 
-
+  // Implementation for 3D only
+  template <>
+  void cylinder(Triangulation<3> &tria,
+                const double      radius,
+                const double      half_length)
+  {
+    subdivided_cylinder(tria, 2, radius, half_length);
+  }
 
   template <>
   void quarter_hyper_ball(Triangulation<3> &tria,

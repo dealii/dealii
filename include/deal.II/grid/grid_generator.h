@@ -959,7 +959,7 @@ namespace GridGenerator
    * and its projection into the @p yz-plane is a circle of radius @p
    * radius. In two dimensions, the cylinder is a rectangle from
    * `x=-half_length` to `x=+half_length` and from `y=-radius` to
-   * `y=radius`.
+   * `y=radius`. This function is only implemented for dim==3.
    *
    * The boundaries are colored according to the following scheme: 0 for the
    * hull of the cylinder, 1 for the left hand face and 2 for the right hand
