@@ -969,8 +969,8 @@ namespace GridGenerator
    * The manifold id for the hull of the cylinder is set to zero, and a
    * CylindricalManifold is attached to it.
    *
-   * @pre The triangulation passed as argument needs to be empty when calling
-   * this function.
+   * @param tria The triangulation to be created. It needs to be empty upon
+   * calling this function.
    *
    * @param x_subdivisions A positive integer denoting the number
    * of cells to generate in the x direction. The default cylinder has
