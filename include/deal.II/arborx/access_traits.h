@@ -29,11 +29,12 @@ DEAL_II_NAMESPACE_OPEN
 namespace ArborXWrappers
 {
   /**
-   * Base class for Point-based predicates.
+   * Base class for Point-based predicates providing basic functionality for
+   * dericed classes, not supposed to be used on its own.
    */
   class PointPredicate
   {
-  public:
+  protected:
     /**
      * Constructor. @p points is a list of points used by the predicate.
      */
@@ -62,7 +63,7 @@ namespace ArborXWrappers
    * This class defines a predicate used by ArborXWrappers::BVH to determine
    * for given points which of the bounding boxes used to build the
    * ArborXWrappers::BVH intersect with them.
-   * @note The class is not supposed to be used in polymorphic context.
+   * @note The class is not supposed to be used in a polymorphic context.
    */
   class PointIntersectPredicate : private PointPredicate
   {
@@ -86,7 +87,7 @@ namespace ArborXWrappers
    * This class defines a predicate used by ArborXWrappers::BVH to determine
    * for given points which are the nearest bounding boxes/points among the ones
    * used to build the ArborXWrappers::BVH.
-   * @note The class is not supposed to be used in polymorphic context.
+   * @note The class is not supposed to be used in a polymorphic context.
    */
   class PointNearestPredicate : private PointPredicate
   {
@@ -117,11 +118,12 @@ namespace ArborXWrappers
 
 
   /**
-   * Base class for BoundingBox predicates.
+   * Base class for BoundingBox predicates providing basic functionality for
+   * dericed classes, not supposed to be used on its own.
    */
   class BoundingBoxPredicate
   {
-  public:
+  protected:
     /**
      * Constructor. @p bounding_boxes is a list of bounding boxes used by the
      * predicate.
@@ -152,7 +154,7 @@ namespace ArborXWrappers
    * This class is used by ArborXWrappers::BVH to determine for given bounding
    * boxes which of the bounding boxes used to build the ArborXWrappers::BVH
    * intersect with them.
-   * @note The class is not supposed to be used in polymorphic context.
+   * @note The class is not supposed to be used in a polymorphic context.
    */
   class BoundingBoxIntersectPredicate : private BoundingBoxPredicate
   {
@@ -175,7 +177,7 @@ namespace ArborXWrappers
    * This class is used by ArborXWrappers::BVH to determine for given bounding
    * boxes which are the nearest bounding boxes/points among the ones used to
    * build the ArborXWrappers::BVH.
-   * @note The class is not supposed to be used in polymorphic context.
+   * @note The class is not supposed to be used in a polymorphic context.
    */
   class BoundingBoxNearestPredicate : private BoundingBoxPredicate
   {
