@@ -58,6 +58,7 @@ namespace internal
      */
     DEAL_II_CONSTEXPR dealii::ReferenceCell
                       make_reference_cell_from_int(const std::uint8_t kind);
+
   } // namespace ReferenceCell
 } // namespace internal
 
@@ -466,6 +467,26 @@ public:
    */
   unsigned int
   exodusii_face_to_deal_face(const unsigned int face_n) const;
+
+  /**
+   * Return a VTK linear shape constant that corresponds to the reference cell.
+   */
+  unsigned int
+  vtk_linear_type() const;
+
+  /**
+   * Return a VTK quadratic shape constant that corresponds to the reference
+   * cell.
+   */
+  unsigned int
+  vtk_quadratic_type() const;
+
+  /**
+   * Return a VTK Lagrange shape constant that corresponds to the reference
+   * cell.
+   */
+  unsigned int
+  vtk_lagrange_type() const;
 
   /**
    * @}
