@@ -99,12 +99,220 @@ many cases it is best to combine both approaches. The file can be easily
 reloaded by pressing "reload" under the "Geometry" tab if you want to write
 it by hand and see the effects in the graphical user interface of gmsh.
 
+
+
 This tutorial contains an example <code>.geo</code> file that describes a box
-with two objects cut out in the interior. This is how
+with two circles cut out in the interior and several slits on the sides. This is how
 <code>example.geo</code> looks like in %Gmsh (displaying the boundary
 indicators as well as the mesh discussed further down below):
 
-<img src="https://www.dealii.org/images/steps/developer/step-49.gmsh_picture.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-49.gmsh_picture2.png" alt="">
+
+We will go through the basics of %Gmsh and show how we can obtain a mesh like this.
+
+It's also worth mentioning this video (which can be found here https://www.youtube.com/watch?v=xL2LmDsDLYw&t=921s)
+which does a good job of explaining how to use gmsh to create basic shapes and meshes.
+Let us first go through the documented <code>example.geo</code> file that describes the geometry.
+
+We will now go through the main parts of <code>example.geo</code> file that defines the mesh.
+
+<h5>Point declaration</h5>
+
+In this section we create the points that make up the domain.
+
+The points can either be typed in the .geofile manually or
+found via <code>Geometry -> Elementary Entities -> Add ->
+Point</code> where you simply enter the coordinates in the prompt or use the mouse to place them.
+
+@code
+Point(1) = {-3.5, -3.36, 0, 1.0};
+Point(2) = {3.5, -3.36, 0, 1.0};
+Point(3) = {3.5, 3.36, 0, 1.0};
+Point(4) = {-3.5, 3.36, 0, 1.0};
+Point(5) = {-3.5, 0.2, 0, 1.0};
+Point(6) = {-0.98 - b, 0.2, 0, 1.0};
+...
+@endcode
+
+<h5>Lines on outer domain</h5>
+
+To create lines of the mesh, go to <code>Geometry -> Elementary
+entities -> Add -> Line</code>.  You do not get a prompt to enter in
+specific coordinates, rather you simply click a starting point and
+ending point for each line.
+
+The generated code in the geo file then looks like this:
+
+@code
+Line(4) = {4, 5};
+Line(5) = {5, 6};
+Line(6) = {6, 7};
+Line(7) = {7, 8};
+Line(8) = {8, 9};
+...
+@endcode
+
+<h5>Creating holes in domain</h5>
+
+Here are the points and lines that create the two holes in the domain.
+We start by defining the relevant points for bottom left hole:
+
+@code
+Point(31) = {-2.1, -1.54, 0, 1.0}; // origin
+Point(32) = {-2.1, -0.84, 0, 1.0}; // top point
+Point(33) = {-2.1, -2.24, 0, 1.0}; // bottom point
+Point(103) = {-1.4, -1.54, 0, 1.0}; // right point
+Point(104) = {-2.8, -1.54, 0, 1.0}; // left point
+@endcode
+
+Then we use the <code>Circle arc</code> entity, which is found in the same category as
+<code>Point<\code> and <code>Lines</code>.  The file reads "Circle"
+but the difference to note is that this function uses three points to
+make an arc of a circle, namely the starting point, center, and ending point.
+Splitting the circle into four arcs like this allows for more freedom when declaring the
+boundary IDs.
+
+@code
+Circle(48) = {103, 31, 32};
+Circle(49) = {32, 31, 104};
+Circle(50) = {104, 31, 33};
+Circle(51) = {33, 31, 103};
+@endcode
+
+For the second circle, we use the alternate <code>Circle</code> entity, which requires the origin, radius,
+and starting and ending angle respectively.
+
+@code
+radius1 = .5;
+Circle(12) = {0.42, 2.0, 0, radius1, 0, 2*Pi};
+@endcode
+
+<h5>Plane surfaces</h5>
+
+This section describes the "Plane Surfaces", i.e., the 2D surfaces for meshing.
+This can be found in <code>Elementary entities</code> as <code>Plane Surface</code>.
+The purpose of this entity is to specify the domain in 2D.  Because we have our
+mesh split into 4 sections, we must have 4 plane surfaces.
+
+To make a plane surface, simply click <code>Plane surface</code> and click on all
+the relevant borders for the mesh.  This includes holes or other objects contained
+in the mesh.  Again, since we have 4 different meshes, we will do this 4 times.
+
+The code below is for the top right mesh.  Notice we have 2 instances of
+<code>Curve Loop</code>.  The first one is the boundary for the outer domain
+and the second one is for the hole.  This can easily be traced back by following
+along with the numbers in the brackets.
+
+@code
+Curve Loop(1) = {40, -43, 14, 57, 59, 60, 58};
+Curve Loop(2) = {12};
+Plane Surface(1) = {1, 2};
+@endcode
+
+The other 4 surfaces are then declared in a similar way
+
+Next we define the physical surface itself.  This line is what makes our mesh 2D.
+The values in the bracket on the right hand side are the tags for the Plane Surfaces
+we declared above.
+
+@code
+Physical Surface(2) = {1, 2, 3, 4};
+@endcode
+
+<h5>Physical IDs</h5>
+
+This section is for assigning physical IDs as these become boundary IDs in deal.II.  Here you press
+<code>Geometry -> Physical groups -> Add -> Curve</code>.  You may do this
+for points as well, but we will only be needing to use curves.
+
+We assign boundary ID 0 to the outer boundary.  This is usually here by default
+but we include it anyway:
+
+@code
+Physical Curve(0) = {38, 39, 52:57, 59, 60, 58, 40, 41, 4:9};
+@endcode
+
+We then assign boundary ID of 1 top right circle;
+
+@code
+Physical Curve(1) = {12};
+@endcode
+
+Finally, we assign boundary IDs of 2 and 3 to the top and bottom half of the bottom left
+hole, respectively.  We can see here that we needed to pick two boundaries
+to make both of the physical curves.  Recall this circle is comprised of
+four circle arcs, so Physical Curve(2) is the top left and top right quarter
+of the circle, and Physical Curve(3) is the bottom left and bottom right quarter
+of the circle.
+
+@code
+Physical Curve(2) = {48, 49};
+Physical Curve(3) = {50, 51};
+@endcode
+
+<h5>Meshing Parameters</h5>
+
+Finally, the .geo file contains meshing parameters that can all be adjusted in the GMSH UI.  We include it
+at the bottom of our .geo file to keep the changes when creating our
+<code>.msh</code> file.
+
+@code
+Mesh.Algorithm = 3;
+Mesh.RecombineAll = 1;
+Mesh.CharacteristicLengthFactor = .6;
+Mesh.SubdivisionAlgorithm = 1;
+Mesh.Smoothing = 20;
+Show "*";
+@endcode
+
+To view what each of these do, press <code>Tools -> Options -> Mesh</code>.
+
+You may change the algorithm used for meshing in <code>2D algorithm</code>.
+
+<code>CharacteristicLengthFactor</code> can be thought of the distance between
+nodes on the boundaries of the mesh.  This sets the initial size of the nodes
+of the mesh.  If we want a finer mesh we want a smaller characteristic length.
+For this examples purposes we would like to do more refinement in deal.ii so
+we pick a relatively coarse mesh.  This can also be adjusted in the Options
+menu.
+
+<code>SubdivisionAlgorithm</code> is set to 1 in our file because we want to
+use "All Quads" for subdivision.  In the options menu the default is "None",
+but we use "All Quads" for reasons mentioned earlier.
+
+<code>Smoothing</code> is a post-processing step that iteratively improves mesh quality (for example by moving inner vertices). The number of steps is not crucial in this example.
+For our example we pick 20, however this value can be adjusted
+accordingly, as it's not the most important step in mesh building.
+
+
+
+@note That ends the code for <code>example.geo</code>.  It's important to note that
+  the <code>.geo</code> file did not come out as organized as it appears here.  It
+  was edited after creating the mesh and geometry to be more readable.
+
+Before loading this into deal.II, we need to create the <code>.msh</code>
+file.  If everything was set up correctly, we can press <code>Mesh -> 2D</code>.
+If all this goes well, then we
+should see something similar to the following output:
+
+<img src="https://www.dealii.org/images/steps/developer/step-49.gmsh_picture_2Dmesh.png" alt="">
+
+It behooves us at this point to also make sure our boundaries were declared
+correctly.  So in the Options menu go to <code>Mesh -> Visibility</code>.
+In the dropdown menu labeled "Label type" we may choose a label for our boundaries.
+We wish to check physical IDs, so we would like to have "Physical tag" picked.
+Now we check "1D element labels" and we should see the numbers assigned to the
+specified boundaries.
+
+<img src="https://www.dealii.org/images/steps/developer/step-49.gmsh_picture_2Dmesh_ids.png" alt="">
+
+Finally, we can choose  <code>Mesh -> Save</code> to save the <code>.msh</code> file, which 
+deal.II's GridIn class can read. You can also generate the <code>.msh</code> from the
+<code>.geo</code> file by running the command
+
+@code
+gmsh -2 example.geo.
+@endcode
 
 You might want to open the <code>example.geo</code> file in a text editor (it
 is located in the same directory as the <tt>step-49.cc</tt> source file) to
