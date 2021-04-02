@@ -82,14 +82,21 @@ test(const unsigned int max_difference)
       cell->set_active_fe_index(sequence.back());
   dofh.distribute_dofs(fes);
 
-  const bool fe_indices_changed =
-    hp::Refinement::limit_p_level_difference(dofh,
-                                             max_difference,
-                                             contains_fe_index);
-  (void)fe_indices_changed;
-  Assert(fe_indices_changed, ExcInternalError());
+  bool fe_indices_changed = false;
+  tria.signals.post_p4est_refinement.connect(
+    [&]() {
+      const internal::parallel::distributed::TemporarilyMatchRefineFlags<dim>
+        refine_modifier(tria);
+      fe_indices_changed =
+        hp::Refinement::limit_p_level_difference(dofh,
+                                                 max_difference,
+                                                 contains_fe_index);
+    },
+    boost::signals2::at_front);
 
   tria.execute_coarsening_and_refinement();
+
+  Assert(fe_indices_changed, ExcInternalError());
 
   deallog << "active FE indices after adaptation:" << std::endl;
   for (const auto &cell : dofh.active_cell_iterators())

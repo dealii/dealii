@@ -73,6 +73,18 @@ namespace GridTools
   template <typename CellIterator>
   struct PeriodicFacePair;
 }
+
+namespace internal
+{
+  namespace parallel
+  {
+    namespace distributed
+    {
+      template <int, int>
+      class TemporarilyMatchRefineFlags;
+    }
+  } // namespace parallel
+} // namespace internal
 #  endif
 
 namespace parallel
@@ -803,6 +815,10 @@ namespace parallel
 
       template <int, int, class>
       friend class dealii::FETools::internal::ExtrapolateImplementation;
+
+      template <int, int>
+      friend class dealii::internal::parallel::distributed::
+        TemporarilyMatchRefineFlags;
     };
 
 
@@ -910,6 +926,10 @@ namespace parallel
       virtual types::coarse_cell_id
       coarse_cell_index_to_coarse_cell_id(
         const unsigned int coarse_cell_index) const override;
+
+      template <int, int>
+      friend class dealii::internal::parallel::distributed::
+        TemporarilyMatchRefineFlags;
     };
   } // namespace distributed
 } // namespace parallel
@@ -934,7 +954,7 @@ namespace parallel
      */
     template <int dim, int spacedim = dim>
     class Triangulation
-      : public dealii::parallel::TriangulationBase<dim, spacedim>
+      : public dealii::parallel::DistributedTriangulationBase<dim, spacedim>
     {
     public:
       /**
@@ -948,6 +968,75 @@ namespace parallel
 
 
 #endif
+
+
+namespace internal
+{
+  namespace parallel
+  {
+    namespace distributed
+    {
+      /**
+       * This class temporarily modifies the refine and coarsen flags of all
+       * active cells to match the p4est oracle.
+       *
+       * The modification only happens on parallel::distributed::Triangulation
+       * objects, and persists for the lifetime of an instantiation of this
+       * class.
+       *
+       * The TemporarilyMatchRefineFlags class should only be used in
+       * combination with the Triangulation::Signals::post_p4est_refinement
+       * signal. At this stage, the p4est orcale already has been refined, but
+       * the triangulation is still unchanged. After the modification, all
+       * refine and coarsen flags describe how the traingulation will acutally
+       * be refined.
+       */
+      template <int dim, int spacedim = dim>
+      class TemporarilyMatchRefineFlags : public Subscriptor
+      {
+      public:
+        /**
+         * Constructor.
+         *
+         * Stores the refine and coarsen flags of all active cells if the
+         * provided Triangulation is of type
+         * parallel::distributed::Triangulation.
+         *
+         * Adjusts them to be consistent with the p4est oracle.
+         */
+        TemporarilyMatchRefineFlags(Triangulation<dim, spacedim> &tria);
+
+        /**
+         * Destructor.
+         *
+         * Returns the refine and coarsen flags of all active cells on the
+         * parallel::distributed::Triangulation into their previous state.
+         */
+        ~TemporarilyMatchRefineFlags();
+
+      private:
+        /**
+         * The modified parallel::distributed::Triangulation.
+         */
+        const SmartPointer<
+          dealii::parallel::distributed::Triangulation<dim, spacedim>>
+          distributed_tria;
+
+        /**
+         * A vector that temporarily stores the refine flags before they have
+         * been modified on the parallel::distributed::Triangulation.
+         */
+        std::vector<bool> saved_refine_flags;
+
+        /**
+         * A vector that temporarily stores the coarsen flags before they have
+         * been modified on the parallel::distributed::Triangulation.
+         */
+        std::vector<bool> saved_coarsen_flags;
+      };
+    } // namespace distributed
+  }   // namespace parallel
+} // namespace internal
 
 
 DEAL_II_NAMESPACE_CLOSE

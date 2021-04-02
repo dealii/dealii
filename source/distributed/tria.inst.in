@@ -15,19 +15,30 @@
 
 
 
-for (deal_II_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
     namespace parallel
     \{
       namespace distributed
       \{
-        template class Triangulation<deal_II_dimension>;
-#if deal_II_dimension < 3
-        template class Triangulation<deal_II_dimension, deal_II_dimension + 1>;
+#if deal_II_dimension <= deal_II_space_dimension
+        template class Triangulation<deal_II_dimension,
+                                     deal_II_space_dimension>;
 #endif
-#if deal_II_dimension < 2
-        template class Triangulation<deal_II_dimension, deal_II_dimension + 2>;
+      \}
+    \}
+
+    namespace internal
+    \{
+      namespace parallel
+      \{
+        namespace distributed
+        \{
+#if deal_II_dimension <= deal_II_space_dimension
+          template class TemporarilyMatchRefineFlags<deal_II_dimension,
+                                                     deal_II_space_dimension>;
 #endif
+        \}
       \}
     \}
   }
