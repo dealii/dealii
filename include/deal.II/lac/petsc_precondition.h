@@ -685,20 +685,50 @@ namespace PETScWrappers
     struct AdditionalData
     {
       /**
+       * Defines the available relaxation types for BoomerAMG.
+       */
+      enum class RelaxationType
+      {
+        Jacobi,
+        sequentialGaussSeidel,
+        seqboundaryGaussSeidel,
+        SORJacobi,
+        backwardSORJacobi,
+        symmetricSORJacobi,
+        l1scaledSORJacobi,
+        GaussianElimination,
+        l1GaussSeidel,
+        backwardl1GaussSeidel,
+        CG,
+        Chebyshev,
+        FCFJacobi,
+        l1scaledJacobi,
+        None
+      };
+
+      /**
        * Constructor. Note that BoomerAMG offers a lot more options to set
        * than what is exposed here.
        */
-      AdditionalData(const bool         symmetric_operator = false,
-                     const double       strong_threshold   = 0.25,
-                     const double       max_row_sum        = 0.9,
-                     const unsigned int aggressive_coarsening_num_levels = 0,
-                     const bool         output_details = false);
+      AdditionalData(
+        const bool           symmetric_operator               = false,
+        const double         strong_threshold                 = 0.25,
+        const double         max_row_sum                      = 0.9,
+        const unsigned int   aggressive_coarsening_num_levels = 0,
+        const bool           output_details                   = false,
+        const RelaxationType relaxation_type_up   = RelaxationType::SORJacobi,
+        const RelaxationType relaxation_type_down = RelaxationType::SORJacobi,
+        const RelaxationType relaxation_type_coarse =
+          RelaxationType::GaussianElimination,
+        const unsigned int n_sweeps_coarse = 1,
+        const double       tol             = 0.0,
+        const unsigned int max_iter        = 1,
+        const bool         w_cycle         = false);
 
       /**
        * Set this flag to true if you have a symmetric system matrix and you
        * want to use a solver which assumes a symmetric preconditioner like
-       * CG. The relaxation is done with SSOR/Jacobi when set to true and with
-       * SOR/Jacobi otherwise.
+       * CG.
        */
       bool symmetric_operator;
 
@@ -734,6 +764,42 @@ namespace PETScWrappers
        * preconditioner is constructed.
        */
       bool output_details;
+
+      /**
+       * Choose relaxation type up.
+       */
+      RelaxationType relaxation_type_up;
+
+      /**
+       * Choose relaxation type down.
+       */
+      RelaxationType relaxation_type_down;
+
+      /**
+       * Choose relaxation type coarse.
+       */
+      RelaxationType relaxation_type_coarse;
+
+      /**
+       * Choose number of sweeps on coarse grid.
+       */
+      unsigned int n_sweeps_coarse;
+
+      /**
+       * Choose BommerAMG tolerance.
+       */
+      double tol;
+
+      /**
+       * Choose BommerAMG maximum number of cycles.
+       */
+      unsigned int max_iter;
+
+      /**
+       * Defines whether a w-cycle should be used instead of the standard
+       * setting of a v-cycle.
+       */
+      bool w_cycle;
     };
 
     /**

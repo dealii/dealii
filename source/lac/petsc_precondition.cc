@@ -435,19 +435,108 @@ namespace PETScWrappers
   /* ----------------- PreconditionBoomerAMG -------------------- */
 
   PreconditionBoomerAMG::AdditionalData::AdditionalData(
-    const bool         symmetric_operator,
-    const double       strong_threshold,
-    const double       max_row_sum,
-    const unsigned int aggressive_coarsening_num_levels,
-    const bool         output_details)
+    const bool           symmetric_operator,
+    const double         strong_threshold,
+    const double         max_row_sum,
+    const unsigned int   aggressive_coarsening_num_levels,
+    const bool           output_details,
+    const RelaxationType relaxation_type_up,
+    const RelaxationType relaxation_type_down,
+    const RelaxationType relaxation_type_coarse,
+    const unsigned int   n_sweeps_coarse,
+    const double         tol,
+    const unsigned int   max_iter,
+    const bool           w_cycle)
     : symmetric_operator(symmetric_operator)
     , strong_threshold(strong_threshold)
     , max_row_sum(max_row_sum)
     , aggressive_coarsening_num_levels(aggressive_coarsening_num_levels)
     , output_details(output_details)
+    , relaxation_type_up(relaxation_type_up)
+    , relaxation_type_down(relaxation_type_down)
+    , relaxation_type_coarse(relaxation_type_coarse)
+    , n_sweeps_coarse(n_sweeps_coarse)
+    , tol(tol)
+    , max_iter(max_iter)
+    , w_cycle(w_cycle)
   {}
 
 
+
+  namespace
+  {
+    /**
+     * Converts the enums for the different relaxation types to the respective
+     * strings for PETSc.
+     */
+    std::string
+    to_string(
+      PreconditionBoomerAMG::AdditionalData::RelaxationType relaxation_type)
+    {
+      std::string string_type;
+
+      switch (relaxation_type)
+        {
+          case PreconditionBoomerAMG::AdditionalData::RelaxationType::Jacobi:
+            string_type = "Jacobi";
+            break;
+          case PreconditionBoomerAMG::AdditionalData::RelaxationType::
+            sequentialGaussSeidel:
+            string_type = "sequential-Gauss-Seidel";
+            break;
+          case PreconditionBoomerAMG::AdditionalData::RelaxationType::
+            seqboundaryGaussSeidel:
+            string_type = "seqboundary-Gauss-Seidel";
+            break;
+          case PreconditionBoomerAMG::AdditionalData::RelaxationType::SORJacobi:
+            string_type = "SOR/Jacobi";
+            break;
+          case PreconditionBoomerAMG::AdditionalData::RelaxationType::
+            backwardSORJacobi:
+            string_type = "backward-SOR/Jacobi";
+            break;
+          case PreconditionBoomerAMG::AdditionalData::RelaxationType::
+            symmetricSORJacobi:
+            string_type = "symmetric-SOR/Jacobi";
+            break;
+          case PreconditionBoomerAMG::AdditionalData::RelaxationType::
+            l1scaledSORJacobi:
+            string_type = " l1scaled-SOR/Jacobi";
+            break;
+          case PreconditionBoomerAMG::AdditionalData::RelaxationType::
+            GaussianElimination:
+            string_type = "Gaussian-elimination";
+            break;
+          case PreconditionBoomerAMG::AdditionalData::RelaxationType::
+            l1GaussSeidel:
+            string_type = "l1-Gauss-Seidel";
+            break;
+          case PreconditionBoomerAMG::AdditionalData::RelaxationType::
+            backwardl1GaussSeidel:
+            string_type = "backward-l1-Gauss-Seidel";
+            break;
+          case PreconditionBoomerAMG::AdditionalData::RelaxationType::CG:
+            string_type = "CG";
+            break;
+          case PreconditionBoomerAMG::AdditionalData::RelaxationType::Chebyshev:
+            string_type = "Chebyshev";
+            break;
+          case PreconditionBoomerAMG::AdditionalData::RelaxationType::FCFJacobi:
+            string_type = "FCF-Jacobi";
+            break;
+          case PreconditionBoomerAMG::AdditionalData::RelaxationType::
+            l1scaledJacobi:
+            string_type = "l1scaled-Jacobi";
+            break;
+          case PreconditionBoomerAMG::AdditionalData::RelaxationType::None:
+            string_type = "None";
+            break;
+          default:
+            Assert(false, ExcNotImplemented());
+        }
+      return string_type;
+    }
+  } // namespace
 
   PreconditionBoomerAMG::PreconditionBoomerAMG(
     const MPI_Comm &      comm,
@@ -495,29 +584,84 @@ namespace PETScWrappers
                      std::to_string(
                        additional_data.aggressive_coarsening_num_levels));
 
-    std::stringstream ssStream;
-    ssStream << additional_data.max_row_sum;
-    set_option_value("-pc_hypre_boomeramg_max_row_sum", ssStream.str());
+    set_option_value("-pc_hypre_boomeramg_max_row_sum",
+                     std::to_string(additional_data.max_row_sum));
 
-    ssStream.str(""); // empty the stringstream
-    ssStream << additional_data.strong_threshold;
-    set_option_value("-pc_hypre_boomeramg_strong_threshold", ssStream.str());
+    set_option_value("-pc_hypre_boomeramg_strong_threshold",
+                     std::to_string(additional_data.strong_threshold));
 
-    if (additional_data.symmetric_operator)
+    // change to symmetric SOR/Jacobi when using a symmetric operator for
+    // backward compatibility
+    if (additional_data.relaxation_type_up ==
+          AdditionalData::RelaxationType::SORJacobi &&
+        additional_data.symmetric_operator)
       {
-        set_option_value("-pc_hypre_boomeramg_relax_type_up",
-                         "symmetric-SOR/Jacobi");
-        set_option_value("-pc_hypre_boomeramg_relax_type_down",
-                         "symmetric-SOR/Jacobi");
-        set_option_value("-pc_hypre_boomeramg_relax_type_coarse",
-                         "Gaussian-elimination");
+        additional_data.relaxation_type_up =
+          AdditionalData::RelaxationType::symmetricSORJacobi;
       }
-    else
+
+    if (additional_data.relaxation_type_down ==
+          AdditionalData::RelaxationType::SORJacobi &&
+        additional_data.symmetric_operator)
       {
-        set_option_value("-pc_hypre_boomeramg_relax_type_up", "SOR/Jacobi");
-        set_option_value("-pc_hypre_boomeramg_relax_type_down", "SOR/Jacobi");
-        set_option_value("-pc_hypre_boomeramg_relax_type_coarse",
-                         "Gaussian-elimination");
+        additional_data.relaxation_type_down =
+          AdditionalData::RelaxationType::symmetricSORJacobi;
+      }
+
+    if (additional_data.relaxation_type_coarse ==
+          AdditionalData::RelaxationType::SORJacobi &&
+        additional_data.symmetric_operator)
+      {
+        additional_data.relaxation_type_coarse =
+          AdditionalData::RelaxationType::symmetricSORJacobi;
+      }
+
+    auto relaxation_type_is_symmetric =
+      [](AdditionalData::RelaxationType relaxation_type) {
+        return relaxation_type == AdditionalData::RelaxationType::Jacobi ||
+               relaxation_type ==
+                 AdditionalData::RelaxationType::symmetricSORJacobi ||
+               relaxation_type ==
+                 AdditionalData::RelaxationType::GaussianElimination ||
+               relaxation_type == AdditionalData::RelaxationType::None ||
+               relaxation_type ==
+                 AdditionalData::RelaxationType::l1scaledJacobi ||
+               relaxation_type == AdditionalData::RelaxationType::CG ||
+               relaxation_type == AdditionalData::RelaxationType::Chebyshev;
+      };
+
+    if (additional_data.symmetric_operator &&
+        !relaxation_type_is_symmetric(additional_data.relaxation_type_up))
+      Assert(false,
+             ExcMessage("Use a symmetric smoother for relaxation_type_up"));
+
+    if (additional_data.symmetric_operator &&
+        !relaxation_type_is_symmetric(additional_data.relaxation_type_down))
+      Assert(false,
+             ExcMessage("Use a symmetric smoother for relaxation_type_down"));
+
+    if (additional_data.symmetric_operator &&
+        !relaxation_type_is_symmetric(additional_data.relaxation_type_coarse))
+      Assert(false,
+             ExcMessage("Use a symmetric smoother for relaxation_type_coarse"));
+
+    set_option_value("-pc_hypre_boomeramg_relax_type_up",
+                     to_string(additional_data.relaxation_type_up));
+    set_option_value("-pc_hypre_boomeramg_relax_type_down",
+                     to_string(additional_data.relaxation_type_down));
+    set_option_value("-pc_hypre_boomeramg_relax_type_coarse",
+                     to_string(additional_data.relaxation_type_coarse));
+    set_option_value("-pc_hypre_boomeramg_grid_sweeps_coarse",
+                     std::to_string(additional_data.n_sweeps_coarse));
+
+    set_option_value("-pc_hypre_boomeramg_tol",
+                     std::to_string(additional_data.tol));
+    set_option_value("-pc_hypre_boomeramg_max_iter",
+                     std::to_string(additional_data.max_iter));
+
+    if (additional_data.w_cycle)
+      {
+        set_option_value("-pc_hypre_boomeramg_cycle_type", "W");
       }
 
     ierr = PCSetFromOptions(pc);
