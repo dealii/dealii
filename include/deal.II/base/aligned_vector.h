@@ -35,6 +35,7 @@
 #include <boost/serialization/split_member.hpp>
 
 #include <cstring>
+#include <memory>
 #include <type_traits>
 
 
@@ -346,9 +347,9 @@ public:
 
 private:
   /**
-   * Pointer to actual class data.
+   * Pointer to actual data array.
    */
-  T *data_begin;
+  std::unique_ptr<T[], void (*)(T *)> data_begin;
 
   /**
    * Pointer to one past the last valid value.
@@ -710,7 +711,7 @@ namespace internal
 
 template <class T>
 inline AlignedVector<T>::AlignedVector()
-  : data_begin(nullptr)
+  : data_begin(nullptr, [](T *) { Assert(false, ExcInternalError()); })
   , data_end(nullptr)
   , allocated_end(nullptr)
 {}
@@ -719,7 +720,7 @@ inline AlignedVector<T>::AlignedVector()
 
 template <class T>
 inline AlignedVector<T>::AlignedVector(const size_type size, const T &init)
-  : data_begin(nullptr)
+  : data_begin(nullptr, [](T *) { Assert(false, ExcInternalError()); })
   , data_end(nullptr)
   , allocated_end(nullptr)
 {
@@ -739,21 +740,23 @@ inline AlignedVector<T>::~AlignedVector()
 
 template <class T>
 inline AlignedVector<T>::AlignedVector(const AlignedVector<T> &vec)
-  : data_begin(nullptr)
+  : data_begin(nullptr, [](T *) { Assert(false, ExcInternalError()); })
   , data_end(nullptr)
   , allocated_end(nullptr)
 {
   // copy the data from vec
-  reserve(vec.data_end - vec.data_begin);
+  reserve(vec.size());
   data_end = allocated_end;
-  internal::AlignedVectorCopy<T>(vec.data_begin, vec.data_end, data_begin);
+  internal::AlignedVectorCopy<T>(vec.data_begin.get(),
+                                 vec.data_end,
+                                 data_begin.get());
 }
 
 
 
 template <class T>
 inline AlignedVector<T>::AlignedVector(AlignedVector<T> &&vec) noexcept
-  : data_begin(vec.data_begin)
+  : data_begin(std::move(vec.data_begin))
   , data_end(vec.data_end)
   , allocated_end(vec.allocated_end)
 {
@@ -769,8 +772,10 @@ inline AlignedVector<T> &
 AlignedVector<T>::operator=(const AlignedVector<T> &vec)
 {
   resize(0);
-  resize_fast(vec.data_end - vec.data_begin);
-  internal::AlignedVectorCopy<T>(vec.data_begin, vec.data_end, data_begin);
+  resize_fast(vec.data_end - vec.data_begin.get());
+  internal::AlignedVectorCopy<T>(vec.data_begin.get(),
+                                 vec.data_end,
+                                 data_begin.get());
   return *this;
 }
 
@@ -782,11 +787,13 @@ AlignedVector<T>::operator=(AlignedVector<T> &&vec) noexcept
 {
   clear();
 
-  data_begin    = vec.data_begin;
+  // Move the actual data
+  data_begin = std::move(vec.data_begin);
+
+  // Then also steal the other pointers and clear them in the original object:
   data_end      = vec.data_end;
   allocated_end = vec.allocated_end;
 
-  vec.data_begin    = nullptr;
   vec.data_end      = nullptr;
   vec.allocated_end = nullptr;
 
@@ -805,17 +812,17 @@ AlignedVector<T>::resize_fast(const size_type size_in)
       // call destructor on fields that are released. doing it backward
       // releases the elements in reverse order as compared to how they were
       // created
-      while (data_end != data_begin + size_in)
+      while (data_end != data_begin.get() + size_in)
         (--data_end)->~T();
     }
   reserve(size_in);
-  data_end = data_begin + size_in;
+  data_end = data_begin.get() + size_in;
 
   // need to still set the values in case the class is non-trivial because
   // virtual classes etc. need to run their (default) constructor
   if (std::is_trivial<T>::value == false && size_in > old_size)
     dealii::internal::AlignedVectorDefaultInitialize<T, true>(
-      size_in - old_size, data_begin + old_size);
+      size_in - old_size, data_begin.get() + old_size);
 }
 
 
@@ -830,16 +837,16 @@ AlignedVector<T>::resize(const size_type size_in)
       // call destructor on fields that are released. doing it backward
       // releases the elements in reverse order as compared to how they were
       // created
-      while (data_end != data_begin + size_in)
+      while (data_end != data_begin.get() + size_in)
         (--data_end)->~T();
     }
   reserve(size_in);
-  data_end = data_begin + size_in;
+  data_end = data_begin.get() + size_in;
 
   // finally set the desired init values
   if (size_in > old_size)
     dealii::internal::AlignedVectorDefaultInitialize<T, true>(
-      size_in - old_size, data_begin + old_size);
+      size_in - old_size, data_begin.get() + old_size);
 }
 
 
@@ -854,17 +861,17 @@ AlignedVector<T>::resize(const size_type size_in, const T &init)
       // call destructor on fields that are released. doing it backward
       // releases the elements in reverse order as compared to how they were
       // created
-      while (data_end != data_begin + size_in)
+      while (data_end != data_begin.get() + size_in)
         (--data_end)->~T();
     }
   reserve(size_in);
-  data_end = data_begin + size_in;
+  data_end = data_begin.get() + size_in;
 
   // finally set the desired init values
   if (size_in > old_size)
     dealii::internal::AlignedVectorSet<T, true>(size_in - old_size,
                                                 init,
-                                                data_begin + old_size);
+                                                data_begin.get() + old_size);
 }
 
 
@@ -873,8 +880,8 @@ template <class T>
 inline void
 AlignedVector<T>::reserve(const size_type size_alloc)
 {
-  const size_type old_size       = data_end - data_begin;
-  const size_type allocated_size = allocated_end - data_begin;
+  const size_type old_size       = data_end - data_begin.get();
+  const size_type allocated_size = allocated_end - data_begin.get();
   if (size_alloc > allocated_size)
     {
       // if we continuously increase the size of the vector, we might be
@@ -888,22 +895,23 @@ AlignedVector<T>::reserve(const size_type size_alloc)
 
       // allocate and align along 64-byte boundaries (this is enough for all
       // levels of vectorization currently supported by deal.II)
-      T *new_data;
-      Utilities::System::posix_memalign(reinterpret_cast<void **>(&new_data),
-                                        64,
-                                        size_actual_allocate);
+      T *new_data_ptr;
+      Utilities::System::posix_memalign(
+        reinterpret_cast<void **>(&new_data_ptr), 64, size_actual_allocate);
+      std::unique_ptr<T[], void (*)(T *)> new_data(new_data_ptr, [](T *ptr) {
+        std::free(ptr);
+      });
 
       // copy data in case there was some content before and release the old
       // memory with the function corresponding to the one used for allocating
       std::swap(data_begin, new_data);
-      data_end      = data_begin + old_size;
-      allocated_end = data_begin + new_size;
-      if (data_end != data_begin)
+      data_end      = data_begin.get() + old_size;
+      allocated_end = data_begin.get() + new_size;
+      if (data_end != data_begin.get())
         {
-          dealii::internal::AlignedVectorMove<T>(new_data,
-                                                 new_data + old_size,
-                                                 data_begin);
-          free(new_data);
+          dealii::internal::AlignedVectorMove<T>(new_data.get(),
+                                                 new_data.get() + old_size,
+                                                 data_begin.get());
         }
       else
         Assert(new_data == nullptr, ExcInternalError());
@@ -921,10 +929,8 @@ AlignedVector<T>::clear()
   if (data_begin != nullptr)
     {
       if (std::is_trivial<T>::value == false)
-        while (data_end != data_begin)
+        while (data_end != data_begin.get())
           (--data_end)->~T();
-
-      free(data_begin);
     }
   data_begin    = nullptr;
   data_end      = nullptr;
@@ -992,7 +998,7 @@ inline void
 AlignedVector<T>::fill()
 {
   dealii::internal::AlignedVectorDefaultInitialize<T, false>(size(),
-                                                             data_begin);
+                                                             data_begin.get());
 }
 
 
@@ -1001,7 +1007,7 @@ template <class T>
 inline void
 AlignedVector<T>::fill(const T &value)
 {
-  dealii::internal::AlignedVectorSet<T, false>(size(), value, data_begin);
+  dealii::internal::AlignedVectorSet<T, false>(size(), value, data_begin.get());
 }
 
 
@@ -1021,7 +1027,7 @@ template <class T>
 inline bool
 AlignedVector<T>::empty() const
 {
-  return data_end == data_begin;
+  return data_end == data_begin.get();
 }
 
 
@@ -1030,7 +1036,7 @@ template <class T>
 inline typename AlignedVector<T>::size_type
 AlignedVector<T>::size() const
 {
-  return data_end - data_begin;
+  return data_end - data_begin.get();
 }
 
 
@@ -1039,7 +1045,7 @@ template <class T>
 inline typename AlignedVector<T>::size_type
 AlignedVector<T>::capacity() const
 {
-  return allocated_end - data_begin;
+  return allocated_end - data_begin.get();
 }
 
 
@@ -1068,7 +1074,7 @@ template <typename T>
 inline typename AlignedVector<T>::pointer
 AlignedVector<T>::data()
 {
-  return data_begin;
+  return data_begin.get();
 }
 
 
@@ -1077,7 +1083,7 @@ template <typename T>
 inline typename AlignedVector<T>::const_pointer
 AlignedVector<T>::data() const
 {
-  return data_begin;
+  return data_begin.get();
 }
 
 
@@ -1086,7 +1092,7 @@ template <class T>
 inline typename AlignedVector<T>::iterator
 AlignedVector<T>::begin()
 {
-  return data_begin;
+  return data_begin.get();
 }
 
 
@@ -1104,7 +1110,7 @@ template <class T>
 inline typename AlignedVector<T>::const_iterator
 AlignedVector<T>::begin() const
 {
-  return data_begin;
+  return data_begin.get();
 }
 
 
@@ -1126,7 +1132,7 @@ AlignedVector<T>::save(Archive &ar, const unsigned int) const
   size_type vec_size(size());
   ar &      vec_size;
   if (vec_size > 0)
-    ar &boost::serialization::make_array(data_begin, vec_size);
+    ar &boost::serialization::make_array(data_begin.get(), vec_size);
 }
 
 
@@ -1142,8 +1148,8 @@ AlignedVector<T>::load(Archive &ar, const unsigned int)
   if (vec_size > 0)
     {
       reserve(vec_size);
-      ar &boost::serialization::make_array(data_begin, vec_size);
-      data_end = data_begin + vec_size;
+      ar &boost::serialization::make_array(data_begin.get(), vec_size);
+      data_end = data_begin.get() + vec_size;
     }
 }
 
@@ -1154,7 +1160,7 @@ inline typename AlignedVector<T>::size_type
 AlignedVector<T>::memory_consumption() const
 {
   size_type memory = sizeof(*this);
-  for (const T *t = data_begin; t != data_end; ++t)
+  for (const T *t = data_begin.get(); t != data_end; ++t)
     memory += dealii::MemoryConsumption::memory_consumption(*t);
   memory += sizeof(T) * (allocated_end - data_end);
   return memory;
