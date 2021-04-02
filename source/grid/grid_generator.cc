@@ -3952,6 +3952,16 @@ namespace GridGenerator
   }
 
 
+  template <>
+  void subdivided_cylinder(Triangulation<1> &,
+                           const unsigned int,
+                           const double,
+                           const double)
+  {
+    Assert(false, ExcNotImplemented());
+  }
+
+
 
   template <>
   void
@@ -4468,6 +4478,15 @@ namespace GridGenerator
           }
         ++f;
       }
+  }
+
+  template <>
+  void subdivided_cylinder(Triangulation<2> &,
+                           const unsigned int,
+                           const double,
+                           const double)
+  {
+    Assert(false, ExcNotImplemented());
   }
 
 
@@ -5438,40 +5457,34 @@ namespace GridGenerator
 
   // Implementation for 3D only
   template <>
-  void cylinder(Triangulation<3> &tria,
-                const double      radius,
-                const double      half_length)
+  void subdivided_cylinder(Triangulation<3> & tria,
+                           const unsigned int x_subdivisions,
+                           const double       radius,
+                           const double       half_length)
   {
     // Copy the base from hyper_ball<3>
     // and transform it to yz
-    const double d            = radius / std::sqrt(2.0);
-    const double a            = d / (1 + std::sqrt(2.0));
-    Point<3>     vertices[24] = {
-      Point<3>(-d, -half_length, -d),
-      Point<3>(d, -half_length, -d),
-      Point<3>(-a, -half_length, -a),
-      Point<3>(a, -half_length, -a),
-      Point<3>(-a, -half_length, a),
-      Point<3>(a, -half_length, a),
-      Point<3>(-d, -half_length, d),
-      Point<3>(d, -half_length, d),
-      Point<3>(-d, 0, -d),
-      Point<3>(d, 0, -d),
-      Point<3>(-a, 0, -a),
-      Point<3>(a, 0, -a),
-      Point<3>(-a, 0, a),
-      Point<3>(a, 0, a),
-      Point<3>(-d, 0, d),
-      Point<3>(d, 0, d),
-      Point<3>(-d, half_length, -d),
-      Point<3>(d, half_length, -d),
-      Point<3>(-a, half_length, -a),
-      Point<3>(a, half_length, -a),
-      Point<3>(-a, half_length, a),
-      Point<3>(a, half_length, a),
-      Point<3>(-d, half_length, d),
-      Point<3>(d, half_length, d),
-    };
+    const double d = radius / std::sqrt(2.0);
+    const double a = d / (1 + std::sqrt(2.0));
+
+    std::vector<Point<3>> vertices;
+    const double          initial_height   = -half_length;
+    const double          height_increment = 2. * half_length / x_subdivisions;
+
+    for (unsigned int rep = 0; rep < (x_subdivisions + 1); ++rep)
+      {
+        const double height = initial_height + height_increment * rep;
+
+        vertices.emplace_back(Point<3>(-d, height, -d));
+        vertices.emplace_back(Point<3>(d, height, -d));
+        vertices.emplace_back(Point<3>(-a, height, -a));
+        vertices.emplace_back(Point<3>(a, height, -a));
+        vertices.emplace_back(Point<3>(-a, height, a));
+        vertices.emplace_back(Point<3>(a, height, a));
+        vertices.emplace_back(Point<3>(-d, height, d));
+        vertices.emplace_back(Point<3>(d, height, d));
+      }
+
     // Turn cylinder such that y->x
     for (auto &vertex : vertices)
       {
@@ -5480,18 +5493,29 @@ namespace GridGenerator
         vertex(0)      = h;
       }
 
-    int cell_vertices[10][8] = {{0, 1, 8, 9, 2, 3, 10, 11},
-                                {0, 2, 8, 10, 6, 4, 14, 12},
-                                {2, 3, 10, 11, 4, 5, 12, 13},
-                                {1, 7, 9, 15, 3, 5, 11, 13},
-                                {6, 4, 14, 12, 7, 5, 15, 13}};
-    for (unsigned int i = 0; i < 5; ++i)
-      for (unsigned int j = 0; j < 8; ++j)
-        cell_vertices[i + 5][j] = cell_vertices[i][j] + 8;
+    std::vector<std::vector<int>> cell_vertices;
+    cell_vertices.push_back({0, 1, 8, 9, 2, 3, 10, 11});
+    cell_vertices.push_back({0, 2, 8, 10, 6, 4, 14, 12});
+    cell_vertices.push_back({2, 3, 10, 11, 4, 5, 12, 13});
+    cell_vertices.push_back({1, 7, 9, 15, 3, 5, 11, 13});
+    cell_vertices.push_back({6, 4, 14, 12, 7, 5, 15, 13});
 
-    std::vector<CellData<3>> cells(10, CellData<3>());
+    for (unsigned int rep = 1; rep < x_subdivisions; ++rep)
+      {
+        for (unsigned int i = 0; i < 5; ++i)
+          {
+            std::vector<int> new_cell_vertices(8);
+            for (unsigned int j = 0; j < 8; ++j)
+              new_cell_vertices[j] = cell_vertices[i][j] + 8 * rep;
+            cell_vertices.push_back(new_cell_vertices);
+          }
+      }
 
-    for (unsigned int i = 0; i < 10; ++i)
+    unsigned int n_cells = x_subdivisions * 5;
+
+    std::vector<CellData<3>> cells(n_cells, CellData<3>());
+
+    for (unsigned int i = 0; i < n_cells; ++i)
       {
         for (unsigned int j = 0; j < 8; ++j)
           cells[i].vertices[j] = cell_vertices[i][j];
@@ -5513,12 +5537,9 @@ namespace GridGenerator
     // interior if one of its vertices
     // is at coordinates '+-a' as set
     // above
-    Triangulation<3>::cell_iterator cell = tria.begin();
-    Triangulation<3>::cell_iterator end  = tria.end();
-
     tria.set_all_manifold_ids_on_boundary(0);
 
-    for (; cell != end; ++cell)
+    for (const auto &cell : tria.cell_iterators())
       for (unsigned int i : GeometryInfo<3>::face_indices())
         if (cell->at_boundary(i))
           {
@@ -5560,6 +5581,14 @@ namespace GridGenerator
     tria.set_manifold(0, CylindricalManifold<3>());
   }
 
+  // Implementation for 3D only
+  template <>
+  void cylinder(Triangulation<3> &tria,
+                const double      radius,
+                const double      half_length)
+  {
+    subdivided_cylinder(tria, 2, radius, half_length);
+  }
 
   template <>
   void quarter_hyper_ball(Triangulation<3> &tria,
