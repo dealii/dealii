@@ -3,4 +3,3 @@ has been refactored and moved to parallel::DistributedTriangulationBase so that 
 used for parallel::fullydistributed::Triangulation.
 <br>
 (Daniel Arndt, Ivan Fumagalli, Peter Munch, 2021/01/15)
-

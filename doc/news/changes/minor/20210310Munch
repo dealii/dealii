@@ -2,4 +2,3 @@ Improved: The function VectorTools::get_position_vector() can now also take
 a Mapping object as input parameter.
 <br>
 (Peter Munch, 2021/03/10)
-
