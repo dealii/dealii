@@ -572,6 +572,38 @@ namespace SUNDIALS
      * vector whose components are the weights used by KINSOL to compute the
      * vector norm of the solution. The implementation of this function is
      * optional, and it is used only if implemented.
+     *
+     * The intent for this scaling factor is for problems in which the different
+     * components of a solution have vastly different numerical magnitudes --
+     * typically because they have different physical units and represent
+     * different things. For example, if one were to solve a nonlinear Stokes
+     * problem, the solution vector has components that correspond to velocities
+     * and other components that correspond to pressures. These have different
+     * physical units and depending on which units one chooses, they may have
+     * roughly comparable numerical sizes or maybe they don't. To give just one
+     * example, in simulations of flow in the Earth's interior, one has
+     * velocities on the order of maybe ten centimeters per year, and pressures
+     * up to around 100 GPa. If one expresses this in SI units, this corresponds
+     * to velocities of around $0.000,000,003=3 \times 10^{-9}$ m/s, and
+     * pressures around $10^9 \text{kg}/\text{m}/\text{s}^2$, i.e., vastly
+     * different. In such cases, computing the $l_2$ norm of a solution-type
+     * vector (e.g., the difference between the previous and the current
+     * solution) makes no sense because the norm will either be dominated by the
+     * velocity components or the pressure components. The scaling vector this
+     * function returns is intended to provide each component of the solution
+     * with a scaling factor that is generally chosen as as the inverse of a
+     * "typical velocity" or "typical pressure" so that upon multiplication of a
+     * vector component by the corresponding scaling vector component, one
+     * obtains a number that is of order of magnitude of one (i.e., a reasonably
+     * small multiple of one times the typical velocity/pressure). The KINSOL
+     * manual states this as follows: "The user should supply values $D_u$,
+     * which are diagonal elements of the scaling matrix such that $D_u U$ has
+     * all components roughly the same magnitude when $U$ is close to a
+     * solution".
+     *
+     * If no function is provided to a KINSOL object, then this is interpreted
+     * as implicitly saying that all of these scaling factors should be
+     * considered as one.
      */
     std::function<VectorType &()> get_solution_scaling;
 
@@ -581,6 +613,13 @@ namespace SUNDIALS
      * vector norm of the function evaluation away from the solution. The
      * implementation of this function is optional, and it is used only if
      * implemented.
+     *
+     * The point of this function and the scaling vector it returns is similar
+     * to the one discussed above for `get_solution_scaling`, except that it is
+     * for a vector that scales the components of the function $F(U)$, rather
+     * than the components of $U$, when computing norms. As above, if no
+     * function is provided, then this is equivalent to using a scaling vector
+     * whose components are all equal to one.
      */
     std::function<VectorType &()> get_function_scaling;
 
