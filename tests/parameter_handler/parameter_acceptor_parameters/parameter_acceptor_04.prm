@@ -14,5 +14,3 @@ subsection Second Class
   set Second int    = 5
   set Second string = bye bye
 end
-
-

@@ -19,5 +19,3 @@ subsection Particle Tracking Problem
   set Time step                     = 0.002
   set Velocity degree               = 1
 end
-
-

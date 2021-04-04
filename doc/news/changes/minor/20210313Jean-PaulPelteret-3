@@ -3,4 +3,3 @@ Improved: The result type deduction for the product of symbolic types
 tensors has been improved.
 <br>
 (Jean-Paul Pelteret, 2021/03/13)
-
