@@ -263,7 +263,21 @@ DEAL_II_NAMESPACE_OPEN
  * 4 5
  * @endcode
  *
- * # Complex numbers and HDF5
+ * # Datatypes
+ * Attribute datatypes can be float, `double`, `std::complex<float>`,
+ * `std::complex<double>`, `int`, `unsigned int`, `bool` and `std::string`.
+ * HDF5Object::get_attribute() and HDF5Object::set_attribute() can be used with
+ * all of these datatypes.
+ *
+ * Dataset datatypes can be `float`, `double`, `std::complex<float>`,
+ * `std::complex<double>`, `int` and `unsigned int`. DataSet::read(),
+ * DataSet::write(), DataSet::read_selection(), etc. can be used with all of
+ * these datatypes. Note that the dataset datatype can not be `bool`, the
+ * reason is that it can not be assumed that `std::vector<bool>` stores the
+ * elements in a contiguous way.
+ *
+ *
+ * ## Complex numbers and HDF5
  * There is no official HDF5 format to store `std::complex` numbers in a HDF5
  * file. But the *de facto* standard is to store the `std::complex` number in a
  * compound type in which `r` corresponds to the real part and `i` corresponds
