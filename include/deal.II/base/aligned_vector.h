@@ -185,7 +185,7 @@ public:
    * destructor at the old location).
    */
   void
-  reserve(const size_type size_alloc);
+  reserve(const size_type new_allocated_size);
 
   /**
    * Releases all previously allocated memory and leaves the vector in a state
@@ -890,18 +890,18 @@ AlignedVector<T>::resize(const size_type size_in, const T &init)
 
 template <class T>
 inline void
-AlignedVector<T>::reserve(const size_type size_alloc)
+AlignedVector<T>::reserve(const size_type new_allocated_size)
 {
-  const size_type old_size       = used_elements_end - elements.get();
-  const size_type allocated_size = allocated_elements_end - elements.get();
-  if (size_alloc > allocated_size)
+  const size_type old_size           = used_elements_end - elements.get();
+  const size_type old_allocated_size = allocated_elements_end - elements.get();
+  if (new_allocated_size > old_allocated_size)
     {
       // if we continuously increase the size of the vector, we might be
       // reallocating a lot of times. therefore, try to increase the size more
       // aggressively
-      size_type new_size = size_alloc;
-      if (size_alloc < (2 * allocated_size))
-        new_size = 2 * allocated_size;
+      size_type new_size = new_allocated_size;
+      if (new_allocated_size < (2 * old_allocated_size))
+        new_size = 2 * old_allocated_size;
 
       const size_type size_actual_allocate = new_size * sizeof(T);
 
@@ -915,7 +915,7 @@ AlignedVector<T>::reserve(const size_type size_alloc)
       });
 
       // copy whatever elements we need to retain
-      if (size_alloc > 0)
+      if (new_allocated_size > 0)
         dealii::internal::AlignedVectorMove<T>(elements.get(),
                                                elements.get() + old_size,
                                                new_data.get());
@@ -927,7 +927,7 @@ AlignedVector<T>::reserve(const size_type size_alloc)
       used_elements_end      = elements.get() + old_size;
       allocated_elements_end = elements.get() + new_size;
     }
-  else if (size_alloc == 0)
+  else if (new_allocated_size == 0)
     clear();
   else // size_alloc < allocated_size
     {} // nothing to do here
