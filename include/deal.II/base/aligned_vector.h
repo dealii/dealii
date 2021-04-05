@@ -899,17 +899,14 @@ AlignedVector<T>::reserve(const size_type new_allocated_size)
       // if we continuously increase the size of the vector, we might be
       // reallocating a lot of times. therefore, try to increase the size more
       // aggressively
-      size_type new_size = new_allocated_size;
-      if (new_allocated_size < (2 * old_allocated_size))
-        new_size = 2 * old_allocated_size;
-
-      const size_type size_actual_allocate = new_size * sizeof(T);
+      const size_type new_size =
+        std::max(new_allocated_size, 2 * old_allocated_size);
 
       // allocate and align along 64-byte boundaries (this is enough for all
       // levels of vectorization currently supported by deal.II)
       T *new_data_ptr;
       Utilities::System::posix_memalign(
-        reinterpret_cast<void **>(&new_data_ptr), 64, size_actual_allocate);
+        reinterpret_cast<void **>(&new_data_ptr), 64, new_size * sizeof(T));
       std::unique_ptr<T[], void (*)(T *)> new_data(new_data_ptr, [](T *ptr) {
         std::free(ptr);
       });
