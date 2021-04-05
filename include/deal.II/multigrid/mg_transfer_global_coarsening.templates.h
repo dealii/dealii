@@ -2184,7 +2184,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
                     weights[i];
               else
                 for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
-                  dst.local_element(indices_fine[i]) =
+                  this->vec_fine.local_element(indices_fine[i]) =
                     this->vec_coarse.local_element(indices_coarse[i]);
 
               indices_fine += scheme.dofs_per_cell_fine;
@@ -2264,7 +2264,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
                       evaluation_data_fine[i][v] * weights[i];
                 else
                   for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
-                    dst.local_element(indices[i]) = evaluation_data_fine[i][v];
+                    this->vec_fine.local_element(indices[i]) =
+                      evaluation_data_fine[i][v];
 
                 indices += scheme.dofs_per_cell_fine;
 
@@ -2279,10 +2280,10 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
                                             // in do_restrict_add does not work
 
   if (schemes.size() > 0 && schemes.front().fine_element_is_continuous)
-    {
-      this->vec_fine.compress(VectorOperation::add);
-      dst.copy_locally_owned_data_from(this->vec_fine);
-    }
+    this->vec_fine.compress(VectorOperation::add);
+
+  if (true || schemes.size() > 0 && schemes.front().fine_element_is_continuous)
+    dst.copy_locally_owned_data_from(this->vec_fine);
 }
 
 
@@ -2352,7 +2353,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
               else
                 for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
                   distribute_local_to_global(indices_coarse[i],
-                                             src.local_element(indices_fine[i]),
+                                             this->vec_fine.local_element(
+                                               indices_fine[i]),
                                              this->vec_coarse);
 
               indices_fine += scheme.dofs_per_cell_fine;
@@ -2401,7 +2403,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
                       this->vec_fine.local_element(indices[i]) * weights[i];
                 else
                   for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
-                    evaluation_data_fine[i][v] = src.local_element(indices[i]);
+                    evaluation_data_fine[i][v] =
+                      this->vec_fine.local_element(indices[i]);
 
                 indices += scheme.dofs_per_cell_fine;
 
