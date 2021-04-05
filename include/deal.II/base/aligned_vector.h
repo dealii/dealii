@@ -121,15 +121,29 @@ public:
   operator=(AlignedVector<T> &&vec) noexcept;
 
   /**
-   * Change the size of the vector. It keeps old elements previously available
-   * but does not initialize the newly allocated memory, leaving it in an
-   * undefined state.
+   * Change the size of the vector. If the new size is larger than the
+   * previous size, then new elements will be added to the end of the
+   * vector; these elements will remain uninitialized (i.e., left in
+   * an undefined state) if `std::is_trivial<T>` is `true`, and
+   * will be default initialized if `std::is_trivial<T>` is `false`.
+   * See [here](https://en.cppreference.com/w/cpp/types/is_trivial) for
+   * a definition of what `std::is_trivial` does.
+   *
+   * If the new size is less than the previous size, then the last few
+   * elements will be destroyed if `std::is_trivial<T>` will be `false`
+   * or will simply be ignored in the future if
+   * `std::is_trivial<T>` is `true`.
+   *
+   * As a consequence of the outline above, the "_fast" suffix of this
+   * function refers to the fact that for "trivial" classes `T`, this
+   * function omits constructor/destructor calls and in particular the
+   * initialization of new elements.
    *
    * @note This method can only be invoked for classes @p T that define a
    * default constructor, @p T(). Otherwise, compilation will fail.
    */
   void
-  resize_fast(const size_type size);
+  resize_fast(const size_type new_size);
 
   /**
    * Change the size of the vector. It keeps old elements previously
@@ -139,12 +153,12 @@ public:
    * If the new vector size is shorter than the old one, the memory is
    * not immediately released unless the new size is zero; however,
    * the size of the current object is of course set to the requested
-   * value.
+   * value. The destructors of released elements are also called.
    *
    * @dealiiOperationIsMultithreaded
    */
   void
-  resize(const size_type size_in);
+  resize(const size_type new_size);
 
   /**
    * Change the size of the vector. It keeps old elements previously
@@ -162,14 +176,14 @@ public:
    * @dealiiOperationIsMultithreaded
    */
   void
-  resize(const size_type size_in, const T &init);
+  resize(const size_type new_size, const T &init);
 
   /**
-   * Reserve memory space for @p size elements.
+   * Reserve memory space for @p new_allocated_size elements.
    *
-   * If the argument @p size is less than the current number of stored
+   * If the argument @p new_allocated_size is less than the current number of stored
    * elements (as indicated by calling size()), then this function does not
-   * do anything at all. Except if the argument @p size is set
+   * do anything at all. Except if the argument @p new_allocated_size is set
    * to zero, then all previously allocated memory is released (this operation
    * then being equivalent to directly calling the clear() function).
    *
@@ -816,72 +830,72 @@ AlignedVector<T>::operator=(AlignedVector<T> &&vec) noexcept
 
 template <class T>
 inline void
-AlignedVector<T>::resize_fast(const size_type size_in)
+AlignedVector<T>::resize_fast(const size_type new_size)
 {
   const size_type old_size = size();
-  if (std::is_trivial<T>::value == false && size_in < old_size)
+  if (std::is_trivial<T>::value == false && new_size < old_size)
     {
       // call destructor on fields that are released. doing it backward
       // releases the elements in reverse order as compared to how they were
       // created
-      while (used_elements_end != elements.get() + size_in)
+      while (used_elements_end != elements.get() + new_size)
         (--used_elements_end)->~T();
     }
-  reserve(size_in);
-  used_elements_end = elements.get() + size_in;
+  reserve(new_size);
+  used_elements_end = elements.get() + new_size;
 
   // need to still set the values in case the class is non-trivial because
   // virtual classes etc. need to run their (default) constructor
-  if (std::is_trivial<T>::value == false && size_in > old_size)
+  if (std::is_trivial<T>::value == false && new_size > old_size)
     dealii::internal::AlignedVectorDefaultInitialize<T, true>(
-      size_in - old_size, elements.get() + old_size);
+      new_size - old_size, elements.get() + old_size);
 }
 
 
 
 template <class T>
 inline void
-AlignedVector<T>::resize(const size_type size_in)
+AlignedVector<T>::resize(const size_type new_size)
 {
   const size_type old_size = size();
-  if (std::is_trivial<T>::value == false && size_in < old_size)
+  if (std::is_trivial<T>::value == false && new_size < old_size)
     {
       // call destructor on fields that are released. doing it backward
       // releases the elements in reverse order as compared to how they were
       // created
-      while (used_elements_end != elements.get() + size_in)
+      while (used_elements_end != elements.get() + new_size)
         (--used_elements_end)->~T();
     }
-  reserve(size_in);
-  used_elements_end = elements.get() + size_in;
+  reserve(new_size);
+  used_elements_end = elements.get() + new_size;
 
   // finally set the desired init values
-  if (size_in > old_size)
+  if (new_size > old_size)
     dealii::internal::AlignedVectorDefaultInitialize<T, true>(
-      size_in - old_size, elements.get() + old_size);
+      new_size - old_size, elements.get() + old_size);
 }
 
 
 
 template <class T>
 inline void
-AlignedVector<T>::resize(const size_type size_in, const T &init)
+AlignedVector<T>::resize(const size_type new_size, const T &init)
 {
   const size_type old_size = size();
-  if (std::is_trivial<T>::value == false && size_in < old_size)
+  if (std::is_trivial<T>::value == false && new_size < old_size)
     {
       // call destructor on fields that are released. doing it backward
       // releases the elements in reverse order as compared to how they were
       // created
-      while (used_elements_end != elements.get() + size_in)
+      while (used_elements_end != elements.get() + new_size)
         (--used_elements_end)->~T();
     }
-  reserve(size_in);
-  used_elements_end = elements.get() + size_in;
+  reserve(new_size);
+  used_elements_end = elements.get() + new_size;
 
   // finally set the desired init values
-  if (size_in > old_size)
-    dealii::internal::AlignedVectorSet<T, true>(size_in - old_size,
+  if (new_size > old_size)
+    dealii::internal::AlignedVectorSet<T, true>(new_size - old_size,
                                                 init,
                                                 elements.get() + old_size);
 }
