@@ -1238,6 +1238,12 @@ namespace internal
         transfer.schemes[1].fine_element_is_continuous =
           fe_fine.dofs_per_vertex > 0;
 
+      Assert(
+        transfer.schemes[0].fine_element_is_continuous ||
+          constraint_fine.n_constraints() == 0,
+        ExcMessage(
+          "For discontinuous elements, no constraints are supported at the moment."));
+
       // count coarse cells for each scheme (0, 1)
       {
         transfer.schemes[0].n_coarse_cells = 0; // reset
@@ -1659,6 +1665,12 @@ namespace internal
           transfer.schemes[fe_index_pair.second].fine_element_is_continuous =
             dof_handler_fine.get_fe(fe_index_pair.first.second)
               .dofs_per_vertex > 0;
+
+          Assert(
+            transfer.schemes[fe_index_pair.second].fine_element_is_continuous ||
+              constraint_fine.n_constraints() == 0,
+            ExcMessage(
+              "For discontinuous elements, no constraints are supported at the moment."));
         }
 
       precompute_constraints(dof_handler_coarse, constraint_coarse, transfer);
@@ -2306,11 +2318,20 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   const unsigned int n_lanes = VectorizedArrayType::size();
 
-  if (true || schemes.front().fine_element_is_continuous)
-    {
-      this->vec_fine.copy_locally_owned_data_from(src);
-      this->vec_fine.update_ghost_values();
-    }
+  const bool fine_vectors_are_compatible =
+    this->vec_fine.get_partitioner()->is_globally_compatible(
+      *src.get_partitioner());
+  std::cout << static_cast<int>(fine_vectors_are_compatible) << std::endl;
+
+  const auto vec_fine_ptr =
+    fine_vectors_are_compatible ? &src : &this->vec_fine;
+
+  if (fine_vectors_are_compatible == false)
+    this->vec_fine.copy_locally_owned_data_from(src);
+
+  if (schemes.size() > 0 && schemes.front().fine_element_is_continuous ||
+      fine_vectors_are_compatible == false)
+    vec_fine_ptr->update_ghost_values();
 
   this->vec_coarse.copy_locally_owned_data_from(dst);
 
@@ -2356,12 +2377,12 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
                 for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
                   distribute_local_to_global(
                     indices_coarse[i],
-                    this->vec_fine.local_element(indices_fine[i]) * weights[i],
+                    vec_fine_ptr->local_element(indices_fine[i]) * weights[i],
                     this->vec_coarse);
               else
                 for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
                   distribute_local_to_global(indices_coarse[i],
-                                             this->vec_fine.local_element(
+                                             vec_fine_ptr->local_element(
                                                indices_fine[i]),
                                              this->vec_coarse);
 
@@ -2408,11 +2429,11 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
                 if (scheme.fine_element_is_continuous)
                   for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
                     evaluation_data_fine[i][v] =
-                      this->vec_fine.local_element(indices[i]) * weights[i];
+                      vec_fine_ptr->local_element(indices[i]) * weights[i];
                 else
                   for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
                     evaluation_data_fine[i][v] =
-                      this->vec_fine.local_element(indices[i]);
+                      vec_fine_ptr->local_element(indices[i]);
 
                 indices += scheme.dofs_per_cell_fine;
 
