@@ -2124,6 +2124,14 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
 
   const unsigned int n_lanes = VectorizedArrayType::size();
 
+  const bool fine_vectors_are_compatible =
+    this->vec_fine.get_partitioner()->is_globally_compatible(
+      *dst.get_partitioner());
+  std::cout << static_cast<int>(fine_vectors_are_compatible) << std::endl;
+
+  const auto vec_fine_ptr =
+    fine_vectors_are_compatible ? &dst : &this->vec_fine;
+
   // the following code is equivalent to:
   // this->constraint_coarse.distribute(this->vec_coarse);
   {
@@ -2156,7 +2164,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
     .update_ghost_values(); // note: make sure that ghost values are set
 
   if (schemes.size() > 0 && schemes.front().fine_element_is_continuous)
-    this->vec_fine = Number(0.);
+    *vec_fine_ptr = Number(0.);
 
   AlignedVector<VectorizedArrayType> evaluation_data_fine;
   AlignedVector<VectorizedArrayType> evaluation_data_coarse;
@@ -2179,12 +2187,12 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
             {
               if (scheme.fine_element_is_continuous)
                 for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
-                  this->vec_fine.local_element(indices_fine[i]) +=
+                  vec_fine_ptr->local_element(indices_fine[i]) +=
                     this->vec_coarse.local_element(indices_coarse[i]) *
                     weights[i];
               else
                 for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
-                  this->vec_fine.local_element(indices_fine[i]) =
+                  vec_fine_ptr->local_element(indices_fine[i]) =
                     this->vec_coarse.local_element(indices_coarse[i]);
 
               indices_fine += scheme.dofs_per_cell_fine;
@@ -2260,11 +2268,11 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
               {
                 if (scheme.fine_element_is_continuous)
                   for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
-                    this->vec_fine.local_element(indices[i]) +=
+                    vec_fine_ptr->local_element(indices[i]) +=
                       evaluation_data_fine[i][v] * weights[i];
                 else
                   for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
-                    this->vec_fine.local_element(indices[i]) =
+                    vec_fine_ptr->local_element(indices[i]) =
                       evaluation_data_fine[i][v];
 
                 indices += scheme.dofs_per_cell_fine;
@@ -2280,9 +2288,9 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
                                             // in do_restrict_add does not work
 
   if (schemes.size() > 0 && schemes.front().fine_element_is_continuous)
-    this->vec_fine.compress(VectorOperation::add);
+    vec_fine_ptr->compress(VectorOperation::add);
 
-  if (true || schemes.size() > 0 && schemes.front().fine_element_is_continuous)
+  if (fine_vectors_are_compatible == false)
     dst.copy_locally_owned_data_from(this->vec_fine);
 }
 
@@ -2298,7 +2306,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   const unsigned int n_lanes = VectorizedArrayType::size();
 
-  if (schemes.front().fine_element_is_continuous)
+  if (true || schemes.front().fine_element_is_continuous)
     {
       this->vec_fine.copy_locally_owned_data_from(src);
       this->vec_fine.update_ghost_values();
