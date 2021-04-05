@@ -165,12 +165,24 @@ public:
   resize(const size_type size_in, const T &init);
 
   /**
-   * Reserve memory space for @p size elements. If the argument @p size is set
-   * to zero, all previously allocated memory is released.
+   * Reserve memory space for @p size elements.
+   *
+   * If the argument @p size is less than the current number of stored
+   * elements (as indicated by calling size()), then this function does not
+   * do anything at all. Except if the argument @p size is set
+   * to zero, then all previously allocated memory is released (this operation
+   * then being equivalent to directly calling the clear() function).
    *
    * In order to avoid too frequent reallocation (which involves copy of the
    * data), this function doubles the amount of memory occupied when the given
    * size is larger than the previously allocated size.
+   *
+   * Note that this function only changes the amount of elements the object
+   * *can* store, but not the number of elements it *actually* stores. As
+   * a consequence, no constructors or destructors of newly created objects
+   * are run, though the existing elements may be moved to a new location (which
+   * involves running the move constructor at the new location and the
+   * destructor at the old location).
    */
   void
   reserve(const size_type size_alloc);
@@ -902,22 +914,23 @@ AlignedVector<T>::reserve(const size_type size_alloc)
         std::free(ptr);
       });
 
-      // copy data in case there was some content before and release the old
-      // memory with the function corresponding to the one used for allocating
-      std::swap(elements, new_data);
+      // copy whatever elements we need to retain
+      if (size_alloc > 0)
+        dealii::internal::AlignedVectorMove<T>(elements.get(),
+                                               elements.get() + old_size,
+                                               new_data.get());
+
+      // Now reset all of the member variables of the current object
+      // based on the allocation above. Assigning to a std::unique_ptr
+      // object also releases the previously pointed to memory.
+      elements               = std::move(new_data);
       used_elements_end      = elements.get() + old_size;
       allocated_elements_end = elements.get() + new_size;
-      if (used_elements_end != elements.get())
-        {
-          dealii::internal::AlignedVectorMove<T>(new_data.get(),
-                                                 new_data.get() + old_size,
-                                                 elements.get());
-        }
-      else
-        Assert(new_data == nullptr, ExcInternalError());
     }
   else if (size_alloc == 0)
     clear();
+  else // size_alloc < allocated_size
+    {} // nothing to do here
 }
 
 
