@@ -375,7 +375,10 @@ namespace FETools
       const bool do_tensor_product)
     {
       AssertDimension(fes.size(), multiplicities.size());
-
+      Assert(
+        fes.size() > 0,
+        ExcMessage(
+          "This function only makes sense if at least one FiniteElement is provided."));
       // first count the number of dofs and components that will emerge from the
       // given FEs
       unsigned int n_shape_functions = 0;
