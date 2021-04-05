@@ -13378,7 +13378,12 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
 {
-  prepare_coarsening_and_refinement();
+  // Call our version of prepare_coarsening_and_refinement() even if a derived
+  // class like parallel::distributed::Triangulation overrides it. Their
+  // function will be called in their execute_coarsening_and_refinement()
+  // function. Even in a distributed computation our job here is to reconstruct
+  // the local part of the mesh and as such checking our flags is enough.
+  Triangulation<dim, spacedim>::prepare_coarsening_and_refinement();
 
   // verify a case with which we have had
   // some difficulty in the past (see the

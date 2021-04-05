@@ -2244,7 +2244,7 @@ namespace parallel
     void
     Triangulation<dim, spacedim>::copy_local_forest_to_triangulation()
     {
-      // disable mesh smoothing for recreating the deal.II triangulation,
+      // Disable mesh smoothing for recreating the deal.II triangulation,
       // otherwise we might not be able to reproduce the p4est mesh
       // exactly. We restore the original smoothing at the end of this
       // function. Note that the smoothing flag is used in the normal
@@ -2270,21 +2270,25 @@ namespace parallel
 
       bool mesh_changed = false;
 
-      // remove all deal.II refinements. Note that we could skip this and
+      // Remove all deal.II refinements. Note that we could skip this and
       // start from our current state, because the algorithm later coarsens as
       // necessary. This has the advantage of being faster when large parts
       // of the local partition changes (likely) and gives a deterministic
       // ordering of the cells (useful for snapshot/resume).
       // TODO: is there a more efficient way to do this?
       if (settings & mesh_reconstruction_after_repartitioning)
-        while (this->begin_active()->level() > 0)
+        while (this->n_levels() > 1)
           {
-            for (const auto &cell : this->active_cell_iterators())
+            // Instead of marking all active cells, we slice off the finest
+            // level, one level at a time. This takes the same number of
+            // iterations but solves an issue where not all cells on a
+            // periodic boundary are indeed coarsened and we run into an
+            // irrelevant Assert() in update_periodic_face_map().
+            for (const auto &cell :
+                 this->active_cell_iterators_on_level(this->n_levels() - 1))
               {
                 cell->set_coarsen_flag();
               }
-
-            this->prepare_coarsening_and_refinement();
             try
               {
                 dealii::Triangulation<dim, spacedim>::
