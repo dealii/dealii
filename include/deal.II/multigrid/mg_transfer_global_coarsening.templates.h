@@ -2139,7 +2139,6 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
   const bool fine_vectors_are_compatible =
     this->vec_fine.get_partitioner()->is_globally_compatible(
       *dst.get_partitioner());
-  std::cout << static_cast<int>(fine_vectors_are_compatible) << std::endl;
 
   const auto vec_fine_ptr =
     fine_vectors_are_compatible ? &dst : &this->vec_fine;
@@ -2321,7 +2320,6 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   const bool fine_vectors_are_compatible =
     this->vec_fine.get_partitioner()->is_globally_compatible(
       *src.get_partitioner());
-  std::cout << static_cast<int>(fine_vectors_are_compatible) << std::endl;
 
   const auto vec_fine_ptr =
     fine_vectors_are_compatible ? &src : &this->vec_fine;
