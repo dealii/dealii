@@ -1,0 +1,28 @@
+
+DEAL::dim = 2
+DEAL::Restricted direction = 0
+DEAL::value = 1.00000
+DEAL::gradient = 2.00000
+DEAL::Hessian = 3.00000
+DEAL::
+DEAL::Restricted direction = 1
+DEAL::value = 1.00000
+DEAL::gradient = 1.00000
+DEAL::Hessian = 1.00000
+DEAL::
+DEAL::dim = 3
+DEAL::Restricted direction = 0
+DEAL::value = 1.00000
+DEAL::gradient = 2.00000 3.00000
+DEAL::Hessian = 3.00000 4.00000 4.00000 5.00000
+DEAL::
+DEAL::Restricted direction = 1
+DEAL::value = 1.00000
+DEAL::gradient = 3.00000 1.00000
+DEAL::Hessian = 5.00000 3.00000 3.00000 1.00000
+DEAL::
+DEAL::Restricted direction = 2
+DEAL::value = 1.00000
+DEAL::gradient = 1.00000 2.00000
+DEAL::Hessian = 1.00000 2.00000 2.00000 3.00000
+DEAL::

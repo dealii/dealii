@@ -1,0 +1,28 @@
+
+DEAL::dim = 2
+DEAL::open direction = 0
+DEAL::1.00000
+DEAL::1.00000
+DEAL::1.00000
+DEAL::
+DEAL::open direction = 1
+DEAL::1.00000
+DEAL::2.00000
+DEAL::2.00000
+DEAL::
+DEAL::dim = 3
+DEAL::open direction = 0
+DEAL::1.00000
+DEAL::1.00000
+DEAL::1.00000
+DEAL::
+DEAL::open direction = 1
+DEAL::1.00000
+DEAL::2.00000
+DEAL::2.00000
+DEAL::
+DEAL::open direction = 2
+DEAL::1.00000
+DEAL::3.00000
+DEAL::3.00000
+DEAL::
