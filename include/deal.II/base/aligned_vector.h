@@ -325,6 +325,23 @@ public:
    *   typically in memory areas not accessible to the other processes.
    *   As a consequence, the usual use case for this function is to share
    *   arrays of simple objects such as `double`s or `int`s.
+   *
+   * @note After calling this function, objects on different MPI processes
+   *   share a common state. That means that certain operations become
+   *   "collective", i.e., they must be called on all participating
+   *   processors at the same time. In particular, you can no longer call
+   *   resize(), reserve(), or clear() on one MPI process -- you have to do
+   *   so on all processes at the same time, because they have to communicate
+   *   for these operations. If you do not do so, you will likely get
+   *   a deadlock that may be difficult to debug. By extension, this rule of
+   *   only collectively resizing extends to this function itself: You can
+   *   not call it twice in a row because that implies that first all but the
+   *   `root_process` throw away their data, which is not a collective
+   *   operation. Generally, these restrictions on what can and can not be
+   *   done hint at the correctness of the comments above: You should treat
+   *   an AlignedVector on which the current function has been called as
+   *   `const`, on which no further operations can be performed until
+   *   the destructor is called.
    */
   void
   replicate_across_communicator(const MPI_Comm &   communicator,
@@ -1114,6 +1131,17 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
 {
 #  ifdef DEAL_II_WITH_MPI
 #    if DEAL_II_MPI_VERSION_GTE(3, 0)
+
+  // **** Step 0 ****
+  // All but the root process no longer need their data, so release the memory
+  // used to store the previous elements.
+  if (Utilities::MPI::this_mpi_process(communicator) != root_process)
+    {
+      elements.reset();
+      used_elements_end      = nullptr;
+      allocated_elements_end = nullptr;
+    }
+
   // **** Step 1 ****
   // Create communicators for each group of processes that can use
   // shared memory areas. Within each of these groups, we don't care about
