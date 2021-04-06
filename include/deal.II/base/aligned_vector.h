@@ -21,6 +21,7 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/mpi.h>
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/utilities.h>
 
@@ -258,6 +259,35 @@ public:
    */
   void
   fill(const T &element);
+
+  /**
+   * This function replicates the state found on the process indicated by
+   * @p root_process across all processes of the MPI communicator. The current
+   * state found on any of the processes other than @p root_process is lost
+   * in this process. One can imagine this operation to act like a call to
+   * Utilities::MPI::broadcast() from the root process to all other processes.
+   *
+   * The intent of this function is to quickly exchange large arrays from
+   * one process to others, rather than having to compute or create it on
+   * all processes. This is specifically the case for data loaded from
+   * disk -- say, large data tables -- that are more easily dealt with by
+   * reading once and then distributing across all processes in an MPI
+   * universe, than letting each process read the data from disk itself.
+   *
+   * This function does not imply a model of keeping data on different processes
+   * in sync, as parallel::distributed::Vector and other vector classes do where
+   * there exists a notion of certain elements of the vector owned by each
+   * process and possibly ghost elements that are mirrored from its owning
+   * process to other processes. Rather, the elements of the current object are
+   * simply copied to the other processes, and it is useful to think of this
+   * operation as creating a set of `const` AlignedVector objects on all
+   * processes that can not be changed any more after the replication operation,
+   * as this is the only way to ensure that the vectors remain the same on all
+   * processes.
+   */
+  void
+  replicate_across_communicator(const MPI_Comm &   communicator,
+                                const unsigned int root_process);
 
   /**
    * Swaps the given vector with the calling vector.
@@ -1032,6 +1062,23 @@ inline void
 AlignedVector<T>::fill(const T &value)
 {
   dealii::internal::AlignedVectorSet<T, false>(size(), value, elements.get());
+}
+
+
+
+template <class T>
+inline void
+AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
+                                                const unsigned int root_process)
+{
+#  ifdef DEAL_II_WITH_MPI
+  // Simply broadcast the current object to all other processes
+  *this = Utilities::MPI::broadcast(communicator, *this, root_process);
+#  else
+  // No MPI -> nothing to replicate
+  (void)communicator;
+  (void)root_process;
+#  endif
 }
 
 
