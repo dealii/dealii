@@ -21,15 +21,19 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_space.h>
 #include <deal.II/base/symmetric_tensor.h>
-#include <deal.II/base/table.h>
 #include <deal.II/base/tensor.h>
-
-#include <deal.II/lac/lapack_full_matrix.h>
 
 #include <type_traits>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
+
+// Forward declaration
+template <int N, typename T>
+class Table;
+
+template <typename number>
+class LAPACKFullMatrix;
 
 
 /**
