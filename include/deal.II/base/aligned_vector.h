@@ -265,7 +265,11 @@ public:
    * @p root_process across all processes of the MPI communicator. The current
    * state found on any of the processes other than @p root_process is lost
    * in this process. One can imagine this operation to act like a call to
-   * Utilities::MPI::broadcast() from the root process to all other processes.
+   * Utilities::MPI::broadcast() from the root process to all other processes,
+   * though in practice the function may try to move the data into shared
+   * memory regions on each of the machines that host MPI processes and
+   * let all MPI processes on this machine then access this shared memory
+   * region instead of keeping their own copy.
    *
    * The intent of this function is to quickly exchange large arrays from
    * one process to others, rather than having to compute or create it on
@@ -273,6 +277,12 @@ public:
    * disk -- say, large data tables -- that are more easily dealt with by
    * reading once and then distributing across all processes in an MPI
    * universe, than letting each process read the data from disk itself.
+   * Specifically, the use of shared memory regions allows for replicating
+   * the data only once per multicore machine in the MPI universe, rather
+   * than replicating data once for each MPI process. This results in
+   * large memory savings if the data is large on today's machines that
+   * can easily house several dozen MPI processes per shared memory
+   * space.
    *
    * This function does not imply a model of keeping data on different processes
    * in sync, as parallel::distributed::Vector and other vector classes do where
@@ -281,9 +291,16 @@ public:
    * process to other processes. Rather, the elements of the current object are
    * simply copied to the other processes, and it is useful to think of this
    * operation as creating a set of `const` AlignedVector objects on all
-   * processes that can not be changed any more after the replication operation,
-   * as this is the only way to ensure that the vectors remain the same on all
-   * processes.
+   * processes that should not be changed any more after the replication
+   * operation, as this is the only way to ensure that the vectors remain the
+   * same on all processes. This is particularly true because of the use of
+   * shared memory regions where any modification of a vector element on one MPI
+   * process may also result in a modification of elements visible on other
+   * processes, assuming they are located within one shared memory node.
+   *
+   * @note The use of shared memory between MPI processes requires
+   *   that the detected MPI installation supports the necessary operations.
+   *   This is the case for MPI 3.0 and higher.
    */
   void
   replicate_across_communicator(const MPI_Comm &   communicator,
@@ -1072,8 +1089,147 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
                                                 const unsigned int root_process)
 {
 #  ifdef DEAL_II_WITH_MPI
-  // Simply broadcast the current object to all other processes
+#    if DEAL_II_MPI_VERSION_GTE(3, 0)
+  // **** Step 1 ****
+  // Create communicators for each group of processes that can use
+  // shared memory areas. Within each of these groups, we don't care about
+  // which rank each of the old processes gets except that we would like to
+  // make sure that the (global) root process will be have rank=0 within
+  // its own sub-communicator. We can do that through the third argument of
+  // MPI_Comm_split_type (the "key") which is an integer meant to indicate the
+  // order of processes within the split communicators, and we will set it to
+  // zero for the root processes and one for all others -- which means that
+  // for all of these other processes, MPI can choose whatever order it
+  // wants because they have the same key (MPI then documents that these ties
+  // will be broken according to these processes' rank in the old group).
+  //
+  // At least that's the theory. In practice, the MPI implementation where
+  // this function was developed on does not seem to do that. But it
+  // is willing to put the root process onto the *last* rank of the
+  // communicator.
+  MPI_Comm shmem_group_communicator;
+  {
+    const int key =
+      (Utilities::MPI::this_mpi_process(communicator) == root_process ?
+         Utilities::MPI::n_mpi_processes(communicator) :
+         0);
+    const int ierr = MPI_Comm_split_type(communicator,
+                                         MPI_COMM_TYPE_SHARED,
+                                         key,
+                                         MPI_INFO_NULL,
+                                         &shmem_group_communicator);
+    AssertThrowMPI(ierr);
+
+    // Verify the explanation from above
+    if (Utilities::MPI::this_mpi_process(communicator) == root_process)
+      Assert(Utilities::MPI::this_mpi_process(shmem_group_communicator) ==
+               Utilities::MPI::n_mpi_processes(shmem_group_communicator) - 1,
+             ExcInternalError());
+  }
+  const bool is_shmem_root =
+    Utilities::MPI::this_mpi_process(shmem_group_communicator) ==
+    Utilities::MPI::n_mpi_processes(shmem_group_communicator) - 1;
+
+  // **** Step 2 ****
+  // We then have to send the state of the current object from the
+  // root process to one exemplar in each shmem group. To this end,
+  // we create another subcommunicator that includes the ranks zero
+  // of all shmem groups, and because of the trick above, we know
+  // that this also includes the original root process.
+  //
+  // There are different ways of creating a "shmem_roots_communicator".
+  // The conceptually easiest way is to create an MPI_Group that only
+  // includes the shmem roots and then create a communicator from this
+  // by way of MPI_Comm_create or MPI_Comm_create_group. The problem
+  // with this is that we would have to exchange among all processes
+  // which ones are shmem roots and which are not. This is awkward.
+  //
+  // A simpler way is to use MPI_Comm_split that uses "colors" to
+  // indicate which sub-communicator each process wants to be in.
+  // We use color=0 to indicate the group of shmem roots, and color=1
+  // for all other processes -- the latter will simply not ever do
+  // anything among themselves with the communicator so created.
+  //
+  // Using MPI_Comm_split has the additional benefit that, just as above,
+  // we can choose where each rank will end up in the shmem roots communicator.
+  // We would again like to set key=0 for the original root_process -- in other
+  // word, we would then know that among the shmem roots, the original root has
+  // rank=0. But, just like above, this doesn't appear to be working, so we put
+  // the origin root at the *end* of the shmem roots communicator.
+  //
+  // In any case, this makes it easy to next determine which process among the
+  // shmem roots is the one who initiates the broad cast operation mentioned
+  // above
+  MPI_Comm shmem_roots_communicator;
+  {
+    const int key =
+      (Utilities::MPI::this_mpi_process(communicator) == root_process ?
+         Utilities::MPI::n_mpi_processes(communicator) :
+         0);
+
+    const int ierr = MPI_Comm_split(communicator,
+                                    /*color=*/
+                                    (is_shmem_root ? 0 : 1),
+                                    key,
+                                    &shmem_roots_communicator);
+    AssertThrowMPI(ierr);
+
+    // Again verify the explanation from above
+    if (Utilities::MPI::this_mpi_process(communicator) == root_process)
+      Assert(Utilities::MPI::this_mpi_process(shmem_roots_communicator) ==
+               Utilities::MPI::n_mpi_processes(shmem_roots_communicator) - 1,
+             ExcInternalError());
+  }
+
+  // Now let the original root_process broadcast the current object to all
+  // shmem roots. We know that the last rank is the original root process that
+  // has all of the data
+  if (is_shmem_root)
+    Utilities::MPI::broadcast(
+      shmem_roots_communicator,
+      *this,
+      Utilities::MPI::n_mpi_processes(shmem_roots_communicator) - 1);
+
+  // We no longer need the shmem roots communicator, so get rid of it
+  {
+    const int ierr = MPI_Comm_free(&shmem_roots_communicator);
+    AssertThrowMPI(ierr);
+  }
+  // **** Step 3 ****
+  // At this point, all shmem groups have one shmem root process that has
+  // a copy of the data. Let each of these shmem roots broadcast the
+  // data to the other processes in their shmem group. As mentioned above,
+  // we know that the shmem roots is the last rank in their respective
+  // shmem_group_communicator.
+  *this = Utilities::MPI::broadcast(
+    shmem_group_communicator,
+    *this,
+    Utilities::MPI::n_mpi_processes(shmem_group_communicator) - 1);
+
+  // We now also no longer need the shmem group communicators, so get rid of
+  // them
+  {
+    const int ierr = MPI_Comm_free(&shmem_group_communicator);
+    AssertThrowMPI(ierr);
+  }
+
+  // **** Consistency check ****
+  // At this point, each process should have a copy of the data.
+  // Verify this in some sort of round-about way
+#      ifdef DEBUG
+  const std::vector<char> packed_data = Utilities::pack(*this);
+  const int               hash =
+    std::accumulate(packed_data.begin(), packed_data.end(), int(0));
+  Assert(Utilities::MPI::max(hash, communicator) == hash, ExcInternalError());
+#      endif
+
+
+
+#    else
+  // If we only have MPI 2.x, then simply broadcast the current object to all
+  // other processes and forego the idea of using shmem
   *this = Utilities::MPI::broadcast(communicator, *this, root_process);
+#    endif
 #  else
   // No MPI -> nothing to replicate
   (void)communicator;
