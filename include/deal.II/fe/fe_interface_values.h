@@ -25,6 +25,323 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifndef DOXYGEN
+template <int dim, int spacedim>
+class FEInterfaceValues;
+#endif
+
+/**
+ * Namespace for views you get from accessing FEInterfaceValues using an
+ * extractor.
+ */
+namespace FEInterfaceViews
+{
+  /**
+   * The base class for the views.
+   */
+  template <int dim, int spacedim = dim>
+  class Base
+  {
+  public:
+    /**
+     * The constructor.
+     **/
+    Base(const FEInterfaceValues<dim, spacedim> &fe_interface);
+
+  protected:
+    /**
+     * Store a pointer to the FEInterfaceValues instance.
+     */
+    const FEInterfaceValues<dim, spacedim> *fe_interface;
+  };
+
+
+
+  /**
+   * The view of a scalar variable for FEInterfaceValues.
+   */
+  template <int dim, int spacedim = dim>
+  class Scalar : public Base<dim, spacedim>
+  {
+  public:
+    /**
+     * This is the type returned for values.
+     */
+    using value_type = double;
+
+    /**
+     * This is the type returned for gradients, for example from
+     * average_gradient().
+     */
+    using gradient_type =
+      typename FEValuesViews::Scalar<dim, spacedim>::gradient_type;
+
+    /**
+     * This is the type returned for hessians, for example from jump_hessian().
+     */
+    using hessian_type =
+      typename FEValuesViews::Scalar<dim, spacedim>::hessian_type;
+
+    /**
+     * This is the type returned for third derivatives, for example from
+     * jump_hessian().
+     */
+    using third_derivative_type =
+      typename FEValuesViews::Scalar<dim, spacedim>::third_derivative_type;
+
+    /**
+     * Constructor for an object that represents a single scalar component
+     */
+    Scalar(const FEInterfaceValues<dim, spacedim> &fe_interface,
+           const unsigned int                      component);
+
+    /**
+     * Return the value of the shape function
+     * with interface dof index @p interface_dof_index in
+     * quadrature point @p q_point of the component selected by this view.
+     *
+     * The argument @p here_or_there selects between the upstream value and
+     * the downstream value as defined by the direction of the normal vector
+     * in this quadrature point. If @p here_or_there is true, the shape
+     * functions from the first cell of the interface is used.
+     *
+     * In other words, this function returns the limit of the value of the shape
+     * function in the given quadrature point when approaching it from one of
+     * the two cells of the interface.
+     *
+     * @note This function is typically used to pick the upstream or downstream
+     * value based on a direction. This can be achieved by using
+     * <code>(direction * normal)>0</code> as the first argument of this
+     * function.
+     */
+    value_type
+    value(const bool         here_or_there,
+          const unsigned int interface_dof_index,
+          const unsigned int q_point) const;
+
+    /**
+     * Return the jump $\jump{u}=u_1 - u_2$ on the interface for the shape
+     * function
+     * @p interface_dof_index in the quadrature point @p q_point
+     * of the component selected by this view.
+     */
+    value_type
+    jump(const unsigned int interface_dof_index,
+         const unsigned int q_point) const;
+
+    /**
+     * Return the average value $\average{u}=\frac{1}{2}(u_1 + u_2)$ on the
+     * interface for the shape
+     * function @p interface_dof_index in the quadrature point @p q_point
+     * of the component selected by this view.
+     */
+    value_type
+    average(const unsigned int interface_dof_index,
+            const unsigned int q_point) const;
+
+    /**
+     * Return the average of the gradient $\average{\nabla u}$ on the interface
+     * for the shape
+     * function @p interface_dof_index in the quadrature point @p q_point
+     * of the component selected by this view.
+     */
+    gradient_type
+    average_gradient(const unsigned int interface_dof_index,
+                     const unsigned int q_point) const;
+
+    /**
+     * Return the jump of the gradient $\jump{nabla u}$ on the interface for
+     * the shape
+     * function @p interface_dof_index in the quadrature point @p q_point
+     * of the component selected by this view.
+     */
+    gradient_type
+    jump_gradient(const unsigned int interface_dof_index,
+                  const unsigned int q_point) const;
+
+    /**
+     * Return the average of the Hessian $\average{\nabla^2 u} =
+     * \frac{1}{2}\nabla^2 u_{\text{cell0}} + \frac{1}{2} \nabla^2
+     * u_{\text{cell1}}$ on the interface
+     * for the shape function @p interface_dof_index at the quadrature point @p
+     * q_point of the component selected by this view.
+     */
+    hessian_type
+    average_hessian(const unsigned int interface_dof_index,
+                    const unsigned int q_point) const;
+
+    /**
+     * Return the jump in the gradient $\jump{\nabla u}=\nabla u_{\text{cell0}}
+     * - \nabla u_{\text{cell1}}$ on the interface for the shape function @p
+     * interface_dof_index at the quadrature point @p q_point of
+     * the component selected by this view.
+     */
+    hessian_type
+    jump_hessian(const unsigned int interface_dof_index,
+                 const unsigned int q_point) const;
+
+    /**
+     * Return the jump in the third derivative $\jump{\nabla^3 u} = \nabla^3
+     * u_{\text{cell0}} - \nabla^3 u_{\text{cell1}}$ on the interface for the
+     * shape function @p interface_dof_index at the quadrature point @p q_point of
+     * the component selected by this view.
+     */
+    third_derivative_type
+    jump_3rd_derivative(const unsigned int interface_dof_index,
+                        const unsigned int q_point) const;
+
+  private:
+    /**
+     * The extractor for this view.
+     */
+    const FEValuesExtractors::Scalar extractor;
+  };
+
+
+
+  /**
+   * The view of a vector-valued variable for FEInterfaceValues.
+   */
+  template <int dim, int spacedim = dim>
+  class Vector : public Base<dim, spacedim>
+  {
+  public:
+    /**
+     * This is the type returned for values.
+     */
+    using value_type =
+      typename FEValuesViews::Vector<dim, spacedim>::value_type;
+
+    /**
+     * This is the type returned for gradients, for example from
+     * average_gradient().
+     */
+    using gradient_type =
+      typename FEValuesViews::Vector<dim, spacedim>::gradient_type;
+
+    /**
+     * An alias for the type of second derivatives of the view this class
+     * represents. Here, for a set of <code>dim</code> components of the
+     * finite element, the Hessian is a <code>Tensor@<3,dim@></code>.
+     */
+    using hessian_type =
+      typename FEValuesViews::Vector<dim, spacedim>::hessian_type;
+
+    /**
+     * An alias for the type of third derivatives of the view this class
+     * represents. Here, for a set of <code>dim</code> components of the
+     * finite element, the third derivative is a <code>Tensor@<4,dim@></code>.
+     */
+    using third_derivative_type =
+      typename FEValuesViews::Vector<dim, spacedim>::third_derivative_type;
+
+    /**
+     * Constructor for an object that represents a vector component
+     */
+    Vector(const FEInterfaceValues<dim, spacedim> &fe_interface,
+           const unsigned int                      first_vector_component);
+
+    /**
+     * Return the value of the vector components selected by this view
+     * with interface dof index @p interface_dof_index in
+     * quadrature point @p q_point.
+     *
+     * The argument @p here_or_there selects between the upstream value and
+     * the downstream value as defined by the direction of the normal vector
+     * in this quadrature point. If @p here_or_there is true, the shape
+     * functions from the first cell of the interface is used.
+     *
+     * In other words, this function returns the limit of the value of the shape
+     * function in the given quadrature point when approaching it from one of
+     * the two cells of the interface.
+     *
+     * @note This function is typically used to pick the upstream or downstream
+     * value based on a direction. This can be achieved by using
+     * <code>(direction * normal)>0</code> as the first argument of this
+     * function.
+     */
+    value_type
+    value(const bool         here_or_there,
+          const unsigned int interface_dof_index,
+          const unsigned int q_point) const;
+
+    /**
+     * Return the jump vector $[\mathbf{u}]=\mathbf{u_1} - \mathbf{u_2}$ on the
+     * interface for the shape function
+     * @p interface_dof_index in the quadrature point @p q_point.
+     */
+    value_type
+    jump(const unsigned int interface_dof_index,
+         const unsigned int q_point) const;
+
+    /**
+     * Return the average vector $\average{\mathbf{u}}=\frac{1}{2}(\matbf{u_1} +
+     * \mathbf{u_2})$ on the interface for the shape
+     * function @p interface_dof_index in the quadrature point @p q_point.
+     */
+    value_type
+    average(const unsigned int interface_dof_index,
+            const unsigned int q_point) const;
+
+    /**
+     * Return the average of the gradient (a tensor of rank 2) $\average{\nabla
+     * \mathbf{u}}$ on the interface for the shape
+     * function @p interface_dof_index in the quadrature point @p q_point.
+     */
+    gradient_type
+    average_gradient(const unsigned int interface_dof_index,
+                     const unsigned int q_point) const;
+
+    /**
+     * Return the jump of the gradient (a tensor of rank 2) $\jump{\nabla
+     * \mathbf{u}}$ on the interface for the shape
+     * function @p interface_dof_index in the quadrature point @p q_point.
+     */
+    gradient_type
+    jump_gradient(const unsigned int interface_dof_index,
+                  const unsigned int q_point) const;
+
+    /**
+     * Return the average of the Hessian $\average{\nabla^2 u} =
+     * \frac{1}{2}\nabla^2 u_{\text{cell0}} + \frac{1}{2} \nabla^2
+     * u_{\text{cell1}}$ on the interface
+     * for the shape function @p interface_dof_index at the quadrature point @p
+     * q_point of the component selected by this view.
+     */
+    hessian_type
+    average_hessian(const unsigned int interface_dof_index,
+                    const unsigned int q_point) const;
+
+    /**
+     * Return the jump in the gradient $\jump{\nabla u}=\nabla u_{\text{cell0}}
+     * - \nabla u_{\text{cell1}}$ on the interface for the shape function @p
+     * interface_dof_index at the quadrature point @p q_point of
+     * the component selected by this view.
+     */
+    hessian_type
+    jump_hessian(const unsigned int interface_dof_index,
+                 const unsigned int q_point) const;
+
+    /**
+     * Return the jump in the third derivative $\jump{\nabla^3 u} = \nabla^3
+     * u_{\text{cell0}} - \nabla^3 u_{\text{cell1}}$ on the interface for the
+     * shape function @p interface_dof_index at the quadrature point @p q_point of
+     * the component selected by this view.
+     */
+    third_derivative_type
+    jump_3rd_derivative(const unsigned int interface_dof_index,
+                        const unsigned int q_point) const;
+
+  private:
+    /**
+     * The extractor for this view.
+     */
+    const FEValuesExtractors::Vector extractor;
+  };
+} // namespace FEInterfaceViews
+
+
+
 /**
  * FEInterfaceValues is a data structure to access and assemble finite element
  * data on interfaces between two cells of a mesh.
@@ -57,7 +374,6 @@ public:
    * Number of quadrature points.
    */
   const unsigned int n_quadrature_points;
-
 
   /**
    * Construct the FEInterfaceValues with a single FiniteElement (same on both
@@ -99,8 +415,8 @@ public:
    * sub_face_no_neighbor to indicate that you want to work on the entire face,
    * not a sub-face.
    *
-   * The arguments (including their order) are identical to the @p face_worker arguments
-   * in MeshWorker::mesh_loop().
+   * The arguments (including their order) are identical to the @p face_worker
+   * arguments in MeshWorker::mesh_loop().
    *
    * @param[in] cell An iterator to the first cell adjacent to the interface.
    * @param[in] face_no An integer identifying which face of the first cell the
@@ -234,7 +550,6 @@ public:
   const std::vector<Point<spacedim>> &
   get_quadrature_points() const;
 
-
   /**
    * Return the number of DoFs (or shape functions) on the current interface.
    *
@@ -255,8 +570,8 @@ public:
    * in case of level cell (that is, if is_level_cell() return true )
    * the mg dof indices are returned.
    *
-   * @note This function is only available after a call to reinit() and can change
-   * from one call to reinit() to the next.
+   * @note This function is only available after a call to reinit() and can
+   * change from one call to reinit() to the next.
    */
   std::vector<types::global_dof_index>
   get_interface_dof_indices() const;
@@ -269,8 +584,8 @@ public:
    * For discontinuous finite elements each interface dof will correspond to
    * exactly one DoF index.
    *
-   * @note This function is only available after a call to reinit() and can change
-   * from one call to reinit() to the next.
+   * @note This function is only available after a call to reinit() and can
+   * change from one call to reinit() to the next.
    */
   std::array<unsigned int, 2>
   interface_dof_to_dof_indices(const unsigned int interface_dof_index) const;
@@ -428,6 +743,24 @@ public:
                       const unsigned int component = 0) const;
 
   /**
+   * Create a view of the current FEInterfaceValues object that represents a
+   * particular scalar component of the possibly vector-valued finite element.
+   * The concept of views is explained in the documentation of the namespace
+   * FEValuesViews.
+   */
+  const FEInterfaceViews::Scalar<dim, spacedim>
+  operator[](const FEValuesExtractors::Scalar &scalar) const;
+
+  /**
+   * Create a view of the current FEInterfaceValues object that represents a set
+   * of <code>dim</code> scalar components (i.e. a vector) of the vector-valued
+   * finite element. The concept of views is explained in the documentation of
+   * the namespace FEValuesViews.
+   */
+  const FEInterfaceViews::Vector<dim, spacedim>
+  operator[](const FEValuesExtractors::Vector &vector) const;
+
+  /**
    * @}
    */
 
@@ -498,6 +831,8 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
   , fe_face_values(nullptr)
   , fe_face_values_neighbor(nullptr)
 {}
+
+
 
 template <int dim, int spacedim>
 FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
@@ -601,8 +936,6 @@ FEInterfaceValues<dim, spacedim>::reinit(
       fe_face_values_neighbor->get_fe().n_dofs_per_cell());
     cell_neighbor->get_active_or_mg_dof_indices(v2);
 
-
-
     // Fill a map from the global dof index to the left and right
     // local index.
     std::map<types::global_dof_index, std::pair<unsigned int, unsigned int>>
@@ -651,7 +984,6 @@ FEInterfaceValues<dim, spacedim>::reinit(const CellIteratorType &cell,
 
   interface_dof_indices.resize(fe_face_values->get_fe().n_dofs_per_cell());
   cell->get_active_or_mg_dof_indices(interface_dof_indices);
-
 
   dofmap.resize(interface_dof_indices.size());
 
@@ -1006,6 +1338,7 @@ FEInterfaceValues<dim, spacedim>::jump_hessian(
 }
 
 
+
 template <int dim, int spacedim>
 Tensor<3, spacedim>
 FEInterfaceValues<dim, spacedim>::jump_3rd_derivative(
@@ -1036,6 +1369,299 @@ FEInterfaceValues<dim, spacedim>::jump_3rd_derivative(
   return value;
 }
 
+
+
+/*------------ Inline functions: FEInterfaceValues------------*/
+template <int dim, int spacedim>
+inline const FEInterfaceViews::Scalar<dim, spacedim>
+  FEInterfaceValues<dim, spacedim>::
+  operator[](const FEValuesExtractors::Scalar &scalar) const
+{
+  AssertIndexRange(scalar.component, this->get_fe().n_components());
+  return FEInterfaceViews::Scalar<dim, spacedim>(*this, scalar.component);
+}
+
+
+
+template <int dim, int spacedim>
+inline const FEInterfaceViews::Vector<dim, spacedim>
+  FEInterfaceValues<dim, spacedim>::
+  operator[](const FEValuesExtractors::Vector &vector) const
+{
+  const FiniteElement<dim, spacedim> &fe = this->get_fe();
+  const unsigned int                  n_vectors =
+    (fe.n_components() >= Tensor<1, spacedim>::n_independent_components ?
+       fe.n_components() - Tensor<1, spacedim>::n_independent_components + 1 :
+       0);
+  AssertIndexRange(vector.first_vector_component, n_vectors);
+  return FEInterfaceViews::Vector<dim, spacedim>(*this,
+                                                 vector.first_vector_component);
+}
+
+
+
+namespace FEInterfaceViews
+{
+  template <int dim, int spacedim>
+  Base<dim, spacedim>::Base(
+    const FEInterfaceValues<dim, spacedim> &fe_interface)
+    : fe_interface(&fe_interface)
+  {}
+
+
+
+  template <int dim, int spacedim>
+  Scalar<dim, spacedim>::Scalar(
+    const FEInterfaceValues<dim, spacedim> &fe_interface,
+    const unsigned int                      component)
+    : Base<dim, spacedim>(fe_interface)
+    , extractor(component)
+  {}
+
+
+
+  template <int dim, int spacedim>
+  typename Scalar<dim, spacedim>::value_type
+  Scalar<dim, spacedim>::value(const bool         here_or_there,
+                               const unsigned int interface_dof_index,
+                               const unsigned int q_point) const
+  {
+    return this->fe_interface->shape_value(here_or_there,
+                                           interface_dof_index,
+                                           q_point,
+                                           extractor.component);
+  }
+
+
+
+  template <int dim, int spacedim>
+  typename Scalar<dim, spacedim>::value_type
+  Scalar<dim, spacedim>::jump(const unsigned int interface_dof_index,
+                              const unsigned int q_point) const
+  {
+    return this->fe_interface->jump(interface_dof_index,
+                                    q_point,
+                                    extractor.component);
+  }
+
+
+
+  template <int dim, int spacedim>
+  typename Scalar<dim, spacedim>::value_type
+  Scalar<dim, spacedim>::average(const unsigned int interface_dof_index,
+                                 const unsigned int q_point) const
+  {
+    return this->fe_interface->average(interface_dof_index,
+                                       q_point,
+                                       extractor.component);
+  }
+
+
+
+  template <int dim, int spacedim>
+  typename Scalar<dim, spacedim>::gradient_type
+  Scalar<dim, spacedim>::average_gradient(
+    const unsigned int interface_dof_index,
+    const unsigned int q_point) const
+  {
+    return this->fe_interface->average_gradient(interface_dof_index,
+                                                q_point,
+                                                extractor.component);
+  }
+
+
+
+  template <int dim, int spacedim>
+  typename Scalar<dim, spacedim>::gradient_type
+  Scalar<dim, spacedim>::jump_gradient(const unsigned int interface_dof_index,
+                                       const unsigned int q_point) const
+  {
+    return this->fe_interface->jump_gradient(interface_dof_index,
+                                             q_point,
+                                             extractor.component);
+  }
+
+
+
+  template <int dim, int spacedim>
+  typename Scalar<dim, spacedim>::hessian_type
+  Scalar<dim, spacedim>::average_hessian(const unsigned int interface_dof_index,
+                                         const unsigned int q_point) const
+  {
+    return this->fe_interface->average_hessian(interface_dof_index,
+                                               q_point,
+                                               extractor.component);
+  }
+
+
+
+  template <int dim, int spacedim>
+  typename Scalar<dim, spacedim>::third_derivative_type
+  Scalar<dim, spacedim>::jump_3rd_derivative(
+    const unsigned int interface_dof_index,
+    const unsigned int q_point) const
+  {
+    return this->fe_interface->jump_3rd_derivative(interface_dof_index,
+                                                   q_point,
+                                                   extractor.component);
+  }
+
+
+
+  template <int dim, int spacedim>
+  typename Scalar<dim, spacedim>::hessian_type
+  Scalar<dim, spacedim>::jump_hessian(const unsigned int interface_dof_index,
+                                      const unsigned int q_point) const
+  {
+    return this->fe_interface->jump_hessian(interface_dof_index,
+                                            q_point,
+                                            extractor.component);
+  }
+
+
+
+  template <int dim, int spacedim>
+  Vector<dim, spacedim>::Vector(
+    const FEInterfaceValues<dim, spacedim> &fe_interface,
+    const unsigned int                      first_vector_component)
+    : Base<dim, spacedim>(fe_interface)
+    , extractor(first_vector_component)
+  {}
+
+
+
+  template <int dim, int spacedim>
+  typename Vector<dim, spacedim>::value_type
+  Vector<dim, spacedim>::value(const bool         here_or_there,
+                               const unsigned int interface_dof_index,
+                               const unsigned int q_point) const
+  {
+    value_type result;
+    for (int d = 0; d < dim; ++d)
+      result[d] =
+        this->fe_interface->shape_value(here_or_there,
+                                        interface_dof_index,
+                                        q_point,
+                                        d + extractor.first_vector_component);
+
+    return result;
+  }
+
+
+
+  template <int dim, int spacedim>
+  typename Vector<dim, spacedim>::value_type
+  Vector<dim, spacedim>::jump(const unsigned int interface_dof_index,
+                              const unsigned int q_point) const
+  {
+    value_type result;
+    for (int d = 0; d < dim; ++d)
+      result[d] =
+        this->fe_interface->jump(interface_dof_index,
+                                 q_point,
+                                 d + extractor.first_vector_component);
+
+    return result;
+  }
+
+
+
+  template <int dim, int spacedim>
+  typename Vector<dim, spacedim>::value_type
+  Vector<dim, spacedim>::average(const unsigned int interface_dof_index,
+                                 const unsigned int q_point) const
+  {
+    value_type result;
+    for (int d = 0; d < dim; ++d)
+      result[d] =
+        this->fe_interface->average(interface_dof_index,
+                                    q_point,
+                                    d + extractor.first_vector_component);
+
+    return result;
+  }
+
+
+
+  template <int dim, int spacedim>
+  typename Vector<dim, spacedim>::gradient_type
+  Vector<dim, spacedim>::average_gradient(
+    const unsigned int interface_dof_index,
+    const unsigned int q_point) const
+  {
+    gradient_type result;
+    for (int d = 0; d < dim; ++d)
+      result[d] = this->fe_interface->average_gradient(
+        interface_dof_index, q_point, d + extractor.first_vector_component);
+
+    return result;
+  }
+
+
+
+  template <int dim, int spacedim>
+  typename Vector<dim, spacedim>::gradient_type
+  Vector<dim, spacedim>::jump_gradient(const unsigned int interface_dof_index,
+                                       const unsigned int q_point) const
+  {
+    gradient_type result;
+    for (int d = 0; d < dim; ++d)
+      result[d] =
+        this->fe_interface->jump_gradient(interface_dof_index,
+                                          q_point,
+                                          d + extractor.first_vector_component);
+
+    return result;
+  }
+
+
+
+  template <int dim, int spacedim>
+  typename Vector<dim, spacedim>::hessian_type
+  Vector<dim, spacedim>::average_hessian(const unsigned int interface_dof_index,
+                                         const unsigned int q_point) const
+  {
+    hessian_type result;
+    for (int d = 0; d < dim; ++d)
+      result[d] = this->fe_interface->average_hessian(
+        interface_dof_index, q_point, d + extractor.first_vector_component);
+
+    return result;
+  }
+
+
+
+  template <int dim, int spacedim>
+  typename Vector<dim, spacedim>::hessian_type
+  Vector<dim, spacedim>::jump_hessian(const unsigned int interface_dof_index,
+                                      const unsigned int q_point) const
+  {
+    hessian_type result;
+    for (int d = 0; d < dim; ++d)
+      result[d] =
+        this->fe_interface->jump_hessian(interface_dof_index,
+                                         q_point,
+                                         d + extractor.first_vector_component);
+
+    return result;
+  }
+
+
+
+  template <int dim, int spacedim>
+  typename Vector<dim, spacedim>::third_derivative_type
+  Vector<dim, spacedim>::jump_3rd_derivative(
+    const unsigned int interface_dof_index,
+    const unsigned int q_point) const
+  {
+    third_derivative_type result;
+    for (int d = 0; d < dim; ++d)
+      result[d] = this->fe_interface->jump_3rd_derivative(
+        interface_dof_index, q_point, d + extractor.first_vector_component);
+
+    return result;
+  }
+} // namespace FEInterfaceViews
 
 #endif // DOXYGEN
 
