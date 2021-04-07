@@ -22,6 +22,9 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/thread_management.h>
 
+#include <deal.II/lac/vector.h>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declaration
