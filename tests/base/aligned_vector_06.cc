@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Make sure that we don't get into troubl for a vector that is empty
+// Make sure that we don't get into trouble for a vector that is empty
 // -- the AlignedVector class uses a custom deleter that aborts if the
 // object is not storing any data, but this deleter should not be
 // called in that case.
