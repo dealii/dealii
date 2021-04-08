@@ -33,7 +33,7 @@
 #  include <boost/signals2.hpp>
 
 #  include <kinsol/kinsol.h>
-#  if DEAL_II_SUNDIALS_VERSION_LT(5, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_LT(4, 1, 0)
 #    include <kinsol/kinsol_impl.h>
 #  endif
 #  include <nvector/nvector_serial.h>
