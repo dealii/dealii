@@ -3279,16 +3279,19 @@ namespace internal
     find_vector_in_mf(const VectorType &vec,
                       const bool        check_global_compatibility = true) const
     {
-      (void)check_global_compatibility;
+      // case 1: vector was set up with MatrixFree::initialize_dof_vector()
       for (unsigned int c = 0; c < matrix_free.n_components(); ++c)
-        if (
-#  ifdef DEBUG
-          check_global_compatibility ?
-            vec.get_partitioner()->is_globally_compatible(
-              *matrix_free.get_dof_info(c).vector_partitioner) :
-#  endif
-            vec.get_partitioner()->is_compatible(
-              *matrix_free.get_dof_info(c).vector_partitioner))
+        if (vec.get_partitioner().get() ==
+            matrix_free.get_dof_info(c).vector_partitioner.get())
+          return c;
+
+      // case 2: user provided own partitioner (compatibility mode)
+      for (unsigned int c = 0; c < matrix_free.n_components(); ++c)
+        if (check_global_compatibility ?
+              vec.get_partitioner()->is_globally_compatible(
+                *matrix_free.get_dof_info(c).vector_partitioner) :
+              vec.get_partitioner()->is_compatible(
+                *matrix_free.get_dof_info(c).vector_partitioner))
           return c;
 
       Assert(false,
