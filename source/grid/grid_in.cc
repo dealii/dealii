@@ -719,11 +719,13 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
       if ((((type == 44) || (type == 94)) && (dim == 2)) ||
           ((type == 115) && (dim == 3))) // cell
         {
+          const auto reference_cell = ReferenceCells::get_hypercube<dim>();
           cells.emplace_back();
 
           AssertThrow(in, ExcIO());
           for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
-            in >> cells.back().vertices[v];
+            in >> cells.back()
+                    .vertices[reference_cell.unv_vertex_to_deal_vertex(v)];
 
           cells.back().material_id = 0;
 
@@ -759,12 +761,16 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
         }
       else if (((type == 44) || (type == 94)) && (dim == 3)) // boundary quad
         {
+          const auto reference_cell = ReferenceCells::Quadrilateral;
           subcelldata.boundary_quads.emplace_back();
 
           AssertThrow(in, ExcIO());
-          for (unsigned int &vertex :
-               subcelldata.boundary_quads.back().vertices)
-            in >> vertex;
+          Assert(subcelldata.boundary_quads.back().vertices.size() ==
+                   GeometryInfo<2>::vertices_per_cell,
+                 ExcInternalError());
+          for (const unsigned int v : GeometryInfo<2>::vertex_indices())
+            in >> subcelldata.boundary_quads.back()
+                    .vertices[reference_cell.unv_vertex_to_deal_vertex(v)];
 
           subcelldata.boundary_quads.back().material_id = 0;
 
@@ -860,11 +866,12 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
 
   if (dim == spacedim)
     GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
-                                                                     cells);
+                                                                     cells,
+                                                                     true);
 
-  GridReordering<dim, spacedim>::reorder_cells(cells);
+  GridReordering<dim, spacedim>::reorder_cells(cells, true);
 
-  tria->create_triangulation_compatibility(vertices, cells, subcelldata);
+  tria->create_triangulation(vertices, cells, subcelldata);
 }
 
 
