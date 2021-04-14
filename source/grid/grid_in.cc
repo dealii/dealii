@@ -1319,7 +1319,7 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
       cells.emplace_back();
       for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         {
-          in >> cells.back().vertices[i];
+          in >> cells.back().vertices[GeometryInfo<dim>::ucd_to_deal[i]];
 
           AssertThrow((cells.back().vertices[i] >= 1) &&
                         (static_cast<unsigned int>(cells.back().vertices[i]) <=
@@ -1357,9 +1357,10 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
   // ...and cells
   GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
-                                                                   cells);
-  GridReordering<dim, spacedim>::reorder_cells(cells);
-  tria->create_triangulation_compatibility(vertices, cells, subcelldata);
+                                                                   cells,
+                                                                   true);
+  GridReordering<dim, spacedim>::reorder_cells(cells, true);
+  tria->create_triangulation(vertices, cells, subcelldata);
 }
 
 
