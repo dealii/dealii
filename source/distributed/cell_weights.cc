@@ -176,6 +176,10 @@ namespace parallel
              "Triangulation associated with the DoFHandler has changed!"));
     (void)triangulation;
 
+    // Skip if the DoFHandler has not been initialized yet.
+    if (dof_handler.get_fe_collection().size() == 0)
+      return 0;
+
     // Convert cell type from Triangulation to DoFHandler to be able
     // to access the information about the degrees of freedom.
     const typename DoFHandler<dim, spacedim>::cell_iterator cell(*cell_,
