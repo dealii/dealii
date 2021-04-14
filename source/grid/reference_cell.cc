@@ -334,6 +334,42 @@ ReferenceCell::exodusii_face_to_deal_face(const unsigned int face_n) const
 
 
 unsigned int
+ReferenceCell::unv_vertex_to_deal_vertex(const unsigned int vertex_n) const
+{
+  AssertIndexRange(vertex_n, n_vertices());
+  // Information on this file format isn't easy to find - the documents here
+  //
+  // https://www.ceas3.uc.edu/sdrluff/
+  //
+  // Don't actually explain anything about the sections we care about (2412) in
+  // any detail. For node numbering I worked backwards from what is actually in
+  // our test files (since that's supposed to work), which all use some
+  // non-standard clockwise numbering scheme which starts at the bottom right
+  // vertex.
+  if (*this == ReferenceCells::Line)
+    {
+      return vertex_n;
+    }
+  else if (*this == ReferenceCells::Quadrilateral)
+    {
+      constexpr std::array<unsigned int, 4> unv_to_deal{{1, 0, 2, 3}};
+      return unv_to_deal[vertex_n];
+    }
+  else if (*this == ReferenceCells::Hexahedron)
+    {
+      constexpr std::array<unsigned int, 8> unv_to_deal{
+        {6, 7, 5, 4, 2, 3, 1, 0}};
+      return unv_to_deal[vertex_n];
+    }
+
+  Assert(false, ExcNotImplemented());
+
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+unsigned int
 ReferenceCell::vtk_linear_type() const
 {
   if (*this == ReferenceCells::Vertex)

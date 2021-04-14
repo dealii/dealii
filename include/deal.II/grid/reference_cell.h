@@ -469,6 +469,12 @@ public:
   exodusii_face_to_deal_face(const unsigned int face_n) const;
 
   /**
+   * Map a UNV vertex number to a deal.II vertex number.
+   */
+  unsigned int
+  unv_vertex_to_deal_vertex(const unsigned int vertex_n) const;
+
+  /**
    * Return a VTK linear shape constant that corresponds to the reference cell.
    */
   unsigned int
