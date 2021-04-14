@@ -896,8 +896,8 @@ namespace internal
         // can be called even if level_dof_access==false.
         (void)count_level_dofs;
 
-        AssertDimension(dof_indices.size(),
-                        n_dof_indices(accessor, fe_index, count_level_dofs));
+        AssertIndexRange(n_dof_indices(accessor, fe_index, count_level_dofs),
+                         dof_indices.size() + 1);
 
         const auto &fe = accessor.get_fe(fe_index);
 
@@ -958,7 +958,17 @@ namespace internal
                                    dof_indices,
                                    fe_index);
 
-        AssertDimension(dof_indices.size(), index);
+        AssertDimension(n_dof_indices(accessor, fe_index, count_level_dofs),
+                        index);
+
+        // PM: This is a part that should not be reached since it indicates that
+        // an object (and/or its subobjects) is not active. However,
+        // unfortunately this function is called by
+        // DoFTools::set_periodicity_constraints() indirectly by
+        // get_dof_indices() also for artificial faces to determine if a face
+        // is artificial.
+        for (; index < dof_indices.size(); ++index)
+          dof_operation.process_non_active_dof(dof_indices, index);
       }
 
 
@@ -1045,6 +1055,17 @@ namespace internal
           const unsigned int) const
         {
           Assert(false, ExcInternalError());
+        }
+
+        /**
+         * Process non-active DoF.
+         */
+        DEAL_II_ALWAYS_INLINE void
+        process_non_active_dof(
+          std::vector<types::global_dof_index> &dof_indices,
+          const unsigned int                    index) const
+        {
+          dof_indices[index] = numbers::invalid_dof_index;
         }
       };
 
@@ -1133,6 +1154,16 @@ namespace internal
         {
           Assert(false, ExcInternalError());
         }
+
+        /**
+         * Process non-active DoF.
+         */
+        DEAL_II_ALWAYS_INLINE void
+        process_non_active_dof(const std::vector<types::global_dof_index> &,
+                               const unsigned int) const
+        {
+          Assert(false, ExcInternalError());
+        }
       };
 
 
@@ -1204,6 +1235,16 @@ namespace internal
           unsigned int &,
           std::vector<types::global_dof_index> &,
           const unsigned int) const
+        {
+          Assert(false, ExcInternalError());
+        }
+
+        /**
+         * Process non-active DoF.
+         */
+        DEAL_II_ALWAYS_INLINE void
+        process_non_active_dof(std::vector<types::global_dof_index> &,
+                               const unsigned int) const
         {
           Assert(false, ExcInternalError());
         }
@@ -1284,6 +1325,16 @@ namespace internal
           unsigned int &,
           const std::vector<types::global_dof_index> &,
           const unsigned int) const
+        {
+          Assert(false, ExcInternalError());
+        }
+
+        /**
+         * Process non-active DoF.
+         */
+        DEAL_II_ALWAYS_INLINE void
+        process_non_active_dof(const std::vector<types::global_dof_index> &,
+                               const unsigned int) const
         {
           Assert(false, ExcInternalError());
         }
