@@ -1260,8 +1260,18 @@ GridReordering<3>::invert_all_cells_of_negative_grid(
         {
           ++n_negative_cells;
           // reorder vertices: swap front and back face
-          for (unsigned int i = 0; i < 4; ++i)
-            std::swap(cell.vertices[i], cell.vertices[i + 4]);
+          if (use_new_style_ordering)
+            {
+              std::swap(cell.vertices[0], cell.vertices[2]);
+              std::swap(cell.vertices[1], cell.vertices[3]);
+              std::swap(cell.vertices[4], cell.vertices[6]);
+              std::swap(cell.vertices[5], cell.vertices[7]);
+            }
+          else
+            {
+              for (unsigned int i = 0; i < 4; ++i)
+                std::swap(cell.vertices[i], cell.vertices[i + 4]);
+            }
           copy_vertices_to_temp(cell);
 
           // Check whether the resulting cell is now ok.
