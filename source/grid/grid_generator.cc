@@ -1829,28 +1829,41 @@ namespace GridGenerator
 
     unsigned int offset = 0;
 
+    // This Triangulation is constructed using the UCD numbering scheme since,
+    // in that numbering, the front face is first and the back face is second,
+    // which is more convenient for creating a moebius
     std::vector<CellData<dim>> cells(n_cells);
     for (unsigned int i = 0; i < n_cells; ++i)
       {
         for (unsigned int j = 0; j < 2; ++j)
           {
-            cells[i].vertices[0 + 4 * j] = offset + 0 + 4 * j;
-            cells[i].vertices[1 + 4 * j] = offset + 3 + 4 * j;
-            cells[i].vertices[2 + 4 * j] = offset + 2 + 4 * j;
-            cells[i].vertices[3 + 4 * j] = offset + 1 + 4 * j;
+            cells[i].vertices[GeometryInfo<3>::ucd_to_deal[0 + 4 * j]] =
+              offset + 0 + 4 * j;
+            cells[i].vertices[GeometryInfo<3>::ucd_to_deal[1 + 4 * j]] =
+              offset + 3 + 4 * j;
+            cells[i].vertices[GeometryInfo<3>::ucd_to_deal[2 + 4 * j]] =
+              offset + 2 + 4 * j;
+            cells[i].vertices[GeometryInfo<3>::ucd_to_deal[3 + 4 * j]] =
+              offset + 1 + 4 * j;
           }
         offset += 4;
         cells[i].material_id = 0;
       }
 
     // now correct the last four vertices
-    cells[n_cells - 1].vertices[4] = (0 + n_rotations) % 4;
-    cells[n_cells - 1].vertices[5] = (3 + n_rotations) % 4;
-    cells[n_cells - 1].vertices[6] = (2 + n_rotations) % 4;
-    cells[n_cells - 1].vertices[7] = (1 + n_rotations) % 4;
+    cells[n_cells - 1].vertices[GeometryInfo<3>::ucd_to_deal[4]] =
+      (0 + n_rotations) % 4;
+    cells[n_cells - 1].vertices[GeometryInfo<3>::ucd_to_deal[5]] =
+      (3 + n_rotations) % 4;
+    cells[n_cells - 1].vertices[GeometryInfo<3>::ucd_to_deal[6]] =
+      (2 + n_rotations) % 4;
+    cells[n_cells - 1].vertices[GeometryInfo<3>::ucd_to_deal[7]] =
+      (1 + n_rotations) % 4;
 
-    GridReordering<dim>::invert_all_cells_of_negative_grid(vertices, cells);
-    tria.create_triangulation_compatibility(vertices, cells, SubCellData());
+    GridReordering<dim>::invert_all_cells_of_negative_grid(vertices,
+                                                           cells,
+                                                           true);
+    tria.create_triangulation(vertices, cells, SubCellData());
   }
 
 
@@ -1892,105 +1905,105 @@ namespace GridGenerator
     // Right Hand Orientation
     cells[0].vertices[0] = 0;
     cells[0].vertices[1] = 4;
-    cells[0].vertices[2] = 7;
-    cells[0].vertices[3] = 3;
+    cells[0].vertices[2] = 3;
+    cells[0].vertices[3] = 7;
     cells[0].material_id = 0;
 
     cells[1].vertices[0] = 1;
     cells[1].vertices[1] = 5;
-    cells[1].vertices[2] = 4;
-    cells[1].vertices[3] = 0;
+    cells[1].vertices[2] = 0;
+    cells[1].vertices[3] = 4;
     cells[1].material_id = 0;
 
     cells[2].vertices[0] = 2;
     cells[2].vertices[1] = 6;
-    cells[2].vertices[2] = 5;
-    cells[2].vertices[3] = 1;
+    cells[2].vertices[2] = 1;
+    cells[2].vertices[3] = 5;
     cells[2].material_id = 0;
 
     cells[3].vertices[0] = 3;
     cells[3].vertices[1] = 7;
-    cells[3].vertices[2] = 6;
-    cells[3].vertices[3] = 2;
+    cells[3].vertices[2] = 2;
+    cells[3].vertices[3] = 6;
     cells[3].material_id = 0;
 
     cells[4].vertices[0] = 4;
     cells[4].vertices[1] = 8;
-    cells[4].vertices[2] = 11;
-    cells[4].vertices[3] = 7;
+    cells[4].vertices[2] = 7;
+    cells[4].vertices[3] = 11;
     cells[4].material_id = 0;
 
     cells[5].vertices[0] = 5;
     cells[5].vertices[1] = 9;
-    cells[5].vertices[2] = 8;
-    cells[5].vertices[3] = 4;
+    cells[5].vertices[2] = 4;
+    cells[5].vertices[3] = 8;
     cells[5].material_id = 0;
 
     cells[6].vertices[0] = 6;
     cells[6].vertices[1] = 10;
-    cells[6].vertices[2] = 9;
-    cells[6].vertices[3] = 5;
+    cells[6].vertices[2] = 5;
+    cells[6].vertices[3] = 9;
     cells[6].material_id = 0;
 
     cells[7].vertices[0] = 7;
     cells[7].vertices[1] = 11;
-    cells[7].vertices[2] = 10;
-    cells[7].vertices[3] = 6;
+    cells[7].vertices[2] = 6;
+    cells[7].vertices[3] = 10;
     cells[7].material_id = 0;
 
     cells[8].vertices[0] = 8;
     cells[8].vertices[1] = 12;
-    cells[8].vertices[2] = 15;
-    cells[8].vertices[3] = 11;
+    cells[8].vertices[2] = 11;
+    cells[8].vertices[3] = 15;
     cells[8].material_id = 0;
 
     cells[9].vertices[0] = 9;
     cells[9].vertices[1] = 13;
-    cells[9].vertices[2] = 12;
-    cells[9].vertices[3] = 8;
+    cells[9].vertices[2] = 8;
+    cells[9].vertices[3] = 12;
     cells[9].material_id = 0;
 
     cells[10].vertices[0] = 10;
     cells[10].vertices[1] = 14;
-    cells[10].vertices[2] = 13;
-    cells[10].vertices[3] = 9;
+    cells[10].vertices[2] = 9;
+    cells[10].vertices[3] = 13;
     cells[10].material_id = 0;
 
     cells[11].vertices[0] = 11;
     cells[11].vertices[1] = 15;
-    cells[11].vertices[2] = 14;
-    cells[11].vertices[3] = 10;
+    cells[11].vertices[2] = 10;
+    cells[11].vertices[3] = 14;
     cells[11].material_id = 0;
 
     cells[12].vertices[0] = 12;
     cells[12].vertices[1] = 0;
-    cells[12].vertices[2] = 3;
-    cells[12].vertices[3] = 15;
+    cells[12].vertices[2] = 15;
+    cells[12].vertices[3] = 3;
     cells[12].material_id = 0;
 
     cells[13].vertices[0] = 13;
     cells[13].vertices[1] = 1;
-    cells[13].vertices[2] = 0;
-    cells[13].vertices[3] = 12;
+    cells[13].vertices[2] = 12;
+    cells[13].vertices[3] = 0;
     cells[13].material_id = 0;
 
     cells[14].vertices[0] = 14;
     cells[14].vertices[1] = 2;
-    cells[14].vertices[2] = 1;
-    cells[14].vertices[3] = 13;
+    cells[14].vertices[2] = 13;
+    cells[14].vertices[3] = 1;
     cells[14].material_id = 0;
 
     cells[15].vertices[0] = 15;
     cells[15].vertices[1] = 3;
-    cells[15].vertices[2] = 2;
-    cells[15].vertices[3] = 14;
+    cells[15].vertices[2] = 14;
+    cells[15].vertices[3] = 2;
     cells[15].material_id = 0;
 
     // Must call this to be able to create a
     // correct triangulation in dealii, read
     // GridReordering<> doc
-    GridReordering<dim, spacedim>::reorder_cells(cells);
-    tria.create_triangulation_compatibility(vertices, cells, SubCellData());
+    GridReordering<dim, spacedim>::reorder_cells(cells, true);
+    tria.create_triangulation(vertices, cells, SubCellData());
 
     tria.set_all_manifold_ids(0);
     tria.set_manifold(0, TorusManifold<2>(R, r));
