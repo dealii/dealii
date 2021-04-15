@@ -1381,6 +1381,8 @@ GridIn<2>::read_xda(std::istream &in)
   Assert(tria != nullptr, ExcNoTriangulationSelected());
   AssertThrow(in, ExcIO());
 
+  const auto reference_cell = ReferenceCells::get_hypercube<2>();
+
   std::string line;
   // skip comments at start of file
   getline(in, line);
@@ -1412,10 +1414,11 @@ GridIn<2>::read_xda(std::istream &in)
       // should still be input here,
       // so check this:
       AssertThrow(in, ExcIO());
-      Assert(GeometryInfo<2>::vertices_per_cell == 4, ExcInternalError());
 
-      for (unsigned int &vertex : cells[cell].vertices)
-        in >> vertex;
+      // XDA happens to use ExodusII's numbering because XDA/XDR is libMesh's
+      // native format, and libMesh's node numberings come from ExodusII:
+      for (unsigned int i = 0; i < GeometryInfo<2>::vertices_per_cell; i++)
+        in >> cells[cell].vertices[reference_cell.exodusii_vertex_to_deal_vertex(i)];
     }
 
 
@@ -1438,9 +1441,9 @@ GridIn<2>::read_xda(std::istream &in)
   // do some clean-up on vertices...
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
   // ... and cells
-  GridReordering<2>::invert_all_cells_of_negative_grid(vertices, cells);
-  GridReordering<2>::reorder_cells(cells);
-  tria->create_triangulation_compatibility(vertices, cells, subcelldata);
+  GridReordering<2>::invert_all_cells_of_negative_grid(vertices, cells, true);
+  GridReordering<2>::reorder_cells(cells, true);
+  tria->create_triangulation(vertices, cells, subcelldata);
 }
 
 
@@ -1452,12 +1455,11 @@ GridIn<3>::read_xda(std::istream &in)
   Assert(tria != nullptr, ExcNoTriangulationSelected());
   AssertThrow(in, ExcIO());
 
-  static const unsigned int xda_to_dealII_map[] = {0, 1, 5, 4, 3, 2, 6, 7};
+  const auto reference_cell = ReferenceCells::get_hypercube<3>();
 
   std::string line;
   // skip comments at start of file
   getline(in, line);
-
 
   unsigned int n_vertices;
   unsigned int n_cells;
@@ -1485,18 +1487,12 @@ GridIn<3>::read_xda(std::istream &in)
       // should still be input here,
       // so check this:
       AssertThrow(in, ExcIO());
-      Assert(GeometryInfo<3>::vertices_per_cell == 8, ExcInternalError());
 
-      unsigned int xda_ordered_nodes[8];
-
-      for (unsigned int &xda_ordered_node : xda_ordered_nodes)
-        in >> xda_ordered_node;
-
-      for (unsigned int i = 0; i < 8; i++)
-        cells[cell].vertices[i] = xda_ordered_nodes[xda_to_dealII_map[i]];
+      // XDA happens to use ExodusII's numbering because XDA/XDR is libMesh's
+      // native format, and libMesh's node numberings come from ExodusII:
+      for (unsigned int i = 0; i < GeometryInfo<3>::vertices_per_cell; i++)
+        in >> cells[cell].vertices[reference_cell.exodusii_vertex_to_deal_vertex(i)];
     }
-
-
 
   // set up array of vertices
   std::vector<Point<3>> vertices(n_vertices);
@@ -1516,9 +1512,9 @@ GridIn<3>::read_xda(std::istream &in)
   // do some clean-up on vertices...
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
   // ... and cells
-  GridReordering<3>::invert_all_cells_of_negative_grid(vertices, cells);
-  GridReordering<3>::reorder_cells(cells);
-  tria->create_triangulation_compatibility(vertices, cells, subcelldata);
+  GridReordering<3>::invert_all_cells_of_negative_grid(vertices, cells, true);
+  GridReordering<3>::reorder_cells(cells, true);
+  tria->create_triangulation(vertices, cells, subcelldata);
 }
 
 
