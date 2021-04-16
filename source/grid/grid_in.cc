@@ -1319,7 +1319,7 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
       cells.emplace_back();
       for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         {
-          in >> cells.back().vertices[i];
+          in >> cells.back().vertices[GeometryInfo<dim>::ucd_to_deal[i]];
 
           AssertThrow((cells.back().vertices[i] >= 1) &&
                         (static_cast<unsigned int>(cells.back().vertices[i]) <=
@@ -1357,167 +1357,80 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
   // ...and cells
   GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
-                                                                   cells);
-  GridReordering<dim, spacedim>::reorder_cells(cells);
-  tria->create_triangulation_compatibility(vertices, cells, subcelldata);
+                                                                   cells,
+                                                                   true);
+  GridReordering<dim, spacedim>::reorder_cells(cells, true);
+  tria->create_triangulation(vertices, cells, subcelldata);
 }
 
 
 
 template <int dim, int spacedim>
 void
-GridIn<dim, spacedim>::read_xda(std::istream &)
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-
-template <>
-void
-GridIn<2>::read_xda(std::istream &in)
+GridIn<dim, spacedim>::read_xda(std::istream &in)
 {
   Assert(tria != nullptr, ExcNoTriangulationSelected());
   AssertThrow(in, ExcIO());
 
+  const auto reference_cell = ReferenceCells::get_hypercube<dim>();
+
   std::string line;
   // skip comments at start of file
-  getline(in, line);
-
+  std::getline(in, line);
 
   unsigned int n_vertices;
   unsigned int n_cells;
 
   // read cells, throw away rest of line
   in >> n_cells;
-  getline(in, line);
+  std::getline(in, line);
 
   in >> n_vertices;
-  getline(in, line);
+  std::getline(in, line);
 
   // ignore following 8 lines
   for (unsigned int i = 0; i < 8; ++i)
-    getline(in, line);
+    std::getline(in, line);
 
   // set up array of cells
-  std::vector<CellData<2>> cells(n_cells);
-  SubCellData              subcelldata;
+  std::vector<CellData<dim>> cells(n_cells);
+  SubCellData                subcelldata;
 
-  for (unsigned int cell = 0; cell < n_cells; ++cell)
+  for (CellData<dim> &cell : cells)
     {
-      // note that since in the input
-      // file we found the number of
-      // cells at the top, there
-      // should still be input here,
-      // so check this:
+      // note that since in the input file we found the number of cells at the
+      // top, there should still be input here, so check this:
       AssertThrow(in, ExcIO());
-      Assert(GeometryInfo<2>::vertices_per_cell == 4, ExcInternalError());
 
-      for (unsigned int &vertex : cells[cell].vertices)
-        in >> vertex;
+      // XDA happens to use ExodusII's numbering because XDA/XDR is libMesh's
+      // native format, and libMesh's node numberings come from ExodusII:
+      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; i++)
+        in >> cell.vertices[reference_cell.exodusii_vertex_to_deal_vertex(i)];
     }
 
-
-
   // set up array of vertices
-  std::vector<Point<2>> vertices(n_vertices);
-  for (unsigned int vertex = 0; vertex < n_vertices; ++vertex)
+  std::vector<Point<spacedim>> vertices(n_vertices);
+  for (Point<spacedim> &vertex : vertices)
     {
-      double x[3];
-
-      // read vertex
-      in >> x[0] >> x[1] >> x[2];
-
-      // store vertex
-      for (unsigned int d = 0; d < 2; ++d)
-        vertices[vertex](d) = x[d];
+      for (unsigned int d = 0; d < spacedim; ++d)
+        in >> vertex[d];
+      for (unsigned int d = spacedim; d < 3; ++d)
+        {
+          // file is always in 3D
+          double dummy;
+          in >> dummy;
+        }
     }
   AssertThrow(in, ExcIO());
 
   // do some clean-up on vertices...
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
   // ... and cells
-  GridReordering<2>::invert_all_cells_of_negative_grid(vertices, cells);
-  GridReordering<2>::reorder_cells(cells);
-  tria->create_triangulation_compatibility(vertices, cells, subcelldata);
-}
-
-
-
-template <>
-void
-GridIn<3>::read_xda(std::istream &in)
-{
-  Assert(tria != nullptr, ExcNoTriangulationSelected());
-  AssertThrow(in, ExcIO());
-
-  static const unsigned int xda_to_dealII_map[] = {0, 1, 5, 4, 3, 2, 6, 7};
-
-  std::string line;
-  // skip comments at start of file
-  getline(in, line);
-
-
-  unsigned int n_vertices;
-  unsigned int n_cells;
-
-  // read cells, throw away rest of line
-  in >> n_cells;
-  getline(in, line);
-
-  in >> n_vertices;
-  getline(in, line);
-
-  // ignore following 8 lines
-  for (unsigned int i = 0; i < 8; ++i)
-    getline(in, line);
-
-  // set up array of cells
-  std::vector<CellData<3>> cells(n_cells);
-  SubCellData              subcelldata;
-
-  for (unsigned int cell = 0; cell < n_cells; ++cell)
-    {
-      // note that since in the input
-      // file we found the number of
-      // cells at the top, there
-      // should still be input here,
-      // so check this:
-      AssertThrow(in, ExcIO());
-      Assert(GeometryInfo<3>::vertices_per_cell == 8, ExcInternalError());
-
-      unsigned int xda_ordered_nodes[8];
-
-      for (unsigned int &xda_ordered_node : xda_ordered_nodes)
-        in >> xda_ordered_node;
-
-      for (unsigned int i = 0; i < 8; i++)
-        cells[cell].vertices[i] = xda_ordered_nodes[xda_to_dealII_map[i]];
-    }
-
-
-
-  // set up array of vertices
-  std::vector<Point<3>> vertices(n_vertices);
-  for (unsigned int vertex = 0; vertex < n_vertices; ++vertex)
-    {
-      double x[3];
-
-      // read vertex
-      in >> x[0] >> x[1] >> x[2];
-
-      // store vertex
-      for (unsigned int d = 0; d < 3; ++d)
-        vertices[vertex](d) = x[d];
-    }
-  AssertThrow(in, ExcIO());
-
-  // do some clean-up on vertices...
-  GridTools::delete_unused_vertices(vertices, cells, subcelldata);
-  // ... and cells
-  GridReordering<3>::invert_all_cells_of_negative_grid(vertices, cells);
-  GridReordering<3>::reorder_cells(cells);
-  tria->create_triangulation_compatibility(vertices, cells, subcelldata);
+  GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
+                                                                   cells,
+                                                                   true);
+  GridReordering<dim>::reorder_cells(cells, true);
+  tria->create_triangulation(vertices, cells, subcelldata);
 }
 
 
