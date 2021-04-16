@@ -1929,7 +1929,19 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                 cells.emplace_back();
                 cells.back().vertices.resize(vertices_per_cell);
                 for (unsigned int i = 0; i < vertices_per_cell; ++i)
-                  in >> cells.back().vertices[i];
+                  {
+                    // hypercube cells need to be reordered
+                    if (vertices_per_cell ==
+                        GeometryInfo<dim>::vertices_per_cell)
+                      {
+                        in >> cells.back()
+                                .vertices[GeometryInfo<dim>::ucd_to_deal[i]];
+                      }
+                    else
+                      {
+                        in >> cells.back().vertices[i];
+                      }
+                  }
 
                 // to make sure that the cast won't fail
                 Assert(material_id <=
@@ -1944,8 +1956,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
 
                 cells.back().material_id = material_id;
 
-                // transform from ucd to
-                // consecutive numbering
+                // transform from gmsh to consecutive numbering
                 for (unsigned int i = 0; i < vertices_per_cell; ++i)
                   {
                     AssertThrow(
@@ -2108,15 +2119,10 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
       // ... and cells
       if (dim == spacedim)
         GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(
-          vertices, cells);
-      GridReordering<dim, spacedim>::reorder_cells(cells);
-      tria->create_triangulation_compatibility(vertices, cells, subcelldata);
+          vertices, cells, true);
+      GridReordering<dim, spacedim>::reorder_cells(cells, true);
     }
-  else
-    {
-      // simplex or mixed mesh
-      tria->create_triangulation_compatibility(vertices, cells, subcelldata);
-    }
+  tria->create_triangulation(vertices, cells, subcelldata);
 
   // in 1d, we also have to attach boundary ids to vertices, which does not
   // currently work through the call above
