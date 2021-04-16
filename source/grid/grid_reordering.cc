@@ -1179,7 +1179,10 @@ GridReordering<2>::invert_all_cells_of_negative_grid(
       if (GridTools::cell_measure<2>(all_vertices, vertices_lex) < 0)
         {
           ++n_negative_cells;
-          std::swap(cell.vertices[1], cell.vertices[3]);
+          if (use_new_style_ordering)
+            std::swap(cell.vertices[1], cell.vertices[2]);
+          else
+            std::swap(cell.vertices[1], cell.vertices[3]);
 
           // Check whether the resulting cell is now ok.
           // If not, then the grid is seriously broken and
