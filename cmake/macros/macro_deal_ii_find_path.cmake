@@ -18,11 +18,14 @@
 #
 
 MACRO(DEAL_II_FIND_PATH _path_name)
+  # Save a string representation of the arguments before cmake's
+  # FIND_PATH gets its hands on it.
+  TO_STRING(_str ${ARGN})
+
   FIND_PATH(${_path_name} ${ARGN})
 
   IF(${_path_name} MATCHES "-NOTFOUND")
-    MESSAGE(STATUS "${_path_name} not found! Call:")
-    TO_STRING(_str ${ARGN})
+    MESSAGE(STATUS "${_path_name} not found! The call was:")
     MESSAGE(STATUS "    FIND_PATH(${_path_name} ${_str})")
   ELSE()
     MESSAGE(STATUS "Found ${_path_name}")
