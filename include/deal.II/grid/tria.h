@@ -1875,6 +1875,7 @@ public:
    * @note This function internally calls create_triangulation and therefore
    * can throw the same exception as the other function.
    */
+  DEAL_II_DEPRECATED_EARLY
   virtual void
   create_triangulation_compatibility(
     const std::vector<Point<spacedim>> &vertices,
