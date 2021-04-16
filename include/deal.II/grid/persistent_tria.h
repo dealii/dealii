@@ -217,6 +217,7 @@ public:
    * Throw an error, since this function is not useful in the context of this
    * class.
    */
+  DEAL_II_DEPRECATED_EARLY
   virtual void
   create_triangulation_compatibility(
     const std::vector<Point<spacedim>> &vertices,

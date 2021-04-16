@@ -574,15 +574,11 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
           GridReordering<dim, spacedim>::reorder_cells(cells, true);
           tria->create_triangulation(vertices, cells, subcelldata);
-
-          return;
         }
       else
         {
           // simplex or mixed mesh
-          tria->create_triangulation_compatibility(vertices,
-                                                   cells,
-                                                   subcelldata);
+          tria->create_triangulation(vertices, cells, subcelldata);
         }
     }
   else
@@ -2750,8 +2746,8 @@ GridIn<2>::read_tecplot(std::istream &in)
           {
             cells[cell].vertices[0] = i + j * I;
             cells[cell].vertices[1] = i + 1 + j * I;
-            cells[cell].vertices[2] = i + 1 + (j + 1) * I;
-            cells[cell].vertices[3] = i + (j + 1) * I;
+            cells[cell].vertices[2] = i + (j + 1) * I;
+            cells[cell].vertices[3] = i + 1 + (j + 1) * I;
             ++cell;
           }
       Assert(cell == n_cells, ExcInternalError());
@@ -2798,8 +2794,8 @@ GridIn<2>::read_tecplot(std::istream &in)
           // get the connectivity from the
           // input file. the vertices are
           // ordered like in the ucd format
-          for (unsigned int &vertex : cells[i].vertices)
-            in >> vertex;
+          for (const unsigned int j : GeometryInfo<dim>::vertex_indices())
+            in >> cells[i].vertices[GeometryInfo<dim>::ucd_to_deal[j]];
         }
       // do some clean-up on vertices
       GridTools::delete_unused_vertices(vertices, cells, subcelldata);
@@ -2813,9 +2809,10 @@ GridIn<2>::read_tecplot(std::istream &in)
 
   // do some cleanup on cells
   GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
-                                                                   cells);
-  GridReordering<dim, spacedim>::reorder_cells(cells);
-  tria->create_triangulation_compatibility(vertices, cells, subcelldata);
+                                                                   cells,
+                                                                   true);
+  GridReordering<dim, spacedim>::reorder_cells(cells, true);
+  tria->create_triangulation(vertices, cells, subcelldata);
 }
 
 
@@ -2920,7 +2917,8 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
             {
               for (const unsigned int f : GeometryInfo<dim>::vertex_indices())
                 {
-                  cells[valid_cell].vertices[f] =
+                  cells[valid_cell]
+                    .vertices[GeometryInfo<dim>::ucd_to_deal[f]] =
                     mFaces[i].mIndices[f] + v_offset;
                 }
               cells[valid_cell].material_id = m;
@@ -2968,13 +2966,11 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
   if (dim == spacedim)
     GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
-                                                                     cells);
+                                                                     cells,
+                                                                     true);
+  GridReordering<dim, spacedim>::reorder_cells(cells, true);
+  tria->create_triangulation(vertices, cells, subcelldata);
 
-  GridReordering<dim, spacedim>::reorder_cells(cells);
-  if (dim == 2)
-    tria->create_triangulation_compatibility(vertices, cells, subcelldata);
-  else
-    tria->create_triangulation(vertices, cells, subcelldata);
 #else
   (void)filename;
   (void)mesh_index;
