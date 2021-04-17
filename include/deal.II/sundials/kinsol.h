@@ -510,24 +510,29 @@ namespace SUNDIALS
       setup_jacobian;
 
     /**
+     * @deprecated Versions of SUNDIALS after 4.0 no longer provide all
+     *   of the information necessary for this callback (see below). Use the
+     *   `solve_with_jacobian` callback described below.
+     *
      * A function object that users may supply and that is intended to solve
-     * the Jacobian linear system. This function will be called by KINSOL
-     * (possibly several times) after setup_jacobian() has been called at least
-     * once. KINSOL tries to do its best to call setup_jacobian() the minimum
-     * number of times. If convergence can be achieved without updating the
-     * Jacobian, then KINSOL does not call setup_jacobian() again. If, on the
-     * contrary, internal KINSOL convergence tests fail, then KINSOL calls
+     * a linear system with the Jacobian matrix. This function will be called by
+     * KINSOL (possibly several times) after setup_jacobian() has been called at
+     * least once. KINSOL tries to do its best to call setup_jacobian() the
+     * minimum number of times. If convergence can be achieved without updating
+     * the Jacobian, then KINSOL does not call setup_jacobian() again. If, on
+     * the contrary, internal KINSOL convergence tests fail, then KINSOL calls
      * setup_jacobian() again with updated vectors and coefficients so that
      * successive calls to solve_jacobian_systems() lead to better convergence
      * in the Newton process.
      *
-     * If you do not specify a solve_jacobian_system() function, then only a
-     * fixed point iteration strategy can be used. Notice that this may not
-     * converge, or may converge very slowly.
+     * If you do not specify a `solve_jacobian_system` or `solve_with_jacobian`
+     * function, then only a fixed point iteration strategy can be used. Notice
+     * that this may not converge, or may converge very slowly.
      *
      * A call to this function should store in `dst` the result of $J^{-1}$
      * applied to `rhs`, i.e., `J*dst = rhs`. It is the user's responsibility
-     * to set up proper solvers and preconditioners inside this function.
+     * to set up proper solvers and preconditioners inside this function
+     * (or in the `setup_jacobian` callback above).
      *
      *
      * Arguments to the function are:
@@ -547,7 +552,7 @@ namespace SUNDIALS
      * - <0: Unrecoverable error the computation will be aborted and an
      * assertion will be thrown.
      *
-     * @warning Starting with SUNDIALS 4.0, SUNDIALS no longer provides the
+     * @warning Starting with SUNDIALS 4.1, SUNDIALS no longer provides the
      *   `ycur` and `fcur` variables -- only `rhs` is provided and `dst`
      *   needs to be returned. The first two arguments will therefore be
      *   empty vectors in that case. In practice, that means that one
@@ -561,11 +566,55 @@ namespace SUNDIALS
      *   AdditionalData::maximum_newton_step variable to one, indicating
      *   that the Jacobian should be re-computed in every iteration.
      */
+    DEAL_II_DEPRECATED_EARLY
     std::function<int(const VectorType &ycur,
                       const VectorType &fcur,
                       const VectorType &rhs,
                       VectorType &      dst)>
       solve_jacobian_system;
+
+    /**
+     * A function object that users may supply and that is intended to solve
+     * a linear system with the Jacobian matrix. This function will be called by
+     * KINSOL (possibly several times) after setup_jacobian() has been called at
+     * least once. KINSOL tries to do its best to call setup_jacobian() the
+     * minimum number of times. If convergence can be achieved without updating
+     * the Jacobian, then KINSOL does not call setup_jacobian() again. If, on
+     * the contrary, internal KINSOL convergence tests fail, then KINSOL calls
+     * setup_jacobian() again with updated vectors and coefficients so that
+     * successive calls to solve_jacobian_systems() lead to better convergence
+     * in the Newton process.
+     *
+     * If you do not specify a `solve_with_jacobian` function, then only a
+     * fixed point iteration strategy can be used. Notice that this may not
+     * converge, or may converge very slowly.
+     *
+     * A call to this function should store in `dst` the result of $J^{-1}$
+     * applied to `rhs`, i.e., `J*dst = rhs`. It is the user's responsibility
+     * to set up proper solvers and preconditioners inside this function
+     * (or in the `setup_jacobian` callback above). The function attached
+     * to this callback is also provided with a tolerance to the linear solver,
+     * indicating that it is not necessary to solve the linear system with
+     * the Jacobian matrix exactly, but only to a tolerance that KINSOL will
+     * adapt over time.
+     *
+     * Arguments to the function are:
+     *
+     * @param[in] rhs The system right hand side to solve for.
+     * @param[out] dst The solution of $J^{-1} * src$.
+     * @param[in] tolerance The tolerance with which to solve the linear system
+     *   of equations.
+     *
+     * This function should return:
+     * - 0: Success
+     * - >0: Recoverable error (KINSOL will try to change its internal
+     * parameters and attempt a new solution step)
+     * - <0: Unrecoverable error the computation will be aborted and an
+     * assertion will be thrown.
+     */
+    std::function<
+      int(const VectorType &rhs, VectorType &dst, const double tolerance)>
+      solve_with_jacobian;
 
     /**
      * A function object that users may supply and that is intended to return a
