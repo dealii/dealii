@@ -622,12 +622,59 @@ namespace Utilities
           return;
         }
 
+      /*
+       * Create a custom MPI datatype handle describing the memory layout
+       * of the MinMaxAvg struct and a custom MPI op handle for our
+       * max_reduce function.
+       *
+       * This setup will leak some minor allocated memory (in the range of
+       * a few bytes) at the end of the program run because we never call
+       * MPI_Type_free(&type) and MPI_Op_free(&op) to explicitly free up
+       * memory. This is a cosmetic issue but some address sanitizers will
+       * complain about this (such as clang's -fsanitize=address).
+       */
+
+      /* Initialized on first pass control reaches the static variable. So
+       * hopefully not initialized too early. */
+      static MPI_Datatype type = []() {
+        MPI_Datatype type;
+
+        int lengths[] = {3, 2, 1};
+
+        MPI_Aint displacements[] = {0,
+                                    offsetof(MinMaxAvg, min_index),
+                                    offsetof(MinMaxAvg, avg)};
+
+        MPI_Datatype types[] = {MPI_DOUBLE, MPI_INT, MPI_DOUBLE};
+
+        int ierr =
+          MPI_Type_create_struct(3, lengths, displacements, types, &type);
+        AssertThrowMPI(ierr);
+
+        ierr = MPI_Type_commit(&type);
+        AssertThrowMPI(ierr);
+
+        return type;
+      }();
+
+      /* Initialized on first pass control reaches the static variable. So
+       * hopefully not initialized too early. */
+      static MPI_Op op = []() {
+        MPI_Op op;
+
+        int ierr =
+          MPI_Op_create(reinterpret_cast<MPI_User_function *>(&max_reduce),
+                        true,
+                        &op);
+        AssertThrowMPI(ierr);
+
+        return op;
+      }();
+
       AssertDimension(Utilities::MPI::min(my_values.size(), mpi_communicator),
                       Utilities::MPI::max(my_values.size(), mpi_communicator));
 
       AssertDimension(my_values.size(), result.size());
-
-
 
       // To avoid uninitialized values on some MPI implementations, provide
       // result with a default value already...
@@ -646,13 +693,6 @@ namespace Utilities
       const unsigned int numproc =
         dealii::Utilities::MPI::n_mpi_processes(mpi_communicator);
 
-      MPI_Op op;
-      int    ierr =
-        MPI_Op_create(reinterpret_cast<MPI_User_function *>(&max_reduce),
-                      true,
-                      &op);
-      AssertThrowMPI(ierr);
-
       std::vector<MinMaxAvg> in(my_values.size());
 
       for (unsigned int i = 0; i < my_values.size(); i++)
@@ -661,26 +701,8 @@ namespace Utilities
           in[i].min_index = in[i].max_index = my_id;
         }
 
-      MPI_Datatype type;
-      int          lengths[]       = {3, 2, 1};
-      MPI_Aint     displacements[] = {0,
-                                  offsetof(MinMaxAvg, min_index),
-                                  offsetof(MinMaxAvg, avg)};
-      MPI_Datatype types[]         = {MPI_DOUBLE, MPI_INT, MPI_DOUBLE};
-
-      ierr = MPI_Type_create_struct(3, lengths, displacements, types, &type);
-      AssertThrowMPI(ierr);
-
-      ierr = MPI_Type_commit(&type);
-      AssertThrowMPI(ierr);
-      ierr = MPI_Allreduce(
+      int ierr = MPI_Allreduce(
         in.data(), result.data(), my_values.size(), type, op, mpi_communicator);
-      AssertThrowMPI(ierr);
-
-      ierr = MPI_Type_free(&type);
-      AssertThrowMPI(ierr);
-
-      ierr = MPI_Op_free(&op);
       AssertThrowMPI(ierr);
 
       for (auto &r : result)
