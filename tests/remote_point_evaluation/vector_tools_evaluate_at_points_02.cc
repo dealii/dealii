@@ -260,13 +260,13 @@ public:
       A.compress(VectorOperation::values::add);
 
       // solve linear equation system
-      ReductionControl                                     reduction_control;
+      ReductionControl reduction_control(1000, 1e-12, 1e-10);
       SolverCG<LinearAlgebra::distributed::Vector<double>> solver(
         reduction_control);
       solver.solve(A, solution, b, PreconditionIdentity());
 
-      if (Utilities::MPI::this_mpi_process(
-            get_mpi_comm(dof_handler.get_triangulation())) == 0)
+      if (false && Utilities::MPI::this_mpi_process(
+                     get_mpi_comm(dof_handler.get_triangulation())) == 0)
         deallog << "Solved in " << reduction_control.last_step()
                 << " iterations." << std::endl;
 
@@ -342,6 +342,8 @@ main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
   MPILogInitAll                    all;
+
+  deallog.depth_file(1);
 
   test();
 }
