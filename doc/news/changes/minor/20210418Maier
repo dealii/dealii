@@ -1,0 +1,5 @@
+Fixed: Work around a memory leak issue in OpenMPI 4.1.0 triggered by our
+Utilities::MPI::min_max_avg() function by repeatedly allocating and freeing
+MPI_Datatype handles.
+<br>
+(Matthias Maier, 2021/04/18)
