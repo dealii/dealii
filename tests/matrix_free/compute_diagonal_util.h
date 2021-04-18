@@ -241,5 +241,5 @@ public:
                                         n_components,
                                         Number,
                                         VectorizedArrayType> &)>
-    &cell_operation;
+    cell_operation;
 };
