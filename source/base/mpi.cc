@@ -922,6 +922,9 @@ namespace Utilities
           // finally set this number of threads
           MultithreadInfo::set_thread_limit(n_threads);
         }
+
+      // As a final step call the at_mpi_init() signal handler.
+      signals.at_mpi_init();
     }
 
 
@@ -954,6 +957,9 @@ namespace Utilities
 
     MPI_InitFinalize::~MPI_InitFinalize()
     {
+      // First, call the at_mpi_finalize() signal handler.
+      signals.at_mpi_finalize();
+
       // make memory pool release all PETSc/Trilinos/MPI-based vectors that
       // are no longer used at this point. this is relevant because the static
       // object destructors run for these vectors at the end of the program
