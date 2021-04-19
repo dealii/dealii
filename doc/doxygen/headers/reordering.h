@@ -19,62 +19,6 @@
  * @brief A module describing how deal.II consistently orients Triangulation
  * objects.
  *
- * This class reorders the vertices of cells such that they meet the standard
- * requirements of the Triangulation class when creating grids, i.e. all lines
- * have a unique orientation with respect to all neighboring cells. This class
- * is mainly used when reading in grids from files and converting them to
- * deal.II triangulations.
- *
- * @note In contrast to the rest of the deal.II library, by default this class
- * uses the old deal.II numbering scheme, which was used up to deal.II version
- * 5.2 (but the main function of this class takes a flag that specifies
- * whether it should do an implicit conversion from the new to the old format
- * before doing its work, and then back again after reordering). In this old
- * format, the vertex and face ordering in 2d is assumed to be
- * @verbatim
- *          2
- *      3--->---2
- *      |       |
- *     3^       ^1
- *      |       |
- *      0--->---1
- *          0
- * @endverbatim
- * the vertices in 3d:
- * @verbatim
- *         7-------6        7-------6
- *        /|       |       /       /|
- *       / |       |      /       / |
- *      /  |       |     /       /  |
- *     3   |       |    3-------2   |
- *     |   4-------5    |       |   5
- *     |  /       /     |       |  /
- *     | /       /      |       | /
- *     |/       /       |       |/
- *     0-------1        0-------1
- * @endverbatim
- * and the faces in 3d:
- * @verbatim
- *         *-------*        *-------*
- *        /|       |       /       /|
- *       / |   1   |      /   4   / |
- *      /  |       |     /       /  |
- *     *   |       |    *-------*   |
- *     | 5 *-------*    |       | 3 *
- *     |  /       /     |       |  /
- *     | /   2   /      |   0   | /
- *     |/       /       |       |/
- *     *-------*        *-------*
- * @endverbatim
- * After calling the GridReordering::reorder_cells() function the CellData is
- * still in this old numbering scheme. Hence, for creating a Triangulation
- * based on the resulting CellData the
- * Triangulation::create_triangulation_compatibility() (and not the
- * Triangulation::create_triangulation()) function must be used.  For a
- * typical use of the reorder_cells() function see the implementation of the
- * GridIn <code>read_*()</code> functions.
- *
- *
  * <h3>Statement of problems</h3>
  *
  * Triangulations in deal.II have a special structure, in that there are not
@@ -90,7 +34,7 @@
  * For example, in two dimensions, a quad consists of four lines which have a
  * direction, which is by definition as follows:
  * @verbatim
- *   3-->--2
+ *   2-->--3
  *   |     |
  *   ^     ^
  *   |     |
@@ -104,10 +48,10 @@
  *   |   |   |
  *   0---1---2
  * @endverbatim
- * may be characterised by the vertex numbers <tt>(0 1 4 3)</tt> and <tt>(1 2
- * 5 4)</tt>, since the middle line would get the direction <tt>1->4</tt> when
- * viewed from both cells.  The numbering <tt>(0 1 4 3)</tt> and <tt>(5 4 1
- * 2)</tt> would not be allowed, since the left quad would give the common
+ * may be characterised by the vertex numbers <tt>(0 1 3 4)</tt> and <tt>(1 2
+ * 4 5)</tt>, since the middle line would get the direction <tt>1->4</tt> when
+ * viewed from both cells.  The numbering <tt>(0 1 3 4)</tt> and <tt>(5 4 2
+ * 1)</tt> would not be allowed, since the left quad would give the common
  * line the direction <tt>1->4</tt>, while the right one would want to use
  * <tt>4->1</tt>, leading to an ambiguity.
  *
@@ -204,8 +148,8 @@
  *   ^   ^    \ |
  *   0->-1------2
  * @endverbatim
- * (This could for example be done by using the indices <tt>(0 1 4 3)</tt>,
- * <tt>(3 4 7 6)</tt>, <tt>(6 7 10 9)</tt> for the three cells). Now, you will
+ * (This could for example be done by using the indices <tt>(0 1 3 4)</tt>,
+ * <tt>(3 4 6 7)</tt>, <tt>(6 7 9 10)</tt> for the three cells). Now, you will
  * not find a way of giving indices for the right cells, without introducing
  * either ambiguity for one line or other, or without violating that within
  * each cells, there must be one vertex from which both lines are directed
@@ -213,7 +157,7 @@
  *
  * The solution in this case is to renumber one of the three left cells, e.g.
  * by reverting the sense of the line between vertices 7 and 10 by numbering
- * the top left cell by <tt>(9 6 7 10)</tt>:
+ * the top left cell by <tt>(9 6 10 7)</tt>:
  * @verbatim
  *   9->-10-----11
  *   v   v    / |
@@ -255,7 +199,7 @@
  * @endverbatim
  * We have here only indicated the numbers of the vertices that are relevant.
  * Assume that the user had given the cells 0 and 1 by the vertex indices
- * <tt>0 1 2 3</tt> and <tt>6 7 4 5</tt>. Then, if we follow this orientation,
+ * <tt>0 1 3 2</tt> and <tt>6 7 5 4</tt>. Then, if we follow this orientation,
  * the grid after creating the lines for these two cells would look like this:
  * @verbatim
  *   3-->--2-----o-----o ... o-----7--<--6
@@ -297,9 +241,9 @@
  * structure, where node N has as many children as there are possible
  * orientations of node N+1 (in two space dimensions, there are four
  * orientations in which each cell can be constructed from its four vertices;
- * for example, if the vertex indices are <tt>(0 1 2 3)</tt>, then the four
- * possibilities would be <tt>(0 1 2 3)</tt>, <tt>(1 2 3 0)</tt>, <tt>(2 3 0
- * 1)</tt>, and <tt>(3 0 1 2)</tt>). When adding one cell after the other, we
+ * for example, if the vertex indices are <tt>(0 1 3 2)</tt>, then the four
+ * possibilities would be <tt>(0 1 3 2)</tt>, <tt>(1 3 2 0)</tt>, <tt>(3 2 0
+ * 1)</tt>, and <tt>(2 0 1 3)</tt>). When adding one cell after the other, we
  * traverse this tree in a depth-first (pre-order) fashion. When we encounter
  * that one path from the root (cell 0) to a leaf (the last cell) is not
  * allowed (i.e. that the orientations of the cells which are encoded in the
@@ -366,7 +310,7 @@
  *   |      |        \|
  *   0------1---------2
  * @endverbatim
- * First a cell is chosen ( (0,1,4,3) in this case). A single side of the cell
+ * First a cell is chosen ( (0,1,3,4) in this case). A single side of the cell
  * is oriented arbitrarily (3->4). This choice of orientation is then
  * propagated through the mesh, across sides and elements. (0->1), (6->7) and
  * (9->10). The involves edge-hopping and face hopping, giving a path through
@@ -535,8 +479,8 @@
  * 0-----1-----2-----3
  * @endverbatim
  * Note that there is a hole in the middle. Assume now that the user described
- * the first cell 0 by the vertex numbers <tt>2 3 7 6</tt>, and cell 5 by
- * <tt>15 14 10 11</tt>, and assume that cells 1, 2, 3, and 4 are numbered
+ * the first cell 0 by the vertex numbers <tt>2 3 6 7</tt>, and cell 5 by
+ * <tt>15 14 11 10</tt>, and assume that cells 1, 2, 3, and 4 are numbered
  * such that 5 can be added in initial rotation. All other cells are numbered
  * in the usual way, i.e. starting at the bottom left and counting
  * counterclockwise. Given this description of cells, the algorithm will start
