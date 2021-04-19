@@ -623,19 +623,10 @@ namespace Utilities
         }
 
       /*
-       * Create a custom MPI datatype handle describing the memory layout
-       * of the MinMaxAvg struct and a custom MPI op handle for our
-       * max_reduce function.
-       *
-       * This setup will leak some minor allocated memory (in the range of
-       * a few bytes) at the end of the program run because we never call
-       * MPI_Type_free(&type) and MPI_Op_free(&op) to explicitly free up
-       * memory. This is a cosmetic issue but some address sanitizers will
-       * complain about this (such as clang's -fsanitize=address).
+       * A custom MPI datatype handle describing the memory layout of the
+       * MinMaxAvg struct. Initialized on first pass control reaches the
+       * static variable. So hopefully not initialized too early.
        */
-
-      /* Initialized on first pass control reaches the static variable. So
-       * hopefully not initialized too early. */
       static MPI_Datatype type = []() {
         MPI_Datatype type;
 
@@ -654,11 +645,21 @@ namespace Utilities
         ierr = MPI_Type_commit(&type);
         AssertThrowMPI(ierr);
 
+        /* Ensure that we free the allocated datatype again at the end of
+         * the program run just before we call MPI_Finalize():*/
+        MPI_InitFinalize::signals.at_mpi_finalize.connect([type]() mutable {
+          int ierr = MPI_Type_free(&type);
+          AssertThrowMPI(ierr);
+        });
+
         return type;
       }();
 
-      /* Initialized on first pass control reaches the static variable. So
-       * hopefully not initialized too early. */
+      /*
+       * A custom MPI op handle for our max_reduce function.
+       * Initialized on first pass control reaches the static variable. So
+       * hopefully not initialized too early.
+       */
       static MPI_Op op = []() {
         MPI_Op op;
 
@@ -667,6 +668,13 @@ namespace Utilities
                         true,
                         &op);
         AssertThrowMPI(ierr);
+
+        /* Ensure that we free the allocated op again at the end of the
+         * program run just before we call MPI_Finalize():*/
+        MPI_InitFinalize::signals.at_mpi_finalize.connect([op]() mutable {
+          int ierr = MPI_Op_free(&op);
+          AssertThrowMPI(ierr);
+        });
 
         return op;
       }();
