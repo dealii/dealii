@@ -786,6 +786,9 @@ namespace Utilities
 
 #endif
 
+    /* Force initialization of static struct: */
+    MPI_InitFinalize::Signals MPI_InitFinalize::signals =
+      MPI_InitFinalize::Signals();
 
 
     MPI_InitFinalize::MPI_InitFinalize(int &              argc,
