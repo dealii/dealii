@@ -32,7 +32,11 @@
 #include "../tests.h"
 
 
-// tests matrix-free read_cell_data for locally refined mesh
+// Test FEFaceEvaluation::read_dof_values() and
+// FEFaceEvaluation::gather_evaluate() for ECL for two cells.
+//
+// @note Since this program assumes that both cells are within the same
+//   macro cell, this test is only run if vectorization is enabled.
 
 template <int dim,
           int fe_degree,
@@ -42,6 +46,9 @@ template <int dim,
 void
 test(const unsigned int n_refinements = 1)
 {
+  if (VectorizedArrayType::size() == 1)
+    return;
+
   using VectorType = LinearAlgebra::distributed::Vector<Number>;
 
   Triangulation<dim> tria;
@@ -149,5 +156,12 @@ int
 main()
 {
   initlog();
-  test<2, 1, 2, double, VectorizedArray<double, 2>>();
+  test<2,
+       1,
+       2,
+       double,
+       VectorizedArray<double,
+                       VectorizedArray<double>::size() < 2 ?
+                         VectorizedArray<double>::size() :
+                         2>>();
 }
