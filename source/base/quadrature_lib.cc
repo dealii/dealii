@@ -1203,7 +1203,11 @@ QSimplex<dim>::QSimplex(const Quadrature<dim> &quad)
   for (unsigned int i = 0; i < quad.size(); ++i)
     {
       double r = 0;
-      for (unsigned int d = 0; d < dim; ++d)
+      /* Use "int d" instead of the more natural "unsigned int d" to work
+       * around a wrong diagnostic in gcc-10.3.0 that warns about that the
+       * comparison "d < dim" is always false in case of "dim == 0".
+       * MM 2021 */
+      for (int d = 0; d < dim; ++d)
         r += quad.point(i)[d];
       if (r <= 1 + 1e-10)
         {
