@@ -15,10 +15,10 @@
 
 
 /**
- * @defgroup grid Grid classes
+ * @defgroup grid Grids and Triangulations
  *
- * This module groups classes that have to do with the topology and
- * geometry of meshes. A mesh can be thought of as a collection of cells;
+ * This module groups functions and classes that have to do with the topology
+ * and geometry of meshes. A mesh can be thought of as a collection of cells;
  * if the mesh has been refined (possibly in an adaptive way), then
  * this collection is grouped into a hierarchy of refinement
  * levels. In addition to cells, the geometric objects that make up a
