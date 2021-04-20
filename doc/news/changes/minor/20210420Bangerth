@@ -1,0 +1,6 @@
+Deprecated: The TriaAccessor::number_of_children() function has been
+deprecated in favor of the new TriaAccessor::n_active_descendants()
+function.
+<br>
+(Wolfgang Bangerth, 2021/04/20)
+
