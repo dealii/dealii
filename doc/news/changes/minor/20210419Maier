@@ -1,0 +1,8 @@
+Added: The MPI_InitFinalize RAII class has gained an
+MPI_InitFinalize::signals::at_mpi_init and an
+MPI_InitFinalize::signals::at_mpi_finalize signal that are triggered
+immediately after initializing the MPI context with <code>MPI_Init</code>
+and immediately before deinitializing the MPI context with
+<code>MPI_Finalize</code>.
+<br>
+(Matthias Maier, 2021/04/19)

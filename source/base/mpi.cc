@@ -622,12 +622,67 @@ namespace Utilities
           return;
         }
 
+      /*
+       * A custom MPI datatype handle describing the memory layout of the
+       * MinMaxAvg struct. Initialized on first pass control reaches the
+       * static variable. So hopefully not initialized too early.
+       */
+      static MPI_Datatype type = []() {
+        MPI_Datatype type;
+
+        int lengths[] = {3, 2, 1};
+
+        MPI_Aint displacements[] = {0,
+                                    offsetof(MinMaxAvg, min_index),
+                                    offsetof(MinMaxAvg, avg)};
+
+        MPI_Datatype types[] = {MPI_DOUBLE, MPI_INT, MPI_DOUBLE};
+
+        int ierr =
+          MPI_Type_create_struct(3, lengths, displacements, types, &type);
+        AssertThrowMPI(ierr);
+
+        ierr = MPI_Type_commit(&type);
+        AssertThrowMPI(ierr);
+
+        /* Ensure that we free the allocated datatype again at the end of
+         * the program run just before we call MPI_Finalize():*/
+        MPI_InitFinalize::signals.at_mpi_finalize.connect([type]() mutable {
+          int ierr = MPI_Type_free(&type);
+          AssertThrowMPI(ierr);
+        });
+
+        return type;
+      }();
+
+      /*
+       * A custom MPI op handle for our max_reduce function.
+       * Initialized on first pass control reaches the static variable. So
+       * hopefully not initialized too early.
+       */
+      static MPI_Op op = []() {
+        MPI_Op op;
+
+        int ierr =
+          MPI_Op_create(reinterpret_cast<MPI_User_function *>(&max_reduce),
+                        true,
+                        &op);
+        AssertThrowMPI(ierr);
+
+        /* Ensure that we free the allocated op again at the end of the
+         * program run just before we call MPI_Finalize():*/
+        MPI_InitFinalize::signals.at_mpi_finalize.connect([op]() mutable {
+          int ierr = MPI_Op_free(&op);
+          AssertThrowMPI(ierr);
+        });
+
+        return op;
+      }();
+
       AssertDimension(Utilities::MPI::min(my_values.size(), mpi_communicator),
                       Utilities::MPI::max(my_values.size(), mpi_communicator));
 
       AssertDimension(my_values.size(), result.size());
-
-
 
       // To avoid uninitialized values on some MPI implementations, provide
       // result with a default value already...
@@ -646,13 +701,6 @@ namespace Utilities
       const unsigned int numproc =
         dealii::Utilities::MPI::n_mpi_processes(mpi_communicator);
 
-      MPI_Op op;
-      int    ierr =
-        MPI_Op_create(reinterpret_cast<MPI_User_function *>(&max_reduce),
-                      true,
-                      &op);
-      AssertThrowMPI(ierr);
-
       std::vector<MinMaxAvg> in(my_values.size());
 
       for (unsigned int i = 0; i < my_values.size(); i++)
@@ -661,26 +709,8 @@ namespace Utilities
           in[i].min_index = in[i].max_index = my_id;
         }
 
-      MPI_Datatype type;
-      int          lengths[]       = {3, 2, 1};
-      MPI_Aint     displacements[] = {0,
-                                  offsetof(MinMaxAvg, min_index),
-                                  offsetof(MinMaxAvg, avg)};
-      MPI_Datatype types[]         = {MPI_DOUBLE, MPI_INT, MPI_DOUBLE};
-
-      ierr = MPI_Type_create_struct(3, lengths, displacements, types, &type);
-      AssertThrowMPI(ierr);
-
-      ierr = MPI_Type_commit(&type);
-      AssertThrowMPI(ierr);
-      ierr = MPI_Allreduce(
+      int ierr = MPI_Allreduce(
         in.data(), result.data(), my_values.size(), type, op, mpi_communicator);
-      AssertThrowMPI(ierr);
-
-      ierr = MPI_Type_free(&type);
-      AssertThrowMPI(ierr);
-
-      ierr = MPI_Op_free(&op);
       AssertThrowMPI(ierr);
 
       for (auto &r : result)
@@ -764,6 +794,9 @@ namespace Utilities
 
 #endif
 
+    /* Force initialization of static struct: */
+    MPI_InitFinalize::Signals MPI_InitFinalize::signals =
+      MPI_InitFinalize::Signals();
 
 
     MPI_InitFinalize::MPI_InitFinalize(int &              argc,
@@ -922,6 +955,9 @@ namespace Utilities
           // finally set this number of threads
           MultithreadInfo::set_thread_limit(n_threads);
         }
+
+      // As a final step call the at_mpi_init() signal handler.
+      signals.at_mpi_init();
     }
 
 
@@ -954,6 +990,9 @@ namespace Utilities
 
     MPI_InitFinalize::~MPI_InitFinalize()
     {
+      // First, call the at_mpi_finalize() signal handler.
+      signals.at_mpi_finalize();
+
       // make memory pool release all PETSc/Trilinos/MPI-based vectors that
       // are no longer used at this point. this is relevant because the static
       // object destructors run for these vectors at the end of the program

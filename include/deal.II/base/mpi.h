@@ -23,6 +23,8 @@
 #include <deal.II/base/mpi_tags.h>
 #include <deal.II/base/numbers.h>
 
+#include <boost/signals2.hpp>
+
 #include <map>
 #include <numeric>
 #include <set>
@@ -990,6 +992,32 @@ namespace Utilities
        */
       static void
       unregister_request(MPI_Request &request);
+
+      /**
+       * A structure that has boost::signal objects to register a call back
+       * to run after MPI init or finalize.
+       *
+       * For documentation on signals, see
+       * http://www.boost.org/doc/libs/release/libs/signals2 .
+       */
+      struct Signals
+      {
+        /**
+         * A signal that is triggered immediately after we have
+         * initialized the MPI context with <code>MPI_Init()</code>.
+         */
+        boost::signals2::signal<void()> at_mpi_init;
+
+        /**
+         * A signal that is triggered just before we close the MPI context
+         * with <code>MPI_Finalize()</code>. It can be used to deallocate
+         * statically allocated MPI resources that need to be deallocated
+         * before <code>MPI_Finalize()</code> is called.
+         */
+        boost::signals2::signal<void()> at_mpi_finalize;
+      };
+
+      static Signals signals;
 
     private:
       /**
