@@ -954,6 +954,13 @@ public:
   n_children() const;
 
   /**
+   * @deprecated Use n_active_descendants() instead.
+   */
+  DEAL_II_DEPRECATED_EARLY
+  unsigned int
+  number_of_children() const;
+
+  /**
    * Compute and return the number of active descendants of this objects. For
    * example, if all of the eight children of a hex are further refined
    * isotropically exactly once, the returned number will be 64, not 80.
@@ -967,7 +974,7 @@ public:
    * current object is not further refined, the answer is one.
    */
   unsigned int
-  number_of_children() const;
+  n_active_descendants() const;
 
   /**
    * Return the number of times that this object is refined. Note that not all
@@ -2128,7 +2135,15 @@ public:
    * Always zero.
    */
   static unsigned int
+  n_active_descendants();
+
+  /**
+   * @deprecated Use n_active_descendants() instead.
+   */
+  DEAL_II_DEPRECATED_EARLY
+  static unsigned int
   number_of_children();
+
 
   /**
    * Return the number of times that this object is refined. Always 0.
@@ -2586,7 +2601,15 @@ public:
    * Always zero.
    */
   static unsigned int
+  n_active_descendants();
+
+  /**
+   * @deprecated Use n_active_descendants() instead.
+   */
+  DEAL_II_DEPRECATED_EARLY
+  static unsigned int
   number_of_children();
+
 
   /**
    * Return the number of times that this object is refined. Always 0.

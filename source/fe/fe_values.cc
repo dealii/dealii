@@ -5052,10 +5052,10 @@ FESubfaceValues<dim, spacedim>::reinit(
                        0,
                        GeometryInfo<dim>::max_children_per_face));
   Assert(!cell->face(face_no)->has_children() ||
-           subface_no < cell->face(face_no)->number_of_children(),
+           subface_no < cell->face(face_no)->n_active_descendants(),
          ExcIndexRange(subface_no,
                        0,
-                       cell->face(face_no)->number_of_children()));
+                       cell->face(face_no)->n_active_descendants()));
   Assert(cell->has_children() == false,
          ExcMessage("You can't use subface data for cells that are "
                     "already refined. Iterate over their children "

@@ -66,7 +66,7 @@ void check_this(Triangulation<3> &tria)
     for (const unsigned int face_no : GeometryInfo<3>::face_indices())
       if (!cell->at_boundary(face_no) && cell->face(face_no)->has_children())
         for (unsigned int subface_no = 0;
-             subface_no < cell->face(face_no)->number_of_children();
+             subface_no < cell->face(face_no)->n_active_descendants();
              ++subface_no)
           {
             unsigned int neighbor_neighbor = cell->neighbor_face_no(face_no);

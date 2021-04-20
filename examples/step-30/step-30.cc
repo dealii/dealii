@@ -497,7 +497,7 @@ namespace Step30
                     // Now we loop over all subfaces, i.e. the children and
                     // possibly grandchildren of the current face.
                     for (unsigned int subface_no = 0;
-                         subface_no < face->number_of_children();
+                         subface_no < face->n_active_descendants();
                          ++subface_no)
                       {
                         // To get the cell behind the current subface we can
@@ -747,7 +747,7 @@ namespace Step30
                       unsigned int neighbor2 = cell->neighbor_face_no(face_no);
                       // Now we loop over all subfaces,
                       for (unsigned int subface_no = 0;
-                           subface_no < face->number_of_children();
+                           subface_no < face->n_active_descendants();
                            ++subface_no)
                         {
                           // get an iterator pointing to the cell behind the
@@ -840,7 +840,7 @@ namespace Step30
                                  ExcInternalError());
                           Assert(neighbor_face_subface.second <
                                    neighbor->face(neighbor_face_subface.first)
-                                     ->number_of_children(),
+                                     ->n_active_descendants(),
                                  ExcInternalError());
                           Assert(neighbor->neighbor_child_on_subface(
                                    neighbor_face_subface.first,

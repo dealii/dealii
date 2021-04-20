@@ -1139,7 +1139,7 @@ namespace DoFTools
 
                 if (dof_handler.has_hp_capabilities())
                   for (unsigned int c = 0;
-                       c < cell->face(face)->number_of_children();
+                       c < cell->face(face)->n_active_descendants();
                        ++c)
                     {
                       const auto subcell =
