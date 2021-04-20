@@ -258,20 +258,20 @@
  * introduce any faces that have a nonunique direction; if that is so, then we
  * can stop following all paths below this point and track back immediately.
  *
- * Nevertheless, it is already obvious that the tree has <tt>4**N</tt> leaves
- * in two space dimensions, since each of the N cells can be added in four
+ * Nevertheless, it is already obvious that the tree has $4^N$ leaves
+ * in two space dimensions, since each of the $N$ cells can be added in four
  * orientations. Most of these nodes can be discarded rapidly, since firstly
  * the orientation of the first cell is irrelevant, and secondly if we add one
  * cell that has a neighbor that has already been added, then there are
  * already only two possible orientations left, so the total number of checks
  * we have to make until we find a valid way is significantly smaller than
- * <tt>4**N</tt>. However, the algorithm is still exponential in time and
+ * $4^N$. However, the algorithm is still exponential in time and
  * linear in memory (we only have to store the information for the present
  * path in form of a stack of orientations of cells that have already been
  * added).
  *
  * In fact, the two examples above show that the exponential estimate is not a
- * pessimized one: we indeed have to track back to one of the very first cells
+ * pessimistic one: we indeed have to track back to one of the very first cells
  * there to find a way to add all cells in a consistent fashion.
  *
  * This discouraging situation is greatly improved by the fact that we have an
@@ -279,7 +279,8 @@
  * and implemented by Michael Anderson of TICAM, University of Texas, in
  * 2003), and that for 3d we can find an algorithm that in practice is usually
  * only roughly linear in time and memory. We will describe these algorithms
- * in the following.
+ * in the following. A full description and theoretical analysis is given in
+ * @cite AABB17 .
  *
  *
  * <h3>The 2d linear complexity algorithm</h3>
@@ -419,7 +420,8 @@
  *
  * Prior to the implementation of the algorithms described above (originally
  * implemented by Michael Anderson in 2002, and re-implemented by Wolfgang
- * Bangerth in 2016), we used a branch-and-cut algorithm initially
+ * Bangerth in 2016 based on the work in @cite AABB17),
+ * we used a branch-and-cut algorithm initially
  * implemented in 2000 by Wolfgang Bangerth. Although it is no longer used,
  * here is how it works, and why it doesn't always work for large meshes since
  * its run-time can be exponential in bad cases.
