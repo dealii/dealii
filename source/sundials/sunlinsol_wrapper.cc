@@ -194,19 +194,22 @@ namespace SUNDIALS
 
 
 
-  template <typename VectorType>
-  internal::LinearSolverWrapper<VectorType>::~LinearSolverWrapper()
+  namespace internal
   {
-    SUNLinSolFreeEmpty(sun_linear_solver);
-  }
+    template <typename VectorType>
+    LinearSolverWrapper<VectorType>::~LinearSolverWrapper()
+    {
+      SUNLinSolFreeEmpty(sun_linear_solver);
+    }
 
 
 
-  template <typename VectorType>
-  internal::LinearSolverWrapper<VectorType>::operator SUNLinearSolver()
-  {
-    return sun_linear_solver;
-  }
+    template <typename VectorType>
+    LinearSolverWrapper<VectorType>::operator SUNLinearSolver()
+    {
+      return sun_linear_solver;
+    }
+  } // namespace internal
 
 
 
