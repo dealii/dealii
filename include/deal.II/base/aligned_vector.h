@@ -833,22 +833,36 @@ inline void
 AlignedVector<T>::resize_fast(const size_type new_size)
 {
   const size_type old_size = size();
-  if (std::is_trivial<T>::value == false && new_size < old_size)
+
+  if (new_size == 0)
+    clear();
+  else if (new_size == old_size)
+    {} // nothing to do here
+  else if (new_size < old_size)
     {
       // call destructor on fields that are released. doing it backward
       // releases the elements in reverse order as compared to how they were
       // created
-      while (used_elements_end != elements.get() + new_size)
-        (--used_elements_end)->~T();
+      if (std::is_trivial<T>::value == false)
+        {
+          while (used_elements_end != elements.get() + new_size)
+            (--used_elements_end)->~T();
+        }
+      else
+        used_elements_end = elements.get() + new_size;
     }
-  reserve(new_size);
-  used_elements_end = elements.get() + new_size;
+  else // new_size > old_size
+    {
+      // Allocate more space, and claim that space as used
+      reserve(new_size);
+      used_elements_end = elements.get() + new_size;
 
-  // need to still set the values in case the class is non-trivial because
-  // virtual classes etc. need to run their (default) constructor
-  if (std::is_trivial<T>::value == false && new_size > old_size)
-    dealii::internal::AlignedVectorDefaultInitialize<T, true>(
-      new_size - old_size, elements.get() + old_size);
+      // need to still set the values in case the class is non-trivial because
+      // virtual classes etc. need to run their (default) constructor
+      if (std::is_trivial<T>::value == false)
+        dealii::internal::AlignedVectorDefaultInitialize<T, true>(
+          new_size - old_size, elements.get() + old_size);
+    }
 }
 
 
@@ -858,21 +872,34 @@ inline void
 AlignedVector<T>::resize(const size_type new_size)
 {
   const size_type old_size = size();
-  if (std::is_trivial<T>::value == false && new_size < old_size)
+
+  if (new_size == 0)
+    clear();
+  else if (new_size == old_size)
+    {} // nothing to do here
+  else if (new_size < old_size)
     {
       // call destructor on fields that are released. doing it backward
       // releases the elements in reverse order as compared to how they were
       // created
-      while (used_elements_end != elements.get() + new_size)
-        (--used_elements_end)->~T();
+      if (std::is_trivial<T>::value == false)
+        {
+          while (used_elements_end != elements.get() + new_size)
+            (--used_elements_end)->~T();
+        }
+      else
+        used_elements_end = elements.get() + new_size;
     }
-  reserve(new_size);
-  used_elements_end = elements.get() + new_size;
+  else // new_size > old_size
+    {
+      // Allocate more space, and claim that space as used
+      reserve(new_size);
+      used_elements_end = elements.get() + new_size;
 
-  // finally set the desired init values
-  if (new_size > old_size)
-    dealii::internal::AlignedVectorDefaultInitialize<T, true>(
-      new_size - old_size, elements.get() + old_size);
+      // finally set the values to the default initializer
+      dealii::internal::AlignedVectorDefaultInitialize<T, true>(
+        new_size - old_size, elements.get() + old_size);
+    }
 }
 
 
@@ -882,22 +909,35 @@ inline void
 AlignedVector<T>::resize(const size_type new_size, const T &init)
 {
   const size_type old_size = size();
-  if (std::is_trivial<T>::value == false && new_size < old_size)
+
+  if (new_size == 0)
+    clear();
+  else if (new_size == old_size)
+    {} // nothing to do here
+  else if (new_size < old_size)
     {
       // call destructor on fields that are released. doing it backward
       // releases the elements in reverse order as compared to how they were
       // created
-      while (used_elements_end != elements.get() + new_size)
-        (--used_elements_end)->~T();
+      if (std::is_trivial<T>::value == false)
+        {
+          while (used_elements_end != elements.get() + new_size)
+            (--used_elements_end)->~T();
+        }
+      else
+        used_elements_end = elements.get() + new_size;
     }
-  reserve(new_size);
-  used_elements_end = elements.get() + new_size;
+  else // new_size > old_size
+    {
+      // Allocate more space, and claim that space as used
+      reserve(new_size);
+      used_elements_end = elements.get() + new_size;
 
-  // finally set the desired init values
-  if (new_size > old_size)
-    dealii::internal::AlignedVectorSet<T, true>(new_size - old_size,
-                                                init,
-                                                elements.get() + old_size);
+      // finally set the desired init values
+      dealii::internal::AlignedVectorSet<T, true>(new_size - old_size,
+                                                  init,
+                                                  elements.get() + old_size);
+    }
 }
 
 
