@@ -1114,7 +1114,9 @@ namespace Utilities
      * @param[in] root_process The process that sends the object to all
      * processes. By default the process with rank 0 is the root process.
      *
-     * @return Every process receives the object sent by the @p root_process.
+     * @return On the root process, return a copy of @p object_to_send.
+     *   On every other process, return a copy of the object sent by
+     *   the @p root_process.
      */
     template <typename T>
     T
@@ -1514,6 +1516,8 @@ namespace Utilities
 #  endif
     }
 
+
+
     template <typename T>
     T
     broadcast(const MPI_Comm &   comm,
@@ -1553,7 +1557,10 @@ namespace Utilities
         MPI_Bcast(buffer.data(), buffer_size, MPI_CHAR, root_process, comm);
       AssertThrowMPI(ierr);
 
-      return Utilities::unpack<T>(buffer, false);
+      if (Utilities::MPI::this_mpi_process(comm) == root_process)
+        return object_to_send;
+      else
+        return Utilities::unpack<T>(buffer, false);
 #  endif
     }
 
