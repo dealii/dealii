@@ -100,8 +100,6 @@ test(const unsigned int n_refinements)
     return result;
   };
 
-  AssertDimension(process(), false); // not categorize
-
   MatrixFreeTools::categorize_by_boundary_ids(tria, additional_data);
 
   AssertDimension(process(), true); // categorized
