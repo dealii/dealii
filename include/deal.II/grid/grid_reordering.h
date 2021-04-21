@@ -81,7 +81,10 @@ public:
    * vertices within a cell. If false (the default), then use the "old-style"
    * ordering of vertices within cells used by deal.II before version 5.2 and
    * as explained in the documentation of this class.
+   *
+   * @deprecated Use GridTools::invert_all_negative_measure_cells() instead.
    */
+  DEAL_II_DEPRECATED_EARLY
   static void
   invert_all_cells_of_negative_grid(
     const std::vector<Point<spacedim>> &all_vertices,

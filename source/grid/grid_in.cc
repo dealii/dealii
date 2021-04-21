@@ -560,7 +560,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
 
       // TODO: the functions below (GridTools::delete_unused_vertices(),
-      // GridTools::invert_all_cells_of_negative_grid(),
+      // GridTools::invert_all_negative_measure_cells(),
       // GridReordering::reorder_cells()) need to be
       // revisited for simplex/mixed meshes
 
@@ -569,8 +569,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
           GridTools::delete_unused_vertices(vertices, cells, subcelldata);
 
           if (dim == spacedim)
-            GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(
-              vertices, cells, true);
+            GridTools::invert_all_negative_measure_cells(vertices, cells);
 
           GridReordering<dim, spacedim>::reorder_cells(cells, true);
           tria->create_triangulation(vertices, cells, subcelldata);
@@ -861,9 +860,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
 
   if (dim == spacedim)
-    GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
-                                                                     cells,
-                                                                     true);
+    GridTools::invert_all_negative_measure_cells(vertices, cells);
 
   GridReordering<dim, spacedim>::reorder_cells(cells, true);
 
@@ -1097,9 +1094,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
   // ... and cells
   if (dim == spacedim)
-    GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
-                                                                     cells,
-                                                                     true);
+    GridTools::invert_all_negative_measure_cells(vertices, cells);
   GridReordering<dim, spacedim>::reorder_cells(cells, true);
   tria->create_triangulation(vertices, cells, subcelldata);
 }
@@ -1352,9 +1347,7 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
   // do some clean-up on vertices...
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
   // ...and cells
-  GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
-                                                                   cells,
-                                                                   true);
+  GridTools::invert_all_negative_measure_cells(vertices, cells);
   GridReordering<dim, spacedim>::reorder_cells(cells, true);
   tria->create_triangulation(vertices, cells, subcelldata);
 }
@@ -1422,9 +1415,7 @@ GridIn<dim, spacedim>::read_xda(std::istream &in)
   // do some clean-up on vertices...
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
   // ... and cells
-  GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
-                                                                   cells,
-                                                                   true);
+  GridTools::invert_all_negative_measure_cells(vertices, cells);
   GridReordering<dim>::reorder_cells(cells, true);
   tria->create_triangulation(vertices, cells, subcelldata);
 }
@@ -2104,7 +2095,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   AssertThrow(cells.size() > 0, ExcGmshNoCellInformation());
 
   // TODO: the functions below (GridTools::delete_unused_vertices(),
-  // GridTools::invert_all_cells_of_negative_grid(),
+  // GridTools::invert_all_negative_measure_cells(),
   // GridReordering::reorder_cells()) need to be revisited
   // for simplex/mixed meshes
 
@@ -2114,8 +2105,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
       GridTools::delete_unused_vertices(vertices, cells, subcelldata);
       // ... and cells
       if (dim == spacedim)
-        GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(
-          vertices, cells, true);
+        GridTools::invert_all_negative_measure_cells(vertices, cells);
       GridReordering<dim, spacedim>::reorder_cells(cells, true);
     }
   tria->create_triangulation(vertices, cells, subcelldata);
@@ -2808,9 +2798,7 @@ GridIn<2>::read_tecplot(std::istream &in)
   AssertThrow(in, ExcIO());
 
   // do some cleanup on cells
-  GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
-                                                                   cells,
-                                                                   true);
+  GridTools::invert_all_negative_measure_cells(vertices, cells);
   GridReordering<dim, spacedim>::reorder_cells(cells, true);
   tria->create_triangulation(vertices, cells, subcelldata);
 }
@@ -2965,9 +2953,7 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
 
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
   if (dim == spacedim)
-    GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
-                                                                     cells,
-                                                                     true);
+    GridTools::invert_all_negative_measure_cells(vertices, cells);
   GridReordering<dim, spacedim>::reorder_cells(cells, true);
   tria->create_triangulation(vertices, cells, subcelldata);
 
