@@ -1801,13 +1801,22 @@ template <int structdim, int dim, int spacedim>
 unsigned int
 TriaAccessor<structdim, dim, spacedim>::number_of_children() const
 {
+  return n_active_descendants();
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+unsigned int
+TriaAccessor<structdim, dim, spacedim>::n_active_descendants() const
+{
   if (!this->has_children())
     return 1;
   else
     {
       unsigned int sum = 0;
       for (unsigned int c = 0; c < n_children(); ++c)
-        sum += this->child(c)->number_of_children();
+        sum += this->child(c)->n_active_descendants();
       return sum;
     }
 }
@@ -2568,6 +2577,15 @@ TriaAccessor<0, dim, spacedim>::number_of_children()
 
 template <int dim, int spacedim>
 inline unsigned int
+TriaAccessor<0, dim, spacedim>::n_active_descendants()
+{
+  return 0;
+}
+
+
+
+template <int dim, int spacedim>
+inline unsigned int
 TriaAccessor<0, dim, spacedim>::max_refinement_depth()
 {
   return 0;
@@ -2983,6 +3001,15 @@ TriaAccessor<0, 1, spacedim>::n_children()
 template <int spacedim>
 inline unsigned int
 TriaAccessor<0, 1, spacedim>::number_of_children()
+{
+  return 0;
+}
+
+
+
+template <int spacedim>
+inline unsigned int
+TriaAccessor<0, 1, spacedim>::n_active_descendants()
 {
   return 0;
 }

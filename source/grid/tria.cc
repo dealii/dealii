@@ -5326,7 +5326,7 @@ namespace internal
                           if (face_ref_case ==
                               RefinementCase<dim - 1>::isotropic_refinement)
                             {
-                              if (aface->number_of_children() < 4)
+                              if (aface->n_active_descendants() < 4)
                                 // we use user_flags to denote needed
                                 // isotropic refinement
                                 aface->set_user_flag();

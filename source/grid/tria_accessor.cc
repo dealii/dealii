@@ -2981,7 +2981,7 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
               const typename Triangulation<dim, spacedim>::face_iterator
                                  mother_face = this->face(face);
               const unsigned int total_children =
-                mother_face->number_of_children();
+                mother_face->n_active_descendants();
               AssertIndexRange(subface, total_children);
               Assert(total_children <= GeometryInfo<3>::max_children_per_face,
                      ExcInternalError());

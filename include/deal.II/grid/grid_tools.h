@@ -3487,7 +3487,7 @@ namespace GridTools
                 // out which border to the present
                 // cell
                 for (unsigned int c = 0;
-                     c < cell->face(n)->number_of_children();
+                     c < cell->face(n)->n_active_descendants();
                      ++c)
                   active_neighbors.push_back(
                     cell->neighbor_child_on_subface(n, c));
