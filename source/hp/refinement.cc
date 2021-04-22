@@ -634,7 +634,8 @@ namespace hp
             if (cell->future_fe_index_set())
               {
                 predicted_errors[cell->active_cell_index()] *=
-                  std::pow(gamma_p, future_fe_degree - cell->get_fe().degree);
+                  std::pow(gamma_p,
+                           int(future_fe_degree) - int(cell->get_fe().degree));
               }
 
             // step 2: algebraic decay with h-adaptation
