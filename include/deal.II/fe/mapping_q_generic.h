@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/derivative_form.h>
+#include <deal.II/base/polynomial.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/vectorization.h>
@@ -29,6 +30,7 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/matrix_free/shape_info.h>
+#include <deal.II/matrix_free/tensor_product_kernels.h>
 
 #include <array>
 #include <cmath>
@@ -163,6 +165,14 @@ public:
   virtual bool
   preserves_vertex_locations() const override;
 
+  // for documentation, see the Mapping base class
+  virtual BoundingBox<spacedim>
+  get_bounding_box(const typename Triangulation<dim, spacedim>::cell_iterator
+                     &cell) const override;
+
+  virtual bool
+  is_compatible_with(const ReferenceCell &reference_cell) const override;
+
   /**
    * @name Mapping points between reference and real cells
    * @{
@@ -179,6 +189,13 @@ public:
   transform_real_to_unit_cell(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const Point<spacedim> &p) const override;
+
+  // for documentation, see the Mapping base class
+  virtual void
+  transform_points_real_to_unit_cell(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const ArrayView<const Point<spacedim>> &                    real_points,
+    const ArrayView<Point<dim>> &unit_points) const override;
 
   /**
    * @}
@@ -225,6 +242,23 @@ public:
             const ArrayView<Tensor<3, spacedim>> &output) const override;
 
   /**
+   * As compared to the other transform functions that rely on pre-computed
+   * information of InternalDataBase, this function chooses the flexible
+   * evaluation path on the cell and points passed in to the current
+   * function. The types `Number` and `Number2` of the input and output arrays
+   * must be such that `Number2 = apply_transformation(DerivativeForm<1,
+   * spacedim, dim>, Number)`.
+   */
+  template <typename Number, typename Number2>
+  void
+  transform_variable(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const MappingKind                                           kind,
+    const ArrayView<const Point<dim>> &                         unit_points,
+    const ArrayView<const Number> &                             input,
+    const ArrayView<Number2> &                                  output) const;
+
+  /**
    * @}
    */
 
@@ -233,7 +267,6 @@ public:
    * @{
    */
 
-public:
   /**
    * Storage for internal data of polynomial mappings. See
    * Mapping::InternalDataBase for an extensive description.
@@ -294,7 +327,6 @@ public:
      */
     void
     compute_shape_function_values(const std::vector<Point<dim>> &unit_points);
-
 
     /**
      * Shape function at quadrature point. Shape functions are in tensor
@@ -544,10 +576,12 @@ public:
   virtual std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
   get_data(const UpdateFlags, const Quadrature<dim> &quadrature) const override;
 
+  using Mapping<dim, spacedim>::get_face_data;
+
   // documentation can be found in Mapping::get_face_data()
   virtual std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
-  get_face_data(const UpdateFlags          flags,
-                const Quadrature<dim - 1> &quadrature) const override;
+  get_face_data(const UpdateFlags               flags,
+                const hp::QCollection<dim - 1> &quadrature) const override;
 
   // documentation can be found in Mapping::get_subface_data()
   virtual std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
@@ -564,12 +598,14 @@ public:
     dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
 
+  using Mapping<dim, spacedim>::fill_fe_face_values;
+
   // documentation can be found in Mapping::fill_fe_face_values()
   virtual void
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const Quadrature<dim - 1> &                                 quadrature,
+    const hp::QCollection<dim - 1> &                            quadrature,
     const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
     dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
@@ -597,15 +633,40 @@ protected:
   const unsigned int polynomial_degree;
 
   /*
-   * The default line support points. These are used when computing
-   * the location in real space of the support points on lines and
-   * quads, which are asked to the Manifold<dim,spacedim> class.
+   * The default line support points. These are used when computing the
+   * location in real space of the support points on lines and quads, which
+   * are needed by the Manifold<dim,spacedim> class.
    *
-   * The number of quadrature points depends on the degree of this
-   * class, and it matches the number of degrees of freedom of an
-   * FE_Q<1>(this->degree).
+   * The number of points depends on the degree of this class, and it matches
+   * the number of degrees of freedom of an FE_Q<1>(this->degree).
    */
-  QGaussLobatto<1> line_support_points;
+  const std::vector<Point<1>> line_support_points;
+
+  /*
+   * The one-dimensional polynomials defined as Lagrange polynomials from the
+   * line support points. These are used for point evaluations and match the
+   * polynomial space of an FE_Q<1>(this->degree).
+   */
+  const std::vector<Polynomials::Polynomial<double>> polynomials_1d;
+
+  /*
+   * The numbering from the lexicographic to the hierarchical ordering used
+   * when expanding the tensor product with the mapping support points (which
+   * come in hierarchical numbers).
+   */
+  const std::vector<unsigned int> renumber_lexicographic_to_hierarchic;
+
+  /*
+   * The support points in reference coordinates. These are used for
+   * constructing approximations of the output of
+   * compute_mapping_support_points() when evaluating the mapping on the fly,
+   * rather than going through the FEValues interface provided by
+   * InternalData.
+   *
+   * The number of points depends on the degree of this class, and it matches
+   * the number of degrees of freedom of an FE_Q<dim>(this->degree).
+   */
+  const std::vector<Point<dim>> unit_cell_support_points;
 
   /**
    * A vector of tables of weights by which we multiply the locations of the
@@ -626,7 +687,8 @@ protected:
    * For the definition of this table see equation (8) of the `mapping'
    * report.
    */
-  std::vector<Table<2, double>> support_point_weights_perimeter_to_interior;
+  const std::vector<Table<2, double>>
+    support_point_weights_perimeter_to_interior;
 
   /**
    * A table of weights by which we multiply the locations of the vertex
@@ -640,7 +702,7 @@ protected:
    * in 2D, 8 in 3D), and as many rows as there are additional support points
    * in the mapping, i.e., <code>(degree+1)^dim - 2^dim</code>.
    */
-  Table<2, double> support_point_weights_cell;
+  const Table<2, double> support_point_weights_cell;
 
   /**
    * Return the locations of support points for the mapping. For example, for
@@ -865,6 +927,79 @@ inline bool
 MappingQGeneric<dim, spacedim>::preserves_vertex_locations() const
 {
   return true;
+}
+
+
+
+template <int dim, int spacedim>
+template <typename Number, typename Number2>
+inline void
+MappingQGeneric<dim, spacedim>::transform_variable(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const MappingKind                                           kind,
+  const ArrayView<const Point<dim>> &                         unit_points,
+  const ArrayView<const Number> &                             input,
+  const ArrayView<Number2> &                                  output) const
+{
+  AssertDimension(unit_points.size(), output.size());
+  AssertDimension(unit_points.size(), input.size());
+
+  const std::vector<Point<spacedim>> support_points =
+    this->compute_mapping_support_points(cell);
+
+  const unsigned int n_points = unit_points.size();
+  const unsigned int n_lanes  = VectorizedArray<double>::size();
+
+  if (kind != mapping_covariant)
+    Assert(false, ExcNotImplemented());
+
+  // Use the more heavy VectorizedArray code path if there is more than
+  // one point left to compute
+  for (unsigned int i = 0; i < n_points; i += n_lanes)
+    if (n_points - i > 1)
+      {
+        Point<dim, VectorizedArray<double>> p_vec;
+        for (unsigned int j = 0; j < n_lanes; ++j)
+          if (i + j < n_points)
+            for (unsigned int d = 0; d < spacedim; ++d)
+              p_vec[d][j] = unit_points[i + j][d];
+          else
+            for (unsigned int d = 0; d < spacedim; ++d)
+              p_vec[d][j] = unit_points[i][d];
+
+        const DerivativeForm<1, spacedim, dim, VectorizedArray<double>> grad =
+          internal::evaluate_tensor_product_value_and_gradient(
+            polynomials_1d,
+            support_points,
+            p_vec,
+            polynomial_degree == 1,
+            renumber_lexicographic_to_hierarchic)
+            .second;
+
+        const DerivativeForm<1, spacedim, dim, VectorizedArray<double>> jac =
+          grad.transpose().covariant_form();
+        for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
+          {
+            DerivativeForm<1, spacedim, dim> jac_j;
+            for (unsigned int d = 0; d < spacedim; ++d)
+              for (unsigned int e = 0; e < dim; ++e)
+                jac_j[d][e] = jac[d][e][j];
+            output[i + j] = apply_transformation(jac_j, input[i + j]);
+          }
+      }
+    else
+      {
+        const DerivativeForm<1, spacedim, dim> grad =
+          internal::evaluate_tensor_product_value_and_gradient(
+            polynomials_1d,
+            support_points,
+            unit_points[i],
+            polynomial_degree == 1,
+            renumber_lexicographic_to_hierarchic)
+            .second;
+        output[i] =
+          apply_transformation(grad.transpose().covariant_form(), input[i]);
+      }
 }
 
 #endif // DOXYGEN

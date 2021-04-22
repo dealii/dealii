@@ -120,7 +120,7 @@ namespace Particles
 
 #ifdef DEAL_II_WITH_MPI
       if (const auto tria =
-            dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+            dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
               &triangulation))
         {
           const types::particle_index n_particles_to_generate =
@@ -129,12 +129,13 @@ namespace Particles
 
           // The local particle start index is the number of all particles
           // generated on lower MPI ranks.
-          MPI_Exscan(&n_particles_to_generate,
-                     &particle_index,
-                     1,
-                     DEAL_II_PARTICLE_INDEX_MPI_TYPE,
-                     MPI_SUM,
-                     tria->get_communicator());
+          const int ierr = MPI_Exscan(&n_particles_to_generate,
+                                      &particle_index,
+                                      1,
+                                      DEAL_II_PARTICLE_INDEX_MPI_TYPE,
+                                      MPI_SUM,
+                                      tria->get_communicator());
+          AssertThrowMPI(ierr);
         }
 #endif
 
@@ -236,7 +237,7 @@ namespace Particles
     {
       unsigned int combined_seed = random_number_seed;
       if (const auto tria =
-            dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+            dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
               &triangulation))
         {
           const unsigned int my_rank =
@@ -264,7 +265,7 @@ namespace Particles
         double global_weight_integral;
 
         if (const auto tria =
-              dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+              dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
                 &triangulation))
           {
             global_weight_integral =
@@ -292,15 +293,16 @@ namespace Particles
 
 #ifdef DEAL_II_WITH_MPI
         if (const auto tria =
-              dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+              dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
                 &triangulation))
           {
-            MPI_Exscan(&local_weight_integral,
-                       &local_start_weight,
-                       1,
-                       MPI_DOUBLE,
-                       MPI_SUM,
-                       tria->get_communicator());
+            const int ierr = MPI_Exscan(&local_weight_integral,
+                                        &local_start_weight,
+                                        1,
+                                        MPI_DOUBLE,
+                                        MPI_SUM,
+                                        tria->get_communicator());
+            AssertThrowMPI(ierr);
           }
 #endif
 
@@ -401,6 +403,8 @@ namespace Particles
         particle_handler.insert_particles(particles);
       }
     }
+
+
 
     template <int dim, int spacedim>
     void

@@ -614,7 +614,7 @@ namespace TrilinosWrappers
 #  ifdef DEBUG
 #    ifdef DEAL_II_WITH_MPI
       // check that every process has decided to use the same mode. This will
-      // otherwise result in undefined behaviour in the call to
+      // otherwise result in undefined behavior in the call to
       // GlobalAssemble().
       double                double_mode = mode;
       const Epetra_MpiComm *comm_ptr =

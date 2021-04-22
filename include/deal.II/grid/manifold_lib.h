@@ -26,6 +26,17 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// forward declaration
+namespace internal
+{
+  namespace MappingQGenericImplementation
+  {
+    template <int, int>
+    class InverseQuadraticApproximation;
+  }
+} // namespace internal
+
+
 /**
  * Manifold description for a polar coordinate system.
  *
@@ -1132,6 +1143,14 @@ private:
    * use a FlatManifold description.
    */
   FlatManifold<dim> chart_manifold;
+
+  /**
+   * A vector of quadratic approximations to the inverse map from real points
+   * to chart points for each of the coarse mesh cells.
+   */
+  std::vector<internal::MappingQGenericImplementation::
+                InverseQuadraticApproximation<dim, spacedim>>
+    quadratic_approximation;
 
   /**
    * The connection to Triangulation::signals::clear that must be reset once

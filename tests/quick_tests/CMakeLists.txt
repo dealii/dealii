@@ -104,8 +104,8 @@ IF (DEAL_II_WITH_TBB)
   make_quicktest("tbb" ${_mybuild} "")
 ENDIF()
 
-# test cpp-taskflow
-IF (DEAL_II_WITH_CPP_TASKFLOW)
+# test taskflow
+IF (DEAL_II_WITH_TASKFLOW)
   make_quicktest("taskflow" ${_mybuild} "")
 ENDIF()
 

@@ -22,6 +22,7 @@
 
 #include <deal.II/dofs/dof_accessor.h> //provides information about the degrees of freedom local to a cell
 #include <deal.II/dofs/dof_handler.h> //associate DoF to cells/vertices/lines
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h> //use to renumber DoF to have a better sparsity pattern
 #include <deal.II/dofs/dof_tools.h> //needed for the creation of sparsity patterns of sparse matrices
 
@@ -38,7 +39,6 @@
 #include <deal.II/grid/tria_accessor.h> //these two to loop over cells/faces
 #include <deal.II/grid/tria_iterator.h> // ^
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/hp/q_collection.h>
@@ -97,8 +97,8 @@ private:
   std::vector<types::global_dof_index> dofs_per_block;
 
   Triangulation<dim>
-                      triangulation; // a triangulation object of the "dim"-dimensional domain;
-  hp::DoFHandler<dim> dof_handler; // is associated with triangulation;
+                  triangulation; // a triangulation object of the "dim"-dimensional domain;
+  DoFHandler<dim> dof_handler; // is associated with triangulation;
 
   FESystem<dim>         elasticity_fe;
   FESystem<dim>         elasticity_w_lagrange_fe;
@@ -322,11 +322,11 @@ ElasticProblem<dim>::setup_system()
     block_component[i + dim] = lambda_block;
 
   //(1) set active FE indices based in material id...
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
-  unsigned int n_lagrange_cells                           = 0;
-  unsigned int n_elasticity_cells                         = 0;
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
+  unsigned int n_lagrange_cells                       = 0;
+  unsigned int n_elasticity_cells                     = 0;
   for (; cell != endc; ++cell) // loop over all cells
     {
       if (cell->material_id() == id_of_lagrange_mult)

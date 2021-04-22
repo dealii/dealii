@@ -16,11 +16,13 @@
 
 
 // Check the consistency of the number cache of DoFHandler for a sequential
-// object. Like deal.II/dof_handler_number_cache but for an hp object
+// object. Like deal.II/dof_handler_number_cache but for an hp-object
 
 
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>
+
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
@@ -32,7 +34,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include "../tests.h"
@@ -50,7 +51,7 @@ test()
   for (unsigned int i = 0; i < 4; ++i)
     fe.push_back(FESystem<dim>(FE_Q<dim>(i + 1), 2, FE_DGQ<dim>(i), 1));
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(2);
@@ -91,7 +92,7 @@ test()
       triangulation.execute_coarsening_and_refinement();
 
       index = 0;
-      for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+      for (typename DoFHandler<dim>::active_cell_iterator cell =
              dof_handler.begin_active();
            cell != dof_handler.end();
            ++cell, ++index)

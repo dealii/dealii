@@ -26,6 +26,7 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -41,7 +42,6 @@
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
@@ -89,20 +89,20 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
                                               p2);
   }
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   hp::FECollection<dim> fe_collection;
   fe_collection.push_back(
     FESystem<dim>(FE_Q<dim>(p1), 1, FE_Nothing<dim>(1, true), 1));
   fe_collection.push_back(FESystem<dim>(FE_Q<dim>(p2), 1, FE_Q<dim>(1), 1));
-  // push back to be able to resolve hp constrains no matter what:
+  // push back to be able to resolve hp-constrains no matter what:
   fe_collection.push_back(
     FESystem<dim>(FE_Q<dim>(p2), 1, FE_Nothing<dim>(1, true), 1));
 
   hp::QCollection<dim - 1> q_face_collection;
-  q_face_collection.push_back(QIterated<dim - 1>(QTrapez<1>(), 2));
-  q_face_collection.push_back(QIterated<dim - 1>(QTrapez<1>(), 2));
-  q_face_collection.push_back(QIterated<dim - 1>(QTrapez<1>(), 2));
+  q_face_collection.push_back(QIterated<dim - 1>(QTrapezoid<1>(), 2));
+  q_face_collection.push_back(QIterated<dim - 1>(QTrapezoid<1>(), 2));
+  q_face_collection.push_back(QIterated<dim - 1>(QTrapezoid<1>(), 2));
 
   deallog << "2cells: " << fe_collection[0].get_name() << " vs "
           << fe_collection[1].get_name() << std::endl;
@@ -145,14 +145,14 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
       shape_functions.push_back(shape_function);
     }
 
-  DataOut<dim, hp::DoFHandler<dim>> data_out;
+  DataOut<dim, DoFHandler<dim>> data_out;
   data_out.attach_dof_handler(dof_handler);
 
   // get material ids:
   Vector<float> fe_index(triangulation.n_active_cells());
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (unsigned int index = 0; cell != endc; ++cell, ++index)
     {
       fe_index[index] = cell->active_fe_index();
@@ -184,7 +184,7 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
 
   std::vector<unsigned int>   local_face_dof_indices;
   std::vector<Vector<double>> values;
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  for (typename DoFHandler<dim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)

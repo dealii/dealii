@@ -14,7 +14,6 @@
 // ---------------------------------------------------------------------
 
 
-#include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/template_constraints.h>
@@ -34,15 +33,14 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const unsigned int degree)
-  : FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>(
-      TensorProductPolynomialsConst<dim>(
-        Polynomials::generate_complete_Lagrange_basis(
-          QGaussLobatto<1>(degree + 1).get_points())),
-      FiniteElementData<dim>(get_dpo_vector(degree),
-                             1,
-                             degree,
-                             FiniteElementData<dim>::L2),
-      get_riaf_vector(degree))
+  : FE_Q_Base<dim, spacedim>(TensorProductPolynomialsConst<dim>(
+                               Polynomials::generate_complete_Lagrange_basis(
+                                 QGaussLobatto<1>(degree + 1).get_points())),
+                             FiniteElementData<dim>(get_dpo_vector(degree),
+                                                    1,
+                                                    degree,
+                                                    FiniteElementData<dim>::L2),
+                             get_riaf_vector(degree))
 {
   Assert(degree > 0,
          ExcMessage("This element can only be used for polynomial degrees "
@@ -55,14 +53,14 @@ FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const unsigned int degree)
   for (unsigned int d = 0; d < dim; ++d)
     point[d] = 0.5;
   this->unit_support_points.push_back(point);
-  AssertDimension(this->dofs_per_cell, this->unit_support_points.size());
+  AssertDimension(this->n_dofs_per_cell(), this->unit_support_points.size());
 }
 
 
 
 template <int dim, int spacedim>
 FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const Quadrature<1> &points)
-  : FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>(
+  : FE_Q_Base<dim, spacedim>(
       TensorProductPolynomialsConst<dim>(
         Polynomials::generate_complete_Lagrange_basis(points.get_points())),
       FiniteElementData<dim>(get_dpo_vector(points.size() - 1),
@@ -85,7 +83,7 @@ FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const Quadrature<1> &points)
   for (unsigned int d = 0; d < dim; ++d)
     point[d] = 0.5;
   this->unit_support_points.push_back(point);
-  AssertDimension(this->dofs_per_cell, this->unit_support_points.size());
+  AssertDimension(this->n_dofs_per_cell(), this->unit_support_points.size());
 }
 
 
@@ -102,7 +100,7 @@ FE_Q_DG0<dim, spacedim>::get_name() const
   bool                           type     = true;
   const unsigned int             n_points = this->degree + 1;
   std::vector<double>            points(n_points);
-  const unsigned int             dofs_per_cell = this->dofs_per_cell;
+  const unsigned int             dofs_per_cell = this->n_dofs_per_cell();
   const std::vector<Point<dim>> &unit_support_points =
     this->unit_support_points;
   unsigned int index = 0;
@@ -141,7 +139,7 @@ FE_Q_DG0<dim, spacedim>::get_name() const
     {
       if (this->degree > 2)
         namebuf << "FE_Q_DG0<" << Utilities::dim_string(dim, spacedim)
-                << ">(QIterated(QTrapez()," << this->degree << "))";
+                << ">(QIterated(QTrapezoid()," << this->degree << "))";
       else
         namebuf << "FE_Q_DG0<" << Utilities::dim_string(dim, spacedim) << ">("
                 << this->degree << ")";
@@ -187,13 +185,13 @@ FE_Q_DG0<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
   Assert(support_point_values.size() == this->unit_support_points.size(),
          ExcDimensionMismatch(support_point_values.size(),
                               this->unit_support_points.size()));
-  Assert(nodal_dofs.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(nodal_dofs.size(), this->dofs_per_cell));
+  Assert(nodal_dofs.size() == this->n_dofs_per_cell(),
+         ExcDimensionMismatch(nodal_dofs.size(), this->n_dofs_per_cell()));
   Assert(support_point_values[0].size() == this->n_components(),
          ExcDimensionMismatch(support_point_values[0].size(),
                               this->n_components()));
 
-  for (unsigned int i = 0; i < this->dofs_per_cell - 1; ++i)
+  for (unsigned int i = 0; i < this->n_dofs_per_cell() - 1; ++i)
     {
       const std::pair<unsigned int, unsigned int> index =
         this->system_to_component_index(i);
@@ -220,14 +218,15 @@ FE_Q_DG0<dim, spacedim>::get_interpolation_matrix(
       (dynamic_cast<const FEQDG0 *>(&x_source_fe) != nullptr),
     (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
 
-  Assert(interpolation_matrix.m() == this->dofs_per_cell,
-         ExcDimensionMismatch(interpolation_matrix.m(), this->dofs_per_cell));
-  Assert(interpolation_matrix.n() == x_source_fe.dofs_per_cell,
+  Assert(interpolation_matrix.m() == this->n_dofs_per_cell(),
          ExcDimensionMismatch(interpolation_matrix.m(),
-                              x_source_fe.dofs_per_cell));
+                              this->n_dofs_per_cell()));
+  Assert(interpolation_matrix.n() == x_source_fe.n_dofs_per_cell(),
+         ExcDimensionMismatch(interpolation_matrix.m(),
+                              x_source_fe.n_dofs_per_cell()));
 
-  this->FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>::
-    get_interpolation_matrix(x_source_fe, interpolation_matrix);
+  this->FE_Q_Base<dim, spacedim>::get_interpolation_matrix(
+    x_source_fe, interpolation_matrix);
 }
 
 
@@ -264,11 +263,11 @@ FE_Q_DG0<dim, spacedim>::has_support_on_face(
   const unsigned int face_index) const
 {
   // discontinuous function has support on all faces
-  if (shape_index == this->dofs_per_cell - 1)
+  if (shape_index == this->n_dofs_per_cell() - 1)
     return true;
   else
-    return FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>::
-      has_support_on_face(shape_index, face_index);
+    return FE_Q_Base<dim, spacedim>::has_support_on_face(shape_index,
+                                                         face_index);
 }
 
 
@@ -277,14 +276,14 @@ template <int dim, int spacedim>
 std::pair<Table<2, bool>, std::vector<unsigned int>>
 FE_Q_DG0<dim, spacedim>::get_constant_modes() const
 {
-  Table<2, bool> constant_modes(2, this->dofs_per_cell);
+  Table<2, bool> constant_modes(2, this->n_dofs_per_cell());
 
   // 1 represented by FE_Q part
-  for (unsigned int i = 0; i < this->dofs_per_cell - 1; ++i)
+  for (unsigned int i = 0; i < this->n_dofs_per_cell() - 1; ++i)
     constant_modes(0, i) = true;
 
   // 1 represented by DG0 part
-  constant_modes(1, this->dofs_per_cell - 1) = true;
+  constant_modes(1, this->n_dofs_per_cell() - 1) = true;
 
   return std::pair<Table<2, bool>, std::vector<unsigned int>>(
     constant_modes, std::vector<unsigned int>(2, 0));

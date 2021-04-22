@@ -77,7 +77,7 @@ test()
   auto cell = dofh.begin_mg();
   auto endc = dofh.end_mg();
 
-  typedef decltype(cell) Iterator;
+  using Iterator = decltype(cell);
 
   auto cell_worker = [](const Iterator &cell, ScratchData &s, CopyData &c) {
     deallog << "Cell worker on : " << cell->id()

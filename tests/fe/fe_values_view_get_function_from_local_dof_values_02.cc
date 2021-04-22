@@ -60,12 +60,12 @@ test_view(const Vector<double> &            solution,
           const FEValuesExtractors::Scalar &extractor,
           const std::vector<NumberType> &   local_dof_values)
 {
-  typedef typename std::remove_reference<typename std::remove_const<decltype(
-    fe_values[extractor])>::type>::type View;
-  const View &                          fe_values_view = fe_values[extractor];
+  using View = typename std::remove_reference<
+    typename std::remove_const<decltype(fe_values[extractor])>::type>::type;
+  const View &fe_values_view = fe_values[extractor];
 
   // Typedefs
-  typedef typename View::template OutputType<NumberType> OutputType;
+  using OutputType = typename View::template OutputType<NumberType>;
 
   // Values
   std::vector<typename OutputType::value_type> qp_values_local(n_q_points);
@@ -103,12 +103,12 @@ test_view(const Vector<double> &            solution,
           const FEValuesExtractors::Vector &extractor,
           const std::vector<NumberType> &   local_dof_values)
 {
-  typedef typename std::remove_reference<typename std::remove_const<decltype(
-    fe_values[extractor])>::type>::type View;
-  const View &                          fe_values_view = fe_values[extractor];
+  using View = typename std::remove_reference<
+    typename std::remove_const<decltype(fe_values[extractor])>::type>::type;
+  const View &fe_values_view = fe_values[extractor];
 
   // Typedefs
-  typedef typename View::template OutputType<NumberType> OutputType;
+  using OutputType = typename View::template OutputType<NumberType>;
 
   // Values
   std::vector<typename OutputType::value_type> qp_values_local(n_q_points);
@@ -162,16 +162,16 @@ test_view(const Vector<double> &                        solution,
           const FEValuesExtractors::SymmetricTensor<2> &extractor,
           const std::vector<NumberType> &               local_dof_values)
 {
-  typedef typename std::remove_reference<typename std::remove_const<decltype(
-    fe_values[extractor])>::type>::type View;
-  const View &                          fe_values_view = fe_values[extractor];
+  using View = typename std::remove_reference<
+    typename std::remove_const<decltype(fe_values[extractor])>::type>::type;
+  const View &fe_values_view = fe_values[extractor];
 
   // Typedefs
-  typedef typename View::template OutputType<NumberType> OutputType;
-  typedef typename ProductType<typename View::value_type, NumberType>::type
-    value_type;
-  typedef typename ProductType<typename View::divergence_type, NumberType>::type
-    divergence_type;
+  using OutputType = typename View::template OutputType<NumberType>;
+  using value_type =
+    typename ProductType<typename View::value_type, NumberType>::type;
+  using divergence_type =
+    typename ProductType<typename View::divergence_type, NumberType>::type;
 
   // Values
   std::vector<typename OutputType::value_type> qp_values_local(n_q_points);
@@ -193,18 +193,18 @@ test_view(const Vector<double> &               solution,
           const FEValuesExtractors::Tensor<2> &extractor,
           const std::vector<NumberType> &      local_dof_values)
 {
-  typedef typename std::remove_reference<typename std::remove_const<decltype(
-    fe_values[extractor])>::type>::type View;
-  const View &                          fe_values_view = fe_values[extractor];
+  using View = typename std::remove_reference<
+    typename std::remove_const<decltype(fe_values[extractor])>::type>::type;
+  const View &fe_values_view = fe_values[extractor];
 
   // Typedefs
-  typedef typename View::template OutputType<NumberType> OutputType;
-  typedef typename ProductType<typename View::value_type, NumberType>::type
-    value_type;
-  typedef typename ProductType<typename View::gradient_type, NumberType>::type
-    gradient_type;
-  typedef typename ProductType<typename View::divergence_type, NumberType>::type
-    divergence_type;
+  using OutputType = typename View::template OutputType<NumberType>;
+  using value_type =
+    typename ProductType<typename View::value_type, NumberType>::type;
+  using gradient_type =
+    typename ProductType<typename View::gradient_type, NumberType>::type;
+  using divergence_type =
+    typename ProductType<typename View::divergence_type, NumberType>::type;
 
   // Values
   std::vector<typename OutputType::value_type> qp_values_local(n_q_points);

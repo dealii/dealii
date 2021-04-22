@@ -87,8 +87,10 @@ namespace Exceptions
                    << " but the DoFHandler object says that there are " << arg2
                    << " degrees of freedom and there are " << arg3
                    << " active cells. The size of your vector needs to be"
-                   << " either equal to the number of degrees of freedom, or"
-                   << " equal to the number of active cells.");
+                   << " either equal to the number of degrees of freedom (when"
+                   << " the data is of type type_dof_data), or equal to the"
+                   << " number of active cells (when the data is of type "
+                   << " type_cell_data).");
     /**
      * Exception
      */
@@ -216,7 +218,7 @@ namespace internal
      * <a href="https://www.artima.com/cppsource/type_erasure.html">type
      * erasure</a> design pattern.
      */
-    template <typename DoFHandlerType>
+    template <int dim, int spacedim>
     class DataEntryBase
     {
     public:
@@ -225,8 +227,8 @@ namespace internal
        * the vector and their interpretation as scalar or vector data. This
        * constructor assumes that no postprocessor is going to be used.
        */
-      DataEntryBase(const DoFHandlerType *          dofs,
-                    const std::vector<std::string> &names,
+      DataEntryBase(const DoFHandler<dim, spacedim> *dofs,
+                    const std::vector<std::string> & names,
                     const std::vector<
                       DataComponentInterpretation::DataComponentInterpretation>
                       &data_component_interpretation);
@@ -236,9 +238,8 @@ namespace internal
        * case, the names and vector declarations are going to be acquired from
        * the postprocessor.
        */
-      DataEntryBase(const DoFHandlerType *dofs,
-                    const DataPostprocessor<DoFHandlerType::space_dimension>
-                      *data_postprocessor);
+      DataEntryBase(const DoFHandler<dim, spacedim> *  dofs,
+                    const DataPostprocessor<spacedim> *data_postprocessor);
 
       /**
        * Destructor made virtual.
@@ -258,11 +259,9 @@ namespace internal
        * from the vector we actually store.
        */
       virtual void
-      get_function_values(
-        const FEValuesBase<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension> &fe_patch_values,
-        const ComponentExtractor                             extract_component,
-        std::vector<double> &patch_values) const = 0;
+      get_function_values(const FEValuesBase<dim, spacedim> &fe_patch_values,
+                          const ComponentExtractor           extract_component,
+                          std::vector<double> &patch_values) const = 0;
 
       /**
        * Given a FEValuesBase object, extract the values on the present cell
@@ -271,9 +270,8 @@ namespace internal
        */
       virtual void
       get_function_values(
-        const FEValuesBase<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension> &fe_patch_values,
-        const ComponentExtractor                             extract_component,
+        const FEValuesBase<dim, spacedim> &  fe_patch_values,
+        const ComponentExtractor             extract_component,
         std::vector<dealii::Vector<double>> &patch_values_system) const = 0;
 
       /**
@@ -282,11 +280,9 @@ namespace internal
        */
       virtual void
       get_function_gradients(
-        const FEValuesBase<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension> &fe_patch_values,
-        const ComponentExtractor                             extract_component,
-        std::vector<Tensor<1, DoFHandlerType::space_dimension>>
-          &patch_gradients) const = 0;
+        const FEValuesBase<dim, spacedim> &fe_patch_values,
+        const ComponentExtractor           extract_component,
+        std::vector<Tensor<1, spacedim>> & patch_gradients) const = 0;
 
       /**
        * Given a FEValuesBase object, extract the gradients on the present
@@ -294,12 +290,10 @@ namespace internal
        * as the one above but for vector-valued finite elements.
        */
       virtual void
-      get_function_gradients(
-        const FEValuesBase<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension> &fe_patch_values,
-        const ComponentExtractor                             extract_component,
-        std::vector<std::vector<Tensor<1, DoFHandlerType::space_dimension>>>
-          &patch_gradients_system) const = 0;
+      get_function_gradients(const FEValuesBase<dim, spacedim> &fe_patch_values,
+                             const ComponentExtractor extract_component,
+                             std::vector<std::vector<Tensor<1, spacedim>>>
+                               &patch_gradients_system) const = 0;
 
       /**
        * Given a FEValuesBase object, extract the second derivatives on the
@@ -307,11 +301,9 @@ namespace internal
        */
       virtual void
       get_function_hessians(
-        const FEValuesBase<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension> &fe_patch_values,
-        const ComponentExtractor                             extract_component,
-        std::vector<Tensor<2, DoFHandlerType::space_dimension>> &patch_hessians)
-        const = 0;
+        const FEValuesBase<dim, spacedim> &fe_patch_values,
+        const ComponentExtractor           extract_component,
+        std::vector<Tensor<2, spacedim>> & patch_hessians) const = 0;
 
       /**
        * Given a FEValuesBase object, extract the second derivatives on the
@@ -319,12 +311,10 @@ namespace internal
        * the same as the one above but for vector-valued finite elements.
        */
       virtual void
-      get_function_hessians(
-        const FEValuesBase<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension> &fe_patch_values,
-        const ComponentExtractor                             extract_component,
-        std::vector<std::vector<Tensor<2, DoFHandlerType::space_dimension>>>
-          &patch_hessians_system) const = 0;
+      get_function_hessians(const FEValuesBase<dim, spacedim> &fe_patch_values,
+                            const ComponentExtractor extract_component,
+                            std::vector<std::vector<Tensor<2, spacedim>>>
+                              &patch_hessians_system) const = 0;
 
       /**
        * Return whether the data represented by (a derived class of) this object
@@ -349,7 +339,7 @@ namespace internal
       /**
        * Pointer to the DoFHandler object that the vector is based on.
        */
-      SmartPointer<const DoFHandlerType> dof_handler;
+      SmartPointer<const DoFHandler<dim, spacedim>> dof_handler;
 
       /**
        * Names of the components of this data vector.
@@ -369,9 +359,7 @@ namespace internal
        * Pointer to a DataPostprocessing object which shall be applied to this
        * data vector.
        */
-      SmartPointer<
-        const dealii::DataPostprocessor<DoFHandlerType::space_dimension>>
-        postprocessor;
+      SmartPointer<const dealii::DataPostprocessor<spacedim>> postprocessor;
 
       /**
        * Number of output variables this dataset provides (either number of
@@ -413,12 +401,22 @@ namespace internal
         const UpdateFlags update_flags,
         const bool        use_face_values);
 
+      ParallelDataBase(
+        const unsigned int               n_datasets,
+        const unsigned int               n_subdivisions,
+        const std::vector<unsigned int> &n_postprocessor_outputs,
+        const dealii::hp::MappingCollection<dim, spacedim> &mapping,
+        const std::vector<
+          std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
+          &               finite_elements,
+        const UpdateFlags update_flags,
+        const bool        use_face_values);
+
       ParallelDataBase(const ParallelDataBase &data);
 
-      template <typename DoFHandlerType>
       void
       reinit_all_fe_values(
-        std::vector<std::shared_ptr<DataEntryBase<DoFHandlerType>>> &dof_data,
+        std::vector<std::shared_ptr<DataEntryBase<dim, spacedim>>> &dof_data,
         const typename dealii::Triangulation<dim, spacedim>::cell_iterator
           &                cell,
         const unsigned int face = numbers::invalid_unsigned_int);
@@ -981,15 +979,17 @@ protected:
   /**
    * List of data elements with vectors of values for each degree of freedom.
    */
-  std::vector<std::shared_ptr<
-    internal::DataOutImplementation::DataEntryBase<DoFHandlerType>>>
+  std::vector<std::shared_ptr<internal::DataOutImplementation::DataEntryBase<
+    DoFHandlerType::dimension,
+    DoFHandlerType::space_dimension>>>
     dof_data;
 
   /**
    * List of data elements with vectors of values for each cell.
    */
-  std::vector<std::shared_ptr<
-    internal::DataOutImplementation::DataEntryBase<DoFHandlerType>>>
+  std::vector<std::shared_ptr<internal::DataOutImplementation::DataEntryBase<
+    DoFHandlerType::dimension,
+    DoFHandlerType::space_dimension>>>
     cell_data;
 
   /**
@@ -1000,7 +1000,7 @@ protected:
   std::vector<Patch> patches;
 
   /**
-   * Function by which the base class's functions get to know what patches
+   * %Function by which the base class's functions get to know what patches
    * they shall write to a file.
    */
   virtual const std::vector<Patch> &
@@ -1242,6 +1242,21 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::merge_patches(
       if (patches[i].neighbors[n] != Patch::no_neighbor)
         patches[i].neighbors[n] += old_n_patches;
 }
+
+namespace Legacy
+{
+  /**
+   * The template arguments of the original dealii::DataOut_DoFData class will
+   * change in a future release. If for some reason, you need a code that is
+   * compatible with deal.II 9.3 and the subsequent release, use this alias
+   * instead.
+   */
+  template <typename DoFHandlerType,
+            int patch_dim,
+            int patch_space_dim = patch_dim>
+  using DataOut_DoFData =
+    dealii::DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>;
+} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE

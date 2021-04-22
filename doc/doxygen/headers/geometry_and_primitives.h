@@ -49,4 +49,3 @@
  * discussed in the first few tutorial programs and are used
  * throughout deal.II.
  */
-

@@ -29,8 +29,6 @@
 // @sect3{Include files}
 
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
@@ -168,7 +166,7 @@ void grid_3()
 
   for (const auto &cell : triangulation.active_cell_iterators())
     {
-      for (unsigned int i = 0; i < GeometryInfo<2>::vertices_per_cell; ++i)
+      for (const auto i : cell->vertex_indices())
         {
           Point<2> &v = cell->vertex(i);
           if (std::abs(v(1) - 1.0) < 1e-5)

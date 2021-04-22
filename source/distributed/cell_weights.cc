@@ -82,7 +82,7 @@ namespace parallel
              const FiniteElement<dim, spacedim> &future_fe) -> unsigned int {
       const float result =
         std::trunc(coefficients.first *
-                   std::pow(future_fe.dofs_per_cell, coefficients.second));
+                   std::pow(future_fe.n_dofs_per_cell(), coefficients.second));
 
       Assert(result >= 0. &&
                result <=
@@ -106,7 +106,8 @@ namespace parallel
              const FiniteElement<dim, spacedim> &future_fe) -> unsigned int {
       float result = 0;
       for (const auto &pair : coefficients)
-        result += pair.first * std::pow(future_fe.dofs_per_cell, pair.second);
+        result +=
+          pair.first * std::pow(future_fe.n_dofs_per_cell(), pair.second);
       result = std::trunc(result);
 
       Assert(result >= 0. &&
@@ -125,8 +126,8 @@ namespace parallel
 
   template <int dim, int spacedim>
   std::function<unsigned int(
-    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const typename Triangulation<dim, spacedim>::CellStatus     status)>
+    const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell,
+    const typename dealii::Triangulation<dim, spacedim>::CellStatus     status)>
   CellWeights<dim, spacedim>::make_weighting_callback(
     const DoFHandler<dim, spacedim> &dof_handler,
     const typename CellWeights<dim, spacedim>::WeightingFunction
@@ -141,17 +142,19 @@ namespace parallel
       ExcMessage(
         "parallel::CellWeights requires a parallel::TriangulationBase object."));
 
-    return [&dof_handler, tria, weighting_function](
-             const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-             const typename Triangulation<dim, spacedim>::CellStatus     status)
-             -> unsigned int {
-      return CellWeights<dim, spacedim>::weighting_callback(cell,
-                                                            status,
-                                                            std::cref(
-                                                              dof_handler),
-                                                            std::cref(*tria),
-                                                            weighting_function);
-    };
+    return
+      [&dof_handler, tria, weighting_function](
+        const typename dealii::Triangulation<dim, spacedim>::cell_iterator
+          &                                                             cell,
+        const typename dealii::Triangulation<dim, spacedim>::CellStatus status)
+        -> unsigned int {
+        return CellWeights<dim, spacedim>::weighting_callback(
+          cell,
+          status,
+          std::cref(dof_handler),
+          std::cref(*tria),
+          weighting_function);
+      };
   }
 
 
@@ -159,18 +162,23 @@ namespace parallel
   template <int dim, int spacedim>
   unsigned int
   CellWeights<dim, spacedim>::weighting_callback(
-    const typename Triangulation<dim, spacedim>::cell_iterator &cell_,
-    const typename Triangulation<dim, spacedim>::CellStatus     status,
-    const DoFHandler<dim, spacedim> &                           dof_handler,
-    const parallel::TriangulationBase<dim, spacedim> &          triangulation,
+    const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell_,
+    const typename dealii::Triangulation<dim, spacedim>::CellStatus     status,
+    const DoFHandler<dim, spacedim> &                 dof_handler,
+    const parallel::TriangulationBase<dim, spacedim> &triangulation,
     const typename CellWeights<dim, spacedim>::WeightingFunction
       &weighting_function)
   {
     // Check if we are still working with the correct combination of
     // Triangulation and DoFHandler.
-    AssertThrow(&triangulation == &(dof_handler.get_triangulation()),
-                ExcMessage(
-                  "Triangulation associated with the DoFHandler has changed!"));
+    Assert(&triangulation == &(dof_handler.get_triangulation()),
+           ExcMessage(
+             "Triangulation associated with the DoFHandler has changed!"));
+    (void)triangulation;
+
+    // Skip if the DoFHandler has not been initialized yet.
+    if (dof_handler.get_fe_collection().size() == 0)
+      return 0;
 
     // Convert cell type from Triangulation to DoFHandler to be able
     // to access the information about the degrees of freedom.
@@ -189,28 +197,15 @@ namespace parallel
           break;
 
         case Triangulation<dim, spacedim>::CELL_COARSEN:
-          {
-            std::set<unsigned int> fe_indices_children;
-            for (unsigned int child_index = 0; child_index < cell->n_children();
-                 ++child_index)
-              {
-                const auto &child = cell->child(child_index);
-                Assert(child->is_active() && child->coarsen_flag_set(),
-                       typename dealii::Triangulation<
-                         dim>::ExcInconsistentCoarseningFlags());
+#ifdef DEBUG
+          for (const auto &child : cell->child_iterators())
+            Assert(child->is_active() && child->coarsen_flag_set(),
+                   typename dealii::Triangulation<
+                     dim>::ExcInconsistentCoarseningFlags());
+#endif
 
-                fe_indices_children.insert(child->future_fe_index());
-              }
-            Assert(!fe_indices_children.empty(), ExcInternalError());
-
-            fe_index =
-              dof_handler.get_fe_collection().find_dominated_fe_extended(
-                fe_indices_children, /*codim=*/0);
-
-            Assert(fe_index != numbers::invalid_unsigned_int,
-                   typename dealii::hp::FECollection<
-                     dim>::ExcNoDominatedFiniteElementAmongstChildren());
-          }
+          fe_index = dealii::internal::hp::DoFHandlerImplementation::
+            dominated_future_fe_on_children<dim, spacedim>(cell);
           break;
 
         default:

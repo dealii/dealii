@@ -108,7 +108,7 @@ test()
   auto cell = dh.begin_active();
   auto endc = dh.end();
 
-  typedef decltype(cell) Iterator;
+  using Iterator = decltype(cell);
 
   auto cell_worker =
     [&rhs_function](const Iterator &cell, ScratchData &s, CopyData &c) {

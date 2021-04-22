@@ -179,6 +179,8 @@ protected:
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim>
       &data) const override;
 
+  using FiniteElement<dim, spacedim>::fill_fe_face_values;
+
   /**
    * Compute information about the shape functions on the cell and face denoted
    * by the first two arguments. Note that this function must recompute the
@@ -188,7 +190,7 @@ protected:
   fill_fe_face_values(
     const typename Triangulation<dim, dim>::cell_iterator &cell,
     const unsigned int                                     face_no,
-    const Quadrature<dim - 1> &                            quadrature,
+    const hp::QCollection<dim - 1> &                       quadrature,
     const Mapping<dim, dim> &                              mapping,
     const typename Mapping<dim, dim>::InternalDataBase &   mapping_internal,
     const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, dim>

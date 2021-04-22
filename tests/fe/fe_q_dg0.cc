@@ -67,13 +67,13 @@ namespace Step22
   template <>
   struct InnerPreconditioner<2>
   {
-    typedef SparseDirectUMFPACK type;
+    using type = SparseDirectUMFPACK;
   };
 
   template <>
   struct InnerPreconditioner<3>
   {
-    typedef SparseILU<double> type;
+    using type = SparseILU<double>;
   };
 
   template <int dim>
@@ -431,7 +431,7 @@ namespace Step22
 
       /*std::vector<bool> boundary_dofs (dof_handler.n_dofs(), false);
 
-      std::vector<bool>boundary_mask (dim+1, false);
+      std::vector<bool> boundary_mask (dim+1, false);
       boundary_mask[dim]=true;
 
       DoFTools::extract_boundary_dofs (dof_handler,boundary_mask,boundary_dofs);

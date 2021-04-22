@@ -20,6 +20,9 @@
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/std_cxx17/cmath.h>
+
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/component_mask.h>
 #include <deal.II/fe/fe_q.h>
@@ -28,15 +31,12 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/smoothness_estimator.h>
 #include <deal.II/numerics/vector_tools.h>
-
-#include <gsl/gsl_sf_legendre.h>
 
 #include <iostream>
 
@@ -81,8 +81,8 @@ Lh(const Point<dim> &x_q, const TableIndices<dim> &indices)
       const double x = 2.0 * (x_q[d] - 0.5);
       Assert((x_q[d] <= 1.0) && (x_q[d] >= 0.),
              ExcMessage("x_q is not in [0,1]" + Utilities::to_string(x_q[d])));
-      const int ind = indices[d];
-      res *= sqrt(2.0) * gsl_sf_legendre_Pl(ind, x);
+      const unsigned int ind = indices[d];
+      res *= sqrt(2.0) * std_cxx17::legendre(ind, x);
     }
   return res;
 }
@@ -194,8 +194,7 @@ test(const LegendreFunction<dim> &func, const unsigned int poly_degree)
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube(triangulation, 0.0, 1.0); // reference cell
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
-  dof_handler.set_fe(fe_collection);
+  DoFHandler<dim> dof_handler(triangulation);
   dof_handler.begin_active()->set_active_fe_index(fe_index);
   dof_handler.distribute_dofs(fe_collection);
 
@@ -208,7 +207,7 @@ test(const LegendreFunction<dim> &func, const unsigned int poly_degree)
 
   Vector<double> local_dof_values;
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  typename DoFHandler<dim>::active_cell_iterator cell =
     dof_handler.begin_active();
   {
     const unsigned int cell_n_dofs          = cell->get_fe().dofs_per_cell;

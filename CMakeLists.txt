@@ -33,17 +33,14 @@
 MESSAGE(STATUS "This is CMake ${CMAKE_VERSION}")
 MESSAGE(STATUS "")
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
 
 #
 # We support all policy changes up to version 3.1.0. Thus, explicitly set
 # all policies CMP0001 - CMP0054 to new for version 3.1 (and later) to
 # avoid some unnecessary warnings.
 #
-IF( "${CMAKE_VERSION}" VERSION_EQUAL "3.1" OR
-    "${CMAKE_VERSION}" VERSION_GREATER "3.1" )
-  CMAKE_POLICY(VERSION 3.1.0)
-ENDIF()
+CMAKE_POLICY(VERSION 3.1.0)
 
 IF("${CMAKE_VERSION}" VERSION_LESS "3.11" AND POLICY CMP0037)
   # allow to override "test" target for quick tests

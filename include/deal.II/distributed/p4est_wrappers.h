@@ -159,6 +159,20 @@ namespace internal
         types<2>::topidx num_trees,
         types<2>::topidx num_corners,
         types<2>::topidx num_vtt);
+
+      static types<2>::connectivity *(&connectivity_new_copy)(
+        types<2>::topidx        num_vertices,
+        types<2>::topidx        num_trees,
+        types<2>::topidx        num_corners,
+        const double *          vertices,
+        const types<2>::topidx *ttv,
+        const types<2>::topidx *ttt,
+        const int8_t *          ttf,
+        const types<2>::topidx *ttc,
+        const types<2>::topidx *coff,
+        const types<2>::topidx *ctt,
+        const int8_t *          ctc);
+
       static void (&connectivity_join_faces)(types<2>::connectivity *conn,
                                              types<2>::topidx        tree_left,
                                              types<2>::topidx        tree_right,
@@ -179,6 +193,9 @@ namespace internal
         std::size_t             data_size,
         p4est_init_t            init_fn,
         void *                  user_pointer);
+
+      static types<2>::forest *(&copy_forest)(types<2>::forest *input,
+                                              int               copy_data);
 
       static void (&destroy)(types<2>::forest *p4est);
 
@@ -331,6 +348,24 @@ namespace internal
         types<3>::topidx num_corners,
         types<3>::topidx num_ctt);
 
+      static types<3>::connectivity *(&connectivity_new_copy)(
+        types<3>::topidx        num_vertices,
+        types<3>::topidx        num_trees,
+        types<3>::topidx        num_edges,
+        types<3>::topidx        num_corners,
+        const double *          vertices,
+        const types<3>::topidx *ttv,
+        const types<3>::topidx *ttt,
+        const int8_t *          ttf,
+        const types<3>::topidx *tte,
+        const types<3>::topidx *eoff,
+        const types<3>::topidx *ett,
+        const int8_t *          ete,
+        const types<3>::topidx *ttc,
+        const types<3>::topidx *coff,
+        const types<3>::topidx *ctt,
+        const int8_t *          ctc);
+
       static void (&connectivity_join_faces)(types<3>::connectivity *conn,
                                              types<3>::topidx        tree_left,
                                              types<3>::topidx        tree_right,
@@ -349,6 +384,9 @@ namespace internal
         std::size_t             data_size,
         p8est_init_t            init_fn,
         void *                  user_pointer);
+
+      static types<3>::forest *(&copy_forest)(types<3>::forest *input,
+                                              int               copy_data);
 
       static void (&destroy)(types<3>::forest *p8est);
 
@@ -542,6 +580,13 @@ namespace internal
     tree_exists_locally(const typename types<dim>::forest *parallel_forest,
                         const typename types<dim>::topidx  coarse_grid_cell);
 
+
+    /**
+     * Deep copy a p4est connectivity object.
+     */
+    template <int dim>
+    typename types<dim>::connectivity *
+    copy_connectivity(const typename types<dim>::connectivity *connectivity);
   } // namespace p4est
 } // namespace internal
 

@@ -28,14 +28,6 @@
 // And this is the file in which the functions are declared that create grids:
 #include <deal.II/grid/grid_generator.h>
 
-// The next three files contain classes which are needed for loops over all
-// cells and to get the information from the cell objects. The first two have
-// been used before to get geometric information from cells; the last one is
-// new and provides information about the degrees of freedom local to a cell:
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/dofs/dof_accessor.h>
-
 // This file contains the description of the Lagrange interpolation finite
 // element:
 #include <deal.II/fe/fe_q.h>
@@ -364,7 +356,7 @@ void Step3::assemble_system()
   // loops a bit more readable. You will see such shortcuts in many places in
   // larger programs, and `dofs_per_cell` is one that is more or less the
   // conventional name for this kind of object.
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
   // Now, we said that we wanted to assemble the global matrix and vector
   // cell-by-cell. We could write the results directly into the global matrix,
@@ -451,7 +443,7 @@ void Step3::assemble_system()
           // be considered in the following programs).
           for (const unsigned int i : fe_values.dof_indices())
             cell_rhs(i) += (fe_values.shape_value(i, q_index) * // phi_i(x_q)
-                            1 *                                 // f(x_q)
+                            1. *                                // f(x_q)
                             fe_values.JxW(q_index));            // dx
         }
       // Now that we have the contribution of this cell, we have to transfer
@@ -553,9 +545,10 @@ void Step3::solve()
   // which stops the iteration:
   SolverControl solver_control(1000, 1e-12);
   // Then we need the solver itself. The template parameter to the SolverCG
-  // class is the type of the vectors, but the empty angle brackets indicate
-  // that we simply take the default argument (which is
-  // <code>Vector@<double@></code>):
+  // class is the type of the vectors, and leaving the empty angle brackets
+  // would indicate that we are taking the default argument (which is
+  // <code>Vector@<double@></code>). However, we explicitly mention the template
+  // argument:
   SolverCG<Vector<double>> solver(solver_control);
 
   // Now solve the system of equations. The CG solver takes a preconditioner

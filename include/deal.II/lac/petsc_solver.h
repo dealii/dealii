@@ -51,7 +51,7 @@ namespace PETScWrappers
 #    ifndef DOXYGEN
   class MatrixBase;
   class VectorBase;
-  class PreconditionerBase;
+  class PreconditionBase;
 #    endif
 
 
@@ -136,10 +136,10 @@ namespace PETScWrappers
      * performance reasons. See class Documentation.
      */
     void
-    solve(const MatrixBase &        A,
-          VectorBase &              x,
-          const VectorBase &        b,
-          const PreconditionerBase &preconditioner);
+    solve(const MatrixBase &      A,
+          VectorBase &            x,
+          const VectorBase &      b,
+          const PreconditionBase &preconditioner);
 
 
     /**
@@ -169,7 +169,7 @@ namespace PETScWrappers
      * intended for use with SLEPc spectral transformation class.
      */
     void
-    initialize(const PreconditionerBase &preconditioner);
+    initialize(const PreconditionBase &preconditioner);
 
   protected:
     /**
@@ -186,7 +186,7 @@ namespace PETScWrappers
     const MPI_Comm mpi_communicator;
 
     /**
-     * Function that takes a Krylov Subspace Solver context object, and sets
+     * %Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is requested by the derived class.
      */
     virtual void
@@ -311,7 +311,7 @@ namespace PETScWrappers
     const AdditionalData additional_data;
 
     /**
-     * Function that takes a Krylov Subspace Solver context object, and sets
+     * %Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
     virtual void
@@ -362,7 +362,7 @@ namespace PETScWrappers
     const AdditionalData additional_data;
 
     /**
-     * Function that takes a Krylov Subspace Solver context object, and sets
+     * %Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
     virtual void
@@ -412,7 +412,7 @@ namespace PETScWrappers
     const AdditionalData additional_data;
 
     /**
-     * Function that takes a Krylov Subspace Solver context object, and sets
+     * %Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
     virtual void
@@ -462,7 +462,7 @@ namespace PETScWrappers
     const AdditionalData additional_data;
 
     /**
-     * Function that takes a Krylov Subspace Solver context object, and sets
+     * %Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
     virtual void
@@ -529,7 +529,7 @@ namespace PETScWrappers
     const AdditionalData additional_data;
 
     /**
-     * Function that takes a Krylov Subspace Solver context object, and sets
+     * %Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
     virtual void
@@ -580,7 +580,7 @@ namespace PETScWrappers
     const AdditionalData additional_data;
 
     /**
-     * Function that takes a Krylov Subspace Solver context object, and sets
+     * %Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
     virtual void
@@ -629,7 +629,7 @@ namespace PETScWrappers
     const AdditionalData additional_data;
 
     /**
-     * Function that takes a Krylov Subspace Solver context object, and sets
+     * %Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
     virtual void
@@ -679,7 +679,7 @@ namespace PETScWrappers
     const AdditionalData additional_data;
 
     /**
-     * Function that takes a Krylov Subspace Solver context object, and sets
+     * %Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
     virtual void
@@ -734,7 +734,7 @@ namespace PETScWrappers
     const AdditionalData additional_data;
 
     /**
-     * Function that takes a Krylov Subspace Solver context object, and sets
+     * %Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
     virtual void
@@ -784,7 +784,7 @@ namespace PETScWrappers
     const AdditionalData additional_data;
 
     /**
-     * Function that takes a Krylov Subspace Solver context object, and sets
+     * %Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
     virtual void
@@ -835,7 +835,7 @@ namespace PETScWrappers
     const AdditionalData additional_data;
 
     /**
-     * Function that takes a Krylov Subspace Solver context object, and sets
+     * %Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
     virtual void
@@ -890,7 +890,7 @@ namespace PETScWrappers
     const AdditionalData additional_data;
 
     /**
-     * Function that takes a Krylov Subspace Solver context object, and sets
+     * %Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
     virtual void

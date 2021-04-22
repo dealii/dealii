@@ -57,7 +57,6 @@ namespace LA
 #include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -73,8 +72,6 @@ namespace LA
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
@@ -383,45 +380,37 @@ namespace Step70
     // solid domain, and `Particle grid` is used to distribute some tracer
     // particles, that are advected with the velocity and only used as
     // passive tracers.
-    enter_my_subsection(this->prm);
-    this->prm.enter_subsection("Grid generation");
+    enter_subsection("Grid generation");
     {
-      this->prm.add_parameter("Fluid grid generator", name_of_fluid_grid);
-      this->prm.add_parameter("Fluid grid generator arguments",
-                              arguments_for_fluid_grid);
+      add_parameter("Fluid grid generator", name_of_fluid_grid);
+      add_parameter("Fluid grid generator arguments", arguments_for_fluid_grid);
 
-      this->prm.add_parameter("Solid grid generator", name_of_solid_grid);
-      this->prm.add_parameter("Solid grid generator arguments",
-                              arguments_for_solid_grid);
+      add_parameter("Solid grid generator", name_of_solid_grid);
+      add_parameter("Solid grid generator arguments", arguments_for_solid_grid);
 
-      this->prm.add_parameter("Particle grid generator", name_of_particle_grid);
-      this->prm.add_parameter("Particle grid generator arguments",
-                              arguments_for_particle_grid);
+      add_parameter("Particle grid generator", name_of_particle_grid);
+      add_parameter("Particle grid generator arguments",
+                    arguments_for_particle_grid);
     }
-    this->prm.leave_subsection();
-    leave_my_subsection(this->prm);
+    leave_subsection();
 
 
 
-    enter_my_subsection(this->prm);
-    this->prm.enter_subsection("Refinement and remeshing");
+    enter_subsection("Refinement and remeshing");
     {
-      this->prm.add_parameter("Refinement step frequency",
-                              refinement_frequency);
-      this->prm.add_parameter("Refinement maximal level", max_level_refinement);
-      this->prm.add_parameter("Refinement minimal level", min_level_refinement);
-      this->prm.add_parameter("Refinement strategy",
-                              refinement_strategy,
-                              "",
-                              Patterns::Selection(
-                                "fixed_fraction|fixed_number"));
-      this->prm.add_parameter("Refinement coarsening fraction",
-                              coarsening_fraction);
-      this->prm.add_parameter("Refinement fraction", refinement_fraction);
-      this->prm.add_parameter("Maximum number of cells", max_cells);
+      add_parameter("Refinement step frequency", refinement_frequency);
+      add_parameter("Refinement maximal level", max_level_refinement);
+      add_parameter("Refinement minimal level", min_level_refinement);
+      add_parameter("Refinement strategy",
+                    refinement_strategy,
+                    "",
+                    this->prm,
+                    Patterns::Selection("fixed_fraction|fixed_number"));
+      add_parameter("Refinement coarsening fraction", coarsening_fraction);
+      add_parameter("Refinement fraction", refinement_fraction);
+      add_parameter("Maximum number of cells", max_cells);
     }
-    this->prm.leave_subsection();
-    leave_my_subsection(this->prm);
+    leave_subsection();
 
     // The final task is to correct the default dimension for the right hand
     // side function and define a meaningful default angular velocity instead of
@@ -1021,7 +1010,7 @@ namespace Step70
     // levels of the tree:
     std::vector<BoundingBox<spacedim>> all_boxes;
     all_boxes.reserve(fluid_tria.n_locally_owned_active_cells());
-    for (const auto cell : fluid_tria.active_cell_iterators())
+    for (const auto &cell : fluid_tria.active_cell_iterators())
       if (cell->is_locally_owned())
         all_boxes.emplace_back(cell->bounding_box());
 
@@ -1380,7 +1369,7 @@ namespace Step70
                                    update_quadrature_points |
                                    update_JxW_values);
 
-    const unsigned int dofs_per_cell = fluid_fe->dofs_per_cell;
+    const unsigned int dofs_per_cell = fluid_fe->n_dofs_per_cell();
     const unsigned int n_q_points    = fluid_quadrature_formula->size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -1473,11 +1462,11 @@ namespace Step70
     SolidVelocity<spacedim> solid_velocity(par.angular_velocity);
 
     std::vector<types::global_dof_index> fluid_dof_indices(
-      fluid_fe->dofs_per_cell);
+      fluid_fe->n_dofs_per_cell());
 
-    FullMatrix<double>     local_matrix(fluid_fe->dofs_per_cell,
-                                    fluid_fe->dofs_per_cell);
-    dealii::Vector<double> local_rhs(fluid_fe->dofs_per_cell);
+    FullMatrix<double>     local_matrix(fluid_fe->n_dofs_per_cell(),
+                                    fluid_fe->n_dofs_per_cell());
+    dealii::Vector<double> local_rhs(fluid_fe->n_dofs_per_cell());
 
     const auto penalty_parameter =
       1.0 / GridTools::minimal_cell_diameter(fluid_tria);
@@ -1527,13 +1516,14 @@ namespace Step70
             const auto &real_q = p.get_location();
             const auto &JxW    = p.get_properties()[0];
 
-            for (unsigned int i = 0; i < fluid_fe->dofs_per_cell; ++i)
+            for (unsigned int i = 0; i < fluid_fe->n_dofs_per_cell(); ++i)
               {
                 const auto comp_i =
                   fluid_fe->system_to_component_index(i).first;
                 if (comp_i < spacedim)
                   {
-                    for (unsigned int j = 0; j < fluid_fe->dofs_per_cell; ++j)
+                    for (unsigned int j = 0; j < fluid_fe->n_dofs_per_cell();
+                         ++j)
                       {
                         const auto comp_j =
                           fluid_fe->system_to_component_index(j).first;

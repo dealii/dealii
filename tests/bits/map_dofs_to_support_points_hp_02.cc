@@ -24,7 +24,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/mapping_collection.h>
 
@@ -33,7 +32,7 @@
 // check
 //   DoFTools::
 //   map_dofs_to_support_points(...);
-// for the hp case with different finite elements
+// for the hp-case with different finite elements
 // on different cells.
 
 
@@ -58,7 +57,7 @@ test()
   fe_collection.push_back(fe1);
   fe_collection.push_back(fe2);
 
-  hp::DoFHandler<dim> hp_dof_handler(triangulation);
+  DoFHandler<dim> hp_dof_handler(triangulation);
 
   // distribute dofs
   hp_dof_handler.begin_active()->set_active_fe_index(1);

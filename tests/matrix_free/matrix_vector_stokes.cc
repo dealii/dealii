@@ -57,8 +57,8 @@ template <int dim, int degree_p, typename VectorType>
 class MatrixFreeTest
 {
 public:
-  typedef typename DoFHandler<dim>::active_cell_iterator CellIterator;
-  typedef double                                         Number;
+  using CellIterator = typename DoFHandler<dim>::active_cell_iterator;
+  using Number       = double;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
     : data(data_in){};
@@ -69,7 +69,7 @@ public:
               const VectorType &                           src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
-    typedef VectorizedArray<Number>                            vector_t;
+    using vector_t = VectorizedArray<Number>;
     FEEvaluation<dim, degree_p + 1, degree_p + 2, dim, Number> velocity(data,
                                                                         0);
     FEEvaluation<dim, degree_p, degree_p + 2, 1, Number> pressure(data, 1);
@@ -295,7 +295,7 @@ test()
 
   system_matrix.vmult(solution, system_rhs);
 
-  typedef std::vector<Vector<double>>        VectorType;
+  using VectorType = std::vector<Vector<double>>;
   MatrixFreeTest<dim, fe_degree, VectorType> mf(mf_data);
   mf.vmult(vec2, vec1);
 

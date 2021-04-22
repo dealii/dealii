@@ -191,6 +191,11 @@ namespace Utilities
         const MPI_Comm &comm;
 
         /**
+         * Cache if job supports MPI.
+         */
+        const bool job_supports_mpi;
+
+        /**
          * Rank of this process.
          */
         const unsigned int my_rank;
@@ -339,18 +344,18 @@ namespace Utilities
        * step a static sparse data exchange is performed.
        *
        * @note In contrast to NBX, this class splits the same
-       *       task into two distinct steps. In the first step, all processes
-       * are identified who want to send a request to this process. In the
-       *       second step, the data is exchanged. However, since - in the
-       * second step - now it is clear how many requests have to be answered,
-       * i.e. when this process can stop waiting for requests, no IBarrier is
-       *       needed.
+       *   task into two distinct steps. In the first step, all processes
+       *   are identified who want to send a request to this process. In the
+       *   second step, the data is exchanged. However, since - in the
+       *   second step - now it is clear how many requests have to be answered,
+       *   i.e. when this process can stop waiting for requests, no IBarrier is
+       *   needed.
        *
        * @note The function
-       *       Utilities::MPI::compute_point_to_point_communication_pattern() is
-       *       used to determine the source processes, which implements a
-       *       PEX-algorithm from Hoefner et al., "Scalable Communication
-       *       Protocols for Dynamic Sparse Data Exchange".
+       *   Utilities::MPI::compute_point_to_point_communication_pattern() is
+       *   used to determine the source processes, which implements a
+       *   PEX-algorithm from Hoefner et al., "Scalable Communication
+       *   Protocols for Dynamic Sparse Data Exchange".
        *
        * @tparam T1 The type of the elements of the vector to be sent.
        * @tparam T2 The type of the elements of the vector to be received.
@@ -438,6 +443,29 @@ namespace Utilities
          */
         void
         clean_up_and_end_communication();
+      };
+
+      /**
+       * A serial fall back for the above classes to allow programming
+       * independently of whether MPI is used or not.
+       */
+      template <typename T1, typename T2>
+      class Serial : public Interface<T1, T2>
+      {
+      public:
+        /**
+         * Constructor.
+         *
+         * @param process Process to be run during consensus algorithm.
+         * @param comm MPI Communicator (ignored)
+         */
+        Serial(Process<T1, T2> &process, const MPI_Comm &comm);
+
+        /**
+         * @copydoc Interface::run()
+         */
+        virtual void
+        run() override;
       };
 
       /**

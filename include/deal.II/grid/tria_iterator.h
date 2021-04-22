@@ -167,11 +167,10 @@ class TriaActiveIterator;
  * add functionality.
  *
  * The accessors provided by the library consist of two groups, determined by
- * whether they access the data of Triangulation objects or
- * DoFHandler/hp::DoFHandler objects. They are derived from TriaAccessor and
- * DoFAccessor, respectively. Each group also has specialized accessors for
- * cells (as opposed to faces and lines) that offer more functionality such as
- * accessing neighbors.
+ * whether they access the data of Triangulation objects or DoFHandler objects.
+ * They are derived from TriaAccessor and DoFAccessor, respectively. Each group
+ * also has specialized accessors for cells (as opposed to faces and lines) that
+ * offer more functionality such as accessing neighbors.
  *
  * @attention It seems impossible to preserve constness of a triangulation
  * through iterator usage. Thus, if you declare pointers to a <tt>const</tt>
@@ -805,7 +804,7 @@ public:
     const Triangulation<Accessor::dimension, Accessor::space_dimension> *parent,
     const int                                                            level,
     const int                                                            index,
-    const typename Accessor::AccessorData *local_data = 0);
+    const typename Accessor::AccessorData *local_data = nullptr);
 
   /**
    * This is a conversion operator (constructor) which takes another iterator

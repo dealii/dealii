@@ -39,10 +39,7 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
@@ -412,8 +409,8 @@ namespace Step61
                                             update_quadrature_points |
                                             update_JxW_values);
 
-    const unsigned int dofs_per_cell      = fe.dofs_per_cell;
-    const unsigned int dofs_per_cell_dgrt = fe_dgrt.dofs_per_cell;
+    const unsigned int dofs_per_cell      = fe.n_dofs_per_cell();
+    const unsigned int dofs_per_cell_dgrt = fe_dgrt.n_dofs_per_cell();
 
     const unsigned int n_q_points      = fe_values.get_quadrature().size();
     const unsigned int n_q_points_dgrt = fe_values_dgrt.get_quadrature().size();
@@ -666,8 +663,8 @@ namespace Step61
                                             update_quadrature_points |
                                             update_JxW_values);
 
-    const unsigned int dofs_per_cell      = fe.dofs_per_cell;
-    const unsigned int dofs_per_cell_dgrt = fe_dgrt.dofs_per_cell;
+    const unsigned int dofs_per_cell      = fe.n_dofs_per_cell();
+    const unsigned int dofs_per_cell_dgrt = fe_dgrt.n_dofs_per_cell();
 
     const unsigned int n_q_points      = fe_values.get_quadrature().size();
     const unsigned int n_q_points_dgrt = fe_values_dgrt.get_quadrature().size();

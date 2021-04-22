@@ -253,7 +253,7 @@ namespace GridTools
     // list, but std::set throws out those cells already entered
     for (; cell != endc; ++cell)
       {
-        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+        for (const unsigned int v : cell->vertex_indices())
           if (cell->vertex_index(v) == vertex)
             {
               // OK, we found a cell that contains
@@ -266,27 +266,23 @@ namespace GridTools
               // (possibly) coarser neighbor. if this is the case,
               // then we need to also add this neighbor
               if (dim >= 2)
-                for (unsigned int vface = 0; vface < dim; vface++)
-                  {
-                    const unsigned int face =
-                      GeometryInfo<dim>::vertex_to_face[v][vface];
-
-                    if (!cell->at_boundary(face) &&
-                        cell->neighbor(face)->is_active())
-                      {
-                        // there is a (possibly) coarser cell behind a
-                        // face to which the vertex belongs. the
-                        // vertex we are looking at is then either a
-                        // vertex of that coarser neighbor, or it is a
-                        // hanging node on one of the faces of that
-                        // cell. in either case, it is adjacent to the
-                        // vertex, so add it to the list as well (if
-                        // the cell was already in the list then the
-                        // std::set makes sure that we get it only
-                        // once)
-                        adjacent_cells.insert(cell->neighbor(face));
-                      }
-                  }
+                for (const auto face :
+                     cell->reference_cell().faces_for_given_vertex(v))
+                  if (!cell->at_boundary(face) &&
+                      cell->neighbor(face)->is_active())
+                    {
+                      // there is a (possibly) coarser cell behind a
+                      // face to which the vertex belongs. the
+                      // vertex we are looking at is then either a
+                      // vertex of that coarser neighbor, or it is a
+                      // hanging node on one of the faces of that
+                      // cell. in either case, it is adjacent to the
+                      // vertex, so add it to the list as well (if
+                      // the cell was already in the list then the
+                      // std::set makes sure that we get it only
+                      // once)
+                      adjacent_cells.insert(cell->neighbor(face));
+                    }
 
               // in any case, we have found a cell, so go to the next cell
               goto next_cell;
@@ -295,7 +291,7 @@ namespace GridTools
         // in 3d also loop over the edges
         if (dim >= 3)
           {
-            for (unsigned int e = 0; e < GeometryInfo<dim>::lines_per_cell; ++e)
+            for (unsigned int e = 0; e < cell->n_lines(); ++e)
               if (cell->line(e)->has_children())
                 // the only place where this vertex could have been
                 // hiding is on the mid-edge point of the edge we
@@ -419,7 +415,7 @@ namespace GridTools
                                 const double                   tolerance)
   {
     return find_active_cell_around_point<dim, MeshType, spacedim>(
-             StaticMappingQ1<dim, spacedim>::mapping,
+             get_default_linear_mapping(mesh.get_triangulation()),
              mesh,
              p,
              marked_vertices,
@@ -797,8 +793,7 @@ namespace GridTools
          cell != mesh.end(level);
          ++cell)
       if (predicate(cell)) // True predicate --> Part of subdomain
-        for (const unsigned int v :
-             GeometryInfo<MeshType::dimension>::vertex_indices())
+        for (const unsigned int v : cell->vertex_indices())
           locally_active_vertices_on_level_subdomain[cell->vertex_index(v)] =
             true;
 
@@ -809,8 +804,7 @@ namespace GridTools
          cell != mesh.end(level);
          ++cell)
       if (!predicate(cell)) // False predicate --> Potential halo cell
-        for (const unsigned int v :
-             GeometryInfo<MeshType::dimension>::vertex_indices())
+        for (const unsigned int v : cell->vertex_indices())
           if (locally_active_vertices_on_level_subdomain[cell->vertex_index(
                 v)] == true)
             {
@@ -909,8 +903,7 @@ namespace GridTools
     for (const auto &cell : mesh.active_cell_iterators())
       if (!predicate(cell)) // Negation of predicate --> Not Part of subdomain
         {
-          for (const unsigned int v :
-               GeometryInfo<MeshType::dimension>::vertex_indices())
+          for (const unsigned int v : cell->vertex_indices())
             vertices_outside_subdomain[cell->vertex_index(v)] = true;
           n_non_predicate_cells++;
         }
@@ -928,8 +921,7 @@ namespace GridTools
     for (const auto &cell : mesh.active_cell_iterators())
       if (predicate(cell)) // True predicate --> Potential boundary cell of the
                            // subdomain
-        for (const unsigned int v :
-             GeometryInfo<MeshType::dimension>::vertex_indices())
+        for (const unsigned int v : cell->vertex_indices())
           if (vertices_outside_subdomain[cell->vertex_index(v)] == true)
             {
               subdomain_boundary_cells.push_back(cell);
@@ -1094,8 +1086,7 @@ namespace GridTools
     // if it belongs to the predicate domain, extend the bounding box.
     for (const auto &cell : mesh.active_cell_iterators())
       if (predicate(cell)) // True predicate --> Part of subdomain
-        for (const unsigned int v :
-             GeometryInfo<MeshType::dimension>::vertex_indices())
+        for (const unsigned int v : cell->vertex_indices())
           if (locally_active_vertices_on_subdomain[cell->vertex_index(v)] ==
               false)
             {
@@ -1238,9 +1229,13 @@ namespace GridTools
                                                            mesh_2.begin(0),
                                                          endc = mesh_1.end(0);
     for (; cell_1 != endc; ++cell_1, ++cell_2)
-      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
-        if (cell_1->vertex(v) != cell_2->vertex(v))
+      {
+        if (cell_1->n_vertices() != cell_2->n_vertices())
           return false;
+        for (const unsigned int v : cell_1->vertex_indices())
+          if (cell_1->vertex(v) != cell_2->vertex(v))
+            return false;
+      }
 
     // if we've gotten through all
     // this, then the meshes really
@@ -1407,8 +1402,7 @@ namespace GridTools
 
     std::vector<typename MeshType::active_cell_iterator> patch;
     patch.push_back(cell);
-    for (const unsigned int face_number :
-         GeometryInfo<MeshType::dimension>::face_indices())
+    for (const unsigned int face_number : cell->face_indices())
       if (cell->face(face_number)->at_boundary() == false)
         {
           if (cell->neighbor(face_number)->has_children() == false)
@@ -1517,8 +1511,7 @@ namespace GridTools
          uniform_cell != uniform_cells.end();
          ++uniform_cell)
       {
-        for (const unsigned int v :
-             GeometryInfo<Container::dimension>::vertex_indices())
+        for (const unsigned int v : (*uniform_cell)->vertex_indices())
           {
             Point<Container::space_dimension> position =
               (*uniform_cell)->vertex(v);
@@ -1594,7 +1587,7 @@ namespace GridTools
                       // adjust the cell vertices of the local_triangulation to
                       // match cell vertices of the global triangulation
                       for (const unsigned int v :
-                           GeometryInfo<Container::dimension>::vertex_indices())
+                           active_tria_cell->vertex_indices())
                         active_tria_cell->vertex(v) = patch[i]->vertex(v);
 
                       Assert(active_tria_cell->center().distance(
@@ -1760,8 +1753,7 @@ namespace GridTools
             // few and we don't have to use them.
             if (cell->is_artificial() == false)
               {
-                for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell;
-                     ++l)
+                for (unsigned int l = 0; l < cell->n_lines(); ++l)
                   if (cell->line(l)->has_children())
                     for (unsigned int c = 0; c < cell->line(l)->n_children();
                          ++c)
@@ -1793,7 +1785,8 @@ namespace GridTools
         // cells including ghost cells
         if (cell->is_artificial() == false)
           {
-            const unsigned int n_dofs_per_cell = cell->get_fe().dofs_per_cell;
+            const unsigned int n_dofs_per_cell =
+              cell->get_fe().n_dofs_per_cell();
             local_dof_indices.resize(n_dofs_per_cell);
 
             // Take care of adding cell pointer to each
@@ -1810,7 +1803,7 @@ namespace GridTools
             // face (or line).
 
             // Take care of dofs on neighbor faces
-            for (const unsigned int f : GeometryInfo<dim>::face_indices())
+            for (const unsigned int f : cell->face_indices())
               {
                 if (cell->face(f)->has_children())
                   {
@@ -1833,7 +1826,7 @@ namespace GridTools
                                ExcInternalError());
 
                         const unsigned int n_dofs_per_face =
-                          cell->get_fe().dofs_per_face;
+                          cell->get_fe().n_dofs_per_face(f, c);
                         local_face_dof_indices.resize(n_dofs_per_face);
 
                         cell->face(f)->child(c)->get_dof_indices(
@@ -1868,7 +1861,7 @@ namespace GridTools
                     unsigned int subface = neighbor_face_no_subface_no.second;
 
                     const unsigned int n_dofs_per_face =
-                      cell->get_fe().dofs_per_face;
+                      cell->get_fe().n_dofs_per_face(face_no);
                     local_face_dof_indices.resize(n_dofs_per_face);
 
                     cell->neighbor(f)->face(face_no)->get_dof_indices(
@@ -1887,7 +1880,7 @@ namespace GridTools
                                           // original cell
                           {
                             const unsigned int n_dofs_per_face =
-                              cell->get_fe().dofs_per_face;
+                              cell->get_fe().n_dofs_per_face(face_no, c);
                             local_face_dof_indices.resize(n_dofs_per_face);
 
                             Assert(cell->neighbor(f)
@@ -1917,8 +1910,7 @@ namespace GridTools
             // and dofs on all children of parent line.
             if (dim == 3)
               {
-                for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell;
-                     ++l)
+                for (unsigned int l = 0; l < cell->n_lines(); ++l)
                   {
                     if (cell->line(l)->has_children())
                       {
@@ -1933,8 +1925,8 @@ namespace GridTools
                             // dofs_per_line returns number of dofs
                             // on line not including the vertices of the line.
                             const unsigned int n_dofs_per_line =
-                              2 * cell->get_fe().dofs_per_vertex +
-                              cell->get_fe().dofs_per_line;
+                              2 * cell->get_fe().n_dofs_per_vertex() +
+                              cell->get_fe().n_dofs_per_line();
                             local_line_dof_indices.resize(n_dofs_per_line);
 
                             cell->line(l)->child(c)->get_dof_indices(
@@ -1958,8 +1950,8 @@ namespace GridTools
                         // dofs_per_line returns number of dofs
                         // on line not including the vertices of the line.
                         const unsigned int n_dofs_per_line =
-                          2 * cell->get_fe().dofs_per_vertex +
-                          cell->get_fe().dofs_per_line;
+                          2 * cell->get_fe().n_dofs_per_vertex() +
+                          cell->get_fe().n_dofs_per_line();
                         local_line_dof_indices.resize(n_dofs_per_line);
 
                         parent_line->get_dof_indices(local_line_dof_indices);
@@ -1975,8 +1967,8 @@ namespace GridTools
                                    ExcInternalError());
 
                             const unsigned int n_dofs_per_line =
-                              2 * cell->get_fe().dofs_per_vertex +
-                              cell->get_fe().dofs_per_line;
+                              2 * cell->get_fe().n_dofs_per_vertex() +
+                              cell->get_fe().n_dofs_per_line();
                             local_line_dof_indices.resize(n_dofs_per_line);
 
                             parent_line->child(c)->get_dof_indices(
@@ -2227,7 +2219,7 @@ namespace GridTools
          cell != mesh.end(0);
          ++cell)
       {
-        for (unsigned int i : GeometryInfo<dim>::face_indices())
+        for (unsigned int i : cell->face_indices())
           {
             const typename MeshType::face_iterator face = cell->face(i);
             if (face->at_boundary() && face->boundary_id() == b_id1)
@@ -2383,6 +2375,7 @@ namespace GridTools
   {
     using MATCH_T =
       std::array<unsigned int, GeometryInfo<3>::vertices_per_face>;
+
     static inline std::bitset<3>
     lookup(const MATCH_T &matching)
     {
@@ -2442,11 +2435,13 @@ namespace GridTools
 
     std::array<unsigned int, GeometryInfo<dim>::vertices_per_face> matching;
 
+    AssertDimension(face1->n_vertices(), face2->n_vertices());
+
     std::set<unsigned int> face2_vertices;
-    for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_face; ++i)
+    for (unsigned int i = 0; i < face1->n_vertices(); ++i)
       face2_vertices.insert(i);
 
-    for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_face; ++i)
+    for (unsigned int i = 0; i < face1->n_vertices(); ++i)
       {
         for (std::set<unsigned int>::iterator it = face2_vertices.begin();
              it != face2_vertices.end();

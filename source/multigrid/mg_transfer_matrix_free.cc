@@ -185,6 +185,19 @@ MGTransferMatrixFree<dim, Number>::prolongate(
   LinearAlgebra::distributed::Vector<Number> &      dst,
   const LinearAlgebra::distributed::Vector<Number> &src) const
 {
+  dst = 0;
+  prolongate_and_add(to_level, dst, src);
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTransferMatrixFree<dim, Number>::prolongate_and_add(
+  const unsigned int                                to_level,
+  LinearAlgebra::distributed::Vector<Number> &      dst,
+  const LinearAlgebra::distributed::Vector<Number> &src) const
+{
   Assert((to_level >= 1) && (to_level <= level_dof_indices.size()),
          ExcIndexRange(to_level, 1, level_dof_indices.size() + 1));
 
@@ -208,12 +221,10 @@ MGTransferMatrixFree<dim, Number>::prolongate(
           this->vector_partitioners[to_level].get())
         this->ghosted_level_vector[to_level].reinit(
           this->vector_partitioners[to_level]);
-      AssertDimension(this->ghosted_level_vector[to_level].local_size(),
-                      dst.local_size());
+      AssertDimension(this->ghosted_level_vector[to_level].locally_owned_size(),
+                      dst.locally_owned_size());
       this->ghosted_level_vector[to_level] = 0.;
     }
-  else
-    dst = 0;
 
   const LinearAlgebra::distributed::Vector<Number> &src_vec =
     src_inplace ? src : this->ghosted_level_vector[to_level - 1];
@@ -251,10 +262,10 @@ MGTransferMatrixFree<dim, Number>::prolongate(
 
   dst_vec.compress(VectorOperation::add);
   if (dst_inplace == false)
-    dst = dst_vec;
+    dst += dst_vec;
 
   if (src_inplace == true)
-    src.zero_out_ghosts();
+    src.zero_out_ghost_values();
 }
 
 
@@ -288,8 +299,9 @@ MGTransferMatrixFree<dim, Number>::restrict_and_add(
           this->vector_partitioners[from_level - 1].get())
         this->ghosted_level_vector[from_level - 1].reinit(
           this->vector_partitioners[from_level - 1]);
-      AssertDimension(this->ghosted_level_vector[from_level - 1].local_size(),
-                      dst.local_size());
+      AssertDimension(
+        this->ghosted_level_vector[from_level - 1].locally_owned_size(),
+        dst.locally_owned_size());
       this->ghosted_level_vector[from_level - 1] = 0.;
     }
 
@@ -331,7 +343,7 @@ MGTransferMatrixFree<dim, Number>::restrict_and_add(
     dst += dst_vec;
 
   if (src_inplace == true)
-    src.zero_out_ghosts();
+    src.zero_out_ghost_values();
 }
 
 
@@ -414,8 +426,8 @@ MGTransferMatrixFree<dim, Number>::do_prolongate_add(
        cell += vec_size)
     {
       const unsigned int n_lanes =
-        cell + vec_size > n_owned_level_cells[to_level - 1] ?
-          n_owned_level_cells[to_level - 1] - cell :
+        (cell + vec_size > n_owned_level_cells[to_level - 1]) ?
+          (n_owned_level_cells[to_level - 1] - cell) :
           vec_size;
 
       // read from source vector
@@ -459,19 +471,22 @@ MGTransferMatrixFree<dim, Number>::do_prolongate_add(
           // must go through the components backwards because we want to write
           // the output to the same array as the input
           for (int c = n_components - 1; c >= 0; --c)
-            internal::FEEvaluationImplBasisChange<internal::evaluate_general,
-                                                  dim,
-                                                  degree + 1,
-                                                  2 * degree + 1,
-                                                  1,
-                                                  VectorizedArray<Number>,
-                                                  VectorizedArray<Number>>::
-              do_forward(prolongation_matrix_1d,
-                         evaluation_data.begin() +
-                           c * Utilities::fixed_power<dim>(degree_size),
-                         evaluation_data.begin() + c * n_scalar_cell_dofs,
-                         fe_degree + 1,
-                         2 * fe_degree + 1);
+            internal::FEEvaluationImplBasisChange<
+              internal::evaluate_general,
+              internal::EvaluatorQuantity::value,
+              dim,
+              degree + 1,
+              2 * degree + 1,
+              VectorizedArray<Number>,
+              VectorizedArray<Number>>::do_forward(1,
+                                                   prolongation_matrix_1d,
+                                                   evaluation_data.begin() +
+                                                     c * Utilities::fixed_power<
+                                                           dim>(degree_size),
+                                                   evaluation_data.begin() +
+                                                     c * n_scalar_cell_dofs,
+                                                   fe_degree + 1,
+                                                   2 * fe_degree + 1);
           weight_dofs_on_child<dim, degree, Number>(
             &weights_on_refined[to_level - 1][(cell / vec_size) * three_to_dim],
             n_components,
@@ -481,19 +496,22 @@ MGTransferMatrixFree<dim, Number>::do_prolongate_add(
       else
         {
           for (int c = n_components - 1; c >= 0; --c)
-            internal::FEEvaluationImplBasisChange<internal::evaluate_general,
-                                                  dim,
-                                                  degree + 1,
-                                                  2 * degree + 2,
-                                                  1,
-                                                  VectorizedArray<Number>,
-                                                  VectorizedArray<Number>>::
-              do_forward(prolongation_matrix_1d,
-                         evaluation_data.begin() +
-                           c * Utilities::fixed_power<dim>(degree_size),
-                         evaluation_data.begin() + c * n_scalar_cell_dofs,
-                         fe_degree + 1,
-                         2 * fe_degree + 2);
+            internal::FEEvaluationImplBasisChange<
+              internal::evaluate_general,
+              internal::EvaluatorQuantity::value,
+              dim,
+              degree + 1,
+              2 * degree + 2,
+              VectorizedArray<Number>,
+              VectorizedArray<Number>>::do_forward(1,
+                                                   prolongation_matrix_1d,
+                                                   evaluation_data.begin() +
+                                                     c * Utilities::fixed_power<
+                                                           dim>(degree_size),
+                                                   evaluation_data.begin() +
+                                                     c * n_scalar_cell_dofs,
+                                                   fe_degree + 1,
+                                                   2 * fe_degree + 2);
         }
 
       // write into dst vector
@@ -529,8 +547,8 @@ MGTransferMatrixFree<dim, Number>::do_restrict_add(
        cell += vec_size)
     {
       const unsigned int n_lanes =
-        cell + vec_size > n_owned_level_cells[from_level - 1] ?
-          n_owned_level_cells[from_level - 1] - cell :
+        (cell + vec_size > n_owned_level_cells[from_level - 1]) ?
+          (n_owned_level_cells[from_level - 1] - cell) :
           vec_size;
 
       // read from source vector
@@ -557,38 +575,46 @@ MGTransferMatrixFree<dim, Number>::do_restrict_add(
             fe_degree,
             evaluation_data.data());
           for (unsigned int c = 0; c < n_components; ++c)
-            internal::FEEvaluationImplBasisChange<internal::evaluate_general,
-                                                  dim,
-                                                  degree + 1,
-                                                  2 * degree + 1,
-                                                  1,
-                                                  VectorizedArray<Number>,
-                                                  VectorizedArray<Number>>::
-              do_backward(prolongation_matrix_1d,
-                          false,
-                          evaluation_data.begin() + c * n_scalar_cell_dofs,
-                          evaluation_data.begin() +
-                            c * Utilities::fixed_power<dim>(degree_size),
-                          fe_degree + 1,
-                          2 * fe_degree + 1);
+            internal::FEEvaluationImplBasisChange<
+              internal::evaluate_general,
+              internal::EvaluatorQuantity::value,
+              dim,
+              degree + 1,
+              2 * degree + 1,
+              VectorizedArray<Number>,
+              VectorizedArray<Number>>::do_backward(1,
+                                                    prolongation_matrix_1d,
+                                                    false,
+                                                    evaluation_data.begin() +
+                                                      c * n_scalar_cell_dofs,
+                                                    evaluation_data.begin() +
+                                                      c *
+                                                        Utilities::fixed_power<
+                                                          dim>(degree_size),
+                                                    fe_degree + 1,
+                                                    2 * fe_degree + 1);
         }
       else
         {
           for (unsigned int c = 0; c < n_components; ++c)
-            internal::FEEvaluationImplBasisChange<internal::evaluate_general,
-                                                  dim,
-                                                  degree + 1,
-                                                  2 * degree + 2,
-                                                  1,
-                                                  VectorizedArray<Number>,
-                                                  VectorizedArray<Number>>::
-              do_backward(prolongation_matrix_1d,
-                          false,
-                          evaluation_data.begin() + c * n_scalar_cell_dofs,
-                          evaluation_data.begin() +
-                            c * Utilities::fixed_power<dim>(degree_size),
-                          fe_degree + 1,
-                          2 * fe_degree + 2);
+            internal::FEEvaluationImplBasisChange<
+              internal::evaluate_general,
+              internal::EvaluatorQuantity::value,
+              dim,
+              degree + 1,
+              2 * degree + 2,
+              VectorizedArray<Number>,
+              VectorizedArray<Number>>::do_backward(1,
+                                                    prolongation_matrix_1d,
+                                                    false,
+                                                    evaluation_data.begin() +
+                                                      c * n_scalar_cell_dofs,
+                                                    evaluation_data.begin() +
+                                                      c *
+                                                        Utilities::fixed_power<
+                                                          dim>(degree_size),
+                                                    fe_degree + 1,
+                                                    2 * fe_degree + 2);
         }
 
       // write into dst vector
@@ -758,6 +784,30 @@ MGTransferBlockMatrixFree<dim, Number>::prolongate(
       matrix_free_transfer_vector[data_block].prolongate(to_level,
                                                          dst.block(b),
                                                          src.block(b));
+    }
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTransferBlockMatrixFree<dim, Number>::prolongate_and_add(
+  const unsigned int                                     to_level,
+  LinearAlgebra::distributed::BlockVector<Number> &      dst,
+  const LinearAlgebra::distributed::BlockVector<Number> &src) const
+{
+  const unsigned int n_blocks = src.n_blocks();
+  AssertDimension(dst.n_blocks(), n_blocks);
+
+  if (!same_for_all)
+    AssertDimension(matrix_free_transfer_vector.size(), n_blocks);
+
+  for (unsigned int b = 0; b < n_blocks; ++b)
+    {
+      const unsigned int data_block = same_for_all ? 0 : b;
+      matrix_free_transfer_vector[data_block].prolongate_and_add(to_level,
+                                                                 dst.block(b),
+                                                                 src.block(b));
     }
 }
 

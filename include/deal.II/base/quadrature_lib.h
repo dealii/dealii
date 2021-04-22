@@ -108,20 +108,33 @@ public:
 
 /**
  * The trapezoidal rule for numerical quadrature. This formula with two
- * quadrature points is exact for linear polynomials.
+ * quadrature points is exact for linear polynomials and uses the
+ * end points of an interval for function evaluation in 1d, see
+ * https://en.wikipedia.org/wiki/Trapezoidal_rule . In higher dimensions,
+ * the class is constructed via a tensor product and then uses the
+ * vertices of a quadrilateral or hexahedron for function evaluation.
+ */
+template <int dim>
+class QTrapezoid : public Quadrature<dim>
+{
+public:
+  QTrapezoid();
+};
+
+
+/**
+ * An alias for QTrapezoid available for historic reasons. This name is
+ * deprecated.
  *
- * The class is poorly named since the proper name of the quadrature formula
+ * The class was originally named QTrapez, a poorly named choice since the
+ * proper name of the quadrature formula
  * is "trapezoidal rule", or sometimes also called the "trapezoid rule". The
- * misnomer results from the fact that its original authors' poor English
+ * misnomer resulted from the fact that its original authors' poor English
  * language skills led them to translate the name incorrectly from the German
  * "Trapezregel".
  */
 template <int dim>
-class QTrapez : public Quadrature<dim>
-{
-public:
-  QTrapez();
-};
+using QTrapez DEAL_II_DEPRECATED = QTrapezoid<dim>;
 
 
 
@@ -779,6 +792,94 @@ public:
   QSplit(const QSimplex<dim> &base, const Point<dim> &split_point);
 };
 
+/**
+ * Integration rule for simplex entities.
+ *
+ * Users specify a number `n_points_1D` as an indication of what polynomial
+ * degree to be integrated exactly, similarly to the number of points in a
+ * QGauss quadrature object, even though the present quadrature formula is not
+ * a tensor product. The given value is translated for n_points_1D=1,2,3,4 to
+ * following number of quadrature points for 2D and 3D:
+ *   - 2D: 1, 3, 7, 15
+ *   - 3D: 1, 4, 10, 35
+ *
+ * For 1D, the quadrature rule degenerates to a
+ * `dealii::QGauss<1>(n_points_1D)`.
+ *
+ * @ingroup simplex
+ */
+template <int dim>
+class QGaussSimplex : public QSimplex<dim>
+{
+public:
+  /**
+   * Constructor taking the number of quadrature points in 1D direction
+   * @p n_points_1D.
+   */
+  explicit QGaussSimplex(const unsigned int n_points_1D);
+};
+
+/**
+ * Witherden-Vincent rules for simplex entities.
+ *
+ * Like QGauss, users should specify a number `n_points_1D` as an indication
+ * of what polynomial degree to be integrated exactly (e.g., for $n$ points,
+ * the rule can integrate polynomials of degree $2 n - 1$ exactly). The given
+ * value for n_points_1D = 1, 2, 3, 4, 5 results in the following number of
+ * quadrature points in 2D and 3D:
+ * - 2D: 1, 6, 7, 15, 19
+ * - 3D: 1, 8, 14, 35, 59
+ *
+ * For 1D, the quadrature rule degenerates to a
+ * `dealii::QGauss<1>(n_points_1D)`.
+ *
+ * These rules match the ones listed for Witherden-Vincent in the quadpy
+ * @cite quadpy library and were first described in
+ * @cite witherden2015identification.
+ *
+ * @ingroup simplex
+ */
+template <int dim>
+class QWitherdenVincentSimplex : public QSimplex<dim>
+{
+public:
+  /**
+   * Constructor taking the number of quadrature points in 1D direction
+   * @p n_points_1D.
+   */
+  explicit QWitherdenVincentSimplex(const unsigned int n_points_1D);
+};
+
+/**
+ * Integration rule for wedge entities.
+ */
+template <int dim>
+class QGaussWedge : public Quadrature<dim>
+{
+public:
+  /**
+   * Users specify a number `n_points_1D` as an indication of what polynomial
+   * degree to be integrated exactly. For details, see the comments of
+   * QGaussSimplex.
+   */
+  explicit QGaussWedge(const unsigned int n_points_1D);
+};
+
+/**
+ * Integration rule for pyramid entities.
+ */
+template <int dim>
+class QGaussPyramid : public Quadrature<dim>
+{
+public:
+  /**
+   * Users specify a number `n_points_1D` as an indication of what polynomial
+   * degree to be integrated exactly. For details, see the comments of
+   * QGaussSimplex.
+   */
+  explicit QGaussPyramid(const unsigned int n_points_1D);
+};
+
 /*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */
@@ -799,7 +900,7 @@ QGaussLog<1>::get_quadrature_weights(const unsigned int);
 template <>
 QMidpoint<1>::QMidpoint();
 template <>
-QTrapez<1>::QTrapez();
+QTrapezoid<1>::QTrapezoid();
 template <>
 QSimpson<1>::QSimpson();
 template <>

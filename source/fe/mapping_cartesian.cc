@@ -71,6 +71,23 @@ MappingCartesian<dim, spacedim>::preserves_vertex_locations() const
 
 
 template <int dim, int spacedim>
+bool
+MappingCartesian<dim, spacedim>::is_compatible_with(
+  const ReferenceCell &reference_cell) const
+{
+  Assert(dim == reference_cell.get_dimension(),
+         ExcMessage("The dimension of your mapping (" +
+                    Utilities::to_string(dim) +
+                    ") and the reference cell cell_type (" +
+                    Utilities::to_string(reference_cell.get_dimension()) +
+                    " ) do not agree."));
+
+  return reference_cell.is_hyper_cube();
+}
+
+
+
+template <int dim, int spacedim>
 UpdateFlags
 MappingCartesian<dim, spacedim>::requires_update_flags(
   const UpdateFlags in) const
@@ -111,12 +128,14 @@ MappingCartesian<dim, spacedim>::get_data(const UpdateFlags      update_flags,
 template <int dim, int spacedim>
 std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
 MappingCartesian<dim, spacedim>::get_face_data(
-  const UpdateFlags          update_flags,
-  const Quadrature<dim - 1> &quadrature) const
+  const UpdateFlags               update_flags,
+  const hp::QCollection<dim - 1> &quadrature) const
 {
+  AssertDimension(quadrature.size(), 1);
+
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std::make_unique<InternalData>(
-      QProjector<dim>::project_to_all_faces(quadrature));
+    std::make_unique<InternalData>(QProjector<dim>::project_to_all_faces(
+      ReferenceCells::get_hypercube<dim>(), quadrature[0]));
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
 
   // verify that we have computed the transitive hull of the required
@@ -140,8 +159,8 @@ MappingCartesian<dim, spacedim>::get_subface_data(
   const Quadrature<dim - 1> &quadrature) const
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std::make_unique<InternalData>(
-      QProjector<dim>::project_to_all_subfaces(quadrature));
+    std::make_unique<InternalData>(QProjector<dim>::project_to_all_subfaces(
+      ReferenceCells::get_hypercube<dim>(), quadrature));
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
 
   // verify that we have computed the transitive hull of the required
@@ -203,8 +222,7 @@ MappingCartesian<dim, spacedim>::maybe_update_cell_quadrature_points(
 {
   if (data.update_each & update_quadrature_points)
     {
-      const typename QProjector<dim>::DataSetDescriptor offset =
-        QProjector<dim>::DataSetDescriptor::cell();
+      const auto offset = QProjector<dim>::DataSetDescriptor::cell();
 
       transform_quadrature_points(cell, data, offset, quadrature_points);
     }
@@ -224,13 +242,13 @@ MappingCartesian<dim, spacedim>::maybe_update_face_quadrature_points(
 
   if (data.update_each & update_quadrature_points)
     {
-      const typename QProjector<dim>::DataSetDescriptor offset =
-        QProjector<dim>::DataSetDescriptor::face(face_no,
-                                                 cell->face_orientation(
-                                                   face_no),
-                                                 cell->face_flip(face_no),
-                                                 cell->face_rotation(face_no),
-                                                 quadrature_points.size());
+      const auto offset = QProjector<dim>::DataSetDescriptor::face(
+        ReferenceCells::get_hypercube<dim>(),
+        face_no,
+        cell->face_orientation(face_no),
+        cell->face_flip(face_no),
+        cell->face_rotation(face_no),
+        quadrature_points.size());
 
 
       transform_quadrature_points(cell, data, offset, quadrature_points);
@@ -257,15 +275,15 @@ MappingCartesian<dim, spacedim>::maybe_update_subface_quadrature_points(
 
   if (data.update_each & update_quadrature_points)
     {
-      const typename QProjector<dim>::DataSetDescriptor offset =
-        QProjector<dim>::DataSetDescriptor::subface(
-          face_no,
-          sub_no,
-          cell->face_orientation(face_no),
-          cell->face_flip(face_no),
-          cell->face_rotation(face_no),
-          quadrature_points.size(),
-          cell->subface_case(face_no));
+      const auto offset = QProjector<dim>::DataSetDescriptor::subface(
+        ReferenceCells::get_hypercube<dim>(),
+        face_no,
+        sub_no,
+        cell->face_orientation(face_no),
+        cell->face_flip(face_no),
+        cell->face_rotation(face_no),
+        quadrature_points.size(),
+        cell->subface_case(face_no));
 
       transform_quadrature_points(cell, data, offset, quadrature_points);
     }
@@ -437,11 +455,13 @@ void
 MappingCartesian<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const Quadrature<dim - 1> &                                 quadrature,
+  const hp::QCollection<dim - 1> &                            quadrature,
   const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
+  AssertDimension(quadrature.size(), 1);
+
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
@@ -468,7 +488,7 @@ MappingCartesian<dim, spacedim>::fill_fe_face_values(
 
   if (data.update_each & update_JxW_values)
     for (unsigned int i = 0; i < output_data.JxW_values.size(); ++i)
-      output_data.JxW_values[i] = J * quadrature.weight(i);
+      output_data.JxW_values[i] = J * quadrature[0].weight(i);
 
   if (data.update_each & update_boundary_forms)
     for (unsigned int i = 0; i < output_data.boundary_forms.size(); ++i)

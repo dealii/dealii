@@ -105,11 +105,8 @@ CellDataTransfer<dim, spacedim, VectorType>::
               coarsened_cells_active_index.end())
             {
               std::set<unsigned int> indices_children;
-              for (unsigned int child_index = 0;
-                   child_index < parent->n_children();
-                   ++child_index)
+              for (const auto &sibling : parent->child_iterators())
                 {
-                  const auto &sibling = parent->child(child_index);
                   Assert(sibling->is_active() && sibling->coarsen_flag_set(),
                          typename dealii::Triangulation<
                            dim>::ExcInconsistentCoarseningFlags());

@@ -34,11 +34,8 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
@@ -135,9 +132,7 @@ namespace Step14
       bool evaluation_point_found = false;
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (!evaluation_point_found)
-          for (unsigned int vertex = 0;
-               vertex < GeometryInfo<dim>::vertices_per_cell;
-               ++vertex)
+          for (const auto vertex : cell->vertex_indices())
             if (cell->vertex(vertex).distance(evaluation_point) <
                 cell->diameter() * 1e-8)
               {
@@ -208,7 +203,7 @@ namespace Step14
 
       // ...then have some objects of which the meaning will become clear
       // below...
-      QTrapez<dim>                vertex_quadrature;
+      QTrapezoid<dim>             vertex_quadrature;
       FEValues<dim>               fe_values(dof_handler.get_fe(),
                               vertex_quadrature,
                               update_gradients | update_quadrature_points);
@@ -218,9 +213,7 @@ namespace Step14
       // often the vertex has been found:
       unsigned int evaluation_point_hits = 0;
       for (const auto &cell : dof_handler.active_cell_iterators())
-        for (unsigned int vertex = 0;
-             vertex < GeometryInfo<dim>::vertices_per_cell;
-             ++vertex)
+        for (const auto vertex : cell->vertex_indices())
           if (cell->vertex(vertex) == evaluation_point)
             {
               // Things are now no more as simple, since we can't get the
@@ -580,7 +573,7 @@ namespace Step14
       AssemblyScratchData &                                 scratch_data,
       AssemblyCopyData &                                    copy_data) const
     {
-      const unsigned int dofs_per_cell = fe->dofs_per_cell;
+      const unsigned int dofs_per_cell = fe->n_dofs_per_cell();
       const unsigned int n_q_points    = quadrature->size();
 
       copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
@@ -764,7 +757,7 @@ namespace Step14
                               update_values | update_quadrature_points |
                                 update_JxW_values);
 
-      const unsigned int dofs_per_cell = this->fe->dofs_per_cell;
+      const unsigned int dofs_per_cell = this->fe->n_dofs_per_cell();
       const unsigned int n_q_points    = this->quadrature->size();
 
       Vector<double>                       cell_rhs(dofs_per_cell);
@@ -1294,8 +1287,7 @@ namespace Step14
       std::vector<CellData<dim>> cells(n_cells, CellData<dim>());
       for (unsigned int i = 0; i < n_cells; ++i)
         {
-          for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_cell;
-               ++j)
+          for (unsigned int j = 0; j < cell_vertices[i].size(); ++j)
             cells[i].vertices[j] = cell_vertices[i][j];
           cells[i].material_id = 0;
         }
@@ -1447,9 +1439,7 @@ namespace Step14
       // vertices (or very close to a vertex, which may happen due to floating
       // point round-off):
       for (const auto &cell : dof_handler.active_cell_iterators())
-        for (unsigned int vertex = 0;
-             vertex < GeometryInfo<dim>::vertices_per_cell;
-             ++vertex)
+        for (const auto vertex : cell->vertex_indices())
           if (cell->vertex(vertex).distance(evaluation_point) <
               cell->diameter() * 1e-8)
             {
@@ -2273,7 +2263,7 @@ namespace Step14
       // After computing the cell terms, turn to the face terms. For this,
       // loop over all faces of the present cell, and see whether
       // something needs to be computed on it:
-      for (unsigned int face_no : GeometryInfo<dim>::face_indices())
+      for (const auto face_no : cell->face_indices())
         {
           // First, if this face is part of the boundary, then there is
           // nothing to do. However, to make things easier when summing up

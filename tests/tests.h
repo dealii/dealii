@@ -288,16 +288,11 @@ random_box(const double &min = 0.0, const double &max = 1.0)
 void
 cat_file(const char *filename)
 {
-  std::ifstream in(filename);
-  Assert(in, dealii::ExcIO());
-
-  while (in)
-    {
-      std::string s;
-      std::getline(in, s);
-      dealii::deallog.get_file_stream() << s << "\n";
-    }
-  in.close();
+  {
+    std::ifstream in(filename);
+    Assert(in, dealii::ExcIO());
+    deallog.get_file_stream() << in.rdbuf() << "\n";
+  }
 
   std::remove(filename);
 }
@@ -417,6 +412,7 @@ filter_out_small_numbers(const Number number, const double tolerance)
   else
     return number;
 }
+
 
 // ---------------- Functions used in initializing subsystems -----------------
 

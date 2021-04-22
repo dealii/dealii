@@ -20,6 +20,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_enriched.h>
@@ -31,7 +32,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
@@ -115,7 +115,7 @@ test5()
   {
     const unsigned int    global_dof = 11;
     const Vector<double> &solution   = shape_functions[global_dof];
-    QTrapez<dim>          quadrature;
+    QTrapezoid<dim>       quadrature;
     FEValues<dim>         fe_values(fe, quadrature, update_values);
 
     const unsigned int  n_q_points = quadrature.size();

@@ -30,15 +30,24 @@
 
 #include <deal.II/lac/generic_linear_algebra.h>
 
-// uncomment the following \#define if you have PETSc and Trilinos installed
-// and you prefer using Trilinos in this example:
+// This program can use either PETSc or Trilinos for its parallel
+// algebra needs. By default, if deal.II has been configured with
+// PETSc, it will use PETSc. Otherwise, the following few lines will
+// check that deal.II has been configured with Trilinos and take that.
+//
+// But there may be cases where you want to use Trilinos, even though
+// deal.II has *also* been configured with PETSc, for example to
+// compare the performance of these two libraries. To do this,
+// add the following \#define to the source code:
 // @code
 // #define FORCE_USE_OF_TRILINOS
 // @endcode
-
-// This will either import PETSc or TrilinosWrappers into the namespace
-// LA. Note that we are defining the macro USE_PETSC_LA so that we can detect
-// if we are using PETSc (see solve() for an example where this is necessary)
+//
+// Using this logic, the following lines will then import either the
+// PETSc or Trilinos wrappers into the namespace `LA` (for "linear
+// algebra). In the former case, we are also defining the macro
+// `USE_PETSC_LA` so that we can detect if we are using PETSc (see
+// solve() for an example where this is necessary).
 namespace LA
 {
 #if defined(DEAL_II_WITH_PETSC) && !defined(DEAL_II_PETSC_WITH_COMPLEX) && \
@@ -52,6 +61,7 @@ namespace LA
 #endif
 } // namespace LA
 
+
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/solver_cg.h>
@@ -59,10 +69,7 @@ namespace LA
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/fe_q.h>
@@ -366,7 +373,7 @@ namespace Step40
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);

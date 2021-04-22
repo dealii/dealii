@@ -46,7 +46,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/q_collection.h>
 #include <deal.II/hp/refinement.h>
@@ -97,7 +96,7 @@ public:
   void
   run();
 
-  hp::DoFHandler<dim> &
+  DoFHandler<dim> &
   get_dof_handler();
 
   void
@@ -152,7 +151,7 @@ protected:
 
   Triangulation<dim>    triangulation;
   hp::FECollection<dim> fe;
-  hp::DoFHandler<dim>   dof_handler;
+  DoFHandler<dim>       dof_handler;
   hp::QCollection<dim>  quadrature;
   hp::QCollection<dim>  quadrature_infty;
 
@@ -225,7 +224,7 @@ Laplace<dim>::~Laplace()
 
 
 template <int dim>
-hp::DoFHandler<dim> &
+DoFHandler<dim> &
 Laplace<dim>::get_dof_handler()
 {
   return dof_handler;
@@ -428,7 +427,7 @@ Laplace<dim>::refine_grid(const unsigned int cycle)
   // 3.2. Mark cells for h-refinement
   mark_h_cells();
 
-  // 3.3. Substitute h for p refinement
+  // 3.3. Substitute h- for p-refinement
   substitute_h_for_p();
 
   // prepare refinement and store number of flagged cells
@@ -444,7 +443,7 @@ Laplace<dim>::refine_grid(const unsigned int cycle)
     }
 
   // 3.4. Solution Transfer
-  SolutionTransfer<dim, TrilinosWrappers::MPI::Vector, hp::DoFHandler<dim>>
+  SolutionTransfer<dim, TrilinosWrappers::MPI::Vector, DoFHandler<dim>>
     soltrans(dof_handler);
 
   // copy current functions
@@ -458,7 +457,7 @@ Laplace<dim>::refine_grid(const unsigned int cycle)
   // 3.5. h-refinement and p-refinement
   triangulation.execute_coarsening_and_refinement();
 
-  // FIXME: some hp strategies might need:
+  // FIXME: some hp-strategies might need:
   // post_execute_coarsening_and_refinement();
 
   // 3.6. Setup

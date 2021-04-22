@@ -65,7 +65,7 @@ main(int argc, char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        typedef PETScWrappers::SparseMatrix::size_type size_type;
+        using size_type = PETScWrappers::SparseMatrix::size_type;
 
         std::vector<size_type> row_lengths(5, 3U);
         row_lengths.back() = 2;

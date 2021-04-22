@@ -220,7 +220,7 @@ namespace Particles
         if (comps[i])
           space_gtl[i] = j++;
 
-      std::vector<types::global_dof_index> dof_indices(fe.dofs_per_cell);
+      std::vector<types::global_dof_index> dof_indices(fe.n_dofs_per_cell());
 
       while (particle != particle_handler.end())
         {
@@ -233,12 +233,12 @@ namespace Particles
           Assert(pic.begin() == particle, ExcInternalError());
           for (unsigned int i = 0; particle != pic.end(); ++particle, ++i)
             {
-              const auto &reference_location =
+              const Point<dim> reference_location =
                 particle->get_reference_location();
 
               const auto id = particle->get_id();
 
-              for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
+              for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
                 {
                   const auto comp_j =
                     space_gtl[fe.system_to_component_index(j).first];

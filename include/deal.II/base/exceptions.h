@@ -743,7 +743,19 @@ namespace StandardExceptions
    */
   DeclException1(ExcFileNotOpen,
                  std::string,
-                 << "Could not open file " << arg1 << ".");
+                 << "Could not open file " << arg1
+                 << "."
+                    "\n\n"
+                    "If this happens during an operation that tries to read "
+                    "data: you may be "
+                    "trying to read from a file that doesn't exist or that is "
+                    "not readable given its file permissions."
+                    "\n\n"
+                    "If this happens during an operation that tries to write "
+                    "data: you may be trying to write to a file to which file "
+                    "or directory permissions do not allow you to write. A "
+                    "typical example is where you specify an output file in "
+                    "a directory that does not exist.");
 
   /**
    * Exception denoting a part of the library or application program that has
@@ -1070,9 +1082,16 @@ namespace StandardExceptions
    * argument zero. In other cases, this exception is thrown.
    */
   DeclExceptionMsg(ExcScalarAssignmentOnlyForZeroValue,
-                   "You are trying an operation of the form 'vector=s' with "
-                   "a nonzero scalar value 's'. However, such assignments "
-                   "are only allowed if the right hand side is zero.");
+                   "You are trying an operation of the form 'vector = C', "
+                   "'matrix = C', or 'tensor = C' with a nonzero scalar value "
+                   "'C'. However, such assignments are only allowed if the "
+                   "C is zero, since the semantics for assigning any other "
+                   "value are not clear. For example: one could interpret "
+                   "assigning a matrix a value of 1 to mean the matrix has a "
+                   "norm of 1, the matrix is the identity matrix, or the "
+                   "matrix contains only 1s. Similar problems exist with "
+                   "vectors and tensors. Hence, to avoid this ambiguity, such "
+                   "assignments are not permitted.");
 
   /**
    * This function requires support for the LAPACK library.
@@ -1090,6 +1109,14 @@ namespace StandardExceptions
     ExcNeedsMPI,
     "You are attempting to use functionality that is only available "
     "if deal.II was configured to use MPI.");
+
+  /**
+   * This function requires simplex support.
+   */
+  DeclExceptionMsg(
+    ExcNeedsSimplexSupport,
+    "You are attempting to use functionality that is only available "
+    "if deal.II was configured with DEAL_II_WITH_SIMPLEX_SUPPORT enabled.");
 
   /**
    * This function requires support for the FunctionParser library.
@@ -1128,6 +1155,15 @@ namespace StandardExceptions
 #endif
   //@}
 
+  /**
+   * This function requires support for the Exodus II library.
+   */
+  DeclExceptionMsg(
+    ExcNeedsExodusII,
+    "You are attempting to use functionality that is only available if deal.II "
+    "was configured to use Trilinos' SEACAS library (which provides ExodusII), "
+    "but cmake did not find find a valid SEACAS library.");
+
 #ifdef DEAL_II_WITH_MPI
   /**
    * Exception for MPI errors. This exception is only defined if
@@ -1161,6 +1197,40 @@ namespace StandardExceptions
     const int error_code;
   };
 #endif // DEAL_II_WITH_MPI
+
+
+
+#ifdef DEAL_II_TRILINOS_WITH_SEACAS
+  /**
+   * Exception for ExodusII errors. This exception is only defined if
+   * <code>deal.II</code> is compiled with SEACAS support, which is available
+   * through Trilinos. This function should be used with the convenience macro
+   * AssertThrowExodusII.
+   *
+   * @ingroup Exceptions
+   */
+  class ExcExodusII : public ExceptionBase
+  {
+  public:
+    /**
+     * Constructor.
+     *
+     * @param error_code The error code returned by an ExodusII function.
+     */
+    ExcExodusII(const int error_code);
+
+    /**
+     * Print a description of the error to the given stream.
+     */
+    virtual void
+    print_info(std::ostream &out) const override;
+
+    /**
+     * Store the error code.
+     */
+    const int error_code;
+  };
+#endif // DEAL_II_TRILINOS_WITH_SEACAS
 } /*namespace StandardExceptions*/
 
 
@@ -1867,6 +1937,28 @@ namespace internal
 #  endif
 
 #endif
+
+#ifdef DEAL_II_TRILINOS_WITH_SEACAS
+/**
+ * Assertion that checks that the error code produced by calling an ExodusII
+ * routine is equal to EX_NOERR (which is zero).
+ *
+ * @note This and similar macro names are examples of preprocessor definitions
+ * in the deal.II library that are not prefixed by a string that likely makes
+ * them unique to deal.II. As a consequence, it is possible that other
+ * libraries your code interfaces with define the same name, and the result
+ * will be name collisions (see
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
+ * this macro, as well as all other macros defined by deal.II that are not
+ * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
+ * the header <code>deal.II/base/undefine_macros.h</code> after all other
+ * deal.II headers have been included.
+ *
+ * @ingroup Exceptions
+ */
+#  define AssertThrowExodusII(error_code) \
+    AssertThrow(error_code == 0, ExcExodusII(error_code));
+#endif // DEAL_II_TRILINOS_WITH_SEACAS
 
 using namespace StandardExceptions;
 

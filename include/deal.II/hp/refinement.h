@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2020 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -147,9 +147,10 @@ namespace hp
      * Each cell flagged for h-refinement will also be flagged for p-refinement.
      * The same applies to coarsening.
      *
-     * @note Triangulation::prepare_coarsening_and_refinement() may change
-     *   refine and coarsen flags. Avoid calling it before this particular
-     *   function.
+     * @note Triangulation::prepare_coarsening_and_refinement() and
+     *   DoFHandler::prepare_coarsening_and_refinement() may change
+     *   refine and coarsen flags as well as future finite element indices.
+     *   Avoid calling them before this particular function.
      */
     template <int dim, int spacedim>
     void
@@ -164,9 +165,10 @@ namespace hp
      * Each entry of the parameter @p p_flags needs to correspond to an active
      * cell.
      *
-     * @note Triangulation::prepare_coarsening_and_refinement() may change
-     *   refine and coarsen flags. Avoid calling it before this particular
-     *   function.
+     * @note Triangulation::prepare_coarsening_and_refinement() and
+     *   DoFHandler::prepare_coarsening_and_refinement() may change
+     *   refine and coarsen flags as well as future finite element indices.
+     *   Avoid calling them before this particular function.
      */
     template <int dim, int spacedim>
     void
@@ -194,9 +196,10 @@ namespace hp
      * Each entry of the parameter @p criteria needs to correspond to an active
      * cell.
      *
-     * @note Triangulation::prepare_coarsening_and_refinement() may change
-     *   refine and coarsen flags. Avoid calling it before this particular
-     *   function.
+     * @note Triangulation::prepare_coarsening_and_refinement() and
+     *   DoFHandler::prepare_coarsening_and_refinement() may change
+     *   refine and coarsen flags as well as future finite element indices.
+     *   Avoid calling them before this particular function.
      */
     template <int dim, typename Number, int spacedim>
     void
@@ -236,9 +239,10 @@ namespace hp
      * cell. Parameters @p p_refine_fraction and @p p_coarsen_fraction need to be
      * in the interval $[0,1]$.
      *
-     * @note Triangulation::prepare_coarsening_and_refinement() may change
-     *   refine and coarsen flags. Avoid calling it before this particular
-     *   function.
+     * @note Triangulation::prepare_coarsening_and_refinement() and
+     *   DoFHandler::prepare_coarsening_and_refinement() may change
+     *   refine and coarsen flags as well as future finite element indices.
+     *   Avoid calling them before this particular function.
      */
     template <int dim, typename Number, int spacedim>
     void
@@ -279,9 +283,10 @@ namespace hp
      * cell. Parameters @p p_refine_fraction and @p p_coarsen_fraction need to be
      * in the interval $[0,1]$.
      *
-     * @note Triangulation::prepare_coarsening_and_refinement() may change
-     *   refine and coarsen flags. Avoid calling it before this particular
-     *   function.
+     * @note Triangulation::prepare_coarsening_and_refinement() and
+     *   DoFHandler::prepare_coarsening_and_refinement() may change
+     *   refine and coarsen flags as well as future finite element indices.
+     *   Avoid calling them before this particular function.
      */
     template <int dim, typename Number, int spacedim>
     void
@@ -316,9 +321,10 @@ namespace hp
      *
      * For more theoretical details see @cite ainsworth1998hp .
      *
-     * @note Triangulation::prepare_coarsening_and_refinement() may change
-     *   refine and coarsen flags. Avoid calling it before this particular
-     *   function.
+     * @note Triangulation::prepare_coarsening_and_refinement() and
+     *   DoFHandler::prepare_coarsening_and_refinement() may change
+     *   refine and coarsen flags as well as future finite element indices.
+     *   Avoid calling them before this particular function.
      */
     template <int dim, typename Number, int spacedim>
     void
@@ -341,9 +347,10 @@ namespace hp
      * Each entry of the parameters @p criteria and @p references needs to
      * correspond to an active cell.
      *
-     * @note Triangulation::prepare_coarsening_and_refinement() may change
-     *   refine and coarsen flags. Avoid calling it before this particular
-     *   function.
+     * @note Triangulation::prepare_coarsening_and_refinement() and
+     *   DoFHandler::prepare_coarsening_and_refinement() may change
+     *   refine and coarsen flags as well as future finite element indices.
+     *   Avoid calling them before this particular function.
      */
     template <int dim, typename Number, int spacedim>
     void
@@ -354,6 +361,7 @@ namespace hp
       const ComparisonFunction<typename identity<Number>::type> &compare_refine,
       const ComparisonFunction<typename identity<Number>::type>
         &compare_coarsen);
+
     /**
      * @}
      */
@@ -553,7 +561,8 @@ namespace hp
      *
      * @note We want to predict the error by how adaptation will actually happen.
      *   Thus, this function needs to be called after
-     *   Triangulation::prepare_coarsening_and_refinement().
+     *   Triangulation::prepare_coarsening_and_refinement() and
+     *   DoFHandler::prepare_coarsening_and_refinement().
      */
     template <int dim, typename Number, int spacedim>
     void
@@ -579,9 +588,10 @@ namespace hp
      * Removes all refine and coarsen flags on cells that have a
      * @p future_fe_index assigned.
      *
-     * @note Triangulation::prepare_coarsening_and_refinement() may change
-     *   refine and coarsen flags. Avoid calling it before this particular
-     *   function.
+     * @note Triangulation::prepare_coarsening_and_refinement() and
+     *   DoFHandler::prepare_coarsening_and_refinement() may change
+     *   refine and coarsen flags as well as future finite element indices.
+     *   Avoid calling them before this particular function.
      */
     template <int dim, int spacedim>
     void
@@ -620,19 +630,68 @@ namespace hp
      *
      * @note The function Triangulation::prepare_coarsening_and_refinement()
      *   will clean up all h-coarsening flags if they are not shared among
-     *   all siblings. In the hp case, we need to bring forward this decision:
+     *   all siblings. In the hp-case, we need to bring forward this decision:
      *   If the cell will not be coarsened, but qualifies for p-adaptivity,
      *   we have to set all flags accordingly. So this function anticipates
      *   the decision that Triangulation::prepare_coarsening_and_refinement()
      *   would have made later on.
      *
-     * @note Triangulation::prepare_coarsening_and_refinement() may change
-     *   refine and coarsen flags. Avoid calling it before this particular
-     *   function.
+     * @note Triangulation::prepare_coarsening_and_refinement() and
+     *   DoFHandler::prepare_coarsening_and_refinement() may change
+     *   refine and coarsen flags as well as future finite element indices.
+     *   Avoid calling them before this particular function.
      */
     template <int dim, int spacedim>
     void
     choose_p_over_h(const dealii::DoFHandler<dim, spacedim> &dof_handler);
+
+    /**
+     * @}
+     */
+
+    /**
+     * @name Optimiize p-level distribution
+     * @{
+     */
+
+    /**
+     * Limit p-level differences between neighboring cells.
+     *
+     * Essentially does to future FE indices what
+     * Triangulation::prepare_coarsening_and_refinement() does to refinement
+     * flags.
+     *
+     * In detail, this function limits the level difference of neighboring cells
+     * and thus smoothes the overall function space. Future FE indices will be
+     * raised (and never lowered) so that the level difference to neighboring
+     * cells is never larger than @p max_difference.
+     *
+     * Multiple FE hierarchies might have been registered via
+     * hp::FECollection::set_hierarchy(). This function operates on only one
+     * hierarchy, namely the one that contains the FE index @p contains_fe_index.
+     * Cells with future FE indices that are not part of the corresponding
+     * hierarchy will be ignored.
+     *
+     * The function can optionally be called before performing adaptation with
+     * Triangulation::execute_coarsening_and_refinement(). It is not necessary
+     * to call this function, nor will it be automatically invoked in any part
+     * of the library (contrary to its Triangulation counterpart).
+     *
+     * On cells that will be h-coarsened, we enforce the difference criterion as
+     * if it is already a parent cell. That means, we set the level of all
+     * siblings to the highest one among them. In that case, all sibling cells
+     * need to have the h-coarsenening flags set terminally via
+     * Triangulation::prepare_coarsening_and_refinement() beforehand. Otherwise
+     * an assertion will be triggered.
+     *
+     * Returns whether any future FE indices have been changed by this function.
+     */
+    template <int dim, int spacedim>
+    bool
+    limit_p_level_difference(
+      const dealii::DoFHandler<dim, spacedim> &dof_handler,
+      const unsigned int                       max_difference    = 1,
+      const unsigned int                       contains_fe_index = 0);
 
     /**
      * @}

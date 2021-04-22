@@ -1,0 +1,9 @@
+
+DEAL::size: 6
+DEAL:: idx: 0, sequence: 0 2 4
+DEAL:: idx: 1, sequence: 1 3 5
+DEAL:: idx: 2, sequence: 0 2 4
+DEAL:: idx: 3, sequence: 1 3 5
+DEAL:: idx: 4, sequence: 0 2 4
+DEAL:: idx: 5, sequence: 1 3 5
+DEAL::OK

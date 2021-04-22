@@ -23,6 +23,7 @@
 #include <deal.II/base/smartpointer.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -35,7 +36,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -454,7 +454,7 @@ HelmholtzProblem<dim>::process_solution(const unsigned int cycle)
                                     VectorTools::H1_seminorm);
   const double H1_error = difference_per_cell.l2_norm();
 
-  const QTrapez<1>     q_trapez;
+  const QTrapezoid<1>  q_trapez;
   const QIterated<dim> q_iterated(q_trapez, 5);
   VectorTools::integrate_difference(dof_handler,
                                     solution,

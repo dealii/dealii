@@ -183,7 +183,7 @@ namespace Evaluation
   {
     double point_derivative = 0;
 
-    QTrapez<dim>                vertex_quadrature;
+    QTrapezoid<dim>             vertex_quadrature;
     FEValues<dim>               fe_values(dof_handler.get_fe(),
                             vertex_quadrature,
                             update_gradients | update_quadrature_points);
@@ -429,7 +429,7 @@ namespace LaplaceSolver
   void
   Solver<dim>::assemble_linear_system(LinearSystem &linear_system)
   {
-    typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
+    using active_cell_iterator = typename DoFHandler<dim>::active_cell_iterator;
 
     const unsigned int n_threads = MultithreadInfo::n_threads();
     std::vector<std::pair<active_cell_iterator, active_cell_iterator>>
@@ -1015,7 +1015,7 @@ namespace Data
   template <int dim>
   struct Exercise_2_3
   {
-    typedef Functions::ZeroFunction<dim> BoundaryValues;
+    using BoundaryValues = Functions::ZeroFunction<dim>;
 
     class RightHandSide : public Functions::ConstantFunction<dim>
     {
@@ -1354,10 +1354,10 @@ namespace LaplaceSolver
     void
     solve_dual_problem();
 
-    typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
+    using active_cell_iterator = typename DoFHandler<dim>::active_cell_iterator;
 
-    typedef typename std::map<typename DoFHandler<dim>::face_iterator, double>
-      FaceIntegrals;
+    using FaceIntegrals =
+      typename std::map<typename DoFHandler<dim>::face_iterator, double>;
 
     struct CellData
     {
@@ -1901,8 +1901,8 @@ template <int dim>
 struct Framework
 {
 public:
-  typedef Evaluation::EvaluationBase<dim> Evaluator;
-  typedef std::list<Evaluator *>          EvaluatorList;
+  using Evaluator     = Evaluation::EvaluationBase<dim>;
+  using EvaluatorList = std::list<Evaluator *>;
 
 
   struct ProblemDescription

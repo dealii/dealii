@@ -39,8 +39,8 @@ template <int dim, int degree_p, typename BlockVectorType>
 class MatrixFreeTest : public MatrixFreeOperators::Base<dim, BlockVectorType>
 {
 public:
-  typedef typename BlockVectorType::value_type                     Number;
-  typedef typename MatrixFreeOperators::Base<dim, BlockVectorType> Base;
+  using Number = typename BlockVectorType::value_type;
+  using Base   = typename MatrixFreeOperators::Base<dim, BlockVectorType>;
 
   void
   compute_diagonal()
@@ -62,7 +62,7 @@ protected:
     const BlockVectorType &                      src,
     const std::pair<unsigned int, unsigned int> &cell_range) const
   {
-    typedef VectorizedArray<Number>                            vector_t;
+    using vector_t = VectorizedArray<Number>;
     FEEvaluation<dim, degree_p + 1, degree_p + 2, dim, Number> velocity(data,
                                                                         0);
     FEEvaluation<dim, degree_p, degree_p + 2, 1, Number> pressure(data, 1);

@@ -320,10 +320,10 @@ namespace CUDAWrappers
     //@{
     /**
      * Return a tuple containing the pointer to the values of matrix, the
-     * pointer to the columns indices, the pointer to the rows pointer, and
-     * the cuSPARSE matrix description.
+     * pointer to the columns indices, the pointer to the rows pointer,
+     * the cuSPARSE matrix description, and the cuSPARSE SP matrix description.
      */
-    std::tuple<Number *, int *, int *, cusparseMatDescr_t>
+    std::tuple<Number *, int *, int *, cusparseMatDescr_t, cusparseSpMatDescr_t>
     get_cusparse_matrix() const;
     //@}
 
@@ -364,9 +364,14 @@ namespace CUDAWrappers
     std::unique_ptr<int[], void (*)(int *)> row_ptr_dev;
 
     /**
-     * cuSPARSE description of the sparse matrix.
+     * cuSPARSE description of the matrix.
      */
     cusparseMatDescr_t descr;
+
+    /**
+     * cuSPARSE description of the sparse matrix.
+     */
+    cusparseSpMatDescr_t sp_descr;
   };
 
 

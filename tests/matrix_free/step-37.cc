@@ -233,7 +233,7 @@ namespace Step37
   LaplaceOperator<dim, fe_degree, number>::evaluate_coefficient(
     const Coefficient<dim> &coefficient_function)
   {
-    const unsigned int n_cells = data.n_macro_cells();
+    const unsigned int n_cells = data.n_cell_batches();
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(data);
     coefficient.resize(n_cells * phi.n_q_points);
     for (unsigned int cell = 0; cell < n_cells; ++cell)
@@ -256,7 +256,7 @@ namespace Step37
     const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(data);
-    AssertDimension(coefficient.size(), data.n_macro_cells() * phi.n_q_points);
+    AssertDimension(coefficient.size(), data.n_cell_batches() * phi.n_q_points);
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
@@ -376,9 +376,9 @@ namespace Step37
     void
     output_results(const unsigned int cycle) const;
 
-    typedef LaplaceOperator<dim, degree_finite_element, double>
-                                                               SystemMatrixType;
-    typedef LaplaceOperator<dim, degree_finite_element, float> LevelMatrixType;
+    using SystemMatrixType =
+      LaplaceOperator<dim, degree_finite_element, double>;
+    using LevelMatrixType = LaplaceOperator<dim, degree_finite_element, float>;
 
     Triangulation<dim>        triangulation;
     FE_Q<dim>                 fe;
@@ -578,7 +578,7 @@ namespace Step37
     MGCoarseGridHouseholder<float, Vector<double>> mg_coarse;
     mg_coarse.initialize(coarse_matrix);
 
-    typedef PreconditionChebyshev<LevelMatrixType, Vector<double>> SMOOTHER;
+    using SMOOTHER = PreconditionChebyshev<LevelMatrixType, Vector<double>>;
     MGSmootherPrecondition<LevelMatrixType, SMOOTHER, Vector<double>>
       mg_smoother;
 

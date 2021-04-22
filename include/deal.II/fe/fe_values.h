@@ -38,6 +38,8 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
+#include <deal.II/hp/q_collection.h>
+
 #include <algorithm>
 #include <memory>
 #include <type_traits>
@@ -351,26 +353,38 @@ namespace FEValuesViews
         &values) const;
 
     /**
-     * Same as above, but using a vector of local degree-of-freedom values.
-     *
-     * The @p dof_values vector must have a length equal to number of DoFs on
-     * a cell, and  each entry @p dof_values[i] is the value of the local DoF
-     * @p i. The fundamental prerequisite for the @p InputVector is that it must
-     * be possible to create an ArrayView from it; this is satisfied by the
-     * @p std::vector class.
-     *
-     * The DoF values typically would be obtained in the following way:
+     * Same as above, but using a vector of local degree-of-freedom values. In
+     * other words, instead of extracting the nodal values of the degrees of
+     * freedom located on the current cell from a global vector associated with
+     * a DoFHandler object (as the function above does), this function instead
+     * takes these local nodal values through its first argument. A typical
+     * way to obtain such a vector is by calling code such as
      * @code
-     * Vector<double> local_dof_values(cell->get_fe().dofs_per_cell);
-     * cell->get_dof_values(solution, local_dof_values);
+     *   cell->get_dof_values (dof_values, local_dof_values);
      * @endcode
-     * or, for a generic @p Number type,
-     * @code
-     * std::vector<Number> local_dof_values(cell->get_fe().dofs_per_cell);
-     * cell->get_dof_values(solution,
-     *                      local_dof_values.begin(),
-     *                      local_dof_values.end());
-     * @endcode
+     * (See DoFCellAccessor::get_dof_values() for more information on this
+     * function.) The point of the current function is then that one could
+     * modify these local values first, for example by applying a limiter
+     * or by ensuring that all nodal values are positive, before evaluating
+     * the finite element field that corresponds to these local values on the
+     * current cell. Another application is where one wants to postprocess
+     * the solution on a cell into a different finite element space on every
+     * cell, without actually creating a corresponding DoFHandler -- in that
+     * case, all one would compute is a local representation of that
+     * postprocessed function, characterized by its nodal values; this function
+     * then allows the evaluation of that representation at quadrature points.
+     *
+     * @param[in] dof_values A vector of local nodal values. This vector must
+     *   have a length equal to number of DoFs on the current cell, and must
+     *   be ordered in the same order as degrees of freedom are numbered on
+     *   the reference cell.
+     *
+     * @param[out] values A vector of values of the given finite element field,
+     *   at the quadrature points on the current object.
+     *
+     * @tparam InputVector The @p InputVector type must allow creation
+     *   of an ArrayView object from it; this is satisfied by the
+     *   `std::vector` class, among others.
      */
     template <class InputVector>
     void
@@ -406,7 +420,10 @@ namespace FEValuesViews
         &gradients) const;
 
     /**
-     * @copydoc FEValuesViews::Scalar::get_function_values_from_local_dof_values()
+     * This function relates to get_function_gradients() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -442,7 +459,10 @@ namespace FEValuesViews
         &hessians) const;
 
     /**
-     * @copydoc FEValuesViews::Scalar::get_function_values_from_local_dof_values()
+     * This function relates to get_function_hessians() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -480,7 +500,10 @@ namespace FEValuesViews
         &laplacians) const;
 
     /**
-     * @copydoc FEValuesViews::Scalar::get_function_values_from_local_dof_values()
+     * This function relates to get_function_laplacians() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -518,7 +541,10 @@ namespace FEValuesViews
         &third_derivatives) const;
 
     /**
-     * @copydoc FEValuesViews::Scalar::get_function_values_from_local_dof_values()
+     * This function relates to get_function_third_derivatives() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -919,26 +945,38 @@ namespace FEValuesViews
         &values) const;
 
     /**
-     * Same as above, but using a vector of local degree-of-freedom values.
-     *
-     * The @p dof_values vector must have a length equal to number of DoFs on
-     * a cell, and  each entry @p dof_values[i] is the value of the local DoF
-     * @p i. The fundamental prerequisite for the @p InputVector is that it must
-     * be possible to create an ArrayView from it; this is satisfied by the
-     * @p std::vector class.
-     *
-     * The DoF values typically would be obtained in the following way:
+     * Same as above, but using a vector of local degree-of-freedom values. In
+     * other words, instead of extracting the nodal values of the degrees of
+     * freedom located on the current cell from a global vector associated with
+     * a DoFHandler object (as the function above does), this function instead
+     * takes these local nodal values through its first argument. A typical
+     * way to obtain such a vector is by calling code such as
      * @code
-     * Vector<double> local_dof_values(cell->get_fe().dofs_per_cell);
-     * cell->get_dof_values(solution, local_dof_values);
+     *   cell->get_dof_values (dof_values, local_dof_values);
      * @endcode
-     * or, for a generic @p Number type,
-     * @code
-     * std::vector<Number> local_dof_values(cell->get_fe().dofs_per_cell);
-     * cell->get_dof_values(solution,
-     *                      local_dof_values.begin(),
-     *                      local_dof_values.end());
-     * @endcode
+     * (See DoFCellAccessor::get_dof_values() for more information on this
+     * function.) The point of the current function is then that one could
+     * modify these local values first, for example by applying a limiter
+     * or by ensuring that all nodal values are positive, before evaluating
+     * the finite element field that corresponds to these local values on the
+     * current cell. Another application is where one wants to postprocess
+     * the solution on a cell into a different finite element space on every
+     * cell, without actually creating a corresponding DoFHandler -- in that
+     * case, all one would compute is a local representation of that
+     * postprocessed function, characterized by its nodal values; this function
+     * then allows the evaluation of that representation at quadrature points.
+     *
+     * @param[in] dof_values A vector of local nodal values. This vector must
+     *   have a length equal to number of DoFs on the current cell, and must
+     *   be ordered in the same order as degrees of freedom are numbered on
+     *   the reference cell.
+     *
+     * @param[out] values A vector of values of the given finite element field,
+     *   at the quadrature points on the current object.
+     *
+     * @tparam InputVector The @p InputVector type must allow creation
+     *   of an ArrayView object from it; this is satisfied by the
+     *   `std::vector` class, among others.
      */
     template <class InputVector>
     void
@@ -974,7 +1012,10 @@ namespace FEValuesViews
         &gradients) const;
 
     /**
-     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     * This function relates to get_function_gradients() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -1016,7 +1057,10 @@ namespace FEValuesViews
         &symmetric_gradients) const;
 
     /**
-     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     * This function relates to get_function_symmetric_gradients() in the same
+     * way as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -1052,7 +1096,10 @@ namespace FEValuesViews
         &divergences) const;
 
     /**
-     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     * This function relates to get_function_divergences() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -1089,7 +1136,10 @@ namespace FEValuesViews
         &curls) const;
 
     /**
-     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     * This function relates to get_function_curls() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -1125,7 +1175,10 @@ namespace FEValuesViews
         &hessians) const;
 
     /**
-     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     * This function relates to get_function_hessians() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -1162,7 +1215,10 @@ namespace FEValuesViews
         &laplacians) const;
 
     /**
-     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     * This function relates to get_function_laplacians() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -1199,7 +1255,10 @@ namespace FEValuesViews
         &third_derivatives) const;
 
     /**
-     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     * This function relates to get_function_third_derivatives() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -1430,26 +1489,38 @@ namespace FEValuesViews
         &values) const;
 
     /**
-     * Same as above, but using a vector of local degree-of-freedom values.
-     *
-     * The @p dof_values vector must have a length equal to number of DoFs on
-     * a cell, and  each entry @p dof_values[i] is the value of the local DoF
-     * @p i. The fundamental prerequisite for the @p InputVector is that it must
-     * be possible to create an ArrayView from it; this is satisfied by the
-     * @p std::vector class.
-     *
-     * The DoF values typically would be obtained in the following way:
+     * Same as above, but using a vector of local degree-of-freedom values. In
+     * other words, instead of extracting the nodal values of the degrees of
+     * freedom located on the current cell from a global vector associated with
+     * a DoFHandler object (as the function above does), this function instead
+     * takes these local nodal values through its first argument. A typical
+     * way to obtain such a vector is by calling code such as
      * @code
-     * Vector<double> local_dof_values(cell->get_fe().dofs_per_cell);
-     * cell->get_dof_values(solution, local_dof_values);
+     *   cell->get_dof_values (dof_values, local_dof_values);
      * @endcode
-     * or, for a generic @p Number type,
-     * @code
-     * std::vector<Number> local_dof_values(cell->get_fe().dofs_per_cell);
-     * cell->get_dof_values(solution,
-     *                      local_dof_values.begin(),
-     *                      local_dof_values.end());
-     * @endcode
+     * (See DoFCellAccessor::get_dof_values() for more information on this
+     * function.) The point of the current function is then that one could
+     * modify these local values first, for example by applying a limiter
+     * or by ensuring that all nodal values are positive, before evaluating
+     * the finite element field that corresponds to these local values on the
+     * current cell. Another application is where one wants to postprocess
+     * the solution on a cell into a different finite element space on every
+     * cell, without actually creating a corresponding DoFHandler -- in that
+     * case, all one would compute is a local representation of that
+     * postprocessed function, characterized by its nodal values; this function
+     * then allows the evaluation of that representation at quadrature points.
+     *
+     * @param[in] dof_values A vector of local nodal values. This vector must
+     *   have a length equal to number of DoFs on the current cell, and must
+     *   be ordered in the same order as degrees of freedom are numbered on
+     *   the reference cell.
+     *
+     * @param[out] values A vector of values of the given finite element field,
+     *   at the quadrature points on the current object.
+     *
+     * @tparam InputVector The @p InputVector type must allow creation
+     *   of an ArrayView object from it; this is satisfied by the
+     *   `std::vector` class, among others.
      */
     template <class InputVector>
     void
@@ -1489,7 +1560,10 @@ namespace FEValuesViews
         &divergences) const;
 
     /**
-     * @copydoc FEValuesViews::SymmetricTensor<2,dim,spacedim>::get_function_values_from_local_dof_values()
+     * This function relates to get_function_divergences() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -1740,26 +1814,38 @@ namespace FEValuesViews
         &values) const;
 
     /**
-     * Same as above, but using a vector of local degree-of-freedom values.
-     *
-     * The @p dof_values vector must have a length equal to number of DoFs on
-     * a cell, and  each entry @p dof_values[i] is the value of the local DoF
-     * @p i. The fundamental prerequisite for the @p InputVector is that it must
-     * be possible to create an ArrayView from it; this is satisfied by the
-     * @p std::vector class.
-     *
-     * The DoF values typically would be obtained in the following way:
+     * Same as above, but using a vector of local degree-of-freedom values. In
+     * other words, instead of extracting the nodal values of the degrees of
+     * freedom located on the current cell from a global vector associated with
+     * a DoFHandler object (as the function above does), this function instead
+     * takes these local nodal values through its first argument. A typical
+     * way to obtain such a vector is by calling code such as
      * @code
-     * Vector<double> local_dof_values(cell->get_fe().dofs_per_cell);
-     * cell->get_dof_values(solution, local_dof_values);
+     *   cell->get_dof_values (dof_values, local_dof_values);
      * @endcode
-     * or, for a generic @p Number type,
-     * @code
-     * std::vector<Number> local_dof_values(cell->get_fe().dofs_per_cell);
-     * cell->get_dof_values(solution,
-     *                      local_dof_values.begin(),
-     *                      local_dof_values.end());
-     * @endcode
+     * (See DoFCellAccessor::get_dof_values() for more information on this
+     * function.) The point of the current function is then that one could
+     * modify these local values first, for example by applying a limiter
+     * or by ensuring that all nodal values are positive, before evaluating
+     * the finite element field that corresponds to these local values on the
+     * current cell. Another application is where one wants to postprocess
+     * the solution on a cell into a different finite element space on every
+     * cell, without actually creating a corresponding DoFHandler -- in that
+     * case, all one would compute is a local representation of that
+     * postprocessed function, characterized by its nodal values; this function
+     * then allows the evaluation of that representation at quadrature points.
+     *
+     * @param[in] dof_values A vector of local nodal values. This vector must
+     *   have a length equal to number of DoFs on the current cell, and must
+     *   be ordered in the same order as degrees of freedom are numbered on
+     *   the reference cell.
+     *
+     * @param[out] values A vector of values of the given finite element field,
+     *   at the quadrature points on the current object.
+     *
+     * @tparam InputVector The @p InputVector type must allow creation
+     *   of an ArrayView object from it; this is satisfied by the
+     *   `std::vector` class, among others.
      */
     template <class InputVector>
     void
@@ -1799,7 +1885,10 @@ namespace FEValuesViews
         &divergences) const;
 
     /**
-     * @copydoc FEValuesViews::Tensor<2,dim,spacedim>::get_function_values_from_local_dof_values()
+     * This function relates to get_function_divergences() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -1834,7 +1923,10 @@ namespace FEValuesViews
         &gradients) const;
 
     /**
-     * @copydoc FEValuesViews::Tensor<2,dim,spacedim>::get_function_values_from_local_dof_values()
+     * This function relates to get_function_gradients() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more information.
      */
     template <class InputVector>
     void
@@ -2015,8 +2107,8 @@ namespace FEValuesViews
  *   {
  *     values.reinit(cell);
  *     for (unsigned int q=0; q<quadrature.size(); ++q)
- *       for (unsigned int i=0; i<finite_element.dofs_per_cell; ++i)
- *         for (unsigned int j=0; j<finite_element.dofs_per_cell; ++j)
+ *       for (unsigned int i=0; i<finite_element.n_dofs_per_cell(); ++i)
+ *         for (unsigned int j=0; j<finite_element.n_dofs_per_cell(); ++j)
  *           A(i,j) += fe_values.shape_value(i,q) *
  *                     fe_values.shape_value(j,q) *
  *                     fe_values.JxW(q);
@@ -2085,9 +2177,24 @@ public:
   static const unsigned int space_dimension = spacedim;
 
   /**
-   * Number of quadrature points.
+   * Number of quadrature points of the current object. Its value is
+   * initialized by the value of max_n_quadrature_points and is updated,
+   * e.g., if FEFaceValues::reinit() is called for a new cell/face.
+   *
+   * @note The default value equals to the value of max_n_quadrature_points.
    */
   const unsigned int n_quadrature_points;
+
+  /**
+   * Maximum number of quadrature points. This value might be different from
+   * n_quadrature_points, e.g., if a QCollection with different face quadrature
+   * rules has been passed to initialize FEFaceValues.
+   *
+   * This is mostly useful to initialize arrays to allocate the maximum amount
+   * of memory that may be used when re-sizing later on to a the current
+   * number of quadrature points given by n_quadrature_points.
+   */
+  const unsigned int max_n_quadrature_points;
 
   /**
    * Number of shape functions per cell. If we use this base class to evaluate
@@ -2387,20 +2494,58 @@ public:
     std::vector<Vector<typename InputVector::value_type>> &values) const;
 
   /**
-   * Generate function values from an arbitrary vector.
+   * Generate function values from an arbitrary vector. This function
+   * does in essence the same as the first function of this name above,
+   * except that it does not make the assumption that the input vector
+   * corresponds to a DoFHandler that describes the unknowns of a finite
+   * element field (and for which we would then assume that
+   * `fe_function.size() == dof_handler.n_dofs()`). Rather, the nodal
+   * values corresponding to the current cell are elements of an otherwise
+   * arbitrary vector, and these elements are indexed by the second
+   * argument to this function. What the rest of the `fe_function` input
+   * argument corresponds to is of no consequence to this function.
    *
-   * This function offers the possibility to extract function values in
-   * quadrature points from vectors not corresponding to a whole
-   * discretization.
+   * Given this, the function above corresponds to passing `fe_function`
+   * as first argument to the current function, and using the
+   * `local_dof_indices` array that results from the following call as
+   * second argument to the current function:
+   * @code
+   *   cell->get_dof_indices (local_dof_indices);
+   * @endcode
+   * (See DoFCellAccessor::get_dof_indices() for more information.)
    *
-   * The vector <tt>indices</tt> corresponds to the degrees of freedom on a
-   * single cell. Its length may even be a multiple of the number of dofs per
-   * cell. Then, the vectors in <tt>value</tt> should allow for the same
-   * multiple of the components of the finite element.
+   * Likewise, the function above is equivalent to calling
+   * @code
+   *   cell->get_dof_values (fe_function, local_dof_values);
+   * @endcode
+   * and then calling the current function with `local_dof_values` as
+   * first argument, and an array with indices `{0,...,fe.dofs_per_cell-1}`
+   * as second argument.
    *
-   * You may want to use this function, if you want to access just a single
-   * block from a BlockVector, if you have a multi-level vector or if you
-   * already have a local representation of your finite element data.
+   * The point of the current function is that one sometimes wants to
+   * evaluate finite element functions at quadrature points with nodal
+   * values that are not stored in a global vector -- for example, one could
+   * modify these local values first, such as by applying a limiter
+   * or by ensuring that all nodal values are positive, before evaluating
+   * the finite element field that corresponds to these local values on the
+   * current cell. Another application is where one wants to postprocess
+   * the solution on a cell into a different finite element space on every
+   * cell, without actually creating a corresponding DoFHandler -- in that
+   * case, all one would compute is a local representation of that
+   * postprocessed function, characterized by its nodal values; this function
+   * then allows the evaluation of that representation at quadrature points.
+   *
+   * @param[in] fe_function A vector of nodal values. This vector can have
+   *   an arbitrary size, as long as all elements index by `indices` can
+   *   actually be accessed.
+   *
+   * @param[in] indices A vector of indices into `fe_function`. This vector
+   *   must have length equal to the number of degrees of freedom on the
+   *   current cell, and must identify elements in `fe_function` in the
+   *   order in which degrees of freedom are indexed on the reference cell.
+   *
+   * @param[out] values A vector of values of the given finite element field,
+   *   at the quadrature points on the current object.
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
@@ -2414,21 +2559,8 @@ public:
   /**
    * Generate vector function values from an arbitrary vector.
    *
-   * This function offers the possibility to extract function values in
-   * quadrature points from vectors not corresponding to a whole
-   * discretization.
-   *
-   * The vector <tt>indices</tt> corresponds to the degrees of freedom on a
-   * single cell. Its length may even be a multiple of the number of dofs per
-   * cell. Then, the vectors in <tt>value</tt> should allow for the same
-   * multiple of the components of the finite element.
-   *
-   * You may want to use this function, if you want to access just a single
-   * block from a BlockVector, if you have a multi-level vector or if you
-   * already have a local representation of your finite element data.
-   *
-   * Since this function allows for fairly general combinations of argument
-   * sizes, be aware that the checks on the arguments may not detect errors.
+   * This function corresponds to the previous one, just for the vector-valued
+   * case.
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
@@ -2441,14 +2573,9 @@ public:
 
 
   /**
-   * Generate vector function values from an arbitrary vector.
-   *
-   * This function offers the possibility to extract function values in
-   * quadrature points from vectors not corresponding to a whole
-   * discretization.
-   *
-   * The vector <tt>indices</tt> corresponds to the degrees of freedom on a
-   * single cell. Its length may even be a multiple of the number of dofs per
+   * Generate vector function values from an arbitrary vector. This
+   * function is similar to the previous one, but the `indices`
+   * vector may also be a multiple of the number of dofs per
    * cell. Then, the vectors in <tt>value</tt> should allow for the same
    * multiple of the components of the finite element.
    *
@@ -2460,10 +2587,6 @@ public:
    * component of the solution desired, the access to <tt>values</tt> is
    * <tt>values[p][i]</tt> if <tt>quadrature_points_fastest == false</tt>, and
    * <tt>values[i][p]</tt> otherwise.
-   *
-   * You may want to use this function, if you want to access just a single
-   * block from a BlockVector, if you have a multi-level vector or if you
-   * already have a local representation of your finite element data.
    *
    * Since this function allows for fairly general combinations of argument
    * sizes, be aware that the checks on the arguments may not detect errors.
@@ -2550,8 +2673,10 @@ public:
       &gradients) const;
 
   /**
-   * Function gradient access with more flexibility. See get_function_values()
-   * with corresponding arguments.
+   * This function relates to the first of the get_function_gradients() function
+   * above in the same way as the get_function_values() with similar arguments
+   * relates to the first of the get_function_values() functions. See there for
+   * more information.
    *
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
@@ -2564,8 +2689,10 @@ public:
       &gradients) const;
 
   /**
-   * Function gradient access with more flexibility. See get_function_values()
-   * with corresponding arguments.
+   * This function relates to the first of the get_function_gradients() function
+   * above in the same way as the get_function_values() with similar arguments
+   * relates to the first of the get_function_values() functions. See there for
+   * more information.
    *
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
@@ -2576,8 +2703,8 @@ public:
     const ArrayView<const types::global_dof_index> &indices,
     ArrayView<
       std::vector<Tensor<1, spacedim, typename InputVector::value_type>>>
-         gradients,
-    bool quadrature_points_fastest = false) const;
+               gradients,
+    const bool quadrature_points_fastest = false) const;
 
   //@}
   /// @name Access to second derivatives
@@ -2652,12 +2779,16 @@ public:
     const InputVector &fe_function,
     std::vector<
       std::vector<Tensor<2, spacedim, typename InputVector::value_type>>>
-      &  hessians,
-    bool quadrature_points_fastest = false) const;
+      &        hessians,
+    const bool quadrature_points_fastest = false) const;
 
   /**
-   * Access to the second derivatives of a function with more flexibility. See
-   * get_function_values() with corresponding arguments.
+   * This function relates to the first of the get_function_hessians() function
+   * above in the same way as the get_function_values() with similar arguments
+   * relates to the first of the get_function_values() functions. See there for
+   * more information.
+   *
+   * @dealiiRequiresUpdateFlags{update_hessians}
    */
   template <class InputVector>
   void
@@ -2668,8 +2799,10 @@ public:
       &hessians) const;
 
   /**
-   * Access to the second derivatives of a function with more flexibility. See
-   * get_function_values() with corresponding arguments.
+   * This function relates to the first of the get_function_hessians() function
+   * above in the same way as the get_function_values() with similar arguments
+   * relates to the first of the get_function_values() functions. See there for
+   * more information.
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
@@ -2680,8 +2813,8 @@ public:
     const ArrayView<const types::global_dof_index> &indices,
     ArrayView<
       std::vector<Tensor<2, spacedim, typename InputVector::value_type>>>
-         hessians,
-    bool quadrature_points_fastest = false) const;
+               hessians,
+    const bool quadrature_points_fastest = false) const;
 
   /**
    * Compute the (scalar) Laplacian (i.e. the trace of the tensor of second
@@ -2755,8 +2888,10 @@ public:
     std::vector<Vector<typename InputVector::value_type>> &laplacians) const;
 
   /**
-   * Access to the second derivatives of a function with more flexibility. See
-   * get_function_values() with corresponding arguments.
+   * This function relates to the first of the get_function_laplacians()
+   * function above in the same way as the get_function_values() with similar
+   * arguments relates to the first of the get_function_values() functions. See
+   * there for more information.
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
@@ -2768,8 +2903,10 @@ public:
     std::vector<typename InputVector::value_type> & laplacians) const;
 
   /**
-   * Access to the second derivatives of a function with more flexibility. See
-   * get_function_values() with corresponding arguments.
+   * This function relates to the first of the get_function_laplacians()
+   * function above in the same way as the get_function_values() with similar
+   * arguments relates to the first of the get_function_values() functions. See
+   * there for more information.
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
@@ -2781,8 +2918,10 @@ public:
     std::vector<Vector<typename InputVector::value_type>> &laplacians) const;
 
   /**
-   * Access to the second derivatives of a function with more flexibility. See
-   * get_function_values() with corresponding arguments.
+   * This function relates to the first of the get_function_laplacians()
+   * function above in the same way as the get_function_values() with similar
+   * arguments relates to the first of the get_function_values() functions. See
+   * there for more information.
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
@@ -2792,7 +2931,7 @@ public:
     const InputVector &                                         fe_function,
     const ArrayView<const types::global_dof_index> &            indices,
     std::vector<std::vector<typename InputVector::value_type>> &laplacians,
-    bool quadrature_points_fastest = false) const;
+    const bool quadrature_points_fastest = false) const;
 
   //@}
   /// @name Access to third derivatives of global finite element fields
@@ -2867,12 +3006,16 @@ public:
     const InputVector &fe_function,
     std::vector<
       std::vector<Tensor<3, spacedim, typename InputVector::value_type>>>
-      &  third_derivatives,
-    bool quadrature_points_fastest = false) const;
+      &        third_derivatives,
+    const bool quadrature_points_fastest = false) const;
 
   /**
-   * Access to the third derivatives of a function with more flexibility. See
-   * get_function_values() with corresponding arguments.
+   * This function relates to the first of the get_function_third_derivatives()
+   * function above in the same way as the get_function_values() with similar
+   * arguments relates to the first of the get_function_values() functions. See
+   * there for more information.
+   *
+   * @dealiiRequiresUpdateFlags{update_3rd_derivatives}
    */
   template <class InputVector>
   void
@@ -2883,8 +3026,10 @@ public:
       &third_derivatives) const;
 
   /**
-   * Access to the third derivatives of a function with more flexibility. See
-   * get_function_values() with corresponding arguments.
+   * This function relates to the first of the get_function_third_derivatives()
+   * function above in the same way as the get_function_values() with similar
+   * arguments relates to the first of the get_function_values() functions. See
+   * there for more information.
    *
    * @dealiiRequiresUpdateFlags{update_3rd_derivatives}
    */
@@ -2895,8 +3040,8 @@ public:
     const ArrayView<const types::global_dof_index> &indices,
     ArrayView<
       std::vector<Tensor<3, spacedim, typename InputVector::value_type>>>
-         third_derivatives,
-    bool quadrature_points_fastest = false) const;
+               third_derivatives,
+    const bool quadrature_points_fastest = false) const;
   //@}
 
   /// @name Cell degrees of freedom
@@ -3618,12 +3763,33 @@ public:
            const UpdateFlags                   update_flags);
 
   /**
+   * Like the function above, but taking a collection of quadrature rules.
+   *
+   * @note We require, in contrast to FEFaceValues, that the number of quadrature
+   *   rules in the collection is one.
+   */
+  FEValues(const Mapping<dim, spacedim> &      mapping,
+           const FiniteElement<dim, spacedim> &fe,
+           const hp::QCollection<dim> &        quadrature,
+           const UpdateFlags                   update_flags);
+
+  /**
    * Constructor. This constructor is equivalent to the other one except that
    * it makes the object use a $Q_1$ mapping (i.e., an object of type
    * MappingQGeneric(1)) implicitly.
    */
   FEValues(const FiniteElement<dim, spacedim> &fe,
            const Quadrature<dim> &             quadrature,
+           const UpdateFlags                   update_flags);
+
+  /**
+   * Like the function above, but taking a collection of quadrature rules.
+   *
+   * @note We require, in contrast to FEFaceValues, that the number of quadrature
+   *   rules in the collection is one.
+   */
+  FEValues(const FiniteElement<dim, spacedim> &fe,
+           const hp::QCollection<dim> &        quadrature,
            const UpdateFlags                   update_flags);
 
   /**
@@ -3672,7 +3838,7 @@ public:
    *
    * Though it seems that it is not very useful, this function is there to
    * provide capability to the hp::FEValues class, in which case it provides
-   * the FEValues object for the present cell (remember that for hp finite
+   * the FEValues object for the present cell (remember that for hp-finite
    * elements, the actual FE object used may change from cell to cell, so we
    * also need different FEValues objects for different cells; once you
    * reinitialize the hp::FEValues object for a specific cell, it retrieves
@@ -3737,12 +3903,23 @@ public:
    * is <tt>2*dim*(1<<(dim-1))</tt>, i.e. the number of faces times the number
    * of subfaces per face.
    */
-  FEFaceValuesBase(const unsigned int                  n_q_points,
-                   const unsigned int                  dofs_per_cell,
+  FEFaceValuesBase(const unsigned int                  dofs_per_cell,
                    const UpdateFlags                   update_flags,
                    const Mapping<dim, spacedim> &      mapping,
                    const FiniteElement<dim, spacedim> &fe,
                    const Quadrature<dim - 1> &         quadrature);
+
+  /**
+   * Like the function above, but taking a collection of quadrature rules. This
+   * allows to assign each face a different quadrature rule. In the case that
+   * the collection only contains a single face quadrature, this quadrature
+   * rule is use on all faces.
+   */
+  FEFaceValuesBase(const unsigned int                  dofs_per_cell,
+                   const UpdateFlags                   update_flags,
+                   const Mapping<dim, spacedim> &      mapping,
+                   const FiniteElement<dim, spacedim> &fe,
+                   const hp::QCollection<dim - 1> &    quadrature);
 
   /**
    * Boundary form of the transformation of the cell at the <tt>i</tt>th
@@ -3786,6 +3963,12 @@ public:
 
 protected:
   /**
+   * Number of the face selected the last time the reinit() function was
+   * called.
+   */
+  unsigned int present_face_no;
+
+  /**
    * Index of the face selected the last time the reinit() function was
    * called.
    */
@@ -3794,7 +3977,7 @@ protected:
   /**
    * Store a copy of the quadrature formula here.
    */
-  const Quadrature<dim - 1> quadrature;
+  const hp::QCollection<dim - 1> quadrature;
 };
 
 
@@ -3840,12 +4023,33 @@ public:
                const UpdateFlags                   update_flags);
 
   /**
+   * Like the function above, but taking a collection of quadrature rules. This
+   * allows to assign each face a different quadrature rule. In the case that
+   * the collection only contains a single face quadrature, this quadrature
+   * rule is use on all faces.
+   */
+  FEFaceValues(const Mapping<dim, spacedim> &      mapping,
+               const FiniteElement<dim, spacedim> &fe,
+               const hp::QCollection<dim - 1> &    quadrature,
+               const UpdateFlags                   update_flags);
+
+  /**
    * Constructor. This constructor is equivalent to the other one except that
    * it makes the object use a $Q_1$ mapping (i.e., an object of type
    * MappingQGeneric(1)) implicitly.
    */
   FEFaceValues(const FiniteElement<dim, spacedim> &fe,
                const Quadrature<dim - 1> &         quadrature,
+               const UpdateFlags                   update_flags);
+
+  /**
+   * Like the function above, but taking a collection of quadrature rules. This
+   * allows to assign each face a different quadrature rule. In the case that
+   * the collection only contains a single face quadrature, this quadrature
+   * rule is use on all faces.
+   */
+  FEFaceValues(const FiniteElement<dim, spacedim> &fe,
+               const hp::QCollection<dim - 1> &    quadrature,
                const UpdateFlags                   update_flags);
 
   /**
@@ -3911,7 +4115,7 @@ public:
    *
    * Though it seems that it is not very useful, this function is there to
    * provide capability to the hp::FEValues class, in which case it provides
-   * the FEValues object for the present cell (remember that for hp finite
+   * the FEValues object for the present cell (remember that for hp-finite
    * elements, the actual FE object used may change from cell to cell, so we
    * also need different FEValues objects for different cells; once you
    * reinitialize the hp::FEValues object for a specific cell, it retrieves
@@ -3987,12 +4191,33 @@ public:
                   const UpdateFlags                   update_flags);
 
   /**
+   * Like the function above, but taking a collection of quadrature rules.
+   *
+   * @note We require, in contrast to FEFaceValues, that the number of quadrature
+   *   rules in the collection is one.
+   */
+  FESubfaceValues(const Mapping<dim, spacedim> &      mapping,
+                  const FiniteElement<dim, spacedim> &fe,
+                  const hp::QCollection<dim - 1> &    face_quadrature,
+                  const UpdateFlags                   update_flags);
+
+  /**
    * Constructor. This constructor is equivalent to the other one except that
    * it makes the object use a $Q_1$ mapping (i.e., an object of type
    * MappingQGeneric(1)) implicitly.
    */
   FESubfaceValues(const FiniteElement<dim, spacedim> &fe,
                   const Quadrature<dim - 1> &         face_quadrature,
+                  const UpdateFlags                   update_flags);
+
+  /**
+   * Like the function above, but taking a collection of quadrature rules.
+   *
+   * @note We require, in contrast to FEFaceValues, that the number of quadrature
+   *   rules in the collection is one.
+   */
+  FESubfaceValues(const FiniteElement<dim, spacedim> &fe,
+                  const hp::QCollection<dim - 1> &    face_quadrature,
                   const UpdateFlags                   update_flags);
 
   /**
@@ -4066,7 +4291,7 @@ public:
    *
    * Though it seems that it is not very useful, this function is there to
    * provide capability to the hp::FEValues class, in which case it provides
-   * the FEValues object for the present cell (remember that for hp finite
+   * the FEValues object for the present cell (remember that for hp-finite
    * elements, the actual FE object used may change from cell to cell, so we
    * also need different FEValues objects for different cells; once you
    * reinitialize the hp::FEValues object for a specific cell, it retrieves
@@ -4122,7 +4347,7 @@ namespace FEValuesViews
   Scalar<dim, spacedim>::value(const unsigned int shape_function,
                                const unsigned int q_point) const
   {
-    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
+    AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
     Assert(
       fe_values->update_flags & update_values,
       ((typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
@@ -4145,7 +4370,7 @@ namespace FEValuesViews
   Scalar<dim, spacedim>::gradient(const unsigned int shape_function,
                                   const unsigned int q_point) const
   {
-    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
+    AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4168,7 +4393,7 @@ namespace FEValuesViews
   Scalar<dim, spacedim>::hessian(const unsigned int shape_function,
                                  const unsigned int q_point) const
   {
-    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
+    AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
     Assert(fe_values->update_flags & update_hessians,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_hessians")));
@@ -4190,7 +4415,7 @@ namespace FEValuesViews
   Scalar<dim, spacedim>::third_derivative(const unsigned int shape_function,
                                           const unsigned int q_point) const
   {
-    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
+    AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
     Assert(fe_values->update_flags & update_3rd_derivatives,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_3rd_derivatives")));
@@ -4213,7 +4438,7 @@ namespace FEValuesViews
   Vector<dim, spacedim>::value(const unsigned int shape_function,
                                const unsigned int q_point) const
   {
-    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
+    AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
     Assert(fe_values->update_flags & update_values,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
@@ -4251,7 +4476,7 @@ namespace FEValuesViews
   Vector<dim, spacedim>::gradient(const unsigned int shape_function,
                                   const unsigned int q_point) const
   {
-    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
+    AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4291,7 +4516,7 @@ namespace FEValuesViews
                                     const unsigned int q_point) const
   {
     // this function works like in the case above
-    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
+    AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4328,7 +4553,7 @@ namespace FEValuesViews
   {
     // this function works like in the case above
 
-    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
+    AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4500,7 +4725,7 @@ namespace FEValuesViews
                                  const unsigned int q_point) const
   {
     // this function works like in the case above
-    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
+    AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
     Assert(fe_values->update_flags & update_hessians,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_hessians")));
@@ -4540,7 +4765,7 @@ namespace FEValuesViews
                                           const unsigned int q_point) const
   {
     // this function works like in the case above
-    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
+    AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
     Assert(fe_values->update_flags & update_3rd_derivatives,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_3rd_derivatives")));
@@ -4647,7 +4872,7 @@ namespace FEValuesViews
   Vector<dim, spacedim>::symmetric_gradient(const unsigned int shape_function,
                                             const unsigned int q_point) const
   {
-    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
+    AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4682,7 +4907,7 @@ namespace FEValuesViews
   SymmetricTensor<2, dim, spacedim>::value(const unsigned int shape_function,
                                            const unsigned int q_point) const
   {
-    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
+    AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
     Assert(fe_values->update_flags & update_values,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
@@ -4727,7 +4952,7 @@ namespace FEValuesViews
     const unsigned int shape_function,
     const unsigned int q_point) const
   {
-    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
+    AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4805,7 +5030,7 @@ namespace FEValuesViews
   Tensor<2, dim, spacedim>::value(const unsigned int shape_function,
                                   const unsigned int q_point) const
   {
-    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
+    AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
     Assert(fe_values->update_flags & update_values,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
@@ -4855,7 +5080,7 @@ namespace FEValuesViews
   Tensor<2, dim, spacedim>::divergence(const unsigned int shape_function,
                                        const unsigned int q_point) const
   {
-    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
+    AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4911,7 +5136,7 @@ namespace FEValuesViews
   Tensor<2, dim, spacedim>::gradient(const unsigned int shape_function,
                                      const unsigned int q_point) const
   {
-    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
+    AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -5027,7 +5252,7 @@ inline const double &
 FEValuesBase<dim, spacedim>::shape_value(const unsigned int i,
                                          const unsigned int j) const
 {
-  AssertIndexRange(i, fe->dofs_per_cell);
+  AssertIndexRange(i, fe->n_dofs_per_cell());
   Assert(this->update_flags & update_values,
          ExcAccessToUninitializedField("update_values"));
   Assert(fe->is_primitive(i), ExcShapeFunctionNotPrimitive(i));
@@ -5064,7 +5289,7 @@ FEValuesBase<dim, spacedim>::shape_value_component(
   const unsigned int j,
   const unsigned int component) const
 {
-  AssertIndexRange(i, fe->dofs_per_cell);
+  AssertIndexRange(i, fe->n_dofs_per_cell());
   Assert(this->update_flags & update_values,
          ExcAccessToUninitializedField("update_values"));
   AssertIndexRange(component, fe->n_components());
@@ -5093,7 +5318,7 @@ inline const Tensor<1, spacedim> &
 FEValuesBase<dim, spacedim>::shape_grad(const unsigned int i,
                                         const unsigned int j) const
 {
-  AssertIndexRange(i, fe->dofs_per_cell);
+  AssertIndexRange(i, fe->n_dofs_per_cell());
   Assert(this->update_flags & update_gradients,
          ExcAccessToUninitializedField("update_gradients"));
   Assert(fe->is_primitive(i), ExcShapeFunctionNotPrimitive(i));
@@ -5130,7 +5355,7 @@ FEValuesBase<dim, spacedim>::shape_grad_component(
   const unsigned int j,
   const unsigned int component) const
 {
-  AssertIndexRange(i, fe->dofs_per_cell);
+  AssertIndexRange(i, fe->n_dofs_per_cell());
   Assert(this->update_flags & update_gradients,
          ExcAccessToUninitializedField("update_gradients"));
   AssertIndexRange(component, fe->n_components());
@@ -5158,7 +5383,7 @@ inline const Tensor<2, spacedim> &
 FEValuesBase<dim, spacedim>::shape_hessian(const unsigned int i,
                                            const unsigned int j) const
 {
-  AssertIndexRange(i, fe->dofs_per_cell);
+  AssertIndexRange(i, fe->n_dofs_per_cell());
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
   Assert(fe->is_primitive(i), ExcShapeFunctionNotPrimitive(i));
@@ -5195,7 +5420,7 @@ FEValuesBase<dim, spacedim>::shape_hessian_component(
   const unsigned int j,
   const unsigned int component) const
 {
-  AssertIndexRange(i, fe->dofs_per_cell);
+  AssertIndexRange(i, fe->n_dofs_per_cell());
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
   AssertIndexRange(component, fe->n_components());
@@ -5223,7 +5448,7 @@ inline const Tensor<3, spacedim> &
 FEValuesBase<dim, spacedim>::shape_3rd_derivative(const unsigned int i,
                                                   const unsigned int j) const
 {
-  AssertIndexRange(i, fe->dofs_per_cell);
+  AssertIndexRange(i, fe->n_dofs_per_cell());
   Assert(this->update_flags & update_3rd_derivatives,
          ExcAccessToUninitializedField("update_3rd_derivatives"));
   Assert(fe->is_primitive(i), ExcShapeFunctionNotPrimitive(i));
@@ -5260,7 +5485,7 @@ FEValuesBase<dim, spacedim>::shape_3rd_derivative_component(
   const unsigned int j,
   const unsigned int component) const
 {
-  AssertIndexRange(i, fe->dofs_per_cell);
+  AssertIndexRange(i, fe->n_dofs_per_cell());
   Assert(this->update_flags & update_3rd_derivatives,
          ExcAccessToUninitializedField("update_3rd_derivatives"));
   AssertIndexRange(component, fe->n_components());
@@ -5682,7 +5907,7 @@ template <int dim, int spacedim>
 inline const Quadrature<dim - 1> &
 FEFaceValuesBase<dim, spacedim>::get_quadrature() const
 {
-  return quadrature;
+  return quadrature[quadrature.size() == 1 ? 0 : present_face_no];
 }
 
 

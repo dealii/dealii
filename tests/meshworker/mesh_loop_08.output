@@ -1,0 +1,13 @@
+
+DEAL::ONE DIMENSION
+DEAL::
+DEAL::Cell worker on : 1.1
+DEAL::Boundary worker on : 1.1, Face : 1
+DEAL::copier
+DEAL::Cell worker on : 2.0
+DEAL::Boundary worker on : 2.0, Face : 0
+DEAL::Face worker on : 2.0, Neighbor cell : 2.1, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::copier
+DEAL::Cell worker on : 2.1
+DEAL::Face worker on : 2.1, Neighbor cell : 1.1, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::copier

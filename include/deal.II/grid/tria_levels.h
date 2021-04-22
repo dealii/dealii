@@ -21,6 +21,7 @@
 
 #include <deal.II/base/point.h>
 
+#include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria_objects.h>
 
 #include <boost/serialization/utility.hpp>
@@ -102,6 +103,16 @@ namespace internal
       std::vector<unsigned int> active_cell_indices;
 
       /**
+       * Global cell index of each active cell.
+       */
+      std::vector<types::global_cell_index> global_active_cell_indices;
+
+      /**
+       * Global cell index of each cell on the given level.
+       */
+      std::vector<types::global_cell_index> global_level_cell_indices;
+
+      /**
        * Levels and indices of the neighbors of the cells. Convention is, that
        * the neighbors of the cell with index @p i are stored in the fields
        * following $i*(2*real\_space\_dimension)$, e.g. in one spatial
@@ -111,7 +122,7 @@ namespace internal
        * and so on.
        *
        * In neighbors, <tt>neighbors[i].first</tt> is the level, while
-       * <tt>neighbors[i].first</tt> is the index of the neighbor.
+       * <tt>neighbors[i].second</tt> is the index of the neighbor.
        *
        * If a neighbor does not exist (cell is at the boundary),
        * <tt>level=index=-1</tt> is set.
@@ -207,6 +218,13 @@ namespace internal
       std::vector<unsigned char> face_orientations;
 
       /**
+       * Reference cell type of each cell.
+       *
+       * @note Used only for dim=2 and dim=3.
+       */
+      std::vector<dealii::ReferenceCell> reference_cell;
+
+      /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
@@ -215,7 +233,8 @@ namespace internal
 
       /**
        * Read or write the data of this object to or from a stream for the
-       * purpose of serialization
+       * purpose of serialization using the [BOOST serialization
+       * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
        */
       template <class Archive>
       void
@@ -244,6 +263,9 @@ namespace internal
 
       if (dim == 3)
         ar &face_orientations;
+
+      if (dim == 2 || dim == 3)
+        ar &reference_cell;
     }
 
   } // namespace TriangulationImplementation

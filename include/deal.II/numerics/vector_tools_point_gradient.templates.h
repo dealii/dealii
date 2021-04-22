@@ -48,8 +48,8 @@ namespace VectorTools
     std::vector<Tensor<1, spacedim, typename VectorType::value_type>>
       &gradients)
   {
-    if (dof.hp_capability_enabled == false)
-      point_gradient(StaticMappingQ1<dim, spacedim>::mapping,
+    if (dof.has_hp_capabilities() == false)
+      point_gradient(get_default_linear_mapping(dof.get_triangulation()),
                      dof,
                      fe_function,
                      point,
@@ -69,8 +69,8 @@ namespace VectorTools
                  const VectorType &               fe_function,
                  const Point<spacedim> &          point)
   {
-    if (dof.hp_capability_enabled == false)
-      return point_gradient(StaticMappingQ1<dim, spacedim>::mapping,
+    if (dof.has_hp_capabilities() == false)
+      return point_gradient(get_default_linear_mapping(dof.get_triangulation()),
                             dof,
                             fe_function,
                             point);

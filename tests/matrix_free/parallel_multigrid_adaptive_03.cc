@@ -58,7 +58,7 @@ template <int dim,
 class LaplaceOperator : public Subscriptor
 {
 public:
-  typedef number value_type;
+  using value_type = number;
 
   LaplaceOperator(){};
 
@@ -525,7 +525,8 @@ do_test(const DoFHandler<dim> &dof, const bool threaded)
   Functions::ZeroFunction<dim>                        zero_function;
   std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
   dirichlet_boundary[0] = &zero_function;
-  mg_constrained_dofs.initialize(dof, dirichlet_boundary);
+  mg_constrained_dofs.initialize(dof);
+  mg_constrained_dofs.make_zero_boundary_constraints(dof, {0});
 
   MappingQ<dim>                                          mapping(fe_degree + 1);
   LaplaceOperator<dim, fe_degree, n_q_points_1d, double> fine_matrix;
@@ -547,8 +548,8 @@ do_test(const DoFHandler<dim> &dof, const bool threaded)
       in.local_element(i) = 1.;
 
   // set up multigrid in analogy to step-37
-  typedef LaplaceOperator<dim, fe_degree, n_q_points_1d, number>
-    LevelMatrixType;
+  using LevelMatrixType =
+    LaplaceOperator<dim, fe_degree, n_q_points_1d, number>;
 
   MGLevelObject<LevelMatrixType> mg_matrices;
   mg_matrices.resize(0, dof.get_triangulation().n_global_levels() - 1);
@@ -574,9 +575,9 @@ do_test(const DoFHandler<dim> &dof, const bool threaded)
   MGCoarseIterative<LevelMatrixType, number> mg_coarse;
   mg_coarse.initialize(mg_matrices[0]);
 
-  typedef PreconditionChebyshev<LevelMatrixType,
-                                LinearAlgebra::distributed::Vector<number>>
-    SMOOTHER;
+  using SMOOTHER =
+    PreconditionChebyshev<LevelMatrixType,
+                          LinearAlgebra::distributed::Vector<number>>;
   MGSmootherPrecondition<LevelMatrixType,
                          SMOOTHER,
                          LinearAlgebra::distributed::Vector<number>>

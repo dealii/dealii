@@ -1,0 +1,4 @@
+Improved: MatrixFree now also works for hp in MPI-parallelized
+programs.
+<br>
+(Marc Fehling, Katharina Kormann, Martin Kronbichler, Peter Munch, 2020/10/20)

@@ -67,11 +67,13 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
     template FESeries::Legendre<deal_II_dimension, deal_II_space_dimension>
     SmoothnessEstimator::Legendre::default_fe_series<deal_II_dimension,
                                                      deal_II_space_dimension>(
-      const hp::FECollection<deal_II_dimension, deal_II_space_dimension> &);
+      const hp::FECollection<deal_II_dimension, deal_II_space_dimension> &,
+      const unsigned int);
 
     template FESeries::Fourier<deal_II_dimension, deal_II_space_dimension>
     SmoothnessEstimator::Fourier::default_fe_series<deal_II_dimension,
                                                     deal_II_space_dimension>(
-      const hp::FECollection<deal_II_dimension, deal_II_space_dimension> &);
+      const hp::FECollection<deal_II_dimension, deal_II_space_dimension> &,
+      const unsigned int);
 #endif
   }

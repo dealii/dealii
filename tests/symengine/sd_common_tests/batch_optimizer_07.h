@@ -340,7 +340,7 @@ evaluate_SD_SD_stored_symbols_optimisation(const Tensor<2, dim> &t,
                                            const Tensor<1, dim> &v,
                                            const double &        s)
 {
-  typedef SD::Expression SDNumberType;
+  using SDNumberType = SD::Expression;
 
   // Compute the symbolic (derivative) tensors once off
   // ahead of time, and store them for each run of the function
@@ -373,7 +373,7 @@ evaluate_SD_SD_stored_symbols_optimisation(const Tensor<2, dim> &t,
   if (symbols_initialised == false)
     {
       // Function and its derivatives
-      typedef CoupledFunction<dim, SDNumberType> func_sd;
+      using func_sd = CoupledFunction<dim, SDNumberType>;
 
       symb_psi = func_sd::psi(symb_t, symb_v, symb_s);
 #if DEBUG_EXTRA
@@ -484,8 +484,8 @@ evaluate_SD_SD_stored_symbols_optimisation(const Tensor<2, dim> &t,
   const double d2psi_ds_ds = optimizer.evaluate(symb_d2psi_ds_ds);
 
   // Verify the result
-  typedef CoupledFunction<dim, double> func;
-  static const double                  tol = 1e-12;
+  using func              = CoupledFunction<dim, double>;
+  static const double tol = 1e-12;
   Assert(std::abs(psi - func::psi(t, v, s)) < tol,
          ExcMessage("No match for function value."));
   Assert(std::abs((dpsi_dt - func::dpsi_dt(t, v, s)).norm()) < tol,

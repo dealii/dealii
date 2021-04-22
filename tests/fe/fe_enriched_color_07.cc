@@ -25,6 +25,7 @@
 #include <deal.II/base/parsed_function.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -40,7 +41,6 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
@@ -923,7 +923,7 @@ EstimateEnrichmentFunction::~EstimateEnrichmentFunction()
 
 template <int dim>
 void
-plot_shape_function(hp::DoFHandler<dim> &dof_handler, unsigned int patches = 5)
+plot_shape_function(DoFHandler<dim> &dof_handler, unsigned int patches = 5)
 {
   std::cout << "...start plotting shape function" << std::endl;
   std::cout << "Patches for output: " << patches << std::endl;
@@ -1010,7 +1010,7 @@ plot_shape_function(hp::DoFHandler<dim> &dof_handler, unsigned int patches = 5)
       std::cout << "...finished printing support points" << std::endl;
     }
 
-  DataOut<dim, hp::DoFHandler<dim>> data_out;
+  DataOut<dim, DoFHandler<dim>> data_out;
   data_out.attach_dof_handler(dof_handler);
 
   // get material ids:
@@ -1081,8 +1081,8 @@ protected:
   ParameterCollection prm;
   unsigned int        n_enriched_cells;
 
-  Triangulation<dim>  triangulation;
-  hp::DoFHandler<dim> dof_handler;
+  Triangulation<dim> triangulation;
+  DoFHandler<dim>    dof_handler;
 
   std::shared_ptr<const hp::FECollection<dim>> fe_collection;
   hp::QCollection<dim>                         q_collection;
@@ -1110,7 +1110,7 @@ protected:
   std::vector<SigmaFunction<dim>> vec_rhs;
 
   using cell_iterator_function = std::function<Function<dim> *(
-    const typename hp::DoFHandler<dim>::active_cell_iterator &)>;
+    const typename DoFHandler<dim>::active_cell_iterator &)>;
 
   std::vector<std::shared_ptr<Function<dim>>> vec_enrichments;
   std::vector<predicate_function<dim>>        vec_predicates;
@@ -1350,7 +1350,7 @@ LaplaceProblem<dim>::build_fe_space()
         {
           pcout << "...start print fe indices" << std::endl;
 
-          // print fe index
+          // print FE index
           const std::string base_filename =
             "fe_indices" + dealii::Utilities::int_to_string(dim) + "_p" +
             dealii::Utilities::int_to_string(0);
@@ -1668,7 +1668,7 @@ LaplaceProblem<dim>::output_results(const unsigned int cycle)
       filename += ".vtk";
       std::ofstream output(filename.c_str());
 
-      DataOut<dim, hp::DoFHandler<dim>> data_out;
+      DataOut<dim, DoFHandler<dim>> data_out;
       data_out.attach_dof_handler(dof_handler);
       data_out.add_data_vector(localized_solution, "solution");
       if (prm.exact_soln_expr != "")
@@ -1739,7 +1739,7 @@ LaplaceProblem<dim>::run()
   pcout << "...run problem" << std::endl;
   double norm_soln_old(0), norm_rel_change_old(1);
 
-  // Run making grids and building fe space only once.
+  // Run making grids and building FE space only once.
   initialize();
   build_fe_space();
 

@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria_objects.h>
 
 
@@ -72,6 +73,13 @@ namespace internal
       std::vector<unsigned char> quads_line_orientations;
 
       /**
+       * Reference cell type of each quad.
+       *
+       * @note Used only for dim=3.
+       */
+      std::vector<dealii::ReferenceCell> quad_reference_cell;
+
+      /**
        * The TriaObject containing the data of lines.
        *
        * @note Used only for dim>1.
@@ -87,7 +95,8 @@ namespace internal
 
       /**
        * Read or write the data of this object to or from a stream for the
-       * purpose of serialization
+       * purpose of serialization using the [BOOST serialization
+       * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
        */
       template <class Archive>
       void
@@ -106,7 +115,7 @@ namespace internal
         ar &lines;
 
       if (dim == 3)
-        ar &quads &lines &quads_line_orientations;
+        ar &quads &lines &quads_line_orientations &quad_reference_cell;
     }
   } // namespace TriangulationImplementation
 } // namespace internal

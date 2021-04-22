@@ -34,14 +34,12 @@
 
 #  include <deal.II/sundials/copy.h>
 
+// Make sure we #include the SUNDIALS config file...
 #  include <sundials/sundials_config.h>
-#  if DEAL_II_SUNDIALS_VERSION_GTE(3, 0, 0)
-#    include <kinsol/kinsol_direct.h>
-#    include <sunlinsol/sunlinsol_dense.h>
-#    include <sunmatrix/sunmatrix_dense.h>
-#  else
-#    include <kinsol/kinsol_dense.h>
-#  endif
+// ...before the rest of the SUNDIALS files:
+#  include <kinsol/kinsol_direct.h>
+#  include <sunlinsol/sunlinsol_dense.h>
+#  include <sunmatrix/sunmatrix_dense.h>
 
 #  include <iomanip>
 #  include <iostream>
@@ -52,11 +50,88 @@ namespace SUNDIALS
 {
   using namespace internal;
 
+
+  template <typename VectorType>
+  KINSOL<VectorType>::AdditionalData::AdditionalData(
+    const SolutionStrategy &strategy,
+    const unsigned int      maximum_non_linear_iterations,
+    const double            function_tolerance,
+    const double            step_tolerance,
+    const bool              no_init_setup,
+    const unsigned int      maximum_setup_calls,
+    const double            maximum_newton_step,
+    const double            dq_relative_error,
+    const unsigned int      maximum_beta_failures,
+    const unsigned int      anderson_subspace_size)
+    : strategy(strategy)
+    , maximum_non_linear_iterations(maximum_non_linear_iterations)
+    , function_tolerance(function_tolerance)
+    , step_tolerance(step_tolerance)
+    , no_init_setup(no_init_setup)
+    , maximum_setup_calls(maximum_setup_calls)
+    , maximum_newton_step(maximum_newton_step)
+    , dq_relative_error(dq_relative_error)
+    , maximum_beta_failures(maximum_beta_failures)
+    , anderson_subspace_size(anderson_subspace_size)
+  {}
+
+
+
+  template <typename VectorType>
+  void
+  KINSOL<VectorType>::AdditionalData::add_parameters(ParameterHandler &prm)
+  {
+    static std::string strategy_str("newton");
+    prm.add_parameter("Solution strategy",
+                      strategy_str,
+                      "Choose among newton|linesearch|fixed_point|picard",
+                      Patterns::Selection(
+                        "newton|linesearch|fixed_point|picard"));
+    prm.add_action("Solution strategy", [&](const std::string &value) {
+      if (value == "newton")
+        strategy = newton;
+      else if (value == "linesearch")
+        strategy = linesearch;
+      else if (value == "fixed_point")
+        strategy = fixed_point;
+      else if (value == "picard")
+        strategy = picard;
+      else
+        Assert(false, ExcInternalError());
+    });
+    prm.add_parameter("Maximum number of nonlinear iterations",
+                      maximum_non_linear_iterations);
+    prm.add_parameter("Function norm stopping tolerance", function_tolerance);
+    prm.add_parameter("Scaled step stopping tolerance", step_tolerance);
+
+    prm.enter_subsection("Newton parameters");
+    prm.add_parameter("No initial matrix setup", no_init_setup);
+    prm.add_parameter("Maximum iterations without matrix setup",
+                      maximum_setup_calls);
+    prm.add_parameter("Maximum allowable scaled length of the Newton step",
+                      maximum_newton_step);
+    prm.add_parameter("Relative error for different quotient computation",
+                      dq_relative_error);
+    prm.leave_subsection();
+
+    prm.enter_subsection("Linesearch parameters");
+    prm.add_parameter("Maximum number of beta-condition failures",
+                      maximum_beta_failures);
+    prm.leave_subsection();
+
+
+    prm.enter_subsection("Fixed point and Picard parameters");
+    prm.add_parameter("Anderson acceleration subspace size",
+                      anderson_subspace_size);
+    prm.leave_subsection();
+  }
+
+
   namespace
   {
     template <typename VectorType>
     int
-    t_kinsol_function(N_Vector yy, N_Vector FF, void *user_data)
+    residual_or_iteration_callback(N_Vector yy, N_Vector FF, void *user_data)
     {
       KINSOL<VectorType> &solver =
         *static_cast<KINSOL<VectorType> *>(user_data);
@@ -85,9 +160,10 @@ namespace SUNDIALS
 
 
 
+#  if DEAL_II_SUNDIALS_VERSION_LT(4, 1, 0)
     template <typename VectorType>
     int
-    t_kinsol_setup_jacobian(KINMem kinsol_mem)
+    setup_jacobian_callback(KINMem kinsol_mem)
     {
       KINSOL<VectorType> &solver =
         *static_cast<KINSOL<VectorType> *>(kinsol_mem->kin_user_data);
@@ -110,11 +186,11 @@ namespace SUNDIALS
 
     template <typename VectorType>
     int
-    t_kinsol_solve_jacobian(KINMem    kinsol_mem,
-                            N_Vector  x,
-                            N_Vector  b,
-                            realtype *sJpnorm,
-                            realtype *sFdotJp)
+    solve_with_jacobian_callback(KINMem    kinsol_mem,
+                                 N_Vector  x,
+                                 N_Vector  b,
+                                 realtype *sJpnorm,
+                                 realtype *sFdotJp)
     {
       KINSOL<VectorType> &solver =
         *static_cast<KINSOL<VectorType> *>(kinsol_mem->kin_user_data);
@@ -147,11 +223,120 @@ namespace SUNDIALS
 
       return err;
     }
+
+#  else // SUNDIALS 5.0 or later
+
+    template <typename VectorType>
+    int
+    setup_jacobian_callback(N_Vector u,
+                            N_Vector f,
+                            SUNMatrix /* ignored */,
+                            void *user_data,
+                            N_Vector /* tmp1 */,
+                            N_Vector /* tmp2 */)
+    {
+      // Receive the object that describes the linear solver and
+      // unpack the pointer to the KINSOL object from which we can then
+      // get the 'setup' function.
+      const KINSOL<VectorType> &solver =
+        *static_cast<const KINSOL<VectorType> *>(user_data);
+
+      // Allocate temporary (deal.II-type) vectors into which to copy the
+      // N_vectors
+      GrowingVectorMemory<VectorType>            mem;
+      typename VectorMemory<VectorType>::Pointer ycur(mem);
+      typename VectorMemory<VectorType>::Pointer fcur(mem);
+      solver.reinit_vector(*ycur);
+      solver.reinit_vector(*fcur);
+
+      copy(*ycur, u);
+      copy(*fcur, f);
+
+      // Call the user-provided setup function with these arguments:
+      solver.setup_jacobian(*ycur, *fcur);
+
+      return 0;
+    }
+
+
+
+    template <typename VectorType>
+    int
+    solve_with_jacobian_callback(SUNLinearSolver LS,
+                                 SUNMatrix /*ignored*/,
+                                 N_Vector x,
+                                 N_Vector b,
+                                 realtype tol)
+    {
+      // Receive the object that describes the linear solver and
+      // unpack the pointer to the KINSOL object from which we can then
+      // get the 'reinit' and 'solve' functions.
+      const KINSOL<VectorType> &solver =
+        *static_cast<const KINSOL<VectorType> *>(LS->content);
+
+      // This is where we have to make a decision about which of the two
+      // signals to call. Let's first check the more modern one:
+      if (solver.solve_with_jacobian)
+        {
+          // Allocate temporary (deal.II-type) vectors into which to copy the
+          // N_vectors
+          GrowingVectorMemory<VectorType>            mem;
+          typename VectorMemory<VectorType>::Pointer src_b(mem);
+          typename VectorMemory<VectorType>::Pointer dst_x(mem);
+
+          solver.reinit_vector(*src_b);
+          solver.reinit_vector(*dst_x);
+
+          copy(*src_b, b);
+
+          const int err = solver.solve_with_jacobian(*src_b, *dst_x, tol);
+
+          copy(x, *dst_x);
+
+          return err;
+        }
+      else
+        {
+          // User has not provided the modern callback, so the fact that we are
+          // here means that they must have given us something for the old
+          // signal. Check this.
+          Assert(solver.solve_jacobian_system, ExcInternalError());
+
+          // Allocate temporary (deal.II-type) vectors into which to copy the
+          // N_vectors
+          GrowingVectorMemory<VectorType>            mem;
+          typename VectorMemory<VectorType>::Pointer src_ycur(mem);
+          typename VectorMemory<VectorType>::Pointer src_fcur(mem);
+          typename VectorMemory<VectorType>::Pointer src_b(mem);
+          typename VectorMemory<VectorType>::Pointer dst_x(mem);
+
+          solver.reinit_vector(*src_b);
+          solver.reinit_vector(*dst_x);
+
+          copy(*src_b, b);
+
+          // Call the user-provided setup function with these arguments. Note
+          // that Sundials 4.x and later no longer provide values for
+          // src_ycur and src_fcur, and so we simply pass dummy vector in.
+          // These vectors will have zero lengths because we don't reinit them
+          // above.
+          const int err =
+            solver.solve_jacobian_system(*src_ycur, *src_fcur, *src_b, *dst_x);
+
+          copy(x, *dst_x);
+
+          return err;
+        }
+    }
+
+#  endif
   } // namespace
+
+
 
   template <typename VectorType>
   KINSOL<VectorType>::KINSOL(const AdditionalData &data,
-                             const MPI_Comm        mpi_comm)
+                             const MPI_Comm &      mpi_comm)
     : data(data)
     , kinsol_mem(nullptr)
     , solution(nullptr)
@@ -171,6 +356,7 @@ namespace SUNDIALS
   {
     if (kinsol_mem)
       KINFree(&kinsol_mem);
+
 #  ifdef DEAL_II_WITH_MPI
     if (is_serial_vector<VectorType>::value == false)
       {
@@ -233,7 +419,8 @@ namespace SUNDIALS
 
     kinsol_mem = KINCreate();
 
-    int status = KINInit(kinsol_mem, t_kinsol_function<VectorType>, solution);
+    int status =
+      KINInit(kinsol_mem, residual_or_iteration_callback<VectorType>, solution);
     (void)status;
     AssertKINSOL(status);
 
@@ -267,32 +454,108 @@ namespace SUNDIALS
     status = KINSetRelErrFunc(kinsol_mem, data.dq_relative_error);
     AssertKINSOL(status);
 
-#  if DEAL_II_SUNDIALS_VERSION_GTE(3, 0, 0)
     SUNMatrix       J  = nullptr;
     SUNLinearSolver LS = nullptr;
-#  endif
 
-    if (solve_jacobian_system)
+    if (solve_jacobian_system ||
+        solve_with_jacobian) // user assigned a function object to the solver
+                             // slot
       {
+/* interface up to and including 4.0 */
+#  if DEAL_II_SUNDIALS_VERSION_LT(4, 1, 0)
         auto KIN_mem        = static_cast<KINMem>(kinsol_mem);
-        KIN_mem->kin_lsolve = t_kinsol_solve_jacobian<VectorType>;
+        KIN_mem->kin_lsolve = solve_with_jacobian_callback<VectorType>;
+        if (setup_jacobian) // user assigned a function object to the Jacobian
+          // set-up slot
+          KIN_mem->kin_lsetup = setup_jacobian_callback<VectorType>;
+
+/* interface up to and including 4.1 */
+#  elif DEAL_II_SUNDIALS_VERSION_LT(5, 0, 0)
+
+        // deal.II does not currently have support for KINSOL in
+        // SUNDIALS 4.1. One could write this and update this section,
+        // but it does not seem worthwhile spending the time to
+        // interface with an old version of SUNDIAL given that the
+        // code below supports modern SUNDIAL versions just fine.
+        Assert(false, ExcNotImplemented());
+
+#  else /* interface starting with SUNDIALS 5.0 */
+        // Set the operations we care for in the sun_linear_solver object
+        // and attach it to the KINSOL object. The functions that will get
+        // called do not actually receive the KINSOL object, just the LS
+        // object, so we have to store a pointer to the current
+        // object in the LS object
+        LS          = SUNLinSolNewEmpty();
+        LS->content = this;
+
+        LS->ops->gettype =
+          [](SUNLinearSolver /*ignored*/) -> SUNLinearSolver_Type {
+          return SUNLINEARSOLVER_MATRIX_ITERATIVE;
+        };
+
+        LS->ops->free = [](SUNLinearSolver LS) -> int {
+          if (LS->content)
+            {
+              LS->content = nullptr;
+            }
+          if (LS->ops)
+            {
+              free(LS->ops);
+              LS->ops = nullptr;
+            }
+          free(LS);
+          LS = nullptr;
+          return 0;
+        };
+
+        LS->ops->solve = solve_with_jacobian_callback<VectorType>;
+
+        // Even though we don't use it, KINSOL still wants us to set some
+        // kind of matrix object for the nonlinear solver. This is because
+        // if we don't set it, it won't call the functions that set up
+        // the matrix object (i.e., the argument to the 'KINSetJacFn'
+        // function below).
+        J          = SUNMatNewEmpty();
+        J->content = this;
+
+        J->ops->getid = [](SUNMatrix /*ignored*/) -> SUNMatrix_ID {
+          return SUNMATRIX_CUSTOM;
+        };
+
+        J->ops->destroy = [](SUNMatrix A) {
+          if (A->content)
+            {
+              A->content = nullptr;
+            }
+          if (A->ops)
+            {
+              free(A->ops);
+              A->ops = nullptr;
+            }
+          free(A);
+          A = nullptr;
+        };
+
+        // Now set the linear system and Jacobian objects in the solver:
+        status = KINSetLinearSolver(kinsol_mem, LS, J);
+        AssertKINSOL(status);
+
+        // Finally, if we were given a set-up function, tell KINSOL about
+        // it as well. The manual says that this must happen *after*
+        // calling KINSetLinearSolver
         if (setup_jacobian)
           {
-            KIN_mem->kin_lsetup = t_kinsol_setup_jacobian<VectorType>;
-#  if DEAL_II_SUNDIALS_VERSION_LT(3, 0, 0)
-            KIN_mem->kin_setupNonNull = true;
-#  endif
+            status =
+              KINSetJacFn(kinsol_mem, &setup_jacobian_callback<VectorType>);
+            AssertKINSOL(status);
           }
+#  endif
       }
     else
       {
-#  if DEAL_II_SUNDIALS_VERSION_GTE(3, 0, 0)
         J      = SUNDenseMatrix(system_size, system_size);
         LS     = SUNDenseLinearSolver(u_scale, J);
         status = KINDlsSetLinearSolver(kinsol_mem, LS, J);
-#  else
-        status = KINDense(kinsol_mem, system_size);
-#  endif
         AssertKINSOL(status);
       }
 
@@ -330,10 +593,8 @@ namespace SUNDIALS
     status = KINGetNumNonlinSolvIters(kinsol_mem, &nniters);
     AssertKINSOL(status);
 
-#  if DEAL_II_SUNDIALS_VERSION_GTE(3, 0, 0)
     SUNMatDestroy(J);
     SUNLinSolFree(LS);
-#  endif
     KINFree(&kinsol_mem);
 
     return static_cast<unsigned int>(nniters);

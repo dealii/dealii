@@ -80,13 +80,15 @@ TensorProductPolynomialsBubbles<dim>::compute_value(const unsigned int i,
 
   const unsigned int comp = i - tensor_polys.n();
 
-  // compute \prod_{i=1}^d 4*(1-x_i^2)(p)
+  // Compute \prod_{i=1}^d 4*x_i*(1-x_i)
   double value = 1.;
   for (unsigned int j = 0; j < dim; ++j)
     value *= 4 * p(j) * (1 - p(j));
-  // and multiply with (2x_i-1)^{r-1}
+
+  // Then multiply with (2x_i-1)^{r-1}. Since q_degree is generally a
+  // small integer, using a loop is likely faster than using std::pow.
   for (unsigned int i = 0; i < q_degree - 1; ++i)
-    value *= 2 * p(comp) - 1;
+    value *= (2 * p(comp) - 1);
   return value;
 }
 

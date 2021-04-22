@@ -9,6 +9,7 @@ Infrastructure in Geodynamics initiative (CIG), through the NSF under Award
 EAR-0949446 and EAR-1550901 and The University of California -- Davis.
 </i>
 
+@dealiiTutorialDOI{10.5281/zenodo.4004166,https://zenodo.org/badge/DOI/10.5281/zenodo.4004166.svg}
 
 @note As a prerequisite of this program, you need to have both p4est and either the PETSc
 or Trilinos library installed. The installation of deal.II together with these additional
@@ -27,6 +28,11 @@ multigrid (GMG) preconditioners are considered: a matrix-based version similar t
 in step-16 (but for parallel computations) and a matrix-free version
 discussed in step-37. The goal is to find out which approach leads to
 the best solver for large parallel computations.
+
+This tutorial is based on one of the numerical examples in
+@cite clevenger_par_gmg. Please see that publication for a detailed background
+on the multigrid implementation in deal.II. We will summarize some of the
+results in the following text.
 
 Algebraic multigrid methods are obviously the easiest to implement
 with deal.II since classes such as TrilinosWrappers::PreconditionAMG

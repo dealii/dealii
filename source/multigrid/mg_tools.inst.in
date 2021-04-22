@@ -25,10 +25,24 @@ for (PATTERN : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
       template void
       make_sparsity_pattern<deal_II_dimension,
                             deal_II_space_dimension,
-                            PATTERN>(
+                            PATTERN,
+                            double>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         PATTERN &,
-        const unsigned int);
+        const unsigned int,
+        const AffineConstraints<double> &,
+        const bool);
+
+      template void
+      make_sparsity_pattern<deal_II_dimension,
+                            deal_II_space_dimension,
+                            PATTERN,
+                            float>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        PATTERN &,
+        const unsigned int,
+        const AffineConstraints<float> &,
+        const bool);
 #endif
     \}
   }
@@ -143,12 +157,6 @@ for (deal_II_dimension : DIMENSIONS)
       extract_inner_interface_dofs(
         const DoFHandler<deal_II_dimension> &mg_dof_handler,
         std::vector<IndexSet> &              interface_dofs);
-
-      template void
-      extract_non_interface_dofs(
-        const DoFHandler<deal_II_dimension> &           mg_dof_handler,
-        std::vector<std::set<types::global_dof_index>> &non_interface_dofs);
-
 
 #if deal_II_dimension < 3
       template void

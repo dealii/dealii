@@ -973,8 +973,12 @@ public:
 
   /**
    * Copy the nonzero entries of a full matrix into this object. Previous
-   * content is deleted. Note that the underlying sparsity pattern must be
-   * appropriate to hold the nonzero entries of the full matrix.
+   * content is deleted.
+   *
+   * Note that the underlying sparsity pattern must be appropriate to
+   * hold the nonzero entries of the full matrix. This can be achieved
+   * using that version of SparsityPattern::copy_from() that takes a
+   * FullMatrix as argument.
    */
   template <typename somenumber>
   void

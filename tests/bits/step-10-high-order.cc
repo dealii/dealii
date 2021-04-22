@@ -28,6 +28,7 @@ std::ofstream logfile("output");
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q.h>
@@ -39,7 +40,6 @@ std::ofstream logfile("output");
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 
 

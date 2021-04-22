@@ -271,16 +271,16 @@ DEAL::Generated :
 DEAL::FE_Nothing<1>()
 DEAL::Read FE_Nothing()
 DEAL::Generated :
-DEAL::FE_Nothing<1>()
+DEAL::FE_Nothing<1,2>()
 DEAL::Read FE_Nothing()
 DEAL::Generated :
 DEAL::FE_Nothing<2>()
 DEAL::Read FE_Nothing()
 DEAL::Generated :
-DEAL::FE_Nothing<1>()
+DEAL::FE_Nothing<1,3>()
 DEAL::Read FE_Nothing()
 DEAL::Generated :
-DEAL::FE_Nothing<2>()
+DEAL::FE_Nothing<2,3>()
 DEAL::Read FE_Nothing()
 DEAL::Generated :
 DEAL::FE_Nothing<3>()

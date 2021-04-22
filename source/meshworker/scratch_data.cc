@@ -37,8 +37,8 @@ namespace MeshWorker
     , neighbor_cell_update_flags(update_flags)
     , face_update_flags(face_update_flags)
     , neighbor_face_update_flags(face_update_flags)
-    , local_dof_indices(fe.dofs_per_cell)
-    , neighbor_dof_indices(fe.dofs_per_cell)
+    , local_dof_indices(fe.n_dofs_per_cell())
+    , neighbor_dof_indices(fe.n_dofs_per_cell())
   {}
 
 
@@ -61,8 +61,8 @@ namespace MeshWorker
     , neighbor_cell_update_flags(neighbor_update_flags)
     , face_update_flags(face_update_flags)
     , neighbor_face_update_flags(neighbor_face_update_flags)
-    , local_dof_indices(fe.dofs_per_cell)
-    , neighbor_dof_indices(fe.dofs_per_cell)
+    , local_dof_indices(fe.n_dofs_per_cell())
+    , neighbor_dof_indices(fe.n_dofs_per_cell())
   {}
 
 
@@ -74,7 +74,8 @@ namespace MeshWorker
     const UpdateFlags &                 update_flags,
     const Quadrature<dim - 1> &         face_quadrature,
     const UpdateFlags &                 face_update_flags)
-    : ScratchData(StaticMappingQ1<dim, spacedim>::mapping,
+    : ScratchData(fe.reference_cell()
+                    .template get_default_linear_mapping<dim, spacedim>(),
                   fe,
                   quadrature,
                   update_flags,
@@ -93,7 +94,8 @@ namespace MeshWorker
     const Quadrature<dim - 1> &         face_quadrature,
     const UpdateFlags &                 face_update_flags,
     const UpdateFlags &                 neighbor_face_update_flags)
-    : ScratchData(StaticMappingQ1<dim, spacedim>::mapping,
+    : ScratchData(fe.reference_cell()
+                    .template get_default_linear_mapping<dim, spacedim>(),
                   fe,
                   quadrature,
                   update_flags,
@@ -155,7 +157,7 @@ namespace MeshWorker
         *mapping, *fe, face_quadrature, face_update_flags);
 
     fe_face_values->reinit(cell, face_no);
-    local_dof_indices.resize(fe->dofs_per_cell);
+    local_dof_indices.resize(fe->n_dofs_per_cell());
     cell->get_dof_indices(local_dof_indices);
     current_fe_values = fe_face_values.get();
     return *fe_face_values;
@@ -176,7 +178,7 @@ namespace MeshWorker
           fe_subface_values = std::make_unique<FESubfaceValues<dim, spacedim>>(
             *mapping, *fe, face_quadrature, face_update_flags);
         fe_subface_values->reinit(cell, face_no, subface_no);
-        local_dof_indices.resize(fe->dofs_per_cell);
+        local_dof_indices.resize(fe->n_dofs_per_cell());
         cell->get_dof_indices(local_dof_indices);
 
         current_fe_values = fe_subface_values.get();
@@ -367,6 +369,15 @@ namespace MeshWorker
   template <int dim, int spacedim>
   GeneralDataStorage &
   ScratchData<dim, spacedim>::get_general_data_storage()
+  {
+    return user_data_storage;
+  }
+
+
+
+  template <int dim, int spacedim>
+  const GeneralDataStorage &
+  ScratchData<dim, spacedim>::get_general_data_storage() const
   {
     return user_data_storage;
   }

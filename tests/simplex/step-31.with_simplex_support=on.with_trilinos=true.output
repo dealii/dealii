@@ -1,0 +1,45 @@
+
+DEAL::Number of active cells: 2048 (on 5 levels)
+DEAL::Number of degrees of freedom: 13764 (8450+1089+4225)
+DEAL::
+DEAL::Timestep 0:  t=0.00000
+DEAL::   Assembling...
+DEAL::   Rebuilding Stokes preconditioner...
+DEAL::   Solving...
+DEAL::   0 GMRES iterations for Stokes subsystem.
+DEAL::   Time step: 0.459559
+DEAL::   9 CG iterations for temperature.
+DEAL::   Temperature range: -0.141015 0.586975
+DEAL::
+DEAL::Timestep 1:  t=0.459559
+DEAL::   Assembling...
+DEAL::   Solving...
+DEAL::   24 GMRES iterations for Stokes subsystem.
+DEAL::   Time step: 0.459559
+DEAL::   9 CG iterations for temperature.
+DEAL::   Temperature range: -0.301941 1.17152
+DEAL::
+DEAL::Timestep 2:  t=0.919118
+DEAL::   Assembling...
+DEAL::   Solving...
+DEAL::   23 GMRES iterations for Stokes subsystem.
+DEAL::   Time step: 0.459559
+DEAL::   9 CG iterations for temperature.
+DEAL::   Temperature range: -0.467381 1.71946
+DEAL::
+DEAL::Timestep 3:  t=1.37868
+DEAL::   Assembling...
+DEAL::   Solving...
+DEAL::   23 GMRES iterations for Stokes subsystem.
+DEAL::   Time step: 0.459559
+DEAL::   9 CG iterations for temperature.
+DEAL::   Temperature range: -0.612772 2.18114
+DEAL::
+DEAL::Timestep 4:  t=1.83824
+DEAL::   Assembling...
+DEAL::   Solving...
+DEAL::   22 GMRES iterations for Stokes subsystem.
+DEAL::   Time step: 0.459559
+DEAL::   9 CG iterations for temperature.
+DEAL::   Temperature range: -0.705842 2.76592
+DEAL::

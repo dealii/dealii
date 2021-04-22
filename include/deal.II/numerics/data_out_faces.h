@@ -179,7 +179,7 @@ public:
    * deformation of each vertex.
    *
    * @todo The @p mapping argument should be replaced by a
-   * hp::MappingCollection in case of a hp::DoFHandler.
+   * hp::MappingCollection in case of a DoFHandler with hp-capabilities.
    */
   virtual void
   build_patches(const Mapping<dimension> &mapping,
@@ -249,6 +249,18 @@ private:
       &                                                 data,
     DataOutBase::Patch<dimension - 1, space_dimension> &patch);
 };
+
+namespace Legacy
+{
+  /**
+   * The template arguments of the original dealii::DataOutFaces class will
+   * change in a future release. If for some reason, you need a code that is
+   * compatible with deal.II 9.3 and the subsequent release, use this alias
+   * instead.
+   */
+  template <int dim, typename DoFHandlerType = DoFHandler<dim>>
+  using DataOutFaces = dealii::DataOutFaces<dim, DoFHandlerType>;
+} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE

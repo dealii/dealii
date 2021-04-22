@@ -131,7 +131,9 @@ struct CellData
   operator==(const CellData<structdim> &other) const;
 
   /**
-   * Boost serialization function
+   * Read or write the data of this object to or from a stream for the
+   * purpose of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -279,7 +281,9 @@ namespace TriangulationDescription
   struct CellData
   {
     /**
-     * Boost serialization function
+     * Read or write the data of this object to or from a stream for the
+     * purpose of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
      */
     template <class Archive>
     void
@@ -342,7 +346,9 @@ namespace TriangulationDescription
   struct Description
   {
     /**
-     * Boost serialization function
+     * Read or write the data of this object to or from a stream for the
+     * purpose of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
      */
     template <class Archive>
     void
@@ -435,7 +441,7 @@ namespace TriangulationDescription
     Description<dim, spacedim>
     create_description_from_triangulation(
       const dealii::Triangulation<dim, spacedim> &tria,
-      const MPI_Comm                              comm,
+      const MPI_Comm &                            comm,
       const TriangulationDescription::Settings    settings =
         TriangulationDescription::Settings::default_setting,
       const unsigned int my_rank_in = numbers::invalid_unsigned_int);
@@ -475,9 +481,9 @@ namespace TriangulationDescription
       const std::function<void(dealii::Triangulation<dim, spacedim> &)>
         &                                            serial_grid_generator,
       const std::function<void(dealii::Triangulation<dim, spacedim> &,
-                               const MPI_Comm,
+                               const MPI_Comm &,
                                const unsigned int)> &serial_grid_partitioner,
-      const MPI_Comm                                 comm,
+      const MPI_Comm &                               comm,
       const int                                      group_size = 1,
       const typename Triangulation<dim, spacedim>::MeshSmoothing smoothing =
         dealii::Triangulation<dim, spacedim>::none,

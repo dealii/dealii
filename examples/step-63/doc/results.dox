@@ -549,6 +549,3 @@ longer influences convergence speed.
 The code is set up to work correctly with an adaptively refined mesh (the
 interface matrices are created and set). Devise a suitable refinement
 criterium or try the KellyErrorEstimator class.
-
-
-

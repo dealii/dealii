@@ -1543,7 +1543,8 @@ public:
 
   /**
    * Write the data of this object to a stream for the purpose of
-   * serialization.
+   * serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -1551,7 +1552,8 @@ public:
 
   /**
    * Read the data of this object from a stream for the purpose of
-   * serialization.
+   * serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -1560,7 +1562,8 @@ public:
 #ifdef DOXYGEN
   /**
    * Write and read the data of this object from a stream for the purpose
-   * of serialization.
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -2330,8 +2333,8 @@ ParameterHandler::add_parameter(const std::string &          entry,
                 "that is const. Use a non-const type.");
 
   declare_entry(entry,
-                Patterns::Tools::Convert<ParameterType>::to_string(
-                  parameter, pattern.clone()),
+                Patterns::Tools::Convert<ParameterType>::to_string(parameter,
+                                                                   pattern),
                 pattern,
                 documentation,
                 has_to_be_set);
@@ -2342,7 +2345,7 @@ ParameterHandler::add_parameter(const std::string &          entry,
 
   auto action = [&, pattern_index](const std::string &val) {
     parameter = Patterns::Tools::Convert<ParameterType>::to_value(
-      val, patterns[pattern_index]->clone());
+      val, *patterns[pattern_index]);
   };
   add_action(entry, action);
 }

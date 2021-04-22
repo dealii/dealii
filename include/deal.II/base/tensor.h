@@ -338,7 +338,8 @@ public:
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
-   * of serialization
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -494,13 +495,7 @@ public:
    * @note This function can also be used in CUDA device code.
    */
   constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
-                                  Tensor()
-#ifdef DEAL_II_MSVC
-    : values{}
-  {}
-#else
-    = default;
-#endif
+                                  Tensor();
 
   /**
    * A constructor where the data is copied from a C-style array.
@@ -753,7 +748,8 @@ public:
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
-   * of serialization
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -1165,6 +1161,17 @@ constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
 }
 
 
+
+template <int rank_, int dim, typename Number>
+constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
+                                Tensor<rank_, dim, Number>::Tensor()
+  // We would like to use =default, but this causes compile errors with some
+  // MSVC versions and internal compiler errors with -O1 in gcc 5.4.
+  : values{}
+{}
+
+
+
 template <int rank_, int dim, typename Number>
 constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
                                 Tensor<rank_, dim, Number>::Tensor(const array_type &initializer)
@@ -1282,7 +1289,9 @@ constexpr DEAL_II_ALWAYS_INLINE
     DEAL_II_CUDA_HOST_DEV const typename Tensor<rank_, dim, Number>::value_type &
     Tensor<rank_, dim, Number>::operator[](const unsigned int i) const
 {
+#  ifndef DEAL_II_COMPILER_CUDA_AWARE
   AssertIndexRange(i, dim);
+#  endif
 
   return values[i];
 }
@@ -1293,8 +1302,10 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE const Number &
                                                      Tensor<rank_, dim, Number>::
                                                      operator[](const TableIndices<rank_> &indices) const
 {
+#  ifndef DEAL_II_COMPILER_CUDA_AWARE
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
+#  endif
 
   return TensorAccessors::extract<rank_>(*this, indices);
 }
@@ -1305,8 +1316,10 @@ template <int rank_, int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number &
   Tensor<rank_, dim, Number>::operator[](const TableIndices<rank_> &indices)
 {
+#  ifndef DEAL_II_COMPILER_CUDA_AWARE
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
+#  endif
 
   return TensorAccessors::extract<rank_>(*this, indices);
 }
@@ -1368,8 +1381,7 @@ template <int rank_, int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number> &
 Tensor<rank_, dim, Number>::operator=(const Number &d)
 {
-  Assert(numbers::value_is_zero(d),
-         ExcMessage("Only assignment with zero is allowed"));
+  Assert(numbers::value_is_zero(d), ExcScalarAssignmentOnlyForZeroValue());
   (void)d;
 
   for (unsigned int i = 0; i < dim; ++i)
@@ -2494,6 +2506,38 @@ constexpr DEAL_II_ALWAYS_INLINE Number
   return t[0][0];
 }
 
+/**
+ * Specialization for dim==2.
+ *
+ * @relatesalso Tensor
+ */
+template <typename Number>
+constexpr DEAL_II_ALWAYS_INLINE Number
+                                determinant(const Tensor<2, 2, Number> &t)
+{
+  // hard-coded for efficiency reasons
+  return t[0][0] * t[1][1] - t[1][0] * t[0][1];
+}
+
+/**
+ * Specialization for dim==3.
+ *
+ * @relatesalso Tensor
+ */
+template <typename Number>
+constexpr DEAL_II_ALWAYS_INLINE Number
+                                determinant(const Tensor<2, 3, Number> &t)
+{
+  // hard-coded for efficiency reasons
+  const Number C0 = internal::NumberType<Number>::value(t[1][1] * t[2][2]) -
+                    internal::NumberType<Number>::value(t[1][2] * t[2][1]);
+  const Number C1 = internal::NumberType<Number>::value(t[1][2] * t[2][0]) -
+                    internal::NumberType<Number>::value(t[1][0] * t[2][2]);
+  const Number C2 = internal::NumberType<Number>::value(t[1][0] * t[2][1]) -
+                    internal::NumberType<Number>::value(t[1][1] * t[2][0]);
+  return t[0][0] * C0 + t[0][1] * C1 + t[0][2] * C2;
+}
+
 
 /**
  * Compute and return the trace of a tensor of rank 2, i.e. the sum of its
@@ -2555,8 +2599,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Tensor<2, 2, Number>
 {
   Tensor<2, 2, Number> return_tensor;
 
-  // this is Maple output,
-  // thus a bit unstructured
   const Number inv_det_t = internal::NumberType<Number>::value(
     1.0 / (t[0][0] * t[1][1] - t[1][0] * t[0][1]));
   return_tensor[0][0] = t[1][1];
@@ -2575,15 +2617,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Tensor<2, 3, Number>
 {
   Tensor<2, 3, Number> return_tensor;
 
-  const Number t4  = internal::NumberType<Number>::value(t[0][0] * t[1][1]),
-               t6  = internal::NumberType<Number>::value(t[0][0] * t[1][2]),
-               t8  = internal::NumberType<Number>::value(t[0][1] * t[1][0]),
-               t00 = internal::NumberType<Number>::value(t[0][2] * t[1][0]),
-               t01 = internal::NumberType<Number>::value(t[0][1] * t[2][0]),
-               t04 = internal::NumberType<Number>::value(t[0][2] * t[2][0]),
-               inv_det_t = internal::NumberType<Number>::value(
-                 1.0 / (t4 * t[2][2] - t6 * t[2][1] - t8 * t[2][2] +
-                        t00 * t[2][1] + t01 * t[1][2] - t04 * t[1][1]));
   return_tensor[0][0] = internal::NumberType<Number>::value(t[1][1] * t[2][2]) -
                         internal::NumberType<Number>::value(t[1][2] * t[2][1]);
   return_tensor[0][1] = internal::NumberType<Number>::value(t[0][2] * t[2][1]) -
@@ -2592,14 +2625,19 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Tensor<2, 3, Number>
                         internal::NumberType<Number>::value(t[0][2] * t[1][1]);
   return_tensor[1][0] = internal::NumberType<Number>::value(t[1][2] * t[2][0]) -
                         internal::NumberType<Number>::value(t[1][0] * t[2][2]);
-  return_tensor[1][1] =
-    internal::NumberType<Number>::value(t[0][0] * t[2][2]) - t04;
-  return_tensor[1][2] = t00 - t6;
+  return_tensor[1][1] = internal::NumberType<Number>::value(t[0][0] * t[2][2]) -
+                        internal::NumberType<Number>::value(t[0][2] * t[2][0]);
+  return_tensor[1][2] = internal::NumberType<Number>::value(t[0][2] * t[1][0]) -
+                        internal::NumberType<Number>::value(t[0][0] * t[1][2]);
   return_tensor[2][0] = internal::NumberType<Number>::value(t[1][0] * t[2][1]) -
                         internal::NumberType<Number>::value(t[1][1] * t[2][0]);
-  return_tensor[2][1] =
-    t01 - internal::NumberType<Number>::value(t[0][0] * t[2][1]);
-  return_tensor[2][2] = internal::NumberType<Number>::value(t4 - t8);
+  return_tensor[2][1] = internal::NumberType<Number>::value(t[0][1] * t[2][0]) -
+                        internal::NumberType<Number>::value(t[0][0] * t[2][1]);
+  return_tensor[2][2] = internal::NumberType<Number>::value(t[0][0] * t[1][1]) -
+                        internal::NumberType<Number>::value(t[0][1] * t[1][0]);
+  const Number inv_det_t = internal::NumberType<Number>::value(
+    1.0 / (t[0][0] * return_tensor[0][0] + t[0][1] * return_tensor[1][0] +
+           t[0][2] * return_tensor[2][0]));
   return_tensor *= inv_det_t;
 
   return return_tensor;

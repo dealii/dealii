@@ -106,7 +106,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Note that the template parameters to this class have to be given as
  * <tt>InterGridMap<DoFHandler<2> ></tt>, which here is DoFHandler (and could
- * equally well be Triangulation, PersistentTriangulation, or hp::DoFHandler).
+ * equally well be Triangulation or PersistentTriangulation).
  *
  * @ingroup grid
  */

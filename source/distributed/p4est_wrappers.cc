@@ -380,6 +380,19 @@ namespace internal
       types<2>::topidx num_corners,
       types<2>::topidx num_vtt) = p4est_connectivity_new;
 
+    types<2>::connectivity *(&functions<2>::connectivity_new_copy)(
+      types<2>::topidx        num_vertices,
+      types<2>::topidx        num_trees,
+      types<2>::topidx        num_corners,
+      const double *          vertices,
+      const types<2>::topidx *ttv,
+      const types<2>::topidx *ttt,
+      const int8_t *          ttf,
+      const types<2>::topidx *ttc,
+      const types<2>::topidx *coff,
+      const types<2>::topidx *ctt,
+      const int8_t *          ctc) = p4est_connectivity_new_copy;
+
     void (&functions<2>::connectivity_join_faces)(types<2>::connectivity *conn,
                                                   types<2>::topidx tree_left,
                                                   types<2>::topidx tree_right,
@@ -400,6 +413,9 @@ namespace internal
       std::size_t             data_size,
       p4est_init_t            init_fn,
       void *                  user_pointer) = p4est_new_ext;
+
+    types<2>::forest *(&functions<2>::copy_forest)(types<2>::forest *input,
+                                                   int copy_data) = p4est_copy;
 
     void (&functions<2>::destroy)(types<2>::forest *p4est) = p4est_destroy;
 
@@ -567,6 +583,24 @@ namespace internal
       types<3>::topidx num_corners,
       types<3>::topidx num_ctt) = p8est_connectivity_new;
 
+    types<3>::connectivity *(&functions<3>::connectivity_new_copy)(
+      types<3>::topidx        num_vertices,
+      types<3>::topidx        num_trees,
+      types<3>::topidx        num_edges,
+      types<3>::topidx        num_corners,
+      const double *          vertices,
+      const types<3>::topidx *ttv,
+      const types<3>::topidx *ttt,
+      const int8_t *          ttf,
+      const types<3>::topidx *tte,
+      const types<3>::topidx *eoff,
+      const types<3>::topidx *ett,
+      const int8_t *          ete,
+      const types<3>::topidx *ttc,
+      const types<3>::topidx *coff,
+      const types<3>::topidx *ctt,
+      const int8_t *          ctc) = p8est_connectivity_new_copy;
+
     void (&functions<3>::connectivity_destroy)(
       p8est_connectivity_t *connectivity) = p8est_connectivity_destroy;
 
@@ -587,6 +621,9 @@ namespace internal
       std::size_t             data_size,
       p8est_init_t            init_fn,
       void *                  user_pointer) = p8est_new_ext;
+
+    types<3>::forest *(&functions<3>::copy_forest)(types<3>::forest *input,
+                                                   int copy_data) = p8est_copy;
 
     void (&functions<3>::destroy)(types<3>::forest *p8est) = p8est_destroy;
 
@@ -781,6 +818,51 @@ namespace internal
              ExcInternalError());
       return ((coarse_grid_cell >= parallel_forest->first_local_tree) &&
               (coarse_grid_cell <= parallel_forest->last_local_tree));
+    }
+
+
+
+    // template specializations
+
+    template <>
+    typename types<2>::connectivity *
+    copy_connectivity<2>(const typename types<2>::connectivity *connectivity)
+    {
+      return functions<2>::connectivity_new_copy(
+        connectivity->num_vertices,
+        connectivity->num_trees,
+        connectivity->num_corners,
+        connectivity->vertices,
+        connectivity->tree_to_vertex,
+        connectivity->tree_to_tree,
+        connectivity->tree_to_face,
+        connectivity->tree_to_corner,
+        connectivity->ctt_offset,
+        connectivity->corner_to_tree,
+        connectivity->corner_to_corner);
+    }
+
+    template <>
+    typename types<3>::connectivity *
+    copy_connectivity<3>(const typename types<3>::connectivity *connectivity)
+    {
+      return functions<3>::connectivity_new_copy(
+        connectivity->num_vertices,
+        connectivity->num_trees,
+        connectivity->num_edges,
+        connectivity->num_corners,
+        connectivity->vertices,
+        connectivity->tree_to_vertex,
+        connectivity->tree_to_tree,
+        connectivity->tree_to_face,
+        connectivity->tree_to_edge,
+        connectivity->ett_offset,
+        connectivity->edge_to_tree,
+        connectivity->edge_to_edge,
+        connectivity->tree_to_corner,
+        connectivity->ctt_offset,
+        connectivity->corner_to_tree,
+        connectivity->corner_to_corner);
     }
 
 

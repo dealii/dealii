@@ -474,7 +474,7 @@ namespace StokesClass
   StokesOperator<dim, degree_v, number>::evaluate_2_x_viscosity(
     const Viscosity<dim> &viscosity_function)
   {
-    const unsigned int n_cells = this->data->n_macro_cells();
+    const unsigned int n_cells = this->data->n_cell_batches();
     FEEvaluation<dim, degree_v, degree_v + 1, dim, number> velocity(*this->data,
                                                                     0);
     viscosity_x_2.reinit(n_cells, velocity.n_q_points);
@@ -506,7 +506,7 @@ namespace StokesClass
     const LinearAlgebra::distributed::BlockVector<number> &src,
     const std::pair<unsigned int, unsigned int> &          cell_range) const
   {
-    typedef VectorizedArray<number>                          vector_t;
+    using vector_t = VectorizedArray<number>;
     FEEvaluation<dim, degree_v, degree_v + 1, dim, number>   velocity(data, 0);
     FEEvaluation<dim, degree_v - 1, degree_v + 1, 1, number> pressure(data, 1);
 
@@ -609,7 +609,7 @@ namespace StokesClass
   MassMatrixOperator<dim, degree_p, number>::evaluate_1_over_viscosity(
     const Viscosity<dim> &viscosity_function)
   {
-    const unsigned int n_cells = this->data->n_macro_cells();
+    const unsigned int n_cells = this->data->n_cell_batches();
     FEEvaluation<dim, degree_p, degree_p + 2, 1, number> pressure(*this->data,
                                                                   0);
     one_over_viscosity.reinit(n_cells, pressure.n_q_points);
@@ -643,7 +643,7 @@ namespace StokesClass
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
-        AssertDimension(one_over_viscosity.size(0), data.n_macro_cells());
+        AssertDimension(one_over_viscosity.size(0), data.n_cell_batches());
         AssertDimension(one_over_viscosity.size(1), pressure.n_q_points);
 
         pressure.reinit(cell);
@@ -787,7 +787,7 @@ namespace StokesClass
   ABlockOperator<dim, degree_v, number>::evaluate_2_x_viscosity(
     const Viscosity<dim> &viscosity_function)
   {
-    const unsigned int n_cells = this->data->n_macro_cells();
+    const unsigned int n_cells = this->data->n_cell_batches();
     FEEvaluation<dim, degree_v, degree_v + 1, dim, number> velocity(*this->data,
                                                                     0);
     viscosity_x_2.reinit(n_cells, velocity.n_q_points);
@@ -823,7 +823,7 @@ namespace StokesClass
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
-        AssertDimension(viscosity_x_2.size(0), data.n_macro_cells());
+        AssertDimension(viscosity_x_2.size(0), data.n_cell_batches());
         AssertDimension(viscosity_x_2.size(1), velocity.n_q_points);
 
         velocity.reinit(cell);
@@ -934,12 +934,12 @@ namespace StokesClass
     void
     solve();
 
-    typedef LinearAlgebra::distributed::Vector<double>      vector_t;
-    typedef LinearAlgebra::distributed::BlockVector<double> block_vector_t;
+    using vector_t       = LinearAlgebra::distributed::Vector<double>;
+    using block_vector_t = LinearAlgebra::distributed::BlockVector<double>;
 
-    typedef StokesOperator<dim, velocity_degree, double> StokesMatrixType;
-    typedef MassMatrixOperator<dim, velocity_degree - 1, double> MassMatrixType;
-    typedef ABlockOperator<dim, velocity_degree, double> LevelMatrixType;
+    using StokesMatrixType = StokesOperator<dim, velocity_degree, double>;
+    using MassMatrixType = MassMatrixOperator<dim, velocity_degree - 1, double>;
+    using LevelMatrixType = ABlockOperator<dim, velocity_degree, double>;
 
     unsigned int degree_u;
 
@@ -1210,7 +1210,7 @@ namespace StokesClass
       pressure(*stokes_matrix.get_matrix_free(), 1);
 
     for (unsigned int cell = 0;
-         cell < stokes_matrix.get_matrix_free()->n_macro_cells();
+         cell < stokes_matrix.get_matrix_free()->n_cell_batches();
          ++cell)
       {
         velocity.reinit(cell);
@@ -1270,7 +1270,7 @@ namespace StokesClass
                                        false,
                                        false);
 
-    typedef MGTransferMatrixFree<dim, double> Transfer;
+    using Transfer = MGTransferMatrixFree<dim, double>;
 
     Transfer mg_transfer(mg_constrained_dofs);
     mg_transfer.initialize_constraints(mg_constrained_dofs);
@@ -1288,9 +1288,9 @@ namespace StokesClass
       mg_coarse;
     mg_coarse.initialize(coarse_solver, coarse_matrix, coarse_prec_identity);
 
-    typedef PreconditionChebyshev<LevelMatrixType, vector_t> SmootherType;
-    mg::SmootherRelaxation<SmootherType, vector_t>           mg_smoother;
-    MGLevelObject<typename SmootherType::AdditionalData>     smoother_data;
+    using SmootherType = PreconditionChebyshev<LevelMatrixType, vector_t>;
+    mg::SmootherRelaxation<SmootherType, vector_t>       mg_smoother;
+    MGLevelObject<typename SmootherType::AdditionalData> smoother_data;
     smoother_data.resize(0, triangulation.n_global_levels() - 1);
     for (unsigned int level = 0; level < triangulation.n_global_levels();
          ++level)
@@ -1331,16 +1331,16 @@ namespace StokesClass
                                                    mg,
                                                    mg_transfer);
 
-    typedef PreconditionChebyshev<MassMatrixType, vector_t> MassPrec;
-    MassPrec                                                prec_S;
-    typename MassPrec::AdditionalData                       prec_S_data;
+    using MassPrec = PreconditionChebyshev<MassMatrixType, vector_t>;
+    MassPrec                          prec_S;
+    typename MassPrec::AdditionalData prec_S_data;
     prec_S_data.smoothing_range     = 1e-3;
     prec_S_data.degree              = numbers::invalid_unsigned_int;
     prec_S_data.eig_cg_n_iterations = mass_matrix.m();
     prec_S_data.preconditioner      = mass_matrix.get_matrix_diagonal_inverse();
     prec_S.initialize(mass_matrix, prec_S_data);
 
-    typedef PreconditionMG<dim, vector_t, Transfer> A_prec_type;
+    using A_prec_type = PreconditionMG<dim, vector_t, Transfer>;
 
     // create a cheap preconditioner that consists of only a single V-cycle
     const StokesSolver::BlockSchurPreconditioner<StokesMatrixType,

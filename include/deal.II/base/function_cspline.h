@@ -103,8 +103,11 @@ namespace Functions
     laplacian(const Point<dim> & p,
               const unsigned int component = 0) const override;
 
-    std::size_t
-    memory_consumption() const;
+    /**
+     * Return an estimate for the memory consumption, in bytes, of this object.
+     */
+    virtual std::size_t
+    memory_consumption() const override;
 
   private:
     /**

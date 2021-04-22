@@ -263,3 +263,38 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
 #endif
     \}
   }
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+    namespace GridGenerator
+    \{
+#if deal_II_dimension <= deal_II_space_dimension
+      template void
+      reference_cell<deal_II_dimension, deal_II_space_dimension>(
+        const ReferenceCell &,
+        Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+
+      template void
+      convert_hypercube_to_simplex_mesh(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+        Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+#endif
+    \}
+  }
+
+for (deal_II_dimension : DIMENSIONS)
+  {
+    template void GridGenerator::subdivided_hyper_rectangle_with_simplices(
+      Triangulation<deal_II_dimension> & tria,
+      const std::vector<unsigned int> &repetitions,
+      const Point<deal_II_dimension> & p1,
+      const Point<deal_II_dimension> & p2,
+      const bool                       colorize);
+
+    template void GridGenerator::subdivided_hyper_cube_with_simplices(
+      Triangulation<deal_II_dimension> & tria,
+      const unsigned int repetitions,
+      const double       p1,
+      const double       p2,
+      const bool         colorize);
+  }

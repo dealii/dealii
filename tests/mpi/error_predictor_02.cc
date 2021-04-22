@@ -22,17 +22,16 @@
 #include <deal.II/distributed/error_predictor.h>
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
 
-#include <deal.II/grid/grid_generator.h>
-
-#include <deal.II/hp/dof_handler.h>
-
 #include <deal.II/lac/vector.h>
 
 #include "../tests.h"
+
+#include "../test_grids.h"
 
 
 template <int dim>
@@ -41,19 +40,9 @@ test()
 {
   const unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
-  const unsigned int n_cells = 4;
-
   // ------ setup ------
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
-  std::vector<unsigned int>                 rep(dim, 1);
-  rep[0] = n_cells;
-  Point<dim> p1, p2;
-  for (unsigned int d = 0; d < dim; ++d)
-    {
-      p1[d] = 0;
-      p2[d] = (d == 0) ? n_cells : 1;
-    }
-  GridGenerator::subdivided_hyper_rectangle(tria, rep, p1, p2);
+  TestGrids::hyper_line(tria, 4);
 
   for (auto cell = tria.begin(0); cell != tria.end(0); ++cell)
     if (cell->id().to_string() == "0_0:" || cell->id().to_string() == "1_0:")
@@ -64,11 +53,10 @@ test()
   for (unsigned int d = 1; d <= 3; ++d)
     fes.push_back(FE_Q<dim>(d));
 
-  hp::DoFHandler<dim> dh(tria);
-  dh.set_fe(fes);
+  DoFHandler<dim> dh(tria);
   for (const auto &cell : dh.active_cell_iterators())
     {
-      // set active fe index
+      // set active FE index
       if (cell->is_locally_owned())
         cell->set_active_fe_index(1);
     }
@@ -114,6 +102,7 @@ test()
             }
         }
     }
+  dh.distribute_dofs(fes);
 
   // ----- prepare error indicators -----
   Vector<float> error_indicators(tria.n_active_cells());

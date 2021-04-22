@@ -158,18 +158,18 @@ namespace FETools
           // hanging node constraints. Consequently, when the elements are
           // continuous no hanging node constraints are allowed.
           const bool hanging_nodes_not_allowed =
-            ((cell2->get_fe().dofs_per_vertex != 0) &&
+            ((cell2->get_fe().n_dofs_per_vertex() != 0) &&
              (constraints.n_constraints() == 0));
 
           if (hanging_nodes_not_allowed)
-            for (const unsigned int face : GeometryInfo<dim>::face_indices())
+            for (const unsigned int face : cell1->face_indices())
               Assert(cell1->at_boundary(face) ||
                        cell1->neighbor(face)->level() == cell1->level(),
                      ExcHangingNodesNotAllowed());
 #endif
 
-          const unsigned int dofs_per_cell1 = cell1->get_fe().dofs_per_cell;
-          const unsigned int dofs_per_cell2 = cell2->get_fe().dofs_per_cell;
+          const unsigned int dofs_per_cell1 = cell1->get_fe().n_dofs_per_cell();
+          const unsigned int dofs_per_cell2 = cell2->get_fe().n_dofs_per_cell();
           u1_local.reinit(dofs_per_cell1);
           u2_local.reinit(dofs_per_cell2);
 
@@ -297,7 +297,7 @@ namespace FETools
       cell = dof1.begin_active(),
       endc = dof1.end();
 
-    // map from possible fe objects in
+    // map from possible FE objects in
     // dof1 to the back_interpolation
     // matrices
     std::map<const FiniteElement<dim> *, std::unique_ptr<FullMatrix<double>>>
@@ -312,16 +312,17 @@ namespace FETools
           // hanging node constraints. Consequently, when the elements are
           // continuous no hanging node constraints are allowed.
           const bool hanging_nodes_not_allowed =
-            (cell->get_fe().dofs_per_vertex != 0) || (fe2.dofs_per_vertex != 0);
+            (cell->get_fe().n_dofs_per_vertex() != 0) ||
+            (fe2.n_dofs_per_vertex() != 0);
 
           if (hanging_nodes_not_allowed)
-            for (const unsigned int face : GeometryInfo<dim>::face_indices())
+            for (const unsigned int face : cell->face_indices())
               Assert(cell->at_boundary(face) ||
                        cell->neighbor(face)->level() == cell->level(),
                      ExcHangingNodesNotAllowed());
 #endif
 
-          const unsigned int dofs_per_cell1 = cell->get_fe().dofs_per_cell;
+          const unsigned int dofs_per_cell1 = cell->get_fe().n_dofs_per_cell();
 
           // make sure back_interpolation matrix is available
           if (interpolation_matrices[&cell->get_fe()] == nullptr)
@@ -569,8 +570,8 @@ namespace FETools
   {
     // For discontinuous elements without constraints take the simpler version
     // of the back_interpolate function.
-    if (dof1.get_fe().dofs_per_vertex == 0 &&
-        dof2.get_fe().dofs_per_vertex == 0 &&
+    if (dof1.get_fe().n_dofs_per_vertex() == 0 &&
+        dof2.get_fe().n_dofs_per_vertex() == 0 &&
         constraints1.n_constraints() == 0 && constraints2.n_constraints() == 0)
       back_interpolate(dof1, u1, dof2.get_fe(), u1_interpolated);
     else
@@ -621,7 +622,7 @@ namespace FETools
                       " index sets."));
 #endif
 
-    const unsigned int dofs_per_cell = dof1.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof1.get_fe().n_dofs_per_cell();
 
     Vector<typename OutVector::value_type> u1_local(dofs_per_cell);
     Vector<typename OutVector::value_type> u1_diff_local(dofs_per_cell);
@@ -645,10 +646,11 @@ namespace FETools
           // hanging node constraints. Consequently, when the elements are
           // continuous no hanging node constraints are allowed.
           const bool hanging_nodes_not_allowed =
-            (dof1.get_fe().dofs_per_vertex != 0) || (fe2.dofs_per_vertex != 0);
+            (dof1.get_fe().n_dofs_per_vertex() != 0) ||
+            (fe2.n_dofs_per_vertex() != 0);
 
           if (hanging_nodes_not_allowed)
-            for (const unsigned int face : GeometryInfo<dim>::face_indices())
+            for (const unsigned int face : cell->face_indices())
               Assert(cell->at_boundary(face) ||
                        cell->neighbor(face)->level() == cell->level(),
                      ExcHangingNodesNotAllowed());
@@ -730,8 +732,8 @@ namespace FETools
     // without constraints take the
     // cheaper version of the
     // interpolation_difference function.
-    if (dof1.get_fe().dofs_per_vertex == 0 &&
-        dof2.get_fe().dofs_per_vertex == 0 &&
+    if (dof1.get_fe().n_dofs_per_vertex() == 0 &&
+        dof2.get_fe().n_dofs_per_vertex() == 0 &&
         constraints1.n_constraints() == 0 && constraints2.n_constraints() == 0)
       interpolation_difference(dof1, u1, dof2.get_fe(), u1_difference);
     else
@@ -766,8 +768,8 @@ namespace FETools
       dof2.begin_active();
     typename DoFHandler<dim, spacedim>::active_cell_iterator end = dof2.end();
 
-    const unsigned int n1 = dof1.get_fe().dofs_per_cell;
-    const unsigned int n2 = dof2.get_fe().dofs_per_cell;
+    const unsigned int n1 = dof1.get_fe().n_dofs_per_cell();
+    const unsigned int n2 = dof2.get_fe().n_dofs_per_cell();
 
     Vector<typename OutVector::value_type> u1_local(n1);
     Vector<typename OutVector::value_type> u2_local(n2);

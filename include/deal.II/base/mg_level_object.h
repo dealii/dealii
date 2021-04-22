@@ -65,8 +65,19 @@ public:
    *   for level objects.
    * @param[in] maxlevel The highest level for which to provision memory
    *   for level objects.
+   * @param[in] args Optional arguments passed to the constructor of the
+   *   underlying object.
    *
    * @pre minlevel <= maxlevel
+   */
+  template <class... Args>
+  MGLevelObject(const unsigned int minlevel,
+                const unsigned int maxlevel,
+                Args &&... args);
+
+  /**
+   * Constructor. Same as above but without arguments to be forwarded to the
+   * constructor of the underlying object.
    */
   MGLevelObject(const unsigned int minlevel = 0,
                 const unsigned int maxlevel = 0);
@@ -92,11 +103,16 @@ public:
    *   for level objects.
    * @param[in] new_maxlevel The highest level for which to provision memory
    *   for level objects.
+   * @param[in] args Optional arguments passed to the constructor of the
+   *   underlying object.
    *
    * @pre minlevel <= maxlevel
    */
+  template <class... Args>
   void
-  resize(const unsigned int new_minlevel, const unsigned int new_maxlevel);
+  resize(const unsigned int new_minlevel,
+         const unsigned int new_maxlevel,
+         Args &&... args);
 
   /**
    * Call <tt>operator = (s)</tt> on all objects stored by this object.
@@ -167,6 +183,17 @@ private:
 
 
 template <class Object>
+template <class... Args>
+MGLevelObject<Object>::MGLevelObject(const unsigned int min,
+                                     const unsigned int max,
+                                     Args &&... args)
+  : minlevel(0)
+{
+  resize(min, max, std::forward<Args>(args)...);
+}
+
+
+template <class Object>
 MGLevelObject<Object>::MGLevelObject(const unsigned int min,
                                      const unsigned int max)
   : minlevel(0)
@@ -194,9 +221,11 @@ const Object &MGLevelObject<Object>::operator[](const unsigned int i) const
 
 
 template <class Object>
+template <class... Args>
 void
 MGLevelObject<Object>::resize(const unsigned int new_minlevel,
-                              const unsigned int new_maxlevel)
+                              const unsigned int new_maxlevel,
+                              Args &&... args)
 {
   Assert(new_minlevel <= new_maxlevel, ExcInternalError());
   // note that on clear(), the
@@ -207,7 +236,7 @@ MGLevelObject<Object>::resize(const unsigned int new_minlevel,
 
   minlevel = new_minlevel;
   for (unsigned int i = 0; i < new_maxlevel - new_minlevel + 1; ++i)
-    objects.push_back(std::make_shared<Object>());
+    objects.push_back(std::make_shared<Object>(std::forward<Args>(args)...));
 }
 
 

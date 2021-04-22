@@ -1412,9 +1412,7 @@ namespace Differentiation
      *       ad_helper.register_dof_values(solution, local_dof_indices);
      *
      *       // Then we get the complete set of degree of freedom values as
-     *       // represented by auto-differentiable numbers. The operations
-     *       // performed with these variables are tracked by the AD library
-     *       // from this point until stop_recording_operations() is called.
+     *       // represented by auto-differentiable numbers.
      *       const std::vector<ADNumberType> dof_values_ad
      *         = ad_helper.get_sensitive_dof_values();
      *
@@ -2387,11 +2385,12 @@ namespace Differentiation
         using ExtractorType = FEValuesExtractors::SymmetricTensor<2>;
         const IndexType n_components =
           internal::Extractor<dim, ExtractorType>::n_components;
+        const IndexType comp_first =
+          internal::Extractor<dim, ExtractorType>::first_component(
+            extractor_symm_tensor);
+
         if (ignore_symmetries == true)
           {
-            const IndexType comp_first =
-              internal::Extractor<dim, ExtractorType>::first_component(
-                extractor_symm_tensor);
             std::vector<IndexType> indices(n_components);
             std::iota(indices.begin(), indices.end(), comp_first);
             return indices;
@@ -2408,14 +2407,19 @@ namespace Differentiation
             // from the symmetric tensor
             for (unsigned int i = 0; i < indices.size(); ++i)
               {
-                if (indices[i] >= n_components)
+                // The indices stored in the vector start with the extractor's
+                // first_component_index. We need to account for this when
+                // retrieving the tensor (local) index.
+                const IndexType local_index_i = indices[i] - comp_first;
+                if (local_index_i >= n_components)
                   {
                     const TableIndices<2> ti_tensor =
-                      Tensor<2, dim>::unrolled_to_component_indices(indices[i]);
+                      Tensor<2, dim>::unrolled_to_component_indices(
+                        local_index_i);
                     const IndexType sti_new_index =
                       SymmetricTensor<2, dim>::component_to_unrolled_index(
                         ti_tensor);
-                    indices[i] = sti_new_index;
+                    indices[i] = comp_first + sti_new_index;
                   }
               }
 
@@ -3007,7 +3011,7 @@ namespace Differentiation
      *       0.5*mu_0*mu_r*J*H_AD*C_inv_AD*H_AD;
      *
      *     // Register the definition of the total stored energy
-     *     ad_helper.register_dependent_variable(psi_CH);
+     *     ad_helper.register_dependent_variable(psi);
      *
      *     // Indicate that we have completed tracing the operations onto
      *     // the tape.
@@ -3937,7 +3941,7 @@ namespace Differentiation
       // non-symmetric Tensor<3,dim> but we have to fetch information from a
       // SymmTensor row/column that has too few entries to fill the output
       // tensor. So we must duplicate the relevant entries in the row/column
-      // indexset to fetch off-diagonal components that are Otherwise
+      // indexset to fetch off-diagonal components that are otherwise
       // non-existent in a SymmTensor.
       const std::vector<unsigned int> row_index_set(
         internal::extract_field_component_indices<dim>(
@@ -4059,7 +4063,7 @@ namespace Differentiation
       // non-symmetric Tensor<3,dim> but we have to fetch information from a
       // SymmTensor row/column that has too few entries to fill the output
       // tensor. So we must duplicate the relevant entries in the row/column
-      // indexset to fetch off-diagonal components that are Otherwise
+      // indexset to fetch off-diagonal components that are otherwise
       // non-existent in a SymmTensor.
       const std::vector<unsigned int> row_index_set(
         internal::extract_field_component_indices<dim>(

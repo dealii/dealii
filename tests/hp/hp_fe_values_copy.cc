@@ -23,6 +23,7 @@
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_nothing.h>
@@ -32,7 +33,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 
@@ -51,7 +51,7 @@ test()
   hp::FECollection<dim> fe_collection;
   fe_collection.push_back(FE_Nothing<dim>());
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe_collection);
 
   deallog << "   Number of active cells:       "

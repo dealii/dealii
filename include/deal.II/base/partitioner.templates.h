@@ -58,7 +58,7 @@ namespace Utilities
       const unsigned int n_ghost_targets  = ghost_targets_data.size();
 
       if (n_import_targets > 0)
-        AssertDimension(locally_owned_array.size(), local_size());
+        AssertDimension(locally_owned_array.size(), locally_owned_size());
 
       Assert(requests.size() == 0,
              ExcMessage("Another operation seems to still be running. "
@@ -576,7 +576,7 @@ namespace Utilities
       // first wait for the receive to complete
       if (requests.size() > 0 && n_import_targets > 0)
         {
-          AssertDimension(locally_owned_array.size(), local_size());
+          AssertDimension(locally_owned_array.size(), locally_owned_size());
           const int ierr =
             MPI_Waitall(n_import_targets, requests.data(), MPI_STATUSES_IGNORE);
           AssertThrowMPI(ierr);

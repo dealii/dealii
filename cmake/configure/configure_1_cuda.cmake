@@ -57,16 +57,16 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
     ENDIF()
 
     #
-    # disable CUDA support older than 9.0:
+    # disable CUDA support older than 10.2:
     #
-    IF(CUDA_VERSION_MAJOR VERSION_LESS 9.0)
+    IF(CUDA_VERSION VERSION_LESS 10.2)
       MESSAGE(FATAL_ERROR "\n"
-        "deal.II requires CUDA version 9 or newer."
+        "deal.II requires CUDA version 10.2 or newer."
       )
     ENDIF()
 
     #
-    # CUDA Toolkit 9 and CUDA Toolkit 10 are incompatible with C++17.
+    # CUDA Toolkit 10 is incompatible with C++17.
     # Make sure that deal.II is configured appropriately
     #
     MACRO(_cuda_ensure_feature_off _version _cpp_version_bad _cpp_version_good)
@@ -84,7 +84,6 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
       ENDIF()
     ENDMACRO()
 
-    _cuda_ensure_feature_off(9 17 14)
     _cuda_ensure_feature_off(10 17 14)
 
     IF("${DEAL_II_CUDA_FLAGS_SAVED}" MATCHES "-arch[ ]*sm_([0-9]*)")
@@ -175,9 +174,11 @@ MACRO(FEATURE_CUDA_CONFIGURE_EXTERNAL)
   SET(CMAKE_CUDA_USE_RESPONSE_FILE_FOR_OBJECTS 0)
 
   #
-  # Set up cuda flags:
+  # Disable CUDA_ARCHITECTURES target properties
   #
-  ADD_FLAGS(DEAL_II_CUDA_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
+  IF(CMAKE_VERSION VERSION_GREATER_EQUAL 3.18)
+    SET(CMAKE_CUDA_ARCHITECTURES OFF)
+  ENDIF()
 
   # We cannot use -pedantic as compiler flags. nvcc generates code that
   # produces a lot of warnings when pedantic is enabled. So filter out the

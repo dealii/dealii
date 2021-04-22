@@ -36,12 +36,9 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_in.h>
 
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_values.h>
@@ -207,10 +204,10 @@ namespace Step33
     // the function with different input vector data types, so we templatize
     // on it as well:
     template <typename InputVector>
-    static void compute_flux_matrix(
-      const InputVector &                            W,
-      std::array<std::array<typename InputVector::value_type, dim>,
-                 EulerEquations<dim>::n_components> &flux)
+    static void compute_flux_matrix(const InputVector &W,
+                                    ndarray<typename InputVector::value_type,
+                                            EulerEquations<dim>::n_components,
+                                            dim> &     flux)
     {
       // First compute the pressure that appears in the flux matrix, and then
       // compute the first <code>dim</code> columns of the matrix that
@@ -253,8 +250,9 @@ namespace Step33
       const double                                                alpha,
       std::array<typename InputVector::value_type, n_components> &normal_flux)
     {
-      std::array<std::array<typename InputVector::value_type, dim>,
-                 EulerEquations<dim>::n_components>
+      ndarray<typename InputVector::value_type,
+              EulerEquations<dim>::n_components,
+              dim>
         iflux, oflux;
 
       compute_flux_matrix(Wplus, iflux);
@@ -447,7 +445,7 @@ namespace Step33
                                   const Vector<double> & solution,
                                   Vector<double> &       refinement_indicators)
     {
-      const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+      const unsigned int dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
       std::vector<unsigned int> dofs(dofs_per_cell);
 
       const QMidpoint<dim> quadrature_formula;
@@ -1439,7 +1437,7 @@ namespace Step33
   template <int dim>
   void ConservationLaw<dim>::assemble_system()
   {
-    const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
 
     std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
     std::vector<types::global_dof_index> dof_indices_neighbor(dofs_per_cell);
@@ -1486,7 +1484,7 @@ namespace Step33
         // whether we are working on an external or internal face; if it is an
         // external face, the fourth argument denoting the degrees of freedom
         // indices of the neighbor is ignored, so we pass an empty vector):
-        for (unsigned int face_no : GeometryInfo<dim>::face_indices())
+        for (const auto face_no : cell->face_indices())
           if (cell->at_boundary(face_no))
             {
               fe_v_face.reinit(cell, face_no);
@@ -1776,12 +1774,12 @@ namespace Step33
     // terms of autodifferentiation variables, so that the Jacobian
     // contributions can later easily be computed from it:
 
-    std::vector<std::array<std::array<Sacado::Fad::DFad<double>, dim>,
-                           EulerEquations<dim>::n_components>>
+    std::vector<ndarray<Sacado::Fad::DFad<double>,
+                        EulerEquations<dim>::n_components,
+                        dim>>
       flux(n_q_points);
 
-    std::vector<
-      std::array<std::array<double, dim>, EulerEquations<dim>::n_components>>
+    std::vector<ndarray<double, EulerEquations<dim>::n_components, dim>>
       flux_old(n_q_points);
 
     std::vector<

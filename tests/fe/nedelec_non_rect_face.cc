@@ -252,7 +252,7 @@ namespace Maxwell
         // Store computed values at quad points:
         fe_values[E_re].get_function_values(solution, sol);
 
-        // Calc values of curlE from fe solution:
+        // Calc values of curlE from FE solution:
         cell->get_dof_indices(local_dof_indices);
         // Loop over quad points to calculate solution:
         for (const auto q_point : fe_values.quadrature_point_indices())

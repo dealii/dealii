@@ -97,10 +97,10 @@ output(DoFHandler<dim> & dh,
            ++i)
         filenames.push_back(filename_ + Utilities::int_to_string(loop, 2) +
                             "." + Utilities::int_to_string(i, 2) + ".vtu");
-      const std::string pvtu_master_filename =
+      const std::string pvtu_filename =
         (filename_ + Utilities::int_to_string(loop, 2) + ".pvtu");
-      std::ofstream pvtu_master(pvtu_master_filename.c_str());
-      data_out.write_pvtu_record(pvtu_master, filenames);
+      std::ofstream pvtu_output(pvtu_filename.c_str());
+      data_out.write_pvtu_record(pvtu_output, filenames);
     }
 }
 

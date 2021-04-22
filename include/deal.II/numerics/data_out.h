@@ -44,7 +44,7 @@ namespace internal
         const unsigned int               n_datasets,
         const unsigned int               n_subdivisions,
         const std::vector<unsigned int> &n_postprocessor_outputs,
-        const Mapping<dim, spacedim> &   mapping,
+        const dealii::hp::MappingCollection<dim, spacedim> &mapping,
         const std::vector<
           std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
           &                                           finite_elements,
@@ -315,15 +315,22 @@ public:
    * even if the mesh is internally stored in its undeformed configuration and
    * the deformation is only tracked by an additional vector that holds the
    * deformation of each vertex.
-   *
-   * @todo The @p mapping argument should be replaced by a
-   * hp::MappingCollection in case of a hp::DoFHandler.
    */
   virtual void
   build_patches(const Mapping<DoFHandlerType::dimension,
                               DoFHandlerType::space_dimension> &mapping,
                 const unsigned int     n_subdivisions = 0,
                 const CurvedCellRegion curved_region  = curved_boundary);
+
+  /**
+   * Same as above, but for hp::MappingCollection.
+   */
+  virtual void
+  build_patches(
+    const hp::MappingCollection<DoFHandlerType::dimension,
+                                DoFHandlerType::space_dimension> &mapping,
+    const unsigned int     n_subdivisions = 0,
+    const CurvedCellRegion curved_region  = curved_boundary);
 
   /**
    * A function that allows selecting for which cells output should be
@@ -509,6 +516,17 @@ private:
                   const CurvedCellRegion              curved_cell_region);
 };
 
+namespace Legacy
+{
+  /**
+   * The template arguments of the original dealii::DataOut class will
+   * change in a future release. If for some reason, you need a code that is
+   * compatible with deal.II 9.3 and the subsequent release, use this alias
+   * instead.
+   */
+  template <int dim, typename DoFHandlerType = DoFHandler<dim>>
+  using DataOut = dealii::DataOut<dim, DoFHandlerType>;
+} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE

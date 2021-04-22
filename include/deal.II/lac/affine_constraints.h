@@ -31,6 +31,7 @@
 #include <boost/range/iterator_range.hpp>
 
 #include <set>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -442,7 +443,7 @@ class AffineConstraints;
  *
  * The algorithms used in the implementation of this class are described in
  * some detail in the
- * @ref hp_paper "hp paper".
+ * @ref hp_paper "hp-paper".
  * There is also a significant amount of documentation on how to use this
  * class in the
  * @ref constraints
@@ -565,7 +566,8 @@ public:
   /**
    * Move constructor
    */
-  AffineConstraints(AffineConstraints &&affine_constraints) = default; // NOLINT
+  AffineConstraints(AffineConstraints &&affine_constraints) noexcept =
+    default; // NOLINT
 
   /**
    * Copy operator. Like for many other large objects, this operator
@@ -583,7 +585,8 @@ public:
    * Move assignment operator
    */
   AffineConstraints &
-  operator=(AffineConstraints &&affine_constraints) = default; // NOLINT
+  operator=(AffineConstraints &&affine_constraints) noexcept =
+    default; // NOLINT
 
   /**
    * Copy the given object to the current one.
@@ -591,8 +594,9 @@ public:
    * This function exists because @p operator=() is explicitly
    * disabled.
    */
+  template <typename other_number>
   void
-  copy_from(const AffineConstraints &other);
+  copy_from(const AffineConstraints<other_number> &other);
 
   /**
    * clear() the AffineConstraints object and supply an IndexSet with lines
@@ -702,36 +706,48 @@ public:
   add_lines(const IndexSet &lines);
 
   /**
-   * Add an entry to a given line. The list of lines is searched from the back
-   * to the front, so clever programming would add a new line (which is pushed
-   * to the back) and immediately afterwards fill the entries of that line.
-   * This way, no expensive searching is needed.
+   * Add an entry to a given line. In other words, this function adds
+   * a term $a_{ij} x_j$ to the constraints for the $i$th degree of freedom.
    *
    * If an entry with the same indices as the one this function call denotes
    * already exists, then this function simply returns provided that the value
    * of the entry is the same. Thus, it does no harm to enter a constraint
    * twice.
+   *
+   * @param[in] constrained_dof_index The index $i$ of the degree of freedom
+   *   that is being constrained.
+   * @param[in] column The index $j$ of the degree of freedom being entered
+   *   into the constraint for degree of freedom $i$.
+   * @param[in] weight The factor $a_{ij}$ that multiplies $x_j$.
    */
   void
-  add_entry(const size_type line_n, const size_type column, const number value);
+  add_entry(const size_type constrained_dof_index,
+            const size_type column,
+            const number    weight);
 
   /**
    * Add a whole series of entries, denoted by pairs of column indices and
-   * values, to a line of constraints. This function is equivalent to calling
-   * the preceding function several times, but is faster.
+   * weight values, to a line of constraints. This function is equivalent to
+   * calling the preceding function several times, but is faster.
    */
   void
-  add_entries(const size_type                                  line_n,
-              const std::vector<std::pair<size_type, number>> &col_val_pairs);
+  add_entries(
+    const size_type                                  constrained_dof_index,
+    const std::vector<std::pair<size_type, number>> &col_weight_pairs);
 
   /**
-   * Set an inhomogeneity to the constraint line @p line_n, according to the
-   * discussion in the general class description.
+   * Set an inhomogeneity to the constraint for a degree of freedom. In other
+   * words, it adds a constant $b_i$ to the constraint for degree of freedom
+   * $i$. For this to work, you need to call add_line() first for the given
+   * degree of freedom.
    *
-   * @note the line needs to be added with one of the add_line() calls first.
+   * @param[in] constrained_dof_index The index $i$ of the degree of freedom
+   *   that is being constrained.
+   * @param[in] value The right hand side value $b_i$ for the constraint on
+   *   the degree of freedom $i$.
    */
   void
-  set_inhomogeneity(const size_type line_n, const number value);
+  set_inhomogeneity(const size_type constrained_dof_index, const number value);
 
   /**
    * Close the filling of entries. Since the lines of a matrix of this type
@@ -750,8 +766,9 @@ public:
    * while degree of freedom 7 is itself constrained as $u_{7} = \frac{u_2}{2}
    * + \frac{u_4}{2}$. Then, the resolution will be that $u_{13} =
    * \frac{u_3}{2} + \frac{u_2}{4} + \frac{u_4}{4}$. Note, however, that
-   * cycles in this graph of constraints are not allowed, i.e. for example
-   * $u_4$ may not be constrained, directly or indirectly, to $u_{13}$ again.
+   * cycles in this graph of constraints are not allowed, i.e., for example
+   * $u_4$ may not itself be constrained, directly or indirectly, to $u_{13}$
+   * again.
    */
   void
   close();
@@ -1093,7 +1110,11 @@ public:
   /**
    * This function takes a vector of local contributions (@p local_vector)
    * corresponding to the degrees of freedom indices given in @p
-   * local_dof_indices and distributes them to the global vector. In most
+   * local_dof_indices and distributes them to the global vector. In other
+   * words, this function implements a
+   * [scatter
+   * operation](https://en.wikipedia.org/wiki/Gather-scatter_(vector_addressing)).
+   * In most
    * cases, these local contributions will be the result of an integration
    * over a cell or face of a cell. However, as long as @p local_vector and @p
    * local_dof_indices have the same number of elements, this function is
@@ -1141,7 +1162,11 @@ public:
   /**
    * This function takes a vector of local contributions (@p local_vector)
    * corresponding to the degrees of freedom indices given in @p
-   * local_dof_indices and distributes them to the global vector. In most
+   * local_dof_indices and distributes them to the global vector. In other
+   * words, this function implements a
+   * [scatter
+   * operation](https://en.wikipedia.org/wiki/Gather-scatter_(vector_addressing)).
+   * In most
    * cases, these local contributions will be the result of an integration
    * over a cell or face of a cell. However, as long as @p local_vector and @p
    * local_dof_indices have the same number of elements, this function is
@@ -1229,7 +1254,11 @@ public:
   /**
    * This function takes a pointer to a vector of local contributions (@p
    * local_vector) corresponding to the degrees of freedom indices given in @p
-   * local_dof_indices and distributes them to the global vector. In most
+   * local_dof_indices and distributes them to the global vector. In other
+   * words, this function implements a
+   * [scatter
+   * operation](https://en.wikipedia.org/wiki/Gather-scatter_(vector_addressing)).
+   * In most
    * cases, these local contributions will be the result of an integration
    * over a cell or face of a cell. However, as long as the entries in @p
    * local_dof_indices indicate reasonable global vector entries, this
@@ -1266,7 +1295,11 @@ public:
   /**
    * This function takes a matrix of local contributions (@p local_matrix)
    * corresponding to the degrees of freedom indices given in @p
-   * local_dof_indices and distributes them to the global matrix. In most
+   * local_dof_indices and distributes them to the global matrix. In other
+   * words, this function implements a
+   * [scatter
+   * operation](https://en.wikipedia.org/wiki/Gather-scatter_(vector_addressing)).
+   * In most
    * cases, these local contributions will be the result of an integration
    * over a cell or face of a cell. However, as long as @p local_matrix and @p
    * local_dof_indices have the same number of elements, this function is
@@ -1317,10 +1350,10 @@ public:
                              MatrixType &                  global_matrix) const;
 
   /**
-   * Does almost the same as the function above but can treat general
-   * rectangular matrices.  The main difference to achieve this is that the
-   * diagonal entries in constrained rows are left untouched instead of being
-   * filled with arbitrary values.
+   * This function does almost the same as the function above but can treat
+   * general rectangular matrices. The main difference to achieve this is that
+   * the diagonal entries in constrained rows are left untouched instead of
+   * being filled with arbitrary values.
    *
    * Since the diagonal entries corresponding to eliminated degrees of freedom
    * are not set, the result may have a zero eigenvalue, if applied to a
@@ -1351,9 +1384,9 @@ public:
                              MatrixType &                  global_matrix) const;
 
   /**
-   * Does almost the same as the function above for general rectangular
-   * matrices but uses different AffineConstraints objects on the row and
-   * column indices. The convention is that row indices are constrained
+   * This function does almost the same as the function above for general
+   * rectangular matrices but uses different AffineConstraints objects on the
+   * row and column indices. The convention is that row indices are constrained
    * according to the calling AffineConstraints <code>*this</code>, whereas
    * column indices are constrained according to the given AffineConstraints
    * <code>column_affine_constraints</code>. This function allows to handle the
@@ -1377,6 +1410,10 @@ public:
   /**
    * This function simultaneously writes elements into matrix and vector,
    * according to the constraints specified by the calling AffineConstraints.
+   * In other words, it performs the
+   * [scatter
+   * operation](https://en.wikipedia.org/wiki/Gather-scatter_(vector_addressing))
+   * of the corresponding functions for matrices and vectors at the same time.
    * This function can correctly handle inhomogeneous constraints as well. For
    * the parameter use_inhomogeneities_for_rhs see the documentation in
    * @ref constraints
@@ -1406,7 +1443,7 @@ public:
    * sparsity pattern entries.
    *
    * As explained in the
-   * @ref hp_paper "hp paper"
+   * @ref hp_paper "hp-paper"
    * and in step-27, first allocating a sparsity pattern and later coming back
    * and allocating additional entries for those matrix entries that will be
    * written to due to the elimination of constrained degrees of freedom
@@ -1562,6 +1599,26 @@ public:
     number inhomogeneity;
 
     /**
+     * Default constructor.
+     */
+    ConstraintLine(const size_type &index         = numbers::invalid_dof_index,
+                   const Entries &  entries       = {},
+                   const number &   inhomogeneity = 0.0);
+
+    /**
+     * Copy constructor.
+     */
+    template <typename ConstraintLineType>
+    ConstraintLine(const ConstraintLineType &other);
+
+    /**
+     * Copy assignment.
+     */
+    template <typename ConstraintLineType>
+    ConstraintLine &
+    operator=(const ConstraintLineType &other);
+
+    /**
      * This operator is a bit weird and unintuitive: it compares the line
      * numbers of two lines. We need this to sort the lines; in fact we could
      * do this using a comparison predicate.  However, this way, it is easier,
@@ -1587,7 +1644,9 @@ public:
     memory_consumption() const;
 
     /**
-     * Support for boost:serialization.
+     * Write and read the data of this object from a stream for the purpose
+     * of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
      */
     template <class Archive>
     void
@@ -1627,11 +1686,12 @@ public:
    * operation and will return @p true only if all processors are consistent.
    *
    * Please supply the owned DoFs per processor as returned by
-   * DoFHandler::locally_owned_dofs_per_processor() as @p locally_owned_dofs
-   * and the result of DoFTools::extract_locally_active_dofs() as
-   * @p locally_active_dofs. The
-   * former is used to determine ownership of the specific DoF, while the latter
-   * is used as the set of rows that need to be checked.
+   * Utilities::MPI::all_gather(MPI_Comm, DoFHandler::locally_owned_dofs()) as
+   * @p locally_owned_dofs and the result of
+   * DoFTools::extract_locally_active_dofs() as
+   * @p locally_active_dofs. The former is used to determine ownership of the
+   * specific DoF, while the latter is used as the set of rows that need to be
+   * checked.
    *
    * If @p verbose is set to @p true, additional debug information is written
    * to std::cout.
@@ -1648,7 +1708,7 @@ public:
   bool
   is_consistent_in_parallel(const std::vector<IndexSet> &locally_owned_dofs,
                             const IndexSet &             locally_active_dofs,
-                            const MPI_Comm               mpi_communicator,
+                            const MPI_Comm &             mpi_communicator,
                             const bool                   verbose = false) const;
 
   /**
@@ -1758,6 +1818,9 @@ public:
                  << "that every processor who owns a DoF that constrains "
                  << "another DoF also knows about this constraint?");
 
+  template <typename>
+  friend class AffineConstraints;
+
 private:
   /**
    * Store the lines of the matrix.  Entries are usually appended in an
@@ -1840,8 +1903,8 @@ private:
                              const std::vector<size_type> &local_dof_indices,
                              MatrixType &                  global_matrix,
                              VectorType &                  global_vector,
-                             bool use_inhomogeneities_for_rhs,
-                             std::integral_constant<bool, false>) const;
+                             const bool use_inhomogeneities_for_rhs,
+                             const std::integral_constant<bool, false>) const;
 
   /**
    * This function actually implements the local_to_global function for block
@@ -1854,8 +1917,8 @@ private:
                              const std::vector<size_type> &local_dof_indices,
                              MatrixType &                  global_matrix,
                              VectorType &                  global_vector,
-                             bool use_inhomogeneities_for_rhs,
-                             std::integral_constant<bool, true>) const;
+                             const bool use_inhomogeneities_for_rhs,
+                             const std::integral_constant<bool, true>) const;
 
   /**
    * This function actually implements the local_to_global function for
@@ -1867,7 +1930,7 @@ private:
                               SparsityPatternType &         sparsity_pattern,
                               const bool            keep_constrained_entries,
                               const Table<2, bool> &dof_mask,
-                              std::integral_constant<bool, false>) const;
+                              const std::integral_constant<bool, false>) const;
 
   /**
    * This function actually implements the local_to_global function for block
@@ -1879,7 +1942,7 @@ private:
                               SparsityPatternType &         sparsity_pattern,
                               const bool            keep_constrained_entries,
                               const Table<2, bool> &dof_mask,
-                              std::integral_constant<bool, true>) const;
+                              const std::integral_constant<bool, true>) const;
 
   /**
    * Internal helper function for distribute_local_to_global function.
@@ -1972,18 +2035,20 @@ AffineConstraints<number>::add_line(const size_type line_n)
   lines_cache[line_index]    = lines.size() - 1;
 }
 
+
+
 template <typename number>
 inline void
-AffineConstraints<number>::add_entry(const size_type line_n,
+AffineConstraints<number>::add_entry(const size_type constrained_dof_index,
                                      const size_type column,
-                                     const number    value)
+                                     const number    weight)
 {
   Assert(sorted == false, ExcMatrixIsClosed());
-  Assert(line_n != column,
+  Assert(constrained_dof_index != column,
          ExcMessage("Can't constrain a degree of freedom to itself"));
 
   // Ensure that the current line is present in the cache:
-  const size_type line_index = calculate_line_index(line_n);
+  const size_type line_index = calculate_line_index(constrained_dof_index);
   Assert(line_index < lines_cache.size(),
          ExcMessage("The current AffineConstraints does not contain the line "
                     "for the current entry. Call AffineConstraints::add_line "
@@ -1997,26 +2062,30 @@ AffineConstraints<number>::add_entry(const size_type line_n,
   Assert(lines_cache[line_index] != numbers::invalid_size_type,
          ExcInternalError());
   Assert(!local_lines.size() || local_lines.is_element(column),
-         ExcColumnNotStoredHere(line_n, column));
+         ExcColumnNotStoredHere(constrained_dof_index, column));
   ConstraintLine *line_ptr = &lines[lines_cache[line_index]];
-  Assert(line_ptr->index == line_n, ExcInternalError());
+  Assert(line_ptr->index == constrained_dof_index, ExcInternalError());
   for (const auto &p : line_ptr->entries)
     if (p.first == column)
       {
-        Assert(std::abs(p.second - value) < 1.e-14,
-               ExcEntryAlreadyExists(line_n, column, p.second, value));
+        Assert(std::abs(p.second - weight) < 1.e-14,
+               ExcEntryAlreadyExists(
+                 constrained_dof_index, column, p.second, weight));
         return;
       }
 
-  line_ptr->entries.emplace_back(column, value);
+  line_ptr->entries.emplace_back(column, weight);
 }
+
+
 
 template <typename number>
 inline void
-AffineConstraints<number>::set_inhomogeneity(const size_type line_n,
-                                             const number    value)
+AffineConstraints<number>::set_inhomogeneity(
+  const size_type constrained_dof_index,
+  const number    value)
 {
-  const size_type line_index = calculate_line_index(line_n);
+  const size_type line_index = calculate_line_index(constrained_dof_index);
   Assert(line_index < lines_cache.size() &&
            lines_cache[line_index] != numbers::invalid_size_type,
          ExcMessage("call add_line() before calling set_inhomogeneity()"));
@@ -2024,6 +2093,8 @@ AffineConstraints<number>::set_inhomogeneity(const size_type line_n,
   ConstraintLine *line_ptr = &lines[lines_cache[line_index]];
   line_ptr->inhomogeneity  = value;
 }
+
+
 
 template <typename number>
 template <class VectorType>
@@ -2235,82 +2306,133 @@ class BlockSparsityPatternBase;
 template <typename number>
 class BlockSparseMatrixEZ;
 
-/**
- * A class that can be used to determine whether a given type is a block
- * matrix type or not. For example,
- * @code
- *   IsBlockMatrix<SparseMatrix<number> >::value
- * @endcode
- * has the value false, whereas
- * @code
- *   IsBlockMatrix<BlockSparseMatrix<number> >::value
- * @endcode
- * is true. This is sometimes useful in template contexts where we may want to
- * do things differently depending on whether a template type denotes a
- * regular or a block matrix type.
- *
- * @see
- * @ref GlossBlockLA "Block (linear algebra)"
- */
-template <typename MatrixType>
-struct IsBlockMatrix
+namespace internal
 {
-private:
-  struct yes_type
+  namespace AffineConstraints
   {
-    char c[1];
-  };
-  struct no_type
-  {
-    char c[2];
-  };
+    /**
+     * A "traits" class that can be used to determine whether a given type is a
+     * block matrix type or not. For example,
+     * @code
+     *   IsBlockMatrix<SparseMatrix<number> >::value
+     * @endcode
+     * has the value `false`, whereas
+     * @code
+     *   IsBlockMatrix<BlockSparseMatrix<number> >::value
+     * @endcode
+     * is true. This is sometimes useful in template contexts where we may want
+     * to do things differently depending on whether a template type denotes a
+     * regular or a block matrix type.
+     *
+     * @see
+     * @ref GlossBlockLA "Block (linear algebra)"
+     */
+    template <typename MatrixType>
+    struct IsBlockMatrix
+    {
+    private:
+      /**
+       * Overload returning true if the class is derived from BlockMatrixBase,
+       * which is what block matrices do (with the exception of
+       * BlockSparseMatrixEZ).
+       */
+      template <typename T>
+      static std::true_type
+      check(const BlockMatrixBase<T> *);
 
-  /**
-   * Overload returning true if the class is derived from BlockMatrixBase,
-   * which is what block matrices do (with the exception of
-   * BlockSparseMatrixEZ).
-   */
-  template <typename T>
-  static yes_type
-  check_for_block_matrix(const BlockMatrixBase<T> *);
+      /**
+       * Overload for BlockSparseMatrixEZ, which is the only block matrix not
+       * derived from BlockMatrixBase at the time of writing this class.
+       */
+      template <typename T>
+      static std::true_type
+      check(const BlockSparseMatrixEZ<T> *);
 
-  /**
-   * Overload returning true if the class is derived from
-   * BlockSparsityPatternBase, which is what block sparsity patterns do.
-   */
-  template <typename T>
-  static yes_type
-  check_for_block_matrix(const BlockSparsityPatternBase<T> *);
+      /**
+       * Catch all for all other potential types that are then apparently not
+       * block matrices.
+       */
+      static std::false_type
+      check(...);
 
-  /**
-   * Overload for BlockSparseMatrixEZ, which is the only block matrix not
-   * derived from BlockMatrixBase at the time of writing this class.
-   */
-  template <typename T>
-  static yes_type
-  check_for_block_matrix(const BlockSparseMatrixEZ<T> *);
+    public:
+      /**
+       * A statically computable value that indicates whether the template
+       * argument to this class is a block matrix (in fact whether the type is
+       * derived from BlockMatrixBase<T> or is one of the other block matrix
+       * types).
+       */
+      static const bool value =
+        std::is_same<decltype(check(std::declval<MatrixType *>())),
+                     std::true_type>::value;
+    };
 
-  /**
-   * Catch all for all other potential matrix types that are not block
-   * matrices.
-   */
-  static no_type
-  check_for_block_matrix(...);
+    // instantiation of the static member
+    template <typename MatrixType>
+    const bool IsBlockMatrix<MatrixType>::value;
 
-public:
-  /**
-   * A statically computable value that indicates whether the template
-   * argument to this class is a block matrix (in fact whether the type is
-   * derived from BlockMatrixBase<T>).
-   */
-  static const bool value =
-    (sizeof(check_for_block_matrix(static_cast<MatrixType *>(nullptr))) ==
-     sizeof(yes_type));
-};
 
-// instantiation of the static member
-template <typename MatrixType>
-const bool IsBlockMatrix<MatrixType>::value;
+    /**
+     * A class that can be used to determine whether a given type is a block
+     * sparsity pattern type or not. In this, it matches the IsBlockMatrix
+     * class.
+     *
+     * @see
+     * @ref GlossBlockLA "Block (linear algebra)"
+     */
+    template <typename MatrixType>
+    struct IsBlockSparsityPattern
+    {
+    private:
+      /**
+       * Overload returning true if the class is derived from
+       * BlockSparsityPatternBase, which is what block sparsity patterns do.
+       */
+      template <typename T>
+      static std::true_type
+      check(const BlockSparsityPatternBase<T> *);
+
+      /**
+       * Catch all for all other potential types that are then apparently not
+       * block sparsity patterns.
+       */
+      static std::false_type
+      check(...);
+
+    public:
+      /**
+       * A statically computable value that indicates whether the template
+       * argument to this class is a block sparsity pattern (in fact whether the
+       * type is derived from BlockSparsityPatternBase<T>).
+       */
+      static const bool value =
+        std::is_same<decltype(check(std::declval<MatrixType *>())),
+                     std::true_type>::value;
+    };
+
+    // instantiation of the static member
+    template <typename MatrixType>
+    const bool IsBlockSparsityPattern<MatrixType>::value;
+
+  } // namespace AffineConstraints
+} // namespace internal
+
+
+
+template <typename number>
+template <typename other_number>
+inline void
+AffineConstraints<number>::copy_from(
+  const AffineConstraints<other_number> &other)
+{
+  lines.clear();
+  lines.insert(lines.begin(), other.lines.begin(), other.lines.end());
+  lines_cache = other.lines_cache;
+  local_lines = other.local_lines;
+  sorted      = other.sorted;
+}
+
+
 
 template <typename number>
 template <typename MatrixType>
@@ -2330,8 +2452,12 @@ AffineConstraints<number>::distribute_local_to_global(
     global_matrix,
     dummy,
     false,
-    std::integral_constant<bool, IsBlockMatrix<MatrixType>::value>());
+    std::integral_constant<
+      bool,
+      internal::AffineConstraints::IsBlockMatrix<MatrixType>::value>());
 }
+
+
 
 template <typename number>
 template <typename MatrixType, typename VectorType>
@@ -2353,8 +2479,12 @@ AffineConstraints<number>::distribute_local_to_global(
     global_matrix,
     global_vector,
     use_inhomogeneities_for_rhs,
-    std::integral_constant<bool, IsBlockMatrix<MatrixType>::value>());
+    std::integral_constant<
+      bool,
+      internal::AffineConstraints::IsBlockMatrix<MatrixType>::value>());
 }
+
+
 
 template <typename number>
 template <typename SparsityPatternType>
@@ -2372,7 +2502,54 @@ AffineConstraints<number>::add_entries_local_to_global(
     sparsity_pattern,
     keep_constrained_entries,
     dof_mask,
-    std::integral_constant<bool, IsBlockMatrix<SparsityPatternType>::value>());
+    std::integral_constant<bool,
+                           internal::AffineConstraints::IsBlockSparsityPattern<
+                             SparsityPatternType>::value>());
+}
+
+
+
+template <typename number>
+inline AffineConstraints<number>::ConstraintLine::ConstraintLine(
+  const size_type &                                                  index,
+  const typename AffineConstraints<number>::ConstraintLine::Entries &entries,
+  const number &inhomogeneity)
+  : index(index)
+  , entries(entries)
+  , inhomogeneity(inhomogeneity)
+{}
+
+
+
+template <typename number>
+template <typename ConstraintLineType>
+inline AffineConstraints<number>::ConstraintLine::ConstraintLine(
+  const ConstraintLineType &other)
+{
+  this->index = other.index;
+
+  entries.clear();
+  entries.insert(entries.begin(), other.entries.begin(), other.entries.end());
+
+  this->inhomogeneity = other.inhomogeneity;
+}
+
+
+
+template <typename number>
+template <typename ConstraintLineType>
+inline typename AffineConstraints<number>::ConstraintLine &
+AffineConstraints<number>::ConstraintLine::
+operator=(const ConstraintLineType &other)
+{
+  this->index = other.index;
+
+  entries.clear();
+  entries.insert(entries.begin(), other.entries.begin(), other.entries.end());
+
+  this->inhomogeneity = other.inhomogeneity;
+
+  return *this;
 }
 
 DEAL_II_NAMESPACE_CLOSE

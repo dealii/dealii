@@ -217,3 +217,52 @@ surfaces embedded in higher dimensional spaces. But the equation discussed
 here was relatively simple because it only involved an integral operator, not
 derivatives which are more difficult to define on the surface. The step-38
 tutorial program considers such problems and provides the necessary tools.
+
+From a practical perspective, the Boundary Element Method (BEM) used
+here suffers from two bottlenecks. The first is that assembling the
+matrix has a cost that is *quadratic* in the number of unknowns, that
+is ${\cal O}(N^2)$ where $N$ is the total number of unknowns. This can
+be seen by looking at the `assemble_system()` function, which has this
+structure:
+@code
+    for (const auto &cell : dof_handler.active_cell_iterators())
+      {
+        ...
+
+        for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
+          ...
+@endcode
+Here, the first loop walks over all cells (one factor of $N$) whereas
+the inner loop contributes another factor of $N$.
+
+This has to be contrasted with the finite element method for *local*
+differential operators: There, we loop over all cells (one factor of
+$N$) and on each cell do an amount of work that is independent of how
+many cells or unknowns there are. This clearly presents a
+bottleneck.
+
+The second bottleneck is that the system matrix is dense (i.e., is of
+type FullMatrix) because every degree of freedom couples with every
+other degree of freedom. As pointed out above, just *computing* this
+matrix with its $N^2$ nonzero entries necessarily requires at least
+${\cal O}(N^2)$ operations, but it's worth pointing out that it also
+costs this many operations to just do one matrix-vector product. If
+the GMRES method used to solve the linear system requires a number of
+iterations that grows with the size of the problem, as is typically
+the case, then solving the linear system will require a number of
+operations that grows even faster than just ${\cal O}(N^2)$.
+
+"Real" boundary element methods address these issues by strategies
+that determine which entries of the matrix will be small and can
+consequently be neglected (at the cost of introducing an additional
+error, of course). This is possible by recognizing that the matrix
+entries decay with the (physical) distance between the locations where
+degrees of freedom $i$ and $j$ are defined. This can be exploited in
+methods such as the Fast Multipole Method (FMM) that control which
+matrix entries must be stored and computed to achieve a certain
+accuracy, and -- if done right -- result in methods in which both
+assembly and solution of the linear system requires less than
+${\cal O}(N^2)$ operations.
+
+Implementing these methods clearly presents opportunities to extend
+the current program.

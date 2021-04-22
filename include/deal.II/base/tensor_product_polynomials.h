@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/ndarray.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/scalar_polynomials_base.h>
@@ -66,6 +67,10 @@ class TensorProductPolynomialsConst;
  * indices i,j,k of the one-dimensional polynomials in x,y and z direction.
  * The ordering of the dim-dimensional polynomials can be changed by using the
  * set_numbering() function.
+ *
+ * @tparam PolynomialType A class that satisfies the required interface for computing
+ *   tensor products. Typical choices for this template argument are
+ *   Polynomials::Polynomial and Polynomials::PiecewisePolynomial.
  */
 template <int dim, typename PolynomialType = Polynomials::Polynomial<double>>
 class TensorProductPolynomials : public ScalarPolynomialsBase<dim>
@@ -538,7 +543,7 @@ TensorProductPolynomials<dim, PolynomialType>::compute_derivative(
   std::array<unsigned int, dim> indices;
   compute_index(i, indices);
 
-  std::array<std::array<double, 5>, dim> v;
+  ndarray<double, dim, 5> v;
   {
     std::vector<double> tmp(5);
     for (unsigned int d = 0; d < dim; ++d)
@@ -655,6 +660,19 @@ TensorProductPolynomials<dim, PolynomialType>::compute_derivative(
           return derivative;
         }
     }
+}
+
+
+
+template <>
+template <int order>
+Tensor<order, 0>
+TensorProductPolynomials<0, Polynomials::Polynomial<double>>::
+  compute_derivative(const unsigned int, const Point<0> &) const
+{
+  AssertThrow(false, ExcNotImplemented());
+
+  return {};
 }
 
 
@@ -819,6 +837,19 @@ AnisotropicPolynomials<dim>::compute_derivative(const unsigned int i,
           return derivative;
         }
     }
+}
+
+
+
+template <>
+template <int order>
+Tensor<order, 0>
+AnisotropicPolynomials<0>::compute_derivative(const unsigned int,
+                                              const Point<0> &) const
+{
+  AssertThrow(false, ExcNotImplemented());
+
+  return {};
 }
 
 

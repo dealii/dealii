@@ -107,7 +107,7 @@ template <int dim>
 void
 test_trilinos_alternative()
 {
-  typedef LA_Trilinos LA;
+  using LA = LA_Trilinos;
 
   unsigned int myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   unsigned int numproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);

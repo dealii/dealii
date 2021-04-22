@@ -162,7 +162,7 @@ Timer::Timer()
 
 
 
-Timer::Timer(MPI_Comm mpi_communicator, const bool sync_lap_times_)
+Timer::Timer(const MPI_Comm &mpi_communicator, const bool sync_lap_times_)
   : running(false)
   , mpi_communicator(mpi_communicator)
   , sync_lap_times(sync_lap_times_)
@@ -322,7 +322,7 @@ TimerOutput::TimerOutput(ConditionalOStream &  stream,
 
 
 
-TimerOutput::TimerOutput(MPI_Comm              mpi_communicator,
+TimerOutput::TimerOutput(const MPI_Comm &      mpi_communicator,
                          std::ostream &        stream,
                          const OutputFrequency output_frequency,
                          const OutputType      output_type)
@@ -335,7 +335,7 @@ TimerOutput::TimerOutput(MPI_Comm              mpi_communicator,
 
 
 
-TimerOutput::TimerOutput(MPI_Comm              mpi_communicator,
+TimerOutput::TimerOutput(const MPI_Comm &      mpi_communicator,
                          ConditionalOStream &  stream,
                          const OutputFrequency output_frequency,
                          const OutputType      output_type)
@@ -841,8 +841,8 @@ TimerOutput::print_summary() const
 
 
 void
-TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
-                                        const double   quantile) const
+TimerOutput::print_wall_time_statistics(const MPI_Comm &mpi_comm,
+                                        const double    quantile) const
 {
   // we are going to change the precision and width of output below. store the
   // old values so the get restored when exiting this function
@@ -889,14 +889,15 @@ TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
         std::vector<double> receive_data(my_rank == 0 ? n_ranks : 0);
         std::vector<double> result(9);
 #ifdef DEAL_II_WITH_MPI
-        MPI_Gather(&given_time,
-                   1,
-                   MPI_DOUBLE,
-                   receive_data.data(),
-                   1,
-                   MPI_DOUBLE,
-                   0,
-                   mpi_comm);
+        int ierr = MPI_Gather(&given_time,
+                              1,
+                              MPI_DOUBLE,
+                              receive_data.data(),
+                              1,
+                              MPI_DOUBLE,
+                              0,
+                              mpi_comm);
+        AssertThrowMPI(ierr);
         if (my_rank == 0)
           {
             // fill the received data in a pair and sort; on the way, also
@@ -923,7 +924,8 @@ TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
             result[7] = data_rank[n_ranks - 1].first;
             result[8] = data_rank[n_ranks - 1].second;
           }
-        MPI_Bcast(result.data(), 9, MPI_DOUBLE, 0, mpi_comm);
+        ierr = MPI_Bcast(result.data(), 9, MPI_DOUBLE, 0, mpi_comm);
+        AssertThrowMPI(ierr);
 #endif
         out_stream << std::setw(10) << std::setprecision(4) << std::right;
         out_stream << result[0] << "s ";

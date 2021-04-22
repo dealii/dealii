@@ -17,6 +17,7 @@
 // test for class ArrayView. check make_array_view for Table arguments
 
 #include <deal.II/base/array_view.h>
+#include <deal.II/base/table.h>
 
 #include "../tests.h"
 

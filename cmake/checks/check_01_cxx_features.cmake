@@ -25,8 +25,10 @@
 #   DEAL_II_HAVE_FP_EXCEPTIONS
 #   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
 #   DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
+#   DEAL_II_HAVE_CXX17_LEGENDRE_FUNCTIONS
 #   DEAL_II_FALLTHROUGH
 #   DEAL_II_DEPRECATED
+#   DEAL_II_DEPRECATED_EARLY
 #   DEAL_II_CONSTEXPR
 #
 
@@ -43,12 +45,10 @@
 # tests. Create a small macro to easily set CMAKE_REQUIRED_FLAGS
 #
 MACRO(_set_up_cmake_required)
-  # Let's put the user supplied `DEAL_II_CXX_FLAGS_SAVED` last so that we
-  # never override a user supplied -std=c++XY flag in our tests.
   RESET_CMAKE_REQUIRED()
   SET(CMAKE_REQUIRED_FLAGS "")
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS}")
   ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS_SAVED}")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS}")
 ENDMACRO()
 
 
@@ -305,10 +305,17 @@ _set_up_cmake_required()
 _test_cxx14_support()
 
 IF(NOT DEAL_II_HAVE_CXX14)
-  MESSAGE(STATUS "C++14 support not available. Try to set -std=c++14 explicitly")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-std=c++14")
-  _set_up_cmake_required()
-  _test_cxx14_support()
+  #
+  # We failed to detect C++14 support. Let's make an attempt to set the
+  # -std= compiler flag. (But in order to minimize confusion let's not
+  # override any manually specified -std= variable set by the user.)
+  #
+  IF(NOT "${DEAL_II_CXX_FLAGS_SAVED}" MATCHES "-std=")
+    MESSAGE(STATUS "C++14 support not available. Try to set -std=c++14 explicitly")
+    ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_SAVED "-std=c++14")
+    _set_up_cmake_required()
+    _test_cxx14_support()
+  ENDIF()
 ENDIF()
 
 IF(NOT DEAL_II_HAVE_CXX14)
@@ -355,6 +362,7 @@ UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
   DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH
   DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
   DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
+  DEAL_II_HAVE_CXX17_LEGENDRE_FUNCTIONS
   DEAL_II_CXX14_CONSTEXPR_BUG_OK
   )
 
@@ -487,6 +495,11 @@ ELSEIF(DEAL_II_HAVE_ATTRIBUTE_DEPRECATED AND NOT DEAL_II_WITH_CUDA)
 ELSE()
   SET(DEAL_II_DEPRECATED " ")
 ENDIF()
+IF(DEAL_II_EARLY_DEPRECATIONS)
+  SET(DEAL_II_DEPRECATED_EARLY ${DEAL_II_DEPRECATED})
+ELSE()
+  SET(DEAL_II_DEPRECATED_EARLY " ")
+ENDIF()
 
 
 #
@@ -551,7 +564,7 @@ ENDIF()
 
 
 #
-# Check for c++17 bessel function support. Unfortunately libc++ version 10
+# Check for c++17 Bessel function support. Unfortunately libc++ version 10
 # does not have those.
 #
 
@@ -566,6 +579,24 @@ CHECK_CXX_SOURCE_COMPILES(
   }
   "
   DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
+  )
+
+
+#
+# Check for c++17 Legendre function support.
+#
+
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  #include <cmath>
+  using std::legendre;
+  using std::legendref;
+  using std::legendrel;
+  int main()
+  {
+  }
+  "
+  DEAL_II_HAVE_CXX17_LEGENDRE_FUNCTIONS
   )
 
 

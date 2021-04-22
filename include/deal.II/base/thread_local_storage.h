@@ -334,7 +334,10 @@ namespace Threads
     std::shared_lock<decltype(insertion_mutex)> reader_lock(t.insertion_mutex);
     std::unique_lock<decltype(insertion_mutex)> writer_lock(insertion_mutex);
 
-    data = t.data;
+    data     = t.data;
+    exemplar = t.exemplar;
+
+    return *this;
   }
 
 
@@ -352,7 +355,8 @@ namespace Threads
     std::unique_lock<decltype(insertion_mutex)> reader_lock(t.insertion_mutex);
     std::unique_lock<decltype(insertion_mutex)> writer_lock(insertion_mutex);
 
-    data = std::move(t.data);
+    data     = std::move(t.data);
+    exemplar = std::move(t.exemplar);
 
     return *this;
   }

@@ -42,9 +42,9 @@
 
 // forward declaration of the function that must be provided in the
 // .cc files
-template <typename DoFHandlerType>
+template <int dim>
 void
-check_this(const DoFHandlerType &dof_handler);
+check_this(const DoFHandler<dim> &dof_handler);
 
 
 
@@ -110,17 +110,8 @@ check(const FiniteElement<dim> &fe, const std::string &name)
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
 
-  // setup hp DoFHandler
-  hp::FECollection<dim> fe_collection(fe);
-  hp::DoFHandler<dim>   hp_dof_handler(tria);
-  hp_dof_handler.distribute_dofs(fe_collection);
-
   // call main function in .cc files
-  check_this<DoFHandler<dof_handler.dimension, dof_handler.space_dimension>>(
-    dof_handler);
-  check_this<
-    hp::DoFHandler<hp_dof_handler.dimension, hp_dof_handler.space_dimension>>(
-    hp_dof_handler);
+  check_this(dof_handler);
 }
 
 

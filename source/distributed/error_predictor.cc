@@ -22,12 +22,11 @@
 #  include <deal.II/distributed/tria.h>
 
 #  include <deal.II/dofs/dof_accessor.h>
+#  include <deal.II/dofs/dof_handler.h>
 #  include <deal.II/dofs/dof_tools.h>
 
 #  include <deal.II/grid/tria_accessor.h>
 #  include <deal.II/grid/tria_iterator.h>
-
-#  include <deal.II/hp/dof_handler.h>
 
 #  include <deal.II/lac/block_vector.h>
 #  include <deal.II/lac/la_parallel_block_vector.h>
@@ -51,18 +50,18 @@ namespace parallel
   {
     template <int dim, int spacedim>
     ErrorPredictor<dim, spacedim>::ErrorPredictor(
-      const hp::DoFHandler<dim, spacedim> &dof)
+      const DoFHandler<dim, spacedim> &dof)
       : dof_handler(&dof, typeid(*this).name())
       , handle(numbers::invalid_unsigned_int)
       , gamma_p(0.)
       , gamma_h(0.)
       , gamma_n(0.)
     {
-      Assert(
-        (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
-                        *>(&dof_handler->get_triangulation()) != nullptr),
-        ExcMessage(
-          "parallel::distributed::ErrorPredictor requires a parallel::distributed::Triangulation object."));
+      Assert((dynamic_cast<
+                const parallel::distributed::Triangulation<dim, spacedim> *>(
+                &dof_handler->get_triangulation()) != nullptr),
+             ExcMessage("parallel::distributed::ErrorPredictor requires a "
+                        "parallel::distributed::Triangulation object."));
     }
 
 
@@ -167,8 +166,8 @@ namespace parallel
       const typename Triangulation<dim, spacedim>::cell_iterator &cell_,
       const typename Triangulation<dim, spacedim>::CellStatus     status)
     {
-      typename hp::DoFHandler<dim, spacedim>::cell_iterator cell(*cell_,
-                                                                 dof_handler);
+      typename DoFHandler<dim, spacedim>::cell_iterator cell(*cell_,
+                                                             dof_handler);
 
       // create buffer for each individual input vector
       std::vector<float> predicted_errors(error_indicators.size());
@@ -215,7 +214,7 @@ namespace parallel
                   (**estimated_error_it)[cell->active_cell_index()] *
                   (gamma_h * std::pow(.5, future_fe_degree));
 
-                // If the future fe index differs from the active one, also take
+                // If the future FE index differs from the active one, also take
                 // into account p-adaptation.
                 if (cell->future_fe_index_set())
                   *predicted_error_it *=
@@ -233,22 +232,16 @@ namespace parallel
                 // parent cell after h-adaptation analogously to
                 // dealii::internal::hp::DoFHandlerImplementation::Implementation::
                 //   collect_fe_indices_on_cells_to_be_refined()
-                std::set<unsigned int> fe_indices_children;
-                for (unsigned int child_index = 0;
-                     child_index < cell->n_children();
-                     ++child_index)
-                  {
-                    const auto child = cell->child(child_index);
-                    Assert(child->is_active() && child->coarsen_flag_set(),
-                           typename dealii::Triangulation<
-                             dim>::ExcInconsistentCoarseningFlags());
-
-                    fe_indices_children.insert(child->future_fe_index());
-                  }
+#  ifdef DEBUG
+                for (const auto &child : cell->child_iterators())
+                  Assert(child->is_active() && child->coarsen_flag_set(),
+                         typename dealii::Triangulation<
+                           dim>::ExcInconsistentCoarseningFlags());
+#  endif
 
                 const unsigned int future_fe_index =
-                  dof_handler->get_fe_collection().find_dominated_fe_extended(
-                    fe_indices_children, /*codim=*/0);
+                  dealii::internal::hp::DoFHandlerImplementation::
+                    dominated_future_fe_on_children<dim, spacedim>(cell);
 
                 const unsigned int future_fe_degree =
                   dof_handler->get_fe_collection()[future_fe_index].degree;
@@ -258,12 +251,8 @@ namespace parallel
                 float sqrsum_of_predicted_errors = 0.;
                 float predicted_error            = 0.;
                 int   degree_difference          = 0;
-                for (unsigned int child_index = 0;
-                     child_index < cell->n_children();
-                     ++child_index)
+                for (const auto &child : cell->child_iterators())
                   {
-                    const auto child = cell->child(child_index);
-
                     predicted_error =
                       (**estimated_error_it)[child->active_cell_index()] /
                       (gamma_h * std::pow(.5, future_fe_degree));
@@ -336,10 +325,8 @@ namespace parallel
 
             case parallel::distributed::Triangulation<dim,
                                                       spacedim>::CELL_REFINE:
-              for (unsigned int child_index = 0;
-                   child_index < cell->n_children();
-                   ++child_index)
-                (**it_output)[cell->child(child_index)->active_cell_index()] =
+              for (const auto &child : cell->child_iterators())
+                (**it_output)[child->active_cell_index()] =
                   (*it_input) / std::sqrt(cell->n_children());
               break;
 

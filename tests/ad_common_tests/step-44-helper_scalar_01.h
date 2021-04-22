@@ -578,8 +578,8 @@ namespace Step44
         const unsigned int n_independent_variables =
           SymmetricTensor<2, dim>::n_independent_components + 1 + 1;
 
-        typedef AD::ScalarFunction<dim, ad_type_code, number_t> ADHelper;
-        typedef typename ADHelper::ad_type                      ADNumberType;
+        using ADHelper     = AD::ScalarFunction<dim, ad_type_code, number_t>;
+        using ADNumberType = typename ADHelper::ad_type;
         ADHelper ad_helper(n_independent_variables);
         ad_helper.set_tape_buffer_sizes(); // Increase the buffer size from the
                                            // default values
@@ -663,8 +663,8 @@ namespace Step44
         const FEValuesExtractors::Scalar J_dofs(0);
         const unsigned int               n_independent_variables = 1;
 
-        typedef typename AD::ScalarFunction<dim, ad_type_code, double>::ad_type
-                                                      ADNumberType;
+        using ADNumberType =
+          typename AD::ScalarFunction<dim, ad_type_code, double>::ad_type;
         AD::ScalarFunction<dim, ad_type_code, double> ad_helper(
           n_independent_variables);
         ad_helper.set_tape_buffer_sizes(); // Increase the buffer size from the

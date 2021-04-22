@@ -30,7 +30,7 @@ main()
 {
   initlog();
 
-  typedef std::unique_ptr<FunctionParser<3>> T;
+  using T = std::unique_ptr<FunctionParser<3>>;
 
   T a;
   a = Convert<T>::to_value("x*y,y-t");

@@ -404,7 +404,7 @@ Without such a formulation we cannot expect anything to make physical sense,
 even if it produces nice pictures!
 
 
-<h3>Possible directions for extensions</h3>
+<h3>Possibilities for extensions</h3>
 
 The program as is does not really solve an equation that has many applications
 in practice: quasi-static material deformation based on a purely elastic law
@@ -532,7 +532,7 @@ general approach to this would go like this:
       {
         history_field[i][j].reinit(history_dof_handler.n_dofs());
         local_history_values_at_qpoints[i][j].reinit(quadrature.size());
-        local_history_fe_values[i][j].reinit(history_fe.dofs_per_cell);
+        local_history_fe_values[i][j].reinit(history_fe.n_dofs_per_cell());
       }
 
     FullMatrix<double> qpoint_to_dof_matrix (history_fe.dofs_per_cell,
@@ -582,7 +582,7 @@ general approach to this would go like this:
   will do that:
   @code
     FullMatrix<double> dof_to_qpoint_matrix (quadrature.size(),
-                                             history_fe.dofs_per_cell);
+                                             history_fe.n_dofs_per_cell());
     FETools::compute_interpolation_to_quadrature_points_matrix
               (history_fe,
                quadrature,

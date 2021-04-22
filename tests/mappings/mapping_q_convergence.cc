@@ -208,7 +208,7 @@ test(const FiniteElement<dim> &fe)
       deallog << "mapping order: " << mapping_p << std::endl;
       Triangulation<dim> triangulation;
       create_tria(triangulation, geometry);
-      DoFHandler<dim> dof_handler;
+      DoFHandler<dim> dof_handler(triangulation);
 
       std::vector<double> log_refinements;
       std::vector<double> log_l2_errors;
@@ -218,7 +218,7 @@ test(const FiniteElement<dim> &fe)
         {
           triangulation.refine_global(1);
           dof_handler.clear();
-          dof_handler.initialize(triangulation, fe);
+          dof_handler.distribute_dofs(fe);
 
           Vector<double> v(dof_handler.n_dofs());
           VectorTools::project(mapping,

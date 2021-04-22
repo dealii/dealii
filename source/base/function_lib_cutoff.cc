@@ -48,14 +48,6 @@ namespace Functions
   }
 
 
-  template <int dim>
-  void
-  CutOffFunctionBase<dim>::new_center(const Point<dim> &p)
-  {
-    set_center(p);
-  }
-
-
 
   template <int dim>
   void
@@ -71,15 +63,6 @@ namespace Functions
   CutOffFunctionBase<dim>::get_center() const
   {
     return center;
-  }
-
-
-
-  template <int dim>
-  void
-  CutOffFunctionBase<dim>::new_radius(const double r)
-  {
-    set_radius(r);
   }
 
 

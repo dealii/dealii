@@ -32,6 +32,7 @@
 #include <cmath>
 #include <cstddef>
 #include <iterator>
+#include <type_traits>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -65,28 +66,19 @@ template <typename VectorType>
 struct IsBlockVector
 {
 private:
-  struct yes_type
-  {
-    char c[1];
-  };
-  struct no_type
-  {
-    char c[2];
-  };
-
   /**
    * Overload returning true if the class is derived from BlockVectorBase,
    * which is what block vectors do.
    */
   template <typename T>
-  static yes_type
+  static std::true_type
   check_for_block_vector(const BlockVectorBase<T> *);
 
   /**
    * Catch all for all other potential vector types that are not block
    * matrices.
    */
-  static no_type
+  static std::false_type
   check_for_block_vector(...);
 
 public:
@@ -96,8 +88,8 @@ public:
    * derived from BlockVectorBase<T>).
    */
   static const bool value =
-    (sizeof(check_for_block_vector(static_cast<VectorType *>(nullptr))) ==
-     sizeof(yes_type));
+    std::is_same<decltype(check_for_block_vector(std::declval<VectorType *>())),
+                 std::true_type>::value;
 };
 
 
@@ -551,6 +543,14 @@ public:
    */
   std::size_t
   size() const;
+
+  /**
+   * Return local dimension of the vector. This is the sum of the local
+   * dimensions (i.e., values stored on the current processor) of all
+   * components.
+   */
+  std::size_t
+  locally_owned_size() const;
 
   /**
    * Return an index set that describes which elements of this vector are
@@ -1434,6 +1434,18 @@ inline std::size_t
 BlockVectorBase<VectorType>::size() const
 {
   return block_indices.total_size();
+}
+
+
+
+template <class VectorType>
+inline std::size_t
+BlockVectorBase<VectorType>::locally_owned_size() const
+{
+  std::size_t local_size = 0;
+  for (unsigned int b = 0; b < n_blocks(); ++b)
+    local_size += block(b).locally_owned_size();
+  return local_size;
 }
 
 

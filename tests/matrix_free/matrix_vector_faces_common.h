@@ -136,13 +136,13 @@ private:
                      number,
                      VectorizedArrayType>
       fe_eval_neighbor(data, false);
-    typedef
+    using value_type =
       typename FEFaceEvaluation<dim,
                                 fe_degree,
                                 n_q_points_1d,
                                 n_components,
                                 number,
-                                VectorizedArrayType>::value_type value_type;
+                                VectorizedArrayType>::value_type;
     const int actual_degree = data.get_dof_handler().get_fe().degree;
 
     for (unsigned int face = face_range.first; face < face_range.second; face++)
@@ -202,13 +202,13 @@ private:
                      number,
                      VectorizedArrayType>
       fe_eval(data, true);
-    typedef
+    using value_type =
       typename FEFaceEvaluation<dim,
                                 fe_degree,
                                 n_q_points_1d,
                                 n_components,
                                 number,
-                                VectorizedArrayType>::value_type value_type;
+                                VectorizedArrayType>::value_type;
     const int actual_degree = data.get_dof_handler().get_fe().degree;
     for (unsigned int face = face_range.first; face < face_range.second; face++)
       {
@@ -340,13 +340,13 @@ private:
                      number,
                      VectorizedArrayType>
       fe_eval_neighbor(data, false, 0, 0, start_vector_component);
-    typedef
+    using value_type =
       typename FEFaceEvaluation<dim,
                                 fe_degree,
                                 n_q_points_1d,
                                 n_components,
                                 number,
-                                VectorizedArrayType>::value_type value_type;
+                                VectorizedArrayType>::value_type;
     const int actual_degree = data.get_dof_handler().get_fe().degree;
 
     for (unsigned int face = face_range.first; face < face_range.second; face++)
@@ -408,13 +408,13 @@ private:
                      number,
                      VectorizedArrayType>
       fe_eval(data, true, 0, 0, start_vector_component);
-    typedef
+    using value_type =
       typename FEFaceEvaluation<dim,
                                 fe_degree,
                                 n_q_points_1d,
                                 n_components,
                                 number,
-                                VectorizedArrayType>::value_type value_type;
+                                VectorizedArrayType>::value_type;
     const int actual_degree = data.get_dof_handler().get_fe().degree;
     for (unsigned int face = face_range.first; face < face_range.second; face++)
       {
@@ -578,13 +578,13 @@ private:
                      number,
                      VectorizedArrayType>
       phi_p(data, false, 0, 0, start_vector_component);
-    typedef
+    using value_type =
       typename FEFaceEvaluation<dim,
                                 fe_degree,
                                 n_q_points_1d,
                                 n_components,
                                 number,
-                                VectorizedArrayType>::value_type value_type;
+                                VectorizedArrayType>::value_type;
 
     for (unsigned int face = face_range.first; face < face_range.second; face++)
       {
@@ -626,14 +626,14 @@ private:
                      number,
                      VectorizedArrayType>
       fe_eval(data, true, 0, 0, start_vector_component);
-    typedef
+    using value_type =
       typename FEFaceEvaluation<dim,
                                 fe_degree,
                                 n_q_points_1d,
                                 n_components,
                                 number,
-                                VectorizedArrayType>::value_type value_type;
-    value_type                                                   u_plus;
+                                VectorizedArrayType>::value_type;
+    value_type u_plus;
     u_plus = make_vectorized_array<number, VectorizedArrayType::size()>(1.3);
 
     for (unsigned int face = face_range.first; face < face_range.second; face++)

@@ -48,8 +48,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/distributed/tria.h>
@@ -57,7 +55,6 @@
 #include <deal.II/distributed/solution_transfer.h>
 
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -1132,7 +1129,7 @@ namespace Step42
                                      face_quadrature_formula,
                                      update_values | update_JxW_values);
 
-    const unsigned int dofs_per_cell   = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell   = fe.n_dofs_per_cell();
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -1224,7 +1221,7 @@ namespace Step42
                                      face_quadrature,
                                      update_quadrature_points);
 
-    const unsigned int dofs_per_face   = fe.dofs_per_face;
+    const unsigned int dofs_per_face   = fe.n_dofs_per_face();
     const unsigned int n_face_q_points = face_quadrature.size();
 
     std::vector<types::global_dof_index> dof_indices(dofs_per_face);
@@ -1342,7 +1339,7 @@ namespace Step42
                                      update_values | update_quadrature_points |
                                        update_JxW_values);
 
-    const unsigned int dofs_per_cell   = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell   = fe.n_dofs_per_cell();
     const unsigned int n_q_points      = quadrature_formula.size();
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 
@@ -1495,7 +1492,7 @@ namespace Step42
                                      update_values | update_quadrature_points |
                                        update_JxW_values);
 
-    const unsigned int dofs_per_cell   = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell   = fe.n_dofs_per_cell();
     const unsigned int n_q_points      = quadrature_formula.size();
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 
@@ -1929,7 +1926,7 @@ namespace Step42
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (const auto v : cell->vertex_indices())
           if (vertex_touched[cell->vertex_index(v)] == false)
             {
               vertex_touched[cell->vertex_index(v)] = true;
@@ -2035,9 +2032,9 @@ namespace Step42
     // output files. We then do the same again for the competitor of
     // Paraview, the VisIt visualization program, by creating a matching
     // <code>.visit</code> file.
-    const std::string master_name = data_out.write_vtu_with_pvtu_record(
+    const std::string pvtu_filename = data_out.write_vtu_with_pvtu_record(
       output_dir, "solution", current_refinement_cycle, mpi_communicator, 2);
-    pcout << master_name << std::endl;
+    pcout << pvtu_filename << std::endl;
 
     TrilinosWrappers::MPI::Vector tmp(solution);
     tmp *= -1;

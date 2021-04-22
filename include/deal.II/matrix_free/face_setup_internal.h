@@ -203,7 +203,7 @@ namespace internal
                 continue;
               typename dealii::Triangulation<dim>::cell_iterator dcell(
                 &triangulation, cell_levels[i].first, cell_levels[i].second);
-              for (const unsigned int f : GeometryInfo<dim>::face_indices())
+              for (const unsigned int f : dcell->face_indices())
                 {
                   if (dcell->at_boundary(f) && !dcell->has_periodic_neighbor(f))
                     continue;
@@ -571,7 +571,7 @@ namespace internal
             &triangulation, cell_levels[i].first, cell_levels[i].second);
           if (use_active_cells)
             Assert(dcell->is_active(), ExcNotImplemented());
-          for (auto f : GeometryInfo<dim>::face_indices())
+          for (const auto f : dcell->face_indices())
             {
               if (dcell->at_boundary(f) && !dcell->has_periodic_neighbor(f))
                 face_is_owned[dcell->face(f)->index()] =
@@ -767,7 +767,7 @@ namespace internal
                   &triangulation,
                   cell_levels[cell].first,
                   cell_levels[cell].second);
-                for (const unsigned int f : GeometryInfo<dim>::face_indices())
+                for (const auto f : dcell->face_indices())
                   {
                     // boundary face
                     if (face_is_owned[dcell->face(f)->index()] ==
@@ -780,6 +780,9 @@ namespace internal
                         info.cells_exterior[0] = numbers::invalid_unsigned_int;
                         info.interior_face_no  = f;
                         info.exterior_face_no  = dcell->face(f)->boundary_id();
+                        info.face_type =
+                          dcell->face(f)->reference_cell() !=
+                          dealii::ReferenceCells::get_hypercube<dim - 1>();
                         info.subface_index =
                           GeometryInfo<dim>::max_children_per_cell;
                         info.face_orientation = 0;
@@ -959,6 +962,9 @@ namespace internal
       else
         info.exterior_face_no = cell->neighbor_face_no(face_no);
 
+      info.face_type = cell->face(face_no)->reference_cell() !=
+                       dealii::ReferenceCells::get_hypercube<dim - 1>();
+
       info.subface_index = GeometryInfo<dim>::max_children_per_cell;
       Assert(neighbor->level() <= cell->level(), ExcInternalError());
       if (cell->level() > neighbor->level())
@@ -972,23 +978,45 @@ namespace internal
               cell->neighbor_of_coarser_neighbor(face_no).second;
         }
 
+      // special treatment of periodic boundaries
+      if (dim == 3 && cell->has_periodic_neighbor(face_no))
+        {
+          const unsigned int exterior_face_orientation =
+            !cell->get_triangulation()
+               .get_periodic_face_map()
+               .at({cell, face_no})
+               .second[0] +
+            2 * cell->get_triangulation()
+                  .get_periodic_face_map()
+                  .at({cell, face_no})
+                  .second[1] +
+            4 * cell->get_triangulation()
+                  .get_periodic_face_map()
+                  .at({cell, face_no})
+                  .second[2];
+
+          info.face_orientation = exterior_face_orientation;
+
+          return info;
+        }
+
       info.face_orientation = 0;
-      const unsigned int left_face_orientation =
+      const unsigned int interior_face_orientation =
         !cell->face_orientation(face_no) + 2 * cell->face_flip(face_no) +
         4 * cell->face_rotation(face_no);
-      const unsigned int right_face_orientation =
+      const unsigned int exterior_face_orientation =
         !neighbor->face_orientation(info.exterior_face_no) +
         2 * neighbor->face_flip(info.exterior_face_no) +
         4 * neighbor->face_rotation(info.exterior_face_no);
-      if (left_face_orientation != 0)
+      if (interior_face_orientation != 0)
         {
-          info.face_orientation = 8 + left_face_orientation;
-          Assert(right_face_orientation == 0,
+          info.face_orientation = 8 + interior_face_orientation;
+          Assert(exterior_face_orientation == 0,
                  ExcMessage(
                    "Face seems to be wrongly oriented from both sides"));
         }
       else
-        info.face_orientation = right_face_orientation;
+        info.face_orientation = exterior_face_orientation;
       return info;
     }
 
@@ -1001,8 +1029,11 @@ namespace internal
      * to batch similar faces together for vectorization.
      */
     inline bool
-    compare_faces_for_vectorization(const FaceToCellTopology<1> &face1,
-                                    const FaceToCellTopology<1> &face2)
+    compare_faces_for_vectorization(
+      const FaceToCellTopology<1> &    face1,
+      const FaceToCellTopology<1> &    face2,
+      const std::vector<unsigned int> &active_fe_indices,
+      const unsigned int               length)
     {
       if (face1.interior_face_no != face2.interior_face_no)
         return false;
@@ -1012,6 +1043,21 @@ namespace internal
         return false;
       if (face1.face_orientation != face2.face_orientation)
         return false;
+      if (face1.face_type != face2.face_type)
+        return false;
+
+      if (active_fe_indices.size() > 0)
+        {
+          if (active_fe_indices[face1.cells_interior[0] / length] !=
+              active_fe_indices[face2.cells_interior[0] / length])
+            return false;
+
+          if (face2.cells_exterior[0] != numbers::invalid_unsigned_int)
+            if (active_fe_indices[face1.cells_exterior[0] / length] !=
+                active_fe_indices[face2.cells_exterior[0] / length])
+              return false;
+        }
+
       return true;
     }
 
@@ -1026,10 +1072,43 @@ namespace internal
     template <int length>
     struct FaceComparator
     {
+      FaceComparator(const std::vector<unsigned int> &active_fe_indices)
+        : active_fe_indices(active_fe_indices)
+      {}
+
       bool
       operator()(const FaceToCellTopology<length> &face1,
                  const FaceToCellTopology<length> &face2) const
       {
+        // check if active FE indices match
+        if (face1.face_type < face2.face_type)
+          return true;
+        else if (face1.face_type > face2.face_type)
+          return false;
+
+        // check if active FE indices match
+        if (active_fe_indices.size() > 0)
+          {
+            // ... for interior faces
+            if (active_fe_indices[face1.cells_interior[0] / length] <
+                active_fe_indices[face2.cells_interior[0] / length])
+              return true;
+            else if (active_fe_indices[face1.cells_interior[0] / length] >
+                     active_fe_indices[face2.cells_interior[0] / length])
+              return false;
+
+            // ... for exterior faces
+            if (face2.cells_exterior[0] != numbers::invalid_unsigned_int)
+              {
+                if (active_fe_indices[face1.cells_exterior[0] / length] <
+                    active_fe_indices[face2.cells_exterior[0] / length])
+                  return true;
+                else if (active_fe_indices[face1.cells_exterior[0] / length] >
+                         active_fe_indices[face2.cells_exterior[0] / length])
+                  return false;
+              }
+          }
+
         for (unsigned int i = 0; i < length; ++i)
           if (face1.cells_interior[i] < face2.cells_interior[i])
             return true;
@@ -1057,6 +1136,9 @@ namespace internal
 
         return false;
       }
+
+    private:
+      const std::vector<unsigned int> &active_fe_indices;
     };
 
 
@@ -1067,7 +1149,8 @@ namespace internal
       const std::vector<FaceToCellTopology<1>> &faces_in,
       const std::vector<bool> &                 hard_vectorization_boundary,
       std::vector<unsigned int> &               face_partition_data,
-      std::vector<FaceToCellTopology<vectorization_width>> &faces_out)
+      std::vector<FaceToCellTopology<vectorization_width>> &faces_out,
+      const std::vector<unsigned int> &                     active_fe_indices)
     {
       FaceToCellTopology<vectorization_width> macro_face;
       std::vector<std::vector<unsigned int>>  faces_type;
@@ -1097,7 +1180,9 @@ namespace internal
                 {
                   // Compare current face with first face of type type
                   if (compare_faces_for_vectorization(faces_in[face],
-                                                      faces_in[face_type[0]]))
+                                                      faces_in[face_type[0]],
+                                                      active_fe_indices,
+                                                      vectorization_width))
                     {
                       face_type.push_back(face);
                       goto face_found;
@@ -1109,11 +1194,14 @@ namespace internal
             }
 
           // insert new faces in sorted list to get good data locality
+          FaceComparator<vectorization_width> face_comparator(
+            active_fe_indices);
           std::set<FaceToCellTopology<vectorization_width>,
                    FaceComparator<vectorization_width>>
-            new_faces;
+            new_faces(face_comparator);
           for (const auto &face_type : faces_type)
             {
+              macro_face.face_type = faces_in[face_type[0]].face_type;
               macro_face.interior_face_no =
                 faces_in[face_type[0]].interior_face_no;
               macro_face.exterior_face_no =

@@ -35,14 +35,11 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_refinement.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -620,7 +617,7 @@ namespace Step22
                             update_values | update_quadrature_points |
                               update_JxW_values | update_gradients);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
     const unsigned int n_q_points = quadrature_formula.size();
 

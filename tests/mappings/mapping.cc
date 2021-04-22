@@ -54,7 +54,7 @@ plot_transformation(Mapping<dim> &                           mapping,
 {
   const unsigned int div = 7;
 
-  QTrapez<1>     q_trapez;
+  QTrapezoid<1>  q_trapez;
   QIterated<dim> q(q_trapez, div);
   FEValues<dim>  fe_values(
     mapping, fe, q, UpdateFlags(update_quadrature_points | update_JxW_values));

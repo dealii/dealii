@@ -128,13 +128,13 @@ namespace DoFTools
                                     const ComponentMask &component_mask)
     {
       std::vector<unsigned char> local_component_association(
-        fe.dofs_per_cell, static_cast<unsigned char>(-1));
+        fe.n_dofs_per_cell(), static_cast<unsigned char>(-1));
 
       // compute the component each local dof belongs to.
       // if the shape function is primitive, then this
       // is simple and we can just associate it with
       // what system_to_component_index gives us
-      for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+      for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
         if (fe.is_primitive(i))
           local_component_association[i] =
             fe.system_to_component_index(i).first;
@@ -228,7 +228,7 @@ namespace DoFTools
         if (c->is_locally_owned())
           {
             const unsigned int fe_index      = c->active_fe_index();
-            const unsigned int dofs_per_cell = c->get_fe().dofs_per_cell;
+            const unsigned int dofs_per_cell = c->get_fe().n_dofs_per_cell();
             indices.resize(dofs_per_cell);
             c->get_dof_indices(indices);
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -270,9 +270,9 @@ namespace DoFTools
       for (unsigned int f = 0; f < fe_collection.size(); ++f)
         {
           const FiniteElement<dim, spacedim> &fe = fe_collection[f];
-          local_block_association[f].resize(fe.dofs_per_cell,
+          local_block_association[f].resize(fe.n_dofs_per_cell(),
                                             static_cast<unsigned char>(-1));
-          for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+          for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
             local_block_association[f][i] = fe.system_to_block_index(i).first;
 
           Assert(std::find(local_block_association[f].begin(),
@@ -288,7 +288,7 @@ namespace DoFTools
         if (cell->is_locally_owned())
           {
             const unsigned int fe_index      = cell->active_fe_index();
-            const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+            const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
             indices.resize(dofs_per_cell);
             cell->get_dof_indices(indices);
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -355,7 +355,7 @@ namespace DoFTools
 
     for (unsigned int present_cell = 0; cell != endc; ++cell, ++present_cell)
       {
-        const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+        const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
         dof_indices.resize(dofs_per_cell);
         cell->get_dof_indices(dof_indices);
 
@@ -456,46 +456,22 @@ namespace DoFTools
              dof.get_fe_collection().n_components())
       return dof.locally_owned_dofs();
 
-    // If we have to deal with a partial component mask, then
-    // set up a table for the degrees of freedom on the reference cell (for
-    // each element in the collection) to see whether it belongs to one of the
-    // desired components.
-    const auto &                   fe_collection = dof.get_fe_collection();
-    std::vector<std::vector<bool>> local_selected_dofs;
-    Assert(fe_collection.n_components() < 256, ExcNotImplemented());
-    for (unsigned int f = 0; f < fe_collection.size(); ++f)
-      {
-        // First get the component for each shape function
-        const std::vector<unsigned char> local_component_association =
-          internal::get_local_component_association(fe_collection[f],
-                                                    component_mask);
+    // get the component association of each DoF and then select the ones
+    // that match the given set of components
+    std::vector<unsigned char> dofs_by_component(dof.n_locally_owned_dofs());
+    internal::get_component_association(dof, component_mask, dofs_by_component);
 
-        // Check which dofs were selected
-        std::vector<bool> this_selected_dofs(fe_collection[f].dofs_per_cell);
-        for (unsigned int i = 0; i < fe_collection[f].dofs_per_cell; ++i)
-          this_selected_dofs[i] =
-            component_mask[local_component_association[i]];
+    // fill the selected components in a vector
+    std::vector<types::global_dof_index> selected_dofs;
+    selected_dofs.reserve(dof.n_locally_owned_dofs());
+    for (types::global_dof_index i = 0; i < dofs_by_component.size(); ++i)
+      if (component_mask[dofs_by_component[i]] == true)
+        selected_dofs.push_back(dof.locally_owned_dofs().nth_index_in_set(i));
 
-        local_selected_dofs.emplace_back(std::move(this_selected_dofs));
-      }
-
-    // Then loop over all cells and do the work
-    IndexSet                             selected_dofs(dof.n_dofs());
-    std::vector<types::global_dof_index> local_dof_indices;
-    for (const auto &c : dof.active_cell_iterators())
-      if (c->is_locally_owned())
-        {
-          const unsigned int fe_index      = c->active_fe_index();
-          const unsigned int dofs_per_cell = c->get_fe().dofs_per_cell;
-          local_dof_indices.resize(dofs_per_cell);
-          c->get_dof_indices(local_dof_indices);
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            if (dof.locally_owned_dofs().is_element(local_dof_indices[i]) &&
-                local_selected_dofs[fe_index][i])
-              selected_dofs.add_index(local_dof_indices[i]);
-        }
-
-    return selected_dofs;
+    // fill vector of indices to return argument
+    IndexSet result(dof.n_dofs());
+    result.add_indices(selected_dofs.begin(), selected_dofs.end());
+    return result;
   }
 
 
@@ -599,17 +575,17 @@ namespace DoFTools
     // whether it is something interesting or not
     std::vector<unsigned char> local_component_asssociation =
       internal::get_local_component_association(fe, component_mask);
-    std::vector<bool> local_selected_dofs(fe.dofs_per_cell);
-    for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+    std::vector<bool> local_selected_dofs(fe.n_dofs_per_cell());
+    for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
       local_selected_dofs[i] = component_mask[local_component_asssociation[i]];
 
     // then loop over all cells and do work
-    std::vector<types::global_dof_index> indices(fe.dofs_per_cell);
+    std::vector<types::global_dof_index> indices(fe.n_dofs_per_cell());
     typename DoFHandler<dim, spacedim>::level_cell_iterator c;
     for (c = dof.begin(level); c != dof.end(level); ++c)
       {
         c->get_mg_dof_indices(indices);
-        for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
           selected_dofs[indices[i]] = local_selected_dofs[i];
       }
   }
@@ -658,11 +634,25 @@ namespace DoFTools
   }
 
 
+
   template <int dim, int spacedim>
   void
   extract_boundary_dofs(const DoFHandler<dim, spacedim> &   dof_handler,
                         const ComponentMask &               component_mask,
                         IndexSet &                          selected_dofs,
+                        const std::set<types::boundary_id> &boundary_ids)
+  {
+    // Simply forward to the other function
+    selected_dofs =
+      extract_boundary_dofs(dof_handler, component_mask, boundary_ids);
+  }
+
+
+
+  template <int dim, int spacedim>
+  IndexSet
+  extract_boundary_dofs(const DoFHandler<dim, spacedim> &   dof_handler,
+                        const ComponentMask &               component_mask,
                         const std::set<types::boundary_id> &boundary_ids)
   {
     Assert(component_mask.represents_n_components(
@@ -672,9 +662,7 @@ namespace DoFTools
              boundary_ids.end(),
            ExcInvalidBoundaryIndicator());
 
-    // first reset output argument
-    selected_dofs.clear();
-    selected_dofs.set_size(dof_handler.n_dofs());
+    IndexSet selected_dofs(dof_handler.n_dofs());
 
     // let's see whether we have to check for certain boundary indicators
     // or whether we can accept all
@@ -699,11 +687,10 @@ namespace DoFTools
     // boundary line is also part of a boundary face which we will be
     // visiting sooner or later
     for (const auto &cell : dof_handler.active_cell_iterators())
-
       // only work on cells that are either locally owned or at least ghost
       // cells
       if (cell->is_artificial() == false)
-        for (const unsigned int face : GeometryInfo<dim>::face_indices())
+        for (const unsigned int face : cell->face_indices())
           if (cell->at_boundary(face))
             if (!check_boundary_id ||
                 (boundary_ids.find(cell->face(face)->boundary_id()) !=
@@ -711,12 +698,22 @@ namespace DoFTools
               {
                 const FiniteElement<dim, spacedim> &fe = cell->get_fe();
 
-                const unsigned int dofs_per_face = fe.dofs_per_face;
+                const auto reference_cell = cell->reference_cell();
+
+                const unsigned int n_vertices_per_cell =
+                  reference_cell.n_vertices();
+                const unsigned int n_lines_per_cell = reference_cell.n_lines();
+                const unsigned int n_vertices_per_face =
+                  reference_cell.face_reference_cell(face).n_vertices();
+                const unsigned int n_lines_per_face =
+                  reference_cell.face_reference_cell(face).n_lines();
+
+                const unsigned int dofs_per_face = fe.n_dofs_per_face(face);
                 face_dof_indices.resize(dofs_per_face);
                 cell->face(face)->get_dof_indices(face_dof_indices,
                                                   cell->active_fe_index());
 
-                for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
+                for (unsigned int i = 0; i < fe.n_dofs_per_face(face); ++i)
                   if (!check_vector_component)
                     selected_dofs.add_index(face_dof_indices[i]);
                   else
@@ -725,27 +722,40 @@ namespace DoFTools
                     // non-primitive, but use usual convention (see docs)
                     {
                       // first get at the cell-global number of a face dof,
-                      // to ask the fe certain questions
+                      // to ask the FE certain questions
                       const unsigned int cell_index =
                         (dim == 1 ?
                            i :
                            (dim == 2 ?
-                              (i < 2 * fe.dofs_per_vertex ?
+                              (i < 2 * fe.n_dofs_per_vertex() ?
                                  i :
-                                 i + 2 * fe.dofs_per_vertex) :
-                              (dim == 3 ? (i < 4 * fe.dofs_per_vertex ?
+                                 i + 2 * fe.n_dofs_per_vertex()) :
+                              (dim == 3 ? (i < n_vertices_per_face *
+                                                 fe.n_dofs_per_vertex() ?
                                              i :
-                                             (i < 4 * fe.dofs_per_vertex +
-                                                    4 * fe.dofs_per_line ?
-                                                i + 4 * fe.dofs_per_vertex :
-                                                i + 4 * fe.dofs_per_vertex +
-                                                  8 * fe.dofs_per_line)) :
+                                             (i < n_vertices_per_face *
+                                                      fe.n_dofs_per_vertex() +
+                                                    n_lines_per_face *
+                                                      fe.n_dofs_per_line() ?
+                                                (i - n_vertices_per_face *
+                                                       fe.n_dofs_per_vertex()) +
+                                                  n_vertices_per_cell *
+                                                    fe.n_dofs_per_vertex() :
+                                                (i -
+                                                 n_vertices_per_face *
+                                                   fe.n_dofs_per_vertex() -
+                                                 n_lines_per_face *
+                                                   fe.n_dofs_per_line()) +
+                                                  n_vertices_per_cell *
+                                                    fe.n_dofs_per_vertex() +
+                                                  n_lines_per_cell *
+                                                    fe.n_dofs_per_line())) :
                                           numbers::invalid_unsigned_int)));
                       if (fe.is_primitive(cell_index))
                         {
-                          if (component_mask
-                                [fe.face_system_to_component_index(i).first] ==
-                              true)
+                          if (component_mask[fe.face_system_to_component_index(
+                                                 i, face)
+                                               .first] == true)
                             selected_dofs.add_index(face_dof_indices[i]);
                         }
                       else // not primitive
@@ -761,6 +771,8 @@ namespace DoFTools
                         }
                     }
               }
+
+    return selected_dofs;
   }
 
 
@@ -803,7 +815,7 @@ namespace DoFTools
     // boundary line is also part of a boundary face which we will be
     // visiting sooner or later
     for (const auto &cell : dof_handler.active_cell_iterators())
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : cell->face_indices())
         if (cell->at_boundary(face))
           if (!check_boundary_id ||
               (boundary_ids.find(cell->face(face)->boundary_id()) !=
@@ -811,11 +823,11 @@ namespace DoFTools
             {
               const FiniteElement<dim, spacedim> &fe = cell->get_fe();
 
-              const unsigned int dofs_per_cell = fe.dofs_per_cell;
+              const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
               cell_dof_indices.resize(dofs_per_cell);
               cell->get_dof_indices(cell_dof_indices);
 
-              for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+              for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
                 if (fe.has_support_on_face(i, face))
                   {
                     if (!check_vector_component)
@@ -876,7 +888,7 @@ namespace DoFTools
     for (; cell != endc; ++cell)
       if (!cell->is_artificial() && predicate(cell))
         {
-          local_dof_indices.resize(cell->get_fe().dofs_per_cell);
+          local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
           cell->get_dof_indices(local_dof_indices);
           predicate_dofs.insert(local_dof_indices.begin(),
                                 local_dof_indices.end());
@@ -903,7 +915,7 @@ namespace DoFTools
             continue;
           }
 
-        const unsigned int dofs_per_cell = (*it)->get_fe().dofs_per_cell;
+        const unsigned int dofs_per_cell = (*it)->get_fe().n_dofs_per_cell();
         local_dof_indices.resize(dofs_per_cell);
         (*it)->get_dof_indices(local_dof_indices);
         dofs_with_support_on_halo_cells.insert(local_dof_indices.begin(),
@@ -984,14 +996,15 @@ namespace DoFTools
         for (const auto &cell : dof_handler.active_cell_iterators())
           if (!cell->is_artificial())
             {
-              for (const unsigned int face : GeometryInfo<dim>::face_indices())
+              for (const unsigned int face : cell->face_indices())
                 if (cell->face(face)->has_children())
                   {
                     const typename dealii::DoFHandler<dim,
                                                       spacedim>::line_iterator
                       line = cell->face(face);
 
-                    for (unsigned int dof = 0; dof != fe.dofs_per_vertex; ++dof)
+                    for (unsigned int dof = 0; dof != fe.n_dofs_per_vertex();
+                         ++dof)
                       selected_dofs.add_index(
                         line->child(0)->vertex_dof_index(1, dof));
 
@@ -1000,7 +1013,7 @@ namespace DoFTools
                         if (cell->neighbor_child_on_subface(face, child)
                               ->is_artificial())
                           continue;
-                        for (unsigned int dof = 0; dof != fe.dofs_per_line;
+                        for (unsigned int dof = 0; dof != fe.n_dofs_per_line();
                              ++dof)
                           selected_dofs.add_index(
                             line->child(child)->dof_index(dof));
@@ -1027,7 +1040,7 @@ namespace DoFTools
 
         for (const auto &cell : dof_handler.active_cell_iterators())
           if (!cell->is_artificial())
-            for (auto f : GeometryInfo<dim>::face_indices())
+            for (auto f : cell->face_indices())
               {
                 const typename dealii::DoFHandler<dim, spacedim>::face_iterator
                   face = cell->face(f);
@@ -1039,7 +1052,7 @@ namespace DoFTools
                         {
                           // simply take all DoFs that live on this subface
                           std::vector<types::global_dof_index> ldi(
-                            fe.dofs_per_face);
+                            fe.n_dofs_per_face(f, child));
                           face->child(child)->get_dof_indices(ldi);
                           selected_dofs.add_indices(ldi.begin(), ldi.end());
                         }
@@ -1047,7 +1060,7 @@ namespace DoFTools
                     // and subtract (in the end) all the indices which a shared
                     // between this face and its subfaces
                     for (unsigned int vertex = 0; vertex < 4; ++vertex)
-                      for (unsigned int dof = 0; dof != fe.dofs_per_vertex;
+                      for (unsigned int dof = 0; dof != fe.n_dofs_per_vertex();
                            ++dof)
                         unconstrained_dofs.add_index(
                           face->vertex_dof_index(vertex, dof));
@@ -1111,7 +1124,7 @@ namespace DoFTools
     for (; cell != endc; ++cell)
       if (cell->subdomain_id() == subdomain_id)
         {
-          const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+          const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
           local_dof_indices.resize(dofs_per_cell);
           cell->get_dof_indices(local_dof_indices);
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -1141,13 +1154,49 @@ namespace DoFTools
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
         {
-          dof_indices.resize(cell->get_fe().dofs_per_cell);
+          dof_indices.resize(cell->get_fe().n_dofs_per_cell());
           cell->get_dof_indices(dof_indices);
 
           for (const types::global_dof_index dof_index : dof_indices)
             if (!dof_set.is_element(dof_index))
               global_dof_indices.insert(dof_index);
         }
+
+    dof_set.add_indices(global_dof_indices.begin(), global_dof_indices.end());
+
+    dof_set.compress();
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  extract_locally_active_level_dofs(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    IndexSet &                       dof_set,
+    const unsigned int               level)
+  {
+    // collect all the locally owned dofs
+    dof_set = dof_handler.locally_owned_mg_dofs(level);
+
+    // add the DoF on the adjacent ghost cells to the IndexSet, cache them
+    // in a set. need to check each dof manually because we can't be sure
+    // that the dof range of locally_owned_dofs is really contiguous.
+    std::vector<types::global_dof_index> dof_indices;
+    std::set<types::global_dof_index>    global_dof_indices;
+
+    const auto filtered_iterators_range =
+      filter_iterators(dof_handler.cell_iterators_on_level(level),
+                       dealii::IteratorFilters::LocallyOwnedLevelCell());
+    for (const auto &cell : filtered_iterators_range)
+      {
+        dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+        cell->get_mg_dof_indices(dof_indices);
+
+        for (const types::global_dof_index dof_index : dof_indices)
+          if (!dof_set.is_element(dof_index))
+            global_dof_indices.insert(dof_index);
+      }
 
     dof_set.add_indices(global_dof_indices.begin(), global_dof_indices.end());
 
@@ -1181,7 +1230,7 @@ namespace DoFTools
     for (; cell != endc; ++cell)
       if (cell->is_ghost())
         {
-          dof_indices.resize(cell->get_fe().dofs_per_cell);
+          dof_indices.resize(cell->get_fe().n_dofs_per_cell());
           cell->get_dof_indices(dof_indices);
           for (const auto dof_index : dof_indices)
             if (!dof_set.is_element(dof_index))
@@ -1232,7 +1281,7 @@ namespace DoFTools
             id == numbers::artificial_subdomain_id)
           continue;
 
-        dof_indices.resize(cell->get_fe().dofs_per_cell);
+        dof_indices.resize(cell->get_fe().n_dofs_per_cell());
         cell->get_mg_dof_indices(dof_indices);
         for (const auto dof_index : dof_indices)
           if (!dof_set.is_element(dof_index))
@@ -1323,7 +1372,7 @@ namespace DoFTools
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
-          dof_indices.resize(cell->get_fe().dofs_per_cell);
+          dof_indices.resize(cell->get_fe().n_dofs_per_cell());
           cell->get_dof_indices(dof_indices);
 
           for (unsigned int i = 0; i < dof_indices.size(); ++i)
@@ -1513,7 +1562,7 @@ namespace DoFTools
               ExcMessage(
                 "The subdomain ID of the halo cell should not match that of the vector entry."));
 
-            local_dof_indices.resize(cell->get_fe().dofs_per_cell);
+            local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
             cell->get_dof_indices(local_dof_indices);
 
             for (const types::global_dof_index local_dof_index :
@@ -1600,7 +1649,7 @@ namespace DoFTools
       {
         const types::subdomain_id subdomain_id =
           cell_owners[cell->active_cell_index()];
-        const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+        const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
         local_dof_indices.resize(dofs_per_cell);
         cell->get_dof_indices(local_dof_indices);
 
@@ -1681,7 +1730,7 @@ namespace DoFTools
       if ((cell->is_artificial() == false) &&
           (cell->subdomain_id() == subdomain))
         {
-          const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+          const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
           local_dof_indices.resize(dofs_per_cell);
           cell->get_dof_indices(local_dof_indices);
           subdomain_indices.insert(subdomain_indices.end(),
@@ -2106,10 +2155,11 @@ namespace DoFTools
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
     for (; cell != endc; ++cell)
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         if (cell->at_boundary(f))
           {
-            const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
+            const unsigned int dofs_per_face =
+              cell->get_fe().n_dofs_per_face(f);
             dofs_on_face.resize(dofs_per_face);
             cell->face(f)->get_dof_indices(dofs_on_face,
                                            cell->active_fe_index());
@@ -2150,11 +2200,12 @@ namespace DoFTools
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
     for (; cell != endc; ++cell)
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         if (boundary_ids.find(cell->face(f)->boundary_id()) !=
             boundary_ids.end())
           {
-            const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
+            const unsigned int dofs_per_face =
+              cell->get_fe().n_dofs_per_face(f);
             dofs_on_face.resize(dofs_per_face);
             cell->face(f)->get_dof_indices(dofs_on_face,
                                            cell->active_fe_index());
@@ -2186,7 +2237,7 @@ namespace DoFTools
         for (unsigned int fe_index = 0; fe_index < fe_collection.size();
              ++fe_index)
           {
-            // check whether every fe in the collection has support points
+            // check whether every FE in the collection has support points
             Assert(fe_collection[fe_index].has_support_points(),
                    typename FiniteElement<dim>::ExcFEHasNoSupportPoints());
             q_coll_dummy.push_back(Quadrature<dim>(
@@ -2223,12 +2274,13 @@ namespace DoFTools
               const FEValues<dim, spacedim> &fe_values =
                 hp_fe_values.get_present_fe_values();
 
-              local_dof_indices.resize(cell->get_fe().dofs_per_cell);
+              local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
               cell->get_dof_indices(local_dof_indices);
 
               const std::vector<Point<spacedim>> &points =
                 fe_values.get_quadrature_points();
-              for (unsigned int i = 0; i < cell->get_fe().dofs_per_cell; ++i)
+              for (unsigned int i = 0; i < cell->get_fe().n_dofs_per_cell();
+                   ++i)
                 {
                   const unsigned int dof_comp =
                     cell->get_fe().system_to_component_index(i).first;
@@ -2411,7 +2463,7 @@ namespace DoFTools
                               const Table<2, Coupling> &       table,
                               std::vector<Table<2, Coupling>> &tables_by_block)
   {
-    if (dof_handler.hp_capability_enabled == false)
+    if (dof_handler.has_hp_capabilities() == false)
       {
         const FiniteElement<dim, spacedim> &fe = dof_handler.get_fe();
         const unsigned int                  nb = fe.n_blocks();
@@ -2478,12 +2530,12 @@ namespace DoFTools
         ++i;
     block_list.reinit(i,
                       dof_handler.n_dofs(),
-                      dof_handler.get_fe().dofs_per_cell);
+                      dof_handler.get_fe().n_dofs_per_cell());
     i = 0;
     for (cell = dof_handler.begin(level); cell != endc; ++cell)
       if (cell->is_locally_owned_on_level())
         {
-          indices.resize(cell->get_fe().dofs_per_cell);
+          indices.resize(cell->get_fe().n_dofs_per_cell());
           cell->get_mg_dof_indices(indices);
 
           if (selected_dofs.size() != 0)
@@ -2522,20 +2574,19 @@ namespace DoFTools
 
     for (cell = dof_handler.begin(level); cell != endc; ++cell)
       {
-        indices.resize(cell->get_fe().dofs_per_cell);
+        indices.resize(cell->get_fe().n_dofs_per_cell());
         cell->get_mg_dof_indices(indices);
 
         if (interior_only)
           {
             // Exclude degrees of freedom on faces opposite to the vertex
-            exclude.resize(fe.dofs_per_cell);
+            exclude.resize(fe.n_dofs_per_cell());
             std::fill(exclude.begin(), exclude.end(), false);
-            const unsigned int dpf = fe.dofs_per_face;
 
-            for (const unsigned int face : GeometryInfo<dim>::face_indices())
+            for (const unsigned int face : cell->face_indices())
               if (cell->at_boundary(face) ||
                   cell->neighbor(face)->level() != cell->level())
-                for (unsigned int i = 0; i < dpf; ++i)
+                for (unsigned int i = 0; i < fe.n_dofs_per_face(face); ++i)
                   exclude[fe.face_to_cell_index(i, face)] = true;
             for (types::global_dof_index j = 0; j < indices.size(); ++j)
               if (!exclude[j])
@@ -2581,7 +2632,7 @@ namespace DoFTools
 
             // For hp, only this line here would have to be replaced.
             const FiniteElement<dim> &fe     = dof_handler.get_fe();
-            const unsigned int        n_dofs = fe.dofs_per_cell;
+            const unsigned int        n_dofs = fe.n_dofs_per_cell();
             indices.resize(n_dofs);
             exclude.resize(n_dofs);
             std::fill(exclude.begin(), exclude.end(), false);
@@ -2591,13 +2642,11 @@ namespace DoFTools
               {
                 // Eliminate dofs on faces of the child which are on faces
                 // of the parent
-                const unsigned int dpf = fe.dofs_per_face;
-
                 for (unsigned int d = 0; d < dim; ++d)
                   {
                     const unsigned int face =
                       GeometryInfo<dim>::vertex_to_face[child][d];
-                    for (unsigned int i = 0; i < dpf; ++i)
+                    for (unsigned int i = 0; i < fe.n_dofs_per_face(face); ++i)
                       exclude[fe.face_to_cell_index(i, face)] = true;
                   }
 
@@ -2607,7 +2656,8 @@ namespace DoFTools
                   for (const unsigned int face :
                        GeometryInfo<dim>::face_indices())
                     if (cell->at_boundary(face))
-                      for (unsigned int i = 0; i < dpf; ++i)
+                      for (unsigned int i = 0; i < fe.n_dofs_per_face(face);
+                           ++i)
                         exclude[fe.face_to_cell_index(i, face)] = false;
               }
 
@@ -2677,10 +2727,10 @@ namespace DoFTools
     // Identify all vertices active on this level and remember some data
     // about them
     for (cell = dof_handler.begin(level); cell != endc; ++cell)
-      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int v : cell->vertex_indices())
         {
           const unsigned int vg = cell->vertex_index(v);
-          vertex_dof_count[vg] += cell->get_fe().dofs_per_cell;
+          vertex_dof_count[vg] += cell->get_fe().n_dofs_per_cell();
           ++vertex_cell_count[vg];
           for (unsigned int d = 0; d < dim; ++d)
             {
@@ -2728,10 +2778,10 @@ namespace DoFTools
     for (cell = dof_handler.begin(level); cell != endc; ++cell)
       {
         const FiniteElement<dim> &fe = cell->get_fe();
-        indices.resize(fe.dofs_per_cell);
+        indices.resize(fe.n_dofs_per_cell());
         cell->get_mg_dof_indices(indices);
 
-        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+        for (const unsigned int v : cell->vertex_indices())
           {
             const unsigned int vg    = cell->vertex_index(v);
             const unsigned int block = vertex_mapping[vg];
@@ -2745,9 +2795,8 @@ namespace DoFTools
               {
                 // Exclude degrees of freedom on faces opposite to the
                 // vertex
-                exclude.resize(fe.dofs_per_cell);
+                exclude.resize(fe.n_dofs_per_cell());
                 std::fill(exclude.begin(), exclude.end(), false);
-                const unsigned int dpf = fe.dofs_per_face;
 
                 for (unsigned int d = 0; d < dim; ++d)
                   {
@@ -2755,7 +2804,7 @@ namespace DoFTools
                       GeometryInfo<dim>::vertex_to_face[v][d];
                     const unsigned int face =
                       GeometryInfo<dim>::opposite_face[a_face];
-                    for (unsigned int i = 0; i < dpf; ++i)
+                    for (unsigned int i = 0; i < fe.n_dofs_per_face(face); ++i)
                       {
                         // For each dof, get the block it is in and decide to
                         // exclude it or not
@@ -2813,7 +2862,7 @@ namespace DoFTools
         Assert(cell->is_artificial() == false,
                ExcMessage("This function can not be called with cells that are "
                           "not either locally owned or ghost cells."));
-        local_dof_indices.resize(cell->get_fe().dofs_per_cell);
+        local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
         cell->get_dof_indices(local_dof_indices);
         dofs_on_patch.insert(local_dof_indices.begin(),
                              local_dof_indices.end());
@@ -2844,7 +2893,7 @@ namespace DoFTools
         Assert(cell->is_artificial() == false,
                ExcMessage("This function can not be called with cells that are "
                           "not either locally owned or ghost cells."));
-        local_dof_indices.resize(cell->get_fe().dofs_per_cell);
+        local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
         cell->get_dof_indices(local_dof_indices);
         dofs_on_patch.insert(local_dof_indices.begin(),
                              local_dof_indices.end());

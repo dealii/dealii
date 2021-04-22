@@ -22,6 +22,8 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_values_extractors.h>
 
+#include <deal.II/hp/collection.h>
+
 #include <memory>
 
 DEAL_II_NAMESPACE_OPEN
@@ -30,8 +32,7 @@ namespace hp
 {
   /**
    * This class acts as a collection of finite element objects used in the
-   * hp::DoFHandler. It is thus to a hp::DoFHandler what a FiniteElement is to
-   * a ::DoFHandler.
+   * DoFHandler.
    *
    * It implements the concepts stated in the
    * @ref hpcollection
@@ -49,11 +50,11 @@ namespace hp
    * @ingroup hp hpcollection
    */
   template <int dim, int spacedim = dim>
-  class FECollection : public Subscriptor
+  class FECollection : public Collection<FiniteElement<dim, spacedim>>
   {
   public:
     /**
-     * Whenever p adaptivity is considered in an hp finite element program,
+     * Whenever p-adaptivity is considered in an hp-finite element program,
      * a hierarchy of finite elements needs to be established to determine
      * succeeding finite elements for refinement and preceding ones for
      * coarsening.
@@ -180,21 +181,6 @@ namespace hp
     push_back(const FiniteElement<dim, spacedim> &new_fe);
 
     /**
-     * Get a reference to the given element in this collection.
-     *
-     * @pre @p index must be between zero and the number of elements of the
-     * collection.
-     */
-    const FiniteElement<dim, spacedim> &
-    operator[](const unsigned int index) const;
-
-    /**
-     * Return the number of finite element objects stored in this collection.
-     */
-    unsigned int
-    size() const;
-
-    /**
      * Return the number of vector components of the finite elements in this
      * collection.  This number must be the same for all elements in the
      * collection.
@@ -274,23 +260,17 @@ namespace hp
     unsigned int
     max_dofs_per_cell() const;
 
-    /**
-     * Return an estimate for the memory allocated for this object.
-     */
-    std::size_t
-    memory_consumption() const;
-
 
     /**
      * Return whether all elements in this collection implement the hanging
      * node constraints in the new way, which has to be used to make elements
-     * "hp compatible". If this is not the case, the function returns false,
+     * "hp-compatible". If this is not the case, the function returns false,
      * which implies, that at least one element in the FECollection does not
      * support the new face interface constraints. On the other hand, if this
-     * method does return true, this does not imply that the hp method will
+     * method does return true, this does not imply that the hp-method will
      * work!
      *
-     * This behaviour is related to the fact, that FiniteElement classes,
+     * This behavior is related to the fact, that FiniteElement classes,
      * which provide the new style hanging node constraints might still not
      * provide them for all possible cases. If FE_Q and FE_RaviartThomas
      * elements are included in the FECollection and both properly implement
@@ -507,7 +487,29 @@ namespace hp
     set_default_hierarchy();
 
     /**
-     * Function returning the index of the finite element following the given
+     * Returns a sequence of FE indices that corresponds to the registered
+     * hierarchy in ascending order, i.e., FE indices are sorted from lowest to
+     * highest level.
+     *
+     * Multiple sequences of FE indices are possible with a single custom
+     * hierarchy that can be registered with set_hierarchy(). This function
+     * will return the sequence that contains the user-provided index
+     * @p fe_index which could be located anywhere inside the sequence. The
+     * default hierarchy set via set_default_hierarchy(), which corresponds to
+     * FE indices in ascending order, consists of only one sequence.
+     *
+     * This function can be used, for example, to verify that your provided
+     * hierarchy covers all elements in the desired order.
+     *
+     * Only one sequence of FE indices exists if the size of the returned
+     * container equals the number of elements of this object, i.e.,
+     * FECollection::size().
+     */
+    std::vector<unsigned int>
+    get_hierarchy_sequence(const unsigned int fe_index = 0) const;
+
+    /**
+     * %Function returning the index of the finite element following the given
      * @p fe_index in hierarchy.
      *
      * By default, the index succeeding @p fe_index will be returned. If @p fe_index
@@ -519,7 +521,7 @@ namespace hp
     next_in_hierarchy(const unsigned int fe_index) const;
 
     /**
-     * Function returning the index of the finite element preceding the given
+     * %Function returning the index of the finite element preceding the given
      * @p fe_index in hierarchy.
      *
      * By default, the index preceding @p fe_index will be returned. If @p fe_index
@@ -736,28 +738,12 @@ namespace hp
     DeclException0(ExcNoFiniteElements);
 
     /**
-     * Exception
-     *
-     * @ingroup Exceptions
-     */
-    DeclExceptionMsg(
-      ExcNoDominatedFiniteElementAmongstChildren,
-      "No FiniteElement has been found in your FECollection that is "
-      "dominated by all children of a cell you are trying to coarsen!");
-
-    /**
      * @}
      */
 
   private:
     /**
-     * Array of pointers to the finite elements stored by this collection.
-     */
-    std::vector<std::shared_ptr<const FiniteElement<dim, spacedim>>>
-      finite_elements;
-
-    /**
-     * Function returning the index of the finite element following the given
+     * %Function returning the index of the finite element following the given
      * one in hierarchy.
      */
     std::function<unsigned int(const typename hp::FECollection<dim, spacedim> &,
@@ -765,7 +751,7 @@ namespace hp
       hierarchy_next;
 
     /**
-     * Function returning the index of the finite element preceding the given
+     * %Function returning the index of the finite element preceding the given
      * one in hierarchy.
      */
     std::function<unsigned int(const typename hp::FECollection<dim, spacedim> &,
@@ -796,19 +782,12 @@ namespace hp
   }
 
 
-  template <int dim, int spacedim>
-  inline unsigned int
-  FECollection<dim, spacedim>::size() const
-  {
-    return finite_elements.size();
-  }
-
 
   template <int dim, int spacedim>
   inline unsigned int
   FECollection<dim, spacedim>::n_components() const
   {
-    Assert(finite_elements.size() > 0, ExcNoFiniteElements());
+    Assert(this->size() > 0, ExcNoFiniteElements());
 
     // note that there is no need
     // here to enforce that indeed
@@ -818,7 +797,7 @@ namespace hp
     // adding a new element to the
     // collection.
 
-    return finite_elements[0]->n_components();
+    return this->operator[](0).n_components();
   }
 
 
@@ -828,12 +807,12 @@ namespace hp
   FECollection<dim, spacedim>::
   operator==(const FECollection<dim, spacedim> &fe_collection) const
   {
-    const unsigned int n_elements = size();
+    const unsigned int n_elements = this->size();
     if (n_elements != fe_collection.size())
       return false;
 
     for (unsigned int i = 0; i < n_elements; ++i)
-      if (!(*finite_elements[i] == fe_collection[i]))
+      if (!(this->operator[](i) == fe_collection[i]))
         return false;
 
     return true;
@@ -852,24 +831,14 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  inline const FiniteElement<dim, spacedim> &FECollection<dim, spacedim>::
-                                             operator[](const unsigned int index) const
-  {
-    AssertIndexRange(index, finite_elements.size());
-    return *finite_elements[index];
-  }
-
-
-
-  template <int dim, int spacedim>
   unsigned int
   FECollection<dim, spacedim>::max_degree() const
   {
-    Assert(finite_elements.size() > 0, ExcNoFiniteElements());
+    Assert(this->size() > 0, ExcNoFiniteElements());
 
     unsigned int max = 0;
-    for (unsigned int i = 0; i < finite_elements.size(); ++i)
-      max = std::max(max, finite_elements[i]->degree);
+    for (unsigned int i = 0; i < this->size(); ++i)
+      max = std::max(max, this->operator[](i).degree);
 
     return max;
   }
@@ -880,12 +849,11 @@ namespace hp
   unsigned int
   FECollection<dim, spacedim>::max_dofs_per_vertex() const
   {
-    Assert(finite_elements.size() > 0, ExcNoFiniteElements());
+    Assert(this->size() > 0, ExcNoFiniteElements());
 
     unsigned int max = 0;
-    for (unsigned int i = 0; i < finite_elements.size(); ++i)
-      if (finite_elements[i]->dofs_per_vertex > max)
-        max = finite_elements[i]->dofs_per_vertex;
+    for (unsigned int i = 0; i < this->size(); ++i)
+      max = std::max(max, this->operator[](i).n_dofs_per_vertex());
 
     return max;
   }
@@ -896,12 +864,11 @@ namespace hp
   unsigned int
   FECollection<dim, spacedim>::max_dofs_per_line() const
   {
-    Assert(finite_elements.size() > 0, ExcNoFiniteElements());
+    Assert(this->size() > 0, ExcNoFiniteElements());
 
     unsigned int max = 0;
-    for (unsigned int i = 0; i < finite_elements.size(); ++i)
-      if (finite_elements[i]->dofs_per_line > max)
-        max = finite_elements[i]->dofs_per_line;
+    for (unsigned int i = 0; i < this->size(); ++i)
+      max = std::max(max, this->operator[](i).n_dofs_per_line());
 
     return max;
   }
@@ -912,12 +879,11 @@ namespace hp
   unsigned int
   FECollection<dim, spacedim>::max_dofs_per_quad() const
   {
-    Assert(finite_elements.size() > 0, ExcNoFiniteElements());
+    Assert(this->size() > 0, ExcNoFiniteElements());
 
     unsigned int max = 0;
-    for (unsigned int i = 0; i < finite_elements.size(); ++i)
-      if (finite_elements[i]->dofs_per_quad > max)
-        max = finite_elements[i]->dofs_per_quad;
+    for (unsigned int i = 0; i < this->size(); ++i)
+      max = std::max(max, this->operator[](i).max_dofs_per_quad());
 
     return max;
   }
@@ -928,12 +894,11 @@ namespace hp
   unsigned int
   FECollection<dim, spacedim>::max_dofs_per_hex() const
   {
-    Assert(finite_elements.size() > 0, ExcNoFiniteElements());
+    Assert(this->size() > 0, ExcNoFiniteElements());
 
     unsigned int max = 0;
-    for (unsigned int i = 0; i < finite_elements.size(); ++i)
-      if (finite_elements[i]->dofs_per_hex > max)
-        max = finite_elements[i]->dofs_per_hex;
+    for (unsigned int i = 0; i < this->size(); ++i)
+      max = std::max(max, this->operator[](i).n_dofs_per_hex());
 
     return max;
   }
@@ -944,12 +909,11 @@ namespace hp
   unsigned int
   FECollection<dim, spacedim>::max_dofs_per_face() const
   {
-    Assert(finite_elements.size() > 0, ExcNoFiniteElements());
+    Assert(this->size() > 0, ExcNoFiniteElements());
 
     unsigned int max = 0;
-    for (unsigned int i = 0; i < finite_elements.size(); ++i)
-      if (finite_elements[i]->dofs_per_face > max)
-        max = finite_elements[i]->dofs_per_face;
+    for (unsigned int i = 0; i < this->size(); ++i)
+      max = std::max(max, this->operator[](i).max_dofs_per_face());
 
     return max;
   }
@@ -960,12 +924,11 @@ namespace hp
   unsigned int
   FECollection<dim, spacedim>::max_dofs_per_cell() const
   {
-    Assert(finite_elements.size() > 0, ExcNoFiniteElements());
+    Assert(this->size() > 0, ExcNoFiniteElements());
 
     unsigned int max = 0;
-    for (unsigned int i = 0; i < finite_elements.size(); ++i)
-      if (finite_elements[i]->dofs_per_cell > max)
-        max = finite_elements[i]->dofs_per_cell;
+    for (unsigned int i = 0; i < this->size(); ++i)
+      max = std::max(max, this->operator[](i).n_dofs_per_cell());
 
     return max;
   }
@@ -975,13 +938,13 @@ namespace hp
   bool
   FECollection<dim, spacedim>::hp_constraints_are_implemented() const
   {
-    Assert(finite_elements.size() > 0, ExcNoFiniteElements());
-    return std::all_of(
-      finite_elements.cbegin(),
-      finite_elements.cend(),
-      [](const std::shared_ptr<const FiniteElement<dim, spacedim>> &fe) {
-        return fe->hp_constraints_are_implemented();
-      });
+    Assert(this->size() > 0, ExcNoFiniteElements());
+
+    for (unsigned int i = 0; i < this->size(); ++i)
+      if (this->operator[](i).hp_constraints_are_implemented() == false)
+        return false;
+
+    return true;
   }
 
 

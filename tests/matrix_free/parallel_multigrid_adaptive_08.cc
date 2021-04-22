@@ -166,8 +166,8 @@ private:
            ExcMessage("The vector passed to the vmult() function does not have "
                       "the correct size for compatibility with MatrixFree."));
     LinearAlgebra::distributed::Vector<Number> copy_vec(vec);
-    const_cast<LinearAlgebra::distributed::Vector<Number> &>(vec).reinit(
-      this->data->get_dof_info(0).vector_partitioner);
+    this->data->initialize_dof_vector(
+      const_cast<LinearAlgebra::distributed::Vector<Number> &>(vec), 0);
     const_cast<LinearAlgebra::distributed::Vector<Number> &>(vec)
       .copy_locally_owned_data_from(copy_vec);
   }
@@ -236,7 +236,8 @@ do_test(const DoFHandler<dim> &dof)
 
   // level constraints:
   MGConstrainedDoFs mg_constrained_dofs;
-  mg_constrained_dofs.initialize(dof, dirichlet_boundary);
+  mg_constrained_dofs.initialize(dof);
+  mg_constrained_dofs.make_zero_boundary_constraints(dof, {0});
 
   MappingQ<dim> mapping(fe_degree + 1);
 
@@ -326,9 +327,9 @@ do_test(const DoFHandler<dim> &dof)
   MGCoarseIterative<LevelMatrixType, number> mg_coarse;
   mg_coarse.initialize(mg_matrices[0]);
 
-  typedef PreconditionChebyshev<LevelMatrixType,
-                                LinearAlgebra::distributed::Vector<number>>
-    SMOOTHER;
+  using SMOOTHER =
+    PreconditionChebyshev<LevelMatrixType,
+                          LinearAlgebra::distributed::Vector<number>>;
   MGSmootherPrecondition<LevelMatrixType,
                          SMOOTHER,
                          LinearAlgebra::distributed::Vector<number>>

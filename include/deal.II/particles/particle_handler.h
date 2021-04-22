@@ -33,6 +33,7 @@
 
 #include <deal.II/particles/particle.h>
 #include <deal.II/particles/particle_iterator.h>
+#include <deal.II/particles/partitioner.h>
 #include <deal.II/particles/property_pool.h>
 
 #include <boost/range/iterator_range.hpp>
@@ -101,6 +102,29 @@ namespace Particles
     initialize(const Triangulation<dim, spacedim> &tria,
                const Mapping<dim, spacedim> &      mapping,
                const unsigned int                  n_properties = 0);
+
+    /**
+     * Copy the state of particle handler @p particle_handler into the
+     * current object. This will copy
+     * all particles and properties and leave this object
+     * as an identical copy of @p particle_handler. Existing
+     * particles in this object are deleted. Be aware that this
+     * does not copy functions that are connected to the signals of
+     * @p particle_handler, nor does it connect the current object's member
+     * functions to triangulation signals, which must be done by the caller
+     * if necessary, that is if the @p particle_handler had
+     * connected functions.
+     *
+     * This function is expensive as it has to duplicate all data
+     * in @p particle_handler, and insert it into this object,
+     * which may be a significant amount of data. However, it can
+     * be useful to save the state of a particle
+     * collection at a certain point in time and reset this
+     * state later under certain conditions, for example if
+     * a timestep has to be undone and repeated.
+     */
+    void
+    copy_from(const ParticleHandler<dim, spacedim> &particle_handler);
 
     /**
      * Clear all particle related data.
@@ -177,6 +201,26 @@ namespace Particles
 
     /**
      * Return the number of particles that live on the given cell.
+     *
+     * @note While this function is used in step-19, it is not an efficient
+     *   function to use if the number of particles is large. That is because
+     *   to find the particles that are located in one cell costs
+     *   ${\cal O}(\log N)$ where $N$ is the number of overall particles. Since
+     *   you will likely do this for every cell, and assuming that the number
+     *   of particles and the number of cells are roughly proportional,
+     *   you end up with an ${\cal O}(N \log N)$ algorithm. A better approach
+     *   is to use the fact that internally, particles are arranged in the
+     *   order of the active cells they are in. In other words, if you iterate
+     *   over all particles, you will encounter them in the same order as
+     *   you walk over the active cells. You can exploit this by keeping an
+     *   iterator to the first particle of the first cell, and when you move
+     *   to the next cell, you increment the particle iterator as well until
+     *   you find a particle located on that next cell. Counting how many
+     *   steps this took will then give you the number you are looking for,
+     *   at a cost of ${\cal O}(\log N)$ when accumulated over all cells.
+     *   This is the approach used in step-70, for example. The approach is
+     *   also detailed in the "Possibilities for extensions section"
+     *   of step-19.
      */
     types::particle_index
     n_particles_in_cell(
@@ -190,6 +234,25 @@ namespace Particles
      *
      * The number of elements in the returned range equals what the
      * n_particles_in_cell() function returns.
+     *
+     * @note While this function is used in step-19, it is not an efficient
+     *   function to use if the number of particles is large. That is because
+     *   to find the particles that are located in one cell costs
+     *   ${\cal O}(\log N)$ where $N$ is the number of overall particles. Since
+     *   you will likely do this for every cell, and assuming that the number
+     *   of particles and the number of cells are roughly proportional,
+     *   you end up with an ${\cal O}(N \log N)$ algorithm. A better approach
+     *   is to use the fact that internally, particles are arranged in the
+     *   order of the active cells they are in. In other words, if you iterate
+     *   over all particles, you will encounter them in the same order as
+     *   you walk over the active cells. You can exploit this by keeping an
+     *   iterator to the first particle of the first cell, and when you move
+     *   to the next cell, you increment the particle iterator as well until
+     *   you find a particle located on that next cell. This is the approach
+     *   used in step-70, for example, and has an overall cost of
+     *   ${\cal O}(\log N)$ when accumulated over all cells. The approach is
+     *   also detailed in the "Possibilities for extensions section"
+     *   of step-19.
      */
     particle_iterator_range
     particles_in_cell(
@@ -202,6 +265,25 @@ namespace Particles
      *
      * The number of elements in the returned range equals what the
      * n_particles_in_cell() function returns.
+     *
+     * @note While this function is used in step-19, it is not an efficient
+     *   function to use if the number of particles is large. That is because
+     *   to find the particles that are located in one cell costs
+     *   ${\cal O}(\log N)$ where $N$ is the number of overall particles. Since
+     *   you will likely do this for every cell, and assuming that the number
+     *   of particles and the number of cells are roughly proportional,
+     *   you end up with an ${\cal O}(N \log N)$ algorithm. A better approach
+     *   is to use the fact that internally, particles are arranged in the
+     *   order of the active cells they are in. In other words, if you iterate
+     *   over all particles, you will encounter them in the same order as
+     *   you walk over the active cells. You can exploit this by keeping an
+     *   iterator to the first particle of the first cell, and when you move
+     *   to the next cell, you increment the particle iterator as well until
+     *   you find a particle located on that next cell. This is the approach
+     *   used in step-70, for example, and has an overall cost of
+     *   ${\cal O}(\log N)$ when accumulated over all cells. The approach is
+     *   also detailed in the "Possibilities for extensions section"
+     *   of step-19.
      */
     particle_iterator_range
     particles_in_cell(
@@ -598,7 +680,7 @@ namespace Particles
      * Return a reference to the property pool that owns all particle
      * properties, and organizes them physically.
      */
-    PropertyPool &
+    PropertyPool<dim, spacedim> &
     get_property_pool() const;
 
     /**
@@ -624,7 +706,17 @@ namespace Particles
      * member variable.
      */
     void
-    exchange_ghost_particles();
+    exchange_ghost_particles(const bool enable_ghost_cache = false);
+
+    /**
+     * Update all particles that live in cells that are ghost cells to
+     * other processes. In this context, update means to update the
+     * location and the properties of the ghost particles assuming that
+     * the ghost particles have not changed cells. Consequently, this will
+     * not update the reference location of the particles.
+     */
+    void
+    update_ghost_particles();
 
     /**
      * Callback function that should be called before every refinement
@@ -645,7 +737,8 @@ namespace Particles
     register_load_callback_function(const bool serialization);
 
     /**
-     * Serialize the contents of this class.
+     * Serialize the contents of this class using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
      */
     template <class Archive>
     void
@@ -675,6 +768,8 @@ namespace Particles
        *
        * The connected function receives an iterator to the particle in
        * question, and its last known cell association.
+       *
+       * This signal is used in step-19.
        */
       boost::signals2::signal<void(
         const typename Particles::ParticleIterator<dim, spacedim> &particle,
@@ -702,6 +797,16 @@ namespace Particles
      */
     SmartPointer<const Mapping<dim, spacedim>, ParticleHandler<dim, spacedim>>
       mapping;
+
+    /**
+     * This object owns and organizes the memory for all particle
+     * properties. Since particles reference the property pool, the
+     * latter has to be destroyed *after* the particles are destroyed.
+     * This is achieved by making sure the `property_pool` member variable
+     * precedes the declaration of the `particles` and `ghost_particles`
+     * members.
+     */
+    std::unique_ptr<PropertyPool<dim, spacedim>> property_pool;
 
     /**
      * Set of particles currently living in the local domain, organized by
@@ -737,12 +842,6 @@ namespace Particles
      * globally in case new particles need to be generated.
      */
     types::particle_index next_free_particle_index;
-
-    /**
-     * This object owns and organizes the memory for all particle
-     * properties.
-     */
-    std::unique_ptr<PropertyPool> property_pool;
 
     /**
      * A function that can be registered by calling
@@ -822,6 +921,13 @@ namespace Particles
      * particle to be send in which the particle belongs. This parameter
      * is necessary if the cell information of the particle iterator is
      * outdated (e.g. after particle movement).
+     *
+     * @param [in] enable_cache Optional bool that enables updating
+     * the ghost particles without rebuilding them from scratch by
+     * building a cache of type GhostParticlePartitioner, which
+     * stores the necessary information to update the ghost particles.
+     * Once this cache is built, the ghost particles can be updated
+     * by a call to send_recv_particles_properties_and_location().
      */
     void
     send_recv_particles(
@@ -836,8 +942,43 @@ namespace Particles
         &new_cells_for_particles = std::map<
           types::subdomain_id,
           std::vector<
-            typename Triangulation<dim, spacedim>::active_cell_iterator>>());
+            typename Triangulation<dim, spacedim>::active_cell_iterator>>(),
+      const bool enable_cache = false);
+
+    /**
+     * Transfer particles position and properties assuming that
+     * the particles have not changed cells. This routine uses the
+     * GhostParticlePartitioner as a caching structure to update the particles.
+     * It inherently assumes that particles cannot have changed cell.
+     * All updated particles will be appended to the
+     * @p received_particles container.
+     *
+     * @param [in] particles_to_send All particles for which information
+     * should be sent and their new subdomain_ids are in this map.
+     *
+     * @param [in,out] received_particles A map with all received
+     * particles. Note that it is not required nor checked that the container
+     * is empty, received particles are simply inserted into
+     * the map.
+     *
+     */
+    void
+    send_recv_particles_properties_and_location(
+      const std::map<types::subdomain_id, std::vector<particle_iterator>>
+        &particles_to_send,
+      std::multimap<internal::LevelInd, Particle<dim, spacedim>>
+        &received_particles);
+
+
 #endif
+
+    /**
+     * Cache structure used to store the elements which are required to
+     * exchange the particle information (location and properties) accross
+     * processors in order to update the ghost particles. This structure
+     * is only used to update the ghost particles.
+     */
+    internal::GhostParticlePartitioner<dim, spacedim> ghost_particles_cache;
 
     /**
      * Called by listener functions from Triangulation for every cell
@@ -866,11 +1007,81 @@ namespace Particles
   /* ---------------------- inline and template functions ------------------
    */
 
+  template <int dim, int spacedim>
+  inline typename ParticleHandler<dim, spacedim>::particle_iterator
+  ParticleHandler<dim, spacedim>::begin() const
+  {
+    return (const_cast<ParticleHandler<dim, spacedim> *>(this))->begin();
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline typename ParticleHandler<dim, spacedim>::particle_iterator
+  ParticleHandler<dim, spacedim>::begin()
+  {
+    return particle_iterator(particles, particles.begin());
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline typename ParticleHandler<dim, spacedim>::particle_iterator
+  ParticleHandler<dim, spacedim>::end() const
+  {
+    return (const_cast<ParticleHandler<dim, spacedim> *>(this))->end();
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline typename ParticleHandler<dim, spacedim>::particle_iterator
+  ParticleHandler<dim, spacedim>::end()
+  {
+    return particle_iterator(particles, particles.end());
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline typename ParticleHandler<dim, spacedim>::particle_iterator
+  ParticleHandler<dim, spacedim>::begin_ghost() const
+  {
+    return (const_cast<ParticleHandler<dim, spacedim> *>(this))->begin_ghost();
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline typename ParticleHandler<dim, spacedim>::particle_iterator
+  ParticleHandler<dim, spacedim>::begin_ghost()
+  {
+    return particle_iterator(ghost_particles, ghost_particles.begin());
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline typename ParticleHandler<dim, spacedim>::particle_iterator
+  ParticleHandler<dim, spacedim>::end_ghost() const
+  {
+    return (const_cast<ParticleHandler<dim, spacedim> *>(this))->end_ghost();
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline typename ParticleHandler<dim, spacedim>::particle_iterator
+  ParticleHandler<dim, spacedim>::end_ghost()
+  {
+    return particle_iterator(ghost_particles, ghost_particles.end());
+  }
+
 
 
   template <int dim, int spacedim>
   template <class Archive>
-  void
+  inline void
   ParticleHandler<dim, spacedim>::serialize(Archive &ar, const unsigned int)
   {
     // Note that we do not serialize the particle data itself. Instead we
@@ -886,7 +1097,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   template <class VectorType>
-  typename std::enable_if<
+  inline typename std::enable_if<
     std::is_convertible<VectorType *, Function<spacedim> *>::value ==
     false>::type
   ParticleHandler<dim, spacedim>::set_particle_positions(
@@ -911,7 +1122,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   template <class VectorType>
-  void
+  inline void
   ParticleHandler<dim, spacedim>::get_particle_positions(
     VectorType &output_vector,
     const bool  add_to_output_vector)

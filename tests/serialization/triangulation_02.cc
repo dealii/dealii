@@ -169,6 +169,11 @@ test()
   do_boundary(tria_1);
 
   verify(tria_1, tria_2);
+
+  // test if the policy has been set
+  tria_2.begin_active()->set_refine_flag();
+  tria_2.prepare_coarsening_and_refinement();
+  tria_2.execute_coarsening_and_refinement();
 }
 
 

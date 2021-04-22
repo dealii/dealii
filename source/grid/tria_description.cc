@@ -100,7 +100,7 @@ namespace TriangulationDescription
     Description<dim, spacedim>
     create_description_from_triangulation(
       const dealii::Triangulation<dim, spacedim> &tria,
-      const MPI_Comm                              comm,
+      const MPI_Comm &                            comm,
       const TriangulationDescription::Settings    settings,
       const unsigned int                          my_rank_in)
     {
@@ -211,7 +211,7 @@ namespace TriangulationDescription
           for (auto cell : tria.cell_iterators_on_level(level))
             if ((construct_multigrid &&
                  (cell->level_subdomain_id() == my_rank)) ||
-                (cell->active() && cell->subdomain_id() == my_rank))
+                (cell->is_active() && cell->subdomain_id() == my_rank))
               add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
                 cell, vertices_owned_by_locally_owned_cells_on_level);
 
@@ -298,7 +298,7 @@ namespace TriangulationDescription
       // on active level
       const auto is_locally_relevant_on_active_level =
         [&](TriaIterator<CellAccessor<dim, spacedim>> &cell) {
-          if (cell->active())
+          if (cell->is_active())
             for (const auto v : cell->vertex_indices())
               if (vertices_owned_by_locally_owned_active_cells
                     [cell->vertex_index(v)])
@@ -316,7 +316,7 @@ namespace TriangulationDescription
           for (auto cell : tria.cell_iterators_on_level(level))
             if ((construct_multigrid &&
                  (cell->level_subdomain_id() == my_rank)) ||
-                (cell->active() && cell->subdomain_id() == my_rank))
+                (cell->is_active() && cell->subdomain_id() == my_rank))
               add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
                 cell, vertices_owned_by_locally_owned_cells_on_level);
 
@@ -403,9 +403,9 @@ namespace TriangulationDescription
       const std::function<void(dealii::Triangulation<dim, spacedim> &)>
         &                                            serial_grid_generator,
       const std::function<void(dealii::Triangulation<dim, spacedim> &,
-                               const MPI_Comm,
+                               const MPI_Comm &,
                                const unsigned int)> &serial_grid_partitioner,
-      const MPI_Comm                                 comm,
+      const MPI_Comm &                               comm,
       const int                                      group_size,
       const typename Triangulation<dim, spacedim>::MeshSmoothing smoothing,
       const TriangulationDescription::Settings                   settings)

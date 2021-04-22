@@ -220,11 +220,10 @@ namespace LinearAlgebra
      * This function is not implemented and will throw an exception.
      */
     virtual void
-    import(
-      const ReadWriteVector<Number> &                 V,
-      VectorOperation::values                         operation,
-      std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-        std::shared_ptr<const CommunicationPatternBase>()) override;
+    import(const ReadWriteVector<Number> &V,
+           VectorOperation::values        operation,
+           std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+             communication_pattern = {}) override;
 
     /**
      * Add @p a to all components. Note that @p a is a scalar not a vector.
@@ -400,6 +399,15 @@ namespace LinearAlgebra
     memory_consumption() const override;
 
     /**
+     * Write and read the data of this object from a stream for the purpose
+     * of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+     */
+    template <typename Archive>
+    void
+    serialize(Archive &ar, const unsigned int version);
+
+    /**
      * Attempt to perform an operation between two incompatible vector types.
      *
      * @ingroup Exceptions
@@ -407,17 +415,6 @@ namespace LinearAlgebra
     DeclException0(ExcVectorTypeNotCompatible);
 
   private:
-    /**
-     * Serialize the data of this object using boost. This function is
-     * necessary to use boost::archive::text_iarchive and
-     * boost::archive::text_oarchive.
-     */
-    template <typename Archive>
-    void
-    serialize(Archive &ar, const unsigned int version);
-
-    friend class boost::serialization::access;
-
     // Make all other ReadWriteVector types friends.
     template <typename Number2>
     friend class Vector;

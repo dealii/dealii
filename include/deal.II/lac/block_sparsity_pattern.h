@@ -302,10 +302,18 @@ public:
    * understands and which can be used to plot the sparsity pattern in a
    * graphical way. This is the same functionality implemented for usual
    * sparsity patterns, see
-   * @ref SparsityPattern.
+   * SparsityPatternBase::print_gnuplot().
    */
   void
   print_gnuplot(std::ostream &out) const;
+
+  /**
+   * Print the sparsity of the matrix in <tt>svg</tt> format. This is the same
+   * functionality implemented for usual sparsity patterns, see
+   * SparsityPatternBase::print_svg().
+   */
+  void
+  print_svg(std::ostream &out) const;
 
   /**
    * @addtogroup Exceptions

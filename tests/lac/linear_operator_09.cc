@@ -34,7 +34,7 @@
 int
 main(int argc, char *argv[])
 {
-  typedef PETScWrappers::MPI::SparseMatrix::size_type size_type;
+  using size_type = PETScWrappers::MPI::SparseMatrix::size_type;
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 

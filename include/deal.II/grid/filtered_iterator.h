@@ -437,7 +437,7 @@ namespace IteratorFilters
  * <h3>Initialization of filtered iterators</h3>
  *
  * Filtered iterators are given a predicate at construction time which cannot
- * be changed any more. This behaviour would be expected if the predicate
+ * be changed any more. This behavior would be expected if the predicate
  * would have been given as a template parameter to the class, but since that
  * would make the declaration of filtered iterators a nightmare, we rather
  * give the predicate as an unchangeable entity to the constructor. Note that

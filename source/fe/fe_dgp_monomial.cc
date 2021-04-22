@@ -130,20 +130,21 @@ namespace internal
 
 template <int dim>
 FE_DGPMonomial<dim>::FE_DGPMonomial(const unsigned int degree)
-  : FE_Poly<dim>(
-      PolynomialsP<dim>(degree),
-      FiniteElementData<dim>(get_dpo_vector(degree),
-                             1,
-                             degree,
-                             FiniteElementData<dim>::L2),
-      std::vector<bool>(
-        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
-        true),
-      std::vector<ComponentMask>(
-        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
-        std::vector<bool>(1, true)))
+  : FE_Poly<dim>(PolynomialsP<dim>(degree),
+                 FiniteElementData<dim>(get_dpo_vector(degree),
+                                        1,
+                                        degree,
+                                        FiniteElementData<dim>::L2),
+                 std::vector<bool>(
+                   FiniteElementData<dim>(get_dpo_vector(degree), 1, degree)
+                     .n_dofs_per_cell(),
+                   true),
+                 std::vector<ComponentMask>(
+                   FiniteElementData<dim>(get_dpo_vector(degree), 1, degree)
+                     .n_dofs_per_cell(),
+                   std::vector<bool>(1, true)))
 {
-  Assert(this->poly_space->n() == this->dofs_per_cell, ExcInternalError());
+  Assert(this->poly_space->n() == this->n_dofs_per_cell(), ExcInternalError());
   Assert(this->poly_space->degree() == this->degree, ExcInternalError());
 
   // DG doesn't have constraints, so
@@ -208,10 +209,10 @@ FE_DGPMonomial<dim>::get_interpolation_matrix(
       const unsigned int n = interpolation_matrix.n();
       (void)m;
       (void)n;
-      Assert(m == this->dofs_per_cell,
-             ExcDimensionMismatch(m, this->dofs_per_cell));
-      Assert(n == source_dgp_monomial->dofs_per_cell,
-             ExcDimensionMismatch(n, source_dgp_monomial->dofs_per_cell));
+      Assert(m == this->n_dofs_per_cell(),
+             ExcDimensionMismatch(m, this->n_dofs_per_cell()));
+      Assert(n == source_dgp_monomial->n_dofs_per_cell(),
+             ExcDimensionMismatch(n, source_dgp_monomial->n_dofs_per_cell()));
 
       const unsigned int min_mn =
         interpolation_matrix.m() < interpolation_matrix.n() ?
@@ -223,17 +224,18 @@ FE_DGPMonomial<dim>::get_interpolation_matrix(
     }
   else
     {
-      std::vector<Point<dim>> unit_points(this->dofs_per_cell);
+      std::vector<Point<dim>> unit_points(this->n_dofs_per_cell());
       internal::FE_DGPMonomial::generate_unit_points(this->degree, unit_points);
 
       FullMatrix<double> source_fe_matrix(unit_points.size(),
-                                          source_fe.dofs_per_cell);
-      for (unsigned int j = 0; j < source_fe.dofs_per_cell; ++j)
+                                          source_fe.n_dofs_per_cell());
+      for (unsigned int j = 0; j < source_fe.n_dofs_per_cell(); ++j)
         for (unsigned int k = 0; k < unit_points.size(); ++k)
           source_fe_matrix(k, j) = source_fe.shape_value(j, unit_points[k]);
 
-      FullMatrix<double> this_matrix(this->dofs_per_cell, this->dofs_per_cell);
-      for (unsigned int j = 0; j < this->dofs_per_cell; ++j)
+      FullMatrix<double> this_matrix(this->n_dofs_per_cell(),
+                                     this->n_dofs_per_cell());
+      for (unsigned int j = 0; j < this->n_dofs_per_cell(); ++j)
         for (unsigned int k = 0; k < unit_points.size(); ++k)
           this_matrix(k, j) =
             this->poly_space->compute_value(j, unit_points[k]);
@@ -278,7 +280,8 @@ template <int dim>
 void
 FE_DGPMonomial<dim>::get_face_interpolation_matrix(
   const FiniteElement<dim> &x_source_fe,
-  FullMatrix<double> &      interpolation_matrix) const
+  FullMatrix<double> &      interpolation_matrix,
+  const unsigned int) const
 {
   // this is only implemented, if the source
   // FE is also a DGPMonomial element. in that case,
@@ -305,7 +308,8 @@ void
 FE_DGPMonomial<dim>::get_subface_interpolation_matrix(
   const FiniteElement<dim> &x_source_fe,
   const unsigned int,
-  FullMatrix<double> &interpolation_matrix) const
+  FullMatrix<double> &interpolation_matrix,
+  const unsigned int) const
 {
   // this is only implemented, if the source
   // FE is also a DGPMonomial element. in that case,
@@ -374,8 +378,8 @@ FE_DGPMonomial<dim>::hp_line_dof_identities(
 
 template <int dim>
 std::vector<std::pair<unsigned int, unsigned int>>
-FE_DGPMonomial<dim>::hp_quad_dof_identities(
-  const FiniteElement<dim> &fe_other) const
+FE_DGPMonomial<dim>::hp_quad_dof_identities(const FiniteElement<dim> &fe_other,
+                                            const unsigned int) const
 {
   // there are no such constraints for DGPMonomial
   // elements at all

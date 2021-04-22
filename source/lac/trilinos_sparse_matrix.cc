@@ -28,7 +28,9 @@
 #  include <deal.II/lac/trilinos_precondition.h>
 #  include <deal.II/lac/trilinos_sparsity_pattern.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <boost/container/small_vector.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  ifdef DEAL_II_TRILINOS_WITH_EPETRAEXT
 #    include <EpetraExt_MatrixMatrix.h>
@@ -1184,7 +1186,7 @@ namespace TrilinosWrappers
       {
         Assert(false,
                ExcAccessToNonLocalElement(
-                 i, j, local_range().first, local_range().second));
+                 i, j, local_range().first, local_range().second - 1));
       }
     else
       {
@@ -2213,7 +2215,12 @@ namespace TrilinosWrappers
                                         const_cast<Epetra_CrsMatrix &>(
                                           tmp_result.trilinos_matrix()));
 #  else
-      Assert("false", ExcMessage("This function requires EpetraExt."));
+      Assert(false,
+             ExcMessage("This function requires that the Trilinos "
+                        "installation found while running the deal.II "
+                        "CMake scripts contains the optional Trilinos "
+                        "package 'EpetraExt'. However, this optional "
+                        "part of Trilinos was not found."));
 #  endif
       result.reinit(tmp_result.trilinos_matrix());
     }

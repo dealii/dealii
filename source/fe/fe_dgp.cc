@@ -34,10 +34,12 @@ FE_DGP<dim, spacedim>::FE_DGP(const unsigned int degree)
                              degree,
                              FiniteElementData<dim>::L2),
       std::vector<bool>(
-        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
+        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree)
+          .n_dofs_per_cell(),
         true),
       std::vector<ComponentMask>(
-        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
+        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree)
+          .n_dofs_per_cell(),
         std::vector<bool>(1, true)))
 {
   // Reinit the vectors of restriction and prolongation matrices to the right
@@ -104,7 +106,8 @@ template <int dim, int spacedim>
 void
 FE_DGP<dim, spacedim>::get_face_interpolation_matrix(
   const FiniteElement<dim, spacedim> &x_source_fe,
-  FullMatrix<double> &                interpolation_matrix) const
+  FullMatrix<double> &                interpolation_matrix,
+  const unsigned int) const
 {
   // this is only implemented, if the source FE is also a DGP element. in that
   // case, both elements have no dofs on their faces and the face
@@ -130,7 +133,8 @@ void
 FE_DGP<dim, spacedim>::get_subface_interpolation_matrix(
   const FiniteElement<dim, spacedim> &x_source_fe,
   const unsigned int,
-  FullMatrix<double> &interpolation_matrix) const
+  FullMatrix<double> &interpolation_matrix,
+  const unsigned int) const
 {
   // this is only implemented, if the source FE is also a DGP element. in that
   // case, both elements have no dofs on their faces and the face
@@ -197,7 +201,8 @@ FE_DGP<dim, spacedim>::hp_line_dof_identities(
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FE_DGP<dim, spacedim>::hp_quad_dof_identities(
-  const FiniteElement<dim, spacedim> &fe_other) const
+  const FiniteElement<dim, spacedim> &fe_other,
+  const unsigned int) const
 {
   // there are no such constraints for DGP elements at all
   if (dynamic_cast<const FE_DGP<dim, spacedim> *>(&fe_other) != nullptr)
@@ -272,7 +277,7 @@ template <int dim, int spacedim>
 std::pair<Table<2, bool>, std::vector<unsigned int>>
 FE_DGP<dim, spacedim>::get_constant_modes() const
 {
-  Table<2, bool> constant_modes(1, this->dofs_per_cell);
+  Table<2, bool> constant_modes(1, this->n_dofs_per_cell());
   constant_modes(0, 0) = true;
   return std::pair<Table<2, bool>, std::vector<unsigned int>>(
     constant_modes, std::vector<unsigned int>(1, 0));

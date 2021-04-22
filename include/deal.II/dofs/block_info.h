@@ -85,8 +85,8 @@ class DoFHandler;
  * levels of <tt>mg_vector</tt> will have the block structure needed on that
  * level.
  *
- * @todo Extend the functions local() and renumber() to the concept to
- * hp::DoFHandler.
+ * @todo Extend the functions local() and renumber() to allow for
+ * hp-capablilites.
  *
  * @ingroup dofs
  */
@@ -178,7 +178,8 @@ public:
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
-   * of serialization
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void

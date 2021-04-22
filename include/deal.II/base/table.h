@@ -333,42 +333,20 @@ namespace internal
 
 
 /**
- * General class holding an array of objects of templated type in multiple
- * dimensions. If the template parameter indicating the number of dimensions
- * is one, then this is more or less a vector, if it is two then it is a
- * matrix, and so on.
+ * A class holding a multi-dimensional array of objects of templated type.
+ * If the template parameter indicating the number of dimensions
+ * is one, then this class more or less represents a vector; if it is two then
+ * it is a matrix; and so on.
  *
- * Previously, this data type was emulated in this library by constructs like
+ * This class specifically replaces attempts at higher-dimensional arrays like
  * <tt>std::vector<std::vector<T>></tt>, or even higher nested constructs.
- * However, this has the disadvantage that it is hard to initialize, and most
- * importantly that it is very inefficient if all rows have the same size
+ * These constructs have the disadvantage that they are hard to initialize, and
+ * most importantly that they are very inefficient if all rows of a matrix or
+ * higher-dimensional table have the same size
  * (which is the usual case), since then the memory for each row is allocated
  * independently, both wasting time and memory. This can be made more
- * efficient by allocating only one chunk of memory for the entire object.
- *
- * Therefore, this data type was invented. Its implementation is rather
- * straightforward, with two exceptions. The first thing to think about is how
- * to pass the size in each of the coordinate directions to the object; this
- * is done using the TableIndices class. Second, how to access the individual
- * elements. The basic problem here is that we would like to make the number
- * of arguments to be passed to the constructor as well as the access
- * functions dependent on the template parameter <tt>N</tt> indicating the
- * number of dimensions. Of course, this is not possible.
- *
- * The way out of the first problem (and partly the second one as well) is to
- * have a common base class TableBase and a derived class for each value of
- * <tt>N</tt>.  This derived class has a constructor with the correct number
- * of arguments, namely <tt>N</tt>. These then transform their arguments into
- * the data type the base class (this class in fact) uses in the constructor
- * as well as in element access through operator() functions.
- *
- * The second problem is that we would like to allow access through a sequence
- * of <tt>operator[]</tt> calls. This mostly because, as said, this class is a
- * replacement for previous use of nested <tt>std::vector</tt> objects, where
- * we had to use the <tt>operator[]</tt> access function recursively until we
- * were at the innermost object. Emulating this behavior without losing the
- * ability to do index checks, and in particular without losing performance is
- * possible but nontrivial, and done in the TableBaseAccessors namespace.
+ * efficient by allocating only one chunk of memory for the entire object, which
+ * is what the current class does.
  *
  *
  * <h3>Comparison with the Tensor class</h3>
@@ -377,12 +355,12 @@ namespace internal
  * templatizes on the number of dimensions. However, there are two major
  * differences. The first is that the Tensor class stores only numeric values
  * (as <tt>double</tt>s), while the Table class stores arbitrary objects. The
- * second is that the Tensor class has fixed dimensions, also given as a
- * template argument, while this class can handle arbitrary dimensions, which
- * may also be different between different indices.
+ * second is that the Tensor class has fixed sizes in each dimension, also given
+ * as a template argument, while this class can handle arbitrary and different
+ * sizes in each dimension.
  *
  * This has two consequences. First, since the size is not known at compile
- * time, it has to do explicit memory allocating. Second, the layout of
+ * time, it has to do explicit memory allocation. Second, the layout of
  * individual elements is not known at compile time, so access is slower than
  * for the Tensor class where the number of elements are their location is
  * known at compile time and the compiler can optimize with this knowledge
@@ -418,7 +396,7 @@ public:
    * Constructor. Initialize the array with the given dimensions in each index
    * component.
    */
-  TableBase(const TableIndices<N> &sizes);
+  explicit TableBase(const TableIndices<N> &sizes);
 
   /**
    * Constructor. Initialize the array with the given dimensions in each index
@@ -618,7 +596,8 @@ public:
 
   /**
    * Write or read the data of this object to or from a stream for the purpose
-   * of serialization.
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -716,7 +695,7 @@ public:
   /**
    * Constructor. Pass down the given dimension to the base class.
    */
-  Table(const size_type size);
+  explicit Table(const size_type size);
 
   /**
    * Constructor. Create a table with a given size and initialize it from a
@@ -1876,36 +1855,6 @@ public:
   typename AlignedVector<T>::const_reference
   operator()(const TableIndices<7> &indices) const;
 };
-
-
-/**
- * A namespace for iterators for TransposeTable. TransposeTable is unique in
- * that it stores entries in column-major order.
- *
- * @warning The classes defined in this namespace have been deprecated in
- * favor of the more general versions in MatrixTableIterators. Use those
- * instead.
- */
-namespace TransposeTableIterators
-{
-  template <typename T, bool Constness>
-  using AccessorBase DEAL_II_DEPRECATED = MatrixTableIterators::AccessorBase<
-    TransposeTable<T>,
-    Constness,
-    MatrixTableIterators::Storage::column_major>;
-
-  template <typename T, bool Constness>
-  using Accessor DEAL_II_DEPRECATED =
-    MatrixTableIterators::Accessor<TransposeTable<T>,
-                                   Constness,
-                                   MatrixTableIterators::Storage::column_major>;
-
-  template <typename T, bool Constness>
-  using Iterator DEAL_II_DEPRECATED =
-    MatrixTableIterators::Iterator<TransposeTable<T>,
-                                   Constness,
-                                   MatrixTableIterators::Storage::column_major>;
-} // namespace TransposeTableIterators
 
 
 /**

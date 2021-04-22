@@ -157,9 +157,27 @@ namespace Utilities
         struct Dictionary
         {
           /**
-           * The minimum grain size for the ranges.
+           * The minimum grain size for the intervals.
+           *
+           * We choose to limit the smallest size an interval for the
+           * two-stage lookup can have with the following two conflicting
+           * goals in mind: On the one hand, we do not want intervals in the
+           * dictionary to become too short. For uneven distributions of
+           * unknowns (some ranks with several thousands of unknowns, others
+           * with none), the lookup DoFs -> dictionary then involves sending
+           * from one MPI rank to many other MPI ranks holding dictionary
+           * intervals, leading to an exceedingly high number of messages some
+           * ranks have to send. Also, fewer longer intervals are generally
+           * more efficient to look up. On the other hand, a range size too
+           * large leads to opposite effect of many messages that come into a
+           * particular dictionary owner in the lookup DoFs ->
+           * dictionary. With the current setting, we get at most 64 messages
+           * coming to a single MPI rank in case there is 1 dof per MPI rank,
+           * which is reasonably low. At the same time, uneven distributions
+           * up to factors of 4096 can be handled with at most 64 messages as
+           * well.
            */
-          static const unsigned int range_minimum_grain_size = 4096;
+          static const unsigned int range_minimum_grain_size = 64;
 
           /**
            * A vector with as many entries as there are dofs in the dictionary
@@ -196,7 +214,7 @@ namespace Utilities
            * the possible end of the index space. Equivalent to
            * `local_range.second - local_range.first`.
            */
-          types::global_dof_index local_size;
+          types::global_dof_index locally_owned_size;
 
           /**
            * The global size of the index space.
@@ -337,7 +355,7 @@ namespace Utilities
                   }
 
                 // 4) receive messages until all dofs in dict are processed
-                while (this->local_size != dic_local_received)
+                while (this->locally_owned_size != dic_local_received)
                   {
                     // wait for an incoming message
                     MPI_Status status;
@@ -515,10 +533,10 @@ namespace Utilities
             local_range.first  = get_index_offset(my_rank);
             local_range.second = get_index_offset(my_rank + 1);
 
-            local_size = local_range.second - local_range.first;
+            locally_owned_size = local_range.second - local_range.first;
 
             actually_owning_ranks = {};
-            actually_owning_ranks.resize(local_size,
+            actually_owning_ranks.resize(locally_owned_size,
                                          numbers::invalid_unsigned_int);
 #else
             (void)owned_indices;

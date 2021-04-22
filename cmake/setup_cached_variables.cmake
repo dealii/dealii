@@ -165,6 +165,11 @@ OPTION(DEAL_II_UNITY_BUILD
   OFF)
 MARK_AS_ADVANCED(DEAL_II_UNITY_BUILD)
 
+OPTION(DEAL_II_EARLY_DEPRECATIONS
+  "Enable deprecation warnings for features deprecated since the last release."
+  OFF)
+MARK_AS_ADVANCED(DEAL_II_EARLY_DEPRECATIONS)
+
 SET(BUILD_SHARED_LIBS "ON" CACHE BOOL
   "Build a shared library"
   )

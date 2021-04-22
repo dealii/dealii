@@ -37,7 +37,6 @@ MACRO(FEATURE_BOOST_CONFIGURE_COMMON)
   # (anymore) which was deprecated for C++11 and removed in the C++17 standard.
   # Older boost versions can't know about this but provide a possibility to
   # circumvent the issue. Hence, we just check ourselves.
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
   IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     ADD_FLAGS(CMAKE_REQUIRED_FLAGS "/WX /EHsc")
   ELSE()
@@ -93,6 +92,20 @@ MACRO(FEATURE_BOOST_CONFIGURE_BUNDLED)
   # We need to set this path before calling the configure function
   # to be able to use the include paths in the checks.
   SET(BOOST_BUNDLED_INCLUDE_DIRS ${BOOST_FOLDER}/include)
+  #
+  # We still need the version information, which is set up in the FindBoost
+  # module in the non-bundled case:
+  #
+  FILE(STRINGS "${BOOST_BUNDLED_INCLUDE_DIRS}/boost/version.hpp"
+    BOOST_VERSION_STRING
+    REGEX "#define.*BOOST_VERSION")
+
+  STRING(REGEX REPLACE "^.*BOOST_VERSION.* ([0-9]+).*" "\\1"
+    BOOST_VERSION_NUMBER "${BOOST_VERSION_STRING}"
+    )
+  MATH(EXPR Boost_MAJOR_VERSION "${BOOST_VERSION_NUMBER} / 100000")
+  MATH(EXPR Boost_MINOR_VERSION "${BOOST_VERSION_NUMBER} / 100 % 1000")
+  MATH(EXPR Boost_SUBMINOR_VERSION "${BOOST_VERSION_NUMBER} % 100")
 
   FEATURE_BOOST_CONFIGURE_COMMON()
 
@@ -118,7 +131,6 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
       # Test that Boost.Iostreams is usable.
       #
       RESET_CMAKE_REQUIRED()
-      ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
       LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${BOOST_LIBRARIES})
       LIST(APPEND CMAKE_REQUIRED_INCLUDES ${BOOST_INCLUDE_DIRS})
 

@@ -39,7 +39,7 @@ test_scalar(const int n_runs, TimerOutput &timer)
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "Scalar" << std::endl;
 
-  typedef SD::Expression SD_number_t;
+  using SD_number_t = SD::Expression;
 
   const NumberType  a = NumberType(1.5);
   const SD_number_t x("x");

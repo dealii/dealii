@@ -291,39 +291,39 @@ DEAL_II_NAMESPACE_OPEN
  * necessary to call AffineConstraints::distribute().
  *
  *
- * <h3>Implementation in the context of hp finite elements</h3>
+ * <h3>Implementation in the context of hp-finite elements</h3>
  *
- * In the case of hp::DoFHandlers, nothing defines which of the finite
- * elements that are part of the hp::FECollection associated with the DoF
- * handler, should be considered on cells that are not active (i.e., that have
- * children). This is because degrees of freedom are only allocated for active
- * cells and, in fact, it is not allowed to set an active_fe_index on non-
- * active cells using DoFAccessor::set_active_fe_index().
+ * In the case of DoFHandlers with hp-capabilities, nothing defines which of the
+ * finite elements that are part of the hp::FECollection associated with the
+ * DoFHandler, should be considered on cells that are not active (i.e., that
+ * have children). This is because degrees of freedom are only allocated for
+ * active cells and, in fact, it is not allowed to set an active FE index on
+ * non- active cells using DoFAccessor::set_active_fe_index().
  *
  * It is, thus, not entirely natural what should happen if, for example, a few
  * cells are coarsened away. This class then implements the following
  * algorithm:
  * - If a cell is refined, then the values of the solution vector(s) are
- *   saved before refinement on the to-be-refined cell and in the space
- *   associated with this cell. These values are then interpolated to the finite
- *   element spaces of the children post-refinement. This may lose information
- *   if, for example, the old cell used a Q2 space and the children use Q1
- *   spaces, or the information may be prolonged if the mother cell used a Q1
- *   space and the children are Q2s.
+ *   interpolated before refinement on the to-be-refined cell from the space of
+ *   the active finite element to the one of the future finite element. These
+ *   values are then distributed on the finite element spaces of the children
+ *   post-refinement. This may lose information if, for example, the old cell
+ *   used a Q2 space and the children use Q1 spaces, or the information may be
+ *   prolonged if the mother cell used a Q1 space and the children are Q2s.
  * - If cells are to be coarsened, then the values from the child cells are
- *   interpolated to the mother cell using the largest of the child cell spaces,
- *   which will be identified as the least dominant element following the
- *   FiniteElementDomination logic (consult
+ *   interpolated to the mother cell using the largest of the child cell future
+ *   finite element spaces, which will be identified as the least dominant
+ *   element following the FiniteElementDomination logic (consult
  *   hp::FECollection::find_dominated_fe_extended() for more information). For
  *   example, if the children of a cell use Q1, Q2 and Q3 spaces, then the
  *   values from the children are interpolated into a Q3 space on the mother
  *   cell. After refinement, this Q3 function on the mother cell is then
  *   interpolated into the space the user has selected for this cell (which may
  *   be different from Q3, in this example, if the user has set the
- *   active_fe_index for a different space post-refinement and before calling
- *   hp::DoFHandler::distribute_dofs()).
+ *   active FE index for a different space post-refinement and before calling
+ *   DoFHandler::distribute_dofs()).
  *
- * @note In the context of hp refinement, if cells are coarsened or the
+ * @note In the context of hp-refinement, if cells are coarsened or the
  * polynomial degree is lowered on some cells, then the old finite element
  * space is not a subspace of the new space and you may run into the same
  * situation as discussed above with hanging nodes. You may want to consider
@@ -573,6 +573,21 @@ private:
   std::vector<std::vector<Vector<typename VectorType::value_type>>>
     dof_values_on_cell;
 };
+
+namespace Legacy
+{
+  /**
+   * The template arguments of the original dealii::SolutionTransfer class will
+   * change in a future release. If for some reason, you need a code that is
+   * compatible with deal.II 9.3 and the subsequent release, use this alias
+   * instead.
+   */
+  template <int dim,
+            typename VectorType     = Vector<double>,
+            typename DoFHandlerType = DoFHandler<dim>>
+  using SolutionTransfer =
+    dealii::SolutionTransfer<dim, VectorType, DoFHandlerType>;
+} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE

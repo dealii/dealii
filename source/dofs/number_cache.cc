@@ -85,7 +85,7 @@ namespace internal
 
     std::vector<types::global_dof_index>
     NumberCache::get_n_locally_owned_dofs_per_processor(
-      const MPI_Comm mpi_communicator) const
+      const MPI_Comm &mpi_communicator) const
     {
       if (n_global_dofs == 0)
         return std::vector<types::global_dof_index>();
@@ -108,7 +108,7 @@ namespace internal
 
     std::vector<IndexSet>
     NumberCache::get_locally_owned_dofs_per_processor(
-      const MPI_Comm mpi_communicator) const
+      const MPI_Comm &mpi_communicator) const
     {
       AssertDimension(locally_owned_dofs.size(), n_global_dofs);
       if (n_global_dofs == 0)

@@ -398,8 +398,7 @@ namespace Utilities
     std::stringstream origin(input);
 
     bio::filtering_streambuf<bio::input> out;
-    out.push(bio::gzip_compressor(
-      bio::gzip_params(boost::iostreams::gzip::default_compression)));
+    out.push(bio::gzip_compressor());
     out.push(origin);
     bio::copy(out, compressed);
 
@@ -1217,6 +1216,7 @@ namespace Utilities
 
 #endif
 
+#ifndef DOXYGEN
   template std::string
   to_string<int>(int, unsigned int);
   template std::string
@@ -1273,6 +1273,7 @@ namespace Utilities
   template std::uint64_t
   pack_integers<3>(const std::array<std::uint64_t, 3> &, const int);
 
+#endif
 
 } // namespace Utilities
 

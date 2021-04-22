@@ -50,7 +50,7 @@ template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest
 {
 public:
-  typedef std::vector<Vector<Number>> VectorType;
+  using VectorType = std::vector<Vector<Number>>;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
     : data(data_in)

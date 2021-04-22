@@ -76,7 +76,7 @@ test()
   Assert(v(min_index + 39) == min_index + 39, ExcInternalError());
   Assert(v(min_index + 38) == min_index + 38, ExcInternalError());
 
-  v.zero_out_ghosts();
+  v.zero_out_ghost_values();
   v(min_index + 38) = min_index;
   v(min_index + 39) = min_index * 2;
   v(min_index + 41) = min_index + 7;

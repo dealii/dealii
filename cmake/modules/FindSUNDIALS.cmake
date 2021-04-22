@@ -64,7 +64,7 @@ DEAL_II_FIND_LIBRARY(SUNDIALS_LIB_SER NAMES sundials_nvecserial
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
-DEAL_II_FIND_PATH(SUNDIALS_INCLUDE_DIR sundials/sundials_nvector.h
+DEAL_II_FIND_PATH(SUNDIALS_INCLUDE_DIR sundials/sundials_version.h
   HINTS ${SUNDIALS_DIR}
   PATH_SUFFIXES include
 )

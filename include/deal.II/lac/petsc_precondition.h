@@ -19,6 +19,8 @@
 
 #  include <deal.II/base/config.h>
 
+#  include <deal.II/base/subscriptor.h>
+
 #  ifdef DEAL_II_WITH_PETSC
 
 #    include <deal.II/lac/exceptions.h>
@@ -53,18 +55,18 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionerBase
+  class PreconditionBase : public Subscriptor
   {
   public:
     /**
      * Constructor.
      */
-    PreconditionerBase();
+    PreconditionBase();
 
     /**
      * Destructor.
      */
-    virtual ~PreconditionerBase();
+    virtual ~PreconditionBase();
 
     /**
      * Destroys the preconditioner, leaving an object like just after having
@@ -129,12 +131,12 @@ namespace PETScWrappers
    * preconditioner.
    *
    * See the comment in the base class
-   * @ref PreconditionerBase
+   * @ref PreconditionBase
    * for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionJacobi : public PreconditionerBase
+  class PreconditionJacobi : public PreconditionBase
   {
   public:
     /**
@@ -164,7 +166,7 @@ namespace PETScWrappers
      * Intended to be used with SLEPc objects.
      */
     PreconditionJacobi(
-      const MPI_Comm        communicator,
+      const MPI_Comm &      communicator,
       const AdditionalData &additional_data = AdditionalData());
 
     /**
@@ -212,12 +214,12 @@ namespace PETScWrappers
    * the relevant section of the PETSc manual, but is not implemented here.
    *
    * See the comment in the base class
-   * @ref PreconditionerBase
+   * @ref PreconditionBase
    * for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionBlockJacobi : public PreconditionerBase
+  class PreconditionBlockJacobi : public PreconditionBase
   {
   public:
     /**
@@ -246,7 +248,7 @@ namespace PETScWrappers
      * Intended to be used with SLEPc objects.
      */
     PreconditionBlockJacobi(
-      const MPI_Comm        communicator,
+      const MPI_Comm &      communicator,
       const AdditionalData &additional_data = AdditionalData());
 
 
@@ -285,7 +287,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionSOR : public PreconditionerBase
+  class PreconditionSOR : public PreconditionBase
   {
   public:
     /**
@@ -345,7 +347,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionSSOR : public PreconditionerBase
+  class PreconditionSSOR : public PreconditionBase
   {
   public:
     /**
@@ -403,12 +405,12 @@ namespace PETScWrappers
    * each processor.
    *
    * See the comment in the base class
-   * @ref PreconditionerBase
+   * @ref PreconditionBase
    * for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionEisenstat : public PreconditionerBase
+  class PreconditionEisenstat : public PreconditionBase
   {
   public:
     /**
@@ -469,7 +471,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionICC : public PreconditionerBase
+  class PreconditionICC : public PreconditionBase
   {
   public:
     /**
@@ -529,7 +531,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionILU : public PreconditionerBase
+  class PreconditionILU : public PreconditionBase
   {
   public:
     /**
@@ -587,14 +589,14 @@ namespace PETScWrappers
    * (depending on the settings) performs an exact factorization of the
    * matrix, so it is not necessary to wrap it in an iterative solver. This
    * class is typically used with SolverPreOnly to get a direct
-   * solver. Alternatively, you can use PreconditionerBase::vmult() directly.
+   * solver. Alternatively, you can use PreconditionBase::vmult() directly.
    *
    * @note This is not a parallel preconditioner so it only works in serial
    * computations with a single processor.
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionLU : public PreconditionerBase
+  class PreconditionLU : public PreconditionBase
   {
   public:
     /**
@@ -673,7 +675,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionBoomerAMG : public PreconditionerBase
+  class PreconditionBoomerAMG : public PreconditionBase
   {
   public:
     /**
@@ -683,20 +685,50 @@ namespace PETScWrappers
     struct AdditionalData
     {
       /**
+       * Defines the available relaxation types for BoomerAMG.
+       */
+      enum class RelaxationType
+      {
+        Jacobi,
+        sequentialGaussSeidel,
+        seqboundaryGaussSeidel,
+        SORJacobi,
+        backwardSORJacobi,
+        symmetricSORJacobi,
+        l1scaledSORJacobi,
+        GaussianElimination,
+        l1GaussSeidel,
+        backwardl1GaussSeidel,
+        CG,
+        Chebyshev,
+        FCFJacobi,
+        l1scaledJacobi,
+        None
+      };
+
+      /**
        * Constructor. Note that BoomerAMG offers a lot more options to set
        * than what is exposed here.
        */
-      AdditionalData(const bool         symmetric_operator = false,
-                     const double       strong_threshold   = 0.25,
-                     const double       max_row_sum        = 0.9,
-                     const unsigned int aggressive_coarsening_num_levels = 0,
-                     const bool         output_details = false);
+      AdditionalData(
+        const bool           symmetric_operator               = false,
+        const double         strong_threshold                 = 0.25,
+        const double         max_row_sum                      = 0.9,
+        const unsigned int   aggressive_coarsening_num_levels = 0,
+        const bool           output_details                   = false,
+        const RelaxationType relaxation_type_up   = RelaxationType::SORJacobi,
+        const RelaxationType relaxation_type_down = RelaxationType::SORJacobi,
+        const RelaxationType relaxation_type_coarse =
+          RelaxationType::GaussianElimination,
+        const unsigned int n_sweeps_coarse = 1,
+        const double       tol             = 0.0,
+        const unsigned int max_iter        = 1,
+        const bool         w_cycle         = false);
 
       /**
        * Set this flag to true if you have a symmetric system matrix and you
        * want to use a solver which assumes a symmetric preconditioner like
-       * CG. The relaxation is done with SSOR/Jacobi when set to true and with
-       * SOR/Jacobi otherwise.
+       * CG.
        */
       bool symmetric_operator;
 
@@ -732,6 +764,42 @@ namespace PETScWrappers
        * preconditioner is constructed.
        */
       bool output_details;
+
+      /**
+       * Choose relaxation type up.
+       */
+      RelaxationType relaxation_type_up;
+
+      /**
+       * Choose relaxation type down.
+       */
+      RelaxationType relaxation_type_down;
+
+      /**
+       * Choose relaxation type coarse.
+       */
+      RelaxationType relaxation_type_coarse;
+
+      /**
+       * Choose number of sweeps on coarse grid.
+       */
+      unsigned int n_sweeps_coarse;
+
+      /**
+       * Choose BommerAMG tolerance.
+       */
+      double tol;
+
+      /**
+       * Choose BommerAMG maximum number of cycles.
+       */
+      unsigned int max_iter;
+
+      /**
+       * Defines whether a w-cycle should be used instead of the standard
+       * setting of a v-cycle.
+       */
+      bool w_cycle;
     };
 
     /**
@@ -753,7 +821,7 @@ namespace PETScWrappers
      * Intended to be used with SLEPc objects.
      */
     PreconditionBoomerAMG(
-      const MPI_Comm        communicator,
+      const MPI_Comm &      communicator,
       const AdditionalData &additional_data = AdditionalData());
 
 
@@ -803,7 +871,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionParaSails : public PreconditionerBase
+  class PreconditionParaSails : public PreconditionBase
   {
   public:
     /**
@@ -913,7 +981,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionNone : public PreconditionerBase
+  class PreconditionNone : public PreconditionBase
   {
   public:
     /**
@@ -954,6 +1022,12 @@ namespace PETScWrappers
      */
     AdditionalData additional_data;
   };
+
+  /**
+   * Alias for backwards-compatibility.
+   * @deprecated Use PETScWrappers::PreconditionBase instead.
+   */
+  using PreconditionerBase DEAL_II_DEPRECATED_EARLY = PreconditionBase;
 } // namespace PETScWrappers
 
 

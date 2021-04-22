@@ -22,7 +22,10 @@
 
 #include "../tests.h"
 
-// provide only residual function, use internal solver.
+// Solve a nonlinear system but provide only residual function. KINSOL
+// then uses its internal solvers which are based on a
+// finite-difference approximation to the Jacobian and a direct
+// solver.
 
 /**
  * Solve the non linear problem
@@ -37,18 +40,11 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, numbers::invalid_unsigned_int);
 
-  typedef Vector<double> VectorType;
+  using VectorType = Vector<double>;
 
   SUNDIALS::KINSOL<VectorType>::AdditionalData data;
   ParameterHandler                             prm;
   data.add_parameters(prm);
-
-  if (false)
-    {
-      std::ofstream ofile(SOURCE_DIR "/kinsol_01.prm");
-      prm.print_parameters(ofile, ParameterHandler::ShortText);
-      ofile.close();
-    }
 
   std::ifstream ifile(SOURCE_DIR "/kinsol_01.prm");
   prm.parse_input(ifile);

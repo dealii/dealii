@@ -1,57 +1,87 @@
 <h1>Results</h1>
 
-When you run the program, the screen output should look like the following:
+When you run the program using the following command
+@code
+mpirun -np 16 ./step-50  gmg_mf_2d.prm
+@endcode
+the screen output should look like the following:
 @code
 Cycle 0:
-   Number of active cells:       56 (2 global levels)
-   Workload imbalance:           1.14286
-   Number of degrees of freedom: 665 (by level: 117, 665)
+   Number of active cells:       12 (2 global levels)
+   Partition efficiency:         0.1875
+   Number of degrees of freedom: 65 (by level: 21, 65)
    Number of CG iterations:      10
+   Global error estimate:        0.355373
    Wrote solution_00.pvtu
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |    0.0457s |            |
+| Total wallclock time elapsed since start    |    0.0163s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| Assemble right hand side        |         1 |  0.000241s |      0.53% |
-| Estimate                        |         1 |    0.0288s |        63% |
-| Output results                  |         1 |   0.00219s |       4.8% |
-| Setup                           |         1 |   0.00264s |       5.8% |
-| Setup multigrid                 |         1 |   0.00261s |       5.7% |
-| Solve                           |         1 |   0.00355s |       7.8% |
-| Solve: 1 multigrid V-cycle      |         1 |  0.000315s |      0.69% |
-| Solve: CG                       |         1 |   0.00186s |       4.1% |
-| Solve: Preconditioner setup     |         1 |  0.000968s |       2.1% |
+| Assemble right-hand side        |         1 |  0.000374s |       2.3% |
+| Estimate                        |         1 |  0.000724s |       4.4% |
+| Output results                  |         1 |   0.00277s |        17% |
+| Setup                           |         1 |   0.00225s |        14% |
+| Setup multigrid                 |         1 |   0.00181s |        11% |
+| Solve                           |         1 |   0.00364s |        22% |
+| Solve: 1 multigrid V-cycle      |         1 |  0.000354s |       2.2% |
+| Solve: CG                       |         1 |   0.00151s |       9.3% |
+| Solve: Preconditioner setup     |         1 |   0.00125s |       7.7% |
 +---------------------------------+-----------+------------+------------+
 
 Cycle 1:
-   Number of active cells:       126 (3 global levels)
-   Workload imbalance:           1.17483
-   Number of degrees of freedom: 1672 (by level: 117, 665, 1100)
-   Number of CG iterations:      11
+   Number of active cells:       24 (3 global levels)
+   Partition efficiency:         0.276786
+   Number of degrees of freedom: 139 (by level: 21, 65, 99)
+   Number of CG iterations:      10
+   Global error estimate:        0.216726
    Wrote solution_01.pvtu
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |    0.0433s |            |
+| Total wallclock time elapsed since start    |    0.0169s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| Assemble right hand side        |         1 |  0.000286s |      0.66% |
-| Estimate                        |         1 |    0.0272s |        63% |
-| Output results                  |         1 |   0.00333s |       7.7% |
-| Refine grid                     |         1 |   0.00196s |       4.5% |
-| Setup                           |         1 |    0.0023s |       5.3% |
-| Setup multigrid                 |         1 |   0.00262s |         6% |
-| Solve                           |         1 |   0.00549s |        13% |
-| Solve: 1 multigrid V-cycle      |         1 |  0.000343s |      0.79% |
-| Solve: CG                       |         1 |   0.00293s |       6.8% |
-| Solve: Preconditioner setup     |         1 |   0.00174s |         4% |
+| Assemble right-hand side        |         1 |  0.000309s |       1.8% |
+| Estimate                        |         1 |   0.00156s |       9.2% |
+| Output results                  |         1 |   0.00222s |        13% |
+| Refine grid                     |         1 |   0.00278s |        16% |
+| Setup                           |         1 |   0.00196s |        12% |
+| Setup multigrid                 |         1 |    0.0023s |        14% |
+| Solve                           |         1 |   0.00565s |        33% |
+| Solve: 1 multigrid V-cycle      |         1 |  0.000349s |       2.1% |
+| Solve: CG                       |         1 |   0.00285s |        17% |
+| Solve: Preconditioner setup     |         1 |   0.00195s |        12% |
 +---------------------------------+-----------+------------+------------+
 
 Cycle 2:
+   Number of active cells:       51 (4 global levels)
+   Partition efficiency:         0.41875
+   Number of degrees of freedom: 245 (by level: 21, 65, 225, 25)
+   Number of CG iterations:      11
+   Global error estimate:        0.112098
+   Wrote solution_02.pvtu
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |    0.0183s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assemble right-hand side        |         1 |  0.000274s |       1.5% |
+| Estimate                        |         1 |   0.00127s |       6.9% |
+| Output results                  |         1 |   0.00227s |        12% |
+| Refine grid                     |         1 |    0.0024s |        13% |
+| Setup                           |         1 |   0.00191s |        10% |
+| Setup multigrid                 |         1 |   0.00295s |        16% |
+| Solve                           |         1 |   0.00702s |        38% |
+| Solve: 1 multigrid V-cycle      |         1 |  0.000398s |       2.2% |
+| Solve: CG                       |         1 |   0.00376s |        21% |
+| Solve: Preconditioner setup     |         1 |   0.00238s |        13% |
++---------------------------------+-----------+------------+------------+
 .
 .
 .
@@ -236,7 +266,7 @@ same problem on the same number of processors in about one eighth the
 time.
 
 
-<h3> Possible extensions </h3>
+<h3> Possibilities for extensions </h3>
 
 <h4> Testing convergence and higher order elements </h4>
 

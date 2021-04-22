@@ -29,11 +29,8 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/fe/mapping_q1.h>
@@ -515,7 +512,7 @@ namespace Step12
     PreconditionBlockSSOR<SparseMatrix<double>> preconditioner;
 
     // then assign the matrix to it and set the right block size:
-    preconditioner.initialize(system_matrix, fe.dofs_per_cell);
+    preconditioner.initialize(system_matrix, fe.n_dofs_per_cell());
 
     // After these preparations we are ready to start the linear solver.
     solver.solve(system_matrix, solution, right_hand_side, preconditioner);

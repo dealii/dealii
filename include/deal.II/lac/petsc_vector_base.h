@@ -173,14 +173,22 @@ namespace PETScWrappers
       /**
        * Exception
        */
-      DeclException3(ExcAccessToNonlocalElement,
-                     int,
-                     int,
-                     int,
-                     << "You tried to access element " << arg1
-                     << " of a distributed vector, but only elements " << arg2
-                     << " through " << arg3
-                     << " are stored locally and can be accessed.");
+      DeclException3(
+        ExcAccessToNonlocalElement,
+        int,
+        int,
+        int,
+        << "You tried to access element " << arg1
+        << " of a distributed vector, but only elements in range [" << arg2
+        << "," << arg3 << "] are stored locally and can be accessed."
+        << "\n\n"
+        << "A common source for this kind of problem is that you "
+        << "are passing a 'fully distributed' vector into a function "
+        << "that needs read access to vector elements that correspond "
+        << "to degrees of freedom on ghost cells (or at least to "
+        << "'locally active' degrees of freedom that are not also "
+        << "'locally owned'). You need to pass a vector that has these "
+        << "elements as ghost entries.");
       /**
        * Exception.
        */
@@ -280,7 +288,7 @@ namespace PETScWrappers
     operator=(const VectorBase &) = delete;
 
     /**
-     * Destructor
+     * Destructor.
      */
     virtual ~VectorBase() override;
 
@@ -348,10 +356,24 @@ namespace PETScWrappers
      * is the same as size(), but for parallel vectors it may be smaller.
      *
      * To figure out which elements exactly are stored locally, use
-     * local_range().
+     * local_range() or locally_owned_elements().
+     *
+     * @deprecated use locally_owned_size() instead.
      */
+    DEAL_II_DEPRECATED_EARLY
     size_type
     local_size() const;
+
+    /**
+     * Return the local dimension of the vector, i.e. the number of elements
+     * stored on the present MPI process. For sequential vectors, this number
+     * is the same as size(), but for parallel vectors it may be smaller.
+     *
+     * To figure out which elements exactly are stored locally, use
+     * local_range() or locally_owned_elements().
+     */
+    size_type
+    locally_owned_size() const;
 
     /**
      * Return a pair of indices indicating which elements of this vector are
@@ -359,7 +381,7 @@ namespace PETScWrappers
      * stored, the second the index of the one past the last one that is
      * stored locally. If this is a sequential vector, then the result will be
      * the pair (0,N), otherwise it will be a pair (i,i+n), where
-     * <tt>n=local_size()</tt>.
+     * <tt>n=locally_owned_size()</tt>.
      */
     std::pair<size_type, size_type>
     local_range() const;

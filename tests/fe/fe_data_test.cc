@@ -116,7 +116,7 @@ test_fe_datas()
   fe_datas.push_back(new FE_DGQ<dim>(2));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(
-    new FE_DGQArbitraryNodes<dim>(QIterated<1>(QTrapez<1>(), 4)));
+    new FE_DGQArbitraryNodes<dim>(QIterated<1>(QTrapezoid<1>(), 4)));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_DGQ<dim>(4));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;

@@ -17,6 +17,7 @@
 
 // a un-hp-ified version of hp/step-2
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -28,8 +29,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/lac/sparse_matrix.h>
 

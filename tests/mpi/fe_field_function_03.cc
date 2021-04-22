@@ -190,18 +190,9 @@ test()
           else
             break;
         }
-      catch (const VectorTools::ExcPointNotAvailableHere &)
-        {
-          deallog << "  ExcPointNotAvailableHere" << std::endl;
-        }
-      catch (std::exception &exc)
-        {
-          deallog << exc.what() << std::endl;
-        }
       catch (...)
         {
-          deallog << "  Oh no! Some other error that we shouldn't get."
-                  << std::endl;
+          deallog << "  ExcPointNotAvailableHere" << std::endl;
         }
     }
 

@@ -38,8 +38,6 @@
 #include <deal.II/fe/fe_tools.h>
 
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 
@@ -931,6 +929,8 @@ namespace Step59
     FE_DGQHermite<dim> fe;
     DoFHandler<dim>    dof_handler;
 
+    MappingQ1<dim> mapping;
+
     using SystemMatrixType = LaplaceOperator<dim, fe_degree, double>;
     SystemMatrixType system_matrix;
 
@@ -1022,10 +1022,8 @@ namespace Step59
          update_quadrature_points);
       const auto system_mf_storage =
         std::make_shared<MatrixFree<dim, double>>();
-      system_mf_storage->reinit(dof_handler,
-                                dummy,
-                                QGauss<1>(fe.degree + 1),
-                                additional_data);
+      system_mf_storage->reinit(
+        mapping, dof_handler, dummy, QGauss<1>(fe.degree + 1), additional_data);
       system_matrix.initialize(system_mf_storage);
     }
 
@@ -1054,7 +1052,8 @@ namespace Step59
         additional_data.mg_level = level;
         const auto mg_mf_storage_level =
           std::make_shared<MatrixFree<dim, float>>();
-        mg_mf_storage_level->reinit(dof_handler,
+        mg_mf_storage_level->reinit(mapping,
+                                    dof_handler,
                                     dummy,
                                     QGauss<1>(fe.degree + 1),
                                     additional_data);
@@ -1290,7 +1289,8 @@ namespace Step59
   void LaplaceProblem<dim, fe_degree>::analyze_results() const
   {
     Vector<float> error_per_cell(triangulation.n_active_cells());
-    VectorTools::integrate_difference(dof_handler,
+    VectorTools::integrate_difference(mapping,
+                                      dof_handler,
                                       solution,
                                       Solution<dim>(),
                                       error_per_cell,
@@ -1339,7 +1339,9 @@ namespace Step59
             triangulation.begin_active()->face(0)->set_boundary_id(10);
             triangulation.begin_active()->face(1)->set_boundary_id(11);
             triangulation.begin_active()->face(2)->set_boundary_id(0);
-            for (unsigned int f = 3; f < GeometryInfo<dim>::faces_per_cell; ++f)
+            for (unsigned int f = 3;
+                 f < triangulation.begin_active()->n_faces();
+                 ++f)
               triangulation.begin_active()->face(f)->set_boundary_id(1);
 
             std::vector<GridTools::PeriodicFacePair<

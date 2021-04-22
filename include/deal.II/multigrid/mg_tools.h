@@ -75,16 +75,25 @@ namespace MGTools
    * Write the sparsity structure of the matrix belonging to the specified @p
    * level. The sparsity pattern is not compressed, so before creating the
    * actual matrix you have to compress the matrix yourself, using
-   * <tt>SparseMatrixStruct::compress()</tt>.
+   * <tt>SparsityPatternType::compress()</tt>.
    *
-   * There is no need to consider hanging nodes here, since only one level is
-   * considered.
+   * The optional AffineConstraints argument allows to define constraints of
+   * the level matrices like Dirichlet boundary conditions. Note that there is
+   * need to consider hanging nodes on the typical level matrices, since only
+   * one level is considered. See DoFTools::make_sparsity_pattern() for more
+   * details about the arguments.
    */
-  template <int dim, int spacedim, typename SparsityPatternType>
+  template <int dim,
+            int spacedim,
+            typename SparsityPatternType,
+            typename number = double>
   void
-  make_sparsity_pattern(const DoFHandler<dim, spacedim> &dof_handler,
-                        SparsityPatternType &            sparsity,
-                        const unsigned int               level);
+  make_sparsity_pattern(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    SparsityPatternType &            sparsity,
+    const unsigned int               level,
+    const AffineConstraints<number> &constraints = AffineConstraints<number>(),
+    const bool                       keep_constrained_dofs = true);
 
   /**
    * Make a sparsity pattern including fluxes of discontinuous Galerkin
@@ -253,20 +262,6 @@ namespace MGTools
   void
   extract_inner_interface_dofs(const DoFHandler<dim, spacedim> &mg_dof_handler,
                                std::vector<IndexSet> &          interface_dofs);
-
-  /**
-   * For each level in a multigrid hierarchy, produce a std::set of degrees of
-   * freedoms that are not located along interfaces of this level to cells that
-   * only exist on coarser levels.
-   *
-   * @deprecated Use extract_inner_interface_dofs() for computing the complement
-   * of degrees of freedoms instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  extract_non_interface_dofs(
-    const DoFHandler<dim, spacedim> &               mg_dof_handler,
-    std::vector<std::set<types::global_dof_index>> &non_interface_dofs);
 
   /**
    * Return the highest possible level that can be used as the coarsest level in

@@ -36,6 +36,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef signals
+#  error \
+    "The name 'signals' is already defined. You are most likely using the QT library \
+and using the 'signals' keyword. You can either #include the Qt headers (or any conflicting headers) \
+*after* the deal.II headers or you can define the 'QT_NO_KEYWORDS' macro and use the 'Q_SIGNALS' macro."
+#endif
+
 /*!@addtogroup mg */
 /*@{*/
 
@@ -70,6 +77,10 @@ namespace mg
      * This signal is triggered before (@p before is true) and after (@p before
      * is
      * false) the call to the coarse solver on @p level.
+     *
+     * The coarse solve will be done with ``defect[leve]`` and returned in
+     * ``solution[level]``, which can be inspected by the user using this
+     * signal.
      */
     boost::signals2::signal<void(const bool before, const unsigned int level)>
       coarse_solve;
@@ -78,6 +89,9 @@ namespace mg
      * This signal is triggered before (@p before is true) and after (@p before
      * is false) the call to MGTransfer::restrict_and_add() which restricts a
      * vector from @p level to the next coarser one (@p level - 1).
+     *
+     * The vector ``defect[level-1]`` will be updated between these two
+     * triggers and can be inspected by the user using this signal.
      */
     boost::signals2::signal<void(const bool before, const unsigned int level)>
       restriction;
@@ -94,6 +108,9 @@ namespace mg
      * This signal is triggered before (@p before is true) and after (@p before
      * is false) the call to a pre-smoothing step via MGPreSmoother::apply() on
      * @p level.
+     *
+     * The smoother result will be stored in ``solution[level]`` and can be
+     * inspected by the user using this signal.
      */
     boost::signals2::signal<void(const bool before, const unsigned int level)>
       pre_smoother_step;

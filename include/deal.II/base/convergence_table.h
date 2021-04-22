@@ -38,11 +38,13 @@ DEAL_II_NAMESPACE_OPEN
  * set in relation to the number of cells or the number of DoFs. The
  * implementations of these non-standard methods is left to a user.
  *
- * The number of cells and the number of DoFs may be added to the table by
- * calling e.g.  <tt>add_value("n cells", n_cells)</tt>. The table data is
- * also added by calling add_value().  Before the output of the table the
- * functions evaluate_convergence_rates() and evaluate_all_convergence_rates()
- * may be called.
+ * For example, the number of cells may be added to the table by
+ * calling `add_value("n cells", n_cells)`. The number of DoFs may be
+ * added to the table by calling `add_value("n dofs", n_dofs)`. Of course,
+ * one can also add more kinds of information by calling
+ * add_value() with other arguments. In any case, before the output of the table
+ * the functions evaluate_convergence_rates() and
+ * evaluate_all_convergence_rates() may be called.
  *
  * There are two possibilities of how to evaluate the convergence rates of
  * multiple columns in the same RateMode.
@@ -55,7 +57,7 @@ DEAL_II_NAMESPACE_OPEN
  * </ol>
  *
  * A detailed discussion of this class can also be found in the step-7 and
- * step-13 example programs.
+ * step-13 example programs. It is also used in step-74.
  *
  * @ingroup textoutput
  */

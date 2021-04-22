@@ -64,16 +64,15 @@ test()
   deallog << "dim = " << dim << std::endl;
 
   // Construct grid
-  Triangulation<dim>  triangulation;
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  Triangulation<dim> triangulation;
+  DoFHandler<dim>    dof_handler(triangulation);
   GridGenerator::hyper_cube(triangulation, -20, 20);
   triangulation.refine_global(4);
 
   // Construct vector of predicates for 2 and 3 dimensions
   Assert(dim == 2 || dim == 3, ExcDimensionMismatch2(dim, 2, 3));
-  typedef std::function<bool(
-    const typename Triangulation<dim>::active_cell_iterator &)>
-                                  predicate_function;
+  using predicate_function = std::function<bool(
+    const typename Triangulation<dim>::active_cell_iterator &)>;
   std::vector<predicate_function> predicates;
   predicates.resize(5);
   if (dim == 2)

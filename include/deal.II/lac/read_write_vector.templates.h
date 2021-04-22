@@ -23,6 +23,7 @@
 
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/vector_operations_internal.h>
 
@@ -130,7 +131,8 @@ namespace LinearAlgebra
         distributed::Vector<Number, ::dealii::MemorySpace::Host> tmp_vector(
           communication_pattern);
 
-        const unsigned int n_elements = communication_pattern->local_size();
+        const unsigned int n_elements =
+          communication_pattern->locally_owned_size();
         std::copy(values, values + n_elements, tmp_vector.begin());
         tmp_vector.update_ghost_values();
 
@@ -173,8 +175,9 @@ namespace LinearAlgebra
         distributed::Vector<Number, ::dealii::MemorySpace::Host> tmp_vector(
           communication_pattern);
 
-        const unsigned int n_elements = communication_pattern->local_size();
-        cudaError_t        cuda_error_code = cudaMemcpy(tmp_vector.begin(),
+        const unsigned int n_elements =
+          communication_pattern->locally_owned_size();
+        cudaError_t cuda_error_code = cudaMemcpy(tmp_vector.begin(),
                                                  values,
                                                  n_elements * sizeof(Number),
                                                  cudaMemcpyDeviceToHost);
@@ -407,13 +410,75 @@ namespace LinearAlgebra
 
 
 
+  namespace internal
+  {
+    template <typename VectorType, typename Number>
+    void
+    import_serial_vector(const VectorType &       values,
+                         VectorOperation::values  operation,
+                         ReadWriteVector<Number> &rw_vector)
+    {
+      using size_type = types::global_dof_index;
+
+      const IndexSet &stored = rw_vector.get_stored_elements();
+      if (operation == VectorOperation::add)
+        for (size_type i = 0; i < stored.n_elements(); ++i)
+          rw_vector.local_element(i) += values(stored.nth_index_in_set(i));
+      else if (operation == VectorOperation::min)
+        for (size_type i = 0; i < stored.n_elements(); ++i)
+          rw_vector.local_element(i) =
+            get_min(values(stored.nth_index_in_set(i)),
+                    rw_vector.local_element(i));
+      else if (operation == VectorOperation::max)
+        for (size_type i = 0; i < stored.n_elements(); ++i)
+          rw_vector.local_element(i) =
+            get_max(values(stored.nth_index_in_set(i)),
+                    rw_vector.local_element(i));
+      else
+        for (size_type i = 0; i < stored.n_elements(); ++i)
+          rw_vector.local_element(i) = values(stored.nth_index_in_set(i));
+    }
+  } // namespace internal
+
+
+
+  template <typename Number>
+  void
+  ReadWriteVector<Number>::import(
+    const dealii::Vector<Number> &vec,
+    VectorOperation::values       operation,
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+      &communication_pattern)
+  {
+    (void)communication_pattern;
+
+    internal::import_serial_vector(vec, operation, *this);
+  }
+
+
+
+  template <typename Number>
+  void
+  ReadWriteVector<Number>::import(
+    const LinearAlgebra::Vector<Number> &vec,
+    VectorOperation::values              operation,
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+      &communication_pattern)
+  {
+    (void)communication_pattern;
+
+    internal::import_serial_vector(vec, operation, *this);
+  }
+
+
+
   template <typename Number>
   template <typename MemorySpace>
   void
   ReadWriteVector<Number>::import(
     const distributed::Vector<Number, MemorySpace> &vec,
     VectorOperation::values                         operation,
-    const std::shared_ptr<const CommunicationPatternBase>
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
       &communication_pattern)
   {
     // If no communication pattern is given, create one. Otherwise, use the
@@ -481,7 +546,7 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::import(
     const PETScWrappers::MPI::Vector &petsc_vec,
     VectorOperation::values /*operation*/,
-    const std::shared_ptr<const CommunicationPatternBase>
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
       & /*communication_pattern*/)
   {
     // TODO: this works only if no communication is needed.
@@ -494,7 +559,7 @@ namespace LinearAlgebra
       VecGetArray(static_cast<const Vec &>(petsc_vec), &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    const size_type vec_size = petsc_vec.local_size();
+    const size_type vec_size = petsc_vec.locally_owned_size();
     internal::copy_petsc_vector(start_ptr, start_ptr + vec_size, begin());
 
     // restore the representation of the vector
@@ -514,7 +579,7 @@ namespace LinearAlgebra
     const IndexSet &                                            source_elements,
     VectorOperation::values                                     operation,
     const MPI_Comm &                                            mpi_comm,
-    const std::shared_ptr<const CommunicationPatternBase>
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
       &communication_pattern)
   {
     std::shared_ptr<const TpetraWrappers::CommunicationPattern>
@@ -631,7 +696,7 @@ namespace LinearAlgebra
     const IndexSet &          source_elements,
     VectorOperation::values   operation,
     const MPI_Comm &          mpi_comm,
-    const std::shared_ptr<const CommunicationPatternBase>
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
       &communication_pattern)
   {
     std::shared_ptr<const EpetraWrappers::CommunicationPattern>
@@ -770,7 +835,7 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::import(
     const TrilinosWrappers::MPI::Vector &trilinos_vec,
     VectorOperation::values              operation,
-    const std::shared_ptr<const CommunicationPatternBase>
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
       &communication_pattern)
   {
     // While the import does work with Trilinos 12.8.x, it fails with 12.4.x. To
@@ -795,7 +860,7 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::import(
     const LinearAlgebra::TpetraWrappers::Vector<Number> &trilinos_vec,
     VectorOperation::values                              operation,
-    const std::shared_ptr<const CommunicationPatternBase>
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
       &communication_pattern)
   {
     import(trilinos_vec.trilinos_vector(),
@@ -813,7 +878,7 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::import(
     const LinearAlgebra::EpetraWrappers::Vector &trilinos_vec,
     VectorOperation::values                      operation,
-    const std::shared_ptr<const CommunicationPatternBase>
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
       &communication_pattern)
   {
     import(trilinos_vec.trilinos_vector(),
@@ -832,7 +897,7 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::import(
     const LinearAlgebra::CUDAWrappers::Vector<Number> &cuda_vec,
     VectorOperation::values                            operation,
-    const std::shared_ptr<const CommunicationPatternBase> &)
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &)
   {
     const unsigned int n_elements = stored_elements.n_elements();
     if (operation == VectorOperation::insert)

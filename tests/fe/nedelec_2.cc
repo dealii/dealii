@@ -108,7 +108,7 @@ plot(const Triangulation<dim> &tr, const unsigned int p)
   // the values of this so defined
   // function on each cell and on
   // each quadrature point
-  QTrapez<dim - 1>            quadrature;
+  QTrapezoid<dim - 1>         quadrature;
   std::vector<Vector<double>> shape_values1(quadrature.size(),
                                             Vector<double>(dim));
   std::vector<Vector<double>> shape_values2(quadrature.size(),

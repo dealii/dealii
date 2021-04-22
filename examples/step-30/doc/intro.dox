@@ -283,11 +283,11 @@ write code that works for both isotropic and anisotropic refinement:
 @endcode
      Here the number of subfaces is three. It is important to note the subtle
   differences between, for a face, TriaAccessor::n_children() and
-  TriaAccessor::number_of_children(). The first function returns the number of
+  TriaAccessor::n_active_descendants(). The first function returns the number of
   immediate children, which would be two for the above example, whereas the
   second returns the number of active offspring (i.e., including children,
   grandchildren, and further descendants), which is the correct three in
-  the example above. Using <code>face->number_of_children()</code> works for
+  the example above. Using <code>face->n_active_descendants()</code> works for
   isotropic and anisotropic as well as 2D and 3D cases, so it should always be
   used. It should be noted that if any of the cells behind the two
   small subfaces on the left side of the rightmost image is further
@@ -428,7 +428,7 @@ steps:
   requested refinement, using the requested isotropic and anisotropic flags.
 </ol>
 This approach is similar to the one we have used in step-27
-for hp refinement and
+for hp-refinement and
 has the great advantage of flexibility: Any error indicator can be
 used in the anisotropic process, i.e. if you have quite involved a posteriori
 goal-oriented error indicators available you can use them as easily as a simple

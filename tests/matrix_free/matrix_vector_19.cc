@@ -50,7 +50,7 @@ template <int dim, int fe_degree>
 void
 test()
 {
-  typedef double number;
+  using number = double;
 
   parallel::shared::Triangulation<dim> tria(
     MPI_COMM_WORLD,

@@ -99,7 +99,8 @@ freedom in 2D. An animated schlieren plot of the solution looks as follows:
 It is evident that 37k gridpoints for the first-order method is nowhere
 near the resolution needed to resolve any flow features. For comparison,
 here is a "reference" computation with a second-order method and about 9.5M
-gridpoints:
+gridpoints (<a href="https://github.com/conservation-laws/ryujin">github
+project page</a>):
 
 <img src="https://www.dealii.org/images/steps/developer/step-69.2nd-order.t400.jpg" alt="" height="300">
 
@@ -162,11 +163,12 @@ discussed above. The pictures above illustrate how much diffusion that
 introduces and how far the solution is from one that actually resolves
 the features we care about.
 
-This can be fixed, but it would exceed what a *tutorial* is
-about. Nevertheless, it is worth showing what one can achieve by
-adding a second-order scheme. For example, here is a video that shows
-(with a different color scheme) a 2d simulation that corresponds to
-the cases shown above:
+This can be fixed, but it would exceed what a *tutorial* is about.
+Nevertheless, it is worth showing what one can achieve by adding a
+second-order scheme. For example, here is a video computed with <a
+href=https://conservation-laws.43-1.org/>the following research code</a>
+that shows (with a different color scheme) a 2d simulation that corresponds
+to the cases shown above:
 
 @htmlonly
 <p align="center">

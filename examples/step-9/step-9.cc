@@ -33,10 +33,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/numerics/vector_tools.h>
@@ -609,7 +606,7 @@ namespace Step9
     AssemblyCopyData &                                    copy_data)
   {
     // We define some abbreviations to avoid unnecessarily long lines:
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points =
       scratch_data.fe_values.get_quadrature().size();
     const unsigned int n_face_q_points =
@@ -1043,7 +1040,7 @@ namespace Step9
     // have to clear the array storing the iterators to the active
     // neighbors, of course.
     scratch_data.active_neighbors.clear();
-    for (unsigned int face_n : GeometryInfo<dim>::face_indices())
+    for (const auto face_n : cell->face_indices())
       if (!cell->at_boundary(face_n))
         {
           // First define an abbreviation for the iterator to the face and

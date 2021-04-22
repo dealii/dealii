@@ -71,7 +71,7 @@ private:
 
   Triangulation<dim>         triangulation;
   hp::FECollection<dim>      fe;
-  hp::DoFHandler<dim>        dof_handler;
+  DoFHandler<dim>            dof_handler;
   hp::MappingCollection<dim> mapping;
 
   SparsityPattern           sparsity_pattern;

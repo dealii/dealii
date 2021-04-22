@@ -250,24 +250,7 @@ namespace DoFTools
 
   /**
    * Map a coupling table from the user friendly organization by components to
-   * the organization by blocks. Specializations of this function for
-   * DoFHandler and hp::DoFHandler are required due to the different results
-   * of their finite element access.
-   *
-   * The return vector will be initialized to the correct length inside this
-   * function.
-   */
-  template <int dim, int spacedim>
-  void
-  convert_couplings_to_blocks(const DoFHandler<dim, spacedim> &dof_handler,
-                              const Table<2, Coupling> &table_by_component,
-                              std::vector<Table<2, Coupling>> &tables_by_block);
-
-  /**
-   * Map a coupling table from the user friendly organization by components to
-   * the organization by blocks. Specializations of this function for
-   * DoFHandler and hp::DoFHandler are required due to the different results
-   * of their finite element access.
+   * the organization by blocks.
    *
    * The return vector will be initialized to the correct length inside this
    * function.
@@ -362,8 +345,8 @@ namespace DoFTools
    * methods for building the sparsity patterns that depend on the exact
    * formulation of the problem. You will have to do this yourself then.
    *
-   * @param[in] dof_handler The DoFHandler or hp::DoFHandler object that
-   * describes which degrees of freedom live on which cells.
+   * @param[in] dof_handler The DoFHandler object that describes which degrees
+   * of freedom live on which cells.
    *
    * @param[out] sparsity_pattern The sparsity pattern to be filled with
    * entries.
@@ -562,8 +545,8 @@ namespace DoFTools
    * strict super-set of nonzero entries compared to the work done by
    * make_sparsity_pattern().
    *
-   * @param[in] dof_handler The DoFHandler or hp::DoFHandler object that
-   * describes which degrees of freedom live on which cells.
+   * @param[in] dof_handler The DoFHandler object that describes which degrees
+   * of freedom live on which cells.
    *
    * @param[out] sparsity_pattern The sparsity pattern to be filled with
    * entries.
@@ -770,14 +753,11 @@ namespace DoFTools
    * This function does not close the object since you may want to
    * enter other constraints later on yourself.
    *
-   * In the hp-case, i.e. when the argument is of type hp::DoFHandler, we
-   * consider constraints due to different finite elements used on two sides
-   * of a face between cells as hanging nodes as well. In other words, for hp
-   * finite elements, this function computes all constraints due to differing
-   * mesh sizes (h) or polynomial degrees (p) between adjacent cells.
-   *
-   * The template argument (and by consequence the type of the first argument
-   * to this function) can be either ::DoFHandler or hp::DoFHandler.
+   * Using a DoFHandler with hp-capabilities, we consider constraints due to
+   * different finite elements used on two sides of a face between cells as
+   * hanging nodes as well. In other words, in hp-mode, this function computes
+   * all constraints due to differing mesh sizes (h) or polynomial degrees (p)
+   * between adjacent cells.
    *
    * @ingroup constraints
    */
@@ -1425,9 +1405,9 @@ namespace DoFTools
    * specified components of the solution. The function returns its results in
    * the last non-default-valued parameter which contains @p true if a degree
    * of freedom is at the boundary and belongs to one of the selected
-   * components, and @p false otherwise. The function is used in step-15.
+   * components, and @p false otherwise.
    *
-   * By specifying the @p boundary_id variable, you can select which boundary
+   * By specifying the @p boundary_ids variable, you can select which boundary
    * indicators the faces have to have on which the degrees of freedom are
    * located that shall be extracted. If it is an empty list, then all
    * boundary indicators are accepted.
@@ -1444,13 +1424,15 @@ namespace DoFTools
    * component mask is used that corresponds to the first non-zero components.
    * Elements in the mask corresponding to later components are ignored.
    *
-   * @note This function will not work for DoFHandler objects that are built
+   * @deprecated This function will not work for DoFHandler objects that are built
    * on a parallel::distributed::Triangulation object. The reasons is that the
    * output argument @p selected_dofs has to have a length equal to <i>all</i>
    * global degrees of freedom. Consequently, this does not scale to very
-   * large problems. If you need the functionality of this function for
+   * large problems, and this is also why the function is deprecated. If you
+   * need the functionality of this function for
    * parallel triangulations, then you need to use the other
-   * DoFTools::extract_boundary_dofs function.
+   * DoFTools::extract_boundary_dofs() function that returns its information
+   * via an IndexSet object.
    *
    * @param[in] dof_handler The object that describes which degrees of freedom
    * live on which cell.
@@ -1473,50 +1455,70 @@ namespace DoFTools
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, int spacedim>
-  void
+  DEAL_II_DEPRECATED_EARLY void
   extract_boundary_dofs(const DoFHandler<dim, spacedim> &   dof_handler,
                         const ComponentMask &               component_mask,
                         std::vector<bool> &                 selected_dofs,
-                        const std::set<types::boundary_id> &boundary_ids =
-                          std::set<types::boundary_id>());
+                        const std::set<types::boundary_id> &boundary_ids = {});
 
   /**
-   * This function does the same as the previous one but it returns its result
-   * as an IndexSet rather than a std::vector@<bool@>. Thus, it can also be
-   * called for DoFHandler objects that are defined on
-   * parallel::distributed::Triangulation objects.
+   * Extract all degrees of freedom which are at the boundary and belong to
+   * specified components of the solution. The function returns its results in
+   * the form of an IndexSet that contains those entries that correspond to
+   * these selected degrees of freedom, i.e., which are at the boundary and
+   * belong to one of the selected components.
    *
-   * @note If the DoFHandler object is indeed defined on a
-   * parallel::distributed::Triangulation, then the @p selected_dofs index set
+   * By specifying the @p boundary_ids variable, you can select which boundary
+   * indicators the faces have to have on which the degrees of freedom are
+   * located that shall be extracted. If it is an empty list (the default), then
+   * all boundary indicators are accepted.
+   *
+   * @note If the DoFHandler object is defined on a
+   * parallel Triangulation object, then the computed index set
    * will contain only those degrees of freedom on the boundary that belong to
    * the locally relevant set (see
-   * @ref GlossLocallyRelevantDof "locally relevant DoFs").
+   * @ref GlossLocallyRelevantDof "locally relevant DoFs"), i.e., the function
+   * only considers faces of locally owned and ghost cells, but not of
+   * artificial cells.
    *
    * @param[in] dof_handler The object that describes which degrees of freedom
    * live on which cell.
    * @param[in] component_mask A mask denoting the vector components of the
    * finite element that should be considered (see also
-   * @ref GlossComponentMask).
-   * @param[out] selected_dofs The IndexSet object that is returned and that
+   * @ref GlossComponentMask). If left at the default, the component mask
+   * indicates that all vector components of the finite element should be
+   * considered.
+   * @param[in] boundary_ids If empty, this function extracts the indices of the
+   * degrees of freedom for all parts of the boundary. If it is a non-empty
+   * list, then the function only considers boundary faces with the boundary
+   * indicators listed in this argument.
+   * @return The IndexSet object that
    * will contain the indices of degrees of freedom that are located on the
    * boundary (and correspond to the selected vector components and boundary
    * indicators, depending on the values of the @p component_mask and @p
    * boundary_ids arguments).
-   * @param[in] boundary_ids If empty, this function extracts the indices of the
-   * degrees of freedom for all parts of the boundary. If it is a non- empty
-   * list, then the function only considers boundary faces with the boundary
-   * indicators listed in this argument.
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, int spacedim>
-  void
+  IndexSet
+  extract_boundary_dofs(const DoFHandler<dim, spacedim> &dof_handler,
+                        const ComponentMask &component_mask = ComponentMask(),
+                        const std::set<types::boundary_id> &boundary_ids = {});
+
+  /**
+   * The same as the previous function, except that it returns its information
+   * via the third argument.
+   *
+   * @deprecated Use the previous function instead.
+   */
+  template <int dim, int spacedim>
+  DEAL_II_DEPRECATED_EARLY void
   extract_boundary_dofs(const DoFHandler<dim, spacedim> &   dof_handler,
                         const ComponentMask &               component_mask,
                         IndexSet &                          selected_dofs,
-                        const std::set<types::boundary_id> &boundary_ids =
-                          std::set<types::boundary_id>());
+                        const std::set<types::boundary_id> &boundary_ids = {});
 
   /**
    * This function is similar to the extract_boundary_dofs() function but it
@@ -1656,6 +1658,19 @@ namespace DoFTools
   void
   extract_locally_active_dofs(const DoFHandler<dim, spacedim> &dof_handler,
                               IndexSet &                       dof_set);
+
+  /**
+   * Same function as above but for a certain (multigrid-)level.
+   * This function returns all DoF indices that live on
+   * all locally owned cells (including on the interface to ghost cells) on the
+   * given level.
+   */
+  template <int dim, int spacedim>
+  void
+  extract_locally_active_level_dofs(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    IndexSet &                       dof_set,
+    const unsigned int               level);
 
   /**
    * Extract the set of global DoF indices that are active on the current
@@ -2208,14 +2223,13 @@ namespace DoFTools
                          std::vector<unsigned int>());
 
   /**
-   * For each active cell of a DoFHandler or hp::DoFHandler, extract the
-   * active finite element index and fill the vector given as second argument.
-   * This vector is assumed to have as many entries as there are active cells.
+   * For each active cell of a DoFHandler, extract the active finite element
+   * index and fill the vector given as second argument. This vector is assumed
+   * to have as many entries as there are active cells.
    *
-   * For non-hp DoFHandler objects given as first argument, the returned
-   * vector will consist of only zeros, indicating that all cells use the same
-   * finite element. For a hp::DoFHandler, the values may be different,
-   * though.
+   * For DoFHandler objects without hp-capabilities given as first argument, the
+   * returned vector will consist of only zeros, indicating that all cells use
+   * the same finite element. In hp-mode, the values may be different, though.
    */
   template <int dim, int spacedim>
   void
@@ -2345,7 +2359,7 @@ namespace DoFTools
                              const ComponentMask &mask = ComponentMask());
 
   /**
-   * Same as the previous function but for the hp case.
+   * Same as the previous function but for the hp-case.
    */
   template <int dim, int spacedim>
   void
@@ -2394,7 +2408,7 @@ namespace DoFTools
     const ComponentMask &                               mask = ComponentMask());
 
   /**
-   * Same as the previous function but for the hp case.
+   * Same as the previous function but for the hp-case.
    */
   template <int dim, int spacedim>
   void
@@ -2654,8 +2668,8 @@ namespace DoFTools
    */
   DeclException0(ExcGridsDontMatch);
   /**
-   * The ::DoFHandler or hp::DoFHandler was not initialized with a finite
-   * element. Please call DoFHandler::distribute_dofs() etc. first.
+   * The DoFHandler was not initialized with a finite element. Please call
+   * DoFHandler::distribute_dofs() first.
    *
    * @ingroup Exceptions
    */

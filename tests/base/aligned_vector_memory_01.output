@@ -1,0 +1,30 @@
+
+DEAL::Check 1:
+DEAL::Default constructor. Object number 0
+DEAL::copy constructor from 0. Object number 1
+DEAL::copy constructor from 0. Object number 2
+DEAL::destructor. Object number 0
+DEAL::destructor. Object number 2
+DEAL::destructor. Object number 1
+DEAL::Check 2:
+DEAL::Default constructor. Object number 3
+DEAL::copy constructor from 3. Object number 4
+DEAL::copy constructor from 3. Object number 5
+DEAL::destructor. Object number 3
+DEAL::destructor. Object number 5
+DEAL::destructor. Object number 4
+DEAL::Check 3:
+DEAL::Default constructor. Object number 6
+DEAL::copy constructor from 6. Object number 7
+DEAL::copy constructor from 6. Object number 8
+DEAL::destructor. Object number 6
+DEAL::destructor. Object number 8
+DEAL::move constructor from 7. Object number 9
+DEAL::destructor. Object number 7
+DEAL::Default constructor. Object number 10
+DEAL::Default constructor. Object number 11
+DEAL::destructor. Object number 11
+DEAL::destructor. Object number 10
+DEAL::destructor. Object number 9
+DEAL::Objects created: 12
+DEAL::Objects destroyed: 12

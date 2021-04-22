@@ -59,7 +59,7 @@ double
 FE_Poly<dim, spacedim>::shape_value(const unsigned int i,
                                     const Point<dim> & p) const
 {
-  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(i, this->n_dofs_per_cell());
   return poly_space->compute_value(i, p);
 }
 
@@ -72,7 +72,7 @@ FE_Poly<dim, spacedim>::shape_value_component(
   const unsigned int component) const
 {
   (void)component;
-  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(i, this->n_dofs_per_cell());
   AssertIndexRange(component, 1);
   return poly_space->compute_value(i, p);
 }
@@ -84,7 +84,7 @@ Tensor<1, dim>
 FE_Poly<dim, spacedim>::shape_grad(const unsigned int i,
                                    const Point<dim> & p) const
 {
-  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(i, this->n_dofs_per_cell());
   return poly_space->template compute_derivative<1>(i, p);
 }
 
@@ -97,7 +97,7 @@ FE_Poly<dim, spacedim>::shape_grad_component(const unsigned int i,
                                              const unsigned int component) const
 {
   (void)component;
-  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(i, this->n_dofs_per_cell());
   AssertIndexRange(component, 1);
   return poly_space->template compute_derivative<1>(i, p);
 }
@@ -109,7 +109,7 @@ Tensor<2, dim>
 FE_Poly<dim, spacedim>::shape_grad_grad(const unsigned int i,
                                         const Point<dim> & p) const
 {
-  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(i, this->n_dofs_per_cell());
   return poly_space->template compute_derivative<2>(i, p);
 }
 
@@ -123,7 +123,7 @@ FE_Poly<dim, spacedim>::shape_grad_grad_component(
   const unsigned int component) const
 {
   (void)component;
-  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(i, this->n_dofs_per_cell());
   AssertIndexRange(component, 1);
   return poly_space->template compute_derivative<2>(i, p);
 }
@@ -135,7 +135,7 @@ Tensor<3, dim>
 FE_Poly<dim, spacedim>::shape_3rd_derivative(const unsigned int i,
                                              const Point<dim> & p) const
 {
-  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(i, this->n_dofs_per_cell());
   return poly_space->template compute_derivative<3>(i, p);
 }
 
@@ -149,7 +149,7 @@ FE_Poly<dim, spacedim>::shape_3rd_derivative_component(
   const unsigned int component) const
 {
   (void)component;
-  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(i, this->n_dofs_per_cell());
   AssertIndexRange(component, 1);
   return poly_space->template compute_derivative<3>(i, p);
 }
@@ -161,7 +161,7 @@ Tensor<4, dim>
 FE_Poly<dim, spacedim>::shape_4th_derivative(const unsigned int i,
                                              const Point<dim> & p) const
 {
-  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(i, this->n_dofs_per_cell());
   return poly_space->template compute_derivative<4>(i, p);
 }
 
@@ -175,7 +175,7 @@ FE_Poly<dim, spacedim>::shape_4th_derivative_component(
   const unsigned int component) const
 {
   (void)component;
-  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(i, this->n_dofs_per_cell());
   AssertIndexRange(component, 1);
   return poly_space->template compute_derivative<4>(i, p);
 }
@@ -293,17 +293,18 @@ FE_Poly<dim, spacedim>::fill_fe_values(
   // transform gradients and higher derivatives. there is nothing to do
   // for values since we already emplaced them into output_data when
   // we were in get_data()
-  if (flags & update_gradients &&
-      cell_similarity != CellSimilarity::translation)
-    for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
+  if ((flags & update_gradients) &&
+      (cell_similarity != CellSimilarity::translation))
+    for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
       mapping.transform(make_array_view(fe_data.shape_gradients, k),
                         mapping_covariant,
                         mapping_internal,
                         make_array_view(output_data.shape_gradients, k));
 
-  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
+  if ((flags & update_hessians) &&
+      (cell_similarity != CellSimilarity::translation))
     {
-      for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
+      for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
         mapping.transform(make_array_view(fe_data.shape_hessians, k),
                           mapping_covariant_gradient,
                           mapping_internal,
@@ -313,10 +314,10 @@ FE_Poly<dim, spacedim>::fill_fe_values(
         correct_hessians(output_data, mapping_data, quadrature.size());
     }
 
-  if (flags & update_3rd_derivatives &&
-      cell_similarity != CellSimilarity::translation)
+  if ((flags & update_3rd_derivatives) &&
+      (cell_similarity != CellSimilarity::translation))
     {
-      for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
+      for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
         mapping.transform(make_array_view(fe_data.shape_3rd_derivatives, k),
                           mapping_covariant_hessian,
                           mapping_internal,
@@ -335,7 +336,7 @@ void
 FE_Poly<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const Quadrature<dim - 1> &                                 quadrature,
+  const hp::QCollection<dim - 1> &                            quadrature,
   const Mapping<dim, spacedim> &                              mapping,
   const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
   const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
@@ -346,6 +347,9 @@ FE_Poly<dim, spacedim>::fill_fe_face_values(
                                                                      spacedim>
     &output_data) const
 {
+  const unsigned int n_q_points =
+    quadrature[quadrature.size() == 1 ? 0 : face_no].size();
+
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
@@ -358,64 +362,62 @@ FE_Poly<dim, spacedim>::fill_fe_face_values(
   // to take (all data sets for all
   // faces are stored contiguously)
 
-  const typename QProjector<dim>::DataSetDescriptor offset =
-    QProjector<dim>::DataSetDescriptor::face(face_no,
+  const auto offset =
+    QProjector<dim>::DataSetDescriptor::face(this->reference_cell(),
+                                             face_no,
                                              cell->face_orientation(face_no),
                                              cell->face_flip(face_no),
                                              cell->face_rotation(face_no),
-                                             quadrature.size());
+                                             quadrature);
 
   const UpdateFlags flags(fe_data.update_each);
 
   const bool need_to_correct_higher_derivatives =
     higher_derivatives_need_correcting(mapping,
                                        mapping_data,
-                                       quadrature.size(),
+                                       n_q_points,
                                        flags);
 
   // transform gradients and higher derivatives. we also have to copy
   // the values (unlike in the case of fill_fe_values()) since
   // we need to take into account the offsets
   if (flags & update_values)
-    for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-      for (unsigned int i = 0; i < quadrature.size(); ++i)
+    for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
+      for (unsigned int i = 0; i < n_q_points; ++i)
         output_data.shape_values(k, i) = fe_data.shape_values[k][i + offset];
 
   if (flags & update_gradients)
-    for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
+    for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
       mapping.transform(
-        make_array_view(fe_data.shape_gradients, k, offset, quadrature.size()),
+        make_array_view(fe_data.shape_gradients, k, offset, n_q_points),
         mapping_covariant,
         mapping_internal,
         make_array_view(output_data.shape_gradients, k));
 
   if (flags & update_hessians)
     {
-      for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
+      for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
         mapping.transform(
-          make_array_view(fe_data.shape_hessians, k, offset, quadrature.size()),
+          make_array_view(fe_data.shape_hessians, k, offset, n_q_points),
           mapping_covariant_gradient,
           mapping_internal,
           make_array_view(output_data.shape_hessians, k));
 
       if (need_to_correct_higher_derivatives)
-        correct_hessians(output_data, mapping_data, quadrature.size());
+        correct_hessians(output_data, mapping_data, n_q_points);
     }
 
   if (flags & update_3rd_derivatives)
     {
-      for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-        mapping.transform(make_array_view(fe_data.shape_3rd_derivatives,
-                                          k,
-                                          offset,
-                                          quadrature.size()),
-                          mapping_covariant_hessian,
-                          mapping_internal,
-                          make_array_view(output_data.shape_3rd_derivatives,
-                                          k));
+      for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
+        mapping.transform(
+          make_array_view(fe_data.shape_3rd_derivatives, k, offset, n_q_points),
+          mapping_covariant_hessian,
+          mapping_internal,
+          make_array_view(output_data.shape_3rd_derivatives, k));
 
       if (need_to_correct_higher_derivatives)
-        correct_third_derivatives(output_data, mapping_data, quadrature.size());
+        correct_third_derivatives(output_data, mapping_data, n_q_points);
     }
 }
 
@@ -450,8 +452,9 @@ FE_Poly<dim, spacedim>::fill_fe_subface_values(
   // to take (all data sets for all
   // sub-faces are stored contiguously)
 
-  const typename QProjector<dim>::DataSetDescriptor offset =
-    QProjector<dim>::DataSetDescriptor::subface(face_no,
+  const auto offset =
+    QProjector<dim>::DataSetDescriptor::subface(this->reference_cell(),
+                                                face_no,
                                                 sub_no,
                                                 cell->face_orientation(face_no),
                                                 cell->face_flip(face_no),
@@ -471,12 +474,12 @@ FE_Poly<dim, spacedim>::fill_fe_subface_values(
   // the values (unlike in the case of fill_fe_values()) since
   // we need to take into account the offsets
   if (flags & update_values)
-    for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
+    for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
       for (unsigned int i = 0; i < quadrature.size(); ++i)
         output_data.shape_values(k, i) = fe_data.shape_values[k][i + offset];
 
   if (flags & update_gradients)
-    for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
+    for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
       mapping.transform(
         make_array_view(fe_data.shape_gradients, k, offset, quadrature.size()),
         mapping_covariant,
@@ -485,7 +488,7 @@ FE_Poly<dim, spacedim>::fill_fe_subface_values(
 
   if (flags & update_hessians)
     {
-      for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
+      for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
         mapping.transform(
           make_array_view(fe_data.shape_hessians, k, offset, quadrature.size()),
           mapping_covariant_gradient,
@@ -498,7 +501,7 @@ FE_Poly<dim, spacedim>::fill_fe_subface_values(
 
   if (flags & update_3rd_derivatives)
     {
-      for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
+      for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
         mapping.transform(make_array_view(fe_data.shape_3rd_derivatives,
                                           k,
                                           offset,
@@ -524,7 +527,7 @@ FE_Poly<dim, spacedim>::correct_hessians(
     &                mapping_data,
   const unsigned int n_q_points) const
 {
-  for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+  for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
     for (unsigned int i = 0; i < n_q_points; ++i)
       for (unsigned int j = 0; j < spacedim; ++j)
         output_data.shape_hessians[dof][i] -=
@@ -543,7 +546,7 @@ FE_Poly<dim, spacedim>::correct_third_derivatives(
     &                mapping_data,
   const unsigned int n_q_points) const
 {
-  for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+  for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
     for (unsigned int i = 0; i < n_q_points; ++i)
       for (unsigned int j = 0; j < spacedim; ++j)
         for (unsigned int k = 0; k < spacedim; ++k)

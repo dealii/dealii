@@ -83,8 +83,9 @@ namespace Utilities
                                    const MPI_Comm & comm)
         : process(process)
         , comm(comm)
-        , my_rank(this_mpi_process(comm))
-        , n_procs(n_mpi_processes(comm))
+        , job_supports_mpi(Utilities::MPI::job_supports_mpi())
+        , my_rank(job_supports_mpi ? this_mpi_process(comm) : 0)
+        , n_procs(job_supports_mpi ? n_mpi_processes(comm) : 1)
       {}
 
 
@@ -554,25 +555,60 @@ namespace Utilities
 
 
       template <typename T1, typename T2>
+      Serial<T1, T2>::Serial(Process<T1, T2> &process, const MPI_Comm &comm)
+        : Interface<T1, T2>(process, comm)
+      {}
+
+
+
+      template <typename T1, typename T2>
+      void
+      Serial<T1, T2>::run()
+      {
+        const auto targets = this->process.compute_targets();
+
+        if (targets.size() == 0)
+          return; // nothing to do
+
+        AssertDimension(targets[0], 0);
+
+        std::vector<T1> send_buffer;
+        std::vector<T2> recv_buffer;
+        std::vector<T2> request_buffer;
+
+        this->process.create_request(0, send_buffer);
+        this->process.prepare_buffer_for_answer(0, recv_buffer);
+        this->process.answer_request(0, send_buffer, request_buffer);
+        recv_buffer = request_buffer;
+        this->process.read_answer(0, recv_buffer);
+      }
+
+
+
+      template <typename T1, typename T2>
       Selector<T1, T2>::Selector(Process<T1, T2> &process, const MPI_Comm &comm)
         : Interface<T1, T2>(process, comm)
       {
         // Depending on the number of processes we switch between
-        // implementations. We reduce the threshold for debug mode to be able to
-        // test also the non-blocking implementation. This feature is tested by:
-        // tests/multigrid/transfer_matrix_free_06.with_mpi=true.with_p4est=true.with_trilinos=true.mpirun=15.output
+        // implementations. We reduce the threshold for debug mode to be
+        // able to test also the non-blocking implementation. This feature
+        // is tested by:
+        // tests/multigrid/transfer_matrix_free_06.with_mpi=true.with_p4est=true.with_trilinos=true.mpirun=10.output
 #ifdef DEAL_II_WITH_MPI
 #  if DEAL_II_MPI_VERSION_GTE(3, 0)
 #    ifdef DEBUG
-        if (Utilities::MPI::n_mpi_processes(comm) > 14)
+        if (this->n_procs > 10)
 #    else
-        if (Utilities::MPI::n_mpi_processes(comm) > 99)
+        if (this->n_procs > 99)
 #    endif
           consensus_algo.reset(new NBX<T1, T2>(process, comm));
         else
 #  endif
 #endif
+          if (this->n_procs > 1)
           consensus_algo.reset(new PEX<T1, T2>(process, comm));
+        else
+          consensus_algo.reset(new Serial<T1, T2>(process, comm));
       }
 
 

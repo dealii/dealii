@@ -128,7 +128,7 @@ namespace SmoothnessEstimator
      * This object needs to be initialized to have at least $p+1$ coefficients
      * in each direction for every finite element in the collection, where $p$
      * is its polynomial degree.
-     * @param [in] dof_handler An hp::DoFHandler.
+     * @param [in] dof_handler A DoFHandler.
      * @param [in] solution A solution vector.
      * @param [out] smoothness_indicators A vector for smoothness indicators.
      * @param [in] regression_strategy Determines which norm will be used on the
@@ -180,7 +180,7 @@ namespace SmoothnessEstimator
      * @param [in] fe_legendre FESeries::Legendre object to calculate coefficients.
      * This object needs to be initialized to have at least $p+1$ coefficients
      * in each direction, where $p$ is the maximum polynomial degree to be used.
-     * @param [in] dof_handler An hp::DoFHandler
+     * @param [in] dof_handler A DoFHandler
      * @param [in] solution A solution vector
      * @param [out] smoothness_indicators A vector for smoothness indicators
      * @param [in] coefficients_predicate A predicate to select Legendre
@@ -228,14 +228,26 @@ namespace SmoothnessEstimator
      * the default configuration for smoothness estimation purposes.
      *
      * For each finite element of the provided @p fe_collection, we use as many
-     * modes as its polynomial degree plus one, since we start with the first
-     * Legendre polynomial which is just a constant. Further for each element,
-     * we use a Gaussian quadrature designed to yield exact results for the
-     * highest order Legendre polynomial used.
+     * modes as its polynomial degree plus two. This includes the first Legendre
+     * polynomial which is just a constant. Further for each element, we use a
+     * Gaussian quadrature designed to yield exact results for the highest order
+     * Legendre polynomial used.
+     *
+     * As the Legendre expansion can only be performed on scalar fields, this
+     * class does not operate on vector-valued finite elements and will
+     * therefore throw an assertion. However, each component of a finite element
+     * field can be treated as a scalar field, respectively, on which Legendre
+     * expansions are again possible. For this purpose, the optional parameter
+     * @p component defines which component of each FiniteElement will be used.
+     * The default value of @p component only applies to scalar FEs, in which
+     * case it indicates that the sole component is to be decomposed. For
+     * vector-valued FEs, a non-default value must be explicitly provided.
      */
     template <int dim, int spacedim>
     FESeries::Legendre<dim, spacedim>
-    default_fe_series(const hp::FECollection<dim, spacedim> &fe_collection);
+    default_fe_series(
+      const hp::FECollection<dim, spacedim> &fe_collection,
+      const unsigned int component = numbers::invalid_unsigned_int);
   } // namespace Legendre
 
 
@@ -454,14 +466,26 @@ namespace SmoothnessEstimator
      * the default configuration for smoothness estimation purposes.
      *
      * For each finite element of the provided @p fe_collection, we use as many
-     * modes as its polynomial degree plus one, and at least three modes.
-     * Further for each element, we use a 4-point Gaussian quarature iterated in
-     * each dimension by the maximal wave number, which is the number of modes
-     * decreased by one since we start with $k = 0$.
+     * modes as its polynomial degree plus two. Further for each element, we use
+     * a 5-point Gaussian quarature iterated in each dimension by the maximal
+     * wave number, which is the number of modes decreased by one since we start
+     * with $k = 0$.
+     *
+     * As the Fourier expansion can only be performed on scalar fields, this
+     * class does not operate on vector-valued finite elements and will
+     * therefore throw an assertion. However, each component of a finite element
+     * field can be treated as a scalar field, respectively, on which Fourier
+     * expansions are again possible. For this purpose, the optional parameter
+     * @p component defines which component of each FiniteElement will be used.
+     * The default value of @p component only applies to scalar FEs, in which
+     * case it indicates that the sole component is to be decomposed. For
+     * vector-valued FEs, a non-default value must be explicitly provided.
      */
     template <int dim, int spacedim>
     FESeries::Fourier<dim, spacedim>
-    default_fe_series(const hp::FECollection<dim, spacedim> &fe_collection);
+    default_fe_series(
+      const hp::FECollection<dim, spacedim> &fe_collection,
+      const unsigned int component = numbers::invalid_unsigned_int);
   } // namespace Fourier
 } // namespace SmoothnessEstimator
 

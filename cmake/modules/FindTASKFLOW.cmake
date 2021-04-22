@@ -14,7 +14,7 @@
 ## ---------------------------------------------------------------------
 
 #
-# Try to find the Threading Building Blocks library
+# Try to find the Taskflow library
 #
 # This module exports
 #

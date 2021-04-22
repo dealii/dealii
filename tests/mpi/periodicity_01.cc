@@ -505,8 +505,8 @@ namespace Step40
           filenames.push_back("solution-" + Utilities::int_to_string(cycle, 2) +
                               "." + Utilities::int_to_string(i, 4) + ".vtu");
 
-        std::ofstream master_output((filename + ".pvtu").c_str());
-        data_out.write_pvtu_record(master_output, filenames);
+        std::ofstream pvtu_output((filename + ".pvtu").c_str());
+        data_out.write_pvtu_record(pvtu_output, filenames);
       }
   }
 

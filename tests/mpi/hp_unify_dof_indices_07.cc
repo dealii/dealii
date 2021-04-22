@@ -15,11 +15,11 @@
 
 
 
-// have a 2x1 coarse mesh (or 2x1x1) and verify DoF indices in the hp
+// have a 2x1 coarse mesh (or 2x1x1) and verify DoF indices in the hp-
 // case with an FECollection that contains multiple copies of the same
-// FE_Q(2) element. in the sequential case, the hp code will unify DoF
+// FE_Q(2) element. in the sequential case, the hp-code will unify DoF
 // indices on boundaries between locally owned subdomains; in early
-// versions of the parallel hp support, we don't do that, but the
+// versions of the parallel hp-support, we don't do that, but the
 // final version now does
 //
 // this test gives a different perspective on this issue. in the _01
@@ -34,6 +34,7 @@
 
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -43,7 +44,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <numeric>
@@ -72,7 +72,7 @@ test()
 
   hp::FECollection<dim> fe(FE_Q<dim>(2), FE_Q<dim>(2));
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
   if (dof_handler.begin_active()->is_locally_owned())
     dof_handler.begin_active()->set_active_fe_index(0);
   if ((++dof_handler.begin_active())->is_locally_owned())

@@ -37,6 +37,12 @@ class InterGridMap;
 template <int dim, int spacedim>
 class Mapping;
 
+namespace hp
+{
+  template <int dim, int spacedim>
+  class MappingCollection;
+}
+
 namespace VectorTools
 {
   /**
@@ -56,9 +62,6 @@ namespace VectorTools
    * continuous again.
    *
    * See the general documentation of this namespace for further information.
-   *
-   * @todo The @p mapping argument should be replaced by a
-   * hp::MappingCollection in case of a hp::DoFHandler.
    */
   template <int dim, int spacedim, typename VectorType>
   void
@@ -70,8 +73,21 @@ namespace VectorTools
     const ComponentMask &component_mask = ComponentMask());
 
   /**
+   * Same as above but in an hp-context.
+   */
+  template <int dim, int spacedim, typename VectorType>
+  void
+  interpolate(
+    const hp::MappingCollection<dim, spacedim> &               mapping,
+    const DoFHandler<dim, spacedim> &                          dof,
+    const Function<spacedim, typename VectorType::value_type> &function,
+    VectorType &                                               vec,
+    const ComponentMask &component_mask = ComponentMask());
+
+
+  /**
    * Call the @p interpolate() function above with
-   * <tt>mapping=MappingQGeneric1@<dim>@()</tt>.
+   * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>.
    */
   template <int dim, int spacedim, typename VectorType>
   void
@@ -254,10 +270,11 @@ namespace VectorTools
    * vertices of the Triangulation.
    *
    * The optional ComponentMask argument can be used to specify what
-   * components of the FiniteElement to use to describe the geometry. If no
-   * mask is specified at construction time, then a default one is used, i.e.,
-   * the first spacedim components of the FiniteElement are assumed to
-   * represent the geometry of the problem.
+   * components of the FiniteElement to use to describe the
+   * geometry. If no mask is specified at construction time, then a
+   * default-constructed mask is used, which is then interpreted as
+   * saying that the first `spacedim` components of the FiniteElement
+   * are assumed to represent the geometry of the problem.
    *
    * This function is only implemented for FiniteElements where the specified
    * components are primitive.
@@ -265,6 +282,21 @@ namespace VectorTools
   template <int dim, int spacedim, typename VectorType>
   void
   get_position_vector(const DoFHandler<dim, spacedim> &dh,
+                      VectorType &                     vector,
+                      const ComponentMask &            mask = ComponentMask());
+
+  /**
+   * Like the above function but also taking @p mapping as argument.
+   * This will introduce an additional approximation between the true geometry
+   * specified by the manifold if the degree of the mapping is lower than the
+   * degree of the finite finite element in the DoFHandler @p dh, but more
+   * importantly it allows to fill location vectors for mappings that do not
+   * preserve vertex locations (like Eulerian mappings).
+   */
+  template <int dim, int spacedim, typename VectorType>
+  void
+  get_position_vector(const Mapping<dim, spacedim> &   mapping,
+                      const DoFHandler<dim, spacedim> &dh,
                       VectorType &                     vector,
                       const ComponentMask &            mask = ComponentMask());
 

@@ -101,7 +101,7 @@ test_hyper_sphere()
                    1,
                    FE_Q<dim>(2),
                    2,
-                   FE_DGQArbitraryNodes<dim>(QIterated<1>(QTrapez<1>(), 3)),
+                   FE_DGQArbitraryNodes<dim>(QIterated<1>(QTrapezoid<1>(), 3)),
                    dim);
   test(tr, fe);
 }

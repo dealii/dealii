@@ -137,7 +137,7 @@ namespace Step48
       }
 
     inv_mass_matrix.compress(VectorOperation::add);
-    for (unsigned int k = 0; k < inv_mass_matrix.local_size(); ++k)
+    for (unsigned int k = 0; k < inv_mass_matrix.locally_owned_size(); ++k)
       if (inv_mass_matrix.local_element(k) > 1e-15)
         inv_mass_matrix.local_element(k) =
           1. / inv_mass_matrix.local_element(k);
@@ -308,8 +308,11 @@ namespace Step48
 #else
     Triangulation<dim> triangulation;
 #endif
-    FE_Q<dim>                 fe;
-    DoFHandler<dim>           dof_handler;
+    FE_Q<dim>       fe;
+    DoFHandler<dim> dof_handler;
+
+    MappingQ1<dim> mapping;
+
     AffineConstraints<double> constraints;
     IndexSet                  locally_relevant_dofs;
 
@@ -434,7 +437,8 @@ namespace Step48
     additional_data.tasks_parallel_scheme =
       MatrixFree<dim>::AdditionalData::TasksParallelScheme::partition_partition;
 
-    matrix_free_data.reinit(dof_handler,
+    matrix_free_data.reinit(mapping,
+                            dof_handler,
                             constraints,
                             QGaussLobatto<1>(fe_degree + 1),
                             additional_data);
@@ -460,11 +464,11 @@ namespace Step48
   // data that is needed in the VectorTools::integrate_difference() function
   // as well as in DataOut. The only action to take at this point is to make
   // sure that the vector updates its ghost values before we read from
-  // them. This is a feature present only in the
-  // LinearAlgebra::distributed::Vector class. Distributed vectors with PETSc
-  // and Trilinos, on the other hand, need to be copied to special vectors
-  // including ghost values (see the relevant section in step-40). If we also
-  // wanted to access all degrees of freedom on ghost cells (e.g. when
+  // them, and to reset ghost values once done. This is a feature present only
+  // in the LinearAlgebra::distributed::Vector class. Distributed vectors with
+  // PETSc and Trilinos, on the other hand, need to be copied to special
+  // vectors including ghost values (see the relevant section in step-40). If
+  // we also wanted to access all degrees of freedom on ghost cells (e.g. when
   // computing error estimators that use the jump of solution over cell
   // boundaries), we would need more information and create a vector
   // initialized with locally relevant dofs just as in step-40. Observe also
@@ -479,7 +483,8 @@ namespace Step48
 
     Vector<float> norm_per_cell(triangulation.n_active_cells());
     solution.update_ghost_values();
-    VectorTools::integrate_difference(dof_handler,
+    VectorTools::integrate_difference(mapping,
+                                      dof_handler,
                                       solution,
                                       Functions::ZeroFunction<dim>(),
                                       norm_per_cell,
@@ -498,10 +503,12 @@ namespace Step48
 
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(solution, "solution");
-    data_out.build_patches();
+    data_out.build_patches(mapping);
 
     data_out.write_vtu_with_pvtu_record(
       "./", "solution", timestep_number, MPI_COMM_WORLD, 3);
+
+    solution.zero_out_ghost_values();
   }
 
 
@@ -561,10 +568,12 @@ namespace Step48
     // get later consumed by the SineGordonOperation::apply() function. Next,
     // an instance of the <code> SineGordonOperation class </code> based on
     // the finite element degree specified at the top of this file is set up.
-    VectorTools::interpolate(dof_handler,
+    VectorTools::interpolate(mapping,
+                             dof_handler,
                              InitialCondition<dim>(1, time),
                              solution);
-    VectorTools::interpolate(dof_handler,
+    VectorTools::interpolate(mapping,
+                             dof_handler,
                              InitialCondition<dim>(1, time - time_step),
                              old_solution);
     output_results(0);

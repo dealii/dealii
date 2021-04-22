@@ -51,7 +51,7 @@ plot_derivatives(Mapping<dim> &      mapping,
 
   const unsigned int div = 1;
 
-  QTrapez<dim> q;
+  QTrapezoid<dim> q;
   //  QIterated<dim> q(q_trapez, div);
   FEValues<dim> fe(mapping,
                    finel,

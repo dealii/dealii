@@ -168,10 +168,10 @@ test(const unsigned int flag)
                ++i)
             filenames.push_back(output_name(flag, i));
 
-          const std::string master_name =
+          const std::string pvtu_filename =
             "output" + Utilities::int_to_string(flag) + ".pvtu";
-          std::ofstream pvtu_master(master_name.c_str());
-          data_out.write_pvtu_record(pvtu_master, filenames);
+          std::ofstream pvtu_output(pvtu_filename.c_str());
+          data_out.write_pvtu_record(pvtu_output, filenames);
         }
     }
 

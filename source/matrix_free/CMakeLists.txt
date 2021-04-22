@@ -17,17 +17,23 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_src
   dof_info.cc
-  evaluation_selector.cc
+  evaluation_template_factory.cc
+  evaluation_template_factory_inst2.cc
+  evaluation_template_factory_inst3.cc
+  evaluation_template_factory_inst4.cc
+  evaluation_template_factory_inst5.cc
+  evaluation_template_factory_inst6.cc
   mapping_info.cc
   mapping_info_inst2.cc
   mapping_info_inst3.cc
   matrix_free.cc
   shape_info.cc
   task_info.cc
+  vector_data_exchange.cc
   )
 
 SET(_inst
-  evaluation_selector.inst.in
+  evaluation_template_factory.inst.in
   mapping_info.inst.in
   matrix_free.inst.in
   shape_info.inst.in

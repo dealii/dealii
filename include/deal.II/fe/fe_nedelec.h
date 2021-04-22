@@ -177,11 +177,11 @@ public:
 
   /**
    * Return whether this element implements its hanging node constraints in
-   * the new way, which has to be used to make elements "hp compatible".
+   * the new way, which has to be used to make elements "hp-compatible".
    *
    * For the <tt>FE_Nedelec</tt> class the result is always true (independent
    * of the degree of the element), as it implements the complete set of
-   * functions necessary for hp capability.
+   * functions necessary for hp-capability.
    */
   virtual bool
   hp_constraints_are_implemented() const override;
@@ -194,7 +194,7 @@ public:
                          const unsigned int codim = 0) const override final;
 
   /**
-   * If, on a vertex, several finite elements are active, the hp code first
+   * If, on a vertex, several finite elements are active, the hp-code first
    * assigns the degrees of freedom of each of these FEs different global
    * indices. It then calls this function to find out which of them should get
    * identical values, and consequently can receive the same global DoF index.
@@ -203,10 +203,10 @@ public:
    * reference to a finite element object representing one of the other finite
    * elements active on this particular vertex. The function computes which of
    * the degrees of freedom of the two finite element objects are equivalent,
-   * both numbered between zero and the corresponding value of dofs_per_vertex
-   * of the two finite elements. The first index of each pair denotes one of
-   * the vertex dofs of the present element, whereas the second is the
-   * corresponding index of the other finite element.
+   * both numbered between zero and the corresponding value of
+   * n_dofs_per_vertex() of the two finite elements. The first index of each
+   * pair denotes one of the vertex dofs of the present element, whereas the
+   * second is the corresponding index of the other finite element.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
   hp_vertex_dof_identities(const FiniteElement<dim> &fe_other) const override;
@@ -223,7 +223,8 @@ public:
    * of freedom on lines.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_quad_dof_identities(const FiniteElement<dim> &fe_other) const override;
+  hp_quad_dof_identities(const FiniteElement<dim> &fe_other,
+                         const unsigned int        face_no = 0) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face of
@@ -238,7 +239,8 @@ public:
    */
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim> &source,
-                                FullMatrix<double> &matrix) const override;
+                                FullMatrix<double> &      matrix,
+                                const unsigned int face_no = 0) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the subface
@@ -252,9 +254,11 @@ public:
    * <tt>ExcInterpolationNotImplemented</tt>.
    */
   virtual void
-  get_subface_interpolation_matrix(const FiniteElement<dim> &source,
-                                   const unsigned int        subface,
-                                   FullMatrix<double> &matrix) const override;
+  get_subface_interpolation_matrix(
+    const FiniteElement<dim> &source,
+    const unsigned int        subface,
+    FullMatrix<double> &      matrix,
+    const unsigned int        face_no = 0) const override;
 
   /**
    * Projection from a fine grid space onto a coarse grid space. If this
@@ -364,6 +368,16 @@ private:
    * Mutex for protecting initialization of restriction and embedding matrix.
    */
   mutable Threads::Mutex mutex;
+
+  /**
+   * Initialize the permutation pattern and the pattern of sign change.
+   *
+   * @note This function is not fully filled with the correct implementation
+   * yet. It needs to be consistently implemented in a future release to work
+   * on meshes that contain cells with flipped faces.
+   */
+  void
+  initialize_quad_dof_index_permutation_and_sign_change();
 
   // Allow access from other dimensions.
   template <int dim1>

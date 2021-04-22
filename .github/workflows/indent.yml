@@ -11,10 +11,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 100
     - name: setup
       run: |
         ./contrib/utilities/download_clang_format
-        sudo apt-get install doxygen graphviz perl texlive-bibtex-extra
+        sudo apt update && sudo apt install doxygen graphviz perl texlive-bibtex-extra
         doxygen --version
     - name: indent
       run: |
@@ -25,7 +27,8 @@ jobs:
         cd build
         cmake -DDEAL_II_COMPONENT_DOCUMENTATION=ON -DDEAL_II_DOXYGEN_USE_MATHJAX=ON ..
         make -j 2 documentation
-        cat doxygen.log && ! [ -s doxygen.log ]
+        cat doxygen.log
+        ! [ -s doxygen.log ] || exit 1
         tar -czf doxygen_documentation.tar.gz doc/doxygen
     - name: archive documentation
       uses: actions/upload-artifact@v1

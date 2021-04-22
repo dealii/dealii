@@ -21,7 +21,7 @@ SET(TARGET_SRC
 
 # Usually, you will not need to modify anything beyond this point...
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
 
 FIND_PACKAGE(deal.II 9.3.0
   HINTS
@@ -44,11 +44,11 @@ Error! This tutorial requires a deal.II library that was configured with the fol
     DEAL_II_WITH_MPI = ON
     DEAL_II_WITH_PETSC = ON
     DEAL_II_PETSC_WITH_COMPLEX = OFF
-However, the deal.II library found at ${DEAL_II_PATH} was configured with these options
+However, the deal.II library found at ${DEAL_II_PATH} was configured with these options:
     DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}
     DEAL_II_WITH_PETSC = ${DEAL_II_WITH_PETSC}
     DEAL_II_PETSC_WITH_COMPLEX = ${DEAL_II_PETSC_WITH_COMPLEX}
-which conflict with the requirements."
+This conflicts with the requirements."
     )
 ENDIF()
 

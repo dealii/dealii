@@ -89,8 +89,8 @@ template <int dim, int fe_degree>
 void
 test()
 {
-  typedef double number;
-  F<dim>         function(3, 1);
+  using number = double;
+  F<dim> function(3, 1);
 
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
@@ -163,7 +163,7 @@ test()
   {
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> fe_eval(*mf_data);
 
-    const unsigned int n_cells    = mf_data->n_macro_cells();
+    const unsigned int n_cells    = mf_data->n_cell_batches();
     const unsigned int n_q_points = fe_eval.n_q_points;
 
     coefficient->reinit(n_cells, n_q_points);

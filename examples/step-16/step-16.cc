@@ -37,12 +37,9 @@
 #include <deal.II/lac/precondition.h>
 
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
 
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -338,7 +335,7 @@ namespace Step16
     FEValues<dim> &fe_values = scratch_data.fe_values;
     fe_values.reinit(cell);
 
-    const unsigned int dofs_per_cell = fe_values.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = fe_values.get_fe().n_dofs_per_cell();
     const unsigned int n_q_points    = fe_values.get_quadrature().size();
 
     copy_data.reinit(cell, dofs_per_cell);

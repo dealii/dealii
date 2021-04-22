@@ -38,13 +38,10 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -701,7 +698,7 @@ namespace Step63
     copy_data.level = cell->level();
 
     const unsigned int dofs_per_cell =
-      scratch_data.fe_values.get_fe().dofs_per_cell;
+      scratch_data.fe_values.get_fe().n_dofs_per_cell();
     copy_data.dofs_per_cell = dofs_per_cell;
     copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
 

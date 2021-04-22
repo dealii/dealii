@@ -923,7 +923,8 @@ public:
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
-   * of serialization
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -4032,7 +4033,7 @@ constexpr DEAL_II_ALWAYS_INLINE
   operator*(const SymmetricTensor<rank_1, dim, Number> &src1,
             const Tensor<rank_2, dim, OtherNumber> &    src2)
 {
-  return Tensor<rank_2, dim, OtherNumber>(src1) * src2;
+  return Tensor<rank_1, dim, Number>(src1) * src2;
 }
 
 

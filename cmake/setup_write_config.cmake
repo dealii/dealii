@@ -86,6 +86,13 @@ _both(
 #                                ${CMAKE_CXX_COMPILER}
 "
   )
+IF(DEAL_II_HAVE_CXX20)
+  _both("#        C++ language standard:  C++20\n")
+ELSEIF(DEAL_II_HAVE_CXX17)
+  _both("#        C++ language standard:  C++17\n")
+ELSEIF(DEAL_II_HAVE_CXX14)
+  _both("#        C++ language standard:  C++14\n")
+ENDIF()
 
 IF(CMAKE_C_COMPILER_WORKS)
   _detailed("#        CMAKE_C_COMPILER:       ${CMAKE_C_COMPILER}\n")

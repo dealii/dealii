@@ -69,7 +69,7 @@ test_adjust_time_step_size()
   print_time(time);
   time.advance_time();
   print_time(time);
-  time.set_desired_next_step_size(0.36);
+  time.set_next_step_size(0.36);
   time.advance_time();
   print_time(time);
   time.advance_time();

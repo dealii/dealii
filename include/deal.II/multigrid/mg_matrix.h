@@ -208,7 +208,9 @@ namespace mg
         // rich enough interface to populate reinit_(domain|range)_vector.
         // Thus, apply an empty LinearOperator exemplar.
         matrices[level] =
-          linear_operator<VectorType>(LinearOperator<VectorType>(), p[level]);
+          linear_operator<VectorType>(LinearOperator<VectorType>(),
+                                      Utilities::get_underlying_value(
+                                        p[level]));
       }
   }
 

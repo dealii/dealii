@@ -88,5 +88,3 @@ The final test shows results using instead the projection normal to the faces:
 The pictures confirm that the normal to mesh projection approach leads to grids that remain evenly spaced
 throughtout the refinement steps. At the same time, these meshes represent rather well the original geometry even in the bottom region
 of the bulb, which is not well recovered employing the directional projector or the normal projector.
-
-

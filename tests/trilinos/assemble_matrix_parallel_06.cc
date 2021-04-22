@@ -270,8 +270,8 @@ LaplaceProblem<dim>::setup_system()
                                            constraints);
   constraints.close();
 
-  typedef FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-             CellFilter;
+  using CellFilter =
+    FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>;
   CellFilter begin(IteratorFilters::LocallyOwnedCell(),
                    dof_handler.begin_active());
   CellFilter end(IteratorFilters::LocallyOwnedCell(), dof_handler.end());

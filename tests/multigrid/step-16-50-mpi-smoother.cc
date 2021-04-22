@@ -103,8 +103,8 @@ namespace Step50
     FE_Q<dim>                                 fe;
     DoFHandler<dim>                           mg_dof_handler;
 
-    typedef LA::MPI::SparseMatrix matrix_t;
-    typedef LA::MPI::Vector       vector_t;
+    using matrix_t = LA::MPI::SparseMatrix;
+    using vector_t = LA::MPI::Vector;
 
     matrix_t system_matrix;
 
@@ -221,8 +221,8 @@ namespace Step50
 
 
     mg_constrained_dofs.clear();
-    mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
-
+    mg_constrained_dofs.initialize(mg_dof_handler);
+    mg_constrained_dofs.make_zero_boundary_constraints(mg_dof_handler, {0});
 
     const unsigned int n_levels = triangulation.n_global_levels();
 
@@ -438,7 +438,7 @@ namespace Step50
     mg_transfer.build(mg_dof_handler);
 
     // pre and post smoothers:
-    typedef LA::MPI::PreconditionJacobi                  Smoother;
+    using Smoother = LA::MPI::PreconditionJacobi;
     MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
     mg_smoother.initialize(mg_matrices, Smoother::AdditionalData(0.5));
     mg_smoother.set_steps(2);

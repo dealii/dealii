@@ -475,7 +475,7 @@ namespace MatrixFreeOperators
     bool have_interface_matrices;
 
     /**
-     * Function which implements vmult_add (@p transpose = false) and
+     * %Function which implements vmult_add (@p transpose = false) and
      * Tvmult_add (@p transpose = true).
      */
     void
@@ -853,7 +853,7 @@ namespace MatrixFreeOperators
      * coefficient = std::make_shared<Table<2, VectorizedArray<double> > >();
      * {
      *   FEEvaluation<dim,fe_degree,n_q_points_1d,1,double> fe_eval(mf_data);
-     *   const unsigned int n_cells = mf_data.n_macro_cells();
+     *   const unsigned int n_cells = mf_data.n_cell_batches();
      *   const unsigned int n_q_points = fe_eval.n_q_points;
      *   coefficient->reinit(n_cells, n_q_points);
      *   for (unsigned int cell=0; cell<n_cells; ++cell)
@@ -991,8 +991,7 @@ namespace MatrixFreeOperators
            ExcMessage(
              "Expected diagonal to be a multiple of scalar dof per cells"));
 
-    // temporarily reduce size of inverse_jxw to dofs_per_cell to get JxW values
-    // from fe_eval (will not reallocate any memory)
+    // compute values for the first component
     for (unsigned int q = 0; q < dofs_per_component_on_cell; ++q)
       inverse_jxw[q] = 1. / fe_eval.JxW(q);
     // copy values to rest of vector
@@ -1017,11 +1016,8 @@ namespace MatrixFreeOperators
     VectorizedArrayType>::apply(const VectorizedArrayType *in_array,
                                 VectorizedArrayType *      out_array) const
   {
-    internal::CellwiseInverseMassMatrixImpl<
-      dim,
-      fe_degree,
-      n_components,
-      VectorizedArrayType>::apply(fe_eval, in_array, out_array);
+    internal::CellwiseInverseMassMatrixImplBasic<dim, VectorizedArrayType>::
+      template run<fe_degree>(n_components, fe_eval, in_array, out_array);
   }
 
 
@@ -1042,15 +1038,13 @@ namespace MatrixFreeOperators
           const VectorizedArrayType *               in_array,
           VectorizedArrayType *                     out_array) const
   {
-    internal::CellwiseInverseMassMatrixImpl<dim,
-                                            fe_degree,
-                                            n_components,
-                                            VectorizedArrayType>::
-      apply(fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
-            inverse_coefficients,
-            n_actual_components,
-            in_array,
-            out_array);
+    internal::CellwiseInverseMassMatrixImplFlexible<dim, VectorizedArrayType>::
+      template run<fe_degree>(
+        n_actual_components,
+        fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
+        inverse_coefficients,
+        in_array,
+        out_array);
   }
 
 
@@ -1070,15 +1064,14 @@ namespace MatrixFreeOperators
                                      const VectorizedArrayType *in_array,
                                      VectorizedArrayType *      out_array) const
   {
-    internal::CellwiseInverseMassMatrixImpl<dim,
-                                            fe_degree,
-                                            n_components,
-                                            VectorizedArrayType>::
-      transform_from_q_points_to_basis(
-        fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
-        n_actual_components,
-        in_array,
-        out_array);
+    internal::CellwiseInverseMassMatrixImplTransformFromQPoints<
+      dim,
+      VectorizedArrayType>::template run<fe_degree>(n_actual_components,
+                                                    fe_eval.get_shape_info()
+                                                      .data.front()
+                                                      .inverse_shape_values_eo,
+                                                    in_array,
+                                                    out_array);
   }
 
 
@@ -1281,7 +1274,7 @@ namespace MatrixFreeOperators
 
     for (unsigned int j = 0; j < selected_rows.size(); ++j)
       {
-        if (data_->n_macro_cells() > 0)
+        if (data_->n_cell_batches() > 0)
           {
             AssertDimension(level, data_->get_cell_iterator(0, 0, j)->level());
           }
@@ -1382,18 +1375,22 @@ namespace MatrixFreeOperators
 
         // If not, assert that the local ranges are the same and reset to the
         // current partitioner
-        Assert(
-          BlockHelper::subblock(src, i).get_partitioner()->local_size() ==
-            data->get_dof_info(mf_component).vector_partitioner->local_size(),
-          ExcMessage("The vector passed to the vmult() function does not have "
-                     "the correct size for compatibility with MatrixFree."));
+        Assert(BlockHelper::subblock(src, i)
+                   .get_partitioner()
+                   ->locally_owned_size() ==
+                 data->get_dof_info(mf_component)
+                   .vector_partitioner->locally_owned_size(),
+               ExcMessage(
+                 "The vector passed to the vmult() function does not have "
+                 "the correct size for compatibility with MatrixFree."));
 
         // copy the vector content to a temporary vector so that it does not get
         // lost
         LinearAlgebra::distributed::Vector<Number> copy_vec(
           BlockHelper::subblock(src, i));
-        BlockHelper::subblock(const_cast<VectorType &>(src), i)
-          .reinit(data->get_dof_info(mf_component).vector_partitioner);
+        this->data->initialize_dof_vector(
+          BlockHelper::subblock(const_cast<VectorType &>(src), i),
+          mf_component);
         BlockHelper::subblock(const_cast<VectorType &>(src), i)
           .copy_locally_owned_data_from(copy_vec);
       }
@@ -1532,7 +1529,7 @@ namespace MatrixFreeOperators
               .local_element(edge_constrained_indices[j][i]) =
               edge_constrained_values[j][i].first;
           }
-        for (; c < BlockHelper::subblock(dst, j).local_size(); ++c)
+        for (; c < BlockHelper::subblock(dst, j).locally_owned_size(); ++c)
           BlockHelper::subblock(dst, j).local_element(c) = 0.;
       }
   }
@@ -1566,7 +1563,7 @@ namespace MatrixFreeOperators
               BlockHelper::subblock(src_cpy, j).local_element(c) = 0.;
             ++c;
           }
-        for (; c < BlockHelper::subblock(src_cpy, j).local_size(); ++c)
+        for (; c < BlockHelper::subblock(src_cpy, j).locally_owned_size(); ++c)
           BlockHelper::subblock(src_cpy, j).local_element(c) = 0.;
       }
 
@@ -1801,8 +1798,9 @@ namespace MatrixFreeOperators
     this->set_constrained_entries_to_one(diagonal_vector);
     inverse_diagonal_vector = diagonal_vector;
 
-    const unsigned int local_size = inverse_diagonal_vector.local_size();
-    for (unsigned int i = 0; i < local_size; ++i)
+    const unsigned int locally_owned_size =
+      inverse_diagonal_vector.locally_owned_size();
+    for (unsigned int i = 0; i < locally_owned_size; ++i)
       inverse_diagonal_vector.local_element(i) =
         Number(1.) / inverse_diagonal_vector.local_element(i);
 
@@ -1993,7 +1991,8 @@ namespace MatrixFreeOperators
 
     inverse_diagonal_vector = diagonal_vector;
 
-    for (unsigned int i = 0; i < inverse_diagonal_vector.local_size(); ++i)
+    for (unsigned int i = 0; i < inverse_diagonal_vector.locally_owned_size();
+         ++i)
       if (std::abs(inverse_diagonal_vector.local_element(i)) >
           std::sqrt(std::numeric_limits<Number>::epsilon()))
         inverse_diagonal_vector.local_element(i) =

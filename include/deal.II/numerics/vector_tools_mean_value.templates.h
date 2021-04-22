@@ -197,8 +197,12 @@ namespace VectorTools
                      const VectorType &               v,
                      const unsigned int               component)
   {
-    return compute_mean_value(
-      StaticMappingQ1<dim, spacedim>::mapping, dof, quadrature, v, component);
+    return compute_mean_value(get_default_linear_mapping(
+                                dof.get_triangulation()),
+                              dof,
+                              quadrature,
+                              v,
+                              component);
   }
 } // namespace VectorTools
 

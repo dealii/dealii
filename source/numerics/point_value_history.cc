@@ -270,7 +270,7 @@ PointValueHistory<dim>::add_point(const Point<dim> &location)
 
 
   std::vector<types::global_dof_index> local_dof_indices(
-    dof_handler->get_fe().dofs_per_cell);
+    dof_handler->get_fe().n_dofs_per_cell());
   std::vector<types::global_dof_index> new_solution_indices;
   current_cell->get_dof_indices(local_dof_indices);
   // there is an implicit assumption here
@@ -278,7 +278,7 @@ PointValueHistory<dim>::add_point(const Point<dim> &location)
   // the requested point for all finite
   // element components lie in the same cell.
   // this could possibly be violated if
-  // components use different fe orders,
+  // components use different FE orders,
   // requested points are on the edge or
   // vertex of a cell and we are unlucky with
   // floating point rounding. Worst case
@@ -419,7 +419,7 @@ PointValueHistory<dim>::add_points(const std::vector<Point<dim>> &locations)
     }
 
   std::vector<types::global_dof_index> local_dof_indices(
-    dof_handler->get_fe().dofs_per_cell);
+    dof_handler->get_fe().n_dofs_per_cell());
   for (unsigned int point = 0; point < locations.size(); point++)
     {
       current_cell[point]->get_dof_indices(local_dof_indices);
@@ -1245,14 +1245,6 @@ PointValueHistory<dim>::get_support_locations(
   locations = actual_points;
 }
 
-
-template <int dim>
-void
-PointValueHistory<dim>::get_points(
-  std::vector<std::vector<Point<dim>>> &locations)
-{
-  get_support_locations(locations);
-}
 
 
 template <int dim>

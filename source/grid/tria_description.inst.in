@@ -26,7 +26,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
         create_description_from_triangulation(
           const dealii::Triangulation<deal_II_dimension,
                                       deal_II_space_dimension> &tria,
-          const MPI_Comm                                        comm,
+          const MPI_Comm &                                      comm,
           const TriangulationDescription::Settings              settings,
           const unsigned int                                    my_rank_in);
 
@@ -37,9 +37,9 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
               &)> &               serial_grid_generator,
           const std::function<void(
             dealii::Triangulation<deal_II_dimension, deal_II_space_dimension> &,
-            const MPI_Comm,
+            const MPI_Comm &,
             const unsigned int)> &serial_grid_partitioner,
-          const MPI_Comm          comm,
+          const MPI_Comm &        comm,
           const int               group_size,
           const typename Triangulation<deal_II_dimension,
                                        deal_II_space_dimension>::MeshSmoothing

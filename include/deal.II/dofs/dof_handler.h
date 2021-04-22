@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2020 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -213,6 +213,101 @@ namespace parallel
  * using the same kind of finite element before re-loading data from the
  * serialization archive.
  *
+ *
+ * <h3>hp-adaptive finite element methods</h3>
+ *
+ * Instead of only using one particular FiniteElement on all cells, this class
+ * also allows for an enumeration of degrees of freedom on different finite
+ * elements on every cells. To this end, one assigns an
+ * <code>active_fe_index</code> to every cell that indicates which element
+ * within a collection of finite elements (represented by an object of type
+ * hp::FECollection) is the one that lives on this cell. The class then
+ * enumerates the degree of freedom associated with these finite elements on
+ * each cell of a triangulation and, if possible, identifies degrees of
+ * freedom at the interfaces of cells if they match. If neighboring cells
+ * have degrees of freedom along the common interface that do not immediate
+ * match (for example, if you have $Q_2$ and $Q_3$ elements meeting at a
+ * common face), then one needs to compute constraints to ensure that the
+ * resulting finite element space on the mesh remains conforming.
+ *
+ * The whole process of working with objects of this type is explained in
+ * step-27. Many of the algorithms this class implements are described in
+ * the
+ * @ref hp_paper "hp-paper".
+ *
+ *
+ * <h3>Active FE indices and their behavior under mesh refinement</h3>
+ *
+ * The typical workflow for using this class is to create a mesh, assign an
+ * active FE index to every active cell, call DoFHandler::distribute_dofs(),
+ * and then assemble a linear system and solve a problem on this finite element
+ * space.
+ *
+ * Active FE indices will be automatically transferred during mesh adaptation
+ * from the old to the new mesh. Future FE indices are meant to determine the
+ * active FE index after mesh adaptation, and are used to prepare data on the
+ * old mesh for the new one. If no future FE index is specified, the finite
+ * element prevails.
+ *
+ * In particular, the following rules apply during adaptation:
+ * - Upon mesh refinement, child cells inherit the future FE index of
+ *   the parent.
+ * - When coarsening cells, the (now active) parent cell will be assigned
+ *   a future FE index that is determined from its (no longer active)
+ *   children, following the FiniteElementDomination logic: Out of the set of
+ *   elements previously assigned to the former children, we choose the one
+ *   dominated by all children for the parent cell. If none was found, we pick
+ *   the most dominant element in the whole collection that is dominated by
+ *   all former children. See hp::FECollection::find_dominated_fe_extended()
+ *   for further information on this topic.
+ *
+ * Strategies for automatic hp-adaptation which will set future FE indices based
+ * on criteria are available in the hp::Refinement namespace.
+ *
+ *
+ * <h3>Active FE indices and parallel meshes</h3>
+ *
+ * When this class is used with either a parallel::shared::Triangulation
+ * or a parallel::distributed::Triangulation, you can only set active
+ * FE indices on cells that are locally owned,
+ * using a call such as <code>cell-@>set_active_fe_index(...)</code>.
+ * On the other hand, setting the active FE index on ghost
+ * or artificial cells is not allowed.
+ *
+ * Ghost cells do acquire the information what element
+ * is active on them, however: whenever you call DoFHandler::distribute_dofs(),
+ * all processors that participate in the parallel mesh exchange information in
+ * such a way that the active FE index on ghost cells equals the active FE index
+ * that was set on that processor that owned that particular ghost cell.
+ * Consequently, one can <i>query</i> the @p active_fe_index on ghost
+ * cells, just not set it by hand.
+ *
+ * On artificial cells, no information is available about the
+ * @p active_fe_index used there. That's because we don't even know
+ * whether these cells exist at all, and even if they did, the
+ * current processor does not know anything specific about them.
+ * See
+ * @ref GlossArtificialCell "the glossary entry on artificial cells"
+ * for more information.
+ *
+ * During refinement and coarsening, information about the @p active_fe_index
+ * of each cell will be automatically transferred.
+ *
+ * However, using a parallel::distributed::Triangulation with a DoFHandler
+ * in hp-mode requires additional attention during serialization, since no
+ * information on active FE indices will be automatically transferred. This
+ * has to be done manually using the
+ * prepare_for_serialization_of_active_fe_indices() and
+ * deserialize_active_fe_indices() functions. The former has to be called
+ * before parallel::distributed::Triangulation::save() is invoked, and the
+ * latter needs to be run after parallel::distributed::Triangulation::load().
+ * If further data will be attached to the triangulation via the
+ * parallel::distributed::CellDataTransfer,
+ * parallel::distributed::SolutionTransfer, or Particles::ParticleHandler
+ * classes, all corresponding preparation and deserialization function calls
+ * need to happen in the same order. Consult the documentation of
+ * parallel::distributed::SolutionTransfer for more information.
+ *
  * @ingroup dofs
  */
 template <int dim, int spacedim = dim>
@@ -419,12 +514,6 @@ public:
   static const unsigned int space_dimension = spacedim;
 
   /**
-   * Boolean indicating whether or not the current DoFHander has hp
-   * capabilities.
-   */
-  const bool hp_capability_enabled;
-
-  /**
    * The default index of the finite element to be used on a given cell.
    */
   static const unsigned int default_fe_index = 0;
@@ -445,24 +534,22 @@ public:
   using offset_type = unsigned int;
 
   /**
-   * Invalid active_fe_index which will be used as a default value to determine
-   *  whether a future_fe_index has been set or not.
+   * Invalid active FE index which will be used as a default value to determine
+   * whether a future FE index has been set or not.
    */
   static const active_fe_index_type invalid_active_fe_index =
     static_cast<active_fe_index_type>(-1);
 
   /**
    * Standard constructor, not initializing any data. After constructing an
-   * object with this constructor, use initialize() to make a valid
-   * DoFHandler.
+   * object with this constructor, use reinit() to get a valid DoFHandler.
    */
-  DoFHandler(const bool hp_capability_enabled = false);
+  DoFHandler();
 
   /**
    * Constructor. Take @p tria as the triangulation to work on.
    */
-  DoFHandler(const Triangulation<dim, spacedim> &tria,
-             const bool                          hp_capability_enabled = false);
+  explicit DoFHandler(const Triangulation<dim, spacedim> &tria);
 
   /**
    * Copy constructor. DoFHandler objects are large and expensive.
@@ -489,14 +576,20 @@ public:
   /**
    * Assign a Triangulation and a FiniteElement to the DoFHandler and compute
    * the distribution of degrees of freedom over the mesh.
+   *
+   * @deprecated Use reinit() and distribute_dofs() instead.
    */
+  DEAL_II_DEPRECATED
   void
   initialize(const Triangulation<dim, spacedim> &tria,
              const FiniteElement<dim, spacedim> &fe);
 
   /**
    * Same as above but taking an hp::FECollection object.
+   *
+   * @deprecated Use reinit() and distribute_dofs() instead.
    */
+  DEAL_II_DEPRECATED
   void
   initialize(const Triangulation<dim, spacedim> &   tria,
              const hp::FECollection<dim, spacedim> &fe);
@@ -521,13 +614,19 @@ public:
    * either not been distributed yet, or are distributed using a previously set
    * element. In both cases, accessing degrees of freedom will lead to invalid
    * results. To restore consistency, call distribute_dofs().
+   *
+   * @deprecated Use distribute_dofs() instead.
    */
+  DEAL_II_DEPRECATED
   void
   set_fe(const FiniteElement<dim, spacedim> &fe);
 
   /**
    * Same as above but taking an hp::FECollection object.
+   *
+   * @deprecated Use distribute_dofs() instead.
    */
+  DEAL_II_DEPRECATED
   void
   set_fe(const hp::FECollection<dim, spacedim> &fe);
 
@@ -545,6 +644,16 @@ public:
    */
   void
   get_active_fe_indices(std::vector<unsigned int> &active_fe_indices) const;
+
+  /**
+   * Assign a Triangulation to the DoFHandler.
+   *
+   * Remove all associations with the previous Triangulation object and
+   * establish connections with the new one. All information about previous
+   * degrees of freedom will be removed. Activates hp-mode.
+   */
+  void
+  reinit(const Triangulation<dim, spacedim> &tria);
 
   /**
    * Go through the triangulation and "distribute" the degrees of
@@ -591,6 +700,12 @@ public:
    */
   void
   distribute_mg_dofs();
+
+  /**
+   * Returns whether this DoFHandler has hp-capabilities.
+   */
+  bool
+  has_hp_capabilities() const;
 
   /**
    * This function returns whether this DoFHandler has DoFs distributed on
@@ -1083,11 +1198,12 @@ public:
    * @deprecated As of deal.II version 9.2, we do not populate a vector with
    * the index sets of all processors by default any more due to a possibly
    * large memory footprint on many processors. As a consequence, this
-   * function needs to call `Utilities::all_gather(comm, locally_owned_dofs())`
-   * upon the first invocation, including global communication. Use
-   * `Utilities::all_gather(comm, dof_handler.locally_owned_dofs())` instead if
-   * using up to a few thousands of MPI ranks or some variant involving local
-   * communication with more processors.
+   * function needs to call `Utilities::MPI::all_gather(comm,
+   * locally_owned_dofs())` upon the first invocation, including global
+   * communication. Use `Utilities::MPI::all_gather(comm,
+   * dof_handler.locally_owned_dofs())` instead if using up to a few thousands
+   * of MPI ranks or some variant involving local communication with more
+   * processors.
    */
   DEAL_II_DEPRECATED const std::vector<IndexSet> &
                            locally_owned_dofs_per_processor() const;
@@ -1101,9 +1217,9 @@ public:
    * @deprecated As of deal.II version 9.2, we do not populate a vector with
    * the numbers of dofs of all processors by default any more due to a
    * possibly large memory footprint on many processors. As a consequence,
-   * this function needs to call `Utilities::all_gather(comm,
+   * this function needs to call `Utilities::MPI::all_gather(comm,
    * n_locally_owned_dofs()` upon the first invocation, including global
-   * communication. Use `Utilities::all_gather(comm,
+   * communication. Use `Utilities::MPI::all_gather(comm,
    * dof_handler.n_locally_owned_dofs()` instead if using up to a few thousands
    * of MPI ranks or some variant involving local communication with more
    * processors.
@@ -1118,9 +1234,9 @@ public:
    * @deprecated As of deal.II version 9.2, we do not populate a vector with
    * the index sets of all processors by default any more due to a possibly
    * large memory footprint on many processors. As a consequence, this
-   * function needs to call `Utilities::all_gather(comm,
+   * function needs to call `Utilities::MPI::all_gather(comm,
    * locally_owned_dofs_mg())` upon the first invocation, including global
-   * communication. Use `Utilities::all_gather(comm,
+   * communication. Use `Utilities::MPI::all_gather(comm,
    * dof_handler.locally_owned_dofs_mg())` instead if using up to a few
    * thousands of MPI ranks or some variant involving local communication with
    * more processors.
@@ -1129,18 +1245,15 @@ public:
                            locally_owned_mg_dofs_per_processor(const unsigned int level) const;
 
   /**
-   * Return a constant reference to the selected finite element object.
-   * Since there is only one FiniteElement @p index must be equal to zero
-   * which is also the default value.
+   * Return a constant reference to the indexth finite element object that is
+   * used by this object.
    */
   const FiniteElement<dim, spacedim> &
   get_fe(const unsigned int index = 0) const;
 
   /**
    * Return a constant reference to the set of finite element objects that
-   * are used by this @p DoFHandler. Since this object only contains one
-   * FiniteElement, only this one object is returned wrapped in a
-   * hp::FECollection.
+   * are used by this object.
    */
   const hp::FECollection<dim, spacedim> &
   get_fe_collection() const;
@@ -1152,9 +1265,15 @@ public:
   get_triangulation() const;
 
   /**
+   * Return MPI communicator used by the underlying triangulation.
+   */
+  MPI_Comm
+  get_communicator() const;
+
+  /**
    * Whenever serialization with a parallel::distributed::Triangulation as the
    * underlying triangulation is considered, we also need to consider storing
-   * the active_fe_indices on all active cells as well.
+   * the active FE indices on all active cells as well.
    *
    * This function registers that these indices are to be stored whenever the
    * parallel::distributed::Triangulation::save() function is called on the
@@ -1173,10 +1292,10 @@ public:
   /**
    * Whenever serialization with a parallel::distributed::Triangulation as the
    * underlying triangulation is considered, we also need to consider storing
-   * the active_fe_indices on all active cells as well.
+   * the active FE indices on all active cells as well.
    *
    * This function deserializes and distributes the previously stored
-   * active_fe_indices on all active cells.
+   * active FE indices on all active cells.
    *
    * @note Currently only implemented for triangulations of type
    *   parallel::distributed::Triangulation. An assertion will be triggered if
@@ -1201,7 +1320,8 @@ public:
 
   /**
    * Write the data of this object to a stream for the purpose of
-   * serialization.
+   * serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -1209,7 +1329,8 @@ public:
 
   /**
    * Read the data of this object from a stream for the purpose of
-   * serialization.
+   * serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -1218,7 +1339,8 @@ public:
 #ifdef DOXYGEN
   /**
    * Write and read the data of this object from a stream for the purpose
-   * of serialization.
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -1260,25 +1382,25 @@ public:
   DeclException2(ExcInvalidFEIndex,
                  int,
                  int,
-                 << "The mesh contains a cell with an active_fe_index of "
+                 << "The mesh contains a cell with an active FE index of "
                  << arg1 << ", but the finite element collection only has "
                  << arg2 << " elements");
 
   /**
    * Exception used when a certain feature doesn't make sense when
-   * DoFHandler does not hp capabilities.
+   * DoFHandler does not hp-capabilities.
    */
-  DeclExceptionMsg(ExcNotAvailableWithoutHP,
+  DeclExceptionMsg(ExcOnlyAvailableWithHP,
                    "The current function doesn't make sense when used with a "
-                   "DoFHandler without hp capabilities.");
+                   "DoFHandler without hp-capabilities.");
 
   /**
    * Exception used when a certain feature is not implemented when the
-   * DoFHandler has hp capabilities.
+   * DoFHandler has hp-capabilities.
    */
   DeclExceptionMsg(ExcNotImplementedWithHP,
                    "The current function has not yet been implemented for a "
-                   "DoFHandler with hp capabilities.");
+                   "DoFHandler with hp-capabilities.");
 
 private:
   /**
@@ -1352,7 +1474,7 @@ private:
      * on the various levels this vertex exists on.
      *
      * The starting offset of the DoFs that belong to a @p level are given by
-     * <code>dofs_per_vertex * (level-coarsest_level)</code>. @p dofs_per_vertex
+     * <code>n_dofs_per_vertex() * (level-coarsest_level)</code>. @p n_dofs_per_vertex()
      * must therefore be passed as an argument to the functions that set or
      * read an index.
      */
@@ -1361,7 +1483,7 @@ private:
 
   /**
    * Whenever the underlying triangulation changes by either
-   * h/p refinement/coarsening and serialization, the active_fe_index of cells
+   * h/p-refinement/coarsening and serialization, the active FE index of cells
    * needs to be transferred. This structure stores all temporary information
    * required during that process.
    */
@@ -1386,14 +1508,14 @@ private:
     std::map<const cell_iterator, const unsigned int> coarsened_cells_fe_index;
 
     /**
-     * Container to temporarily store the active_fe_index of every locally
+     * Container to temporarily store the active FE index of every locally
      * owned cell for transfer across parallel::distributed::Triangulation
      * objects.
      */
     std::vector<unsigned int> active_fe_indices;
 
     /**
-     * Helper object to transfer all active_fe_indices on
+     * Helper object to transfer all active FE indices on
      * parallel::distributed::Triangulation objects during
      * refinement/coarsening and serialization.
      */
@@ -1407,6 +1529,12 @@ private:
    * An object containing information on the block structure.
    */
   BlockInfo block_info_object;
+
+  /**
+   * Boolean indicating whether or not the current DoFHandler has hp-
+   * capabilities.
+   */
+  bool hp_capability_enabled;
 
   /**
    * Address of the triangulation to work on.
@@ -1471,14 +1599,14 @@ private:
    * relevant active finite elements.
    *
    * @note In normal mode it is possible to access this data strucutre directly.
-   *   In hp mode, an indirection via hp_object_fe_indices/hp_object_fe_ptr is
+   *   In hp-mode, an indirection via hp_object_fe_indices/hp_object_fe_ptr is
    * necessary.
    */
   mutable std::vector<std::array<std::vector<offset_type>, dim + 1>>
     object_dof_ptr;
 
   /**
-   * Active fe indices of each geometric object. Identification
+   * Active FE indices of each geometric object. Identification
    * of the appropriate position of a cell in the vectors is done via
    * hp_object_fe_ptr (CRS scheme).
    */
@@ -1486,20 +1614,20 @@ private:
     hp_object_fe_indices;
 
   /**
-   * Pointer to the first fe index of a geometric object.
+   * Pointer to the first FE index of a geometric object.
    */
   mutable std::array<std::vector<offset_type>, dim + 1> hp_object_fe_ptr;
 
   /**
-   * Active fe index of an active cell (identified by level and level index).
-   * This vector is only used in hp mode.
+   * Active FE index of an active cell (identified by level and level index).
+   * This vector is only used in hp-mode.
    */
   mutable std::vector<std::vector<active_fe_index_type>>
     hp_cell_active_fe_indices;
 
   /**
-   * Future fe index of an active cell (identified by level and level index).
-   * This vector is only used in hp mode.
+   * Future FE index of an active cell (identified by level and level index).
+   * This vector is only used in hp-mode.
    */
   mutable std::vector<std::vector<active_fe_index_type>>
     hp_cell_future_fe_indices;
@@ -1536,6 +1664,13 @@ private:
   std::vector<boost::signals2::connection> tria_listeners;
 
   /**
+   * A list of connections with which this object connects to the
+   * triangulation. They get triggered specifially when data needs to be
+   * transferred due to refinement or repartitioning. Only active in hp-mode.
+   */
+  std::vector<boost::signals2::connection> tria_listeners_for_transfer;
+
+  /**
    * Free all memory used for non-multigrid data structures.
    */
   void
@@ -1569,103 +1704,90 @@ private:
                 const types::global_dof_index global_index) const;
 
   /**
-   * Setup DoFHandler policy.
+   * Set up DoFHandler policy.
    */
   void
   setup_policy();
 
   /**
-   * Setup DoFHandler policy and listeners (in the hp-context).
+   * Set up connections to signals of the underlying triangulation.
    */
   void
-  setup_policy_and_listeners();
+  connect_to_triangulation_signals();
 
   /**
-   * Create default tables for the active_fe_indices.
-   * They are initialized with a zero
-   * indicator, meaning that fe[0] is going to be used by default. This
-   * method is called before refinement and while setting the finite elements
-   * via set_fe(). It ensures each cell has a valid active_fe_index.
+   * Create default tables for the active and future fe_indices.
+   *
+   * Active indices are initialized with a zero indicator, meaning that fe[0] is
+   * going to be used by default. Future indices are initialized with an invalid
+   * indicator, meaning that no p-adaptation is scheduled by default.
+   *
+   * This method is called upon construction and whenever the underlying
+   * triangulation gets created. This ensures that each cell has a valid active
+   * and future fe_index.
    */
   void
   create_active_fe_table();
 
   /**
-   * A function that will be triggered through a triangulation
-   * signal just before the triangulation is modified.
+   * Update tables for active and future fe_indices.
    *
-   * The function that stores the active_fe_flags of all cells that will
-   * be refined or coarsened before the refinement happens, so that
-   * they can be set again after refinement.
+   * Whenever the underlying triangulation changes (either by adaptation or
+   * deserialization), active and future FE index tables will be adjusted to the
+   * current structure of the triangulation. Missing values of active and future
+   * indices will be initialized with their defaults (see
+   * create_active_fe_table()).
+   *
+   * This method is called post refinement and post deserialization. This
+   * ensures that each cell has a valid active and future fe_index.
    */
   void
-  pre_refinement_action();
-
-  /**
-   * A function that will be triggered through a triangulation
-   * signal just after the triangulation is modified.
-   *
-   * The function that restores the active_fe_flags of all cells that
-   * were refined.
-   */
-  void
-  post_refinement_action();
+  update_active_fe_table();
 
   /**
    * A function that will be triggered through a triangulation
    * signal just before the associated Triangulation or
    * parallel::shared::Triangulation is modified.
    *
-   * The function that stores the active_fe_indices of all cells that will
+   * The function that stores the active FE indices of all cells that will
    * be refined or coarsened before the refinement happens, so that
    * they can be set again after refinement.
    */
   void
-  pre_active_fe_index_transfer();
-
-  /**
-   * A function that will be triggered through a triangulation
-   * signal just before the associated parallel::distributed::Triangulation is
-   * modified.
-   *
-   * The function that stores all active_fe_indices on locally owned cells for
-   * distribution over all participating processors.
-   */
-  void
-  pre_distributed_active_fe_index_transfer();
+  pre_transfer_action();
 
   /**
    * A function that will be triggered through a triangulation
    * signal just after the associated Triangulation or
    * parallel::shared::Triangulation is modified.
    *
-   * The function that restores the active_fe_indices of all cells that
+   * The function that restores the active FE indices of all cells that
    * were refined or coarsened.
    */
   void
-  post_active_fe_index_transfer();
+  post_transfer_action();
+
+  /**
+   * A function that will be triggered through a triangulation
+   * signal just before the associated parallel::distributed::Triangulation is
+   * modified.
+   *
+   * The function that stores all active FE indices on locally owned cells for
+   * distribution over all participating processors.
+   */
+  void
+  pre_distributed_transfer_action();
 
   /**
    * A function that will be triggered through a triangulation
    * signal just after the associated parallel::distributed::Triangulation is
    * modified.
    *
-   * The function that restores all active_fe_indices on locally owned cells
+   * The function that restores all active FE indices on locally owned cells
    * that have been communicated.
    */
   void
-  post_distributed_active_fe_index_transfer();
-
-  /**
-   * A function that will be triggered through a triangulation
-   * signal just after the associated parallel::distributed::Triangulation has
-   * been saved.
-   *
-   * The function frees all memory related to the transfer of
-   * active_fe_indices.
-   */
-  void
-  post_distributed_serialization_of_active_fe_indices();
+  post_distributed_transfer_action();
 
 
   // Make accessor objects friends.
@@ -1692,10 +1814,80 @@ private:
 #endif
 };
 
+namespace internal
+{
+  namespace hp
+  {
+    namespace DoFHandlerImplementation
+    {
+      /**
+       * Given a DoFHandler object in hp-mode, make sure that the
+       * future FE indices that a user has set for locally owned cells are
+       * communicated to all other relevant cells as well.
+       *
+       * For parallel::shared::Triangulation objects,
+       * this information is distributed on both ghost and artificial cells.
+       *
+       * In case a parallel::distributed::Triangulation is used,
+       * indices are communicated only to ghost cells.
+       */
+      template <int dim, int spacedim>
+      void
+      communicate_future_fe_indices(DoFHandler<dim, spacedim> &dof_handler);
+
+      /**
+       * Return the index of the finite element from the entire hp::FECollection
+       * that is dominated by those assigned as future finite elements to the
+       * children of @p parent.
+       *
+       * We find the corresponding finite element among the future finite
+       * elements on the children of this cell. If none of them qualify, we
+       * extend our search on the whole hp::FECollection, which is the element
+       * that describes the smallest finite element space that includes all
+       * future finite elements assigned to the children. If the function is not
+       * able to find a finite element at all, an assertion will be triggered.
+       *
+       * In this way, we determine the finite element of the parent cell in case
+       * of h-coarsening in the hp-context.
+       *
+       * @note This function can only be called on direct parent cells, i.e.,
+       * non-active cells whose children are all active.
+       *
+       * @note On parallel::shared::Triangulation objects where sibling cells
+       * can be ghost cells, make sure that future FE indices have been properly
+       * communicated with communicate_future_fe_indices() first. Otherwise,
+       * results might differ on different processors. There is no check for
+       * consistency of future FE indices.
+       */
+      template <int dim, int spacedim = dim>
+      unsigned int
+      dominated_future_fe_on_children(
+        const typename DoFHandler<dim, spacedim>::cell_iterator &parent);
+
+      /**
+       * Exception
+       */
+      DeclExceptionMsg(
+        ExcNoDominatedFiniteElementOnChildren,
+        "No FiniteElement has been found in your FECollection that is "
+        "dominated by all children of a cell you are trying to coarsen!");
+    } // namespace DoFHandlerImplementation
+  }   // namespace hp
+} // namespace internal
+
 #ifndef DOXYGEN
 
 /* ----------------------- Inline functions ----------------------------------
  */
+
+
+template <int dim, int spacedim>
+inline bool
+DoFHandler<dim, spacedim>::has_hp_capabilities() const
+{
+  return hp_capability_enabled;
+}
+
 
 
 template <int dim, int spacedim>
@@ -1779,20 +1971,10 @@ DoFHandler<dim, spacedim>::n_locally_owned_dofs_per_processor() const
   if (number_cache.n_locally_owned_dofs_per_processor.empty() &&
       number_cache.n_global_dofs > 0)
     {
-      MPI_Comm comm;
-
-      const parallel::TriangulationBase<dim, spacedim> *tr =
-        (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-          &this->get_triangulation()));
-      if (tr != nullptr)
-        comm = tr->get_communicator();
-      else
-        comm = MPI_COMM_SELF;
-
       const_cast<dealii::internal::DoFHandlerImplementation::NumberCache &>(
         number_cache)
         .n_locally_owned_dofs_per_processor =
-        number_cache.get_n_locally_owned_dofs_per_processor(comm);
+        number_cache.get_n_locally_owned_dofs_per_processor(get_communicator());
     }
   return number_cache.n_locally_owned_dofs_per_processor;
 }
@@ -1806,20 +1988,10 @@ DoFHandler<dim, spacedim>::locally_owned_dofs_per_processor() const
   if (number_cache.locally_owned_dofs_per_processor.empty() &&
       number_cache.n_global_dofs > 0)
     {
-      MPI_Comm comm;
-
-      const parallel::TriangulationBase<dim, spacedim> *tr =
-        (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-          &this->get_triangulation()));
-      if (tr != nullptr)
-        comm = tr->get_communicator();
-      else
-        comm = MPI_COMM_SELF;
-
       const_cast<dealii::internal::DoFHandlerImplementation::NumberCache &>(
         number_cache)
         .locally_owned_dofs_per_processor =
-        number_cache.get_locally_owned_dofs_per_processor(comm);
+        number_cache.get_locally_owned_dofs_per_processor(get_communicator());
     }
   return number_cache.locally_owned_dofs_per_processor;
 }
@@ -1841,20 +2013,11 @@ DoFHandler<dim, spacedim>::locally_owned_mg_dofs_per_processor(
   if (mg_number_cache[level].locally_owned_dofs_per_processor.empty() &&
       mg_number_cache[level].n_global_dofs > 0)
     {
-      MPI_Comm comm;
-
-      const parallel::TriangulationBase<dim, spacedim> *tr =
-        (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-          &this->get_triangulation()));
-      if (tr != nullptr)
-        comm = tr->get_communicator();
-      else
-        comm = MPI_COMM_SELF;
-
       const_cast<dealii::internal::DoFHandlerImplementation::NumberCache &>(
         mg_number_cache[level])
         .locally_owned_dofs_per_processor =
-        mg_number_cache[level].get_locally_owned_dofs_per_processor(comm);
+        mg_number_cache[level].get_locally_owned_dofs_per_processor(
+          get_communicator());
     }
   return mg_number_cache[level].locally_owned_dofs_per_processor;
 }
@@ -1877,9 +2040,6 @@ template <int dim, int spacedim>
 inline const hp::FECollection<dim, spacedim> &
 DoFHandler<dim, spacedim>::get_fe_collection() const
 {
-  Assert(fe_collection.size() > 0,
-         ExcMessage("No finite element collection is associated with "
-                    "this DoFHandler"));
   return fe_collection;
 }
 
@@ -1893,6 +2053,18 @@ DoFHandler<dim, spacedim>::get_triangulation() const
          ExcMessage("This DoFHandler object has not been associated "
                     "with a triangulation."));
   return *tria;
+}
+
+
+
+template <int dim, int spacedim>
+inline MPI_Comm
+DoFHandler<dim, spacedim>::get_communicator() const
+{
+  Assert(tria != nullptr,
+         ExcMessage("This DoFHandler object has not been associated "
+                    "with a triangulation."));
+  return tria->get_communicator();
 }
 
 
@@ -2121,6 +2293,15 @@ DoFHandler<dim, spacedim>::MGVertexDoFs::set_index(
          ExcInvalidLevel(level));
   indices[dofs_per_vertex * (level - coarsest_level) + dof_number] = index;
 }
+
+
+
+extern template class DoFHandler<1, 1>;
+extern template class DoFHandler<1, 2>;
+extern template class DoFHandler<1, 3>;
+extern template class DoFHandler<2, 2>;
+extern template class DoFHandler<2, 3>;
+extern template class DoFHandler<3, 3>;
 
 
 #endif // DOXYGEN

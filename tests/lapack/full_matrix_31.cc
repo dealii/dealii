@@ -112,14 +112,14 @@ main()
   initlog();
   deallog.get_file_stream().precision(3);
 
-  const std::vector<std::array<unsigned int, 3>> sizes = {{3, 3, 3},
-                                                          {7, 7, 7},
-                                                          {51, 51, 51},
-                                                          {320, 320, 320},
-                                                          {3, 5, 9},
-                                                          {7, 7, 9},
-                                                          {10, 5, 10},
-                                                          {320, 320, 120}};
+  const std::vector<std::array<unsigned int, 3>> sizes = {{{3, 3, 3}},
+                                                          {{7, 7, 7}},
+                                                          {{51, 51, 51}},
+                                                          {{320, 320, 320}},
+                                                          {{3, 5, 9}},
+                                                          {{7, 7, 9}},
+                                                          {{10, 5, 10}},
+                                                          {{320, 320, 120}}};
 
   deallog.push("double");
   for (auto el : sizes)

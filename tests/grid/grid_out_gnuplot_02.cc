@@ -1,3 +1,4 @@
+
 // ---------------------------------------------------------------------
 //
 // Copyright (C) 2018 by the deal.II authors
@@ -87,8 +88,8 @@ gnuplot_output(const GridOutFlags::Gnuplot &flags)
   triangulation.execute_coarsening_and_refinement();
 
   FESystem<dim, spacedim>   displacement_fe(FE_Q<dim, spacedim>(1), spacedim);
-  DoFHandler<dim, spacedim> displacement_dof_handler;
-  displacement_dof_handler.initialize(triangulation, displacement_fe);
+  DoFHandler<dim, spacedim> displacement_dof_handler(triangulation);
+  displacement_dof_handler.distribute_dofs(displacement_fe);
 
   Vector<double> displacements(displacement_dof_handler.n_dofs());
   VectorTools::interpolate(displacement_dof_handler,

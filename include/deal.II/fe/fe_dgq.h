@@ -129,7 +129,7 @@ public:
   /**
    * Return the matrix interpolating from the given finite element to the
    * present one. The size of the matrix is then @p dofs_per_cell times
-   * <tt>source.dofs_per_cell</tt>.
+   * <tt>source.n_dofs_per_cell()</tt>.
    *
    * These matrices are only available if the source element is also a @p
    * FE_DGQ element. Otherwise, an exception of type
@@ -152,7 +152,8 @@ public:
    */
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
-                                FullMatrix<double> &matrix) const override;
+                                FullMatrix<double> &                matrix,
+                                const unsigned int face_no = 0) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -166,9 +167,11 @@ public:
    * FiniteElement<dim>::ExcInterpolationNotImplemented.
    */
   virtual void
-  get_subface_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
-                                   const unsigned int                  subface,
-                                   FullMatrix<double> &matrix) const override;
+  get_subface_interpolation_matrix(
+    const FiniteElement<dim, spacedim> &source,
+    const unsigned int                  subface,
+    FullMatrix<double> &                matrix,
+    const unsigned int                  face_no = 0) const override;
 
   /**
    * Projection from a fine grid space onto a coarse grid space. Overrides the
@@ -226,7 +229,7 @@ public:
    */
 
   /**
-   * If, on a vertex, several finite elements are active, the hp code first
+   * If, on a vertex, several finite elements are active, the hp-code first
    * assigns the degrees of freedom of each of these FEs different global
    * indices. It then calls this function to find out which of them should get
    * identical values, and consequently can receive the same global DoF index.
@@ -235,10 +238,10 @@ public:
    * reference to a finite element object representing one of the other finite
    * elements active on this particular vertex. The function computes which of
    * the degrees of freedom of the two finite element objects are equivalent,
-   * both numbered between zero and the corresponding value of dofs_per_vertex
-   * of the two finite elements. The first index of each pair denotes one of
-   * the vertex dofs of the present element, whereas the second is the
-   * corresponding index of the other finite element.
+   * both numbered between zero and the corresponding value of
+   * n_dofs_per_vertex() of the two finite elements. The first index of each
+   * pair denotes one of the vertex dofs of the present element, whereas the
+   * second is the corresponding index of the other finite element.
    *
    * This being a discontinuous element, the set of such constraints is of
    * course empty.
@@ -266,12 +269,12 @@ public:
    * course empty.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_quad_dof_identities(
-    const FiniteElement<dim, spacedim> &fe_other) const override;
+  hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other,
+                         const unsigned int face_no = 0) const override;
 
   /**
    * Return whether this element implements its hanging node constraints in
-   * the new way, which has to be used to make elements "hp compatible".
+   * the new way, which has to be used to make elements "hp-compatible".
    *
    * For the FE_DGQ class the result is always true (independent of the degree
    * of the element), as it has no hanging nodes (being a discontinuous

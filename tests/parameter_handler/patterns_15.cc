@@ -31,7 +31,7 @@ main()
 {
   initlog();
 
-  typedef ComponentMask T;
+  using T = ComponentMask;
 
   T a;
   a = Convert<T>::to_value("true,false,true");

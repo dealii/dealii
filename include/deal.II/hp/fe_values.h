@@ -23,6 +23,9 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_values.h>
 
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/hp/q_collection.h>
@@ -57,7 +60,7 @@ namespace hp
    * second the dimensionality of the object that we integrate on, i.e. for
    * usual @p hp::FEValues it is equal to the first one, while for face
    * integration it is one less. The third template parameter indicates the
-   * type of underlying non-hp FE*Values base type, i.e. it could either be
+   * type of underlying non-hp-FE*Values base type, i.e. it could either be
    * ::FEValues, ::FEFaceValues, or ::FESubfaceValues.
    *
    * @ingroup hp
@@ -78,6 +81,18 @@ namespace hp
       const UpdateFlags                                       update_flags);
 
     /**
+     * Like the above function but taking a vector of quadrature collections.
+     * For hp::FEFaceValues, the ith entry of the quadrature collections are
+     * interpreted as the face quadrature rules to be applied the ith face.
+     */
+    FEValuesBase(
+      const MappingCollection<dim, FEValuesType::space_dimension>
+        &mapping_collection,
+      const FECollection<dim, FEValuesType::space_dimension> &fe_collection,
+      const std::vector<QCollection<q_dim>> &                 q_collection,
+      const UpdateFlags                                       update_flags);
+
+    /**
      * Constructor. This constructor is equivalent to the other one except
      * that it makes the object use a $Q_1$ mapping (i.e., an object of type
      * MappingQGeneric(1)) implicitly.
@@ -85,6 +100,16 @@ namespace hp
     FEValuesBase(
       const FECollection<dim, FEValuesType::space_dimension> &fe_collection,
       const QCollection<q_dim> &                              q_collection,
+      const UpdateFlags                                       update_flags);
+
+    /**
+     * Like the above function but taking a vector quadrature collections.
+     * For hp::FEFaceValues, the ith entry of the quadrature collections are
+     * interpreted as the face quadrature rules to be applied the ith face.
+     */
+    FEValuesBase(
+      const FECollection<dim, FEValuesType::space_dimension> &fe_collection,
+      const std::vector<QCollection<q_dim>> &                 q_collection,
       const UpdateFlags                                       update_flags);
 
     /**
@@ -196,6 +221,16 @@ namespace hp
      */
     const QCollection<q_dim> q_collection;
 
+    /**
+     * Vector of quadrature collections. For hp::FEFaceValues, the ith entry of
+     * the quadrature collections are interpreted as the face quadrature rules
+     * to be applied the ith face.
+     *
+     * The variable q_collection collects the first quadrature rule of each
+     * quadrature collection of the vector.
+     */
+    const std::vector<QCollection<q_dim>> q_collections;
+
   private:
     /**
      * A table in which we store pointers to fe_values objects for different
@@ -228,11 +263,11 @@ namespace hp
 namespace hp
 {
   /**
-   * An hp equivalent of the ::FEValues class. See the step-27 tutorial
+   * An hp-equivalent of the ::FEValues class. See the step-27 tutorial
    * program for examples of use.
    *
    * The idea of this class is as follows: when one assembled matrices in the
-   * hp finite element method, there may be different finite elements on
+   * hp-finite element method, there may be different finite elements on
    * different cells, and consequently one may also want to use different
    * quadrature formulas for different cells. On the other hand, the
    * ::FEValues efficiently handles pre-evaluating whatever information is
@@ -245,19 +280,19 @@ namespace hp
    * hp::FECollection and hp::QCollection. Later on, when one sits on a
    * concrete cell, one would call the reinit() function for this particular
    * cell, just as one does for a regular ::FEValues object. The difference is
-   * that this time, the reinit() function looks up the active_fe_index of
+   * that this time, the reinit() function looks up the active FE index of
    * that cell, if necessary creates a ::FEValues object that matches the
    * finite element and quadrature formulas with that particular index in
    * their collections, and then re-initializes it for the current cell. The
    * ::FEValues object that then fits the finite element and quadrature
    * formula for the current cell can then be accessed using the
    * get_present_fe_values() function, and one would work with it just like
-   * with any ::FEValues object for non-hp DoF handler objects.
+   * with any ::FEValues object for non-hp-DoFHandler objects.
    *
    * The reinit() functions have additional arguments with default values. If
    * not specified, the function takes the index into the hp::FECollection,
    * hp::QCollection, and hp::MappingCollection objects from the
-   * active_fe_index of the cell, as explained above. However, one can also
+   * active FE index of the cell, as explained above. However, one can also
    * select different indices for a current cell. For example, by specifying a
    * different index into the hp::QCollection class, one does not need to sort
    * the quadrature objects in the quadrature collection so that they match
@@ -333,7 +368,7 @@ namespace hp
      * quadrature formula for each finite element in the hp::FECollection. As
      * a special case, if the quadrature collection contains only a single
      * element (a frequent case if one wants to use the same quadrature object
-     * for all finite elements in an hp discretization, even if that may not
+     * for all finite elements in an hp-discretization, even if that may not
      * be the most efficient), then this single quadrature is used unless a
      * different value for this argument is specified. On the other hand, if a
      * value is given for this argument, it overrides the choice of
@@ -346,12 +381,12 @@ namespace hp
      * <code>cell-@>active_fe_index()</code>, i.e. the same index as that of
      * the finite element. As above, if the mapping collection contains only a
      * single element (a frequent case if one wants to use a $Q_1$ mapping for
-     * all finite elements in an hp discretization), then this single mapping
+     * all finite elements in an hp-discretization), then this single mapping
      * is used unless a different value for this argument is specified.
      */
     template <bool lda>
     void
-    reinit(const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> cell,
+    reinit(const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell,
            const unsigned int q_index       = numbers::invalid_unsigned_int,
            const unsigned int mapping_index = numbers::invalid_unsigned_int,
            const unsigned int fe_index      = numbers::invalid_unsigned_int);
@@ -413,6 +448,20 @@ namespace hp
                  const hp::QCollection<dim - 1> &            q_collection,
                  const UpdateFlags                           update_flags);
 
+    /**
+     * Like the function above, but taking a vector of collection of quadrature
+     * rules. This allows to assign each face a different quadrature rule: the
+     * ith entry of a collection is used as the face quadrature rule on the ith
+     * face.
+     *
+     * In the case that the collections only contains a single face quadrature,
+     * this quadrature rule is use on all faces.
+     */
+    FEFaceValues(const hp::MappingCollection<dim, spacedim> &mapping_collection,
+                 const hp::FECollection<dim, spacedim> &     fe_collection,
+                 const std::vector<hp::QCollection<dim - 1>> &q_collections,
+                 const UpdateFlags                            update_flags);
+
 
     /**
      * Constructor. This constructor is equivalent to the other one except
@@ -422,6 +471,19 @@ namespace hp
     FEFaceValues(const hp::FECollection<dim, spacedim> &fe_collection,
                  const hp::QCollection<dim - 1> &       q_collection,
                  const UpdateFlags                      update_flags);
+
+    /**
+     * Like the function above, but taking a vector of collection of quadrature
+     * rules. This allows to assign each face a different quadrature rule: the
+     * ith entry of a collection is used as the face quadrature rule on the ith
+     * face.
+     *
+     * In the case that the collections only contains a single face quadrature,
+     * this quadrature rule is use on all faces.
+     */
+    FEFaceValues(const hp::FECollection<dim, spacedim> &      fe_collection,
+                 const std::vector<hp::QCollection<dim - 1>> &q_collections,
+                 const UpdateFlags                            update_flags);
 
     /**
      * Reinitialize the object for the given cell and face.
@@ -452,7 +514,7 @@ namespace hp
      * quadrature formula for each finite element in the hp::FECollection. As
      * a special case, if the quadrature collection contains only a single
      * element (a frequent case if one wants to use the same quadrature object
-     * for all finite elements in an hp discretization, even if that may not
+     * for all finite elements in an hp-discretization, even if that may not
      * be the most efficient), then this single quadrature is used unless a
      * different value for this argument is specified. On the other hand, if a
      * value is given for this argument, it overrides the choice of
@@ -465,13 +527,26 @@ namespace hp
      * <code>cell-@>active_fe_index()</code>, i.e. the same index as that of
      * the finite element. As above, if the mapping collection contains only a
      * single element (a frequent case if one wants to use a $Q_1$ mapping for
-     * all finite elements in an hp discretization), then this single mapping
+     * all finite elements in an hp-discretization), then this single mapping
      * is used unless a different value for this argument is specified.
      */
     template <bool lda>
     void
-    reinit(const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> cell,
-           const unsigned int                                      face_no,
+    reinit(const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell,
+           const unsigned int                                       face_no,
+           const unsigned int q_index       = numbers::invalid_unsigned_int,
+           const unsigned int mapping_index = numbers::invalid_unsigned_int,
+           const unsigned int fe_index      = numbers::invalid_unsigned_int);
+
+    /**
+     * Reinitialize the object for the given cell and face.
+     *
+     * @note @p face must be one of @p cell's face iterators.
+     */
+    template <bool lda>
+    void
+    reinit(const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &   cell,
+           const typename Triangulation<dim, spacedim>::face_iterator &face,
            const unsigned int q_index       = numbers::invalid_unsigned_int,
            const unsigned int mapping_index = numbers::invalid_unsigned_int,
            const unsigned int fe_index      = numbers::invalid_unsigned_int);
@@ -491,6 +566,18 @@ namespace hp
     void
     reinit(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
            const unsigned int                                          face_no,
+           const unsigned int q_index       = numbers::invalid_unsigned_int,
+           const unsigned int mapping_index = numbers::invalid_unsigned_int,
+           const unsigned int fe_index      = numbers::invalid_unsigned_int);
+
+    /**
+     * Reinitialize the object for the given cell and face.
+     *
+     * @note @p face must be one of @p cell's face iterators.
+     */
+    void
+    reinit(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+           const typename Triangulation<dim, spacedim>::face_iterator &face,
            const unsigned int q_index       = numbers::invalid_unsigned_int,
            const unsigned int mapping_index = numbers::invalid_unsigned_int,
            const unsigned int fe_index      = numbers::invalid_unsigned_int);
@@ -548,7 +635,7 @@ namespace hp
      * quadrature formula for each finite element in the hp::FECollection. As
      * a special case, if the quadrature collection contains only a single
      * element (a frequent case if one wants to use the same quadrature object
-     * for all finite elements in an hp discretization, even if that may not
+     * for all finite elements in an hp-discretization, even if that may not
      * be the most efficient), then this single quadrature is used unless a
      * different value for this argument is specified. On the other hand, if a
      * value is given for this argument, it overrides the choice of
@@ -561,14 +648,14 @@ namespace hp
      * <code>cell-@>active_fe_index()</code>, i.e. the same index as that of
      * the finite element. As above, if the mapping collection contains only a
      * single element (a frequent case if one wants to use a $Q_1$ mapping for
-     * all finite elements in an hp discretization), then this single mapping
+     * all finite elements in an hp-discretization), then this single mapping
      * is used unless a different value for this argument is specified.
      */
     template <bool lda>
     void
-    reinit(const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> cell,
-           const unsigned int                                      face_no,
-           const unsigned int                                      subface_no,
+    reinit(const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell,
+           const unsigned int                                       face_no,
+           const unsigned int                                       subface_no,
            const unsigned int q_index       = numbers::invalid_unsigned_int,
            const unsigned int mapping_index = numbers::invalid_unsigned_int,
            const unsigned int fe_index      = numbers::invalid_unsigned_int);

@@ -49,7 +49,7 @@ template <int dim>
 class Local : public Subscriptor
 {
 public:
-  typedef EmptyInfo CellInfo;
+  using CellInfo = EmptyInfo;
 
   void
   cell(MeshWorker::DoFInfo<dim> &dinfo, CellInfo &info) const;

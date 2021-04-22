@@ -118,91 +118,6 @@ public:
 
 
 
-template <bool, typename>
-struct constraint_and_return_value;
-
-
-/**
- * This specialization of the general template for the case of a <tt>true</tt>
- * first template argument declares a local alias <tt>type</tt> to the
- * second template argument. It is used in order to construct constraints on
- * template arguments in template (and member template) functions. The
- * negative specialization is missing.
- *
- * Here's how the trick works, called SFINAE (substitution failure is not an
- * error): The C++ standard prescribes that a template function is only
- * considered in a call, if all parts of its signature can be instantiated
- * with the template parameter replaced by the respective types/values in this
- * particular call. Example:
- * @code
- *   template <typename T>
- *   typename T::type  foo(T)
- *   {
- *     ...
- *   };
- *   ...
- *   foo(1);
- * @endcode
- * The compiler should detect that in this call, the template parameter T must
- * be identified with the type "int". However, the return type T::type does
- * not exist. The trick now is that this is not considered an error: this
- * template is simply not considered, the compiler keeps on looking for
- * another possible function foo.
- *
- * The idea is then to make the return type un-instantiatable if certain
- * constraints on the template types are not satisfied:
- * @code
- *   template <bool, typename>
- *   struct constraint_and_return_value;
- *
- *   template <typename T>
- *   struct constraint_and_return_value<true,T>
- *   {
- *     using type = T;
- *   };
- * @endcode
- * constraint_and_return_value<false,T> is not defined. Given something like
- * @code
- *   template <typename>
- *   struct int_or_double
- *   {
- *     static const bool value = false;
- *   };
- *
- *   template <>
- *   struct int_or_double<int>
- *   {
- *     static const bool value = true;
- *   };
- *
- *   template <>
- *   struct int_or_double<double>
- *   {
- *     static const bool value = true;
- *   };
- * @endcode
- * we can write a template
- * @code
- *   template <typename T>
- *   typename constraint_and_return_value<int_or_double<T>::value,void>::type
- *     f (T);
- * @endcode
- * which can only be instantiated if T=int or T=double. A call to f('c') will
- * just fail with a compiler error: "no instance of f(char) found". On the
- * other hand, if the predicate in the first argument to the
- * constraint_and_return_value template is true, then the return type is just
- * the second type in the template.
- *
- * @deprecated Use std::enable_if instead.
- */
-template <typename T>
-struct DEAL_II_DEPRECATED constraint_and_return_value<true, T>
-{
-  using type = T;
-};
-
-
-
 /**
  * A template class that simply exports its template argument as a local
  * alias. This class, while at first appearing useless, makes sense in the
@@ -269,6 +184,24 @@ struct identity
 
 
 /**
+ * A class that always returns a given value.
+ * This is needed as a workaround for lambdas used as default parameters
+ * some compilers struggle to deal with.
+ */
+template <typename ArgType, typename ValueType>
+struct always_return
+{
+  ValueType value;
+  ValueType
+  operator()(const ArgType &)
+  {
+    return value;
+  }
+};
+
+
+
+/**
  * A class to perform comparisons of arbitrary pointers for equality. In some
  * circumstances, one would like to make sure that two arguments to a function
  * are not the same object. One would, in this case, make sure that their
@@ -311,32 +244,6 @@ struct PointerComparison
     return false;
   }
 };
-
-
-
-/**
- * A type that can be used to determine whether two types are equal. It allows
- * to write code like
- * @code
- *   template <typename T>
- *   void Vector<T>::some_operation ()
- *   {
- *     if (std::is_same<T,double>::value == true)
- *       call_some_blas_function_for_doubles;
- *     else
- *       do_it_by_hand;
- *   }
- * @endcode
- *
- * This construct is made possible through the existence of a partial
- * specialization of the class for template arguments that are equal.
- *
- * @deprecated Use the standard library type trait <code>std::is_same</code>
- * instead of this class.
- */
-template <typename T, typename U>
-struct DEAL_II_DEPRECATED types_are_equal : std::is_same<T, U>
-{};
 
 
 

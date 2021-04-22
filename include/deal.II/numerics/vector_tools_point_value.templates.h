@@ -47,8 +47,8 @@ namespace VectorTools
               const Point<spacedim> &                  point,
               Vector<typename VectorType::value_type> &value)
   {
-    if (dof.hp_capability_enabled == false)
-      point_value(StaticMappingQ1<dim, spacedim>::mapping,
+    if (dof.has_hp_capabilities() == false)
+      point_value(get_default_linear_mapping(dof.get_triangulation()),
                   dof,
                   fe_function,
                   point,
@@ -68,8 +68,8 @@ namespace VectorTools
               const VectorType &               fe_function,
               const Point<spacedim> &          point)
   {
-    if (dof.hp_capability_enabled == false)
-      return point_value(StaticMappingQ1<dim, spacedim>::mapping,
+    if (dof.has_hp_capabilities() == false)
+      return point_value(get_default_linear_mapping(dof.get_triangulation()),
                          dof,
                          fe_function,
                          point);
@@ -299,7 +299,7 @@ namespace VectorTools
                                       UpdateFlags(update_values));
     fe_values.reinit(cell_point.first);
 
-    const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     cell_point.first->get_dof_indices(local_dof_indices);
@@ -316,13 +316,15 @@ namespace VectorTools
                              const Point<spacedim> &          p,
                              Vector<double> &                 rhs_vector)
   {
-    if (dof_handler.hp_capability_enabled)
-      create_point_source_vector(hp::StaticMappingQ1<dim>::mapping_collection,
-                                 dof_handler,
-                                 p,
-                                 rhs_vector);
+    if (dof_handler.has_hp_capabilities())
+      create_point_source_vector(
+        hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
+        dof_handler,
+        p,
+        rhs_vector);
     else
-      create_point_source_vector(StaticMappingQ1<dim, spacedim>::mapping,
+      create_point_source_vector(get_default_linear_mapping(
+                                   dof_handler.get_triangulation()),
                                  dof_handler,
                                  p,
                                  rhs_vector);
@@ -358,7 +360,8 @@ namespace VectorTools
                             UpdateFlags(update_values));
     fe_values.reinit(cell_point.first);
 
-    const unsigned int dofs_per_cell = cell_point.first->get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell =
+      cell_point.first->get_fe().n_dofs_per_cell();
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     cell_point.first->get_dof_indices(local_dof_indices);
@@ -400,7 +403,7 @@ namespace VectorTools
                                       UpdateFlags(update_values));
     fe_values.reinit(cell_point.first);
 
-    const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     cell_point.first->get_dof_indices(local_dof_indices);
@@ -419,14 +422,16 @@ namespace VectorTools
                              const Point<dim> &               orientation,
                              Vector<double> &                 rhs_vector)
   {
-    if (dof_handler.hp_capability_enabled)
-      create_point_source_vector(hp::StaticMappingQ1<dim>::mapping_collection,
-                                 dof_handler,
-                                 p,
-                                 orientation,
-                                 rhs_vector);
+    if (dof_handler.has_hp_capabilities())
+      create_point_source_vector(
+        hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
+        dof_handler,
+        p,
+        orientation,
+        rhs_vector);
     else
-      create_point_source_vector(StaticMappingQ1<dim, spacedim>::mapping,
+      create_point_source_vector(get_default_linear_mapping(
+                                   dof_handler.get_triangulation()),
                                  dof_handler,
                                  p,
                                  orientation,
@@ -466,7 +471,8 @@ namespace VectorTools
                             UpdateFlags(update_values));
     fe_values.reinit(cell_point.first);
 
-    const unsigned int dofs_per_cell = cell_point.first->get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell =
+      cell_point.first->get_fe().n_dofs_per_cell();
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     cell_point.first->get_dof_indices(local_dof_indices);

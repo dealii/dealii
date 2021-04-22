@@ -1116,7 +1116,8 @@ template <>
 void
 GridReordering<1>::invert_all_cells_of_negative_grid(
   const std::vector<Point<1>> &,
-  std::vector<CellData<1>> &)
+  std::vector<CellData<1>> &,
+  const bool)
 {
   // nothing to be done in 1d
 }
@@ -1127,7 +1128,8 @@ template <>
 void
 GridReordering<1, 2>::invert_all_cells_of_negative_grid(
   const std::vector<Point<2>> &,
-  std::vector<CellData<1>> &)
+  std::vector<CellData<1>> &,
+  const bool)
 {
   // nothing to be done in 1d
 }
@@ -1138,7 +1140,8 @@ template <>
 void
 GridReordering<1, 3>::invert_all_cells_of_negative_grid(
   const std::vector<Point<3>> &,
-  std::vector<CellData<1>> &)
+  std::vector<CellData<1>> &,
+  const bool)
 {
   // nothing to be done in 1d
 }
@@ -1148,27 +1151,43 @@ template <>
 void
 GridReordering<2>::invert_all_cells_of_negative_grid(
   const std::vector<Point<2>> &all_vertices,
-  std::vector<CellData<2>> &   cells)
+  std::vector<CellData<2>> &   cells,
+  const bool                   use_new_style_ordering)
 {
   unsigned int vertices_lex[GeometryInfo<2>::vertices_per_cell];
   unsigned int n_negative_cells = 0;
+
+  // GridTools::cell_measure requires the vertices to be in lexicographic
+  // ordering
+  auto copy_vertices_to_temp = [&](const CellData<2> &cell) {
+    if (use_new_style_ordering)
+      {
+        std::copy(cell.vertices.begin(),
+                  cell.vertices.end(),
+                  std::begin(vertices_lex));
+      }
+    else
+      {
+        for (const unsigned int i : GeometryInfo<2>::vertex_indices())
+          vertices_lex[GeometryInfo<2>::ucd_to_deal[i]] = cell.vertices[i];
+      }
+  };
+
   for (auto &cell : cells)
     {
-      // GridTools::cell_measure
-      // requires the vertices to be
-      // in lexicographic ordering
-      for (const unsigned int i : GeometryInfo<2>::vertex_indices())
-        vertices_lex[GeometryInfo<2>::ucd_to_deal[i]] = cell.vertices[i];
+      copy_vertices_to_temp(cell);
       if (GridTools::cell_measure<2>(all_vertices, vertices_lex) < 0)
         {
           ++n_negative_cells;
-          std::swap(cell.vertices[1], cell.vertices[3]);
+          if (use_new_style_ordering)
+            std::swap(cell.vertices[1], cell.vertices[2]);
+          else
+            std::swap(cell.vertices[1], cell.vertices[3]);
 
           // Check whether the resulting cell is now ok.
           // If not, then the grid is seriously broken and
           // we just give up.
-          for (const unsigned int i : GeometryInfo<2>::vertex_indices())
-            vertices_lex[GeometryInfo<2>::ucd_to_deal[i]] = cell.vertices[i];
+          copy_vertices_to_temp(cell);
           AssertThrow(GridTools::cell_measure<2>(all_vertices, vertices_lex) >
                         0,
                       ExcInternalError());
@@ -1203,7 +1222,8 @@ template <>
 void
 GridReordering<2, 3>::invert_all_cells_of_negative_grid(
   const std::vector<Point<3>> &,
-  std::vector<CellData<2>> &)
+  std::vector<CellData<2>> &,
+  const bool)
 {
   Assert(false, ExcNotImplemented());
 }
@@ -1214,29 +1234,52 @@ template <>
 void
 GridReordering<3>::invert_all_cells_of_negative_grid(
   const std::vector<Point<3>> &all_vertices,
-  std::vector<CellData<3>> &   cells)
+  std::vector<CellData<3>> &   cells,
+  const bool                   use_new_style_ordering)
 {
   unsigned int vertices_lex[GeometryInfo<3>::vertices_per_cell];
   unsigned int n_negative_cells = 0;
+
+  // GridTools::cell_measure requires the vertices to be in lexicographic
+  // ordering
+  auto copy_vertices_to_temp = [&](const CellData<3> &cell) {
+    if (use_new_style_ordering)
+      {
+        std::copy(cell.vertices.begin(),
+                  cell.vertices.end(),
+                  std::begin(vertices_lex));
+      }
+    else
+      {
+        for (const unsigned int i : GeometryInfo<3>::vertex_indices())
+          vertices_lex[GeometryInfo<3>::ucd_to_deal[i]] = cell.vertices[i];
+      }
+  };
+
   for (auto &cell : cells)
     {
-      // GridTools::cell_measure
-      // requires the vertices to be
-      // in lexicographic ordering
-      for (const unsigned int i : GeometryInfo<3>::vertex_indices())
-        vertices_lex[GeometryInfo<3>::ucd_to_deal[i]] = cell.vertices[i];
+      copy_vertices_to_temp(cell);
       if (GridTools::cell_measure<3>(all_vertices, vertices_lex) < 0)
         {
           ++n_negative_cells;
           // reorder vertices: swap front and back face
-          for (unsigned int i = 0; i < 4; ++i)
-            std::swap(cell.vertices[i], cell.vertices[i + 4]);
+          if (use_new_style_ordering)
+            {
+              std::swap(cell.vertices[0], cell.vertices[2]);
+              std::swap(cell.vertices[1], cell.vertices[3]);
+              std::swap(cell.vertices[4], cell.vertices[6]);
+              std::swap(cell.vertices[5], cell.vertices[7]);
+            }
+          else
+            {
+              for (unsigned int i = 0; i < 4; ++i)
+                std::swap(cell.vertices[i], cell.vertices[i + 4]);
+            }
+          copy_vertices_to_temp(cell);
 
           // Check whether the resulting cell is now ok.
           // If not, then the grid is seriously broken and
           // we just give up.
-          for (const unsigned int i : GeometryInfo<3>::vertex_indices())
-            vertices_lex[GeometryInfo<3>::ucd_to_deal[i]] = cell.vertices[i];
           AssertThrow(GridTools::cell_measure<3>(all_vertices, vertices_lex) >
                         0,
                       ExcInternalError());

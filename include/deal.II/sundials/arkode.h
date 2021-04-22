@@ -34,13 +34,21 @@
 #  include <deal.II/lac/vector_memory.h>
 
 #  include <arkode/arkode.h>
-#  include <arkode/arkode_impl.h>
+#  if DEAL_II_SUNDIALS_VERSION_LT(4, 0, 0)
+#    include <arkode/arkode_impl.h>
+#  endif
 #  include <nvector/nvector_serial.h>
 #  ifdef DEAL_II_WITH_MPI
 #    include <nvector/nvector_parallel.h>
 #  endif
+#  include <deal.II/base/discrete_time.h>
+
+#  include <deal.II/sundials/n_vector.h>
+#  include <deal.II/sundials/sunlinsol_wrapper.h>
+
 #  include <boost/signals2.hpp>
 
+#  include <sundials/sundials_linearsolver.h>
 #  include <sundials/sundials_math.h>
 #  include <sundials/sundials_types.h>
 
@@ -48,6 +56,7 @@
 
 
 DEAL_II_NAMESPACE_OPEN
+
 
 // Shorthand notation for ARKODE error codes.
 #  define AssertARKode(code) Assert(code >= 0, ExcARKodeError(code))
@@ -192,9 +201,10 @@ namespace SUNDIALS
    * $f_I(t, y)$ depends linearly on $y$, and if the Newton-based nonlinear
    * solver is chosen, then the system will be solved using only a single
    * Newton iteration. Notice that in order for the Newton solver to be used,
-   * at least the solve_jacobian_system() function should be supplied. If this
-   * function is not supplied, then only the fixed-point iteration will be
-   * supported, and the `implicit_function_is_linear` setting is ignored.
+   * at least the jacobian_times_vector() function (or solve_jacobian_system()
+   * for SUNDIALS version > 4.0.0) should be supplied. If this function is not
+   * supplied, then only the fixed-point iteration will be supported, and the
+   *`implicit_function_is_linear` setting is ignored.
    *
    * The optimal solver (Newton vs fixed-point) is highly problem-dependent.
    * Since fixed-point solvers do not require the solution of any linear
@@ -221,30 +231,47 @@ namespace SUNDIALS
    * $z_j$ where $j < i$). Additional information on the specific predictor
    * algorithms implemented in ARKode is provided in ARKode documentation.
    *
-   * The user has to provide the implementation of the following std::function:
-   *  - reinit_vector;
-   * and either one or both of
-   *  - implicit_function;
-   *  - explicit_function;
+   * The user has to provide the implementation of at least one (or both) of the
+   * following `std::function`s:
+   *  - implicit_function()
+   *  - explicit_function()
    *
    * If the mass matrix is different from the identity, the user should supply
-   *  - solve_mass_system;
-   * and, optionally,
-   *  - setup_mass;
+   *  - mass_times_vector() (or solve_mass_system() for SUNDIALS version
+   *    < 4.0.0) and, optionally,
+   *  - mass_times_setup() (or setup_mass() for SUNDIALS version < 4.0.0)
    *
    * If the use of a Newton method is desired, then the user should also supply
-   *  - solve_jacobian_system;
-   * and optionally
-   *  - setup_jacobian;
+   *  - jacobian_times_vector (or solve_jacobian_system() for SUNDIALS version
+   *    < 4.0.0)
+   *  - optional: jacobian_times_setup() (or setup_jacobian() for SUNDIALS
+   *    version < 4.0.0)
+   *
+   * @note Although SUNDIALS can provide a difference quotient approximation
+   *   of the Jacobian, this is currently not supported through this wrapper.
+   *
+   * Only for SUNDIALS version > 4.0.0: A SUNDIALS default solver (SPGMR) is
+   * used to solve the linear systems. To use a custom linear solver for the
+   * mass matrix and/or Jacobian, set:
+   *  - solve_mass() and/or
+   *  - solve_jacobian()
+   *
+   * Only for SUNDIALS version > 4.0.0: To use a custom preconditioner with
+   * either a default or custom linear solver, set:
+   * - jacobian_preconditioner_solve() and/or mass_preconditioner_solve()
+   * and, optionally,
+   * - jacobian_preconditioner_setup() and/or mass_preconditioner_setup()
    *
    * Also the following functions could be rewritten. By default
    * they do nothing, or are not required.
-   *  - solver_should_restart;
-   *  - get_local_tolerances;
+   *  - solver_should_restart()
+   *  - get_local_tolerances()
    *
-   * To produce output at fixed steps, overload the function
-   *  - output_step;
+   * To produce output at fixed steps, set the function
+   *  - output_step()
    *
+   * Any other custom settings of the ARKODE object can be specified in
+   *  - custom_setup()
    *
    * To provide a simple example, consider the harmonic oscillator problem:
    * \f[
@@ -285,12 +312,7 @@ namespace SUNDIALS
    *
    * SUNDIALS::ARKode<VectorType> ode;
    *
-   * ode.reinit_vector = [] (VectorType&v)
-   * {
-   *   v.reinit(2);
-   * };
-   *
-   * double kappa = 1.0;
+   * const double kappa = 1.0;
    *
    * ode.explicit_function = [kappa] (double,
    *                                  const VectorType &y,
@@ -325,18 +347,22 @@ namespace SUNDIALS
        * @param initial_time Initial time
        * @param final_time Final time
        * @param initial_step_size Initial step size
-       * @param output_period Time interval between each output
+       * @param output_period Desired time interval between each output
        *
        * Running parameters:
        *
        * @param minimum_step_size Minimum step size
        * @param maximum_order Maximum ARK order
        * @param maximum_non_linear_iterations Maximum number of nonlinear
-       * iterations
+       *   iterations
        * @param implicit_function_is_linear Specifies that the implicit portion
-       * of the problem is linear
+       *   of the problem is linear
        * @param implicit_function_is_time_independent Specifies that the
-       * implicit portion of the problem is linear and time independent
+       *   implicit portion of the problem is linear and time independent
+       * @param mass_is_time_independent Specifies that the mass pre-factor is
+       *   independent of time
+       * @param anderson_acceleration_subspace The number of vectors to use for
+       *   Anderson acceleration within the packaged SUNDIALS solver.
        *
        * Error parameters:
        *
@@ -355,6 +381,8 @@ namespace SUNDIALS
         const unsigned int maximum_non_linear_iterations         = 10,
         const bool         implicit_function_is_linear           = false,
         const bool         implicit_function_is_time_independent = false,
+        const bool         mass_is_time_independent              = false,
+        const int          anderson_acceleration_subspace        = 3,
         // Error parameters
         const double absolute_tolerance = 1e-6,
         const double relative_tolerance = 1e-5)
@@ -370,6 +398,8 @@ namespace SUNDIALS
         , implicit_function_is_linear(implicit_function_is_linear)
         , implicit_function_is_time_independent(
             implicit_function_is_time_independent)
+        , mass_is_time_independent(mass_is_time_independent)
+        , anderson_acceleration_subspace(anderson_acceleration_subspace)
       {}
 
       /**
@@ -377,40 +407,12 @@ namespace SUNDIALS
        * object. When the parameters are parsed from a file, the internal
        * parameters are automatically updated.
        *
-       * The following parameters are declared:
-       *
-       * @code
-       * set Final time                        = 1.000000
-       * set Initial time                      = 0.000000
-       * set Time interval between each output = 0.2
-       * subsection Error control
-       *   set Absolute error tolerance                      = 0.000001
-       *   set Ignore algebraic terms for error computations = true
-       *   set Relative error tolerance                      = 0.00001
-       *   set Use local tolerances                          = false
-       * end
-       * subsection Initial condition correction parameters
-       *   set Correction type at initial time        = none
-       *   set Correction type after restart          = none
-       *   set Maximum number of nonlinear iterations = 5
-       * end
-       * subsection Running parameters
-       *   set Initial step size                      = 0.1
-       *   set Maximum number of nonlinear iterations = 10
-       *   set Maximum order of ARK                   = 5
-       *   set Minimum step size                      = 0.000001
-       * end
-       * @endcode
-       *
-       * These are one-to-one with the options you can pass at construction
-       * time.
-       *
        * The options you pass at construction time are set as default values in
        * the ParameterHandler object `prm`. You can later modify them by parsing
        * a parameter file using `prm`. The values of the parameter will be
        * updated whenever the content of `prm` is updated.
        *
-       * Make sure that this class lives longer than `prm`. Undefined behaviour
+       * Make sure that this class lives longer than `prm`. Undefined behavior
        * will occur if you destroy this class, and then parse a parameter file
        * using `prm`.
        */
@@ -431,6 +433,9 @@ namespace SUNDIALS
                           implicit_function_is_linear);
         prm.add_parameter("Implicit function is time independent",
                           implicit_function_is_time_independent);
+        prm.add_parameter("Mass is time independent", mass_is_time_independent);
+        prm.add_parameter("Anderson-acceleration subspace",
+                          anderson_acceleration_subspace);
         prm.leave_subsection();
 
         prm.enter_subsection("Error control");
@@ -475,7 +480,8 @@ namespace SUNDIALS
       unsigned int maximum_order;
 
       /**
-       * Time period between each output.
+       * Desired time period between each output. The actual output time period
+       * may be adjusted by Arkode.
        */
       double output_period;
 
@@ -495,6 +501,18 @@ namespace SUNDIALS
        * independent.
        */
       bool implicit_function_is_time_independent;
+
+      /**
+       * Specify whether the mass pre-factor is time independent. Has no effect
+       * if no mass is specified.
+       */
+      bool mass_is_time_independent;
+
+      /**
+       * Number of subspace vectors to use for Anderson acceleration. Only
+       * meaningful if the packaged SUNDIALS fixed-point solver is used.
+       */
+      int anderson_acceleration_subspace;
     };
 
     /**
@@ -509,7 +527,7 @@ namespace SUNDIALS
      * @param mpi_comm MPI communicator
      */
     ARKode(const AdditionalData &data     = AdditionalData(),
-           const MPI_Comm        mpi_comm = MPI_COMM_WORLD);
+           const MPI_Comm &      mpi_comm = MPI_COMM_WORLD);
 
     /**
      * Destructor.
@@ -519,9 +537,43 @@ namespace SUNDIALS
     /**
      * Integrate the initial value problem. This function returns the final
      * number of computed steps.
+     *
+     * @param solution On input, this vector contains the initial condition. On
+     *   output, it contains the solution at the final time.
      */
     unsigned int
     solve_ode(VectorType &solution);
+
+    /**
+     * Integrate the initial value problem. Compared to the function above, this
+     * function allows to specify an @p intermediate_time for the next solution.
+     * Repeated calls of this function must use monotonously increasing values
+     * for @p intermediate_time. The last solution state is saved internally
+     * along with the @p intermediate_time and will be reused as initial
+     * condition for the next call.
+     *
+     * Users may find this function useful when integrating ARKode into an outer
+     * time loop of their own, especially when output_step() is too restrictive.
+     *
+     * @note @p intermediate_time may be larger than AdditionalData::final_time,
+     *   which is ignored by this function.
+     *
+     * @param solution The final solution. If the solver restarts, either
+     *   because it is the first ever solve or the flag @p reset_solver is
+     *   set, the vector is also used as initial condition.
+     * @param intermediate_time The time for the incremental solution step. Must
+     *   be greater than the last time that was used in a previous call to this
+     *   function.
+     * @param reset_solver Optional flag to recreate all internal objects which
+     *   may be desirable for spatial adaptivity methods. If set to `true`,
+     *   reset() is called before solving the ODE, which sets @p solution as
+     *   initial condition. This will *not* reset the stored time from previous
+     *   calls to this function.
+     */
+    unsigned int
+    solve_ode_incrementally(VectorType & solution,
+                            const double intermediate_time,
+                            const bool   reset_solver = false);
 
     /**
      * Clear internal memory and start with clean objects. This function is
@@ -533,17 +585,41 @@ namespace SUNDIALS
      * a different function to solver_should_restart() that performs all mesh
      * changes, transfers the solution to the new mesh, and returns true.
      *
-     * @param[in] t  The new starting time
-     * @param[in] h  The new starting time step
-     * @param[in,out] y   The new initial solution
+     * @param t  The new starting time
+     * @param h  The new starting time step
+     * @param y  The new initial solution
      */
     void
     reset(const double t, const double h, const VectorType &y);
 
     /**
-     * A function object that users need to supply and that is intended to
-     * reinit the given vector.
+     * Provides user access to the internally used ARKODE memory.
+     *
+     * This functionality is intended for users who wish to query additional
+     * information directly from the ARKODE integrator, refer to the ARKODE
+     * manual for the various `ARKStepGet...` functions. The `ARKStepSet...`
+     * functions should not be called since this might lead to conflicts with
+     * various settings that are performed by this ARKode object.
+     *
+     * @note If custom settings of ARKODE functionality (that are not achievable
+     *   via the interface of this class) are required, the function
+     *   custom_setup() should be used.
+     *
+     * @return pointer to the ARKODE memory block that can be passed to SUNDIALS
+     *   functions
      */
+    void *
+    get_arkode_memory() const;
+
+    /**
+     * A function object that was used to `reinit` the given vector. Setting
+     * this field does no longer have any effect and all auxiliary vectors are
+     * reinit-ed automatically based on the user-supplied vector in solve_ode().
+     *
+     * @deprecated This function is no longer used and can be safely removed in
+     *   user code.
+     */
+    DEAL_II_DEPRECATED
     std::function<void(VectorType &)> reinit_vector;
 
     /**
@@ -557,10 +633,10 @@ namespace SUNDIALS
      *
      * This function should return:
      * - 0: Success
-     * - >0: Recoverable error (ARKodeReinit will be called if this happens, and
-     *       then last function will be attempted again
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * - >0: Recoverable error, ARKode will reattempt the solution and call this
+     *       function again.
+     * - <0: Unrecoverable error, the computation will be aborted and an
+     *       assertion will be thrown.
      */
     std::function<
       int(const double t, const VectorType &y, VectorType &explicit_f)>
@@ -577,14 +653,15 @@ namespace SUNDIALS
      *
      * This function should return:
      * - 0: Success
-     * - >0: Recoverable error (ARKodeReinit will be called if this happens, and
-     *       then last function will be attempted again
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * - >0: Recoverable error, ARKode will reattempt the solution and call this
+     *       function again.
+     * - <0: Unrecoverable error, the computation will be aborted and an
+     *       assertion will be thrown.
      */
     std::function<int(const double t, const VectorType &y, VectorType &res)>
       implicit_function;
 
+#  if DEAL_II_SUNDIALS_VERSION_LT(4, 0, 0)
     /**
      * A function object that users may supply and that is intended to
      * prepare the linear solver for subsequent calls to
@@ -667,7 +744,7 @@ namespace SUNDIALS
      * - >0: Recoverable error (ARKodeReinit will be called if this happens, and
      *       then last function will be attempted again
      * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     *       assertion will be thrown.
      */
     std::function<int(const int         convfail,
                       const double      t,
@@ -709,9 +786,9 @@ namespace SUNDIALS
      * @param[in] t  the current time
      * @param[in] gamma  the current factor to use in the jacobian computation
      * @param[in] ycur  is the current $y$ vector for the current ARKode
-     * internal step
+     *   internal step
      * @param[in] fcur  is the current value of the implicit right-hand side at
-     * ycur, $f_I (t_n, ypred)$.
+     *   ycur, $f_I (t_n, ypred)$.
      *
      *
      * This function should return:
@@ -719,7 +796,7 @@ namespace SUNDIALS
      * - >0: Recoverable error (ARKodeReinit will be called if this happens, and
      *       then last function will be attempted again
      * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     *       assertion will be thrown.
      */
     std::function<int(const double      t,
                       const double      gamma,
@@ -731,7 +808,7 @@ namespace SUNDIALS
 
 
     /**
-     * A function object that users may supply and that is intended to setup
+     * A function object that users may supply and that is intended to set up
      * the mass matrix. This function is called by ARKode any time a mass
      * matrix update is required. The user should compute the mass matrix (or
      * update all the variables that allow the application of the mass matrix).
@@ -761,7 +838,7 @@ namespace SUNDIALS
      * - >0: Recoverable error (ARKodeReinit will be called if this happens, and
      *       then last function will be attempted again
      * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     *       assertion will be thrown.
      */
     std::function<int(const double t)> setup_mass;
 
@@ -781,10 +858,325 @@ namespace SUNDIALS
      * - >0: Recoverable error (ARKodeReinit will be called if this happens, and
      *       then last function will be attempted again
      * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     *       assertion will be thrown.
      */
     std::function<int(const VectorType &rhs, VectorType &dst)>
       solve_mass_system;
+#  else
+
+    /**
+     * A function object that users may supply and that is intended to compute
+     * the product of the mass matrix with a given vector `v`. This function
+     * will be called by ARKode (possibly several times) after
+     * mass_times_setup() has been called at least once. ARKode tries to do its
+     * best to call mass_times_setup() the minimum amount of times.
+     *
+     * A call to this function should store in `Mv` the result of $M$
+     * applied to `v`.
+     *
+     * This function should return:
+     * - 0: Success
+     * - >0: Recoverable error, ARKode will reattempt the solution and call this
+     *       function again.
+     * - <0: Unrecoverable error, the computation will be aborted and an
+     *       assertion will be thrown.
+     */
+    std::function<int(double t, const VectorType &v, VectorType &Mv)>
+      mass_times_vector;
+
+    /**
+     * A function object that users may supply and that is intended to set up
+     * the mass matrix. This function is called by ARKode any time a mass
+     * matrix update is required. The user should compute the mass matrix (or
+     * update all the variables that allow the application of the mass matrix).
+     * This function is guaranteed to be called by ARKode at least once, before
+     * any call to mass_times_vector().
+     *
+     * ARKode supports the case where the mass matrix may depend on time, but
+     * not the case where the mass matrix depends on the solution itself.
+     *
+     * If the user does not provide a mass_times_vector() function, then the
+     * identity is used. If the mass_times_setup() function is not provided,
+     * then mass_times_vector() should do all the work by itself.
+     *
+     * If the user uses a matrix-based computation of the mass matrix, then
+     * this is the right place where an assembly routine should be called to
+     * assemble the matrix. Subsequent calls (possibly  more than one) to
+     * mass_times_vector() can assume that this function has been called at
+     * least once.
+     *
+     * @note No assumption is made by this interface on what the user
+     *   should do in this function. ARKode only assumes that after a call to
+     *   mass_times_setup() it is possible to call mass_times_vector().
+     *
+     * @param t The current evaluation time
+     *
+     * This function should return:
+     * - 0: Success
+     * - >0: Recoverable error, ARKode will reattempt the solution and call this
+     *       function again.
+     * - <0: Unrecoverable error, the computation will be aborted and an
+     *       assertion will be thrown.
+     */
+    std::function<int(const double t)> mass_times_setup;
+
+    /**
+     * A function object that users may supply and that is intended to compute
+     * the product of the Jacobian matrix with a given vector `v`. The Jacobian
+     * here refers to $J=\frac{\partial f_I}{\partial y}$, i.e., the Jacobian of
+     * the user-specified implicit_function.
+     *
+     * A call to this function should store in `Jv` the result of $J$
+     * applied to `v`.
+     *
+     * Arguments to the function are
+     *
+     * @param[in] v  The vector to be mulitplied by the Jacobian
+     * @param[out] Jv The vector to be filled with the product J*v
+     * @param[in] t  The current time
+     * @param[in] y  The current $y$ vector for the current ARKode internal
+     *   step
+     * @param[in] fy  The current value of the implicit right-hand side at y,
+     *   $f_I (t_n, y)$.
+     *
+     * This function should return:
+     * - 0: Success
+     * - >0: Recoverable error, ARKode will reattempt the solution and call this
+     *       function again.
+     * - <0: Unrecoverable error, the computation will be aborted and an
+     *       assertion will be thrown.
+     */
+    std::function<int(const VectorType &v,
+                      VectorType &      Jv,
+                      double            t,
+                      const VectorType &y,
+                      const VectorType &fy)>
+      jacobian_times_vector;
+
+    /**
+     * A function object that users may supply and that is intended to set up
+     * all data necessary for the application of jacobian_times_setup(). This
+     * function is called by ARKode any time a Jacobian update is required.
+     * The user should compute the Jacobian (or update all the variables that
+     * allow the application of Jacobian). This function is guaranteed to
+     * be called by ARKode at least once, before any call to
+     * jacobian_times_vector().
+     *
+     * If the jacobian_times_setup() function is not provided, then
+     * jacobian_times_vector() should do all the work by itself.
+     *
+     * If the user uses a matrix based computation of the Jacobian, then this is
+     * the right place where an assembly routine should be called to assemble
+     * the matrix. Subsequent calls (possibly  more than one) to
+     * jacobian_times_vector() can assume that this function has been called at
+     * least once.
+     *
+     * @note No assumption is made by this interface on what the user
+     *   should do in this function. ARKode only assumes that after a call to
+     *   jacobian_times_setup() it is possible to call jacobian_times_vector().
+     *
+     * @param t  The current time
+     * @param y  The current ARKode internal solution vector $y$
+     * @param fy  The implicit right-hand side function evaluated at the
+     *   current time $t$ and state $y$, i.e., $f_I(y,t)$
+     *
+     * This function should return:
+     * - 0: Success
+     * - >0: Recoverable error, ARKode will reattempt the solution and call this
+     *       function again.
+     * - <0: Unrecoverable error, the computation will be aborted and an
+     *       assertion will be thrown.
+     */
+    std::function<int(realtype t, const VectorType &y, const VectorType &fy)>
+      jacobian_times_setup;
+
+    /**
+     * A LinearSolveFunction object that users may supply and that is intended
+     * to solve the linearized system $Ax=b$, where $A = M-\gamma J$ is the
+     * Jacobian of the nonlinear residual. The application fo the mass matrix
+     * $M$ and Jacobian $J$ are known through the functions mass_times_vector()
+     * and jacobian_times_vector() and $\gamma$ is a factor provided by
+     * SUNDIALS. The matrix-vector product $Ax$ is encoded in the supplied
+     * SundialsOperator. If a preconditioner was set through
+     * jacobian_preconditioner_solve(), it is encoded in the
+     * SundialsPreconditioner. If no preconditioner was supplied this way, the
+     * preconditioner is the identity matrix, i.e., no preconditioner. The user
+     * is free to use a custom preconditioner in this function object that is
+     * not supplied through SUNDIALS.
+     *
+     * If you do not specify a solve_linearized_system() function, then a
+     * SUNDIALS packaged SPGMR solver with default settings is used.
+     *
+     * For more details on the function type refer to LinearSolveFunction.
+     */
+    LinearSolveFunction<VectorType> solve_linearized_system;
+
+    /**
+     * A LinearSolveFunction object that users may supply and that is intended
+     * to solve the mass system $Mx=b$. The matrix-vector product $Mx$ is
+     * encoded in the supplied SundialsOperator. If a preconditioner was set
+     * through mass_preconditioner_solve(), it is encoded in the
+     * SundialsPreconditioner. If no preconditioner was supplied this way, the
+     * preconditioner is the identity matrix, i.e., no preconditioner. The user
+     * is free to use a custom preconditioner in this function object that is
+     * not supplied through SUNDIALS.
+     *
+     * The user must specify this function if a non-identity mass matrix is used
+     * and applied in mass_times_vector().
+     *
+     * For more details on the function type refer to LinearSolveFunction.
+     */
+    LinearSolveFunction<VectorType> solve_mass;
+
+
+    /**
+     * A function object that users may supply to either pass a preconditioner
+     * to a SUNDIALS built-in solver or to apply a custom preconditioner within
+     * the user's own linear solve specified in solve_linearized_system().
+     *
+     * This function should compute the solution to the preconditioner equation
+     * $Pz=r$ and store it in @p z. In this equation $P$ should approximate the
+     * Jacobian $M-\gamma J$ of the nonlinear system.
+     *
+     * @param[in] t  The current time
+     * @param[in] y  The current $y$ vector for the current ARKode internal
+     *   step
+     * @param[in] fy  The current value of the implicit right-hand side at y,
+     *   $f_I (t_n, y)$.
+     * @param[in] r  The right-hand side of the preconditioner equation
+     * @param[out] z The solution of applying the preconditioner, i.e., solving
+     *   $Pz=r$
+     * @param[in] gamma The value $\gamma$ in the preconditioner equation
+     * @param[in] tol The tolerance up to which the system should be solved
+     * @param[in] lr An input flag indicating whether the preconditioner solve
+     *   is to use the left preconditioner (lr = 1) or the right preconditioner
+     *   (lr = 2). Only relevant if used with a SUNDIALS packaged solver. If
+     *   used with a custom solve_mass() function this will be set to zero.
+     *
+     * This function should return:
+     * - 0: Success
+     * - >0: Recoverable error, ARKode will reattempt the solution and call this
+     *       function again.
+     * - <0: Unrecoverable error, the computation will be aborted and an
+     *       assertion will be thrown.
+     */
+    std::function<int(double            t,
+                      const VectorType &y,
+                      const VectorType &fy,
+                      const VectorType &r,
+                      VectorType &      z,
+                      double            gamma,
+                      double            tol,
+                      int               lr)>
+      jacobian_preconditioner_solve;
+
+    /**
+     * A function object that users may supply to set up a preconditioner
+     * specified in jacobian_preconditioner_solve().
+     *
+     * This function should prepare the solution of the preconditioner equation
+     * $Pz=r$. In this equation $P$ should approximate the Jacobian $M-\gamma J$
+     * of the nonlinear system.
+     *
+     * If the jacobian_preconditioner_setup() function is not provided, then
+     * jacobian_preconditioner_solve() should do all the work by itself.
+     *
+     * @note No assumption is made by this interface on what the user
+     *   should do in this function. ARKode only assumes that after a call to
+     *   jacobian_preconditioner_setup() it is possible to call
+     *   jacobian_preconditioner_solve().
+     *
+     * @param[in] t  The current time
+     * @param[in] y  The current $y$ vector for the current ARKode internal
+     *   step
+     * @param[in] fy  The current value of the implicit right-hand side at y,
+     *   $f_I (t_n, y)$.
+     * @param[in] jok  An input flag indicating whether the Jacobian-related
+     *   data needs to be updated. The jok argument provides for the reuse of
+     *   Jacobian data in the preconditioner solve function. When jok =
+     *   SUNFALSE, the Jacobian-related data should be recomputed from scratch.
+     *   When jok = SUNTRUE the Jacobian data, if saved from the previous call
+     *   to this function, can be reused (with the current value of gamma). A
+     *   call with jok = SUNTRUE can only occur after a call with jok =
+     *   SUNFALSE.
+     * @param[out] jcur On output this should be set to SUNTRUE if Jacobian data
+     *   was recomputed, or set to SUNFALSE if Jacobian data was not recomputed,
+     *   but saved data was still reused.
+     * @param[in] gamma The value $\gamma$ in $M-\gamma J$. The preconditioner
+     *   should approximate the inverse of this matrix.
+     *
+     * This function should return:
+     * - 0: Success
+     * - >0: Recoverable error, ARKode will reattempt the solution and call this
+     *       function again.
+     * - <0: Unrecoverable error, the computation will be aborted and an
+     *       assertion will be thrown.
+     */
+    std::function<int(double            t,
+                      const VectorType &y,
+                      const VectorType &fy,
+                      int               jok,
+                      int &             jcur,
+                      double            gamma)>
+      jacobian_preconditioner_setup;
+
+    /**
+     * A function object that users may supply to either pass a preconditioner
+     * to a SUNDIALS built-in solver or to apply a custom preconditioner within
+     * the user's own linear solve specified in solve_mass().
+     *
+     * This function should compute the solution to the preconditioner equation
+     * $Pz=r$ and store it in @p z. In this equation $P$ should approximate the
+     * mass matrix $M$.
+     *
+     * @param[in] t  The current time
+     * @param[in] r  The right-hand side of the preconditioner equation
+     * @param[out] z The solution of applying the preconditioner, i.e., solving
+     *   $Pz=r$
+     * @param[in] gamma The value $\gamma$ in the preconditioner equation
+     * @param[in] tol The tolerance up to which the system should be solved
+     * @param[in] lr An input flag indicating whether the preconditioner solve
+     *   is to use the left preconditioner (lr = 1) or the right preconditioner
+     *   (lr = 2). Only relevant if used with a SUNDIALS packaged solver. If
+     *   used with a custom solve_mass() function this will be set to zero.
+     *
+     * This function should return:
+     * - 0: Success
+     * - >0: Recoverable error, ARKode will reattempt the solution and call this
+     *       function again.
+     * - <0: Unrecoverable error, the computation will be aborted and an
+     *       assertion will be thrown.
+     */
+    std::function<
+      int(double t, const VectorType &r, VectorType &z, double tol, int lr)>
+      mass_preconditioner_solve;
+
+    /**
+     * A function object that users may supply to set up a preconditioner
+     * specified in mass_preconditioner_solve().
+     *
+     * This function should prepare the solution of the preconditioner equation
+     * $Pz=r$. In this equation $P$ should approximate the mass matrix $M$.
+     *
+     * If the mass_preconditioner_setup() function is not provided, then
+     * mass_preconditioner_solve() should do all the work by itself.
+     *
+     * @note No assumption is made by this interface on what the user
+     *   should do in this function. ARKode only assumes that after a call to
+     *   mass_preconditioner_setup() it is possible to call
+     *   mass_preconditioner_solve().
+     *
+     * @param[in] t  The current time
+     *
+     * This function should return:
+     * - 0: Success
+     * - >0: Recoverable error, ARKode will reattempt the solution and call this
+     *       function again.
+     * - <0: Unrecoverable error, the computation will be aborted and an
+     *       assertion will be thrown.
+     */
+    std::function<int(double t)> mass_preconditioner_setup;
+#  endif
 
     /**
      * A function object that users may supply and that is intended to
@@ -793,12 +1185,12 @@ namespace SUNDIALS
      * polynomial interpolation of the solution, computed using the current ARK
      * order and the (internally stored) previously computed solution steps.
      *
-     * Notice that it is well possible that internally ARKode computes a time
-     * step which is much larger than the `output_period` step, and therefore
-     * calls this function consecutively several times by simply performing all
-     * intermediate interpolations. There is no relationship between how many
-     * times this function is called and how many time steps have actually been
-     * computed.
+     * @note It is well possible that internally ARKode computes a time
+     *   step which is much larger than the `output_period` step, and therefore
+     *   calls this function consecutively several times by simply performing
+     *   all intermediate interpolations. There is no relationship between how
+     *   many times this function is called and how many time steps have
+     *   actually been computed.
      */
     std::function<void(const double       t,
                        const VectorType & sol,
@@ -833,14 +1225,30 @@ namespace SUNDIALS
     std::function<VectorType &()> get_local_tolerances;
 
     /**
-     * Handle ARKode exceptions.
+     * A function object that users may supply and which is intended to perform
+     * custom settings on the supplied @p arkode_mem object. Refer to the
+     * SUNDIALS documentation for valid options.
+     *
+     * For instance, the following code attaches two files for diagnostic and
+     * error output of the internal ARKODE implementation:
+     *
+     * @code
+     *      ode.custom_setup = [&](void *arkode_mem) {
+     *        ARKStepSetErrFile(arkode_mem, errfile);
+     *        ARKStepSetDiagnostics(arkode_mem, diagnostics_file);
+     *      };
+     * @endcode
+     *
+     * @note This function will be called at the end of all other set up right
+     *   before the actual time evloution is started or continued with
+     *   solve_ode(). This function is also called when the solver is restarted,
+     *   see solver_should_restart(). Consult the SUNDIALS manual to see which
+     *   options are still available at this point.
+     *
+     * @param arkode_mem pointer to the ARKODE memory block which can be used
+     *   for custom calls to `ARKStepSet...` methods.
      */
-    DeclException1(ExcARKodeError,
-                   int,
-                   << "One of the SUNDIALS ARKode internal functions "
-                   << " returned a negative error code: " << arg1
-                   << ". Please consult SUNDIALS manual.");
-
+    std::function<void(void *arkode_mem)> custom_setup;
 
   private:
     /**
@@ -851,6 +1259,36 @@ namespace SUNDIALS
                    std::string,
                    << "Please provide an implementation for the function \""
                    << arg1 << "\"");
+
+    /**
+     * Internal routine to call ARKode repeatedly.
+     */
+    int
+    do_evolve_time(VectorType &          solution,
+                   dealii::DiscreteTime &time,
+                   const bool            do_reset);
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(4, 0, 0)
+
+    /**
+     * Set up the (non)linear solver and preconditioners in the ARKODE memory
+     * object based on the user-specified functions.
+     * @param solution The solution vector which is used as a template to create
+     *   new vectors.
+     */
+    void
+    setup_system_solver(const VectorType &solution);
+
+    /**
+     * Set up the solver and preconditioner for a non-identity mass matrix in
+     * the ARKODE memory object based on the user-specified functions.
+     * @param solution The solution vector which is used as a template to create
+     *   new vectors.
+     */
+    void
+    setup_mass_solver(const VectorType &solution);
+
+#  endif
 
     /**
      * This function is executed at construction time to set the
@@ -871,16 +1309,6 @@ namespace SUNDIALS
     void *arkode_mem;
 
     /**
-     * ARKode solution vector.
-     */
-    N_Vector yy;
-
-    /**
-     * ARKode absolute tolerances vector.
-     */
-    N_Vector abs_tolls;
-
-    /**
      * MPI communicator. SUNDIALS solver runs happily in
      * parallel. Note that if the library is compiled without MPI
      * support, MPI_Comm is aliased as int.
@@ -888,9 +1316,14 @@ namespace SUNDIALS
     MPI_Comm communicator;
 
     /**
-     * Memory pool of vectors.
+     * The final time in the last call to solve_ode().
      */
-    GrowingVectorMemory<VectorType> mem;
+    double last_end_time;
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(4, 0, 0)
+    std::unique_ptr<internal::LinearSolverWrapper<VectorType>> linear_solver;
+    std::unique_ptr<internal::LinearSolverWrapper<VectorType>> mass_solver;
+#  endif
 
 #  ifdef DEAL_II_WITH_PETSC
 #    ifdef PETSC_USE_COMPLEX
@@ -905,6 +1338,16 @@ namespace SUNDIALS
 #    endif // PETSC_USE_COMPLEX
 #  endif   // DEAL_II_WITH_PETSC
   };
+
+
+  /**
+   * Handle ARKode exceptions.
+   */
+  DeclException1(ExcARKodeError,
+                 int,
+                 << "One of the SUNDIALS ARKode internal functions "
+                 << " returned a negative error code: " << arg1
+                 << ". Please consult SUNDIALS manual.");
 
 } // namespace SUNDIALS
 

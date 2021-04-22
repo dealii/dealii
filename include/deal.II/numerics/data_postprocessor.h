@@ -24,6 +24,8 @@
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/tensor.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_update_flags.h>
 
 #include <deal.II/lac/vector.h>
@@ -99,18 +101,16 @@ namespace DataPostprocessorInputs
    * To make this work, the DataOut and related classes store in objects
    * of the current type a representation of the cell. To get it back out,
    * you would use the get_cell() function that requires you to say,
-   * as a template parameter, the DoFHandler type to which the cell that
-   * is currently being processed belongs. This is knowledge you typically
-   * have in an application: for example, if your application runs in
-   * @p dim space dimensions and you are currently using the DataOut class,
-   * then the cells that are worked on have data type
-   * <code>DataOut<dim>::cell_iterator</code>. Consequently, in a
-   * postprocessor, you can call
-   * <code>inputs.get_cell@<DoFHandler@<dim@> @> </code>. For technical
-   * reasons, however, C++ will typically require you to write this as
-   * <code>inputs.template get_cell@<DoFHandler@<dim@> @> </code>
-   * because the member function we call here requires that we explicitly
-   * provide the template argument.
+   * as a template parameter, the dimension of the cell that is currently
+   * being processed. This is knowledge you typically have in an
+   * application: for example, if your application runs in @p dim space
+   * dimensions and you are currently using the DataOut class, then the cells
+   * that are worked on have data type <code>DataOut<dim>::cell_iterator</code>.
+   * Consequently, in a postprocessor, you can call <code>inputs.get_cell@<dim@>
+   * </code>. For technical reasons, however, C++ will typically require you to
+   * write this as <code>inputs.template get_cell@<dim@> </code> because the
+   * member function we call here requires that we explicitly provide the
+   * template argument.
    *
    * Let us consider a complete example of a postprocessor that computes
    * the fluid norm of the stress $\|\sigma\| = \|\eta \nabla u\|$ from the
@@ -135,7 +135,7 @@ namespace DataPostprocessorInputs
    *        std::vector<Vector<double> > &computed_quantities) const override
    *       {
    *         const typename DoFHandler<dim>::cell_iterator current_cell =
-   *           input_data.template get_cell<DoFHandler<dim> >();
+   *           input_data.template get_cell<dim>();
    *         const viscosity = look_up_viscosity (current_cell->material_id());
    *
    *         for (unsigned int q=0; q<input_data.solution_gradients.size(); ++q)
@@ -188,8 +188,23 @@ namespace DataPostprocessorInputs
      * called by DataOut and similar classes when creating the object that
      * is then passed to DataPostprocessor.
      */
-    template <typename DoFHandlerType>
+    template <int dim>
     void
+    set_cell(const typename DoFHandler<dim, spacedim>::cell_iterator &cell);
+
+    /**
+     * Set the cell that is currently being used in evaluating the data
+     * for which the DataPostprocessor object is being called.
+     *
+     * This function is not usually called from user space, but is instead
+     * called by DataOut and similar classes when creating the object that
+     * is then passed to DataPostprocessor.
+     *
+     * @deprecated Use the equivalent function with the dim template parameter
+     * instead.
+     */
+    template <typename DoFHandlerType>
+    DEAL_II_DEPRECATED void
     set_cell(const typename DoFHandlerType::cell_iterator &cell);
 
     /**
@@ -197,8 +212,20 @@ namespace DataPostprocessorInputs
      * See the documentation of the current class for an example on how
      * to use this function.
      */
+    template <int dim>
+    typename DoFHandler<dim, spacedim>::cell_iterator
+    get_cell() const;
+
+    /**
+     * Query the cell on which we currently produce graphical output.
+     * See the documentation of the current class for an example on how
+     * to use this function.
+     *
+     * @deprecated Use the equivalent function with the dim template parameter
+     * instead.
+     */
     template <typename DoFHandlerType>
-    typename DoFHandlerType::cell_iterator
+    DEAL_II_DEPRECATED typename DoFHandlerType::cell_iterator
     get_cell() const;
 
   private:
@@ -696,7 +723,9 @@ private:
  * <h3> An example </h3>
  *
  * A common example of what one wants to do with postprocessors is to visualize
- * not just the value of the solution, but the gradient. Let's, for simplicity,
+ * not just the value of the solution, but the gradient. This is, in fact,
+ * precisely what step-19 needs, and it consequently uses the code below almost
+ * verbatim. Let's, for simplicity,
  * assume that you have only a scalar solution. In fact, because it's readily
  * available, let us simply take the step-6 solver to produce such a scalar
  * solution. The gradient is a vector (with exactly @p dim components), so the
@@ -1173,11 +1202,23 @@ namespace DataPostprocessorInputs
   CommonInputs<spacedim>::set_cell(
     const typename DoFHandlerType::cell_iterator &new_cell)
   {
+    return set_cell<DoFHandlerType::dimension>(new_cell);
+  }
+
+
+
+  template <int spacedim>
+  template <int dim>
+  void
+  CommonInputs<spacedim>::set_cell(
+    const typename DoFHandler<dim, spacedim>::cell_iterator &new_cell)
+  {
     // see if we had previously already stored a cell that has the same
     // data type; if so, reuse the memory location and avoid calling 'new'
     // inside boost::any
-    if (typename DoFHandlerType::cell_iterator *storage_location =
-          boost::any_cast<typename DoFHandlerType::cell_iterator>(&cell))
+    if (typename DoFHandler<dim, spacedim>::cell_iterator *storage_location =
+          boost::any_cast<typename DoFHandler<dim, spacedim>::cell_iterator>(
+            &cell))
       *storage_location = new_cell;
     else
       // if we had nothing stored before, or if we had stored a different
@@ -1192,13 +1233,23 @@ namespace DataPostprocessorInputs
   typename DoFHandlerType::cell_iterator
   CommonInputs<spacedim>::get_cell() const
   {
+    return get_cell<DoFHandlerType::dimension>();
+  }
+
+
+
+  template <int spacedim>
+  template <int dim>
+  typename DoFHandler<dim, spacedim>::cell_iterator
+  CommonInputs<spacedim>::get_cell() const
+  {
     Assert(cell.empty() == false,
            ExcMessage(
              "You are trying to access the cell associated with a "
              "DataPostprocessorInputs::Scalar object for which no cell has "
              "been set."));
-    Assert(boost::any_cast<typename DoFHandlerType::cell_iterator>(&cell) !=
-             nullptr,
+    Assert((boost::any_cast<typename DoFHandler<dim, spacedim>::cell_iterator>(
+              &cell) != nullptr),
            ExcMessage(
              "You are trying to access the cell associated with a "
              "DataPostprocessorInputs::Scalar with a DoFHandler type that is "
@@ -1208,7 +1259,9 @@ namespace DataPostprocessorInputs
              "current function with a template argument equal to "
              "DoFHandler<2, 3>, but not with any other class type or dimension "
              "template argument."));
-    return boost::any_cast<typename DoFHandlerType::cell_iterator>(cell);
+
+    return boost::any_cast<typename DoFHandler<dim, spacedim>::cell_iterator>(
+      cell);
   }
 } // namespace DataPostprocessorInputs
 

@@ -84,7 +84,7 @@ namespace internal
    * needs not allocate memory itself, or synchronize with other threads.
    *
    * The sizes of the arrays are initialized with the maximal number of
-   * entries necessary for the hp case. Within the loop over individual
+   * entries necessary for the hp-case. Within the loop over individual
    * cells, we then resize the arrays as necessary. Since for std::vector
    * resizing to a smaller size doesn't imply memory allocation, this is
    * fast.
@@ -195,7 +195,7 @@ namespace internal
 
     /**
      * Resize the arrays so that they fit the number of quadrature points
-     * associated with the given finite element index into the hp
+     * associated with the given finite element index into the hp-
      * collections.
      */
     void
@@ -700,7 +700,7 @@ namespace internal
                ExcInternalError());
 
         // get restriction of finite element function of @p{neighbor} to the
-        // common face. in the hp case, use the quadrature formula that
+        // common face. in the hp-case, use the quadrature formula that
         // matches the one we would use for the present cell
         fe_face_values_neighbor.reinit(neighbor,
                                        neighbor_neighbor,
@@ -881,7 +881,7 @@ namespace internal
     local_face_integrals.clear();
 
     // loop over all faces of this cell
-    for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
+    for (const unsigned int face_no : cell->face_indices())
       {
         const typename DoFHandler<dim, spacedim>::face_iterator face =
           cell->face(face_no);
@@ -1055,7 +1055,7 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   const types::material_id  material_id,
   const Strategy            strategy)
 {
-  estimate(StaticMappingQ1<dim, spacedim>::mapping,
+  estimate(get_default_linear_mapping(dof_handler.get_triangulation()),
            dof_handler,
            quadrature,
            neumann_bc,
@@ -1125,7 +1125,7 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   const types::material_id  material_id,
   const Strategy            strategy)
 {
-  estimate(StaticMappingQ1<dim, spacedim>::mapping,
+  estimate(get_default_linear_mapping(dof_handler.get_triangulation()),
            dof_handler,
            quadrature,
            neumann_bc,
@@ -1290,7 +1290,7 @@ KellyErrorEstimator<dim, spacedim>::estimate(
         const unsigned int present_cell = cell->active_cell_index();
 
         // loop over all faces of this cell
-        for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
+        for (const unsigned int face_no : cell->face_indices())
           {
             Assert(face_integrals.find(cell->face(face_no)) !=
                      face_integrals.end(),
@@ -1370,7 +1370,7 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   const types::material_id                material_id,
   const Strategy                          strategy)
 {
-  estimate(StaticMappingQ1<dim, spacedim>::mapping,
+  estimate(get_default_linear_mapping(dof_handler.get_triangulation()),
            dof_handler,
            quadrature,
            neumann_bc,
@@ -1404,7 +1404,7 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   const types::material_id                material_id,
   const Strategy                          strategy)
 {
-  estimate(StaticMappingQ1<dim, spacedim>::mapping,
+  estimate(get_default_linear_mapping(dof_handler.get_triangulation()),
            dof_handler,
            quadrature,
            neumann_bc,

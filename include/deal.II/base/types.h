@@ -150,6 +150,11 @@ namespace types
    * @ref GlossMaterialId "Glossary entry on material indicators"
    */
   using material_id = unsigned int;
+
+  /**
+   * The type used to denote geometric entity types.
+   */
+  using geometric_entity_type = std::uint8_t;
 } // namespace types
 
 /**
@@ -249,20 +254,6 @@ namespace numbers
    */
   const types::boundary_id internal_face_boundary_id =
     static_cast<types::boundary_id>(-1);
-
-  /**
-   * Invalid manifold_id which we need in several places as a default value.
-   * We assume that all valid manifold_ids lie in the range [0,
-   * invalid_manifold_id).
-   *
-   * @deprecated Use flat_manifold_id instead.
-   *
-   * @see
-   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
-   */
-  DEAL_II_DEPRECATED
-  const types::manifold_id invalid_manifold_id =
-    static_cast<types::manifold_id>(-1);
 
   /**
    * A manifold_id we reserve for the default flat Cartesian manifold.

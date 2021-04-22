@@ -28,6 +28,7 @@ namespace python
 {
   class PointWrapper;
   class TriangulationWrapper;
+  class CellTypeWrapper;
 
   class CellAccessorWrapper
   {
@@ -183,6 +184,26 @@ namespace python
      */
     unsigned int
     vertex_index(const unsigned int i) const;
+
+    /*! @copydoc TriaAccessor::reference_cell
+     */
+    CellTypeWrapper
+    reference_cell() const;
+
+    /*! @copydoc TriaAccessor::n_vertices
+     */
+    unsigned int
+    n_vertices() const;
+
+    /*! @copydoc TriaAccessor::n_lines
+     */
+    unsigned int
+    n_lines() const;
+
+    /*! @copydoc TriaAccessor::n_faces
+     */
+    unsigned int
+    n_faces() const;
 
     /**
      * Exception.

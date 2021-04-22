@@ -35,11 +35,11 @@
 #include <deal.II/distributed/cell_weights.h>
 #include <deal.II/distributed/shared_tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include "../tests.h"
 
@@ -62,13 +62,15 @@ test()
   fe_collection.push_back(FE_Q<dim>(1));
   fe_collection.push_back(FE_Q<dim>(5));
 
-  hp::DoFHandler<dim> dh(tria);
-  dh.set_fe(fe_collection);
+  DoFHandler<dim> dh(tria);
+
   // default: active_fe_index = 0
   for (auto &cell : dh.active_cell_iterators())
     if (cell->is_locally_owned())
       if (cell->id().to_string() == "0_2:00")
         cell->set_active_fe_index(1);
+
+  dh.distribute_dofs(fe_collection);
 
   deallog << "Number of cells before repartitioning: "
           << tria.n_locally_owned_active_cells() << std::endl;
@@ -107,18 +109,21 @@ test()
   GridGenerator::hyper_cube(other_tria);
   other_tria.refine_global(3);
 
-  dh.initialize(other_tria, fe_collection);
+  dh.reinit(other_tria);
+  dh.distribute_dofs(fe_collection);
 
   try
     {
       tria.execute_coarsening_and_refinement();
     }
-  catch (ExcMessage &)
+  catch (const ExceptionBase &e)
     {
-      deallog << "Triangulation changed" << std::endl;
+      deallog << e.get_exc_name() << std::endl;
     }
 #else
-  deallog << "Triangulation changed" << std::endl;
+  deallog
+    << "ExcMessage(\"Triangulation associated with the DoFHandler has changed!\")"
+    << std::endl;
 #endif
 
   // make sure no processor is hanging
@@ -133,6 +138,8 @@ main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    log;
+
+  deal_II_exceptions::disable_abort_on_exception();
 
   deallog.push("2d");
   test<2>();

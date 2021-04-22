@@ -45,7 +45,7 @@ namespace hp
    * The whole process of working with objects of this type is explained in
    * step-27. Many of the algorithms this class implements are described in
    * the
-   * @ref hp_paper "hp paper".
+   * @ref hp_paper "hp-paper".
    *
    *
    * <h3>Active FE indices and their behavior under mesh refinement</h3>
@@ -119,44 +119,13 @@ namespace hp
    * @ingroup dofs
    * @ingroup hp
    *
-   * @note Task is delegated to the base class dealii::DoFHandler.
+   * @deprecated The basic dealii::DoFHandler is capable of hp-adaptation now.
    */
   template <int dim, int spacedim = dim>
-  class DoFHandler : public dealii::DoFHandler<dim, spacedim>
+  class DEAL_II_DEPRECATED DoFHandler : public dealii::DoFHandler<dim, spacedim>
   {
-  public:
-    /**
-     * Default Constructor.
-     *
-     * @deprecated Use dealii::DoFHandler(true) instead.
-     */
-    DEAL_II_DEPRECATED
-    DoFHandler();
-
-    /**
-     * Constructor. Take @p tria as the triangulation to work on.
-     *
-     * @deprecated Use dealii::DoFHandler(tria, true) instead.
-     */
-    DEAL_II_DEPRECATED
-    DoFHandler(const Triangulation<dim, spacedim> &tria);
-
-    /**
-     * Copy constructor. DoFHandler objects are large and expensive.
-     * They should not be copied, in particular not by accident, but
-     * rather deliberately constructed. As a consequence, this constructor
-     * is explicitly removed from the interface of this class.
-     */
-    DoFHandler(const DoFHandler &) = delete;
-
-    /**
-     * Copy operator. DoFHandler objects are large and expensive.
-     * They should not be copied, in particular not by accident, but
-     * rather deliberately constructed. As a consequence, this operator
-     * is explicitly removed from the interface of this class.
-     */
-    DoFHandler &
-    operator=(const DoFHandler &) = delete;
+    using dealii::DoFHandler<dim, spacedim>::DoFHandler;
+    using dealii::DoFHandler<dim, spacedim>::operator=;
   };
 
 } // namespace hp

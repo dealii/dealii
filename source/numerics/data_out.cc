@@ -45,7 +45,7 @@ namespace internal
       const unsigned int               n_datasets,
       const unsigned int               n_subdivisions,
       const std::vector<unsigned int> &n_postprocessor_outputs,
-      const Mapping<dim, spacedim> &   mapping,
+      const dealii::hp::MappingCollection<dim, spacedim> &mapping,
       const std::vector<
         std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
         &                                           finite_elements,
@@ -98,19 +98,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                                DoFHandlerType::space_dimension>
     patch;
   patch.n_subdivisions = n_subdivisions;
-
-  // set the vertices of the patch. if the mapping does not preserve locations
-  // (e.g. MappingQEulerian), we need to compute the offset of the vertex for
-  // the graphical output. Otherwise, we can just use the vertex info.
-  for (const unsigned int vertex :
-       GeometryInfo<DoFHandlerType::dimension>::vertex_indices())
-    if (scratch_data.mapping_collection[0].preserves_vertex_locations())
-      patch.vertices[vertex] = cell_and_index->first->vertex(vertex);
-    else
-      patch.vertices[vertex] =
-        scratch_data.mapping_collection[0].transform_unit_to_real_cell(
-          cell_and_index->first,
-          GeometryInfo<DoFHandlerType::dimension>::unit_cell_vertex(vertex));
+  patch.reference_cell = cell_and_index->first->reference_cell();
 
   // initialize FEValues
   scratch_data.reinit_all_fe_values(this->dof_data, cell_and_index->first);
@@ -118,7 +106,32 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
   const FEValuesBase<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
     &fe_patch_values = scratch_data.get_present_fe_values(0);
 
+  // set the vertices of the patch. if the mapping does not preserve locations
+  // (e.g. MappingQEulerian), we need to compute the offset of the vertex for
+  // the graphical output. Otherwise, we can just use the vertex info.
+  for (const unsigned int vertex : cell_and_index->first->vertex_indices())
+    if (scratch_data.mapping_collection[0].preserves_vertex_locations())
+      patch.vertices[vertex] = cell_and_index->first->vertex(vertex);
+    else
+      patch.vertices[vertex] =
+        fe_patch_values.get_mapping().transform_unit_to_real_cell(
+          cell_and_index->first,
+          GeometryInfo<DoFHandlerType::dimension>::unit_cell_vertex(vertex));
+
   const unsigned int n_q_points = fe_patch_values.n_quadrature_points;
+
+  scratch_data.patch_values_scalar.solution_values.resize(n_q_points);
+  scratch_data.patch_values_scalar.solution_gradients.resize(n_q_points);
+  scratch_data.patch_values_scalar.solution_hessians.resize(n_q_points);
+  scratch_data.patch_values_system.solution_values.resize(n_q_points);
+  scratch_data.patch_values_system.solution_gradients.resize(n_q_points);
+  scratch_data.patch_values_system.solution_hessians.resize(n_q_points);
+
+  for (unsigned int dataset = 0;
+       dataset < scratch_data.postprocessed_values.size();
+       ++dataset)
+    if (scratch_data.postprocessed_values[dataset].size() != 0)
+      scratch_data.postprocessed_values[dataset].resize(n_q_points);
 
   // First fill the geometric information for the patch: Where are the
   // nodes in question located.
@@ -133,7 +146,9 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
   if (curved_cell_region == curved_inner_cells ||
       (curved_cell_region == curved_boundary &&
        (cell_and_index->first->at_boundary() ||
-        (DoFHandlerType::dimension != DoFHandlerType::space_dimension))))
+        (DoFHandlerType::dimension != DoFHandlerType::space_dimension))) ||
+      (cell_and_index->first->reference_cell() !=
+       ReferenceCells::get_hypercube<dim>()))
     {
       Assert(patch.space_dim == DoFHandlerType::space_dimension,
              ExcInternalError());
@@ -230,8 +245,8 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                     cell_and_index->first->level(),
                     cell_and_index->first->index(),
                     dataset->dof_handler);
-                  scratch_data.patch_values_scalar
-                    .template set_cell<DoFHandlerType>(dh_cell);
+                  scratch_data.patch_values_scalar.template set_cell<dim>(
+                    dh_cell);
 
                   // Finally call the postprocessor's function that
                   // deals with scalar inputs.
@@ -654,8 +669,8 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                     cell_and_index->first->level(),
                     cell_and_index->first->index(),
                     dataset->dof_handler);
-                  scratch_data.patch_values_system
-                    .template set_cell<DoFHandlerType>(dh_cell);
+                  scratch_data.patch_values_system.template set_cell<dim>(
+                    dh_cell);
 
                   // Whether the solution was complex-scalar or
                   // complex-vector-valued doesn't matter -- we took it apart
@@ -1009,8 +1024,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
     }
 
 
-  for (const unsigned int f :
-       GeometryInfo<DoFHandlerType::dimension>::face_indices())
+  for (const unsigned int f : cell_and_index->first->face_indices())
     {
       // let's look up whether the neighbor behind that face is noted in the
       // table of cells which we treat. this can only happen if the neighbor
@@ -1070,10 +1084,14 @@ template <int dim, typename DoFHandlerType>
 void
 DataOut<dim, DoFHandlerType>::build_patches(const unsigned int n_subdivisions)
 {
-  build_patches(StaticMappingQ1<DoFHandlerType::dimension,
-                                DoFHandlerType::space_dimension>::mapping,
-                n_subdivisions,
-                no_curved_cells);
+  AssertDimension(this->triangulation->get_reference_cells().size(), 1);
+
+  build_patches(
+    this->triangulation->get_reference_cells()[0]
+      .template get_default_linear_mapping<DoFHandlerType::dimension,
+                                           DoFHandlerType::space_dimension>(),
+    n_subdivisions,
+    no_curved_cells);
 }
 
 
@@ -1085,6 +1103,23 @@ DataOut<dim, DoFHandlerType>::build_patches(
     &                    mapping,
   const unsigned int     n_subdivisions_,
   const CurvedCellRegion curved_region)
+{
+  hp::MappingCollection<DoFHandlerType::dimension,
+                        DoFHandlerType::space_dimension>
+    mapping_collection(mapping);
+
+  build_patches(mapping_collection, n_subdivisions_, curved_region);
+}
+
+
+
+template <int dim, typename DoFHandlerType>
+void
+DataOut<dim, DoFHandlerType>::build_patches(
+  const hp::MappingCollection<DoFHandlerType::dimension,
+                              DoFHandlerType::space_dimension> &mapping,
+  const unsigned int                                            n_subdivisions_,
+  const CurvedCellRegion                                        curved_region)
 {
   // Check consistency of redundant template parameter
   Assert(dim == DoFHandlerType::dimension,

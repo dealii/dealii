@@ -1,0 +1,15 @@
+set Final time                        = 1.
+set Initial time                      = 0.
+set Time interval between each output = 0.1
+subsection Error control
+  set Absolute error tolerance = 0.000001
+  set Relative error tolerance = 0.000010
+end
+subsection Running parameters
+  set Implicit function is linear            = true
+  set Implicit function is time independent  = true
+  set Initial step size                      = 0.010000
+  set Maximum number of nonlinear iterations = 10
+  set Maximum order of ARK                   = 5
+  set Minimum step size                      = 0.000001
+end

@@ -54,7 +54,7 @@ namespace NonMatching
      * Mapping and quadrature are those of this second triangulation.
      *
      * If the triangulation inside @p cache is parallel, only points lying over
-     * locally onwed cells are returned. This is why a vector of unsigned int
+     * locally owned cells are returned. This is why a vector of unsigned int
      * is returned: it describes the indices of cells from the immersed
      * triangulation which have been used (relative to a loop over al cells). If
      * embedding triangulation is not parallel, all cells shall be used.
@@ -231,8 +231,8 @@ namespace NonMatching
     const auto &immersed_fe = immersed_dh.get_fe();
 
     // Dof indices
-    std::vector<types::global_dof_index> dofs(immersed_fe.dofs_per_cell);
-    std::vector<types::global_dof_index> odofs(space_fe.dofs_per_cell);
+    std::vector<types::global_dof_index> dofs(immersed_fe.n_dofs_per_cell());
+    std::vector<types::global_dof_index> odofs(space_fe.n_dofs_per_cell());
 
     // Take care of components
     const ComponentMask space_c =
@@ -275,14 +275,14 @@ namespace NonMatching
     // the version with the dof_mask, this should be uncommented.
     //
     // // Construct a dof_mask, used to distribute entries to the sparsity
-    // able< 2, bool > dof_mask(space_fe.dofs_per_cell,
-    //                          immersed_fe.dofs_per_cell);
+    // able< 2, bool > dof_mask(space_fe.n_dofs_per_cell(),
+    //                          immersed_fe.n_dofs_per_cell());
     // of_mask.fill(false);
-    // or (unsigned int i=0; i<space_fe.dofs_per_cell; ++i)
+    // or (unsigned int i=0; i<space_fe.n_dofs_per_cell(); ++i)
     //  {
     //    const auto comp_i = space_fe.system_to_component_index(i).first;
     //    if (space_gtl[comp_i] != numbers::invalid_unsigned_int)
-    //      for (unsigned int j=0; j<immersed_fe.dofs_per_cell; ++j)
+    //      for (unsigned int j=0; j<immersed_fe.n_dofs_per_cell(); ++j)
     //        {
     //          const auto comp_j =
     //          immersed_fe.system_to_component_index(j).first; if
@@ -416,8 +416,8 @@ namespace NonMatching
     const auto &immersed_fe = immersed_dh.get_fe();
 
     // Dof indices
-    std::vector<types::global_dof_index> dofs(immersed_fe.dofs_per_cell);
-    std::vector<types::global_dof_index> odofs(space_fe.dofs_per_cell);
+    std::vector<types::global_dof_index> dofs(immersed_fe.n_dofs_per_cell());
+    std::vector<types::global_dof_index> odofs(space_fe.n_dofs_per_cell());
 
     // Take care of components
     const ComponentMask space_c =
@@ -446,7 +446,8 @@ namespace NonMatching
         immersed_gtl[i] = j++;
 
     FullMatrix<typename Matrix::value_type> cell_matrix(
-      space_dh.get_fe().dofs_per_cell, immersed_dh.get_fe().dofs_per_cell);
+      space_dh.get_fe().n_dofs_per_cell(),
+      immersed_dh.get_fe().n_dofs_per_cell());
 
     FEValues<dim1, spacedim> fe_v(immersed_mapping,
                                   immersed_dh.get_fe(),
@@ -576,14 +577,15 @@ namespace NonMatching
                 // Reset the matrices.
                 cell_matrix = typename Matrix::value_type();
 
-                for (unsigned int i = 0; i < space_dh.get_fe().dofs_per_cell;
+                for (unsigned int i = 0;
+                     i < space_dh.get_fe().n_dofs_per_cell();
                      ++i)
                   {
                     const auto comp_i =
                       space_dh.get_fe().system_to_component_index(i).first;
                     if (space_gtl[comp_i] != numbers::invalid_unsigned_int)
                       for (unsigned int j = 0;
-                           j < immersed_dh.get_fe().dofs_per_cell;
+                           j < immersed_dh.get_fe().n_dofs_per_cell();
                            ++j)
                         {
                           const auto comp_j = immersed_dh.get_fe()
@@ -676,8 +678,8 @@ namespace NonMatching
     const auto &fe1 = dh1.get_fe();
 
     // Dof indices
-    std::vector<types::global_dof_index> dofs0(fe0.dofs_per_cell);
-    std::vector<types::global_dof_index> dofs1(fe1.dofs_per_cell);
+    std::vector<types::global_dof_index> dofs0(fe0.n_dofs_per_cell());
+    std::vector<types::global_dof_index> dofs1(fe1.n_dofs_per_cell());
 
     if (outer_loop_on_zero)
       {
@@ -829,12 +831,12 @@ namespace NonMatching
                                     update_quadrature_points);
 
     // Dof indices
-    std::vector<types::global_dof_index> dofs0(fe0.dofs_per_cell);
-    std::vector<types::global_dof_index> dofs1(fe1.dofs_per_cell);
+    std::vector<types::global_dof_index> dofs0(fe0.n_dofs_per_cell());
+    std::vector<types::global_dof_index> dofs1(fe1.n_dofs_per_cell());
 
     // Local Matrix
-    FullMatrix<typename Matrix::value_type> cell_matrix(fe0.dofs_per_cell,
-                                                        fe1.dofs_per_cell);
+    FullMatrix<typename Matrix::value_type> cell_matrix(fe0.n_dofs_per_cell(),
+                                                        fe1.n_dofs_per_cell());
 
     // Global to local indices
     const auto p =
@@ -851,7 +853,7 @@ namespace NonMatching
         {
           kernel.set_center(fev0.quadrature_point(q0));
           kernel.value_list(fev1.get_quadrature_points(), kernel_values);
-          for (unsigned int j = 0; j < fe1.dofs_per_cell; ++j)
+          for (unsigned int j = 0; j < fe1.n_dofs_per_cell(); ++j)
             {
               const auto comp_j = fe1.system_to_component_index(j).first;
 
@@ -866,7 +868,7 @@ namespace NonMatching
               // Now compute the main integral with the sum over q1 already
               // completed - this gives a cubic complexity as usual rather
               // than a quartic one with naive loops
-              for (unsigned int i = 0; i < fe0.dofs_per_cell; ++i)
+              for (unsigned int i = 0; i < fe0.n_dofs_per_cell(); ++i)
                 {
                   const auto comp_i = fe0.system_to_component_index(i).first;
                   if (gtl0[comp_i] != numbers::invalid_unsigned_int &&

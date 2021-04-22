@@ -218,6 +218,81 @@ private:
    */
   Table<3, double> interior_weights;
 
+  /**
+   * Fill the necessary tables defined in base classes such as
+   * <code>adjust_quad_dof_index_for_face_orientation_table</code> declared in
+   * fe.cc. We need to fill it with the correct values in case of non-standard,
+   * flipped (rotated by +180 degrees) or rotated (rotated by +90 degrees)
+   *faces. These are given in the form three flags (face_orientation, face_flip,
+   * face_rotation), see the documentation in GeometryInfo<dim> and
+   * this @ref GlossFaceOrientation "glossary entry on face orientation".
+   *
+   * <h3>Example: Raviart-Thomas Elements of order 2 (tensor polynomial
+   * degree 3)</h3>
+   *
+   * The dofs on a face are connected to a $n\times n$
+   * matrix where here <code>n=3</code>. In our example we can imagine the
+   * following dofs on a quad (face):
+   *
+   * @verbatim
+   *  ___________
+   * |           |
+   * |  6  7  8  |
+   * |           |
+   * |  3  4  5  |
+   * |           |
+   * |  0  1  2  |
+   * |___________|
+   *@endverbatim
+   *
+   * We have for a local <code>face_dof_index=i+n*j</code> with index
+   * <code>i</code> in x-direction and index <code>j</code> in y-direction
+   * running from 0 to <code>n-1</code>.  To extract <code>i</code> and
+   * <code>j</code> we can use <code>i = face_dof_index % n</code> and <code>j =
+   * dof_index / n</code> (integer division). The indices <code>i</code> and
+   * <code>j</code> can then be used to compute the offset.
+   *
+   * For our example of Raviart-Thomas elements this means if if the
+   * switches are <code>(true | true | true)</code> that means we rotate the
+   * face first by + 90 degree(counterclockwise) then by another +180
+   * degrees but we do not flip it since the face has standard
+   * orientation. The flip axis is the diagonal from the lower left to the upper
+   * right corner of the face. With these flags the configuration above becomes:
+   *
+   *@verbatim
+   *  ___________
+   * |           |
+   * |  2  5  8  |
+   * |           |
+   * |  1  4  7  |
+   * |           |
+   * |  0  3  6  |
+   * |___________|
+   * @endverbatim
+   *
+   * Note that the necessity of a permutation depends on the combination of the
+   * three flags.
+   *
+   * There is also a pattern for the sign change of the permuted shape functions
+   * that depends on the combination of the switches. In the above example it
+   * would be
+   *
+   * @verbatim
+   *  ___________
+   * |           |
+   * |  +  -  +  |
+   * |           |
+   * |  +  -  +  |
+   * |           |
+   * |  +  -  +  |
+   * |___________|
+   * @endverbatim
+   *
+   * The relevant table for the sign changes is declared in FE_PolyTensor.
+   */
+  void
+  initialize_quad_dof_index_permutation_and_sign_change();
+
   // Allow access from other dimensions.
   template <int dim1>
   friend class FE_RaviartThomas;
@@ -290,12 +365,15 @@ public:
 
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim> &source,
-                                FullMatrix<double> &matrix) const override;
+                                FullMatrix<double> &      matrix,
+                                const unsigned int face_no = 0) const override;
 
   virtual void
-  get_subface_interpolation_matrix(const FiniteElement<dim> &source,
-                                   const unsigned int        subface,
-                                   FullMatrix<double> &matrix) const override;
+  get_subface_interpolation_matrix(
+    const FiniteElement<dim> &source,
+    const unsigned int        subface,
+    FullMatrix<double> &      matrix,
+    const unsigned int        face_no = 0) const override;
   virtual bool
   hp_constraints_are_implemented() const override;
 
@@ -306,7 +384,8 @@ public:
   hp_line_dof_identities(const FiniteElement<dim> &fe_other) const override;
 
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_quad_dof_identities(const FiniteElement<dim> &fe_other) const override;
+  hp_quad_dof_identities(const FiniteElement<dim> &fe_other,
+                         const unsigned int        face_no = 0) const override;
 
   /**
    * @copydoc FiniteElement::compare_for_domination()
@@ -342,6 +421,7 @@ private:
   virtual bool
   has_support_on_face(const unsigned int shape_index,
                       const unsigned int face_index) const override;
+
   /**
    * Initialize the FiniteElement<dim>::generalized_support_points and
    * FiniteElement<dim>::generalized_face_support_points fields. Called from
@@ -353,6 +433,12 @@ private:
    */
   void
   initialize_support_points(const unsigned int rt_degree);
+
+  /**
+   * Initialize the permutation pattern and the pattern of sign change.
+   */
+  void
+  initialize_quad_dof_index_permutation_and_sign_change();
 };
 
 

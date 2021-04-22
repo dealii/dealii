@@ -256,6 +256,12 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-19</td>
+ *       <td> Coupling particles to the solution of partial differential equations.
+ *       <br/> Keywords: Particles
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-20</td>
  *       <td> Mixed finite elements. Using block
  *       matrices and block vectors to define more complicated solvers and
@@ -268,7 +274,7 @@
  *       <td>step-21</td>
  *       <td> The time dependent two-phase flow in
  *       porous media. Extensions of mixed Laplace discretizations. More
- *       complicated block solvers. Simple explicit (forward Euler) time 
+ *       complicated block solvers. Simple explicit (forward Euler) time
  *       stepping.
  *       <br/> Keywords: TensorFunction, FE_RaviartThomas,
  *       VectorTools::project(), DiscreteTime
@@ -287,7 +293,7 @@
  *   <tr valign="top">
  *       <td>step-23</td>
  *       <td> Finally a "real" time dependent problem, the wave equation.
- *       Fractional time stepping (explicit, fully implicit and Crank-Nicholson 
+ *       Fractional time stepping (explicit, fully implicit and Crank-Nicholson
  *       method).
  *       <br/> Keywords: MatrixCreator, VectorTools::project()
  *       </td></tr>
@@ -319,8 +325,8 @@
  *
  *   <tr valign="top">
  *       <td>step-27</td>
- *       <td> The hp finite element method.
- *       <br/> Keywords: hp::DoFHandler, hp::FECollection, hp::QCollection,
+ *       <td> The hp-finite element method.
+ *       <br/> Keywords: hp::FECollection, hp::QCollection, hp::Refinement,
  *       FESeries::Fourier, Triangulation::create_triangulation()
  *       </td></tr>
  *
@@ -570,9 +576,16 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-68</td>
+ *        <td> Simulation of the motion of massless tracer particles in a vortical flow.
+ *             Parallel simulation of the advection of particles with load balancing.
+ *        <br/> Keywords: Particles
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-69</td>
  *        <td> Hyperbolic conservation laws: a first-order guaranteed maximum
- *        wavespeed method for the compressible Euler equations. Explicit time 
+ *        wavespeed method for the compressible Euler equations. Explicit time
  *        stepping.
  *       </td></tr>
  *
@@ -581,6 +594,13 @@
  *       <td> A fluid structure interaction problem on fully distributed
  *       non-matching grids, using penalty methods, and a coupling constructed
  *       through a ParticleHandler object.
+ *       <br/> Keywords: Particles
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-74</td>
+ *       <td> The Symmetric interior penalty Galerkin (SIPG) method for Poisson's equation.
+ *       <br/> Keywords: MeshWorker::mesh_loop(), FEInterfaceValues, ConvergenceTable
  *       </td></tr>
  *
  * </table>
@@ -791,7 +811,8 @@
  *       step-9,
  *       step-14,
  *       step-39,
- *       step-50
+ *       step-50,
+ *       step-74
  *     </td>
  *   </tr>
  *
@@ -823,12 +844,13 @@
  *       step-51,
  *       step-59,
  *       step-61,
- *       step-67
+ *       step-67,
+ *       step-74
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
- *     <td> hp finite elements
+ *     <td> hp-finite elements
  *     </td>
  *     <td>
  *       step-27,
@@ -913,6 +935,16 @@
  *     </td>
  *     <td>
  *       step-62
+ *     </td>
+ *   </tr>
+ *
+ *   <tr valign="top">
+ *     <td> Particles
+ *     </td>
+ *     <td>
+ *     step-19,
+ *     step-68,
+ *     step-70
  *     </td>
  *   </tr>
  *

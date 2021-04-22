@@ -38,11 +38,8 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
@@ -221,9 +218,7 @@ namespace Step13
       bool evaluation_point_found = false;
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (!evaluation_point_found)
-          for (unsigned int vertex = 0;
-               vertex < GeometryInfo<dim>::vertices_per_cell;
-               ++vertex)
+          for (const auto vertex : cell->vertex_indices())
             if (cell->vertex(vertex) == evaluation_point)
               {
                 // In order to extract the point value from the global solution
@@ -876,7 +871,7 @@ namespace Step13
       AssemblyScratchData &                                 scratch_data,
       AssemblyCopyData &                                    copy_data) const
     {
-      const unsigned int dofs_per_cell = fe->dofs_per_cell;
+      const unsigned int dofs_per_cell = fe->n_dofs_per_cell();
       const unsigned int n_q_points    = quadrature->size();
 
       copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
@@ -1052,7 +1047,7 @@ namespace Step13
                               update_values | update_quadrature_points |
                                 update_JxW_values);
 
-      const unsigned int dofs_per_cell = this->fe->dofs_per_cell;
+      const unsigned int dofs_per_cell = this->fe->n_dofs_per_cell();
       const unsigned int n_q_points    = this->quadrature->size();
 
       Vector<double>                       cell_rhs(dofs_per_cell);

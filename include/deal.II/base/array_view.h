@@ -21,15 +21,19 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_space.h>
 #include <deal.II/base/symmetric_tensor.h>
-#include <deal.II/base/table.h>
 #include <deal.II/base/tensor.h>
-
-#include <deal.II/lac/lapack_full_matrix.h>
 
 #include <type_traits>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
+
+// Forward declaration
+template <int N, typename T>
+class Table;
+
+template <typename number>
+class LAPACKFullMatrix;
 
 
 /**
@@ -67,8 +71,9 @@ DEAL_II_NAMESPACE_OPEN
  * therefore changes the std::vector object itself -- consequently, the
  * std::vector::operator[] is non-@p const.
  *
- * @note This class is similar to std::span, but the latter is only
- *  available in C++20.
+ * @note This class is similar to
+ *   [`std::span`](https://en.cppreference.com/w/cpp/container/span), but the
+ *   latter is only available starting in C++20.
  *
  * @ingroup data
  */
@@ -131,7 +136,8 @@ public:
                             MemorySpaceType> &view);
 
   /**
-   * A constructor that automatically creates a view from a value_type object.
+   * A constructor that automatically creates a view from a single value_type
+   * object. The view so created then has length one.
    */
   explicit ArrayView(value_type &element);
 
@@ -167,6 +173,23 @@ public:
    *   such as <code>ArrayView@<double@></code>.
    */
   ArrayView(std::vector<typename std::remove_cv<value_type>::type> &vector);
+
+  /**
+   * A constructor that automatically creates a view for a given C-style array.
+   * This constructor can be used as follows:
+   * @code
+   *   ArrayView<const int>
+   *   get_data_table ()
+   *   {
+   *     static const int my_data[7] = { 1, 1, 2, 3, 5, 8, 13 };
+   *     return {my_data};
+   *   }
+   * @endcode
+   * The object so returned is then a view of the array, with the size 7
+   * correctly deduced.
+   */
+  template <std::size_t N>
+  ArrayView(value_type (&array)[N]);
 
   /**
    * A constructor that automatically creates a view from a std::array object.
@@ -342,9 +365,10 @@ namespace internal
         {
           AssertCuda(cuda_error);
           if (std::is_same<MemorySpaceType, MemorySpace::Host>::value)
-            return attributes.memoryType == cudaMemoryTypeHost;
+            return (attributes.type == cudaMemoryTypeHost) ||
+                   (attributes.type == cudaMemoryTypeUnregistered);
           else
-            return attributes.memoryType == cudaMemoryTypeDevice;
+            return attributes.type == cudaMemoryTypeDevice;
         }
       else
         {
@@ -467,6 +491,15 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
                 "only create an ArrayView to const values from a const "
                 "std::array.");
 }
+
+
+
+template <typename ElementType, typename MemorySpaceType>
+template <std::size_t N>
+inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
+  ElementType (&array)[N])
+  : ArrayView(&array[0], N)
+{}
 
 
 

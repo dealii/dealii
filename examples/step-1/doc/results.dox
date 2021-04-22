@@ -32,7 +32,7 @@ has found its way into the literature: see @cite Mu05. Apparently it is
 good for some things at least.)
 
 
-<h3> Possible extensions </h3>
+<h3> Possibilities for extensions </h3>
 
 <h4> Different adaptive refinement strategies </h4>
 
@@ -53,6 +53,19 @@ returns a Point<2> object; subscripting <code>[0]</code> would give
 the $x$-coordinate, subscripting <code>[1]</code> the
 $y$-coordinate). By looking at the functions that TriaAccessor
 provides, you can also use more complicated criteria for refinement.
+
+In general, what you can do with operations of the form
+`cell->something()` is a bit difficult to find in the documentation
+because `cell` is not a pointer but an iterator. The functions you can
+call on a cell can be found in the documentation of the classes
+`TriaAccessor` (which has functions that can also be called on faces
+of cells or, more generally, all sorts of geometric objects that
+appear in a triangulation), and `CellAccessor` (which adds a few
+functions that are specific to *cells*).
+
+A more thorough description of the whole iterator concept can be found
+in the @ref Iterators documentation module.
+
 
 <h4> Different geometries </h4>
 

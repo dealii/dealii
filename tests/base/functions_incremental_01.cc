@@ -18,6 +18,8 @@
 
 #include <deal.II/base/incremental_function.h>
 
+#include <deal.II/lac/vector.h>
+
 #include "../tests.h"
 
 // homogeneous linear in time function

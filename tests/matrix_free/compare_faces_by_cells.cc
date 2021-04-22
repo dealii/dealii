@@ -51,7 +51,7 @@ template <int dim,
 class LaplaceOperator : public Subscriptor
 {
 public:
-  typedef number value_type;
+  using value_type = number;
 
   LaplaceOperator(){};
 
@@ -97,7 +97,7 @@ public:
     LinearAlgebra::distributed::Vector<number> &result) const
   {
     int dummy;
-    result.zero_out_ghosts();
+    result.zero_out_ghost_values();
     data.cell_loop(&LaplaceOperator::local_diagonal_by_cell,
                    this,
                    result,

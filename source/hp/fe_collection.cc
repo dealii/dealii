@@ -28,28 +28,28 @@ namespace hp
     const std::set<unsigned int> &fes,
     const unsigned int            codim) const
   {
+#ifdef DEBUG
     // Validate user inputs.
     Assert(codim <= dim, ExcImpossibleInDim(dim));
+    Assert(this->size() > 0, ExcEmptyObject());
     for (const auto &fe : fes)
-      {
-        (void)fe;
-        AssertIndexRange(fe, finite_elements.size());
-      }
+      AssertIndexRange(fe, this->size());
+#endif
 
     // Check if any element of this FECollection is able to dominate all
     // elements of @p fes. If one was found, we add it to the set of
     // dominating elements.
     std::set<unsigned int> dominating_fes;
-    for (unsigned int current_fe = 0; current_fe < finite_elements.size();
-         ++current_fe)
+    for (unsigned int current_fe = 0; current_fe < this->size(); ++current_fe)
       {
         // Check if current_fe can dominate all elements in @p fes.
         FiniteElementDomination::Domination domination =
           FiniteElementDomination::no_requirements;
         for (const auto &other_fe : fes)
           domination =
-            domination & finite_elements[current_fe]->compare_for_domination(
-                           *finite_elements[other_fe], codim);
+            domination &
+            this->operator[](current_fe)
+              .compare_for_domination(this->operator[](other_fe), codim);
 
         // If current_fe dominates, add it to the set.
         if ((domination == FiniteElementDomination::this_element_dominates) ||
@@ -68,28 +68,28 @@ namespace hp
     const std::set<unsigned int> &fes,
     const unsigned int            codim) const
   {
+#ifdef DEBUG
     // Validate user inputs.
     Assert(codim <= dim, ExcImpossibleInDim(dim));
+    Assert(this->size() > 0, ExcEmptyObject());
     for (const auto &fe : fes)
-      {
-        (void)fe;
-        AssertIndexRange(fe, finite_elements.size());
-      }
+      AssertIndexRange(fe, this->size());
+#endif
 
     // Check if any element of this FECollection is dominated by all
     // elements of @p fes. If one was found, we add it to the set of
     // dominated elements.
     std::set<unsigned int> dominated_fes;
-    for (unsigned int current_fe = 0; current_fe < finite_elements.size();
-         ++current_fe)
+    for (unsigned int current_fe = 0; current_fe < this->size(); ++current_fe)
       {
         // Check if current_fe is dominated by all other elements in @p fes.
         FiniteElementDomination::Domination domination =
           FiniteElementDomination::no_requirements;
         for (const auto &other_fe : fes)
           domination =
-            domination & finite_elements[current_fe]->compare_for_domination(
-                           *finite_elements[other_fe], codim);
+            domination &
+            this->operator[](current_fe)
+              .compare_for_domination(this->operator[](other_fe), codim);
 
         // If current_fe is dominated, add it to the set.
         if ((domination == FiniteElementDomination::other_element_dominates) ||
@@ -108,18 +108,18 @@ namespace hp
     const std::set<unsigned int> &fes,
     const unsigned int            codim) const
   {
-    // Validate user inputs.
-    Assert(codim <= dim, ExcImpossibleInDim(dim));
-    for (const auto &fe : fes)
-      {
-        (void)fe;
-        AssertIndexRange(fe, finite_elements.size());
-      }
-
     // If the set of elements contains only a single element,
     // then this very element is considered to be the dominating one.
     if (fes.size() == 1)
       return *fes.begin();
+
+#ifdef DEBUG
+    // Validate user inputs.
+    Assert(codim <= dim, ExcImpossibleInDim(dim));
+    Assert(this->size() > 0, ExcEmptyObject());
+    for (const auto &fe : fes)
+      AssertIndexRange(fe, this->size());
+#endif
 
     // There may also be others, in which case we'll check if any of these
     // elements is able to dominate all others. If one was found, we stop
@@ -132,8 +132,9 @@ namespace hp
         for (const auto &other_fe : fes)
           if (current_fe != other_fe)
             domination =
-              domination & finite_elements[current_fe]->compare_for_domination(
-                             *finite_elements[other_fe], codim);
+              domination &
+              this->operator[](current_fe)
+                .compare_for_domination(this->operator[](other_fe), codim);
 
         // If current_fe dominates, return its index.
         if ((domination == FiniteElementDomination::this_element_dominates) ||
@@ -154,18 +155,18 @@ namespace hp
     const std::set<unsigned int> &fes,
     const unsigned int            codim) const
   {
-    // Validate user inputs.
-    Assert(codim <= dim, ExcImpossibleInDim(dim));
-    for (const auto &fe : fes)
-      {
-        (void)fe;
-        AssertIndexRange(fe, finite_elements.size());
-      }
-
     // If the set of elements contains only a single element,
     // then this very element is considered to be the dominated one.
     if (fes.size() == 1)
       return *fes.begin();
+
+#ifdef DEBUG
+    // Validate user inputs.
+    Assert(codim <= dim, ExcImpossibleInDim(dim));
+    Assert(this->size() > 0, ExcEmptyObject());
+    for (const auto &fe : fes)
+      AssertIndexRange(fe, this->size());
+#endif
 
     // There may also be others, in which case we'll check if any of these
     // elements is dominated by all others. If one was found, we stop
@@ -178,8 +179,9 @@ namespace hp
         for (const auto &other_fe : fes)
           if (current_fe != other_fe)
             domination =
-              domination & finite_elements[current_fe]->compare_for_domination(
-                             *finite_elements[other_fe], codim);
+              domination &
+              this->operator[](current_fe)
+                .compare_for_domination(this->operator[](other_fe), codim);
 
         // If current_fe is dominated, return its index.
         if ((domination == FiniteElementDomination::other_element_dominates) ||
@@ -271,17 +273,15 @@ namespace hp
   FECollection<dim, spacedim>::push_back(
     const FiniteElement<dim, spacedim> &new_fe)
   {
-    // check that the new element has the right
-    // number of components. only check with
-    // the first element, since all the other
-    // elements have already passed the test
-    // against the first element
-    if (finite_elements.size() != 0)
-      Assert(new_fe.n_components() == finite_elements[0]->n_components(),
-             ExcMessage("All elements inside a collection need to have the "
-                        "same number of vector components!"));
+    // check that the new element has the right number of components. only check
+    // with the first element, since all the other elements have already passed
+    // the test against the first element
+    Assert(this->size() == 0 ||
+             new_fe.n_components() == this->operator[](0).n_components(),
+           ExcMessage("All elements inside a collection need to have the "
+                      "same number of vector components!"));
 
-    finite_elements.push_back(new_fe.clone());
+    Collection<FiniteElement<dim, spacedim>>::push_back(new_fe.clone());
   }
 
 
@@ -315,14 +315,60 @@ namespace hp
 
 
   template <int dim, int spacedim>
+  std::vector<unsigned int>
+  FECollection<dim, spacedim>::get_hierarchy_sequence(
+    const unsigned int fe_index) const
+  {
+    AssertIndexRange(fe_index, this->size());
+
+    std::deque<unsigned int> sequence = {fe_index};
+
+    // get predecessors
+    {
+      unsigned int front = sequence.front();
+      unsigned int previous;
+      while ((previous = previous_in_hierarchy(front)) != front)
+        {
+          sequence.push_front(previous);
+          front = previous;
+
+          Assert(sequence.size() <= this->size(),
+                 ExcMessage(
+                   "The registered hierarchy is not terminated: "
+                   "previous_in_hierarchy() does not stop at a final index."));
+        }
+    }
+
+    // get successors
+    {
+      unsigned int back = sequence.back();
+      unsigned int next;
+      while ((next = next_in_hierarchy(back)) != back)
+        {
+          sequence.push_back(next);
+          back = next;
+
+          Assert(sequence.size() <= this->size(),
+                 ExcMessage(
+                   "The registered hierarchy is not terminated: "
+                   "next_in_hierarchy() does not stop at a final index."));
+        }
+    }
+
+    return {sequence.begin(), sequence.end()};
+  }
+
+
+
+  template <int dim, int spacedim>
   unsigned int
   FECollection<dim, spacedim>::next_in_hierarchy(
     const unsigned int fe_index) const
   {
-    AssertIndexRange(fe_index, size());
+    AssertIndexRange(fe_index, this->size());
 
     const unsigned int new_fe_index = hierarchy_next(*this, fe_index);
-    AssertIndexRange(new_fe_index, size());
+    AssertIndexRange(new_fe_index, this->size());
 
     return new_fe_index;
   }
@@ -334,10 +380,10 @@ namespace hp
   FECollection<dim, spacedim>::previous_in_hierarchy(
     const unsigned int fe_index) const
   {
-    AssertIndexRange(fe_index, size());
+    AssertIndexRange(fe_index, this->size());
 
     const unsigned int new_fe_index = hierarchy_prev(*this, fe_index);
-    AssertIndexRange(new_fe_index, size());
+    AssertIndexRange(new_fe_index, this->size());
 
     return new_fe_index;
   }
@@ -349,7 +395,7 @@ namespace hp
   FECollection<dim, spacedim>::component_mask(
     const FEValuesExtractors::Scalar &scalar) const
   {
-    Assert(size() > 0,
+    Assert(this->size() > 0,
            ExcMessage("This collection contains no finite element."));
 
     // get the mask from the first element of the collection
@@ -357,7 +403,7 @@ namespace hp
 
     // but then also verify that the other elements of the collection
     // would return the same mask
-    for (unsigned int c = 1; c < size(); ++c)
+    for (unsigned int c = 1; c < this->size(); ++c)
       Assert(mask == (*this)[c].component_mask(scalar), ExcInternalError());
 
     return mask;
@@ -369,7 +415,7 @@ namespace hp
   FECollection<dim, spacedim>::component_mask(
     const FEValuesExtractors::Vector &vector) const
   {
-    Assert(size() > 0,
+    Assert(this->size() > 0,
            ExcMessage("This collection contains no finite element."));
 
     // get the mask from the first element of the collection
@@ -377,7 +423,7 @@ namespace hp
 
     // but then also verify that the other elements of the collection
     // would return the same mask
-    for (unsigned int c = 1; c < size(); ++c)
+    for (unsigned int c = 1; c < this->size(); ++c)
       Assert(mask == (*this)[c].component_mask(vector), ExcInternalError());
 
     return mask;
@@ -389,7 +435,7 @@ namespace hp
   FECollection<dim, spacedim>::component_mask(
     const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const
   {
-    Assert(size() > 0,
+    Assert(this->size() > 0,
            ExcMessage("This collection contains no finite element."));
 
     // get the mask from the first element of the collection
@@ -397,7 +443,7 @@ namespace hp
 
     // but then also verify that the other elements of the collection
     // would return the same mask
-    for (unsigned int c = 1; c < size(); ++c)
+    for (unsigned int c = 1; c < this->size(); ++c)
       Assert(mask == (*this)[c].component_mask(sym_tensor), ExcInternalError());
 
     return mask;
@@ -408,7 +454,7 @@ namespace hp
   ComponentMask
   FECollection<dim, spacedim>::component_mask(const BlockMask &block_mask) const
   {
-    Assert(size() > 0,
+    Assert(this->size() > 0,
            ExcMessage("This collection contains no finite element."));
 
     // get the mask from the first element of the collection
@@ -416,7 +462,7 @@ namespace hp
 
     // but then also verify that the other elements of the collection
     // would return the same mask
-    for (unsigned int c = 1; c < size(); ++c)
+    for (unsigned int c = 1; c < this->size(); ++c)
       Assert(mask == (*this)[c].component_mask(block_mask),
              ExcMessage("Not all elements of this collection agree on what "
                         "the appropriate mask should be."));
@@ -430,7 +476,7 @@ namespace hp
   FECollection<dim, spacedim>::block_mask(
     const FEValuesExtractors::Scalar &scalar) const
   {
-    Assert(size() > 0,
+    Assert(this->size() > 0,
            ExcMessage("This collection contains no finite element."));
 
     // get the mask from the first element of the collection
@@ -438,7 +484,7 @@ namespace hp
 
     // but then also verify that the other elements of the collection
     // would return the same mask
-    for (unsigned int c = 1; c < size(); ++c)
+    for (unsigned int c = 1; c < this->size(); ++c)
       Assert(mask == (*this)[c].block_mask(scalar),
              ExcMessage("Not all elements of this collection agree on what "
                         "the appropriate mask should be."));
@@ -452,7 +498,7 @@ namespace hp
   FECollection<dim, spacedim>::block_mask(
     const FEValuesExtractors::Vector &vector) const
   {
-    Assert(size() > 0,
+    Assert(this->size() > 0,
            ExcMessage("This collection contains no finite element."));
 
     // get the mask from the first element of the collection
@@ -460,7 +506,7 @@ namespace hp
 
     // but then also verify that the other elements of the collection
     // would return the same mask
-    for (unsigned int c = 1; c < size(); ++c)
+    for (unsigned int c = 1; c < this->size(); ++c)
       Assert(mask == (*this)[c].block_mask(vector),
              ExcMessage("Not all elements of this collection agree on what "
                         "the appropriate mask should be."));
@@ -474,7 +520,7 @@ namespace hp
   FECollection<dim, spacedim>::block_mask(
     const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const
   {
-    Assert(size() > 0,
+    Assert(this->size() > 0,
            ExcMessage("This collection contains no finite element."));
 
     // get the mask from the first element of the collection
@@ -482,7 +528,7 @@ namespace hp
 
     // but then also verify that the other elements of the collection
     // would return the same mask
-    for (unsigned int c = 1; c < size(); ++c)
+    for (unsigned int c = 1; c < this->size(); ++c)
       Assert(mask == (*this)[c].block_mask(sym_tensor),
              ExcMessage("Not all elements of this collection agree on what "
                         "the appropriate mask should be."));
@@ -497,7 +543,7 @@ namespace hp
   FECollection<dim, spacedim>::block_mask(
     const ComponentMask &component_mask) const
   {
-    Assert(size() > 0,
+    Assert(this->size() > 0,
            ExcMessage("This collection contains no finite element."));
 
     // get the mask from the first element of the collection
@@ -505,7 +551,7 @@ namespace hp
 
     // but then also verify that the other elements of the collection
     // would return the same mask
-    for (unsigned int c = 1; c < size(); ++c)
+    for (unsigned int c = 1; c < this->size(); ++c)
       Assert(mask == (*this)[c].block_mask(component_mask),
              ExcMessage("Not all elements of this collection agree on what "
                         "the appropriate mask should be."));
@@ -519,29 +565,15 @@ namespace hp
   unsigned int
   FECollection<dim, spacedim>::n_blocks() const
   {
-    Assert(finite_elements.size() > 0, ExcNoFiniteElements());
+    Assert(this->size() > 0, ExcNoFiniteElements());
 
-    const unsigned int nb = finite_elements[0]->n_blocks();
-    for (unsigned int i = 1; i < finite_elements.size(); ++i)
-      Assert(finite_elements[i]->n_blocks() == nb,
+    const unsigned int nb = this->operator[](0).n_blocks();
+    for (unsigned int i = 1; i < this->size(); ++i)
+      Assert(this->operator[](i).n_blocks() == nb,
              ExcMessage("Not all finite elements in this collection have "
                         "the same number of components."));
 
     return nb;
-  }
-
-
-
-  template <int dim, int spacedim>
-  std::size_t
-  FECollection<dim, spacedim>::memory_consumption() const
-  {
-    std::size_t mem =
-      (sizeof(*this) + MemoryConsumption::memory_consumption(finite_elements));
-    for (unsigned int i = 0; i < finite_elements.size(); ++i)
-      mem += finite_elements[i]->memory_consumption();
-
-    return mem;
   }
 } // namespace hp
 

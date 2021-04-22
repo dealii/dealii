@@ -47,6 +47,8 @@ namespace LinearAlgebra
   {
     template <typename, typename>
     class Vector;
+    template <typename>
+    class BlockVector;
   } // namespace distributed
 } // namespace LinearAlgebra
 #endif
@@ -2007,7 +2009,7 @@ namespace internal
                                 solution_old.begin(),
                                 temp_vector1.begin(),
                                 solution.begin());
-      VectorUpdatesRange<Number>(upd, rhs.local_size());
+      VectorUpdatesRange<Number>(upd, rhs.locally_owned_size());
 
       // swap vectors x^{n+1}->x^{n}, given the updates in the function above
       if (iteration_index == 0)
@@ -2100,11 +2102,20 @@ namespace internal
       types::global_dof_index first_local_range = 0;
       if (!vector.locally_owned_elements().is_empty())
         first_local_range = vector.locally_owned_elements().nth_index_in_set(0);
-      for (unsigned int i = 0; i < vector.local_size(); ++i)
+      for (unsigned int i = 0; i < vector.locally_owned_size(); ++i)
         vector.local_element(i) = (i + first_local_range) % 11;
 
       const Number mean_value = vector.mean_value();
       vector.add(-mean_value);
+    }
+
+    template <typename Number>
+    void
+    set_initial_guess(
+      ::dealii::LinearAlgebra::distributed::BlockVector<Number> &vector)
+    {
+      for (unsigned int block = 0; block < vector.n_blocks(); ++block)
+        set_initial_guess(vector.block(block));
     }
 
 
@@ -2112,12 +2123,12 @@ namespace internal
     template <typename Number>
     __global__ void
     set_initial_guess_kernel(const types::global_dof_index offset,
-                             const unsigned int            local_size,
+                             const unsigned int            locally_owned_size,
                              Number *                      values)
 
     {
       const unsigned int index = threadIdx.x + blockDim.x * blockIdx.x;
-      if (index < local_size)
+      if (index < locally_owned_size)
         values[index] = (index + offset) % 11;
     }
 
@@ -2137,7 +2148,7 @@ namespace internal
       if (!vector.locally_owned_elements().is_empty())
         first_local_range = vector.locally_owned_elements().nth_index_in_set(0);
 
-      const auto n_local_elements = vector.local_size();
+      const auto n_local_elements = vector.locally_owned_size();
       const int  n_blocks =
         1 + (n_local_elements - 1) / CUDAWrappers::block_size;
       set_initial_guess_kernel<<<n_blocks, CUDAWrappers::block_size>>>(
@@ -2266,9 +2277,6 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   solution_old.reinit(src);
   temp_vector1.reinit(src, true);
 
-  // calculate largest eigenvalue using a hand-tuned CG iteration on the
-  // matrix weighted by its diagonal. we start with a vector that consists of
-  // ones only, weighted by the length.
   if (data.eig_cg_n_iterations > 0)
     {
       Assert(data.eig_cg_n_iterations > 2,
@@ -2292,8 +2300,9 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
           eigenvalue_tracker.slot(eigenvalues);
         });
 
-      // set an initial guess which is close to the constant vector but where
-      // one entry is different to trigger high frequencies
+      // set an initial guess that contains some high-frequency parts (to the
+      // extent possible without knowing the discretization and the numbering)
+      // to trigger high eigenvalues according to the external function
       internal::PreconditionChebyshevImplementation::set_initial_guess(
         temp_vector1);
       data.constraints.set_zero(temp_vector1);
@@ -2351,9 +2360,9 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
         1 + static_cast<unsigned int>(
               std::log(1. / eps + std::sqrt(1. / eps / eps - 1.)) /
               std::log(1. / sigma));
-
-      info.degree = data.degree;
     }
+
+  info.degree = data.degree;
 
   const_cast<
     PreconditionChebyshev<MatrixType, VectorType, PreconditionerType> *>(this)

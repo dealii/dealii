@@ -619,8 +619,7 @@ namespace OpenCASCADE
             visited_faces[face_index]        = false;
 
             // extract mapped vertex locations
-            std::array<Point<spacedim>, GeometryInfo<2>::vertices_per_cell>
-              verts           = mapping.get_vertices(cell);
+            const auto verts  = mapping.get_vertices(cell);
             vert_to_point[v0] = verts[GeometryInfo<2>::face_to_cell_vertices(
               f, 0, true, false, false)];
             vert_to_point[v1] = verts[GeometryInfo<2>::face_to_cell_vertices(
@@ -842,7 +841,7 @@ namespace OpenCASCADE
         default:
           Assert(false, ExcUnsupportedShape());
       }
-    return Point<dim>();
+    return {};
   }
 
   std::tuple<Point<3>, Tensor<1, 3>, double, double>

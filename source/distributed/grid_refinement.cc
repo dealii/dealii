@@ -71,7 +71,7 @@ namespace
   template <typename number>
   double
   compute_global_sum(const dealii::Vector<number> &criteria,
-                     MPI_Comm                      mpi_communicator)
+                     const MPI_Comm &              mpi_communicator)
   {
     double my_sum =
       std::accumulate(criteria.begin(),
@@ -186,6 +186,67 @@ namespace
           cell->clear_coarsen_flag();
         }
   }
+
+
+
+  /**
+   * Fixed fraction algorithm without a specified vector norm.
+   *
+   * Entries of the criteria vector and fractions are taken as is, so this
+   * function basically evaluates norms on the vector or its subsets as
+   * l1-norms.
+   */
+  template <int dim, int spacedim, typename Number>
+  void
+  refine_and_coarsen_fixed_fraction_via_l1_norm(
+    parallel::distributed::Triangulation<dim, spacedim> &tria,
+    const dealii::Vector<Number> &                       criteria,
+    const double                                         top_fraction_of_error,
+    const double bottom_fraction_of_error)
+  {
+    // first extract from the vector of indicators the ones that correspond
+    // to cells that we locally own
+    Vector<Number> locally_owned_indicators(
+      tria.n_locally_owned_active_cells());
+    get_locally_owned_indicators(tria, criteria, locally_owned_indicators);
+
+    MPI_Comm mpi_communicator = tria.get_communicator();
+
+    // figure out the global max and min of the indicators. we don't need it
+    // here, but it's a collective communication call
+    const std::pair<double, double> global_min_and_max =
+      dealii::internal::parallel::distributed::GridRefinement::
+        compute_global_min_and_max_at_root(locally_owned_indicators,
+                                           mpi_communicator);
+
+    const double total_error =
+      compute_global_sum(locally_owned_indicators, mpi_communicator);
+
+    double top_target_error    = top_fraction_of_error * total_error,
+           bottom_target_error = (1. - bottom_fraction_of_error) * total_error;
+
+    double top_threshold, bottom_threshold;
+    top_threshold = dealii::internal::parallel::distributed::GridRefinement::
+      RefineAndCoarsenFixedFraction::compute_threshold(locally_owned_indicators,
+                                                       global_min_and_max,
+                                                       top_target_error,
+                                                       mpi_communicator);
+
+    // compute bottom threshold only if necessary. otherwise use the lowest
+    // threshold possible
+    if (bottom_fraction_of_error > 0)
+      bottom_threshold = dealii::internal::parallel::distributed::
+        GridRefinement::RefineAndCoarsenFixedFraction::compute_threshold(
+          locally_owned_indicators,
+          global_min_and_max,
+          bottom_target_error,
+          mpi_communicator);
+    else
+      bottom_threshold = std::numeric_limits<Number>::lowest();
+
+    // now refine the mesh
+    mark_cells(tria, criteria, top_threshold, bottom_threshold);
+  }
 } // namespace
 
 
@@ -202,7 +263,7 @@ namespace internal
         std::pair<number, number>
         compute_global_min_and_max_at_root(
           const dealii::Vector<number> &criteria,
-          MPI_Comm                      mpi_communicator)
+          const MPI_Comm &              mpi_communicator)
         {
           // we'd like to compute the global max and min from the local ones in
           // one MPI communication. we can do that by taking the elementwise
@@ -235,21 +296,21 @@ namespace internal
           compute_threshold(const dealii::Vector<number> &   criteria,
                             const std::pair<double, double> &global_min_and_max,
                             const types::global_cell_index   n_target_cells,
-                            MPI_Comm                         mpi_communicator)
+                            const MPI_Comm &                 mpi_communicator)
           {
             double interesting_range[2] = {global_min_and_max.first,
                                            global_min_and_max.second};
             adjust_interesting_range(interesting_range);
 
-            const unsigned int master_mpi_rank = 0;
-            unsigned int       iteration       = 0;
+            const unsigned int root_mpi_rank = 0;
+            unsigned int       iteration     = 0;
 
             do
               {
                 int ierr = MPI_Bcast(interesting_range,
                                      2,
                                      MPI_DOUBLE,
-                                     master_mpi_rank,
+                                     root_mpi_rank,
                                      mpi_communicator);
                 AssertThrowMPI(ierr);
 
@@ -277,10 +338,10 @@ namespace internal
                 // now adjust the range. if we have too many cells, we take the
                 // upper half of the previous range, otherwise the lower half.
                 // if we have hit the right number, then set the range to the
-                // exact value. slave nodes also update their own
+                // exact value. non-root nodes also update their own
                 // interesting_range, however their results are not significant
                 // since the values will be overwritten by MPI_Bcast from the
-                // master node in next loop.
+                // root node in next loop.
                 if (total_count > n_target_cells)
                   interesting_range[0] = test_threshold;
                 else if (total_count < n_target_cells)
@@ -318,21 +379,21 @@ namespace internal
           compute_threshold(const dealii::Vector<number> &   criteria,
                             const std::pair<double, double> &global_min_and_max,
                             const double                     target_error,
-                            MPI_Comm                         mpi_communicator)
+                            const MPI_Comm &                 mpi_communicator)
           {
             double interesting_range[2] = {global_min_and_max.first,
                                            global_min_and_max.second};
             adjust_interesting_range(interesting_range);
 
-            const unsigned int master_mpi_rank = 0;
-            unsigned int       iteration       = 0;
+            const unsigned int root_mpi_rank = 0;
+            unsigned int       iteration     = 0;
 
             do
               {
                 int ierr = MPI_Bcast(interesting_range,
                                      2,
                                      MPI_DOUBLE,
-                                     master_mpi_rank,
+                                     root_mpi_rank,
                                      mpi_communicator);
                 AssertThrowMPI(ierr);
 
@@ -350,7 +411,7 @@ namespace internal
                     ierr = MPI_Bcast(&final_threshold,
                                      1,
                                      MPI_DOUBLE,
-                                     master_mpi_rank,
+                                     root_mpi_rank,
                                      mpi_communicator);
                     AssertThrowMPI(ierr);
 
@@ -376,17 +437,17 @@ namespace internal
                                   1,
                                   MPI_DOUBLE,
                                   MPI_SUM,
-                                  master_mpi_rank,
+                                  root_mpi_rank,
                                   mpi_communicator);
                 AssertThrowMPI(ierr);
 
                 // now adjust the range. if we have too many cells, we take the
                 // upper half of the previous range, otherwise the lower half.
                 // if we have hit the right number, then set the range to the
-                // exact value. slave nodes also update their own
+                // exact value. non-root nodes also update their own
                 // interesting_range, however their results are not significant
                 // since the values will be overwritten by MPI_Bcast from the
-                // master node in next loop.
+                // root node in next loop.
                 if (total_error > target_error)
                   interesting_range[0] = test_threshold;
                 else if (total_error < target_error)
@@ -499,13 +560,15 @@ namespace parallel
       }
 
 
+
       template <int dim, typename Number, int spacedim>
       void
       refine_and_coarsen_fixed_fraction(
         parallel::distributed::Triangulation<dim, spacedim> &tria,
         const dealii::Vector<Number> &                       criteria,
-        const double top_fraction_of_error,
-        const double bottom_fraction_of_error)
+        const double                top_fraction_of_error,
+        const double                bottom_fraction_of_error,
+        const VectorTools::NormType norm_type)
       {
         Assert(criteria.size() == tria.n_active_cells(),
                ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
@@ -519,45 +582,44 @@ namespace parallel
         Assert(criteria.is_non_negative(),
                dealii::GridRefinement::ExcNegativeCriteria());
 
-        // first extract from the vector of indicators the ones that correspond
-        // to cells that we locally own
-        Vector<Number> locally_owned_indicators(
-          tria.n_locally_owned_active_cells());
-        get_locally_owned_indicators(tria, criteria, locally_owned_indicators);
+        switch (norm_type)
+          {
+            case VectorTools::NormType::L1_norm:
+              // evaluate norms on subsets and compare them as
+              //   c_0 + c_1 + ... < fraction * l1-norm(c)
+              refine_and_coarsen_fixed_fraction_via_l1_norm(
+                tria,
+                criteria,
+                top_fraction_of_error,
+                bottom_fraction_of_error);
+              break;
 
-        MPI_Comm mpi_communicator = tria.get_communicator();
+            case VectorTools::NormType::L2_norm:
+              {
+                // we do not want to evaluate norms on subsets as:
+                //   sqrt(c_0^2 + c_1^2 + ...) < fraction * l2-norm(c)
+                // instead take the square of both sides of the equation
+                // and evaluate:
+                //   c_0^2 + c_1^2 + ... < fraction^2 * l1-norm(c.c)
+                // we adjust all parameters accordingly
+                Vector<Number> criteria_squared(criteria.size());
+                std::transform(criteria.begin(),
+                               criteria.end(),
+                               criteria_squared.begin(),
+                               [](Number c) { return c * c; });
 
-        // figure out the global max and min of the indicators. we don't need it
-        // here, but it's a collective communication call
-        const std::pair<double, double> global_min_and_max =
-          dealii::internal::parallel::distributed::GridRefinement::
-            compute_global_min_and_max_at_root(locally_owned_indicators,
-                                               mpi_communicator);
+                refine_and_coarsen_fixed_fraction_via_l1_norm(
+                  tria,
+                  criteria_squared,
+                  top_fraction_of_error * top_fraction_of_error,
+                  bottom_fraction_of_error * bottom_fraction_of_error);
+              }
+              break;
 
-        const double total_error =
-          compute_global_sum(locally_owned_indicators, mpi_communicator);
-        double top_threshold, bottom_threshold;
-        top_threshold = dealii::internal::parallel::distributed::
-          GridRefinement::RefineAndCoarsenFixedFraction::compute_threshold(
-            locally_owned_indicators,
-            global_min_and_max,
-            top_fraction_of_error * total_error,
-            mpi_communicator);
-
-        // compute bottom threshold only if necessary. otherwise use the lowest
-        // threshold possible
-        if (bottom_fraction_of_error > 0)
-          bottom_threshold = dealii::internal::parallel::distributed::
-            GridRefinement::RefineAndCoarsenFixedFraction::compute_threshold(
-              locally_owned_indicators,
-              global_min_and_max,
-              (1. - bottom_fraction_of_error) * total_error,
-              mpi_communicator);
-        else
-          bottom_threshold = std::numeric_limits<Number>::lowest();
-
-        // now refine the mesh
-        mark_cells(tria, criteria, top_threshold, bottom_threshold);
+            default:
+              Assert(false, ExcNotImplemented());
+              break;
+          }
       }
     } // namespace GridRefinement
   }   // namespace distributed

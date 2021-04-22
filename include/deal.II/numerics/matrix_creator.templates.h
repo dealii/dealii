@@ -689,7 +689,7 @@ namespace MatrixCreator
                      const Function<spacedim, number> *const coefficient,
                      const AffineConstraints<number> &       constraints)
   {
-    create_mass_matrix(StaticMappingQ1<dim, spacedim>::mapping,
+    create_mass_matrix(get_default_linear_mapping(dof.get_triangulation()),
                        dof,
                        q,
                        matrix,
@@ -766,7 +766,7 @@ namespace MatrixCreator
                      const Function<spacedim, number> *const coefficient,
                      const AffineConstraints<number> &       constraints)
   {
-    create_mass_matrix(StaticMappingQ1<dim, spacedim>::mapping,
+    create_mass_matrix(get_default_linear_mapping(dof.get_triangulation()),
                        dof,
                        q,
                        matrix,
@@ -948,10 +948,8 @@ namespace MatrixCreator
       const bool fe_is_system    = (n_components != 1);
       const bool fe_is_primitive = fe.is_primitive();
 
-      const unsigned int dofs_per_face = fe.dofs_per_face;
-
       copy_data.cell          = cell;
-      copy_data.dofs_per_cell = fe.dofs_per_cell;
+      copy_data.dofs_per_cell = fe.n_dofs_per_cell();
 
       UpdateFlags update_flags =
         UpdateFlags(update_values | update_JxW_values | update_normal_vectors |
@@ -973,7 +971,7 @@ namespace MatrixCreator
       copy_data.dofs.resize(copy_data.dofs_per_cell);
       cell->get_dof_indices(copy_data.dofs);
 
-      std::vector<types::global_dof_index> dofs_on_face_vector(dofs_per_face);
+      std::vector<types::global_dof_index> dofs_on_face_vector;
 
       // Because CopyData objects are reused and emplace_back is
       // used, dof_is_on_face, cell_matrix, and cell_vector must be
@@ -982,7 +980,7 @@ namespace MatrixCreator
       copy_data.cell_matrix.clear();
       copy_data.cell_vector.clear();
 
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : cell->face_indices())
         // check if this face is on that part of the boundary we are
         // interested in
         if (boundary_functions.find(cell->face(face)->boundary_id()) !=
@@ -1147,6 +1145,7 @@ namespace MatrixCreator
               }
 
 
+            dofs_on_face_vector.resize(fe.n_dofs_per_face(face));
             cell->face(face)->get_dof_indices(dofs_on_face_vector);
             // for each dof on the cell, have a flag whether it is on
             // the face
@@ -1199,7 +1198,7 @@ namespace MatrixCreator
       // inefficient, so we copy the dofs into a set, which enables binary
       // searches.
       unsigned int pos(0);
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : copy_data.cell->face_indices())
         {
           // check if this face is on that part of
           // the boundary we are interested in
@@ -1379,10 +1378,9 @@ namespace MatrixCreator
       const FiniteElement<dim, spacedim> &fe              = cell->get_fe();
       const bool                          fe_is_system    = (n_components != 1);
       const bool                          fe_is_primitive = fe.is_primitive();
-      const unsigned int                  dofs_per_face   = fe.dofs_per_face;
 
       copy_data.cell          = cell;
-      copy_data.dofs_per_cell = fe.dofs_per_cell;
+      copy_data.dofs_per_cell = fe.n_dofs_per_cell();
       copy_data.dofs.resize(copy_data.dofs_per_cell);
       cell->get_dof_indices(copy_data.dofs);
 
@@ -1407,7 +1405,7 @@ namespace MatrixCreator
       std::vector<number>         rhs_values_scalar;
       std::vector<Vector<number>> rhs_values_system;
 
-      std::vector<types::global_dof_index> dofs_on_face_vector(dofs_per_face);
+      std::vector<types::global_dof_index> dofs_on_face_vector;
 
       copy_data.dofs.resize(copy_data.dofs_per_cell);
       cell->get_dof_indices(copy_data.dofs);
@@ -1420,7 +1418,7 @@ namespace MatrixCreator
       copy_data.cell_vector.clear();
 
 
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : cell->face_indices())
         // check if this face is on that part of
         // the boundary we are interested in
         if (boundary_functions.find(cell->face(face)->boundary_id()) !=
@@ -1599,6 +1597,7 @@ namespace MatrixCreator
                   }
               }
 
+            dofs_on_face_vector.resize(fe.n_dofs_per_face(face));
             cell->face(face)->get_dof_indices(dofs_on_face_vector,
                                               cell->active_fe_index());
             // for each dof on the cell, have a
@@ -1653,7 +1652,7 @@ namespace MatrixCreator
       // inefficient, so we copy the dofs into a set, which enables binary
       // searches.
       unsigned int pos(0);
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : copy_data.cell->face_indices())
         {
           // check if this face is on that part of
           // the boundary we are interested in
@@ -1729,7 +1728,8 @@ namespace MatrixCreator
     const Function<spacedim, number> *const a,
     std::vector<unsigned int>               component_mapping)
   {
-    create_boundary_mass_matrix(StaticMappingQ1<dim, spacedim>::mapping,
+    create_boundary_mass_matrix(get_default_linear_mapping(
+                                  dof.get_triangulation()),
                                 dof,
                                 q,
                                 matrix,
@@ -1918,7 +1918,7 @@ namespace MatrixCreator
                         const Function<spacedim> *const  coefficient,
                         const AffineConstraints<double> &constraints)
   {
-    create_laplace_matrix(StaticMappingQ1<dim, spacedim>::mapping,
+    create_laplace_matrix(get_default_linear_mapping(dof.get_triangulation()),
                           dof,
                           q,
                           matrix,
@@ -1994,7 +1994,7 @@ namespace MatrixCreator
                         const Function<spacedim> *const  coefficient,
                         const AffineConstraints<double> &constraints)
   {
-    create_laplace_matrix(StaticMappingQ1<dim, spacedim>::mapping,
+    create_laplace_matrix(get_default_linear_mapping(dof.get_triangulation()),
                           dof,
                           q,
                           matrix,

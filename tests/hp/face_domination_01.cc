@@ -18,6 +18,7 @@
 
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_nothing.h>
@@ -30,7 +31,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 
@@ -43,7 +43,7 @@
 const unsigned int dim = 2;
 
 void
-print_dofs(const hp::DoFHandler<2>::active_cell_iterator &cell)
+print_dofs(const DoFHandler<2>::active_cell_iterator &cell)
 {
   deallog << "DoFs on cell=" << cell << ": ";
 
@@ -73,7 +73,7 @@ main()
   fe_collection.push_back(FESystem<dim>(FE_Nothing<dim>(), 1));
   fe_collection.push_back(FESystem<dim>(FE_Q<dim>(1), 1));
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   dof_handler.begin_active()->set_active_fe_index(1);
 

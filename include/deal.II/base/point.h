@@ -330,7 +330,8 @@ public:
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
-   * of serialization
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -471,7 +472,7 @@ inline DEAL_II_CUDA_HOST_DEV Number
 Point<dim, Number>::operator()(const unsigned int index) const
 {
 #  ifndef __CUDA_ARCH__
-  AssertIndexRange(index, dim);
+  AssertIndexRange(static_cast<int>(index), dim);
 #  endif
   return this->values[index];
 }
@@ -483,7 +484,7 @@ inline DEAL_II_CUDA_HOST_DEV Number &
 Point<dim, Number>::operator()(const unsigned int index)
 {
 #  ifndef __CUDA_ARCH__
-  AssertIndexRange(index, dim);
+  AssertIndexRange(static_cast<int>(index), dim);
 #  endif
   return this->values[index];
 }

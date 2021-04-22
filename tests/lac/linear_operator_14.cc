@@ -189,13 +189,13 @@ void
 evaluate_ops(const TrilinosWrappers::BlockSparseMatrix &matrix,
              const TrilinosWrappers::MPI::BlockVector & vector)
 {
-  const double                                   tol = 1e-12;
-  typedef dealii::TrilinosWrappers::SparseMatrix MatrixType;
-  typedef dealii::TrilinosWrappers::MPI::Vector  VectorType;
-  typedef dealii::TrilinosWrappers::internal::LinearOperatorImplementation::
-    TrilinosPayload                        PayloadType;
-  typedef typename PayloadType::VectorType PayloadVectorType;
-  typedef dealii::types::global_dof_index  size_type;
+  const double tol  = 1e-12;
+  using MatrixType  = dealii::TrilinosWrappers::SparseMatrix;
+  using VectorType  = dealii::TrilinosWrappers::MPI::Vector;
+  using PayloadType = dealii::TrilinosWrappers::internal::
+    LinearOperatorImplementation::TrilinosPayload;
+  using PayloadVectorType = typename PayloadType::VectorType;
+  using size_type         = dealii::types::global_dof_index;
 
   deallog.push("System info");
   {

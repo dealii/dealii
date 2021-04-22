@@ -77,19 +77,12 @@ namespace internal
           MFWorkerInterface *used_worker =
             worker != nullptr ? worker : *worker_pointer;
           Assert(used_worker != nullptr, ExcInternalError());
-          used_worker->cell(
-            std::make_pair(task_info.cell_partition_data[partition],
-                           task_info.cell_partition_data[partition + 1]));
+          used_worker->cell(partition);
 
           if (task_info.face_partition_data.empty() == false)
             {
-              used_worker->face(
-                std::make_pair(task_info.face_partition_data[partition],
-                               task_info.face_partition_data[partition + 1]));
-
-              used_worker->boundary(std::make_pair(
-                task_info.boundary_partition_data[partition],
-                task_info.boundary_partition_data[partition + 1]));
+              used_worker->face(partition);
+              used_worker->boundary(partition);
             }
         }
 
@@ -353,7 +346,7 @@ namespace internal
       if (scheme != none)
         {
           funct.zero_dst_vector_range(numbers::invalid_unsigned_int);
-          if (scheme == partition_partition)
+          if (scheme == partition_partition && evens > 0)
             {
               tbb::empty_task *root =
                 new (tbb::task::allocate_root()) tbb::empty_task;
@@ -412,6 +405,14 @@ namespace internal
 
               root->wait_for_all();
               root->destroy(*root);
+            }
+          else if (scheme == partition_partition)
+            {
+              // catch the case of empty partition list: we still need to call
+              // the vector communication routines to clean up and initiate
+              // things
+              funct.vector_update_ghosts_finish();
+              funct.vector_compress_start();
             }
           else // end of partition-partition, start of partition-color
             {
@@ -599,20 +600,16 @@ namespace internal
                   AssertIndexRange(i + 1, cell_partition_data.size());
                   if (cell_partition_data[i + 1] > cell_partition_data[i])
                     {
-                      funct.cell(std::make_pair(cell_partition_data[i],
-                                                cell_partition_data[i + 1]));
+                      funct.cell(i);
                     }
 
                   if (face_partition_data.empty() == false)
                     {
                       if (face_partition_data[i + 1] > face_partition_data[i])
-                        funct.face(std::make_pair(face_partition_data[i],
-                                                  face_partition_data[i + 1]));
+                        funct.face(i);
                       if (boundary_partition_data[i + 1] >
                           boundary_partition_data[i])
-                        funct.boundary(
-                          std::make_pair(boundary_partition_data[i],
-                                         boundary_partition_data[i + 1]));
+                        funct.boundary(i);
                     }
                   funct.cell_loop_post_range(i);
                 }
@@ -784,12 +781,13 @@ namespace internal
       std::vector<unsigned int> &      renumbering,
       std::vector<unsigned char> &     incompletely_filled_vectorization)
     {
+      Assert(dofs_per_cell > 0, ExcInternalError());
       // This function is decomposed into several steps to determine a good
       // ordering that satisfies the following constraints:
       // a. Only cells belonging to the same category (or next higher if the
       // cell_vectorization_categories_strict is false) can be grouped into
       // the same SIMD batch
-      // b. hp adaptive computations must form contiguous ranges for the same
+      // b. hp-adaptive computations must form contiguous ranges for the same
       // degree (category) in cell_partition_data
       // c. We want to group the cells with the same parent in the same SIMD
       // lane if possible
@@ -945,7 +943,7 @@ namespace internal
 
       // Step 5: Sort the batches of cells by their last cell index to get
       // good locality, assuming that the initial cell order is of good
-      // locality. In case we have hp calculations with categories, we need to
+      // locality. In case we have hp-calculations with categories, we need to
       // sort also by the category.
       std::vector<std::array<unsigned int, 3>> batch_order;
       std::vector<std::array<unsigned int, 3>> batch_order_comm;
@@ -1067,17 +1065,17 @@ namespace internal
       std::vector<unsigned int> &      renumbering,
       std::vector<unsigned char> &     incompletely_filled_vectorization)
     {
-      const unsigned int n_macro_cells =
+      const unsigned int n_cell_batches =
         (n_active_cells + vectorization_length - 1) / vectorization_length;
       const unsigned int n_ghost_slots =
         (n_ghost_cells + vectorization_length - 1) / vectorization_length;
-      incompletely_filled_vectorization.resize(n_macro_cells + n_ghost_slots);
-      if (n_macro_cells * vectorization_length > n_active_cells)
-        incompletely_filled_vectorization[n_macro_cells - 1] =
+      incompletely_filled_vectorization.resize(n_cell_batches + n_ghost_slots);
+      if (n_cell_batches * vectorization_length > n_active_cells)
+        incompletely_filled_vectorization[n_cell_batches - 1] =
           vectorization_length -
-          (n_macro_cells * vectorization_length - n_active_cells);
+          (n_cell_batches * vectorization_length - n_active_cells);
       if (n_ghost_slots * vectorization_length > n_ghost_cells)
-        incompletely_filled_vectorization[n_macro_cells + n_ghost_slots - 1] =
+        incompletely_filled_vectorization[n_cell_batches + n_ghost_slots - 1] =
           vectorization_length -
           (n_ghost_slots * vectorization_length - n_ghost_cells);
 
@@ -1107,13 +1105,13 @@ namespace internal
             (boundary_cells.size() + vectorization_length - 1) /
             vectorization_length;
           cell_partition_data.push_back(
-            (n_macro_cells - n_macro_boundary_cells) / 2);
+            (n_cell_batches - n_macro_boundary_cells) / 2);
           cell_partition_data.push_back(cell_partition_data[1] +
                                         n_macro_boundary_cells);
         }
       else
         AssertDimension(boundary_cells.size(), 0);
-      cell_partition_data.push_back(n_macro_cells);
+      cell_partition_data.push_back(n_cell_batches);
       cell_partition_data.push_back(cell_partition_data.back() + n_ghost_slots);
       partition_row_index.resize(n_procs > 1 ? 4 : 2);
       partition_row_index[0] = 0;
@@ -1162,8 +1160,8 @@ namespace internal
       std::vector<unsigned char> &irregular_cells,
       const bool)
     {
-      const unsigned int n_macro_cells = *(cell_partition_data.end() - 2);
-      if (n_macro_cells == 0)
+      const unsigned int n_cell_batches = *(cell_partition_data.end() - 2);
+      if (n_cell_batches == 0)
         return;
 
       Assert(vectorization_length > 0, ExcInternalError());
@@ -1229,8 +1227,8 @@ namespace internal
 
       // set the start list for each block and compute the renumbering of
       // cells
-      std::vector<unsigned int>  block_start(n_macro_cells + 1);
-      std::vector<unsigned char> irregular(n_macro_cells);
+      std::vector<unsigned int>  block_start(n_cell_batches + 1);
+      std::vector<unsigned char> irregular(n_cell_batches);
 
       unsigned int mcell_start = 0;
       block_start[0]           = 0;
@@ -1238,7 +1236,7 @@ namespace internal
         {
           block_start[block + 1] = block_start[block];
           for (unsigned int mcell = mcell_start;
-               mcell < std::min(mcell_start + block_size, n_macro_cells);
+               mcell < std::min(mcell_start + block_size, n_cell_batches);
                ++mcell)
             {
               unsigned int n_comp = (irregular_cells[mcell] > 0) ?
@@ -1252,7 +1250,7 @@ namespace internal
       counter                    = 0;
       unsigned int counter_macro = 0;
       unsigned int block_size_last =
-        n_macro_cells - block_size * (n_blocks - 1);
+        n_cell_batches - block_size * (n_blocks - 1);
       if (block_size_last == 0)
         block_size_last = block_size;
 
@@ -1281,7 +1279,7 @@ namespace internal
 
       irregular_cells.swap(irregular);
       AssertDimension(counter, n_active_cells);
-      AssertDimension(counter_macro, n_macro_cells);
+      AssertDimension(counter_macro, n_cell_batches);
 
       // check that the renumbering is one-to-one
 #ifdef DEBUG
@@ -1297,7 +1295,7 @@ namespace internal
       update_task_info(
         partition); // Actually sets too much for partition color case
 
-      AssertDimension(cell_partition_data.back(), n_macro_cells);
+      AssertDimension(cell_partition_data.back(), n_cell_batches);
     }
 
 
@@ -1310,8 +1308,8 @@ namespace internal
       std::vector<unsigned char> &     irregular_cells,
       const bool                       hp_bool)
     {
-      const unsigned int n_macro_cells = *(cell_partition_data.end() - 2);
-      if (n_macro_cells == 0)
+      const unsigned int n_cell_batches = *(cell_partition_data.end() - 2);
+      if (n_cell_batches == 0)
         return;
 
       Assert(vectorization_length > 0, ExcInternalError());
@@ -1426,8 +1424,8 @@ namespace internal
         {
           // set the start list for each block and compute the renumbering of
           // cells
-          std::vector<unsigned int>  block_start(n_macro_cells + 1);
-          std::vector<unsigned char> irregular(n_macro_cells);
+          std::vector<unsigned int>  block_start(n_cell_batches + 1);
+          std::vector<unsigned char> irregular(n_cell_batches);
 
           unsigned int counter     = 0;
           unsigned int mcell_start = 0;
@@ -1436,7 +1434,7 @@ namespace internal
             {
               block_start[block + 1] = block_start[block];
               for (unsigned int mcell = mcell_start;
-                   mcell < std::min(mcell_start + block_size, n_macro_cells);
+                   mcell < std::min(mcell_start + block_size, n_cell_batches);
                    ++mcell)
                 {
                   unsigned int n_comp = (irregular_cells[mcell] > 0) ?
@@ -1450,7 +1448,7 @@ namespace internal
           counter                    = 0;
           unsigned int counter_macro = 0;
           unsigned int block_size_last =
-            n_macro_cells - block_size * (n_blocks - 1);
+            n_cell_batches - block_size * (n_blocks - 1);
           if (block_size_last == 0)
             block_size_last = block_size;
 
@@ -1479,7 +1477,7 @@ namespace internal
 
           irregular_cells.swap(irregular);
           AssertDimension(counter, n_active_cells);
-          AssertDimension(counter_macro, n_macro_cells);
+          AssertDimension(counter_macro, n_cell_batches);
           // check that the renumbering is one-to-one
 #ifdef DEBUG
           {
@@ -1505,8 +1503,8 @@ namespace internal
       std::vector<unsigned char> &     irregular_cells,
       const bool                       hp_bool)
     {
-      const unsigned int n_macro_cells = *(cell_partition_data.end() - 2);
-      if (n_macro_cells == 0)
+      const unsigned int n_cell_batches = *(cell_partition_data.end() - 2);
+      if (n_cell_batches == 0)
         return;
 
       const unsigned int cluster_size = block_size * vectorization_length;
@@ -1514,7 +1512,7 @@ namespace internal
       // Create cell-block  partitioning.
 
       // For each block of cells, this variable saves to which partitions the
-      // block belongs. Initialize all to n_macro_cells to mark them as not
+      // block belongs. Initialize all to n_cell_batches to mark them as not
       // yet assigned a partition.
       std::vector<unsigned int> cell_partition(n_active_cells,
                                                numbers::invalid_unsigned_int);
@@ -1622,9 +1620,9 @@ namespace internal
       std::vector<unsigned int> &      partition_partition_list,
       std::vector<unsigned char> &     irregular_cells)
     {
-      const unsigned int n_macro_cells = *(cell_partition_data.end() - 2);
+      const unsigned int n_cell_batches = *(cell_partition_data.end() - 2);
       const unsigned int n_ghost_slots =
-        *(cell_partition_data.end() - 1) - n_macro_cells;
+        *(cell_partition_data.end() - 1) - n_cell_batches;
 
       // List of cells in previous partition
       std::vector<unsigned int> neighbor_list;
@@ -1645,11 +1643,11 @@ namespace internal
              ExcInternalError());
 
       {
-        unsigned int n_macro_cells_before = 0;
+        unsigned int n_cell_batches_before = 0;
         // Create partitioning within partitions.
 
         // For each block of cells, this variable saves to which partitions
-        // the block belongs. Initialize all to n_macro_cells to mark them as
+        // the block belongs. Initialize all to n_cell_batches to mark them as
         // not yet assigned a partition.
         std::vector<unsigned int> cell_partition_l2(
           n_active_cells, numbers::invalid_unsigned_int);
@@ -1732,7 +1730,7 @@ namespace internal
                       // put the cells into separate lists for each FE index
                       // within one partition-partition
                       missing_macros = 0;
-                      std::vector<unsigned int> remaining_per_macro_cell(
+                      std::vector<unsigned int> remaining_per_cell_batch(
                         max_fe_index + 1);
                       std::vector<std::vector<unsigned int>>
                                    renumbering_fe_index;
@@ -1755,10 +1753,10 @@ namespace internal
                           // check how many more cells are needed in the lists
                           for (unsigned int j = 0; j < max_fe_index + 1; j++)
                             {
-                              remaining_per_macro_cell[j] =
+                              remaining_per_cell_batch[j] =
                                 renumbering_fe_index[j].size() %
                                 vectorization_length;
-                              if (remaining_per_macro_cell[j] != 0)
+                              if (remaining_per_cell_batch[j] != 0)
                                 filled = false;
                               missing_macros +=
                                 ((renumbering_fe_index[j].size() +
@@ -1768,12 +1766,12 @@ namespace internal
                         }
                       else
                         {
-                          remaining_per_macro_cell.resize(1);
-                          remaining_per_macro_cell[0] =
+                          remaining_per_cell_batch.resize(1);
+                          remaining_per_cell_batch[0] =
                             partition_counter % vectorization_length;
                           missing_macros =
                             partition_counter / vectorization_length;
-                          if (remaining_per_macro_cell[0] != 0)
+                          if (remaining_per_cell_batch[0] != 0)
                             {
                               filled = false;
                               missing_macros++;
@@ -1831,7 +1829,7 @@ namespace internal
                                   // a macro cell with the FE index that is
                                   // not yet fully populated
                                   if (missing_macros > 0 ||
-                                      remaining_per_macro_cell[this_index] > 0)
+                                      remaining_per_cell_batch[this_index] > 0)
                                     {
                                       cell_partition_l2[neighbor->column()] =
                                         partition_l2;
@@ -1844,16 +1842,16 @@ namespace internal
                                         neighbor->column();
                                       counter++;
                                       partition_counter++;
-                                      if (remaining_per_macro_cell
+                                      if (remaining_per_cell_batch
                                               [this_index] == 0 &&
                                           missing_macros > 0)
                                         missing_macros--;
-                                      remaining_per_macro_cell[this_index]++;
-                                      if (remaining_per_macro_cell
+                                      remaining_per_cell_batch[this_index]++;
+                                      if (remaining_per_cell_batch
                                             [this_index] ==
                                           vectorization_length)
                                         {
-                                          remaining_per_macro_cell[this_index] =
+                                          remaining_per_cell_batch[this_index] =
                                             0;
                                         }
                                       if (missing_macros == 0)
@@ -1862,7 +1860,7 @@ namespace internal
                                           for (unsigned int fe_ind = 0;
                                                fe_ind < max_fe_index + 1;
                                                ++fe_ind)
-                                            if (remaining_per_macro_cell
+                                            if (remaining_per_cell_batch
                                                   [fe_ind] != 0)
                                               filled = false;
                                         }
@@ -1888,10 +1886,10 @@ namespace internal
                                   0)
                                 irregular_cells[renumbering_fe_index[j].size() /
                                                   vectorization_length +
-                                                n_macro_cells_before] =
+                                                n_cell_batches_before] =
                                   renumbering_fe_index[j].size() %
                                   vectorization_length;
-                              n_macro_cells_before +=
+                              n_cell_batches_before +=
                                 (renumbering_fe_index[j].size() +
                                  vectorization_length - 1) /
                                 vectorization_length;
@@ -1900,17 +1898,17 @@ namespace internal
                         }
                       else
                         {
-                          n_macro_cells_before +=
+                          n_cell_batches_before +=
                             partition_counter / vectorization_length;
                           if (partition_counter % vectorization_length != 0)
                             {
-                              irregular_cells[n_macro_cells_before] =
+                              irregular_cells[n_cell_batches_before] =
                                 partition_counter % vectorization_length;
-                              n_macro_cells_before++;
+                              n_cell_batches_before++;
                             }
                         }
                     }
-                    cell_partition_data.push_back(n_macro_cells_before);
+                    cell_partition_data.push_back(n_cell_batches_before);
                     partition_l2++;
                   }
                 neighbor_list = neighbor_neighbor_list;
@@ -1939,8 +1937,8 @@ namespace internal
       const std::vector<unsigned int> &partition_size,
       std::vector<unsigned int> &      partition_color_list)
     {
-      const unsigned int n_macro_cells = *(cell_partition_data.end() - 2);
-      std::vector<unsigned int> cell_color(n_blocks, n_macro_cells);
+      const unsigned int n_cell_batches = *(cell_partition_data.end() - 2);
+      std::vector<unsigned int> cell_color(n_blocks, n_cell_batches);
       std::vector<bool>         color_finder;
 
       partition_row_index.resize(partition + 1);
@@ -2016,7 +2014,7 @@ namespace internal
 
     {
       // For each block of cells, this variable saves to which partitions the
-      // block belongs. Initialize all to n_macro_cells to mark them as not
+      // block belongs. Initialize all to n_cell_batches to mark them as not
       // yet assigned a partition.
       // std::vector<unsigned int> cell_partition (n_active_cells,
       //                                          numbers::invalid_unsigned_int);
@@ -2041,11 +2039,11 @@ namespace internal
             (cell_partition_data[2] - cell_partition_data[1]) :
           0;
 
-      const unsigned int n_macro_cells = *(cell_partition_data.end() - 2);
-      if (n_macro_cells == 0)
+      const unsigned int n_cell_batches = *(cell_partition_data.end() - 2);
+      if (n_cell_batches == 0)
         return;
       if (scheme == color)
-        start_nonboundary = n_macro_cells;
+        start_nonboundary = n_cell_batches;
       if (scheme == partition_color ||
           scheme == color) // blocking_connectivity == true
         start_nonboundary = ((start_nonboundary + block_size - 1) / block_size);

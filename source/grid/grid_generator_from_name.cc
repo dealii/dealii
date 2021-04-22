@@ -142,6 +142,10 @@ namespace GridGenerator
       else if (name == "cylinder")
         parse_and_create<dim, dim, double, double>(cylinder, arguments, tria);
 
+      else if (name == "subdivided_cylinder")
+        parse_and_create<dim, dim, unsigned int, double, double>(
+          subdivided_cylinder, arguments, tria);
+
       else if (name == "truncated_cone")
         parse_and_create<dim, dim, double, double, double>(truncated_cone,
                                                            arguments,

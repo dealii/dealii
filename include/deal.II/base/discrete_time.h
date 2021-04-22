@@ -25,10 +25,8 @@ DEAL_II_NAMESPACE_OPEN
  * time-dependent simulation. It manages stepping forward from a start time
  * $T_{\text{start}}$ to an end time $T_{\text{end}}$. It also allows adjusting
  * the time step size during the simulation. This class provides the necessary
- * interface to be incorporated in any time-dependent simulation. As an
- * example, the usage of this class is demonstrated in step-21. This class
- * attempts to replace the usage of TimestepControl with a better and more
- * modern interface.
+ * interface to be incorporated in any time-dependent simulation.
+ * The usage of this class is demonstrated in step-19 and step-21.
  *
  * This class provides a number of invariants that are guaranteed to be
  * true at all times.
@@ -227,6 +225,9 @@ DEAL_II_NAMESPACE_OPEN
  *   // } end snapshot stage
  * }
  * @endcode
+ * The `run()` function in step-19 shows a very similar example where the call
+ * to advance_time() ends the update stage and is followed by generating
+ * graphical output with the then-current time.
  */
 class DiscreteTime
 {
@@ -348,6 +349,22 @@ public:
    */
   void
   set_desired_next_step_size(const double time_step_size);
+
+  /**
+   * Set the *actual* value of the next time step size. By calling this
+   * method, we are indicating the next time advance_time() is called,
+   * @p time_step_size is to be used to advance the simulation time.
+   *
+   * @note The difference between set_next_step_size() and
+   * set_desired_next_step_size() is that the former uses the provided $dt$
+   * exactly without any adjustment, but produces an
+   * error (in debug mode) if $dt$ is not in the acceptable range.
+   * Generally, set_desired_next_step_size() is the preferred method because
+   * it can adjust the $dt$ intelligently, based on $T_{\text{end}}$.
+   * @pre $0 < dt \le T_{\text{end}} - t$.
+   */
+  void
+  set_next_step_size(const double time_step_size);
 
   /**
    * Advance the current time based on the value of the current step.

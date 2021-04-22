@@ -106,7 +106,7 @@ test()
           << std::endl;
 
   // ghosts are set to zero
-  v.zero_out_ghosts();
+  v.zero_out_ghost_values();
 
   // minimize
   v.compress(VectorOperation::min);
@@ -119,7 +119,7 @@ test()
           << std::endl;
 
   // set ghost dof on non-owning processors and minimize
-  v.zero_out_ghosts();
+  v.zero_out_ghost_values();
   if (myid == 0)
     set_value<<<1, 1>>>(v.get_values(), partitioner->global_to_local(1), -1.);
   v.compress(VectorOperation::min);
@@ -132,7 +132,7 @@ test()
           << std::endl;
 
   // set vector to 1, zeros in ghosts except on owner where -1. is set
-  v.zero_out_ghosts();
+  v.zero_out_ghost_values();
   v = 1.0;
   if (myid == 0)
     set_value<<<1, 1>>>(v.get_values(), partitioner->global_to_local(1), -1.);
@@ -150,7 +150,7 @@ test()
 
   // however, if the ghost value is set on all processors, the
   // maximum is -1:
-  v.zero_out_ghosts();
+  v.zero_out_ghost_values();
   v = 1.0;
   set_value<<<1, 1>>>(v.get_values(), partitioner->global_to_local(1), -1.);
   v.compress(VectorOperation::max);
@@ -162,7 +162,7 @@ test()
 
   // what happens in case max is called two times and all values were smaller
   // than zero
-  v.zero_out_ghosts();
+  v.zero_out_ghost_values();
   v = -1.0;
   set_value<<<1, 1>>>(v.get_values(), partitioner->global_to_local(1), -1.);
   v.compress(VectorOperation::max);

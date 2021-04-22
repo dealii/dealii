@@ -116,7 +116,8 @@ public:
    * cell but instead evaluates an externally given displacement field in
    * addition to the geometry of the cell.
    */
-  virtual std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+  virtual boost::container::small_vector<Point<spacedim>,
+                                         GeometryInfo<dim>::vertices_per_cell>
   get_vertices(const typename Triangulation<dim, spacedim>::cell_iterator &cell)
     const override;
 

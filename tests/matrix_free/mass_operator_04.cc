@@ -46,7 +46,7 @@ template <int dim>
 void
 test()
 {
-  typedef double number;
+  using number = double;
 
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);

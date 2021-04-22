@@ -97,7 +97,7 @@ test(const bool adaptive_ref = true)
     mf_data->reinit(dof, constraints, quad, data);
   }
 
-  const unsigned int     n_cells         = mf_data->n_macro_cells();
+  const unsigned int     n_cells         = mf_data->n_cell_batches();
   const auto &           dof_info        = mf_data->get_dof_info();
   constexpr unsigned int n_vectorization = VectorizedArray<number>::size();
 

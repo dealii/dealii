@@ -381,11 +381,29 @@ namespace Functions
 
 
   /**
-   * Harmonic singularity on the L-shaped domain in 2D.
+   * A function that solves the Laplace equation (with specific
+   * boundary values but zero right hand side) and that has a
+   * singularity at the center of the L-shaped domain in 2D (i.e.,
+   * at the location of the re-entrant corner of this non-convex
+   * domain).
    *
    * The function is given in polar coordinates by $r^{\frac{2}{3}}
-   * \sin(\frac{2}{3} \phi)$ with a singularity at the origin and should be
-   * used with GridGenerator::hyper_L().
+   * \sin(\frac{2}{3} \phi)$ with a singularity at the origin and
+   * should be used with GridGenerator::hyper_L(). Here, $\phi$ is
+   * defined as the *clockwise* angle against the positive $x$-axis.
+   *
+   * This function is often used to illustrate that the solutions of the Laplace
+   * equation
+   * @f[
+   *   -\Delta u = 0
+   * @f]
+   * can be singular even if the boundary values are smooth. (Here, if the
+   * domain is the L-shaped domain $(-1,1)^2 \backslash [0,1]^2$, the
+   * boundary values for $u$ are zero on the two line segments adjacent to the
+   * origin, and equal to $r^{\frac{2}{3}} \sin(\frac{2}{3} \phi)$ on the
+   * remaining parts of the boundary.) The function itself remains bounded on
+   * the domain, but its gradient is of the form $r^{-1/3}$ in the vicinity of
+   * the origin and consequently diverges as one approaches the origin.
    *
    * @ingroup functions
    */
@@ -647,8 +665,8 @@ namespace Functions
      * calculating the memory usage of trees (e.g., <tt>std::map</tt>) is
      * difficult.
      */
-    std::size_t
-    memory_consumption() const;
+    virtual std::size_t
+    memory_consumption() const override;
 
   protected:
     /**
@@ -940,22 +958,6 @@ namespace Functions
      * Virtual destructor.
      */
     virtual ~CutOffFunctionBase() = default;
-
-    /**
-     * Move the center of the ball to new point <tt>p</tt>.
-     *
-     * @deprecated Use set_center() instead.
-     */
-    DEAL_II_DEPRECATED void
-    new_center(const Point<dim> &p);
-
-    /**
-     * Set the radius of the ball to <tt>r</tt>.
-     *
-     * @deprecated Use set_radius() instead.
-     */
-    DEAL_II_DEPRECATED void
-    new_radius(const double r);
 
     /**
      * Set the center of the ball to the point @p p.
@@ -1451,6 +1453,18 @@ namespace Functions
     gradient(const Point<dim> & p,
              const unsigned int component = 0) const override;
 
+    /**
+     * Return an estimate for the memory consumption, in bytes, of this object.
+     */
+    virtual std::size_t
+    memory_consumption() const override;
+
+    /**
+     * Return a reference to the internally stored data.
+     */
+    const Table<dim, double> &
+    get_data() const;
+
   protected:
     /**
      * Find the index in the table of the rectangle containing an input point
@@ -1556,6 +1570,18 @@ namespace Functions
     gradient(const Point<dim> & p,
              const unsigned int component = 0) const override;
 
+    /**
+     * Return an estimate for the memory consumption, in bytes, of this object.
+     */
+    virtual std::size_t
+    memory_consumption() const override;
+
+    /**
+     * Return a reference to the internally stored data.
+     */
+    const Table<dim, double> &
+    get_data() const;
+
   private:
     /**
      * The set of interval endpoints in each of the coordinate directions.
@@ -1623,6 +1649,12 @@ namespace Functions
     virtual Tensor<1, dim>
     gradient(const Point<dim> & p,
              const unsigned int component = 0) const override;
+
+    /**
+     * Return an estimate for the memory consumption, in bytes, of this object.
+     */
+    virtual std::size_t
+    memory_consumption() const override;
 
   private:
     /**

@@ -28,7 +28,7 @@ template <int dim>
 void
 check()
 {
-  typedef Tensor<2, dim> S;
+  using S = Tensor<2, dim>;
   for (unsigned int i = 0; i < S::n_independent_components; ++i)
     {
       deallog << i << "  --  " << S::unrolled_to_component_indices(i)

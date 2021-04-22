@@ -79,7 +79,7 @@ test(int                                              n_refinements,
   for (auto &cell : tria_pft.active_cell_iterators())
     {
       CellId id        = cell->id();
-      auto   cell_base = id.to_cell(basetria);
+      auto   cell_base = basetria.create_cell_iterator(id);
       for (unsigned int d = 0; d < dim; d++)
         Assert(std::abs(cell->center()[d] - cell_base->center()[d]) < 1e-9,
                ExcMessage("Cells do not match"));

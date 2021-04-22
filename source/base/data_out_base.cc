@@ -52,6 +52,7 @@
 
 // we use uint32_t and uint8_t below, which are declared here:
 #include <cstdint>
+#include <vector>
 
 #ifdef DEAL_II_WITH_ZLIB
 #  include <zlib.h>
@@ -292,7 +293,8 @@ namespace DataOutBase
                                         (n_data_sets + spacedim) :
                                         n_data_sets,
                                       patch.data.n_rows()));
-          Assert((n_data_sets == 0) ||
+          Assert(patch.reference_cell != ReferenceCells::get_hypercube<dim>() ||
+                   (n_data_sets == 0) ||
                    (patch.data.n_cols() ==
                     Utilities::fixed_power<dim>(n_subdivisions + 1)),
                  ExcInvalidDatasetSize(patch.data.n_cols(),
@@ -313,7 +315,7 @@ namespace DataOutBase
   DataOutFilter::DataOutFilter()
     : flags(false, true)
     , node_dim(numbers::invalid_unsigned_int)
-    , vertices_per_cell(numbers::invalid_unsigned_int)
+    , num_cells(numbers::invalid_unsigned_int)
   {}
 
 
@@ -321,7 +323,7 @@ namespace DataOutBase
   DataOutFilter::DataOutFilter(const DataOutBase::DataOutFilterFlags &flags)
     : flags(flags)
     , node_dim(numbers::invalid_unsigned_int)
-    , vertices_per_cell(numbers::invalid_unsigned_int)
+    , num_cells(numbers::invalid_unsigned_int)
   {}
 
 
@@ -361,6 +363,10 @@ namespace DataOutBase
                                    const unsigned int pt_index)
   {
     filtered_cells[cell_index] = filtered_points[pt_index];
+
+    // (Re)-initialize counter at any first call to this method.
+    if (cell_index == 0)
+      num_cells = 1;
   }
 
 
@@ -430,7 +436,7 @@ namespace DataOutBase
   unsigned int
   DataOutFilter::n_cells() const
   {
-    return filtered_cells.size() / vertices_per_cell;
+    return num_cells;
   }
 
 
@@ -463,9 +469,11 @@ namespace DataOutBase
                             const unsigned int d2,
                             const unsigned int d3)
   {
+    ++num_cells;
+
     const unsigned int base_entry =
       index * GeometryInfo<dim>::vertices_per_cell;
-    vertices_per_cell = GeometryInfo<dim>::vertices_per_cell;
+
     internal_add_cell(base_entry + 0, start);
     if (dim >= 1)
       {
@@ -482,6 +490,23 @@ namespace DataOutBase
                 internal_add_cell(base_entry + 7, start + d3 + d2);
               }
           }
+      }
+  }
+
+
+
+  void
+  DataOutFilter::write_cell_single(const unsigned int index,
+                                   const unsigned int start,
+                                   const unsigned int n_points)
+  {
+    ++num_cells;
+
+    const unsigned int base_entry = index * n_points;
+
+    for (unsigned int i = 0; i < n_points; ++i)
+      {
+        internal_add_cell(base_entry + i, start + i);
       }
   }
 
@@ -541,38 +566,145 @@ namespace
   const unsigned int tecplot_binary_cell_type[4] = {0, 0, 1, 3};
 #endif
 
-  // NOTE: The dimension of the array is chosen to 5 to allow the choice
-  // DataOutBase<deal_II_dimension,deal_II_dimension+1> in general Wolfgang
-  // supposed that we don't need it in general, but however this choice avoids a
-  // -Warray-bounds check warning
-  const unsigned int vtk_cell_type[5] = {1,  // VTK_VERTEX
-                                         3,  // VTK_LINE
-                                         9,  // VTK_QUAD
-                                         12, // VTK_HEXAHEDRON
-                                         static_cast<unsigned int>(-1)};
+  // Define cell id using VTK nomenclature for linear, quadratic and
+  // high-order Lagrange cells
+  enum vtk_linear_cell_type
+  {
+    VTK_VERTEX     = 1,
+    VTK_LINE       = 3,
+    VTK_TRIANGLE   = 5,
+    VTK_QUAD       = 9,
+    VTK_TETRA      = 10,
+    VTK_HEXAHEDRON = 12,
+    VTK_WEDGE      = 13,
+    VTK_PYRAMID    = 14
+  };
 
-  // VTK cell ids defined in vtk_cell_type are used for linear cells,
-  // the ones defined below are used when Lagrange cells are written.
-  const unsigned int vtk_lagrange_cell_type[5] = {
-    1,  // VTK_VERTEX
-    68, // VTK_LAGRANGE_CURVE
-    70, // VTK_LAGRANGE_QUADRILATERAL
-    72, // VTK_LAGRANGE_HEXAHEDRON
-    static_cast<unsigned int>(-1)};
+  enum vtk_quadratic_cell_type
+  {
+    VTK_QUADRATIC_EDGE       = 21,
+    VTK_QUADRATIC_TRIANGLE   = 22,
+    VTK_QUADRATIC_QUAD       = 23,
+    VTK_QUADRATIC_TETRA      = 24,
+    VTK_QUADRATIC_HEXAHEDRON = 25,
+    VTK_QUADRATIC_WEDGE      = 26,
+    VTK_QUADRATIC_PYRAMID    = 27
+  };
+
+  enum vtk_lagrange_cell_type
+  {
+    VTK_LAGRANGE_CURVE         = 68,
+    VTK_LAGRANGE_TRIANGLE      = 69,
+    VTK_LAGRANGE_QUADRILATERAL = 70,
+    VTK_LAGRANGE_TETRAHEDRON   = 71,
+    VTK_LAGRANGE_HEXAHEDRON    = 72,
+    VTK_LAGRANGE_WEDGE         = 73,
+    VTK_LAGRANGE_PYRAMID       = 74
+  };
+
+  /**
+   * Return the tuple (vtk cell type, number of cells, number of vertices)
+   * for a patch.
+   */
+  template <int dim, int spacedim>
+  std::array<unsigned int, 3>
+  extract_vtk_patch_info(const DataOutBase::Patch<dim, spacedim> &patch,
+                         const bool write_higher_order_cells)
+  {
+    std::array<unsigned int, 3> vtk_cell_id{};
+
+    if (write_higher_order_cells)
+      {
+        if (patch.reference_cell == ReferenceCells::get_hypercube<dim>())
+          {
+            const std::array<unsigned int, 4> cell_type_by_dim{
+              {VTK_VERTEX,
+               VTK_LAGRANGE_CURVE,
+               VTK_LAGRANGE_QUADRILATERAL,
+               VTK_LAGRANGE_HEXAHEDRON}};
+            vtk_cell_id[0] = cell_type_by_dim[dim];
+            vtk_cell_id[1] = 1;
+          }
+        else if (patch.reference_cell == ReferenceCells::Triangle)
+          {
+            vtk_cell_id[0] = VTK_LAGRANGE_TRIANGLE;
+            vtk_cell_id[1] = 1;
+          }
+        else
+          {
+            Assert(false, ExcNotImplemented());
+          }
+      }
+    else if (patch.reference_cell == ReferenceCells::Triangle &&
+             patch.data.n_cols() == 3)
+      {
+        vtk_cell_id[0] = VTK_TRIANGLE;
+        vtk_cell_id[1] = 1;
+      }
+    else if (patch.reference_cell == ReferenceCells::Triangle &&
+             patch.data.n_cols() == 6)
+      {
+        vtk_cell_id[0] = VTK_QUADRATIC_TRIANGLE;
+        vtk_cell_id[1] = 1;
+      }
+    else if (patch.reference_cell == ReferenceCells::Tetrahedron &&
+             patch.data.n_cols() == 4)
+      {
+        vtk_cell_id[0] = VTK_TETRA;
+        vtk_cell_id[1] = 1;
+      }
+    else if (patch.reference_cell == ReferenceCells::Tetrahedron &&
+             patch.data.n_cols() == 10)
+      {
+        vtk_cell_id[0] = VTK_QUADRATIC_TETRA;
+        vtk_cell_id[1] = 1;
+      }
+    else if (patch.reference_cell == ReferenceCells::Wedge &&
+             patch.data.n_cols() == 6)
+      {
+        vtk_cell_id[0] = VTK_WEDGE;
+        vtk_cell_id[1] = 1;
+      }
+    else if (patch.reference_cell == ReferenceCells::Pyramid &&
+             patch.data.n_cols() == 5)
+      {
+        vtk_cell_id[0] = VTK_PYRAMID;
+        vtk_cell_id[1] = 1;
+      }
+    else if (patch.reference_cell == ReferenceCells::get_hypercube<dim>())
+      {
+        const std::array<unsigned int, 4> cell_type_by_dim{
+          {VTK_VERTEX, VTK_LINE, VTK_QUAD, VTK_HEXAHEDRON}};
+        vtk_cell_id[0] = cell_type_by_dim[dim];
+        vtk_cell_id[1] = Utilities::pow(patch.n_subdivisions, dim);
+      }
+    else
+      {
+        Assert(false, ExcNotImplemented());
+      }
+
+    if (patch.reference_cell != ReferenceCells::get_hypercube<dim>() ||
+        write_higher_order_cells)
+      vtk_cell_id[2] = patch.data.n_cols();
+    else
+      vtk_cell_id[2] = GeometryInfo<dim>::vertices_per_cell;
+
+    return vtk_cell_id;
+  }
 
   //----------------------------------------------------------------------//
   // Auxiliary functions
   //----------------------------------------------------------------------//
   // For a given patch, compute the node interpolating the corner nodes linearly
   // at the point (xstep, ystep, zstep)*1./n_subdivisions. If the points are
-  // saved in the patch.data member, return the saved point instead
+  // saved in the patch.data member, return the saved point instead.
   template <int dim, int spacedim>
   inline Point<spacedim>
-  compute_node(const DataOutBase::Patch<dim, spacedim> &patch,
-               const unsigned int                       xstep,
-               const unsigned int                       ystep,
-               const unsigned int                       zstep,
-               const unsigned int                       n_subdivisions)
+  compute_hypercube_node(const DataOutBase::Patch<dim, spacedim> &patch,
+                         const unsigned int                       xstep,
+                         const unsigned int                       ystep,
+                         const unsigned int                       zstep,
+                         const unsigned int n_subdivisions)
   {
     Point<spacedim> node;
     if (patch.points_are_available)
@@ -636,6 +768,36 @@ namespace
               }
           }
       }
+    return node;
+  }
+
+  // For a given patch, compute the nodes for arbitrary (non-hypercube) cells.
+  // If the points are saved in the patch.data member, return the saved point
+  // instead.
+  template <int dim, int spacedim>
+  inline Point<spacedim>
+  compute_arbitrary_node(const DataOutBase::Patch<dim, spacedim> &patch,
+                         const unsigned int                       point_no)
+  {
+    Point<spacedim> node;
+
+    if (patch.points_are_available)
+      {
+        for (unsigned int d = 0; d < spacedim; ++d)
+          node[d] = patch.data(patch.data.size(0) - spacedim + d, point_no);
+        return node;
+      }
+    else
+      {
+        AssertDimension(patch.n_subdivisions, 1);
+        Assert(
+          patch.reference_cell != ReferenceCells::Pyramid,
+          ExcMessage(
+            "Pyramids need different ordering of the vertices, which is not implemented yet here."));
+
+        node = patch.vertices[point_no];
+      }
+
     return node;
   }
 
@@ -786,8 +948,60 @@ namespace
     n_cells = 0;
     for (const auto &patch : patches)
       {
-        n_nodes += Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
-        n_cells += Utilities::fixed_power<dim>(patch.n_subdivisions);
+        // The following formula doesn't hold for non-tensor products.
+        if (patch.reference_cell == ReferenceCells::get_hypercube<dim>())
+          {
+            n_nodes += Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
+            n_cells += Utilities::fixed_power<dim>(patch.n_subdivisions);
+          }
+        else
+          {
+            Assert(patch.n_subdivisions == 1, ExcNotImplemented());
+            n_nodes += patch.reference_cell.n_vertices();
+            n_cells += 1;
+          }
+      }
+  }
+
+  template <int dim, int spacedim>
+  static void
+  compute_sizes(const std::vector<DataOutBase::Patch<dim, spacedim>> &patches,
+                const bool    write_higher_order_cells,
+                unsigned int &n_nodes,
+                unsigned int &n_cells,
+                unsigned int &n_points_and_n_cells)
+  {
+    n_nodes              = 0;
+    n_cells              = 0;
+    n_points_and_n_cells = 0;
+
+    for (const auto &patch : patches)
+      {
+        // The following formulas don't hold for non-tensor products.
+        if (patch.reference_cell == ReferenceCells::get_hypercube<dim>())
+          {
+            n_nodes += Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
+
+            if (write_higher_order_cells)
+              {
+                n_cells += 1;
+                n_points_and_n_cells +=
+                  1 + Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
+              }
+            else
+              {
+                n_cells += Utilities::fixed_power<dim>(patch.n_subdivisions);
+                n_points_and_n_cells +=
+                  Utilities::fixed_power<dim>(patch.n_subdivisions) *
+                  (1 + GeometryInfo<dim>::vertices_per_cell);
+              }
+          }
+        else
+          {
+            n_nodes += patch.data.n_cols();
+            n_cells += 1;
+            n_points_and_n_cells += patch.data.n_cols() + 1;
+          }
       }
   }
 
@@ -845,6 +1059,27 @@ namespace
                const unsigned int /*y_offset*/,
                const unsigned int /*z_offset*/)
     {
+      Assert(false,
+             ExcMessage("The derived class you are using needs to "
+                        "reimplement this function if you want to call "
+                        "it."));
+    }
+
+    /**
+     * Write dim-dimensional @p index cell with @p n_point vertices and first
+     * vertex at number @p start.
+     *
+     * @note All inheriting classes should implement this function.
+     */
+    void
+    write_cell_single(const unsigned int index,
+                      const unsigned int start,
+                      const unsigned int n_points)
+    {
+      (void)index;
+      (void)start;
+      (void)n_points;
+
       Assert(false,
              ExcMessage("The derived class you are using needs to "
                         "reimplement this function if you want to call "
@@ -1061,6 +1296,14 @@ namespace
                const unsigned int z_offset);
 
     /**
+     * Print vertices [start, start+n_points[
+     */
+    void
+    write_cell_single(const unsigned int index,
+                      const unsigned int start,
+                      const unsigned int n_points);
+
+    /**
      * Write a high-order cell type, i.e., a Lagrange cell
      * in the VTK terminology.
      * The connectivity order of the points is given in the
@@ -1102,6 +1345,14 @@ namespace
                const unsigned int x_offset,
                const unsigned int y_offset,
                const unsigned int z_offset);
+
+    /**
+     * Print vertices [start, start+n_points[
+     */
+    void
+    write_cell_single(const unsigned int index,
+                      const unsigned int start,
+                      const unsigned int n_points);
 
     /**
      * Write a high-order cell type, i.e., a Lagrange cell
@@ -1436,6 +1687,7 @@ namespace
                         unsigned int d3)
   {
     stream << GeometryInfo<dim>::vertices_per_cell << '\t' << start;
+
     if (dim >= 1)
       stream << '\t' << start + d1;
     {
@@ -1449,6 +1701,19 @@ namespace
             }
         }
     }
+    stream << '\n';
+  }
+
+  void
+  VtkStream::write_cell_single(const unsigned int index,
+                               const unsigned int start,
+                               const unsigned int n_points)
+  {
+    (void)index;
+
+    stream << '\t' << n_points;
+    for (unsigned int i = 0; i < n_points; ++i)
+      stream << '\t' << start + i;
     stream << '\n';
   }
 
@@ -1547,6 +1812,23 @@ namespace
 #endif
   }
 
+  void
+  VtuStream::write_cell_single(const unsigned int index,
+                               const unsigned int start,
+                               const unsigned int n_points)
+  {
+    (void)index;
+
+#if !defined(DEAL_II_WITH_ZLIB)
+    for (unsigned int i = 0; i < n_points; ++i)
+      stream << '\t' << start + i;
+    stream << '\n';
+#else
+    for (unsigned int i = 0; i < n_points; ++i)
+      cells.push_back(start + i);
+#endif
+  }
+
   template <int dim>
   void
   VtuStream::write_high_order_cell(const unsigned int,
@@ -1612,6 +1894,7 @@ namespace DataOutBase
     : patch_index(no_neighbor)
     , n_subdivisions(1)
     , points_are_available(false)
+    , reference_cell(ReferenceCells::get_hypercube<dim>())
   // all the other data has a constructor of its own, except for the "neighbors"
   // field, which we set to invalid values.
   {
@@ -1689,6 +1972,7 @@ namespace DataOutBase
     std::swap(n_subdivisions, other_patch.n_subdivisions);
     data.swap(other_patch.data);
     std::swap(points_are_available, other_patch.points_are_available);
+    std::swap(reference_cell, other_patch.reference_cell);
   }
 
 
@@ -1712,6 +1996,7 @@ namespace DataOutBase
   Patch<0, spacedim>::Patch()
     : patch_index(no_neighbor)
     , points_are_available(false)
+    , reference_cell(ReferenceCells::get_hypercube<0>())
   {
     Assert(spacedim <= 3, ExcNotImplemented());
   }
@@ -2231,11 +2516,8 @@ namespace DataOutBase
 
 
 
-  TecplotFlags::TecplotFlags(const char * tecplot_binary_file_name,
-                             const char * zone_name,
-                             const double solution_time)
-    : tecplot_binary_file_name(tecplot_binary_file_name)
-    , zone_name(zone_name)
+  TecplotFlags::TecplotFlags(const char *zone_name, const double solution_time)
+    : zone_name(zone_name)
     , solution_time(solution_time)
   {}
 
@@ -2244,9 +2526,7 @@ namespace DataOutBase
   std::size_t
   TecplotFlags::memory_consumption() const
   {
-    return sizeof(*this) +
-           MemoryConsumption::memory_consumption(tecplot_binary_file_name) +
-           MemoryConsumption::memory_consumption(zone_name);
+    return sizeof(*this) + MemoryConsumption::memory_consumption(zone_name);
   }
 
 
@@ -2376,19 +2656,30 @@ namespace DataOutBase
 
     for (const auto &patch : patches)
       {
-        const unsigned int n_subdivisions = patch.n_subdivisions;
-        const unsigned int n              = n_subdivisions + 1;
-        // Length of loops in all dimensions. If a dimension is not used, a loop
-        // of length one will do the job.
-        const unsigned int n1 = (dim > 0) ? n : 1;
-        const unsigned int n2 = (dim > 1) ? n : 1;
-        const unsigned int n3 = (dim > 2) ? n : 1;
+        // special treatment of non-hypercube cells
+        if (patch.reference_cell != ReferenceCells::get_hypercube<dim>())
+          {
+            for (unsigned int point_no = 0; point_no < patch.data.n_cols();
+                 ++point_no)
+              out.write_point(count++, compute_arbitrary_node(patch, point_no));
+          }
+        else
+          {
+            const unsigned int n_subdivisions = patch.n_subdivisions;
+            const unsigned int n              = n_subdivisions + 1;
+            // Length of loops in all dimensions. If a dimension is not used, a
+            // loop of length one will do the job.
+            const unsigned int n1 = (dim > 0) ? n : 1;
+            const unsigned int n2 = (dim > 1) ? n : 1;
+            const unsigned int n3 = (dim > 2) ? n : 1;
 
-        for (unsigned int i3 = 0; i3 < n3; ++i3)
-          for (unsigned int i2 = 0; i2 < n2; ++i2)
-            for (unsigned int i1 = 0; i1 < n1; ++i1)
-              out.write_point(count++,
-                              compute_node(patch, i1, i2, i3, n_subdivisions));
+            for (unsigned int i3 = 0; i3 < n3; ++i3)
+              for (unsigned int i2 = 0; i2 < n2; ++i2)
+                for (unsigned int i1 = 0; i1 < n1; ++i1)
+                  out.write_point(
+                    count++,
+                    compute_hypercube_node(patch, i1, i2, i3, n_subdivisions));
+          }
       }
     out.flush_points();
   }
@@ -2402,28 +2693,39 @@ namespace DataOutBase
     unsigned int first_vertex_of_patch = 0;
     for (const auto &patch : patches)
       {
-        const unsigned int n_subdivisions = patch.n_subdivisions;
-        const unsigned int n              = n_subdivisions + 1;
-        // Length of loops in all dimensons
-        const unsigned int n1 = (dim > 0) ? n_subdivisions : 1;
-        const unsigned int n2 = (dim > 1) ? n_subdivisions : 1;
-        const unsigned int n3 = (dim > 2) ? n_subdivisions : 1;
-        // Offsets of outer loops
-        const unsigned int d1 = 1;
-        const unsigned int d2 = n;
-        const unsigned int d3 = n * n;
-        for (unsigned int i3 = 0; i3 < n3; ++i3)
-          for (unsigned int i2 = 0; i2 < n2; ++i2)
-            for (unsigned int i1 = 0; i1 < n1; ++i1)
-              {
-                const unsigned int offset =
-                  first_vertex_of_patch + i3 * d3 + i2 * d2 + i1 * d1;
-                // First write line in x direction
-                out.template write_cell<dim>(count++, offset, d1, d2, d3);
-              }
-        // finally update the number of the first vertex of this patch
-        first_vertex_of_patch +=
-          Utilities::fixed_power<dim>(n_subdivisions + 1);
+        // special treatment of simplices since they are not subdivided
+        if (patch.reference_cell != ReferenceCells::get_hypercube<dim>())
+          {
+            out.write_cell_single(count++,
+                                  first_vertex_of_patch,
+                                  patch.data.n_cols());
+            first_vertex_of_patch += patch.data.n_cols();
+          }
+        else
+          {
+            const unsigned int n_subdivisions = patch.n_subdivisions;
+            const unsigned int n              = n_subdivisions + 1;
+            // Length of loops in all dimensions
+            const unsigned int n1 = (dim > 0) ? n_subdivisions : 1;
+            const unsigned int n2 = (dim > 1) ? n_subdivisions : 1;
+            const unsigned int n3 = (dim > 2) ? n_subdivisions : 1;
+            // Offsets of outer loops
+            const unsigned int d1 = 1;
+            const unsigned int d2 = n;
+            const unsigned int d3 = n * n;
+            for (unsigned int i3 = 0; i3 < n3; ++i3)
+              for (unsigned int i2 = 0; i2 < n2; ++i2)
+                for (unsigned int i1 = 0; i1 < n1; ++i1)
+                  {
+                    const unsigned int offset =
+                      first_vertex_of_patch + i3 * d3 + i2 * d2 + i1 * d1;
+                    // First write line in x direction
+                    out.template write_cell<dim>(count++, offset, d1, d2, d3);
+                  }
+            // finally update the number of the first vertex of this patch
+            first_vertex_of_patch +=
+              Utilities::fixed_power<dim>(n_subdivisions + 1);
+          }
       }
 
     out.flush_cells();
@@ -2444,36 +2746,53 @@ namespace DataOutBase
 
     for (const auto &patch : patches)
       {
-        const unsigned int n_subdivisions = patch.n_subdivisions;
-        const unsigned int n              = n_subdivisions + 1;
+        if (patch.reference_cell != ReferenceCells::get_hypercube<dim>())
+          {
+            connectivity.resize(patch.data.n_cols());
 
-        cell_order.fill(n_subdivisions);
-        connectivity.resize(Utilities::fixed_power<dim>(n));
+            for (unsigned int i = 0; i < patch.data.n_cols(); ++i)
+              connectivity[i] = i;
 
-        // Length of loops in all dimensons
-        const unsigned int n1 = (dim > 0) ? n_subdivisions : 0;
-        const unsigned int n2 = (dim > 1) ? n_subdivisions : 0;
-        const unsigned int n3 = (dim > 2) ? n_subdivisions : 0;
-        // Offsets of outer loops
-        const unsigned int d1 = 1;
-        const unsigned int d2 = n;
-        const unsigned int d3 = n * n;
-        for (unsigned int i3 = 0; i3 <= n3; ++i3)
-          for (unsigned int i2 = 0; i2 <= n2; ++i2)
-            for (unsigned int i1 = 0; i1 <= n1; ++i1)
-              {
-                const unsigned int local_index = i3 * d3 + i2 * d2 + i1 * d1;
-                const unsigned int connectivity_index =
-                  vtk_point_index_from_ijk(i1, i2, i3, cell_order);
-                connectivity[connectivity_index] = local_index;
-              }
+            out.template write_high_order_cell<dim>(count++,
+                                                    first_vertex_of_patch,
+                                                    connectivity);
 
-        out.template write_high_order_cell<dim>(count++,
-                                                first_vertex_of_patch,
-                                                connectivity);
+            first_vertex_of_patch += patch.data.n_cols();
+          }
+        else
+          {
+            const unsigned int n_subdivisions = patch.n_subdivisions;
+            const unsigned int n              = n_subdivisions + 1;
 
-        // finally update the number of the first vertex of this patch
-        first_vertex_of_patch += Utilities::fixed_power<dim>(n);
+            cell_order.fill(n_subdivisions);
+            connectivity.resize(Utilities::fixed_power<dim>(n));
+
+            // Length of loops in all dimensons
+            const unsigned int n1 = (dim > 0) ? n_subdivisions : 0;
+            const unsigned int n2 = (dim > 1) ? n_subdivisions : 0;
+            const unsigned int n3 = (dim > 2) ? n_subdivisions : 0;
+            // Offsets of outer loops
+            const unsigned int d1 = 1;
+            const unsigned int d2 = n;
+            const unsigned int d3 = n * n;
+            for (unsigned int i3 = 0; i3 <= n3; ++i3)
+              for (unsigned int i2 = 0; i2 <= n2; ++i2)
+                for (unsigned int i1 = 0; i1 <= n1; ++i1)
+                  {
+                    const unsigned int local_index =
+                      i3 * d3 + i2 * d2 + i1 * d1;
+                    const unsigned int connectivity_index =
+                      vtk_point_index_from_ijk(i1, i2, i3, cell_order);
+                    connectivity[connectivity_index] = local_index;
+                  }
+
+            out.template write_high_order_cell<dim>(count++,
+                                                    first_vertex_of_patch,
+                                                    connectivity);
+
+            // finally update the number of the first vertex of this patch
+            first_vertex_of_patch += Utilities::fixed_power<dim>(n);
+          }
       }
 
     out.flush_cells();
@@ -3287,7 +3606,8 @@ namespace DataOutBase
                 for (unsigned int i1 = 0; i1 < n1; ++i1)
                   {
                     // compute coordinates for this patch point
-                    out << compute_node(patch, i1, i2, 0, n_subdivisions)
+                    out << compute_hypercube_node(
+                             patch, i1, i2, 0, n_subdivisions)
                         << ' ';
 
                     for (unsigned int data_set = 0; data_set < n_data_sets;
@@ -3314,7 +3634,7 @@ namespace DataOutBase
                   {
                     // compute coordinates for this patch point
                     this_point =
-                      compute_node(patch, i1, i2, i3, n_subdivisions);
+                      compute_hypercube_node(patch, i1, i2, i3, n_subdivisions);
                     // line into positive x-direction if possible
                     if (i1 < n_subdivisions)
                       {
@@ -3328,7 +3648,7 @@ namespace DataOutBase
                         out << '\n';
 
                         // write point there and its data
-                        out << compute_node(
+                        out << compute_hypercube_node(
                           patch, i1 + 1, i2, i3, n_subdivisions);
 
                         for (unsigned int data_set = 0; data_set < n_data_sets;
@@ -3355,7 +3675,7 @@ namespace DataOutBase
                         out << '\n';
 
                         // write point there and its data
-                        out << compute_node(
+                        out << compute_hypercube_node(
                           patch, i1, i2 + 1, i3, n_subdivisions);
 
                         for (unsigned int data_set = 0; data_set < n_data_sets;
@@ -3382,7 +3702,7 @@ namespace DataOutBase
                         out << '\n';
 
                         // write point there and its data
-                        out << compute_node(
+                        out << compute_hypercube_node(
                           patch, i1, i2, i3 + 1, n_subdivisions);
 
                         for (unsigned int data_set = 0; data_set < n_data_sets;
@@ -3485,7 +3805,7 @@ namespace DataOutBase
     }
 
     // max. and min. height of solution
-    Assert(patches.size() > 0, ExcInternalError());
+    Assert(patches.size() > 0, ExcNoPatches());
     double hmin = patches[0].data(0, 0);
     double hmax = patches[0].data(0, 0);
 
@@ -3568,7 +3888,7 @@ namespace DataOutBase
             {
               // compute coordinates for this patch point, storing in ver
               ver[i1 * d1 + i2 * d2] =
-                compute_node(patch, i1, i2, 0, n_subdivisions);
+                compute_hypercube_node(patch, i1, i2, 0, n_subdivisions);
             }
 
 
@@ -3810,11 +4130,14 @@ namespace DataOutBase
           for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
             {
               Point<spacedim> points[4];
-              points[0] = compute_node(patch, i1, i2, 0, n_subdivisions);
-              points[1] = compute_node(patch, i1 + 1, i2, 0, n_subdivisions);
-              points[2] = compute_node(patch, i1, i2 + 1, 0, n_subdivisions);
-              points[3] =
-                compute_node(patch, i1 + 1, i2 + 1, 0, n_subdivisions);
+              points[0] =
+                compute_hypercube_node(patch, i1, i2, 0, n_subdivisions);
+              points[1] =
+                compute_hypercube_node(patch, i1 + 1, i2, 0, n_subdivisions);
+              points[2] =
+                compute_hypercube_node(patch, i1, i2 + 1, 0, n_subdivisions);
+              points[3] = compute_hypercube_node(
+                patch, i1 + 1, i2 + 1, 0, n_subdivisions);
 
               switch (spacedim)
                 {
@@ -4841,19 +5164,12 @@ namespace DataOutBase
     }
 
     // first count the number of cells and cells for later use
-    unsigned int n_nodes;
-    unsigned int n_cells;
-    compute_sizes<dim, spacedim>(patches, n_nodes, n_cells);
-
-    // If a user set to output high order cells, we treat n_subdivisions
-    // as a cell order and adjust variables accordingly, otherwise
-    // each patch is written as a linear cell.
-    unsigned int n_points_per_cell = GeometryInfo<dim>::vertices_per_cell;
-    if (flags.write_higher_order_cells)
-      {
-        n_cells           = patches.size();
-        n_points_per_cell = n_nodes / n_cells;
-      }
+    unsigned int n_nodes, n_cells, n_points_and_n_cells;
+    compute_sizes(patches,
+                  flags.write_higher_order_cells,
+                  n_nodes,
+                  n_cells,
+                  n_points_and_n_cells);
 
     // in gmv format the vertex coordinates and the data have an order that is a
     // bit unpleasant (first all x coordinates, then all y coordinate, ...;
@@ -4884,8 +5200,7 @@ namespace DataOutBase
     out << '\n';
     /////////////////////////////////
     // now for the cells
-    out << "CELLS " << n_cells << ' ' << n_cells * (n_points_per_cell + 1)
-        << '\n';
+    out << "CELLS " << n_cells << ' ' << n_points_and_n_cells << '\n';
     if (flags.write_higher_order_cells)
       write_high_order_cells(patches, vtk_out);
     else
@@ -4895,12 +5210,17 @@ namespace DataOutBase
     // simple
     out << "CELL_TYPES " << n_cells << '\n';
 
-    // need to distinguish between linear and high order cells
-    const unsigned int vtk_cell_id = flags.write_higher_order_cells ?
-                                       vtk_lagrange_cell_type[dim] :
-                                       vtk_cell_type[dim];
-    for (unsigned int i = 0; i < n_cells; ++i)
-      out << ' ' << vtk_cell_id;
+    // need to distinguish between linear cells, simplex cells (linear or
+    // quadratic), and  high order cells
+    for (const auto &patch : patches)
+      {
+        const auto vtk_cell_id =
+          extract_vtk_patch_info(patch, flags.write_higher_order_cells);
+
+        for (unsigned int i = 0; i < vtk_cell_id[1]; ++i)
+          out << ' ' << vtk_cell_id[0];
+      }
+
     out << '\n';
     ///////////////////////////////////////
     // data output.
@@ -5206,24 +5526,17 @@ namespace DataOutBase
 #ifdef DEAL_II_WITH_ZLIB
     const char *ascii_or_binary = "binary";
 #else
-    const char *ascii_or_binary = "ascii";
+    const char *              ascii_or_binary = "ascii";
 #endif
 
 
     // first count the number of cells and cells for later use
-    unsigned int n_nodes;
-    unsigned int n_cells;
-    compute_sizes<dim, spacedim>(patches, n_nodes, n_cells);
-
-    // If a user set to output high order cells, we treat n_subdivisions
-    // as a cell order and adjust variables accordingly, otherwise
-    // each patch is written as a linear cell.
-    unsigned int n_points_per_cell = GeometryInfo<dim>::vertices_per_cell;
-    if (flags.write_higher_order_cells)
-      {
-        n_cells           = patches.size();
-        n_points_per_cell = n_nodes / n_cells;
-      }
+    unsigned int n_nodes, n_cells, n_points_and_n_cells;
+    compute_sizes(patches,
+                  flags.write_higher_order_cells,
+                  n_nodes,
+                  n_cells,
+                  n_points_and_n_cells);
 
     // in gmv format the vertex coordinates and the data have an order that is a
     // bit unpleasant (first all x coordinates, then all y coordinate, ...;
@@ -5274,9 +5587,33 @@ namespace DataOutBase
     out << "    <DataArray type=\"Int32\" Name=\"offsets\" format=\""
         << ascii_or_binary << "\">\n";
 
-    std::vector<int32_t> offsets(n_cells);
-    for (unsigned int i = 0; i < n_cells; ++i)
-      offsets[i] = (i + 1) * n_points_per_cell;
+    std::vector<int32_t> offsets;
+    offsets.reserve(n_cells);
+
+    // uint8_t might be an alias to unsigned char which is then not printed
+    // as ascii integers
+#ifdef DEAL_II_WITH_ZLIB
+    std::vector<uint8_t> cell_types;
+#else
+    std::vector<unsigned int> cell_types;
+#endif
+    cell_types.reserve(n_cells);
+
+    unsigned int first_vertex_of_patch = 0;
+
+    for (const auto &patch : patches)
+      {
+        const auto vtk_cell_id =
+          extract_vtk_patch_info(patch, flags.write_higher_order_cells);
+
+        for (unsigned int i = 0; i < vtk_cell_id[1]; ++i)
+          {
+            cell_types.push_back(vtk_cell_id[0]);
+            first_vertex_of_patch += vtk_cell_id[2];
+            offsets.push_back(first_vertex_of_patch);
+          }
+      }
+
     vtu_out << offsets;
     out << "\n";
     out << "    </DataArray>\n";
@@ -5286,23 +5623,8 @@ namespace DataOutBase
     out << "    <DataArray type=\"UInt8\" Name=\"types\" format=\""
         << ascii_or_binary << "\">\n";
 
-    {
-      // need to distinguish between linear and high order cells
-      const unsigned int vtk_cell_id = flags.write_higher_order_cells ?
-                                         vtk_lagrange_cell_type[dim] :
-                                         vtk_cell_type[dim];
-
-      // uint8_t might be an alias to unsigned char which is then not printed
-      // as ascii integers
-#ifdef DEAL_II_WITH_ZLIB
-      std::vector<uint8_t> cell_types(n_cells,
-                                      static_cast<uint8_t>(vtk_cell_id));
-#else
-      std::vector<unsigned int> cell_types(n_cells, vtk_cell_id);
-#endif
-      // this should compress well :-)
-      vtu_out << cell_types;
-    }
+    // this should compress well :-)
+    vtu_out << cell_types;
     out << "\n";
     out << "    </DataArray>\n";
     out << "  </Cells>\n";
@@ -5761,7 +6083,8 @@ namespace DataOutBase
     Point<2>                projection_decomposition;
     std::array<Point<2>, 4> projection_decompositions;
 
-    projected_point = compute_node(first_patch, 0, 0, 0, n_subdivisions);
+    projected_point =
+      compute_hypercube_node(first_patch, 0, 0, 0, n_subdivisions);
 
     if (first_patch.data.n_rows() != 0)
       {
@@ -5788,13 +6111,13 @@ namespace DataOutBase
             for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
               {
                 projected_points[0] =
-                  compute_node(patch, i1, i2, 0, n_subdivisions);
+                  compute_hypercube_node(patch, i1, i2, 0, n_subdivisions);
                 projected_points[1] =
-                  compute_node(patch, i1 + 1, i2, 0, n_subdivisions);
+                  compute_hypercube_node(patch, i1 + 1, i2, 0, n_subdivisions);
                 projected_points[2] =
-                  compute_node(patch, i1, i2 + 1, 0, n_subdivisions);
-                projected_points[3] =
-                  compute_node(patch, i1 + 1, i2 + 1, 0, n_subdivisions);
+                  compute_hypercube_node(patch, i1, i2 + 1, 0, n_subdivisions);
+                projected_points[3] = compute_hypercube_node(
+                  patch, i1 + 1, i2 + 1, 0, n_subdivisions);
 
                 x_min = std::min(x_min, projected_points[0][0]);
                 x_min = std::min(x_min, projected_points[1][0]);
@@ -5969,7 +6292,8 @@ namespace DataOutBase
 
     Point<3> point;
 
-    projected_point = compute_node(first_patch, 0, 0, 0, n_subdivisions);
+    projected_point =
+      compute_hypercube_node(first_patch, 0, 0, 0, n_subdivisions);
 
     if (first_patch.data.n_rows() != 0)
       {
@@ -6002,10 +6326,11 @@ namespace DataOutBase
             for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
               {
                 const std::array<Point<spacedim>, 4> projected_vertices{
-                  {compute_node(patch, i1, i2, 0, n_subdivisions),
-                   compute_node(patch, i1 + 1, i2, 0, n_subdivisions),
-                   compute_node(patch, i1, i2 + 1, 0, n_subdivisions),
-                   compute_node(patch, i1 + 1, i2 + 1, 0, n_subdivisions)}};
+                  {compute_hypercube_node(patch, i1, i2, 0, n_subdivisions),
+                   compute_hypercube_node(patch, i1 + 1, i2, 0, n_subdivisions),
+                   compute_hypercube_node(patch, i1, i2 + 1, 0, n_subdivisions),
+                   compute_hypercube_node(
+                     patch, i1 + 1, i2 + 1, 0, n_subdivisions)}};
 
                 Assert((flags.height_vector < patch.data.n_rows()) ||
                          patch.data.n_rows() == 0,
@@ -6143,10 +6468,11 @@ namespace DataOutBase
             for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
               {
                 const std::array<Point<spacedim>, 4> projected_vertices = {
-                  {compute_node(patch, i1, i2, 0, n_subdivisions),
-                   compute_node(patch, i1 + 1, i2, 0, n_subdivisions),
-                   compute_node(patch, i1, i2 + 1, 0, n_subdivisions),
-                   compute_node(patch, i1 + 1, i2 + 1, 0, n_subdivisions)}};
+                  {compute_hypercube_node(patch, i1, i2, 0, n_subdivisions),
+                   compute_hypercube_node(patch, i1 + 1, i2, 0, n_subdivisions),
+                   compute_hypercube_node(patch, i1, i2 + 1, 0, n_subdivisions),
+                   compute_hypercube_node(
+                     patch, i1 + 1, i2 + 1, 0, n_subdivisions)}};
 
                 Assert((flags.height_vector < patch.data.n_rows()) ||
                          patch.data.n_rows() == 0,
@@ -6848,19 +7174,6 @@ DataOutInterface<dim, spacedim>::write_tecplot(std::ostream &out) const
 
 template <int dim, int spacedim>
 void
-DataOutInterface<dim, spacedim>::write_tecplot_binary(std::ostream &out) const
-{
-  DataOutBase::write_tecplot_binary(get_patches(),
-                                    get_dataset_names(),
-                                    get_nonscalar_data_ranges(),
-                                    tecplot_flags,
-                                    out);
-}
-
-
-
-template <int dim, int spacedim>
-void
 DataOutInterface<dim, spacedim>::write_vtk(std::ostream &out) const
 {
   DataOutBase::write_vtk(get_patches(),
@@ -6896,13 +7209,14 @@ template <int dim, int spacedim>
 void
 DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
   const std::string &filename,
-  MPI_Comm           comm) const
+  const MPI_Comm &   comm) const
 {
 #ifndef DEAL_II_WITH_MPI
   // without MPI fall back to the normal way to write a vtu file:
   (void)comm;
 
   std::ofstream f(filename);
+  AssertThrow(f, ExcFileNotOpen(filename));
   write_vtu(f);
 #else
 
@@ -6917,7 +7231,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
                        MPI_MODE_CREATE | MPI_MODE_WRONLY,
                        info,
                        &fh);
-  AssertThrowMPI(ierr);
+  AssertThrow(ierr == MPI_SUCCESS, ExcFileNotOpen(filename));
 
   ierr = MPI_File_set_size(fh, 0); // delete the file contents
   AssertThrowMPI(ierr);
@@ -7039,6 +7353,7 @@ DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
     {
       // every processor writes one file
       std::ofstream output(filename.c_str());
+      AssertThrow(output, ExcFileNotOpen(filename));
       this->write_vtu(output);
     }
   else if (n_groups == 1)
@@ -7062,7 +7377,7 @@ DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
     }
 
   // write pvtu record
-  const std::string filename_master =
+  const std::string pvtu_filename =
     filename_without_extension + "_" +
     Utilities::int_to_string(counter, n_digits_for_counter) + ".pvtu";
 
@@ -7079,11 +7394,11 @@ DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
           filename_vector.emplace_back(filename);
         }
 
-      std::ofstream master_output((directory + filename_master).c_str());
-      this->write_pvtu_record(master_output, filename_vector);
+      std::ofstream pvtu_output((directory + pvtu_filename).c_str());
+      this->write_pvtu_record(pvtu_output, filename_vector);
     }
 
-  return filename_master;
+  return pvtu_filename;
 }
 
 
@@ -7107,7 +7422,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   const DataOutBase::DataOutFilter &data_filter,
   const std::string &               h5_filename,
   const double                      cur_time,
-  MPI_Comm                          comm) const
+  const MPI_Comm &                  comm) const
 {
   return create_xdmf_entry(
     data_filter, h5_filename, h5_filename, cur_time, comm);
@@ -7122,7 +7437,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   const std::string &               h5_mesh_filename,
   const std::string &               h5_solution_filename,
   const double                      cur_time,
-  MPI_Comm                          comm) const
+  const MPI_Comm &                  comm) const
 {
   unsigned int local_node_cell_count[2], global_node_cell_count[2];
 
@@ -7193,7 +7508,7 @@ void
 DataOutInterface<dim, spacedim>::write_xdmf_file(
   const std::vector<XDMFEntry> &entries,
   const std::string &           filename,
-  MPI_Comm                      comm) const
+  const MPI_Comm &              comm) const
 {
 #ifdef DEAL_II_WITH_MPI
   const int myrank = Utilities::MPI::this_mpi_process(comm);
@@ -7216,8 +7531,13 @@ DataOutInterface<dim, spacedim>::write_xdmf_file(
         << "    <Grid Name=\"CellTime\" GridType=\"Collection\" CollectionType=\"Temporal\">\n";
 
       // Write out all the entries indented
+      const auto &patches = get_patches();
+      Assert(patches.size() > 0, DataOutBase::ExcNoPatches());
+
       for (it = entries.begin(); it != entries.end(); ++it)
-        xdmf_file << it->get_xdmf_content(3);
+        {
+          xdmf_file << it->get_xdmf_content(3, patches[0].reference_cell);
+        }
 
       xdmf_file << "    </Grid>\n";
       xdmf_file << "  </Domain>\n";
@@ -7366,7 +7686,7 @@ void
 DataOutInterface<dim, spacedim>::write_hdf5_parallel(
   const DataOutBase::DataOutFilter &data_filter,
   const std::string &               filename,
-  MPI_Comm                          comm) const
+  const MPI_Comm &                  comm) const
 {
   DataOutBase::write_hdf5_parallel(get_patches(), data_filter, filename, comm);
 }
@@ -7380,7 +7700,7 @@ DataOutInterface<dim, spacedim>::write_hdf5_parallel(
   const bool                        write_mesh_file,
   const std::string &               mesh_filename,
   const std::string &               solution_filename,
-  MPI_Comm                          comm) const
+  const MPI_Comm &                  comm) const
 {
   DataOutBase::write_hdf5_parallel(get_patches(),
                                    data_filter,
@@ -7398,7 +7718,7 @@ DataOutBase::write_hdf5_parallel(
   const std::vector<Patch<dim, spacedim>> &patches,
   const DataOutBase::DataOutFilter &       data_filter,
   const std::string &                      filename,
-  MPI_Comm                                 comm)
+  const MPI_Comm &                         comm)
 {
   write_hdf5_parallel(patches, data_filter, true, filename, filename, comm);
 }
@@ -7408,12 +7728,12 @@ DataOutBase::write_hdf5_parallel(
 template <int dim, int spacedim>
 void
 DataOutBase::write_hdf5_parallel(
-  const std::vector<Patch<dim, spacedim>> & /*patches*/,
-  const DataOutBase::DataOutFilter &data_filter,
-  const bool                        write_mesh_file,
-  const std::string &               mesh_filename,
-  const std::string &               solution_filename,
-  MPI_Comm                          comm)
+  const std::vector<Patch<dim, spacedim>> &patches,
+  const DataOutBase::DataOutFilter &       data_filter,
+  const bool                               write_mesh_file,
+  const std::string &                      mesh_filename,
+  const std::string &                      solution_filename,
+  const MPI_Comm &                         comm)
 {
   AssertThrow(
     spacedim >= 2,
@@ -7426,6 +7746,7 @@ DataOutBase::write_hdf5_parallel(
 #ifndef DEAL_II_WITH_HDF5
   // throw an exception, but first make sure the compiler does not warn about
   // the now unused function arguments
+  (void)patches;
   (void)data_filter;
   (void)write_mesh_file;
   (void)mesh_filename;
@@ -7434,15 +7755,16 @@ DataOutBase::write_hdf5_parallel(
   AssertThrow(false, ExcMessage("HDF5 support is disabled."));
 #else
 #  ifndef DEAL_II_WITH_MPI
+  (void)comm;
+#  endif
+
   // verify that there are indeed patches to be written out. most of the times,
   // people just forget to call build_patches when there are no patches, so a
   // warning is in order. that said, the assertion is disabled if we support MPI
   // since then it can happen that on the coarsest mesh, a processor simply has
   // no cells it actually owns, and in that case it is legit if there are no
   // patches
-  Assert(data_filter.n_nodes() > 0, ExcNoPatches());
-  (void)comm;
-#  endif
+  Assert(patches.size() > 0, ExcNoPatches());
 
   hid_t h5_mesh_file_id = -1, h5_solution_file_id, file_plist_id, plist_id;
   hid_t node_dataspace, node_dataset, node_file_dataspace,
@@ -7537,7 +7859,7 @@ DataOutBase::write_hdf5_parallel(
       AssertThrow(node_dataspace >= 0, ExcIO());
 
       cell_ds_dim[0] = global_node_cell_count[1];
-      cell_ds_dim[1] = GeometryInfo<dim>::vertices_per_cell;
+      cell_ds_dim[1] = patches[0].reference_cell.n_vertices();
       cell_dataspace = H5Screate_simple(2, cell_ds_dim, nullptr);
       AssertThrow(cell_dataspace >= 0, ExcIO());
 
@@ -7598,7 +7920,7 @@ DataOutBase::write_hdf5_parallel(
 
       // And repeat for cells
       count[0] = local_node_cell_count[1];
-      count[1] = GeometryInfo<dim>::vertices_per_cell;
+      count[1] = patches[0].reference_cell.n_vertices();
       offset[0] = global_node_cell_offsets[1];
       offset[1] = 0;
       cell_memory_dataspace = H5Screate_simple(2, count, nullptr);
@@ -7804,10 +8126,6 @@ DataOutInterface<dim, spacedim>::write(
 
       case DataOutBase::tecplot:
         write_tecplot(out);
-        break;
-
-      case DataOutBase::tecplot_binary:
-        write_tecplot_binary(out);
         break;
 
       case DataOutBase::vtk:
@@ -8370,6 +8688,33 @@ namespace
 std::string
 XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
 {
+  switch (dimension)
+    {
+      case 0:
+        return get_xdmf_content(indent_level,
+                                ReferenceCells::get_hypercube<0>());
+      case 1:
+        return get_xdmf_content(indent_level,
+                                ReferenceCells::get_hypercube<1>());
+      case 2:
+        return get_xdmf_content(indent_level,
+                                ReferenceCells::get_hypercube<2>());
+      case 3:
+        return get_xdmf_content(indent_level,
+                                ReferenceCells::get_hypercube<3>());
+      default:
+        Assert(false, ExcNotImplemented());
+    }
+
+  return "";
+}
+
+
+
+std::string
+XDMFEntry::get_xdmf_content(const unsigned int   indent_level,
+                            const ReferenceCell &reference_cell) const
+{
   if (!valid)
     return "";
 
@@ -8399,17 +8744,51 @@ XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
            << "\" NumberOfElements=\"" << num_cells
            << "\" NodesPerElement=\"2\">\n";
       else if (dimension == 2)
-        ss << indent(indent_level + 1) << "<Topology TopologyType=\""
-           << "Quadrilateral"
-           << "\" NumberOfElements=\"" << num_cells << "\">\n";
-      else if (dimension == 3)
-        ss << indent(indent_level + 1) << "<Topology TopologyType=\""
-           << "Hexahedron"
-           << "\" NumberOfElements=\"" << num_cells << "\">\n";
+        {
+          Assert(reference_cell == ReferenceCells::Quadrilateral ||
+                   reference_cell == ReferenceCells::Triangle,
+                 ExcNotImplemented());
 
-      ss << indent(indent_level + 2) << "<DataItem Dimensions=\"" << num_cells
-         << " " << (1 << dimension)
-         << "\" NumberType=\"UInt\" Format=\"HDF\">\n";
+          ss << indent(indent_level + 1) << "<Topology TopologyType=\"";
+          if (reference_cell == ReferenceCells::Quadrilateral)
+            {
+              ss << "Quadrilateral"
+                 << "\" NumberOfElements=\"" << num_cells << "\">\n"
+                 << indent(indent_level + 2) << "<DataItem Dimensions=\""
+                 << num_cells << " " << (1 << dimension);
+            }
+          else // if (reference_cell == ReferenceCells::Triangle)
+            {
+              ss << "Triangle"
+                 << "\" NumberOfElements=\"" << num_cells << "\">\n"
+                 << indent(indent_level + 2) << "<DataItem Dimensions=\""
+                 << num_cells << " " << 3;
+            }
+        }
+      else if (dimension == 3)
+        {
+          Assert(reference_cell == ReferenceCells::Hexahedron ||
+                   reference_cell == ReferenceCells::Tetrahedron,
+                 ExcNotImplemented());
+
+          ss << indent(indent_level + 1) << "<Topology TopologyType=\"";
+          if (reference_cell == ReferenceCells::Hexahedron)
+            {
+              ss << "Hexahedron"
+                 << "\" NumberOfElements=\"" << num_cells << "\">\n"
+                 << indent(indent_level + 2) << "<DataItem Dimensions=\""
+                 << num_cells << " " << (1 << dimension);
+            }
+          else // if (reference_cell == ReferenceCells::Tetrahedron)
+            {
+              ss << "Tetrahedron"
+                 << "\" NumberOfElements=\"" << num_cells << "\">\n"
+                 << indent(indent_level + 2) << "<DataItem Dimensions=\""
+                 << num_cells << " " << 4;
+            }
+        }
+
+      ss << "\" NumberType=\"UInt\" Format=\"HDF\">\n";
       ss << indent(indent_level + 3) << h5_mesh_filename << ":/cells\n";
       ss << indent(indent_level + 2) << "</DataItem>\n";
       ss << indent(indent_level + 1) << "</Topology>\n";

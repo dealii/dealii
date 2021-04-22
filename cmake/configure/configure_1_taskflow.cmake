@@ -42,6 +42,26 @@ MACRO(FEATURE_TASKFLOW_FIND_EXTERNAL var)
       )
     SET(${var} FALSE)
   ENDIF()
+
+
+  IF(NOT TASKFLOW_VERSION VERSION_LESS "3.0" AND NOT DEAL_II_HAVE_CXX17)
+    # Clear the previously determined version numbers to avoid confusion
+    SET(TASKFLOW_VERSION "bundled")
+    SET(TASKFLOW_VERSION_MAJOR "")
+    SET(TASKFLOW_VERSION_MINOR "")
+
+    MESSAGE(STATUS
+      "The externally provided Taskflow library (version 3.0 onwards)
+      requires C++17 support, which has not been configured."
+      )
+    SET(TASKFLOW_ADDITIONAL_ERROR_STRING
+      "The externally provided Taskflow library (version 3.0 onwards) "
+      "requires C++17 support, but no C++17 support had been detected "
+      "during configuration.\n"
+      "Try to set -DDEAL_II_CXX_FLAGS=\"-std=c++17\" by hand.\n"
+      )
+    SET(${var} FALSE)
+  ENDIF()
 ENDMACRO()
 
 

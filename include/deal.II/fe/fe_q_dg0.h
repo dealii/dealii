@@ -235,8 +235,7 @@ DEAL_II_NAMESPACE_OPEN
  * </ul>
  */
 template <int dim, int spacedim = dim>
-class FE_Q_DG0
-  : public FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>
+class FE_Q_DG0 : public FE_Q_Base<dim, spacedim>
 {
 public:
   /**
@@ -270,7 +269,7 @@ public:
   /**
    * Return the matrix interpolating from the given finite element to the
    * present one.  The size of the matrix is then @p dofs_per_cell times
-   * <tt>source.dofs_per_cell</tt>.
+   * <tt>source.n_dofs_per_cell()</tt>.
    *
    * These matrices are only available if the source element is also a @p
    * FE_Q_DG0 element. Otherwise, an exception of type

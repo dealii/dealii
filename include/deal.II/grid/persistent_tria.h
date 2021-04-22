@@ -201,10 +201,10 @@ public:
                        const std::vector<CellData<dim>> &  cells,
                        const SubCellData &subcelldata) override;
 
-  /*
+  /**
    * @copydoc Triangulation::create_triangulation()
    *
-   * @note Not inmplemented yet.
+   * @note Not implemented yet.
    */
   virtual void
   create_triangulation(
@@ -217,6 +217,7 @@ public:
    * Throw an error, since this function is not useful in the context of this
    * class.
    */
+  DEAL_II_DEPRECATED_EARLY
   virtual void
   create_triangulation_compatibility(
     const std::vector<Point<spacedim>> &vertices,

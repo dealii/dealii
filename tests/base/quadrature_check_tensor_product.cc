@@ -170,8 +170,8 @@ fill_quadrature_vector(std::vector<Quadrature<dim>> &quadratures,
   quadratures.push_back(QSimpson<dim>());
   quadrature_names.push_back("QSimpson");
 
-  quadratures.push_back(QTrapez<dim>());
-  quadrature_names.push_back("QTrapez");
+  quadratures.push_back(QTrapezoid<dim>());
+  quadrature_names.push_back("QTrapezoid");
 
   quadratures.push_back(QMilne<dim>());
   quadrature_names.push_back("QMilne");

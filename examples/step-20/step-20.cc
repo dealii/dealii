@@ -38,11 +38,8 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_system.h>
@@ -464,7 +461,7 @@ namespace Step20
                                        update_quadrature_points |
                                        update_JxW_values);
 
-    const unsigned int dofs_per_cell   = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell   = fe.n_dofs_per_cell();
     const unsigned int n_q_points      = quadrature_formula.size();
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 
@@ -716,7 +713,7 @@ namespace Step20
     // points for integration. To avoid this problem, we simply use a
     // trapezoidal rule and iterate it <code>degree+2</code> times in each
     // coordinate direction (again as explained in step-7):
-    QTrapez<1>     q_trapez;
+    QTrapezoid<1>  q_trapez;
     QIterated<dim> quadrature(q_trapez, degree + 2);
 
     // With this, we can then let the library compute the errors and output

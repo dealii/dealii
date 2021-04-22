@@ -170,8 +170,7 @@ namespace VectorTools
           const bool                 project_to_boundary_first = false);
 
   /**
-   * Same as above, but for arguments of type hp::DoFHandler, hp::QCollection,
-   * and hp::MappingCollection.
+   * Same as above, but with hp-capabilities.
    */
   template <int dim, typename VectorType, int spacedim>
   void

@@ -129,8 +129,9 @@ public:
 
 
   /**
-   * Standard constructor. The standard output stream to
-   * <tt>std::cout</tt>.
+   * Standard constructor. The constructor sets the output stream to
+   * <tt>std::cout</tt> and the depth to zero. (Use attach() and
+   * depth_console() to change this.)
    */
   LogStream();
 
@@ -322,10 +323,10 @@ private:
 
   /**
    * We record the thread id of the thread creating this object. We need
-   * this information to "steal" the current prefix from this "master"
+   * this information to "steal" the current prefix from this "parent"
    * thread on first use of deallog on a new thread.
    */
-  std::thread::id master_thread;
+  std::thread::id parent_thread;
 
   /**
    * Default stream, where the output is to go to. This stream defaults to

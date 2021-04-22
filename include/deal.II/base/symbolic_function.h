@@ -131,7 +131,7 @@ namespace Functions
    *
    * If you call update_user_substitution_map() and
    * set_additional_function_arguments() with the same argument, the effect on
-   * the function evaluation will be the same, however, the internal behaviour
+   * the function evaluation will be the same, however, the internal behavior
    * and function derivatives will be different. The method
    * update_user_substitution_map() performs the substitution once (the first
    * time it is required), and then stores internally a copy of the resulting

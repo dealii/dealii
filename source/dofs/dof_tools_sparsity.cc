@@ -102,7 +102,7 @@ namespace DoFTools
            (subdomain_id == cell->subdomain_id())) &&
           cell->is_locally_owned())
         {
-          const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+          const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
           dofs_on_this_cell.resize(dofs_per_cell);
           cell->get_dof_indices(dofs_on_this_cell);
 
@@ -168,11 +168,11 @@ namespace DoFTools
     for (unsigned int f = 0; f < fe_collection.size(); ++f)
       {
         bool_dof_mask[f].reinit(
-          TableIndices<2>(fe_collection[f].dofs_per_cell,
-                          fe_collection[f].dofs_per_cell));
+          TableIndices<2>(fe_collection[f].n_dofs_per_cell(),
+                          fe_collection[f].n_dofs_per_cell()));
         bool_dof_mask[f].fill(false);
-        for (unsigned int i = 0; i < fe_collection[f].dofs_per_cell; ++i)
-          for (unsigned int j = 0; j < fe_collection[f].dofs_per_cell; ++j)
+        for (unsigned int i = 0; i < fe_collection[f].n_dofs_per_cell(); ++i)
+          for (unsigned int j = 0; j < fe_collection[f].n_dofs_per_cell(); ++j)
             if (dof_mask[f](i, j) != none)
               bool_dof_mask[f](i, j) = true;
       }
@@ -193,7 +193,7 @@ namespace DoFTools
         {
           const unsigned int fe_index = cell->active_fe_index();
           const unsigned int dofs_per_cell =
-            fe_collection[fe_index].dofs_per_cell;
+            fe_collection[fe_index].n_dofs_per_cell();
 
           dofs_on_this_cell.resize(dofs_per_cell);
           cell->get_dof_indices(dofs_on_this_cell);
@@ -282,9 +282,9 @@ namespace DoFTools
         if (cell_row->is_active() && cell_col->is_active())
           {
             const unsigned int dofs_per_cell_row =
-              cell_row->get_fe().dofs_per_cell;
+              cell_row->get_fe().n_dofs_per_cell();
             const unsigned int dofs_per_cell_col =
-              cell_col->get_fe().dofs_per_cell;
+              cell_col->get_fe().n_dofs_per_cell();
             std::vector<types::global_dof_index> local_dof_indices_row(
               dofs_per_cell_row);
             std::vector<types::global_dof_index> local_dof_indices_col(
@@ -308,9 +308,9 @@ namespace DoFTools
                 const typename DoFHandler<dim, spacedim>::cell_iterator
                                    cell_row_child = child_cells[i];
                 const unsigned int dofs_per_cell_row =
-                  cell_row_child->get_fe().dofs_per_cell;
+                  cell_row_child->get_fe().n_dofs_per_cell();
                 const unsigned int dofs_per_cell_col =
-                  cell_col->get_fe().dofs_per_cell;
+                  cell_col->get_fe().n_dofs_per_cell();
                 std::vector<types::global_dof_index> local_dof_indices_row(
                   dofs_per_cell_row);
                 std::vector<types::global_dof_index> local_dof_indices_col(
@@ -335,9 +335,9 @@ namespace DoFTools
                 const typename DoFHandler<dim, spacedim>::active_cell_iterator
                                    cell_col_child = child_cells[i];
                 const unsigned int dofs_per_cell_row =
-                  cell_row->get_fe().dofs_per_cell;
+                  cell_row->get_fe().n_dofs_per_cell();
                 const unsigned int dofs_per_cell_col =
-                  cell_col_child->get_fe().dofs_per_cell;
+                  cell_col_child->get_fe().n_dofs_per_cell();
                 std::vector<types::global_dof_index> local_dof_indices_row(
                   dofs_per_cell_row);
                 std::vector<types::global_dof_index> local_dof_indices_col(
@@ -404,10 +404,11 @@ namespace DoFTools
       cell = dof.begin_active(),
       endc = dof.end();
     for (; cell != endc; ++cell)
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         if (cell->at_boundary(f))
           {
-            const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
+            const unsigned int dofs_per_face =
+              cell->get_fe().n_dofs_per_face(f);
             dofs_on_this_face.resize(dofs_per_face);
             cell->face(f)->get_dof_indices(dofs_on_this_face,
                                            cell->active_fe_index());
@@ -452,7 +453,8 @@ namespace DoFTools
             while (!cell->is_active())
               cell = cell->child(direction);
 
-            const unsigned int dofs_per_vertex = cell->get_fe().dofs_per_vertex;
+            const unsigned int dofs_per_vertex =
+              cell->get_fe().n_dofs_per_vertex();
             std::vector<types::global_dof_index> boundary_dof_boundary_indices(
               dofs_per_vertex);
 
@@ -499,11 +501,12 @@ namespace DoFTools
       cell = dof.begin_active(),
       endc = dof.end();
     for (; cell != endc; ++cell)
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         if (boundary_ids.find(cell->face(f)->boundary_id()) !=
             boundary_ids.end())
           {
-            const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
+            const unsigned int dofs_per_face =
+              cell->get_fe().n_dofs_per_face(f);
             dofs_on_this_face.resize(dofs_per_face);
             cell->face(f)->get_dof_indices(dofs_on_this_face,
                                            cell->active_fe_index());
@@ -572,7 +575,8 @@ namespace DoFTools
            (subdomain_id == cell->subdomain_id())) &&
           cell->is_locally_owned())
         {
-          const unsigned int n_dofs_on_this_cell = cell->get_fe().dofs_per_cell;
+          const unsigned int n_dofs_on_this_cell =
+            cell->get_fe().n_dofs_per_cell();
           dofs_on_this_cell.resize(n_dofs_on_this_cell);
           cell->get_dof_indices(dofs_on_this_cell);
 
@@ -583,7 +587,7 @@ namespace DoFTools
                                                   sparsity,
                                                   keep_constrained_dofs);
 
-          for (const unsigned int face : GeometryInfo<dim>::face_indices())
+          for (const unsigned int face : cell->face_indices())
             {
               typename DoFHandler<dim, spacedim>::face_iterator cell_face =
                 cell->face(face);
@@ -604,7 +608,7 @@ namespace DoFTools
                   if (neighbor->has_children())
                     {
                       for (unsigned int sub_nr = 0;
-                           sub_nr != cell_face->number_of_children();
+                           sub_nr != cell_face->n_active_descendants();
                            ++sub_nr)
                         {
                           const typename DoFHandler<dim, spacedim>::
@@ -615,7 +619,7 @@ namespace DoFTools
                                 cell->neighbor_child_on_subface(face, sub_nr);
 
                           const unsigned int n_dofs_on_neighbor =
-                            sub_neighbor->get_fe().dofs_per_cell;
+                            sub_neighbor->get_fe().n_dofs_per_cell();
                           dofs_on_other_cell.resize(n_dofs_on_neighbor);
                           sub_neighbor->get_dof_indices(dofs_on_other_cell);
 
@@ -652,7 +656,7 @@ namespace DoFTools
                           continue;
 
                       const unsigned int n_dofs_on_neighbor =
-                        neighbor->get_fe().dofs_per_cell;
+                        neighbor->get_fe().n_dofs_per_cell();
                       dofs_on_other_cell.resize(n_dofs_on_neighbor);
 
                       neighbor->get_dof_indices(dofs_on_other_cell);
@@ -712,7 +716,7 @@ namespace DoFTools
            ExcDimensionMismatch(component_couplings.n_cols(),
                                 fe.n_components()));
 
-    const unsigned int n_dofs = fe.dofs_per_cell;
+    const unsigned int n_dofs = fe.n_dofs_per_cell();
 
     Table<2, Coupling> dof_couplings(n_dofs, n_dofs);
 
@@ -761,7 +765,7 @@ namespace DoFTools
     namespace
     {
       // implementation of the same function in namespace DoFTools for
-      // non-hp DoFHandlers
+      // non-hp-DoFHandlers
       template <int dim,
                 int spacedim,
                 typename SparsityPatternType,
@@ -779,14 +783,14 @@ namespace DoFTools
           bool(const typename DoFHandler<dim, spacedim>::active_cell_iterator &,
                const unsigned int)> &face_has_flux_coupling)
       {
-        if (dof.hp_capability_enabled == false)
+        if (dof.has_hp_capabilities() == false)
           {
             const FiniteElement<dim, spacedim> &fe = dof.get_fe();
 
             std::vector<types::global_dof_index> dofs_on_this_cell(
-              fe.dofs_per_cell);
+              fe.n_dofs_per_cell());
             std::vector<types::global_dof_index> dofs_on_other_cell(
-              fe.dofs_per_cell);
+              fe.n_dofs_per_cell());
 
             const Table<2, Coupling>
               int_dof_mask =
@@ -794,19 +798,19 @@ namespace DoFTools
               flux_dof_mask =
                 dof_couplings_from_component_couplings(fe, flux_mask);
 
-            Table<2, bool> support_on_face(fe.dofs_per_cell,
+            Table<2, bool> support_on_face(fe.n_dofs_per_cell(),
                                            GeometryInfo<dim>::faces_per_cell);
-            for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+            for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
               for (const unsigned int f : GeometryInfo<dim>::face_indices())
                 support_on_face(i, f) = fe.has_support_on_face(i, f);
 
             // Convert the int_dof_mask to bool_int_dof_mask so we can pass it
             // to constraints.add_entries_local_to_global()
-            Table<2, bool> bool_int_dof_mask(fe.dofs_per_cell,
-                                             fe.dofs_per_cell);
+            Table<2, bool> bool_int_dof_mask(fe.n_dofs_per_cell(),
+                                             fe.n_dofs_per_cell());
             bool_int_dof_mask.fill(false);
-            for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-              for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
+            for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
+              for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
                 if (int_dof_mask(i, j) != none)
                   bool_int_dof_mask(i, j) = true;
 
@@ -825,8 +829,7 @@ namespace DoFTools
                                                           keep_constrained_dofs,
                                                           bool_int_dof_mask);
                   // Loop over all interior neighbors
-                  for (const unsigned int face_n :
-                       GeometryInfo<dim>::face_indices())
+                  for (const unsigned int face_n : cell->face_indices())
                     {
                       const typename DoFHandler<dim, spacedim>::face_iterator
                         cell_face = cell->face(face_n);
@@ -836,11 +839,12 @@ namespace DoFTools
 
                       if (cell->at_boundary(face_n) && (!periodic_neighbor))
                         {
-                          for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+                          for (unsigned int i = 0; i < fe.n_dofs_per_cell();
+                               ++i)
                             {
                               const bool i_non_zero_i =
                                 support_on_face(i, face_n);
-                              for (unsigned int j = 0; j < fe.dofs_per_cell;
+                              for (unsigned int j = 0; j < fe.n_dofs_per_cell();
                                    ++j)
                                 {
                                   const bool j_non_zero_i =
@@ -925,7 +929,8 @@ namespace DoFTools
 
                                   sub_neighbor->get_dof_indices(
                                     dofs_on_other_cell);
-                                  for (unsigned int i = 0; i < fe.dofs_per_cell;
+                                  for (unsigned int i = 0;
+                                       i < fe.n_dofs_per_cell();
                                        ++i)
                                     {
                                       const bool i_non_zero_i =
@@ -933,7 +938,7 @@ namespace DoFTools
                                       const bool i_non_zero_e =
                                         support_on_face(i, neighbor_face_n);
                                       for (unsigned int j = 0;
-                                           j < fe.dofs_per_cell;
+                                           j < fe.n_dofs_per_cell();
                                            ++j)
                                         {
                                           const bool j_non_zero_i =
@@ -1019,14 +1024,15 @@ namespace DoFTools
                           else
                             {
                               neighbor->get_dof_indices(dofs_on_other_cell);
-                              for (unsigned int i = 0; i < fe.dofs_per_cell;
+                              for (unsigned int i = 0; i < fe.n_dofs_per_cell();
                                    ++i)
                                 {
                                   const bool i_non_zero_i =
                                     support_on_face(i, face_n);
                                   const bool i_non_zero_e =
                                     support_on_face(i, neighbor_face_n);
-                                  for (unsigned int j = 0; j < fe.dofs_per_cell;
+                                  for (unsigned int j = 0;
+                                       j < fe.n_dofs_per_cell();
                                        ++j)
                                     {
                                       const bool j_non_zero_i =
@@ -1097,7 +1103,7 @@ namespace DoFTools
           {
             // while the implementation above is quite optimized and caches a
             // lot of data (see e.g. the int/flux_dof_mask tables), this is no
-            // longer practical for the hp version since we would have to have
+            // longer practical for the hp-version since we would have to have
             // it for all combinations of elements in the hp::FECollection.
             // consequently, the implementation here is simpler and probably
             // less efficient but at least readable...
@@ -1134,10 +1140,11 @@ namespace DoFTools
             for (unsigned int f = 0; f < fe.size(); ++f)
               {
                 bool_int_and_flux_dof_mask[f].reinit(
-                  TableIndices<2>(fe[f].dofs_per_cell, fe[f].dofs_per_cell));
+                  TableIndices<2>(fe[f].n_dofs_per_cell(),
+                                  fe[f].n_dofs_per_cell()));
                 bool_int_and_flux_dof_mask[f].fill(false);
-                for (unsigned int i = 0; i < fe[f].dofs_per_cell; ++i)
-                  for (unsigned int j = 0; j < fe[f].dofs_per_cell; ++j)
+                for (unsigned int i = 0; i < fe[f].n_dofs_per_cell(); ++i)
+                  for (unsigned int j = 0; j < fe[f].n_dofs_per_cell(); ++j)
                     if (int_and_flux_dof_mask[f](i, j) != none)
                       bool_int_and_flux_dof_mask[f](i, j) = true;
               }
@@ -1151,7 +1158,7 @@ namespace DoFTools
                    (subdomain_id == cell->subdomain_id())) &&
                   cell->is_locally_owned())
                 {
-                  dofs_on_this_cell.resize(cell->get_fe().dofs_per_cell);
+                  dofs_on_this_cell.resize(cell->get_fe().n_dofs_per_cell());
                   cell->get_dof_indices(dofs_on_this_cell);
 
                   // make sparsity pattern for this cell also taking into
@@ -1164,8 +1171,7 @@ namespace DoFTools
                     bool_int_and_flux_dof_mask[cell->active_fe_index()]);
 
                   // Loop over interior faces
-                  for (const unsigned int face :
-                       GeometryInfo<dim>::face_indices())
+                  for (const unsigned int face : cell->face_indices())
                     {
                       const typename dealii::DoFHandler<dim,
                                                         spacedim>::face_iterator
@@ -1183,7 +1189,7 @@ namespace DoFTools
                           if (!face_has_flux_coupling(cell, face))
                             continue;
 
-                          // Like the non-hp case: If the cells are on the same
+                          // Like the non-hp-case: If the cells are on the same
                           // level (and both are active, locally-owned cells)
                           // then only add to the sparsity pattern if the
                           // current cell is 'greater' in the total ordering.
@@ -1192,7 +1198,7 @@ namespace DoFTools
                               neighbor->is_active() &&
                               neighbor->is_locally_owned())
                             continue;
-                          // Again, like the non-hp case: If we are more refined
+                          // Again, like the non-hp-case: If we are more refined
                           // then the neighbor, then we will automatically find
                           // the active neighbor cell when we call 'neighbor
                           // (face)' above. The opposite is not true; if the
@@ -1239,11 +1245,11 @@ namespace DoFTools
                                                                         sub_nr);
 
                                   dofs_on_other_cell.resize(
-                                    sub_neighbor->get_fe().dofs_per_cell);
+                                    sub_neighbor->get_fe().n_dofs_per_cell());
                                   sub_neighbor->get_dof_indices(
                                     dofs_on_other_cell);
                                   for (unsigned int i = 0;
-                                       i < cell->get_fe().dofs_per_cell;
+                                       i < cell->get_fe().n_dofs_per_cell();
                                        ++i)
                                     {
                                       const unsigned int ii =
@@ -1259,8 +1265,8 @@ namespace DoFTools
                                              ExcInternalError());
 
                                       for (unsigned int j = 0;
-                                           j <
-                                           sub_neighbor->get_fe().dofs_per_cell;
+                                           j < sub_neighbor->get_fe()
+                                                 .n_dofs_per_cell();
                                            ++j)
                                         {
                                           const unsigned int jj =
@@ -1299,10 +1305,10 @@ namespace DoFTools
                           else
                             {
                               dofs_on_other_cell.resize(
-                                neighbor->get_fe().dofs_per_cell);
+                                neighbor->get_fe().n_dofs_per_cell());
                               neighbor->get_dof_indices(dofs_on_other_cell);
                               for (unsigned int i = 0;
-                                   i < cell->get_fe().dofs_per_cell;
+                                   i < cell->get_fe().n_dofs_per_cell();
                                    ++i)
                                 {
                                   const unsigned int ii =
@@ -1318,7 +1324,7 @@ namespace DoFTools
                                          ExcInternalError());
 
                                   for (unsigned int j = 0;
-                                       j < neighbor->get_fe().dofs_per_cell;
+                                       j < neighbor->get_fe().n_dofs_per_cell();
                                        ++j)
                                     {
                                       const unsigned int jj =

@@ -130,8 +130,6 @@ DoFCellAccessor<dim, spacedim, lda>::set_dof_indices(
 
   Assert(this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
 
-  AssertDimension(local_dof_indices.size(), this->get_fe().dofs_per_cell);
-
   internal::DoFAccessorImplementation::Implementation::
     template set_dof_indices<dim, spacedim, lda, dim>(*this,
                                                       local_dof_indices,

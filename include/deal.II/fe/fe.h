@@ -113,7 +113,7 @@ class FESystem;
  * particular feature is implemented. An example is whether an element
  * implements the information necessary to use it in the $hp$ finite element
  * context (see
- * @ref hp "hp finite element support").
+ * @ref hp "hp-finite element support").
  *
  *
  * <h3>Nomenclature</h3>
@@ -339,7 +339,7 @@ class FESystem;
  * neighboring (but differently refined) cells. The case that the finite
  * element spaces on different sides of a face are different, i.e., the $hp$
  * case (see
- * @ref hp "hp finite element support")
+ * @ref hp "hp-finite element support")
  * is handled by separate functions. See the
  * FiniteElement::get_face_interpolation_matrix() and
  * FiniteElement::get_subface_interpolation_matrix() functions.
@@ -484,10 +484,10 @@ class FESystem;
  * following piece of code in the constructor of a class derived from
  * FiniteElement to compute the $M$ matrix:
  * @code
- * FullMatrix<double> M(this->dofs_per_cell, this->dofs_per_cell);
+ * FullMatrix<double> M(this->n_dofs_per_cell(), this->n_dofs_per_cell());
  * FETools::compute_node_matrix(M, *this);
- * this->inverse_node_matrix.reinit(this->dofs_per_cell, this->dofs_per_cell);
- * this->inverse_node_matrix.invert(M);
+ * this->inverse_node_matrix.reinit(this->n_dofs_per_cell(),
+ * this->n_dofs_per_cell()); this->inverse_node_matrix.invert(M);
  * @endcode
  * Don't forget to make sure
  * that #unit_support_points or #generalized_support_points are initialized
@@ -509,8 +509,8 @@ class FESystem;
  * In the latter case, all that is required is the following piece of code:
  * @code
  * for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
- *   this->prolongation[c].reinit (this->dofs_per_cell,
- *                                 this->dofs_per_cell);
+ *   this->prolongation[c].reinit (this->n_dofs_per_cell(),
+ *                                 this->n_dofs_per_cell());
  * FETools::compute_embedding_matrices (*this, this->prolongation);
  * @endcode
  * As in this example, prolongation is almost always implemented via
@@ -820,11 +820,11 @@ public:
   /**
    * This operator returns a reference to the present object if the argument
    * given equals to zero. While this does not seem particularly useful, it is
-   * helpful in writing code that works with both ::DoFHandler and the hp
+   * helpful in writing code that works with both ::DoFHandler and the hp-
    * version hp::DoFHandler, since one can then write code like this:
    * @code
    * dofs_per_cell =
-   *   dof_handler->get_fe()[cell->active_fe_index()].dofs_per_cell;
+   *   dof_handler->get_fe()[cell->active_fe_index()].n_dofs_per_cell();
    * @endcode
    *
    * This code doesn't work in both situations without the present operator
@@ -833,13 +833,16 @@ public:
    * doesn't offer a <code>dofs_per_cell</code> member variable: one first has
    * to select which finite element to work on, which is done using the
    * operator[]. Fortunately, <code>cell-@>active_fe_index()</code> also works
-   * for non-hp classes and simply returns zero in that case. The present
+   * for non-hp-classes and simply returns zero in that case. The present
    * operator[] accepts this zero argument, by returning the finite element
    * with index zero within its collection (that, of course, consists only of
    * the present finite element anyway).
+   *
+   * @deprecated With DoFHandler::get_fe(int) and the deprecation of the
+   * hp::DoFHandler class, there is no more use of this operator.
    */
-  const FiniteElement<dim, spacedim> &
-  operator[](const unsigned int fe_index) const;
+  DEAL_II_DEPRECATED const FiniteElement<dim, spacedim> &
+                           operator[](const unsigned int fe_index) const;
 
   /**
    * @name Shape function access
@@ -1227,7 +1230,7 @@ public:
 
   /**
    * Return whether this element implements its hanging node constraints in
-   * the new way, which has to be used to make elements "hp compatible".  That
+   * the new way, which has to be used to make elements "hp-compatible".  That
    * means, the element properly implements the get_face_interpolation_matrix
    * and get_subface_interpolation_matrix methods. Therefore the return value
    * also indicates whether a call to the get_face_interpolation_matrix()
@@ -1236,14 +1239,14 @@ public:
    *
    * Currently the main purpose of this function is to allow the
    * make_hanging_node_constraints method to decide whether the new
-   * procedures, which are supposed to work in the hp framework can be used,
-   * or if the old well verified but not hp capable functions should be used.
+   * procedures, which are supposed to work in the hp-framework can be used,
+   * or if the old well verified but not hp-capable functions should be used.
    * Once the transition to the new scheme for computing the interface
    * constraints is complete, this function will be superfluous and will
    * probably go away.
    *
    * Derived classes should implement this function accordingly. The default
-   * assumption is that a finite element does not provide hp capable face
+   * assumption is that a finite element does not provide hp-capable face
    * interpolation, and the default implementation therefore returns @p false.
    */
   virtual bool
@@ -1285,7 +1288,8 @@ public:
    */
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
-                                FullMatrix<double> &matrix) const;
+                                FullMatrix<double> &                matrix,
+                                const unsigned int face_no = 0) const;
 
 
   /**
@@ -1302,17 +1306,18 @@ public:
   virtual void
   get_subface_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
                                    const unsigned int                  subface,
-                                   FullMatrix<double> &matrix) const;
+                                   FullMatrix<double> &                matrix,
+                                   const unsigned int face_no = 0) const;
   //@}
 
 
   /**
-   * @name Functions to support hp
+   * @name Functions to support hp-
    * @{
    */
 
   /**
-   * If, on a vertex, several finite elements are active, the hp code first
+   * If, on a vertex, several finite elements are active, the hp-code first
    * assigns the degrees of freedom of each of these FEs different global
    * indices. It then calls this function to find out which of them should get
    * identical values, and consequently can receive the same global DoF index.
@@ -1321,10 +1326,10 @@ public:
    * reference to a finite element object representing one of the other finite
    * elements active on this particular vertex. The function computes which of
    * the degrees of freedom of the two finite element objects are equivalent,
-   * both numbered between zero and the corresponding value of dofs_per_vertex
-   * of the two finite elements. The first index of each pair denotes one of
-   * the vertex dofs of the present element, whereas the second is the
-   * corresponding index of the other finite element.
+   * both numbered between zero and the corresponding value of
+   * n_dofs_per_vertex() of the two finite elements. The first index of each
+   * pair denotes one of the vertex dofs of the present element, whereas the
+   * second is the corresponding index of the other finite element.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
   hp_vertex_dof_identities(const FiniteElement<dim, spacedim> &fe_other) const;
@@ -1341,7 +1346,8 @@ public:
    * of freedom on quads.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other) const;
+  hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other,
+                         const unsigned int                  face_no = 0) const;
 
   /**
    * Return whether this element dominates another one given as argument
@@ -1356,7 +1362,7 @@ public:
    *
    * For a definition of domination, see FiniteElementDomination::Domination
    * and in particular the
-   * @ref hp_paper "hp paper".
+   * @ref hp_paper "hp-paper".
    */
   virtual FiniteElementDomination::Domination
   compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
@@ -1465,7 +1471,8 @@ public:
    * indices. The function is mainly there for use inside the library.
    */
   std::pair<unsigned int, unsigned int>
-  face_system_to_component_index(const unsigned int index) const;
+  face_system_to_component_index(const unsigned int index,
+                                 const unsigned int face_no = 0) const;
 
   /**
    * For faces with non-standard face_orientation in 3D, the dofs on faces
@@ -1477,6 +1484,7 @@ public:
    */
   unsigned int
   adjust_quad_dof_index_for_face_orientation(const unsigned int index,
+                                             const unsigned int face_no,
                                              const bool face_orientation,
                                              const bool face_flip,
                                              const bool face_rotation) const;
@@ -1760,7 +1768,8 @@ public:
    * indices. The function is mainly there for use inside the library.
    */
   std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
-  face_system_to_base_index(const unsigned int index) const;
+  face_system_to_base_index(const unsigned int index,
+                            const unsigned int face_no = 0) const;
 
   /**
    * Given a base element number, return the first block of a BlockVector it
@@ -2082,7 +2091,7 @@ public:
    * See the class documentation for details on support points.
    */
   const std::vector<Point<dim - 1>> &
-  get_unit_face_support_points() const;
+  get_unit_face_support_points(const unsigned int face_no = 0) const;
 
   /**
    * Return whether a finite element has defined support points on faces. If
@@ -2093,14 +2102,15 @@ public:
    * function.
    */
   bool
-  has_face_support_points() const;
+  has_face_support_points(const unsigned int face_no = 0) const;
 
   /**
    * The function corresponding to the unit_support_point() function, but for
    * faces. See there for more information.
    */
   virtual Point<dim - 1>
-  unit_face_support_point(const unsigned int index) const;
+  unit_face_support_point(const unsigned int index,
+                          const unsigned int face_no = 0) const;
 
   /**
    * Return a vector of generalized support points.
@@ -2436,7 +2446,7 @@ protected:
    * get_unit_face_support_points() function for a discussion of what
    * contributes a face support point.
    */
-  std::vector<Point<dim - 1>> unit_face_support_points;
+  std::vector<std::vector<Point<dim - 1>>> unit_face_support_points;
 
   /**
    * Support points used for interpolation functions of non-Lagrangian
@@ -2448,7 +2458,7 @@ protected:
    * Face support points used for interpolation functions of non-Lagrangian
    * elements.
    */
-  std::vector<Point<dim - 1>> generalized_face_support_points;
+  std::vector<std::vector<Point<dim - 1>>> generalized_face_support_points;
 
   /**
    * For faces with non-standard face_orientation in 3D, the dofs on faces
@@ -2465,7 +2475,7 @@ protected:
    * no permutation at all. Derived finite element classes have to
    * fill this Table with the correct values.
    */
-  Table<2, int> adjust_quad_dof_index_for_face_orientation_table;
+  std::vector<Table<2, int>> adjust_quad_dof_index_for_face_orientation_table;
 
   /**
    * For lines with non-standard line_orientation in 3D, the dofs on lines
@@ -2496,7 +2506,7 @@ protected:
    * information thus makes only sense if a shape function is non-zero in only
    * one component.
    */
-  std::vector<std::pair<unsigned int, unsigned int>>
+  std::vector<std::vector<std::pair<unsigned int, unsigned int>>>
     face_system_to_component_table;
 
   /**
@@ -2521,7 +2531,8 @@ protected:
   /**
    * Likewise for the indices on faces.
    */
-  std::vector<std::pair<std::pair<unsigned int, unsigned int>, unsigned int>>
+  std::vector<
+    std::vector<std::pair<std::pair<unsigned int, unsigned int>, unsigned int>>>
     face_system_to_base_table;
 
   /**
@@ -2756,11 +2767,22 @@ protected:
    * it is no longer necessary.
    */
   virtual std::unique_ptr<InternalDataBase>
-  get_face_data(const UpdateFlags             update_flags,
-                const Mapping<dim, spacedim> &mapping,
-                const Quadrature<dim - 1> &   quadrature,
+  get_face_data(const UpdateFlags               update_flags,
+                const Mapping<dim, spacedim> &  mapping,
+                const hp::QCollection<dim - 1> &quadrature,
                 dealii::internal::FEValuesImplementation::
                   FiniteElementRelatedData<dim, spacedim> &output_data) const;
+
+  /**
+   * @deprecated Use the version taking a hp::QCollection argument.
+   */
+  virtual std::unique_ptr<InternalDataBase>
+  get_face_data(
+    const UpdateFlags             update_flags,
+    const Mapping<dim, spacedim> &mapping,
+    const Quadrature<dim - 1> &   quadrature,
+    internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
+      &output_data) const;
 
   /**
    * Like get_data(), but return an object that will later be used for
@@ -2953,7 +2975,7 @@ protected:
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const Quadrature<dim - 1> &                                 quadrature,
+    const hp::QCollection<dim - 1> &                            quadrature,
     const Mapping<dim, spacedim> &                              mapping,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
@@ -2962,7 +2984,23 @@ protected:
     const InternalDataBase &fe_internal,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
-      &output_data) const = 0;
+      &output_data) const;
+
+  /**
+   * @deprecated Use the version taking a hp::QCollection argument.
+   */
+  virtual void
+  fill_fe_face_values(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const unsigned int                                          face_no,
+    const Quadrature<dim - 1> &                                 quadrature,
+    const Mapping<dim, spacedim> &                              mapping,
+    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
+    const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      &                     mapping_data,
+    const InternalDataBase &fe_internal,
+    internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
+      &output_data) const;
 
   /**
    * This function is the equivalent to FiniteElement::fill_fe_values(), but
@@ -3120,9 +3158,13 @@ FiniteElement<dim, spacedim>::component_to_system_index(
 template <int dim, int spacedim>
 inline std::pair<unsigned int, unsigned int>
 FiniteElement<dim, spacedim>::face_system_to_component_index(
-  const unsigned int index) const
+  const unsigned int index,
+  const unsigned int face_no) const
 {
-  AssertIndexRange(index, face_system_to_component_table.size());
+  AssertIndexRange(
+    index,
+    face_system_to_component_table[this->n_unique_faces() == 1 ? 0 : face_no]
+      .size());
 
   // in debug mode, check whether the
   // function is primitive, since
@@ -3137,11 +3179,13 @@ FiniteElement<dim, spacedim>::face_system_to_component_index(
   //
   // in 1d, the face index is equal
   // to the cell index
-  Assert(is_primitive(this->face_to_cell_index(index, 0)),
+  Assert(is_primitive(this->face_to_cell_index(index, face_no)),
          (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
            index)));
 
-  return face_system_to_component_table[index];
+  return face_system_to_component_table[this->n_unique_faces() == 1 ?
+                                          0 :
+                                          face_no][index];
 }
 
 
@@ -3160,10 +3204,15 @@ FiniteElement<dim, spacedim>::system_to_base_index(
 template <int dim, int spacedim>
 inline std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
 FiniteElement<dim, spacedim>::face_system_to_base_index(
-  const unsigned int index) const
+  const unsigned int index,
+  const unsigned int face_no) const
 {
-  AssertIndexRange(index, face_system_to_base_table.size());
-  return face_system_to_base_table[index];
+  AssertIndexRange(
+    index,
+    face_system_to_base_table[this->n_unique_faces() == 1 ? 0 : face_no]
+      .size());
+  return face_system_to_base_table[this->n_unique_faces() == 1 ? 0 : face_no]
+                                  [index];
 }
 
 
@@ -3205,7 +3254,7 @@ inline std::pair<unsigned int, types::global_dof_index>
 FiniteElement<dim, spacedim>::system_to_block_index(
   const unsigned int index) const
 {
-  AssertIndexRange(index, this->dofs_per_cell);
+  AssertIndexRange(index, this->n_dofs_per_cell());
   // The block is computed simply as
   // first block of this base plus
   // the index within the base blocks
@@ -3222,7 +3271,7 @@ inline bool
 FiniteElement<dim, spacedim>::restriction_is_additive(
   const unsigned int index) const
 {
-  AssertIndexRange(index, this->dofs_per_cell);
+  AssertIndexRange(index, this->n_dofs_per_cell());
   return restriction_is_additive_flags[index];
 }
 
@@ -3232,7 +3281,7 @@ template <int dim, int spacedim>
 inline const ComponentMask &
 FiniteElement<dim, spacedim>::get_nonzero_components(const unsigned int i) const
 {
-  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(i, this->n_dofs_per_cell());
   return nonzero_components[i];
 }
 
@@ -3242,7 +3291,7 @@ template <int dim, int spacedim>
 inline unsigned int
 FiniteElement<dim, spacedim>::n_nonzero_components(const unsigned int i) const
 {
-  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(i, this->n_dofs_per_cell());
   return n_nonzero_components_table[i];
 }
 
@@ -3261,7 +3310,7 @@ template <int dim, int spacedim>
 inline bool
 FiniteElement<dim, spacedim>::is_primitive(const unsigned int i) const
 {
-  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(i, this->n_dofs_per_cell());
 
   // return primitivity of a shape
   // function by checking whether it
@@ -3285,15 +3334,15 @@ inline GeometryPrimitive
 FiniteElement<dim, spacedim>::get_associated_geometry_primitive(
   const unsigned int cell_dof_index) const
 {
-  AssertIndexRange(cell_dof_index, this->dofs_per_cell);
+  AssertIndexRange(cell_dof_index, this->n_dofs_per_cell());
 
   // just go through the usual cases, taking into account how DoFs
   // are enumerated on the reference cell
-  if (cell_dof_index < this->first_line_index)
+  if (cell_dof_index < this->get_first_line_index())
     return GeometryPrimitive::vertex;
-  else if (cell_dof_index < this->first_quad_index)
+  else if (cell_dof_index < this->get_first_quad_index(0))
     return GeometryPrimitive::line;
-  else if (cell_dof_index < this->first_hex_index)
+  else if (cell_dof_index < this->get_first_hex_index())
     return GeometryPrimitive::quad;
   else
     return GeometryPrimitive::hex;

@@ -18,11 +18,11 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/communication_pattern_base.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi_compute_index_owner_internal.h>
 #include <deal.II/base/mpi_tags.h>
 
-#include <deal.II/lac/communication_pattern_base.h>
 #include <deal.II/lac/vector_space_vector.h>
 
 
@@ -37,7 +37,7 @@ namespace Utilities
      * regarding the order of the underlying index sets.
      */
     class NoncontiguousPartitioner
-      : public dealii::LinearAlgebra::CommunicationPatternBase
+      : public Utilities::MPI::CommunicationPatternBase
     {
     public:
       /**
@@ -99,10 +99,11 @@ namespace Utilities
        * used.
        *
        * @pre The size of the @p temporary_storage vector has to be at least
-       *   as large as the sum of the number of entries in the index sets
-       *   passed to the constructor and the reinit() functions. The reason
-       *   for this is that this vector is used as buffer for both sending
-       *   and receiving data.
+       *   temporary_storage_size. The reason for this is that this vector is
+       *   used as buffer for both sending and receiving data.
+       *
+       * @note Any value less than 10 is a valid value of
+       *   @p communication_channel.
        */
       template <typename Number>
       void
@@ -124,7 +125,10 @@ namespace Utilities
        *   allows for padding and other post-processing of the received data.
        *
        * @pre The required size of the vectors are the same as in the functions
-       * above.
+       *   above.
+       *
+       * @note Any value less than 10 is a valid value of
+       *   @p communication_channel.
        */
       template <typename Number>
       void
@@ -146,7 +150,7 @@ namespace Utilities
        *   destination vector.
        *
        * @pre The required size of the vectors are the same as in the functions
-       * above.
+       *   above.
        */
       template <typename Number>
       void
@@ -160,7 +164,15 @@ namespace Utilities
        * number of processes this process receives data from.
        */
       std::pair<unsigned int, unsigned int>
-      n_targets();
+      n_targets() const;
+
+      /**
+       * Return the size of the temporary storage needed by the
+       * export_to_ghosted_array() functions, if the temporary storage is
+       * handled by the user code.
+       */
+      unsigned int
+      temporary_storage_size() const;
 
       /**
        * Return memory consumption in Byte.

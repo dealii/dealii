@@ -20,9 +20,12 @@ SET(_src
   ida.cc
   copy.cc
   kinsol.cc
+  n_vector.cc
+  sunlinsol_wrapper.cc
   )
 
 SET(_inst
+  n_vector.inst.in
   )
 
 FILE(GLOB _header

@@ -154,7 +154,7 @@ MGTransferPrebuilt<VectorType>::build(
 {
   const unsigned int n_levels =
     dof_handler.get_triangulation().n_global_levels();
-  const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+  const unsigned int dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
 
   this->sizes.resize(n_levels);
   for (unsigned int l = 0; l < n_levels; ++l)
@@ -266,20 +266,11 @@ MGTransferPrebuilt<VectorType>::build(
           // complete sparsity patterns on their own, the sparsity pattern must
           // be manually distributed.
 
-          // Retrieve communicator from triangulation if it is parallel
-          const parallel::TriangulationBase<dim, spacedim> *dist_tria =
-            dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-              &(dof_handler.get_triangulation()));
-
-          MPI_Comm communicator = dist_tria != nullptr ?
-                                    dist_tria->get_communicator() :
-                                    MPI_COMM_SELF;
-
           // Distribute sparsity pattern
           ::dealii::SparsityTools::distribute_sparsity_pattern(
             dsp,
             dof_handler.locally_owned_mg_dofs(level + 1),
-            communicator,
+            dof_handler.get_communicator(),
             dsp.row_index_set());
         }
 #endif

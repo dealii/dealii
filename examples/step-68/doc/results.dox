@@ -1,0 +1,88 @@
+<h1>Results</h1>
+
+The directory in which this program is run contains an example parameter file by default.
+If you do not specify a parameter file as an argument on the command
+line, the program will try to read the file "parameters.prm" by default, and
+will execute the code.
+
+On any number of cores, the simulation output will look like:
+
+@code
+bash$ mpirun -np 4 ./step-68 parameters.prm
+Number of particles inserted: 606
+Repartitioning triangulation after particle generation
+Writing particle output file: analytical-particles-0
+Writing particle output file: analytical-particles-10
+Writing particle output file: analytical-particles-20
+Writing particle output file: analytical-particles-30
+...
+Number of particles inserted: 606
+Repartitioning triangulation after particle generation
+Writing particle output file: interpolated-particles-0
+Writing background field file: background-0
+Writing particle output file: interpolated-particles-10
+Writing background field file: background-10
+Writing particle output file: interpolated-particles-20
+Writing background field file: background-20
+Writing particle output file: interpolated-particles-30
+Writing background field file: background-30
+...
+Writing particle output file: interpolated-particles-1980
+Writing background field file: background-1980
+Writing particle output file: interpolated-particles-1990
+Writing background field file: background-1990
+Writing particle output file: interpolated-particles-2000
+Writing background field file: background-2000
+@endcode
+
+We note that, by default, the simulation runs the particle tracking with
+an analytical velocity for 2000 iterations, then restarts from the beginning and runs the particle tracking with
+velocity interpolation for the same duration. The results are written every
+10th iteration.
+
+<h3> Motion of the particles </h3>
+
+The following animation displays the trajectory of the particles as they
+are advected by the flow field. We see that after the complete duration of the
+flow, the particle go back to their initial configuration as is expected.
+
+@htmlonly
+<p align="center">
+  <iframe width="560" height="500" src="https://www.youtube.com/embed/EbgS5Ch35Xs"
+   frameborder="0"
+   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+   allowfullscreen></iframe>
+ </p>
+@endhtmlonly
+
+<h3> Dynamic load balancing </h3>
+
+The following animation shows the impact of dynamic load balancing. We clearly
+see that the subdomains adapt themselves to balance the number of particles per
+subdomain. However, a perfect load balancing is not reached, in part due to
+the coarseness of the background mesh.
+
+@htmlonly
+<p align="center">
+  <iframe width="560" height="500" src="https://www.youtube.com/embed/ubUcsR4ECj4"
+   frameborder="0"
+   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+   allowfullscreen></iframe>
+ </p>
+@endhtmlonly
+
+
+<h3>Possibilities for extensions</h3>
+
+This program highlights some of the main capabilities for handling particles in deal.II, notably their
+capacity to be used in distributed parallel simulations. However, this step could
+be extended in numerous manners:
+- High-order time integration (for example using a Runge-Kutta 4 method) could be
+used to increase the accuracy or allow for larger time-step sizes with the same accuracy.
+- The full equation of motion (with inertia) could be solved for the particles. In
+this case the particles would need to have additional properties such as their mass,
+as in step-19, and if one wanted to also consider interactions with the fluid, their diameter.
+- Coupling to a flow solver. This step could be straightforwardly coupled to any parallel
+program in which the Stokes (step-32, step-70) or the Navier-Stokes equations are solved (e.g., step-57).
+- Computing the difference in final particle positions between the two models
+would allow to quantify the influence of the interpolation error on particle motion.

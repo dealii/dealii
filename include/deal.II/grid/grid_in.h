@@ -335,12 +335,19 @@ public:
     vtu,
     /// Use read_assimp()
     assimp,
+    /// Use read_exodusii()
+    exodusii,
   };
 
   /**
    * Constructor.
    */
   GridIn();
+
+  /**
+   * Constructor. Attach this triangulation to be fed with the grid data.
+   */
+  GridIn(Triangulation<dim, spacedim> &tria);
 
   /**
    * Attach this triangulation to be fed with the grid data.
@@ -365,20 +372,22 @@ public:
 
   /**
    * Read grid data from a unstructured vtk file. The vtk file may contain
-   * the following VTK cell types: VTK_HEXAHEDRON, VTK_QUAD, and VTK_LINE.
+   * the following VTK cell types: VTK_HEXAHEDRON (12), VTK_TETRA (10),
+   * VTK_QUAD (9), VTK_TRIANGLE (5), and VTK_LINE (3).
    *
    * Depending on the template dimension, only some of the above are accepted.
    *
    * In particular, in three dimensions, this function expects the file to
    * contain
    *
-   * - VTK_HEXAHEDRON cell types
-   * - VTK_QUAD cell types, to specify optional boundary or interior quad faces
+   * - VTK_HEXAHEDRON/VTK_TETRA cell types
+   * - VTK_QUAD/VTK_TRIANGLE cell types, to specify optional boundary or
+   *   interior quad faces
    * - VTK_LINE cell types, to specify optional boundary or interior edges
    *
    * In two dimensions:
    *
-   * - VTK_QUAD cell types
+   * - VTK_QUAD/VTK_TRIANGLE cell types
    * - VTK_LINE cell types, to specify optional boundary or interior edges
    *
    * In one dimension
@@ -397,6 +406,8 @@ public:
    *
    * The companion GridOut::write_vtk function can be used to write VTK files
    * compatible with this method.
+   *
+   * @ingroup simplex
    */
   void
   read_vtk(std::istream &in);
@@ -412,7 +423,7 @@ public:
    * to true.
    *
    * When this flag is set to true, the generated vtu file contains the
-   * triangulation in a xml section which is ignored by vtu general vtu readers.
+   * triangulation in a xml section which is ignored by general vtu readers.
    * If this section is absent, an exception is thrown.
    */
   void
@@ -505,9 +516,70 @@ public:
    * @note The input function of deal.II does not distinguish between newline
    * and other whitespace. Therefore, deal.II will be able to read files in a
    * slightly more general format than %Gmsh.
+   *
+   * @ingroup simplex
    */
   void
   read_msh(std::istream &in);
+
+#ifdef DEAL_II_GMSH_WITH_API
+  /**
+   * Read grid data using Gmsh API. Any file supported by Gmsh can be passed as
+   * argument. The format is deduced from the filename extension.
+   *
+   * This function interprets non-named physical ids (gmsh format < 4.0) as
+   * material or boundary ids (similarly to what happens with the other
+   * read_msh() function). If you want to specify non default manifold or
+   * boundary ids, you must group all entities that require a non default
+   * boundary or manifold id into named physical groups, where the name is
+   * interpreted using the function Patterns::Tools::to_value() applied to a
+   * `std::map<std::string, int>`. The keys can be either `MaterialID` (if the
+   * physical group refers to object of dimension `dim`), `BoundaryID` (if the
+   * group refers to objects of dimension < `dim`), or `ManifoldID`.
+   *
+   * From the Gmsh documentation, the formats of the physical tags follows the
+   * following conventions:
+   * @code
+   * \$PhysicalNames // same as MSH version 2
+   *   numPhysicalNames(ASCII int)
+   *   dimension(ASCII int) physicalTag(ASCII int) "name"(127 characters max)
+   *   ...
+   * \$EndPhysicalNames
+   * @endcode
+   *
+   * For example, the following snippet of mesh file
+   * @code
+   * MeshFormat
+   * 4.1 0 8
+   * \$EndMeshFormat
+   * \$PhysicalNames
+   * 4
+   * 1 1 "ManifoldID:0"
+   * 1 2 "BoundaryID: -1, ManifoldID: 1"
+   * 2 3 "ManifoldID: 1"
+   * 2 4 "MaterialID: 2, ManifoldID: 1"
+   * \$EndPhysicalNames
+   * \$Entities
+   * ...
+   * @endcode
+   *
+   * refers to a two dimensional grid where:
+   * - a portion of the boundary of dimension 1 has physical tag 1, and manifold
+   *   id 0
+   * - some internal faces (lines of dimension 1) have manifold id 1
+   * - some elements have manifold id 1 (and material id equal to the default
+   *   value, i.e., zero)
+   * - some elements have manifold id 1 and material id equal to 2
+   *
+   * If the physical groups are not named, then the behaviour is the same as
+   * the other read_msh() function, i.e., the physical tag itself is interpreted
+   * as a boundary or material id.
+   *
+   * @ingroup simplex
+   */
+  void
+  read_msh(const std::string &filename);
+#endif
 
   /**
    * Read grid data from a file containing tecplot ASCII data. This also works
@@ -558,6 +630,83 @@ public:
               const bool         ignore_unsupported_element_types = true);
 
   /**
+   * A structure containing some of the information provided by ExodusII that
+   * doesn't have a direct representation in the Triangulation object.
+   *
+   * @note This struct exists to enable forward compatibility with future
+   * versions of read_exodusii that may provide additional output data, but for
+   * now it has a single field.
+   */
+  struct ExodusIIData
+  {
+    /**
+     * A vector containing a mapping from deal.II boundary ids (or manifold ids)
+     * to the provided ExodusII sideset ids.
+     */
+    std::vector<std::vector<int>> id_to_sideset_ids;
+  };
+
+  /**
+   * Read in a mesh stored in the ExodusII file format.
+   *
+   * ExodusII is a feature-rich file format that supports many more features
+   * (like node sets, finite element fields, quality assurance data, and more)
+   * than most other grid formats supported by this class. Many of these
+   * features do not have equivalent representations in deal.II and are
+   * therefore not supported (for example, deal.II does not assign degrees of
+   * freedom directly to nodes, so data stored in a nodal format is not loaded
+   * by this function). At the current time only the following information is
+   * extracted from the input file:
+   *
+   * <ol>
+   *   <li>Block ids: the block id of an element is loaded as its material
+   *     id.</li>
+   *   <li>Elements and vertices: the core geometric information stored in the
+   *     ExodusII file populates the attached Triangulation object. Higher-order
+   *     elements are automatically truncated to lower-order elements since
+   *     deal.II does not support this feature (e.g., there is no equivalent to
+   *     the <code>QUAD9</code> element in deal.II since all quadrilaterals have
+   *     four vertices and additional geometric information is either stored in
+   *     a Manifold or something like MappingQEulerian).</li>
+   *   <li>Sideset ids: these are interpreted as boundary ids or manifold ids
+   *     (see the note on the output value below). An error will occur if you
+   *     attempt to read an ExodusII file that assigns a sideset id to an
+   *     internal face boundary id.</li>
+   * </ol>
+   *
+   * Sideset ids are not translated for Triangulations with nonzero codimension
+   * since those Triangulations do not support the setting of boundary ids.
+   *
+   * @param filename The name of the file to read from.
+   *
+   * @param apply_all_indicators_to_manifolds Boolean determining if the sideset
+   * ids should be interpreted as manifold ids or boundary ids. The default
+   * value is <tt>false</tt>, i.e., treat all sideset ids as boundary ids. If
+   * your mesh sets sideset ids on internal faces then it will be necessary to
+   * set this argument to <code>true</code> and then do some postprocessing to
+   * set the boundary ids correctly.
+   *
+   * @return This function returns a struct containing some extra data stored by
+   * the ExodusII file that cannot be loaded into a Triangulation - see
+   * ExodusIIData for more information.
+   *
+   * A cell face in ExodusII can be in an arbitrary number of sidesets (i.e., it
+   * can have an arbitrary number of sideset ids) - however, a boundary cell
+   * face in deal.II has exactly one boundary id. All boundary faces that are
+   * not in a sideset are given the (default) boundary id of $0$. This function
+   * then groups sidesets together into unique sets and gives each one a
+   * boundary id. For example: Consider a single-quadrilateral mesh whose left
+   * side has no sideset id, right side has sideset ids $0$ and $1$, and whose
+   * bottom and top sides have sideset ids of $0$. The left face will have a
+   * boundary id of $0$, the top and bottom faces boundary ids of $1$, and the
+   * right face a boundary id of $2$. Hence the vector returned by this function
+   * in that case will be $\{\{\}, \{0\}, \{0, 1\}\}$.
+   */
+  ExodusIIData
+  read_exodusii(const std::string &filename,
+                const bool         apply_all_indicators_to_manifolds = false);
+
+  /**
    * Return the standard suffix for a file in this format.
    */
   static std::string
@@ -606,7 +755,12 @@ public:
   /**
    * Exception
    */
-  DeclException0(ExcNoTriangulationSelected);
+  DeclExceptionMsg(ExcNoTriangulationSelected,
+                   "No Triangulation has been attached to this GridIn object "
+                   "so that nothing can be filled during any read function "
+                   "calls.  Please pass a reference to the Triangulation tria "
+                   "to be  filled in the constructor GridIn(tria) or attach "
+                   "it with the function call GridIn::attach_triangulation().");
   /**
    * Exception
    */
@@ -680,10 +834,7 @@ public:
    * To access the value use field_data[name_field][cell_id].
    */
   const std::map<std::string, std::vector<double>> &
-  get_field_data()
-  {
-    return this->field_data;
-  }
+  get_field_data() const;
 
 protected:
   /**

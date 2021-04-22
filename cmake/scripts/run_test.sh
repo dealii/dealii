@@ -106,7 +106,7 @@ case $STAGE in
       #   - [space][tab][newline]=,:;<>[](){}^ as separators between
       #     numbers
       #
-      "${NUMDIFF_EXECUTABLE}" -a 1e-6 -r 1e-8 -s ' \t\n=,:;<>[](){}^' \
+      "${NUMDIFF_EXECUTABLE}" -a 1e-6 -r 1e-8 -s ' \t\r\n=,:;<>[](){}^' \
                               "${file}" output > diff${variant}
 
       if [ $? -eq 0 ]; then

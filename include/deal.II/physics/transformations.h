@@ -178,7 +178,7 @@ namespace Physics
 
       /**
        * Return the result of the push forward transformation on a rank-4
-       * contravariant tensor, i.e. (in index notation)
+       * contravariant tensor, i.e. (in index notation):
        * @f[
        *  \left[ \chi\left(\bullet\right)^{\sharp} \right]_{ijkl}
        *    \dealcoloneq F_{iI} F_{jJ}
@@ -197,7 +197,7 @@ namespace Physics
 
       /**
        * Return the result of the push forward transformation on a rank-4
-       * contravariant symmetric tensor, i.e. (in index notation)
+       * contravariant symmetric tensor, i.e. (in index notation):
        * @f[
        *  \left[ \chi\left(\bullet\right)^{\sharp} \right]_{ijkl}
        *    \dealcoloneq F_{iI} F_{jJ}
@@ -280,7 +280,7 @@ namespace Physics
 
       /**
        * Return the result of the pull back transformation on a rank-4
-       * contravariant tensor, i.e. (in index notation)
+       * contravariant tensor, i.e. (in index notation):
        * @f[
        *  \left[ \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
        *    \dealcoloneq F^{-1}_{Ii} F^{-1}_{Jj}
@@ -299,7 +299,7 @@ namespace Physics
 
       /**
        * Return the result of the pull back transformation on a rank-4
-       * contravariant symmetric tensor, i.e. (in index notation)
+       * contravariant symmetric tensor, i.e. (in index notation):
        * @f[
        *  \left[ \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
        *    \dealcoloneq F^{-1}_{Ii} F^{-1}_{Jj}
@@ -403,7 +403,7 @@ namespace Physics
 
       /**
        * Return the result of the push forward transformation on a rank-4
-       * covariant tensor, i.e. (in index notation)
+       * covariant tensor, i.e. (in index notation):
        * @f[
        *  \left[ \chi\left(\bullet\right)^{\flat} \right]_{ijkl}
        *    \dealcoloneq F^{-T}_{iI} F^{-T}_{jJ}
@@ -422,7 +422,7 @@ namespace Physics
 
       /**
        * Return the result of the push forward transformation on a rank-4
-       * covariant symmetric tensor, i.e. (in index notation)
+       * covariant symmetric tensor, i.e. (in index notation):
        * @f[
        *  \left[ \chi\left(\bullet\right)^{\flat} \right]_{ijkl}
        *    \dealcoloneq F^{-T}_{iI} F^{-T}_{jJ}
@@ -505,7 +505,7 @@ namespace Physics
 
       /**
        * Return the result of the pull back transformation on a rank-4
-       * contravariant tensor, i.e. (in index notation)
+       * contravariant tensor, i.e. (in index notation):
        * @f[
        *  \left[ \chi^{-1}\left(\bullet\right)^{\flat} \right]_{IJKL}
        *  \dealcoloneq F^{T}_{Ii} F^{T}_{Jj}
@@ -524,7 +524,7 @@ namespace Physics
 
       /**
        * Return the result of the pull back transformation on a rank-4
-       * contravariant symmetric tensor, i.e. (in index notation)
+       * contravariant symmetric tensor, i.e. (in index notation):
        * @f[
        *  \left[ \chi^{-1}\left(\bullet\right)^{\flat} \right]_{IJKL}
        *  \dealcoloneq F^{T}_{Ii} F^{T}_{Jj}
@@ -619,7 +619,7 @@ namespace Physics
 
       /**
        * Return the result of the push forward transformation on a rank-4
-       * contravariant tensor, i.e. (in index notation)
+       * contravariant tensor, i.e. (in index notation):
        * @f[
        *  \textrm{det} \mathbf{F}^{-1} \; \left[
        * \chi\left(\bullet\right)^{\sharp} \right]_{ijkl}
@@ -640,7 +640,7 @@ namespace Physics
 
       /**
        * Return the result of the push forward transformation on a rank-4
-       * contravariant symmetric tensor, i.e. (in index notation)
+       * contravariant symmetric tensor, i.e. (in index notation):
        * @f[
        *  \textrm{det} \mathbf{F}^{-1} \; \left[
        * \chi\left(\bullet\right)^{\sharp} \right]_{ijkl}
@@ -729,7 +729,7 @@ namespace Physics
 
       /**
        * Return the result of the pull back transformation on a rank-4
-       * contravariant tensor, i.e. (in index notation)
+       * contravariant tensor, i.e. (in index notation):
        * @f[
        *  \textrm{det} \mathbf{F} \; \left[
        * \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
@@ -750,7 +750,7 @@ namespace Physics
 
       /**
        * Return the result of the pull back transformation on a rank-4
-       * contravariant symmetric tensor, i.e. (in index notation)
+       * contravariant symmetric tensor, i.e. (in index notation):
        * @f[
        *  \textrm{det} \mathbf{F} \; \left[
        * \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
@@ -805,6 +805,92 @@ namespace Physics
                     const Tensor<2, dim, Number> &F);
 
     //@}
+
+    /**
+     * @name Basis transformations
+     */
+    //@{
+
+    /**
+     * Return a vector with a changed basis, i.e.
+     * @f[
+     *  \mathbf{V}^{\prime} \dealcoloneq \mathbf{B} \cdot \mathbf{V}
+     * @f]
+     *
+     * @param[in] V The vector to be transformed $\mathbf{V}$
+     * @param[in] B The transformation matrix $\mathbf{B}$
+     * @return      $\mathbf{V}^{\prime}$
+     */
+    template <int dim, typename Number>
+    Tensor<1, dim, Number>
+    basis_transformation(const Tensor<1, dim, Number> &V,
+                         const Tensor<2, dim, Number> &B);
+
+    /**
+     * Return a rank-2 tensor with a changed basis, i.e.
+     * @f[
+     *  \mathbf{T}^{\prime} \dealcoloneq \mathbf{B} \cdot \mathbf{T} \cdot
+     * \mathbf{B}^{T}
+     * @f]
+     *
+     * @param[in] T The tensor to be transformed $\mathbf{T}$
+     * @param[in] B The transformation matrix $\mathbf{B}$
+     * @return      $\mathbf{T}^{\prime}$
+     */
+    template <int dim, typename Number>
+    Tensor<2, dim, Number>
+    basis_transformation(const Tensor<2, dim, Number> &T,
+                         const Tensor<2, dim, Number> &B);
+
+    /**
+     * Return a symmetric rank-2 tensor with a changed basis, i.e.
+     * @f[
+     *  \mathbf{T}^{\prime} \dealcoloneq \mathbf{B} \cdot \mathbf{T} \cdot
+     * \mathbf{B}^{T}
+     * @f]
+     *
+     * @param[in] T The tensor to be transformed $\mathbf{T}$
+     * @param[in] B The transformation matrix $\mathbf{B}$
+     * @return      $\mathbf{T}^{\prime}$
+     */
+    template <int dim, typename Number>
+    SymmetricTensor<2, dim, Number>
+    basis_transformation(const SymmetricTensor<2, dim, Number> &T,
+                         const Tensor<2, dim, Number> &         B);
+
+    /**
+     * Return a rank-4 tensor with a changed basis, i.e. (in index notation):
+     * @f[
+     *  H_{ijkl}^{\prime} \dealcoloneq B_{iI} B_{jJ} H_{IJKL} B_{kK} B_{lL}
+     * @f]
+     *
+     * @param[in] H The tensor to be transformed $\mathbf{T}$
+     * @param[in] B The transformation matrix $\mathbf{B}$
+     * @return      $\mathbf{H}^{\prime}$
+     */
+    template <int dim, typename Number>
+    Tensor<4, dim, Number>
+    basis_transformation(const Tensor<4, dim, Number> &H,
+                         const Tensor<2, dim, Number> &B);
+
+    /**
+     * Return a symmetric rank-4 tensor with a changed basis, i.e. (in index
+     * notation):
+     * @f[
+     *  H_{ijkl}^{\prime} \dealcoloneq B_{iI} B_{jJ} H_{IJKL} B_{kK} B_{lL}
+     * @f]
+     *
+     * @param[in] H The tensor to be transformed $\mathbf{T}$
+     * @param[in] B The transformation matrix $\mathbf{B}$
+     * @return      $\mathbf{H}^{\prime}$
+     */
+    template <int dim, typename Number>
+    SymmetricTensor<4, dim, Number>
+    basis_transformation(const SymmetricTensor<4, dim, Number> &H,
+                         const Tensor<2, dim, Number> &         B);
+
+    //@}
+
   } // namespace Transformations
 } // namespace Physics
 
@@ -812,139 +898,13 @@ namespace Physics
 
 #ifndef DOXYGEN
 
-// ------------------------- inline functions ------------------------
-
-namespace internal
-{
-  namespace Physics
-  {
-    template <int dim, typename Number>
-    inline Tensor<1, dim, Number>
-    transformation_contraction(const Tensor<1, dim, Number> &V,
-                               const Tensor<2, dim, Number> &F)
-    {
-      return contract<1, 0>(F, V);
-    }
-
-
-
-    template <int dim, typename Number>
-    inline Tensor<2, dim, Number>
-    transformation_contraction(const Tensor<2, dim, Number> &T,
-                               const Tensor<2, dim, Number> &F)
-    {
-      return contract<1, 0>(F, contract<1, 1>(T, F));
-    }
-
-
-
-    template <int dim, typename Number>
-    inline dealii::SymmetricTensor<2, dim, Number>
-    transformation_contraction(const dealii::SymmetricTensor<2, dim, Number> &T,
-                               const Tensor<2, dim, Number> &                 F)
-    {
-      Tensor<2, dim, Number> tmp_1;
-      for (unsigned int i = 0; i < dim; ++i)
-        for (unsigned int J = 0; J < dim; ++J)
-          // Loop over I but complex.h defines a macro I, so use I_ instead
-          for (unsigned int I_ = 0; I_ < dim; ++I_)
-            tmp_1[i][J] += F[i][I_] * T[I_][J];
-
-      dealii::SymmetricTensor<2, dim, Number> out;
-      for (unsigned int i = 0; i < dim; ++i)
-        for (unsigned int j = i; j < dim; ++j)
-          for (unsigned int J = 0; J < dim; ++J)
-            out[i][j] += F[j][J] * tmp_1[i][J];
-
-      return out;
-    }
-
-
-
-    template <int dim, typename Number>
-    inline Tensor<4, dim, Number>
-    transformation_contraction(const Tensor<4, dim, Number> &H,
-                               const Tensor<2, dim, Number> &F)
-    {
-      // This contraction order and indexing might look a bit dubious, so a
-      // quick explanation as to what's going on is probably in order:
-      //
-      // When the contract() function operates on the inner indices, the
-      // result has the inner index and outer index transposed, i.e.
-      // contract<2,1>(H,F) implies
-      // T_{IJLk} = (H_{IJMN} F_{mM}) \delta_{mL} \delta_{Nk}
-      // rather than T_{IJkL} (the desired result).
-      // So, in effect, contraction of the 3rd (inner) index with F as the
-      // second argument results in its transposition with respect to its
-      // adjacent neighbor. This is due to the position of the argument F,
-      // leading to the free index being on the right hand side of the result.
-      // However, given that we can do two transformations from the LHS of H
-      // and two from the right we can undo the otherwise erroneous
-      // swapping of the outer indices upon application of the second
-      // sets of contractions.
-      //
-      // Note: Its significantly quicker (in 3d) to push forward
-      // each index individually
-      return contract<1, 1>(
-        F, contract<1, 1>(F, contract<2, 1>(contract<2, 1>(H, F), F)));
-    }
-
-
-
-    template <int dim, typename Number>
-    inline dealii::SymmetricTensor<4, dim, Number>
-    transformation_contraction(const dealii::SymmetricTensor<4, dim, Number> &H,
-                               const Tensor<2, dim, Number> &                 F)
-    {
-      // The first and last transformation operations respectively
-      // break and recover the symmetry properties of the tensors.
-      // We also want to perform a minimal number of operations here
-      // and avoid some complications related to the transposition of
-      // tensor indices when contracting inner indices using the contract()
-      // function. (For an explanation of the contraction operations,
-      // please see the note in the equivalent function for standard
-      // Tensors.) So what we'll do here is manually perform the first
-      // and last contractions that break/recover the tensor symmetries
-      // on the inner indices, and use the contract() function only on
-      // the outer indices.
-      //
-      // Note: Its significantly quicker (in 3d) to push forward
-      // each index individually
-
-      // Push forward (inner) index 1
-      Tensor<4, dim, Number> tmp;
-      // Loop over I but complex.h defines a macro I, so use I_ instead
-      for (unsigned int I_ = 0; I_ < dim; ++I_)
-        for (unsigned int j = 0; j < dim; ++j)
-          for (unsigned int K = 0; K < dim; ++K)
-            for (unsigned int L = 0; L < dim; ++L)
-              for (unsigned int J = 0; J < dim; ++J)
-                tmp[I_][j][K][L] += F[j][J] * H[I_][J][K][L];
-
-      // Push forward (outer) indices 0 and 3
-      tmp = contract<1, 0>(F, contract<3, 1>(tmp, F));
-
-      // Push forward (inner) index 2
-      dealii::SymmetricTensor<4, dim, Number> out;
-      for (unsigned int i = 0; i < dim; ++i)
-        for (unsigned int j = i; j < dim; ++j)
-          for (unsigned int k = 0; k < dim; ++k)
-            for (unsigned int l = k; l < dim; ++l)
-              for (unsigned int K = 0; K < dim; ++K)
-                out[i][j][k][l] += F[k][K] * tmp[i][j][K][l];
-
-      return out;
-    }
-  } // namespace Physics
-} // namespace internal
-
 
 
 template <typename Number>
 Tensor<2, 2, Number>
 Physics::Transformations::Rotations::rotation_matrix_2d(const Number &angle)
 {
-  const double rotation[2][2] = {{std::cos(angle), -std::sin(angle)},
+  const Number rotation[2][2] = {{std::cos(angle), -std::sin(angle)},
                                  {std::sin(angle), std::cos(angle)}};
   return Tensor<2, 2>(rotation);
 }
@@ -962,7 +922,7 @@ Physics::Transformations::Rotations::rotation_matrix_3d(
   const Number c              = std::cos(angle);
   const Number s              = std::sin(angle);
   const Number t              = 1. - c;
-  const double rotation[3][3] = {{t * axis[0] * axis[0] + c,
+  const Number rotation[3][3] = {{t * axis[0] * axis[0] + c,
                                   t * axis[0] * axis[1] - s * axis[2],
                                   t * axis[0] * axis[2] + s * axis[1]},
                                  {t * axis[0] * axis[1] + s * axis[2],
@@ -982,7 +942,7 @@ Physics::Transformations::Contravariant::push_forward(
   const Tensor<1, dim, Number> &V,
   const Tensor<2, dim, Number> &F)
 {
-  return internal::Physics::transformation_contraction(V, F);
+  return Physics::Transformations::basis_transformation(V, F);
 }
 
 
@@ -993,7 +953,7 @@ Physics::Transformations::Contravariant::push_forward(
   const Tensor<2, dim, Number> &T,
   const Tensor<2, dim, Number> &F)
 {
-  return internal::Physics::transformation_contraction(T, F);
+  return Physics::Transformations::basis_transformation(T, F);
 }
 
 
@@ -1004,7 +964,7 @@ Physics::Transformations::Contravariant::push_forward(
   const SymmetricTensor<2, dim, Number> &T,
   const Tensor<2, dim, Number> &         F)
 {
-  return internal::Physics::transformation_contraction(T, F);
+  return Physics::Transformations::basis_transformation(T, F);
 }
 
 
@@ -1015,7 +975,7 @@ Physics::Transformations::Contravariant::push_forward(
   const Tensor<4, dim, Number> &H,
   const Tensor<2, dim, Number> &F)
 {
-  return internal::Physics::transformation_contraction(H, F);
+  return Physics::Transformations::basis_transformation(H, F);
 }
 
 
@@ -1026,7 +986,7 @@ Physics::Transformations::Contravariant::push_forward(
   const SymmetricTensor<4, dim, Number> &H,
   const Tensor<2, dim, Number> &         F)
 {
-  return internal::Physics::transformation_contraction(H, F);
+  return Physics::Transformations::basis_transformation(H, F);
 }
 
 
@@ -1037,7 +997,7 @@ Physics::Transformations::Contravariant::pull_back(
   const Tensor<1, dim, Number> &v,
   const Tensor<2, dim, Number> &F)
 {
-  return internal::Physics::transformation_contraction(v, invert(F));
+  return Physics::Transformations::basis_transformation(v, invert(F));
 }
 
 
@@ -1048,7 +1008,7 @@ Physics::Transformations::Contravariant::pull_back(
   const Tensor<2, dim, Number> &t,
   const Tensor<2, dim, Number> &F)
 {
-  return internal::Physics::transformation_contraction(t, invert(F));
+  return Physics::Transformations::basis_transformation(t, invert(F));
 }
 
 
@@ -1059,7 +1019,7 @@ Physics::Transformations::Contravariant::pull_back(
   const SymmetricTensor<2, dim, Number> &t,
   const Tensor<2, dim, Number> &         F)
 {
-  return internal::Physics::transformation_contraction(t, invert(F));
+  return Physics::Transformations::basis_transformation(t, invert(F));
 }
 
 
@@ -1070,7 +1030,7 @@ Physics::Transformations::Contravariant::pull_back(
   const Tensor<4, dim, Number> &h,
   const Tensor<2, dim, Number> &F)
 {
-  return internal::Physics::transformation_contraction(h, invert(F));
+  return Physics::Transformations::basis_transformation(h, invert(F));
 }
 
 
@@ -1081,7 +1041,7 @@ Physics::Transformations::Contravariant::pull_back(
   const SymmetricTensor<4, dim, Number> &h,
   const Tensor<2, dim, Number> &         F)
 {
-  return internal::Physics::transformation_contraction(h, invert(F));
+  return Physics::Transformations::basis_transformation(h, invert(F));
 }
 
 
@@ -1092,7 +1052,8 @@ Physics::Transformations::Covariant::push_forward(
   const Tensor<1, dim, Number> &V,
   const Tensor<2, dim, Number> &F)
 {
-  return internal::Physics::transformation_contraction(V, transpose(invert(F)));
+  return Physics::Transformations::basis_transformation(V,
+                                                        transpose(invert(F)));
 }
 
 
@@ -1103,7 +1064,8 @@ Physics::Transformations::Covariant::push_forward(
   const Tensor<2, dim, Number> &T,
   const Tensor<2, dim, Number> &F)
 {
-  return internal::Physics::transformation_contraction(T, transpose(invert(F)));
+  return Physics::Transformations::basis_transformation(T,
+                                                        transpose(invert(F)));
 }
 
 
@@ -1114,7 +1076,8 @@ Physics::Transformations::Covariant::push_forward(
   const SymmetricTensor<2, dim, Number> &T,
   const Tensor<2, dim, Number> &         F)
 {
-  return internal::Physics::transformation_contraction(T, transpose(invert(F)));
+  return Physics::Transformations::basis_transformation(T,
+                                                        transpose(invert(F)));
 }
 
 
@@ -1125,7 +1088,8 @@ Physics::Transformations::Covariant::push_forward(
   const Tensor<4, dim, Number> &H,
   const Tensor<2, dim, Number> &F)
 {
-  return internal::Physics::transformation_contraction(H, transpose(invert(F)));
+  return Physics::Transformations::basis_transformation(H,
+                                                        transpose(invert(F)));
 }
 
 
@@ -1136,7 +1100,8 @@ Physics::Transformations::Covariant::push_forward(
   const SymmetricTensor<4, dim, Number> &H,
   const Tensor<2, dim, Number> &         F)
 {
-  return internal::Physics::transformation_contraction(H, transpose(invert(F)));
+  return Physics::Transformations::basis_transformation(H,
+                                                        transpose(invert(F)));
 }
 
 
@@ -1146,7 +1111,7 @@ inline Tensor<1, dim, Number>
 Physics::Transformations::Covariant::pull_back(const Tensor<1, dim, Number> &v,
                                                const Tensor<2, dim, Number> &F)
 {
-  return internal::Physics::transformation_contraction(v, transpose(F));
+  return Physics::Transformations::basis_transformation(v, transpose(F));
 }
 
 
@@ -1156,7 +1121,7 @@ inline Tensor<2, dim, Number>
 Physics::Transformations::Covariant::pull_back(const Tensor<2, dim, Number> &t,
                                                const Tensor<2, dim, Number> &F)
 {
-  return internal::Physics::transformation_contraction(t, transpose(F));
+  return Physics::Transformations::basis_transformation(t, transpose(F));
 }
 
 
@@ -1167,7 +1132,7 @@ Physics::Transformations::Covariant::pull_back(
   const SymmetricTensor<2, dim, Number> &t,
   const Tensor<2, dim, Number> &         F)
 {
-  return internal::Physics::transformation_contraction(t, transpose(F));
+  return Physics::Transformations::basis_transformation(t, transpose(F));
 }
 
 
@@ -1177,7 +1142,7 @@ inline Tensor<4, dim, Number>
 Physics::Transformations::Covariant::pull_back(const Tensor<4, dim, Number> &h,
                                                const Tensor<2, dim, Number> &F)
 {
-  return internal::Physics::transformation_contraction(h, transpose(F));
+  return Physics::Transformations::basis_transformation(h, transpose(F));
 }
 
 
@@ -1188,7 +1153,7 @@ Physics::Transformations::Covariant::pull_back(
   const SymmetricTensor<4, dim, Number> &h,
   const Tensor<2, dim, Number> &         F)
 {
-  return internal::Physics::transformation_contraction(h, transpose(F));
+  return Physics::Transformations::basis_transformation(h, transpose(F));
 }
 
 
@@ -1303,6 +1268,127 @@ Physics::Transformations::nansons_formula(const Tensor<1, dim, Number> &N,
                                           const Tensor<2, dim, Number> &F)
 {
   return cofactor(F) * N;
+}
+
+
+template <int dim, typename Number>
+inline Tensor<1, dim, Number>
+Physics::Transformations::basis_transformation(const Tensor<1, dim, Number> &V,
+                                               const Tensor<2, dim, Number> &B)
+{
+  return contract<1, 0>(B, V);
+}
+
+
+
+template <int dim, typename Number>
+inline Tensor<2, dim, Number>
+Physics::Transformations::basis_transformation(const Tensor<2, dim, Number> &T,
+                                               const Tensor<2, dim, Number> &B)
+{
+  return contract<1, 0>(B, contract<1, 1>(T, B));
+}
+
+
+
+template <int dim, typename Number>
+inline SymmetricTensor<2, dim, Number>
+Physics::Transformations::basis_transformation(
+  const SymmetricTensor<2, dim, Number> &T,
+  const Tensor<2, dim, Number> &         B)
+{
+  Tensor<2, dim, Number> tmp_1;
+  for (unsigned int i = 0; i < dim; ++i)
+    for (unsigned int J = 0; J < dim; ++J)
+      // Loop over I but complex.h defines a macro I, so use I_ instead
+      for (unsigned int I_ = 0; I_ < dim; ++I_)
+        tmp_1[i][J] += B[i][I_] * T[I_][J];
+
+  SymmetricTensor<2, dim, Number> out;
+  for (unsigned int i = 0; i < dim; ++i)
+    for (unsigned int j = i; j < dim; ++j)
+      for (unsigned int J = 0; J < dim; ++J)
+        out[i][j] += B[j][J] * tmp_1[i][J];
+
+  return out;
+}
+
+
+
+template <int dim, typename Number>
+inline Tensor<4, dim, Number>
+Physics::Transformations::basis_transformation(const Tensor<4, dim, Number> &H,
+                                               const Tensor<2, dim, Number> &B)
+{
+  // This contraction order and indexing might look a bit dubious, so a
+  // quick explanation as to what's going on is probably in order:
+  //
+  // When the contract() function operates on the inner indices, the
+  // result has the inner index and outer index transposed, i.e.
+  // contract<2,1>(H,F) implies
+  // T_{IJLk} = (H_{IJMN} F_{mM}) \delta_{mL} \delta_{Nk}
+  // rather than T_{IJkL} (the desired result).
+  // So, in effect, contraction of the 3rd (inner) index with F as the
+  // second argument results in its transposition with respect to its
+  // adjacent neighbor. This is due to the position of the argument F,
+  // leading to the free index being on the right hand side of the result.
+  // However, given that we can do two transformations from the LHS of H
+  // and two from the right we can undo the otherwise erroneous
+  // swapping of the outer indices upon application of the second
+  // sets of contractions.
+  //
+  // Note: Its significantly quicker (in 3d) to push forward
+  // each index individually
+  return contract<1, 1>(
+    B, contract<1, 1>(B, contract<2, 1>(contract<2, 1>(H, B), B)));
+}
+
+
+
+template <int dim, typename Number>
+inline SymmetricTensor<4, dim, Number>
+Physics::Transformations::basis_transformation(
+  const SymmetricTensor<4, dim, Number> &H,
+  const Tensor<2, dim, Number> &         B)
+{
+  // The first and last transformation operations respectively
+  // break and recover the symmetry properties of the tensors.
+  // We also want to perform a minimal number of operations here
+  // and avoid some complications related to the transposition of
+  // tensor indices when contracting inner indices using the contract()
+  // function. (For an explanation of the contraction operations,
+  // please see the note in the equivalent function for standard
+  // Tensors.) So what we'll do here is manually perform the first
+  // and last contractions that break/recover the tensor symmetries
+  // on the inner indices, and use the contract() function only on
+  // the outer indices.
+  //
+  // Note: Its significantly quicker (in 3d) to push forward
+  // each index individually
+
+  // Push forward (inner) index 1
+  Tensor<4, dim, Number> tmp;
+  // Loop over I but complex.h defines a macro I, so use I_ instead
+  for (unsigned int I_ = 0; I_ < dim; ++I_)
+    for (unsigned int j = 0; j < dim; ++j)
+      for (unsigned int K = 0; K < dim; ++K)
+        for (unsigned int L = 0; L < dim; ++L)
+          for (unsigned int J = 0; J < dim; ++J)
+            tmp[I_][j][K][L] += B[j][J] * H[I_][J][K][L];
+
+  // Push forward (outer) indices 0 and 3
+  tmp = contract<1, 0>(B, contract<3, 1>(tmp, B));
+
+  // Push forward (inner) index 2
+  SymmetricTensor<4, dim, Number> out;
+  for (unsigned int i = 0; i < dim; ++i)
+    for (unsigned int j = i; j < dim; ++j)
+      for (unsigned int k = 0; k < dim; ++k)
+        for (unsigned int l = k; l < dim; ++l)
+          for (unsigned int K = 0; K < dim; ++K)
+            out[i][j][k][l] += B[k][K] * tmp[i][j][K][l];
+
+  return out;
 }
 
 #endif // DOXYGEN

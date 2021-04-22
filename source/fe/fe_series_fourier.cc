@@ -65,14 +65,16 @@ namespace
   integrate(const FiniteElement<dim, spacedim> &fe,
             const Quadrature<dim> &             quadrature,
             const Tensor<1, dim> &              k_vector,
-            const unsigned int                  j)
+            const unsigned int                  j,
+            const unsigned int                  component)
   {
     std::complex<double> sum = 0;
     for (unsigned int q = 0; q < quadrature.size(); ++q)
       {
         const Point<dim> &x_q = quadrature.point(q);
         sum += std::exp(std::complex<double>(0, 1) * (k_vector * x_q)) *
-               fe.shape_value(j, x_q) * quadrature.weight(q);
+               fe.shape_value_component(j, x_q, component) *
+               quadrature.weight(q);
       }
     return sum;
   }
@@ -91,19 +93,21 @@ namespace
     const hp::QCollection<1> &                     q_collection,
     const Table<1, Tensor<1, 1>> &                 k_vectors,
     const unsigned int                             fe,
+    const unsigned int                             component,
     std::vector<FullMatrix<std::complex<double>>> &fourier_transform_matrices)
   {
     AssertIndexRange(fe, fe_collection.size());
 
     if (fourier_transform_matrices[fe].m() == 0)
       {
-        fourier_transform_matrices[fe].reinit(n_coefficients_per_direction[fe],
-                                              fe_collection[fe].dofs_per_cell);
+        fourier_transform_matrices[fe].reinit(
+          n_coefficients_per_direction[fe],
+          fe_collection[fe].n_dofs_per_cell());
 
         for (unsigned int k = 0; k < n_coefficients_per_direction[fe]; ++k)
-          for (unsigned int j = 0; j < fe_collection[fe].dofs_per_cell; ++j)
-            fourier_transform_matrices[fe](k, j) =
-              integrate(fe_collection[fe], q_collection[fe], k_vectors(k), j);
+          for (unsigned int j = 0; j < fe_collection[fe].n_dofs_per_cell(); ++j)
+            fourier_transform_matrices[fe](k, j) = integrate(
+              fe_collection[fe], q_collection[fe], k_vectors(k), j, component);
       }
   }
 
@@ -115,6 +119,7 @@ namespace
     const hp::QCollection<2> &                     q_collection,
     const Table<2, Tensor<1, 2>> &                 k_vectors,
     const unsigned int                             fe,
+    const unsigned int                             component,
     std::vector<FullMatrix<std::complex<double>>> &fourier_transform_matrices)
   {
     AssertIndexRange(fe, fe_collection.size());
@@ -123,15 +128,20 @@ namespace
       {
         fourier_transform_matrices[fe].reinit(
           Utilities::fixed_power<2>(n_coefficients_per_direction[fe]),
-          fe_collection[fe].dofs_per_cell);
+          fe_collection[fe].n_dofs_per_cell());
 
         unsigned int k = 0;
         for (unsigned int k1 = 0; k1 < n_coefficients_per_direction[fe]; ++k1)
           for (unsigned int k2 = 0; k2 < n_coefficients_per_direction[fe];
                ++k2, ++k)
-            for (unsigned int j = 0; j < fe_collection[fe].dofs_per_cell; ++j)
-              fourier_transform_matrices[fe](k, j) = integrate(
-                fe_collection[fe], q_collection[fe], k_vectors(k1, k2), j);
+            for (unsigned int j = 0; j < fe_collection[fe].n_dofs_per_cell();
+                 ++j)
+              fourier_transform_matrices[fe](k, j) =
+                integrate(fe_collection[fe],
+                          q_collection[fe],
+                          k_vectors(k1, k2),
+                          j,
+                          component);
       }
   }
 
@@ -143,6 +153,7 @@ namespace
     const hp::QCollection<3> &                     q_collection,
     const Table<3, Tensor<1, 3>> &                 k_vectors,
     const unsigned int                             fe,
+    const unsigned int                             component,
     std::vector<FullMatrix<std::complex<double>>> &fourier_transform_matrices)
   {
     AssertIndexRange(fe, fe_collection.size());
@@ -151,19 +162,21 @@ namespace
       {
         fourier_transform_matrices[fe].reinit(
           Utilities::fixed_power<3>(n_coefficients_per_direction[fe]),
-          fe_collection[fe].dofs_per_cell);
+          fe_collection[fe].n_dofs_per_cell());
 
         unsigned int k = 0;
         for (unsigned int k1 = 0; k1 < n_coefficients_per_direction[fe]; ++k1)
           for (unsigned int k2 = 0; k2 < n_coefficients_per_direction[fe]; ++k2)
             for (unsigned int k3 = 0; k3 < n_coefficients_per_direction[fe];
                  ++k3, ++k)
-              for (unsigned int j = 0; j < fe_collection[fe].dofs_per_cell; ++j)
+              for (unsigned int j = 0; j < fe_collection[fe].n_dofs_per_cell();
+                   ++j)
                 fourier_transform_matrices[fe](k, j) =
                   integrate(fe_collection[fe],
                             q_collection[fe],
                             k_vectors(k1, k2, k3),
-                            j);
+                            j,
+                            component);
       }
   }
 } // namespace
@@ -176,15 +189,27 @@ namespace FESeries
   Fourier<dim, spacedim>::Fourier(
     const std::vector<unsigned int> &      n_coefficients_per_direction,
     const hp::FECollection<dim, spacedim> &fe_collection,
-    const hp::QCollection<dim> &           q_collection)
+    const hp::QCollection<dim> &           q_collection,
+    const unsigned int                     component_)
     : n_coefficients_per_direction(n_coefficients_per_direction)
     , fe_collection(&fe_collection)
     , q_collection(q_collection)
     , fourier_transform_matrices(fe_collection.size())
+    , component(component_ != numbers::invalid_unsigned_int ? component_ : 0)
   {
     Assert(n_coefficients_per_direction.size() == fe_collection.size() &&
              n_coefficients_per_direction.size() == q_collection.size(),
            ExcMessage("All parameters are supposed to have the same size."));
+
+    if (fe_collection[0].n_components() > 1)
+      Assert(
+        component_ != numbers::invalid_unsigned_int,
+        ExcMessage(
+          "For vector-valued problems, you need to explicitly specify for "
+          "which vector component you will want to do a Fourier decomposition "
+          "by setting the 'component' argument of this constructor."));
+
+    AssertIndexRange(component, fe_collection[0].n_components());
 
     const unsigned int max_n_coefficients_per_direction =
       *std::max_element(n_coefficients_per_direction.cbegin(),
@@ -221,7 +246,8 @@ namespace FESeries
       (*fe_collection == *(fourier.fe_collection)) &&
       (q_collection == fourier.q_collection) &&
       (k_vectors == fourier.k_vectors) &&
-      (fourier_transform_matrices == fourier.fourier_transform_matrices));
+      (fourier_transform_matrices == fourier.fourier_transform_matrices) &&
+      (component == fourier.component));
   }
 
 
@@ -238,6 +264,7 @@ namespace FESeries
                          q_collection,
                          k_vectors,
                          fe,
+                         component,
                          fourier_transform_matrices);
       });
 
@@ -273,6 +300,7 @@ namespace FESeries
                      q_collection,
                      k_vectors,
                      cell_active_fe_index,
+                     component,
                      fourier_transform_matrices);
 
     const FullMatrix<CoefficientType> &matrix =

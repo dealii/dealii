@@ -56,8 +56,8 @@ test_hypercube(unsigned int ref, unsigned int max_bbox)
   GridGenerator::hyper_cube(tria);
   tria.refine_global(4);
 
-  typedef typename parallel::distributed::Triangulation<dim, spacedim>::
-    active_cell_iterator cell_iterator;
+  using cell_iterator = typename parallel::distributed::
+    Triangulation<dim, spacedim>::active_cell_iterator;
 
   std::function<bool(const cell_iterator &)> predicate =
     pred_locally_owned<dim, spacedim>;

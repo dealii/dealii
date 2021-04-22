@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/memory_space.h>
+#include <deal.II/base/memory_space_data.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/types.h>
@@ -1638,7 +1639,7 @@ namespace internal
 
       template <typename MemorySpace2>
       static void
-      import(
+      import_elements(
         const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
         /*thread_loop_partitioner*/,
         const size_type /*size*/,
@@ -1995,18 +1996,19 @@ namespace internal
 
       template <typename MemorySpace2>
       static void
-      import(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-               &                     thread_loop_partitioner,
-             const size_type         size,
-             VectorOperation::values operation,
-             const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
-               &v_data,
-             ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                    ::dealii::MemorySpace::Host>
-               &data,
-             typename std::enable_if<
-               std::is_same<MemorySpace2, dealii::MemorySpace::Host>::value,
-               int>::type = 0)
+      import_elements(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+          &                     thread_loop_partitioner,
+        const size_type         size,
+        VectorOperation::values operation,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
+          &v_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::Host>
+          &data,
+        typename std::enable_if<
+          std::is_same<MemorySpace2, dealii::MemorySpace::Host>::value,
+          int>::type = 0)
       {
         if (operation == VectorOperation::insert)
           {
@@ -2025,18 +2027,19 @@ namespace internal
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
       template <typename MemorySpace2>
       static void
-      import(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-               & /*thread_loop_partitioner*/,
-             const size_type         size,
-             VectorOperation::values operation,
-             const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
-               &v_data,
-             ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                    ::dealii::MemorySpace::Host>
-               &data,
-             typename std::enable_if<
-               std::is_same<MemorySpace2, ::dealii::MemorySpace::CUDA>::value,
-               int>::type = 0)
+      import_elements(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+          & /*thread_loop_partitioner*/,
+        const size_type         size,
+        VectorOperation::values operation,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
+          &v_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::Host>
+          &data,
+        typename std::enable_if<
+          std::is_same<MemorySpace2, ::dealii::MemorySpace::CUDA>::value,
+          int>::type = 0)
       {
         if (operation == VectorOperation::insert)
           {
@@ -2511,18 +2514,19 @@ namespace internal
 
       template <typename MemorySpace2>
       static void
-      import(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-               &                     thread_loop_partitioner,
-             const size_type         size,
-             VectorOperation::values operation,
-             const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
-               &v_data,
-             ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                    ::dealii::MemorySpace::CUDA>
-               &data,
-             typename std::enable_if<
-               std::is_same<MemorySpace2, ::dealii::MemorySpace::CUDA>::value,
-               int>::type = 0)
+      import_elements(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+          &                     thread_loop_partitioner,
+        const size_type         size,
+        VectorOperation::values operation,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
+          &v_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::CUDA>
+          &data,
+        typename std::enable_if<
+          std::is_same<MemorySpace2, ::dealii::MemorySpace::CUDA>::value,
+          int>::type = 0)
       {
         if (operation == VectorOperation::insert)
           {
@@ -2540,18 +2544,19 @@ namespace internal
 
       template <typename MemorySpace2>
       static void
-      import(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-               & /*thread_loop_partitioner*/,
-             const size_type         size,
-             VectorOperation::values operation,
-             const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
-               &v_data,
-             ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                    ::dealii::MemorySpace::CUDA>
-               &data,
-             typename std::enable_if<
-               std::is_same<MemorySpace2, ::dealii::MemorySpace::Host>::value,
-               int>::type = 0)
+      import_elements(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+          & /*thread_loop_partitioner*/,
+        const size_type         size,
+        VectorOperation::values operation,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
+          &v_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::CUDA>
+          &data,
+        typename std::enable_if<
+          std::is_same<MemorySpace2, ::dealii::MemorySpace::Host>::value,
+          int>::type = 0)
       {
         if (operation == VectorOperation::insert)
           {

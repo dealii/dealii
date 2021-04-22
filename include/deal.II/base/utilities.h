@@ -45,15 +45,15 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/core/demangle.hpp>
+#include <boost/iostreams/device/array.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/complex.hpp>
 #include <boost/serialization/vector.hpp>
 
 #ifdef DEAL_II_WITH_ZLIB
-#  include <boost/iostreams/device/back_inserter.hpp>
 #  include <boost/iostreams/filter/gzip.hpp>
-#  include <boost/iostreams/filtering_stream.hpp>
-#  include <boost/iostreams/stream.hpp>
 #endif
 
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
@@ -691,6 +691,20 @@ namespace Utilities
          const bool allow_compression = true);
 
   /**
+   * Check if the bit at position @p n in @p number is set.
+   */
+  bool
+  get_bit(const unsigned char number, const unsigned int n);
+
+
+  /**
+   * Set the bit at position @p n in @p number to value @p x.
+   */
+  void
+  set_bit(unsigned char &number, const unsigned int n, const bool x);
+
+
+  /**
    * Convert an object of type `std::unique_ptr<From>` to an object of
    * type `std::unique_ptr<To>`, where it is assumed that we can cast
    * the pointer to `From` to a pointer to `To` using a `dynamic_cast`
@@ -749,20 +763,42 @@ namespace Utilities
    */
   template <typename To, typename From>
   std::unique_ptr<To>
-  dynamic_unique_cast(std::unique_ptr<From> &&p)
-  {
-    // Let's see if we can cast from 'From' to 'To'. If so, do the cast,
-    // and then release the pointer from the old
-    // owner
-    if (To *cast = dynamic_cast<To *>(p.get()))
-      {
-        std::unique_ptr<To> result(cast);
-        p.release();
-        return result;
-      }
-    else
-      throw std::bad_cast();
-  }
+  dynamic_unique_cast(std::unique_ptr<From> &&p);
+
+  /**
+   * Return underlying value. Default: return input.
+   */
+  template <typename T>
+  T &
+  get_underlying_value(T &p);
+
+  /**
+   * Return underlying value. Specialization for std::shared_ptr<T>.
+   */
+  template <typename T>
+  T &
+  get_underlying_value(std::shared_ptr<T> &p);
+
+  /**
+   * Return underlying value. Specialization for const std::shared_ptr<T>.
+   */
+  template <typename T>
+  T &
+  get_underlying_value(const std::shared_ptr<T> &p);
+
+  /**
+   * Return underlying value. Specialization for std::unique_ptr<T>.
+   */
+  template <typename T>
+  T &
+  get_underlying_value(std::unique_ptr<T> &p);
+
+  /**
+   * Return underlying value. Specialization for const std::unique_ptr<T>.
+   */
+  template <typename T>
+  T &
+  get_underlying_value(const std::unique_ptr<T> &p);
 
   /**
    * A namespace for utility functions that probe system properties.
@@ -1183,28 +1219,18 @@ namespace Utilities
        std::vector<char> &dest_buffer,
        const bool         allow_compression)
   {
-    // the data is never compressed when we can't use zlib.
-    (void)allow_compression;
-
     std::size_t size = 0;
 
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
-    //
-    // we have to work around the fact that GCC 4.8.x claims to be C++
-    // conforming, but is not actually as it does not implement
-    // std::is_trivially_copyable.
-#if __GNUG__ && __GNUC__ < 5
-    if (__has_trivial_copy(T) && sizeof(T) < 256)
-#else
-#  ifdef DEAL_II_HAVE_CXX17
+#ifdef DEAL_II_HAVE_CXX17
     if constexpr (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#  else
+#else
     if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#  endif
 #endif
       {
+        (void)allow_compression;
         const std::size_t previous_size = dest_buffer.size();
         dest_buffer.resize(previous_size + sizeof(T));
 
@@ -1217,31 +1243,21 @@ namespace Utilities
         // use buffer as the target of a compressing
         // stream into which we serialize the current object
         const std::size_t previous_size = dest_buffer.size();
+        {
+          boost::iostreams::filtering_ostreambuf fosb;
 #ifdef DEAL_II_WITH_ZLIB
-        if (allow_compression)
-          {
-            boost::iostreams::filtering_ostream out;
-            out.push(
-              boost::iostreams::gzip_compressor(boost::iostreams::gzip_params(
-                boost::iostreams::gzip::default_compression)));
-            out.push(boost::iostreams::back_inserter(dest_buffer));
-
-            boost::archive::binary_oarchive archive(out);
-            archive << object;
-            out.flush();
-          }
-        else
+          if (allow_compression)
+            fosb.push(boost::iostreams::gzip_compressor());
+#else
+          (void)allow_compression;
 #endif
-          {
-            std::ostringstream              out;
-            boost::archive::binary_oarchive archive(out);
-            archive << object;
+          fosb.push(boost::iostreams::back_inserter(dest_buffer));
 
-            const std::string s = out.str();
-            dest_buffer.reserve(dest_buffer.size() + s.size());
-            std::move(s.begin(), s.end(), std::back_inserter(dest_buffer));
-          }
-
+          boost::archive::binary_oarchive boa(fosb);
+          boa << object;
+          // the stream object has to be destroyed before the return statement
+          // to ensure that all data has been written in the buffer
+        }
         size = dest_buffer.size() - previous_size;
       }
 
@@ -1267,54 +1283,33 @@ namespace Utilities
   {
     T object;
 
-    // the data is never compressed when we can't use zlib.
-    (void)allow_compression;
-
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
-    //
-    // we have to work around the fact that GCC 4.8.x claims to be C++
-    // conforming, but is not actually as it does not implement
-    // std::is_trivially_copyable.
-#if __GNUG__ && __GNUC__ < 5
-    if (__has_trivial_copy(T) && sizeof(T) < 256)
-#else
-#  ifdef DEAL_II_HAVE_CXX17
+#ifdef DEAL_II_HAVE_CXX17
     if constexpr (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#  else
+#else
     if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#  endif
 #endif
       {
+        (void)allow_compression;
         Assert(std::distance(cbegin, cend) == sizeof(T), ExcInternalError());
         std::memcpy(&object, &*cbegin, sizeof(T));
       }
     else
       {
-        std::string decompressed_buffer;
-
-        // first decompress the buffer
+        // decompress the buffer section into the object
+        boost::iostreams::filtering_istreambuf fisb;
 #ifdef DEAL_II_WITH_ZLIB
         if (allow_compression)
-          {
-            boost::iostreams::filtering_ostream decompressing_stream;
-            decompressing_stream.push(boost::iostreams::gzip_decompressor());
-            decompressing_stream.push(
-              boost::iostreams::back_inserter(decompressed_buffer));
-            decompressing_stream.write(&*cbegin, std::distance(cbegin, cend));
-          }
-        else
+          fisb.push(boost::iostreams::gzip_decompressor());
+#else
+        (void)allow_compression;
 #endif
-          {
-            decompressed_buffer.assign(cbegin, cend);
-          }
+        fisb.push(boost::iostreams::array_source(&*cbegin, &*cend));
 
-        // then restore the object from the buffer
-        std::istringstream              in(decompressed_buffer);
-        boost::archive::binary_iarchive archive(in);
-
-        archive >> object;
+        boost::archive::binary_iarchive bia(fisb);
+        bia >> object;
       }
 
     return object;
@@ -1339,17 +1334,7 @@ namespace Utilities
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
-    //
-    // we have to work around the fact that GCC 4.8.x claims to be C++
-    // conforming, but is not actually as it does not implement
-    // std::is_trivially_copyable.
-    if (
-#if __GNUG__ && __GNUC__ < 5
-      __has_trivial_copy(T)
-#else
-      std::is_trivially_copyable<T>()
-#endif
-      && sizeof(T) * N < 256)
+    if (std::is_trivially_copyable<T>() && sizeof(T) * N < 256)
       {
         Assert(std::distance(cbegin, cend) == sizeof(T) * N,
                ExcInternalError());
@@ -1357,30 +1342,18 @@ namespace Utilities
       }
     else
       {
-        std::string decompressed_buffer;
-
-        // first decompress the buffer
-        (void)allow_compression;
+        // decompress the buffer section into the object
+        boost::iostreams::filtering_istreambuf fisb;
 #ifdef DEAL_II_WITH_ZLIB
         if (allow_compression)
-          {
-            boost::iostreams::filtering_ostream decompressing_stream;
-            decompressing_stream.push(boost::iostreams::gzip_decompressor());
-            decompressing_stream.push(
-              boost::iostreams::back_inserter(decompressed_buffer));
-            decompressing_stream.write(&*cbegin, std::distance(cbegin, cend));
-          }
-        else
+          fisb.push(boost::iostreams::gzip_decompressor());
+#else
+        (void)allow_compression;
 #endif
-          {
-            decompressed_buffer.assign(cbegin, cend);
-          }
+        fisb.push(boost::iostreams::array_source(&*cbegin, &*cend));
 
-        // then restore the object from the buffer
-        std::istringstream              in(decompressed_buffer);
-        boost::archive::binary_iarchive archive(in);
-
-        archive >> unpacked_object;
+        boost::archive::binary_iarchive bia(fisb);
+        bia >> unpacked_object;
       }
   }
 
@@ -1395,6 +1368,96 @@ namespace Utilities
                  buffer.cend(),
                  unpacked_object,
                  allow_compression);
+  }
+
+
+
+  inline bool
+  get_bit(const unsigned char number, const unsigned int n)
+  {
+    AssertIndexRange(n, 8);
+
+    // source:
+    // https://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit
+    // "Checking a bit"
+    return (number >> n) & 1U;
+  }
+
+
+
+  inline void
+  set_bit(unsigned char &number, const unsigned int n, const bool x)
+  {
+    AssertIndexRange(n, 8);
+
+    // source:
+    // https://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit
+    // "Changing the nth bit to x"
+    number ^= (-static_cast<unsigned char>(x) ^ number) & (1U << n);
+  }
+
+
+
+  template <typename To, typename From>
+  inline std::unique_ptr<To>
+  dynamic_unique_cast(std::unique_ptr<From> &&p)
+  {
+    // Let's see if we can cast from 'From' to 'To'. If so, do the cast,
+    // and then release the pointer from the old
+    // owner
+    if (To *cast = dynamic_cast<To *>(p.get()))
+      {
+        std::unique_ptr<To> result(cast);
+        p.release();
+        return result;
+      }
+    else
+      throw std::bad_cast();
+  }
+
+
+
+  template <typename T>
+  inline T &
+  get_underlying_value(T &p)
+  {
+    return p;
+  }
+
+
+
+  template <typename T>
+  inline T &
+  get_underlying_value(std::shared_ptr<T> &p)
+  {
+    return *p;
+  }
+
+
+
+  template <typename T>
+  inline T &
+  get_underlying_value(const std::shared_ptr<T> &p)
+  {
+    return *p;
+  }
+
+
+
+  template <typename T>
+  inline T &
+  get_underlying_value(std::unique_ptr<T> &p)
+  {
+    return *p;
+  }
+
+
+
+  template <typename T>
+  inline T &
+  get_underlying_value(const std::unique_ptr<T> &p)
+  {
+    return *p;
   }
 
 
@@ -1447,7 +1510,7 @@ namespace boost
   namespace serialization
   {
     // Provides boost and c++11 with a way to serialize tuples and pairs
-    // automatically
+    // automatically.
     template <int N>
     struct Serialize
     {
