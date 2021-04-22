@@ -105,14 +105,18 @@ namespace SUNDIALS
       ops->nvwsqrsumlocal     = nullptr;
       ops->nvwsqrsummasklocal = nullptr;
 
+#    if DEAL_II_SUNDIALS_VERSION_GTE(5, 4, 0)
       /* XBraid interface operations */
       ops->nvbufsize   = nullptr;
       ops->nvbufpack   = nullptr;
       ops->nvbufunpack = nullptr;
+#    endif
 
+#    if DEAL_II_SUNDIALS_VERSION_GTE(5, 3, 0)
       /* debugging functions (called when SUNDIALS_DEBUG_PRINTVEC is defined) */
       ops->nvprint     = nullptr;
       ops->nvprintfile = nullptr;
+#    endif
 #  endif
 
       /* attach ops and initialize content to nullptr */
@@ -213,14 +217,18 @@ namespace SUNDIALS
       v->ops->nvwsqrsumlocal     = w->ops->nvwsqrsumlocal;
       v->ops->nvwsqrsummasklocal = w->ops->nvwsqrsummasklocal;
 
+#    if DEAL_II_SUNDIALS_VERSION_GTE(5, 4, 0)
       /* XBraid interface operations */
       v->ops->nvbufsize   = w->ops->nvbufsize;
       v->ops->nvbufpack   = w->ops->nvbufpack;
       v->ops->nvbufunpack = w->ops->nvbufunpack;
+#    endif
 
+#    if DEAL_II_SUNDIALS_VERSION_GTE(5, 3, 0)
       /* debugging functions (called when SUNDIALS_DEBUG_PRINTVEC is defined) */
       v->ops->nvprint     = w->ops->nvprint;
       v->ops->nvprintfile = w->ops->nvprintfile;
+#    endif
 #  endif
 
       return (0);
