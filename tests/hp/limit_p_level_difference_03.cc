@@ -15,7 +15,7 @@
 
 
 // verify restrictions on level differences imposed by
-// DoFHandler::prepare_coarsening_and_refinement()
+// hp::Refinement::limit_p_level_difference()
 // on h-refined grids
 
 

@@ -148,7 +148,7 @@ namespace hp
      * The same applies to coarsening.
      *
      * @note Triangulation::prepare_coarsening_and_refinement() and
-     *   DoFHandler::prepare_coarsening_and_refinement() may change
+     *   hp::Refinement::limit_p_level_difference() may change
      *   refine and coarsen flags as well as future finite element indices.
      *   Avoid calling them before this particular function.
      */
@@ -166,7 +166,7 @@ namespace hp
      * cell.
      *
      * @note Triangulation::prepare_coarsening_and_refinement() and
-     *   DoFHandler::prepare_coarsening_and_refinement() may change
+     *   hp::Refinement::limit_p_level_difference() may change
      *   refine and coarsen flags as well as future finite element indices.
      *   Avoid calling them before this particular function.
      */
@@ -197,7 +197,7 @@ namespace hp
      * cell.
      *
      * @note Triangulation::prepare_coarsening_and_refinement() and
-     *   DoFHandler::prepare_coarsening_and_refinement() may change
+     *   hp::Refinement::limit_p_level_difference() may change
      *   refine and coarsen flags as well as future finite element indices.
      *   Avoid calling them before this particular function.
      */
@@ -240,7 +240,7 @@ namespace hp
      * in the interval $[0,1]$.
      *
      * @note Triangulation::prepare_coarsening_and_refinement() and
-     *   DoFHandler::prepare_coarsening_and_refinement() may change
+     *   hp::Refinement::limit_p_level_difference() may change
      *   refine and coarsen flags as well as future finite element indices.
      *   Avoid calling them before this particular function.
      */
@@ -284,7 +284,7 @@ namespace hp
      * in the interval $[0,1]$.
      *
      * @note Triangulation::prepare_coarsening_and_refinement() and
-     *   DoFHandler::prepare_coarsening_and_refinement() may change
+     *   hp::Refinement::limit_p_level_difference() may change
      *   refine and coarsen flags as well as future finite element indices.
      *   Avoid calling them before this particular function.
      */
@@ -322,7 +322,7 @@ namespace hp
      * For more theoretical details see @cite ainsworth1998hp .
      *
      * @note Triangulation::prepare_coarsening_and_refinement() and
-     *   DoFHandler::prepare_coarsening_and_refinement() may change
+     *   hp::Refinement::limit_p_level_difference() may change
      *   refine and coarsen flags as well as future finite element indices.
      *   Avoid calling them before this particular function.
      */
@@ -348,7 +348,7 @@ namespace hp
      * correspond to an active cell.
      *
      * @note Triangulation::prepare_coarsening_and_refinement() and
-     *   DoFHandler::prepare_coarsening_and_refinement() may change
+     *   hp::Refinement::limit_p_level_difference() may change
      *   refine and coarsen flags as well as future finite element indices.
      *   Avoid calling them before this particular function.
      */
@@ -562,7 +562,7 @@ namespace hp
      * @note We want to predict the error by how adaptation will actually happen.
      *   Thus, this function needs to be called after
      *   Triangulation::prepare_coarsening_and_refinement() and
-     *   DoFHandler::prepare_coarsening_and_refinement().
+     *   hp::Refinement::limit_p_level_difference().
      */
     template <int dim, typename Number, int spacedim>
     void
@@ -589,7 +589,7 @@ namespace hp
      * @p future_fe_index assigned.
      *
      * @note Triangulation::prepare_coarsening_and_refinement() and
-     *   DoFHandler::prepare_coarsening_and_refinement() may change
+     *   hp::Refinement::limit_p_level_difference() may change
      *   refine and coarsen flags as well as future finite element indices.
      *   Avoid calling them before this particular function.
      */
@@ -637,7 +637,7 @@ namespace hp
      *   would have made later on.
      *
      * @note Triangulation::prepare_coarsening_and_refinement() and
-     *   DoFHandler::prepare_coarsening_and_refinement() may change
+     *   hp::Refinement::limit_p_level_difference() may change
      *   refine and coarsen flags as well as future finite element indices.
      *   Avoid calling them before this particular function.
      */
