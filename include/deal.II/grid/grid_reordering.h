@@ -26,19 +26,15 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * An exception that is thrown whenever the edges of a mesh are not
- * orientable.
- */
-DeclExceptionMsg(ExcMeshNotOrientable,
-                 "The edges of the mesh are not consistently orientable.");
-
-
-/**
  * A class implementing various grid reordering algorithms. For more information
  * see the @ref reordering "reordering module".
+ *
+ * @deprecated Use GridTools::invert_all_negative_measure_cells() or
+ * GridTools::consistently_order_cells() instead of the functions provided by
+ * this class. Usage of the old-style numbering is deprecated.
  */
 template <int dim, int spacedim = dim>
-class GridReordering
+class DEAL_II_DEPRECATED_EARLY GridReordering
 {
 public:
   /**
@@ -54,7 +50,10 @@ public:
    * vertices within a cell. If false (the default), then use the "old-style"
    * ordering of vertices within cells used by deal.II before version 5.2 and
    * as explained in the documentation of this class.
+   *
+   * @deprecated Use GridTools::consistently_order_cells() instead.
    */
+  DEAL_II_DEPRECATED_EARLY
   static void
   reorder_cells(std::vector<CellData<dim>> &original_cells,
                 const bool                  use_new_style_ordering = false);

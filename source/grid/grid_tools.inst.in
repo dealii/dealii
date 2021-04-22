@@ -250,6 +250,11 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const std::vector<Point<deal_II_space_dimension>> &,
         std::vector<CellData<deal_II_dimension>> &);
 
+#  if deal_II_dimension == deal_II_space_dimension
+      template void
+      consistently_order_cells(std::vector<CellData<deal_II_dimension>> &);
+#  endif
+
       template void
       shift<deal_II_dimension>(
         const Tensor<1, deal_II_space_dimension> &,
