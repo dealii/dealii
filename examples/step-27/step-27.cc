@@ -441,6 +441,20 @@ namespace Step27
       // not both at once.
       hp::Refinement::choose_p_over_h(dof_handler);
 
+      // For grid adaptive refinement, we ensure a 2:1 mesh balance by limiting
+      // the difference of refinement levels of neighboring cells to one by
+      // calling Triangulation::prepare_coarsening_and_refinement(). We would
+      // like to achieve something similar for the p-levels of neighboring
+      // cells: levels of future finite elements are not allowed to differ by
+      // more than a specified difference. With its default parameters, a call
+      // of hp::Refinement::limit_p_level_difference() ensures that their level
+      // difference is limited to one. This will not necessarily decrease the
+      // number of hanging nodes in the domain, but makes sure that high order
+      // polynomials are not constrained to much lower polynomials on faces,
+      // e.g., fifth order to second order polynomials.
+      triangulation.prepare_coarsening_and_refinement();
+      hp::Refinement::limit_p_level_difference(dof_handler);
+
       // At the end of this procedure, we then refine the mesh. During this
       // process, children of cells undergoing bisection inherit their mother
       // cell's finite element index. Further, future finite element indices
