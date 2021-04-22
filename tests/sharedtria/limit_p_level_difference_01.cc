@@ -15,7 +15,7 @@
 
 
 // verify restrictions on level differences imposed by
-// DoFHandler::prepare_coarsening_and_refinement()
+// hp::Refinement::limit_p_level_difference()
 //
 // set the center cell to the highest p-level in a hyper_cross geometry
 // and verify that all other cells comply to the level difference
