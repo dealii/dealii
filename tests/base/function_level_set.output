@@ -1,0 +1,43 @@
+
+DEAL::dim = 1
+DEAL::
+DEAL::test_sphere_level_set
+DEAL::point = 2.00000
+DEAL::value = 1.00000
+DEAL::gradient = 1.00000
+DEAL::Hessian = 0.00000
+DEAL::
+DEAL::test_plane_level_set
+DEAL::point = 1.00000
+DEAL::value = 1.00000
+DEAL::gradient = 1.00000
+DEAL::Hessian = 0.00000
+DEAL::
+DEAL::dim = 2
+DEAL::
+DEAL::test_sphere_level_set
+DEAL::point = 2.00000 0.00000
+DEAL::value = 1.00000
+DEAL::gradient = 1.00000 0.00000
+DEAL::Hessian = 0.00000 0.00000 0.00000 0.500000
+DEAL::
+DEAL::test_plane_level_set
+DEAL::point = 1.00000 1.00000
+DEAL::value = 1.00000
+DEAL::gradient = 1.00000 0.00000
+DEAL::Hessian = 0.00000 0.00000 0.00000 0.00000
+DEAL::
+DEAL::dim = 3
+DEAL::
+DEAL::test_sphere_level_set
+DEAL::point = 2.00000 0.00000 0.00000
+DEAL::value = 1.00000
+DEAL::gradient = 1.00000 0.00000 0.00000
+DEAL::Hessian = 0.00000 0.00000 0.00000 0.00000 0.500000 0.00000 0.00000 0.00000 0.500000
+DEAL::
+DEAL::test_plane_level_set
+DEAL::point = 1.00000 1.00000 1.00000
+DEAL::value = 1.00000
+DEAL::gradient = 1.00000 0.00000 0.00000
+DEAL::Hessian = 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000
+DEAL::
