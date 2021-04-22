@@ -19,13 +19,14 @@
 // This tests is based on hp/error_prediction.cc
 
 
-#include <deal.II/distributed/error_predictor.h>
+#include <deal.II/distributed/cell_data_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
+
+#include <deal.II/hp/refinement.h>
 
 #include <deal.II/lac/vector.h>
 
@@ -44,9 +45,11 @@ test()
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   TestGrids::hyper_line(tria, 4);
 
-  for (auto cell = tria.begin(0); cell != tria.end(0); ++cell)
-    if (cell->id().to_string() == "0_0:" || cell->id().to_string() == "1_0:")
-      cell->set_refine_flag();
+  {
+    auto first = tria.begin(0);
+    if (first->id().to_string() == "0_0:")
+      first->set_refine_flag();
+  }
   tria.execute_coarsening_and_refinement();
 
   hp::FECollection<dim> fes;
@@ -54,60 +57,46 @@ test()
     fes.push_back(FE_Q<dim>(d));
 
   DoFHandler<dim> dh(tria);
-  for (const auto &cell : dh.active_cell_iterators())
-    {
-      // set active FE index
-      if (cell->is_locally_owned())
-        cell->set_active_fe_index(1);
-    }
   for (auto cell = dh.begin(0); cell != dh.end(0); ++cell)
-    {
-      // set refinement/coarsening flags
-      if (cell->id().to_string() == "0_0:")
-        {
-          // h-coarsening and p-refinement
-          for (unsigned int i = 0; i < cell->n_children(); ++i)
-            if (cell->child(i)->is_locally_owned())
-              {
-                cell->child(i)->set_coarsen_flag();
-                cell->child(i)->set_future_fe_index(2);
-              }
-        }
-      else if (cell->id().to_string() == "1_0:")
-        {
-          // h-coarsening and p-coarsening
-          for (unsigned int i = 0; i < cell->n_children(); ++i)
-            if (cell->child(i)->is_locally_owned())
-              {
-                cell->child(i)->set_coarsen_flag();
-                cell->child(i)->set_future_fe_index(0);
-              }
-        }
-      else if (cell->id().to_string() == "2_0:")
-        {
-          // h-refinement and p-refinement
-          if (cell->is_locally_owned())
-            {
-              cell->set_refine_flag();
-              cell->set_future_fe_index(2);
-            }
-        }
-      else if (cell->id().to_string() == "3_0:")
-        {
-          // h-refinement and p-coarsening
-          if (cell->is_locally_owned())
-            {
-              cell->set_refine_flag();
-              cell->set_future_fe_index(0);
-            }
-        }
-    }
+    if (cell->id().to_string() == "0_0:")
+      {
+        // h-coarsening
+        for (unsigned int i = 0; i < cell->n_children(); ++i)
+          if (cell->child(i)->is_locally_owned())
+            cell->child(i)->set_coarsen_flag();
+      }
+    else if (cell->id().to_string() == "1_0:")
+      {
+        // h-refinement
+        if (cell->is_locally_owned())
+          cell->set_refine_flag();
+      }
+    else if (cell->id().to_string() == "2_0:")
+      {
+        // p-refinement
+        if (cell->is_locally_owned())
+          cell->set_future_fe_index(2);
+      }
   dh.distribute_dofs(fes);
 
   // ----- prepare error indicators -----
   Vector<float> error_indicators(tria.n_active_cells());
   for (unsigned int i = 0; i < error_indicators.size(); ++i)
     error_indicators(i) = 10.;
+
+  // ----- connect error predictor -----
+  Vector<float> predicted_errors;
+  tria.signals.post_p4est_refinement.connect([&]() {
+    const internal::parallel::distributed::TemporarilyMatchRefineFlags<dim>
+      refine_modifier(tria);
+    predicted_errors.reinit(tria.n_active_cells());
+    hp::Refinement::predict_error(dh,
+                                  error_indicators,
+                                  predicted_errors,
+                                  /*gamma_p=*/0.5,
+                                  /*gamma_h=*/1.,
+                                  /*gamma_n=*/1.);
+  });
 
   // ----- verify ------
   deallog << "pre_adaptation" << std::endl;
@@ -130,16 +119,17 @@ test()
       }
 
   // ----- execute adaptation -----
-  parallel::distributed::ErrorPredictor<dim> predictor(dh);
+  parallel::distributed::CellDataTransfer<dim, dim, Vector<float>>
+  data_transfer(tria,
+                /*transfer_variable_size_data=*/false,
+                &AdaptationStrategies::Refinement::l2_norm<dim, dim, float>,
+                &AdaptationStrategies::Coarsening::l2_norm<dim, dim, float>);
 
-  predictor.prepare_for_coarsening_and_refinement(error_indicators,
-                                                  /*gamma_p=*/0.5,
-                                                  /*gamma_h=*/1.,
-                                                  /*gamma_n=*/1.);
+  data_transfer.prepare_for_coarsening_and_refinement(predicted_errors);
   tria.execute_coarsening_and_refinement();
 
-  Vector<float> predicted_errors(tria.n_active_cells());
-  predictor.unpack(predicted_errors);
+  predicted_errors.reinit(tria.n_active_cells());
+  data_transfer.unpack(predicted_errors);
 
   // ------ verify ------
   deallog << "post_adaptation" << std::endl;
