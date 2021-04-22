@@ -1860,9 +1860,7 @@ namespace GridGenerator
     cells[n_cells - 1].vertices[GeometryInfo<3>::ucd_to_deal[7]] =
       (1 + n_rotations) % 4;
 
-    GridReordering<dim>::invert_all_cells_of_negative_grid(vertices,
-                                                           cells,
-                                                           true);
+    GridTools::invert_all_negative_measure_cells(vertices, cells);
     tria.create_triangulation(vertices, cells, SubCellData());
   }
 

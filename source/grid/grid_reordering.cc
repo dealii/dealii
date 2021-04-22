@@ -1154,66 +1154,13 @@ GridReordering<2>::invert_all_cells_of_negative_grid(
   std::vector<CellData<2>> &   cells,
   const bool                   use_new_style_ordering)
 {
-  unsigned int vertices_lex[GeometryInfo<2>::vertices_per_cell];
-  unsigned int n_negative_cells = 0;
+  if (!use_new_style_ordering)
+    reorder_old_to_new_style(cells);
 
-  // GridTools::cell_measure requires the vertices to be in lexicographic
-  // ordering
-  auto copy_vertices_to_temp = [&](const CellData<2> &cell) {
-    if (use_new_style_ordering)
-      {
-        std::copy(cell.vertices.begin(),
-                  cell.vertices.end(),
-                  std::begin(vertices_lex));
-      }
-    else
-      {
-        for (const unsigned int i : GeometryInfo<2>::vertex_indices())
-          vertices_lex[GeometryInfo<2>::ucd_to_deal[i]] = cell.vertices[i];
-      }
-  };
+  GridTools::invert_all_negative_measure_cells(all_vertices, cells);
 
-  for (auto &cell : cells)
-    {
-      copy_vertices_to_temp(cell);
-      if (GridTools::cell_measure<2>(all_vertices, vertices_lex) < 0)
-        {
-          ++n_negative_cells;
-          if (use_new_style_ordering)
-            std::swap(cell.vertices[1], cell.vertices[2]);
-          else
-            std::swap(cell.vertices[1], cell.vertices[3]);
-
-          // Check whether the resulting cell is now ok.
-          // If not, then the grid is seriously broken and
-          // we just give up.
-          copy_vertices_to_temp(cell);
-          AssertThrow(GridTools::cell_measure<2>(all_vertices, vertices_lex) >
-                        0,
-                      ExcInternalError());
-        }
-    }
-
-  // We assume that all cells of a grid have
-  // either positive or negative volumes but
-  // not both mixed. Although above reordering
-  // might work also on single cells, grids
-  // with both kind of cells are very likely to
-  // be broken. Check for this here.
-  AssertThrow(
-    n_negative_cells == 0 || n_negative_cells == cells.size(),
-    ExcMessage(
-      std::string("This class assumes that either all cells have positive "
-                  "volume, or that all cells have been specified in an "
-                  "inverted vertex order so that their volume is negative. "
-                  "(In the latter case, this class automatically inverts "
-                  "every cell.) However, the mesh you have specified "
-                  "appears to have both cells with positive and cells with "
-                  "negative volume. You need to check your mesh which "
-                  "cells these are and how they got there.\n"
-                  "As a hint, of the total ") +
-      std::to_string(cells.size()) + " cells in the mesh, " +
-      std::to_string(n_negative_cells) + " appear to have a negative volume."));
+  if (!use_new_style_ordering)
+    reorder_new_to_old_style(cells);
 }
 
 
@@ -1237,82 +1184,13 @@ GridReordering<3>::invert_all_cells_of_negative_grid(
   std::vector<CellData<3>> &   cells,
   const bool                   use_new_style_ordering)
 {
-  unsigned int vertices_lex[GeometryInfo<3>::vertices_per_cell];
-  unsigned int n_negative_cells = 0;
+  if (!use_new_style_ordering)
+    reorder_old_to_new_style(cells);
 
-  // GridTools::cell_measure requires the vertices to be in lexicographic
-  // ordering
-  auto copy_vertices_to_temp = [&](const CellData<3> &cell) {
-    if (use_new_style_ordering)
-      {
-        std::copy(cell.vertices.begin(),
-                  cell.vertices.end(),
-                  std::begin(vertices_lex));
-      }
-    else
-      {
-        for (const unsigned int i : GeometryInfo<3>::vertex_indices())
-          vertices_lex[GeometryInfo<3>::ucd_to_deal[i]] = cell.vertices[i];
-      }
-  };
+  GridTools::invert_all_negative_measure_cells(all_vertices, cells);
 
-  for (auto &cell : cells)
-    {
-      copy_vertices_to_temp(cell);
-      if (GridTools::cell_measure<3>(all_vertices, vertices_lex) < 0)
-        {
-          ++n_negative_cells;
-          // reorder vertices: swap front and back face
-          if (use_new_style_ordering)
-            {
-              std::swap(cell.vertices[0], cell.vertices[2]);
-              std::swap(cell.vertices[1], cell.vertices[3]);
-              std::swap(cell.vertices[4], cell.vertices[6]);
-              std::swap(cell.vertices[5], cell.vertices[7]);
-            }
-          else
-            {
-              for (unsigned int i = 0; i < 4; ++i)
-                std::swap(cell.vertices[i], cell.vertices[i + 4]);
-            }
-          copy_vertices_to_temp(cell);
-
-          // Check whether the resulting cell is now ok.
-          // If not, then the grid is seriously broken and
-          // we just give up.
-          AssertThrow(GridTools::cell_measure<3>(all_vertices, vertices_lex) >
-                        0,
-                      ExcInternalError());
-        }
-    }
-
-  // We assume that all cells of a
-  // grid have either positive or
-  // negative volumes but not both
-  // mixed. Although above reordering
-  // might work also on single cells,
-  // grids with both kind of cells
-  // are very likely to be
-  // broken. Check for this here.
-  AssertThrow(n_negative_cells == 0 || n_negative_cells == cells.size(),
-              ExcMessage("While sorting the cells that will be passed for "
-                         "creating a Triangulation object, deal.II found that "
-                         "some but not all cells have a negative volume. (If "
-                         "all cells had a negative volume, they would simply "
-                         "all have been inverted.) This usually happens in "
-                         "hand-generated meshes if one accidentally uses an "
-                         "incorrect convention for ordering the vertices in "
-                         "one or more cells; in that case, you may want to "
-                         "double check that you specified the vertex indices "
-                         "in their correct order. If you are reading a mesh "
-                         "that was created by a mesh generator, then this "
-                         "exception indicates that some of the cells created "
-                         "are so badly distorted that their volume becomes "
-                         "negative; this commonly occurs at complex geometric "
-                         "features, and you may see if the problem can be "
-                         "fixed by playing with the parameters that control "
-                         "mesh properties in your mesh generator, such as "
-                         "the number of cells, the mesh density, etc."));
+  if (!use_new_style_ordering)
+    reorder_new_to_old_style(cells);
 }
 
 

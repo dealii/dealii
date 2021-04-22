@@ -858,6 +858,77 @@ namespace GridTools
 
 
 
+  template <int dim, int spacedim>
+  void
+  invert_all_negative_measure_cells(
+    const std::vector<Point<spacedim>> &all_vertices,
+    std::vector<CellData<dim>> &        cells)
+  {
+    if (dim == 1)
+      return;
+    if (dim == 2 && spacedim == 3)
+      Assert(false, ExcNotImplemented());
+
+    std::size_t n_negative_cells = 0;
+    for (auto &cell : cells)
+      {
+        Assert(cell.vertices.size() ==
+                 ReferenceCells::get_hypercube<dim>().n_vertices(),
+               ExcNotImplemented());
+        const ArrayView<const unsigned int> vertices(cell.vertices);
+        if (GridTools::cell_measure<dim>(all_vertices, vertices) < 0)
+          {
+            ++n_negative_cells;
+
+            // TODO: this only works for quads and hexes
+            if (dim == 2)
+              {
+                // flip the cell across the y = x line in 2D
+                std::swap(cell.vertices[1], cell.vertices[2]);
+              }
+            else if (dim == 3)
+              {
+                // swap the front and back faces in 3D
+                std::swap(cell.vertices[0], cell.vertices[2]);
+                std::swap(cell.vertices[1], cell.vertices[3]);
+                std::swap(cell.vertices[4], cell.vertices[6]);
+                std::swap(cell.vertices[5], cell.vertices[7]);
+              }
+
+            // Check whether the resulting cell is now ok.
+            // If not, then the grid is seriously broken and
+            // we just give up.
+            AssertThrow(GridTools::cell_measure<dim>(all_vertices, vertices) >
+                          0,
+                        ExcInternalError());
+          }
+      }
+
+    // We assume that all cells of a grid have
+    // either positive or negative volumes but
+    // not both mixed. Although above reordering
+    // might work also on single cells, grids
+    // with both kind of cells are very likely to
+    // be broken. Check for this here.
+    AssertThrow(n_negative_cells == 0 || n_negative_cells == cells.size(),
+                ExcMessage(
+                  std::string(
+                    "This function assumes that either all cells have positive "
+                    "volume, or that all cells have been specified in an "
+                    "inverted vertex order so that their volume is negative. "
+                    "(In the latter case, this class automatically inverts "
+                    "every cell.) However, the mesh you have specified "
+                    "appears to have both cells with positive and cells with "
+                    "negative volume. You need to check your mesh which "
+                    "cells these are and how they got there.\n"
+                    "As a hint, of the total ") +
+                  std::to_string(cells.size()) + " cells in the mesh, " +
+                  std::to_string(n_negative_cells) +
+                  " appear to have a negative volume."));
+  }
+
+
+
   // define some transformations
   namespace internal
   {
