@@ -21,20 +21,20 @@ Cycle 1:
    Number of constraints       : 756
 Cycle 2:
    Number of active cells      : 927
-   Number of degrees of freedom: 7978
-   Number of constraints       : 1760
+   Number of degrees of freedom: 8226
+   Number of constraints       : 1856
 Cycle 3:
-   Number of active cells      : 1020
-   Number of degrees of freedom: 11750
-   Number of constraints       : 2898
+   Number of active cells      : 978
+   Number of degrees of freedom: 12146
+   Number of constraints       : 2944
 Cycle 4:
-   Number of active cells      : 1158
-   Number of degrees of freedom: 16342
-   Number of constraints       : 3892
+   Number of active cells      : 1104
+   Number of degrees of freedom: 16892
+   Number of constraints       : 3998
 Cycle 5:
-   Number of active cells      : 1197
-   Number of degrees of freedom: 20569
-   Number of constraints       : 4954
+   Number of active cells      : 1149
+   Number of degrees of freedom: 22078
+   Number of constraints       : 5230
 @endcode
 
 The first thing we learn from this is that the number of constrained degrees
@@ -64,36 +64,36 @@ Secondly, let us look at the sequence of meshes generated:
 
 <div class="threecolumn" style="width: 80%">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-mesh-00.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.mesh-00.svg"
          alt="Triangulation containing reentrant corners without adaptive refinement."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-mesh-01.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.mesh-01.svg"
          alt="Triangulation containing reentrant corners with one level of
          refinement. New cells are placed near the corners."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-mesh-02.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.mesh-02.svg"
          alt="Triangulation containing reentrant corners with two levels of
          refinement. New cells are placed near the corners."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-mesh-03.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.mesh-03.svg"
          alt="Triangulation containing reentrant corners with three levels of
          refinement. New cells are placed near the corners."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-mesh-04.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.mesh-04.svg"
          alt="Triangulation containing reentrant corners with four levels of
          refinement. New cells are placed near the corners."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-mesh-05.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.mesh-05.svg"
          alt="Triangulation containing reentrant corners with five levels of
          refinement. New cells are placed near the corners."
          width="200" height="200">
@@ -108,32 +108,32 @@ to degree seven:
 
 <div class="threecolumn" style="width: 80%">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-fe_degree-00.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-00.svg"
          alt="Initial grid where all cells contain just biquadratic functions."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-fe_degree-01.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-01.svg"
          alt="Depiction of local approximation degrees after one refinement."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-fe_degree-02.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-02.svg"
          alt="Depiction of local approximation degrees after two refinements."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-fe_degree-03.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-03.svg"
          alt="Depiction of local approximation degrees after three refinements."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-fe_degree-04.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-04.svg"
          alt="Depiction of local approximation degrees after four refinements."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-fe_degree-05.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-05.svg"
          alt="Depiction of local approximation degrees after five refinements."
          width="200" height="200">
   </div>
@@ -152,32 +152,32 @@ indicating least smoothness and lighter indicating the smoothest areas:
 
 <div class="threecolumn" style="width: 80%">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-smoothness-00.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-00.svg"
          alt="Estimated regularity per cell on the initial grid."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-smoothness-01.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-01.svg"
          alt="Depiction of the estimated regularity per cell after one refinement."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-smoothness-02.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-02.svg"
          alt="Depiction of the estimated regularity per cell after two refinements."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-smoothness-03.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-03.svg"
          alt="Depiction of the estimated regularity per cell after three refinements."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-smoothness-04.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-04.svg"
          alt="Depiction of the estimated regularity per cell after four refinements."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-smoothness-05.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-05.svg"
          alt="Depiction of the estimated regularity per cell after five refinements."
          width="200" height="200">
   </div>
