@@ -5484,69 +5484,72 @@ namespace GridTools
     const auto &b_tree = cache.get_cell_bounding_boxes_rtree();
 
     // Now make a tree of indices for the points
-    const auto p_tree = pack_rtree_of_indices(points);
+    // [TODO] This would work better with pack_rtree_of_indices, but
+    // windows does not like it. Build a tree with pairs of point and id
+    std::vector<std::pair<Point<spacedim>, unsigned int>> points_and_ids(np);
+    for (unsigned int i = 0; i < np; ++i)
+      points_and_ids[i] = std::make_pair(points[i], i);
+    const auto p_tree = pack_rtree(points_and_ids);
 
     // Keep track of all found points
     std::vector<bool> found_points(points.size(), false);
 
     // Check if a point was found
-    const auto already_found = [&found_points](const unsigned int &id) {
-      AssertIndexRange(id, found_points.size());
-      return found_points[id];
+    const auto already_found = [&found_points](const auto &id) {
+      AssertIndexRange(id.second, found_points.size());
+      return found_points[id.second];
     };
 
-    // check if the cell was already in the vector before. If so, returns its
-    // index, otherwise adds it to the list of cells, return the new index,
-    // and resize also the other two vectors. Start from last entry.
-    const auto get_local_cell_index =
-      [&](const typename Triangulation<dim, spacedim>::active_cell_iterator
-            &cell) {
+    // check if the given cell was already in the vector of cells before. If so,
+    // insert in the corresponding vectors the reference point and the id.
+    // Otherwise append a new entry to all vectors.
+    const auto store_cell_point_and_id =
+      [&](
+        const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
+        const Point<dim> &  ref_point,
+        const unsigned int &id) {
         const auto it = std::find(cells_out.rbegin(), cells_out.rend(), cell);
         if (it != cells_out.rend())
           {
-            return (cells_out.size() - 1 - (it - cells_out.rbegin()));
+            const auto cell_id =
+              (cells_out.size() - 1 - (it - cells_out.rbegin()));
+            qpoints_out[cell_id].emplace_back(ref_point);
+            maps_out[cell_id].emplace_back(id);
           }
         else
           {
             cells_out.emplace_back(cell);
-            qpoints_out.resize(cells_out.size());
-            maps_out.resize(cells_out.size());
-            return (cells_out.size() - 1);
+            qpoints_out.emplace_back(std::vector<Point<dim>>({ref_point}));
+            maps_out.emplace_back(std::vector<unsigned int>({id}));
           }
       };
 
     // Check all points within a given pair of box and cell
-    const auto check_all_points_within_box =
-      [&](const decltype(*b_tree.begin()) &leaf) {
-        const auto &box       = leaf.first;
-        const auto &cell_hint = leaf.second;
+    const auto check_all_points_within_box = [&](const auto &leaf) {
+      const auto &box       = leaf.first;
+      const auto &cell_hint = leaf.second;
 
-        for (const auto id :
-             p_tree | bgi::adaptors::queried(!bgi::satisfies(already_found) &&
-                                             bgi::intersects(box)))
-          {
-            const auto cell_and_ref =
-              GridTools::find_active_cell_around_point(cache,
-                                                       points[id],
-                                                       cell_hint);
-            const auto &cell      = cell_and_ref.first;
-            const auto &ref_point = cell_and_ref.second;
+      for (const auto &point_and_id :
+           p_tree | bgi::adaptors::queried(!bgi::satisfies(already_found) &&
+                                           bgi::intersects(box)))
+        {
+          const auto id = point_and_id.second;
+          const auto cell_and_ref =
+            GridTools::find_active_cell_around_point(cache,
+                                                     points[id],
+                                                     cell_hint);
+          const auto &cell      = cell_and_ref.first;
+          const auto &ref_point = cell_and_ref.second;
 
-            if (cell.state() == IteratorState::valid)
-              {
-                const auto cell_id = get_local_cell_index(cell);
-                qpoints_out[cell_id].emplace_back(ref_point);
-                maps_out[cell_id].emplace_back(id);
-                found_points[id] = true;
-              }
-            else
-              {
-                missing_points_out.emplace_back(id);
-                // Don't look anymore for this point
-                found_points[id] = true;
-              }
-          }
-      };
+          if (cell.state() == IteratorState::valid)
+            store_cell_point_and_id(cell, ref_point, id);
+          else
+            missing_points_out.emplace_back(id);
+
+          // Don't look anymore for this point
+          found_points[id] = true;
+        }
+    };
 
     // If a hint cell was given, use it
     if (cell_hint.state() == IteratorState::valid)
@@ -5565,10 +5568,7 @@ namespace GridTools
           else
             {
               // We should not get here. Throw an error.
-              Assert(false,
-                     ExcInternalError(
-                       "I cannot find the closest cell to a point."
-                       "Something is rotten inside."));
+              Assert(false, ExcInternalError());
             }
         }
     // Now make sure we send out the rest of the points that we did not find.
@@ -5602,7 +5602,7 @@ namespace GridTools
                            std::move(qpoints_out),
                            std::move(maps_out),
                            std::move(missing_points_out));
-  } // namespace GridTools
+  }
 
 
 

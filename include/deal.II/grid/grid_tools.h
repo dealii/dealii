@@ -862,8 +862,8 @@ namespace GridTools
 
   /**
    * Given a Triangulation's @p cache and a list of @p points, call
-   * find_active_cell_around_point() on each element of @p points , and return
-   * @p cells , referece positions @p qpoints , and a mapping @p maps from local
+   * find_active_cell_around_point() on each element of @p points, and return
+   * @p cells, reference positions @p qpoints, and a mapping @p maps from local
    * to global indices into @p points .
    *
    * @param[in] cache The triangulation's GridTools::Cache .
@@ -891,7 +891,7 @@ namespace GridTools
    *
    * @note If a point is not found inside the mesh, or is lying inside an
    * artificial cell of a parallel::TriangulationBase, the point is silently
-   * igored. If you want to infer for which points the search failed, use the
+   * ignored. If you want to infer for which points the search failed, use the
    * function compute_point_locations_try_all() that also returns a vector of
    * indices indicating the points for which the search failed.
    *
@@ -1451,6 +1451,11 @@ namespace GridTools
    *      // do something with cell_and_ref_point
    *      ...
    *   }
+   *  else
+   *    {
+   *       // The function did not find a locally owned or ghost cell in which
+   *       // the point is located. We ought to handle this somehow here.
+   *    }
    *   ...
    * }
    * @endcode
