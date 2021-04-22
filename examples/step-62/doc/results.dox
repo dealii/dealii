@@ -132,3 +132,106 @@ which are promising candidates to study macroscopic quantum phenomena.
 The 20GHz mode of a micropillar superlattice cavity is essentially a mechanical harmonic oscillator that is very well isolated
 from the environment. If the device is cooled down to 20mK in a dilution fridge, the mode would then become a
 macroscopic quantum harmonic oscillator.
+
+
+<h3>Possibilities for extensions</h3>
+
+Instead of setting the parameters in the C++ file we could set the parameters
+using a python script and save them in the HDF5 file that we will use for
+the simulations. Then the deal.II program will read the parameters from the
+HDF5 file.
+
+@code{.py}
+import numpy as np
+import h5py
+import matplotlib.pyplot as plt
+import subprocess
+import scipy.constants as constants
+import scipy.optimize
+
+# This considerably reduces the size of the svg data
+plt.rcParams['svg.fonttype'] = 'none'
+
+h5_file = h5py.File('results.h5', 'w')
+data = h5_file.create_group('data')
+displacement = data.create_group('displacement')
+calibration = data.create_group('calibration')
+
+# Set the parameters
+for group in [displacement, calibration]:
+    # Dimensions of the domain
+    # The waveguide length is equal to dimension_x
+    group.attrs['dimension_x'] = 2e-5
+    # The waveguide width is equal to dimension_y
+    group.attrs['dimension_y'] = 2e-8
+
+    # Position of the probe that we use to measure the flux
+    group.attrs['probe_pos_x']   = 8e-6
+    group.attrs['probe_pos_y']   = 0
+    group.attrs['probe_width_y'] = 2e-08
+
+    # Number of points in the probe
+    group.attrs['nb_probe_points'] = 5
+
+    # Global refinement
+    group.attrs['grid_level'] = 1
+
+    # Cavity
+    group.attrs['cavity_resonance_frequency'] = 20e9
+    group.attrs['nb_mirror_pairs']            = 15
+
+    # Material
+    group.attrs['poissons_ratio'] = 0.27
+    group.attrs['youngs_modulus'] = 270000000000.0
+    group.attrs['material_a_rho'] = 3200
+    if group == displacement:
+        group.attrs['material_b_rho'] = 2000
+    else:
+        group.attrs['material_b_rho'] = 3200
+    group.attrs['lambda'] = (group.attrs['youngs_modulus'] * group.attrs['poissons_ratio'] /
+                           ((1 + group.attrs['poissons_ratio']) *
+                           (1 - 2 * group.attrs['poissons_ratio'])))
+    group.attrs['mu']= (group.attrs['youngs_modulus'] / (2 * (1 + group.attrs['poissons_ratio'])))
+
+    # Force
+    group.attrs['max_force_amplitude'] = 1e26
+    group.attrs['force_sigma_x']       = 1e-7
+    group.attrs['force_sigma_y']       = 1
+    group.attrs['max_force_width_x']   = 3e-7
+    group.attrs['max_force_width_y']   = 2e-8
+    group.attrs['force_x_pos']         = -8e-6
+    group.attrs['force_y_pos']         = 0
+
+    # PML
+    group.attrs['pml_x']            = True
+    group.attrs['pml_y']            = False
+    group.attrs['pml_width_x']      = 1.8e-6
+    group.attrs['pml_width_y']      = 5e-7
+    group.attrs['pml_coeff']        = 1.6
+    group.attrs['pml_coeff_degree'] = 2
+
+    # Frequency sweep
+    group.attrs['center_frequency']    = 20e9
+    group.attrs['frequency_range']     = 0.5e9
+    group.attrs['start_frequency']     = group.attrs['center_frequency'] - group.attrs['frequency_range'] / 2
+    group.attrs['stop_frequency']      = group.attrs['center_frequency'] + group.attrs['frequency_range'] / 2
+    group.attrs['nb_frequency_points'] = 400
+
+    # Other parameters
+    if group == displacement:
+        group.attrs['simulation_name'] = 'phononic_cavity_displacement'
+    else:
+        group.attrs['simulation_name'] = 'phononic_cavity_calibration'
+    group.attrs['save_vtu_files'] = False
+
+h5_file.close()
+@endcode
+
+In order to read the HDF5 parameters we have to use the
+HDF5::File::FileAccessMode::open flag.
+@code{.py}
+      HDF5::File data_file("results.h5",
+                           HDF5::File::FileAccessMode::open,
+                           MPI_COMM_WORLD);
+      auto       data = data_file.open_group("data");
+@endcode
