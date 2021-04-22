@@ -249,119 +249,110 @@ for (VEC : GENERAL_CONTAINER_TYPES; Number : ALL_SCALAR_TYPES;
     template void
     FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
       get_function_values_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::value_type> &) const;
+        const VEC<Number> &, std::vector<solution_value_type<Number>> &) const;
 
     template void
     FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
       get_function_gradients_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::gradient_type> &) const;
+        const VEC<Number> &, std::vector<solution_gradient_type<Number>> &)
+        const;
 
     template void
     FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
       get_function_hessians_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::hessian_type> &) const;
+        const VEC<Number> &, std::vector<solution_hessian_type<Number>> &)
+        const;
 
     template void
     FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
       get_function_laplacians_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::value_type> &) const;
+        const VEC<Number> &, std::vector<solution_value_type<Number>> &) const;
 
     template void
     FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
       get_function_third_derivatives_from_local_dof_values<VEC<Number>>(
         const VEC<Number> &,
-        std::vector<typename OutputType<Number>::third_derivative_type> &)
-        const;
+        std::vector<solution_third_derivative_type<Number>> &) const;
 
 
 
     template void
     FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
       get_function_values_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::value_type> &) const;
+        const VEC<Number> &, std::vector<solution_value_type<Number>> &) const;
 
     template void
     FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
       get_function_gradients_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::gradient_type> &) const;
+        const VEC<Number> &, std::vector<solution_gradient_type<Number>> &)
+        const;
 
     template void
     FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
       get_function_symmetric_gradients_from_local_dof_values<VEC<Number>>(
         const VEC<Number> &,
-        std::vector<typename OutputType<Number>::symmetric_gradient_type> &)
-        const;
+        std::vector<solution_symmetric_gradient_type<Number>> &) const;
 
     template void
     FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
       get_function_divergences_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::divergence_type> &) const;
+        const VEC<Number> &, std::vector<solution_divergence_type<Number>> &)
+        const;
 
     template void
     FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
       get_function_curls_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::curl_type> &) const;
+        const VEC<Number> &, std::vector<solution_curl_type<Number>> &) const;
 
     template void
     FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
       get_function_hessians_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::hessian_type> &) const;
+        const VEC<Number> &, std::vector<solution_hessian_type<Number>> &)
+        const;
 
     template void
     FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
       get_function_laplacians_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::value_type> &) const;
+        const VEC<Number> &, std::vector<solution_value_type<Number>> &) const;
 
     template void
     FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
       get_function_third_derivatives_from_local_dof_values<VEC<Number>>(
         const VEC<Number> &,
-        std::vector<typename OutputType<Number>::third_derivative_type> &)
-        const;
+        std::vector<solution_third_derivative_type<Number>> &) const;
 
 
 
-    template void FEValuesViews::
-      SymmetricTensor<2, deal_II_dimension, deal_II_space_dimension>::
-        get_function_values_from_local_dof_values<VEC<Number>>(
-          const VEC<Number> &,
-          std::vector<typename OutputType<Number>::value_type> &) const;
+    template void FEValuesViews::SymmetricTensor<2,
+                                                 deal_II_dimension,
+                                                 deal_II_space_dimension>::
+      get_function_values_from_local_dof_values<VEC<Number>>(
+        const VEC<Number> &, std::vector<solution_value_type<Number>> &) const;
 
     template void FEValuesViews::
       SymmetricTensor<2, deal_II_dimension, deal_II_space_dimension>::
         get_function_divergences_from_local_dof_values<VEC<Number>>(
-          const VEC<Number> &,
-          std::vector<typename OutputType<Number>::divergence_type> &) const;
+          const VEC<Number> &, std::vector<solution_divergence_type<Number>> &)
+          const;
 
 
 
     template void
     FEValuesViews::Tensor<2, deal_II_dimension, deal_II_space_dimension>::
       get_function_values_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::value_type> &) const;
+        const VEC<Number> &, std::vector<solution_value_type<Number>> &) const;
 
     template void
     FEValuesViews::Tensor<2, deal_II_dimension, deal_II_space_dimension>::
       get_function_divergences_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::divergence_type> &) const;
+        const VEC<Number> &, std::vector<solution_divergence_type<Number>> &)
+        const;
 
     template void
     FEValuesViews::Tensor<2, deal_II_dimension, deal_II_space_dimension>::
       get_function_gradients_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::gradient_type> &) const;
+        const VEC<Number> &, std::vector<solution_gradient_type<Number>> &)
+        const;
 #endif
   }
 
