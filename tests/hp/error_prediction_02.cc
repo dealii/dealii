@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2021 by the deal.II authors
+// Copyright (C) 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,7 +17,7 @@
 
 // validate combination of error prediction and cell data transfer algorithms
 // for hp-adaptive methods
-// test either h- or p-adaptation
+// test all combinations of h- and p-adaptation
 
 
 #include <deal.II/dofs/dof_handler.h>
@@ -41,11 +41,12 @@ template <int dim>
 void
 test()
 {
-  // ----- setup -----
+  // ------ setup ------
   Triangulation<dim> tria;
   TestGrids::hyper_line(tria, 4);
 
   tria.begin_active()->set_refine_flag();
+  (++tria.begin_active())->set_refine_flag();
   tria.execute_coarsening_and_refinement();
 
   hp::FECollection<dim> fes;
@@ -56,30 +57,49 @@ test()
   for (const auto &cell : dh.active_cell_iterators())
     {
       // set active FE index
-      cell->set_active_fe_index(1);
+      if (cell->is_locally_owned())
+        cell->set_active_fe_index(1);
     }
   for (auto cell = dh.begin(0); cell != dh.end(0); ++cell)
     {
+      // set refinement/coarsening flags
       if (cell->id().to_string() == "0_0:")
         {
-          // h-coarsening
+          // h-coarsening and p-refinement
           for (unsigned int i = 0; i < cell->n_children(); ++i)
-            cell->child(i)->set_coarsen_flag();
+            if (cell->child(i)->is_locally_owned())
+              {
+                cell->child(i)->set_coarsen_flag();
+                cell->child(i)->set_future_fe_index(2);
+              }
         }
       else if (cell->id().to_string() == "1_0:")
         {
-          // h-refinement
-          cell->set_refine_flag();
+          // h-coarsening and p-coarsening
+          for (unsigned int i = 0; i < cell->n_children(); ++i)
+            if (cell->child(i)->is_locally_owned())
+              {
+                cell->child(i)->set_coarsen_flag();
+                cell->child(i)->set_future_fe_index(0);
+              }
         }
       else if (cell->id().to_string() == "2_0:")
         {
-          // p-refinement
-          cell->set_future_fe_index(2);
+          // h-refinement and p-refinement
+          if (cell->is_locally_owned())
+            {
+              cell->set_refine_flag();
+              cell->set_future_fe_index(2);
+            }
         }
       else if (cell->id().to_string() == "3_0:")
         {
-          // p-coarsening
-          cell->set_future_fe_index(0);
+          // h-refinement and p-coarsening
+          if (cell->is_locally_owned())
+            {
+              cell->set_refine_flag();
+              cell->set_future_fe_index(0);
+            }
         }
     }
   dh.distribute_dofs(fes);
