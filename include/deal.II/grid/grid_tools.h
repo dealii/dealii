@@ -460,6 +460,19 @@ namespace GridTools
     const std::vector<Point<spacedim>> &all_vertices,
     std::vector<CellData<dim>> &        cells);
 
+  /**
+   * Given a vector of CellData objects describing a mesh, reorder their
+   * vertices so that all lines are consistently oriented.
+   *
+   * The expectations on orientation and a discussion of this function are
+   * available in the @ref reordering "reordering module".
+   *
+   * @param cells The array of CellData objects that describe the mesh's topology.
+   */
+  template <int dim>
+  void
+  consistently_order_cells(std::vector<CellData<dim>> &cells);
+
   /*@}*/
   /**
    * @name Rotating, stretching and otherwise transforming meshes
@@ -3311,10 +3324,22 @@ namespace GridTools
                  << "The given vertex with index " << arg1
                  << " is not used in the given triangulation.");
 
-
   /*@}*/
 
 } /*namespace GridTools*/
+
+
+/**
+ * An exception that is thrown whenever the edges of a mesh are not
+ * orientable.
+ *
+ * @note for backwards compatibility with the old GridReordering class this
+ * exception is not in the GridTools namespace.
+ *
+ * @ingroup Exceptions
+ */
+DeclExceptionMsg(ExcMeshNotOrientable,
+                 "The edges of the mesh are not consistently orientable.");
 
 
 
