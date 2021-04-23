@@ -5741,13 +5741,12 @@ namespace GridTools
                   Point<dim>>>
         locally_owned_active_cells_around_point;
 
-      try
+      const auto first_cell = GridTools::find_active_cell_around_point(
+        cache, point, cell_hint, marked_vertices, tolerance);
+
+      cell_hint = first_cell.first;
+      if (cell_hint.state() == IteratorState::valid)
         {
-          const auto first_cell = GridTools::find_active_cell_around_point(
-            cache, point, cell_hint, marked_vertices, tolerance);
-
-          cell_hint = first_cell.first;
-
           const auto active_cells_around_point =
             GridTools::find_all_active_cells_around_point(
               cache.get_mapping(),
@@ -5763,9 +5762,6 @@ namespace GridTools
             if (cell.first->is_locally_owned())
               locally_owned_active_cells_around_point.push_back(cell);
         }
-      catch (...)
-        {}
-
       return locally_owned_active_cells_around_point;
     }
 
