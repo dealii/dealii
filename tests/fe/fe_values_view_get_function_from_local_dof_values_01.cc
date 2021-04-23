@@ -59,7 +59,6 @@ test_view(const Vector<double> &            solution,
   const View &fe_values_view = fe_values[extractor];
 
   // Typedefs
-  using OutputType = typename View::template OutputType<NumberType>;
   using value_type =
     typename ProductType<typename View::value_type, NumberType>::type;
   using gradient_type =
@@ -73,36 +72,41 @@ test_view(const Vector<double> &            solution,
                          NumberType>::type;
 
   // Values
-  std::vector<typename OutputType::value_type> qp_values_local(n_q_points);
-  std::vector<value_type>                      qp_values_global(n_q_points);
+  std::vector<typename View::template solution_value_type<NumberType>>
+                          qp_values_local(n_q_points);
+  std::vector<value_type> qp_values_global(n_q_points);
   fe_values_view.get_function_values_from_local_dof_values(local_dof_values,
                                                            qp_values_local);
   fe_values_view.get_function_values(solution, qp_values_global);
 
   // Gradients
-  std::vector<typename OutputType::gradient_type> qp_grads_local(n_q_points);
-  std::vector<gradient_type>                      qp_grads_global(n_q_points);
+  std::vector<typename View::template solution_gradient_type<NumberType>>
+                             qp_grads_local(n_q_points);
+  std::vector<gradient_type> qp_grads_global(n_q_points);
   fe_values_view.get_function_gradients_from_local_dof_values(local_dof_values,
                                                               qp_grads_local);
   fe_values_view.get_function_gradients(solution, qp_grads_global);
 
   // Hessians
-  std::vector<typename OutputType::hessian_type> qp_hess_local(n_q_points);
-  std::vector<hessian_type>                      qp_hess_global(n_q_points);
+  std::vector<typename View::template solution_hessian_type<NumberType>>
+                            qp_hess_local(n_q_points);
+  std::vector<hessian_type> qp_hess_global(n_q_points);
   fe_values_view.get_function_hessians_from_local_dof_values(local_dof_values,
                                                              qp_hess_local);
   fe_values_view.get_function_hessians(solution, qp_hess_global);
 
   // Laplacians
-  std::vector<typename OutputType::laplacian_type> qp_laplace_local(n_q_points);
+  std::vector<typename View::template solution_laplacian_type<NumberType>>
+                              qp_laplace_local(n_q_points);
   std::vector<laplacian_type> qp_laplace_global(n_q_points);
   fe_values_view.get_function_laplacians_from_local_dof_values(
     local_dof_values, qp_laplace_local);
   fe_values_view.get_function_laplacians(solution, qp_laplace_global);
 
   // Third derivatives
-  std::vector<typename OutputType::third_derivative_type> qp_third_deriv_local(
-    n_q_points);
+  std::vector<
+    typename View::template solution_third_derivative_type<NumberType>>
+                                     qp_third_deriv_local(n_q_points);
   std::vector<third_derivative_type> qp_third_deriv_global(n_q_points);
   fe_values_view.get_function_third_derivatives_from_local_dof_values(
     local_dof_values, qp_third_deriv_local);
@@ -145,7 +149,6 @@ test_view(const Vector<double> &            solution,
   const View &fe_values_view = fe_values[extractor];
 
   // Typedefs
-  using OutputType = typename View::template OutputType<NumberType>;
   using value_type =
     typename ProductType<typename View::value_type, NumberType>::type;
   using gradient_type =
@@ -166,22 +169,25 @@ test_view(const Vector<double> &            solution,
                          NumberType>::type;
 
   // Values
-  std::vector<typename OutputType::value_type> qp_values_local(n_q_points);
-  std::vector<value_type>                      qp_values_global(n_q_points);
+  std::vector<typename View::template solution_value_type<NumberType>>
+                          qp_values_local(n_q_points);
+  std::vector<value_type> qp_values_global(n_q_points);
   fe_values_view.get_function_values_from_local_dof_values(local_dof_values,
                                                            qp_values_local);
   fe_values_view.get_function_values(solution, qp_values_global);
 
   // Gradients
-  std::vector<typename OutputType::gradient_type> qp_grads_local(n_q_points);
-  std::vector<gradient_type>                      qp_grads_global(n_q_points);
+  std::vector<typename View::template solution_gradient_type<NumberType>>
+                             qp_grads_local(n_q_points);
+  std::vector<gradient_type> qp_grads_global(n_q_points);
   fe_values_view.get_function_gradients_from_local_dof_values(local_dof_values,
                                                               qp_grads_local);
   fe_values_view.get_function_gradients(solution, qp_grads_global);
 
   // Symmetric gradients
-  std::vector<typename OutputType::symmetric_gradient_type> qp_symm_grads_local(
-    n_q_points);
+  std::vector<
+    typename View::template solution_symmetric_gradient_type<NumberType>>
+                                       qp_symm_grads_local(n_q_points);
   std::vector<symmetric_gradient_type> qp_symm_grads_global(n_q_points);
   fe_values_view.get_function_symmetric_gradients_from_local_dof_values(
     local_dof_values, qp_symm_grads_local);
@@ -189,36 +195,41 @@ test_view(const Vector<double> &            solution,
                                                   qp_symm_grads_global);
 
   // Divergences
-  std::vector<typename OutputType::divergence_type> qp_divs_local(n_q_points);
-  std::vector<divergence_type>                      qp_divs_global(n_q_points);
+  std::vector<typename View::template solution_divergence_type<NumberType>>
+                               qp_divs_local(n_q_points);
+  std::vector<divergence_type> qp_divs_global(n_q_points);
   fe_values_view.get_function_divergences_from_local_dof_values(
     local_dof_values, qp_divs_local);
   fe_values_view.get_function_divergences(solution, qp_divs_global);
 
   // Curls
-  std::vector<typename OutputType::curl_type> qp_curls_local(n_q_points);
-  std::vector<curl_type>                      qp_curls_global(n_q_points);
+  std::vector<typename View::template solution_curl_type<NumberType>>
+                         qp_curls_local(n_q_points);
+  std::vector<curl_type> qp_curls_global(n_q_points);
   fe_values_view.get_function_curls_from_local_dof_values(local_dof_values,
                                                           qp_curls_local);
   fe_values_view.get_function_curls(solution, qp_curls_global);
 
   // Hessians
-  std::vector<typename OutputType::hessian_type> qp_hess_local(n_q_points);
-  std::vector<hessian_type>                      qp_hess_global(n_q_points);
+  std::vector<typename View::template solution_hessian_type<NumberType>>
+                            qp_hess_local(n_q_points);
+  std::vector<hessian_type> qp_hess_global(n_q_points);
   fe_values_view.get_function_hessians_from_local_dof_values(local_dof_values,
                                                              qp_hess_local);
   fe_values_view.get_function_hessians(solution, qp_hess_global);
 
   // Laplacians
-  std::vector<typename OutputType::laplacian_type> qp_laplace_local(n_q_points);
+  std::vector<typename View::template solution_laplacian_type<NumberType>>
+                              qp_laplace_local(n_q_points);
   std::vector<laplacian_type> qp_laplace_global(n_q_points);
   fe_values_view.get_function_laplacians_from_local_dof_values(
     local_dof_values, qp_laplace_local);
   fe_values_view.get_function_laplacians(solution, qp_laplace_global);
 
   // Third derivatives
-  std::vector<typename OutputType::third_derivative_type> qp_third_deriv_local(
-    n_q_points);
+  std::vector<
+    typename View::template solution_third_derivative_type<NumberType>>
+                                     qp_third_deriv_local(n_q_points);
   std::vector<third_derivative_type> qp_third_deriv_global(n_q_points);
   fe_values_view.get_function_third_derivatives_from_local_dof_values(
     local_dof_values, qp_third_deriv_local);
@@ -275,22 +286,23 @@ test_view(const Vector<double> &                        solution,
   const View &fe_values_view = fe_values[extractor];
 
   // Typedefs
-  using OutputType = typename View::template OutputType<NumberType>;
   using value_type =
     typename ProductType<typename View::value_type, NumberType>::type;
   using divergence_type =
     typename ProductType<typename View::divergence_type, NumberType>::type;
 
   // Values
-  std::vector<typename OutputType::value_type> qp_values_local(n_q_points);
-  std::vector<value_type>                      qp_values_global(n_q_points);
+  std::vector<typename View::template solution_value_type<NumberType>>
+                          qp_values_local(n_q_points);
+  std::vector<value_type> qp_values_global(n_q_points);
   fe_values_view.get_function_values_from_local_dof_values(local_dof_values,
                                                            qp_values_local);
   fe_values_view.get_function_values(solution, qp_values_global);
 
   // Divergences
-  std::vector<typename OutputType::divergence_type> qp_divs_local(n_q_points);
-  std::vector<divergence_type>                      qp_divs_global(n_q_points);
+  std::vector<typename View::template solution_divergence_type<NumberType>>
+                               qp_divs_local(n_q_points);
+  std::vector<divergence_type> qp_divs_global(n_q_points);
   fe_values_view.get_function_divergences_from_local_dof_values(
     local_dof_values, qp_divs_local);
   fe_values_view.get_function_divergences(solution, qp_divs_global);
@@ -321,7 +333,6 @@ test_view(const Vector<double> &               solution,
   const View &fe_values_view = fe_values[extractor];
 
   // Typedefs
-  using OutputType = typename View::template OutputType<NumberType>;
   using value_type =
     typename ProductType<typename View::value_type, NumberType>::type;
   using gradient_type =
@@ -330,22 +341,25 @@ test_view(const Vector<double> &               solution,
     typename ProductType<typename View::divergence_type, NumberType>::type;
 
   // Values
-  std::vector<typename OutputType::value_type> qp_values_local(n_q_points);
-  std::vector<value_type>                      qp_values_global(n_q_points);
+  std::vector<typename View::template solution_value_type<NumberType>>
+                          qp_values_local(n_q_points);
+  std::vector<value_type> qp_values_global(n_q_points);
   fe_values_view.get_function_values_from_local_dof_values(local_dof_values,
                                                            qp_values_local);
   fe_values_view.get_function_values(solution, qp_values_global);
 
   // Divergences
-  std::vector<typename OutputType::divergence_type> qp_divs_local(n_q_points);
-  std::vector<divergence_type>                      qp_divs_global(n_q_points);
+  std::vector<typename View::template solution_divergence_type<NumberType>>
+                               qp_divs_local(n_q_points);
+  std::vector<divergence_type> qp_divs_global(n_q_points);
   fe_values_view.get_function_divergences_from_local_dof_values(
     local_dof_values, qp_divs_local);
   fe_values_view.get_function_divergences(solution, qp_divs_global);
 
   // Gradients
-  std::vector<typename OutputType::gradient_type> qp_grads_local(n_q_points);
-  std::vector<gradient_type>                      qp_grads_global(n_q_points);
+  std::vector<typename View::template solution_gradient_type<NumberType>>
+                             qp_grads_local(n_q_points);
+  std::vector<gradient_type> qp_grads_global(n_q_points);
   fe_values_view.get_function_gradients_from_local_dof_values(local_dof_values,
                                                               qp_grads_local);
   fe_values_view.get_function_gradients(solution, qp_grads_global);
