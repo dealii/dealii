@@ -449,7 +449,7 @@ template <int rank_, int dim, typename Number>
 class Tensor
 {
 public:
-  static_assert(rank_ >= 0,
+  static_assert(rank_ >= 1,
                 "Tensors must have a rank greater than or equal to one.");
   static_assert(dim >= 0,
                 "Tensors must have a dimension greater than or equal to one.");
