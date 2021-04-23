@@ -463,6 +463,7 @@ namespace PETScWrappers
 
 
 
+#  ifdef DEAL_II_PETSC_WITH_HYPRE
   namespace
   {
     /**
@@ -537,6 +538,7 @@ namespace PETScWrappers
       return string_type;
     }
   } // namespace
+#  endif
 
   PreconditionBoomerAMG::PreconditionBoomerAMG(
     const MPI_Comm &      comm,
