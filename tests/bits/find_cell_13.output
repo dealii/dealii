@@ -1,7 +1,9 @@
 
 DEAL::1.00000 1.00000 is the closest vertex
-DEAL::The first call to the function find_closest_vertex() has thrown an exception. It is supposed to throw.
+DEAL::The first call to the function find_active_cell_around_point()
+DEAL::has returned an invalid iterator. This is good.
 DEAL::Test passed!
 DEAL::0.707107 0.707107 is the closest vertex
-DEAL::The first call to the function find_closest_vertex() has thrown an exception. It is supposed to throw.
+DEAL::The first call to the function find_active_cell_around_point()
+DEAL::has returned an invalid iterator. This is good.
 DEAL::Test passed!
