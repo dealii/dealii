@@ -3171,7 +3171,7 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
         {
           // Let us begin with the
           // interpolation part.
-          const QGauss<dim - 1> reference_edge_quadrature(this->degree);
+          const QGauss<1>    reference_edge_quadrature(this->degree);
           const unsigned int n_edge_points = reference_edge_quadrature.size();
 
           for (unsigned int i = 0; i < 2; ++i)
@@ -3191,17 +3191,17 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
                   nodal_values[(i + 2 * j) * this->degree] = 0.0;
               }
 
-          // If the degree is greater
-          // than 0, then we have still
-          // some higher order edge
-          // shape functions to
-          // consider.
-          // Here the projection part
-          // starts. The dof support_point_values
-          // are obtained by solving
+          // If the Nedelec element degree is greater
+          // than 0 (i.e., the polynomial degree is greater than 1),
+          // then we have still some higher order edge
+          // shape functions to consider.
+          // Note that this->degree returns the polynomial
+          // degree.
+          // Here the projection part starts.
+          // The dof support_point_values are obtained by solving
           // a linear system of
           // equations.
-          if (this->degree - 1 > 1)
+          if (this->degree > 1)
             {
               // We start with projection
               // on the higher order edge

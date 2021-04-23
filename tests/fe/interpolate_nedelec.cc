@@ -20,7 +20,6 @@
 
 #include "interpolate_common.h"
 
-
 // FE_Nedelec<dim>::interpolate(...)
 
 template <int dim>
@@ -37,6 +36,7 @@ check1(const Function<dim> &f, const unsigned int degree)
                                      Vector<double>(dim));
   f.vector_value_list(fe.get_generalized_support_points(), values);
   fe.convert_generalized_support_point_values_to_dof_values(values, dofs);
+
   deallog << " vector " << vector_difference(fe, dofs, f, 0) << std::endl;
 }
 
@@ -56,16 +56,32 @@ main()
     check1(w22, 2);
     Q1WedgeFunction<2, 3, 2> w23;
     check1(w23, 3);
+
+    PolynomialFunction<2, 1, 2> p21;
+    check1(p21, 1);
+    PolynomialFunction<2, 2, 2> p22;
+    check1(p22, 2);
+    PolynomialFunction<2, 3, 2> p23;
+    check1(p23, 3);
   }
 
   {
     Q1WedgeFunction<3, 1, 3> w21;
     check1(w21, 1);
     check1(w21, 2);
+
+
+
     // FIXME - higher order interpolation is currently broken
+    // PolynomialFunction<3, 1, 3> p21;
+    // check1(p21, 1);
     // Q1WedgeFunction<3, 2, 3> w22;
     // check1(w22, 2);
     // Q1WedgeFunction<3, 3, 3> w23;
     // check1(w23, 3);
+    // PolynomialFunction<3, 2, 3> p22;
+    // check1(p22, 2);
+    // PolynomialFunction<3, 3, 3> p23;
+    // check1(p23, 3);
   }
 }
