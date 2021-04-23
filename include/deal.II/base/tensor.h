@@ -1293,7 +1293,7 @@ constexpr DEAL_II_ALWAYS_INLINE
   AssertIndexRange(i, dim);
 #  endif
 
-  return values[i];
+  return values[i < dim ? i : 0];
 }
 
 
