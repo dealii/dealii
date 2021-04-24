@@ -117,6 +117,28 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
         const bool,
         const types::subdomain_id);
 
+    template void DoFTools::
+      make_flux_sparsity_pattern<deal_II_dimension, deal_II_dimension + 1, SP>(
+        const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof,
+        SP &                                                        sparsity,
+        const AffineConstraints<S> &,
+        const bool,
+        const Table<2, Coupling> &,
+        const Table<2, Coupling> &,
+        const types::subdomain_id,
+        const std::function<bool(
+          const typename DoFHandler<deal_II_dimension, deal_II_dimension + 1>::
+            active_cell_iterator &,
+          const unsigned int)> &);
+
+    template void DoFTools::
+      make_flux_sparsity_pattern<deal_II_dimension, deal_II_dimension + 1, SP>(
+        const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof,
+        SP &                                                        sparsity,
+        const AffineConstraints<S> &,
+        const bool,
+        const types::subdomain_id);
+
 #endif
 
 #if deal_II_dimension == 3
@@ -132,6 +154,25 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
       const DoFHandler<1, 3> &,
       const Table<2, Coupling> &,
       SP &,
+      const AffineConstraints<S> &,
+      const bool,
+      const types::subdomain_id);
+
+    template void DoFTools::make_flux_sparsity_pattern<1, 3, SP>(
+      const DoFHandler<1, 3> &dof,
+      SP &                    sparsity,
+      const AffineConstraints<S> &,
+      const bool,
+      const Table<2, Coupling> &,
+      const Table<2, Coupling> &,
+      const types::subdomain_id,
+      const std::function<
+        bool(const typename DoFHandler<1, 3>::active_cell_iterator &,
+             const unsigned int)> &);
+
+    template void DoFTools::make_flux_sparsity_pattern<1, 3, SP>(
+      const DoFHandler<1, 3> &dof,
+      SP &                    sparsity,
       const AffineConstraints<S> &,
       const bool,
       const types::subdomain_id);
