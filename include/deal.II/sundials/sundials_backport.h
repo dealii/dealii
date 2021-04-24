@@ -29,8 +29,9 @@
 #include <deal.II/base/config.h>
 
 #ifdef DEAL_II_WITH_SUNDIALS
+#  if DEAL_II_SUNDIALS_VERSION_LT(5, 0, 0)
 
-#  include <sundials/sundials_nvector.h>
+#    include <sundials/sundials_nvector.h>
 
 DEAL_II_NAMESPACE_OPEN
 namespace SUNDIALS
@@ -53,10 +54,10 @@ namespace SUNDIALS
       ops->nvspace           = nullptr;
       ops->nvgetarraypointer = nullptr;
       ops->nvsetarraypointer = nullptr;
-#  if DEAL_II_SUNDIALS_VERSION_GTE(5, 0, 0)
+#    if DEAL_II_SUNDIALS_VERSION_GTE(5, 0, 0)
       ops->nvgetcommunicator = nullptr;
       ops->nvgetlength       = nullptr;
-#  endif
+#    endif
 
       /* standard vector operations */
       ops->nvlinearsum    = nullptr;
@@ -79,7 +80,7 @@ namespace SUNDIALS
       ops->nvconstrmask   = nullptr;
       ops->nvminquotient  = nullptr;
 
-#  if DEAL_II_SUNDIALS_VERSION_GTE(5, 0, 0)
+#    if DEAL_II_SUNDIALS_VERSION_GTE(5, 0, 0)
       /* fused vector operations (optional) */
       ops->nvlinearcombination = nullptr;
       ops->nvscaleaddmulti     = nullptr;
@@ -164,10 +165,10 @@ namespace SUNDIALS
       v->ops->nvspace           = w->ops->nvspace;
       v->ops->nvgetarraypointer = w->ops->nvgetarraypointer;
       v->ops->nvsetarraypointer = w->ops->nvsetarraypointer;
-#  if DEAL_II_SUNDIALS_VERSION_GTE(5, 0, 0)
+#    if DEAL_II_SUNDIALS_VERSION_GTE(5, 0, 0)
       v->ops->nvgetcommunicator = w->ops->nvgetcommunicator;
       v->ops->nvgetlength       = w->ops->nvgetlength;
-#  endif
+#    endif
 
       /* standard vector operations */
       v->ops->nvlinearsum    = w->ops->nvlinearsum;
@@ -190,7 +191,7 @@ namespace SUNDIALS
       v->ops->nvconstrmask   = w->ops->nvconstrmask;
       v->ops->nvminquotient  = w->ops->nvminquotient;
 
-#  if DEAL_II_SUNDIALS_VERSION_GTE(5, 0, 0)
+#    if DEAL_II_SUNDIALS_VERSION_GTE(5, 0, 0)
       /* fused vector operations */
       v->ops->nvlinearcombination = w->ops->nvlinearcombination;
       v->ops->nvscaleaddmulti     = w->ops->nvscaleaddmulti;
@@ -237,5 +238,6 @@ namespace SUNDIALS
 } // namespace SUNDIALS
 DEAL_II_NAMESPACE_CLOSE
 
+#  endif
 #endif // DEAL_II_WITH_SUNDIALS
 #endif // dealii_sundials_sunlinsol_newempty_h
