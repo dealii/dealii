@@ -157,7 +157,7 @@ namespace MatrixFreeTools
 
   // implementations
 
-
+#ifndef DOXYGEN
 
   template <int dim, typename AdditionalData>
   void
@@ -889,6 +889,8 @@ namespace MatrixFreeTools
                                quad_no,
                                first_selected_component);
   }
+
+#endif // DOXYGEN
 
 } // namespace MatrixFreeTools
 
