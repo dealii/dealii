@@ -224,6 +224,56 @@ namespace FEValuesViews
       typename ProductType<Number, third_derivative_type>::type;
 
     /**
+     * A struct that provides the output type for the product of the value
+     * and derivatives of basis functions of the Scalar view and any @p Number type.
+     *
+     * @deprecated Use the types defined in the surrounding class instead.
+     */
+    template <typename Number>
+    struct DEAL_II_DEPRECATED_EARLY OutputType
+    {
+      /**
+       * An alias for the data type of the product of a @p Number and the
+       * values of the view the Scalar class.
+       */
+      using value_type =
+        typename ProductType<Number,
+                             typename Scalar<dim, spacedim>::value_type>::type;
+
+      /**
+       * An alias for the data type of the product of a @p Number and the
+       * gradients of the view the Scalar class.
+       */
+      using gradient_type = typename ProductType<
+        Number,
+        typename Scalar<dim, spacedim>::gradient_type>::type;
+
+      /**
+       * An alias for the data type of the product of a @p Number and the
+       * laplacians of the view the Scalar class.
+       */
+      using laplacian_type =
+        typename ProductType<Number,
+                             typename Scalar<dim, spacedim>::value_type>::type;
+
+      /**
+       * An alias for the data type of the product of a @p Number and the
+       * hessians of the view the Scalar class.
+       */
+      using hessian_type = typename ProductType<
+        Number,
+        typename Scalar<dim, spacedim>::hessian_type>::type;
+
+      /**
+       * An alias for the data type of the product of a @p Number and the
+       * third derivatives of the view the Scalar class.
+       */
+      using third_derivative_type = typename ProductType<
+        Number,
+        typename Scalar<dim, spacedim>::third_derivative_type>::type;
+    };
+
+    /**
      * A structure where for each shape function we pre-compute a bunch of
      * data that will make later accesses much cheaper.
      */
@@ -736,6 +786,80 @@ namespace FEValuesViews
     template <typename Number>
     using solution_third_derivative_type =
       typename ProductType<Number, third_derivative_type>::type;
+
+    /**
+     * A struct that provides the output type for the product of the value
+     * and derivatives of basis functions of the Vector view and any @p Number type.
+     *
+     * @deprecated Use the types defined in the surrounding class instead.
+     */
+    template <typename Number>
+    struct DEAL_II_DEPRECATED_EARLY OutputType
+    {
+      /**
+       * An alias for the data type of the product of a @p Number and the
+       * values of the view the Vector class.
+       */
+      using value_type =
+        typename ProductType<Number,
+                             typename Vector<dim, spacedim>::value_type>::type;
+
+      /**
+       * An alias for the data type of the product of a @p Number and the
+       * gradients of the view the Vector class.
+       */
+      using gradient_type = typename ProductType<
+        Number,
+        typename Vector<dim, spacedim>::gradient_type>::type;
+
+      /**
+       * An alias for the data type of the product of a @p Number and the
+       * symmetric gradients of the view the Vector class.
+       */
+      using symmetric_gradient_type = typename ProductType<
+        Number,
+        typename Vector<dim, spacedim>::symmetric_gradient_type>::type;
+
+      /**
+       * An alias for the data type of the product of a @p Number and the
+       * divergences of the view the Vector class.
+       */
+      using divergence_type = typename ProductType<
+        Number,
+        typename Vector<dim, spacedim>::divergence_type>::type;
+
+      /**
+       * An alias for the data type of the product of a @p Number and the
+       * laplacians of the view the Vector class.
+       */
+      using laplacian_type =
+        typename ProductType<Number,
+                             typename Vector<dim, spacedim>::value_type>::type;
+
+      /**
+       * An alias for the data type of the product of a @p Number and the
+       * curls of the view the Vector class.
+       */
+      using curl_type =
+        typename ProductType<Number,
+                             typename Vector<dim, spacedim>::curl_type>::type;
+
+      /**
+       * An alias for the data type of the product of a @p Number and the
+       * hessians of the view the Vector class.
+       */
+      using hessian_type = typename ProductType<
+        Number,
+        typename Vector<dim, spacedim>::hessian_type>::type;
+
+      /**
+       * An alias for the data type of the product of a @p Number and the
+       * third derivatives of the view the Vector class.
+       */
+      using third_derivative_type = typename ProductType<
+        Number,
+        typename Vector<dim, spacedim>::third_derivative_type>::type;
+    };
 
     /**
      * A structure where for each shape function we pre-compute a bunch of
@@ -1343,6 +1467,33 @@ namespace FEValuesViews
     using solution_divergence_type =
       typename ProductType<Number, divergence_type>::type;
 
+
+    /**
+     * A struct that provides the output type for the product of the value
+     * and derivatives of basis functions of the SymmetricTensor view and any @p Number type.
+     *
+     * @deprecated Use the types defined in the surrounding class instead.
+     */
+    template <typename Number>
+    struct DEAL_II_DEPRECATED_EARLY OutputType
+    {
+      /**
+       * An alias for the data type of the product of a @p Number and the
+       * values of the view the SymmetricTensor class.
+       */
+      using value_type = typename ProductType<
+        Number,
+        typename SymmetricTensor<2, dim, spacedim>::value_type>::type;
+
+      /**
+       * An alias for the data type of the product of a @p Number and the
+       * divergences of the view the SymmetricTensor class.
+       */
+      using divergence_type = typename ProductType<
+        Number,
+        typename SymmetricTensor<2, dim, spacedim>::divergence_type>::type;
+    };
+
     /**
      * A structure where for each shape function we pre-compute a bunch of
      * data that will make later accesses much cheaper.
@@ -1643,6 +1794,41 @@ namespace FEValuesViews
     template <typename Number>
     using solution_gradient_type =
       typename ProductType<Number, gradient_type>::type;
+
+
+    /**
+     * A struct that provides the output type for the product of the value
+     * and derivatives of basis functions of the Tensor view and any @p Number type.
+     *
+     * @deprecated Use the types defined in the surrounding class instead.
+     */
+    template <typename Number>
+    struct DEAL_II_DEPRECATED_EARLY OutputType
+    {
+      /**
+       * An alias for the data type of the product of a @p Number and the
+       * values of the view the Tensor class.
+       */
+      using value_type = typename ProductType<
+        Number,
+        typename Tensor<2, dim, spacedim>::value_type>::type;
+
+      /**
+       * An alias for the data type of the product of a @p Number and the
+       * divergences of the view the Tensor class.
+       */
+      using divergence_type = typename ProductType<
+        Number,
+        typename Tensor<2, dim, spacedim>::divergence_type>::type;
+
+      /**
+       * An alias for the data type of the product of a @p Number and the
+       * gradient of the view the Tensor class.
+       */
+      using gradient_type = typename ProductType<
+        Number,
+        typename Tensor<2, dim, spacedim>::gradient_type>::type;
+    };
 
     /**
      * A structure where for each shape function we pre-compute a bunch of
