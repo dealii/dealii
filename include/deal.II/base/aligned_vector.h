@@ -1232,6 +1232,11 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
                Utilities::MPI::n_mpi_processes(shmem_roots_communicator) - 1,
              ExcInternalError());
   }
+  const unsigned int shmem_roots_root_rank =
+    Utilities::MPI::n_mpi_processes(shmem_roots_communicator) - 1;
+  const bool is_shmem_roots_root =
+    (Utilities::MPI::this_mpi_process(shmem_roots_communicator) ==
+     shmem_roots_root_rank);
 
   // Now let the original root_process broadcast the current object to all
   // shmem roots. We know that the last rank is the original root process that
@@ -1247,12 +1252,11 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
           // In that case, first tell all of the other shmem roots how many
           // elements we will have to deal with, and let them resize their
           // (non-shared) arrays.
-          const size_type new_size = Utilities::MPI::broadcast(
-            shmem_roots_communicator,
-            size(),
-            Utilities::MPI::n_mpi_processes(shmem_roots_communicator) - 1);
-          if (Utilities::MPI::this_mpi_process(shmem_roots_communicator) !=
-              Utilities::MPI::n_mpi_processes(shmem_roots_communicator) - 1)
+          const size_type new_size =
+            Utilities::MPI::broadcast(shmem_roots_communicator,
+                                      size(),
+                                      shmem_roots_root_rank);
+          if (is_shmem_roots_root == false)
             resize(new_size);
 
           // Then directly copy from the root process into these buffers
@@ -1270,17 +1274,20 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
           // to go through the serialization/deserialization machinery. On all
           // but the sending process, overwrite the current state with the
           // vector just broadcast.
+          //
+          // On the root rank, this would lead to resetting the 'entries'
+          // pointer, which would trigger the deleter which would lead to a
+          // deadlock. So we just send the result of the broadcast() call to
+          // nirvana on the root process and keep our current state.
           if (Utilities::MPI::this_mpi_process(shmem_roots_communicator) ==
               Utilities::MPI::n_mpi_processes(shmem_roots_communicator) - 1)
-            Utilities::MPI::broadcast(
-              shmem_roots_communicator,
-              *this,
-              Utilities::MPI::n_mpi_processes(shmem_roots_communicator) - 1);
+            Utilities::MPI::broadcast(shmem_roots_communicator,
+                                      *this,
+                                      shmem_roots_root_rank);
           else
-            *this = Utilities::MPI::broadcast(
-              shmem_roots_communicator,
-              *this,
-              Utilities::MPI::n_mpi_processes(shmem_roots_communicator) - 1);
+            *this = Utilities::MPI::broadcast(shmem_roots_communicator,
+                                              *this,
+                                              shmem_roots_root_rank);
         }
     }
 
@@ -1308,7 +1315,7 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
   // gives us a pointer to an address one byte past a desired alignment
   // boundary, and in that case aligning the memory will require us to waste the
   // first (align_by-1) bytes. So we have to ask for
-  //   size() * sizeof(T) + align_by - 1
+  //   size() * sizeof(T) + (align_by - 1)
   // bytes.
   //
   // Before MPI 4.0, there was no way to specify that we want memory aligned to
@@ -1336,7 +1343,7 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
   const MPI_Aint align_by   = 64;
   const MPI_Aint alloc_size = Utilities::MPI::broadcast(
     shmem_group_communicator,
-    (size() * sizeof(T) + align_by - 1),
+    (size() * sizeof(T) + (align_by - 1)),
     Utilities::MPI::n_mpi_processes(shmem_group_communicator) - 1);
 
   {
