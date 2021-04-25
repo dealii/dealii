@@ -269,7 +269,7 @@ namespace TensorAccessors
             typename T1,
             typename T2,
             typename T3>
-  DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE void
+  constexpr inline DEAL_II_ALWAYS_INLINE void
   contract(T1 &result, const T2 &left, const T3 &right)
   {
     static_assert(rank_1 >= no_contr,
@@ -623,7 +623,7 @@ namespace TensorAccessors
     {
     public:
       template <typename T1, typename T2, typename T3>
-      DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE static void
+      constexpr inline DEAL_II_ALWAYS_INLINE static void
       contract(T1 &result, const T2 &left, const T3 &right)
       {
         for (unsigned int i = 0; i < dim; ++i)
@@ -653,7 +653,7 @@ namespace TensorAccessors
     {
     public:
       template <typename T1, typename T2, typename T3>
-      DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE static void
+      constexpr inline DEAL_II_ALWAYS_INLINE static void
       contract(T1 &result, const T2 &left, const T3 &right)
       {
         for (unsigned int i = 0; i < dim; ++i)
@@ -683,7 +683,7 @@ namespace TensorAccessors
     {
     public:
       template <typename T1, typename T2, typename T3>
-      DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE static void
+      constexpr inline DEAL_II_ALWAYS_INLINE static void
       contract(T1 &result, const T2 &left, const T3 &right)
       {
         result = Contract2<no_contr, dim>::template contract2<T1>(left, right);
@@ -699,7 +699,7 @@ namespace TensorAccessors
     {
     public:
       template <typename T1, typename T2, typename T3>
-      DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE static T1
+      constexpr inline DEAL_II_ALWAYS_INLINE static T1
       contract2(const T2 &left, const T3 &right)
       {
         // Some auto-differentiable numbers need explicit
@@ -758,7 +758,7 @@ namespace TensorAccessors
     {
     public:
       template <typename T1, typename T2, typename T3, typename T4>
-      DEAL_II_CONSTEXPR static inline T1
+      constexpr static inline T1
       contract3(const T2 &left, const T3 &middle, const T4 &right)
       {
         // Some auto-differentiable numbers need explicit
@@ -788,7 +788,7 @@ namespace TensorAccessors
     {
     public:
       template <typename T1, typename T2, typename T3, typename T4>
-      DEAL_II_CONSTEXPR static inline T1
+      constexpr static inline T1
       contract3(const T2 &left, const T3 &middle, const T4 &right)
       {
         // Some auto-differentiable numbers need explicit
