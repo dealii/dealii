@@ -1556,6 +1556,20 @@ namespace Functions
       const Table<dim, double> &                        data_values);
 
     /**
+     * Like the previous constructor, but take the arguments as rvalue
+     * references and *move*, instead of *copy* the data. This is often useful
+     * in cases where the data stored in these tables is large and the
+     * information used to initialize the current object is no longer needed
+     * separately. In other words, there is no need to keep the original object
+     * from which this object could copy its information, but it might as well
+     * take over ("move") the data.
+     */
+    InterpolatedUniformGridData(
+      std::array<std::pair<double, double>, dim> &&interval_endpoints,
+      std::array<unsigned int, dim> &&             n_subintervals,
+      Table<dim, double> &&                        data_values);
+
+    /**
      * Compute the value of the function set by bilinear interpolation of the
      * given data set.
      *

@@ -2683,6 +2683,32 @@ namespace Functions
   }
 
 
+
+  template <int dim>
+  InterpolatedUniformGridData<dim>::InterpolatedUniformGridData(
+    std::array<std::pair<double, double>, dim> &&interval_endpoints,
+    std::array<unsigned int, dim> &&             n_subintervals,
+    Table<dim, double> &&                        data_values)
+    : interval_endpoints(std::move(interval_endpoints))
+    , n_subintervals(std::move(n_subintervals))
+    , data_values(std::move(data_values))
+  {
+    for (unsigned int d = 0; d < dim; ++d)
+      {
+        Assert(this->n_subintervals[d] >= 1,
+               ExcMessage("There needs to be at least one subinterval in each "
+                          "coordinate direction."));
+        Assert(this->interval_endpoints[d].first <
+                 this->interval_endpoints[d].second,
+               ExcMessage("The interval in each coordinate direction needs "
+                          "to have positive size"));
+        Assert(this->data_values.size()[d] == this->n_subintervals[d] + 1,
+               ExcMessage("The data table does not have the correct size."));
+      }
+  }
+
+
+
   template <int dim>
   double
   InterpolatedUniformGridData<dim>::value(const Point<dim> & p,
