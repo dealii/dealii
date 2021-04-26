@@ -1,0 +1,16 @@
+
+DEAL::1D
+DEAL::value: [-0.500000, 2.50000]
+DEAL::gradient[0]: [0.00000, 2.00000]
+DEAL::
+DEAL::2D
+DEAL::value: [-3.00000, 5.00000]
+DEAL::gradient[0]: [-1.00000, 3.00000]
+DEAL::gradient[1]: [-2.00000, 6.00000]
+DEAL::
+DEAL::3D
+DEAL::value: [-6.50000, 8.50000]
+DEAL::gradient[0]: [-2.00000, 4.00000]
+DEAL::gradient[1]: [-4.00000, 8.00000]
+DEAL::gradient[2]: [-6.00000, 12.0000]
+DEAL::
