@@ -43,7 +43,7 @@ test()
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs(fe);
 
-  const IndexSet boundary_dofs =
+  IndexSet boundary_dofs =
     DoFTools::extract_boundary_dofs(dofh, std::vector<bool>(1, true));
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     boundary_dofs.write(deallog.get_file_stream());
