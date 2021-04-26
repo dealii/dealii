@@ -2552,15 +2552,20 @@ namespace internal
       // note that this is based on the dimensionality 'dim' of the manifold,
       // not 'spacedim' of the output vector
       const unsigned int n_vectors =
-        (fe.n_components() >= spacedim ? fe.n_components() - spacedim + 1 : 0);
+        (fe.n_components() >= Tensor<1, spacedim>::n_independent_components ?
+           fe.n_components() - Tensor<1, spacedim>::n_independent_components +
+             1 :
+           0);
       vectors.reserve(n_vectors);
       for (unsigned int component = 0; component < n_vectors; ++component)
         vectors.emplace_back(fe_values, component);
 
       // compute number of symmetric tensors in the same way as above
       const unsigned int n_symmetric_second_order_tensors =
-        (fe.n_components() >= (dim * dim + dim) / 2 ?
-           fe.n_components() - (dim * dim + dim) / 2 + 1 :
+        (fe.n_components() >=
+             SymmetricTensor<2, spacedim>::n_independent_components ?
+           fe.n_components() -
+             SymmetricTensor<2, spacedim>::n_independent_components + 1 :
            0);
       symmetric_second_order_tensors.reserve(n_symmetric_second_order_tensors);
       for (unsigned int component = 0;
@@ -2571,8 +2576,10 @@ namespace internal
 
       // compute number of symmetric tensors in the same way as above
       const unsigned int n_second_order_tensors =
-        (fe.n_components() >= dim * dim ? fe.n_components() - dim * dim + 1 :
-                                          0);
+        (fe.n_components() >= Tensor<2, spacedim>::n_independent_components ?
+           fe.n_components() - Tensor<2, spacedim>::n_independent_components +
+             1 :
+           0);
       second_order_tensors.reserve(n_second_order_tensors);
       for (unsigned int component = 0; component < n_second_order_tensors;
            ++component)
