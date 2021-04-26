@@ -175,11 +175,62 @@ namespace FEValuesViews
     using third_derivative_type = dealii::Tensor<3, spacedim>;
 
     /**
-     * A struct that provides the output type for the product of the value
-     * and derivatives of basis functions of the Scalar view and any @p Number type.
+     * An alias for the data type of the product of a @p Number and the
+     * values of the view this class provides. This is the data type of
+     * scalar components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
      */
     template <typename Number>
-    struct OutputType
+    using solution_value_type = typename ProductType<Number, value_type>::type;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * gradients of the view this class provides. This is the data type of
+     * scalar components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_gradient_type =
+      typename ProductType<Number, gradient_type>::type;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * laplacians of the view this class provides. This is the data type of
+     * scalar components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_laplacian_type =
+      typename ProductType<Number, value_type>::type;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * hessians of the view this class provides. This is the data type of
+     * scalar components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_hessian_type =
+      typename ProductType<Number, hessian_type>::type;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * third derivatives of the view this class provides. This is the data type
+     * of scalar components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_third_derivative_type =
+      typename ProductType<Number, third_derivative_type>::type;
+
+    /**
+     * A struct that provides the output type for the product of the value
+     * and derivatives of basis functions of the Scalar view and any @p Number type.
+     *
+     * @deprecated Use the types defined in the surrounding class instead.
+     */
+    template <typename Number>
+    struct DEAL_II_DEPRECATED_EARLY OutputType
     {
       /**
        * An alias for the data type of the product of a @p Number and the
@@ -348,8 +399,7 @@ namespace FEValuesViews
     void
     get_function_values(
       const InputVector &fe_function,
-      std::vector<typename ProductType<value_type,
-                                       typename InputVector::value_type>::type>
+      std::vector<solution_value_type<typename InputVector::value_type>>
         &values) const;
 
     /**
@@ -390,8 +440,7 @@ namespace FEValuesViews
     void
     get_function_values_from_local_dof_values(
       const InputVector &dof_values,
-      std::vector<
-        typename OutputType<typename InputVector::value_type>::value_type>
+      std::vector<solution_value_type<typename InputVector::value_type>>
         &values) const;
 
     /**
@@ -415,8 +464,7 @@ namespace FEValuesViews
     void
     get_function_gradients(
       const InputVector &fe_function,
-      std::vector<typename ProductType<gradient_type,
-                                       typename InputVector::value_type>::type>
+      std::vector<solution_gradient_type<typename InputVector::value_type>>
         &gradients) const;
 
     /**
@@ -429,8 +477,7 @@ namespace FEValuesViews
     void
     get_function_gradients_from_local_dof_values(
       const InputVector &dof_values,
-      std::vector<
-        typename OutputType<typename InputVector::value_type>::gradient_type>
+      std::vector<solution_gradient_type<typename InputVector::value_type>>
         &gradients) const;
 
     /**
@@ -454,8 +501,7 @@ namespace FEValuesViews
     void
     get_function_hessians(
       const InputVector &fe_function,
-      std::vector<typename ProductType<hessian_type,
-                                       typename InputVector::value_type>::type>
+      std::vector<solution_hessian_type<typename InputVector::value_type>>
         &hessians) const;
 
     /**
@@ -468,8 +514,7 @@ namespace FEValuesViews
     void
     get_function_hessians_from_local_dof_values(
       const InputVector &dof_values,
-      std::vector<
-        typename OutputType<typename InputVector::value_type>::hessian_type>
+      std::vector<solution_hessian_type<typename InputVector::value_type>>
         &hessians) const;
 
 
@@ -495,8 +540,7 @@ namespace FEValuesViews
     void
     get_function_laplacians(
       const InputVector &fe_function,
-      std::vector<typename ProductType<value_type,
-                                       typename InputVector::value_type>::type>
+      std::vector<solution_laplacian_type<typename InputVector::value_type>>
         &laplacians) const;
 
     /**
@@ -509,8 +553,7 @@ namespace FEValuesViews
     void
     get_function_laplacians_from_local_dof_values(
       const InputVector &dof_values,
-      std::vector<
-        typename OutputType<typename InputVector::value_type>::laplacian_type>
+      std::vector<solution_laplacian_type<typename InputVector::value_type>>
         &laplacians) const;
 
 
@@ -536,8 +579,8 @@ namespace FEValuesViews
     void
     get_function_third_derivatives(
       const InputVector &fe_function,
-      std::vector<typename ProductType<third_derivative_type,
-                                       typename InputVector::value_type>::type>
+      std::vector<
+        solution_third_derivative_type<typename InputVector::value_type>>
         &third_derivatives) const;
 
     /**
@@ -549,9 +592,10 @@ namespace FEValuesViews
     template <class InputVector>
     void
     get_function_third_derivatives_from_local_dof_values(
-      const InputVector &                   dof_values,
-      std::vector<typename OutputType<typename InputVector::value_type>::
-                    third_derivative_type> &third_derivatives) const;
+      const InputVector &dof_values,
+      std::vector<
+        solution_third_derivative_type<typename InputVector::value_type>>
+        &third_derivatives) const;
 
 
   private:
@@ -666,11 +710,91 @@ namespace FEValuesViews
     using third_derivative_type = dealii::Tensor<4, spacedim>;
 
     /**
-     * A struct that provides the output type for the product of the value
-     * and derivatives of basis functions of the Vector view and any @p Number type.
+     * An alias for the data type of the product of a @p Number and the
+     * values of the view this class provides. This is the data type of
+     * vector components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
      */
     template <typename Number>
-    struct OutputType
+    using solution_value_type = typename ProductType<Number, value_type>::type;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * gradients of the view this class provides. This is the data type of
+     * vector components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_gradient_type =
+      typename ProductType<Number, gradient_type>::type;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * symmetric gradients of the view this class provides. This is the data
+     * type of vector components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_symmetric_gradient_type =
+      typename ProductType<Number, symmetric_gradient_type>::type;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * divergences of the view this class provides. This is the data type of
+     * vector components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_divergence_type =
+      typename ProductType<Number, divergence_type>::type;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * laplacians of the view this class provides. This is the data type of
+     * vector components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_laplacian_type =
+      typename ProductType<Number, value_type>::type;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * curls of the view this class provides. This is the data type of
+     * vector components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_curl_type = typename ProductType<Number, curl_type>::type;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * hessians of the view this class provides. This is the data type of
+     * vector components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_hessian_type =
+      typename ProductType<Number, hessian_type>::type;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * third derivatives of the view this class provides. This is the data type
+     * of vector components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_third_derivative_type =
+      typename ProductType<Number, third_derivative_type>::type;
+
+    /**
+     * A struct that provides the output type for the product of the value
+     * and derivatives of basis functions of the Vector view and any @p Number type.
+     *
+     * @deprecated Use the types defined in the surrounding class instead.
+     */
+    template <typename Number>
+    struct DEAL_II_DEPRECATED_EARLY OutputType
     {
       /**
        * An alias for the data type of the product of a @p Number and the
@@ -940,8 +1064,7 @@ namespace FEValuesViews
     void
     get_function_values(
       const InputVector &fe_function,
-      std::vector<typename ProductType<value_type,
-                                       typename InputVector::value_type>::type>
+      std::vector<solution_value_type<typename InputVector::value_type>>
         &values) const;
 
     /**
@@ -982,8 +1105,7 @@ namespace FEValuesViews
     void
     get_function_values_from_local_dof_values(
       const InputVector &dof_values,
-      std::vector<
-        typename OutputType<typename InputVector::value_type>::value_type>
+      std::vector<solution_value_type<typename InputVector::value_type>>
         &values) const;
 
     /**
@@ -1007,8 +1129,7 @@ namespace FEValuesViews
     void
     get_function_gradients(
       const InputVector &fe_function,
-      std::vector<typename ProductType<gradient_type,
-                                       typename InputVector::value_type>::type>
+      std::vector<solution_gradient_type<typename InputVector::value_type>>
         &gradients) const;
 
     /**
@@ -1021,8 +1142,7 @@ namespace FEValuesViews
     void
     get_function_gradients_from_local_dof_values(
       const InputVector &dof_values,
-      std::vector<
-        typename OutputType<typename InputVector::value_type>::gradient_type>
+      std::vector<solution_gradient_type<typename InputVector::value_type>>
         &gradients) const;
 
     /**
@@ -1052,8 +1172,8 @@ namespace FEValuesViews
     void
     get_function_symmetric_gradients(
       const InputVector &fe_function,
-      std::vector<typename ProductType<symmetric_gradient_type,
-                                       typename InputVector::value_type>::type>
+      std::vector<
+        solution_symmetric_gradient_type<typename InputVector::value_type>>
         &symmetric_gradients) const;
 
     /**
@@ -1065,9 +1185,10 @@ namespace FEValuesViews
     template <class InputVector>
     void
     get_function_symmetric_gradients_from_local_dof_values(
-      const InputVector &                     dof_values,
-      std::vector<typename OutputType<typename InputVector::value_type>::
-                    symmetric_gradient_type> &symmetric_gradients) const;
+      const InputVector &dof_values,
+      std::vector<
+        solution_symmetric_gradient_type<typename InputVector::value_type>>
+        &symmetric_gradients) const;
 
     /**
      * Return the divergence of the selected vector components of the finite
@@ -1091,8 +1212,7 @@ namespace FEValuesViews
     void
     get_function_divergences(
       const InputVector &fe_function,
-      std::vector<typename ProductType<divergence_type,
-                                       typename InputVector::value_type>::type>
+      std::vector<solution_divergence_type<typename InputVector::value_type>>
         &divergences) const;
 
     /**
@@ -1105,8 +1225,7 @@ namespace FEValuesViews
     void
     get_function_divergences_from_local_dof_values(
       const InputVector &dof_values,
-      std::vector<
-        typename OutputType<typename InputVector::value_type>::divergence_type>
+      std::vector<solution_divergence_type<typename InputVector::value_type>>
         &divergences) const;
 
     /**
@@ -1131,9 +1250,8 @@ namespace FEValuesViews
     void
     get_function_curls(
       const InputVector &fe_function,
-      std::vector<
-        typename ProductType<curl_type, typename InputVector::value_type>::type>
-        &curls) const;
+      std::vector<solution_curl_type<typename InputVector::value_type>> &curls)
+      const;
 
     /**
      * This function relates to get_function_curls() in the same way
@@ -1145,9 +1263,8 @@ namespace FEValuesViews
     void
     get_function_curls_from_local_dof_values(
       const InputVector &dof_values,
-      std::vector<
-        typename OutputType<typename InputVector::value_type>::curl_type>
-        &curls) const;
+      std::vector<solution_curl_type<typename InputVector::value_type>> &curls)
+      const;
 
     /**
      * Return the Hessians of the selected vector components of the finite
@@ -1170,8 +1287,7 @@ namespace FEValuesViews
     void
     get_function_hessians(
       const InputVector &fe_function,
-      std::vector<typename ProductType<hessian_type,
-                                       typename InputVector::value_type>::type>
+      std::vector<solution_hessian_type<typename InputVector::value_type>>
         &hessians) const;
 
     /**
@@ -1184,8 +1300,7 @@ namespace FEValuesViews
     void
     get_function_hessians_from_local_dof_values(
       const InputVector &dof_values,
-      std::vector<
-        typename OutputType<typename InputVector::value_type>::hessian_type>
+      std::vector<solution_hessian_type<typename InputVector::value_type>>
         &hessians) const;
 
     /**
@@ -1210,8 +1325,7 @@ namespace FEValuesViews
     void
     get_function_laplacians(
       const InputVector &fe_function,
-      std::vector<typename ProductType<value_type,
-                                       typename InputVector::value_type>::type>
+      std::vector<solution_laplacian_type<typename InputVector::value_type>>
         &laplacians) const;
 
     /**
@@ -1224,8 +1338,7 @@ namespace FEValuesViews
     void
     get_function_laplacians_from_local_dof_values(
       const InputVector &dof_values,
-      std::vector<
-        typename OutputType<typename InputVector::value_type>::laplacian_type>
+      std::vector<solution_laplacian_type<typename InputVector::value_type>>
         &laplacians) const;
 
     /**
@@ -1250,8 +1363,8 @@ namespace FEValuesViews
     void
     get_function_third_derivatives(
       const InputVector &fe_function,
-      std::vector<typename ProductType<third_derivative_type,
-                                       typename InputVector::value_type>::type>
+      std::vector<
+        solution_third_derivative_type<typename InputVector::value_type>>
         &third_derivatives) const;
 
     /**
@@ -1263,9 +1376,10 @@ namespace FEValuesViews
     template <class InputVector>
     void
     get_function_third_derivatives_from_local_dof_values(
-      const InputVector &                   dof_values,
-      std::vector<typename OutputType<typename InputVector::value_type>::
-                    third_derivative_type> &third_derivatives) const;
+      const InputVector &dof_values,
+      std::vector<
+        solution_third_derivative_type<typename InputVector::value_type>>
+        &third_derivatives) const;
 
   private:
     /**
@@ -1335,11 +1449,33 @@ namespace FEValuesViews
     using divergence_type = dealii::Tensor<1, spacedim>;
 
     /**
-     * A struct that provides the output type for the product of the value
-     * and derivatives of basis functions of the SymmetricTensor view and any @p Number type.
+     * An alias for the data type of the product of a @p Number and the
+     * values of the view this class provides. This is the data type of
+     * vector components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
      */
     template <typename Number>
-    struct OutputType
+    using solution_value_type = typename ProductType<Number, value_type>::type;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * divergences of the view this class provides. This is the data type of
+     * vector components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_divergence_type =
+      typename ProductType<Number, divergence_type>::type;
+
+
+    /**
+     * A struct that provides the output type for the product of the value
+     * and derivatives of basis functions of the SymmetricTensor view and any @p Number type.
+     *
+     * @deprecated Use the types defined in the surrounding class instead.
+     */
+    template <typename Number>
+    struct DEAL_II_DEPRECATED_EARLY OutputType
     {
       /**
        * An alias for the data type of the product of a @p Number and the
@@ -1484,8 +1620,7 @@ namespace FEValuesViews
     void
     get_function_values(
       const InputVector &fe_function,
-      std::vector<typename ProductType<value_type,
-                                       typename InputVector::value_type>::type>
+      std::vector<solution_value_type<typename InputVector::value_type>>
         &values) const;
 
     /**
@@ -1526,8 +1661,7 @@ namespace FEValuesViews
     void
     get_function_values_from_local_dof_values(
       const InputVector &dof_values,
-      std::vector<
-        typename OutputType<typename InputVector::value_type>::value_type>
+      std::vector<solution_value_type<typename InputVector::value_type>>
         &values) const;
 
     /**
@@ -1555,8 +1689,7 @@ namespace FEValuesViews
     void
     get_function_divergences(
       const InputVector &fe_function,
-      std::vector<typename ProductType<divergence_type,
-                                       typename InputVector::value_type>::type>
+      std::vector<solution_divergence_type<typename InputVector::value_type>>
         &divergences) const;
 
     /**
@@ -1569,8 +1702,7 @@ namespace FEValuesViews
     void
     get_function_divergences_from_local_dof_values(
       const InputVector &dof_values,
-      std::vector<
-        typename OutputType<typename InputVector::value_type>::divergence_type>
+      std::vector<solution_divergence_type<typename InputVector::value_type>>
         &divergences) const;
 
   private:
@@ -1635,11 +1767,43 @@ namespace FEValuesViews
     using gradient_type = dealii::Tensor<3, spacedim>;
 
     /**
-     * A struct that provides the output type for the product of the value
-     * and derivatives of basis functions of the Tensor view and any @p Number type.
+     * An alias for the data type of the product of a @p Number and the
+     * values of the view this class provides. This is the data type of
+     * vector components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
      */
     template <typename Number>
-    struct OutputType
+    using solution_value_type = typename ProductType<Number, value_type>::type;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * divergences of the view this class provides. This is the data type of
+     * vector components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_divergence_type =
+      typename ProductType<Number, divergence_type>::type;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * gradient of the view this class provides. This is the data type of
+     * vector components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_gradient_type =
+      typename ProductType<Number, gradient_type>::type;
+
+
+    /**
+     * A struct that provides the output type for the product of the value
+     * and derivatives of basis functions of the Tensor view and any @p Number type.
+     *
+     * @deprecated Use the types defined in the surrounding class instead.
+     */
+    template <typename Number>
+    struct DEAL_II_DEPRECATED_EARLY OutputType
     {
       /**
        * An alias for the data type of the product of a @p Number and the
@@ -1809,8 +1973,7 @@ namespace FEValuesViews
     void
     get_function_values(
       const InputVector &fe_function,
-      std::vector<typename ProductType<value_type,
-                                       typename InputVector::value_type>::type>
+      std::vector<solution_value_type<typename InputVector::value_type>>
         &values) const;
 
     /**
@@ -1851,8 +2014,7 @@ namespace FEValuesViews
     void
     get_function_values_from_local_dof_values(
       const InputVector &dof_values,
-      std::vector<
-        typename OutputType<typename InputVector::value_type>::value_type>
+      std::vector<solution_value_type<typename InputVector::value_type>>
         &values) const;
 
     /**
@@ -1880,8 +2042,7 @@ namespace FEValuesViews
     void
     get_function_divergences(
       const InputVector &fe_function,
-      std::vector<typename ProductType<divergence_type,
-                                       typename InputVector::value_type>::type>
+      std::vector<solution_divergence_type<typename InputVector::value_type>>
         &divergences) const;
 
     /**
@@ -1894,8 +2055,7 @@ namespace FEValuesViews
     void
     get_function_divergences_from_local_dof_values(
       const InputVector &dof_values,
-      std::vector<
-        typename OutputType<typename InputVector::value_type>::divergence_type>
+      std::vector<solution_divergence_type<typename InputVector::value_type>>
         &divergences) const;
 
     /**
@@ -1918,8 +2078,7 @@ namespace FEValuesViews
     void
     get_function_gradients(
       const InputVector &fe_function,
-      std::vector<typename ProductType<gradient_type,
-                                       typename InputVector::value_type>::type>
+      std::vector<solution_gradient_type<typename InputVector::value_type>>
         &gradients) const;
 
     /**
@@ -1932,8 +2091,7 @@ namespace FEValuesViews
     void
     get_function_gradients_from_local_dof_values(
       const InputVector &dof_values,
-      std::vector<
-        typename OutputType<typename InputVector::value_type>::gradient_type>
+      std::vector<solution_gradient_type<typename InputVector::value_type>>
         &gradients) const;
 
   private:

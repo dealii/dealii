@@ -1,0 +1,10 @@
+Deprecated: The FEValuesViews::Scalar, FEValuesViews::Vector,
+FEValuesViews::Tensor, and FEValuesViews::SymmetricTensor classes all
+have `OutputType` structures that defined the types of evaluating
+the values and derivatives of finite element fields at quadrature
+points. These structures have been deprecated, and the corresponding
+types are now defined via local `using` declarations in the classes
+mentioned above.
+<br>
+(Wolfgang Bangerth, 2021/04/25)
+
