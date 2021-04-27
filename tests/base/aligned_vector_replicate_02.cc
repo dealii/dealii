@@ -62,6 +62,9 @@ test()
   else if (Utilities::MPI::this_mpi_process(communicator) == 2)
     avec[3] = 44;
 
+  // Create a barrier before we check the effect
+  MPI_Barrier(communicator);
+
   // Final step, let every process output what it now has. Every
   // process should be able to see the changed element, even though
   // only one changed it.
