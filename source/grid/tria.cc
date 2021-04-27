@@ -10370,7 +10370,7 @@ Triangulation<dim, spacedim>::get_boundary_ids() const
       std::set<types::boundary_id> b_ids;
       for (auto cell : active_cell_iterators())
         if (cell->is_locally_owned())
-          for (const unsigned int face : GeometryInfo<dim>::face_indices())
+          for (const unsigned int face : cell->face_indices())
             if (cell->at_boundary(face))
               b_ids.insert(cell->face(face)->boundary_id());
       std::vector<types::boundary_id> boundary_ids(b_ids.begin(), b_ids.end());
