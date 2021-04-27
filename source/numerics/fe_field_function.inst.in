@@ -22,3 +22,9 @@ for (VECTOR : VECTOR_TYPES; deal_II_dimension : DIMENSIONS)
       template class FEFieldFunction<deal_II_dimension, VECTOR>;
     \}
   }
+
+for (VECTOR : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS)
+  {
+    template class Functions::RefSpaceFEFieldFunction<deal_II_dimension,
+                                                      VECTOR>;
+  }
