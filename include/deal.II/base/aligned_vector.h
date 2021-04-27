@@ -1149,38 +1149,46 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
   // make sure that the (global) root process will have rank=0 within
   // its own sub-communicator. We can do that through the third argument of
   // MPI_Comm_split_type (the "key") which is an integer meant to indicate the
-  // order of processes within the split communicators, and we will set it to
+  // order of processes within the split communicators, and we should set it to
   // zero for the root processes and one for all others -- which means that
   // for all of these other processes, MPI can choose whatever order it
   // wants because they have the same key (MPI then documents that these ties
   // will be broken according to these processes' rank in the old group).
   //
   // At least that's the theory. In practice, the MPI implementation where
-  // this function was developed on does not seem to do that. But it
-  // is willing to put the root process onto the *last* rank of the
-  // communicator.
+  // this function was developed on does not seem to do that. (Bug report
+  // is here: https://github.com/open-mpi/ompi/issues/8854)
+  // We work around this by letting MPI_Comm_split_type choose whatever
+  // rank it wants, and then reshuffle with MPI_Comm_split in a second
+  // step -- not elegant, nor efficient, but seems to work:
   MPI_Comm shmem_group_communicator;
   {
+    MPI_Comm shmem_group_communicator_temp;
+    int      ierr = MPI_Comm_split_type(communicator,
+                                   MPI_COMM_TYPE_SHARED,
+                                   /* key */ 0,
+                                   MPI_INFO_NULL,
+                                   &shmem_group_communicator_temp);
+
+    AssertThrowMPI(ierr);
     const int key =
-      (Utilities::MPI::this_mpi_process(communicator) == root_process ?
-         Utilities::MPI::n_mpi_processes(communicator) :
-         0);
-    const int ierr = MPI_Comm_split_type(communicator,
-                                         MPI_COMM_TYPE_SHARED,
-                                         key,
-                                         MPI_INFO_NULL,
-                                         &shmem_group_communicator);
+      (Utilities::MPI::this_mpi_process(communicator) == root_process ? 0 : 1);
+    ierr = MPI_Comm_split(shmem_group_communicator_temp,
+                          /* color */ 0,
+                          key,
+                          &shmem_group_communicator);
     AssertThrowMPI(ierr);
 
     // Verify the explanation from above
     if (Utilities::MPI::this_mpi_process(communicator) == root_process)
-      Assert(Utilities::MPI::this_mpi_process(shmem_group_communicator) ==
-               Utilities::MPI::n_mpi_processes(shmem_group_communicator) - 1,
+      Assert(Utilities::MPI::this_mpi_process(shmem_group_communicator) == 0,
              ExcInternalError());
+
+    // And get rid of the temporary communicator
+    ierr = MPI_Comm_free(&shmem_group_communicator_temp);
   }
   const bool is_shmem_root =
-    Utilities::MPI::this_mpi_process(shmem_group_communicator) ==
-    Utilities::MPI::n_mpi_processes(shmem_group_communicator) - 1;
+    Utilities::MPI::this_mpi_process(shmem_group_communicator) == 0;
 
   // **** Step 2 ****
   // We then have to send the state of the current object from the
@@ -1204,20 +1212,14 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
   //
   // Using MPI_Comm_split has the additional benefit that, just as above,
   // we can choose where each rank will end up in shmem_roots_communicator.
-  // We would again like to set key=0 for the original root_process -- in other
-  // word, we would then know that among the shmem roots, the original root has
-  // rank=0. But, just like above, this doesn't appear to be working, so we put
-  // the origin root at the *end* of shmem_roots_communicator.
-  //
-  // In any case, this makes it easy to next determine which process among the
-  // shmem roots is the one who initiates the broad cast operation mentioned
-  // above.
+  // We again set key=0 for the original root_process, and key=1 for all other
+  // ranks; then, the global root becomes rank=0 on the
+  // shmem_roots_communicator. We don't care how the other processes are
+  // ordered.
   MPI_Comm shmem_roots_communicator;
   {
     const int key =
-      (Utilities::MPI::this_mpi_process(communicator) == root_process ?
-         Utilities::MPI::n_mpi_processes(communicator) :
-         0);
+      (Utilities::MPI::this_mpi_process(communicator) == root_process ? 0 : 1);
 
     const int ierr = MPI_Comm_split(communicator,
                                     /*color=*/
@@ -1228,15 +1230,14 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
 
     // Again verify the explanation from above
     if (Utilities::MPI::this_mpi_process(communicator) == root_process)
-      Assert(Utilities::MPI::this_mpi_process(shmem_roots_communicator) ==
-               Utilities::MPI::n_mpi_processes(shmem_roots_communicator) - 1,
+      Assert(Utilities::MPI::this_mpi_process(shmem_roots_communicator) == 0,
              ExcInternalError());
   }
-  const unsigned int shmem_roots_root_rank =
-    Utilities::MPI::n_mpi_processes(shmem_roots_communicator) - 1;
-  const bool is_shmem_roots_root =
-    (Utilities::MPI::this_mpi_process(shmem_roots_communicator) ==
-     shmem_roots_root_rank);
+
+  const unsigned int shmem_roots_root_rank = 0;
+  const bool         is_shmem_roots_root =
+    (is_shmem_root && (Utilities::MPI::this_mpi_process(
+                         shmem_roots_communicator) == shmem_roots_root_rank));
 
   // Now let the original root_process broadcast the current object to all
   // shmem roots. We know that the last rank is the original root process that
@@ -1260,12 +1261,11 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
             resize(new_size);
 
           // Then directly copy from the root process into these buffers
-          int ierr = MPI_Bcast(
-            elements.get(),
-            sizeof(T) * new_size,
-            MPI_CHAR,
-            Utilities::MPI::n_mpi_processes(shmem_roots_communicator) - 1,
-            shmem_roots_communicator);
+          int ierr = MPI_Bcast(elements.get(),
+                               sizeof(T) * new_size,
+                               MPI_CHAR,
+                               shmem_roots_root_rank,
+                               shmem_roots_communicator);
           AssertThrowMPI(ierr);
         }
       else
@@ -1279,8 +1279,7 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
           // pointer, which would trigger the deleter which would lead to a
           // deadlock. So we just send the result of the broadcast() call to
           // nirvana on the root process and keep our current state.
-          if (Utilities::MPI::this_mpi_process(shmem_roots_communicator) ==
-              Utilities::MPI::n_mpi_processes(shmem_roots_communicator) - 1)
+          if (Utilities::MPI::this_mpi_process(shmem_roots_communicator) == 0)
             Utilities::MPI::broadcast(shmem_roots_communicator,
                                       *this,
                                       shmem_roots_root_rank);
@@ -1340,11 +1339,11 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
   // able to learn about the array size that way.
   MPI_Win        shmem_window;
   void *         base_ptr;
-  const MPI_Aint align_by   = 64;
-  const MPI_Aint alloc_size = Utilities::MPI::broadcast(
-    shmem_group_communicator,
-    (size() * sizeof(T) + (align_by - 1)),
-    Utilities::MPI::n_mpi_processes(shmem_group_communicator) - 1);
+  const MPI_Aint align_by = 64;
+  const MPI_Aint alloc_size =
+    Utilities::MPI::broadcast(shmem_group_communicator,
+                              (size() * sizeof(T) + (align_by - 1)),
+                              0);
 
   {
     const int disp_unit = (is_shmem_root ? size() : 1);
