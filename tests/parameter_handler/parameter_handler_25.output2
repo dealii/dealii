@@ -18,11 +18,14 @@ An error occurred in file <parameter_handler.cc> in function
 The violated condition was: 
     entries_wrongly_not_set.size() == 0
 Additional information: 
-    Not all entries of the parameter handler that were declared with `has_to_be_set = true` have been set. The following parameters 
-
-  General.Precision
-  General.dim
-
- have not been set. A possible reason might be that you did not add these parameter to the input file or that their spelling is not correct.
+    Not all entries of the parameter handler that were declared with
+    `has_to_be_set = true` have been set. The following parameters
+    
+    General.Precision
+    General.dim
+    
+    have not been set. A possible reason might be that you did not add
+    these parameter to the input file or that their spelling is not
+    correct.
 --------------------------------------------------------
 
