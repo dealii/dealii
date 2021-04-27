@@ -145,7 +145,9 @@ namespace MeshWorker
    * and parallel computation (work on faces to ghost neighbors for example).
    * The @p mesh_loop can be used to simplify operations on cells (for example
    * assembly), on boundaries (Neumann type boundary conditions), or on
-   * interior faces (for example in discontinuous Galerkin methods).
+   * interior faces (for example in discontinuous Galerkin methods). The
+   * function is used in a number of tutorials, including step-12, step-16,
+   * and step-47, to name just a few.
    *
    * For uniformly refined meshes, it would be relatively easy to use
    * WorkStream::run() with a @p cell_worker that also loops over faces, and
@@ -766,7 +768,7 @@ namespace MeshWorker
   }
 
   /**
-   * This is a variant of the mesh_loop() function, that can be used for worker
+   * This is a variant of the mesh_loop() function that can be used for worker
    * and copier functions that are member functions of a class.
    *
    * The argument passed as @p end must be convertible to the same type as @p
