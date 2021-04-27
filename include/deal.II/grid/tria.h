@@ -1532,12 +1532,7 @@ public:
      * automatically generated destructor would have a different one due to
      * member objects.
      */
-#ifdef __INTEL_COMPILER
-    virtual ~DistortedCellList() noexcept override
-    {}
-#else
-    virtual ~DistortedCellList() noexcept override = default;
-#endif
+    virtual ~DistortedCellList() noexcept override;
 
     /**
      * A list of those cells among the coarse mesh cells that are deformed or

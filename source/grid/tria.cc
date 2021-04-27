@@ -15246,6 +15246,12 @@ Triangulation<dim, spacedim>::memory_consumption() const
 }
 
 
+
+template <int dim, int spacedim>
+Triangulation<dim, spacedim>::DistortedCellList::~DistortedCellList() noexcept =
+  default;
+
+
 // explicit instantiations
 #include "tria.inst"
 
