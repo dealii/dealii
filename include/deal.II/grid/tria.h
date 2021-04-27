@@ -1532,7 +1532,7 @@ public:
      * automatically generated destructor would have a different one due to
      * member objects.
      */
-    virtual ~DistortedCellList() noexcept override = default;
+    virtual ~DistortedCellList() noexcept override;
 
     /**
      * A list of those cells among the coarse mesh cells that are deformed or
