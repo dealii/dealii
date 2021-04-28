@@ -767,18 +767,9 @@ public:
   operator()(const size_type i);
 
   /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
+   * Make the variations of `operator()` from the base class available.
    */
-  typename AlignedVector<T>::reference
-  operator()(const TableIndices<1> &indices);
-
-  /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
-   */
-  typename AlignedVector<T>::const_reference
-  operator()(const TableIndices<1> &indices) const;
+  using TableBase<1, T>::operator();
 };
 
 
@@ -1242,19 +1233,9 @@ public:
   operator()(const size_type i, const size_type j);
 
   /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
+   * Make the variations of `operator()` from the base class available.
    */
-  typename AlignedVector<T>::reference
-  operator()(const TableIndices<2> &indices);
-
-  /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
-   */
-  typename AlignedVector<T>::const_reference
-  operator()(const TableIndices<2> &indices) const;
-
+  using TableBase<2, T>::operator();
 
   /**
    * Number of rows. This function really makes only sense since we have a
@@ -1455,18 +1436,9 @@ public:
   operator()(const size_type i, const size_type j, const size_type k);
 
   /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
+   * Make the variations of `operator()` from the base class available.
    */
-  typename AlignedVector<T>::reference
-  operator()(const TableIndices<3> &indices);
-
-  /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
-   */
-  typename AlignedVector<T>::const_reference
-  operator()(const TableIndices<3> &indices) const;
+  using TableBase<3, T>::operator();
 };
 
 
@@ -1548,18 +1520,9 @@ public:
              const size_type l);
 
   /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
+   * Make the variations of `operator()` from the base class available.
    */
-  typename AlignedVector<T>::reference
-  operator()(const TableIndices<4> &indices);
-
-  /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
-   */
-  typename AlignedVector<T>::const_reference
-  operator()(const TableIndices<4> &indices) const;
+  using TableBase<4, T>::operator();
 };
 
 
@@ -1644,18 +1607,9 @@ public:
              const size_type m);
 
   /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
+   * Make the variations of `operator()` from the base class available.
    */
-  typename AlignedVector<T>::reference
-  operator()(const TableIndices<5> &indices);
-
-  /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
-   */
-  typename AlignedVector<T>::const_reference
-  operator()(const TableIndices<5> &indices) const;
+  using TableBase<5, T>::operator();
 };
 
 
@@ -1742,18 +1696,9 @@ public:
              const size_type n);
 
   /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
+   * Make the variations of `operator()` from the base class available.
    */
-  typename AlignedVector<T>::reference
-  operator()(const TableIndices<6> &indices);
-
-  /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
-   */
-  typename AlignedVector<T>::const_reference
-  operator()(const TableIndices<6> &indices) const;
+  using TableBase<6, T>::operator();
 };
 
 
@@ -1842,18 +1787,9 @@ public:
              const size_type o);
 
   /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
+   * Make the variations of `operator()` from the base class available.
    */
-  typename AlignedVector<T>::reference
-  operator()(const TableIndices<7> &indices);
-
-  /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
-   */
-  typename AlignedVector<T>::const_reference
-  operator()(const TableIndices<7> &indices) const;
+  using TableBase<7, T>::operator();
 };
 
 
@@ -2578,24 +2514,6 @@ Table<1, T>::operator()(const size_type i)
 }
 
 
-
-template <typename T>
-inline typename AlignedVector<T>::const_reference
-Table<1, T>::operator()(const TableIndices<1> &indices) const
-{
-  return TableBase<1, T>::operator()(indices);
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::reference
-Table<1, T>::operator()(const TableIndices<1> &indices)
-{
-  return TableBase<1, T>::operator()(indices);
-}
-
-
 //---------------------------------------------------------------------------
 
 
@@ -2670,24 +2588,6 @@ Table<2, T>::operator()(const size_type i, const size_type j)
   AssertIndexRange(i, this->table_size[0]);
   AssertIndexRange(j, this->table_size[1]);
   return this->values[size_type(i) * this->table_size[1] + j];
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::const_reference
-Table<2, T>::operator()(const TableIndices<2> &indices) const
-{
-  return TableBase<2, T>::operator()(indices);
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::reference
-Table<2, T>::operator()(const TableIndices<2> &indices)
-{
-  return TableBase<2, T>::operator()(indices);
 }
 
 
@@ -3217,24 +3117,6 @@ Table<3, T>::operator()(const size_type i, const size_type j, const size_type k)
 
 
 template <typename T>
-inline typename AlignedVector<T>::const_reference
-Table<3, T>::operator()(const TableIndices<3> &indices) const
-{
-  return TableBase<3, T>::operator()(indices);
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::reference
-Table<3, T>::operator()(const TableIndices<3> &indices)
-{
-  return TableBase<3, T>::operator()(indices);
-}
-
-
-
-template <typename T>
 inline Table<4, T>::Table(const size_type size1,
                           const size_type size2,
                           const size_type size3,
@@ -3306,24 +3188,6 @@ Table<4, T>::operator()(const size_type i,
               k) *
                this->table_size[3] +
              l];
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::const_reference
-Table<4, T>::operator()(const TableIndices<4> &indices) const
-{
-  return TableBase<4, T>::operator()(indices);
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::reference
-Table<4, T>::operator()(const TableIndices<4> &indices)
-{
-  return TableBase<4, T>::operator()(indices);
 }
 
 
@@ -3411,24 +3275,6 @@ Table<5, T>::operator()(const size_type i,
               l) *
                this->table_size[4] +
              m];
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::const_reference
-Table<5, T>::operator()(const TableIndices<5> &indices) const
-{
-  return TableBase<5, T>::operator()(indices);
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::reference
-Table<5, T>::operator()(const TableIndices<5> &indices)
-{
-  return TableBase<5, T>::operator()(indices);
 }
 
 
@@ -3535,24 +3381,6 @@ Table<6, T>::operator()(const size_type i,
               m) *
                this->table_size[5] +
              n];
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::const_reference
-Table<6, T>::operator()(const TableIndices<6> &indices) const
-{
-  return TableBase<6, T>::operator()(indices);
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::reference
-Table<6, T>::operator()(const TableIndices<6> &indices)
-{
-  return TableBase<6, T>::operator()(indices);
 }
 
 
@@ -3667,24 +3495,6 @@ Table<7, T>::operator()(const size_type i,
       n) *
        this->table_size[6] +
      o];
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::const_reference
-Table<7, T>::operator()(const TableIndices<7> &indices) const
-{
-  return TableBase<7, T>::operator()(indices);
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::reference
-Table<7, T>::operator()(const TableIndices<7> &indices)
-{
-  return TableBase<7, T>::operator()(indices);
 }
 
 
