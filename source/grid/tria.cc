@@ -448,12 +448,12 @@ namespace
         std::vector<unsigned int> quad_cell_count(triangulation.n_raw_quads(),
                                                   0);
         for (const auto &cell : triangulation.cell_iterators())
-          for (unsigned int q : GeometryInfo<dim>::face_indices())
+          for (unsigned int q : cell->face_indices())
             ++quad_cell_count[cell->quad_index(q)];
         return quad_cell_count;
       }
     else
-      return std::vector<unsigned int>();
+      return {};
   }
 
 
@@ -9697,9 +9697,7 @@ namespace internal
             for (const auto &cell : triangulation.cell_iterators())
               if (cell->refine_flag_set())
                 {
-                  for (unsigned int line = 0;
-                       line < GeometryInfo<dim>::lines_per_cell;
-                       ++line)
+                  for (unsigned int line = 0; line < cell->n_lines(); ++line)
                     if (GeometryInfo<dim>::line_refinement_case(
                           cell->refine_flag_set(), line) ==
                         RefinementCase<1>::cut_x)
@@ -9733,9 +9731,7 @@ namespace internal
                    cell = triangulation.last_active();
                  cell != triangulation.end();
                  --cell)
-              for (unsigned int line = 0;
-                   line < GeometryInfo<dim>::lines_per_cell;
-                   ++line)
+              for (unsigned int line = 0; line < cell->n_lines(); ++line)
                 {
                   if (cell->line(line)->has_children())
                     {
