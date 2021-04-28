@@ -663,8 +663,7 @@ protected:
  * @ingroup data
  */
 template <int N, typename T>
-class Table : public TableBase<N, T>
-{};
+class Table;
 
 
 /**
