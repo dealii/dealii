@@ -389,7 +389,7 @@ namespace
       triangulation.n_vertices(), 0);
 
     for (const auto &cell : triangulation.active_cell_iterators())
-      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int v : cell->vertex_indices())
         {
           min_adjacent_cell_level[cell->vertex_index(v)] =
             std::min<unsigned int>(
