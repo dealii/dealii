@@ -687,7 +687,7 @@ public:
    *   large core counts on which many MPI processes run on the same machine.
    *
    * @note This function only makes sense if the data type `T` is
-   *   "self-contained", i.e., all if its information is stored in its
+   *   "self-contained", i.e., all of its information is stored in its
    *   member variables, and if none of the member variables are pointers
    *   to other parts of the memory. This is because if a type `T` does
    *   have pointers to other parts of memory, then moving `T` into

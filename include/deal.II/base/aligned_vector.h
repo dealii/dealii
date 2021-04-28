@@ -282,7 +282,11 @@ public:
    * than replicating data once for each MPI process. This results in
    * large memory savings if the data is large on today's machines that
    * can easily house several dozen MPI processes per shared memory
-   * space.
+   * space. This use case is outlined in the TableBase class documentation
+   * as the current function is called from
+   * TableBase::replicate_across_communicator(). Indeed, the primary rationale
+   * for this function is to enable sharing data tables based on TableBase
+   * across MPI processes.
    *
    * This function does not imply a model of keeping data on different processes
    * in sync, as parallel::distributed::Vector and other vector classes do where
