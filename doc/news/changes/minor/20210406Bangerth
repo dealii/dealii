@@ -1,5 +1,6 @@
-New: The function AlignedVector::replicate_across_communicator()
-allows copying information across MPI processes.
+New: The functions AlignedVector::replicate_across_communicator()
+and  Table::replicate_across_communicator()
+allow copying information across MPI processes.
 <br>
-(Wolfgang Bangerth, 2021/04/06)
+(Wolfgang Bangerth, 2021/04/28)
 
