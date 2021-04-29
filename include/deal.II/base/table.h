@@ -668,12 +668,9 @@ class Table;
 
 /**
  * A class representing a one-dimensional table, i.e. a vector-like class.
- * Since the C++ library has a vector class, there is probably not much need
- * for this particular class, but since it is so simple to implement on top of
- * the template base class, we provide it anyway.
- *
- * For the rationale of this class, and a description of the interface, see
- * the base class.
+ * The majority of the interface of this class is implemented in the
+ * TableBase base class. See there for an outline of the rationale for and
+ * interface of this class.
  *
  * @ingroup data
  */
@@ -1092,12 +1089,13 @@ namespace MatrixTableIterators
 /**
  * A class representing a two-dimensional table, i.e. a matrix of objects (not
  * necessarily only numbers).
+ * The majority of the interface of this class is implemented in the
+ * TableBase base class. See there for an outline of the rationale for and
+ * interface of this class.
  *
- * For the rationale of this class, and a description of the interface, see
- * the base class. Since this serves as the base class of the full matrix
- * classes in this library, and to keep a minimal compatibility with a
- * predecessor class (<tt>vector2d</tt>), some additional functions are
- * provided.
+ * This class also serves as the base class for the FullMatrix class
+ * and consequently has a number of functions that are specific to
+ * matrices and their needs.
  *
  * @ingroup data
  */
@@ -1342,9 +1340,9 @@ protected:
 /**
  * A class representing a three-dimensional table of objects (not necessarily
  * only numbers).
- *
- * For the rationale of this class, and a description of the interface, see
- * the base class.
+ * The majority of the interface of this class is implemented in the
+ * TableBase base class.See there for an outline of the rationale for and
+ * interface of this class.
  *
  * @ingroup data
  */
@@ -1473,9 +1471,9 @@ public:
 /**
  * A class representing a four-dimensional table of objects (not necessarily
  * only numbers).
- *
- * For the rationale of this class, and a description of the interface, see
- * the base class.
+ * The majority of the interface of this class is implemented in the
+ * TableBase base class. See there for an outline of the rationale for and
+ * interface of this class.
  *
  * @ingroup data
  */
@@ -1566,9 +1564,9 @@ public:
 /**
  * A class representing a five-dimensional table of objects (not necessarily
  * only numbers).
- *
- * For the rationale of this class, and a description of the interface, see
- * the base class.
+ * The majority of the interface of this class is implemented in the
+ * TableBase base class. See there for an outline of the rationale for and
+ * interface of this class.
  *
  * @ingroup data
  */
@@ -1662,9 +1660,9 @@ public:
 /**
  * A class representing a six-dimensional table of objects (not necessarily
  * only numbers).
- *
- * For the rationale of this class, and a description of the interface, see
- * the base class.
+ * The majority of the interface of this class is implemented in the
+ * TableBase base class. See there for an outline of the rationale for and
+ * interface of this class.
  *
  * @ingroup data
  */
@@ -1759,9 +1757,9 @@ public:
 /**
  * A class representing a seven-dimensional table of objects (not necessarily
  * only numbers).
- *
- * For the rationale of this class, and a description of the interface, see
- * the base class.
+ * The majority of the interface of this class is implemented in the
+ * TableBase base class. See there for an outline of the rationale for and
+ * interface of this class.
  *
  * @ingroup data
  */
