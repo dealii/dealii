@@ -1177,7 +1177,7 @@ DynamicSparsityPattern::end(const size_type r) const
 {
   AssertIndexRange(r, n_rows());
 
-  unsigned int row = r + 1;
+  const size_type row = r + 1;
   if (row == n_rows())
     return {this};
   else
