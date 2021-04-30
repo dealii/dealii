@@ -10498,10 +10498,6 @@ Triangulation<dim, spacedim>::reset_policy()
     }
   else
     {
-#ifndef DEAL_II_WITH_SIMPLEX_SUPPORT
-      Assert(false, ExcNeedsSimplexSupport());
-#endif
-
       this->policy =
         std::make_unique<internal::TriangulationImplementation::PolicyWrapper<
           dim,

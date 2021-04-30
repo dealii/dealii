@@ -8263,9 +8263,6 @@ namespace GridGenerator
     const Point<dim> &               p2,
     const bool                       colorize)
   {
-#  ifndef DEAL_II_WITH_SIMPLEX_SUPPORT
-    Assert(false, ExcNeedsSimplexSupport());
-#  endif
     AssertDimension(dim, spacedim);
 
     AssertThrow(colorize == false, ExcNotImplemented());

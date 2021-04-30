@@ -694,123 +694,6 @@ public:
     matrix_free.initialize_dof_vector(vec);
   }
 
-  void
-  rhs(VectorType &vec) const
-  {
-    const int dummy = 0;
-
-    matrix_free.template loop<VectorType, int>(
-      [&](const auto &data, auto &dst, const auto &src, const auto cell_range) {
-        FEEvaluation<dim, -1, 0, 1, double> phi(data, cell_range);
-        for (unsigned int cell = cell_range.first; cell < cell_range.second;
-             ++cell)
-          {
-            phi.reinit(cell);
-            for (unsigned int q = 0; q < phi.n_q_points; ++q)
-              phi.submit_value(0.0, q);
-
-            phi.integrate_scatter(true, false, dst);
-          }
-      },
-      [&](const auto &data, auto &dst, const auto &src, const auto face_range) {
-        (void)data;
-        (void)dst;
-        (void)src;
-        (void)face_range;
-      },
-      [&](const auto &data, auto &dst, const auto &src, const auto face_range) {
-        FEFaceEvaluation<dim, -1, 0, 1, double> phi(data, face_range);
-        for (unsigned int face = face_range.first; face < face_range.second;
-             ++face)
-          {
-            phi.reinit(face);
-            for (unsigned int q = 0; q < phi.n_q_points; ++q)
-              {
-                const auto beta_n =
-                  beta(phi.quadrature_point(q)) * phi.get_normal_vector(q);
-                const auto beta_n_m = (-std::abs(beta_n) + beta_n) * 0.5;
-                phi.submit_value(-beta_n_m *
-                                   boundary_values(phi.quadrature_point(q)),
-                                 q);
-              }
-
-            phi.integrate_scatter(true, false, dst);
-          }
-      },
-      vec,
-      dummy,
-      true);
-  }
-
-  void
-  vmult(VectorType &dst, const VectorType &src) const
-  {
-    matrix_free.template loop<VectorType, VectorType>(
-      [&](const auto &data, auto &dst, const auto &src, const auto cell_range) {
-        FEEvaluation<dim, -1, 0, 1, double> phi(data, cell_range);
-        for (unsigned int cell = cell_range.first; cell < cell_range.second;
-             ++cell)
-          {
-            phi.reinit(cell);
-            phi.gather_evaluate(src, true, false);
-            for (unsigned int q = 0; q < phi.n_q_points; ++q)
-              phi.submit_gradient(-beta(phi.quadrature_point(q)) *
-                                    phi.get_value(q),
-                                  q);
-            phi.integrate_scatter(false, true, dst);
-          }
-      },
-      [&](const auto &data, auto &dst, const auto &src, const auto face_range) {
-        FEFaceEvaluation<dim, -1, 0, 1, double> phi_m(data, face_range, true);
-        FEFaceEvaluation<dim, -1, 0, 1, double> phi_p(data, face_range, false);
-        for (unsigned int cell = face_range.first; cell < face_range.second;
-             ++cell)
-          {
-            phi_m.reinit(cell);
-            phi_m.gather_evaluate(src, true, false);
-            phi_p.reinit(cell);
-            phi_p.gather_evaluate(src, true, false);
-            for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
-              {
-                const auto beta_n =
-                  beta(phi_m.quadrature_point(q)) * phi_m.get_normal_vector(q);
-
-                const auto u_m = phi_m.get_value(q);
-                const auto u_p = phi_p.get_value(q);
-                const auto temp =
-                  0.5 * ((u_m + u_p) * beta_n + (u_m - u_p) * std::abs(beta_n));
-
-                phi_m.submit_value(+temp, q);
-                phi_p.submit_value(-temp, q);
-              }
-
-            phi_m.integrate_scatter(true, false, dst);
-            phi_p.integrate_scatter(true, false, dst);
-          }
-      },
-      [&](const auto &data, auto &dst, const auto &src, const auto face_range) {
-        FEFaceEvaluation<dim, -1, 0, 1, double> phi(data, face_range);
-        for (unsigned int cell = face_range.first; cell < face_range.second;
-             ++cell)
-          {
-            phi.reinit(cell);
-            phi.gather_evaluate(src, true, false);
-            for (unsigned int q = 0; q < phi.n_q_points; ++q)
-              {
-                const auto beta_n =
-                  beta(phi.quadrature_point(q)) * phi.get_normal_vector(q);
-                const auto beta_n_p = (std::abs(beta_n) + beta_n) * 0.5;
-                phi.submit_value(beta_n_p * phi.get_value(q), q);
-              }
-
-            phi.integrate_scatter(true, false, dst);
-          }
-      },
-      dst,
-      src,
-      true);
-  }
-
   Tensor<1, dim, VectorizedArray<double>>
   beta(const Point<dim, VectorizedArray<double>> &points) const
   {
@@ -846,6 +729,123 @@ public:
       betas[v] = (points[0][v] < 0.5) ? 1.0 : 0.0;
 
     return betas;
+  }
+
+  void
+  rhs(VectorType &vec) const
+  {
+    const int dummy = 0;
+
+    matrix_free.template loop<VectorType, int>(
+      [&](const auto &data, auto &dst, const auto &src, const auto cell_range) {
+        FEEvaluation<dim, -1, 0, 1, double> phi(data, cell_range);
+        for (unsigned int cell = cell_range.first; cell < cell_range.second;
+             ++cell)
+          {
+            phi.reinit(cell);
+            for (unsigned int q = 0; q < phi.n_q_points; ++q)
+              phi.submit_value(0.0, q);
+
+            phi.integrate_scatter(true, false, dst);
+          }
+      },
+      [&](const auto &data, auto &dst, const auto &src, const auto face_range) {
+        (void)data;
+        (void)dst;
+        (void)src;
+        (void)face_range;
+      },
+      [&](const auto &data, auto &dst, const auto &src, const auto face_range) {
+        FEFaceEvaluation<dim, -1, 0, 1, double> phi(data, face_range);
+        for (unsigned int face = face_range.first; face < face_range.second;
+             ++face)
+          {
+            phi.reinit(face);
+            for (unsigned int q = 0; q < phi.n_q_points; ++q)
+              {
+                const auto beta_n = this->beta(phi.quadrature_point(q)) *
+                                    phi.get_normal_vector(q);
+                const auto beta_n_m = (-std::abs(beta_n) + beta_n) * 0.5;
+                phi.submit_value(-beta_n_m * this->boundary_values(
+                                               phi.quadrature_point(q)),
+                                 q);
+              }
+
+            phi.integrate_scatter(true, false, dst);
+          }
+      },
+      vec,
+      dummy,
+      true);
+  }
+
+  void
+  vmult(VectorType &dst, const VectorType &src) const
+  {
+    matrix_free.template loop<VectorType, VectorType>(
+      [&](const auto &data, auto &dst, const auto &src, const auto cell_range) {
+        FEEvaluation<dim, -1, 0, 1, double> phi(data, cell_range);
+        for (unsigned int cell = cell_range.first; cell < cell_range.second;
+             ++cell)
+          {
+            phi.reinit(cell);
+            phi.gather_evaluate(src, true, false);
+            for (unsigned int q = 0; q < phi.n_q_points; ++q)
+              phi.submit_gradient(-this->beta(phi.quadrature_point(q)) *
+                                    phi.get_value(q),
+                                  q);
+            phi.integrate_scatter(false, true, dst);
+          }
+      },
+      [&](const auto &data, auto &dst, const auto &src, const auto face_range) {
+        FEFaceEvaluation<dim, -1, 0, 1, double> phi_m(data, face_range, true);
+        FEFaceEvaluation<dim, -1, 0, 1, double> phi_p(data, face_range, false);
+        for (unsigned int cell = face_range.first; cell < face_range.second;
+             ++cell)
+          {
+            phi_m.reinit(cell);
+            phi_m.gather_evaluate(src, true, false);
+            phi_p.reinit(cell);
+            phi_p.gather_evaluate(src, true, false);
+            for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
+              {
+                const auto beta_n = this->beta(phi_m.quadrature_point(q)) *
+                                    phi_m.get_normal_vector(q);
+
+                const auto u_m = phi_m.get_value(q);
+                const auto u_p = phi_p.get_value(q);
+                const auto temp =
+                  0.5 * ((u_m + u_p) * beta_n + (u_m - u_p) * std::abs(beta_n));
+
+                phi_m.submit_value(+temp, q);
+                phi_p.submit_value(-temp, q);
+              }
+
+            phi_m.integrate_scatter(true, false, dst);
+            phi_p.integrate_scatter(true, false, dst);
+          }
+      },
+      [&](const auto &data, auto &dst, const auto &src, const auto face_range) {
+        FEFaceEvaluation<dim, -1, 0, 1, double> phi(data, face_range);
+        for (unsigned int cell = face_range.first; cell < face_range.second;
+             ++cell)
+          {
+            phi.reinit(cell);
+            phi.gather_evaluate(src, true, false);
+            for (unsigned int q = 0; q < phi.n_q_points; ++q)
+              {
+                const auto beta_n = this->beta(phi.quadrature_point(q)) *
+                                    phi.get_normal_vector(q);
+                const auto beta_n_p = (std::abs(beta_n) + beta_n) * 0.5;
+                phi.submit_value(beta_n_p * phi.get_value(q), q);
+              }
+
+            phi.integrate_scatter(true, false, dst);
+          }
+      },
+      dst,
+      src,
+      true);
   }
 
 private:
