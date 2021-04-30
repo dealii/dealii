@@ -108,14 +108,12 @@ namespace Utilities
         start_communication();
 
         // 2) answer requests and check if all requests of this process have
-        // been
-        //    answered
+        //    been answered
         while (!check_own_state())
           answer_requests();
 
         // 3) signal to all other processes that all requests of this process
-        // have
-        //    been answered
+        //    have been answered
         signal_finish();
 
         // 4) nevertheless, this process has to keep on answering (potential)
