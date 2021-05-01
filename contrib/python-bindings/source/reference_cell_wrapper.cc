@@ -21,39 +21,39 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace python
 {
-  CellTypeWrapper::CellTypeWrapper()
+  ReferenceCellWrapper::ReferenceCellWrapper()
   {}
 
 
 
-  CellTypeWrapper::CellTypeWrapper(const CellTypeWrapper &other)
+  ReferenceCellWrapper::ReferenceCellWrapper(const ReferenceCellWrapper &other)
   {
     cell_type = other.cell_type;
   }
 
 
 
-  CellTypeWrapper::CellTypeWrapper(const std::uint8_t &kind)
+  ReferenceCellWrapper::ReferenceCellWrapper(const std::uint8_t &kind)
   {
     cell_type = internal::ReferenceCell::make_reference_cell_from_int(kind);
   }
 
 
 
-  CellTypeWrapper::CellTypeWrapper(const ReferenceCell &cell_type_in)
+  ReferenceCellWrapper::ReferenceCellWrapper(const ReferenceCell &cell_type_in)
   {
     cell_type = cell_type_in;
   }
 
 
 
-  CellTypeWrapper::~CellTypeWrapper()
+  ReferenceCellWrapper::~ReferenceCellWrapper()
   {}
 
 
 
   std::uint8_t
-  CellTypeWrapper::cell_kind() const
+  ReferenceCellWrapper::cell_kind() const
   {
     return cell_type;
   }
