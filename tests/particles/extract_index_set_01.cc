@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Test ParticleHandler::locally_relevant_ids().
+// Test ParticleHandler::locally_owned_particle_ids().
 
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/utilities.h>
@@ -63,7 +63,7 @@ test()
   auto cpu_to_index =
     particle_handler.insert_global_particles(points, global_bounding_boxes);
 
-  const auto set = particle_handler.locally_relevant_ids();
+  const auto set = particle_handler.locally_owned_particle_ids();
   deallog << "Local set: ";
   set.print(deallog);
   deallog << std::endl;

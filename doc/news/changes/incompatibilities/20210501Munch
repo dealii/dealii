@@ -1,0 +1,4 @@
+Renamed: The function ParticleHandler::locally_relevant_ids() has been deprecated.
+Please use the new function ParticleHandler::locally_owned_particle_ids() instead.
+<br>
+(Peter Munch, 2021/05/01)

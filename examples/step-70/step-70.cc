@@ -1062,7 +1062,7 @@ namespace Step70
     // successive vector elements (this is what the IndexSet::tensor_priduct()
     // function does).
     locally_owned_tracer_particle_coordinates =
-      tracer_particle_handler.locally_relevant_ids().tensor_product(
+      tracer_particle_handler.locally_owned_particle_ids().tensor_product(
         complete_index_set(spacedim));
 
     // At the beginning of the simulation, all particles are in their original
@@ -1865,7 +1865,7 @@ namespace Step70
           tracer_particle_velocities *= time_step;
 
           locally_relevant_tracer_particle_coordinates =
-            tracer_particle_handler.locally_relevant_ids().tensor_product(
+            tracer_particle_handler.locally_owned_particle_ids().tensor_product(
               complete_index_set(spacedim));
 
           relevant_tracer_particle_displacements.reinit(
