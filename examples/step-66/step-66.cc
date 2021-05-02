@@ -151,7 +151,7 @@ namespace Step66
 
 
 
-  // The constructor of the JacobainOperator just calls the constructor of the
+  // The constructor of the JacobianOperator just calls the constructor of the
   // base class MatrixFreeOperators::Base, which is itself derived from the
   // Subscriptor class.
   template <int dim, int fe_degree, typename number>
@@ -174,8 +174,8 @@ namespace Step66
 
 
 
-  // The following evlauate_newton_step function is based on the
-  // evlauate_coefficient function from step-37, however, it does not evaluate a
+  // The following evaluate_newton_step function is based on the
+  // evaluate_coefficient function from step-37, however, it does not evaluate a
   // function object, it evaluates a vector representing a finite element
   // function, namely the last Newton step needed for the Jacobian. Therefore we
   // set up a FEEvaluateion object and evaluate the finite element function in
@@ -718,7 +718,7 @@ namespace Step66
   // important if we would use an adaptive version of the Newton method. Then
   // for example we would compute the residual for different step lengths and
   // compare the residuals. However for our problem the full Newton step with
-  // $\alpha=1$ is the best we can do. An adaptive verison of Newton's method
+  // $\alpha=1$ is the best we can do. An adaptive version of Newton's method
   // becomes interesting if we have no good initial value. Note, the theory
   // states that Newton's method converges with quadratic order, but only if we
   // have an appropriate initial value. For wrong initial values the Newton

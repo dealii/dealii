@@ -15,7 +15,7 @@ step-48 and others.
 On the unit circle $\Omega = \bigl\{ x \in \mathbb{R}^2 : \|x\| \leq 1 \bigr\}$
 we consider the following nonlinear elliptic boundary value problem subject to a
 homogeneous Dirichlet boundary condition: Find a function
-$u\colon\Omega\to\mathbb{R}$ such that holds:
+$u\colon\Omega\to\mathbb{R}$ such that it holds:
 @f{align*}
  - \Delta u &= \exp(u) & \qquad & \text{in } \Omega,\\
           u &= 0       & \qquad & \text{on } \partial\Omega.
@@ -28,12 +28,12 @@ by Jerrold Bebernes and David Eberly</a>.
 
 
 <h3>Discretization with finite elements</h3>
-Even it is a nonlinear problem, we first derive the weak formulation for this
+As usual, we first derive the weak formulation for this
 problem by multiplying with a smooth test function $v\colon\Omega\to\mathbb{R}$
-respecting the boundary condition and integrate over the domain $\Omega$.
+respecting the boundary condition and integrating over the domain $\Omega$.
 Integration by parts and putting the term on the right hand side to the left
 yields the weak formulation: Find a function $u\colon\Omega\to\mathbb{R}$
-such that for all test functions $v$ holds:
+such that for all test functions $v$ it holds:
 @f{align*}{
  \int_\Omega \nabla v \cdot \nabla u \,\mathrm{d}x
  -
@@ -45,7 +45,7 @@ such that for all test functions $v$ holds:
 Choosing the Lagrangian finite element space $V_h$ we can define a basis
 $\{\varphi_i\}_{i=1,\dots,N}$ and it suffices to test only with those basis
 functions. So the discrete problem reads as follows: Find $u_h\in V_h$ such that
-for all $i=1,\dots,N$ holds:
+for all $i=1,\dots,N$ it holds:
 @f{align*}{
  F(u_h)
  \dealcoloneq
@@ -58,7 +58,7 @@ representing the discrete nonlinear problem.
 
 To solve this nonlinear problem we use Newton's method. So given an
 initial guess $u_h^0\in V_h$ we determine a sequence of Newton steps
-$\bigl( u_h^n \bigr)_n$ by successively apply the following scheme:
+$\bigl( u_h^n \bigr)_n$ by successively applying      the following scheme:
 @f{align*}{
  &\text{Solve for } s_h^n\in V_h: \qquad & F'(u_h^n)[s_h^n] &= -F(u_h^n),\\
  &\text{Update: } & u_h^{n+1} &= u_h^n + s_h^n.
@@ -94,9 +94,10 @@ discrete equations.
 
 
 <h3>Numerical linear algebra</h3>
-Note, how the system matrix, actually the Jacobian, depends on the previous
-Newton step $A = F'(u^n)$. Hence before we can use the system matrix we have to
-tell it, what was the last Newton step. In an implementation with a classical
+Note how the system matrix, the Jacobian, depends on the previous
+Newton step $A = F'(u^n)$. Hence before we need to tell the function that
+computes the system matrix about the solution at the last Newton step. In an
+implementation with a classical
 assemble_system function we would gather this information from the last Newton
 step during assembly by the use of the member functions get_function_values and
 get_function_gradients of the FEValuesBase class. The assemble_system function
@@ -168,7 +169,7 @@ GelfandProblem<dim>::assemble_system()
 }
 @endcode
 
-However, since we want to solve this problem without storing a matrix, we need
+Since we want to solve this problem without storing a matrix, we need
 to tell the MatrixFreeOperator this information before we use it. Therefore in
 the derived class JacobianOperator we will implement a function called
 evaluate_newton_step, which will process the information of the last Newton step
@@ -197,7 +198,7 @@ GelfandProblem<dim>::compute_update()
 	mg_matrices[level].evaluate_newton_step(mg_solution[level]);
   }
 
-  // Define the actual preconitioner
+  // Define the actual preconditioner
   ...
 
   // Solve the linear system
@@ -207,7 +208,7 @@ GelfandProblem<dim>::compute_update()
 
 The function evaluating the nonlinearity works basically in the same way as the
 function evaluate_coefficient from step-37 evaluating a coefficient function.
-The idea is to use a FEEvaluation object to evaluate the Newton step and store
+The idea is to use an FEEvaluation object to evaluate the Newton step and store
 the expression in a table for all cells and all quadrature points:
 @code
 void
@@ -230,7 +231,7 @@ JacobianOperator<dim,fe_degree,number>::evaluate_newton_step(const LinearAlgebra
 
 
 <h3>Triangulation</h3>
-As said in step-37 the matrix-free method works more efficient if we choose a
+As said in step-37 the matrix-free method gets more efficient if we choose a
 higher order finite element space. Since we want to solve the problem on the
 unit circle, it would be good to have an appropriate boundary approximation to
 overcome convergence issues. For this reason we use the MappingC1 class to
