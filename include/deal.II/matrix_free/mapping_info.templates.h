@@ -388,7 +388,6 @@ namespace internal
 
               if (flag == false)
                 {
-#ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
                   cell_data[my_q].descriptor[hpq].initialize(quad[my_q][hpq],
                                                              update_default);
                   const auto quad_face =
@@ -421,9 +420,6 @@ namespace internal
 
                   reference_cell_types[my_q][hpq] =
                     face_quadrature_collection.first;
-#else
-                  Assert(false, ExcNotImplemented());
-#endif
                 }
               else
                 {
@@ -1742,11 +1738,7 @@ namespace internal
              reference_cell == dealii::ReferenceCells::get_hypercube<dim>()) ==
             false)
           {
-#ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
             return index;
-#else
-            Assert(false, ExcNotImplemented());
-#endif
           }
 
         if (dim == 3)
@@ -1836,11 +1828,6 @@ namespace internal
           for (unsigned int my_q = 0; my_q < mapping_info.face_data.size();
                ++my_q)
             {
-#ifndef DEAL_II_WITH_SIMPLEX_SUPPORT
-              // currently only non-hp-case...
-              AssertDimension(mapping_in.size(), 1);
-#endif
-
               // We assume that we have the faces sorted by the active FE
               // indices so that the active FE index of the interior side of the
               // face batch is the same as the FE index of the interior side of

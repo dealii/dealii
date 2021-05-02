@@ -56,7 +56,6 @@
 #cmakedefine DEAL_II_WITH_P4EST
 #cmakedefine DEAL_II_WITH_PETSC
 #cmakedefine DEAL_II_WITH_SCALAPACK
-#cmakedefine DEAL_II_WITH_SIMPLEX_SUPPORT
 #cmakedefine DEAL_II_WITH_SLEPC
 #cmakedefine DEAL_II_WITH_SUNDIALS
 #cmakedefine DEAL_II_WITH_SYMENGINE

@@ -203,7 +203,6 @@ namespace internal
             {
               const FE_Poly<dim, spacedim> *fe_poly_ptr =
                 dynamic_cast<const FE_Poly<dim, spacedim> *>(fe_ptr);
-#ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
               // Simplices are a special case since the polynomial family is not
               // indicative of their support
               if (dynamic_cast<const FE_SimplexP<dim> *>(fe_poly_ptr) ||
@@ -211,7 +210,6 @@ namespace internal
                   dynamic_cast<const FE_WedgeP<dim> *>(fe_poly_ptr) ||
                   dynamic_cast<const FE_PyramidP<dim> *>(fe_poly_ptr))
                 return true;
-#endif
 
               if (dynamic_cast<const TensorProductPolynomials<dim> *>(
                     &fe_poly_ptr->get_poly_space()) == nullptr &&
@@ -243,7 +241,6 @@ namespace internal
                               const FiniteElement<dim> &fe_in,
                               const unsigned int        base_element_number)
     {
-#ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
       if (quad_in.is_tensor_product() == false ||
           dynamic_cast<const FE_SimplexP<dim> *>(
             &fe_in.base_element(base_element_number)) ||
@@ -433,9 +430,6 @@ namespace internal
 
           return;
         }
-#else
-      Assert(quad_in.is_tensor_product(), ExcNotImplemented());
-#endif
 
       const auto quad = quad_in.get_tensor_basis()[0];
 

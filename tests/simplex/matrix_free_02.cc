@@ -204,12 +204,15 @@ test(const unsigned version, const unsigned int degree, const bool do_helmholtz)
                                       quads,
                                       VectorTools::NormType::L2_norm);
 
-    return {reduction_control.last_step(),
-            reduction_control.last_value(),
-            x.linfty_norm(),
-            VectorTools::compute_global_error(tria,
-                                              difference,
-                                              VectorTools::NormType::L2_norm)};
+    std::tuple<unsigned int, double, double, double> result(
+      reduction_control.last_step(),
+      reduction_control.last_value(),
+      x.linfty_norm(),
+      VectorTools::compute_global_error(tria,
+                                        difference,
+                                        VectorTools::NormType::L2_norm));
+
+    return result;
   };
 
   const auto mf_algo = [&]() {

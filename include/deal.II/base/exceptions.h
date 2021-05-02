@@ -1111,14 +1111,6 @@ namespace StandardExceptions
     "if deal.II was configured to use MPI.");
 
   /**
-   * This function requires simplex support.
-   */
-  DeclExceptionMsg(
-    ExcNeedsSimplexSupport,
-    "You are attempting to use functionality that is only available "
-    "if deal.II was configured with DEAL_II_WITH_SIMPLEX_SUPPORT enabled.");
-
-  /**
    * This function requires support for the FunctionParser library.
    */
   DeclExceptionMsg(
