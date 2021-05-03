@@ -63,8 +63,9 @@ Thus, we define the nonlinear function $F\colon\mathbb{R}^N\to\mathbb{R}^N$
 representing the discrete nonlinear problem.
 
 To solve this nonlinear problem we use Newton's method. So given an
-initial guess $u_h^0\in V_h$ we determine a sequence of Newton steps
-$\bigl( u_h^n \bigr)_n$ by successively applying      the following scheme:
+initial guess $u_h^0\in V_h$, which already fulfills the Dirichlet boundary
+condition, we determine a sequence of Newton steps $\bigl( u_h^n \bigr)_n$ by
+successively applying the following scheme:
 @f{align*}{
  &\text{Solve for } s_h^n\in V_h: \qquad & F'(u_h^n)[s_h^n] &= -F(u_h^n),\\
  &\text{Update: } & u_h^{n+1} &= u_h^n + s_h^n.
@@ -73,7 +74,11 @@ So in each Newton step we have to solve a linear problem $A\,x = b$, where the
 system matrix $A$ is represented by the Jacobian
 $F'(u_h^n)[\,\cdot\,]\colon\mathbb{R}^N\to\mathbb{R}^N$ and the right hand side
 $b$ by the negative residual $-F(u_h^n)$. The solution vector $x$ is in that
-case the Newton update of the $n$-th Newton step.
+case the Newton update of the $n$-th Newton step. Note, that we assume an
+initial guess $u_h^0$, which already fulfills the Dirichlet boundary conditions
+of the problem formulation (in fact this could also be an inhomogeneous
+Dirichlet boundary condition) and thus the Newton updates $s_h$ satisfy a
+homogeneous Dirichlet condition.
 
 Until now we only tested with the basis functions, however, we can also
 represent any function of $V_h$ as linear combination of basis functions. More
