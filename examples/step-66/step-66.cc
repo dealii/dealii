@@ -992,29 +992,15 @@ namespace Step66
       }
     data_out.add_data_vector(subdomain, "subdomain");
 
-    data_out.build_patches(fe.degree);
-    std::ofstream output(
-      "solution-" + Utilities::to_string(cycle, 2) + "." +
-      Utilities::to_string(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD),
-                           4) +
-      ".vtu");
-    data_out.write_vtu(output);
+    data_out.build_patches(mapping,
+                           fe.degree); // TODO coarse meshes look strange in
+                                       // paraview if we give the mapping object
 
-    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-      {
-        std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-             ++i)
-          {
-            filenames.emplace_back("solution-" +
-                                   Utilities::to_string(cycle, 2) + "." +
-                                   Utilities::to_string(i, 4) + ".vtu");
-          }
-        std::ofstream master_output("solution-" +
-                                    Utilities::to_string(cycle, 2) + ".pvtu");
-        data_out.write_pvtu_record(master_output, filenames);
-      }
+    DataOutBase::VtkFlags flags;
+    flags.compression_level = DataOutBase::VtkFlags::best_speed;
+    data_out.set_flags(flags);
+    data_out.write_vtu_with_pvtu_record(
+      "./", "solution", cycle, MPI_COMM_WORLD, 3);
   }
 
 
