@@ -8517,7 +8517,7 @@ namespace GridGenerator
     std::vector<value_type> ls_values;
 
     fe_values.reinit(cell);
-    ls_values.resize(cell->get_fe().n_dofs_per_cell());
+    ls_values.resize(fe_values.n_quadrature_points);
     fe_values.get_function_values(ls_vector, ls_values);
     process_cell(
       ls_values, fe_values.get_quadrature_points(), iso_level, vertices, cells);
