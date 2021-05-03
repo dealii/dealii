@@ -28,12 +28,12 @@ by Jerrold Bebernes and David Eberly</a>.
 
 
 <h3>Discretization with finite elements</h3>
-As usual, we first derive the weak formulation for this
-problem by multiplying with a smooth test function $v\colon\Omega\to\mathbb{R}$
-respecting the boundary condition and integrating over the domain $\Omega$.
-Integration by parts and putting the term on the right hand side to the left
-yields the weak formulation: Find a function $u\colon\Omega\to\mathbb{R}$
-such that for all test functions $v$ it holds:
+As usual, we first derive the weak formulation for this problem by multiplying
+with a smooth test function $v\colon\Omega\to\mathbb{R}$ respecting the
+boundary condition and integrating over the domain $\Omega$. Integration by
+parts and putting the term on the right hand side to the left yields the weak
+formulation: Find a function $u\colon\Omega\to\mathbb{R}$ such that for all
+test functions $v$ it holds:
 @f{align*}{
  \int_\Omega \nabla v \cdot \nabla u \,\mathrm{d}x
  -
@@ -42,10 +42,13 @@ such that for all test functions $v$ it holds:
  0.
 @f}
 
-Choosing the Lagrangian finite element space $V_h$ we can define a basis
-$\{\varphi_i\}_{i=1,\dots,N}$ and it suffices to test only with those basis
-functions. So the discrete problem reads as follows: Find $u_h\in V_h$ such that
-for all $i=1,\dots,N$ it holds:
+Choosing the Lagrangian finite element space $V_h \dealcoloneq
+\Bigl\{ v \in C(\overline{\Omega}) : v|_Q \in \mathbb{Q}_p \text{ for all }
+Q \in \mathcal{T}_h \Bigr\} \cap H_0^1(\Omega)$, which directly incorporates
+the homogeneous Dirichlet boundary condition, we can define a basis
+$\{\varphi_i\}_{i=1,\dots,N}$ and thus it suffices to test only with those
+basis functions. So the discrete problem reads as follows: Find $u_h\in V_h$
+such that for all $i=1,\dots,N$ it holds:
 @f{align*}{
  F(u_h)
  \dealcoloneq
