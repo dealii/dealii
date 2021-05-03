@@ -675,7 +675,7 @@ namespace Step66
         additional_data.mapping_update_flags =
           (update_values | update_gradients | update_JxW_values |
            update_quadrature_points);
-        additional_data.level_mg_handler = level;
+        additional_data.mg_level = level;
         std::shared_ptr<MatrixFree<dim, float>> mg_mf_storage_level(
           new MatrixFree<dim, float>());
         mg_mf_storage_level->reinit(dof_handler,
@@ -1024,9 +1024,8 @@ namespace Step66
     {
       const unsigned int n_ranks =
         Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-      const unsigned int n_vect_doubles =
-        VectorizedArray<double>::n_array_elements;
-      const unsigned int n_vect_bits = 8 * sizeof(double) * n_vect_doubles;
+      const unsigned int n_vect_doubles = VectorizedArray<double>::size();
+      const unsigned int n_vect_bits    = 8 * sizeof(double) * n_vect_doubles;
 
       std::string DAT_header = "START DATE: " + Utilities::System::get_date() +
                                ", TIME: " + Utilities::System::get_time();
