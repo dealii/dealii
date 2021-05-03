@@ -203,7 +203,8 @@ namespace Step66
     for (unsigned int cell = 0; cell < n_cells; ++cell)
       {
         phi.reinit(cell);
-        phi.gather_evaluate(src, true, false);
+        phi.read_dof_values_plain(src);
+        phi.evaluate(true, false);
 
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           nonlinear_values(cell, q) = std::exp(phi.get_value(q));
