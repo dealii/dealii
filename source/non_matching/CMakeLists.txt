@@ -16,11 +16,13 @@
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_src
+  quadrature_generator.cc
   coupling.cc
   immersed_surface_quadrature.cc
   )
 
 SET(_inst
+  quadrature_generator.inst.in
   coupling.inst.in
   )
 

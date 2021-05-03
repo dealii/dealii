@@ -1,0 +1,33 @@
+
+DEAL::test_cut_through_center
+DEAL::
+DEAL::Negative
+DEAL::0.500000, 0.105662, 0.250000
+DEAL::0.500000, 0.394338, 0.250000
+DEAL::Positive
+DEAL::0.500000, 0.605662, 0.250000
+DEAL::0.500000, 0.894338, 0.250000
+DEAL::Indefinite
+DEAL::Surface
+DEAL::0.500000, 0.500000, 1.00000, 0.00000, 1.00000
+DEAL::
+DEAL::test_missed_roots_on_bottom_face
+DEAL::
+DEAL::Negative
+DEAL::Positive
+DEAL::0.500000, 0.211325, 0.500000
+DEAL::0.500000, 0.788675, 0.500000
+DEAL::Indefinite
+DEAL::Surface
+DEAL::0.500000, 0.00000, 1.00000, 0.00000, 1.00000
+DEAL::
+DEAL::test_missed_roots_on_top_face
+DEAL::
+DEAL::Negative
+DEAL::0.500000, 0.211325, 0.500000
+DEAL::0.500000, 0.788675, 0.500000
+DEAL::Positive
+DEAL::Indefinite
+DEAL::Surface
+DEAL::0.500000, 1.00000, 1.00000, 0.00000, 1.00000
+DEAL::

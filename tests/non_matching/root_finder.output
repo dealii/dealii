@@ -1,0 +1,6 @@
+
+DEAL::test_roots_sorted_not_duplicated
+DEAL::0.250000, 0.750000
+DEAL::
+DEAL::test_find_both_roots
+DEAL::0.250000, 0.750000
