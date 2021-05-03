@@ -374,18 +374,7 @@ namespace internal
     TriaObjects::n_objects() const
     {
       // assume that each cell has the same number of faces
-
-      unsigned int faces_per_cell = 1;
-
-      if (this->structdim == 1)
-        faces_per_cell = GeometryInfo<1>::faces_per_cell;
-      else if (this->structdim == 2)
-        faces_per_cell = GeometryInfo<2>::faces_per_cell;
-      else if (this->structdim == 3)
-        faces_per_cell = GeometryInfo<3>::faces_per_cell;
-      else
-        AssertThrow(false, ExcNotImplemented());
-
+      const unsigned int faces_per_cell = 2 * this->structdim;
       return cells.size() / faces_per_cell;
     }
 
@@ -395,18 +384,7 @@ namespace internal
     TriaObjects::get_bounding_object_indices(const unsigned int index)
     {
       // assume that each cell has the same number of faces
-
-      unsigned int faces_per_cell = 1;
-
-      if (this->structdim == 1)
-        faces_per_cell = GeometryInfo<1>::faces_per_cell;
-      else if (this->structdim == 2)
-        faces_per_cell = GeometryInfo<2>::faces_per_cell;
-      else if (this->structdim == 3)
-        faces_per_cell = GeometryInfo<3>::faces_per_cell;
-      else
-        AssertThrow(false, ExcNotImplemented());
-
+      const unsigned int faces_per_cell = 2 * this->structdim;
       return ArrayView<int>(cells.data() + index * faces_per_cell,
                             faces_per_cell);
     }
